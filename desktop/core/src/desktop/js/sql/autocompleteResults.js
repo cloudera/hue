@@ -551,6 +551,7 @@ class AutocompleteResults {
         sourceType: self.dialect(),
         namespace: self.snippet.namespace(),
         compute: self.snippet.compute(),
+        connector: self.snippet.connector(),
         path: [],
         temporaryOnly: self.temporaryOnly
       })
@@ -812,6 +813,7 @@ class AutocompleteResults {
             sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
+            connector: self.snippet.connector(),
             path: [database],
             temporaryOnly: self.temporaryOnly
           })
@@ -1413,6 +1415,7 @@ class AutocompleteResults {
             sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
+            connector: self.snippet.connector(),
             paths: paths
           })
           .done(multiTableEntry => {
@@ -1533,6 +1536,7 @@ class AutocompleteResults {
             sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
+            connector: self.snippet.connector(),
             paths: paths
           })
           .done(multiTableEntry => {
@@ -1622,6 +1626,7 @@ class AutocompleteResults {
             sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
+            connector: self.snippet.connector(),
             paths: paths
           })
           .done(multiTableEntry => {
@@ -1737,7 +1742,7 @@ class AutocompleteResults {
 
     self.cancellablePromises.push(
       dataCatalog
-        .getCatalog(self.dialect())
+        .getCatalog(self.dialect(), self.snippet.connector())
         .loadOptimizerPopularityForTables({
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
@@ -1851,6 +1856,7 @@ class AutocompleteResults {
             sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
+            connector: self.snippet.connector(),
             paths: paths
           })
           .done(multiTableEntry => {
@@ -1942,6 +1948,7 @@ class AutocompleteResults {
           sourceType: self.dialect(),
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
+          connector: self.snippet.connector(),
           path: [db],
           temporaryOnly: self.temporaryOnly
         })
@@ -2026,7 +2033,7 @@ class AutocompleteResults {
 
       self.cancellablePromises.push(
         dataCatalog
-          .getCatalog(self.dialect())
+          .getCatalog(self.dialect(), self.snippet.connector())
           .loadOptimizerPopularityForTables({
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
@@ -2253,6 +2260,7 @@ class AutocompleteResults {
           sourceType: self.dialect(),
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
+          connector: self.snippet.connector(),
           path: fetchedPath,
           temporaryOnly: self.temporaryOnly
         })
@@ -2299,6 +2307,7 @@ class AutocompleteResults {
           sourceType: self.dialect(),
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
+          connector: self.snippet.connector(),
           path: [],
           temporaryOnly: self.temporaryOnly
         })

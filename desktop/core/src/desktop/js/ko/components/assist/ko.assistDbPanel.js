@@ -23,7 +23,7 @@ import componentUtils from 'ko/components/componentUtils';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from '../../../utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 const ASSIST_TABLE_TEMPLATES = `
   <script type="text/html" id="assist-no-database-entries">
@@ -649,6 +649,7 @@ class AssistDbPanel {
                 sourceType: 'solr',
                 namespace: assistDbNamespace.namespace,
                 compute: assistDbNamespace.compute(),
+                connector: {},
                 path: []
               })
               .done(entry => {
@@ -874,6 +875,7 @@ class AssistDbPanel {
                   i18n: self.i18n,
                   type: interpreter.type,
                   name: interpreter.name,
+                  connector: interpreter,
                   nonSqlType: false,
                   navigationSettings: navigationSettings
                 });

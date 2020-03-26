@@ -179,6 +179,14 @@ class Snippet {
       self.status('ready');
     });
 
+    self.connector = ko.pureComputed(() => {
+      // To support optimizer changes in editor v2
+      if (self.type() === 'hive' || self.type() === 'impala') {
+        return { optimizer: 'api' };
+      }
+      return {};
+    });
+
     self.isBatchable = ko.computed(() => {
       return (
         self.type() == 'hive' ||
@@ -1052,6 +1060,7 @@ class Snippet {
                 sourceType: self.type(),
                 namespace: self.namespace(),
                 compute: self.compute(),
+                connector: self.connector(),
                 path: path
               })
               .done(entry => {

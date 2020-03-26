@@ -276,6 +276,7 @@ class HistoryPanel {
                       sourceType: snippet.type(),
                       namespace: snippet.namespace(),
                       compute: snippet.compute(),
+                      connector: snippet.connector(),
                       path: []
                     })
                     .done(entry => {

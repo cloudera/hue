@@ -933,12 +933,17 @@ class SqlContextContentsGlobalSearch {
 
     if (self.isCatalogEntry) {
       contextCatalog.getNamespaces({ sourceType: sourceType }).done(context => {
-        // TODO: Namespace and compute selection for global search results?
+        // TODO: Connector, Namespace and compute selection for global search results?
+        const connector = {}; // TODO: Add connector to global search
+        if (sourceType === 'hive' || sourceType === 'impala') {
+          connector.optimizer = 'api';
+        }
         dataCatalog
           .getEntry({
             sourceType: sourceType,
             namespace: context.namespaces[0],
             compute: context.namespaces[0].computes[0],
+            connector: connector,
             path: path,
             definition: { type: params.data.type.toLowerCase() }
           })

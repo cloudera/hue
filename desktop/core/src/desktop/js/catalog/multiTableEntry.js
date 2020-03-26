@@ -17,12 +17,7 @@
 import $ from 'jquery';
 
 import catalogUtils from 'catalog/catalogUtils';
-import {
-  fetchTopAggs,
-  fetchTopColumns,
-  fetchTopFilters,
-  fetchTopJoins
-} from './optimizer/optimizerApiHelper';
+import { getOptimizer } from './optimizer/optimizer';
 
 /**
  * Helper function to reload a Optimizer multi table attribute, like topAggs or topFilters
@@ -185,8 +180,13 @@ class MultiTableEntry {
    * @return {CancellablePromise}
    */
   getTopAggs(options) {
-    const self = this;
-    return genericOptimizerGet(self, options, 'topAggsPromise', 'topAggs', fetchTopAggs);
+    return genericOptimizerGet(
+      this,
+      options,
+      'topAggsPromise',
+      'topAggs',
+      getOptimizer(this.dataCatalog.connector).fetchTopAggs
+    );
   }
 
   /**
@@ -201,8 +201,13 @@ class MultiTableEntry {
    * @return {CancellablePromise}
    */
   getTopColumns(options) {
-    const self = this;
-    return genericOptimizerGet(self, options, 'topColumnsPromise', 'topColumns', fetchTopColumns);
+    return genericOptimizerGet(
+      this,
+      options,
+      'topColumnsPromise',
+      'topColumns',
+      getOptimizer(this.dataCatalog.connector).fetchTopColumns
+    );
   }
 
   /**
@@ -217,8 +222,13 @@ class MultiTableEntry {
    * @return {CancellablePromise}
    */
   getTopFilters(options) {
-    const self = this;
-    return genericOptimizerGet(self, options, 'topFiltersPromise', 'topFilters', fetchTopFilters);
+    return genericOptimizerGet(
+      this,
+      options,
+      'topFiltersPromise',
+      'topFilters',
+      getOptimizer(this.dataCatalog.connector).fetchTopFilters
+    );
   }
 
   /**
@@ -233,8 +243,13 @@ class MultiTableEntry {
    * @return {CancellablePromise}
    */
   getTopJoins(options) {
-    const self = this;
-    return genericOptimizerGet(self, options, 'topJoinsPromise', 'topJoins', fetchTopJoins);
+    return genericOptimizerGet(
+      this,
+      options,
+      'topJoinsPromise',
+      'topJoins',
+      getOptimizer(this.dataCatalog.connector).fetchTopJoins
+    );
   }
 }
 

@@ -61,6 +61,7 @@ class DataCatalogContext {
                 .dataCatalog.getEntry({
                   namespace: self.catalogEntry().namespace,
                   compute: self.catalogEntry().compute,
+                  connector: self.catalogEntry().connector,
                   path: this.path,
                   temporaryOnly: self.catalogEntry().isTemporary
                 })

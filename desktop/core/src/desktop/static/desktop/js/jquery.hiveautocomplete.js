@@ -279,10 +279,13 @@
       })
     };
 
+    // TODO: Use connector for hive autocomplete
+    const connector = {};
+
     self.getTables = function (database, callback) {
       var self = this;
       $.when(self.namespaceDeferred, self.computeDeferred).done(function (namespace, compute) {
-        dataCatalog.getEntry({ sourceType: self.options.apiHelperType, namespace: namespace, compute: compute, path: [ database ] }).done(function (entry) {
+        dataCatalog.getEntry({ sourceType: self.options.apiHelperType, connector: connector, namespace: namespace, compute: compute, path: [ database ] }).done(function (entry) {
           entry.getSourceMeta().done(callback)
         });
       });
@@ -291,7 +294,7 @@
     self.getColumns = function (database, table, callback) {
       var self = this;
       $.when(self.namespaceDeferred, self.computeDeferred).done(function (namespace, compute) {
-        dataCatalog.getEntry({ sourceType: self.options.apiHelperType, namespace: namespace, compute: compute, path: [ database, table ] }).done(function (entry) {
+        dataCatalog.getEntry({ sourceType: self.options.apiHelperType, connector: connector, namespace: namespace, compute: compute, path: [ database, table ] }).done(function (entry) {
           entry.getSourceMeta().done(callback)
         });
       });

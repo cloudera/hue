@@ -403,6 +403,7 @@ HueContextSelector.prototype.reloadDatabases = function() {
   const self = this;
   if (self.database && !self.hideDatabases) {
     self.loadingDatabases(true);
+    const connector = {}; // TODO: Add connectors to the context selector
     $.when(self[TYPES_INDEX.namespace.lastPromise], self[TYPES_INDEX.compute.lastPromise]).done(
       () => {
         window.clearTimeout(self.reloadDatabaseThrottle);
@@ -417,6 +418,7 @@ HueContextSelector.prototype.reloadDatabases = function() {
               sourceType: ko.unwrap(self.sourceType),
               namespace: self[TYPES_INDEX.namespace.name](),
               compute: self[TYPES_INDEX.compute.name](),
+              connector: connector,
               path: [],
               definition: { type: 'source' }
             })
