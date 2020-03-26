@@ -50,11 +50,37 @@ class TestRunAsyncQueryTask():
       with patch('notebook.tasks.get_api') as get_api:
         with patch('notebook.tasks.DataAdapter') as DataAdapter:
           with patch('notebook.tasks.export_csvxls.create_generator') as create_generator:
+            with patch('notebook.tasks.caches') as caches:
 
-            DataAdapter.return_value = MagicMock(row_counter=2)
+              content_generator = MagicMock(row_counter=2)
+              content_generator.__iter__.return_value = [('col1', [[1]]), ('col2', [[2]])]
+              DataAdapter.return_value = content_generator
 
-            get_api.return_value = Mock(
-              check_status=Mock(return_value={'status': 0})
+              get_api.return_value = Mock(
+                check_status=Mock(return_value={'status': 0})
+              )
+
+              def notebook_dict(key):
+                return {
+                  'uuid': '1ca47e0d-4708-4709-82c1-a9280e15452b',
+                }.get(key, Mock())
+              notebook = MagicMock()
+              notebook.__getitem__.side_effect = notebook_dict
+              snippet = MagicMock()
+
+              meta = download_to_file(notebook, snippet)
+
+              assert_equal(meta['row_counter'], 2, meta)
+
+
+  def test_close_statement(self):
+    with patch('notebook.tasks._get_request') as _get_request:
+      with patch('notebook.tasks.download_to_file') as download_to_file:
+        with patch('notebook.tasks.close_statement_async') as close_statement_async:
+          with patch('notebook.tasks.caches') as caches:
+
+            download_to_file.AsyncResult.return_value = Mock(
+              state=states.SUCCESS
             )
 
             def notebook_dict(key):
@@ -65,30 +91,9 @@ class TestRunAsyncQueryTask():
             notebook.__getitem__.side_effect = notebook_dict
             snippet = MagicMock()
 
-            meta = download_to_file(notebook, snippet)
+            response = close_statement(notebook, snippet)
 
-            assert_equal(meta['row_counter'], 2, meta)
-
-
-  def test_close_statement(self):
-    with patch('notebook.tasks._get_request') as _get_request:
-      with patch('notebook.tasks.download_to_file') as download_to_file:
-
-        download_to_file.AsyncResult.return_value = Mock(
-          state=states.SUCCESS
-        )
-
-        def notebook_dict(key):
-          return {
-            'uuid': '1ca47e0d-4708-4709-82c1-a9280e15452b',
-          }.get(key, Mock())
-        notebook = MagicMock()
-        notebook.__getitem__.side_effect = notebook_dict
-        snippet = MagicMock()
-
-        response = close_statement(notebook, snippet)
-
-        assert_equal(response, {'status': 0})
+            assert_equal(response, {'status': 0})
 
 
   def test_get_log(self):
