@@ -45,11 +45,7 @@ import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from 'apps/notebook2/components/ko.ex
 import { UPDATE_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
 import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 import { cancelActiveRequest } from 'api/apiUtils';
-import {
-  analyzeCompatibility,
-  analyzeRisk,
-  analyzeSimilarity
-} from 'catalog/optimizer/optimizerApiHelper';
+import { getOptimizer } from 'catalog/optimizer/optimizer';
 
 // TODO: Remove for ENABLE_NOTEBOOK_2. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
@@ -915,10 +911,11 @@ export default class Snippet {
           return true;
         });
         if (unknownResponse) {
-          lastComplexityRequest = analyzeRisk({
-            notebookJson: await this.parentNotebook.toContextJson(),
-            snippetJson: this.toContextJson()
-          })
+          lastComplexityRequest = getOptimizer(this.connector())
+            .analyzeRisk({
+              notebookJson: await this.parentNotebook.toContextJson(),
+              snippetJson: this.toContextJson()
+            })
             .then(data => {
               knownResponses.unshift({
                 hash: hash,
@@ -1220,18 +1217,20 @@ export default class Snippet {
   async getSimilarQueries() {
     hueAnalytics.log('notebook', 'get_query_similarity');
 
-    analyzeSimilarity({
-      notebookJson: await this.parentNotebook.toContextJson(),
-      snippetJson: this.toContextJson(),
-      sourcePlatform: this.dialect()
-    }).then(data => {
-      if (data.status === 0) {
-        // eslint-disable-next-line no-restricted-syntax
-        console.log(data.statement_similarity);
-      } else {
-        $(document).trigger('error', data.message);
-      }
-    });
+    getOptimizer(this.connector())
+      .analyzeSimilarity({
+        notebookJson: await this.parentNotebook.toContextJson(),
+        snippetJson: this.toContextJson(),
+        sourcePlatform: this.dialect()
+      })
+      .then(data => {
+        if (data.status === 0) {
+          // eslint-disable-next-line no-restricted-syntax
+          console.log(data.statement_similarity);
+        } else {
+          $(document).trigger('error', data.message);
+        }
+      });
   }
 
   handleAjaxError(data, callback) {
@@ -1351,12 +1350,13 @@ export default class Snippet {
     this.hasSuggestion(null);
     const positionStatement = this.positionStatement();
 
-    this.lastCompatibilityRequest = analyzeCompatibility({
-      notebookJson: await this.parentNotebook.toContextJson(),
-      snippetJson: this.toContextJson(),
-      sourcePlatform: this.compatibilitySourcePlatform().value,
-      targetPlatform: this.compatibilityTargetPlatform().value
-    })
+    this.lastCompatibilityRequest = getOptimizer(this.connector())
+      .analyzeCompatibility({
+        notebookJson: await this.parentNotebook.toContextJson(),
+        snippetJson: this.toContextJson(),
+        sourcePlatform: this.compatibilitySourcePlatform().value,
+        targetPlatform: this.compatibilityTargetPlatform().value
+      })
       .then(data => {
         if (data.status === 0) {
           this.aceErrorsHolder([]);

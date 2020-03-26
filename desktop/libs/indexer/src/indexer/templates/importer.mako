@@ -1669,6 +1669,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             sourceType: self.sourceType,
             namespace: self.namespace(),
             compute: self.compute(),
+            connector: { type: self.sourceType }, // TODO: Migrate importer to connectors
             name: tableName,
             columns: temporaryColumns,
             sample: self.sample()
@@ -2142,6 +2143,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             dataCatalog.getEntry({
               sourceType: self.sourceType,
               compute: wizard.compute(),
+              connector: {}, // TODO: Use connectors in the importer
               namespace: wizard.namespace(),
               path: self.outputFormat() === 'table' ? [self.databaseName(), self.tableName()] : [],
             }).done(function (catalogEntry) {
@@ -2854,15 +2856,16 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                   if (!snippet.result.handle().has_more_statements) {
                     if (self.editorVM.selectedNotebook().onSuccessUrl()) {
                       var match = snippet.statement_raw().match(/CREATE TABLE `([^`]+)`/i);
+                      const connector = {} // TODO: Use connector in importer
                       if (match) {
                         var db = match[1];
-                        dataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.namespace(), compute: self.compute(), path: [ db ]}).done(function (dbEntry) {
+                        dataCatalog.getEntry({ sourceType: snippet.type(), connector: connector, namespace: self.namespace(), compute: self.compute(), path: [ db ]}).done(function (dbEntry) {
                           dbEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
                             huePubSub.publish('open.link', self.editorVM.selectedNotebook().onSuccessUrl());
                           })
                         });
                       } else {
-                        dataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.namespace(), compute: self.compute(), path: []}).done(function (sourceEntry) {
+                        dataCatalog.getEntry({ sourceType: snippet.type(), connector: connector, namespace: self.namespace(), compute: self.compute(), path: []}).done(function (sourceEntry) {
                           sourceEntry.clearCache({ silenceErrors: true }).done(function () {
                             huePubSub.publish('open.link', self.editorVM.selectedNotebook().onSuccessUrl());
                           })
