@@ -29,6 +29,7 @@ import Result from 'apps/notebook/result';
 import Session from 'apps/notebook/session';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
 import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistModal';
+import { cancelActiveRequest } from 'api/apiUtils';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -176,6 +177,14 @@ class Snippet {
     );
     self.type.subscribe(newVal => {
       self.status('ready');
+    });
+
+    self.connector = ko.pureComputed(() => {
+      // To support optimizer changes in editor v2
+      if (self.type() === 'hive' || self.type() === 'impala') {
+        return { optimizer: 'api' };
+      }
+      return {};
     });
 
     self.isBatchable = ko.computed(() => {
@@ -370,7 +379,7 @@ class Snippet {
     let lastFetchQueriesRequest = null;
 
     self.fetchQueries = function() {
-      apiHelper.cancelActiveRequest(lastFetchQueriesRequest);
+      cancelActiveRequest(lastFetchQueriesRequest);
 
       const QUERIES_PER_PAGE = 50;
       lastQueriesPage = self.queriesCurrentPage();
@@ -1051,6 +1060,7 @@ class Snippet {
                 sourceType: self.type(),
                 namespace: self.namespace(),
                 compute: self.compute(),
+                connector: self.connector(),
                 path: path
               })
               .done(entry => {
@@ -1501,14 +1511,14 @@ class Snippet {
           return;
         }
 
-        apiHelper.cancelActiveRequest(lastComplexityRequest);
+        cancelActiveRequest(lastComplexityRequest);
 
         hueAnalytics.log('notebook', 'get_query_risk');
         clearActiveRisks();
 
         const changeSubscription = self.statement.subscribe(() => {
           changeSubscription.dispose();
-          apiHelper.cancelActiveRequest(lastComplexityRequest);
+          cancelActiveRequest(lastComplexityRequest);
         });
 
         const hash = self.statement().hashCode();
@@ -2032,7 +2042,7 @@ class Snippet {
     };
 
     self.queryCompatibility = function(targetPlatform) {
-      apiHelper.cancelActiveRequest(lastCompatibilityRequest);
+      cancelActiveRequest(lastCompatibilityRequest);
 
       hueAnalytics.log('notebook', 'compatibility');
       self.compatibilityCheckRunning(targetPlatform != self.type());
@@ -2483,13 +2493,13 @@ class Snippet {
     };
 
     self.clearActiveExecuteRequests = function() {
-      apiHelper.cancelActiveRequest(self.lastGetLogsRequest);
+      cancelActiveRequest(self.lastGetLogsRequest);
       if (self.getLogsTimeout !== null) {
         window.clearTimeout(self.getLogsTimeout);
         self.getLogsTimeout = null;
       }
 
-      apiHelper.cancelActiveRequest(self.lastCheckStatusRequest);
+      cancelActiveRequest(self.lastCheckStatusRequest);
       if (self.checkStatusTimeout !== null) {
         window.clearTimeout(self.checkStatusTimeout);
         self.checkStatusTimeout = null;
@@ -2497,7 +2507,7 @@ class Snippet {
     };
 
     self.getLogs = function() {
-      apiHelper.cancelActiveRequest(self.lastGetLogsRequest);
+      cancelActiveRequest(self.lastGetLogsRequest);
 
       self.lastGetLogsRequest = $.post(
         '/notebook/api/get_logs',

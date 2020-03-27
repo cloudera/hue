@@ -20,6 +20,7 @@ import ApiHelper from 'api/apiHelper';
 import SqlExecutable from './sqlExecutable';
 import { EXECUTION_STATUS } from './executable';
 import sessionManager from './sessionManager';
+import * as ApiUtils from 'api/apiUtils';
 
 describe('sqlExecutable.js', () => {
   afterEach(() => {
@@ -70,7 +71,7 @@ describe('sqlExecutable.js', () => {
     const subject = createSubject('SELECT * FROM customers');
 
     const simplePostDeferred = $.Deferred();
-    jest.spyOn(ApiHelper, 'simplePost').mockImplementation(url => {
+    jest.spyOn(ApiUtils, 'simplePost').mockImplementation(url => {
       expect(url).toEqual('/notebook/api/execute/impala');
       return simplePostDeferred;
     });
@@ -100,7 +101,7 @@ describe('sqlExecutable.js', () => {
         })
     );
 
-    jest.spyOn(ApiHelper, 'simplePost').mockImplementation(url => {
+    jest.spyOn(ApiUtils, 'simplePost').mockImplementation(url => {
       expect(url).toEqual('/notebook/api/execute/impala');
       return simplePostDeferred;
     });
@@ -123,7 +124,7 @@ describe('sqlExecutable.js', () => {
 
     const simplePostExeuteDeferred = $.Deferred();
     const simplePostCancelDeferred = $.Deferred();
-    jest.spyOn(ApiHelper, 'simplePost').mockImplementation(url => {
+    jest.spyOn(ApiUtils, 'simplePost').mockImplementation(url => {
       if (url === '/notebook/api/execute/impala') {
         return simplePostExeuteDeferred;
       } else if (url === '/notebook/api/cancel_statement') {

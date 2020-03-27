@@ -26,6 +26,7 @@ import I18n from 'utils/i18n';
 import sqlUtils from 'sql/sqlUtils';
 import { SqlSetOptions, SqlFunctions } from 'sql/sqlFunctions';
 import { DIALECT } from 'apps/notebook2/snippet';
+import { cancelActiveRequest } from 'api/apiUtils';
 
 const normalizedColors = HueColors.getNormalizedColors();
 
@@ -417,7 +418,7 @@ class AutocompleteResults {
     const self = this;
 
     while (self.lastKnownRequests.length) {
-      apiHelper.cancelActiveRequest(self.lastKnownRequests.pop());
+      cancelActiveRequest(self.lastKnownRequests.pop());
     }
 
     while (self.cancellablePromises.length) {
@@ -550,6 +551,7 @@ class AutocompleteResults {
         sourceType: self.dialect(),
         namespace: self.snippet.namespace(),
         compute: self.snippet.compute(),
+        connector: self.snippet.connector(),
         path: [],
         temporaryOnly: self.temporaryOnly
       })
@@ -811,6 +813,7 @@ class AutocompleteResults {
             sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
+            connector: self.snippet.connector(),
             path: [database],
             temporaryOnly: self.temporaryOnly
           })
@@ -1412,6 +1415,7 @@ class AutocompleteResults {
             sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
+            connector: self.snippet.connector(),
             paths: paths
           })
           .done(multiTableEntry => {
@@ -1445,7 +1449,7 @@ class AutocompleteResults {
                         const tableParts = table.split('.');
                         if (!existingTables[tableParts[tableParts.length - 1]]) {
                           tablesAdded = true;
-                          const identifier = self.convertNavOptQualifiedIdentifier(
+                          const identifier = self.convertOptimizerQualifiedIdentifier(
                             table,
                             suggestJoins.tables
                           );
@@ -1469,13 +1473,13 @@ class AutocompleteResults {
                             suggestionString += self.parseResult.lowerCase ? ' and ' : ' AND ';
                           }
                           suggestionString +=
-                            self.convertNavOptQualifiedIdentifier(
+                            self.convertOptimizerQualifiedIdentifier(
                               joinColPair.columns[0],
                               suggestJoins.tables,
                               self.dialect()
                             ) +
                             ' = ' +
-                            self.convertNavOptQualifiedIdentifier(
+                            self.convertOptimizerQualifiedIdentifier(
                               joinColPair.columns[1],
                               suggestJoins.tables,
                               self.dialect()
@@ -1532,6 +1536,7 @@ class AutocompleteResults {
             sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
+            connector: self.snippet.connector(),
             paths: paths
           })
           .done(multiTableEntry => {
@@ -1555,12 +1560,12 @@ class AutocompleteResults {
                             suggestionString += self.parseResult.lowerCase ? ' and ' : ' AND ';
                           }
                           suggestionString +=
-                            self.convertNavOptQualifiedIdentifier(
+                            self.convertOptimizerQualifiedIdentifier(
                               joinColPair.columns[0],
                               suggestJoinConditions.tables
                             ) +
                             ' = ' +
-                            self.convertNavOptQualifiedIdentifier(
+                            self.convertOptimizerQualifiedIdentifier(
                               joinColPair.columns[1],
                               suggestJoinConditions.tables
                             );
@@ -1621,6 +1626,7 @@ class AutocompleteResults {
             sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
+            connector: self.snippet.connector(),
             paths: paths
           })
           .done(multiTableEntry => {
@@ -1717,7 +1723,7 @@ class AutocompleteResults {
     return aggregateFunctionsDeferred;
   }
 
-  handlePopularGroupByOrOrderBy(navOptAttribute, suggestSpec, deferred, columnsDeferred) {
+  handlePopularGroupByOrOrderBy(optimizerAttribute, suggestSpec, deferred, columnsDeferred) {
     const self = this;
     const paths = [];
     suggestSpec.tables.forEach(table => {
@@ -1736,8 +1742,8 @@ class AutocompleteResults {
 
     self.cancellablePromises.push(
       dataCatalog
-        .getCatalog(self.dialect())
-        .loadNavOptPopularityForTables({
+        .getCatalog(self.dialect(), self.snippet.connector())
+        .loadOptimizerPopularityForTables({
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
           paths: paths,
@@ -1753,28 +1759,30 @@ class AutocompleteResults {
             : '';
 
           entries.forEach(entry => {
-            if (entry.navOptPopularity[navOptAttribute]) {
-              totalColumnCount += entry.navOptPopularity[navOptAttribute].columnCount;
+            if (entry.optimizerPopularity[optimizerAttribute]) {
+              totalColumnCount += entry.optimizerPopularity[optimizerAttribute].columnCount;
               matchedEntries.push(entry);
             }
           });
           if (totalColumnCount > 0) {
             const suggestions = [];
             matchedEntries.forEach(entry => {
-              const filterValue = self.createNavOptIdentifierForColumn(
-                entry.navOptPopularity[navOptAttribute],
+              const filterValue = self.createOptimizerIdentifierForColumn(
+                entry.optimizerPopularity[optimizerAttribute],
                 suggestSpec.tables
               );
               suggestions.push({
                 value: prefix + filterValue,
                 filterValue: filterValue,
-                meta: navOptAttribute === 'groupByColumn' ? META_I18n.groupBy : META_I18n.orderBy,
+                meta:
+                  optimizerAttribute === 'groupByColumn' ? META_I18n.groupBy : META_I18n.orderBy,
                 category:
-                  navOptAttribute === 'groupByColumn'
+                  optimizerAttribute === 'groupByColumn'
                     ? CATEGORIES.POPULAR_GROUP_BY
                     : CATEGORIES.POPULAR_ORDER_BY,
                 weightAdjust: Math.round(
-                  (100 * entry.navOptPopularity[navOptAttribute].columnCount) / totalColumnCount
+                  (100 * entry.optimizerPopularity[optimizerAttribute].columnCount) /
+                    totalColumnCount
                 ),
                 popular: ko.observable(true),
                 hasCatalogEntry: false,
@@ -1848,6 +1856,7 @@ class AutocompleteResults {
             sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
+            connector: self.snippet.connector(),
             paths: paths
           })
           .done(multiTableEntry => {
@@ -1871,7 +1880,7 @@ class AutocompleteResults {
                                     ? suggestFilters.prefix.toLowerCase()
                                     : suggestFilters.prefix) + ' '
                                 : '';
-                              compVal += self.createNavOptIdentifier(
+                              compVal += self.createOptimizerIdentifier(
                                 value.tableName,
                                 grp.columnName,
                                 suggestFilters.tables
@@ -1939,20 +1948,21 @@ class AutocompleteResults {
           sourceType: self.dialect(),
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
+          connector: self.snippet.connector(),
           path: [db],
           temporaryOnly: self.temporaryOnly
         })
         .done(entry => {
           self.cancellablePromises.push(
             entry
-              .loadNavOptPopularityForChildren({ silenceErrors: true, cancellable: true })
+              .loadOptimizerPopularityForChildren({ silenceErrors: true, cancellable: true })
               .done(childEntries => {
                 let totalPopularity = 0;
                 const popularityIndex = {};
                 childEntries.forEach(childEntry => {
-                  if (childEntry.navOptPopularity && childEntry.navOptPopularity.popularity) {
+                  if (childEntry.optimizerPopularity && childEntry.optimizerPopularity.popularity) {
                     popularityIndex[childEntry.name] = true;
-                    totalPopularity += childEntry.navOptPopularity.popularity;
+                    totalPopularity += childEntry.optimizerPopularity.popularity;
                   }
                 });
                 if (totalPopularity > 0 && Object.keys(popularityIndex).length) {
@@ -1961,7 +1971,8 @@ class AutocompleteResults {
                       tableSuggestions.forEach(suggestion => {
                         if (popularityIndex[suggestion.details.name]) {
                           suggestion.relativePopularity = Math.round(
-                            (100 * suggestion.details.navOptPopularity.popularity) / totalPopularity
+                            (100 * suggestion.details.optimizerPopularity.popularity) /
+                              totalPopularity
                           );
                           if (suggestion.relativePopularity >= 5) {
                             suggestion.popular(true);
@@ -2022,8 +2033,8 @@ class AutocompleteResults {
 
       self.cancellablePromises.push(
         dataCatalog
-          .getCatalog(self.dialect())
-          .loadNavOptPopularityForTables({
+          .getCatalog(self.dialect(), self.snippet.connector())
+          .loadOptimizerPopularityForTables({
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
             paths: paths,
@@ -2046,7 +2057,10 @@ class AutocompleteResults {
             const popularityIndex = {};
 
             popularEntries.forEach(popularEntry => {
-              if (popularEntry.navOptPopularity && popularEntry.navOptPopularity[valueAttribute]) {
+              if (
+                popularEntry.optimizerPopularity &&
+                popularEntry.optimizerPopularity[valueAttribute]
+              ) {
                 popularityIndex[popularEntry.getQualifiedPath()] = true;
               }
             });
@@ -2067,14 +2081,14 @@ class AutocompleteResults {
                   ) {
                     matchedSuggestions.push(suggestion);
                     totalColumnCount +=
-                      suggestion.details.navOptPopularity[valueAttribute].columnCount;
+                      suggestion.details.optimizerPopularity[valueAttribute].columnCount;
                   }
                 });
                 if (totalColumnCount > 0) {
                   matchedSuggestions.forEach(matchedSuggestion => {
                     matchedSuggestion.relativePopularity = Math.round(
                       (100 *
-                        matchedSuggestion.details.navOptPopularity[valueAttribute].columnCount) /
+                        matchedSuggestion.details.optimizerPopularity[valueAttribute].columnCount) /
                         totalColumnCount
                     );
                     if (matchedSuggestion.relativePopularity >= 5) {
@@ -2094,9 +2108,9 @@ class AutocompleteResults {
     return popularColumnsDeferred;
   }
 
-  createNavOptIdentifier(navOptTableName, navOptColumnName, tables) {
+  createOptimizerIdentifier(optimizerTableName, optimizerColumnName, tables) {
     const self = this;
-    let path = navOptTableName + '.' + navOptColumnName.split('.').pop();
+    let path = optimizerTableName + '.' + optimizerColumnName.split('.').pop();
     for (let i = 0; i < tables.length; i++) {
       let tablePath = '';
       if (tables[i].identifierChain.length === 2) {
@@ -2119,38 +2133,40 @@ class AutocompleteResults {
     return path;
   }
 
-  createNavOptIdentifierForColumn(navOptColumn, tables) {
+  createOptimizerIdentifierForColumn(optimizerColumn, tables) {
     const self = this;
     for (let i = 0; i < tables.length; i++) {
       if (
-        navOptColumn.dbName &&
-        (navOptColumn.dbName !== self.activeDatabase ||
-          navOptColumn.dbName !== tables[i].identifierChain[0].name)
+        optimizerColumn.dbName &&
+        (optimizerColumn.dbName !== self.activeDatabase ||
+          optimizerColumn.dbName !== tables[i].identifierChain[0].name)
       ) {
         continue;
       }
       if (
-        navOptColumn.tableName &&
+        optimizerColumn.tableName &&
         hueUtils.equalIgnoreCase(
-          navOptColumn.tableName,
+          optimizerColumn.tableName,
           tables[i].identifierChain[tables[i].identifierChain.length - 1].name
         ) &&
         tables[i].alias
       ) {
-        return tables[i].alias + '.' + navOptColumn.columnName;
+        return tables[i].alias + '.' + optimizerColumn.columnName;
       }
     }
 
-    if (navOptColumn.dbName && navOptColumn.dbName !== self.activeDatabase) {
-      return navOptColumn.dbName + '.' + navOptColumn.tableName + '.' + navOptColumn.columnName;
+    if (optimizerColumn.dbName && optimizerColumn.dbName !== self.activeDatabase) {
+      return (
+        optimizerColumn.dbName + '.' + optimizerColumn.tableName + '.' + optimizerColumn.columnName
+      );
     }
     if (tables.length > 1) {
-      return navOptColumn.tableName + '.' + navOptColumn.columnName;
+      return optimizerColumn.tableName + '.' + optimizerColumn.columnName;
     }
-    return navOptColumn.columnName;
+    return optimizerColumn.columnName;
   }
 
-  convertNavOptQualifiedIdentifier(qualifiedIdentifier, tables, type) {
+  convertOptimizerQualifiedIdentifier(qualifiedIdentifier, tables, type) {
     const self = this;
     const aliases = [];
     let tablesHasDefaultDatabase = false;
@@ -2244,6 +2260,7 @@ class AutocompleteResults {
           sourceType: self.dialect(),
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
+          connector: self.snippet.connector(),
           path: fetchedPath,
           temporaryOnly: self.temporaryOnly
         })
@@ -2290,6 +2307,7 @@ class AutocompleteResults {
           sourceType: self.dialect(),
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
+          connector: self.snippet.connector(),
           path: [],
           temporaryOnly: self.temporaryOnly
         })

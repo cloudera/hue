@@ -211,7 +211,7 @@ def _execute_notebook(request, notebook, snippet):
 @require_POST
 @check_document_access_permission
 @api_error_handler
-def execute(request, engine=None):
+def execute(request, dialect=None):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
@@ -412,6 +412,9 @@ def get_logs(request):
   operation_id = request.POST.get('operationId')
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
+
+  if operation_id:
+    notebook['uuid'] = operation_id
 
   startFrom = request.POST.get('from')
   startFrom = int(startFrom) if startFrom else None
@@ -665,7 +668,10 @@ def close_statement(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = None
-  operation_id = request.POST.get('operationId') or notebook['uuid']
+  operation_id = request.POST.get('operationId')
+
+  if operation_id and not notebook.get('uuid'):
+    notebook['uuid'] = operation_id
 
   snippet = _get_snippet(request.user, notebook, snippet, operation_id)
 

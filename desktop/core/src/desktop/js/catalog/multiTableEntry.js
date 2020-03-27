@@ -17,26 +17,27 @@
 import $ from 'jquery';
 
 import catalogUtils from 'catalog/catalogUtils';
+import { getOptimizer } from './optimizer/optimizer';
 
 /**
- * Helper function to reload a NavOpt multi table attribute, like topAggs or topFilters
+ * Helper function to reload a Optimizer multi table attribute, like topAggs or topFilters
  *
  * @param {MultiTableEntry} multiTableEntry
  * @param {Object} [options]
  * @param {boolean} [options.silenceErrors] - Default true
  * @param {string} promiseAttribute
  * @param {string} dataAttribute
- * @param {string} apiHelperFunction
+ * @param {Function} apiHelperFunction
  * @return {CancellablePromise}
  */
-const genericNavOptReload = function(
+const genericOptimizerReload = function(
   multiTableEntry,
   options,
   promiseAttribute,
   dataAttribute,
   apiHelperFunction
 ) {
-  if (multiTableEntry.dataCatalog.canHaveNavOptMetadata()) {
+  if (multiTableEntry.dataCatalog.canHaveOptimizerMeta()) {
     return multiTableEntry.trackedPromise(
       promiseAttribute,
       catalogUtils.fetchAndSave(apiHelperFunction, dataAttribute, multiTableEntry, options)
@@ -47,7 +48,7 @@ const genericNavOptReload = function(
 };
 
 /**
- * Helper function to get a NavOpt multi table attribute, like topAggs or topFilters
+ * Helper function to get a Optimizer multi table attribute, like topAggs or topFilters
  *
  * @param {MultiTableEntry} multiTableEntry
  * @param {Object} [options]
@@ -57,10 +58,10 @@ const genericNavOptReload = function(
  * @param {boolean} [options.cancellable] - Default false
  * @param {string} promiseAttribute
  * @param {string} dataAttribute
- * @param {string} apiHelperFunction
+ * @param {Function} apiHelperFunction
  * @return {CancellablePromise}
  */
-const genericNavOptGet = function(
+const genericOptimizerGet = function(
   multiTableEntry,
   options,
   promiseAttribute,
@@ -77,7 +78,7 @@ const genericNavOptGet = function(
   }
   if (options && options.refreshCache) {
     return catalogUtils.applyCancellable(
-      genericNavOptReload(
+      genericOptimizerReload(
         multiTableEntry,
         options,
         promiseAttribute,
@@ -89,7 +90,7 @@ const genericNavOptGet = function(
   }
   return catalogUtils.applyCancellable(
     multiTableEntry[promiseAttribute] ||
-      genericNavOptReload(
+      genericOptimizerReload(
         multiTableEntry,
         options,
         promiseAttribute,
@@ -179,8 +180,13 @@ class MultiTableEntry {
    * @return {CancellablePromise}
    */
   getTopAggs(options) {
-    const self = this;
-    return genericNavOptGet(self, options, 'topAggsPromise', 'topAggs', 'fetchNavOptTopAggs');
+    return genericOptimizerGet(
+      this,
+      options,
+      'topAggsPromise',
+      'topAggs',
+      getOptimizer(this.dataCatalog.connector).fetchTopAggs
+    );
   }
 
   /**
@@ -195,13 +201,12 @@ class MultiTableEntry {
    * @return {CancellablePromise}
    */
   getTopColumns(options) {
-    const self = this;
-    return genericNavOptGet(
-      self,
+    return genericOptimizerGet(
+      this,
       options,
       'topColumnsPromise',
       'topColumns',
-      'fetchNavOptTopColumns'
+      getOptimizer(this.dataCatalog.connector).fetchTopColumns
     );
   }
 
@@ -217,13 +222,12 @@ class MultiTableEntry {
    * @return {CancellablePromise}
    */
   getTopFilters(options) {
-    const self = this;
-    return genericNavOptGet(
-      self,
+    return genericOptimizerGet(
+      this,
       options,
       'topFiltersPromise',
       'topFilters',
-      'fetchNavOptTopFilters'
+      getOptimizer(this.dataCatalog.connector).fetchTopFilters
     );
   }
 
@@ -239,8 +243,13 @@ class MultiTableEntry {
    * @return {CancellablePromise}
    */
   getTopJoins(options) {
-    const self = this;
-    return genericNavOptGet(self, options, 'topJoinsPromise', 'topJoins', 'fetchNavOptTopJoins');
+    return genericOptimizerGet(
+      this,
+      options,
+      'topJoinsPromise',
+      'topJoins',
+      getOptimizer(this.dataCatalog.connector).fetchTopJoins
+    );
   }
 }
 

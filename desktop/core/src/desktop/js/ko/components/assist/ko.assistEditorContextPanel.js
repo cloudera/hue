@@ -423,6 +423,7 @@ class AssistEditorContextPanel {
                     sourceType: activeLocations.type,
                     namespace: activeLocations.namespace,
                     compute: activeLocations.compute,
+                    connector: {}, // TODO: User connectors in assist editor context panel
                     path: [database],
                     definition: { type: 'database' }
                   })
@@ -503,6 +504,7 @@ class AssistEditorContextPanel {
                                   sourceType: activeLocations.type,
                                   namespace: activeLocations.namespace,
                                   compute: activeLocations.compute,
+                                  connector: {}, // TODO: Use connectors in assist editor context panel
                                   path: []
                                 })
                                 .done(sourceEntry => {

@@ -348,6 +348,7 @@ Plugin.prototype.init = function() {
           sourceType: self.options.apiHelperType,
           namespace: namespace,
           compute: compute,
+          connector: {},
           path: [database]
         })
         .done(entry => {
@@ -364,6 +365,7 @@ Plugin.prototype.init = function() {
           sourceType: self.options.apiHelperType,
           namespace: namespace,
           compute: compute,
+          connector: {},
           path: [database, table]
         })
         .done(entry => {

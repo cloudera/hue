@@ -153,10 +153,10 @@ class MetastoreDatabase {
         if (optimizerEnabled) {
           this.loadingTablePopularity(true);
           this.catalogEntry
-            .loadNavOptPopularityForChildren()
+            .loadOptimizerPopularityForChildren()
             .done(() => {
               this.tables().forEach(table => {
-                table.optimizerStats(table.catalogEntry.navOptPopularity);
+                table.optimizerStats(table.catalogEntry.optimizerPopularity);
               });
             })
             .always(() => {
