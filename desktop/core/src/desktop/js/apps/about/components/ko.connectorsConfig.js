@@ -28,12 +28,12 @@ export const NAME = 'connectors-config';
 const TEMPLATE = `
 <script type="text/html" id="installed-connectors-page">
   <div class="row-fluid">
-    <a href="javascript:void(0)" data-bind="click: $root.addNewConnector">
+    <a href="javascript:void(0)" data-bind="click: addNewConnector">
       + Connector
     </a>
   </div>
 
-  <div data-bind="template: { name: 'connectors-page', data: $root.instances() }"></div>
+  <div data-bind="template: { name: 'connectors-page', data: instances() }"></div>
 
 </script>
 
@@ -43,7 +43,7 @@ const TEMPLATE = `
     Add a Connector
   </div>
 
-  <div data-bind="template: { name: 'connectors-page', data: $root.connectors() }"></div>
+  <div data-bind="template: { name: 'connectors-page', data: connectors() }"></div>
 
 </script>
 
@@ -55,12 +55,12 @@ const TEMPLATE = `
       <div class="span2">
         <div data-bind="dockable: { scrollable: ${ window.MAIN_SCROLLABLE }, jumpCorrection: 0, topSnap: '${ window.BANNER_TOP_HTML ? '78px' : '50px' }', triggerAdjust: 0 }">
           <ul class="nav nav-pills nav-stacked">
-            <li data-bind="css: { 'active': $root.selectedConnectorCategory() === 'All' }">
-              <a href="javascript:void(0)" data-bind="text: 'All', click: function(){ $root.selectedConnectorCategory('All') }"></a>
+            <li data-bind="css: { 'active': $parent.selectedConnectorCategory() === 'All' }">
+              <a href="javascript:void(0)" data-bind="text: 'All', click: function() { $parent.selectedConnectorCategory('All') }"></a>
             </li>
-            <!-- ko foreach: $root.categories -->
-            <li data-bind="css: { 'active': $root.selectedConnectorCategory() === type }">
-              <a href="javascript:void(0)" data-bind="text: name, click: function(){ $root.selectedConnectorCategory(type) }"></a>
+            <!-- ko foreach: $parent.categories -->
+            <li data-bind="css: { 'active': $parents[1].selectedConnectorCategory() === type }">
+              <a href="javascript:void(0)" data-bind="text: name, click: function(){ $parents[1].selectedConnectorCategory(type) }"></a>
             </li>
             <!-- /ko -->
           </ul>
@@ -74,12 +74,12 @@ const TEMPLATE = `
               <i class="fa fa-question-circle"></i> ${ I18n('Help') }
             </a>
           </span>
-          <input type="text" data-bind="clearable: $root.connectorsFilter, valueUpdate: 'afterkeydown'"
+          <input type="text" data-bind="clearable: $parent.connectorsFilter, valueUpdate: 'afterkeydown'"
               class="input-xlarge pull-right margin-bottom-10" placeholder="${ I18n('Filter...') }">
         </div>
 
         <div class="margin-top-10">
-          <div data-bind="foreach: $root.filteredConnectors()">
+          <div data-bind="foreach: $parent.filteredConnectors()">
             <h4 data-bind="text: category_name"></h4>
             <table class="table table-condensed">
               <thead>
@@ -90,7 +90,7 @@ const TEMPLATE = `
               </thead>
               <!-- ko if: $data.values.length > 0 -->
               <tbody data-bind="foreach: values">
-                <tr data-bind="click: $root.editConnector">
+                <tr data-bind="click: $parents[1].editConnector">
                   <td data-bind="text: nice_name"></td>
                   <td data-bind="text: description"></td>
                 </tr>
@@ -101,8 +101,8 @@ const TEMPLATE = `
                 <tr>
                   <td colspan="2">
                     ${ I18n('No connectors') }
-                    <!-- ko if: $root.section() == 'installed-connectors-page' -->
-                      <a href="javascript:void(0)" data-bind="click: function() { $root.selectedConnectorCategory($data.category); $root.addNewConnector(); }">
+                    <!-- ko if: $parent.section() == 'installed-connectors-page' -->
+                      <a href="javascript:void(0)" data-bind="click: function() { $parent.selectedConnectorCategory($data.category); $parent.addNewConnector(); }">
                         ${ I18n('Add one ?') }
                       </a>
                     <!-- /ko -->
@@ -113,7 +113,7 @@ const TEMPLATE = `
             </table>
           </div>
 
-          <!-- ko if: $root.filteredConnectors().length == 0 -->
+          <!-- ko if: $parent.filteredConnectors().length == 0 -->
           <table class="table table-condensed">
             <thead>
               <tr>
@@ -125,8 +125,8 @@ const TEMPLATE = `
               <tr>
                 <td colspan="2">
                   ${ I18n('No connectors') }
-                  <!-- ko if: $root.section() == 'installed-connectors-page' -->
-                    <a href="javascript:void(0)" data-bind="click: function() { $root.selectedConnectorCategory($data.category); $root.addNewConnector(); }">
+                  <!-- ko if: $parent.section() == 'installed-connectors-page' -->
+                    <a href="javascript:void(0)" data-bind="click: function() { $parent.selectedConnectorCategory($data.category); $parent.addNewConnector(); }">
                       ${ I18n('Add one ?') }
                     </a>
                   <!-- /ko -->
@@ -149,30 +149,30 @@ const TEMPLATE = `
     <!-- ko if: typeof id != 'undefined' -->
       <!-- ko if: id -->
         (<span data-bind="text: name"></span>)
-        <a href="javascript:void(0)" data-bind="click: $root.updateConnector">
+        <a href="javascript:void(0)" data-bind="click: $parent.updateConnector">
           ${ I18n('Update') }
         </a>
-        <a href="javascript:void(0)" data-bind="click: $root.deleteConnector">
+        <a href="javascript:void(0)" data-bind="click: $parent.deleteConnector">
           ${ I18n('Delete') }
         </a>
       <!-- /ko -->
       <!-- ko ifnot: id -->
-        <a href="javascript:void(0)" data-bind="click: $root.updateConnector">
+        <a href="javascript:void(0)" data-bind="click: $parent.updateConnector">
           ${ I18n('Save') }
         </a>
-        <a href="javascript:void(0)" data-bind="click: function() { $root.section('add-connector-page'); }">
+        <a href="javascript:void(0)" data-bind="click: function() { $parent.section('add-connector-page'); }">
           ${ I18n('Cancel') }
         </a>
       <!-- /ko -->
     <!-- /ko -->
-    <a href="javascript:void(0)" data-bind="click: $root.testConnector">
+    <a href="javascript:void(0)" data-bind="click: $parent.testConnector">
       ${ I18n('Test connection') }
     </a>
     <span>
-      <i class="fa fa-question" data-bind="visible: !$root.testConnectionExecuted()"></i>
-      <i class="fa fa-check" data-bind="visible: $root.testConnectionExecuted() && $root.testConnectionErrors().length == 0"></i>
-      <i class="fa fa-exclamation" data-bind="visible: $root.testConnectionExecuted() && $root.testConnectionErrors().length != 0"></i>
-      <span data-bind="visible: $root.testConnectionExecuted() && $root.testConnectionErrors().length != 0, text: $root.testConnectionErrors">
+      <i class="fa fa-question" data-bind="visible: !$parent.testConnectionExecuted()"></i>
+      <i class="fa fa-check" data-bind="visible: $parent.testConnectionExecuted() && $parent.testConnectionErrors().length"></i>
+      <i class="fa fa-exclamation" data-bind="visible: $parent.testConnectionExecuted() && !$parent.testConnectionErrors().length"></i>
+      <span data-bind="visible: $parent.testConnectionExecuted() && $parent.testConnectionErrors().length, text: $parent.testConnectionErrors">
       </span>
     </span>
     <table class="table table-condensed">
@@ -205,8 +205,8 @@ const TEMPLATE = `
     <div data-bind="template: { name: 'add-connector-page' }"></div>
   <!-- /ko -->
 
-  <!-- ko if: section() === 'connector-page' && $root.instance() -->
-    <div data-bind="template: { name: 'connector-page', data: $root.instance() }"></div>
+  <!-- ko if: section() === 'connector-page' && instance() -->
+    <div data-bind="template: { name: 'connector-page', data: instance() }"></div>
   <!-- /ko -->
 </div>
 `;
