@@ -59,7 +59,7 @@ InsertValuesStatement_EDIT
 
 InsertValuesList
  : ParenthesizedRowValuesList
- | RowValuesList ',' ParenthesizedRowValuesList
+ | InsertValuesList ',' ParenthesizedRowValuesList
  ;
 
 ParenthesizedRowValuesList
