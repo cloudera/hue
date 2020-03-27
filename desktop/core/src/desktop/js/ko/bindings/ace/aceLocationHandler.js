@@ -185,6 +185,7 @@ class AceLocationHandler {
                         sourceType: self.dialect(),
                         namespace: self.snippet.namespace(),
                         compute: self.snippet.compute(),
+                        connector: self.snippet.connector(),
                         temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly,
                         path: $.map(tableChain, identifier => {
                           return identifier.name;

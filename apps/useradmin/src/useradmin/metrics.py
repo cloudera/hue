@@ -38,10 +38,10 @@ def active_users():
   return count
 
 global_registry().gauge_callback(
-    name='users.active',
+    name='users.active.total',
     callback=active_users,
     label='Active Users',
-    description='Number of users that were active in the last hour',
+    description='Number of users that were active in the last hour in all instances',
     numerator='users',
 )
 
@@ -58,7 +58,7 @@ def active_users_per_instance():
   return count
 
 global_registry().gauge_callback(
-    name='users.active.instance',
+    name='users.active',
     callback=active_users_per_instance,
     label='Active Users per Instance',
     description='Number of users that were active in the last hour on specific instance',

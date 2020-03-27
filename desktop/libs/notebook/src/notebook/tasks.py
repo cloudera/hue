@@ -33,7 +33,7 @@ from django.core.files.storage import get_storage_class
 from django.db import transaction
 from django.http import FileResponse, HttpRequest
 
-from beeswax import data_export
+from beeswax.data_export import DataAdapter
 from desktop.auth.backend import rewrite_user
 from desktop.celery import app
 from desktop.conf import TASK_SERVER
@@ -121,7 +121,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
         snippet,
         ExecutionWrapperCallback(notebook['uuid'], meta, f_log)
     )
-    content_generator = data_export.DataAdapter(
+    content_generator = DataAdapter(
         result_wrapper,
         max_rows=max_rows,
         store_data_type_in_header=True
@@ -134,7 +134,8 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
 
     if TASK_SERVER.RESULT_CACHE.get():
       with storage.open(result_key, 'r') as f:
-        csv_reader = csv.reader(f, delimiter=',')
+        delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
+        csv_reader = csv.reader(f, delimiter=delimiter)
         caches[CACHES_CELERY_QUERY_RESULT_KEY].set(result_key, [row for row in csv_reader], 60 * 5)
 
     meta['row_counter'] = content_generator.row_counter
@@ -333,6 +334,7 @@ def progress(notebook, snippet, logs=None, **kwargs):
   info = result.info
   snippet['result']['handle'] = info.get('handle', {}).copy()
   request = _get_request(**kwargs)
+
   api = get_api(request, snippet)
 
   return api.progress(notebook, snippet, logs=logs)
@@ -400,7 +402,8 @@ def _get_data(task_id):
     csv_reader = csv_reader[1:]
   else:
     f = storage.open(result_key)
-    csv_reader = csv.reader(f, delimiter=','.encode('utf-8'))
+    delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
+    csv_reader = csv.reader(f, delimiter=delimiter)
     headers = next(csv_reader, [])
 
   return headers, csv_reader
@@ -446,10 +449,13 @@ def cancel(*args, **kwargs):
 
   return {'status': status}
 
+
 def close_statement(*args, **kwargs):
   notebook = args[0]
   snippet = args[1]
-  result = download_to_file.AsyncResult(notebook['uuid'])
+  task_id = _get_query_key(notebook, snippet)
+
+  result = download_to_file.AsyncResult(task_id)
   state = result.state
   status = 0
 
@@ -466,12 +472,16 @@ def close_statement(*args, **kwargs):
     close_statement_async.apply_async(args=args, kwargs=kwargs, task_id=_close_statement_async_id(notebook, snippet))
 
   result.forget()
+
   _cleanup(notebook, snippet)
 
   return {'status': status}
 
+
 def _cleanup(notebook, snippet):
-  storage.delete(_result_key(notebook, snippet)) # TODO: abstract storage + caches
+  task_id = _get_query_key(notebook, snippet)
+
+  storage.delete(_result_key(task_id))  # TODO: abstract storage + caches
   storage.delete(_log_key(notebook, snippet))
   caches[CACHES_CELERY_KEY].delete(_fetch_progress_key(notebook, snippet))
 

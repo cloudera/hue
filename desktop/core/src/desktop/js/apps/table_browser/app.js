@@ -138,12 +138,18 @@ huePubSub.subscribe('app.dom.loaded', app => {
   huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
   huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
 
+  // TODO: Use connectors in the table browser
+  const connector = {};
+  if (viewModel.source().type === 'hive' || viewModel.source().type === 'impala') {
+    connector.optimizer = 'api';
+  }
   if (location.getParameter('refresh') === 'true') {
     dataCatalog
       .getEntry({
         namespace: viewModel.source().namespace().namespace,
         compute: viewModel.source().namespace().compute,
         sourceType: viewModel.source().type,
+        connector: connector,
         path: [],
         definition: { type: 'source' }
       })

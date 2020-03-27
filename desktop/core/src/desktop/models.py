@@ -42,6 +42,7 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED
 from kafka.conf import has_kafka
+from metadata.conf import has_optimizer
 from notebook.conf import DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters
 from useradmin.models import User, Group, get_organization
 from useradmin.organization import _fitered_queryset
@@ -1790,8 +1791,10 @@ class ClusterConfig(object):
           'displayName': interpreter['name'],
           'buttonName': _('Query'),
           'tooltip': _('%s Query') % interpreter['type'].title(),
+          'optimizer': 'api' if has_optimizer() else 'off',  # TODO: Change to proper values
           'page': '/editor/?type=%(type)s' % interpreter,
           'is_sql': interpreter['is_sql'],
+          'is_batchable': interpreter['dialect'] in ['hive', 'impala'] or interpreter['interface'] in ['oozie', 'sqlalchemy'],
           'dialect': interpreter['dialect'],
           'dialect_properties': interpreter.get('dialect_properties'),
         })

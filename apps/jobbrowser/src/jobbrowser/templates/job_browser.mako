@@ -2795,6 +2795,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self.fetchJob = function () {
+        // TODO: Remove cancelActiveRequest from apiHelper when in webpack
         vm.apiHelper.cancelActiveRequest(lastFetchJobRequest);
         vm.apiHelper.cancelActiveRequest(lastUpdateJobRequest);
 

@@ -19,14 +19,19 @@ import apiHelper from 'api/apiHelper';
 /**
  * Wrapper function around ApiHelper calls, it will also save the entry on success.
  *
- * @param {string} apiHelperFunction - The name of the ApiHelper function to call
+ * @param {string|Function} apiHelperFunction - The name of the ApiHelper function to call
  * @param {string} attributeName - The attribute to set
  * @param {DataCatalogEntry|MultiTableEntry} entry - The catalog entry
  * @param {Object} [apiOptions]
  * @param {boolean} [apiOptions.silenceErrors]
  */
-const fetchAndSave = (apiHelperFunction, attributeName, entry, apiOptions) =>
-  apiHelper[apiHelperFunction]({
+const fetchAndSave = (apiHelperFunction, attributeName, entry, apiOptions) => {
+  const func =
+    typeof apiHelperFunction === 'string'
+      ? apiHelper[apiHelperFunction].bind(apiHelper)
+      : apiHelperFunction;
+
+  return func({
     sourceType: entry.dataCatalog.sourceType,
     compute: entry.compute,
     path: entry.path, // Set for DataCatalogEntry
@@ -37,7 +42,7 @@ const fetchAndSave = (apiHelperFunction, attributeName, entry, apiOptions) =>
     entry[attributeName] = data;
     entry.saveLater();
   });
-
+};
 /**
  * Helper function that adds sets the silence errors option to true if not specified
  *
