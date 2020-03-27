@@ -8,10 +8,11 @@
 * Preso/Notebook mode
 
 * Buttons on middle line
-
 * Query History versioning (execution/saved later)
-
 * Scheduling + notifications + sharing
+* Comparing dates / trend
+* ERD
+* Formatting
 
 * Js executor
 * Proxy executor
