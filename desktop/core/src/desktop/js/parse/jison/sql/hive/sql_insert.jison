@@ -255,7 +255,7 @@ GenericInsert_EDIT
 
 InsertValuesList
  : ParenthesizedRowValuesList
- | RowValuesList ',' ParenthesizedRowValuesList
+ | InsertValuesList ',' ParenthesizedRowValuesList
  ;
 
 ParenthesizedRowValuesList
