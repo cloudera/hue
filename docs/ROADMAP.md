@@ -3,24 +3,20 @@
 High Level Roadmap
 ------------------
 
-* Connectors
-  * Better [connectors](https://docs.gethue.com/administrator/configuration/connectors/)
-  * Potential [connectors ideas](https://docs.gethue.com/developer/connectors/)
+* Better [SQL parsers](https://docs.gethue.com/developer/parsers/) for [Databases](https://docs.gethue.com/administrator/configuration/connectors/):
+    * [Apache Calcite](https://calcite.apache.org) based: Phoenix, Druid, Spark SQL, Presto, Flink SQL..
+    * Kafka SQL
+    * Elastic Search SQL
+    * Solr SQL
+    * PartiQl
+    * ZetaSql...
 
 * Editor
   * [ ] Editor v2 [HUE-8768](https://issues.cloudera.org/browse/HUE-8768)
   * [ ] Query Browser v2
   * [ ] Query Scheduling [HUE-3797](https://issues.cloudera.org/browse/HUE-3797)
-  * [ ] Generify risk alert and optimization API [HUE-8824](https://issues.cloudera.org/browse/HUE-8824)
   * [ ] Query Builder [HUE-3228](https://issues.cloudera.org/browse/HUE-3228)
   * [ ] Public SQL REST APIs [HUE-1450](https://issues.cloudera.org/browse/HUE-1450)
-  * [ ] Additional/Improved SQL autocompletes [HUE-9084](https://issues.cloudera.org/browse/HUE-9084)
-    * [Apache Calcite](https://calcite.apache.org) based: Phoenix, Druid, Spark SQL, Presto, Flink SQL..
-    * KSQL
-    * Elastic Search SQL
-    * Solr SQL
-    * PartiQl
-    * ZetaSql...
 * Cloud
   * [ ] Configuration of connectors via UI [HUE-8758](https://issues.cloudera.org/browse/HUE-8758)
   * [ ] Multi clusters [HUE-8330](https://issues.cloudera.org/browse/HUE-8330)
@@ -44,6 +40,8 @@ High Level Roadmap
 
 Done
 
+* [x] Additional/Improved SQL autocompletes [HUE-9084](https://issues.cloudera.org/browse/HUE-9084)
+* [x] Generify risk alert and optimization API [HUE-8824](https://issues.cloudera.org/browse/HUE-8824)
 * [x] Kubernetes [HUE-8744](https://issues.cloudera.org/browse/HUE-8744)
 * [x] Minimal Continuous Integration [Blog post](http://gethue.com/improving-the-developer-productivity-with-some-continuous-integration/)
 * [x] Integrate with Apache Atlas [HUE-8749](https://issues.cloudera.org/browse/HUE-8749)

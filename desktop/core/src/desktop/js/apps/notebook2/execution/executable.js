@@ -167,7 +167,10 @@ export default class Executable {
     this.setProgress(0);
 
     try {
-      hueAnalytics.log('notebook', 'execute/' + this.executor.sourceType());
+      hueAnalytics.log(
+        'notebook',
+        'execute/' + (this.executor.connector() ? this.executor.connector().dialect : '')
+      );
       try {
         const response = await this.internalExecute();
         this.handle = response.handle;
@@ -224,7 +227,6 @@ export default class Executable {
       this.logs.fetchLogs();
     } catch (err) {
       this.setStatus(EXECUTION_STATUS.failed);
-      throw err;
     }
   }
 
@@ -309,7 +311,10 @@ export default class Executable {
 
   async cancel() {
     if (this.cancellables.length && this.status === EXECUTION_STATUS.running) {
-      hueAnalytics.log('notebook', 'cancel/' + this.executor.sourceType());
+      hueAnalytics.log(
+        'notebook',
+        'cancel/' + (this.executor.connector() ? this.executor.connector().dialect : '')
+      );
       this.setStatus(EXECUTION_STATUS.canceling);
       while (this.cancellables.length) {
         await this.cancellables.pop().cancel();
@@ -372,6 +377,7 @@ export default class Executable {
 
   async toContext(id) {
     if (this.snippet) {
+      // V1
       return {
         operationId: this.operationId,
         snippet: this.snippet.toContextJson(),
@@ -379,10 +385,10 @@ export default class Executable {
       };
     }
 
-    const session = await sessionManager.getSession({ type: this.executor.sourceType() });
+    const session = await sessionManager.getSession({ type: this.executor.connector().type });
     const statement = this.getStatement();
     const snippet = {
-      type: this.executor.sourceType(),
+      type: this.executor.connector().type,
       result: {
         handle: this.handle
       },
@@ -399,13 +405,14 @@ export default class Executable {
     };
 
     const notebook = {
-      type: this.executor.sourceType(),
+      type: this.executor.connector().type,
       snippets: [snippet],
       id: this.notebookId,
       uuid: hueUtils.UUID(),
       name: '',
       isSaved: false,
-      sessions: [session]
+      sessions: [session],
+      editorWsChannel: window.WS_CHANNEL
     };
 
     return {

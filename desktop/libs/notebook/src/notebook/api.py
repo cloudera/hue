@@ -211,7 +211,7 @@ def _execute_notebook(request, notebook, snippet):
 @require_POST
 @check_document_access_permission
 @api_error_handler
-def execute(request, engine=None):
+def execute(request, dialect=None):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
@@ -413,6 +413,9 @@ def get_logs(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
+  if operation_id:
+    notebook['uuid'] = operation_id
+
   startFrom = request.POST.get('from')
   startFrom = int(startFrom) if startFrom else None
   size = request.POST.get('size')
@@ -444,7 +447,11 @@ def get_logs(request):
   return JsonResponse(response)
 
 def _save_notebook(notebook, user):
-  notebook_type = notebook.get('type', 'notebook')
+  if notebook['snippets'][0].get('connector'):
+    notebook_type = 'query-%(dialect)s' % notebook['snippets'][0]['connector']
+  else:
+    notebook_type = notebook.get('type', 'notebook')
+
   save_as = False
 
   if notebook.get('parentSavedQueryUuid'): # We save into the original saved query, not into the query history
@@ -551,6 +558,7 @@ def get_history(request):
 
   doc_type = request.GET.get('doc_type')
   doc_text = request.GET.get('doc_text')
+  connector_id = request.GET.get('doc_connector')
   page = min(int(request.GET.get('page', 1)), 100)
   limit = min(int(request.GET.get('limit', 50)), 100)
   is_notification_manager = request.GET.get('is_notification_manager', 'false') == 'true'
@@ -558,7 +566,7 @@ def get_history(request):
   if is_notification_manager:
     docs = Document2.objects.get_tasks_history(user=request.user)
   else:
-    docs = Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)
+    docs = Document2.objects.get_history(doc_type='query-%s' % doc_type, connector_id=connector_id, user=request.user)
 
   if doc_text:
     docs = docs.filter(Q(name__icontains=doc_text) | Q(description__icontains=doc_text) | Q(search__icontains=doc_text))
@@ -660,7 +668,10 @@ def close_statement(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = None
-  operation_id = request.POST.get('operationId') or notebook['uuid']
+  operation_id = request.POST.get('operationId')
+
+  if operation_id and not notebook.get('uuid'):
+    notebook['uuid'] = operation_id
 
   snippet = _get_snippet(request.user, notebook, snippet, operation_id)
 

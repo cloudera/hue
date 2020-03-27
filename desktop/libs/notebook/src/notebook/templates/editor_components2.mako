@@ -135,7 +135,7 @@
           <ul class="nav editor-nav">
             <li class="app-header" style="display:none" data-bind="visible: true">
               <!-- ko if: editorMode -->
-              <a data-bind="hueLink: '${ url('notebook:editor') }?type=' + editorType(), attr: { 'title': editorTypeTitle() + '${ _(' Editor') }'}" style="cursor: pointer">
+              <a data-bind="hueLink: '${ url('notebook:editor') }?type=' + editorType(), attr: { 'title': editorTitle() + '${ _(' Editor') }'}" style="cursor: pointer">
                 <!-- ko template: { name: 'app-icon-template', data: { icon: editorType() } } --><!-- /ko -->
 
                 <!-- ko switch: editorType() -->
@@ -160,7 +160,7 @@
                 <!-- ko case: 'markdown' -->Markdown<!-- /ko -->
                 <!-- ko case: 'text' -->Text<!-- /ko -->
                 <!-- ko case: 'clickhouse' -->ClickHouse<!-- /ko -->
-                <!-- ko case: $default --><span data-bind="text: editorTypeTitle()"></span><!-- /ko -->
+                <!-- ko case: $default --><span data-bind="text: editorTitle()"></span><!-- /ko -->
                 <!-- /ko -->
                 <!-- ko component: { name: 'hue-favorite-app', params: { app: 'editor', interpreter: editorType() }} --><!-- /ko -->
               </a>
@@ -266,7 +266,7 @@
         <ul class="dropdown-menu pull-right">
           <li>
             <!-- ko if: editorMode -->
-            <a href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
+            <a href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTitle() + '${ _(' Query') }' }">
               <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
             </a>
             <!-- /ko -->
@@ -407,8 +407,6 @@
         params: {
           user: user,
           sql: {
-            sourceTypes: sqlSourceTypes,
-            activeSourceType: activeSqlSourceType,
             navigationSettings: {
               openDatabase: false,
               openItem: false,
@@ -928,16 +926,7 @@
             }
           "></div>
         <!-- ko component: { name: 'hueAceAutocompleter', params: { editor: ace.bind($data), snippet: $data } } --><!-- /ko -->
-
-        <ul class="table-drop-menu hue-context-menu">
-          <li class="editor-drop-value"><a href="javascript:void(0);">"<span class="editor-drop-identifier"></span>"</a></li>
-          <li class="divider"></li>
-          <li class="editor-drop-select"><a href="javascript:void(0);">SELECT FROM <span class="editor-drop-identifier"></span>...</a></li>
-          <li class="editor-drop-insert"><a href="javascript:void(0);">INSERT INTO <span class="editor-drop-identifier"></span>...</a></li>
-          <li class="editor-drop-update"><a href="javascript:void(0);">UPDATE <span class="editor-drop-identifier"></span>...</a></li>
-          <li class="editor-drop-drop"><a href="javascript:void(0);">DROP TABLE <span class="editor-drop-identifier"></span>...</a></li>
-          <li class="editor-drop-view"><a href="javascript:void(0);">DROP VIEW <span class="editor-drop-identifier"></span>...</a></li>
-        </ul>
+        <!-- ko component: { name: 'hue-editor-droppable-menu', params: { editor: ace.bind($data), parentDropTarget: '.editor' } } --><!-- /ko -->
       </div>
 
       <div class="clearfix"></div>

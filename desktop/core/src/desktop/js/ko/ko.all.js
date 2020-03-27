@@ -151,6 +151,7 @@ import 'ko/components/ko.contextSelector';
 import 'ko/components/ko.createDirectoryModal';
 import 'ko/components/ko.deleteDocModal';
 import 'ko/components/ko.dropDown';
+import 'ko/components/ko.editorDroppableMenu';
 import 'ko/components/ko.executionAnalysis';
 import 'ko/components/ko.favoriteApp';
 import 'ko/components/ko.fieldSamples';
@@ -174,6 +175,7 @@ import 'ko/components/ko.sqlColumnsTable';
 
 // TODO: Move to about app when it has it's own webpack entry
 import 'apps/about/components/ko.hueConfigTree';
+import 'apps/about/components/ko.connectorsConfig';
 
 import 'ko/extenders/ko.maxLength';
 import 'ko/extenders/ko.numeric';

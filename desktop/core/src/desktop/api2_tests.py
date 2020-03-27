@@ -62,6 +62,7 @@ class TestApi2(object):
     finally:
       query.delete()
 
+
   def test_get_hue_config(self):
     client = make_logged_in_client(username="api2_superuser", groupname="default", recreate=True, is_superuser=True)
     user = User.objects.get(username="api2_superuser")
@@ -87,6 +88,7 @@ class TestApi2(object):
     finally:
       clear()
 
+
   def test_get_hue_config_private(self):
     client = make_logged_in_client(username="api2_superuser", groupname="default", recreate=True, is_superuser=True)
     user = User.objects.get(username="api2_superuser")
@@ -111,6 +113,33 @@ class TestApi2(object):
 
     # There should be more private than non-private
     assert_true(len(response.content) < len(private_response.content))
+
+
+  def test_get_config(self):
+    response = self.client.get('/desktop/api2/get_config')
+
+    assert_equal(200, response.status_code)
+    config = json.loads(response.content)
+
+    assert_true('types' in config['documents'])
+    assert_false('query-TestApi2.test_get_config' in config['documents']['types'], config)
+
+    doc = Document2.objects.create(
+        name='Query xxx',
+        type='query-TestApi2.test_get_config',
+        owner=self.user
+    )
+
+    try:
+      response = self.client.get('/desktop/api2/get_config')
+
+      assert_equal(200, response.status_code)
+      config = json.loads(response.content)
+
+      assert_true('query-TestApi2.test_get_config' in config['documents']['types'], config)
+    finally:
+      doc.delete()
+
 
 class TestDocumentApiSharingPermissions(object):
 

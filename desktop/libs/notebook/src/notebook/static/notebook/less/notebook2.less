@@ -1297,6 +1297,32 @@
     display: block;
   }
 
+  .snippet-error-log {
+    position: relative;
+
+    .clear-container {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+
+      .close {
+        opacity: 0.5;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+
+      .close::before {
+        border-color: #a60115 !important;
+      }
+
+      .close::after {
+        border-color: #a60115 !important;
+      }
+    }
+  }
+
   .jobs-overlay {
     background-color: @cui-white;
     opacity: 0.8;

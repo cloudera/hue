@@ -21,16 +21,20 @@ import json
 import sys
 
 from collections import OrderedDict
+from datetime import datetime
 from nose.plugins.attrib import attr
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false
 
+from django.test.client import Client
 from django.urls import reverse
 from azure.conf import is_adls_enabled
 
 from desktop import appmanager
-from desktop.conf import APP_BLACKLIST
+from desktop.conf import APP_BLACKLIST, ENABLE_CONNECTORS, ENABLE_PROMETHEUS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission
+from desktop.metrics import num_of_queries
 from desktop.models import Directory, Document, Document2
 from hadoop import cluster as originalCluster
 from useradmin.models import User
@@ -49,7 +53,7 @@ else:
   from mock import patch
 
 
-class TestNotebookApi(object):
+class TestApi(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
@@ -57,9 +61,6 @@ class TestNotebookApi(object):
 
     self.user = User.objects.get(username="test")
     self.user_not_me = User.objects.get(username="not_perm_user")
-
-    grant_access("test", "default", "notebook")
-    grant_access("not_perm_user", "default", "notebook")
 
     self.notebook_json = """
       {
@@ -138,6 +139,26 @@ class TestNotebookApi(object):
 
     # Test that saving a notebook will save the search field to the first statement text
     assert_equal(doc.search, "select * from default.web_logs where app = 'metastore';")
+
+
+  def test_save_notebook_with_connector(self):
+    if not ENABLE_CONNECTORS.get():
+      raise SkipTest
+
+    notebook_cp = self.notebook.copy()
+    notebook_cp.pop('id')
+    notebook_cp['snippets'][0]['connector'] = {
+      "name": "MySql",
+      "dialect": "mysql"
+    }
+    notebook_json = json.dumps(notebook_cp)
+
+    response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json})
+    data = json.loads(response.content)
+
+    assert_equal(0, data['status'], data)
+    doc = Document2.objects.get(pk=data['id'])
+    assert_equal('query-mysql', doc.type)
 
 
   def test_historify(self):
@@ -565,6 +586,22 @@ def test_get_interpreters_to_show():
     appmanager.DESKTOP_MODULES = []
     appmanager.DESKTOP_APPS = None
     appmanager.load_apps(APP_BLACKLIST.get())
+
+
+class TestQueriesMetrics(object):
+
+  def test_queries_num(self):
+    with patch('desktop.models.Document2.objects') as doc2_value_mock:
+      doc2_value_mock.filter.return_value.count.return_value = 12500
+      count = num_of_queries()
+      assert_equal(12500, count)
+
+      if not ENABLE_PROMETHEUS.get():
+        raise SkipTest
+
+      c = Client()
+      response = c.get('/metrics')
+      assert_true(b'hue_queries_numbers 12500.0' in response.content, response.content)
 
 
 class TestAnalytics(object):

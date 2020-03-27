@@ -21,6 +21,7 @@ import DisposableComponent from 'ko/components/DisposableComponent';
 import I18n from 'utils/i18n';
 import { NAME as PAGINATOR_COMPONENT } from './ko.paginator';
 import apiHelper from 'api/apiHelper';
+import { cancelActiveRequest } from 'api/apiUtils';
 
 export const UPDATE_SAVED_QUERIES_EVENT = 'update.saved.queries';
 export const NAME = 'saved-queries';
@@ -156,7 +157,7 @@ class SavedQueries extends DisposableComponent {
   }
 
   async fetchQueries() {
-    apiHelper.cancelActiveRequest(this.lastFetchQueriesRequest);
+    cancelActiveRequest(this.lastFetchQueriesRequest);
 
     this.loading(true);
     this.hasErrors(false);

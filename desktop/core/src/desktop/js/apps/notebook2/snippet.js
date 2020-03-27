@@ -35,10 +35,7 @@ import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
-import {
-  ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT,
-  REDRAW_FIXED_HEADERS_EVENT
-} from 'apps/notebook2/events';
+import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
 import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
@@ -47,6 +44,8 @@ import {
 import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from 'apps/notebook2/components/ko.executableActions';
 import { UPDATE_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
 import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import { cancelActiveRequest } from 'api/apiUtils';
+import { getOptimizer } from 'catalog/optimizer/optimizer';
 
 // TODO: Remove for ENABLE_NOTEBOOK_2. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
@@ -193,6 +192,7 @@ export default class Snippet {
     this.connector = ko.observable();
 
     this.dialect = ko.pureComputed(() => this.connector() && this.connector().dialect);
+    this.connectorType = ko.pureComputed(() => this.connector() && this.connector().type);
 
     this.isSqlDialect = ko.pureComputed(() => this.connector() && this.connector().is_sql);
     this.defaultLimit = ko.observable(snippetRaw.defaultLimit);
@@ -231,16 +231,7 @@ export default class Snippet {
       }
     });
 
-    this.isBatchable = ko.pureComputed(
-      () =>
-        this.dialect() === DIALECT.hive ||
-        this.dialect() === DIALECT.impala ||
-        this.parentVm.availableLanguages.some(
-          language =>
-            language.type === this.dialect() && // TODO: language.type = dialect ?
-            (language.interface === 'oozie' || language.interface === 'sqlalchemy')
-        )
-    );
+    this.isBatchable = ko.pureComputed(() => this.connector() && this.connector().is_batchable);
 
     this.autocompleteSettings = {
       temporaryOnly: false
@@ -900,14 +891,14 @@ export default class Snippet {
           return;
         }
 
-        apiHelper.cancelActiveRequest(lastComplexityRequest);
+        cancelActiveRequest(lastComplexityRequest);
 
         hueAnalytics.log('notebook', 'get_query_risk');
         clearActiveRisks();
 
         const changeSubscription = this.statement.subscribe(() => {
           changeSubscription.dispose();
-          apiHelper.cancelActiveRequest(lastComplexityRequest);
+          cancelActiveRequest(lastComplexityRequest);
         });
 
         const hash = this.statement().hashCode();
@@ -920,8 +911,8 @@ export default class Snippet {
           return true;
         });
         if (unknownResponse) {
-          lastComplexityRequest = apiHelper
-            .statementRisk({
+          lastComplexityRequest = getOptimizer(this.connector())
+            .analyzeRisk({
               notebookJson: await this.parentNotebook.toContextJson(),
               snippetJson: this.toContextJson()
             })
@@ -1006,7 +997,7 @@ export default class Snippet {
     this.executor = new Executor({
       compute: this.compute,
       database: this.database,
-      sourceType: this.dialect,
+      connector: this.connector,
       namespace: this.namespace,
       defaultLimit: this.defaultLimit,
       isOptimizerEnabled: this.parentVm.isOptimizerEnabled(),
@@ -1226,8 +1217,8 @@ export default class Snippet {
   async getSimilarQueries() {
     hueAnalytics.log('notebook', 'get_query_similarity');
 
-    apiHelper
-      .statementSimilarity({
+    getOptimizer(this.connector())
+      .analyzeSimilarity({
         notebookJson: await this.parentNotebook.toContextJson(),
         snippetJson: this.toContextJson(),
         sourcePlatform: this.dialect()
@@ -1352,15 +1343,15 @@ export default class Snippet {
   }
 
   async queryCompatibility(targetPlatform) {
-    apiHelper.cancelActiveRequest(this.lastCompatibilityRequest);
+    cancelActiveRequest(this.lastCompatibilityRequest);
 
     hueAnalytics.log('notebook', 'compatibility');
     this.compatibilityCheckRunning(targetPlatform !== this.dialect());
     this.hasSuggestion(null);
     const positionStatement = this.positionStatement();
 
-    this.lastCompatibilityRequest = apiHelper
-      .statementCompatibility({
+    this.lastCompatibilityRequest = getOptimizer(this.connector())
+      .analyzeCompatibility({
         notebookJson: await this.parentNotebook.toContextJson(),
         snippetJson: this.toContextJson(),
         sourcePlatform: this.compatibilitySourcePlatform().value,

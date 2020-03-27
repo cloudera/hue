@@ -42,6 +42,7 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED
 from kafka.conf import has_kafka
+from metadata.conf import has_optimizer
 from notebook.conf import DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters
 from useradmin.models import User, Group, get_organization
 from useradmin.organization import _fitered_queryset
@@ -52,6 +53,7 @@ from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_K8S_
     has_connectors, TASK_SERVER, ENABLE_GIST, APP_BLACKLIST
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
+from desktop.lib.connectors.models import Connector
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root, SAFE_CHARACTERS_URI_COMPONENTS
@@ -1017,11 +1019,29 @@ class Document2Manager(models.Manager, Document2QueryMixin):
 
     return latest_doc
 
-  def get_history(self, user, doc_type, include_trashed=False):
-    return self.documents(user, perms='owned', include_history=True, include_trashed=include_trashed).filter(type=doc_type, is_history=True)
+  def get_history(self, user, doc_type=None, connector_id=None, include_trashed=False):
+    history = self.documents(
+        user,
+        perms='owned',
+        include_history=True,
+        include_trashed=include_trashed
+    ).filter(is_history=True)
+
+    if doc_type is not None:
+      history = history.filter(type=doc_type)
+    if connector_id is not None:
+      history = history.filter(connector__id=connector_id)
+
+    return history
 
   def get_tasks_history(self, user):
-    return self.documents(user, perms='owned', include_history=True, include_trashed=False, include_managed=True).filter(is_history=True, is_managed=True).exclude(name='pig-app-hue-script').exclude(type='oozie-workflow2')
+    return self.documents(
+        user,
+        perms='owned',
+        include_history=True,
+        include_trashed=False,
+        include_managed=True
+    ).filter(is_history=True, is_managed=True).exclude(name='pig-app-hue-script').exclude(type='oozie-workflow2')
 
   def get_home_directory(self, user):
     try:
@@ -1108,7 +1128,20 @@ class Document2(models.Model):
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
   uuid = models.CharField(default=uuid_default, max_length=36, db_index=True)
-  type = models.CharField(default='', max_length=32, db_index=True, help_text=_t('Type of document, e.g. Hive query, Oozie workflow, Search Dashboard...'))
+  type = models.CharField(
+      default='',
+      max_length=32,
+      db_index=True,
+      help_text=_t('Type of document, e.g. Hive query, Oozie workflow, Search Dashboard...')
+  )
+  connector = models.ForeignKey(
+      Connector,
+      verbose_name=_t('Connector'),
+      help_text=_t('Connector.'),
+      blank=True,
+      null=True,
+      db_index=True
+  )
 
   data = models.TextField(default='{}')
   extra = models.TextField(default='')
@@ -1118,7 +1151,11 @@ class Document2(models.Model):
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
   version = models.SmallIntegerField(default=1, verbose_name=_t('Document version'), db_index=True)
   is_history = models.BooleanField(default=False, db_index=True)
-  is_managed = models.BooleanField(default=False, db_index=True, verbose_name=_t('If managed under the cover by Hue and never by the user')) # Aka isTask
+  is_managed = models.BooleanField(  # Aka isTask
+      default=False,
+      db_index=True,
+      verbose_name=_t('If managed under the cover by Hue and never by the user')
+  )
   is_trashed = models.NullBooleanField(default=False, db_index=True, verbose_name=_t('True if trashed'))
 
   dependencies = models.ManyToManyField('self', symmetrical=False, related_name='dependents', db_index=True)
@@ -1484,6 +1521,7 @@ class Document2(models.Model):
       permissions['link_read'] = link_read_perm.is_link_on
     if link_write_perm:
       permissions['link_write'] = link_write_perm.is_link_on
+
     permissions['link_sharing_on'] = permissions['link_read'] or permissions['link_write']
 
     return permissions
@@ -1518,6 +1556,7 @@ class Document2(models.Model):
 
     slow = self
     fast = self
+
     while True:
       slow = slow.parent_directory
       if slow and slow.uuid == self.uuid:
@@ -1752,8 +1791,10 @@ class ClusterConfig(object):
           'displayName': interpreter['name'],
           'buttonName': _('Query'),
           'tooltip': _('%s Query') % interpreter['type'].title(),
+          'optimizer': 'api' if has_optimizer() else 'off',  # TODO: Change to proper values
           'page': '/editor/?type=%(type)s' % interpreter,
           'is_sql': interpreter['is_sql'],
+          'is_batchable': interpreter['dialect'] in ['hive', 'impala'] or interpreter['interface'] in ['oozie', 'sqlalchemy'],
           'dialect': interpreter['dialect'],
           'dialect_properties': interpreter.get('dialect_properties'),
         })

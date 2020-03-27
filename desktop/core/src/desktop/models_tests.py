@@ -32,6 +32,7 @@ from notebook.models import import_saved_beeswax_query
 from useradmin.models import get_default_user_group, User
 
 from desktop.converters import DocumentConverter
+from desktop.lib.connectors.models import Connector
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.fs import ProxyFS
 from desktop.lib.test_utils import grant_access
@@ -48,12 +49,12 @@ class MockFs(object):
   def __init__(self):
     pass
 
+
 class TestDocument2(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="doc2", groupname="doc2", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="doc2")
-    grant_access("doc2", "doc2", "beeswax")
 
     # This creates the user directories for the new user
     response = self.client.get('/desktop/api2/doc/')
@@ -400,6 +401,52 @@ class TestDocument2(object):
     assert_true(Document2.TRASH_DIR in [f['name'] for f in data['children']])
 
 
+  def test_get_history(self):
+    history = Document2.objects.get_history(user=self.user, doc_type='query-hive')
+    assert_false(history.filter(name='test_get_history').exists())
+
+    query = Document2.objects.create(
+        name='test_get_history',
+        type='query-hive',
+        owner=self.user,
+        is_history=True
+    )
+
+    try:
+      history = Document2.objects.get_history(user=self.user, doc_type='query-hive')
+      assert_true(history.filter(name='test_get_history').exists())
+    finally:
+      query.delete()
+
+
+  def test_get_history_with_connector(self):
+    connector = Connector.objects.create(
+        name='MySql',
+        dialect='mysql'
+    )
+
+    query = Document2.objects.create(
+        name='test_get_history',
+        type='query-hive',
+        owner=self.user,
+        is_history=False,
+        connector=connector
+    )
+
+    try:
+      history = Document2.objects.get_history(user=self.user, doc_type='query-hive', connector_id=connector.id)
+      assert_false(history.filter(name='test_get_history').exists())
+
+      query.is_history = True
+      query.save()
+
+      history = Document2.objects.get_history(user=self.user, doc_type='query-hive', connector_id=connector.id)
+      assert_true(history.filter(name='test_get_history').exists())
+    finally:
+      query.delete()
+      connector.delete()
+
+
   def test_validate_immutable_user_directories(self):
     # Test that home and Trash directories cannot be recreated or modified
     test_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
@@ -474,6 +521,7 @@ class TestDocument2(object):
 
     assert_true('data' in data, data)
     assert_equal(data['data'], doc_data)
+
 
   def test_is_trashed_migration(self):
 

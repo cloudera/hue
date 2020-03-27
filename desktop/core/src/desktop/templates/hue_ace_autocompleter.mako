@@ -736,8 +736,8 @@ from desktop.views import _ko
           }, COMMENT_LOAD_DELAY);
         }
 
-        if (self.catalogEntry.navOptPopularity && self.catalogEntry.navOptPopularity.relativePopularity) {
-          self.popularity(self.catalogEntry.navOptPopularity.relativePopularity);
+        if (self.catalogEntry.optimizerPopularity && self.catalogEntry.optimizerPopularity.relativePopularity) {
+          self.popularity(self.catalogEntry.optimizerPopularity.relativePopularity);
         }
       }
 
