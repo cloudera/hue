@@ -448,7 +448,7 @@ def get_logs(request):
   return JsonResponse(response)
 
 def _save_notebook(notebook, user):
-  if notebook['snippets'][0].get('connector'):
+  if notebook['snippets'][0].get('connector') and notebook['snippets'][0]['connector'].get('dialect'):
     notebook_type = 'query-%(dialect)s' % notebook['snippets'][0]['connector']
   else:
     notebook_type = notebook.get('type', 'notebook')
