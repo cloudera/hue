@@ -142,15 +142,14 @@ class TestApi(object):
 
 
   def test_save_notebook_with_connector(self):
-    if not ENABLE_CONNECTORS.get():
-      raise SkipTest
-
     notebook_cp = self.notebook.copy()
     notebook_cp.pop('id')
     notebook_cp['snippets'][0]['connector'] = {
-      "name": "MySql",
-      "dialect": "mysql"
+      "optimizer": "api"
     }
+    if not ENABLE_CONNECTORS.get():  # At some point even v1 should set those
+      notebook_cp['snippets'][0]['connector']['name'] = 'MySql'
+      notebook_cp['snippets'][0]['connector']['dialect'] = 'mysql'
     notebook_json = json.dumps(notebook_cp)
 
     response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json})
