@@ -39,9 +39,10 @@ RUN set -eux; \
         libtidy \
         libxml2-devel \
         libxslt-devel \
-        nmap-ncat \
         ncurses-devel \
+        nmap-ncat \
         openldap-devel \
+        openssl \
         openssl-devel \
         postgresql \
         postgresql-libs \
@@ -50,8 +51,10 @@ RUN set -eux; \
         readline-devel \
         sqlite-devel \
         sudo \
+        swig \
         which \
         xmlsec1 \
+        xmlsec1-openssl \
         zlib-devel
 
 RUN set -eux; easy_install supervisor pip

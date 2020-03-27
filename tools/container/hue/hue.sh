@@ -46,6 +46,17 @@ function db_connectivity_check() {
   echo "$ret"
 }
 
+function set_saml() {
+  mkdir -pm 755 $HUE_CONF_DIR/samlcert
+  cd $HUE_CONF_DIR/samlcert
+  openssl genrsa -des3 -out hue.key -passout pass:cloudera 2048
+  openssl rsa -inform PEM -outform PEM -in hue.key -pubout -out hue-nopass.pem -passin pass:cloudera
+  echo "#!/bin/bash" >> samlscript.sh
+  echo "echo cloudera" >> samlscript.sh
+  chmod a+x samlscript.sh
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64
+}
+
 # If database connectivity is not set then fail
 ret=$(db_connectivity_check)
 if [[ $ret == "fail" ]];  then
@@ -63,6 +74,7 @@ if [[ $1 == kt_renewer ]]; then
     $HUE_BIN/hue kt_renewer
   fi
 elif [[ $1 == runcpserver ]]; then
+    set_saml
     $HUE_BIN/hue runcherrypyserver
 fi
 
