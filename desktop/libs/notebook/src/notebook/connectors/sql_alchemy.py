@@ -312,7 +312,7 @@ class SqlAlchemyApi(Api):
         }
         for col in columns
       ]
-      response['foreign_keys'] = assist.get_foreign_keys(database, table)
+      response.update(assist.get_keys(database, table))
     else:
       columns = assist.get_columns(database, table)
       response['name'] = next((col['name'] for col in columns if column == col['name']), '')
@@ -416,13 +416,16 @@ class Assist(object):
     finally:
       connection.close()
 
-  def get_foreign_keys(self, database, table):
+  def get_keys(self, database, table):
     meta = MetaData()
     metaTable = Table(table, meta, schema=database, autoload=True, autoload_with=self.engine)
 
-    return [{
-        'name': fk.parent.name,
-        'to': fk.target_fullname
-      }
-      for fk in metaTable.foreign_keys
-    ]
+    return {
+      'foreign_keys': [{
+          'name': fk.parent.name,
+          'to': fk.target_fullname
+        }
+        for fk in metaTable.foreign_keys
+      ],
+      'primary_keys': [{'name': pk.name} for pk in metaTable.primary_key.columns]
+    }
