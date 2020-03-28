@@ -780,25 +780,23 @@ and recompiling the Docker image. It will then auto-restart on Python code chang
 
 ### Documentation
 
-Install [Hugo](https://gohugo.io/getting-started/quick-start/).
+Install [Hugo](https://gohugo.io/getting-started/quick-start/). Each page has a link to its own source file in the top right corner.
 
-Build it and see live changes:
+Build the [source](https://github.com/cloudera/hue/tree/master/docs/docs-site) and see live changes:
 
     cd docs/docs-site
 
     hugo serve
 
-Check for links not working (returning a 404) with muffet, a fast link checker crawler:
+Check for links not working (e.g. returning a 404) with muffet, a fast link checker crawler. It recommended to use the [check links script](https://github.com/cloudera/hue/blob/master/tools/ci/check_for_website_dead_links.sh).
 
-    sudo snap install muffet
-
-Then after booting the hugo documentation server, we point to its url. We also blacklist certain urls to avoid some noisy false positives:
-
-    muffet http://localhost:35741/ --exclude ".*releases.*" -f
+The posts [manual](https://gethue.com/easily-checking-for-deadlinks-on-docs-gethue-com/) and [continuous integration](https://gethue.com/easily-checking-for-deadlinks-on-docs-gethue-com/) contain more information about it.
 
 ### Blog & Website
 
 Like for the [Documentation](#Documentation) install hugo. The content for each language is in its [own directory](https://github.com/cloudera/hue/tree/master/docs/gethue/content).
+
+Blog posts are located in [docs/gethue/content/en/posts](https://github.com/cloudera/hue/tree/master/docs/gethue/content/en/posts).
 
 Build it and see live changes:
 
