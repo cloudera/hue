@@ -729,6 +729,11 @@ class TestLogin(PseudoHdfsTestBase):
     response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
     assert_equal(200, response.status_code, "Expected unauthorized status.")
 
+  def test_modal_login(self):
+    c = make_logged_in_client(username='test', password='test', is_superuser=False, recreate=True)
+    response = c.get('/hue')
+    assert_true(b'<div id="login-modal" class="modal fade hide">' in response.content, response.content)
+
 
 class TestLoginNoHadoop(object):
 
