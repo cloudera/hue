@@ -186,7 +186,7 @@ def dt_login(request, from_modal=False):
         ensure_home_directory(request.fs, request.user)
       except (IOError, WebHdfsException) as e:
         LOG.error('Could not create home directory for %s user %s.' % ('OIDC' if 'OIDCBackend' in backend_names else 'SAML', request.user))
-    if request.user.is_authenticated():
+    if request.user.is_authenticated() and not from_modal:
       return HttpResponseRedirect(redirect_to)
 
   if is_active_directory and not is_ldap_option_selected and \
