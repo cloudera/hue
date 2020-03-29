@@ -266,6 +266,7 @@ export default class Executable {
               this.nextExecutable.execute();
             }
             break;
+          case EXECUTION_STATUS.canceled:
           case EXECUTION_STATUS.expired:
             this.executeEnded = Date.now();
             this.setStatus(queryStatus);
