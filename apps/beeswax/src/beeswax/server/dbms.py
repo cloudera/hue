@@ -38,14 +38,16 @@ from desktop.settings import CACHES_HIVE_DISCOVERY_KEY
 from indexer.file_format import HiveFormat
 from libzookeeper import conf as libzookeeper_conf
 
-from beeswax import hive_site
-from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_SERVER_HOST, HIVE_HTTP_THRIFT_PORT, HIVE_METASTORE_HOST, HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
-  AUTH_USERNAME, AUTH_PASSWORD, APPLY_NATURAL_SORT_MAX, QUERY_PARTITIONS_LIMIT, HIVE_DISCOVERY_HIVESERVER2_ZNODE, \
-  HIVE_DISCOVERY_HS2, HIVE_DISCOVERY_LLAP, HIVE_DISCOVERY_LLAP_HA, HIVE_DISCOVERY_LLAP_ZNODE, CACHE_TIMEOUT, \
-  LLAP_SERVER_HOST, LLAP_SERVER_PORT, LLAP_SERVER_THRIFT_PORT, USE_SASL as HIVE_USE_SASL, CLOSE_SESSIONS, has_session_pool, MAX_NUMBER_OF_SESSIONS
+from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_SERVER_HOST, HIVE_HTTP_THRIFT_PORT, HIVE_METASTORE_HOST, \
+    HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
+    AUTH_USERNAME, AUTH_PASSWORD, APPLY_NATURAL_SORT_MAX, QUERY_PARTITIONS_LIMIT, HIVE_DISCOVERY_HIVESERVER2_ZNODE, \
+    HIVE_DISCOVERY_HS2, HIVE_DISCOVERY_LLAP, HIVE_DISCOVERY_LLAP_HA, HIVE_DISCOVERY_LLAP_ZNODE, CACHE_TIMEOUT, \
+    LLAP_SERVER_HOST, LLAP_SERVER_PORT, LLAP_SERVER_THRIFT_PORT, USE_SASL as HIVE_USE_SASL, CLOSE_SESSIONS, has_session_pool, \
+    MAX_NUMBER_OF_SESSIONS
 from beeswax.common import apply_natural_sort
 from beeswax.design import hql_query
-from beeswax.hive_site import hiveserver2_use_ssl
+from beeswax.hive_site import hiveserver2_use_ssl, hiveserver2_impersonation_enabled, get_hiveserver2_kerberos_principal, \
+    hiveserver2_transport_mode, hiveserver2_thrift_http_path
 from beeswax.models import QueryHistory, QUERY_TYPES
 
 
@@ -126,7 +128,14 @@ def get_query_server_config(name='beeswax', connector=None):
               for server in hiveservers:
                 llap_servers= json.loads(zk.get("{0}/{1}".format(znode, server))[0])["internal"][0]
                 if llap_servers["api"] == "activeEndpoint":
-                  cache.set("llap", json.dumps({"host": llap_servers["addresses"][0]["host"], "port": llap_servers["addresses"][0]["port"]}), CACHE_TIMEOUT.get())
+                  cache.set(
+                    "llap",
+                    json.dumps({
+                        "host": llap_servers["addresses"][0]["host"],
+                        "port": llap_servers["addresses"][0]["port"]
+                      }),
+                      CACHE_TIMEOUT.get()
+                  )
             else:
               LOG.error("LLAP Endpoint not found, reverting to HiveServer2")
               cache.set("llap", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}), CACHE_TIMEOUT.get())
@@ -136,7 +145,13 @@ def get_query_server_config(name='beeswax', connector=None):
             if zk.exists(znode):
               hiveservers = zk.get_children(znode)
               for server in hiveservers:
-                cache.set("llap", json.dumps({"host": server.split(';')[0].split('=')[1].split(":")[0], "port": server.split(';')[0].split('=')[1].split(":")[1]}))
+                cache.set(
+                  "llap",
+                  json.dumps({
+                    "host": server.split(';')[0].split('=')[1].split(":")[0],
+                    "port": server.split(';')[0].split('=')[1].split(":")[1]
+                  })
+                )
           zk.stop()
         else:
           LOG.debug("Zookeeper Discovery not enabled, reverting to config values")
@@ -153,7 +168,13 @@ def get_query_server_config(name='beeswax', connector=None):
           if zk.exists(znode):
             hiveservers = zk.get_children(znode)
             server_to_use = 0 # if CONF.HIVE_SPREAD.get() randint(0, len(hiveservers)-1) else 0
-            cache.set("hiveserver2", json.dumps({"host": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0], "port": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[1]}))
+            cache.set(
+              "hiveserver2",
+              json.dumps({
+                "host": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0],
+                "port": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[1]
+              })
+            )
           else:
             cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
           zk.stop()
@@ -165,19 +186,19 @@ def get_query_server_config(name='beeswax', connector=None):
       from impala.dbms import get_query_server_config as impala_query_server_config
       query_server = impala_query_server_config()
     elif name == 'hms':
-      kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
+      kerberos_principal = get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
       query_server = {
           'server_name': 'hms',
           'server_host': HIVE_METASTORE_HOST.get() if not cluster_config else cluster_config.get('server_host'),
           'server_port': HIVE_METASTORE_PORT.get(),
           'principal': kerberos_principal,
-          'transport_mode': 'http' if hive_site.hiveserver2_transport_mode() == 'HTTP' else 'socket',
+          'transport_mode': 'http' if hiveserver2_transport_mode() == 'HTTP' else 'socket',
           'auth_username': AUTH_USERNAME.get(),
           'auth_password': AUTH_PASSWORD.get(),
           'use_sasl': HIVE_USE_SASL.get()
       }
     else:
-      kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
+      kerberos_principal = get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
       query_server = {
           'server_name': 'beeswax',
           'server_host': activeEndpoint["host"],
@@ -187,9 +208,9 @@ def get_query_server_config(name='beeswax', connector=None):
               'protocol': 'https' if hiveserver2_use_ssl() else 'http',
               'host': activeEndpoint["host"],
               'port': activeEndpoint["port"],
-              'end_point': hive_site.hiveserver2_thrift_http_path()
+              'end_point': hiveserver2_thrift_http_path()
             },
-          'transport_mode': 'http' if hive_site.hiveserver2_transport_mode() == 'HTTP' else 'socket',
+          'transport_mode': 'http' if hiveserver2_transport_mode() == 'HTTP' else 'socket',
           'auth_username': AUTH_USERNAME.get(),
           'auth_password': AUTH_PASSWORD.get(),
           'use_sasl': HIVE_USE_SASL.get(),
@@ -236,7 +257,7 @@ def get_query_server_config_via_connector(connector):
       'auth_username': AUTH_USERNAME.get(),
       'auth_password': AUTH_PASSWORD.get(),
 
-      'impersonation_enabled': connector['dialect'] in ('impala',),
+      'impersonation_enabled': hiveserver2_impersonation_enabled(),
       'use_sasl': connector['dialect'] in ('hive',),
       'SESSION_TIMEOUT_S': 15 * 60,
       'querycache_rows': 1000,
