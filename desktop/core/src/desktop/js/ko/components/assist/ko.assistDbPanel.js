@@ -575,40 +575,37 @@ class AssistDbPanel {
    * @constructor
    **/
   constructor(options) {
-    const self = this;
-    self.options = options;
-    self.i18n = options.i18n;
+    this.options = options;
+    this.i18n = options.i18n;
 
-    self.isStreams = options.isStreams;
-    self.isSolr = options.isSolr;
-    self.nonSqlType = self.isSolr || self.isStreams;
+    this.isStreams = options.isStreams;
+    this.isSolr = options.isSolr;
+    this.nonSqlType = this.isSolr || this.isStreams;
 
-    self.sources = ko.observableArray();
-    self.sourceIndex = {};
-    self.selectedSource = ko.observable(null);
+    this.sources = ko.observableArray();
+    this.sourceIndex = {};
+    this.selectedSource = ko.observable(null);
 
-    self.breadcrumb = ko.pureComputed(() => {
-      if (self.isStreams && self.selectedSource()) {
-        return self.selectedSource().name;
+    this.breadcrumb = ko.pureComputed(() => {
+      if (this.isStreams && this.selectedSource()) {
+        return this.selectedSource().name;
       }
-      if (!self.isSolr && self.selectedSource()) {
-        if (self.selectedSource().selectedNamespace()) {
+      if (!this.isSolr && this.selectedSource()) {
+        if (this.selectedSource().selectedNamespace()) {
           if (
-            self
-              .selectedSource()
+            this.selectedSource()
               .selectedNamespace()
               .selectedDatabase()
           ) {
-            return self
-              .selectedSource()
+            return this.selectedSource()
               .selectedNamespace()
               .selectedDatabase().catalogEntry.name;
           }
           if (window.HAS_MULTI_CLUSTER) {
-            return self.selectedSource().selectedNamespace().name;
+            return this.selectedSource().selectedNamespace().name;
           }
         }
-        return self.selectedSource().name;
+        return this.selectedSource().name;
       }
       return null;
     });
@@ -623,24 +620,24 @@ class AssistDbPanel {
       huePubSub.publish('context.popover.hide');
       window.setTimeout(() => {
         let foundSource;
-        self.sources().some(source => {
+        this.sources().some(source => {
           if (source.sourceType === catalogEntry.getSourceType()) {
             foundSource = source;
             return true;
           }
         });
         if (foundSource) {
-          if (self.selectedSource() !== foundSource) {
-            self.selectedSource(foundSource);
+          if (this.selectedSource() !== foundSource) {
+            this.selectedSource(foundSource);
           }
           foundSource.highlightInside(catalogEntry);
         }
       }, 0);
     });
 
-    if (self.isSolr) {
+    if (this.isSolr) {
       huePubSub.subscribe('assist.collections.refresh', () => {
-        const solrSource = self.sourceIndex['solr'];
+        const solrSource = this.sourceIndex['solr'];
         const doRefresh = () => {
           if (solrSource.selectedNamespace()) {
             const assistDbNamespace = solrSource.selectedNamespace();
@@ -663,18 +660,18 @@ class AssistDbPanel {
           doRefresh();
         }
       });
-    } else if (!self.isSolr && !self.isStreams) {
+    } else if (!this.isSolr && !this.isStreams) {
       huePubSub.subscribe('assist.set.database', databaseDef => {
-        if (!databaseDef.source || !self.sourceIndex[databaseDef.source]) {
+        if (!databaseDef.source || !this.sourceIndex[databaseDef.source]) {
           return;
         }
-        self.selectedSource(self.sourceIndex[databaseDef.source]);
-        self.setDatabaseWhenLoaded(databaseDef.namespace, databaseDef.name);
+        this.selectedSource(this.sourceIndex[databaseDef.source]);
+        this.setDatabaseWhenLoaded(databaseDef.namespace, databaseDef.name);
       });
 
       const getSelectedDatabase = source => {
         const deferred = $.Deferred();
-        const assistDbSource = self.sourceIndex[source];
+        const assistDbSource = this.sourceIndex[source];
         if (assistDbSource) {
           assistDbSource.loadedDeferred.done(() => {
             if (assistDbSource.selectedNamespace()) {
@@ -728,17 +725,17 @@ class AssistDbPanel {
       huePubSub.subscribe('assist.get.source', () => {
         huePubSub.publish(
           'assist.source.set',
-          self.selectedSource() ? self.selectedSource().sourceType : undefined
+          this.selectedSource() ? this.selectedSource().sourceType : undefined
         );
       });
 
       huePubSub.subscribe('assist.set.source', source => {
-        if (self.sourceIndex[source]) {
-          self.selectedSource(self.sourceIndex[source]);
+        if (this.sourceIndex[source]) {
+          this.selectedSource(this.sourceIndex[source]);
         }
       });
 
-      self.selectedSource.subscribe(newSource => {
+      this.selectedSource.subscribe(newSource => {
         if (newSource) {
           if (newSource.namespaces().length === 0) {
             newSource.loadNamespaces();
@@ -750,7 +747,7 @@ class AssistDbPanel {
       });
     }
 
-    self.init(options.navigationSettings).then(() => {
+    this.init(options.navigationSettings).then(() => {
       huePubSub.publish('assist.db.panel.ready');
 
       huePubSub.subscribe('assist.is.db.panel.ready', () => {
@@ -760,30 +757,26 @@ class AssistDbPanel {
   }
 
   setDatabaseWhenLoaded(namespace, databaseName) {
-    const self = this;
-    self.selectedSource().whenLoaded(() => {
+    this.selectedSource().whenLoaded(() => {
       if (
-        self.selectedSource().selectedNamespace() &&
-        self.selectedSource().selectedNamespace().namespace.id !== namespace.id
+        this.selectedSource().selectedNamespace() &&
+        this.selectedSource().selectedNamespace().namespace.id !== namespace.id
       ) {
-        self
-          .selectedSource()
+        this.selectedSource()
           .namespaces()
           .some(otherNamespace => {
             if (otherNamespace.namespace.id === namespace.id) {
-              self.selectedSource().selectedNamespace(otherNamespace);
+              this.selectedSource().selectedNamespace(otherNamespace);
               return true;
             }
           });
       }
 
-      if (self.selectedSource().selectedNamespace()) {
-        self
-          .selectedSource()
+      if (this.selectedSource().selectedNamespace()) {
+        this.selectedSource()
           .selectedNamespace()
           .whenLoaded(() => {
-            self
-              .selectedSource()
+            this.selectedSource()
               .selectedNamespace()
               .setDatabase(databaseName);
           });
@@ -823,7 +816,7 @@ class AssistDbPanel {
   setSingleSource(type, navigationSettings, nonSqlType) {
     this.sourceIndex = {};
     const source = new AssistDbSource({
-      i18n: self.i18n,
+      i18n: this.i18n,
       type: type,
       name: type,
       nonSqlType: nonSqlType,
@@ -834,7 +827,7 @@ class AssistDbPanel {
     this.selectedSource(source);
 
     source.loadNamespaces().done(() => {
-      const namespace = self.selectedSource().selectedNamespace();
+      const namespace = this.selectedSource().selectedNamespace();
       if (namespace) {
         namespace.initDatabases();
         namespace.whenLoaded(() => {
@@ -846,13 +839,13 @@ class AssistDbPanel {
 
   async init(navigationSettings) {
     return new Promise(resolve => {
-      if (self.isSolr) {
+      if (this.isSolr) {
         this.setSingleSource('solr', navigationSettings, true);
         resolve();
         return;
       }
 
-      if (self.isStreams) {
+      if (this.isStreams) {
         this.setSingleSource('kafka', navigationSettings, true);
         resolve();
         return;
@@ -872,7 +865,7 @@ class AssistDbPanel {
               const source =
                 this.sourceIndex[interpreter.type] ||
                 new AssistDbSource({
-                  i18n: self.i18n,
+                  i18n: this.i18n,
                   type: interpreter.type,
                   name: interpreter.name,
                   connector: interpreter,
