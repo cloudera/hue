@@ -531,9 +531,6 @@ class OnePageViewModel {
         url: '/desktop/connectors',
         app: function() {
           self.loadApp('connectors');
-          self.getActiveAppViewModel(viewModel => {
-            viewModel.fetchConnectors();
-          });
         }
       },
       {

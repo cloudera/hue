@@ -28,7 +28,7 @@ export const NAME = 'connectors-config';
 const TEMPLATE = `
 <script type="text/html" id="installed-connectors-page">
   <div class="row-fluid">
-    <a href="javascript:void(0)" data-bind="click: addNewConnector">
+    <a href="javascript:void(0)" data-bind="click: addNewConnector.bind($data)">
       + Connector
     </a>
   </div>
@@ -90,7 +90,7 @@ const TEMPLATE = `
               </thead>
               <!-- ko if: $data.values.length > 0 -->
               <tbody data-bind="foreach: values">
-                <tr data-bind="click: $parents[1].editConnector">
+                <tr data-bind="click: $parents[2].editConnector.bind($parents[2])">
                   <td data-bind="text: nice_name"></td>
                   <td data-bind="text: description"></td>
                 </tr>
@@ -101,8 +101,8 @@ const TEMPLATE = `
                 <tr>
                   <td colspan="2">
                     ${ I18n('No connectors') }
-                    <!-- ko if: $parent.section() == 'installed-connectors-page' -->
-                      <a href="javascript:void(0)" data-bind="click: function() { $parent.selectedConnectorCategory($data.category); $parent.addNewConnector(); }">
+                    <!-- ko if: $parents[1].section() === 'installed-connectors-page' -->
+                      <a href="javascript:void(0)" data-bind="click: function() { $parents[1].selectedConnectorCategory($data.category); $parents[1].addNewConnector(); }">
                         ${ I18n('Add one ?') }
                       </a>
                     <!-- /ko -->
@@ -149,15 +149,15 @@ const TEMPLATE = `
     <!-- ko if: typeof id != 'undefined' -->
       <!-- ko if: id -->
         (<span data-bind="text: name"></span>)
-        <a href="javascript:void(0)" data-bind="click: $parent.updateConnector">
+        <a href="javascript:void(0)" data-bind="click: $parent.updateConnector.bind($parent)">
           ${ I18n('Update') }
         </a>
-        <a href="javascript:void(0)" data-bind="click: $parent.deleteConnector">
+        <a href="javascript:void(0)" data-bind="click: $parent.deleteConnector.bind($parent)">
           ${ I18n('Delete') }
         </a>
       <!-- /ko -->
       <!-- ko ifnot: id -->
-        <a href="javascript:void(0)" data-bind="click: $parent.updateConnector">
+        <a href="javascript:void(0)" data-bind="click: $parent.updateConnector.bind($parent)">
           ${ I18n('Save') }
         </a>
         <a href="javascript:void(0)" data-bind="click: function() { $parent.section('add-connector-page'); }">
@@ -165,7 +165,7 @@ const TEMPLATE = `
         </a>
       <!-- /ko -->
     <!-- /ko -->
-    <a href="javascript:void(0)" data-bind="click: $parent.testConnector">
+    <a href="javascript:void(0)" data-bind="click: $parent.testConnector.bind($parent)">
       ${ I18n('Test connection') }
     </a>
     <span>
@@ -214,6 +214,7 @@ const TEMPLATE = `
 class ConnectorsConfig extends DisposableComponent {
   constructor() {
     super();
+
     this.section = ko.observable('installed-connectors-page');
     this.categories = ko.observableArray();
     this.selectedConnectorCategory = ko.observable('All');
@@ -264,121 +265,123 @@ class ConnectorsConfig extends DisposableComponent {
       return filteredConnectors;
     });
 
-    this.addNewConnector = () => {
-      this.testConnectionExecuted(false);
-      this.testConnectionErrors('');
-      this.section('add-connector-page');
-    };
+    this.fetchConnectors();
+  }
 
-    this.fetchConnectors = () => {
-      this.fetchConnectorTypes(); // TODO: might be cleaner to chain below
-      simpleGet(
-        '/desktop/connectors/api/instances/',
-        {},
-        {
-          successCallback: data => {
-            this.instances(data.connectors);
-          }
+  addNewConnector() {
+    this.testConnectionExecuted(false);
+    this.testConnectionErrors('');
+    this.section('add-connector-page');
+  }
+
+  fetchConnectors() {
+    this.fetchConnectorTypes(); // TODO: might be cleaner to chain below
+    simpleGet(
+      '/desktop/connectors/api/instances/',
+      {},
+      {
+        successCallback: data => {
+          this.instances(data.connectors);
         }
-      );
-    };
-
-    this.editConnector = data => {
-      if (this.section() === 'installed-connectors-page') {
-        this.instance(data);
-      } else {
-        this.newConnector(data.dialect);
       }
-      this.section('connector-page');
-    };
+    );
+  }
 
-    this.newConnector = dialect => {
-      simpleGet(
-        '/desktop/connectors/api/instance/new/' + dialect,
-        {},
-        {
-          successCallback: data => {
-            this.instance(ko.mapping.fromJS(data.connector));
-          }
+  editConnector(data) {
+    if (this.section() === 'installed-connectors-page') {
+      this.instance(data);
+    } else {
+      this.newConnector(data.dialect);
+    }
+    this.section('connector-page');
+  }
+
+  newConnector(dialect) {
+    simpleGet(
+      '/desktop/connectors/api/instance/new/' + dialect,
+      {},
+      {
+        successCallback: data => {
+          this.instance(ko.mapping.fromJS(data.connector));
         }
-      );
-    };
+      }
+    );
+  }
 
-    this.fetchConnector = id => {
-      simpleGet(
-        '/desktop/connectors/api/instance/get/' + id,
-        {},
-        {
-          successCallback: data => {
-            this.instance(ko.mapping.fromJS(data.connector));
-          }
+  fetchConnector(id) {
+    simpleGet(
+      '/desktop/connectors/api/instance/get/' + id,
+      {},
+      {
+        successCallback: data => {
+          this.instance(ko.mapping.fromJS(data.connector));
         }
-      );
-    };
+      }
+    );
+  }
 
-    this.deleteConnector = connector => {
-      simplePost(
-        '/desktop/connectors/api/instance/delete',
-        {
-          connector: ko.mapping.toJSON(connector)
-        },
-        {
-          successCallback: data => {
-            this.section('installed-connectors-page');
-            this.fetchConnectors();
-            huePubSub.publish('cluster.config.refresh.config');
-          }
+  deleteConnector(connector) {
+    simplePost(
+      '/desktop/connectors/api/instance/delete',
+      {
+        connector: ko.mapping.toJSON(connector)
+      },
+      {
+        successCallback: data => {
+          this.section('installed-connectors-page');
+          this.fetchConnectors();
+          huePubSub.publish('cluster.config.refresh.config');
         }
-      );
-    };
+      }
+    );
+  }
 
-    this.updateConnector = connector => {
-      simplePost(
-        '/desktop/connectors/api/instance/update',
-        {
-          connector: ko.mapping.toJSON(connector)
-        },
-        {
-          successCallback: data => {
-            connector.id = data.connector.id;
-            this.section('installed-connectors-page');
-            this.fetchConnectors();
-            huePubSub.publish('cluster.config.refresh.config');
-          }
+  updateConnector(connector) {
+    simplePost(
+      '/desktop/connectors/api/instance/update',
+      {
+        connector: ko.mapping.toJSON(connector)
+      },
+      {
+        successCallback: data => {
+          connector.id = data.connector.id;
+          this.section('installed-connectors-page');
+          this.fetchConnectors();
+          huePubSub.publish('cluster.config.refresh.config');
         }
-      );
-    };
+      }
+    );
+  }
 
-    this.fetchConnectorTypes = () => {
-      simpleGet(
-        '/desktop/connectors/api/types/',
-        {},
-        {
-          successCallback: data => {
-            this.connectors(data.connectors);
-            this.categories(data.categories);
-          }
+  fetchConnectorTypes() {
+    simpleGet(
+      '/desktop/connectors/api/types/',
+      {},
+      {
+        successCallback: data => {
+          this.connectors(data.connectors);
+          this.categories(data.categories);
         }
-      );
-    };
+      }
+    );
+  }
 
-    this.testConnector = connector => {
-      this.testConnectionExecuted(false);
-      this.testConnectionErrors('');
+  testConnector(connector) {
+    this.testConnectionExecuted(false);
+    this.testConnectionErrors('');
 
-      simplePost(
-        '/desktop/connectors/api/instance/test',
-        {
-          connector: ko.mapping.toJSON(connector)
-        },
-        {
-          successCallback: data => {
-            this.testConnectionExecuted(true);
-            this.testConnectionErrors(data.warnings);
-          }
+    simplePost(
+      '/desktop/connectors/api/instance/test',
+      {
+        connector: ko.mapping.toJSON(connector)
+      },
+      {
+        successCallback: data => {
+          this.testConnectionExecuted(true);
+          this.testConnectionErrors(data.warnings);
         }
-      );
-    };
+      }
+    );
   }
 }
 
