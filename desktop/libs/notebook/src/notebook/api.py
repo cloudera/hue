@@ -447,14 +447,14 @@ def get_logs(request):
   return JsonResponse(response)
 
 def _save_notebook(notebook, user):
-  if notebook['snippets'][0].get('connector') and notebook['snippets'][0]['connector'].get('dialect'):
+  if notebook['snippets'][0].get('connector') and notebook['snippets'][0]['connector'].get('dialect'):  # TODO Connector unification
     notebook_type = 'query-%(dialect)s' % notebook['snippets'][0]['connector']
   else:
     notebook_type = notebook.get('type', 'notebook')
 
   save_as = False
 
-  if notebook.get('parentSavedQueryUuid'): # We save into the original saved query, not into the query history
+  if notebook.get('parentSavedQueryUuid'):  # We save into the original saved query, not into the query history
     notebook_doc = Document2.objects.get_by_uuid(user=user, uuid=notebook['parentSavedQueryUuid'])
   elif notebook.get('id'):
     notebook_doc = Document2.objects.get(id=notebook['id'])
