@@ -138,12 +138,12 @@ huePubSub.subscribe('app.dom.loaded', app => {
   huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
   huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
 
-  // TODO: Use connectors in the table browser
-  const connector = {};
-  if (viewModel.source().type === 'hive' || viewModel.source().type === 'impala') {
-    connector.optimizer = 'api';
-  }
   if (location.getParameter('refresh') === 'true') {
+    // TODO: Use connectors in the table browser
+    const connector = {};
+    if (viewModel.source().type === 'hive' || viewModel.source().type === 'impala') {
+      connector.optimizer = 'api';
+    }
     dataCatalog
       .getEntry({
         namespace: viewModel.source().namespace().namespace,
