@@ -125,7 +125,7 @@ ko.bindingHandlers.editable = {
 
         if (!multiLineEllipsisHandler) {
           multiLineEllipsisHandler = new MultiLineEllipsisHandler({
-            element: this,
+            element: element,
             text: value,
             overflowHeight: editableOptions.multiLineEllipsis.overflowHeight,
             expandable: editableOptions.multiLineEllipsis,
