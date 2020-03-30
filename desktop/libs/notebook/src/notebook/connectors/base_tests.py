@@ -26,7 +26,7 @@ from nose.tools import assert_equal, assert_true, assert_false
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
 
-from notebook.connectors.base import Notebook
+from notebook.connectors.base import Notebook, get_api
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock, MagicMock
@@ -41,6 +41,16 @@ class TestNotebook(object):
     self.user = User.objects.get(username="test")
 
 
+  def test_get_api(self):
+    request = Mock()
+    snippet = {
+      'connector': {'optimizer': 'api'},
+      'type': 'hive'  # Backward compatibility
+    }
+
+    get_api(request=request, snippet=snippet)
+
+
   def test_execute_and_wait(self):
     query = Notebook()
 
@@ -48,7 +58,7 @@ class TestNotebook(object):
     query.check_status = Mock(
       side_effect=check_status_side_effect
     )
-    request=Mock()
+    request = Mock()
 
     resp = query.execute_and_wait(request=request)
     assert_equal(1, resp['history_uuid'])
@@ -58,7 +68,7 @@ class TestNotebook(object):
   def test_check_status(self):
     query = Notebook()
 
-    request=Mock()
+    request = Mock()
     operation_id = Mock()
 
     with patch('notebook.api.Document2.objects.get_by_uuid') as get_by_uuid:
