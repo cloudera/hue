@@ -379,7 +379,7 @@ def get_api(request, snippet):
   if snippet.get('type') == 'report':
     snippet['type'] = 'impala'
 
-  if snippet.get('connector'):
+  if snippet.get('connector') and snippet['connector'].get('type'):  # TODO Connector unification
     connector_name = snippet['connector']['type']  # Ideally unify with name and nice_name
     snippet['type'] = connector_name
   else:
