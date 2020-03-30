@@ -59,6 +59,7 @@ CONNECTOR_TYPES = [
     'settings': [
       {'name': 'server_host', 'value': ''},
       {'name': 'server_port', 'value': ''},
+      {'name': 'impersonation_enabled', 'value': False},
     ],
     'category': 'editor',
     'description': '',

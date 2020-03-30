@@ -74,10 +74,10 @@ def get_authorized_proxy_user_config():
 
 def is_impersonation_enabled():
   """
-    Returns True if user_config config contains 'hue='
+  If hue user is allowed to send the queries as itself with an additiona doas parameter containing the logged-in user username.
   """
   user_config = get_conf().get(_AUTHORIZED_PROXY_USER_CONFIG)
-  return True if user_config and 'hue=' in user_config else False
+  return user_config and 'hue=' in user_config
 
 def default_query_option(option_name):
   query_options = get_conf().get(_DEFAULT_QUERY_OPTIONS)
