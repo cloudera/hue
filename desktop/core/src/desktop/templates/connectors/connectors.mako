@@ -25,13 +25,13 @@ from desktop.views import commonheader, commonfooter
 
 ${ layout.menubar(section='connectors') }
 
-<div id="connectorsConfiguration">
+<div id="connectorsComponents">
   <!-- ko component: { name: 'connectors-config' } --><!-- /ko -->
 </div>
 
 <script type="text/javascript">
   $(document).ready(function () {
-    ko.applyBindings({}, $('#connectorsConfiguration')[0]);
+    ko.applyBindings({}, $('#connectorsComponents')[0]);
   });
 </script>
 
