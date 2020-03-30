@@ -46,14 +46,14 @@ function db_connectivity_check() {
   echo "$ret"
 }
 
-function set_saml() {
+function set_samlcert() {
   mkdir -pm 755 $HUE_CONF_DIR/samlcert
   cd $HUE_CONF_DIR/samlcert
-  openssl genrsa -des3 -out hue.key -passout pass:cloudera 2048
-  openssl rsa -inform PEM -outform PEM -in hue.key -pubout -out hue-nopass.pem -passin pass:cloudera
-  echo "#!/bin/bash" >> samlscript.sh
-  echo "echo cloudera" >> samlscript.sh
-  chmod a+x samlscript.sh
+  export RANDFILE=$HUE_CONF_DIR/samlcert/.rnd
+  openssl genrsa -des3 -passout pass:x -out server.pass.key 2048
+  openssl rsa -inform PEM -outform PEM -passin pass:x -in server.pass.key -out server.key
+  openssl req -new -key server.key -out server.csr -subj "/C=US/ST=California/L=Palo Alto/O=Cloudera/OU=Hue/CN=$EXTERNAL_HOST"
+  openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64
 }
 
@@ -74,8 +74,10 @@ if [[ $1 == kt_renewer ]]; then
     $HUE_BIN/hue kt_renewer
   fi
 elif [[ $1 == runcpserver ]]; then
-    set_saml
-    $HUE_BIN/hue runcherrypyserver
+  if [ -e "/etc/hue/conf/saml.ini" ]; then
+    set_samlcert
+  fi
+  $HUE_BIN/hue runcherrypyserver
 fi
 
 exit 0
