@@ -23,7 +23,6 @@ from desktop.lib.i18n import smart_unicode
 
 
 def get_api(request, interface):
-
   if interface == 'navopt':
     from metadata.optimizer.optimizer_client import OptimizerClient
     return OptimizerClient(request.user)

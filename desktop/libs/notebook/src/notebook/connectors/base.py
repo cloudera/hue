@@ -30,6 +30,7 @@ from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from desktop.models import get_cluster_config
+from metadata.optimizer.base import get_api as get_optimizer_api
 
 from notebook.conf import get_ordered_interpreters
 from notebook.sql_utils import get_current_statement
@@ -543,11 +544,29 @@ class Api(object):
 
   def export_large_data_to_hdfs(self, notebook, snippet, destination): raise NotImplementedError()
 
-  def statement_risk(self, notebook, snippet): raise NotImplementedError()
+  def statement_risk(self, interface, notebook, snippet):
+    response = self._get_current_statement(notebook, snippet)
+    query = response['statement']
 
-  def statement_compatibility(self, notebook, snippet, source_platform, target_platform): raise NotImplementedError()
+    client = get_optimizer_api(self.request, interface)
 
-  def statement_similarity(self, notebook, snippet, source_platform, target_platform): raise NotImplementedError()
+    return client.query_risk(query=query, source_platform=snippet['type'], db_name=snippet.get('database') or 'default')
+
+  def statement_compatibility(self, interface, notebook, snippet, source_platform, target_platform):
+    response = self._get_current_statement(notebook, snippet)
+    query = response['statement']
+
+    client = get_optimizer_api(self.request, interface)
+
+    return client.query_compatibility(source_platform, target_platform, query)
+
+  def statement_similarity(self, interface, notebook, snippet, source_platform):
+    response = self._get_current_statement(notebook, snippet)
+    query = response['statement']
+
+    client = get_optimizer_api(self.request, interface)
+
+    return client.similar_queries(source_platform, query)
 
   def describe(self, notebook, snippet, database=None, table=None, column=None):
     if column:
