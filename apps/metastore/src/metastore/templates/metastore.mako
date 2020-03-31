@@ -56,13 +56,9 @@ ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 </style>
 % endif
 
-<script src="${ static('desktop/ext/js/wysihtml5-0.3.0.min.js') }"></script>
-<script src="${ static('desktop/js/bootstrap-wysihtml5-0.0.2.js') }"></script>
-<script src="${ static('desktop/ext/js/bootstrap-editable.wysihtml5.js') }"></script>
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-wysihtml5-0.0.2.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 
 ${ render_bundle('tableBrowser') | n,unicode }
