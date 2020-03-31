@@ -183,18 +183,10 @@ ko.bindingHandlers.editable = {
     if (ko.isObservable(value)) {
       $editable.on('save.ko', function (e, params) {
         var newValue = params.newValue || '';
-        if (editableOptions.type === 'wysihtml5') {
-          if (editableOptions.skipNewLines) {
-            newValue = newValue.replace(/<br\s*[\/]?>/gi, ' ').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-          } else {
-            newValue = newValue.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-          }
-        } else {
-          newValue = newValue.replace(/<(?:.|\n)*?>/gm, '');
+        newValue = newValue.replace(/<(?:.|\n)*?>/gm, '');
 
-          if (editableOptions.type !== 'textarea') {
-            newValue = newValue.replace(/\r?\n|\r/g, ' ');
-          }
+        if (editableOptions.type !== 'textarea') {
+          newValue = newValue.replace(/\r?\n|\r/g, ' ');
         }
         value(newValue);
       })
