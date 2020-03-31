@@ -548,7 +548,7 @@ class Api(object):
     response = self._get_current_statement(notebook, snippet)
     query = response['statement']
 
-    client = get_optimizer_api(self.request, interface)
+    client = get_optimizer_api(self.user, interface)
 
     return client.query_risk(query=query, source_platform=snippet['type'], db_name=snippet.get('database') or 'default')
 
@@ -556,7 +556,7 @@ class Api(object):
     response = self._get_current_statement(notebook, snippet)
     query = response['statement']
 
-    client = get_optimizer_api(self.request, interface)
+    client = get_optimizer_api(self.user, interface)
 
     return client.query_compatibility(source_platform, target_platform, query)
 
@@ -564,7 +564,7 @@ class Api(object):
     response = self._get_current_statement(notebook, snippet)
     query = response['statement']
 
-    client = get_optimizer_api(self.request, interface)
+    client = get_optimizer_api(self.user, interface)
 
     return client.similar_queries(source_platform, query)
 
