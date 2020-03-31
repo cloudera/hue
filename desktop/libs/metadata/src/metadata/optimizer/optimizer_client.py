@@ -228,16 +228,18 @@ class OptimizerClient(object):
 
 
   def query_risk(self, query, source_platform, db_name, page_size=100, startingToken=None):
-    response = self._call('getQueryRisk', {
-      'tenant' : self._tenant_id,
-      'query': _clean_query(query),
-      'dbName': db_name,
-      'sourcePlatform': source_platform,
-      'pageSize': page_size,
-      'startingToken': startingToken
-    })
+    response = self._call(
+      'getQueryRisk', {
+        'tenant' : self._tenant_id,
+        'query': _clean_query(query),
+        'dbName': db_name,
+        'sourcePlatform': source_platform,
+        'pageSize': page_size,
+        'startingToken': startingToken
+      }
+    )
 
-    hints = response.get(source_platform + 'Risk', {})
+    hints = response.get(source_platform + 'Risk', [])
 
     if hints and hints == [{"riskTables": [], "riskAnalysis": "", "riskId": 0, "risk": "low", "riskRecommendation": ""}]:
       hints = []
