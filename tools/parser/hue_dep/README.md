@@ -1,5 +1,5 @@
 
- Using Parser in node.js app
+ Using Parser in [src/app.js](src/app.js) app
 
     cd hue_dep
     npm install
@@ -14,7 +14,7 @@ In package.json there’s a dependency on Hue git project:
 
 Note that it can also be a GitHub link: “hue”: "git://github.com/cloudera/hue.git” but takes a bit longer to do “npm install"
 
-  { locations:
+    { locations:
     [ { type: 'statement', location: [Object] },
       { type: 'statementType',
         location: [Object],
