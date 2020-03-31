@@ -475,18 +475,22 @@ class HS2Api(Api):
       queries_with_state = parse_out_queries(logs, engine=engine, with_state=True)
 
       jobs = [{
-        'name': job.get('job_id', ''),
-        'url': reverse('jobbrowser.views.single_job', kwargs={'job': job.get('job_id', '')}),
-        'started': job.get('started', False),
-        'finished': job.get('finished', False)
-      } for job in jobs_with_state]
-      if has_hive_query_browser:
-        jobs += [{
           'name': job.get('job_id', ''),
-          'url': 'api/job/queries-hive/',
+          'url': reverse('jobbrowser.views.single_job', kwargs={'job': job.get('job_id', '')}),
           'started': job.get('started', False),
           'finished': job.get('finished', False)
-        } for job in queries_with_state]
+        }
+        for job in jobs_with_state
+      ]
+      if has_hive_query_browser:
+        jobs += [{
+            'name': job.get('job_id', ''),
+            'url': 'api/job/queries-hive/',
+            'started': job.get('started', False),
+            'finished': job.get('finished', False)
+          }
+          for job in queries_with_state
+        ]
     elif snippet['type'] == 'impala' and has_query_browser:
       guid = snippet['result']['handle']['guid']
       if isinstance(guid, str):
