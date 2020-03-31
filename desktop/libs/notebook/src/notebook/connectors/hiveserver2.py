@@ -18,8 +18,7 @@
 from __future__ import division
 from future import standard_library
 standard_library.install_aliases()
-from builtins import next
-from builtins import object
+from builtins import next, object
 import binascii
 import copy
 import json
@@ -41,9 +40,9 @@ from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.lib.rest.http_client import RestException
 from desktop.lib.thrift_util import unpack_guid, unpack_guid_base64
 from desktop.models import DefaultConfiguration, Document2
-from metadata.optimizer.optimizer_client import OptimizerClient
 
-from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported, _get_snippet_name, Notebook, get_interpreter
+from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported, _get_snippet_name, Notebook, \
+    get_interpreter
 
 if sys.version_info[0] > 2:
   from urllib.parse import quote as urllib_quote, unquote as urllib_unquote
@@ -56,7 +55,8 @@ LOG = logging.getLogger(__name__)
 try:
   from beeswax import conf as beeswax_conf, data_export
   from beeswax.api import _autocomplete, _get_sample_data
-  from beeswax.conf import CONFIG_WHITELIST as hive_settings, DOWNLOAD_ROW_LIMIT, DOWNLOAD_BYTES_LIMIT, MAX_NUMBER_OF_SESSIONS, has_session_pool, has_multiple_sessions, CLOSE_SESSIONS
+  from beeswax.conf import CONFIG_WHITELIST as hive_settings, DOWNLOAD_ROW_LIMIT, DOWNLOAD_BYTES_LIMIT, MAX_NUMBER_OF_SESSIONS, \
+      has_session_pool, has_multiple_sessions, CLOSE_SESSIONS
   from beeswax.data_export import upload
   from beeswax.design import hql_query
   from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory, Session
@@ -624,33 +624,6 @@ DROP TABLE IF EXISTS `%(table)s`;
     success_url = '/filebrowser/view=%s' % urllib_quote(destination.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
 
     return hql, success_url
-
-
-  def statement_risk(self, notebook, snippet):
-    response = self._get_current_statement(notebook, snippet)
-    query = response['statement']
-
-    client = OptimizerClient(self.user)
-
-    return client.query_risk(query=query, source_platform=snippet['type'], db_name=snippet.get('database') or 'default')
-
-
-  def statement_compatibility(self, notebook, snippet, source_platform, target_platform):
-    response = self._get_current_statement(notebook, snippet)
-    query = response['statement']
-
-    client = OptimizerClient(self.user)
-
-    return client.query_compatibility(source_platform, target_platform, query)
-
-
-  def statement_similarity(self, notebook, snippet, source_platform):
-    response = self._get_current_statement(notebook, snippet)
-    query = response['statement']
-
-    client = OptimizerClient(self.user)
-
-    return client.similar_queries(source_platform, query)
 
 
   def upgrade_properties(self, lang='hive', properties=None):

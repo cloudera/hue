@@ -38,6 +38,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2, Document, __paginate, _get_gist_document
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
+from metadata.conf import OPTIMIZER
 
 from notebook.connectors.base import Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name
 from notebook.connectors.hiveserver2 import HS2Api
@@ -895,10 +896,11 @@ def statement_risk(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
 
-  api = HS2Api(request.user, snippet)
+  api = get_api(request, snippet)
 
-  response['query_complexity'] = api.statement_risk(notebook, snippet)
+  response['query_complexity'] = api.statement_risk(interface, notebook, snippet)
   response['status'] = 0
 
   return JsonResponse(response)
@@ -912,12 +914,14 @@ def statement_compatibility(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   source_platform = request.POST.get('sourcePlatform')
   target_platform = request.POST.get('targetPlatform')
 
   api = get_api(request, snippet)
 
   response['query_compatibility'] = api.statement_compatibility(
+      interface,
       notebook,
       snippet,
       source_platform=source_platform,
@@ -936,11 +940,12 @@ def statement_similarity(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   source_platform = request.POST.get('sourcePlatform')
 
   api = get_api(request, snippet)
 
-  response['statement_similarity'] = api.statement_similarity(notebook, snippet, source_platform=source_platform)
+  response['statement_similarity'] = api.statement_similarity(interface, notebook, snippet, source_platform=source_platform)
   response['status'] = 0
 
   return JsonResponse(response)
