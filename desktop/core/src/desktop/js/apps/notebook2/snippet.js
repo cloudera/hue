@@ -201,7 +201,6 @@ export default class Snippet {
     this.name = ko.observable(snippetRaw.name || '');
 
     this.connector = ko.observable();
-
     this.connector.subscribe(connector => {
       sessionManager.getSession({ type: connector.id }).then(() => {
         this.status(STATUS.ready);
@@ -215,6 +214,11 @@ export default class Snippet {
 
     this.isSqlDialect = ko.pureComputed(() => this.connector() && this.connector().is_sql);
     this.defaultLimit = ko.observable(snippetRaw.defaultLimit);
+    this.defaultLimit.extend({ rateLimit: 1000 });
+    this.defaultLimit.subscribe(newValue => {
+      // Not trigered because inFocus() is false
+      this.checkComplexity();
+    });
 
     if (!this.defaultLimit()) {
       const lastKnownConfig = getLastKnownConfig();
