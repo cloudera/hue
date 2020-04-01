@@ -2002,10 +2002,13 @@
     ## api_url=http://localhost:7180/api
 
   [[optimizer]]
-    # Type of Optimizer connector to query, e.g. optimizer, dummy
-    # interface=optimizer
+    # Mode of optimization: off, local, api.
+    ## mode=off
 
-    # Hostnameto Optimizer API or compatible service.
+    # Type of Optimizer connector to use, e.g. optimizer, navopt, dummy.
+    ## interface=navopt
+
+    # Hostname of Optimizer API service.
     ## hostname=navoptapi.us-west-1.optimizer.altus.cloudera.com
 
     # The name of the key of the service.
