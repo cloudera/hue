@@ -772,7 +772,7 @@ class HiveServerClient(object):
         message = res.status.errorMessage
       else:
         message = 'Bad status for request %s:\n%s' % (req, res)
-      raise QueryServerException(Exception(message))
+      raise QueryServerException(Exception(message), message=message)
     else:
       return (res, session)
 
