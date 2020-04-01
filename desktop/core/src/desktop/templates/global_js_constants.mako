@@ -29,7 +29,7 @@
   from filebrowser.conf import SHOW_UPLOAD_BUTTON
   from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_catalog, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER, get_optimizer_url, \
-      get_catalog_url
+      get_catalog_url, get_optimizer_mode
   from metastore.conf import ENABLE_NEW_CREATE_TABLE
   from metastore.views import has_write_access
   from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_SQL_INDEXER, \
@@ -104,6 +104,7 @@
   window.HAS_READ_ONLY_CATALOG = '${ has_readonly_catalog(request.user) }' === 'True' || '${ has_write_access(request.user) }' === 'False';
 
   window.HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
+  window.OPTIMIZER_MODE = '${ get_optimizer_mode() }';
   window.OPTIMIZER_URL = '${ get_optimizer_url() }'
   window.AUTO_UPLOAD_OPTIMIZER_STATS = '${ OPTIMIZER.AUTO_UPLOAD_STATS.get() }' === 'True';
 

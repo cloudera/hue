@@ -18,13 +18,17 @@ import ApiStrategy from './apiStrategy';
 import BaseStrategy from './baseStrategy';
 
 const OPTIMIZER_STRATEGIES = {
-  api: new ApiStrategy(),
-  off: new BaseStrategy()
+  api: ApiStrategy,
+  off: BaseStrategy
 };
 
 export const getOptimizer = connector => {
-  if (connector && connector.optimizer && OPTIMIZER_STRATEGIES[connector.optimizer]) {
-    return OPTIMIZER_STRATEGIES[connector.optimizer];
-  }
-  return OPTIMIZER_STRATEGIES.off;
+  // Can remove window.OPTIMIZER_MODE and hardcoded { optimizer: 'api' } when 'connector.optimizer_mode' works.
+  const strategy =
+    connector && connector.optimizer && OPTIMIZER_STRATEGIES[window.OPTIMIZER_MODE]
+      ? OPTIMIZER_STRATEGIES[window.OPTIMIZER_MODE]
+      : OPTIMIZER_STRATEGIES.off;
+
+  // Connector should contain proper 'sourceType' so that dataCatalog.getEntry works in localStrategy
+  return new strategy(connector);
 };

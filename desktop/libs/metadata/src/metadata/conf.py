@@ -68,6 +68,9 @@ def get_optimizer_url():
 def has_optimizer():
   return OPTIMIZER.INTERFACE.get() != 'navopt' or bool(OPTIMIZER.AUTH_KEY_ID.get())
 
+def get_optimizer_mode():
+  return has_optimizer() and OPTIMIZER.MODE.get() or 'off'
+
 def has_workload_analytics():
   # Note: unused
   return bool(ALTUS.AUTH_KEY_ID.get()) and ALTUS.HAS_WA.get()
@@ -94,14 +97,19 @@ OPTIMIZER = ConfigSection(
   key='optimizer',
   help=_t("""Configuration options for Optimizer API"""),
   members=dict(
+    MODE=Config(
+      key='mode',
+      help=_t('Mode of optimization: off, local, api.'),
+      default='off'
+    ),
     INTERFACE=Config(
       key='interface',
-      help=_t('Type of Optimizer connector to query, e.g. optimizer, dummy'),
+      help=_t('Type of optimizer connector to use, e.g. optimizer, navopt, dummy.'),
       default='navopt'
     ),
     HOSTNAME=Config(
       key='hostname',
-      help=_t('Hostname to Optimizer API or compatible service.'),
+      help=_t('Hostname of Optimizer API service.'),
       default='navoptapi.us-west-1.optimizer.altus.cloudera.com'
     ),
     AUTH_KEY_ID=Config(
