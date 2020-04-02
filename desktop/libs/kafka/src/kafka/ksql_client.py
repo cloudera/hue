@@ -117,7 +117,9 @@ class KSqlApi(object):
     if is_select or is_print:
       result = self.client.query(statement)
 
-      metadata = [['Row', 'STRING']]
+      metadata = [
+        {'type': 'STRING', 'name': 'Row', 'comment': None}
+      ]
 
       if has_channels() and channel_name:
         _send_to_channel(
@@ -155,7 +157,7 @@ class KSqlApi(object):
           _send_to_channel(
               channel_name,
               message_type='task.result',
-              message_data={'data': data, 'metadata': metadata, 'query_id': 1}
+              message_data={'data': data, 'meta': metadata, 'query_id': 1}
           )
           data = []  # TODO: special message when end of stream
     else:
@@ -167,7 +169,7 @@ class KSqlApi(object):
         _send_to_channel(
             channel_name,
             message_type='task.result',
-            message_data={'data': data, 'metadata': metadata, 'query_id': 1}
+            message_data={'data': data, 'meta': metadata, 'query_id': 1}
         )
         data = []  # TODO: special message when end of stream
 

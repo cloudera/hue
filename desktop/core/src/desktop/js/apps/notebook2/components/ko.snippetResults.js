@@ -71,7 +71,7 @@ const TEMPLATE = `
     </div>
     <div class="table-results" data-bind="visible: type() === 'table'" style="display: none;">
       <div data-bind="visible: !executing() && hasData() && showGrid()" style="display: none; position: relative;">
-        <!-- ko component: { 
+        <!-- ko component: {
           name: 'result-grid',
           params: {
             activeExecutable: activeExecutable,
@@ -115,6 +115,8 @@ const TEMPLATE = `
       </div>
       <div data-bind="visible: executing" style="display: none;">
         <h1 class="empty"><i class="fa fa-spinner fa-spin"></i> ${ I18n('Executing...') }</h1>
+      </div>
+      <div id="wsResult">
       </div>
     </div>
   </div>
@@ -225,6 +227,8 @@ class SnippetResults extends DisposableComponent {
     this.cleanedStringMeta([]);
     this.hasMore(false);
     this.type(RESULT_TYPE.TABLE);
+    // eslint-disable-next-line no-undef
+    $('#wsResult').empty();
   }
 
   updateFromExecutionResult(executionResult, refresh) {

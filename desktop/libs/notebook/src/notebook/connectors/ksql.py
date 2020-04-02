@@ -73,8 +73,8 @@ class KSqlApi(Api):
           'has_more': False,
           'data': data if has_result_set else [],
           'meta': [{
-            'name': col[0],
-            'type': col[1],
+            'name': col['name'],
+            'type': col['type'],
             'comment': ''
           } for col in description
         ] if has_result_set else [],
