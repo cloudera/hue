@@ -46,6 +46,12 @@ SERVER_PORT = Config(
   default=21050,
   type=int)
 
+COORDINATOR_URL = Config(
+  key="coordinator_url",
+  help=_t("URL of the Impala Coordinator Server."),
+  type=str,
+  default="")
+
 IMPALA_PRINCIPAL=Config(
   key='impala_principal',
   help=_t("Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."),
