@@ -130,6 +130,12 @@ class KSqlApi(object):
         # columns = line.keys()
         # data.append([line[col] for col in columns])
         if 'finalMessage' in line:
+          if has_channels() and channel_name:  # Send results via WS and empty results
+            _send_to_channel(
+                channel_name,
+                message_type='task.result',
+                message_data={'status': 'finalMessage', 'query_id': 1}
+            )
           break
         elif 'header' in line:
           continue
@@ -144,18 +150,26 @@ class KSqlApi(object):
             data.append(data_line['row']['columns'])
         else:
           data.append([line])
+
+        if has_channels() and channel_name:  # Send results via WS and empty results
+          _send_to_channel(
+              channel_name,
+              message_type='task.result',
+              message_data={'data': data, 'metadata': metadata, 'query_id': 1}
+          )
+          data = []  # TODO: special message when end of stream
     else:
       data, metadata = self._decode_result(
         self.ksql(statement)
       )
 
-    if has_channels() and channel_name:  # Send results via WS and empty results
-      _send_to_channel(
-          channel_name,
-          message_type='task.result',
-          message_data={'data': data, 'metadata': metadata, 'query_id': 1}
-      )
-      data = []  # TODO: special message when end of stream
+      if has_channels() and channel_name:  # Send results via WS and empty results
+        _send_to_channel(
+            channel_name,
+            message_type='task.result',
+            message_data={'data': data, 'metadata': metadata, 'query_id': 1}
+        )
+        data = []  # TODO: special message when end of stream
 
     return data, metadata
 
