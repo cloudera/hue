@@ -657,12 +657,16 @@ class ExecutionWrapper(object):
 
   def fetch(self, handle, start_over=None, rows=None):
     if start_over:
-      if not self.snippet['result'].get('handle') or not self.snippet['result']['handle'].get('guid') or not self.api.can_start_over(self.notebook, self.snippet):
+      if not self.snippet['result'].get('handle') \
+          or not self.snippet['result']['handle'].get('guid') \
+          or not self.api.can_start_over(self.notebook, self.snippet):
         start_over = False
         handle = self.api.execute(self.notebook, self.snippet)
         self.snippet['result']['handle'] = handle
+
         if self.callback and hasattr(self.callback, 'on_execute'):
           self.callback.on_execute(handle)
+
         self.should_close = True
         self._until_available()
 
