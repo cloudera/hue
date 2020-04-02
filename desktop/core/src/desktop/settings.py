@@ -748,8 +748,9 @@ if desktop.conf.ENABLE_PROMETHEUS.get():
 
   if 'mysql' in DATABASES['default']['ENGINE']:
     DATABASES['default']['ENGINE'] = DATABASES['default']['ENGINE'].replace('django.db.backends', 'django_prometheus.db.backends')
-  for name, val in list(CACHES.items()):
-    val['BACKEND'] = val['BACKEND'].replace('django.core.cache.backends', 'django_prometheus.cache.backends')
+  # enable only when use these metrics: django_cache_get_total, django_cache_hits_total, django_cache_misses_total
+  # for name, val in list(CACHES.items()):
+  #   val['BACKEND'] = val['BACKEND'].replace('django.core.cache.backends', 'django_prometheus.cache.backends')
 
 
 ################################################################

@@ -166,6 +166,40 @@ def test_public_views():
     response = c.get(url)
     assert_equal(200, response.status_code)
 
+def test_prometheus_view():
+  if not desktop.conf.ENABLE_PROMETHEUS.get():
+    raise SkipTest
+
+  ALL_PROMETHEUS_METRICS = [
+    'django_http_requests_before_middlewares_total',
+    'django_http_responses_before_middlewares_total',
+    'django_http_requests_latency_including_middlewares_seconds',
+    'django_http_requests_unknown_latency_including_middlewares_total',
+    'django_http_requests_latency_seconds_by_view_method',
+    'django_http_requests_unknown_latency_total',
+    'django_http_ajax_requests_total',
+    'django_http_requests_total_by_method',
+    'django_http_requests_total_by_transport',
+    'django_http_requests_total_by_view_transport_method',
+    'django_http_requests_body_total_bytes',
+    'django_http_responses_total_by_templatename',
+    'django_http_responses_total_by_status',
+    'django_http_responses_body_total_bytes',
+    'django_http_responses_total_by_charset',
+    'django_http_responses_streaming_total',
+    'django_http_exceptions_total_by_type',
+    'django_http_exceptions_total_by_view',
+  ]
+
+  c = Client()
+  response = c.get('/metrics')
+  for metric in ALL_PROMETHEUS_METRICS:
+    metric = metric if isinstance(metric, bytes) else metric.encode('utf-8')
+    if metric not in desktop.metrics.ALLOWED_DJANGO_PROMETHEUS_METRICS:
+      assert_false(metric in response.content, 'metric: %s \n %s' % (metric, response.content))
+    else:
+      assert_true(metric in response.content, 'metric: %s \n %s' % (metric, response.content))
+
 def test_log_view():
   c = make_logged_in_client()
 
