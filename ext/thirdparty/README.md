@@ -205,5 +205,4 @@ Frontend third party dependencies (some checked in and some via npm)
 |Webpack cli|3.2.1|MIT|https://www.npmjs.com/package/webpack-cli|
 |Webpack clean plugin|1.0.1|MIT|https://www.npmjs.com/package/clean-webpack-plugin|
 |Webpack Clean Obsolete Chunks plugin|0.4.0|MIT|https://github.com/GProst/webpack-clean-obsolete-chunks|
-|wysihtml5|0.3.0|MIT|https://github.com/xing/wysihtml5|
 |X-editable|1.5.1|MIT|http://github.com/vitalets/x-editable|"
