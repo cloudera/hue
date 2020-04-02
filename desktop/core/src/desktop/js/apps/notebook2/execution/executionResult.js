@@ -64,6 +64,16 @@ const COMPLEX_TYPES = {
   struct: true
 };
 
+huePubSub.subscribe('editor.ws.query.fetch_result', executionResult => {
+  if (executionResult.status != 'finalMessage') {
+    const result = new ExecutionResult(null);
+    result.fetchedOnce = true;
+    result.handleResultResponse(executionResult);
+    // eslint-disable-next-line no-undef
+    $('#wsResult').append('<div>' + executionResult.data + '</div>');
+  }
+});
+
 export default class ExecutionResult {
   /**
    *
