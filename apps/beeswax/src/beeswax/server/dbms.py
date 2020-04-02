@@ -110,9 +110,10 @@ def get(user, query_server=None, cluster=None):
 
 def get_query_server_config(name='beeswax', connector=None):
   if connector and has_connectors(): # TODO: Give empty connector when no connector in use
+    LOG.debug("Query via connector %s" % name)
     query_server = get_query_server_config_via_connector(connector)
   else:
-    LOG.debug("Query cluster %s" % name)
+    LOG.debug("Query via ini %s" % name)
     if name == "llap":
       activeEndpoint = cache.get('llap')
       if activeEndpoint is None:
