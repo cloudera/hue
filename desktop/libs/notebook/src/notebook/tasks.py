@@ -137,6 +137,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
         delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
         csv_reader = csv.reader(f, delimiter=delimiter)
         caches[CACHES_CELERY_QUERY_RESULT_KEY].set(result_key, [row for row in csv_reader], 60 * 5)
+        LOG.info('Caching results %s.' % result_key)
 
     meta['row_counter'] = content_generator.row_counter
     meta['truncated'] = content_generator.is_truncated
@@ -396,10 +397,10 @@ def _get_data(task_id):
 
   if TASK_SERVER.RESULT_CACHE.get():
     csv_reader = caches[CACHES_CELERY_QUERY_RESULT_KEY].get(result_key)  # TODO check if expired
-    if not csv_reader:
+    if csv_reader is None:
       raise QueryError('Cached results %s not found.' % result_key)
-    headers = csv_reader[0]  # TODO check size
-    csv_reader = csv_reader[1:]
+    headers = csv_reader[0] if csv_reader else []  # TODO check size
+    csv_reader = csv_reader[1:] if csv_reader else []
   else:
     f = storage.open(result_key)
     delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
