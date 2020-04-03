@@ -363,7 +363,7 @@ const TEMPLATE =
     <div class="assist-db-header-actions">
       <!-- ko ifnot: loading -->
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
-      <!-- ko if: window.ENABLE_NEW_CREATE_TABLE && (sourceType === 'hive' || sourceType === 'impala') -->
+      <!-- ko if: window.ENABLE_NEW_CREATE_TABLE && (sourceType === 'hive' || sourceType === 'impala' || (typeof connector !== 'undefined' && connector && (connector.dialect == 'impala' || connector.dialect == 'hive'))) -->
       <!-- ko if: typeof databaseName !== 'undefined' -->
         <a class="inactive-action" data-bind="hueLink: window.HUE_URLS.IMPORTER_CREATE_TABLE + databaseName + '/?sourceType=' + sourceType + '&namespace=' + assistDbNamespace.namespace.id" title="${I18n(
           'Create table'
