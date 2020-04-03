@@ -224,6 +224,8 @@ install-env:
 
 .PHONY: npm-install
 npm-install:
+	npm --version
+	node --version
 	npm install
 	npm run webpack
 	npm run webpack-login
