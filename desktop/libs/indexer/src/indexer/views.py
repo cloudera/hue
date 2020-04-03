@@ -110,7 +110,9 @@ def importer_prefill(request, source_type, target_type, target_path=None):
 
 
 def _importer(request, prefill):
-  source_type = request.GET.get('sourceType') or get_cluster_config(request.user)['default_sql_interpreter']
+  cluster_config = get_cluster_config(request.user)
+
+  source_type = request.GET.get('sourceType') or cluster_config['default_sql_interpreter']
 
   return render('importer.mako', request, {
       'is_embeddable': request.GET.get('is_embeddable', False),
