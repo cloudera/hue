@@ -31,6 +31,7 @@ if sys.version_info[0] > 2:
 else:
   from StringIO import StringIO as string_io
 
+
 def test_get_ensemble():
   # Non ascii
   data = string_io('fieldA\nrel=""nofollow"">Twitter for Péché')
