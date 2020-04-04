@@ -561,7 +561,7 @@ Then give Hue the information about the database source:
 
 ### Apache Solr
 
-### SQL
+#### SQL
 
 Query collections like we would query a regular database.
 
@@ -890,6 +890,9 @@ The json credentials of a service account can be stored for development in plain
     [[[default]]]
     json_credentials='{ "type": "service_account", "project_id": .... }'
 
+### Apache Ozone
+
+The API is the same as [S3](#s3).
 
 ### HBase
 
