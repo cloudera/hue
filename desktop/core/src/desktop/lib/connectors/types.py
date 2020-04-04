@@ -209,6 +209,28 @@ CONNECTOR_TYPES = [
     }
   },
   {
+    'nice_name': "Phoenix SQL",
+    'dialect': 'phoenix',
+    'interface': 'sqlalchemy',
+    'settings': [
+      {'name': 'url', 'value': 'phoenix://sql-phoenix.com:8765/'}
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': False,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+    }
+  },
+  {
     'nice_name': "MySQL",
     'dialect': 'mysql',
     'interface': 'sqlalchemy',
