@@ -6,16 +6,7 @@
 * Reusable in popup like in Dashboard
 * Result popup explorer
 * Preso/Notebook mode
-
 * Buttons on middle line
-* Query History versioning (execution/saved later)
-* Scheduling + notifications + sharing
-* Comparing dates / trend
-* ERD
-* Formatting
-
-* Js executor
-* Proxy executor
 
  ## March update
 
