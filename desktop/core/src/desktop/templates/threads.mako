@@ -30,12 +30,13 @@ ${ commonheader(_('Threads'), "about", user, request) | n,unicode }
   (function () {
     var ThreadsViewModel = function () {
       var self = this;
-      self.apiHelper = window.apiHelper;
       self.threads = ko.observable();
       self.fetchThreads = function () {
-        self.apiHelper.simpleGet('/desktop/debug/threads', {}, {successCallback: self.threads});
+        window.simpleGet('/desktop/debug/threads', {}, {
+          successCallback: self.threads
+        });
       };
-    }
+    };
     $(document).ready(function () {
       var viewModel = new ThreadsViewModel();
       ko.applyBindings(viewModel, $('#threadsComponents')[0]);

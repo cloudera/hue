@@ -36,17 +36,16 @@ else:
   (function () {
     var AnalyticsViewModel = function () {
       var self = this;
-
-      self.apiHelper = window.apiHelper;
-
       self.stats = ko.observableArray();
 
       self.fetchAnalytics = function () {
-        self.apiHelper.simpleGet('/desktop/analytics/api/admin_stats', {}, {successCallback: function (data) {
-          self.stats(data.admin_stats);
-        }});
+        window.simpleGet('/desktop/analytics/api/admin_stats', {}, {
+          successCallback: function (data) {
+            self.stats(data.admin_stats);
+          }
+        });
       };
-    }
+    };
 
     $(document).ready(function () {
       var viewModel = new AnalyticsViewModel();

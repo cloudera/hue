@@ -73,10 +73,12 @@ import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and
 import HueFileEntry from 'doc/hueFileEntry';
 import HueDocument from 'doc/hueDocument';
 import { REFRESH_CONFIG_EVENT } from 'utils/hueConfig';
+import { simpleGet } from 'api/apiUtils'; // In analytics.mako, metrics.mako, threads.mako
 
 // TODO: Migrate away
 window._ = _;
 window.apiHelper = apiHelper;
+window.simpleGet = simpleGet;
 window.CancellablePromise = CancellablePromise;
 window.contextCatalog = contextCatalog;
 window.d3 = d3;
