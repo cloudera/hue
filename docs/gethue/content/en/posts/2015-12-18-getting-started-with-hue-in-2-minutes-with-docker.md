@@ -1,5 +1,5 @@
 ---
-title: Getting started with Hue in 1 minute with Docker
+title: Getting started with Hue in 2 minutes with Docker
 author: admin
 type: post
 date: 2015-12-18T15:35:33+00:00
@@ -64,17 +64,17 @@ Please find below a video showing how to start Hue with Docker on a Mac and inst
 
 {{< youtube ciJgNKjRYvU >}}
 
-# [][7]{#user-content-get-the-docker-image.anchor}Get the docker image
+# Get the docker image
 
 They are two ways: just pull the latest from the Internet or build it yourself from the [Hue repository][8].
 
-### [][9]{#user-content-pull-the-image-from-docker-hub.anchor}Pull the image from Docker Hub
+### Pull the image from Docker Hub
 
 <pre><code class="bash">sudo docker pull gethue/hue:latest
 
 </code></pre>
 
-### [][10]{#user-content-build-the-image.anchor}Build the image
+### Build the image
 
 <pre><code class="bash">cd tools/docker/hue-base
 
@@ -82,7 +82,7 @@ sudo docker build -rm -t gethue/hue:latest .
 
 </code></pre>
 
-## [][11]{#user-content-running-the-image.anchor}Running the image
+## Running the image
 
 <pre><code class="bash">docker run -it -p 8888:8888 gethue/hue:latest bash
 
@@ -130,7 +130,7 @@ RX bytes:10626 (10.6 KB) TX bytes:648 (648.0 B)
 
 <a href="https://raw.githubusercontent.com/cloudera/hue/master/docs/images/login.png" target="_blank" rel="noopener noreferrer"><img title="Hue First Login" src="https://raw.githubusercontent.com/cloudera/hue/master/docs/images/login.png" alt="alt text" /></a>
 
-## [][14]{#user-content-next.anchor}Next
+## Next
 
 You can then configure Hue and start using it!
 

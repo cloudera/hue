@@ -53,7 +53,7 @@ from desktop.lib.parameterization import substitute_variables
 from desktop.lib.python_util import from_string_to_bits, get_bytes_from_bits
 from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.lib.security_util import get_localhost_name
-from desktop.lib.test_export_csvxls import _read_xls_sheet_data
+from desktop.lib.export_csvxls_tests import _read_xls_sheet_data
 from hadoop.fs.hadoopfs import Hdfs
 from useradmin.models import User
 

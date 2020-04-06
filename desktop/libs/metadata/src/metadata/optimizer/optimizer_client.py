@@ -94,7 +94,9 @@ class OptimizerClient(object):
     self.user = user
     self._api_url = (api_url or get_optimizer_url()).strip('/')
     self._auth_key = auth_key if auth_key else OPTIMIZER.AUTH_KEY_ID.get()
-    self._auth_key_secret = auth_key_secret if auth_key_secret else (OPTIMIZER.AUTH_KEY_SECRET.get() and OPTIMIZER.AUTH_KEY_SECRET.get().replace('\\n', '\n'))
+    self._auth_key_secret = auth_key_secret if auth_key_secret else (
+        OPTIMIZER.AUTH_KEY_SECRET.get() and OPTIMIZER.AUTH_KEY_SECRET.get().replace('\\n', '\n')
+    )
 
     self._api = ApiLib("navopt", self._api_url, self._auth_key, self._auth_key_secret)
 

@@ -19,14 +19,14 @@ import logging
 
 from django.utils.translation import ugettext as _
 
-from desktop.conf import CLUSTER_ID
+from desktop.conf import CLUSTER_ID, has_connectors
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
-from desktop.models import Cluster, ClusterConfig
+from desktop.models import Cluster
 from beeswax.design import hql_query
 from beeswax.models import QUERY_TYPES
 from beeswax.server import dbms
-from beeswax.server.dbms import HiveServer2Dbms, QueryServerException, QueryServerTimeoutException,\
+from beeswax.server.dbms import HiveServer2Dbms, QueryServerException, QueryServerTimeoutException, \
   get_query_server_config as beeswax_query_server_config, get_query_server_config_via_connector
 
 from impala import conf
@@ -38,6 +38,7 @@ LOG = logging.getLogger(__name__)
 def get_query_server_config(connector=None):
   if connector and has_connectors():
     query_server = get_query_server_config_via_connector(connector)
+    query_server['impersonation_enabled'] = conf.IMPERSONATION_ENABLED.get()  # TODO Use impersonation_enabled property
   else:
     query_server = {
         'server_name': 'impala',

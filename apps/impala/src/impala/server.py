@@ -28,7 +28,7 @@ from beeswax.server.hive_server2_lib import HiveServerClient
 
 from ImpalaService import ImpalaHiveServer2Service
 from impala.impala_flags import get_webserver_certificate_file, is_webserver_spnego_enabled, is_kerberos_enabled
-from impala.conf import DAEMON_API_USERNAME, DAEMON_API_PASSWORD
+from impala.conf import DAEMON_API_USERNAME, DAEMON_API_PASSWORD, COORDINATOR_URL
 
 
 LOG = logging.getLogger(__name__)
@@ -42,7 +42,11 @@ def get_api(user, url):
 
 def _get_impala_server_url(session):
   properties = session.get_properties()
-  http_addr = properties.get('coordinator_host', properties.get('http_addr'))
+  http_addr = ""
+  if COORDINATOR_URL.get():
+    http_addr = COORDINATOR_URL.get()
+  else:
+    http_addr = properties.get('coordinator_host', properties.get('http_addr'))
   http_addr = http_addr.replace('http://', '').replace('https://', '')
   return ('https://' if get_webserver_certificate_file() else 'http://') + http_addr
 

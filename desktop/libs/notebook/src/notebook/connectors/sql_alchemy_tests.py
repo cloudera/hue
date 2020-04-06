@@ -28,7 +28,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
 
 from notebook.connectors.base import AuthenticationRequired
-from notebook.connectors.sql_alchemy import SqlAlchemyApi
+from notebook.connectors.sql_alchemy import SqlAlchemyApi, Assist
 
 
 if sys.version_info[0] > 2:
@@ -269,7 +269,6 @@ class TestAutocomplete(object):
 
           assert_equal(data['databases'], ['SYSTEM', 'NULL'])
 
-
   def test_columns_with_null_type(self):
     interpreter = {
       'options': {'url': 'phoenix://'}
@@ -296,9 +295,30 @@ class TestAutocomplete(object):
           col2.__getitem__.side_effect = col2_dict
           col2.get = col2_dict
 
-          Assist.return_value=Mock(get_columns=Mock(return_value=[col1, col2]))
+          Assist.return_value=Mock(get_columns=Mock(return_value=[col1, col2]), get_keys=Mock(return_value={}))
 
           data = SqlAlchemyApi(self.user, interpreter).autocomplete(snippet, database='database', table='table')
 
           assert_equal(data['columns'], ['col1', 'col2'])
           assert_equal([col['type'] for col in data['extended_columns']], ['string', 'Null'])
+
+  def test_get_keys(self):
+
+    with patch('notebook.connectors.sql_alchemy.Table') as Table:
+      Table.return_value = Mock(
+        foreign_keys=[
+          Mock(
+            parent=Mock(name='col1'),
+            target_fullname='db2.table2.col2'
+          )
+        ],
+        primary_key=Mock(columns=[Mock(name='col2')])
+      )
+
+      db, engine, backticks = Mock(), Mock(), Mock()
+      database, table = Mock(), Mock()
+
+      keys = Assist(db, engine, backticks).get_keys(database, table)
+
+      assert_true(keys['primary_keys'])  # For some reason could not mock two level to get some colum names
+      assert_equal(keys['foreign_keys'][0]['to'], 'db2.table2.col2')
