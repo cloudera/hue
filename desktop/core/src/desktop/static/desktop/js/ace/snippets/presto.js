@@ -1,1 +1,1 @@
-ace.define("ace/snippets/presto",["require","exports","module"],function(e,t,n){"use strict";t.snippetText="",t.scope="presto"})
+ace.define("ace/snippets/presto",["require","exports","module"],function(e,t,n){"use strict";t.snippetText=undefined,t.scope="presto"})

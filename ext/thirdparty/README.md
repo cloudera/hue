@@ -106,7 +106,6 @@ Frontend third party dependencies (some checked in and some via npm)
 |Project|Version|License|Source URL|
 |-------|-------|-------|----------|
 |Ace Editor|1.2.2|BSD|https://github.com/ajaxorg/ace|
-|Architect Build|0.1.1|None|https://www.npmjs.com/package/architect-build|
 |Babel cli|6.26.0|MIT|https://www.npmjs.com/package/babel-cli|
 |Babel Core|7.2.2|MIT|https://www.npmjs.com/package/babel-core|
 |Babel eslint|10.0.1|MIT|https://www.npmjs.com/package/babel-eslint|
@@ -132,7 +131,6 @@ Frontend third party dependencies (some checked in and some via npm)
 |ESLint config prettier|4.0.0|MIT|https://www.npmjs.com/package/eslint-config-prettier|
 |ESLint plugin prettier|3.0.1|MIT|https://www.npmjs.com/package/eslint-plugin-prettier|
 |Expose Loader|0.7.5|MIT|https://www.npmjs.com/package/expose-loader|
-|Dryice|0.4.11|None|https://www.npmjs.com/package/dryice|
 |django-debug-panel|0.8.3|BSD|https://pypi.org/project/django-debug-panel/0.8.3/|
 |django-debug-toolbar|1.3.2|BSD|https://pypi.python.org/pypi/django-debug-toolbar/1.3.2|
 |filesize.js|4.0.0|BSD|https://github.com/avoidwork/filesize.js|
@@ -141,7 +139,6 @@ Frontend third party dependencies (some checked in and some via npm)
 |Gridster.js|0.7.0|MIT|https://github.com/dsmorse/gridster.js|
 |Grunt|1.0.3|MIT|https://www.npmjs.com/package//grunt|
 |Grunt contrib less|2.0.0|MIT|https://www.npmjs.com/package/grunt-contrib-less|
-|Grunt contrib uglify|4.0.0|MIT|https://www.npmjs.com/package/grunt-contrib-uglify|
 |Grunt contrib watch|1.1.0|MIT|https://www.npmjs.com/package/grunt-contrib-watch|
 |Jasmine|3.3.0,3.3.1|MIT|https://github.com/jasmine/jasmine|
 |Jasmine types|3.3.9|MIT|https://www.npmjs.com/package/@types/jasmine|
@@ -182,7 +179,6 @@ Frontend third party dependencies (some checked in and some via npm)
 |Markdown.js|?|MIT|https://github.com/cadorn/markdown-js|
 |Medium Editor|5.23.3|MIT|https://github.com/yabwe/medium-editor|
 |Moment.js|2.13.0|MIT|https://momentjs.com|
-|Minimist|1.2.0|MIT|https://www.npmjs.com/package/minimist|
 |Mustache.js|0.7.2|MIT|http://github.com/janl/mustache.js|
 |nvd3|1.1.15b|Apache|https://github.com/novus/nvd3|
 |page.js|1.8.6|MIT|https://github.com/visionmedia/page.js|
