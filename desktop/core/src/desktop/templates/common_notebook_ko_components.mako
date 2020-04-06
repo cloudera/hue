@@ -216,11 +216,13 @@ from notebook.conf import ENABLE_SQL_INDEXER
           </a>
         </li>
         % endif
+        % if request.fs:
         <li>
           <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal' + snippet.id()).modal('show'); }" title="${ _('Export the result into a file, an index, a new table...') }">
             <i class="fa fa-fw fa-cloud-upload"></i> ${ _('Export') }
           </a>
         </li>
+        % endif
       </ul>
     </div>
 
