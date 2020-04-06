@@ -17,11 +17,11 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
+import { simpleGet } from 'api/apiUtils';
 
 // prettier-ignore
 const TEMPLATE = `
@@ -109,8 +109,7 @@ class LanguageReferenceTopic {
       return this.loadDeferred.promise();
     }
     this.loading(true);
-    apiHelper
-      .simpleGet(this.index[this.ref])
+    simpleGet(this.index[this.ref])
       .done(doc => {
         this.body(doc.body);
       })
