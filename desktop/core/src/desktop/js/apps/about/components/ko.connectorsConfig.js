@@ -44,40 +44,39 @@ const TEMPLATE = `
   </div>
 
   <div data-bind="template: { name: 'connectors-page', data: connectors() }"></div>
-
 </script>
 
 
 <script type="text/html" id="connectors-page">
-  <div class="card card-small margin-top-10">
+  <div style="margin: 0 10px;">
+    <div class="pull-right" style="display: inline-block">
+      <div style="display: inline-block; margin-right: 10px;" data-bind="component: {
+          name: 'hue-drop-down',
+          params: {
+            fixedPosition: true,
+            value: $parent.selectedConnectorCategory,
+            labelAttribute: 'name',
+            entries: $parent.filterCategories,
+            linkTitle: '${ I18n('Category') }'
+          }
+        }
+      "></div>
+      <input type="text" class="input-large" style="padding: 3px 4px; border-radius: 2px; margin-top: 8px; margin-right: 10px;" placeholder="${ I18n('Filter...') }" data-bind="
+          clearable: $parent.connectorsFilter,
+          valueUpdate: 'afterkeydown'
+      ">
+      <span>
+        <a href="https://docs.gethue.com/administrator/configuration/" target="_blank">
+          <i class="fa fa-question-circle"></i> ${ I18n('Help') }
+        </a>
+      </span>
+    </div>
+  </div>
 
+  <div class="card card-small margin-top-10">
     <div class="card-body clearfix">
-      <div class="span2">
-        <div data-bind="dockable: { scrollable: ${ window.MAIN_SCROLLABLE }, jumpCorrection: 0, topSnap: '${ window.BANNER_TOP_HTML ? '78px' : '50px' }', triggerAdjust: 0 }">
-          <ul class="nav nav-pills nav-stacked">
-            <li data-bind="css: { 'active': $parent.selectedConnectorCategory() === 'All' }">
-              <a href="javascript:void(0)" data-bind="text: 'All', click: function() { $parent.selectedConnectorCategory('All') }"></a>
-            </li>
-            <!-- ko foreach: $parent.categories -->
-            <li data-bind="css: { 'active': $parents[1].selectedConnectorCategory() === type }">
-              <a href="javascript:void(0)" data-bind="text: name, click: function(){ $parents[1].selectedConnectorCategory(type) }"></a>
-            </li>
-            <!-- /ko -->
-          </ul>
-        </div
-      </div>
 
       <div class="span10">
-        <div data-bind="dockable: { scrollable: ${ window.MAIN_SCROLLABLE }, jumpCorrection: 0, topSnap: '${ window.BANNER_TOP_HTML ? '78px' : '50px' }', triggerAdjust: 0 }">
-          <span class="pull-right">
-            <a href="https://docs.gethue.com/administrator/configuration/" target="_blank">
-              <i class="fa fa-question-circle"></i> ${ I18n('Help') }
-            </a>
-          </span>
-          <input type="text" data-bind="clearable: $parent.connectorsFilter, valueUpdate: 'afterkeydown'"
-              class="input-xlarge pull-right margin-bottom-10" placeholder="${ I18n('Filter...') }">
-        </div>
-
         <div class="margin-top-10">
           <div data-bind="foreach: $parent.filteredConnectors()">
             <h4 data-bind="text: category_name"></h4>
@@ -193,7 +192,7 @@ const TEMPLATE = `
 </script>
 
 <div class="container-fluid">
-  <a href="javascript:void(0)" data-bind="click: function() { selectedConnectorCategory('All'); section('installed-connectors-page'); }">
+  <a href="javascript:void(0)" data-bind="click: function() { section('installed-connectors-page'); }">
     ${ I18n('Connectors') }
   </a>
 
@@ -211,13 +210,18 @@ const TEMPLATE = `
 </div>
 `;
 
+const ALL_CATEGORY = { type: 'all', name: I18n('All') };
+
 class ConnectorsConfig extends DisposableComponent {
   constructor() {
     super();
 
     this.section = ko.observable('installed-connectors-page');
     this.categories = ko.observableArray();
-    this.selectedConnectorCategory = ko.observable('All');
+    this.filterCategories = ko.pureComputed(() => {
+      return [ALL_CATEGORY].concat(this.categories());
+    });
+    this.selectedConnectorCategory = ko.observable(ALL_CATEGORY);
     this.connectorsFilter = ko.observable();
 
     this.testConnectionExecuted = ko.observable(false);
@@ -233,11 +237,11 @@ class ConnectorsConfig extends DisposableComponent {
     this.selectedConnectors = ko.pureComputed(() => {
       const connectors =
         this.section() === 'installed-connectors-page' ? this.instances() : this.connectors();
-      if (this.selectedConnectorCategory() === 'All') {
+      if (this.selectedConnectorCategory() === ALL_CATEGORY) {
         return connectors;
       }
       return connectors.filter(
-        connector => connector.category === this.selectedConnectorCategory()
+        connector => connector.category === this.selectedConnectorCategory().type
       );
     });
 

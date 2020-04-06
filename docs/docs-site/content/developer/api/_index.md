@@ -20,24 +20,15 @@ See the currently shipped [SQL dialects](https://github.com/cloudera/hue/tree/ma
 
 What if I only want to use only the autocomplete as a JavaScript module in my own app?
 
-Importing the Parser can be simply done as a npm package. Here is an example on how to use the parser in a [node.js app](https://github.com/cloudera/hue/tree/master/tools/parser/hue_dep):
+Importing the Parser can be simply done as a npm package. Here is an example on how to use the parser in a Node.js demo app. There are two ways to get the module:
 
-    cd tools/parser/hue_dep
-    npm install
-    npm run webpack
-    npm run app
+* npm registry
 
-In `package.json` there’s a dependency on Hue:
+    npm install gethue
 
-    "dependencies": {
-      "hue": "file:../../.."
-    },
+Will install the latest from https://www.npmjs.com/package/gethue. Then import the parser you need with something like below and run it on an SQL statement:
 
-Note that it can also be a GitHub link, e.g. "hue": "git://github.com/cloudera/hue.git” but it takes a bit longer to do `npm install`.
-
-Now let's import the Hive parser and run it on an SQL statement:
-
-    import sqlAutocompleteParser from 'hue/desktop/core/src/desktop/js/parse/sql/hive/hiveAutocompleteParser';
+    import sqlAutocompleteParser from 'gethue/parse/sql/hive/hiveAutocompleteParser';
 
     const beforeCursor = 'SELECT col1, col2, tbl2.col3 FROM tbl; '; // Note extra space at end
     const afterCursor = '';
@@ -107,6 +98,26 @@ Which then will output keywords suggestions and all the known locations:
         { value: 'USE', weight: -1 },
         { value: 'WITH', weight: -1 } ],
       definitions: [] }
+
+* Local dependency
+
+Checkout Hue and cd the [demo app](https://github.com/cloudera/hue/tree/master/tools/parser/hue_dep)
+
+    cd tools/parser/hue_dep
+
+    npm install
+    npm run webpack
+    npm run app
+
+In `package.json` there's a dependency on Hue:
+
+    "dependencies": {
+      "hue": "file:../../.."
+    },
+
+Now let's import the Hive parser:
+
+    import sqlAutocompleteParser from 'hue/desktop/core/src/desktop/js/parse/sql/hive/hiveAutocompleteParser';
 
 ### Scratchpad
 

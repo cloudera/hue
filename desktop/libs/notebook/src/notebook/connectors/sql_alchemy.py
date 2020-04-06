@@ -57,7 +57,7 @@ import textwrap
 from string import Template
 
 from django.utils.translation import ugettext as _
-from sqlalchemy import create_engine, inspect
+from sqlalchemy import create_engine, inspect, Table, MetaData
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.types import NullType
 
@@ -300,17 +300,19 @@ class SqlAlchemyApi(Api):
     elif column is None:
       database = self._fix_phoenix_empty_database(database)
       columns = assist.get_columns(database, table)
-      response['columns'] = [col['name'] for col in columns]
 
+      response['columns'] = [col['name'] for col in columns]
       response['extended_columns'] = [{
           'autoincrement': col.get('autoincrement'),
           'comment': col.get('comment'),
           'default': col.get('default'),
           'name': col.get('name'),
           'nullable': col.get('nullable'),
-          'type': str(col.get('type')) if not isinstance(col.get('type'), NullType) else 'Null'
-        } for col in columns
+          'type': str(col.get('type')) if not isinstance(col.get('type'), NullType) else 'Null',
+        }
+        for col in columns
       ]
+      response.update(assist.get_keys(database, table))
     else:
       columns = assist.get_columns(database, table)
       response['name'] = next((col['name'] for col in columns if column == col['name']), '')
@@ -413,3 +415,17 @@ class Assist(object):
       return result.cursor.description, result.fetchall()
     finally:
       connection.close()
+
+  def get_keys(self, database, table):
+    meta = MetaData()
+    metaTable = Table(table, meta, schema=database, autoload=True, autoload_with=self.engine)
+
+    return {
+      'foreign_keys': [{
+          'name': fk.parent.name,
+          'to': fk.target_fullname
+        }
+        for fk in metaTable.foreign_keys
+      ],
+      'primary_keys': [{'name': pk.name} for pk in metaTable.primary_key.columns]
+    }
