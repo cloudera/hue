@@ -1,1 +1,1 @@
-ace.define("ace/snippets/druid",["require","exports","module"],function(e,t,n){"use strict";t.snippetText="",t.scope="druid"})
+ace.define("ace/snippets/druid",["require","exports","module"],function(e,t,n){"use strict";t.snippetText=undefined,t.scope="druid"})
