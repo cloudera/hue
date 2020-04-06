@@ -37,3 +37,4 @@
 /desktop/core/src/desktop/js/parse/sql/flink/flinkAutocompleteParser.js
 /desktop/core/src/desktop/js/parse/sql/flink/flinkSyntaxParser.js
 /desktop/core/src/desktop/js/parse/sql/flink/spec/flinkAutocompleteParser_Locations_Spec.js
+**/node_modules/**
