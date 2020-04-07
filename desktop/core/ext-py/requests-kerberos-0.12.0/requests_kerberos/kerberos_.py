@@ -201,6 +201,7 @@ class HTTPKerberosAuth(AuthBase):
                                              urlparse(response.url).port,
                                              threading.current_thread().ident)
 
+        log.debug("generate_request_header(): host_port_thread: {0}".format(host_port_thread))
         # Flags used by kerberos module.
         gssflags = kerberos.GSS_C_MUTUAL_FLAG | kerberos.GSS_C_SEQUENCE_FLAG
         if self.delegate:
@@ -374,7 +375,18 @@ class HTTPKerberosAuth(AuthBase):
             else:
                 result = kerberos.authGSSClientStep(self.context[host_port_thread],
                                                     _negotiate_value(response))
-        except kerberos.GSSError:
+        except kerberos.GSSError as e:
+            # Since Isilon's webhdfs host and port will be the same for
+            # both 'NameNode' and 'DataNode' connections, Mutual Authentication will fail here
+            # due to the fact that a 307 redirect is made to the same host and port.
+            # host_port_thread will be the same when calling authGssClientStep().
+            # If we get a "Context is already fully established" response, that is OK if
+            # the response.url contains "datanode=true".  "datanode=true" is Isilon-specific
+            # in that it is not part of CDH.  It is an indicator to the Isilon server
+            # that the operation is a DataNode operation.
+            if 'datanode=true' in response.url and 'Context is already fully established' in e.args[1]:
+                log.debug("Caught Isilon mutual auth exception %s - %s" % (response.url, e.args[1][0]))
+                return True
             log.exception("authenticate_server(): authGSSClientStep() failed:")
             return False
 
