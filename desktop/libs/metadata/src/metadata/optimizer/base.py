@@ -22,17 +22,16 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 
 
-def get_api(request, interface):
-
+def get_api(user, interface):
   if interface == 'navopt':
     from metadata.optimizer.optimizer_client import OptimizerClient
-    return OptimizerClient(request.user)
+    return OptimizerClient(user)
   elif interface == 'optimizer':
     from metadata.optimizer.optimizer_rest_client import OptimizerRestClient
-    return OptimizerRestClient(request.user)
+    return OptimizerRestClient(user)
   elif interface == 'dummy':
     from metadata.optimizer.dummy_client import DummyClient
-    return DummyClient(user=request.user)
+    return DummyClient(user=user)
   else:
     raise PopupException(_('Optimizer connector interface not recognized: %s') % interface)
 
