@@ -263,7 +263,7 @@ class HTTPConnectionPool(ConnectionPool, RequestMethods):
 
         # If this is a persistent connection, check if it got disconnected
         if conn and is_connection_dropped(conn):
-            log.debug("Resetting dropped connection: %s", self.host)
+            log.debug("Resetting dropped connection: %s:%s", self.host, self.port or "80")
             conn.close()
             if getattr(conn, "auto_open", 1) == 0:
                 # This is a proxied connection that has been mutated by
@@ -295,7 +295,7 @@ class HTTPConnectionPool(ConnectionPool, RequestMethods):
             pass
         except queue.Full:
             # This should never happen if self.block == True
-            log.warning("Connection pool is full, discarding connection: %s", self.host)
+            log.warning("Connection pool is full, discarding connection: %s:%s", self.host, self.port or "80")
 
         # Connection never got put back into the pool, close it.
         if conn:
