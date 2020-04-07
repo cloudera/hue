@@ -3,6 +3,7 @@ try:
 except ImportError:
     import winkerberos as kerberos
 import logging
+import threading
 import re
 import sys
 import warnings
@@ -186,7 +187,7 @@ class HTTPKerberosAuth(AuthBase):
         self.cbt_binding_tried = False
         self.cbt_struct = None
 
-    def generate_request_header(self, response, host, is_preemptive=False):
+    def generate_request_header(self, response, host, host_port_thread=False, is_preemptive=False):
         """
         Generates the GSSAPI authentication token with kerberos.
 
@@ -194,6 +195,11 @@ class HTTPKerberosAuth(AuthBase):
         with failure detail.
 
         """
+        if not host_port_thread:
+            # Initialize uniq key for the self.context dictionary
+            host_port_thread = "%s_%s_%s" % (urlparse(response.url).hostname,
+                                             urlparse(response.url).port,
+                                             threading.current_thread().ident)
 
         # Flags used by kerberos module.
         gssflags = kerberos.GSS_C_MUTUAL_FLAG | kerberos.GSS_C_SEQUENCE_FLAG
@@ -202,14 +208,14 @@ class HTTPKerberosAuth(AuthBase):
 
         try:
             kerb_stage = "authGSSClientInit()"
-            # contexts still need to be stored by host, but hostname_override
+            # contexts still need to be stored by host_port_thread, but hostname_override
             # allows use of an arbitrary hostname for the kerberos exchange
             # (eg, in cases of aliased hosts, internal vs external, CNAMEs
             # w/ name-based HTTP hosting)
             kerb_host = self.hostname_override if self.hostname_override is not None else host
             kerb_spn = "{0}@{1}".format(self.service, kerb_host)
 
-            result, self.context[host] = kerberos.authGSSClientInit(kerb_spn,
+            result, self.context[host_port_thread] = kerberos.authGSSClientInit(kerb_spn,
                 gssflags=gssflags, principal=self.principal)
 
             if result < 1:
@@ -222,18 +228,18 @@ class HTTPKerberosAuth(AuthBase):
             kerb_stage = "authGSSClientStep()"
             # If this is set pass along the struct to Kerberos
             if self.cbt_struct:
-                result = kerberos.authGSSClientStep(self.context[host],
+                result = kerberos.authGSSClientStep(self.context[host_port_thread],
                                                     negotiate_resp_value,
                                                     channel_bindings=self.cbt_struct)
             else:
-                result = kerberos.authGSSClientStep(self.context[host],
+                result = kerberos.authGSSClientStep(self.context[host_port_thread],
                                                     negotiate_resp_value)
 
             if result < 0:
                 raise EnvironmentError(result, kerb_stage)
 
             kerb_stage = "authGSSClientResponse()"
-            gss_response = kerberos.authGSSClientResponse(self.context[host])
+            gss_response = kerberos.authGSSClientResponse(self.context[host_port_thread])
 
             return "Negotiate {0}".format(gss_response)
 
@@ -256,6 +262,11 @@ class HTTPKerberosAuth(AuthBase):
         """Handles user authentication with gssapi/kerberos"""
 
         host = urlparse(response.url).hostname
+
+        # Initialize uniq key for the self.context dictionary
+        host_port_thread = "%s_%s_%s" % (urlparse(response.url).hostname,
+                                         urlparse(response.url).port,
+                                         threading.current_thread().ident)
 
         try:
             auth_header = self.generate_request_header(response, host)
@@ -350,14 +361,18 @@ class HTTPKerberosAuth(AuthBase):
 
         host = urlparse(response.url).hostname
 
+        # Initialize uniq key for the self.context dictionary
+        host_port_thread = "%s_%s_%s" % (urlparse(response.url).hostname,
+                                         urlparse(response.url).port,
+                                         threading.current_thread().ident)
         try:
             # If this is set pass along the struct to Kerberos
             if self.cbt_struct:
-                result = kerberos.authGSSClientStep(self.context[host],
+                result = kerberos.authGSSClientStep(self.context[host_port_thread],
                                                     _negotiate_value(response),
                                                     channel_bindings=self.cbt_struct)
             else:
-                result = kerberos.authGSSClientStep(self.context[host],
+                result = kerberos.authGSSClientStep(self.context[host_port_thread],
                                                     _negotiate_value(response))
         except kerberos.GSSError:
             log.exception("authenticate_server(): authGSSClientStep() failed:")
@@ -434,7 +449,12 @@ class HTTPKerberosAuth(AuthBase):
             # by the 401 handler
             host = urlparse(request.url).hostname
 
-            auth_header = self.generate_request_header(None, host, is_preemptive=True)
+            # Initialize uniq key for the self.context dictionary
+            host_port_thread = "%s_%s_%s" % (urlparse(request.url).hostname,
+                                             urlparse(request.url).port,
+                                             threading.current_thread().ident)
+
+            auth_header = self.generate_request_header(None, host, host_port_thread=host_port_thread, is_preemptive=True)
 
             log.debug("HTTPKerberosAuth: Preemptive Authorization header: {0}".format(auth_header))
 
