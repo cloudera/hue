@@ -81,8 +81,10 @@ try:
   from jobbrowser.apis.query_api import _get_api
   has_query_browser = ENABLE_QUERY_BROWSER.get()
   has_hive_query_browser = ENABLE_HIVE_QUERY_BROWSER.get()
+  has_jobbrowser = True
 except (AttributeError, ImportError) as e:
   LOG.warn("Job Browser app is not enabled")
+  has_jobbrowser = False
   has_query_browser = False
   has_hive_query_browser = False
 
@@ -476,7 +478,7 @@ class HS2Api(Api):
 
       jobs = [{
           'name': job.get('job_id', ''),
-          'url': reverse('jobbrowser.views.single_job', kwargs={'job': job.get('job_id', '')}),
+          'url': reverse('jobbrowser.views.single_job', kwargs={'job': job.get('job_id', '')}) if has_jobbrowser else '',
           'started': job.get('started', False),
           'finished': job.get('finished', False)
         }
