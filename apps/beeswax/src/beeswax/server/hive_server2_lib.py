@@ -114,12 +114,15 @@ class HiveServerTable(Table):
     col_row_index = 0
     try:
       cols = [col.strip() for col in map(itemgetter('col_name'), rows[col_row_index:])]
-      if cols[0] == '# col_name': # Hive MR/Impala have headers and one blank line, Hive Tez has nothing
-        col_row_index = 2
-        cols = cols[2:]
+      # Hive MR/Impala have headers and one blank line, Hive Tez has nothing, Hive LLAP upstream has headers and no blank line
+      if cols[0] == '# col_name':
+        col_row_index = 1
+        if not cols[1]:
+          col_row_index += 1
+        cols = cols[col_row_index:]
       end_cols_index = cols.index('')
       return rows[col_row_index:][:end_cols_index] + self._get_partition_columns()
-    except ValueError: # DESCRIBE on nested columns does not always contain additional rows beyond cols
+    except ValueError:  # DESCRIBE on nested columns does not always contain additional rows beyond cols
       return rows[col_row_index:]
     except:
       return rows
