@@ -22,4 +22,4 @@ logging.getLogger(__name__).addHandler(NullHandler())
 
 __all__ = ('HTTPKerberosAuth', 'MutualAuthenticationError', 'REQUIRED',
            'OPTIONAL', 'DISABLED')
-__version__ = '0.6.1'
+__version__ = '0.12.0'

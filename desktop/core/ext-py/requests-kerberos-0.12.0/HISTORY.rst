@@ -1,6 +1,52 @@
 History
 =======
 
+0.12.0: 2017-12-20
+------------------------
+
+- Add support for channel binding tokens (assumes pykerberos support >= 1.2.1)
+- Add support for kerberos message encryption (assumes pykerberos support >= 1.2.1)
+- Misc CI/test fixes
+
+0.11.0: 2016-11-02
+------------------
+
+- Switch dependency on Windows from kerberos-sspi/pywin32 to WinKerberos.
+  This brings Custom Principal support to Windows users.
+
+0.10.0: 2016-05-18
+------------------
+
+- Make it possible to receive errors without having their contents and headers
+  stripped.
+- Resolve a bug caused by passing the ``principal`` keyword argument to
+  kerberos-sspi on Windows.
+
+0.9.0: 2016-05-06
+-----------------
+
+- Support for principal, hostname, and realm override.
+
+- Added support for mutual auth.
+
+0.8.0: 2016-01-07
+-----------------
+
+- Support for Kerberos delegation.
+
+- Fixed problems declaring kerberos-sspi on Windows installs.
+
+0.7.0: 2015-05-04
+-----------------
+
+- Added Windows native authentication support by adding kerberos-sspi as an
+  alternative backend.
+
+- Prevent infinite recursion when a server returns 401 to an authorization
+  attempt.
+
+- Reduce the logging during successful responses.
+
 0.6.1: 2014-11-14
 -----------------
 
