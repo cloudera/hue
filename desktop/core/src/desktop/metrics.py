@@ -25,14 +25,36 @@ import multiprocessing
 import threading
 
 from datetime import datetime, timedelta
-from prometheus_client import Gauge
+from prometheus_client import Gauge, REGISTRY
 
 from useradmin.models import User
 
+from desktop.conf import ENABLE_PROMETHEUS
 from desktop.lib.metrics import global_registry
 
 
 LOG = logging.getLogger(__name__)
+
+ALLOWED_DJANGO_PROMETHEUS_METRICS = (
+    'django_http_requests_latency_including_middlewares_seconds',
+    'django_http_requests_total_by_method',
+    'django_http_ajax_requests_total',
+    'django_http_ajax_requests_created',
+    'django_http_responses_body_total_bytes',
+    'django_http_responses_total_by_status'
+)
+
+if ENABLE_PROMETHEUS.get():
+  django_collectors = set()
+  django_metrics_names = [name for name in REGISTRY._names_to_collectors.keys() if name.startswith('django_') and not name.startswith(ALLOWED_DJANGO_PROMETHEUS_METRICS)]
+
+  for metric_name in django_metrics_names:
+    collector_obj = REGISTRY._names_to_collectors[metric_name]
+    LOG.info("%d - %s" % (id(collector_obj), metric_name))
+    django_collectors.add(collector_obj)
+
+  for django_collector in django_collectors:
+    REGISTRY.unregister(django_collector)
 
 
 global_registry().gauge_callback(
