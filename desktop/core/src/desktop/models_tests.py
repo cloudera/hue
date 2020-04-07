@@ -18,6 +18,7 @@
 
 from builtins import object
 import json
+import sys
 
 from datetime import datetime
 
@@ -31,12 +32,13 @@ from beeswax.design import hql_query
 from notebook.models import import_saved_beeswax_query
 from useradmin.models import get_default_user_group, User
 
+from desktop.conf import has_connectors
 from desktop.converters import DocumentConverter
 from desktop.lib.connectors.models import Connector
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.fs import ProxyFS
 from desktop.lib.test_utils import grant_access
-from desktop.models import Directory, Document2, Document, Document2Permission
+from desktop.models import Directory, Document2, Document, Document2Permission, ClusterConfig
 
 try:
   from oozie.models2 import Workflow
@@ -44,10 +46,32 @@ try:
 except RuntimeError:
   has_oozie = False
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock, MagicMock
+else:
+  from mock import patch, Mock, MagicMock
+
 
 class MockFs(object):
   def __init__(self):
     pass
+
+
+class TestClusterConfig(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="test", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test")
+
+  def test_get_fs(self):
+    if not has_connectors():
+      raise SkipTest
+
+    with patch('desktop.models.appmanager.get_apps_dict') as get_apps_dict:
+      with patch('desktop.models.fsmanager.is_enabled_and_has_access') as is_enabled_and_has_access:
+        # filebrowser
+
+        ClusterConfig(user=self.user)
 
 
 class TestDocument2(object):

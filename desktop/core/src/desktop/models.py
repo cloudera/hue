@@ -1742,7 +1742,8 @@ class ClusterConfig(object):
       'has_computes': self.cluster_type in ('altus', 'snowball'), # or any grouped engine connectors
       'hue_config': {
         'enable_sharing': ENABLE_SHARING.get()
-      }
+      },
+      'has_fs': app_config.get('browsers') and any([app['type'] in ('hdfs', 's3', 'adls', 'abfs') for app in app_config.get('browsers')])
     }
 
 
