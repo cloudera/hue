@@ -41,7 +41,7 @@ from metadata.conf import OPTIMIZER
 
 from notebook.connectors.base import Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name, patch_snippet_for_connector
 from notebook.connectors.hiveserver2 import HS2Api
-from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
+from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission, ssh_error_handler
 from notebook.models import escape_rows, make_notebook, upgrade_session_properties, get_api, MockRequest
 
 if sys.version_info[0] > 2:
@@ -96,6 +96,7 @@ def create_notebook(request):
 @require_POST
 @check_document_access_permission
 @api_error_handler
+@ssh_error_handler
 def create_session(request):
   response = {'status': -1}
 
@@ -112,6 +113,7 @@ def create_session(request):
 @require_POST
 @check_document_access_permission
 @api_error_handler
+@ssh_error_handler
 def close_session(request):
   response = {'status': -1}
 
@@ -214,6 +216,7 @@ def _execute_notebook(request, notebook, snippet):
 @require_POST
 @check_document_access_permission
 @api_error_handler
+@ssh_error_handler
 def execute(request, dialect=None):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
@@ -234,6 +237,7 @@ def execute(request, dialect=None):
 @require_POST
 @check_document_access_permission
 @api_error_handler
+@ssh_error_handler
 def check_status(request):
   response = {'status': -1}
 
@@ -300,6 +304,7 @@ def _check_status(request, notebook=None, snippet=None, operation_id=None):
 @require_POST
 @check_document_access_permission
 @api_error_handler
+@ssh_error_handler
 def fetch_result_data(request):
   operation_id = request.POST.get('operationId')
   notebook = json.loads(request.POST.get('notebook', '{}'))
@@ -340,6 +345,7 @@ def _fetch_result_data(user, notebook=None, snippet=None, operation_id=None, row
 @require_POST
 @check_document_access_permission
 @api_error_handler
+@ssh_error_handler
 def fetch_result_metadata(request):
   response = {'status': -1}
 
@@ -366,6 +372,7 @@ def fetch_result_metadata(request):
 @require_POST
 @check_document_access_permission
 @api_error_handler
+@ssh_error_handler
 def fetch_result_size(request):
   response = {'status': -1}
 
@@ -392,6 +399,7 @@ def fetch_result_size(request):
 @require_POST
 @check_document_access_permission
 @api_error_handler
+@ssh_error_handler
 def cancel_statement(request):
   response = {'status': -1}
 
@@ -418,6 +426,7 @@ def cancel_statement(request):
 @require_POST
 @check_document_access_permission
 @api_error_handler
+@ssh_error_handler
 def get_logs(request):
   response = {'status': -1}
 
@@ -724,6 +733,7 @@ def close_statement(request):
 @require_POST
 @check_document_access_permission
 @api_error_handler
+@ssh_error_handler
 def autocomplete(request, server=None, database=None, table=None, column=None, nested=None):
   response = {'status': -1}
 
@@ -746,6 +756,7 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
 @require_POST
 @check_document_access_permission
 @api_error_handler
+@ssh_error_handler
 def get_sample_data(request, server=None, database=None, table=None, column=None):
   response = {'status': -1}
 
@@ -766,6 +777,7 @@ def get_sample_data(request, server=None, database=None, table=None, column=None
 @require_POST
 @check_document_access_permission
 @api_error_handler
+@ssh_error_handler
 def explain(request):
   response = {'status': -1}
 
@@ -791,6 +803,7 @@ def format(request):
 @require_POST
 @check_document_access_permission
 @api_error_handler
+@ssh_error_handler
 def export_result(request):
   response = {'status': -1, 'message': _('Success')}
 
@@ -1008,6 +1021,7 @@ def _get_statement_from_file(user, fs, snippet):
 
 @require_POST
 @api_error_handler
+@ssh_error_handler
 def describe(request, database, table=None, column=None):
   response = {'status': -1, 'message': ''}
   notebook = json.loads(request.POST.get('notebook', '{}'))
