@@ -6,5 +6,5 @@ odfpy
 openpyxl>=2.4.0
 pandas
 pyyaml
-xlrd
-xlwt
+#xlrd
+#xlwt

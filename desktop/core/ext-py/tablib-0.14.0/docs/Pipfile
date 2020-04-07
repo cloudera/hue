@@ -10,8 +10,8 @@ verify_ssl = true
 odfpy = "*"
 openpyxl = ">=2.4.0"
 pandas = "*"
-xlrd = "*"
-xlwt = "*"
+#xlrd = "*"
+#xlwt = "*"
 PyYAML = "*"
 
 [requires]
