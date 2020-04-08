@@ -1,0 +1,72 @@
+'\" t
+.\"     Title: odf2epub
+.\"    Author: S\(/oren Roug
+.\" Generator: DocBook XSL Stylesheets v1.75.2 <http://docbook.sf.net/>
+.\"      Date: 05/16/2010
+.\"    Manual: User commands
+.\"    Source: odfpy
+.\"  Language: English
+.\"
+.TH "ODF2EPUB" "1" "05/16/2010" "odfpy" "User commands"
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+odf2epub \- Convert ODF to an ePub ebook
+.SH "SYNOPSIS"
+.HP \w'\fBodf2epub\fR\ 'u
+\fBodf2epub\fR [\-p] [\-o\ \fIoutputfile\fR] [\-c\ \fIcover_image\fR] \fIpath\fR
+.SH "DESCRIPTION"
+.PP
+\fBodf2epub\fR
+is a program that will create an ebook (\&.epub) from the input file and will write the ebook to stdout or a file specified by \-o\&. "Path" is assumed to be an OpenDocument file of text, spreadsheet or presentation type\&.
+.PP
+If the document doesn\'t have a title in the properties, then the first heading of any level is used\&.
+.SH "OPTIONS"
+.PP
+\-c, \-\-cover
+.RS 4
+The \-c argument add a cover image to the EPUB file\&. Make sure the cover image itself is scaled to less than 1000px in width and height\&. Best practice is to use an image in JPG or PNG format at 600 pixels wide by 800 pixels in height\&.
+.RE
+.PP
+\-p, \-\-plain
+.RS 4
+The \-p flag will generate HTML without CSS\&.
+.RE
+.PP
+\-o, \-\-output
+.RS 4
+Specify the output file with this flag\&. "\-" implies standard out\&.
+.RE
+.SH "EXAMPLE"
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+odf2epub \-o example\&.epub odf\-file\&.odt
+.fi
+.if n \{\
+.RE
+.\}
+.SH "BUGS"
+.PP
+The EPUB format has the following limitations when running on a mobile device\&. If these limits are not adhered to, EPUB files
+\fImight\fR
+not work on mobile devices\&. Image Size: 10MB uncompressed\&. Individual XHTML file sizes: 300k uncompressed/100k compressed\&. Odf2epub does not ensure that these limits are adhered to\&.
+.SH "SEE ALSO"
+.PP
+\fBodf2xhtml\fR(1)
+.SH "AUTHOR"
+.PP
+\fBS\(/oren Roug\fR
+.RS 4
+Original author
+.RE
