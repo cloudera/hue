@@ -66,8 +66,8 @@ describe('notebook.js', () => {
     });
 
     const notebook = new Notebook(viewModel, {});
-    notebook.addSnippet({ connector: { dialect: 'hive' } });
-    notebook.addSnippet({ connector: { dialect: 'impala' } });
+    notebook.addSnippet({ connector: { dialect: 'hive', type: 'hive' } });
+    notebook.addSnippet({ connector: { dialect: 'impala', type: 'impala' } });
 
     expect(spy).toHaveBeenCalled();
 
