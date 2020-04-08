@@ -191,19 +191,22 @@ def ssh_error_handler(f):
 
         if connector_json_data.get('type') == 'hello':
           connector = connector_json_data['interpreter']
+          idle_time = 10
         else:
           connector_id = int(connector_json_data.get('type'))
           connector_data = _get_installed_connectors(connector_id=connector_id)[0]
           connector = _connector_to_iterpreter(
             _augment_connector_properties(connector_data)
           )
+          idle_time = 1800
 
         if connector['interface'] != 'hiveserver2':
           raise e
 
         # TODO: local server_port is not dynamic
         # TODO: "Could not request local forwarding" bubble up
-        ssh = "ssh -L %(server_port)s:%(ssh_server_host)s:%(server_port)s gethue@%(server_host)s -o ExitOnForwardFailure=yes sleep 1800" % connector['options']
+        ssh = "ssh -L %(server_port)s:%(ssh_server_host)s:%(server_port)s gethue@%(server_host)s -o ExitOnForwardFailure=yes" % connector['options']
+        ssh += ' sleep %s' % idle_time
         LOG.info(ssh)
 
         if len(list(os.popen('ps -ef | grep "%s"' % ssh))) < 3:
