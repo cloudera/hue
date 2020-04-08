@@ -153,6 +153,7 @@ const TYPES = Object.keys(TYPES_INDEX).map(key => {
  * @param {ko.observable} [params.cluster]
  * @param {ko.observable} [params.compute]
  * @param {ko.observable} [params.namespace]
+ * @param {ko.observable} [params.connector]
  * @param {ko.observable} [params.database]
  * @param {ko.observableArray} [params.availableDatabases]
  * @param {boolean} [params.hideClusters] - Can be used to force hide cluster selection even if a cluster
@@ -172,6 +173,7 @@ const HueContextSelector = function(params) {
   const self = this;
 
   self.sourceType = params.sourceType;
+  self.connector = params.connector;
   self.disposals = [];
   self.hideLabels = params.hideLabels;
 
@@ -403,11 +405,13 @@ HueContextSelector.prototype.reloadDatabases = function() {
   const self = this;
   if (self.database && !self.hideDatabases) {
     self.loadingDatabases(true);
-    const connector = {}; // TODO: Add connectors to the context selector
     $.when(self[TYPES_INDEX.namespace.lastPromise], self[TYPES_INDEX.compute.lastPromise]).done(
       () => {
         window.clearTimeout(self.reloadDatabaseThrottle);
         self.reloadDatabaseThrottle = window.setTimeout(() => {
+          const connector = (self.connector && ko.unwrap(self.connector)) || {
+            type: ko.unwrap(self.sourceType)
+          };
           if (!self[TYPES_INDEX.namespace.name]()) {
             self.availableDatabases([]);
             self.loadingDatabases(false);
@@ -415,10 +419,12 @@ HueContextSelector.prototype.reloadDatabases = function() {
           }
           dataCatalog
             .getEntry({
-              sourceType: ko.unwrap(self.sourceType),
+              sourceType: connector.type, // TODO: Drop when dataCatalog only needs connector
               namespace: self[TYPES_INDEX.namespace.name](),
               compute: self[TYPES_INDEX.compute.name](),
-              connector: connector,
+              connector: (self.connector && ko.unwrap(self.connector)) || {
+                type: ko.unwrap(self.sourceType)
+              },
               path: [],
               definition: { type: 'source' }
             })
