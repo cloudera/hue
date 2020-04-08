@@ -169,6 +169,67 @@ def api_error_handler(f):
 
   return wrapper
 
+
+def ssh_error_handler(f):
+  @wraps(f)
+  def wrapper(*args, **kwargs):
+    try:
+      return f(*args, **kwargs)
+    except Exception as e:
+      if 'Connection refused' in str(e) or 'Could not connect' in str(e):
+        LOG.info('SSH')
+        from notebook.conf import _connector_to_iterpreter
+        from desktop.lib.connectors.models import _augment_connector_properties
+
+        if args[0].POST.get('session'):
+          connector_c = args[0].POST['session']
+        else:
+          connector_c = args[0].POST.get('snippet')
+
+        connector_json_data = json.loads(connector_c)
+        print(connector_json_data)
+
+        if connector_json_data.get('type') == 'hello':
+          connector = connector_json_data['interpreter']
+        else:
+          connector_id = int(connector_json_data.get('type'))
+          connector_data = _get_installed_connectors(connector_id=connector_id)[0]
+          connector = _connector_to_iterpreter(
+            _augment_connector_properties(connector_data)
+          )
+
+        if connector['interface'] != 'hiveserver2':
+          raise e
+
+        # TODO: local server_port is not dynamic
+        # TODO: "Could not request local forwarding" bubble up
+        ssh = "ssh -L %(server_port)s:%(ssh_server_host)s:%(server_port)s gethue@%(server_host)s -o ExitOnForwardFailure=yes sleep 1800" % connector['options']
+        LOG.info(ssh)
+
+        if len(list(os.popen('ps -ef | grep "%s"' % ssh))) < 3:
+          FNULL = open(os.devnull, 'w')
+          subprocess.Popen(ssh.split(' '), stdout=FNULL, stderr=FNULL)
+
+          retries = 0
+
+          while retries < 5:
+            try:
+              return f(*args, **kwargs)
+            except Exception as e2:
+              LOG.info(e2)
+              if 'Connection refused' in str(e2) or 'Could not connect' in str(e2):
+                time.sleep(1)
+                retries += 1
+              else:
+                raise e2
+          raise e
+        else:
+          raise e
+      else:
+        raise e
+  return wrapper
+
+
 def _closest_power_of_2(number):
   return math.pow(2, math.ceil(math.log(number, 2)))
 

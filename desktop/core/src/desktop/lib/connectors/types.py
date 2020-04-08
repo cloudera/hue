@@ -64,6 +64,8 @@ CONNECTOR_TYPES = [
       {'name': 'server_host', 'value': ''},
       {'name': 'server_port', 'value': ''},
       {'name': 'impersonation_enabled', 'value': False},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
     'description': '',
