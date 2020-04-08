@@ -169,8 +169,8 @@ const TEMPLATE = `
     </a>
     <span>
       <i class="fa fa-question" data-bind="visible: !$parent.testConnectionExecuted()"></i>
-      <i class="fa fa-check" data-bind="visible: $parent.testConnectionExecuted() && $parent.testConnectionErrors().length"></i>
-      <i class="fa fa-exclamation" data-bind="visible: $parent.testConnectionExecuted() && !$parent.testConnectionErrors().length"></i>
+      <i class="fa fa-check" data-bind="visible: $parent.testConnectionExecuted() && !$parent.testConnectionErrors().length"></i>
+      <i class="fa fa-exclamation" data-bind="visible: $parent.testConnectionExecuted() && $parent.testConnectionErrors().length"></i>
       <span data-bind="visible: $parent.testConnectionExecuted() && $parent.testConnectionErrors().length, text: $parent.testConnectionErrors">
       </span>
     </span>
