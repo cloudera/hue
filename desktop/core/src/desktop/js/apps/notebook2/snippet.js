@@ -212,7 +212,8 @@ export default class Snippet {
           this.defaultLimit(this.editorConfig.default_limit);
         }
         const connectors = this.editorConfig.interpreters;
-        if (snippetRaw.connector) {
+
+        if (snippetRaw.connector && snippetRaw.connector.type) {
           this.connector(
             connectors.find(connector => connector.type === snippetRaw.connector.type) ||
               connectors.find(connector => connector.dialect === snippetRaw.connector.dialect)
