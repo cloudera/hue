@@ -673,6 +673,7 @@
         sourceType: dialect,
         compute: compute,
         namespace: namespace,
+        connector: connector,
         availableDatabases: availableDatabases,
         database: database,
         hideDatabases: !isSqlDialect()
