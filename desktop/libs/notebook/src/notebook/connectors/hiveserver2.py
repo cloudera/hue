@@ -42,7 +42,7 @@ from desktop.lib.thrift_util import unpack_guid, unpack_guid_base64
 from desktop.models import DefaultConfiguration, Document2
 
 from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported, _get_snippet_name, Notebook, \
-    get_interpreter
+    get_interpreter, patch_snippet_for_connector
 
 if sys.version_info[0] > 2:
   from urllib.parse import quote as urllib_quote, unquote as urllib_unquote
@@ -448,7 +448,9 @@ class HS2Api(Api):
 
   @query_error_handler
   def progress(self, notebook, snippet, logs=''):
-    if snippet['type'] == 'hive':
+    patch_snippet_for_connector(snippet)
+
+    if snippet['dialect'] == 'hive':
       match = re.search('Total jobs = (\d+)', logs, re.MULTILINE)
       total = int(match.group(1)) if match else 1
 
@@ -457,7 +459,7 @@ class HS2Api(Api):
 
       progress = int((started + ended) * 100 / (total * 2))
       return max(progress, 5)  # Return 5% progress as a minimum
-    elif snippet['type'] == 'impala':
+    elif snippet['dialect'] == 'impala':
       match = re.findall('(\d+)% Complete', logs, re.MULTILINE)
       # Retrieve the last reported progress percentage if it exists
       return int(match[-1]) if match and isinstance(match, list) else 0
@@ -469,7 +471,9 @@ class HS2Api(Api):
   def get_jobs(self, notebook, snippet, logs):
     jobs = []
 
-    if snippet['type'] == 'hive':
+    patch_snippet_for_connector(snippet)
+
+    if snippet['dialect'] == 'hive':
       engine = self._get_hive_execution_engine(notebook, snippet)
       jobs_with_state = parse_out_jobs(logs, engine=engine, with_state=True)
       queries_with_state = parse_out_queries(logs, engine=engine, with_state=True)
@@ -491,7 +495,7 @@ class HS2Api(Api):
           }
           for job in queries_with_state
         ]
-    elif snippet['type'] == 'impala' and has_query_browser:
+    elif snippet['dialect'] == 'impala' and has_query_browser:
       guid = snippet['result']['handle']['guid']
       if isinstance(guid, str):
         guid = guid.encode('utf-8')
