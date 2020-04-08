@@ -46,11 +46,13 @@ ALLOWED_DJANGO_PROMETHEUS_METRICS = (
 
 if ENABLE_PROMETHEUS.get():
   django_collectors = set()
-  django_metrics_names = [name for name in REGISTRY._names_to_collectors.keys() if name.startswith('django_') and not name.startswith(ALLOWED_DJANGO_PROMETHEUS_METRICS)]
+  django_metrics_names = [
+      name
+      for name in REGISTRY._names_to_collectors.keys() if name.startswith('django_') and not name.startswith(ALLOWED_DJANGO_PROMETHEUS_METRICS)
+  ]
 
   for metric_name in django_metrics_names:
     collector_obj = REGISTRY._names_to_collectors[metric_name]
-    LOG.debug("%d - %s" % (id(collector_obj), metric_name))
     django_collectors.add(collector_obj)
 
   for django_collector in django_collectors:
@@ -188,7 +190,11 @@ spnego_authentication_time = global_registry().timer(
 def num_of_queries():
   from desktop.models import Document2 # Avoid circular dependency
   try:
-    count = Document2.objects.filter(type__istartswith='query-', is_history=True, last_modified__gt=datetime.now() - timedelta(minutes=10)).count()
+    count = Document2.objects.filter(
+      type__istartswith='query-',
+      is_history=True,
+      last_modified__gt=datetime.now() - timedelta(minutes=10)
+    ).count()
   except:
     LOG.exception('Could not get num_of_queries')
     count = 0
