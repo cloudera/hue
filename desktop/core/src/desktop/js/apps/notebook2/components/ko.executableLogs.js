@@ -48,7 +48,7 @@ const TEMPLATE = `
             click: function() {
               huePubSub.publish('show.jobs.panel', {
                 id: name,
-                interface: $parent.sourceType() == 'impala' ? 'queries' : 'jobs',
+                interface: $parent.sourceType(),
                 compute: $parent.compute
               });
             },

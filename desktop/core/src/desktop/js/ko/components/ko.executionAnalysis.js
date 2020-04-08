@@ -265,7 +265,7 @@ class ExecutionAnalysis {
     const self = this;
     //TODO: Loading
     if (!$('[href*="' + self.details().name + '"]')[0]) {
-      huePubSub.publish('show.jobs.panel', { id: self.details().name, interface: 'queries' });
+      huePubSub.publish('show.jobs.panel', { id: self.details().name, interface: 'queries-impala' });
       setTimeout(() => {
         huePubSub.publish('impala.node.moveto', contributor.result_id);
         huePubSub.publish('impala.node.select', contributor.result_id);

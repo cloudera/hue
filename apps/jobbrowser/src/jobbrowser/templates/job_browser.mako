@@ -1723,7 +1723,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="tab-pane" id="queries-page-plan${ SUFFIX }" data-profile="plan">
           <div data-bind="visible:properties.plan && properties.plan().plan_json && properties.plan().plan_json.plan_nodes.length">
             <div class="query-plan" id="queries-page-plan-graph${ SUFFIX }" data-bind="impalaDagre: { value: properties.plan && properties.plan(), height:$root.isMini() ? 535 : 600 }">
-              <svg style="width:100%;height:100%;position:relative;" id="queries-page-plan-svg${ SUFFIX }">
+              <svg style="width:100%; height:100%; position:relative;" id="queries-page-plan-svg${ SUFFIX }">
                 <g></g>
               </svg>
             </div>
@@ -1823,7 +1823,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- /ko -->
         </div>
         <div class="tab-pane" id="queries-page-hive-stmt${ SUFFIX }" data-profile="stmt">
-          <pre data-bind="text: (properties.plan && properties.plan().stmt) || _('The selected tab has no data')"></pre>
+          <pre data-bind="highlight: { value: properties.plan && properties.plan().stmt, enableOverflow: true, formatted: true, dialect: 'hive' }"></pre>
         </div>
         <div class="tab-pane" id="queries-page-hive-perf${ SUFFIX }" data-profile="perf">
           <hive-query-plan></hive-query-plan>
@@ -2047,7 +2047,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <div class="tab-content">
         <div class="tab-pane active" id="schedule-hive-page-properties${ SUFFIX }">
-          <pre data-bind="highlight: { value: properties['query'], formatted: true, dialect: 'hive' }"></pre>
+          <pre data-bind="highlight: { value: properties['query'], enableOverflow: true, formatted: true, dialect: 'hive' }"></pre>
         </div>
 
         <div class="tab-pane" id="schedule-hive-page-queries${ SUFFIX }">
@@ -3059,17 +3059,17 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         else if (/altus:dataware/.test(self.id()) && /:cluster:/.test(self.id())) {
           interface = 'dataware-clusters';
         }
+        else if (/[a-z0-9]+_[0-9]{14}_.*/.test(self.id())) {
+          interface = 'queries-hive';
+        }
         else if (/[a-z0-9]{16}:[a-z0-9]{16}/.test(self.id())) {
           interface = 'queries-impala';
-        }
-        else if (/hive_[a-z0-9]*_[a-z0-9]*/.test(self.id())) {
-          interface = 'queries-hive';
         }
         else if (/livy-[0-9]+/.test(self.id())) {
           interface = 'livy-sessions';
         }
 
-        interface = interface.indexOf('dataeng') || interface.indexOf('dataware') ? interface : vm.isValidInterface(interface); // TODO: support multi cluster selection in isValidInterface
+        interface = vm.isValidInterface(interface);
         vm.interface(interface);
 
         lastFetchJobRequest = self._fetchJob(function (data) {
@@ -3123,17 +3123,19 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             }
 
             vm.resetBreadcrumbs(crumbs);
+
             // Show is still bound to old job, setTimeout allows knockout model change event done at begining of this method to sends it's notification
             setTimeout(function () {
               if (vm.job().mainType() === 'queries-impala' && !$("#queries-page-plan${ SUFFIX }").parent().children().hasClass("active")) {
                 $("a[href=\'#queries-page-plan${ SUFFIX }\']").tab("show");
               }
             }, 0);
-            %if not is_mini:
+
+            % if not is_mini:
             if (vm.job().type() === 'workflow' && !vm.job().workflowGraphLoaded) {
               vm.job().updateWorkflowGraph();
             }
-            %else:
+            % else:
             if (vm.job().type() === 'workflow') {
               vm.job().fetchProfile('properties');
               $('a[href="#workflow-page-metadata${ SUFFIX }"]').tab('show');
@@ -3148,10 +3150,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                  var killModalData = $(this).data('modal');
                  killModalData.$backdrop.appendTo("#jobbrowserMiniComponents");
             });
-            %endif
+            % endif
 
             vm.job().fetchLogs();
-
           } else {
             $(document).trigger("error", data.message);
           }
@@ -3902,7 +3903,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return '${ ENABLE_HISTORY_V2.get() }' == 'True';
         };
         var jobsInterfaceCondition = function () {
-          return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+          return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1;
         };
         var dataEngInterfaceCondition = function () {
           return self.cluster() && self.cluster()['type'] == 'altus-de';
@@ -3917,7 +3918,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return self.cluster() && self.cluster()['type'] == 'altus-dw2';
         };
         var schedulerInterfaceCondition = function () {
-          return '${ user.has_hue_permission(action="access", app="oozie") }' == 'True' && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1) && self.appConfig() && self.appConfig()['scheduler'];
+          return '${ user.has_hue_permission(action="access", app="oozie") }' == 'True' && self.appConfig() && self.appConfig()['scheduler'];
         };
         var schedulerExtraInterfaceCondition = function () {
           return '${ is_mini }' == 'False' && schedulerInterfaceCondition();
@@ -3926,10 +3927,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return self.appConfig() && self.appConfig()['scheduler'] && self.appConfig()['scheduler']['interpreter_names'].indexOf('celery-beat') != -1;
         };
         var livyInterfaceCondition = function () {
-          return '${ is_mini }' == 'False' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+          return '${ is_mini }' == 'False' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1;
         };
         var queryInterfaceCondition = function () {
-          return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+          return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1;
         };
         var queryHiveInterfaceCondition = function () {
           return '${ ENABLE_HIVE_QUERY_BROWSER.get() }' == 'True';
@@ -4248,7 +4249,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           if (options.compute) {
             jobBrowserViewModel.compute(options.compute);
           }
-          $('#jobsPanel .nav-pills li').removeClass('active');
+          $('#jobsPanel .nav-pills li').removeClass('active');console.log(options.section)
           interface = jobBrowserViewModel.isValidInterface(options.section);
           $('#jobsPanel .nav-pills li[data-interface="' + interface + '"]').addClass('active');
           jobBrowserViewModel.selectInterface(interface);

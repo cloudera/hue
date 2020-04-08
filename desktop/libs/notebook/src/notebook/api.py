@@ -224,6 +224,7 @@ def execute(request, dialect=None):
 
   if dialect:
     notebook['dialect'] = dialect
+    notebook['snippets'][0]['dialect'] = dialect
 
   with opentracing.tracer.start_span('notebook-execute') as span:
     span.set_tag('user-id', request.user.username)
@@ -448,8 +449,14 @@ def get_logs(request):
 
   db = get_api(request, snippet)
 
+  # if snippet.get('connector') and snippet['connector'].get('type'):
+  #   snippet['type'] = snippet['connector']['type']  # To rename to 'id'
+  #   snippet['dialect'] = snippet['connector']['dialect']
+
   with opentracing.tracer.start_span('notebook-get_logs') as span:
-    logs = smart_str(db.get_log(notebook, snippet, startFrom=startFrom, size=size))
+    logs = smart_str(
+      db.get_log(notebook, snippet, startFrom=startFrom, size=size)
+    )
 
     span.set_tag('user-id', request.user.username)
     span.set_tag(
@@ -584,6 +591,7 @@ def _get_statement(notebook):
   if notebook['snippets'] and len(notebook['snippets']) > 0:
     return Notebook.statement_with_variables(notebook['snippets'][0])
   return ''
+
 
 @require_GET
 @api_error_handler

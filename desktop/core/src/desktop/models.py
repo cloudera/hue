@@ -51,7 +51,7 @@ from useradmin.organization import _fitered_queryset
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_K8S_ONLY, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS,\
-    has_connectors, TASK_SERVER, ENABLE_GIST, APP_BLACKLIST, ENABLE_SHARING
+    has_connectors, TASK_SERVER, ENABLE_GIST, APP_BLACKLIST, ENABLE_SHARING, ENABLE_CONNECTORS
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.connectors.models import Connector
@@ -1848,7 +1848,14 @@ class ClusterConfig(object):
         'buttonName': _('Query'),
         'interpreters': interpreters,
         'default_limit': None if DEFAULT_LIMIT.get() == 0 else DEFAULT_LIMIT.get(),
-        'interpreter_names': [interpreter['type'] for interpreter in interpreters],
+        'interpreter_names':
+          list(
+            set([
+              interpreter['dialect'] if ENABLE_CONNECTORS.get() else interpreter['type']
+              for interpreter in interpreters
+            ]
+          )
+        ),
         'page': interpreters[0]['page'],
         'default_sql_interpreter': next((interpreter['type'] for interpreter in interpreters if interpreter.get('is_sql')), 'hive')
       }

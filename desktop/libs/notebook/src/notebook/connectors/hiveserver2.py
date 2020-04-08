@@ -89,7 +89,7 @@ except (AttributeError, ImportError, RuntimeError) as e:
   has_hive_query_browser = False
 
 
-DEFAULT_HIVE_ENGINE = 'mr'
+DEFAULT_HIVE_ENGINE = 'tez'
 
 
 def query_error_handler(func):
@@ -484,9 +484,12 @@ class HS2Api(Api):
   def get_jobs(self, notebook, snippet, logs):
     jobs = []
 
-    patch_snippet_for_connector(snippet)
+    # patch_snippet_for_connector(snippet)
 
-    if snippet['dialect'] == 'hive':
+    print('============================')
+    print(snippet)
+
+    if snippet['dialect'] == 'hive': # or True:
       engine = self._get_hive_execution_engine(notebook, snippet)
       jobs_with_state = parse_out_jobs(logs, engine=engine, with_state=True)
       queries_with_state = parse_out_queries(logs, engine=engine, with_state=True)

@@ -75,14 +75,26 @@ class JobBrowserPanel {
         huePubSub.publish('context.selector.set.cluster', 'impala');
       }
 
+      let section = 'jobs';
+      if (!options || !options.interface) {
+        section = 'queries-hive'; // HACK! // interface: $parent.sourceType() in empty
+        // options.interface = 'jobs';
+      } else if (options.interface == 'impala') {
+        section = 'queries-impala';
+      } else if (options.interface == 'hive') {
+        section = 'queries-hive';
+      }
+
       huePubSub.publish('hide.history.panel');
       $(window).on('resize', reposition);
       reposition();
       $jobsPanel.show();
+
       huePubSub.publish('mini.jb.navigate', {
-        section: options && options.interface ? options.interface : 'jobs',
+        section: section,
         compute: options && options.compute
       });
+
       if (options && options.id) {
         huePubSub.publish('mini.jb.open.job', options.id);
       }
