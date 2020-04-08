@@ -37,7 +37,7 @@ if (missing.length) {
 
 const getPendingReviews = async user => {
   const { stdout, stderr } = await exec(
-    `rbt api-get --server=https://review.cloudera.org /review-requests/ --from-user=${user} --status=pending --max-results=100`
+    `rbt api-get --server=https://review.cloudera.org /review-requests/ --from-user=${user} --status=pending --max-results=20`
   );
   if (stderr) {
     throw new Error(stderr);
@@ -104,13 +104,30 @@ const jiraApi = new JiraApi({
   strictSSL: true
 });
 
-const fetchExistingJiraComments = async jiraNumber => {
-  const jira = await jiraApi.findIssue(jiraNumber, undefined, 'comment');
-  if (jira && jira.fields && jira.fields.comment && jira.fields.comment.comments) {
-    return jira.fields.comment.comments.reduce((val, comment) => val + comment.body + '\n', '');
+const fetchExistingJira = async jiraNumber => {
+  const existingJira = await jiraApi.findIssue(jiraNumber, undefined, 'comment, status');
+  if (
+    !existingJira ||
+    !existingJira.fields ||
+    !existingJira.fields.comment ||
+    !existingJira.fields.status
+  ) {
+    throw new Error('Returned Jira has no comment or status fields.');
+  }
+  return existingJira;
+};
+
+const extractJiraComment = existingJira => {
+  if (existingJira.fields.comment.comments) {
+    return existingJira.fields.comment.comments.reduce(
+      (val, comment) => val + comment.body + '\n',
+      ''
+    );
   }
   return '';
 };
+
+const hasOpenStatus = existingJira => existingJira.fields.status.id === '1';
 
 const generateComment = (commitUrls, reviewUrls) => {
   let comment = '';
@@ -128,12 +145,18 @@ const generateComment = (commitUrls, reviewUrls) => {
   return comment;
 };
 
-const setMissingJiraComments = async reviewJiras => {
+const transitionJiraToInProgress = async jira => {
+  await jiraApi.transitionIssue(jira.key, { transition: { id: 4 } });
+};
+
+const updateExistingJira = async reviewJiras => {
   let updatedJiraCount = 0;
   await asyncForEach(reviewJiras, async reviewJira => {
     const missingCommitUrls = [];
     const missingReviewUrls = [];
-    const existingComment = (await fetchExistingJiraComments(reviewJira.jira)).toLowerCase();
+    const existingJira = await fetchExistingJira(reviewJira.jira);
+
+    const existingComment = extractJiraComment(existingJira).toLowerCase();
     reviewJira.reviews.forEach(review => {
       if (existingComment.indexOf(review.toLowerCase()) === -1) {
         missingReviewUrls.push(review);
@@ -147,12 +170,19 @@ const setMissingJiraComments = async reviewJiras => {
     if (missingCommitUrls.length || missingReviewUrls.length) {
       const comment = generateComment(missingCommitUrls, missingReviewUrls);
       // eslint-disable-next-line no-restricted-syntax
-      console.log(`\nAdding to ${reviewJira.jira}...\n`.cyan);
+      console.log(`\nAdding comment to ${existingJira.key}...\n`.cyan);
       // eslint-disable-next-line no-restricted-syntax
       console.log(comment);
       updatedJiraCount++;
       if (!program.dryRun) {
-        await jiraApi.addComment(reviewJira.jira, comment);
+        await jiraApi.addComment(existingJira.key, comment);
+      }
+      if (hasOpenStatus(existingJira)) {
+        // eslint-disable-next-line no-restricted-syntax
+        console.log(`\nTransitioning ${existingJira.key} to 'In Progress'...\n`.cyan);
+        if (!program.dryRun) {
+          await transitionJiraToInProgress(existingJira);
+        }
       }
     }
   });
@@ -178,7 +208,7 @@ const main = async () => {
   await linkCommits(reviewJiras);
 
   // Update the actual jira with missing review and commit urls
-  const updatedJiraCount = await setMissingJiraComments(reviewJiras);
+  const updatedJiraCount = await updateExistingJira(reviewJiras);
 
   if (updatedJiraCount) {
     // eslint-disable-next-line no-restricted-syntax
