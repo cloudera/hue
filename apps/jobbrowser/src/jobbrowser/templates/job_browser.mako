@@ -1637,7 +1637,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <pre data-bind="text: (properties.plan && properties.plan().summary) || _('The selected tab has no data')"/>
         </div>
         <div class="tab-pane" id="queries-page-profile${ SUFFIX }" data-profile="profile">
-          <pre data-bind="text: (properties.profile && properties.profile().profile) || _('The selected tab has no data')"/>
+          <button class="btn" type="button" data-clipboard-target="#query-impala-profile" data-bind="
+              clipboard: { onSuccess: function() { $.jHueNotify.info('${ _("Profile copied to clipboard!") }'); } }">
+            <i class="fa fa-fw fa-clipboard"></i> ${ _('Clipboard') }
+          </button>
+          <a class="btn" href="/desktop/download_logs" download>
+            <i class="fa fa-fw fa-download"></i> ${ _('Download') }
+          </a>
+          <pre id="query-impala-profile" data-bind="text: (properties.profile && properties.profile().profile) || _('The selected tab has no data')"/>
         </div>
         <div class="tab-pane" id="queries-page-memory${ SUFFIX }" data-profile="mem_usage">
           <pre data-bind="text: (properties.memory && properties.memory().mem_usage) || _('The selected tab has no data')"/>
@@ -3635,7 +3642,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return '${ is_mini }' == 'False' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
         var queryInterfaceCondition = function () {
-          return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+          return true || '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
         var queryHiveInterfaceCondition = function () {
           return '${ ENABLE_HIVE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('hive') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
