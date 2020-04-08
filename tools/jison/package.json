@@ -1,15 +1,14 @@
 {
-  "name": "sql-docs",
+  "name": "parser-generator",
   "version": "1.0.0",
   "description": "",
-  "main": "DocFragment.js",
+  "main": "generateParsers.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "libxmljs": "^0.19.5",
-    "epub": "^1.1.0"
+    "jison": "https://github.com/JohanAhlen/jison/tarball/ad8e41475e"
   }
 }

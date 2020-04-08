@@ -39,7 +39,6 @@ ${ commonheader(_('Metrics'), "about", user, request) | n,unicode }
   (function () {
     var MetricsViewModel = function () {
       var self = this;
-      self.apiHelper = window.apiHelper;
       self.metricsFilter = ko.observable();
       self.metrics = ko.observableArray();
       self.selectedMetric = ko.observable('All');
@@ -76,14 +75,16 @@ ${ commonheader(_('Metrics'), "about", user, request) | n,unicode }
       });
       var successCallback = function (data) {
         self.metrics(data.metric);
-      }
+      };
       self.fetchMetrics = function () {
-        self.apiHelper.simpleGet('/desktop/metrics/', {}, {successCallback: successCallback});
+        window.simpleGet('/desktop/metrics/', {}, {
+          successCallback: successCallback
+        });
       };
       self.isUnusedMetric = function (metricKey) {
         return metricKey.startsWith("auth") || metricKey.startsWith("multiprocessing") || metricKey.startsWith("python.gc");
       }
-    }
+    };
 
     $(document).ready(function () {
       var viewModel = new MetricsViewModel();
