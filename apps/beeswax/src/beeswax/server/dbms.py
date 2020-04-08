@@ -249,6 +249,18 @@ def get_query_server_config_via_connector(connector):
     full_connector_name = '%s-%s' % (connector_name, compute_name)
   LOG.debug("Query cluster connector %s compute %s" % (connector_name, compute_name))
 
+  if connector['options'].get('has_ssh') == 'true':
+    server_host = '127.0.0.1'
+    server_port = connector['options']['server_port']
+  else:
+    server_host = (connector['compute']['options'] if 'compute' in connector else connector['options'])['server_host']
+    server_port = int((connector['compute']['options'] if 'compute' in connector else connector['options'])['server_port'])
+
+  if 'impersonation_enabled' in connector['options']:
+    impersonation_enabled = connector['options']['impersonation_enabled'] == 'true'
+  else:
+    impersonation_enabled = hiveserver2_impersonation_enabled()
+
   return {
       'dialect': connector['dialect'],
       'server_name': full_connector_name,
@@ -258,7 +270,7 @@ def get_query_server_config_via_connector(connector):
       'auth_username': AUTH_USERNAME.get(),
       'auth_password': AUTH_PASSWORD.get(),
 
-      'impersonation_enabled': hiveserver2_impersonation_enabled(),
+      'impersonation_enabled': impersonation_enabled,
       'use_sasl': connector['dialect'] in ('hive',),
       'SESSION_TIMEOUT_S': 15 * 60,
       'querycache_rows': 1000,
