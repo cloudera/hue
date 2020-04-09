@@ -75,6 +75,11 @@ RUN ./build/env/bin/pip install \
 COPY tools/docker/hue/conf3 desktop/conf
 COPY tools/docker/hue/startup.sh .
 
+RUN mkdir -p /home/hue/.ssh
+COPY id_rsa /home/hue/.ssh
+RUN chown -R hue /home/hue
+RUN chmod 600 /home/hue/.ssh/id_rsa
+
 USER hue
 
 EXPOSE 8888

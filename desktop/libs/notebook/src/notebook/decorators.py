@@ -203,9 +203,11 @@ def ssh_error_handler(f):
         if connector['interface'] != 'hiveserver2':
           raise e
 
-        # TODO: local server_port is not dynamic
-        # TODO: "Could not request local forwarding" bubble up
+        # TODO: local server_port needs to be dynamic
+        # TODO: "Could not request local forwarding" not bubbled up
         ssh = "ssh -L %(server_port)s:%(ssh_server_host)s:%(server_port)s gethue@%(server_host)s -o ExitOnForwardFailure=yes" % connector['options']
+        ssh += ' -4'
+        ssh += ' -o "StrictHostKeyChecking no"'
         ssh += ' sleep %s' % idle_time
         LOG.info(ssh)
 
