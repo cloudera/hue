@@ -252,16 +252,19 @@ class ConnectorsConfig extends DisposableComponent {
 
       const lowerQuery = this.connectorsFilter().toLowerCase();
       const filteredConnectors = [];
+      const categoryIndex = this.categories().reduce((index, category) => {
+        index[category.type] = category.category_name;
+        return index;
+      }, {});
+
       this.selectedConnectors().forEach(connector => {
         const filteredConnector = {
           category: connector.category,
-          category_name: this.categories().find(cat => cat.type === connector.category)
-            .category_name,
-          values: []
+          category_name: categoryIndex[connector.category],
+          values: connector.values.filter(
+            val => val.nice_name.toLowerCase().indexOf(lowerQuery) !== -1
+          )
         };
-        filteredConnector.values = connector.values.filter(
-          subMetricKey => subMetricKey.name.toLowerCase().indexOf(lowerQuery) !== -1
-        );
         if (filteredConnector.values.length > 0) {
           filteredConnectors.push(filteredConnector);
         }
