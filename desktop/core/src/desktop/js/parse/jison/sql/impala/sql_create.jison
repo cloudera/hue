@@ -560,7 +560,13 @@ PartitionedBy
  | 'PARTITION' 'BY' HashClauses
  | 'PARTITION' 'BY' HashClauses ',' RangeClause
  | 'PARTITION' 'BY' RangeClause
+ | 'PARTITIONED' 'BY' '(' ColumnIdentifierList ')'
  ;
+ 
+ ColumnIdentifierList
+: ColumnIdentifier ',' ColumnIdentifierList
+| ColumnIdentifier
+;
 
 PartitionedBy_EDIT
  : 'PARTITIONED' 'CURSOR'
