@@ -19,7 +19,7 @@ from six.moves.urllib import parse
 import saml2.cryptography.asymmetric
 import saml2.cryptography.pki
 
-from tempfile import NamedTemporaryFile
+from tempfile import NamedTemporaryFile, mkdtemp
 from subprocess import Popen
 from subprocess import PIPE
 
@@ -483,6 +483,19 @@ def parse_xmlsec_output(output):
 def sha1_digest(msg):
     return hashlib.sha1(msg).digest()
 
+class NamedPipe(object):
+    def __init__(self):
+        self._tempdir = mkdtemp()
+        self.name = os.path.join(self._tempdir, 'fifo')
+
+        try:
+            os.mkfifo(self.name)
+        except:
+            os.rmdir(self._tempdir)
+
+    def close(self):
+        os.remove(self.name)
+        os.rmdir(self._tempdir)
 
 class Signer(object):
     """Abstract base class for signing algorithms."""
@@ -651,10 +664,10 @@ class CryptoBackend(object):
     def encrypt_assertion(self, statement, enc_key, template, key_type, node_xpath):
         raise NotImplementedError()
 
-    def decrypt(self, enctext, key_file, id_attr):
+    def decrypt(self, enctext, key_file, id_attr, passphrase=None):
         raise NotImplementedError()
 
-    def sign_statement(self, statement, node_name, key_file, node_id, id_attr):
+    def sign_statement(self, statement, node_name, key_file, node_id, id_attr, passphrase=None):
         raise NotImplementedError()
 
     def validate_signature(self, enctext, cert_file, cert_type, node_name, node_id, id_attr):
@@ -775,7 +788,7 @@ class CryptoBackendXmlSec1(CryptoBackend):
 
         return output.decode('utf-8')
 
-    def decrypt(self, enctext, key_file, id_attr):
+    def decrypt(self, enctext, key_file, id_attr, passphrase=None):
         """
 
         :param enctext: XML document containing an encrypted part
@@ -785,6 +798,16 @@ class CryptoBackendXmlSec1(CryptoBackend):
 
         logger.debug('Decrypt input len: %d', len(enctext))
         _, fil = make_temp(enctext, decode=False)
+
+        named_pipe = None
+        if key_file is not None:
+            if passphrase is not None:
+                named_pipe = NamedPipe()
+                # Decrypt the certificate
+                with open(key_file) as f, open(named_pipe.name, 'wb') as g:
+                    key = crypto.load_privatekey(crypto.FILETYPE_PEM, f.read(), passphrase=passphrase)
+                    g.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, key))
+                key_file = named_pipe.name
 
         com_list = [
             self.xmlsec,
@@ -801,7 +824,7 @@ class CryptoBackendXmlSec1(CryptoBackend):
 
         return output.decode('utf-8')
 
-    def sign_statement(self, statement, node_name, key_file, node_id, id_attr):
+    def sign_statement(self, statement, node_name, key_file, node_id, id_attr, passphrase=None):
         """
         Sign an XML statement.
 
@@ -822,6 +845,16 @@ class CryptoBackendXmlSec1(CryptoBackend):
             decode=False,
             delete=self._xmlsec_delete_tmpfiles,
         )
+
+        named_pipe = None
+        if key_file is not None:
+            if passphrase is not None:
+                named_pipe = NamedPipe()
+                # Decrypt the certificate
+                with open(key_file) as f, open(named_pipe.name, 'wb') as g:
+                    key = crypto.load_privatekey(crypto.FILETYPE_PEM, f.read(), passphrase=passphrase)
+                    g.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, key))
+                key_file = named_pipe.name
 
         com_list = [
             self.xmlsec,
@@ -939,7 +972,7 @@ class CryptoBackendXMLSecurity(CryptoBackend):
         # better than static 0.0 here.
         return 'XMLSecurity 0.0'
 
-    def sign_statement(self, statement, node_name, key_file, node_id, id_attr):
+    def sign_statement(self, statement, node_name, key_file, node_id, id_attr, passphrase=None):
         """
         Sign an XML statement.
 
@@ -954,6 +987,8 @@ class CryptoBackendXMLSecurity(CryptoBackend):
         """
         import xmlsec
         import lxml.etree
+
+        assert passphrase is None, "Encrypted key files is not supported"
 
         xml = xmlsec.parse_xml(statement)
         signed = xmlsec.sign(xml, key_file)
@@ -1062,6 +1097,7 @@ def security_context(conf):
             tmp_cert_file=conf.tmp_cert_file,
             tmp_key_file=conf.tmp_key_file,
             validate_certificate=conf.validate_certificate,
+            key_file_passphrase=conf.key_file_passphrase,
             enc_key_files=enc_key_files,
             encryption_keypairs=conf.encryption_keypairs,
             sec_backend=sec_backend,
@@ -1251,6 +1287,7 @@ class SecurityContext(object):
             generate_cert_info=None,
             tmp_cert_file=None, tmp_key_file=None,
             validate_certificate=None,
+            key_file_passphrase=None,
             enc_key_files=None, enc_key_type='pem',
             encryption_keypairs=None,
             enc_cert_type='pem',
@@ -1268,6 +1305,7 @@ class SecurityContext(object):
 
         # Your private key for signing
         self.key_file = key_file
+        self.key_file_passphrase = key_file_passphrase
         self.key_type = key_type
 
         # Your public key for signing
@@ -1358,6 +1396,7 @@ class SecurityContext(object):
         :return: The decrypted text
         """
         key_files = []
+        passphrase = self.key_file_passphrase
 
         if not isinstance(keys, list):
             keys = [keys]
@@ -1370,7 +1409,7 @@ class SecurityContext(object):
             key_files.append(key_file)
 
         try:
-            dectext = self.decrypt(enctext, key_file=key_files, id_attr=id_attr)
+            dectext = self.decrypt(enctext, key_file=key_files, id_attr=id_attr, passphrase=passphrase)
         except DecryptError as e:
             raise
         else:
@@ -1379,12 +1418,15 @@ class SecurityContext(object):
             for key_file in key_files:
                 os.unlink(key_file)
 
-    def decrypt(self, enctext, key_file=None, id_attr=''):
+    def decrypt(self, enctext, key_file=None, id_attr='', passphrase=None):
         """ Decrypting an encrypted text by the use of a private key.
 
         :param enctext: The encrypted text as a string
         :return: The decrypted text
         """
+        if passphrase is None:
+            passphrase = self.key_file_passphrase
+
         if not id_attr:
             id_attr = self.id_attr
 
@@ -1396,7 +1438,7 @@ class SecurityContext(object):
         ]
         for key_file in key_files:
             try:
-                dectext = self.crypto.decrypt(enctext, key_file, id_attr)
+                dectext = self.crypto.decrypt(enctext, key_file, id_attr, passphrase=passphrase)
             except XmlsecError as e:
                 continue
             else:
@@ -1650,7 +1692,7 @@ class SecurityContext(object):
         """ Deprecated function. See sign_statement(). """
         return self.sign_statement(statement, **kwargs)
 
-    def sign_statement(self, statement, node_name, key=None, key_file=None, node_id=None, id_attr=''):
+    def sign_statement(self, statement, node_name, key=None, key_file=None, node_id=None, id_attr='', passphrase=None):
         """Sign a SAML statement.
 
         :param statement: The statement to be signed
@@ -1671,12 +1713,15 @@ class SecurityContext(object):
         if not key and not key_file:
             key_file = self.key_file
 
+        if not passphrase:
+            passphrase = self.key_file_passphrase
+
         return self.crypto.sign_statement(
                 statement,
                 node_name,
                 key_file,
                 node_id,
-                id_attr)
+                id_attr, passphrase=passphrase)
 
     def sign_assertion_using_xmlsec(self, statement, **kwargs):
         """ Deprecated function. See sign_assertion(). """
@@ -1709,7 +1754,7 @@ class SecurityContext(object):
         return self.sign_statement(
                 statement, class_name(samlp.AttributeQuery()), **kwargs)
 
-    def multiple_signatures(self, statement, to_sign, key=None, key_file=None, sign_alg=None, digest_alg=None):
+    def multiple_signatures(self, statement, to_sign, key=None, key_file=None, sign_alg=None, digest_alg=None, passphrase=None):
         """
         Sign multiple parts of a statement
 
@@ -1740,7 +1785,7 @@ class SecurityContext(object):
                     key=key,
                     key_file=key_file,
                     node_id=sid,
-                    id_attr=id_attr)
+                    id_attr=id_attr, passphrase=passphrase)
 
         return statement
 
