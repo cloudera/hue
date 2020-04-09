@@ -44,8 +44,7 @@ Note: using the task server would not leverage any caching.
 from future import standard_library
 standard_library.install_aliases()
 
-from builtins import next
-from builtins import object
+from builtins import next, object
 import datetime
 import json
 import logging
@@ -143,6 +142,8 @@ class SqlAlchemyApi(Api):
     options = self.options.copy()
     options.pop('session', None)
     options.pop('url', None)
+    options.pop('has_ssh', None)
+    options.pop('ssh_server_host', None)
 
     return create_engine(url, **options)
 
