@@ -50,7 +50,7 @@ if ENABLE_PROMETHEUS.get():
 
   for metric_name in django_metrics_names:
     collector_obj = REGISTRY._names_to_collectors[metric_name]
-    LOG.info("%d - %s" % (id(collector_obj), metric_name))
+    LOG.debug("%d - %s" % (id(collector_obj), metric_name))
     django_collectors.add(collector_obj)
 
   for django_collector in django_collectors:

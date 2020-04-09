@@ -371,6 +371,18 @@ def get_interpreter(connector_type, user=None):
   return interpreter[0]
 
 
+def patch_snippet_for_connector(snippet):
+  """
+  Connector backward compatibility switcher.
+  # TODO Connector unification
+  """
+  if snippet.get('connector') and snippet['connector'].get('type'):
+    snippet['type'] = snippet['connector']['type']  # To rename to 'id'
+    snippet['dialect'] = snippet['connector']['dialect']
+  else:
+    snippet['dialect'] = snippet['type']
+
+
 def get_api(request, snippet):
   from notebook.connectors.oozie_batch import OozieApi
 
@@ -380,11 +392,9 @@ def get_api(request, snippet):
   if snippet.get('type') == 'report':
     snippet['type'] = 'impala'
 
-  if snippet.get('connector') and snippet['connector'].get('type'):  # TODO Connector unification
-    connector_name = snippet['connector']['type']  # Ideally unify with name and nice_name
-    snippet['type'] = connector_name
-  else:
-    connector_name = snippet['type']
+  patch_snippet_for_connector(snippet)
+
+  connector_name = snippet['type']
 
   if has_connectors() and snippet.get('type') == 'hello' and is_admin(request.user):
     interpreter = snippet.get('interpreter')
@@ -549,8 +559,9 @@ class Api(object):
     query = response['statement']
 
     client = get_optimizer_api(self.user, interface)
+    patch_snippet_for_connector(snippet)
 
-    return client.query_risk(query=query, source_platform=snippet['type'], db_name=snippet.get('database') or 'default')
+    return client.query_risk(query=query, source_platform=snippet['dialect'], db_name=snippet.get('database') or 'default')
 
   def statement_compatibility(self, interface, notebook, snippet, source_platform, target_platform):
     response = self._get_current_statement(notebook, snippet)
