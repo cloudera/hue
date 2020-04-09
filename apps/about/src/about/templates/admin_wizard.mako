@@ -320,7 +320,6 @@ ${ layout.menubar(section='quick_start') }
 
     self.installConnectorDataExample = function(connector, event) {
       self.isInstallingSample(true);
-
       $.post("${ url('notebook:install_examples') }", {
           connector: connector.type
         }, function(data) {
@@ -330,14 +329,14 @@ ${ layout.menubar(section='quick_start') }
           if (data.errorMessage) {
             $(document).trigger('error', data.errorMessage);
           }
-          if (data.status == 0 && $(button).data("is-connector")) {
+          if (data.status == 0 && $(event.target).data("is-connector")) {
             huePubSub.publish('cluster.config.refresh.config');
           }
       }).always(function(data) {
         self.isInstallingSample(false);
       });
     }
-  }
+  };
 
   function installConnectorExample() {
     var button = $(this);
