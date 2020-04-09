@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    examples.join_conditions.threeway
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+        <link rel="copyright" title="Copyright" href="../../../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../../../index.html" />
+        <link rel="up" title="Module code" href="../../index.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.16</span>
+
+
+        | Release Date: April 7, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="">
+
+        <div id="index-nav">
+            <form class="search" action="../../../search.html" method="get">
+              <label>
+                 Search terms:
+              <input type="text" placeholder="search..." name="q" size="12" />
+              </label>
+              <input type="submit" value="Search" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+
+            <p>
+            <a href="../../../contents.html">Contents</a> |
+            <a href="../../../genindex.html">Index</a>
+            </p>
+
+        </div>
+
+
+    </div>
+
+    
+
+    <div id="docs-body" class="" >
+        
+<h1>Source code for examples.join_conditions.threeway</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Illustrate a &quot;three way join&quot; - where a primary table joins to a remote</span>
+<span class="sd">table via an association table, but then the primary table also needs</span>
+<span class="sd">to refer to some columns in the remote table directly.</span>
+
+<span class="sd">E.g.::</span>
+
+<span class="sd">    first.first_id      -&gt; second.first_id</span>
+<span class="sd">                           second.other_id --&gt; partitioned.other_id</span>
+<span class="sd">    first.partition_key ---------------------&gt; partitioned.partition_key</span>
+
+<span class="sd">For a relationship like this, &quot;second&quot; is a lot like a &quot;secondary&quot; table,</span>
+<span class="sd">but the mechanics aren&#39;t present within the &quot;secondary&quot; feature to allow</span>
+<span class="sd">for the join directly between first and partitioned.  Instead, we</span>
+<span class="sd">will derive a selectable from partitioned and second combined together, then</span>
+<span class="sd">link first to that derived selectable.</span>
+
+<span class="sd">If we define the derived selectable as::</span>
+
+<span class="sd">    second JOIN partitioned ON second.other_id = partitioned.other_id</span>
+
+<span class="sd">A JOIN from first to this derived selectable is then::</span>
+
+<span class="sd">    first JOIN (second JOIN partitioned</span>
+<span class="sd">                ON second.other_id = partitioned.other_id)</span>
+<span class="sd">          ON first.first_id = second.first_id AND</span>
+<span class="sd">             first.partition_key = partitioned.partition_key</span>
+
+<span class="sd">We will use the &quot;non primary mapper&quot; feature in order to produce this.</span>
+<span class="sd">A non primary mapper is essentially an &quot;extra&quot; :func:`.mapper` that we can</span>
+<span class="sd">use to associate a particular class with some selectable that is</span>
+<span class="sd">not its usual mapped table.   It is used only when called upon within</span>
+<span class="sd">a Query (or a :func:`.relationship`).</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">and_</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">Column</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">create_engine</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">Integer</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">join</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">String</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">foreign</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">mapper</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">relationship</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">Session</span>
+
+
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">First</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;first&quot;</span>
+
+    <span class="n">first_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">partition_key</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;First(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">first_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">partition_key</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Second</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;second&quot;</span>
+
+    <span class="n">first_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">other_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Partitioned</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;partitioned&quot;</span>
+
+    <span class="n">other_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">partition_key</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Partitioned(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">other_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">partition_key</span><span class="p">)</span>
+
+
+<span class="n">j</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">Partitioned</span><span class="p">,</span> <span class="n">Second</span><span class="p">,</span> <span class="n">Partitioned</span><span class="o">.</span><span class="n">other_id</span> <span class="o">==</span> <span class="n">Second</span><span class="o">.</span><span class="n">other_id</span><span class="p">)</span>
+
+<span class="n">partitioned_second</span> <span class="o">=</span> <span class="n">mapper</span><span class="p">(</span>
+    <span class="n">Partitioned</span><span class="p">,</span>
+    <span class="n">j</span><span class="p">,</span>
+    <span class="n">non_primary</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">properties</span><span class="o">=</span><span class="p">{</span>
+        <span class="c1"># note we need to disambiguate columns here - the join()</span>
+        <span class="c1"># will provide them as j.c.&lt;tablename&gt;_&lt;colname&gt; for access,</span>
+        <span class="c1"># but they retain their real names in the mapping</span>
+        <span class="s2">&quot;other_id&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">j</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">partitioned_other_id</span><span class="p">,</span> <span class="n">j</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">second_other_id</span><span class="p">]</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+
+<span class="n">First</span><span class="o">.</span><span class="n">partitioned</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+    <span class="n">partitioned_second</span><span class="p">,</span>
+    <span class="n">primaryjoin</span><span class="o">=</span><span class="n">and_</span><span class="p">(</span>
+        <span class="n">First</span><span class="o">.</span><span class="n">partition_key</span> <span class="o">==</span> <span class="n">partitioned_second</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">partition_key</span><span class="p">,</span>
+        <span class="n">First</span><span class="o">.</span><span class="n">first_id</span> <span class="o">==</span> <span class="n">foreign</span><span class="p">(</span><span class="n">partitioned_second</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">first_id</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">innerjoin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># when using any database other than SQLite, we will get a nested</span>
+<span class="c1"># join, e.g. &quot;first JOIN (partitioned JOIN second ON ..) ON ..&quot;.</span>
+<span class="c1"># On SQLite, SQLAlchemy needs to render a full subquery.</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s2">&quot;sqlite://&quot;</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add_all</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">First</span><span class="p">(</span><span class="n">first_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">partition_key</span><span class="o">=</span><span class="s2">&quot;p1&quot;</span><span class="p">),</span>
+        <span class="n">First</span><span class="p">(</span><span class="n">first_id</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">partition_key</span><span class="o">=</span><span class="s2">&quot;p1&quot;</span><span class="p">),</span>
+        <span class="n">First</span><span class="p">(</span><span class="n">first_id</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">partition_key</span><span class="o">=</span><span class="s2">&quot;p2&quot;</span><span class="p">),</span>
+        <span class="n">Second</span><span class="p">(</span><span class="n">first_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">other_id</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">Second</span><span class="p">(</span><span class="n">first_id</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">other_id</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">Second</span><span class="p">(</span><span class="n">first_id</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">other_id</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+        <span class="n">Partitioned</span><span class="p">(</span><span class="n">partition_key</span><span class="o">=</span><span class="s2">&quot;p1&quot;</span><span class="p">,</span> <span class="n">other_id</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">Partitioned</span><span class="p">(</span><span class="n">partition_key</span><span class="o">=</span><span class="s2">&quot;p1&quot;</span><span class="p">,</span> <span class="n">other_id</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+        <span class="n">Partitioned</span><span class="p">(</span><span class="n">partition_key</span><span class="o">=</span><span class="s2">&quot;p2&quot;</span><span class="p">,</span> <span class="n">other_id</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">First</span><span class="p">,</span> <span class="n">Partitioned</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">First</span><span class="o">.</span><span class="n">partitioned</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">First</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">partitioned</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">partition_key</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">partition_key</span><span class="p">)</span></pre></div>
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links">
+
+    <div id="docs-copyright">
+        &copy; <a href="../../../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.0.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../../../',
+          VERSION:     '1.3.16',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../../../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

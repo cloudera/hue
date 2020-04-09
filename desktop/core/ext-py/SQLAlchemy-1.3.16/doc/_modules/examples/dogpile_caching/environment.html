@@ -1,0 +1,247 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    examples.dogpile_caching.environment
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+        <link rel="copyright" title="Copyright" href="../../../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../../../index.html" />
+        <link rel="up" title="Module code" href="../../index.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.16</span>
+
+
+        | Release Date: April 7, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="">
+
+        <div id="index-nav">
+            <form class="search" action="../../../search.html" method="get">
+              <label>
+                 Search terms:
+              <input type="text" placeholder="search..." name="q" size="12" />
+              </label>
+              <input type="submit" value="Search" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+
+            <p>
+            <a href="../../../contents.html">Contents</a> |
+            <a href="../../../genindex.html">Index</a>
+            </p>
+
+        </div>
+
+
+    </div>
+
+    
+
+    <div id="docs-body" class="" >
+        
+<h1>Source code for examples.dogpile_caching.environment</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Establish data / cache file paths, and configurations,</span>
+<span class="sd">bootstrap fixture data if necessary.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">hashlib</span> <span class="k">import</span> <span class="n">md5</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">dogpile.cache.region</span> <span class="k">import</span> <span class="n">make_region</span>
+
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">create_engine</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">scoped_session</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">sessionmaker</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">caching_query</span>
+
+
+<span class="n">py2k</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">py2k</span><span class="p">:</span>
+    <span class="nb">input</span> <span class="o">=</span> <span class="n">raw_input</span>  <span class="c1"># noqa</span>
+
+<span class="c1"># dogpile cache regions.  A home base for cache configurations.</span>
+<span class="n">regions</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<span class="c1"># scoped_session.  Apply our custom CachingQuery class to it,</span>
+<span class="c1"># using a callable that will associate the dictionary</span>
+<span class="c1"># of regions with the Query.</span>
+<span class="n">Session</span> <span class="o">=</span> <span class="n">scoped_session</span><span class="p">(</span>
+    <span class="n">sessionmaker</span><span class="p">(</span><span class="n">query_cls</span><span class="o">=</span><span class="n">caching_query</span><span class="o">.</span><span class="n">query_callable</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
+<span class="p">)</span>
+
+<span class="c1"># global declarative base class.</span>
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+
+<span class="n">root</span> <span class="o">=</span> <span class="s2">&quot;./dogpile_data/&quot;</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
+    <span class="nb">input</span><span class="p">(</span>
+        <span class="s2">&quot;Will create datafiles in </span><span class="si">%r</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;To reset the cache + database, delete this directory.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;Press enter to continue.</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">root</span>
+    <span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+<span class="n">dbfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;dogpile_demo.db&quot;</span><span class="p">)</span>
+<span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s2">&quot;sqlite:///</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">dbfile</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">Session</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">md5_key_mangler</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Receive cache keys as long concatenated strings;</span>
+<span class="sd">    distill them into an md5 hash.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">md5</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+
+<span class="c1"># configure the &quot;default&quot; cache region.</span>
+<span class="n">regions</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">make_region</span><span class="p">(</span>
+    <span class="c1"># the &quot;dbm&quot; backend needs</span>
+    <span class="c1"># string-encoded keys</span>
+    <span class="n">key_mangler</span><span class="o">=</span><span class="n">md5_key_mangler</span>
+<span class="p">)</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span>
+    <span class="c1"># using type &#39;file&#39; to illustrate</span>
+    <span class="c1"># serialized persistence.  Normally</span>
+    <span class="c1"># memcached or similar is a better choice</span>
+    <span class="c1"># for caching.</span>
+    <span class="s2">&quot;dogpile.cache.dbm&quot;</span><span class="p">,</span>
+    <span class="n">expiration_time</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span>
+    <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;cache.dbm&quot;</span><span class="p">)},</span>
+<span class="p">)</span>
+
+<span class="c1"># optional; call invalidate() on the region</span>
+<span class="c1"># once created so that all data is fresh when</span>
+<span class="c1"># the app is restarted.  Good for development,</span>
+<span class="c1"># on a production system needs to be used carefully</span>
+<span class="c1"># regions[&#39;default&#39;].invalidate()</span>
+
+
+<span class="n">installed</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">bootstrap</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">installed</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">fixture_data</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dbfile</span><span class="p">):</span>
+        <span class="n">fixture_data</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
+        <span class="n">installed</span> <span class="o">=</span> <span class="kc">True</span></pre></div>
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links">
+
+    <div id="docs-copyright">
+        &copy; <a href="../../../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.0.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../../../',
+          VERSION:     '1.3.16',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../../../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

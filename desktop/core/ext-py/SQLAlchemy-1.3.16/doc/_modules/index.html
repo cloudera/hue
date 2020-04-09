@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    Overview: module code
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.16</span>
+
+
+        | Release Date: April 7, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="">
+
+        <div id="index-nav">
+            <form class="search" action="../search.html" method="get">
+              <label>
+                 Search terms:
+              <input type="text" placeholder="search..." name="q" size="12" />
+              </label>
+              <input type="submit" value="Search" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+
+            <p>
+            <a href="../contents.html">Contents</a> |
+            <a href="../genindex.html">Index</a>
+            </p>
+
+        </div>
+
+
+    </div>
+
+    
+
+    <div id="docs-body" class="" >
+        
+<h1>All modules for which code is available</h1>
+<ul><li><a href="examples/adjacency_list/adjacency_list.html">examples.adjacency_list.adjacency_list</a></li>
+<li><a href="examples/association/basic_association.html">examples.association.basic_association</a></li>
+<li><a href="examples/association/dict_of_sets_with_default.html">examples.association.dict_of_sets_with_default</a></li>
+<li><a href="examples/association/proxied_association.html">examples.association.proxied_association</a></li>
+<li><a href="examples/custom_attributes/active_column_defaults.html">examples.custom_attributes.active_column_defaults</a></li>
+<li><a href="examples/custom_attributes/custom_management.html">examples.custom_attributes.custom_management</a></li>
+<li><a href="examples/custom_attributes/listen_for_events.html">examples.custom_attributes.listen_for_events</a></li>
+<li><a href="examples/dogpile_caching/advanced.html">examples.dogpile_caching.advanced</a></li>
+<li><a href="examples/dogpile_caching/caching_query.html">examples.dogpile_caching.caching_query</a></li>
+<li><a href="examples/dogpile_caching/environment.html">examples.dogpile_caching.environment</a></li>
+<li><a href="examples/dogpile_caching/fixture_data.html">examples.dogpile_caching.fixture_data</a></li>
+<li><a href="examples/dogpile_caching/helloworld.html">examples.dogpile_caching.helloworld</a></li>
+<li><a href="examples/dogpile_caching/local_session_caching.html">examples.dogpile_caching.local_session_caching</a></li>
+<li><a href="examples/dogpile_caching/model.html">examples.dogpile_caching.model</a></li>
+<li><a href="examples/dogpile_caching/relationship_caching.html">examples.dogpile_caching.relationship_caching</a></li>
+<li><a href="examples/dynamic_dict/dynamic_dict.html">examples.dynamic_dict.dynamic_dict</a></li>
+<li><a href="examples/elementtree/adjacency_list.html">examples.elementtree.adjacency_list</a></li>
+<li><a href="examples/elementtree/optimized_al.html">examples.elementtree.optimized_al</a></li>
+<li><a href="examples/elementtree/pickle_type.html">examples.elementtree.pickle_type</a></li>
+<li><a href="examples/generic_associations/discriminator_on_association.html">examples.generic_associations.discriminator_on_association</a></li>
+<li><a href="examples/generic_associations/generic_fk.html">examples.generic_associations.generic_fk</a></li>
+<li><a href="examples/generic_associations/table_per_association.html">examples.generic_associations.table_per_association</a></li>
+<li><a href="examples/generic_associations/table_per_related.html">examples.generic_associations.table_per_related</a></li>
+<li><a href="examples/graphs/directed_graph.html">examples.graphs.directed_graph</a></li>
+<li><a href="examples/inheritance/concrete.html">examples.inheritance.concrete</a></li>
+<li><a href="examples/inheritance/joined.html">examples.inheritance.joined</a></li>
+<li><a href="examples/inheritance/single.html">examples.inheritance.single</a></li>
+<li><a href="examples/join_conditions/cast.html">examples.join_conditions.cast</a></li>
+<li><a href="examples/join_conditions/threeway.html">examples.join_conditions.threeway</a></li>
+<li><a href="examples/large_collection/large_collection.html">examples.large_collection.large_collection</a></li>
+<li><a href="examples/materialized_paths/materialized_paths.html">examples.materialized_paths.materialized_paths</a></li>
+<li><a href="examples/nested_sets/nested_sets.html">examples.nested_sets.nested_sets</a></li>
+<li><a href="examples/performance/__main__.html">examples.performance.__main__</a></li>
+<li><a href="examples/performance/bulk_inserts.html">examples.performance.bulk_inserts</a></li>
+<li><a href="examples/performance/bulk_updates.html">examples.performance.bulk_updates</a></li>
+<li><a href="examples/performance/large_resultsets.html">examples.performance.large_resultsets</a></li>
+<li><a href="examples/performance/short_selects.html">examples.performance.short_selects</a></li>
+<li><a href="examples/performance/single_inserts.html">examples.performance.single_inserts</a></li>
+<li><a href="examples/postgis/postgis.html">examples.postgis.postgis</a></li>
+<li><a href="examples/sharding/attribute_shard.html">examples.sharding.attribute_shard</a></li>
+<li><a href="examples/space_invaders/space_invaders.html">examples.space_invaders.space_invaders</a></li>
+<li><a href="examples/versioned_history/history_meta.html">examples.versioned_history.history_meta</a></li>
+<li><a href="examples/versioned_history/test_versioning.html">examples.versioned_history.test_versioning</a></li>
+<li><a href="examples/versioned_rows/versioned_map.html">examples.versioned_rows.versioned_map</a></li>
+<li><a href="examples/versioned_rows/versioned_rows.html">examples.versioned_rows.versioned_rows</a></li>
+<li><a href="examples/versioned_rows/versioned_rows_w_versionid.html">examples.versioned_rows.versioned_rows_w_versionid</a></li>
+<li><a href="examples/versioned_rows/versioned_update_old_row.html">examples.versioned_rows.versioned_update_old_row</a></li>
+<li><a href="examples/vertical/dictlike.html">examples.vertical.dictlike</a></li>
+<li><a href="examples/vertical/dictlike-polymorphic.html">examples.vertical.dictlike-polymorphic</a></li>
+</ul>
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links">
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.0.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.16',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

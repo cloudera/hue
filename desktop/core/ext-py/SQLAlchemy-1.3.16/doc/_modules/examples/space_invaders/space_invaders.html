@@ -1,0 +1,949 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    examples.space_invaders.space_invaders
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+        <link rel="copyright" title="Copyright" href="../../../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../../../index.html" />
+        <link rel="up" title="Module code" href="../../index.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.16</span>
+
+
+        | Release Date: April 7, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="">
+
+        <div id="index-nav">
+            <form class="search" action="../../../search.html" method="get">
+              <label>
+                 Search terms:
+              <input type="text" placeholder="search..." name="q" size="12" />
+              </label>
+              <input type="submit" value="Search" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+
+            <p>
+            <a href="../../../contents.html">Contents</a> |
+            <a href="../../../genindex.html">Index</a>
+            </p>
+
+        </div>
+
+
+    </div>
+
+    
+
+    <div id="docs-body" class="" >
+        
+<h1>Source code for examples.space_invaders.space_invaders</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">curses</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">Column</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">create_engine</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">ForeignKey</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">func</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">Integer</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">String</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.hybrid</span> <span class="k">import</span> <span class="n">hybrid_method</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.hybrid</span> <span class="k">import</span> <span class="n">hybrid_property</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">joinedload</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">relationship</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">Session</span>
+
+
+<span class="n">_PY3</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">_PY3</span><span class="p">:</span>
+    <span class="n">xrange</span> <span class="o">=</span> <span class="nb">range</span>
+
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;space_invaders.log&quot;</span><span class="p">,</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2">,</span><span class="si">%(msecs)03d</span><span class="s2"> </span><span class="si">%(levelname)-5.5s</span><span class="s2"> </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;sqlalchemy.engine&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+
+<span class="n">WINDOW_LEFT</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">WINDOW_TOP</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">WINDOW_WIDTH</span> <span class="o">=</span> <span class="mi">70</span>
+<span class="n">WINDOW_HEIGHT</span> <span class="o">=</span> <span class="mi">34</span>
+<span class="n">VERT_PADDING</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">HORIZ_PADDING</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">ENEMY_VERT_SPACING</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">MAX_X</span> <span class="o">=</span> <span class="n">WINDOW_WIDTH</span> <span class="o">-</span> <span class="n">HORIZ_PADDING</span>
+<span class="n">MAX_Y</span> <span class="o">=</span> <span class="n">WINDOW_HEIGHT</span> <span class="o">-</span> <span class="n">VERT_PADDING</span>
+<span class="n">LEFT_KEY</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="s2">&quot;j&quot;</span><span class="p">)</span>
+<span class="n">RIGHT_KEY</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="s2">&quot;l&quot;</span><span class="p">)</span>
+<span class="n">FIRE_KEY</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+<span class="n">PAUSE_KEY</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">)</span>
+
+<span class="n">COLOR_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;K&quot;</span><span class="p">:</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_BLACK</span><span class="p">,</span>
+    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_BLUE</span><span class="p">,</span>
+    <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_CYAN</span><span class="p">,</span>
+    <span class="s2">&quot;G&quot;</span><span class="p">:</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_GREEN</span><span class="p">,</span>
+    <span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_MAGENTA</span><span class="p">,</span>
+    <span class="s2">&quot;R&quot;</span><span class="p">:</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_RED</span><span class="p">,</span>
+    <span class="s2">&quot;W&quot;</span><span class="p">:</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_WHITE</span><span class="p">,</span>
+    <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_YELLOW</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">Glyph</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Describe a &quot;glyph&quot;, a graphical element</span>
+<span class="sd">    to be painted on the screen.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;glyph&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
+    <span class="n">alt_data</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;polymorphic_on&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">alt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encode_glyph</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">alt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">alt_data</span><span class="p">,</span> <span class="n">alt_w</span><span class="p">,</span> <span class="n">alt_h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encode_glyph</span><span class="p">(</span><span class="n">alt</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_encode_glyph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Receive a textual description of the glyph and</span>
+<span class="sd">        encode into a format understood by</span>
+<span class="sd">        GlyphCoordinate.render().</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^\n&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="n">img</span><span class="p">))</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;W&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">img</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="n">render_line</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">while</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">char</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s2">&quot;#&quot;</span><span class="p">:</span>
+                    <span class="n">color</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="n">render_line</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">color</span><span class="p">,</span> <span class="n">char</span><span class="p">))</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">render_line</span><span class="p">)</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">rl</span><span class="p">)</span> <span class="k">for</span> <span class="n">rl</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">char</span><span class="p">)</span> <span class="k">for</span> <span class="n">color</span><span class="p">,</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">render_line</span><span class="p">)</span>
+            <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;W &quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">width</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">render_line</span><span class="p">)))</span>
+            <span class="k">for</span> <span class="n">render_line</span> <span class="ow">in</span> <span class="n">data</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">glyph_for_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coord</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the appropriate data representation</span>
+<span class="sd">        for this Glyph, based on the current coordinates</span>
+<span class="sd">        and state.</span>
+
+<span class="sd">        Subclasses may override this to provide animations.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+
+
+<span class="k">class</span> <span class="nc">GlyphCoordinate</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Describe a glyph rendered at a certain x, y coordinate.</span>
+
+<span class="sd">    The GlyphCoordinate may also include optional values</span>
+<span class="sd">    such as the tick at time of render, a label, and a</span>
+<span class="sd">    score value.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;glyph_coordinate&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">glyph_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;glyph.id&quot;</span><span class="p">))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">tick</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">glyph</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="n">Glyph</span><span class="p">,</span> <span class="n">innerjoin</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">glyph_name</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">tick</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">score</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glyph</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Glyph</span><span class="p">)</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">glyph_name</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tick</span> <span class="o">=</span> <span class="n">tick</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">score</span> <span class="o">=</span> <span class="n">score</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Render the Glyph at this position.&quot;&quot;&quot;</span>
+
+        <span class="n">col</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">glyph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">glyph</span><span class="o">.</span><span class="n">glyph_for_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">color</span><span class="p">,</span> <span class="n">char</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="p">]:</span>
+
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">col</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">row</span>
+            <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">MAX_X</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">y</span> <span class="o">&lt;=</span> <span class="n">MAX_Y</span><span class="p">:</span>
+                <span class="n">window</span><span class="o">.</span><span class="n">addstr</span><span class="p">(</span>
+                    <span class="n">y</span> <span class="o">+</span> <span class="n">VERT_PADDING</span><span class="p">,</span>
+                    <span class="n">x</span> <span class="o">+</span> <span class="n">HORIZ_PADDING</span><span class="p">,</span>
+                    <span class="n">char</span><span class="p">,</span>
+                    <span class="n">_COLOR_PAIRS</span><span class="p">[</span><span class="n">color</span><span class="p">],</span>
+                <span class="p">)</span>
+            <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="n">glyph</span><span class="o">.</span><span class="n">width</span><span class="p">:</span>
+                <span class="n">col</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">row</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_render_label</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_render_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">blank</span><span class="p">):</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">blank</span> <span class="k">else</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">MAX_X</span><span class="p">:</span>
+            <span class="n">window</span><span class="o">.</span><span class="n">addstr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">window</span><span class="o">.</span><span class="n">addstr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">),</span> <span class="n">label</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">blank</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Render a blank box for this glyph&#39;s position and size.&quot;&quot;&quot;</span>
+
+        <span class="n">glyph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">MAX_X</span><span class="p">)</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">MAX_X</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">y_a</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">glyph</span><span class="o">.</span><span class="n">height</span><span class="p">):</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y_a</span>
+            <span class="n">window</span><span class="o">.</span><span class="n">addstr</span><span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="n">VERT_PADDING</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">HORIZ_PADDING</span><span class="p">,</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">width</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_render_label</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="nd">@hybrid_property</span>
+    <span class="k">def</span> <span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph</span><span class="o">.</span><span class="n">width</span>
+
+    <span class="nd">@width</span><span class="o">.</span><span class="n">expression</span>
+    <span class="k">def</span> <span class="nf">width</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Glyph</span><span class="o">.</span><span class="n">width</span>
+
+    <span class="nd">@hybrid_property</span>
+    <span class="k">def</span> <span class="nf">height</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph</span><span class="o">.</span><span class="n">height</span>
+
+    <span class="nd">@height</span><span class="o">.</span><span class="n">expression</span>
+    <span class="k">def</span> <span class="nf">height</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Glyph</span><span class="o">.</span><span class="n">height</span>
+
+    <span class="nd">@hybrid_property</span>
+    <span class="k">def</span> <span class="nf">bottom_bound</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">&gt;=</span> <span class="n">MAX_Y</span>
+
+    <span class="nd">@hybrid_property</span>
+    <span class="k">def</span> <span class="nf">top_bound</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+
+    <span class="nd">@hybrid_property</span>
+    <span class="k">def</span> <span class="nf">left_bound</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+
+    <span class="nd">@hybrid_property</span>
+    <span class="k">def</span> <span class="nf">right_bound</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">&gt;=</span> <span class="n">MAX_X</span>
+
+    <span class="nd">@hybrid_property</span>
+    <span class="k">def</span> <span class="nf">right_edge_bound</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">MAX_X</span>
+
+    <span class="nd">@hybrid_method</span>
+    <span class="k">def</span> <span class="nf">intersects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return True if this GlyphCoordinate intersects with</span>
+<span class="sd">        the given GlyphCoordinate.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="o">~</span><span class="p">(</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+        <span class="p">)</span> <span class="o">&amp;</span> <span class="o">~</span><span class="p">(</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+            <span class="o">|</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+        <span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">EnemyGlyph</span><span class="p">(</span><span class="n">Glyph</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Describe an enemy.&quot;&quot;&quot;</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;polymorphic_identity&quot;</span><span class="p">:</span> <span class="s2">&quot;enemy&quot;</span><span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">ArmyGlyph</span><span class="p">(</span><span class="n">EnemyGlyph</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Describe an enemy that&#39;s part of the &quot;army&quot;. &quot;&quot;&quot;</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;polymorphic_identity&quot;</span><span class="p">:</span> <span class="s2">&quot;army&quot;</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">glyph_for_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coord</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;flip&quot;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alt_data</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+
+
+<span class="k">class</span> <span class="nc">SaucerGlyph</span><span class="p">(</span><span class="n">EnemyGlyph</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Describe the enemy saucer flying overhead.&quot;&quot;&quot;</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;polymorphic_identity&quot;</span><span class="p">:</span> <span class="s2">&quot;saucer&quot;</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">glyph_for_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coord</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;flip&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alt_data</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+
+
+<span class="k">class</span> <span class="nc">MessageGlyph</span><span class="p">(</span><span class="n">Glyph</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Describe a glyph for displaying a message.&quot;&quot;&quot;</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;polymorphic_identity&quot;</span><span class="p">:</span> <span class="s2">&quot;message&quot;</span><span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">PlayerGlyph</span><span class="p">(</span><span class="n">Glyph</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Describe a glyph representing the player.&quot;&quot;&quot;</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;polymorphic_identity&quot;</span><span class="p">:</span> <span class="s2">&quot;player&quot;</span><span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">MissileGlyph</span><span class="p">(</span><span class="n">Glyph</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Describe a glyph representing a missile.&quot;&quot;&quot;</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;polymorphic_identity&quot;</span><span class="p">:</span> <span class="s2">&quot;missile&quot;</span><span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">SplatGlyph</span><span class="p">(</span><span class="n">Glyph</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Describe a glyph representing a &quot;splat&quot;.&quot;&quot;&quot;</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;polymorphic_identity&quot;</span><span class="p">:</span> <span class="s2">&quot;splat&quot;</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">glyph_for_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coord</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="n">age</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;tick&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">coord</span><span class="o">.</span><span class="n">tick</span>
+        <span class="k">if</span> <span class="n">age</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alt_data</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+
+
+<span class="k">def</span> <span class="nf">init_glyph</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create the glyphs used during play.&quot;&quot;&quot;</span>
+
+    <span class="n">enemy1</span> <span class="o">=</span> <span class="n">ArmyGlyph</span><span class="p">(</span>
+        <span class="s2">&quot;enemy1&quot;</span><span class="p">,</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         #W-#B^#R-#B^#W-</span>
+<span class="sd">         #G|   |</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         #W&gt;#B^#R-#B^#W&lt;</span>
+<span class="sd">         #G^   ^</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">enemy2</span> <span class="o">=</span> <span class="n">ArmyGlyph</span><span class="p">(</span>
+        <span class="s2">&quot;enemy2&quot;</span><span class="p">,</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         #W***</span>
+<span class="sd">        #R&lt;#C~~~#R&gt;</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         #W@@@</span>
+<span class="sd">        #R&lt;#C---#R&gt;</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">enemy3</span> <span class="o">=</span> <span class="n">ArmyGlyph</span><span class="p">(</span>
+        <span class="s2">&quot;enemy3&quot;</span><span class="p">,</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        #Y((--))</span>
+<span class="sd">        #M-~-~-~</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        #Y[[--]]</span>
+<span class="sd">        #M~-~-~-</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">saucer</span> <span class="o">=</span> <span class="n">SaucerGlyph</span><span class="p">(</span>
+        <span class="s2">&quot;saucer&quot;</span><span class="p">,</span>
+        <span class="sd">&quot;&quot;&quot;#R~#Y^#R~#G&lt;&lt;((=#WOO#G=))&gt;&gt;&quot;&quot;&quot;</span><span class="p">,</span>
+        <span class="sd">&quot;&quot;&quot;#Y^#R~#Y^#G&lt;&lt;((=#WOO#G=))&gt;&gt;&quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">splat1</span> <span class="o">=</span> <span class="n">SplatGlyph</span><span class="p">(</span>
+        <span class="s2">&quot;splat1&quot;</span><span class="p">,</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">             #WVVVVV</span>
+<span class="sd">            #W&gt; #R*** #W&lt;</span>
+<span class="sd">             #W^^^^^</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                #M|</span>
+<span class="sd">             #M- #Y+++ #M-</span>
+<span class="sd">                #M|</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">ship</span> <span class="o">=</span> <span class="n">PlayerGlyph</span><span class="p">(</span>
+        <span class="s2">&quot;ship&quot;</span><span class="p">,</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">       #Y^</span>
+<span class="sd">     #G=====</span>
+<span class="sd">    &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">missile</span> <span class="o">=</span> <span class="n">MissileGlyph</span><span class="p">(</span>
+        <span class="s2">&quot;missile&quot;</span><span class="p">,</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        |</span>
+<span class="sd">    &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">start</span> <span class="o">=</span> <span class="n">MessageGlyph</span><span class="p">(</span>
+        <span class="s2">&quot;start_message&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;J = move left; L = move right; SPACE = fire</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;           #GPress any key to start&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">lose</span> <span class="o">=</span> <span class="n">MessageGlyph</span><span class="p">(</span><span class="s2">&quot;lose_message&quot;</span><span class="p">,</span> <span class="s2">&quot;#YY O U  L O S E ! ! !&quot;</span><span class="p">)</span>
+    <span class="n">win</span> <span class="o">=</span> <span class="n">MessageGlyph</span><span class="p">(</span><span class="s2">&quot;win_message&quot;</span><span class="p">,</span> <span class="s2">&quot;#RL E V E L  C L E A R E D ! ! !&quot;</span><span class="p">)</span>
+    <span class="n">paused</span> <span class="o">=</span> <span class="n">MessageGlyph</span><span class="p">(</span>
+        <span class="s2">&quot;pause_message&quot;</span><span class="p">,</span> <span class="s2">&quot;#WP A U S E D</span><span class="se">\n</span><span class="s2">#GPress P to continue&quot;</span>
+    <span class="p">)</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">add_all</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">enemy1</span><span class="p">,</span>
+            <span class="n">enemy2</span><span class="p">,</span>
+            <span class="n">enemy3</span><span class="p">,</span>
+            <span class="n">ship</span><span class="p">,</span>
+            <span class="n">saucer</span><span class="p">,</span>
+            <span class="n">missile</span><span class="p">,</span>
+            <span class="n">start</span><span class="p">,</span>
+            <span class="n">lose</span><span class="p">,</span>
+            <span class="n">win</span><span class="p">,</span>
+            <span class="n">paused</span><span class="p">,</span>
+            <span class="n">splat1</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">setup_curses</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Setup terminal/curses state.&quot;&quot;&quot;</span>
+
+    <span class="n">window</span> <span class="o">=</span> <span class="n">curses</span><span class="o">.</span><span class="n">initscr</span><span class="p">()</span>
+    <span class="n">curses</span><span class="o">.</span><span class="n">noecho</span><span class="p">()</span>
+
+    <span class="n">window</span> <span class="o">=</span> <span class="n">curses</span><span class="o">.</span><span class="n">newwin</span><span class="p">(</span>
+        <span class="n">WINDOW_HEIGHT</span> <span class="o">+</span> <span class="p">(</span><span class="n">VERT_PADDING</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">WINDOW_WIDTH</span> <span class="o">+</span> <span class="p">(</span><span class="n">HORIZ_PADDING</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">WINDOW_TOP</span> <span class="o">-</span> <span class="n">VERT_PADDING</span><span class="p">,</span>
+        <span class="n">WINDOW_LEFT</span> <span class="o">-</span> <span class="n">HORIZ_PADDING</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">curses</span><span class="o">.</span><span class="n">start_color</span><span class="p">()</span>
+
+    <span class="k">global</span> <span class="n">_COLOR_PAIRS</span>
+    <span class="n">_COLOR_PAIRS</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">COLOR_MAP</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">curses</span><span class="o">.</span><span class="n">init_pair</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_BLACK</span><span class="p">)</span>
+        <span class="n">_COLOR_PAIRS</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">curses</span><span class="o">.</span><span class="n">color_pair</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">window</span>
+
+
+<span class="k">def</span> <span class="nf">init_positions</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Establish a new field of play.</span>
+
+<span class="sd">    This generates GlyphCoordinate objects</span>
+<span class="sd">    and persists them to the database.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># delete all existing coordinates</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+    <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+        <span class="n">GlyphCoordinate</span><span class="p">(</span>
+            <span class="n">session</span><span class="p">,</span> <span class="s2">&quot;ship&quot;</span><span class="p">,</span> <span class="n">WINDOW_WIDTH</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="n">WINDOW_HEIGHT</span> <span class="o">-</span> <span class="mi">4</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">arrangement</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="s2">&quot;enemy3&quot;</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;enemy2&quot;</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;enemy1&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;enemy2&quot;</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;enemy1&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">ship_vert</span><span class="p">,</span> <span class="p">(</span><span class="n">etype</span><span class="p">,</span> <span class="n">score</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="n">xrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">ENEMY_VERT_SPACING</span><span class="p">),</span> <span class="n">arrangement</span>
+    <span class="p">):</span>
+        <span class="k">for</span> <span class="n">ship_horiz</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                <span class="n">GlyphCoordinate</span><span class="p">(</span>
+                    <span class="n">session</span><span class="p">,</span> <span class="n">etype</span><span class="p">,</span> <span class="n">ship_horiz</span><span class="p">,</span> <span class="n">ship_vert</span><span class="p">,</span> <span class="n">score</span><span class="o">=</span><span class="n">score</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load all current GlyphCoordinate objects from the</span>
+<span class="sd">    database and render.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">gcoord</span> <span class="ow">in</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">joinedload</span><span class="p">(</span><span class="s2">&quot;glyph&quot;</span><span class="p">)):</span>
+        <span class="n">gcoord</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+    <span class="n">window</span><span class="o">.</span><span class="n">addstr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">WINDOW_WIDTH</span> <span class="o">-</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;Score: </span><span class="si">%.4d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;score&quot;</span><span class="p">])</span>
+    <span class="n">window</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">window</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">check_win</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the number of army glyphs remaining -</span>
+<span class="sd">    the player wins if this is zero.&quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="o">.</span><span class="n">glyph</span><span class="o">.</span><span class="n">of_type</span><span class="p">(</span><span class="n">ArmyGlyph</span><span class="p">))</span>
+        <span class="o">.</span><span class="n">scalar</span><span class="p">()</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">check_lose</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the number of army glyphs either colliding</span>
+<span class="sd">    with the player or hitting the bottom of the screen.</span>
+
+<span class="sd">    The player loses if this is non-zero.&quot;&quot;&quot;</span>
+
+    <span class="n">player</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;player&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="o">.</span><span class="n">glyph</span><span class="o">.</span><span class="n">of_type</span><span class="p">(</span><span class="n">ArmyGlyph</span><span class="p">))</span>
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">GlyphCoordinate</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">player</span><span class="p">)</span> <span class="o">|</span> <span class="n">GlyphCoordinate</span><span class="o">.</span><span class="n">bottom_bound</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">render_message</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Render a message glyph.</span>
+
+<span class="sd">    Clears the area beneath the message first</span>
+<span class="sd">    and assumes the display will be paused</span>
+<span class="sd">    afterwards.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># create message box</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">GlyphCoordinate</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="c1"># clear existing glyphs which intersect</span>
+    <span class="k">for</span> <span class="n">gly</span> <span class="ow">in</span> <span class="p">(</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="o">.</span><span class="n">glyph</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
+    <span class="p">):</span>
+        <span class="n">gly</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+
+    <span class="c1"># render</span>
+    <span class="n">msg</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="n">window</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">msg</span>
+
+
+<span class="k">def</span> <span class="nf">win</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Handle the win case.&quot;&quot;&quot;</span>
+    <span class="n">render_message</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="s2">&quot;win_message&quot;</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">start</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">lose</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Handle the lose case.&quot;&quot;&quot;</span>
+    <span class="n">render_message</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="s2">&quot;lose_message&quot;</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">start</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">pause</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pause the game.&quot;&quot;&quot;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">render_message</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="s2">&quot;pause_message&quot;</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+    <span class="n">prompt</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+    <span class="n">msg</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">prompt</span><span class="p">(</span><span class="n">window</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Display a prompt, quashing any keystrokes</span>
+<span class="sd">    which might have remained.&quot;&quot;&quot;</span>
+
+    <span class="n">window</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">window</span><span class="o">.</span><span class="n">nodelay</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">window</span><span class="o">.</span><span class="n">getch</span><span class="p">()</span>
+    <span class="n">window</span><span class="o">.</span><span class="n">nodelay</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">window</span><span class="o">.</span><span class="n">getch</span><span class="p">()</span>
+    <span class="n">window</span><span class="o">.</span><span class="n">nodelay</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">move_army</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update the army position based on the current</span>
+<span class="sd">    size of the field.&quot;&quot;&quot;</span>
+    <span class="n">speed</span> <span class="o">=</span> <span class="mi">30</span> <span class="o">//</span> <span class="mi">25</span> <span class="o">*</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;num_enemies&quot;</span><span class="p">]</span>
+
+    <span class="n">flip</span> <span class="o">=</span> <span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">&quot;tick&quot;</span><span class="p">]</span> <span class="o">%</span> <span class="n">speed</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flip</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">state</span><span class="p">[</span><span class="s2">&quot;flip&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;flip&quot;</span><span class="p">]</span>
+
+    <span class="n">x_slide</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="c1"># get the lower/upper boundaries of the army</span>
+    <span class="c1"># along the X axis.</span>
+    <span class="n">min_x</span><span class="p">,</span> <span class="n">max_x</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+            <span class="n">func</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="o">.</span><span class="n">x</span><span class="p">),</span>
+            <span class="n">func</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">GlyphCoordinate</span><span class="o">.</span><span class="n">width</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="o">.</span><span class="n">glyph</span><span class="o">.</span><span class="n">of_type</span><span class="p">(</span><span class="n">ArmyGlyph</span><span class="p">))</span>
+        <span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">min_x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">max_x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># no enemies</span>
+        <span class="k">return</span>
+
+    <span class="n">direction</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;army_direction&quot;</span><span class="p">]</span>
+    <span class="n">move_y</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">max_x</span> <span class="o">+</span> <span class="n">x_slide</span> <span class="o">&gt;=</span> <span class="n">MAX_X</span><span class="p">:</span>
+        <span class="n">direction</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;army_direction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">move_y</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">min_x</span> <span class="o">-</span> <span class="n">x_slide</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">direction</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;army_direction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">move_y</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">for</span> <span class="n">enemy_g</span> <span class="ow">in</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">GlyphCoordinate</span><span class="o">.</span><span class="n">glyph</span><span class="o">.</span><span class="n">of_type</span><span class="p">(</span><span class="n">ArmyGlyph</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="n">enemy_g</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">move_y</span><span class="p">:</span>
+            <span class="n">enemy_g</span><span class="o">.</span><span class="n">y</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">enemy_g</span><span class="o">.</span><span class="n">x</span> <span class="o">+=</span> <span class="n">x_slide</span>
+        <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">enemy_g</span><span class="o">.</span><span class="n">x</span> <span class="o">-=</span> <span class="n">x_slide</span>
+
+
+<span class="k">def</span> <span class="nf">move_player</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Receive player input and adjust state.&quot;&quot;&quot;</span>
+
+    <span class="n">ch</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">getch</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ch</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">LEFT_KEY</span><span class="p">,</span> <span class="n">RIGHT_KEY</span><span class="p">,</span> <span class="n">FIRE_KEY</span><span class="p">,</span> <span class="n">PAUSE_KEY</span><span class="p">):</span>
+        <span class="k">return</span>
+    <span class="k">elif</span> <span class="n">ch</span> <span class="o">==</span> <span class="n">PAUSE_KEY</span><span class="p">:</span>
+        <span class="n">pause</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">player</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;player&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">ch</span> <span class="o">==</span> <span class="n">RIGHT_KEY</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">player</span><span class="o">.</span><span class="n">right_bound</span><span class="p">:</span>
+        <span class="n">player</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+        <span class="n">player</span><span class="o">.</span><span class="n">x</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">ch</span> <span class="o">==</span> <span class="n">LEFT_KEY</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">player</span><span class="o">.</span><span class="n">left_bound</span><span class="p">:</span>
+        <span class="n">player</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+        <span class="n">player</span><span class="o">.</span><span class="n">x</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">ch</span> <span class="o">==</span> <span class="n">FIRE_KEY</span> <span class="ow">and</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;missile&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">state</span><span class="p">[</span><span class="s2">&quot;missile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">GlyphCoordinate</span><span class="p">(</span>
+            <span class="n">session</span><span class="p">,</span> <span class="s2">&quot;missile&quot;</span><span class="p">,</span> <span class="n">player</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="n">player</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">move_missile</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update the status of the current missile, if any.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;missile&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;tick&quot;</span><span class="p">]</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="n">missile</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;missile&quot;</span><span class="p">]</span>
+
+    <span class="c1"># locate enemy glyphs which intersect with the</span>
+    <span class="c1"># missile&#39;s current position; i.e. a hit</span>
+    <span class="n">glyph</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="o">.</span><span class="n">glyph</span><span class="o">.</span><span class="n">of_type</span><span class="p">(</span><span class="n">EnemyGlyph</span><span class="p">))</span>
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">missile</span><span class="p">))</span>
+        <span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="n">missile</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">glyph</span> <span class="ow">or</span> <span class="n">missile</span><span class="o">.</span><span class="n">top_bound</span><span class="p">:</span>
+        <span class="c1"># missile is done</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">missile</span><span class="p">)</span>
+        <span class="n">state</span><span class="p">[</span><span class="s2">&quot;missile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">glyph</span><span class="p">:</span>
+            <span class="c1"># score!</span>
+            <span class="n">score</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">glyph</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># move missile up one character.</span>
+        <span class="n">missile</span><span class="o">.</span><span class="n">y</span> <span class="o">-=</span> <span class="mi">1</span>
+
+
+<span class="k">def</span> <span class="nf">move_saucer</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update the status of the saucer.&quot;&quot;&quot;</span>
+
+    <span class="n">saucer_interval</span> <span class="o">=</span> <span class="mi">500</span>
+    <span class="n">saucer_speed_interval</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="k">if</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;saucer&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;tick&quot;</span><span class="p">]</span> <span class="o">%</span> <span class="n">saucer_interval</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;saucer&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">state</span><span class="p">[</span><span class="s2">&quot;saucer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">saucer</span> <span class="o">=</span> <span class="n">GlyphCoordinate</span><span class="p">(</span>
+            <span class="n">session</span><span class="p">,</span> <span class="s2">&quot;saucer&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">score</span><span class="o">=</span><span class="n">random</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;tick&quot;</span><span class="p">]</span> <span class="o">%</span> <span class="n">saucer_speed_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">saucer</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;saucer&quot;</span><span class="p">]</span>
+        <span class="n">saucer</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+        <span class="n">saucer</span><span class="o">.</span><span class="n">x</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">saucer</span><span class="o">.</span><span class="n">right_edge_bound</span><span class="p">:</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">saucer</span><span class="p">)</span>
+            <span class="n">state</span><span class="p">[</span><span class="s2">&quot;saucer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">update_splat</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Render splat animations.&quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">splat</span> <span class="ow">in</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">GlyphCoordinate</span><span class="o">.</span><span class="n">glyph</span><span class="o">.</span><span class="n">of_type</span><span class="p">(</span><span class="n">SplatGlyph</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="n">age</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;tick&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">splat</span><span class="o">.</span><span class="n">tick</span>
+        <span class="k">if</span> <span class="n">age</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">splat</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">splat</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">splat</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">glyph</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Process a glyph intersecting with a missile.&quot;&quot;&quot;</span>
+
+    <span class="n">glyph</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">glyph</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;saucer&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="n">glyph</span><span class="p">:</span>
+        <span class="n">state</span><span class="p">[</span><span class="s2">&quot;saucer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">state</span><span class="p">[</span><span class="s2">&quot;score&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">glyph</span><span class="o">.</span><span class="n">score</span>
+    <span class="c1"># render a splat !</span>
+    <span class="n">GlyphCoordinate</span><span class="p">(</span>
+        <span class="n">session</span><span class="p">,</span>
+        <span class="s2">&quot;splat1&quot;</span><span class="p">,</span>
+        <span class="n">glyph</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+        <span class="n">glyph</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+        <span class="n">tick</span><span class="o">=</span><span class="n">state</span><span class="p">[</span><span class="s2">&quot;tick&quot;</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">score</span><span class="p">),</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">update_state</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update all state for each game tick.&quot;&quot;&quot;</span>
+
+    <span class="n">num_enemies</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;num_enemies&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">check_win</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">num_enemies</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">win</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">check_lose</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="n">lose</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># update the tick counter.</span>
+        <span class="n">state</span><span class="p">[</span><span class="s2">&quot;tick&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">move_player</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="n">move_missile</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="n">move_army</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="n">move_saucer</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="n">update_splat</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">continue_</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Start a new field of play.&quot;&quot;&quot;</span>
+
+    <span class="n">render_message</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="s2">&quot;start_message&quot;</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+    <span class="n">prompt</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+
+    <span class="n">init_positions</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+
+    <span class="n">player</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">GlyphCoordinate</span><span class="o">.</span><span class="n">glyph</span><span class="o">.</span><span class="n">of_type</span><span class="p">(</span><span class="n">PlayerGlyph</span><span class="p">))</span>
+        <span class="o">.</span><span class="n">one</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="n">state</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;field_pos&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;alt&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;tick&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;missile&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;saucer&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;player&quot;</span><span class="p">:</span> <span class="n">player</span><span class="p">,</span>
+            <span class="s2">&quot;army_direction&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;flip&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">continue_</span><span class="p">:</span>
+        <span class="n">state</span><span class="p">[</span><span class="s2">&quot;score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">window</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">window</span><span class="o">.</span><span class="n">box</span><span class="p">()</span>
+    <span class="n">draw</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Initialize the database and establish the game loop.&quot;&quot;&quot;</span>
+
+    <span class="n">e</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s2">&quot;sqlite://&quot;</span><span class="p">)</span>
+    <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="n">init_glyph</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">window</span> <span class="o">=</span> <span class="n">setup_curses</span><span class="p">()</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">start</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">update_state</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="n">draw</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span></pre></div>
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links">
+
+    <div id="docs-copyright">
+        &copy; <a href="../../../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.0.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../../../',
+          VERSION:     '1.3.16',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../../../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

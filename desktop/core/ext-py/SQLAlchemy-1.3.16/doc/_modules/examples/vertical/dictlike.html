@@ -1,0 +1,331 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    examples.vertical.dictlike
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+        <link rel="copyright" title="Copyright" href="../../../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../../../index.html" />
+        <link rel="up" title="Module code" href="../../index.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.16</span>
+
+
+        | Release Date: April 7, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="">
+
+        <div id="index-nav">
+            <form class="search" action="../../../search.html" method="get">
+              <label>
+                 Search terms:
+              <input type="text" placeholder="search..." name="q" size="12" />
+              </label>
+              <input type="submit" value="Search" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+
+            <p>
+            <a href="../../../contents.html">Contents</a> |
+            <a href="../../../genindex.html">Index</a>
+            </p>
+
+        </div>
+
+
+    </div>
+
+    
+
+    <div id="docs-body" class="" >
+        
+<h1>Source code for examples.vertical.dictlike</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Mapping a vertical table as a dictionary.</span>
+
+<span class="sd">This example illustrates accessing and modifying a &quot;vertical&quot; (or</span>
+<span class="sd">&quot;properties&quot;, or pivoted) table via a dict-like interface.  These are tables</span>
+<span class="sd">that store free-form object properties as rows instead of columns.  For</span>
+<span class="sd">example, instead of::</span>
+
+<span class="sd">  # A regular (&quot;horizontal&quot;) table has columns for &#39;species&#39; and &#39;size&#39;</span>
+<span class="sd">  Table(&#39;animal&#39;, metadata,</span>
+<span class="sd">        Column(&#39;id&#39;, Integer, primary_key=True),</span>
+<span class="sd">        Column(&#39;species&#39;, Unicode),</span>
+<span class="sd">        Column(&#39;size&#39;, Unicode))</span>
+
+<span class="sd">A vertical table models this as two tables: one table for the base or parent</span>
+<span class="sd">entity, and another related table holding key/value pairs::</span>
+
+<span class="sd">  Table(&#39;animal&#39;, metadata,</span>
+<span class="sd">        Column(&#39;id&#39;, Integer, primary_key=True))</span>
+
+<span class="sd">  # The properties table will have one row for a &#39;species&#39; value, and</span>
+<span class="sd">  # another row for the &#39;size&#39; value.</span>
+<span class="sd">  Table(&#39;properties&#39;, metadata</span>
+<span class="sd">        Column(&#39;animal_id&#39;, Integer, ForeignKey(&#39;animal.id&#39;),</span>
+<span class="sd">               primary_key=True),</span>
+<span class="sd">        Column(&#39;key&#39;, UnicodeText),</span>
+<span class="sd">        Column(&#39;value&#39;, UnicodeText))</span>
+
+<span class="sd">Because the key/value pairs in a vertical scheme are not fixed in advance,</span>
+<span class="sd">accessing them like a Python dict can be very convenient.  The example below</span>
+<span class="sd">can be used with many common vertical schemas as-is or with minor adaptations.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span>
+
+
+<span class="k">class</span> <span class="nc">ProxiedDictMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adds obj[key] access to a mapped class.</span>
+
+<span class="sd">    This class basically proxies dictionary access to an attribute</span>
+<span class="sd">    called ``_proxied``.  The class which inherits this class</span>
+<span class="sd">    should have an attribute called ``_proxied`` which points to a dictionary.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_proxied</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_proxied</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proxied</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proxied</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_proxied</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proxied</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="p">(</span>
+        <span class="n">Column</span><span class="p">,</span>
+        <span class="n">Integer</span><span class="p">,</span>
+        <span class="n">Unicode</span><span class="p">,</span>
+        <span class="n">ForeignKey</span><span class="p">,</span>
+        <span class="n">UnicodeText</span><span class="p">,</span>
+        <span class="n">and_</span><span class="p">,</span>
+        <span class="n">create_engine</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">relationship</span><span class="p">,</span> <span class="n">Session</span>
+    <span class="kn">from</span> <span class="nn">sqlalchemy.orm.collections</span> <span class="k">import</span> <span class="n">attribute_mapped_collection</span>
+    <span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">declarative_base</span>
+    <span class="kn">from</span> <span class="nn">sqlalchemy.ext.associationproxy</span> <span class="k">import</span> <span class="n">association_proxy</span>
+
+    <span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">AnimalFact</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A fact about an animal.&quot;&quot;&quot;</span>
+
+        <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;animal_fact&quot;</span>
+
+        <span class="n">animal_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;animal.id&quot;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Unicode</span><span class="p">(</span><span class="mi">64</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">UnicodeText</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Animal</span><span class="p">(</span><span class="n">ProxiedDictMixin</span><span class="p">,</span> <span class="n">Base</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;an Animal&quot;&quot;&quot;</span>
+
+        <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;animal&quot;</span>
+
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Unicode</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+
+        <span class="n">facts</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+            <span class="s2">&quot;AnimalFact&quot;</span><span class="p">,</span> <span class="n">collection_class</span><span class="o">=</span><span class="n">attribute_mapped_collection</span><span class="p">(</span><span class="s2">&quot;key&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">_proxied</span> <span class="o">=</span> <span class="n">association_proxy</span><span class="p">(</span>
+            <span class="s2">&quot;facts&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;value&quot;</span><span class="p">,</span>
+            <span class="n">creator</span><span class="o">=</span><span class="k">lambda</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">AnimalFact</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+        <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;Animal(</span><span class="si">%r</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="nd">@classmethod</span>
+        <span class="k">def</span> <span class="nf">with_characteristic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">facts</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s2">&quot;sqlite://&quot;</span><span class="p">)</span>
+    <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+
+    <span class="n">stoat</span> <span class="o">=</span> <span class="n">Animal</span><span class="p">(</span><span class="s2">&quot;stoat&quot;</span><span class="p">)</span>
+    <span class="n">stoat</span><span class="p">[</span><span class="s2">&quot;color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;reddish&quot;</span>
+    <span class="n">stoat</span><span class="p">[</span><span class="s2">&quot;cuteness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;somewhat&quot;</span>
+
+    <span class="c1"># dict-like assignment transparently creates entries in the</span>
+    <span class="c1"># stoat.facts collection:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">stoat</span><span class="o">.</span><span class="n">facts</span><span class="p">[</span><span class="s2">&quot;color&quot;</span><span class="p">])</span>
+
+    <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">stoat</span><span class="p">)</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+    <span class="n">critter</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Animal</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Animal</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;stoat&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">critter</span><span class="p">[</span><span class="s2">&quot;color&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">critter</span><span class="p">[</span><span class="s2">&quot;cuteness&quot;</span><span class="p">])</span>
+
+    <span class="n">critter</span><span class="p">[</span><span class="s2">&quot;cuteness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;very&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;changing cuteness:&quot;</span><span class="p">)</span>
+
+    <span class="n">marten</span> <span class="o">=</span> <span class="n">Animal</span><span class="p">(</span><span class="s2">&quot;marten&quot;</span><span class="p">)</span>
+    <span class="n">marten</span><span class="p">[</span><span class="s2">&quot;color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;brown&quot;</span>
+    <span class="n">marten</span><span class="p">[</span><span class="s2">&quot;cuteness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;somewhat&quot;</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">marten</span><span class="p">)</span>
+
+    <span class="n">shrew</span> <span class="o">=</span> <span class="n">Animal</span><span class="p">(</span><span class="s2">&quot;shrew&quot;</span><span class="p">)</span>
+    <span class="n">shrew</span><span class="p">[</span><span class="s2">&quot;cuteness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;somewhat&quot;</span>
+    <span class="n">shrew</span><span class="p">[</span><span class="s2">&quot;poisonous-part&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;saliva&quot;</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">shrew</span><span class="p">)</span>
+
+    <span class="n">loris</span> <span class="o">=</span> <span class="n">Animal</span><span class="p">(</span><span class="s2">&quot;slow loris&quot;</span><span class="p">)</span>
+    <span class="n">loris</span><span class="p">[</span><span class="s2">&quot;cuteness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;fairly&quot;</span>
+    <span class="n">loris</span><span class="p">[</span><span class="s2">&quot;poisonous-part&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;elbows&quot;</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">loris</span><span class="p">)</span>
+
+    <span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Animal</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">Animal</span><span class="o">.</span><span class="n">facts</span><span class="o">.</span><span class="n">any</span><span class="p">(</span>
+            <span class="n">and_</span><span class="p">(</span><span class="n">AnimalFact</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="n">AnimalFact</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;reddish&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;reddish animals&quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+
+    <span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Animal</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">Animal</span><span class="o">.</span><span class="n">with_characteristic</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;brown&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;brown animals&quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+
+    <span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Animal</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="o">~</span><span class="n">Animal</span><span class="o">.</span><span class="n">with_characteristic</span><span class="p">(</span><span class="s2">&quot;poisonous-part&quot;</span><span class="p">,</span> <span class="s2">&quot;elbows&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;animals without poisonous-part == elbows&quot;</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+
+    <span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Animal</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Animal</span><span class="o">.</span><span class="n">facts</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;somewhat&quot;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;any animal with any .value of &quot;somewhat&quot;&#39;</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">all</span><span class="p">())</span></pre></div>
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links">
+
+    <div id="docs-copyright">
+        &copy; <a href="../../../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.0.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../../../',
+          VERSION:     '1.3.16',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../../../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

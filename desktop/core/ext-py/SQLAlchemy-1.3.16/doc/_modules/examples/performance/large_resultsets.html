@@ -1,0 +1,352 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    examples.performance.large_resultsets
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+        <link rel="copyright" title="Copyright" href="../../../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../../../index.html" />
+        <link rel="up" title="Module code" href="../../index.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.16</span>
+
+
+        | Release Date: April 7, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="">
+
+        <div id="index-nav">
+            <form class="search" action="../../../search.html" method="get">
+              <label>
+                 Search terms:
+              <input type="text" placeholder="search..." name="q" size="12" />
+              </label>
+              <input type="submit" value="Search" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+
+            <p>
+            <a href="../../../contents.html">Contents</a> |
+            <a href="../../../genindex.html">Index</a>
+            </p>
+
+        </div>
+
+
+    </div>
+
+    
+
+    <div id="docs-body" class="" >
+        
+<h1>Source code for examples.performance.large_resultsets</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;In this series of tests, we are looking at time to load a large number</span>
+<span class="sd">of very small and simple rows.</span>
+
+<span class="sd">A special test here illustrates the difference between fetching the</span>
+<span class="sd">rows from the raw DBAPI and throwing them away, vs. assembling each</span>
+<span class="sd">row into a completely basic Python object and appending to a list. The</span>
+<span class="sd">time spent typically more than doubles.  The point is that while</span>
+<span class="sd">DBAPIs will give you raw rows very fast if they are written in C, the</span>
+<span class="sd">moment you do anything with those rows, even something trivial,</span>
+<span class="sd">overhead grows extremely fast in cPython. SQLAlchemy&#39;s Core and</span>
+<span class="sd">lighter-weight ORM options add absolutely minimal overhead, and the</span>
+<span class="sd">full blown ORM doesn&#39;t do terribly either even though mapped objects</span>
+<span class="sd">provide a huge amount of functionality.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">Column</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">create_engine</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">Integer</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">String</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">Bundle</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">Session</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">Profiler</span>
+
+
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+<span class="n">engine</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="k">class</span> <span class="nc">Customer</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;customer&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">255</span><span class="p">))</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">255</span><span class="p">))</span>
+
+
+<span class="n">Profiler</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="s2">&quot;large_resultsets&quot;</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">500000</span><span class="p">)</span>
+
+
+<span class="nd">@Profiler</span><span class="o">.</span><span class="n">setup_once</span>
+<span class="k">def</span> <span class="nf">setup_database</span><span class="p">(</span><span class="n">dburl</span><span class="p">,</span> <span class="n">echo</span><span class="p">,</span> <span class="n">num</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">engine</span>
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">dburl</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="n">echo</span><span class="p">)</span>
+    <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">drop_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="mi">10000</span><span class="p">):</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="n">Customer</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">insert</span><span class="p">(),</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;customer name </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;customer description </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span>
+                <span class="p">}</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">chunk</span> <span class="o">+</span> <span class="mi">10000</span><span class="p">)</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+
+<span class="nd">@Profiler</span><span class="o">.</span><span class="n">profile</span>
+<span class="k">def</span> <span class="nf">test_orm_full_objects_list</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load fully tracked ORM objects into one big list().&quot;&quot;&quot;</span>
+
+    <span class="n">sess</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+    <span class="nb">list</span><span class="p">(</span><span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Customer</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+
+
+<span class="nd">@Profiler</span><span class="o">.</span><span class="n">profile</span>
+<span class="k">def</span> <span class="nf">test_orm_full_objects_chunks</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load fully tracked ORM objects a chunk at a time using yield_per().&quot;&quot;&quot;</span>
+
+    <span class="n">sess</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Customer</span><span class="p">)</span><span class="o">.</span><span class="n">yield_per</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+
+<span class="nd">@Profiler</span><span class="o">.</span><span class="n">profile</span>
+<span class="k">def</span> <span class="nf">test_orm_bundles</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load lightweight &quot;bundle&quot; objects using the ORM.&quot;&quot;&quot;</span>
+
+    <span class="n">sess</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">bundle</span> <span class="o">=</span> <span class="n">Bundle</span><span class="p">(</span>
+        <span class="s2">&quot;customer&quot;</span><span class="p">,</span> <span class="n">Customer</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">Customer</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">Customer</span><span class="o">.</span><span class="n">description</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">bundle</span><span class="p">)</span><span class="o">.</span><span class="n">yield_per</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+
+<span class="nd">@Profiler</span><span class="o">.</span><span class="n">profile</span>
+<span class="k">def</span> <span class="nf">test_orm_columns</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load individual columns into named tuples using the ORM.&quot;&quot;&quot;</span>
+
+    <span class="n">sess</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="p">(</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Customer</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">Customer</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">Customer</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">yield_per</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="k">pass</span>
+
+
+<span class="nd">@Profiler</span><span class="o">.</span><span class="n">profile</span>
+<span class="k">def</span> <span class="nf">test_core_fetchall</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load Core result rows using fetchall.&quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="n">engine</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">Customer</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="n">row</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span>
+
+
+<span class="nd">@Profiler</span><span class="o">.</span><span class="n">profile</span>
+<span class="k">def</span> <span class="nf">test_core_fetchmany_w_streaming</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load Core result rows using fetchmany/streaming.&quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="n">engine</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execution_options</span><span class="p">(</span><span class="n">stream_results</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="n">Customer</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">fetchmany</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">chunk</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">chunk</span><span class="p">:</span>
+                <span class="n">row</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span>
+
+
+<span class="nd">@Profiler</span><span class="o">.</span><span class="n">profile</span>
+<span class="k">def</span> <span class="nf">test_core_fetchmany</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load Core result rows using Core / fetchmany.&quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="n">engine</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">Customer</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">fetchmany</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">chunk</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">chunk</span><span class="p">:</span>
+                <span class="n">row</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span>
+
+
+<span class="nd">@Profiler</span><span class="o">.</span><span class="n">profile</span>
+<span class="k">def</span> <span class="nf">test_dbapi_fetchall_plus_append_objects</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load rows using DBAPI fetchall(), generate an object for each row.&quot;&quot;&quot;</span>
+
+    <span class="n">_test_dbapi_raw</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+
+<span class="nd">@Profiler</span><span class="o">.</span><span class="n">profile</span>
+<span class="k">def</span> <span class="nf">test_dbapi_fetchall_no_object</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load rows using DBAPI fetchall(), don&#39;t make any objects.&quot;&quot;&quot;</span>
+
+    <span class="n">_test_dbapi_raw</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_test_dbapi_raw</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">make_objects</span><span class="p">):</span>
+    <span class="n">compiled</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">Customer</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">select</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+            <span class="n">dialect</span><span class="o">=</span><span class="n">engine</span><span class="o">.</span><span class="n">dialect</span><span class="p">,</span> <span class="n">compile_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;literal_binds&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">make_objects</span><span class="p">:</span>
+        <span class="c1"># because if you&#39;re going to roll your own, you&#39;re probably</span>
+        <span class="c1"># going to do this, so see how this pushes you right back into</span>
+        <span class="c1"># ORM land anyway :)</span>
+        <span class="k">class</span> <span class="nc">SimpleCustomer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">id_</span> <span class="o">=</span> <span class="n">id_</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+
+    <span class="n">sql</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">compiled</span><span class="p">)</span>
+
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">engine</span><span class="o">.</span><span class="n">raw_connection</span><span class="p">()</span>
+    <span class="n">cursor</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">make_objects</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">():</span>
+            <span class="c1"># ensure that we fully fetch!</span>
+            <span class="n">SimpleCustomer</span><span class="p">(</span><span class="n">id_</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">():</span>
+            <span class="c1"># ensure that we fully fetch!</span>
+            <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">Profiler</span><span class="o">.</span><span class="n">main</span><span class="p">()</span></pre></div>
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links">
+
+    <div id="docs-copyright">
+        &copy; <a href="../../../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.0.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../../../',
+          VERSION:     '1.3.16',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../../../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+
