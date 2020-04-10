@@ -1,0 +1,159 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<refentry id="gbtext2odt">
+
+<refmeta>
+<refentrytitle>gbtext2odt</refentrytitle>
+<manvolnum>1</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname>gbtext2odt</refname>
+<refpurpose>Create OpenDocument from Project Gutenberg text</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis>
+    <command>gbtext2odt</command>
+    <arg choice="opt">-e <replaceable>encoding</replaceable></arg>
+    <arg choice="opt">-a <replaceable>author</replaceable></arg>
+    <arg choice="opt">-c <replaceable>creation date</replaceable></arg>
+    <arg choice="opt">-l <replaceable>language</replaceable></arg>
+    <arg choice="opt">-n <replaceable>etext</replaceable></arg>
+    <arg choice="opt">-p <replaceable>publisher</replaceable></arg>
+    <arg choice="opt">-t <replaceable>title</replaceable></arg>
+    <arg choice="opt">-T</arg>
+    <arg choice="opt"><replaceable>inputfile</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para>
+Project Gutenberg is the first and largest single collection of free
+electronic books, or eBooks.
+The project started in 1971, and the chosen format is
+"Plain Vanilla ASCII," and this makes the text frustrating to read.
+Therefore the gbtext2odt program will convert such a text to
+OpenDocument and add some light markup.
+The idea behind the program is to test the feasibility of using
+OpenDocument for archival of documents.
+</para>
+<para>
+&quot;Inputfile&quot; is assumed to be an eBook from Project
+Gutenberg in text form. Books work pretty well, whereas plays,
+such as <emphasis>Romeo and Juliet</emphasis>, will probably be
+messed up.
+</para>
+</refsect1>
+
+<refsect1><title>Options</title>
+<variablelist>
+
+<varlistentry>
+<term>-e <replaceable>encoding</replaceable></term>
+<listitem>
+<para>
+Enter the encoding of the source eBook. Common encodings are: iso-8859-1,
+cp1252 (default), ascii and utf-8
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-a <replaceable>author</replaceable></term>
+<listitem>
+<para>
+The name of the author. Entered into the metadata.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-c <replaceable>creation date</replaceable></term>
+<listitem>
+<para>
+The date of the creation. Entered into the metadata.
+This can be the date of conversion, or the date the author completed his document.
+The format must be in ISO 8601 format. I.e. YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-l <replaceable>language</replaceable></term>
+<listitem>
+<para>
+Language of the eBook. It consists of a two or three letter language code
+taken from the ISO 639 standard optionally
+followed by a hyphen and a two-letter country code.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-n <replaceable>etext</replaceable></term>
+<listitem>
+<para>
+Adds the Gutenberg E-text number to the metadata.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-p <replaceable>publisher</replaceable></term>
+<listitem>
+<para>
+The name of the publisher. Entered into the metadata.
+Defaults to Gutenberg Project
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-t <replaceable>title</replaceable></term>
+<listitem>
+<para>
+The title of the document. Entered into the metadata.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-T</term>
+<listitem>
+<para>
+Use the title as the output filename, rather than based on the input filename.
+</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+</refsect1>
+
+<refsect1><title>Example</title>
+<para>
+Conversion of <citetitle>Herodotus’ Histories</citetitle> from around 430 BCE. Known from the movie
+<citetitle>The English Patient</citetitle>. The OpenDocument standard doesn't understand creation dates
+that are before common era, so we won't add the publication date to the meta data.
+</para>
+<screen>
+wget http://www.gutenberg.org/dirs/etext01/1hofh10.txt
+gbtext2odt -e cp1252 -t "The history of Herodotus — Volume 1" -a Herodotus -l en -T 1hofh10.txt
+</screen>
+</refsect1>
+
+<refsect1><title>See Also</title>
+<para>
+http://www.gutenberg.org
+</para>
+</refsect1>
+
+<refsect1><title>Issues</title>
+<para>
+OpenOffice doesn't handle creation dates before the year 1000.
+</para>
+</refsect1>
+
+</refentry>
+

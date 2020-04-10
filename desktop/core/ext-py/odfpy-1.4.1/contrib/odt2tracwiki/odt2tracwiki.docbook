@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<refentry id="odt2tracwiki">
+  <refentryinfo>
+    <productname>odfpy</productname>
+    <author><firstname>Søren</firstname><surname>Roug</surname>
+    <contrib>Original author</contrib>
+    </author>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>odt2tracwiki</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="manual">User commands</refmiscinfo>
+  </refmeta>
+<refnamediv>
+<refname>odt2tracwiki</refname>
+<refpurpose>Convert ODF to Trac Wiki format</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis>
+    <command>odt2tracwiki</command>
+    <arg choice="plain"><replaceable>path</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para><command>odt2tracwiki</command> is a program that will create 
+a Trac Wiki format.
+See http://trac.edgewall.org/.
+I expect to add a feature that will upload the page with images to a Trac Wiki page
+using XML-RPC. http://trac-hacks.org/wiki/XmlRpcPlugin
+</para>
+<para>
+&quot;Path&quot; is assumed to be an
+OpenDocument file of text, spreadsheet or presentation type.
+</para>
+</refsect1>
+<refsect1><title>Example</title>
+<screen>
+odt2tracwiki odf-file
+</screen>
+</refsect1>
+</refentry>
+

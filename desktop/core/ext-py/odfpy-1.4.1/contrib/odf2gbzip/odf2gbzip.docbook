@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<refentry id="odf2gbzip">
+<refnamediv>
+<refname>odf2gbzip</refname>
+<refpurpose>Convert ODF to zipped web archive</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis>
+    <command>odf2gbzip</command>
+    <arg choice="plain"><replaceable>path</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para><command>odf2gbzip</command> is a program that will create 
+a zipped web archive according to the convention followed by Project Gutenberg.
+</para>
+<para>
+&quot;Path&quot; is assumed to be an
+OpenDocument file of text, spreadsheet or presentation type.
+</para>
+</refsect1>
+<refsect1><title>Example</title>
+<screen>
+odf2gbzip odf-file
+</screen>
+</refsect1>
+<refsect1><title>See Also</title>
+<para>
+<command>odf2mht</command>(1)
+<command>odf2war</command>(1)
+</para>
+</refsect1>
+</refentry>
+

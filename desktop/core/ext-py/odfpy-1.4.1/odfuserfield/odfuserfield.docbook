@@ -1,0 +1,144 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<refentry id="odfuserfield">
+  <refentryinfo>
+    <productname>odfpy</productname>
+    <author>
+      <firstname>Søren</firstname><surname>Roug</surname>
+      <contrib>Original author</contrib>
+    </author>
+    <author>
+      <firstname>Michael</firstname><surname>Howitz</surname>
+      <affiliation>
+      <orgname>gocept gmbh &amp; co. kg</orgname>
+      </affiliation>
+      <contrib>Refactoring</contrib>
+    </author>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>odfuserfield</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="manual">User commands</refmiscinfo>
+  </refmeta>
+
+<refnamediv>
+<refname>odfuserfield</refname>
+<refpurpose>List or change the user-field declarations in an ODF file</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis>
+    <command>odfuserfield</command>
+    <arg>-l</arg>
+    <arg>-L</arg>
+    <arg rep="repeat">-x <replaceable>field</replaceable></arg>
+    <arg rep="repeat">-X <replaceable>field</replaceable></arg>
+    <arg rep="repeat">-s <replaceable>field:value</replaceable></arg>
+    <arg choice="opt">-o <replaceable>path</replaceable></arg>
+    <arg choice="plain"><replaceable>path</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para>
+<command>Odfuserfield</command> is a program that will list or change
+the user variable declarations in an OpenDocument file.
+There are two kinds of variables in OpenDocument. Simple variables can
+take different values at different positions, throughout a document.
+User variables have the same value throughout a document. Due to the latter's
+global nature it is safe to change them with an external application.
+</para>
+<para>
+Use <command>odfuserfield</command> to fill out form letters before
+printing or giving to the user.
+</para>
+<para>
+<quote>Path</quote> is assumed to be an
+OpenDocument file of text, spreadsheet or presentation type.
+</para>
+</refsect1>
+
+<refsect1><title>Options</title>
+<variablelist>
+
+<varlistentry>
+<term>-l</term>
+<listitem>
+<para>
+List (extract) all known user-fields.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-L</term>
+<listitem>
+<para>
+List (extract) all known user-fields with type and value.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-x <replaceable>field</replaceable></term>
+<listitem>
+<para>
+Extract the contents of this field from the file.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-X <replaceable>field</replaceable></term>
+<listitem>
+<para>
+Same as -x, but also preserves/includes the field name and type.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-s <replaceable>field:value</replaceable></term>
+<listitem>
+<para>
+Set the value of an existing user field.
+The field type will be the same.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>-o <replaceable>path</replaceable></term>
+<listitem>
+<para>
+Filename to write modified ODT file to.
+If no <option>-o</option> option is provided, the ODT file will be written to stdout.
+</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+</refsect1>
+
+<refsect1><title>Example</title>
+<screen>
+odfuserfield -L odf-file
+</screen>
+</refsect1>
+
+<refsect1><title>See Also</title>
+<para>
+<command>formail</command>(1),
+<command>id3tag</command>(1)
+</para>
+</refsect1>
+
+<refsect1><title>Todo</title>
+<para>
+Implement formulas. See OpenDocument v1.0 specification section 6.3.5.
+This requires a different syntax for -s arguments.
+</para>
+</refsect1>
+
+</refentry>

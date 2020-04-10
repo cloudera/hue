@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<refentry id="odfoutline">
+  <refentryinfo>
+    <productname>odfpy</productname>
+    <author><firstname>Søren</firstname><surname>Roug</surname>
+    <contrib>Original author</contrib>
+    </author>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>odfoutline</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="manual">User commands</refmiscinfo>
+  </refmeta>
+
+<refnamediv>
+<refname>odfoutline</refname>
+<refpurpose>Show outline of OpenDocument</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis>
+    <command>odfoutline</command>
+    <arg choice="plain"><replaceable>path</replaceable></arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para>
+odfoutline is a simple program that will show the headings in the file
+and the level the heading is.
+</para>
+<para>
+<quote>Path</quote> is assumed to be an
+OpenDocument file of text, spreadsheet or presentation type.
+</para>
+</refsect1>
+<refsect1><title>Example</title>
+<screen>
+odfoutline odf-file
+</screen>
+</refsect1>
+</refentry>
+

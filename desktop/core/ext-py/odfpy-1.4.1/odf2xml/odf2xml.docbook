@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<refentry id="odf2xml">
+  <refentryinfo>
+    <productname>odfpy</productname>
+    <author><firstname>Søren</firstname><surname>Roug</surname>
+    <contrib>Original author</contrib>
+    </author>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>odf2xml</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="manual">User commands</refmiscinfo>
+  </refmeta>
+  <refnamediv>
+    <refname>odf2xml</refname>
+    <refpurpose>Create OpenDocument XML file from OD? package</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>odf2xml</command>
+      <arg choice="opt">-e </arg>
+      <arg choice="opt">-o <replaceable>outputfile</replaceable></arg>
+      <arg choice="opt">
+        <replaceable>inputfile</replaceable>
+      </arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>Description</title>
+    <para>
+OpenDocument can be a complete office document in a single
+XML file. The script will take an OpenDocument and create an XML file
+This is mainly useful XML processors such as XSL transformation.
+</para>
+    <para>
+</para>
+    <para>
+"Inputfile" is assumed to be an OpenDocument file.
+If there is no inputfile, the program will read from standard input.
+</para>
+  </refsect1>
+  <refsect1>
+    <title>Options</title>
+    <variablelist>
+      <varlistentry>
+        <term>-e</term>
+        <listitem>
+          <para>
+Normally, images that are stored in the archive in the Pictures folder are ignored.
+Using the -e flag will <emphasis>embed</emphasis> the images in the XML as base64.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-o <replaceable>outputfile</replaceable></term>
+        <listitem>
+          <para>
+If output file is not specified output will be to standard out.
+</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+  <refsect1>
+    <title>Example</title>
+    <screen>
+odf2xml -o file.xml  testdocument.odt
+</screen>
+  </refsect1>
+  <refsect1>
+    <title>See Also</title>
+    <para><command>xml2odf</command>(1)
+</para>
+  </refsect1>
+  <refsect1>
+    <title>Bugs</title>
+    <para>
+Doesn't handle external data -- images and such.
+</para>
+  </refsect1>
+</refentry>

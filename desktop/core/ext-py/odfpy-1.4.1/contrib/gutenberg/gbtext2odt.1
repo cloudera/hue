@@ -1,0 +1,76 @@
+.\"     Title: gbtext2odt
+.\"    Author: 
+.\" Generator: DocBook XSL Stylesheets v1.72.0 <http://docbook.sf.net/>
+.\"      Date: 09/01/2007
+.\"    Manual: 
+.\"    Source: 
+.\"
+.TH "GBTEXT2ODT" "1" "09/01/2007" "" ""
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.SH "NAME"
+gbtext2odt \- Create OpenDocument from Project Gutenberg text
+.SH "SYNOPSIS"
+.HP 11
+\fBgbtext2odt\fR [\-e\ \fIencoding\fR] [\-a\ \fIauthor\fR] [\-c\ \fIcreation\ date\fR] [\-l\ \fIlanguage\fR] [\-p\ \fIpublisher\fR] [\-t\ \fItitle\fR] [\-T] [\fIinputfile\fR]
+.SH "DESCRIPTION"
+.PP
+Project Gutenberg is the first and largest single collection of free electronic books, or eBooks. The project started in 1971, and the chosen format is "Plain Vanilla ASCII," and this makes the text frustrating to read. Therefore the gbtext2odt program will convert such a text to OpenDocument and add some light markup. The idea behind the program is to test the feasibility of using OpenDocument for archival of documents.
+.PP
+"Inputfile" is assumed to be an eBook from Project Gutenberg in text form. Books work pretty well, whereas plays, such as
+\fIRomeo and Juliet\fR, will probably be messed up.
+.SH "OPTIONS"
+.PP
+\-e \fIencoding\fR
+.RS 4
+Enter the encoding of the source eBook. Common encodings are: iso\-8859\-1, cp1252 (default), ascii and utf\-8
+.RE
+.PP
+\-a \fIauthor\fR
+.RS 4
+The name of the author. Entered into the metadata.
+.RE
+.PP
+\-c \fIcreation date\fR
+.RS 4
+The date of the creation. Entered into the metadata. This can be the date of conversion, or the date the author completed his document. The format must be in ISO 8601 format. I.e. YYYY\-MM\-DD or YYYY\-MM\-DDTHH:MM:SS.
+.RE
+.PP
+\-l \fIlanguage\fR
+.RS 4
+Language of the eBook. It consists of a two or three letter language code taken from the ISO 639 standard optionally followed by a hyphen and a two\-letter country code.
+.RE
+.PP
+\-p \fIpublisher\fR
+.RS 4
+The name of the publisher. Entered into the metadata. Defaults to Gutenberg Project
+.RE
+.PP
+\-t \fItitle\fR
+.RS 4
+The title of the document. Entered into the metadata.
+.RE
+.PP
+\-T
+.RS 4
+Use the title as the output filename, rather than based on the input filename.
+.RE
+.SH "EXAMPLE"
+.PP
+Conversion of Herodotus\(cq Histories from around 430 BC. Known from the movie
+[The English Patient].
+.sp
+.RS 4
+.nf
+wget http://www.gutenberg.org/dirs/etext01/1hofh10.txt
+gbtext2odt \-e cp1252 \-t "The history of Herodotus \(em Volume 1" \-a Herodotus \-l en \-T 1hofh10.txt
+.fi
+.RE
+.SH "SEE ALSO"
+.PP
+http://www.gutenberg.org
+.SH "ISSUES"
+.PP
+OpenOffice doesn't handle creation dates before the year 1000.
