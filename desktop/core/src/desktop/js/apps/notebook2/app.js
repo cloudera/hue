@@ -359,7 +359,7 @@ export const initNotebook2 = () => {
       // Close the notebook snippets when leaving the page
       window.onbeforeunload = function(e) {
         if (!viewModel.selectedNotebook().avoidClosing) {
-          viewModel.selectedNotebook().close();
+          //viewModel.selectedNotebook().close(); // TODO
         }
       };
       $(window).data('beforeunload', window.onbeforeunload);

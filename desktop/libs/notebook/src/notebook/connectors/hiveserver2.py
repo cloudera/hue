@@ -497,7 +497,7 @@ class HS2Api(Api):
           }
           for job in queries_with_state
         ]
-    elif snippet['dialect'] == 'impala' and has_query_browser or True:
+    elif snippet['dialect'] == 'impala' and has_query_browser:
       guid = snippet['result']['handle']['guid']
       if isinstance(guid, str):
         guid = guid.encode('utf-8')
