@@ -169,11 +169,14 @@ class SqlAlchemyApi(Api):
     cache = {
       'connection': connection,
       'result': result,
-      'meta': [{
+      'meta': [
+        {
           'name': col[0] if (type(col) is tuple or type(col) is dict) else col.name if hasattr(col, 'name') else col,
           'type': 'STRING_TYPE',
           'comment': ''
-        } for col in result.cursor.description] if result.cursor else []
+        }
+        for col in result.cursor.description
+      ] if result.cursor else []
     }
     CONNECTION_CACHE[guid] = cache
 
@@ -202,21 +205,22 @@ class SqlAlchemyApi(Api):
         response['status'] = 'available'
       else:
         response['status'] = 'success'
+    else:
+      raise QueryExpired()
 
     return response
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
     guid = snippet['result']['handle']['guid']
-    cache = CONNECTION_CACHE.get(guid)
+    handle = CONNECTION_CACHE.get(guid)
 
-    if cache:
-      data = cache['result'].fetchmany(rows)
-      meta = cache['meta']
+    if handle:
+      data = handle['result'].fetchmany(rows)
+      meta = handle['meta']
       self._assign_types(data, meta)
     else:
-      data = []
-      meta = []
+      raise QueryExpired()
 
     return {
       'has_more': data and len(data) >= rows or False,
