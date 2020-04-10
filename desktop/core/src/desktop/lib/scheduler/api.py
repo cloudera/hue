@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import sys
 
 from django.forms.formsets import formset_factory
 from django.urls import reverse
@@ -98,4 +99,4 @@ def submit_schedule(request, doc_id):
       force_template=True
   ).content
 
-  return JsonResponse(popup, safe=False)
+  return JsonResponse(popup.decode("utf-8") if sys.version_info[0] > 2 else popup, safe=False)
