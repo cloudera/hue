@@ -176,8 +176,8 @@ def ssh_error_handler(f):
     try:
       return f(*args, **kwargs)
     except Exception as e:
-      if 'Connection refused' in str(e) or 'Could not connect' in str(e):
-        LOG.info('SSH')
+      if 'Connection refused' in str(e) or 'Could not connect' in str(e) or 'No route to host' in str(e):
+        LOG.info('Opening SSH tunnel')
         from notebook.conf import _connector_to_iterpreter
         from desktop.lib.connectors.models import _augment_connector_properties
 
@@ -187,7 +187,6 @@ def ssh_error_handler(f):
           connector_c = args[0].POST.get('snippet')
 
         connector_json_data = json.loads(connector_c)
-        print(connector_json_data)
 
         if connector_json_data.get('type') == 'hello':
           connector = connector_json_data['interpreter']
@@ -200,15 +199,35 @@ def ssh_error_handler(f):
           )
           idle_time = 1800
 
-        if connector['interface'] != 'hiveserver2':
+        if not connector['options'].get('has_ssh'):
           raise e
 
+        ssh_options = connector['options'].copy()
+
+        ssh_options['idle_time'] = idle_time
+
+        if connector['interface'] == 'sqlalchemy':
+          import re
+          p = '(?:.*://|@)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*'
+
+          m = re.search(p, ssh_options['url'])
+          ssh_options['server_host'] = m.group('host')
+          ssh_options['server_port'] = m.group('port')
+
+          if not ssh_options['server_host']:
+            raise QueryError('Hostname of %(url)s could not be found: %(server_host)s' % ssh_options)
+          if not ssh_options['server_port']:
+            raise QueryError('Port of %(url)s could not be found: %(server_port)s' % ssh_options)
+
+        # Docs: https://gist.github.com/scy/6781836
         # TODO: local server_port needs to be dynamic
         # TODO: "Could not request local forwarding" not bubbled up
-        ssh = "ssh -L %(server_port)s:%(ssh_server_host)s:%(server_port)s gethue@%(server_host)s -o ExitOnForwardFailure=yes" % connector['options']
+        # TODO: grep: no sleep 10: No such file or directory
+        ssh = "ssh -f -L %(server_port)s:%(server_host)s:%(server_port)s gethue@%(ssh_server_host)s -o ExitOnForwardFailure=yes" % ssh_options
         ssh += ' -4'
-        ssh += ' -o "StrictHostKeyChecking no"'
-        ssh += ' sleep %s' % idle_time
+        ssh += ' -o StrictHostKeyChecking=no'
+        ssh += ' sleep %(idle_time)s' % ssh_options
+
         LOG.info(ssh)
 
         if len(list(os.popen('ps -ef | grep "%s"' % ssh))) < 3:
@@ -221,8 +240,7 @@ def ssh_error_handler(f):
             try:
               return f(*args, **kwargs)
             except Exception as e2:
-              LOG.info(e2)
-              if 'Connection refused' in str(e2) or 'Could not connect' in str(e2):
+              if 'Connection refused' in str(e2) or 'Could not connect' in str(e2) or 'No route to host' in str(e):
                 time.sleep(1)
                 retries += 1
               else:

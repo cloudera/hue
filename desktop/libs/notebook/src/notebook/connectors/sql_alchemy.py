@@ -192,6 +192,17 @@ class SqlAlchemyApi(Api):
           self.options.pop('connect_args')
       )
 
+    if self.options.get('has_ssh'):
+      p = '(?:.*://|@)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*'
+
+      m = re.search(p, self.options['url'])
+      server_host = m.group('host')
+
+      if not server_host:
+        raise QueryError('Hostname of %(url)s could not be found: %(server_host)s' % {'url': url, 'server_host': server_host})
+
+      url = re.sub(server_host, '127.0.0.1', url)
+
     options = self.options.copy()
     options.pop('session', None)
     options.pop('url', None)
