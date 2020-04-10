@@ -1637,14 +1637,19 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <pre data-bind="text: (properties.plan && properties.plan().summary) || _('The selected tab has no data')"/>
         </div>
         <div class="tab-pane" id="queries-page-profile${ SUFFIX }" data-profile="profile">
-          <button class="btn" type="button" data-clipboard-target="#query-impala-profile" data-bind="
+          <button class="btn" type="button" data-clipboard-target="#query-impala-profile" style="float: right;" data-bind="
+              visible: properties.profile && properties.profile().profile,
               clipboard: { onSuccess: function() { $.jHueNotify.info('${ _("Profile copied to clipboard!") }'); } }">
             <i class="fa fa-fw fa-clipboard"></i> ${ _('Clipboard') }
           </button>
-          <a class="btn" href="/desktop/download_logs" download>
+          <button class="btn" type="button" style="float: right;" data-bind="
+              click: function(){ submitQueryProfileDownloadForm('download-profile'); },
+              visible: properties.profile && properties.profile().profile">
             <i class="fa fa-fw fa-download"></i> ${ _('Download') }
-          </a>
-          <pre id="query-impala-profile" data-bind="text: (properties.profile && properties.profile().profile) || _('The selected tab has no data')"/>
+          </button>
+          <div id="downloadProgressModal"></div>
+          <pre id="query-impala-profile" style="float: left; margin-top: 8px" data-bind="
+              text: (properties.profile && properties.profile().profile) || _('The selected tab has no data')"/>
         </div>
         <div class="tab-pane" id="queries-page-memory${ SUFFIX }" data-profile="mem_usage">
           <pre data-bind="text: (properties.memory && properties.memory().mem_usage) || _('The selected tab has no data')"/>
@@ -1756,7 +1761,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
+    <div data-bind="css:{ 'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
 
       <ul class="nav nav-pills margin-top-20">
         <li>
@@ -3009,6 +3014,39 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return lastFetchLogsRequest;
       };
 
+      self.submitQueryProfileDownloadForm = function(name) {
+        var $downloadForm = $(
+          '<form method="POST" class="download-form" style="display: inline" action="' +
+            window.HUE_BASE_URL +
+            '/jobbrowser/api/job/profile"></form>'
+        );
+
+        $('<input type="hidden" name="csrfmiddlewaretoken" />')
+          .val(window.CSRF_TOKEN)
+          .appendTo($downloadForm);
+        $('<input type="hidden" name="cluster" />')
+          .val(ko.mapping.toJSON(vm.compute))
+          .appendTo($downloadForm);
+        $('<input type="hidden" name="app_id" />')
+          .val(ko.mapping.toJSON(self.id))
+          .appendTo($downloadForm);
+        $('<input type="hidden" name="interface" />')
+          .val(ko.mapping.toJSON(vm.interface))
+          .appendTo($downloadForm);
+        $('<input type="hidden" name="app_type" />')
+          .val(ko.mapping.toJSON(self.type))
+          .appendTo($downloadForm);
+        $('<input type="hidden" name="app_property" />')
+          .val(ko.mapping.toJSON(name))
+          .appendTo($downloadForm);
+        $('<input type="hidden" name="app_filters" />')
+          .val(ko.mapping.toJSON(self.filters))
+          .appendTo($downloadForm);
+
+        $('#downloadProgressModal').append($downloadForm);
+        $downloadForm.submit();
+      }
+
       self.fetchProfile = function (name, callback) {
         vm.apiHelper.cancelActiveRequest(lastFetchProfileRequest);
         lastFetchProfileRequest = $.post("/jobbrowser/api/job/profile", {
@@ -3642,7 +3680,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return '${ is_mini }' == 'False' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
         var queryInterfaceCondition = function () {
-          return true || '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+          return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
         var queryHiveInterfaceCondition = function () {
           return '${ ENABLE_HIVE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('hive') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);

@@ -18,6 +18,8 @@
 import json
 import logging
 
+from django.http import HttpResponse
+
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.django_util import JsonResponse
 from django.utils.translation import ugettext as _
@@ -135,7 +137,11 @@ def profile(request):
   api = get_api(request.user, interface, cluster=cluster)
   api._set_request(request) # For YARN
 
-  response[app_property] = api.profile(app_id, app_type, app_property, app_filters)
-  response['status'] = 0
+  resp = api.profile(app_id, app_type, app_property, app_filters)
 
-  return JsonResponse(response)
+  if isinstance(resp, HttpResponse):
+    return resp
+  else:
+    response[app_property] = resp
+    response['status'] = 0
+    return JsonResponse(response)

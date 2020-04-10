@@ -25,9 +25,11 @@ from datetime import datetime
 
 from django.utils.translation import ugettext as _
 
-from jobbrowser.apis.base_api import Api
+from desktop.lib import export_csvxls
 from libanalyze import analyze as analyzer, rules
 from notebook.conf import ENABLE_QUERY_ANALYSIS
+
+from jobbrowser.apis.base_api import Api
 
 ANALYZER = rules.TopDownAnalysis() # We need to parse some files so save as global
 LOG = logging.getLogger(__name__)
@@ -157,7 +159,6 @@ class QueryApi(Api):
 
     return message;
 
-
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
 
@@ -166,12 +167,15 @@ class QueryApi(Api):
       return self._memory(appid, app_type, app_property, app_filters)
     elif app_property == 'profile':
       return self._query_profile(appid)
+    elif app_property == 'download-profile':
+      return export_csvxls.make_response([self._query_profile(appid)['profile']], 'txt', 'query-profile_%s' % appid)
     elif app_property == 'backends':
       return self._query_backends(appid)
     elif app_property == 'finstances':
       return self._query_finstances(appid)
     else:
       return self._query(appid)
+
 
   def profile_encoded(self, appid):
     return self.api.get_query_profile_encoded(query_id=appid)
