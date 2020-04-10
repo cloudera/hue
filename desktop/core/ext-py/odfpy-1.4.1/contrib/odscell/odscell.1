@@ -1,0 +1,98 @@
+'\" t
+.\"     Title: odscell
+.\"    Author: Kartikaya Gupta
+.\" Generator: DocBook XSL Stylesheets v1.76.0 <http://docbook.sf.net/>
+.\"      Date: 12/22/2010
+.\"    Manual: User commands
+.\"    Source: odfpy
+.\"  Language: English
+.\"
+.TH "ODSCELL" "1" "12/22/2010" "odfpy" "User commands"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+odscell \- Read and update blocks of cells in OpenDocument spreadsheets files
+.SH "SYNOPSIS"
+.HP \w'\fBodscell\fR\ 'u
+\fBodscell\fR \fIfile\&.ods\fR \fIcell\fR
+.SH "DESCRIPTION"
+.PP
+This program reads a cell or block of cells from a file in ODS format, and prints it out in a CSV format to standard output\&. Alternatively, if the \-w flag is set, the program reads in a CSV\-formatted block of cells from standard input, and overwites a cell or block of cells in a file in ODS format\&.
+.SH "OPTIONS"
+.PP
+\-\-version
+.RS 4
+Display the version and exit\&.
+.RE
+.PP
+\-h, \-\-help
+.RS 4
+Display command usage\&.
+.RE
+.PP
+\-r \fIROWS\fR, \-\-rows=\fIROWS\fR
+.RS 4
+Specify the height of the block of cells, in rows\&. Must be greater than zero\&. Defaults to 1 when the \-w option is not present\&. Defaults to the number of input rows when the \-w option is present\&.
+.RE
+.PP
+\-c \fICOLS\fR, \-\-cols=\fICOLS\fR
+.RS 4
+Specify the width of the block of cells, in columns\&. Must be greater than zero\&. Defaults to 1 when the \-w option is not present\&. Defaults to the number of input columns when the \-w option is present\&.
+.RE
+.PP
+\-s \fISHEET\fR, \-\-sheet=\fISHEET\fR
+.RS 4
+The sheet in the ODS file to read/modify\&. Must be greater than zero; defaults to 1\&.
+.RE
+.PP
+\-w
+.RS 4
+If specified, the spreadsheet will be modified with data from standard input\&. If not specified, the cells from the spreadsheet will be written to standard output\&.
+.RE
+.PP
+\fIfile\&.ods\fR
+.RS 4
+The ODS file to be read from or modified\&.
+.RE
+.PP
+\fIcell\fR
+.RS 4
+The top\-left cell of the block of cells to be read from or modified\&. This should be specified in normal spreadsheet format, e\&.g\&. "A1" or "BA23"\&.
+.RE
+.SH "EXAMPLE"
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+odscell foo\&.ods A4                                          # display value in cell A4 on sheet 1 of foo\&.ods
+odscell \-r 2 \-c 2 foo\&.ods B2                                # display values for cells B2,B3,C2,C3 on sheet 1 of foo\&.ods
+echo "hello,world,garbage" | odscell \-c 2 \-w foo\&.ods A1     # write "hello" to cell A1 and "world" to cell A2 on sheet 1 of foo\&.ods
+cat bar\&.csv | odscell \-s 2 \-w foo\&.ods A1                    # put the CSV data from bar\&.csv into sheet 2 of foo\&.ods
+.fi
+.if n \{\
+.RE
+.\}
+.SH "AUTHOR"
+.PP
+\fBKartikaya Gupta\fR
+.RS 4
+Original author of odscell
+.RE

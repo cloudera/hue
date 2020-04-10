@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<refentry id="odscell">
+  <refentryinfo>
+    <productname>odfpy</productname>
+    <author><firstname>Kartikaya</firstname><surname>Gupta</surname>
+     <contrib>Original author of odscell</contrib>
+    </author>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>odscell</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="manual">User commands</refmiscinfo>
+  </refmeta>
+  <refnamediv>
+    <refname>odscell</refname>
+    <refpurpose>Read and update blocks of cells in OpenDocument spreadsheets files</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>odscell</command>
+      <arg choice="plain"><replaceable>file.ods</replaceable></arg>
+      <arg choice="plain"><replaceable>cell</replaceable></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>Description</title>
+    <para>
+This program reads a cell or block of cells from a file in ODS format, and prints it out
+in a CSV format to standard output. Alternatively, if the -w flag is set, the program reads
+in a CSV-formatted block of cells from standard input, and overwites a cell or block of cells
+in a file in ODS format.
+</para>
+  </refsect1>
+  <refsect1>
+    <title>Options</title>
+    <variablelist>
+      <varlistentry>
+        <term>--version</term>
+        <listitem>
+          <para>
+Display the version and exit.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-h, --help</term>
+        <listitem>
+          <para>
+Display command usage.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-r <replaceable>ROWS</replaceable>, --rows=<replaceable>ROWS</replaceable></term>
+        <listitem>
+          <para>
+Specify the height of the block of cells, in rows. Must be greater than zero. Defaults to 1 when
+the -w option is not present. Defaults to the number of input rows when the -w option is present.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-c <replaceable>COLS</replaceable>, --cols=<replaceable>COLS</replaceable></term>
+        <listitem>
+          <para>
+Specify the width of the block of cells, in columns. Must be greater than zero. Defaults to 1 when
+the -w option is not present. Defaults to the number of input columns when the -w option is present.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-s <replaceable>SHEET</replaceable>, --sheet=<replaceable>SHEET</replaceable></term>
+        <listitem>
+          <para>
+The sheet in the ODS file to read/modify. Must be greater than zero; defaults to 1.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-w</term>
+        <listitem>
+          <para>
+If specified, the spreadsheet will be modified with data from standard input. If not specified,
+the cells from the spreadsheet will be written to standard output.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><replaceable>file.ods</replaceable></term>
+        <listitem>
+          <para>
+The ODS file to be read from or modified.
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><replaceable>cell</replaceable></term>
+        <listitem>
+          <para>
+The top-left cell of the block of cells to be read from or modified. This should be specified
+in normal spreadsheet format, e.g. "A1" or "BA23".
+</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+  <refsect1>
+    <title>Example</title>
+    <screen>
+odscell foo.ods A4                                          # display value in cell A4 on sheet 1 of foo.ods
+odscell -r 2 -c 2 foo.ods B2                                # display values for cells B2,B3,C2,C3 on sheet 1 of foo.ods
+echo "hello,world,garbage" | odscell -c 2 -w foo.ods A1     # write "hello" to cell A1 and "world" to cell A2 on sheet 1 of foo.ods
+cat bar.csv | odscell -s 2 -w foo.ods A1                    # put the CSV data from bar.csv into sheet 2 of foo.ods
+</screen>
+  </refsect1>
+</refentry>

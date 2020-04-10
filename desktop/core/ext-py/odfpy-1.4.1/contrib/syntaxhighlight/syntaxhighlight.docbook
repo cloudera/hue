@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<refentry id="syntaxhighlight">
+  <refentryinfo>
+    <productname>odfpy</productname>
+    <author>
+      <firstname>Søren</firstname>
+      <surname>Roug</surname>
+      <contrib>Original author</contrib>
+    </author>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>syntaxhighlight</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="manual">User commands</refmiscinfo>
+  </refmeta>
+  <refnamediv>
+    <refname>syntaxhighlight</refname>
+    <refpurpose>Create OpenDocument with syntax highlighted programming code</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>syntaxhighlight</command>
+      <arg choice="opt">-e <replaceable>encoding</replaceable></arg>
+      <arg choice="opt">-l <replaceable>language</replaceable></arg>
+      <arg>
+        <replaceable>inputfile</replaceable>
+      </arg>
+      <arg>
+        <replaceable>outputfile</replaceable>
+      </arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>Description</title>
+    <para>
+The syntaxhighlight program will read a source code file,
+format it with syntax highlighting and write an OpenDocument text file.
+</para>
+  </refsect1>
+  <refsect1>
+    <title>Options</title>
+    <variablelist>
+      <varlistentry>
+        <term>-e <replaceable>encoding</replaceable></term>
+        <listitem>
+          <para>
+Enter the encoding of the source file. Common encodings are: iso-8859-1,
+cp1252, ascii and utf-8 (default).
+</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>-l <replaceable>language</replaceable></term>
+        <listitem>
+          <para>
+Programming language of the input file. If not specified, 
+it is guessed fron the file ending.
+Values can be:
+Python, HTML, C, C++ and PHP.
+</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+  <refsect1>
+    <title>Example</title>
+    <screen>
+syntaxhighlight -e cp1252 -l Python example.py example.odt
+</screen>
+  </refsect1>
+</refentry>
