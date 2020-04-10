@@ -823,7 +823,8 @@ export default class Snippet {
       }
     });
 
-    if (HAS_OPTIMIZER && !this.parentVm.isNotificationManager()) {
+    // TODO: Add optimizer check per connector?
+    if (window.HAS_OPTIMIZER && !this.parentVm.isNotificationManager()) {
       let lastComplexityRequest;
       let lastCheckedComplexityStatement;
       const knownResponses = [];
@@ -933,16 +934,15 @@ export default class Snippet {
         }
       };
 
-      if (this.dialect() === DIALECT.hive || this.dialect() === DIALECT.impala) {
-        if (this.statement_raw()) {
-          window.setTimeout(() => {
-            this.checkComplexity();
-          }, 2000);
-        }
-        this.delayedStatement.subscribe(() => {
+      if (this.statement_raw()) {
+        window.setTimeout(() => {
           this.checkComplexity();
-        });
+        }, 2000);
       }
+
+      this.delayedStatement.subscribe(() => {
+        this.checkComplexity();
+      });
     }
 
     this.wasBatchExecuted = ko.observable(!!snippetRaw.wasBatchExecuted);
