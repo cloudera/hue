@@ -60,7 +60,7 @@ const onMessage = msg => {
         let locations = [];
         const activeStatementLocations = [];
         msg.data.statementDetails.precedingStatements.forEach(statement => {
-          handleStatement(statement, locations, msg.data.type, false);
+          handleStatement(statement, locations, parser, false);
         });
         if (msg.data.statementDetails.activeStatement) {
           handleStatement(
@@ -72,7 +72,7 @@ const onMessage = msg => {
           locations = locations.concat(activeStatementLocations);
         }
         msg.data.statementDetails.followingStatements.forEach(statement => {
-          handleStatement(statement, locations, msg.data.type, false);
+          handleStatement(statement, locations, parser, false);
         });
 
         // Add databases where missing in the table identifier chains
