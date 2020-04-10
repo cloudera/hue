@@ -50,16 +50,10 @@ function set_samlcert() {
   mkdir -pm 755 $HUE_CONF_DIR/samlcert
   cd $HUE_CONF_DIR/samlcert
   export RANDFILE=$HUE_CONF_DIR/samlcert/.rnd
-  if [ -z ${PASSPHRASE+x} ]; then
-    openssl genrsa -des3 -passout pass:cloudera -out server.pass.key 2048
-    openssl rsa -inform PEM -outform PEM -passin pass:cloudera -in server.pass.key -out server.key
-    openssl req -new -key server.key -out server.csr -subj "/C=US/ST=California/L=Palo Alto/O=Cloudera/OU=Hue/CN=$EXTERNAL_HOST"
-    openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
-  else
-    openssl genrsa -des3 -passout pass:$PASSPHRASE -out server.key 2048
-    openssl req -new -key server.key -out server.csr -passin pass:$PASSPHRASE -subj "/C=US/ST=California/L=Palo Alto/O=Cloudera/OU=Hue/CN=$EXTERNAL_HOST"
-    openssl x509 -req -days 365 -in server.csr -passin pass:$PASSPHRASE -signkey server.key -out server.crt
-  fi
+  openssl genrsa -des3 -passout pass:x -out server.pass.key 2048
+  openssl rsa -inform PEM -outform PEM -passin pass:x -in server.pass.key -out server.key
+  openssl req -new -key server.key -out server.csr -subj "/C=US/ST=California/L=Palo Alto/O=Cloudera/OU=Hue/CN=$EXTERNAL_HOST"
+  openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64
 }
 
