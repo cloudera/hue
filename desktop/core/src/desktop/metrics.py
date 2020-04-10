@@ -41,7 +41,8 @@ ALLOWED_DJANGO_PROMETHEUS_METRICS = (
     'django_http_ajax_requests_total',
     'django_http_ajax_requests_created',
     'django_http_responses_body_total_bytes',
-    'django_http_responses_total_by_status'
+    'django_http_responses_total_by_status',
+    'django_db'
 )
 
 if ENABLE_PROMETHEUS.get():
