@@ -20,15 +20,10 @@ import CancellablePromise from '/api/cancellablePromise';
 
 export default class BaseStrategy {
   constructor(connector) {
-    this.connector = connector;
-
-    if (!this.connector) {
-      // eslint-disable-next-line no-restricted-syntax
-      console.log('Warning: connector empty.');
-    } else {
-      // eslint-disable-next-line no-restricted-syntax
-      console.log('Connector: ' + JSON.stringify(this.connector));
+    if (!connector) {
+      console.warn('BaseStrategy instantiated without connector.');
     }
+    this.connector = connector;
   }
 
   analyzeRisk(options) {
