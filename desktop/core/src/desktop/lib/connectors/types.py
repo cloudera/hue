@@ -129,7 +129,7 @@ CONNECTOR_TYPES = [
     'dialect': 'flink',
     'interface': 'flink',
     'settings': [
-      {'name': 'api_url', 'value': 'http://flink:10000'},
+      {'name': 'api_url', 'value': 'http://127.0.0.1:8083'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
