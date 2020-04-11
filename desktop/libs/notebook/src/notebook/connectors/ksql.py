@@ -52,8 +52,19 @@ class KSqlApi(Api):
     Api.__init__(self, user, interpreter=interpreter)
 
     self.options = interpreter['options']
-
     self.url = self.options['url']
+
+    if self.options.get('has_ssh'):
+      import re
+      p = '(?:.*://|@)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*'
+
+      m = re.search(p, self.options['url'])
+      server_host = m.group('host')
+
+      if not server_host:
+        raise QueryError('Hostname of %(url)s could not be found: %(server_host)s' % {'url': self.url, 'server_host': server_host})
+
+      self.url = re.sub(server_host, '127.0.0.1', self.url)
 
 
   def _get_db(self):

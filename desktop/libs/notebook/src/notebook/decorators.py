@@ -206,7 +206,7 @@ def ssh_error_handler(f):
 
         ssh_options['idle_time'] = idle_time
 
-        if connector['interface'] == 'sqlalchemy':
+        if connector['interface'] in ('sqlalchemy', 'ksql'):
           import re
           p = '(?:.*://|@)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*'
 
