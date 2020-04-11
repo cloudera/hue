@@ -208,6 +208,6 @@ class KSqlApi(object):
       data.append([result['commandStatus']['status']])
       data.append([result['commandStatus']['message']])
 
-    columns = [[col, 'STRING'] for col in columns]
+    columns = [{'name': col, 'type': 'STRING'} for col in columns]
 
     return data, columns
