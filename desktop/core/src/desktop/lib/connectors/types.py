@@ -173,6 +173,30 @@ CONNECTOR_TYPES = [
     }
   },
   {
+    'nice_name': "Livy",
+    'dialect': 'livy',
+    'interface': 'livy',
+    'settings': [
+      {'name': 'api_url', 'value': 'http://localhost:8998'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+    }
+  },
+  {
     'nice_name': "Phoenix SQL",
     'dialect': 'phoenix',
     'interface': 'sqlalchemy',
