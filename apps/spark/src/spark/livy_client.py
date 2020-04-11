@@ -45,14 +45,14 @@ def get_api(user):
     API_CACHE_LOCK.acquire()
     try:
       if API_CACHE is None:
-        API_CACHE = JobServerApi(get_livy_server_url())
+        API_CACHE = LivyClient(get_livy_server_url())
     finally:
       API_CACHE_LOCK.release()
   API_CACHE.setuser(user)
   return API_CACHE
 
 
-class JobServerApi(object):
+class LivyClient(object):
 
   def __init__(self, livy_url):
     self._url = posixpath.join(livy_url)
@@ -71,7 +71,7 @@ class JobServerApi(object):
     self._client.set_verify(SSL_CERT_CA_VERIFY.get())
 
   def __str__(self):
-    return "JobServerApi at %s" % (self._url,)
+    return "LivyClient at %s" % (self._url,)
 
   @property
   def url(self):
