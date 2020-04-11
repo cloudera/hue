@@ -124,7 +124,7 @@ class KSqlApi(Api):
     except Exception as e:
       LOG.warn('Autocomplete data fetching error: %s' % e)
       response['code'] = 500
-      response['error'] = e.message
+      response['error'] = str(e)
 
     return response
 
