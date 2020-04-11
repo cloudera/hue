@@ -100,7 +100,7 @@ def get_livy_server_url():
   return url
 
 def get_spark_status(user):
-  from spark.job_server_api import get_api
+  from spark.livy_client import get_api
   status = None
 
   try:

@@ -38,7 +38,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from spark.conf import LIVY_SERVER_SESSION_KIND
-  from spark.job_server_api import get_api as get_spark_api
+  from spark.livy_client import get_api as get_spark_api
 except ImportError as e:
   LOG.exception('Spark is not enabled')
 
