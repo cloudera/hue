@@ -475,7 +475,7 @@ def get_api(request, snippet):
     from notebook.connectors.ksql import KSqlApi
     return KSqlApi(request.user, interpreter=interpreter)
   elif interface == 'flink':
-    from notebook.connectors.flink import FlinkSqlApi
+    from notebook.connectors.flink_sql import FlinkSqlApi
     return FlinkSqlApi(request.user, interpreter=interpreter)
   elif interface == 'kafka':
     from notebook.connectors.kafka import KafkaApi
