@@ -344,8 +344,8 @@ from metadata.conf import has_optimizer, OPTIMIZER
 
     $('#rowDetailsModal .hue-modal-search').jHueDelayedInput(function () {
       var $t = $('#rowDetailsModal').find('table');
-      $('#rowDetailsModal .no-results').addClass('hide');
       $t.find('tr').removeClass('hide');
+      $('#rowDetailsModal .no-results').addClass('hide');
       var shown = 0;
       $t.find('tr').each(function () {
         if ($(this).text().toLowerCase().indexOf($('#rowDetailsModal .hue-modal-search').val().toLowerCase()) == -1) {
