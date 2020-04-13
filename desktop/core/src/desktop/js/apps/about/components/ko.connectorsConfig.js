@@ -217,6 +217,10 @@ class ConnectorsConfig extends DisposableComponent {
     super();
 
     this.section = ko.observable('installed-connectors-page');
+    this.section.subscribe(() => {
+      this.connectorsFilter('');
+      this.testConnectionExecuted(false);
+    });
     this.categories = ko.observableArray();
     this.filterCategories = ko.pureComputed(() => {
       return [ALL_CATEGORY].concat(this.categories());
@@ -276,8 +280,6 @@ class ConnectorsConfig extends DisposableComponent {
   }
 
   addNewConnector() {
-    this.testConnectionExecuted(false);
-    this.testConnectionErrors('');
     this.section('add-connector-page');
   }
 
