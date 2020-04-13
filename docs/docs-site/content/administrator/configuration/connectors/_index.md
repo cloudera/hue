@@ -334,15 +334,23 @@ Via native HiveServer2 API:
       name=SparkSql
       interface=hiveserver2
 
-### KSQL
+### ksqlDB
 
-To add to the list of [[interpreters]]:
+The ksql Python module should be added to the system or Hue Python virtual environment:
+
+    ./build/env/bin/pip install git+https://github.com/romainr/ksql-python
+
+Then give Hue the information about the interpreter and ksql API:
+
+To add to the list of interpreters:
+
+    [[interpreters]]
 
     [[[ksql]]]
       name=ksql
       interface=ksql
 
-And provide the address of the KSQL REST Api:
+    ...
 
     [kafka]
 
@@ -352,6 +360,9 @@ And provide the address of the KSQL REST Api:
 
         # Base URL of Kafka Ksql API.
         ## ksql_api_url=http://127.0.0.1:8088
+
+
+Note: the configuration will be much simpler after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758).
 
 ### Azure SQL Database
 
