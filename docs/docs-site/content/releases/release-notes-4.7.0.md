@@ -22,7 +22,7 @@ The focus of this release was to keep building on top of [4.6](https://gethue.co
 * A big summary of the [Datawarehouse UX](https://gethue.com/blog/2020-02-10-sql-query-experience-of-your-cloud-data-warehouse/) was published
 
 
-Read the complete list of improvements on [Hue 4.7 is out!](http://gethue.com/hue-4-7-and-its-improvements-are-out/).
+Read the complete list of improvements on [Hue 4.7 is out!](http://gethue.com/blog/hue-4-7-and-its-improvements-are-out/).
 
 Download the [tarball](https://cdn.gethue.com/downloads/hue-4.7.0.tgz) or [source](https://github.com/cloudera/hue/archive/release-4.7.0.zip) releases.
 
