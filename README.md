@@ -20,7 +20,7 @@ are executing 100s of 1000s of queries daily. It also [ships](https://docs.gethu
 Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/api/) and any [contributions](https://docs.gethue.com/developer/) are welcome.
 
 
-![Hue Editor](https://cdn.gethue.com/uploads/2019/12/hue4.6.png)
+![Hue Editor](https://cdn.gethue.com/uploads/2020/04/hue-4.7.png)
 
 
 Getting Started
