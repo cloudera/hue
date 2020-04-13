@@ -2011,9 +2011,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
     <div data-bind="css: {'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
-        <li>
-          <a href="#schedule-hive-page-statements${ SUFFIX }" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#schedule-hive-statements${ SUFFIX }\']').tab('show'); }">
+        <li class="active">
+          <a href="#schedule-hive-page-properties${ SUFFIX }" data-toggle="tab">
             ${ _('Properties') }
+          </a>
+        </li>
+        <li>
+          <a href="#schedule-hive-page-queries${ SUFFIX }" data-bind="click: function(){ fetchProfile('tasks'); $('a[href=\'#schedule-hive-queries${ SUFFIX }\']').tab('show'); }" data-toggle="tab">
+            ${ _('Queries') }
           </a>
         </li>
         <li class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></li>
@@ -2022,27 +2027,35 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="clearfix"></div>
 
       <div class="tab-content">
-        <div class="tab-pane active" id="schedule-hive-page-statements${ SUFFIX }">
-          <table id="actionsTable" class="datatables table table-condensed">
+        <div class="tab-pane active" id="schedule-hive-page-properties${ SUFFIX }">
+          <pre data-bind="html: properties['query']"></pre>
+        </div>
+
+        <div class="tab-pane" id="schedule-hive-page-queries${ SUFFIX }">
+          <!-- ko with: coordinatorActions() -->
+          <form class="form-inline">
+            <div data-bind="template: { name: 'job-actions${ SUFFIX }' }" class="pull-right"></div>
+          </form>
+
+          <table id="schedulesHiveTable" class="datatables table table-condensed status-border-container">
             <thead>
             <tr>
-              <th>${_('Id')}</th>
-              <th>${_('State')}</th>
-              <th>${_('Output')}</th>
+              <th width="1%"><div class="select-all hue-checkbox fa" data-bind="hueCheckAll: { allValues: apps, selectedValues: selectedJobs }"></div></th>
+              <th>${_('Status')}</th>
+              <th>${_('Title')}</th>
             </tr>
             </thead>
-            <tbody data-bind="foreach: properties['statements']">
-              <tr data-bind="click: function() {  $root.job().id(id); $root.job().fetchJob(); }" class="pointer">
-                <td>
-                  <a data-bind="hueLink: '/jobbrowser/jobs/' + id(), clickBubble: false">
-                    <i class="fa fa-tasks"></i>
-                  </a>
+            <tbody data-bind="foreach: apps">
+              <tr class="status-border pointer" data-bind="css: {'completed': properties.status() == 'SUCCEEDED', 'running': ['RUNNING', 'FAILED', 'KILLED'].indexOf(properties.status()) != -1, 'failed': properties.status() == 'FAILED' || properties.status() == 'KILLED'}, click: function() {  if (properties.externalId() && properties.externalId() != '-') { $root.job().id(properties.externalId()); $root.job().fetchJob(); } }">
+                <td data-bind="click: function() {}, clickBubble: false">
+                  <div class="hue-checkbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#schedulesHiveTable', value: $data, hueChecked: $parent.selectedJobs"></div>
                 </td>
-                <td data-bind="text: state"></td>
-                <td data-bind="text: output"></td>
+                <td><span class="label job-status-label" data-bind="text: properties.status"></span></td>
+                <td data-bind="text: properties.title"></td>
               </tr>
             </tbody>
           </table>
+          <!-- /ko -->
         </div>
       </div>
     </div>
@@ -2834,7 +2847,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self.coordinatorActions = ko.pureComputed(function() {
-        if (self.mainType() == 'schedules' && self.properties['tasks']) {
+        if (self.mainType().indexOf('schedule') != -1 && self.properties['tasks']) {
           var apps = self.properties['tasks']().map(function (instance) {
             var job = new CoordinatorAction(vm, ko.mapping.toJS(instance), self);
             job.properties = ko.mapping.fromJS(instance);

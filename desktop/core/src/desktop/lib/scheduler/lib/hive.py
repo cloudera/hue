@@ -106,6 +106,42 @@ class HiveSchedulerApi(Api):
       self._get_task(row) for row in handle['result']['data']
     ]
 
+  def list_executed_tasks(self, app_id):
+    sql_query = """
+SELECT scheduled_executions.*
+FROM information_schema.scheduled_executions
+JOIN information_schema.scheduled_queries ON scheduled_queries.schedule_name = scheduled_executions.schedule_name
+where scheduled_query_id = %(scheduled_query_id)s
+LIMIT 100""" % {
+      'scheduled_query_id': app_id
+    }
+
+    job = make_notebook(
+        name='List Hive scheduled execution',
+        editor_type='hive',
+        statement=sql_query,
+        status='ready',
+        database='default',
+        is_task=False,
+    )
+    request = MockRequest(self.user)
+
+    handle = job.execute_and_wait(request, include_results=True)
+
+    return [
+        {
+        'scheduled_execution_id': row[0],
+        'schedule_name': row[1],
+        'executor_query_id': row[2],
+        'state': row[3],
+        'start_time': row[4],
+        'end_time': row[5],
+        'elapsed': row[6],
+        'error_message': row[7],
+        'last_update_time': row[8],
+      } for row in handle['result']['data']
+    ]
+
   def list_task(self, task_id):
     task_id = task_id.replace('schedule-hive-', '')
 
