@@ -93,8 +93,8 @@ jobs:
             tar -xvf go1.11.linux-amd64.tar.gz
             go/bin/go get -u github.com/raviqqe/muffet
 
-            curl --output hugo_0.66.0_Linux-64bit.tar.gz -L https://github.com/gohugoio/hugo/releases/download/v0.66.0/hugo_0.66.0_Linux-64bit.tar.gz
-            tar -xvf hugo_0.66.0_Linux-64bit.tar.gz
+            curl --output hugo_0.69.0_Linux-64bit.tar.gz -L https://github.com/gohugoio/hugo/releases/download/v0.69.0/hugo_0.69.0_Linux-64bit.tar.gz
+            tar -xvf hugo_0.69.0_Linux-64bit.tar.gz
 
             export PATH=$PWD:$HOME/go/bin:$PATH
 
