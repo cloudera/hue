@@ -168,7 +168,8 @@ const TEMPLATE = `
       ${ I18n('Test connection') }
     </a>
     <span>
-      <i class="fa fa-question" data-bind="visible: !$parent.testConnectionExecuted()"></i>
+      <i class="fa fa-spinner fa-spin" data-bind="visible: $parent.testConnectionExecuting()"></i>
+      <i class="fa fa-question" data-bind="visible: !$parent.testConnectionExecuted() && !$parent.testConnectionExecuting()"></i>
       <i class="fa fa-check" data-bind="visible: $parent.testConnectionExecuted() && !$parent.testConnectionErrors().length"></i>
       <i class="fa fa-exclamation" data-bind="visible: $parent.testConnectionExecuted() && $parent.testConnectionErrors().length"></i>
       <span data-bind="visible: $parent.testConnectionExecuted() && $parent.testConnectionErrors().length, text: $parent.testConnectionErrors">
@@ -229,6 +230,7 @@ class ConnectorsConfig extends DisposableComponent {
     this.connectorsFilter = ko.observable();
 
     this.testConnectionExecuted = ko.observable(false);
+    this.testConnectionExecuting = ko.observable(false);
     this.testConnectionErrors = ko.observable('');
 
     // Handle two types of objects are being listed: connector instances and types
@@ -377,6 +379,7 @@ class ConnectorsConfig extends DisposableComponent {
 
   testConnector(connector) {
     this.testConnectionExecuted(false);
+    this.testConnectionExecuting(true);
     this.testConnectionErrors('');
 
     simplePost(
@@ -387,6 +390,7 @@ class ConnectorsConfig extends DisposableComponent {
       {
         successCallback: data => {
           this.testConnectionExecuted(true);
+          this.testConnectionExecuting(false);
           this.testConnectionErrors(data.warnings);
         }
       }
