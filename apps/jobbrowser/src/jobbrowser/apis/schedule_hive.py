@@ -75,6 +75,8 @@ class HiveScheduleApi(Api):
         'canWrite': self.user.username == app['user'],
         'submitted': app['enabled'],
         'properties': {
+            'query': app['query'],
+            'tasks': []
         }
     }
 
@@ -83,7 +85,7 @@ class HiveScheduleApi(Api):
     api = HiveSchedulerApi(user=self.user)
 
     operations = []
-    actual_app_ids = [app_id.replace('schedule-hive-', '') for app_id in app_ids]
+    actual_app_ids = [app_id.rsplit('-')[-1] for app_id in app_ids]
 
     for app_id in actual_app_ids:
       try:
@@ -106,10 +108,16 @@ class HiveScheduleApi(Api):
   def profile(self, appid, app_type, app_property, app_filters):
     appid = appid.rsplit('-')[-1]
 
-    if app_property == 'properties':
-      api = get_api(self.user)
+    if app_property == 'tasks':
+      api = HiveSchedulerApi(user=self.user)
 
-      return api.get_statements(appid)
+      return [
+        {
+          'status': task['state'],
+          'title': task['executor_query_id'],
+        }
+        for task in api.list_executed_tasks(appid)
+      ]
     else:
       return {}
 

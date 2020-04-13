@@ -53,7 +53,8 @@ class AuthenticationRequired(Exception):
     self.message = message
 
 class OperationTimeout(Exception):
-  pass
+  def __str__(self):
+    return 'OperationTimeout'
 
 class OperationNotSupported(Exception):
   pass
@@ -289,7 +290,7 @@ class Notebook(object):
     return _execute_notebook(request, notebook_data, snippet)
 
 
-  def execute_and_wait(self, request, timeout_sec=30.0, sleep_interval=0.5, include_results=False):
+  def execute_and_wait(self, request, timeout_sec=30.0, sleep_interval=1, include_results=False):
     """
     Run query and check status until it finishes or timeouts.
 
@@ -315,7 +316,7 @@ class Notebook(object):
           # TODO: close
         return handle
 
-      status = self.check_status(request, operation_id=operation_id)
+      handle = self.check_status(request, operation_id=operation_id)
       time.sleep(sleep_interval)
       curr = time.time()
 
