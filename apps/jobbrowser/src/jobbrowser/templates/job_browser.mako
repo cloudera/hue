@@ -2028,7 +2028,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <div class="tab-content">
         <div class="tab-pane active" id="schedule-hive-page-properties${ SUFFIX }">
-          <pre data-bind="highlight: { value: properties['query'], formatted: false, dialect: 'hive' }"></pre>
+          <pre data-bind="highlight: { value: properties['query'], formatted: true, dialect: 'hive' }"></pre>
         </div>
 
         <div class="tab-pane" id="schedule-hive-page-queries${ SUFFIX }">

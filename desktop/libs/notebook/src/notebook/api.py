@@ -316,7 +316,7 @@ def fetch_result_data(request):
     return JsonResponse(response)
 
 
-def _fetch_result_data(user, notebook=None, snippet=None, operation_id=None, rows=100, start_over=False):
+def _fetch_result_data(user, notebook=None, snippet=None, operation_id=None, rows=100, start_over=False, nulls_only=False):
   snippet = _get_snippet(user, notebook, snippet, operation_id)
   request = MockRequest(user)
 
@@ -326,7 +326,7 @@ def _fetch_result_data(user, notebook=None, snippet=None, operation_id=None, row
 
   # Materialize and HTML escape results
   if response['result'].get('data') and response['result'].get('type') == 'table' and not response['result'].get('isEscaped'):
-    response['result']['data'] = escape_rows(response['result']['data'])
+    response['result']['data'] = escape_rows(response['result']['data'], nulls_only=nulls_only)
     response['result']['isEscaped'] = True
 
   return response
