@@ -218,7 +218,7 @@ from desktop.views import _ko
       <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular join') }</div>
       <div class="autocompleter-details-contents">
         <div class="autocompleter-details-contents-inner">
-          <div class="details-code" data-bind="highlight: { value: value, formatted: false, dialect: $parent.snippet.dialect() }"></div>
+          <div class="details-code" data-bind="highlight: { value: value, formatted: false, dialect: typeof $parent.snippet.dialect == 'function' ? $parent.snippet.dialect() : $parent.snippet.dialect }"></div>
           <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }">
             <i class="fa fa-fw fa-star-o popular-color"></i>
             <div class="progress">
