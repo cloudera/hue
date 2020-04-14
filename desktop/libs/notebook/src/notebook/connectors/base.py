@@ -342,7 +342,7 @@ class Notebook(object):
   def fetch_result_data(self, user, operation_id):
     from notebook.api import _fetch_result_data
 
-    return _fetch_result_data(user, operation_id=operation_id, rows=100, start_over=False)
+    return _fetch_result_data(user, operation_id=operation_id, rows=100, start_over=False, nulls_only=True)
 
 
 def get_interpreter(connector_type, user=None):
