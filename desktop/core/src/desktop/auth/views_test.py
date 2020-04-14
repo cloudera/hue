@@ -734,6 +734,17 @@ class TestLogin(PseudoHdfsTestBase):
     response = c.get('/hue')
     assert_true(b'<div id="login-modal" class="modal fade hide">' in response.content, response.content)
 
+  def test_login_without_last_login(self):
+    self.reset.append( conf.AUTH.BACKEND.set_for_testing(["desktop.auth.backend.AllowFirstUserDjangoBackend"]) )
+    self.reset.append( conf.AUTH.EXPIRES_AFTER.set_for_testing(10) )
+
+    client = make_logged_in_client(username=self.test_username, password="test")
+    client.get('/accounts/logout')
+    user = User.objects.get(username=self.test_username)
+    user.last_login = None
+    user.save()
+    response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
+    assert_equal(200, response.status_code, "Expected ok status.")
 
 class TestLoginNoHadoop(object):
 
