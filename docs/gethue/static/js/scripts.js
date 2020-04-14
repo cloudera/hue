@@ -14,7 +14,7 @@ mr = (function (mr, $, window, document){
     $(window).on("load", windowLoad);
 
     function documentReady(context){
-        
+
         context = typeof context === typeof undefined ? $ : context;
         components.documentReady.concat(components.documentReadyDeferred).forEach(function(component){
             component(context);
@@ -60,8 +60,8 @@ mr = (function (mr, $, window, document){
     "use strict";
     mr.util = {};
 
-    mr.util.requestAnimationFrame    = window.requestAnimationFrame || 
-                                       window.mozRequestAnimationFrame || 
+    mr.util.requestAnimationFrame    = window.requestAnimationFrame ||
+                                       window.mozRequestAnimationFrame ||
                                        window.webkitRequestAnimationFrame ||
                                        window.msRequestAnimationFrame;
 
@@ -114,17 +114,17 @@ mr = (function (mr, $, window, document){
           if (keyA > keyB) return order2;
           return 0;
         });
-        
+
         // Append back into place
         $parentElement.empty();
         $(items).each(function(i, itm){
           $parentElement.append(itm);
         });
     };
-    
+
     // Set data-src attribute of element from src to be restored later
     mr.util.idleSrc = function(context, selector){
-        
+
             selector  = (typeof selector !== typeof undefined) ? selector : '';
             var elems = context.is(selector+'[src]') ? context : context.find(selector+'[src]');
 
@@ -139,14 +139,14 @@ mr = (function (mr, $, window, document){
             }
 
             // Clear the src attribute
-            elem.attr('src', '');    
-            
+            elem.attr('src', '');
+
         });
     };
 
     // Set src attribute of element from its data-src where it was temporarily stored earlier
     mr.util.activateIdleSrc = function(context, selector){
-        
+
         selector     = (typeof selector !== typeof undefined) ? selector : '';
         var elems    = context.is(selector+'[data-src]') ? context : context.find(selector+'[data-src]');
 
@@ -171,7 +171,7 @@ mr = (function (mr, $, window, document){
     // Take a text value in either px (eg. 150px) or vh (eg. 65vh) and return a number in pixels.
     mr.util.parsePixels = function(text){
         var windowHeight = $(window).height(), value;
-        
+
         // Text text against regular expression for px value.
         if(/^[1-9]{1}[0-9]*[p][x]$/.test(text)){
             return parseInt(text.replace('px', ''),10);
@@ -187,7 +187,7 @@ mr = (function (mr, $, window, document){
         }
     };
 
-    mr.util.removeHash = function() { 
+    mr.util.removeHash = function() {
         // Removes hash from URL bar without reloading and without losing search query
         history.pushState("", document.title, window.location.pathname + window.location.search);
     }
@@ -219,39 +219,39 @@ mr = (function (mr, $, window, document){
 mr = (function (mr, $, window, document){
     "use strict";
 
-    
+
     mr.scroll           = {};
-    var raf             = window.requestAnimationFrame || 
-                          window.mozRequestAnimationFrame || 
+    var raf             = window.requestAnimationFrame ||
+                          window.mozRequestAnimationFrame ||
                           window.webkitRequestAnimationFrame ||
                           window.msRequestAnimationFrame;
     mr.scroll.listeners = [];
     mr.scroll.busy      = false;
     mr.scroll.y         = 0;
     mr.scroll.x         = 0;
-    
+
     var documentReady = function($){
 
         //////////////// Capture Scroll Event and fire scroll function
-        jQuery(window).off('scroll.mr');    
+        jQuery(window).off('scroll.mr');
         jQuery(window).on('scroll.mr', function(evt) {
                 if(mr.scroll.busy === false){
-                    
+
                     mr.scroll.busy = true;
-                    raf(function(evt){  
+                    raf(function(evt){
                         mr.scroll.update(evt);
                     });
-                    
+
                 }
                 if(evt.stopPropagation){
                     evt.stopPropagation();
                 }
         });
-        
+
     };
 
     mr.scroll.update = function(event){
-        
+
         // Loop through all mr scroll listeners
         var parallax = typeof window.mr_parallax !== typeof undefined ? true : false;
         mr.scroll.y = (parallax ? mr_parallax.mr_getScrollPosition() : window.pageYOffset);
@@ -266,7 +266,7 @@ mr = (function (mr, $, window, document){
                mr.scroll.listeners[i](event);
             }
         }
-        
+
     };
 
     mr.scroll.documentReady = documentReady;
@@ -314,9 +314,9 @@ mr = (function (mr, $, window, document){
                     //console.log('Error - Scrollpoint not found.');
                     return false;
                 }
-            }   
+            }
         });
-        
+
         if(mr.scroll.classModifiers.rules.length){
             return true;
         }else{
@@ -329,12 +329,12 @@ mr = (function (mr, $, window, document){
             scrollRules   = mr.scroll.classModifiers.rules,
             l             = scrollRules.length,
             currentRule;
-        
-        // Given the current scrollPoint, check for necessary changes 
+
+        // Given the current scrollPoint, check for necessary changes
         while(l--) {
-            
+
             currentRule = scrollRules[l];
-            
+
             if(currentScroll > currentRule.scrollPoint && !currentRule.hasClass){
                 // Set local copy and glogal copy at the same time;
                 currentRule.element.classList.add(currentRule.toggleClass);
@@ -361,7 +361,7 @@ mr = (function (mr, $, window, document){
         // Each element has data-scroll-class with a formatted value to represent class to add/remove at a particular scroll point.
         $('[data-scroll-class]').each(function(){
             var element  = $(this);
-                
+
             // Test the rules to be added to an array of rules.
             if(!mr.scroll.classModifiers.parseScrollRules(element)){
                 console.log('Error parsing scroll rules on: '+element);
@@ -371,7 +371,7 @@ mr = (function (mr, $, window, document){
         // For 'position fixed' elements, give them a max-width for correct fixing behaviour
         fixedElementSizes();
         $(window).on('resize', fixedElementSizes);
-        
+
         // If there are valid scroll rules add classModifiers update function to the scroll event processing queue.
         if(mr.scroll.classModifiers.rules.length){
             mr.scroll.listeners.push(mr.scroll.classModifiers.update);
@@ -379,9 +379,9 @@ mr = (function (mr, $, window, document){
     };
 
     mr.components.documentReady.push(documentReady);
-    mr.scroll.classModifiers.documentReady = documentReady;    
+    mr.scroll.classModifiers.documentReady = documentReady;
 
-    
+
 
     return mr;
 
@@ -393,7 +393,7 @@ mr = (function (mr, $, window, document){
     "use strict";
 
     mr.accordions = mr.accordions || {};
-    
+
     mr.accordions.documentReady = function($){
         $('.accordion__title').on('click', function(){
             mr.accordions.activatePanel($(this));
@@ -412,39 +412,39 @@ mr = (function (mr, $, window, document){
         }
 
         jQuery(document).on('click', 'a[href^="#"]:not(a[href="#"])', function(){
-             
+
              if($('.accordion > li > .accordion__title'+$(this).attr('href')).length){
                 mr.accordions.activatePanelById($(this).attr('href'), true);
              }
         });
     };
 
-    
+
 
     mr.accordions.activatePanel = function(panel, forceOpen){
-        
+
         var $panel    = $(panel),
             accordion = $panel.closest('.accordion'),
             li        = $panel.closest('li'),
             openEvent = document.createEvent('Event'),
             closeEvent = document.createEvent('Event');
-            
+
             openEvent.initEvent('panelOpened.accordions.mr', true, true);
             closeEvent.initEvent('panelClosed.accordions.mr', true, true);
-        
+
 
 
         if(li.hasClass('active')){
-            
+
             if(forceOpen !== true){
-                
+
                 li.removeClass('active');
                 $panel.trigger('panelClosed.accordions.mr').get(0).dispatchEvent(closeEvent);
             }
         }else{
-            
+
             if(accordion.hasClass('accordion--oneopen')){
-                
+
                 var wasActive = accordion.find('li.active');
                 if(wasActive.length){
                     wasActive.removeClass('active');
@@ -452,9 +452,9 @@ mr = (function (mr, $, window, document){
                 }
                 li.addClass('active');
                 li.trigger('panelOpened.accordions.mr').get(0).dispatchEvent(openEvent);
-                
+
             }else{
-                
+
                 if(!li.is('.active')){
                     li.trigger('panelOpened.accordions.mr').get(0).dispatchEvent(openEvent);
                 }
@@ -465,14 +465,14 @@ mr = (function (mr, $, window, document){
 
     mr.accordions.activatePanelById = function(id, forceOpen){
         var panel;
-       
+
         if(id !== '' && id !== '#' && id.match(/#\/.*/) === null){
             panel = $('.accordion > li > .accordion__title#'+id.replace('#', ''));
             if(panel.length){
                 $('html, body').stop(true).animate({
                     scrollTop: (panel.offset().top - 50)
                 }, 1200);
-                
+
                 mr.accordions.activatePanel(panel, forceOpen);
             }
         }
@@ -489,7 +489,7 @@ mr = (function (mr, $, window, document){
     "use strict";
 
     mr.alerts = mr.alerts || {};
-    
+
     mr.alerts.documentReady = function($){
         $('.alert__close').on('click touchstart', function(){
             jQuery(this).closest('.alert').addClass('alert--dismissed');
@@ -505,11 +505,11 @@ mr = (function (mr, $, window, document){
 //////////////// Backgrounds
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.backgrounds = mr.backgrounds || {};
-    
+
     mr.backgrounds.documentReady = function($){
-        
+
         //////////////// Append .background-image-holder <img>'s as CSS backgrounds
 
 	    $('.background-image-holder').each(function() {
@@ -526,9 +526,9 @@ mr = (function (mr, $, window, document){
 //////////////// Bars
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.bars = mr.bars || {};
-    
+
     mr.bars.documentReady = function($){
         $('.nav-container .bar[data-scroll-class*="fixed"]:not(.bar--absolute)').each(function(){
             var bar = $(this),
@@ -545,7 +545,7 @@ mr = (function (mr, $, window, document){
 //////////////// Cookies
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.cookies = {
 
         getItem: function (sKey) {
@@ -594,7 +594,7 @@ mr = (function (mr, $, window, document){
 //////////////// Countdown
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.countdown = mr.countdown || {};
     mr.countdown.options = mr.countdown.options || {};
 
@@ -606,7 +606,7 @@ mr = (function (mr, $, window, document){
                 daysText     = typeof element.attr('data-days-text') !== typeof undefined ? '%D '+element.attr('data-days-text')+' %H:%M:%S': '%D days %H:%M:%S',
                 daysText     = typeof mr.countdown.options.format !== typeof undefined ? mr.countdown.options.format : daysText,
                 dateFormat   = typeof element.attr('data-date-format') !== typeof undefined ? element.attr('data-date-format'): daysText,
-                
+
                 fallback;
 
             if(typeof element.attr('data-date-fallback') !== typeof undefined){
@@ -623,7 +623,7 @@ mr = (function (mr, $, window, document){
                 }
             });
         });
-        
+
     };
 
     mr.components.documentReadyDeferred.push(mr.countdown.documentReady);
@@ -634,11 +634,11 @@ mr = (function (mr, $, window, document){
 //////////////// Datepicker
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.datepicker = mr.datepicker || {};
 
     var options = mr.datepicker.options || {};
-    
+
     mr.datepicker.documentReady = function($){
         if($('.datepicker').length){
             $('.datepicker').pickadate(options);
@@ -653,11 +653,11 @@ mr = (function (mr, $, window, document){
 //////////////// Dropdowns
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.dropdowns = mr.dropdowns || {};
 
     mr.dropdowns.done = false;
-    
+
     mr.dropdowns.documentReady = function($){
 
         var rtl = false;
@@ -691,8 +691,8 @@ mr = (function (mr, $, window, document){
             // Append a container to the body for measuring purposes
             jQuery('body').append('<div class="container containerMeasure" style="opacity:0;pointer-events:none;"></div>');
 
-            
-        
+
+
 
             // Menu dropdown positioning
             if(rtl === false){
@@ -713,19 +713,19 @@ mr = (function (mr, $, window, document){
 
                 jQuery(this).css('left', '');
 
-                container       = jQuery(this);  
+                container       = jQuery(this);
                 containerOffset = container.offset().left;
                 masterOffset    = jQuery('.containerMeasure').offset().left;
                 menuItem        = container.closest('.dropdown').offset().left;
                 content         = null;
-                
+
                 container.css('left',((-containerOffset)+(masterOffset)));
 
                 if(container.find('.dropdown__content:not([class*="lg-12"])').length){
                     content = container.find('.dropdown__content');
                     content.css('left', ((menuItem)-(masterOffset)));
                 }
-                
+
         });
         $('.dropdown__content').each(function(){
             var dropdown, offset, width, offsetRight, winWidth, leftCorrect;
@@ -750,7 +750,7 @@ mr = (function (mr, $, window, document){
 
         $('.dropdown__container').each(function(){
             var container, containerOffset, masterOffset, menuItem, content;
- 
+
                 jQuery(this).css('left', '');
 
                 container   = jQuery(this);
@@ -758,7 +758,7 @@ mr = (function (mr, $, window, document){
                 masterOffset    = jQuery('.containerMeasure').offset().left;
                 menuItem        = windowWidth - (container.closest('.dropdown').offset().left + container.closest('.dropdown').outerWidth(true));
                 content         = null;
-                
+
                 container.css('right',((-containerOffset)+(masterOffset)));
 
                 if(container.find('.dropdown__content:not([class*="lg-12"])').length){
@@ -782,7 +782,7 @@ mr = (function (mr, $, window, document){
 
         });
     };
-    
+
 
     mr.components.documentReady.push(mr.dropdowns.documentReady);
     return mr;
@@ -793,7 +793,7 @@ mr = (function (mr, $, window, document){
 
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.forms                 = mr.forms || {};
     mr.forms.captcha         = {};
     mr.forms.captcha.widgets = [];
@@ -851,7 +851,7 @@ mr = (function (mr, $, window, document){
             $(this).siblings('input').trigger('click');
             return false;
         });
-        
+
         //////////////// Handle Form Submit
 
         $('form.form-email, form[action*="list-manage.com"], form[action*="createsend.com"]').attr('novalidate', true).off('submit').on('submit', mr.forms.submit);
@@ -888,7 +888,7 @@ mr = (function (mr, $, window, document){
                 $column.insertBefore($insertBefore);
             }
 
-       
+
             // Add the widget div to the widgets array
             widgetObject = {
                 element:    $captchaDiv.get(0),
@@ -897,7 +897,7 @@ mr = (function (mr, $, window, document){
                 size:       widgetSize,
             };
 
-          
+
 
             mr.forms.captcha.widgets.push(widgetObject);
 
@@ -912,7 +912,7 @@ mr = (function (mr, $, window, document){
                 }
             }else{
                 if(typeof grecaptcha !== typeof undefined){
-                    mr.forms.captcha.renderWidgets();    
+                    mr.forms.captcha.renderWidgets();
                 }
             }
 
@@ -920,7 +920,7 @@ mr = (function (mr, $, window, document){
 
 
     };
-    
+
     mr.forms.submit = function(e){
         // return false so form submits through jQuery rather than reloading page.
         if (e.preventDefault) e.preventDefault();
@@ -952,17 +952,17 @@ mr = (function (mr, $, window, document){
             if (typeof originalError !== typeof undefined && originalError !== false) {
                 formError.html(originalError);
             }
-            
+
             // validateFields returns 1 on error;
             if (mr.forms.validateFields(thisForm) !== 1) {
-               
+
                 thisForm.removeClass('attempted-submit');
 
                 // Hide the error if one was shown
                 formError.fadeOut(200);
                 // Create a new loading spinner in the submit button.
                 submitButton.addClass('btn--loading');
-                
+
                 try{
                     $.ajax({
                         url: thisForm.attr('action'),
@@ -976,7 +976,7 @@ mr = (function (mr, $, window, document){
                             // Request was a success, what was the response?
 
                             if (data.result !== "success" && data.Status !== 200) {
-                                
+
                                 // Got an error from Mail Chimp or Campaign Monitor
 
                                 // Keep the current error text in a data attribute on the form
@@ -987,9 +987,9 @@ mr = (function (mr, $, window, document){
 
                                 submitButton.removeClass('btn--loading');
                             } else {
-                                
+
                                 // Got success from Mail Chimp or Campaign Monitor
-                                
+
                                 submitButton.removeClass('btn--loading');
 
                                 successRedirect = thisForm.attr('data-success-redirect');
@@ -1013,9 +1013,9 @@ mr = (function (mr, $, window, document){
 
                     submitButton.removeClass('btn--loading');
                 }
-            
 
-                
+
+
             } else {
                 // There was a validation error - show the default form error message
                 mr.forms.showFormError(formSuccess, formError, 1000, 5000, 500);
@@ -1036,7 +1036,7 @@ mr = (function (mr, $, window, document){
 
                 // Hide the error if one was shown
                 formError.fadeOut(200);
-                
+
                 // Create a new loading spinner in the submit button.
                 submitButton.addClass('btn--loading');
 
@@ -1086,7 +1086,7 @@ mr = (function (mr, $, window, document){
         }
         return false;
     };
-    
+
     mr.forms.validateFields = function(form) {
         var body = $(body),
             error = false,
@@ -1139,7 +1139,7 @@ mr = (function (mr, $, window, document){
         // Validate recaptcha
         if(form.find('div.recaptcha').length && typeof form.attr('data-recaptcha-sitekey') !== typeof undefined){
             thisElement = $(form.find('div.recaptcha'));
-    
+
             if(grecaptcha.getResponse(form.data('recaptchaWidgetID')) !== ""){
                 thisElement.removeClass('field-error');
             }else{
@@ -1151,9 +1151,9 @@ mr = (function (mr, $, window, document){
         if (!form.find('.field-error').length) {
             body.find('.form-error').fadeOut(1000);
         }else{
-            
+
             var firstError = $(form).find('.field-error:first');
-            
+
             if(firstError.length){
                 $('html, body').stop(true).animate({
                     scrollTop: (firstError.offset().top - 100)
@@ -1167,7 +1167,7 @@ mr = (function (mr, $, window, document){
     };
 
     mr.forms.showFormSuccess = function(formSuccess, formError, fadeOutError, wait, fadeOutSuccess){
-        
+
         formSuccess.stop(true).fadeIn(fadeOutError);
 
         formError.stop(true).fadeOut(fadeOutError);
@@ -1177,7 +1177,7 @@ mr = (function (mr, $, window, document){
     };
 
     mr.forms.showFormError = function(formSuccess, formError, fadeOutSuccess, wait, fadeOutError){
-        
+
         formError.stop(true).fadeIn(fadeOutSuccess);
 
         formSuccess.stop(true).fadeOut(fadeOutSuccess);
@@ -1235,7 +1235,7 @@ mr = (function (mr, $, window, document){
 //////////////// Granim
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.granim = mr.granim || {};
 
     mr.granim.documentReady = function($){
@@ -1250,7 +1250,7 @@ mr = (function (mr, $, window, document){
 				passes,
 				i,
                 themeDefaults,
-                
+
                 options;
 
 			// Canvas element forms the gradient background
@@ -1273,7 +1273,7 @@ mr = (function (mr, $, window, document){
                     tempPair.push(colours.shift());
                     pairs.push(tempPair);
             	}
-                
+
                 // attribute overrides - allows per-gradient override of global options.
                 ao.states = {
                     "default-state": {
@@ -1294,12 +1294,12 @@ mr = (function (mr, $, window, document){
                     }
                 }
             };
-            
+
             options = jQuery.extend({}, themeDefaults, mr.granim.options, ao);
             $(this).data('gradientOptions', options);
     		var granimElement = $(this);
     		var granimInstance = new Granim(options);
-    	});        
+    	});
     };
 
     mr.components.documentReadyDeferred.push(mr.granim.documentReady);
@@ -1310,13 +1310,13 @@ mr = (function (mr, $, window, document){
 //////////////// Instagram
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.instagram = mr.instagram || {};
 
     mr.instagram.documentReady = function($){
 
         var themeDefaults, options, ao = {};
-        
+
         if($('.instafeed').length){
 
             // Replace with your own Access Token and Client ID
@@ -1335,14 +1335,14 @@ mr = (function (mr, $, window, document){
             jQuery.fn.spectragram.accessData = {
                 accessToken: token,
                 clientID: client
-            };  
+            };
         }
 
         $('.instafeed').each(function(){
             var feed   = $(this),
                 feedID = feed.attr('data-user-name'),
                 fetchNumber = 12;
-            
+
             themeDefaults = {
                 query: 'mediumrarethemes',
                 max: 12
@@ -1367,7 +1367,7 @@ mr = (function (mr, $, window, document){
 //////////////// Maps
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.maps = mr.maps || {};
     mr.maps.options = mr.maps.options || {};
 
@@ -1377,14 +1377,14 @@ mr = (function (mr, $, window, document){
         $('.map-holder').on('click', function() {
             $(this).addClass('interact');
         }).removeClass('interact');
-        
+
         var mapsOnPage = $('.map-container[data-maps-api-key]');
         if(mapsOnPage.length){
             mapsOnPage.addClass('gmaps-active');
             mr.maps.initAPI($);
             mr.maps.init();
         }
-        
+
     };
 
     mr.maps.initAPI = function($){
@@ -1393,14 +1393,14 @@ mr = (function (mr, $, window, document){
             if($('[data-maps-api-key]').length){
                 var script = document.createElement('script');
                 var apiKey = $('[data-maps-api-key]:first').attr('data-maps-api-key');
-                apiKey = typeof apiKey !== typeof undefined ? apiKey : ''; 
+                apiKey = typeof apiKey !== typeof undefined ? apiKey : '';
                 if(apiKey !== ''){
                     script.type = 'text/javascript';
                     script.src = 'https://maps.googleapis.com/maps/api/js?key='+apiKey+'&callback=mr.maps.init';
                     script.className = 'gMapsAPI';
-                    document.body.appendChild(script);  
+                    document.body.appendChild(script);
                 }
-            } 
+            }
         }
     };
 
@@ -1410,7 +1410,7 @@ mr = (function (mr, $, window, document){
 
                 mr.maps.instances = [];
 
-                
+
                 jQuery('.gmaps-active').each(function(){
                     var mapElement      = this,
                         mapInstance     = jQuery(this),
@@ -1427,8 +1427,8 @@ mr = (function (mr, $, window, document){
                         mapCreatedEvent    = document.createEvent('Event');
                         mapCreatedEvent.initEvent('mapCreated.maps.mr', true, true);
 
-                        
-                    
+
+
 
                     mapDefaults = {
                         disableDefaultUI: true,
@@ -1436,7 +1436,7 @@ mr = (function (mr, $, window, document){
                         scrollwheel: false,
                         styles: [{"featureType":"landscape","stylers":[{"saturation":-100},{"lightness":65},{"visibility":"on"}]},{"featureType":"poi","stylers":[{"saturation":-100},{"lightness":51},{"visibility":"simplified"}]},{"featureType":"road.highway","stylers":[{"saturation":-100},{"visibility":"simplified"}]},{"featureType":"road.arterial","stylers":[{"saturation":-100},{"lightness":30},{"visibility":"on"}]},{"featureType":"road.local","stylers":[{"saturation":-100},{"lightness":40},{"visibility":"on"}]},{"featureType":"transit","stylers":[{"saturation":-100},{"visibility":"simplified"}]},{"featureType":"administrative.province","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"labels","stylers":[{"visibility":"on"},{"lightness":-25},{"saturation":-100}]},{"featureType":"water","elementType":"geometry","stylers":[{"hue":"#ffff00"},{"lightness":-25},{"saturation":-97}]}],
                         zoom: 17,
-                        zoomControl: false,    
+                        zoomControl: false,
                     };
 
                     // Attribute overrides - allows data attributes on the map to override global options
@@ -1455,7 +1455,7 @@ mr = (function (mr, $, window, document){
 
                     mapOptions = jQuery.extend({}, mapDefaults, mr.maps.options.map, mapAo);
                     markerOptions = jQuery.extend({}, markerDefaults, mr.maps.options.marker, markerAo);
-                    
+
 
                     if(address !== undefined && address[0] !== ""){
                             geocoder.geocode( { 'address': address[0].replace('[nomarker]','')}, function(results, status) {
@@ -1466,7 +1466,7 @@ mr = (function (mr, $, window, document){
                                 mr.maps.instances.push(map);
                                 jQuery(mapElement).trigger('mapCreated.maps.mr').get(0).dispatchEvent(mapCreatedEvent);
                                 map.setCenter(results[0].geometry.location);
-                                
+
                                 address.forEach(function(address){
                                     var markerGeoCoder;
 
@@ -1499,9 +1499,9 @@ mr = (function (mr, $, window, document){
                         });
                     }
                     else if(typeof latitude !== typeof undefined && latitude !== "" && latitude !== false && typeof longitude !== typeof undefined && longitude !== "" && longitude !== false ){
-                        
+
                         mapOptions.center   = { lat: latitude, lng: longitude};
-                        map                 = new google.maps.Map(mapElement, mapOptions); 
+                        map                 = new google.maps.Map(mapElement, mapOptions);
                         marker              = new google.maps.Marker(jQuery.extend({}, markerOptions, {
                                                     position: { lat: latitude, lng: longitude },
                                                     map: map }));
@@ -1511,9 +1511,9 @@ mr = (function (mr, $, window, document){
 
                     }
 
-                    
 
-                }); 
+
+                });
             }
         }
     };
@@ -1527,7 +1527,7 @@ mr = (function (mr, $, window, document){
 //////////////// Masonry
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.masonry = mr.masonry || {};
 
     mr.masonry.documentReady = function($){
@@ -1551,9 +1551,9 @@ mr = (function (mr, $, window, document){
                 }
             });
             masonryContainer.isotope({ filter: filterValue });
-            
+
         });
-        
+
     };
 
     mr.masonry.windowLoad = function(){
@@ -1590,7 +1590,7 @@ mr = (function (mr, $, window, document){
                 }
             });
 
-            
+
             masonry.isotope(jQuery.extend({}, themeDefaults, mr.masonry.options, ao));
 
         });
@@ -1600,9 +1600,9 @@ mr = (function (mr, $, window, document){
 
         // If no argument is supplied, just apply the update to all masonry sets on the page.
         masonry = typeof masonry !== typeof undefined ? masonry : '.masonry';
-        
+
         var $masonry = $(masonry);
-        
+
         $masonry.each(function(){
             var $masonry         = $(this),
                 masonryContainer = $masonry.find('.masonry__container'),
@@ -1610,12 +1610,12 @@ mr = (function (mr, $, window, document){
                 // data-filter-all-text can be used to set the word for "all"
                 filterAllText    = typeof filters.attr('data-filter-all-text') !== typeof undefined ? filters.attr('data-filter-all-text') : "All",
                 filtersList;
-            
+
             // Ensure we are working with a .masonry element
             if($masonry.is('.masonry')){
                 // If a filterable masonry item exists
                 if(masonryContainer.find('.masonry__item[data-masonry-filter]').length){
-                    
+
                     // Create empty ul for filters
                     filtersList = filters.find('> ul');
 
@@ -1632,7 +1632,7 @@ mr = (function (mr, $, window, document){
 
                         // If not undefined or empty
                         if(typeof filterString !== typeof undefined && filterString !== ""){
-                            // Split tags from string into array 
+                            // Split tags from string into array
                             filtersArray = filterString.split(',');
                         }
                         $(filtersArray).each(function(index, tag){
@@ -1648,16 +1648,16 @@ mr = (function (mr, $, window, document){
                             // If this tag does not appear in the list already, add it
                             if(!filtersList.find('[data-masonry-filter="'+slug+'"]').length){
                                 filtersList.append('<li data-masonry-filter="'+slug+'">'+tag+'</li>');
-                                
+
                             }
-                        }); 
+                        });
                     });
-                    
+
                     // Remove any unnused filter options in list
                     filtersList.find('[data-masonry-filter]').each(function(){
                         var $this  = $(this),
                             filter = $this.text();
-                        
+
                         if($(this).attr('data-masonry-filter') !== "*"){
                             if(!$masonry.find('.masonry__item[data-masonry-filter*="'+filter+'"]').length){
                                 $this.remove();
@@ -1680,12 +1680,12 @@ mr = (function (mr, $, window, document){
     };
 
     mr.masonry.updateLayout = function(masonry){
-        
+
         // If no argument is supplied, just apply the update to all masonry sets on the page.
         masonry = typeof masonry !== typeof undefined ? masonry : '.masonry';
 
         var $masonry = $(masonry);
-        
+
 
         $masonry.each(function(){
             var collection       = $(this),
@@ -1696,7 +1696,7 @@ mr = (function (mr, $, window, document){
                 if(newItems.length){
                     masonryContainer.isotope('appended', newItems).isotope( 'layout');
                 }
-                
+
                 masonryContainer.isotope('layout');
             }
         });
@@ -1712,7 +1712,7 @@ mr = (function (mr, $, window, document){
 //////////////// Modals
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.modals = mr.modals || {};
 
     mr.modals.documentReady = function($){
@@ -1735,14 +1735,14 @@ mr = (function (mr, $, window, document){
             var modal        = $(this),
                 $window      = $(window),
                 modalContent = modal.find('.modal-content');
-                
-            
+
+
             if(!modal.find('.modal-close').length){
                 modal.find('.modal-content').append('<div class="modal-close modal-close-cross"></div>');
             }
 
             // Set modal height
-            
+
             if(modalContent.attr('data-width') !== undefined){
                 var modalWidth = modalContent.attr('data-width').substr(0,modalContent.attr('data-width').indexOf('%')) * 1;
                 modalContent.css('width',modalWidth + '%');
@@ -1763,39 +1763,39 @@ mr = (function (mr, $, window, document){
             var modal = modalInstance.find('.modal-container');
             var modalContent = modalInstance.find('.modal-content');
             var trigger = modalInstance.find('.modal-trigger');
-            
+
             // Link modal with modal-id attribute
-            
+
             trigger.attr('data-modal-index',index);
             modal.attr('data-modal-index',index);
-            
+
             // Set unique id for multiple triggers
-            
+
             if(typeof modal.attr('data-modal-id') !== typeof undefined){
                 trigger.attr('data-modal-id', modal.attr('data-modal-id'));
             }
-            
 
-            // Attach the modal to the body            
+
+            // Attach the modal to the body
             modal = modal.detach();
             mr.modals.allModalsContainer.append(modal);
         });
-        
+
 
         $('.modal-trigger').on('click', function(){
 
             var modalTrigger = $(this);
             var uniqueID, targetModal;
             // Determine if the modal id is set by user or is set programatically
-   
+
             if(typeof modalTrigger.attr('data-modal-id') !== typeof undefined){
                 uniqueID = modalTrigger.attr('data-modal-id');
-                targetModal = mr.modals.allModalsContainer.find('.modal-container[data-modal-id="'+uniqueID+'"]');    
+                targetModal = mr.modals.allModalsContainer.find('.modal-container[data-modal-id="'+uniqueID+'"]');
             }else{
                 uniqueID = $(this).attr('data-modal-index');
                 targetModal = mr.modals.allModalsContainer.find('.modal-container[data-modal-index="'+uniqueID+'"]');
             }
-            
+
             mr.util.activateIdleSrc(targetModal, 'iframe');
             mr.modals.autoplayVideo(targetModal);
 
@@ -1812,7 +1812,7 @@ mr = (function (mr, $, window, document){
             }
         });
 
-        $('.modal-container:not(.modal--prevent-close)').on('click', function(e) { 
+        $('.modal-container:not(.modal--prevent-close)').on('click', function(e) {
             if( e.target !== this ) return;
             mr.modals.closeActiveModal();
         });
@@ -1842,8 +1842,8 @@ mr = (function (mr, $, window, document){
                 delay = 0;
 
             if(modal.attr('data-delay')){
-                delay = parseInt(modal.attr('data-delay'), 10) || 0;  
-            } 
+                delay = parseInt(modal.attr('data-delay'), 10) || 0;
+            }
 
             // If a valid selector is found, attach leave event to show modal.
             if($(exitSelector).length){
@@ -1869,12 +1869,12 @@ mr = (function (mr, $, window, document){
             if($('[data-modal-id="'+modalID+'"]').length){
                 mr.modals.closeActiveModal();
                 mr.modals.showModal($('[data-modal-id="'+modalID+'"]'));
-            }  
+            }
         }
 
         jQuery(document).on('click','a[href^="#"]', function(){
             var modalID = $(this).attr('href').replace('#', '');
-            if($('[data-modal-id="'+modalID+'"]').length){    
+            if($('[data-modal-id="'+modalID+'"]').length){
                 mr.modals.closeActiveModal();
                 setTimeout(mr.modals.showModal, 500,'[data-modal-id="'+modalID+'"]', 0);
             }
@@ -1884,7 +1884,7 @@ mr = (function (mr, $, window, document){
         jQuery(document).on('wheel mousewheel scroll','.modal-content, .modal-content .scrollable', function(evt){
             if(evt.preventDefault){evt.preventDefault();}
             if(evt.stopPropagation){evt.stopPropagation();}
-            this.scrollTop += (evt.originalEvent.deltaY); 
+            this.scrollTop += (evt.originalEvent.deltaY);
         });
     };
     ////////////////
@@ -1892,9 +1892,9 @@ mr = (function (mr, $, window, document){
     ////////////////
 
     mr.modals.showModal = function(modal, millisecondsDelay){
-        
+
         var delay = (typeof millisecondsDelay !== typeof undefined) ? (1*millisecondsDelay) : 0, $modal = $(modal);
-            
+
         if($modal.length){
             setTimeout(function(){
                 var openEvent = document.createEvent('Event');
@@ -1906,7 +1906,7 @@ mr = (function (mr, $, window, document){
     };
 
     mr.modals.closeActiveModal = function(){
-        var modal      = jQuery('body div.modal-active'), 
+        var modal      = jQuery('body div.modal-active'),
             closeEvent = document.createEvent('Event');
 
         mr.util.idleSrc(modal, 'iframe');
@@ -1943,13 +1943,13 @@ mr = (function (mr, $, window, document){
 //////////////// Newsletter Providers
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.newsletters = mr.newsletters || {};
 
     mr.newsletters.documentReady = function($){
-  
+
   	var form,checkbox,label,id,parent,radio;
-    
+
     // Treat Campaign Monitor forms
     $('form[action*="createsend.com"]').each(function(){
     	form = $(this);
@@ -1966,13 +1966,13 @@ mr = (function (mr, $, window, document){
                     if($input.attr('placeholder') === ""){
                         if($input.siblings('label').length){
                             $input.attr('placeholder', $input.siblings('label').first().text());
-                            if(form.is('.form--no-labels')){   
+                            if(form.is('.form--no-labels')){
                                 $input.siblings('label').first().remove();
                             }
                         }
                     }
                 }else if($input.siblings('label').length){
-                    $input.attr('placeholder', $input.siblings('label').first().text()); 
+                    $input.attr('placeholder', $input.siblings('label').first().text());
                     if(form.is('.form--no-labels')){
                         $input.siblings('label').first().remove();
                     }
@@ -2003,7 +2003,7 @@ mr = (function (mr, $, window, document){
             if(!label.length){
                 label = $('<label for="'+id+'"></label>');
             }
-    		
+
     		checkbox.before('<div class="input-checkbox" data-id="'+id+'"></div>');
     		$('.input-checkbox[data-id="'+id+'"]').prepend(checkbox);
     		$('.input-checkbox[data-id="'+id+'"]').prepend(label);
@@ -2016,7 +2016,7 @@ mr = (function (mr, $, window, document){
                 button.unwrap();
             }
         });
-        
+
         form.find('[required]').attr('required', 'required').addClass('validate-required');
 
         form.addClass('form--active');
@@ -2041,13 +2041,13 @@ mr = (function (mr, $, window, document){
                     if($input.attr('placeholder') === ""){
                         if($input.siblings('label').length){
                             $input.attr('placeholder', $input.siblings('label').first().text());
-                            if(form.is('.form--no-labels')){   
+                            if(form.is('.form--no-labels')){
                                 $input.siblings('label').first().remove();
                             }
                         }
                     }
                 }else if($input.siblings('label').length){
-                    $input.attr('placeholder', $input.siblings('label').first().text()); 
+                    $input.attr('placeholder', $input.siblings('label').first().text());
                     if(form.is('.form--no-labels')){
                         $input.siblings('label').first().remove();
                     }
@@ -2102,9 +2102,9 @@ mr = (function (mr, $, window, document){
 
         form.find('input[type="submit"]').each(function(){
             var submit = $(this);
-            
+
             var newButton = jQuery('<button/>').attr('type','submit').attr('class', submit.attr('class')).addClass('btn').text(submit.attr('value'));
-            
+
             if(submit.parent().is('div.clear')){
                 submit.unwrap();
             }
@@ -2134,12 +2134,12 @@ mr = (function (mr, $, window, document){
 
         mr.newsletters.prepareAjaxAction(form);
 
-    }); 
+    });
 
 	// Reinitialize the forms so interactions work as they should
 
 	mr.forms.documentReady(mr.setContext('form.form--active'));
-		
+
   };
 
   mr.newsletters.prepareAjaxAction = function(form){
@@ -2173,18 +2173,18 @@ mr = (function (mr, $, window, document){
 //////////////// Notifications
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.notifications = mr.notifications || {};
 
     mr.notifications.documentReady = function($){
-        
+
         $('.notification').each(function(){
             var notification = $(this);
             if(!notification.find('.notification-close').length){
                 notification.append('<div class="notification-close-cross notification-close"></div>');
             }
         });
-    
+
 
         $('.notification[data-autoshow]').each(function(){
             var notification = $(this);
@@ -2223,7 +2223,7 @@ mr = (function (mr, $, window, document){
             var notificationLink = jQuery(this).closest('.notification').attr('data-notification-link');
             mr.notifications.closeNotification(notificationLink);
         });
-    
+
     };
 
 
@@ -2231,7 +2231,7 @@ mr = (function (mr, $, window, document){
         var $notification = jQuery(notification),
             delay         = (typeof millisecondsDelay !== typeof undefined) ? (1*millisecondsDelay) : 0,
             openEvent     = document.createEvent('Event');
-            
+
         setTimeout(function(){
             openEvent.initEvent('notificationOpened.notifications.mr', true, true);
             $notification.addClass('notification--reveal').trigger('notificationOpened.notifications.mr').get(0).dispatchEvent(openEvent);
@@ -2239,11 +2239,11 @@ mr = (function (mr, $, window, document){
             if($notification.find('input').length){
                 $notification.find('input').first().focus();
             }
-            
+
 
 
         },delay);
-        // If notification has autohide attribute, set a timeout 
+        // If notification has autohide attribute, set a timeout
         // for the autohide time plus the original delay time in case notification was called
         // on page load
         if(notification.is('[data-autohide]')){
@@ -2257,12 +2257,12 @@ mr = (function (mr, $, window, document){
     mr.notifications.closeNotification = function(notification){
         var $notification = jQuery(notification),
             closeEvent    = document.createEvent('Event');
-        notification = $notification.is('.notification') ? 
+        notification = $notification.is('.notification') ?
                        $notification :
-                       $notification.is('.notification-close') ? 
-                       $notification.closest('.notification') : 
+                       $notification.is('.notification-close') ?
+                       $notification.closest('.notification') :
                        $('.notification[data-notification-link="'+notification+'"]');
-        
+
         closeEvent.initEvent('notificationClosed.notifications.mr', true, true);
         notification.addClass('notification--dismissed').trigger('notificationClosed.notifications.mr').get(0).dispatchEvent(closeEvent);
         notification.closest('nav').removeClass('notification--reveal');
@@ -2281,12 +2281,12 @@ mr = (function (mr, $, window, document){
 //////////////// Parallax
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.parallax = mr.parallax || {};
 
     mr.parallax.documentReady = function($){
-        
-        var $window      = $(window); 
+
+        var $window      = $(window);
         var windowWidth  = $window.width();
         var windowHeight = $window.height();
         var navHeight    = $('nav').outerHeight(true);
@@ -2300,8 +2300,8 @@ mr = (function (mr, $, window, document){
                 parallaxHeroImage.css('height', windowHeight + navHeight);
             }
         }
-    };     
-    
+    };
+
     mr.parallax.update = function(){
         if(typeof mr_parallax !== typeof undefined){
             mr_parallax.profileParallaxElements();
@@ -2317,7 +2317,7 @@ mr = (function (mr, $, window, document){
 //////////////// Progress Horizontal (bars)
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.progressHorizontal = mr.progressHorizontal || {};
 
     mr.progressHorizontal.documentReady = function($){
@@ -2398,7 +2398,7 @@ mr = (function (mr, $, window, document){
 
 		  		chart.css('height',pieSize).css('width',pieSize);
 
-          
+
 
 		  		if(typeof mr.easypiecharts.options === 'object'){
             options = jQuery.extend({}, defaults, mr.easypiecharts.options, attributeOverrides);
@@ -2419,7 +2419,7 @@ mr = (function (mr, $, window, document){
 	  mr.easypiecharts.init = function($){
 
 			mr.easypiecharts.pies = [];
-          
+
 			$('.radial').each(function(){
 			  var pieObject  = {},
 				  currentPie = jQuery(this);
@@ -2437,7 +2437,7 @@ mr = (function (mr, $, window, document){
 			mr.easypiecharts.pies.forEach(function(pie){
 				if(Math.round((mr.scroll.y + mr.window.height)) >= Math.round(pie.top+pie.height)){
 					if(pie.active === false){
-						
+
 	                	pie.element.data('easyPieChart').enableAnimation();
 	                	pie.element.data('easyPieChart').update(pie.value);
 	                	pie.element.addClass('radial--active');
@@ -2452,93 +2452,26 @@ mr = (function (mr, $, window, document){
 
 }(mr, jQuery, window, document));
 
-//////////////// Flickity
-mr = (function (mr, $, window, document){
-    "use strict";
-    
-    mr.sliders = mr.sliders || {};
-
-    mr.sliders.documentReady = function($){
-
-        $('.slider').each(function(index){
-            
-            var slider = $(this);
-            var sliderInitializer = slider.find('ul.slides');
-            sliderInitializer.find('>li').addClass('slide');
-            var childnum = sliderInitializer.find('li').length;
-            
-            var themeDefaults = {
-                cellSelector: '.slide',
-                cellAlign: 'left',
-                wrapAround: true,
-                pageDots: false,
-                prevNextButtons: false,
-                autoPlay: true,
-                draggable: (childnum < 2 ? false: true),
-                imagesLoaded: true,
-                accessibility: true,
-                rightToLeft: false,
-                initialIndex: 0,
-                freeScroll: false
-            }; 
-
-            // Attribute Overrides - options that are overridden by data attributes on the slider element
-            var ao = {};
-            ao.pageDots = (slider.attr('data-paging') === 'true' && sliderInitializer.find('li').length > 1) ? true : undefined;
-            ao.prevNextButtons = slider.attr('data-arrows') === 'true'? true: undefined;
-            ao.draggable = slider.attr('data-draggable') === 'false'? false : undefined;
-            ao.autoPlay = slider.attr('data-autoplay') === 'false'? false: (slider.attr('data-timing') ? parseInt(slider.attr('data-timing'), 10): undefined);
-            ao.accessibility = slider.attr('data-accessibility') === 'false'? false : undefined;
-            ao.rightToLeft = slider.attr('data-rtl') === 'true'? true : undefined;
-            ao.initialIndex = slider.attr('data-initial') ? parseInt(slider.attr('data-initial'), 10) : undefined;
-            ao.freeScroll = slider.attr('data-freescroll') === "true" ? true: undefined;
-
-            // Set data attribute to inidicate the number of children in the slider
-            slider.attr('data-children',childnum);
-
-            
-            $(this).data('sliderOptions', jQuery.extend({}, themeDefaults, mr.sliders.options, ao));
-
-            $(sliderInitializer).flickity($(this).data('sliderOptions'));
-
-            $(sliderInitializer).on( 'scroll.flickity', function( event, progress ) {
-              if(slider.find('.is-selected').hasClass('controls--dark')){
-                slider.addClass('controls--dark');
-              }else{
-                slider.removeClass('controls--dark'); 
-              }
-            });
-        });
-
-        if(mr.parallax.update){ mr.parallax.update(); }
-        
-    };
-
-    mr.components.documentReadyDeferred.push(mr.sliders.documentReady);
-    return mr;
-
-}(mr, jQuery, window, document));
-
 //////////////// Smoothscroll
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.smoothscroll = mr.smoothscroll || {};
     mr.smoothscroll.sections = [];
-    
+
     mr.smoothscroll.init = function(){
         mr.smoothscroll.sections = [];
 
-       
+
 
         $('a.inner-link').each(function(){
             var sectionObject = {},
                 link          = $(this),
                 href          = link.attr('href'),
                 validLink     = new RegExp('^#[^\r\n\t\f\v\#\.]+$','gm');
-                            
+
             if(validLink.test(href)){
-                
+
                 if($('section'+href).length){
 
                     sectionObject.id     = href;
@@ -2601,8 +2534,8 @@ mr = (function (mr, $, window, document){
                 offset = offset*1;
             }
 
-            ao.offset = offset !== 0 ? offset: undefined; 
-            
+            ao.offset = offset !== 0 ? offset: undefined;
+
             smoothScroll.init(jQuery.extend({}, themeDefaults, mr.smoothscroll.options, ao));
         }
     };
@@ -2618,7 +2551,7 @@ mr = (function (mr, $, window, document){
     "use strict";
 
     mr.tabs = mr.tabs || {};
-    
+
     mr.tabs.documentReady = function($){
         $('.tabs').each(function(){
             var tabs = $(this);
@@ -2631,7 +2564,7 @@ mr = (function (mr, $, window, document){
                 currentTab.closest('.tabs-container').find('.tabs-content').append(tabContentClone);
             });
         });
-        
+
         $('.tabs > li').on('click', function(){
             var clickedTab = $(this), hash;
             mr.tabs.activateTab(clickedTab);
@@ -2677,11 +2610,11 @@ mr = (function (mr, $, window, document){
 
         tabContainer.find('> .tabs > li').removeClass('active');
         tabContainer.find('> .tabs-content > li').removeClass('active');
-        
+
         clickedTab.addClass('active').trigger('tabOpened.tabs.mr').get(0).dispatchEvent(openEvent);
         activeContent.addClass('active');
 
-        
+
 
         // If there is an <iframe> element in the tab, reload its content when the tab is made active.
         iframe = activeContent.find('iframe');
@@ -2708,14 +2641,14 @@ mr = (function (mr, $, window, document){
 //////////////// Toggle Class
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.toggleClass = mr.toggleClass || {};
-    
+
     mr.toggleClass.documentReady = function($){
         $('[data-toggle-class]').each(function(){
         	var element = $(this),
                 data    = element.attr('data-toggle-class').split("|");
-        		
+
 
             $(data).each(function(){
                 var candidate     = element,
@@ -2751,9 +2684,9 @@ mr = (function (mr, $, window, document){
 //////////////// Typed Headline Effect
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.typed = mr.typed || {};
-    
+
 
     mr.typed.documentReady = function($){
         $('.typed-text').each(function(){
@@ -2769,7 +2702,7 @@ mr = (function (mr, $, window, document){
             ao.strings = text.attr("data-typed-strings") ? text.attr("data-typed-strings").split(",") : undefined;
 
             $(text).typed(jQuery.extend({}, themeDefaults, mr.typed.options, ao));
-            
+
         });
     };
 
@@ -2781,7 +2714,7 @@ mr = (function (mr, $, window, document){
 //////////////// Twitter Feeds
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.twitter = mr.twitter || {};
     mr.twitter.options = mr.twitter.options || {};
 
@@ -2790,7 +2723,7 @@ mr = (function (mr, $, window, document){
             $(this).attr('id', 'tweets-' + index);
         }).each(function(index) {
             var element = $('#tweets-' + index);
-            
+
             var TweetConfig = {
                "domId": '',
                "maxTweets": 6,
@@ -2803,7 +2736,7 @@ mr = (function (mr, $, window, document){
             };
 
             TweetConfig = jQuery.extend(TweetConfig, mr.twitter.options);
-           
+
 
 
             if(typeof element.attr('data-widget-id') !== typeof undefined){
@@ -2816,7 +2749,7 @@ mr = (function (mr, $, window, document){
                 TweetConfig.profile = {"screenName": 'twitter'};
             }
 
-            TweetConfig.maxTweets = element.attr('data-amount') ? element.attr('data-amount'): TweetConfig.maxTweets; 
+            TweetConfig.maxTweets = element.attr('data-amount') ? element.attr('data-amount'): TweetConfig.maxTweets;
 
             if(element.closest('.twitter-feed--slider').length){
                 element.addClass('slider');
@@ -2832,11 +2765,11 @@ mr = (function (mr, $, window, document){
                 }
                 html += '</ul>';
                 element.html(html);
-                
+
                 // Initialize twitter feed slider
                 if(element.closest('.slider').length){
                     mr.sliders.documentReady(mr.setContext());
-                     
+
                     return html;
                 }
             }
@@ -2852,13 +2785,13 @@ mr = (function (mr, $, window, document){
 //////////////// Video
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.video = mr.video || {};
     mr.video.options = mr.video.options || {};
     mr.video.options.ytplayer = mr.video.options.ytplayer || {};
-    
+
 	  mr.video.documentReady = function($){
-	      
+
 			//////////////// Youtube Background
 
 			if($('.youtube-background').length){
@@ -2866,7 +2799,7 @@ mr = (function (mr, $, window, document){
 
 
 					var player = $(this),
-					
+
 					themeDefaults = {
 						containment: "self",
 						autoPlay: true,
@@ -2883,14 +2816,14 @@ mr = (function (mr, $, window, document){
 					player.YTPlayer(jQuery.extend({}, themeDefaults, mr.video.options.ytplayer, ao));
 					player.on("YTPStart",function(){
 				  		player.closest('.videobg').addClass('video-active');
-					});	
+					});
 
 				});
 			}
 
 			if($('.videobg').find('video').length){
 				$('.videobg').find('video').closest('.videobg').addClass('video-active');
-			} 
+			}
 
 			//////////////// Video Cover Play Icons
 
@@ -2927,28 +2860,28 @@ mr = (function (mr, $, window, document){
 //////////////// Wizard
 mr = (function (mr, $, window, document){
     "use strict";
-    
+
     mr.wizard = mr.wizard || {};
 
 	  mr.wizard.documentReady = function($){
 
 			$('.wizard').each(function(){
 				var wizard = jQuery(this), themeDefaults = {};
- 
+
         themeDefaults = {
 					headerTag: "h5",
 				  bodyTag: "section",
 					transitionEffect: "slideLeft",
 					autoFocus: true
-				}      
-				
+				}
 
-				if(!wizard.is('[role="application"][id^="steps-uid"]')){  	
+
+				if(!wizard.is('[role="application"][id^="steps-uid"]')){
 						wizard.steps(jQuery.extend({}, themeDefaults, mr.wizard.options));
-		
+
 		   	    wizard.addClass('active');
 		    }
-				
+
 		  });
 		};
 
