@@ -1628,7 +1628,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <pre data-bind="visible:!properties.plan || !properties.plan().plan_json || !properties.plan().plan_json.plan_nodes.length" >${ _('The selected tab has no data') }</pre>
         </div>
         <div class="tab-pane" id="queries-page-stmt${ SUFFIX }" data-profile="plan">
-          <pre data-bind="text: (properties.plan && properties.plan().stmt) || _('The selected tab has no data')"/>
+          <pre data-bind="highlight: { value: (properties.plan && properties.plan().stmt) || _('The selected tab has no data'), formatted: true, dialect: 'impala' }"/>
         </div>
         <div class="tab-pane" id="queries-page-plan-text${ SUFFIX }" data-profile="plan">
           <pre data-bind="text: (properties.plan && properties.plan().plan) || _('The selected tab has no data')"/>
