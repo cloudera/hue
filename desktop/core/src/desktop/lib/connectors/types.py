@@ -50,6 +50,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': True,
       'has_optimizer_values': True,
       'has_auto_limit': False,
+      'has_reference_language': True,
+      'has_reference_functions': True,
     }
   },
   {
@@ -74,6 +76,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': True,
       'has_optimizer_values': True,
       'has_auto_limit': False,
+      'has_reference_language': True,
+      'has_reference_functions': True,
     }
   },
   {
@@ -98,6 +102,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': True,
       'has_optimizer_values': True,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -122,6 +128,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': False,
       'has_optimizer_values': False,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -146,6 +154,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': True,
       'has_optimizer_values': True,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -170,6 +180,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': True,
       'has_optimizer_values': True,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -194,6 +206,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': True,
       'has_optimizer_values': True,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -218,6 +232,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': True,
       'has_optimizer_values': True,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -242,6 +258,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': False,
       'has_optimizer_values': False,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -266,6 +284,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': False,
       'has_optimizer_values': False,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -290,6 +310,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': False,
       'has_optimizer_values': False,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -314,6 +336,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': False,
       'has_optimizer_values': False,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -339,6 +363,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': True,
       'has_optimizer_values': True,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -361,6 +387,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': False,
       'has_optimizer_values': False,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -383,6 +411,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': False,
       'has_optimizer_values': False,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -405,6 +435,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': False,
       'has_optimizer_values': False,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -427,6 +459,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': False,
       'has_optimizer_values': False,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -451,6 +485,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': False,
       'has_optimizer_values': False,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -475,6 +511,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': False,
       'has_optimizer_values': False,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -499,6 +537,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': False,
       'has_optimizer_values': False,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
   {
@@ -526,6 +566,8 @@ CONNECTOR_TYPES = [
       'has_optimizer_risks': False,
       'has_optimizer_values': False,
       'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
     }
   },
 
