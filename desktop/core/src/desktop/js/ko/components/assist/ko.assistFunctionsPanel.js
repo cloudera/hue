@@ -22,6 +22,10 @@ import huePubSub from 'utils/huePubSub';
 import { PigFunctions, SqlFunctions } from 'sql/sqlFunctions';
 import I18n from 'utils/i18n';
 import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
+import {
+  ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT,
+  GET_ACTIVE_SNIPPET_DIALECT_EVENT
+} from 'apps/notebook2/events';
 
 // prettier-ignore
 const TEMPLATE = `
@@ -29,7 +33,7 @@ const TEMPLATE = `
     <div class="assist-flex-panel">
       <div class="assist-flex-header">
         <div class="assist-inner-header">
-          <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { fixedPosition: true, value: activeType, entries: availableTypes, linkTitle: '${I18n(
+          <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { fixedPosition: true, value: activeDialect, entries: availableDialects, linkTitle: '${I18n(
             'Selected dialect'
           )}' } }" style="display: inline-block"></div>
         </div>
@@ -87,16 +91,16 @@ class AssistFunctionsPanel {
     this.categories = {};
     this.disposals = [];
 
-    this.activeType = ko.observable();
-    this.availableTypes = ko.observableArray();
+    this.activeDialect = ko.observable();
+    this.availableDialects = ko.observableArray();
 
     this.query = ko.observable().extend({ rateLimit: 400 });
     this.selectedFunction = ko.observable();
 
-    const selectedFunctionPerType = {};
+    const selectedFunctionPeDialect = {};
     this.selectedFunction.subscribe(newFunction => {
       if (newFunction) {
-        selectedFunctionPerType[this.activeType()] = newFunction;
+        selectedFunctionPeDialect[this.activeDialect()] = newFunction;
         if (!newFunction.category.open()) {
           newFunction.category.open(true);
         }
@@ -148,19 +152,19 @@ class AssistFunctionsPanel {
       return result;
     });
 
-    this.activeType.subscribe(newType => {
-      if (newType) {
-        this.selectedFunction(selectedFunctionPerType[newType]);
-        this.activeCategories(this.categories[newType]);
-        apiHelper.setInTotalStorage('assist', 'function.panel.active.type', newType);
+    this.activeDialect.subscribe(newDialect => {
+      if (newDialect) {
+        this.selectedFunction(selectedFunctionPeDialect[newDialect]);
+        this.activeCategories(this.categories[newDialect]);
+        apiHelper.setInTotalStorage('assist', 'function.panel.active.dialect', newDialect);
       }
     });
 
-    const updateType = type => {
-      this.availableTypes().every(availableType => {
-        if (availableType.toLowerCase() === type) {
-          if (this.activeType() !== availableType) {
-            this.activeType(availableType);
+    const updateDialect = dialect => {
+      this.availableDialects().every(availableDialect => {
+        if (availableDialect.toLowerCase() === dialect) {
+          if (this.activeDialect() !== availableDialect) {
+            this.activeDialect(availableDialect);
           }
           return false;
         }
@@ -168,49 +172,54 @@ class AssistFunctionsPanel {
       });
     };
 
-    const activeSnippetTypeSub = huePubSub.subscribe('active.snippet.type.changed', details => {
-      updateType(details.type);
-    });
+    const activeSnippetDialectSub = huePubSub.subscribe(
+      ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT,
+      details => {
+        updateDialect(details.dialect);
+      }
+    );
 
     const configUpdated = config => {
-      const lastActiveType =
-        this.activeType() || apiHelper.getFromTotalStorage('assist', 'function.panel.active.type');
+      const lastActiveDialect =
+        this.activeDialect() ||
+        apiHelper.getFromTotalStorage('assist', 'function.panel.active.dialect');
       if (config.app_config && config.app_config.editor && config.app_config.editor.interpreters) {
-        const typesIndex = {};
+        const dialectIndex = {};
         config.app_config.editor.interpreters.forEach(interpreter => {
           if (
-            interpreter.type === 'hive' ||
-            interpreter.type === 'impala' ||
-            interpreter.type === 'pig'
+            interpreter.dialect === 'hive' ||
+            interpreter.dialect === 'impala' ||
+            interpreter.dialect === 'pig'
           ) {
-            typesIndex[interpreter.type] = true;
+            dialectIndex[interpreter.dialect] = true;
           }
         });
-        this.availableTypes(Object.keys(typesIndex).sort());
+        this.availableDialects(Object.keys(dialectIndex).sort());
 
-        this.availableTypes().forEach(type => {
-          this.initFunctions(type);
+        this.availableDialects().forEach(dialect => {
+          this.initFunctions(dialect);
         });
 
-        if (lastActiveType && typesIndex[lastActiveType]) {
-          this.activeType(lastActiveType);
+        if (lastActiveDialect && dialectIndex[lastActiveDialect]) {
+          this.activeDialect(lastActiveDialect);
         } else {
-          this.activeType(this.availableTypes().length ? this.availableTypes()[0] : undefined);
+          this.activeDialect(
+            this.availableDialects().length ? this.availableDialects()[0] : undefined
+          );
         }
       } else {
-        this.availableTypes([]);
+        this.availableDialects([]);
       }
+      huePubSub.publish(GET_ACTIVE_SNIPPET_DIALECT_EVENT, updateDialect);
     };
 
     huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
     const configSub = huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
 
     this.disposals.push(() => {
-      activeSnippetTypeSub.remove();
+      activeSnippetDialectSub.remove();
       configSub.remove();
     });
-
-    huePubSub.publish('get.active.snippet.type', updateType);
   }
 
   dispose() {

@@ -1,4 +1,5 @@
-export const ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT = 'active.snippet.type.changed';
+export const ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT = 'active.snippet.dialect.changed';
+export const GET_ACTIVE_SNIPPET_DIALECT_EVENT = 'get.active.snippet.dialect';
 export const REDRAW_CHART_EVENT = 'result.chart.redraw';
 export const HIDE_FIXED_HEADERS_EVENT = 'result.grid.hide.fixed.headers';
 export const REDRAW_FIXED_HEADERS_EVENT = 'result.grid.redraw.fixed.headers';

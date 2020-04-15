@@ -22,6 +22,10 @@ import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
 import { simpleGet } from 'api/apiUtils';
+import {
+  ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT,
+  GET_ACTIVE_SNIPPET_DIALECT_EVENT
+} from 'apps/notebook2/events';
 
 // prettier-ignore
 const TEMPLATE = `
@@ -145,9 +149,12 @@ class AssistLangRefPanel {
       }
     };
 
-    const activeSnippetTypeSub = huePubSub.subscribe('active.snippet.type.changed', details => {
-      updateType(details.type);
-    });
+    const activeSnippetTypeSub = huePubSub.subscribe(
+      ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT,
+      details => {
+        updateType(details.dialect);
+      }
+    );
 
     const configUpdated = config => {
       const lastActiveType = this.sourceType();
@@ -178,7 +185,7 @@ class AssistLangRefPanel {
       activeSnippetTypeSub.remove();
     });
 
-    huePubSub.publish('get.active.snippet.type', updateType);
+    huePubSub.publish(GET_ACTIVE_SNIPPET_DIALECT_EVENT, updateType);
 
     this.topics = ko.pureComputed(() => {
       return this.sourceType() ? this.allTopics[this.sourceType()] : [];

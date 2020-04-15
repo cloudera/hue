@@ -32,8 +32,7 @@ import {
   REDRAW_FIXED_HEADERS_EVENT,
   SHOW_GRID_SEARCH_EVENT,
   SHOW_NORMAL_RESULT_EVENT,
-  REDRAW_CHART_EVENT,
-  ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT
+  REDRAW_CHART_EVENT
 } from 'apps/notebook2/events';
 import { DIALECT } from 'apps/notebook2/snippet';
 

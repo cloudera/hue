@@ -25,6 +25,10 @@ import hueUtils from 'utils/hueUtils';
 
 import Notebook from 'apps/notebook/notebook';
 import Snippet from 'apps/notebook/snippet';
+import {
+  ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT,
+  GET_ACTIVE_SNIPPET_DIALECT_EVENT
+} from 'apps/notebook2/events';
 
 class EditorViewModel {
   constructor(editor_id, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -299,14 +303,10 @@ class EditorViewModel {
     });
 
     huePubSub.subscribe(
-      'get.active.snippet.type',
+      GET_ACTIVE_SNIPPET_DIALECT_EVENT,
       callback => {
         withActiveSnippet(activeSnippet => {
-          if (callback) {
-            callback(activeSnippet.type());
-          } else {
-            huePubSub.publish('set.active.snippet.type', activeSnippet.type());
-          }
+          callback(activeSnippet.type()); // Dialect = type in editor v1
         });
       },
       self.huePubSubId
@@ -566,8 +566,8 @@ class EditorViewModel {
               if (self.editorMode()) {
                 self.editorType(data.document.type.substring('query-'.length));
                 if (!self.isNotificationManager()) {
-                  huePubSub.publish('active.snippet.type.changed', {
-                    type: self.editorType(),
+                  huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
+                    dialect: self.editorType(),
                     isSqlDialect: self.getSnippetViewSettings(self.editorType()).sqlDialect
                   });
                 }
@@ -594,8 +594,8 @@ class EditorViewModel {
 
     self.newNotebook = function(editorType, callback, queryTab) {
       if (!self.isNotificationManager()) {
-        huePubSub.publish('active.snippet.type.changed', {
-          type: editorType,
+        huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
+          dialect: editorType,
           isSqlDialect: editorType ? self.getSnippetViewSettings(editorType).sqlDialect : undefined
         });
       }
@@ -624,8 +624,8 @@ class EditorViewModel {
               hueUtils.changeURLParameter('type', self.editorType());
             }
             if (!self.isNotificationManager()) {
-              huePubSub.publish('active.snippet.type.changed', {
-                type: editorType,
+              huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
+                dialect: editorType,
                 isSqlDialect: editorType
                   ? self.getSnippetViewSettings(editorType).sqlDialect
                   : undefined

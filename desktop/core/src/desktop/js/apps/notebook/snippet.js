@@ -30,6 +30,7 @@ import Session from 'apps/notebook/session';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
 import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistModal';
 import { cancelActiveRequest } from 'api/apiUtils';
+import { ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT } from 'apps/notebook2/events';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -235,8 +236,8 @@ class Snippet {
 
     self.inFocus.subscribe(newValue => {
       if (newValue) {
-        huePubSub.publish('active.snippet.type.changed', {
-          type: self.type(),
+        huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
+          dialect: self.type(),
           isSqlDialect: self.isSqlDialect()
         });
       }
