@@ -30,7 +30,7 @@ describe('ko.assistLangRefPanel.js', () => {
         cb({
           app_config: {
             editor: {
-              interpreters: [{ type: 'hive' }, { type: 'impala' }, { type: 'banana' }]
+              interpreters: [{ dialect: 'hive' }, { dialect: 'impala' }, { dialect: 'banana' }]
             }
           }
         });
@@ -40,31 +40,31 @@ describe('ko.assistLangRefPanel.js', () => {
     const subject = new AssistLangRefPanel();
 
     expect(spy).toHaveBeenCalled();
-    expect(subject.availableTypes()).toEqual(['hive', 'impala']);
+    expect(subject.availableDialects()).toEqual(['hive', 'impala']);
 
     spy.mockRestore();
 
     huePubSub.publish(CONFIG_REFRESHED_EVENT, {
       app_config: {
         editor: {
-          interpreters: [{ type: 'impala' }]
+          interpreters: [{ dialect: 'impala' }]
         }
       }
     });
 
-    expect(subject.availableTypes()).toEqual(['impala']);
-    expect(subject.sourceType()).toEqual('impala');
+    expect(subject.availableDialects()).toEqual(['impala']);
+    expect(subject.activeDialect()).toEqual('impala');
 
     huePubSub.publish(CONFIG_REFRESHED_EVENT, {
       app_config: {
         editor: {
-          interpreters: [{ type: 'banana' }]
+          interpreters: [{ dialect: 'banana' }]
         }
       }
     });
 
-    expect(subject.availableTypes()).toEqual([]);
-    expect(subject.sourceType()).toBeFalsy();
+    expect(subject.availableDialects()).toEqual([]);
+    expect(subject.activeDialect()).toBeFalsy();
 
     subject.dispose();
   });
