@@ -338,6 +338,7 @@ def get_interpreter(connector_type, user=None):
   interpreter = [
     interpreter for interpreter in get_ordered_interpreters(user) if connector_type == interpreter['type']
   ]
+
   if not interpreter:
     if connector_type == 'hbase': # TODO move to connectors
       interpreter = [{
@@ -371,6 +372,18 @@ def get_interpreter(connector_type, user=None):
   return interpreter[0]
 
 
+def patch_snippet_for_connector(snippet):
+  """
+  Connector backward compatibility switcher.
+  # TODO Connector unification
+  """
+  if snippet.get('connector') and snippet['connector'].get('type'):
+    snippet['type'] = snippet['connector']['type']  # To rename to 'id'
+    snippet['dialect'] = snippet['connector']['dialect']
+  else:
+    snippet['dialect'] = snippet['type']
+
+
 def get_api(request, snippet):
   from notebook.connectors.oozie_batch import OozieApi
 
@@ -380,11 +393,9 @@ def get_api(request, snippet):
   if snippet.get('type') == 'report':
     snippet['type'] = 'impala'
 
-  if snippet.get('connector') and snippet['connector'].get('type'):  # TODO Connector unification
-    connector_name = snippet['connector']['type']  # Ideally unify with name and nice_name
-    snippet['type'] = connector_name
-  else:
-    connector_name = snippet['type']
+  patch_snippet_for_connector(snippet)
+
+  connector_name = snippet['type']
 
   if has_connectors() and snippet.get('type') == 'hello' and is_admin(request.user):
     interpreter = snippet.get('interpreter')
@@ -549,8 +560,9 @@ class Api(object):
     query = response['statement']
 
     client = get_optimizer_api(self.user, interface)
+    patch_snippet_for_connector(snippet)
 
-    return client.query_risk(query=query, source_platform=snippet['type'], db_name=snippet.get('database') or 'default')
+    return client.query_risk(query=query, source_platform=snippet['dialect'], db_name=snippet.get('database') or 'default')
 
   def statement_compatibility(self, interface, notebook, snippet, source_platform, target_platform):
     response = self._get_current_statement(notebook, snippet)
@@ -645,12 +657,16 @@ class ExecutionWrapper(object):
 
   def fetch(self, handle, start_over=None, rows=None):
     if start_over:
-      if not self.snippet['result'].get('handle') or not self.snippet['result']['handle'].get('guid') or not self.api.can_start_over(self.notebook, self.snippet):
+      if not self.snippet['result'].get('handle') \
+          or not self.snippet['result']['handle'].get('guid') \
+          or not self.api.can_start_over(self.notebook, self.snippet):
         start_over = False
         handle = self.api.execute(self.notebook, self.snippet)
         self.snippet['result']['handle'] = handle
+
         if self.callback and hasattr(self.callback, 'on_execute'):
           self.callback.on_execute(handle)
+
         self.should_close = True
         self._until_available()
 

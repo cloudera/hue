@@ -1421,7 +1421,11 @@ class AutocompleteResults {
           .done(multiTableEntry => {
             self.cancellablePromises.push(
               multiTableEntry
-                .getTopJoins({ silenceErrors: true, cancellable: true })
+                .getTopJoins({
+                  silenceErrors: true,
+                  cancellable: true,
+                  connector: self.snippet.connector()
+                })
                 .done(topJoins => {
                   const joinSuggestions = [];
                   let totalCount = 0;

@@ -73,10 +73,30 @@ import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and
 import HueFileEntry from 'doc/hueFileEntry';
 import HueDocument from 'doc/hueDocument';
 import { REFRESH_CONFIG_EVENT } from 'utils/hueConfig';
+import { simpleGet } from 'api/apiUtils'; // In analytics.mako, metrics.mako, threads.mako
+
+// import all the other Vue SFCs here
+// and then create as many instances of Vue as needed.
+// NOTE: given the nature of the project, Vue should be referenced after the page load
+//
+// import Vue from 'vue';
+// import TrademarkBanner from 'vue/components/login/TrademarkBanner.vue';
+// window.addEventListener('DOMContentLoaded', () => {
+//   new Vue({
+//     el: '#vue-element-id',
+//     components: {
+//       TrademarkBanner
+//     },
+//     data: {
+//       message: 'Hello VueHue!'
+//     }
+//   });
+// });
 
 // TODO: Migrate away
 window._ = _;
 window.apiHelper = apiHelper;
+window.simpleGet = simpleGet;
 window.CancellablePromise = CancellablePromise;
 window.contextCatalog = contextCatalog;
 window.d3 = d3;

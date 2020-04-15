@@ -77,57 +77,13 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Hive Tez",
-    'dialect': 'hive',
-    'interface': 'hiveserver2',
-    'settings': [
-      {'name': 'server_host', 'value': ''},
-      {'name': 'server_port', 'value': ''},
-    ],
-    'category': 'editor',
-    'description': '',
-    'properties': {
-      'is_sql': True,
-      'sql_identifier_quote': '`',
-      'sql_identifier_comment_single': '--',
-      'has_catalog': False,
-      'has_database': True,
-      'has_table': True,
-      'has_live_queries': False,
-      'has_optimizer_risks': True,
-      'has_optimizer_values': True,
-      'has_auto_limit': False,
-    }
-  },
-  {
-    'nice_name': "Hive LLAP",
-    'dialect': 'hive',
-    'interface': 'hiveserver2',
-    'settings': [
-      {'name': 'server_host', 'value': ''},
-      {'name': 'server_port', 'value': ''},
-    ],
-    'category': 'editor',
-    'description': '',
-    'properties': {
-      'is_sql': True,
-      'sql_identifier_quote': '`',
-      'sql_identifier_comment_single': '--',
-      'has_catalog': False,
-      'has_database': True,
-      'has_table': True,
-      'has_live_queries': False,
-      'has_optimizer_risks': True,
-      'has_optimizer_values': True,
-      'has_auto_limit': False,
-    }
-  },
-  {
     'nice_name': "Druid",
     'dialect': 'druid',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}
+      {'name': 'url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
     'description': '',
@@ -145,11 +101,13 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Kafka SQL",
+    'nice_name': "ksqlDB",
     'dialect': 'ksql',
     'interface': 'ksql',
     'settings': [
-      {'name': 'url', 'value': 'http://localhost:8088'}
+      {'name': 'url', 'value': 'http://localhost:8088'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
     'description': '',
@@ -171,7 +129,9 @@ CONNECTOR_TYPES = [
     'dialect': 'flink',
     'interface': 'flink',
     'settings': [
-      {'name': 'api_url', 'value': 'http://flink:10000'}
+      {'name': 'api_url', 'value': 'http://flink:10000'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
     'description': '',
@@ -192,7 +152,11 @@ CONNECTOR_TYPES = [
     'nice_name': "SparkSQL",
     'dialect': 'sparksql',
     'interface': 'sqlalchemy',
-    'settings': [],
+    'settings': [
+      {'name': 'api_url', 'value': 'http://sparksql-thrift-server:10000'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
+    ],
     'category': 'editor',
     'description': '',
     'properties': {
@@ -209,11 +173,37 @@ CONNECTOR_TYPES = [
     }
   },
   {
+    'nice_name': "Phoenix SQL",
+    'dialect': 'phoenix',
+    'interface': 'sqlalchemy',
+    'settings': [
+      {'name': 'url', 'value': 'phoenix://sql-phoenix.com:8765/'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': False,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+    }
+  },
+  {
     'nice_name': "MySQL",
     'dialect': 'mysql',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'mysql://username:password@mysq-host:3306/hue'}
+      {'name': 'url', 'value': 'mysql://username:password@mysq-host:3306/hue'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
     'description': '',
@@ -235,7 +225,9 @@ CONNECTOR_TYPES = [
     'dialect': 'postgresql',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'postgresql://username:password@host:5432/hue'}
+      {'name': 'url', 'value': 'postgresql://username:password@host:5432/hue'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
     'description': '',
@@ -257,7 +249,9 @@ CONNECTOR_TYPES = [
     'dialect': 'presto',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'presto://host:8080/tpch'}
+      {'name': 'url', 'value': 'presto://host:8080/tpch'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
     'description': '',
@@ -275,11 +269,13 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Elastic Search",
+    'nice_name': "Elasticsearch SQL",
     'dialect': 'elasticsearch',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'elasticsearch+http://localhost:9200/'}
+      {'name': 'url', 'value': 'elasticsearch+http://localhost:9200/'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
     'description': '',
@@ -303,6 +299,8 @@ CONNECTOR_TYPES = [
     'settings': [
       {'name': 'server_host', 'value': ''},
       {'name': 'server_port', 'value': ''},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
     'description': '',
@@ -324,7 +322,7 @@ CONNECTOR_TYPES = [
     'dialect': 'athena',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'awsathena+rest://XXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch'}
+      {'name': 'url', 'value': 'awsathena+rest://XXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch'},
     ],
     'category': 'editor',
     'description': '',
@@ -346,7 +344,7 @@ CONNECTOR_TYPES = [
     'dialect': 'redshift',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'edshift+psycopg2://username@host.amazonaws.com:5439/database'}
+      {'name': 'url', 'value': 'edshift+psycopg2://username@host.amazonaws.com:5439/database'},
     ],
     'category': 'editor',
     'description': '',
@@ -368,7 +366,7 @@ CONNECTOR_TYPES = [
     'dialect': 'snowflake',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'snowflake://{user}:{password}@{account}/{database}'}
+      {'name': 'url', 'value': 'snowflake://{user}:{password}@{account}/{database}'},
     ],
     'category': 'editor',
     'description': '',
@@ -390,7 +388,7 @@ CONNECTOR_TYPES = [
     'dialect': 'bigquery',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'bigquery://projectName/datasetName'}
+      {'name': 'url', 'value': 'bigquery://projectName/datasetName'},
     ],
     'category': 'editor',
     'description': '',
@@ -412,7 +410,9 @@ CONNECTOR_TYPES = [
     'dialect': 'oracle',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'oracle://scott:tiger@dsn'}
+      {'name': 'url', 'value': 'oracle://scott:tiger@dsn'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
     'description': '',
@@ -434,7 +434,9 @@ CONNECTOR_TYPES = [
     'dialect': 'solr',
     'interface': 'solr',
     'settings': [
-      {'name': 'url', 'value': 'solr://<username>:<password>@<host>:<port>/solr/<collection>[?use_ssl=true|false]'}
+      {'name': 'url', 'value': 'solr://<username>:<password>@<host>:<port>/solr/<collection>[?use_ssl=true|false]'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
     'description': '',
@@ -452,12 +454,13 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name':
-    "SQL Database",
+    'nice_name': "SQL Database",
     'dialect': 'sql',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'name://projectName/datasetName'}
+      {'name': 'url', 'value': 'name://projectName/datasetName'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
     'description': '',
@@ -478,12 +481,13 @@ CONNECTOR_TYPES = [
     'nice_name': "SQL Database (JDBC)",
     'dialect': 'sql',
     'interface': 'sqlalchemy',
-    'settings': [{
-        "url": "jdbc:db2://gethue.com:50000/SQOOP",
-        "driver": "com.ibm.db2.jcc.DB2Driver",
-        "user": "hue",
-        "password": "hue"
-      }
+    'settings': [
+      {'name': 'url', 'value': 'jdbc:db2://gethue.com:50000/SQOOP'},
+      {'name': 'driver', 'value': 'com.ibm.db2.jcc.DB2Driver'},
+      {'name': 'user', 'value': 'hue'},
+      {'name': 'password', 'value': "hue"},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
     'description': 'Deprecated: older way to connect to any database.',
@@ -500,7 +504,6 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
     }
   },
-  # solr
 
   {'nice_name': "PySpark", 'dialect': 'pyspark', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
   {'nice_name': "Spark", 'dialect': 'spark', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
@@ -512,6 +515,7 @@ CONNECTOR_TYPES = [
   {'nice_name': "S3", 'dialect': 's3', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
   {'nice_name': "ADLS", 'dialect': 'adls-v1', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
   # HBase
+  # Solr
 
   {
     'nice_name': "Hive Metastore",

@@ -34,7 +34,7 @@ from desktop.conf import TASK_SERVER
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document2, Document, __paginate, _get_gist_document
+from desktop.models import Document2, Document, __paginate, _get_gist_document, FilesystemException
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from metadata.conf import OPTIMIZER
@@ -674,9 +674,9 @@ def close_statement(request):
   if operation_id and not notebook.get('uuid'):
     notebook['uuid'] = operation_id
 
-  snippet = _get_snippet(request.user, notebook, snippet, operation_id)
-
   try:
+    snippet = _get_snippet(request.user, notebook, snippet, operation_id)
+
     with opentracing.tracer.start_span('notebook-close_statement') as span:
       response['result'] = get_api(request, snippet).close_statement(notebook, snippet)
 
@@ -686,10 +686,13 @@ def close_statement(request):
         snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
       )
   except QueryExpired:
-    pass
+    response['message'] = _('Query already expired.')
+  except FilesystemException:
+    response['message'] = _('Query id could not be found.')
+  else:
+    response['message'] = _('Query closed.')
 
   response['status'] = 0
-  response['message'] = _('Statement closed !')
 
   return JsonResponse(response)
 
@@ -994,7 +997,7 @@ def describe(request, database, table=None, column=None):
 
 def _get_snippet(user, notebook, snippet, operation_id):
   if operation_id or not snippet:
-    nb_doc = Document2.objects.get_by_uuid(user=user, uuid=operation_id or notebook['uuid'])
+    nb_doc = Document2.objects.get_by_uuid(user=user, uuid=operation_id or notebook.get('uuid'))
     notebook = Notebook(document=nb_doc).get_data()
     snippet = notebook['snippets'][0]
   return snippet

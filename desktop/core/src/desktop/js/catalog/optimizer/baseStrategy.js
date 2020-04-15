@@ -19,6 +19,13 @@ import $ from 'jquery';
 import CancellablePromise from '/api/cancellablePromise';
 
 export default class BaseStrategy {
+  constructor(connector) {
+    if (!connector) {
+      console.warn('BaseStrategy instantiated without connector.');
+    }
+    this.connector = connector;
+  }
+
   analyzeRisk(options) {
     return $.Deferred().reject();
   }

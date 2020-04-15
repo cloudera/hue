@@ -23,12 +23,17 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import force_unicode
+from desktop.conf import has_channels
 from kafka.ksql_client import KSqlApi as KSqlClientApi
 
 from notebook.connectors.base import Api, QueryError
 
 
 LOG = logging.getLogger(__name__)
+
+
+if has_channels():
+  from notebook.consumer import _send_to_channel
 
 
 def query_error_handler(func):
@@ -53,24 +58,26 @@ class KSqlApi(Api):
 
   @query_error_handler
   def execute(self, notebook, snippet):
+    channel_name = notebook.get('editorWsChannel')
 
     data, description = self.db.query(
         snippet['statement'],
-        channel_name=notebook.get('editorWsChannel')
+        channel_name=channel_name
     )
     has_result_set = data is not None
 
     return {
-      'sync': True,
+      'sync': not (has_channels() and channel_name),
       'has_result_set': has_result_set,
       'result': {
-        'has_more': False,
-        'data': data if has_result_set else [],
-        'meta': [{
-          'name': col[0],
-          'type': col[1],
-          'comment': ''
-        } for col in description] if has_result_set else [],
+          'has_more': False,
+          'data': data if has_result_set else [],
+          'meta': [{
+            'name': col['name'],
+            'type': col['type'],
+            'comment': ''
+          } for col in description
+        ] if has_result_set else [],
         'type': 'table'
       }
     }
@@ -120,3 +127,12 @@ class KSqlApi(Api):
       response['error'] = e.message
 
     return response
+
+
+  def fetch_result(self, notebook, snippet, rows, start_over):
+    """Only called at the end of a live query."""
+    return {
+      'has_more': False,
+      'data': [],
+      'meta': []
+    }

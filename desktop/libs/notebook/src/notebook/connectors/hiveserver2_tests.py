@@ -16,8 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import next
-from builtins import object
+from builtins import next, object
 import json
 import logging
 import re
@@ -48,6 +47,7 @@ if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock
 else:
   from mock import patch, Mock
+
 
 LOG = logging.getLogger(__name__)
 
@@ -268,6 +268,51 @@ class TestApi(object):
     assert_equal(data['status'], 0)
     assert_equal(data['result']['handle']['secret'], 'server_id')
     assert_equal(data['result']['handle']['statement'], 'SELECT * from customers')
+
+
+class TestHS2Api():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    self.user = rewrite_user(User.objects.get(username="test"))
+
+
+  @patch('notebook.connectors.hiveserver2.has_jobbrowser', True)
+  def test_get_jobs_with_jobbrowser(self):
+    notebook = Mock()
+    snippet = {'type': 'hive', 'properties': {}}
+    logs = ''
+
+    with patch('notebook.connectors.hiveserver2.HS2Api._get_hive_execution_engine') as _get_hive_execution_engine:
+      with patch('notebook.connectors.hiveserver2.parse_out_jobs') as parse_out_jobs:
+
+        _get_hive_execution_engine.return_value = 'tez'
+        parse_out_jobs.return_value = [{'job_id': 'job_id_00001'}]
+
+        jobs = HS2Api(self.user).get_jobs(notebook, snippet, logs)
+
+        assert_true(jobs, jobs)
+        assert_equal(jobs[0]['name'], 'job_id_00001')
+        assert_equal(jobs[0]['url'], '/jobbrowser/jobs/job_id_00001')
+
+
+  @patch('notebook.connectors.hiveserver2.has_jobbrowser', False)
+  def test_get_jobs_without_jobbrowser(self):
+    notebook = Mock()
+    snippet = {'type': 'hive', 'properties': {}}
+    logs = ''
+
+    with patch('notebook.connectors.hiveserver2.HS2Api._get_hive_execution_engine') as _get_hive_execution_engine:
+      with patch('notebook.connectors.hiveserver2.parse_out_jobs') as parse_out_jobs:
+
+        _get_hive_execution_engine.return_value = 'tez'
+        parse_out_jobs.return_value = [{'job_id': 'job_id_00001'}]
+
+        jobs = HS2Api(self.user).get_jobs(notebook, snippet, logs)
+
+        assert_true(jobs, jobs)
+        assert_equal(jobs[0]['name'], 'job_id_00001')
+        assert_equal(jobs[0]['url'], '')  # Is empty
 
 
 class TestHiveserver2Api(object):

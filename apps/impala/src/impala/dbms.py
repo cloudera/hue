@@ -38,7 +38,6 @@ LOG = logging.getLogger(__name__)
 def get_query_server_config(connector=None):
   if connector and has_connectors():
     query_server = get_query_server_config_via_connector(connector)
-    query_server['impersonation_enabled'] = conf.IMPERSONATION_ENABLED.get()  # TODO Use impersonation_enabled property
   else:
     query_server = {
         'server_name': 'impala',

@@ -63,7 +63,7 @@ describe('snippet.js', () => {
     });
 
     const notebook = new Notebook(viewModel, {});
-    const snippet = notebook.addSnippet({ connector: { dialect: 'hive' } });
+    const snippet = notebook.addSnippet({ connector: { dialect: 'hive', type: 'hive' } });
 
     expect(spy).toHaveBeenCalled();
 

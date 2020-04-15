@@ -129,6 +129,11 @@ class TestApi2(object):
         type='query-TestApi2.test_get_config',
         owner=self.user
     )
+    doc2 = Document2.objects.create(
+        name='Query xxx 2',
+        type='query-TestApi2.test_get_config',
+        owner=self.user
+    )
 
     try:
       response = self.client.get('/desktop/api2/get_config')
@@ -137,6 +142,7 @@ class TestApi2(object):
       config = json.loads(response.content)
 
       assert_true('query-TestApi2.test_get_config' in config['documents']['types'], config)
+      assert_equal(1, len([t for t in config['documents']['types'] if t == 'query-TestApi2.test_get_config']))
     finally:
       doc.delete()
 

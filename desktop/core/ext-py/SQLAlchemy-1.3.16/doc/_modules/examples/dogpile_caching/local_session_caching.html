@@ -1,0 +1,259 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    examples.dogpile_caching.local_session_caching
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+        <link rel="copyright" title="Copyright" href="../../../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../../../index.html" />
+        <link rel="up" title="Module code" href="../../index.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.16</span>
+
+
+        | Release Date: April 7, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="">
+
+        <div id="index-nav">
+            <form class="search" action="../../../search.html" method="get">
+              <label>
+                 Search terms:
+              <input type="text" placeholder="search..." name="q" size="12" />
+              </label>
+              <input type="submit" value="Search" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+
+            <p>
+            <a href="../../../contents.html">Contents</a> |
+            <a href="../../../genindex.html">Index</a>
+            </p>
+
+        </div>
+
+
+    </div>
+
+    
+
+    <div id="docs-body" class="" >
+        
+<h1>Source code for examples.dogpile_caching.local_session_caching</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This example creates a new dogpile.cache backend that will persist data in a</span>
+<span class="sd">dictionary which is local to the current session.   remove() the session and</span>
+<span class="sd">the cache is gone.</span>
+
+<span class="sd">Create a new Dogpile cache backend that will store</span>
+<span class="sd">cached data local to the current Session.</span>
+
+<span class="sd">This is an advanced example which assumes familiarity</span>
+<span class="sd">with the basic operation of CachingQuery.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">dogpile.cache.api</span> <span class="k">import</span> <span class="n">CacheBackend</span>
+<span class="kn">from</span> <span class="nn">dogpile.cache.api</span> <span class="k">import</span> <span class="n">NO_VALUE</span>
+<span class="kn">from</span> <span class="nn">dogpile.cache.region</span> <span class="k">import</span> <span class="n">register_backend</span>
+
+
+<span class="k">class</span> <span class="nc">ScopedSessionBackend</span><span class="p">(</span><span class="n">CacheBackend</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A dogpile backend which will cache objects locally on</span>
+<span class="sd">    the current session.</span>
+
+<span class="sd">    When used with the query_cache system, the effect is that the objects</span>
+<span class="sd">    in the cache are the same as that within the session - the merge()</span>
+<span class="sd">    is a formality that doesn&#39;t actually create a second instance.</span>
+<span class="sd">    This makes it safe to use for updates of data from an identity</span>
+<span class="sd">    perspective (still not ideal for deletes though).</span>
+
+<span class="sd">    When the session is removed, the cache is gone too, so the cache</span>
+<span class="sd">    is automatically disposed upon session.remove().</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arguments</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoped_session</span> <span class="o">=</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;scoped_session&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_dictionary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">NO_VALUE</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_dictionary</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_dictionary</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_cache_dictionary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the cache dictionary linked to the current Session.&quot;&quot;&quot;</span>
+
+        <span class="n">sess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scoped_session</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cache_dict</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">_cache_dictionary</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">_cache_dictionary</span> <span class="o">=</span> <span class="n">cache_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">return</span> <span class="n">cache_dict</span>
+
+
+<span class="n">register_backend</span><span class="p">(</span><span class="s2">&quot;sqlalchemy.session&quot;</span><span class="p">,</span> <span class="vm">__name__</span><span class="p">,</span> <span class="s2">&quot;ScopedSessionBackend&quot;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">.environment</span> <span class="k">import</span> <span class="n">Session</span><span class="p">,</span> <span class="n">regions</span>
+    <span class="kn">from</span> <span class="nn">.caching_query</span> <span class="k">import</span> <span class="n">FromCache</span>
+    <span class="kn">from</span> <span class="nn">dogpile.cache</span> <span class="k">import</span> <span class="n">make_region</span>
+
+    <span class="c1"># set up a region based on the ScopedSessionBackend,</span>
+    <span class="c1"># pointing to the scoped_session declared in the example</span>
+    <span class="c1"># environment.</span>
+    <span class="n">regions</span><span class="p">[</span><span class="s2">&quot;local_session&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">make_region</span><span class="p">()</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span>
+        <span class="s2">&quot;sqlalchemy.session&quot;</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;scoped_session&quot;</span><span class="p">:</span> <span class="n">Session</span><span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="kn">from</span> <span class="nn">.model</span> <span class="k">import</span> <span class="n">Person</span>
+
+    <span class="c1"># query to load Person by name, with criterion</span>
+    <span class="c1"># of &quot;person 10&quot;</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">Session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Person</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">FromCache</span><span class="p">(</span><span class="s2">&quot;local_session&quot;</span><span class="p">))</span>
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Person</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;person 10&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># load from DB</span>
+    <span class="n">person10</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+
+    <span class="c1"># next call, the query is cached.</span>
+    <span class="n">person10</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+
+    <span class="c1"># clear out the Session.  The &quot;_cache_dictionary&quot; dictionary</span>
+    <span class="c1"># disappears with it.</span>
+    <span class="n">Session</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+
+    <span class="c1"># query calls from DB again</span>
+    <span class="n">person10</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+
+    <span class="c1"># identity is preserved - person10 is the *same* object that&#39;s</span>
+    <span class="c1"># ultimately inside the cache.   So it is safe to manipulate</span>
+    <span class="c1"># the not-queried-for attributes of objects when using such a</span>
+    <span class="c1"># cache without the need to invalidate - however, any change</span>
+    <span class="c1"># that would change the results of a cached query, such as</span>
+    <span class="c1"># inserts, deletes, or modification to attributes that are</span>
+    <span class="c1"># part of query criterion, still require careful invalidation.</span>
+    <span class="n">cache</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">_get_cache_plus_key</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">person10</span> <span class="ow">is</span> <span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></pre></div>
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links">
+
+    <div id="docs-copyright">
+        &copy; <a href="../../../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.0.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../../../',
+          VERSION:     '1.3.16',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../../../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

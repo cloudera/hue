@@ -212,7 +212,8 @@ export default class Snippet {
           this.defaultLimit(this.editorConfig.default_limit);
         }
         const connectors = this.editorConfig.interpreters;
-        if (snippetRaw.connector) {
+
+        if (snippetRaw.connector && snippetRaw.connector.type) {
           this.connector(
             connectors.find(connector => connector.type === snippetRaw.connector.type) ||
               connectors.find(connector => connector.dialect === snippetRaw.connector.dialect)
@@ -822,7 +823,8 @@ export default class Snippet {
       }
     });
 
-    if (HAS_OPTIMIZER && !this.parentVm.isNotificationManager()) {
+    // TODO: Add optimizer check per connector?
+    if (window.HAS_OPTIMIZER && !this.parentVm.isNotificationManager()) {
       let lastComplexityRequest;
       let lastCheckedComplexityStatement;
       const knownResponses = [];
@@ -932,16 +934,15 @@ export default class Snippet {
         }
       };
 
-      if (this.dialect() === DIALECT.hive || this.dialect() === DIALECT.impala) {
-        if (this.statement_raw()) {
-          window.setTimeout(() => {
-            this.checkComplexity();
-          }, 2000);
-        }
-        this.delayedStatement.subscribe(() => {
+      if (this.statement_raw()) {
+        window.setTimeout(() => {
           this.checkComplexity();
-        });
+        }, 2000);
       }
+
+      this.delayedStatement.subscribe(() => {
+        this.checkComplexity();
+      });
     }
 
     this.wasBatchExecuted = ko.observable(!!snippetRaw.wasBatchExecuted);
