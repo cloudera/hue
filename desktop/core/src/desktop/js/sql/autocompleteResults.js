@@ -2105,6 +2105,7 @@ class AutocompleteResults {
               })
               .fail(popularColumnsDeferred.reject);
           })
+          .fail(popularColumnsDeferred.reject)
       );
     } else {
       popularColumnsDeferred.reject();
