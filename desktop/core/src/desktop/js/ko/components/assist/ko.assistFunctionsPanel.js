@@ -21,7 +21,7 @@ import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import { PigFunctions, SqlFunctions } from 'sql/sqlFunctions';
 import I18n from 'utils/i18n';
-import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, filterConnectors } from 'utils/hueConfig';
 import {
   ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT,
   GET_ACTIVE_SNIPPET_DIALECT_EVENT
@@ -179,41 +179,43 @@ class AssistFunctionsPanel {
       }
     );
 
-    const configUpdated = config => {
+    const configUpdated = async () => {
       const lastActiveDialect =
         this.activeDialect() ||
         apiHelper.getFromTotalStorage('assist', 'function.panel.active.dialect');
-      if (config.app_config && config.app_config.editor && config.app_config.editor.interpreters) {
-        const dialectIndex = {};
-        config.app_config.editor.interpreters.forEach(interpreter => {
-          if (
-            interpreter.dialect === 'hive' ||
-            interpreter.dialect === 'impala' ||
-            interpreter.dialect === 'pig'
-          ) {
-            dialectIndex[interpreter.dialect] = true;
-          }
-        });
-        this.availableDialects(Object.keys(dialectIndex).sort());
 
-        this.availableDialects().forEach(dialect => {
-          this.initFunctions(dialect);
-        });
+      const uniqueDialects = {};
 
-        if (lastActiveDialect && dialectIndex[lastActiveDialect]) {
-          this.activeDialect(lastActiveDialect);
-        } else {
-          this.activeDialect(
-            this.availableDialects().length ? this.availableDialects()[0] : undefined
-          );
-        }
+      const configuredDialects = (await filterConnectors(connector => {
+        const isMatch =
+          !uniqueDialects[connector.dialect] &&
+          (connector.dialect === 'hive' ||
+            connector.dialect === 'impala' ||
+            connector.dialect === 'pig');
+        uniqueDialects[connector.dialect] = true;
+        return isMatch;
+      })).map(connector => connector.dialect);
+      configuredDialects.sort();
+      this.availableDialects(configuredDialects);
+
+      this.availableDialects().forEach(dialect => {
+        this.initFunctions(dialect);
+      });
+
+      if (
+        lastActiveDialect &&
+        this.availableDialects().find(dialect => dialect === lastActiveDialect)
+      ) {
+        this.activeDialect(lastActiveDialect);
       } else {
-        this.availableDialects([]);
+        this.activeDialect(
+          this.availableDialects().length ? this.availableDialects()[0] : undefined
+        );
       }
       huePubSub.publish(GET_ACTIVE_SNIPPET_DIALECT_EVENT, updateDialect);
     };
 
-    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
+    configUpdated();
     const configSub = huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
 
     this.disposals.push(() => {

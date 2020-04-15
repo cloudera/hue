@@ -28,7 +28,7 @@ import {
   ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT,
   GET_ACTIVE_SNIPPET_DIALECT_EVENT
 } from 'apps/notebook2/events';
-import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT, findConnector } from 'utils/hueConfig';
 
 class EditorViewModel {
   constructor(editorId, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -309,6 +309,16 @@ class EditorViewModel {
   }
 
   async newNotebook(editorType, callback, queryTab) {
+    const connector = await findConnector(connector => connector.type === editorType);
+    if (!connector) {
+      console.warn('No connector found for type ' + editorType);
+    } else {
+      huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
+        dialect: connector.dialect,
+        isSqlDialect: connector.is_sql
+      });
+    }
+
     return new Promise((resolve, reject) => {
       $.post('/notebook/api/create_notebook', {
         type: editorType,

@@ -43,7 +43,7 @@ import {
 } from 'ko/bindings/ace/aceLocationHandler';
 import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from 'apps/notebook2/components/ko.executableActions';
 import { UPDATE_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
-import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import { GET_KNOWN_CONFIG_EVENT, findConnector } from 'utils/hueConfig';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { getOptimizer } from 'catalog/optimizer/optimizer';
 
@@ -1044,17 +1044,13 @@ export default class Snippet {
     huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this);
   }
 
-  changeDialect(dialect) {
-    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, config => {
-      if (config && config.app_config && config.app_config.editor) {
-        const foundConnector = config.app_config.editor.interpreters.find(
-          connector => connector.dialect === dialect
-        );
-        if (foundConnector) {
-          this.connector(foundConnector);
-        }
-      }
-    });
+  async changeDialect(dialect) {
+    const connector = await findConnector(connector => connector.dialect === dialect);
+    if (!connector) {
+      throw new Error('No connector found for dialect ' + dialect);
+    }
+    // TODO: Switch changeDialect to changeType
+    this.connector(connector);
   }
 
   updateFromExecutable(executable) {

@@ -14,9 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import huePubSub from 'utils/huePubSub';
 import AssistLangRefPanel from './ko.assistLangRefPanel';
-import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import apiHelper from 'api/apiHelper';
+import $ from 'jquery';
+import { refreshConfig } from 'utils/hueConfig';
+import { sleep } from 'utils/hueUtils';
 
 describe('ko.assistLangRefPanel.js', () => {
   beforeAll(() => {
@@ -24,47 +26,48 @@ describe('ko.assistLangRefPanel.js', () => {
     window.HIVE_DOC_TOP_LEVEL = [];
   });
 
-  it('should handle cluster config updates', () => {
-    const spy = jest.spyOn(huePubSub, 'publish').mockImplementation((topic, cb) => {
-      if (topic === GET_KNOWN_CONFIG_EVENT && cb) {
-        cb({
+  it('should handle cluster config updates', async () => {
+    const spy = jest.spyOn(apiHelper, 'getClusterConfig').mockImplementation(() =>
+      $.Deferred()
+        .resolve({
+          status: 0,
           app_config: {
             editor: {
               interpreters: [{ dialect: 'hive' }, { dialect: 'impala' }, { dialect: 'banana' }]
             }
           }
-        });
-      }
-    });
-
+        })
+        .promise()
+    );
+    await refreshConfig();
     const subject = new AssistLangRefPanel();
+    await sleep(0);
 
     expect(spy).toHaveBeenCalled();
     expect(subject.availableDialects()).toEqual(['hive', 'impala']);
 
     spy.mockRestore();
 
-    huePubSub.publish(CONFIG_REFRESHED_EVENT, {
-      app_config: {
-        editor: {
-          interpreters: [{ dialect: 'impala' }]
-        }
-      }
-    });
+    const changeSpy = jest.spyOn(apiHelper, 'getClusterConfig').mockImplementation(() =>
+      $.Deferred()
+        .resolve({
+          status: 0,
+          app_config: {
+            editor: {
+              interpreters: [{ dialect: 'impala' }]
+            }
+          }
+        })
+        .promise()
+    );
+    await refreshConfig();
+    expect(changeSpy).toHaveBeenCalled();
+    changeSpy.mockRestore();
+
+    await sleep(0);
 
     expect(subject.availableDialects()).toEqual(['impala']);
     expect(subject.activeDialect()).toEqual('impala');
-
-    huePubSub.publish(CONFIG_REFRESHED_EVENT, {
-      app_config: {
-        editor: {
-          interpreters: [{ dialect: 'banana' }]
-        }
-      }
-    });
-
-    expect(subject.availableDialects()).toEqual([]);
-    expect(subject.activeDialect()).toBeFalsy();
 
     subject.dispose();
   });

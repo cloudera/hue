@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
+import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT, filterConnectors } from 'utils/hueConfig';
 import { simpleGet } from 'api/apiUtils';
 import {
   ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT,
@@ -156,26 +156,24 @@ class AssistLangRefPanel {
       }
     );
 
-    const configUpdated = config => {
+    const configUpdated = async config => {
       const lastActiveDialect = this.activeDialect();
-      if (config.app_config && config.app_config.editor && config.app_config.editor.interpreters) {
-        const dialectIndex = {};
-        config.app_config.editor.interpreters.forEach(interpreter => {
-          if (interpreter.dialect === 'hive' || interpreter.dialect === 'impala') {
-            dialectIndex[interpreter.dialect] = true;
-          }
-        });
-        this.availableDialects(Object.keys(dialectIndex).sort());
 
-        if (lastActiveDialect && dialectIndex[lastActiveDialect]) {
-          this.activeDialect(lastActiveDialect);
-        } else {
-          this.activeDialect(
-            this.availableDialects().length ? this.availableDialects()[0] : undefined
-          );
-        }
+      const configuredDialects = (await filterConnectors(
+        connector => connector.dialect === 'hive' || connector.dialect === 'impala'
+      )).map(connector => connector.dialect);
+      configuredDialects.sort();
+      this.availableDialects(configuredDialects);
+
+      if (
+        lastActiveDialect &&
+        this.availableDialects().find(dialect => dialect === lastActiveDialect)
+      ) {
+        this.activeDialect(lastActiveDialect);
       } else {
-        this.availableDialects([]);
+        this.activeDialect(
+          this.availableDialects().length ? this.availableDialects()[0] : undefined
+        );
       }
     };
 

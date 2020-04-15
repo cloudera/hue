@@ -23,7 +23,7 @@ import componentUtils from 'ko/components/componentUtils';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, filterConnectors, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 const ASSIST_TABLE_TEMPLATES = `
   <script type="text/html" id="assist-no-database-entries">
@@ -851,31 +851,22 @@ class AssistDbPanel {
         return;
       }
 
-      const updateFromConfig = config => {
+      const updateFromConfig = async config => {
         const sources = [];
-        if (
-          config &&
-          config.app_config &&
-          config.app_config.editor &&
-          config.app_config.editor.interpreters
-        ) {
-          const interpreters = config.app_config.editor.interpreters;
-          interpreters.forEach(interpreter => {
-            if (interpreter.is_sql) {
-              const source =
-                this.sourceIndex[interpreter.type] ||
-                new AssistDbSource({
-                  i18n: this.i18n,
-                  type: interpreter.type,
-                  name: interpreter.name,
-                  connector: interpreter,
-                  nonSqlType: false,
-                  navigationSettings: navigationSettings
-                });
-              sources.push(source);
-            }
-          });
-        }
+        const connectors = await filterConnectors(connector => connector.is_sql);
+        connectors.forEach(connector => {
+          const source =
+            this.sourceIndex[connector.type] ||
+            new AssistDbSource({
+              i18n: this.i18n,
+              type: connector.type, // TODO: Remove redundant
+              name: connector.name, // TODO: Remove redundant
+              connector: connector,
+              nonSqlType: false,
+              navigationSettings: navigationSettings
+            });
+          sources.push(source);
+        });
         this.sourceIndex = {};
         sources.forEach(source => {
           this.sourceIndex[source.sourceType] = source;
