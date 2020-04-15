@@ -188,7 +188,7 @@ def ssh_error_handler(f):
             connector_c = args[0].POST.get('snippet')
           connector_json_data = json.loads(connector_c)
         else:
-          connector_json_data = args[1]
+          connector_json_data = args[1]  # Task Server
 
 
         if connector_json_data.get('type') == 'hello':

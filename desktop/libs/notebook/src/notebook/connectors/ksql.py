@@ -27,6 +27,7 @@ from desktop.conf import has_channels
 from kafka.ksql_client import KSqlApi as KSqlClientApi
 
 from notebook.connectors.base import Api, QueryError
+from notebook.decorators import ssh_error_handler
 
 
 LOG = logging.getLogger(__name__)
@@ -72,6 +73,7 @@ class KSqlApi(Api):
 
 
   @query_error_handler
+  @ssh_error_handler
   def execute(self, notebook, snippet):
     channel_name = notebook.get('editorWsChannel')
 
@@ -107,6 +109,7 @@ class KSqlApi(Api):
 
 
   @query_error_handler
+  @ssh_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     response = {}
 
