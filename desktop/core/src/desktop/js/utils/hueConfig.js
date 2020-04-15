@@ -24,7 +24,7 @@ export const GET_KNOWN_CONFIG_EVENT = 'cluster.config.get.config';
 
 let lastConfigPromise = undefined;
 
-const refreshConfig = () => {
+export const refreshConfig = async () => {
   lastConfigPromise = new Promise((resolve, reject) => {
     apiHelper
       .getClusterConfig()
@@ -46,6 +46,33 @@ const refreshConfig = () => {
     .catch(() => {
       huePubSub.publish(CONFIG_REFRESHED_EVENT);
     });
+
+  return lastConfigPromise;
+};
+
+const validateConfigForConnectors = config => {
+  if (
+    !config ||
+    !config.app_config ||
+    !config.app_config.editor ||
+    !config.app_config.editor.interpreters
+  ) {
+    throw new Error('No "interpreters" attribute present in the config.');
+  }
+};
+
+export const findConnector = async connectorTest => {
+  const config = await lastConfigPromise;
+  validateConfigForConnectors(config);
+  const connectors = config.app_config.editor.interpreters;
+  return connectors.find(connectorTest);
+};
+
+export const filterConnectors = async connectorTest => {
+  const config = await lastConfigPromise;
+  validateConfigForConnectors(config);
+  const connectors = config.app_config.editor.interpreters;
+  return connectors.filter(connectorTest);
 };
 
 huePubSub.subscribe(REFRESH_CONFIG_EVENT, refreshConfig);
