@@ -153,10 +153,11 @@ const reloadSample = function(dataCatalogEntry, apiOptions) {
  */
 const reloadOptimizerMeta = function(dataCatalogEntry, apiOptions) {
   if (dataCatalogEntry.dataCatalog.canHaveOptimizerMeta()) {
+    const optimizer = getOptimizer(dataCatalogEntry.dataCatalog.connector);
     return dataCatalogEntry.trackedPromise(
       'optimizerMetaPromise',
       catalogUtils.fetchAndSave(
-        getOptimizer(dataCatalogEntry.dataCatalog.connector).fetchOptimizerMeta,
+        optimizer.fetchOptimizerMeta.bind(optimizer),
         'optimizerMeta',
         dataCatalogEntry,
         apiOptions

@@ -272,7 +272,6 @@ class DataCatalog {
    * @return {CancellablePromise}
    */
   loadOptimizerPopularityForTables(options) {
-    const self = this;
     const deferred = $.Deferred();
     const cancellablePromises = [];
     let popularEntries = [];
@@ -283,8 +282,7 @@ class DataCatalog {
     const existingPromises = [];
     options.paths.forEach(path => {
       const existingDeferred = $.Deferred();
-      self
-        .getEntry({ namespace: options.namespace, compute: options.compute, path: path })
+      this.getEntry({ namespace: options.namespace, compute: options.compute, path: path })
         .done(tableEntry => {
           if (tableEntry.optimizerPopularityForChildrenPromise) {
             tableEntry.optimizerPopularityForChildrenPromise
@@ -320,7 +318,7 @@ class DataCatalog {
       const loadDeferred = $.Deferred();
       if (pathsToLoad.length) {
         cancellablePromises.push(
-          getOptimizer(options.connector)
+          getOptimizer(this.connector)
             .fetchPopularity({
               silenceErrors: options.silenceErrors,
               paths: pathsToLoad
@@ -356,8 +354,11 @@ class DataCatalog {
 
               Object.keys(perTable).forEach(path => {
                 const tableDeferred = $.Deferred();
-                self
-                  .getEntry({ namespace: options.namespace, compute: options.compute, path: path })
+                this.getEntry({
+                  namespace: options.namespace,
+                  compute: options.compute,
+                  path: path
+                })
                   .done(entry => {
                     cancellablePromises.push(
                       entry.trackedPromise(
