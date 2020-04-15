@@ -21,7 +21,7 @@ spec:
         - name: daphne-websocket
           image: {{ .Values.image.registry }}/hue:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ['./build/env/bin/daphne', '-p', '8001', 'desktop.asgi:application']
+          command: ['./build/env/bin/daphne', '-p', '8001', 'desktop.asgi:application', '--bind', '0.0.0.0']
           resources:
             requests:
               # memory: "64Mi"
