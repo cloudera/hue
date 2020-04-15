@@ -459,9 +459,10 @@ def pem_format(key):
     ]).encode('ascii')
 
 
-def import_rsa_key_from_file(filename):
+def import_rsa_key_from_file(filename, passphrase=None):
     data = read_file(filename, 'rb')
-    key = saml2.cryptography.asymmetric.load_pem_private_key(data, None)
+    passphrase = bytes(passphrase) if passphrase else None
+    key = saml2.cryptography.asymmetric.load_pem_private_key(data, passphrase)
     return key
 
 
@@ -1065,7 +1066,7 @@ def security_context(conf):
         _file_name = conf.getattr('key_file', '')
         if _file_name:
             try:
-                rsa_key = import_rsa_key_from_file(_file_name)
+                rsa_key = import_rsa_key_from_file(_file_name, passphrase=conf.key_file_passphrase)
             except Exception as err:
                 logger.error('Cannot import key from {file}: {err_msg}'.format(
                     file=_file_name, err_msg=err))

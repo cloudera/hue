@@ -56,7 +56,9 @@ function set_samlcert() {
     openssl req -new -key server.key -out server.csr -subj "/C=US/ST=California/L=Palo Alto/O=Cloudera/OU=Hue/CN=$EXTERNAL_HOST"
     openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
   else
-    echo "echo \$PASSPHRASE" > $HUE_CONF_DIR/samlcert/pass.key
+    echo "#!/bin/bash" > $HUE_CONF_DIR/samlcert/pass.key
+    echo "echo \$PASSPHRASE" >> $HUE_CONF_DIR/samlcert/pass.key
+    chmod a+x $HUE_CONF_DIR/samlcert/pass.key
     openssl genrsa -des3 -passout pass:$PASSPHRASE -out server.key 2048
     openssl req -new -key server.key -out server.csr -passin pass:$PASSPHRASE -subj "/C=US/ST=California/L=Palo Alto/O=Cloudera/OU=Hue/CN=$EXTERNAL_HOST"
     openssl x509 -req -days 365 -in server.csr -passin pass:$PASSPHRASE -signkey server.key -out server.crt
