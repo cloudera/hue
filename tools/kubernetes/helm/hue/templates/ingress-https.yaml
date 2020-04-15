@@ -7,6 +7,7 @@ metadata:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-hue-prod
     cert-manager.io/acme-challenge-type: http01
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-name: "hue-balancer"
@@ -22,14 +23,16 @@ spec:
   - host: {{ .Values.ingress.domain }}
     http:
       paths:
+      {{ if .Values.websocket.enabled }}
       - backend:
-          serviceName: hue-balancer
-          servicePort: 80
-        path: /
-        - backend:
           serviceName: daphne-websocket
           servicePort: 8001
         path: /(ws/.*)
+      {{- end -}}
+      - backend:
+          serviceName: hue-balancer
+          servicePort: 80
+        path: /(.*)
   {{- range .Values.ingress.extraHosts }}
   - host: {{ . | quote }}
     http:
