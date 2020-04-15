@@ -49,7 +49,7 @@ const TEMPLATE = `
     <div class="assist-flex-panel">
       <div class="assist-flex-header">
         <div class="assist-inner-header">
-          <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { fixedPosition: true, value: sourceType, entries: availableTypes, linkTitle: '${I18n(
+          <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { fixedPosition: true, value: activeDialect, entries: availableDialects, linkTitle: '${I18n(
             'Selected dialect'
           )}' } }" style="display: inline-block"></div>
         </div>
@@ -128,8 +128,8 @@ class LanguageReferenceTopic {
 class AssistLangRefPanel {
   constructor(params, element) {
     this.disposals = [];
-    this.availableTypes = ko.observableArray();
-    this.sourceType = ko.observable();
+    this.availableDialects = ko.observableArray();
+    this.activeDialect = ko.observable();
 
     this.allTopics = {
       impala: [],
@@ -143,37 +143,39 @@ class AssistLangRefPanel {
       this.allTopics.hive.push(new LanguageReferenceTopic(topLevelItem, window.HIVE_DOC_INDEX));
     });
 
-    const updateType = type => {
-      if (this.availableTypes().indexOf(type) !== -1) {
-        this.sourceType(type);
+    const updateDialect = dialect => {
+      if (this.availableDialects().indexOf(dialect) !== -1) {
+        this.activeDialect(dialect);
       }
     };
 
-    const activeSnippetTypeSub = huePubSub.subscribe(
+    const activeSnippetDialectSub = huePubSub.subscribe(
       ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT,
       details => {
-        updateType(details.dialect);
+        updateDialect(details.dialect);
       }
     );
 
     const configUpdated = config => {
-      const lastActiveType = this.sourceType();
+      const lastActiveDialect = this.activeDialect();
       if (config.app_config && config.app_config.editor && config.app_config.editor.interpreters) {
-        const typesIndex = {};
+        const dialectIndex = {};
         config.app_config.editor.interpreters.forEach(interpreter => {
-          if (interpreter.type === 'hive' || interpreter.type === 'impala') {
-            typesIndex[interpreter.type] = true;
+          if (interpreter.dialect === 'hive' || interpreter.dialect === 'impala') {
+            dialectIndex[interpreter.dialect] = true;
           }
         });
-        this.availableTypes(Object.keys(typesIndex).sort());
+        this.availableDialects(Object.keys(dialectIndex).sort());
 
-        if (lastActiveType && typesIndex[lastActiveType]) {
-          this.sourceType(lastActiveType);
+        if (lastActiveDialect && dialectIndex[lastActiveDialect]) {
+          this.activeDialect(lastActiveDialect);
         } else {
-          this.sourceType(this.availableTypes().length ? this.availableTypes()[0] : undefined);
+          this.activeDialect(
+            this.availableDialects().length ? this.availableDialects()[0] : undefined
+          );
         }
       } else {
-        this.availableTypes([]);
+        this.availableDialects([]);
       }
     };
 
@@ -182,13 +184,13 @@ class AssistLangRefPanel {
 
     this.disposals.push(() => {
       configSub.remove();
-      activeSnippetTypeSub.remove();
+      activeSnippetDialectSub.remove();
     });
 
-    huePubSub.publish(GET_ACTIVE_SNIPPET_DIALECT_EVENT, updateType);
+    huePubSub.publish(GET_ACTIVE_SNIPPET_DIALECT_EVENT, updateDialect);
 
     this.topics = ko.pureComputed(() => {
-      return this.sourceType() ? this.allTopics[this.sourceType()] : [];
+      return this.activeDialect() ? this.allTopics[this.activeDialect()] : [];
     });
 
     this.selectedTopic = ko.observable();
