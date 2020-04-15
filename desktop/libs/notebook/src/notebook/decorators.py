@@ -181,12 +181,15 @@ def ssh_error_handler(f):
         from notebook.conf import _connector_to_iterpreter
         from desktop.lib.connectors.models import _augment_connector_properties
 
-        if args[0].POST.get('session'):
-          connector_c = args[0].POST['session']
+        if hasattr(args[0], 'POST'):
+          if args[0].POST.get('session'):
+            connector_c = args[0].POST['session']
+          else:
+            connector_c = args[0].POST.get('snippet')
+          connector_json_data = json.loads(connector_c)
         else:
-          connector_c = args[0].POST.get('snippet')
+          connector_json_data = args[1]
 
-        connector_json_data = json.loads(connector_c)
 
         if connector_json_data.get('type') == 'hello':
           connector = connector_json_data['interpreter']

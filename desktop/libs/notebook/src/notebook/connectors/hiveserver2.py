@@ -168,6 +168,7 @@ class ImpalaConfiguration(object):
     }
   ]
 
+from notebook.decorators import  ssh_error_handler
 
 class HS2Api(Api):
 
@@ -177,6 +178,7 @@ class HS2Api(Api):
 
 
   @query_error_handler
+  @ssh_error_handler
   def create_session(self, lang='hive', properties=None):
     application = 'beeswax' if lang == 'hive' or lang == 'llap' else lang
 
@@ -226,6 +228,7 @@ class HS2Api(Api):
 
 
   @query_error_handler
+  @ssh_error_handler
   def close_session(self, session):
     app_name = session.get('type')
     session_id = session.get('id')
@@ -286,6 +289,7 @@ class HS2Api(Api):
     return response['result']
 
   @query_error_handler
+  @ssh_error_handler
   def execute(self, notebook, snippet):
     db = self._get_db(snippet, interpreter=self.interpreter)
 
