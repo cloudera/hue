@@ -1578,7 +1578,8 @@
     });
 
     % if conf.WEBSOCKETS.ENABLED.get():
-      var editorWs = new WebSocket('ws://' + window.location.host + '/ws/editor/results/' + 'userA' + '/');
+      const prefix = location.protocol === 'https:' ? 'wss://' : 'ws://';
+      var editorWs = new WebSocket(prefix + window.location.host + '/ws/editor/results/' + 'userA' + '/');
 
       editorWs.onopen = function(e) {
         console.info('Notification socket open.');
