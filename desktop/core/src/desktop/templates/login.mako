@@ -165,13 +165,11 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
   % endif
 </div>
 
-<div id="trademark" class="trademark center muted">
-  <trademark-banner>
+<div class="trademark center muted">
   % if CUSTOM.LOGO_SVG.get():
     ${ _('Powered by') } <img src="${ static('desktop/art/hue-login-logo.png') }" width="40" style="vertical-align: middle"  alt="${ _('Hue logo') }"> -
   % endif
   ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
-  </trademark-banner>
 </div>
 
 <script>

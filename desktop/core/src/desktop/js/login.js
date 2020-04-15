@@ -23,16 +23,3 @@ import huePubSub from 'utils/huePubSub';
 window.Dropzone = Dropzone;
 window.hueAnalytics = hueAnalytics;
 window.huePubSub = huePubSub;
-
-import Vue from 'vue';
-import TrademarkBanner from 'vue/components/login/TrademarkBanner.vue';
-
-window.addEventListener('DOMContentLoaded', () => {
-  new Vue({
-    el: '#trademark',
-    components: {
-      'trademark-banner': TrademarkBanner
-    },
-    data: {}
-  });
-});
