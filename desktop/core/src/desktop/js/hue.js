@@ -72,7 +72,7 @@ import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and notebook.ko
 import HueFileEntry from 'doc/hueFileEntry';
 import HueDocument from 'doc/hueDocument';
-import { REFRESH_CONFIG_EVENT } from 'utils/hueConfig';
+import { refreshConfig } from 'utils/hueConfig';
 import { simpleGet } from 'api/apiUtils'; // In analytics.mako, metrics.mako, threads.mako
 
 // import all the other Vue SFCs here
@@ -136,8 +136,8 @@ window.sqlStatementsParser = sqlStatementsParser;
 window.sqlUtils = sqlUtils;
 window.sqlWorkerHandler = sqlWorkerHandler;
 
-$(document).ready(() => {
-  huePubSub.publish(REFRESH_CONFIG_EVENT); // Prefetch the config early
+$(document).ready(async () => {
+  await refreshConfig(); // Make sure we have config up front
 
   const onePageViewModel = new OnePageViewModel();
   ko.applyBindings(onePageViewModel, $('.page-content')[0]);
