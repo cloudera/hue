@@ -53,14 +53,20 @@ class KSqlApi(Api):
 
     self.options = interpreter['options']
 
-    self.db = KSqlClientApi(user=user, url=self.options['url'])
+    self.url = self.options['url']
+
+
+  def _get_db(self):
+    return KSqlClientApi(user=self.user, url=self.url)
 
 
   @query_error_handler
   def execute(self, notebook, snippet):
     channel_name = notebook.get('editorWsChannel')
 
-    data, description = self.db.query(
+    db = self._get_db()
+
+    data, description = db.query(
         snippet['statement'],
         channel_name=channel_name
     )
@@ -93,23 +99,25 @@ class KSqlApi(Api):
     response = {}
 
     try:
+      db = self._get_db()
+
       if database is None:
         response['databases'] = ['tables', 'topics', 'streams']
       elif table is None:
         if database == 'tables':
-          response['tables_meta'] = self.db.show_tables()
+          response['tables_meta'] = db.show_tables()
         elif database == 'topics':
-          response['tables_meta'] = self.db.show_topics()
+          response['tables_meta'] = db.show_topics()
         elif database == 'streams':
           response['tables_meta'] = [{
               'name': t['name'],
               'type': t['type'],
               'comment': 'Topic: %(topic)s Format: %(format)s' % t
             }
-            for t in self.db.show_streams()
+            for t in db.show_streams()
           ]
       elif column is None:
-        columns = self.db.get_columns(table)
+        columns = db.get_columns(table)
         response['columns'] = [col['name'] for col in columns]
         response['extended_columns'] = [{
             'comment': col.get('comment'),
