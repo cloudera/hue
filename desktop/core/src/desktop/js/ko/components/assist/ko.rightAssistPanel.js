@@ -20,6 +20,7 @@ import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT } from 'apps/notebook2/events';
 
 const EDITOR_ASSISTANT_TAB = 'editorAssistant';
 const DASHBOARD_ASSISTANT_TAB = 'dashboardAssistant';
@@ -164,8 +165,8 @@ class RightAssistPanel {
       updateTabs();
     };
 
-    const snippetTypeSub = huePubSub.subscribe('active.snippet.type.changed', details => {
-      updateContentsForType(details.type, details.isSqlDialect);
+    const snippetTypeSub = huePubSub.subscribe(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, details => {
+      updateContentsForType(details.dialect, details.isSqlDialect);
     });
     this.disposals.push(snippetTypeSub.remove.bind(snippetTypeSub));
 

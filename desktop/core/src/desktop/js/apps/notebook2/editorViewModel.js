@@ -24,7 +24,10 @@ import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 
 import Notebook from 'apps/notebook2/notebook';
-import { ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT } from 'apps/notebook2/events';
+import {
+  ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT,
+  GET_ACTIVE_SNIPPET_DIALECT_EVENT
+} from 'apps/notebook2/events';
 import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 class EditorViewModel {
@@ -155,14 +158,10 @@ class EditorViewModel {
     });
 
     huePubSub.subscribe(
-      'get.active.snippet.type',
+      GET_ACTIVE_SNIPPET_DIALECT_EVENT,
       callback => {
         this.withActiveSnippet(activeSnippet => {
-          if (callback) {
-            callback(activeSnippet.dialect());
-          } else {
-            huePubSub.publish('set.active.snippet.type', activeSnippet.dialect());
-          }
+          callback(activeSnippet.dialect());
         });
       },
       this.huePubSubId
@@ -377,7 +376,7 @@ class EditorViewModel {
   notifyDialectChange(dialect, isSqlDialect) {
     if (dialect && this.lastNotifiedDialect !== dialect) {
       huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
-        type: dialect,
+        dialect: dialect,
         isSqlDialect: isSqlDialect
       });
       this.lastNotifiedDialect = dialect;

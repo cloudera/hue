@@ -27,6 +27,7 @@ import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 import { initNotebook2 } from 'apps/notebook2/app';
+import { ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT } from 'apps/notebook2/events';
 
 if (window.ENABLE_NOTEBOOK_2) {
   initNotebook2();
@@ -925,8 +926,8 @@ if (window.ENABLE_NOTEBOOK_2) {
           if (app === 'editor') {
             huePubSub.publish('redraw.fixed.headers');
             huePubSub.publish('hue.scrollleft.show');
-            huePubSub.publish('active.snippet.type.changed', {
-              type: viewModel.editorType(),
+            huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
+              dialect: viewModel.editorType(),
               isSqlDialect: viewModel.getSnippetViewSettings(viewModel.editorType()).sqlDialect
             });
           }

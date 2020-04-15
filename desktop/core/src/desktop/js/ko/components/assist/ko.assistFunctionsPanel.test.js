@@ -26,10 +26,10 @@ describe('ko.assistFunctionsPanel.js', () => {
           app_config: {
             editor: {
               interpreters: [
-                { type: 'pig' },
-                { type: 'pig' },
-                { type: 'impala' },
-                { type: 'banana' }
+                { dialect: 'pig' },
+                { dialect: 'pig' },
+                { dialect: 'impala' },
+                { dialect: 'banana' }
               ]
             }
           }
@@ -39,31 +39,31 @@ describe('ko.assistFunctionsPanel.js', () => {
     const subject = new AssistFunctionsPanel();
 
     expect(spy).toHaveBeenCalled();
-    expect(subject.availableTypes()).toEqual(['impala', 'pig']);
+    expect(subject.availableDialects()).toEqual(['impala', 'pig']);
 
     spy.mockRestore();
 
     huePubSub.publish(CONFIG_REFRESHED_EVENT, {
       app_config: {
         editor: {
-          interpreters: [{ type: 'pig' }]
+          interpreters: [{ dialect: 'pig' }]
         }
       }
     });
 
-    expect(subject.availableTypes()).toEqual(['pig']);
-    expect(subject.activeType()).toEqual('pig');
+    expect(subject.availableDialects()).toEqual(['pig']);
+    expect(subject.activeDialect()).toEqual('pig');
 
     huePubSub.publish(CONFIG_REFRESHED_EVENT, {
       app_config: {
         editor: {
-          interpreters: [{ type: 'banana' }]
+          interpreters: [{ dialect: 'banana' }]
         }
       }
     });
 
-    expect(subject.availableTypes()).toEqual([]);
-    expect(subject.activeType()).toBeFalsy();
+    expect(subject.availableDialects()).toEqual([]);
+    expect(subject.activeDialect()).toBeFalsy();
 
     subject.dispose();
   });
