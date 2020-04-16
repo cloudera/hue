@@ -63,7 +63,7 @@ describe('assistStorageEntry.js', () => {
       if (topic === GET_KNOWN_CONFIG_EVENT && cb) {
         cb({
           app_config: {
-            browsers: {
+            browser: {
               interpreters: [{ type: 'abfs' }]
             }
           }
