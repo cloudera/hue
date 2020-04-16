@@ -14,6 +14,8 @@ spec:
     metadata:
       labels:
         pod: celery-beat
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap-hue-extra.yaml") . | sha256sum }}
     spec:
       containers:
         - name: celery-beat
