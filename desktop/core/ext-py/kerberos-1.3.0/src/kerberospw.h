@@ -21,4 +21,6 @@
 
 #define krb5_get_err_text(context,code) error_message(code)
 
-int change_user_krb5pwd(const char *user, const char* oldpswd, const char *newpswd);
+int change_user_krb5pwd(
+    const char *user, const char* oldpswd, const char *newpswd
+);
