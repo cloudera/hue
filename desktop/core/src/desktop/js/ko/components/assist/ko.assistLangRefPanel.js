@@ -23,8 +23,8 @@ import I18n from 'utils/i18n';
 import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT, filterConnectors } from 'utils/hueConfig';
 import { simpleGet } from 'api/apiUtils';
 import {
-  ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT,
-  GET_ACTIVE_SNIPPET_DIALECT_EVENT
+  ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
+  GET_ACTIVE_SNIPPET_CONNECTOR_EVENT
 } from 'apps/notebook2/events';
 
 // prettier-ignore
@@ -150,9 +150,9 @@ class AssistLangRefPanel {
     };
 
     const activeSnippetDialectSub = huePubSub.subscribe(
-      ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT,
-      details => {
-        updateDialect(details.dialect);
+      ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
+      connector => {
+        updateDialect(connector.dialect);
       }
     );
 
@@ -185,7 +185,9 @@ class AssistLangRefPanel {
       activeSnippetDialectSub.remove();
     });
 
-    huePubSub.publish(GET_ACTIVE_SNIPPET_DIALECT_EVENT, updateDialect);
+    huePubSub.publish(GET_ACTIVE_SNIPPET_CONNECTOR_EVENT, connector => {
+      updateDialect(connector.dialect);
+    });
 
     this.topics = ko.pureComputed(() => {
       return this.activeDialect() ? this.allTopics[this.activeDialect()] : [];

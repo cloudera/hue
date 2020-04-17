@@ -20,7 +20,7 @@ import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT } from 'apps/notebook2/events';
+import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
 
 const EDITOR_ASSISTANT_TAB = 'editorAssistant';
 const DASHBOARD_ASSISTANT_TAB = 'dashboardAssistant';
@@ -56,7 +56,7 @@ const TEMPLATE = `
   <!-- ko if: visible -->
   <div class="right-assist-contents">
     <!-- ko if: editorAssistantTabAvailable-->
-    <div data-bind="component: { name: 'assist-editor-context-panel', params: { activeTab: activeTab, sourceType: sourceType } }, visible: activeTab() === 'editorAssistant'"></div>
+    <div data-bind="component: { name: 'assist-editor-context-panel', params: { activeTab: activeTab, sourceType: dialect } }, visible: activeTab() === 'editorAssistant'"></div>
     <!-- /ko -->
 
     <!-- ko if: functionsTabAvailable -->
@@ -82,7 +82,7 @@ class RightAssistPanel {
 
     this.activeTab = ko.observable();
     this.visible = params.visible;
-    this.sourceType = ko.observable();
+    this.dialect = ko.observable();
 
     this.editorAssistantTabAvailable = ko.observable(false);
     this.dashboardAssistantTabAvailable = ko.observable(false);
@@ -142,7 +142,7 @@ class RightAssistPanel {
     };
 
     const updateContentsForType = (type, isSqlDialect) => {
-      this.sourceType(type);
+      this.dialect(type);
 
       // TODO: Get these dynamically from langref and functions modules when moved to webpack
       this.functionsTabAvailable(type === 'hive' || type === 'impala' || type === 'pig');
@@ -165,9 +165,12 @@ class RightAssistPanel {
       updateTabs();
     };
 
-    const snippetTypeSub = huePubSub.subscribe(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, details => {
-      updateContentsForType(details.dialect, details.isSqlDialect);
-    });
+    const snippetTypeSub = huePubSub.subscribe(
+      ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
+      connector => {
+        updateContentsForType(connector.dialect, connector.is_sql);
+      }
+    );
     this.disposals.push(snippetTypeSub.remove.bind(snippetTypeSub));
 
     const onAppChange = appName => {

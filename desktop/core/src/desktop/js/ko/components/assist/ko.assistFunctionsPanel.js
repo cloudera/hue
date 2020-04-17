@@ -23,8 +23,8 @@ import { PigFunctions, SqlFunctions } from 'sql/sqlFunctions';
 import I18n from 'utils/i18n';
 import { CONFIG_REFRESHED_EVENT, filterConnectors } from 'utils/hueConfig';
 import {
-  ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT,
-  GET_ACTIVE_SNIPPET_DIALECT_EVENT
+  ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
+  GET_ACTIVE_SNIPPET_CONNECTOR_EVENT
 } from 'apps/notebook2/events';
 
 // prettier-ignore
@@ -173,9 +173,9 @@ class AssistFunctionsPanel {
     };
 
     const activeSnippetDialectSub = huePubSub.subscribe(
-      ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT,
-      details => {
-        updateDialect(details.dialect);
+      ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
+      connector => {
+        updateDialect(connector.dialect);
       }
     );
 
@@ -212,7 +212,9 @@ class AssistFunctionsPanel {
           this.availableDialects().length ? this.availableDialects()[0] : undefined
         );
       }
-      huePubSub.publish(GET_ACTIVE_SNIPPET_DIALECT_EVENT, updateDialect);
+      huePubSub.publish(GET_ACTIVE_SNIPPET_CONNECTOR_EVENT, connector => {
+        updateDialect(connector.dialect);
+      });
     };
 
     configUpdated();

@@ -25,8 +25,8 @@ import hueUtils from 'utils/hueUtils';
 
 import Notebook from 'apps/notebook2/notebook';
 import {
-  ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT,
-  GET_ACTIVE_SNIPPET_DIALECT_EVENT
+  ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
+  GET_ACTIVE_SNIPPET_CONNECTOR_EVENT
 } from 'apps/notebook2/events';
 import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT, findConnector } from 'utils/hueConfig';
 
@@ -158,10 +158,10 @@ class EditorViewModel {
     });
 
     huePubSub.subscribe(
-      GET_ACTIVE_SNIPPET_DIALECT_EVENT,
+      GET_ACTIVE_SNIPPET_CONNECTOR_EVENT,
       callback => {
         this.withActiveSnippet(activeSnippet => {
-          callback(activeSnippet.dialect());
+          callback(activeSnippet.connector());
         });
       },
       this.huePubSubId
@@ -313,10 +313,7 @@ class EditorViewModel {
     if (!connector) {
       console.warn('No connector found for type ' + editorType);
     } else {
-      huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
-        dialect: connector.dialect,
-        isSqlDialect: connector.is_sql
-      });
+      huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, connector);
     }
 
     return new Promise((resolve, reject) => {
@@ -383,12 +380,9 @@ class EditorViewModel {
     }
   }
 
-  notifyDialectChange(dialect, isSqlDialect) {
+  notifyDialectChange(dialect) {
     if (dialect && this.lastNotifiedDialect !== dialect) {
-      huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
-        dialect: dialect,
-        isSqlDialect: isSqlDialect
-      });
+      huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, this.activeConnector());
       this.lastNotifiedDialect = dialect;
     }
   }

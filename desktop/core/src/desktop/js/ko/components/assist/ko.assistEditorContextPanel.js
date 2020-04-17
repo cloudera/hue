@@ -24,7 +24,7 @@ import componentUtils from 'ko/components/componentUtils';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT } from 'apps/notebook2/events';
+import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
 
 const TEMPLATE =
   ASSIST_TABLE_TEMPLATES +
@@ -210,8 +210,8 @@ class AssistEditorContextPanel {
         (this.sourceType() === 'impala' || this.sourceType() === 'hive')
     );
 
-    const typeSub = huePubSub.subscribe(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, details => {
-      this.sourceType(details.dialect);
+    const typeSub = huePubSub.subscribe(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, connector => {
+      this.sourceType(connector.dialect);
     });
 
     this.disposals.push(() => {
