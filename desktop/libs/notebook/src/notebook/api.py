@@ -40,7 +40,7 @@ from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from metadata.conf import OPTIMIZER
 
-from notebook.connectors.base import Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name
+from notebook.connectors.base import Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name, patch_snippet_for_connector
 from notebook.connectors.hiveserver2 import HS2Api
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.models import escape_rows, make_notebook, upgrade_session_properties, get_api
@@ -989,6 +989,8 @@ def describe(request, database, table=None, column=None):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   source_type = request.POST.get('source_type', '')
   snippet = {'type': source_type}
+
+  patch_snippet_for_connector(snippet)
 
   describe = get_api(request, snippet).describe(notebook, snippet, database, table, column=column)
   response.update(describe)

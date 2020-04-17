@@ -753,18 +753,24 @@ DROP TABLE IF EXISTS `%(table)s`;
 
 
   def _get_db(self, snippet, is_async=False, interpreter=None):
-    if not is_async and snippet['type'] == 'hive':
+    if interpreter and interpreter.get('dialect'):
+      dialect = interpreter['dialect']
+    else:
+      dialect = snippet['type']  # Backward compatibility without connectors
+
+    if not is_async and dialect == 'hive':
       name = 'beeswax'
-    elif snippet['type'] == 'hive':
+    elif dialect == 'hive':
       name = 'hive'
-    elif snippet['type'] == 'llap':
+    elif dialect == 'llap':
       name = 'llap'
-    elif snippet['type'] == 'impala':
+    elif dialect == 'impala':
       name = 'impala'
     else:
       name = 'sparksql'
 
-    return dbms.get(self.user, query_server=get_query_server_config(name=name, connector=interpreter)) # Note: name is not used if interpreter is present
+    # Note: name is not used if interpreter is present
+    return dbms.get(self.user, query_server=get_query_server_config(name=name, connector=interpreter))
 
 
   def _parse_job_counters(self, job_id):
@@ -780,14 +786,23 @@ DROP TABLE IF EXISTS `%(table)s`;
       # Extract totalCounterValue from HIVE counter group
       hive_counters = next((group for group in counter_groups if group.get('counterGroupName', '').upper() == 'HIVE'), None)
       if hive_counters:
-        total_records = next((counter.get('totalCounterValue') for counter in hive_counters['counter'] if counter['name'] == 'RECORDS_OUT_0'), None)
+        total_records = next(
+          (counter.get('totalCounterValue') for counter in hive_counters['counter'] if counter['name'] == 'RECORDS_OUT_0'),
+          None
+        )
       else:
         LOG.info("No HIVE counter group found for job: %s" % job_id)
 
       # Extract totalCounterValue from FileSystemCounter counter group
-      fs_counters = next((group for group in counter_groups if group.get('counterGroupName') == 'org.apache.hadoop.mapreduce.FileSystemCounter'), None)
+      fs_counters = next(
+          (group for group in counter_groups if group.get('counterGroupName') == 'org.apache.hadoop.mapreduce.FileSystemCounter'),
+          None
+        )
       if fs_counters:
-        total_size = next((counter.get('totalCounterValue') for counter in fs_counters['counter'] if counter['name'] == 'HDFS_BYTES_WRITTEN'), None)
+        total_size = next(
+          (counter.get('totalCounterValue') for counter in fs_counters['counter'] if counter['name'] == 'HDFS_BYTES_WRITTEN'),
+          None
+        )
       else:
         LOG.info("No FileSystemCounter counter group found for job: %s" % job_id)
 
@@ -904,7 +919,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     }
 
   def describe_database(self, notebook, snippet, database=None):
-    db = self._get_db(snippet, self.interpreter)
+    db = self._get_db(snippet, interpreter=self.interpreter)
     return db.get_database(database)
 
   def get_log_is_full_log(self, notebook, snippet):
