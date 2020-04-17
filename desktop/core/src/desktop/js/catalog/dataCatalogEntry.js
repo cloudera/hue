@@ -23,6 +23,7 @@ import catalogUtils from 'catalog/catalogUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { getOptimizer } from './optimizer/optimizer';
+import { DataCatalog } from './dataCatalog';
 
 /**
  * Helper function to reload the source meta for the given entry
@@ -404,12 +405,18 @@ class DataCatalogEntry {
    */
   getChildren(options) {
     const self = this;
-    if (self.childrenPromise && (!options || !options.refreshCache)) {
+    if (self.childrenPromise && DataCatalog.cacheEnabled() && (!options || !options.refreshCache)) {
       return catalogUtils.applyCancellable(self.childrenPromise, options);
     }
     const deferred = $.Deferred();
 
-    if (options && options.cachedOnly && !self.sourceMeta && !self.sourceMetaPromise) {
+    if (
+      DataCatalog.cacheEnabled() &&
+      options &&
+      options.cachedOnly &&
+      !self.sourceMeta &&
+      !self.sourceMetaPromise
+    ) {
       return deferred.reject(false).promise();
     }
 
@@ -556,7 +563,11 @@ class DataCatalogEntry {
         .promise();
     }
 
-    if (self.navigatorMetaForChildrenPromise && (!options || !options.refreshCache)) {
+    if (
+      self.navigatorMetaForChildrenPromise &&
+      DataCatalog.cacheEnabled() &&
+      (!options || !options.refreshCache)
+    ) {
       return catalogUtils.applyCancellable(self.navigatorMetaForChildrenPromise, options);
     }
 
@@ -571,7 +582,11 @@ class DataCatalogEntry {
           const someHaveNavMeta = children.some(childEntry => {
             return childEntry.navigatorMeta;
           });
-          if (someHaveNavMeta && (!options || !options.refreshCache)) {
+          if (
+            someHaveNavMeta &&
+            DataCatalog.cacheEnabled() &&
+            (!options || !options.refreshCache)
+          ) {
             deferred.resolve(children);
             return;
           }
@@ -739,12 +754,21 @@ class DataCatalogEntry {
         .reject()
         .promise();
     }
-    if (self.optimizerPopularityForChildrenPromise && (!options || !options.refreshCache)) {
+    if (
+      self.optimizerPopularityForChildrenPromise &&
+      DataCatalog.cacheEnabled() &&
+      (!options || !options.refreshCache)
+    ) {
       return catalogUtils.applyCancellable(self.optimizerPopularityForChildrenPromise, options);
     }
     const deferred = $.Deferred();
     const cancellablePromises = [];
-    if (self.definition && self.definition.optimizerLoaded && (!options || !options.refreshCache)) {
+    if (
+      self.definition &&
+      self.definition.optimizerLoaded &&
+      DataCatalog.cacheEnabled() &&
+      (!options || !options.refreshCache)
+    ) {
       cancellablePromises.push(
         self
           .getChildren(options)
