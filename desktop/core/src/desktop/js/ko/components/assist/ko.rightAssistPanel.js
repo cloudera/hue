@@ -56,7 +56,7 @@ const TEMPLATE = `
   <!-- ko if: visible -->
   <div class="right-assist-contents">
     <!-- ko if: editorAssistantTabAvailable-->
-    <div data-bind="component: { name: 'assist-editor-context-panel', params: { activeTab: activeTab, sourceType: dialect } }, visible: activeTab() === 'editorAssistant'"></div>
+    <div data-bind="component: { name: 'assist-editor-context-panel', params: { activeTab: activeTab, connector: connector } }, visible: activeTab() === 'editorAssistant'"></div>
     <!-- /ko -->
 
     <!-- ko if: functionsTabAvailable -->
@@ -82,12 +82,26 @@ class RightAssistPanel {
 
     this.activeTab = ko.observable();
     this.visible = params.visible;
-    this.dialect = ko.observable();
+    this.connector = ko.observable();
 
-    this.editorAssistantTabAvailable = ko.observable(false);
-    this.dashboardAssistantTabAvailable = ko.observable(false);
-    this.functionsTabAvailable = ko.observable(false);
-    this.langRefTabAvailable = ko.observable(false);
+    this.editorAssistantTabAvailable = ko.pureComputed(
+      () => this.connector() && this.connector().is_sql
+    );
+    this.dashboardAssistantTabAvailable = ko.pureComputed(
+      () => this.connector() && this.connector().type === 'dashboard'
+    );
+    this.functionsTabAvailable = ko.pureComputed(
+      () =>
+        this.connector() &&
+        (this.connector().dialect === 'hive' ||
+          this.connector().dialect === 'impala' ||
+          this.connector().dialect === 'pig')
+    );
+    this.langRefTabAvailable = ko.pureComputed(
+      () =>
+        this.connector() &&
+        (this.connector().dialect === 'hive' || this.connector().dialect === 'impala')
+    );
     this.schedulesTabAvailable = ko.observable(false);
 
     this.lastActiveTabEditor = apiHelper.withTotalStorage(
@@ -141,16 +155,10 @@ class RightAssistPanel {
       }
     };
 
-    const updateContentsForType = (type, isSqlDialect) => {
-      this.dialect(type);
-
-      // TODO: Get these dynamically from langref and functions modules when moved to webpack
-      this.functionsTabAvailable(type === 'hive' || type === 'impala' || type === 'pig');
-      this.langRefTabAvailable(type === 'hive' || type === 'impala');
-      this.editorAssistantTabAvailable(isSqlDialect);
-      this.dashboardAssistantTabAvailable(type === 'dashboard');
+    const updateContentsForConnector = connector => {
+      this.connector(connector);
       this.schedulesTabAvailable(false);
-      if (type !== 'dashboard') {
+      if (connector.type !== 'dashboard') {
         if (window.ENABLE_QUERY_SCHEDULING) {
           huePubSub.subscribeOnce('set.current.app.view.model', viewModel => {
             // Async
@@ -167,15 +175,13 @@ class RightAssistPanel {
 
     const snippetTypeSub = huePubSub.subscribe(
       ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
-      connector => {
-        updateContentsForType(connector.dialect, connector.is_sql);
-      }
+      updateContentsForConnector
     );
     this.disposals.push(snippetTypeSub.remove.bind(snippetTypeSub));
 
     const onAppChange = appName => {
       if (appName === 'dashboard') {
-        updateContentsForType(appName, false);
+        updateContentsForConnector({ type: appName, is_sql: false });
       }
     };
     huePubSub.publish('get.current.app.name', onAppChange);

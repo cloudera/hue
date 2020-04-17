@@ -201,21 +201,18 @@ class AssistEditorContextPanel {
     this.isSolr = ko.observable(false);
     this.activeTab = params.activeTab;
 
-    this.sourceType = ko.observable(params.sourceType());
+    this.connector = params.connector;
 
-    this.showRisks = ko.pureComputed(
-      () =>
-        window.HAS_OPTIMIZER &&
-        !this.isSolr() &&
-        (this.sourceType() === 'impala' || this.sourceType() === 'hive')
-    );
-
-    const typeSub = huePubSub.subscribe(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, connector => {
-      this.sourceType(connector.dialect);
-    });
-
-    this.disposals.push(() => {
-      typeSub.remove();
+    this.showRisks = ko.pureComputed(() => {
+      if (!window.HAS_OPTIMIZER || this.isSolr()) {
+        return false;
+      }
+      if (this.connector().dialect_properties) {
+        // TODO: dialect_properties only for when ENABLE_CONNECTORS is enabled
+        return this.connector().dialect_properties.has_optimizer_risks;
+      } else {
+        return this.connector().dialect === 'impala' || this.connector().dialect === 'hive';
+      }
     });
 
     this.uploadingTableStats = ko.observable(false);
@@ -424,7 +421,7 @@ class AssistEditorContextPanel {
                     sourceType: activeLocations.type,
                     namespace: activeLocations.namespace,
                     compute: activeLocations.compute,
-                    connector: {}, // TODO: User connectors in assist editor context panel
+                    connector: this.connector(),
                     path: [database],
                     definition: { type: 'database' }
                   })
@@ -505,7 +502,7 @@ class AssistEditorContextPanel {
                                   sourceType: activeLocations.type,
                                   namespace: activeLocations.namespace,
                                   compute: activeLocations.compute,
-                                  connector: {}, // TODO: Use connectors in assist editor context panel
+                                  connector: this.connector(),
                                   path: []
                                 })
                                 .done(sourceEntry => {
