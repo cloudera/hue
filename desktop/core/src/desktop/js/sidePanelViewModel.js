@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import apiHelper from 'api/apiHelper';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
-import { ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT } from 'apps/notebook2/events';
+import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
 
 class SidePanelViewModel {
   constructor() {
@@ -71,8 +71,8 @@ class SidePanelViewModel {
     huePubSub.subscribe('set.current.app.name', onAppChange);
     huePubSub.publish('get.current.app.name', onAppChange);
 
-    huePubSub.subscribe(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, details => {
-      self.rightAssistAvailable(details.isSqlDialect || details.dialect === 'pig');
+    huePubSub.subscribe(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, connector => {
+      self.rightAssistAvailable(connector.is_sql || connector.dialect === 'pig');
     });
 
     self.activeAppViewModel = ko.observable();
