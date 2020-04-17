@@ -324,21 +324,6 @@ const TEMPLATE =
     &nbsp;<a class="pull-right pointer close-popover inactive-action">&times;</a>
   </script>
 
-  <script type="text/html" id="ask-for-invalidate-content">
-    <label class="radio">
-      <input type="radio" name="refreshImpala" value="cache" data-bind="checked: invalidateOnRefresh" />
-      ${I18n('Clear cache')}
-    </label>
-    <label class="radio">
-      <input type="radio" name="refreshImpala" value="invalidate" data-bind="checked: invalidateOnRefresh" />
-      ${I18n('Perform incremental metadata update.')}
-    </label>
-    <div class="assist-invalidate-description">${I18n('This will sync missing tables.')}</div>
-    <div style="width: 100%; display: inline-block; margin-top: 5px;"><button class="pull-right btn btn-primary" data-bind="css: { 'btn-primary': invalidateOnRefresh() !== 'invalidateAndFlush', 'btn-danger': invalidateOnRefresh() === 'invalidateAndFlush' }, click: function (data, event) { huePubSub.publish('close.popover'); triggerRefresh(data, event); }, clickBubble: false">${I18n(
-      'Refresh'
-    )}</button></div>
-  </script>
-
   <script type="text/html" id="assist-namespace-header-actions">
     <div class="assist-db-header-actions">
       <!-- ko ifnot: loading -->
@@ -380,16 +365,9 @@ const TEMPLATE =
         <i class="pointer fa fa-plus" title="${I18n('Create index')}"></i>
       </a>
       <!-- /ko -->
-      <!-- ko if: sourceType === 'impala' -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="templatePopover : { contentTemplate: 'ask-for-invalidate-content', titleTemplate: 'ask-for-invalidate-title', trigger: 'click', minWidth: '320px' }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
-        'Refresh'
-      )}"></i></a>
-      <!-- /ko -->
-      <!-- ko if: sourceType !== 'impala' -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
         'Refresh'
       )}"></i></a>
-      <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: loading -->
       <i class="fa fa-refresh fa-spin blue" title="${I18n('Refresh')}"></i>
