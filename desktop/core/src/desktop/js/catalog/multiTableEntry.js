@@ -18,6 +18,7 @@ import $ from 'jquery';
 
 import catalogUtils from 'catalog/catalogUtils';
 import { getOptimizer } from './optimizer/optimizer';
+import { DataCatalog } from './dataCatalog';
 
 /**
  * Helper function to reload a Optimizer multi table attribute, like topAggs or topFilters
@@ -68,7 +69,7 @@ const genericOptimizerGet = function(
   dataAttribute,
   apiHelperFunction
 ) {
-  if (options && options.cachedOnly) {
+  if (DataCatalog.cacheEnabled() && options && options.cachedOnly) {
     return (
       catalogUtils.applyCancellable(multiTableEntry[promiseAttribute], options) ||
       $.Deferred()
@@ -76,7 +77,7 @@ const genericOptimizerGet = function(
         .promise()
     );
   }
-  if (options && options.refreshCache) {
+  if (!DataCatalog.cacheEnabled() || (options && options.refreshCache)) {
     return catalogUtils.applyCancellable(
       genericOptimizerReload(
         multiTableEntry,

@@ -18,6 +18,7 @@ import $ from 'jquery';
 import localforage from 'localforage';
 
 import apiHelper from 'api/apiHelper';
+import { DataCatalog } from './dataCatalog';
 
 const STORAGE_POSTFIX = window.LOGGED_USERNAME;
 const DATA_CATALOG_VERSION = 5;
@@ -41,7 +42,11 @@ class GeneralDataCatalog {
    */
   getAllNavigatorTags(options) {
     const self = this;
-    if (self.allNavigatorTagsPromise && (!options || !options.refreshCache)) {
+    if (
+      self.allNavigatorTagsPromise &&
+      DataCatalog.cacheEnabled() &&
+      (!options || !options.refreshCache)
+    ) {
       return self.allNavigatorTagsPromise;
     }
 
@@ -72,7 +77,11 @@ class GeneralDataCatalog {
       }
     };
 
-    if (window.CACHEABLE_TTL.default > 0 && (!options || !options.refreshCache)) {
+    if (
+      window.CACHEABLE_TTL.default > 0 &&
+      DataCatalog.cacheEnabled() &&
+      (!options || !options.refreshCache)
+    ) {
       self.store
         .getItem('hue.dataCatalog.allNavTags')
         .then(storeEntry => {
