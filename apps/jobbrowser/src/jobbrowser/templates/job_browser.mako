@@ -1803,7 +1803,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
         <!-- ko if: $root.job().mainType() == 'queries-hive' -->
         <div class="tab-pane active" id="queries-page-hive-plan-text${ SUFFIX }" data-profile="plan">
-          <pre data-bind="text: (properties.plan && properties.plan().plan && JSON.stringify(ko.toJS(properties.plan().plan), null, 2)) || _('The selected tab has no data')"/>
+          <pre data-bind="text: properties.plan && properties.plan().plan"/>
         </div>
         <div class="tab-pane" id="queries-page-hive-stmt${ SUFFIX }" data-profile="stmt">
           <pre data-bind="text: (properties.plan && properties.plan().stmt) || _('The selected tab has no data')"/>

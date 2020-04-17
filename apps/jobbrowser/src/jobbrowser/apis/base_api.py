@@ -38,8 +38,8 @@ def get_api(user, interface, cluster=None):
     from jobbrowser.apis.query_api import QueryApi
     return QueryApi(user, cluster=cluster)
   elif interface == 'queries-hive':
-    from jobbrowser.apis.beeswax_query_api import BeeswaxQueryApi
-    return BeeswaxQueryApi(user, cluster=cluster)
+    from jobbrowser.apis.hive_query_api import HiveQueryApi
+    return HiveQueryApi(user, cluster=cluster)
   elif interface == 'workflows':
     from jobbrowser.apis.workflow_api import WorkflowApi
     return WorkflowApi(user)
