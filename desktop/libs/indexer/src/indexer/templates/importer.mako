@@ -2865,7 +2865,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                       if (match) {
                         var db = match[1];
                         dataCatalog.getEntry({ sourceType: snippet.type(), connector: connector, namespace: self.namespace(), compute: self.compute(), path: [ db ]}).done(function (dbEntry) {
-                          dbEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
+                          dbEntry.clearCache({ silenceErrors: true }).done(function () {
                             huePubSub.publish('open.link', self.editorVM.selectedNotebook().onSuccessUrl());
                           })
                         });

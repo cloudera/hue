@@ -449,7 +449,6 @@
     'Partition key': '${ _('Partition key') }',
     'Partitions': '${ _('Partitions') }',
     'Password': '${ _('Password') }',
-    'Perform incremental metadata update.': '${ _('Perform incremental metadata update.') }',
     'Permissions': '${ _('Permissions') }',
     'Pie Chart': '${ _('Pie Chart') }',
     'Pig Design': '${_('Pig Design')}',
