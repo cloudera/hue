@@ -121,7 +121,7 @@ const mergeMultiTableEntry = function(multiTableCatalogEntry, storeEntry) {
   mergeAttribute('topJoins', CACHEABLE_TTL.optimizer, 'topJoinsPromise');
 };
 
-class DataCatalog {
+export class DataCatalog {
   /**
    * @param {string} sourceType
    * @param {Connector} connector
@@ -155,6 +155,10 @@ class DataCatalog {
    */
   static enableCache() {
     cacheEnabled = true;
+  }
+
+  static cacheEnabled() {
+    return cacheEnabled;
   }
 
   /**
