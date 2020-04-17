@@ -106,6 +106,7 @@ class HiveSchedulerApi(Api):
       self._get_task(row) for row in handle['result']['data']
     ]
 
+
   def list_executed_tasks(self, app_id):
     sql_query = """
 SELECT scheduled_executions.*
