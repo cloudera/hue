@@ -102,9 +102,7 @@ class MetastoreNamespace {
     if (!this.loading() && this.catalogEntry()) {
       this.loading(true);
       // Clear will publish when done
-      this.catalogEntry().clearCache({
-        invalidate: this.sourceType === 'impala' ? 'invalidate' : 'cache'
-      });
+      this.catalogEntry().clearCache();
     }
   }
 
@@ -158,7 +156,7 @@ class MetastoreNamespace {
         this.setDatabase(foundDatabases[0], callback);
       } else if (clearCacheOnMissing) {
         this.catalogEntry()
-          .clearCache({ invalidate: 'invalidate', silenceErrors: true })
+          .clearCache({ silenceErrors: true })
           .then(() => {
             this.loadDatabases().done(() => {
               whenLoaded(false);

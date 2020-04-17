@@ -155,7 +155,6 @@ huePubSub.subscribe('app.dom.loaded', app => {
       })
       .done(entry => {
         entry.clearCache({
-          invalidate: viewModel.source().type === 'impala' ? 'invalidate' : 'cache',
           silenceErrors: true
         });
         hueUtils.replaceURL('?');

@@ -280,7 +280,7 @@ class HistoryPanel {
                       path: []
                     })
                     .done(entry => {
-                      entry.clearCache({ invalidate: 'cache', cascade: true, silenceErrors: true });
+                      entry.clearCache({ cascade: true, silenceErrors: true });
                     });
                 } else if (notebook.onSuccessUrl()) {
                   huePubSub.publish(notebook.pubSubUrl());

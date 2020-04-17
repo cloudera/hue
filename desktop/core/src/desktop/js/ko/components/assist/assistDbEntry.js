@@ -52,7 +52,6 @@ class AssistDbEntry {
     self.navigationSettings = navigationSettings;
 
     self.sourceType = assistDbNamespace.sourceType;
-    self.invalidateOnRefresh = assistDbNamespace.invalidateOnRefresh;
 
     self.expandable = self.catalogEntry.hasPossibleChildren();
 
@@ -264,7 +263,7 @@ class AssistDbEntry {
 
   triggerRefresh() {
     const self = this;
-    self.catalogEntry.clearCache({ invalidate: self.invalidateOnRefresh(), cascade: true });
+    self.catalogEntry.clearCache({ cascade: true });
   }
 
   highlightInside(path) {

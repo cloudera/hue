@@ -63,7 +63,6 @@ class AssistDbNamespace {
     self.loading = ko.observable(false);
     self.reloading = ko.observable(false);
     self.hasErrors = ko.observable(false);
-    self.invalidateOnRefresh = ko.observable('cache');
 
     self.loadingTables = ko.pureComputed(
       () =>
@@ -361,7 +360,7 @@ class AssistDbNamespace {
   triggerRefresh() {
     const self = this;
     if (self.catalogEntry) {
-      self.catalogEntry.clearCache({ invalidate: self.invalidateOnRefresh() });
+      self.catalogEntry.clearCache();
     }
   }
 }

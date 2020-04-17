@@ -80,7 +80,7 @@ class DataCatalogContext {
     const self = this;
     self
       .catalogEntry()
-      .clearCache({ invalidate: 'invalidate', cascade: true })
+      .clearCache({ cascade: true })
       .always(self.load.bind(self));
   }
 

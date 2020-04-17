@@ -96,6 +96,7 @@ class ImpalaDbms(HiveServer2Dbms):
     return 'SELECT histogram(%s) FROM %s' % (select_clause, from_clause)
 
 
+  # Deprecated
   def invalidate(self, database=None, table=None, flush_all=False):
     handle = None
 

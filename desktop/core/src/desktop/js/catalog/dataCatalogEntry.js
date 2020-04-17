@@ -306,7 +306,6 @@ class DataCatalogEntry {
    * Resets the entry and clears the cache
    *
    * @param {Object} options
-   * @param {string} [options.invalidate] - 'cache', 'invalidate' or 'invalidateAndFlush', default 'cache', only used for Impala
    * @param {boolean} [options.cascade] - Default false, only used when the entry is for the source
    * @param {boolean} [options.silenceErrors] - Default false
    * @param {string} [options.targetChild] - Optional specific child to invalidate
@@ -319,34 +318,6 @@ class DataCatalogEntry {
       options = {};
     }
 
-    let invalidatePromise;
-    let invalidate = options.invalidate || 'cache';
-
-    if (invalidate !== 'cache' && self.getSourceType() === 'impala') {
-      if (window.IS_K8S_ONLY) {
-        invalidate = 'invalidateAndFlush';
-      }
-      if (self.dataCatalog.invalidatePromise) {
-        invalidatePromise = self.dataCatalog.invalidatePromise;
-      } else {
-        invalidatePromise = apiHelper.invalidateSourceMetadata({
-          sourceType: self.getSourceType(),
-          compute: self.compute,
-          invalidate: invalidate,
-          path: options.targetChild ? self.path.concat(options.targetChild) : self.path,
-          silenceErrors: options.silenceErrors
-        });
-        self.dataCatalog.invalidatePromise = invalidatePromise;
-        invalidatePromise.always(() => {
-          delete self.dataCatalog.invalidatePromise;
-        });
-      }
-    } else {
-      invalidatePromise = $.Deferred()
-        .resolve()
-        .promise();
-    }
-
     if (self.definition && self.definition.optimizerLoaded) {
       delete self.definition.optimizerLoaded;
     }
@@ -356,16 +327,14 @@ class DataCatalogEntry {
       ? self.dataCatalog.clearStorageCascade(self.namespace, self.compute, self.path)
       : self.save();
 
-    const clearPromise = $.when(invalidatePromise, saveDeferred);
-
-    clearPromise.always(() => {
+    saveDeferred.always(() => {
       huePubSub.publish('data.catalog.entry.refreshed', {
         entry: self,
         cascade: !!options.cascade
       });
     });
 
-    return new CancellablePromise(clearPromise, undefined, [invalidatePromise]);
+    return new CancellablePromise(saveDeferred, undefined, []);
   }
 
   /**
