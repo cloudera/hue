@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2006-2008 Apple Inc. All rights reserved.
+ * Copyright (c) 2006-2018 Apple Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,7 @@
  * limitations under the License.
  **/
 
-#include <gssapi/gssapi.h>
-#include <gssapi/gssapi_generic.h>
-#include <gssapi/gssapi_krb5.h>
+#include <stddef.h>
 
-#define krb5_get_err_text(context,code) error_message(code)
-
-int authenticate_user_krb5pwd(const char *user, const char *pswd, const char *service, const char *default_realm);
+char *base64_encode(const unsigned char *value, size_t vlen);
+unsigned char *base64_decode(const char *value, size_t *rlen);
