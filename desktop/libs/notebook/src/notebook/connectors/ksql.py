@@ -98,41 +98,33 @@ class KSqlApi(Api):
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
     response = {}
 
-    try:
-      db = self._get_db()
+    db = self._get_db()
 
-      if database is None:
-        response['databases'] = ['tables', 'topics', 'streams']
-      elif table is None:
-        if database == 'tables':
-          response['tables_meta'] = db.show_tables()
-        elif database == 'topics':
-          response['tables_meta'] = db.show_topics()
-        elif database == 'streams':
-          response['tables_meta'] = [{
-              'name': t['name'],
-              'type': t['type'],
-              'comment': 'Topic: %(topic)s Format: %(format)s' % t
-            }
-            for t in db.show_streams()
-          ]
-      elif column is None:
-        columns = db.get_columns(table)
-        response['columns'] = [col['name'] for col in columns]
-        response['extended_columns'] = [{
-            'comment': col.get('comment'),
-            'name': col.get('name'),
-            'type': str(col['schema'].get('type'))
+    if database is None:
+      response['databases'] = ['tables', 'topics', 'streams']
+    elif table is None:
+      if database == 'tables':
+        response['tables_meta'] = db.show_tables()
+      elif database == 'topics':
+        response['tables_meta'] = db.show_topics()
+      elif database == 'streams':
+        response['tables_meta'] = [{
+            'name': t['name'],
+            'type': t['type'],
+            'comment': 'Topic: %(topic)s Format: %(format)s' % t
           }
-          for col in columns
+          for t in db.show_streams()
         ]
-      else:
-        response = {}
-
-    except Exception as e:
-      LOG.warn('Autocomplete data fetching error: %s' % e)
-      response['code'] = 500
-      response['error'] = str(e)
+    elif column is None:
+      columns = db.get_columns(table)
+      response['columns'] = [col['name'] for col in columns]
+      response['extended_columns'] = [{
+          'comment': col.get('comment'),
+          'name': col.get('name'),
+          'type': str(col['schema'].get('type'))
+        }
+        for col in columns
+      ]
 
     return response
 
