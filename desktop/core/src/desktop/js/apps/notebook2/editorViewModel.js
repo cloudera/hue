@@ -62,6 +62,9 @@ class EditorViewModel {
       if (this.editorMode()) {
         const snippet = this.getActiveSnippet();
         if (snippet) {
+          if (!snippet.connector()) {
+            console.warn('Snippet connector is empty');
+          }
           return snippet.connector();
         }
       } else if (this.config() && this.config().app_config && this.config().app_config.editor) {
@@ -364,6 +367,9 @@ class EditorViewModel {
 
       if (typeof skipUrlChange === 'undefined' && !this.isNotificationManager()) {
         if (this.editorMode()) {
+          if (!this.editorType()) {
+            console.warn('Snippet connector type or dialect is empty');
+          }
           this.changeURL(
             this.URLS.editor + '?editor=' + docData.document.id + '&type=' + this.editorType()
           );

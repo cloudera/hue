@@ -30,7 +30,7 @@ from django.views.decorators.http import require_GET, require_POST
 import opentracing.tracer
 
 from azure.abfs.__init__ import abfspath
-from desktop.conf import TASK_SERVER
+from desktop.conf import TASK_SERVER, ENABLE_CONNECTORS
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
@@ -215,6 +215,9 @@ def _execute_notebook(request, notebook, snippet):
 def execute(request, dialect=None):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
+
+  if dialect:
+    notebook['dialect'] = dialect
 
   with opentracing.tracer.start_span('notebook-execute') as span:
     span.set_tag('user-id', request.user.username)
@@ -513,7 +516,7 @@ def _clear_sessions(notebook):
 
 
 def _historify(notebook, user):
-  query_type = notebook['type']
+  query_type = 'query-%(dialect)s' % notebook if ENABLE_CONNECTORS.get() else notebook['type']
   name = notebook['name'] if (notebook['name'] and notebook['name'].strip() != '') else DEFAULT_HISTORY_NAME
   is_managed = notebook.get('isManaged') == True # Prevents None
 
