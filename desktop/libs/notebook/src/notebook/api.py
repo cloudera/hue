@@ -41,7 +41,8 @@ from metadata.conf import OPTIMIZER
 
 from notebook.connectors.base import Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name, patch_snippet_for_connector
 from notebook.connectors.hiveserver2 import HS2Api
-from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission, ssh_error_handler
+from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission, ssh_error_handler, \
+    has_missing_ssh
 from notebook.models import escape_rows, make_notebook, upgrade_session_properties, get_api, MockRequest
 
 if sys.version_info[0] > 2:
@@ -735,7 +736,7 @@ def close_statement(request):
 @api_error_handler
 @ssh_error_handler
 def autocomplete(request, server=None, database=None, table=None, column=None, nested=None):
-  response = {'status': -1}
+  response = {'status': -1, 'message': ''}
 
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))

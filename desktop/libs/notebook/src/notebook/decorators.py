@@ -176,7 +176,7 @@ def ssh_error_handler(f):
     try:
       return f(*args, **kwargs)
     except Exception as e:
-      if 'Connection refused' in str(e) or 'Could not connect' in str(e) or 'No route to host' in str(e):
+      if has_missing_ssh(message=str(e)):
         LOG.info('Opening SSH tunnel')
         from notebook.conf import _connector_to_iterpreter
         from desktop.lib.connectors.models import _augment_connector_properties
@@ -243,7 +243,7 @@ def ssh_error_handler(f):
             try:
               return f(*args, **kwargs)
             except Exception as e2:
-              if 'Connection refused' in str(e2) or 'Could not connect' in str(e2) or 'No route to host' in str(e):
+              if has_missing_ssh(message=str(e2)):
                 time.sleep(1)
                 retries += 1
               else:
@@ -254,6 +254,11 @@ def ssh_error_handler(f):
       else:
         raise e
   return wrapper
+
+
+def has_missing_ssh(message):
+  return 'Connection refused' in message or 'Could not connect' in message or 'No route to host' in message \
+      or 'Missing SSH tunnel' in message
 
 
 def _closest_power_of_2(number):
