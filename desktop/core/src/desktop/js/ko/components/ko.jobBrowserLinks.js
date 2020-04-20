@@ -174,7 +174,9 @@ class JobBrowserPanel {
       if (window.ENABLE_QUERY_SCHEDULING) {
         lastScheduleBrowserRequest = checkScheduleBrowserStatus();
       }
-      lastHistoryBrowserRequest = checkHistoryBrowserStatus();
+      if (window.ENABLE_HISTORY_V2) {
+        lastHistoryBrowserRequest = checkHistoryBrowserStatus();
+      }
 
       $.when
         .apply($, [lastYarnBrowserRequest, lastScheduleBrowserRequest, lastHistoryBrowserRequest])
