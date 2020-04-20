@@ -32,6 +32,11 @@ import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistM
 import { cancelActiveRequest } from 'api/apiUtils';
 import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
 import { findConnector } from 'utils/hueConfig';
+import {
+  ASSIST_GET_DATABASE_EVENT,
+  ASSIST_GET_SOURCE_EVENT,
+  ASSIST_SET_SOURCE_EVENT
+} from 'ko/components/assist/events';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -445,17 +450,11 @@ class Snippet {
       }
     };
 
-    huePubSub.subscribeOnce(
-      'assist.source.set',
-      source => {
-        if (source !== self.type()) {
-          huePubSub.publish('assist.set.source', self.type());
-        }
-      },
-      vm.huePubSubId
-    );
-
-    huePubSub.publish('assist.get.source');
+    huePubSub.publish(ASSIST_GET_SOURCE_EVENT, source => {
+      if (source !== self.type()) {
+        huePubSub.publish(ASSIST_SET_SOURCE_EVENT, self.type());
+      }
+    });
 
     let ignoreNextAssistDatabaseUpdate = false;
     self.handleAssistSelection = function(databaseDef) {
@@ -472,9 +471,9 @@ class Snippet {
     };
 
     if (!self.database()) {
-      huePubSub.publish('assist.get.database.callback', {
+      huePubSub.publish(ASSIST_GET_DATABASE_EVENT, {
         source: self.type(),
-        callback: function(databaseDef) {
+        callback: databaseDef => {
           self.handleAssistSelection(databaseDef);
         }
       });

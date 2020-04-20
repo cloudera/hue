@@ -23,6 +23,7 @@ import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { ASSIST_SET_DATABASE_EVENT } from './assist/events';
 
 export const NAME = 'hue-context-selector';
 
@@ -472,7 +473,7 @@ HueContextSelector.prototype.reloadDatabases = function() {
                   self.loadingDatabases(false);
 
                   if (updateAssist) {
-                    huePubSub.publish('assist.set.database', {
+                    huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
                       source: ko.unwrap(self.sourceType),
                       namespace: self[TYPES_INDEX.namespace.name](),
                       name: self.database()
