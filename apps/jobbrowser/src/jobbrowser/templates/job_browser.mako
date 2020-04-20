@@ -19,6 +19,7 @@ from django.utils.translation import ugettext as _
 from desktop.conf import CUSTOM, IS_K8S_ONLY
 from desktop.views import commonheader, commonfooter, _ko
 from metadata.conf import PROMETHEUS
+from notebook.conf import ENABLE_QUERY_SCHEDULING
 
 from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER, ENABLE_HIVE_QUERY_BROWSER, ENABLE_HISTORY_V2
 %>
@@ -417,6 +418,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
                 <!-- ko if: mainType() == 'celery-beat' -->
                   <div class="jb-panel" data-bind="template: { name: 'celery-beat-page${ SUFFIX }' }"></div>
+                <!-- /ko -->
+
+                <!-- ko if: mainType() == 'schedule-hive' -->
+                  <div class="jb-panel" data-bind="template: { name: 'schedule-hive-page${ SUFFIX }' }"></div>
                 <!-- /ko -->
 
                 <!-- ko if: mainType() == 'workflows' -->
@@ -1927,7 +1932,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
     <div data-bind="css: {'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
-
       <ul class="nav nav-pills margin-top-20">
         <li>
           <a href="#celery-beat-page-statements${ SUFFIX }" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#celery-beat-page-statements${ SUFFIX }\']').tab('show'); }">
@@ -1941,6 +1945,84 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <div class="tab-content">
         <div class="tab-pane active" id="celery-beat-page-statements${ SUFFIX }">
+          <table id="actionsTable" class="datatables table table-condensed">
+            <thead>
+            <tr>
+              <th>${_('Id')}</th>
+              <th>${_('State')}</th>
+              <th>${_('Output')}</th>
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: properties['statements']">
+              <tr data-bind="click: function() {  $root.job().id(id); $root.job().fetchJob(); }" class="pointer">
+                <td>
+                  <a data-bind="hueLink: '/jobbrowser/jobs/' + id(), clickBubble: false">
+                    <i class="fa fa-tasks"></i>
+                  </a>
+                </td>
+                <td data-bind="text: state"></td>
+                <td data-bind="text: output"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+
+<script type="text/html" id="schedule-hive-page${ SUFFIX }">
+  <div class="row-fluid">
+    <div data-bind="css: {'span2': !$root.isMini(), 'span12': $root.isMini() }">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Id') }</li>
+          <li class="break-word"><span data-bind="text: id"></span></li>
+          <!-- ko if: doc_url -->
+          <li class="nav-header">${ _('Document') }</li>
+          <li>
+            <a data-bind="hueLink: doc_url" href="javascript: void(0);" title="${ _('Open in editor') }">
+              <span data-bind="text: name"></span>
+            </a>
+          </li>
+          <!-- /ko -->
+          <!-- ko ifnot: doc_url -->
+          <li class="nav-header">${ _('Name') }</li>
+          <li><span data-bind="text: name"></span></li>
+          <!-- /ko -->
+          <li class="nav-header">${ _('Status') }</li>
+          <li><span data-bind="text: status"></span></li>
+          <li class="nav-header">${ _('User') }</li>
+          <li><span data-bind="text: user"></span></li>
+          <li class="nav-header">${ _('Progress') }</li>
+          <li><span data-bind="text: progress"></span>%</li>
+          <li>
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': apiStatus() === 'RUNNING', 'progress-success': apiStatus() === 'SUCCEEDED' }">
+              <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+            </div>
+          </li>
+          <li class="nav-header">${ _('Duration') }</li>
+          <li><span data-bind="text: duration().toHHMMSS()"></span></li>
+          <li class="nav-header">${ _('Submitted') }</li>
+          <li><span data-bind="moment: {data: submitted, format: 'LLL'}"></span></li>
+        </ul>
+      </div>
+    </div>
+    <div data-bind="css: {'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
+      <ul class="nav nav-pills margin-top-20">
+        <li>
+          <a href="#schedule-hive-page-statements${ SUFFIX }" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#schedule-hive-statements${ SUFFIX }\']').tab('show'); }">
+            ${ _('Properties') }
+          </a>
+        </li>
+        <li class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></li>
+      </ul>
+
+      <div class="clearfix"></div>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="schedule-hive-page-statements${ SUFFIX }">
           <table id="actionsTable" class="datatables table table-condensed">
             <thead>
             <tr>
@@ -2824,7 +2906,20 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.hasKill = ko.pureComputed(function() {
         return self.type() && (
-          ['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY', 'TEZ', 'YarnV2', 'DDL', 'celery-beat', 'history'].indexOf(self.type()) != -1 ||
+          [
+            'MAPREDUCE',
+            'SPARK',
+            'workflow',
+            'schedule',
+            'bundle',
+            'QUERY',
+            'TEZ',
+            'YarnV2',
+            'DDL',
+            'schedule-hive',
+            'celery-beat',
+            'history'
+          ].indexOf(self.type()) != -1 ||
           self.type().indexOf('Data Warehouse') != -1 ||
           self.type().indexOf('Altus') != -1
         );
@@ -2835,7 +2930,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasResume = ko.pureComputed(function() {
-        return ['workflow', 'schedule', 'bundle', 'celery-beat', 'history'].indexOf(self.type()) != -1;
+        return ['workflow', 'schedule', 'bundle', 'schedule-hive', 'celery-beat', 'history'].indexOf(self.type()) != -1;
       });
       self.resumeEnabled = ko.pureComputed(function() {
         return self.hasResume() && self.canWrite() && self.apiStatus() == 'PAUSED';
@@ -2849,7 +2944,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasPause = ko.pureComputed(function() {
-        return ['workflow', 'schedule', 'bundle', 'celery-beat', 'history'].indexOf(self.type()) != -1;
+        return ['workflow', 'schedule', 'bundle', 'celery-beat', 'schedule-hive', 'history'].indexOf(self.type()) != -1;
       });
       self.pauseEnabled = ko.pureComputed(function() {
         return self.hasPause() && self.canWrite() && self.apiStatus() == 'RUNNING';
@@ -2916,6 +3011,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
         else if (/celery-beat-\w+/.test(self.id())) {
           interface = 'celery-beat';
+        }
+        else if (/schedule-hive-\w+/.test(self.id())) {
+          interface = 'schedule-hive';
         }
         else if (/altus:dataeng/.test(self.id()) && /:job:/.test(self.id())) {
           interface = 'dataeng-jobs';
@@ -3403,6 +3501,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           'dataware-clusters',
           'dataware2-clusters',
           'celery-beat',
+          'schedule-hive',
           'history'
         ].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
@@ -3413,7 +3512,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasResume = ko.pureComputed(function() {
-        return ['workflows', 'schedules', 'bundles', 'dataware2-clusters', 'celery-beat', 'history'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
+        return [
+          'workflows',
+          'schedules',
+          'bundles',
+          'dataware2-clusters',
+          'celery-beat',
+          'schedule-hive',
+          'history'
+        ].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.resumeEnabled = ko.pureComputed(function() {
         return self.hasResume() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -3431,7 +3538,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasPause = ko.pureComputed(function() {
-        return ['workflows', 'schedules', 'bundles', 'dataware2-clusters', 'celery-beat', 'history'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
+        return [
+          'workflows',
+          'schedules',
+          'bundles',
+          'dataware2-clusters',
+          'celery-beat',
+          'schedule-hive',
+          'history'
+        ].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.pauseEnabled = ko.pureComputed(function() {
         return self.hasPause() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -3777,6 +3892,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         var queryHiveInterfaceCondition = function () {
           return '${ ENABLE_HIVE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('hive') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
+        var scheduleHiveInterfaceCondition = function () {
+          return '${ ENABLE_QUERY_SCHEDULING.get() }' == 'True';
+        };
 
         var interfaces = [
           {'interface': 'jobs', 'label': '${ _ko('Jobs') }', 'condition': jobsInterfaceCondition},
@@ -3787,6 +3905,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           {'interface': 'engines', 'label': '${ _ko('') }', 'condition': enginesInterfaceCondition},
           {'interface': 'queries-impala', 'label': '${ _ko('Impala') }', 'condition': queryInterfaceCondition},
           {'interface': 'queries-hive', 'label': '${ _ko('Hive') }', 'condition': queryHiveInterfaceCondition},
+          {'interface': 'schedule-hive', 'label': '${ _ko('Hive Schedules') }', 'condition': scheduleHiveInterfaceCondition},
           {'interface': 'celery-beat', 'label': '${ _ko('Scheduled Tasks') }', 'condition': schedulerBeatInterfaceCondition},
           {'interface': 'history', 'label': '${ _ko('History') }', 'condition': historyInterfaceCondition},
           {'interface': 'workflows', 'label': '${ _ko('Workflows') }', 'condition': schedulerInterfaceCondition},
@@ -3979,6 +4098,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           case 'queries-impala':
           case 'queries-hive':
           case 'celery-beat':
+          case 'schedule-hive':
           case 'history':
           case 'workflows':
           case 'schedules':

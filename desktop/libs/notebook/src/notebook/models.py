@@ -623,3 +623,9 @@ class Analytics(object):
     # Could count number of "forks" (but would need to start tracking parent of Saved As query cf. saveAsNotebook)
 
     return stats
+
+
+class MockRequest():
+  def __init__(self, user, ):
+    self.user = user
+    self.POST = {}
