@@ -23,6 +23,12 @@ import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
+import {
+  ASSIST_SHOW_DOC_EVENT,
+  ASSIST_SHOW_SOLR_EVENT,
+  ASSIST_SHOW_SQL_EVENT,
+  SHOW_LEFT_ASSIST_EVENT
+} from './events';
 
 const TEMPLATE = `
   <script type="text/html" id="assist-panel-inner-header">
@@ -112,7 +118,7 @@ class AssistPanel {
           });
           panels.push(sqlPanel);
 
-          huePubSub.subscribe('assist.show.sql', () => {
+          huePubSub.subscribe(ASSIST_SHOW_SQL_EVENT, () => {
             if (self.visiblePanel() !== sqlPanel) {
               self.visiblePanel(sqlPanel);
             }
@@ -164,7 +170,7 @@ class AssistPanel {
                 minHeight: 75
               });
               panels.push(solrPanel);
-              huePubSub.subscribe('assist.show.solr', () => {
+              huePubSub.subscribe(ASSIST_SHOW_SOLR_EVENT, () => {
                 if (self.visiblePanel() !== solrPanel) {
                   self.visiblePanel(solrPanel);
                 }
@@ -226,8 +232,8 @@ class AssistPanel {
 
           panels.push(documentsPanel);
 
-          huePubSub.subscribe('assist.show.documents', docType => {
-            huePubSub.publish('left.assist.show');
+          huePubSub.subscribe(ASSIST_SHOW_DOC_EVENT, docType => {
+            huePubSub.publish(SHOW_LEFT_ASSIST_EVENT);
             if (self.visiblePanel() !== documentsPanel) {
               self.visiblePanel(documentsPanel);
             }

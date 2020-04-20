@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import dataCatalog from 'catalog/dataCatalog';
-import SqlAutocompleter from '../sqlAutocompleter';
+import SqlAutocompleter from 'sql/sqlAutocompleter';
 
 // TODO: Ignore until ace is in webpack
 

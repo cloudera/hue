@@ -28,6 +28,11 @@ import Snippet, { STATUS as SNIPPET_STATUS } from 'apps/notebook2/snippet';
 import { HISTORY_CLEARED_EVENT } from 'apps/notebook2/components/ko.queryHistory';
 import { UPDATE_SAVED_QUERIES_EVENT } from 'apps/notebook2/components/ko.savedQueries';
 import SqlExecutable from './execution/sqlExecutable';
+import {
+  ASSIST_DB_PANEL_IS_READY_EVENT,
+  ASSIST_IS_DB_PANEL_READY_EVENT,
+  ASSIST_SET_DATABASE_EVENT
+} from 'ko/components/assist/events';
 
 export default class Notebook {
   constructor(vm, notebookRaw) {
@@ -129,11 +134,11 @@ export default class Notebook {
     });
 
     huePubSub.subscribeOnce(
-      'assist.db.panel.ready',
+      ASSIST_DB_PANEL_IS_READY_EVENT,
       () => {
         if (this.type().indexOf('query') === 0) {
           const whenDatabaseAvailable = function(snippet) {
-            huePubSub.publish('assist.set.database', {
+            huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
               source: snippet.dialect(),
               namespace: snippet.namespace(),
               name: snippet.database()
@@ -177,7 +182,7 @@ export default class Notebook {
       vm.huePubSubId
     );
 
-    huePubSub.publish('assist.is.db.panel.ready');
+    huePubSub.publish(ASSIST_IS_DB_PANEL_READY_EVENT);
   }
 
   addSnippet(snippetRaw) {

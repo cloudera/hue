@@ -35,6 +35,7 @@ import {
   REDRAW_CHART_EVENT
 } from 'apps/notebook2/events';
 import { DIALECT } from 'apps/notebook2/snippet';
+import { SHOW_LEFT_ASSIST_EVENT } from 'ko/components/assist/events';
 
 export const initNotebook2 = () => {
   window.Clipboard = Clipboard;
@@ -574,7 +575,7 @@ export const initNotebook2 = () => {
       );
 
       huePubSub.subscribe(
-        'left.assist.show',
+        SHOW_LEFT_ASSIST_EVENT,
         () => {
           if (!viewModel.isLeftPanelVisible() && viewModel.assistAvailable()) {
             viewModel.isLeftPanelVisible(true);

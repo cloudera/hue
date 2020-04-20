@@ -17,9 +17,9 @@
 import * as ko from 'knockout';
 
 import ApiHelper, { LINK_SHARING_PERMS } from '/api/apiHelper';
-import componentUtils from '../componentUtils';
+import componentUtils from 'ko/components/componentUtils';
 import I18n from 'utils/i18n';
-import DisposableComponent from '../DisposableComponent';
+import DisposableComponent from 'ko/components/DisposableComponent';
 import { DOCUMENT_UPDATED_EVENT } from 'doc/hueDocument';
 import huePubSub from 'utils/huePubSub';
 

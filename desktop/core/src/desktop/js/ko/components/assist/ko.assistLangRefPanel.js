@@ -26,6 +26,7 @@ import {
   ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
   GET_ACTIVE_SNIPPET_CONNECTOR_EVENT
 } from 'apps/notebook2/events';
+import { ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT } from './events';
 
 // prettier-ignore
 const TEMPLATE = `
@@ -308,37 +309,40 @@ class AssistLangRefPanel {
 
     huePubSub.subscribe('scroll.test', scrollToSelectedTopic);
 
-    const showTopicSub = huePubSub.subscribe('assist.lang.ref.panel.show.topic', targetTopic => {
-      const topicStack = [];
-      const findTopic = topics => {
-        topics.some(topic => {
-          topicStack.push(topic);
-          if (topic.ref === targetTopic.ref) {
-            while (topicStack.length) {
-              topicStack.pop().open(true);
-            }
-            this.query('');
-            this.selectedTopic(topic);
-            window.setTimeout(() => {
-              scrollToAnchor(targetTopic.anchorId);
-              scrollToSelectedTopic();
-            }, 0);
-            return true;
-          } else if (topic.children.length) {
-            const inChild = findTopic(topic.children);
-            if (inChild) {
+    const showTopicSub = huePubSub.subscribe(
+      ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT,
+      targetTopic => {
+        const topicStack = [];
+        const findTopic = topics => {
+          topics.some(topic => {
+            topicStack.push(topic);
+            if (topic.ref === targetTopic.ref) {
+              while (topicStack.length) {
+                topicStack.pop().open(true);
+              }
+              this.query('');
+              this.selectedTopic(topic);
+              window.setTimeout(() => {
+                scrollToAnchor(targetTopic.anchorId);
+                scrollToSelectedTopic();
+              }, 0);
               return true;
+            } else if (topic.children.length) {
+              const inChild = findTopic(topic.children);
+              if (inChild) {
+                return true;
+              }
             }
-          }
-          topicStack.pop();
-        });
-      };
-      findTopic(this.topics());
-    });
+            topicStack.pop();
+          });
+        };
+        findTopic(this.topics());
+      }
+    );
 
     $(element).on('click.langref', event => {
       if (event.target.className === 'hue-doc-internal-link') {
-        huePubSub.publish('assist.lang.ref.panel.show.topic', {
+        huePubSub.publish(ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT, {
           ref: $(event.target).data('doc-ref'),
           anchorId: $(event.target).data('doc-anchor-id')
         });

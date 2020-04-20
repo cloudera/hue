@@ -23,6 +23,7 @@ import HueFileEntry from 'doc/hueFileEntry';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { DOCUMENT_TYPES } from 'doc/docSupport';
+import { ASSIST_DOC_HIGHLIGHT_EVENT, ASSIST_SHOW_DOC_EVENT } from './events';
 
 export const REFRESH_DOC_ASSIST_EVENT = 'assist.document.refresh';
 
@@ -300,8 +301,8 @@ class AssistDocumentsPanel {
       self.reload();
     });
 
-    huePubSub.subscribe('assist.doc.highlight', details => {
-      huePubSub.publish('assist.show.documents');
+    huePubSub.subscribe(ASSIST_DOC_HIGHLIGHT_EVENT, details => {
+      huePubSub.publish(ASSIST_SHOW_DOC_EVENT);
       huePubSub.publish('context.popover.hide');
       const whenLoaded = $.Deferred().done(() => {
         self.activeEntry().highlightInside(details.docUuid);

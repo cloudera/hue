@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 import qq from 'ext/fileuploader.custom';
 
-import huePubSub from '../../utils/huePubSub';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
 /*

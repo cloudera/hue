@@ -18,6 +18,7 @@ import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
+import { ASSIST_DOC_HIGHLIGHT_EVENT } from 'ko/components/assist/events';
 
 const TEMPLATE_NAME = 'context-document-details';
 
@@ -93,7 +94,7 @@ class DocumentContext {
     self.loadDocument();
 
     const showInAssistPubSub = huePubSub.subscribe('context.popover.show.in.assist', () => {
-      huePubSub.publish('assist.doc.highlight', {
+      huePubSub.publish(ASSIST_DOC_HIGHLIGHT_EVENT, {
         parentUuid: self.data.parentUuid,
         docUuid: self.data.uuid
       });

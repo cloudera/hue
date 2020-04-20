@@ -21,6 +21,11 @@ import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
+import {
+  ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT,
+  ASSIST_LANG_REF_SHOW_TOPIC_EVENT,
+  SHOW_RIGHT_ASSIST_EVENT
+} from './events';
 
 const EDITOR_ASSISTANT_TAB = 'editorAssistant';
 const DASHBOARD_ASSISTANT_TAB = 'dashboardAssistant';
@@ -123,12 +128,12 @@ class RightAssistPanel {
       }
     });
 
-    huePubSub.subscribe('assist.lang.ref.show.topic', targetTopic => {
-      huePubSub.publish('right.assist.show');
+    huePubSub.subscribe(ASSIST_LANG_REF_SHOW_TOPIC_EVENT, targetTopic => {
+      huePubSub.publish(SHOW_RIGHT_ASSIST_EVENT);
       if (this.langRefTabAvailable() && this.activeTab() !== LANG_REF_TAB) {
         this.activeTab(LANG_REF_TAB);
       }
-      huePubSub.publish('assist.lang.ref.panel.show.topic', targetTopic);
+      huePubSub.publish(ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT, targetTopic);
     });
 
     const updateTabs = () => {

@@ -21,7 +21,7 @@ import apiHelper from 'api/apiHelper';
 import AceLocationHandler from 'ko/bindings/ace/aceLocationHandler';
 import huePubSub from 'utils/huePubSub';
 import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
-import { registerBinding } from '../bindingUtils';
+import { registerBinding } from 'ko/bindings/bindingUtils';
 
 // TODO: Depends on Ace
 

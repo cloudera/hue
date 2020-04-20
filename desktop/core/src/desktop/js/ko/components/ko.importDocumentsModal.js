@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import HueFileEntry from '../../doc/hueFileEntry';
+import HueFileEntry from 'doc/hueFileEntry';
 
 export const HIDE_EVENT = 'hide.import.documents.modal';
 export const SHOW_EVENT = 'show.import.documents.modal';

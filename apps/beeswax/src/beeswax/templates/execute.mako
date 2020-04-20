@@ -2815,7 +2815,7 @@ huePubSub.subscribe("assist.database.set", handleAssistSelection);
 huePubSub.subscribe("assist.database.selected", handleAssistSelection);
 
 if (! snippet.database()) {
-  huePubSub.publish("assist.get.database", snippetType);
+  huePubSub.publish("assist.get.database", { source: snippetType, callback: handleAssistSelection });
 }
 
 shareViewModel = initSharing("#documentShareModal");

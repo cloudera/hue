@@ -17,14 +17,14 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import componentUtils from '../componentUtils';
+import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import HueFileEntry from 'doc/hueFileEntry';
-import DisposableComponent from '../DisposableComponent';
+import DisposableComponent from 'ko/components/DisposableComponent';
 
 import './ko.linkSharing';
-import { REFRESH_DOC_ASSIST_EVENT } from '../assist/ko.assistDocumentsPanel';
+import { REFRESH_DOC_ASSIST_EVENT } from 'ko/components/assist/ko.assistDocumentsPanel';
 
 export const SHOW_EVENT = 'doc.show.share.modal';
 export const SHOWN_EVENT = 'doc.share.modal.shown';

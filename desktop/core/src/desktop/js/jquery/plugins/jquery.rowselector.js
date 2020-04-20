@@ -16,7 +16,7 @@
 
 import $ from 'jquery';
 
-import huePubSub from '../../utils/huePubSub';
+import huePubSub from 'utils/huePubSub';
 
 /*
  * jHue row selector plugin

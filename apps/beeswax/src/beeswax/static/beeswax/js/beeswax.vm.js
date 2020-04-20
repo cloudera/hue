@@ -75,7 +75,7 @@ function BeeswaxViewModel(server, apiHelper) {
   self.database = ko.observable(null);
 
   var type = server === "beeswax" ? "hive" : "impala";
-  huePubSub.subscribe("assist.db.panel.ready", function () {
+  huePubSub.subscribe("assist.db.panel.is.ready", function () {
     // Defer to let the db be set
     window.setTimeout(function () {
       huePubSub.publish('assist.set.database', {

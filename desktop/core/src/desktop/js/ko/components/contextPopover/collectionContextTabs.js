@@ -20,6 +20,7 @@ import * as ko from 'knockout';
 import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { ASSIST_DB_HIGHLIGHT_EVENT } from 'ko/components/assist/events';
 
 class CollectionContextTabs {
   constructor(data) {
@@ -68,7 +69,7 @@ class CollectionContextTabs {
     self.activeTab = ko.observable('terms');
 
     const showInAssistPubSub = huePubSub.subscribe('context.popover.show.in.assist', () => {
-      huePubSub.publish('assist.db.highlight', self.catalogEntry);
+      huePubSub.publish(ASSIST_DB_HIGHLIGHT_EVENT, self.catalogEntry);
     });
     self.disposals.push(() => {
       showInAssistPubSub.remove();

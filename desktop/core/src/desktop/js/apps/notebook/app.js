@@ -28,6 +28,7 @@ import I18n from 'utils/i18n';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 import { initNotebook2 } from 'apps/notebook2/app';
 import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
+import { SHOW_LEFT_ASSIST_EVENT } from 'ko/components/assist/events';
 
 if (window.ENABLE_NOTEBOOK_2) {
   initNotebook2();
@@ -1039,7 +1040,7 @@ if (window.ENABLE_NOTEBOOK_2) {
       );
 
       huePubSub.subscribe(
-        'left.assist.show',
+        SHOW_LEFT_ASSIST_EVENT,
         () => {
           if (!viewModel.isLeftPanelVisible() && viewModel.assistAvailable()) {
             viewModel.isLeftPanelVisible(true);

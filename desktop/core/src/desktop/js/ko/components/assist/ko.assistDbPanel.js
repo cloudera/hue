@@ -24,6 +24,18 @@ import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { CONFIG_REFRESHED_EVENT, filterConnectors, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import {
+  ASSIST_DB_HIGHLIGHT_EVENT,
+  ASSIST_DB_PANEL_IS_READY_EVENT,
+  ASSIST_GET_DATABASE_EVENT,
+  ASSIST_GET_SOURCE_EVENT,
+  ASSIST_IS_DB_PANEL_READY_EVENT,
+  ASSIST_SET_DATABASE_EVENT,
+  ASSIST_SET_SOURCE_EVENT,
+  ASSIST_SHOW_SOLR_EVENT,
+  ASSIST_SHOW_SQL_EVENT,
+  SHOW_LEFT_ASSIST_EVENT
+} from './events';
 
 const ASSIST_TABLE_TEMPLATES = `
   <script type="text/html" id="assist-no-database-entries">
@@ -588,12 +600,12 @@ class AssistDbPanel {
       return null;
     });
 
-    huePubSub.subscribe('assist.db.highlight', catalogEntry => {
-      huePubSub.publish('left.assist.show');
+    huePubSub.subscribe(ASSIST_DB_HIGHLIGHT_EVENT, catalogEntry => {
+      huePubSub.publish(SHOW_LEFT_ASSIST_EVENT);
       if (catalogEntry.getSourceType() === 'solr') {
-        huePubSub.publish('assist.show.solr');
+        huePubSub.publish(ASSIST_SHOW_SOLR_EVENT);
       } else {
-        huePubSub.publish('assist.show.sql');
+        huePubSub.publish(ASSIST_SHOW_SQL_EVENT);
       }
       huePubSub.publish('context.popover.hide');
       window.setTimeout(() => {
@@ -639,7 +651,7 @@ class AssistDbPanel {
         }
       });
     } else if (!this.isSolr && !this.isStreams) {
-      huePubSub.subscribe('assist.set.database', databaseDef => {
+      huePubSub.subscribe(ASSIST_SET_DATABASE_EVENT, databaseDef => {
         if (!databaseDef.source || !this.sourceIndex[databaseDef.source]) {
           return;
         }
@@ -690,24 +702,15 @@ class AssistDbPanel {
         return deferred;
       };
 
-      huePubSub.subscribe('assist.get.database', source => {
-        getSelectedDatabase(source).done(databaseDef => {
-          huePubSub.publish('assist.database.set', databaseDef);
-        });
-      });
-
-      huePubSub.subscribe('assist.get.database.callback', options => {
+      huePubSub.subscribe(ASSIST_GET_DATABASE_EVENT, options => {
         getSelectedDatabase(options.source).done(options.callback);
       });
 
-      huePubSub.subscribe('assist.get.source', () => {
-        huePubSub.publish(
-          'assist.source.set',
-          this.selectedSource() ? this.selectedSource().sourceType : undefined
-        );
+      huePubSub.subscribe(ASSIST_GET_SOURCE_EVENT, callback => {
+        callback(this.selectedSource() ? this.selectedSource().sourceType : undefined);
       });
 
-      huePubSub.subscribe('assist.set.source', source => {
+      huePubSub.subscribe(ASSIST_SET_SOURCE_EVENT, source => {
         if (this.sourceIndex[source]) {
           this.selectedSource(this.sourceIndex[source]);
         }
@@ -726,10 +729,10 @@ class AssistDbPanel {
     }
 
     this.init(options.navigationSettings).then(() => {
-      huePubSub.publish('assist.db.panel.ready');
+      huePubSub.publish(ASSIST_DB_PANEL_IS_READY_EVENT);
 
-      huePubSub.subscribe('assist.is.db.panel.ready', () => {
-        huePubSub.publish('assist.db.panel.ready');
+      huePubSub.subscribe(ASSIST_IS_DB_PANEL_READY_EVENT, () => {
+        huePubSub.publish(ASSIST_DB_PANEL_IS_READY_EVENT);
       });
     });
   }

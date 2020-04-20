@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import hueUtils from '../utils/hueUtils';
+import hueUtils from 'utils/hueUtils';
 
 /**
  * @param {Object} [response]

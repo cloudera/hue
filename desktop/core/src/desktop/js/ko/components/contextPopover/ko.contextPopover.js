@@ -31,7 +31,7 @@ import LangRefContext from './langRefContext';
 import PartitionContext, { PARTITION_CONTEXT_TEMPLATE } from './partitionContext';
 import ResizeHelper from './resizeHelper';
 import StorageContext from './storageContext';
-import componentUtils from '../componentUtils';
+import componentUtils from 'ko/components/componentUtils';
 import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 export const CONTEXT_POPOVER_CLASS = 'hue-popover';

@@ -19,6 +19,7 @@ import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
+import { ASSIST_DB_HIGHLIGHT_EVENT } from 'ko/components/assist/events';
 
 class DataCatalogContext {
   constructor(options) {
@@ -176,7 +177,7 @@ class DataCatalogContext {
 
   showInAssist() {
     const self = this;
-    huePubSub.publish('assist.db.highlight', self.catalogEntry());
+    huePubSub.publish(ASSIST_DB_HIGHLIGHT_EVENT, self.catalogEntry());
     huePubSub.publish('global.search.close');
   }
 
