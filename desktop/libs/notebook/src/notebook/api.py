@@ -449,7 +449,10 @@ def get_logs(request):
   jobs = db.get_jobs(notebook, snippet, full_log)
 
   response['logs'] = logs.strip()
-  response['progress'] = min(db.progress(notebook, snippet, logs=full_log), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
+  response['progress'] = min(
+      db.progress(notebook, snippet, logs=full_log),
+      99
+    ) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
   response['jobs'] = jobs
   response['isFullLogs'] = db.get_log_is_full_log(notebook, snippet)
   response['status'] = 0
@@ -483,6 +486,8 @@ def _save_notebook(notebook, user):
   notebook['id'] = notebook_doc.id
   _clear_sessions(notebook)
   notebook_doc1 = notebook_doc._get_doc1(doc2_type=notebook_type)
+  if ENABLE_CONNECTORS.get():
+    notebook_doc.connector_id = int(notebook['type'])
   notebook_doc.update_data(notebook)
   notebook_doc.search = _get_statement(notebook)
   notebook_doc.name = notebook_doc1.name = notebook['name']
@@ -528,7 +533,7 @@ def _historify(notebook, user):
       type=query_type,
       owner=user,
       is_history=True,
-      is_managed=is_managed
+      is_managed=is_managed,
     )
 
   # Link history of saved query
@@ -548,6 +553,8 @@ def _historify(notebook, user):
 
   notebook['uuid'] = history_doc.uuid
   _clear_sessions(notebook)
+  if ENABLE_CONNECTORS.get():
+    history_doc.connector_id = int(notebook['type'])
   history_doc.update_data(notebook)
   history_doc.search = _get_statement(notebook)
   history_doc.save()
