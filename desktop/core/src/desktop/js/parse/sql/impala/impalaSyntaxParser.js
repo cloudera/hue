@@ -5139,101 +5139,101 @@ case 395: yy.lexer.unput('('); yy_.yytext = 'extract'; parser.addFunctionLocatio
 break;
 case 396: yy.lexer.unput('('); yy_.yytext = 'group_concat'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 583; 
 break;
-case 397: yy.lexer.unput('('); yy_.yytext = 'max'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 629; 
+case 397: yy.lexer.unput('('); yy_.yytext = 'left'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 618; 
 break;
-case 398: yy.lexer.unput('('); yy_.yytext = 'min'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 632; 
+case 398: yy.lexer.unput('('); yy_.yytext = 'max'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 629; 
 break;
-case 399: yy.lexer.unput('('); yy_.yytext = 'ndv'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 639; 
+case 399: yy.lexer.unput('('); yy_.yytext = 'min'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 632; 
 break;
-case 400: yy.lexer.unput('('); yy_.yytext = 'stddev'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 717; 
+case 400: yy.lexer.unput('('); yy_.yytext = 'ndv'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 639; 
 break;
-case 401: yy.lexer.unput('('); yy_.yytext = 'stddev_pop'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 718; 
+case 401: yy.lexer.unput('('); yy_.yytext = 'replace'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 73; 
 break;
-case 402: yy.lexer.unput('('); yy_.yytext = 'stddev_samp'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 719; 
+case 402: yy.lexer.unput('('); yy_.yytext = 'right'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 691; 
 break;
-case 403: yy.lexer.unput('('); yy_.yytext = 'sum'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 726; 
+case 403: yy.lexer.unput('('); yy_.yytext = 'stddev'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 717; 
 break;
-case 404: yy.lexer.unput('('); yy_.yytext = 'var_pop'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 753; 
+case 404: yy.lexer.unput('('); yy_.yytext = 'stddev_pop'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 718; 
 break;
-case 405: yy.lexer.unput('('); yy_.yytext = 'var_samp'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 754; 
+case 405: yy.lexer.unput('('); yy_.yytext = 'stddev_samp'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 719; 
 break;
-case 406: yy.lexer.unput('('); yy_.yytext = 'variance'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 757; 
+case 406: yy.lexer.unput('('); yy_.yytext = 'sum'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 726; 
 break;
-case 407: yy.lexer.unput('('); yy_.yytext = 'variance_pop'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 758; 
+case 407: yy.lexer.unput('('); yy_.yytext = 'var_pop'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 753; 
 break;
-case 408: yy.lexer.unput('('); yy_.yytext = 'variance_samp'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 759; 
+case 408: yy.lexer.unput('('); yy_.yytext = 'var_samp'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 754; 
 break;
-case 409: yy.lexer.unput('('); yy_.yytext = 'cume_dist'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
+case 409: yy.lexer.unput('('); yy_.yytext = 'variance'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 757; 
 break;
-case 410: yy.lexer.unput('('); yy_.yytext = 'dense_rank'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
+case 410: yy.lexer.unput('('); yy_.yytext = 'variance_pop'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 758; 
 break;
-case 411: yy.lexer.unput('('); yy_.yytext = 'first_value'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
+case 411: yy.lexer.unput('('); yy_.yytext = 'variance_samp'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 759; 
 break;
-case 412: yy.lexer.unput('('); yy_.yytext = 'lag'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
+case 412: yy.lexer.unput('('); yy_.yytext = 'cume_dist'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
 break;
-case 413: yy.lexer.unput('('); yy_.yytext = 'last_value'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
+case 413: yy.lexer.unput('('); yy_.yytext = 'dense_rank'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
 break;
-case 414: yy.lexer.unput('('); yy_.yytext = 'lead'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
+case 414: yy.lexer.unput('('); yy_.yytext = 'first_value'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
 break;
-case 415: yy.lexer.unput('('); yy_.yytext = 'ntile'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
+case 415: yy.lexer.unput('('); yy_.yytext = 'lag'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
 break;
-case 416: yy.lexer.unput('('); yy_.yytext = 'percent_rank'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
+case 416: yy.lexer.unput('('); yy_.yytext = 'last_value'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
 break;
-case 417: yy.lexer.unput('('); yy_.yytext = 'rank'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
+case 417: yy.lexer.unput('('); yy_.yytext = 'lead'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
 break;
-case 418: yy.lexer.unput('('); yy_.yytext = 'row_number'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
+case 418: yy.lexer.unput('('); yy_.yytext = 'ntile'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
 break;
-case 419: yy.lexer.unput('('); yy_.yytext = 'system'; return 923; 
+case 419: yy.lexer.unput('('); yy_.yytext = 'percent_rank'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
 break;
-case 420: return 748; 
+case 420: yy.lexer.unput('('); yy_.yytext = 'rank'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
 break;
-case 421: return 748; 
+case 421: yy.lexer.unput('('); yy_.yytext = 'row_number'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 476; 
 break;
-case 422: return 749; 
+case 422: yy.lexer.unput('('); yy_.yytext = 'system'; return 923; 
 break;
-case 423: return 466; 
+case 423: return 748; 
 break;
-case 424: parser.yy.cursorFound = true; return 27; 
+case 424: return 748; 
 break;
-case 425: parser.yy.cursorFound = true; return 771; 
+case 425: return 749; 
 break;
-case 426: return 587; 
+case 426: return 466; 
 break;
-case 427: parser.addFileLocation(yy_.yylloc, yy_.yytext); return 980; 
+case 427: parser.yy.cursorFound = true; return 27; 
 break;
-case 428: this.popState(); return 981; 
+case 428: parser.yy.cursorFound = true; return 771; 
 break;
-case 429: return 456; 
+case 429: return 587; 
 break;
-case 430: return 477; 
+case 430: parser.addFileLocation(yy_.yylloc, yy_.yytext); return 980; 
 break;
-case 431: return 652; 
+case 431: this.popState(); return 981; 
 break;
-case 432: return 54; 
+case 432: return 456; 
 break;
-case 433: return 236; 
+case 433: return 477; 
 break;
-case 434: return 237; 
+case 434: return 652; 
 break;
-case 435: return 277; 
+case 435: return 54; 
 break;
-case 436: return 277; 
+case 436: return 236; 
 break;
-case 437: return 277; 
+case 437: return 237; 
 break;
 case 438: return 277; 
 break;
 case 439: return 277; 
 break;
-case 440: return 472; 
+case 440: return 277; 
 break;
-case 441: return 471; 
+case 441: return 277; 
 break;
-case 442: return 482; 
+case 442: return 277; 
 break;
-case 443: return 482; 
+case 443: return 472; 
 break;
-case 444: return 482; 
+case 444: return 471; 
 break;
 case 445: return 482; 
 break;
@@ -5241,81 +5241,87 @@ case 446: return 482;
 break;
 case 447: return 482; 
 break;
-case 448: return 95; 
+case 448: return 482; 
 break;
-case 449: return 138; 
+case 449: return 482; 
 break;
-case 450: return 341; 
+case 450: return 482; 
 break;
-case 451: return 247; 
+case 451: return 95; 
 break;
-case 452: return 460; 
+case 452: return 138; 
 break;
-case 453: return 769; 
+case 453: return 341; 
 break;
-case 454: return 470; 
+case 454: return 247; 
 break;
-case 455: return 89; 
+case 455: return 460; 
 break;
-case 456: return 91; 
+case 456: return 769; 
 break;
-case 457: return 473; 
+case 457: return 470; 
 break;
-case 458: return 474; 
+case 458: return 89; 
 break;
-case 459: return 467; 
+case 459: return 91; 
 break;
-case 460: this.begin('backtickedValue'); return 491; 
+case 460: return 473; 
 break;
-case 461:
+case 461: return 474; 
+break;
+case 462: return 467; 
+break;
+case 463: this.begin('backtickedValue'); return 491; 
+break;
+case 464:
                                              if (parser.handleQuotedValueWithCursor(this, yy_.yytext, yy_.yylloc, '`')) {
                                                return 774;
                                              }
                                              return 181;
                                            
 break;
-case 462: this.popState(); return 491; 
+case 465: this.popState(); return 491; 
 break;
-case 463: this.begin('singleQuotedValue'); return 179; 
+case 466: this.begin('singleQuotedValue'); return 179; 
 break;
-case 464:
+case 467:
                                              if (parser.handleQuotedValueWithCursor(this, yy_.yytext, yy_.yylloc, '\'')) {
                                                return 774;
                                              }
                                              return 181;
                                            
 break;
-case 465: this.popState(); return 179; 
+case 468: this.popState(); return 179; 
 break;
-case 466: this.begin('doubleQuotedValue'); return 180; 
+case 469: this.begin('doubleQuotedValue'); return 180; 
 break;
-case 467:
+case 470:
                                              if (parser.handleQuotedValueWithCursor(this, yy_.yytext, yy_.yylloc, '"')) {
                                                return 774;
                                              }
                                              return 181;
                                            
 break;
-case 468: this.popState(); return 180; 
+case 471: this.popState(); return 180; 
 break;
-case 469: return 456; 
+case 472: return 456; 
 break;
-case 470: /* To prevent console logging of unknown chars */ 
-break;
-case 471: 
-break;
-case 472: 
-break;
-case 473: 
+case 473: /* To prevent console logging of unknown chars */ 
 break;
 case 474: 
 break;
-case 475:console.log(yy_.yytext);
+case 475: 
+break;
+case 476: 
+break;
+case 477: 
+break;
+case 478:console.log(yy_.yytext);
 break;
 }
 },
-rules: [/^(?:\s)/i,/^(?:--.*)/i,/^(?:[\/][*][^*]*[*]+([^\/*][^*]*[*]+)*[\/])/i,/^(?:\u2020)/i,/^(?:\u2021)/i,/^(?:ADD)/i,/^(?:AGGREGATE)/i,/^(?:ALL)/i,/^(?:ALLOCATE)/i,/^(?:ALTER)/i,/^(?:ANALYTIC)/i,/^(?:AND)/i,/^(?:ANTI)/i,/^(?:ANY)/i,/^(?:ARE)/i,/^(?:ARRAY_AGG)/i,/^(?:ARRAY_MAX_CARDINALITY)/i,/^(?:AS)/i,/^(?:ASC)/i,/^(?:ASENSITIVE)/i,/^(?:ASYMMETRIC)/i,/^(?:AT)/i,/^(?:ATOMIC)/i,/^(?:AUTHORIZATION)/i,/^(?:AVRO)/i,/^(?:BEGIN_FRAME)/i,/^(?:BEGIN_PARTITION)/i,/^(?:BETWEEN)/i,/^(?:BIGINT)/i,/^(?:BLOB)/i,/^(?:BLOCK_SIZE)/i,/^(?:BOOLEAN)/i,/^(?:BOTH)/i,/^(?:BY)/i,/^(?:CACHED)/i,/^(?:CALLED)/i,/^(?:CARDINALITY)/i,/^(?:CASCADE)/i,/^(?:CASCADED)/i,/^(?:CASE)/i,/^(?:CHANGE)/i,/^(?:CHAR)/i,/^(?:CHARACTER)/i,/^(?:CLOB)/i,/^(?:CLOSE_FN)/i,/^(?:COLLATE)/i,/^(?:COLLECT)/i,/^(?:COLUMN)/i,/^(?:COLUMNS)/i,/^(?:COMMENT)/i,/^(?:COMMIT)/i,/^(?:COMPRESSION)/i,/^(?:COMPUTE)/i,/^(?:CONDITION)/i,/^(?:CONNECT)/i,/^(?:CONSTRAINT)/i,/^(?:CONTAINS)/i,/^(?:CONVERT)/i,/^(?:COPY)/i,/^(?:CORR)/i,/^(?:CORRESPONDING)/i,/^(?:COVAR_POP)/i,/^(?:COVAR_SAMP)/i,/^(?:CREATE)/i,/^(?:CROSS)/i,/^(?:CUBE)/i,/^(?:CURRENT)/i,/^(?:CURRENT_DATE)/i,/^(?:CURRENT_DEFAULT_TRANSFORM_GROUP)/i,/^(?:CURRENT_PATH)/i,/^(?:CURRENT_ROLE)/i,/^(?:CURRENT_ROW)/i,/^(?:CURRENT_SCHEMA)/i,/^(?:CURRENT_TIME)/i,/^(?:CURRENT_TRANSFORM_GROUP_FOR_TYPE)/i,/^(?:CYCLE)/i,/^(?:DATA)/i,/^(?:DATABASE)/i,/^(?:DATABASES)/i,/^(?:DEALLOCATE)/i,/^(?:DEC)/i,/^(?:DECFLOAT)/i,/^(?:DECIMAL)/i,/^(?:DECLARE)/i,/^(?:DEFINE)/i,/^(?:DELETE)/i,/^(?:DELIMITED)/i,/^(?:DEREF)/i,/^(?:DESC)/i,/^(?:DESCRIBE)/i,/^(?:DETERMINISTIC)/i,/^(?:DISCONNECT)/i,/^(?:DISTINCT)/i,/^(?:DIV)/i,/^(?:DOUBLE)/i,/^(?:DROP)/i,/^(?:DYNAMIC)/i,/^(?:EACH)/i,/^(?:ELEMENT)/i,/^(?:ELSE)/i,/^(?:EMPTY)/i,/^(?:ENCODING)/i,/^(?:END)/i,/^(?:END_FRAME)/i,/^(?:END_PARTITION)/i,/^(?:EQUALS)/i,/^(?:ESCAPE)/i,/^(?:ESCAPED)/i,/^(?:EVERY)/i,/^(?:EXCEPT)/i,/^(?:EXEC)/i,/^(?:EXECUTE)/i,/^(?:EXISTS)/i,/^(?:EXPLAIN)/i,/^(?:EXTENDED)/i,/^(?:EXTERNAL)/i,/^(?:FALSE)/i,/^(?:FETCH)/i,/^(?:FIELDS)/i,/^(?:FILEFORMAT)/i,/^(?:FILES)/i,/^(?:FILTER)/i,/^(?:FINALIZE_FN)/i,/^(?:FIRST)/i,/^(?:FLOAT)/i,/^(?:FOLLOWING)/i,/^(?:FOR)/i,/^(?:FOREIGN)/i,/^(?:FORMAT)/i,/^(?:FORMATTED)/i,/^(?:FRAME_ROW)/i,/^(?:FREE)/i,/^(?:FROM)/i,/^(?:FULL)/i,/^(?:FUNCTION)/i,/^(?:FUNCTIONS)/i,/^(?:FUSION)/i,/^(?:GET)/i,/^(?:GLOBAL)/i,/^(?:GRANT)/i,/^(?:GROUP)/i,/^(?:GROUPING)/i,/^(?:GROUPS)/i,/^(?:HASH)/i,/^(?:HAVING)/i,/^(?:HOLD)/i,/^(?:IF)/i,/^(?:IGNORE)/i,/^(?:ILIKE)/i,/^(?:IN)/i,/^(?:INCREMENTAL)/i,/^(?:INDICATOR)/i,/^(?:INIT_FN)/i,/^(?:INITIAL)/i,/^(?:INNER)/i,/^(?:INOUT)/i,/^(?:INPATH)/i,/^(?:INSENSITIVE)/i,/^(?:INSERT)/i,/^(?:INT)/i,/^(?:INTEGER)/i,/^(?:INTERMEDIATE)/i,/^(?:INTERSECT)/i,/^(?:INTERSECTION)/i,/^(?:INTERVAL)/i,/^(?:INTO)/i,/^(?:INVALIDATE)/i,/^(?:IREGEXP)/i,/^(?:IS)/i,/^(?:JOIN)/i,/^(?:JSON_ARRAY)/i,/^(?:JSON_ARRAYAGG)/i,/^(?:JSON_EXISTS)/i,/^(?:JSON_OBJECT)/i,/^(?:JSON_OBJECTAGG)/i,/^(?:JSON_QUERY)/i,/^(?:JSON_TABLE)/i,/^(?:JSON_TABLE_PRIMITIVE)/i,/^(?:JSON_VALUE)/i,/^(?:KEY)/i,/^(?:KUDU)/i,/^(?:LARGE)/i,/^(?:LAST)/i,/^(?:LATERAL)/i,/^(?:LEADING)/i,/^(?:LEFT)/i,/^(?:LIKE)/i,/^(?:LIKE_REGEX)/i,/^(?:LIMIT)/i,/^(?:LINES)/i,/^(?:LISTAGG)/i,/^(?:LOAD)/i,/^(?:LOCAL)/i,/^(?:LOCALTIMESTAMP)/i,/^(?:LOCATION)/i,/^(?:MATCH)/i,/^(?:MATCH_NUMBER)/i,/^(?:MATCH_RECOGNIZE)/i,/^(?:MATCHES)/i,/^(?:MERGE)/i,/^(?:MERGE_FN)/i,/^(?:METADATA)/i,/^(?:METHOD)/i,/^(?:MODIFIES)/i,/^(?:MULTISET)/i,/^(?:NATIONAL)/i,/^(?:NATURAL)/i,/^(?:NCHAR)/i,/^(?:NCLOB)/i,/^(?:NO)/i,/^(?:NONE)/i,/^(?:NORMALIZE)/i,/^(?:NOT)/i,/^(?:NTH_VALUE)/i,/^(?:NULL)/i,/^(?:NULLS)/i,/^(?:NUMERIC)/i,/^(?:OCCURRENCES_REGEX)/i,/^(?:OCTET_LENGTH)/i,/^(?:OF)/i,/^(?:OFFSET)/i,/^(?:OMIT)/i,/^(?:ON)/i,/^(?:ONE)/i,/^(?:ONLY)/i,/^(?:OPTION)/i,/^(?:OR)/i,/^(?:ORC)/i,/^(?:ORDER)/i,/^(?:OUT)/i,/^(?:OUTER)/i,/^(?:OVER)/i,/^(?:OVERLAPS)/i,/^(?:OVERLAY)/i,/^(?:OVERWRITE)/i,/^(?:PARQUET)/i,/^(?:PARTITION)/i,/^(?:PARTITIONED)/i,/^(?:PARTITIONS)/i,/^(?:PATTERN)/i,/^(?:PER)/i,/^(?:PERCENT)/i,/^(?:PERCENTILE_CONT)/i,/^(?:PERCENTILE_DISC)/i,/^(?:PORTION)/i,/^(?:POSITION)/i,/^(?:POSITION_REGEX)/i,/^(?:PRECEDES)/i,/^(?:PRECEDING)/i,/^(?:PREPARE)/i,/^(?:PREPARE_FN)/i,/^(?:PRIMARY)/i,/^(?:PROCEDURE)/i,/^(?:PTF)/i,/^(?:PURGE)/i,/^(?:RANGE)/i,/^(?:RCFILE)/i,/^(?:READS)/i,/^(?:REAL)/i,/^(?:RECOVER)/i,/^(?:RECURSIVE)/i,/^(?:REF)/i,/^(?:REFERENCES)/i,/^(?:REFERENCING)/i,/^(?:REFRESH)/i,/^(?:REGEXP)/i,/^(?:REGR_AVGX)/i,/^(?:REGR_AVGY)/i,/^(?:REGR_COUNT)/i,/^(?:REGR_INTERCEPT)/i,/^(?:REGR_R2REGR_SLOPE)/i,/^(?:REGR_SXX)/i,/^(?:REGR_SXY)/i,/^(?:REGR_SYY)/i,/^(?:RELEASE)/i,/^(?:RENAME)/i,/^(?:REPEATABLE)/i,/^(?:REPLACE)/i,/^(?:REPLICATION)/i,/^(?:RESTRICT)/i,/^(?:RETURNS)/i,/^(?:REVOKE)/i,/^(?:RIGHT)/i,/^(?:RLIKE)/i,/^(?:ROLE)/i,/^(?:ROLES)/i,/^(?:ROLLBACK)/i,/^(?:ROLLUP)/i,/^(?:ROW)/i,/^(?:ROWS)/i,/^(?:RUNNING)/i,/^(?:SAVEPOINT)/i,/^(?:SCHEMA)/i,/^(?:SCHEMAS)/i,/^(?:SCOPE)/i,/^(?:SCROLL)/i,/^(?:SEARCH)/i,/^(?:SEEK)/i,/^(?:SELECT)/i,/^(?:SEMI)/i,/^(?:SENSITIVE)/i,/^(?:SEQUENCEFILE)/i,/^(?:SERDEPROPERTIES)/i,/^(?:SERIALIZE_FN)/i,/^(?:SERVER)/i,/^(?:SET)/i,/^(?:SHOW)/i,/^(?:SIMILAR)/i,/^(?:SKIP)/i,/^(?:SMALLINT)/i,/^(?:SOME)/i,/^(?:SORT)/i,/^(?:SPECIFIC)/i,/^(?:SPECIFICTYPE)/i,/^(?:SQLEXCEPTION)/i,/^(?:SQLSTATE)/i,/^(?:SQLWARNING)/i,/^(?:STATIC)/i,/^(?:STATS)/i,/^(?:STORED)/i,/^(?:STRAIGHT_JOIN)/i,/^(?:STRING)/i,/^(?:SUBMULTISET)/i,/^(?:SUBSET)/i,/^(?:SUBSTRING_REGEX)/i,/^(?:SUCCEEDS)/i,/^(?:SYMBOL)/i,/^(?:SYMMETRIC)/i,/^(?:SYSTEM_TIME)/i,/^(?:SYSTEM_USER)/i,/^(?:TABLE)/i,/^(?:TABLES)/i,/^(?:TABLESAMPLE)/i,/^(?:TBLPROPERTIES)/i,/^(?:TERMINATED)/i,/^(?:TEXTFILE)/i,/^(?:THEN)/i,/^(?:TIMESTAMP)/i,/^(?:TIMEZONE_HOUR)/i,/^(?:TIMEZONE_MINUTE)/i,/^(?:TINYINT)/i,/^(?:TO)/i,/^(?:TRAILING)/i,/^(?:TRANSLATE_REGEX)/i,/^(?:TRANSLATION)/i,/^(?:TREAT)/i,/^(?:TRIGGER)/i,/^(?:TRIM_ARRAY)/i,/^(?:TRUE)/i,/^(?:TRUNCATE)/i,/^(?:UESCAPE)/i,/^(?:UNBOUNDED)/i,/^(?:UNCACHED)/i,/^(?:UNION)/i,/^(?:UNIQUE)/i,/^(?:UNKNOWN)/i,/^(?:UNNEST)/i,/^(?:UPDATE)/i,/^(?:UPDATE_FN)/i,/^(?:UPSERT)/i,/^(?:URI)/i,/^(?:USE)/i,/^(?:USER)/i,/^(?:USING)/i,/^(?:VALUE_OF)/i,/^(?:VALUES)/i,/^(?:VARBINARY)/i,/^(?:VARCHAR)/i,/^(?:VARYING)/i,/^(?:VERSIONING)/i,/^(?:VIEW)/i,/^(?:WHEN)/i,/^(?:WHENEVER)/i,/^(?:WHERE)/i,/^(?:WIDTH_BUCKET)/i,/^(?:WINDOW)/i,/^(?:WITH)/i,/^(?:WITHIN)/i,/^(?:WITHOUT)/i,/^(?:LIKE\s+PARQUET)/i,/^(?:PARTITION\s+VALUE\s)/i,/^(?:OVER)/i,/^(?:ROLE)/i,/^(?:ARRAY)/i,/^(?:DEFAULT)/i,/^(?:MAP)/i,/^(?:OWNER)/i,/^(?:STRUCT)/i,/^(?:\[BROADCAST\])/i,/^(?:\[NOSHUFFLE\])/i,/^(?:\[SHUFFLE\])/i,/^(?:APPX_MEDIAN\s*\()/i,/^(?:AVG\s*\()/i,/^(?:CAST\s*\()/i,/^(?:COUNT\s*\()/i,/^(?:EXTRACT\s*\()/i,/^(?:GROUP_CONCAT\s*\()/i,/^(?:MAX\s*\()/i,/^(?:MIN\s*\()/i,/^(?:NDV\s*\()/i,/^(?:STDDEV\s*\()/i,/^(?:STDDEV_POP\s*\()/i,/^(?:STDDEV_SAMP\s*\()/i,/^(?:SUM\s*\()/i,/^(?:VAR_POP\s*\()/i,/^(?:VAR_SAMP\s*\()/i,/^(?:VARIANCE\s*\()/i,/^(?:VARIANCE_POP\s*\()/i,/^(?:VARIANCE_SAMP\s*\()/i,/^(?:CUME_DIST\s*\()/i,/^(?:DENSE_RANK\s*\()/i,/^(?:FIRST_VALUE\s*\()/i,/^(?:LAG\s*\()/i,/^(?:LAST_VALUE\s*\()/i,/^(?:LEAD\s*\()/i,/^(?:NTILE\s*\()/i,/^(?:PERCENT_RANK\s*\()/i,/^(?:RANK\s*\()/i,/^(?:ROW_NUMBER\s*\()/i,/^(?:SYSTEM\s*\()/i,/^(?:[0-9]+)/i,/^(?:[0-9]+(?:[YSL]|BD)?)/i,/^(?:[0-9]+E)/i,/^(?:[A-Za-z0-9_]+)/i,/^(?:\u2020)/i,/^(?:\u2021)/i,/^(?:\s+['"])/i,/^(?:[^'"\u2020\u2021]+)/i,/^(?:['"])/i,/^(?:$)/i,/^(?:&&)/i,/^(?:\|\|)/i,/^(?:=)/i,/^(?:<)/i,/^(?:>)/i,/^(?:!=)/i,/^(?:<=)/i,/^(?:>=)/i,/^(?:<>)/i,/^(?:<=>)/i,/^(?:-)/i,/^(?:\*)/i,/^(?:\+)/i,/^(?:\/)/i,/^(?:%)/i,/^(?:\|)/i,/^(?:\^)/i,/^(?:&)/i,/^(?:,)/i,/^(?:\.)/i,/^(?:\.\.\.)/i,/^(?::)/i,/^(?:;)/i,/^(?:~)/i,/^(?:!)/i,/^(?:\()/i,/^(?:\))/i,/^(?:\[)/i,/^(?:\])/i,/^(?:\$\{[^}]*\})/i,/^(?:`)/i,/^(?:[^`]+)/i,/^(?:`)/i,/^(?:')/i,/^(?:(?:\\\\|\\[']|[^'])+)/i,/^(?:')/i,/^(?:")/i,/^(?:(?:\\\\|\\["]|[^"])+)/i,/^(?:")/i,/^(?:$)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i],
-conditions: {"hdfs":{"rules":[424,425,426,427,428,429,471],"inclusive":false},"doubleQuotedValue":{"rules":[467,468,474],"inclusive":false},"singleQuotedValue":{"rules":[464,465,473],"inclusive":false},"backtickedValue":{"rules":[461,462,472],"inclusive":false},"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,349,350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365,366,367,368,369,370,371,372,373,374,375,376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,419,420,421,422,423,430,431,432,433,434,435,436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,452,453,454,455,456,457,458,459,460,463,466,469,470,475],"inclusive":true}}
+rules: [/^(?:\s)/i,/^(?:--.*)/i,/^(?:[\/][*][^*]*[*]+([^\/*][^*]*[*]+)*[\/])/i,/^(?:\u2020)/i,/^(?:\u2021)/i,/^(?:ADD)/i,/^(?:AGGREGATE)/i,/^(?:ALL)/i,/^(?:ALLOCATE)/i,/^(?:ALTER)/i,/^(?:ANALYTIC)/i,/^(?:AND)/i,/^(?:ANTI)/i,/^(?:ANY)/i,/^(?:ARE)/i,/^(?:ARRAY_AGG)/i,/^(?:ARRAY_MAX_CARDINALITY)/i,/^(?:AS)/i,/^(?:ASC)/i,/^(?:ASENSITIVE)/i,/^(?:ASYMMETRIC)/i,/^(?:AT)/i,/^(?:ATOMIC)/i,/^(?:AUTHORIZATION)/i,/^(?:AVRO)/i,/^(?:BEGIN_FRAME)/i,/^(?:BEGIN_PARTITION)/i,/^(?:BETWEEN)/i,/^(?:BIGINT)/i,/^(?:BLOB)/i,/^(?:BLOCK_SIZE)/i,/^(?:BOOLEAN)/i,/^(?:BOTH)/i,/^(?:BY)/i,/^(?:CACHED)/i,/^(?:CALLED)/i,/^(?:CARDINALITY)/i,/^(?:CASCADE)/i,/^(?:CASCADED)/i,/^(?:CASE)/i,/^(?:CHANGE)/i,/^(?:CHAR)/i,/^(?:CHARACTER)/i,/^(?:CLOB)/i,/^(?:CLOSE_FN)/i,/^(?:COLLATE)/i,/^(?:COLLECT)/i,/^(?:COLUMN)/i,/^(?:COLUMNS)/i,/^(?:COMMENT)/i,/^(?:COMMIT)/i,/^(?:COMPRESSION)/i,/^(?:COMPUTE)/i,/^(?:CONDITION)/i,/^(?:CONNECT)/i,/^(?:CONSTRAINT)/i,/^(?:CONTAINS)/i,/^(?:CONVERT)/i,/^(?:COPY)/i,/^(?:CORR)/i,/^(?:CORRESPONDING)/i,/^(?:COVAR_POP)/i,/^(?:COVAR_SAMP)/i,/^(?:CREATE)/i,/^(?:CROSS)/i,/^(?:CUBE)/i,/^(?:CURRENT)/i,/^(?:CURRENT_DATE)/i,/^(?:CURRENT_DEFAULT_TRANSFORM_GROUP)/i,/^(?:CURRENT_PATH)/i,/^(?:CURRENT_ROLE)/i,/^(?:CURRENT_ROW)/i,/^(?:CURRENT_SCHEMA)/i,/^(?:CURRENT_TIME)/i,/^(?:CURRENT_TRANSFORM_GROUP_FOR_TYPE)/i,/^(?:CYCLE)/i,/^(?:DATA)/i,/^(?:DATABASE)/i,/^(?:DATABASES)/i,/^(?:DEALLOCATE)/i,/^(?:DEC)/i,/^(?:DECFLOAT)/i,/^(?:DECIMAL)/i,/^(?:DECLARE)/i,/^(?:DEFINE)/i,/^(?:DELETE)/i,/^(?:DELIMITED)/i,/^(?:DEREF)/i,/^(?:DESC)/i,/^(?:DESCRIBE)/i,/^(?:DETERMINISTIC)/i,/^(?:DISCONNECT)/i,/^(?:DISTINCT)/i,/^(?:DIV)/i,/^(?:DOUBLE)/i,/^(?:DROP)/i,/^(?:DYNAMIC)/i,/^(?:EACH)/i,/^(?:ELEMENT)/i,/^(?:ELSE)/i,/^(?:EMPTY)/i,/^(?:ENCODING)/i,/^(?:END)/i,/^(?:END_FRAME)/i,/^(?:END_PARTITION)/i,/^(?:EQUALS)/i,/^(?:ESCAPE)/i,/^(?:ESCAPED)/i,/^(?:EVERY)/i,/^(?:EXCEPT)/i,/^(?:EXEC)/i,/^(?:EXECUTE)/i,/^(?:EXISTS)/i,/^(?:EXPLAIN)/i,/^(?:EXTENDED)/i,/^(?:EXTERNAL)/i,/^(?:FALSE)/i,/^(?:FETCH)/i,/^(?:FIELDS)/i,/^(?:FILEFORMAT)/i,/^(?:FILES)/i,/^(?:FILTER)/i,/^(?:FINALIZE_FN)/i,/^(?:FIRST)/i,/^(?:FLOAT)/i,/^(?:FOLLOWING)/i,/^(?:FOR)/i,/^(?:FOREIGN)/i,/^(?:FORMAT)/i,/^(?:FORMATTED)/i,/^(?:FRAME_ROW)/i,/^(?:FREE)/i,/^(?:FROM)/i,/^(?:FULL)/i,/^(?:FUNCTION)/i,/^(?:FUNCTIONS)/i,/^(?:FUSION)/i,/^(?:GET)/i,/^(?:GLOBAL)/i,/^(?:GRANT)/i,/^(?:GROUP)/i,/^(?:GROUPING)/i,/^(?:GROUPS)/i,/^(?:HASH)/i,/^(?:HAVING)/i,/^(?:HOLD)/i,/^(?:IF)/i,/^(?:IGNORE)/i,/^(?:ILIKE)/i,/^(?:IN)/i,/^(?:INCREMENTAL)/i,/^(?:INDICATOR)/i,/^(?:INIT_FN)/i,/^(?:INITIAL)/i,/^(?:INNER)/i,/^(?:INOUT)/i,/^(?:INPATH)/i,/^(?:INSENSITIVE)/i,/^(?:INSERT)/i,/^(?:INT)/i,/^(?:INTEGER)/i,/^(?:INTERMEDIATE)/i,/^(?:INTERSECT)/i,/^(?:INTERSECTION)/i,/^(?:INTERVAL)/i,/^(?:INTO)/i,/^(?:INVALIDATE)/i,/^(?:IREGEXP)/i,/^(?:IS)/i,/^(?:JOIN)/i,/^(?:JSON_ARRAY)/i,/^(?:JSON_ARRAYAGG)/i,/^(?:JSON_EXISTS)/i,/^(?:JSON_OBJECT)/i,/^(?:JSON_OBJECTAGG)/i,/^(?:JSON_QUERY)/i,/^(?:JSON_TABLE)/i,/^(?:JSON_TABLE_PRIMITIVE)/i,/^(?:JSON_VALUE)/i,/^(?:KEY)/i,/^(?:KUDU)/i,/^(?:LARGE)/i,/^(?:LAST)/i,/^(?:LATERAL)/i,/^(?:LEADING)/i,/^(?:LEFT)/i,/^(?:LIKE)/i,/^(?:LIKE_REGEX)/i,/^(?:LIMIT)/i,/^(?:LINES)/i,/^(?:LISTAGG)/i,/^(?:LOAD)/i,/^(?:LOCAL)/i,/^(?:LOCALTIMESTAMP)/i,/^(?:LOCATION)/i,/^(?:MATCH)/i,/^(?:MATCH_NUMBER)/i,/^(?:MATCH_RECOGNIZE)/i,/^(?:MATCHES)/i,/^(?:MERGE)/i,/^(?:MERGE_FN)/i,/^(?:METADATA)/i,/^(?:METHOD)/i,/^(?:MODIFIES)/i,/^(?:MULTISET)/i,/^(?:NATIONAL)/i,/^(?:NATURAL)/i,/^(?:NCHAR)/i,/^(?:NCLOB)/i,/^(?:NO)/i,/^(?:NONE)/i,/^(?:NORMALIZE)/i,/^(?:NOT)/i,/^(?:NTH_VALUE)/i,/^(?:NULL)/i,/^(?:NULLS)/i,/^(?:NUMERIC)/i,/^(?:OCCURRENCES_REGEX)/i,/^(?:OCTET_LENGTH)/i,/^(?:OF)/i,/^(?:OFFSET)/i,/^(?:OMIT)/i,/^(?:ON)/i,/^(?:ONE)/i,/^(?:ONLY)/i,/^(?:OPTION)/i,/^(?:OR)/i,/^(?:ORC)/i,/^(?:ORDER)/i,/^(?:OUT)/i,/^(?:OUTER)/i,/^(?:OVER)/i,/^(?:OVERLAPS)/i,/^(?:OVERLAY)/i,/^(?:OVERWRITE)/i,/^(?:PARQUET)/i,/^(?:PARTITION)/i,/^(?:PARTITIONED)/i,/^(?:PARTITIONS)/i,/^(?:PATTERN)/i,/^(?:PER)/i,/^(?:PERCENT)/i,/^(?:PERCENTILE_CONT)/i,/^(?:PERCENTILE_DISC)/i,/^(?:PORTION)/i,/^(?:POSITION)/i,/^(?:POSITION_REGEX)/i,/^(?:PRECEDES)/i,/^(?:PRECEDING)/i,/^(?:PREPARE)/i,/^(?:PREPARE_FN)/i,/^(?:PRIMARY)/i,/^(?:PROCEDURE)/i,/^(?:PTF)/i,/^(?:PURGE)/i,/^(?:RANGE)/i,/^(?:RCFILE)/i,/^(?:READS)/i,/^(?:REAL)/i,/^(?:RECOVER)/i,/^(?:RECURSIVE)/i,/^(?:REF)/i,/^(?:REFERENCES)/i,/^(?:REFERENCING)/i,/^(?:REFRESH)/i,/^(?:REGEXP)/i,/^(?:REGR_AVGX)/i,/^(?:REGR_AVGY)/i,/^(?:REGR_COUNT)/i,/^(?:REGR_INTERCEPT)/i,/^(?:REGR_R2REGR_SLOPE)/i,/^(?:REGR_SXX)/i,/^(?:REGR_SXY)/i,/^(?:REGR_SYY)/i,/^(?:RELEASE)/i,/^(?:RENAME)/i,/^(?:REPEATABLE)/i,/^(?:REPLACE)/i,/^(?:REPLICATION)/i,/^(?:RESTRICT)/i,/^(?:RETURNS)/i,/^(?:REVOKE)/i,/^(?:RIGHT)/i,/^(?:RLIKE)/i,/^(?:ROLE)/i,/^(?:ROLES)/i,/^(?:ROLLBACK)/i,/^(?:ROLLUP)/i,/^(?:ROW)/i,/^(?:ROWS)/i,/^(?:RUNNING)/i,/^(?:SAVEPOINT)/i,/^(?:SCHEMA)/i,/^(?:SCHEMAS)/i,/^(?:SCOPE)/i,/^(?:SCROLL)/i,/^(?:SEARCH)/i,/^(?:SEEK)/i,/^(?:SELECT)/i,/^(?:SEMI)/i,/^(?:SENSITIVE)/i,/^(?:SEQUENCEFILE)/i,/^(?:SERDEPROPERTIES)/i,/^(?:SERIALIZE_FN)/i,/^(?:SERVER)/i,/^(?:SET)/i,/^(?:SHOW)/i,/^(?:SIMILAR)/i,/^(?:SKIP)/i,/^(?:SMALLINT)/i,/^(?:SOME)/i,/^(?:SORT)/i,/^(?:SPECIFIC)/i,/^(?:SPECIFICTYPE)/i,/^(?:SQLEXCEPTION)/i,/^(?:SQLSTATE)/i,/^(?:SQLWARNING)/i,/^(?:STATIC)/i,/^(?:STATS)/i,/^(?:STORED)/i,/^(?:STRAIGHT_JOIN)/i,/^(?:STRING)/i,/^(?:SUBMULTISET)/i,/^(?:SUBSET)/i,/^(?:SUBSTRING_REGEX)/i,/^(?:SUCCEEDS)/i,/^(?:SYMBOL)/i,/^(?:SYMMETRIC)/i,/^(?:SYSTEM_TIME)/i,/^(?:SYSTEM_USER)/i,/^(?:TABLE)/i,/^(?:TABLES)/i,/^(?:TABLESAMPLE)/i,/^(?:TBLPROPERTIES)/i,/^(?:TERMINATED)/i,/^(?:TEXTFILE)/i,/^(?:THEN)/i,/^(?:TIMESTAMP)/i,/^(?:TIMEZONE_HOUR)/i,/^(?:TIMEZONE_MINUTE)/i,/^(?:TINYINT)/i,/^(?:TO)/i,/^(?:TRAILING)/i,/^(?:TRANSLATE_REGEX)/i,/^(?:TRANSLATION)/i,/^(?:TREAT)/i,/^(?:TRIGGER)/i,/^(?:TRIM_ARRAY)/i,/^(?:TRUE)/i,/^(?:TRUNCATE)/i,/^(?:UESCAPE)/i,/^(?:UNBOUNDED)/i,/^(?:UNCACHED)/i,/^(?:UNION)/i,/^(?:UNIQUE)/i,/^(?:UNKNOWN)/i,/^(?:UNNEST)/i,/^(?:UPDATE)/i,/^(?:UPDATE_FN)/i,/^(?:UPSERT)/i,/^(?:URI)/i,/^(?:USE)/i,/^(?:USER)/i,/^(?:USING)/i,/^(?:VALUE_OF)/i,/^(?:VALUES)/i,/^(?:VARBINARY)/i,/^(?:VARCHAR)/i,/^(?:VARYING)/i,/^(?:VERSIONING)/i,/^(?:VIEW)/i,/^(?:WHEN)/i,/^(?:WHENEVER)/i,/^(?:WHERE)/i,/^(?:WIDTH_BUCKET)/i,/^(?:WINDOW)/i,/^(?:WITH)/i,/^(?:WITHIN)/i,/^(?:WITHOUT)/i,/^(?:LIKE\s+PARQUET)/i,/^(?:PARTITION\s+VALUE\s)/i,/^(?:OVER)/i,/^(?:ROLE)/i,/^(?:ARRAY)/i,/^(?:DEFAULT)/i,/^(?:MAP)/i,/^(?:OWNER)/i,/^(?:STRUCT)/i,/^(?:\[BROADCAST\])/i,/^(?:\[NOSHUFFLE\])/i,/^(?:\[SHUFFLE\])/i,/^(?:APPX_MEDIAN\s*\()/i,/^(?:AVG\s*\()/i,/^(?:CAST\s*\()/i,/^(?:COUNT\s*\()/i,/^(?:EXTRACT\s*\()/i,/^(?:GROUP_CONCAT\s*\()/i,/^(?:LEFT\s*\()/i,/^(?:MAX\s*\()/i,/^(?:MIN\s*\()/i,/^(?:NDV\s*\()/i,/^(?:REPLACE\s*\()/i,/^(?:RIGHT\s*\()/i,/^(?:STDDEV\s*\()/i,/^(?:STDDEV_POP\s*\()/i,/^(?:STDDEV_SAMP\s*\()/i,/^(?:SUM\s*\()/i,/^(?:VAR_POP\s*\()/i,/^(?:VAR_SAMP\s*\()/i,/^(?:VARIANCE\s*\()/i,/^(?:VARIANCE_POP\s*\()/i,/^(?:VARIANCE_SAMP\s*\()/i,/^(?:CUME_DIST\s*\()/i,/^(?:DENSE_RANK\s*\()/i,/^(?:FIRST_VALUE\s*\()/i,/^(?:LAG\s*\()/i,/^(?:LAST_VALUE\s*\()/i,/^(?:LEAD\s*\()/i,/^(?:NTILE\s*\()/i,/^(?:PERCENT_RANK\s*\()/i,/^(?:RANK\s*\()/i,/^(?:ROW_NUMBER\s*\()/i,/^(?:SYSTEM\s*\()/i,/^(?:[0-9]+)/i,/^(?:[0-9]+(?:[YSL]|BD)?)/i,/^(?:[0-9]+E)/i,/^(?:[A-Za-z0-9_]+)/i,/^(?:\u2020)/i,/^(?:\u2021)/i,/^(?:\s+['"])/i,/^(?:[^'"\u2020\u2021]+)/i,/^(?:['"])/i,/^(?:$)/i,/^(?:&&)/i,/^(?:\|\|)/i,/^(?:=)/i,/^(?:<)/i,/^(?:>)/i,/^(?:!=)/i,/^(?:<=)/i,/^(?:>=)/i,/^(?:<>)/i,/^(?:<=>)/i,/^(?:-)/i,/^(?:\*)/i,/^(?:\+)/i,/^(?:\/)/i,/^(?:%)/i,/^(?:\|)/i,/^(?:\^)/i,/^(?:&)/i,/^(?:,)/i,/^(?:\.)/i,/^(?:\.\.\.)/i,/^(?::)/i,/^(?:;)/i,/^(?:~)/i,/^(?:!)/i,/^(?:\()/i,/^(?:\))/i,/^(?:\[)/i,/^(?:\])/i,/^(?:\$\{[^}]*\})/i,/^(?:`)/i,/^(?:[^`]+)/i,/^(?:`)/i,/^(?:')/i,/^(?:(?:\\\\|\\[']|[^'])+)/i,/^(?:')/i,/^(?:")/i,/^(?:(?:\\\\|\\["]|[^"])+)/i,/^(?:")/i,/^(?:$)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i],
+conditions: {"hdfs":{"rules":[427,428,429,430,431,432,474],"inclusive":false},"doubleQuotedValue":{"rules":[470,471,477],"inclusive":false},"singleQuotedValue":{"rules":[467,468,476],"inclusive":false},"backtickedValue":{"rules":[464,465,475],"inclusive":false},"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,349,350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365,366,367,368,369,370,371,372,373,374,375,376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,419,420,421,422,423,424,425,426,433,434,435,436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,452,453,454,455,456,457,458,459,460,461,462,463,466,469,472,473,478],"inclusive":true}}
 });
 return lexer;
 })();
