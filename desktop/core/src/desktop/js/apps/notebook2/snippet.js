@@ -1055,6 +1055,7 @@ export default class Snippet {
 
   updateFromExecutable(executable) {
     if (executable) {
+      this.lastExecuted(executable.executeStarted);
       if (
         executable.status === EXECUTION_STATUS.available ||
         executable.status === EXECUTION_STATUS.failed ||
@@ -1436,6 +1437,7 @@ export default class Snippet {
       statementType: this.statementType(),
       statement: this.statement(),
       aceCursorPosition: this.aceCursorPosition(),
+      lastExecuted: this.lastExecuted(),
       statementPath: this.statementPath(),
       associatedDocumentUuid: this.associatedDocumentUuid(),
       properties: komapping.toJS(this.properties), // TODO: Drop komapping
