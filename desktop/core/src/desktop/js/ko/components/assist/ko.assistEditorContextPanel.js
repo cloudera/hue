@@ -197,7 +197,6 @@ class AssistantUtils {
 
 class AssistEditorContextPanel {
   constructor(params) {
-    this.disposals = [];
     this.isSolr = ko.observable(false);
     this.activeTab = params.activeTab;
 
@@ -333,11 +332,7 @@ class AssistEditorContextPanel {
       return result;
     };
 
-    const activeTablesSub = this.activeTables.subscribe(loadEntries);
-    this.disposals.push(() => {
-      window.clearTimeout(loadEntriesTimeout);
-      activeTablesSub.dispose();
-    });
+    this.activeTables.subscribe(loadEntries);
 
     let updateOnVisible = false;
 
@@ -591,7 +586,7 @@ class AssistEditorContextPanel {
       }
     };
 
-    const entryRefreshedSub = huePubSub.subscribe('data.catalog.entry.refreshed', details => {
+    huePubSub.subscribe('data.catalog.entry.refreshed', details => {
       const sourceType = details.entry.getSourceType();
       if (sources[sourceType]) {
         let completeRefresh = false;
@@ -631,18 +626,13 @@ class AssistEditorContextPanel {
       updateOnVisible = true;
     }
 
-    const activeTabSub = this.activeTab.subscribe(activeTab => {
+    this.activeTab.subscribe(activeTab => {
       if (activeTab === 'editorAssistant' && updateOnVisible) {
         huePubSub.publish('get.active.editor.locations', handleLocationUpdate);
       }
     });
 
-    this.disposals.push(() => {
-      entryRefreshedSub.remove();
-      activeTabSub.dispose();
-    });
-
-    const activeLocationsSub = huePubSub.subscribe('editor.active.locations', activeLocations => {
+    huePubSub.subscribe('editor.active.locations', activeLocations => {
       if (this.activeTab() === 'editorAssistant') {
         handleLocationUpdate(activeLocations);
       } else {
@@ -650,7 +640,7 @@ class AssistEditorContextPanel {
       }
     });
 
-    const activeRisksSub = huePubSub.subscribe('editor.active.risks', details => {
+    huePubSub.subscribe('editor.active.risks', details => {
       if (details.risks !== this.activeRisks()) {
         this.activeRisks(details.risks);
         this.activeEditor(details.editor);
@@ -660,11 +650,6 @@ class AssistEditorContextPanel {
     huePubSub.publish('editor.get.active.risks', details => {
       this.activeRisks(details.risks);
       this.activeEditor(details.editor);
-    });
-
-    this.disposals.push(() => {
-      activeLocationsSub.remove();
-      activeRisksSub.remove();
     });
   }
 
@@ -730,12 +715,6 @@ class AssistEditorContextPanel {
       callback: () => {
         this.uploadingTableStats(false);
       }
-    });
-  }
-
-  dispose() {
-    this.disposals.forEach(dispose => {
-      dispose();
     });
   }
 }
