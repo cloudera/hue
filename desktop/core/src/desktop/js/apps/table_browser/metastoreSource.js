@@ -22,9 +22,10 @@ import contextCatalog from 'catalog/contextCatalog';
 import huePubSub from 'utils/huePubSub';
 import MetastoreNamespace from 'apps/table_browser/metastoreNamespace';
 import {
-  ASSIST_DB_PANEL_IS_READY_EVENT,
+  ASSIST_DB_PANEL_IS_READY_EVENT, ASSIST_IS_DB_PANEL_READY_EVENT,
   ASSIST_SET_DATABASE_EVENT
 } from 'ko/components/assist/events';
+import {findConnector} from "../../utils/hueConfig";
 
 class MetastoreSource {
   constructor(options) {
@@ -57,21 +58,29 @@ class MetastoreSource {
       }
     };
 
-    huePubSub.subscribe(ASSIST_DB_PANEL_IS_READY_EVENT, () => {
-      this.lastLoadNamespacesDeferred.done(() => {
-        let lastSelectedDb = apiHelper.getFromTotalStorage(
-          'assist_' + this.sourceType + '_' + this.namespace.id,
-          'lastSelectedDb'
-        );
-        if (!lastSelectedDb && lastSelectedDb !== '') {
-          lastSelectedDb = 'default';
-        }
-        huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
-          source: this.type,
-          namespace: this.namespace().namespace,
-          name: lastSelectedDb
+    this.connector = ko.observable();
+
+    findConnector(connector => connector.type === this.type).then(connector => {
+      this.connector(connector);
+
+      huePubSub.subscribe(ASSIST_DB_PANEL_IS_READY_EVENT, () => {
+        this.lastLoadNamespacesDeferred.done(() => {
+          let lastSelectedDb = apiHelper.getFromTotalStorage(
+            'assist_' + this.type + '_' + this.namespace.id,
+            'lastSelectedDb'
+          );
+          if (!lastSelectedDb && lastSelectedDb !== '') {
+            lastSelectedDb = 'default';
+          }
+          huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
+            connector: connector,
+            namespace: this.namespace().namespace,
+            name: lastSelectedDb
+          });
         });
       });
+
+      huePubSub.publish(ASSIST_IS_DB_PANEL_READY_EVENT);
     });
 
     const getCurrentState = () => {
