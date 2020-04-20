@@ -282,7 +282,7 @@ def _check_status(request, notebook=None, snippet=None, operation_id=None):
     else:
       has_result_set = None
 
-    if notebook['type'].startswith('query') or notebook.get('isManaged'):
+    if notebook.get('dialect') or notebook['type'].startswith('query') or notebook.get('isManaged'):
       nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=operation_id or notebook['uuid'])
       if nb_doc.can_write(request.user):
         nb = Notebook(document=nb_doc).get_data()
