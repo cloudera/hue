@@ -48,6 +48,9 @@ class componentUtils {
               instances[name] = new model(params);
             }
           }
+          if (instances[name] && instances[name].dispose) {
+            console.warn('"dispose" function present on static component ' + name);
+          }
           return instances[name];
         }
       },

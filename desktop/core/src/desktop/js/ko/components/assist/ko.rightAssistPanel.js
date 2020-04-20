@@ -108,8 +108,6 @@ const TEMPLATE = `
 
 class RightAssistPanel {
   constructor(params) {
-    this.disposals = [];
-
     this.activeTab = ko.observable();
     this.visible = params.visible;
     this.connector = ko.observable();
@@ -203,11 +201,7 @@ class RightAssistPanel {
       updateTabs();
     };
 
-    const snippetTypeSub = huePubSub.subscribe(
-      ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
-      updateContentsForConnector
-    );
-    this.disposals.push(snippetTypeSub.remove.bind(snippetTypeSub));
+    huePubSub.subscribe(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, updateContentsForConnector);
 
     const onAppChange = appName => {
       if (appName === 'dashboard') {
@@ -254,12 +248,6 @@ class RightAssistPanel {
   schedulesTabClick() {
     this.lastActiveTabEditor(SCHEDULES_TAB);
     this.switchTab(SCHEDULES_TAB);
-  }
-
-  dispose() {
-    this.disposals.forEach(dispose => {
-      dispose();
-    });
   }
 }
 

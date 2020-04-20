@@ -62,12 +62,11 @@ const TEMPLATE = `
 
 class AssistSchedulePanel {
   constructor() {
-    this.disposals = [];
     this.selectedNotebook = ko.observable();
 
     // TODO: Move all the scheduler logic out of the notebook to here.
 
-    const selectedNotebookSub = this.selectedNotebook.subscribe(notebook => {
+    this.selectedNotebook.subscribe(notebook => {
       // Happening 4 times for each notebook loaded
       if (
         notebook &&
@@ -81,9 +80,8 @@ class AssistSchedulePanel {
         }
       }
     });
-    this.disposals.push(selectedNotebookSub.dispose.bind(selectedNotebookSub));
 
-    const setSelectedNotebookSub = huePubSub.subscribe('jobbrowser.schedule.data', jobs => {
+    huePubSub.subscribe('jobbrowser.schedule.data', jobs => {
       if (this.selectedNotebook() && this.selectedNotebook().viewSchedulerId()) {
         const job = jobs.filter(job => this.selectedNotebook().viewSchedulerId() === job.id);
         this.selectedNotebook().isSchedulerJobRunning(
@@ -91,24 +89,15 @@ class AssistSchedulePanel {
         );
       }
     });
-    this.disposals.push(setSelectedNotebookSub.remove.bind(setSelectedNotebookSub));
 
     // Hue 3
-    const setSelectedNotebookSub3 = huePubSub.subscribe(
-      'set.selected.notebook',
-      this.selectedNotebook
-    );
-    this.disposals.push(setSelectedNotebookSub3.remove.bind(setSelectedNotebookSub3));
+    huePubSub.subscribe('set.selected.notebook', this.selectedNotebook);
 
-    const selectedNotebookChangedSub = huePubSub.subscribe(
-      'selected.notebook.changed',
-      this.selectedNotebook
-    );
-    this.disposals.push(selectedNotebookChangedSub.remove.bind(selectedNotebookChangedSub));
+    huePubSub.subscribe('selected.notebook.changed', this.selectedNotebook);
     huePubSub.publish('get.selected.notebook');
 
     // Hue 4
-    const currentAppSub = huePubSub.subscribe('set.current.app.view.model', viewModel => {
+    huePubSub.subscribe('set.current.app.view.model', viewModel => {
       if (viewModel.selectedNotebook) {
         if (viewModel.selectedNotebook()) {
           this.selectedNotebook(viewModel.selectedNotebook());
@@ -121,13 +110,6 @@ class AssistSchedulePanel {
       } else {
         this.selectedNotebook(null);
       }
-    });
-    this.disposals.push(currentAppSub.remove.bind(currentAppSub));
-  }
-
-  dispose() {
-    this.disposals.forEach(dispose => {
-      dispose();
     });
   }
 }
