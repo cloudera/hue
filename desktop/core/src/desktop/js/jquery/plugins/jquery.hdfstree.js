@@ -16,7 +16,7 @@
 
 import jQuery from 'jquery';
 
-import hueUtils from '../../utils/hueUtils';
+import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
 
 // TODO: don't create multiple jquery instances from chunks

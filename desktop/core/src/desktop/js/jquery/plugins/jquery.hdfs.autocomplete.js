@@ -16,7 +16,7 @@
 
 import $ from 'jquery';
 
-import hueUtils from '../../utils/hueUtils';
+import hueUtils from 'utils/hueUtils';
 
 /*
  * jHue HDFS autocomplete plugin

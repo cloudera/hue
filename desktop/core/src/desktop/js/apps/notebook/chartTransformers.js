@@ -16,8 +16,8 @@
 
 import $ from 'jquery';
 
-import HueColors from '../../utils/hueColors';
-import hueUtils from '../../utils/hueUtils';
+import HueColors from 'utils/hueColors';
+import hueUtils from 'utils/hueUtils';
 
 const isNotNullForCharts = val => val !== 'NULL' && val !== null;
 
