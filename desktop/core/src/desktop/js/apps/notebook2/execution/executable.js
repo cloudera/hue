@@ -92,11 +92,15 @@ export default class Executable {
     return (this.executeEnded || Date.now()) - this.executeStarted;
   }
 
-  notify() {
+  notify(sync) {
     window.clearTimeout(this.notifyThrottle);
-    this.notifyThrottle = window.setTimeout(() => {
+    if (sync) {
       huePubSub.publish(EXECUTABLE_UPDATED_EVENT, this);
-    }, 1);
+    } else {
+      this.notifyThrottle = window.setTimeout(() => {
+        huePubSub.publish(EXECUTABLE_UPDATED_EVENT, this);
+      }, 1);
+    }
   }
 
   isReady() {
@@ -165,6 +169,7 @@ export default class Executable {
 
     this.setStatus(EXECUTION_STATUS.running);
     this.setProgress(0);
+    this.notify(true);
 
     try {
       hueAnalytics.log(
@@ -398,6 +403,7 @@ export default class Executable {
       id: id || UUID(),
       statement_raw: statement,
       statement: statement,
+      lastExecuted: this.executeStarted,
       variables: [],
       compute: this.executor.compute(),
       namespace: this.executor.namespace(),
