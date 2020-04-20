@@ -22,11 +22,9 @@ import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT, filterConnectors } from 'utils/hueConfig';
 import { simpleGet } from 'api/apiUtils';
-import {
-  ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
-  GET_ACTIVE_SNIPPET_CONNECTOR_EVENT
-} from 'apps/notebook2/events';
 import { ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT } from './events';
+
+export const NAME = 'assist-language-reference-panel';
 
 // prettier-ignore
 const TEMPLATE = `
@@ -128,7 +126,8 @@ class LanguageReferenceTopic {
 
 class AssistLangRefPanel {
   constructor(params, element) {
-    this.disposals = [];
+    this.connector = params.connector;
+
     this.availableDialects = ko.observableArray();
     this.activeDialect = ko.observable();
 
@@ -150,14 +149,13 @@ class AssistLangRefPanel {
       }
     };
 
-    const activeSnippetDialectSub = huePubSub.subscribe(
-      ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
-      connector => {
+    this.connector.subscribe(connector => {
+      if (connector) {
         updateDialect(connector.dialect);
       }
-    );
+    });
 
-    const configUpdated = async config => {
+    const configUpdated = async () => {
       const lastActiveDialect = this.activeDialect();
 
       const configuredDialects = (await filterConnectors(
@@ -179,30 +177,22 @@ class AssistLangRefPanel {
     };
 
     huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
-    const configSub = huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
+    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
 
-    this.disposals.push(() => {
-      configSub.remove();
-      activeSnippetDialectSub.remove();
-    });
+    if (this.connector()) {
+      updateDialect(this.connector().dialect);
+    }
 
-    huePubSub.publish(GET_ACTIVE_SNIPPET_CONNECTOR_EVENT, connector => {
-      updateDialect(connector.dialect);
-    });
-
-    this.topics = ko.pureComputed(() => {
-      return this.activeDialect() ? this.allTopics[this.activeDialect()] : [];
-    });
+    this.topics = ko.pureComputed(() =>
+      this.activeDialect() ? this.allTopics[this.activeDialect()] : []
+    );
 
     this.selectedTopic = ko.observable();
 
-    const selectedSub = this.selectedTopic.subscribe(newTopic => {
+    this.selectedTopic.subscribe(newTopic => {
       if (newTopic) {
         newTopic.load();
       }
-    });
-    this.disposals.push(() => {
-      selectedSub.dispose();
     });
 
     this.query = ko.observable().extend({ throttle: 200 });
@@ -272,13 +262,13 @@ class AssistLangRefPanel {
       }, 0);
     });
 
-    const selectedTopicSub = this.selectedTopic.subscribe(() => {
+    this.selectedTopic.subscribe(() => {
       $(element)
         .find('.assist-docs-details')
         .scrollTop(0);
     });
 
-    const querySub = this.query.subscribe(() => {
+    this.query.subscribe(() => {
       $(element)
         .find('.assist-docs-topics')
         .scrollTop(0);
@@ -309,36 +299,33 @@ class AssistLangRefPanel {
 
     huePubSub.subscribe('scroll.test', scrollToSelectedTopic);
 
-    const showTopicSub = huePubSub.subscribe(
-      ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT,
-      targetTopic => {
-        const topicStack = [];
-        const findTopic = topics => {
-          topics.some(topic => {
-            topicStack.push(topic);
-            if (topic.ref === targetTopic.ref) {
-              while (topicStack.length) {
-                topicStack.pop().open(true);
-              }
-              this.query('');
-              this.selectedTopic(topic);
-              window.setTimeout(() => {
-                scrollToAnchor(targetTopic.anchorId);
-                scrollToSelectedTopic();
-              }, 0);
-              return true;
-            } else if (topic.children.length) {
-              const inChild = findTopic(topic.children);
-              if (inChild) {
-                return true;
-              }
+    huePubSub.subscribe(ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT, targetTopic => {
+      const topicStack = [];
+      const findTopic = topics => {
+        topics.some(topic => {
+          topicStack.push(topic);
+          if (topic.ref === targetTopic.ref) {
+            while (topicStack.length) {
+              topicStack.pop().open(true);
             }
-            topicStack.pop();
-          });
-        };
-        findTopic(this.topics());
-      }
-    );
+            this.query('');
+            this.selectedTopic(topic);
+            window.setTimeout(() => {
+              scrollToAnchor(targetTopic.anchorId);
+              scrollToSelectedTopic();
+            }, 0);
+            return true;
+          } else if (topic.children.length) {
+            const inChild = findTopic(topic.children);
+            if (inChild) {
+              return true;
+            }
+          }
+          topicStack.pop();
+        });
+      };
+      findTopic(this.topics());
+    });
 
     $(element).on('click.langref', event => {
       if (event.target.className === 'hue-doc-internal-link') {
@@ -348,24 +335,11 @@ class AssistLangRefPanel {
         });
       }
     });
-
-    this.disposals.push(() => {
-      selectedTopicSub.dispose();
-      querySub.dispose();
-      showTopicSub.remove();
-      $(element).off('click.langref');
-    });
-  }
-
-  dispose() {
-    while (this.disposals.length) {
-      this.disposals.pop()();
-    }
   }
 }
 
 componentUtils.registerStaticComponent(
-  'assist-language-reference-panel',
+  NAME,
   {
     createViewModel: (params, componentInfo) =>
       new AssistLangRefPanel(params, componentInfo.element)

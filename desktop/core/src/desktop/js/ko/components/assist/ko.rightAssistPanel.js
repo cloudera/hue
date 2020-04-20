@@ -61,15 +61,40 @@ const TEMPLATE = `
   <!-- ko if: visible -->
   <div class="right-assist-contents">
     <!-- ko if: editorAssistantTabAvailable-->
-    <div data-bind="component: { name: 'assist-editor-context-panel', params: { activeTab: activeTab, connector: connector } }, visible: activeTab() === 'editorAssistant'"></div>
+    <div data-bind="
+        component: { 
+          name: 'assist-editor-context-panel', 
+          params: { 
+            activeTab: activeTab, 
+            connector: connector 
+          }
+        },
+        visible: activeTab() === 'editorAssistant'
+      "></div>
     <!-- /ko -->
 
     <!-- ko if: functionsTabAvailable -->
-    <div data-bind="component: { name: 'assist-functions-panel' }, visible: activeTab() === 'functions'"></div>
+    <div data-bind="
+        component: { 
+          name: 'assist-functions-panel',
+          params: {
+            connector: connector
+          }
+        },
+        visible: activeTab() === 'functions'
+      "></div>
     <!-- /ko -->
 
     <!-- ko if: langRefTabAvailable -->
-    <div data-bind="component: { name: 'assist-language-reference-panel' }, visible: activeTab() === 'langRef'"></div>
+    <div data-bind="
+        component: {
+          name: 'assist-language-reference-panel',
+          params: {
+            connector: connector
+          }
+        },
+        visible: activeTab() === 'langRef'
+      "></div>
     <!-- /ko -->
 
     <!-- ko if: dashboardAssistantTabAvailable -->
