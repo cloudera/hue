@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import * as ko from 'knockout';
+
 import AssistLangRefPanel from './ko.assistLangRefPanel';
 import apiHelper from 'api/apiHelper';
 import $ from 'jquery';
@@ -40,7 +42,8 @@ describe('ko.assistLangRefPanel.js', () => {
         .promise()
     );
     await refreshConfig();
-    const subject = new AssistLangRefPanel();
+    const connector = ko.observable({ dialect: 'impala' });
+    const subject = new AssistLangRefPanel({ connector: connector });
     await sleep(0);
 
     expect(spy).toHaveBeenCalled();
@@ -68,7 +71,5 @@ describe('ko.assistLangRefPanel.js', () => {
 
     expect(subject.availableDialects()).toEqual(['impala']);
     expect(subject.activeDialect()).toEqual('impala');
-
-    subject.dispose();
   });
 });
