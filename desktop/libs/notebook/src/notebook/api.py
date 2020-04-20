@@ -463,6 +463,7 @@ def get_logs(request):
 def _save_notebook(notebook, user):
   if notebook['snippets'][0].get('connector') and notebook['snippets'][0]['connector'].get('dialect'):  # TODO Connector unification
     notebook_type = 'query-%(dialect)s' % notebook['snippets'][0]['connector']
+    notebook['snippets'][0]['executor']['executables'] = []
   else:
     notebook_type = notebook.get('type', 'notebook')
 
