@@ -43,7 +43,7 @@ from metadata.conf import OPTIMIZER
 from notebook.connectors.base import Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name, patch_snippet_for_connector
 from notebook.connectors.hiveserver2 import HS2Api
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
-from notebook.models import escape_rows, make_notebook, upgrade_session_properties, get_api
+from notebook.models import escape_rows, make_notebook, upgrade_session_properties, get_api, MockRequest
 
 if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_unquote
@@ -297,8 +297,6 @@ def _check_status(request, notebook=None, snippet=None, operation_id=None):
 @check_document_access_permission
 @api_error_handler
 def fetch_result_data(request):
-  response = {'status': -1}
-
   operation_id = request.POST.get('operationId')
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
@@ -306,25 +304,33 @@ def fetch_result_data(request):
   rows = json.loads(request.POST.get('rows', '100'))
   start_over = json.loads(request.POST.get('startOver', 'false'))
 
-  snippet = _get_snippet(request.user, notebook, snippet, operation_id)
-
   with opentracing.tracer.start_span('notebook-fetch_result_data') as span:
-    response['result'] = get_api(request, snippet).fetch_result(notebook, snippet, rows, start_over)
-
     span.set_tag('user-id', request.user.username)
     span.set_tag(
       'query-id',
       snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
     )
 
+    response = _fetch_result_data(request.user, notebook, snippet, operation_id, rows=rows, start_over=start_over)
+    response['status'] = 0
+
+    return JsonResponse(response)
+
+
+def _fetch_result_data(user, notebook=None, snippet=None, operation_id=None, rows=100, start_over=False):
+  snippet = _get_snippet(user, notebook, snippet, operation_id)
+  request = MockRequest(user)
+
+  response = {
+    'result': get_api(request, snippet).fetch_result(notebook, snippet, rows, start_over)
+  }
+
   # Materialize and HTML escape results
   if response['result'].get('data') and response['result'].get('type') == 'table' and not response['result'].get('isEscaped'):
     response['result']['data'] = escape_rows(response['result']['data'])
     response['result']['isEscaped'] = True
 
-  response['status'] = 0
-
-  return JsonResponse(response)
+  return response
 
 
 @require_POST
