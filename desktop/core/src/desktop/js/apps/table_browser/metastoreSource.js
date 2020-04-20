@@ -22,10 +22,11 @@ import contextCatalog from 'catalog/contextCatalog';
 import huePubSub from 'utils/huePubSub';
 import MetastoreNamespace from 'apps/table_browser/metastoreNamespace';
 import {
-  ASSIST_DB_PANEL_IS_READY_EVENT, ASSIST_IS_DB_PANEL_READY_EVENT,
+  ASSIST_DB_PANEL_IS_READY_EVENT,
+  ASSIST_IS_DB_PANEL_READY_EVENT,
   ASSIST_SET_DATABASE_EVENT
 } from 'ko/components/assist/events';
-import {findConnector} from "../../utils/hueConfig";
+import { findConnector } from '../../utils/hueConfig';
 
 class MetastoreSource {
   constructor(options) {

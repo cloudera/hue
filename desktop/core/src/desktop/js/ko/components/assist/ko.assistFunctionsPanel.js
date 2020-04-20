@@ -22,11 +22,8 @@ import huePubSub from 'utils/huePubSub';
 import { PigFunctions, SqlFunctions } from 'sql/sqlFunctions';
 import I18n from 'utils/i18n';
 import { CONFIG_REFRESHED_EVENT, filterConnectors } from 'utils/hueConfig';
-import {
-  ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
-  GET_ACTIVE_SNIPPET_CONNECTOR_EVENT
-} from 'apps/notebook2/events';
 
+export const NAME = 'assist-functions-panel';
 // prettier-ignore
 const TEMPLATE = `
   <div class="assist-inner-panel">
@@ -87,9 +84,10 @@ const TEMPLATE = `
 `;
 
 class AssistFunctionsPanel {
-  constructor() {
+  constructor(params) {
     this.categories = {};
-    this.disposals = [];
+
+    this.connector = params.connector;
 
     this.activeDialect = ko.observable();
     this.availableDialects = ko.observableArray();
@@ -98,6 +96,7 @@ class AssistFunctionsPanel {
     this.selectedFunction = ko.observable();
 
     const selectedFunctionPeDialect = {};
+
     this.selectedFunction.subscribe(newFunction => {
       if (newFunction) {
         selectedFunctionPeDialect[this.activeDialect()] = newFunction;
@@ -172,12 +171,11 @@ class AssistFunctionsPanel {
       });
     };
 
-    const activeSnippetDialectSub = huePubSub.subscribe(
-      ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
-      connector => {
+    this.connector.subscribe(connector => {
+      if (connector) {
         updateDialect(connector.dialect);
       }
-    );
+    });
 
     const configUpdated = async () => {
       const lastActiveDialect =
@@ -212,24 +210,13 @@ class AssistFunctionsPanel {
           this.availableDialects().length ? this.availableDialects()[0] : undefined
         );
       }
-      huePubSub.publish(GET_ACTIVE_SNIPPET_CONNECTOR_EVENT, connector => {
-        updateDialect(connector.dialect);
-      });
+      if (this.connector()) {
+        updateDialect(this.connector().dialect);
+      }
     };
 
     configUpdated();
-    const configSub = huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
-
-    this.disposals.push(() => {
-      activeSnippetDialectSub.remove();
-      configSub.remove();
-    });
-  }
-
-  dispose() {
-    this.disposals.forEach(dispose => {
-      dispose();
-    });
+    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
   }
 
   initFunctions(dialect) {
@@ -262,6 +249,6 @@ class AssistFunctionsPanel {
   }
 }
 
-componentUtils.registerStaticComponent('assist-functions-panel', AssistFunctionsPanel, TEMPLATE);
+componentUtils.registerStaticComponent(NAME, AssistFunctionsPanel, TEMPLATE);
 
 export default AssistFunctionsPanel;
