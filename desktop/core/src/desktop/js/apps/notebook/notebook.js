@@ -921,7 +921,7 @@ class Notebook {
             );
 
             huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
-              source: snippet.type(),
+              connector: snippet.connector(),
               namespace: snippet.namespace(),
               name: lastSelectedDb === '' ? '' : snippet.database()
             });

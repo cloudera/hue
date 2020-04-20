@@ -423,9 +423,7 @@ HueContextSelector.prototype.reloadDatabases = function() {
               sourceType: connector.type, // TODO: Drop when dataCatalog only needs connector
               namespace: self[TYPES_INDEX.namespace.name](),
               compute: self[TYPES_INDEX.compute.name](),
-              connector: (self.connector && ko.unwrap(self.connector)) || {
-                type: ko.unwrap(self.sourceType)
-              },
+              connector: connector,
               path: [],
               definition: { type: 'source' }
             })
@@ -474,7 +472,7 @@ HueContextSelector.prototype.reloadDatabases = function() {
 
                   if (updateAssist) {
                     huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
-                      source: ko.unwrap(self.sourceType),
+                      connector: connector,
                       namespace: self[TYPES_INDEX.namespace.name](),
                       name: self.database()
                     });

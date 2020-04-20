@@ -652,10 +652,10 @@ class AssistDbPanel {
       });
     } else if (!this.isSolr && !this.isStreams) {
       huePubSub.subscribe(ASSIST_SET_DATABASE_EVENT, databaseDef => {
-        if (!databaseDef.source || !this.sourceIndex[databaseDef.source]) {
+        if (!databaseDef.connector || !this.sourceIndex[databaseDef.connector.type]) {
           return;
         }
-        this.selectedSource(this.sourceIndex[databaseDef.source]);
+        this.selectedSource(this.sourceIndex[databaseDef.connector.type]);
         this.setDatabaseWhenLoaded(databaseDef.namespace, databaseDef.name);
       });
 

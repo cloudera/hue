@@ -139,7 +139,7 @@ export default class Notebook {
         if (this.type().indexOf('query') === 0) {
           const whenDatabaseAvailable = function(snippet) {
             huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
-              source: snippet.dialect(),
+              connector: snippet.connector(),
               namespace: snippet.namespace(),
               name: snippet.database()
             });
