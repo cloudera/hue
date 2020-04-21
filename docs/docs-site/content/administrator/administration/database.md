@@ -263,3 +263,28 @@ Run both scripts:
 
     -- Run delete_from_tables.ddl
     sqlplus hue/<your hue password> < delete_from_tables.ddl
+
+
+## RAC
+
+The current setup of Oracle is this way:
+
+    Hostname : ORACLE IP
+    Database Type: Oracle
+    Database Name: <Service Name/SID of one of the instance>
+    Username: <username>
+    Password: <password>
+
+This would be an alternate way to address the Oracle RAC issue:
+
+1. Go to Hue > Configuration > Database > Hue Database Name
+2. Enter the database name in the following format
+Hue Database Name=(DESCRIPTION=(LOAD_BALANCE=off)(FAILOVER=on)(CONNECT_TIMEOUT=5)(TRANSPORT_CONNECT_TIMEOUT=3)(RETRY_COUNT=3)(ADDRESS=(PROTOCOL=TCP)(HOST=<scan ip>)(PORT=<port>))(CONNECT_DATA=(SERVICE_NAME=<service name>)))
+
+If the above does not work, then use the below config info `hue_safety_valve_server` for database:
+
+    engine=oracle
+    port=0
+    user=<username>
+    password=<password>
+    name=(DESCRIPTION=(LOAD_BALANCE=off)(FAILOVER=on)(CONNECT_TIMEOUT=5)(TRANSPORT_CONNECT_TIMEOUT=3)(RETRY_COUNT=3)(ADDRESS=(PROTOCOL=TCP)(HOST=<scan ip>)(PORT=<port>))(CONNECT_DATA=(SERVICE_NAME=<service name>)))
