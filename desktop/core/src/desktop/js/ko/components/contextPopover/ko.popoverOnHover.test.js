@@ -20,7 +20,7 @@ import { koSetup } from 'jest/koTestUtils';
 
 import { NAME } from './ko.popoverOnHover';
 import huePubSub from 'utils/huePubSub';
-import { HIDE_EVENT } from './ko.contextPopover';
+import { HIDE_CONTEXT_POPOVER_EVENT } from './ko.contextPopover';
 
 describe('ko.popoverOnHover.js', () => {
   const setup = koSetup();
@@ -52,11 +52,16 @@ describe('ko.popoverOnHover.js', () => {
 
     // Mouse leaves
     let publishCalled = false;
-    huePubSub.subscribeOnce(HIDE_EVENT, () => {
+    huePubSub.subscribeOnce(HIDE_CONTEXT_POPOVER_EVENT, () => {
       publishCalled = true;
     });
     $(wrapper.firstChild).trigger('mouseleave');
     jest.runAllTimers();
     expect(publishCalled).toBeTruthy();
+
+    // Mouse clicks
+    callbackCalled = false;
+    $(wrapper.firstChild).trigger('click');
+    expect(callbackCalled).toBeTruthy();
   });
 });
