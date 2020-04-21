@@ -16,10 +16,10 @@
 
 import $ from 'jquery';
 import * as ko from 'knockout';
-import { CONTEXT_POPOVER_CLASS } from './ko.contextPopover';
+import { CONTEXT_POPOVER_CLASS, CONTEXT_POPOVER_HIDDEN_EVENT } from './ko.contextPopover';
 import huePubSub from 'utils/huePubSub';
 
-import { HIDE_EVENT } from './ko.contextPopover';
+import { HIDE_CONTEXT_POPOVER_EVENT } from './ko.contextPopover';
 
 const DEFAULT_DELAY = 700;
 
@@ -52,7 +52,7 @@ ko.bindingHandlers[NAME] = {
       hideTimeout = window.setTimeout(() => {
         visible = false;
         $(popoverSelector).off('.onHover');
-        huePubSub.publish(HIDE_EVENT);
+        huePubSub.publish(HIDE_CONTEXT_POPOVER_EVENT);
       }, options.delay);
     };
 
@@ -64,7 +64,7 @@ ko.bindingHandlers[NAME] = {
 
       showTimeout = window.setTimeout(() => {
         visible = true;
-        huePubSub.publish(HIDE_EVENT);
+        huePubSub.publish(HIDE_CONTEXT_POPOVER_EVENT);
         options.onHover.bind(bindingContext.$data)(
           bindingContext.$data,
           event,
@@ -72,6 +72,16 @@ ko.bindingHandlers[NAME] = {
         );
       }, options.delay);
     };
+
+    $element.on('click.onHover', event => {
+      clearTimeouts();
+      visible = true;
+      options.onHover.bind(bindingContext.$data)(
+        bindingContext.$data,
+        event,
+        options.positionAdjustments
+      );
+    });
 
     $element.on('mouseenter.onHover', show);
 
@@ -90,12 +100,17 @@ ko.bindingHandlers[NAME] = {
       }
     });
 
+    const hiddenSub = huePubSub.subscribe(CONTEXT_POPOVER_HIDDEN_EVENT, () => {
+      visible = false;
+    });
+
     ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
       $element.off('.onHover');
       $(popoverSelector).off('.onHover');
       clearTimeouts();
+      hiddenSub.remove();
       if (visible) {
-        huePubSub.publish(HIDE_EVENT);
+        huePubSub.publish(HIDE_CONTEXT_POPOVER_EVENT);
       }
     });
   }
