@@ -35,8 +35,9 @@ import componentUtils from 'ko/components/componentUtils';
 import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 export const CONTEXT_POPOVER_CLASS = 'hue-popover';
-export const HIDE_EVENT = 'context.popover.hide';
-export const SHOW_EVENT = 'context.popover.show';
+export const HIDE_CONTEXT_POPOVER_EVENT = 'context.popover.hide';
+export const CONTEXT_POPOVER_HIDDEN_EVENT = 'context.popover.hidden';
+export const SHOW_CONTEXT_POPOVER_EVENT = 'context.popover.show';
 export const NAME = 'context-popover';
 
 // prettier-ignore
@@ -566,7 +567,7 @@ const hidePopover = function() {
       ko.cleanNode($contextPopover[0]);
       $contextPopover.remove();
       $(document).off('click.context');
-      huePubSub.publish('context.popover.hidden');
+      huePubSub.publish(CONTEXT_POPOVER_HIDDEN_EVENT);
     }
   }
 };
@@ -867,9 +868,9 @@ componentUtils
       CONTEXT_POPOVER_TEMPLATE
   )
   .then(() => {
-    huePubSub.subscribe(HIDE_EVENT, hidePopover);
+    huePubSub.subscribe(HIDE_CONTEXT_POPOVER_EVENT, hidePopover);
 
-    huePubSub.subscribe(SHOW_EVENT, details => {
+    huePubSub.subscribe(SHOW_CONTEXT_POPOVER_EVENT, details => {
       hidePopover();
       const $contextPopover = $(
         '<div id="contextPopover" data-bind="component: { name: \'context-popover\', params: $data }" />'
