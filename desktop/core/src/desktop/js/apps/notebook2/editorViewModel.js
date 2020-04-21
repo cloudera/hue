@@ -176,7 +176,7 @@ class EditorViewModel {
             contents: activeSnippet.statement()
           };
           const options = {
-            successCallback: function(result) {
+            successCallback: result => {
               if (result && result.exists) {
                 $(document).trigger('info', result.path + ' saved successfully.');
               }

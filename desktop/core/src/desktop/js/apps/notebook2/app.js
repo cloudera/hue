@@ -246,7 +246,7 @@ export const initNotebook2 = () => {
           }
         };
 
-        const handleFileSelect = function(evt) {
+        const handleFileSelect = evt => {
           evt.stopPropagation();
           evt.preventDefault();
           const dt = evt.dataTransfer;
