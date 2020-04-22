@@ -269,16 +269,7 @@ class SqlAlchemyApi(Api):
 
   @query_error_handler
   def cancel(self, notebook, snippet):
-    result = {'status': -1}
-    try:
-      guid = snippet['result']['handle']['guid']
-      connection = CONNECTION_CACHE.get(guid)
-      if connection:
-        connection['connection'].close()
-        del CONNECTION_CACHE[guid]
-      result['status'] = 0
-    finally:
-      return result
+    return self.close_statement(notebook, snippet)
 
 
   @query_error_handler
