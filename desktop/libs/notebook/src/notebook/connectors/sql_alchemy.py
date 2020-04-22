@@ -87,6 +87,7 @@ else:
 ENGINES = {}
 CONNECTIONS = {}
 ENGINE_KEY = '%(username)s-%(connector_name)s'
+URL_PATTERN = '(?P<driver_name>.+?://)(?P<host>[^:/ ]+):(?P<port>[0-9]*).*'
 
 LOG = logging.getLogger(__name__)
 
@@ -116,7 +117,7 @@ def query_error_handler(func):
 class SqlAlchemyApi(Api):
 
   def __init__(self, user, interpreter):
-    super().__init__(user=user, interpreter=interpreter)
+    super(SqlAlchemyApi, self).__init__(user=user, interpreter=interpreter)
     self.options = interpreter['options']
 
     if interpreter.get('dialect_properties'):
@@ -162,10 +163,23 @@ class SqlAlchemyApi(Api):
       s3_staging_dir = url.rsplit('s3_staging_dir=', 1)[1]
       url = url.replace(s3_staging_dir, urllib_quote_plus(s3_staging_dir))
 
+    if self.options.get('has_impersonation'):
+      m = re.search(URL_PATTERN, url)
+      driver_name = m.group('driver_name')
+
+      if not driver_name:
+        raise QueryError('Driver name of %(url)s could not be found and impersonation is turned on' % {'url': url})
+
+      url = url.replace(driver_name, '%(driver_name)s%(username)s@' % {
+        'driver_name': driver_name,
+        'username': self.user.username
+      })
+
     options = self.options.copy()
     options.pop('session', None)
     options.pop('url', None)
     options.pop('has_ssh', None)
+    options.pop('has_impersonation', None)
     options.pop('ssh_server_host', None)
 
     return create_engine(url, **options)
