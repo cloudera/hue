@@ -999,12 +999,16 @@
     #   interface=oozie
 
     # [[[presto]]]
-    #   name=Presto SQL
-    #   interface=presto
-    #   ## Specific options for connecting to the Presto server.
-    #   ## The JDBC driver presto-jdbc.jar need to be in the CLASSPATH environment variable.
-    #   ## If 'user' and 'password' are omitted, they will be prompted in the UI.
-    #   options='{"url": "jdbc:presto://localhost:8080/catalog/schema", "driver": "io.prestosql.jdbc.PrestoDriver", "user": "root", "password": "root"}'
+    # name=Presto SQL
+    # interface=presto
+    # ## Specific options for connecting to the Presto server.
+    # ## The JDBC driver presto-jdbc.jar need to be in the CLASSPATH environment variable.
+    # ## If 'user' and 'password' are omitted, they will be prompted in the UI.
+    # options='{"url": "jdbc:presto://localhost:8080/catalog/schema", "driver": "io.prestosql.jdbc.PrestoDriver", "user": "root", "password": "root"}'
+    # ## Impersonation on.
+    # # options='{"url": "presto://localhost:8080/hive/default", "has_impersonation": true}'
+    # ## Kerberos.
+    # # options='{"url": "presto://localhost:8080/hive/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
 
     # [[[clickhouse]]]
     #   name=ClickHouse
