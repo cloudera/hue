@@ -179,6 +179,30 @@ class TestApi(object):
       SqlAlchemyApi(self.user, interpreter)._create_engine()
 
 
+  def test_create_engine_with_impersonation(self):
+    interpreter = {
+      'name': 'hive',
+      'options': {
+        'url': 'presto://hue:8080/hue',
+        'session': {},
+        'has_impersonation': False  # Off
+      }
+    }
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
+
+      create_engine.assert_called_with('presto://hue:8080/hue')
+
+
+    interpreter['options']['has_impersonation'] = True  # On
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
+
+      create_engine.assert_called_with('presto://test@hue:8080/hue')
+
+
   def test_check_status(self):
     notebook = Mock()
 

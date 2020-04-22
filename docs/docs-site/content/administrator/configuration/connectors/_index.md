@@ -137,12 +137,20 @@ The dialect should be added to the Python system or Hue Python virtual environme
 
     ./build/env/bin/pip install pyhive
 
-Then give Hue the information about the database source:
+Then give Hue the information about the database source following the `presto://{presto-coordinator}:{port}/{catalog}/{schema}` format:
 
     [[[presto]]]
        name = Presto
        interface=sqlalchemy
-       options='{"url": "presto://localhost:8080/hive/default"}'
+       options='{"url": "presto://localhost:8080/tpch/default"}'
+
+With impersonation:
+
+        options='{"url": "presto://localhost:8080/tpch/default", "has_impersonation": true}'
+
+With Kerberos:
+
+        options='{"url": "presto://localhost:8080/tpch/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
 
 Alternatives.
 
