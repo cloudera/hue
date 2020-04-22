@@ -33,13 +33,21 @@ Supported parameters are:
 e.g.
 mysql://${USER}:${PASSWORD}@localhost:3306/hue
 
-Parameters are not saved at any time in the Hue database. The are currently not even cached in the Hue process. The clients serves these parameters
-each time a query is sent.
+Parameters are not saved at any time in the Hue database. The are currently not even cached in the Hue process.
+The clients serves these parameters each time a query is sent in case the previously created engine is not there.
 
-Note: the SQL Alchemy engine could leverage create_session() and cache the engine object (without its credentials) like in the jdbc.py interpreter.
-Note: this is currently supporting concurrent querying by one users as engine is a new object each time. Could use a thread global SQL Alchemy
-session at some point.
-Note: using the task server would not leverage any caching.
+Note: create_session() could create the engine object (without its credentials) like in the other interpreters.
+Note: its currently has one engine per user. This should be changed to one engine per URL but then it makes it complicated to close
+all the queries of a user. It could also have an engine per Editor session and an engine for the managed queries (where Hue guarantees
+to properly close queries).
+
+Engines and connections
+-----------------------
+SqlAlchemy documentation is pretty good: https://docs.sqlalchemy.org/en/13/core/connections.html
+
+Each URL is mapped to one engine and should be created once per process.
+Each query statement grabs a connection from the engine and will return it after its close().
+Disposing the engine closes all its connections.
 '''
 from future import standard_library
 standard_library.install_aliases()
@@ -78,6 +86,7 @@ else:
 
 ENGINES = {}
 CONNECTIONS = {}
+ENGINE_KEY = '%(username)s-%(connector_name)s'
 
 LOG = logging.getLogger(__name__)
 
@@ -116,7 +125,7 @@ class SqlAlchemyApi(Api):
       self.backticks = '"' if re.match('^(postgresql://|awsathena|elasticsearch)', self.options.get('url', '')) else '`'
 
   def _get_engine(self):
-    engine_key = '%(username)s-%(connector_name)s' % {
+    engine_key = ENGINE_KEY % {
       'username': self.user.username,
       'connector_name': self.interpreter['name']
     }
@@ -293,7 +302,8 @@ class SqlAlchemyApi(Api):
 
 
   def close_session(self, session):
-    pass
+    engine = self._get_engine()
+    engine.dispose()  # ENGINE_KEY currently includes the current user
 
 
   @query_error_handler
