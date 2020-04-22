@@ -77,7 +77,7 @@ else:
 
 
 ENGINES = {}
-CONNECTION_CACHE = {}
+CONNECTIONS = {}
 
 LOG = logging.getLogger(__name__)
 
@@ -194,7 +194,7 @@ class SqlAlchemyApi(Api):
         for col in result.cursor.description
       ] if result.cursor else []
     }
-    CONNECTION_CACHE[guid] = cache
+    CONNECTIONS[guid] = cache
 
     return {
       'sync': False,
@@ -212,7 +212,7 @@ class SqlAlchemyApi(Api):
   @query_error_handler
   def check_status(self, notebook, snippet):
     guid = snippet['result']['handle']['guid']
-    connection = CONNECTION_CACHE.get(guid)
+    connection = CONNECTIONS.get(guid)
 
     response = {'status': 'canceled'}
 
@@ -229,7 +229,7 @@ class SqlAlchemyApi(Api):
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
     guid = snippet['result']['handle']['guid']
-    handle = CONNECTION_CACHE.get(guid)
+    handle = CONNECTIONS.get(guid)
 
     if handle:
       data = handle['result'].fetchmany(rows)
@@ -283,13 +283,17 @@ class SqlAlchemyApi(Api):
 
     try:
       guid = snippet['result']['handle']['guid']
-      connection = CONNECTION_CACHE.get(guid)
+      connection = CONNECTIONS.get(guid)
       if connection:
         connection['connection'].close()
-        del CONNECTION_CACHE[guid]
+        del CONNECTIONS[guid]
       result['status'] = 0
     finally:
       return result
+
+
+  def close_session(self, session):
+    pass
 
 
   @query_error_handler
