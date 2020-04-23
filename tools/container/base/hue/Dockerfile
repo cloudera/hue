@@ -1,4 +1,4 @@
-FROM docker-private.infra.cloudera.com/cloudera_base/centos:7.6.1810 as base-centos-jdk
+FROM registry.access.redhat.com/ubi7/ubi as base-ubi-7
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 
