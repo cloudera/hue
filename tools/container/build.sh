@@ -60,6 +60,10 @@ docker_hue_build() {
   cp -a $BUILD_DIR/hue $HUE_DIR
   rm -f $HUE_DIR/hue/desktop/conf/*
 
+  # Reduce Hue container size
+  rm -rf $HUE_DIR/hue/node_modules
+  rm -rf $HUE_DIR/hue/desktop/core/ext-eggs
+
   for f in $(find $HUE_DIR/supervisor-files -name "*_template"); do
     subst_var $f
   done
