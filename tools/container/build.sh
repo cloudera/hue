@@ -43,7 +43,7 @@ docker_hue_compile() {
   mkdir -p $BUILD_DIR
   docker run -dt --name $CONTAINER $COMPILEHUE_VERSION /bin/bash
   docker container cp $HUE_SRC $CONTAINER:$CONTAINER_HUE_SRC
-  docker container exec -it $CONTAINER $CONTAINER_HUE_SRC/tools/container/build.sh compile_hue
+  docker container exec $CONTAINER $CONTAINER_HUE_SRC/tools/container/build.sh compile_hue
   docker container cp $CONTAINER:$CONTAINER_HUE_OPT/hue $BUILD_DIR
   docker container stop $CONTAINER
 }
