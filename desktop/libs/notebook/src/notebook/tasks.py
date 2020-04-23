@@ -487,7 +487,10 @@ def _cleanup(notebook, snippet):
   caches[CACHES_CELERY_KEY].delete(_fetch_progress_key(notebook, snippet))
 
 def _get_query_key(notebook, snippet):
-  return snippet['executor']['executables'][0]['history']['uuid'] if ENABLE_NOTEBOOK_2.get() else notebook['uuid']
+  if ENABLE_NOTEBOOK_2.get():
+    return snippet['executor']['executables'][0].get('history', {}).get('uuid')
+  else:
+    return notebook['uuid']
 
 def _log_key(notebook, snippet):
   return _get_query_key(notebook, snippet) + '_log'
