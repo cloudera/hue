@@ -375,6 +375,21 @@ class SparkApi(Api):
     else:
       return self._get_standalone_jobs(logs)
 
+  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+    if operation != 'hello':
+      raise NotImplementedError()
+
+    response = {}
+
+    api = get_spark_api(self.user)
+
+    api.get_status()
+
+    response['status'] = 0
+    response['rows'] = []
+
+    return response
+
   def _get_standalone_jobs(self, logs):
     job_ids = set([])
 

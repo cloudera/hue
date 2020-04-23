@@ -436,10 +436,10 @@ def get_api(request, snippet):
     return OozieApi(user=request.user, request=request)
   elif interface == 'livy':
     from notebook.connectors.spark_shell import SparkApi
-    return SparkApi(request.user)
+    return SparkApi(request.user, interpreter=interpreter)
   elif interface == 'livy-batch':
     from notebook.connectors.spark_batch import SparkBatchApi
-    return SparkBatchApi(request.user)
+    return SparkBatchApi(request.user, interpreter=interpreter)
   elif interface == 'text' or interface == 'markdown':
     from notebook.connectors.text import TextApi
     return TextApi(request.user)
@@ -559,13 +559,17 @@ class Api(object):
   def get_jobs(self, notebook, snippet, logs):
     return []
 
-  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None): raise NotImplementedError()
+  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+    raise NotImplementedError()
 
-  def export_data_as_hdfs_file(self, snippet, target_file, overwrite): raise NotImplementedError()
+  def export_data_as_hdfs_file(self, snippet, target_file, overwrite):
+    raise NotImplementedError()
 
-  def export_data_as_table(self, notebook, snippet, destination, is_temporary=False, location=None): raise NotImplementedError()
+  def export_data_as_table(self, notebook, snippet, destination, is_temporary=False, location=None):
+    raise NotImplementedError()
 
-  def export_large_data_to_hdfs(self, notebook, snippet, destination): raise NotImplementedError()
+  def export_large_data_to_hdfs(self, notebook, snippet, destination):
+    raise NotImplementedError()
 
   def statement_risk(self, interface, notebook, snippet):
     response = self._get_current_statement(notebook, snippet)
