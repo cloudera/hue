@@ -497,7 +497,7 @@ class AssistEditorContextPanel {
                                   sourceType: activeLocations.type,
                                   namespace: activeLocations.namespace,
                                   compute: activeLocations.compute,
-                                  connector: this.connector(),
+                                  connector: self.connector,
                                   path: []
                                 })
                                 .done(sourceEntry => {
