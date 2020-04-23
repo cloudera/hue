@@ -271,6 +271,7 @@ class SqlAlchemyApi(Api):
 
 
   @query_error_handler
+<<<<<<< HEAD
   def explain(self, notebook, snippet):
     session = self._get_session(notebook, snippet)
     if session is not None:
@@ -294,6 +295,7 @@ class SqlAlchemyApi(Api):
 
 
   @query_error_handler
+  @ssh_error_handler
   def check_status(self, notebook, snippet):
     guid = snippet['result']['handle']['guid']
     connection = CONNECTIONS.get(guid)
