@@ -90,6 +90,28 @@ class TestNotebook(object):
           assert_equal(0, resp['query_status']['status'])
 
 
+  def test_statement_with_variables(self):
+    snippet = {
+      'statement_raw': "SELECT * FROM table WHERE city='${city}'",
+      'type': 'hive',
+      'variables': [
+        {'name': 'city', 'value': 'San Francisco'},
+      ]
+    }
+
+    assert_equal(
+      "SELECT * FROM table WHERE city='San Francisco'",
+      Notebook.statement_with_variables(snippet)
+    )
+
+    snippet['variables'][0]['value'] = 'Saint-Étienne'
+
+    assert_equal(
+      "SELECT * FROM table WHERE city='Saint-Étienne'",
+      Notebook.statement_with_variables(snippet)
+    )
+
+
 iteration = 0
 def check_status_side_effect(request, operation_id):
   """First time query is still running, second time the execution is finished."""
