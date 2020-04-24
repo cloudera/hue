@@ -312,7 +312,7 @@ class EditorViewModel {
   }
 
   async newNotebook(editorType, callback, queryTab) {
-    const connector = await findConnector(connector => connector.type === editorType);
+    const connector = findConnector(connector => connector.type === editorType);
     if (!connector) {
       console.warn('No connector found for type ' + editorType);
     } else {

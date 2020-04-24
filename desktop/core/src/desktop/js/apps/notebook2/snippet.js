@@ -1042,8 +1042,8 @@ export default class Snippet {
     huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this);
   }
 
-  async changeDialect(dialect) {
-    const connector = await findConnector(connector => connector.dialect === dialect);
+  changeDialect(dialect) {
+    const connector = findConnector(connector => connector.dialect === dialect);
     if (!connector) {
       throw new Error('No connector found for dialect ' + dialect);
     }

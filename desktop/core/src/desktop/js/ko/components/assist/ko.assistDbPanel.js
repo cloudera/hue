@@ -23,7 +23,7 @@ import componentUtils from 'ko/components/componentUtils';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { CONFIG_REFRESHED_EVENT, filterConnectors, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, filterConnectors } from 'utils/hueConfig';
 import {
   ASSIST_DB_HIGHLIGHT_EVENT,
   ASSIST_DB_PANEL_IS_READY_EVENT,
@@ -732,12 +732,11 @@ class AssistDbPanel {
       });
     }
 
-    this.init(options.navigationSettings).then(() => {
-      huePubSub.publish(ASSIST_DB_PANEL_IS_READY_EVENT);
+    this.init(options.navigationSettings);
+    huePubSub.publish(ASSIST_DB_PANEL_IS_READY_EVENT);
 
-      huePubSub.subscribe(ASSIST_IS_DB_PANEL_READY_EVENT, () => {
-        huePubSub.publish(ASSIST_DB_PANEL_IS_READY_EVENT);
-      });
+    huePubSub.subscribe(ASSIST_IS_DB_PANEL_READY_EVENT, () => {
+      huePubSub.publish(ASSIST_DB_PANEL_IS_READY_EVENT);
     });
   }
 
@@ -822,58 +821,51 @@ class AssistDbPanel {
     });
   }
 
-  async init(navigationSettings) {
-    return new Promise(resolve => {
-      if (this.isSolr) {
-        this.setSingleSource('solr', navigationSettings, true);
-        resolve();
-        return;
-      }
+  init(navigationSettings) {
+    if (this.isSolr) {
+      this.setSingleSource('solr', navigationSettings, true);
+      return;
+    }
 
-      if (this.isStreams) {
-        this.setSingleSource('kafka', navigationSettings, true);
-        resolve();
-        return;
-      }
+    if (this.isStreams) {
+      this.setSingleSource('kafka', navigationSettings, true);
+      return;
+    }
 
-      const updateFromConfig = async config => {
-        const sources = [];
-        const connectors = await filterConnectors(connector => connector.is_sql);
-        connectors.forEach(connector => {
-          const source =
-            this.sourceIndex[connector.type] ||
-            new AssistDbSource({
-              i18n: this.i18n,
-              type: connector.type, // TODO: Remove redundant
-              name: connector.name, // TODO: Remove redundant
-              connector: connector,
-              nonSqlType: false,
-              navigationSettings: navigationSettings
-            });
-          sources.push(source);
-        });
-        this.sourceIndex = {};
-        sources.forEach(source => {
-          this.sourceIndex[source.sourceType] = source;
-        });
-
-        if (sources.indexOf(this.selectedSource()) === -1) {
-          if (sources.length) {
-            const storageSourceType = apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
-            this.selectedSource(this.sourceIndex[storageSourceType] || sources[0]);
-          } else {
-            this.selectedSource(undefined);
-          }
-        }
-        this.sources(sources);
-      };
-
-      huePubSub.subscribe(CONFIG_REFRESHED_EVENT, updateFromConfig);
-      huePubSub.publish(GET_KNOWN_CONFIG_EVENT, config => {
-        updateFromConfig(config);
-        resolve();
+    const updateFromConfig = () => {
+      const sources = [];
+      const connectors = filterConnectors(connector => connector.is_sql);
+      connectors.forEach(connector => {
+        const source =
+          this.sourceIndex[connector.type] ||
+          new AssistDbSource({
+            i18n: this.i18n,
+            type: connector.type, // TODO: Remove redundant
+            name: connector.name, // TODO: Remove redundant
+            connector: connector,
+            nonSqlType: false,
+            navigationSettings: navigationSettings
+          });
+        sources.push(source);
       });
-    });
+      this.sourceIndex = {};
+      sources.forEach(source => {
+        this.sourceIndex[source.sourceType] = source;
+      });
+
+      if (sources.indexOf(this.selectedSource()) === -1) {
+        if (sources.length) {
+          const storageSourceType = apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
+          this.selectedSource(this.sourceIndex[storageSourceType] || sources[0]);
+        } else {
+          this.selectedSource(undefined);
+        }
+      }
+      this.sources(sources);
+    };
+
+    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, updateFromConfig);
+    updateFromConfig();
   }
 }
 

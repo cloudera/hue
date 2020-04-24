@@ -23,6 +23,7 @@ export const CONFIG_REFRESHED_EVENT = 'cluster.config.set.config';
 export const GET_KNOWN_CONFIG_EVENT = 'cluster.config.get.config';
 
 let lastConfigPromise = undefined;
+let lastKnownConfig = undefined;
 
 export const refreshConfig = async () => {
   lastConfigPromise = new Promise((resolve, reject) => {
@@ -30,6 +31,7 @@ export const refreshConfig = async () => {
       .getClusterConfig()
       .done(data => {
         if (data.status === 0) {
+          lastKnownConfig = data;
           resolve(data);
         } else {
           $(document).trigger('error', data.message);
@@ -50,33 +52,37 @@ export const refreshConfig = async () => {
   return lastConfigPromise;
 };
 
-const validateConfigForConnectors = config => {
+const validConnectorConfig = config => {
   if (
     !config ||
     !config.app_config ||
     !config.app_config.editor ||
     !config.app_config.editor.interpreters
   ) {
-    throw new Error('No "interpreters" attribute present in the config.');
+    console.error('No "interpreters" attribute present in the config.');
+    return false;
+  }
+  return true;
+};
+
+export const findConnector = connectorTest => {
+  if (validConnectorConfig(lastKnownConfig)) {
+    const connectors = lastKnownConfig.app_config.editor.interpreters;
+    return connectors.find(connectorTest);
   }
 };
 
-export const findConnector = async connectorTest => {
-  const config = await lastConfigPromise;
-  validateConfigForConnectors(config);
-  const connectors = config.app_config.editor.interpreters;
-  return connectors.find(connectorTest);
-};
-
-export const filterConnectors = async connectorTest => {
-  const config = await lastConfigPromise;
-  validateConfigForConnectors(config);
-  const connectors = config.app_config.editor.interpreters;
-  return connectors.filter(connectorTest);
+export const filterConnectors = connectorTest => {
+  if (validConnectorConfig(lastKnownConfig)) {
+    const connectors = lastKnownConfig.app_config.editor.interpreters;
+    return connectors.filter(connectorTest);
+  }
+  return [];
 };
 
 huePubSub.subscribe(REFRESH_CONFIG_EVENT, refreshConfig);
 
+// TODO: Replace GET_KNOWN_CONFIG_EVENT pubSub with sync getKnownConfig const
 huePubSub.subscribe(GET_KNOWN_CONFIG_EVENT, callback => {
   if (lastConfigPromise && callback) {
     lastConfigPromise.then(callback).catch(callback);
