@@ -1,7 +1,7 @@
 
 ## Build
 
-    docker build . -t gethue/nginx:latest -f tools/docker/nginx/Dockerfile
+    docker build . -t gethue/nginx:latest -f tools/docker/nginx/Dockerfile --build-arg registry=gethue --build-arg tag=latest
 
 ## Push
 

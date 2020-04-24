@@ -34,6 +34,8 @@ import {
   SHOW_NORMAL_RESULT_EVENT,
   REDRAW_CHART_EVENT
 } from 'apps/notebook2/events';
+import { DIALECT } from 'apps/notebook2/snippet';
+import { SHOW_LEFT_ASSIST_EVENT } from 'ko/components/assist/events';
 
 export const initNotebook2 = () => {
   window.Clipboard = Clipboard;
@@ -244,7 +246,7 @@ export const initNotebook2 = () => {
           }
         };
 
-        const handleFileSelect = function(evt) {
+        const handleFileSelect = evt => {
           evt.stopPropagation();
           evt.preventDefault();
           const dt = evt.dataTransfer;
@@ -357,7 +359,7 @@ export const initNotebook2 = () => {
       // Close the notebook snippets when leaving the page
       window.onbeforeunload = function(e) {
         if (!viewModel.selectedNotebook().avoidClosing) {
-          viewModel.selectedNotebook().close();
+          //viewModel.selectedNotebook().close(); // TODO
         }
       };
       $(window).data('beforeunload', window.onbeforeunload);
@@ -502,10 +504,10 @@ export const initNotebook2 = () => {
           if (app === 'editor') {
             huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
             huePubSub.publish('hue.scrollleft.show');
-            huePubSub.publish('active.snippet.type.changed', {
-              type: viewModel.editorType(),
-              isSqlDialect: viewModel.getSnippetViewSettings(viewModel.editorType()).sqlDialect
-            });
+            viewModel.notifyDialectChange(
+              viewModel.editorType(),
+              viewModel.getSnippetViewSettings(viewModel.editorType()).sqlDialect
+            );
           }
         },
         HUE_PUB_SUB_EDITOR_ID
@@ -516,37 +518,6 @@ export const initNotebook2 = () => {
         tab => {
           if (tab !== 'queryResults') {
             $('.hue-datatable-search').hide();
-          }
-          if (tab === 'queryHistory') {
-            hueUtils.waitForRendered(
-              $('#queryHistory .history-table'),
-              el => {
-                return el.is(':visible');
-              },
-              () => {
-                viewModel.selectedNotebook().forceHistoryInitialHeight(true);
-                huePubSub.publish('editor.calculate.history.height');
-              }
-            );
-          }
-        },
-        HUE_PUB_SUB_EDITOR_ID
-      );
-
-      huePubSub.subscribe(
-        'editor.calculate.history.height',
-        () => {
-          if (
-            viewModel.editorMode() &&
-            (viewModel.selectedNotebook().historyInitialHeight() === 0 ||
-              viewModel.selectedNotebook().forceHistoryInitialHeight())
-          ) {
-            let h = $('#queryHistory .history-table').height();
-            if (h === 0) {
-              h = viewModel.selectedNotebook().history().length * 32;
-            }
-            viewModel.selectedNotebook().historyInitialHeight(h + 80); // add pagination too
-            viewModel.selectedNotebook().forceHistoryInitialHeight(false);
           }
         },
         HUE_PUB_SUB_EDITOR_ID
@@ -604,7 +575,7 @@ export const initNotebook2 = () => {
       );
 
       huePubSub.subscribe(
-        'left.assist.show',
+        SHOW_LEFT_ASSIST_EVENT,
         () => {
           if (!viewModel.isLeftPanelVisible() && viewModel.assistAvailable()) {
             viewModel.isLeftPanelVisible(true);
@@ -744,7 +715,7 @@ export const initNotebook2 = () => {
         'jobbrowser.data',
         jobs => {
           const snippet = viewModel.selectedNotebook().snippets()[0];
-          if (!snippet || snippet.type() === 'impala') {
+          if (!snippet || snippet.dialect() === DIALECT.impala) {
             return;
           }
           if (jobs.length > 0) {

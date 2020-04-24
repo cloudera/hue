@@ -584,7 +584,9 @@ export const sleep = async timeout => new Promise(resolve => setTimeout(resolve,
 
 export const defer = async callback => {
   await sleep(0);
-  callback();
+  if (callback) {
+    callback();
+  }
 };
 
 export default {

@@ -19,7 +19,7 @@ import logging
 
 from django.utils.translation import ugettext as _
 
-from spark.job_server_api import get_api
+from spark.livy_client import get_api
 
 from jobbrowser.apis.base_api import Api
 

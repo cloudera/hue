@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import json
+import logging
 import os
 import subprocess
 
@@ -23,6 +24,7 @@ from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop.lib.conf import Config, coerce_bool, coerce_csv, coerce_password_from_script
 
+LOG = logging.getLogger(__name__)
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -36,7 +38,8 @@ def xmlsec():
   try:
     proc = subprocess.Popen(['which', 'xmlsec1'], stdout=subprocess.PIPE)
     return proc.stdout.read().strip()
-  except (subprocess.CalledProcessError, OSError):
+  except Exception as e:
+    LOG.debug("xmlsec: %s" % e)
     return '/usr/local/bin/xmlsec1'
 
 

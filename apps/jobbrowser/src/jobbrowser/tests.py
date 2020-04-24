@@ -428,12 +428,12 @@ class TestMapReduce2NoHadoop(object):
 
   def test_running_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1356251510842_0054')
-    assert_true('job_1356251510842_0054' in response.content, response.content)
-    assert_true('RUNNING' in response.content)
+    assert_true(b'job_1356251510842_0054' in response.content, response.content)
+    assert_true(b'RUNNING' in response.content)
 
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0054')
-    assert_true('job_1356251510842_0054' in response.content)
-    assert_true('RUNNING' in response.content)
+    assert_true(b'job_1356251510842_0054' in response.content)
+    assert_true(b'RUNNING' in response.content)
 
   def test_application_no_start_time(self):
     response = self.c.get('/jobbrowser/jobs/application_1428442704693_0007?format=json')
@@ -478,7 +478,7 @@ class TestMapReduce2NoHadoop(object):
     assert_false(can_modify_job('test3', response.context[0]['job']))
 
     response2 = self.c3.get('/jobbrowser/jobs/job_1356251510842_0054')
-    assert_true('don&#39;t have permission to access job' in response2.content, response2.content)
+    assert_true(b'don&#39;t have permission to access job' in response2.content, response2.content)
 
   def test_kill_job(self):
     job_id = 'application_1356251510842_0054'
@@ -489,7 +489,7 @@ class TestMapReduce2NoHadoop(object):
       MockResourceManagerApi.APPS[job_id]['state'] = 'RUNNING'
 
     response = self.c2.post('/jobbrowser/jobs/%s/kill?format=json' % job_id)
-    assert_true('Kill operation is forbidden.' in response.content, response.content)
+    assert_true(b'Kill operation is forbidden.' in response.content, response.content)
 
 
 

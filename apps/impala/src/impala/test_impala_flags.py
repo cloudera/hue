@@ -15,15 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import logging
 import os
 import sys
 import tempfile
 
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_false, assert_true
 
 from impala import conf, impala_flags
+
 
 if sys.version_info[0] > 2:
   open_file = open
@@ -44,7 +44,7 @@ def test_impala_flags():
       resets.append(conf.QUERYCACHE_ROWS.set_for_testing(expected_rows))
 
     assert_equal(conf.QUERYCACHE_ROWS.get(), expected_rows)
-    assert_equal(conf.IMPERSONATION_ENABLED.get(), False)
+    assert_false(conf.IMPERSONATION_ENABLED.get())
 
     flags = """
       -webserver_certificate_file=/etc/test-ssl-conf/CA_STANDARD/impala-cert.pem
@@ -64,7 +64,7 @@ def test_impala_flags():
 
     # From Config
     assert_equal(conf.QUERYCACHE_ROWS.get(), expected_rows)
-    assert_equal(conf.IMPERSONATION_ENABLED.get(), True)
+    assert_true(conf.IMPERSONATION_ENABLED.get())
   finally:
     impala_flags.reset()
     for reset in resets:

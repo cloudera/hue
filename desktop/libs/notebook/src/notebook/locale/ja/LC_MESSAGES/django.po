@@ -659,7 +659,7 @@ msgid "Error loading my queries"
 msgstr "クエリのロード中にエラーが発生しました"
 
 #: src/notebook/templates/editor_components.mako:802
-msgid "You don't have any saved query."
+msgid "You don't have any saved queries."
 msgstr "保存済みクエリがありません。"
 
 #: src/notebook/templates/editor_components.mako:811

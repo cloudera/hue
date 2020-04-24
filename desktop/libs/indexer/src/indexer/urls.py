@@ -28,7 +28,11 @@ urlpatterns = [
   url(r'^install_examples$', indexer_views.install_examples, name='install_examples'),
 
   url(r'^importer/?$', indexer_views.importer, name='importer'),
-  url(r'^importer/prefill/(?P<source_type>[^/]+)/(?P<target_type>[^/]+)/(?P<target_path>[^/]+)?$', indexer_views.importer_prefill, name='importer_prefill'),
+  url(
+    r'^importer/prefill/(?P<source_type>[^/]+)/(?P<target_type>[^/]+)/(?P<target_path>[^/]+)?$',
+    indexer_views.importer_prefill,
+    name='importer_prefill'
+  ),
 ]
 
 if ENABLE_NEW_INDEXER.get():

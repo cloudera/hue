@@ -1,0 +1,325 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>An extremely simple example of a SAML2 service provider &#8212; pysaml2  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="An extremly simple example of a SAML2 identity provider." href="idp.html" />
+    <link rel="prev" title="Quick pysaml2 example" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="an-extremely-simple-example-of-a-saml2-service-provider">
+<span id="example-sp"></span><h1>An extremely simple example of a SAML2 service provider<a class="headerlink" href="#an-extremely-simple-example-of-a-saml2-service-provider" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="how-it-works">
+<h2>How it works<a class="headerlink" href="#how-it-works" title="Permalink to this headline">¶</a></h2>
+<p>A SP works with authentication and possibly attribute aggregation.
+Both of these functions can be seen as parts of the normal Repoze.who
+setup. Namely the Challenger, Identifier and MetadataProvider parts.</p>
+<p>Normal for Repoze.who Identifier and MetadataProvider plugins are that
+they place information in environment variables. The convention is to place
+identity information in environ[“repoze.who.identity”].
+This is a dictionary with keys like ‘login’, and ‘repoze.who.userid’.</p>
+<p>The SP follows this pattern and places the information gathered from
+the IdP that handled the authentication and possible extra information
+received from attribute authorities in the above mentioned dictionary under
+the key ‘user’.</p>
+<p>So in environ[“repoze.who.identity”] you will find a dictionary with
+attributes and values, the attribute names used depends on what’s returned
+from the IdP/AA. If there exists both a name and a friendly name, for
+instance, the friendly name is used as the key.</p>
+</div>
+<div class="section" id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h2>
+<p><strong>sp-wsgi:</strong></p>
+<ul>
+<li><p>Go to the folder and copy the example files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="n">cd</span> <span class="p">[</span><span class="n">your</span> <span class="n">path</span><span class="p">]</span><span class="o">/</span><span class="n">pysaml2</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="n">sp</span><span class="o">-</span><span class="n">wsgi</span>
+<span class="n">cp</span> <span class="n">service_conf</span><span class="o">.</span><span class="n">py</span><span class="o">.</span><span class="n">example</span> <span class="n">service_conf</span><span class="o">.</span><span class="n">py</span>
+<span class="n">cp</span> <span class="n">sp_conf</span><span class="o">.</span><span class="n">py</span><span class="o">.</span><span class="n">example</span> <span class="n">sp_conf</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>sp_conf.py is configured to run on localhost on port 8087. If you want to you could make the necessary changes before proceeding to the next step.</p>
+<ul>
+<li><p>In order to generate the metadata file open a terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="n">cd</span> <span class="p">[</span><span class="n">your</span> <span class="n">path</span><span class="p">]</span><span class="o">/</span><span class="n">pysaml2</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="n">sp</span><span class="o">-</span><span class="n">wsgi</span>
+<span class="n">make_metadata</span><span class="o">.</span><span class="n">py</span> <span class="n">sp_conf</span><span class="o">.</span><span class="n">py</span> <span class="o">&gt;</span> <span class="n">sp</span><span class="o">.</span><span class="n">xml</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p><strong>sp-repoze:</strong></p>
+<ul class="simple">
+<li><p>Go to the folder:</p></li>
+</ul>
+<p>[your path]/pysaml2/example/sp-repoze</p>
+<ul class="simple">
+<li><p>Take the file named sp_conf.py.example and rename it sp_conf.py</p></li>
+</ul>
+<p>sp_conf.py is configured to run on localhost on port 8087. If you want to you could make the necessary changes before proceeding to the next step.</p>
+<ul>
+<li><p>In order to generate the metadata file open a terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="n">cd</span> <span class="p">[</span><span class="n">your</span> <span class="n">path</span><span class="p">]</span><span class="o">/</span><span class="n">pysaml2</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="n">sp</span><span class="o">-</span><span class="n">repoze</span>
+<span class="n">make_metadata</span><span class="o">.</span><span class="n">py</span> <span class="n">sp_conf</span><span class="o">.</span><span class="n">py</span> <span class="o">&gt;</span> <span class="n">sp</span><span class="o">.</span><span class="n">xml</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>Important files:</p>
+<dl class="simple">
+<dt>sp_conf.py</dt><dd><p>The SPs configuration</p>
+</dd>
+<dt>who.ini</dt><dd><p>The repoze.who configuration file</p>
+</dd>
+</dl>
+<p>Inside the folder named pki there are two files with certificates, mykey.pem with the private
+certificate and mycert.pem with the public part.</p>
+<p>I’ll go through these step by step.</p>
+<div class="section" id="sp-conf-py">
+<h3>sp_conf.py<a class="headerlink" href="#sp-conf-py" title="Permalink to this headline">¶</a></h3>
+<p>The configuration is written as described in <a class="reference internal" href="../howto/config.html#howto-config"><span class="std std-ref">Configuration of pySAML2 entities</span></a>. It means among other
+things that it’s easily testable as to the correct syntax.</p>
+<p>You can see the whole file in example/sp/sp_conf.py, here I will go through
+it line by line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="s">&quot;service&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;sp&quot;</span><span class="p">],</span>
+</pre></div>
+</div>
+<p>Tells the software what type of services the software is supposed to
+supply. It is used to check for the
+completeness of the configuration and also when constructing metadata from
+the configuration. More about that later. Allowed values are: “sp”
+(service provider), “idp” (identity provider) and “aa” (attribute authority).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="s">&quot;entityid&quot;</span> <span class="p">:</span> <span class="s">&quot;urn:mace:example.com:saml:sp&quot;</span><span class="p">,</span>
+<span class="s">&quot;service_url&quot;</span> <span class="p">:</span> <span class="s">&quot;http://example.com:8087/&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>The ID of the entity and the URL on which it is listening.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="s">&quot;idp_url&quot;</span> <span class="p">:</span> <span class="s">&quot;https://example.com/saml2/idp/SSOService.php&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>Since this is a very simple SP it only needs to know about one IdP, therefore there
+is really no need for a metadata file or a WAYF-function or anything like that.
+It needs the URL of the IdP and that’s all.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="s">&quot;my_name&quot;</span> <span class="p">:</span> <span class="s">&quot;My first SP&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>This is just for informal purposes, not really needed but nice to do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="s">&quot;debug&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>Well, at this point in time you’d really like to have as much information
+as possible as to what’s going on, right ?</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="s">&quot;key_file&quot;</span> <span class="p">:</span> <span class="s">&quot;./mykey.pem&quot;</span><span class="p">,</span>
+<span class="s">&quot;cert_file&quot;</span> <span class="p">:</span> <span class="s">&quot;./mycert.pem&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>The necessary certificates.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="s">&quot;xmlsec_binary&quot;</span> <span class="p">:</span> <span class="s">&quot;/opt/local/bin/xmlsec1&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>Right now the software is built to use xmlsec binaries and not the python
+xmlsec package. There are reasons for this but I won’t go into them here.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="s">&quot;organization&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;Example Co&quot;</span><span class="p">,</span>
+    <span class="c">#display_name</span>
+    <span class="s">&quot;url&quot;</span><span class="p">:</span><span class="s">&quot;http://www.example.com/&quot;</span><span class="p">,</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p>Information about the organization that is behind this SP, only used when
+building metadata.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="s">&quot;contact&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="s">&quot;given_name&quot;</span><span class="p">:</span><span class="s">&quot;John&quot;</span><span class="p">,</span>
+    <span class="s">&quot;sur_name&quot;</span><span class="p">:</span> <span class="s">&quot;Smith&quot;</span><span class="p">,</span>
+    <span class="s">&quot;email_address&quot;</span><span class="p">:</span> <span class="s">&quot;john.smith@example.com&quot;</span><span class="p">,</span>
+    <span class="c">#contact_type</span>
+    <span class="c">#company</span>
+    <span class="c">#telephone_number</span>
+<span class="p">}]</span>
+</pre></div>
+</div>
+<p>Another piece of information that only matters if you build and distribute
+metadata.</p>
+<p>So, now to that part. In order to allow the IdP to talk to you, you may have
+to provide the one running the IdP with a metadata file.
+If you have a SP configuration file similar to the one I’ve walked you
+through here, but with your information, you can make the metadata file
+by running the make_metadata script you can find in the tools directory.</p>
+<p>Change directory to where you have the configuration file and do</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="n">make_metadata</span><span class="o">.</span><span class="n">py</span> <span class="n">sp_conf</span><span class="o">.</span><span class="n">py</span> <span class="o">&gt;</span> <span class="n">metadata</span><span class="o">.</span><span class="n">xml</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="who-ini">
+<h3>who.ini<a class="headerlink" href="#who-ini" title="Permalink to this headline">¶</a></h3>
+<p>The file named <code class="docutils literal notranslate"><span class="pre">who.ini</span></code> is the <code class="docutils literal notranslate"><span class="pre">sp-repoze</span></code> folder</p>
+<p>I’m not going through the INI file format here. You should read
+<a class="reference external" href="http://docs.repoze.org/who/2.0/middleware.html">Middleware Responsibilities</a>
+to get a good introduction to the concept.</p>
+<p>The configuration of the pysaml2 part in the applications middleware are
+first the special module configuration, namely:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="p">[</span><span class="n">plugin</span><span class="p">:</span><span class="n">saml2auth</span><span class="p">]</span>
+<span class="n">use</span> <span class="o">=</span> <span class="n">s2repoze</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">sp</span><span class="p">:</span><span class="n">make_plugin</span>
+<span class="n">saml_conf</span> <span class="o">=</span> <span class="n">sp_conf</span><span class="o">.</span><span class="n">py</span>
+<span class="n">rememberer_name</span> <span class="o">=</span> <span class="n">auth_tkt</span>
+<span class="n">debug</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">path_logout</span> <span class="o">=</span> <span class="o">.*/</span><span class="n">logout</span><span class="o">.*</span>
+</pre></div>
+</div>
+<p>Which contains a specification (“use”) of which function in which module
+should be used to initialize the part. After that comes the name of the
+file (“saml_conf”) that contains the PySaml2 configuration. The third line
+(“rememberer_name”) points at the plugin that should be used to
+remember the user information.</p>
+<p>After this, the plugin is referenced in a couple of places:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="p">[</span><span class="n">identifiers</span><span class="p">]</span>
+<span class="n">plugins</span> <span class="o">=</span>
+      <span class="n">saml2auth</span>
+      <span class="n">auth_tkt</span>
+
+<span class="p">[</span><span class="n">authenticators</span><span class="p">]</span>
+<span class="n">plugins</span> <span class="o">=</span> <span class="n">saml2auth</span>
+
+<span class="p">[</span><span class="n">challengers</span><span class="p">]</span>
+<span class="n">plugins</span> <span class="o">=</span> <span class="n">saml2auth</span>
+
+<span class="p">[</span><span class="n">mdproviders</span><span class="p">]</span>
+<span class="n">plugins</span> <span class="o">=</span> <span class="n">saml2auth</span>
+</pre></div>
+</div>
+<p>Which means that the plugin is used in all phases.</p>
+</div>
+</div>
+<div class="section" id="run-sp">
+<h2>Run SP:<a class="headerlink" href="#run-sp" title="Permalink to this headline">¶</a></h2>
+<p>Open a Terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="n">cd</span> <span class="p">[</span><span class="n">your</span> <span class="n">path</span><span class="p">]</span><span class="o">/</span><span class="n">pysaml2</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="n">sp</span><span class="o">-</span><span class="n">wsgi</span>
+<span class="n">python</span> <span class="n">sp</span><span class="o">.</span><span class="n">py</span> <span class="n">sp_conf</span>
+</pre></div>
+</div>
+<p>Note that you should not have the .py extension on the sp_conf.py while running the program</p>
+<p>Now you should be able to open a web browser and go to to service provider (if you didn’t change sp_conf.py it should be: <a class="reference external" href="http://localhost:8087">http://localhost:8087</a>)</p>
+<p>You should be redirected to the IDP and presented with a login screen.</p>
+<p>You could enter Username:roland and Password:dianakra
+All users are specified in idp.py in a dictionary named PASSWD</p>
+<div class="section" id="the-application">
+<h3>The application<a class="headerlink" href="#the-application" title="Permalink to this headline">¶</a></h3>
+<p>The app is, as said before, extremely simple. The only thing that is connected to
+the PySaml2 configuration is at the bottom, namely where the server is.
+You have to ascertain that this coincides with what is specified in the
+PySaml2 configuration. Apart from that there really is nothing in
+application.py that demands that you use PySaml2 as middleware. If you
+switched to using the LDAP or CAS plugins nothing would change in the
+application. In the application configuration yes! But not in the application.
+And that is really how it should be done.</p>
+<p>There is one assumption, and that is that the middleware plugin that gathers
+information about the user places the extra information in as a value on the
+“user” property in the dictionary found under the key “repoze.who.identity”
+in the environment.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">pysaml2</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Quick install guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Quick pysaml2 example</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">An extremely simple example of a SAML2 service provider</a></li>
+<li class="toctree-l2"><a class="reference internal" href="idp.html">An extremly simple example of a SAML2 identity provider.</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../howto/index.html">How to use PySAML2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sp_test/internal.html">How sp_test works internally</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Quick pysaml2 example</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Quick pysaml2 example</a></li>
+      <li>Next: <a href="idp.html" title="next chapter">An extremly simple example of a SAML2 identity provider.</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2010-2011, Roland Hedberg.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/examples/sp.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

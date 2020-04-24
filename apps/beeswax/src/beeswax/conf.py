@@ -227,7 +227,9 @@ CLOSE_QUERIES = Config(
 
 MAX_NUMBER_OF_SESSIONS = Config(
   key="max_number_of_sessions",
-  help=_t("Hue will use at most this many HiveServer2 sessions per user at a time"),
+  help=_t("Hue will use at most this many HiveServer2 sessions per user at a time"
+          # The motivation for -1 is that Hue does currently keep track of session state perfectly and the user does not have ability to manage them effectively. The cost of a session is low
+          "-1 is unlimited number of sessions."),
   type=int,
   default=1
 )
@@ -324,3 +326,20 @@ USE_SASL = Config(
   private=False,
   type=coerce_bool,
   dynamic_default=get_use_sasl_default)
+
+def has_multiple_sessions():
+  """When true will create multiple sessions for user queries"""
+  return MAX_NUMBER_OF_SESSIONS.get() != 1
+
+CLOSE_SESSIONS = Config(
+  key="close_sessions",
+  help=_t(
+      'When set to True, Hue will close sessions created for background queries and open new ones as needed.'
+      'When set to False, Hue will keep sessions created for background queries opened and reuse them as needed.'
+      'This flag is useful when max_number_of_sessions != 1'),
+  type=coerce_bool,
+  dynamic_default=has_multiple_sessions
+)
+
+def has_session_pool():
+  return has_multiple_sessions() and not CLOSE_SESSIONS.get()

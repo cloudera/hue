@@ -553,6 +553,17 @@ describe('impalaAutocompleteParser.js CREATE statements', () => {
       });
     });
 
+    it('should handle for "CREATE TABLE foo (id INTEGER);|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE TABLE foo (id INTEGER);',
+        afterCursor: '',
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
     it('should suggest keywords for "CREATE TABLE foo (id |"', () => {
       assertAutoComplete({
         beforeCursor: 'CREATE TABLE foo (id ',
@@ -640,7 +651,7 @@ describe('impalaAutocompleteParser.js CREATE statements', () => {
       assertAutoComplete({
         beforeCursor:
           'CREATE EXTERNAL TABLE IF NOT EXISTS foo.bar ' +
-          "PARTITIONED BY (foo int COMMENT 'col_comment', bar int COMMENT 'col_comment') " +
+          'PARTITIONED BY (foo, bar) ' +
           'SORT BY (foo, bar) ' +
           "COMMENT 'table_comment' " +
           "ROW FORMAT DELIMITED FIELDS TERMINATED BY 'c' ESCAPED BY 'c' " +
@@ -885,11 +896,11 @@ describe('impalaAutocompleteParser.js CREATE statements', () => {
       });
     });
 
-    it('should suggest keywords for "CREATE TABLE foo (id int) PARTITIONED BY (boo INT, baa BIGINT |, boo INT) AS SELECT * FROM baa;"', () => {
+    it('should suggest keywords for "CREATE TABLE foo PARTITIONED BY (boo, baa, boo) AS | SELECT * FROM baa;"', () => {
       assertAutoComplete({
-        beforeCursor: 'CREATE TABLE foo (id int) PARTITIONED BY (boo INT, baa BIGINT ',
-        afterCursor: ', boo INT) AS SELECT * FROM baa;',
-        containsKeywords: ['COMMENT'],
+        beforeCursor: 'CREATE TABLE foo PARTITIONED BY (boo, baa, boo) AS  ',
+        afterCursor: '',
+        containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
         }

@@ -24,10 +24,14 @@ from django.db.models import Q
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.decorators.http import require_POST
 
 from beeswax.data_export import DOWNLOAD_COOKIE_AGE
+from beeswax.management.commands import beeswax_install_examples
+from desktop.auth.decorators import admin_required
 from desktop.conf import ENABLE_DOWNLOAD, USE_NEW_EDITOR
 from desktop.lib import export_csvxls
+from desktop.lib.connectors.models import Connector
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
@@ -36,7 +40,7 @@ from desktop.views import serve_403_error
 from metadata.conf import has_optimizer, has_catalog, has_workload_analytics
 
 from notebook.conf import get_ordered_interpreters, SHOW_NOTEBOOKS
-from notebook.connectors.base import Notebook, _get_snippet_name
+from notebook.connectors.base import Notebook, _get_snippet_name, get_interpreter
 from notebook.connectors.spark_shell import SparkApi
 from notebook.decorators import check_editor_access_permission, check_document_access_permission, check_document_modify_permission
 from notebook.management.commands.notebook_setup import Command
@@ -53,12 +57,20 @@ def notebooks(request):
     if USE_NEW_EDITOR.get():
       notebooks = [doc.to_dict() for doc in Document2.objects.documents(user=request.user).search_documents(types=['query-%s' % editor_type])]
     else:
-      notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra__startswith='query')) if not d.content_object.is_history and d.content_object.type == 'query-' + editor_type]
+      notebooks = [
+        d.content_object.to_dict()
+          for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra__startswith='query'))
+          if not d.content_object.is_history and d.content_object.type == 'query-' + editor_type
+      ]
   else:
     if USE_NEW_EDITOR.get():
       notebooks = [doc.to_dict() for doc in Document2.objects.documents(user=request.user).search_documents(types=['notebook'])]
     else:
-      notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra='notebook')) if not d.content_object.is_history]
+      notebooks = [
+        d.content_object.to_dict()
+          for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra='notebook'))
+          if not d.content_object.is_history
+      ]
 
   return render('notebooks.mako', request, {
       'notebooks_json': json.dumps(notebooks, cls=JSONEncoderForHTML),
@@ -181,7 +193,6 @@ def browse(request, database, table, partition_spec=None):
         namespace=namespace,
         compute=compute
     )
-
     return render('editor.mako', request, {
         'notebooks_json': json.dumps([editor.get_data()]),
         'options_json': json.dumps({
@@ -191,6 +202,7 @@ def browse(request, database, table, partition_spec=None):
         }),
         'editor_type': editor_type,
     })
+
 
 # Deprecated in Hue 4
 @check_document_access_permission
@@ -208,12 +220,25 @@ def execute_and_watch(request):
 
   if action == 'save_as_table':
     sql, success_url = api.export_data_as_table(notebook, snippet, destination)
-    editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute', database=snippet['database'])
+    editor = make_notebook(
+        name='Execute and watch',
+        editor_type=editor_type,
+        statement=sql,
+        status='ready-execute',
+        database=snippet['database']
+    )
   elif action == 'insert_as_query':
     # TODO: checks/workarounds in case of non impersonation or Sentry
     # TODO: keep older simpler way in case of known not many rows?
     sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
-    editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute', database=snippet['database'], on_success_url=success_url)
+    editor = make_notebook(
+        name='Execute and watch',
+        editor_type=editor_type,
+        statement=sql,
+        status='ready-execute',
+        database=snippet['database'],
+        on_success_url=success_url
+    )
   elif action == 'index_query':
     if destination == '__hue__':
       destination = _get_snippet_name(notebook, unique=True, table_format=True)
@@ -304,7 +329,7 @@ def copy(request):
 
   notebooks = json.loads(request.POST.get('notebooks', '[]'))
 
-  if len(notebooks) == 0:
+  if not notebooks:
     response['message'] = _('No notebooks have been selected for copying.')
   else:
     ctr = 0
@@ -364,17 +389,31 @@ def download(request):
   return response
 
 
+@require_POST
+@admin_required
 def install_examples(request):
-  response = {'status': -1, 'message': ''}
+  response = {'status': -1, 'message': '', 'errorMessage': ''}
 
-  if request.method == 'POST':
-    try:
+  try:
+    connector = Connector.objects.get(id=request.POST.get('connector'))
+    if connector:
+      dialect = connector.dialect
+      db_name = request.POST.get('db_name', 'default')
+      interpreter = get_interpreter(connector_type=connector.to_dict()['type'], user=request.user)
+
+      successes, errors = beeswax_install_examples.Command().handle(
+          dialect=dialect, db_name=db_name, user=request.user, interpreter=interpreter, request=request
+      )
+      response['message'] = ' '.join(successes)
+      response['errorMessage'] = ' '.join(errors)
+      response['status'] = len(errors)
+    else:
       Command().handle(user=request.user)
       response['status'] = 0
-    except Exception as err:
-      LOG.exception(err)
-      response['message'] = str(err)
-  else:
-    response['message'] = _('A POST request is required.')
+      response['message'] = _('Examples refreshed')
+  except Exception as e:
+    msg = 'Error during Editor samples installation'
+    LOG.exception(msg)
+    response['errorMessage'] = msg + ': ' + str(e)
 
   return JsonResponse(response)

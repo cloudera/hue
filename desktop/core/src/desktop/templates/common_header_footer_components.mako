@@ -86,20 +86,22 @@ from metadata.conf import has_optimizer, OPTIMIZER
       }
     }
 
-
-    var xhrOpen = XMLHttpRequest.prototype.open;
-    XMLHttpRequest.prototype.open = function () {
-      if (arguments[1].indexOf(window.HUE_BASE_URL) < 0) {
-        var index = arguments[1].indexOf(window.location.host);
-        if (index >= 0 && window.HUE_BASE_URL.length) { //Host is present in the url when using an html form.
-          index += window.location.host.length;
-            arguments[1] = arguments[1].substring(0, index) + window.HUE_BASE_URL + arguments[1].substring(index);
-        } else {
-          arguments[1] = window.HUE_BASE_URL + arguments[1];
+    // Enable XHR URL rewrite if Knox is there
+    if (window.HUE_BASE_URL && window.HUE_BASE_URL.length) {
+      var xhrOpen = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function () {
+        if (arguments[1].indexOf(window.HUE_BASE_URL) < 0) {
+          var index = arguments[1].indexOf(window.location.host);
+          if (index >= 0 && window.HUE_BASE_URL.length) { // Host is present in the URL when using an HTML form
+            index += window.location.host.length;
+              arguments[1] = arguments[1].substring(0, index) + window.HUE_BASE_URL + arguments[1].substring(index);
+          } else {
+            arguments[1] = window.HUE_BASE_URL + arguments[1];
+          }
         }
-      }
-      return xhrOpen.apply(this, arguments);
-    };
+        return xhrOpen.apply(this, arguments);
+      };
+    }
     var xhrSend = XMLHttpRequest.prototype.send;
     XMLHttpRequest.prototype.send = function (data) {
       // Add CSRF Token to all XHR Requests
@@ -284,31 +286,6 @@ from metadata.conf import has_optimizer, OPTIMIZER
   </div>
 </div>
 
-<div id="gistModal" class="modal hide fade">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-    <h2 class="modal-title">${ _('Shareable link') }</h2>
-  </div>
-  <div class="modal-body">
-    <div class="row-fluid">
-      <div class="span12">
-        <div class="input-group">
-          <input class="input-xxlarge" onfocus="this.select()" name="gist-link" id="gist-link" type="text" placeholder="${ _('Link') }"/>
-        </div>
-        <div class="input-prepend">
-          <a class="btn gist-link-btn" data-clipboard-target="#gist-link" data-dismiss="modal">${_('Copy')}</a>
-          <button class="add-on muted gist-link-btn" data-clipboard-target="#gist-link">
-            <i class="fa fa-clipboard"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('Close')}</a>
-  </div>
-</div>
-
 <div class="clipboard-content"></div>
 
 <script type="text/javascript">
@@ -367,8 +344,8 @@ from metadata.conf import has_optimizer, OPTIMIZER
 
     $('#rowDetailsModal .hue-modal-search').jHueDelayedInput(function () {
       var $t = $('#rowDetailsModal').find('table');
-      $('#rowDetailsModal .no-results').addClass('hide');
       $t.find('tr').removeClass('hide');
+      $('#rowDetailsModal .no-results').addClass('hide');
       var shown = 0;
       $t.find('tr').each(function () {
         if ($(this).text().toLowerCase().indexOf($('#rowDetailsModal .hue-modal-search').val().toLowerCase()) == -1) {
@@ -588,11 +565,6 @@ from metadata.conf import has_optimizer, OPTIMIZER
     nv.log = function () {
     };
   }
-
-  $(document).on('showGistModal', (e, data) => {
-    $('#gistModal input[name="gist-link"]').val(data['link']);
-    $('#gistModal').modal('show');
-  });
 
   % if collect_usage:
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

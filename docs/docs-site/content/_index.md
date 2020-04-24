@@ -11,16 +11,16 @@ pre = "<b>1. </b>"
 
 Hue is a mature open source SQL Assistant for querying [Databases & Data Warehouses](https://docs.gethue.com/administrator/configuration/connectors/) and collaborating: [gethue.com](http://gethue.com)
 
-Many companies and organizations use Hue to quickly answer questions via self-service querying e.g.:
+Many companies and organizations use Hue to quickly answer questions via [self-service querying](/user/querying/) e.g.:
 
 * 1000+ customers
 * Top Fortune 500
 
-are executing 100s of 1000s of queries daily. It also ships in Amazon AWS and its open source version is used by hundreds of companies.
+are executing 100s of 1000s of queries daily. It also [ships](/administrator/installation/) in Cloudera Data Platform, Amazon AWS, Open Data Hub...
 
-Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/parsers/) and any [contributions](CONTRIBUTING.md) are welcome.
+Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/parsers/) and any [contributions](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md) are welcome.
 
-!["Hue Editor"](https://cdn.gethue.com/uploads/2019/08/hue_4.5.png)
+!["Hue Editor"](https://cdn.gethue.com/uploads/2019/12/hue4.6.png)
 
 
 Administrate
@@ -38,6 +38,7 @@ How to extend SQL connectors, reuse the API or build applications is detailed in
 Releases
 --------
 
+* April 10, 2020 --- [Version 4.7.0](releases/release-notes-4.7.0/index.html)
 * December 5, 2019 --- [Version 4.6.0](releases/release-notes-4.6.0/index.html)
 * August 12, 2019 --- [Version 4.5.0](releases/release-notes-4.5.0/index.html)
 * March 28, 2019 --- [Version 4.4.0](releases/release-notes-4.4.0/index.html)

@@ -22,6 +22,7 @@ import huePubSub from 'utils/huePubSub';
 import MetastoreViewModel from 'apps/table_browser/metastoreViewModel';
 import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
+import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
 
 const HUE_PUB_SUB_EDITOR_ID = 'metastore';
 
@@ -130,24 +131,30 @@ huePubSub.subscribe('app.dom.loaded', app => {
 
   ko.applyBindings(viewModel, $('#metastoreComponents')[0]);
 
-  huePubSub.subscribe('cluster.config.set.config', clusterConfig => {
-    viewModel.appConfig(clusterConfig && clusterConfig['app_config']);
-  });
+  const configUpdated = config => {
+    viewModel.appConfig(config && config['app_config']);
+  };
 
-  huePubSub.publish('cluster.config.get.config');
+  huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
+  huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
 
   if (location.getParameter('refresh') === 'true') {
+    // TODO: Use connectors in the table browser
+    const connector = {};
+    if (viewModel.source().type === 'hive' || viewModel.source().type === 'impala') {
+      connector.optimizer = 'api';
+    }
     dataCatalog
       .getEntry({
         namespace: viewModel.source().namespace().namespace,
         compute: viewModel.source().namespace().compute,
         sourceType: viewModel.source().type,
+        connector: connector,
         path: [],
         definition: { type: 'source' }
       })
       .done(entry => {
         entry.clearCache({
-          invalidate: viewModel.source().type === 'impala' ? 'invalidate' : 'cache',
           silenceErrors: true
         });
         hueUtils.replaceURL('?');

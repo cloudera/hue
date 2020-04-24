@@ -17,6 +17,7 @@
 from django.utils.translation import ugettext as _
 
 from desktop.auth.backend import is_admin
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.views import commonheader, commonfooter
 
 from useradmin.models import group_permissions, Group
@@ -26,13 +27,19 @@ from useradmin.models import group_permissions, Group
 <%namespace name="layout" file="layout.mako" />
 
 % if not is_embeddable:
-${ commonheader(_('Hue Permissions'), "useradmin", user, request) | n,unicode }
+  ${ commonheader(_('Permissions'), "useradmin", user, request) | n,unicode }
 % endif
-${ layout.menubar(section='permissions') }
+  ${ layout.menubar(section='permissions') }
 
 <div id="permissionsComponents" class="useradmin container-fluid">
   <div class="card card-small">
-    <h1 class="card-heading simple">${_('Hue Permissions')}</h1>
+    <h1 class="card-heading simple">
+      ${_('Permissions')}
+      % if ENABLE_ORGANIZATIONS.get():
+        @ ${ user.organization }
+      % endif
+    </h1>
+
     <%actionbar:render>
       <%def name="search()">
           <input type="text" class="input-xlarge search-query filter-input" placeholder="${_('Search for application, group, etc...')}">
@@ -51,20 +58,20 @@ ${ layout.menubar(section='permissions') }
           % for perm in permissions:
           <tr class="tableRow"
               data-search="${perm.app}${perm.description}${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}">
-          <td>
-            %if is_admin(user):
-              <strong>
-                <a title="${_('Edit permission')}"
-                    href="${ url('useradmin.views.edit_permission', app=perm.app, priv=perm.action) }"
-                    data-name="${perm.app}" data-row-selector="true">${perm.app}
-                </a>
-              </strong>
-            %else:
-              <strong>${perm.app}</strong>
-            %endif
-          </td>
+            <td>
+              % if is_admin(user):
+                <strong>
+                  <a title="${ _('Edit permission') }"
+                      href="${ url('useradmin.views.edit_permission', app=perm.app, priv=perm.action) }"
+                      data-name="${ perm.app }" data-row-selector="true">${ perm.app }
+                  </a>
+                </strong>
+              % else:
+                <strong>${ perm.app }</strong>
+              % endif
+            </td>
             <td>${ perm.description }</td>
-            <td>${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}</td>
+            <td>${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')]) }</td>
           </tr>
           % endfor
       </tbody>

@@ -19,11 +19,14 @@ import logging
 import os
 import re
 
+
+import requests
 from django.utils.translation import ugettext_lazy as _, ugettext as _t
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool, coerce_password_from_script
 from desktop.lib.idbroker import conf as conf_idbroker
 from hadoop.core_site import get_s3a_access_key, get_s3a_secret_key, get_s3a_session_token
+
 
 LOG = logging.getLogger(__name__)
 
@@ -100,6 +103,7 @@ def get_default_region():
 
 def get_region(conf=None):
   global REGION_CACHED
+
   if REGION_CACHED is not None:
     return REGION_CACHED
   region = ''
@@ -145,6 +149,13 @@ def get_key_expiry():
   else:
     return 86400
 
+
+HAS_IAM_DETECTION=Config(
+  help=_('Enable the detection of an IAM role providing the credentials automatically. It can take a few seconds.'),
+  key='has_iam_detection',
+  default=False,
+  type=coerce_bool
+)
 
 AWS_ACCOUNTS = UnspecifiedConfigSection(
   'aws_accounts',
@@ -238,47 +249,67 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
         key='key_expiry',
         default=14400,
         type=int
-      )
+      ),
     )
   )
 )
 
 
 def is_enabled():
-  return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or has_iam_metadata()
+  return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or \
+      has_iam_metadata()
 
 
 def is_ec2_instance():
-  # To avoid unnecessary network call, check if Hue is running on EC2 instance
+  # To avoid unnecessary network call, check if Hue is running on EC2 instance.
   # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/identify_ec2_instances.html
   # /sys/hypervisor/uuid doesn't work on m5/c5, but /sys/devices/virtual/dmi/id/product_uuid does
   global IS_EC2_CACHED
+
+  # Detection can be slow and so is disabled by default.
+  if not HAS_IAM_DETECTION.get():
+    IS_EC2_CACHED = False
+
   if IS_EC2_CACHED is not None:
     return IS_EC2_CACHED
+
   try:
-    IS_EC2_CACHED = (os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'r').read()[:3].lower() == 'ec2') or (os.path.exists('/sys/devices/virtual/dmi/id/product_uuid') and open('/sys/devices/virtual/dmi/id/product_uuid', 'r').read()[:3].lower() == 'ec2') 
-  except IOError as e:
-    IS_EC2_CACHED = 'Permission denied' in str(e) # If permission is denied, assume cost of network call
+    # Low chance of false positive
+    IS_EC2_CACHED = (os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'r').read()[:3].lower() == 'ec2') or \
+      (
+        os.path.exists('/sys/devices/virtual/dmi/id/product_uuid') and \
+        open('/sys/devices/virtual/dmi/id/product_uuid', 'r').read()[:3].lower() == 'ec2'
+      )
   except Exception as e:
-    IS_EC2_CACHED = False
-    LOG.exception("Failed to read /sys/hypervisor/uuid or /sys/devices/virtual/dmi/id/product_uuid: %s" % e)
+    LOG.info("Detecting if Hue on an EC2 host, error might be expected: %s" % e)
+
+  if IS_EC2_CACHED is None:
+    try:
+      resp = requests.get('http://169.254.169.254/latest/dynamic/instance-identity/')  # Definitive way to check
+      IS_EC2_CACHED = resp.status_code == 200
+    except Exception as e:
+      IS_EC2_CACHED = False
+      LOG.info("Detecting if Hue on an EC2 host, error might be expected: %s" % e)
+
   return IS_EC2_CACHED
 
 
 def has_iam_metadata():
+  global IS_IAM_CACHED
+
   try:
-    global IS_IAM_CACHED
     if IS_IAM_CACHED is not None:
       return IS_IAM_CACHED
-    import boto.utils
+
     if is_ec2_instance():
+      import boto.utils
       metadata = boto.utils.get_instance_metadata(timeout=1, num_retries=1)
       IS_IAM_CACHED = 'iam' in metadata
     else:
       IS_IAM_CACHED = False
-  except Exception as e:
+  except:
     IS_IAM_CACHED = False
-    LOG.exception("Encountered error when checking IAM metadata: %s" % e)
+    LOG.exception("Encountered error when checking IAM metadata")
   return IS_IAM_CACHED
 
 
@@ -290,6 +321,7 @@ def has_s3_access(user):
 def config_validator(user):
   res = []
   import desktop.lib.fsmanager # Circular dependecy
+
   if is_enabled():
     try:
       conn = desktop.lib.fsmanager.get_client(name='default', fs='s3a')._s3_connection

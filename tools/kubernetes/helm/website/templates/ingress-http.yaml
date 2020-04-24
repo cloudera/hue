@@ -17,7 +17,7 @@ spec:
       paths:
       - backend:
           serviceName: docs
-          servicePort: 80
+          servicePort: 9001
         path: /
   {{ end }}
   {{ if .Values.website.enabled }}
@@ -26,7 +26,16 @@ spec:
       paths:
       - backend:
           serviceName: website
-          servicePort: 80
+          servicePort: 9002
+        path: /
+  {{ end }}
+  {{ if .Values.website.jp.enabled }}
+  - host: {{ .Values.website.jp.domain }}
+    http:
+      paths:
+      - backend:
+          serviceName: website-jp
+          servicePort: 9002
         path: /
   {{ end }}
 {{- end -}}

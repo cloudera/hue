@@ -23,7 +23,11 @@ import HueFileEntry from 'doc/hueFileEntry';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { DOCUMENT_TYPES } from 'doc/docSupport';
+import { ASSIST_DOC_HIGHLIGHT_EVENT, ASSIST_SHOW_DOC_EVENT } from './events';
 
+export const REFRESH_DOC_ASSIST_EVENT = 'assist.document.refresh';
+
+// prettier-ignore
 const TEMPLATE = `
   <script type="text/html" id="document-context-items">
     <!-- ko if: definition().type === 'directory' -->
@@ -46,7 +50,7 @@ const TEMPLATE = `
       'Share'
     )}</a></li>
   </script>
-  
+
   <script type="text/html" id="assist-document-header-actions">
     <div class="assist-db-header-actions">
       <!-- ko if: !loading() -->
@@ -152,7 +156,7 @@ const TEMPLATE = `
             </li>
           </ul>
       </span>
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.document.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('${ REFRESH_DOC_ASSIST_EVENT }'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
         'Manual refresh'
       )}"></i></a>
     </div>
@@ -178,7 +182,7 @@ const TEMPLATE = `
   <div class="assist-flex-search">
     <div class="assist-filter">
       <form autocomplete="off">
-        <input class="clearable" type="text" autocorrect="off" autocomplete="do-not-autocomplete" spellcheck="false" placeholder="${I18n(
+        <input class="clearable" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="${I18n(
           'Filter...'
         )}" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/>
       </form>
@@ -196,7 +200,7 @@ const TEMPLATE = `
       <ul class="assist-tables" data-bind="foreachVisible: { data: filteredEntries, minHeight: 27, container: '.assist-file-scrollable' }">
         <li class="assist-entry assist-file-entry" data-bind="appAwareTemplateContextMenu: { template: 'document-context-items', scrollContainer: '.assist-file-scrollable', beforeOpen: beforeContextOpen }, assistFileDroppable, assistFileDraggable, visibleOnHover: { 'selector': '.assist-file-actions' }">
           <div class="assist-file-actions table-actions">
-            <a class="inactive-action" href="javascript:void(0)" data-bind="click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
+            <a class="inactive-action" href="javascript:void(0)" data-bind="popoverOnHover: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
               'Show details'
             )}"></i></a>
           </div>
@@ -292,13 +296,13 @@ class AssistDocumentsPanel {
       );
     };
 
-    huePubSub.subscribe('assist.document.refresh', () => {
+    huePubSub.subscribe(REFRESH_DOC_ASSIST_EVENT, () => {
       huePubSub.publish('assist.clear.document.cache');
       self.reload();
     });
 
-    huePubSub.subscribe('assist.doc.highlight', details => {
-      huePubSub.publish('assist.show.documents');
+    huePubSub.subscribe(ASSIST_DOC_HIGHLIGHT_EVENT, details => {
+      huePubSub.publish(ASSIST_SHOW_DOC_EVENT);
       huePubSub.publish('context.popover.hide');
       const whenLoaded = $.Deferred().done(() => {
         self.activeEntry().highlightInside(details.docUuid);

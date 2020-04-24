@@ -17,9 +17,10 @@
 import * as ko from 'knockout';
 
 import componentUtils from 'ko/components/componentUtils';
+import DisposableComponent from 'ko/components/DisposableComponent';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
-import DisposableComponent from 'ko/components/DisposableComponent';
 
 export const NAME = 'executable-actions';
 
@@ -39,10 +40,10 @@ const TEMPLATE = `
       <button class="btn btn-danger btn-mini btn-execute disable-feedback" data-test="stop" data-bind="click: stop"><i class="fa fa-stop fa-fw"></i>
       <!-- ko ifnot: waiting -->
         ${ I18n('Stop') }
-      <!-- /ko --> 
+      <!-- /ko -->
       <!-- ko if: waiting -->
         ${ I18n('Stop batch') }
-      <!-- /ko --> 
+      <!-- /ko -->
       </button>
       <!-- /ko -->
       <!-- ko if: stopping -->
@@ -50,6 +51,9 @@ const TEMPLATE = `
       <!-- /ko -->
     <!-- /ko -->
   </div>
+  <form autocomplete="off" class="inline-block margin-left-10">
+    <input class="input-small limit-input" type="number" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="${ I18n('Limit') }" data-bind="textInput: limit, autogrowInput: { minWidth: 50, maxWidth: 80, comfortZone: 25 }">
+  </form>
 </div>
 `;
 
@@ -63,6 +67,14 @@ class ExecutableActions extends DisposableComponent {
     this.status = ko.observable(EXECUTION_STATUS.ready);
     this.partOfRunningExecution = ko.observable(false);
     this.beforeExecute = params.beforeExecute;
+
+    this.limit = ko.observable();
+
+    this.subscribe(this.limit, newVal => {
+      if (this.activeExecutable()) {
+        this.activeExecutable().executor.defaultLimit(newVal);
+      }
+    });
 
     this.waiting = ko.pureComputed(
       () =>
@@ -93,11 +105,16 @@ class ExecutableActions extends DisposableComponent {
     });
 
     this.subscribe(this.activeExecutable, this.updateFromExecutable.bind(this));
+
+    if (this.activeExecutable()) {
+      this.updateFromExecutable(this.activeExecutable());
+    }
   }
 
   updateFromExecutable(executable) {
     this.status(executable.status);
     this.partOfRunningExecution(executable.isPartOfRunningExecution());
+    this.limit(executable.executor.defaultLimit());
   }
 
   async stop() {
@@ -110,6 +127,7 @@ class ExecutableActions extends DisposableComponent {
   }
 
   async execute() {
+    huePubSub.publish('hue.ace.autocompleter.hide');
     if (this.beforeExecute) {
       await this.beforeExecute();
     }
@@ -118,13 +136,6 @@ class ExecutableActions extends DisposableComponent {
       await executable.reset();
       executable.execute();
     }
-  }
-
-  executeNext() {
-    if (this.activeExecutable() && this.activeExecutable().nextExecutable) {
-      this.activeExecutable(this.activeExecutable().nextExecutable);
-    }
-    this.execute();
   }
 }
 

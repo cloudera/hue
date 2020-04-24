@@ -17,30 +17,34 @@
 
 from builtins import object
 import datetime
-from nose.tools import assert_true, assert_false, assert_equal
+from nose.tools import assert_true, assert_false, assert_equal, assert_raises
 
 from django_auth_ldap import backend as django_auth_ldap_backend
+from django.db.utils import DataError
 from django.conf import settings
 from django.test.client import Client
 
 from hadoop.test_base import PseudoHdfsTestBase
 from hadoop import pseudo_hdfs4
 from useradmin import ldap_access
-from useradmin.models import get_default_user_group, User, Group
+from useradmin.models import get_default_user_group, User, Group, get_profile
 from useradmin.tests import LdapTestConnection
 from useradmin.views import import_ldap_groups
 
 from desktop import conf, middleware
 from desktop.auth import backend
+from desktop.auth.backend import create_user
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group
 
 
 def get_mocked_config():
-  return {'mocked_ldap': {
-    'users': {},
-    'groups': {}
-  }}
+  return {
+    'mocked_ldap': {
+      'users': {},
+      'groups': {}
+    }
+  }
 
 class TestLoginWithHadoop(PseudoHdfsTestBase):
   integration = True
@@ -729,16 +733,31 @@ class TestLogin(PseudoHdfsTestBase):
     response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
     assert_equal(200, response.status_code, "Expected unauthorized status.")
 
+  def test_modal_login(self):
+    c = make_logged_in_client(username='test', password='test', is_superuser=False, recreate=True)
+    response = c.get('/hue')
+    assert_true(b'<div id="login-modal" class="modal fade hide">' in response.content, response.content)
 
-class TestLoginNoHadoop(object):
+  def test_login_without_last_login(self):
+    self.reset.append( conf.AUTH.BACKEND.set_for_testing(["desktop.auth.backend.AllowFirstUserDjangoBackend"]) )
+    self.reset.append( conf.AUTH.EXPIRES_AFTER.set_for_testing(10) )
 
+    client = make_logged_in_client(username=self.test_username, password="test")
+    client.get('/accounts/logout')
+    user = User.objects.get(username=self.test_username)
+    user.last_login = None
+    user.save()
+    response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
+    assert_equal(200, response.status_code, "Expected ok status.")
+
+
+class TestLogin(object):
   reset = []
-  test_username = "test_login_no_hadoop"
+  test_username = "test_login"
 
   @classmethod
   def setup_class(cls):
-    # Simulate first login ever
-    User.objects.all().delete()
+    User.objects.all().delete()  # Simulate first login ever
 
     cls.auth_backends = settings.AUTHENTICATION_BACKENDS
     settings.AUTHENTICATION_BACKENDS = ('desktop.auth.backend.AllowFirstUserDjangoBackend',)
@@ -750,7 +769,9 @@ class TestLoginNoHadoop(object):
   def setUp(self):
     self.c = Client()
 
-    self.reset.append( conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.AllowFirstUserDjangoBackend']) )
+    self.reset.append(
+      conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.AllowFirstUserDjangoBackend'])
+    )
 
   def tearDown(self):
     for finish in self.reset:
@@ -760,8 +781,11 @@ class TestLoginNoHadoop(object):
     if Group.objects.filter(name=self.test_username).exists():
       Group.objects.filter(name=self.test_username).delete()
 
+
   def test_login_does_not_reset_groups(self):
-    self.reset.append( conf.AUTH.BACKEND.set_for_testing(["desktop.auth.backend.AllowFirstUserDjangoBackend"]) )
+    self.reset.append(
+      conf.AUTH.BACKEND.set_for_testing(["desktop.auth.backend.AllowFirstUserDjangoBackend"])
+    )
 
     client = make_logged_in_client(username=self.test_username, password="test")
     client.get('/accounts/logout')
@@ -771,8 +795,47 @@ class TestLoginNoHadoop(object):
     user.groups.all().delete()
     assert_false(user.groups.exists())
 
-    response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
-    assert_equal(200, response.status_code, "Expected ok status.")
+    # Webpack bundles not found if follow=True and running test locally
+    response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"))
+    assert_equal(302, response.status_code)
+
+
+  def test_login_set_auth_backend_in_profile(self):
+    client = make_logged_in_client(username=self.test_username, password="test")
+
+    response = client.post('/hue/accounts/login/', {'username': self.test_username, 'password': 'test'})
+    assert_equal(302, response.status_code)
+
+    user = User.objects.get(username=self.test_username)
+    existing_profile = get_profile(user)
+
+    assert_equal('desktop.auth.backend.AllowFirstUserDjangoBackend', existing_profile.data['auth_backend'])
+
+
+  def test_login_long_username(self):
+    self.reset.append(
+      conf.AUTH.BACKEND.set_for_testing(["desktop.auth.backend.AllowFirstUserDjangoBackend"])
+    )
+
+    c = Client()
+
+    username = 'a' * 15
+    user = create_user(username=username, password='test', is_superuser=False)
+
+    response = c.post('/hue/accounts/login/', {'username': username, 'password': 'test'})
+    assert_equal(302, response.status_code)
+
+    username = 'a' * 145
+    user = create_user(username=username, password='test', is_superuser=False)
+    response = c.post('/hue/accounts/login/', {'username': username, 'password': 'test'})
+    assert_equal(302, response.status_code)
+
+    # 250 is currently the max in the official Django User model.
+    # We can't create a previou user with more characters as the DB will truncate anyway.
+    username = 'a' * 255
+    response = c.post('/hue/accounts/login/', {'username': username, 'password': 'test'})
+    assert_equal(200, response.status_code)
+    assert_true(response.context[0]['login_errors'])
 
 
 class TestImpersonationBackend(object):

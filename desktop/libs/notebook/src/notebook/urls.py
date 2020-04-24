@@ -17,17 +17,9 @@
 
 from django.conf.urls import url
 
-# FIXME: This could be replaced with hooking into the `AppConfig.ready()`
-# signal in Django 1.7:
-#
-# https://docs.djangoproject.com/en/1.7/ref/applications/#django.apps.AppConfig.ready
-#
-# For now though we have to load in the monkey patches here because we know
-# this file has been loaded after `desktop.settings` has been loaded.
-
-# Start DBProxy server
 from notebook import views as notebook_views
 from notebook import api as notebook_api
+
 
 # Views
 urlpatterns = [
@@ -52,7 +44,7 @@ urlpatterns += [
   url(r'^api/create_notebook/?$', notebook_api.create_notebook, name='create_notebook'),
   url(r'^api/create_session/?$', notebook_api.create_session, name='create_session'),
   url(r'^api/close_session/?$', notebook_api.close_session, name='close_session'),
-  url(r'^api/execute(?:/(?P<engine>.+))?/?$', notebook_api.execute, name='execute'),
+  url(r'^api/execute(?:/(?P<dialect>.+))?/?$', notebook_api.execute, name='execute'),
   url(r'^api/check_status/?$', notebook_api.check_status, name='check_status'),
   url(r'^api/fetch_result_data/?$', notebook_api.fetch_result_data, name='fetch_result_data'),
   url(r'^api/fetch_result_metadata/?$', notebook_api.fetch_result_metadata, name='fetch_result_metadata'),

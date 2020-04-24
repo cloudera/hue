@@ -2,7 +2,7 @@
 
 ## Run the image
 
-Hue can run in one line via the `docker` command (but needs to be configured to point to a traditional database instead of Sqlite). To have a zero configuration start use [kubernetes](tools/kubernetes/) instead.
+Hue can run in one line via the `docker` command (but needs to be configured to point to a traditional database instead of Sqlite). To have a zero configuration start use [kubernetes](/tools/kubernetes/) instead.
 
 ### Docker
 

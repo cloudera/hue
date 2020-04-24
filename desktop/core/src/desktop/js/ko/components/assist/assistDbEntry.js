@@ -52,7 +52,6 @@ class AssistDbEntry {
     self.navigationSettings = navigationSettings;
 
     self.sourceType = assistDbNamespace.sourceType;
-    self.invalidateOnRefresh = assistDbNamespace.invalidateOnRefresh;
 
     self.expandable = self.catalogEntry.hasPossibleChildren();
 
@@ -264,7 +263,7 @@ class AssistDbEntry {
 
   triggerRefresh() {
     const self = this;
-    self.catalogEntry.clearCache({ invalidate: self.invalidateOnRefresh(), cascade: true });
+    self.catalogEntry.clearCache({ cascade: true });
   }
 
   highlightInside(path) {
@@ -388,17 +387,17 @@ class AssistDbEntry {
       (self.catalogEntry.isTable() || self.catalogEntry.isDatabase()) &&
       !self.assistDbNamespace.nonSqlType
     ) {
-      self.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true }).done(() => {
+      self.catalogEntry.loadOptimizerPopularityForChildren({ silenceErrors: true }).done(() => {
         loadEntriesDeferred.done(() => {
           if (!self.hasErrors()) {
             self.entries().forEach(entry => {
-              if (entry.catalogEntry.navOptPopularity) {
-                if (entry.catalogEntry.navOptPopularity.popularity) {
-                  entry.popularity(entry.catalogEntry.navOptPopularity.popularity);
-                } else if (entry.catalogEntry.navOptPopularity.column_count) {
-                  entry.popularity(entry.catalogEntry.navOptPopularity.column_count);
-                } else if (entry.catalogEntry.navOptPopularity.selectColumn) {
-                  entry.popularity(entry.catalogEntry.navOptPopularity.selectColumn.columnCount);
+              if (entry.catalogEntry.optimizerPopularity) {
+                if (entry.catalogEntry.optimizerPopularity.popularity) {
+                  entry.popularity(entry.catalogEntry.optimizerPopularity.popularity);
+                } else if (entry.catalogEntry.optimizerPopularity.column_count) {
+                  entry.popularity(entry.catalogEntry.optimizerPopularity.column_count);
+                } else if (entry.catalogEntry.optimizerPopularity.selectColumn) {
+                  entry.popularity(entry.catalogEntry.optimizerPopularity.selectColumn.columnCount);
                 }
               }
             });

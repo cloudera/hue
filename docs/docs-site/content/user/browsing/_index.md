@@ -5,9 +5,9 @@ draft: false
 weight: 3
 ---
 
-Browsers power the Data Catalog. They let you easily search, glance and perform actions on data or jobs in Cloud or on premise clusters.
+Browsers power the Data Catalog. They let you easily search, glance, import datasets or jobs.
 
-The browsers can be "enriched" with [Search and Tagging](http://gethue.com/improved-sql-exploration-in-hue-4-3/) by metadata services.
+The browsers can be "enriched" with external [catalog/metadata services](/administrator/configuration/connectors/#storage/).
 
 ## Catalogs
 
@@ -15,7 +15,7 @@ The browsers can be "enriched" with [Search and Tagging](http://gethue.com/impro
 
 The Table Browser enables you to manage the databases, tables, and partitions of the metastore shared by the Hive and Impala. You can perform the following operations:
 
--   Search and display metadata like tags and additional description from [Catalog backends](/administrator/configuration/connectors/#storage/).
+-   Search and display metadata like tags and additional description
 
 -   Databases
     -   Select a database
@@ -32,11 +32,9 @@ The Table Browser enables you to manage the databases, tables, and partitions of
 
 ### Data Catalogs
 
-[Apache Atlas](https://atlas.apache.org/) is powering the Search and Commenting of tables, columns. New Catalogs can be integrated via [connectors](/developer/connectors/).
+Before typing any query to get insights, users need to find and explore the correct datasets.  It is accessible from the top bar of the interface and offers free text search of SQL tables, columns, tags and saved queries. This is particularly useful for quickly looking up a table among thousands or finding existing queries already analyzing a certain dataset.
 
 Existing tags, descriptions and indexed objects show up automatically, any additional tags you add appear back in metadata server, and the familiar metadata server search syntax is supported.
-
-Before typing any query to get insights, users need to find and explore the correct datasets. The Data Catalog search usability experience has been improved in each release since. It is accessible from the top bar of the interface and offers free text search of SQL tables, columns, tags and saved queries. This is particularly useful for quickly looking up a table among thousands or finding existing queries already analyzing a certain dataset.
 
 ![Data Catalog top search](https://cdn.gethue.com/uploads/2018/04/blog_top_search_.png)
 
@@ -50,7 +48,7 @@ Listing the possible tags to filter on. This also works for ‘types’.
 
 The list of tables and their columns is displayed in multiple part of the interface. This data is pretty costly to fetch and comes from different sources. In this new version, the information is now cached and reused by all the Hue components. As the sources are diverse, e.g. Apache Hive, Apache Atlas those are stored into a single object, so that it is easier and faster to display without caring about the underlying technical details.
 
-In addition to editing the tags of any SQL objects like tables, views, columns… which has been available since version one, table descriptions can now also be edited. This allows a self service documentation of the metadata by the end users, which was not possible until know as directly editing Hive comments require some admin Sentry privileges which are not granted to regular users in a secure cluster.
+In addition to editing the tags of any SQL objects like tables, views, columns… which has been available since version one, table descriptions can now also be edited. This allows a self service documentation of the metadata by the end users, which was not possible until now as directly editing Hive comments require some admin Sentry privileges which are not granted to regular users in a secure cluster.
 
 ![Data Catalog](https://cdn.gethue.com/uploads/2018/04/blog_metadata.png)
 
@@ -62,12 +60,12 @@ Example of searches:
 
 Atlas
 
-* ‘sample’ → Any table or Hue document with prefix ‘sample’ will be returned
-* ‘type:database’→ List all databases on this cluster
-* ‘type:table → List all tables on this cluster
-* ‘type:field name’→ List tables with field(column): ‘name’
+* sample → Any table or Hue document with prefix ‘sample’ will be returned
+* type:database → List all databases on this cluster
+* type:table → List all tables on this cluster
+* type:field name → List tables with field(column): ‘name’
 * ‘tag:classification_testdb5’ or ‘classification:classification_testdb5’→ List entities with classification ‘classification_testdb5’
-* ‘owner:admin’→ List all tables owned by ‘admin’ user
+* owner:admin → List all tables owned by ‘admin’ user
 
 Navigator
 

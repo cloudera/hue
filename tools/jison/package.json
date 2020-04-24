@@ -1,0 +1,14 @@
+{
+  "name": "parser-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "generateParsers.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jison": "https://github.com/JohanAhlen/jison/tarball/ad8e41475e"
+  }
+}

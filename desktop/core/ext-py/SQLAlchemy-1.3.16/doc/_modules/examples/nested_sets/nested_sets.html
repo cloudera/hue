@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    examples.nested_sets.nested_sets
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+        <link rel="copyright" title="Copyright" href="../../../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../../../index.html" />
+        <link rel="up" title="Module code" href="../../index.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.16</span>
+
+
+        | Release Date: April 7, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="">
+
+        <div id="index-nav">
+            <form class="search" action="../../../search.html" method="get">
+              <label>
+                 Search terms:
+              <input type="text" placeholder="search..." name="q" size="12" />
+              </label>
+              <input type="submit" value="Search" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+
+            <p>
+            <a href="../../../contents.html">Contents</a> |
+            <a href="../../../genindex.html">Index</a>
+            </p>
+
+        </div>
+
+
+    </div>
+
+    
+
+    <div id="docs-body" class="" >
+        
+<h1>Source code for examples.nested_sets.nested_sets</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Celko&#39;s &quot;Nested Sets&quot; Tree Structure.</span>
+
+<span class="sd">http://www.intelligententerprise.com/001020/celko.jhtml</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">case</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">Column</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">create_engine</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">event</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">func</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">Integer</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">select</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">String</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">aliased</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">Session</span>
+
+
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">Employee</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;personnel&quot;</span>
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;batch&quot;</span><span class="p">:</span> <span class="kc">False</span>  <span class="c1"># allows extension to fire for each</span>
+        <span class="c1"># instance before going to the next.</span>
+    <span class="p">}</span>
+
+    <span class="n">parent</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">emp</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">left</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;lft&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">right</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;rgt&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Employee(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%d</span><span class="s2">, </span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">emp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">)</span>
+
+
+<span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">Employee</span><span class="p">,</span> <span class="s2">&quot;before_insert&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">before_insert</span><span class="p">(</span><span class="n">mapper</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">instance</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">personnel</span> <span class="o">=</span> <span class="n">mapper</span><span class="o">.</span><span class="n">mapped_table</span>
+        <span class="n">right_most_sibling</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">scalar</span><span class="p">(</span>
+            <span class="n">select</span><span class="p">([</span><span class="n">personnel</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">rgt</span><span class="p">])</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                <span class="n">personnel</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">emp</span> <span class="o">==</span> <span class="n">instance</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">emp</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="n">personnel</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">personnel</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">rgt</span> <span class="o">&gt;=</span> <span class="n">right_most_sibling</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">(</span>
+                <span class="n">lft</span><span class="o">=</span><span class="n">case</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="p">(</span>
+                            <span class="n">personnel</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">lft</span> <span class="o">&gt;</span> <span class="n">right_most_sibling</span><span class="p">,</span>
+                            <span class="n">personnel</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">lft</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">],</span>
+                    <span class="n">else_</span><span class="o">=</span><span class="n">personnel</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">lft</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">rgt</span><span class="o">=</span><span class="n">case</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="p">(</span>
+                            <span class="n">personnel</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">rgt</span> <span class="o">&gt;=</span> <span class="n">right_most_sibling</span><span class="p">,</span>
+                            <span class="n">personnel</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">rgt</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">],</span>
+                    <span class="n">else_</span><span class="o">=</span><span class="n">personnel</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">rgt</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">right_most_sibling</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right_most_sibling</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># before_update() would be needed to support moving of nodes</span>
+    <span class="c1"># after_delete() would be needed to support removal of nodes.</span>
+
+
+<span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s2">&quot;sqlite://&quot;</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+
+<span class="n">albert</span> <span class="o">=</span> <span class="n">Employee</span><span class="p">(</span><span class="n">emp</span><span class="o">=</span><span class="s2">&quot;Albert&quot;</span><span class="p">)</span>
+<span class="n">bert</span> <span class="o">=</span> <span class="n">Employee</span><span class="p">(</span><span class="n">emp</span><span class="o">=</span><span class="s2">&quot;Bert&quot;</span><span class="p">)</span>
+<span class="n">chuck</span> <span class="o">=</span> <span class="n">Employee</span><span class="p">(</span><span class="n">emp</span><span class="o">=</span><span class="s2">&quot;Chuck&quot;</span><span class="p">)</span>
+<span class="n">donna</span> <span class="o">=</span> <span class="n">Employee</span><span class="p">(</span><span class="n">emp</span><span class="o">=</span><span class="s2">&quot;Donna&quot;</span><span class="p">)</span>
+<span class="n">eddie</span> <span class="o">=</span> <span class="n">Employee</span><span class="p">(</span><span class="n">emp</span><span class="o">=</span><span class="s2">&quot;Eddie&quot;</span><span class="p">)</span>
+<span class="n">fred</span> <span class="o">=</span> <span class="n">Employee</span><span class="p">(</span><span class="n">emp</span><span class="o">=</span><span class="s2">&quot;Fred&quot;</span><span class="p">)</span>
+
+<span class="n">bert</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">albert</span>
+<span class="n">chuck</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">albert</span>
+<span class="n">donna</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">chuck</span>
+<span class="n">eddie</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">chuck</span>
+<span class="n">fred</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">chuck</span>
+
+<span class="c1"># the order of &quot;add&quot; is important here.  elements must be added in</span>
+<span class="c1"># the order in which they should be INSERTed.</span>
+<span class="n">session</span><span class="o">.</span><span class="n">add_all</span><span class="p">([</span><span class="n">albert</span><span class="p">,</span> <span class="n">bert</span><span class="p">,</span> <span class="n">chuck</span><span class="p">,</span> <span class="n">donna</span><span class="p">,</span> <span class="n">eddie</span><span class="p">,</span> <span class="n">fred</span><span class="p">])</span>
+<span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Employee</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+
+<span class="c1"># 1. Find an employee and all their supervisors, no matter how deep the tree.</span>
+<span class="n">ealias</span> <span class="o">=</span> <span class="n">aliased</span><span class="p">(</span><span class="n">Employee</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Employee</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">ealias</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">Employee</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">Employee</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">ealias</span><span class="o">.</span><span class="n">emp</span> <span class="o">==</span> <span class="s2">&quot;Eddie&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="c1"># 2. Find the employee and all their subordinates.</span>
+<span class="c1"># (This query has a nice symmetry with the first query.)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Employee</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Employee</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">ealias</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">ealias</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">ealias</span><span class="o">.</span><span class="n">emp</span> <span class="o">==</span> <span class="s2">&quot;Chuck&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="c1"># 3. Find the level of each node, so you can print the tree</span>
+<span class="c1"># as an indented listing.</span>
+<span class="k">for</span> <span class="n">indentation</span><span class="p">,</span> <span class="n">employee</span> <span class="ow">in</span> <span class="p">(</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">Employee</span><span class="o">.</span><span class="n">emp</span><span class="p">)</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;indentation&quot;</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ealias</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">ealias</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">Employee</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">Employee</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">ealias</span><span class="o">.</span><span class="n">emp</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">ealias</span><span class="o">.</span><span class="n">left</span><span class="p">)</span>
+<span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    &quot;</span> <span class="o">*</span> <span class="n">indentation</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">employee</span><span class="p">))</span></pre></div>
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links">
+
+    <div id="docs-copyright">
+        &copy; <a href="../../../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.0.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../../../',
+          VERSION:     '1.3.16',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../../../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

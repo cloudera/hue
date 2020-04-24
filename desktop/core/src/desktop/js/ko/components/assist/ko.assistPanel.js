@@ -22,6 +22,13 @@ import AssistInnerPanel from 'ko/components/assist/assistInnerPanel';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
+import {
+  ASSIST_SHOW_DOC_EVENT,
+  ASSIST_SHOW_SOLR_EVENT,
+  ASSIST_SHOW_SQL_EVENT,
+  SHOW_LEFT_ASSIST_EVENT
+} from './events';
 
 const TEMPLATE = `
   <script type="text/html" id="assist-panel-inner-header">
@@ -63,10 +70,6 @@ class AssistPanel {
    * @param {boolean} params.onlySql - For the old query editors
    * @param {string[]} params.visibleAssistPanels - Panels that will initially be shown regardless of total storage
    * @param {Object} params.sql
-   * @param {Object[]} params.sql.sourceTypes - All the available SQL source types
-   * @param {string} params.sql.sourceTypes[].name - Example: Hive SQL
-   * @param {string} params.sql.sourceTypes[].type - Example: hive
-   * @param {string} [params.sql.activeSourceType] - Example: hive
    * @param {Object} params.sql.navigationSettings - enable/disable the links
    * @param {boolean} params.sql.navigationSettings.openItem - Example: true
    * @param {boolean} params.sql.navigationSettings.showStats - Example: true
@@ -91,7 +94,8 @@ class AssistPanel {
     self.lastOpenPanelType = ko.observable();
     apiHelper.withTotalStorage('assist', 'last.open.panel', self.lastOpenPanelType);
 
-    huePubSub.subscribeOnce('cluster.config.set.config', clusterConfig => {
+    // TODO: Support dynamic config changes
+    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, clusterConfig => {
       if (clusterConfig && clusterConfig['app_config']) {
         const panels = [];
         const appConfig = clusterConfig['app_config'];
@@ -114,7 +118,7 @@ class AssistPanel {
           });
           panels.push(sqlPanel);
 
-          huePubSub.subscribe('assist.show.sql', () => {
+          huePubSub.subscribe(ASSIST_SHOW_SQL_EVENT, () => {
             if (self.visiblePanel() !== sqlPanel) {
               self.visiblePanel(sqlPanel);
             }
@@ -122,13 +126,13 @@ class AssistPanel {
         }
 
         if (self.tabsEnabled) {
-          if (appConfig.browser && appConfig.browser.interpreter_names) {
-            const storageBrowsers = appConfig.browser.interpreter_names.filter(
+          if (appConfig.browser && appConfig.browser.interpreters) {
+            const storageBrowsers = appConfig.browser.interpreters.filter(
               interpreter =>
-                interpreter === 'adls' ||
-                interpreter === 'hdfs' ||
-                interpreter === 's3' ||
-                interpreter === 'abfs'
+                interpreter.type === 'adls' ||
+                interpreter.type === 'hdfs' ||
+                interpreter.type === 's3' ||
+                interpreter.type === 'abfs'
             );
 
             if (storageBrowsers.length) {
@@ -166,7 +170,7 @@ class AssistPanel {
                 minHeight: 75
               });
               panels.push(solrPanel);
-              huePubSub.subscribe('assist.show.solr', () => {
+              huePubSub.subscribe(ASSIST_SHOW_SOLR_EVENT, () => {
                 if (self.visiblePanel() !== solrPanel) {
                   self.visiblePanel(solrPanel);
                 }
@@ -228,8 +232,8 @@ class AssistPanel {
 
           panels.push(documentsPanel);
 
-          huePubSub.subscribe('assist.show.documents', docType => {
-            huePubSub.publish('left.assist.show');
+          huePubSub.subscribe(ASSIST_SHOW_DOC_EVENT, docType => {
+            huePubSub.publish(SHOW_LEFT_ASSIST_EVENT);
             if (self.visiblePanel() !== documentsPanel) {
               self.visiblePanel(documentsPanel);
             }
@@ -290,13 +294,6 @@ class AssistPanel {
         lastFoundPanel.length === 1 ? lastFoundPanel[0] : self.availablePanels()[0]
       );
     });
-
-    window.setTimeout(() => {
-      // Main initialization trigger in hue.mako, this is for Hue 3
-      if (self.availablePanels().length === 0) {
-        huePubSub.publish('cluster.config.get.config');
-      }
-    }, 0);
   }
 }
 

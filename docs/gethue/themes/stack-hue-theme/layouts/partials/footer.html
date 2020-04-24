@@ -4,11 +4,21 @@
 <footer class="space--sm footer-2 ">
   <div class="container">
     <div class="row">
-      <div class="col-sm-6">
+      <div class="col-sm-9">
         <ul class="list-inline list--hover">
-          <li> <a href="mailto:team@gethue.com"><span>Contact</span></a> </li>
-          <li> <a href="https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md"><span>Work with us</span></a> </li>
-          <li> <a href="{{ .Site.BaseURL }}/posts/"><span>Blog</span></a> </li>
+          {{ $currentLang := .Lang }}
+          {{ range $.Site.Home.AllTranslations }}
+            {{ if ne .Lang $currentLang }}
+            <li>
+              <a href="{{ .Permalink }}">
+                <img class="icon icon--xs flag" alt="{{ .Language.LanguageName }}" title="{{ .Language.LanguageName }}" src="{{ .Site.BaseURL }}img/flags/{{.Lang}}.png" />
+              </a>
+            </li>
+            {{ end }}
+          {{ end }}
+          <li> <a href="mailto:team@gethue.com"><span>{{ i18n "contact" }}</span></a> </li>
+          <li> <a href="https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md"><span>{{ i18n "work" }}</span></a> </li>
+          <li> <a href="{{ .Site.BaseURL }}/posts/"><span>{{ i18n "blog" }}</span></a> </li>
           <li> <a href="https://stackoverflow.com/questions/tagged/hue"><span>Stackoverflow</span></a> </li>
           <li>
             <a href="https://github.com/cloudera/hue" title="GitHub" target="_blank">
@@ -22,10 +32,10 @@
           </li>
         </ul>
       </div>
-      <div class="col-sm-6 text-right text-center-xs">
+      <div class="col-sm-3 text-right text-center-xs">
         <a class="btn btn--sm btn--primary type--uppercase" href="http://demo.gethue.com" target="_blank">
           <span class="btn__text">
-            Try Hue Now
+            {{ i18n "try" }}
           </span>
         </a>
       </div>
@@ -52,12 +62,21 @@
   <i class="stack-interface stack-up-open-big"></i>
 </a>
 <script src="{{ .Site.BaseURL }}/js/jquery-3.1.1.min.js"></script>
-<script src="{{ .Site.BaseURL }}/js/flickity.min.js"></script>
 <script src="{{ .Site.BaseURL }}/js/typed.min.js"></script>
 <script src="{{ .Site.BaseURL }}/js/lightbox.min.js"></script>
 <script src="{{ .Site.BaseURL }}/js/smooth-scroll.min.js"></script>
 <script src="{{ .Site.BaseURL }}/js/gifffer.min.js"></script>
 <script src="{{ .Site.BaseURL }}/js/scripts.js"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-37637545-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-37637545-1');
+</script>
+
 </body>
 
 </html>

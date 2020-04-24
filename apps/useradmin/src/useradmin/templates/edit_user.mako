@@ -16,8 +16,8 @@
 <%!
 from django.utils.translation import ugettext as _
 
-from desktop.auth.backend import is_admin
-from desktop.conf import ENABLE_ORGANIZATIONS
+from desktop.auth.backend import is_admin, is_hue_admin
+from desktop.conf import ENABLE_ORGANIZATIONS, ENABLE_CONNECTORS
 from desktop.views import commonheader, commonfooter
 
 from useradmin.hue_password_policy import is_password_policy_enabled, get_password_hint
@@ -27,7 +27,7 @@ from useradmin.views import is_user_locked_out
 <%namespace name="layout" file="layout.mako" />
 
 % if not is_embeddable:
-${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
+  ${ commonheader(_('Users'), "useradmin", user, request) | n,unicode }
 % endif
 
 ${ layout.menubar(section='users') }
@@ -35,11 +35,12 @@ ${ layout.menubar(section='users') }
 
 <div id="editUserComponents" class="useradmin container-fluid">
   <div class="card card-small title">
-    % if username:
-      <h1 class="card-heading simple">${_('Hue Users - Edit user: %(username)s') % dict(username=username)}</h1>
-    % else:
-      <h1 class="card-heading simple">${_('Hue Users - Create user')}</h1>
-    % endif
+    <h1 class="card-heading simple">
+      ${ _('User %(username)s') % dict(username=username) if username else _('Create user') }
+      % if ENABLE_ORGANIZATIONS.get():
+        @ ${ user.organization }
+      % endif
+    </h1>
 
     <br/>
 
@@ -81,8 +82,12 @@ ${ layout.menubar(section='users') }
           % endif
           ${layout.render_field(form["password2"], extra_attrs=username is None and {'validate':'true'} or {})}
         % endif
-        ${layout.render_field(form["ensure_home_directory"])}
+
+        % if not ENABLE_CONNECTORS.get():
+          ${ layout.render_field(form["ensure_home_directory"]) }
+        % endif
         </div>
+
         <div id="step2" class="stepDetails hide">
           % if "first_name" in form.fields:
             ${layout.render_field(form["first_name"])}
@@ -103,15 +108,19 @@ ${ layout.menubar(section='users') }
             ${layout.render_field(form["groups"])}
           % endif
         </div>
-      % if is_admin(user):
-        <div id="step3" class="stepDetails hide">
-          ${ layout.render_field(form["is_active"]) }
-          ${'is_superuser' in form.fields and layout.render_field(form["is_superuser"])}
-          % if is_user_locked_out(username):
-            ${ layout.render_field(form["unlock_account"]) }
-          % endif
-        </div>
-      % endif
+        % if is_admin(user):
+          <div id="step3" class="stepDetails hide">
+            ${ layout.render_field(form["is_active"]) }
+
+            % if is_hue_admin(user):
+              ${ 'is_superuser' in form.fields and layout.render_field(form["is_superuser"]) }
+            % endif
+
+            % if is_user_locked_out(username):
+              ${ layout.render_field(form["unlock_account"]) }
+            % endif
+          </div>
+        % endif
       </div>
 
       <div class="form-actions">

@@ -48,4 +48,4 @@ A general rule is to follow the on-going style of the code context.
 
 ## CI & Tests
 
-See the [Running the tests](https://docs.gethue.com/latest/developer/development/#testing) or opening-up a pull request will automatically run them via [CircleCi](https://circleci.com/gh/cloudera/hue).
+See how to automatically [run the tests](https://docs.gethue.com/developer/development/#testing) via [CircleCi](https://circleci.com/gh/cloudera/hue) by pushing to a branch or opening-up a pull request.

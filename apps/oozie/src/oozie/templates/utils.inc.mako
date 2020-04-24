@@ -25,6 +25,7 @@
 <%!
   import logging
   import posixpath
+  import sys
   import time
 
   from django.template.defaultfilters import date, time as dtime
@@ -33,6 +34,9 @@
   from desktop.lib.view_util import format_duration_in_millis
   from hadoop.fs.hadoopfs import Hdfs
   from liboozie.utils import format_time
+
+  if sys.version_info[0] > 2:
+    unicode = str
 
   LOG = logging.getLogger(__name__)
 %>

@@ -47,7 +47,7 @@ from django.urls import reverse
 from desktop.auth.backend import is_admin
 
 if sys.version_info[0] > 2:
-  from io import StringIO as string_io
+  from io import BytesIO as string_io
 else:
   from cStringIO import StringIO as string_io
 
@@ -168,7 +168,10 @@ class WorkflowAction(Action):
       self.retries = int(self.retries)
 
     if self.conf:
-      xml = string_io(i18n.smart_str(self.conf))
+      conf_data = i18n.smart_str(self.conf)
+      if not isinstance(conf_data, bytes):
+        conf_data = conf_data.encode('utf-8')
+      xml = string_io(conf_data)
       try:
         self.conf_dict = hadoop.confparse.ConfParse(xml)
       except Exception as e:
@@ -244,7 +247,10 @@ class CoordinatorAction(Action):
       self.lastModifiedTime = parse_timestamp(self.lastModifiedTime)
 
     if self.runConf:
-      xml = string_io(i18n.smart_str(self.runConf))
+      conf_data = i18n.smart_str(self.runConf)
+      if not isinstance(conf_data, bytes):
+        conf_data = conf_data.encode('utf-8')
+      xml = string_io(conf_data)
       self.conf_dict = hadoop.confparse.ConfParse(xml)
     else:
       self.conf_dict = {}
@@ -292,7 +298,10 @@ class BundleAction(Action):
     self.name = self.coordJobName
 
     if self.conf:
-      xml = string_io(i18n.smart_str(self.conf))
+      conf_data = i18n.smart_str(self.conf)
+      if not isinstance(conf_data, bytes):
+        conf_data = conf_data.encode('utf-8')
+      xml = string_io(conf_data)
       self.conf_dict = hadoop.confparse.ConfParse(xml)
     else:
       self.conf_dict = {}
@@ -346,7 +355,10 @@ class Job(object):
 
     self.actions = [Action.create(self.ACTION, act_dict) for act_dict in self.actions]
     if self.conf is not None:
-      xml = string_io(i18n.smart_str(self.conf))
+      conf_data = i18n.smart_str(self.conf)
+      if not isinstance(conf_data, bytes):
+        conf_data = conf_data.encode('utf-8')
+      xml = string_io(conf_data)
       self.conf_dict = hadoop.confparse.ConfParse(xml)
     else:
       self.conf_dict = {}

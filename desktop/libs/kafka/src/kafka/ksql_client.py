@@ -25,8 +25,11 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.rest.http_client import RestException
+from desktop.conf import has_channels
 
-from kafka.conf import KAFKA
+
+if has_channels():
+  from notebook.consumer import _send_to_channel
 
 
 LOG = logging.getLogger(__name__)
@@ -48,17 +51,21 @@ class KSqlApi(object):
   https://pypi.org/project/ksql/
 
   pip install ksql
+
+  https://github.com/bryanyang0528/ksql-python/pull/60 fixes:
+  - STREAMS requires a LIMIT currently or will hang or run forever
+  - https://github.com/bryanyang0528/ksql-python/issues/57
   """
 
-  def __init__(self, user=None, security_enabled=False, ssl_cert_ca_verify=False):
+  def __init__(self, user=None, url=None, security_enabled=False, ssl_cert_ca_verify=False):
     try:
       from ksql import KSQLAPI
     except ImportError:
       raise KSqlApiException('Module missing: pip install ksql')
 
-    self._api_url = KAFKA.KSQL_API_URL.get().strip('/') if KAFKA.KSQL_API_URL.get() else ''
-
+    self._api_url = url.strip('/')
     self.user = user
+
     self.client = client = KSQLAPI(self._api_url)
 
 
@@ -70,35 +77,101 @@ class KSqlApi(object):
       raise KSqlApiException(e)
 
 
+  def show_topics(self):
+    try:
+      response = self.client.ksql('SHOW TOPICS')
+      return response[0]['topics']
+    except Exception as e:
+      raise KSqlApiException(e)
+
+
+  def show_streams(self):
+    try:
+      response = self.client.ksql('SHOW STREAMS')
+      return response[0]['streams']
+    except Exception as e:
+      raise KSqlApiException(e)
+
+
+  def get_columns(self, table):
+    try:
+      response = self.client.ksql('DESCRIBE %s' % table)
+      return response[0]['sourceDescription']['fields']
+    except Exception as e:
+      raise KSqlApiException(e)
+
+
   def ksql(self, statement):
     response = self.client.ksql(statement)
     print(response)
     return response[0]
 
 
-  def query(self, statement):
+  def query(self, statement, channel_name=None):
     data = []
     metadata = []
 
-    is_select = statement.strip().lower().startswith('select')
-    if is_select or statement.strip().lower().startswith('print'):
-      # STREAMS requires a LIMIT currently or will hang without https://github.com/bryanyang0528/ksql-python/pull/60
+    is_select = statement.strip().lower().startswith('select')  # TODO via parser
+    is_print = statement.strip().lower().startswith('print')
+
+    if is_select or is_print:
       result = self.client.query(statement)
-      for line in ''.join(list(result)).split('\n'): # Until https://github.com/bryanyang0528/ksql-python/issues/57
+
+      metadata = [
+        {'type': 'STRING', 'name': 'Row', 'comment': None}
+      ]
+
+      if has_channels() and channel_name:
+        _send_to_channel(
+            channel_name,
+            message_type='task.progress',
+            message_data={'status': 'running', 'query_id': 1}
+        )
+
+      for line in result:
         # columns = line.keys()
         # data.append([line[col] for col in columns])
-        if is_select and line: # Empty first 2 lines?
+        if 'finalMessage' in line:
+          if has_channels() and channel_name:  # Send results via WS and empty results
+            _send_to_channel(
+                channel_name,
+                message_type='task.result',
+                message_data={'status': 'finalMessage', 'query_id': 1}
+            )
+          break
+        elif 'header' in line:
+          continue
+        else:
+          line = line.strip()[:-1]
+
+        if is_select:
           data_line = json.loads(line)
-          if data_line['row']: # If limit not reached
+          if data_line.get('@type') == 'statement_error':
+            raise KSqlApiException(data_line['message'])
+          if data_line['row']:  # If limit not reached
             data.append(data_line['row']['columns'])
         else:
           data.append([line])
-        # TODO: WS to plug-in
-      metadata = [['Row', 'STRING']]
+
+        if has_channels() and channel_name:  # Send results via WS and empty results
+          _send_to_channel(
+              channel_name,
+              message_type='task.result',
+              message_data={'data': data, 'meta': metadata, 'query_id': 1}
+          )
+          data = []  # TODO: special message when end of stream
     else:
       data, metadata = self._decode_result(
         self.ksql(statement)
       )
+
+      if has_channels() and channel_name:  # Send results via WS and empty results
+        _send_to_channel(
+            channel_name,
+            message_type='task.result',
+            message_data={'data': data, 'meta': metadata, 'query_id': 1}
+        )
+        data = []  # TODO: special message when end of stream
 
     return data, metadata
 
@@ -135,6 +208,6 @@ class KSqlApi(object):
       data.append([result['commandStatus']['status']])
       data.append([result['commandStatus']['message']])
 
-    columns = [[col, 'STRING'] for col in columns]
+    columns = [{'name': col, 'type': 'STRING'} for col in columns]
 
     return data, columns

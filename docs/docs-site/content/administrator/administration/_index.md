@@ -5,4 +5,4 @@ draft: false
 weight: 4
 ---
 
-This sections details the "ops" part of Hue, e.g. how to monitor the servers, manage users and permissions.
+This sections details the "ops" part of Hue, e.g. how to monitor the servers, get a big picture of the architecture, manage users and permissions.

@@ -15,13 +15,18 @@
 ## limitations under the License.
 <%!
 import datetime
-import urllib
+import sys
 from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
 
 from django.template.defaultfilters import urlencode, stringformat, date, filesizeformat, time
 from django.utils.translation import ugettext as _
 
 from aws.conf import get_default_region
+
+if sys.version_info[0] > 2:
+  from urllib.parse import quote as urllib_quote
+else:
+  from urllib import quote as urllib_quote
 %>
 
 <%def name="breadcrumbs(path, breadcrumbs, from_listdir=False)">
@@ -46,7 +51,7 @@ from aws.conf import get_default_region
             </span>
           </li>
         %else:
-          <li><a class="pointer breadcrumb-link homeLink" data-bind="click: $root.openHome, attr:{'href': window.HUE_BASE_URL + '/filebrowser/view=${ urllib.quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) }?default_to_home'}">
+          <li><a class="pointer breadcrumb-link homeLink" data-bind="click: $root.openHome, attr:{'href': window.HUE_BASE_URL + '/filebrowser/view=${ urllib_quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) }?default_to_home'}">
             <i class="fa fa-home"></i> ${_('Home')}</a>
           </li>
         %endif
@@ -63,7 +68,7 @@ from aws.conf import get_default_region
         </li>
         % if is_trash_enabled:
         <li class="pull-right">
-          <a class="pointer breadcrumb-link trashLink" data-bind="click: $root.openTrash, attr:{'href': window.HUE_BASE_URL + '/filebrowser/view=${ urllib.quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) }?default_to_trash'}" title="${_('View trash')}">
+          <a class="pointer breadcrumb-link trashLink" data-bind="click: $root.openTrash, attr:{'href': window.HUE_BASE_URL + '/filebrowser/view=${ urllib_quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) }?default_to_trash'}" title="${_('View trash')}">
             <i class="fa fa-trash-o"></i> ${_('Trash')}
           </a>
         </li>
@@ -71,7 +76,7 @@ from aws.conf import get_default_region
       </ul>
     % else:
       <ul class="nav nav-pills hue-breadcrumbs-bar">
-        <li><a data-bind="hueLink: window.HUE_BASE_URL + '/filebrowser/view=${ urllib.quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) }?default_to_home'" class="breadcrumb-link homeLink"><i class="fa fa-home"></i> ${_('Home')}</a></li>
+        <li><a data-bind="hueLink: window.HUE_BASE_URL + '/filebrowser/view=${ urllib_quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) }?default_to_home'" class="breadcrumb-link homeLink"><i class="fa fa-home"></i> ${_('Home')}</a></li>
         <li>
           <ul class="hue-breadcrumbs" style="padding-right:40px; padding-top: 12px">
           % for breadcrumb_item in breadcrumbs:

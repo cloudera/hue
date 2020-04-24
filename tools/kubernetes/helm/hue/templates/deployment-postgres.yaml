@@ -1,0 +1,46 @@
+{{- if .Values.hue.database.create -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-hue
+spec:
+  selector:
+    matchLabels:
+      app: postgres-hue
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: postgres-hue
+    spec:
+      containers:
+        - name: postgres-hue
+          image: postgres:9.5
+          env:
+            - name: POSTGRES_USER
+              value: hue
+            - name: POSTGRES_PASSWORD
+              value: hue
+            - name: POSTGRES_DB
+              value: hue
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          ports:
+            - containerPort: 5432
+          resources:
+            requests:
+              # memory: "350Mi"
+              cpu: "20m"
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-data
+      volumes:
+        - name: postgres-data
+          {{ if .Values.hue.database.persist }}
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+          {{ else }}
+          emptyDir: {}
+          {{ end }}
+{{- end -}}

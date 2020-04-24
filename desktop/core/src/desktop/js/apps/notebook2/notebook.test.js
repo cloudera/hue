@@ -16,6 +16,8 @@
 
 import Notebook from './notebook';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
+import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import huePubSub from 'utils/huePubSub';
 
 describe('notebook.js', () => {
   const viewModel = {
@@ -33,27 +35,56 @@ describe('notebook.js', () => {
     }
   };
 
+  const previousEnableNotebook2 = window.ENABLE_NOTEBOOK_2;
+
+  beforeAll(() => {
+    window.ENABLE_NOTEBOOK_2 = true;
+  });
+
+  afterAll(() => {
+    window.ENABLE_NOTEBOOK_2 = previousEnableNotebook2;
+  });
+
   beforeEach(() => {
     jest.spyOn(sessionManager, 'getSession').mockImplementation(() => Promise.resolve());
   });
 
   it('should serialize a notebook to JSON', async () => {
+    const spy = jest.spyOn(huePubSub, 'publish').mockImplementation((topic, cb) => {
+      if (topic === GET_KNOWN_CONFIG_EVENT && cb) {
+        cb({
+          app_config: {
+            editor: {
+              interpreters: [
+                { type: 'hive', dialect: 'hive' },
+                { type: 'impala', dialect: 'impala' }
+              ]
+            }
+          }
+        });
+      }
+    });
+
     const notebook = new Notebook(viewModel, {});
-    notebook.addSnippet({ type: 'hive' });
-    notebook.addSnippet({ type: 'impala' });
+    notebook.addSnippet({ connector: { dialect: 'hive', type: 'hive' } });
+    notebook.addSnippet({ connector: { dialect: 'impala', type: 'impala' } });
+
+    expect(spy).toHaveBeenCalled();
+
+    spy.mockRestore();
 
     const notebookJSON = await notebook.toJson();
 
     const notebookRaw = JSON.parse(notebookJSON);
 
     expect(notebookRaw.snippets.length).toEqual(2);
-    expect(notebookRaw.snippets[0].type).toEqual('hive');
-    expect(notebookRaw.snippets[1].type).toEqual('impala');
+    expect(notebookRaw.snippets[0].connector.dialect).toEqual('hive');
+    expect(notebookRaw.snippets[1].connector.dialect).toEqual('impala');
   });
 
   it('should serialize a notebook context to JSON', async () => {
     const notebook = new Notebook(viewModel, {});
-    notebook.addSnippet({ type: 'hive' });
+    notebook.addSnippet({ connector: { dialect: 'hive' } });
 
     const notebookContextJSON = await notebook.toContextJson();
 

@@ -108,8 +108,7 @@ class HDFStemporaryUploadedFile(object):
       self._do_cleanup = False
     except IOError as ex:
       if ex.errno != errno.ENOENT:
-        LOG.exception('Failed to remove temporary upload file "%s". '
-                      'Please cleanup manually: %s' % (self._path, ex))
+        LOG.exception('Failed to remove temporary upload file "%s". Please cleanup manually: %s' % (self._path, ex))
 
   def write(self, data):
     self._file.write(data)
@@ -143,10 +142,12 @@ class HDFSfileUploadHandler(FileUploadHandler):
     self._destination = request.GET.get('dest', None) # GET param avoids infinite looping
     self.request = request
     fs = fsmanager.get_filesystem('default')
-    fs.setuser(request.user.username)
-    FileUploadHandler.chunk_size = fs.get_upload_chuck_size(self._destination) if self._destination else UPLOAD_CHUNK_SIZE.get()
-
-    LOG.debug("Chunk size = %d" % FileUploadHandler.chunk_size)
+    if not fs:
+      LOG.warn('No HDFS set for HDFS upload')
+    else:
+      fs.setuser(request.user.username)
+      FileUploadHandler.chunk_size = fs.get_upload_chuck_size(self._destination) if self._destination else UPLOAD_CHUNK_SIZE.get()
+      LOG.debug("Chunk size = %d" % FileUploadHandler.chunk_size)
 
   def new_file(self, field_name, file_name, *args, **kwargs):
     # Detect "HDFS" in the field name.
@@ -179,8 +180,7 @@ class HDFSfileUploadHandler(FileUploadHandler):
       self._file.flush()
       return None
     except IOError:
-      LOG.exception('Error storing upload data in temporary file "%s"' %
-                    (self._file.get_temp_path(),))
+      LOG.exception('Error storing upload data in temporary file "%s"' % (self._file.get_temp_path(),))
       raise StopUpload()
 
   def file_complete(self, file_size):
@@ -190,8 +190,7 @@ class HDFSfileUploadHandler(FileUploadHandler):
     try:
       self._file.finish_upload(file_size)
     except IOError:
-      LOG.exception('Error closing uploaded temporary file "%s"' %
-                    (self._file.get_temp_path(),))
+      LOG.exception('Error closing uploaded temporary file "%s"' % (self._file.get_temp_path(),))
       raise
 
     elapsed = time.time() - self._starttime

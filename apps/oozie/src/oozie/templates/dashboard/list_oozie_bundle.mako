@@ -16,12 +16,17 @@
 ## limitations under the License.
 
 <%!
-  import urllib
+  import sys
   from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
 
   from oozie.conf import ENABLE_V2
+
+  if sys.version_info[0] > 2:
+    from urllib.parse import quote as urllib_quote
+  else:
+    from urllib import quote as urllib_quote
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />
@@ -110,7 +115,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
                % endif
             "
               id="rerun-btn"
-              data-rerun-url="${ url('oozie:rerun_oozie_bundle', job_id=oozie_bundle.id, app_path=urllib.quote(oozie_bundle.bundleJobPath.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)) }"
+              data-rerun-url="${ url('oozie:rerun_oozie_bundle', job_id=oozie_bundle.id, app_path=urllib_quote(oozie_bundle.bundleJobPath.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)) }"
             style="margin-bottom: 5px">
               ${ _('Rerun') }
             </button>
@@ -279,7 +284,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
       </div>
 
       <div class="tab-pane" id="definition">
-        <div id="definitionEditor">${ oozie_bundle.definition.decode('utf-8', 'replace') }</div>
+        <div id="definitionEditor">${ oozie_bundle.definition if isinstance(oozie_bundle.definition, str) else oozie_bundle.definition.decode('utf-8', 'replace') }</div>
       </div>
     </div>
 

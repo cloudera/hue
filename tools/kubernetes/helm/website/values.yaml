@@ -9,6 +9,10 @@ website:
   enabled: true
   replicas: 1
   domain: "gethue.com"
+  jp:
+    enabled: true
+    replicas: 1
+    domain: "jp.gethue.com"
 docs:
   enabled: true
   replicas: 1
@@ -17,6 +21,7 @@ monitoring:
   enabled: false
 ingress:
   create: false
+  hasAuth: false
   type: "nginx"
   # type: "nginx-ssl"
   email: "team@gethue.com"

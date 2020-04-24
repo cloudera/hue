@@ -5,7 +5,126 @@ draft: false
 weight: 5
 ---
 
-Hue can be accessed directly via a Django Python Shell or by its REST API.
+Hue can easily be extended to natively support other databases or be enriched via other data catalogs. Some components of Hue like the SQL parsers or Editor Scratchpad can also be imported independently as dependencies into your own apps.
+
+
+## SQL Editor
+
+The [parsers](/developer/parsers/) are the flagship part of Hue and power extremely advanced autocompletes and other [SQL functionalities](/user/querying/#autocomplete). They are running on the client side and comes with just a few megabytes of JavaScript that are cached by the browser. This provides a very reactive experience to the end user and allows to import them as classic JavaScript modules for your own development needs.
+
+While the dynamic content like the list of tables, columns is obviously fetched via [remote endpoints](#sql-querying), all the SQL knowledge of the statements is available.
+
+See the currently shipped [SQL dialects](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/sql).
+
+### npm package
+
+What if I only want to use only the autocomplete as a JavaScript module in my own app?
+
+Importing the Parser can be simply done as a npm package. Here is an example on how to use the parser in a Node.js demo app. There are two ways to get the module:
+
+* npm registry
+
+    npm install gethue
+
+Will install the latest from https://www.npmjs.com/package/gethue. Then import the parser you need with something like below and run it on an SQL statement:
+
+    import sqlAutocompleteParser from 'gethue/parse/sql/hive/hiveAutocompleteParser';
+
+    const beforeCursor = 'SELECT col1, col2, tbl2.col3 FROM tbl; '; // Note extra space at end
+    const afterCursor = '';
+    const dialect = 'hive';
+    const debug = false;
+
+    console.log(
+      JSON.stringify(
+        sqlAutocompleteParser.parseSql(beforeCursor, afterCursor, dialect, debug),
+        null,
+        2
+      )
+    );
+
+Which then will output keywords suggestions and all the known locations:
+
+    { locations:
+      [ { type: 'statement', location: [Object] },
+        { type: 'statementType',
+          location: [Object],
+          identifier: 'SELECT' },
+        { type: 'selectList', missing: false, location: [Object] },
+        { type: 'column',
+          location: [Object],
+          identifierChain: [Array],
+          qualified: false,
+          tables: [Array] },
+        { type: 'column',
+          location: [Object],
+          identifierChain: [Array],
+          qualified: false,
+          tables: [Array] },
+        { type: 'column',
+          location: [Object],
+          identifierChain: [Array],
+          qualified: false,
+          tables: [Array] },
+        { type: 'table', location: [Object], identifierChain: [Array] },
+        { type: 'whereClause', missing: true, location: [Object] },
+        { type: 'limitClause', missing: true, location: [Object] } ],
+      lowerCase: false,
+      suggestKeywords:
+      [ { value: 'ABORT', weight: -1 },
+        { value: 'ALTER', weight: -1 },
+        { value: 'ANALYZE TABLE', weight: -1 },
+        { value: 'CREATE', weight: -1 },
+        { value: 'DELETE', weight: -1 },
+        { value: 'DESCRIBE', weight: -1 },
+        { value: 'DROP', weight: -1 },
+        { value: 'EXPLAIN', weight: -1 },
+        { value: 'EXPORT', weight: -1 },
+        { value: 'FROM', weight: -1 },
+        { value: 'GRANT', weight: -1 },
+        { value: 'IMPORT', weight: -1 },
+        { value: 'INSERT', weight: -1 },
+        { value: 'LOAD', weight: -1 },
+        { value: 'MERGE', weight: -1 },
+        { value: 'MSCK', weight: -1 },
+        { value: 'RELOAD FUNCTION', weight: -1 },
+        { value: 'RESET', weight: -1 },
+        { value: 'REVOKE', weight: -1 },
+        { value: 'SELECT', weight: -1 },
+        { value: 'SET', weight: -1 },
+        { value: 'SHOW', weight: -1 },
+        { value: 'TRUNCATE', weight: -1 },
+        { value: 'UPDATE', weight: -1 },
+        { value: 'USE', weight: -1 },
+        { value: 'WITH', weight: -1 } ],
+      definitions: [] }
+
+* Local dependency
+
+Checkout Hue and cd the [demo app](https://github.com/cloudera/hue/tree/master/tools/parser/hue_dep)
+
+    cd tools/parser/hue_dep
+
+    npm install
+    npm run webpack
+    npm run app
+
+In `package.json` there's a dependency on Hue:
+
+    "dependencies": {
+      "hue": "file:../../.."
+    },
+
+Now let's import the Hive parser:
+
+    import sqlAutocompleteParser from 'hue/desktop/core/src/desktop/js/parse/sql/hive/hiveAutocompleteParser';
+
+### Scratchpad
+
+The lightweight SQL Editor also called "Quick Query" comes as a [Web component](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/js/ko/components/contextPopover/ko.quickQueryContext.js).
+
+!["Mini SQL Editor component"](https://cdn.gethue.com/uploads/2020/02/quick-query-component.jpg)
+
 
 ## REST
 
@@ -52,9 +171,9 @@ Once the request is successful then capture headers and cookies for subsequent r
 
 ### Data Catalog
 
-The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata) is powering [Search and Tagging here](/user/browsing/#data-catalogs).
+The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata) is powering the external [Catalog integrations](/user/browsing/#data-catalogs).
 
-See the backends API in the [data catalog connector](/developer/connectors/#data-catalog) section.
+Additional catalogs can be integrated via some [connectors](/developer/connectors/#data-catalog).
 
 #### Searching for entities
 
@@ -183,6 +302,57 @@ Adding/updating a comment with the dummy backend:
     });
 
 ### SQL Querying
+
+#### Listing Databases
+
+    $.post("/notebook/api/autocomplete/", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+#### Listing Tables
+
+    $.post("/notebook/api/autocomplete/<DB>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+#### Table details and Columns
+
+    $.post("/notebook/api/autocomplete/<DB>/<TABLE>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+#### Column details
+
+    $.post("/notebook/api/autocomplete/<DB>/<TABLE>/<COL1>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+For nested columns:
+
+    $.post("/notebook/api/autocomplete/<DB>/<TABLE>/<COL1>/<COL2>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
 ### SQL Risk Optimization
 ### Data Browsing
 ### Workflow scheduling
@@ -192,7 +362,7 @@ Adding/updating a comment with the dummy backend:
 * [Hue API: Execute some builtin or shell commands](http://gethue.com/hue-api-execute-some-builtin-commands/).
 * [How to manage the Hue database with the shell](http://gethue.com/how-to-manage-the-hue-database-with-the-shell/).
 
-### How to count documents of a user
+### Count the documents of a user
 
 On the command line:
 

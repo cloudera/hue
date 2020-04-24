@@ -14,7 +14,10 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+import sys
 from django.utils.translation import ugettext as _
+if sys.version_info[0] > 2:
+  unicode = str
 %>
 
 <%def name="render_field(field)">

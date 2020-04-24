@@ -31,7 +31,8 @@ from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
 from desktop.settings import LANGUAGES
 
 from useradmin.hue_password_policy import hue_get_password_validators
-from useradmin.models import GroupPermission, HuePermission, get_default_user_group, User, Group, default_organization, Organization
+from useradmin.models import GroupPermission, HuePermission, get_default_user_group, User, Group, Organization
+from useradmin.organization import get_user_request_organization
 
 
 LOG = logging.getLogger(__name__)
@@ -78,8 +79,7 @@ def validate_last_name(last_name):
 
 class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   """
-  This is similar, but not quite the same as djagno.contrib.auth.forms.UserChangeForm
-  and UserCreationForm.
+  This is similar, but not quite the same as djagno.contrib.auth.forms.UserChangeForm and UserCreationForm.
   """
 
   GENERIC_VALIDATION_ERROR = _("Username or password is invalid.")
@@ -104,7 +104,11 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       required=False,
       validators=hue_get_password_validators()
   )
-  password_old = forms.CharField(label=_t("Current password"), widget=forms.PasswordInput, required=False)
+  password_old = forms.CharField(
+      label=_t("Current password"),
+      widget=forms.PasswordInput,
+      required=False
+  )
   ensure_home_directory = forms.BooleanField(
       label=_t("Create home directory"),
       help_text=_t("Create home directory if one doesn't already exist."),
@@ -148,6 +152,10 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
         self.fields['unlock_account'].widget.attrs['readonly'] = True
       if 'groups' in self.fields:
         self.fields['groups'].widget.attrs['readonly'] = True
+
+    if ENABLE_ORGANIZATIONS.get():
+      organization = self.instance.organization if self.instance.id else get_user_request_organization()
+      self.fields['groups'].choices = [(group.id, group.name) for group in organization.organizationgroup_set.all()]
 
   def clean_username(self):
     username = self.cleaned_data["username"]
@@ -216,7 +224,9 @@ if ENABLE_ORGANIZATIONS.get():
       if self.instance.id:
         self.fields['email'].widget.attrs['readonly'] = True
 
-      self.fields['organization'] = forms.ChoiceField(choices=((default_organization().id, default_organization()),), initial=default_organization())
+      self.fields['organization'] = forms.ChoiceField(
+        choices=((get_user_request_organization().id, get_user_request_organization()),), initial=get_user_request_organization()
+      )
 
     def clean_organization(self):
       try:
@@ -264,7 +274,9 @@ if ENABLE_ORGANIZATIONS.get():
       if self.instance.id:
         self.fields['email'].widget.attrs['readonly'] = True
 
-      self.fields['organization'] = forms.ChoiceField(choices=((default_organization().id, default_organization()),), initial=default_organization())
+      self.fields['organization'] = forms.ChoiceField(
+        choices=((get_user_request_organization().id, get_user_request_organization()),), initial=get_user_request_organization()
+      )
 
     def clean_organization(self):
       try:
@@ -314,7 +326,7 @@ class SuperUserChangeForm(UserChangeForm):
       # If the user exists already, we'll use its current group memberships
       self.initial['groups'] = set(self.instance.groups.all())
     else:
-      # If his is a new user, suggest the default group
+      # If this is a new user, suggest the default group
       default_group = get_default_user_group()
       if default_group is not None:
         self.initial['groups'] = set([default_group])
@@ -434,20 +446,20 @@ class GroupEditForm(forms.ModelForm):
   def __init__(self, *args, **kwargs):
     super(GroupEditForm, self).__init__(*args, **kwargs)
 
-    ordering_field = 'email' if ENABLE_ORGANIZATIONS.get() else 'username'
-
     if self.instance.id:
       self.fields['name'].widget.attrs['readonly'] = True
-      initial_members = User.objects.filter(groups=self.instance).order_by(ordering_field)
+      initial_members = User.objects.filter(groups=self.instance).order_by('email' if ENABLE_ORGANIZATIONS.get() else 'username')
       initial_perms = HuePermission.objects.filter(grouppermission__group=self.instance).order_by('app', 'description')
     else:
       initial_members = []
       initial_perms = []
 
-    self.fields["members"] = _make_model_field(_("members"), initial_members, User.objects.order_by(ordering_field))
+    self.fields["members"] = _make_model_field(_("members"), initial_members, User.objects.order_by('username'))
     self.fields["permissions"] = _make_model_field(_("permissions"), initial_perms, HuePermission.objects.order_by('app', 'description'))
     if 'organization' in self.fields:
-      self.fields['organization'] = forms.ChoiceField(choices=((default_organization().id, default_organization()),), initial=default_organization())
+      self.fields['organization'] = forms.ChoiceField(
+        choices=((get_user_request_organization().id, get_user_request_organization()),), initial=get_user_request_organization()
+      )
 
   def _compute_diff(self, field_name):
     current = set(self.fields[field_name].initial_objs)
@@ -534,7 +546,7 @@ def _make_model_field(label, initial, choices, multi=True):
   if multi:
     field = forms.models.ModelMultipleChoiceField(choices, required=False)
     field.initial_objs = initial
-    field.initial = [ obj.pk for obj in initial ]
+    field.initial = [obj.pk for obj in initial]
     field.label = label
   else:
     field = forms.models.ModelChoiceField(choices, required=False)

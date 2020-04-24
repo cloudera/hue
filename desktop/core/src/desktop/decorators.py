@@ -19,16 +19,15 @@ import logging
 
 from django.utils.translation import ugettext as _
 
+from desktop.auth.backend import is_admin
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document2
-
+from desktop.lib.django_util import JsonResponse
+from desktop.lib.i18n import force_unicode
 
 try:
   from functools import wraps
 except ImportError:
   from django.utils.functional import wraps
-
-from desktop.auth.backend import is_admin
 
 
 LOG = logging.getLogger(__name__)
@@ -36,8 +35,7 @@ LOG = logging.getLogger(__name__)
 
 def hue_permission_required(action, app):
   """
-  Checks that the user has permissions to do
-  action 'action' on app 'app'.
+  Checks that the user has permissions to do action 'action' on app 'app'.
 
   Note that user must already be logged in.
   """
@@ -71,6 +69,7 @@ def check_document_access_permission():
           doc_id['id'] = kwargs['doc_id']
 
         if doc_id:
+          from desktop.models import Document2
           doc2 = Document2.objects.get(**doc_id)
           doc2.doc.get().can_read_or_exception(request.user)
       except Document2.DoesNotExist:
@@ -79,3 +78,20 @@ def check_document_access_permission():
       return view_func(request, *args, **kwargs)
     return wraps(view_func)(decorate)
   return inner
+
+
+def api_error_handler(func):
+  def decorator(*args, **kwargs):
+    response = {}
+
+    try:
+      return func(*args, **kwargs)
+    except Exception as e:
+      LOG.exception('Error running %s' % func)
+      response['status'] = -1
+      response['message'] = force_unicode(str(e))
+    finally:
+      if response:
+        return JsonResponse(response)
+
+  return decorator

@@ -18,18 +18,23 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.auth.backend import is_admin
-  from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION, USE_NEW_SIDE_PANELS, VCS
+  from desktop.auth.backend import is_admin, is_hue_admin
+  from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, CUSTOM_DASHBOARD_URL, \
+      DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION, USE_NEW_SIDE_PANELS, \
+      VCS, ENABLE_GIST, ENABLE_LINK_SHARING
   from desktop.models import hue_version, _get_apps, get_cluster_config
 
-  from beeswax.conf import DOWNLOAD_BYTES_LIMIT, DOWNLOAD_ROW_LIMIT, LIST_PARTITIONS_LIMIT
+  from beeswax.conf import DOWNLOAD_BYTES_LIMIT, DOWNLOAD_ROW_LIMIT, LIST_PARTITIONS_LIMIT, CLOSE_SESSIONS
   from dashboard.conf import HAS_SQL_ENABLED
+  from jobbrowser.conf import ENABLE_HISTORY_V2
   from filebrowser.conf import SHOW_UPLOAD_BUTTON
   from indexer.conf import ENABLE_NEW_INDEXER
-  from metadata.conf import has_catalog, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER, get_optimizer_url, get_catalog_url
+  from metadata.conf import has_catalog, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER, get_optimizer_url, \
+      get_catalog_url, get_optimizer_mode
   from metastore.conf import ENABLE_NEW_CREATE_TABLE
   from metastore.views import has_write_access
-  from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_SQL_INDEXER, get_ordered_interpreters, SHOW_NOTEBOOKS
+  from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_SQL_INDEXER, \
+      get_ordered_interpreters, SHOW_NOTEBOOKS
 %>
 
 <%namespace name="sqlDocIndex" file="/sql_doc_index.mako" />
@@ -55,6 +60,8 @@
     window.CSRF_TOKEN = '';
   %endif
 
+  window.PREVENT_AUTOFILL_INPUT_ATTRS = 'autocorrect="off" autocomplete="do-not-autocomplete" autocapitalize="off" spellcheck="false"';
+
   window.APP_SWITCHER_ALTUS_BASE_URL = '${ APP_SWITCHER_ALTUS_BASE_URL.get() }';
   window.APP_SWITCHER_MOW_BASE_URL = '${ APP_SWITCHER_MOW_BASE_URL.get() }';
   window.DISPLAY_APP_SWITCHER = '${ DISPLAY_APP_SWITCHER.get() }' === 'True';
@@ -72,6 +79,7 @@
   window.HAS_MULTI_CLUSTER = '${ get_cluster_config(user)['has_computes'] }' === 'True';
 
   window.HAS_SQL_DASHBOARD = '${ HAS_SQL_ENABLED.get() }' === 'True';
+  window.CUSTOM_DASHBOARD_URL = '${ CUSTOM_DASHBOARD_URL.get() }';
 
   window.DROPZONE_HOME_DIR = '${ user.get_home_directory() if not user.is_anonymous() else "" }';
 
@@ -90,6 +98,8 @@
   window.ENABLE_QUERY_BUILDER = '${ ENABLE_QUERY_BUILDER.get() }' === 'True';
   window.ENABLE_QUERY_SCHEDULING = '${ ENABLE_QUERY_SCHEDULING.get() }' === 'True';
 
+  window.ENABLE_HISTORY_V2 = '${ hasattr(ENABLE_HISTORY_V2, 'get') and ENABLE_HISTORY_V2.get() }' === 'True';
+
   window.ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
 
   window.HAS_CATALOG = '${ has_catalog(request.user) }' === 'True';
@@ -97,8 +107,12 @@
   window.HAS_READ_ONLY_CATALOG = '${ has_readonly_catalog(request.user) }' === 'True' || '${ has_write_access(request.user) }' === 'False';
 
   window.HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
+  window.OPTIMIZER_MODE = '${ get_optimizer_mode() }';
   window.OPTIMIZER_URL = '${ get_optimizer_url() }'
   window.AUTO_UPLOAD_OPTIMIZER_STATS = '${ OPTIMIZER.AUTO_UPLOAD_STATS.get() }' === 'True';
+
+  window.HAS_GIST = '${ ENABLE_GIST.get() }' === 'True';
+  window.HAS_LINK_SHARING = '${ ENABLE_LINK_SHARING.get() }' === 'True';
 
   ## In the past was has_workload_analytics()
   window.HAS_WORKLOAD_ANALYTICS = '${ ENABLE_QUERY_ANALYSIS.get() }' === 'True';
@@ -111,6 +125,7 @@
   window.JB_HEADER_CHECK_INTERVAL_IN_MILLIS = 30000;
   window.JB_SINGLE_CHECK_INTERVAL_IN_MILLIS = 5000;
   window.JB_MULTI_CHECK_INTERVAL_IN_MILLIS = 20000;
+  window.CLOSE_SESSIONS = {'hive': '${ CLOSE_SESSIONS.get() }' === 'True'};
 
   window.HUE_URLS = {
     IMPORTER_CREATE_TABLE: '${ 'indexer' in apps and url('indexer:importer_prefill', source_type = 'all', target_type = 'table')}',
@@ -291,6 +306,8 @@
     'Foreign keys': '${_('Foreign keys')}',
     'Format the current SQL query': '${ _('Format the current SQL query') }',
     'Share the query selection via a link': '${ _('Share the query selection via a link') }',
+    'Share link': '${ _('Share link') }',
+    'Share as a gist': '${ _('Share as a gist') }',
     'Format': '${ _('Format') }',
     'France': '${ _('France') }',
     'Functions': '${ _('Functions') }',
@@ -435,7 +452,6 @@
     'Partition key': '${ _('Partition key') }',
     'Partitions': '${ _('Partitions') }',
     'Password': '${ _('Password') }',
-    'Perform incremental metadata update.': '${ _('Perform incremental metadata update.') }',
     'Permissions': '${ _('Permissions') }',
     'Pie Chart': '${ _('Pie Chart') }',
     'Pig Design': '${_('Pig Design')}',
@@ -629,6 +645,7 @@
 
   window.USER_VIEW_EDIT_USER_ENABLED = '${ user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or is_admin(user) }' === 'True';
   window.USER_IS_ADMIN = '${ is_admin(user) }' === 'True';
+  window.USER_IS_HUE_ADMIN = '${ is_hue_admin(user) }' === 'True';
   window.DJANGO_DEBUG_MODE = '${ conf.DJANGO_DEBUG_MODE.get() }' === 'True';
   window.IS_LDAP_SETUP = '${ 'desktop.auth.backend.LdapBackend' in conf.AUTH.BACKEND.get() }' === 'True';
   window.LOGGED_USERNAME = '${ user.username }';
@@ -647,17 +664,6 @@
 
   window.USE_NEW_SIDE_PANELS = '${ USE_NEW_SIDE_PANELS.get() }' === 'True'
   window.USER_HOME_DIR = '${ home_dir }';
-
-  // TODO: Refactor assist to fetch from config.
-  window.ASSIST_SQL_INTERPRETERS = [];
-  % for interpreter in get_ordered_interpreters(request.user):
-    % if interpreter["is_sql"]:
-      ASSIST_SQL_INTERPRETERS.push({
-        type: '${ interpreter["type"] }',
-        name: '${ interpreter["name"] }'
-      });
-    % endif
-  % endfor
 
   var userGroups = [];
   % for group in user.groups.all():

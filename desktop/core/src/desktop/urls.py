@@ -103,8 +103,12 @@ dynamic_patterns += [
   url(r'^desktop/debug/check_config_ajax$', desktop_views.check_config_ajax),
   url(r'^desktop/log_frontend_event$', desktop_views.log_frontend_event),
 
+  # Catch-up gist
+  url(r'^hue/gist/?$', desktop_api2.gist_get),
+
   # Mobile
   url(r'^assist_m', desktop_views.assist_m),
+
   # Hue 4
   url(r'^hue.*/?$', desktop_views.hue, name='desktop_views_hue'),
   url(r'^403$', desktop_views.path_forbidden),
@@ -160,6 +164,7 @@ dynamic_patterns += [
   url(r'^desktop/api2/doc/share/?$', desktop_api2.share_document),
 
   url(r'^desktop/api2/get_config/?$', desktop_api2.get_config),
+  url(r'^desktop/api2/get_hue_config/?$', desktop_api2.get_hue_config),
   url(r'^desktop/api2/context/namespaces/(?P<interface>[\w\-]+)/?$', desktop_api2.get_context_namespaces),
   url(r'^desktop/api2/context/computes/(?P<interface>[\w\-]+)/?$', desktop_api2.get_context_computes),
   url(r'^desktop/api2/context/clusters/(?P<interface>[\w\-]+)/?$', desktop_api2.get_context_clusters),
@@ -170,6 +175,7 @@ dynamic_patterns += [
 
   url(r'^desktop/api2/gist/create/?$', desktop_api2.gist_create),
   url(r'^desktop/api2/gist/open/?$', desktop_api2.gist_get),
+
 
   url(r'^desktop/api/search/entities/?$', desktop_api2.search_entities),
   url(r'^desktop/api/search/entities_interactive/?$', desktop_api2.search_entities_interactive),

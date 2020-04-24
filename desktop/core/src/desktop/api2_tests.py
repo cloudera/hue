@@ -22,21 +22,20 @@ import re
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises
 
-from useradmin.models import get_default_user_group
+from beeswax.conf import HIVE_SERVER_HOST
+from useradmin.models import get_default_user_group, User
 
+from desktop.conf import ENABLE_GIST_PREVIEW
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access
-from desktop.models import Document2, User
+from desktop.models import Document2, Directory
 
 
 class TestApi2(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="api2_user", groupname="default", recreate=True, is_superuser=False)
-
     self.user = User.objects.get(username="api2_user")
 
-    grant_access(self.user.username, self.user.username, "desktop")
 
   def test_search_entities_interactive_xss(self):
     query = Document2.objects.create(
@@ -64,6 +63,90 @@ class TestApi2(object):
       query.delete()
 
 
+  def test_get_hue_config(self):
+    client = make_logged_in_client(username="api2_superuser", groupname="default", recreate=True, is_superuser=True)
+    user = User.objects.get(username="api2_superuser")
+
+    response = client.get('/desktop/api2/get_hue_config', data={})
+
+    # It should have multiple config sections in json
+    config = json.loads(response.content)['config']
+    assert_true(len(config) > 1)
+
+    # It should only allow superusers
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+
+    response = client_not_me.get('/desktop/api2/get_hue_config', data={})
+    assert_true(b"You must be a superuser" in response.content, response.content)
+
+    # It should contain a config parameter
+    CANARY = b"abracadabra"
+    clear = HIVE_SERVER_HOST.set_for_testing(CANARY)
+    try:
+      response = client.get('/desktop/api2/get_hue_config', data={})
+      assert_true(CANARY in response.content, response.content)
+    finally:
+      clear()
+
+
+  def test_get_hue_config_private(self):
+    client = make_logged_in_client(username="api2_superuser", groupname="default", recreate=True, is_superuser=True)
+    user = User.objects.get(username="api2_superuser")
+
+    # Not showing private if not asked for
+    response = client.get('/desktop/api2/get_hue_config', data={})
+    assert_false(b'bind_password' in response.content)
+
+    # Masking passwords if private
+    private_response = client.get('/desktop/api2/get_hue_config', data={'private': True})
+    assert_true(b'bind_password' in private_response.content)
+    config_json = json.loads(private_response.content)
+    desktop_config = [conf for conf in config_json['config'] if conf['key'] == 'desktop']
+    ldap_desktop_config = [val for conf in desktop_config for val in conf['values'] if val['key'] == 'ldap']
+    assert_true(  # Note: level 1 might not be hidden, e.g. secret_key_script
+      any(
+        val['value'] == '**********'
+        for conf in ldap_desktop_config for val in conf['values'] if val['key'] == 'bind_password'
+      ),
+      ldap_desktop_config
+    )
+
+    # There should be more private than non-private
+    assert_true(len(response.content) < len(private_response.content))
+
+
+  def test_get_config(self):
+    response = self.client.get('/desktop/api2/get_config')
+
+    assert_equal(200, response.status_code)
+    config = json.loads(response.content)
+
+    assert_true('types' in config['documents'])
+    assert_false('query-TestApi2.test_get_config' in config['documents']['types'], config)
+
+    doc = Document2.objects.create(
+        name='Query xxx',
+        type='query-TestApi2.test_get_config',
+        owner=self.user
+    )
+    doc2 = Document2.objects.create(
+        name='Query xxx 2',
+        type='query-TestApi2.test_get_config',
+        owner=self.user
+    )
+
+    try:
+      response = self.client.get('/desktop/api2/get_config')
+
+      assert_equal(200, response.status_code)
+      config = json.loads(response.content)
+
+      assert_true('query-TestApi2.test_get_config' in config['documents']['types'], config)
+      assert_equal(1, len([t for t in config['documents']['types'] if t == 'query-TestApi2.test_get_config']))
+    finally:
+      doc.delete()
+
+
 class TestDocumentApiSharingPermissions(object):
 
   def setUp(self):
@@ -72,9 +155,6 @@ class TestDocumentApiSharingPermissions(object):
 
     self.user = User.objects.get(username="perm_user")
     self.user_not_me = User.objects.get(username="not_perm_user")
-
-    grant_access(self.user.username, self.user.username, "desktop")
-    grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")
 
 
   def _add_doc(self, name):
@@ -93,13 +173,13 @@ class TestDocumentApiSharingPermissions(object):
         'data': json.dumps(permissions)
     })
 
-  def share_link_doc(self, doc, perm, is_on=False, client=None):
+  def share_link_doc(self, doc, perm, client=None):
     if client is None:
       client = self.client
 
     return client.post("/desktop/api2/doc/share/link", {
         'uuid': json.dumps(doc.uuid),
-        'data': json.dumps({'name': 'link_%s' % perm, 'is_link_on': is_on})
+        'perm': json.dumps(perm)
     })
 
   def test_update_permissions(self):
@@ -437,12 +517,13 @@ class TestDocumentApiSharingPermissions(object):
     assert_false(doc.can_write(self.user_not_me))
 
     # Share by read link
-    response = self.share_link_doc(doc, perm='read', is_on=True)
+    response = self.share_link_doc(doc, perm='read')
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
 
     assert_true(doc.can_read(self.user))
     assert_true(doc.can_write(self.user))
+
     assert_true(doc.can_read(self.user_not_me))
     assert_false(doc.can_write(self.user_not_me))
 
@@ -459,7 +540,7 @@ class TestDocumentApiSharingPermissions(object):
     assert_equal(0, json.loads(response.content)['status'], response.content)
 
     # Un-share
-    response = self.share_link_doc(doc, perm='read', is_on=False)
+    response = self.share_link_doc(doc, perm='off')
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
 
@@ -481,7 +562,7 @@ class TestDocumentApiSharingPermissions(object):
     assert_equal(-1, json.loads(response.content)['status'], response.content)
 
     # Share by write link
-    response = self.share_link_doc(doc, perm='write', is_on=True)
+    response = self.share_link_doc(doc, perm='write')
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
 
@@ -502,8 +583,31 @@ class TestDocumentApiSharingPermissions(object):
     response = self.client_not_me.get('/desktop/api2/doc/?uuid=%s' % doc_id)
     assert_equal(0, json.loads(response.content)['status'], response.content)
 
+    # Demote to read link
+    response = self.share_link_doc(doc, perm='read')
+
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+
+    assert_true(doc.can_read(self.user_not_me))
+    assert_false(doc.can_write(self.user_not_me))  # Back to false
+
+    response = self.client.get('/desktop/api2/docs/?text=test_link_sharing_permissions')
+    assert_true(json.loads(response.content)['documents'])
+
+    response = self.client_not_me.get('/desktop/api2/docs/?text=test_link_sharing_permissions')
+    assert_false(json.loads(response.content)['documents'])  #  Link sharing does not list docs in Home, only provides direct access
+
+    response = self.client.get('/desktop/api2/doc/?uuid=%s' % doc_id)
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    response = self.client_not_me.get('/desktop/api2/doc/?uuid=%s' % doc_id)
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
     # Un-share
-    response = self.share_link_doc(doc, perm='write', is_on=False)
+    response = self.share_link_doc(doc, perm='off')
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
 
@@ -523,3 +627,139 @@ class TestDocumentApiSharingPermissions(object):
 
     response = self.client_not_me.get('/desktop/api2/doc/?uuid=%s' % doc_id)
     assert_equal(-1, json.loads(response.content)['status'], response.content)
+
+
+class TestDocumentGist(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="gist_user", groupname="default", recreate=True, is_superuser=False)
+    self.client_not_me = make_logged_in_client(username="other_gist_user", groupname="default", recreate=True, is_superuser=False)
+
+    self.user = User.objects.get(username="gist_user")
+    self.user_not_me = User.objects.get(username="other_gist_user")
+
+
+  def _create_gist(self, statement, doc_type, name='', description='', client=None):
+    if client is None:
+      client = self.client
+
+    return client.post("/desktop/api2/gist/create", {
+        'statement': statement,
+        'doc_type': doc_type,
+        'name': name,
+        'description': description,
+      },
+    )
+
+
+  def _get_gist(self, uuid, client=None, is_crawler_bot=False):
+    if client is None:
+      client = self.client
+
+    if is_crawler_bot:
+      headers = {'HTTP_USER_AGENT': 'Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)'}
+    else:
+      headers = {}
+
+    return client.get("/desktop/api2/gist/open", {
+        'uuid': uuid,
+      },
+      **headers
+    )
+
+
+  def test_create(self):
+    assert_false(Document2.objects.filter(type='gist', name='test_gist_create'))
+
+    response = self._create_gist(
+        statement='SELECT 1',
+        doc_type='hive-query',
+        name='test_gist_create',
+    )
+    gist = json.loads(response.content)
+
+    assert_true(Document2.objects.filter(type='gist', name='test_gist_create'))
+    assert_true(Document2.objects.filter(type='gist', uuid=gist['uuid']))
+    assert_equal(
+        'SELECT 1',
+        json.loads(Document2.objects.get(type='gist', uuid=gist['uuid']).data)['statement_raw']
+    )
+
+    response2 = self._create_gist(
+        statement='SELECT 2',
+        doc_type='hive-query',
+        name='test_gist_create2',
+    )
+    gist2 = json.loads(response2.content)
+
+    assert_true(Document2.objects.filter(type='gist', name='test_gist_create2'))
+    assert_true(Document2.objects.filter(type='gist', uuid=gist2['uuid']))
+    assert_equal(
+        'SELECT 2',
+        json.loads(Document2.objects.get(type='gist', uuid=gist2['uuid']).data)['statement_raw']
+    )
+
+
+  def test_get(self):
+    response = self._create_gist(
+        statement='SELECT 1',
+        doc_type='hive-query',
+        name='test_gist_get',
+    )
+    gist = json.loads(response.content)
+
+    response = self._get_gist(uuid=gist['uuid'])
+    assert_equal(302, response.status_code)
+    assert_equal('/hue/editor?gist=%(uuid)s&type=hive-query' % gist, response.url)
+
+    response = self._get_gist(uuid=gist['uuid'], client=self.client_not_me)
+    assert_equal(302, response.status_code)
+    assert_equal('/hue/editor?gist=%(uuid)s&type=hive-query' % gist, response.url)
+
+
+  def test_gist_directory_creation(self):
+    home_dir = Directory.objects.get_home_directory(self.user)
+
+    assert_false(home_dir.children.filter(name='Gist').exists())
+
+    Document2.objects.get_gist_directory(self.user)
+
+    assert_true(home_dir.children.filter(name='Gist').exists())
+
+
+  def test_get_unfurl(self):
+    # Unfurling on
+    f = ENABLE_GIST_PREVIEW.set_for_testing(True)
+
+    try:
+      response = self._create_gist(
+          statement='SELECT 1',
+          doc_type='hive-query',
+          name='test_gist_get',
+      )
+      gist = json.loads(response.content)
+
+      response = self._get_gist(
+        uuid=gist['uuid'],
+        is_crawler_bot=True
+      )
+
+      assert_equal(200, response.status_code)
+      assert_true(b'<meta name="twitter:card" content="summary">' in response.content, response.content)
+      assert_true(b'<meta property="og:description" content="SELECT 1"/>' in response.content, response.content)
+    finally:
+      f()
+
+    # Unfurling off
+    f = ENABLE_GIST_PREVIEW.set_for_testing(False)
+
+    try:
+      response = self._get_gist(
+        uuid=gist['uuid'],
+        is_crawler_bot=True
+      )
+
+      assert_equal(302, response.status_code)
+      assert_equal('/hue/editor?gist=%(uuid)s&type=hive-query' % gist, response.url)
+    finally:
+      f()

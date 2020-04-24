@@ -19,16 +19,15 @@ import logging
 
 from django.utils.translation import ugettext as _
 
-from desktop.conf import CLUSTER_ID
+from desktop.conf import CLUSTER_ID, has_connectors
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
-from desktop.models import Cluster, ClusterConfig
+from desktop.models import Cluster
 from beeswax.design import hql_query
 from beeswax.models import QUERY_TYPES
 from beeswax.server import dbms
-from beeswax.server.dbms import HiveServer2Dbms, QueryServerException, QueryServerTimeoutException,\
+from beeswax.server.dbms import HiveServer2Dbms, QueryServerException, QueryServerTimeoutException, \
   get_query_server_config as beeswax_query_server_config, get_query_server_config_via_connector
-from notebook.conf import get_ordered_interpreters
 
 from impala import conf
 
@@ -42,6 +41,7 @@ def get_query_server_config(connector=None):
   else:
     query_server = {
         'server_name': 'impala',
+        'dialect': 'impala',
         'server_host': conf.SERVER_HOST.get(),
         'server_port': conf.SERVER_PORT.get(),
         'principal': conf.IMPALA_PRINCIPAL.get(),
@@ -96,6 +96,7 @@ class ImpalaDbms(HiveServer2Dbms):
     return 'SELECT histogram(%s) FROM %s' % (select_clause, from_clause)
 
 
+  # Deprecated
   def invalidate(self, database=None, table=None, flush_all=False):
     handle = None
 

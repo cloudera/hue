@@ -16,7 +16,7 @@ This section goes into greater detail on how to build and reuse the components o
 * Python 2.7+ (Python 3 support tracked in [HUE-8737](https://issues.cloudera.org/browse/HUE-8737))
 * Django (1.11 already included in the distribution)
 * Java (Java 1.8) (should go away after [HUE-8740](https://issues.cloudera.org/browse/HUE-8740))
-* npm ([10.0+](https://deb.nodesource.com/setup_10.x))
+* Node.js ([10.0+](https://deb.nodesource.com/setup_10.x))
 
 ### Build & Start
 
@@ -93,13 +93,13 @@ ones that you may write yourself.
 Hue is a web application built on the Django python web framework.
 Django, running on the WSGI container/web server (typically CherryPy), manages
 the url dispatch, executes application logic code, and puts together the views
-from their templates.  Django uses a database (typically sqlite)
-to manage session data, and Hue applications can use it as well
-for their "models".  (For example, the saved Editor stores
-saved queries in the database.)
+from their templates. Django uses a database (typically MySql or PostGres) to manage session data, and Hue applications can use it as well
+for their "models". (For example, the saved Editor stores saved queries in the database.)
 
 In addition to the web server, some Hue applications run
 daemon processes "on the side". Some examples are the `Celery Task Server`, `Celery Beat`.
+
+![Reference Architecture](/images/hue_architecture.png)
 
 ### Interacting with external services
 
@@ -112,20 +112,12 @@ These APIs work by making REST or Thrift calls.
 
 ![Architecture](/images/architecture.png)
 
-A Hue application may span three tiers: (1) the UI
-and user interaction in the client's browser, (2) the
-core application logic in the Hue web
-server, and (3) external services with which applications
-may interact.
+A Hue application may span three tiers: (1) the UI and user interaction in the client's browser, (2) the
+core application logic in the Hue web server, and (3) external services with which applications may interact.
 
-The absolute minimum that you must implement (besides
-boilerplate), is a
-"Django [view](https://docs.djangoproject.com/en/1.11/#the-view-layer/)"
-function that processes the request and the associated template
-to render the response into HTML.
+The absolute minimum that you must implement (besides boilerplate), is a "Django [view](https://docs.djangoproject.com/en/1.11/#the-view-layer/)" function that processes the request and the associated template to render the response into HTML.
 
-Many apps will evolve to have a bit of custom JavaScript and
-CSS styles. Apps that need to talk to an external service
+Many apps will evolve to have a bit of custom JavaScript and CSS styles. Apps that need to talk to an external service
 will pull in the code necessary to talk to that service.
 
 ### File Layout
@@ -297,14 +289,11 @@ would say finicky); Django templates are simpler, but are less expressive.
 
 ### Authentication Backends
 
-Hue exposes a configuration flag ("auth") to configure
-a custom authentication backend.
-See http://docs.djangoproject.com/en/dev/topics/auth/#writing-an-authentication-backend
-for writing such a backend.
+Hue exposes a configuration flag ("auth") to configure a custom authentication [backend](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/auth/backend.py).
+See [writing an authentication backend](http://docs.djangoproject.com/en/dev/topics/auth/#writing-an-authentication-backend)
+for more details.
 
-In addition to that, backends may support a `manages_passwords_externally()` method, returning
-True or False, to tell the user manager application whether or not changing
-passwords within Hue is possible.
+In addition to that, backends may support a `manages_passwords_externally()` method, returning True or False, to tell the user manager application whether or not changing passwords within Hue is possible.
 
 ### Authorization
 
@@ -337,10 +326,8 @@ for regenerating the code from the interfaces.
 
 ### Upgrades
 
-After upgrading the version of Hue, running these two commands will make sure the
-database has the correct tables and fields.
+After upgrading the version of Hue, running these two commands will make sure the database has the correct tables and fields.
 
-    ./build/env/bin/hue syncdb
     ./build/env/bin/hue migrate
 
 
@@ -382,7 +369,7 @@ database has the correct tables and fields.
     TEST_IMPALAD_HOST=impalad-01.gethue.com
       Point to an Impalad and trigger the Impala tests.
 
-## User interface
+## User Interface (UI)
 
 Developing applications for Hue requires a minimal amount of CSS
 (and potentially JavaScript) to use existing functionality.
@@ -472,7 +459,7 @@ development mode.
 
 ### The short story
 
-Run the unit tests
+Run the API unit tests
 
     ./build/env/bin/hue test unit
 
@@ -484,26 +471,16 @@ How to run just some parts of the tests, e.g.:
     build/env/bin/hue test specific impala.tests:TestMockedImpala
     build/env/bin/hue test specific impala.tests:TestMockedImpala.test_basic_flow
 
-Jest tests:
+Run the user interface tests:
 
     npm run test
 
+### Running the API tests
 
-### Longer story
+The ``test`` management command prepares the arguments (test app names) and passes them to nose (django_nose.nose_runner). Nose will then magically find all the tests to run.
 
-The ``test`` management command prepares the arguments (test app names)
-and passes them to nose (django_nose.nose_runner). Nose will then magically
-find all the tests to run.
-
-Tests themselves should be named *_test.py.  These will be found
-as long as they're in packages covered by django.  You can use the
-unittest frameworks, or you can just name your method with
-the word "test" at a word boundary, and nose will find it.
-
-See apps/hello/src/hello/hello_test.py for an example.
-
-
-#### Running only specific tests
+Tests themselves should be named `*_test.py`.  These will be found as long as they're in packages covered by django.  You can use the
+unittest frameworks, or you can just name your method with the word "test" at a word boundary, and nose will find it. See `apps/hello/src/hello/hello_test.py` for an example.
 
 To run the unit tests (should take 5-10 minutes):
 
@@ -535,15 +512,113 @@ To run a specific test in a class, use:
 
     build/env/bin/hue test specific <app><module>:<class><test_func>
 
+Note:
+
+When running the tests and seeing an error similar to:
+
+    ...
+    ValueError: The file 'desktop/js/bundles/hue/vendors~hue~notebook~tableBrowser-chunk-f7c8562ecf79bc8f1f16.js' could not be found with <django.contrib.staticfiles.storage.CachedStaticFilesStorage object at 0x7faf77042630>.
+
+
+Re-building the collection of static files should fix it:
+
+    ./build/env/bin/hue collectstatic
+
+### Running the UI tests
+
+The tests are next to the file under test, the filename of the test has to end with `.test.js`.
+
+    someFile.js         <- File under test
+    someFile.test.js    <- File containing tests
+
+Run all the tests once with:
+
+    npm run test
+
+Run tests from a specific file once:
+
+    npm run test -- foo.test.js
+
+To run the tests in watch mode:
+
+    npm run test-dev
+
+While in watch mode Jest will detect changes to all files and re-run related tests. There are
+also options to target specific files or tests. Press 'w' in the console to see the options.
+
+Note: on certain OS like Ubuntu, running the tests via a global jest seems to not hang your system
+
+    npm install jest --global
+
 e.g.
 
-    build/env/bin/hue test specific useradmin.tests:AdminTest.test_login
+    jest calciteAutocompleteParser.Select.stream.test.js --testPathIgnorePatterns=[]
+    jest calciteAutocompleteParser --testPathIgnorePatterns=[]
 
-Start up pdb on test failures:
+How to update snapshot tests:
 
-    build/env/bin/hue test <args> --pdb --pdb-failure -s
+    jest --updateSnapshot
 
-#### Coverage
+#### Testing KO Js components
+
+koSetup provides utilities to test Knockout components and bindings using `jsdom` from `jest`.
+
+An example of component test:
+
+    import { koSetup } from 'jest/koTestUtils';
+
+    import 'ko/someComponent';
+
+    describe('ko.someComponent.js', () => {
+      const setup = koSetup(); // Adds the necessary setup and teardown
+
+      it('should render component', async () => {
+        const someParams = {}
+
+        const element = await setup.renderComponent('someComponent', someParams);
+
+        expect(element.innerHTML).toMatchSnapshot();
+      });
+
+      it('should change after observable update', async () => {
+        const someParams = { visible: ko.observable(false) };
+        const wrapper = await setup.renderComponent('someComponent', someParams);
+        expect(wrapper.querySelector('[data-test="some-test-id"]').style['display']).toEqual('none');
+
+        someParams.visible(true); // Or trigger some event on an elmement etc.
+        await setup.waitForKoUpdate(); // Waits for re-render
+
+        expect(wrapper.querySelector('[data-test="some-test-id"]').style['display']).toEqual('inline-block');
+      });
+    });
+
+An example of a binding test:
+
+    import ko from 'knockout';
+    import { koSetup } from 'jest/koTestUtils';
+    import './ko.myBinding';
+
+    describe('ko.myBinding.js', () => {
+      const setup = koSetup();
+
+      it('should toggle observable', async () => {
+        const viewModel = { testObservable: ko.observable(false) };
+        const wrapper = await setup.renderKo(
+          '<div class="click-test" data-bind="myBinding: testObservable"></div>',
+          viewModel
+        );
+
+        expect(viewModel.testObservable()).toBeFalsy();
+
+        wrapper.querySelector('.click-test').click();
+        await setup.waitForKoUpdate();
+
+        expect(viewModel.testObservable()).toBeTruthy();
+      });
+    });
+
+
+### Coverage
 
 Add the following options:
 
@@ -553,87 +628,7 @@ For js run:
 
     npm run test-coverage
 
-#### Create and run the Jest tests
-
-Add them next to the file under test, the filename of the test has to end with ".test.js".
-
-    someFile.js         <- File under test
-    someFile.test.js    <- File containing tests
-
-Run all the tests once with:
-
-    npm run test
-
-To run the tests in watch mode:
-
-    npm run test-dev
-
-While in watch mode Jest will detect changes to all files and re-run related tests. There are
-also options to target specific files or tests. Press 'w' in the console to see the options.
-
-#### Testing KO components and bindings
-
-koSetup provides utilities to test knockout components and bindings using jsdom from jest.
-
-An example of component test:
-
-```
-import { koSetup } from 'jest/koTestUtils';
-
-import 'ko/someComponent';
-
-describe('ko.someComponent.js', () => {
-  const setup = koSetup(); // Adds the necessary setup and teardown
-
-  it('should render component', async () => {
-    const someParams = {}
-
-    const element = await setup.renderComponent('someComponent', someParams);
-
-    expect(element.innerHTML).toMatchSnapshot();
-  });
-
-  it('should change after observable update', async () => {
-    const someParams = { visible: ko.observable(false) };
-    const wrapper = await setup.renderComponent('someComponent', someParams);
-    expect(wrapper.querySelector('[data-test="some-test-id"]').style['display']).toEqual('none');
-
-    someParams.visible(true); // Or trigger some event on an elmement etc.
-    await setup.waitForKoUpdate(); // Waits for re-render
-
-    expect(wrapper.querySelector('[data-test="some-test-id"]').style['display']).toEqual('inline-block');
-  });
-});
-```
-
-An example of a binding test:
-
-```
-import ko from 'knockout';
-import { koSetup } from 'jest/koTestUtils';
-import './ko.myBinding';
-
-describe('ko.myBinding.js', () => {
-  const setup = koSetup();
-
-  it('should toggle observable', async () => {
-    const viewModel = { testObservable: ko.observable(false) };
-    const wrapper = await setup.renderKo(
-      '<div class="click-test" data-bind="myBinding: testObservable"></div>',
-      viewModel
-    );
-
-    expect(viewModel.testObservable()).toBeFalsy();
-
-    wrapper.querySelector('.click-test').click();
-    await setup.waitForKoUpdate();
-
-    expect(viewModel.testObservable()).toBeTruthy();
-  });
-});
-```
-
-#### Continuous Integration (CI)
+### Continuous Integration (CI)
 
 [CircleCi](https://circleci.com/gh/cloudera/hue) automatically run the unit tests (Python, Javascript, linting) on branch updates and pull requests. Branches containing `ci-commit-master` will try to be auto pushed to master if the run is green and the Github permissions match.
 This logic is described in the [config.yml](https://github.com/cloudera/hue/tree/master/.circleci).
@@ -642,7 +637,7 @@ The runs happen in an image based on [latest Hue's image](https://hub.docker.com
 
 Note: until the `desktop/ext-py` dependencies are moved to a `requirement.txt`, adding new Python modules will require adding them first to the Docker image by building a Hue branch which has them.
 
-#### Integration tests
+### Integration tests
 
 To not fail on integration tests, Hue would need to be configured to point to a live cluster, or you could install the mini cluster (only once) with:
 
@@ -692,22 +687,22 @@ And add them and the authors to the release notes:
 
 Pushing the release branch:
 
-    git push origin HEAD:branch-4.6.0
+    git push origin HEAD:branch-4.7.0
 
 Tagging the release:
 
-    git tag -a release-4.6.0 -m "release-4.6.0"
-    git push origin release-4.6.0
+    git tag -a release-4.7.0 -m "release-4.7.0"
+    git push origin release-4.7.0
 
 Building the tarball release:
 
     make prod
 
-Source of the release: https://github.com/cloudera/hue/archive/release-4.6.0.zip
+Source of the release: https://github.com/cloudera/hue/archive/release-4.7.0.zip
 
 Push to the CDN:
 
-    scp hue-4.6.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
+    scp hue-4.7.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
 
 Other things to update:
 
@@ -718,17 +713,17 @@ Other things to update:
 
 Instructions:
 
-    docker build https://github.com/cloudera/hue.git#release-4.6.0 -t gethue/hue:4.6.0 -f tools/docker/hue/Dockerfile
-    docker tag gethue/hue:4.6.0 gethue/hue:latest
+    docker build https://github.com/cloudera/hue.git#release-4.7.0 -t gethue/hue:4.7.0 -f tools/docker/hue/Dockerfile
+    docker tag gethue/hue:4.7.0 gethue/hue:latest
     docker images
     docker login
     docker push gethue/hue
-    docker push gethue/hue:4.6.0
+    docker push gethue/hue:4.7.0
 
-    docker build . -t gethue/nginx:4.6.0 -f tools/docker/nginx/Dockerfile;
-    docker tag gethue/nginx:4.6.0 gethue/nginx:latest
+    docker build . -t gethue/nginx:4.7.0 -f tools/docker/nginx/Dockerfile;
+    docker tag gethue/nginx:4.7.0 gethue/nginx:latest
     docker push gethue/nginx
-    docker push gethue/nginx:4.6.0
+    docker push gethue/nginx:4.7.0
 
 Documentation
 
@@ -744,10 +739,12 @@ Release:
 
     ssh root@docs.gethue.com
     cd /var/www/docs.gethue.com
-    mkdir 4.6.0
-    rm latest; ln -s 4.6.0 latest
+    mkdir 4.7.0
+    rm latest; ln -s 4.7.0 latest
 
-    scp -r docs/docs-site/public/* root@docs.gethue.com:/var/www/docs.gethue.com/4.6.0
+    scp -r docs/docs-site/public/* root@docs.gethue.com:/var/www/docs.gethue.com/4.7.0
+
+    scp -r hue-4.6/build/release/prod/hue-4.7.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads/
 
 
 Then send release notes to the [Forum](https://discourse.gethue.com/), [hue-user](https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user), https://twitter.com/gethue !
@@ -778,26 +775,36 @@ Note: code updates won’t be seen after the Docker container runs. For this Hue
 
     ./build/env/bin/hue runserver 0.0.0.0:8888
 
-and recompiling the Docker image. It will then auto-restart on Python code changes. For JavaScript, those would need to be [compiled](//developer/development/#javascript).
+and recompiling the Docker image. It will then auto-restart on Python code changes. For JavaScript, those would need to be [compiled](/developer/development/#javascript).
 
 
 ### Documentation
 
-Install [Hugo](https://gohugo.io/getting-started/quick-start/).
+Install [Hugo](https://gohugo.io/getting-started/quick-start/). Each page has a link to its own source file in the top right corner.
 
-Build it and see live changes:
+Build the [source](https://github.com/cloudera/hue/tree/master/docs/docs-site) and see live changes:
 
     cd docs/docs-site
 
     hugo serve
 
-Check for links not working (returning a 404) with muffet, a fast link checker crawler:
+Check for links not working (e.g. returning a 404) with muffet, a fast link checker crawler. It recommended to use the [check links script](https://github.com/cloudera/hue/blob/master/tools/ci/check_for_website_dead_links.sh).
 
-    sudo snap install muffet
+The posts [manual](https://gethue.com/easily-checking-for-deadlinks-on-docs-gethue-com/) and [continuous integration](https://gethue.com/easily-checking-for-deadlinks-on-docs-gethue-com/) contain more information about it.
 
-Then after booting the hugo documentation server, we point to its url. We also blacklist certain urls to avoid some noisy false positives:
+### Blog & Website
 
-    muffet http://localhost:35741/ --exclude ".*releases.*" -f
+Like for the [Documentation](#Documentation) install hugo. The content for each language is in its [own directory](https://github.com/cloudera/hue/tree/master/docs/gethue/content).
+
+Blog posts are located in [docs/gethue/content/en/posts](https://github.com/cloudera/hue/tree/master/docs/gethue/content/en/posts).
+
+Build it and see live changes:
+
+    cd docs/gethue
+
+    hugo serve
+
+Will automatically start one server for each language domain.
 
 ### SQL Autocomplete
 

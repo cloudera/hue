@@ -23,6 +23,19 @@ import componentUtils from 'ko/components/componentUtils';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { CONFIG_REFRESHED_EVENT, filterConnectors, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import {
+  ASSIST_DB_HIGHLIGHT_EVENT,
+  ASSIST_DB_PANEL_IS_READY_EVENT,
+  ASSIST_GET_DATABASE_EVENT,
+  ASSIST_GET_SOURCE_EVENT,
+  ASSIST_IS_DB_PANEL_READY_EVENT,
+  ASSIST_SET_DATABASE_EVENT,
+  ASSIST_SET_SOURCE_EVENT,
+  ASSIST_SHOW_SOLR_EVENT,
+  ASSIST_SHOW_SQL_EVENT,
+  SHOW_LEFT_ASSIST_EVENT
+} from './events';
 
 const ASSIST_TABLE_TEMPLATES = `
   <script type="text/html" id="assist-no-database-entries">
@@ -139,7 +152,7 @@ const ASSIST_TABLE_TEMPLATES = `
   <script type="text/html" id="assist-table-entry">
     <li class="assist-table" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { override: statsVisible() || navigationSettings.rightAssist, selector: '.table-actions' }">
       <div class="assist-actions table-actions" data-bind="css: { 'assist-actions-left': navigationSettings.rightAssist }" style="opacity: 0">
-        <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
+        <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, popoverOnHover: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
           'Show details'
         )}"></i></a>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${I18n(
@@ -158,7 +171,7 @@ const ASSIST_TABLE_TEMPLATES = `
   <script type="text/html" id="assist-column-entry">
     <li data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visible: ! hasErrors(), visibleOnHover: { childrenOnly: true, override: statsVisible, selector: catalogEntry.isView() ? '.table-actions' : '.column-actions' }, css: { 'assist-table': catalogEntry.isView(), 'assist-column': catalogEntry.isField() }">
       <div class="assist-actions column-actions" data-bind="css: { 'assist-actions-left': navigationSettings.rightAssist }" style="opacity: 0">
-        <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
+        <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, popoverOnHover: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
           'Show details'
         )}"></i></a>
       </div>
@@ -180,7 +193,7 @@ const ASSIST_TABLE_TEMPLATES = `
   <script type="text/html" id="assist-column-entry-assistant">
     <li data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visible: ! hasErrors(), visibleOnHover: { childrenOnly: true, override: statsVisible, selector: catalogEntry.isView() ? '.table-actions' : '.column-actions' }, css: { 'assist-table': catalogEntry.isView(), 'assist-column': catalogEntry.isField() }">
       <div class="assist-actions column-actions assist-actions-left" style="opacity: 0">
-        <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
+        <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, popoverOnHover: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
           'Show details'
         )}"></i></a>
       </div>
@@ -243,7 +256,7 @@ const TEMPLATE =
   <script type="text/html" id="assist-database-actions">
     <div class="assist-actions database-actions" style="opacity: 0">
       <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: function (data, event) { showContextPopover(data, event); }, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
+      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, popoverOnHover: function (data, event) { showContextPopover(data, event); }, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
         'Show details'
       )}"></i></a>
       <!-- /ko -->
@@ -274,7 +287,7 @@ const TEMPLATE =
       <a data-bind="click: back, appAwareTemplateContextMenu: { template: 'sql-context-items', viewModel: selectedSource().selectedNamespace().selectedDatabase() }">
         <i class="fa fa-chevron-left assist-breadcrumb-back" ></i>
         <i class="fa assist-breadcrumb-text" data-bind="css: { 'fa-server': nonSqlType, 'fa-database': !nonSqlType }"></i>
-        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() +  (nonSqlType ? '' : ' (' + selectedSource().sourceType + ' ' + selectedSource().selectedNamespace().name + ')') }"></span>
+        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumbTitle }"></span>
       </a>
       <!-- /ko -->
       <!-- ko ifnot: selectedSource().selectedNamespace().selectedDatabase() -->
@@ -282,7 +295,7 @@ const TEMPLATE =
       <a data-bind="click: back">
         <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
         <i class="fa fa-snowflake-o assist-breadcrumb-text"></i>
-        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() + ' (' + selectedSource().sourceType + ')' }"></span>
+        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumbTitle }"></span>
       </a>
       <!-- /ko -->
       <!-- ko ifnot: window.HAS_MULTI_CLUSTER -->
@@ -321,21 +334,6 @@ const TEMPLATE =
 
   <script type="text/html" id="ask-for-invalidate-title">
     &nbsp;<a class="pull-right pointer close-popover inactive-action">&times;</a>
-  </script>
-
-  <script type="text/html" id="ask-for-invalidate-content">
-    <label class="radio">
-      <input type="radio" name="refreshImpala" value="cache" data-bind="checked: invalidateOnRefresh" />
-      ${I18n('Clear cache')}
-    </label>
-    <label class="radio">
-      <input type="radio" name="refreshImpala" value="invalidate" data-bind="checked: invalidateOnRefresh" />
-      ${I18n('Perform incremental metadata update.')}
-    </label>
-    <div class="assist-invalidate-description">${I18n('This will sync missing tables.')}</div>
-    <div style="width: 100%; display: inline-block; margin-top: 5px;"><button class="pull-right btn btn-primary" data-bind="css: { 'btn-primary': invalidateOnRefresh() !== 'invalidateAndFlush', 'btn-danger': invalidateOnRefresh() === 'invalidateAndFlush' }, click: function (data, event) { huePubSub.publish('close.popover'); triggerRefresh(data, event); }, clickBubble: false">${I18n(
-      'Refresh'
-    )}</button></div>
   </script>
 
   <script type="text/html" id="assist-namespace-header-actions">
@@ -379,16 +377,9 @@ const TEMPLATE =
         <i class="pointer fa fa-plus" title="${I18n('Create index')}"></i>
       </a>
       <!-- /ko -->
-      <!-- ko if: sourceType === 'impala' -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="templatePopover : { contentTemplate: 'ask-for-invalidate-content', titleTemplate: 'ask-for-invalidate-title', trigger: 'click', minWidth: '320px' }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
-        'Refresh'
-      )}"></i></a>
-      <!-- /ko -->
-      <!-- ko if: sourceType !== 'impala' -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
         'Refresh'
       )}"></i></a>
-      <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: loading -->
       <i class="fa fa-refresh fa-spin blue" title="${I18n('Refresh')}"></i>
@@ -565,10 +556,6 @@ class AssistDbPanel {
   /**
    * @param {Object} options
    * @param {Object} options.i18n
-   * @param {Object[]} options.sourceTypes - All the available SQL source types
-   * @param {string} options.sourceTypes[].name - Example: Hive SQL
-   * @param {string} options.sourceTypes[].type - Example: hive
-   * @param {string} [options.activeSourceType] - Example: hive
    * @param {Object} options.navigationSettings - enable/disable the links
    * @param {boolean} options.navigationSettings.openItem
    * @param {boolean} options.navigationSettings.showStats
@@ -578,52 +565,73 @@ class AssistDbPanel {
    * @constructor
    **/
   constructor(options) {
-    const self = this;
-    self.options = options;
-    self.i18n = options.i18n;
-    self.initialized = false;
-    self.initalizing = false;
+    this.options = options;
+    this.i18n = options.i18n;
 
-    self.isStreams = options.isStreams;
-    self.isSolr = options.isSolr;
-    self.nonSqlType = self.isSolr || self.isStreams;
+    this.isStreams = options.isStreams;
+    this.isSolr = options.isSolr;
+    this.nonSqlType = this.isSolr || this.isStreams;
 
-    if (typeof options.sourceTypes === 'undefined') {
-      options.sourceTypes = [];
+    this.sources = ko.observableArray();
+    this.sourceIndex = {};
+    this.selectedSource = ko.observable(null);
 
-      if (self.isSolr) {
-        options.sourceTypes = [{ type: 'solr', name: 'solr' }];
-      } else if (self.isStreams) {
-        options.sourceTypes = [{ type: 'kafka', name: 'kafka' }];
-      } else {
-        window.ASSIST_SQL_INTERPRETERS.forEach(interpreter => {
-          options.sourceTypes.push(interpreter);
-        });
+    this.breadcrumbTitle = ko.pureComputed(
+      () => `${this.breadcrumb()} (${this.selectedSource().connector.displayName})`
+    );
+
+    this.breadcrumb = ko.pureComputed(() => {
+      if (this.isStreams && this.selectedSource()) {
+        return this.selectedSource().name;
       }
-    }
-
-    self.sources = ko.observableArray();
-    self.sourceIndex = {};
-    self.selectedSource = ko.observable(null);
-
-    options.sourceTypes.forEach(sourceType => {
-      self.sourceIndex[sourceType.type] = new AssistDbSource({
-        i18n: self.i18n,
-        type: sourceType.type,
-        name: sourceType.name,
-        nonSqlType: sourceType.type === 'solr' || sourceType.type === 'kafka',
-        navigationSettings: options.navigationSettings
-      });
-      self.sources.push(self.sourceIndex[sourceType.type]);
+      if (!this.isSolr && this.selectedSource()) {
+        if (this.selectedSource().selectedNamespace()) {
+          if (
+            this.selectedSource()
+              .selectedNamespace()
+              .selectedDatabase()
+          ) {
+            return this.selectedSource()
+              .selectedNamespace()
+              .selectedDatabase().catalogEntry.name;
+          }
+          if (window.HAS_MULTI_CLUSTER) {
+            return this.selectedSource().selectedNamespace().name;
+          }
+        }
+        return this.selectedSource().name;
+      }
+      return null;
     });
 
-    if (self.sources().length === 1) {
-      self.selectedSource(self.sources()[0]);
-    }
+    huePubSub.subscribe(ASSIST_DB_HIGHLIGHT_EVENT, catalogEntry => {
+      huePubSub.publish(SHOW_LEFT_ASSIST_EVENT);
+      if (catalogEntry.getSourceType() === 'solr') {
+        huePubSub.publish(ASSIST_SHOW_SOLR_EVENT);
+      } else {
+        huePubSub.publish(ASSIST_SHOW_SQL_EVENT);
+      }
+      huePubSub.publish('context.popover.hide');
+      window.setTimeout(() => {
+        let foundSource;
+        this.sources().some(source => {
+          if (source.sourceType === catalogEntry.getSourceType()) {
+            foundSource = source;
+            return true;
+          }
+        });
+        if (foundSource) {
+          if (this.selectedSource() !== foundSource) {
+            this.selectedSource(foundSource);
+          }
+          foundSource.highlightInside(catalogEntry);
+        }
+      }, 0);
+    });
 
-    if (self.sourceIndex['solr']) {
+    if (this.isSolr) {
       huePubSub.subscribe('assist.collections.refresh', () => {
-        const solrSource = self.sourceIndex['solr'];
+        const solrSource = this.sourceIndex['solr'];
         const doRefresh = () => {
           if (solrSource.selectedNamespace()) {
             const assistDbNamespace = solrSource.selectedNamespace();
@@ -632,6 +640,7 @@ class AssistDbPanel {
                 sourceType: 'solr',
                 namespace: assistDbNamespace.namespace,
                 compute: assistDbNamespace.compute(),
+                connector: {},
                 path: []
               })
               .done(entry => {
@@ -645,45 +654,18 @@ class AssistDbPanel {
           doRefresh();
         }
       });
-    }
-
-    huePubSub.subscribe('assist.db.highlight', catalogEntry => {
-      huePubSub.publish('left.assist.show');
-      if (catalogEntry.getSourceType() === 'solr') {
-        huePubSub.publish('assist.show.solr');
-      } else {
-        huePubSub.publish('assist.show.sql');
-      }
-      huePubSub.publish('context.popover.hide');
-      window.setTimeout(() => {
-        let foundSource;
-        self.sources().some(source => {
-          if (source.sourceType === catalogEntry.getSourceType()) {
-            foundSource = source;
-            return true;
-          }
-        });
-        if (foundSource) {
-          if (self.selectedSource() !== foundSource) {
-            self.selectedSource(foundSource);
-          }
-          foundSource.highlightInside(catalogEntry);
-        }
-      }, 0);
-    });
-
-    if (!self.isSolr && !self.isStreams) {
-      huePubSub.subscribe('assist.set.database', databaseDef => {
-        if (!databaseDef.source || !self.sourceIndex[databaseDef.source]) {
+    } else if (!this.isSolr && !this.isStreams) {
+      huePubSub.subscribe(ASSIST_SET_DATABASE_EVENT, databaseDef => {
+        if (!databaseDef.connector || !this.sourceIndex[databaseDef.connector.type]) {
           return;
         }
-        self.selectedSource(self.sourceIndex[databaseDef.source]);
-        self.setDatabaseWhenLoaded(databaseDef.namespace, databaseDef.name);
+        this.selectedSource(this.sourceIndex[databaseDef.connector.type]);
+        this.setDatabaseWhenLoaded(databaseDef.namespace, databaseDef.name);
       });
 
       const getSelectedDatabase = source => {
         const deferred = $.Deferred();
-        const assistDbSource = self.sourceIndex[source];
+        const assistDbSource = this.sourceIndex[source];
         if (assistDbSource) {
           assistDbSource.loadedDeferred.done(() => {
             if (assistDbSource.selectedNamespace()) {
@@ -695,11 +677,13 @@ class AssistDbPanel {
                     name: assistDbSource.selectedNamespace().selectedDatabase().name
                   });
                 } else {
-                  const lastSelectedDb = apiHelper.getFromTotalStorage(
+                  let lastSelectedDb = apiHelper.getFromTotalStorage(
                     'assist_' + source + '_' + assistDbSource.selectedNamespace().namespace.id,
-                    'lastSelectedDb',
-                    'default'
+                    'lastSelectedDb'
                   );
+                  if (!lastSelectedDb && lastSelectedDb !== '') {
+                    lastSelectedDb = 'default';
+                  }
                   deferred.resolve({
                     sourceType: source,
                     namespace: assistDbSource.selectedNamespace().namespace,
@@ -722,36 +706,21 @@ class AssistDbPanel {
         return deferred;
       };
 
-      huePubSub.subscribe('assist.get.database', source => {
-        getSelectedDatabase(source).done(databaseDef => {
-          huePubSub.publish('assist.database.set', databaseDef);
-        });
-      });
-
-      huePubSub.subscribe('assist.get.database.callback', options => {
+      huePubSub.subscribe(ASSIST_GET_DATABASE_EVENT, options => {
         getSelectedDatabase(options.source).done(options.callback);
       });
 
-      huePubSub.subscribe('assist.get.source', () => {
-        huePubSub.publish(
-          'assist.source.set',
-          self.selectedSource() ? self.selectedSource().sourceType : undefined
-        );
+      huePubSub.subscribe(ASSIST_GET_SOURCE_EVENT, callback => {
+        callback(this.selectedSource() ? this.selectedSource().sourceType : undefined);
       });
 
-      huePubSub.subscribe('assist.set.source', source => {
-        if (self.sourceIndex[source]) {
-          self.selectedSource(self.sourceIndex[source]);
+      huePubSub.subscribe(ASSIST_SET_SOURCE_EVENT, source => {
+        if (this.sourceIndex[source]) {
+          this.selectedSource(this.sourceIndex[source]);
         }
       });
 
-      huePubSub.publish('assist.db.panel.ready');
-
-      huePubSub.subscribe('assist.is.db.panel.ready', () => {
-        huePubSub.publish('assist.db.panel.ready');
-      });
-
-      self.selectedSource.subscribe(newSource => {
+      this.selectedSource.subscribe(newSource => {
         if (newSource) {
           if (newSource.namespaces().length === 0) {
             newSource.loadNamespaces();
@@ -763,78 +732,36 @@ class AssistDbPanel {
       });
     }
 
-    if (self.isSolr || self.isStreams) {
-      if (self.sources().length === 1) {
-        self.selectedSource(self.sources()[0]);
-        self
-          .selectedSource()
-          .loadNamespaces()
-          .done(() => {
-            const solrNamespace = self.selectedSource().selectedNamespace();
-            if (solrNamespace) {
-              solrNamespace.initDatabases();
-              solrNamespace.whenLoaded(() => {
-                solrNamespace.setDatabase('default');
-              });
-            }
-          });
-      }
-    }
+    this.init(options.navigationSettings).then(() => {
+      huePubSub.publish(ASSIST_DB_PANEL_IS_READY_EVENT);
 
-    self.breadcrumb = ko.pureComputed(() => {
-      if (self.isStreams && self.selectedSource()) {
-        return self.selectedSource().name;
-      }
-      if (!self.isSolr && self.selectedSource()) {
-        if (self.selectedSource().selectedNamespace()) {
-          if (
-            self
-              .selectedSource()
-              .selectedNamespace()
-              .selectedDatabase()
-          ) {
-            return self
-              .selectedSource()
-              .selectedNamespace()
-              .selectedDatabase().catalogEntry.name;
-          }
-          if (window.HAS_MULTI_CLUSTER) {
-            return self.selectedSource().selectedNamespace().name;
-          }
-        }
-        return self.selectedSource().name;
-      }
-      return null;
+      huePubSub.subscribe(ASSIST_IS_DB_PANEL_READY_EVENT, () => {
+        huePubSub.publish(ASSIST_DB_PANEL_IS_READY_EVENT);
+      });
     });
-
-    self.init();
   }
 
   setDatabaseWhenLoaded(namespace, databaseName) {
-    const self = this;
-    self.selectedSource().whenLoaded(() => {
+    this.selectedSource().whenLoaded(() => {
       if (
-        self.selectedSource().selectedNamespace() &&
-        self.selectedSource().selectedNamespace().namespace.id !== namespace.id
+        this.selectedSource().selectedNamespace() &&
+        this.selectedSource().selectedNamespace().namespace.id !== namespace.id
       ) {
-        self
-          .selectedSource()
+        this.selectedSource()
           .namespaces()
           .some(otherNamespace => {
             if (otherNamespace.namespace.id === namespace.id) {
-              self.selectedSource().selectedNamespace(otherNamespace);
+              this.selectedSource().selectedNamespace(otherNamespace);
               return true;
             }
           });
       }
 
-      if (self.selectedSource().selectedNamespace()) {
-        self
-          .selectedSource()
+      if (this.selectedSource().selectedNamespace()) {
+        this.selectedSource()
           .selectedNamespace()
           .whenLoaded(() => {
-            self
-              .selectedSource()
+            this.selectedSource()
               .selectedNamespace()
               .setDatabase(databaseName);
           });
@@ -857,6 +784,9 @@ class AssistDbPanel {
           this.selectedSource()
             .selectedNamespace()
             .selectedDatabase(null);
+          this.selectedSource()
+            .selectedNamespace()
+            .selectedDatabaseChanged();
         } else if (window.HAS_MULTI_CLUSTER) {
           this.selectedSource().selectedNamespace(null);
         } else {
@@ -868,25 +798,82 @@ class AssistDbPanel {
     }
   }
 
-  init() {
-    if (this.initialized) {
-      return;
-    }
-    if (this.isSolr) {
-      this.selectedSource(this.sourceIndex['solr']);
-    } else if (this.isStreams) {
-      this.selectedSource(this.sourceIndex['kafka']);
-    } else {
-      const storageSourceType = apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
-      if (!this.selectedSource()) {
-        if (this.options.activeSourceType) {
-          this.selectedSource(this.sourceIndex[this.options.activeSourceType]);
-        } else if (storageSourceType && this.sourceIndex[storageSourceType]) {
-          this.selectedSource(this.sourceIndex[storageSourceType]);
-        }
+  setSingleSource(type, navigationSettings, nonSqlType) {
+    this.sourceIndex = {};
+    const source = new AssistDbSource({
+      i18n: this.i18n,
+      type: type,
+      name: type,
+      nonSqlType: nonSqlType,
+      navigationSettings: navigationSettings
+    });
+    this.sourceIndex[type] = source;
+    this.sources([source]);
+    this.selectedSource(source);
+
+    source.loadNamespaces().done(() => {
+      const namespace = this.selectedSource().selectedNamespace();
+      if (namespace) {
+        namespace.initDatabases();
+        namespace.whenLoaded(() => {
+          namespace.setDatabase('default');
+        });
       }
-    }
-    this.initialized = true;
+    });
+  }
+
+  async init(navigationSettings) {
+    return new Promise(resolve => {
+      if (this.isSolr) {
+        this.setSingleSource('solr', navigationSettings, true);
+        resolve();
+        return;
+      }
+
+      if (this.isStreams) {
+        this.setSingleSource('kafka', navigationSettings, true);
+        resolve();
+        return;
+      }
+
+      const updateFromConfig = async config => {
+        const sources = [];
+        const connectors = await filterConnectors(connector => connector.is_sql);
+        connectors.forEach(connector => {
+          const source =
+            this.sourceIndex[connector.type] ||
+            new AssistDbSource({
+              i18n: this.i18n,
+              type: connector.type, // TODO: Remove redundant
+              name: connector.name, // TODO: Remove redundant
+              connector: connector,
+              nonSqlType: false,
+              navigationSettings: navigationSettings
+            });
+          sources.push(source);
+        });
+        this.sourceIndex = {};
+        sources.forEach(source => {
+          this.sourceIndex[source.sourceType] = source;
+        });
+
+        if (sources.indexOf(this.selectedSource()) === -1) {
+          if (sources.length) {
+            const storageSourceType = apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
+            this.selectedSource(this.sourceIndex[storageSourceType] || sources[0]);
+          } else {
+            this.selectedSource(undefined);
+          }
+        }
+        this.sources(sources);
+      };
+
+      huePubSub.subscribe(CONFIG_REFRESHED_EVENT, updateFromConfig);
+      huePubSub.publish(GET_KNOWN_CONFIG_EVENT, config => {
+        updateFromConfig(config);
+        resolve();
+      });
+    });
   }
 }
 

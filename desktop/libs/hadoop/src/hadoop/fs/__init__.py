@@ -172,6 +172,9 @@ class LocalSubFileSystem(object):
       for i in groups:
         newargs[i] = grp.getgrnam(newargs[i]).gr_gid
 
+      if f == builtins_open and sys.version_info[0] > 2:
+        return f(*newargs, encoding='utf-8')
+
       return f(*newargs)
 
     return wrapped

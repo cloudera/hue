@@ -18,19 +18,28 @@
 This module provides access to LDAP servers, along with some basic functionality required for Hue and
 User Admin to work seamlessly with LDAP.
 """
-from builtins import str
-from builtins import object
-import ldap
-import ldap.filter
+from builtins import str, object
+
 import logging
+
+LOG = logging.getLogger(__name__)
+
+try:
+  import ldap
+  import ldap.filter
+  from ldap import SCOPE_SUBTREE
+except ImportError:
+  LOG.warn('ldap module not found')
+  SCOPE_SUBTREE = None
 import re
+
+from django.utils.encoding import smart_text
 
 import desktop.conf
 from desktop.lib.python_util import CaseInsensitiveDict
+
 from useradmin.models import User
 
-
-LOG = logging.getLogger(__name__)
 CACHED_LDAP_CONN = None
 
 
@@ -238,13 +247,15 @@ class LdapConnection(object):
           }
 
           if 'givenName' in data:
-            if len(data['givenName'][0]) > 30:
+            first_name = smart_text(data['givenName'][0])
+            if len(first_name) > 30:
               LOG.warn('First name is truncated to 30 characters for [<User: %s>].' % ldap_info['username'])
-            ldap_info['first'] = data['givenName'][0][:30]
+            ldap_info['first'] = first_name[:30]
           if 'sn' in data:
-            if len(data['sn'][0]) > 30:
+            last_name = smart_text(data['sn'][0])
+            if len(last_name) > 30:
               LOG.warn('Last name is truncated to 30 characters for [<User: %s>].' % ldap_info['username'])
-            ldap_info['last'] = data['sn'][0][:30]
+            ldap_info['last'] = last_name[:30]
           if 'mail' in data:
             ldap_info['email'] = data['mail'][0]
           # memberOf and isMemberOf should be the same if they both exist
@@ -298,7 +309,7 @@ class LdapConnection(object):
 
     return group_info
 
-  def find_users(self, username_pattern, search_attr=None, user_name_attr=None, user_filter=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
+  def find_users(self, username_pattern, search_attr=None, user_name_attr=None, user_filter=None, find_by_dn=False, scope=SCOPE_SUBTREE):
     """
     LDAP search helper method finding users. This supports searching for users
     by distinguished name, or the configured username attribute.
@@ -361,7 +372,7 @@ class LdapConnection(object):
 
     return None
 
-  def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None, group_member_attr=None, group_filter=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
+  def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None, group_member_attr=None, group_filter=None, find_by_dn=False, scope=SCOPE_SUBTREE):
     """
     LDAP search helper method for finding groups
 
@@ -415,7 +426,7 @@ class LdapConnection(object):
     else:
       return []
 
-  def find_members_of_group(self, dn, search_attr, ldap_filter, scope=ldap.SCOPE_SUBTREE):
+  def find_members_of_group(self, dn, search_attr, ldap_filter, scope=SCOPE_SUBTREE):
     if ldap_filter and not ldap_filter.startswith('('):
       ldap_filter = '(' + ldap_filter + ')'
 

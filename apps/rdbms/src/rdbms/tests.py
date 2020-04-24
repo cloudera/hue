@@ -51,16 +51,16 @@ class TestMockedRdbms(object):
 
   def test_basic_flow(self):
     response = self.client.get("/rdbms/")
-    assert_true('DB Query' in response.content, response.content)
+    assert_true(b'DB Query' in response.content, response.content)
 
   def test_config_error(self):
     self.finish = rdbms_conf.DATABASES.set_for_testing({})
 
     response = self.client.get("/rdbms/")
-    assert_true('There are currently no databases configured.' in response.content)
+    assert_true(b'There are currently no databases configured.' in response.content)
 
     response = self.client.get("/rdbms/execute/")
-    assert_true('There are currently no databases configured.' in response.content)
+    assert_true(b'There are currently no databases configured.' in response.content)
 
     self.finish()
 

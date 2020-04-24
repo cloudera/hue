@@ -24,6 +24,7 @@ import I18n from 'utils/i18n';
 
 export const NAME = 'inline-autocomplete';
 
+// prettier-ignore
 const TEMPLATE = `
   <div class="inline-autocomp-container">
     <div>
@@ -36,7 +37,7 @@ const TEMPLATE = `
         <!-- /ko -->
       <!-- /ko-->
       <form autocomplete="off">
-        <input class="inline-autocomp-input" autocorrect="off" autocomplete="do-not-autocomplete" autocapitalize="off" spellcheck="false" type="text" data-bind="
+        <input class="inline-autocomp-input" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } type="text" data-bind="
           attr: { 'placeHolder' : hasFocus() ? '' : placeHolder },
           textInput: searchInput,
           hasFocus: hasFocus,

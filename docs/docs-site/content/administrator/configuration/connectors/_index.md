@@ -5,11 +5,28 @@ draft: false
 weight: 2
 ---
 
+Looking at improving or adding a new one? Go check the **[connector API section](/developer/connectors/)**!
+
 ## Databases
 
-Hue connect to any database or warehouse via native connectors or SqlAlchemy.
+Hue connects to any database or warehouse via native or SqlAlchemy connectors. Connections can be configured via a UI after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) is done, until then they need to be added to the [Hue ini file](/administrator/configuration/). Except [impala] and [beeswax] which have a dedicated section, all the other ones should be appended below the [[interpreters]] of [notebook] e.g.:
 
-Read about building some [better autocompletes](/developer/parsers/) or extending the connectors with SQL Alchemy, JDBC or building your own [connectors](/developer/sdk).
+    [notebook]
+    [[interpreters]]
+
+    [[[mysql]]]
+    name=MySQL
+    interface=sqlalchemy
+    options='{"url": "mysql://${USER}:${PASSWORD}@localhost:3306/hue"}'
+
+    [[[presto]]]
+    name = Presto
+    interface=sqlalchemy
+    options='{"url": "presto://localhost:8080/hive/default"}'
+
+Note that USER and PASSWORD can be prompted to the user like in the MySQL connector above.
+
+Read about [how to build your own parser](/developer/parsers/) if you are looking at better autocompletes for your own SQL dialects.
 
 ### Apache Impala
 
@@ -91,41 +108,49 @@ In order to prevent spamming zookeeper, HiveServer2 is cached for the life of th
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install mysqlclient
+    ./build/env/bin/pip install mysqlclient
 
 Then give Hue the information about the database source:
 
     [[[mysql]]]
-       name = MySQL
-       interface=sqlalchemy
-       options='{"url": "mysql://root:root@localhost:3306/hue"}'
-       ## mysql://${USER}:${PASSWORD}@localhost:3306/hue
+    name=MySQL
+    interface=sqlalchemy
+    options='{"url": "mysql://root:root@localhost:3306/hue"}'
+    ## mysql://${USER}:${PASSWORD}@localhost:3306/hue
 
 Query string options are documented in the [SqlAlchemy MySQL documentation](https://docs.sqlalchemy.org/en/latest/dialects/mysql.html).
 
 Alternative:
 
     [[[mysqljdbc]]]
-       name=MySql JDBC
-      interface=jdbc
-       ## Specific options for connecting to the server.
-       ## The JDBC connectors, e.g. mysql.jar, need to be in the CLASSPATH environment variable.
-       ## If 'user' and 'password' are omitted, they will be prompted in the UI.
-       options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver", "user": "root", "password": "root"}'
-       ## options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver"}'
+    name=MySql JDBC
+    interface=jdbc
+    ## Specific options for connecting to the server.
+    ## The JDBC connectors, e.g. mysql.jar, need to be in the CLASSPATH environment variable.
+    ## If 'user' and 'password' are omitted, they will be prompted in the UI.
+    options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver", "user": "root", "password": "root"}'
+    ## options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver"}'
 
-### Apache Presto
+### Presto
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install pyhive
+    ./build/env/bin/pip install pyhive
 
-Then give Hue the information about the database source:
+Then give Hue the information about the database source following the `presto://{presto-coordinator}:{port}/{catalog}/{schema}` format:
 
     [[[presto]]]
        name = Presto
        interface=sqlalchemy
-       options='{"url": "presto://localhost:8080/hive/default"}'
+       options='{"url": "presto://localhost:8080/tpch/default"}'
+
+With impersonation:
+
+        options='{"url": "presto://localhost:8080/tpch/default", "has_impersonation": true}'
+
+With Kerberos:
+
+        options='{"url": "presto://localhost:8080/tpch/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
 
 Alternatives.
 
@@ -154,7 +179,7 @@ The client driver is maintained by the Presto Team and can be downloaded here: h
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install cx_Oracle
+    ./build/env/bin/pip install cx_Oracle
 
 Then give Hue the information about the database source:
 
@@ -167,9 +192,9 @@ Then give Hue the information about the database source:
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install psycopg2
+    ./build/env/bin/pip install psycopg2
       or
-      ./build/env/bin/pip install psycopg2-binary
+    ./build/env/bin/pip install psycopg2-binary
 
 Then give Hue the information about the database source:
 
@@ -205,7 +230,7 @@ Secondly, we need to add a new interpreter to the notebook app. This will allow 
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install PyAthena
+    ./build/env/bin/pip install PyAthena
 
 Then give Hue the information about the database source:
 
@@ -224,7 +249,7 @@ Note: Keys and S3 buckets need to be URL quoted but Hue does it automatically fo
 
 First, make sure that Hue can talk to Druid via the [pydruid SqlAlchemy connector](https://github.com/druid-io/pydruid). Either make sure it is in the global Python environment or install it in the Hue virtual environment.
 
-      ./build/env/bin/pip install pydruid
+    ./build/env/bin/pip install pydruid
 
 **Note** Make sure the version is equal or more to 0.4.1 if not you will get a "Can't load plugin: sqlalchemy.dialects:druid".
 
@@ -246,7 +271,7 @@ Adding the `+https` prefix will use HTTPS e.g.:
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install sqlalchemy-teradata
+    ./build/env/bin/pip install sqlalchemy-teradata
 
 Then give Hue the information about the database source:
 
@@ -266,7 +291,7 @@ Alternative:
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install ibm_db_sa
+    ./build/env/bin/pip install ibm_db_sa
 
 (or via https://github.com/ibmdb/python-ibmdbsa/tree/master/ibm_db_sa)
 
@@ -288,7 +313,7 @@ Alternative:
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install pyhive
+    ./build/env/bin/pip install pyhive
 
 Then give Hue the information about the database source:
 
@@ -317,15 +342,23 @@ Via native HiveServer2 API:
       name=SparkSql
       interface=hiveserver2
 
-### KSQL
+### ksqlDB
 
-To add to the list of [[interpreters]]:
+The ksql Python module should be added to the system or Hue Python virtual environment:
+
+    ./build/env/bin/pip install git+https://github.com/romainr/ksql-python
+
+Then give Hue the information about the interpreter and ksql API:
+
+To add to the list of interpreters:
+
+    [[interpreters]]
 
     [[[ksql]]]
       name=ksql
       interface=ksql
 
-And provide the address of the KSQL REST Api:
+    ...
 
     [kafka]
 
@@ -336,11 +369,14 @@ And provide the address of the KSQL REST Api:
         # Base URL of Kafka Ksql API.
         ## ksql_api_url=http://127.0.0.1:8088
 
+
+Note: the configuration will be much simpler after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758).
+
 ### Azure SQL Database
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install pyodbc
+    ./build/env/bin/pip install pyodbc
 
 Then configure ODBC according to the [documentation](https://github.com/mkleehammer/pyodbc).
 
@@ -359,7 +395,7 @@ Read more on the [Azure SQL Database](https://docs.microsoft.com/en-us/azure/sql
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install pymssql
+    ./build/env/bin/pip install pymssql
 
 Then give Hue the information about the database source:
 
@@ -381,7 +417,7 @@ Microsoft’s SQL Server JDBC drivers can be downloaded from the official site: 
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install sqlalchemy-vertica-python
+    ./build/env/bin/pip install sqlalchemy-vertica-python
 
 Then give Hue the information about the database source:
 
@@ -392,7 +428,7 @@ Then give Hue the information about the database source:
 
 Alternative:
 
-Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Drivers](https://my.vertica.com/download/vertica/client-drivers/). Be sure to download the driver for the right version and OS.
+Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Drivers](http://my.vertica.com/download/vertica/client-drivers/). Be sure to download the driver for the right version and OS.
 
     [[[vertica]]]
     name=Vertica JDBC
@@ -452,7 +488,7 @@ The Phoenix JDBC client driver is bundled with the Phoenix binary and source rel
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install sqlalchemy-redshift
+    ./build/env/bin/pip install sqlalchemy-redshift
 
 Then give Hue the information about the database source:
 
@@ -465,8 +501,8 @@ Then give Hue the information about the database source:
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install pybigquery
-      ./build/env/bin/pip install pyasn1==0.4.1
+    ./build/env/bin/pip install pybigquery
+    ./build/env/bin/pip install pyasn1==0.4.1
 
 From https://github.com/mxmzdlv/pybigquery.
 
@@ -517,7 +553,7 @@ The [Drill JDBC driver](http://maprdocs.mapr.com/home/Hue/ConfigureHuewithDrill.
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install python-sybase
+    ./build/env/bin/pip install python-sybase
 
 Then give Hue the information about the database source:
 
@@ -531,7 +567,7 @@ Then give Hue the information about the database source:
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install sqlalchemy-hana
+    ./build/env/bin/pip install sqlalchemy-hana
 
 (or via https://github.com/SAP/sqlalchemy-hana)
 
@@ -544,25 +580,26 @@ Then give Hue the information about the database source:
 
 ### Apache Solr
 
-Solr provide great [dashboards](/user/querying/#dashboard). Just point to an existing Solr:
-
-    [search]
-
-      # URL of the Solr Server
-      solr_url=http://localhost:8983/solr/
-
-      # Requires FQDN in solr_url if enabled
-      ## security_enabled=false
-
-      ## Query sent when no term is entered
-      ## empty_query=*:*
-
-
-### Apache Solr SQL
+#### SQL
 
 Query collections like we would query a regular database.
 
-As Solr SQL is pretty recent, there are some caveats, notably Solr lacks support of:
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+    ./build/env/bin/pip install sqlalchemy-solr
+
+(or via https://github.com/aadel/sqlalchemy-solr)
+
+Then give Hue the information about the database source:
+
+    [[[solr]]]
+       name = Solr SQL
+       interface=sqlalchemy
+       options='{"url": "solr://<username>:<password>@<host>:<port>/solr/<collection>[?use_ssl=true|false]"}'
+
+#### Native
+
+As Solr SQL is pretty recent, the native implementation has some caveats, notably Solr lacks support of:
 
 * SELECT *
 * WHERE close with a LIKE
@@ -580,6 +617,21 @@ Then add the interpreter:
       ## Name of the collection handler
       # options='{"collection": "default"}'
 
+### Dashboards
+Solr provide great [dashboards](/user/querying/#dashboard). Just point to an existing Solr:
+
+    [search]
+
+      # URL of the Solr Server
+      solr_url=http://localhost:8983/solr/
+
+      # Requires FQDN in solr_url if enabled
+      ## security_enabled=false
+
+      ## Query sent when no term is entered
+      ## empty_query=*:*
+
+
 ### Apache Kylin
 
 Apache Kylin is an open-source online analytical processing (OLAP) engine.
@@ -588,7 +640,7 @@ See how to configure the [Kylin Query Editor](http://gethue.com/using-hue-to-int
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install kylinpy
+    ./build/env/bin/pip install kylinpy
 
 Then give Hue the information about the database source:
 
@@ -608,7 +660,7 @@ Alternative:
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install sqlalchemy-clickhouse
+    ./build/env/bin/pip install sqlalchemy-clickhouse
 
 Then give Hue the information about the database source:
 
@@ -630,7 +682,7 @@ Alternative:
 
 The dialect for https://github.com/elastic/elasticsearch should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install elasticsearch-dbapi
+    ./build/env/bin/pip install elasticsearch-dbapi
 
     [[[es]]]
       name = Elastic Search
@@ -642,7 +694,7 @@ The dialect for https://github.com/elastic/elasticsearch should be added to the 
 
 The dialect for https://pinot.apache.org should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install pinotdb
+    ./build/env/bin/pip install pinotdb
 
 Then give Hue the information about the database source:
 
@@ -655,7 +707,7 @@ Then give Hue the information about the database source:
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install snowflake-sqlalchemy
+    ./build/env/bin/pip install snowflake-sqlalchemy
 
 Then give Hue the information about the database source:
 
@@ -689,7 +741,7 @@ Just give Hue the information about the database source:
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install gsheetsdb
+    ./build/env/bin/pip install gsheetsdb
 
 Then give Hue the information about the database source:
 
@@ -704,7 +756,7 @@ Read more on the [gsheetsdb page](https://github.com/betodealmeida/gsheets-db-ap
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install psycopg2
+    ./build/env/bin/pip install psycopg2
 
 Then give Hue the information about the database source:
 
@@ -812,6 +864,8 @@ Alternatively (but not recommended for production or secure environments), you c
 
 The region should be set to the AWS region corresponding to the S3 account. By default, this region will be set to 'us-east-1'.
 
+**Using Ozone**
+Apache Ozone should work out of the box.
 
 **Using Ceph**
 New end points have been added in [HUE-5420](https://issues.cloudera.org/browse/HUE-5420)
@@ -824,15 +878,6 @@ Read more about it in the [ADLS User Documentation](/user/browsing#adls-abfs).
 
 In order to add an Azure account to Hue, you'll need to configure Hue with valid Azure credentials, including the client ID, client secret and tenant ID.
 These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:
-
-    [azure]
-    [[azure_accounts]]
-    [[[default]]]
-    client_id_script=/path/to/client_id_script.sh
-    client_secret_script=/path/to/client_secret_script.sh
-    tenant_id_script=/path/to/tenant_id_script.sh
-
-Alternatively (but not recommended for production or secure environments), you can set the client_secret value in plain-text:
 
     [azure]
     [[azure_account]]
@@ -850,7 +895,7 @@ The account name used by ADLS / ABFS will need to be configured via the followin
 
     [[abfs_clusters]]
     [[[default]]]
-    fs_defaultfs=abfss://<container_name>@<account_name>.dfs.core.windows.net
+    fs_defaultfs=abfs://<container_name>@<account_name>.dfs.core.windows.net
     webhdfs_url=https://<container_name>@<account_name>.dfs.core.windows.net
 
 ### GCS
@@ -864,6 +909,9 @@ The json credentials of a service account can be stored for development in plain
     [[[default]]]
     json_credentials='{ "type": "service_account", "project_id": .... }'
 
+### Apache Ozone
+
+The API is the same as [S3](#s3).
 
 ### HBase
 

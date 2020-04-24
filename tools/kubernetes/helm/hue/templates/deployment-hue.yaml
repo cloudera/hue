@@ -17,6 +17,11 @@ spec:
     metadata:
       labels:
         pod: hue
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap-hue-extra.yaml") . | sha256sum }}
+{{- with .Values.podAnnotations }}
+{{ toYaml . | indent 8 }}
+{{- end }}
     spec:
       containers:
       - name: hue
@@ -48,6 +53,10 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
           - containerPort: 80
+        resources:
+          requests:
+            # memory: "64Mi"
+            cpu: "20m"
         volumeMounts:
         - name: nginx-config
           mountPath: /etc/nginx/sites-available/hue

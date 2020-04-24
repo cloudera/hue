@@ -1,4 +1,4 @@
-FROM docker-private.infra.cloudera.com/cloudera_base/centos:7.6.1810 as base-centos-jdk
+FROM registry.access.redhat.com/ubi7/ubi as base-ubi-7
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 
@@ -39,9 +39,10 @@ RUN set -eux; \
         libtidy \
         libxml2-devel \
         libxslt-devel \
-        nmap-ncat \
         ncurses-devel \
+        nmap-ncat \
         openldap-devel \
+        openssl \
         openssl-devel \
         postgresql \
         postgresql-libs \
@@ -50,7 +51,10 @@ RUN set -eux; \
         readline-devel \
         sqlite-devel \
         sudo \
+        swig \
+        which \
         xmlsec1 \
+        xmlsec1-openssl \
         zlib-devel
 
 RUN set -eux; easy_install supervisor pip

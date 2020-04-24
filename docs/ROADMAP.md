@@ -3,25 +3,24 @@
 High Level Roadmap
 ------------------
 
-* Editor
-  * [ ] Editor v2 [HUE-8768](https://issues.cloudera.org/browse/HUE-8768)
-  * [ ] Query Browser v2
-  * [ ] Query Scheduling [HUE-3797](https://issues.cloudera.org/browse/HUE-3797)
-  * [ ] Generify risk alert and optimization API [HUE-8824](https://issues.cloudera.org/browse/HUE-8824)
-  * [ ] Query Builder [HUE-3228](https://issues.cloudera.org/browse/HUE-3228)
-  * [ ] Public SQL REST APIs [HUE-1450](https://issues.cloudera.org/browse/HUE-1450)
-  * [ ] Additional/Improved SQL autocompletes [HUE-9084](https://issues.cloudera.org/browse/HUE-9084)
+* Better [SQL parsers](https://docs.gethue.com/developer/parsers/) for [Databases](https://docs.gethue.com/administrator/configuration/connectors/):
     * [Apache Calcite](https://calcite.apache.org) based: Phoenix, Druid, Spark SQL, Presto, Flink SQL..
-    * KSQL
+    * Kafka SQL
     * Elastic Search SQL
     * Solr SQL
     * PartiQl
     * ZetaSql...
+
+* Editor
+  * [ ] Editor v2 [HUE-8768](https://issues.cloudera.org/browse/HUE-8768)
+  * [ ] Query Browser v2
+  * [ ] Query Scheduling [HUE-3797](https://issues.cloudera.org/browse/HUE-3797)
+  * [ ] Query Builder [HUE-3228](https://issues.cloudera.org/browse/HUE-3228)
+  * [ ] Public SQL REST APIs [HUE-1450](https://issues.cloudera.org/browse/HUE-1450)
 * Cloud
   * [ ] Configuration of connectors via UI [HUE-8758](https://issues.cloudera.org/browse/HUE-8758)
   * [ ] Multi clusters [HUE-8330](https://issues.cloudera.org/browse/HUE-8330)
   * [ ] Multi tenants [HUE-8530](https://issues.cloudera.org/browse/HUE-8530)
-  * [ ] Modernize CI/CD [HUE-8888](https://issues.cloudera.org/browse/HUE-8888)
   * [ ] SQL queries and requests tracing [HUE-8936](https://issues.cloudera.org/browse/HUE-8936)
   * [ ] Productionize metrics [HUE-9021](https://issues.cloudera.org/browse/HUE-9021)
   * [ ] Google Storage connector [HUE-8978](https://issues.cloudera.org/browse/HUE-8978)
@@ -41,6 +40,8 @@ High Level Roadmap
 
 Done
 
+* [x] Additional/Improved SQL autocompletes [HUE-9084](https://issues.cloudera.org/browse/HUE-9084)
+* [x] Generify risk alert and optimization API [HUE-8824](https://issues.cloudera.org/browse/HUE-8824)
 * [x] Kubernetes [HUE-8744](https://issues.cloudera.org/browse/HUE-8744)
 * [x] Minimal Continuous Integration [Blog post](http://gethue.com/improving-the-developer-productivity-with-some-continuous-integration/)
 * [x] Integrate with Apache Atlas [HUE-8749](https://issues.cloudera.org/browse/HUE-8749)
@@ -51,6 +52,7 @@ Done
 * [x] Documentation refresh [HUE-8741](https://issues.cloudera.org/browse/HUE-8741)
 * [x] Frontend moved to Webpack [HUE-8687](https://issues.cloudera.org/browse/HUE-8687)
 * [x] SQL Alchemy full support [HUE-8740](https://issues.cloudera.org/browse/HUE-8740)
+* [x] Modernize CI/CD [HUE-8888](https://issues.cloudera.org/browse/HUE-8888)
 
 Links
 

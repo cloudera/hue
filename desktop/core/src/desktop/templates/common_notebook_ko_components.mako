@@ -216,11 +216,13 @@ from notebook.conf import ENABLE_SQL_INDEXER
           </a>
         </li>
         % endif
+        % if request.fs:
         <li>
           <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal' + snippet.id()).modal('show'); }" title="${ _('Export the result into a file, an index, a new table...') }">
             <i class="fa fa-fw fa-cloud-upload"></i> ${ _('Export') }
           </a>
         </li>
+        % endif
       </ul>
     </div>
 
@@ -419,20 +421,6 @@ from notebook.conf import ENABLE_SQL_INDEXER
           $('.clipboard-content').empty();
         });
 
-        % if conf.WEBSOCKETS.ENABLED.get():
-        var chatSocket = new WebSocket('ws://' + window.location.host + '/ws/editor/results/' + self.snippet.id() + '/');
-
-        chatSocket.onmessage = function(e) {
-          var data = JSON.parse(e.data);
-          var message = data['message'];
-          console.log(message);
-        };
-
-        chatSocket.onclose = function(e) {
-          console.error('Chat socket closed unexpectedly');
-        };
-        % endif
-
         self.trySaveResults = function () {
           if (self.isValidDestination()) {
             self.saveResults();
@@ -467,7 +455,7 @@ from notebook.conf import ENABLE_SQL_INDEXER
                 huePubSub.publish('open.link', resp.watch_url);
               } else if (resp.history_uuid) {
                 $(self.saveResultsModalId).modal('hide');
-                huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+                huePubSub.publish('notebook.task.submitted', resp);
               } else if (resp && resp.message) {
                 $(document).trigger("error", resp.message);
               }

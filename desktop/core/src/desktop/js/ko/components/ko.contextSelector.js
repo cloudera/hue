@@ -23,6 +23,7 @@ import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { ASSIST_SET_DATABASE_EVENT } from './assist/events';
 
 export const NAME = 'hue-context-selector';
 
@@ -153,6 +154,7 @@ const TYPES = Object.keys(TYPES_INDEX).map(key => {
  * @param {ko.observable} [params.cluster]
  * @param {ko.observable} [params.compute]
  * @param {ko.observable} [params.namespace]
+ * @param {ko.observable} [params.connector]
  * @param {ko.observable} [params.database]
  * @param {ko.observableArray} [params.availableDatabases]
  * @param {boolean} [params.hideClusters] - Can be used to force hide cluster selection even if a cluster
@@ -172,6 +174,7 @@ const HueContextSelector = function(params) {
   const self = this;
 
   self.sourceType = params.sourceType;
+  self.connector = params.connector;
   self.disposals = [];
   self.hideLabels = params.hideLabels;
 
@@ -407,6 +410,9 @@ HueContextSelector.prototype.reloadDatabases = function() {
       () => {
         window.clearTimeout(self.reloadDatabaseThrottle);
         self.reloadDatabaseThrottle = window.setTimeout(() => {
+          const connector = (self.connector && ko.unwrap(self.connector)) || {
+            type: ko.unwrap(self.sourceType)
+          };
           if (!self[TYPES_INDEX.namespace.name]()) {
             self.availableDatabases([]);
             self.loadingDatabases(false);
@@ -414,9 +420,10 @@ HueContextSelector.prototype.reloadDatabases = function() {
           }
           dataCatalog
             .getEntry({
-              sourceType: ko.unwrap(self.sourceType),
+              sourceType: connector.type, // TODO: Drop when dataCatalog only needs connector
               namespace: self[TYPES_INDEX.namespace.name](),
               compute: self[TYPES_INDEX.compute.name](),
+              connector: connector,
               path: [],
               definition: { type: 'source' }
             })
@@ -434,18 +441,24 @@ HueContextSelector.prototype.reloadDatabases = function() {
                   self.availableDatabases([]);
                 })
                 .always(() => {
+                  let lastSelectedDb = apiHelper.getFromTotalStorage(
+                    'assist_' +
+                      ko.unwrap(self.sourceType) +
+                      '_' +
+                      self[TYPES_INDEX.namespace.name]().id,
+                    'lastSelectedDb'
+                  );
+
+                  const updateAssist = lastSelectedDb !== '';
+
                   if (
                     !self.database() ||
                     self.availableDatabases().indexOf(self.database()) === -1
                   ) {
-                    const lastSelectedDb = apiHelper.getFromTotalStorage(
-                      'assist_' +
-                        ko.unwrap(self.sourceType) +
-                        '_' +
-                        self[TYPES_INDEX.namespace.name]().id,
-                      'lastSelectedDb',
-                      'default'
-                    );
+                    if (!lastSelectedDb) {
+                      lastSelectedDb = 'default';
+                    }
+
                     if (
                       self.availableDatabases().length === 0 ||
                       self.availableDatabases().indexOf(lastSelectedDb) !== -1
@@ -457,11 +470,13 @@ HueContextSelector.prototype.reloadDatabases = function() {
                   }
                   self.loadingDatabases(false);
 
-                  huePubSub.publish('assist.set.database', {
-                    source: ko.unwrap(self.sourceType),
-                    namespace: self[TYPES_INDEX.namespace.name](),
-                    name: self.database()
-                  });
+                  if (updateAssist) {
+                    huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
+                      connector: connector,
+                      namespace: self[TYPES_INDEX.namespace.name](),
+                      name: self.database()
+                    });
+                  }
                 });
             });
         }, 10);

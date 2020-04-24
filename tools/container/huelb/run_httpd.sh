@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
 mkdir -p ${HUE_LOG_DIR}
-rm -rf /run/httpd/* /tmp/httpd*
+ip_address=$(hostname -i)
 
 exec /usr/sbin/httpd -DFOREGROUND "$@"

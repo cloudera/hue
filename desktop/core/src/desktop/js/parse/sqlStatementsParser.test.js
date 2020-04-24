@@ -103,6 +103,40 @@ describe('sqlStatementsParser.js', () => {
     ]);
   });
 
+  it('should split escaped \\ correctly in single quotes', () => {
+    testParser("SELECT '\\\\';\n SELECT 1;", [
+      {
+        type: 'statement',
+        statement: "SELECT '\\\\';",
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 12 },
+        firstToken: 'SELECT'
+      },
+      {
+        type: 'statement',
+        statement: '\n SELECT 1;',
+        location: { first_line: 1, first_column: 12, last_line: 2, last_column: 10 },
+        firstToken: 'SELECT'
+      }
+    ]);
+  });
+
+  it('should split escaped \\ correctly in double quotes', () => {
+    testParser('SELECT "\\\\";\n SELECT 1;', [
+      {
+        type: 'statement',
+        statement: 'SELECT "\\\\";',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 12 },
+        firstToken: 'SELECT'
+      },
+      {
+        type: 'statement',
+        statement: '\n SELECT 1;',
+        location: { first_line: 1, first_column: 12, last_line: 2, last_column: 10 },
+        firstToken: 'SELECT'
+      }
+    ]);
+  });
+
   it('should split ";   \\n;   \\r\\n;" correctly', () => {
     testParser(';   \n;   \r\n;', [
       {

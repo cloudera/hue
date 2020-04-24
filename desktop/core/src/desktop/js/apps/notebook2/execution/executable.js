@@ -92,11 +92,15 @@ export default class Executable {
     return (this.executeEnded || Date.now()) - this.executeStarted;
   }
 
-  notify() {
+  notify(sync) {
     window.clearTimeout(this.notifyThrottle);
-    this.notifyThrottle = window.setTimeout(() => {
+    if (sync) {
       huePubSub.publish(EXECUTABLE_UPDATED_EVENT, this);
-    }, 1);
+    } else {
+      this.notifyThrottle = window.setTimeout(() => {
+        huePubSub.publish(EXECUTABLE_UPDATED_EVENT, this);
+      }, 1);
+    }
   }
 
   isReady() {
@@ -165,14 +169,26 @@ export default class Executable {
 
     this.setStatus(EXECUTION_STATUS.running);
     this.setProgress(0);
+    this.notify(true);
 
     try {
-      hueAnalytics.log('notebook', 'execute/' + this.executor.sourceType());
+      hueAnalytics.log(
+        'notebook',
+        'execute/' + (this.executor.connector() ? this.executor.connector().dialect : '')
+      );
       try {
         const response = await this.internalExecute();
         this.handle = response.handle;
         this.history = response.history;
         this.operationId = response.history.uuid;
+        if (response.handle.session_id) {
+          sessionManager.updateSession({
+            type: response.handle.session_type,
+            id: response.handle.session_id,
+            session_id: response.handle.session_guid,
+            properties: []
+          });
+        }
       } catch (err) {
         const match = ERROR_REGEX.exec(err);
         if (match) {
@@ -216,7 +232,6 @@ export default class Executable {
       this.logs.fetchLogs();
     } catch (err) {
       this.setStatus(EXECUTION_STATUS.failed);
-      throw err;
     }
   }
 
@@ -256,6 +271,7 @@ export default class Executable {
               this.nextExecutable.execute();
             }
             break;
+          case EXECUTION_STATUS.canceled:
           case EXECUTION_STATUS.expired:
             this.executeEnded = Date.now();
             this.setStatus(queryStatus);
@@ -301,7 +317,10 @@ export default class Executable {
 
   async cancel() {
     if (this.cancellables.length && this.status === EXECUTION_STATUS.running) {
-      hueAnalytics.log('notebook', 'cancel/' + this.executor.sourceType());
+      hueAnalytics.log(
+        'notebook',
+        'cancel/' + (this.executor.connector() ? this.executor.connector().dialect : '')
+      );
       this.setStatus(EXECUTION_STATUS.canceling);
       while (this.cancellables.length) {
         await this.cancellables.pop().cancel();
@@ -363,25 +382,28 @@ export default class Executable {
   }
 
   async toContext(id) {
-    if (this.executor.snippet) {
+    if (this.snippet) {
+      // V1
       return {
         operationId: this.operationId,
-        snippet: this.executor.snippet.toContextJson(),
-        notebook: await this.executor.snippet.parentNotebook.toContextJson()
+        snippet: this.snippet.toContextJson(),
+        notebook: await this.snippet.parentNotebook.toContextJson()
       };
     }
 
-    const session = await sessionManager.getSession({ type: this.executor.sourceType() });
+    const session = await sessionManager.getSession({ type: this.executor.connector().type });
     const statement = this.getStatement();
     const snippet = {
-      type: this.executor.sourceType(),
+      type: this.executor.connector().type,
       result: {
         handle: this.handle
       },
+      executor: this.executor.toJs(),
       status: this.status,
       id: id || UUID(),
       statement_raw: statement,
       statement: statement,
+      lastExecuted: this.executeStarted,
       variables: [],
       compute: this.executor.compute(),
       namespace: this.executor.namespace(),
@@ -390,13 +412,14 @@ export default class Executable {
     };
 
     const notebook = {
-      type: this.executor.sourceType(),
+      type: this.executor.connector().type,
       snippets: [snippet],
       id: this.notebookId,
       uuid: hueUtils.UUID(),
       name: '',
       isSaved: false,
-      sessions: [session]
+      sessions: [session],
+      editorWsChannel: window.WS_CHANNEL
     };
 
     return {

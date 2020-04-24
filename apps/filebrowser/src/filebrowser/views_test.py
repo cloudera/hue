@@ -25,8 +25,8 @@ from builtins import object
 import json
 import logging
 import os
-
 import re
+import stat
 import sys
 import tempfile
 
@@ -34,9 +34,7 @@ import urllib.request, urllib.error
 import urllib.parse
 
 from time import sleep, time
-
 from avro import schema, datafile, io
-
 from aws.s3.s3fs import S3FileSystemException
 from aws.s3.s3test_utils import get_test_bucket
 
@@ -55,18 +53,25 @@ from desktop.lib.view_util import location_to_url
 from desktop.conf import is_oozie_enabled
 from hadoop import pseudo_hdfs4
 from hadoop.conf import UPLOAD_CHUNK_SIZE
-from useradmin.models import User, Group, default_organization
+from hadoop.fs.webhdfs import WebHdfs
+from useradmin.models import User, Group
 
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE
 from filebrowser.lib.rwx import expand_mode
 from filebrowser.views import snappy_installed
 
 if sys.version_info[0] > 2:
-  from urllib.parse import unquote as urllib_unquote
+  from urllib.parse import unquote as urllib_unquote, urlparse
   open_file = open
 else:
   from urllib import unquote as urllib_unquote
+  from urlparse import urlparse
   open_file = file
+
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 
 LOG = logging.getLogger(__name__)
@@ -86,6 +91,150 @@ def cleanup_file(cluster, path):
     # Don't let cleanup errors mask earlier failures
     LOG.exception('failed to cleanup %s' % path)
 
+
+class TestFileBrowser():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test_filebrowser", groupname='test_filebrowser', recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test_filebrowser")
+    grant_access(self.user.username, 'test_filebrowser', 'filebrowser')
+    add_to_group(self.user.username, 'test_filebrowser')
+
+  def test_listdir_paged(self):
+
+    with patch('desktop.middleware.fsmanager.get_filesystem') as get_filesystem:
+      with patch('filebrowser.views.snappy_installed') as snappy_installed:
+        snappy_installed.return_value = False
+        get_filesystem.return_value = Mock(
+          stats=Mock(
+            return_value=Mock(
+              isDir=True,
+              size=1024,
+              path=b'/',
+              mtime=None,
+              mode=stat.S_IFDIR
+            ),
+          ),
+          normpath=Mock(return_value='/'),
+          listdir_stats=Mock(
+            return_value=[]  # Add "Mock files here"
+          ),
+          superuser='hdfs',
+          supergroup='hdfs'
+        )
+
+        response = self.client.get('/filebrowser/view=')
+
+        assert_equal(200, response.status_code)
+        dir_listing = response.context[0]['files']
+        assert_equal(1, len(dir_listing))
+
+
+  def test_listdir_paged_with_non_ascii(self):
+    parent_dir = Mock(
+      isDir=True,
+      size=0,
+      path=u'/user/systest/test5/Tжейкоб/..',
+      mtime=1581717441.0,
+      mode=16877,
+      user=u'systest',
+      type=u'DIRECTORY',
+      to_json_dict=Mock(
+        return_value={'size': 0, 'group': u'supergroup', 'blockSize': 0, 'replication': 0, 'user': u'systest',
+                      'mtime': 1581717441.0, 'path': u'/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431/..',
+                      'atime': 0.0, 'mode': 16877}
+      )
+    )
+    parent_dir.name = u'..'
+    self_dir = Mock(
+      isDir=True,
+      size=0,
+      path=u'/user/systest/test5/Tжейкоб',
+      mtime=1581717441.0,
+      mode=16877,
+      user=u'systest',
+      type=u'DIRECTORY',
+      to_json_dict=Mock(
+        return_value={'size': 0, 'group': u'supergroup', 'blockSize': 0, 'replication': 0, 'user': u'systest',
+                      'mtime': 1581717441.0, 'path': u'/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431',
+                      'atime': 0.0, 'mode': 16877}
+      )
+    )
+    self_dir.name = u'Tжейкоб'
+    file_1 = Mock(
+      isDir=False,
+      size=9,
+      path=u'/user/systest/test5/Tжейкоб/file_1.txt',
+      mtime=1581670301.0, mode=33279,
+      user=u'systest',
+      type=u'FILE',
+      to_json_dict=Mock(
+        return_value={'size': 9, 'group': u'supergroup', 'blockSize': 134217728, 'replication': 1, 'user': u'systest',
+                      'mtime': 1581670301.0,
+                      'path': u'/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431/file_1.txt',
+                      'atime': 1581708019.0, 'mode': 33279}
+      )
+    )
+    file_1.name = u'file_1.txt'
+    file_2 = Mock(
+      isDir=False,
+      size=0,
+      path=u'/user/systest/test5/Tжейкоб/文件_2.txt',
+      mtime=1581707672.0,
+      mode=33188,
+      user=u'systest',
+      type=u'FILE',
+      to_json_dict=Mock(
+        return_value={'size': 18, 'group': u'supergroup', 'blockSize': 134217728, 'replication': 1, 'user': u'systest',
+                      'mtime': 1581707672.0,
+                      'path': u'/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431/\u6587\u4ef6_2.txt',
+                      'atime': 1581707672.0, 'mode': 33188}
+      )
+    )
+    file_2.name = u'文件_2.txt'
+    file_3 = Mock(
+      isDir=False,
+      size=0,
+      path=u'/user/systest/test5/Tжейкоб/employés_file.txt',
+      mtime=1581039792.0,
+      mode=33188,
+      user=u'systest',
+      type=u'FILE',
+      to_json_dict=Mock(
+        return_value={'size': 0, 'group': u'supergroup', 'blockSize': 134217728, 'replication': 1, 'user': u'systest',
+                      'mtime': 1581039792.0,
+                      'path': u'/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431/employ\xe9s_file.txt',
+                      'atime': 1581708003.0, 'mode': 33188}
+      )
+    )
+    file_3.name = u'employés_file.txt'
+
+    with patch('desktop.middleware.fsmanager.get_filesystem') as get_filesystem:
+      with patch('filebrowser.views.snappy_installed') as snappy_installed:
+        snappy_installed.return_value = False
+        get_filesystem.return_value = Mock(
+          stats=Mock(
+            return_value=self_dir
+          ),
+          normpath=WebHdfs.norm_path,
+          is_sentry_managed=Mock(return_value=False),
+          listdir_stats=Mock(
+            return_value=[parent_dir, file_1, file_2, file_3]
+          ),
+          superuser='hdfs',
+          supergroup='hdfs'
+        )
+
+        response = self.client.get('/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1?pagesize=45&pagenum=1&filter=&sortby=name&descending=false&format=json&_=1581670214204')
+
+        assert_equal(200, response.status_code)
+        dir_listing = json.loads(response.content)['files']
+        assert_equal(5, len(dir_listing))
+        assert_true(b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5",' in response.content, response.content)
+        assert_true(b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1",' in response.content, response.content)
+        assert_true(b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1%2Ffile_1.txt",' in response.content, response.content)
+        assert_true(b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1%2F%E6%96%87%E4%BB%B6_2.txt",' in response.content, response.content)
+        assert_true(b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1%2Femploy%C3%A9s_file.txt",' in response.content, response.content)
 
 class TestFileBrowserWithHadoop(object):
   requires_hadoop = True
@@ -655,9 +804,7 @@ class TestFileBrowserWithHadoop(object):
     """)
 
     f = self.cluster.fs.open(prefix + '/test-view.avro', "w")
-    data_file_writer = datafile.DataFileWriter(f, io.DatumWriter(),
-                                                writers_schema=test_schema,
-                                                codec='deflate')
+    data_file_writer = datafile.DataFileWriter(f, io.DatumWriter(), writers_schema=test_schema, codec='deflate')
     dummy_datum = {
       'name': 'Test',
       'integer': 10,

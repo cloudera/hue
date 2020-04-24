@@ -23,40 +23,30 @@ import threading
 
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
-
 from beeswax.server.dbms import QueryServerException
 from beeswax.server.hive_server2_lib import HiveServerClient
 
 from ImpalaService import ImpalaHiveServer2Service
-from impala.impala_flags import get_webserver_certificate_file
-from impala.conf import DAEMON_API_USERNAME, DAEMON_API_PASSWORD
+from impala.impala_flags import get_webserver_certificate_file, is_webserver_spnego_enabled, is_kerberos_enabled
+from impala.conf import DAEMON_API_USERNAME, DAEMON_API_PASSWORD, COORDINATOR_URL
 
 
 LOG = logging.getLogger(__name__)
 
-API_CACHE = None
-API_CACHE_LOCK = threading.Lock()
-
 
 def get_api(user, url):
-  global  API_CACHE
-  if API_CACHE is None or API_CACHE.get(url) is None:
-    API_CACHE_LOCK.acquire()
-    try:
-      if API_CACHE is None:
-        API_CACHE = {}
-      if API_CACHE.get(url) is None:
-        API_CACHE[url] = ImpalaDaemonApi(url)
-    finally:
-      API_CACHE_LOCK.release()
-  api = API_CACHE[url]
+  api = ImpalaDaemonApi(url)
   api.set_user(user)
   return api
 
 
 def _get_impala_server_url(session):
   properties = session.get_properties()
-  http_addr = properties.get('coordinator_host', properties.get('http_addr'))
+  http_addr = ""
+  if COORDINATOR_URL.get():
+    http_addr = COORDINATOR_URL.get()
+  else:
+    http_addr = properties.get('coordinator_host', properties.get('http_addr'))
   http_addr = http_addr.replace('http://', '').replace('https://', '')
   return ('https://' if get_webserver_certificate_file() else 'http://') + http_addr
 
@@ -146,14 +136,19 @@ class ImpalaDaemonApi(object):
   def __init__(self, server_url):
     self._url = server_url
     self._client = HttpClient(self._url, logger=LOG)
+    self._root = Resource(self._client)
+    self._security_enabled = is_kerberos_enabled()
+    self._webserver_spnego_enabled = is_webserver_spnego_enabled()
+    self._thread_local = threading.local()
+
     # You can set username/password for Impala Web UI which overrides kerberos
     if DAEMON_API_USERNAME.get() is not None and DAEMON_API_PASSWORD.get() is not None:
       self._client.set_digest_auth(DAEMON_API_USERNAME.get(), DAEMON_API_PASSWORD.get())
+      LOG.info('Using username and password for authentication')
 
-    self._root = Resource(self._client)
-    self._security_enabled = False
-    self._thread_local = threading.local()
-
+    elif self._webserver_spnego_enabled or self._security_enabled:
+      self._client.set_kerberos_auth()
+      LOG.info('Using kerberos principal for authentication')
 
   def __str__(self):
     return "ImpalaDaemonApi at %s" % self._url

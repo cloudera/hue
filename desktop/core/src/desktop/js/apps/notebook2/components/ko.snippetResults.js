@@ -33,34 +33,10 @@ import { CURRENT_QUERY_TAB_SWITCHED_EVENT } from 'apps/notebook2/snippet';
 
 export const NAME = 'snippet-results';
 
-const META_TYPE_TO_CSS = {
-  TINYINT_TYPE: 'sort-numeric',
-  SMALLINT_TYPE: 'sort-numeric',
-  INT_TYPE: 'sort-numeric',
-  BIGINT_TYPE: 'sort-numeric',
-  FLOAT_TYPE: 'sort-numeric',
-  DOUBLE_TYPE: 'sort-numeric',
-  DECIMAL_TYPE: 'sort-numeric',
-  TIMESTAMP_TYPE: 'sort-date',
-  DATE_TYPE: 'sort-date',
-  DATETIME_TYPE: 'sort-date'
-};
-
-const isNumericColumn = type =>
-  ['tinyint', 'smallint', 'int', 'bigint', 'float', 'double', 'decimal', 'real'].indexOf(type) !==
-  -1;
-
-const isDateTimeColumn = type => ['timestamp', 'date', 'datetime'].indexOf(type) !== -1;
-
-const isComplexColumn = type => ['array', 'map', 'struct'].indexOf(type) !== -1;
-
-const isStringColumn = type =>
-  !isNumericColumn(type) && !isDateTimeColumn(type) && !isComplexColumn(type);
-
 // prettier-ignore
 const TEMPLATE = `
 <div class="snippet-row">
-  <div class="result-actions">
+  <div class="snippet-tab-actions">
     <div class="btn-group">
       <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showGrid, css: { 'active': showGrid }"><i class="fa fa-fw fa-th"></i> ${ I18n('Grid') }</button>
       <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showChart, css: { 'active': showChart }"><i class="hcha fa-fw hcha-bar-chart"></i> ${ I18n('Chart') }</button>
@@ -76,8 +52,8 @@ const TEMPLATE = `
       </button>
     </div>
   </div>
-  
-  <div class="result-body">
+
+  <div class="snippet-tab-body">
     <div data-bind="visible: type() !== 'table'" style="display:none; margin: 10px 0; overflow-y: auto">
       <!-- ko if: data().length && data()[0][1] != "" -->
       <pre data-bind="text: data()[0][1]" class="no-margin-bottom"></pre>
@@ -95,7 +71,7 @@ const TEMPLATE = `
     </div>
     <div class="table-results" data-bind="visible: type() === 'table'" style="display: none;">
       <div data-bind="visible: !executing() && hasData() && showGrid()" style="display: none; position: relative;">
-        <!-- ko component: { 
+        <!-- ko component: {
           name: 'result-grid',
           params: {
             activeExecutable: activeExecutable,
@@ -139,6 +115,8 @@ const TEMPLATE = `
       </div>
       <div data-bind="visible: executing" style="display: none;">
         <h1 class="empty"><i class="fa fa-spinner fa-spin"></i> ${ I18n('Executing...') }</h1>
+      </div>
+      <div id="wsResult">
       </div>
     </div>
   </div>
@@ -190,19 +168,10 @@ class SnippetResults extends DisposableComponent {
 
     attachTracker(this.activeExecutable, NAME, this, trackedObservables);
 
-    this.cleanedMeta = ko.pureComputed(() => this.meta().filter(item => item.name !== ''));
-
-    this.cleanedDateTimeMeta = ko.pureComputed(() =>
-      this.meta().filter(item => item.name !== '' && isDateTimeColumn(item.type))
-    );
-
-    self.cleanedStringMeta = ko.pureComputed(() =>
-      this.meta().filter(item => item.name !== '' && isStringColumn(item.type))
-    );
-
-    this.cleanedNumericMeta = ko.pureComputed(() =>
-      this.meta().filter(item => item.name !== '' && isNumericColumn(item.type))
-    );
+    this.cleanedMeta = ko.observableArray();
+    this.cleanedDateTimeMeta = ko.observableArray();
+    this.cleanedStringMeta = ko.observableArray();
+    this.cleanedNumericMeta = ko.observableArray();
 
     this.subscribe(this.showChart, val => {
       if (val) {
@@ -228,24 +197,23 @@ class SnippetResults extends DisposableComponent {
     });
 
     let lastRenderedResult = undefined;
-    this.subscribe(RESULT_UPDATED_EVENT, executionResult => {
-      if (this.activeExecutable() === executionResult.executable) {
-        const refresh = lastRenderedResult !== executionResult;
-        this.updateFromExecutionResult(executionResult, refresh);
-        lastRenderedResult = executionResult;
-      }
-    });
-
-    this.subscribe(this.activeExecutable, executable => {
-      if (executable && executable.result) {
-        if (executable !== lastRenderedResult) {
-          this.updateFromExecutionResult(executable.result, true);
-          lastRenderedResult = executable;
-        }
+    const handleResultChange = () => {
+      if (this.activeExecutable() && this.activeExecutable().result) {
+        const refresh = lastRenderedResult !== this.activeExecutable().result;
+        this.updateFromExecutionResult(this.activeExecutable().result, refresh);
+        lastRenderedResult = this.activeExecutable().result;
       } else {
         this.resetResultData();
       }
+    };
+
+    this.subscribe(RESULT_UPDATED_EVENT, executionResult => {
+      if (this.activeExecutable() === executionResult.executable) {
+        handleResultChange();
+      }
     });
+
+    this.subscribe(this.activeExecutable, handleResultChange);
   }
 
   resetResultData() {
@@ -253,8 +221,14 @@ class SnippetResults extends DisposableComponent {
     this.lastFetchedRows([]);
     this.data([]);
     this.meta([]);
+    this.cleanedMeta([]);
+    this.cleanedDateTimeMeta([]);
+    this.cleanedNumericMeta([]);
+    this.cleanedStringMeta([]);
     this.hasMore(false);
     this.type(RESULT_TYPE.TABLE);
+    // eslint-disable-next-line no-undef
+    $('#wsResult').empty();
   }
 
   updateFromExecutionResult(executionResult, refresh) {
@@ -268,19 +242,19 @@ class SnippetResults extends DisposableComponent {
       this.type(executionResult.type);
 
       if (!this.meta().length && executionResult.meta.length) {
-        this.meta(
-          executionResult.meta.map((item, index) => ({
-            name: item.name,
-            type: item.type.replace(/_type/i, '').toLowerCase(),
-            comment: item.comment,
-            cssClass: META_TYPE_TO_CSS[item.type] || 'sort-string',
-            checked: ko.observable(true),
-            originalIndex: index
-          }))
-        );
+        this.meta(executionResult.koEnrichedMeta);
+        this.cleanedMeta(executionResult.cleanedMeta);
+        this.cleanedDateTimeMeta(executionResult.cleanedDateTimeMeta);
+        this.cleanedStringMeta(executionResult.cleanedStringMeta);
+        this.cleanedNumericMeta(executionResult.cleanedNumericMeta);
       }
 
-      if (executionResult.lastRows.length) {
+      if (refresh) {
+        this.data(executionResult.rows);
+      } else if (
+        executionResult.lastRows.length &&
+        this.data().length !== executionResult.rows.length
+      ) {
         this.data.push(...executionResult.lastRows);
       }
       this.lastFetchedRows(executionResult.lastRows);

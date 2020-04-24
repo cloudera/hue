@@ -56,16 +56,11 @@ ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 </style>
 % endif
 
-<script src="${ static('desktop/ext/js/wysihtml5-0.3.0.min.js') }"></script>
-<script src="${ static('desktop/js/bootstrap-wysihtml5-0.0.2.js') }"></script>
-<script src="${ static('desktop/ext/js/bootstrap-editable.wysihtml5.js') }"></script>
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-wysihtml5-0.0.2.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 
-## ${ render_bundle('vendors~tableBrowser') | n,unicode }
 ${ render_bundle('tableBrowser') | n,unicode }
 
 <span class="notebook">
@@ -991,7 +986,7 @@ ${ components.menubar(is_embeddable) }
       dataType: 'json',
       success: function(resp) {
         if (resp.history_uuid) {
-          huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+          huePubSub.publish('notebook.task.submitted', resp);
           huePubSub.publish('metastore.clear.selection');
         } else if (resp && resp.message) {
           $(document).trigger("error", resp.message);
@@ -1029,7 +1024,7 @@ ${ components.menubar(is_embeddable) }
       cluster: compute
     },function(resp) {
       if (resp.history_uuid) {
-        huePubSub.publish('open.editor.query', resp.history_uuid);
+        huePubSub.publish('open.editor.query', resp);
       } else if (resp.message) {
         $(document).trigger("error", resp.message);
       }

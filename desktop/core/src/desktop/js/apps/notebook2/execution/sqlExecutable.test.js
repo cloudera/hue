@@ -20,6 +20,7 @@ import ApiHelper from 'api/apiHelper';
 import SqlExecutable from './sqlExecutable';
 import { EXECUTION_STATUS } from './executable';
 import sessionManager from './sessionManager';
+import * as ApiUtils from 'api/apiUtils';
 
 describe('sqlExecutable.js', () => {
   afterEach(() => {
@@ -30,12 +31,15 @@ describe('sqlExecutable.js', () => {
    * @param statement
    * @return {SqlExecutable}
    */
-  const createSubject = statement => {
+  const createSubject = (statement, limit) => {
     if (typeof statement === 'string') {
       return new SqlExecutable({
         database: 'default',
-        parsedStatement: { statement: statement },
-        sourceType: 'impala'
+        parsedStatement: { statement: statement, firstToken: 'select' },
+        sourceType: 'impala',
+        executor: {
+          defaultLimit: () => limit
+        }
       });
     }
 
@@ -44,7 +48,10 @@ describe('sqlExecutable.js', () => {
       namespace: { id: 'namespace' },
       database: 'default',
       parsedStatement: statement,
-      sourceType: 'impala'
+      sourceType: 'impala',
+      executor: {
+        defaultLimit: () => limit
+      }
     });
   };
 
@@ -55,7 +62,7 @@ describe('sqlExecutable.js', () => {
   });
 
   it('should handle parsed statements', () => {
-    const subject = createSubject({ statement: 'SELECT * FROM customers' });
+    const subject = createSubject({ statement: 'SELECT * FROM customers', firstToken: 'SELECT' });
 
     expect(subject.getStatement()).toEqual('SELECT * FROM customers');
   });
@@ -64,7 +71,7 @@ describe('sqlExecutable.js', () => {
     const subject = createSubject('SELECT * FROM customers');
 
     const simplePostDeferred = $.Deferred();
-    jest.spyOn(ApiHelper, 'simplePost').mockImplementation(url => {
+    jest.spyOn(ApiUtils, 'simplePost').mockImplementation(url => {
       expect(url).toEqual('/notebook/api/execute/impala');
       return simplePostDeferred;
     });
@@ -94,7 +101,7 @@ describe('sqlExecutable.js', () => {
         })
     );
 
-    jest.spyOn(ApiHelper, 'simplePost').mockImplementation(url => {
+    jest.spyOn(ApiUtils, 'simplePost').mockImplementation(url => {
       expect(url).toEqual('/notebook/api/execute/impala');
       return simplePostDeferred;
     });
@@ -117,7 +124,7 @@ describe('sqlExecutable.js', () => {
 
     const simplePostExeuteDeferred = $.Deferred();
     const simplePostCancelDeferred = $.Deferred();
-    jest.spyOn(ApiHelper, 'simplePost').mockImplementation(url => {
+    jest.spyOn(ApiUtils, 'simplePost').mockImplementation(url => {
       if (url === '/notebook/api/execute/impala') {
         return simplePostExeuteDeferred;
       } else if (url === '/notebook/api/cancel_statement') {

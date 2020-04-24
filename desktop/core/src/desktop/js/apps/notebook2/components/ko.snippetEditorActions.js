@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery';
 import * as ko from 'knockout';
 
 import 'ko/bindings/ko.publish';
@@ -22,8 +21,10 @@ import 'ko/bindings/ko.publish';
 import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
 import hueAnalytics from 'utils/hueAnalytics';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { STATUS } from 'apps/notebook2/snippet';
+import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistModal';
+import { DIALECT, STATUS } from 'apps/notebook2/snippet';
 
 const TEMPLATE = `
 <div class="snippet-editor-actions">
@@ -40,13 +41,15 @@ const TEMPLATE = `
           <i class="fa fa-fw fa-map-o"></i> ${I18n('Explain')}
         </a>
       </li>
+      <!-- ko if: window.HAS_GIST -->
       <li>
         <a href="javascript:void(0)" data-bind="click: createGist, css: { 'disabled': !createGistEnabled() }" title="${I18n(
           'Share the query selection via a link'
         )}">
-          <i class="fa fa-wf fa-link"></i> ${I18n('Share link')}
+          <i class="fa fa-fw fa-link"></i> ${I18n('Get shareable link')}
         </a>
       </li>
+      <!-- /ko -->
       <li>
         <a href="javascript:void(0)" data-bind="click: format, css: { 'disabled': !formatEnabled() }" title="${I18n(
           'Format the current SQL query'
@@ -98,7 +101,7 @@ class SnippetEditorActions {
     this.clearEnabled = this.snippet.isReady;
 
     this.compatibilityEnabled = ko.pureComputed(
-      () => this.snippet.type() === 'hive' || this.snippet.type() === 'impala'
+      () => this.snippet.dialect() === DIALECT.hive || this.snippet.dialect() === DIALECT.impala
     );
 
     this.createGistEnabled = ko.pureComputed(
@@ -166,16 +169,12 @@ class SnippetEditorActions {
         this.snippet.ace().getSelectedText() != ''
           ? this.snippet.ace().getSelectedText()
           : this.snippet.statement_raw(),
-      doc_type: this.snippet.type(),
+      doc_type: this.snippet.dialect(),
       name: this.snippet.name(),
       description: ''
     });
 
-    new window.Clipboard('.gist-link-btn');
-
-    $(document).trigger('showGistModal', {
-      link: gistLink
-    });
+    huePubSub.publish(SHOW_GIST_MODAL_EVENT, { link: gistLink });
   }
 
   format() {

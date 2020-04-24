@@ -86,32 +86,36 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
 
       ${ form['email'].errors | n,unicode }
     % else:
+      % if 'username' in form.fields:
+        <div class="text-input
+          % if backend_names == ['OAuthBackend']:
+            hide
+          % endif
+          % if form['username'].errors or (login_errors and not form['username'].errors and not form['password'].errors):
+            error
+          % endif
+        ">
+          ${ form['username'] | n,unicode }
+        </div>
+
+        ${ form['username'].errors | n,unicode }
+      % endif
+    % endif
+
+    % if 'password' in form.fields:
       <div class="text-input
-        % if backend_names == ['OAuthBackend']:
+        % if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
           hide
         % endif
-        % if form['username'].errors or (not form['username'].errors and not form['password'].errors and login_errors):
+        % if form['password'].errors or (login_errors and ('username' in form and not form['username'].errors) and not form['password'].errors):
           error
         % endif
       ">
-        ${ form['username'] | n,unicode }
+        ${ form['password'] | n,unicode }
       </div>
 
-      ${ form['username'].errors | n,unicode }
+      ${ form['password'].errors | n,unicode }
     % endif
-
-    <div class="text-input
-      % if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
-        hide
-      % endif
-      % if form['password'].errors or (('username' in form and not form['username'].errors) and not form['password'].errors and login_errors):
-        error
-      % endif
-    ">
-      ${ form['password'] | n,unicode }
-    </div>
-
-    ${ form['password'].errors | n,unicode }
 
     % if active_directory:
     <div
@@ -139,11 +143,17 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
       % endif
     % endif
 
-    % if first_login_ever:
-      <input type="submit" class="btn btn-primary" value="${_('Create Account')}"/>
-    % else:
-      <input type="submit" class="btn btn-primary" value="${_('Sign In')}"/>
+    % if 'username' in form.fields or 'email' in form.fields:
+      % if first_login_ever:
+        <input type="submit" class="btn btn-primary" value="${ _('Create Account') }"/>
+      % else:
+        <input type="submit" class="btn btn-primary" value="${ _('Sign In') }"/>
+      % endif
+      % if ENABLE_ORGANIZATIONS.get():
+        <input type="submit" class="btn btn-primary" value="${ _('Create Account') }"/>
+      % endif
     % endif
+
     <input type="hidden" name="next" value="${next}"/>
 
   </form>
@@ -155,11 +165,13 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
   % endif
 </div>
 
-<div class="trademark center muted">
+<div id="trademark" class="trademark center muted">
+  <trademark-banner>
   % if CUSTOM.LOGO_SVG.get():
     ${ _('Powered by') } <img src="${ static('desktop/art/hue-login-logo.png') }" width="40" style="vertical-align: middle"  alt="${ _('Hue logo') }"> -
   % endif
   ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
+  </trademark-banner>
 </div>
 
 <script>

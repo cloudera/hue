@@ -20,14 +20,15 @@
 # Local customizations are done by symlinking a file
 # as local_settings.py.
 
-from builtins import map
-from builtins import zip
+from builtins import map, zip
+import datetime
 import gc
 import json
 import logging
 import os
 import pkg_resources
 import sys
+import uuid
 
 import django_opentracing
 
@@ -50,6 +51,7 @@ NICE_NAME = "Hue"
 
 ENV_HUE_PROCESS_NAME = "HUE_PROCESS_NAME"
 ENV_DESKTOP_DEBUG = "DESKTOP_DEBUG"
+LOGGING_CONFIG = None # We're handling our own logging config. Consider upgrading our logging infra to LOGGING_CONFIG
 
 
 ############################################################
@@ -170,6 +172,7 @@ MIDDLEWARE_CLASSES = [
     #@TODO@ Prakash to check FailedLoginMiddleware working or not?
     #'axes.middleware.FailedLoginMiddleware',
     'desktop.middleware.MimeTypeJSFileFixStreamingMiddleware',
+    'crequest.middleware.CrequestMiddleware',
 ]
 
 # if os.environ.get(ENV_DESKTOP_DEBUG):
@@ -208,6 +211,7 @@ INSTALLED_APPS = [
     'axes',
     'webpack_loader',
     'django_prometheus',
+    'crequest',
     #'django_celery_results',
 ]
 
@@ -328,6 +332,11 @@ if DEBUG: # For simplification, force all DEBUG when django_debug_mode is True a
 
 if desktop.conf.ENABLE_ORGANIZATIONS.get():
   AUTH_USER_MODEL = 'useradmin.OrganizationUser'
+  MIGRATION_MODULES = {
+    'beeswax': 'beeswax.org_migrations',
+    'useradmin': 'useradmin.org_migrations',
+    'desktop': 'desktop.org_migrations',
+  }
 
 # Configure allowed hosts
 ALLOWED_HOSTS = desktop.conf.ALLOWED_HOSTS.get()
@@ -497,7 +506,6 @@ SECRET_KEY = desktop.conf.get_secret_key()
 if SECRET_KEY:
   SECRET_KEY += str(AUTHENTICATION_BACKENDS)
 else:
-  import uuid
   SECRET_KEY = str(uuid.uuid4())
 
 # Axes
@@ -602,6 +610,8 @@ if is_s3_enabled():
 
 if is_abfs_enabled():
   file_upload_handlers.insert(0, 'azure.abfs.upload.ABFSFileUploadHandler')
+
+
 FILE_UPLOAD_HANDLERS = tuple(file_upload_handlers)
 
 ############################################################
@@ -738,8 +748,9 @@ if desktop.conf.ENABLE_PROMETHEUS.get():
 
   if 'mysql' in DATABASES['default']['ENGINE']:
     DATABASES['default']['ENGINE'] = DATABASES['default']['ENGINE'].replace('django.db.backends', 'django_prometheus.db.backends')
-  for name, val in list(CACHES.items()):
-    val['BACKEND'] = val['BACKEND'].replace('django.core.cache.backends', 'django_prometheus.cache.backends')
+  # enable only when use these metrics: django_cache_get_total, django_cache_hits_total, django_cache_misses_total
+  # for name, val in list(CACHES.items()):
+  #   val['BACKEND'] = val['BACKEND'].replace('django.core.cache.backends', 'django_prometheus.cache.backends')
 
 
 ################################################################

@@ -235,6 +235,7 @@ class SampleEnrichedEntry {
       return (
         self.catalogEntry().isPrimaryKey() ||
         self.catalogEntry().isPartitionKey() ||
+        self.catalogEntry().isForeignKey() ||
         self.joinColumns().length
       );
     });
@@ -246,6 +247,9 @@ class SampleEnrichedEntry {
       }
       if (self.catalogEntry().isPartitionKey()) {
         keys.push(I18n('Partition key'));
+      }
+      if (self.catalogEntry().isForeignKey()) {
+        keys.push(I18n('Foreign key'));
       }
       if (self.joinColumns().length) {
         let key = I18n(self.joinColumns().length > 1 ? 'Foreign keys' : 'Foreign key') + ':';
@@ -413,8 +417,14 @@ class CatalogEntriesList {
     };
 
     const entrySort = function(a, b) {
-      const aIsKey = a.catalogEntry().isPrimaryKey() || a.catalogEntry().isPartitionKey();
-      const bIsKey = b.catalogEntry().isPrimaryKey() || b.catalogEntry().isPartitionKey();
+      const aIsKey =
+        a.catalogEntry().isPrimaryKey() ||
+        a.catalogEntry().isPartitionKey() ||
+        a.catalogEntry().isForeignKey();
+      const bIsKey =
+        b.catalogEntry().isPrimaryKey() ||
+        b.catalogEntry().isPartitionKey() ||
+        b.catalogEntry().isForeignKey();
       if (aIsKey && !bIsKey) {
         return -1;
       }
@@ -525,7 +535,7 @@ class CatalogEntriesList {
       self.cancellablePromises.push(
         self
           .catalogEntry()
-          .loadNavOptPopularityForChildren({ silenceErrors: true, cancellable: true })
+          .loadOptimizerPopularityForChildren({ silenceErrors: true, cancellable: true })
           .done(popularEntries => {
             if (popularEntries.length) {
               childPromise.done(() => {
@@ -539,15 +549,15 @@ class CatalogEntriesList {
                 popularEntries.forEach(popularEntry => {
                   if (
                     entryIndex[popularEntry.name] &&
-                    popularEntry.navOptPopularity &&
-                    popularEntry.navOptPopularity.selectColumn &&
-                    popularEntry.navOptPopularity.selectColumn.columnCount > 0
+                    popularEntry.optimizerPopularity &&
+                    popularEntry.optimizerPopularity.selectColumn &&
+                    popularEntry.optimizerPopularity.selectColumn.columnCount > 0
                   ) {
-                    totalCount += popularEntry.navOptPopularity.selectColumn.columnCount;
+                    totalCount += popularEntry.optimizerPopularity.selectColumn.columnCount;
                     popularityToApply.push(() => {
                       entryIndex[popularEntry.name].popularity(
                         Math.round(
-                          (100 * popularEntry.navOptPopularity.selectColumn.columnCount) /
+                          (100 * popularEntry.optimizerPopularity.selectColumn.columnCount) /
                             totalCount
                         )
                       );

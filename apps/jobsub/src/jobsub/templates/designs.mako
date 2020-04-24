@@ -15,7 +15,6 @@
 
 <%!
 import cgi
-import urllib
 import time
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _

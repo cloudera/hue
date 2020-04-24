@@ -13,6 +13,7 @@ hue:
     user: "hue"
     password: "hue"
     name: "hue"
+    storageName: "microk8s-hostpath"
   interpreters: |
     [[[postgresql]]]
       name = postgresql
@@ -50,6 +51,7 @@ cron:
   emailStats: "0 13 * * WED,SUN"
 ingress:
   create: false
+  hasAuth: false
   type: "nginx"
   # type: "nginx-ssl"
   # type: "nginx-ssl-staging"
@@ -60,4 +62,7 @@ ingress:
 aws:
   accessKeyId: ""
   secretAccessKey: ""
-  region: "us-east-1"
+  awsRegion: "us-east-1"
+
+## Pod Annotations
+# podAnnotations: {}

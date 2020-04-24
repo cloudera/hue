@@ -14,8 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import huePubSub from 'utils/huePubSub';
+import * as ko from 'knockout';
+
 import AssistLangRefPanel from './ko.assistLangRefPanel';
+import apiHelper from 'api/apiHelper';
+import $ from 'jquery';
+import { refreshConfig } from 'utils/hueConfig';
+import { sleep } from 'utils/hueUtils';
 
 describe('ko.assistLangRefPanel.js', () => {
   beforeAll(() => {
@@ -23,46 +28,48 @@ describe('ko.assistLangRefPanel.js', () => {
     window.HIVE_DOC_TOP_LEVEL = [];
   });
 
-  it('should handle cluster config updates', () => {
-    let clusterConfigGetCalled = false;
-    const configSub = huePubSub.subscribe('cluster.config.get.config', () => {
-      clusterConfigGetCalled = true;
-      huePubSub.publish('cluster.config.set.config', {
-        app_config: {
-          editor: {
-            interpreters: [{ type: 'hive' }, { type: 'impala' }, { type: 'banana' }]
+  it('should handle cluster config updates', async () => {
+    const spy = jest.spyOn(apiHelper, 'getClusterConfig').mockImplementation(() =>
+      $.Deferred()
+        .resolve({
+          status: 0,
+          app_config: {
+            editor: {
+              interpreters: [{ dialect: 'hive' }, { dialect: 'impala' }, { dialect: 'banana' }]
+            }
           }
-        }
-      });
-    });
-    const subject = new AssistLangRefPanel();
+        })
+        .promise()
+    );
+    await refreshConfig();
+    const connector = ko.observable({ dialect: 'impala' });
+    const subject = new AssistLangRefPanel({ connector: connector });
+    await sleep(0);
 
-    expect(clusterConfigGetCalled).toBeTruthy();
-    expect(subject.availableTypes()).toEqual(['hive', 'impala']);
+    expect(spy).toHaveBeenCalled();
+    expect(subject.availableDialects()).toEqual(['hive', 'impala']);
 
-    huePubSub.publish('cluster.config.set.config', {
-      app_config: {
-        editor: {
-          interpreters: [{ type: 'impala' }]
-        }
-      }
-    });
+    spy.mockRestore();
 
-    expect(subject.availableTypes()).toEqual(['impala']);
-    expect(subject.sourceType()).toEqual('impala');
+    const changeSpy = jest.spyOn(apiHelper, 'getClusterConfig').mockImplementation(() =>
+      $.Deferred()
+        .resolve({
+          status: 0,
+          app_config: {
+            editor: {
+              interpreters: [{ dialect: 'impala' }]
+            }
+          }
+        })
+        .promise()
+    );
+    await refreshConfig();
+    expect(changeSpy).toHaveBeenCalled();
+    changeSpy.mockRestore();
 
-    huePubSub.publish('cluster.config.set.config', {
-      app_config: {
-        editor: {
-          interpreters: [{ type: 'banana' }]
-        }
-      }
-    });
+    await sleep(0);
 
-    expect(subject.availableTypes()).toEqual([]);
-    expect(subject.sourceType()).toBeFalsy();
-
-    configSub.remove();
-    subject.dispose();
+    expect(subject.availableDialects()).toEqual(['impala']);
+    expect(subject.activeDialect()).toEqual('impala');
   });
 });

@@ -23,12 +23,17 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import force_unicode
+from desktop.conf import has_channels
 from kafka.ksql_client import KSqlApi as KSqlClientApi
 
 from notebook.connectors.base import Api, QueryError
 
 
 LOG = logging.getLogger(__name__)
+
+
+if has_channels():
+  from notebook.consumer import _send_to_channel
 
 
 def query_error_handler(func):
@@ -46,25 +51,39 @@ class KSqlApi(Api):
   def __init__(self, user, interpreter=None):
     Api.__init__(self, user, interpreter=interpreter)
 
-    self.db = KSqlClientApi(user=user)
+    self.options = interpreter['options']
+
+    self.url = self.options['url']
+
+
+  def _get_db(self):
+    return KSqlClientApi(user=self.user, url=self.url)
 
 
   @query_error_handler
   def execute(self, notebook, snippet):
-    data, description = self.db.query(snippet['statement'])
+    channel_name = notebook.get('editorWsChannel')
+
+    db = self._get_db()
+
+    data, description = db.query(
+        snippet['statement'],
+        channel_name=channel_name
+    )
     has_result_set = data is not None
 
     return {
-      'sync': True,
+      'sync': not (has_channels() and channel_name),
       'has_result_set': has_result_set,
       'result': {
-        'has_more': False,
-        'data': data if has_result_set else [],
-        'meta': [{
-          'name': col[0],
-          'type': col[1],
-          'comment': ''
-        } for col in description] if has_result_set else [],
+          'has_more': False,
+          'data': data if has_result_set else [],
+          'meta': [{
+            'name': col['name'],
+            'type': col['type'],
+            'comment': ''
+          } for col in description
+        ] if has_result_set else [],
         'type': 'table'
       }
     }
@@ -79,17 +98,41 @@ class KSqlApi(Api):
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
     response = {}
 
-    try:
-      if database is None:
-        response['databases'] = ['default']
-      elif table is None:
-        response['tables_meta'] = self.db.show_tables()
-      else:
-        response = {}
+    db = self._get_db()
 
-    except Exception as e:
-      LOG.warn('Autocomplete data fetching error: %s' % e)
-      response['code'] = 500
-      response['error'] = e.message
+    if database is None:
+      response['databases'] = ['tables', 'topics', 'streams']
+    elif table is None:
+      if database == 'tables':
+        response['tables_meta'] = db.show_tables()
+      elif database == 'topics':
+        response['tables_meta'] = db.show_topics()
+      elif database == 'streams':
+        response['tables_meta'] = [{
+            'name': t['name'],
+            'type': t['type'],
+            'comment': 'Topic: %(topic)s Format: %(format)s' % t
+          }
+          for t in db.show_streams()
+        ]
+    elif column is None:
+      columns = db.get_columns(table)
+      response['columns'] = [col['name'] for col in columns]
+      response['extended_columns'] = [{
+          'comment': col.get('comment'),
+          'name': col.get('name'),
+          'type': str(col['schema'].get('type'))
+        }
+        for col in columns
+      ]
 
     return response
+
+
+  def fetch_result(self, notebook, snippet, rows, start_over):
+    """Only called at the end of a live query."""
+    return {
+      'has_more': False,
+      'data': [],
+      'meta': []
+    }

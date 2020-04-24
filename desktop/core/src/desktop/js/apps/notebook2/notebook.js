@@ -25,6 +25,14 @@ import hueUtils from 'utils/hueUtils';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 
 import Snippet, { STATUS as SNIPPET_STATUS } from 'apps/notebook2/snippet';
+import { HISTORY_CLEARED_EVENT } from 'apps/notebook2/components/ko.queryHistory';
+import { UPDATE_SAVED_QUERIES_EVENT } from 'apps/notebook2/components/ko.savedQueries';
+import SqlExecutable from './execution/sqlExecutable';
+import {
+  ASSIST_DB_PANEL_IS_READY_EVENT,
+  ASSIST_IS_DB_PANEL_READY_EVENT,
+  ASSIST_SET_DATABASE_EVENT
+} from 'ko/components/assist/events';
 
 export default class Notebook {
   constructor(vm, notebookRaw) {
@@ -43,20 +51,14 @@ export default class Notebook {
     this.canWrite = ko.observable(notebookRaw.can_write !== false);
     this.onSuccessUrl = ko.observable(notebookRaw.onSuccessUrl);
     this.pubSubUrl = ko.observable(notebookRaw.pubSubUrl);
+
     this.isPresentationModeDefault = ko.observable(!!notebookRaw.isPresentationModeDefault);
     this.isPresentationMode = ko.observable(false);
     this.isPresentationModeInitialized = ko.observable(false);
-    this.isPresentationMode.subscribe(newValue => {
-      if (!newValue) {
-        this.cancelExecutingAll();
-      }
-      huePubSub.publish('editor.presentation.operate.toggle', newValue); // Problem with headers / row numbers redraw on full screen results
-      vm.togglePresentationMode();
-      if (newValue) {
-        hueAnalytics.convert('editor', 'presentation');
-      }
-    });
+    this.isPresentationMode.subscribe(this.onPresentationModeChange.bind(this));
     this.presentationSnippets = ko.observable({});
+    this.prePresentationModeSnippet = undefined;
+
     this.isHidingCode = ko.observable(!!notebookRaw.isHidingCode);
 
     this.snippets = ko.observableArray();
@@ -75,42 +77,6 @@ export default class Notebook {
         vm.selectedNotebook().history()[0].type === this.type()
         ? vm.selectedNotebook().history()
         : []
-    );
-
-    // This is to keep the "Saved Query" tab selected when opening a doc from the left assist
-    // TODO: Refactor code to reflect purpose
-    this.history.subscribe(val => {
-      if (
-        this.id() == null &&
-        val.length === 0 &&
-        this.historyFilter() === '' &&
-        !vm.isNotificationManager()
-      ) {
-        this.snippets()[0].currentQueryTab('savedQueries');
-      }
-    });
-
-    this.historyFilter = ko.observable('');
-    this.historyFilterVisible = ko.observable(false);
-    this.historyFilter.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 900 } });
-    this.historyFilter.subscribe(() => {
-      if (this.historyCurrentPage() !== 1) {
-        this.historyCurrentPage(1);
-      } else {
-        this.fetchHistory();
-      }
-    });
-    this.loadingHistory = ko.observable(this.history().length === 0);
-    this.historyInitialHeight = ko.observable(0).extend({ throttle: 1000 });
-    this.forceHistoryInitialHeight = ko.observable(false);
-    this.historyCurrentPage = ko.observable(
-      vm.selectedNotebook() ? vm.selectedNotebook().historyCurrentPage() : 1
-    );
-    this.historyCurrentPage.subscribe(() => {
-      this.fetchHistory();
-    });
-    this.historyTotalPages = ko.observable(
-      vm.selectedNotebook() ? vm.selectedNotebook().historyTotalPages() : 1
     );
 
     this.schedulerViewModel = null;
@@ -132,7 +98,6 @@ export default class Notebook {
     this.canSave = vm.canSave;
 
     this.unloaded = ko.observable(false);
-    this.updateHistoryFailed = false;
 
     this.viewSchedulerId = ko.observable(notebookRaw.viewSchedulerId || '');
     this.viewSchedulerId.subscribe(() => {
@@ -158,27 +123,29 @@ export default class Notebook {
           this.presentationSnippets()[key] = _snippet;
         });
       }
-      if (vm.editorMode() && this.history().length === 0) {
-        this.fetchHistory(() => {
-          this.updateHistory(['starting', 'running'], 30000);
-          this.updateHistory(['available'], 60000 * 5);
-        });
-      }
     }
 
+    huePubSub.subscribe(HISTORY_CLEARED_EVENT, () => {
+      if (this.isHistory()) {
+        this.id(null);
+        this.uuid(hueUtils.UUID());
+        this.parentVm.changeURL(this.parentVm.URLS.editor + '?type=' + this.parentVm.editorType());
+      }
+    });
+
     huePubSub.subscribeOnce(
-      'assist.db.panel.ready',
+      ASSIST_DB_PANEL_IS_READY_EVENT,
       () => {
         if (this.type().indexOf('query') === 0) {
-          const whenDatabaseAvailable = function(snippet) {
-            huePubSub.publish('assist.set.database', {
-              source: snippet.type(),
+          const whenDatabaseAvailable = snippet => {
+            huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
+              connector: snippet.connector(),
               namespace: snippet.namespace(),
               name: snippet.database()
             });
           };
 
-          const whenNamespaceAvailable = function(snippet) {
+          const whenNamespaceAvailable = snippet => {
             if (snippet.database()) {
               whenDatabaseAvailable(snippet);
             } else {
@@ -189,7 +156,7 @@ export default class Notebook {
             }
           };
 
-          const whenSnippetAvailable = function(snippet) {
+          const whenSnippetAvailable = snippet => {
             if (snippet.namespace()) {
               whenNamespaceAvailable(snippet);
             } else {
@@ -215,7 +182,7 @@ export default class Notebook {
       vm.huePubSubId
     );
 
-    huePubSub.publish('assist.is.db.panel.ready');
+    huePubSub.publish(ASSIST_IS_DB_PANEL_READY_EVENT);
   }
 
   addSnippet(snippetRaw) {
@@ -223,32 +190,6 @@ export default class Notebook {
     this.snippets.push(newSnippet);
     newSnippet.init();
     return newSnippet;
-  }
-
-  async clearHistory() {
-    hueAnalytics.log('notebook', 'clearHistory');
-    apiHelper
-      .clearNotebookHistory({
-        notebookJson: await this.toContextJson(),
-        docType: this.selectedSnippet(),
-        isNotificationManager: this.parentVm.isNotificationManager()
-      })
-      .then(() => {
-        this.history.removeAll();
-        if (this.isHistory()) {
-          this.id(null);
-          this.uuid(hueUtils.UUID());
-          this.parentVm.changeURL(
-            this.parentVm.URLS.editor + '?type=' + this.parentVm.editorType()
-          );
-        }
-      })
-      .fail(xhr => {
-        if (xhr.status !== 502) {
-          $(document).trigger('error', xhr.responseText);
-        }
-      });
-    $(document).trigger('hideHistoryModal');
   }
 
   clearResults() {
@@ -277,48 +218,8 @@ export default class Notebook {
     this.snippets()[this.executingAllIndex()].execute();
   }
 
-  fetchHistory(callback) {
-    const QUERIES_PER_PAGE = 50;
-    this.loadingHistory(true);
-
-    $.get(
-      '/notebook/api/get_history',
-      {
-        doc_type: this.selectedSnippet(),
-        limit: QUERIES_PER_PAGE,
-        page: this.historyCurrentPage(),
-        doc_text: this.historyFilter(),
-        is_notification_manager: this.parentVm.isNotificationManager()
-      },
-      data => {
-        const parsedHistory = [];
-        if (data && data.history) {
-          data.history.forEach(nbk => {
-            parsedHistory.push(
-              this.makeHistoryRecord(
-                nbk.absoluteUrl,
-                nbk.data.statement,
-                nbk.data.lastExecuted,
-                nbk.data.status,
-                nbk.name,
-                nbk.uuid
-              )
-            );
-          });
-        }
-        this.history(parsedHistory);
-        this.historyTotalPages(Math.ceil(data.count / QUERIES_PER_PAGE));
-      }
-    ).always(() => {
-      this.loadingHistory(false);
-      if (callback) {
-        callback();
-      }
-    });
-  }
-
   getSnippets(type) {
-    return this.snippets().filter(snippet => snippet.type() === type);
+    return this.snippets().filter(snippet => snippet.dialect() === type);
   }
 
   loadScheduler() {
@@ -331,7 +232,7 @@ export default class Notebook {
       }
       hueAnalytics.log('notebook', 'schedule/' + action);
 
-      const getCoordinator = function() {
+      const getCoordinator = () => {
         $.get(
           '/scheduler/api/schedule/' + action + '/',
           {
@@ -343,7 +244,7 @@ export default class Notebook {
             if ($('#schedulerEditor').length > 0) {
               huePubSub.publish('hue4.process.headers', {
                 response: data.layout,
-                callback: function(r) {
+                callback: r => {
                   const $schedulerEditor = $('#schedulerEditor');
                   $schedulerEditor.html(r);
 
@@ -397,17 +298,6 @@ export default class Notebook {
     }
   }
 
-  makeHistoryRecord(url, statement, lastExecuted, status, name, uuid) {
-    return komapping.fromJS({
-      url: url,
-      query: statement.substring(0, 1000) + (statement.length > 1000 ? '...' : ''),
-      lastExecuted: lastExecuted,
-      status: status,
-      name: name,
-      uuid: uuid
-    });
-  }
-
   newSnippet(type) {
     if (type) {
       this.selectedSnippet(type);
@@ -439,18 +329,6 @@ export default class Notebook {
     this.snippets(this.snippets().move(this.snippets().length - 1, idx));
   }
 
-  nextHistoryPage() {
-    if (this.historyCurrentPage() < this.historyTotalPages()) {
-      this.historyCurrentPage(this.historyCurrentPage() + 1);
-    }
-  }
-
-  prevHistoryPage() {
-    if (this.historyCurrentPage() !== 1) {
-      this.historyCurrentPage(this.historyCurrentPage() - 1);
-    }
-  }
-
   async save(callback) {
     hueAnalytics.log('notebook', 'save');
 
@@ -471,20 +349,11 @@ export default class Notebook {
         this.isHistory(false);
         $(document).trigger('info', data.message);
         if (editorMode) {
-          if (!data.save_as) {
-            const existingQuery = this.snippets()[0]
-              .queries()
-              .filter(item => item.uuid() === data.uuid);
-            if (existingQuery.length > 0) {
-              existingQuery[0].name(data.name);
-              existingQuery[0].description(data.description);
-              existingQuery[0].last_modified(data.last_modified);
-            }
-          } else if (this.snippets()[0].queries().length > 0) {
-            // Saved queries tab already loaded
-            this.snippets()[0].queries.unshift(komapping.fromJS(data));
-          }
+          huePubSub.publish(UPDATE_SAVED_QUERIES_EVENT, data);
 
+          if (data.save_as) {
+            huePubSub.publish('assist.document.refresh');
+          }
           if (this.coordinatorUuid() && this.schedulerViewModel) {
             this.saveScheduler();
             this.schedulerViewModel.coordinator.refreshParameters();
@@ -559,6 +428,99 @@ export default class Notebook {
     });
   }
 
+  onPresentationModeChange(isPresentationMode) {
+    if (isPresentationMode) {
+      hueAnalytics.convert('editor', 'presentation');
+    }
+
+    // Problem with headers / row numbers redraw on full screen results
+    huePubSub.publish('editor.presentation.operate.toggle', isPresentationMode);
+    const newSnippets = [];
+
+    if (isPresentationMode) {
+      const sourceSnippet = this.snippets()[0];
+      this.prePresentationModeSnippet = sourceSnippet;
+      const variables = sourceSnippet.variables();
+      const statementKeys = {};
+
+      const database = sourceSnippet.database();
+
+      sourceSnippet.executor.executables.forEach(executable => {
+        const sqlStatement = executable.parsedStatement.statement;
+        const statementKey = sqlStatement.hashCode() + database;
+
+        let presentationSnippet;
+
+        if (!this.presentationSnippets()[statementKey]) {
+          const titleLines = [];
+          const statementLines = [];
+          sqlStatement
+            .trim()
+            .split('\n')
+            .forEach(line => {
+              if (line.trim().startsWith('--') && statementLines.length === 0) {
+                titleLines.push(line.substr(2));
+              } else {
+                statementLines.push(line);
+              }
+            });
+          presentationSnippet = new Snippet(this.parentVm, this, {
+            connector: sourceSnippet.connector(),
+            statement_raw: statementLines.join('\n'),
+            database: database,
+            name: titleLines.join('\n'),
+            variables: komapping.toJS(variables)
+          });
+          window.setTimeout(() => {
+            const executableRaw = executable.toJs();
+            const reattachedExecutable = SqlExecutable.fromJs(
+              presentationSnippet.executor,
+              executableRaw
+            );
+            reattachedExecutable.result = executable.result;
+            presentationSnippet.executor.executables = [reattachedExecutable];
+            presentationSnippet.activeExecutable(reattachedExecutable);
+          }, 1000); // TODO: Make it possible to set activeSnippet on Snippet creation
+          presentationSnippet.init();
+          this.presentationSnippets()[statementKey] = presentationSnippet;
+        } else {
+          presentationSnippet = this.presentationSnippets()[statementKey];
+        }
+        presentationSnippet.variables(variables);
+        statementKeys[statementKey] = true;
+        newSnippets.push(presentationSnippet);
+      });
+
+      Object.keys(this.presentationSnippets()).forEach(key => {
+        // Dead statements
+        if (!statementKeys[key]) {
+          this.presentationSnippets()[key].executor.executables.forEach(executable => {
+            executable.cancelBatchChain();
+          });
+          delete this.presentationSnippets()[key];
+        }
+      });
+    } else {
+      newSnippets.push(this.prePresentationModeSnippet);
+    }
+    this.parentVm.editorMode(!isPresentationMode);
+    this.snippets(newSnippets);
+
+    newSnippets.forEach(snippet => {
+      huePubSub.publish('editor.redraw.data', { snippet: snippet });
+      if (this.isPresentationMode()) {
+        window.setTimeout(() => {
+          snippet.executor.executables.forEach(executable => {
+            executable.notify();
+            if (executable.result) {
+              executable.result.notify();
+            }
+          });
+        }, 1000); // TODO: Make it possible to set activeSnippet on Snippet creation
+      }
+    });
+  }
+
   async toContextJson() {
     return JSON.stringify({
       id: this.id(),
@@ -587,7 +549,10 @@ export default class Notebook {
       name: this.name(),
       onSuccessUrl: this.onSuccessUrl(),
       parentSavedQueryUuid: this.parentSavedQueryUuid(),
-      presentationSnippets: this.presentationSnippets(),
+      presentationSnippets: Object.keys(this.presentationSnippets()).reduce((result, key) => {
+        result[key] = this.presentationSnippets()[key].toJs();
+        return result;
+      }, {}),
       pubSubUrl: this.pubSubUrl(),
       result: {}, // TODO: Moved to executor but backend requires it
       sessions: await sessionManager.getAllSessions(),
@@ -615,51 +580,5 @@ export default class Notebook {
       }
     });
     return currentQueries;
-  }
-
-  updateHistory(statuses, interval) {
-    let items = this.history()
-      .filter(item => statuses.indexOf(item.status()) !== -1)
-      .slice(0, 25);
-
-    const updateHistoryCall = item => {
-      apiHelper
-        .checkStatus({ notebookJson: JSON.stringify({ uuid: item.uuid() }) })
-        .then(data => {
-          const status =
-            data.status === -3
-              ? 'expired'
-              : data.status === 0
-              ? data.query_status.status
-              : 'failed';
-          if (status && item.status() !== status) {
-            item.status(status);
-          }
-        })
-        .fail(() => {
-          items = [];
-          this.updateHistoryFailed = true;
-          console.warn('Lost connectivity to the Hue history refresh backend.');
-        })
-        .always(() => {
-          if (items.length > 0) {
-            window.setTimeout(() => {
-              updateHistoryCall(items.pop());
-            }, 1000);
-          } else if (!this.updateHistoryFailed) {
-            window.setTimeout(() => {
-              this.updateHistory(statuses, interval);
-            }, interval);
-          }
-        });
-    };
-
-    if (items.length > 0) {
-      updateHistoryCall(items.pop());
-    } else if (!this.updateHistoryFailed) {
-      window.setTimeout(() => {
-        this.updateHistory(statuses, interval);
-      }, interval);
-    }
   }
 }

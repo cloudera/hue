@@ -693,7 +693,7 @@ msgid "Error loading my queries"
 msgstr "Fehler beim Laden meiner Abfragen"
 
 #: src/notebook/templates/editor_components.mako:802
-msgid "You don't have any saved query."
+msgid "You don't have any saved queries."
 msgstr "Keine gespeicherten Abfragen vorhanden."
 
 #: src/notebook/templates/editor_components.mako:811

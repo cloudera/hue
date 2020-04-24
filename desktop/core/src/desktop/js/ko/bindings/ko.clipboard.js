@@ -22,7 +22,7 @@ ko.bindingHandlers.clipboard = {
       console.warn('ko.clipboard.js depends on window.Clipboard');
       return;
     }
-    const options = valueAccessor();
+    const options = valueAccessor() || {};
 
     const clipboard = new window.Clipboard(element, {
       target: options.target,

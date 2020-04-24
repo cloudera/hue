@@ -1,0 +1,911 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    examples.versioned_history.test_versioning
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+        <link rel="copyright" title="Copyright" href="../../../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../../../index.html" />
+        <link rel="up" title="Module code" href="../../index.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.16</span>
+
+
+        | Release Date: April 7, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="">
+
+        <div id="index-nav">
+            <form class="search" action="../../../search.html" method="get">
+              <label>
+                 Search terms:
+              <input type="text" placeholder="search..." name="q" size="12" />
+              </label>
+              <input type="submit" value="Search" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+
+            <p>
+            <a href="../../../contents.html">Contents</a> |
+            <a href="../../../genindex.html">Index</a>
+            </p>
+
+        </div>
+
+
+    </div>
+
+    
+
+    <div id="docs-body" class="" >
+        
+<h1>Source code for examples.versioned_history.test_versioning</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Unit tests illustrating usage of the ``history_meta.py``</span>
+<span class="sd">module functions.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">unittest</span> <span class="k">import</span> <span class="n">TestCase</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">Boolean</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">Column</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">create_engine</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">ForeignKey</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">Integer</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">select</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">String</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">clear_mappers</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">column_property</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">deferred</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">exc</span> <span class="k">as</span> <span class="n">orm_exc</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">relationship</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">Session</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.testing</span> <span class="k">import</span> <span class="n">assert_raises</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.testing</span> <span class="k">import</span> <span class="n">AssertsCompiledSQL</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.testing</span> <span class="k">import</span> <span class="n">eq_</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.testing</span> <span class="k">import</span> <span class="n">ne_</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.testing.entities</span> <span class="k">import</span> <span class="n">ComparableEntity</span>
+<span class="kn">from</span> <span class="nn">.history_meta</span> <span class="k">import</span> <span class="n">Versioned</span>
+<span class="kn">from</span> <span class="nn">.history_meta</span> <span class="k">import</span> <span class="n">versioned_session</span>
+
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+
+<span class="n">engine</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">setup_module</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">engine</span>
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s2">&quot;sqlite://&quot;</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">TestVersioning</span><span class="p">(</span><span class="n">TestCase</span><span class="p">,</span> <span class="n">AssertsCompiledSQL</span><span class="p">):</span>
+    <span class="n">__dialect__</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
+
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+        <span class="n">versioned_session</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">clear_mappers</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">drop_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">create_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_plain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">SomeClass</span><span class="p">(</span><span class="n">Versioned</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">ComparableEntity</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;sometable&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tables</span><span class="p">()</span>
+        <span class="n">sess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1&quot;</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">sc</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;sc1modified&quot;</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="n">sc</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">2</span>
+
+        <span class="n">SomeClassHistory</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="o">.</span><span class="n">__history_mapper__</span><span class="o">.</span><span class="n">class_</span>
+
+        <span class="n">eq_</span><span class="p">(</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SomeClassHistory</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">SomeClassHistory</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+            <span class="p">[</span><span class="n">SomeClassHistory</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1&quot;</span><span class="p">)],</span>
+        <span class="p">)</span>
+
+        <span class="n">sc</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;sc1modified2&quot;</span>
+
+        <span class="n">eq_</span><span class="p">(</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SomeClassHistory</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">SomeClassHistory</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+            <span class="p">[</span>
+                <span class="n">SomeClassHistory</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1&quot;</span><span class="p">),</span>
+                <span class="n">SomeClassHistory</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1modified&quot;</span><span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">sc</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">3</span>
+
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">sc</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;temp&quot;</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;sc1modified2&quot;</span>
+
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">eq_</span><span class="p">(</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SomeClassHistory</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">SomeClassHistory</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+            <span class="p">[</span>
+                <span class="n">SomeClassHistory</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1&quot;</span><span class="p">),</span>
+                <span class="n">SomeClassHistory</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1modified&quot;</span><span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="n">sess</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">eq_</span><span class="p">(</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SomeClassHistory</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">SomeClassHistory</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+            <span class="p">[</span>
+                <span class="n">SomeClassHistory</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1&quot;</span><span class="p">),</span>
+                <span class="n">SomeClassHistory</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1modified&quot;</span><span class="p">),</span>
+                <span class="n">SomeClassHistory</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1modified2&quot;</span><span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_w_mapper_versioning</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">SomeClass</span><span class="p">(</span><span class="n">Versioned</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">ComparableEntity</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;sometable&quot;</span>
+            <span class="n">use_mapper_versioning</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tables</span><span class="p">()</span>
+        <span class="n">sess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1&quot;</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">s2</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">sess</span><span class="o">.</span><span class="n">bind</span><span class="p">)</span>
+        <span class="n">sc2</span> <span class="o">=</span> <span class="n">s2</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SomeClass</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="n">sc2</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;sc1modified&quot;</span>
+
+        <span class="n">sc</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;sc1modified_again&quot;</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">eq_</span><span class="p">(</span><span class="n">sc</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">assert_raises</span><span class="p">(</span><span class="n">orm_exc</span><span class="o">.</span><span class="n">StaleDataError</span><span class="p">,</span> <span class="n">s2</span><span class="o">.</span><span class="n">flush</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_from_null</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">SomeClass</span><span class="p">(</span><span class="n">Versioned</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">ComparableEntity</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;sometable&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tables</span><span class="p">()</span>
+        <span class="n">sess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="p">()</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">sc</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;sc1&quot;</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="n">sc</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">2</span>
+
+    <span class="k">def</span> <span class="nf">test_insert_null</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">SomeClass</span><span class="p">(</span><span class="n">Versioned</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">ComparableEntity</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;sometable&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">boole</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Boolean</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tables</span><span class="p">()</span>
+        <span class="n">sess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="p">(</span><span class="n">boole</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">sc</span><span class="o">.</span><span class="n">boole</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">sc</span><span class="o">.</span><span class="n">boole</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">SomeClassHistory</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="o">.</span><span class="n">__history_mapper__</span><span class="o">.</span><span class="n">class_</span>
+
+        <span class="n">eq_</span><span class="p">(</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SomeClassHistory</span><span class="o">.</span><span class="n">boole</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">SomeClassHistory</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+            <span class="p">[(</span><span class="kc">True</span><span class="p">,),</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)],</span>
+        <span class="p">)</span>
+
+        <span class="n">eq_</span><span class="p">(</span><span class="n">sc</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_deferred</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;test versioning of unloaded, deferred columns.&quot;&quot;&quot;</span>
+
+        <span class="k">class</span> <span class="nc">SomeClass</span><span class="p">(</span><span class="n">Versioned</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">ComparableEntity</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;sometable&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">deferred</span><span class="p">(</span><span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">25</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tables</span><span class="p">()</span>
+        <span class="n">sess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="s2">&quot;somedata&quot;</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SomeClass</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="s2">&quot;data&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sc</span><span class="o">.</span><span class="vm">__dict__</span>
+
+        <span class="n">sc</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;sc1modified&quot;</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="n">sc</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">2</span>
+
+        <span class="n">SomeClassHistory</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="o">.</span><span class="n">__history_mapper__</span><span class="o">.</span><span class="n">class_</span>
+
+        <span class="n">eq_</span><span class="p">(</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SomeClassHistory</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">SomeClassHistory</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+            <span class="p">[</span><span class="n">SomeClassHistory</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="s2">&quot;somedata&quot;</span><span class="p">)],</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_joined_inheritance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">BaseClass</span><span class="p">(</span><span class="n">Versioned</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">ComparableEntity</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;basetable&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+            <span class="nb">type</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>
+
+            <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;polymorphic_on&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
+                <span class="s2">&quot;polymorphic_identity&quot;</span><span class="p">:</span> <span class="s2">&quot;base&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="k">class</span> <span class="nc">SubClassSeparatePk</span><span class="p">(</span><span class="n">BaseClass</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;subtable1&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">column_property</span><span class="p">(</span>
+                <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">BaseClass</span><span class="o">.</span><span class="n">id</span>
+            <span class="p">)</span>
+            <span class="n">base_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;basetable.id&quot;</span><span class="p">))</span>
+            <span class="n">subdata1</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+            <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;polymorphic_identity&quot;</span><span class="p">:</span> <span class="s2">&quot;sep&quot;</span><span class="p">}</span>
+
+        <span class="k">class</span> <span class="nc">SubClassSamePk</span><span class="p">(</span><span class="n">BaseClass</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;subtable2&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;basetable.id&quot;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">subdata2</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+            <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;polymorphic_identity&quot;</span><span class="p">:</span> <span class="s2">&quot;same&quot;</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tables</span><span class="p">()</span>
+        <span class="n">sess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span>
+
+        <span class="n">sep1</span> <span class="o">=</span> <span class="n">SubClassSeparatePk</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;sep1&quot;</span><span class="p">,</span> <span class="n">subdata1</span><span class="o">=</span><span class="s2">&quot;sep1subdata&quot;</span><span class="p">)</span>
+        <span class="n">base1</span> <span class="o">=</span> <span class="n">BaseClass</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;base1&quot;</span><span class="p">)</span>
+        <span class="n">same1</span> <span class="o">=</span> <span class="n">SubClassSamePk</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;same1&quot;</span><span class="p">,</span> <span class="n">subdata2</span><span class="o">=</span><span class="s2">&quot;same1subdata&quot;</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">add_all</span><span class="p">([</span><span class="n">sep1</span><span class="p">,</span> <span class="n">base1</span><span class="p">,</span> <span class="n">same1</span><span class="p">])</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">base1</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;base1mod&quot;</span>
+        <span class="n">same1</span><span class="o">.</span><span class="n">subdata2</span> <span class="o">=</span> <span class="s2">&quot;same1subdatamod&quot;</span>
+        <span class="n">sep1</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;sep1mod&quot;</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">BaseClassHistory</span> <span class="o">=</span> <span class="n">BaseClass</span><span class="o">.</span><span class="n">__history_mapper__</span><span class="o">.</span><span class="n">class_</span>
+        <span class="n">SubClassSeparatePkHistory</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">SubClassSeparatePk</span><span class="o">.</span><span class="n">__history_mapper__</span><span class="o">.</span><span class="n">class_</span>
+        <span class="p">)</span>
+        <span class="n">SubClassSamePkHistory</span> <span class="o">=</span> <span class="n">SubClassSamePk</span><span class="o">.</span><span class="n">__history_mapper__</span><span class="o">.</span><span class="n">class_</span>
+        <span class="n">eq_</span><span class="p">(</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">BaseClassHistory</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">BaseClassHistory</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+            <span class="p">[</span>
+                <span class="n">SubClassSeparatePkHistory</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sep1&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;sep&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span>
+                <span class="p">),</span>
+                <span class="n">BaseClassHistory</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;base1&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">SubClassSamePkHistory</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;same1&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="n">same1</span><span class="o">.</span><span class="n">subdata2</span> <span class="o">=</span> <span class="s2">&quot;same1subdatamod2&quot;</span>
+
+        <span class="n">eq_</span><span class="p">(</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">BaseClassHistory</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">BaseClassHistory</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">BaseClassHistory</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+            <span class="p">[</span>
+                <span class="n">SubClassSeparatePkHistory</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sep1&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;sep&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span>
+                <span class="p">),</span>
+                <span class="n">BaseClassHistory</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;base1&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">SubClassSamePkHistory</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;same1&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span>
+                <span class="p">),</span>
+                <span class="n">SubClassSamePkHistory</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;same1&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">2</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="n">base1</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;base1mod2&quot;</span>
+        <span class="n">eq_</span><span class="p">(</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">BaseClassHistory</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">BaseClassHistory</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">BaseClassHistory</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+            <span class="p">[</span>
+                <span class="n">SubClassSeparatePkHistory</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sep1&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;sep&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span>
+                <span class="p">),</span>
+                <span class="n">BaseClassHistory</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;base1&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">BaseClassHistory</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;base1mod&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">2</span>
+                <span class="p">),</span>
+                <span class="n">SubClassSamePkHistory</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;same1&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span>
+                <span class="p">),</span>
+                <span class="n">SubClassSamePkHistory</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;same1&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">2</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_joined_inheritance_multilevel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">BaseClass</span><span class="p">(</span><span class="n">Versioned</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">ComparableEntity</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;basetable&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+            <span class="nb">type</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>
+
+            <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;polymorphic_on&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
+                <span class="s2">&quot;polymorphic_identity&quot;</span><span class="p">:</span> <span class="s2">&quot;base&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="k">class</span> <span class="nc">SubClass</span><span class="p">(</span><span class="n">BaseClass</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;subtable&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">column_property</span><span class="p">(</span>
+                <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">BaseClass</span><span class="o">.</span><span class="n">id</span>
+            <span class="p">)</span>
+            <span class="n">base_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;basetable.id&quot;</span><span class="p">))</span>
+            <span class="n">subdata1</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+            <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;polymorphic_identity&quot;</span><span class="p">:</span> <span class="s2">&quot;sub&quot;</span><span class="p">}</span>
+
+        <span class="k">class</span> <span class="nc">SubSubClass</span><span class="p">(</span><span class="n">SubClass</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;subsubtable&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;subtable.id&quot;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">subdata2</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+            <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;polymorphic_identity&quot;</span><span class="p">:</span> <span class="s2">&quot;subsub&quot;</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tables</span><span class="p">()</span>
+
+        <span class="n">SubSubHistory</span> <span class="o">=</span> <span class="n">SubSubClass</span><span class="o">.</span><span class="n">__history_mapper__</span><span class="o">.</span><span class="n">class_</span>
+        <span class="n">sess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SubSubHistory</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_compile</span><span class="p">(</span>
+            <span class="n">q</span><span class="p">,</span>
+            <span class="s2">&quot;SELECT &quot;</span>
+            <span class="s2">&quot;subsubtable_history.id AS subsubtable_history_id, &quot;</span>
+            <span class="s2">&quot;subtable_history.id AS subtable_history_id, &quot;</span>
+            <span class="s2">&quot;basetable_history.id AS basetable_history_id, &quot;</span>
+            <span class="s2">&quot;subsubtable_history.changed AS subsubtable_history_changed, &quot;</span>
+            <span class="s2">&quot;subtable_history.changed AS subtable_history_changed, &quot;</span>
+            <span class="s2">&quot;basetable_history.changed AS basetable_history_changed, &quot;</span>
+            <span class="s2">&quot;basetable_history.name AS basetable_history_name, &quot;</span>
+            <span class="s2">&quot;basetable_history.type AS basetable_history_type, &quot;</span>
+            <span class="s2">&quot;subsubtable_history.version AS subsubtable_history_version, &quot;</span>
+            <span class="s2">&quot;subtable_history.version AS subtable_history_version, &quot;</span>
+            <span class="s2">&quot;basetable_history.version AS basetable_history_version, &quot;</span>
+            <span class="s2">&quot;subtable_history.base_id AS subtable_history_base_id, &quot;</span>
+            <span class="s2">&quot;subtable_history.subdata1 AS subtable_history_subdata1, &quot;</span>
+            <span class="s2">&quot;subsubtable_history.subdata2 AS subsubtable_history_subdata2 &quot;</span>
+            <span class="s2">&quot;FROM basetable_history &quot;</span>
+            <span class="s2">&quot;JOIN subtable_history &quot;</span>
+            <span class="s2">&quot;ON basetable_history.id = subtable_history.base_id &quot;</span>
+            <span class="s2">&quot;AND basetable_history.version = subtable_history.version &quot;</span>
+            <span class="s2">&quot;JOIN subsubtable_history ON subtable_history.id = &quot;</span>
+            <span class="s2">&quot;subsubtable_history.id AND subtable_history.version = &quot;</span>
+            <span class="s2">&quot;subsubtable_history.version&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">ssc</span> <span class="o">=</span> <span class="n">SubSubClass</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;ss1&quot;</span><span class="p">,</span> <span class="n">subdata1</span><span class="o">=</span><span class="s2">&quot;sd1&quot;</span><span class="p">,</span> <span class="n">subdata2</span><span class="o">=</span><span class="s2">&quot;sd2&quot;</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ssc</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="n">eq_</span><span class="p">(</span><span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SubSubHistory</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="p">[])</span>
+        <span class="n">ssc</span><span class="o">.</span><span class="n">subdata1</span> <span class="o">=</span> <span class="s2">&quot;sd11&quot;</span>
+        <span class="n">ssc</span><span class="o">.</span><span class="n">subdata2</span> <span class="o">=</span> <span class="s2">&quot;sd22&quot;</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="n">eq_</span><span class="p">(</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SubSubHistory</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+            <span class="p">[</span>
+                <span class="n">SubSubHistory</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ss1&quot;</span><span class="p">,</span>
+                    <span class="n">subdata1</span><span class="o">=</span><span class="s2">&quot;sd1&quot;</span><span class="p">,</span>
+                    <span class="n">subdata2</span><span class="o">=</span><span class="s2">&quot;sd2&quot;</span><span class="p">,</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;subsub&quot;</span><span class="p">,</span>
+                    <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">eq_</span><span class="p">(</span>
+            <span class="n">ssc</span><span class="p">,</span>
+            <span class="n">SubSubClass</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ss1&quot;</span><span class="p">,</span> <span class="n">subdata1</span><span class="o">=</span><span class="s2">&quot;sd11&quot;</span><span class="p">,</span> <span class="n">subdata2</span><span class="o">=</span><span class="s2">&quot;sd22&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">2</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_joined_inheritance_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">BaseClass</span><span class="p">(</span><span class="n">Versioned</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">ComparableEntity</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;basetable&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+            <span class="nb">type</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>
+
+            <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;polymorphic_on&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
+                <span class="s2">&quot;polymorphic_identity&quot;</span><span class="p">:</span> <span class="s2">&quot;base&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="k">class</span> <span class="nc">SubClass</span><span class="p">(</span><span class="n">BaseClass</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;subtable&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;basetable.id&quot;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;polymorphic_identity&quot;</span><span class="p">:</span> <span class="s2">&quot;sep&quot;</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tables</span><span class="p">()</span>
+
+        <span class="n">BaseClassHistory</span> <span class="o">=</span> <span class="n">BaseClass</span><span class="o">.</span><span class="n">__history_mapper__</span><span class="o">.</span><span class="n">class_</span>
+        <span class="n">SubClassHistory</span> <span class="o">=</span> <span class="n">SubClass</span><span class="o">.</span><span class="n">__history_mapper__</span><span class="o">.</span><span class="n">class_</span>
+        <span class="n">sess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span>
+        <span class="n">s1</span> <span class="o">=</span> <span class="n">SubClass</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;s1&quot;</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">s1</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;s2&quot;</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">actual_changed_base</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">scalar</span><span class="p">(</span>
+            <span class="n">select</span><span class="p">([</span><span class="n">BaseClass</span><span class="o">.</span><span class="n">__history_mapper__</span><span class="o">.</span><span class="n">local_table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">changed</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="n">actual_changed_sub</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">scalar</span><span class="p">(</span>
+            <span class="n">select</span><span class="p">([</span><span class="n">SubClass</span><span class="o">.</span><span class="n">__history_mapper__</span><span class="o">.</span><span class="n">local_table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">changed</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="n">h1</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">BaseClassHistory</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="n">eq_</span><span class="p">(</span><span class="n">h1</span><span class="o">.</span><span class="n">changed</span><span class="p">,</span> <span class="n">actual_changed_base</span><span class="p">)</span>
+        <span class="n">eq_</span><span class="p">(</span><span class="n">h1</span><span class="o">.</span><span class="n">changed</span><span class="p">,</span> <span class="n">actual_changed_sub</span><span class="p">)</span>
+
+        <span class="n">h1</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SubClassHistory</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="n">eq_</span><span class="p">(</span><span class="n">h1</span><span class="o">.</span><span class="n">changed</span><span class="p">,</span> <span class="n">actual_changed_base</span><span class="p">)</span>
+        <span class="n">eq_</span><span class="p">(</span><span class="n">h1</span><span class="o">.</span><span class="n">changed</span><span class="p">,</span> <span class="n">actual_changed_sub</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_single_inheritance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">BaseClass</span><span class="p">(</span><span class="n">Versioned</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">ComparableEntity</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;basetable&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+            <span class="nb">type</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+            <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;polymorphic_on&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
+                <span class="s2">&quot;polymorphic_identity&quot;</span><span class="p">:</span> <span class="s2">&quot;base&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="k">class</span> <span class="nc">SubClass</span><span class="p">(</span><span class="n">BaseClass</span><span class="p">):</span>
+
+            <span class="n">subname</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;polymorphic_identity&quot;</span><span class="p">:</span> <span class="s2">&quot;sub&quot;</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tables</span><span class="p">()</span>
+        <span class="n">sess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span>
+
+        <span class="n">b1</span> <span class="o">=</span> <span class="n">BaseClass</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;b1&quot;</span><span class="p">)</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">SubClass</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;s1&quot;</span><span class="p">,</span> <span class="n">subname</span><span class="o">=</span><span class="s2">&quot;sc1&quot;</span><span class="p">)</span>
+
+        <span class="n">sess</span><span class="o">.</span><span class="n">add_all</span><span class="p">([</span><span class="n">b1</span><span class="p">,</span> <span class="n">sc</span><span class="p">])</span>
+
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">b1</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;b1modified&quot;</span>
+
+        <span class="n">BaseClassHistory</span> <span class="o">=</span> <span class="n">BaseClass</span><span class="o">.</span><span class="n">__history_mapper__</span><span class="o">.</span><span class="n">class_</span>
+        <span class="n">SubClassHistory</span> <span class="o">=</span> <span class="n">SubClass</span><span class="o">.</span><span class="n">__history_mapper__</span><span class="o">.</span><span class="n">class_</span>
+
+        <span class="n">eq_</span><span class="p">(</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">BaseClassHistory</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">BaseClassHistory</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">BaseClassHistory</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+            <span class="p">[</span><span class="n">BaseClassHistory</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;b1&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">)],</span>
+        <span class="p">)</span>
+
+        <span class="n">sc</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;s1modified&quot;</span>
+        <span class="n">b1</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;b1modified2&quot;</span>
+
+        <span class="n">eq_</span><span class="p">(</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">BaseClassHistory</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">BaseClassHistory</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">BaseClassHistory</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+            <span class="p">[</span>
+                <span class="n">BaseClassHistory</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;b1&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">BaseClassHistory</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;b1modified&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">2</span>
+                <span class="p">),</span>
+                <span class="n">SubClassHistory</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;s1&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;sub&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="c1"># test the unique constraint on the subclass</span>
+        <span class="c1"># column</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;modifyagain&quot;</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">test_unique</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">SomeClass</span><span class="p">(</span><span class="n">Versioned</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">ComparableEntity</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;sometable&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tables</span><span class="p">()</span>
+        <span class="n">sess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="s2">&quot;sc1&quot;</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">sc</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;sc1modified&quot;</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="n">sc</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">2</span>
+
+        <span class="n">sc</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;sc1modified2&quot;</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="n">sc</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">3</span>
+
+    <span class="k">def</span> <span class="nf">test_relationship</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">SomeRelated</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">ComparableEntity</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;somerelated&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">class</span> <span class="nc">SomeClass</span><span class="p">(</span><span class="n">Versioned</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">ComparableEntity</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;sometable&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+            <span class="n">related_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;somerelated.id&quot;</span><span class="p">))</span>
+            <span class="n">related</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;SomeRelated&quot;</span><span class="p">,</span> <span class="n">backref</span><span class="o">=</span><span class="s2">&quot;classes&quot;</span><span class="p">)</span>
+
+        <span class="n">SomeClassHistory</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="o">.</span><span class="n">__history_mapper__</span><span class="o">.</span><span class="n">class_</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tables</span><span class="p">()</span>
+        <span class="n">sess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1&quot;</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="n">sc</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span>
+
+        <span class="n">sr1</span> <span class="o">=</span> <span class="n">SomeRelated</span><span class="p">()</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">related</span> <span class="o">=</span> <span class="n">sr1</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="n">sc</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">2</span>
+
+        <span class="n">eq_</span><span class="p">(</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SomeClassHistory</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">SomeClassHistory</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+            <span class="p">[</span><span class="n">SomeClassHistory</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1&quot;</span><span class="p">,</span> <span class="n">related_id</span><span class="o">=</span><span class="kc">None</span><span class="p">)],</span>
+        <span class="p">)</span>
+
+        <span class="n">sc</span><span class="o">.</span><span class="n">related</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">eq_</span><span class="p">(</span>
+            <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SomeClassHistory</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">SomeClassHistory</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+            <span class="p">[</span>
+                <span class="n">SomeClassHistory</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1&quot;</span><span class="p">,</span> <span class="n">related_id</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
+                <span class="n">SomeClassHistory</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1&quot;</span><span class="p">,</span> <span class="n">related_id</span><span class="o">=</span><span class="n">sr1</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">sc</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">3</span>
+
+    <span class="k">def</span> <span class="nf">test_backref_relationship</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">SomeRelated</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">ComparableEntity</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;somerelated&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+            <span class="n">related_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;sometable.id&quot;</span><span class="p">))</span>
+            <span class="n">related</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;SomeClass&quot;</span><span class="p">,</span> <span class="n">backref</span><span class="o">=</span><span class="s2">&quot;related&quot;</span><span class="p">)</span>
+
+        <span class="k">class</span> <span class="nc">SomeClass</span><span class="p">(</span><span class="n">Versioned</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">ComparableEntity</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;sometable&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tables</span><span class="p">()</span>
+        <span class="n">sess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="p">()</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="n">sc</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span>
+
+        <span class="n">sr</span> <span class="o">=</span> <span class="n">SomeRelated</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;sr&quot;</span><span class="p">,</span> <span class="n">related</span><span class="o">=</span><span class="n">sc</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sr</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="n">sc</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span>
+
+        <span class="n">sr</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;sr2&quot;</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="n">sc</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span>
+
+        <span class="n">sess</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">sr</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="n">sc</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">test_create_double_flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">SomeClass</span><span class="p">(</span><span class="n">Versioned</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">ComparableEntity</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;sometable&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">30</span><span class="p">))</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">30</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tables</span><span class="p">()</span>
+
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Foo&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="n">sc</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">2</span>
+
+    <span class="k">def</span> <span class="nf">test_mutate_plain_column</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">Document</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">Versioned</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;document&quot;</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">description_</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tables</span><span class="p">()</span>
+
+        <span class="n">document</span> <span class="o">=</span> <span class="n">Document</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
+        <span class="n">document</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Foo&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="n">document</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Bar&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">DocumentHistory</span> <span class="o">=</span> <span class="n">Document</span><span class="o">.</span><span class="n">__history_mapper__</span><span class="o">.</span><span class="n">class_</span>
+        <span class="n">v2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Document</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+        <span class="n">v1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">DocumentHistory</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">v2</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">v2</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;Bar&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;Foo&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_mutate_named_column</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">Document</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">Versioned</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;document&quot;</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">description_</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tables</span><span class="p">()</span>
+
+        <span class="n">document</span> <span class="o">=</span> <span class="n">Document</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
+        <span class="n">document</span><span class="o">.</span><span class="n">description_</span> <span class="o">=</span> <span class="s2">&quot;Foo&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="n">document</span><span class="o">.</span><span class="n">description_</span> <span class="o">=</span> <span class="s2">&quot;Bar&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">DocumentHistory</span> <span class="o">=</span> <span class="n">Document</span><span class="o">.</span><span class="n">__history_mapper__</span><span class="o">.</span><span class="n">class_</span>
+        <span class="n">v2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Document</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+        <span class="n">v1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">DocumentHistory</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">v2</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">v2</span><span class="o">.</span><span class="n">description_</span><span class="p">,</span> <span class="s2">&quot;Bar&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">description_</span><span class="p">,</span> <span class="s2">&quot;Foo&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_unique_identifiers_across_deletes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Ensure unique integer values are used for the primary table.</span>
+
+<span class="sd">        Checks whether the database assigns the same identifier twice</span>
+<span class="sd">        within the span of a table.  SQLite will do this if</span>
+<span class="sd">        sqlite_autoincrement is not set (e.g. SQLite&#39;s AUTOINCREMENT flag).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">class</span> <span class="nc">SomeClass</span><span class="p">(</span><span class="n">Versioned</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Base</span><span class="p">,</span> <span class="n">ComparableEntity</span><span class="p">):</span>
+            <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;sometable&quot;</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_tables</span><span class="p">()</span>
+        <span class="n">sess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc1&quot;</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">sess</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">sc2</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;sc2&quot;</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sc2</span><span class="p">)</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="n">SomeClassHistory</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="o">.</span><span class="n">__history_mapper__</span><span class="o">.</span><span class="n">class_</span>
+
+        <span class="c1"># only one entry should exist in the history table; one()</span>
+        <span class="c1"># ensures that</span>
+        <span class="n">scdeleted</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SomeClassHistory</span><span class="p">)</span><span class="o">.</span><span class="n">one</span><span class="p">()</span>
+
+        <span class="c1"># If sc2 has the same id that deleted sc1 had,</span>
+        <span class="c1"># it will fail when modified or deleted</span>
+        <span class="c1"># because of the violation of the uniqueness of the primary key on</span>
+        <span class="c1"># sometable_history</span>
+        <span class="n">ne_</span><span class="p">(</span><span class="n">sc2</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">scdeleted</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="c1"># If previous assertion fails, this will also fail:</span>
+        <span class="n">sc2</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;sc2 modified&quot;</span>
+        <span class="n">sess</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></pre></div>
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links">
+
+    <div id="docs-copyright">
+        &copy; <a href="../../../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.0.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../../../',
+          VERSION:     '1.3.16',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../../../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

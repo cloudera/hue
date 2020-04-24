@@ -24,6 +24,7 @@ LOG = logging.getLogger(__name__)
 _IMPALA_FLAGS = None
 
 _WEBSERVER_CERTIFICATE_FILE = '-webserver_certificate_file'
+_WEBSERVER_REQUIRE_SPNEGO = '-webserver_require_spnego'
 _SSL_SERVER_CERTIFICATE = '-ssl_server_certificate'
 _MAX_RESULT_CACHE_SIZE = '-max_result_cache_size'
 _AUTHORIZED_PROXY_USER_CONFIG = '-authorized_proxy_user_config'
@@ -73,10 +74,10 @@ def get_authorized_proxy_user_config():
 
 def is_impersonation_enabled():
   """
-    Returns True if user_config config contains 'hue='
+  If hue user is allowed to send the queries as itself with an additiona doas parameter containing the logged-in user username.
   """
   user_config = get_conf().get(_AUTHORIZED_PROXY_USER_CONFIG)
-  return True if user_config and 'hue=' in user_config else False
+  return user_config and 'hue=' in user_config
 
 def default_query_option(option_name):
   query_options = get_conf().get(_DEFAULT_QUERY_OPTIONS)
@@ -93,6 +94,13 @@ def is_transactional():
 
 def is_kerberos_enabled():
   return get_conf().get(_PRINCIPAL) is not None
+
+def is_webserver_spnego_enabled():
+  """
+    Returns True if Enable Kerberos Authentication for HTTP Web-Consoles for Impala service is turned on (default: true)
+    -webserver_require_spnego=true  in impalad_flags
+   """
+  return get_conf().get(_WEBSERVER_REQUIRE_SPNEGO)
 
 def _parse_impala_flags():
   from impala import conf # Cyclic dependency

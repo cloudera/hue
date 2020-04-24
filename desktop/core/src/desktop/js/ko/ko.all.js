@@ -24,7 +24,6 @@ import 'knockout.validation';
 import 'ext/ko.editable.custom';
 import 'ext/ko.selectize.custom';
 
-// import 'ko/bindings/charts/plotly/ko.plotly'; // The Plotly chart replacement
 import 'ko/bindings/charts/mapchart/ko.mapChart';
 import 'ko/bindings/charts/ko.barChart';
 import 'ko/bindings/charts/ko.leafletMapChart';
@@ -142,12 +141,17 @@ import 'ko/components/assist/ko.assistSchedulePanel';
 import 'ko/components/assist/ko.assistStoragePanel';
 import 'ko/components/assist/ko.rightAssistPanel';
 import 'ko/components/contextPopover/ko.contextPopover';
+import 'ko/components/contextPopover/ko.quickQueryContext';
+import 'ko/components/contextPopover/ko.popoverOnHover';
+import 'ko/components/doc/ko.shareDocModal';
 import 'ko/components/simpleAceEditor/ko.simpleAceEditor';
+
 import 'ko/components/ko.catalogEntriesList';
 import 'ko/components/ko.contextSelector';
 import 'ko/components/ko.createDirectoryModal';
 import 'ko/components/ko.deleteDocModal';
 import 'ko/components/ko.dropDown';
+import 'ko/components/ko.editorDroppableMenu';
 import 'ko/components/ko.executionAnalysis';
 import 'ko/components/ko.favoriteApp';
 import 'ko/components/ko.fieldSamples';
@@ -161,12 +165,17 @@ import 'ko/components/ko.navProperties';
 import 'ko/components/ko.navTags';
 import 'ko/components/ko.performanceGraph';
 import 'ko/components/ko.pollingCatalogEntriesList';
+import 'ko/components/ko.quickQueryAction';
 import 'ko/components/ko.sentryPrivileges';
 import 'ko/components/ko.sessionAuthModal';
 import 'ko/components/ko.sessionPanel';
-import 'ko/components/ko.shareDocModal';
+import 'ko/components/ko.shareGistModal';
 import 'ko/components/ko.sidebar';
 import 'ko/components/ko.sqlColumnsTable';
+
+// TODO: Move to about app when it has it's own webpack entry
+import 'apps/about/components/ko.hueConfigTree';
+import 'apps/about/components/ko.connectorsConfig';
 
 import 'ko/extenders/ko.maxLength';
 import 'ko/extenders/ko.numeric';

@@ -16,9 +16,9 @@
 
 import $ from 'jquery';
 
-import ApiHelper from 'api/apiHelper';
 import { EXECUTION_STATUS } from './executable';
 import Executor from './executor';
+import * as ApiUtils from 'api/apiUtils';
 
 describe('executor.js', () => {
   /**
@@ -30,7 +30,7 @@ describe('executor.js', () => {
       compute: { id: 'compute' },
       namespace: { id: 'namespace' },
       database: 'default',
-      sourceType: 'impala',
+      connector: () => ({ type: 'impala' }),
       statement: statement,
       isSqlEngine: true
     });
@@ -39,7 +39,7 @@ describe('executor.js', () => {
     const subject = createSubject('SELECT * FROM customers;');
 
     const simplePostDeferred = $.Deferred();
-    jest.spyOn(ApiHelper, 'simplePost').mockImplementation(url => {
+    jest.spyOn(ApiUtils, 'simplePost').mockImplementation(url => {
       expect(url).toEqual('/notebook/api/execute/impala');
       return simplePostDeferred;
     });

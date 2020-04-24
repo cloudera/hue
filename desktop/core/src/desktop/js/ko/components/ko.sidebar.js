@@ -21,8 +21,11 @@ import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
 
 export const NAME = 'hue-sidebar';
+
+const CLOSE_ON_NEW_HOVER_EVENT = 'hue.sidebar.close.on.new.hover';
 
 // prettier-ignore
 const TEMPLATE = `
@@ -35,69 +38,85 @@ const TEMPLATE = `
     <!-- /ko -->
   </script>
 
-  <script type="text/html" id="sidebar-item">
-    <div class="item-wrapper" data-bind="css: itemClass">
-      <!-- ko if: click -->
-      <a href="javascript: void(0);" data-bind="click: click, attr: { 'aria-label': displayName, 'data-tooltip': displayName }, css: { 'active': active }" class="item">
-        <!-- ko template: 'sidebar-inner-item' --><!-- /ko -->
-      </a>
-      <!-- /ko -->
-      <!-- ko ifnot: click -->
-      <a href="javascript: void(0);" data-bind="hueLink: url, publish: 'hue.sidebar.update.active', attr: { 'aria-label': displayName, 'data-tooltip': displayName }, css: { 'active': active }" class="item">
-        <!-- ko template: 'sidebar-inner-item' --><!-- /ko -->
-      </a>
-      <!-- /ko -->
-      <!-- ko if: subMenuTemplate -->
-      <!-- ko template: subMenuTemplate --><!-- /ko -->
-      <!-- /ko -->
-    </div>
-  </script>
+  <script type="text/html" id="sidebar-sub-menu">
+    <div class="sidebar-menu" data-bind="
+        css: {
+          'open' : open() || hoverOpen(),
+          'fixed-bottom': fixedBottom
+        },
+        event: {
+          mouseenter: mouseEnter
+        }
+      ">
+      <div class="inner">
+        <div class="menu">
+          <!-- ko if: headerTemplate -->
+          <div class="menu-header" data-bind="template: headerTemplate"></div>
+          <!-- /ko -->
 
-  <script type="text/html" id="user-sub-menu-template">
-    <div class="sidebar-menu user-menu" data-bind="css: { 'open' : $component.userMenuOpen }">
-      <div class="menu">
-        <div class="menu-header">
-          <div class="user-icon" style="background-color: #fff">${window.LOGGED_USERNAME[0].toUpperCase()}</div>
-          <div>
-            <div>${window.LOGGED_USERNAME}</div>
-          </div>
+          <ul class="sidebar-nav-list" data-bind="foreach: children">
+            <li data-bind="css: { 'divider': isDivider }">
+              <!-- ko if: isDivider -->
+                &nbsp;
+              <!-- /ko -->
+              <!-- ko ifnot: isDivider -->
+                <!-- ko if: children && children.length -->
+                  <a href="javascript:void(0);" data-bind="toggle: open, text: displayName"></a>
+                  <!-- ko template: { name: 'sidebar-sub-menu' } --><!-- /ko -->
+                <!-- /ko -->
+                <!-- ko if: !children && url -->
+                  <a href="javascript:void(0);" data-bind="hueLink: url, text: displayName"></a>
+                <!-- /ko -->
+                <!-- ko if: !children && href -->
+                  <a href="javascript:void(0);" target="_blank" data-bind="attr: { 'href': href }, text: displayName"></a>
+                <!-- /ko -->
+                <!-- ko if: !children && click -->
+                  <a href="javascript:void(0);" target="_blank" data-bind="click: click.bind($data), text: displayName"></a>
+                <!-- /ko -->
+              <!-- /ko -->
+            </li>
+          </ul>
         </div>
-        <ul class="sidebar-nav-list">
-          <!-- ko if: window.USER_VIEW_EDIT_USER_ENABLED -->
-          <li><a href="javascript:void(0);" data-bind="
-              hueLink: '/useradmin/users/edit/${window.LOGGED_USERNAME}',
-              attr: { 
-                'title': window.IS_LDAP_SETUP ? '${I18n('View Profile')}' : '${I18n('Edit Profile')}'
-              }
-            ">${I18n('My Profile')}</a></li>
-          <!-- /ko -->
-          <!-- ko if: window.USER_IS_ADMIN -->
-          <li><a href="javascript: void(0);" data-bind="hueLink: '/useradmin/users/'">${I18n(
-            'Manage Users'
-          )}</a></li>
-          <li><a href="javascript: void(0);" data-bind="hueLink: '/about/'">${I18n(
-            'Administration'
-          )}</a></li>
-          <!-- /ko -->
-          <li><a href="javascript: void(0);" data-bind="hueLink: '/accounts/logout'" title="${I18n(
-            'Sign out'
-          )}" >${I18n('Sign out')}</a></li>
-        </ul>
       </div>
     </div>
   </script>
 
-  <script type="text/html" id="support-sub-menu-template">
-    <div class="sidebar-menu support-menu" data-bind="css: { 'open' : $component.supportMenuOpen }">
-      <div class="menu">
-        <ul class="sidebar-nav-list">
-          <li><a href="https://docs.gethue.com" target="_blank">${I18n('Documentation')}</a></li>
-          <li><a href="javascript:void(0)" data-bind="publish: 'show.welcome.tour'">${I18n(
-            'Welcome Tour'
-          )}</a></li>
-          <li><a href="http://gethue.com" target="_blank">Gethue.com</a></li>
-        </ul>
-      </div>
+  <script type="text/html" id="sidebar-item">
+    <div class="item-wrapper" data-bind="css: itemClass, event: { mouseenter: mouseEnter, mouseleave: mouseLeave }">
+      <!-- ko if: children && children.length -->
+        <a href="javascript: void(0);" data-bind="
+            toggle: open,
+            css: { 'active': active },
+            template: 'sidebar-inner-item'
+          " class="item"></a>
+          <!-- ko template: 'sidebar-sub-menu' --><!-- /ko -->
+      <!-- /ko -->
+      <!-- ko if: !children || !children.length -->
+        <!-- ko if: click -->
+          <a href="javascript: void(0);" data-bind="
+              click: click,
+              attr: { 'aria-label': displayName, 'data-tooltip': displayName },
+              css: { 'active': active },
+              template: 'sidebar-inner-item'
+            " class="item"></a>
+        <!-- /ko -->
+        <!-- ko ifnot: click -->
+          <a href="javascript: void(0);" data-bind="
+              hueLink: url,
+              publish: 'hue.sidebar.update.active',
+              attr: { 'aria-label': displayName, 'data-tooltip': displayName },
+              css: { 'active': active },
+              template: 'sidebar-inner-item'
+            " class="item"></a>
+        <!-- /ko -->
+      <!-- /ko -->
+    </div>
+  </script>
+
+  <script type="text/html" id="user-header-template">
+    <div class="user-icon" style="background-color: #fff">${ window.LOGGED_USERNAME[0].toUpperCase() }</div>
+    <div>
+      <div>${ window.LOGGED_USERNAME }</div>
     </div>
   </script>
 
@@ -134,20 +153,96 @@ const TEMPLATE = `
   </div>
 `;
 
+const trackCloseOnClick = (observable, id) => {
+  observable.subscribe(newVal => {
+    if (newVal) {
+      window.setTimeout(() => {
+        $(document).on('click.' + id, () => {
+          observable(false);
+        });
+      }, 0);
+    } else {
+      $(document).off('click.' + id);
+    }
+  });
+};
+
 class SidebarItem {
   constructor(options) {
     this.isCategory = !!options.isCategory;
     this.displayName = options.displayName;
+    this.isDivider = !!options.isDivider;
+    this.href = options.href;
     this.url = options.url;
     this.icon = options.icon;
     this.children = options.children;
     this.name = options.name;
     this.type = options.type;
     this.active = ko.observable(false);
+    this.open = ko.observable(false);
+    this.hoverOpen = ko.observable(false);
     this.click = options.click;
-    this.subMenuTemplate = options.subMenuTemplate;
     this.iconHtml = options.iconHtml;
     this.itemClass = options.itemClass;
+    this.headerTemplate = options.headerTemplate;
+    this.fixedBottom = !!options.fixedBottom;
+
+    trackCloseOnClick(this.open, 'sidebar-sub');
+    trackCloseOnClick(this.hoverOpen, 'sidebar-sub');
+    this.hoverdelay = -1;
+
+    this.open.subscribe(() => {
+      huePubSub.publish(CLOSE_ON_NEW_HOVER_EVENT, this);
+      window.clearTimeout(this.hoverdelay);
+      this.hoverOpen(false);
+    });
+
+    huePubSub.subscribe(CLOSE_ON_NEW_HOVER_EVENT, item => {
+      if (item !== this) {
+        window.clearTimeout(this.hoverdelay);
+        this.hoverOpen(false);
+        this.open(false);
+      }
+    });
+  }
+
+  isActive(lastAppName) {
+    if (lastAppName === 'filebrowser') {
+      if (location.href.indexOf('=S3A') !== -1) {
+        return this.type === 's3';
+      } else if (location.href.indexOf('=adl') !== -1) {
+        return this.type === 'adls';
+      } else if (location.href.indexOf('=abfs') !== -1) {
+        return this.type === 'abfs';
+      }
+      return this.type === 'hdfs';
+    }
+
+    if (lastAppName && lastAppName === this.type) {
+      return true;
+    }
+
+    if (this.children && this.children.length) {
+      return this.children.some(child => child.isActive(lastAppName));
+    }
+
+    return location.pathname === '/hue' + this.url;
+  }
+
+  mouseEnter() {
+    if (this.open()) {
+      return;
+    }
+    huePubSub.publish(CLOSE_ON_NEW_HOVER_EVENT, this);
+    window.clearTimeout(this.hoverdelay);
+    this.hoverOpen(true);
+  }
+
+  mouseLeave() {
+    window.clearTimeout(this.hoverdelay);
+    this.hoverdelay = window.setTimeout(() => {
+      this.hoverOpen(false);
+    }, 400);
   }
 }
 
@@ -159,31 +254,9 @@ class Sidebar {
     this.userMenuOpen = ko.observable(false);
     this.supportMenuOpen = ko.observable(false);
 
-    this.userMenuOpen.subscribe(newVal => {
-      if (newVal) {
-        window.setTimeout(() => {
-          $(document).on('click.userMenu', () => {
-            this.userMenuOpen(false);
-          });
-        }, 0);
-        this.supportMenuOpen(false);
-      } else {
-        $(document).off('click.userMenu');
-      }
-    });
+    trackCloseOnClick(this.userMenuOpen, 'userMenuOpen');
 
-    this.supportMenuOpen.subscribe(newVal => {
-      if (newVal) {
-        window.setTimeout(() => {
-          $(document).on('click.supportMenu', () => {
-            this.supportMenuOpen(false);
-          });
-        }, 0);
-        this.userMenuOpen(false);
-      } else {
-        $(document).off('click.supportMenu');
-      }
-    });
+    trackCloseOnClick(this.supportMenuOpen, 'supportMenuOpen');
 
     this.collapsed.subscribe(newVal => {
       if (newVal) {
@@ -196,111 +269,173 @@ class Sidebar {
     apiHelper.withTotalStorage('hue.sidebar', 'collabse', this.collapsed, true);
 
     this.items = ko.observableArray();
+
+    const userChildren = [];
+
+    if (window.USER_VIEW_EDIT_USER_ENABLED) {
+      userChildren.push(
+        new SidebarItem({
+          url: '/useradmin/users/edit/' + window.LOGGED_USERNAME,
+          displayName: I18n('My Profile')
+        })
+      );
+    }
+
+    if (window.USER_IS_ADMIN || window.USER_IS_HUE_ADMIN) {
+      userChildren.push(
+        new SidebarItem({ url: '/useradmin/users/', displayName: I18n('Manage Users') })
+      );
+      userChildren.push(
+        new SidebarItem({
+          url: '/about/',
+          displayName: I18n('Administration'),
+          type: 'admin_wizard'
+        })
+      );
+    }
+
+    userChildren.push(new SidebarItem({ url: '/accounts/logout', displayName: I18n('Sign out') }));
+
     this.footerItems = [
       new SidebarItem({
         displayName: 'Support',
         icon: 'support',
-        click: () => this.supportMenuOpen(!this.supportMenuOpen()),
-        subMenuTemplate: 'support-sub-menu-template'
+        children: [
+          new SidebarItem({
+            displayName: I18n('Documentation'),
+            href: 'https://docs.gethue.com'
+          }),
+          new SidebarItem({
+            displayName: I18n('Welcome Tour'),
+            click: () => {
+              huePubSub.publish('show.welcome.tour');
+            }
+          }),
+          new SidebarItem({
+            displayName: 'Gethue.com',
+            href: 'https://gethue.com'
+          })
+        ],
+        fixedBottom: true
       }),
       new SidebarItem({
         displayName: window.LOGGED_USERNAME,
         itemClass: 'shepherd-user-menu',
         iconHtml: '<div class="user-icon">' + window.LOGGED_USERNAME[0].toUpperCase() + '</div>',
-        click: () => this.userMenuOpen(!this.userMenuOpen()),
-        subMenuTemplate: 'user-sub-menu-template'
+        headerTemplate: 'user-header-template',
+        children: userChildren,
+        fixedBottom: true
       })
     ];
     this.lastAppName = undefined;
+    this.lastHref = location.href;
 
     const updateActive = () => {
       this.userMenuOpen(false);
       this.supportMenuOpen(false);
+      let activeFound = false;
+
+      const testActive = child => {
+        if (!activeFound) {
+          child.active(child.isActive(this.lastAppName));
+          activeFound = child.active();
+        } else {
+          child.active(false);
+        }
+      };
+
       this.items().forEach(item => {
-        item.children.forEach(child => {
-          let active = false;
-          if (this.lastAppName === 'editor') {
-            active = child.type === 'editor';
-          } else if (this.lastAppName === 'filebrowser') {
-            if (location.href.indexOf('=S3A') !== -1) {
-              active = child.type === 's3';
-            } else if (location.href.indexOf('=adl') !== -1) {
-              active = child.type === 'adls';
-            } else if (location.href.indexOf('=abfs') !== -1) {
-              active = child.type === 'abfs';
-            } else {
-              active = child.type === 'hdfs';
-            }
-          } else {
-            active = location.pathname == '/hue' + child.url;
-          }
-          child.active(active);
-        });
+        item.children.forEach(testActive);
       });
+      this.footerItems.forEach(testActive);
     };
 
-    huePubSub.subscribe('cluster.config.set.config', clusterConfig => {
+    const configUpdated = clusterConfig => {
       const items = [];
-      if (clusterConfig && clusterConfig['app_config']) {
-        const appsItems = [];
-        const appConfig = clusterConfig['app_config'];
-        if (appConfig['editor']) {
-          let editor = null;
-          if (
-            clusterConfig['main_button_action'] &&
-            clusterConfig['main_button_action'].page.indexOf('/editor') === 0
-          ) {
-            editor = clusterConfig['main_button_action'];
-          }
 
-          if (!editor) {
-            const defaultEditor = appConfig['editor']['default_sql_interpreter'];
-            if (defaultEditor) {
-              const foundEditor = appConfig['editor']['interpreters'].filter(interpreter => {
-                return interpreter.type === defaultEditor;
+      if (clusterConfig && clusterConfig.app_config) {
+        const favourite = clusterConfig.main_button_action;
+        const appsItems = [];
+        const appConfig = clusterConfig.app_config;
+
+        ['editor', 'dashboard', 'scheduler', 'sdkapps'].forEach(appName => {
+          const config = appConfig[appName];
+          if (window.CUSTOM_DASHBOARD_URL && appName === 'dashboard') {
+            appsItems.push(
+              new SidebarItem({
+                displayName: I18n('Dashboard'),
+                click: () => {
+                  window.open(window.CUSTOM_DASHBOARD_URL, '_blank');
+                },
+                icon: 'dashboard',
+                type: 'dashboard'
+              })
+            );
+            return;
+          }
+          if (config && config.interpreters.length) {
+            if (config.interpreters.length === 1) {
+              appsItems.push(
+                new SidebarItem({
+                  displayName: config.displayName,
+                  url: config.interpreters[0].page,
+                  icon: config.name,
+                  type: config.name
+                })
+              );
+            } else {
+              const subApps = [];
+              let lastWasSql = false;
+              let dividerAdded = false;
+              config.interpreters.forEach(interpreter => {
+                if (!dividerAdded && lastWasSql && !interpreter.is_sql) {
+                  subApps.push(new SidebarItem({ isDivider: true }));
+                  dividerAdded = true;
+                }
+                if (favourite && favourite.page === interpreter.page) {
+                  // Put the favourite on top
+                  subApps.unshift(
+                    new SidebarItem({
+                      displayName: interpreter.displayName,
+                      url: interpreter.page,
+                      icon: interpreter.dialect || interpreter.name,
+                      type: interpreter.dialect || interpreter.name
+                    })
+                  );
+                } else {
+                  subApps.push(
+                    new SidebarItem({
+                      displayName: interpreter.displayName,
+                      url: interpreter.page,
+                      icon: interpreter.dialect || interpreter.name,
+                      type: interpreter.dialect || interpreter.name
+                    })
+                  );
+                }
+                lastWasSql = interpreter.is_sql;
               });
-              if (foundEditor.length === 1) {
-                editor = foundEditor[0];
+
+              if (appName === 'editor' && window.SHOW_ADD_MORE_EDITORS) {
+                subApps.push(new SidebarItem({ isDivider: true }));
+                subApps.push(
+                  new SidebarItem({
+                    displayName: I18n('Add more...'),
+                    href: 'https://docs.gethue.com/administrator/configuration/connectors/'
+                  })
+                );
               }
+              appsItems.push(
+                new SidebarItem({
+                  displayName: config.displayName,
+                  icon: config.name,
+                  type: config.name,
+                  children: subApps
+                })
+              );
             }
           }
-
-          if (!editor && appConfig['editor']['interpreters'].length > 1) {
-            editor = appConfig['editor']['interpreters'][1];
-          }
-
-          if (editor) {
-            appsItems.push(
-              new SidebarItem({
-                displayName: I18n('Editor'),
-                url: editor['page'],
-                icon: 'editor',
-                type: 'editor'
-              })
-            );
-          } else {
-            appsItems.push(
-              new SidebarItem({
-                displayName: appConfig['editor']['displayName'],
-                url: appConfig['editor']['page'],
-                icon: 'editor',
-                type: 'editor'
-              })
-            );
-          }
-        }
-        ['dashboard', 'scheduler'].forEach(appName => {
-          if (appConfig[appName]) {
-            appsItems.push(
-              new SidebarItem({
-                displayName: appConfig[appName]['displayName'],
-                url: appConfig[appName]['page'],
-                icon: appName,
-                type: appName
-              })
-            );
-          }
         });
+
         if (appsItems.length > 0) {
           items.push(
             new SidebarItem({
@@ -312,16 +447,18 @@ class Sidebar {
         }
 
         const browserItems = [];
-        browserItems.push(
-          new SidebarItem({
-            displayName: I18n('Documents'),
-            url: '/home/',
-            icon: 'documents',
-            type: 'home'
-          })
-        );
-        if (appConfig['browser'] && appConfig['browser']['interpreters']) {
-          appConfig['browser']['interpreters'].forEach(browser => {
+        if (appConfig.home) {
+          browserItems.push(
+            new SidebarItem({
+              displayName: appConfig.home.buttonName,
+              url: appConfig.home.page,
+              icon: 'documents',
+              type: appConfig.home.name
+            })
+          );
+        }
+        if (appConfig.browser && appConfig.browser.interpreters) {
+          appConfig.browser.interpreters.forEach(browser => {
             browserItems.push(
               new SidebarItem({
                 displayName: browser.displayName,
@@ -336,30 +473,8 @@ class Sidebar {
           items.push(
             new SidebarItem({
               isCategory: true,
-              displayName: I18n('Browsers'),
+              displayName: appConfig.browser.displayName,
               children: browserItems
-            })
-          );
-        }
-
-        const sdkItems = [];
-        if (appConfig['sdkapps'] && appConfig['sdkapps']['interpreters']) {
-          appConfig['sdkapps']['interpreters'].forEach(sdkInterpreter => {
-            sdkItems.push(
-              new SidebarItem({
-                displayName: sdkInterpreter['displayName'],
-                url: sdkInterpreter['page'],
-                type: sdkInterpreter.type
-              })
-            );
-          });
-        }
-        if (sdkItems.length > 0) {
-          items.push(
-            new SidebarItem({
-              isCategory: true,
-              displayName: appConfig['sdkapps']['displayName'],
-              children: sdkItems
             })
           );
         }
@@ -367,16 +482,22 @@ class Sidebar {
 
       this.items(items);
       updateActive();
-    });
+    };
+
+    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
+    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
 
     let throttle = -1;
     huePubSub.subscribe('set.current.app.name', appName => {
       if (!appName) {
         return;
       }
-      this.lastAppName = appName;
-      window.clearTimeout(throttle);
-      throttle = window.setTimeout(updateActive, 20);
+      if (appName !== this.lastAppName || location.href !== this.lastHref) {
+        this.lastAppName = appName;
+        this.lastHref = location.href;
+        window.clearTimeout(throttle);
+        throttle = window.setTimeout(updateActive, 100);
+      }
     });
     updateActive();
 

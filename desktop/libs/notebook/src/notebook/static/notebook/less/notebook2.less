@@ -248,13 +248,21 @@
     margin-top: 10px !important;
   }
 
-  .result-actions {
-    padding: 5px;
+  .snippet-tab-actions {
+    padding: 10px 5px 5px 5px;
     height: 30px;
+
+    .search-input {
+      margin: 0;
+      padding: 5px 6px;
+      height: 12px;
+      border-radius: 2px;
+      width: 150px;
+    }
   }
 
-  .result-actions .btn-group,
-  .result-body .result-actions-append .btn-group {
+  .snippet-tab-actions .btn-group,
+  .snippet-tab-body .snippet-tab-actions-append .btn-group {
     .btn-editor:first-of-type {
       border-top-left-radius: 2px;
       border-bottom-left-radius: 2px;
@@ -266,10 +274,10 @@
     }
   }
 
-  .result-body {
+  .snippet-tab-body {
     padding: 0 5px;
 
-    .result-actions-append {
+    .snippet-tab-actions-append {
       position: absolute;
       left: 150px;
       top: -35px;
@@ -1287,6 +1295,32 @@
 
   .snippet-log-container:hover .close-logs-overlay {
     display: block;
+  }
+
+  .snippet-error-log {
+    position: relative;
+
+    .clear-container {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+
+      .close {
+        opacity: 0.5;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+
+      .close::before {
+        border-color: #a60115 !important;
+      }
+
+      .close::after {
+        border-color: #a60115 !important;
+      }
+    }
   }
 
   .jobs-overlay {

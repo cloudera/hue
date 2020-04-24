@@ -769,6 +769,8 @@ def sync_coord_workflow(request, job_id):
              'header': _('Sync Workflow definition?'),
              'action': reverse('oozie:sync_coord_workflow', kwargs={'job_id': job_id})
            }, force_template=True).content
+  if not isinstance(popup, str):
+    popup = popup.decode('utf-8')
   return JsonResponse(popup, safe=False)
 
 @show_oozie_error

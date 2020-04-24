@@ -2183,7 +2183,7 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'select cast(bla as ',
         afterCursor: '',
-        containsKeywords: ['INT', 'STRING'],
+        containsKeywords: ['INT', 'INTEGER', 'STRING'],
         expectedResult: {
           lowerCase: true
         }
@@ -2194,7 +2194,7 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT CAST(bla AS ',
         afterCursor: ' FROM bar;',
-        containsKeywords: ['INT', 'STRING'],
+        containsKeywords: ['INT', 'INTEGER', 'STRING'],
         expectedResult: {
           lowerCase: false
         }
@@ -2205,7 +2205,7 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT CAST(bla AS ST',
         afterCursor: ') FROM bar;',
-        containsKeywords: ['INT', 'STRING'],
+        containsKeywords: ['INT', 'INTEGER', 'STRING'],
         expectedResult: {
           lowerCase: false
         }
@@ -2216,7 +2216,7 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT CAST(AS ',
         afterCursor: '',
-        containsKeywords: ['INT', 'STRING'],
+        containsKeywords: ['INT', 'INTEGER', 'STRING'],
         expectedResult: {
           lowerCase: false
         }

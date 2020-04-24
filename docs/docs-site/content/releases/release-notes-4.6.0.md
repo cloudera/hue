@@ -8,7 +8,7 @@ tags: ['skipIndexing']
 
 ## Hue v4.6.0, released December 5th 2019
 
-Hue is an open source SQL Cloud Assistant for developing and accessing [Databases & Data Warehouses](https://docs.gethue.com/administrator/configuration/connectors/)/Data Apps and collaborating: http://gethue.com
+Hue is an open source SQL Cloud Assistant for developing and accessing [Databases & Data Warehouses](/administrator/configuration/connectors/)/Data Apps and collaborating: https://gethue.com
 
 
 ### Summary
@@ -16,11 +16,14 @@ Hue is an open source SQL Cloud Assistant for developing and accessing [Database
 The focus of this release was to keep building on top of 4.5 and modularize the tech stack, improve SQL integrations and prepare major upcoming features of Hue 5. In particular now:
 
 * Python 3 support can be tested
-* There is a new version of [gethue.com](gethue.com) and the content of [docs.gethue.com](docs.gethue.com) was revamped
+* There is a new version of [gethue.com](https://gethue.com) and the content of [docs.gethue.com](https://docs.gethue.com) was revamped
 * The new version of the Editor with multi execution contexts and more robustness is 66% done
-* Build your own or improve [SQL parsers with highlighter](https://docs.gethue.com/developer/parsers/)
+* Build your own or improve [SQL parsers with highlighter](/developer/parsers/)
 
-Read the complete list of improvements on [Hue 4.6 is out!](http://gethue.com/hue-4-6-and-its-improvements-are-out/).
+
+Read the complete list of improvements on [Hue 4.6 is out!](https://gethue.com/hue-4-6-and-its-improvements-are-out/).
+
+Download the [tarball](https://cdn.gethue.com/downloads/hue-4.6.0.tgz) or [source](https://github.com/cloudera/hue/archive/release-4.6.0.zip) releases.
 
 
 ### Notable Changes
@@ -29,17 +32,17 @@ Read the complete list of improvements on [Hue 4.6 is out!](http://gethue.com/hu
   * Apache Hive Tez improvements
   * Apache Hive LLAP improvements
   * Autocompletes
-    * Tutorial on how to [improve/create a new SQL parser](https://docs.gethue.com/developer/parsers/) with [Highlighter](/how-to-improve-or-add-your-own-sql-syntax-highlighter/)
+    * Tutorial on how to [improve/create a new SQL parser](/developer/parsers/) with [Highlighter](https://gethue.com/how-to-improve-or-add-your-own-sql-syntax-highlighter/)
     * Skeletons of dedicated parsers for Apache Druid, Phoenix, Elastic Serch, Presto, KSQL, Calcite are present
-  * [Primary Keys, Partition Keys icons showing in the assists](/2019-11-13-sql-column-assist-icons/)
+  * [Primary Keys, Partition Keys icons showing in the assists](https://gethue.com/2019-11-13-sql-column-assist-icons/)
 * Collaboration
   * The Sharing icons as well as sharing action are now showing-up in left assistant
   * Copy result to Clipboard now properly keeps the table formatting
 * Cloud
-  * [Tracing calls](/introducing-request-tracing-with-opentracing-and-jaeger-in-kubernetes/)
-  * [Retrieving and searching Logs](/collecting-hue-metrics-with-prometheus-in-kubernetes/)
-  * [Collecting health and performance Metrics](/collecting-and-querying-hue-logs-with-fluentd-in-kubernetes/)
-  * [Azure ADLS v2 / ABFS v1](/integration-with-microsoft-azure-data-lake-store-gen2/) has been integrated
+  * [Tracing calls](https://gethue.com/introducing-request-tracing-with-opentracing-and-jaeger-in-kubernetes/)
+  * [Retrieving and searching Logs](https://gethue.com/collecting-hue-metrics-with-prometheus-in-kubernetes/)
+  * [Collecting health and performance Metrics](https://gethue.com/collecting-and-querying-hue-logs-with-fluentd-in-kubernetes/)
+  * [Azure ADLS v2 / ABFS v1](https://gethue.com/integration-with-microsoft-azure-data-lake-store-gen2/) has been integrated
 * Infra
   * Python 3: support is making progress and now can be beta tested. `py3-ci` [CI branch](https://circleci.com/gh/cloudera/hue/tree/py3-ci), how to compile it and send feedback:
   ```
@@ -47,7 +50,7 @@ Read the complete list of improvements on [Hue 4.6 is out!](http://gethue.com/hu
   make apps
   ```
   * Javascript testing switched to Jest and now supports headless
-  * [docs.gethue.com](docs.gethue.com) has been revamped
+  * [docs.gethue.com](https://docs.gethue.com) has been revamped
 * Bugs
   * The erratic behaviour of the horizontal result scrollbar in the SQL Editor has been fixed
   * Several Dashboard layout issues and IE 11 support fixes

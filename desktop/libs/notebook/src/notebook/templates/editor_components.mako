@@ -411,8 +411,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         params: {
           user: user,
           sql: {
-            sourceTypes: sqlSourceTypes,
-            activeSourceType: activeSqlSourceType,
             navigationSettings: {
               openDatabase: false,
               openItem: false,
@@ -754,7 +752,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("Error loading my queries") }</div>
           <!-- /ko -->
           <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length === 0 && queriesFilter() === '' -->
-          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("You don't have any saved query.") }</div>
+          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("You don't have any saved queries.") }</div>
           <!-- /ko -->
           <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length === 0 && queriesFilter() !== '' -->
           <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _('No queries found for') } <strong data-bind="text: queriesFilter"></strong>.</div>
@@ -1132,16 +1130,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         }
       }, style: {opacity: statementType() !== 'text' || $root.isPresentationMode() ? '0.75' : '1', 'min-height': $root.editorMode() ? '0' : '48px', 'top': $root.editorMode() && statementType() !== 'text' ? '60px' : '0'}"></div>
       <!-- ko component: { name: 'hueAceAutocompleter', params: { editor: ace.bind($data), snippet: $data } } --><!-- /ko -->
-
-      <ul class="table-drop-menu hue-context-menu">
-        <li class="editor-drop-value"><a href="javascript:void(0);">"<span class="editor-drop-identifier"></span>"</a></li>
-        <li class="divider"></li>
-        <li class="editor-drop-select"><a href="javascript:void(0);">SELECT FROM <span class="editor-drop-identifier"></span>...</a></li>
-        <li class="editor-drop-insert"><a href="javascript:void(0);">INSERT INTO <span class="editor-drop-identifier"></span>...</a></li>
-        <li class="editor-drop-update"><a href="javascript:void(0);">UPDATE <span class="editor-drop-identifier"></span>...</a></li>
-        <li class="editor-drop-drop"><a href="javascript:void(0);">DROP TABLE <span class="editor-drop-identifier"></span>...</a></li>
-        <li class="editor-drop-view"><a href="javascript:void(0);">DROP VIEW <span class="editor-drop-identifier"></span>...</a></li>
-      </ul>
+      <!-- ko component: { name: 'hue-editor-droppable-menu', params: { editor: ace.bind($data), parentDropTarget: '.editor' } } --><!-- /ko -->
     </div>
 
     <div class="clearfix"></div>
@@ -1541,7 +1530,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   <!-- ko ifnot: $root.isPresentationMode() -->
   <div class="row-fluid">
     <div class="span6" data-bind="clickForAceFocus: ace">
-      <div class="ace-editor" data-bind="attr: { id: id() }, aceEditor: {
+      <div class="ace-editor" data-bind="attr: { id: id }, aceEditor: {
         snippet: $data,
         updateOnInput: true
       }"></div>
@@ -1793,11 +1782,13 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <i class="fa fa-fw fa-map-o"></i> ${_('Explain')}
           </a>
         </li>
+        % if conf.ENABLE_GIST.get():
         <li>
           <a href="javascript:void(0)" data-bind="click: createGist, css: {'disabled': ! isReady() }" title="${ _('Share the query selection via a link') }">
-            <i class="fa fa-fw fa-link"></i> ${_('Share link')}
+            <i class="fa fa-fw fa-link"></i> ${_('Get shareable link')}
           </a>
         </li>
+        % endif
         <!-- ko if: formatEnabled -->
         <li>
           <a href="javascript:void(0)" data-bind="click: format, css: {'disabled': ! isReady() }" title="${ _('Format the current SQL query') }">
@@ -1839,6 +1830,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </a>
     </div>
 
+    <!-- ko if: window.CUSTOM_DASHBOARD_URL -->
+    <a class="snippet-side-btn" href="javascript: void(0)" data-bind="click: dashboardRedirect.bind($data)" title="${ _('Dashboard') }">
+      <i class="hcha fa-fw hcha-bar-chart"></i>
+    </a>
+    <!-- /ko -->
+    <!-- ko ifnot: window.CUSTOM_DASHBOARD_URL -->
     <div class="dropdown">
       <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="css: {'active': $data.showChart }, click: function() { $data.showChart(true); }" >
         <i class="hcha fa-fw hcha-bar-chart" data-bind="visible: chartType() == window.HUE_CHARTS.TYPES.BARCHART" title="${ _('Bars') }"></i>
@@ -1885,6 +1882,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         </li>
       </ul>
     </div>
+    <!-- /ko -->
 
     <div>
       <a class="snippet-side-btn" href="javascript:void(0)" data-bind="click: function(){ huePubSub.publish('chart.hard.reset'); isResultSettingsVisible(! isResultSettingsVisible()) }, css: { 'blue' : isResultSettingsVisible }" title="${ _('Columns') }">
@@ -2127,6 +2125,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       ksql: {
         placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
         aceMode: 'ace/mode/ksql',
+        snippetIcon: 'fa-database',
+        sqlDialect: true
+      },
+      flink: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/flink',
         snippetIcon: 'fa-database',
         sqlDialect: true
       },

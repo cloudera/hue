@@ -26,6 +26,7 @@ CreateStatement
  : DatabaseDefinition
  | TableDefinition
  | ViewDefinition
+ | MaterializedViewDefinition
  | RoleDefinition
  | FunctionDefinition
  | IndexDefinition
@@ -36,6 +37,7 @@ CreateStatement_EDIT
  : DatabaseDefinition_EDIT
  | TableDefinition_EDIT
  | ViewDefinition_EDIT
+ | MaterializedViewDefinition_EDIT
  | FunctionDefinition_EDIT
  | IndexDefinition_EDIT
  | MacroDefinition_EDIT
@@ -47,7 +49,7 @@ CreateStatement_EDIT
        if ($2 && !$3) {
          parser.suggestKeywords(['EXTERNAL TABLE', 'FUNCTION', 'MACRO', 'TABLE']);
        } else if (!$2 && !$3) {
-         parser.suggestKeywords(['DATABASE', 'EXTERNAL TABLE', 'FUNCTION', 'INDEX', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY EXTERNAL TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'TEMPORARY TABLE', 'TRANSACTIONAL TABLE', 'VIEW']);
+         parser.suggestKeywords(['DATABASE', 'EXTERNAL TABLE', 'FUNCTION', 'INDEX', 'MATERIALIZED VIEW', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY EXTERNAL TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'TEMPORARY TABLE', 'TRANSACTIONAL TABLE', 'VIEW']);
        } else if ($3) {
          parser.suggestKeywords(['TABLE']);
        }
@@ -56,8 +58,7 @@ CreateStatement_EDIT
  ;
 
 DatabaseDefinition
- : 'CREATE' DatabaseOrSchema OptionalIfNotExists
- | 'CREATE' DatabaseOrSchema OptionalIfNotExists RegularIdentifier DatabaseDefinitionOptionals
+ : 'CREATE' DatabaseOrSchema OptionalIfNotExists RegularIdentifier DatabaseDefinitionOptionals
    {
      parser.addNewDatabaseLocation(@4, [{ name: $4 }]);
    }
@@ -208,7 +209,7 @@ TableDefinitionRightPart_EDIT
    OptionalWithSerdeproperties HdfsLocation_EDIT OptionalTblproperties OptionalAsSelectStatement
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy
    OptionalClusteredBy OptionalSkewedBy OptionalRowFormat OptionalStoredAsOrBy
-   OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalAsSelectStatement_EDIT
+   OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties AsSelectStatement_EDIT
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy
    OptionalClusteredBy OptionalSkewedBy OptionalRowFormat OptionalStoredAsOrBy
    OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties 'CURSOR'
@@ -286,12 +287,12 @@ OptionalColumnSpecificationsOrLike_EDIT
 
 ParenthesizedColumnSpecificationList
  : '(' ColumnSpecificationList ')'                              -> $2
- | '(' ColumnSpecificationList ',' ConstraintSpecification ')'  -> $2
+ | '(' ColumnSpecificationList ',' TableConstraints ')'  -> $2
  ;
 
 ParenthesizedColumnSpecificationList_EDIT
  : '(' ColumnSpecificationList_EDIT RightParenthesisOrError
- | '(' ColumnSpecificationList ',' ConstraintSpecification_EDIT RightParenthesisOrError
+ | '(' ColumnSpecificationList ',' TableConstraints_EDIT RightParenthesisOrError
  | '(' ColumnSpecificationList ',' 'CURSOR' RightParenthesisOrError
    {
      parser.suggestKeywords([{ value: 'PRIMARY KEY', weight: 2 }, { value: 'CONSTRAINT', weight: 1 }]);
@@ -327,15 +328,24 @@ ColumnSpecificationList_EDIT
  ;
 
 ColumnSpecification
- : ColumnIdentifier ColumnDataType OptionalColumnOptions
+ : ColumnIdentifier ColumnDataType OptionalColumnOptions OptionalComment
    {
      $$ = $1;
      $$.type = $2;
      var keywords = [];
-     if (!$3['comment']) {
-       keywords.push('COMMENT');
-       if ($2.toLowerCase() === 'double') {
-         keywords.push({ value: 'PRECISION', weight: 2 });
+     if (!$4) {
+       keywords = keywords.concat([
+         { value: 'COMMENT', weight: 1 },
+         { value: 'CHECK', weight: 2 },
+         { value: 'PRIMARY KEY', weight: 2 },
+         { value: 'UNIQUE', weight: 2 },
+         { value: 'NOT NULL', weight: 2 },
+         { value: 'DEFAULT', weight: 2 }
+       ]);
+       if (!$3 && $2.toLowerCase() === 'double') {
+         keywords.push({ value: 'PRECISION', weight: 3 });
+       } else if ($3 && $3.suggestKeywords) {
+         keywords = keywords.concat($3.suggestKeywords)
        }
      }
      if (keywords.length > 0) {
@@ -345,32 +355,88 @@ ColumnSpecification
  ;
 
 ColumnSpecification_EDIT
- : ColumnIdentifier 'CURSOR' OptionalColumnOptions
+ : ColumnIdentifier 'CURSOR' OptionalColumnOptions OptionalComment
    {
      parser.suggestKeywords(parser.getColumnDataTypeKeywords());
    }
- | ColumnIdentifier ColumnDataType_EDIT OptionalColumnOptions
+ | ColumnIdentifier ColumnDataType_EDIT OptionalColumnOptions OptionalComment
  ;
 
 OptionalColumnOptions
- :                      -> {}
+ :
  | ColumnOptions
  ;
 
 ColumnOptions
  : ColumnOption
-   {
-     $$ = {};
-     $$[$1] = true;
-   }
  | ColumnOptions ColumnOption
-   {
-     $1[$2] = true;
-   }
  ;
 
 ColumnOption
- : Comment                                                   -> 'comment'
+ : 'PRIMARY' 'KEY' ColumnOptionOptionals                  -> $3
+ | 'PRIMARY'                                              -> { suggestKeywords: [{ value: 'KEY', weight: 3 }] }
+ | 'UNIQUE' ColumnOptionOptionals                         -> $2
+ | 'NOT' 'NULL' ColumnOptionOptionals                     -> $3
+ | 'NOT'                                                  -> { suggestKeywords: [{ value: 'NULL', weight: 3 }] }
+ | 'DEFAULT' DefaultValue ColumnOptionOptionals           -> $3
+ | 'CHECK' '(' ValueExpression ')' ColumnOptionOptionals  -> $5
+ | 'DEFAULT'
+   {
+     $$ = {
+       suggestKeywords: [
+         { value: 'LITERAL', weight: 3 },
+         { value: 'CURRENT_USER()', weight: 3 },
+         { value: 'CURRENT_DATE()', weight: 3 },
+         { value: 'CURRENT_TIMESTAMP()', weight: 3 },
+         { value: 'NULL', weight: 3 }
+       ]
+     }
+   }
+ ;
+
+ColumnOptionOptionals
+ : OptionalEnableOrDisable OptionalNovalidate OptionalRelyOrNorely
+   {
+     var keywords = [];
+     if (!$3) {
+       keywords.push({ value: 'RELY', weight: 3 });
+       keywords.push({ value: 'NORELY', weight: 3 });
+       if (!$2) {
+         keywords.push({ value: 'NOVALIDATE', weight: 3 });
+         if (!$1) {
+           keywords.push({ value: 'RELY', weight: 3 });
+           keywords.push({ value: 'NORELY', weight: 3 });
+         }
+       }
+     }
+     if (keywords.length) {
+       $$ = { suggestKeywords: keywords };
+     }
+   }
+ ;
+
+DefaultValue
+ : 'LITERAL'
+ | 'CURRENT_USER' '(' ')'
+ | 'CURRENT_DATE' '(' ')'
+ | 'CURRENT_TIMESTAMP' '(' ')'
+ | 'NULL'
+ ;
+
+OptionalEnableOrDisable
+ :
+ | 'ENABLE'
+ | 'DISABLE'
+ ;
+
+OptionalDisable
+ :
+ | 'DISABLE'
+ ;
+
+OptionalNovalidate
+ :
+ | 'NOVALIDATE'
  ;
 
 ColumnDataType
@@ -525,55 +591,80 @@ GreaterThanOrError
  | error
  ;
 
-ConstraintSpecification
+TableConstraints
  : PrimaryKeySpecification
- | 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification
- | PrimaryKeySpecification ',' 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification
+ | ConstraintList
+ | PrimaryKeySpecification ',' ConstraintList
  ;
 
-ConstraintSpecification_EDIT
+TableConstraints_EDIT
  : PrimaryKeySpecification_EDIT
  | PrimaryKeySpecification ',' 'CURSOR'
    {
      parser.suggestKeywords(['CONSTRAINT']);
    }
- | PrimaryKeySpecification ',' 'CONSTRAINT' RegularOrBacktickedIdentifier 'CURSOR'
+ | ConstraintList_EDIT
+ | PrimaryKeySpecification ',' ConstraintList_EDIT
+ | PrimaryKeySpecification_EDIT ',' ConstraintList
+ ;
+
+ConstraintList
+ : TableConstraint
+ | ConstraintList ',' TableConstraint
+ ;
+
+ConstraintList_EDIT
+ : TableConstraint_EDIT
+ | ConstraintList ',' TableConstraint_EDIT
+ ;
+
+TableConstraint
+ : TableConstraintLeftPart OptionalDisable OptionalNovalidate OptionalRelyOrNorely
+ ;
+
+TableConstraint_EDIT
+ : TableConstraintLeftPart_EDIT OptionalDisable OptionalNovalidate OptionalRelyOrNorely
+ | TableConstraintLeftPart OptionalDisable OptionalNovalidate OptionalRelyOrNorely 'CURSOR'
    {
-     parser.suggestKeywords(['FOREIGN KEY']);
-   }
- | PrimaryKeySpecification ',' 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification_EDIT
- | PrimaryKeySpecification_EDIT ',' 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification
- | 'CONSTRAINT' RegularOrBacktickedIdentifier 'CURSOR'
-   {
-     parser.suggestKeywords(['FOREIGN KEY']);
-   }
- | 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification_EDIT
- | 'CURSOR' 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification
-   {
-     parser.suggestKeywords(['PRIMARY KEY']);
+     parser.suggestKeywordsForOptionalsLR([$4, $3, $2], [
+       [{ value: 'RELY', weight: 1 }, { value: 'NORELY', weight: 1 }],
+       { value: 'NOVALIDATE', weight: 2 },
+       { value: 'DISABLE', weight: 3 }
+     ]);
    }
  ;
 
+TableConstraintLeftPart
+ : 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification
+ | 'CONSTRAINT' RegularOrBacktickedIdentifier 'CHECK' '(' ValueExpression ')'
+ | 'CONSTRAINT' RegularOrBacktickedIdentifier 'UNIQUE' ParenthesizedColumnList
+ ;
+
+TableConstraintLeftPart_EDIT
+ : 'CONSTRAINT' RegularOrBacktickedIdentifier 'CURSOR'
+   {
+     parser.suggestKeywords(['CHECK', 'FOREIGN KEY', 'UNIQUE']);
+   }
+ | 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification_EDIT
+ ;
 PrimaryKeySpecification
- : PrimaryKey ParenthesizedColumnList 'DISABLE' 'NOVALIDATE'
+ : PrimaryKey ParenthesizedColumnList OptionalDisable OptionalNovalidate OptionalRelyOrNorely
  ;
 
 PrimaryKeySpecification_EDIT
  : PrimaryKey_EDIT
  | PrimaryKey ParenthesizedColumnList_EDIT
- | PrimaryKey ParenthesizedColumnList 'CURSOR'
+ | PrimaryKey ParenthesizedColumnList OptionalDisable OptionalNovalidate OptionalRelyOrNorely 'CURSOR'
    {
-     parser.suggestKeywords(['DISABLE NOVALIDATE']);
+     parser.suggestKeywordsForOptionalsLR([$5, $4, $3], [
+        [{ value: 'RELY', weight: 1 }, { value: 'NORELY', weight: 1 }],
+        { value: 'NOVALIDATE', weight: 2 },
+        { value: 'DISABLE', weight: 1 }]);
    }
- | PrimaryKey ParenthesizedColumnList 'DISABLE' 'CURSOR'
-   {
-     parser.suggestKeywords(['NOVALIDATE']);
-   }
- | PrimaryKey ParenthesizedColumnList_EDIT 'DISABLE' 'NOVALIDATE'
  ;
 
 ForeignKeySpecification
- : 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList 'DISABLE' 'NOVALIDATE' OptionalRelyNoRely
+ : 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList
    {
      parser.addTablePrimary($5);
    }
@@ -599,26 +690,9 @@ ForeignKeySpecification_EDIT
    {
      parser.addTablePrimary($5);
    }
- | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList 'CURSOR'
-   {
-     parser.addTablePrimary($5);
-     parser.suggestKeywords(['DISABLE NOVALIDATE']);
-   }
- | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList 'DISABLE' 'CURSOR'
-   {
-     parser.addTablePrimary($5);
-     parser.suggestKeywords(['NOVALIDATE']);
-   }
- | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList 'DISABLE' 'NOVALIDATE' OptionalRelyNoRely 'CURSOR'
-   {
-     parser.addTablePrimary($5);
-     if (!$9) {
-       parser.suggestKeywords(['NORELY', 'RELY']);
-     }
-   }
  ;
 
-OptionalRelyNoRely
+OptionalRelyOrNorely
  :
  | 'RELY'
  | 'NORELY'
@@ -665,6 +739,23 @@ PartitionedBy_EDIT
    }
  ;
 
+OptionalPartitionedOn
+ :
+ | PartitionedOn
+ ;
+
+PartitionedOn
+ : 'PARTITIONED' 'ON' ParenthesizedColumnList
+ ;
+
+PartitionedOn_EDIT
+ : 'PARTITIONED' 'CURSOR'
+   {
+     parser.suggestKeywords(['ON']);
+   }
+ | 'PARTITIONED' 'ON' ParenthesizedColumnList_EDIT
+ ;
+
 LessThanOrEqualTo
  : '<'
  | 'COMPARISON_OPERATOR' // This is fine for autocompletion
@@ -700,6 +791,58 @@ ClusteredBy_EDIT
    }
  | 'CLUSTERED' 'BY' ParenthesizedColumnList OptionalSortedBy_EDIT 'INTO' 'UNSIGNED_INTEGER' 'BUCKETS'
  | 'CLUSTERED' 'BY' ParenthesizedColumnList OptionalSortedBy_EDIT
+ ;
+
+OptionalClusteredOrDistributedOn
+ :
+ | ClusteredOn
+ | DistributedOn SortedOn
+ ;
+
+ClusteredOrDistributedOn_EDIT
+ : ClusteredOn_EDIT
+ | DistributedOn_EDIT
+ | DistributedOn 'CURSOR'
+   {
+     parser.suggestKeywords(['SORTED ON']);
+   }
+ | DistributedOn SortedOn_EDIT
+ ;
+
+ClusteredOn
+ : 'CLUSTERED' 'ON' ParenthesizedColumnList
+ ;
+
+ClusteredOn_EDIT
+ : 'CLUSTERED' 'CURSOR'
+   {
+     parser.suggestKeywords(['ON']);
+   }
+ | 'CLUSTERED' 'ON' ParenthesizedColumnList_EDIT
+ ;
+
+DistributedOn
+ : 'DISTRIBUTED' 'ON' ParenthesizedColumnList
+ ;
+
+DistributedOn_EDIT
+ : 'DISTRIBUTED' 'CURSOR'
+   {
+     parser.suggestKeywords(['ON']);
+   }
+ | 'DISTRIBUTED' 'ON' ParenthesizedColumnList_EDIT
+ ;
+
+SortedOn
+ : 'SORTED' 'ON' ParenthesizedColumnList
+ ;
+
+SortedOn_EDIT
+ : 'SORTED' 'CURSOR'
+   {
+     parser.suggestKeywords(['ON']);
+   }
+ | 'SORTED' 'ON' ParenthesizedColumnList_EDIT
  ;
 
 OptionalSortedBy
@@ -1018,10 +1161,14 @@ TblProperties
 
 OptionalAsSelectStatement
  :
- | 'AS' CommitLocations QuerySpecification
+ | AsSelectStatement
  ;
 
-OptionalAsSelectStatement_EDIT
+AsSelectStatement
+ : 'AS' CommitLocations QuerySpecification
+ ;
+
+AsSelectStatement_EDIT
  : 'AS' CommitLocations 'CURSOR'
    {
      parser.suggestKeywords(['SELECT']);
@@ -1033,6 +1180,76 @@ CommitLocations
  : /* empty */
    {
      parser.commitLocations();
+   }
+ ;
+
+MaterializedViewDefinition
+ : 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier
+    OptionalDisableRewrite OptionalComment OptionalPartitionedOn OptionalClusteredOrDistributedOn
+    OptionalRowFormat OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties
+    AsSelectStatement
+ ;
+
+MaterializedViewDefinition_EDIT
+ : 'CREATE' 'MATERIALIZED' 'CURSOR'
+   {
+     parser.suggestKeywords(['VIEW']);
+   }
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists 'CURSOR'
+   {
+     if (!$4) {
+       parser.suggestKeywords(['IF NOT EXISTS']);
+     }
+     parser.suggestDatabases({ appendDot: true });
+   }
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalDisableRewrite OptionalComment
+   OptionalPartitionedOn OptionalClusteredOrDistributedOn OptionalRowFormat OptionalStoredAsOrBy OptionalHdfsLocation
+   OptionalTblproperties 'CURSOR'
+   {
+     parser.suggestKeywordsForOptionalsLR([undefined, $12, $11, $10, $9, $8, $7, $6, $5], [
+       { value: 'AS SELECT', weight: 1 },
+       { value: 'TBLPROPERTIES', weight: 2 },
+       { value: 'LOCATION', weight: 3 },
+       [{ value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }],
+       [{ value: 'CLUSTERED ON', weight: 5 }, { value: 'DISTRIBUTED ON', weight: 5 }],
+       { value: 'PARTITIONED ON', weight: 6 },
+       { value: 'COMMENT', weight: 7 },
+       { value: 'DISABLE REWRITE', weight: 8 }
+     ]);
+   }
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier DisableRewrite_EDIT OptionalComment
+   OptionalPartitionedOn OptionalClusteredOrDistributedOn OptionalRowFormat OptionalStoredAsOrBy OptionalHdfsLocation
+   OptionalTblproperties
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalDisableRewrite OptionalComment
+   PartitionedOn_EDIT OptionalClusteredOrDistributedOn OptionalRowFormat OptionalStoredAsOrBy OptionalHdfsLocation
+   OptionalTblproperties
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalDisableRewrite OptionalComment
+   OptionalPartitionedOn ClusteredOrDistributedOn_EDIT OptionalRowFormat OptionalStoredAsOrBy OptionalHdfsLocation
+   OptionalTblproperties
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalDisableRewrite OptionalComment
+   OptionalPartitionedOn OptionalClusteredOrDistributedOn RowFormat_EDIT OptionalStoredAsOrBy OptionalHdfsLocation
+   OptionalTblproperties
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalDisableRewrite OptionalComment
+   OptionalPartitionedOn OptionalClusteredOrDistributedOn OptionalRowFormat StoredAsOrBy_EDIT OptionalHdfsLocation
+   OptionalTblproperties
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalDisableRewrite OptionalComment
+   OptionalPartitionedOn OptionalClusteredOrDistributedOn OptionalRowFormat OptionalStoredAsOrBy HdfsLocation_EDIT
+   OptionalTblproperties
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalDisableRewrite OptionalComment
+   OptionalPartitionedOn OptionalClusteredOrDistributedOn OptionalRowFormat OptionalStoredAsOrBy OptionalHdfsLocation
+   OptionalTblproperties AsSelectStatement_EDIT
+ ;
+
+
+OptionalDisableRewrite
+ :
+ | 'DISABLE' 'REWRITE'
+ ;
+
+DisableRewrite_EDIT
+ : 'DISABLE' 'CURSOR'
+   {
+     parser.suggestKeywords(['REWRITE']);
    }
  ;
 
@@ -1191,7 +1408,7 @@ RoleDefinition
 IndexDefinition
  : 'CREATE' 'INDEX' RegularOrBacktickedIdentifier 'ON' 'TABLE' ExistingTable ParenthesizedIndexColumnList
    'AS' IndexType OptionalWithDeferredRebuild OptionalIdxProperties OptionalInTable OptionalRowFormat
-   OptionalStoredAsOrBy  OptionalHdfsLocation OptionalTblproperties OptionalComment
+   OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalComment
  ;
 
 IndexDefinition_EDIT

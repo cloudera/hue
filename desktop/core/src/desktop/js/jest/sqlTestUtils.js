@@ -33,10 +33,8 @@ const resultEquals = function(a, b) {
       }
     }
     return true;
-  } else {
-    // TODO: Jasmine version?
-    return jasmine.jasmine.matchersUtil.equals(a, b);
   }
+  return a == b;
 };
 
 const jsonStringToJsString = function(jsonString) {
@@ -97,7 +95,7 @@ expect.extend({
       if (!resultEquals(actualResponse.definitions, testDefinition.expectedDefinitions)) {
         return {
           pass: false,
-          message:
+          message: () =>
             '\n        Statement: ' +
             testDefinition.beforeCursor +
             '|' +
@@ -118,7 +116,7 @@ expect.extend({
     if (testDefinition.locationsOnly) {
       return {
         pass: resultEquals(actualResponse.locations, testDefinition.expectedLocations),
-        message:
+        message: () =>
           '\n        Statement: ' +
           testDefinition.beforeCursor +
           '|' +
@@ -145,7 +143,7 @@ expect.extend({
       if (actualResponse.locations.length > 0) {
         return {
           pass: false,
-          message:
+          message: () =>
             '\nStatement: ' +
             testDefinition.beforeCursor +
             '|' +
@@ -164,7 +162,7 @@ expect.extend({
       if (typeof actualResponse.suggestColRefKeywords == 'undefined') {
         return {
           pass: false,
-          message:
+          message: () =>
             '\nStatement: ' +
             testDefinition.beforeCursor +
             '|' +
@@ -184,7 +182,7 @@ expect.extend({
         if (!contains) {
           return {
             pass: false,
-            message:
+            message: () =>
               '\nStatement: ' +
               testDefinition.beforeCursor +
               '|' +
@@ -215,7 +213,7 @@ expect.extend({
       if (!contains) {
         return {
           pass: false,
-          message:
+          message: () =>
             '\n        Statement: ' +
             testDefinition.beforeCursor +
             '|' +
@@ -232,7 +230,7 @@ expect.extend({
       deleteKeywords = true;
     }
     if (typeof testDefinition.doesNotContainKeywords !== 'undefined') {
-      const keywords = actualResponse.suggestKeywords;
+      const keywords = actualResponse.suggestKeywords || [];
       let contains = false;
       testDefinition.doesNotContainKeywords.forEach(keyword => {
         if (typeof keywords === 'undefined' || keywords.indexOf(keyword) !== -1) {
@@ -243,7 +241,7 @@ expect.extend({
       if (contains) {
         return {
           pass: false,
-          message:
+          message: () =>
             '\n            Statement: ' +
             testDefinition.beforeCursor +
             '|' +
@@ -265,7 +263,7 @@ expect.extend({
     }
     return {
       pass: resultEquals(actualResponse, testDefinition.expectedResult),
-      message:
+      message: () =>
         '\n        Statement: ' +
         testDefinition.beforeCursor +
         '|' +

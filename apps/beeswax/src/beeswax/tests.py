@@ -18,12 +18,7 @@
 
 from future import standard_library
 standard_library.install_aliases()
-from builtins import next
-from builtins import map
-from builtins import str
-from builtins import chr
-from builtins import range
-from builtins import object
+from builtins import next, map, str, chr, range, object
 import gzip
 import json
 import logging
@@ -48,21 +43,17 @@ from django.urls import reverse
 from django.db import transaction
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.conf import \
-    AUTH_USERNAME as DEFAULT_AUTH_USERNAME, \
-    AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, \
-    AUTH_PASSWORD_SCRIPT as DEFAULT_AUTH_PASSWORD_SCRIPT, \
-    LDAP_USERNAME, \
-    LDAP_PASSWORD, \
-    USE_NEW_EDITOR
+from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, \
+  AUTH_PASSWORD_SCRIPT as DEFAULT_AUTH_PASSWORD_SCRIPT, LDAP_USERNAME, LDAP_PASSWORD, USE_NEW_EDITOR
 from desktop import redaction
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.parameterization import substitute_variables
+from desktop.lib.python_util import from_string_to_bits, get_bytes_from_bits
 from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.lib.security_util import get_localhost_name
-from desktop.lib.test_export_csvxls import _read_xls_sheet_data
+from desktop.lib.export_csvxls_tests import _read_xls_sheet_data
 from hadoop.fs.hadoopfs import Hdfs
 from useradmin.models import User
 
@@ -80,23 +71,24 @@ from beeswax import conf, hive_site
 from beeswax.common import apply_natural_sort
 from beeswax.conf import HIVE_SERVER_HOST, AUTH_USERNAME, AUTH_PASSWORD, AUTH_PASSWORD_SCRIPT
 from beeswax.views import collapse_whitespace, _save_design, parse_out_jobs, parse_out_queries
-from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config,\
-  fetch_query_result_data
+from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config, fetch_query_result_data
 from beeswax.design import hql_query
 from beeswax.data_export import upload, download
 from beeswax.models import SavedQuery, QueryHistory, HQL, HIVE_SERVER2
 from beeswax.server import dbms
 from beeswax.server.dbms import QueryServerException
-from beeswax.server.hive_server2_lib import HiveServerClient,\
-  PartitionKeyCompatible, PartitionValueCompatible, HiveServerTable,\
-  HiveServerTColumnValue2
+from beeswax.server.hive_server2_lib import HiveServerClient, PartitionKeyCompatible, PartitionValueCompatible, HiveServerTable, \
+    HiveServerTColumnValue2
 from beeswax.test_base import BeeswaxSampleProvider, is_hive_on_spark, get_available_execution_engines
 from beeswax.hive_site import get_metastore, hiveserver2_jdbc_url
 
+
 if sys.version_info[0] > 2:
-  from io import StringIO as string_io
+  from unittest.mock import patch, Mock
+  from io import BytesIO as string_io
   open_file = open
 else:
+  from mock import patch, Mock
   from cStringIO import StringIO as string_io
   open_file = file
 
@@ -136,7 +128,13 @@ def get_csv(client, result_response):
   return ''.join(csv_resp.streaming_content)
 
 
-class TestBeeswax(object):
+class TestHive(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test_hive", groupname="default", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test_hive")
+
+
   def test_parse_out_queries(self):
     text = """INFO  : Compiling command(queryId=hive_20191029132605_17883ebe-d3d5-41bf-a1e9-01cf207a3c6b): select 1
 INFO  : Semantic Analysis Completed (retrial = false)
@@ -156,8 +154,19 @@ INFO  : OK"""
     assert_true(jobs and jobs[0]['job_id'] == 'hive_20191029132605_17883ebe-d3d5-41bf-a1e9-01cf207a3c6a')
     assert_true(jobs and jobs[0]['started'] == False)
     assert_true(jobs and jobs[0]['finished'] == False)
-    
 
+
+  def test_install_examples(self):
+    with patch('beeswax.management.commands.beeswax_install_examples.Command') as Command:
+      resp = self.client.get('/beeswax/install_examples')
+      assert_true('POST request is required.' in json.loads(resp.content)['message'])
+
+      resp = self.client.post('/beeswax/install_examples', {'db_name': 'default'})
+      data = json.loads(resp.content)
+      assert_equal(0, data['status'])
+
+
+# This test suite is not running currently, to split between integration and unit tests.
 class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
   requires_hadoop = True
   integration = True
@@ -2129,10 +2138,16 @@ for x in sys.stdin:
 def test_import_gzip_reader():
   """Test the gzip reader in create table"""
   # Make gzipped data
-  data = open_file(__file__).read()
+  if sys.version_info[0] > 2:
+    data = open(__file__, encoding='utf-8').read()
+  else:
+    data = file(__file__).read()
   data_gz_sio = string_io()
   gz = gzip.GzipFile(fileobj=data_gz_sio, mode='wb')
-  gz.write(data)
+  gz_data = data
+  if not isinstance(gz_data, bytes):
+    gz_data = gz_data.encode('utf-8')
+  gz.write(gz_data)
   gz.close()
   data_gz = data_gz_sio.getvalue()
 
@@ -2698,6 +2713,41 @@ class TestHiveServer2API(object):
     assert_false(data is HiveServerTColumnValue2.set_nulls(data, nulls))
 
 
+  def test_bits_to_bytes_conversion(self):
+    if sys.version_info[0] < 3:
+      raise SkipTest
+
+    nulls = '\x00'
+    bitstring = from_string_to_bits(nulls)
+    assert_equal('00000000', bitstring)
+    assert_equal([0, 0], get_bytes_from_bits(bitstring))
+
+    nulls = '\x03'
+    bitstring = from_string_to_bits(nulls)
+    assert_equal('00000011', bitstring)
+    assert_equal([3, 0], get_bytes_from_bits(bitstring))
+
+    nulls = 't'
+    bitstring = from_string_to_bits(nulls)
+    assert_equal('01110100', bitstring)
+    assert_equal([116, 0], get_bytes_from_bits(bitstring))
+
+    nulls = '\xff\xee\x03'
+    bitstring = from_string_to_bits(nulls)
+    assert_equal('111111111110111000000011', bitstring)
+    assert_equal([255, 238, 3, 0], get_bytes_from_bits(bitstring))
+
+    nulls = '\x41'
+    bitstring = from_string_to_bits(nulls)
+    assert_equal('01000001', bitstring)
+    assert_equal([65, 0], get_bytes_from_bits(bitstring))
+
+    nulls = '\x01\x23\x45\x67\x89\xab\xcd\xef'
+    bitstring = from_string_to_bits(nulls)
+    assert_equal('0000000100100011010001010110011110001001101010111100110111101111', bitstring)
+    assert_equal([1, 35, 69, 103, 137, 171, 205, 239, 0], get_bytes_from_bits(bitstring))
+
+
 class MockDbms(object):
 
   def __init__(self, client, server_type):
@@ -2857,7 +2907,7 @@ class TestWithMockedServer(object):
 
   def test_get_history_xss(self):
     sql = 'SELECT count(sample_07.salary) FROM sample_07;"><iFrAME>src="javascript:alert(\'Hue has an xss\');"></iFraME>'
-    sql_escaped = 'SELECT count(sample_07.salary) FROM sample_07;&quot;&gt;&lt;iFrAME&gt;src=&quot;javascript:alert(&#39;Hue has an xss&#39;);&quot;&gt;&lt;/iFraME&gt;'
+    sql_escaped = b'SELECT count(sample_07.salary) FROM sample_07;&quot;&gt;&lt;iFrAME&gt;src=&quot;javascript:alert(&#39;Hue has an xss&#39;);&quot;&gt;&lt;/iFraME&gt;'
 
     response = _make_query(self.client, sql, submission_type='Save', name='My Name 1', desc='My Description')
     content = json.loads(response.content)
@@ -2881,6 +2931,8 @@ class TestWithMockedServer(object):
 
     resp = self.client.get('/beeswax/query_history?format=json')
     assert_true(sql_escaped in resp.content, resp.content)
+    if not isinstance(sql, bytes):
+      sql = sql.encode('utf-8')
     assert_false(sql in resp.content, resp.content)
 
   def test_redact_saved_design(self):
@@ -3054,26 +3106,23 @@ def test_hiveserver2_get_security():
 
 
     # Impala
-    cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
+    impala_query_server = {
+        'server_name': 'impala', 'dialect': 'impala', 'principal': 'impala', 'impersonation_enabled': False, 'auth_username': 'hue',
+        'auth_password': None, 'use_sasl': False
+    }
+    impala_query_server.update(default_query_server)
+    assert_equal((False, 'GSSAPI', 'impala', False, 'hue', None), HiveServerClient(impala_query_server, user).get_security())
 
-    finish = cluster_conf.SECURITY_ENABLED.set_for_testing(False)
-    try:
-      impala_query_server = {'server_name': 'impala', 'principal': 'impala', 'impersonation_enabled': False, 'auth_username': 'hue', 'auth_password': None, 'use_sasl': False}
-      impala_query_server.update(default_query_server)
-      assert_equal((False, 'GSSAPI', 'impala', False, 'hue', None), HiveServerClient(impala_query_server, user).get_security())
+    impala_query_server = {
+        'server_name': 'impala', 'dialect': 'impala', 'principal': 'impala', 'impersonation_enabled': True, 'auth_username': 'hue',
+        'auth_password': None, 'use_sasl': False
+    }
+    impala_query_server.update(default_query_server)
+    assert_equal((False, 'GSSAPI', 'impala', True, 'hue', None), HiveServerClient(impala_query_server, user).get_security())
 
-      impala_query_server = {'server_name': 'impala', 'principal': 'impala', 'impersonation_enabled': True, 'auth_username': 'hue', 'auth_password': None, 'use_sasl': False}
-      impala_query_server.update(default_query_server)
-      assert_equal((False, 'GSSAPI', 'impala', True, 'hue', None), HiveServerClient(impala_query_server, user).get_security())
-    finally:
-      finish()
 
-    finish = cluster_conf.SECURITY_ENABLED.set_for_testing(True)
-    try:
-      impala_query_server.update({'use_sasl': True})
-      assert_equal((True, 'GSSAPI', 'impala', True, 'hue', None), HiveServerClient(impala_query_server, user).get_security())
-    finally:
-      finish()
+    impala_query_server.update({'use_sasl': True})
+    assert_equal((True, 'GSSAPI', 'impala', True, 'hue', None), HiveServerClient(impala_query_server, user).get_security())
   finally:
     if prev is not None:
       hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = prev
@@ -3160,14 +3209,14 @@ def test_close_queries_flag():
   finish = conf.CLOSE_QUERIES.set_for_testing(False)
   try:
     resp = c.get('/beeswax/execute')
-    assert_false('closeQuery()' in resp.content, resp.content)
+    assert_false(b'closeQuery()' in resp.content, resp.content)
   finally:
     finish()
 
   finish = conf.CLOSE_QUERIES.set_for_testing(True)
   try:
     resp = c.get('/beeswax/execute')
-    assert_true('closeQuery()' in resp.content, resp.content)
+    assert_true(b'closeQuery()' in resp.content, resp.content)
   finally:
     finish()
 

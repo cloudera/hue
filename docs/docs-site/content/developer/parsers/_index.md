@@ -5,15 +5,22 @@ draft: false
 weight: 2
 ---
 
-This guide goes you through the steps necessary to create an autocompleter for any SQL dialect in Hue. The major benefits are:
+This guide goes you through the steps necessary to create an autocompleter for any [SQL dialect](/administrator/configuration/connectors/#databases) in Hue. The major benefits are:
 
-* showing only valid syntax in the autocomplete
-* getting the list of tables, columns automatically
-* proper syntax highlighting of the keywords
+* Proposing only valid syntax in the autocomplete
+* Getting the list of tables, columns, UDFs... automatically
+* Suggesting fixes
 
 ## Parser Theory
 
 There are several parsers in Hue already (e.g. one for Impala, one for Hive..) and a generic SQL that is used for other dialects. The parsers are written using a [bison](https://www.gnu.org/software/bison/) grammar and are generated with [jison](https://github.com/zaach/jison). They arere 100% Javascript and live on the client side, this gives the performance of a desktop editor in your browser.
+
+Building a dedicated work is more effort but it then allows a very rich end user experience, e.g.:
+
+* Handle invalid/imcomplete queries and propose suggestions/fixes
+* date_column = <Date compatible UDF ...>
+* Language reference or data samples just by pointing the cursor on SQL identifiers
+* Leverage the parser for risk alerts (e.g. adding automatic LIMIT) or proper re-formatting
 
 ### Structure
 
@@ -108,7 +115,9 @@ For the statement above we’d add an extra rule with an _EDIT postfix like this
 
 So for example if a cursor without any text is encountered, it will tell us to suggest the ‘SELECT’ keyword etc.
 
-## Tutorial: Creating a PostgreSQL parser
+## Tutorial: Creating a parser
+
+The goal is to create from scratch a new parser for the PostgreSQL database.
 
 ### Prerequisites
 
@@ -151,7 +160,7 @@ This gives you an idea on how to add custom syntax to the newly generated postgr
 
 We’ll start by adding a test, in `postgresqlAutocompleteParser.test.js` in the test folder inside the main describe function before the first `it('should...`:
 
-    fdescribe('REINDEX', () => {
+    describe('REINDEX', () => {
       it('should handle "REINDEX TABLE foo FORCE; |"', () => {
         assertAutoComplete({
           beforeCursor: 'REINDEX TABLE foo FORCE;  ',
@@ -177,7 +186,12 @@ We’ll start by adding a test, in `postgresqlAutocompleteParser.test.js` in the
       });
     });
 
-When we now run `npm run test` there should be two failing tests.
+When we now run `npm run test -- postgresqlAutocompleteParser.test.js` there should be two failing tests.
+
+Alternatively, if using Jest directly and working on parsers currently being skipped in the CI, provide matching file names and an empty blacklist file pattern. e.g.:
+
+    jest calciteAutocompleteParser.Select.stream.test.js --testPathIgnorePatterns=[]
+    jest calciteAutocompleteParser --testPathIgnorePatterns=[]
 
 Next we’ll have to add the keyword to the lexer, let’s open `sql.jisonlex` in the jison folder for postgresql and add the following new tokens:
 
@@ -210,7 +224,7 @@ Now let’s add the grammar, starting with the complete specification. For simpl
 
 "DataDefinition" is an existing rule and this extends that rule with "ReindexStatement".
 
-Save the files and first run `node tools/jison/generateParsers.js postgresql` then `npm run test` and we should be down to one failing test.
+Save the files and first run `node tools/jison/generateParsers.js postgresql` then `npm run test -- postgresqlAutocompleteParser.test.js` and we should be down to one failing test.
 
 For the next one we’ll add some keyword suggestions after the user has typed REINDEX, we’ll continue below the ReindexStatement in `sql_main.jison`:
 
@@ -225,7 +239,7 @@ For the next one we’ll add some keyword suggestions after the user has typed R
       }
     ;
 
-Again, run `node tools/jison/generateParsers.js postgresql` then `npm run test` and the tests should both be green.
+Again, run `node tools/jison/generateParsers.js postgresql` then `npm run test -- postgresqlAutocompleteParser.test.js` and the tests should both be green.
 
 We also want the autocompleter to suggest the keyword REINDEX when the user hasn’t typed anything, to do that let’s first add the following test with the other new ones in `postgresqlAutocompleteParser.test.js`:
 
@@ -241,9 +255,9 @@ We also want the autocompleter to suggest the keyword REINDEX when the user hasn
       });
     });
 
-For this to pass we need to add REINDEX to the list of DDL and DML keywords in the file `sqlParseSupport.js` next to the generated parser (`desktop/core/src/desktop/js/parse/sql/postgresql/sqlParseSupport.js/`). Find the function `parser.suggestDdlAndDmlKeywords` and add ‘REINDEX’ to the keywords array. Now run `npm run test` and the three tests should pass.
+For this to pass we need to add REINDEX to the list of DDL and DML keywords in the file `sqlParseSupport.js` next to the generated parser (`desktop/core/src/desktop/js/parse/sql/postgresql/sqlParseSupport.js/`). Find the function `parser.suggestDdlAndDmlKeywords` and add ‘REINDEX’ to the keywords array. Now run `npm run test -- postgresqlAutocompleteParser.test.js` and the three tests should pass.
 
-Before you continue further be sure to remove the ‘f’ from ‘fdescribe’ in the spec to allow all other tests to run. Note that in this case there will be two new failing tests where the keyword ‘REINDEX’ has to be added.
+Before you continue further, note that in this case there will be two new failing tests where the keyword ‘REINDEX’ has to be added.
 
 In order to use the newly generated parsers we have to add them to the webpack bundles:
 
@@ -317,3 +331,7 @@ And cf. above [prerequisites](#prerequisites), any interpreter snippet with `ksq
         interface=ksql
 
 Note: after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) we will be able to have multiple interpreters on the same dialect (e.g. pointing to two different databases of the same type).
+
+## API: Exporting a parser
+
+Parsers generated by Hue are JavaScript modules. This makes it easy to import a parser into your own apps (e.g. Webapp, Node.Js...). How to do it is described in depth in the [API section](/developer/api/#sql-autocompletion).

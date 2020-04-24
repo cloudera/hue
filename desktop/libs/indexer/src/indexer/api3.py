@@ -15,11 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
 from future import standard_library
 standard_library.install_aliases()
-from builtins import oct
-from builtins import zip
+
+from builtins import oct, zip
 from past.builtins import basestring
 import json
 import logging
@@ -29,8 +28,14 @@ import sys
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
-from simple_salesforce.api import Salesforce
-from simple_salesforce.exceptions import SalesforceRefusedRequest
+
+LOG = logging.getLogger(__name__)
+
+try:
+  from simple_salesforce.api import Salesforce
+  from simple_salesforce.exceptions import SalesforceRefusedRequest
+except ImportError:
+  LOG.warn('simple_salesforce module not found')
 
 from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse
@@ -62,10 +67,6 @@ else:
   from StringIO import StringIO as string_io
   from urllib import unquote as urllib_unquote
   from urlparse import urlparse
-
-
-LOG = logging.getLogger(__name__)
-
 
 try:
   from beeswax.server import dbms

@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>How to use PySAML2 &#8212; pysaml2  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Configuration of pySAML2 entities" href="config.html" />
+    <link rel="prev" title="An extremly simple example of a SAML2 identity provider." href="../examples/idp.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="how-to-use-pysaml2">
+<span id="howto"></span><h1>How to use PySAML2<a class="headerlink" href="#how-to-use-pysaml2" title="Permalink to this headline">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Release</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Date</dt>
+<dd class="field-even"><p>Nov 03, 2019</p>
+</dd>
+</dl>
+<p>Before you can use Pysaml2, you’ll need to get it installed.
+If you have not done it yet, read the <a class="reference internal" href="../install.html#install"><span class="std std-ref">Quick install guide</span></a></p>
+<p>Well, now you have it installed and you want to do something.</p>
+<p>And I’m sorry to tell you this; but there isn’t really a lot you can do with
+this code on its own.</p>
+<p>Sure you can send a AuthenticationRequest to an IdentityProvider or a
+AttributeQuery to an AttributeAuthority, but in order to get what they
+return you have to sit behind a Web server. Well that is not really true since
+the AttributeQuery would be over SOAP and you would get the result over the
+connection you have to the AttributeAuthority.</p>
+<p>But anyway, you may get my point. This is middleware stuff !</p>
+<p>PySAML2 is built to fit into a
+<a class="reference external" href="http://www.python.org/dev/peps/pep-0333/">WSGI</a> application</p>
+<p>But it can be used in a non-WSGI environment too.</p>
+<p>So you will find descriptions of both cases here.</p>
+<p>The configuration is the same regardless of whether you are using PySAML2 in a
+WSGI or non-WSGI environment.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration of pySAML2 entities</a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">pysaml2</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Quick install guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Quick pysaml2 example</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to use PySAML2</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config.html">Configuration of pySAML2 entities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../sp_test/internal.html">How sp_test works internally</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../examples/idp.html" title="previous chapter">An extremly simple example of a SAML2 identity provider.</a></li>
+      <li>Next: <a href="config.html" title="next chapter">Configuration of pySAML2 entities</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2010-2011, Roland Hedberg.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/howto/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

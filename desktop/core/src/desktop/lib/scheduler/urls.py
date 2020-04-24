@@ -24,4 +24,5 @@ urlpatterns = [
   url(r'^api/schedule/new/?$', api.get_schedule, name='scheduler.api.new_schedule'),
   url(r'^api/schedule/edit/?$', api.get_schedule, name='scheduler.api.edit_schedule'),
   url(r'^api/schedule/submit/(?P<doc_id>[-\w]+)?$', api.submit_schedule, name='scheduler.api.submit_schedule'),
+  url(r'^api/schedule/list/?$', api.list_schedules, name='scheduler.api.list_schedules'),
 ]

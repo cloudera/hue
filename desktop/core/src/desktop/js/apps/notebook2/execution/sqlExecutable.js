@@ -19,6 +19,8 @@ import Executable from 'apps/notebook2/execution/executable';
 
 const BATCHABLE_STATEMENT_TYPES = /ALTER|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i;
 
+const SELECT_END_REGEX = /([^;]*)([;]?[^;]*)/;
+
 export default class SqlExecutable extends Executable {
   /**
    * @param options
@@ -34,7 +36,24 @@ export default class SqlExecutable extends Executable {
   }
 
   getStatement() {
-    return this.statement || this.parsedStatement.statement;
+    let statement = this.statement || this.parsedStatement.statement;
+    if (
+      this.parsedStatement &&
+      this.parsedStatement.firstToken &&
+      this.parsedStatement.firstToken.toLowerCase() === 'select' &&
+      !isNaN(this.executor.defaultLimit()) &&
+      this.executor.defaultLimit() > 0 &&
+      !/\slimit\s[0-9]/i.test(statement)
+    ) {
+      const endMatch = statement.match(SELECT_END_REGEX);
+      if (endMatch) {
+        statement = endMatch[1] + ' LIMIT ' + this.executor.defaultLimit();
+        if (endMatch[2]) {
+          statement += endMatch[2];
+        }
+      }
+    }
+    return statement;
   }
 
   async internalExecute() {
@@ -85,7 +104,7 @@ export default class SqlExecutable extends Executable {
   toJson() {
     return JSON.stringify({
       id: this.id,
-      statement: this.parsedStatement.statement,
+      statement: this.getStatement(),
       database: this.database
       // session:
     });

@@ -85,7 +85,7 @@ def get_tenant(request):
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   cluster_id = request.POST.get('cluster_id')
 
-  api = get_api(request, interface)
+  api = get_api(request.user, interface)
 
   data = api.get_tenant(cluster_id=cluster_id)
 
@@ -107,7 +107,7 @@ def top_tables(request):
   database = request.POST.get('database', 'default')
   limit = request.POST.get('len', 1000)
 
-  api = get_api(request, interface)
+  api = get_api(request.user, interface)
 
   data = api.top_tables(database_name=database, page_size=limit)
 
@@ -145,7 +145,7 @@ def table_details(request):
   database_name = request.POST.get('databaseName')
   table_name = request.POST.get('tableName')
 
-  api = get_api(request, interface)
+  api = get_api(request.user, interface)
 
   data = api.table_details(database_name=database_name, table_name=table_name)
 
@@ -168,7 +168,7 @@ def query_compatibility(request):
   target_platform = request.POST.get('targetPlatform')
   query = request.POST.get('query')
 
-  api = get_api(request, interface)
+  api = get_api(request.user, interface)
 
   data = api.query_compatibility(source_platform=source_platform, target_platform=target_platform, query=query)
 
@@ -191,7 +191,7 @@ def query_risk(request):
   source_platform = request.POST.get('sourcePlatform')
   db_name = request.POST.get('dbName')
 
-  api = get_api(request, interface)
+  api = get_api(request.user, interface)
 
   data = api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
 
@@ -213,7 +213,7 @@ def similar_queries(request):
   source_platform = request.POST.get('sourcePlatform')
   query = json.loads(request.POST.get('query'))
 
-  api = get_api(request, interface)
+  api = get_api(request.user, interface)
 
   data = api.similar_queries(source_platform=source_platform, query=query)
 
@@ -235,7 +235,7 @@ def top_filters(request):
   db_tables = json.loads(request.POST.get('dbTables', '[]'))
   column_name = request.POST.get('columnName') # Unused
 
-  api = get_api(request, interface)
+  api = get_api(request.user, interface)
 
   data = api.top_filters(db_tables=db_tables)
 
@@ -264,7 +264,7 @@ def top_joins(request):
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   db_tables = json.loads(request.POST.get('dbTables', '[]'))
 
-  api = get_api(request, interface)
+  api = get_api(request.user, interface)
 
   data = api.top_joins(db_tables=db_tables)
 
@@ -285,7 +285,7 @@ def top_aggs(request):
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   db_tables = json.loads(request.POST.get('dbTables', '[]'))
 
-  api = get_api(request, interface)
+  api = get_api(request.user, interface)
 
   data = api.top_aggs(db_tables=db_tables)
 
@@ -305,7 +305,7 @@ def top_databases(request):
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
 
-  api = get_api(request, interface)
+  api = get_api(request.user, interface)
 
   data = api.top_databases()
 
@@ -326,7 +326,7 @@ def top_columns(request):
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   db_tables = json.loads(request.POST.get('dbTables', '[]'))
 
-  api = get_api(request, interface)
+  api = get_api(request.user, interface)
 
   data = api.top_columns(db_tables=db_tables)
 
@@ -346,7 +346,10 @@ def _convert_queries(queries_data):
     try:
       snippet = query_data['snippets'][0]
       if 'guid' in snippet['result']['handle']: # Not failed query
-        original_query_id = '%s:%s' % struct.unpack(b"QQ", base64.decodestring(snippet['result']['handle']['guid'])) # unpack_guid uses '%016x:%016x' while optmizer api uses '%s:%s'.
+        guid = snippet['result']['handle']['guid']
+        if isinstance(guid, str):
+          guid = guid.encode('utf-8')
+        original_query_id = '%s:%s' % struct.unpack(b"QQ", base64.decodestring(guid)) # unpack_guid uses '%016x:%016x' while optmizer api uses '%s:%s'.
         execution_time = snippet['result']['executionTime'] * 100 if snippet['status'] in ('available', 'expired') else -1
         statement = _clean_query(_get_statement(query_data))
         queries.append((original_query_id, execution_time, statement, snippet.get('database', 'default').strip()))
@@ -363,7 +366,7 @@ def upload_history(request):
 
   if is_admin(request.user):
     interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
-    api = get_api(request, interface)
+    api = get_api(request.user, interface)
     histories = []
     upload_stats = {}
 
@@ -407,7 +410,7 @@ def upload_query(request):
       queries = _convert_queries([query_data])
       source_platform = query_data['snippets'][0]['type']
 
-      api = get_api(request, interface)
+      api = get_api(request.user, interface)
 
       response['query_upload'] = api.upload(data=queries, data_type='queries', source_platform=source_platform)
     except Document2.DoesNotExist:
@@ -502,7 +505,7 @@ def upload_table_stats(request):
     except Exception as e:
       LOG.exception('Skipping upload of %s: %s' % (db_table, e))
 
-  api = get_api(request, interface)
+  api = get_api(request.user, interface)
 
   response['status'] = 0
 
@@ -532,7 +535,7 @@ def upload_status(request):
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   workload_id = request.POST.get('workloadId')
 
-  api = get_api(request, interface)
+  api = get_api(request.user, interface)
 
   response['upload_status'] = api.upload_status(workload_id=workload_id)
   response['status'] = 0

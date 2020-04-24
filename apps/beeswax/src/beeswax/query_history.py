@@ -36,11 +36,13 @@ from desktop.lib import django_mako
 
 from useradmin.models import install_sample_user
 
+
 LOG = logging.getLogger(__name__)
 
 QUERY_HISTORY_CACHE_MAX_USER_COUNT = 10
 QUERY_HISTORY_CACHE_MAX_LENGTH_PER_USER = 25
 HAS_CREATED_TABLE = False
+
 
 class QueryHistory(object):
   def __init__(self, max_user=10, max_history_per_user=25):

@@ -29,34 +29,52 @@ User to remain a django.contrib.auth.models.User object.
 """
 
 from builtins import object
-import ldap
+from importlib import import_module
+
 import logging
-import pam
+LOG = logging.getLogger(__name__)
+
+try:
+  import ldap
+except ImportError:
+  LOG.warn('ldap module not found')
+try:
+  import pam
+except ImportError:
+  LOG.warn('pam module not found')
 import requests
 
-from importlib import import_module
 import django.contrib.auth.backends
 from django.contrib import auth
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpResponseRedirect
 from django.forms import ValidationError
-from django_auth_ldap.backend import LDAPBackend
-from django_auth_ldap.config import LDAPSearch
+try:
+  from django_auth_ldap.backend import LDAPBackend
+  from django_auth_ldap.config import LDAPSearch
+except ImportError:
+  LOG.warn('django_auth_ldap module not found')
+  class LDAPSearch: pass
+  class LDAPSearch: pass
 from liboauth.metrics import oauth_authentication_time
-from mozilla_django_oidc.auth import OIDCAuthenticationBackend, default_username_algo
-from mozilla_django_oidc.utils import absolutify, import_from_settings
+try:
+  from mozilla_django_oidc.auth import OIDCAuthenticationBackend, default_username_algo
+  from mozilla_django_oidc.utils import absolutify, import_from_settings
+except ImportError:
+  LOG.warn('mozilla_django_oidc module not found')
+  class OIDCAuthenticationBackend: pass
 
 from desktop import metrics
 from desktop.conf import AUTH, LDAP, OIDC, ENABLE_ORGANIZATIONS
 from desktop.settings import LOAD_BALANCER_COOKIE
 
 from useradmin import ldap_access
-from useradmin.models import get_profile, get_default_user_group, UserProfile, User, Organization
+from useradmin.models import get_profile, get_default_user_group, UserProfile, User
+from useradmin.organization import get_organization
 
 
-LOG = logging.getLogger(__name__)
-
+# TODO: slowly move those utils to the useradmin module
 
 def load_augmentation_class():
   """
@@ -66,7 +84,7 @@ def load_augmentation_class():
   try:
     class_name = AUTH.USER_AUGMENTOR.get()
     i = class_name.rfind('.')
-    module, attr = class_name[:i], class_name[i+1:]
+    module, attr = class_name[:i], class_name[i + 1:]
     mod = import_module(module)
     klass = getattr(mod, attr)
     LOG.info("Augmenting users with class: %s" % (klass,))
@@ -74,6 +92,7 @@ def load_augmentation_class():
   except:
     LOG.exception('failed to augment class')
     raise ImproperlyConfigured("Could not find user_augmentation_class: %s" % (class_name,))
+
 
 _user_augmentation_class = None
 def get_user_augmentation_class():
@@ -83,31 +102,58 @@ def get_user_augmentation_class():
     _user_augmentation_class = load_augmentation_class()
   return _user_augmentation_class
 
+
 def rewrite_user(user):
   """
   Rewrites the user according to the augmentation class.
-  We currently only re-write specific attributes,
-  though this could be generalized.
+  We currently only re-write specific attributes, though this could be generalized.
   """
   if user is None:
     LOG.warn('Failed to rewrite user, user is None.')
   else:
     augment = get_user_augmentation_class()(user)
-    for attr in ("get_groups", "get_home_directory", "has_hue_permission"):
+    for attr in ('get_groups', 'get_home_directory', 'has_hue_permission', 'get_permissions'):
       setattr(user, attr, getattr(augment, attr))
+
+    setattr(user, 'profile', get_profile(user))
+    setattr(user, 'auth_backend', user.profile.data.get('auth_backend'))
   return user
 
+
 def is_admin(user):
+  """
+  Admin of the Organization. Typically can edit users, connectors...
+  To rename to is_org_admin at some point.
+
+  If ENABLE_ORGANIZATIONS is false:
+    - Hue superusers are automatically also admin
+
+  If ENABLE_ORGANIZATIONS is true:
+    - Hue superusers might not be admin of the organization
+  """
   is_admin = False
-  if hasattr(user, 'is_superuser'):
+
+  if hasattr(user, 'is_superuser') and not ENABLE_ORGANIZATIONS.get():
     is_admin = user.is_superuser
+
   if not is_admin and user.is_authenticated():
     try:
       user = rewrite_user(user)
-      is_admin = user.has_hue_permission(action="superuser", app="useradmin")
-    except Exception as e:
-      LOG.exception("Could not validate if %s is a superuser assuming False." % user)
+      is_admin = user.is_admin if ENABLE_ORGANIZATIONS.get() else user.has_hue_permission(action="superuser", app="useradmin")
+    except Exception:
+      LOG.exception("Could not validate if %s is a superuser, assuming False." % user)
+
   return is_admin
+
+
+def is_hue_admin(user):
+  """
+  Hue service super user. Can manage global settings of the services used by all the organization.
+
+  Independent of ENABLE_ORGANIZATIONS.
+  """
+  return hasattr(user, 'is_superuser') and user.is_superuser
+
 
 class DefaultUserAugmentor(object):
   def __init__(self, parent):
@@ -125,33 +171,46 @@ class DefaultUserAugmentor(object):
   def has_hue_permission(self, action, app):
     return self._get_profile().has_hue_permission(action=action, app=app)
 
+  def get_permissions(self):
+    return self._get_profile().get_permissions()
+
+
 def find_user(username):
   lookup = {'email': username} if ENABLE_ORGANIZATIONS.get() else {'username': username}
 
   try:
     user = User.objects.get(**lookup)
-    LOG.debug("Found user %s in the db" % username)
+    LOG.debug("Found user %s" % user)
   except User.DoesNotExist:
     user = None
+
   return user
+
 
 def create_user(username, password, is_superuser=True):
   if ENABLE_ORGANIZATIONS.get():
     organization = get_organization(email=username)
-    lookup = {'email': username, 'organization': organization}
+    attrs = {'email': username, 'organization': organization}
   else:
-    lookup = {'username': username}
+    attrs = {'username': username}
 
-  LOG.info("Materializing user %s in the database" % lookup)
-
-  user = User(**lookup)
+  user = User(**attrs)
 
   if password is None:
     user.set_unusable_password()
   else:
     user.set_password(password)
+
   user.is_superuser = is_superuser
+
+  if ENABLE_ORGANIZATIONS.get():
+    user.is_admin = is_superuser or not organization.organizationuser_set.exists() or not organization.is_multi_user
+    user.save()
+    ensure_has_a_group(user)
+
   user.save()
+
+  LOG.info("User %s was created." % username)
 
   return user
 
@@ -162,7 +221,7 @@ def find_or_create_user(username, password=None, is_superuser=True):
   return user
 
 def ensure_has_a_group(user):
-  default_group = get_default_user_group()
+  default_group = get_default_user_group(user=user)
 
   if not user.groups.exists() and default_group is not None:
     user.groups.add(default_group)
@@ -174,11 +233,6 @@ def force_username_case(username):
   elif AUTH.FORCE_USERNAME_UPPERCASE.get():
     username = username.upper()
   return username
-
-def get_organization(email):
-  domain = email.split('@')[1]
-  organization, created = Organization.objects.get_or_create(name=domain)
-  return organization
 
 
 class DesktopBackendBase(object):
@@ -221,6 +275,7 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
       username = email
     username = force_username_case(username)
     request = None
+
     user = super(AllowFirstUserDjangoBackend, self).authenticate(request, username=username, password=password)
 
     if user is not None:
@@ -715,8 +770,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
     if not code or not state:
       return None
 
-    reverse_url = import_from_settings('OIDC_AUTHENTICATION_CALLBACK_URL',
-                                       'oidc_authentication_callback')
+    reverse_url = import_from_settings('OIDC_AUTHENTICATION_CALLBACK_URL', 'oidc_authentication_callback')
 
     token_payload = {
       'client_id': self.OIDC_RP_CLIENT_ID,

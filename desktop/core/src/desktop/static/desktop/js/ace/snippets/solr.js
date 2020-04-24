@@ -1,1 +1,1 @@
-ace.define("ace/snippets/solr",["require","exports","module"],function(e,t,n){"use strict";t.snippetText="",t.scope="solr"})
+ace.define("ace/snippets/solr",["require","exports","module"],function(e,t,n){"use strict";t.snippetText=undefined,t.scope="solr"})

@@ -20,129 +20,40 @@ import logging
 
 from django.utils.translation import ugettext as _
 
-from desktop.conf import has_connectors, CONNECTORS
+from useradmin.models import update_app_permissions
+from notebook.conf import config_validator, _connector_to_iterpreter
+
+from desktop.auth.decorators import admin_required
+from desktop.decorators import api_error_handler
 from desktop.lib.django_util import JsonResponse, render
-from desktop.lib.connectors.lib.impala import Impala
-from desktop.lib.connectors.lib.hive import Hive
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.connectors.models import _get_installed_connectors, get_connectors_types, Connector, _create_connector_examples, \
+    _augment_connector_properties
+from desktop.lib.connectors.types import get_connectors_types, get_connector_categories, get_connector_by_type
 
 
 LOG = logging.getLogger(__name__)
 
 
-# TODO: automatically load modules from lib module
-# TODO: offer to white/black list available connector types
-CONNECTOR_TYPES = [{
-    'nice_name': connector.NAME,
-    'dialect': connector.TYPE,
-    'interface': connector.INTERFACE, # interfaces = ['int1', 'int2'...]
-    'settings': connector.PROPERTIES,
-    'category': 'editor',
-    'description': '',
-    'properties': {'is_sql': True}
-  }
-  for connector in [
-    Impala(), Hive()
-  ]
-]
-
-CONNECTOR_TYPES += [
-  {'nice_name': "Hive Tez", 'dialect': 'hive-tez', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "Hive LLAP", 'dialect': 'hive-llap', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "Druid", 'dialect': 'sql-druid', 'interface': 'sqlalchemy', 'settings': [{'name': 'url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "Kafka SQL", 'dialect': 'kafka-sql', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "SparkSQL", 'dialect': 'spark-sql', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "MySQL", 'dialect': 'mysql', 'interface': 'sqlalchemy', 'settings': [{'name': 'url', 'value': 'mysql://username:password@mysq-host:3306/hue'}], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "Presto", 'dialect': 'presto', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "Athena", 'dialect': 'athena', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "Redshift", 'dialect': 'redshift', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "Big Query", 'dialect': 'bigquery', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "Oracle", 'dialect': 'oracle', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "SQL Database", 'dialect': 'sql-alchemy', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "SQL Database (JDBC)", 'dialect': 'sql-jdbc', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': 'Deprecated: older way to connect to any database.', 'properties': {'is_sql': True}},
-  # solr
-  # hbase
-  # kafka
-
-  {'nice_name': "PySpark", 'dialect': 'pyspark', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
-  {'nice_name': "Spark", 'dialect': 'spark', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
-  {'nice_name': "Pig", 'dialect': 'pig', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
-  {'nice_name': "Java", 'dialect': 'java', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
-
-  {'nice_name': "HDFS", 'dialect': 'hdfs', 'interface': 'rest', 'settings': [{'name': 'server_url', 'value': 'http://localhost:9870/webhdfs/v1'}, {'name': 'default_fs', 'value': 'fs_defaultfs=hdfs://localhost:8020'}], 'category': 'browsers', 'description': '', 'properties': {}},
-  {'nice_name': "YARN", 'dialect': 'yarn', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
-  {'nice_name': "S3", 'dialect': 's3', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
-  {'nice_name': "ADLS", 'dialect': 'adls-v1', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
-
-  {
-    'nice_name': "Hive Metastore",
-    'dialect': 'hms',
-    'interface': 'hiveserver2',
-    'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},],
-    'category': 'catalogs',
-    'description': '',
-    'properties': {}
-  },
-  {'nice_name': "Atlas", 'dialect': 'atlas', 'interface': 'rest', 'settings': [], 'category': 'catalogs', 'description': '', 'properties': {}},
-  {'nice_name': "Navigator", 'dialect': 'navigator', 'interface': 'rest', 'settings': [], 'category': 'catalogs', 'description': '', 'properties': {}},
-
-  {'nice_name': "Optimizer", 'dialect': 'optimizer', 'settings': [], 'category': 'optimizers', 'description': '', 'properties': {}},
-
-  {'nice_name': "Oozie", 'dialect': 'oozie', 'settings': [], 'category': 'schedulers', 'description': '', 'properties': {}},
-  {'nice_name': "Celery", 'dialect': 'celery', 'settings': [], 'category': 'schedulers', 'description': '', 'properties': {}},
-]
-
-CATEGORIES = [
-  {"name": "Editor", 'type': 'editor', 'description': ''},
-  {"name": "Browsers", 'type': 'browsers', 'description': ''},
-  {"name": "Catalogs", 'type': 'catalogs', 'description': ''},
-  {"name": "Optimizers", 'type': 'optimizers', 'description': ''},
-  {"name": "Schedulers", 'type': 'schedulers', 'description': ''},
-  {"name": "Plugins", 'type': 'plugins', 'description': ''},
-]
-
-
-def _group_category_connectors(connectors):
-  return [{
-    'category': category['type'],
-    'category_name': category['name'],
-    'description': category['description'],
-    'values': [_connector for _connector in connectors if _connector['category'] == category['type']],
-  } for category in CATEGORIES
-]
-
-AVAILABLE_CONNECTORS = _group_category_connectors(CONNECTOR_TYPES)
-
-
-# TODO: persist in DB
-# TODO: remove installed connectors that don't have a connector or are blacklisted
-# TODO: load back from DB and apply Category properties, e.g. defaults, interface, category, category_name...
-# TODO: connector groups: if we want one type (e.g. Hive) to show-up with multiple computes and the same saved query.
-
-# connector_type: category --> engine, is_sql --> engine_type: sql
-CONNECTOR_INSTANCES = None
-CONNECTOR_IDS = 1
-
 def get_connector_types(request):
-  global AVAILABLE_CONNECTORS
-  global CATEGORIES
-
   return JsonResponse({
-    'connectors': AVAILABLE_CONNECTORS,
-    'categories': CATEGORIES
+    'connectors': _group_by_category(
+      get_connectors_types()
+    ),
+    'categories': get_connector_categories()
   })
 
 
-def get_installed_connectors(request):
+def get_connectors_instances(request):
   return JsonResponse({
-    'connectors': _group_category_connectors(
+    'connectors': _group_by_category(
       _get_installed_connectors()
-    ),
+    )
   })
 
 
 def new_connector(request, dialect):
-  instance = _get_connector_by_type(dialect)
+  instance = get_connector_by_type(dialect)
 
   instance['nice_name'] = dialect.title()
   instance['id'] = None
@@ -151,115 +62,103 @@ def new_connector(request, dialect):
 
 
 def get_connector(request, id):
-  instance = _get_connector_by_id(id)
+  instance = Connector.objects.get(id=id)
 
-  return JsonResponse(instance)
+  return JsonResponse({
+    'id': instance.id,
+    'name': instance.name,
+    'description': instance.description,
+    'dialect': instance.dialect,
+    'settings': json.loads(instance.settings)
+  })
 
 
+@admin_required
 def update_connector(request):
-  global CONNECTOR_IDS
-
-  connector = json.loads(request.POST.get('connector'), '{}')
+  connector = json.loads(request.POST.get('connector', '{}'))
   saved_as = False
 
   if connector.get('id'):
-    instance = _get_connector_by_id(connector['id'])
-    instance.update(connector)
+    instance = Connector.objects.get(id=connector['id'])
+    instance.name = connector['nice_name']
+    instance.description = connector['description']
+    instance.settings = json.dumps(connector['settings'])
+    instance.save()
   else:
     saved_as = True
-    instance = connector
-    instance['id'] = CONNECTOR_IDS
-    instance['nice_name'] = instance['nice_name']
-    instance['name'] = '%s-%s' % (instance['dialect'], CONNECTOR_IDS)
-    CONNECTOR_IDS += 1
-    CONNECTOR_INSTANCES.append(instance)
+    instance = Connector.objects.create(
+      name=connector['nice_name'],
+      description='',
+      dialect=connector['dialect'],
+      settings=json.dumps(connector['settings'])
+    )
+    connector['id'] = instance.id
+    connector['name'] = instance.id
 
-  return JsonResponse({'connector': instance, 'saved_as': saved_as})
+  update_app_permissions()
 
-
-def _get_connector_by_type(dialect):
-  global CONNECTOR_TYPES
-
-  instance = [connector for connector in CONNECTOR_TYPES if connector['dialect'] == dialect]
-
-  if instance:
-    return instance[0]
-  else:
-    raise PopupException(_('No connector with the type %s found.') % type)
+  return JsonResponse({'connector': connector, 'saved_as': saved_as})
 
 
+@admin_required
 def delete_connector(request):
-  global CONNECTOR_INSTANCES
+  connector = json.loads(request.POST.get('connector', '{}'))
 
-  connector = json.loads(request.POST.get('connector'), '{}')
+  try:
+    Connector.objects.get(id=connector['id']).delete()
+  except Exception as e:
+    raise PopupException(_('Error deleting connector %s: %s') % (connector['name'], e))
 
-  size_before = len(CONNECTOR_INSTANCES)
-  CONNECTOR_INSTANCES = [_connector for _connector in CONNECTOR_INSTANCES if _connector['name'] != connector['name']]
-  size_after = len(CONNECTOR_INSTANCES)
+  update_app_permissions()
 
-  if size_before == size_after + 1:
-    return JsonResponse({})
-  else:
-    raise PopupException(_('No connector with the name %(name)s found.') % connector)
+  return JsonResponse({})
 
 
-def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None):
-  global CONNECTOR_INSTANCES
-  global CONNECTOR_IDS
-  config_connectors = CONNECTORS.get()
+@admin_required
+def test_connector(request):
+  connector = json.loads(request.POST.get('connector', '{}'))
 
-  if CONNECTOR_INSTANCES is None:
-    CONNECTOR_INSTANCES = []
+  # Currently only Editor connectors are supported.
+  interpreter = _connector_to_iterpreter(
+      _augment_connector_properties(connector)
+  )
+  interpreter['type'] = 'hello'  # This is the id of the common health check query
 
-    for i in config_connectors:
-      connector_types = []
-      for connector_type in CONNECTOR_TYPES:
-        if connector_type['dialect'] == config_connectors[i].DIALECT.get():
-          connector_types.insert(0, connector_type)
-        elif connector_type.get('interface') == config_connectors[i].INTERFACE.get():
-          connector_types.append(connector_type)
+  warnings = ''.join([
+    ''.join(warning)
+    for warning in config_validator(user=request.user, interpreters=[interpreter])
+  ])
 
-      if not connector_types:
-        LOG.warn('Skipping connector %s as connector dialect %s or interface %s are not installed.' % (
-            i, config_connectors[i].DIALECT.get(), config_connectors[i].INTERFACE.get()
-          )
-        )
-      else:
-        connector_type = connector_types[0]
-        connector = {
-          'nice_name': config_connectors[i].NICE_NAME.get() or i,
-          'name': i,
-          'dialect': config_connectors[i].DIALECT.get(),
-          'interface': config_connectors[i].INTERFACE.get(),
-          'settings': config_connectors[i].SETTINGS.get(),
-          'id': CONNECTOR_IDS,
-          'category': connector_type['category'],
-          'description': connector_type['description']
-        }
-        connector.update(connector_type['properties'])
-        CONNECTOR_INSTANCES.append(connector)
-        CONNECTOR_IDS += 1
-
-  connectors = CONNECTOR_INSTANCES
-
-  if categories is not None:
-    connectors = [connector for connector in connectors if connector['category'] in categories]
-  if category is not None:
-    connectors = [connector for connector in connectors if connector['category'] == category]
-  if dialect is not None:
-    connectors = [connector for connector in connectors if connector['dialect'] == dialect]
-  if interface is not None:
-    connectors = [connector for connector in connectors if connector['interface'] == interface]
-
-  return connectors
+  return JsonResponse({'warnings': warnings, 'hasWarnings': bool(warnings)})
 
 
-def _get_connector_by_id(id):
-  global CONNECTOR_INSTANCES
+@admin_required
+@api_error_handler
+def install_connector_examples(request):
+  message = []
 
-  instance = [connector for connector in CONNECTOR_INSTANCES if connector['id'] == id]
+  try:
+    added, skipped = _create_connector_examples()
+    if added:
+      message.append('Added connectors: ' + ', '.join(added))
+    if skipped:
+      message.append('Already installed connectors: ' + ', '.join(skipped))
+  except Exception as e:
+    raise PopupException(_('Error installing connector examples: %s') % e)
 
-  if instance:
-    return instance[0]
-  else:
-    raise PopupException(_('No connector with the id %s found.') % id)
+  update_app_permissions()
+
+  return JsonResponse({'status': 0, 'message': '. '.join(message)})
+
+
+def _group_by_category(conns):
+  return [{
+      'category': category['type'],
+      'category_name': category['name'],
+      'description': category['description'],
+      'values': [
+        _connector
+        for _connector in conns if _connector['category'] == category['type']
+      ],
+    } for category in get_connector_categories()
+  ]
