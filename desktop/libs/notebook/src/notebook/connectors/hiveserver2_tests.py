@@ -41,7 +41,7 @@ from hadoop.pseudo_hdfs4 import is_live_cluster
 from useradmin.models import User
 
 from notebook.api import _save_notebook
-from notebook.connectors.base import QueryError
+from notebook.connectors.base import QueryError, QueryExpired
 from notebook.connectors.hiveserver2 import HS2Api
 from notebook.models import make_notebook, Notebook
 
@@ -348,6 +348,26 @@ class TestApi():
                   e.message,
                   'Error while compiling statement: FAILED: HiveAccessControlException Permission denied',
                 )
+
+
+  def test_autocomplete_time_out(self):
+    snippet = {'type': 'hive', 'properties': {}}
+
+    with patch('notebook.connectors.hiveserver2._autocomplete') as _autocomplete:
+
+      _autocomplete.return_value = {
+        'code': 500,
+        'error': "HTTPSConnectionPool(host='gethue.com', port=10001): Read timed out. (read timeout=120)"
+      }
+
+      api = HS2Api(self.user)
+
+      try:
+        resp = api.autocomplete(snippet, database='database')
+        assert_false(True)
+      except QueryExpired as e:
+        assert_equal(e.message, "HTTPSConnectionPool(host='gethue.com', port=10001): Read timed out. (read timeout=120)")
+
 
 
 class TestHiveserver2ApiNonMock(object):

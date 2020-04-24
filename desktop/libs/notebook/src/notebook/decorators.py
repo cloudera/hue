@@ -141,7 +141,7 @@ def api_error_handler(f):
           response['help'] = {
             'setting': {
               'name': 'max_row_size',
-              'value':str(int(_closest_power_of_2(_to_size_in_bytes(size.group(1), size.group(2)))))
+              'value': str(int(_closest_power_of_2(_to_size_in_bytes(size.group(1), size.group(2)))))
             }
           }
       if e.handle:

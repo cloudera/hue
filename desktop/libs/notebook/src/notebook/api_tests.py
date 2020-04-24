@@ -42,15 +42,15 @@ from useradmin.models import User
 import notebook.connectors.hiveserver2
 
 from notebook.api import _historify
-from notebook.connectors.base import Notebook, QueryError, Api
+from notebook.connectors.base import Notebook, QueryError, Api, QueryExpired
 from notebook.decorators import api_error_handler
 from notebook.conf import get_ordered_interpreters, INTERPRETERS_SHOWN_ON_WHEEL, INTERPRETERS
 from notebook.models import Analytics
 
 if sys.version_info[0] > 2:
-  from unittest.mock import patch
+  from unittest.mock import patch, Mock
 else:
-  from mock import patch
+  from mock import patch, Mock
 
 
 class TestApi(object):
@@ -322,6 +322,26 @@ FROM déclenché c, c.addresses a"""
     response = send_exception(message)
     data = json.loads(response.content)
     assert_equal(1, data['status'])
+
+
+  def test_notebook_autocomplete(self):
+
+    with patch('notebook.api.get_api') as get_api:
+      get_api.return_value = Mock(
+        autocomplete=Mock(
+          side_effect=QueryExpired("HTTPSConnectionPool(host='gethue.com', port=10001): Read timed out. (read timeout=120)")
+        )
+      )
+
+      response = self.client.post(
+          reverse('notebook:api_autocomplete_tables', kwargs={'database': 'database'}),
+          {
+            'snippet': json.dumps({'type': 'hive'})
+          }
+      )
+
+      data = json.loads(response.content)
+      assert_equal(data, {'status': 0})  # We get back empty instead of failure with QueryExpired to silence end user messages
 
 
 class MockedApi(Api):
