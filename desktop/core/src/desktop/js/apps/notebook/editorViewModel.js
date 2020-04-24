@@ -52,9 +52,7 @@ class EditorViewModel {
 
     const updateConnector = type => {
       if (type) {
-        findConnector(connector => connector.type === type).then(connector => {
-          self.activeConnector(connector);
-        });
+        self.activeConnector(findConnector(connector => connector.type === type));
       }
     };
 
@@ -610,52 +608,45 @@ class EditorViewModel {
     self.newNotebook = function(editorType, callback, queryTab) {
       const type = editorType || options.editor_type;
 
-      const create = () => {
-        $.post(
-          '/notebook/api/create_notebook',
-          {
-            type: type,
-            directory_uuid: window.location.getParameter('directory_uuid'),
-            gist: self.isNotificationManager() ? undefined : window.location.getParameter('gist')
-          },
-          data => {
-            self.loadNotebook(data.notebook);
-            if (self.editorMode() && !self.isNotificationManager()) {
-              const snippet =
-                self.selectedNotebook().snippets().length == 0
-                  ? self.selectedNotebook().newSnippet(self.editorType())
-                  : self.selectedNotebook().snippets()[0];
-              if (
-                queryTab &&
-                ['queryHistory', 'savedQueries', 'queryBuilderTab'].indexOf(queryTab) > -1
-              ) {
-                snippet.currentQueryTab(queryTab);
-              }
-              huePubSub.publish('detach.scrolls', self.selectedNotebook().snippets()[0]);
-              if (window.location.getParameter('type') === '') {
-                hueUtils.changeURLParameter('type', self.editorType());
-              }
-              if (!self.isNotificationManager()) {
-                huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, self.activeConnector());
-              }
-            }
+      if (!self.isNotificationManager()) {
+        self.activeConnector(findConnector(connector => connector.type === type));
+        huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, self.activeConnector());
+      }
 
-            if (callback) {
-              callback();
+      $.post(
+        '/notebook/api/create_notebook',
+        {
+          type: type,
+          directory_uuid: window.location.getParameter('directory_uuid'),
+          gist: self.isNotificationManager() ? undefined : window.location.getParameter('gist')
+        },
+        data => {
+          self.loadNotebook(data.notebook);
+          if (self.editorMode() && !self.isNotificationManager()) {
+            const snippet =
+              self.selectedNotebook().snippets().length === 0
+                ? self.selectedNotebook().newSnippet(self.editorType())
+                : self.selectedNotebook().snippets()[0];
+            if (
+              queryTab &&
+              ['queryHistory', 'savedQueries', 'queryBuilderTab'].indexOf(queryTab) > -1
+            ) {
+              snippet.currentQueryTab(queryTab);
+            }
+            huePubSub.publish('detach.scrolls', self.selectedNotebook().snippets()[0]);
+            if (window.location.getParameter('type') === '') {
+              hueUtils.changeURLParameter('type', self.editorType());
+            }
+            if (!self.isNotificationManager()) {
+              huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, self.activeConnector());
             }
           }
-        );
-      };
 
-      if (!self.isNotificationManager()) {
-        findConnector(connector => connector.type === type).then(connector => {
-          self.activeConnector(connector);
-          huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, self.activeConnector());
-          create();
-        });
-      } else {
-        create();
-      }
+          if (callback) {
+            callback();
+          }
+        }
+      );
     };
 
     self.saveNotebook = function() {

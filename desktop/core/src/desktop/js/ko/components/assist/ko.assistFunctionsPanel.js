@@ -177,14 +177,14 @@ class AssistFunctionsPanel {
       }
     });
 
-    const configUpdated = async () => {
+    const configUpdated = () => {
       const lastActiveDialect =
         this.activeDialect() ||
         apiHelper.getFromTotalStorage('assist', 'function.panel.active.dialect');
 
       const uniqueDialects = {};
 
-      const configuredDialects = (await filterConnectors(connector => {
+      const configuredDialects = filterConnectors(connector => {
         const isMatch =
           !uniqueDialects[connector.dialect] &&
           (connector.dialect === 'hive' ||
@@ -192,7 +192,7 @@ class AssistFunctionsPanel {
             connector.dialect === 'pig');
         uniqueDialects[connector.dialect] = true;
         return isMatch;
-      })).map(connector => connector.dialect);
+      }).map(connector => connector.dialect);
       configuredDialects.sort();
       this.availableDialects(configuredDialects);
 

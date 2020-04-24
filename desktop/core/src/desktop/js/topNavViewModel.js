@@ -38,19 +38,19 @@ class TopNavViewModel {
     self.hasJobBrowser = ko.observable(window.HAS_JOB_BROWSER);
     self.clusters = ko.observableArray();
 
-    const configUpdated = async config => {
+    const configUpdated = config => {
       if (config && config.clusters) {
         self.clusters(config.clusters);
       }
 
       self.hasJobBrowser(
         window.HAS_JOB_BROWSER &&
-          (await findConnector(
+          findConnector(
             connector =>
               connector.dialect === 'yarn' ||
               connector.dialect === 'impala' ||
               connector.dialect === 'dataeng'
-          ))
+          )
       );
     };
 
