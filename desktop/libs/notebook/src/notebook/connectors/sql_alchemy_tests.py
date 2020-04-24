@@ -246,6 +246,41 @@ class TestApi(object):
           assert_equal(response['rows'], [[1], [2]])
 
 
+  def test_dialect_trim_statement_semicolon(self):
+    interpreter = {
+      'name': 'presto',
+      'options': {
+        'url': 'presto://hue:8080/hue',
+        'session': {},
+      }
+    }
+
+    with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._create_engine') as _create_engine:
+      with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._get_session') as _get_session:
+        execute = Mock(return_value=Mock(cursor=None))
+        _create_engine.return_value = Mock(
+          connect=Mock(
+            return_value=Mock(
+              execute=execute
+            )
+          )
+        )
+        notebook = {}
+        snippet = {'statement': 'SELECT 1;'}
+
+        # Trim
+        engine = SqlAlchemyApi(self.user, interpreter).execute(notebook, snippet)
+
+        execute.assert_called_with('SELECT 1')
+
+        # No Trim
+        interpreter['options']['url'] = 'mysql://hue:3306/hue'
+
+        engine = SqlAlchemyApi(self.user, interpreter).execute(notebook, snippet)
+
+        execute.assert_called_with('SELECT 1;')
+
+
 class TestDialects(object):
 
   def setUp(self):

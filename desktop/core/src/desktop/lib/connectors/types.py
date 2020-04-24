@@ -52,6 +52,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': True,
       'has_reference_functions': True,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -78,6 +79,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': True,
       'has_reference_functions': True,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -104,6 +106,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -130,6 +133,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -156,6 +160,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -182,6 +187,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -208,6 +214,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -234,6 +241,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -260,6 +268,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -286,6 +295,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -296,6 +306,7 @@ CONNECTOR_TYPES = [
       {'name': 'url', 'value': 'presto://host:8080/tpch'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
+      {'name': 'impersonation_enabled', 'value': False},
     ],
     'category': 'editor',
     'description': '',
@@ -312,6 +323,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': True,
     }
   },
   {
@@ -338,6 +350,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -365,6 +378,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -389,6 +403,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -413,6 +428,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -437,6 +453,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -461,6 +478,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -487,6 +505,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -513,6 +532,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -539,6 +559,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
   {
@@ -568,6 +589,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
+      'trim_statement_semicolon': False,
     }
   },
 

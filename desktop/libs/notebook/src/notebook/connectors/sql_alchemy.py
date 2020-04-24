@@ -202,8 +202,13 @@ class SqlAlchemyApi(Api):
 
     engine = self._get_engine()
     connection = engine.connect()
+    statement = snippet['statement']
 
-    result = connection.execute(snippet['statement'])
+    if self.options['url'].startswith('presto://') or \
+        self.interpreter.get('dialect_properties') and self.interpreter['dialect_properties']['trim_statement_semicolon']:
+      statement = statement.strip().rstrip(';')
+
+    result = connection.execute(statement)
 
     cache = {
       'connection': connection,

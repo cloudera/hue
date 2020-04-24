@@ -281,7 +281,7 @@ def _check_status(request, notebook=None, snippet=None, operation_id=None):
     else:
       has_result_set = None
 
-    if notebook['type'].startswith('query') or notebook.get('isManaged'):
+    if notebook.get('dialect') or notebook['type'].startswith('query') or notebook.get('isManaged'):
       nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=operation_id or notebook['uuid'])
       if nb_doc.can_write(request.user):
         nb = Notebook(document=nb_doc).get_data()
@@ -523,7 +523,7 @@ def _clear_sessions(notebook):
 def _historify(notebook, user):
   query_type = 'query-%(dialect)s' % notebook if ENABLE_CONNECTORS.get() else notebook['type']
   name = notebook['name'] if (notebook['name'] and notebook['name'].strip() != '') else DEFAULT_HISTORY_NAME
-  is_managed = notebook.get('isManaged') == True # Prevents None
+  is_managed = notebook.get('isManaged') == True  # Prevents None
 
   if is_managed and Document2.objects.filter(uuid=notebook['uuid']).exists():
     history_doc = Document2.objects.get(uuid=notebook['uuid'])

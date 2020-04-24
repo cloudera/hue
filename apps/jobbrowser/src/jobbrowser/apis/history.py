@@ -27,6 +27,7 @@ from notebook.api import _get_statement
 from notebook.models import Notebook
 
 from jobbrowser.apis.base_api import Api
+from jobbrowser.conf import MAX_JOB_FETCH
 
 
 LOG = logging.getLogger(__name__)
@@ -35,7 +36,7 @@ LOG = logging.getLogger(__name__)
 class HistoryApi(Api):
 
   def apps(self, filters):
-    tasks = Document2.objects.get_history(doc_type='query-hive', user=self.user)
+    tasks = Document2.objects.get_history(user=self.user).order_by('-last_modified')[:MAX_JOB_FETCH.get()]
     apps = []
 
     for app in tasks:
@@ -57,18 +58,23 @@ class HistoryApi(Api):
           } if notebook['snippets'] else {},
           'absoluteUrl': app.get_absolute_url(),
       }
+      api_status = self._api_status(history)
+
+      if filters.get('states') and api_status.lower() not in filters['states']:
+        continue
+
       apps.append({
-          'id': 'history-%(id)s' % history,
+          'id': 'history-%010d' % history['id'],
           'name': history['data']['statement'],
           'status': history['data']['status'],
-          'apiStatus': self._api_status(history),
+          'apiStatus': api_status,
           'type': 'history-%s' % history['type'],
           'user': self.user.username,
           'progress': 50,
           'queue': '',
           'canWrite': True,
           'duration': 1,
-          'submitted': 1
+          'submitted': history['data']['lastExecuted']
         })
 
     return {
@@ -83,7 +89,7 @@ class HistoryApi(Api):
     app = Document2.objects.document(user=self.user, doc_id=appid)
 
     return {
-      'id': 'history-%s' % app.id,
+      'id': 'history-%010d' % app.id,
       'name': app.name,
       'status': 'ready',
       'apiStatus': 'RUNNING',
@@ -116,7 +122,7 @@ class HistoryApi(Api):
   def _api_status(self, task):
     if task['data']['status'] in ('expired', 'failed'):
       return 'FAILED'
-    elif task['data']['status'] == 'available':
+    elif task['data']['status'] in ('available', 'canceled'):
       return 'SUCCEEDED'
     else:
       return 'RUNNING'

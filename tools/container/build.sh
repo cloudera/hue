@@ -9,22 +9,43 @@ HUE_DIR=$WORK_DIR/hue
 APACHE_DIR=$WORK_DIR/huelb
 BASEHUE_DIR=$WORK_DIR/base/hue
 BASEHUELB_DIR=$WORK_DIR/base/huelb
-HUEBASE_VERSION=huebase_centos:7.6.0.1
-HUELBBASE_VERSION=huelb_httpd:2.4.7.6
+HUEBASE_VERSION=huebase_ubi:7.5.1
+HUELBBASE_VERSION=huelb_httpd_ubi:2.4
+COMPILEHUE_DIR=$WORK_DIR/compile/hue
+COMPILEHUE_VERSION=huecompile_ubi:7.5.1
 HUEUSER="hive"
+CONTAINER=$(uuidgen | cut -d"-" -f5)
+CONTAINER_HUE_SRC=/root/hue
+CONTAINER_HUE_OPT=/opt
 
 if [ -z "$REGISTRY" ]; then
   REGISTRY=${REGISTRY:-"docker.io/hortonworks"}
 fi
 
 compile_hue() {
-  mkdir -p $BUILD_DIR
-  cd $HUE_SRC
-  PREFIX=$BUILD_DIR make install
-  cd $BUILD_DIR/hue
+  mkdir -p $CONTAINER_HUE_OPT
+  cd $CONTAINER_HUE_SRC
+  PREFIX=$CONTAINER_HUE_OPT make install
+  cd $CONTAINER_HUE_OPT/hue
   APPS=$(find apps -maxdepth 2 -name "src" -type d|cut -d"/" -f2|sort| sed 's/[^ ]* */apps\/&/g')
   ./build/env/bin/python tools/app_reg/app_reg.py --install $APPS --relative-paths
   bash tools/relocatable.sh
+}
+
+docker_hue_compile() {
+  export HUE_USER="hive"
+  export HUE_CONF="/etc/hue"
+  export HUE_HOME="/opt/${HUEUSER}"
+  export HUE_CONF_DIR="${HUE_CONF}/conf"
+  export HUE_LOG_DIR="/var/log/${HUEUSER}"
+  export UUID_GEN=$(uuidgen | cut -d"-" -f5)
+
+  mkdir -p $BUILD_DIR
+  docker run -dt --name $CONTAINER $COMPILEHUE_VERSION /bin/bash
+  docker container cp $HUE_SRC $CONTAINER:$CONTAINER_HUE_SRC
+  docker container exec $CONTAINER $CONTAINER_HUE_SRC/tools/container/build.sh compile_hue
+  docker container cp $CONTAINER:$CONTAINER_HUE_OPT/hue $BUILD_DIR
+  docker container stop $CONTAINER
 }
 
 find_git_state() {
@@ -59,6 +80,10 @@ docker_hue_build() {
   cd $HUE_DIR
   cp -a $BUILD_DIR/hue $HUE_DIR
   rm -f $HUE_DIR/hue/desktop/conf/*
+
+  # Reduce Hue container size
+  rm -rf $HUE_DIR/hue/node_modules
+  rm -rf $HUE_DIR/hue/desktop/core/ext-eggs
 
   for f in $(find $HUE_DIR/supervisor-files -name "*_template"); do
     subst_var $f
@@ -116,6 +141,14 @@ build_huelbbase() {
   docker pull ${REGISTRY}/$HUELBBASE_VERSION
 }
 
+build_huecompilebase() {
+  cd $COMPILEHUE_DIR
+  docker build -f $COMPILEHUE_DIR/Dockerfile -t ${REGISTRY}/$COMPILEHUE_VERSION .
+  docker tag ${REGISTRY}/$COMPILEHUE_VERSION $COMPILEHUE_VERSION
+  docker push ${REGISTRY}/$COMPILEHUE_VERSION
+  docker pull ${REGISTRY}/$COMPILEHUE_VERSION
+}
+
 pull_base_images() {
   set +e
 
@@ -130,11 +163,22 @@ pull_base_images() {
     build_huelbbase
   fi
   docker tag ${REGISTRY}/$HUELBBASE_VERSION $HUELBBASE_VERSION
+
+  docker pull ${REGISTRY}/$COMPILEHUE_VERSION
+  if [[ $? != 0 ]]; then
+    build_huecompilebase
+  fi
+  docker tag ${REGISTRY}/$COMPILEHUE_VERSION $COMPILEHUE_VERSION
+
   set -e
 }
 
-compile_hue
-find_git_state
-pull_base_images
-docker_hue_build
-docker_huelb_build
+if [[ $1 == "compile_hue" ]]; then
+  compile_hue
+else
+  pull_base_images
+  find_git_state
+  docker_hue_compile
+  docker_hue_build
+  docker_huelb_build
+fi
