@@ -133,6 +133,9 @@ class Command(BaseCommand):
     #south_logger = logging.getLogger('south')
     #south_logger.setLevel(logging.INFO)
 
+    logger = logging.getLogger('django.db.backends.schema')
+    logger.setLevel('INFO')
+
     if len(args) == 0:
       print(self.help)
       sys.exit(1)
