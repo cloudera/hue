@@ -22,6 +22,7 @@ import 'apps/notebook2/execution/sessionManager';
 import './jquery.setup';
 import './sqlTestUtils';
 
+import $ from 'jquery';
 import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
 
@@ -99,4 +100,11 @@ const globalVars = {
 Object.keys(globalVars).forEach(key => {
   global[key] = globalVars[key];
   global.window[key] = globalVars[key];
+});
+
+$.ajaxSetup({
+  beforeSend: function() {
+    console.warn('actual jQuery ajax called');
+    console.trace();
+  }
 });

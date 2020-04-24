@@ -16,15 +16,36 @@
 
 import { koSetup } from 'jest/koTestUtils';
 import { NAME } from './ko.quickQueryContext';
+import * as hueConfig from 'utils/hueConfig';
+import apiHelper from 'api/apiHelper';
+
+import $ from 'jquery';
 
 describe('ko.quickQueryContext.js', () => {
   const setup = koSetup();
 
   it('should render component', async () => {
+    const connectorsSpy = jest
+      .spyOn(hueConfig, 'filterConnectors')
+      .mockImplementation(() => [{ type: 'impala' }]);
+    const computeSpy = jest
+      .spyOn(apiHelper, 'fetchContextComputes')
+      .mockImplementation(() => $.Deferred().resolve({}));
+    const fetchContextNamespaces = jest
+      .spyOn(apiHelper, 'fetchContextNamespaces')
+      .mockImplementation(() => $.Deferred().resolve({}));
+
     const element = await setup.renderComponent(NAME, {});
+
+    expect(connectorsSpy).toHaveBeenCalled();
+    expect(computeSpy).toHaveBeenCalled();
+    expect(fetchContextNamespaces).toHaveBeenCalled();
 
     expect(
       element.innerHTML.replace(/[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}/gi, 'uuid-uuid')
     ).toMatchSnapshot();
+
+    connectorsSpy.mockRestore();
+    connectorsSpy.mockClear();
   });
 });
