@@ -23,6 +23,7 @@ import time
 import uuid
 
 from django.utils.translation import ugettext as _
+from django.utils.encoding import smart_str
 
 from desktop.auth.backend import is_admin
 from desktop.conf import TASK_SERVER, has_connectors
@@ -136,8 +137,8 @@ class Notebook(object):
         p1 = match.group(1)
         p2 = match.group(2)
         variable = variables[p2]
-        value = str(variable['value'])
-        return p1 + (value if value is not None else variable['meta'].get('placeholder',''))
+        value = smart_str(variable['value'])
+        return smart_str(p1) + smart_str(value if value is not None else variable['meta'].get('placeholder',''))
 
       return re.sub(
           "([^\\\\])\\$" + (
@@ -145,7 +146,7 @@ class Notebook(object):
             if hasCurlyBracketParameters else ""
           ),
           replace,
-          statement_raw
+          smart_str(statement_raw)
       )
 
     return statement_raw
