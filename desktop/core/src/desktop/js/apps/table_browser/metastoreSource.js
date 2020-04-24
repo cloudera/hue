@@ -26,7 +26,7 @@ import {
   ASSIST_IS_DB_PANEL_READY_EVENT,
   ASSIST_SET_DATABASE_EVENT
 } from 'ko/components/assist/events';
-import { findConnector } from '../../utils/hueConfig';
+import { findConnector } from 'utils/hueConfig';
 
 class MetastoreSource {
   constructor(options) {
@@ -59,30 +59,26 @@ class MetastoreSource {
       }
     };
 
-    this.connector = ko.observable();
+    this.connector = ko.observable(findConnector(connector => connector.type === this.type));
 
-    findConnector(connector => connector.type === this.type).then(connector => {
-      this.connector(connector);
-
-      huePubSub.subscribe(ASSIST_DB_PANEL_IS_READY_EVENT, () => {
-        this.lastLoadNamespacesDeferred.done(() => {
-          let lastSelectedDb = apiHelper.getFromTotalStorage(
-            'assist_' + this.type + '_' + this.namespace.id,
-            'lastSelectedDb'
-          );
-          if (!lastSelectedDb && lastSelectedDb !== '') {
-            lastSelectedDb = 'default';
-          }
-          huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
-            connector: connector,
-            namespace: this.namespace().namespace,
-            name: lastSelectedDb
-          });
+    huePubSub.subscribe(ASSIST_DB_PANEL_IS_READY_EVENT, () => {
+      this.lastLoadNamespacesDeferred.done(() => {
+        let lastSelectedDb = apiHelper.getFromTotalStorage(
+          'assist_' + this.type + '_' + this.namespace.id,
+          'lastSelectedDb'
+        );
+        if (!lastSelectedDb && lastSelectedDb !== '') {
+          lastSelectedDb = 'default';
+        }
+        huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
+          connector: this.connector(),
+          namespace: this.namespace().namespace,
+          name: lastSelectedDb
         });
       });
-
-      huePubSub.publish(ASSIST_IS_DB_PANEL_READY_EVENT);
     });
+
+    huePubSub.publish(ASSIST_IS_DB_PANEL_READY_EVENT);
 
     const getCurrentState = () => {
       const result = {

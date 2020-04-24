@@ -187,7 +187,7 @@ class Snippet {
 
     const updateConnector = type => {
       if (type) {
-        findConnector(connector => connector.type === type).then(self.connector);
+        self.connector(findConnector(connector => connector.type === type));
       }
     };
 

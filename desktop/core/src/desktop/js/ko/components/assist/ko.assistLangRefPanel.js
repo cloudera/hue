@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT, filterConnectors } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, filterConnectors } from 'utils/hueConfig';
 import { simpleGet } from 'api/apiUtils';
 import { ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT } from './events';
 
@@ -155,12 +155,12 @@ class AssistLangRefPanel {
       }
     });
 
-    const configUpdated = async () => {
+    const configUpdated = () => {
       const lastActiveDialect = this.activeDialect();
 
-      const configuredDialects = (await filterConnectors(
+      const configuredDialects = filterConnectors(
         connector => connector.dialect === 'hive' || connector.dialect === 'impala'
-      )).map(connector => connector.dialect);
+      ).map(connector => connector.dialect);
       configuredDialects.sort();
       this.availableDialects(configuredDialects);
 
@@ -176,7 +176,7 @@ class AssistLangRefPanel {
       }
     };
 
-    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
+    configUpdated();
     huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
 
     if (this.connector()) {
