@@ -529,7 +529,14 @@ class HS2Api(Api):
       query = self._get_current_statement(notebook, snippet)['statement']
       database, table = '', ''
 
-    return _autocomplete(db, database, table, column, nested, query=query, cluster=self.interpreter)
+    resp = _autocomplete(db, database, table, column, nested, query=query, cluster=self.interpreter)
+
+    if resp.get('error'):
+      resp['message'] = resp.pop('error')
+      if 'Read timed out' in resp['message']:
+        raise QueryExpired(resp['message'])
+
+    return resp
 
 
   @query_error_handler
