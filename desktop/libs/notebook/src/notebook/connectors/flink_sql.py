@@ -41,7 +41,11 @@ def query_error_handler(func):
     try:
       return func(*args, **kwargs)
     except RestException as e:
-      message = force_unicode(json.loads(e.message)['errors'])
+      try:
+        message = force_unicode(json.loads(e.message)['errors'])
+      except:
+        message = e.message
+      message = force_unicode(message)
       raise QueryError(message)
     except Exception as e:
       message = force_unicode(str(e))
