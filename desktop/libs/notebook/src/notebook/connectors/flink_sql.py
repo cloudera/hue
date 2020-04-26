@@ -66,20 +66,6 @@ class FlinkSqlApi(Api):
 
   @query_error_handler
   def create_session(self, lang=None, properties=None):
-    # session = Session.objects.get_session(self.user, application=application)
-    # reuse_session = session is not None
-    # if not reuse_session:
-    #   db = dbms.get(self.user, query_server=get_query_server_config(name=lang, connector=self.interpreter))
-    #   session = db.open_session(self.user)
-
-
-    # "session_name": "test",  # optional
-    # "planner": "blink",  # required, "old"/"blink"
-    # "execution_type": "streaming",  # required, "batch"/"streaming"
-    # "properties": {  # optional
-    #     "key": "value"
-    # }
-
     session = self.db.create_session()
 
     response = {
@@ -113,41 +99,25 @@ class FlinkSqlApi(Api):
   def execute(self, notebook, snippet):
     session = self._get_session()
     session_id = session['id']
+    job_id = None
 
     resp = self.db.execute_statement(session_id=session_id, statement=snippet['statement'])
 
     if resp['statement_types'][0] == 'SELECT':
       job_id = resp['results'][0]['data'][0][0]
-
-      i = 0
-      import time
-      status = 'running'
-      while i < 10 and status == 'running':
-        status = self.db.fetch_status(session_id, job_id)['status']
-        i += 1
-        time.sleep(1)
-
-      resp = self.db.fetch_results(session_id, job_id)
-      data, description = resp['results'][0]['data'], resp['results'][0]['columns']
-
-      i = 1
-      while i < 10 and resp.get('next_result_uri'):
-        resp = self.db.fetch_results(session_id, job_id, i)
-        i += 1
-        if resp:
-          data.extend(resp['results'][0]['data'])
+      data, description = [], []
     else:
       data, description = resp['results'][0]['data'], resp['results'][0]['columns']
-
 
     has_result_set = data is not None
 
     return {
-      'sync': True,
+      'sync': job_id is None,
       'has_result_set': has_result_set,
+      'guid': job_id,
       'result': {
-        'has_more': False,
-        'data': data,
+        'has_more': job_id is not None,
+        'data': data if job_id is None else [],
         'meta': [{
             'name': col['name'],
             'type': col['type'],
@@ -162,17 +132,44 @@ class FlinkSqlApi(Api):
 
   @query_error_handler
   def check_status(self, notebook, snippet):
-    # resp = self.db.fetch_status(session_id, job_id)
-    return {'status': 'expired'}
+    session = self._get_session()
+    statement_id = snippet['result']['handle']['guid']
 
-    if resp.get('status') == 'RUNNING':
-      status = 'running'
-    elif resp.get('status') == 'FINISHED':
-      status = 'available'
-    else:
-      status = 'expired'
+    status = 'expired'
+
+    if session:
+      if not statement_id:  # Sync result
+        status = 'available'
+      else:
+        resp = self.db.fetch_status(session['id'], statement_id)
+        if resp.get('status') == 'RUNNING':
+          status = 'running'
+        elif resp.get('status') == 'FINISHED':
+          status = 'available'
 
     return {'status': status}
+
+
+  @query_error_handler
+  def fetch_result(self, notebook, snippet, rows, start_over):
+    session = self._get_session()
+    statement_id = snippet['result']['handle']['guid']
+    token = 0
+
+    resp = self.db.fetch_results(session['id'], job_id=statement_id, token=token)
+
+    return {
+        'has_more': bool(resp.get('next_result_uri')) and False,  # TODO: here we should increment the token
+        'data': resp['results'][0]['data'],  # No escaping...
+        'meta': [{
+            'name': column['name'],
+            'type': column['type'],
+            'comment': ''
+          }
+          for column in resp['results'][0]['columns']
+        ],
+        'type': 'table'
+    }
 
 
   @query_error_handler
@@ -191,7 +188,8 @@ class FlinkSqlApi(Api):
             'comment': col.get('comment'),
             'name': col.get('name'),
             'type': str(col['schema'].get('type'))
-          } for col in columns
+          }
+          for col in columns
         ]
       else:
         response = {}
