@@ -3,13 +3,13 @@
 
 The Hue project gladly welcomes [pull requests](https://github.com/cloudera/hue/pulls)!
 
-This document contains instructions on how to help get involved with Hue.
+This document contains instructions on how to get involved in Hue improvement.
 
 In any case, feel free to ask here, on the [forum](https://discourse.gethue.com/) or [@gethue](https://twitter.com/gethue).
 
 # What to improve
 
-Here is some inspiration on which areas would love to have some contributions:
+Here is some inspiration on which areas we would love to have some contributions:
 
 1. Updating a small piece of [documentation](https://docs.gethue.com)
 2. High level [Roadmap](/docs/ROADMAP.md)
@@ -18,7 +18,7 @@ Here is some inspiration on which areas would love to have some contributions:
 
 # Submitting an improvement
 
-Here are some example of changes:
+Here are some examples of changes:
 
 * [Pull request 842](https://github.com/cloudera/hue/pull/842)
 * [HUE-8802 [search] Deleting an index throws a js exception](https://issues.cloudera.org/browse/HUE-8802)
@@ -32,7 +32,7 @@ Have a look at [how to quick build](https://docs.gethue.com/developer/developmen
 It is flexible:
 
 * **Github Pull request**
-Prefered way. Just post the [pull request](https://github.com/cloudera/hue/pulls) and reviewers will start from there. The CI will run a bsic set of tests for you.
+Preferred way. Just post the [pull request](https://github.com/cloudera/hue/pulls) and reviewers will start from there. The CI will run a basic set of tests for you.
 
 * **Review Board**
 For large changes. Create an account on Hue's [Review Board](https://review.cloudera.org/groups/hue).
