@@ -34,6 +34,8 @@ from notebook.connectors.base import Api, QueryError
 LOG = logging.getLogger(__name__)
 _JSON_CONTENT_TYPE = 'application/json'
 _API_VERSION = 'v1'
+SESSIONS = {}
+SESSION_KEY = '%(username)s-%(connector_name)s'
 
 
 def query_error_handler(func):
@@ -63,9 +65,54 @@ class FlinkSqlApi(Api):
 
 
   @query_error_handler
-  def execute(self, notebook, snippet):
+  def create_session(self, lang=None, properties=None):
+    # session = Session.objects.get_session(self.user, application=application)
+    # reuse_session = session is not None
+    # if not reuse_session:
+    #   db = dbms.get(self.user, query_server=get_query_server_config(name=lang, connector=self.interpreter))
+    #   session = db.open_session(self.user)
+
+
+    # "session_name": "test",  # optional
+    # "planner": "blink",  # required, "old"/"blink"
+    # "execution_type": "streaming",  # required, "batch"/"streaming"
+    # "properties": {  # optional
+    #     "key": "value"
+    # }
+
     session = self.db.create_session()
-    session_id = session['session_id']
+
+    response = {
+      'type': lang,
+      'id': session['session_id']
+    }
+
+    return response
+
+  def _get_session(self):
+    session_key = SESSION_KEY % {
+      'username': self.user.username,
+      'connector_name': self.interpreter['name']
+    }
+
+    if session_key not in SESSIONS:
+      SESSIONS[session_key] = self.create_session()
+
+    try:
+      self.db.session_heartbeat(session_id=SESSIONS[session_key]['id'])
+    except Exception as e:
+      if 'Session: %(id)s does not exist' % SESSIONS[session_key] in str(e):
+        LOG.info('Session: %(id)s does not exist, opening a new one' % SESSIONS[session_key])
+        SESSIONS[session_key] = self.create_session()
+      else:
+        raise e
+
+    return SESSIONS[session_key]
+
+  @query_error_handler
+  def execute(self, notebook, snippet):
+    session = self._get_session()
+    session_id = session['id']
 
     resp = self.db.execute_statement(session_id=session_id, statement=snippet['statement'])
 
@@ -92,7 +139,6 @@ class FlinkSqlApi(Api):
     else:
       data, description = resp['results'][0]['data'], resp['results'][0]['columns']
 
-    self.db.close_session(session_id) ## No!
 
     has_result_set = data is not None
 
@@ -159,25 +205,27 @@ class FlinkSqlApi(Api):
 
 
   def show_databases(self):
-    session = self.db.create_session()
-    session_id = session['session_id']
+    session = self._get_session()
+    session_id = session['id']
 
     resp = self.db.execute_statement(session_id=session_id, statement='SHOW DATABASES')
-    self.db.close_session(session_id)
 
     return [db[0] for db in resp['results'][0]['data']]
 
 
   def show_tables(self, database):
-    session = self.db.create_session()
-    session_id = session['session_id']
+    session = self._get_session()
+    session_id = session['id']
 
     resp = self.db.execute_statement(session_id=session_id, statement='USE %(database)s' % {'database': database})
     resp = self.db.execute_statement(session_id=session_id, statement='SHOW TABLES')
 
-    self.db.close_session(session_id)
-
     return [table[0] for table in resp['results'][0]['data']]
+
+
+  def close_session(self, session):
+    session = self._get_session()
+    self.db.close_session(session['id'])
 
 
 class FlinkSqlClient():
@@ -200,11 +248,11 @@ class FlinkSqlClient():
 
   def create_session(self, **properties):
     data = {
-        # "session_name": "test", # optional
-        "planner": "blink", # required, "old"/"blink"
-        "execution_type": "streaming", # required, "batch"/"streaming"
-        "properties": { # optional, properties for current session
-            #"key": "value"
+        "session_name": "test",  # optional
+        "planner": "blink",  # required, "old"/"blink"
+        "execution_type": "streaming",  # required, "batch"/"streaming"
+        "properties": {  # optional
+            "key": "value"
         }
     }
     data.update(properties)
@@ -216,12 +264,12 @@ class FlinkSqlClient():
 
   def execute_statement(self, session_id, statement):
     data = {
-        "statement": statement, # required
-        "execution_timeout": "" # execution time limit in milliseconds, optional, but required for stream SELECT ?
+        "statement": statement,  # required
+        "execution_timeout": ""  # execution time limit in milliseconds, optional, but required for stream SELECT ?
     }
 
     return self._root.post(
-      'sessions/%(session_id)s/statements' % {
+        'sessions/%(session_id)s/statements' % {
         'session_id': session_id
       },
       data=json.dumps(data),
@@ -235,7 +283,6 @@ class FlinkSqlClient():
         'job_id': job_id
       }
     )
-
 
   def fetch_results(self, session_id, job_id, token=0):
     return self._root.get(
