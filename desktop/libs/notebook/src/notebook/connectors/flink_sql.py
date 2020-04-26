@@ -69,9 +69,31 @@ class FlinkSqlApi(Api):
 
     resp = self.db.execute_statement(session_id=session_id, statement=snippet['statement'])
 
+    if resp['statement_types'][0] == 'SELECT':
+      job_id = resp['results'][0]['data'][0][0]
+
+      i = 0
+      import time
+      status = 'running'
+      while i < 10 and status == 'running':
+        status = self.db.fetch_status(session_id, job_id)['status']
+        i += 1
+        time.sleep(1)
+
+      resp = self.db.fetch_results(session_id, job_id)
+      data, description = resp['results'][0]['data'], resp['results'][0]['columns']
+
+      i = 1
+      while i < 10 and resp.get('next_result_uri'):
+        resp = self.db.fetch_results(session_id, job_id, i)
+        i += 1
+        if resp:
+          data.extend(resp['results'][0]['data'])
+    else:
+      data, description = resp['results'][0]['data'], resp['results'][0]['columns']
+
     self.db.close_session(session_id) ## No!
 
-    data, description = resp['results'][0]['data'], resp['results'][0]['columns']
     has_result_set = data is not None
 
     return {
@@ -79,7 +101,7 @@ class FlinkSqlApi(Api):
       'has_result_set': has_result_set,
       'result': {
         'has_more': False,
-        'data': data if has_result_set else [],
+        'data': data,
         'meta': [{
             'name': col['name'],
             'type': col['type'],
@@ -94,7 +116,17 @@ class FlinkSqlApi(Api):
 
   @query_error_handler
   def check_status(self, notebook, snippet):
-    return {'status': 'available'}
+    # resp = self.db.fetch_status(session_id, job_id)
+    return {'status': 'expired'}
+
+    if resp.get('status') == 'RUNNING':
+      status = 'running'
+    elif resp.get('status') == 'FINISHED':
+      status = 'available'
+    else:
+      status = 'expired'
+
+    return {'status': status}
 
 
   @query_error_handler
@@ -143,6 +175,7 @@ class FlinkSqlApi(Api):
 
     return [db[0] for db in resp['results'][0]['data']]
 
+
   def show_tables(self, database):
     session = self.db.create_session()
     session_id = session['session_id']
@@ -175,11 +208,11 @@ class FlinkSqlClient():
 
   def create_session(self, **properties):
     data = {
-        "session_name": "test", # optional
-        "planner": "old", # required, case insensitive
-        "execution_type": "batch", # required, case insensitive
+        # "session_name": "test", # optional
+        "planner": "blink", # required, "old"/"blink"
+        "execution_type": "streaming", # required, "batch"/"streaming"
         "properties": { # optional, properties for current session
-            "key": "value"
+            #"key": "value"
         }
     }
     data.update(properties)
@@ -203,18 +236,18 @@ class FlinkSqlClient():
       contenttype=_JSON_CONTENT_TYPE
     )
 
-  def fetch_status(self, session_id, job_id, token=None):
+  def fetch_status(self, session_id, job_id):
     return self._root.get(
-      'sessions/%(ession_id)s/jobs/%(job_id)s/result%(token)s' % {
+      'sessions/%(session_id)s/jobs/%(job_id)s/status' % {
         'session_id': session_id,
-        'job_id': job_id,
-        'token': '/' + token if token else ''
+        'job_id': job_id
       }
     )
 
-  def fetch_data(self, session_id, job_id):
+
+  def fetch_results(self, session_id, job_id, token=0):
     return self._root.get(
-      'sessions/%(session_id)s/jobs/%(job_id)s/status' % {
+      'sessions/%(session_id)s/jobs/%(job_id)s/result/%(token)s' % {
         'session_id': session_id,
         'job_id': job_id,
         'token': token
