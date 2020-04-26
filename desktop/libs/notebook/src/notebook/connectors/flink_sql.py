@@ -137,15 +137,7 @@ class FlinkSqlApi(Api):
       if database is None:
         response['databases'] = self.show_databases()
       elif table is None:
-        if database == 'tables':
-          response['tables_meta'] = self.show_tables(database)
-        elif database == 'topics':
-          response['tables_meta'] = self.db.show_topics()
-        elif database == 'streams':
-          response['tables_meta'] = [
-            {'name': t['name'], 'type': t['type'], 'comment': 'Topic: %(topic)s Format: %(format)s' % t}
-            for t in self.db.show_streams()
-          ]
+        response['tables_meta'] = self.show_tables(database)
       elif column is None:
         columns = self.db.get_columns(table)
         response['columns'] = [col['name'] for col in columns]

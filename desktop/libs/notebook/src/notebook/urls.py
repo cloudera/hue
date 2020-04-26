@@ -75,12 +75,12 @@ urlpatterns += [
 urlpatterns += [
   # HS2, RDBMS, JDBC
   url(r'^api/autocomplete/?$', notebook_api.autocomplete, name='api_autocomplete_databases'),
-  url(r'^api/autocomplete/(?P<database>\w+)/?$', notebook_api.autocomplete, name='api_autocomplete_tables'),
-  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>[\w_\-]+)/?$', notebook_api.autocomplete, name='api_autocomplete_columns'),
-  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$', notebook_api.autocomplete, name='api_autocomplete_column'),
-  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$', notebook_api.autocomplete, name='api_autocomplete_nested'),
-  url(r'^api/sample/(?P<database>\w+)/(?P<table>[\w_\-]+)/?$', notebook_api.get_sample_data, name='api_sample_data'),
-  url(r'^api/sample/(?P<database>\w+)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data_column'),
+  url(r'^api/autocomplete/(?P<database>[\w_]+)/?$', notebook_api.autocomplete, name='api_autocomplete_tables'),
+  url(r'^api/autocomplete/(?P<database>[\w_]+)/(?P<table>[\w_\-]+)/?$', notebook_api.autocomplete, name='api_autocomplete_columns'),
+  url(r'^api/autocomplete/(?P<database>[\w_]+)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$', notebook_api.autocomplete, name='api_autocomplete_column'),
+  url(r'^api/autocomplete/(?P<database>[\w_]+)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$', notebook_api.autocomplete, name='api_autocomplete_nested'),
+  url(r'^api/sample/(?P<database>[\w_]+)/(?P<table>[\w_\-]+)/?$', notebook_api.get_sample_data, name='api_sample_data'),
+  url(r'^api/sample/(?P<database>[\w_]+)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data_column'),
 
   # SQLite
   url(r'^api/autocomplete//?(?P<server>[\w_\-/]+)/(?P<database>[\w._\-0-9]+)/?$', notebook_api.autocomplete, name='api_autocomplete_tables'),
