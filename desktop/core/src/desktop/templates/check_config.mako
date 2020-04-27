@@ -29,7 +29,9 @@ from desktop.auth.backend import is_hue_admin
 
 % if error_list:
   <div class="alert alert-warn">
+    <a href="https://docs.gethue.com/administrator/configuration/" target="_blank">
     ${ _('Potential misconfiguration detected.') }
+    </a>
     % if not has_connectors():
       ${ _('Fix and restart Hue.') }
     % endif
