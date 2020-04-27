@@ -74,4 +74,4 @@ The document sharing modal was restyled to be friendlier with proper full names 
 Any feedback or question? Feel free to comment here or on the <a href="https://discourse.gethue.com/">Forum</a> and <a href="https://docs.gethue.com/quickstart/">quick start</a> SQL querying!
 
 
-Romain fromthe Hue Team
+Romain from the Hue Team
