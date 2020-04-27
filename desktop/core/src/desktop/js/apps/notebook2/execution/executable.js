@@ -20,6 +20,7 @@ import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 import ExecutionLogs from 'apps/notebook2/execution/executionLogs';
+import hueUtils, { UUID } from 'utils/hueUtils';
 
 /**
  *
@@ -51,11 +52,13 @@ export default class Executable {
    * @param {Session[]} [options.sessions]
    */
   constructor(options) {
+    this.id = UUID();
     this.executor = options.executor;
-
     this.handle = {
       statement_id: 0 // TODO: Get rid of need for initial handle in the backend
     };
+    this.operationId = undefined;
+    this.history = undefined;
     this.status = EXECUTION_STATUS.ready;
     this.progress = 0;
     this.result = undefined;
@@ -69,6 +72,10 @@ export default class Executable {
 
     this.previousExecutable = undefined;
     this.nextExecutable = undefined;
+
+    this.observerState = {};
+
+    this.lost = false;
   }
 
   setStatus(status) {
@@ -85,11 +92,15 @@ export default class Executable {
     return (this.executeEnded || Date.now()) - this.executeStarted;
   }
 
-  notify() {
+  notify(sync) {
     window.clearTimeout(this.notifyThrottle);
-    this.notifyThrottle = window.setTimeout(() => {
+    if (sync) {
       huePubSub.publish(EXECUTABLE_UPDATED_EVENT, this);
-    }, 1);
+    } else {
+      this.notifyThrottle = window.setTimeout(() => {
+        huePubSub.publish(EXECUTABLE_UPDATED_EVENT, this);
+      }, 1);
+    }
   }
 
   isReady() {
@@ -158,12 +169,26 @@ export default class Executable {
 
     this.setStatus(EXECUTION_STATUS.running);
     this.setProgress(0);
+    this.notify(true);
 
     try {
-      const session = await sessionManager.getSession({ type: this.executor.sourceType() });
-      hueAnalytics.log('notebook', 'execute/' + this.executor.sourceType());
+      hueAnalytics.log(
+        'notebook',
+        'execute/' + (this.executor.connector() ? this.executor.connector().dialect : '')
+      );
       try {
-        this.handle = await this.internalExecute(session);
+        const response = await this.internalExecute();
+        this.handle = response.handle;
+        this.history = response.history;
+        this.operationId = response.history.uuid;
+        if (response.handle.session_id) {
+          sessionManager.updateSession({
+            type: response.handle.session_type,
+            id: response.handle.session_id,
+            session_id: response.handle.session_guid,
+            properties: []
+          });
+        }
       } catch (err) {
         const match = ERROR_REGEX.exec(err);
         if (match) {
@@ -188,18 +213,25 @@ export default class Executable {
 
         throw err;
       }
+
       if (this.handle.has_result_set && this.handle.sync) {
         this.result = new ExecutionResult(this);
         if (this.handle.sync) {
+          if (this.handle.result) {
+            this.result.handleResultResponse(this.handle.result);
+          }
           this.result.fetchRows();
         }
+      }
+
+      if (this.executor.isOptimizerEnabled) {
+        huePubSub.publish('editor.upload.query', this.history.id);
       }
 
       this.checkStatus();
       this.logs.fetchLogs();
     } catch (err) {
       this.setStatus(EXECUTION_STATUS.failed);
-      throw err;
     }
   }
 
@@ -218,7 +250,7 @@ export default class Executable {
 
     this.cancellables.push(
       apiHelper.checkExecutionStatus({ executable: this }).done(async queryStatus => {
-        switch (this.status) {
+        switch (queryStatus) {
           case EXECUTION_STATUS.success:
             this.executeEnded = Date.now();
             this.setStatus(queryStatus);
@@ -239,6 +271,7 @@ export default class Executable {
               this.nextExecutable.execute();
             }
             break;
+          case EXECUTION_STATUS.canceled:
           case EXECUTION_STATUS.expired:
             this.executeEnded = Date.now();
             this.setStatus(queryStatus);
@@ -254,6 +287,10 @@ export default class Executable {
               statusCheckCount > 45 ? 5000 : 1000
             );
             break;
+          case EXECUTION_STATUS.failed:
+            this.executeEnded = Date.now();
+            this.setStatus(queryStatus);
+            break;
           default:
             this.executeEnded = Date.now();
             console.warn('Got unknown status ' + queryStatus);
@@ -266,7 +303,7 @@ export default class Executable {
     this.cancellables.push(cancellable);
   }
 
-  async internalExecute(session) {
+  async internalExecute() {
     throw new Error('Implement in subclass!');
   }
 
@@ -280,7 +317,10 @@ export default class Executable {
 
   async cancel() {
     if (this.cancellables.length && this.status === EXECUTION_STATUS.running) {
-      hueAnalytics.log('notebook', 'cancel/' + this.executor.sourceType());
+      hueAnalytics.log(
+        'notebook',
+        'cancel/' + (this.executor.connector() ? this.executor.connector().dialect : '')
+      );
       this.setStatus(EXECUTION_STATUS.canceling);
       while (this.cancellables.length) {
         await this.cancellables.pop().cancel();
@@ -304,6 +344,25 @@ export default class Executable {
     this.setStatus(EXECUTION_STATUS.ready);
   }
 
+  toJs() {
+    const state = Object.assign({}, this.observerState);
+    delete state.aceAnchor;
+
+    return {
+      executeEnded: this.executeEnded,
+      executeStarted: this.executeStarted,
+      handle: this.handle,
+      history: this.history,
+      id: this.id,
+      logs: this.logs.toJs(),
+      lost: this.lost,
+      observerState: state,
+      progress: this.progress,
+      status: this.status,
+      type: 'executable'
+    };
+  }
+
   async close() {
     while (this.cancellables.length) {
       const nextCancellable = this.cancellables.pop();
@@ -320,5 +379,53 @@ export default class Executable {
       console.warn('Failed closing statement');
     }
     this.setStatus(EXECUTION_STATUS.closed);
+  }
+
+  async toContext(id) {
+    if (this.snippet) {
+      // V1
+      return {
+        operationId: this.operationId,
+        snippet: this.snippet.toContextJson(),
+        notebook: await this.snippet.parentNotebook.toContextJson()
+      };
+    }
+
+    const session = await sessionManager.getSession({ type: this.executor.connector().type });
+    const statement = this.getStatement();
+    const snippet = {
+      type: this.executor.connector().type,
+      result: {
+        handle: this.handle
+      },
+      executor: this.executor.toJs(),
+      status: this.status,
+      id: id || UUID(),
+      statement_raw: statement,
+      statement: statement,
+      lastExecuted: this.executeStarted,
+      variables: [],
+      compute: this.executor.compute(),
+      namespace: this.executor.namespace(),
+      database: this.database,
+      properties: { settings: [] }
+    };
+
+    const notebook = {
+      type: this.executor.connector().type,
+      snippets: [snippet],
+      id: this.notebookId,
+      uuid: hueUtils.UUID(),
+      name: '',
+      isSaved: false,
+      sessions: [session],
+      editorWsChannel: window.WS_CHANNEL
+    };
+
+    return {
+      operationId: undefined,
+      snippet: JSON.stringify(snippet),
+      notebook: JSON.stringify(notebook)
+    };
   }
 }

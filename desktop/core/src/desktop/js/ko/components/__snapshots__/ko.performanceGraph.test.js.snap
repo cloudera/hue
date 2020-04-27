@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.performanceGraph.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;performance-graph&quot;, params: params }\\"><script type=\\"text/html\\" id=\\"performance-graph-d3-template\\">
+  <div style=\\"position:relative;\\"
+      data-bind=\\"attr: { 'id': id }, style: { height: graphHeight + 'px', width: graphWidth + 'px' }\\"></div>
+</script><div style=\\"position: relative\\" data-bind=\\"template: { afterRender: componentRendered }\\">
+  <div style=\\"padding: 10px; float: right;\\" data-bind=\\"foreach: availableGranularities\\">
+    <!-- ko if: $data === $parent.selectedGranularity() -->
+    <span class=\\"margin-right-20\\" data-bind=\\"text: label\\">1 hour</span>
+    <!-- /ko -->
+    <!-- ko if: $data !== $parent.selectedGranularity() --><!-- /ko -->
+  
+    <!-- ko if: $data === $parent.selectedGranularity() --><!-- /ko -->
+    <!-- ko if: $data !== $parent.selectedGranularity() -->
+    <a class=\\"margin-right-20\\" href=\\"javascript: void(0);\\" data-bind=\\"text: label, click: function () { $parent.selectedGranularity($data); }\\">8 hours</a>
+    <!-- /ko -->
+  
+    <!-- ko if: $data === $parent.selectedGranularity() --><!-- /ko -->
+    <!-- ko if: $data !== $parent.selectedGranularity() -->
+    <a class=\\"margin-right-20\\" href=\\"javascript: void(0);\\" data-bind=\\"text: label, click: function () { $parent.selectedGranularity($data); }\\">1 week</a>
+    <!-- /ko -->
+  </div>
+  <div style=\\"clear: both; height: 500px; width: 1000px;\\" class=\\"performance-graph\\" data-bind=\\"style: { height: graphHeight + 'px', width: graphWidth + 'px' }\\"><svg width=\\"1000\\" height=\\"500\\"><text class=\\"loading-text\\" text-anchor=\\"middle\\" dy=\\"250\\" dx=\\"500\\">Loading metrics...</text></svg></div>
+</div></div>"
+`;

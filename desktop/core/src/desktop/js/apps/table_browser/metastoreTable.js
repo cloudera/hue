@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
@@ -157,12 +157,12 @@ class MetastoreTable {
           );
 
           this.catalogEntry
-            .getNavOptMeta()
-            .done(navOptMeta => {
-              this.optimizerDetails(navOptMeta);
+            .getOptimizerMeta()
+            .done(optimizerMeta => {
+              this.optimizerDetails(optimizerMeta);
 
               const topColIndex = {};
-              navOptMeta.topCols.forEach(topCol => {
+              optimizerMeta.topCols.forEach(topCol => {
                 topColIndex[topCol.name] = topCol;
               });
 
@@ -352,7 +352,7 @@ class MetastoreTable {
         cluster: JSON.stringify(this.database.catalogEntry.compute)
       }).done(resp => {
         if (resp.history_uuid) {
-          huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+          huePubSub.publish('notebook.task.submitted', resp);
         } else {
           $(document).trigger('error', resp.message);
         }
@@ -380,9 +380,7 @@ class MetastoreTable {
     this.samples.loaded(false);
     this.partitions.loaded(false);
     // Clear will publish when done
-    this.catalogEntry.clearCache({
-      invalidate: this.catalogEntry.getSourceType() === 'impala' ? 'invalidate' : 'cache'
-    });
+    this.catalogEntry.clearCache();
   }
 
   showImportData() {

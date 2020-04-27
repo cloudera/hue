@@ -15,17 +15,15 @@
 ## limitations under the License.
 <%!
 from django.utils.translation import ugettext as _
-
-from desktop import conf
-from desktop.conf import USE_NEW_EDITOR
-from desktop.models import hue_version
-from desktop.lib.i18n import smart_unicode
+from webpack_loader.templatetags.webpack_loader import render_bundle
 
 from metadata.conf import has_optimizer, OPTIMIZER
 
+from desktop import conf
 from desktop.auth.backend import is_admin
-
-from webpack_loader.templatetags.webpack_loader import render_bundle
+from desktop.conf import USE_NEW_EDITOR
+from desktop.models import hue_version
+from desktop.lib.i18n import smart_unicode
 
 home_url = url('desktop_views_home')
 if USE_NEW_EDITOR.get():
@@ -151,7 +149,7 @@ if USE_NEW_EDITOR.get():
     ${ render_bundle('login', config='LOGIN') | n,unicode }
   %else:
     ${ render_bundle('vendors~hue~notebook~tableBrowser') | n,unicode }
-    ${ render_bundle('vendors~hue~tableBrowser') | n,unicode }
+    ${ render_bundle('vendors~hue~notebook') | n,unicode }
     ${ render_bundle('vendors~hue') | n,unicode }
     ${ render_bundle('hue~notebook') | n,unicode }
     ${ render_bundle('hue~notebook~tableBrowser') | n,unicode }
@@ -186,7 +184,6 @@ if USE_NEW_EDITOR.get():
 
 % if user.is_authenticated():
   <script src="${ static('desktop/ext/js/localforage.min.js') }"></script>
-  <script src="${ static('desktop/js/clusterConfig.js') }"></script>
 
   <script type="text/javascript">
     $(document).ready(function () {
@@ -217,7 +214,7 @@ if USE_NEW_EDITOR.get():
 ${ hueIcons.symbols() }
 
 
-% if request.environ.get("PATH_INFO").find("/hue/") < 0:
+% if hasattr(request, 'environ') and request.environ.get("PATH_INFO").find("/hue/") < 0:
   <script>
     window.location.replace("/");
   </script>
@@ -239,6 +236,7 @@ ${ hueIcons.symbols() }
         count += 1
     return found_app, count
 %>
+
 % if not skip_topbar:
 <div class="navigator">
   <div class="pull-right">

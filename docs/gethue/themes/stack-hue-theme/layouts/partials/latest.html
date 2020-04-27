@@ -1,0 +1,28 @@
+<section class="bg--secondary">
+    <div class="container">
+        <div class="row text-block">
+            <div class="col-md-12">
+                <h3>More recent stories</h3>
+            </div>
+        </div>
+        <!--end of row-->
+        
+        <div class="row">
+            {{ range first 3 (where .Site.Pages "Type" "post") }}
+            <div class="col-md-4">
+                <article class="feature feature-1">
+                    <div class="feature__body boxed boxed--border">
+                        <span>{{ .Date.Format "02 January 2006" }}</span>
+                        <h5>{{ .Title }}</h5>
+                        <a href="{{ .Permalink }}">
+                            Read More
+                        </a>
+                    </div>
+                </article>
+            </div>
+            {{ end }}
+        </div>
+        <!--end of row-->
+    </div>
+    <!--end of container-->
+</section>

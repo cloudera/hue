@@ -24,9 +24,9 @@ import sys
 import traceback
 
 if sys.version_info[0] > 2:
-    from django.utils.encoding import force_text as force_unicode
+  from django.utils.encoding import force_text as force_unicode
 else:
-    from django.utils.encoding import force_unicode
+  from django.utils.encoding import force_unicode
 
 import desktop.lib.django_util
 
@@ -73,6 +73,9 @@ class PopupException(Exception):
 
     if not request.ajax:
       data['request'] = request
+    else:
+      data['traceback'] = traceback.format_list(data['traceback'])
+
     response = desktop.lib.django_util.render("popup_error.mako", request, data)
     if self.error_code == 500 and data['is_embeddable']: # Hue 4
       response.status_code = 200

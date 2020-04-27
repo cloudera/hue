@@ -21,9 +21,9 @@ standard_library.install_aliases()
 from builtins import object
 import json
 import logging
+import sys
 import urllib.request, urllib.parse, urllib.error
 
-from mock import patch, Mock
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
@@ -43,6 +43,10 @@ from beeswax.models import QueryHistory
 from beeswax.server import dbms
 from beeswax.test_base import BeeswaxSampleProvider
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 LOG = logging.getLogger(__name__)
 

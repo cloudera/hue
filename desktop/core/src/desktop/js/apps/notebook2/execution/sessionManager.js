@@ -101,6 +101,12 @@ class SessionManager {
     });
   }
 
+  updateSession(options) {
+    this.knownSessionPromises[options.type] = new Promise((resolve, reject) => {
+      resolve(options);
+    });
+  }
+
   async getAllSessions() {
     const promises = Object.keys(this.knownSessionPromises).map(
       key => this.knownSessionPromises[key]

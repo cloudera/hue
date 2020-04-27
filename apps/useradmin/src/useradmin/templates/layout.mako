@@ -15,9 +15,10 @@
 ## limitations under the License.
 
 <%!
-from desktop import conf
 from django.utils.translation import ugettext as _
+
 from desktop.auth.backend import is_admin
+from desktop.conf import USE_DEFAULT_CONFIGURATION, ENABLE_ORGANIZATIONS
 
 def is_selected(section, matcher):
   if section == matcher:
@@ -61,14 +62,37 @@ def is_selected(section, matcher):
                   ${ _('User Admin') }
                 </a>
               </li>
-              %if is_admin(user):
-                <li class="${is_selected(section, 'users')}"><a href="${ url('useradmin.views.list_users') }">${_('Users')}</a></li>
-                <li class="${is_selected(section, 'groups')}"><a href="${ url('useradmin.views.list_groups') }">${_('Groups')}</a></li>
-                <li class="${is_selected(section, 'permissions')}"><a href="${ url('useradmin.views.list_permissions') }">${_('Permissions')}</a></li>
-                %if conf.USE_DEFAULT_CONFIGURATION.get():
-                <li class="${is_selected(section, 'configurations')}"><a href="${ url('useradmin.views.list_configurations') }">${_('Configurations')}</a></li>
-                %endif
-              %endif
+              % if is_admin(user):
+                <li class="${is_selected(section, 'users')}">
+                  <a href="${ url('useradmin.views.list_users') }">
+                    ${ _('Users') }
+                  </a>
+                </li>
+                <li class="${is_selected(section, 'groups')}">
+                  <a href="${ url('useradmin.views.list_groups') }">
+                    ${ _('Groups') }
+                  </a>
+                </li>
+                <li class="${is_selected(section, 'permissions')}">
+                  <a href="${ url('useradmin.views.list_permissions') }">
+                    ${ _('Permissions') }
+                  </a>
+                </li>
+                % if ENABLE_ORGANIZATIONS.get():
+                <li class="${is_selected(section, 'organizations')}">
+                  <a href="${ url('useradmin.views.list_organizations') }">
+                    ${ _('Organizations') }
+                  </a>
+                </li>
+                % endif
+                % if USE_DEFAULT_CONFIGURATION.get():
+                <li class="${is_selected(section, 'configurations')}">
+                  <a href="${ url('useradmin.views.list_configurations') }">
+                    ${ _('Configurations') }
+                  </a>
+                </li>
+                % endif
+              % endif
             </ul>
           </div>
         </div>

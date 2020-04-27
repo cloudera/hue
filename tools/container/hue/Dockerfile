@@ -1,4 +1,4 @@
-FROM huebase_centos:7
+FROM ${HUEBASE_VERSION}
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 
@@ -24,7 +24,7 @@ ENV NAME="hue" \
     SUPERVISOR_VERSION=4.0.2
 
 # create hue user
-RUN groupadd -g 1123 ${HUEUSER} && useradd -g 1123 -d ${HUE_HOME} -s /bin/bash -u 1123 ${HUEUSER}
+RUN groupadd -g 1000 ${HUEUSER} && useradd -g 1000 -d ${HUE_HOME} -s /bin/bash -u 1000 ${HUEUSER}
 
 COPY hue ${HUE_HOME}
 COPY hue.sh ${HUE_HOME}/hue.sh
@@ -49,10 +49,11 @@ RUN ln -s ${HUE_CONF}/conf/log.conf ${HUE_HOME}/desktop/conf/log.conf; \
     ln -s ${HUE_CONF}/conf/log4j.properties ${HUE_HOME}/desktop/conf/log4j.properties
 
 # supervisor stuff
-RUN mkdir -p /etc/supervisor.d/ && chmod +w /etc/supervisor.d && mkdir -p /var/log/root
+RUN mkdir -p /etc/supervisor.d/ && chmod +w /etc/supervisor.d && mkdir -p /var/log/root && chown -R ${HUEUSER}:${HUEUSER} /var/log/root
 ADD supervisor-files/etc/supervisord.conf /etc/supervisord.conf
 ADD supervisor-files/hue_server.conf /etc/supervisor.d/
 ADD supervisor-files/hue_ktrenewer.conf /etc/supervisor.d/
+RUN chown -R ${HUEUSER}:${HUEUSER} /etc/supervisord.conf && chown -R ${HUEUSER}:${HUEUSER} /etc/supervisor.d
 
 EXPOSE 8888 9111
 

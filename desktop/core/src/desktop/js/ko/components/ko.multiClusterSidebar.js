@@ -15,11 +15,13 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+
+export const NAME = 'hue-multi-cluster-sidebar';
 
 const TEMPLATE = `
   <div class="sidebar-content" data-bind="foreach: categories">
@@ -28,7 +30,7 @@ const TEMPLATE = `
     <!-- /ko -->
     <!-- ko foreach: items -->
     <!-- ko if: typeof items == 'undefined' -->
-    <a role="button" class="sidebar-item" data-bind="css: { 'active': false }, hueLink: url, attr: { 'title': label">
+    <a role="button" class="sidebar-item" data-bind="css: { 'active': false }, hueLink: url, attr: { 'title': label }">
       <span class="sidebar-icon without-tooltip">
         <span data-bind="css: icon"></span>
       </span>
@@ -131,4 +133,4 @@ class MultiClusterSidebar {
   }
 }
 
-componentUtils.registerComponent('hue-multi-cluster-sidebar', MultiClusterSidebar, TEMPLATE);
+componentUtils.registerComponent(NAME, MultiClusterSidebar, TEMPLATE);

@@ -1,0 +1,29 @@
+baseURL = "https://gethue.com/"
+languageCode = "en-us"
+title = "Hue - The open source SQL Assistant for Data Warehouses"
+theme = "stack-hue-theme"
+pygmentsStyle = "monokailight"
+disqusShortname = "gethue"
+DefaultContentLanguage = "en"
+enableGitInfo = true
+
+[languages]
+  [languages.en]
+    baseURL = "https://gethue.com/"
+    title = "Hue - The open source SQL Assistant for Data Warehouses"
+    contentDir = "content/en"
+    languageName = "English"
+    weight = 10
+  [languages.jp]
+    baseURL = "https://jp.gethue.com/"
+    title = "Hue - The open source SQL Assistant for Data Warehouses"
+    contentDir = "content/jp"
+    languageName = "日本語"
+    weight = 20
+    hasCJKLanguage = true
+
+[params]
+docsHost = "https://docs.gethue.com"
+
+[markup.goldmark.renderer]
+unsafe=true

@@ -7,18 +7,20 @@ pre = "<b>1. </b>"
 +++
 ![Hue Logo Back-end](/images/hue_logo.png)
 
-<span style="font-size:52px; text-align:center; display: block">Documentation</span>
+<h1>Documentation</h1>
 
-Hue is a mature open source SQL Assistant for querying, visualizing and sharing data in Databases & Data Warehouses: [gethue.com](http://gethue.com).
+Hue is a mature open source SQL Assistant for querying [Databases & Data Warehouses](https://docs.gethue.com/administrator/configuration/connectors/) and collaborating: [gethue.com](http://gethue.com)
 
-Thousands of companies and organizations use Hue to open-up their data and provide self service querying. Hue is heavily used by:
+Many companies and organizations use Hue to quickly answer questions via [self-service querying](/user/querying/) e.g.:
 
-* 1000+ paying customers
-* top Fortune 500
+* 1000+ customers
+* Top Fortune 500
 
-who are executing 100s of 1000s of queries daily. It also ships in Amazon AWS and its open source version is used by hundred of companies.
+are executing 100s of 1000s of queries daily. It also [ships](/administrator/installation/) in Cloudera Data Platform, Amazon AWS, Open Data Hub...
 
-Hue is also ideal for building your own Cloud SQL Editor and any contributions are welcome.
+Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/parsers/) and any [contributions](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md) are welcome.
+
+!["Hue Editor"](https://cdn.gethue.com/uploads/2019/12/hue4.6.png)
 
 
 Administrate
@@ -36,6 +38,8 @@ How to extend SQL connectors, reuse the API or build applications is detailed in
 Releases
 --------
 
+* April 10, 2020 --- [Version 4.7.0](releases/release-notes-4.7.0/index.html)
+* December 5, 2019 --- [Version 4.6.0](releases/release-notes-4.6.0/index.html)
 * August 12, 2019 --- [Version 4.5.0](releases/release-notes-4.5.0/index.html)
 * March 28, 2019 --- [Version 4.4.0](releases/release-notes-4.4.0/index.html)
 * October 17, 2018 --- [Version 4.3.0](releases/release-notes-4.3.0/index.html)

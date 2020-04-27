@@ -19,10 +19,10 @@ from builtins import object
 import json
 import logging
 import re
+import sys
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false, assert_raises
-from mock import patch, Mock
 
 from django.urls import reverse
 
@@ -43,6 +43,11 @@ from useradmin.models import User
 
 from impala import conf
 from impala.dbms import ImpalaDbms
+
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 
 LOG = logging.getLogger(__name__)
@@ -72,11 +77,11 @@ class TestMockedImpala(object):
 
   def test_basic_flow(self):
     response = self.client.get("/impala/")
-    assert_true(re.search('Impala', response.content), response.content)
-    assert_true('Query Editor' in response.content)
+    assert_true(re.search(b'Impala', response.content), response.content)
+    assert_true(b'Query Editor' in response.content)
 
     response = self.client.get("/impala/execute/")
-    assert_true('Query Editor' in response.content)
+    assert_true(b'Query Editor' in response.content)
 
   def test_saved_queries(self):
     user = User.objects.get(username='test')
@@ -119,7 +124,7 @@ class TestMockedImpala(object):
         ddms.client.query.assert_called_once_with(ddms.client.query.call_args[0][0])
         assert_true('customers' in ddms.client.query.call_args[0][0].hql_query) # diff of 1 table
 
-        get_different_tables.return_value = ['customers','','','','','','','','','','']
+        get_different_tables.return_value = ['customers', '', '', '', '', '', '', '', '', '', '']
         assert_raises(PopupException, ddms.invalidate, 'default') # diff of 11 tables. Limit is 10.
 
         ddms.invalidate('default', 'customers')
@@ -147,13 +152,11 @@ class TestImpalaIntegration(object):
     cls.db = dbms.get(cls.user, get_query_server_config(name='impala'))
     cls.DATABASE = get_db_prefix(name='impala')
 
-    queries = ["""
-      DROP TABLE IF EXISTS %(db)s.tweets;
-    """ % {'db': cls.DATABASE}, """
-      DROP DATABASE IF EXISTS %(db)s CASCADE;
-    """ % {'db': cls.DATABASE}, """
-      CREATE DATABASE %(db)s;
-    """ % {'db': cls.DATABASE}]
+    queries = [
+      'DROP TABLE IF EXISTS %(db)s.tweets;' % {'db': cls.DATABASE},
+      'DROP DATABASE IF EXISTS %(db)s CASCADE;' % {'db': cls.DATABASE},
+      'CREATE DATABASE %(db)s;' % {'db': cls.DATABASE}
+    ]
 
     for query in queries:
        resp = _make_query(cls.client, query, database='default', local=False, server_name='impala')

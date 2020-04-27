@@ -15,11 +15,13 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+
+export const NAME = 'hue-job-browser-links';
 
 const TEMPLATE = `
   <div class="btn-group pull-right">
@@ -94,7 +96,7 @@ class JobBrowserPanel {
       }
     });
 
-    self.jobCounts = ko.observable({ yarn: 0, schedules: 0 });
+    self.jobCounts = ko.observable({ yarn: 0, schedules: 0, history: 0 });
     self.jobCount = ko.pureComputed(() => {
       let total = 0;
       Object.keys(self.jobCounts()).forEach(value => {
@@ -125,7 +127,7 @@ class JobBrowserPanel {
     let lastScheduleBrowserRequest = undefined;
     const checkScheduleBrowserStatus = function() {
       return $.post(
-        '/jobbrowser/api/jobs',
+        '/scheduler/api/schedule/list',
         {
           interface: ko.mapping.toJSON('schedules'),
           filters: ko.mapping.toJSON([
@@ -144,6 +146,27 @@ class JobBrowserPanel {
         }
       );
     };
+    let lastHistoryBrowserRequest = null;
+    const checkHistoryBrowserStatus = function() {
+      return $.post('/jobbrowser/api/jobs/history', {
+        interface: ko.mapping.toJSON('history'),
+        filters: ko.mapping.toJSON([
+          { states: ['running'] },
+          { text: 'user:' + window.LOGGED_USERNAME },
+          { time: { time_value: 7, time_unit: 'days' } },
+          { pagination: { page: 1, offset: 1, limit: 1 } }
+        ])
+      })
+        .done(data => {
+          if (data != null && data.apps != null) {
+            self.jobCounts()['history'] = data.apps.length;
+            self.jobCounts.valueHasMutated();
+          }
+        })
+        .fail(response => {
+          console.warn(response);
+        });
+    };
 
     let checkJobBrowserStatusIdx = -1;
     const checkJobBrowserStatus = function() {
@@ -151,9 +174,12 @@ class JobBrowserPanel {
       if (window.ENABLE_QUERY_SCHEDULING) {
         lastScheduleBrowserRequest = checkScheduleBrowserStatus();
       }
+      if (window.ENABLE_HISTORY_V2) {
+        lastHistoryBrowserRequest = checkHistoryBrowserStatus();
+      }
 
       $.when
-        .apply($, [lastYarnBrowserRequest, lastScheduleBrowserRequest])
+        .apply($, [lastYarnBrowserRequest, lastScheduleBrowserRequest, lastHistoryBrowserRequest])
         .done(() => {
           window.clearTimeout(checkJobBrowserStatusIdx);
           checkJobBrowserStatusIdx = window.setTimeout(
@@ -186,8 +212,9 @@ class JobBrowserPanel {
 
       huePubSub.subscribe('check.job.browser', checkYarnBrowserStatus);
       huePubSub.subscribe('check.schedules.browser', checkScheduleBrowserStatus);
+      huePubSub.subscribe('check.history.browser', checkHistoryBrowserStatus);
     }
   }
 }
 
-componentUtils.registerComponent('hue-job-browser-links', JobBrowserPanel, TEMPLATE);
+componentUtils.registerComponent(NAME, JobBrowserPanel, TEMPLATE);

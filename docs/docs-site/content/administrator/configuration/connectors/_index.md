@@ -5,11 +5,30 @@ draft: false
 weight: 2
 ---
 
+Looking at improving or adding a new one? Go check the **[connector API section](/developer/connectors/)**!
+
 ## Databases
 
-Native connectors (via the `hiveserver2` interface) are recommended for Hive and Impala, otherwise SqlAlchemy is prefered. Read more about the [connectors](../apps#connectors).
+Hue connects to any database or warehouse via native or SqlAlchemy connectors. Connections can be configured via a UI after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) is done, until then they need to be added to the [Hue ini file](/administrator/configuration/). Except [impala] and [beeswax] which have a dedicated section, all the other ones should be appended below the [[interpreters]] of [notebook] e.g.:
 
-### Impala
+    [notebook]
+    [[interpreters]]
+
+    [[[mysql]]]
+    name=MySQL
+    interface=sqlalchemy
+    options='{"url": "mysql://${USER}:${PASSWORD}@localhost:3306/hue"}'
+
+    [[[presto]]]
+    name = Presto
+    interface=sqlalchemy
+    options='{"url": "presto://localhost:8080/hive/default"}'
+
+Note that USER and PASSWORD can be prompted to the user like in the MySQL connector above.
+
+Read about [how to build your own parser](/developer/parsers/) if you are looking at better autocompletes for your own SQL dialects.
+
+### Apache Impala
 
 Support is native via a dedicated section.
 
@@ -22,7 +41,7 @@ Support is native via a dedicated section.
 
 Read more about [LDAP or PAM pass-through authentication](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/) and [High Availability](../server/).
 
-### Hive
+### Apache Hive
 
 Support is native via a dedicated section.
 
@@ -45,85 +64,93 @@ Read more about [LDAP or PAM pass-through authentication](http://gethue.com/ldap
 Requires support for sending multiple queries when using Tez (instead of a maximum of just one at the time). You can turn it on with this setting:
 
     [beeswax]
-    max_number_of_sessions=10
+    max_number_of_sessions=3
 
 **LLAP**
 
 When the LLAP interpreter is added, there are 2 ways to enable connectivity (direct configuration or service discovery). LLAP is added by enabling the following settings:
 
     [notebook]
-        [[interpreters]]
-            [[[llap]]]
-               name=LLAP
-               interface=hiveserver2
+    [[interpreters]]
+      [[[llap]]]
+      name=LLAP
+      interface=hiveserver2
 
     [beeswax]
-        # Direct Configuration
-        llap_server_host = localhost
-        llap_server_port = 10500
-        llap_server_thrift_port = 10501
+    # Direct Configuration
+    llap_server_host = localhost
+    llap_server_port = 10500
+    llap_server_thrift_port = 10501
 
-        # or Service Discovery
-        ## hive_discovery_llap = true
-        ## hive_discovery_llap_ha = false
-        # Shortcuts to finding LLAP znode Key
-        # Non-HA - hiveserver-interactive-site - hive.server2.zookeeper.namespace ex hive2 = /hive2
-        # HA-NonKerberized - <llap_app_name>_llap ex app name llap0 = /llap0_llap
-        # HA-Kerberized - <llap_app_name>_llap-sasl ex app name llap0 = /llap0_llap-sasl
-        ## hive_discovery_llap_znode = /hiveserver2-hive2
+    # or Service Discovery
+    ## hive_discovery_llap = true
+    ## hive_discovery_llap_ha = false
+    # Shortcuts to finding LLAP znode Key
+    # Non-HA - hiveserver-interactive-site - hive.server2.zookeeper.namespace ex hive2 = /hive2
+    # HA-NonKerberized - <llap_app_name>_llap ex app name llap0 = /llap0_llap
+    # HA-Kerberized - <llap_app_name>_llap-sasl ex app name llap0 = /llap0_llap-sasl
+    ## hive_discovery_llap_znode = /hiveserver2-hive2
 
 **Service Discovery**
 
 When setup, Hue will query zookeeper to find an enabled hiveserver2 or LLAP endpoint.
 
-        [beeswax]
-            hive_discovery_llap = true
-            hive_discovery_hs2 = true
+    [beeswax]
+    hive_discovery_llap = true
+    hive_discovery_hs2 = true
 
 In order to prevent spamming zookeeper, HiveServer2 is cached for the life of the process and llap is cached based on the following setting:
 
-        [beeswax]
-            cache_timeout = 60
+    [beeswax]
+    cache_timeout = 60
 
 ### MySQL
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install mysqlclient
+    ./build/env/bin/pip install mysqlclient
 
 Then give Hue the information about the database source:
 
     [[[mysql]]]
-       name = MySQL
-       interface=sqlalchemy
-       options='{"url": "mysql://root:root@localhost:3306/hue"}'
-       ## mysql://${USER}:${PASSWORD}@localhost:3306/hue
+    name=MySQL
+    interface=sqlalchemy
+    options='{"url": "mysql://root:root@localhost:3306/hue"}'
+    ## mysql://${USER}:${PASSWORD}@localhost:3306/hue
 
 Query string options are documented in the [SqlAlchemy MySQL documentation](https://docs.sqlalchemy.org/en/latest/dialects/mysql.html).
 
 Alternative:
 
     [[[mysqljdbc]]]
-       name=MySql JDBC
-      interface=jdbc
-       ## Specific options for connecting to the server.
-       ## The JDBC connectors, e.g. mysql.jar, need to be in the CLASSPATH environment variable.
-       ## If 'user' and 'password' are omitted, they will be prompted in the UI.
-       options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver", "user": "root", "password": "root"}'
-       ## options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver"}'
+    name=MySql JDBC
+    interface=jdbc
+    ## Specific options for connecting to the server.
+    ## The JDBC connectors, e.g. mysql.jar, need to be in the CLASSPATH environment variable.
+    ## If 'user' and 'password' are omitted, they will be prompted in the UI.
+    options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver", "user": "root", "password": "root"}'
+    ## options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver"}'
 
 ### Presto
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install pyhive
+    ./build/env/bin/pip install pyhive
 
-Then give Hue the information about the database source:
+Then give Hue the information about the database source following the `presto://{presto-coordinator}:{port}/{catalog}/{schema}` format:
 
     [[[presto]]]
        name = Presto
        interface=sqlalchemy
-       options='{"url": "presto://localhost:8080/hive/default"}'
+       options='{"url": "presto://localhost:8080/tpch/default"}'
+
+With impersonation:
+
+        options='{"url": "presto://localhost:8080/tpch/default", "has_impersonation": true}'
+
+With Kerberos:
+
+        options='{"url": "presto://localhost:8080/tpch/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
 
 Alternatives.
 
@@ -152,7 +179,7 @@ The client driver is maintained by the Presto Team and can be downloaded here: h
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install cx_Oracle
+    ./build/env/bin/pip install cx_Oracle
 
 Then give Hue the information about the database source:
 
@@ -161,13 +188,13 @@ Then give Hue the information about the database source:
        interface=sqlalchemy
        options='{"url": "oracle://scott:tiger@dsn"}'
 
-### PostgreSql
+### PostgreSQL
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install psycopg2
+    ./build/env/bin/pip install psycopg2
       or
-      ./build/env/bin/pip install psycopg2-binary
+    ./build/env/bin/pip install psycopg2-binary
 
 Then give Hue the information about the database source:
 
@@ -203,7 +230,7 @@ Secondly, we need to add a new interpreter to the notebook app. This will allow 
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install PyAthena
+    ./build/env/bin/pip install PyAthena
 
 Then give Hue the information about the database source:
 
@@ -220,26 +247,31 @@ Note: Keys and S3 buckets need to be URL quoted but Hue does it automatically fo
 
 ### Apache Druid
 
-First, make sure that Hue can talk to Druid via the pydruid SqlAlchemy connector. Either make sure it is in the global Python environment or install it in the Hue virtual environment.
+First, make sure that Hue can talk to Druid via the [pydruid SqlAlchemy connector](https://github.com/druid-io/pydruid). Either make sure it is in the global Python environment or install it in the Hue virtual environment.
 
-      ./build/env/bin/pip install pydruid
+    ./build/env/bin/pip install pydruid
 
 **Note** Make sure the version is equal or more to 0.4.1 if not you will get a "Can't load plugin: sqlalchemy.dialects:druid".
 
 In the hue.ini configuration file, now let's add the interpreter. Here 'druid-host.com' would be the machine where Druid is running.
 
-      [notebook]
-      [[interpreters]]
-      [[[druid]]]
-      name = Druid
-      interface=sqlalchemy
-      options='{"url": "druid://druid-host.com:8082/druid/v2/sql/"}'
+    [notebook]
+    [[interpreters]]
+    [[[druid]]]
+    name = Druid
+    interface=sqlalchemy
+    options='{"url": "druid://druid-host.com:8082/druid/v2/sql/?header=true"}'
+
+`?header=true` option requires Druid 13.0 or later.
+Adding the `+https` prefix will use HTTPS e.g.:
+
+    druid+https://druid-host.com:8082/druid/v2/sql/?header=true
 
 ### Teradata
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install sqlalchemy-teradata
+    ./build/env/bin/pip install sqlalchemy-teradata
 
 Then give Hue the information about the database source:
 
@@ -259,7 +291,7 @@ Alternative:
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install ibm_db_sa
+    ./build/env/bin/pip install ibm_db_sa
 
 (or via https://github.com/ibmdb/python-ibmdbsa/tree/master/ibm_db_sa)
 
@@ -277,11 +309,11 @@ Alternative:
       interface=jdbc
       options='{"url": "jdbc:db2://db2.vpc.cloudera.com:50000/SQOOP", "driver": "com.ibm.db2.jcc.DB2Driver", "user": "DB2INST1", "password": "cloudera"}'
 
-### Spark SQL
+### Apache Spark SQL
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install pyhive
+    ./build/env/bin/pip install pyhive
 
 Then give Hue the information about the database source:
 
@@ -310,17 +342,41 @@ Via native HiveServer2 API:
       name=SparkSql
       interface=hiveserver2
 
-### Kafka SQL
+### ksqlDB
 
-    [[[kafkasql]]]
-      name=Kafka SQL
-      interface=kafka
+The ksql Python module should be added to the system or Hue Python virtual environment:
+
+    ./build/env/bin/pip install git+https://github.com/romainr/ksql-python
+
+Then give Hue the information about the interpreter and ksql API:
+
+To add to the list of interpreters:
+
+    [[interpreters]]
+
+    [[[ksql]]]
+      name=ksql
+      interface=ksql
+
+    ...
+
+    [kafka]
+
+      [[kafka]]
+        # Enable the Kafka integration.
+        is_enabled=true
+
+        # Base URL of Kafka Ksql API.
+        ## ksql_api_url=http://127.0.0.1:8088
+
+
+Note: the configuration will be much simpler after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758).
 
 ### Azure SQL Database
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install pyodbc
+    ./build/env/bin/pip install pyodbc
 
 Then configure ODBC according to the [documentation](https://github.com/mkleehammer/pyodbc).
 
@@ -339,7 +395,7 @@ Read more on the [Azure SQL Database](https://docs.microsoft.com/en-us/azure/sql
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install pymssql
+    ./build/env/bin/pip install pymssql
 
 Then give Hue the information about the database source:
 
@@ -361,7 +417,7 @@ Microsoft’s SQL Server JDBC drivers can be downloaded from the official site: 
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install sqlalchemy-vertica-python
+    ./build/env/bin/pip install sqlalchemy-vertica-python
 
 Then give Hue the information about the database source:
 
@@ -372,14 +428,14 @@ Then give Hue the information about the database source:
 
 Alternative:
 
-Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Drivers](https://my.vertica.com/download/vertica/client-drivers/). Be sure to download the driver for the right version and OS.
+Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Drivers](http://my.vertica.com/download/vertica/client-drivers/). Be sure to download the driver for the right version and OS.
 
     [[[vertica]]]
     name=Vertica JDBC
     interface=jdbc
     options='{"url": "jdbc:vertica://localhost:5433/example", "driver": "com.vertica.jdbc.Driver", "user": "admin", "password": "pass"}'
 
-### Phoenix
+### Apache Phoenix
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
@@ -390,7 +446,32 @@ The dialect should be added to the Python system or Hue Python virtual environme
     interface=sqlalchemy
     options='{"url": "phoenix://sql-phoenix-1.gce.cloudera.com:8765/"}'
 
-**Note**: Check the list of know issues [here](https://github.com/Pirionfr/pyPhoenix#known-issues).
+**Notes**
+
+1. Existing HBase tables need to be mapped to views
+
+    ```
+    0: jdbc:phoenix:> CREATE VIEW if not exists "analytics_demo_view" ( pk VARCHAR PRIMARY KEY, "hours"."01-Total" VARCHAR );
+    Error: ERROR 505 (42000): Table is read only. (state=42000,code=505)
+    -->
+    0: jdbc:phoenix:> CREATE Table if not exists "analytics_demo" ( pk VARCHAR PRIMARY KEY, "hours"."01-Total" VARCHAR );
+    ```
+
+2. Tables are seeing as uppercase by Phoenix. When getting started, it is simpler to just create the table via Phoenix.
+
+    ```
+    Error: ERROR 1012 (42M03): Table undefined. tableName=ANALYTICS_DEMO (state=42M03,code=1012)
+    -->
+    0: jdbc:phoenix:> select * from "analytics_demo" where pk = "domain.0" limit 5;
+    ```
+
+3. Phoenix follows Apache Calcite. Feel free to help improve the SQL autocomplete support for it.
+
+4. Skip the semicolon ‘;’.
+
+5. Not tested yet with security.
+
+6. List of some of the known issues are listed on the [Phoenix SqlAlchemy](https://github.com/Pirionfr/pyPhoenix#known-issues) connector page.
 
 Alternative:
 
@@ -407,7 +488,7 @@ The Phoenix JDBC client driver is bundled with the Phoenix binary and source rel
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install sqlalchemy-redshift
+    ./build/env/bin/pip install sqlalchemy-redshift
 
 Then give Hue the information about the database source:
 
@@ -420,8 +501,8 @@ Then give Hue the information about the database source:
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install pybigquery
-      ./build/env/bin/pip install pyasn1==0.4.1
+    ./build/env/bin/pip install pybigquery
+    ./build/env/bin/pip install pyasn1==0.4.1
 
 From https://github.com/mxmzdlv/pybigquery.
 
@@ -468,11 +549,11 @@ The [Drill JDBC driver](http://maprdocs.mapr.com/home/Hue/ConfigureHuewithDrill.
       ## If 'user' and 'password' are omitted, they will be prompted in the UI.
       options='{"url": "<drill-jdbc-url>", "driver": "org.apache.drill.jdbc.Driver", "user": "admin", "password": "admin"}'</code>
 
-### Sybase
+### SAP Sybase
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install python-sybase
+    ./build/env/bin/pip install python-sybase
 
 Then give Hue the information about the database source:
 
@@ -482,11 +563,11 @@ Then give Hue the information about the database source:
        options='{"url": "sybase+pysybase://<username>:<password>@<dsn>/[database name]"}'
 
 
-### Hana
+### SAP Hana
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install sqlalchemy-hana
+    ./build/env/bin/pip install sqlalchemy-hana
 
 (or via https://github.com/SAP/sqlalchemy-hana)
 
@@ -497,7 +578,38 @@ Then give Hue the information about the database source:
        interface=sqlalchemy
        options='{"url": "hana://username:password@example.de:30015"}'
 
-### Solr SQL
+### Apache Solr
+
+#### SQL
+
+Query collections like we would query a regular database.
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+    ./build/env/bin/pip install sqlalchemy-solr
+
+(or via https://github.com/aadel/sqlalchemy-solr)
+
+Then give Hue the information about the database source:
+
+    [[[solr]]]
+       name = Solr SQL
+       interface=sqlalchemy
+       options='{"url": "solr://<username>:<password>@<host>:<port>/solr/<collection>[?use_ssl=true|false]"}'
+
+#### Native
+
+As Solr SQL is pretty recent, the native implementation has some caveats, notably Solr lacks support of:
+
+* SELECT *
+* WHERE close with a LIKE
+* resultset pagination
+
+which prevents a SQL UX experience comparable to the standard other databases (but we track it in [HUE-3686](https://issues.cloudera.org/browse/HUE-3686)).
+
+First make sure Solr search is [configured](#apache-solr):
+
+Then add the interpreter:
 
     [[[solr]]]
       name = Solr SQL
@@ -505,11 +617,30 @@ Then give Hue the information about the database source:
       ## Name of the collection handler
       # options='{"collection": "default"}'
 
-### Kylin
+### Dashboards
+Solr provide great [dashboards](/user/querying/#dashboard). Just point to an existing Solr:
+
+    [search]
+
+      # URL of the Solr Server
+      solr_url=http://localhost:8983/solr/
+
+      # Requires FQDN in solr_url if enabled
+      ## security_enabled=false
+
+      ## Query sent when no term is entered
+      ## empty_query=*:*
+
+
+### Apache Kylin
+
+Apache Kylin is an open-source online analytical processing (OLAP) engine.
+See how to configure the [Kylin Query Editor](http://gethue.com/using-hue-to-interact-with-apache-kylin/).
+
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install kylinpy
+    ./build/env/bin/pip install kylinpy
 
 Then give Hue the information about the database source:
 
@@ -529,7 +660,7 @@ Alternative:
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install sqlalchemy-clickhouse
+    ./build/env/bin/pip install sqlalchemy-clickhouse
 
 Then give Hue the information about the database source:
 
@@ -547,11 +678,23 @@ Alternative:
       ## The JDBC driver clickhouse-jdbc.jar and its related jars need to be in the CLASSPATH environment variable.
       options='{"url": "jdbc:clickhouse://localhost:8123", "driver": "ru.yandex.clickhouse.ClickHouseDriver", "user": "readonly", "password": ""}'
 
-### Pinot DB
+### Elastic Search
+
+The dialect for https://github.com/elastic/elasticsearch should be added to the Python system or Hue Python virtual environment:
+
+    ./build/env/bin/pip install elasticsearch-dbapi
+
+    [[[es]]]
+      name = Elastic Search
+      interface=sqlalchemy
+      options='{"url": "elasticsearch+http://localhost:9200/"}'
+
+
+### Apache Pinot DB
 
 The dialect for https://pinot.apache.org should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install pinotdb
+    ./build/env/bin/pip install pinotdb
 
 Then give Hue the information about the database source:
 
@@ -560,83 +703,11 @@ Then give Hue the information about the database source:
        interface=sqlalchemy
        options='{"url": "pinot+http://localhost:8099/query?server=http://localhost:9000/"}'
 
-### Spark
-
-This connector leverage the [Apache Livy REST Api](https://livy.incubator.apache.org/):
-
-In the `[[interpreters]]` section:
-
-      [[[pyspark]]]
-            name=PySpark
-            interface=livy
-
-      [[[sql]]]
-            name=SparkSql
-            interface=livy
-
-      [[[spark]]]
-            name=Scala
-            interface=livy
-
-      [[[r]]]
-            name=R
-            interface=livy
-
-In the `[spark]` section:
-
-    [spark]
-      # The Livy Server URL.
-      livy_server_url=http://localhost:8998
-
-And if using Cloudera distribution, make sure you have notebooks enabled:
-
-    [desktop]
-      app_blacklist=
-
-    [notebook]
-      show_notebooks=true
-
-**YARN: Spark session could not be created**
-
-If seeing an error similar to this with `primitiveMkdir`:
-
-    The Spark session could not be created in the cluster: at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeMethod(RetryInvocationHandler.java:165)
-    at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invoke(RetryInvocationHandler.java:157)
-    at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeOnce(RetryInvocationHandler.java:95)
-    at org.apache.hadoop.io.retry.RetryInvocationHandler.invoke(RetryInvocationHandler.java:359) at com.sun.proxy.$Proxy10.mkdirs(Unknown Source)
-    at org.apache.hadoop.hdfs.DFSClient.primitiveMkdir(DFSClient.java:2333) ... 20 more
-    19/05/13 12:27:07 INFO util.ShutdownHookManager: Shutdown hook called 19/05/13 12:27:07 INFO util.ShutdownHookManager:
-    Deleting directory /tmp/spark-0d045154-77a0-4e12-94b2-2df18725a4ae YARN Diagnostics:
-
-Does your logged-in user have a home dir on HDFS (i.e. `/user/bob`)? (you should see the full error in the Livy or YARN logs).
-
-In Hue admin for you user, you can click the 'Create home' checkbox and save.
-
-**CSRF**
-
-Livy supports a configuration parameter in the Livy conf:
-
-      livy.server.csrf-protection.enabled
-
-...which is false by default. Upon trying to launch a Livy session from the notebook, Hue will pass along the connection error from Livy as a 400 response that the "Missing Required Header for CSRF protection". To enable it, add to the Hue config:
-
-      [spark]
-      # Whether Livy requires client to use csrf protection.
-      ## csrf_enabled=false
-
-### Pig
-
-Pig is native to Hue and depends on the [Oozie service](/administrator/configuration/connectors/#oozie) to be configured:
-
-    [[[pig]]]
-      name=Pig
-      interface=oozie
-
 ### Snowflake
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install snowflake-sqlalchemy
+    ./build/env/bin/pip install snowflake-sqlalchemy
 
 Then give Hue the information about the database source:
 
@@ -670,7 +741,7 @@ Just give Hue the information about the database source:
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install gsheetsdb
+    ./build/env/bin/pip install gsheetsdb
 
 Then give Hue the information about the database source:
 
@@ -685,7 +756,7 @@ Read more on the [gsheetsdb page](https://github.com/betodealmeida/gsheets-db-ap
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install psycopg2
+    ./build/env/bin/pip install psycopg2
 
 Then give Hue the information about the database source:
 
@@ -717,8 +788,8 @@ HA is supported by pointing to the HttpFs service instead of the NameNode.
 Make sure the HDFS service has in it `hdfs-site.xml`:
 
     <property>
-    <name>dfs.webhdfs.enable</name>
-    <value>true</value>
+      <name>dfs.webhdfs.enable</name>
+      <value>true</value>
     </property>
 
 Configure Hue as a proxy user for all other users and groups, meaning it may submit a request on behalf of any other user:
@@ -793,46 +864,30 @@ Alternatively (but not recommended for production or secure environments), you c
 
 The region should be set to the AWS region corresponding to the S3 account. By default, this region will be set to 'us-east-1'.
 
+**Using Ozone**
+Apache Ozone should work out of the box.
 
 **Using Ceph**
 New end points have been added in [HUE-5420](https://issues.cloudera.org/browse/HUE-5420)
 
+### Azure File Systems
 
-### ADLS / ABFS
+Hue's file browser can now allow users to explore, manage, and upload data in an ADLS v1 or ADLS v2 (ABFS), in addition to HDFS and S3.
 
-Hue's file browser can now allow users to explore, manage, and upload data in an ADLS v1 or ADLS v2 (ABFS), in addition to HDFS and S3. ABFS is currently a work in progress with [HUE-8908](https://issues.cloudera.org/browse/HUE-8908)
+Read more about it in the [ADLS User Documentation](/user/browsing#adls-abfs).
 
-Read more about it in the [ADLS User Documentation](/user/browsing#adls).
-
-In order to add an ADLS account to Hue, you'll need to configure Hue with valid ADLS credentials, including the client ID, client secret and tenant ID.
+In order to add an Azure account to Hue, you'll need to configure Hue with valid Azure credentials, including the client ID, client secret and tenant ID.
 These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:
 
-    [adls]
-    [[azure_accounts]]
-    [[[default]]]
-    client_id_script=/path/to/client_id_script.sh
-    client_secret_script=/path/to/client_secret_script.sh
-    tenant_id_script=/path/to/tenant_id_script.sh
-
-    [[adls_clusters]]
-    [[[default]]]
-    fs_defaultfs=adl://<account_name>.azuredatalakestore.net
-    webhdfs_url=https://<account_name>.azuredatalakestore.net
-
-    [[abfs_clusters]]
-    [[[default]]]
-    fs_defaultfs=abfss://<container_name>@<account_name>.dfs.core.windows.net
-    webhdfs_url=https://<container_name>@<account_name>.dfs.core.windows.net
-
-Alternatively (but not recommended for production or secure environments), you can set the client_secret value in plain-text:
-
-    [adls]
+    [azure]
     [[azure_account]]
     [[[default]]]
     client_id=adlsclientid
     client_secret=adlsclientsecret
     tenant_id=adlstenantid
 
+The account name used by ADLS / ABFS will need to be configured via the following properties:
+
     [[adls_clusters]]
     [[[default]]]
     fs_defaultfs=adl://<account_name>.azuredatalakestore.net
@@ -840,7 +895,7 @@ Alternatively (but not recommended for production or secure environments), you c
 
     [[abfs_clusters]]
     [[[default]]]
-    fs_defaultfs=abfss://<container_name>@<account_name>.dfs.core.windows.net
+    fs_defaultfs=abfs://<container_name>@<account_name>.dfs.core.windows.net
     webhdfs_url=https://<container_name>@<account_name>.dfs.core.windows.net
 
 ### GCS
@@ -854,6 +909,9 @@ The json credentials of a service account can be stored for development in plain
     [[[default]]]
     json_credentials='{ "type": "service_account", "project_id": .... }'
 
+### Apache Ozone
+
+The API is the same as [S3](#s3).
 
 ### HBase
 
@@ -862,7 +920,7 @@ Specify the comma-separated list of HBase Thrift servers for clusters in the for
     [hbase]
     hbase_clusters=(Cluster|localhost:9090)
 
-### Impersonation
+#### Impersonation
 
 doAs Impersonation provides a flexible way to use the same client to impersonate multiple principals. doAs is supported only in Thrift 1.
 Enable doAs support by adding the following properties to hbase-site.xml on each Thrift gateway:
@@ -889,7 +947,7 @@ And the Hue hosts, or * to authorize from any host:
 
 Note: If you use framed transport, you cannot use doAs impersonation, because SASL does not work with Thrift framed transport.
 
-### Kerberos cluster
+#### Kerberos cluster
 
 In a secure cluster its also needs these properties:
 
@@ -907,29 +965,137 @@ And from the HBase shell, authorize some ends users, e.g. to give full access to
 
     hbase shell> grant 'admin', 'RWXCA'
 
-## Others
+## Metadata
 
-### Data Catalog
+### Apache Atlas
 
-In the `[metadata]` section, Hue is supporting Cloudera Navigator and soon Apache Atlas ([HUE-8749](https://issues.cloudera.org/browse/HUE-8749)) in order to enrich the [data catalog](/user/browsing/).
+In the `[metadata]` section, Hue is supporting Cloudera Navigator and Apache Atlas in order to enrich the [data catalog](/user/browsing/#data-catalog).
 
-### Spark
+    [metadata]
+    [[catalog]]
+      # The type of Catalog: Apache Atlas, Cloudera Navigator...
+      interface=atlas
+      # Catalog API URL (without version suffix).
+      api_url=http://localhost:21000/atlas/v2
 
-The `[spark]` section details how to point to [Livy](https://livy.incubator.apache.org/) in order to execute interactive Spark snippets in Scala or Python.
+      # Username of the CM user used for authentication.
+      ## server_user=hue
+      # Password of the user used for authentication.
+      server_password=
+
+      # Limits found entities to a specific cluster. When empty the entities from all clusters will be included in the search results.
+      ## search_cluster=
+
+      # Set to true when authenticating via kerberos instead of username/password
+      ## kerberos_enabled=false
+
+![Data Catalog Search](https://cdn.gethue.com/uploads/2019/06/SearchWithType_field_name.png)
+
+### Cloudera Navigator
+
+The integration was replaced with Apache Atlas but can still be used.
+
+### Cloudera Navigator Optimizer
+
+The integration is powering the [Risk Alerts and Popular Values](/user/querying/#query-troubleshooting) in the SQL Autocomplete.
+
+![Popular joins suggestion](https://cdn.gethue.com/uploads/2017/07/hue_4_query_joins.png)
+
+## Jobs
+
+### Apache Spark
+
+This connector leverage the [Apache Livy REST Api](https://livy.incubator.apache.org/).
+
+In the `[[interpreters]]` section:
+
+    [[[pyspark]]]
+      name=PySpark
+      interface=livy
+
+    [[[sql]]]
+      name=SparkSql
+      interface=livy
+
+    [[[spark]]]
+      name=Scala
+      interface=livy
+
+    [[[r]]]
+      name=R
+      interface=livy
+
+In the `[spark]` section:
 
     [spark]
-      # Host address of the Livy Server.
-      ## livy_server_host=localhost
+      # The Livy Server URL.
+      livy_server_url=http://localhost:8998
 
-      # Port of the Livy Server.
-      ## livy_server_port=8998
+And if using Cloudera distribution, make sure you have notebooks enabled:
 
-### Kafka
+    [desktop]
+      app_blacklist=
 
-The configuration is in `[kafka]` but the service is still experiemental.
+    [notebook]
+      show_notebooks=true
+
+**YARN: Spark session could not be created**
+
+If seeing an error similar to this with `primitiveMkdir`:
+
+    The Spark session could not be created in the cluster: at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeMethod(RetryInvocationHandler.java:165)
+    at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invoke(RetryInvocationHandler.java:157)
+    at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeOnce(RetryInvocationHandler.java:95)
+    at org.apache.hadoop.io.retry.RetryInvocationHandler.invoke(RetryInvocationHandler.java:359) at com.sun.proxy.$Proxy10.mkdirs(Unknown Source)
+    at org.apache.hadoop.hdfs.DFSClient.primitiveMkdir(DFSClient.java:2333) ... 20 more
+    19/05/13 12:27:07 INFO util.ShutdownHookManager: Shutdown hook called 19/05/13 12:27:07 INFO util.ShutdownHookManager:
+    Deleting directory /tmp/spark-0d045154-77a0-4e12-94b2-2df18725a4ae YARN Diagnostics:
+
+Does your logged-in user have a home dir on HDFS (i.e. `/user/bob`)? (you should see the full error in the Livy or YARN logs).
+
+In Hue admin for you user, you can click the 'Create home' checkbox and save.
+
+**CSRF**
+
+Livy supports a configuration parameter in the Livy conf:
+
+      livy.server.csrf-protection.enabled
+
+...which is false by default. Upon trying to launch a Livy session from the notebook, Hue will pass along the connection error from Livy as a 400 response that the "Missing Required Header for CSRF protection". To enable it, add to the Hue config:
+
+      [spark]
+      # Whether Livy requires client to use csrf protection.
+      ## csrf_enabled=false
+
+**Impersonation**
+
+Let’s say we want to create a shell running as the user bob, this is particularly useful when multi users are sharing a Notebook server
+
+    curl -X POST --data '{"kind": "pyspark", "proxyUser": "bob"}' -H "Content-Type: application/json" localhost:8998/sessions
+
+    {"id":0,"state":"starting","kind":"pyspark","proxyUser":"bob","log":[]}
+
+Do not forget to add the user running Hue (your current login in dev or hue in production) in the Hadoop proxy user list (/etc/hadoop/conf/core-site.xml):
+
+    <property>
+      <name>hadoop.proxyuser.hue.hosts</name>
+      <value>*</value>
+    </property>
+    <property>
+      <name>hadoop.proxyuser.hue.groups</name>
+      <value>*</value>
+    </property>
 
 
-### Oozie
+### Apache Pig
+
+Pig is native to Hue and depends on the [Oozie service](/administrator/configuration/connectors/#apache-oozie) to be configured:
+
+    [[[pig]]]
+      name=Pig
+      interface=oozie
+
+### Apache Oozie
 
 In oder to schedule workflows, the `[liboozie]` section of the configuration file:
 
@@ -950,7 +1116,7 @@ To configure Hue as a default proxy user, add the following properties to /etc/o
         <value>*</value>
     </property>
 
-### YARN Cluster
+### Apache YARN
 
 Hue supports one or two Yarn clusters (two for HA). These clusters should be defined
 under the `[[[default]]]` and `[[[ha]]]` sub-sections.
@@ -966,3 +1132,106 @@ under the `[[[default]]]` and `[[[ha]]]` sub-sections.
         proxy_api_url=http://yarn-proxy.com:8088/
         resourcemanager_port=8032
         history_server_api_url=http://yarn-rhs-com:19888/
+
+### Apache Sentry
+
+To have Hue point to a Sentry service and another host, modify these hue.ini properties:
+
+    [libsentry]
+      # Hostname or IP of server.
+      hostname=localhost
+
+      # Port the sentry service is running on.
+      port=8038
+
+      # Sentry configuration directory, where sentry-site.xml is located.
+      sentry_conf_dir=/etc/sentry/conf
+
+Hue will also automatically pick up the server name of HiveServer2 from the sentry-site.xml file of /etc/hive/conf.
+
+![Listing of Sentry Tables privileges](https://cdn.gethue.com/uploads/2019/04/HueSecurityRoles.png
+
+And that’s it, you can know specify who can see/do what directly in a Web UI! The app sits on top of the standard Sentry API and so it fully compatible with Sentry. Next planned features will bring Solr Collections, HBase privilege management as well as more bulk operations and a tighter integration with HDFS.
+
+
+To be able to edit roles and privileges in Hue, the logged-in Hue user needs to belong to a group in Hue that is also an admin group in Sentry (whatever UserGroupMapping Sentry is using, the corresponding groups must exist in Hue or need to be entered manually). For example, our ‘hive’ user belongs to a ‘hive’ group in Hue and also to a ‘hive’ group in Sentry:
+
+    <property>
+      <name>sentry.service.admin.group</name>
+      <value>hive,impala,hue</value>
+    </property>
+
+**Notes**
+
+* Create a role in the Sentry app through Hue
+* Grant privileges to that role such that the role can see the database in the Sentry app
+* Create a group in Hue with the same name as the role in Sentry
+* Grant that role to a user in Hue
+* Ensure that the user in Hue has an equivalent O/S level
+* Ensure a user has an O/S level account on all hosts and that user is part of a group with the same name as the group in Hue (this assumes that the default ShellBasedUnixGroupsMapping is set for HDFS in CM)
+
+Our users are:
+
+* hive (admin) belongs to the hive group
+* user1_1 belongs to the user_group1 group
+* user2_1 belongs to the user_group2 group
+
+We synced the Unix users/groups into Hue with these commands:
+
+    export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'`"
+
+    build/env/bin/hue useradmin_sync_with_unix --min-uid=1000
+
+If using the package version and has the CDH repository register, install sentry with:
+
+    sudo apt-get install sentry
+
+If using Kerberos, make sure ‘hue’ is allowed to connect to Sentry in /etc/sentry/conf/sentry-site.xml:
+
+    <property>
+      <name>sentry.service.allow.connect</name>
+      <value>impala,hive,solr,hue</value>
+    </property>
+
+Here is an example of sentry-site.xml
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <configuration>
+    <property>
+      <name>sentry.service.security.mode</name>
+      <value>none</value>
+    </property>
+    <property>
+      <name>sentry.service.admin.group</name>
+      <value>hive,romain</value>
+    </property>
+    <property>
+      <name>sentry.service.allow.connect</name>
+      <value>impala,hive,solr</value>
+    </property>
+    <property>
+      <name>sentry.store.jdbc.url</name>
+      <value>jdbc:derby:;databaseName=sentry_store_db;create=true</value>
+    </property>
+    <property>
+      <name>sentry.store.jdbc.driver</name>
+      <value>org.apache.derby.jdbc.EmbeddedDriver</value>
+    </property>
+    <property>
+      <name>sentry.store.jdbc.password</name>
+      <value>aaa</value>
+    </property>
+    </configuration>
+
+### Apache Knox
+
+    [[knox]]
+
+      # This is a list of hosts that knox proxy requests can come from
+      ## knox_proxyhosts=server1.domain.com,server2.domain.com
+
+      # List of Kerberos principal name which is allowed to impersonate others
+      ## knox_principal=knox1,knox2
+
+      # Comma separated list of strings representing the ports that the Hue server can trust as knox port.
+      ## knox_ports=80,8443

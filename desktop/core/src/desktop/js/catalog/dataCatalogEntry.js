@@ -15,12 +15,15 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import CancellablePromise from 'api/cancellablePromise';
 import catalogUtils from 'catalog/catalogUtils';
 import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
+import { getOptimizer } from './optimizer/optimizer';
+import { DataCatalog } from './dataCatalog';
 
 /**
  * Helper function to reload the source meta for the given entry
@@ -149,15 +152,21 @@ const reloadSample = function(dataCatalogEntry, apiOptions) {
  *
  * @return {CancellablePromise}
  */
-const reloadNavOptMeta = function(dataCatalogEntry, apiOptions) {
-  if (dataCatalogEntry.dataCatalog.canHaveNavOptMetadata()) {
+const reloadOptimizerMeta = function(dataCatalogEntry, apiOptions) {
+  if (dataCatalogEntry.dataCatalog.canHaveOptimizerMeta()) {
+    const optimizer = getOptimizer(dataCatalogEntry.dataCatalog.connector);
     return dataCatalogEntry.trackedPromise(
-      'navOptMetaPromise',
-      catalogUtils.fetchAndSave('fetchNavOptMeta', 'navOptMeta', dataCatalogEntry, apiOptions)
+      'optimizerMetaPromise',
+      catalogUtils.fetchAndSave(
+        optimizer.fetchOptimizerMeta.bind(optimizer),
+        'optimizerMeta',
+        dataCatalogEntry,
+        apiOptions
+      )
     );
   }
-  dataCatalogEntry.navOptMetaPromise = $.Deferred.reject().promise();
-  return dataCatalogEntry.navOptMetaPromise;
+  dataCatalogEntry.optimizerMetaPromise = $.Deferred.reject().promise();
+  return dataCatalogEntry.optimizerMetaPromise;
 };
 
 /**
@@ -255,12 +264,12 @@ class DataCatalogEntry {
     self.sample = undefined;
     self.samplePromise = undefined;
 
-    self.navOptPopularity = undefined;
-    self.navOptMeta = undefined;
-    self.navOptMetaPromise = undefined;
+    self.optimizerPopularity = undefined;
+    self.optimizerMeta = undefined;
+    self.optimizerMetaPromise = undefined;
 
     self.navigatorMetaForChildrenPromise = undefined;
-    self.navOptPopularityForChildrenPromise = undefined;
+    self.optimizerPopularityForChildrenPromise = undefined;
 
     self.childrenPromise = undefined;
 
@@ -272,7 +281,7 @@ class DataCatalogEntry {
       });
       if (parent) {
         parent.navigatorMetaForChildrenPromise = undefined;
-        parent.navOptPopularityForChildrenPromise = undefined;
+        parent.optimizerPopularityForChildrenPromise = undefined;
       }
     }
   }
@@ -297,7 +306,6 @@ class DataCatalogEntry {
    * Resets the entry and clears the cache
    *
    * @param {Object} options
-   * @param {string} [options.invalidate] - 'cache', 'invalidate' or 'invalidateAndFlush', default 'cache', only used for Impala
    * @param {boolean} [options.cascade] - Default false, only used when the entry is for the source
    * @param {boolean} [options.silenceErrors] - Default false
    * @param {string} [options.targetChild] - Optional specific child to invalidate
@@ -310,36 +318,8 @@ class DataCatalogEntry {
       options = {};
     }
 
-    let invalidatePromise;
-    let invalidate = options.invalidate || 'cache';
-
-    if (invalidate !== 'cache' && self.getSourceType() === 'impala') {
-      if (window.IS_K8S_ONLY) {
-        invalidate = 'invalidateAndFlush';
-      }
-      if (self.dataCatalog.invalidatePromise) {
-        invalidatePromise = self.dataCatalog.invalidatePromise;
-      } else {
-        invalidatePromise = apiHelper.invalidateSourceMetadata({
-          sourceType: self.getSourceType(),
-          compute: self.compute,
-          invalidate: invalidate,
-          path: options.targetChild ? self.path.concat(options.targetChild) : self.path,
-          silenceErrors: options.silenceErrors
-        });
-        self.dataCatalog.invalidatePromise = invalidatePromise;
-        invalidatePromise.always(() => {
-          delete self.dataCatalog.invalidatePromise;
-        });
-      }
-    } else {
-      invalidatePromise = $.Deferred()
-        .resolve()
-        .promise();
-    }
-
-    if (self.definition && self.definition.navOptLoaded) {
-      delete self.definition.navOptLoaded;
+    if (self.definition && self.definition.optimizerLoaded) {
+      delete self.definition.optimizerLoaded;
     }
 
     self.reset();
@@ -347,16 +327,14 @@ class DataCatalogEntry {
       ? self.dataCatalog.clearStorageCascade(self.namespace, self.compute, self.path)
       : self.save();
 
-    const clearPromise = $.when(invalidatePromise, saveDeferred);
-
-    clearPromise.always(() => {
+    saveDeferred.always(() => {
       huePubSub.publish('data.catalog.entry.refreshed', {
         entry: self,
         cascade: !!options.cascade
       });
     });
 
-    return new CancellablePromise(clearPromise, undefined, [invalidatePromise]);
+    return new CancellablePromise(saveDeferred, undefined, []);
   }
 
   /**
@@ -396,12 +374,18 @@ class DataCatalogEntry {
    */
   getChildren(options) {
     const self = this;
-    if (self.childrenPromise && (!options || !options.refreshCache)) {
+    if (self.childrenPromise && DataCatalog.cacheEnabled() && (!options || !options.refreshCache)) {
       return catalogUtils.applyCancellable(self.childrenPromise, options);
     }
     const deferred = $.Deferred();
 
-    if (options && options.cachedOnly && !self.sourceMeta && !self.sourceMetaPromise) {
+    if (
+      DataCatalog.cacheEnabled() &&
+      options &&
+      options.cachedOnly &&
+      !self.sourceMeta &&
+      !self.sourceMetaPromise
+    ) {
       return deferred.reject(false).promise();
     }
 
@@ -418,6 +402,18 @@ class DataCatalogEntry {
         if (sourceMeta.partition_keys) {
           sourceMeta.partition_keys.forEach(partitionKey => {
             partitionKeys[partitionKey.name] = true;
+          });
+        }
+        const primaryKeys = {};
+        if (sourceMeta.primary_keys) {
+          sourceMeta.primary_keys.forEach(primaryKey => {
+            primaryKeys[primaryKey.name] = true;
+          });
+        }
+        const foreignKeys = {};
+        if (sourceMeta.foreign_keys) {
+          sourceMeta.foreign_keys.forEach(foreignKey => {
+            foreignKeys[foreignKey.name] = true;
           });
         }
 
@@ -455,6 +451,12 @@ class DataCatalogEntry {
                       }
                       if (sourceMeta.partition_keys) {
                         definition.partitionKey = !!partitionKeys[entity.name];
+                      }
+                      if (sourceMeta.primary_keys) {
+                        definition.primaryKey = !!primaryKeys[entity.name];
+                      }
+                      if (sourceMeta.foreign_keys) {
+                        definition.foreignKey = !!foreignKeys[entity.name];
                       }
                       definition.index = index++;
                       catalogEntry.definition = definition;
@@ -530,7 +532,11 @@ class DataCatalogEntry {
         .promise();
     }
 
-    if (self.navigatorMetaForChildrenPromise && (!options || !options.refreshCache)) {
+    if (
+      self.navigatorMetaForChildrenPromise &&
+      DataCatalog.cacheEnabled() &&
+      (!options || !options.refreshCache)
+    ) {
       return catalogUtils.applyCancellable(self.navigatorMetaForChildrenPromise, options);
     }
 
@@ -545,7 +551,11 @@ class DataCatalogEntry {
           const someHaveNavMeta = children.some(childEntry => {
             return childEntry.navigatorMeta;
           });
-          if (someHaveNavMeta && (!options || !options.refreshCache)) {
+          if (
+            someHaveNavMeta &&
+            DataCatalog.cacheEnabled() &&
+            (!options || !options.refreshCache)
+          ) {
             deferred.resolve(children);
             return;
           }
@@ -632,13 +642,13 @@ class DataCatalogEntry {
    *
    * @return {CancellablePromise}
    */
-  applyNavOptResponseToChildren(response, options) {
+  applyOptimizerResponseToChildren(response, options) {
     const self = this;
     const deferred = $.Deferred();
     if (!self.definition) {
       self.definition = {};
     }
-    self.definition.navOptLoaded = true;
+    self.definition.optimizerLoaded = true;
     self.saveLater();
 
     const childPromise = self
@@ -654,21 +664,21 @@ class DataCatalogEntry {
           response.top_tables.forEach(topTable => {
             const matchingChild = entriesByName[topTable.name.toLowerCase()];
             if (matchingChild) {
-              matchingChild.navOptPopularity = topTable;
+              matchingChild.optimizerPopularity = topTable;
               matchingChild.saveLater();
               updatedIndex[matchingChild.getQualifiedPath()] = matchingChild;
             }
           });
         } else if (self.isTableOrView() && response.values) {
-          const addNavOptPopularity = function(columns, type) {
+          const addOptimizerPopularity = function(columns, type) {
             if (columns) {
               columns.forEach(column => {
                 const matchingChild = entriesByName[column.columnName.toLowerCase()];
                 if (matchingChild) {
-                  if (!matchingChild.navOptPopularity) {
-                    matchingChild.navOptPopularity = {};
+                  if (!matchingChild.optimizerPopularity) {
+                    matchingChild.optimizerPopularity = {};
                   }
-                  matchingChild.navOptPopularity[type] = column;
+                  matchingChild.optimizerPopularity[type] = column;
                   matchingChild.saveLater();
                   updatedIndex[matchingChild.getQualifiedPath()] = matchingChild;
                 }
@@ -676,11 +686,11 @@ class DataCatalogEntry {
             }
           };
 
-          addNavOptPopularity(response.values.filterColumns, 'filterColumn');
-          addNavOptPopularity(response.values.groupbyColumns, 'groupByColumn');
-          addNavOptPopularity(response.values.joinColumns, 'joinColumn');
-          addNavOptPopularity(response.values.orderbyColumns, 'orderByColumn');
-          addNavOptPopularity(response.values.selectColumns, 'selectColumn');
+          addOptimizerPopularity(response.values.filterColumns, 'filterColumn');
+          addOptimizerPopularity(response.values.groupbyColumns, 'groupByColumn');
+          addOptimizerPopularity(response.values.joinColumns, 'joinColumn');
+          addOptimizerPopularity(response.values.orderbyColumns, 'orderByColumn');
+          addOptimizerPopularity(response.values.selectColumns, 'selectColumn');
         }
         const popularEntries = [];
         Object.keys(updatedIndex).forEach(path => {
@@ -703,29 +713,38 @@ class DataCatalogEntry {
    *
    * @return {CancellablePromise}
    */
-  loadNavOptPopularityForChildren(options) {
+  loadOptimizerPopularityForChildren(options) {
     const self = this;
 
     options = catalogUtils.setSilencedErrors(options);
 
-    if (!self.dataCatalog.canHaveNavOptMetadata()) {
+    if (!self.dataCatalog.canHaveOptimizerMeta()) {
       return $.Deferred()
         .reject()
         .promise();
     }
-    if (self.navOptPopularityForChildrenPromise && (!options || !options.refreshCache)) {
-      return catalogUtils.applyCancellable(self.navOptPopularityForChildrenPromise, options);
+    if (
+      self.optimizerPopularityForChildrenPromise &&
+      DataCatalog.cacheEnabled() &&
+      (!options || !options.refreshCache)
+    ) {
+      return catalogUtils.applyCancellable(self.optimizerPopularityForChildrenPromise, options);
     }
     const deferred = $.Deferred();
     const cancellablePromises = [];
-    if (self.definition && self.definition.navOptLoaded && (!options || !options.refreshCache)) {
+    if (
+      self.definition &&
+      self.definition.optimizerLoaded &&
+      DataCatalog.cacheEnabled() &&
+      (!options || !options.refreshCache)
+    ) {
       cancellablePromises.push(
         self
           .getChildren(options)
           .done(childEntries => {
             deferred.resolve(
               childEntries.filter(entry => {
-                return entry.navOptPopularity;
+                return entry.optimizerPopularity;
               })
             );
           })
@@ -733,8 +752,8 @@ class DataCatalogEntry {
       );
     } else if (self.isDatabase() || self.isTableOrView()) {
       cancellablePromises.push(
-        apiHelper
-          .fetchNavOptPopularity({
+        getOptimizer(self.dataCatalog.connector)
+          .fetchPopularity({
             silenceErrors: options && options.silenceErrors,
             refreshCache: options && options.refreshCache,
             paths: [self.path]
@@ -742,7 +761,7 @@ class DataCatalogEntry {
           .done(data => {
             cancellablePromises.push(
               self
-                .applyNavOptResponseToChildren(data, options)
+                .applyOptimizerResponseToChildren(data, options)
                 .done(deferred.resolve)
                 .fail(deferred.reject)
             );
@@ -755,7 +774,7 @@ class DataCatalogEntry {
 
     return catalogUtils.applyCancellable(
       self.trackedPromise(
-        'navOptPopularityForChildrenPromise',
+        'optimizerPopularityForChildrenPromise',
         new CancellablePromise(deferred, undefined, cancellablePromises)
       ),
       options
@@ -1187,6 +1206,12 @@ class DataCatalogEntry {
       if (type) {
         title += ' (' + type + ')';
       }
+    } else if (
+      self.definition &&
+      self.definition.type &&
+      self.definition.type.toLowerCase() === 'materialized_view'
+    ) {
+      title += ' (' + I18n('Materialized') + ')';
     }
     if (includeComment && self.hasResolvedComment() && self.getResolvedComment()) {
       title += ' - ' + self.getResolvedComment();
@@ -1230,7 +1255,7 @@ class DataCatalogEntry {
    */
   isPrimaryKey() {
     const self = this;
-    return self.isColumn() && self.definition && /true/i.test(self.definition.primary_key);
+    return self.isColumn() && self.definition && !!self.definition.primaryKey;
   }
 
   /**
@@ -1242,6 +1267,27 @@ class DataCatalogEntry {
   isPartitionKey() {
     const self = this;
     return self.definition && !!self.definition.partitionKey;
+  }
+
+  /**
+   * Returns true if the entry is a foreign key. Note that the definition has to come from a parent entry, i.e.
+   * getChildren().
+   *
+   * @return {boolean}
+   */
+  isForeignKey() {
+    const self = this;
+    return self.definition && !!self.definition.foreignKey;
+  }
+
+  /**
+   * Returns true if the entry is either a partition or primary key. Note that the definition has to come from a parent entry, i.e.
+   * getChildren().
+   *
+   * @return {boolean}
+   */
+  isKey() {
+    return this.isPartitionKey() || this.isPrimaryKey() || this.isForeignKey();
   }
 
   /**
@@ -1283,7 +1329,8 @@ class DataCatalogEntry {
       ((self.sourceMeta && self.sourceMeta.is_view) ||
         (self.definition &&
           self.definition.type &&
-          self.definition.type.toLowerCase() === 'view') ||
+          (self.definition.type.toLowerCase() === 'view' ||
+            self.definition.type.toLowerCase() === 'materialized_view')) ||
         (self.analysis &&
           self.analysis.details &&
           self.analysis.details.properties &&
@@ -1541,29 +1588,29 @@ class DataCatalogEntry {
    *
    * @return {CancellablePromise}
    */
-  getNavOptMeta(options) {
+  getOptimizerMeta(options) {
     const self = this;
 
     options = catalogUtils.setSilencedErrors(options);
 
-    if (!self.dataCatalog.canHaveNavOptMetadata() || !self.isTableOrView()) {
+    if (!self.dataCatalog.canHaveOptimizerMeta() || !self.isTableOrView()) {
       return $.Deferred()
         .reject()
         .promise();
     }
     if (options && options.cachedOnly) {
       return (
-        catalogUtils.applyCancellable(self.navOptMetaPromise, options) ||
+        catalogUtils.applyCancellable(self.optimizerMetaPromise, options) ||
         $.Deferred()
           .reject(false)
           .promise()
       );
     }
     if (options && options.refreshCache) {
-      return catalogUtils.applyCancellable(reloadNavOptMeta(self, options), options);
+      return catalogUtils.applyCancellable(reloadOptimizerMeta(self, options), options);
     }
     return catalogUtils.applyCancellable(
-      self.navOptMetaPromise || reloadNavOptMeta(self, options),
+      self.optimizerMetaPromise || reloadOptimizerMeta(self, options),
       options
     );
   }

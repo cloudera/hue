@@ -66,7 +66,10 @@ def get_optimizer_url():
   return OPTIMIZER.HOSTNAME.get() and OPTIMIZER.HOSTNAME.get().strip('/')
 
 def has_optimizer():
-  return bool(OPTIMIZER.AUTH_KEY_ID.get())
+  return OPTIMIZER.INTERFACE.get() != 'navopt' or bool(OPTIMIZER.AUTH_KEY_ID.get())
+
+def get_optimizer_mode():
+  return has_optimizer() and OPTIMIZER.MODE.get() or 'off'
 
 def has_workload_analytics():
   # Note: unused
@@ -94,38 +97,52 @@ OPTIMIZER = ConfigSection(
   key='optimizer',
   help=_t("""Configuration options for Optimizer API"""),
   members=dict(
+    MODE=Config(
+      key='mode',
+      help=_t('Mode of optimization: off, local, api.'),
+      default='off'
+    ),
+    INTERFACE=Config(
+      key='interface',
+      help=_t('Type of optimizer connector to use, e.g. optimizer, navopt, dummy.'),
+      default='navopt'
+    ),
     HOSTNAME=Config(
       key='hostname',
-      help=_t('Hostname to Optimizer API or compatible service.'),
-      default='navoptapi.us-west-1.optimizer.altus.cloudera.com'),
-
+      help=_t('Hostname of Optimizer API service.'),
+      default='navoptapi.us-west-1.optimizer.altus.cloudera.com'
+    ),
     AUTH_KEY_ID=Config(
       key="auth_key_id",
       help=_t("The name of the key of the service."),
       private=False,
-      default=None),
+      default=None
+    ),
     AUTH_KEY_SECRET=Config(
       key="auth_key_secret",
       help=_t("The private part of the key associated with the auth_key."),
       private=True,
-      dynamic_default=get_optimizer_password_script),
+      dynamic_default=get_optimizer_password_script
+    ),
     AUTH_KEY_SECRET_SCRIPT=Config(
       key="auth_key_secret_script",
       help=_t("Execute this script to produce the auth_key secret. This will be used when `auth_key_secret` is not set."),
       private=True,
       type=coerce_password_from_script,
-      default=None),
+      default=None
+    ),
     TENANT_ID=Config(
       key="tenant_id",
       help=_t("The name of the workload where queries are uploaded and optimizations are calculated from. Automatically guessed from auth_key and cluster_id if not specified."),
       private=True,
-      default=None),
+      default=None
+    ),
     CLUSTER_ID=Config(
       key="cluster_id",
       help=_t("The name of the cluster used to determine the tenant id when this one is not specified. Defaults to the cluster Id or 'default'."),
       private=True,
-      default=DEFAULT_CLUSTER_ID.get()),
-
+      default=DEFAULT_CLUSTER_ID.get()
+    ),
     APPLY_SENTRY_PERMISSIONS = Config(
       key="apply_sentry_permissions",
       help=_t("Perform Sentry privilege filtering. Default to true automatically if the cluster is secure."),
@@ -172,34 +189,41 @@ ALTUS = ConfigSection(
     HOSTNAME=Config(
       key='hostname',
       help=_t('Hostname prefix to Altus API or compatible service.'),
-      default='sdxapi.us-west-1.altus.cloudera.com'),
+      default='sdxapi.us-west-1.altus.cloudera.com'
+    ),
     HOSTNAME_ANALYTICDB=Config(
       key='hostname_analyticdb',
       help=_t('Hostname prefix to Altus ADB API or compatible service.'),
-      default='analyticdbapi.us-west-1.altus.cloudera.com'),
+      default='analyticdbapi.us-west-1.altus.cloudera.com'
+    ),
     HOSTNAME_DATAENG=Config(
       key='hostname_dataeng',
       help=_t('Hostname prefix to Altus DE API or compatible service.'),
-      default='dataengapi.us-west-1.altus.cloudera.com'),
+      default='dataengapi.us-west-1.altus.cloudera.com'
+    ),
     HOSTNAME_WA=Config(
       key='hostname_wa',
       help=_t('Hostname prefix to Altus WA API or compatible service.'),
-      default='waapi.us-west-1.altus.cloudera.com'),
+      default='waapi.us-west-1.altus.cloudera.com'
+    ),
     HAS_WA = Config(
       key="has_wa",
       help=_t("Switch to turn on workload analytics insights."),
       default=True,
-      type=coerce_bool),
+      type=coerce_bool
+    ),
     AUTH_KEY_ID=Config(
       key="auth_key_id",
       help=_t("The name of the key of the service."),
       private=False,
-      default=None),
+      default=None
+    ),
     AUTH_KEY_SECRET=Config(
       key="auth_key_secret",
       help=_t("The private part of the key associated with the auth_key."),
       private=True,
-      default=None)
+      default=None
+    )
   )
 )
 
@@ -229,10 +253,10 @@ def get_catalog_url():
 def has_catalog(user):
   from desktop.auth.backend import is_admin
   return (
-      bool(get_catalog_url()) or has_navigator(user)
-    ) and (
-      is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0])
-    )
+    bool(get_catalog_url()) or has_navigator(user)
+  ) and (
+    is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0])
+  )
 
 def has_readonly_catalog(user):
   return has_catalog(user) and not has_navigator(user)
@@ -256,30 +280,36 @@ CATALOG = ConfigSection(
     INTERFACE=Config(
       key='interface',
       help=_t('Type of Catalog to connect to, e.g. Apache Atlas, Navigator...'),
-      dynamic_default=default_catalog_interface),
+      dynamic_default=default_catalog_interface
+    ),
     API_URL=Config(
       key='api_url',
       help=_t('Base URL to Catalog API.'),
-      dynamic_default=default_catalog_url),
+      dynamic_default=default_catalog_url
+    ),
     SERVER_USER=Config(
       key="server_user",
       help=_t("Username of the CM user used for authentication."),
-      dynamic_default=get_auth_username),
+      dynamic_default=get_auth_username
+    ),
     SERVER_PASSWORD=Config(
       key="server_password",
       help=_t("Password of the user used for authentication."),
       private=True,
-      dynamic_default=get_catalog_server_password_script),
+      dynamic_default=get_catalog_server_password_script
+    ),
     SERVER_PASSWORD_SCRIPT=Config(
       key="server_password_script",
       help=_t("Execute this script to produce the server password secret. This will be used when `server_password` is not set."),
       private=True,
       type=coerce_password_from_script,
-      default=None),
+      default=None
+    ),
     SEARCH_CLUSTER=Config(
       key="search_cluster",
       help=_t("Limits found entities to a specific cluster."),
-      default=None),
+      default=None
+    ),
     FETCH_SIZE_SEARCH_INTERACTIVE = Config(
       key="fetch_size_search_interactive",
       help=_t("Max number of items to fetch in one call in object search autocomplete."),
@@ -363,60 +393,67 @@ NAVIGATOR = ConfigSection(
     API_URL=Config(
       key='api_url',
       help=_t('Base URL to Navigator API.'),
-      dynamic_default=default_navigator_url),
+      dynamic_default=default_navigator_url
+    ),
     AUTH_TYPE=Config(
       key="navmetadataserver_auth_type",
       help=_t("Which authentication to use: CM or external via LDAP or SAML."),
-      default='CMDB'),
-
+      default='CMDB'
+    ),
     AUTH_CM_USERNAME=Config(
       key="navmetadataserver_cmdb_user",
       help=_t("Username of the CM user used for authentication."),
-      dynamic_default=get_auth_username),
+      dynamic_default=get_auth_username
+    ),
     AUTH_CM_PASSWORD=Config(
       key="navmetadataserver_cmdb_password",
       help=_t("CM password of the user used for authentication."),
       private=True,
-      dynamic_default=get_navigator_cm_password),
+      dynamic_default=get_navigator_cm_password
+    ),
     AUTH_CM_PASSWORD_SCRIPT=Config(
       key="navmetadataserver_cmdb_password_script",
       help=_t("Execute this script to produce the CM password. This will be used when the plain password is not set."),
       private=True,
       type=coerce_password_from_script,
-      default=None),
-
+      default=None
+    ),
     AUTH_LDAP_USERNAME=Config(
       key="navmetadataserver_ldap_user",
       help=_t("Username of the LDAP user used for authentication."),
-      dynamic_default=get_auth_username),
+      dynamic_default=get_auth_username
+    ),
     AUTH_LDAP_PASSWORD=Config(
       key="navmetadataserver_ldap_password",
       help=_t("LDAP password of the user used for authentication."),
       private=True,
-      dynamic_default=get_navigator_ldap_password),
+      dynamic_default=get_navigator_ldap_password
+    ),
     AUTH_LDAP_PASSWORD_SCRIPT=Config(
       key="navmetadataserver_ldap_password_script",
       help=_t("Execute this script to produce the LDAP password. This will be used when the plain password is not set."),
       private=True,
       type=coerce_password_from_script,
-      default=None),
-
+      default=None
+    ),
     AUTH_SAML_USERNAME=Config(
       key="navmetadataserver_saml_user",
       help=_t("Username of the SAML user used for authentication."),
-      dynamic_default=get_auth_username),
+      dynamic_default=get_auth_username
+    ),
     AUTH_SAML_PASSWORD=Config(
       key="navmetadataserver_saml_password",
       help=_t("SAML password of the user used for authentication."),
       private=True,
-      dynamic_default=get_navigator_saml_password),
+      dynamic_default=get_navigator_saml_password
+    ),
     AUTH_SAML_PASSWORD_SCRIPT=Config(
       key="navmetadataserver_saml_password_script",
       help=_t("Execute this script to produce the SAML password. This will be used when the plain password  is not set."),
       private=True,
       type=coerce_password_from_script,
-      default=None),
-
+      default=None
+    ),
     CONF_DIR = Config(
       key='conf_dir',
       help=_t('Navigator configuration directory, where navigator.client.properties is located.'),
@@ -440,7 +477,6 @@ NAVIGATOR = ConfigSection(
       default=450,
       type=int
     ),
-
     ENABLE_FILE_SEARCH = Config(
       key="enable_file_search",
       help=_t("Enable to search HDFS, S3 files."),
@@ -459,7 +495,8 @@ MANAGER = ConfigSection(
     API_URL=Config(
       key='api_url',
       help=_t('Base URL to API.'),
-      default=None),
+      default=None
+    ),
   )
   # username comes from get_navigator_auth_username()
   # password comes from get_navigator_auth_password()
@@ -472,7 +509,8 @@ PROMETHEUS = ConfigSection(
     API_URL=Config(
       key='api_url',
       help=_t('Base URL to API.'),
-      default=None),
+      default=None
+    ),
   )
 )
 

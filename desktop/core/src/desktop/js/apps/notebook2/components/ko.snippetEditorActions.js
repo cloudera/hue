@@ -14,17 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import 'ko/bindings/ko.publish';
 
 import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
 import hueAnalytics from 'utils/hueAnalytics';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { notebookToContextJSON, snippetToContextJSON } from 'apps/notebook2/notebookSerde';
-import { STATUS } from 'apps/notebook2/snippet';
+import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistModal';
+import { DIALECT, STATUS } from 'apps/notebook2/snippet';
 
 const TEMPLATE = `
 <div class="snippet-editor-actions">
@@ -41,6 +41,15 @@ const TEMPLATE = `
           <i class="fa fa-fw fa-map-o"></i> ${I18n('Explain')}
         </a>
       </li>
+      <!-- ko if: window.HAS_GIST -->
+      <li>
+        <a href="javascript:void(0)" data-bind="click: createGist, css: { 'disabled': !createGistEnabled() }" title="${I18n(
+          'Share the query selection via a link'
+        )}">
+          <i class="fa fa-fw fa-link"></i> ${I18n('Get shareable link')}
+        </a>
+      </li>
+      <!-- /ko -->
       <li>
         <a href="javascript:void(0)" data-bind="click: format, css: { 'disabled': !formatEnabled() }" title="${I18n(
           'Format the current SQL query'
@@ -92,7 +101,11 @@ class SnippetEditorActions {
     this.clearEnabled = this.snippet.isReady;
 
     this.compatibilityEnabled = ko.pureComputed(
-      () => this.snippet.type() === 'hive' || this.snippet.type() === 'impala'
+      () => this.snippet.dialect() === DIALECT.hive || this.snippet.dialect() === DIALECT.impala
+    );
+
+    this.createGistEnabled = ko.pureComputed(
+      () => this.snippet.isSqlDialect() && this.snippet.statement() !== ''
     );
 
     this.explainEnabled = ko.pureComputed(
@@ -133,28 +146,35 @@ class SnippetEditorActions {
     this.snippet.status(STATUS.ready);
   }
 
-  explain() {
+  async explain() {
     if (!this.explainEnabled()) {
       return;
     }
     hueAnalytics.log('notebook', 'explain');
 
-    this.snippet.result.explanation('');
-    this.snippet.errors([]);
-    this.snippet.status(STATUS.ready);
+    this.snippet.explanation('');
+    const explanation = await apiHelper.explainAsync({ snippet: this.snippet });
+    this.snippet.explanation(explanation);
+    this.snippet.currentQueryTab('queryExplain');
+  }
 
-    $.post('/notebook/api/explain', {
-      notebook: notebookToContextJSON(this.snippet.parentNotebook),
-      snippet: snippetToContextJSON(this.snippet)
-    }).then(data => {
-      if (data.status === 0) {
-        this.snippet.currentQueryTab('queryExplain');
-        this.snippet.result.fetchedOnce(true);
-        this.snippet.result.explanation(data.explanation);
-      } else {
-        this.snippet.handleAjaxError(data);
-      }
+  async createGist() {
+    if (!this.createGistEnabled()) {
+      return;
+    }
+    hueAnalytics.log('notebook', 'createGist');
+
+    const gistLink = await apiHelper.createGistAsync({
+      statement:
+        this.snippet.ace().getSelectedText() != ''
+          ? this.snippet.ace().getSelectedText()
+          : this.snippet.statement_raw(),
+      doc_type: this.snippet.dialect(),
+      name: this.snippet.name(),
+      description: ''
     });
+
+    huePubSub.publish(SHOW_GIST_MODAL_EVENT, { link: gistLink });
   }
 
   format() {

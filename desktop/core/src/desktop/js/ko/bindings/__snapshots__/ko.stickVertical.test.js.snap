@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.stickVertical.js should render binding 1`] = `
+"<div class=\\"scroll-container\\">
+              <div data-bind=\\"scrollVertical: { scrollContainer: '.scroll-container' }\\"></div>
+            </div>"
+`;

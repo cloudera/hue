@@ -26,12 +26,12 @@ import sys
 from django.utils.encoding import iri_to_uri, smart_str
 from django.utils.http import urlencode
 
-from desktop import conf
-
 from requests import exceptions
 from requests.auth import AuthBase ,HTTPBasicAuth, HTTPDigestAuth
 from requests_kerberos import HTTPKerberosAuth, REQUIRED, OPTIONAL, DISABLED
 from urllib3.contrib import pyopenssl
+
+from desktop import conf
 
 if sys.version_info[0] > 2:
   import urllib.request, urllib.error
@@ -39,6 +39,7 @@ if sys.version_info[0] > 2:
 else:
   from urllib import quote as urllib_quote
   from urlparse import urlparse as lib_urlparse
+
 
 pyopenssl.DEFAULT_SSL_CIPHER_LIST = conf.SSL_CIPHER_LIST.get()
 

@@ -1,0 +1,16 @@
+{{- if .Values.docs.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: docs
+  labels:
+    pod: docs
+spec:
+  selector:
+    pod: docs
+  ports:
+  - name: docs
+    port: 9001
+    targetPort: 80
+  type: NodePort
+{{- end -}}

@@ -31,9 +31,10 @@ from common import cmp
 
 if sys.version_info[0] > 2:
   from builtins import object
-  from past.builtins import cmp
+
 
 LOG = logging.getLogger(__name__)
+
 
 class AppRegistry(object):
   """

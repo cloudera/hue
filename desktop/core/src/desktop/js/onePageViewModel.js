@@ -16,12 +16,13 @@
 
 import $ from 'jquery';
 import _ from 'lodash';
-import ko from 'knockout';
+import * as ko from 'knockout';
 import page from 'page';
 
 import hueUtils from 'utils/hueUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 class OnePageViewModel {
   constructor() {
@@ -54,7 +55,9 @@ class OnePageViewModel {
           hueUtils.waitForObservable(viewModel.selectedNotebook, () => {
             if (viewModel.editorType() !== type) {
               viewModel.selectedNotebook().selectedSnippet(type);
-              viewModel.editorType(type);
+              if (!window.ENABLE_NOTEBOOK_2) {
+                viewModel.editorType(type);
+              }
               viewModel.newNotebook(type);
             }
           });
@@ -75,14 +78,23 @@ class OnePageViewModel {
       });
     });
 
-    huePubSub.subscribe('get.current.app.name', () => {
-      huePubSub.publish('set.current.app.name', self.currentApp());
+    huePubSub.subscribe('get.current.app.name', callback => {
+      callback(self.currentApp());
     });
 
-    huePubSub.subscribe('open.editor.query', uuid => {
+    huePubSub.subscribe('open.editor.query', resp => {
       self.loadApp('editor');
+      const data = { uuid: resp.history_uuid };
+      if (resp.handle && resp.handle.session_id) {
+        data['session'] = {
+          type: resp.handle.session_type,
+          id: resp.handle.session_id,
+          session_id: resp.handle.session_guid,
+          properties: []
+        };
+      }
       self.getActiveAppViewModel(viewModel => {
-        viewModel.openNotebook(uuid);
+        viewModel.openNotebook(data.uuid, null, null, null, data.session);
       });
     });
 
@@ -261,7 +273,16 @@ class OnePageViewModel {
       });
     });
 
-    self.loadApp = function(app, loadDeep) {
+    let loadAppTimeout = -1;
+    self.loadApp = (app, loadDeep) => {
+      // This prevents loading an app twice when the URL is changed multiple times in one operation
+      window.clearTimeout(loadAppTimeout);
+      loadAppTimeout = window.setTimeout(() => {
+        self.loadAppThrottled(app, loadDeep);
+      }, 0);
+    };
+
+    self.loadAppThrottled = (app, loadDeep) => {
       if (self.currentApp() === 'editor' && $('#editorComponents').length) {
         const vm = ko.dataFor($('#editorComponents')[0]);
         if (vm.isPresentationMode()) {
@@ -491,6 +512,13 @@ class OnePageViewModel {
         }
       },
       {
+        url: '/gist',
+        app: function() {
+          const uuid = getUrlParameter('uuid');
+          location.href = '/desktop/api2/gist/open?uuid=' + uuid;
+        }
+      },
+      {
         url: '/desktop/metrics',
         app: function() {
           self.loadApp('metrics');
@@ -503,9 +531,6 @@ class OnePageViewModel {
         url: '/desktop/connectors',
         app: function() {
           self.loadApp('connectors');
-          self.getActiveAppViewModel(viewModel => {
-            viewModel.fetchConnectors();
-          });
         }
       },
       {
@@ -540,9 +565,11 @@ class OnePageViewModel {
               if (getUrlParameter('editor') !== '') {
                 self.getActiveAppViewModel(viewModel => {
                   self.isLoadingEmbeddable(true);
-                  viewModel.openNotebook(getUrlParameter('editor')).always(() => {
-                    self.isLoadingEmbeddable(false);
-                  });
+                  viewModel
+                    .openNotebook(getUrlParameter('editor'))
+                    [window.ENABLE_NOTEBOOK_2 ? 'finally' : 'always'](() => {
+                      self.isLoadingEmbeddable(false);
+                    });
                 });
               } else if (getUrlParameter('type') !== '') {
                 self.changeEditorType(getUrlParameter('type'));
@@ -640,9 +667,11 @@ class OnePageViewModel {
           if (notebookId !== '') {
             self.getActiveAppViewModel(viewModel => {
               self.isLoadingEmbeddable(true);
-              viewModel.openNotebook(notebookId).always(() => {
-                self.isLoadingEmbeddable(false);
-              });
+              viewModel
+                .openNotebook(notebookId)
+                [window.ENABLE_NOTEBOOK_2 ? 'finally' : 'always'](() => {
+                  self.isLoadingEmbeddable(false);
+                });
             });
           } else {
             self.getActiveAppViewModel(viewModel => {
@@ -744,6 +773,7 @@ class OnePageViewModel {
       { url: '/sqoop', app: 'sqoop' },
       { url: '/jobsub', app: 'jobsub' },
       { url: '/useradmin/configurations/', app: 'useradmin_configurations' },
+      { url: '/useradmin/organizations/', app: 'useradmin_organizations' },
       { url: '/useradmin/groups/', app: 'useradmin_groups' },
       { url: '/useradmin/groups/new', app: 'useradmin_newgroup' },
       { url: '/useradmin/groups/edit/:group', app: 'useradmin_editgroup' },
@@ -781,7 +811,7 @@ class OnePageViewModel {
       );
     });
 
-    huePubSub.subscribe('cluster.config.set.config', clusterConfig => {
+    const configUpdated = clusterConfig => {
       page('/', () => {
         page(clusterConfig['main_button_action'].page);
       });
@@ -790,7 +820,10 @@ class OnePageViewModel {
         self.loadApp('404');
       });
       page();
-    });
+    };
+
+    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
+    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
 
     huePubSub.subscribe('open.link', href => {
       if (href) {

@@ -19,9 +19,9 @@ from __future__ import division
 from __future__ import print_function
 from builtins import next
 from builtins import zip
-from past.utils import old_div
 from builtins import object
 import logging
+import math
 import json
 import numbers
 import re
@@ -547,7 +547,7 @@ class SQLDashboardApi(DashboardApi):
     elif value <= 1:
       return value
     else:
-      return old_div(value, 100)
+      return math.floor(value / 100)
 
   @classmethod
   def _supports_cume_dist(self):

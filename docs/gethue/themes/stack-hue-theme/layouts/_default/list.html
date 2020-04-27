@@ -1,0 +1,155 @@
+{{ partial "header.html" . }}
+
+<div class="main-container">
+  <section class="space--xs ">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+            <span class="h2 inline-block">Articles & News</span>
+          <!--
+          <div class="typed-headline">
+            <span class="h2 inline-block">Hue helps you</span>
+            <span class="h2 inline-block typed-text typed-text--cursor color--primary" data-typed-strings="discover insights.,write SQL.,visualize data."></span>
+          </div>
+          -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="text-center space--xs ">
+    <div class="container">
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="masonry-filter-container d-flex align-items-center">
+            <span>Category:</span>
+            <div class="masonry-filter-holder">
+              <div class="masonry__filters">
+                <ul>
+                  {{ $currentUrl := .URL }}
+                  {{if eq $currentUrl `/posts/`}}
+                  <li class="active"><a href="/posts">All Categories</a></li>
+                  {{else}}
+                    <li class="active">{{ .Title }}</li>
+                    <li><a href="/posts">All Categories</a></li>
+                    {{end}}
+                    {{ range $key, $value := .Site.Taxonomies.categories }}
+                    <li><a href="/categories/{{ $key | urlize  }}">{{ $key | humanize }}</a> ({{ len $value }})</li>
+                    {{ end }}
+                </ul>
+              </div>
+            </div>
+          </div>
+          <hr>
+        </div>
+      </div>
+    </div>
+    <!--end of container-->
+  </section>
+
+
+
+  {{ $paginator := .Paginate (where .Data.Pages "Type" "post") }}
+  {{ range $paginator.Pages }}
+  <section class="space--xs blog-article-wide">
+    <div class="container">
+      <div class="row cta cta--horizontal text-center-xs">
+        <div class="col-md-3">
+          <h4>{{ .Date.Format "02 January 2006" }}</h4>
+        </div>
+        <div class="col-md-6">
+          <a href="{{ .Permalink }}">
+            <p class="lead">
+              {{ .Title }}
+            </p>
+          </a>
+          <p class="mt-2">{{ .Summary }}{{ if .Truncated }}&hellip;{{ end }}</p>
+          {{ $read := .ReadingTime }}
+          <span>{{ .ReadingTime }} minute{{ if gt $read 1 }}s{{ end }} read</span> -
+          {{ $categories := .Params.categories }}
+          {{ range $index, $element := $categories }}
+          <a href="{{ "/categories/" | relLangURL }}{{ $element | urlize }}">{{ $element }}</a>
+          {{ if (ne (add $index 1) (len $categories)) }}
+          /
+          {{ end }}
+          {{ end }}
+        </div>
+        <div class="col-md-3 text-right text-center-xs">
+          <a class="btn type--uppercase" href="{{ .Permalink }}">
+            <span class="btn__text">
+              Read Article
+            </span>
+          </a>
+        </div>
+      </div>
+      <!--end of row-->
+    </div>
+    <!--end of container-->
+  </section>
+  {{ end }}
+
+
+  <section>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+
+          {{ $pag := $.Paginator }}
+          {{ if gt $pag.TotalPages 1 }}
+          <div class="pagination">
+            {{ with $pag.First }}
+            <a class="pagination__prev" href="{{ .URL }}" title="First Page">&laquo;&laquo;</a>
+            {{ end }}
+
+            <!-- {{ if $pag.HasPrev }}
+                  <a class="pagination__prev ml-5" href="{{ $pag.Prev.URL }}" title="Previous Page">&laquo;</a>
+                  {{ end }} -->
+
+            <ol>
+              {{ $ellipsed := false }}
+              {{ $shouldEllipse := false }}
+              {{ range $pag.Pagers }}
+              {{ $right := sub .TotalPages .PageNumber }}
+              {{ $showNumber := or (le .PageNumber 3) (eq $right 0) }}
+              {{ $showNumber := or $showNumber (and (gt .PageNumber (sub $pag.PageNumber 2)) (lt .PageNumber (add $pag.PageNumber 2)))  }}
+              {{ if $showNumber }}
+              {{ $ellipsed = false }}
+              {{ $shouldEllipse = false }}
+              {{ else }}
+              {{ $shouldEllipse = not $ellipsed }}
+              {{ $ellipsed = true }}
+              {{ end }}
+              {{ if $showNumber }}
+              <li class="{{ if eq . $pag }}pagination__current{{ end }}"><a href="{{ .URL }}">{{ .PageNumber }}</a></li>
+              {{ else if $shouldEllipse }}
+              <li class="page-item disabled"><span aria-hidden="true">&nbsp;&hellip;&nbsp;</span></li>
+              {{ end }}
+              {{ end }}
+            </ol>
+
+            <!-- {{ if $pag.HasNext }}
+                  <a class="pagination__next mr-5" href="{{ $pag.Next.URL }}" title="Next Page">&raquo;</a>
+                  {{ end }} -->
+
+            {{ with $pag.Last }}
+            <a class="pagination__next" href="{{ .URL }}" title="Last Page">&raquo;&raquo;</a>
+            {{ end }}
+
+          </div>
+          {{ end }}
+
+        </div>
+      </div>
+      <!--end of row-->
+    </div>
+    <!--end of container-->
+  </section>
+
+  {{ partial "latest.html" . }}
+
+
+</div>
+
+
+{{ partial "footer.html" . }}

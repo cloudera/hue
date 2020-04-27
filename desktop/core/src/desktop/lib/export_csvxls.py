@@ -20,8 +20,7 @@ Common library to export either CSV or XLS.
 """
 from future import standard_library
 standard_library.install_aliases()
-from builtins import next
-from builtins import object
+from builtins import next, object
 import gc
 import logging
 import numbers
@@ -37,15 +36,21 @@ from django.utils.http import urlquote
 from desktop.lib import i18n
 
 if sys.version_info[0] > 2:
-  from io import StringIO as string_io
+  from io import BytesIO as string_io
 else:
   from StringIO import StringIO as string_io
+
 
 LOG = logging.getLogger(__name__)
 
 DOWNLOAD_CHUNK_SIZE = 1 * 1024 * 1024 # 1MB
 ILLEGAL_CHARS = r'[\000-\010]|[\013-\014]|[\016-\037]'
-FORMAT_TO_CONTENT_TYPE = {'csv': 'application/csv', 'xls': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'json': 'application/json'}
+FORMAT_TO_CONTENT_TYPE = {
+    'csv': 'application/csv',
+    'xls': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'json': 'application/json'
+}
+
 
 def nullify(cell):
   return cell if cell is not None else "NULL"
@@ -147,14 +152,15 @@ def make_response(generator, format, name, encoding=None, user_agent=None): #TOD
   elif format == 'xls':
     format = 'xlsx'
     resp = HttpResponse(next(generator), content_type=content_type)
-  elif format == 'json':
+  elif format == 'json' or format == 'txt':
     resp = HttpResponse(generator, content_type=content_type)
   else:
     raise Exception("Unknown format: %s" % format)
 
   try:
     name = name.encode('ascii')
-    resp['Content-Disposition'] = 'attachment; filename="%s.%s"' % (name, format)
+    format = format.encode('ascii')
+    resp['Content-Disposition'] = b'attachment; filename="%s.%s"' % (name, format)
   except UnicodeEncodeError:
     name = urlquote(name)
     if user_agent is not None and 'Firefox' in user_agent:

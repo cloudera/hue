@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
@@ -48,6 +48,14 @@ ko.bindingHandlers.sqlContextPopover = {
       () => {
         return function() {
           const options = valueAccessor();
+
+          // TODO: Use connector for SQL context popover
+          if (
+            !options.connector &&
+            (options.sourceType === 'hive' || options.sourceType === 'impala')
+          ) {
+            options.connector = { optimizer: 'api' };
+          }
           dataCatalog.getEntry(options).done(entry => {
             const $source = $(element);
             const offset = $source.offset();

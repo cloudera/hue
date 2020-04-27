@@ -7,14 +7,12 @@ weight: -1
 
 ## Dependencies
 
-Hue employs some Python modules which use native code and requires
-certain development libraries be installed on your system. To install from the
-tarball, you'll need these library development packages and tools installed on your system:
+Hue employs some Python modules which use native code and requires certain development libraries be installed on your system. To install from the tarball, you'll need these library development packages and tools installed on your system:
 
 * Python 2.7
-* Python 3 (not available yet [HUE-8737](https://issues.cloudera.org/browse/HUE-8737))
+* Python 3 (can be tested cf. instructions on [HUE-8737](https://issues.cloudera.org/browse/HUE-8737))
 * [MySQL InnoDB or PostgreSQL or Oracle](https://www.cloudera.com/documentation/enterprise/latest/topics/hue_dbs_0.html)
-* Java (but only for the JDBC proxy, should be removed when [SQL Alchemy](https://issues.cloudera.org/browse/HUE-8740) is mature)
+
 
 ### Ubuntu
 
@@ -27,19 +25,10 @@ tarball, you'll need these library development packages and tools installed on y
     sudo apt-get install -y nodejs
 
 
-**Install Oracle JDK**
-
-On Ubuntu 16.04 or less only:
-
-    sudo add-apt-repository ppa:webupd8team/java
-    sudo apt-get update
-    sudo apt-get install oracle-java8-installer
-
 ### CentOS/RHEL
 
     sudo yum install ant asciidoc cyrus-sasl-devel cyrus-sasl-gssapi cyrus-sasl-plain gcc gcc-c++ krb5-devel libffi-devel libxml2-devel libxslt-devel make mysql mysql-devel openldap-devel python-devel sqlite-devel gmp-devel
 
-* [Oracle JDK](https://www.digitalocean.com/community/tutorials/how-to-install-java-on-centos-and-fedora)
 * mvn (from [``apache-maven``](https://gist.github.com/sebsto/19b99f1fa1f32cae5d00) package or maven3 tarball)
 * libtidy (for unit tests only)
 * openssl-devel (for version 7+)
@@ -99,11 +88,10 @@ for more details, refer to this link: [https://docs.oracle.com/cd/E37670_01/E590
 
 * Xcode command line tools
 * [Homebrew](https://brew.sh)
-* [Oracle Instant Client](http://www.oracle.com/technetwork/database/database-technologies/instant-client/downloads/index.html)
 
 Install Dependencies via Homebrew
 
-    brew install mysql@5.7 maven gmp openssl libffi && brew cask install adoptopenjdk
+    brew install mysql@5.7 maven gmp openssl libffi
 
 Install Xcode command line tools
 
@@ -113,12 +101,24 @@ Fix openssl errors (required for MacOS 10.11+)
 
     export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include
 
+On macOS 10.15+, install an older version of openssl
+
+    brew uninstall --ignore-dependencies openssl && brew install https://github.com/tebelorg/Tump/releases/download/v1.0.0/openssl.rb
+
 Fix the possible missing Python headers message by installing the MacOS SDK headers
+
+On macOS 10.14.x
 
     open /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
 
+On macOS 10.15.x
+
+    sudo ln -s /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/* /usr/local/include/
+
 
 ### Oracle Client lib
+
+#### Version 11
 
 Download both instantclient-basic and instantclient-sdk of the same version (11.2.0.4.0 for this example) and on your ~/.bash_profile, add
 
@@ -143,6 +143,49 @@ and finally
 
     cd sdk
     unzip ottclasses.zip
+
+#### Version 12
+
+Hue comes with an older Oracle client cx_Oracle-5.2.1 Python module so it will fail. We need to do the above client install and then upgrade Hue's client module to at least cx_Oracle-5.3.
+
+Make sure you have the `python-dev` package dependencies, ensure that ORACLE_HOME and LB_LIBRARY_PATH are properly set so that pip knows which version to install, then:
+
+    echo $ORACLE_HOME $LD_LIBRARY_PATH
+
+    ./build/env/bin/pip install cx_Oracle
+
+Tip: You can also wget the proper cx_Oracle file yourself: https://pypi.python.org/pypi/cx_Oracle/.
+
+Tip: Going to where is the Oracle client, e.g. /usr/local/share/oracle then creating a symlink similar to below could even trick the cx_Oracle-5.2.1 module to work with 12.2 without doing the pip upgrade:
+
+    ln -s libclntsh.so.12.2 libclntsh.so.11.1
+
+There is more details on this [Apply Temporary Workaround for Oracle 12 Client](https://docs.cloudera.com/documentation/enterprise/latest/topics/hue_dbs_oracle_pkg.html#concept_qx3_hfw_4z).
+
+
+#### Mac
+
+* [Oracle Instant Client](http://www.oracle.com/technetwork/database/database-technologies/instant-client/downloads/index.html)
+
+### Java
+
+Java is only for the [JDBC proxy](/developer/connectors/#jdbc) connector.
+
+**Install Oracle JDK**
+
+On Ubuntu 16.04 or less only:
+
+    sudo add-apt-repository ppa:webupd8team/java
+    sudo apt-get update
+    sudo apt-get install oracle-java8-installer
+
+On Centos:
+
+* [Oracle JDK](https://www.digitalocean.com/community/tutorials/how-to-install-java-on-centos-and-fedora)
+
+On Mac:
+
+    brew cask install adoptopenjdk
 
 ### Supported Browsers
 

@@ -15,11 +15,14 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+
+export const SHOW_EVENT = 'doc.show.delete.modal';
+export const SHOWN_EVENT = 'doc.delete.modal.shown';
 
 const TEMPLATE = `
   <!-- ko with: activeEntry -->
@@ -76,18 +79,25 @@ const TEMPLATE = `
 `;
 
 componentUtils.registerComponent('delete-entry', undefined, TEMPLATE).then(() => {
-  huePubSub.subscribe('doc.show.delete.modal', docViewModel => {
+  huePubSub.subscribe(SHOW_EVENT, docViewModel => {
     let $deleteEntriesModal = $('#deleteEntriesModal');
     if ($deleteEntriesModal.length > 0) {
       ko.cleanNode($deleteEntriesModal[0]);
       $deleteEntriesModal.remove();
     }
 
+    const data = {
+      params: docViewModel,
+      descendantsComplete: () => {
+        huePubSub.publish(SHOWN_EVENT);
+      }
+    };
+
     $deleteEntriesModal = $(
-      '<div id="deleteEntriesModal" data-bind="component: { name: \'delete-entry\', params: $data }" data-keyboard="true" class="modal hide fade" tabindex="-1"/>'
+      '<div id="deleteEntriesModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'delete-entry\', params: params }" data-keyboard="true" class="modal hide fade" tabindex="-1"/>'
     );
     $('body').append($deleteEntriesModal);
 
-    ko.applyBindings(docViewModel, $deleteEntriesModal[0]);
+    ko.applyBindings(data, $deleteEntriesModal[0]);
   });
 });

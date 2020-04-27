@@ -58,6 +58,7 @@ _CNF_HIVESERVER2_TRUSTSTORE_PATH = 'hive.server2.truststore.path'
 _CNF_HIVESERVER2_TRUSTSTORE_PASSWORD = 'hive.server2.truststore.password'
 
 _CNF_HIVESERVER2_TRANSPORT_MODE = 'hive.server2.transport.mode'
+_CNF_HIVESERVER2_THRIFT_BINARY_PORT = 'hive.server2.thrift.port'
 _CNF_HIVESERVER2_THRIFT_HTTP_PORT = 'hive.server2.thrift.http.port'
 _CNF_HIVESERVER2_THRIFT_HTTP_PATH = 'hive.server2.thrift.http.path'
 _CNF_HIVESERVER2_THRIFT_SASL_QOP = 'hive.server2.thrift.sasl.qop'
@@ -66,6 +67,7 @@ _CNF_HIVESERVER2_USE_SASL = 'hive.metastore.sasl.enabled'
 
 _CNF_HIVE_SUPPORT_CONCURRENCY = 'hive.support.concurrency'
 _CNF_HIVE_HOOK_PROTO_BASE_DIR = 'hive.hook.proto.base-directory'
+_CNF_HIVE_EXECUTION_MODE = 'hive.execution.mode'
 
 
 # Host is whatever up to the colon. Allow and ignore a trailing slash.
@@ -149,7 +151,7 @@ def hiveserver2_impersonation_enabled():
 
 def hiveserver2_jdbc_url():
   is_transport_mode_http = hiveserver2_transport_mode() == 'HTTP'
-  urlbase = 'jdbc:hive2://%s:%s/default' % (beeswax.conf.HIVE_SERVER_HOST.get(), hiveserver2_thrift_http_port() if is_transport_mode_http else beeswax.conf.HIVE_SERVER_PORT.get())
+  urlbase = 'jdbc:hive2://%s:%s/default' % (beeswax.conf.HIVE_SERVER_HOST.get(), beeswax.conf.HIVE_HTTP_THRIFT_PORT.get() if is_transport_mode_http else beeswax.conf.HIVE_SERVER_PORT.get())
 
   if get_conf().get(_CNF_HIVESERVER2_USE_SSL, 'FALSE').upper() == 'TRUE':
     urlbase += ';ssl=true'
@@ -177,8 +179,11 @@ def hiveserver2_use_ssl():
 def hiveserver2_transport_mode():
   return get_conf().get(_CNF_HIVESERVER2_TRANSPORT_MODE, 'TCP').upper()
 
+def hiveserver2_thrift_binary_port():
+  return get_conf().get(_CNF_HIVESERVER2_THRIFT_BINARY_PORT)
+
 def hiveserver2_thrift_http_port():
-  return get_conf().get(_CNF_HIVESERVER2_THRIFT_HTTP_PORT, '10001')
+  return get_conf().get(_CNF_HIVESERVER2_THRIFT_HTTP_PORT)
 
 def hiveserver2_thrift_http_path():
   return get_conf().get(_CNF_HIVESERVER2_THRIFT_HTTP_PATH, 'cliservice')
@@ -194,6 +199,9 @@ def has_concurrency_support():
 
 def get_hive_hook_proto_base_directory():
   return get_conf().get(_CNF_HIVE_HOOK_PROTO_BASE_DIR)
+
+def get_hive_execution_mode():
+  return get_conf().get(_CNF_HIVE_EXECUTION_MODE)
 
 def _parse_hive_site():
   """

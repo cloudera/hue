@@ -129,7 +129,7 @@ class TestMock(TestPigBase):
 
   def test_editor_view(self):
     response = self.c.get(reverse('pig:app'))
-    assert_true('Unsaved script' in response.content)
+    assert_true(b'Unsaved script' in response.content)
 
   def test_save(self):
     attrs = {'user': self.user,}

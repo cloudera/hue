@@ -31,18 +31,18 @@ from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
 from beeswax.management.commands import create_table_query_data
 
-from desktop.conf import DEFAULT_USER
 from desktop.lib.exceptions_renderable import raise_popup_exception, PopupException
 from desktop.lib import django_mako
 
-from useradmin.models import User
+from useradmin.models import install_sample_user
+
 
 LOG = logging.getLogger(__name__)
-DEFAULT_USER = DEFAULT_USER.get()
 
 QUERY_HISTORY_CACHE_MAX_USER_COUNT = 10
 QUERY_HISTORY_CACHE_MAX_LENGTH_PER_USER = 25
 HAS_CREATED_TABLE = False
+
 
 class QueryHistory(object):
   def __init__(self, max_user=10, max_history_per_user=25):
@@ -128,7 +128,7 @@ class QueryHistory(object):
       by_user = self.by_user.get(request_user)
       if by_user and by_user['filters'] == filters:
         del self.by_user[request_user] # Moving request_user to head of queue
-        by_user[request_user] = by_user
+        self.by_user[request_user] = by_user
         return by_user
       return None
     finally:
@@ -214,7 +214,7 @@ def _get_query_history_from(request_user=None, start_date=None, start_time=None,
   return data
 
 def _execute_query(proposed_query, limit):
-  user = User.objects.get(username=DEFAULT_USER)
+  user = install_sample_user()
   query_server = get_query_server_config('beeswax')
   server = dbms.get(user, query_server)
   query = hql_query(proposed_query)

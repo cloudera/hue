@@ -19,8 +19,7 @@
 from __future__ import absolute_import
 from future import standard_library
 standard_library.install_aliases()
-from builtins import range
-from builtins import object
+from builtins import range, object
 import json
 import logging
 import os
@@ -42,15 +41,12 @@ from django.urls import reverse
 from django.test.client import Client
 from django.views.static import serve
 from django.http import HttpResponse
-from mock import patch, Mock, MagicMock
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises, nottest
 
 from dashboard.conf import HAS_SQL_ENABLED
 from desktop.settings import DATABASES
-from beeswax.conf import HIVE_SERVER_HOST
-from pig.models import PigScript
 from useradmin.models import GroupPermission, User
 
 import desktop
@@ -73,12 +69,14 @@ from desktop.middleware import DJANGO_VIEW_AUTH_WHITELIST
 from desktop.models import Directory, Document, Document2, get_data_link, _version_from_properties, ClusterConfig, HUE_VERSION
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
-from desktop.views import check_config, home, generate_configspec, load_confs, collect_validation_messages
+from desktop.views import check_config, home, generate_configspec, load_confs, collect_validation_messages, _get_config_errors
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
+  from unittest.mock import patch, Mock
 else:
   from cStringIO import StringIO as string_io
+  from mock import patch, Mock
 
 
 LOG = logging.getLogger(__name__)
@@ -89,9 +87,10 @@ def test_home():
   user = User.objects.get(username="test_home")
 
   response = c.get(reverse(home))
-  assert_equal(["notmine", "trash", "mine", "history"], list(json.loads(response.context[0]['json_tags']).keys()))
+  assert_equal(sorted(["notmine", "trash", "mine", "history"]), sorted(list(json.loads(response.context[0]['json_tags']).keys())))
   assert_equal(200, response.status_code)
 
+  from pig.models import PigScript
   script, created = PigScript.objects.get_or_create(owner=user)
   doc = Document.objects.link(script, owner=script.owner, name='test_home')
 
@@ -167,6 +166,40 @@ def test_public_views():
     response = c.get(url)
     assert_equal(200, response.status_code)
 
+def test_prometheus_view():
+  if not desktop.conf.ENABLE_PROMETHEUS.get():
+    raise SkipTest
+
+  ALL_PROMETHEUS_METRICS = [
+    'django_http_requests_before_middlewares_total',
+    'django_http_responses_before_middlewares_total',
+    'django_http_requests_latency_including_middlewares_seconds',
+    'django_http_requests_unknown_latency_including_middlewares_total',
+    'django_http_requests_latency_seconds_by_view_method',
+    'django_http_requests_unknown_latency_total',
+    'django_http_ajax_requests_total',
+    'django_http_requests_total_by_method',
+    'django_http_requests_total_by_transport',
+    'django_http_requests_total_by_view_transport_method',
+    'django_http_requests_body_total_bytes',
+    'django_http_responses_total_by_templatename',
+    'django_http_responses_total_by_status',
+    'django_http_responses_body_total_bytes',
+    'django_http_responses_total_by_charset',
+    'django_http_responses_streaming_total',
+    'django_http_exceptions_total_by_type',
+    'django_http_exceptions_total_by_view',
+  ]
+
+  c = Client()
+  response = c.get('/metrics')
+  for metric in ALL_PROMETHEUS_METRICS:
+    metric = metric if isinstance(metric, bytes) else metric.encode('utf-8')
+    if metric not in desktop.metrics.ALLOWED_DJANGO_PROMETHEUS_METRICS:
+      assert_false(metric in response.content, 'metric: %s \n %s' % (metric, response.content))
+    else:
+      assert_true(metric in response.content, 'metric: %s \n %s' % (metric, response.content))
+
 def test_log_view():
   c = make_logged_in_client()
 
@@ -201,86 +234,6 @@ def test_download_log_view():
   # UnicodeDecodeError: 'ascii' codec can't decode byte... should not happen
   response = c.get(URL)
   assert_equal("application/zip", response.get('Content-Type', ''))
-
-def test_dump_config():
-  c = make_logged_in_client()
-
-  CANARY = "abracadabra"
-
-  # Depending on the order of the conf.initialize() in settings, the set_for_testing() are not seen in the global settings variable
-  clear = HIVE_SERVER_HOST.set_for_testing(CANARY)
-
-  try:
-    response1 = c.get(reverse('desktop.views.dump_config'))
-    assert_true(CANARY in response1.content, response1.content)
-
-    response2 = c.get(reverse('desktop.views.dump_config'), {'private': 'true'})
-    assert_true(CANARY in response2.content)
-
-    # There are more private variables...
-    assert_true(len(response1.content) < len(response2.content))
-  finally:
-    clear()
-
-  CANARY = "(localhost|127\.0\.0\.1):(50030|50070|50060|50075)"
-  clear = proxy.conf.WHITELIST.set_for_testing(CANARY)
-
-  try:
-    response1 = c.get(reverse('desktop.views.dump_config'))
-    assert_true(CANARY in response1.content)
-  finally:
-    clear()
-
-  # Malformed port per HUE-674
-  CANARY = "asdfoijaoidfjaosdjffjfjaoojosjfiojdosjoidjfoa"
-  clear = HIVE_SERVER_HOST.set_for_testing(CANARY)
-
-  try:
-    response1 = c.get(reverse('desktop.views.dump_config'))
-    assert_true(CANARY in response1.content, response1.content)
-  finally:
-    clear()
-
-  CANARY = '/tmp/spacé.dat'
-  finish = proxy.conf.WHITELIST.set_for_testing(CANARY)
-  try:
-    response = c.get(reverse('desktop.views.dump_config'))
-    assert_true(CANARY in response.content, response.content)
-  finally:
-    finish()
-
-  # Not showing some passwords
-  response = c.get(reverse('desktop.views.dump_config'))
-  assert_false('bind_password' in response.content)
-
-  # Login as someone else
-  client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
-  grant_access("not_me", "test", "desktop")
-
-  response = client_not_me.get(reverse('desktop.views.dump_config'))
-  assert_true("You must be a superuser" in response.content, response.content)
-
-  prev_env_conf = os.environ.get("HUE_CONF_DIR")
-  try:
-    os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
-    resp = c.get(reverse('desktop.views.dump_config'))
-    assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
-  finally:
-    if prev_env_conf is None:
-      os.environ.pop("HUE_CONF_DIR", None)
-    else:
-      os.environ["HUE_CONF_DIR"] = prev_env_conf
-
-
-  finish = desktop.conf.ENABLE_CONNECTORS.set_for_testing(True)
-  try:
-    with patch('desktop.lib.fsmanager.has_hdfs_enabled') as has_hdfs_enabled:
-      has_hdfs_enabled.return_value = True
-      response = c.get(reverse('desktop.views.dump_config'))
-      assert_equal(1, len(response.context[0]['apps']), response.context[0])
-  finally:
-    finish()
-
 
 def hue_version():
   global HUE_VERSION
@@ -353,7 +306,7 @@ def test_status_bar():
   views.register_status_bar_view(f)
 
   response = c.get("/desktop/status_bar")
-  assert_equal("foobar", response.content)
+  assert_equal(b"foobar", response.content)
 
   views._status_bar_views = backup
 
@@ -392,7 +345,7 @@ def test_paginator():
 def test_thread_dump():
   c = make_logged_in_client()
   response = c.get("/desktop/debug/threads", HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-  assert_true("test_thread_dump" in response.content)
+  assert_true(b"test_thread_dump" in response.content)
 
 def test_truncating_model():
   class TinyModel(TruncatingModel):
@@ -711,7 +664,7 @@ def test_error_handling_failure():
   try:
     # Make sure we are showing default 500.html page.
     # See django.test.client#L246
-    assert_raises(AttributeError, c.get, reverse('desktop.views.dump_config'))
+    assert_raises(AttributeError, c.get, reverse('desktop.views.threads'))
   finally:
     # Restore the world
     restore_django_debug()
@@ -724,7 +677,9 @@ def test_404_handling():
   c = make_logged_in_client()
   response = c.get(view_name)
   assert_true(any(['404.mako' in _template.filename for _template in response.templates]), response.templates)
-  assert_true('not found' in response.content)
+  assert_true(b'not found' in response.content)
+  if not isinstance(view_name, bytes):
+    view_name = view_name.encode('utf-8')
   assert_true(view_name in response.content)
 
 class RecordingHandler(logging.Handler):
@@ -857,6 +812,8 @@ def test_ui_customizations():
   try:
     c = make_logged_in_client()
     c.logout()
+    if not isinstance(custom_message, bytes):
+      custom_message = custom_message.encode('utf-8')
     resp = c.get('/hue/accounts/login/', follow=False)
     assert_true(custom_message in resp.content, resp)
     resp = c.get('/hue/about', follow=True)
@@ -894,9 +851,13 @@ def test_cx_Oracle():
 class TestStrictRedirection(object):
 
   def setUp(self):
+    self.finish = desktop.conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.AllowFirstUserDjangoBackend'])
     self.client = make_logged_in_client()
     self.user = dict(username="test", password="test")
     desktop.conf.REDIRECT_WHITELIST.set_for_testing('^\/.*$,^http:\/\/example.com\/.*$')
+
+  def tearDown(self):
+    self.finish()
 
   def test_redirection_blocked(self):
     # Redirection with code 301 should be handled properly
@@ -919,19 +880,20 @@ class TestStrictRedirection(object):
     self._test_redirection(redirection_url='http://example.com/', expected_status_code=302)
 
   def _test_redirection(self, redirection_url, expected_status_code, **kwargs):
-    self.client.get('/accounts/logout', **kwargs)
     data = self.user.copy()
     data['next'] = redirection_url
     response = self.client.post('/hue/accounts/login/', data, **kwargs )
     assert_equal(expected_status_code, response.status_code)
     if expected_status_code == 403:
         error_msg = 'Redirect to ' + redirection_url + ' is not allowed.'
+        if not isinstance(error_msg, bytes):
+          error_msg = error_msg.encode('utf-8')
         assert_true(error_msg in response.content, response.content)
 
 
 class BaseTestPasswordConfig(object):
 
-  SCRIPT = '%s -c "print \'\\n password from script \\n\'"' % sys.executable
+  SCRIPT = '%s -c "print(\'\\n password from script \\n\')"' % sys.executable
 
   def get_config_password(self):
     raise NotImplementedError
@@ -1076,16 +1038,20 @@ class TestDocument(object):
     make_logged_in_client(username="copy_owner", groupname="test_doc", recreate=True, is_superuser=False)
     self.copy_user = User.objects.get(username="copy_owner")
 
-    self.document2 = Document2.objects.create(name='Test Document2',
-                                              type='search-dashboard',
-                                              owner=self.user,
-                                              description='Test Document2')
+    self.document2 = Document2.objects.create(
+        name='Test Document2',
+        type='search-dashboard',
+        owner=self.user,
+        description='Test Document2'
+    )
 
-    self.document = Document.objects.link(content_object=self.document2,
-                                          owner=self.user,
-                                          name='Test Document',
-                                          description='Test Document',
-                                          extra='test')
+    self.document = Document.objects.link(
+        content_object=self.document2,
+        owner=self.user,
+        name='Test Document',
+        description='Test Document',
+        extra='test'
+    )
 
     self.document.save()
     self.document2.doc.add(self.document)
@@ -1164,40 +1130,46 @@ class TestDocument(object):
 
   def test_multiple_home_directories(self):
     home_dir = Directory.objects.get_home_directory(self.user)
-    test_doc1 = Document2.objects.create(name='test-doc1',
-                                         type='query-hive',
-                                         owner=self.user,
-                                         description='',
-                                         parent_directory=home_dir)
+    test_doc1 = Document2.objects.create(
+        name='test-doc1',
+        type='query-hive',
+        owner=self.user,
+        description='',
+        parent_directory=home_dir
+    )
 
-    assert_equal(home_dir.children.exclude(name='.Trash').count(), 2)
+    assert_equal(home_dir.children.exclude(name__in=['.Trash', 'Gist']).count(), 2)
 
     # Cannot create second home directory directly as it will fail in Document2.validate()
     second_home_dir = Document2.objects.create(owner=self.user, parent_directory=None, name='second_home_dir', type='directory')
     Document2.objects.filter(name='second_home_dir').update(name=Document2.HOME_DIR, parent_directory=None)
     assert_equal(Document2.objects.filter(owner=self.user, name=Document2.HOME_DIR).count(), 2)
 
-    test_doc2 = Document2.objects.create(name='test-doc2',
-                                              type='query-hive',
-                                              owner=self.user,
-                                              description='',
-                                              parent_directory=second_home_dir)
+    test_doc2 = Document2.objects.create(
+        name='test-doc2',
+        type='query-hive',
+        owner=self.user,
+        description='',
+        parent_directory=second_home_dir
+    )
     assert_equal(second_home_dir.children.count(), 1)
 
     merged_home_dir = Directory.objects.get_home_directory(self.user)
     children = merged_home_dir.children.all()
-    assert_equal(children.exclude(name='.Trash').count(), 3)
+    assert_equal(children.exclude(name__in=['.Trash', 'Gist']).count(), 3)
     children_names = [child.name for child in children]
     assert_true(test_doc2.name in children_names)
     assert_true(test_doc1.name in children_names)
 
   def test_multiple_trash_directories(self):
     home_dir = Directory.objects.get_home_directory(self.user)
-    test_doc1 = Document2.objects.create(name='test-doc1',
-                                         type='query-hive',
-                                         owner=self.user,
-                                         description='',
-                                         parent_directory=home_dir)
+    test_doc1 = Document2.objects.create(
+        name='test-doc1',
+        type='query-hive',
+        owner=self.user,
+        description='',
+        parent_directory=home_dir
+    )
 
     assert_equal(home_dir.children.count(), 3)
 
@@ -1207,11 +1179,13 @@ class TestDocument(object):
     assert_equal(Directory.objects.filter(owner=self.user, name=Document2.TRASH_DIR).count(), 2)
 
 
-    test_doc2 = Document2.objects.create(name='test-doc2',
-                                              type='query-hive',
-                                              owner=self.user,
-                                              description='',
-                                              parent_directory=home_dir)
+    test_doc2 = Document2.objects.create(
+        name='test-doc2',
+        type='query-hive',
+        owner=self.user,
+        description='',
+        parent_directory=home_dir
+    )
     assert_equal(home_dir.children.count(), 5) # Including the second trash
     assert_raises(Document2.MultipleObjectsReturned, Directory.objects.get, name=Document2.TRASH_DIR)
 
@@ -1405,9 +1379,18 @@ def test_get_data_link():
   assert_equal(None, get_data_link({}))
   assert_equal('gethue.com', get_data_link({'type': 'link', 'link': 'gethue.com'}))
 
-  assert_equal('/hbase/#Cluster/document_demo/query/20150527', get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527'}))
-  assert_equal('/hbase/#Cluster/document_demo/query/20150527[f1]', get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1'}))
-  assert_equal('/hbase/#Cluster/document_demo/query/20150527[f1:c1]', get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1', 'col': 'c1'}))
+  assert_equal(
+    '/hbase/#Cluster/document_demo/query/20150527',
+    get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527'})
+  )
+  assert_equal(
+      '/hbase/#Cluster/document_demo/query/20150527[f1]',
+      get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1'})
+  )
+  assert_equal(
+      '/hbase/#Cluster/document_demo/query/20150527[f1:c1]',
+      get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1', 'col': 'c1'})
+  )
 
   assert_equal('/filebrowser/view=/data/hue/1', get_data_link({'type': 'hdfs', 'path': '/data/hue/1'}))
   assert_equal('/metastore/table/default/sample_07', get_data_link({'type': 'hive', 'database': 'default', 'table': 'sample_07'}))
@@ -1433,7 +1416,7 @@ def test_collect_validation_messages_default():
     # This is for the hue.ini file only
     error_list = []
     collect_validation_messages(conf, error_list)
-    assert_equal(len(error_list), 0)
+    assert_equal(len(error_list), 0, error_list)
   finally:
     os.remove(configspec.name)
 
@@ -1471,7 +1454,10 @@ def test_collect_validation_messages_extras():
   finally:
     os.remove(configspec.name)
   assert_equal(len(error_list), 1)
-  assert_equal(u'Extra section, extrasection in the section: top level, Extra keyvalue, extrakey in the section: [desktop] , Extra section, extrasubsection in the section: [desktop] , Extra section, extrasubsubsection in the section: [desktop] [[auth]] ', error_list[0]['message'])
+  assert_equal(u'Extra section, extrasection in the section: top level, Extra keyvalue, extrakey in the section: [desktop] , '
+      'Extra section, extrasubsection in the section: [desktop] , Extra section, extrasubsubsection in the section: [desktop] [[auth]] ',
+      error_list[0]['message']
+  )
 
 # Test db migration from 5.7,...,5.15 to latest
 def test_db_migrations_sqlite():
@@ -1496,6 +1482,7 @@ def test_db_migrations_sqlite():
       call_command('migrate', '--fake-initial', '--database=' + name)
     finally:
       del DATABASES[name]
+
 
 def test_db_migrations_mysql():
   if desktop.conf.DATABASE.ENGINE.get().find('mysql') < 0:
@@ -1525,11 +1512,42 @@ def test_db_migrations_mysql():
       'CONN_MAX_AGE': desktop.conf.DATABASE.CONN_MAX_AGE.get(),
     }
     try:
-      subprocess.check_output('mysql -u%(USER)s -p%(PASSWORD)s -e "CREATE DATABASE %(SCHEMA)s"' % DATABASES[name], stderr=subprocess.STDOUT, shell=True) # No way to run this command with django
-      subprocess.check_output('mysql -u%(USER)s -p%(PASSWORD)s %(SCHEMA)s < %(PATH)s' % DATABASES[name], stderr=subprocess.STDOUT, shell=True)
+      subprocess.check_output(
+        'mysql -u%(USER)s -p%(PASSWORD)s -e "CREATE DATABASE %(SCHEMA)s"' % DATABASES[name], stderr=subprocess.STDOUT, shell=True
+      )  # No way to run this command with django
+      subprocess.check_output(
+        'mysql -u%(USER)s -p%(PASSWORD)s %(SCHEMA)s < %(PATH)s' % DATABASES[name], stderr=subprocess.STDOUT, shell=True
+      )
       call_command('migrate', '--fake-initial', '--database=%(SCHEMA)s' % DATABASES[name])
     except subprocess.CalledProcessError as e:
       LOG.warn('stderr: {}'.format(e.output))
       raise e
     finally:
       del DATABASES[name]
+
+
+class TestGetConfigErrors():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test")
+
+  def test_get_config_errors_unicode(self):
+    """
+    Avoid a Python 2 issue:
+    AttributeError: 'unicode' object has no attribute 'get_fully_qualifying_key'
+    """
+    request = Mock(user=self.user)
+
+    with patch('desktop.views.appmanager') as appmanager:
+      appmanager.DESKTOP_MODULES = [
+        Mock(
+          conf=Mock(
+            config_validator=lambda user: [(u'Connector 1', 'errored because of ...')]
+          )
+        )
+      ]
+      assert_equal(
+        [{'name': 'Connector 1', 'message': 'errored because of ...'}],
+        _get_config_errors(request, cache=False)
+      )

@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 const instances = {};
 
@@ -47,6 +47,9 @@ class componentUtils {
             } else if (model) {
               instances[name] = new model(params);
             }
+          }
+          if (instances[name] && instances[name].dispose) {
+            console.warn('"dispose" function present on static component ' + name);
           }
           return instances[name];
         }

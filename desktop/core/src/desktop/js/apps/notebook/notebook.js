@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
 
 import apiHelper from 'api/apiHelper';
@@ -25,6 +25,11 @@ import hueUtils from 'utils/hueUtils';
 
 import Session from 'apps/notebook/session';
 import Snippet from 'apps/notebook/snippet';
+import {
+  ASSIST_DB_PANEL_IS_READY_EVENT,
+  ASSIST_IS_DB_PANEL_READY_EVENT,
+  ASSIST_SET_DATABASE_EVENT
+} from 'ko/components/assist/events';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -324,14 +329,17 @@ class Notebook {
       const _snippet = new Snippet(vm, self, snippet);
       self.snippets.push(_snippet);
 
+      const deferred = $.Deferred().done(() => {
+        _snippet.init();
+      });
       if (self.getSession(_snippet.type()) == null && typeof skipSession == 'undefined') {
-        window.setTimeout(() => {
-          _snippet.status('loading');
-          self.createSession(new Session(vm, { type: _snippet.type() }));
-        }, 200);
+        self.createSession(new Session(vm, { type: _snippet.type() }), () => {
+          deferred.resolve();
+        });
+      } else {
+        deferred.resolve();
       }
 
-      _snippet.init();
       return _snippet;
     };
 
@@ -514,6 +522,9 @@ class Notebook {
                 self.snippets()[0].queries.unshift(komapping.fromJS(data));
               }
 
+              if (data.save_as) {
+                huePubSub.publish('assist.document.refresh');
+              }
               if (self.coordinatorUuid() && self.schedulerViewModel) {
                 self.saveScheduler();
                 self.schedulerViewModel.coordinator.refreshParameters();
@@ -679,7 +690,7 @@ class Notebook {
 
       function updateHistoryCall(item) {
         $.post('/notebook/api/check_status', {
-          notebook: komapping.toJSON({ id: item.uuid() })
+          notebook: komapping.toJSON({ uuid: item.uuid() })
         })
           .done(data => {
             const status =
@@ -900,14 +911,19 @@ class Notebook {
     }
 
     huePubSub.subscribeOnce(
-      'assist.db.panel.ready',
+      ASSIST_DB_PANEL_IS_READY_EVENT,
       () => {
         if (self.type().indexOf('query') === 0) {
           const whenDatabaseAvailable = function(snippet) {
-            huePubSub.publish('assist.set.database', {
-              source: snippet.type(),
+            const lastSelectedDb = apiHelper.getFromTotalStorage(
+              'assist_' + snippet.type() + '_' + snippet.namespace().id,
+              'lastSelectedDb'
+            );
+
+            huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
+              connector: snippet.connector(),
               namespace: snippet.namespace(),
-              name: snippet.database()
+              name: lastSelectedDb === '' ? '' : snippet.database()
             });
           };
 
@@ -948,7 +964,7 @@ class Notebook {
       vm.huePubSubId
     );
 
-    huePubSub.publish('assist.is.db.panel.ready');
+    huePubSub.publish(ASSIST_IS_DB_PANEL_READY_EVENT);
   }
 }
 

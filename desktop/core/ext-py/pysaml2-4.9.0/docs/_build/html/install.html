@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Quick install guide &#8212; pysaml2  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Quick pysaml2 example" href="examples/index.html" />
+    <link rel="prev" title="About SAML 2.0" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="quick-install-guide">
+<span id="install"></span><h1>Quick install guide<a class="headerlink" href="#quick-install-guide" title="Permalink to this headline">¶</a></h1>
+<p>Before you can use PySAML2, you’ll need to get it installed. This guide
+will guide you to a simple, minimal installation.</p>
+<div class="section" id="install-pysaml2">
+<h2>Install PySAML2<a class="headerlink" href="#install-pysaml2" title="Permalink to this headline">¶</a></h2>
+<p>For all this to work, you need to have Python installed.
+The development has been done using 2.7.
+There is now a 3.X version.</p>
+<div class="section" id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h3>
+<p>You have to have ElementTree, which is either part of your Python distribution
+if it’s recent enough, or if the Python is too old you have to install it,
+for instance by getting it from the Python Package Instance by using
+easy_install.</p>
+<p>You also need xmlsec1 which you can download from <a class="reference external" href="http://www.aleksey.com/xmlsec/">http://www.aleksey.com/xmlsec/</a></p>
+<p>If you’re on macOS, you can get xmlsec1 installed from MacPorts or Fink.</p>
+<p>Depending on how you are going to use PySAML2 you might also need</p>
+<ul class="simple">
+<li><p>Mako</p></li>
+<li><p>pyASN1</p></li>
+<li><p>repoze.who</p></li>
+<li><p>python-memcache</p></li>
+<li><p>memcached</p></li>
+</ul>
+</div>
+<div class="section" id="quick-build-instructions">
+<h3>Quick build instructions<a class="headerlink" href="#quick-build-instructions" title="Permalink to this headline">¶</a></h3>
+<p>Once you have installed all the necessary prerequisites a simple:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
+</pre></div>
+</div>
+<p>will install the basic code.</p>
+<p>Note for rhel/centos 6: cffi depends on libffi-devel, and cryptography on openssl-devel to compile
+So you might want first to do:
+yum install libffi-devel openssl-devel</p>
+<p>After this, you ought to be able to run the tests without a hitch.
+The tests are based on the pypy test environment, so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="n">cd</span> <span class="n">tests</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">test</span><span class="o">-</span><span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+<span class="n">pytest</span>
+</pre></div>
+</div>
+<p>is what you should use. If you don’t have py.test, get it it’s part of pypy!
+It’s really good!</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">pysaml2</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quick install guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#install-pysaml2">Install PySAML2</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Quick pysaml2 example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto/index.html">How to use PySAML2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sp_test/internal.html">How sp_test works internally</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">About SAML 2.0</a></li>
+      <li>Next: <a href="examples/index.html" title="next chapter">Quick pysaml2 example</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2010-2011, Roland Hedberg.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/install.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

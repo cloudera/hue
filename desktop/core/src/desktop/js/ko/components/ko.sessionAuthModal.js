@@ -15,12 +15,15 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
+
+export const SHOW_EVENT = 'show.session.auth.modal';
+export const SHOWN_EVENT = 'session.auth.modal.shown';
 
 const TEMPLATE = `
 <div class="modal-header">
@@ -41,7 +44,7 @@ const TEMPLATE = `
     <div class="span6">
       <div class="input-prepend">
         <span class="add-on muted"><i class="fa fa-user"></i></span>
-        <input name="username" type="text" data-bind="value: $root.authSessionUsername" placeholder="${I18n(
+        <input name="username" data-test="usernameInput" type="text" data-bind="textInput: authSessionUsername" placeholder="${I18n(
           'Username'
         )}"/>
       </div>
@@ -49,7 +52,7 @@ const TEMPLATE = `
     <div class="span6">
       <div class="input-prepend">
         <span class="add-on muted"><i class="fa fa-lock"></i></span>
-        <input name="password" type="password" data-bind="value: $root.authSessionPassword" placeholder="${I18n(
+        <input name="password" data-test="passwordInput" type="password" data-bind="textInput: authSessionPassword" placeholder="${I18n(
           'Password'
         )}"/>
       </div>
@@ -113,7 +116,7 @@ class SessionAuthModal {
 }
 
 componentUtils.registerComponent('session-auth-modal', undefined, TEMPLATE).then(() => {
-  huePubSub.subscribe('show.session.auth.modal', sessionAuthParams => {
+  huePubSub.subscribe(SHOW_EVENT, sessionAuthParams => {
     let $sessionAuthModal = $('#sessionAuthModal');
     if ($sessionAuthModal.length > 0) {
       ko.cleanNode($sessionAuthModal[0]);
@@ -121,12 +124,19 @@ componentUtils.registerComponent('session-auth-modal', undefined, TEMPLATE).then
     }
 
     $sessionAuthModal = $(
-      '<div id="sessionAuthModal" data-bind="component: { name: \'session-auth-modal\', params: $data }" data-keyboard="true" class="modal hide fade" tabindex="-1"/>'
+      '<div id="sessionAuthModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'session-auth-modal\', params: params }" data-keyboard="true" class="modal hide fade" tabindex="-1"/>'
     );
     $('body').append($sessionAuthModal);
 
     const model = new SessionAuthModal(sessionAuthParams, $sessionAuthModal);
-    ko.applyBindings(model, $sessionAuthModal[0]);
+    const data = {
+      params: model,
+      descendantsComplete: () => {
+        huePubSub.publish(SHOWN_EVENT, $sessionAuthModal[0]);
+      }
+    };
+
+    ko.applyBindings(data, $sessionAuthModal[0]);
     $sessionAuthModal.modal('show');
     $sessionAuthModal.on('hidden', () => {
       if (model.pending) {

@@ -18,13 +18,12 @@ from __future__ import absolute_import
 import logging
 import unittest
 
-from mock import patch, Mock
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_not_equal
 
 from desktop.conf import is_gs_enabled
-from desktop.lib.fs.gc.client import get_client
 
+from desktop.lib.fsmanager import get_client
 
 LOG = logging.getLogger(__name__)
 
@@ -35,7 +34,7 @@ class TestGCS(unittest.TestCase):
       raise SkipTest('gs not enabled')
 
   def test_with_credentials(self):
-    # Simple test that makes sure no errors are thrown. 
-    client = get_client()
+    # Simple test that makes sure no errors are thrown.
+    client = get_client(fs='gs')
     buckets = client.listdir_stats('gs://')
     LOG.info(len(buckets))

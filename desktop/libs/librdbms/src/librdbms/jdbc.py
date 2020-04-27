@@ -27,11 +27,10 @@ from notebook.connectors.base import AuthenticationRequired
 
 LOG = logging.getLogger(__name__)
 
-
 try:
   from py4j.java_gateway import JavaGateway, JavaObject
-except ImportError as e:
-  LOG.exception('Failed to import py4j')
+except:
+  LOG.warn('Failed to import py4j')
 
 
 def query_and_fetch(db, statement, n=None):
@@ -132,7 +131,7 @@ class Cursor(object):
   def fetchmany(self, n=None):
     res = []
 
-    while next(self.rs) and (n is None or n > 0):
+    while self.rs.next() and (n is None or n > 0):
       row = []
       for c in range(self._meta.getColumnCount()):
         cell = self.rs.getObject(c + 1)

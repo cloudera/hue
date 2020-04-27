@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.quickQueryContext.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;quick-query-context&quot;, params: params }\\"><div class=\\"context-popover-flex-fill\\" style=\\"overflow: auto;\\">
+  <!-- ko hueSpinner: { spin: loadingConfig, center: true, size: 'xlarge' } --><!-- /ko -->
+  <!-- ko ifnot: loadingConfig --><!-- /ko -->
+</div></div>"
+`;

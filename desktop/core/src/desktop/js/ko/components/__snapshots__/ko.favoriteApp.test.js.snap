@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.favoriteApp.js should render favorite 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;hue-favorite-app&quot;, params: params }\\"><div class=\\"inline pointer favorite-app\\" data-bind=\\"click: setAsFavoriteApp.bind($data), tooltip: { placement: 'bottom', title: isFavorite() ? 'Unset from default application' : 'Set as default application' }\\">
+    <i class=\\"fa inactive-action fa-star\\" data-bind=\\"css: { 'fa-star-o': !isFavorite(), 'fa-star': isFavorite }\\"></i>
+  </div></div>"
+`;
+
+exports[`ko.favoriteApp.js should render non-favorite 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;hue-favorite-app&quot;, params: params }\\"><div class=\\"inline pointer favorite-app\\" data-bind=\\"click: setAsFavoriteApp.bind($data), tooltip: { placement: 'bottom', title: isFavorite() ? 'Unset from default application' : 'Set as default application' }\\">
+    <i class=\\"fa inactive-action fa-star-o\\" data-bind=\\"css: { 'fa-star-o': !isFavorite(), 'fa-star': isFavorite }\\"></i>
+  </div></div>"
+`;

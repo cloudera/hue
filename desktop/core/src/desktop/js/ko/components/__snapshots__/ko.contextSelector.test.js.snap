@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.contextSelector.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;hue-context-selector&quot;, params: params }\\"><i class=\\"fa fa-spinner fa-spin muted\\"></i><div class=\\"inline-block\\" style=\\"\\" data-bind=\\"visible: !loadingContext()\\">
+    <!-- ko if: window.HAS_MULTI_CLUSTER --><!-- /ko -->
+
+    <!-- ko if: availableDatabases().length > 0 && !hideDatabases--><!-- /ko -->
+    <!-- ko if: availableDatabases().length === 0  && !hideDatabases --><!-- /ko -->
+  </div></div>"
+`;

@@ -35,11 +35,11 @@ from functools import reduce
 standard_library.install_aliases()
 from builtins import map
 from builtins import range
-from past.utils import old_div
 from builtins import object
 import errno
 import grp
 import logging
+import math
 import os
 import posixpath
 import pwd
@@ -172,6 +172,9 @@ class LocalSubFileSystem(object):
       for i in groups:
         newargs[i] = grp.getgrnam(newargs[i]).gr_gid
 
+      if f == builtins_open and sys.version_info[0] > 2:
+        return f(*newargs, encoding='utf-8')
+
       return f(*newargs)
 
     return wrapped
@@ -251,9 +254,9 @@ class FakeStatus(object):
     o = dict()
     GB = 1024*1024*1024
     o["bytesTotal"] = 5*GB
-    o["bytesUsed"] = old_div(5*GB,2)
+    o["bytesUsed"] = math.floor(5*GB / 2)
     o["bytesRemaining"] = 2*GB
-    o["bytesNonDfs"] = old_div(GB,2)
+    o["bytesNonDfs"] = math.floor(GB / 2)
     o["liveDataNodes"] = 13
     o["deadDataNodes"] = 2
     o["upgradeStatus"] = dict(version=13, percentComplete=100, finalized=True)

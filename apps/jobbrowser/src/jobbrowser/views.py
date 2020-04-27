@@ -23,6 +23,7 @@ from builtins import str
 import logging
 import re
 import string
+import sys
 import time
 import urllib.request, urllib.error, urllib.parse
 import urllib.parse
@@ -156,8 +157,9 @@ def jobs(request):
       )
     except Exception as ex:
       ex_message = str(ex)
-      if 'Connection refused' in ex_message or 'standby RM' in ex_message:
-        raise PopupException(_('Resource Manager cannot be contacted or might be down.'))
+      if 'Connection refused' in ex_message or 'standby RM' in ex_message or 'Name or service not known' in ex_message:
+        response = {'status': 1, 'message': _('Resource Manager cannot be contacted or might be down.')}
+        return JsonResponse(response)
       elif 'Could not connect to' in ex_message:
         raise PopupException(_('Job Tracker cannot be contacted or might be down.'))
       else:
@@ -254,9 +256,14 @@ def single_job(request, job):
     return single_spark_job(request, job)
 
   failed_tasks = job.filter_tasks(task_states=('failed',))
-  failed_tasks.sort(cmp_exec_time)
   recent_tasks = job.filter_tasks(task_states=('running', 'succeeded',))
-  recent_tasks.sort(cmp_exec_time, reverse=True)
+
+  if sys.version_info[0] > 2:
+    failed_tasks.sort(key=lambda task: task.execStartTimeMs)
+    recent_tasks.sort(key=lambda task: task.execStartTimeMs, reverse=True)
+  else:
+    failed_tasks.sort(cmp_exec_time)
+    recent_tasks.sort(cmp_exec_time, reverse=True)
 
   if request.GET.get('format') == 'json':
     json_failed_tasks = [massage_task_for_json(task) for task in failed_tasks]
@@ -375,7 +382,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
     params = {
       'doAs': request.user.username
     }
-      
+
     if offset != 0:
       params['start'] = offset
 

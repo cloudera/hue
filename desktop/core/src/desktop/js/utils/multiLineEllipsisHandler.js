@@ -15,41 +15,39 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import hueUtils from 'utils/hueUtils';
 
-const checkOverflow = function(element) {
-  return element.offsetHeight < element.scrollHeight || element.offsetWidth < element.scrollWidth;
-};
+const checkOverflow = element =>
+  element &&
+  (element.offsetHeight < element.scrollHeight || element.offsetWidth < element.scrollWidth);
 
 class MultiLineEllipsisHandler {
   constructor(options) {
-    const self = this;
+    this.element = options.element;
+    this.$element = $(options.element);
+    this.overflowHeight = options.overflowHeight;
+    this.expandable = options.expandable;
+    this.expandClass = options.expandClass;
+    this.expandActionClass = options.expandActionClass;
+    this.overflowing = options.overflowing;
 
-    self.element = options.element;
-    self.$element = $(options.element);
-    self.overflowHeight = options.overflowHeight;
-    self.expandable = options.expandable;
-    self.expandClass = options.expandClass;
-    self.expandActionClass = options.expandActionClass;
-    self.overflowing = options.overflowing;
+    this.onActionRender = options.onActionRender;
 
-    self.onActionRender = options.onActionRender;
+    this.lastKnownOffsetHeight;
+    this.lastKnownOffsetWidth;
+    this.isOverflowing;
 
-    self.lastKnownOffsetHeight;
-    self.lastKnownOffsetWidth;
-    self.isOverflowing;
+    this.expanded = options.expanded || ko.observable(false);
+    this.updateOverflowHeight();
 
-    self.expanded = options.expanded || ko.observable(false);
-    self.updateOverflowHeight();
-
-    self.contents = options.text;
-    self.element.innerHTML = self.contents;
+    this.contents = options.text;
+    this.element.innerHTML = this.contents;
 
     const linkRegex = /(?:(?:[a-z]+:\/\/)|www\.)[^\s\/]+(?:[.\/]\S+)*[^\s`!()\[\]{};:'".,<>?«»“”‘’]/gi;
 
-    self.renderContents = function(contents) {
+    this.renderContents = contents => {
       if (options.linkify) {
         return hueUtils.deXSS(
           contents.replace(linkRegex, val => {
@@ -66,99 +64,94 @@ class MultiLineEllipsisHandler {
       return hueUtils.deXSS(contents);
     };
 
-    self.delayedResumeTimeout = window.setTimeout(() => {
-      self.resume();
+    this.delayedResumeTimeout = window.setTimeout(() => {
+      this.resume();
     }, 0);
   }
 
   updateOverflowHeight() {
-    const self = this;
-    if (self.overflowHeight) {
-      self.$element.css('max-height', self.expanded() ? '' : self.overflowHeight);
-      self.$element.css('overflow', self.expanded() ? '' : 'hidden');
+    if (this.overflowHeight) {
+      this.$element.css('max-height', this.expanded() ? '' : this.overflowHeight);
+      this.$element.css('overflow', this.expanded() ? '' : 'hidden');
     }
   }
 
   resume() {
-    const self = this;
-    self.refresh();
-    window.clearInterval(self.sizeCheckInterval);
-    self.sizeCheckInterval = window.setInterval(() => {
+    this.refresh();
+    window.clearInterval(this.sizeCheckInterval);
+    this.sizeCheckInterval = window.setInterval(() => {
       if (
-        self.element.offsetWidth !== self.lastKnownOffsetWidth ||
-        self.element.offsetHeight !== self.lastKnownOffsetHeight
+        this.element.offsetWidth !== this.lastKnownOffsetWidth ||
+        this.element.offsetHeight !== this.lastKnownOffsetHeight
       ) {
-        self.refresh();
+        this.refresh();
       }
     }, 500);
   }
 
   pause() {
-    const self = this;
-    window.clearTimeout(self.delayedResumeTimeout);
-    window.clearInterval(self.sizeCheckInterval);
+    window.clearTimeout(this.delayedResumeTimeout);
+    window.clearInterval(this.sizeCheckInterval);
   }
 
   dispose() {
-    const self = this;
-    self.pause();
+    this.pause();
   }
 
   refresh() {
-    const self = this;
-    self.$element.empty();
-    const textElement = $('<span>').appendTo(self.$element)[0];
-    if (self.expandable) {
-      textElement.innerHTML = self.renderContents
-        ? self.renderContents(self.contents)
-        : self.contents;
-      if (self.expanded() || checkOverflow(self.element)) {
-        self.$element.append('&nbsp;');
+    this.$element.empty();
+    const textElement = $('<span>').appendTo(this.$element)[0];
+    if (this.expandable) {
+      textElement.innerHTML = this.renderContents
+        ? this.renderContents(this.contents)
+        : this.contents;
+      if (this.expanded() || checkOverflow(this.element)) {
+        this.$element.append('&nbsp;');
         const $expandLink = $(
           '<a href="javascript:void(0);"><i class="fa fa-fw ' +
-            (self.expanded() ? 'fa-chevron-up' : 'fa-chevron-down') +
+            (this.expanded() ? 'fa-chevron-up' : 'fa-chevron-down') +
             '"></i></a>'
         );
-        if (self.expandActionClass) {
-          $expandLink.addClass(self.expandActionClass);
+        if (this.expandActionClass) {
+          $expandLink.addClass(this.expandActionClass);
         }
-        $expandLink.appendTo(self.$element);
+        $expandLink.appendTo(this.$element);
         $expandLink.add(textElement).click(e => {
-          self.expanded(!self.expanded());
-          self.updateOverflowHeight();
-          if (self.expanded()) {
-            if (self.expandClass) {
-              self.$element.addClass(self.expandClass);
+          this.expanded(!this.expanded());
+          this.updateOverflowHeight();
+          if (this.expanded()) {
+            if (this.expandClass) {
+              this.$element.addClass(this.expandClass);
             }
-            self.refresh();
-            self.pause();
+            this.refresh();
+            this.pause();
           } else {
-            if (self.expandClass) {
-              self.$element.removeClass(self.expandClass);
+            if (this.expandClass) {
+              this.$element.removeClass(this.expandClass);
             }
-            self.resume();
+            this.resume();
           }
         });
       }
     } else {
-      textElement.innerHTML = self.renderContents
-        ? self.renderContents(self.contents)
-        : self.contents;
+      textElement.innerHTML = this.renderContents
+        ? this.renderContents(this.contents)
+        : this.contents;
     }
 
-    if (self.onActionRender) {
-      self.onActionRender(self.$element, checkOverflow(self.element));
+    if (this.onActionRender) {
+      this.onActionRender(this.$element, checkOverflow(this.element));
     }
 
-    self.isOverflowing = false;
+    this.isOverflowing = false;
 
-    if (!self.expanded()) {
-      while (checkOverflow(self.element)) {
-        self.isOverflowing = true;
+    if (!this.expanded()) {
+      while (checkOverflow(this.element)) {
+        this.isOverflowing = true;
         const contents = $(textElement).contents();
         const lastContent = contents[contents.length - 1];
         // Check for text node
-        if (lastContent.nodeType === 3) {
+        if (lastContent && lastContent.nodeType === 3) {
           const lastSpaceIndex = lastContent.textContent.regexLastIndexOf(/\s\S+/);
           if (lastSpaceIndex !== -1) {
             lastContent.replaceWith(
@@ -169,24 +162,27 @@ class MultiLineEllipsisHandler {
           } else {
             break;
           }
-        } else if (contents.length > 1) {
+        } else if (contents && contents.length > 1) {
           // Remove any elements like links
           textElement.removeChild(lastContent);
+        } else {
+          console.warn('Failed adjusting text length in element:');
+          console.warn(textElement);
+          break;
         }
       }
     }
 
-    if (ko.isObservable(self.overflowing) && self.overflowing() !== self.isOverflowing) {
-      self.overflowing(self.isOverflowing);
+    if (ko.isObservable(this.overflowing) && this.overflowing() !== this.isOverflowing) {
+      this.overflowing(this.isOverflowing);
     }
-    self.lastKnownOffsetHeight = self.element.offsetHeight;
-    self.lastKnownOffsetWidth = self.element.offsetWidth;
+    this.lastKnownOffsetHeight = this.element.offsetHeight;
+    this.lastKnownOffsetWidth = this.element.offsetWidth;
   }
 
   setText(text) {
-    const self = this;
-    self.contents = text;
-    self.refresh();
+    this.contents = text;
+    this.refresh();
   }
 }
 

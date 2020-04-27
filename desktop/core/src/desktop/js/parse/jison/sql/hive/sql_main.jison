@@ -68,9 +68,6 @@ SqlStatement
  : DataDefinition
  | DataManipulation
  | QuerySpecification
- | ExplainClause DataDefinition
- | ExplainClause DataManipulation
- | ExplainClause QuerySpecification
  ;
 
 SqlStatement_EDIT
@@ -82,17 +79,10 @@ SqlStatement_EDIT
    {
      parser.suggestKeywords(['INSERT', 'SELECT']);
    }
- | ExplainClause_EDIT
  | DataDefinition_EDIT
  | DataManipulation_EDIT
  | QuerySpecification_EDIT
  | SetSpecification_EDIT
- | ExplainClause DataDefinition_EDIT
- | ExplainClause DataManipulation_EDIT
- | ExplainClause QuerySpecification_EDIT
- | ExplainClause_EDIT DataDefinition
- | ExplainClause_EDIT DataManipulation
- | ExplainClause_EDIT QuerySpecification
  ;
 
 NonReservedKeyword
@@ -102,11 +92,14 @@ NonReservedKeyword
  | 'AFTER'
  | 'ANALYZE'
  | 'ARCHIVE'
+ | 'AST'
  | 'AVRO'
  | 'BUCKET'
  | 'BUCKETS'
  | 'CASCADE'
+ | 'CBO'
  | 'CHANGE'
+ | 'CHECK'
  | 'CLUSTERED'
  | 'COLLECTION'
  | 'COLUMNS'
@@ -115,22 +108,31 @@ NonReservedKeyword
  | 'COMPACTIONS'
  | 'COMPUTE'
  | 'CONCATENATE'
+ | 'COST'
+ | 'CURRENT_DATE'
+ | 'CURRENT_TIMESTAMP'
+ | 'CURRENT_USER'
  | 'DATA'
  | 'DATABASES'
  | 'DAY'
+ | 'DAYOFWEEK'
  | 'DBPROPERTIES'
+ | 'DEFAULT'
  | 'DEFERRED'
  | 'DEFINED'
  | 'DELIMITED'
  | 'DEPENDENCY'
+ | 'DETAIL'
  | 'DIRECTORY'
  | 'DISABLE'
+ | 'DISTRIBUTED'
  | 'DOUBLE_PRECISION'
  | 'ENABLE'
  | 'ESCAPED'
  | 'EXCHANGE'
  | 'EXPLAIN'
  | 'EXPORT'
+ | 'EXPRESSION'
  | 'FIELDS'
  | 'FILE'
  | 'FILEFORMAT'
@@ -143,14 +145,18 @@ NonReservedKeyword
  | 'INPUTFORMAT'
  | 'ITEMS'
  | 'JAR'
+ | 'JOINCOST'
  | 'JSONFILE'
  | 'KEY'
  | 'KEYS'
+ | 'LAST'
  | 'LINES'
+ | 'LITERAL'
  | 'LOAD'
  | 'LOCATION'
  | 'LOCKS'
  | 'MATCHED'
+ | 'MATERIALIZED'
  | 'MERGE'
  | 'METADATA'
  | 'MINUTE'
@@ -161,10 +167,13 @@ NonReservedKeyword
  | 'NOSCAN'
  | 'NOVALIDATE'
  | 'OFFLINE'
+ | 'ONLY'
+ | 'OPERATOR'
  | 'OPTION'
  | 'ORC'
  | 'OUTPUTFORMAT'
  | 'OVERWRITE'
+ | 'OVERWRITE_DIRECTORY'
  | 'OWNER'
  | 'PARQUET'
  | 'PARTITIONED'
@@ -183,6 +192,7 @@ NonReservedKeyword
  | 'REPLACE'
  | 'REPLICATION'
  | 'RESTRICT'
+ | 'REWRITE'
  | 'ROLE'
  | 'ROLES'
  | 'SCHEMAS'
@@ -192,26 +202,29 @@ NonReservedKeyword
  | 'SERDEPROPERTIES'
  | 'SETS'
  | 'SHOW'
+ | 'SKEWED_LOCATION'
  | 'SKEWED'
  | 'SORTED'
  | 'STATISTICS'
  | 'STORED'
+ | 'STORED_AS_DIRECTORIES'
  | 'STRING'
  | 'STRUCT'
+ | 'SUMMARY'
  | 'TABLES'
  | 'TBLPROPERTIES'
  | 'TEMPORARY'
  | 'TERMINATED'
  | 'TEXTFILE'
- | 'TIMESTAMP'
  | 'TINYINT'
  | 'TOUCH'
  | 'TRANSACTIONAL'
  | 'TRANSACTIONS'
  | 'UNARCHIVE'
  | 'UNIONTYPE'
+ | 'UNIQUE'
  | 'USE'
- | 'USER'
+ | 'VECTORIZATION'
  | 'VIEW'
  | 'WAIT'
  | 'WEEK'
@@ -221,41 +234,22 @@ NonReservedKeyword
 // | 'DESC'
 // | 'DISTRIBUTE'
 // | 'FORMATTED'
-// | 'FUNCTION'
 // | 'INDEX'
 // | 'INDEXES'
 // | 'LOCK'
+// | 'OVER'
 // | 'SCHEMA'
 // | 'SHOW_DATABASE'
 // | 'SORT'
+// | 'TABLESAMPLE'
+// | 'WINDOW'
+// | 'WITH'
  ;
 
 RegularIdentifier
  : 'REGULAR_IDENTIFIER'
  | 'VARIABLE_REFERENCE'
  | NonReservedKeyword
- ;
-
-ExplainClause
- : 'EXPLAIN' OptionalExplainTypes
- ;
-
-ExplainClause_EDIT
- : 'EXPLAIN' OptionalExplainTypes 'CURSOR'
-   {
-     if (!$2) {
-       parser.suggestDdlAndDmlKeywords([{ value: 'AUTHORIZATION', weight: 2 }, { value: 'DEPENDENCY', weight: 2 }, { value: 'EXTENDED', weight: 2 }]);
-     } else {
-       parser.suggestDdlAndDmlKeywords();
-     }
-   }
- ;
-
-OptionalExplainTypes
- :
- | 'AUTHORIZATION'
- | 'DEPENDENCY'
- | 'EXTENDED'
  ;
 
 // This is a work-around for error handling when a statement starts with some token that the parser can understand but
@@ -370,6 +364,7 @@ NonStartingToken
  | 'INPATH'
  | 'INPUTFORMAT'
  | 'INT'
+ | 'INTEGER'
  | 'INTO'
  | 'IS'
  | 'ITEMS'
@@ -378,6 +373,7 @@ NonStartingToken
  | 'JSONFILE'
  | 'KEY'
  | 'KEYS'
+ | 'LAST'
  | 'LATERAL'
  | 'LEFT'
  | 'LIKE'
@@ -402,6 +398,7 @@ NonStartingToken
  | 'NOVALIDATE'
  | 'NTILE'
  | 'NULL'
+ | 'NULLS'
  | 'OF'
  | 'ON'
  | 'OPTION'
@@ -1121,6 +1118,7 @@ PrimitiveType
  | 'DOUBLE_PRECISION'
  | 'FLOAT'
  | 'INT'
+ | 'INTEGER'
  | 'SMALLINT'
  | 'STRING'
  | 'TIMESTAMP'
@@ -1975,30 +1973,52 @@ OrderByColumnList_EDIT
  ;
 
 OrderByIdentifier
- : ValueExpression OptionalAscOrDesc  -> parser.mergeSuggestKeywords($2)
+ : ValueExpression OptionalAscOrDesc OptionalNullsFirstOrLast
+   {
+     if ($2.suggestKeywords && $3.suggestKeywords) {
+       $$ = parser.mergeSuggestKeywords($2, $3);
+     } else {
+       $$ = parser.mergeSuggestKeywords($3);
+     }
+   }
  ;
 
 OrderByIdentifier_EDIT
- : ValueExpression_EDIT OptionalAscOrDesc
+ : ValueExpression_EDIT OptionalAscOrDesc OptionalNullsFirstOrLast
    {
      parser.suggestSelectListAliases();
    }
- | AnyCursor OptionalAscOrDesc
+ | AnyCursor OptionalAscOrDesc OptionalNullsFirstOrLast
    {
      $$ = { emptyOrderBy: true }
      parser.valueExpressionSuggest();
      parser.suggestAnalyticFunctions();
      parser.suggestSelectListAliases();
    }
+ | ValueExpression OptionalAscOrDesc NullsFirstOrLast_EDIT
  ;
 
 OptionalAscOrDesc
- :
-  {
-    $$ = { suggestKeywords: ['ASC', 'DESC'] };
-  }
+ :                          -> { suggestKeywords: ['ASC', 'DESC'] };
  | 'ASC'
  | 'DESC'
+ ;
+
+OptionalNullsFirstOrLast
+ :                          -> { suggestKeywords: ['NULLS FIRST', 'NULLS LAST'] }
+ | NullsFirstOrLast
+ ;
+
+NullsFirstOrLast
+ : 'NULLS' 'FIRST'
+ | 'NULLS' 'LAST'
+ ;
+
+NullsFirstOrLast_EDIT
+ : 'NULLS' 'CURSOR'
+   {
+     parser.suggestKeywords(['FIRST', 'LAST']);
+   }
  ;
 
 OptionalClusterOrDistributeBy
@@ -3456,35 +3476,35 @@ CountFunction_EDIT
  ;
 
 ExtractFunction
- : 'EXTRACT' '(' DateField 'FROM' ValueExpression ')'  -> { types: ['INT'] }
+ : 'EXTRACT' '(' DateField 'FROM' ValueExpression ')'  -> { types: ['INT', 'INTEGER'] }
  ;
 
 ExtractFunction_EDIT
  : 'EXTRACT' '(' AnyCursor RightParenthesisOrError
    {
      parser.suggestKeywords(['DAY', 'DAYOFWEEK', 'HOUR', 'MINUTE', 'MONTH', 'QUARTER', 'SECOND', 'WEEK', 'YEAR']);
-     $$ = { types: ['INT'] }
+     $$ = { types: ['INT', 'INTEGER'] }
    }
  | 'EXTRACT' '(' DateField 'CURSOR' RightParenthesisOrError
    {
      parser.suggestKeywords(['FROM']);
-     $$ = { types: ['INT'] }
+     $$ = { types: ['INT', 'INTEGER'] }
    }
  | 'EXTRACT' '(' DateField 'FROM' 'CURSOR' RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
-     $$ = { types: ['INT'] }
+     $$ = { types: ['INT', 'INTEGER'] }
    }
- | 'EXTRACT' '(' DateField 'FROM' ValueExpression_EDIT RightParenthesisOrError  -> { types: ['INT'] }
+ | 'EXTRACT' '(' DateField 'FROM' ValueExpression_EDIT RightParenthesisOrError  -> { types: ['INT', 'INTEGER'] }
  | 'EXTRACT' '(' AnyCursor 'FROM' ValueExpression RightParenthesisOrError
    {
       parser.suggestKeywords(['DAY', 'DAYOFWEEK', 'HOUR', 'MINUTE', 'MONTH', 'QUARTER', 'SECOND', 'WEEK', 'YEAR']);
-      $$ = { types: ['INT'] }
+      $$ = { types: ['INT', 'INTEGER'] }
    }
  | 'EXTRACT' '(' DateField 'CURSOR' ValueExpression RightParenthesisOrError
    {
      parser.suggestKeywords(['FROM']);
-     $$ = { types: ['INT'] }
+     $$ = { types: ['INT', 'INTEGER'] }
    }
  ;
 

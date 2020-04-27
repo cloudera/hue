@@ -8,33 +8,26 @@
 Query. Explore. Share.
 ----------------------
 
-Hue is an open source SQL Assistant for querying, visualizing and sharing data in Databases & Data Warehouses: [gethue.com](http://gethue.com)
+Hue is a mature open source SQL Assistant for [querying](https://docs.gethue.com/user/querying/) any [Databases & Data Warehouses](https://docs.gethue.com/administrator/configuration/connectors/) and collaborating: [gethue.com](http://gethue.com)
 
-It features:
+Many companies and organizations use Hue to quickly answer questions via self-service querying e.g.:
 
-   * [Editors](http://gethue.com/sql-editor/) to query with SQL [any database](https://docs.gethue.com/latest/administrator/configuration/editor/#connectors) and submit jobs
-   * [Dashboards](http://gethue.com/search-dashboards/) to dynamically interact and visualize data
-   * [Scheduler](http://gethue.com/scheduling/) of jobs and workflows
-   * [Catalog](http://gethue.com/browsers/) for browsing data storages and metadata
+* 1000+ customers
+* Top Fortune 500
+
+are executing 100s of 1000s of queries daily. It also [ships](https://docs.gethue.com/administrator/installation/) in Cloudera Data Platform, Amazon AWS, Open Data Hub...
+
+Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/api/) and any [contributions](https://docs.gethue.com/developer/) are welcome.
 
 
-![alt text](docs/images/sql-editor.png "Hue Editor")
+![Hue Editor](https://cdn.gethue.com/uploads/2020/04/hue-4.7.png)
 
-
-Who is using Hue
-----------------
-Thousands of companies and organizations use Hue to open-up their data and provide self service querying. Hue is heavily used by:
-
-* 1000+ paying customers
-* top Fortune 500
-
-who are executing 100s of 1000s of queries daily. It also ships in Amazon AWS and its open source version is used by hundred of companies.
-
-Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/parsers/) and any [contributions](CONTRIBUTING.md) are welcome.
 
 Getting Started
 ---------------
-Add the development packages, build and get the development server running:
+The [Forum](https://discourse.gethue.com/) is here in case you are looking for help.
+
+First, add the development packages, build and get the development server running:
 ```
 git clone https://github.com/cloudera/hue.git
 cd hue
@@ -65,7 +58,7 @@ Read more about configurations at [``tools/kubernetes``](tools/kubernetes/).
 Community
 -----------
    * How to [contribute](CONTRIBUTING.md)
-   * Help Forum: https://discourse.gethue.com/ ([previous mailing list](http://groups.google.com/a/cloudera.org/group/hue-user))
+   * Help Forum: https://discourse.gethue.com/
    * High level [roadmap](docs/ROADMAP.md)
    * Jira: https://issues.cloudera.org/browse/HUE
 

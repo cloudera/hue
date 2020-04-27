@@ -17,7 +17,7 @@
 // based on the original https://github.com/brianchance/knockout-x-editable
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 ko.bindingHandlers.editable = {
   init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
@@ -125,7 +125,7 @@ ko.bindingHandlers.editable = {
 
         if (!multiLineEllipsisHandler) {
           multiLineEllipsisHandler = new MultiLineEllipsisHandler({
-            element: this,
+            element: element,
             text: value,
             overflowHeight: editableOptions.multiLineEllipsis.overflowHeight,
             expandable: editableOptions.multiLineEllipsis,
@@ -183,18 +183,10 @@ ko.bindingHandlers.editable = {
     if (ko.isObservable(value)) {
       $editable.on('save.ko', function (e, params) {
         var newValue = params.newValue || '';
-        if (editableOptions.type === 'wysihtml5') {
-          if (editableOptions.skipNewLines) {
-            newValue = newValue.replace(/<br\s*[\/]?>/gi, ' ').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-          } else {
-            newValue = newValue.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-          }
-        } else {
-          newValue = newValue.replace(/<(?:.|\n)*?>/gm, '');
+        newValue = newValue.replace(/<(?:.|\n)*?>/gm, '');
 
-          if (editableOptions.type !== 'textarea') {
-            newValue = newValue.replace(/\r?\n|\r/g, ' ');
-          }
+        if (editableOptions.type !== 'textarea') {
+          newValue = newValue.replace(/\r?\n|\r/g, ' ');
         }
         value(newValue);
       })

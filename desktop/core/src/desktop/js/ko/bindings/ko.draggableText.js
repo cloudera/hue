@@ -15,11 +15,15 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
+import { registerBinding } from './bindingUtils';
 
-ko.bindingHandlers.draggableText = {
+export const DRAGGABLE_TEXT_META_EVENT = 'draggable.text.meta';
+export const NAME = 'draggableText';
+
+registerBinding(NAME, {
   init: function(element, valueAccessor) {
     const $element = $(element);
     const options = valueAccessor();
@@ -42,7 +46,7 @@ ko.bindingHandlers.draggableText = {
       start: function(event) {
         dragStartX = event.clientX;
         dragStartY = event.clientY;
-        huePubSub.publish('draggable.text.meta', options.meta);
+        huePubSub.publish(DRAGGABLE_TEXT_META_EVENT, options.meta);
         notifiedOnDragStarted = false;
       },
       drag: function(event) {
@@ -80,4 +84,4 @@ ko.bindingHandlers.draggableText = {
       }
     });
   }
-};
+});

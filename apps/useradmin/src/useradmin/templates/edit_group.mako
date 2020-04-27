@@ -14,19 +14,27 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-import urllib
+import sys
 
 from django.utils.translation import ugettext as _
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_util import extract_field_data
 from desktop.views import commonheader, commonfooter
+
+if sys.version_info[0] > 2:
+  from urllib.parse import quote as urllib_quote
+  unicode = str
+else:
+  from urllib import quote as urllib_quote
 %>
 
 <%namespace name="layout" file="layout.mako" />
 
 % if not is_embeddable:
-${ commonheader(_('Hue Groups'), "useradmin", user, request) | n,unicode }
+  ${ commonheader(_('Groups'), "useradmin", user, request) | n,unicode }
 % endif
+
 ${ layout.menubar(section='groups') }
 
 <%def name="render_field(field)">
@@ -47,18 +55,23 @@ ${ layout.menubar(section='groups') }
 <div id="editGroupComponents" class="useradmin container-fluid">
   <div class="card card-small">
     % if name:
-        <h1 class="card-heading simple">${ _('Hue Groups - Edit group: %(name)s') % {'name': name} }</h1>
+        <h1 class="card-heading simple">
+          ${ _('Edit %(name)s') % {'name': name} }
+          % if ENABLE_ORGANIZATIONS.get():
+            @ ${ user.organization }
+          % endif
+        </h1>
     % else:
       % if ldap:
-          <h1 class="card-heading simple">${_('Hue Groups - Add/Sync LDAP group')}</h1>
+          <h1 class="card-heading simple">${_('Add/Sync LDAP group')}</h1>
       % else:
-          <h1 class="card-heading simple">${_('Hue Groups - Create group')}</h1>
+          <h1 class="card-heading simple">${_('Create group')}</h1>
       % endif
     % endif
 
     <br/>
 
-    <form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal" autocomplete="off">
+    <form id="editForm" action="${urllib_quote(action)}" method="POST" class="form form-horizontal" autocomplete="off">
       ${ csrf_token(request) | n,unicode }
       <fieldset>
         % for field in form:
@@ -127,5 +140,5 @@ ${ layout.menubar(section='groups') }
 ${ layout.commons() }
 
 % if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
+  ${ commonfooter(request, messages) | n,unicode }
 % endif

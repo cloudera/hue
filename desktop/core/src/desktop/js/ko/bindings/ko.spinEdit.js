@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 ko.bindingHandlers.spinedit = {
   init: function(element, valueAccessor, allBindingsAccessor) {

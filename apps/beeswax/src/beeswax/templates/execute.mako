@@ -51,8 +51,6 @@ ${ layout.menubar(section='query') }
                 user: HIVE_AUTOCOMPLETE_USER,
                 onlySql: true,
                 sql: {
-                  sourceTypes: editorViewModel.sqlSourceTypes,
-                  activeSourceType: snippetType,
                   navigationSettings: {
                     openItem: false,
                     showPreview: true,
@@ -2817,7 +2815,7 @@ huePubSub.subscribe("assist.database.set", handleAssistSelection);
 huePubSub.subscribe("assist.database.selected", handleAssistSelection);
 
 if (! snippet.database()) {
-  huePubSub.publish("assist.get.database", snippetType);
+  huePubSub.publish("assist.get.database", { source: snippetType, callback: handleAssistSelection });
 }
 
 shareViewModel = initSharing("#documentShareModal");

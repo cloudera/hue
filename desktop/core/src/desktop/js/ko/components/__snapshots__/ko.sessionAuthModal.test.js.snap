@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.sessionAuthModal.js should render component 1`] = `
+"<html><head></head><body class=\\"modal-open\\"><div id=\\"sessionAuthModal\\" data-bind=\\"descendantsComplete: descendantsComplete, component: { name: 'session-auth-modal', params: params }\\" data-keyboard=\\"true\\" class=\\"modal hide fade in\\" tabindex=\\"-1\\" aria-hidden=\\"false\\">
+<div class=\\"modal-header\\">
+  <button type=\\"button\\" class=\\"close\\" data-dismiss=\\"modal\\" aria-label=\\"Close\\"><span aria-hidden=\\"true\\">×</span></button>
+  <h2 class=\\"modal-title\\">Connect to the data source</h2>
+</div>
+<div class=\\"modal-body\\">
+  <!-- ko if: authSessionMessage -->
+    <div class=\\"row-fluid\\">
+      <div class=\\"alert-warning\\">
+        <span data-bind=\\"text: authSessionMessage\\">hello</span>
+      </div>
+    </div>
+  <!-- /ko -->
+  <div class=\\"row-fluid\\">
+    <div class=\\"span6\\">
+      <div class=\\"input-prepend\\">
+        <span class=\\"add-on muted\\"><i class=\\"fa fa-user\\"></i></span>
+        <input name=\\"username\\" data-test=\\"usernameInput\\" type=\\"text\\" data-bind=\\"textInput: authSessionUsername\\" placeholder=\\"Username\\">
+      </div>
+    </div>
+    <div class=\\"span6\\">
+      <div class=\\"input-prepend\\">
+        <span class=\\"add-on muted\\"><i class=\\"fa fa-lock\\"></i></span>
+        <input name=\\"password\\" data-test=\\"passwordInput\\" type=\\"password\\" data-bind=\\"textInput: authSessionPassword\\" placeholder=\\"Password\\">
+      </div>
+    </div>
+  </div>
+</div>
+<div class=\\"modal-footer\\">
+  <a class=\\"btn\\" data-dismiss=\\"modal\\">Cancel</a>
+  <a class=\\"btn btn-primary disable-feedback\\" data-bind=\\"click: connect, css: { 'disabled': loading }\\"><i class=\\"fa fa-spinner fa-spin\\" data-bind=\\"visible: loading\\" style=\\"display: none;\\"></i> Connect</a>
+</div>
+</div><div class=\\"modal-backdrop fade in\\"></div></body></html>"
+`;

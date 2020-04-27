@@ -25,7 +25,7 @@
           <div class="nav-collapse">
             <ul class="nav">
               <li class="app-header">
-                <a href="/${app_name}">
+                <a href="/metastore">
                   <img src="${ static('metastore/art/icon_metastore_48.png') }" class="app-icon" alt="${ _('Metastore icon') }" />
                   ${ _('Table Browser') if is_embeddable else _('Metastore Manager') }
                 </a>

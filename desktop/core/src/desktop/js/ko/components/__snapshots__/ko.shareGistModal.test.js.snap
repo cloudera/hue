@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.shareGistModal.js should render component 1`] = `
+"<html><head></head><body class=\\"modal-open\\"><div id=\\"shareGistModal\\" data-bind=\\"descendantsComplete: descendantsComplete, component: { name: 'share-gist-modal', params: params }\\" data-keyboard=\\"true\\" class=\\"modal hide fade in\\" tabindex=\\"-1\\" aria-hidden=\\"false\\">
+  <div class=\\"modal-header\\">
+    <button type=\\"button\\" class=\\"close\\" data-dismiss=\\"modal\\" aria-label=\\"Close\\"><span aria-hidden=\\"true\\">×</span></button>
+    <h2 class=\\"modal-title\\">Shareable link</h2>
+  </div>
+  <div class=\\"modal-body\\">
+    <div class=\\"row-fluid\\">
+      <div class=\\"span12\\">
+        <form autocomplete=\\"off\\">
+          <input id=\\"gistLink\\" class=\\"input-xxlarge\\" autocorrect=\\"off\\" autocomplete=\\"do-not-autocomplete\\" autocapitalize=\\"off\\" spellcheck=\\"false\\" onfocus=\\"this.select()\\" data-bind=\\"value: link\\" type=\\"text\\" placeholder=\\"Link\\">
+        </form>
+        <button class=\\"btn\\" type=\\"button\\" data-dismiss=\\"modal\\" data-clipboard-target=\\"#gistLink\\" data-bind=\\"clipboard\\">
+          <i class=\\"fa fa-clipboard\\"></i> Copy
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class=\\"modal-footer\\">
+    <a class=\\"btn\\" data-dismiss=\\"modal\\">Close</a>
+  </div>
+</div><div class=\\"modal-backdrop fade in\\"></div></body></html>"
+`;

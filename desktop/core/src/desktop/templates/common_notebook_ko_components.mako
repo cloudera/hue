@@ -21,6 +21,7 @@ from django.utils.translation import ugettext as _
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
+
 from beeswax.conf import DOWNLOAD_ROW_LIMIT, DOWNLOAD_BYTES_LIMIT
 from notebook.conf import ENABLE_SQL_INDEXER
 %>
@@ -215,11 +216,13 @@ from notebook.conf import ENABLE_SQL_INDEXER
           </a>
         </li>
         % endif
+        % if request.fs:
         <li>
           <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal' + snippet.id()).modal('show'); }" title="${ _('Export the result into a file, an index, a new table...') }">
             <i class="fa fa-fw fa-cloud-upload"></i> ${ _('Export') }
           </a>
         </li>
+        % endif
       </ul>
     </div>
 
@@ -389,30 +392,33 @@ from notebook.conf import ENABLE_SQL_INDEXER
         });
 
         var clipboard = new Clipboard('.clipboard' + self.snippet.id().split('-')[0], {
-          text: function () {
+          target: function (trigger) {
             if (self.snippet.result && self.snippet.result.data()) {
               var data = self.snippet.result.data();
-              var result = '';
+              var result = '<table><tr>';
               for (var i = 1; i < self.snippet.result.meta().length; i++) { // Skip the row number column
-                result += hueUtils.html2text(self.snippet.result.meta()[i].name) + '\t';
+                result += '<th>' + hueUtils.html2text(self.snippet.result.meta()[i].name) + '</th>';
               }
-              result += '\n';
+              result += '</tr>';
               data.forEach(function (row) {
+                result += '<tr>';
                 for (var i = 1; i < row.length; i++) { // Skip the row number column
-                  result += hueUtils.html2text(row[i]) + '\t';
+                  result += '<td>' + hueUtils.html2text(row[i]) + '</td>';
                 }
-                result += '\n';
+                result += '</tr>';
               });
-              return result;
+              $('.clipboard-content').html(result);
             } else {
-              return window.I18n('Error while copying results.');
+              $('.clipboard-content').html(window.I18n('Error while copying results.'));
             }
+            return $('.clipboard-content')[0];
           }
         });
 
         clipboard.on('success', function (e) {
           $.jHueNotify.info(self.snippet.result.data().length + ' ' + window.I18n('result(s) copied to the clipboard'));
           e.clearSelection();
+          $('.clipboard-content').empty();
         });
 
         self.trySaveResults = function () {
@@ -449,7 +455,7 @@ from notebook.conf import ENABLE_SQL_INDEXER
                 huePubSub.publish('open.link', resp.watch_url);
               } else if (resp.history_uuid) {
                 $(self.saveResultsModalId).modal('hide');
-                huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+                huePubSub.publish('notebook.task.submitted', resp);
               } else if (resp && resp.message) {
                 $(document).trigger("error", resp.message);
               }

@@ -14,12 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
+
+export const NAME = 'field-samples';
 
 const TEMPLATE = `
   <div class="context-popover-inline-autocomplete" style="display: flex">
@@ -232,4 +234,4 @@ class FieldSamples {
   }
 }
 
-componentUtils.registerComponent('field-samples', FieldSamples, TEMPLATE);
+componentUtils.registerComponent(NAME, FieldSamples, TEMPLATE);

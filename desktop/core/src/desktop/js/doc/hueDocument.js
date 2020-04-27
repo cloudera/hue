@@ -15,10 +15,13 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import hueUtils from 'utils/hueUtils';
+import huePubSub from 'utils/huePubSub';
+
+export const DOCUMENT_UPDATED_EVENT = 'hue.document.updated';
 
 class HueDocument {
   /**
@@ -42,11 +45,29 @@ class HueDocument {
     this.idToUserMap = {};
     this.groupMap = {};
     this.items = [];
+
+    huePubSub.subscribe(DOCUMENT_UPDATED_EVENT, definition => {
+      if (this.definition() && this.definition().uuid === definition.uuid) {
+        this.definition(definition);
+      }
+    });
+  }
+
+  isShared() {
+    const perms = this.definition() && this.definition().perms;
+    return (
+      perms &&
+      (perms.read.users.length > 0 ||
+        perms.read.groups.length > 0 ||
+        perms.write.users.length > 0 ||
+        perms.write.groups.length > 0 ||
+        perms.link_sharing_on)
+    );
   }
 
   onShareAutocompleteUserEnter() {
     const self = this;
-    const searchAutoCompInput = $('#userSearchAutocomp').val();
+    const searchAutoCompInput = $('#shareDocUserInput').val();
     const selectedUserOrGroup = self.userMap[searchAutoCompInput]
       ? self.userMap[searchAutoCompInput]
       : self.groupMap[searchAutoCompInput];
@@ -58,7 +79,7 @@ class HueDocument {
       }
       this.persistPerms();
     }
-    $('#userSearchAutocomp').val('');
+    $('#shareDocUserInput').val('');
   }
 
   shareAutocompleteUserSource(request, callback) {
@@ -145,7 +166,37 @@ class HueDocument {
     });
   }
 
-  load() {
+  persistLinkSharingPerms(perm) {
+    // Perm is either: read, write, off
+    const self = this;
+
+    $.post(
+      '/desktop/api2/doc/share/link',
+      {
+        uuid: JSON.stringify(self.fileEntry.definition().uuid),
+        perm: JSON.stringify(perm)
+      },
+      response => {
+        if (response != null) {
+          if (response.status !== 0) {
+            $(document).trigger(
+              'error',
+              'There was an error processing your action: ' + response.message
+            );
+          } else {
+            // self.load();
+          }
+        }
+      }
+    ).fail(response => {
+      $(document).trigger(
+        'error',
+        'There was an error processing your action: ' + response.responseText
+      );
+    });
+  }
+
+  load(successCallback, errorCallback) {
     const self = this;
     if (self.loading()) {
       return;
@@ -154,40 +205,49 @@ class HueDocument {
     self.loading(true);
     self.hasErrors(false);
 
-    const fetchDocumentsSuccessCallback = data => {
-      const readUsers = data.document.perms.read.users.map(user => user.id);
-      const writeUsers = data.document.perms.write.users.map(user => user.id);
-      const allUsers = readUsers.concat(writeUsers);
-      if (allUsers.length > 0) {
-        apiHelper.fetchUsersByIds({
-          userids: JSON.stringify(allUsers),
-          successCallback: response => {
-            response.users.forEach(user => {
-              // Needed for getting prettyusername of already shared users
-              self.idToUserMap[user.id] = user;
-            });
-            self.definition(data.document);
-          },
-          errorCallback: () => {}
-        });
-      } else {
-        self.definition(data.document);
-      }
-    };
+    const fetchDocumentsSuccessCallback = async data =>
+      new Promise(resolve => {
+        const readUsers = data.document.perms.read.users.map(user => user.id);
+        const writeUsers = data.document.perms.write.users.map(user => user.id);
+        const allUsers = readUsers.concat(writeUsers);
+        if (allUsers.length > 0) {
+          apiHelper.fetchUsersByIds({
+            userids: JSON.stringify(allUsers),
+            successCallback: response => {
+              response.users.forEach(user => {
+                // Needed for getting prettyusername of already shared users
+                self.idToUserMap[user.id] = user;
+              });
+              self.definition(data.document);
+              resolve();
+            },
+            errorCallback: () => {}
+          });
+        } else {
+          self.definition(data.document);
+          resolve();
+        }
+      });
 
     apiHelper
       .fetchDocument({
         uuid: self.fileEntry.definition().uuid
       })
-      .done(data => {
-        fetchDocumentsSuccessCallback(data);
+      .done(async data => {
+        await fetchDocumentsSuccessCallback(data);
         self.loading(false);
         self.loaded(true);
+        if (successCallback) {
+          successCallback(this);
+        }
       })
       .fail(() => {
         self.hasErrors(true);
         self.loading(false);
         self.loaded(true);
+        if (errorCallback) {
+          errorCallback();
+        }
       });
   }
 

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.LanguageCode | default "en-us" }}">
+
+<head>
+  <meta charset="utf-8" />
+  <title>
+    Hue - The open source SQL Assistant for Data Warehouses
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  {{ with .Site.Params.description }}
+  <meta name="description" content="{{ . }}" />
+  {{ end }} {{ with .Site.Params.author }}
+  <meta name="author" content="{{ . }}" />
+  {{ end }}
+
+  <link href="{{ .Site.BaseURL }}/css/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+  <link
+    href="{{ .Site.BaseURL }}/css/stack-interface.css"
+    rel="stylesheet"
+    type="text/css"
+    media="all"
+  />
+  <link href="{{ .Site.BaseURL }}/css/socicon.css" rel="stylesheet" type="text/css" media="all" />
+  <link
+    href="{{ .Site.BaseURL }}/css/lightbox.min.css"
+    rel="stylesheet"
+    type="text/css"
+    media="all"
+  />
+  <link href="{{ .Site.BaseURL }}/css/iconsmind.css" rel="stylesheet" type="text/css" media="all" />
+  <link href="{{ .Site.BaseURL }}/css/theme.css" rel="stylesheet" type="text/css" media="all" />
+  <link href="{{ .Site.BaseURL }}/css/custom.css" rel="stylesheet" type="text/css" media="all" />
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:200,300,400,400i,500,600,700%7CMerriweather:300,300i"
+    rel="stylesheet"
+  />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+</head>
+
+<body class="dropdowns--hover">
+  <a id="start"></a>
+  <div class="nav-container">
+    <div>
+      <div class="bar bar--sm visible-xs">
+        <div class="container">
+          <div class="row">
+            <div class="col-3 col-md-2">
+              <a href="{{ .Site.BaseURL }}/">
+                <img class="logo logo-dark" alt="logo" src="{{ .Site.BaseURL }}/img/hue-logo.svg" />
+              </a>
+            </div>
+            <div class="col-9 col-md-10 text-right">
+              <a href="#" class="hamburger-toggle" data-toggle-class="#menu1;hidden-xs hidden-sm">
+                <i class="icon icon--sm stack-interface stack-menu"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <nav id="menu1" class="bar bar-1 hidden-xs" data-scroll-class="100px:pos-fixed">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-1 col-md-2 hidden-xs">
+              <div class="bar__module">
+                <a href="{{ .Site.BaseURL }}/">
+                  <img class="logo logo-dark" alt="logo" src="{{ .Site.BaseURL }}/img/hue-logo.svg"
+                /></a>
+              </div>
+            </div>
+            <div class="col-lg-11 col-md-12 text-right text-left-xs text-left-sm">
+              <div class="bar__module">
+                <ul class="menu-horizontal text-left">
+                  <li class="dropdown">
+                    <span class="dropdown__trigger">
+                      {{ i18n "product" }}
+                    </span>
+                    <div class="dropdown__container">
+                      <div class="container">
+                        <div class="row">
+                          <div class="dropdown__content col-lg-2">
+                            <ul class="menu-vertical">
+                              <li>
+                                <a href="{{ .Site.Params.docsHost }}/user/querying/"
+                                  >{{ i18n "user" }}</a
+                                >
+                              </li>
+                              <li>
+                                <a href="{{ .Site.Params.docsHost }}/administrator/"
+                                  >{{ i18n "admin" }}</a
+                                >
+                              </li>
+                              <li>
+                                <a href="{{ .Site.Params.docsHost }}/developer/"
+                                  >{{ i18n "developer" }}</a
+                                >
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <a href="{{ .Site.BaseURL }}/posts/">
+                      {{ i18n "blog" }}
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://discourse.gethue.com/">
+                      {{ i18n "forum" }}
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/cloudera/hue" title="GitHub" target="_blank">
+                      <i class="socicon socicon-github icon icon--xs"></i>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <div class="bar__module">
+                <a
+                  class="btn btn--sm type--uppercase"
+                  href="https://docs.gethue.com/quickstart/"
+                  target="_blank"
+                >
+                  <span class="btn__text">
+                    {{ i18n "quickstart" }}
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </div>
+</body>

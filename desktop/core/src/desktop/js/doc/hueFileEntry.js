@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
@@ -163,7 +163,8 @@ class HueFileEntry {
         (perms.read.users.length > 0 ||
           perms.read.groups.length > 0 ||
           perms.write.users.length > 0 ||
-          perms.write.groups.length > 0)
+          perms.write.groups.length > 0 ||
+          perms.link_sharing_on)
       );
     });
 
@@ -178,7 +179,8 @@ class HueFileEntry {
           (perms.write.users.some(user => user.username === this.user) ||
             perms.write.groups.some(
               writeGroup => LOGGED_USERGROUPS.indexOf(writeGroup.name) !== -1
-            )))
+            ) ||
+            (perms.link_sharing_on && perms.link_write)))
       );
     });
 
@@ -376,7 +378,7 @@ class HueFileEntry {
     }
     if (this.selectedEntry()) {
       this.selectedEntry().loadDocument();
-      $('#shareDocumentModal').modal('show');
+      huePubSub.publish('doc.show.share.modal', this.selectedEntry());
     }
   }
 
@@ -408,9 +410,24 @@ class HueFileEntry {
     copyNext();
   }
 
-  loadDocument() {
-    this.document(new HueDocument({ fileEntry: this }));
-    this.document().load();
+  async loadDocument(successCallback, errorCallback) {
+    return new Promise((resolve, reject) => {
+      this.document(new HueDocument({ fileEntry: this }));
+      this.document().load(
+        () => {
+          if (successCallback) {
+            successCallback(this.document());
+          }
+          resolve(this.document());
+        },
+        err => {
+          if (errorCallback) {
+            errorCallback(err);
+          }
+          reject(err);
+        }
+      );
+    });
   }
 
   /**

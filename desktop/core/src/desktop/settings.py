@@ -20,14 +20,15 @@
 # Local customizations are done by symlinking a file
 # as local_settings.py.
 
-from builtins import map
-from builtins import zip
+from builtins import map, zip
+import datetime
 import gc
 import json
 import logging
 import os
 import pkg_resources
 import sys
+import uuid
 
 import django_opentracing
 
@@ -36,6 +37,7 @@ from django.utils.translation import ugettext_lazy as _
 import desktop.redaction
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
+from desktop.conf import has_channels
 
 from aws.conf import is_enabled as is_s3_enabled
 from azure.conf import is_abfs_enabled
@@ -49,6 +51,7 @@ NICE_NAME = "Hue"
 
 ENV_HUE_PROCESS_NAME = "HUE_PROCESS_NAME"
 ENV_DESKTOP_DEBUG = "DESKTOP_DEBUG"
+LOGGING_CONFIG = None # We're handling our own logging config. Consider upgrading our logging infra to LOGGING_CONFIG
 
 
 ############################################################
@@ -169,6 +172,7 @@ MIDDLEWARE_CLASSES = [
     #@TODO@ Prakash to check FailedLoginMiddleware working or not?
     #'axes.middleware.FailedLoginMiddleware',
     'desktop.middleware.MimeTypeJSFileFixStreamingMiddleware',
+    'crequest.middleware.CrequestMiddleware',
 ]
 
 # if os.environ.get(ENV_DESKTOP_DEBUG):
@@ -186,7 +190,6 @@ GTEMPLATE_DIRS = (
 
 INSTALLED_APPS = [
     'django.contrib.auth',
-    'django_openid_auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
@@ -208,6 +211,7 @@ INSTALLED_APPS = [
     'axes',
     'webpack_loader',
     'django_prometheus',
+    'crequest',
     #'django_celery_results',
 ]
 
@@ -328,6 +332,11 @@ if DEBUG: # For simplification, force all DEBUG when django_debug_mode is True a
 
 if desktop.conf.ENABLE_ORGANIZATIONS.get():
   AUTH_USER_MODEL = 'useradmin.OrganizationUser'
+  MIGRATION_MODULES = {
+    'beeswax': 'beeswax.org_migrations',
+    'useradmin': 'useradmin.org_migrations',
+    'desktop': 'desktop.org_migrations',
+  }
 
 # Configure allowed hosts
 ALLOWED_HOSTS = desktop.conf.ALLOWED_HOSTS.get()
@@ -480,12 +489,23 @@ if EMAIL_BACKEND == 'sendgrid_backend.SendgridBackend':
   SENDGRID_SANDBOX_MODE_IN_DEBUG = DEBUG
 
 
+if has_channels():
+  INSTALLED_APPS.append('channels')
+  ASGI_APPLICATION = 'desktop.routing.application'
+  CHANNEL_LAYERS = {
+    'default': {
+      'BACKEND': 'channels_redis.core.RedisChannelLayer',
+      'CONFIG': {
+        'hosts': [(desktop.conf.WEBSOCKETS.LAYER_HOST.get(), desktop.conf.WEBSOCKETS.LAYER_PORT.get())],
+      },
+    },
+  }
+
 # Used for securely creating sessions. Should be unique and not shared with anybody. Changing auth backends will invalidate all open sessions.
 SECRET_KEY = desktop.conf.get_secret_key()
 if SECRET_KEY:
   SECRET_KEY += str(AUTHENTICATION_BACKENDS)
 else:
-  import uuid
   SECRET_KEY = str(uuid.uuid4())
 
 # Axes
@@ -515,13 +535,6 @@ if SAML_AUTHENTICATION:
 for middleware in desktop.conf.MIDDLEWARE.get():
   MIDDLEWARE_CLASSES.append(middleware)
 
-# OpenId
-OPENID_AUTHENTICATION = 'libopenid.backend.OpenIDBackend' in AUTHENTICATION_BACKENDS
-if OPENID_AUTHENTICATION:
-  from libopenid.openid_settings import *
-  INSTALLED_APPS.append('libopenid')
-  LOGIN_URL = '/openid/login'
-  SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # OpenID Connect
 def is_oidc_configured():
@@ -597,6 +610,8 @@ if is_s3_enabled():
 
 if is_abfs_enabled():
   file_upload_handlers.insert(0, 'azure.abfs.upload.ABFSFileUploadHandler')
+
+
 FILE_UPLOAD_HANDLERS = tuple(file_upload_handlers)
 
 ############################################################
@@ -733,8 +748,9 @@ if desktop.conf.ENABLE_PROMETHEUS.get():
 
   if 'mysql' in DATABASES['default']['ENGINE']:
     DATABASES['default']['ENGINE'] = DATABASES['default']['ENGINE'].replace('django.db.backends', 'django_prometheus.db.backends')
-  for name, val in list(CACHES.items()):
-    val['BACKEND'] = val['BACKEND'].replace('django.core.cache.backends', 'django_prometheus.cache.backends')
+  # enable only when use these metrics: django_cache_get_total, django_cache_hits_total, django_cache_misses_total
+  # for name, val in list(CACHES.items()):
+  #   val['BACKEND'] = val['BACKEND'].replace('django.core.cache.backends', 'django_prometheus.cache.backends')
 
 
 ################################################################

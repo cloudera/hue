@@ -33,7 +33,7 @@
 
 .subnav {
   background-color: @cui-gray-100;
-  background-image: -moz-linear-gradient(center top, @cui-gray-050 0, @cui-gray-100 100%);
+  background-image: -moz-linear-gradient(center top, @cui-gray-050 0, @cui-gray-100 100%); /* stylelint-disable-line */
   background-repeat: repeat-x;
   border: 1px solid @cui-gray-200;
   border-radius: 4px;
@@ -81,9 +81,9 @@
 .subnav .nav > li:first-child > a,
 .subnav .nav > li:first-child > a:hover {
   border-left: 0 none;
-  border-radius: 4px 0 0 4px;
-  -webkit-border-radius: 4px 0 0 4px;
-  -moz-border-radius: 4px 0 0 4px;
+  border-radius: 0;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
   padding-left: 12px;
 }
 
@@ -116,13 +116,6 @@
   padding: 0 1px;
 }
 
-.subnav .nav > li:first-child > a,
-.subnav .nav > li:first-child > a:hover {
-  border-radius: 0;
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-}
-
 .hue-title-bar {
   position: fixed;
   right: 0;
@@ -142,7 +135,6 @@
   -moz-border-radius: 0;
   border-radius: 0;
 }
-
 
 .search-container {
   .display-flex;

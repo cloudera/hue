@@ -14,12 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import componentUtils from 'ko/components/componentUtils';
+import DisposableComponent from 'ko/components/DisposableComponent';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
-import DisposableComponent from 'ko/components/DisposableComponent';
 
 export const NAME = 'executable-actions';
 
@@ -30,19 +31,19 @@ const TEMPLATE = `
 <div class="snippet-execute-actions" data-test="${ NAME }">
   <div class="btn-group">
     <!-- ko if: status() !== '${ EXECUTION_STATUS.running }' && !waiting() -->
-    <button class="btn btn-primary btn-mini btn-execute disable-feedback" data-test="execute" data-bind="click: execute"><i class="fa fa-play fa-fw"></i> ${I18n(
+    <button class="btn btn-primary btn-mini btn-execute disable-feedback" data-test="execute" data-bind="click: execute, disable: disabled"><i class="fa fa-play fa-fw"></i> ${I18n(
       'Execute'
     )}</button>
     <!-- /ko -->
     <!-- ko if: status() === '${ EXECUTION_STATUS.running }' || waiting() -->
       <!-- ko ifnot: stopping -->
-      <button class="btn btn-primary btn-mini btn-execute disable-feedback" data-test="stop" data-bind="click: stop"><i class="fa fa-stop fa-fw"></i>
+      <button class="btn btn-danger btn-mini btn-execute disable-feedback" data-test="stop" data-bind="click: stop"><i class="fa fa-stop fa-fw"></i>
       <!-- ko ifnot: waiting -->
         ${ I18n('Stop') }
-      <!-- /ko --> 
+      <!-- /ko -->
       <!-- ko if: waiting -->
         ${ I18n('Stop batch') }
-      <!-- /ko --> 
+      <!-- /ko -->
       </button>
       <!-- /ko -->
       <!-- ko if: stopping -->
@@ -50,8 +51,13 @@ const TEMPLATE = `
       <!-- /ko -->
     <!-- /ko -->
   </div>
+  <form autocomplete="off" class="inline-block margin-left-10">
+    <input class="input-small limit-input" type="number" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="${ I18n('Limit') }" data-bind="textInput: limit, autogrowInput: { minWidth: 50, maxWidth: 80, comfortZone: 25 }">
+  </form>
 </div>
 `;
+
+const WHITE_SPACE_REGEX = /^\s*$/;
 
 class ExecutableActions extends DisposableComponent {
   constructor(params) {
@@ -62,12 +68,29 @@ class ExecutableActions extends DisposableComponent {
     this.partOfRunningExecution = ko.observable(false);
     this.beforeExecute = params.beforeExecute;
 
+    this.limit = ko.observable();
+
+    this.subscribe(this.limit, newVal => {
+      if (this.activeExecutable()) {
+        this.activeExecutable().executor.defaultLimit(newVal);
+      }
+    });
+
     this.waiting = ko.pureComputed(
       () =>
         this.activeExecutable() &&
         this.activeExecutable().isReady() &&
         this.partOfRunningExecution()
     );
+
+    this.disabled = ko.pureComputed(() => {
+      const executable = this.activeExecutable();
+
+      return (
+        !executable ||
+        (executable.parsedStatement && WHITE_SPACE_REGEX.test(executable.parsedStatement.statement))
+      );
+    });
 
     this.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
       if (this.activeExecutable() === executable) {
@@ -82,11 +105,16 @@ class ExecutableActions extends DisposableComponent {
     });
 
     this.subscribe(this.activeExecutable, this.updateFromExecutable.bind(this));
+
+    if (this.activeExecutable()) {
+      this.updateFromExecutable(this.activeExecutable());
+    }
   }
 
   updateFromExecutable(executable) {
     this.status(executable.status);
     this.partOfRunningExecution(executable.isPartOfRunningExecution());
+    this.limit(executable.executor.defaultLimit());
   }
 
   async stop() {
@@ -99,6 +127,7 @@ class ExecutableActions extends DisposableComponent {
   }
 
   async execute() {
+    huePubSub.publish('hue.ace.autocompleter.hide');
     if (this.beforeExecute) {
       await this.beforeExecute();
     }
@@ -107,13 +136,6 @@ class ExecutableActions extends DisposableComponent {
       await executable.reset();
       executable.execute();
     }
-  }
-
-  executeNext() {
-    if (this.activeExecutable() && this.activeExecutable().nextExecutable) {
-      this.activeExecutable(this.activeExecutable().nextExecutable);
-    }
-    this.execute();
   }
 }
 

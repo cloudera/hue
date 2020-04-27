@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import AssistDbNamespace from 'ko/components/assist/assistDbNamespace';
@@ -29,6 +29,7 @@ class AssistDbSource {
    * @param {string} options.type
    * @param {ContextNamespace} [options.initialNamespace] - Optional initial namespace to use
    * @param {ContextCompute} [options.initialCompute] - Optional initial compute to use
+   * @param {Connector} options.connector
    * @param {string} options.name
    * @param {boolean} options.nonSqlType - Optional, default false
    * @param {Object} options.navigationSettings
@@ -38,6 +39,7 @@ class AssistDbSource {
     const self = this;
 
     self.sourceType = options.type;
+    self.connector = options.connector;
     self.name = options.name;
     self.i18n = options.i18n;
     self.nonSqlType = options.nonSqlType;
@@ -130,6 +132,7 @@ class AssistDbSource {
               newNamespaces.push(
                 new AssistDbNamespace({
                   sourceType: self.sourceType,
+                  connector: self.connector,
                   namespace: newNamespace,
                   i18n: self.i18n,
                   nonSqlType: self.nonSqlType,
@@ -169,6 +172,7 @@ class AssistDbSource {
           const assistNamespace = new AssistDbNamespace({
             sourceType: self.sourceType,
             namespace: namespace,
+            connector: self.connector,
             i18n: self.i18n,
             nonSqlType: self.nonSqlType,
             navigationSettings: self.navigationSettings

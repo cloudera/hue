@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
+import { syncExecutables } from 'apps/notebook2/execution/utils';
 
 // TODO: Remove, debug var
 window.sessionManager = sessionManager;
@@ -24,71 +24,46 @@ class Executor {
   /**
    * @param options
    * @param {boolean} [options.isSqlEngine] (default false)
-   * @param {string} options.sourceType
-   * @param {ContextCompute} options.compute
-   * @param {ContextNamespace} options.namespace
-   * @param {string} options.statement
+   * @param {observable<Connector>} options.connector
+   * @param {observable<ContextCompute>} options.compute
+   * @param {observable<ContextNamespace>} options.namespace
    * @param {string} [options.database]
+   * @param {function} [options.defaultLimit]
+   * @param {boolean} [options.isOptimizerEnabled] - Default false
    */
   constructor(options) {
-    this.sourceType = options.sourceType;
+    this.connector = options.connector;
     this.compute = options.compute;
     this.namespace = options.namespace;
     this.database = options.database;
     this.isSqlEngine = options.isSqlEngine;
+    this.isOptimizerEnabled = options.isOptimizerEnabled;
     this.executables = [];
+    this.defaultLimit = options.defaultLimit || (() => {});
   }
 
-  getExecutables(statementDetails) {
-    const allExecutablesIndex = {};
-    this.executables.forEach(executable => {
-      allExecutablesIndex[executable.getKey()] = executable;
-    });
-
-    const selectedExecutables = [];
-    let activeDatabase = this.database();
-    let currentSelectedIndex = 0;
-    const newExecutables = statementDetails.precedingStatements
-      .concat(statementDetails.activeStatement, statementDetails.followingStatements)
-      .map(parsedStatement => {
-        if (/USE/i.test(parsedStatement.firstToken)) {
-          const dbMatch = parsedStatement.statement.match(/use\s+([^;]+)/i);
-          if (dbMatch) {
-            activeDatabase = dbMatch[1];
-          }
-        }
-        let executable = new SqlExecutable({
-          parsedStatement: parsedStatement,
-          database: activeDatabase,
-          executor: this
-        });
-        if (allExecutablesIndex[executable.getKey()]) {
-          executable = allExecutablesIndex[executable.getKey()];
-          delete allExecutablesIndex[executable.getKey()];
-        }
-        if (
-          currentSelectedIndex < statementDetails.selectedStatements.length &&
-          parsedStatement === statementDetails.selectedStatements[currentSelectedIndex]
-        ) {
-          selectedExecutables.push(executable);
-          currentSelectedIndex++;
-        }
-        return executable;
-      });
-
-    const lostExecutables = Object.keys(allExecutablesIndex).map(key => allExecutablesIndex[key]);
+  toJs() {
     return {
-      all: newExecutables,
-      lost: lostExecutables,
-      selected: selectedExecutables
+      executables: this.executables.map(executable => executable.toJs())
     };
   }
 
-  update(statementDetails, beforeExecute) {
-    const executables = this.getExecutables(statementDetails);
+  cancelAll() {
+    this.executables.forEach(existingExecutable => existingExecutable.cancelBatchChain());
+  }
+
+  setExecutables(executables) {
+    this.cancelAll();
+    this.executables = executables;
+    this.executables.forEach(executable => executable.notify());
+  }
+
+  update(statementDetails, beforeExecute, snippet) {
+    const executables = syncExecutables(this, statementDetails, snippet);
 
     // Cancel any "lost" executables and any batch chain it's part of
     executables.lost.forEach(lostExecutable => {
+      lostExecutable.lost = true;
       lostExecutable.cancelBatchChain();
     });
 

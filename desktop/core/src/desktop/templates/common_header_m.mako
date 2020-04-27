@@ -72,7 +72,6 @@ if USE_NEW_EDITOR.get():
   </style>
 
   <script type="text/javascript">
-
     var LOGGED_USERNAME = '${ user.username }';
     var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
     var HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
@@ -287,4 +286,3 @@ if USE_NEW_EDITOR.get():
     </div>
   </div>
 </div>
-

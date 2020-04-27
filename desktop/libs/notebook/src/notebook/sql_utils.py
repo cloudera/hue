@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from future import standard_library
 standard_library.install_aliases()
 import hashlib
@@ -27,6 +28,7 @@ if sys.version_info[0] > 2:
   from io import StringIO as string_io
 else:
   from StringIO import StringIO as string_io
+
 
 # Note: Might be replaceable by sqlparse.split
 def get_statements(hql_query):

@@ -32,7 +32,7 @@ from aws.s3 import S3A_ROOT, normpath as s3_normpath
 from azure.abfs.__init__ import ABFS_ROOT, normpath as abfs_normpath
 from desktop.lib import i18n
 from hadoop.fs import normpath
-from useradmin.models import User, Group, default_organization
+from useradmin.models import User, Group
 
 from filebrowser.lib import rwx
 

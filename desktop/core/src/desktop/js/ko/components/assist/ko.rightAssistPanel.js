@@ -14,12 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
+import {
+  ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT,
+  ASSIST_LANG_REF_SHOW_TOPIC_EVENT,
+  SHOW_RIGHT_ASSIST_EVENT
+} from './events';
 
 const EDITOR_ASSISTANT_TAB = 'editorAssistant';
 const DASHBOARD_ASSISTANT_TAB = 'dashboardAssistant';
@@ -55,15 +61,40 @@ const TEMPLATE = `
   <!-- ko if: visible -->
   <div class="right-assist-contents">
     <!-- ko if: editorAssistantTabAvailable-->
-    <div data-bind="component: { name: 'assist-editor-context-panel', params: { activeTab: activeTab, sourceType: sourceType } }, visible: activeTab() === 'editorAssistant'"></div>
+    <div data-bind="
+        component: { 
+          name: 'assist-editor-context-panel', 
+          params: { 
+            activeTab: activeTab, 
+            connector: connector 
+          }
+        },
+        visible: activeTab() === 'editorAssistant'
+      "></div>
     <!-- /ko -->
 
     <!-- ko if: functionsTabAvailable -->
-    <div data-bind="component: { name: 'assist-functions-panel' }, visible: activeTab() === 'functions'"></div>
+    <div data-bind="
+        component: { 
+          name: 'assist-functions-panel',
+          params: {
+            connector: connector
+          }
+        },
+        visible: activeTab() === 'functions'
+      "></div>
     <!-- /ko -->
 
     <!-- ko if: langRefTabAvailable -->
-    <div data-bind="component: { name: 'assist-language-reference-panel' }, visible: activeTab() === 'langRef'"></div>
+    <div data-bind="
+        component: {
+          name: 'assist-language-reference-panel',
+          params: {
+            connector: connector
+          }
+        },
+        visible: activeTab() === 'langRef'
+      "></div>
     <!-- /ko -->
 
     <!-- ko if: dashboardAssistantTabAvailable -->
@@ -77,16 +108,28 @@ const TEMPLATE = `
 
 class RightAssistPanel {
   constructor(params) {
-    this.disposals = [];
-
     this.activeTab = ko.observable();
     this.visible = params.visible;
-    this.sourceType = ko.observable();
+    this.connector = ko.observable();
 
-    this.editorAssistantTabAvailable = ko.observable(false);
-    this.dashboardAssistantTabAvailable = ko.observable(false);
-    this.functionsTabAvailable = ko.observable(false);
-    this.langRefTabAvailable = ko.observable(false);
+    this.editorAssistantTabAvailable = ko.pureComputed(
+      () => this.connector() && this.connector().is_sql
+    );
+    this.dashboardAssistantTabAvailable = ko.pureComputed(
+      () => this.connector() && this.connector().type === 'dashboard'
+    );
+    this.functionsTabAvailable = ko.pureComputed(
+      () =>
+        this.connector() &&
+        (this.connector().dialect === 'hive' ||
+          this.connector().dialect === 'impala' ||
+          this.connector().dialect === 'pig')
+    );
+    this.langRefTabAvailable = ko.pureComputed(
+      () =>
+        this.connector() &&
+        (this.connector().dialect === 'hive' || this.connector().dialect === 'impala')
+    );
     this.schedulesTabAvailable = ko.observable(false);
 
     this.lastActiveTabEditor = apiHelper.withTotalStorage(
@@ -108,12 +151,12 @@ class RightAssistPanel {
       }
     });
 
-    huePubSub.subscribe('assist.lang.ref.show.topic', targetTopic => {
-      huePubSub.publish('right.assist.show');
+    huePubSub.subscribe(ASSIST_LANG_REF_SHOW_TOPIC_EVENT, targetTopic => {
+      huePubSub.publish(SHOW_RIGHT_ASSIST_EVENT);
       if (this.langRefTabAvailable() && this.activeTab() !== LANG_REF_TAB) {
         this.activeTab(LANG_REF_TAB);
       }
-      huePubSub.publish('assist.lang.ref.panel.show.topic', targetTopic);
+      huePubSub.publish(ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT, targetTopic);
     });
 
     const updateTabs = () => {
@@ -140,16 +183,10 @@ class RightAssistPanel {
       }
     };
 
-    const updateContentsForType = (type, isSqlDialect) => {
-      this.sourceType(type);
-
-      // TODO: Get these dynamically from langref and functions modules when moved to webpack
-      this.functionsTabAvailable(type === 'hive' || type === 'impala' || type === 'pig');
-      this.langRefTabAvailable(type === 'hive' || type === 'impala');
-      this.editorAssistantTabAvailable(isSqlDialect);
-      this.dashboardAssistantTabAvailable(type === 'dashboard');
+    const updateContentsForConnector = connector => {
+      this.connector(connector);
       this.schedulesTabAvailable(false);
-      if (type !== 'dashboard') {
+      if (connector.type !== 'dashboard') {
         if (window.ENABLE_QUERY_SCHEDULING) {
           huePubSub.subscribeOnce('set.current.app.view.model', viewModel => {
             // Async
@@ -164,17 +201,15 @@ class RightAssistPanel {
       updateTabs();
     };
 
-    const snippetTypeSub = huePubSub.subscribe('active.snippet.type.changed', details => {
-      updateContentsForType(details.type, details.isSqlDialect);
-    });
-    this.disposals.push(snippetTypeSub.remove.bind(snippetTypeSub));
+    huePubSub.subscribe(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, updateContentsForConnector);
 
-    huePubSub.subscribe('set.current.app.name', appName => {
+    const onAppChange = appName => {
       if (appName === 'dashboard') {
-        updateContentsForType(appName, false);
+        updateContentsForConnector({ type: appName, is_sql: false });
       }
-    });
-    huePubSub.publish('get.current.app.name');
+    };
+    huePubSub.publish('get.current.app.name', onAppChange);
+    huePubSub.subscribe('set.current.app.name', onAppChange);
     updateTabs();
   }
 
@@ -213,12 +248,6 @@ class RightAssistPanel {
   schedulesTabClick() {
     this.lastActiveTabEditor(SCHEDULES_TAB);
     this.switchTab(SCHEDULES_TAB);
-  }
-
-  dispose() {
-    this.disposals.forEach(dispose => {
-      dispose();
-    });
   }
 }
 

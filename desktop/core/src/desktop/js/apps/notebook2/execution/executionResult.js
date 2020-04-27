@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import * as ko from 'knockout';
+
 import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
 import { sleep } from 'utils/hueUtils';
@@ -25,6 +27,53 @@ export const RESULT_TYPE = {
   TABLE: 'table'
 };
 
+const META_TYPE_TO_CSS = {
+  bigint: 'sort-numeric',
+  date: 'sort-date',
+  datetime: 'sort-date',
+  decimal: 'sort-numeric',
+  double: 'sort-numeric',
+  float: 'sort-numeric',
+  int: 'sort-numeric',
+  real: 'sort-numeric',
+  smallint: 'sort-numeric',
+  timestamp: 'sort-date',
+  tinyint: 'sort-numeric'
+};
+
+const NUMERIC_TYPES = {
+  bigint: true,
+  decimal: true,
+  double: true,
+  float: true,
+  int: true,
+  real: true,
+  smallint: true,
+  tinyint: true
+};
+
+const DATE_TIME_TYPES = {
+  date: true,
+  datetime: true,
+  timestamp: true
+};
+
+const COMPLEX_TYPES = {
+  array: true,
+  map: true,
+  struct: true
+};
+
+huePubSub.subscribe('editor.ws.query.fetch_result', executionResult => {
+  if (executionResult.status != 'finalMessage') {
+    const result = new ExecutionResult(null);
+    result.fetchedOnce = true;
+    result.handleResultResponse(executionResult);
+    // eslint-disable-next-line no-undef
+    $('#wsResult').append('<div>' + executionResult.data + '</div>');
+  }
+});
+
 export default class ExecutionResult {
   /**
    *
@@ -34,9 +83,15 @@ export default class ExecutionResult {
     this.executable = executable;
 
     this.type = RESULT_TYPE.TABLE;
-    this.state = {};
     this.rows = [];
     this.meta = [];
+
+    this.cleanedMeta = [];
+    this.cleanedDateTimeMeta = [];
+    this.cleanedStringMeta = [];
+    this.cleanedNumericMeta = [];
+    this.koEnrichedMeta = [];
+
     this.lastRows = [];
     this.images = [];
     this.type = undefined;
@@ -93,6 +148,10 @@ export default class ExecutionResult {
       startOver: options && options.startOver
     });
 
+    this.handleResultResponse(resultResponse);
+  }
+
+  handleResultResponse(resultResponse) {
     const initialIndex = this.rows.length;
     resultResponse.data.forEach((row, index) => {
       row.unshift(initialIndex + index + 1);
@@ -103,11 +162,37 @@ export default class ExecutionResult {
     if (!this.meta.length) {
       this.meta = resultResponse.meta;
       this.meta.unshift({ type: 'INT_TYPE', name: '', comment: null });
+
+      this.meta.forEach((item, index) => {
+        const cleanedType = item.type.replace(/_type/i, '').toLowerCase();
+        if (index) {
+          this.cleanedMeta.push(item);
+          if (NUMERIC_TYPES[cleanedType]) {
+            this.cleanedNumericMeta.push(item);
+          } else if (DATE_TIME_TYPES[cleanedType]) {
+            this.cleanedDateTimeMeta.push(item);
+          } else if (!COMPLEX_TYPES[cleanedType]) {
+            this.cleanedStringMeta.push(item);
+          }
+        }
+        this.koEnrichedMeta.push({
+          name: item.name,
+          type: cleanedType,
+          comment: item.comment,
+          cssClass: META_TYPE_TO_CSS[cleanedType] || 'sort-string',
+          checked: ko.observable(true),
+          originalIndex: index
+        });
+      });
     }
     this.hasMore = resultResponse.has_more;
     this.isEscaped = resultResponse.isEscaped;
     this.type = resultResponse.type;
     this.fetchedOnce = true;
+    this.notify();
+  }
+
+  notify() {
     huePubSub.publish(RESULT_UPDATED_EVENT, this);
   }
 }

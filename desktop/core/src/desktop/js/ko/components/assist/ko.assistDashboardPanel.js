@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import AssistDbEntry from 'ko/components/assist/assistDbEntry';
 import AssistDbSource from 'ko/components/assist/assistDbSource';
@@ -25,7 +25,6 @@ import { TEMPLATE, AssistantUtils } from 'ko/components/assist/ko.assistEditorCo
 
 class AssistDashboardPanel {
   constructor() {
-    this.disposals = [];
     this.isSolr = ko.observable(true);
 
     this.showRisks = ko.observable(false);
@@ -58,119 +57,108 @@ class AssistDashboardPanel {
     };
     const i18n = {};
 
-    const activeDashboardCollection = huePubSub.subscribe(
-      'set.active.dashboard.collection',
-      collection => {
-        const collectionName = collection.name();
+    huePubSub.subscribe('set.active.dashboard.collection', collection => {
+      const collectionName = collection.name();
 
-        if (!collectionName) {
-          return;
-        }
+      if (!collectionName) {
+        return;
+      }
 
-        this.sourceType = ko.observable(collection.engine());
+      this.sourceType = ko.observable(collection.engine());
 
-        const assistDbSource = new AssistDbSource({
-          i18n: i18n,
-          initialNamespace: collection.activeNamespace,
-          initialCompute: collection.activeCompute,
-          type: collection.engine(),
-          name: collection.engine(),
-          nonSqlType: true,
-          navigationSettings: navigationSettings
-        });
+      const assistDbSource = new AssistDbSource({
+        i18n: i18n,
+        initialNamespace: collection.activeNamespace,
+        initialCompute: collection.activeCompute,
+        type: collection.engine(),
+        name: collection.engine(),
+        nonSqlType: true,
+        navigationSettings: navigationSettings
+      });
 
-        const fakeParentName =
-          collectionName.indexOf('.') > -1 ? collectionName.split('.')[0] : 'default';
+      const fakeParentName =
+        collectionName.indexOf('.') > -1 ? collectionName.split('.')[0] : 'default';
 
-        const sourceType =
-          collection.source() === 'query' ? collection.engine() + '-query' : collection.engine();
+      const sourceType =
+        collection.source() === 'query' ? collection.engine() + '-query' : collection.engine();
 
-        dataCatalog
-          .getEntry({
-            sourceType: sourceType,
-            namespace: collection.activeNamespace,
-            compute: collection.activeCompute,
-            path: [fakeParentName],
-            definition: { type: 'database' }
-          })
-          .done(fakeDbCatalogEntry => {
-            const assistFakeDb = new AssistDbEntry(
-              fakeDbCatalogEntry,
-              null,
-              assistDbSource,
-              this.filter,
-              i18n,
-              navigationSettings
-            );
-            dataCatalog
-              .getEntry({
-                sourceType: sourceType,
-                namespace: collection.activeNamespace,
-                compute: collection.activeCompute,
-                path: [
-                  fakeParentName,
-                  collectionName.indexOf('.') > -1 ? collectionName.split('.')[1] : collectionName
-                ],
-                definition: { type: 'table' }
-              })
-              .done(collectionCatalogEntry => {
-                const collectionEntry = new AssistDbEntry(
-                  collectionCatalogEntry,
-                  assistFakeDb,
-                  assistDbSource,
-                  this.filter,
-                  i18n,
-                  navigationSettings
-                );
-                this.activeTables([collectionEntry]);
+      dataCatalog
+        .getEntry({
+          sourceType: sourceType,
+          namespace: collection.activeNamespace,
+          compute: collection.activeCompute,
+          connector: {}, // TODO: Use connectors in assist dashboard panel
+          path: [fakeParentName],
+          definition: { type: 'database' }
+        })
+        .done(fakeDbCatalogEntry => {
+          const assistFakeDb = new AssistDbEntry(
+            fakeDbCatalogEntry,
+            null,
+            assistDbSource,
+            this.filter,
+            i18n,
+            navigationSettings
+          );
+          dataCatalog
+            .getEntry({
+              sourceType: sourceType,
+              namespace: collection.activeNamespace,
+              compute: collection.activeCompute,
+              connector: {}, // TODO: Use connectors in assist dashboard panel
+              path: [
+                fakeParentName,
+                collectionName.indexOf('.') > -1 ? collectionName.split('.')[1] : collectionName
+              ],
+              definition: { type: 'table' }
+            })
+            .done(collectionCatalogEntry => {
+              const collectionEntry = new AssistDbEntry(
+                collectionCatalogEntry,
+                assistFakeDb,
+                assistDbSource,
+                this.filter,
+                i18n,
+                navigationSettings
+              );
+              this.activeTables([collectionEntry]);
 
-                if (
-                  !collectionEntry.loaded &&
-                  !collectionEntry.hasErrors() &&
-                  !collectionEntry.loading()
-                ) {
-                  collectionEntry.loadEntries(() => {
-                    collectionEntry.toggleOpen();
-                  });
-                }
-              });
-          });
-
-        this.autocompleteFromEntries = function(nonPartial, partial) {
-          const added = {};
-          const result = [];
-          const partialLower = partial.toLowerCase();
-          this.activeTables().forEach(table => {
-            if (
-              !added[table.catalogEntry.name] &&
-              table.catalogEntry.name.toLowerCase().indexOf(partialLower) === 0
-            ) {
-              added[table.catalogEntry.name] = true;
-              result.push(nonPartial + partial + table.catalogEntry.name.substring(partial.length));
-            }
-            table.entries().forEach(col => {
               if (
-                !added[col.catalogEntry.name] &&
-                col.catalogEntry.name.toLowerCase().indexOf(partialLower) === 0
+                !collectionEntry.loaded &&
+                !collectionEntry.hasErrors() &&
+                !collectionEntry.loading()
               ) {
-                added[col.catalogEntry.name] = true;
-                result.push(nonPartial + partial + col.catalogEntry.name.substring(partial.length));
+                collectionEntry.loadEntries(() => {
+                  collectionEntry.toggleOpen();
+                });
               }
             });
+        });
+
+      this.autocompleteFromEntries = function(nonPartial, partial) {
+        const added = {};
+        const result = [];
+        const partialLower = partial.toLowerCase();
+        this.activeTables().forEach(table => {
+          if (
+            !added[table.catalogEntry.name] &&
+            table.catalogEntry.name.toLowerCase().indexOf(partialLower) === 0
+          ) {
+            added[table.catalogEntry.name] = true;
+            result.push(nonPartial + partial + table.catalogEntry.name.substring(partial.length));
+          }
+          table.entries().forEach(col => {
+            if (
+              !added[col.catalogEntry.name] &&
+              col.catalogEntry.name.toLowerCase().indexOf(partialLower) === 0
+            ) {
+              added[col.catalogEntry.name] = true;
+              result.push(nonPartial + partial + col.catalogEntry.name.substring(partial.length));
+            }
           });
-          return result;
-        };
-      }
-    );
-
-    this.disposals.push(() => {
-      activeDashboardCollection.remove();
-    });
-  }
-
-  dispose() {
-    this.disposals.forEach(dispose => {
-      dispose();
+        });
+        return result;
+      };
     });
   }
 }

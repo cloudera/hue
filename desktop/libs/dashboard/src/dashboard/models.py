@@ -291,7 +291,7 @@ class Collection2(object):
         LOG.error('Could not access collection: %s' % e)
         return []
 
-    return sorted([self._make_field(field, attributes) for field, attributes in schema_fields.items()])
+    return sorted([self._make_field(field, attributes) for field, attributes in schema_fields.items()], key=lambda f: f['name'])
 
   def update_data(self, post_data):
     data_dict = self.data

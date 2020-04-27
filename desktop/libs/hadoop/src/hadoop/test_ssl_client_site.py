@@ -19,12 +19,17 @@ from __future__ import absolute_import
 from hadoop import conf
 import logging
 import os
+import sys
 import tempfile
 
 from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal, assert_raises
 
 from hadoop import ssl_client_site
 
+if sys.version_info[0] > 2:
+  open_file = open
+else:
+  open_file = file
 
 LOG = logging.getLogger(__name__)
 
@@ -56,7 +61,7 @@ def test_ssl_client_site():
 </configuration>
 
     """
-    file(os.path.join(hadoop_home, 'ssl-client.xml'), 'w').write(xml)
+    open_file(os.path.join(hadoop_home, 'ssl-client.xml'), 'w').write(xml)
 
     finish = conf.HDFS_CLUSTERS['default'].HADOOP_CONF_DIR.set_for_testing(hadoop_home)
     ssl_client_site.reset()

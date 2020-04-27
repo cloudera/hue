@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.appAwareTemplateContextMenu = {
   init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
     viewModel.$currentApp = ko.observable('');
+    huePubSub.publish('get.current.app.name', viewModel.$currentApp);
     huePubSub.subscribe('set.current.app.name', viewModel.$currentApp);
-    huePubSub.publish('get.current.app.name');
     ko.bindingHandlers.templateContextMenu.init(
       element,
       valueAccessor,

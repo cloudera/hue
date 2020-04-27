@@ -15,7 +15,9 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
+
+import './ko.resultDownloadActions';
 
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
@@ -29,21 +31,34 @@ import {
   SHOW_NORMAL_RESULT_EVENT
 } from 'apps/notebook2/events';
 
+import { attachTracker } from 'apps/notebook2/components/executableStateHandler';
+
 export const NAME = 'result-grid';
 
 // prettier-ignore
 const TEMPLATE = `
-<div class="result-actions-append">
-  <div class="btn-group">
-    <button class="btn btn-editor btn-mini disable-feedback" data-bind="click: showSearch.bind($data), css: { 'disabled': !data().length }">
-      <i class="fa fa-search"></i> ${ I18n('Search') }
-    </button>
-  </div>
+<div class="snippet-tab-actions-append">
   <div class="btn-group">
     <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: columnsVisible, css: { 'active' : columnsVisible }">
       <i class="fa fa-columns"></i> ${ I18n('Columns') }
     </button>
   </div>
+
+  <div class="btn-group">
+    <button class="btn btn-editor btn-mini disable-feedback" data-bind="click: showSearch.bind($data), css: { 'disabled': !data().length }">
+      <i class="fa fa-search"></i> ${ I18n('Search') }
+    </button>
+  </div>
+
+  <!-- ko component: {
+    name: 'result-download-actions',
+    params: {
+      activeExecutable: activeExecutable,
+      meta: meta,
+      data: data
+    }
+  } --><!-- /ko -->
+
   <!-- ko if: false && window.ENABLE_DOWNLOAD -->
     <div data-bind="
         component: {
@@ -59,8 +74,8 @@ const TEMPLATE = `
 </div>
 
 <div class="split-result-container">
-  <div class="result-settings-panel" style="display: none;" data-bind="visible: columnsVisible">
-    <div class="snippet-grid-settings" data-bind="delayedOverflow">
+  <div class="result-settings-panel" style="display: none; height: auto; position:relative" data-bind="visible: columnsVisible">
+    <div class="snippet-grid-settings" data-bind="delayedOverflow, stickVertical: { scrollContainer: MAIN_SCROLLABLE }">
       <table class="table table-condensed margin-top-10 no-border">
         <thead>
         <tr>
@@ -169,6 +184,7 @@ class ResultGrid extends DisposableComponent {
   constructor(params, element) {
     super();
     this.element = element;
+    this.activeExecutable = params.activeExecutable;
 
     this.isResultFullScreenMode = params.isResultFullScreenMode;
     this.editorMode = params.editorMode;
@@ -176,14 +192,22 @@ class ResultGrid extends DisposableComponent {
     this.hasMore = params.hasMore;
     this.fetchResult = params.fetchResult;
 
+    const trackedObservables = {
+      columnsVisible: false,
+      isMetaFilterVisible: false
+    };
+
     this.status = params.status;
-    this.columnsVisible = ko.observable(true);
-    this.isMetaFilterVisible = ko.observable(false);
+    this.columnsVisible = ko.observable(trackedObservables.columnsVisible);
+    this.isMetaFilterVisible = ko.observable(trackedObservables.isMetaFilterVisible);
     this.metaFilter = ko.observable();
     this.resultsKlass = params.resultsKlass;
     this.meta = params.meta;
     this.data = params.data;
     this.lastFetchedRows = params.lastFetchedRows;
+
+    const tracker = attachTracker(this.activeExecutable, NAME, this, trackedObservables);
+    super.addDisposalCallback(tracker.dispose.bind(tracker));
 
     this.hueDatatable = undefined;
 
@@ -306,7 +330,9 @@ class ResultGrid extends DisposableComponent {
             heightAfterCorrection: 0
           });
           this.disposals.push(() => {
-            $datatablesWrapper.data('plugin_jHueTableScroller').destroy();
+            if ($datatablesWrapper.data('plugin_jHueTableScroller')) {
+              $datatablesWrapper.data('plugin_jHueTableScroller').destroy();
+            }
           });
         }
       },
@@ -344,7 +370,9 @@ class ResultGrid extends DisposableComponent {
       $resultTable.jHueTableExtender2(tableExtenderOptions);
 
       this.disposals.push(() => {
-        $resultTable.data('plugin_jHueTableExtender2').destroy();
+        if ($resultTable.data('plugin_jHueTableExtender2')) {
+          $resultTable.data('plugin_jHueTableExtender2').destroy();
+        }
       });
 
       if (this.editorMode()) {
@@ -505,22 +533,6 @@ class ResultGrid extends DisposableComponent {
     const $snippet = this.getSnippetElement();
     if ($snippet.find('.resultTable').is(':visible')) {
       $datatablesWrapper = $snippet.find('.dataTables_wrapper');
-      const topCoord =
-        this.isPresentationMode() || this.isResultFullScreenMode()
-          ? window.BANNER_TOP_HTML
-            ? 31
-            : 1
-          : 73;
-      const $resultSettings = $('.result-settings');
-      $snippet.find('.snippet-grid-settings').css({
-        height:
-          this.isPresentationMode() || !this.editorMode()
-            ? '330px'
-            : Math.ceil(
-                $(window).height() -
-                  Math.max($resultSettings.length ? $resultSettings.offset().top : 0, topCoord)
-              ) + 'px'
-      });
     } else {
       $datatablesWrapper = $snippet.find('.chart:visible');
     }

@@ -1,0 +1,82 @@
+<a class="back-to-top inner-link" href="#start" data-scroll-class="100vh:active">
+  <i class="stack-interface stack-up-open-big"></i>
+</a>
+<footer class="space--sm footer-2 ">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-9">
+        <ul class="list-inline list--hover">
+          {{ $currentLang := .Lang }}
+          {{ range $.Site.Home.AllTranslations }}
+            {{ if ne .Lang $currentLang }}
+            <li>
+              <a href="{{ .Permalink }}">
+                <img class="icon icon--xs flag" alt="{{ .Language.LanguageName }}" title="{{ .Language.LanguageName }}" src="{{ .Site.BaseURL }}img/flags/{{.Lang}}.png" />
+              </a>
+            </li>
+            {{ end }}
+          {{ end }}
+          <li> <a href="mailto:team@gethue.com"><span>{{ i18n "contact" }}</span></a> </li>
+          <li> <a href="https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md"><span>{{ i18n "work" }}</span></a> </li>
+          <li> <a href="{{ .Site.BaseURL }}/posts/"><span>{{ i18n "blog" }}</span></a> </li>
+          <li> <a href="https://stackoverflow.com/questions/tagged/hue"><span>Stackoverflow</span></a> </li>
+          <li>
+            <a href="https://github.com/cloudera/hue" title="GitHub" target="_blank">
+              <i class="socicon socicon-github icon icon--xs"></i>
+            </a>
+          </li>
+          <li>
+            <a href="https://twitter.com/gethue" title="Twitter" target="_blank">
+              <i class="socicon socicon-twitter icon icon--xs"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-3 text-right text-center-xs">
+        <a class="btn btn--sm btn--primary type--uppercase" href="http://demo.gethue.com" target="_blank">
+          <span class="btn__text">
+            {{ i18n "try" }}
+          </span>
+        </a>
+      </div>
+    </div>
+    <!--end of row-->
+    <div class="row">
+      <div class="col-md-8">
+        <span class="type--fine-print">&copy; <span class="update-year"></span> gethue.com. Hue is open source under the Apache License 2.0. Hue name and logo are trademarks of Cloudera, Inc.
+        </span>
+      </div>
+      <div class="col-md-4 text-right text-left-xs">
+        <ul class="social-list list-inline list--hover">
+          <li><a class="type--fine-print" href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a class="type--fine-print" href="/terms-and-conditions-of-site-use/">Terms & Conditions</a></li>
+
+        </ul>
+      </div>
+    </div>
+    <!--end of row-->
+  </div>
+  <!--end of container-->
+</footer>
+<a class="back-to-top inner-link" href="#start" data-scroll-class="100vh:active">
+  <i class="stack-interface stack-up-open-big"></i>
+</a>
+<script src="{{ .Site.BaseURL }}/js/jquery-3.1.1.min.js"></script>
+<script src="{{ .Site.BaseURL }}/js/typed.min.js"></script>
+<script src="{{ .Site.BaseURL }}/js/lightbox.min.js"></script>
+<script src="{{ .Site.BaseURL }}/js/smooth-scroll.min.js"></script>
+<script src="{{ .Site.BaseURL }}/js/gifffer.min.js"></script>
+<script src="{{ .Site.BaseURL }}/js/scripts.js"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-37637545-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-37637545-1');
+</script>
+
+</body>
+
+</html>

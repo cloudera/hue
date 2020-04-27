@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
@@ -98,6 +98,7 @@ class AsteriskData {
             sourceType: sourceType,
             namespace: namespace,
             compute: compute,
+            connector: {}, // TODO: Add connector to asteriskContextTabs
             path: path
           })
           .done(entry => {

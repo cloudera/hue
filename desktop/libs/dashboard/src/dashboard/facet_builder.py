@@ -16,17 +16,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, print_function
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
-from builtins import range
-from past.utils import old_div
+
+from builtins import str, range
+
 import logging
+import math
 import numbers
-import urllib.request, urllib.parse, urllib.error
 import re
+import urllib.request, urllib.parse, urllib.error
 
 from datetime import datetime, timedelta
 from math import ceil
@@ -114,13 +114,13 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
 
 def _get_interval(domain_ms, SLOTS):
   biggest_interval = TIME_INTERVALS[len(TIME_INTERVALS) - 1]
-  biggest_interval_is_too_small = old_div(domain_ms, biggest_interval['ms']) > SLOTS
+  biggest_interval_is_too_small = math.floor(domain_ms / biggest_interval['ms']) > SLOTS
   if biggest_interval_is_too_small:
-    coeff = min(ceil(old_div(domain_ms, SLOTS)), 100) # If we go over 100 years, something has gone wrong.
+    coeff = min(ceil(math.floor(domain_ms / SLOTS)), 100) # If we go over 100 years, something has gone wrong.
     return {'ms': YEAR_MS * coeff, 'coeff': coeff, 'unit': 'YEARS'}
 
   for i in range(len(TIME_INTERVALS) - 2, 0, -1):
-    slots = old_div(domain_ms, TIME_INTERVALS[i]['ms'])
+    slots = math.floor(domain_ms / TIME_INTERVALS[i]['ms'])
     if slots > SLOTS:
       return TIME_INTERVALS[i + 1]
 
@@ -175,7 +175,7 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
         SLOTS = 5
       elif widget_type == 'facet-widget' or widget_type == 'text-facet-widget' or widget_type == 'histogram-widget' or widget_type == 'bar-widget' or widget_type == 'bucket-widget' or widget_type == 'timeline-widget':
         if window_size:
-          SLOTS = old_div(int(window_size), 75) # Value is determined as the thinnest space required to display a timestamp on x axis
+          SLOTS = math.floor(int(window_size) / 75) # Value is determined as the thinnest space required to display a timestamp on x axis
         else:
           SLOTS = 10
       else:
@@ -202,7 +202,7 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
         end = int(end)
 
       if gap is None:
-        gap = int(old_div((end - start), SLOTS))
+        gap = int(math.floor((end - start) / SLOTS))
       if gap < 1:
         gap = 1
 
@@ -248,7 +248,7 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
       is_date = True
       domain_ms = _get_interval_duration(stat_facet['min'])
       interval = _get_interval(domain_ms, SLOTS)
-      nb_slot = old_div(domain_ms, interval['ms'])
+      nb_slot = math.floor(domain_ms / interval['ms'])
       gap = _format_interval(interval)
       end_ts = datetime.utcnow()
       end_ts_clamped = _clamp_date(interval, end_ts)

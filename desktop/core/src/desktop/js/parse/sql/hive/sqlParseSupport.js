@@ -249,6 +249,7 @@ const initSqlParser = function(parser) {
       'DOUBLE PRECISION',
       'FLOAT',
       'INT',
+      'INTEGER',
       'SMALLINT',
       'TIMESTAMP',
       'STRING',
@@ -1235,6 +1236,13 @@ const initSqlParser = function(parser) {
       'SEQUENCEFILE',
       'TEXTFILE'
     ]);
+  };
+
+  parser.suggestKeywordsForOptionalsLR = function(optionals, keywords, override) {
+    const result = parser.getKeywordsForOptionalsLR(optionals, keywords, override);
+    if (result.length) {
+      parser.suggestKeywords(result);
+    }
   };
 
   parser.getKeywordsForOptionalsLR = function(optionals, keywords, override) {

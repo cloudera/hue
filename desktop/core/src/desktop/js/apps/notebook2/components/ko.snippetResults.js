@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
@@ -25,39 +25,18 @@ import 'apps/notebook2/components/resultChart/ko.resultChart';
 import 'apps/notebook2/components/resultGrid/ko.resultGrid';
 import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
 import { REDRAW_CHART_EVENT } from 'apps/notebook2/events';
-import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
+import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import { RESULT_TYPE, RESULT_UPDATED_EVENT } from 'apps/notebook2/execution/executionResult';
+import { attachTracker } from 'apps/notebook2/components/executableStateHandler';
+import { defer } from 'utils/hueUtils';
+import { CURRENT_QUERY_TAB_SWITCHED_EVENT } from 'apps/notebook2/snippet';
 
 export const NAME = 'snippet-results';
-
-const META_TYPE_TO_CSS = {
-  TINYINT_TYPE: 'sort-numeric',
-  SMALLINT_TYPE: 'sort-numeric',
-  INT_TYPE: 'sort-numeric',
-  BIGINT_TYPE: 'sort-numeric',
-  FLOAT_TYPE: 'sort-numeric',
-  DOUBLE_TYPE: 'sort-numeric',
-  DECIMAL_TYPE: 'sort-numeric',
-  TIMESTAMP_TYPE: 'sort-date',
-  DATE_TYPE: 'sort-date',
-  DATETIME_TYPE: 'sort-date'
-};
-
-const isNumericColumn = type =>
-  ['tinyint', 'smallint', 'int', 'bigint', 'float', 'double', 'decimal', 'real'].indexOf(type) !==
-  -1;
-
-const isDateTimeColumn = type => ['timestamp', 'date', 'datetime'].indexOf(type) !== -1;
-
-const isComplexColumn = type => ['array', 'map', 'struct'].indexOf(type) !== -1;
-
-const isStringColumn = type =>
-  !isNumericColumn(type) && !isDateTimeColumn(type) && !isComplexColumn(type);
 
 // prettier-ignore
 const TEMPLATE = `
 <div class="snippet-row">
-  <div class="result-actions">
+  <div class="snippet-tab-actions">
     <div class="btn-group">
       <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showGrid, css: { 'active': showGrid }"><i class="fa fa-fw fa-th"></i> ${ I18n('Grid') }</button>
       <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showChart, css: { 'active': showChart }"><i class="hcha fa-fw hcha-bar-chart"></i> ${ I18n('Chart') }</button>
@@ -73,8 +52,8 @@ const TEMPLATE = `
       </button>
     </div>
   </div>
-  
-  <div class="result-body">
+
+  <div class="snippet-tab-body">
     <div data-bind="visible: type() !== 'table'" style="display:none; margin: 10px 0; overflow-y: auto">
       <!-- ko if: data().length && data()[0][1] != "" -->
       <pre data-bind="text: data()[0][1]" class="no-margin-bottom"></pre>
@@ -91,10 +70,11 @@ const TEMPLATE = `
       <!-- /ko -->
     </div>
     <div class="table-results" data-bind="visible: type() === 'table'" style="display: none;">
-      <div data-bind="visible: showGrid() && data().length" style="display: none; position: relative;">
-        <!-- ko component: { 
+      <div data-bind="visible: !executing() && hasData() && showGrid()" style="display: none; position: relative;">
+        <!-- ko component: {
           name: 'result-grid',
           params: {
+            activeExecutable: activeExecutable,
             data: data,
             lastFetchedRows: lastFetchedRows,
             editorMode: editorMode,
@@ -108,10 +88,11 @@ const TEMPLATE = `
           }
         } --><!-- /ko -->
       </div>
-      <div data-bind="visible: showChart() && data().length" style="display: none; position: relative;">
+      <div data-bind="visible: !executing() && hasData() && showChart()" style="display: none; position: relative;">
         <!-- ko component: {
           name: 'result-chart',
           params: {
+            activeExecutable: activeExecutable,
             cleanedMeta: cleanedMeta,
             cleanedDateTimeMeta: cleanedDateTimeMeta,
             cleanedNumericMeta: cleanedNumericMeta,
@@ -123,8 +104,19 @@ const TEMPLATE = `
           }
         } --><!-- /ko -->
       </div>
-      <div data-bind="visible: !data().length" style="display: none;">
-        <h1 class="empty">${ I18n('Select and execute a query to see the result.') }</h1>
+      <div data-bind="visible: !executing() && !hasData() && !hasResultSet() && status() === 'available' && fetchedOnce()" style="display: none;">
+        <h1 class="empty">${ I18n('Success.') }</h1>
+      </div>
+      <div data-bind="visible: !executing() && !hasData() && hasResultSet() && status() === 'available' && fetchedOnce()" style="display: none;">
+        <h1 class="empty">${ I18n('Empty result.') }</h1>
+      </div>
+      <div data-bind="visible: !executing() && !hasData() && status() === 'expired'" style="display: none;">
+        <h1 class="empty">${ I18n('Results have expired, rerun the query if needed.') }</h1>
+      </div>
+      <div data-bind="visible: executing" style="display: none;">
+        <h1 class="empty"><i class="fa fa-spinner fa-spin"></i> ${ I18n('Executing...') }</h1>
+      </div>
+      <div id="wsResult">
       </div>
     </div>
   </div>
@@ -152,25 +144,34 @@ class SnippetResults extends DisposableComponent {
     this.images = ko.observableArray();
     this.hasMore = ko.observable();
     this.hasResultSet = ko.observable();
+    this.fetchedOnce = ko.observable(false);
 
-    this.hasSomeResult = ko.pureComputed(() => this.data().length);
+    this.subscribe(CURRENT_QUERY_TAB_SWITCHED_EVENT, queryTab => {
+      if (queryTab === 'queryResults') {
+        defer(() => {
+          huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
+        });
+      }
+    });
 
-    this.showGrid = ko.observable(true); // TODO: Should be persisted
-    this.showChart = ko.observable(false); // TODO: Should be persisted
+    this.executing = ko.pureComputed(() => this.status() === EXECUTION_STATUS.running);
 
-    this.cleanedMeta = ko.pureComputed(() => this.meta().filter(item => item.name !== ''));
+    this.hasData = ko.pureComputed(() => this.data().length);
 
-    this.cleanedDateTimeMeta = ko.pureComputed(() =>
-      this.meta().filter(item => item.name !== '' && isDateTimeColumn(item.type))
-    );
+    const trackedObservables = {
+      showGrid: true,
+      showChart: false
+    };
 
-    self.cleanedStringMeta = ko.pureComputed(() =>
-      this.meta().filter(item => item.name !== '' && isStringColumn(item.type))
-    );
+    this.showGrid = ko.observable(trackedObservables.showGrid);
+    this.showChart = ko.observable(trackedObservables.showChart);
 
-    this.cleanedNumericMeta = ko.pureComputed(() =>
-      this.meta().filter(item => item.name !== '' && isNumericColumn(item.type))
-    );
+    attachTracker(this.activeExecutable, NAME, this, trackedObservables);
+
+    this.cleanedMeta = ko.observableArray();
+    this.cleanedDateTimeMeta = ko.observableArray();
+    this.cleanedStringMeta = ko.observableArray();
+    this.cleanedNumericMeta = ko.observableArray();
 
     this.subscribe(this.showChart, val => {
       if (val) {
@@ -184,7 +185,7 @@ class SnippetResults extends DisposableComponent {
       if (val) {
         this.showChart(false);
         huePubSub.publish('editor.grid.shown', this);
-        huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
+        defer(() => huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT));
         huePubSub.publish('table.extender.redraw');
       }
     });
@@ -196,59 +197,64 @@ class SnippetResults extends DisposableComponent {
     });
 
     let lastRenderedResult = undefined;
+    const handleResultChange = () => {
+      if (this.activeExecutable() && this.activeExecutable().result) {
+        const refresh = lastRenderedResult !== this.activeExecutable().result;
+        this.updateFromExecutionResult(this.activeExecutable().result, refresh);
+        lastRenderedResult = this.activeExecutable().result;
+      } else {
+        this.resetResultData();
+      }
+    };
+
     this.subscribe(RESULT_UPDATED_EVENT, executionResult => {
       if (this.activeExecutable() === executionResult.executable) {
-        const refresh = lastRenderedResult !== executionResult;
-        this.updateFromExecutionResult(executionResult, refresh);
-        lastRenderedResult = executionResult;
+        handleResultChange();
       }
     });
 
-    this.subscribe(this.activeExecutable, executable => {
-      if (executable && executable.result) {
-        if (executable !== lastRenderedResult) {
-          this.updateFromExecutionResult(executable.result, true);
-          lastRenderedResult = executable;
-        }
-      } else {
-        this.reset();
-      }
-    });
+    this.subscribe(this.activeExecutable, handleResultChange);
   }
 
-  reset() {
+  resetResultData() {
     this.images([]);
     this.lastFetchedRows([]);
     this.data([]);
     this.meta([]);
+    this.cleanedMeta([]);
+    this.cleanedDateTimeMeta([]);
+    this.cleanedNumericMeta([]);
+    this.cleanedStringMeta([]);
     this.hasMore(false);
     this.type(RESULT_TYPE.TABLE);
-    this.status(undefined);
+    // eslint-disable-next-line no-undef
+    $('#wsResult').empty();
   }
 
   updateFromExecutionResult(executionResult, refresh) {
     if (refresh) {
-      this.reset();
+      this.resetResultData();
     }
 
     if (executionResult) {
+      this.fetchedOnce(executionResult.fetchedOnce);
       this.hasMore(executionResult.hasMore);
       this.type(executionResult.type);
 
       if (!this.meta().length && executionResult.meta.length) {
-        this.meta(
-          executionResult.meta.map((item, index) => ({
-            name: item.name,
-            type: item.type.replace(/_type/i, '').toLowerCase(),
-            comment: item.comment,
-            cssClass: META_TYPE_TO_CSS[item.type] || 'sort-string',
-            checked: ko.observable(true),
-            originalIndex: index
-          }))
-        );
+        this.meta(executionResult.koEnrichedMeta);
+        this.cleanedMeta(executionResult.cleanedMeta);
+        this.cleanedDateTimeMeta(executionResult.cleanedDateTimeMeta);
+        this.cleanedStringMeta(executionResult.cleanedStringMeta);
+        this.cleanedNumericMeta(executionResult.cleanedNumericMeta);
       }
 
-      if (executionResult.lastRows.length) {
+      if (refresh) {
+        this.data(executionResult.rows);
+      } else if (
+        executionResult.lastRows.length &&
+        this.data().length !== executionResult.rows.length
+      ) {
         this.data.push(...executionResult.lastRows);
       }
       this.lastFetchedRows(executionResult.lastRows);
@@ -256,9 +262,10 @@ class SnippetResults extends DisposableComponent {
   }
 
   updateFromExecutable(executable) {
+    this.status(executable.status);
     this.hasResultSet(executable.handle.has_result_set);
     if (!this.hasResultSet) {
-      this.reset();
+      this.resetResultData();
     }
   }
 

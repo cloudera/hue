@@ -14,15 +14,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# Extra python utils
 
-from past.builtins import basestring
 from builtins import object
+from six import string_types
+
 import datetime
 import select
 import socket
 import sys
+
 from django.utils.translation import ugettext as _
 from desktop import conf
 from desktop.lib.i18n import smart_str
@@ -52,7 +52,7 @@ class CaseInsensitiveDict(dict):
 
   @classmethod
   def from_dict(cls, _dict):
-    return CaseInsensitiveDict([(isinstance(key, basestring) and key.lower() or key, _dict[key]) for key in _dict])
+    return CaseInsensitiveDict([(isinstance(key, string_types) and key.lower() or key, _dict[key]) for key in _dict])
 
 
 class SynchronousIOMultiplexer(object):
@@ -120,7 +120,7 @@ def force_list_to_strings(lst):
 
   new_list = []
   for item in lst:
-    if isinstance(item, basestring):
+    if isinstance(item, string_types):
       # Strings should not be unicode.
       new_list.append(smart_str(item))
     elif isinstance(item, dict):
@@ -142,7 +142,7 @@ def force_dict_to_strings(dictionary):
   new_dict = {}
   for k in dictionary:
     new_key = smart_str(k)
-    if isinstance(dictionary[k], basestring):
+    if isinstance(dictionary[k], string_types):
       # Strings should not be unicode.
       new_dict[new_key] = smart_str(dictionary[k])
     elif isinstance(dictionary[k], dict):
@@ -155,6 +155,19 @@ def force_dict_to_strings(dictionary):
       new_dict[new_key] = dictionary[k]
 
   return new_dict
+
+
+def from_string_to_bits(str_value):
+  return ''.join(format(ord(byte), '08b') for byte in str_value)
+
+
+def get_bytes_from_bits(bit_string):
+  """
+  This should be used in py3 or above
+  """
+  padded_bits = bit_string + '0' * (8 - len(bit_string) % 8)
+  return list(int(padded_bits, 2).to_bytes(len(padded_bits) // 8, 'big'))
+
 
 def isASCII(data):
   try:

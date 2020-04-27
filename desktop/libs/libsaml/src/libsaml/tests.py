@@ -16,11 +16,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from mock import patch, Mock, MagicMock
+import sys
+
 from nose.tools import assert_equal, assert_true, assert_false
 
 from libsaml.conf import xmlsec
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 def test_xmlsec_dynamic_default_no_which():
 

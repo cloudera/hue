@@ -1,0 +1,99 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.fieldSamples.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;field-samples&quot;, params: params }\\"><div class=\\"context-popover-inline-autocomplete\\" style=\\"display: flex\\">
+    <div class=\\"context-popover-sample-filter\\">
+      <!-- ko component: {
+        name: 'inline-autocomplete',
+        params: {
+          querySpec: querySpec,
+          autocompleteFromEntries: autocompleteFromEntries
+        }
+      } --><div class=\\"inline-autocomp-container\\">
+    <div>
+      <!-- ko if: showMagnify --><!-- /ko-->
+      <form autocomplete=\\"off\\">
+        <input class=\\"inline-autocomp-input\\" autocorrect=\\"off\\" autocomplete=\\"do-not-autocomplete\\" autocapitalize=\\"off\\" spellcheck=\\"false\\" type=\\"text\\" data-bind=\\"
+          attr: { 'placeHolder' : hasFocus() ? '' : placeHolder },
+          textInput: searchInput,
+          hasFocus: hasFocus,
+          clearable: { value: searchInput, onClear: onClear },
+          css: { 'inline-autocomp-magnify-input': showMagnify }\\" placeholder=\\"Filter...\\">
+        <input class=\\"inline-autocomp-autocomp\\" disabled=\\"\\" type=\\"text\\" autocomplete=\\"do-not-autocomplete\\" data-bind=\\"
+          value: inlineAutocomplete,
+          css: { 'inline-autocomp-magnify-input': showMagnify }\\">
+      </form>
+    </div>
+  </div><div class=\\"hue-drop-down-container hue-drop-down-fixed\\" data-bind=\\"event: { 'mousedown': facetDropDownMouseDown }, css: { 'open' : facetDropDownVisible() }, dropDownKeyUp: { onEsc: facetDropDownOnEsc, onEnter: facetDropDownOnEnter, onSelected: facetDropDownOnSelected, dropDownVisible: facetDropDownVisible }\\">
+    <div class=\\"dropdown-menu\\" style=\\"overflow-y: auto; display: none;\\" data-bind=\\"visible: facetSuggestions().length > 0\\">
+      <ul class=\\"hue-inner-drop-down\\" data-bind=\\"foreach: facetSuggestions\\"></ul>
+    </div>
+  </div><!-- /ko -->
+    </div>
+    <!-- ko if: showOperations -->
+    <div class=\\"context-popover-sample-controls\\">
+      <div class=\\"margin-left-10 inline-block\\" data-bind=\\"component: { name: 'hue-drop-down', params: { value: operation, entries: operations } }\\"><a class=\\"inactive-action hue-drop-down-active\\" href=\\"javascript:void(0)\\" data-bind=\\"toggle: dropDownVisible, css: { 'blue': dropDownVisible }\\">
+    <!-- ko if: icon --><!-- /ko -->
+    <!-- ko if: !noLabel && value -->
+    <span class=\\"hue-drop-down-selected\\" data-bind=\\"text: value() &amp;&amp; typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': value() &amp;&amp; typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value() }\\" title=\\"default\\">default</span>
+    <!-- /ko -->
+    <i class=\\"fa fa-caret-down\\"></i>
+  </a><input class=\\"hue-drop-down-input\\" type=\\"text\\" data-bind=\\"textInput: filter, attr: { 'placeHolder': inputPlaceHolder }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }\\" placeholder=\\"default\\" style=\\"display: none; color: rgb(170, 170, 170); min-height: 22px; margin-left: 10px;\\"><i class=\\"fa fa-caret-down\\"></i><div class=\\"hue-drop-down-container\\" data-bind=\\"css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition, 'hue-drop-down-container-searchable': searchable }, dropDownKeyUp: { onEsc: onEsc, onEnter: onEnter, dropDownVisible: dropDownVisible }\\">
+    <div style=\\"overflow-y: auto;\\" class=\\"dropdown-menu\\" data-bind=\\"visible: filteredEntries().length > 0\\">
+      <!-- ko if: foreachVisible --><!-- /ko -->
+      <!-- ko ifnot: foreachVisible -->
+      <ul class=\\"hue-inner-drop-down\\" data-bind=\\"foreach: filteredEntries\\">
+        <!-- ko if: typeof $data.divider !== 'undefined' && $data.divider --><!-- /ko -->
+        <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
+        <li><a href=\\"javascript:void(0)\\" data-bind=\\"text: $data &amp;&amp; typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { let previous = $parent.value(); $parent.value($data); $parent.onSelect($data, previous); }\\">default</a></li>
+        <!-- /ko -->
+      
+        <!-- ko if: typeof $data.divider !== 'undefined' && $data.divider --><!-- /ko -->
+        <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
+        <li><a href=\\"javascript:void(0)\\" data-bind=\\"text: $data &amp;&amp; typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { let previous = $parent.value(); $parent.value($data); $parent.onSelect($data, previous); }\\">distinct</a></li>
+        <!-- /ko -->
+      
+        <!-- ko if: typeof $data.divider !== 'undefined' && $data.divider --><!-- /ko -->
+        <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
+        <li><a href=\\"javascript:void(0)\\" data-bind=\\"text: $data &amp;&amp; typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { let previous = $parent.value(); $parent.value($data); $parent.onSelect($data, previous); }\\">max</a></li>
+        <!-- /ko -->
+      
+        <!-- ko if: typeof $data.divider !== 'undefined' && $data.divider --><!-- /ko -->
+        <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
+        <li><a href=\\"javascript:void(0)\\" data-bind=\\"text: $data &amp;&amp; typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { let previous = $parent.value(); $parent.value($data); $parent.onSelect($data, previous); }\\">min</a></li>
+        <!-- /ko -->
+      </ul>
+      <!-- /ko -->
+    </div>
+  </div></div>
+      <div class=\\"margin-left-10 inactive-action inline-block\\">
+        <!-- ko if: loadingSamples() || refreshSampleEnabled() --><!-- /ko -->
+        <!-- ko if: !loadingSamples() && !refreshSampleEnabled() -->
+        <a href=\\"javascript:void(0);\\" data-bind=\\"click: function () { loadSamples(true) }\\"><i class=\\"fa fa-play\\"></i></a>
+        <!-- /ko -->
+      </div>
+    </div>
+    <!-- /ko -->
+  </div><table class=\\"table table-condensed table-nowrap\\">
+    <thead>
+    <tr>
+      <th>Sample</th>
+    </tr>
+    </thead>
+    <!-- ko if: loadingSamples() && (!refreshSampleEnabled() || (refreshSampleEnabled() && columnSamples().length === 0))  --><!-- /ko -->
+
+    <!-- ko if: !loadingSamples() || (refreshSampleEnabled() && columnSamples().length > 0)  -->
+    <tbody data-bind=\\"foreach: filteredColumnSamples\\"></tbody>
+    <!-- ko if: filteredColumnSamples().length === 0 -->
+    <tbody>
+    <tr>
+      <!-- ko ifnot: hasErrors --><!-- /ko -->
+      <!-- ko if: hasErrors -->
+      <td style=\\"font-style: italic;\\">Error loading samples</td>
+      <!-- /ko -->
+    </tr>
+    </tbody>
+    <!-- /ko -->
+    <!-- /ko -->
+  </table></div>"
+`;

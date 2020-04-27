@@ -17,13 +17,15 @@
 import $ from 'jquery';
 import d3v3 from 'd3v3';
 import 'ext/d3-tip.min';
-import ko from 'knockout';
+import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
 
 import apiHelper from 'api/apiHelper';
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+
+export const NAME = 'hue-execution-analysis';
 
 const TEMPLATE = `
   <div class="hue-execution-analysis">
@@ -257,7 +259,7 @@ class ExecutionAnalysis {
         compute: self.details().compute
       })
       .done(resp => {
-        huePubSub.publish('notebook.task.submitted', resp.task.history_uuid);
+        huePubSub.publish('notebook.task.submitted', resp);
         fix.fixed = true;
         self.analysis.valueHasMutated();
       });
@@ -289,4 +291,4 @@ class ExecutionAnalysis {
   }
 }
 
-componentUtils.registerComponent('hue-execution-analysis', ExecutionAnalysis, TEMPLATE);
+componentUtils.registerComponent(NAME, ExecutionAnalysis, TEMPLATE);

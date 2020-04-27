@@ -17,17 +17,18 @@
 
 import logging
 import os
-import sys
 import socket
+import sys
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
-from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_USERNAME as DEFAULT_AUTH_USERNAME,\
-  AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD
+
+from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_USERNAME as DEFAULT_AUTH_USERNAME, \
+    AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, has_connectors
 from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coerce_password_from_script
 from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.paths import get_desktop_root
 
-from impala.impala_flags import get_max_result_cache_size, is_impersonation_enabled, is_kerberos_enabled
+from impala.impala_flags import get_max_result_cache_size, is_impersonation_enabled, is_kerberos_enabled, is_webserver_spnego_enabled
 from impala.settings import NICE_NAME
 
 
@@ -44,6 +45,12 @@ SERVER_PORT = Config(
   help=_t("Port of the Impala Server."),
   default=21050,
   type=int)
+
+COORDINATOR_URL = Config(
+  key="coordinator_url",
+  help=_t("URL of the Impala Coordinator Server."),
+  type=str,
+  default="")
 
 IMPALA_PRINCIPAL=Config(
   key='impala_principal',
@@ -105,6 +112,7 @@ CONFIG_WHITELIST = Config(
 IMPALA_CONF_DIR = Config(
   key='impala_conf_dir',
   help=_t('Impala configuration directory, where impala_flags is located.'),
+  type=str,
   default=os.environ.get("HUE_CONF_DIR", get_desktop_root("conf")) + '/impala-conf'
 )
 
@@ -235,13 +243,16 @@ USE_SASL = Config(
 
 
 def config_validator(user):
-  # dbms is dependent on beeswax.conf (this file)
-  # import in method to avoid circular dependency
+  # dbms is dependent on beeswax.conf, import in method to avoid circular dependency
   from beeswax.design import hql_query
   from beeswax.server import dbms
   from beeswax.server.dbms import get_query_server_config
 
   res = []
+
+  if has_connectors():
+    return res
+
   try:
     try:
       if not 'test' in sys.argv: # Avoid tests hanging

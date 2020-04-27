@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.jobBrowserLinks.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;hue-job-browser-links&quot;, params: params }\\"><div class=\\"btn-group pull-right\\">
+    <!-- ko if: window.IS_K8S_ONLY --><!-- /ko -->
+    <!-- ko if: window.HAS_JOB_BROWSER --><!-- /ko -->
+  </div></div>"
+`;

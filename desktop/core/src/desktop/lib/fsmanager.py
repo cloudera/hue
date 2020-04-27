@@ -17,24 +17,38 @@
 
 from __future__ import absolute_import
 
+from functools import partial
 import logging
 
 import aws.client
 import azure.client
+import desktop.lib.fs.gc.client
 
 from aws.conf import is_enabled as is_s3_enabled, has_s3_access
 from azure.conf import is_adls_enabled, is_abfs_enabled, has_adls_access, has_abfs_access
 
-from desktop.lib.fs.proxyfs import ProxyFS
-from desktop.conf import is_gs_enabled, has_gs_access
-from desktop.lib.fs.gc.client import get_client as get_client_gs
 
-from hadoop.cluster import get_hdfs
+from desktop.conf import is_gs_enabled, has_gs_access, DEFAULT_USER
+
+from desktop.lib.fs.proxyfs import ProxyFS
+from desktop.lib.python_util import current_ms_from_utc
+from desktop.lib.idbroker import conf as conf_idbroker
+
+from hadoop.cluster import get_hdfs, _make_filesystem
 from hadoop.conf import has_hdfs_enabled
 
 
 SUPPORTED_FS = ['hdfs', 's3a', 'adl', 'abfs', 'gs']
+CLIENT_CACHE = None
+_DEFAULT_USER = DEFAULT_USER.get()
 
+# FIXME: Should we check hue principal for the default user?
+def _get_cache_key(fs, identifier, user=_DEFAULT_USER): # FIXME: Caching via username has issues when users get deleted. Need to switch to userid, but bigger change
+  return fs + ':' + identifier + ':' + user
+
+def clear_cache():
+  global CLIENT_CACHE
+  CLIENT_CACHE = None
 
 def has_access(fs=None, user=None):
   if fs == 'hdfs':
@@ -66,21 +80,44 @@ def is_enabled_and_has_access(fs=None, user=None):
   return is_enabled(fs) and has_access(fs, user)
 
 
-def _get_client(fs=None):
+def _make_client(fs, name, user):
   if fs == 'hdfs':
-    return get_hdfs
+    return _make_filesystem(name)
   elif fs == 's3a':
-    return aws.client.get_client
+    return aws.client._make_client(name, user)
   elif fs == 'adl':
-    return azure.client.get_client
+    return azure.client._make_adls_client(name, user)
   elif fs == 'abfs':
-    return azure.client.get_client_abfs
+    return azure.client._make_abfs_client(name, user)
   elif fs == 'gs':
-    return get_client_gs
+    return desktop.lib.fs.gc.client._make_client(name, user)
   return None
 
 
-def get_client(name='default', fs=None, user=None):
+def _get_client(fs=None):
+  if fs == 'hdfs':
+    return get_hdfs
+  elif fs in ['s3a', 'adl', 'abfs', 'gs']:
+    return partial(_get_client_cached, fs)
+  return None
+
+
+def _get_client_cached(fs, name, user):
+  global CLIENT_CACHE
+  if CLIENT_CACHE is None:
+    CLIENT_CACHE = {}
+  cache_key = _get_cache_key(fs, name, user) if conf_idbroker.is_idbroker_enabled(fs) else _get_cache_key(fs, name) # We don't want to cache by username when IDBroker not enabled
+  client = CLIENT_CACHE.get(cache_key)
+
+  if client and (client.expiration is None or client.expiration > int(current_ms_from_utc())): # expiration from IDBroker returns java timestamp in MS
+    return client
+  else:
+    client = _make_client(fs, name, user)
+    CLIENT_CACHE[cache_key] = client
+    return client
+
+
+def get_client(name='default', fs=None, user=_DEFAULT_USER):
   fs_getter = _get_client(fs)
   if fs_getter:
     return fs_getter(name, user)
@@ -105,20 +142,8 @@ def get_filesystem(name='default'):
   for fs in SUPPORTED_FS:
     if is_enabled(fs):
       pdict[fs] = _get_client(fs)
-  return ProxyFS(pdict, get_default_schema(), name)
+  return ProxyFS(pdict, get_default_schema(), name) if pdict else None
 
 
 def get_filesystems(user):
   return [fs for fs in SUPPORTED_FS if is_enabled(fs) and has_access(fs, user)]
-
-
-def _get_client(fs=None):
-  if fs == 'hdfs':
-    return get_hdfs
-  elif fs == 's3a':
-    return aws.client.get_client
-  elif fs == 'adl':
-    return azure.client.get_client
-  elif fs == 'abfs':
-    return azure.client.get_client_abfs
-  return None

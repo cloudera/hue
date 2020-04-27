@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
 
@@ -35,7 +35,7 @@ import huePubSub from 'utils/huePubSub';
  *
  */
 ko.bindingHandlers.contextMenu = {
-  initContextMenu: function($menu, $scrollContainer) {
+  initContextMenu: function($menu, $scrollContainer, onShow, onHide) {
     let active = false;
 
     let currentLeft = 0;
@@ -74,6 +74,9 @@ ko.bindingHandlers.contextMenu = {
         $menu.css('opacity', 1);
         active = true;
         $scrollContainer.on('scroll', adjustForScroll);
+        if (onShow) {
+          onShow();
+        }
       },
       hide: function() {
         if (active) {
@@ -83,6 +86,9 @@ ko.bindingHandlers.contextMenu = {
             $menu.hide();
           }, 300);
           active = false;
+        }
+        if (onHide) {
+          onHide();
         }
       }
     };

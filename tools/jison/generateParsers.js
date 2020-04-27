@@ -17,7 +17,7 @@
 /* eslint-disable no-restricted-syntax */
 
 const fs = require('fs');
-const exec = require('child_process').exec;
+const cli = require('jison/lib/cli');
 
 const LICENSE =
   '// Licensed to Cloudera, Inc. under one\n' +
@@ -43,9 +43,11 @@ const SQL_STATEMENTS_PARSER_JSDOC =
   ' * @return {SqlStatementsParserResult}\n' +
   ' */\n';
 
-const PARSER_FOLDER = 'desktop/core/src/desktop/js/parse/sql/';
-const JISON_FOLDER = 'desktop/core/src/desktop/js/parse/jison/';
-const SQL_PARSER_REPOSITORY_PATH = 'desktop/core/src/desktop/js/parse/sql/sqlParserRepository.js';
+const PARSER_FOLDER = '../../desktop/core/src/desktop/js/parse/sql/';
+const OUTPUT_FOLDER = '../../desktop/core/src/desktop/js/parse/';
+const JISON_FOLDER = '../../desktop/core/src/desktop/js/parse/jison/';
+const SQL_PARSER_REPOSITORY_PATH =
+  '../../desktop/core/src/desktop/js/parse/sql/sqlParserRepository.js';
 const SYNTAX_PARSER_IMPORT_TEMPLATE =
   '  KEY: () => import(/* webpackChunkName: "KEY-parser" */ \'parse/sql/KEY/KEYSyntaxParser\')';
 const AUTOCOMPLETE_PARSER_IMPORT_TEMPLATE =
@@ -55,7 +57,7 @@ const parserDefinitions = {
   globalSearchParser: {
     sources: ['globalSearchParser.jison'],
     target: 'globalSearchParser.jison',
-    outputFolder: 'desktop/core/src/desktop/js/parse/',
+    outputFolder: OUTPUT_FOLDER,
     afterParse: contents =>
       new Promise(resolve => {
         resolve(
@@ -71,7 +73,7 @@ const parserDefinitions = {
   solrFormulaParser: {
     sources: ['solrFormulaParser.jison'],
     target: 'solrFormulaParser.jison',
-    outputFolder: 'desktop/core/src/desktop/js/parse/',
+    outputFolder: OUTPUT_FOLDER,
     afterParse: contents =>
       new Promise(resolve => {
         resolve(LICENSE + contents + 'export default solrFormulaParser;\n');
@@ -80,7 +82,7 @@ const parserDefinitions = {
   solrQueryParser: {
     sources: ['solrQueryParser.jison'],
     target: 'solrQueryParser.jison',
-    outputFolder: 'desktop/core/src/desktop/js/parse/',
+    outputFolder: OUTPUT_FOLDER,
     afterParse: contents =>
       new Promise(resolve => {
         resolve(LICENSE + contents + 'export default solrQueryParser;\n');
@@ -89,7 +91,7 @@ const parserDefinitions = {
   sqlStatementsParser: {
     sources: ['sqlStatementsParser.jison'],
     target: 'sqlStatementsParser.jison',
-    outputFolder: 'desktop/core/src/desktop/js/parse/',
+    outputFolder: OUTPUT_FOLDER,
     afterParse: contents =>
       new Promise(resolve => {
         resolve(
@@ -153,16 +155,6 @@ const deleteFile = path => {
   fs.unlinkSync(path);
 };
 
-const execCmd = cmd =>
-  new Promise((resolve, reject) => {
-    exec(cmd, (err, stdout, stderr) => {
-      if (err) {
-        reject('stderr:\n' + stderr + '\n\nstdout:\n' + stdout);
-      }
-      resolve(stdout);
-    });
-  });
-
 const generateParser = parserName =>
   new Promise((resolve, reject) => {
     const parserConfig = parserDefinitions[parserName];
@@ -188,36 +180,38 @@ const generateParser = parserName =>
 
     concatPromise
       .then(targetPath => {
-        let jisonCommand = 'jison ' + targetPath;
+        const options = {
+          file: targetPath,
+          'module-type': 'js'
+        };
         if (parserConfig.lexer) {
-          jisonCommand += ' ' + JISON_FOLDER + parserConfig.lexer;
+          options['lexfile'] = JISON_FOLDER + parserConfig.lexer;
         }
-        jisonCommand += ' -m js';
+
         console.log('Generating parser...');
-        execCmd(jisonCommand)
-          .then(stdout => {
-            if (/\S/.test(stdout)) {
-              console.log('got output for: ' + jisonCommand);
-              console.log(stdout);
-            }
-            if (parserConfig.sources.length > 1) {
-              deleteFile(targetPath); // Remove concatenated file
-            }
-            console.log('Adjusting JS...');
-            const generatedJsFileName = parserConfig.target
-              .replace('.jison', '.js')
-              .replace(/^.*\/([^/]+)$/, '$1');
-            readFile(generatedJsFileName)
-              .then(contents => {
-                parserConfig
-                  .afterParse(contents)
-                  .then(finalContents => {
-                    writeFile(parserConfig.outputFolder + generatedJsFileName, finalContents)
-                      .then(() => {
-                        deleteFile(generatedJsFileName);
-                        resolve();
-                      })
-                      .catch(reject);
+        try {
+          cli.main(options);
+        } catch (err) {
+          console.error('Failed calling jison cli');
+          throw err;
+        }
+        if (parserConfig.sources.length > 1) {
+          deleteFile(targetPath); // Remove concatenated file
+        }
+        console.log('Adjusting JS...');
+        const generatedJsFileName = parserConfig.target
+          .replace('.jison', '.js')
+          .replace(/^.*\/([^/]+)$/, '$1');
+        console.log(generatedJsFileName);
+        readFile(generatedJsFileName)
+          .then(contents => {
+            parserConfig
+              .afterParse(contents)
+              .then(finalContents => {
+                writeFile(parserConfig.outputFolder + generatedJsFileName, finalContents)
+                  .then(() => {
+                    deleteFile(generatedJsFileName);
+                    resolve();
                   })
                   .catch(reject);
               })
@@ -249,7 +243,7 @@ const findParser = (fileIndex, folder, sharedFiles, autocomplete) => {
       lexer: 'sql/' + folder + '/sql.jisonlex',
       target: 'sql/' + folder + '/' + parserName + '.jison',
       sqlParser: autocomplete ? 'AUTOCOMPLETE' : 'SYNTAX',
-      outputFolder: 'desktop/core/src/desktop/js/parse/sql/' + folder + '/',
+      outputFolder: OUTPUT_FOLDER + 'sql/' + folder + '/',
       afterParse: contents =>
         new Promise(resolve => {
           resolve(
@@ -327,21 +321,21 @@ const identifySqlParsers = () =>
     });
   });
 
-const copySpecs = (source, target) =>
+const copyTests = (source, target) =>
   new Promise((resolve, reject) => {
     const replaceRegexp = new RegExp(source + '(Autocomplete|Syntax)Parser', 'g');
     mkdir(PARSER_FOLDER + target)
       .then(() => {
-        mkdir(PARSER_FOLDER + target + '/spec')
+        mkdir(PARSER_FOLDER + target + '/test')
           .then(() => {
-            listDir(PARSER_FOLDER + source + '/spec')
-              .then(specFiles => {
+            listDir(PARSER_FOLDER + source + '/test')
+              .then(testFiles => {
                 const copyPromises = [];
-                specFiles.forEach(specFile => {
+                testFiles.forEach(testFile => {
                   copyPromises.push(
                     copyFile(
-                      PARSER_FOLDER + source + '/spec/' + specFile,
-                      PARSER_FOLDER + target + '/spec/' + specFile.replace(source, target),
+                      PARSER_FOLDER + source + '/test/' + testFile,
+                      PARSER_FOLDER + target + '/test/' + testFile.replace(source, target),
                       contents => contents.replace(replaceRegexp, target + '$1Parser')
                     )
                   );
@@ -369,7 +363,7 @@ const prepareForNewParser = () =>
       if (
         !Object.keys(parserDefinitions).some(key => {
           if (key.indexOf(source) === 0) {
-            copySpecs(source, target)
+            copyTests(source, target)
               .then(() => {
                 mkdir(JISON_FOLDER + 'sql/' + target)
                   .then(() => {
@@ -397,14 +391,10 @@ const prepareForNewParser = () =>
                         });
                         autocompleteSources.push('sql/' + target + '/autocomplete_footer.jison');
                         syntaxSources.push('sql/' + target + '/syntax_footer.jison');
-                        mkdir('desktop/core/src/desktop/js/parse/sql/' + target).then(() => {
+                        mkdir(PARSER_FOLDER + target).then(() => {
                           copyFile(
-                            'desktop/core/src/desktop/js/parse/sql/' +
-                              source +
-                              '/sqlParseSupport.js',
-                            'desktop/core/src/desktop/js/parse/sql/' +
-                              target +
-                              '/sqlParseSupport.js',
+                            PARSER_FOLDER + source + '/sqlParseSupport.js',
+                            PARSER_FOLDER + target + '/sqlParseSupport.js',
                             contents =>
                               contents.replace(
                                 /parser\.yy\.activeDialect = '[^']+';'/g,

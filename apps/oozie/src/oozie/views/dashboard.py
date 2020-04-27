@@ -454,7 +454,7 @@ def list_oozie_workflow(request, job_id):
 @show_oozie_error
 def list_oozie_coordinator(request, job_id):
   kwargs = {'cnt': 50, 'filters': []}
-  kwargs['offset'] = request.GET.get('offset', 1)
+  kwargs['offset'] = request.GET.get('offset', default=1)
   if request.GET.getlist('status'):
       kwargs['filters'].extend([('status', status) for status in request.GET.getlist('status')])
 
@@ -769,6 +769,8 @@ def sync_coord_workflow(request, job_id):
              'header': _('Sync Workflow definition?'),
              'action': reverse('oozie:sync_coord_workflow', kwargs={'job_id': job_id})
            }, force_template=True).content
+  if not isinstance(popup, str):
+    popup = popup.decode('utf-8')
   return JsonResponse(popup, safe=False)
 
 @show_oozie_error

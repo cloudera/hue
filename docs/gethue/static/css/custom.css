@@ -1,0 +1,10 @@
+.blog-article img {
+  box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.15);
+}
+.blog-article img:hover {
+  box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.15);
+}
+img.flag {
+  max-width: 1.5em;
+  border: 1px solid #cccccc;
+}

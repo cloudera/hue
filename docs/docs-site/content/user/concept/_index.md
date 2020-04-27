@@ -28,28 +28,16 @@ Have you ever struggled to remember table names related to your project? Does it
 
 The new search bar is always accessible on the top of screen, and it offers a document search and metadata search too if Hue is configured to access a metadata server.
 
-Existing tags and indexed objects show up automatically, any additional tags you add appear back in metadata server, and the familiar metadata server search syntax is supported.
+![Top Search](https://cdn.gethue.com/uploads/2016/04/table_search.png)
 
-By default, only tables and views are returned. To search for columns, partitions, databases use the ‘type:' filter.
-
-Example of searches:
-
-* table:customer → Find the customer table
-* table:tax* tags:finance → List all the tables starting with tax and tagged with ‘finance'
-* owner:admin type:field usage → List all the fields created by the admin user that matches the usage string
-* parentPath:"/default/web_logs" type:FIELD  originalName:b* → List all the columns starting with `b` of the table `web_logs` in the database `default`.
-
-Learn more on the [Tagging](https://blog.cloudera.com/blog/2017/05/new-in-cloudera-enterprise-5-11-hue-data-search-and-tagging/).
-
-### Tagging
-
-In addition, you can also now tag objects with names to better categorize them and group them to different projects. These tags are searchable, expediting the exploration process through easier, more intuitive discovery.
 
 ### Left assist
 
 Data where you need it when you need it.
 
 Find your documents, HDFS and S3 files and more in the left assist panel, right-clicking items will show a list of actions, you can also drag-and-drop a file to get the path in your editor and more.
+
+![Left assist Navigation and drop](https://cdn.gethue.com/uploads/2018/05/HDFS_Context_Change_Path_2.gif)
 
 ### Right assist
 
@@ -58,6 +46,8 @@ This assistant content depends on the context of the application selected and wi
 ### Sample popup
 
 This popup offers a quick way to see sample of the data and other statistics on databases, tables, and columns. You can open the popup from the SQL Assist or with a right-click on any SQL object (table, column, function…). In this release, it also opens faster and caches the data.
+
+![Sample popup Navigation](https://cdn.gethue.com/uploads/2018/05/SQL_Context_Navigation.gif)
 
 ## Documents
 
@@ -69,16 +59,22 @@ Sharing happens on the main page or via the top right menu of the selected appli
 
 Two types of sharing permissions exist:
 
-- read only
-- can modify
+- Read only
+- Can modify
 
-Shared documents will show-up with a little blue icon in the homepage.
+Shared documents will show-up with a little blue icon.
+
+![Sharing](https://cdn.gethue.com/uploads/2019/04/editor_sharing.png)
 
 ### Import / Export
 
 Via the Home page, saved documents can be exported for backups or transferring to another Hue.
 
 ## Settings
+
+### Landing page
+
+Any application or editor can be starred next to its name so that it becomes the default editor and the landing page when logging in.
 
 ### Changing the language
 

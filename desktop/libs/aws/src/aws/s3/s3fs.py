@@ -95,15 +95,30 @@ class S3FileSystem(object):
     self.header_values = headers
 
   def _get_bucket(self, name):
-    return self._s3_connection.get_bucket(name, headers=self.header_values)
+    try:
+      return self._s3_connection.get_bucket(name, headers=self.header_values)
+    except S3ResponseError as e:
+      if e.status == 301 or e.status == 400:
+        raise S3FileSystemException(_('Failed to retrieve bucket "%s" in region "%s" with "%s". Your bucket is in region "%s"') % (name, self._get_location(), e.message or e.reason, self.get_bucket_location(name)))
+      else:
+        raise e
+
+  def get_bucket_location(self, name):
+    try:
+      # We use make_request, because self._s3_connection.get_bucket does not returns headers which contains the bucket location
+      resp = self._s3_connection.make_request('HEAD', name)
+      return resp.getheader('x-amz-bucket-region')
+    except Exception as e:
+      LOG.warn('Failed to fetch bucket "%s" location with "%s"' % (name, e.message or e.reason))
+      return None
 
   def _get_or_create_bucket(self, name):
     try:
       bucket = self._get_bucket(name)
     except BotoClientError as e:
-      raise S3FileSystemException(_('Failed to create bucket named "%s": %s') % (name, e.reason))
+      raise S3FileSystemException(_('Failed to create bucket "%s" with "%s"') % (name, e.message or e.reason))
     except S3ResponseError as e:
-      if e.status == 403 or e.status == 301:
+      if e.status == 403:
         raise S3FileSystemException(_('User is not authorized to access bucket named "%s". '
           'If you are attempting to create a bucket, this bucket name is already reserved.') % name)
       elif e.status == 404:
@@ -111,8 +126,6 @@ class S3FileSystem(object):
         if self._get_location():
           kwargs['location'] = self._get_location()
         bucket = self._create_bucket(name, **kwargs)
-      elif e.status == 400:
-        raise S3FileSystemException(_('Failed to create bucket named "%s": %s') % (name, e.reason))
       else:
         raise S3FileSystemException(e.message or e.reason)
     return bucket
@@ -182,7 +195,7 @@ class S3FileSystem(object):
       else:
         raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
     except Exception as e: # SSL errors show up here, because they've been remapped in boto
-      raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.message))
+      raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, str(e)))
     if key is None:
       key = self._get_key(path, validate=False)
     return self._stats_key(key, self.fs)
@@ -353,6 +366,8 @@ class S3FileSystem(object):
   def filebrowser_action(self):
     return self._filebrowser_action
 
+  def create_home_dir(self, home_path):
+    LOG.info('Create home directory is not available for S3 filesystem')
 
   @translate_s3_error
   @auth_error_handler

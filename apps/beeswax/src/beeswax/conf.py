@@ -17,8 +17,8 @@
 
 from __future__ import division
 from builtins import str
-from past.utils import old_div
 import logging
+import math
 import os.path
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
@@ -72,14 +72,14 @@ CACHE_TIMEOUT = Config(
 
 LLAP_SERVER_PORT = Config(
   key="llap_server_port",
-  help=_t("Configure the base port the Hive Server Interactive runs on (10500 default)."),
+  help=_t("LLAP binary Thrift port (10500 default)."),
   default=10500,
   type=int
 )
 
 LLAP_SERVER_THRIFT_PORT = Config(
   key="llap_server_thrift_port",
-  help=_t("Configure the thrift port the Hive Server Interactive runs on (10501 default)"),
+  help=_t("LLAP http Thrift port (10501 default)"),
   default=10501,
   type=int
 )
@@ -97,10 +97,26 @@ HIVE_SERVER_HOST = Config(
          "the fully-qualified domain name (FQDN) is required"),
   default="localhost")
 
+def get_hive_thrift_binary_port():
+  """Devise port from core-site Thrift / execution mode & Http port"""
+  from beeswax.hive_site import hiveserver2_thrift_binary_port, get_hive_execution_mode   # Cyclic dependency
+  return hiveserver2_thrift_binary_port() or (10500 if (get_hive_execution_mode() or '').lower() == 'llap' else 10000)
+
 HIVE_SERVER_PORT = Config(
   key="hive_server_port",
-  help=_t("Configure the port the HiveServer2 server runs on."),
-  default=10000,
+  help=_t("Configure the binary Thrift port for HiveServer2."),
+  dynamic_default=get_hive_thrift_binary_port,
+  type=int)
+
+def get_hive_thrift_http_port():
+  """Devise port from core-site Thrift / execution mode & Http port"""
+  from beeswax.hive_site import hiveserver2_thrift_http_port, get_hive_execution_mode   # Cyclic dependency
+  return hiveserver2_thrift_http_port() or (10501 if (get_hive_execution_mode() or '').lower() == 'llap'  else 10001)
+
+HIVE_HTTP_THRIFT_PORT = Config(
+  key="hive_server_http_port",
+  help=_t("Configure the Http Thrift port for HiveServer2."),
+  dynamic_default=get_hive_thrift_http_port,
   type=int)
 
 HIVE_METASTORE_HOST = Config(
@@ -141,8 +157,8 @@ USE_GET_LOG_API = Config( # To remove in Hue 4
   key='use_get_log_api',
   default=False,
   type=coerce_bool,
-  help=_t('Choose whether to use the old GetLog() thrift call from before Hive 0.14 to retrieve the logs.'
-          'If false, use the FetchResults() thrift call from Hive 1.0 or more instead.')
+  help=_t('Choose whether to use the old GetLog() Thrift call from before Hive 0.14 to retrieve the logs.'
+          'If false, use the FetchResults() Thrift call from Hive 1.0 or more instead.')
 )
 
 BROWSE_PARTITIONED_TABLE_LIMIT = Config( # Deprecated, to remove in Hue 4
@@ -178,7 +194,7 @@ DOWNLOAD_CELL_LIMIT = Config(
 
 def get_deprecated_download_cell_limit():
   """Get the old default"""
-  return old_div(DOWNLOAD_CELL_LIMIT.get(), 100) if DOWNLOAD_CELL_LIMIT.get() > 0 else DOWNLOAD_CELL_LIMIT.get()
+  return math.floor(DOWNLOAD_CELL_LIMIT.get() / 100) if DOWNLOAD_CELL_LIMIT.get() > 0 else DOWNLOAD_CELL_LIMIT.get()
 
 DOWNLOAD_ROW_LIMIT = Config(
   key='download_row_limit',
@@ -211,7 +227,9 @@ CLOSE_QUERIES = Config(
 
 MAX_NUMBER_OF_SESSIONS = Config(
   key="max_number_of_sessions",
-  help=_t("Hue will use at most this many HiveServer2 sessions per user at a time"),
+  help=_t("Hue will use at most this many HiveServer2 sessions per user at a time"
+          # The motivation for -1 is that Hue does currently keep track of session state perfectly and the user does not have ability to manage them effectively. The cost of a session is low
+          "-1 is unlimited number of sessions."),
   type=int,
   default=1
 )
@@ -220,7 +238,7 @@ THRIFT_VERSION = Config(
   key="thrift_version",
   help=_t("Thrift version to use when communicating with HiveServer2."),
   type=int,
-  default=7
+  default=11
 )
 
 CONFIG_WHITELIST = Config(
@@ -308,3 +326,20 @@ USE_SASL = Config(
   private=False,
   type=coerce_bool,
   dynamic_default=get_use_sasl_default)
+
+def has_multiple_sessions():
+  """When true will create multiple sessions for user queries"""
+  return MAX_NUMBER_OF_SESSIONS.get() != 1
+
+CLOSE_SESSIONS = Config(
+  key="close_sessions",
+  help=_t(
+      'When set to True, Hue will close sessions created for background queries and open new ones as needed.'
+      'When set to False, Hue will keep sessions created for background queries opened and reuse them as needed.'
+      'This flag is useful when max_number_of_sessions != 1'),
+  type=coerce_bool,
+  dynamic_default=has_multiple_sessions
+)
+
+def has_session_pool():
+  return has_multiple_sessions() and not CLOSE_SESSIONS.get()

@@ -552,8 +552,9 @@
     <!-- ko case: 'sqoop' --><svg class="hi hi-fw"><use xlink:href="#hi-sqoop"></use></svg><!-- /ko -->
     <!-- ko case: 'sqoop1' --><svg class="hi hi-fw"><use xlink:href="#hi-sqoop"></use></svg><!-- /ko -->
     <!-- ko case: 'tables' --><i class="fa fa-fw fa-table"></i><!-- /ko -->
+    <!-- ko case: 'database' --><i class="fa fa-fw fa-database"></i><!-- /ko -->
     <!-- ko case: 'text' --><i class="fa fa-fw fa-i-cursor"></i><!-- /ko -->
-    <!-- ko case: 'yarn' --><svg class="hi hi-fw"><use xlink:href="#hi-broadcast"></use></svg><!-- /ko -->
+    <!-- ko case: 'yarn' --><i class="fa fa-fw fa-tasks"></i><!-- /ko -->
     <!-- ko case: 'warehouses' --><i class="altus-icon altus-adb-cluster" style="margin: 0 1px 0 3px"></i><!-- /ko -->
     <!-- ko case: 'workflows' --><svg class="hi hi-fw"><use xlink:href="#hi-oozie"></use></svg><!-- /ko -->
     <!-- ko case: $else --><i class="fa fa-fw fa-database"></i><!-- /ko -->

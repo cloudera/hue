@@ -15,7 +15,8 @@
 // limitations under the License.
 
 import 'utils/publicPath';
-import '@babel/polyfill';
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 import _ from 'lodash';
 import $ from 'jquery/jquery.common';
 import 'ext/bootstrap.2.3.2.min';
@@ -71,10 +72,31 @@ import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and notebook.ko
 import HueFileEntry from 'doc/hueFileEntry';
 import HueDocument from 'doc/hueDocument';
+import { refreshConfig } from 'utils/hueConfig';
+import { simpleGet } from 'api/apiUtils'; // In analytics.mako, metrics.mako, threads.mako
+
+// import all the other Vue SFCs here
+// and then create as many instances of Vue as needed.
+// NOTE: given the nature of the project, Vue should be referenced after the page load
+//
+// import Vue from 'vue';
+// import TrademarkBanner from 'vue/components/login/TrademarkBanner.vue';
+// window.addEventListener('DOMContentLoaded', () => {
+//   new Vue({
+//     el: '#vue-element-id',
+//     components: {
+//       TrademarkBanner
+//     },
+//     data: {
+//       message: 'Hello VueHue!'
+//     }
+//   });
+// });
 
 // TODO: Migrate away
 window._ = _;
 window.apiHelper = apiHelper;
+window.simpleGet = simpleGet;
 window.CancellablePromise = CancellablePromise;
 window.contextCatalog = contextCatalog;
 window.d3 = d3;
@@ -114,7 +136,9 @@ window.sqlStatementsParser = sqlStatementsParser;
 window.sqlUtils = sqlUtils;
 window.sqlWorkerHandler = sqlWorkerHandler;
 
-$(document).ready(() => {
+$(document).ready(async () => {
+  await refreshConfig(); // Make sure we have config up front
+
   const onePageViewModel = new OnePageViewModel();
   ko.applyBindings(onePageViewModel, $('.page-content')[0]);
 
@@ -135,8 +159,6 @@ $(document).ready(() => {
     ko.applyBindings(sidebarViewModel, $('.hue-sidebar-container')[0]);
   }
 
-  huePubSub.publish('cluster.config.get.config');
-
   $(document).on('hideHistoryModal', e => {
     $('#clearNotificationHistoryModal').modal('hide');
   });
@@ -150,7 +172,7 @@ $(document).ready(() => {
       },
       resp => {
         if (resp.history_uuid) {
-          huePubSub.publish('open.editor.query', resp.history_uuid);
+          huePubSub.publish('open.editor.query', resp);
         } else if (resp.message) {
           $(document).trigger('error', resp.message);
         }

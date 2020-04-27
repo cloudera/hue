@@ -42,6 +42,7 @@ LOG_OFFSET = Config(
   help=_('Offset in bytes where a negative offset will fetch the last N bytes for the given log file (default 1MB).')
 )
 
+# Deprecated
 ENABLE_V2 = Config(
   key="enable_v2",
   help=_("Show the version 2 of app which unifies all the past browsers into one."),
@@ -56,9 +57,24 @@ MAX_JOB_FETCH = Config(
   help=_('Maximum number of jobs to fetch and display when pagination is not supported for the type.')
 )
 
+# Deprecated
 ENABLE_QUERY_BROWSER = Config(
   key="enable_query_browser",
-  help=_("Show the query section for listing and showing more troubleshooting information."),
+  help=_("Show the Impala query section for listing and showing more troubleshooting information."),
   type=coerce_bool,
   default=True
+)
+
+ENABLE_HIVE_QUERY_BROWSER = Config(
+  key="enable_hive_query_browser",
+  help=_("# Show the Hive query section for listing and showing more troubleshooting information."),
+  type=coerce_bool,
+  default=False
+) 
+
+ENABLE_HISTORY_V2 = Config(
+  key="enable_history_v2",
+  help=_("Show the version 2 of job/query History which unifies the all into one."),
+  type=coerce_bool,
+  default=False
 )

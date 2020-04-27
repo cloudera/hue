@@ -23,11 +23,14 @@ from desktop.lib.connectors import views, api
 urlpatterns = [
   url(r'^$', views.index, name='desktop.lib.connectors.views.index'),
 
-  url(r'^api/types/?$', api.get_connector_classes, name='connectors.api.get_connector_classes'),
-  url(r'^api/instances/?$', api.get_installed_connectors, name='connectors.api.get_installed_connectors'),
+  url(r'^api/types/?$', api.get_connector_types, name='connectors.api.get_connector_types'),
+  url(r'^api/instances/?$', api.get_connectors_instances, name='connectors.api.get_connectors_instances'),
 
   url(r'^api/instance/new/(?P<dialect>[\w\-]+)$', api.new_connector, name='connectors.api.new_connector'),
   url(r'^api/instance/get/(?P<id>\d+)$', api.get_connector, name='connectors.api.get_connector'),
   url(r'^api/instance/delete/?$', api.delete_connector, name='connectors.api.delete_connector'),
   url(r'^api/instance/update/?$', api.update_connector, name='connectors.api.update_connector'),
+  url(r'^api/instance/test/?$', api.test_connector, name='connectors.api.test_connector'),
+
+  url(r'^api/examples/install/?$', api.install_connector_examples, name='connectors.api.install_connector_examples'),
 ]

@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.paginator.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;paginator&quot;, params: params }\\"><div class=\\"pagination\\" data-bind=\\"visible: totalPages() > 1\\" style=\\"\\">
+  <ul>
+    <li data-bind=\\"css: { 'disabled' : currentPage() === 1 }\\" class=\\"disabled\\">
+      <a href=\\"javascript: void(0);\\" data-bind=\\"click: previousPage.bind($data)\\">Prev</a>
+    </li>
+    <li class=\\"active\\"><span data-bind=\\"text: currentPage() + '/' + totalPages()\\">1/5</span></li>
+    <li data-bind=\\"css: { 'disabled' : currentPage() === totalPages() }\\">
+      <a href=\\"javascript: void(0);\\" data-bind=\\"click: nextPage.bind($data)\\">Next</a>
+    </li>
+  </ul>
+</div></div>"
+`;

@@ -248,6 +248,7 @@ const initSqlParser = function(parser) {
       'DOUBLE',
       'FLOAT',
       'INT',
+      'INTEGER',
       'REAL',
       'SMALLINT',
       'TIMESTAMP',

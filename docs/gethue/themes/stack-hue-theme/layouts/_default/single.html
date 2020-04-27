@@ -1,0 +1,118 @@
+{{ partial "header.html" . }}
+<link rel="stylesheet"
+      href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/styles/github.min.css">
+<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<div class="main-container blog-article">
+    <section>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-12 col-lg-12">
+                    <article>
+                        <div class="article__title text-center">
+                            <h1 class="h2">{{ .Title }}</h1>
+                            {{ $pub := .Date.Format "02 January 2006" }}
+                            {{ $last := .Lastmod.Format "02 January 2006" }}
+                            <span>Published on {{ $pub }} in</span>
+                            <span>
+                                {{ $categories := .Params.categories }}
+                                {{ range $index, $element := $categories }}
+                                  <a href="{{ "/categories/" | relLangURL }}{{ $element | urlize }}">{{ $element }}</a>
+                                  {{ if (ne (add $index 1) (len $categories)) }}
+                                  /
+                                  {{ end }}
+                                {{ end }}
+                            </span>
+                            {{ $read := .ReadingTime }}
+                            - <span>{{ .ReadingTime }} minute{{ if gt $read 1 }}s{{ end }} read</span>
+
+                            {{ if and (ne $pub $last) (.Lastmod.After .Date) }}
+                            <span> - Last modified on {{ $last }}</span>
+                            {{ end }}
+                            {{ if .IsTranslated }}
+                            - <span>Read in
+                                {{ range .Translations }}
+                                <a href="{{ .Permalink }}">{{ .Lang }}</a>
+                                {{ end }}
+                            </span>
+                            {{ end }}
+                        </div>
+                        <!--end article title-->
+                        <div class="article__body">
+                            {{ .Content }}
+                        </div>
+                        <div class="article__share text-center">
+                            <a class="btn bg--facebook btn--icon" href="#">
+                                <span class="btn__text">
+                                    <i class="socicon socicon-facebook"></i>
+                                    Share on Facebook
+                                </span>
+                            </a>
+                            <a class="btn bg--twitter btn--icon" href="#">
+                                <span class="btn__text">
+                                    <i class="socicon socicon-twitter"></i>
+                                    Share on Twitter
+                                </span>
+                            </a>
+                        </div>
+                    </article>
+                    <!--end item-->
+                </div>
+            </div>
+            <!--end of row-->
+        </div>
+        <!--end of container-->
+    </section>
+
+    <section class="space--sm">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <hr>
+                </div>
+            </div>
+            <!--end of row-->
+        </div>
+        <!--end of container-->
+    </section>
+    <section>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-12 col-lg-12">
+                    <div class="comments">
+                        {{ template "_internal/disqus.html" . }}
+                    </div>
+                    <!--end comments-->
+                    <!-- <div class="comments-form">
+                        <h4>Leave a comment</h4>
+                        <form class="row">
+                            <div class="col-md-6">
+                                <label>Your Name:</label>
+                                <input type="text" name="Name" placeholder="Type name here" />
+                            </div>
+                            <div class="col-md-6">
+                                <label>Email Address:</label>
+                                <input type="email" name="email" placeholder="you@mailprovider.com" />
+                            </div>
+                            <div class="col-md-12">
+                                <label>Comment:</label>
+                                <textarea rows="4" name="Message" placeholder="Message"></textarea>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn--primary" type="submit">Submit Comment</button>
+                            </div>
+                        </form>
+                    </div> -->
+                </div>
+            </div>
+            <!--end of row-->
+        </div>
+        <!--end of container-->
+    </section>
+
+    {{ partial "latest.html" . }}
+</div>
+
+
+{{ partial "footer.html" . }}

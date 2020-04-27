@@ -17,12 +17,12 @@
 import $ from 'jquery';
 import localforage from 'localforage';
 
-import apiHelper from 'api/apiHelper';
 import CancellablePromise from 'api/cancellablePromise';
 import catalogUtils from 'catalog/catalogUtils';
 import DataCatalogEntry from 'catalog/dataCatalogEntry';
 import GeneralDataCatalog from 'catalog/generalDataCatalog';
 import MultiTableEntry from 'catalog/multiTableEntry';
+import { getOptimizer } from './optimizer/optimizer';
 
 const STORAGE_POSTFIX = window.LOGGED_USERNAME;
 const DATA_CATALOG_VERSION = 5;
@@ -88,8 +88,8 @@ const mergeEntry = function(dataCatalogEntry, storeEntry) {
   mergeAttribute('partitions', CACHEABLE_TTL.default, 'partitionsPromise');
   mergeAttribute('sample', CACHEABLE_TTL.default, 'samplePromise');
   mergeAttribute('navigatorMeta', CACHEABLE_TTL.default, 'navigatorMetaPromise');
-  mergeAttribute('navOptMeta', CACHEABLE_TTL.optimizer, 'navOptMetaPromise');
-  mergeAttribute('navOptPopularity', CACHEABLE_TTL.optimizer);
+  mergeAttribute('optimizerMeta', CACHEABLE_TTL.optimizer, 'optimizerMetaPromise');
+  mergeAttribute('optimizerPopularity', CACHEABLE_TTL.optimizer);
 };
 
 /**
@@ -121,15 +121,17 @@ const mergeMultiTableEntry = function(multiTableCatalogEntry, storeEntry) {
   mergeAttribute('topJoins', CACHEABLE_TTL.optimizer, 'topJoinsPromise');
 };
 
-class DataCatalog {
+export class DataCatalog {
   /**
    * @param {string} sourceType
+   * @param {Connector} connector
    *
    * @constructor
    */
-  constructor(sourceType) {
+  constructor(sourceType, connector) {
     const self = this;
     self.sourceType = sourceType;
+    self.connector = connector;
     self.entries = {};
     self.temporaryEntries = {};
     self.multiTableEntries = {};
@@ -155,14 +157,22 @@ class DataCatalog {
     cacheEnabled = true;
   }
 
+  static cacheEnabled() {
+    return cacheEnabled;
+  }
+
   /**
-   * Returns true if the catalog can have NavOpt metadata
+   * Returns true if the catalog can have Optimizer metadata
    *
    * @return {boolean}
    */
-  canHaveNavOptMetadata() {
-    const self = this;
-    return HAS_OPTIMIZER && (self.sourceType === 'hive' || self.sourceType === 'impala');
+  canHaveOptimizerMeta() {
+    return (
+      HAS_OPTIMIZER &&
+      this.connector &&
+      this.connector.optimizer &&
+      this.connector.optimizer !== 'off'
+    );
   }
 
   /**
@@ -243,8 +253,8 @@ class DataCatalog {
         partitions: dataCatalogEntry.partitions,
         sample: dataCatalogEntry.sample,
         navigatorMeta: dataCatalogEntry.navigatorMeta,
-        navOptMeta: dataCatalogEntry.navOptMeta,
-        navOptPopularity: dataCatalogEntry.navOptPopularity
+        optimizerMeta: dataCatalogEntry.optimizerMeta,
+        optimizerPopularity: dataCatalogEntry.optimizerPopularity
       })
       .then(deferred.resolve)
       .catch(deferred.reject);
@@ -258,14 +268,14 @@ class DataCatalog {
    * @param {Object} options
    * @param {ContextNamespace} options.namespace - The context namespace
    * @param {ContextCompute} options.compute - The context compute
+   * @param {Connector} options.connector
    * @param {string[][]} options.paths
    * @param {boolean} [options.silenceErrors] - Default true
    * @param {boolean} [options.cancellable] - Default false
    *
    * @return {CancellablePromise}
    */
-  loadNavOptPopularityForTables(options) {
-    const self = this;
+  loadOptimizerPopularityForTables(options) {
     const deferred = $.Deferred();
     const cancellablePromises = [];
     let popularEntries = [];
@@ -276,23 +286,22 @@ class DataCatalog {
     const existingPromises = [];
     options.paths.forEach(path => {
       const existingDeferred = $.Deferred();
-      self
-        .getEntry({ namespace: options.namespace, compute: options.compute, path: path })
+      this.getEntry({ namespace: options.namespace, compute: options.compute, path: path })
         .done(tableEntry => {
-          if (tableEntry.navOptPopularityForChildrenPromise) {
-            tableEntry.navOptPopularityForChildrenPromise
+          if (tableEntry.optimizerPopularityForChildrenPromise) {
+            tableEntry.optimizerPopularityForChildrenPromise
               .done(existingPopularEntries => {
                 popularEntries = popularEntries.concat(existingPopularEntries);
                 existingDeferred.resolve();
               })
               .fail(existingDeferred.reject);
-          } else if (tableEntry.definition && tableEntry.definition.navOptLoaded) {
+          } else if (tableEntry.definition && tableEntry.definition.optimizerLoaded) {
             cancellablePromises.push(
               tableEntry
                 .getChildren(options)
                 .done(childEntries => {
                   childEntries.forEach(childEntry => {
-                    if (childEntry.navOptPopularity) {
+                    if (childEntry.optimizerPopularity) {
                       popularEntries.push(childEntry);
                     }
                   });
@@ -313,15 +322,15 @@ class DataCatalog {
       const loadDeferred = $.Deferred();
       if (pathsToLoad.length) {
         cancellablePromises.push(
-          apiHelper
-            .fetchNavOptPopularity({
+          getOptimizer(this.connector)
+            .fetchPopularity({
               silenceErrors: options.silenceErrors,
               paths: pathsToLoad
             })
             .done(data => {
               const perTable = {};
 
-              const splitNavOptValuesPerTable = function(listName) {
+              const splitOptimizerValuesPerTable = function(listName) {
                 if (data.values[listName]) {
                   data.values[listName].forEach(column => {
                     let tableMeta = perTable[column.dbName + '.' + column.tableName];
@@ -338,25 +347,28 @@ class DataCatalog {
               };
 
               if (data.values) {
-                splitNavOptValuesPerTable('filterColumns');
-                splitNavOptValuesPerTable('groupbyColumns');
-                splitNavOptValuesPerTable('joinColumns');
-                splitNavOptValuesPerTable('orderbyColumns');
-                splitNavOptValuesPerTable('selectColumns');
+                splitOptimizerValuesPerTable('filterColumns');
+                splitOptimizerValuesPerTable('groupbyColumns');
+                splitOptimizerValuesPerTable('joinColumns');
+                splitOptimizerValuesPerTable('orderbyColumns');
+                splitOptimizerValuesPerTable('selectColumns');
               }
 
               const tablePromises = [];
 
               Object.keys(perTable).forEach(path => {
                 const tableDeferred = $.Deferred();
-                self
-                  .getEntry({ namespace: options.namespace, compute: options.compute, path: path })
+                this.getEntry({
+                  namespace: options.namespace,
+                  compute: options.compute,
+                  path: path
+                })
                   .done(entry => {
                     cancellablePromises.push(
                       entry.trackedPromise(
-                        'navOptPopularityForChildrenPromise',
+                        'optimizerPopularityForChildrenPromise',
                         entry
-                          .applyNavOptResponseToChildren(perTable[path], options)
+                          .applyOptimizerResponseToChildren(perTable[path], options)
                           .done(entries => {
                             popularEntries = popularEntries.concat(entries);
                             tableDeferred.resolve();
@@ -416,6 +428,7 @@ class DataCatalog {
    * @param {string} options.name
    * @param {ContextNamespace} options.namespace - The context namespace
    * @param {ContextCompute} options.compute - The context compute
+   * @param {Connector} options.connector
    *
    * @param {Object[]} options.columns
    * @param {string} options.columns[].name
@@ -464,7 +477,7 @@ class DataCatalog {
         path: [],
         definition: {
           index: 0,
-          navOptLoaded: true,
+          optimizerLoaded: true,
           type: 'source'
         }
       });
@@ -494,7 +507,7 @@ class DataCatalog {
             path: ['default'],
             definition: {
               index: 0,
-              navOptLoaded: true,
+              optimizerLoaded: true,
               type: 'database'
             }
           });
@@ -526,7 +539,7 @@ class DataCatalog {
                 comment: '',
                 index: 0,
                 name: options.name,
-                navOptLoaded: true,
+                optimizerLoaded: true,
                 type: 'table'
               }
             });
@@ -716,6 +729,7 @@ class DataCatalog {
    * @param {Object} options
    * @param {ContextNamespace} options.namespace - The context namespace
    * @param {ContextCompute} options.compute - The context compute
+   * @param {Connector} options.connector
    * @param {string[][]} options.paths
    *
    * @return {Promise}
@@ -733,7 +747,11 @@ class DataCatalog {
     if (!cacheEnabled) {
       deferred
         .resolve(
-          new MultiTableEntry({ identifier: identifier, dataCatalog: self, paths: options.paths })
+          new MultiTableEntry({
+            identifier: identifier,
+            dataCatalog: self,
+            paths: options.paths
+          })
         )
         .promise();
     } else {
@@ -753,7 +771,11 @@ class DataCatalog {
         .catch(error => {
           console.warn(error);
           deferred.resolve(
-            new MultiTableEntry({ identifier: identifier, dataCatalog: self, paths: options.paths })
+            new MultiTableEntry({
+              identifier: identifier,
+              dataCatalog: self,
+              paths: options.paths
+            })
           );
         });
     }
@@ -796,15 +818,17 @@ const sourceBoundCatalogs = {};
  * Helper function to get the DataCatalog instance for a given data source.
  *
  * @param {string} sourceType
+ * @param {Connector} connector
+ *
  * @return {DataCatalog}
  */
-const getCatalog = function(sourceType) {
+const getCatalog = function(sourceType, connector) {
   if (!sourceType) {
     throw new Error('getCatalog called without sourceType');
   }
   return (
     sourceBoundCatalogs[sourceType] ||
-    (sourceBoundCatalogs[sourceType] = new DataCatalog(sourceType))
+    (sourceBoundCatalogs[sourceType] = new DataCatalog(sourceType, connector))
   );
 };
 
@@ -819,6 +843,7 @@ export default {
    * @param {string} options.sourceType
    * @param {ContextNamespace} options.namespace - The context namespace
    * @param {ContextCompute} options.compute - The context compute
+   * @param {Connector} options.connector
    * @param {string} options.name
    *
    * @param {Object[]} options.columns
@@ -829,7 +854,7 @@ export default {
    * @return {Object}
    */
   addTemporaryTable: function(options) {
-    return getCatalog(options.sourceType).addTemporaryTable(options);
+    return getCatalog(options.sourceType, options.connector).addTemporaryTable(options);
   },
 
   /**
@@ -837,6 +862,7 @@ export default {
    * @param {string} options.sourceType
    * @param {ContextNamespace} options.namespace - The context namespace
    * @param {ContextCompute} options.compute - The context compute
+   * @param {Connector} options.connector
    * @param {string|string[]} options.path
    * @param {Object} [options.definition] - Optional initial definition
    * @param {boolean} [options.temporaryOnly] - Default: false
@@ -844,7 +870,7 @@ export default {
    * @return {Promise}
    */
   getEntry: function(options) {
-    return getCatalog(options.sourceType).getEntry(options);
+    return getCatalog(options.sourceType, options.connector).getEntry(options);
   },
 
   /**
@@ -852,12 +878,13 @@ export default {
    * @param {string} options.sourceType
    * @param {ContextNamespace} options.namespace - The context namespace
    * @param {ContextCompute} options.compute - The context compute
+   * @param {Connector} options.connector
    * @param {string[][]} options.paths
    *
    * @return {Promise}
    */
   getMultiTableEntry: function(options) {
-    return getCatalog(options.sourceType).getMultiTableEntry(options);
+    return getCatalog(options.sourceType, options.connector).getMultiTableEntry(options);
   },
 
   /**
@@ -868,6 +895,7 @@ export default {
    * @param {string} options.sourceType
    * @param {ContextNamespace} options.namespace - The context namespace
    * @param {ContextCompute} options.compute - The context compute
+   * @param {Connector} options.connector
    * @param {string|string[]} options.path
    * @param {Object} [options.definition] - Optional initial definition of the parent entry
    * @param {boolean} [options.silenceErrors]
@@ -880,7 +908,7 @@ export default {
   getChildren: function(options) {
     const deferred = $.Deferred();
     const cancellablePromises = [];
-    getCatalog(options.sourceType)
+    getCatalog(options.sourceType, options.connector)
       .getEntry(options)
       .done(entry => {
         cancellablePromises.push(
@@ -896,6 +924,7 @@ export default {
 
   /**
    * @param {string} sourceType
+   * @param {Connector} connector
    *
    * @return {DataCatalog}
    */

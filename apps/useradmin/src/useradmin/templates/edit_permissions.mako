@@ -14,19 +14,27 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-import urllib
+import sys
 
-from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
+
+from desktop.conf import ENABLE_ORGANIZATIONS
+from desktop.views import commonheader, commonfooter
+
+if sys.version_info[0] > 2:
+  from urllib.parse import quote as urllib_quote
+  unicode = str
+else:
+  from urllib import quote as urllib_quote
 %>
 
 <%namespace name="layout" file="layout.mako" />
 
-%if not is_embeddable:
-${ commonheader(_('Hue Permissions'), "useradmin", user, request) | n,unicode }
-%endif
+% if not is_embeddable:
+  ${ commonheader(_('Permissions'), "useradmin", user, request) | n,unicode }
+% endif
 
-${layout.menubar(section='permissions')}
+${ layout.menubar(section='permissions') }
 
 <%def name="render_field(field)">
   %if not field.is_hidden:
@@ -34,9 +42,9 @@ ${layout.menubar(section='permissions')}
     <div class="control-group ${group_class}">
       <label class="control-label" for="id_${field.html_name}">${field.label}</label>
     <div class="controls">
-    ${unicode(field) | n}
+    ${ unicode(field) | n }
     % if len(field.errors):
-        <span class="help-inline">${unicode(field.errors) | n}</span>
+      <span class="help-inline">${unicode(field.errors) | n}</span>
     % endif
     </div>
     </div>
@@ -45,10 +53,15 @@ ${layout.menubar(section='permissions')}
 
 <div id="editPermissionsComponents" class="useradmin container-fluid">
   <div class="card card-small">
-    <h1 class="card-heading simple">${_('Hue Permissions - Edit app: %(app)s') % dict(app=app)}</h1>
+    <h1 class="card-heading simple">
+      ${_('Edit %(app)s') % dict(app=app)}
+      % if ENABLE_ORGANIZATIONS.get():
+        @ ${ user.organization }
+      % endif
+    </h1>
     <br/>
 
-    <form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal">
+    <form id="editForm" action="${urllib_quote(action)}" method="POST" class="form form-horizontal">
       ${ csrf_token(request) | n,unicode }
       <fieldset>
           % for field in form:

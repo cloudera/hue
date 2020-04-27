@@ -1,0 +1,29 @@
+[product]
+other = "製品"
+
+[user]
+other = "ユーザー"
+
+[admin]
+other = "管理者"
+
+[developer]
+other = "デベロッパー"
+
+[blog]
+other = "ブログ"
+
+[forum]
+other = "フォーラム"
+
+[quickstart]
+other = "クイックスタート"
+
+[contact]
+other = "連絡先"
+
+[work]
+other = "一緒に開発しましょう"
+
+[try]
+other = "Hue を試してみる"

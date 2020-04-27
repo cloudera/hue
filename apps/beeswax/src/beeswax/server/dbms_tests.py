@@ -17,15 +17,19 @@
 # limitations under the License.
 
 import logging
+import sys
 
 from django.core.cache import caches
-from mock import patch, Mock
 from nose.tools import assert_equal, assert_true
 
 from desktop.settings import CACHES_HIVE_DISCOVERY_KEY
 
 from beeswax.server.dbms import get_query_server_config
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 LOG = logging.getLogger(__name__)
 cache = caches[CACHES_HIVE_DISCOVERY_KEY]

@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import AssistStorageEntry from 'ko/components/assist/assistStorageEntry';
 import huePubSub from 'utils/huePubSub';

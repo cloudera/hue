@@ -14,12 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import 'ko/components/ko.catalogEntriesList';
 
 import componentUtils from './componentUtils';
 import dataCatalog from 'catalog/dataCatalog';
+
+export const NAME = 'polling-catalog-entries-list';
 
 const TEMPLATE = `
   <div>
@@ -141,6 +143,7 @@ class PollingCatalogEntriesList {
         sourceType: ko.unwrap(self.sourceType),
         namespace: ko.unwrap(self.namespace),
         compute: ko.unwrap(self.compute),
+        connector: {}, // TODO: Use connectors in polling catalog entries list
         path: ko.unwrap(self.path)
       })
       .done(catalogEntry => {
@@ -161,8 +164,4 @@ class PollingCatalogEntriesList {
   }
 }
 
-componentUtils.registerComponent(
-  'polling-catalog-entries-list',
-  PollingCatalogEntriesList,
-  TEMPLATE
-);
+componentUtils.registerComponent(NAME, PollingCatalogEntriesList, TEMPLATE);

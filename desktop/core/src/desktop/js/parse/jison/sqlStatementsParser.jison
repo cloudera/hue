@@ -31,12 +31,12 @@
 <inLineComment>[\n]                                                   { this.popState(); return 'PART_OF_STATEMENT'; }
 
 '"'                                                                   { this.begin("doubleQuote"); return 'PART_OF_STATEMENT'; }
-<doubleQuote>(?:\\["]|[^"])+                                          { return 'PART_OF_STATEMENT'; }
+<doubleQuote>(?:\\\\|\\["]|[^"])+                                     { return 'PART_OF_STATEMENT'; }
 <doubleQuote><<EOF>>                                                  { this.popState(); return 'EOF'; }
 <doubleQuote>'"'                                                      { this.popState(); return 'PART_OF_STATEMENT'; }
 
 '\''                                                                  { this.begin("singleQuote"); return 'PART_OF_STATEMENT'; }
-<singleQuote>(?:\\[']|[^'])+                                          { return 'PART_OF_STATEMENT'; }
+<singleQuote>(?:\\\\|\\[']|[^'])+                                     { return 'PART_OF_STATEMENT'; }
 <singleQuote><<EOF>>                                                  { this.popState(); return 'EOF'; }
 <singleQuote>'\''                                                     { this.popState(); return 'PART_OF_STATEMENT'; }
 

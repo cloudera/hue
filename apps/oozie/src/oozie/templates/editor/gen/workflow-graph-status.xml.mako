@@ -20,7 +20,11 @@
 
 <%!
   import re
+  import sys
   from django.utils.translation import ugettext as _
+
+  if sys.version_info[0] > 2:
+    unicode = str
 %>
 
 <%def name="get_tab(form, action, control, css_box_class)">

@@ -14,7 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import '@babel/polyfill';
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 import sqlParserRepository from 'parse/sql/sqlParserRepository';
 
 const handleStatement = (statement, locations, autocompleteParser, active) => {
@@ -59,7 +60,7 @@ const onMessage = msg => {
         let locations = [];
         const activeStatementLocations = [];
         msg.data.statementDetails.precedingStatements.forEach(statement => {
-          handleStatement(statement, locations, msg.data.type, false);
+          handleStatement(statement, locations, parser, false);
         });
         if (msg.data.statementDetails.activeStatement) {
           handleStatement(
@@ -71,7 +72,7 @@ const onMessage = msg => {
           locations = locations.concat(activeStatementLocations);
         }
         msg.data.statementDetails.followingStatements.forEach(statement => {
-          handleStatement(statement, locations, msg.data.type, false);
+          handleStatement(statement, locations, parser, false);
         });
 
         // Add databases where missing in the table identifier chains

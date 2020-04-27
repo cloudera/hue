@@ -56,6 +56,7 @@ desktop/core/ext-py/lxml/src/lxml/lxml-version.h
 # Coverage product
 /.coverage
 /coverage.xml
+/coverage
 
 # Common utility alias
 /d
@@ -115,3 +116,6 @@ desktop/core/src/desktop/static/desktop/js/bundles/
 
 # Hugo generated files
 docs/docs-site/public/
+
+# VSCode settings
+.vscode

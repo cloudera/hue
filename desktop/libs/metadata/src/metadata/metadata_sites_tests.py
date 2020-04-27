@@ -20,6 +20,7 @@ from builtins import object
 import logging
 import os
 import shutil
+import sys
 import tempfile
 
 from nose.tools import assert_equal
@@ -27,6 +28,11 @@ from nose.tools import assert_equal
 from . import metadata_sites
 from metadata.conf import NAVIGATOR
 from metadata.metadata_sites import get_navigator_server_url
+
+if sys.version_info[0] > 2:
+  open_file = open
+else:
+  open_file = file
 
 LOG = logging.getLogger(__name__)
 
@@ -40,7 +46,7 @@ class TestReadConfiguration(object):
     ]
 
     try:
-      file(os.path.join(tmpdir, 'navigator.lineage.client.properties'), 'w').write("""
+      open_file(os.path.join(tmpdir, 'navigator.lineage.client.properties'), 'w').write("""
 navigator.client.serviceType=HUE
 navigator.server.url=http://hue-rocks.com:7187
 navigator.client.roleName=HUE-1-HUE_SERVER-50cf99601c4bf64e9ccded4c8cd96d12

@@ -25,6 +25,7 @@ from django.http import Http404
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
+from desktop.auth.backend import is_admin
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2
@@ -32,10 +33,9 @@ from libsentry.privilege_checker import MissingSentryPrivilegeException
 from notebook.api import _get_statement
 from notebook.models import Notebook
 
-from metadata.optimizer_client import OptimizerApi, NavOptException, _get_table_name, _clean_query
+from metadata.optimizer.base import get_api
+from metadata.optimizer.optimizer_client import NavOptException, _get_table_name, _clean_query
 from metadata.conf import OPTIMIZER
-
-from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -82,9 +82,11 @@ def error_handler(view_fn):
 def get_tenant(request):
   response = {'status': -1}
 
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   cluster_id = request.POST.get('cluster_id')
 
-  api = OptimizerApi(request.user)
+  api = get_api(request.user, interface)
+
   data = api.get_tenant(cluster_id=cluster_id)
 
   if data:
@@ -101,21 +103,30 @@ def get_tenant(request):
 def top_tables(request):
   response = {'status': -1}
 
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   database = request.POST.get('database', 'default')
   limit = request.POST.get('len', 1000)
 
-  api = OptimizerApi(user=request.user)
+  api = get_api(request.user, interface)
+
   data = api.top_tables(database_name=database, page_size=limit)
 
+  if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
+    checker = get_checker(user=self.user)
+    action = 'SELECT'
+
+    def getkey(table):
+      names = _get_table_name(table['name'])
+      return {'server': get_hive_sentry_provider(), 'db': names['database'], 'table': names['table']}
+
+    data['results'] = list(checker.filter_objects(data['results'], action, key=getkey))
+
   tables = [{
-      'eid': table['eid'],
       'database': _get_table_name(table['name'])['database'],
       'name': _get_table_name(table['name'])['table'],
       'popularity': table['workloadPercent'],
       'column_count': table['columnCount'],
-      'patternCount': table['patternCount'],
       'total': table['total'],
-      'is_fact': table['type'] != 'Dimension'
     } for table in data['results']
   ]
 
@@ -130,10 +141,11 @@ def top_tables(request):
 def table_details(request):
   response = {'status': -1}
 
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   database_name = request.POST.get('databaseName')
   table_name = request.POST.get('tableName')
 
-  api = OptimizerApi(request.user)
+  api = get_api(request.user, interface)
 
   data = api.table_details(database_name=database_name, table_name=table_name)
 
@@ -151,11 +163,12 @@ def table_details(request):
 def query_compatibility(request):
   response = {'status': -1}
 
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   source_platform = request.POST.get('sourcePlatform')
   target_platform = request.POST.get('targetPlatform')
   query = request.POST.get('query')
 
-  api = OptimizerApi(request.user)
+  api = get_api(request.user, interface)
 
   data = api.query_compatibility(source_platform=source_platform, target_platform=target_platform, query=query)
 
@@ -173,11 +186,12 @@ def query_compatibility(request):
 def query_risk(request):
   response = {'status': -1}
 
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   query = json.loads(request.POST.get('query'))
   source_platform = request.POST.get('sourcePlatform')
   db_name = request.POST.get('dbName')
 
-  api = OptimizerApi(request.user)
+  api = get_api(request.user, interface)
 
   data = api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
 
@@ -195,10 +209,11 @@ def query_risk(request):
 def similar_queries(request):
   response = {'status': -1}
 
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   source_platform = request.POST.get('sourcePlatform')
   query = json.loads(request.POST.get('query'))
 
-  api = OptimizerApi(request.user)
+  api = get_api(request.user, interface)
 
   data = api.similar_queries(source_platform=source_platform, query=query)
 
@@ -216,10 +231,12 @@ def similar_queries(request):
 def top_filters(request):
   response = {'status': -1}
 
-  db_tables = json.loads(request.POST.get('dbTables'), '[]')
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
+  db_tables = json.loads(request.POST.get('dbTables', '[]'))
   column_name = request.POST.get('columnName') # Unused
 
-  api = OptimizerApi(request.user)
+  api = get_api(request.user, interface)
+
   data = api.top_filters(db_tables=db_tables)
 
   if data:
@@ -227,6 +244,14 @@ def top_filters(request):
     response['values'] = data['results']
   else:
     response['message'] = 'Optimizer: %s' % data
+
+  if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
+    filtered_filters = []
+    for result in results['results']:
+      cols = [_get_table_name(col['columnName']) for col in result["popularValues"][0]["group"]]
+      if len(cols) == len(list(_secure_results(cols, self.user))):
+        filtered_filters.append(result)
+    results['results'] = filtered_filters
 
   return JsonResponse(response)
 
@@ -236,9 +261,11 @@ def top_filters(request):
 def top_joins(request):
   response = {'status': -1}
 
-  db_tables = json.loads(request.POST.get('dbTables'), '[]')
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
+  db_tables = json.loads(request.POST.get('dbTables', '[]'))
 
-  api = OptimizerApi(request.user)
+  api = get_api(request.user, interface)
+
   data = api.top_joins(db_tables=db_tables)
 
   if data:
@@ -255,9 +282,11 @@ def top_joins(request):
 def top_aggs(request):
   response = {'status': -1}
 
-  db_tables = json.loads(request.POST.get('dbTables'), '[]')
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
+  db_tables = json.loads(request.POST.get('dbTables', '[]'))
 
-  api = OptimizerApi(request.user)
+  api = get_api(request.user, interface)
+
   data = api.top_aggs(db_tables=db_tables)
 
   if data:
@@ -274,7 +303,10 @@ def top_aggs(request):
 def top_databases(request):
   response = {'status': -1}
 
-  api = OptimizerApi(request.user)
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
+
+  api = get_api(request.user, interface)
+
   data = api.top_databases()
 
   if data:
@@ -291,9 +323,11 @@ def top_databases(request):
 def top_columns(request):
   response = {'status': -1}
 
-  db_tables = json.loads(request.POST.get('dbTables'), '[]')
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
+  db_tables = json.loads(request.POST.get('dbTables', '[]'))
 
-  api = OptimizerApi(request.user)
+  api = get_api(request.user, interface)
+
   data = api.top_columns(db_tables=db_tables)
 
   if data:
@@ -312,7 +346,10 @@ def _convert_queries(queries_data):
     try:
       snippet = query_data['snippets'][0]
       if 'guid' in snippet['result']['handle']: # Not failed query
-        original_query_id = '%s:%s' % struct.unpack(b"QQ", base64.decodestring(snippet['result']['handle']['guid'])) # unpack_guid uses '%016x:%016x' while optmizer api uses '%s:%s'.
+        guid = snippet['result']['handle']['guid']
+        if isinstance(guid, str):
+          guid = guid.encode('utf-8')
+        original_query_id = '%s:%s' % struct.unpack(b"QQ", base64.decodestring(guid)) # unpack_guid uses '%016x:%016x' while optmizer api uses '%s:%s'.
         execution_time = snippet['result']['executionTime'] * 100 if snippet['status'] in ('available', 'expired') else -1
         statement = _clean_query(_get_statement(query_data))
         queries.append((original_query_id, execution_time, statement, snippet.get('database', 'default').strip()))
@@ -328,7 +365,8 @@ def upload_history(request):
   response = {'status': -1}
 
   if is_admin(request.user):
-    api = OptimizerApi(request.user)
+    interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
+    api = get_api(request.user, interface)
     histories = []
     upload_stats = {}
 
@@ -360,6 +398,7 @@ def upload_history(request):
 def upload_query(request):
   response = {'status': -1}
 
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   source_platform = request.POST.get('sourcePlatform', 'default')
   query_id = request.POST.get('query_id')
 
@@ -371,7 +410,7 @@ def upload_query(request):
       queries = _convert_queries([query_data])
       source_platform = query_data['snippets'][0]['type']
 
-      api = OptimizerApi(request.user)
+      api = get_api(request.user, interface)
 
       response['query_upload'] = api.upload(data=queries, data_type='queries', source_platform=source_platform)
     except Document2.DoesNotExist:
@@ -388,7 +427,8 @@ def upload_query(request):
 def upload_table_stats(request):
   response = {'status': -1}
 
-  db_tables = json.loads(request.POST.get('db_tables'), '[]')
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
+  db_tables = json.loads(request.POST.get('db_tables', '[]'))
   source_platform = json.loads(request.POST.get('sourcePlatform', '"hive"'))
   with_ddl = json.loads(request.POST.get('with_ddl', 'false'))
   with_table_stats = json.loads(request.POST.get('with_table', 'false'))
@@ -465,7 +505,7 @@ def upload_table_stats(request):
     except Exception as e:
       LOG.exception('Skipping upload of %s: %s' % (db_table, e))
 
-  api = OptimizerApi(request.user)
+  api = get_api(request.user, interface)
 
   response['status'] = 0
 
@@ -492,9 +532,10 @@ def upload_table_stats(request):
 def upload_status(request):
   response = {'status': -1}
 
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   workload_id = request.POST.get('workloadId')
 
-  api = OptimizerApi(request.user)
+  api = get_api(request.user, interface)
 
   response['upload_status'] = api.upload_status(workload_id=workload_id)
   response['status'] = 0

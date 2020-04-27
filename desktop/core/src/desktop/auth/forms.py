@@ -72,7 +72,7 @@ class AuthenticationForm(DjangoAuthenticationForm):
     'inactive': _t("Account deactivated. Please contact an administrator."),
   }
 
-  username = CharField(label=_t("Username"), widget=TextInput(attrs={'maxlength': 30, 'placeholder': _t("Username"), 'autocomplete': 'off', 'autofocus': 'autofocus'}))
+  username = CharField(label=_t("Username"), widget=TextInput(attrs={'maxlength': 150, 'placeholder': _t("Username"), 'autocomplete': 'off', 'autofocus': 'autofocus'}))
   password = CharField(label=_t("Password"), widget=PasswordInput(attrs={'placeholder': _t("Password"), 'autocomplete': 'off'}))
 
   def authenticate(self):
@@ -84,7 +84,7 @@ class AuthenticationForm(DjangoAuthenticationForm):
         user = User.objects.get(username=self.cleaned_data.get('username'))
 
         expires_delta = datetime.timedelta(seconds=conf.AUTH.EXPIRES_AFTER.get())
-        if user.is_active and user.last_login + expires_delta < datetime.datetime.now():
+        if user.is_active and user.last_login and user.last_login + expires_delta < datetime.datetime.now():
           INACTIVE_EXPIRATION_DELTA = datetime.timedelta(days=365)
           if is_admin(user):
             if conf.AUTH.EXPIRE_SUPERUSERS.get():
@@ -145,21 +145,21 @@ class OrganizationAuthenticationForm(Form):
     return self.cleaned_data
 
   def confirm_login_allowed(self, user):
-        """
-        Controls whether the given User may log in. This is a policy setting,
-        independent of end-user authentication. This default behavior is to
-        allow login by active users, and reject login by inactive users.
+    """
+    Controls whether the given User may log in. This is a policy setting,
+    independent of end-user authentication. This default behavior is to
+    allow login by active users, and reject login by inactive users.
 
-        If the given user cannot log in, this method should raise a
-        ``forms.ValidationError``.
+    If the given user cannot log in, this method should raise a
+    ``forms.ValidationError``.
 
-        If the given user may log in, this method should return None.
-        """
-        if not user.is_active:
-            raise ValidationError(
-                self.error_messages['inactive'],
-                code='inactive',
-            )
+    If the given user may log in, this method should return None.
+    """
+    if not user.is_active:
+        raise ValidationError(
+            self.error_messages['inactive'],
+            code='inactive',
+        )
 
   def get_user(self):
       return self.user_cache

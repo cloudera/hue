@@ -48,20 +48,26 @@ class Handler(http.server.BaseHTTPRequestHandler):
     self.send_response(200)
     self.send_header("Content-type", "text/html; charset=utf8")
     self.end_headers()
-    self.wfile.write("Hello there.")
-    self.wfile.write("You requested: " + self.path + ".")
-    self.wfile.write("Image: <img src='/foo.jpg'>")
-    self.wfile.write("Link: <a href='/baz?with=parameter'>link</a>")
+    self.wfile.write(b"Hello there.")
+    path = self.path
+    if not isinstance(path, bytes):
+      path = path.encode('utf-8')
+    self.wfile.write(b"You requested: " + path + b".")
+    self.wfile.write(b"Image: <img src='/foo.jpg'>")
+    self.wfile.write(b"Link: <a href='/baz?with=parameter'>link</a>")
 
   def do_POST(self):
     self.send_response(200)
     self.send_header("Content-type", "text/html; charset=utf8")
     self.end_headers()
-    self.wfile.write("Hello there.")
-    self.wfile.write("You requested: " + self.path + ".")
+    self.wfile.write(b"Hello there.")
+    path = self.path
+    if not isinstance(path, bytes):
+      path = path.encode('utf-8')
+    self.wfile.write(b"You requested: " + path + b".")
     # Somehow in this architecture read() blocks, so we read the exact
     # number of bytes the test sends.
-    self.wfile.write("Data: " + self.rfile.read(16))
+    self.wfile.write(b"Data: " + self.rfile.read(16))
 
   def log_message(self, fmt, *args):
     logging.debug("%s - - [%s] %s" %
@@ -105,10 +111,16 @@ def test_proxy_get():
       response_get = client.get('/proxy/127.0.0.1/%s/' % httpd.server_port, dict(foo="bar"))
     finally:
       finish_conf()
-    assert_true("Hello there" in response_get.content)
-    assert_true("You requested: /?foo=bar." in response_get.content)
-    assert_true("/proxy/127.0.0.1/%s/foo.jpg" % httpd.server_port in response_get.content)
-    assert_true("/proxy/127.0.0.1/%s/baz?with=parameter" % httpd.server_port in response_get.content)
+    assert_true(b"Hello there" in response_get.content)
+    assert_true(b"You requested: /?foo=bar." in response_get.content)
+    proxy_url = "/proxy/127.0.0.1/%s/foo.jpg" % httpd.server_port
+    if not isinstance(proxy_url, bytes):
+      proxy_url = proxy_url.encode('utf-8')
+    assert_true(proxy_url in response_get.content)
+    proxy_url = "/proxy/127.0.0.1/%s/baz?with=parameter" % httpd.server_port
+    if not isinstance(proxy_url, bytes):
+      proxy_url = proxy_url.encode('utf-8')
+    assert_true(proxy_url in response_get.content)
   finally:
     finish()
 
@@ -127,10 +139,10 @@ def test_proxy_post():
       response_post = client.post('/proxy/127.0.0.1/%s/' % httpd.server_port, dict(foo="bar", foo2="bar"))
     finally:
       finish_conf()
-    assert_true("Hello there" in response_post.content)
-    assert_true("You requested: /." in response_post.content)
-    assert_true("foo=bar" in response_post.content)
-    assert_true("foo2=bar" in response_post.content)
+    assert_true(b"Hello there" in response_post.content)
+    assert_true(b"You requested: /." in response_post.content)
+    assert_true(b"foo=bar" in response_post.content)
+    assert_true(b"foo2=bar" in response_post.content)
   finally:
     finish()
 
@@ -143,13 +155,13 @@ def test_blacklist():
   try:
     # Request 1: Hit the blacklist
     resp = client.get('/proxy/localhost/1234//foo//fred/')
-    assert_true("is blocked" in resp.content)
+    assert_true(b"is blocked" in resp.content)
 
     # Request 2: This is not a match
     httpd, finish = run_test_server()
     try:
       resp = client.get('/proxy/localhost/%s//foo//fred_ok' % (httpd.server_port,))
-      assert_true("Hello there" in resp.content)
+      assert_true(b"Hello there" in resp.content)
     finally:
       finish()
   finally:
@@ -174,14 +186,14 @@ def test_rewriting():
   Tests that simple re-writing is working.
   """
   html = "<a href='foo'>bar</a><a href='http://alpha.com'>baz</a>"
-  assert_true('<a href="/proxy/abc.com/80/sub/foo">bar</a>' in _rewrite_links(UrlLibFileWrapper(html, "http://abc.com/sub/")),
+  assert_true(b'<a href="/proxy/abc.com/80/sub/foo">bar</a>' in _rewrite_links(UrlLibFileWrapper(html, "http://abc.com/sub/")),
     msg="Relative links")
-  assert_true('<a href="/proxy/alpha.com/80/">baz</a>' in _rewrite_links(UrlLibFileWrapper(html, "http://abc.com/sub/")),
+  assert_true(b'<a href="/proxy/alpha.com/80/">baz</a>' in _rewrite_links(UrlLibFileWrapper(html, "http://abc.com/sub/")),
     msg="Absolute links")
 
   # Test url with port and invalid port
   html = "<a href='http://alpha.com:1234/bar'>bar</a><a href='http://alpha.com:-1/baz'>baz</a>"
-  assert_true('<a href="/proxy/alpha.com/1234/bar">bar</a><a>baz</a>' in
+  assert_true(b'<a href="/proxy/alpha.com/1234/bar">bar</a><a>baz</a>' in
               _rewrite_links(UrlLibFileWrapper(html, "http://abc.com/sub/")),
               msg="URL with invalid port")
 
@@ -189,6 +201,6 @@ def test_rewriting():
   <img src="/static/hadoop-logo.jpg"/><br>
   """
   rewritten = _rewrite_links(UrlLibFileWrapper(html, "http://abc.com/sub/"))
-  assert_true('<img src="/proxy/abc.com/80/static/hadoop-logo.jpg">' in
+  assert_true(b'<img src="/proxy/abc.com/80/static/hadoop-logo.jpg">' in
               rewritten,
               msg="Rewrite images")

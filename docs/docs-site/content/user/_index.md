@@ -12,15 +12,15 @@ Hue consists in a single page interface that allow the users to perform data
 analyses without losing any context. The goal is to promote self service and stay simple like Excel
 so that 80% of the user can find, explore and query data and become more data driven.
 
-Please refer to [database list](/administrator/configuration/connectors/#databases) or the main [configuration section](/administrator/configuration/) for all the Database/Data Warehouse connectors.
+Please refer to [connector section](/administrator/configuration/connectors/#databases) for the list of the most popular Database/Data Warehouse supported.
 
 **1. Find or import your data**
 
-Use the left metadata assists to browse your existing data without losing your editor. The top search will look through your saved queries and matching tables, columns and databases. Objects can be tagged for a quick retrieval or assigning a more “humane” name. If the data does not exist yet, just drag & drop it to trigger the Create Table wizard and to import it in just two steps.
+Use the left metadata assists to browse your existing data without losing your editor. The top search will look through your saved queries and matching tables, columns and databases of connected [Data Catalogs](/user/browsing/#data-catalog). Objects can be tagged for a quick retrieval or assigning a more “humane” name. If the data does not exist yet, just drag & drop it to trigger the Create Table wizard and import it in just two steps.
 
 **2. Query your data**
 
-When you found your data, the Editor's autocomplete is extremely powerful as they support 90-100% of the language syntax and will highlight any syntax or logical error. The right assistant provides quick previews of the datasets, which columns or JOINs are popular and recommendations on how to type optimized queries. After the querying, refine your results before exporting to S3/HDFS/ADLS or downloaded as CSV/Excel.
+When you found your data, the [Editor's](/user/querying/#editor) autocomplete is extremely powerful and will highlight any syntax or logical error and provide risk alerts as well as inline documentation. The right assistant provides quick previews of the datasets, which columns or JOINs are popular and recommendations on how to type optimized queries. After the querying, refine your results before exporting to S3/HDFS/ADLS or downloaded as CSV/Excel.
 
 **3. Applications**
 
@@ -30,4 +30,4 @@ When you found your data, the Editor's autocomplete is extremely powerful as the
 * Scheduler: The application lets you build workflows and then schedule them to run regularly automatically. A monitoring interface shows the progress, logs and allow actions like pausing or stopping jobs.
 
 
-Each app of Hue can be extended to support your own languages or apps as detailed in the [developer guide](../../developer/).
+Each app of Hue can be extended to support your own languages or apps as detailed in the [developer guide](/developer/).

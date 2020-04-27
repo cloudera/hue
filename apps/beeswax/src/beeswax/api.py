@@ -35,6 +35,9 @@ from desktop.lib.i18n import force_unicode
 from desktop.lib.parameterization import substitute_variables
 from metastore import parser
 from notebook.models import escape_rows, MockedDjangoRequest, make_notebook
+from metastore.conf import FORCE_HS2_METADATA
+from metastore.views import _get_db, _get_servername
+from useradmin.models import User
 
 import beeswax.models
 from beeswax.data_export import upload
@@ -43,13 +46,10 @@ from beeswax.conf import USE_GET_LOG_API
 from beeswax.forms import QueryForm
 from beeswax.models import Session, QueryHistory
 from beeswax.server import dbms
-from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException, QueryServerTimeoutException,\
+from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException, QueryServerTimeoutException, \
     SubQueryTable
-from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form,\
+from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form, \
     safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state, parse_out_jobs
-from metastore.conf import FORCE_HS2_METADATA
-from metastore.views import _get_db, _get_servername
-from useradmin.models import User
 
 
 LOG = logging.getLogger(__name__)
@@ -122,22 +122,29 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
 
       cols_extended = massage_columns_for_json(table.cols)
 
-      if table.is_impala_only:
-        if db.client.query_server['server_name'] != 'impala': # Expand Kudu columns information
-          query_server = get_query_server_config('impala', cluster=cluster)
+      if table.is_impala_only: # Expand Kudu table information
+        if db.client.query_server['server_name'] != 'impala':
+          query_server = get_query_server_config('impala', connector=cluster)
           db = dbms.get(db.client.user, query_server, cluster=cluster)
 
-        col_options = db.get_table_describe(database, table.name)
+        col_options = db.get_table_describe(database, table.name) # Expand columns information
         extra_col_options = dict([(col[0], dict(list(zip(col_options.cols(), col)))) for col in col_options.rows()])
-
         for col_props in cols_extended:
           col_props.update(extra_col_options.get(col_props['name'], {}))
+
+        primary_keys = [col['name'] for col in extra_col_options.values() if col.get('primary_key') == 'true'] # Until IMPALA-8291
+        foreign_keys = []  # Not supported yet
+      else:
+        primary_keys = [pk.name for pk in table.primary_keys]
+        foreign_keys = table.foreign_keys
 
       response['support_updates'] = table.is_impala_only
       response['columns'] = [column.name for column in table.cols]
       response['extended_columns'] = cols_extended
       response['is_view'] = table.is_view
       response['partition_keys'] = [{'name': part.name, 'type': part.type} for part in table.partition_keys]
+      response['primary_keys'] = [{'name': pk} for pk in primary_keys]
+      response['foreign_keys'] = [{'name': fk.name, 'to': fk.type} for fk in foreign_keys]
     else:
       col = db.get_column(database, table, column)
       if col:
@@ -653,25 +660,28 @@ def get_sample_data(request, database, table, column=None):
   app_name = get_app_name(request)
   cluster = json.loads(request.POST.get('cluster', '{}'))
 
-  query_server = get_query_server_config(app_name, cluster=cluster)
+  query_server = get_query_server_config(app_name, connector=cluster)
   db = dbms.get(request.user, query_server)
 
   response = _get_sample_data(db, database, table, column, cluster=cluster)
   return JsonResponse(response)
 
 
-def _get_sample_data(db, database, table, column, async=False, cluster=None, operation=None):
-  table_obj = db.get_table(database, table)
-  if table_obj.is_impala_only and db.client.query_server['server_name'] != 'impala':
-    query_server = get_query_server_config('impala', cluster=cluster)
-    db = dbms.get(db.client.user, query_server, cluster=cluster)
+def _get_sample_data(db, database, table, column, is_async=False, cluster=None, operation=None):
+  if operation == 'hello':
+    table_obj = None
+  else:
+    table_obj = db.get_table(database, table)
+    if table_obj.is_impala_only and db.client.query_server['server_name'] != 'impala':  # Kudu table, now Hive should support it though
+      query_server = get_query_server_config('impala', connector=cluster)
+      db = dbms.get(db.client.user, query_server, cluster=cluster)
 
-  sample_data = db.get_sample(database, table_obj, column, generate_sql_only=async, operation=operation)
+  sample_data = db.get_sample(database, table_obj, column, generate_sql_only=is_async, operation=operation)
   response = {'status': -1}
 
   if sample_data:
     response['status'] = 0
-    if async:
+    if is_async:
       notebook = make_notebook(
           name=_('Table sample for `%(database)s`.`%(table)s`.`%(column)s`') % {'database': database, 'table': table, 'column': column},
           editor_type=_get_servername(db),
@@ -755,7 +765,7 @@ def analyze_table(request, database, table, columns=None):
   app_name = get_app_name(request)
   cluster = json.loads(request.POST.get('cluster', '{}'))
 
-  query_server = get_query_server_config(app_name, cluster=cluster)
+  query_server = get_query_server_config(app_name, connector=cluster)
   db = dbms.get(request.user, query_server)
 
   table_obj = db.get_table(database, table)
@@ -784,7 +794,7 @@ def get_table_stats(request, database, table, column=None):
   app_name = get_app_name(request)
   cluster = json.loads(request.POST.get('cluster', '{}'))
 
-  query_server = get_query_server_config(app_name, cluster=cluster)
+  query_server = get_query_server_config(app_name, connector=cluster)
   db = dbms.get(request.user, query_server)
 
   response = {'status': -1, 'message': '', 'redirect': ''}
@@ -807,7 +817,7 @@ def get_top_terms(request, database, table, column, prefix=None):
   app_name = get_app_name(request)
   cluster = json.loads(request.POST.get('cluster', '{}'))
 
-  query_server = get_query_server_config(app_name, cluster=cluster)
+  query_server = get_query_server_config(app_name, connector=cluster)
   db = dbms.get(request.user, query_server)
 
   response = {'status': -1, 'message': '', 'redirect': ''}

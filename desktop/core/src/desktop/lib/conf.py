@@ -65,31 +65,30 @@ variables.
 # using it. So instead of breaking compatibility, we make a "pytype" alias.
 
 from __future__ import print_function
-from past.builtins import basestring
+from six import string_types
 from builtins import object
 pytype = type
 
-from django.utils.encoding import smart_str
-from django.utils.translation import ugettext as _
-
-from desktop.lib.paths import get_desktop_root, get_build_dir
-
-from configobj import ConfigObj, ConfigObjError
 import json
 import logging
+import numbers
 import os
 import textwrap
 import re
 import subprocess
 import sys
 
+from django.utils.encoding import smart_str
+from django.utils.translation import ugettext_lazy as _t
+from configobj import ConfigObj, ConfigObjError
+
+from desktop.lib.paths import get_desktop_root, get_build_dir
+
 try:
   from collections import OrderedDict
 except ImportError:
   from ordereddict import OrderedDict # Python 2.6
 
-if sys.version_info[0] > 2:
-  from past.builtins import long
 
 # Magical object for use as a "symbol"
 _ANONYMOUS = ("_ANONYMOUS")
@@ -149,7 +148,7 @@ class BoundConfig(object):
         data = self.bind_to
     except AttributeError:
       LOG.exception("Error value of key '%s' in configuration." % self.grab_key)
-      data = _("Possible misconfiguration")
+      data = _t("Possible misconfiguration")
       present = True
 
     return data, present
@@ -192,9 +191,7 @@ class BoundConfig(object):
     self.config.print_help(*args, **kwargs)
 
   def __repr__(self):
-    return repr("%s(config=%s, bind_to=%s, grab_key=%s)" %
-                (str(self.__class__),
-                 repr(self.config), repr(self.bind_to), repr(self.grab_key)))
+    return repr("%s(config=%s, bind_to=%s, grab_key=%s)" % (str(self.__class__),  repr(self.config), repr(self.bind_to), repr(self.grab_key)))
 
 
 class Config(object):
@@ -222,7 +219,7 @@ class Config(object):
     if dynamic_default is not None and not dynamic_default.__doc__ and not private:
       raise ValueError("Dynamic default '%s' must have __doc__ defined!" % (key,))
 
-    if pytype(default) in (int, long, float, complex, bool) and \
+    if (isinstance(default, numbers.Number) or pytype(default) is bool) and \
           not isinstance(type(default), pytype(default)):
       raise ValueError("%s: '%s' does not match that of the default value %r (%s)"
                       % (key, type, default, pytype(default)))
@@ -629,7 +626,7 @@ def coerce_bool(value):
   if isinstance(value, bool):
     return value
 
-  if isinstance(value, basestring):
+  if isinstance(value, string_types):
     upper = value.upper()
   else:
     upper = value
@@ -654,7 +651,7 @@ def coerce_csv(value):
   raise Exception("Could not coerce %r to csv array." % value)
 
 def coerce_json_dict(value):
-  if isinstance(value, basestring):
+  if isinstance(value, string_types):
     return json.loads(value)
   elif isinstance(value, dict):
     return value
@@ -662,7 +659,7 @@ def coerce_json_dict(value):
 
 def list_of_compiled_res(skip_empty=False):
   def fn(list_of_strings):
-    if isinstance(list_of_strings, basestring):
+    if isinstance(list_of_strings, string_types):
       list_of_strings = list_of_strings.split(',')
     list_of_strings = [string if skip_empty else True for string in list_of_strings]
     return list(re.compile(x) for x in list_of_strings)

@@ -26,6 +26,7 @@
 @import "components/hue-filechooser.less";
 @import "components/hue-gridster.less";
 @import "components/hue-inputautocomplete.less";
+@import "components/hue-link-sharing.less";
 @import "components/hue-nav-properties.less";
 @import "components/hue-notify.less";
 @import "components/hue-performance-graph.less";
@@ -293,6 +294,13 @@ input[type='password']::-ms-reveal {
   }
 
   .ace_marker-layer {
+    .ace-failed-marker {
+      position: absolute;
+      width: 100% !important;
+      margin-left: -3px;
+    }
+
+    .ace-failed-marker,
     .ace_error-line {
       background-color: @cui-pink-050 !important;
       opacity: 0.5;
@@ -328,6 +336,13 @@ input[type='password']::-ms-reveal {
   }
 
   .ace_marker-layer {
+    .ace-failed-marker {
+      position: absolute;
+      width: 100% !important;
+      margin-left: -3px;
+    }
+
+    .ace-failed-marker,
     .ace_error-line {
       background-color: @cui-pink-050 !important;
       opacity: 0.5;
@@ -666,7 +681,6 @@ ul.errorlist {
   z-index: 2;
   height: 10px;
   line-height: 10px;
-  background-color: @cui-gray-050;
   cursor: s-resize;
   text-align: center;
 }
@@ -680,7 +694,7 @@ ul.errorlist {
 }
 
 .toggle-overflow-toggle:hover {
-  background-color: @cui-gray-100;
+  background-color: @cui-gray-050;
 }
 
 .datepicker {

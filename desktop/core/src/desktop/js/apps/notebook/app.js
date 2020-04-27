@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import Clipboard from 'clipboard';
 import 'jquery-mousewheel';
-import ko from 'knockout';
+import * as ko from 'knockout';
 import 'ext/bootstrap-datepicker.min';
 import 'ext/jquery.hotkeys';
 import 'jquery/plugins/jquery.hdfstree';
@@ -27,6 +27,8 @@ import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 import { initNotebook2 } from 'apps/notebook2/app';
+import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
+import { SHOW_LEFT_ASSIST_EVENT } from 'ko/components/assist/events';
 
 if (window.ENABLE_NOTEBOOK_2) {
   initNotebook2();
@@ -925,10 +927,7 @@ if (window.ENABLE_NOTEBOOK_2) {
           if (app === 'editor') {
             huePubSub.publish('redraw.fixed.headers');
             huePubSub.publish('hue.scrollleft.show');
-            huePubSub.publish('active.snippet.type.changed', {
-              type: viewModel.editorType(),
-              isSqlDialect: viewModel.getSnippetViewSettings(viewModel.editorType()).sqlDialect
-            });
+            huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, viewModel.activeConnector());
           }
         },
         HUE_PUB_SUB_EDITOR_ID
@@ -1041,7 +1040,7 @@ if (window.ENABLE_NOTEBOOK_2) {
       );
 
       huePubSub.subscribe(
-        'left.assist.show',
+        SHOW_LEFT_ASSIST_EVENT,
         () => {
           if (!viewModel.isLeftPanelVisible() && viewModel.assistAvailable()) {
             viewModel.isLeftPanelVisible(true);

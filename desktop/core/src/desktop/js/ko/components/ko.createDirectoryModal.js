@@ -15,11 +15,14 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+
+export const SHOW_EVENT = 'show.create.directory.modal';
+export const SHOWN_EVENT = 'create.directory.modal.shown';
 
 const TEMPLATE = `
   <!-- ko with: activeEntry -->
@@ -48,18 +51,25 @@ const TEMPLATE = `
 `;
 
 componentUtils.registerComponent('create-directory', undefined, TEMPLATE).then(() => {
-  huePubSub.subscribe('show.create.directory.modal', docViewModel => {
+  huePubSub.subscribe(SHOW_EVENT, docViewModel => {
     let $createDirectoryModal = $('#createDirectoryModal');
     if ($createDirectoryModal.length > 0) {
       ko.cleanNode($createDirectoryModal[0]);
       $createDirectoryModal.remove();
     }
 
+    const data = {
+      params: docViewModel,
+      descendantsComplete: () => {
+        huePubSub.publish(SHOWN_EVENT);
+      }
+    };
+
     $createDirectoryModal = $(
-      '<div id="createDirectoryModal" data-bind="component: { name: \'create-directory\', params: $data }" data-keyboard="true" class="modal hide fade" tabindex="-1"/>'
+      '<div id="createDirectoryModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'create-directory\', params: params }" data-keyboard="true" class="modal hide fade" tabindex="-1"/>'
     );
     $('body').append($createDirectoryModal);
 
-    ko.applyBindings(docViewModel, $createDirectoryModal[0]);
+    ko.applyBindings(data, $createDirectoryModal[0]);
   });
 });

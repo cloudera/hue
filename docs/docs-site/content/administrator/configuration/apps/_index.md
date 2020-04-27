@@ -233,11 +233,11 @@ Then make sure the `hive` interpreter is present in the `[[interpreters]]` list.
 
 ### Custom
 
-A series of native connectors interacting with the editor have been developed and are listed in the [developer section](/developer/sdk/#sql-connectors).
+A series of native connectors (e.g. Livy, ksql...) interacting with the editor have been developed and are listed in the [developer section](/developer/connectors/#databases).
 
 ### JDBC
 
-**Note** This is an historical connector, SQLAlchemy should be prefered at this time as it does not require a proxy and is fully secure.
+**Note**: This is an historical connector, SQLAlchemy should be prefered at this time as it does not require a proxy and is fully secure.
 
 Use the query editor with any JDBC database.
 
@@ -245,7 +245,9 @@ The “rdbms” interface works great for MySQL, PostgreSQL, SQLite, and Oracle,
 
 Integrating an external JDBC database involves a 3-step process:
 
-Download the compatible client driver JAR file for your specific OS and database. Usually you can find the driver files from the official database vendor site; for example, the MySQL JDBC connector for Mac OSX can be found here: https://dev.mysql.com/downloads/connector/j/. (NOTE: In the case of MySQL, the JDBC driver is platform independent, but some drivers are specific to certain OSes and versions so be sure to verify compatibility.)
+Download the compatible client driver JAR file for your specific OS and database. Usually you can find the driver files from the official database vendor site; for example, the MySQL JDBC connector for Mac OSX can be found here: https://dev.mysql.com/downloads/connector/j/.
+
+**Note**: In the case of MySQL, the JDBC driver is platform independent, but some drivers are specific to certain OSes and versions so be sure to verify compatibility.)
 Add the path to the driver JAR file to your Java CLASSPATH. Here, we set the CLASSPATH environment variable in our `.bash_profile` script.
 
     # MySQL
@@ -267,7 +269,7 @@ be started if any interpreter is using it.
     ## Main flag to override the automatic starting of the DBProxy server.
     enable_dbproxy_server=true
 
-**Note**
+**Note**:
 Hue needs to be compiled with the flag `BUILD_DB_PROXY=true` in order to come with the JDBC connector.
 
 **Tip**: Testing JDBC Configurations
@@ -275,32 +277,3 @@ Before adding your interpreter's JDBC configurations to hue.ini, verify that the
 
 **Tip**: Prompt for JDBC authentication
 You can leave out the username and password in the JDBC options, and Hue will instead prompt the user for a username and password. This allows administrators to provide access to JDBC sources without granting all Hue users the same access.
-
-### Django DB Connectors
-
-**Note** This is an historical connector, SQLAlchemy should be prefered at this time.
-
-Those rely on the `[dbms]` lib an dedicated Python libs.
-
-First, in your hue.ini file, add the relevant database connection information under the `[librdbms]` section:
-
-    [librdbms]
-      [[databases]]
-        [[[postgresql]]]
-        nice_name=PostgreSQL
-        name=music
-        engine=postgresql_psycopg2
-        port=5432
-        user=hue
-        password=hue
-        options={}
-
-Secondly, add a new interpreter to the notebook app. This will allow the new database type to be registered as a snippet-type in the Notebook app. For query editors that use a Django-compatible database, the name in the brackets should match the database configuration name in the librdbms section (e.g. – postgresql). The interface will be set to rdbms. This tells Hue to use the librdbms driver and corresponding connection information to connect to the database. For example, with the above postgresql connection configuration in the librdbms section, we can add a PostgreSQL interpreter with the following notebook configuration:
-
-    [notebook]
-      [[interpreters]]
-        [[[postgresql]]]
-        name=PostgreSQL
-        interface=rdbms
-
-After updating the configuration and restarting Hue, we can access the new PostgreSQL interpreter in the Notebook app.

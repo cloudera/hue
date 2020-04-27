@@ -42,17 +42,22 @@
 }
 
 .shepherd-element.shepherd-theme-hue {
-  max-width: 100%;
   max-height: 100%;
+  border-radius: 0;
+  z-index: 9999;
+  max-width: 24em;
+  font-size: 1em;
 }
 
 .shepherd-element.shepherd-theme-hue .shepherd-content {
+  .hue-box-shadow-bottom;
+
   border-radius: 4px;
+  padding: 0;
   position: relative;
   font-family: inherit;
   background: @cui-gray-900;
   color: @cui-gray-200;
-  padding: 1em;
   font-size: 1.1em;
   line-height: 1.5em;
 }
@@ -241,13 +246,6 @@
   border-right-color: @cui-gray-900;
 }
 
-.shepherd-element.shepherd-theme-hue {
-  border-radius: 0;
-  z-index: 9999;
-  max-width: 24em;
-  font-size: 1em;
-}
-
 .shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-center.shepherd-has-title .shepherd-content::before,
 .shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-right.shepherd-target-attached-bottom.shepherd-has-title .shepherd-content::before,
 .shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-left.shepherd-target-attached-bottom.shepherd-has-title .shepherd-content::before {
@@ -266,13 +264,6 @@
 
 .shepherd-element.shepherd-theme-hue.shepherd-has-cancel-link .shepherd-content header h3 {
   float: left;
-}
-
-.shepherd-element.shepherd-theme-hue .shepherd-content {
-  .hue-box-shadow-bottom;
-
-  border-radius: 4px;
-  padding: 0;
 }
 
 .shepherd-element.shepherd-theme-hue .shepherd-content * {
@@ -349,8 +340,6 @@
   vertical-align: middle;
   *vertical-align: auto;
   *zoom: 1;
-  *display: inline;
-  border-radius: 0;
   cursor: pointer;
   border: 0;
   margin: 0 0.5em 0 0;
@@ -378,8 +367,6 @@
   vertical-align: middle;
   *vertical-align: auto;
   *zoom: 1;
-  *display: inline;
-  border-radius: 0;
   cursor: pointer;
   border: 0;
   margin: 0 0.5em 0 0;

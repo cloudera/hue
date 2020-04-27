@@ -18,6 +18,8 @@
 import json
 import logging
 
+from django.http import HttpResponse
+
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.django_util import JsonResponse
 from django.utils.translation import ugettext as _
@@ -52,7 +54,7 @@ def jobs(request, interface=None):
   response = {'status': -1}
 
   cluster = json.loads(request.POST.get('cluster', '{}'))
-  interface = json.loads(request.POST.get('interface'))
+  interface = interface or json.loads(request.POST.get('interface'))
   filters = dict([(key, value) for _filter in json.loads(request.POST.get('filters', '[]')) for key, value in list(_filter.items()) if value])
 
   jobs = get_api(request.user, interface, cluster=cluster).apps(filters)
@@ -69,10 +71,14 @@ def job(request, interface=None):
   response = {'status': -1}
 
   cluster = json.loads(request.POST.get('cluster', '{}'))
-  interface = json.loads(request.POST.get('interface'))
+  interface = interface or json.loads(request.POST.get('interface'))
   app_id = json.loads(request.POST.get('app_id'))
 
-  response_app = get_api(request.user, interface, cluster=cluster).app(app_id)
+  if interface == 'schedules':
+    offset = json.loads(request.POST.get('pagination', '{"offset": 1}')).get('offset')
+    response_app = get_api(request.user, interface, cluster=cluster).app(app_id, offset=offset)
+  else :
+    response_app = get_api(request.user, interface, cluster=cluster).app(app_id)
 
   if response_app.get('status') == -1 and response_app.get('message'):
     response.update(response_app)
@@ -131,7 +137,11 @@ def profile(request):
   api = get_api(request.user, interface, cluster=cluster)
   api._set_request(request) # For YARN
 
-  response[app_property] = api.profile(app_id, app_type, app_property, app_filters)
-  response['status'] = 0
+  resp = api.profile(app_id, app_type, app_property, app_filters)
 
-  return JsonResponse(response)
+  if isinstance(resp, HttpResponse):
+    return resp
+  else:
+    response[app_property] = resp
+    response['status'] = 0
+    return JsonResponse(response)

@@ -141,6 +141,8 @@ def _hive_add_privileges(user, role, privileges):
 
 def _massage_uri(uri):
   if uri:
+    if not isinstance(uri, str):
+      uri = uri.decode('utf-8')
     if uri.startswith('hdfs:///'):
       uri = uri.replace('hdfs://', get_defaultfs())
     elif uri.startswith('/'):

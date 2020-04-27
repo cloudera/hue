@@ -24,6 +24,7 @@
   from desktop.views import commonheader, commonfooter
   from django.template.defaultfilters import urlencode
   from django.utils.translation import ugettext as _
+  from six import iteritems
 %>
 <%def name="task_table(dom_id, tasks)">
     <table id="${ dom_id }" class="taskTable table table-condensed">
@@ -57,7 +58,7 @@
 </%def>
 
 <%def name="rows_for_conf_vars(rows)">
-    %  for k, v in sorted(rows.iteritems()):
+    %  for k, v in sorted(iteritems(rows)):
         <tr>
             <td>${k}</td>
         <%

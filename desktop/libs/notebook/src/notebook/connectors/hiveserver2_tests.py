@@ -16,16 +16,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import next
-from builtins import object
+from builtins import next, object
 import json
 import logging
 import re
+import sys
 import time
 
-from mock import patch, Mock
 from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true
+from nose.tools import assert_equal, assert_true, assert_raises
 
 from django.urls import reverse
 from TCLIService.ttypes import TStatusCode, TProtocolVersion, TOperationType
@@ -36,19 +35,26 @@ from desktop.lib.i18n import smart_str
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from beeswax.server import dbms
+from beeswax.server.dbms import QueryServerException
 from beeswax.test_base import BeeswaxSampleProvider, get_query_server_config, is_hive_on_spark
 from hadoop.pseudo_hdfs4 import is_live_cluster
 from useradmin.models import User
 
 from notebook.api import _save_notebook
+from notebook.connectors.base import QueryError
 from notebook.connectors.hiveserver2 import HS2Api
 from notebook.models import make_notebook, Notebook
+
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 
 LOG = logging.getLogger(__name__)
 
 
-class TestApi(object):
+class TestApiWithConnectors(object):
 
   NOTEBOOK_JSON = """
     {
@@ -266,7 +272,85 @@ class TestApi(object):
     assert_equal(data['result']['handle']['statement'], 'SELECT * from customers')
 
 
-class TestHiveserver2Api(object):
+class TestApi():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    self.user = rewrite_user(User.objects.get(username="test"))
+
+
+  @patch('notebook.connectors.hiveserver2.has_jobbrowser', True)
+  def test_get_jobs_with_jobbrowser(self):
+    notebook = Mock()
+    snippet = {'type': 'hive', 'properties': {}}
+    logs = ''
+
+    with patch('notebook.connectors.hiveserver2.HS2Api._get_hive_execution_engine') as _get_hive_execution_engine:
+      with patch('notebook.connectors.hiveserver2.parse_out_jobs') as parse_out_jobs:
+
+        _get_hive_execution_engine.return_value = 'tez'
+        parse_out_jobs.return_value = [{'job_id': 'job_id_00001'}]
+
+        jobs = HS2Api(self.user).get_jobs(notebook, snippet, logs)
+
+        assert_true(jobs, jobs)
+        assert_equal(jobs[0]['name'], 'job_id_00001')
+        assert_equal(jobs[0]['url'], '/jobbrowser/jobs/job_id_00001')
+
+
+  @patch('notebook.connectors.hiveserver2.has_jobbrowser', False)
+  def test_get_jobs_without_jobbrowser(self):
+    notebook = Mock()
+    snippet = {'type': 'hive', 'properties': {}}
+    logs = ''
+
+    with patch('notebook.connectors.hiveserver2.HS2Api._get_hive_execution_engine') as _get_hive_execution_engine:
+      with patch('notebook.connectors.hiveserver2.parse_out_jobs') as parse_out_jobs:
+
+        _get_hive_execution_engine.return_value = 'tez'
+        parse_out_jobs.return_value = [{'job_id': 'job_id_00001'}]
+
+        jobs = HS2Api(self.user).get_jobs(notebook, snippet, logs)
+
+        assert_true(jobs, jobs)
+        assert_equal(jobs[0]['name'], 'job_id_00001')
+        assert_equal(jobs[0]['url'], '')  # Is empty
+
+
+  def test_get_error_message_from_query(self):
+    with patch('notebook.connectors.hiveserver2.HS2Api._get_db') as _get_db:
+      with patch('notebook.connectors.hiveserver2.HS2Api._get_current_statement') as _get_current_statement:
+        with patch('notebook.connectors.hiveserver2.HS2Api._get_session') as _get_session:
+          with patch('notebook.connectors.hiveserver2.HS2Api._prepare_hql_query') as _prepare_hql_query:
+            with patch('notebook.connectors.hiveserver2.HS2Api._get_session_by_id') as _get_session_by_id:
+              _get_db.return_value = Mock(
+                use=Mock(
+                ),
+                client=Mock(
+                  query=Mock(
+                    side_effect=QueryServerException(
+                      Exception('Execution error!'),
+                      message='Error while compiling statement: FAILED: HiveAccessControlException Permission denied'
+                    )
+                  ),
+                ),
+              )
+              notebook, snippet = {}, {'type': 'hive'}
+
+              api = HS2Api(self.user)
+
+              assert_raises(QueryError, api.execute, notebook, snippet)
+
+              try:
+                api = api.execute(notebook, snippet)
+              except QueryError as e:
+                assert_equal(
+                  e.message,
+                  'Error while compiling statement: FAILED: HiveAccessControlException Permission denied',
+                )
+
+
+class TestHiveserver2ApiNonMock(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="test", recreate=False, is_superuser=False)

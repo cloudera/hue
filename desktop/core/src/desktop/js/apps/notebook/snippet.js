@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
 import { markdown } from 'markdown';
 
@@ -28,6 +28,15 @@ import hueUtils from 'utils/hueUtils';
 import Result from 'apps/notebook/result';
 import Session from 'apps/notebook/session';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
+import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistModal';
+import { cancelActiveRequest } from 'api/apiUtils';
+import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
+import { findConnector } from 'utils/hueConfig';
+import {
+  ASSIST_GET_DATABASE_EVENT,
+  ASSIST_GET_SOURCE_EVENT,
+  ASSIST_SET_SOURCE_EVENT
+} from 'ko/components/assist/events';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -173,8 +182,36 @@ class Snippet {
     self.type = ko.observable(
       typeof snippet.type != 'undefined' && snippet.type != null ? snippet.type : 'hive'
     );
-    self.type.subscribe(newVal => {
+
+    self.connector = ko.observable();
+
+    const updateConnector = type => {
+      if (type) {
+        findConnector(connector => connector.type === type).then(self.connector);
+      }
+    };
+
+    updateConnector(self.type());
+
+    self.type.subscribe(type => {
+      if (!self.connector() || self.connector().type !== type) {
+        updateConnector(type);
+      }
       self.status('ready');
+    });
+
+    self.isSqlDialect = ko.pureComputed(() => {
+      return vm.getSnippetViewSettings(self.type()).sqlDialect;
+    });
+
+    self.connector = ko.pureComputed(() => {
+      // To support optimizer changes in editor v2
+      return {
+        optimizer: self.type() === 'hive' || self.type() === 'impala' ? 'api' : 'off',
+        type: self.type(),
+        dialect: self.type(),
+        is_sql: self.isSqlDialect()
+      };
     });
 
     self.isBatchable = ko.computed(() => {
@@ -225,10 +262,7 @@ class Snippet {
 
     self.inFocus.subscribe(newValue => {
       if (newValue) {
-        huePubSub.publish('active.snippet.type.changed', {
-          type: self.type(),
-          isSqlDialect: self.isSqlDialect()
-        });
+        huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, self.connector());
       }
     });
 
@@ -241,10 +275,6 @@ class Snippet {
     self.dbSelectionVisible = ko.observable(false);
 
     self.showExecutionAnalysis = ko.observable(false);
-
-    self.isSqlDialect = ko.pureComputed(() => {
-      return vm.getSnippetViewSettings(self.type()).sqlDialect;
-    });
 
     self.getPlaceHolder = function() {
       return vm.getSnippetViewSettings(self.type()).placeHolder;
@@ -369,7 +399,7 @@ class Snippet {
     let lastFetchQueriesRequest = null;
 
     self.fetchQueries = function() {
-      apiHelper.cancelActiveRequest(lastFetchQueriesRequest);
+      cancelActiveRequest(lastFetchQueriesRequest);
 
       const QUERIES_PER_PAGE = 50;
       lastQueriesPage = self.queriesCurrentPage();
@@ -420,17 +450,11 @@ class Snippet {
       }
     };
 
-    huePubSub.subscribeOnce(
-      'assist.source.set',
-      source => {
-        if (source !== self.type()) {
-          huePubSub.publish('assist.set.source', self.type());
-        }
-      },
-      vm.huePubSubId
-    );
-
-    huePubSub.publish('assist.get.source');
+    huePubSub.publish(ASSIST_GET_SOURCE_EVENT, source => {
+      if (source !== self.type()) {
+        huePubSub.publish(ASSIST_SET_SOURCE_EVENT, self.type());
+      }
+    });
 
     let ignoreNextAssistDatabaseUpdate = false;
     self.handleAssistSelection = function(databaseDef) {
@@ -447,9 +471,9 @@ class Snippet {
     };
 
     if (!self.database()) {
-      huePubSub.publish('assist.get.database.callback', {
+      huePubSub.publish(ASSIST_GET_DATABASE_EVENT, {
         source: self.type(),
-        callback: function(databaseDef) {
+        callback: databaseDef => {
           self.handleAssistSelection(databaseDef);
         }
       });
@@ -1050,6 +1074,7 @@ class Snippet {
                 sourceType: self.type(),
                 namespace: self.namespace(),
                 compute: self.compute(),
+                connector: self.connector(),
                 path: path
               })
               .done(entry => {
@@ -1500,14 +1525,14 @@ class Snippet {
           return;
         }
 
-        apiHelper.cancelActiveRequest(lastComplexityRequest);
+        cancelActiveRequest(lastComplexityRequest);
 
         hueAnalytics.log('notebook', 'get_query_risk');
         clearActiveRisks();
 
         const changeSubscription = self.statement.subscribe(() => {
           changeSubscription.dispose();
-          apiHelper.cancelActiveRequest(lastComplexityRequest);
+          cancelActiveRequest(lastComplexityRequest);
         });
 
         const hash = self.statement().hashCode();
@@ -1844,6 +1869,22 @@ class Snippet {
           }
 
           if (data.handle) {
+            if (data.handle.session_id) {
+              // Execute can update the session
+              if (!notebook.sessions().length) {
+                notebook.addSession(
+                  new Session(vm, {
+                    type: self.type(),
+                    session_id: data.handle.session_guid,
+                    id: data.handle.session_id,
+                    properties: {}
+                  })
+                );
+              } else {
+                notebook.sessions()[0].session_id(data.handle.session_guid);
+                notebook.sessions()[0].id(data.handle.session_id);
+              }
+            }
             if (vm.editorMode()) {
               if (vm.isNotificationManager()) {
                 // Update task status
@@ -1910,6 +1951,31 @@ class Snippet {
         self.statement_raw && self.statement_raw() != null && self.statement_raw().length < 400000
       ); // ie: 5000 lines at 80 chars per line
     });
+
+    self.createGist = function() {
+      if (self.isSqlDialect()) {
+        apiHelper
+          .createGist({
+            statement:
+              self.ace().getSelectedText() !== ''
+                ? self.ace().getSelectedText()
+                : self.statement_raw(),
+            doc_type: self.type(),
+            name: self.name(),
+            description: ''
+          })
+          .done(data => {
+            if (data.status === 0) {
+              huePubSub.publish(SHOW_GIST_MODAL_EVENT, {
+                link: data.link
+              });
+            } else {
+              self._ajaxError(data);
+            }
+          });
+      }
+      hueAnalytics.log('gist', self.type());
+    };
 
     self.format = function() {
       if (self.isSqlDialect()) {
@@ -1990,7 +2056,7 @@ class Snippet {
     };
 
     self.queryCompatibility = function(targetPlatform) {
-      apiHelper.cancelActiveRequest(lastCompatibilityRequest);
+      cancelActiveRequest(lastCompatibilityRequest);
 
       hueAnalytics.log('notebook', 'compatibility');
       self.compatibilityCheckRunning(targetPlatform != self.type());
@@ -2272,6 +2338,10 @@ class Snippet {
 
               if (data.status === 0) {
                 self.status(data.query_status.status);
+                if (self.result.handle() && data.query_status.has_result_set !== undefined) {
+                  self.result.handle().has_result_set = data.query_status.has_result_set;
+                  self.result.hasResultset(self.result.handle().has_result_set);
+                }
 
                 if (
                   self.status() == 'running' ||
@@ -2437,13 +2507,13 @@ class Snippet {
     };
 
     self.clearActiveExecuteRequests = function() {
-      apiHelper.cancelActiveRequest(self.lastGetLogsRequest);
+      cancelActiveRequest(self.lastGetLogsRequest);
       if (self.getLogsTimeout !== null) {
         window.clearTimeout(self.getLogsTimeout);
         self.getLogsTimeout = null;
       }
 
-      apiHelper.cancelActiveRequest(self.lastCheckStatusRequest);
+      cancelActiveRequest(self.lastCheckStatusRequest);
       if (self.checkStatusTimeout !== null) {
         window.clearTimeout(self.checkStatusTimeout);
         self.checkStatusTimeout = null;
@@ -2451,7 +2521,7 @@ class Snippet {
     };
 
     self.getLogs = function() {
-      apiHelper.cancelActiveRequest(self.lastGetLogsRequest);
+      cancelActiveRequest(self.lastGetLogsRequest);
 
       self.lastGetLogsRequest = $.post(
         '/notebook/api/get_logs',
@@ -2700,6 +2770,21 @@ class Snippet {
     };
 
     self.refreshHistory = notebook.fetchHistory;
+  }
+
+  dashboardRedirect() {
+    const statement =
+      this.selectedStatement() ||
+      (this.positionStatement() && this.positionStatement().statement) ||
+      this.statement_raw();
+    window.open(
+      window.CUSTOM_DASHBOARD_URL +
+        '?db=' +
+        window.encodeURIComponent(this.database()) +
+        '&query=' +
+        window.encodeURIComponent(statement),
+      '_blank'
+    );
   }
 
   renderMarkdown() {

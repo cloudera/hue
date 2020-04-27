@@ -21,8 +21,8 @@ This assumes a single-threaded server.
 """
 from __future__ import division
 
-from past.utils import old_div
 import logging
+import math
 import re
 import resource
 import sys
@@ -96,7 +96,7 @@ class AccessInfo(dict):
     if sys.platform == 'darwin':
       rusage_denom = rusage_denom * 1024
     # get peak memory usage, bytes on OSX, Kilobytes on Linux
-    return old_div(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss, rusage_denom)
+    return math.floor(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / rusage_denom)
 
   def log(self, level, msg=None, start_time=None, response=None):
     is_instrumentation = desktop.conf.INSTRUMENTATION.get()

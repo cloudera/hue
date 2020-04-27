@@ -25,24 +25,28 @@ import threading
 import time
 import unittest
 
-LOG = logging.getLogger(__name__)
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 gen_py_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "gen-py"))
 if not gen_py_path in sys.path:
   sys.path.insert(1, gen_py_path)
 
-from djangothrift_test_gen.ttypes import TestStruct, TestNesting, TestEnum, TestManyTypes
 from djangothrift_test_gen import TestService
+from djangothrift_test_gen.ttypes import TestStruct, TestNesting, TestEnum, TestManyTypes
+from nose.tools import assert_equal, assert_true
+from thrift.protocol.TBinaryProtocol import TBinaryProtocolFactory
+from thrift.server import TServer
+from thrift.transport import TSocket
+from thrift.transport.TTransport import TBufferedTransportFactory, TTransportException
 
 from desktop.lib import python_util, thrift_util
 from desktop.lib.thrift_util import jsonable2thrift, thrift2json, _unpack_guid_secret_in_handle
 
-from thrift.protocol.TBinaryProtocol import TBinaryProtocolFactory
-from thrift.server import TServer
-from thrift.transport import TSocket
-from thrift.transport.TTransport import TBufferedTransportFactory
 
-from nose.tools import assert_equal
+LOG = logging.getLogger(__name__)
 
 
 class SimpleThriftServer(object):
@@ -221,11 +225,18 @@ class ThriftUtilTest(unittest.TestCase):
     self.assertEquals(struct1.myenumAsString,'ENUM_ONE')
 
   def test_unpack_guid_secret_in_handle(self):
-    hive_handle = """(TExecuteStatementReq(confOverlay={}, sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=\'\x1aOYj\xf3\x86M\x95\xbb\xc8\xe9/;\xb0{9\', guid=\'\x86\xa6$\xb2\xb8\xdaF\xbd\xbd\xf5\xc5\xf4\xcb\x96\x03<\')), runAsync=True, statement="SELECT \'Hello World!\'"),)"""
-    self.assertEqual(_unpack_guid_secret_in_handle(hive_handle), """(TExecuteStatementReq(confOverlay={}, sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=954d86f36a594f1a:397bb03b2fe9c8bb, guid=bd46dab8b224a686:3c0396cbf4c5f5bd)), runAsync=True, statement="SELECT \'Hello World!\'"),)""")
+    if sys.version_info[0] > 2:
+      hive_handle = """(TGetTablesReq(sessionHandle=TSessionHandle(sessionId=THandleIdentifier(guid=%s, secret=%s)), catalogName=None, schemaName='default', tableName='customers', tableTypes=None),)""" % (str(b'N\xc5\xed\x14k\xbeI\xda\xb9\x14\xe7\xf2\x9a\xb7\xf0\xa5'), str(b']s(\xb5\xf6ZO\x03\x99\x955\xacl\xb4\x98\xae'))
+      self.assertEqual(_unpack_guid_secret_in_handle(hive_handle), """(TGetTablesReq(sessionHandle=TSessionHandle(sessionId=THandleIdentifier(guid=da49be6b14edc54e:a5f0b79af2e714b9, secret=034f5af6b528735d:ae98b46cac359599)), catalogName=None, schemaName=\'default\', tableName=\'customers\', tableTypes=None),)""")
 
-    impala_handle = """(TGetTablesReq(schemaName=u\'default\', sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=\'\x7f\x98\x97s\xe1\xa8G\xf4\x8a\x8a\\r\x0e6\xc2\xee\xf0\', guid=\'\xfa\xb0/\x04 \xfeDX\x99\xfcq\xff2\x07\x02\xfe\')), tableName=u\'customers\', tableTypes=None, catalogName=None),)"""
-    self.assertEqual(_unpack_guid_secret_in_handle(impala_handle), """(TGetTablesReq(schemaName=u\'default\', sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=f447a8e17397987f:f0eec2360e0d8a8a, guid=5844fe20042fb0fa:fe020732ff71fc99)), tableName=u\'customers\', tableTypes=None, catalogName=None),)""")
+      impala_handle = """(TExecuteStatementReq(sessionHandle=TSessionHandle(sessionId=THandleIdentifier(guid=%s, secret=%s)), statement=b\'USE `default`\', confOverlay={\'QUERY_TIMEOUT_S\': \'300\'}, runAsync=False),)""" % (str(b'\xc4\xccnI\xf1\xbdJ\xc3\xb2\n\xd5[9\xe1Mr'), str(b'\xb0\x9d\xfd\x82\x94%L\xae\x9ch$f=\xfa{\xd0'))
+      self.assertEqual(_unpack_guid_secret_in_handle(impala_handle), """(TExecuteStatementReq(sessionHandle=TSessionHandle(sessionId=THandleIdentifier(guid=c34abdf1496eccc4:724de1395bd50ab2, secret=ae4c259482fd9db0:d07bfa3d6624689c)), statement=b\'USE `default`\', confOverlay={\'QUERY_TIMEOUT_S\': \'300\'}, runAsync=False),)""")
+    else:
+      hive_handle = """(TExecuteStatementReq(confOverlay={}, sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=\'\x1aOYj\xf3\x86M\x95\xbb\xc8\xe9/;\xb0{9\', guid=\'\x86\xa6$\xb2\xb8\xdaF\xbd\xbd\xf5\xc5\xf4\xcb\x96\x03<\')), runAsync=True, statement="SELECT \'Hello World!\'"),)"""
+      self.assertEqual(_unpack_guid_secret_in_handle(hive_handle), """(TExecuteStatementReq(confOverlay={}, sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=954d86f36a594f1a:397bb03b2fe9c8bb, guid=bd46dab8b224a686:3c0396cbf4c5f5bd)), runAsync=True, statement="SELECT \'Hello World!\'"),)""")
+
+      impala_handle = """(TGetTablesReq(schemaName=u\'default\', sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=\'\x7f\x98\x97s\xe1\xa8G\xf4\x8a\x8a\\r\x0e6\xc2\xee\xf0\', guid=\'\xfa\xb0/\x04 \xfeDX\x99\xfcq\xff2\x07\x02\xfe\')), tableName=u\'customers\', tableTypes=None, catalogName=None),)"""
+      self.assertEqual(_unpack_guid_secret_in_handle(impala_handle), """(TGetTablesReq(schemaName=u\'default\', sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=f447a8e17397987f:f0eec2360e0d8a8a, guid=5844fe20042fb0fa:fe020732ff71fc99)), tableName=u\'customers\', tableTypes=None, catalogName=None),)""")
 
     # Following should be added to test, but fails because eval doesn't handle null bytes
     #impala_handle = """(TGetTablesReq(schemaName=u\'default\', sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=\'\x7f\x98\x97s\xe1\xa8G\xf4\x8a\x8a\\r\x0e6\xc2\xee\xf0\', guid=\'\xd23\xfa\x150\xf5D\x91\x00\x00\x00\x00\xd7\xef\x91\x00\')), tableName=u\'customers\', tableTypes=None, catalogName=None),)"""
@@ -302,6 +313,35 @@ class TestJsonable2Thrift(unittest.TestCase):
     """
     self.assertBackAndForth(TestManyTypes(a_string_list=["alpha", "beta"]))
     self.assertBackAndForth(TestManyTypes(a_string_list=[u"alpha", u"beta"]))
+
+
+class TestSuperClient(unittest.TestCase):
+
+  def test_wrapper_no_retry(self):
+    wrapped_client, transport = Mock(), Mock()
+    wrapped_client.my_call = Mock(
+      side_effect=TTransportException(message='read operation timed out')
+    )
+
+    client = thrift_util.SuperClient(wrapped_client, transport)
+
+    with self.assertRaises(TTransportException):
+      client.my_call()
+      # Could check output for "Not retrying thrift call my_call due to socket timeout"
+
+
+  def test_wrapper_with_retry(self):
+    wrapped_client, transport = Mock(), Mock()
+    wrapped_client.my_call = Mock(
+      side_effect=TTransportException(message='some error')
+    )
+
+    client = thrift_util.SuperClient(wrapped_client, transport)
+
+    with self.assertRaises(TTransportException):
+      client.my_call()
+      # Could check output for several "Thrift exception; retrying: some error"
+
 
 if __name__ == '__main__':
   unittest.main()

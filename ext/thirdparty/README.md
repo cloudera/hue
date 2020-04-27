@@ -22,9 +22,9 @@ Checked-in third party dependencies
 |Y|Django|1.6.10|BSD|http://www.djangoproject.com/download/1.6.10/tarball/|
 |Y|django-auth-ldap|1.2.0|BSD|http://bitbucket.org/psagers/django-auth-ldap/|
 |Y|django-axes|1.5.0|MIT|http://github.com/django-pci/django-axes.git|
+|Y|django-crequest|2018.5.11|BSD|https://pypi.org/project/django-crequest/|
 |Y|Django Extensions|1.5.0|New BSD|http://pypi.python.org/pypi/django-extensions/1.5.0|
 |Y|Django_nose (part of basie)|1.3|MIT|http://code.basieproject.org/trunk/apps/django_nose/nose_runner.py|
-|Y|django-openid-auth|0.5| |http://openidenabled.com/python-openid/|
 |Y|django-webpack-loader|0.5.0|MIT|https://github.com/owais/django-webpack-loader/|
 |Y|djangosaml2|0.16.4|Apache ||
 |Y|dnspython|1.15.0|ISC|https://pypi.org/project/dnspython/1.15.0/|
@@ -86,7 +86,6 @@ Checked-in third party dependencies
 |Y|ssl|1.15|Python|http://pypi.python.org/pypi/ssl/1.15|
 |Y|tablib|0.10.0|MIT|http://docs.python-tablib.org/en/latest/|
 |Y|Thrift|0.9.1|Apache|http://incubator.apache.org/thrift/download/|
-|Y|thriftpy|0.3.9|Apache|https://github.com/eleme/thriftpy|
 |Y|urllib2_kerberos|0.1.6|ASL2|http://pypi.python.org/pypi/urllib2_kerberos|
 
 ---
@@ -99,7 +98,6 @@ Downloaded third party dependencies during build
 |Y|nosetty|0.4|LGPL|http://code.google.com/p/nosetty/|
 |N|pylint|0.19.0|GPL|http://www.logilab.org/project/pylint|
 |Y|Werkzeug|0.6|BSD|http://werkzeug.pocoo.org/|
-|Y|windmill|1.3|Apache2|http://www.getwindmill.com/|
 
 
 ---
@@ -108,7 +106,6 @@ Frontend third party dependencies (some checked in and some via npm)
 |Project|Version|License|Source URL|
 |-------|-------|-------|----------|
 |Ace Editor|1.2.2|BSD|https://github.com/ajaxorg/ace|
-|Architect Build|0.1.1|None|https://www.npmjs.com/package/architect-build|
 |Babel cli|6.26.0|MIT|https://www.npmjs.com/package/babel-cli|
 |Babel Core|7.2.2|MIT|https://www.npmjs.com/package/babel-core|
 |Babel eslint|10.0.1|MIT|https://www.npmjs.com/package/babel-eslint|
@@ -134,7 +131,6 @@ Frontend third party dependencies (some checked in and some via npm)
 |ESLint config prettier|4.0.0|MIT|https://www.npmjs.com/package/eslint-config-prettier|
 |ESLint plugin prettier|3.0.1|MIT|https://www.npmjs.com/package/eslint-plugin-prettier|
 |Expose Loader|0.7.5|MIT|https://www.npmjs.com/package/expose-loader|
-|Dryice|0.4.11|None|https://www.npmjs.com/package/dryice|
 |django-debug-panel|0.8.3|BSD|https://pypi.org/project/django-debug-panel/0.8.3/|
 |django-debug-toolbar|1.3.2|BSD|https://pypi.python.org/pypi/django-debug-toolbar/1.3.2|
 |filesize.js|4.0.0|BSD|https://github.com/avoidwork/filesize.js|
@@ -143,7 +139,6 @@ Frontend third party dependencies (some checked in and some via npm)
 |Gridster.js|0.7.0|MIT|https://github.com/dsmorse/gridster.js|
 |Grunt|1.0.3|MIT|https://www.npmjs.com/package//grunt|
 |Grunt contrib less|2.0.0|MIT|https://www.npmjs.com/package/grunt-contrib-less|
-|Grunt contrib uglify|4.0.0|MIT|https://www.npmjs.com/package/grunt-contrib-uglify|
 |Grunt contrib watch|1.1.0|MIT|https://www.npmjs.com/package/grunt-contrib-watch|
 |Jasmine|3.3.0,3.3.1|MIT|https://github.com/jasmine/jasmine|
 |Jasmine types|3.3.9|MIT|https://www.npmjs.com/package/@types/jasmine|
@@ -184,7 +179,6 @@ Frontend third party dependencies (some checked in and some via npm)
 |Markdown.js|?|MIT|https://github.com/cadorn/markdown-js|
 |Medium Editor|5.23.3|MIT|https://github.com/yabwe/medium-editor|
 |Moment.js|2.13.0|MIT|https://momentjs.com|
-|Minimist|1.2.0|MIT|https://www.npmjs.com/package/minimist|
 |Mustache.js|0.7.2|MIT|http://github.com/janl/mustache.js|
 |nvd3|1.1.15b|Apache|https://github.com/novus/nvd3|
 |page.js|1.8.6|MIT|https://github.com/visionmedia/page.js|
@@ -207,5 +201,4 @@ Frontend third party dependencies (some checked in and some via npm)
 |Webpack cli|3.2.1|MIT|https://www.npmjs.com/package/webpack-cli|
 |Webpack clean plugin|1.0.1|MIT|https://www.npmjs.com/package/clean-webpack-plugin|
 |Webpack Clean Obsolete Chunks plugin|0.4.0|MIT|https://github.com/GProst/webpack-clean-obsolete-chunks|
-|wysihtml5|0.3.0|MIT|https://github.com/xing/wysihtml5|
 |X-editable|1.5.1|MIT|http://github.com/vitalets/x-editable|"

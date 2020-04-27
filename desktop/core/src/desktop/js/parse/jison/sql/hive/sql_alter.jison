@@ -25,6 +25,7 @@ DataDefinition_EDIT
 AlterStatement
  : AlterDatabase
  | AlterIndex
+ | AlterMaterializedView
  | AlterTable
  | AlterView
  | Msck
@@ -34,13 +35,14 @@ AlterStatement
 AlterStatement_EDIT
  : AlterDatabase_EDIT
  | AlterIndex_EDIT
+ | AlterMaterializedView_EDIT
  | AlterTable_EDIT
  | AlterView_EDIT
  | Msck_EDIT
  | ReloadFunction_EDIT
  | 'ALTER' 'CURSOR'
    {
-     parser.suggestKeywords(['DATABASE', 'INDEX', 'SCHEMA', 'TABLE', 'VIEW']);
+     parser.suggestKeywords(['DATABASE', 'INDEX', 'MATERIALIZED VIEW', 'SCHEMA', 'TABLE', 'VIEW']);
    }
  ;
 
@@ -122,10 +124,45 @@ AlterIndex_EDIT
    }
  ;
 
+AlterMaterializedView
+ : 'ALTER' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier EnableOrDisable 'REWRITE'
+   {
+     parser.addTablePrimary($4);
+   }
+ ;
+
+AlterMaterializedView_EDIT
+ : 'ALTER' 'MATERIALIZED' 'CURSOR'
+   {
+     parser.suggestKeywords(['VIEW']);
+   }
+ | 'ALTER' 'MATERIALIZED' 'VIEW' 'CURSOR'
+   {
+     parser.suggestTables({ onlyViews: true });
+     parser.suggestDatabases({ appendDot: true });
+   }
+ | 'ALTER' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier_EDIT
+   {
+     if (parser.yy.result.suggestTables) {
+       parser.yy.result.suggestTables.onlyViews = true;
+     }
+   }
+ | 'ALTER' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier 'CURSOR'
+   {
+     parser.addTablePrimary($4);
+     parser.suggestKeywords(['DISABLE REWRITE', 'ENABLE REWRITE']);
+   }
+ | 'ALTER' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier EnableOrDisable 'CURSOR'
+   {
+     parser.addTablePrimary($4);
+     parser.suggestKeywords(['REWRITE']);
+   }
+ ;
+
 AlterTable
  : AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' RegularOrBacktickedIdentifier PrimaryKeySpecification
- | AlterTableLeftSide 'ADD' 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification
+ | AlterTableLeftSide 'ADD' TableConstraint
  | AlterTableLeftSide 'RENAME' 'TO' RegularOrBackTickedSchemaQualifiedName
  | AlterTableLeftSide ClusteredBy
  | AlterTableLeftSide 'SKEWED' 'BY' ParenthesizedColumnList 'ON' ParenthesizedSkewedValueList OptionalStoredAsDirectories
@@ -147,6 +184,7 @@ AlterTable
 AlterTable_EDIT
  : AlterTableLeftSide_EDIT
  | AlterTableLeftSide_EDIT 'ADD' OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs
+ | AlterTableLeftSide_EDIT TableConstraint
  | AlterTableLeftSide_EDIT 'RENAME' 'TO' RegularOrBackTickedSchemaQualifiedName
  | AlterTableLeftSide_EDIT ClusteredBy
  | AlterTableLeftSide_EDIT 'SKEWED' 'BY' ParenthesizedColumnList 'ON' ParenthesizedSkewedValueList OptionalStoredAsDirectories
@@ -194,7 +232,7 @@ AlterTable_EDIT
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' 'CURSOR'
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' RegularOrBacktickedIdentifier 'CURSOR'
    {
-     parser.suggestKeywords(['FOREIGN KEY', 'PRIMARY KEY']);
+     parser.suggestKeywords(['CHECK', 'FOREIGN KEY', 'PRIMARY KEY', 'UNIQUE']);
    }
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' RegularOrBacktickedIdentifier PrimaryKeySpecification_EDIT
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification_EDIT
@@ -750,32 +788,66 @@ AlterViewLeftSide_EDIT
  ;
 
 Msck
- : 'MSCK' 'REPAIR' 'TABLE' SchemaQualifiedTableIdentifier
+ : 'MSCK' OptionalRepair 'TABLE' SchemaQualifiedTableIdentifier OptionalAddDropSyncPartitions
    {
      parser.addTablePrimary($4);
    }
  ;
 
 Msck_EDIT
- : 'MSCK' 'CURSOR'
+ : 'MSCK' OptionalRepair 'CURSOR'
    {
-     parser.suggestKeywords(['REPAIR TABLE']);
+     if (!$2) {
+       parser.suggestKeywords(['TABLE', 'REPAIR TABLE']);
+     } else {
+       parser.suggestKeywords(['TABLE']);
+     }
    }
- | 'MSCK' 'REPAIR' 'CURSOR'
-   {
-     parser.suggestKeywords(['TABLE']);
-   }
- | 'MSCK' 'REPAIR' 'TABLE' 'CURSOR'
+ | 'MSCK' OptionalRepair 'TABLE' 'CURSOR'
    {
      parser.suggestTables({ onlyTables: true });
      parser.suggestDatabases({ appendDot: true });
    }
- | 'MSCK' 'REPAIR' 'TABLE' SchemaQualifiedTableIdentifier_EDIT
+ | 'MSCK' OptionalRepair 'TABLE' SchemaQualifiedTableIdentifier_EDIT
    {
      if (parser.yy.result.suggestTables) {
        parser.yy.result.suggestTables.onlyViews = true;
      }
    }
+ | 'MSCK' OptionalRepair 'TABLE' SchemaQualifiedTableIdentifier AddDropSyncPartitions_EDIT
+   {
+     parser.addTablePrimary($4);
+   }
+ | 'MSCK' OptionalRepair 'TABLE' SchemaQualifiedTableIdentifier OptionalAddDropSyncPartitions 'CURSOR'
+   {
+     parser.addTablePrimary($4);
+     if (!$5) {
+       parser.suggestKeywords(['ADD PARTITIONS', 'DROP PARTITIONS', 'SYNC PARTITIONS']);
+     }
+   }
+ ;
+
+OptionalRepair
+ :
+ | 'REPAIR'
+ ;
+
+OptionalAddDropSyncPartitions
+ :
+ | AddDropOrSync 'PARTITIONS'
+ ;
+
+AddDropSyncPartitions_EDIT
+ : AddDropOrSync 'CURSOR'
+   {
+     parser.suggestKeywords(['PARTITIONS']);
+   }
+ ;
+
+AddDropOrSync
+ : 'ADD'
+ | 'DROP'
+ | 'SYNC'
  ;
 
 ReloadFunction

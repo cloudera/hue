@@ -14,19 +14,23 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter
-from django.utils.translation import ugettext as _
-from desktop.views import _ko
-from useradmin.models import group_permissions
 from django.contrib.auth.models import Group
+from django.utils.translation import ugettext as _
+
+from desktop.views import commonheader, commonfooter
+from desktop.views import _ko
+
+from useradmin.models import group_permissions
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="layout" file="layout.mako" />
-%if not is_embeddable:
-${commonheader(_('Configurations'), "useradmin", user, request) | n,unicode}
-%endif
+
+% if not is_embeddable:
+  ${ commonheader(_('Configurations'), "useradmin", user, request) | n,unicode }
+% endif
+
 ${layout.menubar(section='configurations')}
 
 <script id="app-list" type="text/html">
@@ -293,7 +297,8 @@ ${ configKoComponents.config() }
   })();
 </script>
 
-${layout.commons()}
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif
+${ layout.commons() }
+
+% if not is_embeddable:
+  ${ commonfooter(request, messages) | n,unicode }
+% endif
