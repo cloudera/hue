@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.assistKey.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;hue-assist-key&quot;, params: params }\\"><a class=\\"assist-field-link\\" style=\\"padding: 0 2px;\\" href=\\"javascript: void(0);\\" data-bind=\\"
+          tooltip: {
+            title: foreignKeyTooltipHtml,
+            html: true,
+            placement: 'bottom'
+          },
+          click: highlight
+        \\" data-original-title=\\"\\"><i class=\\"fa fa-key\\"></i></a><i class=\\"fa fa-key\\" style=\\"padding: 0 2px;\\" data-bind=\\"
+        tooltip: {
+          title: 'Primary Key',
+          placement: 'bottom'
+        }\\" data-original-title=\\"\\"></i><i class=\\"fa fa-key\\"></i></div>"
+`;

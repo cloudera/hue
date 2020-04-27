@@ -413,7 +413,7 @@ class DataCatalogEntry {
         const foreignKeys = {};
         if (sourceMeta.foreign_keys) {
           sourceMeta.foreign_keys.forEach(foreignKey => {
-            foreignKeys[foreignKey.name] = true;
+            foreignKeys[foreignKey.name] = foreignKey;
           });
         }
 
@@ -456,7 +456,7 @@ class DataCatalogEntry {
                         definition.primaryKey = !!primaryKeys[entity.name];
                       }
                       if (sourceMeta.foreign_keys) {
-                        definition.foreignKey = !!foreignKeys[entity.name];
+                        definition.foreignKey = foreignKeys[entity.name];
                       }
                       definition.index = index++;
                       catalogEntry.definition = definition;
