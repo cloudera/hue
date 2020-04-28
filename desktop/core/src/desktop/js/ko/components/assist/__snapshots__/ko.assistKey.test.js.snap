@@ -7,7 +7,8 @@ exports[`ko.assistKey.js should render component 1`] = `
             html: true,
             placement: 'bottom'
           },
-          click: foreignKeyClick
+          click: foreignKeyClick,
+          clickbubble: false
         \\" data-original-title=\\"\\"><i class=\\"fa fa-key\\"></i></a><i class=\\"fa fa-key\\" style=\\"padding: 0 2px;\\" data-bind=\\"
           tooltip: {
             title: 'Foreign Key',
