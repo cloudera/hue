@@ -21,8 +21,8 @@ import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import sqlUtils from 'sql/sqlUtils';
 import DisposableComponent from './DisposableComponent';
-import { DRAGGABLE_TEXT_META_EVENT } from '../bindings/ko.draggableText';
-import { INSERT_AT_CURSOR_EVENT } from '../bindings/ace/ko.aceEditor';
+import { DRAGGABLE_TEXT_META_EVENT } from 'ko/bindings/ko.draggableText';
+import { INSERT_AT_CURSOR_EVENT } from 'ko/bindings/ace/ko.aceEditor';
 import { defer, sleep } from 'utils/hueUtils';
 
 export const NAME = 'hue-editor-droppable-menu';
@@ -140,7 +140,7 @@ class EditorDroppableMenu extends DisposableComponent {
     let cursorEndAdjust = 0;
     switch (type) {
       case TYPES.UPDATE:
-        textToInsert = 'UPDATE ' + this.identifier() + ' SET ';
+        textToInsert = 'UPDATE ' + this.identifier() + '\nSET ';
         cursorEndAdjust = -1;
         break;
       case TYPES.DROP:
@@ -149,11 +149,11 @@ class EditorDroppableMenu extends DisposableComponent {
         cursorEndAdjust = -2;
         break;
       case TYPES.INSERT:
-        textToInsert = 'INSERT INTO ' + this.identifier() + ' VALUES ();';
+        textToInsert = 'INSERT INTO ' + this.identifier() + '\nVALUES ();';
         cursorEndAdjust = -3;
         break;
       case TYPES.SELECT:
-        textToInsert = 'SELECT * FROM ' + this.identifier() + ' LIMIT 100;';
+        textToInsert = 'SELECT *\nFROM ' + this.identifier() + '\nLIMIT 100\n;';
         cursorEndAdjust = -2;
         break;
       default:

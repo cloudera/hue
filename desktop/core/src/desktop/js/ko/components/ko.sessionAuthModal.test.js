@@ -19,7 +19,7 @@ import huePubSub from 'utils/huePubSub';
 
 import 'ext/bootstrap.2.3.2.min';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
-import { simulateInput } from '../../jest/koTestUtils';
+import { simulateInput } from 'jest/koTestUtils';
 
 describe('ko.sessionAuthModal.js', () => {
   it('should render component', async () => {

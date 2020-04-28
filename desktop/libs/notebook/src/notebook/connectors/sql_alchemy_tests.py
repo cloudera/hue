@@ -47,6 +47,7 @@ class TestApi(object):
 
     self.user = rewrite_user(User.objects.get(username="test"))
     self.interpreter = {
+      'name': 'hive',
       'options': {
         'url': 'mysql://hue:localhost@hue:3306/hue'
       },
@@ -55,6 +56,7 @@ class TestApi(object):
 
   def test_column_backticks_escaping(self):
     interpreter = {
+      'name': 'hive',
       'options': {
         'url': 'mysql://'
       }
@@ -62,14 +64,17 @@ class TestApi(object):
     assert_equal(SqlAlchemyApi(self.user, interpreter).backticks, '`')
 
     interpreter = {
+      'name': 'hive',
       'options': {
         'url': 'postgresql://'
       }
     }
     assert_equal(SqlAlchemyApi(self.user, interpreter).backticks, '"')
 
+
   def test_create_athena_engine(self):
     interpreter = {
+      'name': 'hive',
       'options': {
         'url': 'awsathena+rest://XXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch'
       }
@@ -85,8 +90,8 @@ class TestApi(object):
     rows = 10
     start_over = True
 
-    with patch('notebook.connectors.sql_alchemy.CONNECTION_CACHE') as CONNECTION_CACHE:
-      CONNECTION_CACHE.get = Mock(
+    with patch('notebook.connectors.sql_alchemy.CONNECTIONS') as CONNECTIONS:
+      CONNECTIONS.get = Mock(
         return_value={
           'result': Mock(
             fetchmany=Mock(return_value=[]) # We have 0 rows
@@ -114,8 +119,8 @@ class TestApi(object):
     rows = 10
     start_over = True
 
-    with patch('notebook.connectors.sql_alchemy.CONNECTION_CACHE') as CONNECTION_CACHE:
-      CONNECTION_CACHE.get = Mock(
+    with patch('notebook.connectors.sql_alchemy.CONNECTIONS') as CONNECTIONS:
+      CONNECTIONS.get = Mock(
         return_value={
           'result': Mock(
             fetchmany=Mock(return_value=[['row1'], ['row2']]) # We have 2 rows
@@ -136,12 +141,14 @@ class TestApi(object):
       assert_equal(data['data'], [['row1'], ['row2']])
       assert_equal(data['meta'](), [{'type': 'BIGINT_TYPE'}])
 
+
   @raises(AuthenticationRequired)
   def test_create_engine_auth_error(self):
     interpreter = {
-        'options': {
-            'url': 'mysql://${USER}:${PASSWORD}@hue:3306/hue'
-        }
+      'name': 'hive',
+      'options': {
+        'url': 'mysql://${USER}:${PASSWORD}@hue:3306/hue'
+      }
     }
 
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
@@ -150,6 +157,7 @@ class TestApi(object):
 
   def test_create_engine_auth(self):
     interpreter = {
+      'name': 'hive',
       'options': {
         'url': 'mysql://${USER}:${PASSWORD}@hue:3306/hue',
         'session': {
@@ -171,10 +179,34 @@ class TestApi(object):
       SqlAlchemyApi(self.user, interpreter)._create_engine()
 
 
+  def test_create_engine_with_impersonation(self):
+    interpreter = {
+      'name': 'hive',
+      'options': {
+        'url': 'presto://hue:8080/hue',
+        'session': {},
+        'has_impersonation': False  # Off
+      }
+    }
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
+
+      create_engine.assert_called_with('presto://hue:8080/hue')
+
+
+    interpreter['options']['has_impersonation'] = True  # On
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
+
+      create_engine.assert_called_with('presto://test@hue:8080/hue')
+
+
   def test_check_status(self):
     notebook = Mock()
 
-    with patch('notebook.connectors.sql_alchemy.CONNECTION_CACHE') as CONNECTION_CACHE:
+    with patch('notebook.connectors.sql_alchemy.CONNECTIONS') as CONNECTIONS:
 
       snippet = {'result': {'handle': {'guid': 'guid-1', 'has_result_set': False}}}
       response = SqlAlchemyApi(self.user, self.interpreter).check_status(notebook, snippet)
@@ -214,6 +246,41 @@ class TestApi(object):
           assert_equal(response['rows'], [[1], [2]])
 
 
+  def test_dialect_trim_statement_semicolon(self):
+    interpreter = {
+      'name': 'presto',
+      'options': {
+        'url': 'presto://hue:8080/hue',
+        'session': {},
+      }
+    }
+
+    with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._create_engine') as _create_engine:
+      with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._get_session') as _get_session:
+        execute = Mock(return_value=Mock(cursor=None))
+        _create_engine.return_value = Mock(
+          connect=Mock(
+            return_value=Mock(
+              execute=execute
+            )
+          )
+        )
+        notebook = {}
+        snippet = {'statement': 'SELECT 1;'}
+
+        # Trim
+        engine = SqlAlchemyApi(self.user, interpreter).execute(notebook, snippet)
+
+        execute.assert_called_with('SELECT 1')
+
+        # No Trim
+        interpreter['options']['url'] = 'mysql://hue:3306/hue'
+
+        engine = SqlAlchemyApi(self.user, interpreter).execute(notebook, snippet)
+
+        execute.assert_called_with('SELECT 1;')
+
+
 class TestDialects(object):
 
   def setUp(self):
@@ -222,7 +289,7 @@ class TestDialects(object):
 
 
   def test_backticks_with_connectors(self):
-    interpreter = {'options': {'url': 'dialect://'}, 'dialect_properties': {'sql_identifier_quote': '`'}}
+    interpreter = {'name': 'hive', 'options': {'url': 'dialect://'}, 'dialect_properties': {'sql_identifier_quote': '`'}}
     data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
 
     assert_equal(data, 'SELECT *\nFROM `db1`.`table1`\nLIMIT 1000\n')
@@ -235,13 +302,13 @@ class TestDialects(object):
 
 
   def test_backticks_without_connectors(self):
-    interpreter = {'options': {'url': 'phoenix://'}}
+    interpreter = {'name': 'hive', 'options': {'url': 'phoenix://'}}
     data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
 
     assert_equal(data, 'SELECT *\nFROM `db1`.`table1`\nLIMIT 1000\n')
 
 
-    interpreter = {'options': {'url': 'postgresql://'}}
+    interpreter = {'name': 'hive', 'options': {'url': 'postgresql://'}}
     data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
 
     assert_equal(data, 'SELECT *\nFROM "db1"."table1"\nLIMIT 1000\n')
@@ -256,6 +323,7 @@ class TestAutocomplete(object):
 
   def test_empty_database_names(self):
     interpreter = {
+      'name': 'hive',
       'options': {'url': 'phoenix://'}
     }
 
@@ -271,6 +339,7 @@ class TestAutocomplete(object):
 
   def test_columns_with_null_type(self):
     interpreter = {
+      'name': 'hive',
       'options': {'url': 'phoenix://'}
     }
 

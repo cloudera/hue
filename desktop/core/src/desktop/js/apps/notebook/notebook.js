@@ -25,6 +25,11 @@ import hueUtils from 'utils/hueUtils';
 
 import Session from 'apps/notebook/session';
 import Snippet from 'apps/notebook/snippet';
+import {
+  ASSIST_DB_PANEL_IS_READY_EVENT,
+  ASSIST_IS_DB_PANEL_READY_EVENT,
+  ASSIST_SET_DATABASE_EVENT
+} from 'ko/components/assist/events';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -906,7 +911,7 @@ class Notebook {
     }
 
     huePubSub.subscribeOnce(
-      'assist.db.panel.ready',
+      ASSIST_DB_PANEL_IS_READY_EVENT,
       () => {
         if (self.type().indexOf('query') === 0) {
           const whenDatabaseAvailable = function(snippet) {
@@ -915,8 +920,8 @@ class Notebook {
               'lastSelectedDb'
             );
 
-            huePubSub.publish('assist.set.database', {
-              source: snippet.type(),
+            huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
+              connector: snippet.connector(),
               namespace: snippet.namespace(),
               name: lastSelectedDb === '' ? '' : snippet.database()
             });
@@ -959,7 +964,7 @@ class Notebook {
       vm.huePubSubId
     );
 
-    huePubSub.publish('assist.is.db.panel.ready');
+    huePubSub.publish(ASSIST_IS_DB_PANEL_READY_EVENT);
   }
 }
 

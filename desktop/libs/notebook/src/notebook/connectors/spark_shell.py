@@ -15,8 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import range
-from builtins import object
+from builtins import range, object
 import logging
 import re
 import time
@@ -38,7 +37,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from spark.conf import LIVY_SERVER_SESSION_KIND
-  from spark.job_server_api import get_api as get_spark_api
+  from spark.livy_client import get_api as get_spark_api
 except ImportError as e:
   LOG.exception('Spark is not enabled')
 
@@ -168,7 +167,6 @@ class SparkApi(Api):
 
     props = dict([(p['name'], p['value']) for p in properties]) if properties is not None else {}
 
-
     # HUE-4761: Hue's session request is causing Livy to fail with "JsonMappingException: Can not deserialize
     # instance of scala.collection.immutable.List out of VALUE_STRING token" due to List type values
     # not being formed properly, they are quoted csv strings (without brackets) instead of proper List
@@ -178,37 +176,30 @@ class SparkApi(Api):
     # empty list '[]' for these four values.
     # Note also that Livy has a 90 second timeout for the session request to complete, this needs to
     # be increased for requests that take longer, for example when loading large archives.
-    tmparchives = props['archives']
-    if type(tmparchives) is not list:
-      props['archives'] = tmparchives.split(",")
+    tmp_archives = props['archives']
+    if type(tmp_archives) is not list:
+      props['archives'] = tmp_archives.split(",")
       LOG.debug("Check List type: archives was not a list")
 
-    tmpjars = props['jars']
-    if type(tmpjars) is not list:
-      props['jars'] = tmpjars.split(",")
+    tmp_jars = props['jars']
+    if type(tmp_jars) is not list:
+      props['jars'] = tmp_jars.split(",")
       LOG.debug("Check List type: jars was not a list")
 
-    tmpfiles = props['files']
-    if type(tmpfiles) is not list:
-      props['files'] = tmpfiles.split(",")
+    tmp_files = props['files']
+    if type(tmp_files) is not list:
+      props['files'] = tmp_files.split(",")
       LOG.debug("Check List type: files was not a list")
 
-    tmppyFiles = props['pyFiles']
-    if type(tmppyFiles) is not list:
-      props['pyFiles'] = tmppyFiles.split(",")
+    tmp_py_files = props['pyFiles']
+    if type(tmp_py_files) is not list:
+      props['pyFiles'] = tmp_py_files.split(",")
       LOG.debug("Check List type: pyFiles was not a list")
 
     # Convert the conf list to a dict for Livy
-    listitems = props['conf']
-    LOG.debug("Property Spark Conf kvp list from UI is: " + str(listitems))
-    confDict = {}
-    for i in range(len(listitems)):
-      kvp = listitems[i]
-      LOG.debug("Property Spark Conf key " + str(i) + " = " + str(kvp.get('key')))
-      LOG.debug("Property Spark Conf value " + str(i) + " = " + str(kvp.get('value')))
-      confDict[kvp.get('key')] = kvp.get('value')
-    props['conf'] = confDict
-    LOG.debug("Property Spark Conf dictionary is: " + str(confDict))
+    LOG.debug("Property Spark Conf kvp list from UI is: " + str(props['conf']))
+    props['conf'] = {conf.get('key'): conf.get('value') for i, conf in enumerate(props['conf'])}
+    LOG.debug("Property Spark Conf dictionary is: " + str(props['conf']))
 
     props['kind'] = lang
 
@@ -374,6 +365,29 @@ class SparkApi(Api):
       return self._get_yarn_jobs(start_logs)
     else:
       return self._get_standalone_jobs(logs)
+
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+    response = {}
+
+    # As booting a new SQL session is slow and we don't send the id of the current one in /autocomplete
+    # we could implement this by introducing an API cache per user similarly to SqlAlchemy.
+
+    return response
+
+  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+    if operation != 'hello':
+      raise NotImplementedError()
+
+    response = {}
+
+    api = get_spark_api(self.user)
+
+    api.get_status()
+
+    response['status'] = 0
+    response['rows'] = []
+
+    return response
 
   def _get_standalone_jobs(self, logs):
     job_ids = set([])

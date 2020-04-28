@@ -58,10 +58,17 @@ class TestNotebook(object):
     query.check_status = Mock(
       side_effect=check_status_side_effect
     )
+    query.fetch_result_data = Mock(
+      return_value={'results': [[1], [2]]}
+    )
     request = Mock()
 
-    resp = query.execute_and_wait(request=request)
-    assert_equal(1, resp['history_uuid'])
+    resp = query.execute_and_wait(request=request, include_results=True)
+
+    assert_equal(0, resp.get('status'), resp)
+    assert_equal('available', resp['query_status']['status'], resp)
+    assert_equal([[1], [2]], resp.get('results'), resp)
+
     assert_equal(2, query.check_status.call_count)
 
 
@@ -83,6 +90,28 @@ class TestNotebook(object):
           assert_equal(0, resp['query_status']['status'])
 
 
+  def test_statement_with_variables(self):
+    snippet = {
+      'statement_raw': "SELECT * FROM table WHERE city='${city}'",
+      'type': 'hive',
+      'variables': [
+        {'name': 'city', 'value': 'San Francisco'},
+      ]
+    }
+
+    assert_equal(
+      "SELECT * FROM table WHERE city='San Francisco'",
+      Notebook.statement_with_variables(snippet)
+    )
+
+    snippet['variables'][0]['value'] = 'Saint-Étienne'
+
+    assert_equal(
+      "SELECT * FROM table WHERE city='Saint-Étienne'",
+      Notebook.statement_with_variables(snippet)
+    )
+
+
 iteration = 0
 def check_status_side_effect(request, operation_id):
   """First time query is still running, second time the execution is finished."""
@@ -90,6 +119,6 @@ def check_status_side_effect(request, operation_id):
 
   if iteration == 0:
     iteration += 1
-    return {'status': 'running'}
+    return {'status': 0, 'query_status': {'status': 'running'}}
   else:
-    return {'status': 'done'}
+    return {'status': 0, 'query_status': {'status': 'available'}}

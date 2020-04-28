@@ -17,8 +17,8 @@
 import $ from 'jquery';
 
 import AssistStorageEntry from './assistStorageEntry';
-import huePubSub from '../../../utils/huePubSub';
-import { GET_KNOWN_CONFIG_EVENT } from '../../../utils/hueConfig';
+import huePubSub from 'utils/huePubSub';
+import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 describe('assistStorageEntry.js', () => {
   it('it should handle domain in ADLS/ABFS', () => {
@@ -63,7 +63,7 @@ describe('assistStorageEntry.js', () => {
       if (topic === GET_KNOWN_CONFIG_EVENT && cb) {
         cb({
           app_config: {
-            browsers: {
+            browser: {
               interpreters: [{ type: 'abfs' }]
             }
           }

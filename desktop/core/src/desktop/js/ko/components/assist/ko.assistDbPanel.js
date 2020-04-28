@@ -23,7 +23,21 @@ import componentUtils from 'ko/components/componentUtils';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, filterConnectors } from 'utils/hueConfig';
+import {
+  ASSIST_DB_HIGHLIGHT_EVENT,
+  ASSIST_DB_PANEL_IS_READY_EVENT,
+  ASSIST_GET_DATABASE_EVENT,
+  ASSIST_GET_SOURCE_EVENT,
+  ASSIST_IS_DB_PANEL_READY_EVENT,
+  ASSIST_SET_DATABASE_EVENT,
+  ASSIST_SET_SOURCE_EVENT,
+  ASSIST_SHOW_SOLR_EVENT,
+  ASSIST_SHOW_SQL_EVENT,
+  SHOW_LEFT_ASSIST_EVENT
+} from './events';
+
+import { NAME as ASSIST_KEY_COMPONENT_NAME } from './ko.assistKey';
 
 const ASSIST_TABLE_TEMPLATES = `
   <script type="text/html" id="assist-no-database-entries">
@@ -165,12 +179,12 @@ const ASSIST_TABLE_TEMPLATES = `
       </div>
       <!-- ko if: expandable -->
       <a class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': catalogEntry.getTitle(true) }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: catalogEntry.isKey() --> <i class="fa fa-key"></i><!-- /ko -->
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: catalogEntry.isKey() --> <!-- ko component: { name: '${ASSIST_KEY_COMPONENT_NAME}', params: catalogEntry } --><!-- /ko --><!-- /ko -->
       </a>
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
       <div class="assist-entry assist-field-link default-cursor" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': catalogEntry.getTitle(true) }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isKey()  --> <i class="fa fa-key"></i><!-- /ko -->
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isKey() --> <!-- ko component: { name: '${ASSIST_KEY_COMPONENT_NAME}', params: catalogEntry } --><!-- /ko --><!-- /ko -->
       </div>
       <!-- /ko -->
       <div class="center assist-spinner" data-bind="visible: loading"><i class="fa fa-spinner fa-spin"></i></div>
@@ -188,13 +202,13 @@ const ASSIST_TABLE_TEMPLATES = `
       <!-- ko if: expandable -->
       <a class="assist-entry assist-field-link assist-field-link-dark assist-entry-left-action assist-ellipsis" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': catalogEntry.getTitle(true) }">
         <span data-bind="text: catalogEntry.getType()" class="muted pull-right margin-right-20"></span>
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: catalogEntry.name, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: catalogEntry.isKey() --> <i class="fa fa-key"></i><!-- /ko -->
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: catalogEntry.name, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: catalogEntry.isKey() --> <!-- ko component: { name: '${ASSIST_KEY_COMPONENT_NAME}', params: catalogEntry } --><!-- /ko --><!-- /ko -->
       </a>
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
       <div class="assist-entry assist-field-link assist-field-link-dark default-cursor assist-ellipsis" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': catalogEntry.getTitle(true) }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
         <span data-bind="text: catalogEntry.getType()" class="muted pull-right margin-right-20"></span>
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.name, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isKey() --> <i class="fa fa-key"></i><!-- /ko -->
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.name, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isKey() --> <!-- ko component: { name: '${ASSIST_KEY_COMPONENT_NAME}', params: catalogEntry } --><!-- /ko --><!-- /ko -->
       </div>
       <!-- /ko -->
       <div class="center assist-spinner" data-bind="visible: loading"><i class="fa fa-spinner fa-spin"></i></div>
@@ -275,7 +289,7 @@ const TEMPLATE =
       <a data-bind="click: back, appAwareTemplateContextMenu: { template: 'sql-context-items', viewModel: selectedSource().selectedNamespace().selectedDatabase() }">
         <i class="fa fa-chevron-left assist-breadcrumb-back" ></i>
         <i class="fa assist-breadcrumb-text" data-bind="css: { 'fa-server': nonSqlType, 'fa-database': !nonSqlType }"></i>
-        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() +  (nonSqlType ? '' : ' (' + selectedSource().sourceType + ' ' + selectedSource().selectedNamespace().name + ')') }"></span>
+        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumbTitle }"></span>
       </a>
       <!-- /ko -->
       <!-- ko ifnot: selectedSource().selectedNamespace().selectedDatabase() -->
@@ -283,7 +297,7 @@ const TEMPLATE =
       <a data-bind="click: back">
         <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
         <i class="fa fa-snowflake-o assist-breadcrumb-text"></i>
-        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb() + ' (' + selectedSource().sourceType + ')' }"></span>
+        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumbTitle }"></span>
       </a>
       <!-- /ko -->
       <!-- ko ifnot: window.HAS_MULTI_CLUSTER -->
@@ -322,21 +336,6 @@ const TEMPLATE =
 
   <script type="text/html" id="ask-for-invalidate-title">
     &nbsp;<a class="pull-right pointer close-popover inactive-action">&times;</a>
-  </script>
-
-  <script type="text/html" id="ask-for-invalidate-content">
-    <label class="radio">
-      <input type="radio" name="refreshImpala" value="cache" data-bind="checked: invalidateOnRefresh" />
-      ${I18n('Clear cache')}
-    </label>
-    <label class="radio">
-      <input type="radio" name="refreshImpala" value="invalidate" data-bind="checked: invalidateOnRefresh" />
-      ${I18n('Perform incremental metadata update.')}
-    </label>
-    <div class="assist-invalidate-description">${I18n('This will sync missing tables.')}</div>
-    <div style="width: 100%; display: inline-block; margin-top: 5px;"><button class="pull-right btn btn-primary" data-bind="css: { 'btn-primary': invalidateOnRefresh() !== 'invalidateAndFlush', 'btn-danger': invalidateOnRefresh() === 'invalidateAndFlush' }, click: function (data, event) { huePubSub.publish('close.popover'); triggerRefresh(data, event); }, clickBubble: false">${I18n(
-      'Refresh'
-    )}</button></div>
   </script>
 
   <script type="text/html" id="assist-namespace-header-actions">
@@ -380,16 +379,9 @@ const TEMPLATE =
         <i class="pointer fa fa-plus" title="${I18n('Create index')}"></i>
       </a>
       <!-- /ko -->
-      <!-- ko if: sourceType === 'impala' -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="templatePopover : { contentTemplate: 'ask-for-invalidate-content', titleTemplate: 'ask-for-invalidate-title', trigger: 'click', minWidth: '320px' }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
-        'Refresh'
-      )}"></i></a>
-      <!-- /ko -->
-      <!-- ko if: sourceType !== 'impala' -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
         'Refresh'
       )}"></i></a>
-      <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: loading -->
       <i class="fa fa-refresh fa-spin blue" title="${I18n('Refresh')}"></i>
@@ -586,6 +578,10 @@ class AssistDbPanel {
     this.sourceIndex = {};
     this.selectedSource = ko.observable(null);
 
+    this.breadcrumbTitle = ko.pureComputed(
+      () => `${this.breadcrumb()} (${this.selectedSource().connector.displayName})`
+    );
+
     this.breadcrumb = ko.pureComputed(() => {
       if (this.isStreams && this.selectedSource()) {
         return this.selectedSource().name;
@@ -610,12 +606,12 @@ class AssistDbPanel {
       return null;
     });
 
-    huePubSub.subscribe('assist.db.highlight', catalogEntry => {
-      huePubSub.publish('left.assist.show');
+    huePubSub.subscribe(ASSIST_DB_HIGHLIGHT_EVENT, catalogEntry => {
+      huePubSub.publish(SHOW_LEFT_ASSIST_EVENT);
       if (catalogEntry.getSourceType() === 'solr') {
-        huePubSub.publish('assist.show.solr');
+        huePubSub.publish(ASSIST_SHOW_SOLR_EVENT);
       } else {
-        huePubSub.publish('assist.show.sql');
+        huePubSub.publish(ASSIST_SHOW_SQL_EVENT);
       }
       huePubSub.publish('context.popover.hide');
       window.setTimeout(() => {
@@ -661,11 +657,11 @@ class AssistDbPanel {
         }
       });
     } else if (!this.isSolr && !this.isStreams) {
-      huePubSub.subscribe('assist.set.database', databaseDef => {
-        if (!databaseDef.source || !this.sourceIndex[databaseDef.source]) {
+      huePubSub.subscribe(ASSIST_SET_DATABASE_EVENT, databaseDef => {
+        if (!databaseDef.connector || !this.sourceIndex[databaseDef.connector.type]) {
           return;
         }
-        this.selectedSource(this.sourceIndex[databaseDef.source]);
+        this.selectedSource(this.sourceIndex[databaseDef.connector.type]);
         this.setDatabaseWhenLoaded(databaseDef.namespace, databaseDef.name);
       });
 
@@ -712,24 +708,15 @@ class AssistDbPanel {
         return deferred;
       };
 
-      huePubSub.subscribe('assist.get.database', source => {
-        getSelectedDatabase(source).done(databaseDef => {
-          huePubSub.publish('assist.database.set', databaseDef);
-        });
-      });
-
-      huePubSub.subscribe('assist.get.database.callback', options => {
+      huePubSub.subscribe(ASSIST_GET_DATABASE_EVENT, options => {
         getSelectedDatabase(options.source).done(options.callback);
       });
 
-      huePubSub.subscribe('assist.get.source', () => {
-        huePubSub.publish(
-          'assist.source.set',
-          this.selectedSource() ? this.selectedSource().sourceType : undefined
-        );
+      huePubSub.subscribe(ASSIST_GET_SOURCE_EVENT, callback => {
+        callback(this.selectedSource() ? this.selectedSource().sourceType : undefined);
       });
 
-      huePubSub.subscribe('assist.set.source', source => {
+      huePubSub.subscribe(ASSIST_SET_SOURCE_EVENT, source => {
         if (this.sourceIndex[source]) {
           this.selectedSource(this.sourceIndex[source]);
         }
@@ -747,12 +734,11 @@ class AssistDbPanel {
       });
     }
 
-    this.init(options.navigationSettings).then(() => {
-      huePubSub.publish('assist.db.panel.ready');
+    this.init(options.navigationSettings);
+    huePubSub.publish(ASSIST_DB_PANEL_IS_READY_EVENT);
 
-      huePubSub.subscribe('assist.is.db.panel.ready', () => {
-        huePubSub.publish('assist.db.panel.ready');
-      });
+    huePubSub.subscribe(ASSIST_IS_DB_PANEL_READY_EVENT, () => {
+      huePubSub.publish(ASSIST_DB_PANEL_IS_READY_EVENT);
     });
   }
 
@@ -837,67 +823,51 @@ class AssistDbPanel {
     });
   }
 
-  async init(navigationSettings) {
-    return new Promise(resolve => {
-      if (this.isSolr) {
-        this.setSingleSource('solr', navigationSettings, true);
-        resolve();
-        return;
-      }
+  init(navigationSettings) {
+    if (this.isSolr) {
+      this.setSingleSource('solr', navigationSettings, true);
+      return;
+    }
 
-      if (this.isStreams) {
-        this.setSingleSource('kafka', navigationSettings, true);
-        resolve();
-        return;
-      }
+    if (this.isStreams) {
+      this.setSingleSource('kafka', navigationSettings, true);
+      return;
+    }
 
-      const updateFromConfig = config => {
-        const sources = [];
-        if (
-          config &&
-          config.app_config &&
-          config.app_config.editor &&
-          config.app_config.editor.interpreters
-        ) {
-          const interpreters = config.app_config.editor.interpreters;
-          interpreters.forEach(interpreter => {
-            if (interpreter.is_sql) {
-              const source =
-                this.sourceIndex[interpreter.type] ||
-                new AssistDbSource({
-                  i18n: this.i18n,
-                  type: interpreter.type,
-                  name: interpreter.name,
-                  connector: interpreter,
-                  nonSqlType: false,
-                  navigationSettings: navigationSettings
-                });
-              sources.push(source);
-            }
+    const updateFromConfig = () => {
+      const sources = [];
+      const connectors = filterConnectors(connector => connector.is_sql);
+      connectors.forEach(connector => {
+        const source =
+          this.sourceIndex[connector.type] ||
+          new AssistDbSource({
+            i18n: this.i18n,
+            type: connector.type, // TODO: Remove redundant
+            name: connector.name, // TODO: Remove redundant
+            connector: connector,
+            nonSqlType: false,
+            navigationSettings: navigationSettings
           });
-        }
-        this.sourceIndex = {};
-        sources.forEach(source => {
-          this.sourceIndex[source.sourceType] = source;
-        });
-
-        if (sources.indexOf(this.selectedSource()) === -1) {
-          if (sources.length) {
-            const storageSourceType = apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
-            this.selectedSource(this.sourceIndex[storageSourceType] || sources[0]);
-          } else {
-            this.selectedSource(undefined);
-          }
-        }
-        this.sources(sources);
-      };
-
-      huePubSub.subscribe(CONFIG_REFRESHED_EVENT, updateFromConfig);
-      huePubSub.publish(GET_KNOWN_CONFIG_EVENT, config => {
-        updateFromConfig(config);
-        resolve();
+        sources.push(source);
       });
-    });
+      this.sourceIndex = {};
+      sources.forEach(source => {
+        this.sourceIndex[source.sourceType] = source;
+      });
+
+      if (sources.indexOf(this.selectedSource()) === -1) {
+        if (sources.length) {
+          const storageSourceType = apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
+          this.selectedSource(this.sourceIndex[storageSourceType] || sources[0]);
+        } else {
+          this.selectedSource(undefined);
+        }
+      }
+      this.sources(sources);
+    };
+
+    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, updateFromConfig);
+    updateFromConfig();
   }
 }
 

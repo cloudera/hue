@@ -131,7 +131,7 @@ class Cursor(object):
   def fetchmany(self, n=None):
     res = []
 
-    while next(self.rs) and (n is None or n > 0):
+    while self.rs.next() and (n is None or n > 0):
       row = []
       for c in range(self._meta.getColumnCount()):
         cell = self.rs.getObject(c + 1)

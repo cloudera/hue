@@ -27,78 +27,74 @@ import DisposableComponent from 'ko/components/DisposableComponent';
 import Executor from 'apps/notebook2/execution/executor';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
-import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
-import huePubSub from 'utils/huePubSub';
+import { CONFIG_REFRESHED_EVENT, filterConnectors } from 'utils/hueConfig';
 
 export const NAME = 'quick-query-context';
 
 // prettier-ignore
 const TEMPLATE = `
 <div class="context-popover-flex-fill" style="overflow: auto;">
-  <!-- ko hueSpinner: { spin: loadingConfig, center: true, size: 'xlarge' } --><!-- /ko -->
-  <!-- ko ifnot: loadingConfig -->
-    <div style="display: inline-block" data-bind="
+  <div style="display: inline-block" data-bind="
+    component: {
+      name: '${ DROP_DOWN }',
+      params: {
+        value: interpreter,
+        labelAttribute: 'displayName',
+        entries: availableInterpreters,
+        linkTitle: 'Active connector'
+      }
+    }
+  "></div>
+  <!-- ko if: interpreter() -->
+    <div class="margin-left-10" style="display: inline-block" data-bind="
       component: {
-        name: '${ DROP_DOWN }',
+        name: '${ CONTEXT_SELECTOR }',
         params: {
-          value: interpreter,
-          labelAttribute: 'displayName',
-          entries: availableInterpreters,
-          linkTitle: 'Active connector'
+          sourceType: interpreter().type,
+          compute: compute,
+          namespace: namespace,
+          availableDatabases: availableDatabases,
+          database: database,
+          hideLabels: true
         }
       }
     "></div>
-    <!-- ko if: interpreter() -->
-      <div class="margin-left-10" style="display: inline-block" data-bind="
+  <!-- /ko -->
+  <!-- ko ifnot: loadingContext -->
+    <!-- ko with: interpreter -->
+      <div style="margin: 10px;" data-bind="
         component: {
-          name: '${ CONTEXT_SELECTOR }',
+          name: '${ SIMPLE_ACE_MULTI }',
           params: {
-            sourceType: interpreter().type,
-            compute: compute,
-            namespace: namespace,
-            availableDatabases: availableDatabases,
-            database: database,
-            hideLabels: true
+            autocomplete: $parent.autocomplete,
+            value: $parent.statement,
+            lines: 3,
+            aceOptions: {
+              minLines: 3,
+              maxLines: 5
+            },
+            mode: dialect,
+            database: $parent.database,
+            availableDatabases: $parent.availableDatabases,
+            namespace: $parent.namespace,
+            compute: $parent.compute,
+            executor: $parent.executor,
+            activeExecutable: $parent.activeExecutable
           }
         }
       "></div>
-    <!-- /ko -->
-    <!-- ko ifnot: loadingContext -->
-      <!-- ko with: interpreter -->
-        <div style="margin: 10px;" data-bind="
-          component: {
-            name: '${ SIMPLE_ACE_MULTI }',
-            params: {
-              autocomplete: $parent.autocomplete,
-              value: $parent.statement,
-              lines: 3,
-              aceOptions: {
-                minLines: 3,
-                maxLines: 5
-              },
-              mode: dialect,
-              database: $parent.database,
-              availableDatabases: $parent.availableDatabases,
-              namespace: $parent.namespace,
-              compute: $parent.compute,
-              executor: $parent.executor,
-              activeExecutable: $parent.activeExecutable
-            }
-          }
-        "></div>
-        <div data-bind="
-          component: {
-            name: '${ EXECUTABLE_ACTIONS }',
-            params: { activeExecutable: $parent.activeExecutable }
-          }
-        "></div>
-        <div data-bind="
-          component: {
-            name: '${ SIMPLE_RESULT_GRID }',
-            params: { activeExecutable: $parent.activeExecutable }
-          }
-        "></div>
-      <!-- /ko -->
+      <div data-bind="
+        component: {
+          name: '${ EXECUTABLE_ACTIONS }',
+          params: { activeExecutable: $parent.activeExecutable }
+        }
+      "></div>
+      <div data-bind="
+        component: {
+          name: '${ SIMPLE_RESULT_GRID }',
+          params: { activeExecutable: $parent.activeExecutable }
+        }
+      "></div>
     <!-- /ko -->
   <!-- /ko -->
 </div>
@@ -119,8 +115,6 @@ class QuickQueryContext extends DisposableComponent {
     // TODO: Switch over to connector in ko.simpleAceEditor
     this.namespace = ko.observable();
     this.compute = ko.observable();
-
-    this.loadingConfig = ko.observable(true);
 
     this.statement = ko.observable();
 
@@ -143,8 +137,8 @@ class QuickQueryContext extends DisposableComponent {
       () => this.interpreter() && { type: this.interpreter().dialect }
     );
 
+    this.updateFromConfig();
     this.subscribe(CONFIG_REFRESHED_EVENT, this.updateFromConfig.bind(this));
-    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, this.updateFromConfig.bind(this));
 
     let refreshExecutableThrottle = -1;
     const refreshExecutable = () => {
@@ -166,19 +160,9 @@ class QuickQueryContext extends DisposableComponent {
     this.subscribe(this.database, refreshExecutable);
   }
 
-  updateFromConfig(config) {
-    if (
-      config &&
-      config.app_config &&
-      config.app_config.editor &&
-      config.app_config.editor.interpreters
-    ) {
-      this.availableInterpreters(
-        config.app_config.editor.interpreters.filter(interpreter => interpreter.is_sql)
-      );
-    } else {
-      this.availableInterpreters([]);
-    }
+  updateFromConfig() {
+    const configuredSqlConnectors = filterConnectors(connector => connector.is_sql);
+    this.availableInterpreters(configuredSqlConnectors);
 
     const found =
       this.interpreter() &&
@@ -193,7 +177,6 @@ class QuickQueryContext extends DisposableComponent {
         this.availableInterpreters().length ? this.availableInterpreters()[0] : undefined
       );
     }
-    this.loadingConfig(false);
   }
 }
 

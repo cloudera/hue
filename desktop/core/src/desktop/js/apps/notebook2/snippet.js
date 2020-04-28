@@ -23,7 +23,6 @@ import 'apps/notebook2/components/ko.executableActions';
 import 'apps/notebook2/components/ko.executableLogs';
 import 'apps/notebook2/components/ko.executableProgressBar';
 import 'apps/notebook2/components/ko.snippetEditorActions';
-import 'apps/notebook2/components/ko.savedQueries';
 import 'apps/notebook2/components/ko.snippetResults';
 import 'apps/notebook2/components/ko.queryHistory';
 
@@ -43,9 +42,14 @@ import {
 } from 'ko/bindings/ace/aceLocationHandler';
 import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from 'apps/notebook2/components/ko.executableActions';
 import { UPDATE_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
-import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import { GET_KNOWN_CONFIG_EVENT, findConnector } from 'utils/hueConfig';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { getOptimizer } from 'catalog/optimizer/optimizer';
+import {
+  ASSIST_GET_DATABASE_EVENT,
+  ASSIST_GET_SOURCE_EVENT,
+  ASSIST_SET_SOURCE_EVENT
+} from 'ko/components/assist/events';
 
 // TODO: Remove for ENABLE_NOTEBOOK_2. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
@@ -302,22 +306,16 @@ export default class Snippet {
     this.currentQueryTab = ko.observable(snippetRaw.currentQueryTab || 'queryHistory');
     this.pinnedContextTabs = ko.observableArray(snippetRaw.pinnedContextTabs || []);
 
-    huePubSub.subscribeOnce(
-      'assist.source.set',
-      source => {
-        if (source !== this.dialect()) {
-          huePubSub.publish('assist.set.source', this.dialect());
-        }
-      },
-      this.parentVm.huePubSubId
-    );
-
-    huePubSub.publish('assist.get.source');
+    huePubSub.publish(ASSIST_GET_SOURCE_EVENT, source => {
+      if (source !== this.dialect()) {
+        huePubSub.publish(ASSIST_SET_SOURCE_EVENT, this.dialect());
+      }
+    });
 
     this.ignoreNextAssistDatabaseUpdate = false;
 
     if (!this.database()) {
-      huePubSub.publish('assist.get.database.callback', {
+      huePubSub.publish(ASSIST_GET_DATABASE_EVENT, {
         source: this.dialect(),
         callback: databaseDef => {
           this.handleAssistSelection(databaseDef);
@@ -1045,20 +1043,17 @@ export default class Snippet {
   }
 
   changeDialect(dialect) {
-    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, config => {
-      if (config && config.app_config && config.app_config.editor) {
-        const foundConnector = config.app_config.editor.interpreters.find(
-          connector => connector.dialect === dialect
-        );
-        if (foundConnector) {
-          this.connector(foundConnector);
-        }
-      }
-    });
+    const connector = findConnector(connector => connector.dialect === dialect);
+    if (!connector) {
+      throw new Error('No connector found for dialect ' + dialect);
+    }
+    // TODO: Switch changeDialect to changeType
+    this.connector(connector);
   }
 
   updateFromExecutable(executable) {
     if (executable) {
+      this.lastExecuted(executable.executeStarted);
       if (
         executable.status === EXECUTION_STATUS.available ||
         executable.status === EXECUTION_STATUS.failed ||
@@ -1440,6 +1435,7 @@ export default class Snippet {
       statementType: this.statementType(),
       statement: this.statement(),
       aceCursorPosition: this.aceCursorPosition(),
+      lastExecuted: this.lastExecuted(),
       statementPath: this.statementPath(),
       associatedDocumentUuid: this.associatedDocumentUuid(),
       properties: komapping.toJS(this.properties), // TODO: Drop komapping

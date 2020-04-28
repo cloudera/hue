@@ -23,6 +23,7 @@ import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { ASSIST_SET_DATABASE_EVENT } from './assist/events';
 
 export const NAME = 'hue-context-selector';
 
@@ -422,9 +423,7 @@ HueContextSelector.prototype.reloadDatabases = function() {
               sourceType: connector.type, // TODO: Drop when dataCatalog only needs connector
               namespace: self[TYPES_INDEX.namespace.name](),
               compute: self[TYPES_INDEX.compute.name](),
-              connector: (self.connector && ko.unwrap(self.connector)) || {
-                type: ko.unwrap(self.sourceType)
-              },
+              connector: connector,
               path: [],
               definition: { type: 'source' }
             })
@@ -472,8 +471,8 @@ HueContextSelector.prototype.reloadDatabases = function() {
                   self.loadingDatabases(false);
 
                   if (updateAssist) {
-                    huePubSub.publish('assist.set.database', {
-                      source: ko.unwrap(self.sourceType),
+                    huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
+                      connector: connector,
                       namespace: self[TYPES_INDEX.namespace.name](),
                       name: self.database()
                     });

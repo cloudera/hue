@@ -30,7 +30,7 @@ from django.views.decorators.http import require_GET, require_POST
 import opentracing.tracer
 
 from azure.abfs.__init__ import abfspath
-from desktop.conf import TASK_SERVER
+from desktop.conf import TASK_SERVER, ENABLE_CONNECTORS
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
@@ -39,10 +39,10 @@ from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from metadata.conf import OPTIMIZER
 
-from notebook.connectors.base import Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name
+from notebook.connectors.base import Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name, patch_snippet_for_connector
 from notebook.connectors.hiveserver2 import HS2Api
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
-from notebook.models import escape_rows, make_notebook, upgrade_session_properties, get_api
+from notebook.models import escape_rows, make_notebook, upgrade_session_properties, get_api, MockRequest
 
 if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_unquote
@@ -216,6 +216,9 @@ def execute(request, dialect=None):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
+  if dialect:
+    notebook['dialect'] = dialect
+
   with opentracing.tracer.start_span('notebook-execute') as span:
     span.set_tag('user-id', request.user.username)
 
@@ -278,7 +281,7 @@ def _check_status(request, notebook=None, snippet=None, operation_id=None):
     else:
       has_result_set = None
 
-    if notebook['type'].startswith('query') or notebook.get('isManaged'):
+    if notebook.get('dialect') or notebook['type'].startswith('query') or notebook.get('isManaged'):
       nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=operation_id or notebook['uuid'])
       if nb_doc.can_write(request.user):
         nb = Notebook(document=nb_doc).get_data()
@@ -296,8 +299,6 @@ def _check_status(request, notebook=None, snippet=None, operation_id=None):
 @check_document_access_permission
 @api_error_handler
 def fetch_result_data(request):
-  response = {'status': -1}
-
   operation_id = request.POST.get('operationId')
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
@@ -305,25 +306,33 @@ def fetch_result_data(request):
   rows = json.loads(request.POST.get('rows', '100'))
   start_over = json.loads(request.POST.get('startOver', 'false'))
 
-  snippet = _get_snippet(request.user, notebook, snippet, operation_id)
-
   with opentracing.tracer.start_span('notebook-fetch_result_data') as span:
-    response['result'] = get_api(request, snippet).fetch_result(notebook, snippet, rows, start_over)
-
     span.set_tag('user-id', request.user.username)
     span.set_tag(
       'query-id',
       snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
     )
 
+    response = _fetch_result_data(request.user, notebook, snippet, operation_id, rows=rows, start_over=start_over)
+    response['status'] = 0
+
+    return JsonResponse(response)
+
+
+def _fetch_result_data(user, notebook=None, snippet=None, operation_id=None, rows=100, start_over=False, nulls_only=False):
+  snippet = _get_snippet(user, notebook, snippet, operation_id)
+  request = MockRequest(user)
+
+  response = {
+    'result': get_api(request, snippet).fetch_result(notebook, snippet, rows, start_over)
+  }
+
   # Materialize and HTML escape results
   if response['result'].get('data') and response['result'].get('type') == 'table' and not response['result'].get('isEscaped'):
-    response['result']['data'] = escape_rows(response['result']['data'])
+    response['result']['data'] = escape_rows(response['result']['data'], nulls_only=nulls_only)
     response['result']['isEscaped'] = True
 
-  response['status'] = 0
-
-  return JsonResponse(response)
+  return response
 
 
 @require_POST
@@ -440,7 +449,10 @@ def get_logs(request):
   jobs = db.get_jobs(notebook, snippet, full_log)
 
   response['logs'] = logs.strip()
-  response['progress'] = min(db.progress(notebook, snippet, logs=full_log), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
+  response['progress'] = min(
+      db.progress(notebook, snippet, logs=full_log),
+      99
+    ) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
   response['jobs'] = jobs
   response['isFullLogs'] = db.get_log_is_full_log(notebook, snippet)
   response['status'] = 0
@@ -450,6 +462,8 @@ def get_logs(request):
 def _save_notebook(notebook, user):
   if notebook['snippets'][0].get('connector') and notebook['snippets'][0]['connector'].get('dialect'):  # TODO Connector unification
     notebook_type = 'query-%(dialect)s' % notebook['snippets'][0]['connector']
+    if notebook['snippets'][0] and notebook['snippets'][0].get('executor'):
+      notebook['snippets'][0]['executor']['executables'] = []
   else:
     notebook_type = notebook.get('type', 'notebook')
 
@@ -474,6 +488,8 @@ def _save_notebook(notebook, user):
   notebook['id'] = notebook_doc.id
   _clear_sessions(notebook)
   notebook_doc1 = notebook_doc._get_doc1(doc2_type=notebook_type)
+  if ENABLE_CONNECTORS.get():
+    notebook_doc.connector_id = int(notebook['type'])
   notebook_doc.update_data(notebook)
   notebook_doc.search = _get_statement(notebook)
   notebook_doc.name = notebook_doc1.name = notebook['name']
@@ -507,7 +523,7 @@ def _clear_sessions(notebook):
 
 
 def _historify(notebook, user):
-  query_type = notebook['type']
+  query_type = 'query-%(dialect)s' % notebook if ENABLE_CONNECTORS.get() else notebook['type']
   name = notebook['name'] if (notebook['name'] and notebook['name'].strip() != '') else DEFAULT_HISTORY_NAME
   is_managed = notebook.get('isManaged') == True  # Prevents None
 
@@ -519,7 +535,7 @@ def _historify(notebook, user):
       type=query_type,
       owner=user,
       is_history=True,
-      is_managed=is_managed
+      is_managed=is_managed,
     )
 
   # Link history of saved query
@@ -539,6 +555,8 @@ def _historify(notebook, user):
 
   notebook['uuid'] = history_doc.uuid
   _clear_sessions(notebook)
+  if ENABLE_CONNECTORS.get():
+    history_doc.connector_id = int(notebook['type'])
   history_doc.update_data(notebook)
   history_doc.search = _get_statement(notebook)
   history_doc.save()
@@ -988,6 +1006,8 @@ def describe(request, database, table=None, column=None):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   source_type = request.POST.get('source_type', '')
   snippet = {'type': source_type}
+
+  patch_snippet_for_connector(snippet)
 
   describe = get_api(request, snippet).describe(notebook, snippet, database, table, column=column)
   response.update(describe)

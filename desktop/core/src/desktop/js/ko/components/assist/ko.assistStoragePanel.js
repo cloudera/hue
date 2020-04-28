@@ -16,10 +16,10 @@
 
 import * as ko from 'knockout';
 
-import apiHelper from '../../../api/apiHelper';
+import apiHelper from 'api/apiHelper';
 import AssistStorageEntry from './assistStorageEntry';
 import componentUtils from 'ko/components/componentUtils';
-import huePubSub from '../../../utils/huePubSub';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
 // prettier-ignore

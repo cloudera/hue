@@ -24,8 +24,11 @@ import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 
 import Notebook from 'apps/notebook2/notebook';
-import { ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT } from 'apps/notebook2/events';
-import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import {
+  ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
+  GET_ACTIVE_SNIPPET_CONNECTOR_EVENT
+} from 'apps/notebook2/events';
+import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT, findConnector } from 'utils/hueConfig';
 
 class EditorViewModel {
   constructor(editorId, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -59,6 +62,9 @@ class EditorViewModel {
       if (this.editorMode()) {
         const snippet = this.getActiveSnippet();
         if (snippet) {
+          if (!snippet.connector()) {
+            console.warn('Snippet connector is empty');
+          }
           return snippet.connector();
         }
       } else if (this.config() && this.config().app_config && this.config().app_config.editor) {
@@ -155,14 +161,10 @@ class EditorViewModel {
     });
 
     huePubSub.subscribe(
-      'get.active.snippet.type',
+      GET_ACTIVE_SNIPPET_CONNECTOR_EVENT,
       callback => {
         this.withActiveSnippet(activeSnippet => {
-          if (callback) {
-            callback(activeSnippet.dialect());
-          } else {
-            huePubSub.publish('set.active.snippet.type', activeSnippet.dialect());
-          }
+          callback(activeSnippet.connector());
         });
       },
       this.huePubSubId
@@ -177,7 +179,7 @@ class EditorViewModel {
             contents: activeSnippet.statement()
           };
           const options = {
-            successCallback: function(result) {
+            successCallback: result => {
               if (result && result.exists) {
                 $(document).trigger('info', result.path + ' saved successfully.');
               }
@@ -310,6 +312,13 @@ class EditorViewModel {
   }
 
   async newNotebook(editorType, callback, queryTab) {
+    const connector = findConnector(connector => connector.type === editorType);
+    if (!connector) {
+      console.warn('No connector found for type ' + editorType);
+    } else {
+      huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, connector);
+    }
+
     return new Promise((resolve, reject) => {
       $.post('/notebook/api/create_notebook', {
         type: editorType,
@@ -358,6 +367,9 @@ class EditorViewModel {
 
       if (typeof skipUrlChange === 'undefined' && !this.isNotificationManager()) {
         if (this.editorMode()) {
+          if (!this.editorType()) {
+            console.warn('Snippet connector type or dialect is empty');
+          }
           this.changeURL(
             this.URLS.editor + '?editor=' + docData.document.id + '&type=' + this.editorType()
           );
@@ -374,12 +386,9 @@ class EditorViewModel {
     }
   }
 
-  notifyDialectChange(dialect, isSqlDialect) {
+  notifyDialectChange(dialect) {
     if (dialect && this.lastNotifiedDialect !== dialect) {
-      huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
-        type: dialect,
-        isSqlDialect: isSqlDialect
-      });
+      huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, this.activeConnector());
       this.lastNotifiedDialect = dialect;
     }
   }

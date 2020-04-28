@@ -28,6 +28,11 @@ import Snippet, { STATUS as SNIPPET_STATUS } from 'apps/notebook2/snippet';
 import { HISTORY_CLEARED_EVENT } from 'apps/notebook2/components/ko.queryHistory';
 import { UPDATE_SAVED_QUERIES_EVENT } from 'apps/notebook2/components/ko.savedQueries';
 import SqlExecutable from './execution/sqlExecutable';
+import {
+  ASSIST_DB_PANEL_IS_READY_EVENT,
+  ASSIST_IS_DB_PANEL_READY_EVENT,
+  ASSIST_SET_DATABASE_EVENT
+} from 'ko/components/assist/events';
 
 export default class Notebook {
   constructor(vm, notebookRaw) {
@@ -129,18 +134,18 @@ export default class Notebook {
     });
 
     huePubSub.subscribeOnce(
-      'assist.db.panel.ready',
+      ASSIST_DB_PANEL_IS_READY_EVENT,
       () => {
         if (this.type().indexOf('query') === 0) {
-          const whenDatabaseAvailable = function(snippet) {
-            huePubSub.publish('assist.set.database', {
-              source: snippet.dialect(),
+          const whenDatabaseAvailable = snippet => {
+            huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
+              connector: snippet.connector(),
               namespace: snippet.namespace(),
               name: snippet.database()
             });
           };
 
-          const whenNamespaceAvailable = function(snippet) {
+          const whenNamespaceAvailable = snippet => {
             if (snippet.database()) {
               whenDatabaseAvailable(snippet);
             } else {
@@ -151,7 +156,7 @@ export default class Notebook {
             }
           };
 
-          const whenSnippetAvailable = function(snippet) {
+          const whenSnippetAvailable = snippet => {
             if (snippet.namespace()) {
               whenNamespaceAvailable(snippet);
             } else {
@@ -177,7 +182,7 @@ export default class Notebook {
       vm.huePubSubId
     );
 
-    huePubSub.publish('assist.is.db.panel.ready');
+    huePubSub.publish(ASSIST_IS_DB_PANEL_READY_EVENT);
   }
 
   addSnippet(snippetRaw) {
@@ -227,7 +232,7 @@ export default class Notebook {
       }
       hueAnalytics.log('notebook', 'schedule/' + action);
 
-      const getCoordinator = function() {
+      const getCoordinator = () => {
         $.get(
           '/scheduler/api/schedule/' + action + '/',
           {
@@ -239,7 +244,7 @@ export default class Notebook {
             if ($('#schedulerEditor').length > 0) {
               huePubSub.publish('hue4.process.headers', {
                 response: data.layout,
-                callback: function(r) {
+                callback: r => {
                   const $schedulerEditor = $('#schedulerEditor');
                   $schedulerEditor.html(r);
 

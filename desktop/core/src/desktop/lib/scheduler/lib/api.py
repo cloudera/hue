@@ -19,7 +19,10 @@ from builtins import object
 
 
 def get_api(request, interface):
-  if interface == 'beat':
+  if interface == 'hive':
+    from desktop.lib.scheduler.lib.hive import HiveSchedulerApi
+    return HiveSchedulerApi(user=request.user)
+  elif interface == 'beat':
     from desktop.lib.scheduler.lib.beat import CeleryBeatApi
     return CeleryBeatApi(user=request.user)
   elif interface == 'oozie':

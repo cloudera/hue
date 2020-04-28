@@ -163,11 +163,15 @@ class DataAdapter(object):
       for row in results.rows():
         num_bytes = self._getsizeofascii(row)
         if self.limit_rows and self.row_counter + 1 > self.max_rows:
-          LOG.warn('The query results exceeded the maximum row limit of %d and has been truncated to first %d rows.' % (self.max_rows, self.row_counter))
+          LOG.warn('The query results exceeded the maximum row limit of %d and has been truncated to first %d rows.' % (
+              self.max_rows, self.row_counter)
+          )
           self.is_truncated = True
           break
         if self.limit_bytes and self.bytes_counter + num_bytes > self.max_bytes:
-          LOG.warn('The query results exceeded the maximum bytes limit of %d and has been truncated to first %d rows.' % (self.max_bytes, self.row_counter))
+          LOG.warn('The query results exceeded the maximum bytes limit of %d and has been truncated to first %d rows.' % (
+              self.max_bytes, self.row_counter)
+          )
           self.is_truncated = True
           break
         self.row_counter += 1

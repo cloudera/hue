@@ -21,6 +21,12 @@ import apiHelper from 'api/apiHelper';
 import contextCatalog from 'catalog/contextCatalog';
 import huePubSub from 'utils/huePubSub';
 import MetastoreNamespace from 'apps/table_browser/metastoreNamespace';
+import {
+  ASSIST_DB_PANEL_IS_READY_EVENT,
+  ASSIST_IS_DB_PANEL_READY_EVENT,
+  ASSIST_SET_DATABASE_EVENT
+} from 'ko/components/assist/events';
+import { findConnector } from 'utils/hueConfig';
 
 class MetastoreSource {
   constructor(options) {
@@ -53,22 +59,26 @@ class MetastoreSource {
       }
     };
 
-    huePubSub.subscribe('assist.db.panel.ready', () => {
+    this.connector = ko.observable(findConnector(connector => connector.type === this.type));
+
+    huePubSub.subscribe(ASSIST_DB_PANEL_IS_READY_EVENT, () => {
       this.lastLoadNamespacesDeferred.done(() => {
         let lastSelectedDb = apiHelper.getFromTotalStorage(
-          'assist_' + this.sourceType + '_' + this.namespace.id,
+          'assist_' + this.type + '_' + this.namespace.id,
           'lastSelectedDb'
         );
         if (!lastSelectedDb && lastSelectedDb !== '') {
           lastSelectedDb = 'default';
         }
-        huePubSub.publish('assist.set.database', {
-          source: this.type,
+        huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {
+          connector: this.connector(),
           namespace: this.namespace().namespace,
           name: lastSelectedDb
         });
       });
     });
+
+    huePubSub.publish(ASSIST_IS_DB_PANEL_READY_EVENT);
 
     const getCurrentState = () => {
       const result = {

@@ -34,13 +34,29 @@ LOG = logging.getLogger(__name__)
 LIVY_SERVER_URL = Config(
   key="livy_server_url",
   help=_t("The Livy Server URL."),
-  default="")
+  default=""
+)
+
+SECURITY_ENABLED = Config(
+  key="security_enabled",
+  help=_t("Whether Livy requires client to perform Kerberos authentication."),
+  default=False,
+  type=coerce_bool
+)
+
+CSRF_ENABLED = Config(
+  key="csrf_enabled",
+  help=_t("Whether Livy requres client to have CSRF enabled."),
+  default=False,
+  type=coerce_bool
+)
 
 # Deprecated
 LIVY_SERVER_HOST = Config(
   key="livy_server_host",
   help=_t("Host address of the Livy Server."),
-  default="localhost")
+  default="localhost"
+)
 
 # Deprecated
 LIVY_SERVER_PORT = Config(
@@ -48,22 +64,12 @@ LIVY_SERVER_PORT = Config(
   help=_t("Port of the Livy Server."),
   default="8998")
 
+# Deprecated
 LIVY_SERVER_SESSION_KIND = Config( # Note: this one is ignored by Livy, this should match the current Spark mode
    key="livy_server_session_kind",
    help=_t("Configure livy to start in local 'process' mode, or 'yarn' workers."),
-   default="yarn")
-
-SECURITY_ENABLED = Config(
-  key="security_enabled",
-  help=_t("Whether Livy requires client to perform Kerberos authentication."),
-  default=False,
-  type=coerce_bool)
-
-CSRF_ENABLED = Config(
-  key="csrf_enabled",
-  help=_t("Whether Livy requres client to have CSRF enabled."),
-  default=False,
-  type=coerce_bool)
+   default="yarn"
+)
 
 # Spark SQL
 SQL_SERVER_HOST = Config(
@@ -99,8 +105,9 @@ def get_livy_server_url():
     url = 'http://%s:%s' % (LIVY_SERVER_HOST.get(), LIVY_SERVER_PORT.get())
   return url
 
+
 def get_spark_status(user):
-  from spark.job_server_api import get_api
+  from spark.livy_client import get_api
   status = None
 
   try:

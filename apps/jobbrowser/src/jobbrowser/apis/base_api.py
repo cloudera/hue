@@ -30,45 +30,54 @@ LOG = logging.getLogger(__name__)
 
 
 def get_api(user, interface, cluster=None):
-  from jobbrowser.apis.bundle_api import BundleApi
-  from jobbrowser.apis.data_eng_api import DataEngClusterApi, DataEngJobApi
-  from jobbrowser.apis.clusters import ClusterApi
-  from jobbrowser.apis.data_warehouse import DataWarehouseClusterApi
-  from jobbrowser.apis.livy_api import LivySessionsApi, LivyJobApi
-  from jobbrowser.apis.job_api import JobApi
-  from jobbrowser.apis.query_api import QueryApi
-  from jobbrowser.apis.beeswax_query_api import BeeswaxQueryApi
-  from jobbrowser.apis.schedule_api import ScheduleApi
-  from jobbrowser.apis.workflow_api import WorkflowApi
 
   if interface == 'jobs':
+    from jobbrowser.apis.job_api import JobApi
     return JobApi(user)
   elif interface == 'queries-impala':
+    from jobbrowser.apis.query_api import QueryApi
     return QueryApi(user, cluster=cluster)
   elif interface == 'queries-hive':
-    return BeeswaxQueryApi(user, cluster=cluster)
+    from jobbrowser.apis.hive_query_api import HiveQueryApi
+    return HiveQueryApi(user, cluster=cluster)
   elif interface == 'workflows':
+    from jobbrowser.apis.workflow_api import WorkflowApi
     return WorkflowApi(user)
   elif interface == 'schedules':
+    from jobbrowser.apis.schedule_api import ScheduleApi
     return ScheduleApi(user)
   elif interface == 'bundles':
+    from jobbrowser.apis.bundle_api import BundleApi
     return BundleApi(user)
   elif interface == 'celery-beat':
     from jobbrowser.apis.beat_api import BeatApi
     return BeatApi(user)
+  elif interface == 'schedule-hive':
+    from jobbrowser.apis.schedule_hive import HiveScheduleApi
+    return HiveScheduleApi(user)
+  elif interface == 'history':
+    from jobbrowser.apis.history import HistoryApi
+    return HistoryApi(user)
   elif interface == 'engines':
+    from jobbrowser.apis.clusters import ClusterApi
     return ClusterApi(user)
   elif interface == 'dataeng-clusters':
+    from jobbrowser.apis.data_eng_api import DataEngClusterApi
     return DataEngClusterApi(user)
   elif interface == 'dataware-clusters':
+    from jobbrowser.apis.data_warehouse import DataWarehouseClusterApi
     return DataWarehouseClusterApi(user)
   elif interface == 'dataware2-clusters':
+    from jobbrowser.apis.data_warehouse import DataWarehouseClusterApi
     return DataWarehouseClusterApi(user, version=2)
   elif interface == 'dataeng-jobs':
+    from jobbrowser.apis.data_eng_api import DataEngJobApi
     return DataEngJobApi(user)
   elif interface == 'livy-sessions':
+    from jobbrowser.apis.livy_api import LivySessionsApi
     return LivySessionsApi(user)
   elif interface == 'livy-job':
+    from jobbrowser.apis.livy_api import LivyJobApi
     return LivyJobApi(user)
   elif interface == 'slas':
     return Api(user)

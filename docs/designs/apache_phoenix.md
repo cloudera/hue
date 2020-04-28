@@ -19,7 +19,12 @@ The most crucial is to stabilize the querying API, improve the Editor assistant 
 
 ### API
 
-* SqlAchemy connector
+* SqlAchemy API
+  * Improve Session and closing statements similarly to https://github.com/cloudera/hue/issues/1020
+  * Caching or storage of larger resultsets
+  * Impersonation support http://phoenix.apache.org/server.html#Impersonation
+
+* Phoenix connector
   * to ship
   * to "battle test" ([pyPhoenix](https://github.com/Pirionfr/pyPhoenix#known-issues), reuse [DB 2.0 API](https://phoenix.apache.org/python.html) [PhoenixDB](https://github.com/apache/phoenix/tree/master/python)?)
   * with Hue Editor API to polish ([dev reference](https://docs.gethue.com/developer/connectors/#sqlalchemy))

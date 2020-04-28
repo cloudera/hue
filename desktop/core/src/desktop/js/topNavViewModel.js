@@ -20,6 +20,7 @@ import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
 import {
   CONFIG_REFRESHED_EVENT,
+  findConnector,
   GET_KNOWN_CONFIG_EVENT,
   REFRESH_CONFIG_EVENT
 } from 'utils/hueConfig';
@@ -44,12 +45,12 @@ class TopNavViewModel {
 
       self.hasJobBrowser(
         window.HAS_JOB_BROWSER &&
-          config &&
-          config.app_config &&
-          config.app_config.browser &&
-          (config.app_config.browser.interpreter_names.indexOf('yarn') !== -1 ||
-            config.app_config.editor.interpreter_names.indexOf('impala') !== -1 ||
-            config.app_config.browser.interpreter_names.indexOf('dataeng') !== -1)
+          findConnector(
+            connector =>
+              connector.dialect === 'yarn' ||
+              connector.dialect === 'impala' ||
+              connector.dialect === 'dataeng'
+          )
       );
     };
 

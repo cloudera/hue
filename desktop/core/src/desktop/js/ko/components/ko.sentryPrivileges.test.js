@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import $ from 'jquery';
 import { koSetup } from 'jest/koTestUtils';
 import { NAME } from './ko.sentryPrivileges';
 
@@ -21,10 +22,15 @@ describe('ko.sentryPrivileges.js', () => {
   const setup = koSetup();
 
   it('should render component', async () => {
+    const ajaxSpy = jest
+      .spyOn($, 'ajax')
+      .mockImplementation(() => $.Deferred().reject({ error: 'Not implemented' }));
+
     const element = await setup.renderComponent(NAME, {
       path: 'foo'
     });
 
+    expect(ajaxSpy).toHaveBeenCalled();
     expect(element.innerHTML).toMatchSnapshot();
   });
 });

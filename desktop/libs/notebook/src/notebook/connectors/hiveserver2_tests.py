@@ -24,7 +24,7 @@ import sys
 import time
 
 from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true
+from nose.tools import assert_equal, assert_true, assert_raises
 
 from django.urls import reverse
 from TCLIService.ttypes import TStatusCode, TProtocolVersion, TOperationType
@@ -35,11 +35,13 @@ from desktop.lib.i18n import smart_str
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from beeswax.server import dbms
+from beeswax.server.dbms import QueryServerException
 from beeswax.test_base import BeeswaxSampleProvider, get_query_server_config, is_hive_on_spark
 from hadoop.pseudo_hdfs4 import is_live_cluster
 from useradmin.models import User
 
 from notebook.api import _save_notebook
+from notebook.connectors.base import QueryError, QueryExpired
 from notebook.connectors.hiveserver2 import HS2Api
 from notebook.models import make_notebook, Notebook
 
@@ -52,7 +54,7 @@ else:
 LOG = logging.getLogger(__name__)
 
 
-class TestApi(object):
+class TestApiWithConnectors(object):
 
   NOTEBOOK_JSON = """
     {
@@ -270,7 +272,7 @@ class TestApi(object):
     assert_equal(data['result']['handle']['statement'], 'SELECT * from customers')
 
 
-class TestHS2Api():
+class TestApi():
 
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
@@ -315,7 +317,60 @@ class TestHS2Api():
         assert_equal(jobs[0]['url'], '')  # Is empty
 
 
-class TestHiveserver2Api(object):
+  def test_get_error_message_from_query(self):
+    with patch('notebook.connectors.hiveserver2.HS2Api._get_db') as _get_db:
+      with patch('notebook.connectors.hiveserver2.HS2Api._get_current_statement') as _get_current_statement:
+        with patch('notebook.connectors.hiveserver2.HS2Api._get_session') as _get_session:
+          with patch('notebook.connectors.hiveserver2.HS2Api._prepare_hql_query') as _prepare_hql_query:
+            with patch('notebook.connectors.hiveserver2.HS2Api._get_session_by_id') as _get_session_by_id:
+              _get_db.return_value = Mock(
+                use=Mock(
+                ),
+                client=Mock(
+                  query=Mock(
+                    side_effect=QueryServerException(
+                      Exception('Execution error!'),
+                      message='Error while compiling statement: FAILED: HiveAccessControlException Permission denied'
+                    )
+                  ),
+                ),
+              )
+              notebook, snippet = {}, {'type': 'hive'}
+
+              api = HS2Api(self.user)
+
+              assert_raises(QueryError, api.execute, notebook, snippet)
+
+              try:
+                api = api.execute(notebook, snippet)
+              except QueryError as e:
+                assert_equal(
+                  e.message,
+                  'Error while compiling statement: FAILED: HiveAccessControlException Permission denied',
+                )
+
+
+  def test_autocomplete_time_out(self):
+    snippet = {'type': 'hive', 'properties': {}}
+
+    with patch('notebook.connectors.hiveserver2._autocomplete') as _autocomplete:
+
+      _autocomplete.return_value = {
+        'code': 500,
+        'error': "HTTPSConnectionPool(host='gethue.com', port=10001): Read timed out. (read timeout=120)"
+      }
+
+      api = HS2Api(self.user)
+
+      try:
+        resp = api.autocomplete(snippet, database='database')
+        assert_false(True)
+      except QueryExpired as e:
+        assert_equal(e.message, "HTTPSConnectionPool(host='gethue.com', port=10001): Read timed out. (read timeout=120)")
+
+
+
+class TestHiveserver2ApiNonMock(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="test", recreate=False, is_superuser=False)

@@ -23,6 +23,7 @@ import time
 import uuid
 
 from django.utils.translation import ugettext as _
+from django.utils.encoding import smart_str
 
 from desktop.auth.backend import is_admin
 from desktop.conf import TASK_SERVER, has_connectors
@@ -53,7 +54,8 @@ class AuthenticationRequired(Exception):
     self.message = message
 
 class OperationTimeout(Exception):
-  pass
+  def __str__(self):
+    return 'OperationTimeout'
 
 class OperationNotSupported(Exception):
   pass
@@ -135,8 +137,8 @@ class Notebook(object):
         p1 = match.group(1)
         p2 = match.group(2)
         variable = variables[p2]
-        value = str(variable['value'])
-        return p1 + (value if value is not None else variable['meta'].get('placeholder',''))
+        value = smart_str(variable['value'])
+        return smart_str(p1) + smart_str(value if value is not None else variable['meta'].get('placeholder',''))
 
       return re.sub(
           "([^\\\\])\\$" + (
@@ -144,7 +146,7 @@ class Notebook(object):
             if hasCurlyBracketParameters else ""
           ),
           replace,
-          statement_raw
+          smart_str(statement_raw)
       )
 
     return statement_raw
@@ -289,49 +291,59 @@ class Notebook(object):
     return _execute_notebook(request, notebook_data, snippet)
 
 
-  def execute_and_wait(self, request, timeout_sec=30.0, sleep_interval=0.5):
-      """
-      Run query and check status until it finishes or timeouts.
+  def execute_and_wait(self, request, timeout_sec=30.0, sleep_interval=1, include_results=False):
+    """
+    Run query and check status until it finishes or timeouts.
 
-      Check status until it finishes or timeouts.
-      """
-      handle = self.execute(request, batch=False)
+    Check status until it finishes or timeouts.
+    """
+    handle = self.execute(request, batch=False)
 
-      if handle['status'] != 0:
-        raise QueryError(e, message='SQL statement failed.', handle=handle)
+    if handle['status'] != 0:
+      raise QueryError(e, message='SQL statement failed.', handle=handle)
 
-      operation_id = handle['history_uuid']
+    operation_id = handle['history_uuid']
+    curr = time.time()
+    end = curr + timeout_sec
+
+    handle = self.check_status(request, operation_id=operation_id)
+
+    while curr <= end:
+      if handle['status'] == 0 and handle['query_status']['status'] not in ('waiting', 'running'):
+        if include_results and handle['query_status']['status'] == 'available':
+          handle.update(
+            self.fetch_result_data(request.user, operation_id=operation_id)
+          )
+          # TODO: close
+        return handle
+
+      handle = self.check_status(request, operation_id=operation_id)
+      time.sleep(sleep_interval)
       curr = time.time()
-      end = curr + timeout_sec
 
-      status = self.check_status(request, operation_id=operation_id)
+    # TODO
+    # msg = "The query timed out after %(timeout)d seconds, canceled query." % {'timeout': timeout_sec}
+    # LOG.warning(msg)
+    # try:
+    #   self.cancel_operation(handle)
+    #   # get_api(request, snippet).cancel(notebook, snippet)
+    # except Exception as e:
+    #   msg = "Failed to cancel query."
+    #   LOG.warning(msg)
+    #   self.close_operation(handle)
+    #   raise QueryServerException(e, message=msg)
 
-      while curr <= end:
-        if status['status'] not in ('waiting', 'running'):
-          return handle
-
-        status = self.check_status(request, operation_id=operation_id)
-        time.sleep(sleep_interval)
-        curr = time.time()
-
-      # TODO
-      # msg = "The query timed out after %(timeout)d seconds, canceled query." % {'timeout': timeout_sec}
-      # LOG.warning(msg)
-      # try:
-      #   self.cancel_operation(handle)
-      #   # get_api(request, snippet).cancel(notebook, snippet)
-      # except Exception as e:
-      #   msg = "Failed to cancel query."
-      #   LOG.warning(msg)
-      #   self.close_operation(handle)
-      #   raise QueryServerException(e, message=msg)
-
-      raise OperationTimeout()
+    raise OperationTimeout()
 
   def check_status(self, request, operation_id):
-    from notebook.api import _check_status  # Cyclic dependency
+    from notebook.api import _check_status
 
     return _check_status(request, operation_id=operation_id)
+
+  def fetch_result_data(self, user, operation_id):
+    from notebook.api import _fetch_result_data
+
+    return _fetch_result_data(user, operation_id=operation_id, rows=100, start_over=False, nulls_only=True)
 
 
 def get_interpreter(connector_type, user=None):
@@ -424,10 +436,10 @@ def get_api(request, snippet):
     return OozieApi(user=request.user, request=request)
   elif interface == 'livy':
     from notebook.connectors.spark_shell import SparkApi
-    return SparkApi(request.user)
+    return SparkApi(request.user, interpreter=interpreter)
   elif interface == 'livy-batch':
     from notebook.connectors.spark_batch import SparkBatchApi
-    return SparkBatchApi(request.user)
+    return SparkBatchApi(request.user, interpreter=interpreter)
   elif interface == 'text' or interface == 'markdown':
     from notebook.connectors.text import TextApi
     return TextApi(request.user)
@@ -475,7 +487,7 @@ def get_api(request, snippet):
     from notebook.connectors.ksql import KSqlApi
     return KSqlApi(request.user, interpreter=interpreter)
   elif interface == 'flink':
-    from notebook.connectors.flink import FlinkSqlApi
+    from notebook.connectors.flink_sql import FlinkSqlApi
     return FlinkSqlApi(request.user, interpreter=interpreter)
   elif interface == 'kafka':
     from notebook.connectors.kafka import KafkaApi
@@ -547,13 +559,17 @@ class Api(object):
   def get_jobs(self, notebook, snippet, logs):
     return []
 
-  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None): raise NotImplementedError()
+  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+    raise NotImplementedError()
 
-  def export_data_as_hdfs_file(self, snippet, target_file, overwrite): raise NotImplementedError()
+  def export_data_as_hdfs_file(self, snippet, target_file, overwrite):
+    raise NotImplementedError()
 
-  def export_data_as_table(self, notebook, snippet, destination, is_temporary=False, location=None): raise NotImplementedError()
+  def export_data_as_table(self, notebook, snippet, destination, is_temporary=False, location=None):
+    raise NotImplementedError()
 
-  def export_large_data_to_hdfs(self, notebook, snippet, destination): raise NotImplementedError()
+  def export_large_data_to_hdfs(self, notebook, snippet, destination):
+    raise NotImplementedError()
 
   def statement_risk(self, interface, notebook, snippet):
     response = self._get_current_statement(notebook, snippet)

@@ -25,6 +25,11 @@ import hueUtils from 'utils/hueUtils';
 
 import Notebook from 'apps/notebook/notebook';
 import Snippet from 'apps/notebook/snippet';
+import {
+  ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
+  GET_ACTIVE_SNIPPET_CONNECTOR_EVENT
+} from 'apps/notebook2/events';
+import { findConnector } from 'utils/hueConfig';
 
 class EditorViewModel {
   constructor(editor_id, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -43,13 +48,28 @@ class EditorViewModel {
     self.isMobile = ko.observable(options.mobile);
     self.isNotificationManager = ko.observable(options.is_notification_manager || false);
     self.editorType = ko.observable(options.editor_type);
+    self.activeConnector = ko.observable();
+
+    const updateConnector = type => {
+      if (type) {
+        self.activeConnector(findConnector(connector => connector.type === type));
+      }
+    };
+
+    updateConnector(self.editorType());
+
     self.editorType.subscribe(newVal => {
-      self.editorMode(newVal != 'notebook');
+      if (!this.activeConnector() || this.activeConnector().type !== newVal) {
+        updateConnector(newVal);
+      }
+
+      self.editorMode(newVal !== 'notebook');
       hueUtils.changeURLParameter('type', newVal);
       if (self.editorMode()) {
         self.selectedNotebook().fetchHistory(); // Js error if notebook did not have snippets
       }
     });
+
     self.preEditorTogglingSnippet = ko.observable();
     self.toggleEditorMode = function() {
       const notebook = self.selectedNotebook();
@@ -299,14 +319,10 @@ class EditorViewModel {
     });
 
     huePubSub.subscribe(
-      'get.active.snippet.type',
+      GET_ACTIVE_SNIPPET_CONNECTOR_EVENT,
       callback => {
         withActiveSnippet(activeSnippet => {
-          if (callback) {
-            callback(activeSnippet.type());
-          } else {
-            huePubSub.publish('set.active.snippet.type', activeSnippet.type());
-          }
+          callback(activeSnippet.connector());
         });
       },
       self.huePubSubId
@@ -566,10 +582,7 @@ class EditorViewModel {
               if (self.editorMode()) {
                 self.editorType(data.document.type.substring('query-'.length));
                 if (!self.isNotificationManager()) {
-                  huePubSub.publish('active.snippet.type.changed', {
-                    type: self.editorType(),
-                    isSqlDialect: self.getSnippetViewSettings(self.editorType()).sqlDialect
-                  });
+                  huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, self.activeConnector());
                 }
                 self.changeURL(
                   self.URLS.editor + '?editor=' + data.document.id + '&type=' + self.editorType()
@@ -593,16 +606,17 @@ class EditorViewModel {
     };
 
     self.newNotebook = function(editorType, callback, queryTab) {
+      const type = editorType || options.editor_type;
+
       if (!self.isNotificationManager()) {
-        huePubSub.publish('active.snippet.type.changed', {
-          type: editorType,
-          isSqlDialect: editorType ? self.getSnippetViewSettings(editorType).sqlDialect : undefined
-        });
+        self.activeConnector(findConnector(connector => connector.type === type));
+        huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, self.activeConnector());
       }
+
       $.post(
         '/notebook/api/create_notebook',
         {
-          type: editorType || options.editor_type,
+          type: type,
           directory_uuid: window.location.getParameter('directory_uuid'),
           gist: self.isNotificationManager() ? undefined : window.location.getParameter('gist')
         },
@@ -610,7 +624,7 @@ class EditorViewModel {
           self.loadNotebook(data.notebook);
           if (self.editorMode() && !self.isNotificationManager()) {
             const snippet =
-              self.selectedNotebook().snippets().length == 0
+              self.selectedNotebook().snippets().length === 0
                 ? self.selectedNotebook().newSnippet(self.editorType())
                 : self.selectedNotebook().snippets()[0];
             if (
@@ -624,12 +638,7 @@ class EditorViewModel {
               hueUtils.changeURLParameter('type', self.editorType());
             }
             if (!self.isNotificationManager()) {
-              huePubSub.publish('active.snippet.type.changed', {
-                type: editorType,
-                isSqlDialect: editorType
-                  ? self.getSnippetViewSettings(editorType).sqlDialect
-                  : undefined
-              });
+              huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, self.activeConnector());
             }
           }
 

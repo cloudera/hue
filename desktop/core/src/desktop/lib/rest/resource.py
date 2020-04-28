@@ -119,7 +119,7 @@ class Resource(object):
       duration = time.time() - start_time
       try:
         req_data = smart_unicode(data, errors='replace')
-        resp_content = smart_unicode(resp.content, errors='replace')
+        resp_content = smart_unicode(resp.content, errors='replace') if resp and resp.content else ''
         message = u'%s %s %s%s%s %s%s returned in %dms %s %s %s%s' % (
           method,
           type(self._client._session.auth) if self._client._session and self._client._session.auth else None,

@@ -30,6 +30,13 @@ import Session from 'apps/notebook/session';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
 import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistModal';
 import { cancelActiveRequest } from 'api/apiUtils';
+import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
+import { findConnector } from 'utils/hueConfig';
+import {
+  ASSIST_GET_DATABASE_EVENT,
+  ASSIST_GET_SOURCE_EVENT,
+  ASSIST_SET_SOURCE_EVENT
+} from 'ko/components/assist/events';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -175,16 +182,36 @@ class Snippet {
     self.type = ko.observable(
       typeof snippet.type != 'undefined' && snippet.type != null ? snippet.type : 'hive'
     );
-    self.type.subscribe(newVal => {
+
+    self.connector = ko.observable();
+
+    const updateConnector = type => {
+      if (type) {
+        self.connector(findConnector(connector => connector.type === type));
+      }
+    };
+
+    updateConnector(self.type());
+
+    self.type.subscribe(type => {
+      if (!self.connector() || self.connector().type !== type) {
+        updateConnector(type);
+      }
       self.status('ready');
+    });
+
+    self.isSqlDialect = ko.pureComputed(() => {
+      return vm.getSnippetViewSettings(self.type()).sqlDialect;
     });
 
     self.connector = ko.pureComputed(() => {
       // To support optimizer changes in editor v2
-      if (self.type() === 'hive' || self.type() === 'impala') {
-        return { optimizer: 'api', type: self.type() };
-      }
-      return {};
+      return {
+        optimizer: self.type() === 'hive' || self.type() === 'impala' ? 'api' : 'off',
+        type: self.type(),
+        dialect: self.type(),
+        is_sql: self.isSqlDialect()
+      };
     });
 
     self.isBatchable = ko.computed(() => {
@@ -235,10 +262,7 @@ class Snippet {
 
     self.inFocus.subscribe(newValue => {
       if (newValue) {
-        huePubSub.publish('active.snippet.type.changed', {
-          type: self.type(),
-          isSqlDialect: self.isSqlDialect()
-        });
+        huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, self.connector());
       }
     });
 
@@ -251,10 +275,6 @@ class Snippet {
     self.dbSelectionVisible = ko.observable(false);
 
     self.showExecutionAnalysis = ko.observable(false);
-
-    self.isSqlDialect = ko.pureComputed(() => {
-      return vm.getSnippetViewSettings(self.type()).sqlDialect;
-    });
 
     self.getPlaceHolder = function() {
       return vm.getSnippetViewSettings(self.type()).placeHolder;
@@ -430,17 +450,11 @@ class Snippet {
       }
     };
 
-    huePubSub.subscribeOnce(
-      'assist.source.set',
-      source => {
-        if (source !== self.type()) {
-          huePubSub.publish('assist.set.source', self.type());
-        }
-      },
-      vm.huePubSubId
-    );
-
-    huePubSub.publish('assist.get.source');
+    huePubSub.publish(ASSIST_GET_SOURCE_EVENT, source => {
+      if (source !== self.type()) {
+        huePubSub.publish(ASSIST_SET_SOURCE_EVENT, self.type());
+      }
+    });
 
     let ignoreNextAssistDatabaseUpdate = false;
     self.handleAssistSelection = function(databaseDef) {
@@ -457,9 +471,9 @@ class Snippet {
     };
 
     if (!self.database()) {
-      huePubSub.publish('assist.get.database.callback', {
+      huePubSub.publish(ASSIST_GET_DATABASE_EVENT, {
         source: self.type(),
-        callback: function(databaseDef) {
+        callback: databaseDef => {
           self.handleAssistSelection(databaseDef);
         }
       });

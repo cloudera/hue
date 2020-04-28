@@ -137,12 +137,20 @@ The dialect should be added to the Python system or Hue Python virtual environme
 
     ./build/env/bin/pip install pyhive
 
-Then give Hue the information about the database source:
+Then give Hue the information about the database source following the `presto://{presto-coordinator}:{port}/{catalog}/{schema}` format:
 
     [[[presto]]]
        name = Presto
        interface=sqlalchemy
-       options='{"url": "presto://localhost:8080/hive/default"}'
+       options='{"url": "presto://localhost:8080/tpch/default"}'
+
+With impersonation:
+
+        options='{"url": "presto://localhost:8080/tpch/default", "has_impersonation": true}'
+
+With Kerberos:
+
+        options='{"url": "presto://localhost:8080/tpch/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
 
 Alternatives.
 
@@ -303,36 +311,56 @@ Alternative:
 
 ### Apache Spark SQL
 
-The dialect should be added to the Python system or Hue Python virtual environment:
+There are two ways to connect depending on your infrastructure:
+
+* [Thrift Server](https://spark.apache.org/docs/latest/sql-distributed-sql-engine.html)
+* [Apache Livy REST API](https://livy.apache.org/)
+
+#### Thrift Server
+
+Either via SqlAlchemy or HiveServer Thrift interface:
+
+With SqlAlchemy the dialect should be added to the Python system or Hue Python virtual environment:
 
     ./build/env/bin/pip install pyhive
 
 Then give Hue the information about the database source:
 
     [[[sparksql]]]
-       name = SparkSql
-       interface=sqlalchemy
-       options='{"url": "hive://user:password@host:10000/database"}'
+    name = Spark SQL
+    interface=sqlalchemy
+    options='{"url": "hive://user:password@host:10000/database"}'
 
-Alternatives:
-
-Via [Apache Livy](https://livy.incubator.apache.org/):
-
-    [[[sparksql]]]
-      name=SparkSql
-      interface=livy
-
-    ...
+With the HiveServer Thrift (same as the one used by Hive and Impala so more robust depending on the use cases):
 
     [spark]
-      # The Livy Server URL.
-      livy_server_url=http://localhost:8998
+    # Host of the Spark Thrift Server
+    # https://spark.apache.org/docs/latest/sql-distributed-sql-engine.html
+    sql_server_host=localhost
 
-Via native HiveServer2 API:
+    # Port of the Spark Thrift Server
+    sql_server_port=10000
+
+And make sure you have a `sparksql` interpreter configured:
 
     [[[sparksql]]]
-      name=SparkSql
-      interface=hiveserver2
+    name=Spark SQL
+    interface=hiveserver2
+
+#### Apache Livy
+
+[Apache Livy](https://livy.incubator.apache.org/) provides a bridge to a running Spark interpreter so that SQL, pyspark and scala snippets can be executed interactively:
+
+    [spark]
+    # The Livy Server URL.
+    livy_server_url=http://localhost:8998
+
+And as always, make sure you have an interpreter configured:
+
+    [[[sparksql]]]
+    name=Spark SQL
+    interface=livy
+
 
 ### ksqlDB
 

@@ -20,8 +20,11 @@ import * as ko from 'knockout';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, filterConnectors } from 'utils/hueConfig';
 import { simpleGet } from 'api/apiUtils';
+import { ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT } from './events';
+
+export const NAME = 'assist-language-reference-panel';
 
 // prettier-ignore
 const TEMPLATE = `
@@ -45,7 +48,7 @@ const TEMPLATE = `
     <div class="assist-flex-panel">
       <div class="assist-flex-header">
         <div class="assist-inner-header">
-          <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { fixedPosition: true, value: sourceType, entries: availableTypes, linkTitle: '${I18n(
+          <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { fixedPosition: true, value: activeDialect, entries: availableDialects, linkTitle: '${I18n(
             'Selected dialect'
           )}' } }" style="display: inline-block"></div>
         </div>
@@ -123,9 +126,10 @@ class LanguageReferenceTopic {
 
 class AssistLangRefPanel {
   constructor(params, element) {
-    this.disposals = [];
-    this.availableTypes = ko.observableArray();
-    this.sourceType = ko.observable();
+    this.connector = params.connector;
+
+    this.availableDialects = ko.observableArray();
+    this.activeDialect = ko.observable();
 
     this.allTopics = {
       impala: [],
@@ -139,60 +143,56 @@ class AssistLangRefPanel {
       this.allTopics.hive.push(new LanguageReferenceTopic(topLevelItem, window.HIVE_DOC_INDEX));
     });
 
-    const updateType = type => {
-      if (this.availableTypes().indexOf(type) !== -1) {
-        this.sourceType(type);
+    const updateDialect = dialect => {
+      if (this.availableDialects().indexOf(dialect) !== -1) {
+        this.activeDialect(dialect);
       }
     };
 
-    const activeSnippetTypeSub = huePubSub.subscribe('active.snippet.type.changed', details => {
-      updateType(details.type);
+    this.connector.subscribe(connector => {
+      if (connector) {
+        updateDialect(connector.dialect);
+      }
     });
 
-    const configUpdated = config => {
-      const lastActiveType = this.sourceType();
-      if (config.app_config && config.app_config.editor && config.app_config.editor.interpreters) {
-        const typesIndex = {};
-        config.app_config.editor.interpreters.forEach(interpreter => {
-          if (interpreter.type === 'hive' || interpreter.type === 'impala') {
-            typesIndex[interpreter.type] = true;
-          }
-        });
-        this.availableTypes(Object.keys(typesIndex).sort());
+    const configUpdated = () => {
+      const lastActiveDialect = this.activeDialect();
 
-        if (lastActiveType && typesIndex[lastActiveType]) {
-          this.sourceType(lastActiveType);
-        } else {
-          this.sourceType(this.availableTypes().length ? this.availableTypes()[0] : undefined);
-        }
+      const configuredDialects = filterConnectors(
+        connector => connector.dialect === 'hive' || connector.dialect === 'impala'
+      ).map(connector => connector.dialect);
+      configuredDialects.sort();
+      this.availableDialects(configuredDialects);
+
+      if (
+        lastActiveDialect &&
+        this.availableDialects().find(dialect => dialect === lastActiveDialect)
+      ) {
+        this.activeDialect(lastActiveDialect);
       } else {
-        this.availableTypes([]);
+        this.activeDialect(
+          this.availableDialects().length ? this.availableDialects()[0] : undefined
+        );
       }
     };
 
-    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
-    const configSub = huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
+    configUpdated();
+    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
 
-    this.disposals.push(() => {
-      configSub.remove();
-      activeSnippetTypeSub.remove();
-    });
+    if (this.connector()) {
+      updateDialect(this.connector().dialect);
+    }
 
-    huePubSub.publish('get.active.snippet.type', updateType);
-
-    this.topics = ko.pureComputed(() => {
-      return this.sourceType() ? this.allTopics[this.sourceType()] : [];
-    });
+    this.topics = ko.pureComputed(() =>
+      this.activeDialect() ? this.allTopics[this.activeDialect()] : []
+    );
 
     this.selectedTopic = ko.observable();
 
-    const selectedSub = this.selectedTopic.subscribe(newTopic => {
+    this.selectedTopic.subscribe(newTopic => {
       if (newTopic) {
         newTopic.load();
       }
-    });
-    this.disposals.push(() => {
-      selectedSub.dispose();
     });
 
     this.query = ko.observable().extend({ throttle: 200 });
@@ -262,13 +262,13 @@ class AssistLangRefPanel {
       }, 0);
     });
 
-    const selectedTopicSub = this.selectedTopic.subscribe(() => {
+    this.selectedTopic.subscribe(() => {
       $(element)
         .find('.assist-docs-details')
         .scrollTop(0);
     });
 
-    const querySub = this.query.subscribe(() => {
+    this.query.subscribe(() => {
       $(element)
         .find('.assist-docs-topics')
         .scrollTop(0);
@@ -299,7 +299,7 @@ class AssistLangRefPanel {
 
     huePubSub.subscribe('scroll.test', scrollToSelectedTopic);
 
-    const showTopicSub = huePubSub.subscribe('assist.lang.ref.panel.show.topic', targetTopic => {
+    huePubSub.subscribe(ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT, targetTopic => {
       const topicStack = [];
       const findTopic = topics => {
         topics.some(topic => {
@@ -329,30 +329,17 @@ class AssistLangRefPanel {
 
     $(element).on('click.langref', event => {
       if (event.target.className === 'hue-doc-internal-link') {
-        huePubSub.publish('assist.lang.ref.panel.show.topic', {
+        huePubSub.publish(ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT, {
           ref: $(event.target).data('doc-ref'),
           anchorId: $(event.target).data('doc-anchor-id')
         });
       }
     });
-
-    this.disposals.push(() => {
-      selectedTopicSub.dispose();
-      querySub.dispose();
-      showTopicSub.remove();
-      $(element).off('click.langref');
-    });
-  }
-
-  dispose() {
-    while (this.disposals.length) {
-      this.disposals.pop()();
-    }
   }
 }
 
 componentUtils.registerStaticComponent(
-  'assist-language-reference-panel',
+  NAME,
   {
     createViewModel: (params, componentInfo) =>
       new AssistLangRefPanel(params, componentInfo.element)

@@ -20,6 +20,8 @@ import * as ko from 'knockout';
 import apiHelper from 'api/apiHelper';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
+import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
+import { SHOW_LEFT_ASSIST_EVENT, SHOW_RIGHT_ASSIST_EVENT } from 'ko/components/assist/events';
 
 class SidePanelViewModel {
   constructor() {
@@ -70,8 +72,8 @@ class SidePanelViewModel {
     huePubSub.subscribe('set.current.app.name', onAppChange);
     huePubSub.publish('get.current.app.name', onAppChange);
 
-    huePubSub.subscribe('active.snippet.type.changed', details => {
-      self.rightAssistAvailable(details.isSqlDialect || details.type === 'pig');
+    huePubSub.subscribe(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, connector => {
+      self.rightAssistAvailable(connector && (connector.is_sql || connector.dialect === 'pig'));
     });
 
     self.activeAppViewModel = ko.observable();
@@ -145,13 +147,13 @@ class SidePanelViewModel {
       }, 0);
     });
 
-    huePubSub.subscribe('right.assist.show', () => {
+    huePubSub.subscribe(SHOW_RIGHT_ASSIST_EVENT, () => {
       if (!self.rightAssistVisible()) {
         self.rightAssistVisible(true);
       }
     });
 
-    huePubSub.subscribe('left.assist.show', () => {
+    huePubSub.subscribe(SHOW_LEFT_ASSIST_EVENT, () => {
       if (!self.leftAssistVisible()) {
         self.leftAssistVisible(true);
       }

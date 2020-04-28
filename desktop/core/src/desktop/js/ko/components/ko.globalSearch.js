@@ -22,6 +22,7 @@ import dataCatalog from 'catalog/dataCatalog';
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { ASSIST_SHOW_SQL_EVENT } from './assist/events';
 
 export const NAME = 'hue-global-search';
 
@@ -401,7 +402,7 @@ class GlobalSearch {
     if (entry.data && entry.data.link) {
       huePubSub.publish('open.link', entry.data.link);
     } else if (!/:\s*$/.test(entry.value)) {
-      huePubSub.publish('assist.show.sql');
+      huePubSub.publish(ASSIST_SHOW_SQL_EVENT);
       huePubSub.publish('assist.db.search', entry.value);
     }
   }

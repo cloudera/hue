@@ -18,6 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
+import { ASSIST_LANG_REF_SHOW_TOPIC_EVENT } from 'ko/components/assist/events';
 
 class LangRefContext {
   constructor(options) {
@@ -36,7 +37,7 @@ class LangRefContext {
 
     $('.hue-popover').on('click.contextLangRef', event => {
       if (event.target.className === 'hue-doc-internal-link') {
-        huePubSub.publish('assist.lang.ref.show.topic', {
+        huePubSub.publish(ASSIST_LANG_REF_SHOW_TOPIC_EVENT, {
           ref: $(event.target).data('doc-ref'),
           anchorId: $(event.target).data('doc-anchor-id')
         });
@@ -50,7 +51,7 @@ class LangRefContext {
 
   openInRightAssist() {
     const self = this;
-    huePubSub.publish('assist.lang.ref.show.topic', { ref: self.topicId });
+    huePubSub.publish(ASSIST_LANG_REF_SHOW_TOPIC_EVENT, { ref: self.topicId });
     huePubSub.publish('context.popover.hide');
   }
 }

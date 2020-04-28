@@ -999,12 +999,16 @@
     #   interface=oozie
 
     # [[[presto]]]
-    #   name=Presto SQL
-    #   interface=presto
-    #   ## Specific options for connecting to the Presto server.
-    #   ## The JDBC driver presto-jdbc.jar need to be in the CLASSPATH environment variable.
-    #   ## If 'user' and 'password' are omitted, they will be prompted in the UI.
-    #   options='{"url": "jdbc:presto://localhost:8080/catalog/schema", "driver": "io.prestosql.jdbc.PrestoDriver", "user": "root", "password": "root"}'
+    # name=Presto SQL
+    # interface=presto
+    # ## Specific options for connecting to the Presto server.
+    # ## The JDBC driver presto-jdbc.jar need to be in the CLASSPATH environment variable.
+    # ## If 'user' and 'password' are omitted, they will be prompted in the UI.
+    # options='{"url": "jdbc:presto://localhost:8080/catalog/schema", "driver": "io.prestosql.jdbc.PrestoDriver", "user": "root", "password": "root"}'
+    # ## Impersonation on.
+    # # options='{"url": "presto://localhost:8080/hive/default", "has_impersonation": true}'
+    # ## Kerberos.
+    # # options='{"url": "presto://localhost:8080/hive/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
 
     # [[[clickhouse]]]
     #   name=ClickHouse
@@ -1363,19 +1367,17 @@
   # The Livy Server URL.
   ## livy_server_url=http://localhost:8998
 
-  # Configure Livy to start in local 'process' mode, or 'yarn' workers.
-  ## livy_server_session_kind=yarn
-
   # Whether Livy requires client to perform Kerberos authentication.
   ## security_enabled=false
 
   # Whether Livy requires client to use csrf protection.
   ## csrf_enabled=false
 
-  # Host of the Sql Server
+  # Host of the Spark Thrift Server
+  # https://spark.apache.org/docs/latest/sql-distributed-sql-engine.html
   ## sql_server_host=localhost
 
-  # Port of the Sql Server
+  # Port of the Spark Thrift Server
   ## sql_server_port=10000
 
   # Choose whether Hue should validate certificates received from the server.

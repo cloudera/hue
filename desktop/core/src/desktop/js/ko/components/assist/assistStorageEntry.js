@@ -19,7 +19,7 @@ import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
-import { GET_KNOWN_CONFIG_EVENT } from '../../../utils/hueConfig';
+import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 const PAGE_SIZE = 100;
 
@@ -350,8 +350,8 @@ class AssistStorageEntry {
     type = type.replace(/abfs.*/i, 'abfs');
 
     huePubSub.publish(GET_KNOWN_CONFIG_EVENT, config => {
-      if (config && config.app_config && config.app_config.browsers) {
-        const source = config.app_config.browsers.interpreters.find(
+      if (config && config.app_config && config.app_config.browser) {
+        const source = config.app_config.browser.interpreters.find(
           interpreter => interpreter.type === type
         );
         if (source) {

@@ -32,10 +32,10 @@ import {
   REDRAW_FIXED_HEADERS_EVENT,
   SHOW_GRID_SEARCH_EVENT,
   SHOW_NORMAL_RESULT_EVENT,
-  REDRAW_CHART_EVENT,
-  ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT
+  REDRAW_CHART_EVENT
 } from 'apps/notebook2/events';
 import { DIALECT } from 'apps/notebook2/snippet';
+import { SHOW_LEFT_ASSIST_EVENT } from 'ko/components/assist/events';
 
 export const initNotebook2 = () => {
   window.Clipboard = Clipboard;
@@ -246,7 +246,7 @@ export const initNotebook2 = () => {
           }
         };
 
-        const handleFileSelect = function(evt) {
+        const handleFileSelect = evt => {
           evt.stopPropagation();
           evt.preventDefault();
           const dt = evt.dataTransfer;
@@ -359,7 +359,7 @@ export const initNotebook2 = () => {
       // Close the notebook snippets when leaving the page
       window.onbeforeunload = function(e) {
         if (!viewModel.selectedNotebook().avoidClosing) {
-          viewModel.selectedNotebook().close();
+          //viewModel.selectedNotebook().close(); // TODO
         }
       };
       $(window).data('beforeunload', window.onbeforeunload);
@@ -575,7 +575,7 @@ export const initNotebook2 = () => {
       );
 
       huePubSub.subscribe(
-        'left.assist.show',
+        SHOW_LEFT_ASSIST_EVENT,
         () => {
           if (!viewModel.isLeftPanelVisible() && viewModel.assistAvailable()) {
             viewModel.isLeftPanelVisible(true);

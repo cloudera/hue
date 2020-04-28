@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import $ from 'jquery';
 import { koSetup } from 'jest/koTestUtils';
 import { NAME } from './ko.historyPanel';
 
@@ -21,8 +22,14 @@ describe('ko.historyPanel.js', () => {
   const setup = koSetup();
 
   it('should render component', async () => {
-    const element = await setup.renderComponent(NAME, {});
+    const spy = jest.spyOn($, 'post').mockImplementation(() => $.Deferred().reject());
 
+    const element = await setup.renderComponent(NAME, {});
     expect(element.innerHTML).toMatchSnapshot();
+
+    expect(spy).toHaveBeenCalled();
+
+    spy.mockRestore();
+    spy.mockClear();
   });
 });
