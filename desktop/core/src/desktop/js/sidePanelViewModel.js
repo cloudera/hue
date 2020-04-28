@@ -73,7 +73,7 @@ class SidePanelViewModel {
     huePubSub.publish('get.current.app.name', onAppChange);
 
     huePubSub.subscribe(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, connector => {
-      self.rightAssistAvailable(connector.is_sql || connector.dialect === 'pig');
+      self.rightAssistAvailable(connector && (connector.is_sql || connector.dialect === 'pig'));
     });
 
     self.activeAppViewModel = ko.observable();

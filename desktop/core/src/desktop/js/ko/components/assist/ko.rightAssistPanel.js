@@ -186,7 +186,7 @@ class RightAssistPanel {
     const updateContentsForConnector = connector => {
       this.connector(connector);
       this.schedulesTabAvailable(false);
-      if (connector.type !== 'dashboard') {
+      if (connector && connector.type !== 'dashboard') {
         if (window.ENABLE_QUERY_SCHEDULING) {
           huePubSub.subscribeOnce('set.current.app.view.model', viewModel => {
             // Async

@@ -111,7 +111,9 @@ def get_ordered_interpreters(user=None):
       'dialect': i.get('dialect', i['name']).lower(),
       'dialect_properties': i.get('dialect_properties'),
       'category': i.get('category', 'editor'),
-      "is_sql": i.get('is_sql') or i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy", "ksql", "flink"],
+      "is_sql": i.get('is_sql') or \
+          i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy", "ksql", "flink"] or \
+          i['type'] == 'sql',
       "is_catalog": i['interface'] in ["hms",],
     }
     for i in interpreters
