@@ -192,8 +192,8 @@ class Hdfs(object):
           try:  # Handle the case when there is no group with the same name as the user.
             self.chown(home_path, group=user)
           except IOError:
-            LOG.error('Failed to change the group of "{}" to "{}" when creating a home directory '
-                      'for user "{}"'.format(home_path, user, user))
+            LOG.exception('Failed to change the group of "{}" to "{}" when creating a home directory '
+                          'for user "{}"'.format(home_path, user, user))
         except IOError:
           msg = 'Failed to create home dir ("%s") as superuser %s' % (home_path, self.superuser)
           LOG.exception(msg)
