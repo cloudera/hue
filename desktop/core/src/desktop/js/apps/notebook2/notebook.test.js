@@ -16,8 +16,7 @@
 
 import Notebook from './notebook';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
-import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
-import huePubSub from 'utils/huePubSub';
+import * as hueConfig from 'utils/hueConfig';
 
 describe('notebook.js', () => {
   const viewModel = {
@@ -50,20 +49,10 @@ describe('notebook.js', () => {
   });
 
   it('should serialize a notebook to JSON', async () => {
-    const spy = jest.spyOn(huePubSub, 'publish').mockImplementation((topic, cb) => {
-      if (topic === GET_KNOWN_CONFIG_EVENT && cb) {
-        cb({
-          app_config: {
-            editor: {
-              interpreters: [
-                { type: 'hive', dialect: 'hive' },
-                { type: 'impala', dialect: 'impala' }
-              ]
-            }
-          }
-        });
-      }
-    });
+    const connectors = [{ type: 'hive', dialect: 'hive' }, { type: 'impala', dialect: 'impala' }];
+    const spy = jest
+      .spyOn(hueConfig, 'findConnector')
+      .mockImplementation(connectors.find.bind(connectors));
 
     const notebook = new Notebook(viewModel, {});
     notebook.addSnippet({ connector: { dialect: 'hive', type: 'hive' } });
@@ -84,6 +73,9 @@ describe('notebook.js', () => {
 
   it('should serialize a notebook context to JSON', async () => {
     const notebook = new Notebook(viewModel, {});
+    const connectors = [{ type: 'hive', dialect: 'hive' }, { type: 'impala', dialect: 'impala' }];
+    jest.spyOn(hueConfig, 'findConnector').mockImplementation(connectors.find.bind(connectors));
+
     notebook.addSnippet({ connector: { dialect: 'hive' } });
 
     const notebookContextJSON = await notebook.toContextJson();
