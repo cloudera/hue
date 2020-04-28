@@ -31,6 +31,7 @@ import LangRefContext from './langRefContext';
 import PartitionContext, { PARTITION_CONTEXT_TEMPLATE } from './partitionContext';
 import ResizeHelper from './resizeHelper';
 import StorageContext from './storageContext';
+import { ASSIST_KEY_COMPONENT } from 'ko/components/assist/ko.assistKey';
 import componentUtils from 'ko/components/componentUtils';
 import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
@@ -288,15 +289,9 @@ const SUPPORT_TEMPLATES = `
           <!-- ko with: catalogEntry -->
           <!-- ko if: isField() -->
           (<span data-bind="text: getType()"></span>)
-          <i class="fa fa-key" title="${I18n(
-            'Primary key'
-          )}" data-bind="visible: isPrimaryKey()"></i>
-          <i class="fa fa-key" title="${I18n(
-            'Partition key'
-          )}" data-bind="visible: isPartitionKey()"></i>
-          <i class="fa fa-key" title="${I18n(
-            'Foreign key'
-          )}" data-bind="visible: isForeignKey()"></i>
+          <!-- ko if: isKey() -->
+            <!-- ko component: { name: '${ ASSIST_KEY_COMPONENT }', params: { entry: $data, onForeignKeyClick: $parents[1].setEntry.bind($parents[1]) } } --><!-- /ko -->
+          <!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
         </div>
