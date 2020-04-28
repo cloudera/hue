@@ -77,6 +77,10 @@ class DataCatalogContext {
     self.load();
   }
 
+  setEntry(entry) {
+    this.catalogEntry(entry);
+  }
+
   refresh() {
     const self = this;
     self

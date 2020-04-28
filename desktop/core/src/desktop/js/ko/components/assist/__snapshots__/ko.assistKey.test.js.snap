@@ -7,10 +7,16 @@ exports[`ko.assistKey.js should render component 1`] = `
             html: true,
             placement: 'bottom'
           },
-          click: highlight
+          click: foreignKeyClick
         \\" data-original-title=\\"\\"><i class=\\"fa fa-key\\"></i></a><i class=\\"fa fa-key\\" style=\\"padding: 0 2px;\\" data-bind=\\"
+          tooltip: {
+            title: 'Foreign Key',
+            placement: 'bottom'
+          }
+        \\" data-original-title=\\"\\"></i><i class=\\"fa fa-key\\" style=\\"padding: 0 2px;\\" data-bind=\\"
         tooltip: {
-          title: 'Primary Key',
+          title: entry.isPrimaryKey() ? 'Primary Key' : 'Partition Key',
           placement: 'bottom'
-        }\\" data-original-title=\\"\\"></i><i class=\\"fa fa-key\\"></i></div>"
+        }
+      \\" data-original-title=\\"\\"></i><i class=\\"fa fa-key\\"></i></div>"
 `;

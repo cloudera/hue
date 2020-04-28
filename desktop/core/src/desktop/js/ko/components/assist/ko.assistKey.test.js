@@ -17,7 +17,7 @@
 import 'ext/bootstrap.2.3.2.min';
 
 import { koSetup } from 'jest/koTestUtils';
-import { NAME } from './ko.assistKey';
+import { ASSIST_KEY_COMPONENT } from './ko.assistKey';
 
 describe('ko.assistKey.js', () => {
   const setup = koSetup();
@@ -26,9 +26,12 @@ describe('ko.assistKey.js', () => {
     const entry = {
       definition: {
         primaryKey: true
-      }
+      },
+      isPrimaryKey: () => true,
+      isForeignKey: () => false,
+      isPartitionKey: () => false
     };
-    const element = await setup.renderComponent(NAME, entry);
+    const element = await setup.renderComponent(ASSIST_KEY_COMPONENT, { entry: entry });
 
     expect(element.innerHTML).toMatchSnapshot();
   });

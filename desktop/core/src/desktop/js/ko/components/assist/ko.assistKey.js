@@ -23,10 +23,10 @@ import { ASSIST_DB_HIGHLIGHT_EVENT } from './events';
 
 import 'ko/bindings/ko.tooltip';
 
-export const NAME = 'hue-assist-key';
+export const ASSIST_KEY_COMPONENT = 'hue-assist-key';
 
 const TEMPLATE = `
-  <!-- ko if: entry.definition.foreignKey -->
+  <!-- ko if: entry.isForeignKey() -->
     <!-- ko if: entry.definition.foreignKey.to -->
       <a class="assist-field-link" style="padding: 0 2px;" href="javascript: void(0);" data-bind="
           tooltip: {
@@ -34,33 +34,43 @@ const TEMPLATE = `
             html: true,
             placement: 'bottom'
           },
-          click: highlight
+          click: foreignKeyClick
         "><i class="fa fa-key"></i></a>
     <!-- /ko -->
+    <!-- ko ifnot: entry.definition.foreignKey.to -->
+      <i class="fa fa-key" style="padding: 0 2px;" data-bind="
+          tooltip: {
+            title: '${I18n('Foreign Key')}',
+            placement: 'bottom'
+          }
+        "></i>
+    <!-- /ko -->
   <!-- /ko -->
-  <!-- ko if: entry.definition.primaryKey -->
+  <!-- ko if: entry.isPrimaryKey() || entry.isPartitionKey() -->
     <i class="fa fa-key" style="padding: 0 2px;" data-bind="
         tooltip: {
-          title: '${I18n('Primary Key')}',
+          title: entry.isPrimaryKey() ? '${I18n('Primary Key')}' : '${I18n('Partition Key')}',
           placement: 'bottom'
-        }"></i>
+        }
+      "></i>
   <!-- /ko -->
-  <!-- ko ifnot: entry.definition.foreignKey || entry.definition.primaryKey -->
-  <i class="fa fa-key"></i>
+  <!-- ko ifnot: entry.isForeignKey() || entry.isPrimaryKey() || entry.isPartitionKey() -->
+    <i class="fa fa-key"></i>
   <!-- /ko -->
 `;
 
 class AssistKey {
-  constructor(entry) {
-    this.entry = entry;
+  constructor(params) {
+    this.entry = params.entry;
+    this.onForeignKeyClick = params.onForeignKeyClick;
 
     this.foreignKeyTooltipHtml = ko.pureComputed(
       () => `<i style="margin-right: 4px" class="fa fa-arrow-right"></i>
-    ${entry.definition.foreignKey && entry.definition.foreignKey.to}`
+    ${this.entry.definition.foreignKey && this.entry.definition.foreignKey.to}`
     );
   }
 
-  highlight(entry, event) {
+  foreignKeyClick() {
     this.entry.dataCatalog
       .getEntry({
         path: this.entry.definition.foreignKey.to,
@@ -68,9 +78,13 @@ class AssistKey {
         compute: this.entry.compute
       })
       .then(entry => {
-        huePubSub.publish(ASSIST_DB_HIGHLIGHT_EVENT, entry);
+        if (this.onForeignKeyClick) {
+          this.onForeignKeyClick(entry);
+        } else {
+          huePubSub.publish(ASSIST_DB_HIGHLIGHT_EVENT, entry);
+        }
       });
   }
 }
 
-componentUtils.registerComponent(NAME, AssistKey, TEMPLATE);
+componentUtils.registerComponent(ASSIST_KEY_COMPONENT, AssistKey, TEMPLATE);
