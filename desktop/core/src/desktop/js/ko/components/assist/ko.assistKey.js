@@ -34,7 +34,8 @@ const TEMPLATE = `
             html: true,
             placement: 'bottom'
           },
-          click: foreignKeyClick
+          click: foreignKeyClick,
+          clickbubble: false
         "><i class="fa fa-key"></i></a>
     <!-- /ko -->
     <!-- ko ifnot: entry.definition.foreignKey.to -->
@@ -61,7 +62,7 @@ const TEMPLATE = `
 
 class AssistKey {
   constructor(params) {
-    this.entry = params.entry;
+    this.entry = ko.unwrap(params.entry);
     this.onForeignKeyClick = params.onForeignKeyClick;
 
     this.foreignKeyTooltipHtml = ko.pureComputed(
