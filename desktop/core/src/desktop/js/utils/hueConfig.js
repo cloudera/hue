@@ -65,6 +65,8 @@ const validConnectorConfig = config => {
   return true;
 };
 
+export const getLastKnownConfig = () => lastKnownConfig;
+
 export const findConnector = connectorTest => {
   if (validConnectorConfig(lastKnownConfig)) {
     const connectors = lastKnownConfig.app_config.editor.interpreters;

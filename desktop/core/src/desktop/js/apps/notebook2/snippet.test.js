@@ -16,8 +16,7 @@
 
 import Notebook from './notebook';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
-import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
-import huePubSub from 'utils/huePubSub';
+import * as hueConfig from 'utils/hueConfig';
 
 describe('snippet.js', () => {
   const viewModel = {
@@ -50,17 +49,10 @@ describe('snippet.js', () => {
   });
 
   it('should serialize a snippet context to JSON', async () => {
-    const spy = jest.spyOn(huePubSub, 'publish').mockImplementation((topic, cb) => {
-      if (topic === GET_KNOWN_CONFIG_EVENT && cb) {
-        cb({
-          app_config: {
-            editor: {
-              interpreters: [{ type: 'hive', dialect: 'hive' }]
-            }
-          }
-        });
-      }
-    });
+    const connectors = [{ type: 'hive', dialect: 'hive' }];
+    const spy = jest
+      .spyOn(hueConfig, 'findConnector')
+      .mockImplementation(connectors.find.bind(connectors));
 
     const notebook = new Notebook(viewModel, {});
     const snippet = notebook.addSnippet({ connector: { dialect: 'hive', type: 'hive' } });
