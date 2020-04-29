@@ -489,7 +489,7 @@ def _save_notebook(notebook, user):
   _clear_sessions(notebook)
   notebook_doc1 = notebook_doc._get_doc1(doc2_type=notebook_type)
   if ENABLE_CONNECTORS.get():
-    notebook_doc.connector_id = int(notebook['type'])
+    notebook_doc.connector_id = int(notebook['snippets'][0]['connector']['type'])
   notebook_doc.update_data(notebook)
   notebook_doc.search = _get_statement(notebook)
   notebook_doc.name = notebook_doc1.name = notebook['name']

@@ -141,19 +141,53 @@ class TestApi(object):
     assert_equal(doc.search, "select * from default.web_logs where app = 'metastore';")
 
 
-  def test_save_notebook_with_connector(self):
+  def test_save_notebook_with_connector_off(self):
+    reset = ENABLE_CONNECTORS.set_for_testing(False)
+
     notebook_cp = self.notebook.copy()
     notebook_cp.pop('id')
     notebook_cp['snippets'][0]['connector'] = {
-      "optimizer": "api"
+      'name': 'MySql',  # At some point even v1 should set those two
+      'dialect': 'mysql',
+      'optimizer': 'api',
     }
-    if not ENABLE_CONNECTORS.get():  # At some point even v1 should set those
-      notebook_cp['snippets'][0]['connector']['name'] = 'MySql'
-      notebook_cp['snippets'][0]['connector']['dialect'] = 'mysql'
     notebook_json = json.dumps(notebook_cp)
 
-    response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json})
-    data = json.loads(response.content)
+    try:
+      response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json})
+      data = json.loads(response.content)
+    finally:
+      reset()
+
+    assert_equal(0, data['status'], data)
+    doc = Document2.objects.get(pk=data['id'])
+    assert_equal('query-mysql', doc.type)
+
+
+  def test_save_notebook_with_connector_on(self):
+    if not ENABLE_CONNECTORS.get():
+      raise SkipTest
+
+    notebook_cp = self.notebook.copy()
+    notebook_cp.pop('id')
+
+    connector = Connector.objects.create(
+        name='MySql',
+        dialect='mysql'
+    )
+
+    notebook_cp['snippets'][0]['connector'] = {
+      'name': 'MySql',
+      'dialect': 'mysql',
+      'type': str(connector.id),
+      'optimizer': 'api',
+    }
+
+    try:
+      response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json})
+      data = json.loads(response.content)
+    finally:
+      connector.delete()
 
     assert_equal(0, data['status'], data)
     doc = Document2.objects.get(pk=data['id'])
