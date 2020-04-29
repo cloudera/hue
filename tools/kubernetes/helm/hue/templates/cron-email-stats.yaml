@@ -17,6 +17,9 @@ spec:
             - /bin/bash
             - -c
             - ./build/env/bin/hue send_query_stats
+            resources:
+              requests:
+                cpu: "5m"
             volumeMounts:
             - name: config-volume
               mountPath: /usr/share/hue/desktop/conf/z-hue.ini
