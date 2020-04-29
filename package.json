@@ -15,7 +15,7 @@
     "Weixia Xu <weixia@cloudera.com>",
     "Johan Ahlen <johan.ahlen@cloudera.com>"
   ],
-  "license": "Apache",
+  "license": "Apache-2.0",
   "private": false,
   "engines": {
     "node": ">=0.10.0"
