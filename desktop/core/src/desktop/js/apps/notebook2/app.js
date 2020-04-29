@@ -32,7 +32,8 @@ import {
   REDRAW_FIXED_HEADERS_EVENT,
   SHOW_GRID_SEARCH_EVENT,
   SHOW_NORMAL_RESULT_EVENT,
-  REDRAW_CHART_EVENT
+  REDRAW_CHART_EVENT,
+  IGNORE_NEXT_UNLOAD_EVENT
 } from 'apps/notebook2/events';
 import { DIALECT } from 'apps/notebook2/snippet';
 import { SHOW_LEFT_ASSIST_EVENT } from 'ko/components/assist/events';
@@ -356,10 +357,20 @@ export const initNotebook2 = () => {
         huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
       });
 
+      let ignoreNextUnload = false;
+
+      huePubSub.subscribe(IGNORE_NEXT_UNLOAD_EVENT, () => {
+        ignoreNextUnload = true;
+      });
+
       // Close the notebook snippets when leaving the page
       window.onbeforeunload = function(e) {
+        if (ignoreNextUnload) {
+          ignoreNextUnload = false;
+          return;
+        }
         if (!viewModel.selectedNotebook().avoidClosing) {
-          //viewModel.selectedNotebook().close(); // TODO
+          viewModel.selectedNotebook().close();
         }
       };
       $(window).data('beforeunload', window.onbeforeunload);

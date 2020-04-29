@@ -3245,8 +3245,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           .appendTo($downloadForm);
 
         $('#downloadProgressModal').append($downloadForm);
+
+        huePubSub.publish('ignore.next.unload');
         $downloadForm.submit();
-      }
+      };
 
       self.fetchProfile = function (name, callback) {
         vm.apiHelper.cancelActiveRequest(lastFetchProfileRequest);
