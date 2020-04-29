@@ -27,7 +27,10 @@ import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 import { initNotebook2 } from 'apps/notebook2/app';
-import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
+import {
+  ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
+  IGNORE_NEXT_UNLOAD_EVENT
+} from 'apps/notebook2/events';
 import { SHOW_LEFT_ASSIST_EVENT } from 'ko/components/assist/events';
 
 if (window.ENABLE_NOTEBOOK_2) {
@@ -614,8 +617,19 @@ if (window.ENABLE_NOTEBOOK_2) {
         redrawFixedHeaders(200);
       });
 
+      let ignoreNextUnload = false;
+
+      huePubSub.subscribe(IGNORE_NEXT_UNLOAD_EVENT, () => {
+        ignoreNextUnload = true;
+      });
+
       // Close the notebook snippets when leaving the page
       window.onbeforeunload = function(e) {
+        if (ignoreNextUnload) {
+          ignoreNextUnload = false;
+          return;
+        }
+
         if (!viewModel.selectedNotebook().avoidClosing) {
           viewModel.selectedNotebook().close();
         }
