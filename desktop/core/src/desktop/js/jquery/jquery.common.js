@@ -17,6 +17,7 @@
 import $ from 'jquery';
 import 'jquery/jquery.migration';
 
+import 'jquery-contextmenu'; // TODO: Remove, it's only used for "old" query builder
 import 'jquery.cookie';
 import 'jquery-form';
 import 'jquery/plugins/jquery.selectize';

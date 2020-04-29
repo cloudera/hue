@@ -39,6 +39,7 @@
     "jquery-mousewheel": "3.1.13",
     "jquery-ui": "1.12.1",
     "jquery.cookie": "1.4.1",
+    "jquery-contextmenu": "^2.9.0",
     "knockout": "3.5.1",
     "knockout-sortable": "1.2.0",
     "knockout-switch-case": "2.1.0",
