@@ -34,7 +34,7 @@ spec:
           subPath: hue-ini
         resources:
           limits:
-            cpu: 100m
+            cpu: 5m
       volumes:
         - name: config-volume
           configMap:
