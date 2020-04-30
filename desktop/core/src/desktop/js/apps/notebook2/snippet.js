@@ -35,7 +35,11 @@ import hueUtils from 'utils/hueUtils';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
-import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
+import {
+  EXECUTABLE_STATUS_TRANSITION_EVENT,
+  EXECUTABLE_UPDATED_EVENT,
+  EXECUTION_STATUS
+} from 'apps/notebook2/execution/executable';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
   REFRESH_STATEMENT_LOCATIONS_EVENT
@@ -893,6 +897,18 @@ export default class Snippet {
       }
     });
 
+    huePubSub.subscribe(EXECUTABLE_STATUS_TRANSITION_EVENT, transitionDetails => {
+      if (this.activeExecutable() === transitionDetails.executable) {
+        if (
+          transitionDetails.newStatus === EXECUTION_STATUS.available ||
+          transitionDetails.newStatus === EXECUTION_STATUS.failed ||
+          transitionDetails.newStatus === EXECUTION_STATUS.success
+        ) {
+          huePubSub.publish(UPDATE_HISTORY_EVENT);
+        }
+      }
+    });
+
     this.activeExecutable.subscribe(this.updateFromExecutable.bind(this));
 
     this.refreshHistory = notebook.fetchHistory;
@@ -1034,13 +1050,6 @@ export default class Snippet {
   updateFromExecutable(executable) {
     if (executable) {
       this.lastExecuted(executable.executeStarted);
-      if (
-        executable.status === EXECUTION_STATUS.available ||
-        executable.status === EXECUTION_STATUS.failed ||
-        executable.status === EXECUTION_STATUS.success
-      ) {
-        huePubSub.publish(UPDATE_HISTORY_EVENT);
-      }
       this.status(executable.status);
       if (executable.result) {
         this.currentQueryTab('queryResults');

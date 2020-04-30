@@ -41,6 +41,7 @@ export const EXECUTION_STATUS = {
 };
 
 export const EXECUTABLE_UPDATED_EVENT = 'hue.executable.updated';
+export const EXECUTABLE_STATUS_TRANSITION_EVENT = 'hue.executable.status.transitioned';
 
 const ERROR_REGEX = /line ([0-9]+)(\:([0-9]+))?/i;
 
@@ -79,7 +80,15 @@ export default class Executable {
   }
 
   setStatus(status) {
+    const oldStatus = this.status;
     this.status = status;
+    if (oldStatus !== status) {
+      huePubSub.publish(EXECUTABLE_STATUS_TRANSITION_EVENT, {
+        executable: this,
+        oldStatus: oldStatus,
+        newStatus: status
+      });
+    }
     this.notify();
   }
 
