@@ -1536,12 +1536,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       }"></div>
     </div>
     <div class="span6">
-      <div data-bind="html: renderMarkdown, attr: {'id': 'liveMD' + id()}"></div>
+      <div data-bind="html: renderMarkdown(), attr: {'id': 'liveMD' + id()}"></div>
     </div>
   </div>
   <!-- /ko -->
   <!-- ko if: $root.isPresentationMode() -->
-  <div data-bind="html: renderMarkdown"></div>
+  <div data-bind="html: renderMarkdown()"></div>
   <!-- /ko -->
 </script>
 
