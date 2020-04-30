@@ -34,6 +34,8 @@ from notebook.connectors.base import Api, QueryError
 LOG = logging.getLogger(__name__)
 _JSON_CONTENT_TYPE = 'application/json'
 _API_VERSION = 'v1'
+SESSIONS = {}
+SESSION_KEY = '%(username)s-%(connector_name)s'
 
 
 def query_error_handler(func):
@@ -41,7 +43,11 @@ def query_error_handler(func):
     try:
       return func(*args, **kwargs)
     except RestException as e:
-      message = force_unicode(json.loads(e.message)['errors'])
+      try:
+        message = force_unicode(json.loads(e.message)['errors'])
+      except:
+        message = e.message
+      message = force_unicode(message)
       raise QueryError(message)
     except Exception as e:
       message = force_unicode(str(e))
@@ -59,23 +65,59 @@ class FlinkSqlApi(Api):
 
 
   @query_error_handler
-  def execute(self, notebook, snippet):
+  def create_session(self, lang=None, properties=None):
     session = self.db.create_session()
-    session_id = session['session_id']
+
+    response = {
+      'type': lang,
+      'id': session['session_id']
+    }
+
+    return response
+
+  def _get_session(self):
+    session_key = SESSION_KEY % {
+      'username': self.user.username,
+      'connector_name': self.interpreter['name']
+    }
+
+    if session_key not in SESSIONS:
+      SESSIONS[session_key] = self.create_session()
+
+    try:
+      self.db.session_heartbeat(session_id=SESSIONS[session_key]['id'])
+    except Exception as e:
+      if 'Session: %(id)s does not exist' % SESSIONS[session_key] in str(e):
+        LOG.info('Session: %(id)s does not exist, opening a new one' % SESSIONS[session_key])
+        SESSIONS[session_key] = self.create_session()
+      else:
+        raise e
+
+    return SESSIONS[session_key]
+
+  @query_error_handler
+  def execute(self, notebook, snippet):
+    session = self._get_session()
+    session_id = session['id']
+    job_id = None
 
     resp = self.db.execute_statement(session_id=session_id, statement=snippet['statement'])
 
-    self.db.close_session(session_id) ## No!
+    if resp['statement_types'][0] == 'SELECT':
+      job_id = resp['results'][0]['data'][0][0]
+      data, description = [], []
+    else:
+      data, description = resp['results'][0]['data'], resp['results'][0]['columns']
 
-    data, description = resp['results'][0]['data'], resp['results'][0]['columns']
     has_result_set = data is not None
 
     return {
-      'sync': True,
+      'sync': job_id is None,
       'has_result_set': has_result_set,
+      'guid': job_id,
       'result': {
-        'has_more': False,
-        'data': data if has_result_set else [],
+        'has_more': job_id is not None,
+        'data': data if job_id is None else [],
         'meta': [{
             'name': col['name'],
             'type': col['type'],
@@ -90,7 +132,44 @@ class FlinkSqlApi(Api):
 
   @query_error_handler
   def check_status(self, notebook, snippet):
-    return {'status': 'available'}
+    session = self._get_session()
+    statement_id = snippet['result']['handle']['guid']
+
+    status = 'expired'
+
+    if session:
+      if not statement_id:  # Sync result
+        status = 'available'
+      else:
+        resp = self.db.fetch_status(session['id'], statement_id)
+        if resp.get('status') == 'RUNNING':
+          status = 'running'
+        elif resp.get('status') == 'FINISHED':
+          status = 'available'
+
+    return {'status': status}
+
+
+  @query_error_handler
+  def fetch_result(self, notebook, snippet, rows, start_over):
+    session = self._get_session()
+    statement_id = snippet['result']['handle']['guid']
+    token = 0
+
+    resp = self.db.fetch_results(session['id'], job_id=statement_id, token=token)
+
+    return {
+        'has_more': bool(resp.get('next_result_uri')) and False,  # TODO: here we should increment the token
+        'data': resp['results'][0]['data'],  # No escaping...
+        'meta': [{
+            'name': column['name'],
+            'type': column['type'],
+            'comment': ''
+          }
+          for column in resp['results'][0]['columns']
+        ],
+        'type': 'table'
+    }
 
 
   @query_error_handler
@@ -101,15 +180,7 @@ class FlinkSqlApi(Api):
       if database is None:
         response['databases'] = self.show_databases()
       elif table is None:
-        if database == 'tables':
-          response['tables_meta'] = self.show_tables(database)
-        elif database == 'topics':
-          response['tables_meta'] = self.db.show_topics()
-        elif database == 'streams':
-          response['tables_meta'] = [
-            {'name': t['name'], 'type': t['type'], 'comment': 'Topic: %(topic)s Format: %(format)s' % t}
-            for t in self.db.show_streams()
-          ]
+        response['tables_meta'] = self.show_tables(database)
       elif column is None:
         columns = self.db.get_columns(table)
         response['columns'] = [col['name'] for col in columns]
@@ -117,7 +188,8 @@ class FlinkSqlApi(Api):
             'comment': col.get('comment'),
             'name': col.get('name'),
             'type': str(col['schema'].get('type'))
-          } for col in columns
+          }
+          for col in columns
         ]
       else:
         response = {}
@@ -131,24 +203,27 @@ class FlinkSqlApi(Api):
 
 
   def show_databases(self):
-    session = self.db.create_session()
-    session_id = session['session_id']
+    session = self._get_session()
+    session_id = session['id']
 
     resp = self.db.execute_statement(session_id=session_id, statement='SHOW DATABASES')
-    self.db.close_session(session_id)
 
     return [db[0] for db in resp['results'][0]['data']]
 
+
   def show_tables(self, database):
-    session = self.db.create_session()
-    session_id = session['session_id']
+    session = self._get_session()
+    session_id = session['id']
 
     resp = self.db.execute_statement(session_id=session_id, statement='USE %(database)s' % {'database': database})
     resp = self.db.execute_statement(session_id=session_id, statement='SHOW TABLES')
 
-    self.db.close_session(session_id)
-
     return [table[0] for table in resp['results'][0]['data']]
+
+
+  def close_session(self, session):
+    session = self._get_session()
+    self.db.close_session(session['id'])
 
 
 class FlinkSqlClient():
@@ -171,10 +246,10 @@ class FlinkSqlClient():
 
   def create_session(self, **properties):
     data = {
-        "session_name": "test", # optional
-        "planner": "old", # required, case insensitive
-        "execution_type": "batch", # required, case insensitive
-        "properties": { # optional, properties for current session
+        "session_name": "test",  # optional
+        "planner": "blink",  # required, "old"/"blink"
+        "execution_type": "streaming",  # required, "batch"/"streaming"
+        "properties": {  # optional
             "key": "value"
         }
     }
@@ -187,30 +262,29 @@ class FlinkSqlClient():
 
   def execute_statement(self, session_id, statement):
     data = {
-        "statement": statement, # required
-        "execution_timeout": "" # execution time limit in milliseconds, optional, but required for stream SELECT ?
+        "statement": statement,  # required
+        "execution_timeout": ""  # execution time limit in milliseconds, optional, but required for stream SELECT ?
     }
 
     return self._root.post(
-      'sessions/%(session_id)s/statements' % {
+        'sessions/%(session_id)s/statements' % {
         'session_id': session_id
       },
       data=json.dumps(data),
       contenttype=_JSON_CONTENT_TYPE
     )
 
-  def fetch_status(self, session_id, job_id, token=None):
+  def fetch_status(self, session_id, job_id):
     return self._root.get(
-      'sessions/%(ession_id)s/jobs/%(job_id)s/result%(token)s' % {
+      'sessions/%(session_id)s/jobs/%(job_id)s/status' % {
         'session_id': session_id,
-        'job_id': job_id,
-        'token': '/' + token if token else ''
+        'job_id': job_id
       }
     )
 
-  def fetch_data(self, session_id, job_id):
+  def fetch_results(self, session_id, job_id, token=0):
     return self._root.get(
-      'sessions/%(session_id)s/jobs/%(job_id)s/status' % {
+      'sessions/%(session_id)s/jobs/%(job_id)s/result/%(token)s' % {
         'session_id': session_id,
         'job_id': job_id,
         'token': token
