@@ -27,7 +27,7 @@ import $ from 'jquery';
  * - data-tablescroller-enforce-height="true": displays the table at its maximum height accordingly to the page
  */
 
-const pluginName = 'jHueTableScroller',
+const PLUGIN_NAME = 'jHueTableScroller',
   defaults = {
     minHeight: 300,
     maxHeight: -1,
@@ -35,10 +35,11 @@ const pluginName = 'jHueTableScroller',
   };
 
 function Plugin(element, options) {
+  this.disposeFunctions = [];
   this.element = element;
   this.options = $.extend({}, defaults, options);
   this._defaults = defaults;
-  this._name = pluginName;
+  this._name = PLUGIN_NAME;
   this.init();
 }
 
@@ -58,14 +59,27 @@ Plugin.prototype.init = function() {
     .data('tablescroller-disable');
   if (disableScrollingTable == null || disableScrollingTable !== true) {
     resizeScrollingTable(_this);
-    let _resizeTimeout = -1;
-    $(window).resize(() => {
-      window.clearTimeout(_resizeTimeout);
-      _resizeTimeout = window.setTimeout(() => {
+    let resizeTimeout = -1;
+    const onResize = () => {
+      window.clearTimeout(resizeTimeout);
+      resizeTimeout = window.setTimeout(() => {
         resizeScrollingTable(_this);
       }, 400);
+    };
+    $(window).on('resize', onResize);
+    this.disposeFunctions.push(() => {
+      window.clearTimeout(resizeTimeout);
+      $(window).off('resize', onResize);
     });
   }
+};
+
+Plugin.prototype.destroy = function() {
+  const $element = $(this.element);
+  this.disposeFunctions.forEach(disposeFunction => {
+    disposeFunction();
+  });
+  $element.data('plugin_' + PLUGIN_NAME, null);
 };
 
 function resizeScrollingTable(_this) {
@@ -142,12 +156,12 @@ function resizeScrollingTable(_this) {
   }
 }
 
-$.fn[pluginName] = function(options) {
+$.fn[PLUGIN_NAME] = function(options) {
   return this.each(function() {
-    if (!$.data(this, 'plugin_' + pluginName)) {
-      $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
+    if (!$.data(this, 'plugin_' + PLUGIN_NAME)) {
+      $.data(this, 'plugin_' + PLUGIN_NAME, new Plugin(this, options));
     } else {
-      $.data(this, 'plugin_' + pluginName).setOptions(options);
+      $.data(this, 'plugin_' + PLUGIN_NAME).setOptions(options);
     }
   });
 };
