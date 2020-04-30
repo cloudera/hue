@@ -33,7 +33,7 @@ import {
 
 import { attachTracker } from 'apps/notebook2/components/executableStateHandler';
 
-export const NAME = 'result-grid';
+export const RESULT_GRID_COMPONENT = 'result-grid';
 
 // prettier-ignore
 const TEMPLATE = `
@@ -187,8 +187,7 @@ class ResultGrid extends DisposableComponent {
     this.activeExecutable = params.activeExecutable;
 
     this.isResultFullScreenMode = params.isResultFullScreenMode;
-    this.editorMode = params.editorMode;
-    this.isPresentationMode = params.isPresentationMode;
+    this.notebookMode = params.notebookMode;
     this.hasMore = params.hasMore;
     this.fetchResult = params.fetchResult;
 
@@ -206,7 +205,12 @@ class ResultGrid extends DisposableComponent {
     this.data = params.data;
     this.lastFetchedRows = params.lastFetchedRows;
 
-    const tracker = attachTracker(this.activeExecutable, NAME, this, trackedObservables);
+    const tracker = attachTracker(
+      this.activeExecutable,
+      RESULT_GRID_COMPONENT,
+      this,
+      trackedObservables
+    );
     super.addDisposalCallback(tracker.dispose.bind(tracker));
 
     this.hueDatatable = undefined;
@@ -309,7 +313,6 @@ class ResultGrid extends DisposableComponent {
       const colCount = this.data()[0].length;
       invisibleRows = colCount > 200 ? 10 : colCount > 30 ? 50 : 100;
     }
-    const $datatablesWrapper = $resultTable.parents('.dataTables_wrapper');
 
     const hueDatatable = $resultTable.hueDataTable({
       i18n: {
@@ -318,7 +321,8 @@ class ResultGrid extends DisposableComponent {
       },
       fnDrawCallback: () => {
         const $resultTable = this.getResultTableElement();
-        if (this.editorMode()) {
+        const $datatablesWrapper = $resultTable.parents('.dataTables_wrapper');
+        if (!this.notebookMode()) {
           $('#queryResults').removeAttr('style');
           datatablesMaxHeight = $(window).height() - $resultTable.parent().offset().top - 40;
           $datatablesWrapper.css('overflow-x', 'hidden');
@@ -336,11 +340,8 @@ class ResultGrid extends DisposableComponent {
           });
         }
       },
-      scrollable:
-        this.editorMode() && !this.isPresentationMode()
-          ? window.MAIN_SCROLLABLE
-          : '.dataTables_wrapper',
-      contained: !this.editorMode() || this.isPresentationMode(),
+      scrollable: this.notebookMode() ? '.dataTables_wrapper' : window.MAIN_SCROLLABLE,
+      contained: this.notebookMode(),
       forceInvisible: invisibleRows
     });
 
@@ -352,19 +353,16 @@ class ResultGrid extends DisposableComponent {
       const $resultTable = this.getResultTableElement();
 
       const tableExtenderOptions = {
-        mainScrollable: window.MAIN_SCROLLABLE,
-        fixedFirstColumn: this.editorMode(),
+        mainScrollable: this.notebookMode() ? '.dataTables_wrapper' : window.MAIN_SCROLLABLE,
+        fixedFirstColumn: !this.notebookMode(),
         parentId: $resultTable.parents('.snippet').attr('id'),
-        clonedContainerPosition: 'fixed',
+        clonedContainerPosition: this.notebookMode() ? 'absolute' : 'fixed',
         app: 'editor'
       };
-      if (this.editorMode()) {
+      if (!this.notebookMode()) {
         $resultTable.parents('.dataTables_wrapper').css('overflow-x', 'hidden');
         const bannerTopHeight = window.BANNER_TOP_HTML ? 30 : 2;
         tableExtenderOptions.stickToTopPosition = 48 + bannerTopHeight;
-      } else {
-        tableExtenderOptions.mainScrollable = $datatablesWrapper[0];
-        tableExtenderOptions.clonedContainerPosition = 'absolute';
       }
 
       $resultTable.jHueTableExtender2(tableExtenderOptions);
@@ -375,7 +373,7 @@ class ResultGrid extends DisposableComponent {
         }
       });
 
-      if (this.editorMode()) {
+      if (!this.notebookMode()) {
         $resultTable.jHueHorizontalScrollbar();
       }
     });
@@ -400,7 +398,7 @@ class ResultGrid extends DisposableComponent {
 
     const $dataTablesWrapper = $resultTable.parents('.dataTables_wrapper');
 
-    if (!this.editorMode()) {
+    if (this.notebookMode()) {
       $dataTablesWrapper.on(
         'mousewheel.resultGrid DOMMouseScroll.resultGrid wheel.resultGrid',
         function(event) {
@@ -427,8 +425,12 @@ class ResultGrid extends DisposableComponent {
     }
 
     let $scrollElement = $dataTablesWrapper;
-    if (this.editorMode()) {
+    if (!this.notebookMode()) {
       $scrollElement = $(window.MAIN_SCROLLABLE);
+    }
+
+    if ($scrollElement.data('scrollFnDtCreation')) {
+      $scrollElement.off('scroll', $scrollElement.data('scrollFnDtCreation'));
     }
 
     let scrollThrottle = -1;
@@ -447,7 +449,7 @@ class ResultGrid extends DisposableComponent {
       window.clearTimeout(scrollThrottle);
       $scrollElement.data('scrollPosition', $scrollElement.scrollTop());
       scrollThrottle = window.setTimeout(() => {
-        if (this.editorMode()) {
+        if (!this.notebookMode()) {
           lastScrollPosition--; //hack for forcing fetching
         }
         if (
@@ -649,7 +651,7 @@ class ResultGrid extends DisposableComponent {
 }
 
 componentUtils.registerComponent(
-  NAME,
+  RESULT_GRID_COMPONENT,
   {
     createViewModel: (params, componentInfo) => new ResultGrid(params, componentInfo.element)
   },

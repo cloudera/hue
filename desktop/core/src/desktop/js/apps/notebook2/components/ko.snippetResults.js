@@ -21,8 +21,8 @@ import DisposableComponent from 'ko/components/DisposableComponent';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
-import 'apps/notebook2/components/resultChart/ko.resultChart';
-import 'apps/notebook2/components/resultGrid/ko.resultGrid';
+import { RESULT_CHART_COMPONENT } from 'apps/notebook2/components/resultChart/ko.resultChart';
+import { RESULT_GRID_COMPONENT } from 'apps/notebook2/components/resultGrid/ko.resultGrid';
 import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
 import { REDRAW_CHART_EVENT } from 'apps/notebook2/events';
 import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
@@ -69,18 +69,17 @@ const TEMPLATE = `
       </ul>
       <!-- /ko -->
     </div>
-    <div class="table-results" data-bind="visible: type() === 'table'" style="display: none;">
+    <div class="table-results" data-bind="visible: type() === 'table', css: { 'table-results-notebook': notebookMode }" style="display: none;">
       <div data-bind="visible: !executing() && hasData() && showGrid()" style="display: none; position: relative;">
         <!-- ko component: {
-          name: 'result-grid',
+          name: '${ RESULT_GRID_COMPONENT }',
           params: {
             activeExecutable: activeExecutable,
             data: data,
             lastFetchedRows: lastFetchedRows,
-            editorMode: editorMode,
             fetchResult: fetchResult.bind($data),
             hasMore: hasMore,
-            isPresentationMode: isPresentationMode,
+            notebookMode: notebookMode,
             isResultFullScreenMode: isResultFullScreenMode,
             meta: meta,
             resultsKlass: resultsKlass,
@@ -90,7 +89,7 @@ const TEMPLATE = `
       </div>
       <div data-bind="visible: !executing() && hasData() && showChart()" style="display: none; position: relative;">
         <!-- ko component: {
-          name: 'result-chart',
+          name: '${ RESULT_CHART_COMPONENT }',
           params: {
             activeExecutable: activeExecutable,
             cleanedMeta: cleanedMeta,
