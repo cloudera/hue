@@ -66,6 +66,23 @@
     margin-right: 18px;
   }
 
+  .snippet-v2 {
+    .table-results {
+      position: relative;
+      width: 100%;
+      min-height: 290px;
+
+      table > thead > tr > td:first-child,
+      table > tbody > tr > td:first-child {
+        background-color: @cui-gray-050;
+      }
+
+      &.table-results-notebook {
+        max-height: 400px;
+      }
+    }
+  }
+
   .notebook-snippet {
     border-bottom: 1px solid @cui-default-border-color;
     border-radius: 0;

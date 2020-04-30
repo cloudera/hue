@@ -54,7 +54,6 @@
   %if ENABLE_QUERY_BUILDER.get():
     <!-- For query builder -->
     <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.contextMenu.min.css') }">
-    <script src="${ static('desktop/ext/js/jquery/plugins/jquery.contextMenu.min.js') }"></script>
     <script src="${ static('desktop/js/queryBuilder.js') }"></script>
     <script>
 
@@ -685,7 +684,7 @@
   <script type="text/html" id="snippet${ suffix }">
     <div data-bind="visibleOnHover: { override: inFocus() || settingsVisible() || dbSelectionVisible() || $root.editorMode() || saveResultsModalVisible(), selector: '.hover-actions' }">
       <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: $root.editorMode() || inFocus() || saveResultsModalVisible(), selector: '.snippet-actions' }">
-        <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode(), 'editor-mode': $root.editorMode(), 'active-editor': inFocus, 'snippet-text' : dialect() === 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace.bind($data)">
+        <div class="snippet card card-widget snippet-v2" data-bind="css: {'notebook-snippet' : ! $root.editorMode(), 'editor-mode': $root.editorMode(), 'active-editor': inFocus, 'snippet-text' : dialect() === 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace.bind($data)">
           <div style="position: relative;">
             <div class="snippet-row" style="position: relative;">
               <div class="snippet-body" data-bind="clickForAceFocus: ace.bind($data), visible: ! $root.isResultFullScreenMode()">
