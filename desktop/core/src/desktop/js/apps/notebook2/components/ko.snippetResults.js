@@ -35,7 +35,7 @@ export const NAME = 'snippet-results';
 
 // prettier-ignore
 const TEMPLATE = `
-<div class="snippet-row">
+<div class="snippet-row" data-bind="visible: visible" style="display: none;">
   <div class="snippet-tab-actions">
     <div class="btn-group">
       <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showGrid, css: { 'active': showGrid }"><i class="fa fa-fw fa-th"></i> ${ I18n('Grid') }</button>
@@ -157,6 +157,12 @@ class SnippetResults extends DisposableComponent {
     this.executing = ko.pureComputed(() => this.status() === EXECUTION_STATUS.running);
 
     this.hasData = ko.pureComputed(() => this.data().length);
+
+    this.notebookMode = ko.pureComputed(() => !this.editorMode() || this.isPresentationMode());
+
+    this.visible = ko.pureComputed(
+      () => !this.notebookMode() || this.executing() || this.hasResultSet()
+    );
 
     const trackedObservables = {
       showGrid: true,
