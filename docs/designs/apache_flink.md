@@ -7,7 +7,7 @@
 * https://github.com/ververica/flink-sql-gateway
 * https://twitter.com/rmetzger_/status/1253013022697807879
 
-![Hue Flink Editor](https://cdn.gethue.com/uploads/2020/04/editor_flink_sql.png)
+![Hue Flink Editor](https://cdn.gethue.com/uploads/2020/04/editor_flink_sql_select.png)
 
 This document is about the Query UX specific improvements and assumes a running Flink cluster is available.
 
@@ -29,6 +29,7 @@ The big pieces would be to stabilize a query API, improve the SQL autocomplete, 
   * Could be turned to a SqlAchemy module for more standardization
   * List of [supported statements](https://github.com/ververica/flink-sql-gateway#supported-statements)
 * Security support?
+* Fetching more results
 
 ### UI
 
@@ -40,10 +41,11 @@ The big pieces would be to stabilize a query API, improve the SQL autocomplete, 
   * Risk Alerts
 * Support and display of "live" query/streams
 * Addition of Task Server and Websockets for smoother support
+* Importer support
 
 Note: some ways to iteratively get some progress could be to start with these static modules which don't necessarily require a running Hue.
 
-![Flink SQL Scratchpad Editor](https://cdn.gethue.com/uploads/2020/04/flink_cloudera.png)
+![Flink SQL Scratchpad Editor](https://cdn.gethue.com/uploads/2020/04/flink_cloudera.jpeg)
 
 * Autocomplete Parser module
   * https://docs.gethue.com/developer/api/#npm-package
