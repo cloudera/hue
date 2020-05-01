@@ -23,7 +23,7 @@ import componentUtils from 'ko/components/componentUtils';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { CONFIG_REFRESHED_EVENT, filterConnectors } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'utils/hueConfig';
 import {
   ASSIST_DB_HIGHLIGHT_EVENT,
   ASSIST_DB_PANEL_IS_READY_EVENT,
@@ -836,7 +836,7 @@ class AssistDbPanel {
 
     const updateFromConfig = () => {
       const sources = [];
-      const connectors = filterConnectors(connector => connector.is_sql);
+      const connectors = filterEditorConnectors(connector => connector.is_sql);
       connectors.forEach(connector => {
         const source =
           this.sourceIndex[connector.type] ||

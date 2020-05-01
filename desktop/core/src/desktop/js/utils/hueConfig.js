@@ -52,14 +52,14 @@ export const refreshConfig = async () => {
   return lastConfigPromise;
 };
 
-const validConnectorConfig = config => {
+const validConnectorConfig = (config, type) => {
   if (
     !config ||
     !config.app_config ||
-    !config.app_config.editor ||
-    !config.app_config.editor.interpreters
+    !config.app_config[type] ||
+    !config.app_config[type].interpreters
   ) {
-    console.error('No "interpreters" attribute present in the config.');
+    console.error(`No "interpreters" attribute present in the config for type "${type}".`);
     return false;
   }
   return true;
@@ -67,19 +67,51 @@ const validConnectorConfig = config => {
 
 export const getLastKnownConfig = () => lastKnownConfig;
 
-export const findConnector = connectorTest => {
-  if (validConnectorConfig(lastKnownConfig)) {
-    const connectors = lastKnownConfig.app_config.editor.interpreters;
+const CONNECTOR_TYPES = {
+  editor: 'editor',
+  browser: 'browser'
+};
+
+const findConnector = (connectorTest, type) => {
+  if (validConnectorConfig(lastKnownConfig, type)) {
+    const connectors = lastKnownConfig.app_config[type].interpreters;
     return connectors.find(connectorTest);
   }
 };
 
-export const filterConnectors = connectorTest => {
-  if (validConnectorConfig(lastKnownConfig)) {
-    const connectors = lastKnownConfig.app_config.editor.interpreters;
+const filterConnectors = (connectorTest, type) => {
+  if (validConnectorConfig(lastKnownConfig, type)) {
+    const connectors = lastKnownConfig.app_config[type].interpreters;
     return connectors.filter(connectorTest);
   }
   return [];
+};
+
+export const findBrowserConnector = connectorTest =>
+  findConnector(connectorTest, CONNECTOR_TYPES.browser);
+
+export const findEditorConnector = connectorTest =>
+  findConnector(connectorTest, CONNECTOR_TYPES.editor);
+
+export const filterEditorConnectors = connectorTest =>
+  filterConnectors(connectorTest, CONNECTOR_TYPES.editor);
+
+const rootPathRegex = /.*%3A%2F%2F(.+)$/;
+
+/**
+ * This takes the initial path from the "browser" config, used in cases where the users can't access '/'
+ * for abfs etc.
+ */
+export const getRootFilePath = connector => {
+  if (!connector || connector.type === 'hdfs') {
+    return '';
+  }
+  const match = connector.page.match(rootPathRegex);
+  if (match) {
+    return match[1] + '/';
+  }
+
+  return '';
 };
 
 huePubSub.subscribe(REFRESH_CONFIG_EVENT, refreshConfig);

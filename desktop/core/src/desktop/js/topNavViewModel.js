@@ -20,7 +20,7 @@ import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
 import {
   CONFIG_REFRESHED_EVENT,
-  findConnector,
+  findEditorConnector,
   GET_KNOWN_CONFIG_EVENT,
   REFRESH_CONFIG_EVENT
 } from 'utils/hueConfig';
@@ -45,7 +45,7 @@ class TopNavViewModel {
 
       self.hasJobBrowser(
         window.HAS_JOB_BROWSER &&
-          findConnector(
+          findEditorConnector(
             connector =>
               connector.dialect === 'yarn' ||
               connector.dialect === 'impala' ||

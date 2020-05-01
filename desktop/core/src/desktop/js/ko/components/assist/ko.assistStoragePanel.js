@@ -21,6 +21,7 @@ import AssistStorageEntry from './assistStorageEntry';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { getRootFilePath } from 'utils/hueConfig';
 
 // prettier-ignore
 const TEMPLATE = `
@@ -174,21 +175,6 @@ const TEMPLATE = `
   <!-- /ko -->
 `;
 
-const rootPathRegex = /.*%3A%2F%2F(.+)$/;
-
-/**
- * This takes the initial path from the "browser" config, used in cases where the users can't access '/'
- */
-const getRootPath = source => {
-  if (source) {
-    const match = source.page.match(rootPathRegex);
-    if (match) {
-      return match[1] + '/';
-    }
-  }
-  return '';
-};
-
 class AssistStoragePanel {
   /**
    * @param {Object} options
@@ -209,13 +195,13 @@ class AssistStoragePanel {
     this.activeSource = ko.observable(foundLastSource);
     this.loading = ko.observable();
     this.initialized = false;
-    this.rootPath = getRootPath(this.activeSource());
+    this.rootPath = getRootFilePath(this.activeSource());
 
     this.selectedStorageEntry = ko.observable();
 
     this.activeSource.subscribe(newValue => {
       if (newValue) {
-        this.rootPath = getRootPath(this.activeSource());
+        this.rootPath = getRootFilePath(this.activeSource());
         apiHelper.setInTotalStorage('assist', 'lastStorageSource', newValue.type);
         this.selectedStorageEntry(undefined);
         this.reload();

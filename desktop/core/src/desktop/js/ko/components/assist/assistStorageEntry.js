@@ -19,7 +19,7 @@ import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
-import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import { findBrowserConnector, GET_KNOWN_CONFIG_EVENT, getRootFilePath } from 'utils/hueConfig';
 
 const PAGE_SIZE = 100;
 
@@ -187,6 +187,11 @@ class AssistStorageEntry {
       return;
     }
 
+    if (this.rootPath) {
+      const relativeFolders = folders.join('/').replace(new RegExp('^' + this.rootPath, ''), '');
+      folders = relativeFolders.split('/');
+    }
+
     const nextName = folders.shift();
     let loadedPages = 0;
 
@@ -349,46 +354,38 @@ class AssistStorageEntry {
     type = type.replace(/adl.*/i, 'adls');
     type = type.replace(/abfs.*/i, 'abfs');
 
-    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, config => {
-      if (config && config.app_config && config.app_config.browser) {
-        const source = config.app_config.browser.interpreters.find(
-          interpreter => interpreter.type === type
+    const connector = findBrowserConnector(connector => connector.type === type);
+    if (connector) {
+      const rootPath = getRootFilePath(connector);
+      const rootEntry = new AssistStorageEntry({
+        source: connector,
+        rootPath: rootPath,
+        originalType: typeMatch && typeMatch[1],
+        definition: {
+          name: rootPath,
+          type: 'dir'
+        },
+        parent: null,
+        apiHelper: apiHelper
+      });
+
+      if (type === 'abfs' || type === 'adls') {
+        // ABFS / ADLS can have domain name in path. To prevent regression with s3 which allow periods in bucket name handle separately.
+        const azureMatch = path.match(
+          /^([^:]+):\/(\/((\w+)@)?[\w]+([\-\.]{1}\w+)*\.[\w]*)?(\/.*)?\/?/i
         );
-        if (source) {
-          const rootEntry = new AssistStorageEntry({
-            source: source,
-            originalType: typeMatch && typeMatch[1],
-            definition: {
-              name: '/',
-              type: 'dir'
-            },
-            parent: null,
-            apiHelper: apiHelper
-          });
-
-          if (type === 'abfs' || type === 'adls') {
-            // ABFS / ADLS can have domain name in path. To prevent regression with s3 which allow periods in bucket name handle separately.
-            const azureMatch = path.match(
-              /^([^:]+):\/(\/((\w+)@)?[\w]+([\-\.]{1}\w+)*\.[\w]*)?(\/.*)?\/?/i
-            );
-            path = (azureMatch ? azureMatch[6] || '' : path)
-              .replace(/(?:^\/)|(?:\/$)/g, '')
-              .split('/');
-            if (azureMatch && azureMatch[4]) {
-              path.unshift(azureMatch[4]);
-            }
-          } else {
-            path = (typeMatch ? typeMatch[2] : path).replace(/(?:^\/)|(?:\/$)/g, '').split('/');
-          }
-
-          rootEntry.loadDeep(path, deferred.resolve);
-        } else {
-          deferred.reject();
+        path = (azureMatch ? azureMatch[6] || '' : path).replace(/(?:^\/)|(?:\/$)/g, '').split('/');
+        if (azureMatch && azureMatch[4]) {
+          path.unshift(azureMatch[4]);
         }
       } else {
-        deferred.reject();
+        path = (typeMatch ? typeMatch[2] : path).replace(/(?:^\/)|(?:\/$)/g, '').split('/');
       }
-    });
+
+      rootEntry.loadDeep(path, deferred.resolve);
+    } else {
+      deferred.reject();
+    }
 
     return deferred.promise();
   }

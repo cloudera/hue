@@ -51,7 +51,7 @@ describe('notebook.js', () => {
   it('should serialize a notebook to JSON', async () => {
     const connectors = [{ type: 'hive', dialect: 'hive' }, { type: 'impala', dialect: 'impala' }];
     const spy = jest
-      .spyOn(hueConfig, 'findConnector')
+      .spyOn(hueConfig, 'findEditorConnector')
       .mockImplementation(connectors.find.bind(connectors));
 
     const notebook = new Notebook(viewModel, {});
@@ -74,7 +74,9 @@ describe('notebook.js', () => {
   it('should serialize a notebook context to JSON', async () => {
     const notebook = new Notebook(viewModel, {});
     const connectors = [{ type: 'hive', dialect: 'hive' }, { type: 'impala', dialect: 'impala' }];
-    jest.spyOn(hueConfig, 'findConnector').mockImplementation(connectors.find.bind(connectors));
+    jest
+      .spyOn(hueConfig, 'findEditorConnector')
+      .mockImplementation(connectors.find.bind(connectors));
 
     notebook.addSnippet({ connector: { dialect: 'hive' } });
 

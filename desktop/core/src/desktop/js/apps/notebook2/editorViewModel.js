@@ -28,7 +28,11 @@ import {
   ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
   GET_ACTIVE_SNIPPET_CONNECTOR_EVENT
 } from 'apps/notebook2/events';
-import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT, findConnector } from 'utils/hueConfig';
+import {
+  CONFIG_REFRESHED_EVENT,
+  GET_KNOWN_CONFIG_EVENT,
+  findEditorConnector
+} from 'utils/hueConfig';
 
 class EditorViewModel {
   constructor(editorId, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -312,7 +316,7 @@ class EditorViewModel {
   }
 
   async newNotebook(editorType, callback, queryTab) {
-    const connector = findConnector(connector => connector.type === editorType);
+    const connector = findEditorConnector(connector => connector.type === editorType);
     if (!connector) {
       console.warn('No connector found for type ' + editorType);
     } else {

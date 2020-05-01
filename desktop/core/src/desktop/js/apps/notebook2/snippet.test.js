@@ -51,7 +51,7 @@ describe('snippet.js', () => {
   it('should serialize a snippet context to JSON', async () => {
     const connectors = [{ type: 'hive', dialect: 'hive' }];
     const spy = jest
-      .spyOn(hueConfig, 'findConnector')
+      .spyOn(hueConfig, 'findEditorConnector')
       .mockImplementation(connectors.find.bind(connectors));
 
     const notebook = new Notebook(viewModel, {});

@@ -21,7 +21,7 @@ import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import { PigFunctions, SqlFunctions } from 'sql/sqlFunctions';
 import I18n from 'utils/i18n';
-import { CONFIG_REFRESHED_EVENT, filterConnectors } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'utils/hueConfig';
 
 export const NAME = 'assist-functions-panel';
 // prettier-ignore
@@ -184,7 +184,7 @@ class AssistFunctionsPanel {
 
       const uniqueDialects = {};
 
-      const configuredDialects = filterConnectors(connector => {
+      const configuredDialects = filterEditorConnectors(connector => {
         const isMatch =
           !uniqueDialects[connector.dialect] &&
           (connector.dialect === 'hive' ||
