@@ -674,6 +674,7 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
     user = rewrite_user(user)
     return user
 
+
 class KnoxSpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
   """
   Knox Trusted proxy passes GET parameter doAs
