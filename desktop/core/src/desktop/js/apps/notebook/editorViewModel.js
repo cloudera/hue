@@ -29,7 +29,7 @@ import {
   ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
   GET_ACTIVE_SNIPPET_CONNECTOR_EVENT
 } from 'apps/notebook2/events';
-import { findConnector } from 'utils/hueConfig';
+import { findEditorConnector } from 'utils/hueConfig';
 
 class EditorViewModel {
   constructor(editor_id, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -52,7 +52,7 @@ class EditorViewModel {
 
     const updateConnector = type => {
       if (type) {
-        self.activeConnector(findConnector(connector => connector.type === type));
+        self.activeConnector(findEditorConnector(connector => connector.type === type));
       }
     };
 
@@ -609,7 +609,7 @@ class EditorViewModel {
       const type = editorType || options.editor_type;
 
       if (!self.isNotificationManager()) {
-        self.activeConnector(findConnector(connector => connector.type === type));
+        self.activeConnector(findEditorConnector(connector => connector.type === type));
         huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, self.activeConnector());
       }
 

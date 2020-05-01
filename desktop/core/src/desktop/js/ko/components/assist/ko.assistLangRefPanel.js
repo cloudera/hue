@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { CONFIG_REFRESHED_EVENT, filterConnectors } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'utils/hueConfig';
 import { simpleGet } from 'api/apiUtils';
 import { ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT } from './events';
 
@@ -158,7 +158,7 @@ class AssistLangRefPanel {
     const configUpdated = () => {
       const lastActiveDialect = this.activeDialect();
 
-      const configuredDialects = filterConnectors(
+      const configuredDialects = filterEditorConnectors(
         connector => connector.dialect === 'hive' || connector.dialect === 'impala'
       ).map(connector => connector.dialect);
       configuredDialects.sort();
