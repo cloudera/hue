@@ -229,7 +229,7 @@ class AssistStorageEntry {
         const rootParts = entry.definition.name.split('/').filter(Boolean);
         rootParts.reverse();
         parts = parts.concat(rootParts);
-      } else {
+      } else if (entry.definition.name) {
         parts.push(entry.definition.name);
       }
       entry = entry.parent;
