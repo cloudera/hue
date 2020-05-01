@@ -27,7 +27,7 @@ import DisposableComponent from 'ko/components/DisposableComponent';
 import Executor from 'apps/notebook2/execution/executor';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
-import { CONFIG_REFRESHED_EVENT, filterConnectors } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'utils/hueConfig';
 
 export const NAME = 'quick-query-context';
 
@@ -161,7 +161,7 @@ class QuickQueryContext extends DisposableComponent {
   }
 
   updateFromConfig() {
-    const configuredSqlConnectors = filterConnectors(connector => connector.is_sql);
+    const configuredSqlConnectors = filterEditorConnectors(connector => connector.is_sql);
     this.availableInterpreters(configuredSqlConnectors);
 
     const found =

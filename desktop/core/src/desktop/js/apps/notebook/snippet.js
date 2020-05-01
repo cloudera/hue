@@ -31,7 +31,7 @@ import sqlStatementsParser from 'parse/sqlStatementsParser';
 import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistModal';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
-import { findConnector } from 'utils/hueConfig';
+import { findEditorConnector } from 'utils/hueConfig';
 import {
   ASSIST_GET_DATABASE_EVENT,
   ASSIST_GET_SOURCE_EVENT,
@@ -187,7 +187,7 @@ class Snippet {
 
     const updateConnector = type => {
       if (type) {
-        self.connector(findConnector(connector => connector.type === type));
+        self.connector(findEditorConnector(connector => connector.type === type));
       }
     };
 

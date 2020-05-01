@@ -26,7 +26,7 @@ import {
   ASSIST_IS_DB_PANEL_READY_EVENT,
   ASSIST_SET_DATABASE_EVENT
 } from 'ko/components/assist/events';
-import { findConnector } from 'utils/hueConfig';
+import { findEditorConnector } from 'utils/hueConfig';
 
 class MetastoreSource {
   constructor(options) {
@@ -59,7 +59,7 @@ class MetastoreSource {
       }
     };
 
-    this.connector = ko.observable(findConnector(connector => connector.type === this.type));
+    this.connector = ko.observable(findEditorConnector(connector => connector.type === this.type));
 
     huePubSub.subscribe(ASSIST_DB_PANEL_IS_READY_EVENT, () => {
       this.lastLoadNamespacesDeferred.done(() => {
