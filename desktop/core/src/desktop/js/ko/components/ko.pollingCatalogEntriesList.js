@@ -52,7 +52,7 @@ class PollingCatalogEntriesList {
    *   compute: ko.observable({ id: 'default' }),
    *   path: ko.observable('default.foo'),
    *   refreshSampleInterval: 3000
-   * }}" />
+   * }}"></div>
    *
    * @param params
    * @constructor

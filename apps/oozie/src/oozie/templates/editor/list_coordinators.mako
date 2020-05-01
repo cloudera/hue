@@ -96,7 +96,7 @@ ${ layout.menubar(section='coordinators') }
               >
             </div>
             % if coordinator.can_read(user):
-              <a href="${ url('oozie:edit_coordinator', coordinator=coordinator.id) }" data-row-selector="true"/>
+              <a href="${ url('oozie:edit_coordinator', coordinator=coordinator.id) }" data-row-selector="true"></a>
             % endif
           </td>
           <td>${ coordinator.name }</td>

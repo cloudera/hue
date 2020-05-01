@@ -42,7 +42,7 @@ const TEMPLATE = `
         <h4>${I18n('Heatmap')}</h4>
         <div>
             <select data-bind="options: heatmapMetrics, event: { change: $parent.heatmapMetricChanged.bind($parent) }"></select>
-            <svg class="heatmap"/>
+            <svg class="heatmap"></svg>
         </div>
       </div>
       <div>

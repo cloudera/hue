@@ -31,7 +31,7 @@
           <tr>
             <th>${ _('Name') }</th>
             <th>${ _('Value') }</th>
-            <th/>
+            <th></th>
           </tr>
         </thead>
         <tbody data-bind="foreach: ${ element }">

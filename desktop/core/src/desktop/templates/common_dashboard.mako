@@ -223,11 +223,11 @@
                 <select data-bind="selectize: $root.collection.template.filteredModalFields().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 }), value: fieldName, optionsValue: 'name', optionsText: 'name', optionsCaption: '${ _ko('Field...') }'" class="hit-options input-small" style="margin-bottom: 0"></select>
                 <!-- ko if: fieldName -->
                 <a class="inactive-action context-popover-icon" href="javascript:void(0);" data-bind="sqlContextPopover: { sourceType: 'solr', namespace: $root.collection.activeNamespace(), compute: $root.collection.activeCompute(), path: 'default.' + $root.collection.name() + '.' + fieldName()  }">
-                  <i class="fa fa-fw fa-info" title="${_('Show Details')}"/>
+                  <i class="fa fa-fw fa-info" title="${_('Show Details')}"></i>
                 </a>
                 <!-- /ko -->
                 <!-- ko ifnot: fieldName  -->
-                  <i class="fa fa-fw"/>
+                <i class="fa fa-fw"></i>
                 <!-- /ko -->
 
 

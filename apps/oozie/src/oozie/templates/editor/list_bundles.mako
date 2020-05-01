@@ -93,7 +93,7 @@ ${ layout.menubar(section='bundles') }
               >
             </div>
             % if bundle.can_read(user):
-              <a href="${ url('oozie:edit_bundle', bundle=bundle.id) }" data-row-selector="true"/>
+              <a href="${ url('oozie:edit_bundle', bundle=bundle.id) }" data-row-selector="true"></a>
             % endif
           </td>
           <td>${ bundle.name }</td>

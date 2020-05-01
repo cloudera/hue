@@ -359,7 +359,7 @@ ${ layout.menubar(section='coordinators') }
                 <tr title="${ _('Click to view the dataset') }" rel="tooltip">
                   <td>
                   % if coordinator.is_editable(user):
-                    <a href="javascript:void(0)" class="editDataset" data-url="${ url('oozie:edit_coordinator_dataset', dataset=form.instance.id) }" data-row-selector="true"/>
+                    <a href="javascript:void(0)" class="editDataset" data-url="${ url('oozie:edit_coordinator_dataset', dataset=form.instance.id) }" data-row-selector="true"></a>
                   % endif
                   ${ form.instance.name }
                   </td>
