@@ -31,8 +31,10 @@ import LangRefContext from './langRefContext';
 import PartitionContext, { PARTITION_CONTEXT_TEMPLATE } from './partitionContext';
 import ResizeHelper from './resizeHelper';
 import StorageContext from './storageContext';
+import { ASSIST_KEY_COMPONENT } from 'ko/components/assist/ko.assistKey';
 import componentUtils from 'ko/components/componentUtils';
 import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import { DOCUMENT_CONTEXT_FOOTER } from './ko.documentContextFooter';
 
 export const CONTEXT_POPOVER_CLASS = 'hue-popover';
 export const HIDE_CONTEXT_POPOVER_EVENT = 'context.popover.hide';
@@ -77,14 +79,7 @@ const SUPPORT_TEMPLATES = `
       <!-- ko if: isDocument -->
         <div class="context-popover-bottom-attributes">
         <!-- ko with: contents -->
-          <!-- ko if: data && data.last_modified -->
-          <div><span>${I18n(
-            'Modified'
-          )}</span> <span data-bind="momentFromNow: { data: data.last_modified, titleFormat: 'LLL Z' }"></span></div>
-          <!-- /ko -->
-          <!-- ko if: data && data.owner && data.owner !== window.LOGGED_USERNAME -->
-          <div><span>${I18n('Owner')}</span> <span data-bind="text: data.owner"></span></div>
-          <!-- /ko -->
+          <!-- ko component: { name: '${ DOCUMENT_CONTEXT_FOOTER }', params: { popoverData: $data } } --><!-- /ko -->
         <!-- /ko -->
         </div>
       <!-- /ko -->
@@ -288,15 +283,9 @@ const SUPPORT_TEMPLATES = `
           <!-- ko with: catalogEntry -->
           <!-- ko if: isField() -->
           (<span data-bind="text: getType()"></span>)
-          <i class="fa fa-key" title="${I18n(
-            'Primary key'
-          )}" data-bind="visible: isPrimaryKey()"></i>
-          <i class="fa fa-key" title="${I18n(
-            'Partition key'
-          )}" data-bind="visible: isPartitionKey()"></i>
-          <i class="fa fa-key" title="${I18n(
-            'Foreign key'
-          )}" data-bind="visible: isForeignKey()"></i>
+          <!-- ko if: isKey() -->
+            <!-- ko component: { name: '${ ASSIST_KEY_COMPONENT }', params: { entry: $data, onForeignKeyClick: $parents[1].setEntry.bind($parents[1]) } } --><!-- /ko -->
+          <!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
         </div>

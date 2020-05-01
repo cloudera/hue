@@ -33,7 +33,7 @@ import { UUID } from 'utils/hueUtils';
 import { REDRAW_CHART_EVENT } from 'apps/notebook2/events';
 import { attachTracker } from 'apps/notebook2/components/executableStateHandler';
 
-export const NAME = 'result-chart';
+export const RESULT_CHART_COMPONENT = 'result-chart';
 
 const TYPES = window.HUE_CHARTS.TYPES;
 
@@ -532,7 +532,7 @@ class ResultChart extends DisposableComponent {
     this.chartYSingle = ko.observable(trackedObservables.chartYSingle);
     this.chartType = ko.observable(trackedObservables.chartType);
 
-    attachTracker(this.activeExecutable, NAME, this, trackedObservables);
+    attachTracker(this.activeExecutable, RESULT_CHART_COMPONENT, this, trackedObservables);
 
     this.chartId = ko.pureComputed(() => this.chartType() + '_' + this.id());
     this.isBarChart = ko.pureComputed(() => TYPES.BARCHART === this.chartType());
@@ -780,4 +780,4 @@ class ResultChart extends DisposableComponent {
   }
 }
 
-componentUtils.registerComponent(NAME, ResultChart, TEMPLATE);
+componentUtils.registerComponent(RESULT_CHART_COMPONENT, ResultChart, TEMPLATE);

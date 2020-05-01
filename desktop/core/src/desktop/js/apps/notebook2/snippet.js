@@ -35,14 +35,18 @@ import hueUtils from 'utils/hueUtils';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
-import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
+import {
+  EXECUTABLE_STATUS_TRANSITION_EVENT,
+  EXECUTABLE_UPDATED_EVENT,
+  EXECUTION_STATUS
+} from 'apps/notebook2/execution/executable';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
 import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from 'apps/notebook2/components/ko.executableActions';
 import { UPDATE_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
-import { GET_KNOWN_CONFIG_EVENT, findConnector } from 'utils/hueConfig';
+import { findConnector, getLastKnownConfig } from 'utils/hueConfig';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { getOptimizer } from 'catalog/optimizer/optimizer';
 import {
@@ -195,46 +199,26 @@ export default class Snippet {
 
     this.connector = ko.observable();
 
-    this.dialect = ko.pureComputed(() => this.connector() && this.connector().dialect);
-    this.connectorType = ko.pureComputed(() => this.connector() && this.connector().type);
-
-    this.isSqlDialect = ko.pureComputed(() => this.connector() && this.connector().is_sql);
-    this.defaultLimit = ko.observable(snippetRaw.defaultLimit);
-
     this.connector.subscribe(connector => {
       sessionManager.getSession({ type: connector.type }).then(() => {
         this.status(STATUS.ready);
       });
     });
 
-    this.editorConfig = undefined;
+    this.initializeConnector(snippetRaw);
 
-    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, config => {
-      if (config && config.app_config && config.app_config.editor) {
-        this.editorConfig = config.app_config.editor;
-        if (!this.defaultLimit() && this.editorConfig.default_limit) {
-          this.defaultLimit(this.editorConfig.default_limit);
-        }
-        const connectors = this.editorConfig.interpreters;
+    this.dialect = ko.pureComputed(() => this.connector() && this.connector().dialect);
+    this.connectorType = ko.pureComputed(() => this.connector() && this.connector().type);
 
-        if (snippetRaw.connector && snippetRaw.connector.type) {
-          this.connector(
-            connectors.find(connector => connector.type === snippetRaw.connector.type) ||
-              connectors.find(connector => connector.dialect === snippetRaw.connector.dialect)
-          );
-          if (!this.connector()) {
-            // Could happen if a connector is removed after a doc has been saved.
-            this.connector(snippetRaw.connector);
-          }
-        } else if (snippetRaw.type) {
-          // In the past "type" was used to denote dialect.
-          this.connector(
-            connectors.find(connector => connector.dialect === snippetRaw.type) ||
-              connectors.find(connector => connector.type === snippetRaw.type)
-          );
-        }
+    this.isSqlDialect = ko.pureComputed(() => this.connector() && this.connector().is_sql);
+    this.defaultLimit = ko.observable(snippetRaw.defaultLimit);
+
+    if (!this.defaultLimit()) {
+      const lastKnownConfig = getLastKnownConfig();
+      if (lastKnownConfig && lastKnownConfig.app_config && lastKnownConfig.app_config.editor) {
+        this.defaultLimit(lastKnownConfig.app_config.editor.default_limit);
       }
-    });
+    }
 
     this.isBatchable = ko.pureComputed(() => this.connector() && this.connector().is_batchable);
 
@@ -821,6 +805,116 @@ export default class Snippet {
       }
     });
 
+    this.wasBatchExecuted = ko.observable(!!snippetRaw.wasBatchExecuted);
+    this.isReady = ko.pureComputed(
+      () =>
+        (this.statementType() === 'text' &&
+          ((this.isSqlDialect() && this.statement() !== '') ||
+            ([DIALECT.jar, DIALECT.java, DIALECT.spark2, DIALECT.distcp].indexOf(this.dialect()) ===
+              -1 &&
+              this.statement() !== '') ||
+            ([DIALECT.jar, DIALECT.java].indexOf(this.dialect()) !== -1 &&
+              (this.properties().app_jar() !== '' && this.properties().class() !== '')) ||
+            (DIALECT.spark2 === this.dialect() && this.properties().jars().length > 0) ||
+            (DIALECT.shell === this.dialect() && this.properties().command_path().length > 0) ||
+            (DIALECT.mapreduce === this.dialect() && this.properties().app_jar().length > 0) ||
+            (DIALECT.distcp === this.dialect() &&
+              this.properties().source_path().length > 0 &&
+              this.properties().destination_path().length > 0))) ||
+        (this.statementType() === 'file' && this.statementPath().length > 0) ||
+        (this.statementType() === 'document' &&
+          this.associatedDocumentUuid() &&
+          this.associatedDocumentUuid().length > 0)
+    );
+    this.lastExecuted = ko.observable(snippetRaw.lastExecuted || 0);
+    this.lastAceSelectionRowOffset = ko.observable(snippetRaw.lastAceSelectionRowOffset || 0);
+
+    this.executingBlockingOperation = null; // A ExecuteStatement()
+    this.showLongOperationWarning = ko.observable(false);
+    this.showLongOperationWarning.subscribe(newValue => {
+      if (newValue) {
+        hueAnalytics.convert('editor', 'showLongOperationWarning');
+      }
+    });
+
+    this.longOperationTimeout = -1;
+
+    this.lastCompatibilityRequest = undefined;
+
+    this.isFetchingData = false;
+
+    this.isCanceling = ko.observable(false);
+
+    this.autocompleter = new AceAutocompleteWrapper({
+      snippet: this,
+      user: this.parentVm.user,
+      optEnabled: false,
+      timeout: this.parentVm.autocompleteTimeout
+    });
+
+    this.activeExecutable = ko.observable();
+
+    // TODO: User connector instead of compute, namespace, sourceType, isOptimizerEnabled, isSqlEngine
+    this.executor = new Executor({
+      compute: this.compute,
+      database: this.database,
+      connector: this.connector,
+      namespace: this.namespace,
+      defaultLimit: this.defaultLimit,
+      isOptimizerEnabled: this.parentVm.isOptimizerEnabled(),
+      snippet: this,
+      isSqlEngine: this.isSqlDialect
+    });
+
+    if (snippetRaw.executor) {
+      try {
+        this.executor.executables = snippetRaw.executor.executables.map(executableRaw => {
+          switch (executableRaw.type) {
+            case 'sqlExecutable': {
+              return SqlExecutable.fromJs(this.executor, executableRaw);
+            }
+            default: {
+              throw new Error('Failed to created executable of type ' + executableRaw.type);
+            }
+          }
+        });
+
+        this.executor.executables.forEach(async executable => {
+          if (executable.status !== EXECUTION_STATUS.ready) {
+            await executable.checkStatus();
+          } else {
+            executable.notify();
+          }
+        });
+      } catch (err) {
+        console.error(err); // TODO: Move up
+      }
+    }
+
+    huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
+      if (this.activeExecutable() === executable) {
+        this.updateFromExecutable(executable);
+      }
+    });
+
+    huePubSub.subscribe(EXECUTABLE_STATUS_TRANSITION_EVENT, transitionDetails => {
+      if (this.activeExecutable() === transitionDetails.executable) {
+        if (
+          transitionDetails.newStatus === EXECUTION_STATUS.available ||
+          transitionDetails.newStatus === EXECUTION_STATUS.failed ||
+          transitionDetails.newStatus === EXECUTION_STATUS.success
+        ) {
+          huePubSub.publish(UPDATE_HISTORY_EVENT);
+        }
+      }
+    });
+
+    this.activeExecutable.subscribe(this.updateFromExecutable.bind(this));
+
+    this.refreshHistory = notebook.fetchHistory;
+
+    huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this);
+
     // TODO: Add optimizer check per connector?
     if (window.HAS_OPTIMIZER && !this.parentVm.isNotificationManager()) {
       let lastComplexityRequest;
@@ -942,104 +1036,6 @@ export default class Snippet {
         this.checkComplexity();
       });
     }
-
-    this.wasBatchExecuted = ko.observable(!!snippetRaw.wasBatchExecuted);
-    this.isReady = ko.pureComputed(
-      () =>
-        (this.statementType() === 'text' &&
-          ((this.isSqlDialect() && this.statement() !== '') ||
-            ([DIALECT.jar, DIALECT.java, DIALECT.spark2, DIALECT.distcp].indexOf(this.dialect()) ===
-              -1 &&
-              this.statement() !== '') ||
-            ([DIALECT.jar, DIALECT.java].indexOf(this.dialect()) !== -1 &&
-              (this.properties().app_jar() !== '' && this.properties().class() !== '')) ||
-            (DIALECT.spark2 === this.dialect() && this.properties().jars().length > 0) ||
-            (DIALECT.shell === this.dialect() && this.properties().command_path().length > 0) ||
-            (DIALECT.mapreduce === this.dialect() && this.properties().app_jar().length > 0) ||
-            (DIALECT.distcp === this.dialect() &&
-              this.properties().source_path().length > 0 &&
-              this.properties().destination_path().length > 0))) ||
-        (this.statementType() === 'file' && this.statementPath().length > 0) ||
-        (this.statementType() === 'document' &&
-          this.associatedDocumentUuid() &&
-          this.associatedDocumentUuid().length > 0)
-    );
-    this.lastExecuted = ko.observable(snippetRaw.lastExecuted || 0);
-    this.lastAceSelectionRowOffset = ko.observable(snippetRaw.lastAceSelectionRowOffset || 0);
-
-    this.executingBlockingOperation = null; // A ExecuteStatement()
-    this.showLongOperationWarning = ko.observable(false);
-    this.showLongOperationWarning.subscribe(newValue => {
-      if (newValue) {
-        hueAnalytics.convert('editor', 'showLongOperationWarning');
-      }
-    });
-
-    this.longOperationTimeout = -1;
-
-    this.lastCompatibilityRequest = undefined;
-
-    this.isFetchingData = false;
-
-    this.isCanceling = ko.observable(false);
-
-    this.autocompleter = new AceAutocompleteWrapper({
-      snippet: this,
-      user: this.parentVm.user,
-      optEnabled: false,
-      timeout: this.parentVm.autocompleteTimeout
-    });
-
-    this.activeExecutable = ko.observable();
-
-    // TODO: User connector instead of compute, namespace, sourceType, isOptimizerEnabled, isSqlEngine
-    this.executor = new Executor({
-      compute: this.compute,
-      database: this.database,
-      connector: this.connector,
-      namespace: this.namespace,
-      defaultLimit: this.defaultLimit,
-      isOptimizerEnabled: this.parentVm.isOptimizerEnabled(),
-      snippet: this,
-      isSqlEngine: this.isSqlDialect
-    });
-
-    if (snippetRaw.executor) {
-      try {
-        this.executor.executables = snippetRaw.executor.executables.map(executableRaw => {
-          switch (executableRaw.type) {
-            case 'sqlExecutable': {
-              return SqlExecutable.fromJs(this.executor, executableRaw);
-            }
-            default: {
-              throw new Error('Failed to created executable of type ' + executableRaw.type);
-            }
-          }
-        });
-
-        this.executor.executables.forEach(async executable => {
-          if (executable.status !== EXECUTION_STATUS.ready) {
-            await executable.checkStatus();
-          } else {
-            executable.notify();
-          }
-        });
-      } catch (err) {
-        console.error(err); // TODO: Move up
-      }
-    }
-
-    huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
-      if (this.activeExecutable() === executable) {
-        this.updateFromExecutable(executable);
-      }
-    });
-
-    this.activeExecutable.subscribe(this.updateFromExecutable.bind(this));
-
-    this.refreshHistory = notebook.fetchHistory;
-
-    huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this);
   }
 
   changeDialect(dialect) {
@@ -1054,13 +1050,6 @@ export default class Snippet {
   updateFromExecutable(executable) {
     if (executable) {
       this.lastExecuted(executable.executeStarted);
-      if (
-        executable.status === EXECUTION_STATUS.available ||
-        executable.status === EXECUTION_STATUS.failed ||
-        executable.status === EXECUTION_STATUS.success
-      ) {
-        huePubSub.publish(UPDATE_HISTORY_EVENT);
-      }
       this.status(executable.status);
       if (executable.result) {
         this.currentQueryTab('queryResults');
@@ -1326,6 +1315,26 @@ export default class Snippet {
     }
   }
 
+  initializeConnector(snippetRaw) {
+    const connectorTypeToFind =
+      (snippetRaw.connector && snippetRaw.connector.type) || snippetRaw.type;
+    let foundConnector = findConnector(connector => connector.type === connectorTypeToFind);
+
+    if (!foundConnector) {
+      // If not found by type pick the first by dialect
+      const connectorDialectToFind =
+        (snippetRaw.connector && snippetRaw.connector.dialect) || snippetRaw.type;
+      foundConnector = findConnector(connector => connector.dialect === connectorDialectToFind);
+    }
+
+    if (!foundConnector && snippetRaw.connector) {
+      // This could happen when the connector has been removed completely
+      foundConnector = snippetRaw.connector;
+    }
+
+    this.connector(foundConnector);
+  }
+
   onKeydownInVariable(context, e) {
     if ((e.ctrlKey || e.metaKey) && e.which === 13) {
       // Ctrl-enter
@@ -1457,10 +1466,7 @@ export default class Snippet {
       connector: this.connector(),
       currentQueryTab: this.currentQueryTab(),
       database: this.database(),
-      defaultLimit:
-        !this.editorConfig || this.defaultLimit() !== this.editorConfig.default_limit
-          ? this.defaultLimit()
-          : undefined,
+      defaultLimit: this.defaultLimit(),
       id: this.id(),
       is_redacted: this.is_redacted(),
       lastAceSelectionRowOffset: this.lastAceSelectionRowOffset(),

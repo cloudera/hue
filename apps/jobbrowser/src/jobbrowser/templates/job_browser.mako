@@ -1717,7 +1717,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
         <div class="tab-pane" id="queries-page-stmt${ SUFFIX }" data-profile="plan">
           <!-- ko if: properties.plan && properties.plan().stmt -->
-            <pre data-bind="highlight: { value: properties.plan().stmt.trim(), formatted: true, dialect: 'impala' }"/>
+            <pre data-bind="highlight: { value: properties.plan().stmt.trim(), enableOverflow: true, formatted: true, dialect: 'impala' }"/>
           <!-- /ko -->
           <!-- ko ifnot: properties.plan && properties.plan().stmt -->
             <pre>
@@ -3245,8 +3245,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           .appendTo($downloadForm);
 
         $('#downloadProgressModal').append($downloadForm);
+
+        huePubSub.publish('ignore.next.unload');
         $downloadForm.submit();
-      }
+      };
 
       self.fetchProfile = function (name, callback) {
         vm.apiHelper.cancelActiveRequest(lastFetchProfileRequest);
