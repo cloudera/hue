@@ -823,7 +823,7 @@ ${ commonshare() | n,unicode }
 
   // Initial htmlEscape
   String.prototype.htmlEscape = function() {
-    return $('<div/>').text(this.toString()).html();
+    return $('<div></div>').text(this.toString()).html();
   };
 
   var dataTable = null;

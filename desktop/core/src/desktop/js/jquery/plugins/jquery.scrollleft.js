@@ -58,7 +58,7 @@ Plugin.prototype.setupScrollLeft = function() {
     link = $('#jHueScrollLeftAnchor');
     $(document).off('click', '#jHueScrollLeftAnchor');
   } else {
-    link = $('<a/>')
+    link = $('<a></a>')
       .attr('id', 'jHueScrollLeftAnchor')
       .addClass('hueAnchor hueAnchorScroller')
       .attr('href', 'javascript:void(0)')

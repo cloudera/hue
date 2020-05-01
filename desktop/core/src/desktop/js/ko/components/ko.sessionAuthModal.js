@@ -124,7 +124,7 @@ componentUtils.registerComponent('session-auth-modal', undefined, TEMPLATE).then
     }
 
     $sessionAuthModal = $(
-      '<div id="sessionAuthModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'session-auth-modal\', params: params }" data-keyboard="true" class="modal hide fade" tabindex="-1"/>'
+      '<div id="sessionAuthModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'session-auth-modal\', params: params }" data-keyboard="true" class="modal hide fade" tabindex="-1"></div>'
     );
     $('body').append($sessionAuthModal);
 

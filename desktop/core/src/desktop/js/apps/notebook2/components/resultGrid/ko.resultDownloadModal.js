@@ -159,7 +159,7 @@ componentUtils.registerComponent(NAME, undefined, TEMPLATE).then(() => {
     const $downloadProgressModal = $(
       '<div id="downloadProgressModal" data-bind="component: { name: \'' +
         NAME +
-        '\', params: $data }" data-keyboard="true" class="modal hide fade downloadProgressModal" tabindex="-1"/>'
+        '\', params: $data }" data-keyboard="true" class="modal hide fade downloadProgressModal" tabindex="-1"></div>'
     );
     $('body').append($downloadProgressModal);
 

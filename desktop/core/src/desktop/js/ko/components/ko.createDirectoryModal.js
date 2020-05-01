@@ -66,7 +66,7 @@ componentUtils.registerComponent('create-directory', undefined, TEMPLATE).then((
     };
 
     $createDirectoryModal = $(
-      '<div id="createDirectoryModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'create-directory\', params: params }" data-keyboard="true" class="modal hide fade" tabindex="-1"/>'
+      '<div id="createDirectoryModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'create-directory\', params: params }" data-keyboard="true" class="modal hide fade" tabindex="-1"></div>'
     );
     $('body').append($createDirectoryModal);
 

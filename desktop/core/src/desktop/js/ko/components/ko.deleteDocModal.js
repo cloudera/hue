@@ -94,7 +94,7 @@ componentUtils.registerComponent('delete-entry', undefined, TEMPLATE).then(() =>
     };
 
     $deleteEntriesModal = $(
-      '<div id="deleteEntriesModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'delete-entry\', params: params }" data-keyboard="true" class="modal hide fade" tabindex="-1"/>'
+      '<div id="deleteEntriesModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'delete-entry\', params: params }" data-keyboard="true" class="modal hide fade" tabindex="-1"></div>'
     );
     $('body').append($deleteEntriesModal);
 

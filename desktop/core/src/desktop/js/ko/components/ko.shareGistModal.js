@@ -56,7 +56,7 @@ componentUtils.registerComponent('share-gist-modal', undefined, TEMPLATE).then((
     }
 
     $shareGistModal = $(
-      '<div id="shareGistModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'share-gist-modal\', params: params }" data-keyboard="true" class="modal hide fade" tabindex="-1"/>'
+      '<div id="shareGistModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'share-gist-modal\', params: params }" data-keyboard="true" class="modal hide fade" tabindex="-1"></div>'
     );
     $('body').append($shareGistModal);
 

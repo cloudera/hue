@@ -84,13 +84,13 @@ export const text2Url = selectors => {
  * @return {*|jQuery}
  */
 export const htmlEncode = value => {
-  return $('<div/>')
+  return $('<div></div>')
     .text(value)
     .html();
 };
 
 export const html2text = value => {
-  return $('<div/>')
+  return $('<div></div>')
     .html(value)
     .text()
     .replace(/\u00A0/g, ' ');
@@ -261,7 +261,7 @@ export const waitForVariable = (variable, callback, timeout) => {
 };
 
 export const scrollbarWidth = () => {
-  const $parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo(
+  const $parent = $('<div style="width:50px;height:50px;overflow:auto"><div></div></div>').appendTo(
     'body'
   );
   const $children = $parent.children();

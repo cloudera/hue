@@ -862,7 +862,7 @@ componentUtils
     huePubSub.subscribe(SHOW_CONTEXT_POPOVER_EVENT, details => {
       hidePopover();
       const $contextPopover = $(
-        '<div id="contextPopover" data-bind="component: { name: \'context-popover\', params: $data }" />'
+        '<div id="contextPopover" data-bind="component: { name: \'context-popover\', params: $data }" ></div>'
       );
       $('body').append($contextPopover);
       ko.applyBindings(details, $contextPopover[0]);
