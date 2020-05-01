@@ -1036,8 +1036,12 @@ class Snippet {
     self.onDdlExecute = function() {
       if (self.result.handle() && self.result.handle().has_more_statements) {
         window.clearTimeout(self.executeNextTimeout);
+        const previousHash = self.result.handle().previous_statement_hash;
         self.executeNextTimeout = setTimeout(() => {
-          self.execute(true); // Execute next, need to wait as we disabled fast click
+          // Don't execute if the handle has changed during the timeout
+          if (previousHash === self.result.handle().previous_statement_hash) {
+            self.execute(true); // Execute next, need to wait as we disabled fast click
+          }
         }, 1000);
       }
       if (
