@@ -491,7 +491,7 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
         <tr>
           <th>${ _('Property name') }</th>
           <th>${ _('Value') }</th>
-          <th/>
+          <th></th>
         </tr>
       </thead>
       <tbody data-bind="foreach: value()">
@@ -585,7 +585,7 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
         <tr>
           <th>${ _('Property name') }</th>
           <th>${ _('Value') }</th>
-          <th/>
+          <th></th>
         </tr>
       </thead>
       <tbody data-bind="foreach: value()">
