@@ -136,7 +136,7 @@
             <thead>
               <tr>
                 <th>${ _('Predicate') }</th>
-                <th/>
+                <th></th>
                 <th>${ _('Action') }</th>
               </tr>
             </thead>
@@ -208,13 +208,13 @@
           <tr>
             <th>${ _('Type') }</th>
             <th>${ _('Value') }</th>
-            <th/>
+            <th></th>
           </tr>
         </thead>
         <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
           <tr>
             <td>
-              <span class="span4 required" data-bind="text: type" />
+              <span class="span4 required" data-bind="text: type"></span>
             </td>
             <td>
               <input type="text" class="input-xxlarge required" data-bind="fileChooser: $data, value: value, uniqueName: false" />
