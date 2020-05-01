@@ -61,7 +61,7 @@ Plugin.prototype.setupScrollUp = function() {
     link = $('#jHueScrollUpAnchor');
     $(document).off('click', '#jHueScrollUpAnchor');
   } else {
-    link = $('<a/>')
+    link = $('<a></a>')
       .attr('id', 'jHueScrollUpAnchor')
       .addClass('hueAnchor hueAnchorScroller')
       .attr('href', 'javascript:void(0)')

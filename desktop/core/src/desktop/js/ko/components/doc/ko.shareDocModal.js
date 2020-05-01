@@ -214,7 +214,7 @@ componentUtils.registerComponent('share-doc-modal', ShareDocModal, TEMPLATE).the
     }
 
     $shareDocMocal = $(
-      '<div id="shareDocModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'share-doc-modal\', params: params }" data-keyboard="true" class="modal hide fade" tabindex="-1"/>'
+      '<div id="shareDocModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'share-doc-modal\', params: params }" data-keyboard="true" class="modal hide fade" tabindex="-1"></div>'
     );
     $('body').append($shareDocMocal);
 
