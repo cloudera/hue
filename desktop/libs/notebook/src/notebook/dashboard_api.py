@@ -57,7 +57,6 @@ class SQLDashboardApi(DashboardApi):
     super(SQLDashboardApi, self).__init__(user, cluster)
     self.engine = engine
     self.source = source
-    self.async = engine == 'hive' or engine == 'impala'
     self.backticks = '"' if engine in ['postgresql', 'athena'] else '`'
 
 
@@ -364,7 +363,6 @@ class SQLDashboardApi(DashboardApi):
         database=database,
         status='ready-execute',
         skip_historify=True
-        # async=False
     )
 
     request = MockRequest(self.user, self.cluster)

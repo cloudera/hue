@@ -30,12 +30,13 @@ greenlet==0.4.15
 gunicorn==19.9.0
 jaeger-client==4.3.0
 jdcal==1.0.1
-kazoo==2.0
+kazoo==2.7.0
 kerberos==1.3.0
 lockfile==0.12.2
 lxml==4.5.0
 Mako==1.0.7
 Markdown==3.1
+mysqlclient==1.4.6
 nose==1.3.7
 openpyxl==2.6.2
 pyformance==0.3.2
