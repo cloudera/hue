@@ -37,6 +37,8 @@ _API_VERSION = 'v1'
 SESSIONS = {}
 SESSION_KEY = '%(username)s-%(connector_name)s'
 
+n = 0
+
 
 def query_error_handler(func):
   def decorator(*args, **kwargs):
@@ -53,6 +55,7 @@ def query_error_handler(func):
       message = force_unicode(str(e))
       raise QueryError(message)
   return decorator
+
 
 
 class FlinkSqlApi(Api):
@@ -88,7 +91,7 @@ class FlinkSqlApi(Api):
       self.db.session_heartbeat(session_id=SESSIONS[session_key]['id'])
     except Exception as e:
       if 'Session: %(id)s does not exist' % SESSIONS[session_key] in str(e):
-        LOG.info('Session: %(id)s does not exist, opening a new one' % SESSIONS[session_key])
+        LOG.warn('Session: %(id)s does not exist, opening a new one' % SESSIONS[session_key])
         SESSIONS[session_key] = self.create_session()
       else:
         raise e
@@ -97,6 +100,8 @@ class FlinkSqlApi(Api):
 
   @query_error_handler
   def execute(self, notebook, snippet):
+    global n
+    n = 0
     session = self._get_session()
     session_id = session['id']
     job_id = None
@@ -106,6 +111,7 @@ class FlinkSqlApi(Api):
     if resp['statement_types'][0] == 'SELECT':
       job_id = resp['results'][0]['data'][0][0]
       data, description = [], []
+      # TODO: change_flags
     else:
       data, description = resp['results'][0]['data'], resp['results'][0]['columns']
 
@@ -132,6 +138,7 @@ class FlinkSqlApi(Api):
 
   @query_error_handler
   def check_status(self, notebook, snippet):
+    global n
     session = self._get_session()
     statement_id = snippet['result']['handle']['guid']
 
@@ -141,25 +148,42 @@ class FlinkSqlApi(Api):
       if not statement_id:  # Sync result
         status = 'available'
       else:
-        resp = self.db.fetch_status(session['id'], statement_id)
-        if resp.get('status') == 'RUNNING':
-          status = 'running'
-        elif resp.get('status') == 'FINISHED':
-          status = 'available'
+        try:
+          resp = self.db.fetch_status(session['id'], statement_id)
+          if resp.get('status') == 'RUNNING':
+            status = 'running'
+            # if n >= 5:
+            print(self.fetch_result(notebook, snippet, n, False)['data'])
+          elif resp.get('status') == 'FINISHED':
+            status = 'available'
+          elif resp.get('status') == 'FAILED':
+            status = 'failed'
+          elif resp.get('status') == 'CANCELED':
+            status = 'expired'
+        except Exception as e:
+          if '%s does not exist in current session' % statement_id in str(e):
+            LOG.warn('Job: %s does not exist' % statement_id)
+          else:
+            raise e
 
     return {'status': status}
 
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
+    global n
     session = self._get_session()
     statement_id = snippet['result']['handle']['guid']
-    token = 0
+    token = n #rows
 
     resp = self.db.fetch_results(session['id'], job_id=statement_id, token=token)
 
+    next_result = resp.get('next_result_uri')
+    if next_result:
+      n = int(next_result.rsplit('/', 1)[-1])
+
     return {
-        'has_more': bool(resp.get('next_result_uri')) and False,  # TODO: here we should increment the token
+        'has_more': bool(next_result),
         'data': resp['results'][0]['data'],  # No escaping...
         'meta': [{
             'name': column['name'],
@@ -219,6 +243,21 @@ class FlinkSqlApi(Api):
     resp = self.db.execute_statement(session_id=session_id, statement='SHOW TABLES')
 
     return [table[0] for table in resp['results'][0]['data']]
+
+
+  def cancel(self, notebook, snippet):
+    session = self._get_session()
+    statement_id = snippet['result']['handle']['guid']
+
+    try:
+      self.db.close_statement(session_id=session['id'], job_id=statement_id)
+    except Exception as e:
+      if 'does not exist in current session:' in str(e):
+        return {'status': -1}  # skipped
+      else:
+        raise e
+
+    return {'status': 0}
 
 
   def close_session(self, session):
