@@ -432,7 +432,7 @@ export default class Executable {
     };
 
     return {
-      operationId: undefined,
+      operationId: this.operationId,
       snippet: JSON.stringify(snippet),
       notebook: JSON.stringify(notebook)
     };
