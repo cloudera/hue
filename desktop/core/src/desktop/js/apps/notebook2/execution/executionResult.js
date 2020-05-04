@@ -138,10 +138,6 @@ export default class ExecutionResult {
    * @return {Promise}
    */
   async fetchRows(options) {
-    if (this.executable.status !== EXECUTION_STATUS.available) {
-      return Promise.reject();
-    }
-
     const resultResponse = await apiHelper.fetchResults({
       executable: this.executable,
       rows: (options && options.rows) || 100,
