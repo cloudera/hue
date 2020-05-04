@@ -27,6 +27,7 @@ import sqlUtils from 'sql/sqlUtils';
 import { SqlSetOptions, SqlFunctions } from 'sql/sqlFunctions';
 import { DIALECT } from 'apps/notebook2/snippet';
 import { cancelActiveRequest } from 'api/apiUtils';
+import { findBrowserConnector, getRootFilePath } from 'utils/hueConfig';
 
 const normalizedColors = HueColors.getNormalizedColors();
 
@@ -1330,13 +1331,30 @@ class AutocompleteResults {
 
       if (/^s3a:\/\//i.test(path)) {
         fetchFunction = 'fetchS3Path';
-        path = path.substring(4);
+        path = path.substring(5);
       } else if (/^adl:\/\//i.test(path)) {
         fetchFunction = 'fetchAdlsPath';
-        path = path.substring(4);
+        path = path.substring(5);
       } else if (/^abfs:\/\//i.test(path)) {
         fetchFunction = 'fetchAbfsPath';
-        path = path.substring(5);
+        path = path.substring(6);
+        if (path === '/') {
+          const connector = findBrowserConnector(connector => connector.type === 'abfs');
+          const rootPath = getRootFilePath(connector);
+          if (rootPath) {
+            pathsDeferred.resolve([
+              {
+                value: rootPath,
+                meta: 'abfs',
+                category: CATEGORIES.HDFS,
+                weightAdjust: 0,
+                popular: ko.observable(false),
+                details: null
+              }
+            ]);
+            return pathsDeferred;
+          }
+        }
       } else if (/^hdfs:\/\//i.test(path)) {
         path = path.substring(6);
       }
