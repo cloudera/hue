@@ -57,22 +57,26 @@ LOG = logging.getLogger(__name__)
 def escape_rows(rows, nulls_only=False, encoding=None):
   data = []
 
-  for row in rows:
-    escaped_row = []
-    for field in row:
-      if isinstance(field, numbers.Number):
-        if math.isnan(field) or math.isinf(field):
-          escaped_field = json.dumps(field)
+  try:
+    for row in rows:
+      escaped_row = []
+
+      for field in row:
+        if isinstance(field, numbers.Number):
+          if math.isnan(field) or math.isinf(field):
+            escaped_field = json.dumps(field)
+          else:
+            escaped_field = field
+        elif field is None:
+          escaped_field = 'NULL'
         else:
-          escaped_field = field
-      elif field is None:
-        escaped_field = 'NULL'
-      else:
-        escaped_field = smart_unicode(field, errors='replace', encoding=encoding) # Prevent error when getting back non utf8 like charset=iso-8859-1
-        if not nulls_only:
-          escaped_field = escape(escaped_field).replace(' ', '&nbsp;')
-      escaped_row.append(escaped_field)
-    data.append(escaped_row)
+          escaped_field = smart_unicode(field, errors='replace', encoding=encoding) # Prevent error when getting back non utf8 like charset=iso-8859-1
+          if not nulls_only:
+            escaped_field = escape(escaped_field).replace(' ', '&nbsp;')
+        escaped_row.append(escaped_field)
+      data.append(escaped_row)
+  except RuntimeError:
+    pass  # pep-0479: expected Py3.8 generator raised StopIteration
 
   return data
 
