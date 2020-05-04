@@ -183,7 +183,9 @@ export default class ExecutionResult {
     }
     this.hasMore = resultResponse.has_more;
     this.isEscaped = resultResponse.isEscaped;
-    this.type = resultResponse.type;
+    if (resultResponse.type) {
+      this.type = resultResponse.type;
+    }
     this.fetchedOnce = true;
     this.notify();
   }
