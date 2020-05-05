@@ -206,12 +206,12 @@ class FlinkSqlApi(Api):
       elif table is None:
         response['tables_meta'] = self.show_tables(database)
       elif column is None:
-        columns = self.db.get_columns(table)
+        columns = self.get_columns(database, table)
         response['columns'] = [col['name'] for col in columns]
         response['extended_columns'] = [{
             'comment': col.get('comment'),
             'name': col.get('name'),
-            'type': str(col['schema'].get('type'))
+            'type': col['type']
           }
           for col in columns
         ]
@@ -243,6 +243,24 @@ class FlinkSqlApi(Api):
     resp = self.db.execute_statement(session_id=session_id, statement='SHOW TABLES')
 
     return [table[0] for table in resp['results'][0]['data']]
+
+
+  def get_columns(self, database, table):
+    session = self._get_session()
+    session_id = session['id']
+
+    resp = self.db.execute_statement(session_id=session_id, statement='USE %(database)s' % {'database': database})
+    resp = self.db.execute_statement(session_id=session_id, statement='DESCRIBE %(table)s' % {'table': table})
+
+    columns = json.loads(resp['results'][0]['data'][0][0])['columns']
+
+    return [{
+        'name': col['field_name'],
+        'type': col['field_type'],  # Types to unify
+        'comment': '',
+      }
+      for col in columns
+    ]
 
 
   def cancel(self, notebook, snippet):
