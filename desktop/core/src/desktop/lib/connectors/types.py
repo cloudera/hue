@@ -361,6 +361,7 @@ CONNECTOR_TYPES = [
     'settings': [
       {'name': 'server_host', 'value': ''},
       {'name': 'server_port', 'value': ''},
+      {'name': 'is_llap', 'value': False},  # cf. _get_session_by_id() or create a separate connector
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
