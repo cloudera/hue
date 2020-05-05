@@ -80,7 +80,16 @@ class AssistKey {
       })
       .then(entry => {
         if (this.onForeignKeyClick) {
-          this.onForeignKeyClick(entry);
+          // Ensure definition is loaded
+          if (!entry.definition) {
+            entry.getParent().then(parentEntry => {
+              parentEntry.getChildren().then(() => {
+                this.onForeignKeyClick(entry);
+              });
+            });
+          } else {
+            this.onForeignKeyClick(entry);
+          }
         } else {
           huePubSub.publish(ASSIST_DB_HIGHLIGHT_EVENT, entry);
         }
