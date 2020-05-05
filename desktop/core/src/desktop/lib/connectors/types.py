@@ -38,6 +38,7 @@ CONNECTOR_TYPES = [
     'settings': [
       {'name': 'server_host', 'value': ''},
       {'name': 'server_port', 'value': ''},
+      {'name': 'is_llap', 'value': False},  # cf. _get_session_by_id() or create a separate connector
     ],
     'properties': {
       'is_sql': True,
