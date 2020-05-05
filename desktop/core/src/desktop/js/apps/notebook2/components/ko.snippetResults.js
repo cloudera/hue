@@ -255,7 +255,7 @@ class SnippetResults extends DisposableComponent {
       }
 
       if (refresh) {
-        this.data(executionResult.rows);
+        this.data(executionResult.rows.concat());
       } else if (
         executionResult.lastRows.length &&
         this.data().length !== executionResult.rows.length
