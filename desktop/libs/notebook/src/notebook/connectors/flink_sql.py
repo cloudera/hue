@@ -139,6 +139,7 @@ class FlinkSqlApi(Api):
   @query_error_handler
   def check_status(self, notebook, snippet):
     global n
+    response = {}
     session = self._get_session()
     statement_id = snippet['result']['handle']['guid']
 
@@ -152,8 +153,7 @@ class FlinkSqlApi(Api):
           resp = self.db.fetch_status(session['id'], statement_id)
           if resp.get('status') == 'RUNNING':
             status = 'running'
-            # if n >= 5:
-            print(self.fetch_result(notebook, snippet, n, False)['data'])
+            response.update(self.fetch_result(notebook, snippet, n, False))
           elif resp.get('status') == 'FINISHED':
             status = 'available'
           elif resp.get('status') == 'FAILED':
@@ -166,7 +166,9 @@ class FlinkSqlApi(Api):
           else:
             raise e
 
-    return {'status': status}
+    response['status'] = status
+
+    return response
 
 
   @query_error_handler

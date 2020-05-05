@@ -115,8 +115,8 @@ const TEMPLATE = `
       <div data-bind="visible: executing" style="display: none;">
         <h1 class="empty"><i class="fa fa-spinner fa-spin"></i> ${ I18n('Executing...') }</h1>
       </div>
-      <div id="wsResult">
-      </div>
+      <ul id="wsResult">
+      </ul>
     </div>
   </div>
 </div>
