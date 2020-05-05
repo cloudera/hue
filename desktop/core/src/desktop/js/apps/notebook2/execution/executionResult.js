@@ -70,7 +70,7 @@ huePubSub.subscribe('editor.ws.query.fetch_result', executionResult => {
     result.fetchedOnce = true;
     result.handleResultResponse(executionResult);
     // eslint-disable-next-line no-undef
-    $('#wsResult').append('<div>' + executionResult.data + '</div>');
+    $('#wsResult').append('<li>' + executionResult.data + '</li>');
   }
 });
 
