@@ -544,7 +544,7 @@
           var $this, data, tooltip;
           $this = $(this);
           data = $this.data('fresheditor');
-          tooltip = $('<div/>', {
+          tooltip = $('<div></div>', {
             text: $this.attr('title')
           });
           if (!data) {

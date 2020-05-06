@@ -168,7 +168,7 @@ componentUtils.registerComponent('import-documents-modal', undefined, TEMPLATE).
     huePubSub.publish(HIDE_EVENT);
 
     const $importDocumentsModal = $(
-      '<div id="importDocumentsModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'import-documents-modal\', params: params }" data-keyboard="true" class="modal hide fade fileupload-modal" tabindex="-1"/>'
+      '<div id="importDocumentsModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'import-documents-modal\', params: params }" data-keyboard="true" class="modal hide fade fileupload-modal" tabindex="-1"></div>'
     );
     $('body').append($importDocumentsModal);
 

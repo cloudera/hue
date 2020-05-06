@@ -46,7 +46,7 @@ import {
 } from 'ko/bindings/ace/aceLocationHandler';
 import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from 'apps/notebook2/components/ko.executableActions';
 import { UPDATE_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
-import { findConnector, getLastKnownConfig } from 'utils/hueConfig';
+import { findEditorConnector, getLastKnownConfig } from 'utils/hueConfig';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { getOptimizer } from 'catalog/optimizer/optimizer';
 import {
@@ -1039,7 +1039,7 @@ export default class Snippet {
   }
 
   changeDialect(dialect) {
-    const connector = findConnector(connector => connector.dialect === dialect);
+    const connector = findEditorConnector(connector => connector.dialect === dialect);
     if (!connector) {
       throw new Error('No connector found for dialect ' + dialect);
     }
@@ -1318,13 +1318,15 @@ export default class Snippet {
   initializeConnector(snippetRaw) {
     const connectorTypeToFind =
       (snippetRaw.connector && snippetRaw.connector.type) || snippetRaw.type;
-    let foundConnector = findConnector(connector => connector.type === connectorTypeToFind);
+    let foundConnector = findEditorConnector(connector => connector.type === connectorTypeToFind);
 
     if (!foundConnector) {
       // If not found by type pick the first by dialect
       const connectorDialectToFind =
         (snippetRaw.connector && snippetRaw.connector.dialect) || snippetRaw.type;
-      foundConnector = findConnector(connector => connector.dialect === connectorDialectToFind);
+      foundConnector = findEditorConnector(
+        connector => connector.dialect === connectorDialectToFind
+      );
     }
 
     if (!foundConnector && snippetRaw.connector) {

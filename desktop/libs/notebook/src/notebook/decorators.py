@@ -130,7 +130,7 @@ def api_error_handler(f):
       response['status'] = -4
     except FilesystemException as e:
       response['status'] = 2
-      response['message'] = e.message
+      response['message'] = e.message or 'Query history not found'
     except QueryError as e:
       LOG.exception('Error running %s' % f.__name__)
       response['status'] = 1

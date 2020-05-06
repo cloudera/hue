@@ -113,7 +113,7 @@ ko.bindingHandlers.autocomplete = {
               .data('ui-autocomplete-item', item);
             ko.applyBindings(item, $li[0]);
           } else if (item.divider) {
-            $('<li/>')
+            $('<li></li>')
               .addClass(this.options.classPrefix + 'autocomplete-divider')
               .appendTo(ul);
           } else {
