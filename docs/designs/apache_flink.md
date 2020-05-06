@@ -3,9 +3,9 @@
 
 ## Background
 
-* https://docs.cloudera.com/csa/1.1.0/flink-overview/topics/csa-flink-overview.html
+* https://ci.apache.org/projects/flink/flink-docs-master/dev/table/sql/queries.html#queries
 * https://github.com/ververica/flink-sql-gateway
-* https://twitter.com/rmetzger_/status/1253013022697807879
+* https://github.com/cloudera/hue/issues/1010
 
 ![Hue Flink Editor](https://cdn.gethue.com/uploads/2020/04/editor_flink_sql_select.png)
 
@@ -25,11 +25,15 @@ The big pieces would be to stabilize a query API, improve the SQL autocomplete, 
 * Currently leveraging the [Flink SQL Gateway](https://github.com/ververica/flink-sql-gateway)
   * Early stage
   * From Ververica (Apache 2)
-  * Note: initial tables needs to be defined and loaded via a config file (which I could [not make it work](https://github.com/cloudera/hue/issues/1010#issuecomment-620042416) so far)
   * Could be turned to a SqlAchemy module for more standardization
   * List of [supported statements](https://github.com/ververica/flink-sql-gateway#supported-statements)
-* Security support?
-* Fetching more results
+  * See some of the [open issues](https://github.com/ververica/flink-sql-gateway/issues/created_by/romainr)
+* Security support
+* Fetching results
+  * Use the proper result grid instead of list items
+  * Move counter to query handle
+  * Fetch N
+  * Live queries
 
 ### UI
 
@@ -43,7 +47,7 @@ The big pieces would be to stabilize a query API, improve the SQL autocomplete, 
 * Addition of Task Server and Websockets for smoother support
 * Importer support
 
-Note: some ways to iteratively get some progress could be to start with these static modules which don't necessarily require a running Hue.
+Non Full Editor: some ways to iteratively get some progress could be to start with these static modules which don't necessarily require a running Hue.
 
 ![Flink SQL Scratchpad Editor](https://cdn.gethue.com/uploads/2020/04/flink_cloudera.jpeg)
 
