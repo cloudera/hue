@@ -137,5 +137,5 @@ def s3datetime_to_timestamp(datetime):
     assert datetime[-4:] == ' GMT', 'Time [%s] is not in GMT.' % datetime
   except ValueError:
     stripped = time.strptime(datetime[:-5], '%Y-%m-%dT%H:%M:%S')
-    assert datetime[-5:] == '.000Z', 'Time [%s] is not in GMT.' % datetime
+    assert datetime[-1:] == 'Z' and datetime[-5:-4] == '.', 'Time [%s] is not in GMT.' % datetime
   return int(calendar.timegm(stripped))

@@ -65,11 +65,11 @@ def test_s3datetime_to_timestamp():
   f = s3.s3datetime_to_timestamp
   eq_(1424983327, f('Thu, 26 Feb 2015 20:42:07 GMT'))
   eq_(1424983327, f('2015-02-26T20:42:07.000Z'))
+  eq_(1424983327, f('2015-02-26T20:42:07.040Z'))
 
   assert_raises(ValueError, f, '2/26/2015 20:42:07')
 
   assert_raises(AssertionError, f, 'Thu, 26 Feb 2015 20:42:07 PDT')
-  assert_raises(AssertionError, f, '2015-02-26T20:42:07.040Z')
 
 
 def test_get_default_region():
