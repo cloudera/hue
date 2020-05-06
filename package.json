@@ -82,6 +82,7 @@
     "jest-environment-jsdom-fourteen": "^0.1.0",
     "jsdom": "13.2.0",
     "lesshint": "^6.3.7",
+    "license-checker": "^25.0.1",
     "load-grunt-tasks": "4.0.0",
     "markdown": "0.5.0",
     "prettier": "1.16.1",
@@ -110,7 +111,8 @@
     "test": "jest",
     "test-coverage": "jest --coverage",
     "test-dev": "jest --watch",
-    "test-clearCache": "jest --clearCache"
+    "test-clearCache": "jest --clearCache",
+    "check-license": "node ./tools/license/checkLicenses.js"
   },
   "files": [
     "desktop/core/src/desktop/js/parse",
