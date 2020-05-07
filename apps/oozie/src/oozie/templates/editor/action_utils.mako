@@ -508,7 +508,7 @@
         <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
           <tr>
             <td>
-              <span class="span4 required" data-bind="text: type" />
+              <span class="span4 required" data-bind="text: type"></span>
             </td>
             <td>
               <input type="text" class="input-xxlarge required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: value, uniqueName: false" />
@@ -548,7 +548,7 @@
         <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
           <tr>
             <td>
-              <span class="span4 required" data-bind="text: type" />
+              <span class="span4 required" data-bind="text: type"></span>
             </td>
             <td>
               <input type="text" class="input-xxlarge required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: value, uniqueName: false" />
