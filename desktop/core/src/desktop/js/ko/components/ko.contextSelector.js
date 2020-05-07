@@ -143,7 +143,7 @@ const TYPES = Object.keys(TYPES_INDEX).map(key => {
  *   <!-- ko component: {
  *     name: 'hue-context-selector',
  *     params: {
- *       sourceType: 'impala',
+ *       connector: myConnectorObservable,
  *       compute: myComputeObservable,
  *       namespace: myNamespaceObservable,
  *     }
@@ -175,6 +175,11 @@ const HueContextSelector = function(params) {
 
   self.sourceType = params.sourceType;
   self.connector = params.connector;
+
+  // TODO: Use connector in HueContextSelector
+  if (!self.connector || !ko.unwrap(self.connector)) {
+    self.connector = ko.observable({ type: params.sourceType });
+  }
   self.disposals = [];
   self.hideLabels = params.hideLabels;
 
@@ -212,7 +217,7 @@ const HueContextSelector = function(params) {
   let refreshThrottle = -1;
 
   const refresh = function(sourceType) {
-    if (!sourceType || ko.unwrap(self.sourceType) === sourceType) {
+    if (!sourceType || ko.unwrap(self.connector).type === sourceType) {
       window.clearTimeout(refreshThrottle);
       refreshThrottle = window.setTimeout(() => {
         TYPES.forEach(self.reload.bind(self));
@@ -240,7 +245,7 @@ const HueContextSelector = function(params) {
   if (self.database) {
     huePubSub.subscribe('data.catalog.entry.refreshed', details => {
       if (details.entry.isSource()) {
-        if (ko.unwrap(self.sourceType) === details.entry.getSourceType()) {
+        if (ko.unwrap(self.connector).type === details.entry.getConnector().type) {
           self.reloadDatabases();
         }
       }
@@ -325,7 +330,7 @@ HueContextSelector.prototype.reload = function(type) {
   if (self[type.name]) {
     self[type.loading](true);
     self[type.lastPromise] = contextCatalog[type.contextCatalogFn]({
-      sourceType: ko.unwrap(self.sourceType)
+      sourceType: ko.unwrap(self.connector).type
     })
       .done(available => {
         // Namespaces response differs slightly from the others
@@ -410,9 +415,7 @@ HueContextSelector.prototype.reloadDatabases = function() {
       () => {
         window.clearTimeout(self.reloadDatabaseThrottle);
         self.reloadDatabaseThrottle = window.setTimeout(() => {
-          const connector = (self.connector && ko.unwrap(self.connector)) || {
-            type: ko.unwrap(self.sourceType)
-          };
+          const connector = ko.unwrap(self.connector);
           if (!self[TYPES_INDEX.namespace.name]()) {
             self.availableDatabases([]);
             self.loadingDatabases(false);
@@ -420,7 +423,6 @@ HueContextSelector.prototype.reloadDatabases = function() {
           }
           dataCatalog
             .getEntry({
-              sourceType: connector.type, // TODO: Drop when dataCatalog only needs connector
               namespace: self[TYPES_INDEX.namespace.name](),
               compute: self[TYPES_INDEX.compute.name](),
               connector: connector,
@@ -443,7 +445,7 @@ HueContextSelector.prototype.reloadDatabases = function() {
                 .always(() => {
                   let lastSelectedDb = apiHelper.getFromTotalStorage(
                     'assist_' +
-                      ko.unwrap(self.sourceType) +
+                      ko.unwrap(self.connector).type +
                       '_' +
                       self[TYPES_INDEX.namespace.name]().id,
                     'lastSelectedDb'

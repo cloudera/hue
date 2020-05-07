@@ -191,9 +191,10 @@ Plugin.prototype.init = function() {
       validateTimeout = window.setTimeout(() => {
         $.when(self.namespaceDeferred, self.computeDeferred).done((namespace, compute) => {
           const target = path.pop();
+          // TODO: Use connectors in hiveautocomplete
           dataCatalog
             .getChildren({
-              sourceType: self.options.apiHelperType,
+              connector: { type: self.options.apiHelperType },
               namespace: namespace,
               compute: compute,
               path: path
@@ -325,7 +326,7 @@ Plugin.prototype.init = function() {
     $.when(self.namespaceDeferred, self.computeDeferred).done((namespace, compute) => {
       dataCatalog
         .getChildren({
-          sourceType: self.options.apiHelperType,
+          connector: { type: self.options.apiHelperType }, // TODO: Use connectors in hiveautocomplete
           namespace: namespace,
           compute: compute,
           path: []
@@ -345,10 +346,9 @@ Plugin.prototype.init = function() {
     $.when(self.namespaceDeferred, self.computeDeferred).done((namespace, compute) => {
       dataCatalog
         .getEntry({
-          sourceType: self.options.apiHelperType,
           namespace: namespace,
           compute: compute,
-          connector: {},
+          connector: { type: self.options.apiHelperType },
           path: [database]
         })
         .done(entry => {
@@ -362,10 +362,9 @@ Plugin.prototype.init = function() {
     $.when(self.namespaceDeferred, self.computeDeferred).done((namespace, compute) => {
       dataCatalog
         .getEntry({
-          sourceType: self.options.apiHelperType,
           namespace: namespace,
           compute: compute,
-          connector: {},
+          connector: { type: self.options.apiHelperType },
           path: [database, table]
         })
         .done(entry => {

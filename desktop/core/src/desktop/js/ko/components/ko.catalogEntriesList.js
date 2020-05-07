@@ -137,7 +137,7 @@ const TEMPLATE = `
       <thead>
       <tr>
         <!-- ko template: 'entries-table-shared-headers' --><!-- /ko -->
-        <th data-bind="text: catalogEntry().getSourceType() !== 'solr' ? '${I18n(
+        <th data-bind="text: catalogEntry().getDialect() !== 'solr' ? '${I18n(
           'Table'
         )}' : '${I18n('Collection')}'"></th>
         <th>${I18n(
@@ -165,7 +165,7 @@ const TEMPLATE = `
       <thead>
       <tr>
         <!-- ko template: 'entries-table-shared-headers' --><!-- /ko -->
-        <th><span data-bind="text: catalogEntry().getSourceType() !== 'solr' ? '${I18n(
+        <th><span data-bind="text: catalogEntry().getDialect() !== 'solr' ? '${I18n(
           'Column'
         )}' : '${I18n(
   'Field'
