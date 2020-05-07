@@ -160,12 +160,16 @@ class SparkApi(Api):
       if USE_DEFAULT_CONFIGURATION.get():
         config = DefaultConfiguration.objects.get_configuration_for_user(app='spark', user=self.user)
 
-      if config is not None:
-        properties = config.properties_list
-      else:
-        properties = self.get_properties()
+      # Populate props with default configuration
+      properties = self.get_properties()
+      props = dict([(p['name'], p['value']) for p in properties]) if properties is not None else {}
 
-    props = dict([(p['name'], p['value']) for p in properties]) if properties is not None else {}
+      if config is not None:
+        # Merge props with custom configuration
+        properties = config.properties_list
+        props.update(dict([(p['name'], p['value']) for p in properties])) if properties is not None else {}
+    else:
+      props = dict([(p['name'], p['value']) for p in properties]) if properties is not None else {}
 
     # HUE-4761: Hue's session request is causing Livy to fail with "JsonMappingException: Can not deserialize
     # instance of scala.collection.immutable.List out of VALUE_STRING token" due to List type values
