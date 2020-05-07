@@ -83,7 +83,7 @@ Then from another shell we copy the Flink SQL config to the gateway so that we g
 
     wget https://raw.githubusercontent.com/romainr/flink-sql-gateway/master/docs/demo/sql-gateway-defaults.yaml
 
-    docker sql-gateway-defaults.yaml flink-sql-training_sql-client_1:/opt/flink-sql-gateway-0.1-SNAPSHOT/conf/
+    docker cp sql-gateway-defaults.yaml flink-sql-training_sql-client_1:/opt/flink-sql-gateway-0.1-SNAPSHOT/conf/
 
 Now we can go back to the shell in the container and are ready to start it:
 
@@ -103,7 +103,7 @@ And now we can issue a few commands to validate the setup:
     > {"session_id":"7eea0827c249e5a8fcbe129422f049e8"}
 
 
-Note:
+**Note**
 
 It "should" also be possible to deploy the SQL gateway not in the SQL client container by:
 
