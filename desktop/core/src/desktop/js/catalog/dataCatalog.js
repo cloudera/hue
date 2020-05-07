@@ -123,23 +123,25 @@ const mergeMultiTableEntry = function(multiTableCatalogEntry, storeEntry) {
 
 export class DataCatalog {
   /**
-   * @param {string} sourceType
    * @param {Connector} connector
    *
    * @constructor
    */
-  constructor(sourceType, connector) {
+  constructor(connector) {
     const self = this;
-    self.sourceType = sourceType;
+    if (!connector || !connector.type) {
+      throw new Error('DataCatalog created without connector or type');
+    }
     self.connector = connector;
+
     self.entries = {};
     self.temporaryEntries = {};
     self.multiTableEntries = {};
     self.store = localforage.createInstance({
-      name: 'HueDataCatalog_' + self.sourceType + '_' + STORAGE_POSTFIX
+      name: 'HueDataCatalog_' + self.connector.type + '_' + STORAGE_POSTFIX
     });
     self.multiTableStore = localforage.createInstance({
-      name: 'HueDataCatalog_' + self.sourceType + '_multiTable_' + STORAGE_POSTFIX
+      name: 'HueDataCatalog_' + self.connector.type + '_multiTable_' + STORAGE_POSTFIX
     });
   }
 
@@ -817,18 +819,17 @@ const sourceBoundCatalogs = {};
 /**
  * Helper function to get the DataCatalog instance for a given data source.
  *
- * @param {string} sourceType
  * @param {Connector} connector
  *
  * @return {DataCatalog}
  */
-const getCatalog = function(sourceType, connector) {
-  if (!sourceType) {
-    throw new Error('getCatalog called without sourceType');
+const getCatalog = function(connector) {
+  if (!connector || !connector.type) {
+    throw new Error('getCatalog called without connector with type');
   }
   return (
-    sourceBoundCatalogs[sourceType] ||
-    (sourceBoundCatalogs[sourceType] = new DataCatalog(sourceType, connector))
+    sourceBoundCatalogs[connector.type] ||
+    (sourceBoundCatalogs[connector.type] = new DataCatalog(connector))
   );
 };
 
@@ -840,7 +841,6 @@ export default {
    * Calling this returns a handle that allows deletion of any created entries by calling delete() on the handle.
    *
    * @param {Object} options
-   * @param {string} options.sourceType
    * @param {ContextNamespace} options.namespace - The context namespace
    * @param {ContextCompute} options.compute - The context compute
    * @param {Connector} options.connector
@@ -854,12 +854,11 @@ export default {
    * @return {Object}
    */
   addTemporaryTable: function(options) {
-    return getCatalog(options.sourceType, options.connector).addTemporaryTable(options);
+    return getCatalog(options.connector).addTemporaryTable(options);
   },
 
   /**
    * @param {Object} options
-   * @param {string} options.sourceType
    * @param {ContextNamespace} options.namespace - The context namespace
    * @param {ContextCompute} options.compute - The context compute
    * @param {Connector} options.connector
@@ -870,12 +869,11 @@ export default {
    * @return {Promise}
    */
   getEntry: function(options) {
-    return getCatalog(options.sourceType, options.connector).getEntry(options);
+    return getCatalog(options.connector).getEntry(options);
   },
 
   /**
    * @param {Object} options
-   * @param {string} options.sourceType
    * @param {ContextNamespace} options.namespace - The context namespace
    * @param {ContextCompute} options.compute - The context compute
    * @param {Connector} options.connector
@@ -884,7 +882,7 @@ export default {
    * @return {Promise}
    */
   getMultiTableEntry: function(options) {
-    return getCatalog(options.sourceType, options.connector).getMultiTableEntry(options);
+    return getCatalog(options.connector).getMultiTableEntry(options);
   },
 
   /**
@@ -892,7 +890,6 @@ export default {
    * getEntry then getChildren.
    *
    * @param {Object} options
-   * @param {string} options.sourceType
    * @param {ContextNamespace} options.namespace - The context namespace
    * @param {ContextCompute} options.compute - The context compute
    * @param {Connector} options.connector
@@ -908,7 +905,7 @@ export default {
   getChildren: function(options) {
     const deferred = $.Deferred();
     const cancellablePromises = [];
-    getCatalog(options.sourceType, options.connector)
+    getCatalog(options.connector)
       .getEntry(options)
       .done(entry => {
         cancellablePromises.push(
@@ -923,7 +920,6 @@ export default {
   },
 
   /**
-   * @param {string} sourceType
    * @param {Connector} connector
    *
    * @return {DataCatalog}

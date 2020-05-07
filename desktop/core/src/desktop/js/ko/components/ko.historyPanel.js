@@ -273,7 +273,6 @@ class HistoryPanel {
                 if (notebook.onSuccessUrl() === 'assist.db.refresh') {
                   dataCatalog
                     .getEntry({
-                      sourceType: snippet.type(),
                       namespace: snippet.namespace(),
                       compute: snippet.compute(),
                       connector: snippet.connector(),
