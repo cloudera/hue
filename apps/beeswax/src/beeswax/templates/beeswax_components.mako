@@ -157,9 +157,9 @@ ${field.label_tag() | n}
             ${unicode(field) | n}
         % else:
             % if tag == 'textarea':
-                <textarea name="${field.html_name | n}" ${make_attr_str(attrs) | n} class="${cls}" />${extract_field_data(field) or ''}</textarea>
+                <textarea name="${field.html_name | n}" ${make_attr_str(attrs) | n} class="${cls}">${extract_field_data(field) or ''}</textarea>
             % elif tag == 'button':
-                <button name="${field.html_name | n}" ${make_attr_str(attrs) | n} value="${value}"/>${button_text or field.name or ''}</button>
+                <button name="${field.html_name | n}" ${make_attr_str(attrs) | n} value="${value}">${button_text or field.name or ''}</button>
             % elif tag == 'checkbox':
                 % if help:
                     <input type="checkbox" name="${field.html_name | n}" ${make_attr_str(attrs) | n} ${value and "CHECKED" or ""}/ /> <span rel="tooltip" data-original-title="${help}" >${button_text or field.name or ''}</span>
