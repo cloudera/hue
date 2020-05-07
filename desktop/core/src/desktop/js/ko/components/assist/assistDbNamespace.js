@@ -216,7 +216,6 @@ class AssistDbNamespace {
 
       dataCatalog
         .getEntry({
-          sourceType: self.sourceType,
           namespace: self.namespace,
           compute: self.compute(),
           connector: self.connector,
@@ -277,7 +276,7 @@ class AssistDbNamespace {
       huePubSub.subscribe('data.catalog.entry.refreshed', details => {
         if (
           self.namespace.id !== details.entry.namespace.id ||
-          details.entry.getSourceType() !== self.sourceType
+          details.entry.getConnector().type !== self.sourceType
         ) {
           return;
         }

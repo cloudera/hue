@@ -170,6 +170,24 @@ class MultiTableEntry {
   }
 
   /**
+   * Returns the dialect of this entry.
+   *
+   * @return {string} - 'impala', 'hive', 'solr', etc.
+   */
+  getDialect() {
+    return this.getConnector().dialect || this.getConnector().type; // .type for editor v1
+  }
+
+  /**
+   * Returns the connector for this entry
+   *
+   * @return {Connector}
+   */
+  getConnector() {
+    return this.dataCatalog.connector;
+  }
+
+  /**
    * Gets the top aggregate UDFs for the entry. It will fetch it if not cached or if the refresh option is set.
    *
    * @param {Object} [options]

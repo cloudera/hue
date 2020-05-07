@@ -62,7 +62,7 @@ class MetastoreNamespace {
       });
 
     // TODO: Use connectors in the table browser
-    const connector = {};
+    const connector = { type: this.sourceType };
     if (this.sourceType === 'hive' || this.sourceType === 'impala') {
       connector.optimizer = 'api';
     }
@@ -71,7 +71,6 @@ class MetastoreNamespace {
         namespace: this.namespace,
         compute: this.compute,
         connector: connector,
-        sourceType: this.sourceType,
         path: [],
         definition: { type: 'source' }
       })

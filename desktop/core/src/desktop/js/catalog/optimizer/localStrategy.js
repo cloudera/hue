@@ -65,7 +65,6 @@ export default class LocalStrategy extends BaseStrategy {
 
     dataCatalog
       .getEntry({
-        sourceType: this.connector.type,
         connector: this.connector,
         path: path,
         namespace: { id: 'default' }

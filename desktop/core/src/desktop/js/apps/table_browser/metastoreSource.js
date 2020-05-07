@@ -159,7 +159,7 @@ class MetastoreSource {
     huePubSub.subscribe('data.catalog.entry.refreshed', details => {
       const refreshedEntry = details.entry;
 
-      if (refreshedEntry.getSourceType() !== this.type) {
+      if (refreshedEntry.getConnector().type !== this.type) {
         return;
       }
 

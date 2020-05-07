@@ -902,6 +902,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <!-- ko component: {
       name: 'hue-context-selector',
       params: {
+        connector: connector,
         sourceType: type,
         compute: compute,
         namespace: namespace,

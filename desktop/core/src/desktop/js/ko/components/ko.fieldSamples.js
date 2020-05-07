@@ -109,8 +109,8 @@ class FieldSamples {
 
     self.showOperations =
       !self.catalogEntry().isTemporary &&
-      (self.catalogEntry().getSourceType() === 'impala' ||
-        self.catalogEntry().getSourceType() === 'hive');
+      (self.catalogEntry().getDialect() === 'impala' ||
+        self.catalogEntry().getDialect() === 'hive');
 
     self.sampleClick = function(html) {
       self.onSampleClick(hueUtils.html2text(html));

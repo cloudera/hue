@@ -412,7 +412,6 @@ class AssistEditorContextPanel {
               } else {
                 dataCatalog
                   .getEntry({
-                    sourceType: activeLocations.type,
                     namespace: activeLocations.namespace,
                     compute: activeLocations.compute,
                     connector: this.connector(),
@@ -493,7 +492,6 @@ class AssistEditorContextPanel {
                               });
                               dataCatalog
                                 .getEntry({
-                                  sourceType: activeLocations.type,
                                   namespace: activeLocations.namespace,
                                   compute: activeLocations.compute,
                                   connector: self.connector,
@@ -586,7 +584,7 @@ class AssistEditorContextPanel {
     };
 
     huePubSub.subscribe('data.catalog.entry.refreshed', details => {
-      const sourceType = details.entry.getSourceType();
+      const sourceType = details.entry.getConnector().type;
       if (sources[sourceType]) {
         let completeRefresh = false;
         if (details.entry.isSource()) {

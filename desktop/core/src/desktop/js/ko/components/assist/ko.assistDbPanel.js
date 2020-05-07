@@ -608,7 +608,7 @@ class AssistDbPanel {
 
     huePubSub.subscribe(ASSIST_DB_HIGHLIGHT_EVENT, catalogEntry => {
       huePubSub.publish(SHOW_LEFT_ASSIST_EVENT);
-      if (catalogEntry.getSourceType() === 'solr') {
+      if (catalogEntry.getDialect() === 'solr') {
         huePubSub.publish(ASSIST_SHOW_SOLR_EVENT);
       } else {
         huePubSub.publish(ASSIST_SHOW_SQL_EVENT);
@@ -617,7 +617,7 @@ class AssistDbPanel {
       window.setTimeout(() => {
         let foundSource;
         this.sources().some(source => {
-          if (source.sourceType === catalogEntry.getSourceType()) {
+          if (source.sourceType === catalogEntry.getConnector().type) {
             foundSource = source;
             return true;
           }
@@ -639,10 +639,9 @@ class AssistDbPanel {
             const assistDbNamespace = solrSource.selectedNamespace();
             dataCatalog
               .getEntry({
-                sourceType: 'solr',
                 namespace: assistDbNamespace.namespace,
                 compute: assistDbNamespace.compute(),
-                connector: {},
+                connector: { type: 'solr' },
                 path: []
               })
               .done(entry => {

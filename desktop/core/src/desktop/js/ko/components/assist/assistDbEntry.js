@@ -21,12 +21,11 @@ import huePubSub from 'utils/huePubSub';
 import sqlUtils from 'sql/sqlUtils';
 
 const findNameInHierarchy = (entry, searchCondition) => {
-  const sourceType = entry.sourceType;
   while (entry && !searchCondition(entry)) {
     entry = entry.parent;
   }
   if (entry) {
-    return sqlUtils.backTickIfNeeded(sourceType, entry.catalogEntry.name);
+    return sqlUtils.backTickIfNeeded(entry.catalogEntry.getDialect(), entry.catalogEntry.name);
   }
 };
 
@@ -479,7 +478,7 @@ class AssistDbEntry {
         '/metastore/tables/' +
         self.catalogEntry.name +
         '?source=' +
-        self.catalogEntry.getSourceType() +
+        self.catalogEntry.getConnector().type +
         '&namespace=' +
         self.catalogEntry.namespace.id;
     } else if (self.catalogEntry.isTableOrView()) {
@@ -489,7 +488,7 @@ class AssistDbEntry {
         '/' +
         self.catalogEntry.name +
         '?source=' +
-        self.catalogEntry.getSourceType() +
+        self.catalogEntry.getConnector().type +
         '&namespace=' +
         self.catalogEntry.namespace.id;
     } else {

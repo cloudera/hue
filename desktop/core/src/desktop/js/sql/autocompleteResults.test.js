@@ -235,7 +235,9 @@ describe('AutocompleteResults.js', () => {
       type: function() {
         return 'hive';
       },
-      connector: function() {},
+      connector: function() {
+        return { type: 'hive' };
+      },
       database: function() {
         return 'default';
       },

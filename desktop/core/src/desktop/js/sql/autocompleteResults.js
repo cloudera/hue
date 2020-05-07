@@ -549,7 +549,6 @@ class AutocompleteResults {
     const databasesDeferred = $.Deferred();
     dataCatalog
       .getEntry({
-        sourceType: self.dialect(),
         namespace: self.snippet.namespace(),
         compute: self.snippet.compute(),
         connector: self.snippet.connector(),
@@ -811,7 +810,6 @@ class AutocompleteResults {
 
         dataCatalog
           .getEntry({
-            sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
             connector: self.snippet.connector(),
@@ -1430,7 +1428,6 @@ class AutocompleteResults {
       if (paths.length) {
         dataCatalog
           .getMultiTableEntry({
-            sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
             connector: self.snippet.connector(),
@@ -1555,7 +1552,6 @@ class AutocompleteResults {
       if (paths.length) {
         dataCatalog
           .getMultiTableEntry({
-            sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
             connector: self.snippet.connector(),
@@ -1645,7 +1641,6 @@ class AutocompleteResults {
       if (paths.length) {
         dataCatalog
           .getMultiTableEntry({
-            sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
             connector: self.snippet.connector(),
@@ -1875,7 +1870,6 @@ class AutocompleteResults {
       if (paths.length) {
         dataCatalog
           .getMultiTableEntry({
-            sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
             connector: self.snippet.connector(),
@@ -1967,7 +1961,6 @@ class AutocompleteResults {
 
       dataCatalog
         .getEntry({
-          sourceType: self.dialect(),
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
           connector: self.snippet.connector(),
@@ -2280,7 +2273,6 @@ class AutocompleteResults {
 
       dataCatalog
         .getEntry({
-          sourceType: self.dialect(),
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
           connector: self.snippet.connector(),
@@ -2327,7 +2319,6 @@ class AutocompleteResults {
     if (path.length > 1 && (self.dialect() === DIALECT.impala || self.dialect() === DIALECT.hive)) {
       dataCatalog
         .getEntry({
-          sourceType: self.dialect(),
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
           connector: self.snippet.connector(),

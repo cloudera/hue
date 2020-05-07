@@ -322,7 +322,7 @@ const SUPPORT_TEMPLATES = `
           <!-- /ko -->
 
           <!-- ko ifnot: $parent.commentExpanded -->
-              <!-- ko if: window.HAS_CATALOG && !isTemporary && (getSourceType() === 'hive' || getSourceType() === 'impala') -->
+              <!-- ko if: window.HAS_CATALOG && !isTemporary && (getDialect() === 'hive' || getDialect() === 'impala') -->
               <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, overflowEllipsis: true } }"></div>
               <!-- /ko -->
 
@@ -333,7 +333,7 @@ const SUPPORT_TEMPLATES = `
             <!-- /ko -->
 
             <!-- ko if: $parent.viewSqlVisible -->
-            <div class="context-popover-sql" data-bind="highlight: { value: $parent.viewSql, enableOverflow: true, formatted: true, dialect: getSourceType() }"></div>
+            <div class="context-popover-sql" data-bind="highlight: { value: $parent.viewSql, enableOverflow: true, formatted: true, dialect: getDialect() }"></div>
             <!-- /ko -->
             <!-- ko ifnot: $parent.viewSqlVisible -->
             <!-- ko component: { name: 'catalog-entries-list', params: { catalogEntry: $data, onClick: $parent.catalogEntry, onSampleClick: $parent.onSampleClick } } --><!-- /ko -->
@@ -357,7 +357,7 @@ const SUPPORT_TEMPLATES = `
               )}" class="fa fa-external-link"></i> ${I18n('Dashboard')}
             </a>
           <!-- /ko -->
-          <!-- ko if: catalogEntry().getSourceType() !== 'solr' && openActionsEnabled() -->
+          <!-- ko if: catalogEntry().getDialect() !== 'solr' && openActionsEnabled() -->
           <a class="inactive-action pointer" data-bind="click: openInTableBrowser">
             <i style="font-size: 11px;" title="${I18n(
               'Open in Table Browser...'
@@ -678,7 +678,7 @@ class ContextPopoverViewModel {
 
     if (
       self.isCatalogEntry &&
-      params.data.catalogEntry.getSourceType() === 'solr' &&
+      params.data.catalogEntry.getDialect() === 'solr' &&
       params.data.catalogEntry.isField()
     ) {
       self.isCollection = true;
@@ -930,7 +930,6 @@ class SqlContextContentsGlobalSearch {
         }
         dataCatalog
           .getEntry({
-            sourceType: sourceType,
             namespace: context.namespaces[0],
             compute: context.namespaces[0].computes[0],
             connector: connector,

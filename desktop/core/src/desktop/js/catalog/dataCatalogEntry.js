@@ -218,14 +218,19 @@ class DataCatalogEntry {
   constructor(options) {
     const self = this;
 
+    if (!options.dataCatalog.connector) {
+      throw new Error('DataCatalogEntry created without connector');
+    }
+
     self.namespace = options.namespace;
     self.compute = options.compute;
     self.dataCatalog = options.dataCatalog;
+
     self.path =
       typeof options.path === 'string' && options.path
         ? options.path.split('.')
         : options.path || [];
-    self.name = self.path.length ? self.path[self.path.length - 1] : options.dataCatalog.sourceType;
+    self.name = self.path.length ? self.path[self.path.length - 1] : self.getConnector().type;
     self.isTemporary = options.isTemporary;
 
     self.definition = options.definition;
@@ -486,10 +491,8 @@ class DataCatalogEntry {
             }
           });
         }
-        if (
-          (self.getSourceType() === 'impala' || self.getSourceType() === 'hive') &&
-          self.isComplex()
-        ) {
+        // TODO: Move to connector attributes
+        if ((self.getDialect() === 'impala' || self.getDialect() === 'hive') && self.isComplex()) {
           (sourceMeta.type === 'map' ? ['key', 'value'] : ['item']).forEach(path => {
             if (sourceMeta[path]) {
               promises.push(
@@ -807,9 +810,10 @@ class DataCatalogEntry {
    */
   canHaveNavigatorMetadata() {
     const self = this;
+    // TODO: Move to connector attributes
     return (
       window.HAS_CATALOG &&
-      (self.getSourceType() === 'hive' || self.getSourceType() === 'impala') &&
+      (self.getDialect() === 'hive' || self.getDialect() === 'impala') &&
       (self.isDatabase() || self.isTableOrView() || self.isColumn())
     );
   }
@@ -821,10 +825,8 @@ class DataCatalogEntry {
    */
   getResolvedComment() {
     const self = this;
-    if (
-      self.navigatorMeta &&
-      (self.getSourceType() === 'hive' || self.getSourceType() === 'impala')
-    ) {
+    // TODO: Move to connector attributes
+    if (self.navigatorMeta && (self.getDialect() === 'hive' || self.getDialect() === 'impala')) {
       return self.navigatorMeta.description || self.navigatorMeta.originalDescription || '';
     }
     return (self.sourceMeta && self.sourceMeta.comment) || '';
@@ -1043,7 +1045,7 @@ class DataCatalogEntry {
     } else {
       apiHelper
         .updateSourceMetadata({
-          sourceType: self.getSourceType(),
+          sourceType: self.getConnector().type,
           path: self.path,
           properties: {
             comment: comment
@@ -1171,13 +1173,21 @@ class DataCatalogEntry {
   }
 
   /**
-   * Returns the source type of this entry.
+   * Returns the dialect of this entry.
    *
    * @return {string} - 'impala', 'hive', 'solr', etc.
    */
-  getSourceType() {
-    const self = this;
-    return self.dataCatalog.sourceType;
+  getDialect() {
+    return this.getConnector().dialect || this.getConnector().type; // .type for editor v1
+  }
+
+  /**
+   * Returns the connector for this entry
+   *
+   * @return {Connector}
+   */
+  getConnector() {
+    return this.dataCatalog.connector;
   }
 
   /**
@@ -1654,7 +1664,7 @@ class DataCatalogEntry {
     if (options && options.operation && options.operation !== 'default') {
       return catalogUtils.applyCancellable(
         apiHelper.fetchSample({
-          sourceType: self.dataCatalog.sourceType,
+          sourceType: self.getConnector().type,
           compute: self.compute,
           path: self.path,
           silenceErrors: options && options.silenceErrors,

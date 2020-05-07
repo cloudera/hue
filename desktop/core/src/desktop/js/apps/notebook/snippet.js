@@ -1075,7 +1075,6 @@ class Snippet {
             ignoreNextAssistDatabaseUpdate = true;
             dataCatalog
               .getEntry({
-                sourceType: self.type(),
                 namespace: self.namespace(),
                 compute: self.compute(),
                 connector: self.connector(),

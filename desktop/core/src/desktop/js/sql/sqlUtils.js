@@ -731,9 +731,10 @@ const resolveCatalogEntry = options => {
     }
 
     cancellablePromises.push(
+      // TODO: Use connectors in sqlUtils
       dataCatalog
         .getChildren({
-          sourceType: options.sourceType,
+          connector: { type: options.sourceType },
           namespace: options.namespace,
           compute: options.compute,
           path: identifierChainToPath(nextTable.identifierChain),
@@ -768,9 +769,9 @@ const resolveCatalogEntry = options => {
   } else {
     dataCatalog
       .getEntry({
-        sourceType: options.sourceType,
         namespace: options.namespace,
         compute: options.compute,
+        connector: { type: options.sourceType }, // TODO: Use connector in sqlUtils
         path: [],
         cachedOnly: options && options.cachedOnly,
         cancellable: options && options.cancellable,

@@ -394,7 +394,7 @@ class MetastoreTable {
       '/metastore/table/' +
         this.catalogEntry.path.join('/') +
         '/load?source_type=' +
-        this.catalogEntry.getSourceType()
+        this.catalogEntry.getConnector().type
     )
       .done(data => {
         $('#import-data-modal').html(data['data']);
