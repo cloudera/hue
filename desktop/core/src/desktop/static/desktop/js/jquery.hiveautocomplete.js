@@ -53,7 +53,7 @@
     if (self.options.namespace) {
       self.namespaceDeferred.resolve(self.options.namespace);
     } else {
-      contextCatalog.getNamespaces({ sourceType: options.apiHelperType }).done(function (context) {
+      contextCatalog.getNamespaces({ connector: { type: options.apiHelperType } }).done(function (context) {
         if (context.namespaces && context.namespaces.length) {
           self.namespaceDeferred.resolve(context.namespaces[0]);
         } else {

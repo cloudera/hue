@@ -669,10 +669,9 @@
     <!-- ko component: {
       name: 'hue-context-selector',
       params: {
-        sourceType: dialect,
+        connector: connector,
         compute: compute,
         namespace: namespace,
-        connector: connector,
         availableDatabases: availableDatabases,
         database: database,
         hideDatabases: !isSqlDialect()
