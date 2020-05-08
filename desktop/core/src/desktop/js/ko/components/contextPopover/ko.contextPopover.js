@@ -33,7 +33,8 @@ import ResizeHelper from './resizeHelper';
 import StorageContext from './storageContext';
 import { ASSIST_KEY_COMPONENT } from 'ko/components/assist/ko.assistKey';
 import componentUtils from 'ko/components/componentUtils';
-import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import { findEditorConnector, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import { DOCUMENT_CONTEXT_FOOTER } from './ko.documentContextFooter';
 
 export const CONTEXT_POPOVER_CLASS = 'hue-popover';
 export const HIDE_CONTEXT_POPOVER_EVENT = 'context.popover.hide';
@@ -78,14 +79,7 @@ const SUPPORT_TEMPLATES = `
       <!-- ko if: isDocument -->
         <div class="context-popover-bottom-attributes">
         <!-- ko with: contents -->
-          <!-- ko if: data && data.last_modified -->
-          <div><span>${I18n(
-            'Modified'
-          )}</span> <span data-bind="momentFromNow: { data: data.last_modified, titleFormat: 'LLL Z' }"></span></div>
-          <!-- /ko -->
-          <!-- ko if: data && data.owner && data.owner !== window.LOGGED_USERNAME -->
-          <div><span>${I18n('Owner')}</span> <span data-bind="text: data.owner"></span></div>
-          <!-- /ko -->
+          <!-- ko component: { name: '${ DOCUMENT_CONTEXT_FOOTER }', params: { popoverData: $data } } --><!-- /ko -->
         <!-- /ko -->
         </div>
       <!-- /ko -->
@@ -328,7 +322,7 @@ const SUPPORT_TEMPLATES = `
           <!-- /ko -->
 
           <!-- ko ifnot: $parent.commentExpanded -->
-              <!-- ko if: window.HAS_CATALOG && !isTemporary && (getSourceType() === 'hive' || getSourceType() === 'impala') -->
+              <!-- ko if: window.HAS_CATALOG && !isTemporary && (getDialect() === 'hive' || getDialect() === 'impala') -->
               <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, overflowEllipsis: true } }"></div>
               <!-- /ko -->
 
@@ -339,7 +333,7 @@ const SUPPORT_TEMPLATES = `
             <!-- /ko -->
 
             <!-- ko if: $parent.viewSqlVisible -->
-            <div class="context-popover-sql" data-bind="highlight: { value: $parent.viewSql, enableOverflow: true, formatted: true, dialect: getSourceType() }"></div>
+            <div class="context-popover-sql" data-bind="highlight: { value: $parent.viewSql, enableOverflow: true, formatted: true, dialect: getDialect() }"></div>
             <!-- /ko -->
             <!-- ko ifnot: $parent.viewSqlVisible -->
             <!-- ko component: { name: 'catalog-entries-list', params: { catalogEntry: $data, onClick: $parent.catalogEntry, onSampleClick: $parent.onSampleClick } } --><!-- /ko -->
@@ -363,7 +357,7 @@ const SUPPORT_TEMPLATES = `
               )}" class="fa fa-external-link"></i> ${I18n('Dashboard')}
             </a>
           <!-- /ko -->
-          <!-- ko if: catalogEntry().getSourceType() !== 'solr' && openActionsEnabled() -->
+          <!-- ko if: catalogEntry().getDialect() !== 'solr' && openActionsEnabled() -->
           <a class="inactive-action pointer" data-bind="click: openInTableBrowser">
             <i style="font-size: 11px;" title="${I18n(
               'Open in Table Browser...'
@@ -684,7 +678,7 @@ class ContextPopoverViewModel {
 
     if (
       self.isCatalogEntry &&
-      params.data.catalogEntry.getSourceType() === 'solr' &&
+      params.data.catalogEntry.getDialect() === 'solr' &&
       params.data.catalogEntry.isField()
     ) {
       self.isCollection = true;
@@ -868,7 +862,7 @@ componentUtils
     huePubSub.subscribe(SHOW_CONTEXT_POPOVER_EVENT, details => {
       hidePopover();
       const $contextPopover = $(
-        '<div id="contextPopover" data-bind="component: { name: \'context-popover\', params: $data }" />'
+        '<div id="contextPopover" data-bind="component: { name: \'context-popover\', params: $data }" ></div>'
       );
       $('body').append($contextPopover);
       ko.applyBindings(details, $contextPopover[0]);
@@ -928,15 +922,16 @@ class SqlContextContentsGlobalSearch {
     }
 
     if (self.isCatalogEntry) {
-      contextCatalog.getNamespaces({ sourceType: sourceType }).done(context => {
-        // TODO: Connector, Namespace and compute selection for global search results?
-        const connector = {}; // TODO: Add connector to global search
-        if (sourceType === 'hive' || sourceType === 'impala') {
-          connector.optimizer = 'api';
-        }
+      // TODO: Connector, Namespace and compute selection for global search results?
+      let connector = findEditorConnector(connector => connector.type === sourceType);
+
+      if (!connector) {
+        // TODO: Global search results are referring to dialect and not type
+        connector = findEditorConnector(connector => connector.dialect === sourceType);
+      }
+      contextCatalog.getNamespaces({ connector: connector }).done(context => {
         dataCatalog
           .getEntry({
-            sourceType: sourceType,
             namespace: context.namespaces[0],
             compute: context.namespaces[0].computes[0],
             connector: connector,

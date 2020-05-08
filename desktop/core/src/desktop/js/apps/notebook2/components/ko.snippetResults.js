@@ -21,8 +21,8 @@ import DisposableComponent from 'ko/components/DisposableComponent';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
-import 'apps/notebook2/components/resultChart/ko.resultChart';
-import 'apps/notebook2/components/resultGrid/ko.resultGrid';
+import { RESULT_CHART_COMPONENT } from 'apps/notebook2/components/resultChart/ko.resultChart';
+import { RESULT_GRID_COMPONENT } from 'apps/notebook2/components/resultGrid/ko.resultGrid';
 import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
 import { REDRAW_CHART_EVENT } from 'apps/notebook2/events';
 import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
@@ -35,7 +35,7 @@ export const NAME = 'snippet-results';
 
 // prettier-ignore
 const TEMPLATE = `
-<div class="snippet-row">
+<div class="snippet-row" data-bind="visible: visible" style="display: none;">
   <div class="snippet-tab-actions">
     <div class="btn-group">
       <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showGrid, css: { 'active': showGrid }"><i class="fa fa-fw fa-th"></i> ${ I18n('Grid') }</button>
@@ -69,18 +69,17 @@ const TEMPLATE = `
       </ul>
       <!-- /ko -->
     </div>
-    <div class="table-results" data-bind="visible: type() === 'table'" style="display: none;">
+    <div class="table-results" data-bind="visible: type() === 'table', css: { 'table-results-notebook': notebookMode }" style="display: none;">
       <div data-bind="visible: !executing() && hasData() && showGrid()" style="display: none; position: relative;">
         <!-- ko component: {
-          name: 'result-grid',
+          name: '${ RESULT_GRID_COMPONENT }',
           params: {
             activeExecutable: activeExecutable,
             data: data,
             lastFetchedRows: lastFetchedRows,
-            editorMode: editorMode,
             fetchResult: fetchResult.bind($data),
             hasMore: hasMore,
-            isPresentationMode: isPresentationMode,
+            notebookMode: notebookMode,
             isResultFullScreenMode: isResultFullScreenMode,
             meta: meta,
             resultsKlass: resultsKlass,
@@ -90,7 +89,7 @@ const TEMPLATE = `
       </div>
       <div data-bind="visible: !executing() && hasData() && showChart()" style="display: none; position: relative;">
         <!-- ko component: {
-          name: 'result-chart',
+          name: '${ RESULT_CHART_COMPONENT }',
           params: {
             activeExecutable: activeExecutable,
             cleanedMeta: cleanedMeta,
@@ -116,8 +115,8 @@ const TEMPLATE = `
       <div data-bind="visible: executing" style="display: none;">
         <h1 class="empty"><i class="fa fa-spinner fa-spin"></i> ${ I18n('Executing...') }</h1>
       </div>
-      <div id="wsResult">
-      </div>
+      <ul id="wsResult">
+      </ul>
     </div>
   </div>
 </div>
@@ -157,6 +156,12 @@ class SnippetResults extends DisposableComponent {
     this.executing = ko.pureComputed(() => this.status() === EXECUTION_STATUS.running);
 
     this.hasData = ko.pureComputed(() => this.data().length);
+
+    this.notebookMode = ko.pureComputed(() => !this.editorMode() || this.isPresentationMode());
+
+    this.visible = ko.pureComputed(
+      () => !this.notebookMode() || this.executing() || this.hasResultSet()
+    );
 
     const trackedObservables = {
       showGrid: true,
@@ -250,7 +255,7 @@ class SnippetResults extends DisposableComponent {
       }
 
       if (refresh) {
-        this.data(executionResult.rows);
+        this.data(executionResult.rows.concat());
       } else if (
         executionResult.lastRows.length &&
         this.data().length !== executionResult.rows.length

@@ -33,7 +33,7 @@ import { UUID } from 'utils/hueUtils';
 import { REDRAW_CHART_EVENT } from 'apps/notebook2/events';
 import { attachTracker } from 'apps/notebook2/components/executableStateHandler';
 
-export const NAME = 'result-chart';
+export const RESULT_CHART_COMPONENT = 'result-chart';
 
 const TYPES = window.HUE_CHARTS.TYPES;
 
@@ -451,31 +451,31 @@ const TEMPLATE = `
 
     <div data-bind="visible: hasDataForChart" style="display:none">
       <!-- ko if: isPieChart -->
-      <div class="chart" data-bind="attr: { 'id': chartId }, pieChart: pieChartParams()" />
+      <div class="chart" data-bind="attr: { 'id': chartId }, pieChart: pieChartParams()"></div>
       <!-- /ko -->
 
       <!-- ko if: isBarChart -->
-      <div class="chart" data-bind="attr: { 'id': chartId }, barChart: barChartParams()" />
+      <div class="chart" data-bind="attr: { 'id': chartId }, barChart: barChartParams()"></div>
       <!-- /ko -->
 
       <!-- ko if: isLineChart -->
-      <div class="chart" data-bind="attr: { 'id': chartId }, lineChart: lineChartParams()" />
+      <div class="chart" data-bind="attr: { 'id': chartId }, lineChart: lineChartParams()"></div>
       <!-- /ko -->
 
       <!-- ko if: isTimelineChart -->
-      <div class="chart" data-bind="attr:{ 'id': chartId }, timelineChart: timeLineChartParams()" />
+      <div class="chart" data-bind="attr:{ 'id': chartId }, timelineChart: timeLineChartParams()"></div>
       <!-- /ko -->
 
       <!-- ko if: isMapChart -->
-      <div class="chart" data-bind="attr:{ 'id': chartId }, leafletMapChart: leafletMapChartParams()" />
+      <div class="chart" data-bind="attr:{ 'id': chartId }, leafletMapChart: leafletMapChartParams()"></div>
       <!-- /ko -->
 
       <!-- ko if: isGradientMapChart -->
-      <div class="chart" data-bind="attr:{ 'id': chartId }, mapChart: mapChartParams()" />
+      <div class="chart" data-bind="attr:{ 'id': chartId }, mapChart: mapChartParams()"></div>
       <!-- /ko -->
 
       <!-- ko if: isScatterChart -->
-      <div class="chart" data-bind="attr:{ 'id': chartId }, scatterChart: scatterChartParams()" />
+      <div class="chart" data-bind="attr:{ 'id': chartId }, scatterChart: scatterChartParams()"></div>
       <!-- /ko -->
     </div>
   </div>
@@ -532,7 +532,7 @@ class ResultChart extends DisposableComponent {
     this.chartYSingle = ko.observable(trackedObservables.chartYSingle);
     this.chartType = ko.observable(trackedObservables.chartType);
 
-    attachTracker(this.activeExecutable, NAME, this, trackedObservables);
+    attachTracker(this.activeExecutable, RESULT_CHART_COMPONENT, this, trackedObservables);
 
     this.chartId = ko.pureComputed(() => this.chartType() + '_' + this.id());
     this.isBarChart = ko.pureComputed(() => TYPES.BARCHART === this.chartType());
@@ -780,4 +780,4 @@ class ResultChart extends DisposableComponent {
   }
 }
 
-componentUtils.registerComponent(NAME, ResultChart, TEMPLATE);
+componentUtils.registerComponent(RESULT_CHART_COMPONENT, ResultChart, TEMPLATE);

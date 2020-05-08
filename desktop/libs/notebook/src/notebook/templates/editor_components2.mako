@@ -54,7 +54,6 @@
   %if ENABLE_QUERY_BUILDER.get():
     <!-- For query builder -->
     <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.contextMenu.min.css') }">
-    <script src="${ static('desktop/ext/js/jquery/plugins/jquery.contextMenu.min.js') }"></script>
     <script src="${ static('desktop/js/queryBuilder.js') }"></script>
     <script>
 
@@ -670,10 +669,9 @@
     <!-- ko component: {
       name: 'hue-context-selector',
       params: {
-        sourceType: dialect,
+        connector: connector,
         compute: compute,
         namespace: namespace,
-        connector: connector,
         availableDatabases: availableDatabases,
         database: database,
         hideDatabases: !isSqlDialect()
@@ -685,7 +683,7 @@
   <script type="text/html" id="snippet${ suffix }">
     <div data-bind="visibleOnHover: { override: inFocus() || settingsVisible() || dbSelectionVisible() || $root.editorMode() || saveResultsModalVisible(), selector: '.hover-actions' }">
       <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: $root.editorMode() || inFocus() || saveResultsModalVisible(), selector: '.snippet-actions' }">
-        <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode(), 'editor-mode': $root.editorMode(), 'active-editor': inFocus, 'snippet-text' : dialect() === 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace.bind($data)">
+        <div class="snippet card card-widget snippet-v2" data-bind="css: {'notebook-snippet' : ! $root.editorMode(), 'editor-mode': $root.editorMode(), 'active-editor': inFocus, 'snippet-text' : dialect() === 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace.bind($data)">
           <div style="position: relative;">
             <div class="snippet-row" style="position: relative;">
               <div class="snippet-body" data-bind="clickForAceFocus: ace.bind($data), visible: ! $root.isResultFullScreenMode()">
@@ -994,7 +992,7 @@
             <!-- ko if: path() -->
             <a href="javascript:void(0);" data-bind="click: $root.showContextPopover" style="float: left"> <span class="muted add-on" data-bind="text: name"></span></a>
             <!-- /ko -->
-            <!-- ko if: meta.type() == 'text' -->
+            <!-- ko if: meta.type() === 'text' -->
             <!-- ko if: meta.placeholder() -->
             <input class="input-medium" type="text" data-bind="value: value, attr: { value: value, type: type, placeholder: meta.placeholder() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
             <!-- /ko -->
@@ -1013,8 +1011,20 @@
             <!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->
-            <!-- ko if: meta.type() == 'select' -->
-            <select data-bind="selectize: sample, optionsText: 'text', optionsValue: 'value', selectizeOptions: { create: function (input) { sampleUser().push({ text: ko.observable(input), value: ko.observable(input) }); return { text: input, value: input }; } }, value: value, event: { 'keydown': $parent.onKeydownInVariable }"/>
+            <!-- ko if: meta.type() === 'select' -->
+            <select data-bind="
+                selectize: sample,
+                optionsText: 'text',
+                optionsValue: 'value',
+                selectizeOptions: {
+                  create: function (input) {
+                    sampleUser().push({ text: ko.observable(input), value: ko.observable(input) });
+                    return { text: input, value: input };
+                  }
+                },
+                value: value,
+                event: { 'keydown': $parent.onKeydownInVariable }
+              "></select>
             <!-- /ko -->
           </div>
         </li>
@@ -1222,9 +1232,9 @@
 
   <script type ="text/html" id="snippet-execution-controls${ suffix }">
     <div class="snippet-actions clearfix">
-      <div class="pull-left" data-bind="component: { name: 'executable-actions', params: { activeExecutable: activeExecutable, beforeExecute: beforeExecute } }" />
+      <div class="pull-left" data-bind="component: { name: 'executable-actions', params: { activeExecutable: activeExecutable, beforeExecute: beforeExecute } }"></div>
       <!-- ko if: isSqlDialect() && !$root.isPresentationMode() -->
-      <div class="pull-right" data-bind="component: { name: 'snippet-editor-actions', params: { snippet: $data } }" />
+      <div class="pull-right" data-bind="component: { name: 'snippet-editor-actions', params: { snippet: $data } }"></div>
       <!-- /ko -->
       <div class="pull-right">
         <!-- ko if: status() === 'loading' -->

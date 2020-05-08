@@ -6,9 +6,9 @@ exports[`ko.quickQueryContext.js should render component 1`] = `
     component: {
       name: 'hue-drop-down',
       params: {
-        value: interpreter,
+        value: connector,
         labelAttribute: 'displayName',
-        entries: availableInterpreters,
+        entries: availableConnectors,
         linkTitle: 'Active connector'
       }
     }
@@ -31,12 +31,12 @@ exports[`ko.quickQueryContext.js should render component 1`] = `
       <!-- /ko -->
     </div>
   </div></div>
-  <!-- ko if: interpreter() -->
+  <!-- ko if: connector() -->
     <div class=\\"margin-left-10\\" style=\\"display: inline-block\\" data-bind=\\"
       component: {
         name: 'hue-context-selector',
         params: {
-          sourceType: interpreter().type,
+          connector: connector,
           compute: compute,
           namespace: namespace,
           availableDatabases: availableDatabases,

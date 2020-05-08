@@ -795,7 +795,6 @@ ${ commonshare() | n,unicode }
 %if ENABLE_QUERY_BUILDER.get():
 <!-- For query builder -->
 <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.contextMenu.min.css') }">
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery.contextMenu.min.js') }"></script>
 <script src="${ static('desktop/js/queryBuilder.js') }"></script>
 <script>
   // query-builder-menu is the class to use
@@ -2805,9 +2804,9 @@ function setupCodeMirrorSubscription() {
 viewModel = new BeeswaxViewModel("${app_name}", apiHelper);
 ko.applyBindings(viewModel, $("#beeswax-execute")[0]);
 
-var handleAssistSelection = function (databaseDef) {
-  if (databaseDef.sourceType === snippetType && snippet.database() !== databaseDef.name) {
-    snippet.database(databaseDef.name);
+var handleAssistSelection = function (entry) {
+  if (entry.getConnector().type === snippetType && snippet.database() !== entry.name) {
+    snippet.database(entry.name);
   }
 };
 
@@ -2815,7 +2814,7 @@ huePubSub.subscribe("assist.database.set", handleAssistSelection);
 huePubSub.subscribe("assist.database.selected", handleAssistSelection);
 
 if (! snippet.database()) {
-  huePubSub.publish("assist.get.database", { source: snippetType, callback: handleAssistSelection });
+  huePubSub.publish("assist.get.database", { connector: { type: snippetType }, callback: handleAssistSelection });
 }
 
 shareViewModel = initSharing("#documentShareModal");

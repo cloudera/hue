@@ -1141,7 +1141,7 @@ qq.extend(qq.UploadHandlerForm.prototype, {
         // var iframe = document.createElement('iframe');
         // iframe.setAttribute('name', id);
 
-        var iframe = qq.toElement('<iframe src="javascript:false;" name="' + id + '" />');
+        var iframe = qq.toElement('<iframe src="javascript:false;" name="' + id + '"></iframe>');
         // src="javascript:false;" removes ie6 prompt on https
 
         iframe.setAttribute('id', id);

@@ -49,7 +49,7 @@
   </div>
   %endif
   % if layout_json == '':
-   <div class="container-fluid" id="workflow_graph"/>
+    <div class="container-fluid" id="workflow_graph"></div>
   %endif
 </div>
 
@@ -353,7 +353,7 @@
     <div data-bind="visible: $root.isEditing" style="margin: 10px">
       <div data-bind="visible: $parent.ooziePropertiesExpanded">
         <h6 class="field-title">${ _('Message') }</h6>
-        <textarea class="span12" data-bind="value: properties.message" />
+        <textarea class="span12" data-bind="value: properties.message"></textarea>
 
         <h6 class="field-title">${ _('Email on error') } <input type="checkbox" data-bind="checked: properties.enableMail" style="margin-top: -3px;margin-left: 4px;" /></h6>
 
@@ -1323,7 +1323,7 @@
 
     <div data-bind="visible: ! $root.isEditing()">
       <span data-bind="template: { name: 'logs-icon' }"></span>
-      <span data-bind="text: properties.main_class" />
+      <span data-bind="text: properties.main_class"></span>
     </div>
 
     <div data-bind="visible: $root.isEditing">
@@ -1415,7 +1415,7 @@
     <div data-bind="visible: ! $root.isEditing()">
       <span data-bind="template: { name: 'logs-icon' }"></span>
       <div class="command-ellipsis">
-        <span data-bind="text: properties.command(), attr: { title: properties.command() }" />
+        <span data-bind="text: properties.command(), attr: { title: properties.command() }"></span>
       </div>
     </div>
 
@@ -1829,9 +1829,9 @@
 
     <div data-bind="visible: ! $root.isEditing()">
       <span data-bind="template: { name: 'logs-icon' }"></span>
-      <span data-bind="text: properties.host" />
+      <span data-bind="text: properties.host"></span>
       <div class="command-ellipsis">
-        <span data-bind="text: properties.ssh_command(), attr: { title: properties.ssh_command() }" />
+        <span data-bind="text: properties.ssh_command(), attr: { title: properties.ssh_command() }"></span>
       </div>
     </div>
 
@@ -1907,10 +1907,10 @@
         <li>
           <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>
           ${ _('to') }
-          <span data-bind="text: permissions"/>
-          <span data-bind="visible: ! dir_files(), text: '${ _ko('for directories') }'"/>
-          <span data-bind="visible: dir_files(), text: '${ _ko('for directories and files') }'"/>
-          <span data-bind="visible: recursive, text: '${ _ko('recursively') }'"/>
+          <span data-bind="text: permissions"></span>
+          <span data-bind="visible: ! dir_files(), text: '${ _ko('for directories') }'"></span>
+          <span data-bind="visible: dir_files(), text: '${ _ko('for directories and files') }'"></span>
+          <span data-bind="visible: recursive, text: '${ _ko('recursively') }'"></span>
         </li>
       </ul>
 
@@ -1919,10 +1919,10 @@
         <li>
           <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>
           ${ _('to') }
-          <span data-bind="text: group"/>
-          <span data-bind="visible: ! dir_files(), text: '${ _ko('for directories') }'"/>
-          <span data-bind="visible: dir_files(), text: '${ _ko('for directories and files') }'"/>
-          <span data-bind="visible: recursive, text: '${ _ko('recursively') }'"/>
+          <span data-bind="text: group"></span>
+          <span data-bind="visible: ! dir_files(), text: '${ _ko('for directories') }'"></span>
+          <span data-bind="visible: dir_files(), text: '${ _ko('for directories and files') }'"></span>
+          <span data-bind="visible: recursive, text: '${ _ko('recursively') }'"></span>
         </li>
       </ul>
     </div>
@@ -2116,10 +2116,10 @@
     <div data-bind="visible: ! $root.isEditing()">
       <span data-bind="template: { name: 'logs-icon' }"></span>
       ${ _('To') }
-      <span data-bind="text: properties.to"/>
+      <span data-bind="text: properties.to"></span>
       <br/>
       ${ _('About') }
-      <span data-bind="text: properties.subject"/>
+      <span data-bind="text: properties.subject"></span>
     </div>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">

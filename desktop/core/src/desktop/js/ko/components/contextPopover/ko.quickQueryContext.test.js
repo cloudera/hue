@@ -26,7 +26,7 @@ describe('ko.quickQueryContext.js', () => {
 
   it('should render component', async () => {
     const connectorsSpy = jest
-      .spyOn(hueConfig, 'filterConnectors')
+      .spyOn(hueConfig, 'filterEditorConnectors')
       .mockImplementation(() => [{ type: 'impala' }]);
     const computeSpy = jest
       .spyOn(apiHelper, 'fetchContextComputes')

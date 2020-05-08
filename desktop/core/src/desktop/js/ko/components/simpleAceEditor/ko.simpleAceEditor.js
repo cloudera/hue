@@ -26,6 +26,7 @@ import SolrQueryAutocompleter from './solrQueryAutocompleter';
 import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
+import { findEditorConnector } from '../../../utils/hueConfig';
 
 export const NAME = 'hue-simple-ace-editor';
 export const MULTI_NAME = 'hue-simple-ace-editor-multi';
@@ -100,17 +101,28 @@ class SimpleAceEditor {
 
     if (params.autocomplete && ko.unwrap(params.autocomplete)) {
       const autocomplete = ko.unwrap(params.autocomplete);
-      const sourceType =
-        autocomplete.type.indexOf('Query') !== -1
-          ? autocomplete.type.replace('Query', '')
-          : autocomplete.type;
+      let connector = ko.unwrap(autocomplete.connector);
+
+      if (!connector || !connector.type) {
+        const type =
+          autocomplete.type.indexOf('Query') !== -1
+            ? autocomplete.type.replace('Query', '')
+            : autocomplete.type;
+        connector = findEditorConnector(connector => connector.type === type);
+
+        // TODO: Temporary fix for dashboard
+        if (!connector) {
+          connector = { type: type };
+        }
+      }
 
       const snippet = {
         autocompleteSettings: {
           temporaryOnly: params.temporaryOnly
         },
-        type: ko.observable(sourceType),
-        dialect: ko.observable(sourceType),
+        type: ko.observable(connector.type),
+        dialect: ko.observable(connector.dialect),
+        connector: ko.observable(connector),
         id: ko.observable($element.attr('id')),
         namespace: params.namespace,
         compute: params.compute,
@@ -137,12 +149,12 @@ class SimpleAceEditor {
           promise.dispose = function() {};
           return promise;
         },
-        isSqlDialect: ko.observable(true),
+        isSqlDialect: ko.observable(connector.is_sql),
         aceCursorPosition: ko.observable(),
         inFocus: ko.observable()
       };
 
-      if (ko.unwrap(sourceType) === 'hive' || ko.unwrap(sourceType) === 'impala') {
+      if (connector.is_sql) {
         sqlWorkerHandler.registerWorkers();
         const aceLocationHandler = new AceLocationHandler({
           editor: editor,

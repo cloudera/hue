@@ -398,7 +398,7 @@
           <tr>
             <th>${ _('Property name') }</th>
             <th>${ _('Value') }</th>
-            <th/>
+            <th></th>
           </tr>
         </thead>
         <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
@@ -432,7 +432,7 @@
           <tr>
             <th>${ _('Source') }</th>
             <th>${ _('Destination') }</th>
-            <th/>
+            <th></th>
           </tr>
         </thead>
         <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
@@ -467,7 +467,7 @@
             <th>${ _('Path') }</th>
             <th>${ _('Permissions') }</th>
             <th>${ _('Recursive') }</th>
-            <th/>
+            <th></th>
           </tr>
         </thead>
         <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
@@ -502,13 +502,13 @@
           <tr>
             <th>${ _('Type') }</th>
             <th>${ _('Value') }</th>
-            <th/>
+            <th></th>
           </tr>
         </thead>
         <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
           <tr>
             <td>
-              <span class="span4 required" data-bind="text: type" />
+              <span class="span4 required" data-bind="text: type"></span>
             </td>
             <td>
               <input type="text" class="input-xxlarge required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: value, uniqueName: false" />
@@ -542,13 +542,13 @@
           <tr>
             <th>${ _('Type') }</th>
             <th>${ _('Value') }</th>
-            <th/>
+            <th></th>
           </tr>
         </thead>
         <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
           <tr>
             <td>
-              <span class="span4 required" data-bind="text: type" />
+              <span class="span4 required" data-bind="text: type"></span>
             </td>
             <td>
               <input type="text" class="input-xxlarge required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: value, uniqueName: false" />

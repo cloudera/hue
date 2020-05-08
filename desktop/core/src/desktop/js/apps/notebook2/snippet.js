@@ -35,14 +35,18 @@ import hueUtils from 'utils/hueUtils';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
-import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
+import {
+  EXECUTABLE_STATUS_TRANSITION_EVENT,
+  EXECUTABLE_UPDATED_EVENT,
+  EXECUTION_STATUS
+} from 'apps/notebook2/execution/executable';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
 import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from 'apps/notebook2/components/ko.executableActions';
 import { UPDATE_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
-import { findConnector, getLastKnownConfig } from 'utils/hueConfig';
+import { findEditorConnector, getLastKnownConfig } from 'utils/hueConfig';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { getOptimizer } from 'catalog/optimizer/optimizer';
 import {
@@ -296,7 +300,7 @@ export default class Snippet {
 
     if (!this.database()) {
       huePubSub.publish(ASSIST_GET_DATABASE_EVENT, {
-        source: this.dialect(),
+        connector: this.connector(),
         callback: databaseDef => {
           this.handleAssistSelection(databaseDef);
         }
@@ -893,6 +897,18 @@ export default class Snippet {
       }
     });
 
+    huePubSub.subscribe(EXECUTABLE_STATUS_TRANSITION_EVENT, transitionDetails => {
+      if (this.activeExecutable() === transitionDetails.executable) {
+        if (
+          transitionDetails.newStatus === EXECUTION_STATUS.available ||
+          transitionDetails.newStatus === EXECUTION_STATUS.failed ||
+          transitionDetails.newStatus === EXECUTION_STATUS.success
+        ) {
+          huePubSub.publish(UPDATE_HISTORY_EVENT);
+        }
+      }
+    });
+
     this.activeExecutable.subscribe(this.updateFromExecutable.bind(this));
 
     this.refreshHistory = notebook.fetchHistory;
@@ -1023,7 +1039,7 @@ export default class Snippet {
   }
 
   changeDialect(dialect) {
-    const connector = findConnector(connector => connector.dialect === dialect);
+    const connector = findEditorConnector(connector => connector.dialect === dialect);
     if (!connector) {
       throw new Error('No connector found for dialect ' + dialect);
     }
@@ -1034,13 +1050,6 @@ export default class Snippet {
   updateFromExecutable(executable) {
     if (executable) {
       this.lastExecuted(executable.executeStarted);
-      if (
-        executable.status === EXECUTION_STATUS.available ||
-        executable.status === EXECUTION_STATUS.failed ||
-        executable.status === EXECUTION_STATUS.success
-      ) {
-        huePubSub.publish(UPDATE_HISTORY_EVENT);
-      }
       this.status(executable.status);
       if (executable.result) {
         this.currentQueryTab('queryResults');
@@ -1279,15 +1288,15 @@ export default class Snippet {
     }
   }
 
-  handleAssistSelection(databaseDef) {
+  handleAssistSelection(entry) {
     if (this.ignoreNextAssistDatabaseUpdate) {
       this.ignoreNextAssistDatabaseUpdate = false;
-    } else if (databaseDef.sourceType === this.dialect()) {
-      if (this.namespace() !== databaseDef.namespace) {
-        this.namespace(databaseDef.namespace);
+    } else if (entry.getConnector().type === this.connector().type) {
+      if (this.namespace() !== entry.namespace) {
+        this.namespace(entry.namespace);
       }
-      if (this.database() !== databaseDef.name) {
-        this.database(databaseDef.name);
+      if (this.database() !== entry.name) {
+        this.database(entry.name);
       }
     }
   }
@@ -1309,13 +1318,15 @@ export default class Snippet {
   initializeConnector(snippetRaw) {
     const connectorTypeToFind =
       (snippetRaw.connector && snippetRaw.connector.type) || snippetRaw.type;
-    let foundConnector = findConnector(connector => connector.type === connectorTypeToFind);
+    let foundConnector = findEditorConnector(connector => connector.type === connectorTypeToFind);
 
     if (!foundConnector) {
       // If not found by type pick the first by dialect
       const connectorDialectToFind =
         (snippetRaw.connector && snippetRaw.connector.dialect) || snippetRaw.type;
-      foundConnector = findConnector(connector => connector.dialect === connectorDialectToFind);
+      foundConnector = findEditorConnector(
+        connector => connector.dialect === connectorDialectToFind
+      );
     }
 
     if (!foundConnector && snippetRaw.connector) {

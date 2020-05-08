@@ -145,7 +145,7 @@ Frontend third party dependencies (some checked in and some via npm)
 |jqCron|?|MIT|https://github.com/arnapou/jqcron|
 |jQuery|2.2.4+3.3.1|MIT|https://github.com/jquery/jquery|
 |jQuery Basic Table|?|MIT|https://github.com/jerrylow/basictable|
-|jQuery contextMenu|?|MIT|https://github.com/swisnl/jQuery-contextMenu|
+|jQuery contextMenu|2.9.0|MIT|https://github.com/swisnl/jQuery-contextMenu|
 |jQuery Cookie|1.4.1|MIT|https://github.com/carhartl/jquery-cookie|
 |jQuery curvedArrow|?|None|https://github.com/csytan/jquery-curvedarrow|
 |jQuery dataTables|1.8.2|BSD|http://www.datatables.net|

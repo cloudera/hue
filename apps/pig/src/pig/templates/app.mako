@@ -531,7 +531,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
             <script id="logTemplate" type="text/html">
               <div data-bind="css:{'alert-modified': name != '', 'alert': name != '', 'alert-success': (status == 'SUCCEEDED' || status == 'OK') && isReallyDone, 'alert-error': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}">
                 <div class="pull-right">
-                    ${ _('Status:') } <a data-bind="text: status, visible: absoluteUrl != '', attr: {'href': absoluteUrl}" target="_blank"/> <i class="fa fa-share"></i>
+                  ${ _('Status:') } <a data-bind="text: status, visible: absoluteUrl != '', attr: {'href': absoluteUrl}" target="_blank"></a> <i class="fa fa-share"></i>
                 </div>
                 <h4>${ _('Progress:') } <span data-bind="text: progress"></span>${ _('%') }</h4>
                 <div data-bind="css: {'progress': name != '', 'progress-striped': name != '', 'active': status == 'RUNNING'}" style="margin-top:10px">
@@ -1016,9 +1016,16 @@ ${ commonshare() | n,unicode }
 
     % if autocomplete_base_url != '':
       var apiHelper = window.apiHelper;
-      contextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (context) {
+      var connector = { type: 'hive' };
+      contextCatalog.getNamespaces({ connector: connector }).done(function (context) {
         // TODO: Namespace and compute selection
-        dataCatalog.getChildren({ namespace: context.namespaces[0], compute: context.namespaces[0].computes[0], sourceType: 'hive', path: ['default'], silenceErrors: true }).done(function (childEntries) {
+        dataCatalog.getChildren({
+          namespace: context.namespaces[0],
+          compute: context.namespaces[0].computes[0],
+          connector: { type: 'hive' },
+          path: ['default'],
+          silenceErrors: true
+        }).done(function (childEntries) {
           availableTables = $.map(childEntries, function (entry) { return entry.name }).join(' ');
         });
       });
