@@ -457,15 +457,15 @@ class Snippet {
     });
 
     let ignoreNextAssistDatabaseUpdate = false;
-    self.handleAssistSelection = function(databaseDef) {
+    self.handleAssistSelection = function(entry) {
       if (ignoreNextAssistDatabaseUpdate) {
         ignoreNextAssistDatabaseUpdate = false;
-      } else if (databaseDef.sourceType === self.type()) {
-        if (self.namespace() !== databaseDef.namespace) {
-          self.namespace(databaseDef.namespace);
+      } else if (entry.getConnector().type === self.connector().type) {
+        if (self.namespace() !== entry.namespace) {
+          self.namespace(entry.namespace);
         }
-        if (self.database() !== databaseDef.name) {
-          self.database(databaseDef.name);
+        if (self.database() !== entry.name) {
+          self.database(entry.name);
         }
       }
     };

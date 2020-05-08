@@ -209,9 +209,9 @@ class EditorViewModel {
 
     huePubSub.subscribe(
       'assist.database.set',
-      databaseDef => {
+      entry => {
         this.withActiveSnippet(activeSnippet => {
-          activeSnippet.handleAssistSelection(databaseDef);
+          activeSnippet.handleAssistSelection(entry);
         });
       },
       this.huePubSubId
@@ -219,9 +219,9 @@ class EditorViewModel {
 
     huePubSub.subscribe(
       'assist.database.selected',
-      databaseDef => {
+      entry => {
         this.withActiveSnippet(activeSnippet => {
-          activeSnippet.handleAssistSelection(databaseDef);
+          activeSnippet.handleAssistSelection(entry);
         });
       },
       this.huePubSubId
