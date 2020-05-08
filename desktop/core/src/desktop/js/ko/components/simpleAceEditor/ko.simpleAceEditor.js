@@ -154,7 +154,7 @@ class SimpleAceEditor {
         inFocus: ko.observable()
       };
 
-      if (connector.dialect === 'hive' || connector.dialect === 'impala') {
+      if (connector.is_sql) {
         sqlWorkerHandler.registerWorkers();
         const aceLocationHandler = new AceLocationHandler({
           editor: editor,
