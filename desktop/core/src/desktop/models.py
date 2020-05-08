@@ -1787,7 +1787,8 @@ class ClusterConfig(object):
       if interpreter['interface'] != 'hms':
         interpreters.append({
           'name': interpreter['name'],
-          'type': interpreter['type'],
+          'type': interpreter['type'],  # Connector v1
+          'id': interpreter['type'],
           'displayName': interpreter['name'],
           'buttonName': _('Query'),
           'tooltip': _('%s Query') % interpreter['type'].title(),
