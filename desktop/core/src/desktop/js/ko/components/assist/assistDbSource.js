@@ -19,7 +19,7 @@ import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import AssistDbNamespace from 'ko/components/assist/assistDbNamespace';
-import contextCatalog from 'catalog/contextCatalog';
+import contextCatalog, { NAMESPACES_REFRESHED_EVENT } from 'catalog/contextCatalog';
 import huePubSub from 'utils/huePubSub';
 
 class AssistDbSource {
@@ -108,14 +108,14 @@ class AssistDbSource {
 
     self.hasNamespaces = ko.pureComputed(() => self.namespaces().length > 0);
 
-    huePubSub.subscribe('context.catalog.namespaces.refreshed', sourceType => {
-      if (self.sourceType !== sourceType) {
+    huePubSub.subscribe(NAMESPACES_REFRESHED_EVENT, connectorType => {
+      if (self.connector.type !== connectorType) {
         return;
       }
 
       self.loading(true);
       contextCatalog
-        .getNamespaces({ sourceType: self.sourceType })
+        .getNamespaces({ connector: self.connector })
         .done(context => {
           const newNamespaces = [];
           const existingNamespaceIndex = {};
@@ -159,11 +159,11 @@ class AssistDbSource {
     self.loading(true);
 
     if (refresh) {
-      contextCatalog.getComputes({ sourceType: self.sourceType, clearCache: true });
+      contextCatalog.getComputes({ connector: self.connector, clearCache: true });
     }
 
     return contextCatalog
-      .getNamespaces({ sourceType: self.sourceType, clearCache: refresh })
+      .getNamespaces({ connector: self.connector, clearCache: refresh })
       .done(context => {
         const assistNamespaces = [];
         let activeNamespace;

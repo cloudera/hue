@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
-import contextCatalog from 'catalog/contextCatalog';
+import contextCatalog, { NAMESPACES_REFRESHED_EVENT } from 'catalog/contextCatalog';
 import huePubSub from 'utils/huePubSub';
 import MetastoreNamespace from 'apps/table_browser/metastoreNamespace';
 import {
@@ -148,8 +148,8 @@ class MetastoreSource {
         });
     };
 
-    huePubSub.subscribe('context.catalog.namespaces.refreshed', sourceType => {
-      if (this.type !== sourceType) {
+    huePubSub.subscribe(NAMESPACES_REFRESHED_EVENT, connectorType => {
+      if (this.type !== connectorType) {
         return;
       }
       const previousState = getCurrentState();
@@ -203,7 +203,7 @@ class MetastoreSource {
   loadNamespaces() {
     this.loading(true);
     contextCatalog
-      .getNamespaces({ sourceType: this.type })
+      .getNamespaces({ connector: this.connector() })
       .done(context => {
         const namespacesWithComputes = context.namespaces.filter(
           namespace => namespace.computes.length

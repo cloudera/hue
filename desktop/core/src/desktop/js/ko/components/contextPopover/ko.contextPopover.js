@@ -33,7 +33,7 @@ import ResizeHelper from './resizeHelper';
 import StorageContext from './storageContext';
 import { ASSIST_KEY_COMPONENT } from 'ko/components/assist/ko.assistKey';
 import componentUtils from 'ko/components/componentUtils';
-import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import { findEditorConnector, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 import { DOCUMENT_CONTEXT_FOOTER } from './ko.documentContextFooter';
 
 export const CONTEXT_POPOVER_CLASS = 'hue-popover';
@@ -922,12 +922,14 @@ class SqlContextContentsGlobalSearch {
     }
 
     if (self.isCatalogEntry) {
-      contextCatalog.getNamespaces({ sourceType: sourceType }).done(context => {
-        // TODO: Connector, Namespace and compute selection for global search results?
-        const connector = {}; // TODO: Add connector to global search
-        if (sourceType === 'hive' || sourceType === 'impala') {
-          connector.optimizer = 'api';
-        }
+      // TODO: Connector, Namespace and compute selection for global search results?
+      let connector = findEditorConnector(connector => connector.type === sourceType);
+
+      if (!connector) {
+        // TODO: Global search results are referring to dialect and not type
+        connector = findEditorConnector(connector => connector.dialect === sourceType);
+      }
+      contextCatalog.getNamespaces({ connector: connector }).done(context => {
         dataCatalog
           .getEntry({
             namespace: context.namespaces[0],

@@ -17,7 +17,7 @@
 import * as ko from 'knockout';
 
 import { MULTI_NAME as SIMPLE_ACE_MULTI } from 'ko/components/simpleAceEditor/ko.simpleAceEditor';
-import { NAME as CONTEXT_SELECTOR } from 'ko/components/ko.contextSelector';
+import { CONTEXT_SELECTOR_COMPONENT } from 'ko/components/ko.contextSelector';
 import { NAME as DROP_DOWN } from 'ko/components/ko.dropDown';
 import { NAME as EXECUTABLE_ACTIONS } from 'apps/notebook2/components/ko.executableActions';
 import { NAME as SIMPLE_RESULT_GRID } from 'apps/notebook2/components/resultGrid/ko.simpleResultGrid';
@@ -48,9 +48,9 @@ const TEMPLATE = `
   <!-- ko if: connector() -->
     <div class="margin-left-10" style="display: inline-block" data-bind="
       component: {
-        name: '${ CONTEXT_SELECTOR }',
+        name: '${ CONTEXT_SELECTOR_COMPONENT }',
         params: {
-          sourceType: connector().type,
+          connector: connector,
           compute: compute,
           namespace: namespace,
           availableDatabases: availableDatabases,

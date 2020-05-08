@@ -19,13 +19,16 @@ import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import componentUtils from './componentUtils';
-import contextCatalog from 'catalog/contextCatalog';
+import contextCatalog, {
+  CONTEXT_CATALOG_REFRESHED_EVENT,
+  NAMESPACES_REFRESHED_EVENT
+} from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { ASSIST_SET_DATABASE_EVENT } from './assist/events';
 
-export const NAME = 'hue-context-selector';
+export const CONTEXT_SELECTOR_COMPONENT = 'hue-context-selector';
 
 const TEMPLATE = `
   <!-- ko if: loadingContext -->
@@ -132,7 +135,7 @@ const TYPES = Object.keys(TYPES_INDEX).map(key => {
 
 /**
  * This is a component for compute, namespace and database selection. All parameters are optional except the
- * sourceType, if for instance no database and namespace observables are provided it will only show compute
+ * connector, if for instance no database and namespace observables are provided it will only show compute
  * selection.
  *
  * If it's desired to just show namespaces for a given compute you can force hide the compute selection by
@@ -150,7 +153,6 @@ const TYPES = Object.keys(TYPES_INDEX).map(key => {
  *   } --><!-- /ko -->
  *
  * @param {Object} params
- * @param {ko.observable|string} params.sourceType
  * @param {ko.observable} [params.cluster]
  * @param {ko.observable} [params.compute]
  * @param {ko.observable} [params.namespace]
@@ -172,15 +174,13 @@ const TYPES = Object.keys(TYPES_INDEX).map(key => {
  */
 const HueContextSelector = function(params) {
   const self = this;
-
-  self.sourceType = params.sourceType;
-  self.connector = params.connector;
-
-  // TODO: Use connector in HueContextSelector
-  if (!self.connector || !ko.unwrap(self.connector)) {
-    self.connector = ko.observable({ type: params.sourceType });
+  if (!params.connector || !ko.unwrap(params.connector)) {
+    throw new Error('No connector with type provided');
   }
+
   self.disposals = [];
+
+  self.connector = params.connector;
   self.hideLabels = params.hideLabels;
 
   TYPES.forEach(type => {
@@ -216,8 +216,8 @@ const HueContextSelector = function(params) {
 
   let refreshThrottle = -1;
 
-  const refresh = function(sourceType) {
-    if (!sourceType || ko.unwrap(self.connector).type === sourceType) {
+  const refresh = function(connectorType) {
+    if (!connectorType || ko.unwrap(self.connector).type === connectorType) {
       window.clearTimeout(refreshThrottle);
       refreshThrottle = window.setTimeout(() => {
         TYPES.forEach(self.reload.bind(self));
@@ -225,8 +225,8 @@ const HueContextSelector = function(params) {
     }
   };
 
-  const namespaceRefreshSub = huePubSub.subscribe('context.catalog.namespaces.refreshed', refresh);
-  const contextCatalogRefreshSub = huePubSub.subscribe('context.catalog.refreshed', refresh);
+  const namespaceRefreshSub = huePubSub.subscribe(NAMESPACES_REFRESHED_EVENT, refresh);
+  const contextCatalogRefreshSub = huePubSub.subscribe(CONTEXT_CATALOG_REFRESHED_EVENT, refresh);
   self.disposals.push(() => {
     window.clearTimeout(refreshThrottle);
     namespaceRefreshSub.remove();
@@ -330,7 +330,7 @@ HueContextSelector.prototype.reload = function(type) {
   if (self[type.name]) {
     self[type.loading](true);
     self[type.lastPromise] = contextCatalog[type.contextCatalogFn]({
-      sourceType: ko.unwrap(self.connector).type
+      connector: ko.unwrap(self.connector)
     })
       .done(available => {
         // Namespaces response differs slightly from the others
@@ -497,4 +497,4 @@ HueContextSelector.prototype.dispose = function() {
   }
 };
 
-componentUtils.registerComponent(NAME, HueContextSelector, TEMPLATE);
+componentUtils.registerComponent(CONTEXT_SELECTOR_COMPONENT, HueContextSelector, TEMPLATE);
