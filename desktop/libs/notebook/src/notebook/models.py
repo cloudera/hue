@@ -496,7 +496,7 @@ def _get_editor_type(editor_id):
   return document.type.rsplit('-', 1)[-1]
 
 
-class ApiWrapper(object):
+class ApiWrapper():
   def __init__(self, request, snippet):
     self.request = request
     self.api = _get_api(request, snippet)
@@ -505,11 +505,11 @@ class ApiWrapper(object):
     if TASK_SERVER.ENABLED.get():
       from notebook import tasks as ntasks
       if hasattr(ntasks, name):
-        attr = object.__getattribute__(ntasks, name)
+        attr = getattr(ntasks, name)
         def _method(*args, **kwargs):
           return attr(*args, **dict(kwargs, postdict=self.request.POST, user_id=self.request.user.id))
         return _method
-    return object.__getattribute__(self.api, name)
+    return getattr(self.api, name)
 
 
 def get_api(request, snippet):
