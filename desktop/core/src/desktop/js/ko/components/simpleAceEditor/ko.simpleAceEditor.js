@@ -103,12 +103,17 @@ class SimpleAceEditor {
       const autocomplete = ko.unwrap(params.autocomplete);
       let connector = ko.unwrap(autocomplete.connector);
 
-      if (!connector) {
+      if (!connector || !connector.type) {
         const type =
           autocomplete.type.indexOf('Query') !== -1
             ? autocomplete.type.replace('Query', '')
             : autocomplete.type;
         connector = findEditorConnector(connector => connector.type === type);
+
+        // TODO: Temporary fix for dashboard
+        if (!connector) {
+          connector = { type: type };
+        }
       }
 
       const snippet = {

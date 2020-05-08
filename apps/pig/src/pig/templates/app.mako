@@ -1016,7 +1016,8 @@ ${ commonshare() | n,unicode }
 
     % if autocomplete_base_url != '':
       var apiHelper = window.apiHelper;
-      contextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (context) {
+      var connector = { type: 'hive' };
+      contextCatalog.getNamespaces({ connector: connector }).done(function (context) {
         // TODO: Namespace and compute selection
         dataCatalog.getChildren({
           namespace: context.namespaces[0],

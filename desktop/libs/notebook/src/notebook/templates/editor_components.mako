@@ -903,7 +903,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       name: 'hue-context-selector',
       params: {
         connector: connector,
-        sourceType: type,
         compute: compute,
         namespace: namespace,
         availableDatabases: availableDatabases,
