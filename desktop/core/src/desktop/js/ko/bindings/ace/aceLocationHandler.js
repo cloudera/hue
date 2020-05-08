@@ -182,7 +182,6 @@ class AceLocationHandler {
                     // Note, as cachedOnly is set to true it will call the successCallback right away (or not at all)
                     dataCatalog
                       .getEntry({
-                        sourceType: self.dialect(),
                         namespace: self.snippet.namespace(),
                         compute: self.snippet.compute(),
                         connector: self.snippet.connector(),
@@ -851,7 +850,7 @@ class AceLocationHandler {
     const deferred = $.Deferred();
     dataCatalog
       .getChildren({
-        sourceType: self.dialect(),
+        connector: self.snippet.connector(),
         namespace: self.snippet.namespace(),
         compute: self.snippet.compute(),
         temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly,
@@ -969,7 +968,7 @@ class AceLocationHandler {
           if (typeof nextTable.subQuery === 'undefined') {
             dataCatalog
               .getChildren({
-                sourceType: self.dialect(),
+                connector: self.snippet.connector(),
                 namespace: self.snippet.namespace(),
                 compute: self.snippet.compute(),
                 temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly,
