@@ -120,6 +120,13 @@ jobs:
 
             npm run lint
 
+      - run:
+          name: run npm license checker
+          command: |
+            cd /usr/share/hue
+
+            npm run check-license
+
       # Run tests
       - run:
           name: run python API tests
