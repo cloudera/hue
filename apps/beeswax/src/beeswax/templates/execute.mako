@@ -2804,9 +2804,9 @@ function setupCodeMirrorSubscription() {
 viewModel = new BeeswaxViewModel("${app_name}", apiHelper);
 ko.applyBindings(viewModel, $("#beeswax-execute")[0]);
 
-var handleAssistSelection = function (databaseDef) {
-  if (databaseDef.sourceType === snippetType && snippet.database() !== databaseDef.name) {
-    snippet.database(databaseDef.name);
+var handleAssistSelection = function (entry) {
+  if (entry.getConnector().type === snippetType && snippet.database() !== entry.name) {
+    snippet.database(entry.name);
   }
 };
 

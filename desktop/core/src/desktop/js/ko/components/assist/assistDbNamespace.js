@@ -146,16 +146,13 @@ class AssistDbNamespace {
           self.selectedDatabase().loadEntries();
         }
         if (!self.navigationSettings.rightAssist) {
+          const entry = self.selectedDatabase().catalogEntry;
           apiHelper.setInTotalStorage(
             'assist_' + self.sourceType + '_' + self.namespace.id,
             'lastSelectedDb',
             self.selectedDatabase().catalogEntry.name
           );
-          huePubSub.publish('assist.database.set', {
-            sourceType: self.sourceType,
-            namespace: self.namespace,
-            name: self.selectedDatabase().catalogEntry.name
-          });
+          huePubSub.publish('assist.database.set', entry);
         }
       } else {
         apiHelper.setInTotalStorage(

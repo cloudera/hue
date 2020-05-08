@@ -531,18 +531,9 @@ class AssistDbEntry {
   openItem() {
     const self = this;
     if (self.catalogEntry.isTableOrView()) {
-      huePubSub.publish('assist.table.selected', {
-        sourceType: self.assistDbNamespace.sourceType,
-        namespace: self.assistDbNamespace.namespace,
-        database: self.databaseName,
-        name: self.catalogEntry.name
-      });
+      huePubSub.publish('assist.table.selected', self.catalogEntry);
     } else if (self.catalogEntry.isDatabase()) {
-      huePubSub.publish('assist.database.selected', {
-        sourceType: self.assistDbNamespace.sourceType,
-        namespace: self.assistDbNamespace.namespace,
-        name: self.catalogEntry.name
-      });
+      huePubSub.publish('assist.database.selected', self.catalogEntry);
     }
   }
 }

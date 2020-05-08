@@ -1288,15 +1288,15 @@ export default class Snippet {
     }
   }
 
-  handleAssistSelection(databaseDef) {
+  handleAssistSelection(entry) {
     if (this.ignoreNextAssistDatabaseUpdate) {
       this.ignoreNextAssistDatabaseUpdate = false;
-    } else if (databaseDef.sourceType === this.dialect()) {
-      if (this.namespace() !== databaseDef.namespace) {
-        this.namespace(databaseDef.namespace);
+    } else if (entry.getConnector().type === this.connector().type) {
+      if (this.namespace() !== entry.namespace) {
+        this.namespace(entry.namespace);
       }
-      if (this.database() !== databaseDef.name) {
-        this.database(databaseDef.name);
+      if (this.database() !== entry.name) {
+        this.database(entry.name);
       }
     }
   }
