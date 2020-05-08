@@ -1759,7 +1759,7 @@ class AutocompleteResults {
 
     self.cancellablePromises.push(
       dataCatalog
-        .getCatalog(self.dialect(), self.snippet.connector())
+        .getCatalog(self.snippet.connector())
         .loadOptimizerPopularityForTables({
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
@@ -2048,7 +2048,7 @@ class AutocompleteResults {
 
       self.cancellablePromises.push(
         dataCatalog
-          .getCatalog(self.dialect(), self.snippet.connector())
+          .getCatalog(self.snippet.connector())
           .loadOptimizerPopularityForTables({
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
