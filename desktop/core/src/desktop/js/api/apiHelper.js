@@ -1993,9 +1993,9 @@ class ApiHelper {
         if (response && response.query_status) {
           deferred.resolve(response.query_status);
         } else if (response && response.status === -3) {
-          deferred.resolve(EXECUTION_STATUS.expired);
+          deferred.resolve({ status: EXECUTION_STATUS.expired });
         } else {
-          deferred.resolve(EXECUTION_STATUS.failed);
+          deferred.resolve({ status: EXECUTION_STATUS.failed, message: response.message });
         }
       })
       .fail(err => {
