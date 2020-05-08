@@ -472,9 +472,9 @@ class Snippet {
 
     if (!self.database()) {
       huePubSub.publish(ASSIST_GET_DATABASE_EVENT, {
-        source: self.type(),
-        callback: databaseDef => {
-          self.handleAssistSelection(databaseDef);
+        connector: self.connector(),
+        callback: entry => {
+          self.handleAssistSelection(entry);
         }
       });
     }
