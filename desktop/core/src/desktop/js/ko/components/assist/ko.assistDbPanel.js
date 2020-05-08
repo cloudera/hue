@@ -664,40 +664,47 @@ class AssistDbPanel {
         this.setDatabaseWhenLoaded(databaseDef.namespace, databaseDef.name);
       });
 
-      const getSelectedDatabase = source => {
+      const getSelectedDatabase = connector => {
         const deferred = $.Deferred();
-        const assistDbSource = this.sourceIndex[source];
+        const assistDbSource = this.sourceIndex[connector.type];
         if (assistDbSource) {
           assistDbSource.loadedDeferred.done(() => {
             if (assistDbSource.selectedNamespace()) {
               assistDbSource.selectedNamespace().loadedDeferred.done(() => {
                 if (assistDbSource.selectedNamespace().selectedDatabase()) {
-                  deferred.resolve({
-                    sourceType: source,
-                    namespace: assistDbSource.selectedNamespace().namespace,
-                    name: assistDbSource.selectedNamespace().selectedDatabase().name
-                  });
+                  deferred.resolve(
+                    assistDbSource.selectedNamespace().selectedDatabase().catalogEntry
+                  );
                 } else {
                   let lastSelectedDb = apiHelper.getFromTotalStorage(
-                    'assist_' + source + '_' + assistDbSource.selectedNamespace().namespace.id,
+                    'assist_' +
+                      connector.type +
+                      '_' +
+                      assistDbSource.selectedNamespace().namespace.id,
                     'lastSelectedDb'
                   );
                   if (!lastSelectedDb && lastSelectedDb !== '') {
                     lastSelectedDb = 'default';
                   }
-                  deferred.resolve({
-                    sourceType: source,
-                    namespace: assistDbSource.selectedNamespace().namespace,
-                    name: lastSelectedDb
-                  });
+                  dataCatalog
+                    .getEntry({
+                      connector: connector,
+                      namespace: assistDbSource.selectedNamespace().namespace,
+                      compute: assistDbSource.selectedNamespace().compute,
+                      path: [lastSelectedDb]
+                    })
+                    .then(deferred.resolve);
                 }
               });
             } else {
-              deferred.resolve({
-                sourceType: source,
-                namespace: { id: 'default' },
-                name: 'default'
-              });
+              dataCatalog
+                .getEntry({
+                  connector: connector,
+                  namespace: { id: 'default' },
+                  compute: { id: 'default' },
+                  path: ['default']
+                })
+                .then(deferred.resolve);
             }
           });
         } else {
@@ -708,7 +715,7 @@ class AssistDbPanel {
       };
 
       huePubSub.subscribe(ASSIST_GET_DATABASE_EVENT, options => {
-        getSelectedDatabase(options.source).done(options.callback);
+        getSelectedDatabase(options.connector).done(options.callback);
       });
 
       huePubSub.subscribe(ASSIST_GET_SOURCE_EVENT, callback => {

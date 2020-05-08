@@ -300,7 +300,7 @@ export default class Snippet {
 
     if (!this.database()) {
       huePubSub.publish(ASSIST_GET_DATABASE_EVENT, {
-        source: this.dialect(),
+        connector: this.connector(),
         callback: databaseDef => {
           this.handleAssistSelection(databaseDef);
         }
