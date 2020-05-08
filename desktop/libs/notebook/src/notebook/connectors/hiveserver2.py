@@ -672,7 +672,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     if session:
       session_id = session.get('id')
       if session_id:
-        filters = {'id': session_id, 'application': 'beeswax' if type == 'hive' else type}
+        filters = {'id': session_id, 'application': 'beeswax' if type == 'hive' or type == 'llap' else type}
         if not is_admin(self.user):
           filters['owner'] = self.user
         return Session.objects.get(**filters)
