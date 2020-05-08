@@ -70,20 +70,27 @@ export default class LocalStrategy extends BaseStrategy {
         namespace: { id: 'default' }
       })
       .then(entry => {
-        if (!entry.sourceMeta) {
-          entry.sourceMeta = { foreign_keys: [] };
-        }
-        const data = {
-          values: entry.sourceMeta.foreign_keys.map(key => ({
-            totalTableCount: 22,
-            totalQueryCount: 3,
-            joinCols: [{ columns: [path + '.' + key.name, key.to] }],
-            tables: [path].concat(key.to.split('.', 2).join('.')),
-            joinType: 'join'
-          }))
-        };
-        deferred.resolve(data);
-      });
+        entry
+          .getSourceMeta({ silenceErrors: true })
+          .then(() => {
+            if (!entry.sourceMeta) {
+              entry.sourceMeta = { foreign_keys: [] };
+            }
+            const data = {
+              values: entry.sourceMeta.foreign_keys.map(key => ({
+                totalTableCount: 22,
+                totalQueryCount: 3,
+                joinCols: [{ columns: [path + '.' + key.name, key.to] }],
+                tables: [path].concat(key.to.split('.', 2).join('.')),
+                joinType: 'join'
+              }))
+            };
+            deferred.resolve(data);
+          })
+          .fail(deferred.reject);
+      })
+      .fail(deferred.reject);
+
     return deferred.promise();
   }
 }
