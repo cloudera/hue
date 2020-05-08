@@ -115,8 +115,8 @@ const TEMPLATE = `
       <div data-bind="visible: executing" style="display: none;">
         <h1 class="empty"><i class="fa fa-spinner fa-spin"></i> ${ I18n('Executing...') }</h1>
       </div>
-      <div id="wsResult">
-      </div>
+      <ul id="wsResult">
+      </ul>
     </div>
   </div>
 </div>
@@ -255,7 +255,7 @@ class SnippetResults extends DisposableComponent {
       }
 
       if (refresh) {
-        this.data(executionResult.rows);
+        this.data(executionResult.rows.concat());
       } else if (
         executionResult.lastRows.length &&
         this.data().length !== executionResult.rows.length

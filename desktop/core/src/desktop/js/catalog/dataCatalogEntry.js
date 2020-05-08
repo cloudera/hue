@@ -362,6 +362,25 @@ class DataCatalogEntry {
   }
 
   /**
+   * Gets the parent entry, rejected if there's no parent.
+   *
+   * @return {Promise}
+   */
+  getParent() {
+    if (!this.path.length) {
+      return $.Deferred()
+        .reject()
+        .promise();
+    }
+
+    return this.dataCatalog.getEntry({
+      namespace: this.namespace,
+      compute: this.compute,
+      path: this.path.slice(0, this.path.length - 1)
+    });
+  }
+
+  /**
    * Get the children of the catalog entry, columns for a table entry etc.
    *
    * @param {Object} [options]
