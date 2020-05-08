@@ -39,6 +39,7 @@ ko.bindingHandlers[NAME] = {
     }
 
     let visible = false;
+    let clickedOpen = false;
     let showTimeout = -1;
     let hideTimeout = -1;
 
@@ -75,6 +76,7 @@ ko.bindingHandlers[NAME] = {
 
     $element.on('click.onHover', event => {
       clearTimeouts();
+      clickedOpen = true;
       visible = true;
       options.onHover.bind(bindingContext.$data)(
         bindingContext.$data,
@@ -86,6 +88,9 @@ ko.bindingHandlers[NAME] = {
     $element.on('mouseenter.onHover', show);
 
     $element.on('mouseleave.onHover', () => {
+      if (clickedOpen) {
+        return;
+      }
       clearTimeouts();
       // Keep open if mouse moves to the context popover
       if (visible) {
@@ -102,6 +107,7 @@ ko.bindingHandlers[NAME] = {
 
     const hiddenSub = huePubSub.subscribe(CONTEXT_POPOVER_HIDDEN_EVENT, () => {
       visible = false;
+      clickedOpen = false;
     });
 
     ko.utils.domNodeDisposal.addDisposeCallback(element, () => {

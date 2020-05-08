@@ -488,9 +488,14 @@ def _cleanup(notebook, snippet):
 
 def _get_query_key(notebook, snippet):
   if ENABLE_NOTEBOOK_2.get():
-    return snippet['executor']['executables'][0].get('history', {}).get('uuid')
+    query_key = snippet['executor']['executables'][0].get('history', {}).get('uuid')
   else:
-    return notebook['uuid']
+    query_key = notebook['uuid']
+
+  if not query_key:
+    raise QueryError()
+  else:
+    return query_key
 
 def _log_key(notebook, snippet):
   return _get_query_key(notebook, snippet) + '_log'

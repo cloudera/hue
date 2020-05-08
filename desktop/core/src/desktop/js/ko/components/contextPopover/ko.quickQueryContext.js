@@ -27,7 +27,7 @@ import DisposableComponent from 'ko/components/DisposableComponent';
 import Executor from 'apps/notebook2/execution/executor';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
-import { CONFIG_REFRESHED_EVENT, filterConnectors } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'utils/hueConfig';
 
 export const NAME = 'quick-query-context';
 
@@ -38,19 +38,19 @@ const TEMPLATE = `
     component: {
       name: '${ DROP_DOWN }',
       params: {
-        value: interpreter,
+        value: connector,
         labelAttribute: 'displayName',
-        entries: availableInterpreters,
+        entries: availableConnectors,
         linkTitle: 'Active connector'
       }
     }
   "></div>
-  <!-- ko if: interpreter() -->
+  <!-- ko if: connector() -->
     <div class="margin-left-10" style="display: inline-block" data-bind="
       component: {
         name: '${ CONTEXT_SELECTOR }',
         params: {
-          sourceType: interpreter().type,
+          sourceType: connector().type,
           compute: compute,
           namespace: namespace,
           availableDatabases: availableDatabases,
@@ -61,7 +61,7 @@ const TEMPLATE = `
     "></div>
   <!-- /ko -->
   <!-- ko ifnot: loadingContext -->
-    <!-- ko with: interpreter -->
+    <!-- ko with: connector -->
       <div style="margin: 10px;" data-bind="
         component: {
           name: '${ SIMPLE_ACE_MULTI }',
@@ -104,8 +104,8 @@ class QuickQueryContext extends DisposableComponent {
   constructor(params) {
     super(params);
 
-    this.availableInterpreters = ko.observableArray();
-    this.interpreter = ko.observable();
+    this.availableConnectors = ko.observableArray();
+    this.connector = ko.observable();
 
     this.availableDatabases = ko.observableArray();
     this.database = ko.observable();
@@ -121,20 +121,20 @@ class QuickQueryContext extends DisposableComponent {
     this.loadingContext = ko.pureComputed(
       () => !this.namespace() || !this.compute() || !this.database()
     );
-    this.dialect = ko.pureComputed(() => this.interpreter() && this.interpreter().dialect);
-    this.type = ko.pureComputed(() => this.interpreter() && this.interpreter().type);
+    this.dialect = ko.pureComputed(() => this.connector() && this.connector().dialect);
+    this.type = ko.pureComputed(() => this.connector() && this.connector().type);
     this.defaultLimit = ko.observable(10);
 
     this.executor = new Executor({
       sourceType: this.type,
       namespace: this.namespace,
       compute: this.compute,
-      connector: this.interpreter,
+      connector: this.connector,
       defaultLimit: this.defaultLimit
     });
 
     this.autocomplete = ko.pureComputed(
-      () => this.interpreter() && { type: this.interpreter().dialect }
+      () => this.connector() && { type: this.connector().dialect, connector: this.connector }
     );
 
     this.updateFromConfig();
@@ -161,21 +161,19 @@ class QuickQueryContext extends DisposableComponent {
   }
 
   updateFromConfig() {
-    const configuredSqlConnectors = filterConnectors(connector => connector.is_sql);
-    this.availableInterpreters(configuredSqlConnectors);
+    const configuredSqlConnectors = filterEditorConnectors(connector => connector.is_sql);
+    this.availableConnectors(configuredSqlConnectors);
 
     const found =
-      this.interpreter() &&
-      this.availableInterpreters().some(interpreter => {
-        if (interpreter.type === this.interpreter().type) {
-          this.interpreter(interpreter);
+      this.connector() &&
+      this.availableConnectors().some(connector => {
+        if (connector.type === this.connector().type) {
+          this.connector(connector);
           return true;
         }
       });
     if (!found) {
-      this.interpreter(
-        this.availableInterpreters().length ? this.availableInterpreters()[0] : undefined
-      );
+      this.connector(this.availableConnectors().length ? this.availableConnectors()[0] : undefined);
     }
   }
 }

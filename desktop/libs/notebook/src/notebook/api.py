@@ -728,8 +728,8 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
   try:
     autocomplete_data = get_api(request, snippet).autocomplete(snippet, database, table, column, nested)
     response.update(autocomplete_data)
-  except QueryExpired:
-    pass
+  except QueryExpired as e:
+    LOG.warn('Expired query seen: %s' % e)
 
   response['status'] = 0
 

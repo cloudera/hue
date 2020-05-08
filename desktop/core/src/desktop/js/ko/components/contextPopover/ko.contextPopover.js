@@ -34,6 +34,7 @@ import StorageContext from './storageContext';
 import { ASSIST_KEY_COMPONENT } from 'ko/components/assist/ko.assistKey';
 import componentUtils from 'ko/components/componentUtils';
 import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import { DOCUMENT_CONTEXT_FOOTER } from './ko.documentContextFooter';
 
 export const CONTEXT_POPOVER_CLASS = 'hue-popover';
 export const HIDE_CONTEXT_POPOVER_EVENT = 'context.popover.hide';
@@ -78,14 +79,7 @@ const SUPPORT_TEMPLATES = `
       <!-- ko if: isDocument -->
         <div class="context-popover-bottom-attributes">
         <!-- ko with: contents -->
-          <!-- ko if: data && data.last_modified -->
-          <div><span>${I18n(
-            'Modified'
-          )}</span> <span data-bind="momentFromNow: { data: data.last_modified, titleFormat: 'LLL Z' }"></span></div>
-          <!-- /ko -->
-          <!-- ko if: data && data.owner && data.owner !== window.LOGGED_USERNAME -->
-          <div><span>${I18n('Owner')}</span> <span data-bind="text: data.owner"></span></div>
-          <!-- /ko -->
+          <!-- ko component: { name: '${ DOCUMENT_CONTEXT_FOOTER }', params: { popoverData: $data } } --><!-- /ko -->
         <!-- /ko -->
         </div>
       <!-- /ko -->
@@ -868,7 +862,7 @@ componentUtils
     huePubSub.subscribe(SHOW_CONTEXT_POPOVER_EVENT, details => {
       hidePopover();
       const $contextPopover = $(
-        '<div id="contextPopover" data-bind="component: { name: \'context-popover\', params: $data }" />'
+        '<div id="contextPopover" data-bind="component: { name: \'context-popover\', params: $data }" ></div>'
       );
       $('body').append($contextPopover);
       ko.applyBindings(details, $contextPopover[0]);

@@ -41,6 +41,7 @@ export const EXECUTION_STATUS = {
 };
 
 export const EXECUTABLE_UPDATED_EVENT = 'hue.executable.updated';
+export const EXECUTABLE_STATUS_TRANSITION_EVENT = 'hue.executable.status.transitioned';
 
 const ERROR_REGEX = /line ([0-9]+)(\:([0-9]+))?/i;
 
@@ -79,7 +80,15 @@ export default class Executable {
   }
 
   setStatus(status) {
+    const oldStatus = this.status;
     this.status = status;
+    if (oldStatus !== status) {
+      huePubSub.publish(EXECUTABLE_STATUS_TRANSITION_EVENT, {
+        executable: this,
+        oldStatus: oldStatus,
+        newStatus: status
+      });
+    }
     this.notify();
   }
 
@@ -250,15 +259,15 @@ export default class Executable {
 
     this.cancellables.push(
       apiHelper.checkExecutionStatus({ executable: this }).done(async queryStatus => {
-        switch (queryStatus) {
+        switch (queryStatus.status) {
           case EXECUTION_STATUS.success:
             this.executeEnded = Date.now();
-            this.setStatus(queryStatus);
+            this.setStatus(queryStatus.status);
             this.setProgress(99); // TODO: why 99 here (from old code)?
             break;
           case EXECUTION_STATUS.available:
             this.executeEnded = Date.now();
-            this.setStatus(queryStatus);
+            this.setStatus(queryStatus.status);
             this.setProgress(100);
             if (!this.result && this.handle.has_result_set) {
               this.result = new ExecutionResult(this);
@@ -274,12 +283,15 @@ export default class Executable {
           case EXECUTION_STATUS.canceled:
           case EXECUTION_STATUS.expired:
             this.executeEnded = Date.now();
-            this.setStatus(queryStatus);
+            this.setStatus(queryStatus.status);
             break;
           case EXECUTION_STATUS.running:
+            if (queryStatus.data) {
+              huePubSub.publish('editor.ws.query.fetch_result', queryStatus);
+            }
           case EXECUTION_STATUS.starting:
           case EXECUTION_STATUS.waiting:
-            this.setStatus(queryStatus);
+            this.setStatus(queryStatus.status);
             checkStatusTimeout = window.setTimeout(
               () => {
                 this.checkStatus(statusCheckCount);
@@ -289,11 +301,11 @@ export default class Executable {
             break;
           case EXECUTION_STATUS.failed:
             this.executeEnded = Date.now();
-            this.setStatus(queryStatus);
+            this.setStatus(queryStatus.status);
             break;
           default:
             this.executeEnded = Date.now();
-            console.warn('Got unknown status ' + queryStatus);
+            console.warn('Got unknown status ' + queryStatus.status);
         }
       })
     );
@@ -423,7 +435,7 @@ export default class Executable {
     };
 
     return {
-      operationId: undefined,
+      operationId: this.operationId,
       snippet: JSON.stringify(snippet),
       notebook: JSON.stringify(notebook)
     };
