@@ -68,6 +68,10 @@ class ParameterForm(forms.Form):
     params = [key for key in list(conf_dict.keys()) if key not in ParameterForm.NON_PARAMETERS]
     return [{'name': name, 'value': conf_dict[name]} for name in params]
 
+  @staticmethod
+  def get_non_parameters(conf_dict):
+    params = filter(lambda key: key in ParameterForm.NON_PARAMETERS, conf_dict.keys())
+    return [{'name': name, 'value': conf_dict[name]} for name in params]
 
 class WorkflowForm(forms.ModelForm):
   class Meta(object):
