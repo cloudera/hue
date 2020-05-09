@@ -151,25 +151,32 @@ class SparkApi(Api):
   STANDALONE_JOB_RE = re.compile("Got job (\d+)")
 
   @staticmethod
-  def get_properties():
-    return SparkConfiguration.PROPERTIES
+  def get_props(properties=None):
+    props = dict([(p['name'], p['value']) for p in SparkConfiguration.PROPERTIES])
+    if properties is not None:
+      props.update(dict([(p['name'], p['value']) for p in properties]))
+
+    return props
+
+  @staticmethod
+  def get_properties(props=None):
+    properties = list()
+    for p in SparkConfiguration.PROPERTIES:
+      properties.append(p.copy())
+
+    if props is not None:
+      for p in properties:
+        if p['name'] in props:
+          p['value'] = props[p['name']]
+
+    return properties
 
   def create_session(self, lang='scala', properties=None):
-    if not properties:
-      config = None
-      if USE_DEFAULT_CONFIGURATION.get():
-        config = DefaultConfiguration.objects.get_configuration_for_user(app='spark', user=self.user)
+    if not properties and USE_DEFAULT_CONFIGURATION.get():
+      user_config = DefaultConfiguration.objects.get_configuration_for_user(app='spark', user=self.user)
+      properties = user_config.properties_list
 
-      # Populate props with default configuration
-      properties = self.get_properties()
-      props = dict([(p['name'], p['value']) for p in properties]) if properties is not None else {}
-
-      if config is not None:
-        # Merge props with custom configuration
-        properties = config.properties_list
-        props.update(dict([(p['name'], p['value']) for p in properties])) if properties is not None else {}
-    else:
-      props = dict([(p['name'], p['value']) for p in properties]) if properties is not None else {}
+    props = self.get_props(properties)
 
     # HUE-4761: Hue's session request is causing Livy to fail with "JsonMappingException: Can not deserialize
     # instance of scala.collection.immutable.List out of VALUE_STRING token" due to List type values
@@ -208,7 +215,6 @@ class SparkApi(Api):
     props['kind'] = lang
 
     api = get_spark_api(self.user)
-
     response = api.create_session(**props)
 
     status = api.get_session(response['id'])
@@ -226,7 +232,7 @@ class SparkApi(Api):
     return {
         'type': lang,
         'id': response['id'],
-        'properties': properties
+        'properties': self.get_properties(props)
     }
 
   def execute(self, notebook, snippet):
