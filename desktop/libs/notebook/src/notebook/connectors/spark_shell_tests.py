@@ -101,6 +101,30 @@ class TestSparkApi(object):
       assert_equal(files_properties[0]['value'], [], session['properties'])
 
 
+  def test_create_session_plain(self):
+    lang = 'pyspark'
+    properties = None
+
+    with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
+      get_spark_api.return_value = Mock(
+        create_session=Mock(
+          return_value={'id': '1'}
+        ),
+        get_session=Mock(
+          return_value={'state': 'idle', 'log': ''}
+        )
+      )
+
+      session = self.api.create_session(lang=lang, properties=properties)
+
+      assert_equal(session['type'], 'pyspark')
+      assert_equal(session['id'], '1')
+
+      files_properties = [prop for prop in session['properties'] if prop['name'] == 'files']
+      assert_true(files_properties, session['properties'])
+      assert_equal(files_properties[0]['value'], [], session['properties'])
+
+
   def test_get_jobs(self):
     local_jobs = [
       {'url': u'http://172.21.1.246:4040/jobs/job/?id=0', 'name': u'0'}

@@ -88,7 +88,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <!-- ko component: {
       name: 'hue-context-selector',
       params: {
-        sourceType: 'impala',
+        connector: { type: 'impala' },
         compute: compute,
         ##namespace: namespace,
         ##availableDatabases: availableDatabases,
@@ -101,7 +101,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <!-- ko component: {
       name: 'hue-context-selector',
       params: {
-        sourceType: 'jobs',
+        connector: { type: 'jobs' },
         cluster: cluster,
         onClusterSelect: onClusterSelect,
         hideLabels: true
@@ -164,7 +164,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <!-- ko component: {
               name: 'hue-context-selector',
               params: {
-                sourceType: 'jobs',
+                connector: { type: 'jobs' },
                 cluster: cluster,
                 onClusterSelect: onClusterSelect
               }

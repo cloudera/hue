@@ -148,7 +148,6 @@ huePubSub.subscribe('app.dom.loaded', app => {
       .getEntry({
         namespace: viewModel.source().namespace().namespace,
         compute: viewModel.source().namespace().compute,
-        sourceType: viewModel.source().type,
         connector: connector,
         path: [],
         definition: { type: 'source' }

@@ -2526,33 +2526,33 @@ class ApiHelper {
   /**
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {string} options.sourceType
+   * @param {Connector} options.connector
    * @return {Promise}
    */
   fetchContextNamespaces(options) {
-    const url = '/desktop/api2/context/namespaces/' + options.sourceType;
+    const url = '/desktop/api2/context/namespaces/' + options.connector.type;
     return simpleGet(url, undefined, options);
   }
 
   /**
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {string} options.sourceType
+   * @param {Connector} options.connector
    * @return {Promise}
    */
   fetchContextComputes(options) {
-    const url = '/desktop/api2/context/computes/' + options.sourceType;
+    const url = '/desktop/api2/context/computes/' + options.connector.type;
     return simpleGet(url, undefined, options);
   }
 
   /**
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {string} options.sourceType
+   * @param {Connector} options.connector
    * @return {Promise}
    */
   fetchContextClusters(options) {
-    const url = '/desktop/api2/context/clusters/' + options.sourceType;
+    const url = '/desktop/api2/context/clusters/' + options.connector.type;
     return simpleGet(url, undefined, options);
   }
 

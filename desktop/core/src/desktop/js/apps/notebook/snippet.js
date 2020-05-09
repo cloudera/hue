@@ -457,24 +457,24 @@ class Snippet {
     });
 
     let ignoreNextAssistDatabaseUpdate = false;
-    self.handleAssistSelection = function(databaseDef) {
+    self.handleAssistSelection = function(entry) {
       if (ignoreNextAssistDatabaseUpdate) {
         ignoreNextAssistDatabaseUpdate = false;
-      } else if (databaseDef.sourceType === self.type()) {
-        if (self.namespace() !== databaseDef.namespace) {
-          self.namespace(databaseDef.namespace);
+      } else if (entry.getConnector().type === self.connector().type) {
+        if (self.namespace() !== entry.namespace) {
+          self.namespace(entry.namespace);
         }
-        if (self.database() !== databaseDef.name) {
-          self.database(databaseDef.name);
+        if (self.database() !== entry.name) {
+          self.database(entry.name);
         }
       }
     };
 
     if (!self.database()) {
       huePubSub.publish(ASSIST_GET_DATABASE_EVENT, {
-        source: self.type(),
-        callback: databaseDef => {
-          self.handleAssistSelection(databaseDef);
+        connector: self.connector(),
+        callback: entry => {
+          self.handleAssistSelection(entry);
         }
       });
     }
@@ -1075,7 +1075,6 @@ class Snippet {
             ignoreNextAssistDatabaseUpdate = true;
             dataCatalog
               .getEntry({
-                sourceType: self.type(),
                 namespace: self.namespace(),
                 compute: self.compute(),
                 connector: self.connector(),
