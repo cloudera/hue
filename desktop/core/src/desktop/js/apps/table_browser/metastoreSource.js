@@ -59,7 +59,7 @@ class MetastoreSource {
       }
     };
 
-    this.connector = ko.observable(findEditorConnector(connector => connector.type === this.type));
+    this.connector = ko.observable(findEditorConnector(connector => connector.id === this.type));
 
     huePubSub.subscribe(ASSIST_DB_PANEL_IS_READY_EVENT, () => {
       this.lastLoadNamespacesDeferred.done(() => {
@@ -148,8 +148,8 @@ class MetastoreSource {
         });
     };
 
-    huePubSub.subscribe(NAMESPACES_REFRESHED_EVENT, connectorType => {
-      if (this.type !== connectorType) {
+    huePubSub.subscribe(NAMESPACES_REFRESHED_EVENT, connectorId => {
+      if (this.type !== connectorId) {
         return;
       }
       const previousState = getCurrentState();
@@ -159,7 +159,7 @@ class MetastoreSource {
     huePubSub.subscribe('data.catalog.entry.refreshed', details => {
       const refreshedEntry = details.entry;
 
-      if (refreshedEntry.getConnector().type !== this.type) {
+      if (refreshedEntry.getConnector().id !== this.type) {
         return;
       }
 

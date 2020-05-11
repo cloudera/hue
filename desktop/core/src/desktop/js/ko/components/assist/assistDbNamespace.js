@@ -148,7 +148,7 @@ class AssistDbNamespace {
         if (!self.navigationSettings.rightAssist) {
           const entry = self.selectedDatabase().catalogEntry;
           apiHelper.setInTotalStorage(
-            'assist_' + entry.getConnector().type + '_' + entry.namespace.id,
+            'assist_' + entry.getConnector().id + '_' + entry.namespace.id,
             'lastSelectedDb',
             entry.name
           );
@@ -156,7 +156,7 @@ class AssistDbNamespace {
         }
       } else {
         apiHelper.setInTotalStorage(
-          'assist_' + self.connector.type + '_' + self.namespace.id,
+          'assist_' + self.connector.id + '_' + self.namespace.id,
           'lastSelectedDb',
           ''
         );
@@ -273,7 +273,7 @@ class AssistDbNamespace {
       huePubSub.subscribe('data.catalog.entry.refreshed', details => {
         if (
           self.namespace.id !== details.entry.namespace.id ||
-          details.entry.getConnector().type !== self.sourceType
+          details.entry.getConnector().id !== self.sourceType
         ) {
           return;
         }

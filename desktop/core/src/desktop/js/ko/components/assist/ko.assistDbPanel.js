@@ -617,7 +617,7 @@ class AssistDbPanel {
       window.setTimeout(() => {
         let foundSource;
         this.sources().some(source => {
-          if (source.sourceType === catalogEntry.getConnector().type) {
+          if (source.sourceType === catalogEntry.getConnector().id) {
             foundSource = source;
             return true;
           }
@@ -641,7 +641,7 @@ class AssistDbPanel {
               .getEntry({
                 namespace: assistDbNamespace.namespace,
                 compute: assistDbNamespace.compute(),
-                connector: { type: 'solr' },
+                connector: { id: 'solr' },
                 path: []
               })
               .done(entry => {
@@ -657,16 +657,16 @@ class AssistDbPanel {
       });
     } else if (!this.isSolr && !this.isStreams) {
       huePubSub.subscribe(ASSIST_SET_DATABASE_EVENT, databaseDef => {
-        if (!databaseDef.connector || !this.sourceIndex[databaseDef.connector.type]) {
+        if (!databaseDef.connector || !this.sourceIndex[databaseDef.connector.id]) {
           return;
         }
-        this.selectedSource(this.sourceIndex[databaseDef.connector.type]);
+        this.selectedSource(this.sourceIndex[databaseDef.connector.id]);
         this.setDatabaseWhenLoaded(databaseDef.namespace, databaseDef.name);
       });
 
       const getSelectedDatabase = connector => {
         const deferred = $.Deferred();
-        const assistDbSource = this.sourceIndex[connector.type];
+        const assistDbSource = this.sourceIndex[connector.id];
         if (assistDbSource) {
           assistDbSource.loadedDeferred.done(() => {
             if (assistDbSource.selectedNamespace()) {
@@ -678,7 +678,7 @@ class AssistDbPanel {
                 } else {
                   let lastSelectedDb = apiHelper.getFromTotalStorage(
                     'assist_' +
-                      connector.type +
+                      connector.id +
                       '_' +
                       assistDbSource.selectedNamespace().namespace.id,
                     'lastSelectedDb'
@@ -845,10 +845,10 @@ class AssistDbPanel {
       const connectors = filterEditorConnectors(connector => connector.is_sql);
       connectors.forEach(connector => {
         const source =
-          this.sourceIndex[connector.type] ||
+          this.sourceIndex[connector.id] ||
           new AssistDbSource({
             i18n: this.i18n,
-            type: connector.type, // TODO: Remove redundant
+            type: connector.id, // TODO: Remove redundant
             name: connector.name, // TODO: Remove redundant
             connector: connector,
             nonSqlType: false,

@@ -53,7 +53,7 @@
     if (self.options.namespace) {
       self.namespaceDeferred.resolve(self.options.namespace);
     } else {
-      contextCatalog.getNamespaces({ connector: { type: options.apiHelperType } }).done(function (context) {
+      contextCatalog.getNamespaces({ connector: { id: options.apiHelperType } }).done(function (context) {
         if (context.namespaces && context.namespaces.length) {
           self.namespaceDeferred.resolve(context.namespaces[0]);
         } else {
@@ -273,7 +273,7 @@
     self.getDatabases = function (callback) {
       var self = this;
       $.when(self.namespaceDeferred, self.computeDeferred).done(function (namespace, compute) {
-        dataCatalog.getChildren({ connector: { type: self.options.apiHelperType }, namespace: namespace, compute: compute, path: [] }).done(function (dbEntries) {
+        dataCatalog.getChildren({ connector: { id: self.options.apiHelperType }, namespace: namespace, compute: compute, path: [] }).done(function (dbEntries) {
           callback($.map(dbEntries, function (entry) { return entry.name }));
         });
       })
@@ -281,7 +281,7 @@
 
     // TODO: Use connector for hive autocomplete
     const connector = {
-      type: self.options.apiHelperType
+      id: self.options.apiHelperType
     };
 
     self.getTables = function (database, callback) {

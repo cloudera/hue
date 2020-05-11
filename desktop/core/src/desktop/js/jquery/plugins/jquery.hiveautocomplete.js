@@ -58,7 +58,7 @@ function Plugin(element, options) {
   if (self.options.namespace) {
     self.namespaceDeferred.resolve(self.options.namespace);
   } else {
-    contextCatalog.getNamespaces({ connector: { type: options.apiHelperType } }).done(context => {
+    contextCatalog.getNamespaces({ connector: { id: options.apiHelperType } }).done(context => {
       if (context.namespaces && context.namespaces.length) {
         self.namespaceDeferred.resolve(context.namespaces[0]);
       } else {
@@ -194,7 +194,7 @@ Plugin.prototype.init = function() {
           // TODO: Use connectors in hiveautocomplete
           dataCatalog
             .getChildren({
-              connector: { type: self.options.apiHelperType },
+              connector: { id: self.options.apiHelperType },
               namespace: namespace,
               compute: compute,
               path: path
@@ -326,7 +326,7 @@ Plugin.prototype.init = function() {
     $.when(self.namespaceDeferred, self.computeDeferred).done((namespace, compute) => {
       dataCatalog
         .getChildren({
-          connector: { type: self.options.apiHelperType }, // TODO: Use connectors in hiveautocomplete
+          connector: { id: self.options.apiHelperType }, // TODO: Use connectors in hiveautocomplete
           namespace: namespace,
           compute: compute,
           path: []
@@ -348,7 +348,7 @@ Plugin.prototype.init = function() {
         .getEntry({
           namespace: namespace,
           compute: compute,
-          connector: { type: self.options.apiHelperType },
+          connector: { id: self.options.apiHelperType },
           path: [database]
         })
         .done(entry => {
@@ -364,7 +364,7 @@ Plugin.prototype.init = function() {
         .getEntry({
           namespace: namespace,
           compute: compute,
-          connector: { type: self.options.apiHelperType },
+          connector: { id: self.options.apiHelperType },
           path: [database, table]
         })
         .done(entry => {
