@@ -608,7 +608,7 @@ class AssistDbPanel {
 
     huePubSub.subscribe(ASSIST_DB_HIGHLIGHT_EVENT, catalogEntry => {
       huePubSub.publish(SHOW_LEFT_ASSIST_EVENT);
-      if (catalogEntry.getSourceType() === 'solr') {
+      if (catalogEntry.getDialect() === 'solr') {
         huePubSub.publish(ASSIST_SHOW_SOLR_EVENT);
       } else {
         huePubSub.publish(ASSIST_SHOW_SQL_EVENT);
@@ -617,7 +617,7 @@ class AssistDbPanel {
       window.setTimeout(() => {
         let foundSource;
         this.sources().some(source => {
-          if (source.sourceType === catalogEntry.getSourceType()) {
+          if (source.sourceType === catalogEntry.getConnector().id) {
             foundSource = source;
             return true;
           }
@@ -639,10 +639,9 @@ class AssistDbPanel {
             const assistDbNamespace = solrSource.selectedNamespace();
             dataCatalog
               .getEntry({
-                sourceType: 'solr',
                 namespace: assistDbNamespace.namespace,
                 compute: assistDbNamespace.compute(),
-                connector: {},
+                connector: { id: 'solr' },
                 path: []
               })
               .done(entry => {
@@ -658,47 +657,54 @@ class AssistDbPanel {
       });
     } else if (!this.isSolr && !this.isStreams) {
       huePubSub.subscribe(ASSIST_SET_DATABASE_EVENT, databaseDef => {
-        if (!databaseDef.connector || !this.sourceIndex[databaseDef.connector.type]) {
+        if (!databaseDef.connector || !this.sourceIndex[databaseDef.connector.id]) {
           return;
         }
-        this.selectedSource(this.sourceIndex[databaseDef.connector.type]);
+        this.selectedSource(this.sourceIndex[databaseDef.connector.id]);
         this.setDatabaseWhenLoaded(databaseDef.namespace, databaseDef.name);
       });
 
-      const getSelectedDatabase = source => {
+      const getSelectedDatabase = connector => {
         const deferred = $.Deferred();
-        const assistDbSource = this.sourceIndex[source];
+        const assistDbSource = this.sourceIndex[connector.id];
         if (assistDbSource) {
           assistDbSource.loadedDeferred.done(() => {
             if (assistDbSource.selectedNamespace()) {
               assistDbSource.selectedNamespace().loadedDeferred.done(() => {
                 if (assistDbSource.selectedNamespace().selectedDatabase()) {
-                  deferred.resolve({
-                    sourceType: source,
-                    namespace: assistDbSource.selectedNamespace().namespace,
-                    name: assistDbSource.selectedNamespace().selectedDatabase().name
-                  });
+                  deferred.resolve(
+                    assistDbSource.selectedNamespace().selectedDatabase().catalogEntry
+                  );
                 } else {
                   let lastSelectedDb = apiHelper.getFromTotalStorage(
-                    'assist_' + source + '_' + assistDbSource.selectedNamespace().namespace.id,
+                    'assist_' +
+                      connector.id +
+                      '_' +
+                      assistDbSource.selectedNamespace().namespace.id,
                     'lastSelectedDb'
                   );
                   if (!lastSelectedDb && lastSelectedDb !== '') {
                     lastSelectedDb = 'default';
                   }
-                  deferred.resolve({
-                    sourceType: source,
-                    namespace: assistDbSource.selectedNamespace().namespace,
-                    name: lastSelectedDb
-                  });
+                  dataCatalog
+                    .getEntry({
+                      connector: connector,
+                      namespace: assistDbSource.selectedNamespace().namespace,
+                      compute: assistDbSource.selectedNamespace().compute,
+                      path: [lastSelectedDb]
+                    })
+                    .then(deferred.resolve);
                 }
               });
             } else {
-              deferred.resolve({
-                sourceType: source,
-                namespace: { id: 'default' },
-                name: 'default'
-              });
+              dataCatalog
+                .getEntry({
+                  connector: connector,
+                  namespace: { id: 'default' },
+                  compute: { id: 'default' },
+                  path: ['default']
+                })
+                .then(deferred.resolve);
             }
           });
         } else {
@@ -709,7 +715,7 @@ class AssistDbPanel {
       };
 
       huePubSub.subscribe(ASSIST_GET_DATABASE_EVENT, options => {
-        getSelectedDatabase(options.source).done(options.callback);
+        getSelectedDatabase(options.connector).done(options.callback);
       });
 
       huePubSub.subscribe(ASSIST_GET_SOURCE_EVENT, callback => {
@@ -839,10 +845,10 @@ class AssistDbPanel {
       const connectors = filterEditorConnectors(connector => connector.is_sql);
       connectors.forEach(connector => {
         const source =
-          this.sourceIndex[connector.type] ||
+          this.sourceIndex[connector.id] ||
           new AssistDbSource({
             i18n: this.i18n,
-            type: connector.type, // TODO: Remove redundant
+            type: connector.id, // TODO: Remove redundant
             name: connector.name, // TODO: Remove redundant
             connector: connector,
             nonSqlType: false,

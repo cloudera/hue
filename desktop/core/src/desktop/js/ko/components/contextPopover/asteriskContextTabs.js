@@ -95,10 +95,9 @@ class AsteriskData {
         }
         dataCatalog
           .getEntry({
-            sourceType: sourceType,
             namespace: namespace,
             compute: compute,
-            connector: {}, // TODO: Add connector to asteriskContextTabs
+            connector: { id: sourceType }, // TODO: Add connector to asteriskContextTabs
             path: path
           })
           .done(entry => {

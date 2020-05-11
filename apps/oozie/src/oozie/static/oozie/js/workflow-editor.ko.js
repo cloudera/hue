@@ -530,8 +530,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.availableComputes = ko.observableArray();
   self.compute = ko.observable();
 
-  contextCatalog.getNamespaces({ sourceType: 'oozie' }).done(function (context) { self.availableNamespaces(context.namespaces) });
-  contextCatalog.getComputes({ sourceType: 'oozie' }).done(self.availableComputes);
+  contextCatalog.getNamespaces({ connector: { id: 'oozie' } }).done(function (context) { self.availableNamespaces(context.namespaces) });
+  contextCatalog.getComputes({ connector: { id: 'oozie' } }).done(self.availableComputes);
 
 
   self.previewColumns = ko.observable("");

@@ -575,7 +575,8 @@ ${ commonheader(_("Streams Browser"), "search", user, request, "60px") | n,unico
       self.activeNamespace = ko.observable();
       self.activeCompute = ko.observable();
 
-      contextCatalog.getNamespaces({ sourceType: 'solr' }).done(function (context) {
+      // TODO: Use connectors in topics
+      contextCatalog.getNamespaces({ connector: { id: 'solr' } }).done(function (context) {
         // TODO: Namespace selection
         self.activeNamespace(context.namespaces[0]);
         self.activeCompute(context.namespaces[0].computes[0]);

@@ -644,7 +644,8 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
       self.activeNamespace = ko.observable();
       self.activeCompute = ko.observable();
 
-      contextCatalog.getNamespaces({ sourceType: 'solr' }).done(function (context) {
+      // TODO: Use connectors in indexes
+      contextCatalog.getNamespaces({ connector: { id: 'solr' }}).done(function (context) {
         // TODO: Namespace selection
         self.activeNamespace(context.namespaces[0]);
         self.activeCompute(context.namespaces[0].computes[0]);

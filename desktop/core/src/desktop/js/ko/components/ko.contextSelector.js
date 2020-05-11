@@ -19,13 +19,16 @@ import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import componentUtils from './componentUtils';
-import contextCatalog from 'catalog/contextCatalog';
+import contextCatalog, {
+  CONTEXT_CATALOG_REFRESHED_EVENT,
+  NAMESPACES_REFRESHED_EVENT
+} from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { ASSIST_SET_DATABASE_EVENT } from './assist/events';
 
-export const NAME = 'hue-context-selector';
+export const CONTEXT_SELECTOR_COMPONENT = 'hue-context-selector';
 
 const TEMPLATE = `
   <!-- ko if: loadingContext -->
@@ -132,7 +135,7 @@ const TYPES = Object.keys(TYPES_INDEX).map(key => {
 
 /**
  * This is a component for compute, namespace and database selection. All parameters are optional except the
- * sourceType, if for instance no database and namespace observables are provided it will only show compute
+ * connector, if for instance no database and namespace observables are provided it will only show compute
  * selection.
  *
  * If it's desired to just show namespaces for a given compute you can force hide the compute selection by
@@ -143,14 +146,13 @@ const TYPES = Object.keys(TYPES_INDEX).map(key => {
  *   <!-- ko component: {
  *     name: 'hue-context-selector',
  *     params: {
- *       sourceType: 'impala',
+ *       connector: myConnectorObservable,
  *       compute: myComputeObservable,
  *       namespace: myNamespaceObservable,
  *     }
  *   } --><!-- /ko -->
  *
  * @param {Object} params
- * @param {ko.observable|string} params.sourceType
  * @param {ko.observable} [params.cluster]
  * @param {ko.observable} [params.compute]
  * @param {ko.observable} [params.namespace]
@@ -172,10 +174,13 @@ const TYPES = Object.keys(TYPES_INDEX).map(key => {
  */
 const HueContextSelector = function(params) {
   const self = this;
+  if (!params.connector || !ko.unwrap(params.connector)) {
+    throw new Error('No connector with type provided');
+  }
 
-  self.sourceType = params.sourceType;
-  self.connector = params.connector;
   self.disposals = [];
+
+  self.connector = params.connector;
   self.hideLabels = params.hideLabels;
 
   TYPES.forEach(type => {
@@ -211,8 +216,8 @@ const HueContextSelector = function(params) {
 
   let refreshThrottle = -1;
 
-  const refresh = function(sourceType) {
-    if (!sourceType || ko.unwrap(self.sourceType) === sourceType) {
+  const refresh = function(connectorId) {
+    if (!connectorId || ko.unwrap(self.connector).id === connectorId) {
       window.clearTimeout(refreshThrottle);
       refreshThrottle = window.setTimeout(() => {
         TYPES.forEach(self.reload.bind(self));
@@ -220,8 +225,8 @@ const HueContextSelector = function(params) {
     }
   };
 
-  const namespaceRefreshSub = huePubSub.subscribe('context.catalog.namespaces.refreshed', refresh);
-  const contextCatalogRefreshSub = huePubSub.subscribe('context.catalog.refreshed', refresh);
+  const namespaceRefreshSub = huePubSub.subscribe(NAMESPACES_REFRESHED_EVENT, refresh);
+  const contextCatalogRefreshSub = huePubSub.subscribe(CONTEXT_CATALOG_REFRESHED_EVENT, refresh);
   self.disposals.push(() => {
     window.clearTimeout(refreshThrottle);
     namespaceRefreshSub.remove();
@@ -240,7 +245,7 @@ const HueContextSelector = function(params) {
   if (self.database) {
     huePubSub.subscribe('data.catalog.entry.refreshed', details => {
       if (details.entry.isSource()) {
-        if (ko.unwrap(self.sourceType) === details.entry.getSourceType()) {
+        if (ko.unwrap(self.connector).id === details.entry.getConnector().id) {
           self.reloadDatabases();
         }
       }
@@ -325,7 +330,7 @@ HueContextSelector.prototype.reload = function(type) {
   if (self[type.name]) {
     self[type.loading](true);
     self[type.lastPromise] = contextCatalog[type.contextCatalogFn]({
-      sourceType: ko.unwrap(self.sourceType)
+      connector: ko.unwrap(self.connector)
     })
       .done(available => {
         // Namespaces response differs slightly from the others
@@ -410,9 +415,7 @@ HueContextSelector.prototype.reloadDatabases = function() {
       () => {
         window.clearTimeout(self.reloadDatabaseThrottle);
         self.reloadDatabaseThrottle = window.setTimeout(() => {
-          const connector = (self.connector && ko.unwrap(self.connector)) || {
-            type: ko.unwrap(self.sourceType)
-          };
+          const connector = ko.unwrap(self.connector);
           if (!self[TYPES_INDEX.namespace.name]()) {
             self.availableDatabases([]);
             self.loadingDatabases(false);
@@ -420,7 +423,6 @@ HueContextSelector.prototype.reloadDatabases = function() {
           }
           dataCatalog
             .getEntry({
-              sourceType: connector.type, // TODO: Drop when dataCatalog only needs connector
               namespace: self[TYPES_INDEX.namespace.name](),
               compute: self[TYPES_INDEX.compute.name](),
               connector: connector,
@@ -443,7 +445,7 @@ HueContextSelector.prototype.reloadDatabases = function() {
                 .always(() => {
                   let lastSelectedDb = apiHelper.getFromTotalStorage(
                     'assist_' +
-                      ko.unwrap(self.sourceType) +
+                      ko.unwrap(self.connector).id +
                       '_' +
                       self[TYPES_INDEX.namespace.name]().id,
                     'lastSelectedDb'
@@ -495,4 +497,4 @@ HueContextSelector.prototype.dispose = function() {
   }
 };
 
-componentUtils.registerComponent(NAME, HueContextSelector, TEMPLATE);
+componentUtils.registerComponent(CONTEXT_SELECTOR_COMPONENT, HueContextSelector, TEMPLATE);

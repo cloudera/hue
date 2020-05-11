@@ -654,7 +654,7 @@ const identifierChainToPath = identifierChain => identifierChain.map(identifier 
 /**
  *
  * @param {Object} options
- * @param {String} options.sourceType
+ * @param {String} options.connector
  * @param {ContextNamespace} options.namespace
  * @param {ContextCompute} options.compute
  * @param {boolean} [options.temporaryOnly] - Default: false
@@ -665,7 +665,7 @@ const identifierChainToPath = identifierChain => identifierChain.map(identifier 
  *
  * @return {CancellablePromise}
  */
-const resolveCatalogEntry = options => {
+export const resolveCatalogEntry = options => {
   const cancellablePromises = [];
   const deferred = $.Deferred();
   const promise = new CancellablePromise(deferred, undefined, cancellablePromises);
@@ -733,7 +733,7 @@ const resolveCatalogEntry = options => {
     cancellablePromises.push(
       dataCatalog
         .getChildren({
-          sourceType: options.sourceType,
+          connector: options.connector,
           namespace: options.namespace,
           compute: options.compute,
           path: identifierChainToPath(nextTable.identifierChain),
@@ -768,9 +768,9 @@ const resolveCatalogEntry = options => {
   } else {
     dataCatalog
       .getEntry({
-        sourceType: options.sourceType,
         namespace: options.namespace,
         compute: options.compute,
+        connector: options.connector,
         path: [],
         cachedOnly: options && options.cachedOnly,
         cancellable: options && options.cancellable,
@@ -824,6 +824,5 @@ export default {
     a.last_column === b.last_column,
   identifierEquals: identifierEquals,
   sortSuggestions: sortSuggestions,
-  resolveCatalogEntry: resolveCatalogEntry,
   identifierChainToPath: identifierChainToPath
 };

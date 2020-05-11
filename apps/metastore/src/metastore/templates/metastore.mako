@@ -372,9 +372,9 @@ ${ components.menubar(is_embeddable) }
         </div>
 
         % if is_embeddable:
-          <button href="javascript: void(0);" class="btn btn-default" data-bind="publish: { 'open.link': '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }' + '/?sourceType=' + catalogEntry().getSourceType() + '&namespace=' + catalogEntry().namespace.id + '&compute=' + catalogEntry().compute.id  }" title="${_('Create a new database')}"><i class="fa fa-plus"></i> ${_('New')}</button>
+          <button href="javascript: void(0);" class="btn btn-default" data-bind="publish: { 'open.link': '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }' + '/?sourceType=' + catalogEntry().getConnector().id + '&namespace=' + catalogEntry().namespace.id + '&compute=' + catalogEntry().compute.id  }" title="${_('Create a new database')}"><i class="fa fa-plus"></i> ${_('New')}</button>
         % elif ENABLE_NEW_CREATE_TABLE.get():
-          <button class="btn btn-default" data-bind="attr: { 'href': '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }' + '/?sourceType=' + catalogEntry().getSourceType() + '&namespace=' + catalogEntry().namespace.id + '&compute=' + catalogEntry().compute.id }" title="${_('Create a new database')}"><i class="fa fa-plus"></i> ${_('New')}</button>
+          <button class="btn btn-default" data-bind="attr: { 'href': '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }' + '/?sourceType=' + catalogEntry().getConnector().id + '&namespace=' + catalogEntry().namespace.id + '&compute=' + catalogEntry().compute.id }" title="${_('Create a new database')}"><i class="fa fa-plus"></i> ${_('New')}</button>
         % else:
           <button href="${ url('beeswax:create_database') }" class="btn btn-default" title="${_('Create a new database')}"><i class="fa fa-plus"></i> ${_('New')}</button>
         % endif
@@ -504,9 +504,9 @@ ${ components.menubar(is_embeddable) }
         % if has_write_access:
           <button id="dropBtn" class="btn toolbarBtn" title="${_('Drop the selected tables')}" data-bind="click: function () { $('#dropTable').modal('show'); }, disable: selectedTables().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
           % if is_embeddable:
-            <button href="javascript: void(0);" class="btn btn-default" data-bind="publish: { 'open.link': '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + catalogEntry.name + '/?sourceType=' + catalogEntry.getSourceType() + '&namespace=' + catalogEntry.namespace.id + '&compute=' + catalogEntry.compute.id }" title="${_('Create a new table')}"><i class="fa fa-plus"></i> ${_('New')}</button>
+            <button href="javascript: void(0);" class="btn btn-default" data-bind="publish: { 'open.link': '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + catalogEntry.name + '/?sourceType=' + catalogEntry.getConnector().id + '&namespace=' + catalogEntry.namespace.id + '&compute=' + catalogEntry.compute.id }" title="${_('Create a new table')}"><i class="fa fa-plus"></i> ${_('New')}</button>
           % elif ENABLE_NEW_CREATE_TABLE.get():
-            <button class="btn btn-default" data-bind="attr: { 'href': '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + catalogEntry.name + '/?sourceType=' + catalogEntry.getSourceType() + '&namespace=' + catalogEntry.namespace.id + '&compute=' + catalogEntry.compute.id }" title="${_('Create a new table')}"><i class="fa fa-plus"></i> ${_('New')}</button>
+            <button class="btn btn-default" data-bind="attr: { 'href': '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + catalogEntry.name + '/?sourceType=' + catalogEntry.getConnector().id + '&namespace=' + catalogEntry.namespace.id + '&compute=' + catalogEntry.compute.id }" title="${_('Create a new table')}"><i class="fa fa-plus"></i> ${_('New')}</button>
           % else:
             <button class="btn btn-default" data-bind="attr: { 'href': '/beeswax/create/import_wizard/' + catalogEntry.name }" title="${_('Create a new table from a file')}"><i class="fa fa-stack"></i> ${_('New from file')}</button>
             <button class="btn btn-default" data-bind="attr: { 'href': '/beeswax/create/create_table/' + catalogEntry.name }" title="${_('Create a new table manually')}"><i class="fa fa-plus"></i> ${_('New manually')}</button>
@@ -720,7 +720,7 @@ ${ components.menubar(is_embeddable) }
   <div style="padding: 5px 15px">
     <!-- ko hueSpinner: { spin: loadingViewSql, inline: true } --><!-- /ko -->
     <!-- ko ifnot: loadingViewSql -->
-    <div data-bind="highlight: { value: viewSql, formatted: true, dialect: catalogEntry.getSourceType() }"></div>
+    <div data-bind="highlight: { value: viewSql, formatted: true, dialect: catalogEntry.getDialect() }"></div>
     <!-- /ko -->
   </div>
 </script>
@@ -764,14 +764,14 @@ ${ components.menubar(is_embeddable) }
     <!-- /ko -->
     <!-- ko foreach: topJoins -->
     <tr>
-      <td><a href="javascript:void(0);" data-bind="text: tableName, sqlContextPopover: { sourceType: $parents[1].catalogEntry.getSourceType(), namespace: parents[1].catalogEntry.namespace, compute: parents[1].catalogEntry.compute, path: tablePath, offset: { top: -3, left: 3 }}"></a></td>
+      <td><a href="javascript:void(0);" data-bind="text: tableName, sqlContextPopover: { sourceType: $parents[1].catalogEntry.getConnector().id, namespace: parents[1].catalogEntry.namespace, compute: parents[1].catalogEntry.compute, path: tablePath, offset: { top: -3, left: 3 }}"></a></td>
       <td>
         <table class="metastore-join-column-table">
           <tbody data-bind="foreach: joinCols">
           <tr>
-            <td><a href="javascript:void(0);" data-bind="text: target, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), namespace: $parents[2].catalogEntry.namespace, compute: parents[2].catalogEntry.compute, path: targetPath, offset: { top: -3, left: 3 }}"></a></td>
+            <td><a href="javascript:void(0);" data-bind="text: target, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getConnector().id, namespace: $parents[2].catalogEntry.namespace, compute: parents[2].catalogEntry.compute, path: targetPath, offset: { top: -3, left: 3 }}"></a></td>
             <td class="metastore-join-arrow"><i class="fa fa-arrows-h"></i></td>
-            <td><a href="javascript:void(0);" data-bind="text: source, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getSourceType(), namespace: $parents[2].catalogEntry.namespace, compute: parents[2].catalogEntry.compute, path: sourcePath, offset: { top: -3, left: 3 }}"></a></td>
+            <td><a href="javascript:void(0);" data-bind="text: source, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getConnector().id, namespace: $parents[2].catalogEntry.namespace, compute: parents[2].catalogEntry.compute, path: sourcePath, offset: { top: -3, left: 3 }}"></a></td>
           </tr>
           </tbody>
         </table>
@@ -1034,7 +1034,7 @@ ${ components.menubar(is_embeddable) }
   }
 
   function queryAndWatch(catalogEntry) {
-    queryAndWatchUrl('/notebook/browse/' + catalogEntry.path.join('/') + '/', catalogEntry.getSourceType(),
+    queryAndWatchUrl('/notebook/browse/' + catalogEntry.path.join('/') + '/', catalogEntry.getConnector().id,
             catalogEntry.namespace && catalogEntry.namespace.id, catalogEntry.compute)
   }
 </script>

@@ -493,7 +493,7 @@ def _get_query_key(notebook, snippet):
     query_key = notebook['uuid']
 
   if not query_key:
-    raise QueryError()
+    raise QueryError('Query Key Missing')
   else:
     return query_key
 

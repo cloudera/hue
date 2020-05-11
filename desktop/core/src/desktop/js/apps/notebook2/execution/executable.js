@@ -13,6 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+import $ from 'jquery';
 
 import apiHelper from 'api/apiHelper';
 import ExecutionResult from 'apps/notebook2/execution/executionResult';
@@ -302,9 +303,13 @@ export default class Executable {
           case EXECUTION_STATUS.failed:
             this.executeEnded = Date.now();
             this.setStatus(queryStatus.status);
+            if (queryStatus.message) {
+              $.jHueNotify.error(queryStatus.message); // TODO: Inline instead of popup, e.g. ERROR_REGEX in Execute()
+            }
             break;
           default:
             this.executeEnded = Date.now();
+            this.setStatus(EXECUTION_STATUS.failed);
             console.warn('Got unknown status ' + queryStatus.status);
         }
       })
@@ -403,10 +408,10 @@ export default class Executable {
       };
     }
 
-    const session = await sessionManager.getSession({ type: this.executor.connector().type });
+    const session = await sessionManager.getSession({ type: this.executor.connector().id });
     const statement = this.getStatement();
     const snippet = {
-      type: this.executor.connector().type,
+      type: this.executor.connector().id,
       result: {
         handle: this.handle
       },
@@ -424,7 +429,7 @@ export default class Executable {
     };
 
     const notebook = {
-      type: this.executor.connector().type,
+      type: this.executor.connector().id,
       snippets: [snippet],
       id: this.notebookId,
       uuid: hueUtils.UUID(),

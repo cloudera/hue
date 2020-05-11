@@ -58,7 +58,7 @@ function Plugin(element, options) {
   if (self.options.namespace) {
     self.namespaceDeferred.resolve(self.options.namespace);
   } else {
-    contextCatalog.getNamespaces({ sourceType: options.apiHelperType }).done(context => {
+    contextCatalog.getNamespaces({ connector: { id: options.apiHelperType } }).done(context => {
       if (context.namespaces && context.namespaces.length) {
         self.namespaceDeferred.resolve(context.namespaces[0]);
       } else {
@@ -191,9 +191,10 @@ Plugin.prototype.init = function() {
       validateTimeout = window.setTimeout(() => {
         $.when(self.namespaceDeferred, self.computeDeferred).done((namespace, compute) => {
           const target = path.pop();
+          // TODO: Use connectors in hiveautocomplete
           dataCatalog
             .getChildren({
-              sourceType: self.options.apiHelperType,
+              connector: { id: self.options.apiHelperType },
               namespace: namespace,
               compute: compute,
               path: path
@@ -325,7 +326,7 @@ Plugin.prototype.init = function() {
     $.when(self.namespaceDeferred, self.computeDeferred).done((namespace, compute) => {
       dataCatalog
         .getChildren({
-          sourceType: self.options.apiHelperType,
+          connector: { id: self.options.apiHelperType }, // TODO: Use connectors in hiveautocomplete
           namespace: namespace,
           compute: compute,
           path: []
@@ -345,10 +346,9 @@ Plugin.prototype.init = function() {
     $.when(self.namespaceDeferred, self.computeDeferred).done((namespace, compute) => {
       dataCatalog
         .getEntry({
-          sourceType: self.options.apiHelperType,
           namespace: namespace,
           compute: compute,
-          connector: {},
+          connector: { id: self.options.apiHelperType },
           path: [database]
         })
         .done(entry => {
@@ -362,10 +362,9 @@ Plugin.prototype.init = function() {
     $.when(self.namespaceDeferred, self.computeDeferred).done((namespace, compute) => {
       dataCatalog
         .getEntry({
-          sourceType: self.options.apiHelperType,
           namespace: namespace,
           compute: compute,
-          connector: {},
+          connector: { id: self.options.apiHelperType },
           path: [database, table]
         })
         .done(entry => {

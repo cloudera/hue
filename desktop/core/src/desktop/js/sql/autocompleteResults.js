@@ -549,7 +549,6 @@ class AutocompleteResults {
     const databasesDeferred = $.Deferred();
     dataCatalog
       .getEntry({
-        sourceType: self.dialect(),
         namespace: self.snippet.namespace(),
         compute: self.snippet.compute(),
         connector: self.snippet.connector(),
@@ -811,7 +810,6 @@ class AutocompleteResults {
 
         dataCatalog
           .getEntry({
-            sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
             connector: self.snippet.connector(),
@@ -1339,6 +1337,7 @@ class AutocompleteResults {
         fetchFunction = 'fetchAbfsPath';
         path = path.substring(6);
         if (path === '/') {
+          // TODO: connector.id for browsers
           const connector = findBrowserConnector(connector => connector.type === 'abfs');
           const rootPath = getRootFilePath(connector);
           if (rootPath) {
@@ -1430,7 +1429,6 @@ class AutocompleteResults {
       if (paths.length) {
         dataCatalog
           .getMultiTableEntry({
-            sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
             connector: self.snippet.connector(),
@@ -1555,7 +1553,6 @@ class AutocompleteResults {
       if (paths.length) {
         dataCatalog
           .getMultiTableEntry({
-            sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
             connector: self.snippet.connector(),
@@ -1645,7 +1642,6 @@ class AutocompleteResults {
       if (paths.length) {
         dataCatalog
           .getMultiTableEntry({
-            sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
             connector: self.snippet.connector(),
@@ -1764,7 +1760,7 @@ class AutocompleteResults {
 
     self.cancellablePromises.push(
       dataCatalog
-        .getCatalog(self.dialect(), self.snippet.connector())
+        .getCatalog(self.snippet.connector())
         .loadOptimizerPopularityForTables({
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
@@ -1875,7 +1871,6 @@ class AutocompleteResults {
       if (paths.length) {
         dataCatalog
           .getMultiTableEntry({
-            sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
             connector: self.snippet.connector(),
@@ -1967,7 +1962,6 @@ class AutocompleteResults {
 
       dataCatalog
         .getEntry({
-          sourceType: self.dialect(),
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
           connector: self.snippet.connector(),
@@ -2055,7 +2049,7 @@ class AutocompleteResults {
 
       self.cancellablePromises.push(
         dataCatalog
-          .getCatalog(self.dialect(), self.snippet.connector())
+          .getCatalog(self.snippet.connector())
           .loadOptimizerPopularityForTables({
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
@@ -2280,7 +2274,6 @@ class AutocompleteResults {
 
       dataCatalog
         .getEntry({
-          sourceType: self.dialect(),
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
           connector: self.snippet.connector(),
@@ -2327,7 +2320,6 @@ class AutocompleteResults {
     if (path.length > 1 && (self.dialect() === DIALECT.impala || self.dialect() === DIALECT.hive)) {
       dataCatalog
         .getEntry({
-          sourceType: self.dialect(),
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
           connector: self.snippet.connector(),

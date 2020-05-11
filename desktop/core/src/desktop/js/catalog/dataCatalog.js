@@ -22,7 +22,7 @@ import catalogUtils from 'catalog/catalogUtils';
 import DataCatalogEntry from 'catalog/dataCatalogEntry';
 import GeneralDataCatalog from 'catalog/generalDataCatalog';
 import MultiTableEntry from 'catalog/multiTableEntry';
-import { getOptimizer } from './optimizer/optimizer';
+import { getOptimizer, LOCAL_STRATEGY } from './optimizer/optimizer';
 
 const STORAGE_POSTFIX = window.LOGGED_USERNAME;
 const DATA_CATALOG_VERSION = 5;
@@ -88,8 +88,10 @@ const mergeEntry = function(dataCatalogEntry, storeEntry) {
   mergeAttribute('partitions', CACHEABLE_TTL.default, 'partitionsPromise');
   mergeAttribute('sample', CACHEABLE_TTL.default, 'samplePromise');
   mergeAttribute('navigatorMeta', CACHEABLE_TTL.default, 'navigatorMetaPromise');
-  mergeAttribute('optimizerMeta', CACHEABLE_TTL.optimizer, 'optimizerMetaPromise');
-  mergeAttribute('optimizerPopularity', CACHEABLE_TTL.optimizer);
+  if (dataCatalogEntry.getConnector().optimizer !== LOCAL_STRATEGY) {
+    mergeAttribute('optimizerMeta', CACHEABLE_TTL.optimizer, 'optimizerMetaPromise');
+    mergeAttribute('optimizerPopularity', CACHEABLE_TTL.optimizer);
+  }
 };
 
 /**
@@ -99,6 +101,9 @@ const mergeEntry = function(dataCatalogEntry, storeEntry) {
  * @param {Object} storeEntry - The cached version
  */
 const mergeMultiTableEntry = function(multiTableCatalogEntry, storeEntry) {
+  if (multiTableCatalogEntry.getConnector().optimizer === LOCAL_STRATEGY) {
+    return;
+  }
   const mergeAttribute = function(attributeName, ttl, promiseName) {
     if (
       storeEntry.version === DATA_CATALOG_VERSION &&
@@ -123,23 +128,25 @@ const mergeMultiTableEntry = function(multiTableCatalogEntry, storeEntry) {
 
 export class DataCatalog {
   /**
-   * @param {string} sourceType
    * @param {Connector} connector
    *
    * @constructor
    */
-  constructor(sourceType, connector) {
+  constructor(connector) {
     const self = this;
-    self.sourceType = sourceType;
+    if (!connector || !connector.id) {
+      throw new Error('DataCatalog created without connector or id');
+    }
     self.connector = connector;
+
     self.entries = {};
     self.temporaryEntries = {};
     self.multiTableEntries = {};
     self.store = localforage.createInstance({
-      name: 'HueDataCatalog_' + self.sourceType + '_' + STORAGE_POSTFIX
+      name: 'HueDataCatalog_' + self.connector.id + '_' + STORAGE_POSTFIX
     });
     self.multiTableStore = localforage.createInstance({
-      name: 'HueDataCatalog_' + self.sourceType + '_multiTable_' + STORAGE_POSTFIX
+      name: 'HueDataCatalog_' + self.connector.id + '_multiTable_' + STORAGE_POSTFIX
     });
   }
 
@@ -253,8 +260,12 @@ export class DataCatalog {
         partitions: dataCatalogEntry.partitions,
         sample: dataCatalogEntry.sample,
         navigatorMeta: dataCatalogEntry.navigatorMeta,
-        optimizerMeta: dataCatalogEntry.optimizerMeta,
-        optimizerPopularity: dataCatalogEntry.optimizerPopularity
+        optimizerMeta:
+          this.connector.optimizer !== LOCAL_STRATEGY ? dataCatalogEntry.optimizerMeta : undefined,
+        optimizerPopularity:
+          this.connector.optimizer !== LOCAL_STRATEGY
+            ? dataCatalogEntry.optimizerPopularity
+            : undefined
       })
       .then(deferred.resolve)
       .catch(deferred.reject);
@@ -791,7 +802,12 @@ export class DataCatalog {
    */
   persistMultiTableEntry(multiTableEntry) {
     const self = this;
-    if (!cacheEnabled || CACHEABLE_TTL.default <= 0 || CACHEABLE_TTL.optimizer <= 0) {
+    if (
+      !cacheEnabled ||
+      CACHEABLE_TTL.default <= 0 ||
+      CACHEABLE_TTL.optimizer <= 0 ||
+      multiTableEntry.getConnector().optimizer === LOCAL_STRATEGY
+    ) {
       return $.Deferred()
         .resolve()
         .promise();
@@ -817,18 +833,17 @@ const sourceBoundCatalogs = {};
 /**
  * Helper function to get the DataCatalog instance for a given data source.
  *
- * @param {string} sourceType
  * @param {Connector} connector
  *
  * @return {DataCatalog}
  */
-const getCatalog = function(sourceType, connector) {
-  if (!sourceType) {
-    throw new Error('getCatalog called without sourceType');
+const getCatalog = function(connector) {
+  if (!connector || !connector.id) {
+    throw new Error('getCatalog called without connector with id');
   }
   return (
-    sourceBoundCatalogs[sourceType] ||
-    (sourceBoundCatalogs[sourceType] = new DataCatalog(sourceType, connector))
+    sourceBoundCatalogs[connector.id] ||
+    (sourceBoundCatalogs[connector.id] = new DataCatalog(connector))
   );
 };
 
@@ -840,7 +855,6 @@ export default {
    * Calling this returns a handle that allows deletion of any created entries by calling delete() on the handle.
    *
    * @param {Object} options
-   * @param {string} options.sourceType
    * @param {ContextNamespace} options.namespace - The context namespace
    * @param {ContextCompute} options.compute - The context compute
    * @param {Connector} options.connector
@@ -854,12 +868,11 @@ export default {
    * @return {Object}
    */
   addTemporaryTable: function(options) {
-    return getCatalog(options.sourceType, options.connector).addTemporaryTable(options);
+    return getCatalog(options.connector).addTemporaryTable(options);
   },
 
   /**
    * @param {Object} options
-   * @param {string} options.sourceType
    * @param {ContextNamespace} options.namespace - The context namespace
    * @param {ContextCompute} options.compute - The context compute
    * @param {Connector} options.connector
@@ -870,12 +883,11 @@ export default {
    * @return {Promise}
    */
   getEntry: function(options) {
-    return getCatalog(options.sourceType, options.connector).getEntry(options);
+    return getCatalog(options.connector).getEntry(options);
   },
 
   /**
    * @param {Object} options
-   * @param {string} options.sourceType
    * @param {ContextNamespace} options.namespace - The context namespace
    * @param {ContextCompute} options.compute - The context compute
    * @param {Connector} options.connector
@@ -884,7 +896,7 @@ export default {
    * @return {Promise}
    */
   getMultiTableEntry: function(options) {
-    return getCatalog(options.sourceType, options.connector).getMultiTableEntry(options);
+    return getCatalog(options.connector).getMultiTableEntry(options);
   },
 
   /**
@@ -892,7 +904,6 @@ export default {
    * getEntry then getChildren.
    *
    * @param {Object} options
-   * @param {string} options.sourceType
    * @param {ContextNamespace} options.namespace - The context namespace
    * @param {ContextCompute} options.compute - The context compute
    * @param {Connector} options.connector
@@ -908,7 +919,7 @@ export default {
   getChildren: function(options) {
     const deferred = $.Deferred();
     const cancellablePromises = [];
-    getCatalog(options.sourceType, options.connector)
+    getCatalog(options.connector)
       .getEntry(options)
       .done(entry => {
         cancellablePromises.push(
@@ -923,7 +934,6 @@ export default {
   },
 
   /**
-   * @param {string} sourceType
    * @param {Connector} connector
    *
    * @return {DataCatalog}

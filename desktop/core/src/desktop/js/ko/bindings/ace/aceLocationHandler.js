@@ -25,6 +25,12 @@ import sqlStatementsParser from 'parse/sqlStatementsParser';
 import sqlUtils from 'sql/sqlUtils';
 import stringDistance from 'sql/stringDistance';
 import { DIALECT } from 'apps/notebook2/snippet';
+import {
+  POST_FROM_LOCATION_WORKER_EVENT,
+  POST_FROM_SYNTAX_WORKER_EVENT,
+  POST_TO_LOCATION_WORKER_EVENT,
+  POST_TO_SYNTAX_WORKER_EVENT
+} from 'sql/sqlWorkerHandler';
 
 // TODO: depends on Ace, sqlStatementsParser
 
@@ -182,7 +188,6 @@ class AceLocationHandler {
                     // Note, as cachedOnly is set to true it will call the successCallback right away (or not at all)
                     dataCatalog
                       .getEntry({
-                        sourceType: self.dialect(),
                         namespace: self.snippet.namespace(),
                         compute: self.snippet.compute(),
                         connector: self.snippet.connector(),
@@ -720,13 +725,13 @@ class AceLocationHandler {
             statementLocation.last_column
           )
         );
-      huePubSub.publish('ace.sql.syntax.worker.post', {
+      huePubSub.publish(POST_TO_SYNTAX_WORKER_EVENT, {
         id: self.snippet.id(),
         editorChangeTime: editorChangeTime,
         beforeCursor: beforeCursor,
         afterCursor: afterCursor,
         statementLocation: statementLocation,
-        type: self.dialect()
+        connector: self.snippet.connector()
       });
     }
   }
@@ -754,7 +759,7 @@ class AceLocationHandler {
       return;
     }
 
-    self.sqlSyntaxWorkerSub = huePubSub.subscribe('ace.sql.syntax.worker.message', e => {
+    self.sqlSyntaxWorkerSub = huePubSub.subscribe(POST_FROM_SYNTAX_WORKER_EVENT, e => {
       if (
         e.data.id !== self.snippet.id() ||
         e.data.editorChangeTime !== self.editor.lastChangeTime
@@ -851,7 +856,7 @@ class AceLocationHandler {
     const deferred = $.Deferred();
     dataCatalog
       .getChildren({
-        sourceType: self.dialect(),
+        connector: self.snippet.connector(),
         namespace: self.snippet.namespace(),
         compute: self.snippet.compute(),
         temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly,
@@ -969,7 +974,7 @@ class AceLocationHandler {
           if (typeof nextTable.subQuery === 'undefined') {
             dataCatalog
               .getChildren({
-                sourceType: self.dialect(),
+                connector: self.snippet.connector(),
                 namespace: self.snippet.namespace(),
                 compute: self.snippet.compute(),
                 temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly,
@@ -1192,7 +1197,7 @@ class AceLocationHandler {
       getLocationsSub.remove();
     });
 
-    const locationWorkerSub = huePubSub.subscribe('ace.sql.location.worker.message', e => {
+    const locationWorkerSub = huePubSub.subscribe(POST_FROM_LOCATION_WORKER_EVENT, e => {
       if (
         e.data.id !== self.snippet.id() ||
         e.data.editorChangeTime !== self.editor.lastChangeTime ||
@@ -1203,7 +1208,7 @@ class AceLocationHandler {
 
       lastKnownLocations = {
         id: self.editorId,
-        type: self.dialect(),
+        connector: self.snippet.connector(),
         namespace: self.snippet.namespace(),
         compute: self.snippet.compute(),
         defaultDatabase: self.snippet.database(),
@@ -1338,10 +1343,10 @@ class AceLocationHandler {
             lastContextRequest.dispose();
           }
           lastContextRequest = self.snippet.whenContextSet().done(() => {
-            huePubSub.publish('ace.sql.location.worker.post', {
+            huePubSub.publish(POST_TO_LOCATION_WORKER_EVENT, {
               id: self.snippet.id(),
               statementDetails: statementDetails,
-              type: self.snippet && self.snippet.dialect ? self.snippet.dialect() : self.dialect(),
+              connector: self.snippet.connector(),
               namespace: self.snippet.namespace(),
               compute: self.snippet.compute(),
               defaultDatabase: self.snippet.database()

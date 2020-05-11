@@ -110,9 +110,10 @@ class DataCatalogContext {
         })
     );
 
+    // TODO: Use connector attributes in dataCatalogContext
     if (
-      self.catalogEntry().getSourceType() === 'impala' ||
-      self.catalogEntry().getSourceType() === 'hive'
+      self.catalogEntry().getDialect() === 'impala' ||
+      self.catalogEntry().getDialect() === 'hive'
     ) {
       self.activePromises.push(
         self
@@ -192,7 +193,7 @@ class DataCatalogContext {
       '/hue/dashboard/browse/' +
         self.catalogEntry().path.join('.') +
         '?engine=' +
-        self.catalogEntry().getSourceType()
+        self.catalogEntry().getConnector().id
     );
     huePubSub.publish('context.popover.hide');
     huePubSub.publish('global.search.close');
@@ -206,7 +207,7 @@ class DataCatalogContext {
         (self.catalogEntry().isTableOrView() ? '/' : 's/') +
         self.catalogEntry().path.join('/') +
         '?source_type=' +
-        self.catalogEntry().getSourceType() +
+        self.catalogEntry().getConnector().id +
         '&namespace=' +
         self.catalogEntry().namespace.id
     );

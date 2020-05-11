@@ -31,10 +31,10 @@ import apiHelper from 'api/apiHelper';
 import Executor from 'apps/notebook2/execution/executor';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
+import hueUtils, { defer } from 'utils/hueUtils';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
-import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
+import { HIDE_FIXED_HEADERS_EVENT, REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
 import {
   EXECUTABLE_STATUS_TRANSITION_EVENT,
   EXECUTABLE_UPDATED_EVENT,
@@ -54,6 +54,7 @@ import {
   ASSIST_GET_SOURCE_EVENT,
   ASSIST_SET_SOURCE_EVENT
 } from 'ko/components/assist/events';
+import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
 
 // TODO: Remove for ENABLE_NOTEBOOK_2. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
@@ -200,7 +201,7 @@ export default class Snippet {
     this.connector = ko.observable();
 
     this.connector.subscribe(connector => {
-      sessionManager.getSession({ type: connector.type }).then(() => {
+      sessionManager.getSession({ type: connector.id }).then(() => {
         this.status(STATUS.ready);
       });
     });
@@ -208,7 +209,7 @@ export default class Snippet {
     this.initializeConnector(snippetRaw);
 
     this.dialect = ko.pureComputed(() => this.connector() && this.connector().dialect);
-    this.connectorType = ko.pureComputed(() => this.connector() && this.connector().type);
+    this.connectorType = ko.pureComputed(() => this.connector() && this.connector().id);
 
     this.isSqlDialect = ko.pureComputed(() => this.connector() && this.connector().is_sql);
     this.defaultLimit = ko.observable(snippetRaw.defaultLimit);
@@ -288,6 +289,16 @@ export default class Snippet {
 
     // History is currently in Notebook, same with saved queries by snippets, might be better in assist
     this.currentQueryTab = ko.observable(snippetRaw.currentQueryTab || 'queryHistory');
+
+    this.currentQueryTab.subscribe(newVal => {
+      huePubSub.publish(HIDE_FIXED_HEADERS_EVENT);
+      if (newVal === 'queryResults') {
+        defer(() => {
+          huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
+        });
+      }
+    });
+
     this.pinnedContextTabs = ko.observableArray(snippetRaw.pinnedContextTabs || []);
 
     huePubSub.publish(ASSIST_GET_SOURCE_EVENT, source => {
@@ -300,7 +311,7 @@ export default class Snippet {
 
     if (!this.database()) {
       huePubSub.publish(ASSIST_GET_DATABASE_EVENT, {
-        source: this.dialect(),
+        connector: this.connector(),
         callback: databaseDef => {
           this.handleAssistSelection(databaseDef);
         }
@@ -582,7 +593,7 @@ export default class Snippet {
     });
 
     const activeSourcePromises = [];
-    huePubSub.subscribe('ace.sql.location.worker.message', e => {
+    huePubSub.subscribe(POST_FROM_LOCATION_WORKER_EVENT, e => {
       while (activeSourcePromises.length) {
         const promise = activeSourcePromises.pop();
         if (promise.cancel) {
@@ -1288,15 +1299,15 @@ export default class Snippet {
     }
   }
 
-  handleAssistSelection(databaseDef) {
+  handleAssistSelection(entry) {
     if (this.ignoreNextAssistDatabaseUpdate) {
       this.ignoreNextAssistDatabaseUpdate = false;
-    } else if (databaseDef.sourceType === this.dialect()) {
-      if (this.namespace() !== databaseDef.namespace) {
-        this.namespace(databaseDef.namespace);
+    } else if (entry.getConnector().id === this.connector().id) {
+      if (this.namespace() !== entry.namespace) {
+        this.namespace(entry.namespace);
       }
-      if (this.database() !== databaseDef.name) {
-        this.database(databaseDef.name);
+      if (this.database() !== entry.name) {
+        this.database(entry.name);
       }
     }
   }
@@ -1316,9 +1327,8 @@ export default class Snippet {
   }
 
   initializeConnector(snippetRaw) {
-    const connectorTypeToFind =
-      (snippetRaw.connector && snippetRaw.connector.type) || snippetRaw.type;
-    let foundConnector = findEditorConnector(connector => connector.type === connectorTypeToFind);
+    const connectorIdToFind = (snippetRaw.connector && snippetRaw.connector.id) || snippetRaw.type;
+    let foundConnector = findEditorConnector(connector => connector.id === connectorIdToFind);
 
     if (!foundConnector) {
       // If not found by type pick the first by dialect

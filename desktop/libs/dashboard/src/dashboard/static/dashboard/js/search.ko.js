@@ -559,7 +559,7 @@ var Collection = function (vm, collection) {
   self.activeNamespace = ko.observable();
   self.activeCompute = ko.observable();
 
-  contextCatalog.getNamespaces({ sourceType: collection.engine || 'solr' }).done(function (context) {
+  contextCatalog.getNamespaces({ connector: { id: collection.engine || 'solr' } }).done(function (context) {
     // TODO: Namespace selection
     self.activeNamespace(context.namespaces[0]);
     self.activeCompute(context.namespaces[0].computes[0]);

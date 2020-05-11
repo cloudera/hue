@@ -21,7 +21,8 @@ import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import MetastoreSource from 'apps/table_browser/metastoreSource';
-import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import dataCatalog from 'catalog/dataCatalog';
+import { findEditorConnector, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 class MetastoreViewModel {
   /**
@@ -115,10 +116,10 @@ class MetastoreViewModel {
 
     this.currentTab = ko.observable('');
 
-    huePubSub.subscribe('assist.database.selected', databaseDef => {
-      if (this.source().type !== databaseDef.sourceType) {
+    huePubSub.subscribe('assist.database.selected', entry => {
+      if (this.source().type !== entry.getConnector().id) {
         const found = this.sources().some(source => {
-          if (source.type === databaseDef.sourceType) {
+          if (source.type === entry.getConnector().id) {
             this.source(source);
             return true;
           }
@@ -128,11 +129,11 @@ class MetastoreViewModel {
         }
       }
 
-      if (this.source().namespace().id !== databaseDef.namespace.id) {
+      if (this.source().namespace().id !== entry.namespace.id) {
         const found = this.source()
           .namespaces()
           .some(namespace => {
-            if (namespace.id === databaseDef.namespace.id) {
+            if (namespace.id === entry.namespace.id) {
               this.source().namespace(namespace);
               return true;
             }
@@ -153,13 +154,13 @@ class MetastoreViewModel {
       }
       this.source()
         .namespace()
-        .setDatabaseByName(databaseDef.name, () => {
+        .setDatabaseByName(entry.name, () => {
           huePubSub.publish('metastore.url.change');
         });
     });
 
-    huePubSub.subscribe('assist.table.selected', tableDef => {
-      this.loadTableDef(tableDef, () => {
+    huePubSub.subscribe('assist.table.selected', entry => {
+      this.loadTableDef(entry, () => {
         huePubSub.publish('metastore.url.change');
       });
     });
@@ -271,10 +272,10 @@ class MetastoreViewModel {
     };
   }
 
-  loadTableDef(tableDef, callback) {
-    if (this.source().type !== tableDef.sourceType) {
+  loadTableDef(entry, callback) {
+    if (this.source().type !== entry.getConnector().id) {
       const found = this.sources().some(source => {
-        if (source.type === tableDef.sourceType) {
+        if (source.type === entry.getConnector().id) {
           this.source(source);
           return true;
         }
@@ -283,11 +284,11 @@ class MetastoreViewModel {
         return;
       }
     }
-    if (this.source().namespace().id !== tableDef.namespace.id) {
+    if (this.source().namespace().id !== entry.namespace.id) {
       const found = this.source()
         .namespaces()
         .some(namespace => {
-          if (namespace.id === tableDef.namespace.id) {
+          if (namespace.id === entry.namespace.id) {
             this.source().namespace(namespace);
             return true;
           }
@@ -299,7 +300,7 @@ class MetastoreViewModel {
 
     this.source()
       .namespace()
-      .setDatabaseByName(tableDef.database, () => {
+      .setDatabaseByName(entry.path[0], () => {
         if (
           this.source()
             .namespace()
@@ -313,7 +314,7 @@ class MetastoreViewModel {
             this.source()
               .namespace()
               .database()
-              .table().catalogEntry.name === tableDef.name
+              .table().catalogEntry.name === entry.name
           ) {
             if (callback) {
               callback();
@@ -326,7 +327,7 @@ class MetastoreViewModel {
               .namespace()
               .database()
               .tables()
-              .filter(table => table.catalogEntry.name === tableDef.name);
+              .filter(table => table.catalogEntry.name === entry.name);
             if (foundTables.length === 1) {
               this.source()
                 .namespace()
@@ -339,7 +340,7 @@ class MetastoreViewModel {
               dbEntry
                 .getChildren({ refreshCache: true, silenceErrors: true })
                 .then(childEntries => {
-                  if (childEntries.some(childEntry => childEntry.name === tableDef.name)) {
+                  if (childEntries.some(childEntry => childEntry.name === entry.name)) {
                     this.source()
                       .namespace()
                       .database()
@@ -351,7 +352,7 @@ class MetastoreViewModel {
                       .clearCache({
                         invalidate: 'invalidate',
                         silenceErrors: true,
-                        targetChild: tableDef.name
+                        targetChild: entry.name
                       })
                       .then(() => {
                         this.source()
@@ -489,25 +490,27 @@ class MetastoreViewModel {
             },
             'metastore'
           );
-          this.loadTableDef(
-            {
-              name: pathParts[2],
-              database: pathParts[1],
-              sourceType: this.source().type,
-              namespace: namespace
-            },
-            () => {
-              if (pathParts.length > 3 && pathParts[3] === 'partitions') {
-                huePubSub.subscribe(
-                  'metastore.loaded.partitions',
-                  () => {
-                    this.currentTab('partitions');
-                  },
-                  'metastore'
-                );
-              }
-            }
-          );
+
+          dataCatalog
+            .getEntry({
+              connector: findEditorConnector(connector => connector.id === this.source().type),
+              namespace: namespace.namespace,
+              compute: namespace.compute,
+              path: [pathParts[1], pathParts[2]]
+            })
+            .then(entry => {
+              this.loadTableDef(entry, () => {
+                if (pathParts.length > 3 && pathParts[3] === 'partitions') {
+                  huePubSub.subscribe(
+                    'metastore.loaded.partitions',
+                    () => {
+                      this.currentTab('partitions');
+                    },
+                    'metastore'
+                  );
+                }
+              });
+            });
       }
     });
   }

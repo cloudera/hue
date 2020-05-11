@@ -53,7 +53,7 @@
     if (self.options.namespace) {
       self.namespaceDeferred.resolve(self.options.namespace);
     } else {
-      contextCatalog.getNamespaces({ sourceType: options.apiHelperType }).done(function (context) {
+      contextCatalog.getNamespaces({ connector: { id: options.apiHelperType } }).done(function (context) {
         if (context.namespaces && context.namespaces.length) {
           self.namespaceDeferred.resolve(context.namespaces[0]);
         } else {
@@ -167,7 +167,7 @@
         validateTimeout = window.setTimeout(function () {
           $.when(self.namespaceDeferred, self.computeDeferred).done(function (namespace, compute) {
             var target = path.pop();
-            dataCatalog.getChildren({ sourceType: self.options.apiHelperType, namespace: namespace, compute: compute, path: path }).done(function (childEntries) {
+            dataCatalog.getChildren({ connector: connector, namespace: namespace, compute: compute, path: path }).done(function (childEntries) {
               if (childEntries.some(function (childEntry) { return childEntry.name === target })) {
                 onPathChange($el.val());
               }
@@ -273,19 +273,21 @@
     self.getDatabases = function (callback) {
       var self = this;
       $.when(self.namespaceDeferred, self.computeDeferred).done(function (namespace, compute) {
-        dataCatalog.getChildren({ sourceType: self.options.apiHelperType, namespace: namespace, compute: compute, path: [] }).done(function (dbEntries) {
+        dataCatalog.getChildren({ connector: { id: self.options.apiHelperType }, namespace: namespace, compute: compute, path: [] }).done(function (dbEntries) {
           callback($.map(dbEntries, function (entry) { return entry.name }));
         });
       })
     };
 
     // TODO: Use connector for hive autocomplete
-    const connector = {};
+    const connector = {
+      id: self.options.apiHelperType
+    };
 
     self.getTables = function (database, callback) {
       var self = this;
       $.when(self.namespaceDeferred, self.computeDeferred).done(function (namespace, compute) {
-        dataCatalog.getEntry({ sourceType: self.options.apiHelperType, connector: connector, namespace: namespace, compute: compute, path: [ database ] }).done(function (entry) {
+        dataCatalog.getEntry({ connector: connector, namespace: namespace, compute: compute, path: [ database ] }).done(function (entry) {
           entry.getSourceMeta().done(callback)
         });
       });
@@ -294,7 +296,7 @@
     self.getColumns = function (database, table, callback) {
       var self = this;
       $.when(self.namespaceDeferred, self.computeDeferred).done(function (namespace, compute) {
-        dataCatalog.getEntry({ sourceType: self.options.apiHelperType, connector: connector, namespace: namespace, compute: compute, path: [ database, table ] }).done(function (entry) {
+        dataCatalog.getEntry({ connector: connector, namespace: namespace, compute: compute, path: [ database, table ] }).done(function (entry) {
           entry.getSourceMeta().done(callback)
         });
       });

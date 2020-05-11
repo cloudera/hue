@@ -37,6 +37,7 @@ import {
   ASSIST_GET_SOURCE_EVENT,
   ASSIST_SET_SOURCE_EVENT
 } from 'ko/components/assist/events';
+import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -185,16 +186,16 @@ class Snippet {
 
     self.connector = ko.observable();
 
-    const updateConnector = type => {
-      if (type) {
-        self.connector(findEditorConnector(connector => connector.type === type));
+    const updateConnector = id => {
+      if (id) {
+        self.connector(findEditorConnector(connector => connector.id === id));
       }
     };
 
     updateConnector(self.type());
 
     self.type.subscribe(type => {
-      if (!self.connector() || self.connector().type !== type) {
+      if (!self.connector() || self.connector().id !== type) {
         updateConnector(type);
       }
       self.status('ready');
@@ -209,10 +210,13 @@ class Snippet {
       return {
         optimizer: self.type() === 'hive' || self.type() === 'impala' ? 'api' : 'off',
         type: self.type(),
+        id: self.type(),
         dialect: self.type(),
         is_sql: self.isSqlDialect()
       };
     });
+
+    self.dialect = ko.pureComputed(() => this.connector().dialect);
 
     self.isBatchable = ko.computed(() => {
       return (
@@ -457,24 +461,24 @@ class Snippet {
     });
 
     let ignoreNextAssistDatabaseUpdate = false;
-    self.handleAssistSelection = function(databaseDef) {
+    self.handleAssistSelection = function(entry) {
       if (ignoreNextAssistDatabaseUpdate) {
         ignoreNextAssistDatabaseUpdate = false;
-      } else if (databaseDef.sourceType === self.type()) {
-        if (self.namespace() !== databaseDef.namespace) {
-          self.namespace(databaseDef.namespace);
+      } else if (entry.getConnector().id === self.connector().id) {
+        if (self.namespace() !== entry.namespace) {
+          self.namespace(entry.namespace);
         }
-        if (self.database() !== databaseDef.name) {
-          self.database(databaseDef.name);
+        if (self.database() !== entry.name) {
+          self.database(entry.name);
         }
       }
     };
 
     if (!self.database()) {
       huePubSub.publish(ASSIST_GET_DATABASE_EVENT, {
-        source: self.type(),
-        callback: databaseDef => {
-          self.handleAssistSelection(databaseDef);
+        connector: self.connector(),
+        callback: entry => {
+          self.handleAssistSelection(entry);
         }
       });
     }
@@ -862,7 +866,7 @@ class Snippet {
     });
 
     const activeSourcePromises = [];
-    huePubSub.subscribe('ace.sql.location.worker.message', e => {
+    huePubSub.subscribe(POST_FROM_LOCATION_WORKER_EVENT, e => {
       while (activeSourcePromises.length) {
         const promise = activeSourcePromises.pop();
         if (promise.cancel) {
@@ -1075,7 +1079,6 @@ class Snippet {
             ignoreNextAssistDatabaseUpdate = true;
             dataCatalog
               .getEntry({
-                sourceType: self.type(),
                 namespace: self.namespace(),
                 compute: self.compute(),
                 connector: self.connector(),

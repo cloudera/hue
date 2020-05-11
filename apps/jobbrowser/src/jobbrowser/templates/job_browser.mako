@@ -88,7 +88,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <!-- ko component: {
       name: 'hue-context-selector',
       params: {
-        sourceType: 'impala',
+        connector: { id: 'impala' },
         compute: compute,
         ##namespace: namespace,
         ##availableDatabases: availableDatabases,
@@ -101,7 +101,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <!-- ko component: {
       name: 'hue-context-selector',
       params: {
-        sourceType: 'jobs',
+        connector: { id: 'jobs' },
         cluster: cluster,
         onClusterSelect: onClusterSelect,
         hideLabels: true
@@ -164,7 +164,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <!-- ko component: {
               name: 'hue-context-selector',
               params: {
-                sourceType: 'jobs',
+                connector: { id: 'jobs' },
                 cluster: cluster,
                 onClusterSelect: onClusterSelect
               }
@@ -1717,7 +1717,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
         <div class="tab-pane" id="queries-page-stmt${ SUFFIX }" data-profile="plan">
           <!-- ko if: properties.plan && properties.plan().stmt -->
-            <pre data-bind="highlight: { value: properties.plan().stmt.trim(), enableOverflow: true, formatted: true, dialect: 'impala' }"/>
+            <pre data-bind="highlight: { value: properties.plan().stmt.trim(), enableOverflow: true, formatted: true, dialect: 'impala' }"></pre>
           <!-- /ko -->
           <!-- ko ifnot: properties.plan && properties.plan().stmt -->
             <pre>

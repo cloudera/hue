@@ -35,7 +35,7 @@ describe('ko.fieldSamples.js', () => {
         loadNavigatorMetaForChildren: () => $.Deferred().reject(),
         loadOptimizerPopularityForChildren: () => $.Deferred().reject(),
         isTableOrView: () => false,
-        getSourceType: () => 'impala'
+        getDialect: () => 'impala'
       }
     });
 

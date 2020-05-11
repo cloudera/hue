@@ -346,12 +346,13 @@ class AssistEditorContextPanel {
       }
       updateOnVisible = false;
 
-      if (!sources[activeLocations.type]) {
-        sources[activeLocations.type] = {
+      if (!sources[activeLocations.connector.id]) {
+        sources[activeLocations.connector.id] = {
           assistDbSource: new AssistDbSource({
             i18n: i18n,
             initialNamespace: activeLocations.namespace,
-            type: activeLocations.type,
+            connector: activeLocations.connector,
+            type: activeLocations.connector.id,
             name: activeLocations.type,
             navigationSettings: navigationSettings
           }),
@@ -360,9 +361,9 @@ class AssistEditorContextPanel {
         };
       }
 
-      const assistDbSource = sources[activeLocations.type].assistDbSource;
-      const databaseIndex = sources[activeLocations.type].databaseIndex;
-      const activeTableIndex = sources[activeLocations.type].activeTableIndex;
+      const assistDbSource = sources[activeLocations.connector.id].assistDbSource;
+      const databaseIndex = sources[activeLocations.connector.id].databaseIndex;
+      const activeTableIndex = sources[activeLocations.connector.id].activeTableIndex;
 
       if (!activeLocations) {
         this.activeLocations(undefined);
@@ -412,10 +413,9 @@ class AssistEditorContextPanel {
               } else {
                 dataCatalog
                   .getEntry({
-                    sourceType: activeLocations.type,
                     namespace: activeLocations.namespace,
                     compute: activeLocations.compute,
-                    connector: this.connector(),
+                    connector: activeLocations.connector,
                     path: [database],
                     definition: { type: 'database' }
                   })
@@ -493,10 +493,9 @@ class AssistEditorContextPanel {
                               });
                               dataCatalog
                                 .getEntry({
-                                  sourceType: activeLocations.type,
                                   namespace: activeLocations.namespace,
                                   compute: activeLocations.compute,
-                                  connector: self.connector,
+                                  connector: activeLocations.connector,
                                   path: []
                                 })
                                 .done(sourceEntry => {
@@ -586,19 +585,19 @@ class AssistEditorContextPanel {
     };
 
     huePubSub.subscribe('data.catalog.entry.refreshed', details => {
-      const sourceType = details.entry.getSourceType();
-      if (sources[sourceType]) {
+      const connectorId = details.entry.getConnector().id;
+      if (sources[connectorId]) {
         let completeRefresh = false;
         if (details.entry.isSource()) {
-          sources[sourceType].databaseIndex = {};
-          sources[sourceType].activeTableIndex = {};
+          sources[connectorId].databaseIndex = {};
+          sources[connectorId].activeTableIndex = {};
           completeRefresh = true;
         } else if (
           details.entry.isDatabase() &&
-          sources[sourceType].databaseIndex[details.entry.name]
+          sources[connectorId].databaseIndex[details.entry.name]
         ) {
-          const dbEntry = sources[sourceType].databaseIndex[details.entry.name];
-          const activeTableIndex = sources[sourceType].activeTableIndex;
+          const dbEntry = sources[connectorId].databaseIndex[details.entry.name];
+          const activeTableIndex = sources[connectorId].activeTableIndex;
           Object.keys(activeTableIndex).forEach(tableKey => {
             const tableEntry = activeTableIndex[tableKey];
             if (tableEntry.parent === dbEntry) {
@@ -607,7 +606,7 @@ class AssistEditorContextPanel {
             }
           });
         } else if (details.entry.isTableOrView()) {
-          const activeTableIndex = sources[sourceType].activeTableIndex;
+          const activeTableIndex = sources[connectorId].activeTableIndex;
           if (activeTableIndex[details.entry.getQualifiedPath()]) {
             delete activeTableIndex[details.entry.getQualifiedPath()];
             completeRefresh = true;

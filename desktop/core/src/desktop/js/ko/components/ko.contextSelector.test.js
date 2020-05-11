@@ -15,13 +15,15 @@
 // limitations under the License.
 
 import { koSetup } from 'jest/koTestUtils';
-import { NAME } from './ko.contextSelector';
+import { CONTEXT_SELECTOR_COMPONENT } from './ko.contextSelector';
 
 describe('ko.contextSelector.js', () => {
   const setup = koSetup();
 
   it('should render component', async () => {
-    const element = await setup.renderComponent(NAME, {});
+    const element = await setup.renderComponent(CONTEXT_SELECTOR_COMPONENT, {
+      connector: { id: 'foo' }
+    });
 
     expect(element.innerHTML).toMatchSnapshot();
   });

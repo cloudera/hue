@@ -2804,9 +2804,9 @@ function setupCodeMirrorSubscription() {
 viewModel = new BeeswaxViewModel("${app_name}", apiHelper);
 ko.applyBindings(viewModel, $("#beeswax-execute")[0]);
 
-var handleAssistSelection = function (databaseDef) {
-  if (databaseDef.sourceType === snippetType && snippet.database() !== databaseDef.name) {
-    snippet.database(databaseDef.name);
+var handleAssistSelection = function (entry) {
+  if (entry.getConnector().id === snippetType && snippet.database() !== entry.name) {
+    snippet.database(entry.name);
   }
 };
 
@@ -2814,7 +2814,7 @@ huePubSub.subscribe("assist.database.set", handleAssistSelection);
 huePubSub.subscribe("assist.database.selected", handleAssistSelection);
 
 if (! snippet.database()) {
-  huePubSub.publish("assist.get.database", { source: snippetType, callback: handleAssistSelection });
+  huePubSub.publish("assist.get.database", { connector: { id: snippetType }, callback: handleAssistSelection });
 }
 
 shareViewModel = initSharing("#documentShareModal");
