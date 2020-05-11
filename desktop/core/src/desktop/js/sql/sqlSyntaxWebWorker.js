@@ -50,7 +50,7 @@ const onMessage = msg => {
   }
   clearTimeout(throttle);
   throttle = setTimeout(() => {
-    sqlParserRepository.getSyntaxParser(msg.data.type).then(parser => {
+    sqlParserRepository.getSyntaxParser(msg.data.connector.dialect).then(parser => {
       const syntaxError = parser.parseSyntax(msg.data.beforeCursor, msg.data.afterCursor);
 
       if (syntaxError) {
@@ -58,6 +58,7 @@ const onMessage = msg => {
       }
       postMessage({
         id: msg.data.id,
+        connector: msg.data.connector,
         editorChangeTime: msg.data.editorChangeTime,
         syntaxError: syntaxError,
         statementLocation: msg.data.statementLocation

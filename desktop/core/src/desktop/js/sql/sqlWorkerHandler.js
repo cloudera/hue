@@ -18,9 +18,14 @@ import $ from 'jquery';
 
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
-import sqlUtils from 'sql/sqlUtils';
+import { resolveCatalogEntry } from 'sql/sqlUtils';
 
-const attachEntryResolver = function(location, sourceType, namespace, compute) {
+export const POST_TO_LOCATION_WORKER_EVENT = 'ace.sql.location.worker.post';
+export const POST_FROM_LOCATION_WORKER_EVENT = 'ace.sql.location.worker.message';
+export const POST_TO_SYNTAX_WORKER_EVENT = 'ace.sql.syntax.worker.post';
+export const POST_FROM_SYNTAX_WORKER_EVENT = 'ace.sql.syntax.worker.message';
+
+const attachEntryResolver = function(location, connector, namespace, compute) {
   location.resolveCatalogEntry = function(options) {
     if (!options) {
       options = {};
@@ -39,8 +44,8 @@ const attachEntryResolver = function(location, sourceType, namespace, compute) {
       return location.resolvePathPromise;
     }
 
-    const promise = sqlUtils.resolveCatalogEntry({
-      sourceType: sourceType,
+    const promise = resolveCatalogEntry({
+      connector: connector,
       namespace: namespace,
       compute: compute,
       temporaryOnly: options.temporaryOnly,
@@ -78,23 +83,29 @@ export default {
 
       // For syntax checking
       const aceSqlSyntaxWorker = new Worker(
-        window.HUE_BASE_URL + '/desktop/workers/aceSqlSyntaxWorker.js?v=' + window.HUE_VERSION
+        window.HUE_BASE_URL +
+          '/desktop/workers/aceSqlSyntaxWorker.js?v=' +
+          window.HUE_VERSION +
+          '.1'
       );
       aceSqlSyntaxWorker.onmessage = function(e) {
         if (e.data.ping) {
           aceSqlSyntaxWorker.isReady = true;
         } else {
-          huePubSub.publish('ace.sql.syntax.worker.message', e);
+          huePubSub.publish(POST_FROM_SYNTAX_WORKER_EVENT, e);
         }
       };
 
-      huePubSub.subscribe('ace.sql.syntax.worker.post', message => {
+      huePubSub.subscribe(POST_TO_SYNTAX_WORKER_EVENT, message => {
         whenWorkerIsReady(aceSqlSyntaxWorker, message);
       });
 
       // For location marking
       const aceSqlLocationWorker = new Worker(
-        window.HUE_BASE_URL + '/desktop/workers/aceSqlLocationWorker.js?v=' + window.HUE_VERSION
+        window.HUE_BASE_URL +
+          '/desktop/workers/aceSqlLocationWorker.js?v=' +
+          window.HUE_VERSION +
+          '.1'
       );
       aceSqlLocationWorker.onmessage = function(e) {
         if (e.data.ping) {
@@ -102,14 +113,14 @@ export default {
         } else {
           if (e.data.locations) {
             e.data.locations.forEach(location => {
-              attachEntryResolver(location, e.data.sourceType, e.data.namespace, e.data.compute);
+              attachEntryResolver(location, e.data.connector, e.data.namespace, e.data.compute);
             });
           }
-          huePubSub.publish('ace.sql.location.worker.message', e);
+          huePubSub.publish(POST_FROM_LOCATION_WORKER_EVENT, e);
         }
       };
 
-      huePubSub.subscribe('ace.sql.location.worker.post', message => {
+      huePubSub.subscribe(POST_TO_LOCATION_WORKER_EVENT, message => {
         whenWorkerIsReady(aceSqlLocationWorker, message);
       });
 

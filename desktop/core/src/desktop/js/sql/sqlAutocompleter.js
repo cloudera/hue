@@ -75,9 +75,7 @@ class SqlAutocompleter {
               }
             }) + this.fixedPostfix();
           sqlParserRepository
-            .getAutocompleter(
-              window.ENABLE_NOTEBOOK_2 ? this.snippet.dialect() : this.snippet.type()
-            )
+            .getAutocompleter(this.snippet.dialect())
             .then(autocompleteParser => {
               resolve(autocompleteParser.parseSql(beforeCursor, afterCursor));
             })
@@ -97,7 +95,7 @@ class SqlAutocompleter {
   async parseAll() {
     return new Promise((resolve, reject) => {
       sqlParserRepository
-        .getAutocompleter(window.ENABLE_NOTEBOOK_2 ? this.snippet.dialect() : this.snippet.type())
+        .getAutocompleter(this.snippet.dialect())
         .then(autocompleteParser => {
           resolve(
             autocompleteParser.parseSql(

@@ -49,25 +49,25 @@ class SqlParserRepository {
     this.modulePromises = {};
   }
 
-  async getParser(sourceType, parserType) {
-    if (!this.modulePromises[sourceType + parserType]) {
+  async getParser(dialect, parserType) {
+    if (!this.modulePromises[dialect + parserType]) {
       const modules = parserType === 'Autocomplete' ? AUTOCOMPLETE_MODULES : SYNTAX_MODULES;
-      this.modulePromises[sourceType + parserType] = new Promise((resolve, reject) => {
-        const targetModule = modules[sourceType] || modules.generic;
+      this.modulePromises[dialect + parserType] = new Promise((resolve, reject) => {
+        const targetModule = modules[dialect] || modules.generic;
         targetModule()
           .then(module => resolve(module.default))
           .catch(reject);
       });
     }
-    return this.modulePromises[sourceType + parserType];
+    return this.modulePromises[dialect + parserType];
   }
 
-  async getAutocompleter(sourceType) {
-    return this.getParser(sourceType, 'Autocomplete');
+  async getAutocompleter(dialect) {
+    return this.getParser(dialect, 'Autocomplete');
   }
 
-  async getSyntaxParser(sourceType) {
-    return this.getParser(sourceType, 'Syntax');
+  async getSyntaxParser(dialect) {
+    return this.getParser(dialect, 'Syntax');
   }
 }
 
