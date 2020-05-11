@@ -38,6 +38,7 @@ class AssistDbSource {
   constructor(options) {
     const self = this;
 
+    // TODO: Get rid of sourceType
     self.sourceType = options.type;
     self.connector = options.connector;
     self.name = options.name;
