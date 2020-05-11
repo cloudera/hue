@@ -20,12 +20,15 @@ import LocalStrategy from './localStrategy';
 
 const optimizerInstances = {};
 
+export const LOCAL_STRATEGY = 'local';
+export const API_STRATEGY = 'api';
+
 const createOptimizer = connector => {
   // TODO: Remove window.OPTIMIZER_MODE and hardcoded { optimizer: 'api' } when 'connector.optimizer_mode' works.
-  if (window.OPTIMIZER_MODE === 'local') {
+  if (window.OPTIMIZER_MODE === LOCAL_STRATEGY) {
     return new LocalStrategy(connector);
   }
-  if (window.OPTIMIZER_MODE === 'api') {
+  if (window.OPTIMIZER_MODE === API_STRATEGY) {
     return new ApiStrategy(connector);
   }
   return new BaseStrategy(connector);
