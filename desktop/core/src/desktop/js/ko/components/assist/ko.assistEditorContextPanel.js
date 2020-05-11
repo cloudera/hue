@@ -346,12 +346,13 @@ class AssistEditorContextPanel {
       }
       updateOnVisible = false;
 
-      if (!sources[activeLocations.type]) {
-        sources[activeLocations.type] = {
+      if (!sources[activeLocations.connector.id]) {
+        sources[activeLocations.connector.id] = {
           assistDbSource: new AssistDbSource({
             i18n: i18n,
             initialNamespace: activeLocations.namespace,
-            type: activeLocations.type,
+            connector: activeLocations.connector,
+            type: activeLocations.connector.id,
             name: activeLocations.type,
             navigationSettings: navigationSettings
           }),
@@ -360,9 +361,9 @@ class AssistEditorContextPanel {
         };
       }
 
-      const assistDbSource = sources[activeLocations.type].assistDbSource;
-      const databaseIndex = sources[activeLocations.type].databaseIndex;
-      const activeTableIndex = sources[activeLocations.type].activeTableIndex;
+      const assistDbSource = sources[activeLocations.connector.id].assistDbSource;
+      const databaseIndex = sources[activeLocations.connector.id].databaseIndex;
+      const activeTableIndex = sources[activeLocations.connector.id].activeTableIndex;
 
       if (!activeLocations) {
         this.activeLocations(undefined);
@@ -414,7 +415,7 @@ class AssistEditorContextPanel {
                   .getEntry({
                     namespace: activeLocations.namespace,
                     compute: activeLocations.compute,
-                    connector: this.connector(),
+                    connector: activeLocations.connector,
                     path: [database],
                     definition: { type: 'database' }
                   })
@@ -494,7 +495,7 @@ class AssistEditorContextPanel {
                                 .getEntry({
                                   namespace: activeLocations.namespace,
                                   compute: activeLocations.compute,
-                                  connector: self.connector,
+                                  connector: activeLocations.connector,
                                   path: []
                                 })
                                 .done(sourceEntry => {

@@ -37,6 +37,7 @@ import {
   ASSIST_GET_SOURCE_EVENT,
   ASSIST_SET_SOURCE_EVENT
 } from 'ko/components/assist/events';
+import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -214,6 +215,8 @@ class Snippet {
         is_sql: self.isSqlDialect()
       };
     });
+
+    self.dialect = ko.pureComputed(() => this.connector().dialect);
 
     self.isBatchable = ko.computed(() => {
       return (
@@ -863,7 +866,7 @@ class Snippet {
     });
 
     const activeSourcePromises = [];
-    huePubSub.subscribe('ace.sql.location.worker.message', e => {
+    huePubSub.subscribe(POST_FROM_LOCATION_WORKER_EVENT, e => {
       while (activeSourcePromises.length) {
         const promise = activeSourcePromises.pop();
         if (promise.cancel) {
