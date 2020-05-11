@@ -129,8 +129,8 @@ export class DataCatalog {
    */
   constructor(connector) {
     const self = this;
-    if (!connector || !connector.type) {
-      throw new Error('DataCatalog created without connector or type');
+    if (!connector || !connector.id) {
+      throw new Error('DataCatalog created without connector or id');
     }
     self.connector = connector;
 
@@ -138,10 +138,10 @@ export class DataCatalog {
     self.temporaryEntries = {};
     self.multiTableEntries = {};
     self.store = localforage.createInstance({
-      name: 'HueDataCatalog_' + self.connector.type + '_' + STORAGE_POSTFIX
+      name: 'HueDataCatalog_' + self.connector.id + '_' + STORAGE_POSTFIX
     });
     self.multiTableStore = localforage.createInstance({
-      name: 'HueDataCatalog_' + self.connector.type + '_multiTable_' + STORAGE_POSTFIX
+      name: 'HueDataCatalog_' + self.connector.id + '_multiTable_' + STORAGE_POSTFIX
     });
   }
 
@@ -824,12 +824,12 @@ const sourceBoundCatalogs = {};
  * @return {DataCatalog}
  */
 const getCatalog = function(connector) {
-  if (!connector || !connector.type) {
-    throw new Error('getCatalog called without connector with type');
+  if (!connector || !connector.id) {
+    throw new Error('getCatalog called without connector with id');
   }
   return (
-    sourceBoundCatalogs[connector.type] ||
-    (sourceBoundCatalogs[connector.type] = new DataCatalog(connector))
+    sourceBoundCatalogs[connector.id] ||
+    (sourceBoundCatalogs[connector.id] = new DataCatalog(connector))
   );
 };
 

@@ -216,8 +216,8 @@ const HueContextSelector = function(params) {
 
   let refreshThrottle = -1;
 
-  const refresh = function(connectorType) {
-    if (!connectorType || ko.unwrap(self.connector).type === connectorType) {
+  const refresh = function(connectorId) {
+    if (!connectorId || ko.unwrap(self.connector).id === connectorId) {
       window.clearTimeout(refreshThrottle);
       refreshThrottle = window.setTimeout(() => {
         TYPES.forEach(self.reload.bind(self));
@@ -245,7 +245,7 @@ const HueContextSelector = function(params) {
   if (self.database) {
     huePubSub.subscribe('data.catalog.entry.refreshed', details => {
       if (details.entry.isSource()) {
-        if (ko.unwrap(self.connector).type === details.entry.getConnector().type) {
+        if (ko.unwrap(self.connector).id === details.entry.getConnector().id) {
           self.reloadDatabases();
         }
       }
@@ -445,7 +445,7 @@ HueContextSelector.prototype.reloadDatabases = function() {
                 .always(() => {
                   let lastSelectedDb = apiHelper.getFromTotalStorage(
                     'assist_' +
-                      ko.unwrap(self.connector).type +
+                      ko.unwrap(self.connector).id +
                       '_' +
                       self[TYPES_INDEX.namespace.name]().id,
                     'lastSelectedDb'

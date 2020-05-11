@@ -117,9 +117,9 @@ class MetastoreViewModel {
     this.currentTab = ko.observable('');
 
     huePubSub.subscribe('assist.database.selected', entry => {
-      if (this.source().type !== entry.getConnector().type) {
+      if (this.source().type !== entry.getConnector().id) {
         const found = this.sources().some(source => {
-          if (source.type === entry.getConnector().type) {
+          if (source.type === entry.getConnector().id) {
             this.source(source);
             return true;
           }
@@ -273,9 +273,9 @@ class MetastoreViewModel {
   }
 
   loadTableDef(entry, callback) {
-    if (this.source().type !== entry.getConnector().type) {
+    if (this.source().type !== entry.getConnector().id) {
       const found = this.sources().some(source => {
-        if (source.type === entry.getConnector().type) {
+        if (source.type === entry.getConnector().id) {
           this.source(source);
           return true;
         }
@@ -493,7 +493,7 @@ class MetastoreViewModel {
 
           dataCatalog
             .getEntry({
-              connector: findEditorConnector(connector => connector.type === this.source().type),
+              connector: findEditorConnector(connector => connector.id === this.source().type),
               namespace: namespace.namespace,
               compute: namespace.compute,
               path: [pathParts[1], pathParts[2]]

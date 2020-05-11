@@ -193,7 +193,7 @@ class DataCatalogContext {
       '/hue/dashboard/browse/' +
         self.catalogEntry().path.join('.') +
         '?engine=' +
-        self.catalogEntry().getConnector().type
+        self.catalogEntry().getConnector().id
     );
     huePubSub.publish('context.popover.hide');
     huePubSub.publish('global.search.close');
@@ -207,7 +207,7 @@ class DataCatalogContext {
         (self.catalogEntry().isTableOrView() ? '/' : 's/') +
         self.catalogEntry().path.join('/') +
         '?source_type=' +
-        self.catalogEntry().getConnector().type +
+        self.catalogEntry().getConnector().id +
         '&namespace=' +
         self.catalogEntry().namespace.id
     );

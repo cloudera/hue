@@ -97,7 +97,7 @@ class AsteriskData {
           .getEntry({
             namespace: namespace,
             compute: compute,
-            connector: { type: sourceType }, // TODO: Add connector to asteriskContextTabs
+            connector: { id: sourceType }, // TODO: Add connector to asteriskContextTabs
             path: path
           })
           .done(entry => {

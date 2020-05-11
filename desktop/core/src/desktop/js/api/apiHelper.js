@@ -2530,7 +2530,7 @@ class ApiHelper {
    * @return {Promise}
    */
   fetchContextNamespaces(options) {
-    const url = '/desktop/api2/context/namespaces/' + options.connector.type;
+    const url = '/desktop/api2/context/namespaces/' + options.connector.id;
     return simpleGet(url, undefined, options);
   }
 
@@ -2541,7 +2541,7 @@ class ApiHelper {
    * @return {Promise}
    */
   fetchContextComputes(options) {
-    const url = '/desktop/api2/context/computes/' + options.connector.type;
+    const url = '/desktop/api2/context/computes/' + options.connector.id;
     return simpleGet(url, undefined, options);
   }
 
@@ -2552,7 +2552,7 @@ class ApiHelper {
    * @return {Promise}
    */
   fetchContextClusters(options) {
-    const url = '/desktop/api2/context/clusters/' + options.connector.type;
+    const url = '/desktop/api2/context/clusters/' + options.connector.id;
     return simpleGet(url, undefined, options);
   }
 

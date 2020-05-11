@@ -403,10 +403,10 @@ export default class Executable {
       };
     }
 
-    const session = await sessionManager.getSession({ type: this.executor.connector().type });
+    const session = await sessionManager.getSession({ type: this.executor.connector().id });
     const statement = this.getStatement();
     const snippet = {
-      type: this.executor.connector().type,
+      type: this.executor.connector().id,
       result: {
         handle: this.handle
       },
@@ -424,7 +424,7 @@ export default class Executable {
     };
 
     const notebook = {
-      type: this.executor.connector().type,
+      type: this.executor.connector().id,
       snippets: [snippet],
       id: this.notebookId,
       uuid: hueUtils.UUID(),

@@ -354,6 +354,7 @@ class AssistStorageEntry {
     type = type.replace(/adl.*/i, 'adls');
     type = type.replace(/abfs.*/i, 'abfs');
 
+    // TODO: connector.id for browser connectors
     const connector = findBrowserConnector(connector => connector.type === type);
     if (connector) {
       const rootPath = getRootFilePath(connector);
