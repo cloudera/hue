@@ -31,10 +31,10 @@ import apiHelper from 'api/apiHelper';
 import Executor from 'apps/notebook2/execution/executor';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
+import hueUtils, { defer } from 'utils/hueUtils';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
-import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
+import { HIDE_FIXED_HEADERS_EVENT, REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
 import {
   EXECUTABLE_STATUS_TRANSITION_EVENT,
   EXECUTABLE_UPDATED_EVENT,
@@ -289,6 +289,16 @@ export default class Snippet {
 
     // History is currently in Notebook, same with saved queries by snippets, might be better in assist
     this.currentQueryTab = ko.observable(snippetRaw.currentQueryTab || 'queryHistory');
+
+    this.currentQueryTab.subscribe(newVal => {
+      huePubSub.publish(HIDE_FIXED_HEADERS_EVENT);
+      if (newVal === 'queryResults') {
+        defer(() => {
+          huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
+        });
+      }
+    });
+
     this.pinnedContextTabs = ko.observableArray(snippetRaw.pinnedContextTabs || []);
 
     huePubSub.publish(ASSIST_GET_SOURCE_EVENT, source => {
