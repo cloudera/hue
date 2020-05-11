@@ -77,15 +77,15 @@ class EditorViewModel {
       }
     });
 
-    this.editorType = ko.pureComputed(() => this.activeConnector() && this.activeConnector().type);
+    this.editorType = ko.pureComputed(() => this.activeConnector() && this.activeConnector().id);
     this.editorTitle = ko.pureComputed(
       () => this.activeConnector() && this.activeConnector().displayName
     );
 
     this.activeConnector.subscribe(connector => {
       if (connector) {
-        if (window.location.getParameter('type') !== connector.type) {
-          hueUtils.changeURLParameter('type', connector.type);
+        if (window.location.getParameter('type') !== connector.id) {
+          hueUtils.changeURLParameter('type', connector.id);
         }
         this.notifyDialectChange(connector.dialect, connector.is_sql);
       }
@@ -315,17 +315,17 @@ class EditorViewModel {
     huePubSub.publish('recalculate.name.description.width');
   }
 
-  async newNotebook(editorType, callback, queryTab) {
-    const connector = findEditorConnector(connector => connector.type === editorType);
+  async newNotebook(connectorId, callback, queryTab) {
+    const connector = findEditorConnector(connector => connector.id === connectorId);
     if (!connector) {
-      console.warn('No connector found for type ' + editorType);
+      console.warn('No connector found for ID ' + connectorId);
     } else {
       huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, connector);
     }
 
     return new Promise((resolve, reject) => {
       $.post('/notebook/api/create_notebook', {
-        type: editorType,
+        type: connectorId,
         directory_uuid: window.location.getParameter('directory_uuid'),
         gist: this.isNotificationManager() ? undefined : window.location.getParameter('gist')
       })
@@ -334,7 +334,7 @@ class EditorViewModel {
           if (this.editorMode() && !this.isNotificationManager()) {
             const snippet =
               this.selectedNotebook().snippets().length === 0
-                ? this.selectedNotebook().newSnippet(editorType)
+                ? this.selectedNotebook().newSnippet(connectorId)
                 : this.selectedNotebook().snippets()[0];
             if (
               queryTab &&

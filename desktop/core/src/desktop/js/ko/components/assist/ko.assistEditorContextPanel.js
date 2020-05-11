@@ -584,19 +584,19 @@ class AssistEditorContextPanel {
     };
 
     huePubSub.subscribe('data.catalog.entry.refreshed', details => {
-      const sourceType = details.entry.getConnector().type;
-      if (sources[sourceType]) {
+      const connectorId = details.entry.getConnector().id;
+      if (sources[connectorId]) {
         let completeRefresh = false;
         if (details.entry.isSource()) {
-          sources[sourceType].databaseIndex = {};
-          sources[sourceType].activeTableIndex = {};
+          sources[connectorId].databaseIndex = {};
+          sources[connectorId].activeTableIndex = {};
           completeRefresh = true;
         } else if (
           details.entry.isDatabase() &&
-          sources[sourceType].databaseIndex[details.entry.name]
+          sources[connectorId].databaseIndex[details.entry.name]
         ) {
-          const dbEntry = sources[sourceType].databaseIndex[details.entry.name];
-          const activeTableIndex = sources[sourceType].activeTableIndex;
+          const dbEntry = sources[connectorId].databaseIndex[details.entry.name];
+          const activeTableIndex = sources[connectorId].activeTableIndex;
           Object.keys(activeTableIndex).forEach(tableKey => {
             const tableEntry = activeTableIndex[tableKey];
             if (tableEntry.parent === dbEntry) {
@@ -605,7 +605,7 @@ class AssistEditorContextPanel {
             }
           });
         } else if (details.entry.isTableOrView()) {
-          const activeTableIndex = sources[sourceType].activeTableIndex;
+          const activeTableIndex = sources[connectorId].activeTableIndex;
           if (activeTableIndex[details.entry.getQualifiedPath()]) {
             delete activeTableIndex[details.entry.getQualifiedPath()];
             completeRefresh = true;

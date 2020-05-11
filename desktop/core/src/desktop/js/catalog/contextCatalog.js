@@ -133,28 +133,28 @@ class ContextCatalog {
    */
   getNamespaces(options) {
     const self = this;
-    const connectorType = options.connector.type;
+    const connectorId = options.connector.id;
 
-    const notifyForRefresh = self.namespacePromises[connectorType] && options.clearCache;
+    const notifyForRefresh = self.namespacePromises[connectorId] && options.clearCache;
     if (options.clearCache) {
-      self.namespacePromises[connectorType] = undefined;
-      self.namespaces[connectorType] = undefined;
+      self.namespacePromises[connectorId] = undefined;
+      self.namespaces[connectorId] = undefined;
     }
 
-    if (self.namespacePromises[connectorType]) {
-      return self.namespacePromises[connectorType];
+    if (self.namespacePromises[connectorId]) {
+      return self.namespacePromises[connectorId];
     }
 
-    if (self.namespaces[connectorType]) {
-      self.namespacePromises[connectorType] = $.Deferred()
-        .resolve(self.namespaces[connectorType])
+    if (self.namespaces[connectorId]) {
+      self.namespacePromises[connectorId] = $.Deferred()
+        .resolve(self.namespaces[connectorId])
         .promise();
-      return self.namespacePromises[connectorType];
+      return self.namespacePromises[connectorId];
     }
 
     const deferred = $.Deferred();
 
-    self.namespacePromises[connectorType] = deferred.promise();
+    self.namespacePromises[connectorId] = deferred.promise();
 
     const startingNamespaces = {};
     const pollTimeout = -1;
@@ -164,8 +164,8 @@ class ContextCatalog {
       window.setTimeout(() => {
         if (Object.keys(startingNamespaces).length) {
           apiHelper.fetchContextNamespaces(options).done(namespaces => {
-            if (namespaces[connectorType]) {
-              const namespaces = namespaces[connectorType];
+            if (namespaces[connectorId]) {
+              const namespaces = namespaces[connectorId];
               if (namespaces) {
                 let statusChanged = false;
                 namespaces.forEach(namespace => {
@@ -176,7 +176,7 @@ class ContextCatalog {
                   }
                 });
                 if (statusChanged) {
-                  huePubSub.publish(NAMESPACES_REFRESHED_EVENT, connectorType);
+                  huePubSub.publish(NAMESPACES_REFRESHED_EVENT, connectorId);
                 }
                 if (Object.keys(startingNamespaces).length) {
                   pollForStarted();
@@ -201,9 +201,9 @@ class ContextCatalog {
 
     const fetchNamespaces = () => {
       apiHelper.fetchContextNamespaces(options).done(namespaces => {
-        if (namespaces[connectorType]) {
+        if (namespaces[connectorId]) {
           const dynamic = namespaces.dynamicClusters;
-          namespaces = namespaces[connectorType];
+          namespaces = namespaces[connectorId];
           if (namespaces) {
             namespaces.forEach(namespace => {
               namespace.computes.forEach(compute => {
@@ -215,24 +215,20 @@ class ContextCatalog {
                 }
               });
             });
-            self.namespaces[connectorType] = {
+            self.namespaces[connectorId] = {
               namespaces: namespaces.filter(namespace => namespace.name),
               dynamic: dynamic,
               hueTimestamp: Date.now()
             };
-            deferred.resolve(self.namespaces[connectorType]);
+            deferred.resolve(self.namespaces[connectorId]);
             if (notifyForRefresh) {
-              huePubSub.publish(NAMESPACES_REFRESHED_EVENT, connectorType);
+              huePubSub.publish(NAMESPACES_REFRESHED_EVENT, connectorId);
             }
 
-            if (self.namespaces[connectorType].namespaces.length) {
-              self.saveLater(
-                NAMESPACES_CONTEXT_TYPE,
-                connectorType,
-                self.namespaces[connectorType]
-              );
+            if (self.namespaces[connectorId].namespaces.length) {
+              self.saveLater(NAMESPACES_CONTEXT_TYPE, connectorId, self.namespaces[connectorId]);
             } else {
-              self.getStore().removeItem(connectorType + '_' + NAMESPACES_CONTEXT_TYPE);
+              self.getStore().removeItem(connectorId + '_' + NAMESPACES_CONTEXT_TYPE);
             }
           } else {
             deferred.reject();
@@ -245,17 +241,17 @@ class ContextCatalog {
 
     if (!options.clearCache) {
       self
-        .getSaved(NAMESPACES_CONTEXT_TYPE, connectorType)
+        .getSaved(NAMESPACES_CONTEXT_TYPE, connectorId)
         .done(namespaces => {
-          self.namespaces[connectorType] = namespaces;
-          deferred.resolve(self.namespaces[connectorType]);
+          self.namespaces[connectorId] = namespaces;
+          deferred.resolve(self.namespaces[connectorId]);
         })
         .fail(fetchNamespaces);
     } else {
       fetchNamespaces();
     }
 
-    return self.namespacePromises[connectorType];
+    return self.namespacePromises[connectorId];
   }
 
   /**
@@ -268,33 +264,33 @@ class ContextCatalog {
   getComputes(options) {
     const self = this;
 
-    const connectorType = options.connector.type;
+    const connectorId = options.connector.id;
 
     if (options.clearCache) {
-      self.computePromises[connectorType] = undefined;
-      self.computes[connectorType] = undefined;
+      self.computePromises[connectorId] = undefined;
+      self.computes[connectorId] = undefined;
     }
 
-    if (self.computePromises[connectorType]) {
-      return self.computePromises[connectorType];
+    if (self.computePromises[connectorId]) {
+      return self.computePromises[connectorId];
     }
 
-    if (self.computes[connectorType]) {
-      self.computePromises[connectorType] = $.Deferred()
-        .resolve(self.computes[connectorType])
+    if (self.computes[connectorId]) {
+      self.computePromises[connectorId] = $.Deferred()
+        .resolve(self.computes[connectorId])
         .promise();
-      return self.computePromises[connectorType];
+      return self.computePromises[connectorId];
     }
 
     const deferred = $.Deferred();
-    self.computePromises[connectorType] = deferred.promise();
+    self.computePromises[connectorId] = deferred.promise();
 
     apiHelper.fetchContextComputes(options).done(computes => {
-      if (computes[connectorType]) {
-        computes = computes[connectorType];
+      if (computes[connectorId]) {
+        computes = computes[connectorId];
         if (computes) {
-          self.computes[connectorType] = computes;
-          deferred.resolve(self.computes[connectorType]);
+          self.computes[connectorId] = computes;
+          deferred.resolve(self.computes[connectorId]);
           // TODO: save
         } else {
           deferred.reject();
@@ -304,7 +300,7 @@ class ContextCatalog {
       }
     });
 
-    return self.computePromises[connectorType];
+    return self.computePromises[connectorId];
   }
 
   /**
@@ -316,32 +312,32 @@ class ContextCatalog {
   getClusters(options) {
     const self = this;
 
-    const connectorType = options.connector.type;
+    const connectorId = options.connector.id;
 
-    if (self.clusterPromises[connectorType]) {
-      return self.clusterPromises[connectorType];
+    if (self.clusterPromises[connectorId]) {
+      return self.clusterPromises[connectorId];
     }
 
-    if (self.clusters[connectorType]) {
-      self.clusterPromises[connectorType] = $.Deferred()
-        .resolve(self.clusters[connectorType])
+    if (self.clusters[connectorId]) {
+      self.clusterPromises[connectorId] = $.Deferred()
+        .resolve(self.clusters[connectorId])
         .promise();
-      return self.clusterPromises[connectorType];
+      return self.clusterPromises[connectorId];
     }
 
     const deferred = $.Deferred();
-    self.clusterPromises[connectorType] = deferred.promise();
+    self.clusterPromises[connectorId] = deferred.promise();
 
     apiHelper.fetchContextClusters(options).done(clusters => {
-      if (clusters && clusters[connectorType]) {
-        self.clusters[connectorType] = clusters[connectorType];
-        deferred.resolve(self.clusters[connectorType]);
+      if (clusters && clusters[connectorId]) {
+        self.clusters[connectorId] = clusters[connectorId];
+        deferred.resolve(self.clusters[connectorId]);
       } else {
         deferred.reject();
       }
     });
 
-    return self.clusterPromises[connectorType];
+    return self.clusterPromises[connectorId];
   }
 }
 

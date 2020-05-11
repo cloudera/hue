@@ -200,7 +200,7 @@ export default class Snippet {
     this.connector = ko.observable();
 
     this.connector.subscribe(connector => {
-      sessionManager.getSession({ type: connector.type }).then(() => {
+      sessionManager.getSession({ type: connector.id }).then(() => {
         this.status(STATUS.ready);
       });
     });
@@ -208,7 +208,7 @@ export default class Snippet {
     this.initializeConnector(snippetRaw);
 
     this.dialect = ko.pureComputed(() => this.connector() && this.connector().dialect);
-    this.connectorType = ko.pureComputed(() => this.connector() && this.connector().type);
+    this.connectorType = ko.pureComputed(() => this.connector() && this.connector().id);
 
     this.isSqlDialect = ko.pureComputed(() => this.connector() && this.connector().is_sql);
     this.defaultLimit = ko.observable(snippetRaw.defaultLimit);
@@ -1291,7 +1291,7 @@ export default class Snippet {
   handleAssistSelection(entry) {
     if (this.ignoreNextAssistDatabaseUpdate) {
       this.ignoreNextAssistDatabaseUpdate = false;
-    } else if (entry.getConnector().type === this.connector().type) {
+    } else if (entry.getConnector().id === this.connector().id) {
       if (this.namespace() !== entry.namespace) {
         this.namespace(entry.namespace);
       }
@@ -1316,9 +1316,8 @@ export default class Snippet {
   }
 
   initializeConnector(snippetRaw) {
-    const connectorTypeToFind =
-      (snippetRaw.connector && snippetRaw.connector.type) || snippetRaw.type;
-    let foundConnector = findEditorConnector(connector => connector.type === connectorTypeToFind);
+    const connectorIdToFind = (snippetRaw.connector && snippetRaw.connector.id) || snippetRaw.type;
+    let foundConnector = findEditorConnector(connector => connector.id === connectorIdToFind);
 
     if (!foundConnector) {
       // If not found by type pick the first by dialect

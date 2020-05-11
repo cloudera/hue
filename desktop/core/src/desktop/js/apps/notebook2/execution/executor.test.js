@@ -30,7 +30,7 @@ describe('executor.js', () => {
       compute: { id: 'compute' },
       namespace: { id: 'namespace' },
       database: 'default',
-      connector: () => ({ type: 'impala' }),
+      connector: () => ({ id: 'impala' }),
       statement: statement,
       isSqlEngine: true
     });

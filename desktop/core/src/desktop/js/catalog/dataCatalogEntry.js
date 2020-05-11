@@ -230,7 +230,7 @@ class DataCatalogEntry {
       typeof options.path === 'string' && options.path
         ? options.path.split('.')
         : options.path || [];
-    self.name = self.path.length ? self.path[self.path.length - 1] : self.getConnector().type;
+    self.name = self.path.length ? self.path[self.path.length - 1] : self.getConnector().id;
     self.isTemporary = options.isTemporary;
 
     self.definition = options.definition;
@@ -1045,7 +1045,7 @@ class DataCatalogEntry {
     } else {
       apiHelper
         .updateSourceMetadata({
-          sourceType: self.getConnector().type,
+          sourceType: self.getConnector().id,
           path: self.path,
           properties: {
             comment: comment
@@ -1178,7 +1178,7 @@ class DataCatalogEntry {
    * @return {string} - 'impala', 'hive', 'solr', etc.
    */
   getDialect() {
-    return this.getConnector().dialect || this.getConnector().type; // .type for editor v1
+    return this.getConnector().dialect || this.getConnector().id; // .id for editor v1
   }
 
   /**
@@ -1664,7 +1664,7 @@ class DataCatalogEntry {
     if (options && options.operation && options.operation !== 'default') {
       return catalogUtils.applyCancellable(
         apiHelper.fetchSample({
-          sourceType: self.getConnector().type,
+          sourceType: self.getConnector().id,
           compute: self.compute,
           path: self.path,
           silenceErrors: options && options.silenceErrors,

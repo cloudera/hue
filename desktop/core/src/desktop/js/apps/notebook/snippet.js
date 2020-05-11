@@ -185,16 +185,16 @@ class Snippet {
 
     self.connector = ko.observable();
 
-    const updateConnector = type => {
-      if (type) {
-        self.connector(findEditorConnector(connector => connector.type === type));
+    const updateConnector = id => {
+      if (id) {
+        self.connector(findEditorConnector(connector => connector.id === id));
       }
     };
 
     updateConnector(self.type());
 
     self.type.subscribe(type => {
-      if (!self.connector() || self.connector().type !== type) {
+      if (!self.connector() || self.connector().id !== type) {
         updateConnector(type);
       }
       self.status('ready');
@@ -209,6 +209,7 @@ class Snippet {
       return {
         optimizer: self.type() === 'hive' || self.type() === 'impala' ? 'api' : 'off',
         type: self.type(),
+        id: self.type(),
         dialect: self.type(),
         is_sql: self.isSqlDialect()
       };
@@ -460,7 +461,7 @@ class Snippet {
     self.handleAssistSelection = function(entry) {
       if (ignoreNextAssistDatabaseUpdate) {
         ignoreNextAssistDatabaseUpdate = false;
-      } else if (entry.getConnector().type === self.connector().type) {
+      } else if (entry.getConnector().id === self.connector().id) {
         if (self.namespace() !== entry.namespace) {
           self.namespace(entry.namespace);
         }

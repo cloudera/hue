@@ -122,7 +122,7 @@ class QuickQueryContext extends DisposableComponent {
       () => !this.namespace() || !this.compute() || !this.database()
     );
     this.dialect = ko.pureComputed(() => this.connector() && this.connector().dialect);
-    this.type = ko.pureComputed(() => this.connector() && this.connector().type);
+    this.type = ko.pureComputed(() => this.connector() && this.connector().id);
     this.defaultLimit = ko.observable(10);
 
     this.executor = new Executor({
@@ -167,7 +167,7 @@ class QuickQueryContext extends DisposableComponent {
     const found =
       this.connector() &&
       this.availableConnectors().some(connector => {
-        if (connector.type === this.connector().type) {
+        if (connector.id === this.connector().id) {
           this.connector(connector);
           return true;
         }

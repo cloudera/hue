@@ -321,7 +321,7 @@ ${ layout.menubar(section='quick_start') }
     self.installConnectorDataExample = function(connector, event) {
       self.isInstallingSample(true);
       $.post("${ url('notebook:install_examples') }", {
-          connector: connector.type
+          connector: connector.id
         }, function(data) {
           if (data.message) {
             $(document).trigger('info', data.message);

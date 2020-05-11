@@ -1016,13 +1016,13 @@ ${ commonshare() | n,unicode }
 
     % if autocomplete_base_url != '':
       var apiHelper = window.apiHelper;
-      var connector = { type: 'hive' };
+      var connector = { id: 'hive' };
       contextCatalog.getNamespaces({ connector: connector }).done(function (context) {
         // TODO: Namespace and compute selection
         dataCatalog.getChildren({
           namespace: context.namespaces[0],
           compute: context.namespaces[0].computes[0],
-          connector: { type: 'hive' },
+          connector: { id: 'hive' },
           path: ['default'],
           silenceErrors: true
         }).done(function (childEntries) {

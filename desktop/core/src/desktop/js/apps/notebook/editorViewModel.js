@@ -50,16 +50,16 @@ class EditorViewModel {
     self.editorType = ko.observable(options.editor_type);
     self.activeConnector = ko.observable();
 
-    const updateConnector = type => {
-      if (type) {
-        self.activeConnector(findEditorConnector(connector => connector.type === type));
+    const updateConnector = id => {
+      if (id) {
+        self.activeConnector(findEditorConnector(connector => connector.id === id));
       }
     };
 
     updateConnector(self.editorType());
 
     self.editorType.subscribe(newVal => {
-      if (!this.activeConnector() || this.activeConnector().type !== newVal) {
+      if (!this.activeConnector() || this.activeConnector().id !== newVal) {
         updateConnector(newVal);
       }
 
@@ -606,17 +606,17 @@ class EditorViewModel {
     };
 
     self.newNotebook = function(editorType, callback, queryTab) {
-      const type = editorType || options.editor_type;
+      const connectorId = editorType || options.editor_type;
 
       if (!self.isNotificationManager()) {
-        self.activeConnector(findEditorConnector(connector => connector.type === type));
+        self.activeConnector(findEditorConnector(connector => connector.id === connectorId));
         huePubSub.publish(ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT, self.activeConnector());
       }
 
       $.post(
         '/notebook/api/create_notebook',
         {
-          type: type,
+          type: connectorId,
           directory_uuid: window.location.getParameter('directory_uuid'),
           gist: self.isNotificationManager() ? undefined : window.location.getParameter('gist')
         },

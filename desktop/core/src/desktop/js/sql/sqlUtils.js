@@ -734,7 +734,7 @@ const resolveCatalogEntry = options => {
       // TODO: Use connectors in sqlUtils
       dataCatalog
         .getChildren({
-          connector: { type: options.sourceType },
+          connector: { id: options.sourceType },
           namespace: options.namespace,
           compute: options.compute,
           path: identifierChainToPath(nextTable.identifierChain),
@@ -771,7 +771,7 @@ const resolveCatalogEntry = options => {
       .getEntry({
         namespace: options.namespace,
         compute: options.compute,
-        connector: { type: options.sourceType }, // TODO: Use connector in sqlUtils
+        connector: { id: options.sourceType }, // TODO: Use connector in sqlUtils
         path: [],
         cachedOnly: options && options.cachedOnly,
         cancellable: options && options.cancellable,

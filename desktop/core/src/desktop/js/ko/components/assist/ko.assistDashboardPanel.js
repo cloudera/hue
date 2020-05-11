@@ -86,7 +86,7 @@ class AssistDashboardPanel {
         .getEntry({
           namespace: collection.activeNamespace,
           compute: collection.activeCompute,
-          connector: { type: sourceType }, // TODO: Use connectors in assist dashboard panel
+          connector: { id: sourceType }, // TODO: Use connectors in assist dashboard panel
           path: [fakeParentName],
           definition: { type: 'database' }
         })
@@ -103,7 +103,7 @@ class AssistDashboardPanel {
             .getEntry({
               namespace: collection.activeNamespace,
               compute: collection.activeCompute,
-              connector: { type: sourceType }, // TODO: Use connectors in assist dashboard panel
+              connector: { id: sourceType }, // TODO: Use connectors in assist dashboard panel
               path: [
                 fakeParentName,
                 collectionName.indexOf('.') > -1 ? collectionName.split('.')[1] : collectionName

@@ -908,14 +908,14 @@ class SqlContextContentsGlobalSearch {
       adaptedData.identifierChain.push({ name: part });
     });
 
-    let sourceType = params.data.sourceType && params.data.sourceType.toLowerCase();
+    let connectorId = params.data.sourceType && params.data.sourceType.toLowerCase();
 
-    if (!sourceType || sourceType === 'hive') {
+    if (!connectorId || connectorId === 'hive') {
       huePubSub.publish(GET_KNOWN_CONFIG_EVENT, clusterConfig => {
         if (clusterConfig) {
           const defaultEditor = clusterConfig['default_sql_interpreter'];
-          if (!sourceType || (sourceType === 'hive' && defaultEditor === 'impala')) {
-            sourceType = defaultEditor;
+          if (!connectorId || (connectorId === 'hive' && defaultEditor === 'impala')) {
+            connectorId = defaultEditor;
           }
         }
       });
@@ -923,11 +923,11 @@ class SqlContextContentsGlobalSearch {
 
     if (self.isCatalogEntry) {
       // TODO: Connector, Namespace and compute selection for global search results?
-      let connector = findEditorConnector(connector => connector.type === sourceType);
+      let connector = findEditorConnector(connector => connector.id === connectorId);
 
       if (!connector) {
         // TODO: Global search results are referring to dialect and not type
-        connector = findEditorConnector(connector => connector.dialect === sourceType);
+        connector = findEditorConnector(connector => connector.dialect === connectorId);
       }
       contextCatalog.getNamespaces({ connector: connector }).done(context => {
         dataCatalog

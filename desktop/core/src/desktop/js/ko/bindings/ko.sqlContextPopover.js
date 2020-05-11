@@ -54,7 +54,11 @@ ko.bindingHandlers.sqlContextPopover = {
             !options.connector &&
             (options.sourceType === 'hive' || options.sourceType === 'impala')
           ) {
-            options.connector = { optimizer: 'api' };
+            options.connector = {
+              optimizer: 'api',
+              id: options.sourceType,
+              dialect: options.sourceType
+            };
           }
           dataCatalog.getEntry(options).done(entry => {
             const $source = $(element);

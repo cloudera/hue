@@ -140,7 +140,10 @@ huePubSub.subscribe('app.dom.loaded', app => {
 
   if (location.getParameter('refresh') === 'true') {
     // TODO: Use connectors in the table browser
-    const connector = {};
+    const connector = {
+      id: viewModel.source().type,
+      dialect: viewModel.source().type
+    };
     if (viewModel.source().type === 'hive' || viewModel.source().type === 'impala') {
       connector.optimizer = 'api';
     }

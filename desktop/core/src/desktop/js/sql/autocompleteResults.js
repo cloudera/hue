@@ -1337,6 +1337,7 @@ class AutocompleteResults {
         fetchFunction = 'fetchAbfsPath';
         path = path.substring(6);
         if (path === '/') {
+          // TODO: connector.id for browsers
           const connector = findBrowserConnector(connector => connector.type === 'abfs');
           const rootPath = getRootFilePath(connector);
           if (rootPath) {

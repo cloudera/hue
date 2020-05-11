@@ -31,7 +31,7 @@ const fetchAndSave = (apiHelperFunction, attributeName, entry, apiOptions) => {
       ? apiHelper[apiHelperFunction].bind(apiHelper)
       : apiHelperFunction;
   return func({
-    sourceType: entry.getConnector().type,
+    sourceType: entry.getConnector().id,
     compute: entry.compute,
     path: entry.path, // Set for DataCatalogEntry
     paths: entry.paths, // Set for MultiTableEntry

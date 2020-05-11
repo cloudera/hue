@@ -108,8 +108,8 @@ class AssistDbSource {
 
     self.hasNamespaces = ko.pureComputed(() => self.namespaces().length > 0);
 
-    huePubSub.subscribe(NAMESPACES_REFRESHED_EVENT, connectorType => {
-      if (self.connector.type !== connectorType) {
+    huePubSub.subscribe(NAMESPACES_REFRESHED_EVENT, connectorId => {
+      if (self.connector.id !== connectorId) {
         return;
       }
 

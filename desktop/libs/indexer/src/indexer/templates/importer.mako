@@ -1668,7 +1668,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           var handle = dataCatalog.addTemporaryTable({
             namespace: self.namespace(),
             compute: self.compute(),
-            connector: { type: self.sourceType }, // TODO: Migrate importer to connectors
+            connector: { id: self.sourceType }, // TODO: Migrate importer to connectors
             name: tableName,
             columns: temporaryColumns,
             sample: self.sample()
@@ -2143,7 +2143,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           wizard.computeSetDeferred.done(function () {
             dataCatalog.getEntry({
               compute: wizard.compute(),
-              connector: { type: self.sourceType }, // TODO: Use connectors in the importer
+              connector: { id: self.sourceType }, // TODO: Use connectors in the importer
               namespace: wizard.namespace(),
               path: self.outputFormat() === 'table' ? [self.databaseName(), self.tableName()] : [],
             }).done(function (catalogEntry) {
@@ -2527,7 +2527,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.computeSetDeferred = $.Deferred();
 
       // TODO: Use connectors in the importer
-      contextCatalog.getNamespaces({ connector: { type: vm.sourceType } }).done(function (context) {
+      contextCatalog.getNamespaces({ connector: { id: vm.sourceType } }).done(function (context) {
         self.namespaces(context.namespaces);
         if (!vm.namespaceId || !context.namespaces.some(function (namespace) {
           if (namespace.id === vm.namespaceId) {
