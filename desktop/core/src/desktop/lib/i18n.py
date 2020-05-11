@@ -35,16 +35,23 @@ DEFAULT_LANG = 'en_US.UTF-8'
 def get_site_encoding():
   """Get the default site encoding"""
   global SITE_ENCODING
+
   if SITE_ENCODING is None:
     encoding = desktop.conf.DEFAULT_SITE_ENCODING.get()
+
     if not validate_encoding(encoding):
       default = desktop.conf.DEFAULT_SITE_ENCODING.config.default_value
-      msg = 'Invalid HUE configuration value for %s: "%s". Using default "%s"' % \
-                  (desktop.conf.DEFAULT_SITE_ENCODING.config.key, encoding, default)
+      msg = 'Invalid HUE configuration value for %s: "%s". Using default "%s"' % (
+          desktop.conf.DEFAULT_SITE_ENCODING.config.key,
+          encoding,
+          default
+      )
       logging.error(msg)
       encoding = default
     SITE_ENCODING = encoding
+
   return SITE_ENCODING
+
 
 def validate_encoding(encoding):
   """Return True/False on whether the system understands this encoding"""

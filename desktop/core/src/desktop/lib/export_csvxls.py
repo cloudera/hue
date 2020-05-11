@@ -55,6 +55,7 @@ FORMAT_TO_CONTENT_TYPE = {
 def nullify(cell):
   return cell if cell is not None else "NULL"
 
+
 def file_reader(fh):
   """Generator that reads a file, chunk-by-chunk."""
   while True:
@@ -63,6 +64,7 @@ def file_reader(fh):
       fh.close()
       break
     yield chunk
+
 
 def encode_row(row, encoding=None, make_excel_links=False):
   encoded_row = []
@@ -74,9 +76,11 @@ def encode_row(row, encoding=None, make_excel_links=False):
       if make_excel_links:
         cell = re.compile('(https?://.+)', re.IGNORECASE).sub(r'=HYPERLINK("\1")', cell)
     cell = nullify(cell)
+
     if not isinstance(cell, numbers.Number):
       cell = smart_str(cell, encoding, strings_only=True, errors='replace')
     encoded_row.append(cell)
+
   return encoded_row
 
 

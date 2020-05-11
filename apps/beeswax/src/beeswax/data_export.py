@@ -137,17 +137,21 @@ class DataAdapter(object):
 
   def __next__(self):
     results = self.db.fetch(self.handle, start_over=self.start_over, rows=self.fetch_size)
+
     if self.first_fetched:
       self.first_fetched = False
       self.start_over = False
+
       results_headers = results.full_cols()
       self.num_cols = len(results_headers)
+
       if self.store_data_type_in_header:
         self.headers = [column['name'] + '|' + column['type'] for column in results_headers]
       else:
         self.headers = [column['name'] for column in results_headers]
       if self.limit_bytes:
         self.bytes_counter += max(self.num_cols - 1, 0)
+
         for header in self.headers:
           self.bytes_counter += len(header)
 
@@ -162,20 +166,24 @@ class DataAdapter(object):
 
       for row in results.rows():
         num_bytes = self._getsizeofascii(row)
+
         if self.limit_rows and self.row_counter + 1 > self.max_rows:
           LOG.warn('The query results exceeded the maximum row limit of %d and has been truncated to first %d rows.' % (
               self.max_rows, self.row_counter)
           )
           self.is_truncated = True
           break
+
         if self.limit_bytes and self.bytes_counter + num_bytes > self.max_bytes:
           LOG.warn('The query results exceeded the maximum bytes limit of %d and has been truncated to first %d rows.' % (
               self.max_bytes, self.row_counter)
           )
           self.is_truncated = True
           break
+
         self.row_counter += 1
         self.bytes_counter += num_bytes
+
         data.append(row)
 
       return self.headers, data
