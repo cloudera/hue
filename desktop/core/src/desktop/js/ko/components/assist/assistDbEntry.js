@@ -478,7 +478,7 @@ class AssistDbEntry {
         '/metastore/tables/' +
         self.catalogEntry.name +
         '?source=' +
-        self.catalogEntry.getConnector().type +
+        self.catalogEntry.getConnector().id +
         '&namespace=' +
         self.catalogEntry.namespace.id;
     } else if (self.catalogEntry.isTableOrView()) {
@@ -488,7 +488,7 @@ class AssistDbEntry {
         '/' +
         self.catalogEntry.name +
         '?source=' +
-        self.catalogEntry.getConnector().type +
+        self.catalogEntry.getConnector().id +
         '&namespace=' +
         self.catalogEntry.namespace.id;
     } else {

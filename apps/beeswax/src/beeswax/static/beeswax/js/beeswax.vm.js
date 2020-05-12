@@ -86,13 +86,13 @@ function BeeswaxViewModel(server, apiHelper) {
   });
 
   huePubSub.subscribe("assist.database.selected", function (entry) {
-    if (entry.getConnector().type === type && self.database() !== entry.name) {
+    if (entry.getConnector().id === type && self.database() !== entry.name) {
       self.database(entry.name);
     }
   });
 
   huePubSub.subscribe("assist.database.set", function (entry) {
-    if (entry.getConnector().type === type && self.database() !== entry.name) {
+    if (entry.getConnector().id === type && self.database() !== entry.name) {
       self.database(entry.name);
     }
   });

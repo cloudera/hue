@@ -116,7 +116,7 @@ class RightAssistPanel {
       () => this.connector() && this.connector().is_sql
     );
     this.dashboardAssistantTabAvailable = ko.pureComputed(
-      () => this.connector() && this.connector().type === 'dashboard'
+      () => this.connector() && this.connector().id === 'dashboard'
     );
     this.functionsTabAvailable = ko.pureComputed(
       () =>
@@ -186,7 +186,7 @@ class RightAssistPanel {
     const updateContentsForConnector = connector => {
       this.connector(connector);
       this.schedulesTabAvailable(false);
-      if (connector && connector.type !== 'dashboard') {
+      if (connector && connector.id !== 'dashboard') {
         if (window.ENABLE_QUERY_SCHEDULING) {
           huePubSub.subscribeOnce('set.current.app.view.model', viewModel => {
             // Async
@@ -205,7 +205,7 @@ class RightAssistPanel {
 
     const onAppChange = appName => {
       if (appName === 'dashboard') {
-        updateContentsForConnector({ type: appName, is_sql: false });
+        updateContentsForConnector({ id: appName, is_sql: false });
       }
     };
     huePubSub.publish('get.current.app.name', onAppChange);
