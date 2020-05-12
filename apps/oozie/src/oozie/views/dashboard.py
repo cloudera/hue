@@ -968,6 +968,12 @@ def submit_external_job(request, application_path):
     params_form = ParametersFormSet(request.POST)
 
     if params_form.is_valid():
+      if application_name == 'coordinator.xml':
+        external_properties = Submission(request.user, fs=request.fs, jt=request.jt).get_external_parameters(application_path)
+        non_parameters = ParameterForm.get_non_parameters(external_properties)
+        mapping = non_parameters
+      else :
+        mapping = {}  
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
       mapping['dryrun'] = request.POST.get('dryrun_checkbox') == 'on'
       application_name = os.path.basename(application_path)
