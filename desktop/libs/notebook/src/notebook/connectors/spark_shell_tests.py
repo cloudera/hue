@@ -32,7 +32,22 @@ class TestSparkApi(object):
 
   def setUp(self):
     self.user = 'hue_test'
-    self.api = SparkApi(self.user)
+    self.interpreter = {
+        'name': 'livy',
+        'options': {
+          'api_url': 'http://gethue.com:8998'
+        },
+      }
+    self.api = SparkApi(self.user, self.interpreter)
+
+
+  def test_get_api(self):
+    lang = 'pyspark'
+    properties = None
+
+    # with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
+    spark_api = self.api.get_api()
+    assert_equal(spark_api.__class__.__name__, 'LivyClient')
 
   def test_get_livy_props_method(self):
     test_properties = [{

@@ -174,7 +174,7 @@ CONNECTOR_TYPES = [
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
-    'description': '',
+    'description': 'Via Thrift server',
     'properties': {
       'is_sql': True,
       'sql_identifier_quote': '`',
@@ -192,8 +192,8 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Livy",
-    'dialect': 'livy',
+    'nice_name': "SparkSQL",
+    'dialect': 'sparksql',
     'interface': 'livy',
     'settings': [
       {'name': 'api_url', 'value': 'http://localhost:8998'},
@@ -201,7 +201,7 @@ CONNECTOR_TYPES = [
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
-    'description': '',
+    'description': 'Via Livy server',
     'properties': {
       'is_sql': True,
       'sql_identifier_quote': '`',

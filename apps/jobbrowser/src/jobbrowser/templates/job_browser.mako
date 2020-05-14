@@ -3926,7 +3926,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return self.appConfig() && self.appConfig()['scheduler'] && self.appConfig()['scheduler']['interpreter_names'].indexOf('celery-beat') != -1;
         };
         var livyInterfaceCondition = function () {
-          return '${ is_mini }' == 'False' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+          return '${ is_mini }' == 'False' && self.appConfig() && self.appConfig()['editor'] && (self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1 || self.appConfig()['editor']['interpreter_names'].indexOf('sparksql') != -1);
         };
         var queryInterfaceCondition = function () {
           return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
