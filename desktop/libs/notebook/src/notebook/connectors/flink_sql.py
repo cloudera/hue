@@ -153,7 +153,7 @@ class FlinkSqlApi(Api):
           resp = self.db.fetch_status(session['id'], statement_id)
           if resp.get('status') == 'RUNNING':
             status = 'streaming'
-            response.update(self.fetch_result(notebook, snippet, n, False))
+            response['result'] = self.fetch_result(notebook, snippet, n, False)
           elif resp.get('status') == 'FINISHED':
             status = 'available'
           elif resp.get('status') == 'FAILED':

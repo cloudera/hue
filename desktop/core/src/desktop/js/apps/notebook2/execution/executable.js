@@ -289,12 +289,12 @@ export default class Executable {
             break;
           case EXECUTION_STATUS.streaming:
             if (window.WEB_SOCKETS_ENABLED) {
-              huePubSub.publish('editor.ws.query.fetch_result', queryStatus);
+              huePubSub.publish('editor.ws.query.fetch_result', queryStatus.result);
             } else {
               if (!this.result) {
                 this.result = new ExecutionResult(this, true);
               }
-              this.result.handleResultResponse(queryStatus);
+              this.result.handleResultResponse(queryStatus.result);
             }
           case EXECUTION_STATUS.running:
           case EXECUTION_STATUS.starting:
