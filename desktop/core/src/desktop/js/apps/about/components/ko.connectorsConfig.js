@@ -302,14 +302,14 @@ class ConnectorsConfig extends DisposableComponent {
     if (this.section() === 'installed-connectors-page') {
       this.instance(data);
     } else {
-      this.newConnector(data.dialect);
+      this.newConnector(data.dialect, data.interface);
     }
     this.section('connector-page');
   }
 
-  newConnector(dialect) {
+  newConnector(dialect, con_interface) {
     simpleGet(
-      '/desktop/connectors/api/instance/new/' + dialect,
+      '/desktop/connectors/api/instance/new/' + dialect + '/' + con_interface,
       {},
       {
         successCallback: data => {
