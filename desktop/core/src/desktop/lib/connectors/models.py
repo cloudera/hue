@@ -145,13 +145,18 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
 
 def _augment_connector_properties(connector):
   '''
-  Add the connector properties based on the dialect type to each connector.
+  Add the connector properties based on the dialect + interface matching to each connector.
   The connector type must exist in desktop/core/src/desktop/lib/connectors/types.py.
   '''
 
   connector_types = []
+  connector_type = None
 
   for connector_type in get_connectors_types():
+    if connector_type['dialect'] == connector['dialect'] and connector['interface'] and \
+          connector_type.get('interface') == connector.get('interface'):
+      connector_types.insert(0, connector_type)
+      break
     if connector_type['dialect'] == connector['dialect']:
       connector_types.insert(0, connector_type)
     elif connector['interface'] and connector_type.get('interface') == connector['interface']:
