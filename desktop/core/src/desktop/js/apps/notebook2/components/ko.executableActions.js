@@ -30,12 +30,12 @@ export const EXECUTE_ACTIVE_EXECUTABLE_EVENT = 'executable.active.executable';
 const TEMPLATE = `
 <div class="snippet-execute-actions" data-test="${ NAME }">
   <div class="btn-group">
-    <!-- ko if: status() !== '${ EXECUTION_STATUS.running }' && !waiting() -->
+    <!-- ko if: showExecute -->
     <button class="btn btn-primary btn-mini btn-execute disable-feedback" data-test="execute" data-bind="click: execute, disable: disabled"><i class="fa fa-play fa-fw"></i> ${I18n(
       'Execute'
     )}</button>
     <!-- /ko -->
-    <!-- ko if: status() === '${ EXECUTION_STATUS.running }' || waiting() -->
+    <!-- ko if: showStop -->
       <!-- ko ifnot: stopping -->
       <button class="btn btn-danger btn-mini btn-execute disable-feedback" data-test="stop" data-bind="click: stop"><i class="fa fa-stop fa-fw"></i>
       <!-- ko ifnot: waiting -->
@@ -81,6 +81,19 @@ class ExecutableActions extends DisposableComponent {
         this.activeExecutable() &&
         this.activeExecutable().isReady() &&
         this.partOfRunningExecution()
+    );
+
+    this.showExecute = ko.pureComputed(
+      () =>
+        this.status() !== EXECUTION_STATUS.running &&
+        this.status() !== EXECUTION_STATUS.streaming &&
+        !this.waiting()
+    );
+    this.showStop = ko.pureComputed(
+      () =>
+        this.status() === EXECUTION_STATUS.running ||
+        this.status() === EXECUTION_STATUS.streaming ||
+        this.waiting()
     );
 
     this.disabled = ko.pureComputed(() => {

@@ -36,6 +36,7 @@ export const EXECUTION_STATUS = {
   starting: 'starting',
   waiting: 'waiting',
   ready: 'ready',
+  streaming: 'streaming',
   canceled: 'canceled',
   canceling: 'canceling',
   closed: 'closed'
@@ -122,7 +123,7 @@ export default class Executable {
   }
 
   isRunning() {
-    return this.status === EXECUTION_STATUS.running;
+    return this.status === EXECUTION_STATUS.running || this.status === EXECUTION_STATUS.streaming;
   }
 
   isSuccess() {
@@ -260,6 +261,11 @@ export default class Executable {
 
     this.cancellables.push(
       apiHelper.checkExecutionStatus({ executable: this }).done(async queryStatus => {
+        // TODO: Remove once backend reports 'streaming' status
+        if (queryStatus.status === EXECUTION_STATUS.running && queryStatus.data) {
+          queryStatus.status = EXECUTION_STATUS.streaming;
+        }
+
         switch (queryStatus.status) {
           case EXECUTION_STATUS.success:
             this.executeEnded = Date.now();
@@ -286,10 +292,11 @@ export default class Executable {
             this.executeEnded = Date.now();
             this.setStatus(queryStatus.status);
             break;
-          case EXECUTION_STATUS.running:
-            if (queryStatus.data) {
+          case EXECUTION_STATUS.streaming:
+            if (window.WEB_SOCKETS_ENABLED) {
               huePubSub.publish('editor.ws.query.fetch_result', queryStatus);
             }
+          case EXECUTION_STATUS.running:
           case EXECUTION_STATUS.starting:
           case EXECUTION_STATUS.waiting:
             this.setStatus(queryStatus.status);
@@ -333,7 +340,10 @@ export default class Executable {
   }
 
   async cancel() {
-    if (this.cancellables.length && this.status === EXECUTION_STATUS.running) {
+    if (
+      this.cancellables.length &&
+      (this.status === EXECUTION_STATUS.running || this.status === EXECUTION_STATUS.streaming)
+    ) {
       hueAnalytics.log(
         'notebook',
         'cancel/' + (this.executor.connector() ? this.executor.connector().dialect : '')
