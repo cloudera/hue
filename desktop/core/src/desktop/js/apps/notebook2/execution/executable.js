@@ -261,11 +261,6 @@ export default class Executable {
 
     this.cancellables.push(
       apiHelper.checkExecutionStatus({ executable: this }).done(async queryStatus => {
-        // TODO: Remove once backend reports 'streaming' status
-        if (queryStatus.status === EXECUTION_STATUS.running && queryStatus.data) {
-          queryStatus.status = EXECUTION_STATUS.streaming;
-        }
-
         switch (queryStatus.status) {
           case EXECUTION_STATUS.success:
             this.executeEnded = Date.now();
