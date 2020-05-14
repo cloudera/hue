@@ -39,17 +39,22 @@ API_CACHE = None
 API_CACHE_LOCK = threading.Lock()
 
 
-def get_api(user):
-  global API_CACHE
-  if API_CACHE is None:
-    API_CACHE_LOCK.acquire()
-    try:
-      if API_CACHE is None:
-        API_CACHE = LivyClient(get_livy_server_url())
-    finally:
-      API_CACHE_LOCK.release()
-  API_CACHE.setuser(user)
-  return API_CACHE
+def get_api(user, connector=None):
+  if connector is not None:
+    client = LivyClient(connector['options']['api_url'])
+    client.setuser(user)
+    return client
+  else:
+    global API_CACHE
+    if API_CACHE is None:
+      API_CACHE_LOCK.acquire()
+      try:
+        if API_CACHE is None:
+          API_CACHE = LivyClient(get_livy_server_url())
+      finally:
+        API_CACHE_LOCK.release()
+    API_CACHE.setuser(user)
+    return API_CACHE
 
 
 class LivyClient(object):
