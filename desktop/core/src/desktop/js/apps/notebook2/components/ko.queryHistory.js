@@ -110,6 +110,9 @@ const TEMPLATE = `
                 <!-- ko case: 'running' -->
                 <div class="history-status" data-bind="tooltip: { title: '${ I18n("Query running") }', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
                 <!-- /ko -->
+                <!-- ko case: 'streaming' -->
+                <div class="history-status" data-bind="tooltip: { title: '${ I18n("Query streaming") }', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
+                <!-- /ko -->
                 <!-- ko case: 'failed' -->
                 <div class="history-status" data-bind="tooltip: { title: '${ I18n("Query failed") }', placement: 'bottom' }"><i class="fa fa-exclamation fa-fw"></i></div>
                 <!-- /ko -->
