@@ -78,11 +78,13 @@ export default class ExecutionResult {
   /**
    *
    * @param {Executable} executable
+   * @param {boolean} [streaming] (default false)
    */
-  constructor(executable) {
+  constructor(executable, streaming) {
     this.executable = executable;
 
     this.type = RESULT_TYPE.TABLE;
+    this.streaming = streaming;
     this.rows = [];
     this.meta = [];
 
