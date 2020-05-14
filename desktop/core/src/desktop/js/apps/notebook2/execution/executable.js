@@ -295,6 +295,11 @@ export default class Executable {
           case EXECUTION_STATUS.streaming:
             if (window.WEB_SOCKETS_ENABLED) {
               huePubSub.publish('editor.ws.query.fetch_result', queryStatus);
+            } else {
+              if (!this.result) {
+                this.result = new ExecutionResult(this, true);
+              }
+              this.result.handleResultResponse(queryStatus);
             }
           case EXECUTION_STATUS.running:
           case EXECUTION_STATUS.starting:

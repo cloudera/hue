@@ -440,7 +440,10 @@ class ResultGrid extends DisposableComponent {
     });
 
     const dataScroll = () => {
-      if (!$resultTable.is(':visible')) {
+      if (
+        !$resultTable.is(':visible') ||
+        (this.activeExecutable().result && this.activeExecutable().result.streaming)
+      ) {
         return;
       }
 
