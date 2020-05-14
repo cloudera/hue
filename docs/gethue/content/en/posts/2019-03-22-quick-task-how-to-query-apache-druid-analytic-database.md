@@ -50,6 +50,10 @@ Apache Druid is an "[OLAP style"][5] database.
 
 If not already running, it is easy to get Druid [downloaded][6] and [started][7]. In our case we will just query the provided Wikipedia data sample.
 
+
+{{< youtube KByeO8AJots >}}
+
+
 ## Administrator
 
 First, let's make sure that Hue can talk to Druid via the [pydruid SqlAlchemy][8] connector. Either make sure it is in the global Python environment via a usual 'pip install' or install it in the Hue virtual environment.
@@ -66,7 +70,6 @@ In the hue.ini configuration file, now let's add the interpreter. Here 'druid-ho
     name = Druid
     interface=sqlalchemy
     options='{"url": "druid://druid-host.com:8082/druid/v2/sql/"}'
-
 
 
 And now restart Hue.
