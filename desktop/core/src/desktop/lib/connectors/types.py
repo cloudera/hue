@@ -152,7 +152,7 @@ CONNECTOR_TYPES = [
       'is_sql': True,
       'sql_identifier_quote': '`',
       'sql_identifier_comment_single': '--',
-      'has_catalog': False,
+      'has_catalog': True,
       'has_database': False,
       'has_table': True,
       'has_live_queries': False,
@@ -161,7 +161,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
-      'trim_statement_semicolon': False,
+      'trim_statement_semicolon': True,
     }
   },
   {
