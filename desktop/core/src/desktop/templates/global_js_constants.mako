@@ -21,7 +21,7 @@
   from desktop.auth.backend import is_admin, is_hue_admin
   from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, CUSTOM_DASHBOARD_URL, \
       DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION, USE_NEW_SIDE_PANELS, \
-      VCS, ENABLE_GIST, ENABLE_LINK_SHARING
+      VCS, ENABLE_GIST, ENABLE_LINK_SHARING, has_channels
   from desktop.models import hue_version, _get_apps, get_cluster_config
 
   from beeswax.conf import DOWNLOAD_BYTES_LIMIT, DOWNLOAD_ROW_LIMIT, LIST_PARTITIONS_LIMIT, CLOSE_SESSIONS
@@ -692,6 +692,8 @@
   window.SOLR_ASSIST_KNOWN_FACET_VALUES = {
     'type': {'date': -1, 'tdate': -1, 'timestamp': -1, 'pdate': -1, 'int': -1, 'tint': -1, 'pint': -1, 'long': -1, 'tlong': -1, 'plong': -1, 'float': -1, 'tfloat': -1, 'pfloat': -1, 'double': -1, 'tdouble': -1, 'pdouble': -1, 'currency': -1, 'smallint': -1, 'bigint': -1, 'tinyint': -1, 'SpatialRecursivePrefixTreeFieldType': -1, 'string': -1, 'boolean': -1 }
   };
+
+  window.WEB_SOCKETS_ENABLED = window.WebSocket && '${ has_channels() }' === 'True';
 
   ${ sqlDocIndex.sqlDocIndex() }
   ${ sqlDocIndex.sqlDocTopLevel() }
