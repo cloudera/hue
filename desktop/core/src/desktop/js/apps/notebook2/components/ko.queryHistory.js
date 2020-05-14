@@ -275,7 +275,7 @@ class QueryHistory extends DisposableComponent {
 
     this.loadingHistory(false);
     this.refreshStatus(
-      [EXECUTION_STATUS.starting, EXECUTION_STATUS.running],
+      [EXECUTION_STATUS.starting, EXECUTION_STATUS.running, EXECUTION_STATUS.streaming],
       STARTING_RUNNING_INTERVAL
     );
     this.refreshStatus([EXECUTION_STATUS.available], AVAILABLE_INTERVAL);
