@@ -29,7 +29,7 @@ import { SHOW_EVENT } from 'ko/components/ko.importDocumentsModal';
 
 export const NAME = 'query-history';
 export const HISTORY_CLEARED_EVENT = 'query.history.cleared';
-export const UPDATE_HISTORY_EVENT = 'query.history.update';
+export const ADD_TO_HISTORY_EVENT = 'query.history.add';
 
 import { NAME as PAGINATOR_COMPONENT } from './ko.paginator';
 
@@ -179,7 +179,10 @@ class QueryHistory extends DisposableComponent {
     this.historyFilter = ko.observable('').extend({ rateLimit: 900 });
 
     this.historyCurrentPage = ko.observable(1);
-    this.historyTotalPages = ko.observable(1);
+    this.totalHistoryCount = ko.observable(0);
+    this.historyTotalPages = ko.pureComputed(() =>
+      Math.max(1, Math.ceil(this.totalHistoryCount() / QUERIES_PER_PAGE))
+    );
 
     this.refreshStatusFailed = false;
 
@@ -203,7 +206,7 @@ class QueryHistory extends DisposableComponent {
 
     this.onPageChange = throttledFetch;
 
-    this.subscribe(UPDATE_HISTORY_EVENT, throttledFetch);
+    this.subscribe(ADD_TO_HISTORY_EVENT, this.addHistoryRecord.bind(this));
 
     throttledFetch();
   }
@@ -218,7 +221,7 @@ class QueryHistory extends DisposableComponent {
       })
       .then(() => {
         this.history.removeAll();
-        this.historyTotalPages(1);
+        this.totalHistoryCount(0);
         this.historyFilter('');
         huePubSub.publish(HISTORY_CLEARED_EVENT);
       })
@@ -242,6 +245,18 @@ class QueryHistory extends DisposableComponent {
         historyResponse.history.map(historyDoc => historyDoc.id).join(',') +
         ']';
     }
+  }
+
+  addHistoryRecord(historyRecord) {
+    this.history.unshift({
+      url: historyRecord.url,
+      query: trimEllipsis(historyRecord.statement),
+      lastExecuted: historyRecord.lastExecuted,
+      status: ko.observable(historyRecord.status),
+      name: historyRecord.name,
+      uuid: historyRecord.uuid
+    });
+    this.totalHistoryCount(this.totalHistoryCount() + 1);
   }
 
   async fetchHistory() {
@@ -270,10 +285,10 @@ class QueryHistory extends DisposableComponent {
         this.history([]);
       }
 
-      this.historyTotalPages(Math.ceil(historyData.count / QUERIES_PER_PAGE));
+      this.totalHistoryCount(historyData.count);
     } catch (err) {
       this.history([]);
-      this.historyTotalPages(1);
+      this.totalHistoryCount(0);
     }
 
     this.loadingHistory(false);
