@@ -190,6 +190,7 @@ class ResultGrid extends DisposableComponent {
     this.notebookMode = params.notebookMode;
     this.hasMore = params.hasMore;
     this.fetchResult = params.fetchResult;
+    this.streaming = params.streaming;
 
     const trackedObservables = {
       columnsVisible: false,
@@ -577,7 +578,11 @@ class ResultGrid extends DisposableComponent {
         dataTable = $resultTable.hueDataTable();
       }
       try {
-        dataTable.fnAddData(initial && this.data().length ? this.data() : this.lastFetchedRows());
+        dataTable.fnAddData(
+          initial && this.data().length ? this.data() : this.lastFetchedRows(),
+          undefined,
+          this.streaming
+        );
       } catch (e) {}
       const $dataTablesWrapper = $snippet.find('.dataTables_wrapper');
       this.showNormalResult();

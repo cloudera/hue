@@ -76,6 +76,7 @@ const TEMPLATE = `
           params: {
             activeExecutable: activeExecutable,
             data: data,
+            streaming: streaming,
             lastFetchedRows: lastFetchedRows,
             fetchResult: fetchResult.bind($data),
             hasMore: hasMore,
@@ -138,6 +139,7 @@ class SnippetResults extends DisposableComponent {
     this.status = ko.observable();
     this.type = ko.observable(RESULT_TYPE.TABLE);
     this.meta = ko.observableArray();
+    this.streaming = ko.observable();
     this.data = ko.observableArray();
     this.lastFetchedRows = ko.observableArray();
     this.images = ko.observableArray();
@@ -226,6 +228,7 @@ class SnippetResults extends DisposableComponent {
     this.lastFetchedRows([]);
     this.data([]);
     this.meta([]);
+    this.streaming(false);
     this.cleanedMeta([]);
     this.cleanedDateTimeMeta([]);
     this.cleanedNumericMeta([]);
@@ -245,6 +248,7 @@ class SnippetResults extends DisposableComponent {
       this.fetchedOnce(executionResult.fetchedOnce);
       this.hasMore(executionResult.hasMore);
       this.type(executionResult.type);
+      this.streaming(executionResult.streaming);
 
       if (!this.meta().length && executionResult.meta.length) {
         this.meta(executionResult.koEnrichedMeta);
