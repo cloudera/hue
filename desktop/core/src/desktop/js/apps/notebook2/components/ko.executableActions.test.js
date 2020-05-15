@@ -3,11 +3,15 @@ import { koSetup } from 'jest/koTestUtils';
 import { NAME } from './ko.executableActions';
 import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import { sleep } from 'utils/hueUtils';
+import sessionManager from 'apps/notebook2/execution/sessionManager';
 
 describe('ko.executableActions.js', () => {
   const setup = koSetup();
 
   it('should render component', async () => {
+    const spy = spyOn(sessionManager, 'getSession').and.returnValue(
+      Promise.resolve({ type: 'foo' })
+    );
     const mockExecutable = {
       cancel: () => {},
       cancelBatchChain: () => {},
@@ -17,7 +21,10 @@ describe('ko.executableActions.js', () => {
       reset: () => {},
       nextExecutable: {},
       executor: {
-        defaultLimit: () => {}
+        defaultLimit: () => {},
+        connector: () => ({
+          id: 'foo'
+        })
       },
       status: EXECUTION_STATUS.ready
     };
@@ -27,10 +34,14 @@ describe('ko.executableActions.js', () => {
       activeExecutable: activeExecutable
     });
 
+    expect(spy).toHaveBeenCalled();
     expect(element.querySelector('[data-test="' + NAME + '"]')).toBeTruthy();
   });
 
   it('should handle execute and stop clicks', async () => {
+    const spy = spyOn(sessionManager, 'getSession').and.returnValue(
+      Promise.resolve({ type: 'foo' })
+    );
     let executeCalled = false;
     let cancelCalled = false;
     const mockExecutable = {
@@ -48,7 +59,10 @@ describe('ko.executableActions.js', () => {
       reset: () => {},
       nextExecutable: {},
       executor: {
-        defaultLimit: () => {}
+        defaultLimit: () => {},
+        connector: () => ({
+          id: 'foo'
+        })
       },
       status: EXECUTION_STATUS.ready
     };
@@ -57,6 +71,8 @@ describe('ko.executableActions.js', () => {
     const wrapper = await setup.renderComponent(NAME, {
       activeExecutable: activeExecutable
     });
+
+    expect(spy).toHaveBeenCalled();
 
     // Click play
     expect(executeCalled).toBeFalsy();
