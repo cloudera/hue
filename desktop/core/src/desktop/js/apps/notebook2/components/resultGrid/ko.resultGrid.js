@@ -180,6 +180,8 @@ const TEMPLATE = `
 </div>
 `;
 
+const STREAMING_MAX_ROWS = 1000;
+
 class ResultGrid extends DisposableComponent {
   constructor(params, element) {
     super();
@@ -581,7 +583,8 @@ class ResultGrid extends DisposableComponent {
         dataTable.fnAddData(
           initial && this.data().length ? this.data() : this.lastFetchedRows(),
           undefined,
-          this.streaming
+          this.streaming,
+          STREAMING_MAX_ROWS
         );
       } catch (e) {}
       const $dataTablesWrapper = $snippet.find('.dataTables_wrapper');
