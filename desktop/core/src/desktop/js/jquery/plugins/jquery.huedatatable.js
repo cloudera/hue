@@ -640,12 +640,15 @@ $.fn.hueDataTable = function(oInit) {
     }
   };
 
-  self.fnAddData = function(mData, bRedraw) {
+  self.fnAddData = function(mData, bRedraw, reverse) {
     const $t = self.$table;
 
     if ($t) {
       const aoColumns = $t.data('aoColumns') || [];
-      $t.data('data', $t.data('data').concat(mData));
+      $t.data(
+        'data',
+        reverse ? mData.reverse().concat($t.data('data')) : $t.data('data').concat(mData)
+      );
 
       if (mData.length === 0) {
         return;
