@@ -640,15 +640,18 @@ $.fn.hueDataTable = function(oInit) {
     }
   };
 
-  self.fnAddData = function(mData, bRedraw, reverse) {
+  self.fnAddData = function(mData, bRedraw, streaming, streamRecordLimit) {
     const $t = self.$table;
 
     if ($t) {
       const aoColumns = $t.data('aoColumns') || [];
-      $t.data(
-        'data',
-        reverse ? mData.reverse().concat($t.data('data')) : $t.data('data').concat(mData)
-      );
+      const newData = streaming
+        ? mData.reverse().concat($t.data('data'))
+        : $t.data('data').concat(mData);
+      if (streaming && streamRecordLimit) {
+        newData.splice(streamRecordLimit);
+      }
+      $t.data('data', newData);
 
       if (mData.length === 0) {
         return;
