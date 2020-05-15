@@ -40,7 +40,7 @@ API_CACHE_LOCK = threading.Lock()
 
 
 def get_api(user, connector=None):
-  if connector is not None:
+  if connector is not None and connector.get('options'):
     client = LivyClient(connector['options']['api_url'])
     client.setuser(user)
     return client
@@ -117,7 +117,8 @@ class LivyClient(object):
     return '\n'.join(response['log'])
 
   def create_session(self, **properties):
-    properties['proxyUser'] = self.user
+    properties['proxyUser'] = self.user.split('@')[0]
+    properties = {'kind': 'sql'}
     return self._root.post('sessions', data=json.dumps(properties), contenttype=_JSON_CONTENT_TYPE)
 
   def get_sessions(self):
