@@ -44,11 +44,13 @@ const TEMPLATE = `
     </button>
   </div>
 
+  <!-- ko ifnot: streaming -->
   <div class="btn-group">
     <button class="btn btn-editor btn-mini disable-feedback" data-bind="click: showSearch.bind($data), css: { 'disabled': !data().length }">
       <i class="fa fa-search"></i> ${ I18n('Search') }
     </button>
   </div>
+  <!-- /ko -->
 
   <!-- ko component: {
     name: 'result-download-actions',
