@@ -104,6 +104,9 @@ const TEMPLATE = `
           }
         } --><!-- /ko -->
       </div>
+      <div data-bind="visible: !executing() && !hasData() && streaming()" style="display: none;">
+        <h1 class="empty">${ I18n('Waiting for streaming data...') }</h1>
+      </div>
       <div data-bind="visible: !executing() && !hasData() && !hasResultSet() && status() === 'available' && fetchedOnce()" style="display: none;">
         <h1 class="empty">${ I18n('Success.') }</h1>
       </div>
