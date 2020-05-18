@@ -68,10 +68,19 @@ const TEMPLATE = `
           params: {
             gridSideBtn: false,
             snippet: $data,
-            notebook: $parent 
-          } 
+            notebook: $parent
+          }
         }
       " style="display:inline-block;"></div>
+  <!-- /ko -->
+
+  <!-- ko if: streaming -->
+  <form autocomplete="off" class="inline-block">
+    <input class="input-small search-input" style="margin-left: 10px;" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="${ I18n('Live filter') }" data-bind="
+        textInput: filter,
+        clearable: filter
+      "/>
+  </form>
   <!-- /ko -->
 </div>
 
@@ -152,7 +161,7 @@ const TEMPLATE = `
         onPosition: function() { redrawFixedHeaders(); }
       }
     "><div class="resize-bar"></div></div>
-    
+
   <div class="split-result-content" data-bind="delayedOverflow: 'slow', css: resultsKlass">
     <table class="table table-condensed resultTable">
       <thead>
@@ -161,7 +170,7 @@ const TEMPLATE = `
             text: ($index() == 0 ? '&nbsp;' : $data.name),
             css: typeof cssClass != 'undefined' ? cssClass : 'sort-string',
             attr: { title: $data.type },
-            style: { 
+            style: {
               'width': $index() == 0 ? '1%' : '',
               'height': $index() == 0 ? '32px' : ''
             },
@@ -195,6 +204,14 @@ class ResultGrid extends DisposableComponent {
     this.hasMore = params.hasMore;
     this.fetchResult = params.fetchResult;
     this.streaming = params.streaming;
+
+    this.filter = ko.observable().extend({ throttle: 100 });
+
+    this.filter.subscribe(filter => {
+      if (this.hueDatatable) {
+        this.hueDatatable.setFilter(filter);
+      }
+    });
 
     const trackedObservables = {
       columnsVisible: false,
@@ -400,6 +417,9 @@ class ResultGrid extends DisposableComponent {
     $resultTable.addClass('dt');
 
     this.hueDatatable = this.createHueDatatable($resultTable);
+    if (this.filter()) {
+      this.hueDatatable.setFilter(this.filter());
+    }
 
     const $dataTablesWrapper = $resultTable.parents('.dataTables_wrapper');
 
@@ -579,7 +599,7 @@ class ResultGrid extends DisposableComponent {
         dataTable = this.createDatatable();
         $resultTable.data('rendered', true);
       } else {
-        dataTable = $resultTable.hueDataTable();
+        dataTable = this.hueDatatable;
       }
       try {
         dataTable.fnAddData(
