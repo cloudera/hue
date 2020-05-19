@@ -278,6 +278,14 @@ class ResultGrid extends DisposableComponent {
 
     this.subscribe(this.data, this.render.bind(this));
 
+    this.subscribe(this.hasMore, val => {
+      // Hive reports hasMore = true when there's actually no more results, this prevents the grid
+      // from being grayed out after scroll as this.data doesn't change but this.hasMore does.
+      if (!val) {
+        this.showNormalResult();
+      }
+    });
+
     this.subscribe(this.meta, meta => {
       if (meta) {
         if (this.hueDatatable) {
