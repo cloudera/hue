@@ -41,17 +41,14 @@ Upgrade or delete:
 * Nodes: 1 primary instance of m3.medium (1CPU 3GB)
 * Quick start with [MicroK8s](https://microk8s.io/#quick-start)
 
-    sudo snap install microk8s --classic
+    sudo snap install microk8s --classic --channel=1.18/stable
+
+    microk8s.enable dns ingress storage helm3
 
     sudo snap alias microk8s.kubectl kubectl
-
-    microk8s.enable dns ingress storage
-
-And
-
-    sudo microk8s.enable helm3
-
     sudo snap alias microk8s.helm3 helm
+
+    microk8s.inspect
 
 Optional (for more complete Kubernetes environment):
 
