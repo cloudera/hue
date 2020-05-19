@@ -605,7 +605,7 @@ class ResultGrid extends DisposableComponent {
         dataTable.fnAddData(
           initial && this.data().length ? this.data() : this.lastFetchedRows(),
           undefined,
-          this.streaming,
+          ko.unwrap(this.streaming),
           STREAMING_MAX_ROWS
         );
       } catch (e) {}
