@@ -55,7 +55,6 @@ import I18n from 'utils/i18n';
 import MultiLineEllipsisHandler from 'utils/multiLineEllipsisHandler';
 
 import sqlUtils from 'sql/sqlUtils';
-import { PigFunctions, SqlSetOptions, SqlFunctions } from 'sql/sqlFunctions';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 
 import 'ko/components/assist/assistViewModel';
@@ -108,12 +107,9 @@ window.localforage = localforage;
 window.MultiLineEllipsisHandler = MultiLineEllipsisHandler;
 window.nv = nv;
 window.page = page;
-window.PigFunctions = PigFunctions;
 window.qq = qq;
 window.sprintf = sprintf;
 window.SqlAutocompleter = SqlAutocompleter;
-window.SqlFunctions = SqlFunctions;
-window.SqlSetOptions = SqlSetOptions;
 window.sqlStatementsParser = sqlStatementsParser;
 window.sqlUtils = sqlUtils;
 window.sqlWorkerHandler = sqlWorkerHandler;
