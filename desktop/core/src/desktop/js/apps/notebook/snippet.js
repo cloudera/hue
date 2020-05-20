@@ -37,6 +37,7 @@ import {
   ASSIST_GET_SOURCE_EVENT,
   ASSIST_SET_SOURCE_EVENT
 } from 'ko/components/assist/events';
+import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -185,16 +186,16 @@ class Snippet {
 
     self.connector = ko.observable();
 
-    const updateConnector = type => {
-      if (type) {
-        self.connector(findEditorConnector(connector => connector.type === type));
+    const updateConnector = id => {
+      if (id) {
+        self.connector(findEditorConnector(connector => connector.id === id));
       }
     };
 
     updateConnector(self.type());
 
     self.type.subscribe(type => {
-      if (!self.connector() || self.connector().type !== type) {
+      if (!self.connector() || self.connector().id !== type) {
         updateConnector(type);
       }
       self.status('ready');
@@ -209,10 +210,13 @@ class Snippet {
       return {
         optimizer: self.type() === 'hive' || self.type() === 'impala' ? 'api' : 'off',
         type: self.type(),
+        id: self.type(),
         dialect: self.type(),
         is_sql: self.isSqlDialect()
       };
     });
+
+    self.dialect = ko.pureComputed(() => this.connector().dialect);
 
     self.isBatchable = ko.computed(() => {
       return (
@@ -460,7 +464,7 @@ class Snippet {
     self.handleAssistSelection = function(entry) {
       if (ignoreNextAssistDatabaseUpdate) {
         ignoreNextAssistDatabaseUpdate = false;
-      } else if (entry.getConnector().type === self.connector().type) {
+      } else if (entry.getConnector().id === self.connector().id) {
         if (self.namespace() !== entry.namespace) {
           self.namespace(entry.namespace);
         }
@@ -862,7 +866,7 @@ class Snippet {
     });
 
     const activeSourcePromises = [];
-    huePubSub.subscribe('ace.sql.location.worker.message', e => {
+    huePubSub.subscribe(POST_FROM_LOCATION_WORKER_EVENT, e => {
       while (activeSourcePromises.length) {
         const promise = activeSourcePromises.pop();
         if (promise.cancel) {

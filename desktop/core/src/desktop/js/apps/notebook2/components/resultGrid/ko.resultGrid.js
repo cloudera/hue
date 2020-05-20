@@ -44,11 +44,13 @@ const TEMPLATE = `
     </button>
   </div>
 
+  <!-- ko ifnot: streaming -->
   <div class="btn-group">
     <button class="btn btn-editor btn-mini disable-feedback" data-bind="click: showSearch.bind($data), css: { 'disabled': !data().length }">
       <i class="fa fa-search"></i> ${ I18n('Search') }
     </button>
   </div>
+  <!-- /ko -->
 
   <!-- ko component: {
     name: 'result-download-actions',
@@ -66,10 +68,19 @@ const TEMPLATE = `
           params: {
             gridSideBtn: false,
             snippet: $data,
-            notebook: $parent 
-          } 
+            notebook: $parent
+          }
         }
       " style="display:inline-block;"></div>
+  <!-- /ko -->
+
+  <!-- ko if: streaming -->
+  <form autocomplete="off" class="inline-block">
+    <input class="input-small search-input" style="margin-left: 10px;" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="${ I18n('Live filter') }" data-bind="
+        textInput: filter,
+        clearable: filter
+      "/>
+  </form>
   <!-- /ko -->
 </div>
 
@@ -150,7 +161,7 @@ const TEMPLATE = `
         onPosition: function() { redrawFixedHeaders(); }
       }
     "><div class="resize-bar"></div></div>
-    
+
   <div class="split-result-content" data-bind="delayedOverflow: 'slow', css: resultsKlass">
     <table class="table table-condensed resultTable">
       <thead>
@@ -159,7 +170,7 @@ const TEMPLATE = `
             text: ($index() == 0 ? '&nbsp;' : $data.name),
             css: typeof cssClass != 'undefined' ? cssClass : 'sort-string',
             attr: { title: $data.type },
-            style: { 
+            style: {
               'width': $index() == 0 ? '1%' : '',
               'height': $index() == 0 ? '32px' : ''
             },
@@ -180,6 +191,8 @@ const TEMPLATE = `
 </div>
 `;
 
+const STREAMING_MAX_ROWS = 1000;
+
 class ResultGrid extends DisposableComponent {
   constructor(params, element) {
     super();
@@ -190,6 +203,15 @@ class ResultGrid extends DisposableComponent {
     this.notebookMode = params.notebookMode;
     this.hasMore = params.hasMore;
     this.fetchResult = params.fetchResult;
+    this.streaming = params.streaming;
+
+    this.filter = ko.observable().extend({ throttle: 100 });
+
+    this.filter.subscribe(filter => {
+      if (this.hueDatatable) {
+        this.hueDatatable.setFilter(filter);
+      }
+    });
 
     const trackedObservables = {
       columnsVisible: false,
@@ -395,6 +417,9 @@ class ResultGrid extends DisposableComponent {
     $resultTable.addClass('dt');
 
     this.hueDatatable = this.createHueDatatable($resultTable);
+    if (this.filter()) {
+      this.hueDatatable.setFilter(this.filter());
+    }
 
     const $dataTablesWrapper = $resultTable.parents('.dataTables_wrapper');
 
@@ -440,7 +465,10 @@ class ResultGrid extends DisposableComponent {
     });
 
     const dataScroll = () => {
-      if (!$resultTable.is(':visible')) {
+      if (
+        !$resultTable.is(':visible') ||
+        (this.activeExecutable().result && this.activeExecutable().result.streaming)
+      ) {
         return;
       }
 
@@ -571,10 +599,15 @@ class ResultGrid extends DisposableComponent {
         dataTable = this.createDatatable();
         $resultTable.data('rendered', true);
       } else {
-        dataTable = $resultTable.hueDataTable();
+        dataTable = this.hueDatatable;
       }
       try {
-        dataTable.fnAddData(initial && this.data().length ? this.data() : this.lastFetchedRows());
+        dataTable.fnAddData(
+          initial && this.data().length ? this.data() : this.lastFetchedRows(),
+          undefined,
+          this.streaming,
+          STREAMING_MAX_ROWS
+        );
       } catch (e) {}
       const $dataTablesWrapper = $snippet.find('.dataTables_wrapper');
       this.showNormalResult();

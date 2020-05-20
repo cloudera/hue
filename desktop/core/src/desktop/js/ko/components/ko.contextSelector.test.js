@@ -22,7 +22,7 @@ describe('ko.contextSelector.js', () => {
 
   it('should render component', async () => {
     const element = await setup.renderComponent(CONTEXT_SELECTOR_COMPONENT, {
-      connector: { type: 'foo' }
+      connector: { id: 'foo' }
     });
 
     expect(element.innerHTML).toMatchSnapshot();

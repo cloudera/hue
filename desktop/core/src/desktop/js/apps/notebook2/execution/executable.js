@@ -13,6 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+import $ from 'jquery';
 
 import apiHelper from 'api/apiHelper';
 import ExecutionResult from 'apps/notebook2/execution/executionResult';
@@ -35,6 +36,7 @@ export const EXECUTION_STATUS = {
   starting: 'starting',
   waiting: 'waiting',
   ready: 'ready',
+  streaming: 'streaming',
   canceled: 'canceled',
   canceling: 'canceling',
   closed: 'closed'
@@ -121,7 +123,7 @@ export default class Executable {
   }
 
   isRunning() {
-    return this.status === EXECUTION_STATUS.running;
+    return this.status === EXECUTION_STATUS.running || this.status === EXECUTION_STATUS.streaming;
   }
 
   isSuccess() {
@@ -285,10 +287,16 @@ export default class Executable {
             this.executeEnded = Date.now();
             this.setStatus(queryStatus.status);
             break;
-          case EXECUTION_STATUS.running:
-            if (queryStatus.data) {
-              huePubSub.publish('editor.ws.query.fetch_result', queryStatus);
+          case EXECUTION_STATUS.streaming:
+            if (window.WEB_SOCKETS_ENABLED) {
+              huePubSub.publish('editor.ws.query.fetch_result', queryStatus.result);
+            } else {
+              if (!this.result) {
+                this.result = new ExecutionResult(this, true);
+              }
+              this.result.handleResultResponse(queryStatus.result);
             }
+          case EXECUTION_STATUS.running:
           case EXECUTION_STATUS.starting:
           case EXECUTION_STATUS.waiting:
             this.setStatus(queryStatus.status);
@@ -302,9 +310,13 @@ export default class Executable {
           case EXECUTION_STATUS.failed:
             this.executeEnded = Date.now();
             this.setStatus(queryStatus.status);
+            if (queryStatus.message) {
+              $.jHueNotify.error(queryStatus.message); // TODO: Inline instead of popup, e.g. ERROR_REGEX in Execute()
+            }
             break;
           default:
             this.executeEnded = Date.now();
+            this.setStatus(EXECUTION_STATUS.failed);
             console.warn('Got unknown status ' + queryStatus.status);
         }
       })
@@ -328,7 +340,10 @@ export default class Executable {
   }
 
   async cancel() {
-    if (this.cancellables.length && this.status === EXECUTION_STATUS.running) {
+    if (
+      this.cancellables.length &&
+      (this.status === EXECUTION_STATUS.running || this.status === EXECUTION_STATUS.streaming)
+    ) {
       hueAnalytics.log(
         'notebook',
         'cancel/' + (this.executor.connector() ? this.executor.connector().dialect : '')
@@ -403,10 +418,10 @@ export default class Executable {
       };
     }
 
-    const session = await sessionManager.getSession({ type: this.executor.connector().type });
+    const session = await sessionManager.getSession({ type: this.executor.connector().id });
     const statement = this.getStatement();
     const snippet = {
-      type: this.executor.connector().type,
+      type: this.executor.connector().id,
       result: {
         handle: this.handle
       },
@@ -424,7 +439,7 @@ export default class Executable {
     };
 
     const notebook = {
-      type: this.executor.connector().type,
+      type: this.executor.connector().id,
       snippets: [snippet],
       id: this.notebookId,
       uuid: hueUtils.UUID(),

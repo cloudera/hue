@@ -26,7 +26,7 @@ import SolrQueryAutocompleter from './solrQueryAutocompleter';
 import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
-import { findEditorConnector } from '../../../utils/hueConfig';
+import { findEditorConnector } from 'utils/hueConfig';
 
 export const NAME = 'hue-simple-ace-editor';
 export const MULTI_NAME = 'hue-simple-ace-editor-multi';
@@ -103,16 +103,16 @@ class SimpleAceEditor {
       const autocomplete = ko.unwrap(params.autocomplete);
       let connector = ko.unwrap(autocomplete.connector);
 
-      if (!connector || !connector.type) {
-        const type =
+      if (!connector || !connector.id) {
+        const connectorId =
           autocomplete.type.indexOf('Query') !== -1
             ? autocomplete.type.replace('Query', '')
             : autocomplete.type;
-        connector = findEditorConnector(connector => connector.type === type);
+        connector = findEditorConnector(connector => connector.id === connectorId);
 
         // TODO: Temporary fix for dashboard
         if (!connector) {
-          connector = { type: type };
+          connector = { id: connectorId };
         }
       }
 
@@ -120,7 +120,7 @@ class SimpleAceEditor {
         autocompleteSettings: {
           temporaryOnly: params.temporaryOnly
         },
-        type: ko.observable(connector.type),
+        type: ko.observable(connector.id),
         dialect: ko.observable(connector.dialect),
         connector: ko.observable(connector),
         id: ko.observable($element.attr('id')),

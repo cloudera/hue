@@ -76,6 +76,7 @@ const TEMPLATE = `
           params: {
             activeExecutable: activeExecutable,
             data: data,
+            streaming: streaming,
             lastFetchedRows: lastFetchedRows,
             fetchResult: fetchResult.bind($data),
             hasMore: hasMore,
@@ -102,6 +103,9 @@ const TEMPLATE = `
             showChart: showChart
           }
         } --><!-- /ko -->
+      </div>
+      <div data-bind="visible: !executing() && !hasData() && streaming()" style="display: none;">
+        <h1 class="empty">${ I18n('Waiting for streaming data...') }</h1>
       </div>
       <div data-bind="visible: !executing() && !hasData() && !hasResultSet() && status() === 'available' && fetchedOnce()" style="display: none;">
         <h1 class="empty">${ I18n('Success.') }</h1>
@@ -138,6 +142,7 @@ class SnippetResults extends DisposableComponent {
     this.status = ko.observable();
     this.type = ko.observable(RESULT_TYPE.TABLE);
     this.meta = ko.observableArray();
+    this.streaming = ko.observable();
     this.data = ko.observableArray();
     this.lastFetchedRows = ko.observableArray();
     this.images = ko.observableArray();
@@ -226,6 +231,7 @@ class SnippetResults extends DisposableComponent {
     this.lastFetchedRows([]);
     this.data([]);
     this.meta([]);
+    this.streaming(false);
     this.cleanedMeta([]);
     this.cleanedDateTimeMeta([]);
     this.cleanedNumericMeta([]);
@@ -245,6 +251,7 @@ class SnippetResults extends DisposableComponent {
       this.fetchedOnce(executionResult.fetchedOnce);
       this.hasMore(executionResult.hasMore);
       this.type(executionResult.type);
+      this.streaming(executionResult.streaming);
 
       if (!this.meta().length && executionResult.meta.length) {
         this.meta(executionResult.koEnrichedMeta);

@@ -50,6 +50,7 @@ Hue supports KnoxSpnegoDjango since Hue4.6, we can turn on Hue’s KnoxSpnegoDja
  through CM UI or hue.ini.
 
 On any cluster with Knox service installed, update hue.ini as following and restart Hue:
+
     [desktop]
     [[auth]]
     backend=desktop.auth.backend.KnoxSpnegoDjangoBackend
@@ -89,13 +90,17 @@ You should be able to log in to hue page:
 
 ## Troubleshooting
 1. If you hit error like "The username or password you entered is incorrect."
+
 ![incorrect-user-or-password.png](https://cdn.gethue.com/uploads/2020/05/incorrect-user-or-password.png)
+
 Check on your knox proxy hosts that user or password is correct.
+
     ssh root@weixia-1.domain.site
     useradd weixia
     passwd weixia
 
 2. If you hit 403 error:
+
 ![hue-login-403.png](https://cdn.gethue.com/uploads/2020/05/hue-login-403.png)
 
 Log in to your ranger service and ensure your user or group say 'public' has proper permissions.
@@ -106,3 +111,4 @@ Any feedback or questions? Feel free to comment here or on the [Forum](https://d
 [@gethue](https://twitter.com/gethue) and [quick start](https://docs.gethue.com/quickstart/) SQL querying!
 
 Weixia Xu from the Hue Team
+

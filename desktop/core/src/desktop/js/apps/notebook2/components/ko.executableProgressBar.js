@@ -46,7 +46,9 @@ class ExecutableProgressBar extends DisposableComponent {
       }
       if (
         this.progress() === 0 &&
-        (this.status() === EXECUTION_STATUS.running || this.status() === EXECUTION_STATUS.starting)
+        (this.status() === EXECUTION_STATUS.running ||
+          this.status() === EXECUTION_STATUS.streaming ||
+          this.status() === EXECUTION_STATUS.starting)
       ) {
         return 'progress-starting';
       }
