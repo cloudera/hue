@@ -291,7 +291,7 @@ class EditorViewModel {
       }
     });
 
-    const withActiveSnippet = function(callback) {
+    this.withActiveSnippet = function(callback) {
       const notebook = self.selectedNotebook();
       let foundSnippet;
       if (notebook) {
@@ -321,7 +321,7 @@ class EditorViewModel {
     huePubSub.subscribe(
       GET_ACTIVE_SNIPPET_CONNECTOR_EVENT,
       callback => {
-        withActiveSnippet(activeSnippet => {
+        this.withActiveSnippet(activeSnippet => {
           callback(activeSnippet.connector());
         });
       },
@@ -331,7 +331,7 @@ class EditorViewModel {
     huePubSub.subscribe(
       'save.snippet.to.file',
       () => {
-        withActiveSnippet(activeSnippet => {
+        this.withActiveSnippet(activeSnippet => {
           const data = {
             path: activeSnippet.statementPath(),
             contents: activeSnippet.statement()
@@ -354,7 +354,7 @@ class EditorViewModel {
     huePubSub.subscribe(
       'sql.context.pin',
       contextData => {
-        withActiveSnippet(activeSnippet => {
+        this.withActiveSnippet(activeSnippet => {
           contextData.tabId = 'context' + activeSnippet.pinnedContextTabs().length;
           activeSnippet.pinnedContextTabs.push(contextData);
           activeSnippet.currentQueryTab(contextData.tabId);
@@ -366,7 +366,7 @@ class EditorViewModel {
     huePubSub.subscribe(
       'assist.database.set',
       entry => {
-        withActiveSnippet(activeSnippet => {
+        this.withActiveSnippet(activeSnippet => {
           activeSnippet.handleAssistSelection(entry);
         });
       },
@@ -376,7 +376,7 @@ class EditorViewModel {
     huePubSub.subscribe(
       'assist.database.selected',
       entry => {
-        withActiveSnippet(activeSnippet => {
+        this.withActiveSnippet(activeSnippet => {
           activeSnippet.handleAssistSelection(entry);
         });
       },
