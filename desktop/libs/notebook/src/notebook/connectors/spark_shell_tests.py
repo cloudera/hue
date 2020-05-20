@@ -34,6 +34,14 @@ class TestSparkApi(object):
     self.user = 'hue_test'
     self.api = SparkApi(self.user)
 
+  def test_get_props_method(self):
+    test_properties = [{
+        "name": "files",
+        "value": 'file_a,file_b,file_c',
+      }]
+    props = self.api.get_props(test_properties)
+    assert_equal(props['files'],['file_a','file_b','file_c'])
+    
   def test_create_session_with_config(self):
     lang = 'pyspark'
     properties = None
@@ -76,7 +84,6 @@ class TestSparkApi(object):
               cores = p['value']
           assert_equal(cores, 1)
 
-
   def test_create_session_plain(self):
     lang = 'pyspark'
     properties = None
@@ -99,31 +106,6 @@ class TestSparkApi(object):
       files_properties = [prop for prop in session['properties'] if prop['name'] == 'files']
       assert_true(files_properties, session['properties'])
       assert_equal(files_properties[0]['value'], [], session['properties'])
-
-
-  def test_create_session_plain(self):
-    lang = 'pyspark'
-    properties = None
-
-    with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
-      get_spark_api.return_value = Mock(
-        create_session=Mock(
-          return_value={'id': '1'}
-        ),
-        get_session=Mock(
-          return_value={'state': 'idle', 'log': ''}
-        )
-      )
-
-      session = self.api.create_session(lang=lang, properties=properties)
-
-      assert_equal(session['type'], 'pyspark')
-      assert_equal(session['id'], '1')
-
-      files_properties = [prop for prop in session['properties'] if prop['name'] == 'files']
-      assert_true(files_properties, session['properties'])
-      assert_equal(files_properties[0]['value'], [], session['properties'])
-
 
   def test_get_jobs(self):
     local_jobs = [

@@ -156,10 +156,33 @@ class SparkApi(Api):
     if properties is not None:
       props.update(dict([(p['name'], p['value']) for p in properties]))
 
+    # HUE-4761: Hue's session request is causing Livy to fail with "JsonMappingException: Can not deserialize
+    # instance of scala.collection.immutable.List out of VALUE_STRING token" due to List type values
+    # not being formed properly, they are quoted csv strings (without brackets) instead of proper List
+    # types, this is for keys; archives, jars, files and pyFiles. The Mako frontend probably should be
+    # modified to pass the values as Livy expects but for now we coerce these types to be Lists.
+    # Issue only occurs when non-default values are used because the default path properly sets the
+    # empty list '[]' for these four values.
+    # Note also that Livy has a 90 second timeout for the session request to complete, this needs to
+    # be increased for requests that take longer, for example when loading large archives.
+    for key in ['archives','jars','files','pyFiles']:
+      if key not in props:
+        continue
+      if type(props[key]) is list:
+        continue
+      LOG.debug("Check List type: {} was not a list".format(key))
+      _tmp = props[key]
+      props[key] = _tmp.split(",")
+    
+    # Convert the conf list to a dict for Livy
+    LOG.debug("Property Spark Conf kvp list from UI is: " + str(props['conf']))
+    props['conf'] = {conf.get('key'): conf.get('value') for i, conf in enumerate(props['conf'])}
+    LOG.debug("Property Spark Conf dictionary is: " + str(props['conf']))
+      
     return props
 
   @staticmethod
-  def get_properties(props=None):
+  def to_properties(props=None):
     properties = list()
     for p in SparkConfiguration.PROPERTIES:
       properties.append(p.copy())
@@ -177,41 +200,6 @@ class SparkApi(Api):
       properties = user_config.properties_list
 
     props = self.get_props(properties)
-
-    # HUE-4761: Hue's session request is causing Livy to fail with "JsonMappingException: Can not deserialize
-    # instance of scala.collection.immutable.List out of VALUE_STRING token" due to List type values
-    # not being formed properly, they are quoted csv strings (without brackets) instead of proper List
-    # types, this is for keys; archives, jars, files and pyFiles. The Mako frontend probably should be
-    # modified to pass the values as Livy expects but for now we coerce these types to be Lists.
-    # Issue only occurs when non-default values are used because the default path properly sets the
-    # empty list '[]' for these four values.
-    # Note also that Livy has a 90 second timeout for the session request to complete, this needs to
-    # be increased for requests that take longer, for example when loading large archives.
-    tmp_archives = props['archives']
-    if type(tmp_archives) is not list:
-      props['archives'] = tmp_archives.split(",")
-      LOG.debug("Check List type: archives was not a list")
-
-    tmp_jars = props['jars']
-    if type(tmp_jars) is not list:
-      props['jars'] = tmp_jars.split(",")
-      LOG.debug("Check List type: jars was not a list")
-
-    tmp_files = props['files']
-    if type(tmp_files) is not list:
-      props['files'] = tmp_files.split(",")
-      LOG.debug("Check List type: files was not a list")
-
-    tmp_py_files = props['pyFiles']
-    if type(tmp_py_files) is not list:
-      props['pyFiles'] = tmp_py_files.split(",")
-      LOG.debug("Check List type: pyFiles was not a list")
-
-    # Convert the conf list to a dict for Livy
-    LOG.debug("Property Spark Conf kvp list from UI is: " + str(props['conf']))
-    props['conf'] = {conf.get('key'): conf.get('value') for i, conf in enumerate(props['conf'])}
-    LOG.debug("Property Spark Conf dictionary is: " + str(props['conf']))
-
     props['kind'] = lang
 
     api = get_spark_api(self.user)
@@ -232,7 +220,7 @@ class SparkApi(Api):
     return {
         'type': lang,
         'id': response['id'],
-        'properties': self.get_properties(props)
+        'properties': self.to_properties(props)
     }
 
   def execute(self, notebook, snippet):
