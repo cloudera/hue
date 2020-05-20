@@ -83,7 +83,7 @@ Flink 1.10 クラスターであれば動作し、デモは [Ververica SQL Train
 
     wget https://raw.githubusercontent.com/romainr/flink-sql-gateway/master/docs/demo/sql-gateway-defaults.yaml
 
-    docker cp sql-gateway-defaults.yaml flink-sql-training_sql-client_1:/opt/flink-sql-gateway-0.1-SNAPSHOT/conf/
+    docker cp sql-gateway-defaults.yaml sql-training_sql-client_1:/opt/flink-sql-gateway-0.1-SNAPSHOT/conf/
 
 これでコンテナのシェルに戻り、開始することができます。
 
@@ -136,18 +136,18 @@ Hue の[コネクター](https://docs.gethue.com/administrator/configuration/con
 
 クライアントのコンテナにゲートウェイをセットアップしていて、ローカルホストから接続したい場合は、そのバインドIPを SQL クライアントコンテナのIPで更新する必要があります。
 
-ゲートウェイサービスの IP は実行しているコンテナの1つです。`flink-sql-training_sql-client_1` を確認してIPを取得します。
+ゲートウェイサービスの IP は実行しているコンテナの1つです。`sql-training_sql-client_1` を確認してIPを取得します。
 
     docker ps
     > CONTAINER ID        IMAGE                                                COMMAND                  CREATED              STATUS              PORTS                                                NAMES
-    > 638574b31cd6        fhueske/flink-sql-training:1-FLINK-1.10-scala_2.11   "/docker-entrypoint.…"   About a minute ago   Up About a minute   6123/tcp, 8081/tcp                                   flink-sql-training_sql-client_1
-    > 59d1627c412a        wurstmeister/kafka:2.12-2.2.1                        "start-kafka.sh"         About a minute ago   Up About a minute   0.0.0.0:9092->9092/tcp                               flink-sql-training_kafka_1
-    > 6711c0707f1e        flink:1.10.0-scala_2.11                              "/docker-entrypoint.…"   About a minute ago   Up About a minute   6121-6123/tcp, 8081/tcp                              flink-sql-training_taskmanager_1
-    > 6a8149af6c1e        flink:1.10.0-scala_2.11                              "/docker-entrypoint.…"   About a minute ago   Up About a minute   6123/tcp, 0.0.0.0:8081->8081/tcp                     flink-sql-training_jobmanager_1
-    > 3de8275dff26        wurstmeister/zookeeper:3.4.6                         "/bin/sh -c '/usr/sb…"   About a minute ago   Up About a minute   22/tcp, 2888/tcp, 3888/tcp, 0.0.0.0:2181->2181/tcp   flink-sql-training_zookeeper_1
-    > a28cee7627a0        mysql:8.0.19                                         "docker-entrypoint.s…"   About a minute ago   Up About a minute   3306/tcp, 33060/tcp                                  flink-sql-training_mysql_1
+    > 638574b31cd6        fhueske/sql-training:1-FLINK-1.10-scala_2.11   "/docker-entrypoint.…"   About a minute ago   Up About a minute   6123/tcp, 8081/tcp                                   sql-training_sql-client_1
+    > 59d1627c412a        wurstmeister/kafka:2.12-2.2.1                        "start-kafka.sh"         About a minute ago   Up About a minute   0.0.0.0:9092->9092/tcp                               sql-training_kafka_1
+    > 6711c0707f1e        flink:1.10.0-scala_2.11                              "/docker-entrypoint.…"   About a minute ago   Up About a minute   6121-6123/tcp, 8081/tcp                              sql-training_taskmanager_1
+    > 6a8149af6c1e        flink:1.10.0-scala_2.11                              "/docker-entrypoint.…"   About a minute ago   Up About a minute   6123/tcp, 0.0.0.0:8081->8081/tcp                     sql-training_jobmanager_1
+    > 3de8275dff26        wurstmeister/zookeeper:3.4.6                         "/bin/sh -c '/usr/sb…"   About a minute ago   Up About a minute   22/tcp, 2888/tcp, 3888/tcp, 0.0.0.0:2181->2181/tcp   sql-training_zookeeper_1
+    > a28cee7627a0        mysql:8.0.19                                         "docker-entrypoint.s…"   About a minute ago   Up About a minute   3306/tcp, 33060/tcp                                  sql-training_mysql_1
 
-    docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' flink-sql-training_sql-client_1
+    docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' sql-training_sql-client_1
     > 172.18.0.7
 
 ![Flink SQL Editor](https://cdn.gethue.com/uploads/2020/05/flink_editor_v1.png)
