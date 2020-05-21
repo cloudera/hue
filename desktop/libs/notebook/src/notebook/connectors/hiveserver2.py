@@ -61,7 +61,7 @@ try:
   from beeswax.design import hql_query
   from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory, Session
   from beeswax.server import dbms
-  from beeswax.server.dbms import get_query_server_config, QueryServerException
+  from beeswax.server.dbms import get_query_server_config, QueryServerException, reset_ha
   from beeswax.views import parse_out_jobs, parse_out_queries
 except ImportError as e:
   LOG.warn('Hive and HiveServer2 interfaces are not enabled: %s' % e)
@@ -192,7 +192,14 @@ class HS2Api(Api):
     reuse_session = session is not None
     if not reuse_session:
       db = dbms.get(self.user, query_server=get_query_server_config(name=lang, connector=self.interpreter))
-      session = db.open_session(self.user)
+      try:
+        session = db.open_session(self.user)
+      except Exception as e:
+        LOG.exception('HA failover?')
+        if 'Connection refused' in str(e) or 'Name or service not known' in str(e):
+          reset_ha()
+          db = dbms.get(self.user, query_server=get_query_server_config(name=lang, connector=self.interpreter))
+          session = db.open_session(self.user)
 
     response = {
       'type': lang,

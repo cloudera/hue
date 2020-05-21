@@ -63,9 +63,11 @@ DBMS_CACHE = {}
 DBMS_CACHE_LOCK = threading.Lock()
 cache = caches[CACHES_HIVE_DISCOVERY_KEY]
 
-# Using file cache to make sure eventlet threads are uniform, this cache is persistent on startup
-# So we clear it to make sure the server resets hiveserver2 host.
-cache.clear()
+# This cache is persistent on startup and we reset the hiveserver2 host.
+def reset_ha():
+  cache.clear()
+
+reset_ha()
 
 
 def get(user, query_server=None, cluster=None):
