@@ -118,17 +118,21 @@ def get_query_server_config(name='beeswax', connector=None):
       activeEndpoint = cache.get('llap')
       if activeEndpoint is None:
         if HIVE_DISCOVERY_LLAP.get():
-          LOG.debug("Checking zookeeper for Hive Server Interactive endpoint")
+          LOG.debug("Checking zookeeper for discovering Hive LLAP server endpoint")
           zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
           zk.start()
           if HIVE_DISCOVERY_LLAP_HA.get():
             znode = "{0}/instances".format(HIVE_DISCOVERY_LLAP_ZNODE.get())
-            LOG.debug("Setting up LLAP with the following node {0}".format(znode))
+            LOG.debug("Setting up Hive LLAP HA with the following node {0}".format(znode))
             if zk.exists(znode):
               hiveservers = zk.get_children(znode)
+              if not hiveservers:
+                raise PopupException(_('There is no running Hive LLAP server available'))
+              LOG.info("Available Hive LLAP servers: {0}".format(hiveservers))
               for server in hiveservers:
-                llap_servers= json.loads(zk.get("{0}/{1}".format(znode, server))[0])["internal"][0]
+                llap_servers = json.loads(zk.get("{0}/{1}".format(znode, server))[0])["internal"][0]
                 if llap_servers["api"] == "activeEndpoint":
+                  LOG.info("Selecting Hive LLAP server: {0}".format(llap_servers))
                   cache.set(
                     "llap",
                     json.dumps({
@@ -138,11 +142,11 @@ def get_query_server_config(name='beeswax', connector=None):
                       CACHE_TIMEOUT.get()
                   )
             else:
-              LOG.error("LLAP Endpoint not found, reverting to HiveServer2")
+              LOG.error("Hive LLAP endpoint not found, reverting to config values")
               cache.set("llap", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}), CACHE_TIMEOUT.get())
           else:
             znode = "{0}".format(HIVE_DISCOVERY_LLAP_ZNODE.get())
-            LOG.debug("Setting up LLAP with the following node {0}".format(znode))
+            LOG.debug("Setting up Hive LLAP with the following node {0}".format(znode))
             if zk.exists(znode):
               hiveservers = zk.get_children(znode)
               for server in hiveservers:
@@ -155,9 +159,11 @@ def get_query_server_config(name='beeswax', connector=None):
                 )
           zk.stop()
         else:
-          LOG.debug("Zookeeper Discovery not enabled, reverting to config values")
+          LOG.debug("Zookeeper discovery not enabled, reverting to config values")
           cache.set("llap", json.dumps({"host": LLAP_SERVER_HOST.get(), "port": LLAP_SERVER_THRIFT_PORT.get()}), CACHE_TIMEOUT.get())
+
       activeEndpoint = json.loads(cache.get("llap"))
+
     elif name != 'hms' and name != 'impala':
       activeEndpoint = cache.get("hiveserver2")
       if activeEndpoint is None:
@@ -165,12 +171,14 @@ def get_query_server_config(name='beeswax', connector=None):
           zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
           zk.start()
           znode = HIVE_DISCOVERY_HIVESERVER2_ZNODE.get()
-          LOG.info("Selecting up HiveServer via the following node {0}".format(znode))
+          LOG.info("Selecting up Hive server via the following node {0}".format(znode))
           if zk.exists(znode):
             hiveservers = zk.get_children(znode)
-            LOG.info("Available HiveServers: {0}".format(hiveservers))
+            LOG.info("Available Hive Servers: {0}".format(hiveservers))
+            if not hiveservers:
+              raise PopupException(_('There is no running Hive server available'))
             server_to_use = 0  # if CONF.HIVE_SPREAD.get() randint(0, len(hiveservers)-1) else 0
-            LOG.info("Selected HiveServer {0}: {1}".format(server_to_use, hiveservers[server_to_use]))
+            LOG.info("Selected Hive server {0}: {1}".format(server_to_use, hiveservers[server_to_use]))
             cache.set(
               "hiveserver2",
               json.dumps({
@@ -183,6 +191,7 @@ def get_query_server_config(name='beeswax', connector=None):
           zk.stop()
         else:
           cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
+
       activeEndpoint = json.loads(cache.get("hiveserver2"))
 
     if name == 'impala':
