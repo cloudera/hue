@@ -2311,11 +2311,14 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
           suggestColumns: {
-            types: ['T'],
             source: 'select',
             tables: [{ identifierChain: [{ name: 'bar' }] }]
+          },
+          udfArgument: {
+            name: 'customudf',
+            position: 1
           }
         }
       });
@@ -2328,11 +2331,14 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
           suggestColumns: {
-            types: ['T'],
             source: 'select',
             tables: [{ identifierChain: [{ name: 'bar' }] }]
+          },
+          udfArgument: {
+            name: 'customudf',
+            position: 2
           }
         }
       });
@@ -2436,11 +2442,14 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
         } else {
           const expectedResult = {
             lowerCase: false,
-            suggestFunctions: { types: aggregateFunction.types || ['T'] },
+            suggestFunctions: {},
             suggestColumns: {
               source: 'select',
-              types: aggregateFunction.types || ['T'],
               tables: [{ identifierChain: [{ name: 'testTable' }] }]
+            },
+            udfArgument: {
+              name: aggregateFunction.name.toLowerCase(),
+              position: 1
             }
           };
           assertAutoComplete({
@@ -2464,11 +2473,14 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
           doesNotContainKeywords: ['ALL'],
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: { types: ['T'] },
+            suggestFunctions: {},
             suggestColumns: {
               source: 'select',
-              types: ['T'],
               tables: [{ identifierChain: [{ name: 'testTable' }] }]
+            },
+            udfArgument: {
+              name: binaryFunction.name.toLowerCase(),
+              position: 1
             }
           }
         });
@@ -2485,11 +2497,14 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
           containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: { types: ['T'] },
+            suggestFunctions: {},
             suggestColumns: {
               source: 'select',
-              types: ['T'],
               tables: [{ identifierChain: [{ name: 'testTable' }] }]
+            },
+            udfArgument: {
+              name: binaryFunction.name.toLowerCase(),
+              position: 2
             }
           }
         });
@@ -2507,11 +2522,14 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
           doesNotContainKeywords: ['ALL'],
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: { types: ['T'] },
+            suggestFunctions: {},
             suggestColumns: {
               source: 'select',
-              types: ['T'],
               tables: [{ identifierChain: [{ name: 'testTable' }] }]
+            },
+            udfArgument: {
+              name: binaryFunction.name.toLowerCase(),
+              position: 1
             }
           }
         });
@@ -3634,10 +3652,13 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['ARRAY', 'MAP'] },
+          suggestFunctions: {},
           suggestColumns: {
-            types: ['ARRAY', 'MAP'],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'explode',
+            position: 1
           }
         }
       });
@@ -3650,9 +3671,12 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
         expectedResult: {
           lowerCase: false,
           suggestColumns: {
-            types: ['ARRAY', 'MAP'],
             identifierChain: [{ name: 'a' }, { name: 'b' }],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'explode',
+            position: 1
           }
         }
       });
@@ -3665,10 +3689,13 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['ARRAY'] },
+          suggestFunctions: {},
           suggestColumns: {
-            types: ['ARRAY'],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'posexplode',
+            position: 1
           }
         }
       });
@@ -4228,11 +4255,14 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['DECIMAL', 'DOUBLE'] },
+          suggestFunctions: {},
           suggestColumns: {
             source: 'select',
-            types: ['DECIMAL', 'DOUBLE'],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'cos',
+            position: 1
           }
         }
       });
@@ -4245,22 +4275,35 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['DOUBLE'] },
+          suggestFunctions: {},
           suggestColumns: {
             source: 'select',
-            types: ['DOUBLE'],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'ceiling',
+            position: 1
           }
         }
       });
     });
 
-    it('should not suggest columns for "SELECT cos(1, | FROM testTable"', () => {
+    it('should suggest arg ref for "SELECT cos(1, | FROM testTable"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT cos(1, ',
         afterCursor: ' FROM testTable',
         expectedResult: {
-          lowerCase: false
+          lowerCase: false,
+          suggestColumns: {
+            source: 'select',
+            tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          suggestFunctions: {},
+          suggestKeywords: ['CASE', 'FALSE', 'NULL', 'TRUE', 'EXISTS', 'NOT'],
+          udfArgument: {
+            name: 'cos',
+            position: 2
+          }
         }
       });
     });
@@ -4272,11 +4315,14 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
           suggestColumns: {
             source: 'select',
-            types: ['T'],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'greatest',
+            position: 5
           }
         }
       });
@@ -4289,11 +4335,14 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
           suggestColumns: {
             source: 'select',
-            types: ['T'],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'greatest',
+            position: 2
           }
         }
       });
@@ -4306,22 +4355,35 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['DECIMAL', 'DOUBLE'] },
+          suggestFunctions: {},
           suggestColumns: {
             source: 'select',
-            types: ['DECIMAL', 'DOUBLE'],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'log',
+            position: 2
           }
         }
       });
     });
 
-    it('should not suggest columns for "SELECT log(a, b, | FROM testTable"', () => {
+    it('should suggest columns with arg ref for "SELECT log(a, b, | FROM testTable"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT log(a, b, ',
         afterCursor: ' FROM testTable',
         expectedResult: {
-          lowerCase: false
+          lowerCase: false,
+          suggestColumns: {
+            source: 'select',
+            tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          suggestFunctions: {},
+          suggestKeywords: ['CASE', 'FALSE', 'NULL', 'TRUE', 'EXISTS', 'NOT'],
+          udfArgument: {
+            name: 'log',
+            position: 3
+          }
         }
       });
     });
