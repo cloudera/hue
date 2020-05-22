@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import { SqlFunctions } from './sqlFunctions';
+import { matchesType } from 'sql/reference/typeUtils';
 
 describe('sqlFunctions.js', () => {
   it('should suggest only BOOLEAN functions when return type is set to BOOLEAN for Hive', () => {
@@ -44,9 +45,9 @@ describe('sqlFunctions.js', () => {
 
     expect(completions.length).not.toEqual(0);
 
-    const completionsWithCorrectType = completions.filter(completion => {
-      return SqlFunctions.matchesType('hive', ['STRING'], [completion.meta]);
-    });
+    const completionsWithCorrectType = completions.filter(completion =>
+      matchesType('hive', ['STRING'], [completion.meta])
+    );
 
     expect(completionsWithCorrectType.length).toEqual(completions.length);
   });
@@ -62,7 +63,7 @@ describe('sqlFunctions.js', () => {
     const completionsWithCorrectType = completions.filter(completion => {
       atleastOneInt = atleastOneInt || completion.meta === 'INT';
       atleastOneString = atleastOneString || completion.meta === 'STRING';
-      return SqlFunctions.matchesType('hive', ['NUMBER'], [completion.meta]);
+      return matchesType('hive', ['NUMBER'], [completion.meta]);
     });
 
     expect(atleastOneInt).toBeTruthy();
@@ -81,53 +82,12 @@ describe('sqlFunctions.js', () => {
     const completionsWithCorrectType = completions.filter(completion => {
       atleastOneInt = atleastOneInt || completion.meta === 'INT';
       stringPresent = stringPresent || completion.meta === 'STRING';
-      return SqlFunctions.matchesType('hive', ['NUMBER'], [completion.meta]);
+      return matchesType('hive', ['NUMBER'], [completion.meta]);
     });
 
     expect(atleastOneInt).toBeTruthy();
     expect(stringPresent).toBeFalsy();
     expect(completionsWithCorrectType.length).toEqual(completions.length);
-  });
-
-  it('should matchTypes for NUMBER', () => {
-    expect(SqlFunctions.matchesType('hive', ['NUMBER'], ['INT'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['NUMBER'], ['BIGINT'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['NUMBER'], ['DOUBLE'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['NUMBER'], ['DECIMAL'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['NUMBER'], ['T'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['NUMBER'], ['STRING'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['INT'], ['NUMBER'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['BIGINT'], ['NUMBER'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['DOUBLE'], ['NUMBER'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['DECIMAL'], ['NUMBER'])).toBeTruthy();
-
-    expect(SqlFunctions.matchesType('hive', ['STRING'], ['NUMBER'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['T'], ['NUMBER'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['NUMBER'], ['BOOLEAN'])).toBeFalsy();
-    expect(SqlFunctions.matchesType('hive', ['BOOLEAN'], ['NUMBER'])).toBeFalsy();
-  });
-
-  it('should strip precision', () => {
-    expect(SqlFunctions.matchesType('hive', ['STRING'], ['VARCHAR(10)'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['NUMBER'], ['DECIMAL(10,1)'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['T'], ['CHAR(1)'])).toBeTruthy();
-  });
-
-  it('should matchTypes for BIGINT', () => {
-    expect(SqlFunctions.matchesType('hive', ['BIGINT'], ['BIGINT'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['BIGINT'], ['INT'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['BIGINT'], ['SMALLINT'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['BIGINT'], ['TINYINT'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['BIGINT'], ['T'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['BIGINT'], ['BOOLEAN'])).toBeFalsy();
-    expect(SqlFunctions.matchesType('hive', ['BIGINT'], ['STRING'])).toBeFalsy();
-    expect(SqlFunctions.matchesType('hive', ['INT'], ['BIGINT'])).toBeFalsy();
-    expect(SqlFunctions.matchesType('hive', ['SMALLINT'], ['BIGINT'])).toBeFalsy();
-    expect(SqlFunctions.matchesType('hive', ['TINYINT'], ['BIGINT'])).toBeFalsy();
-    expect(SqlFunctions.matchesType('hive', ['DECIMAL'], ['BIGINT'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['T'], ['BIGINT'])).toBeTruthy();
-    expect(SqlFunctions.matchesType('hive', ['BOOLEAN'], ['BIGINT'])).toBeFalsy();
-    expect(SqlFunctions.matchesType('hive', ['STRING'], ['BIGINT'])).toBeTruthy();
   });
 
   it('should give the expected argument types at a specific position', () => {
