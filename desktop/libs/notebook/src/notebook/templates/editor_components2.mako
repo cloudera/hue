@@ -1587,7 +1587,7 @@
       }
     });
 
-    % if conf.WEBSOCKETS.ENABLED.get():
+    if (window.WEB_SOCKETS_ENABLED) {
       const prefix = location.protocol === 'https:' ? 'wss://' : 'ws://';
       var editorWs = new WebSocket(prefix + window.location.host + '/ws/editor/results/' + 'userA' + '/');
 
@@ -1608,7 +1608,7 @@
       editorWs.onclose = function(e) {
         console.error('Chat socket closed unexpectedly');
       };
-    % endif
+    }
 
     window.EDITOR_ENABLE_QUERY_SCHEDULING = '${ ENABLE_QUERY_SCHEDULING.get() }' === 'True';
 

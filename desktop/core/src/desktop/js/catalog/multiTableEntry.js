@@ -175,7 +175,7 @@ class MultiTableEntry {
    * @return {string} - 'impala', 'hive', 'solr', etc.
    */
   getDialect() {
-    return this.getConnector().dialect || this.getConnector().type; // .type for editor v1
+    return this.getConnector().dialect || this.getConnector().id; // .id for editor v1
   }
 
   /**

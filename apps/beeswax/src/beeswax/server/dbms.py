@@ -165,10 +165,12 @@ def get_query_server_config(name='beeswax', connector=None):
           zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
           zk.start()
           znode = HIVE_DISCOVERY_HIVESERVER2_ZNODE.get()
-          LOG.info("Setting up Hive with the following node {0}".format(znode))
+          LOG.info("Selecting up HiveServer via the following node {0}".format(znode))
           if zk.exists(znode):
             hiveservers = zk.get_children(znode)
-            server_to_use = 0 # if CONF.HIVE_SPREAD.get() randint(0, len(hiveservers)-1) else 0
+            LOG.info("Available HiveServers: {0}".format(hiveservers))
+            server_to_use = 0  # if CONF.HIVE_SPREAD.get() randint(0, len(hiveservers)-1) else 0
+            LOG.info("Selected HiveServer {0}: {1}".format(server_to_use, hiveservers[server_to_use]))
             cache.set(
               "hiveserver2",
               json.dumps({

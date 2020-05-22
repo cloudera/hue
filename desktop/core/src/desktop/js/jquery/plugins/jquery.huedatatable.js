@@ -426,6 +426,8 @@ $.fn.hueDataTable = function(oInit) {
 
   self.isDrawing = false;
 
+  this.lowerCaseFilter = '';
+
   self.fnDraw = function(force) {
     const aoColumns = self.$table.data('aoColumns');
     if (!self.isDrawing && aoColumns) {
@@ -640,12 +642,48 @@ $.fn.hueDataTable = function(oInit) {
     }
   };
 
-  self.fnAddData = function(mData, bRedraw) {
+  const applyFilter = () => {
+    const data = this.$table.data('originalData');
+
+    if (!this.lowerCaseFilter || !data.length) {
+      this.$table.data('data', data);
+    } else {
+      this.$table.data(
+        'data',
+        data.filter(row =>
+          row.some(
+            (col, idx) => idx > 0 && ('' + col).toLowerCase().indexOf(this.lowerCaseFilter) !== -1
+          )
+        )
+      );
+    }
+  };
+
+  this.setFilter = filter => {
+    this.lowerCaseFilter = filter.toLowerCase();
+    if (this.$table.children('tbody').length > 0) {
+      this.$table.children('tbody').empty();
+    }
+
+    applyFilter();
+
+    this.fnDraw(true);
+  };
+
+  self.fnAddData = function(mData, bRedraw, streaming, streamRecordLimit) {
     const $t = self.$table;
 
     if ($t) {
       const aoColumns = $t.data('aoColumns') || [];
-      $t.data('data', $t.data('data').concat(mData));
+      const newData = streaming
+        ? mData.reverse().concat($t.data('originalData'))
+        : $t.data('originalData').concat(mData);
+      if (streaming && streamRecordLimit) {
+        newData.splice(streamRecordLimit);
+      }
+      $t.data('originalData', newData);
+
+      applyFilter();
 
       if (mData.length === 0) {
         return;
@@ -687,6 +725,7 @@ $.fn.hueDataTable = function(oInit) {
         $t.children('tr').remove();
       }
       $t.data('data', []);
+      $t.data('originalData', []);
       $t.data('aoRows', []);
       $t.data('aoColumns', []);
       $t.data('fnDraws', 0);
@@ -716,6 +755,7 @@ $.fn.hueDataTable = function(oInit) {
     }
     $('.hue-datatable-search').remove();
     self.$table.data('data', []);
+    self.$table.data('originalData', []);
     self.$table.data('aoRows', []);
     self.$table.data('aoColumns', []);
     self.$table.data('fnDraws', 0);

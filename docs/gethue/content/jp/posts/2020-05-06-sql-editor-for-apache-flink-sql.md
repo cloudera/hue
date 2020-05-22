@@ -1,5 +1,5 @@
 ---
-title: SQL Editor for Apache Flink SQL
+title: Apache Flink SQL 用の SQL エディタ
 author: Romain
 type: post
 date: 2020-05-06T00:00:00+00:00
@@ -46,31 +46,31 @@ categories:
 
 # Flink SQL Editor
 
-This is the very first version of the SQL Editor for Flink.
+これは Flink 用 SQL エディタの非常に初期のバージョンです。
 
-The goal is to demo how to execute Flink SQL queries. We use the new Flink SQL gateway project and point to a Flink cluster with live data in a docker container. Hue is used as the SQL Editor for querying Flink tables.
+目標は、Flink SQL のクエリを実行する方法をデモすることです。新しい Flink SQL ゲートウェイプロジェクトを使用して、Docker コンテナ内のライブデータを持つ Flink クラスターを指すようにします。Hue は Flink のテーブルをクエリするための SQL エディタとして使用されます。
 
-Feel free to read more about Flink [SQL](https://ci.apache.org/projects/flink/flink-docs-master/dev/table/sql/queries.html#queries) and [continuous](https://ci.apache.org/projects/flink/flink-docs-master/dev/table/streaming/dynamic_tables.html#continuous-queries) queries.
+Flink [SQL](https://ci.apache.org/projects/flink/flink-docs-master/dev/table/sql/queries.html#queries) と [継続的な](https://ci.apache.org/projects/flink/flink-docs-master/dev/table/streaming/dynamic_tables.html#continuous-queries) クエリの詳細についてはリンク先をご覧ください。
 
 {{< youtube fKHD-fOdDY0 >}}
 
-## Setup
+## セットアップ
 
-Any Flink 1.10 cluster would work and the demo is based on [Ververica SQL Training](https://github.com/ververica/sql-training) which has some easy [setup instructions](https://github.com/ververica/sql-training/wiki/Setting-up-the-Training-Environment):
+Flink 1.10 クラスターであれば動作し、デモは [Ververica SQL Training](https://github.com/ververica/sql-training) をベースにしています。これは簡単な[セットアップ方法](https://github.com/ververica/sql-training/wiki/Setting-up-the-Training-Environment) を説明しています。
 
     git clone https://github.com/ververica/sql-training.git
     cd sql-training
     docker-compose up -d
 
-Then [http://localhost:8081](http://localhost:8081) should be up.
+そうすると [http://localhost:8081](http://localhost:8081) が表示されるようになります。
 
 ![Flink Dashboard](https://cdn.gethue.com/uploads/2020/05/flink_dashboard.png)
 
-Here we start a SQL client container and install the gateway inside (to avoid installing a local Flink as the gateway needs a FLINK_HOME) but this could be done locally or in another containers.
+ここでは SQL クライアントコンテナを起動し、ゲートウェイを内部にインストールします (ゲートウェイには FLINK_HOME が必要なので、ローカルの Flink をインストールしないようにします）が、これはローカルまたは別のコンテナで行うことができます。
 
     docker-compose exec sql-client bash
 
-We grab a [release](https://github.com/ververica/flink-sql-gateway/releases) of the gateway:
+ゲートウェイの[リリース](https://github.com/ververica/flink-sql-gateway/releases) を取得します。
 
     cd /opt
     wget https://github.com/ververica/flink-sql-gateway/releases/download/v0.1-snapshot/flink-sql-gateway-0.1-SNAPSHOT-bin.zip
@@ -79,22 +79,22 @@ We grab a [release](https://github.com/ververica/flink-sql-gateway/releases) of 
 
     echo $FLINK_HOME
 
-Then from another shell we copy the Flink SQL config to the gateway so that we get the demo tables by default:
+続いて、別のシェルから Flink SQL の設定をゲートウェイにコピーして、デフォルトでデモのテーブルを取得するようにします。
 
     wget https://raw.githubusercontent.com/romainr/flink-sql-gateway/master/docs/demo/sql-gateway-defaults.yaml
 
     docker cp sql-gateway-defaults.yaml sql-training_sql-client_1:/opt/flink-sql-gateway-0.1-SNAPSHOT/conf/
 
-Now we can go back to the shell in the container and are ready to start it:
+これでコンテナのシェルに戻り、開始することができます。
 
     cd bin
     ./sql-gateway.sh --library /opt/sql-client/lib
 
-Putting the server in the background with `CTRL-Z` and then:
+`CTRL-Z` でサーバーをバックグラウンドにして、
 
     bg
 
-And now we can issue a few commands to validate the setup:
+セットアップを検証するためにいくつかのコマンドを実行します。
 
     curl localhost:8083/v1/info
     > {"product_name":"Apache Flink","version":"1.10.0"}
@@ -103,15 +103,15 @@ And now we can issue a few commands to validate the setup:
     > {"session_id":"7eea0827c249e5a8fcbe129422f049e8"}
 
 
-**Note**
+**注**
 
-It "should" also be possible to deploy the SQL gateway not in the SQL client container by:
+SQL クライアントコンテナ内ではなく SQL ゲートウェイにデプロイすることも可能です。
 
-1. Having a local Flink [binary package](https://www.apache.org/dyn/closer.lua/flink/flink-1.10.0/flink-1.10.0-bin-scala_2.11.tgz) with FLINK_HOME configured
+1. FLINK_HOME が設定された Flink の[バイナリーパッケージ](https://www.apache.org/dyn/closer.lua/flink/flink-1.10.0/flink-1.10.0-bin-scala_2.11.tgz) を持っていること
 
-2. Updating the `jobmanager.rpc.address` to the real jobmanager address in `$FLINK_HOME/conf/flink-conf.yaml`
+2. `$FLINK_HOME/conf/flink-conf.yaml` で実際の jobmanager のアドレス `jobmanager.rpc.address` を更新する
 
-3. Changing the two address properties in `sql-gateway-defaults.yaml`
+3. `sql-gateway-defaults.yaml` の2つのアドレスのプロパティを変更する
 
 <pre>
     server:
@@ -121,9 +121,9 @@ It "should" also be possible to deploy the SQL gateway not in the SQL client con
       address: 172.18.0.7
 </pre>
 
-## Query Editor
+## クエリエディタ
 
-As detailed in the [connector](https://docs.gethue.com/administrator/configuration/connectors/) section of Hue, we add a Flink interpreter:
+Hue の[コネクター](https://docs.gethue.com/administrator/configuration/connectors/) セクションに説明しているように、Flink インタープリターを追加しています。
 
     [notebook]
 
@@ -134,9 +134,9 @@ As detailed in the [connector](https://docs.gethue.com/administrator/configurati
       interface=flink
       options='{"api_url": "http://172.18.0.7:8993"}'
 
-If we are setting up the gateway in the client container and want to access it via your localhost, we need to update its bind IP with the IP of the SQL client container.
+クライアントのコンテナにゲートウェイをセットアップしていて、ローカルホストから接続したい場合は、そのバインドIPを SQL クライアントコンテナのIPで更新する必要があります。
 
-The IP of the gateway service is the one of the running container. We inspect the `sql-training_sql-client_1` to retrieve its IP:
+ゲートウェイサービスの IP は実行しているコンテナの1つです。`sql-training_sql-client_1` を確認してIPを取得します。
 
     docker ps
     > CONTAINER ID        IMAGE                                                COMMAND                  CREATED              STATUS              PORTS                                                NAMES
@@ -152,7 +152,7 @@ The IP of the gateway service is the one of the running container. We inspect th
 
 ![Flink SQL Editor](https://cdn.gethue.com/uploads/2020/05/flink_editor_v1.png)
 
-And now we can use the left assist to browse the tables, drag and drop one to query it easily as well as leverage the autocomplete for writing more powerful queries:
+そして、ここで左側のアシストを使用してテーブルを参照し、簡単にクエリするためにドラッグ＆ドロップするだけでなく、より強力なクエリを書くためのオートコンプリートを活用しています。
 
     SELECT taxiId, isStart
     FROM default_database.Rides
@@ -168,15 +168,15 @@ And now we can use the left assist to browse the tables, drag and drop one to qu
       psgCnt
     ;
 
-The Flink Dashboard will show the SQL queries running as regular jobs:
+Flink のダッシュボードは通常のジョブとして SQL のクエリを表示します。
 
 ![Flink Job Dashboard](https://cdn.gethue.com/uploads/2020/05/flink_dashboard_one_query.png)
 
-## Next
+## 今後
 
-There are lot of [future iterations](https://github.com/cloudera/hue/blob/master/docs/designs/apache_flink.md) on this first version to make it production ready but the base is getting there.
+この最初のバージョンでは、商用環境の準備をするために数多くの[将来的な繰り返し](https://github.com/cloudera/hue/blob/master/docs/designs/apache_flink.md) がありますが、ベースはそこに到達しています。
 
-One that should be of popular interest would be to improve the [SQL autocomplete](https://ci.apache.org/projects/flink/flink-docs-master/dev/table/sql/queries.html#supported-syntax) which is based on [Apache Calcite](https://calcite.apache.org/docs/reference.html). Hue comes with a SDK for writing better [grammars](https://docs.gethue.com/developer/parsers/) and even ships with a default [Flink SQL dialect](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/jison/sql/flink).
+[Apache Calcite](https://calcite.apache.org/docs/reference.html) をベースにした[SQL オートコンプリート](https://ci.apache.org/projects/flink/flink-docs-master/dev/table/sql/queries.html#supported-syntax) の改善が注目されています。Hue にはより良い[構文](https://docs.gethue.com/developer/parsers/) and even ships with a default [Flink SQL dialect](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/jison/sql/flink).
 
 Another one coming soon will be a more user friendly display of the live data in the result grid.
 

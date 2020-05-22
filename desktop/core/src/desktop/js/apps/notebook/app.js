@@ -1267,36 +1267,37 @@ if (window.ENABLE_NOTEBOOK_2) {
       huePubSub.subscribe(
         'jobbrowser.data',
         jobs => {
-          const snippet = viewModel.selectedNotebook().snippets()[0];
-          if (!snippet || snippet.type() === 'impala') {
-            return;
-          }
-          if (jobs.length > 0) {
-            let progress = 0;
-            let parent;
-            jobs.forEach(job => {
-              const id = job.shortId || job.id;
-              const el = $('.jobs-overlay li:contains(' + id + ')');
-              if (!el.length) {
-                return;
-              }
-              const context = ko.contextFor(el[0]);
-              parent = context.$parent;
-              const _job = context.$data;
-              progress = parseInt(job.mapsPercentComplete);
-              if (isNaN(progress)) {
-                progress = parseInt(job.progress);
-              }
-              if (!isNaN(progress)) {
-                _job.percentJob(progress);
-              } else {
-                progress = 0;
-              }
-            });
-            if (parent && parent.jobs().length === 1) {
-              parent.progress(Math.max(progress, parent.progress()));
+          viewModel.withActiveSnippet(snippet => {
+            if (!snippet || snippet.type() === 'impala') {
+              return;
             }
-          }
+            if (jobs.length > 0) {
+              let progress = 0;
+              let parent;
+              jobs.forEach(job => {
+                const id = job.shortId || job.id;
+                const el = $('.jobs-overlay li:contains(' + id + ')');
+                if (!el.length) {
+                  return;
+                }
+                const context = ko.contextFor(el[0]);
+                parent = context.$parent;
+                const _job = context.$data;
+                progress = parseInt(job.mapsPercentComplete);
+                if (isNaN(progress)) {
+                  progress = parseInt(job.progress);
+                }
+                if (!isNaN(progress)) {
+                  _job.percentJob(progress);
+                } else {
+                  progress = 0;
+                }
+              });
+              if (parent && parent.jobs().length === 1) {
+                parent.progress(Math.max(progress, parent.progress()));
+              }
+            }
+          });
         },
         HUE_PUB_SUB_EDITOR_ID
       );

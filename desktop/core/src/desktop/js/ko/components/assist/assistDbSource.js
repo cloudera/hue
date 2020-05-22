@@ -38,6 +38,7 @@ class AssistDbSource {
   constructor(options) {
     const self = this;
 
+    // TODO: Get rid of sourceType
     self.sourceType = options.type;
     self.connector = options.connector;
     self.name = options.name;
@@ -108,8 +109,8 @@ class AssistDbSource {
 
     self.hasNamespaces = ko.pureComputed(() => self.namespaces().length > 0);
 
-    huePubSub.subscribe(NAMESPACES_REFRESHED_EVENT, connectorType => {
-      if (self.connector.type !== connectorType) {
+    huePubSub.subscribe(NAMESPACES_REFRESHED_EVENT, connectorId => {
+      if (self.connector.id !== connectorId) {
         return;
       }
 
