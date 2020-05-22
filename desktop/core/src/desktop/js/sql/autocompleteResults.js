@@ -25,6 +25,7 @@ import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import sqlUtils from 'sql/sqlUtils';
 import { SqlSetOptions, SqlFunctions } from 'sql/sqlFunctions';
+import { matchesType } from 'sql/reference/typeUtils';
 import { DIALECT } from 'apps/notebook2/snippet';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { findBrowserConnector, getRootFilePath } from 'utils/hueConfig';
@@ -591,9 +592,7 @@ class AutocompleteResults {
       colRefDeferred.done(colRef => {
         const colRefKeywordSuggestions = [];
         Object.keys(self.parseResult.suggestColRefKeywords).forEach(typeForKeywords => {
-          if (
-            SqlFunctions.matchesType(self.dialect(), [typeForKeywords], [colRef.type.toUpperCase()])
-          ) {
+          if (matchesType(self.dialect(), [typeForKeywords], [colRef.type.toUpperCase()])) {
             self.parseResult.suggestColRefKeywords[typeForKeywords].forEach(keyword => {
               colRefKeywordSuggestions.push({
                 value: self.parseResult.lowerCase ? keyword.toLowerCase() : keyword,
@@ -1079,14 +1078,8 @@ class AutocompleteResults {
                         name += '[]';
                       }
                       if (
-                        SqlFunctions.matchesType(self.dialect(), types, [
-                          childEntry.getType().toUpperCase()
-                        ]) ||
-                        SqlFunctions.matchesType(
-                          self.dialect(),
-                          [childEntry.getType().toUpperCase()],
-                          types
-                        ) ||
+                        matchesType(self.dialect(), types, [childEntry.getType().toUpperCase()]) ||
+                        matchesType(self.dialect(), [childEntry.getType().toUpperCase()], types) ||
                         childEntry.getType === 'column' ||
                         childEntry.isComplex()
                       ) {
