@@ -222,11 +222,16 @@ def ssh_error_handler(f):
           if not ssh_options['server_port']:
             raise QueryError('Port of %(url)s could not be found: %(server_port)s' % ssh_options)
 
+        if '@' in ssh_options['ssh_server_host']:
+          ssh_options['ssh_server_user'], ssh_options['ssh_server_host'] = ssh_options['ssh_server_host'].rsplit('@')
+        else:
+          ssh_options['ssh_server_user'] = 'gethue'
+
         # Docs: https://gist.github.com/scy/6781836
-        # TODO: local server_port needs to be dynamic
+        # TODO: local server_port needs to be dynamic (first server_port)
         # TODO: "Could not request local forwarding" not bubbled up
-        # TODO: grep: no sleep 10: No such file or directory
-        ssh = "ssh -f -L %(server_port)s:%(server_host)s:%(server_port)s gethue@%(ssh_server_host)s -o ExitOnForwardFailure=yes" % ssh_options
+        # TODO: grep: no sleep 10: No such file or directory?
+        ssh = "ssh -f -L %(server_port)s:%(server_host)s:%(server_port)s %(ssh_server_user)s@%(ssh_server_host)s -o ExitOnForwardFailure=yes" % ssh_options
         ssh += ' -4'
         ssh += ' -o StrictHostKeyChecking=no'
         ssh += ' sleep %(idle_time)s' % ssh_options
