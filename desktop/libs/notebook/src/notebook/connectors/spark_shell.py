@@ -151,7 +151,7 @@ class SparkApi(Api):
   STANDALONE_JOB_RE = re.compile("Got job (\d+)")
 
   @staticmethod
-  def get_props(properties=None):
+  def get_livy_props(lang, properties=None):
     props = dict([(p['name'], p['value']) for p in SparkConfiguration.PROPERTIES])
     if properties is not None:
       props.update(dict([(p['name'], p['value']) for p in properties]))
@@ -178,6 +178,8 @@ class SparkApi(Api):
     LOG.debug("Property Spark Conf kvp list from UI is: " + str(props['conf']))
     props['conf'] = {conf.get('key'): conf.get('value') for i, conf in enumerate(props['conf'])}
     LOG.debug("Property Spark Conf dictionary is: " + str(props['conf']))
+    
+    props['kind'] = lang
       
     return props
 
@@ -199,8 +201,7 @@ class SparkApi(Api):
       user_config = DefaultConfiguration.objects.get_configuration_for_user(app='spark', user=self.user)
       properties = user_config.properties_list
 
-    props = self.get_props(properties)
-    props['kind'] = lang
+    props = self.get_livy_props(lang, properties)
 
     api = get_spark_api(self.user)
     response = api.create_session(**props)

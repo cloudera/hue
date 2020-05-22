@@ -34,12 +34,12 @@ class TestSparkApi(object):
     self.user = 'hue_test'
     self.api = SparkApi(self.user)
 
-  def test_get_props_method(self):
+  def test_get_livy_props_method(self):
     test_properties = [{
         "name": "files",
         "value": 'file_a,file_b,file_c',
       }]
-    props = self.api.get_props(test_properties)
+    props = self.api.get_livy_props('scala', test_properties)
     assert_equal(props['files'],['file_a','file_b','file_c'])
     
   def test_create_session_with_config(self):
