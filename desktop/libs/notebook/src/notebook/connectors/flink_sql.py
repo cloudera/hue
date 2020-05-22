@@ -64,7 +64,9 @@ class FlinkSqlApi(Api):
     Api.__init__(self, user, interpreter=interpreter)
 
     self.options = interpreter['options']
-    self.db = FlinkSqlClient(user=user, api_url=self.options['api_url'])
+    api_url = self.options['url']
+
+    self.db = FlinkSqlClient(user=user, api_url=api_url)
 
 
   @query_error_handler
