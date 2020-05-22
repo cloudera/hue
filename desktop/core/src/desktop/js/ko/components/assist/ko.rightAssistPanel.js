@@ -75,10 +75,10 @@ const TEMPLATE = `
 
     <!-- ko if: functionsTabAvailable -->
     <div data-bind="
-        component: { 
+        component: {
           name: 'assist-functions-panel',
           params: {
-            connector: connector
+            activeConnector: connector
           }
         },
         visible: activeTab() === 'functions'

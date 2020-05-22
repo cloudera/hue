@@ -17,13 +17,13 @@
 import * as ko from 'knockout';
 
 import { koSetup } from 'jest/koTestUtils';
-import { NAME } from './ko.dropDown';
+import { HUE_DROP_DOWN_COMPONENT } from './ko.dropDown';
 
 describe('ko.dropDown.js', () => {
   const setup = koSetup();
 
   it('should render component', async () => {
-    const element = await setup.renderComponent(NAME, {
+    const element = await setup.renderComponent(HUE_DROP_DOWN_COMPONENT, {
       value: ko.observable(),
       entries: ko.observableArray()
     });
