@@ -37,3 +37,41 @@ export const getUdfCategories = async connector => {
   // TODO: Fetch from API and diff/merge
   return [];
 };
+
+export const findFunction = async (connector, functionName) => {
+  const categories = await getUdfCategories(connector);
+  let found = undefined;
+  categories.some(category => {
+    if (category.functions[functionName]) {
+      found = category.functions[functionName];
+      return true;
+    }
+  });
+  return found;
+};
+
+export const getArgumentTypes = async (connector, functionName, argumentPosition) => {
+  const foundFunction = await findFunction(connector, functionName);
+  if (!foundFunction) {
+    return ['T'];
+  }
+  const args = foundFunction.arguments;
+  if (argumentPosition > args.length) {
+    const multiples = args[args.length - 1].filter(type => {
+      return type.multiple;
+    });
+    if (multiples.length > 0) {
+      return multiples
+        .map(argument => {
+          return argument.type;
+        })
+        .sort();
+    }
+    return [];
+  }
+  return args[argumentPosition - 1]
+    .map(argument => {
+      return argument.type;
+    })
+    .sort();
+};

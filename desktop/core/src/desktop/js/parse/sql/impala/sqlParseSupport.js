@@ -353,23 +353,11 @@ const initSqlParser = function(parser) {
   };
 
   parser.applyArgumentTypesToSuggestions = function(functionName, position) {
-    const foundArguments =
-      typeof SqlFunctions === 'undefined'
-        ? ['T']
-        : SqlFunctions.getArgumentTypes(
-            parser.yy.activeDialect,
-            functionName.toLowerCase(),
-            position
-          );
-    if (foundArguments.length === 0 && parser.yy.result.suggestColumns) {
-      delete parser.yy.result.suggestColumns;
-      delete parser.yy.result.suggestKeyValues;
-      delete parser.yy.result.suggestValues;
-      delete parser.yy.result.suggestFunctions;
-      delete parser.yy.result.suggestIdentifiers;
-      delete parser.yy.result.suggestKeywords;
-    } else {
-      parser.applyTypeToSuggestions(foundArguments);
+    if (parser.yy.result.suggestFunctions || parser.yy.result.suggestColumns) {
+      parser.yy.result.udfArgument = {
+        name: functionName.toLowerCase(),
+        position: position
+      };
     }
   };
 
