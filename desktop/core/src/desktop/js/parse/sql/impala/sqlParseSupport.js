@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import { SqlFunctions } from 'sql/sqlFunctions';
+import { matchesType } from 'sql/reference/typeUtils';
 import stringDistance from 'sql/stringDistance';
 
 const identifierEquals = (a, b) =>
@@ -218,22 +219,13 @@ const initSqlParser = function(parser) {
         }
       };
     }
-    if (
-      typeof SqlFunctions === 'undefined' ||
-      SqlFunctions.matchesType(parser.yy.activeDialect, ['BOOLEAN'], types)
-    ) {
+    if (matchesType(parser.yy.activeDialect, ['BOOLEAN'], types)) {
       keywords = keywords.concat(['AND', 'OR']);
     }
-    if (
-      typeof SqlFunctions === 'undefined' ||
-      SqlFunctions.matchesType(parser.yy.activeDialect, ['NUMBER'], types)
-    ) {
+    if (matchesType(parser.yy.activeDialect, ['NUMBER'], types)) {
       keywords = keywords.concat(['+', '-', '*', '/', '%', 'DIV']);
     }
-    if (
-      typeof SqlFunctions === 'undefined' ||
-      SqlFunctions.matchesType(parser.yy.activeDialect, ['STRING'], types)
-    ) {
+    if (matchesType(parser.yy.activeDialect, ['STRING'], types)) {
       keywords = keywords.concat(['ILIKE', 'IREGEXP', 'LIKE', 'NOT LIKE', 'REGEXP', 'RLIKE']);
     }
     return { suggestKeywords: keywords };
