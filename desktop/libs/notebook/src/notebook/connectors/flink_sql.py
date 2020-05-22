@@ -29,6 +29,7 @@ from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest.resource import Resource
 
 from notebook.connectors.base import Api, QueryError
+from notebook.decorators import ssh_error_handler, rewrite_ssh_api_url
 
 
 LOG = logging.getLogger(__name__)
@@ -65,6 +66,9 @@ class FlinkSqlApi(Api):
 
     self.options = interpreter['options']
     api_url = self.options['url']
+
+    if self.options.get('has_ssh'):
+      api_url = rewrite_ssh_api_url(api_url)['url']
 
     self.db = FlinkSqlClient(user=user, api_url=api_url)
 
@@ -104,6 +108,7 @@ class FlinkSqlApi(Api):
 
 
   @query_error_handler
+  @ssh_error_handler
   def execute(self, notebook, snippet):
     global n
     n = 0
@@ -207,6 +212,7 @@ class FlinkSqlApi(Api):
 
 
   @query_error_handler
+  @ssh_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     response = {}
 

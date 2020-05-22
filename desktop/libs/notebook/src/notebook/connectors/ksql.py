@@ -27,7 +27,7 @@ from desktop.conf import has_channels
 from kafka.ksql_client import KSqlApi as KSqlClientApi
 
 from notebook.connectors.base import Api, QueryError
-from notebook.decorators import ssh_error_handler
+from notebook.decorators import ssh_error_handler, rewrite_ssh_api_url
 
 
 LOG = logging.getLogger(__name__)
@@ -56,16 +56,7 @@ class KSqlApi(Api):
     self.url = self.options['url']
 
     if self.options.get('has_ssh'):
-      import re
-      p = '(?:.*://|@)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*'
-
-      m = re.search(p, self.options['url'])
-      server_host = m.group('host')
-
-      if not server_host:
-        raise QueryError('Hostname of %(url)s could not be found: %(server_host)s' % {'url': self.url, 'server_host': server_host})
-
-      self.url = re.sub(server_host, '127.0.0.1', self.url)
+      self.url = rewrite_ssh_api_url(self.url)['url']
 
 
   def _get_db(self):

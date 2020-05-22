@@ -209,18 +209,11 @@ def ssh_error_handler(f):
 
         ssh_options['idle_time'] = idle_time
 
-        if connector['interface'] in ('sqlalchemy', 'ksql'):
-          import re
-          p = '(?:.*://|@)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*'
+        if connector['interface'] in ('sqlalchemy', 'ksql', 'flink'):
+          ssh_url = rewrite_ssh_api_url(ssh_options['url'])
 
-          m = re.search(p, ssh_options['url'])
-          ssh_options['server_host'] = m.group('host')
-          ssh_options['server_port'] = m.group('port')
-
-          if not ssh_options['server_host']:
-            raise QueryError('Hostname of %(url)s could not be found: %(server_host)s' % ssh_options)
-          if not ssh_options['server_port']:
-            raise QueryError('Port of %(url)s could not be found: %(server_port)s' % ssh_options)
+          ssh_options['server_host'] = ssh_url['server_host']
+          ssh_options['server_port'] = ssh_url['server_port']
 
         if '@' in ssh_options['ssh_server_host']:
           ssh_options['ssh_server_user'], ssh_options['ssh_server_host'] = ssh_options['ssh_server_host'].rsplit('@')
@@ -264,6 +257,23 @@ def ssh_error_handler(f):
 def has_missing_ssh(message):
   return 'Connection refused' in message or 'Could not connect' in message or 'No route to host' in message \
       or 'Missing SSH tunnel' in message
+
+
+def rewrite_ssh_api_url(url):
+  m = re.search('(?:.*://|@)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*', url)
+  server_host = m.group('host')
+  server_port = m.group('port')
+
+  if not server_host:
+    raise QueryError('Hostname of %(url)s could not be found.' % url)
+  if not server_port:
+    raise QueryError('Port of %(url)s could not be found.' % url)
+
+  return {
+    'server_host': server_host,
+    'server_port': server_port,
+    'url': re.sub(server_host, '127.0.0.1', url)
+  }
 
 
 def _closest_power_of_2(number):

@@ -74,7 +74,7 @@ from beeswax import data_export
 from librdbms.server import dbms
 
 from notebook.connectors.base import Api, QueryError, QueryExpired, _get_snippet_name, AuthenticationRequired
-from notebook.decorators import ssh_error_handler
+from notebook.decorators import ssh_error_handler, rewrite_ssh_api_url
 from notebook.models import escape_rows
 
 if sys.version_info[0] > 2:
@@ -194,15 +194,7 @@ class SqlAlchemyApi(Api):
       )
 
     if self.options.get('has_ssh'):
-      p = '(?:.*://|@)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*'
-
-      m = re.search(p, url)
-      server_host = m.group('host')
-
-      if not server_host:
-        raise QueryError('Hostname of %(url)s could not be found: %(server_host)s' % {'url': url, 'server_host': server_host})
-
-      url = re.sub(server_host, '127.0.0.1', url)
+      url = rewrite_ssh_api_url(url)['url']
 
     options = self.options.copy()
     options.pop('session', None)
