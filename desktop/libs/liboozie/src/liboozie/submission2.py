@@ -485,8 +485,9 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
     Return the job deployment directory in HDFS, creating it if necessary.
     The actual deployment dir should be 0711 owned by the user
     """
+    remote_deployment_dir = REMOTE_DEPLOYMENT_DIR.get().replace('$USER', self.user.username).replace('$TIME', str(time.time())).replace('$JOBID', str(self.job.id))
     # Automatic setup of the required directories if needed
-    create_directories(self.fs)
+    create_directories(self.fs, [], remote_deployment_dir)
 
     # Check if job owner owns the deployment directory.
     has_deployment_dir_access = False
@@ -496,7 +497,7 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
 
     # Case of a shared job
     if self.job.document and self.user != self.job.document.owner or not has_deployment_dir_access:
-      path = REMOTE_DEPLOYMENT_DIR.get().replace('$USER', self.user.username).replace('$TIME', str(time.time())).replace('$JOBID', str(self.job.id))
+      path = remote_deployment_dir
       # Shared coords or bundles might not have any existing workspaces
       if self.fs.exists(self.job.deployment_dir):
         self.fs.copy_remote_dir(self.job.deployment_dir, path, owner=self.user)
@@ -809,9 +810,9 @@ print _exec('%(service)s', 'submitHueQuery', {'clusterCrn': cluster_crn, 'payloa
             }'''
     }
 
-def create_directories(fs, directory_list=[]):
+def create_directories(fs, directory_list=[], remote_deployment_dir=REMOTE_DEPLOYMENT_DIR.get()):
   # If needed, create the remote home, deployment and data directories
-  directories = [REMOTE_DEPLOYMENT_DIR.get()] + directory_list
+  directories = [remote_deployment_dir] + directory_list
 
   for directory in directories:
     if not fs.do_as_user(fs.DEFAULT_USER, fs.exists, directory):

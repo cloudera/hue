@@ -25,9 +25,11 @@ import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import sqlUtils from 'sql/sqlUtils';
 import { SqlSetOptions, SqlFunctions } from 'sql/sqlFunctions';
+import { matchesType } from 'sql/reference/typeUtils';
 import { DIALECT } from 'apps/notebook2/snippet';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { findBrowserConnector, getRootFilePath } from 'utils/hueConfig';
+import { getArgumentTypes } from './reference/sqlReferenceRepository';
 
 const normalizedColors = HueColors.getNormalizedColors();
 
@@ -430,7 +432,7 @@ class AutocompleteResults {
     }
   }
 
-  update(parseResult) {
+  async update(parseResult) {
     const self = this;
 
     while (self.activeDeferrals.length > 0) {
@@ -459,6 +461,10 @@ class AutocompleteResults {
     self.loadingPopularColumns(false);
 
     self.filter('');
+
+    if (self.parseResult.udfArgument) {
+      await self.adjustForUdfArgument();
+    }
 
     const colRefDeferred = self.handleColumnReference();
     self.activeDeferrals.push(colRefDeferred);
@@ -492,6 +498,32 @@ class AutocompleteResults {
 
     $.when.apply($, self.activeDeferrals).always(() => {
       huePubSub.publish('hue.ace.autocompleter.done');
+    });
+  }
+
+  async adjustForUdfArgument() {
+    return new Promise(async resolve => {
+      const foundArgumentTypes = (await getArgumentTypes(
+        this.snippet.connector(),
+        this.parseResult.udfArgument.name,
+        this.parseResult.udfArgument.position
+      )) || ['T'];
+      if (foundArgumentTypes.length === 0 && this.parseResult.suggestColumns) {
+        delete this.parseResult.suggestColumns;
+        delete this.parseResult.suggestKeyValues;
+        delete this.parseResult.suggestValues;
+        delete this.parseResult.suggestFunctions;
+        delete this.parseResult.suggestIdentifiers;
+        delete this.parseResult.suggestKeywords;
+      } else if (foundArgumentTypes[0] !== 'BOOLEAN') {
+        if (this.parseResult.suggestFunctions && !this.parseResult.suggestFunctions.types) {
+          this.parseResult.suggestFunctions.types = foundArgumentTypes;
+        }
+        if (this.parseResult.suggestColumns && !this.parseResult.suggestColumns.types) {
+          this.parseResult.suggestColumns.types = foundArgumentTypes;
+        }
+      }
+      resolve();
     });
   }
 
@@ -591,9 +623,7 @@ class AutocompleteResults {
       colRefDeferred.done(colRef => {
         const colRefKeywordSuggestions = [];
         Object.keys(self.parseResult.suggestColRefKeywords).forEach(typeForKeywords => {
-          if (
-            SqlFunctions.matchesType(self.dialect(), [typeForKeywords], [colRef.type.toUpperCase()])
-          ) {
+          if (matchesType(self.dialect(), [typeForKeywords], [colRef.type.toUpperCase()])) {
             self.parseResult.suggestColRefKeywords[typeForKeywords].forEach(keyword => {
               colRefKeywordSuggestions.push({
                 value: self.parseResult.lowerCase ? keyword.toLowerCase() : keyword,
@@ -1079,14 +1109,8 @@ class AutocompleteResults {
                         name += '[]';
                       }
                       if (
-                        SqlFunctions.matchesType(self.dialect(), types, [
-                          childEntry.getType().toUpperCase()
-                        ]) ||
-                        SqlFunctions.matchesType(
-                          self.dialect(),
-                          [childEntry.getType().toUpperCase()],
-                          types
-                        ) ||
+                        matchesType(self.dialect(), types, [childEntry.getType().toUpperCase()]) ||
+                        matchesType(self.dialect(), [childEntry.getType().toUpperCase()], types) ||
                         childEntry.getType === 'column' ||
                         childEntry.isComplex()
                       ) {
