@@ -23,7 +23,7 @@ import DisposableComponent from 'ko/components/DisposableComponent';
 import { DOCUMENT_UPDATED_EVENT } from 'doc/hueDocument';
 import huePubSub from 'utils/huePubSub';
 
-import 'ko/components/ko.dropDown';
+import { HUE_DROP_DOWN_COMPONENT } from 'ko/components/ko.dropDown';
 
 export const NAME = 'link-sharing';
 
@@ -47,7 +47,7 @@ const TEMPLATE = `
     <div>
       ${ I18n('Any logged in user with the link can') }
       <div class="perm-selector" data-bind="component: {
-          name: 'hue-drop-down',
+          name: '${ HUE_DROP_DOWN_COMPONENT }',
           params: {
             value: selectedPerm,
             entries: availablePerms,
