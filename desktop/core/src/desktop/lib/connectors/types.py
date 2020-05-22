@@ -307,7 +307,7 @@ CONNECTOR_TYPES = [
       {'name': 'url', 'value': 'presto://host:8080/tpch'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
-      {'name': 'impersonation_enabled', 'value': False},
+      {'name': 'has_impersonation', 'value': False},
     ],
     'category': 'editor',
     'description': '',
