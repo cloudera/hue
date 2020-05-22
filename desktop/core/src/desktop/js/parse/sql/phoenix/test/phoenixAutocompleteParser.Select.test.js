@@ -2226,11 +2226,14 @@ describe('phoenixAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
           suggestColumns: {
-            types: ['T'],
             source: 'select',
             tables: [{ identifierChain: [{ name: 'bar' }] }]
+          },
+          udfArgument: {
+            name: 'customudf',
+            position: 1
           }
         }
       });
@@ -2243,11 +2246,14 @@ describe('phoenixAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
           suggestColumns: {
-            types: ['T'],
             source: 'select',
             tables: [{ identifierChain: [{ name: 'bar' }] }]
+          },
+          udfArgument: {
+            name: 'customudf',
+            position: 2
           }
         }
       });
@@ -2283,10 +2289,9 @@ describe('phoenixAutocompleteParser.js SELECT statements', () => {
         } else {
           const expectedResult = {
             lowerCase: false,
-            suggestFunctions: { types: aggregateFunction.types || ['T'] },
+            suggestFunctions: {},
             suggestColumns: {
               source: 'select',
-              types: aggregateFunction.types || ['T'],
               tables: [{ identifierChain: [{ name: 'testTable' }] }]
             }
           };
@@ -3131,11 +3136,14 @@ describe('phoenixAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
           suggestColumns: {
             source: 'select',
-            types: ['T'],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'greatest',
+            position: 5
           }
         }
       });
@@ -3148,11 +3156,14 @@ describe('phoenixAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
           suggestColumns: {
             source: 'select',
-            types: ['T'],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'greatest',
+            position: 2
           }
         }
       });
@@ -5943,7 +5954,6 @@ describe('phoenixAutocompleteParser.js SELECT statements', () => {
         expectedResult: {
           suggestColumns: {
             source: 'select',
-            types: ['T'],
             tables: [
               { identifierChain: [{ subQuery: 'boo' }] },
               { identifierChain: [{ subQuery: 'bar' }] }
@@ -5953,7 +5963,11 @@ describe('phoenixAutocompleteParser.js SELECT statements', () => {
             { name: 'boo.', type: 'sub-query' },
             { name: 'bar.', type: 'sub-query' }
           ],
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
+          udfArgument: {
+            name: 'cos',
+            position: 1
+          },
           subQueries: [
             {
               alias: 'boo',
