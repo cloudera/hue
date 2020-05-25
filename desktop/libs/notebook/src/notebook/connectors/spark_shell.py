@@ -199,7 +199,8 @@ class SparkApi(Api):
   def create_session(self, lang='scala', properties=None):
     if not properties and USE_DEFAULT_CONFIGURATION.get():
       user_config = DefaultConfiguration.objects.get_configuration_for_user(app='spark', user=self.user)
-      properties = user_config.properties_list
+      if user_config not None:
+        properties = user_config.properties_list
 
     props = self.get_livy_props(lang, properties)
 
