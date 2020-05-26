@@ -73,13 +73,24 @@ class TestSparkApi(object):
             if p['name'] == 'driverCores':
               cores = p['value']
           assert_equal(cores, 2)
-
-          # Case with no user configuration. Expected 1 driverCores
-          USE_DEFAULT_CONFIGURATION.get.return_value = False
+          
+          # Case without user configuration. Expected 1 driverCores
+          USE_DEFAULT_CONFIGURATION.get.return_value = True
+          DefaultConfiguration.objects.get_configuration_for_user.return_value = None
           session2 = self.api.create_session(lang=lang, properties=properties)
           assert_equal(session2['type'], 'pyspark')
           assert_equal(session2['id'], '1')
           for p in session2['properties']:
+            if p['name'] == 'driverCores':
+              cores = p['value']
+          assert_equal(cores, 1)
+
+          # Case with no user configuration. Expected 1 driverCores
+          USE_DEFAULT_CONFIGURATION.get.return_value = False
+          session3 = self.api.create_session(lang=lang, properties=properties)
+          assert_equal(session3['type'], 'pyspark')
+          assert_equal(session3['id'], '1')
+          for p in session3['properties']:
             if p['name'] == 'driverCores':
               cores = p['value']
           assert_equal(cores, 1)
