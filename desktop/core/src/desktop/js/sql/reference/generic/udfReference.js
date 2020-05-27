@@ -49,4 +49,6 @@ export const AGGREGATE_FUNCTIONS = {
   }
 };
 
-export const UDF_CATEGORIES = [{ name: I18n('Aggregate'), functions: AGGREGATE_FUNCTIONS }];
+export const UDF_CATEGORIES = [
+  { name: I18n('Aggregate'), isAggregate: true, functions: AGGREGATE_FUNCTIONS }
+];
