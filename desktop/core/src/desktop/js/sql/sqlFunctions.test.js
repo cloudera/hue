@@ -15,81 +15,8 @@
 // limitations under the License.
 
 import { SqlFunctions } from './sqlFunctions';
-import { matchesType } from 'sql/reference/typeUtils';
 
 describe('sqlFunctions.js', () => {
-  it('should suggest only BOOLEAN functions when return type is set to BOOLEAN for Hive', () => {
-    const completions = [];
-    SqlFunctions.suggestFunctions('hive', ['BOOLEAN'], undefined, undefined, completions);
-
-    expect(completions.length).not.toEqual(0);
-
-    const completionsWithCorrectType = completions.filter(completion => {
-      return (
-        completion.meta === 'BOOLEAN' ||
-        completion.meta === 'T' ||
-        completion.meta === 'ARRAY' ||
-        completion.meta === 'MAP' ||
-        completion.meta === 'STRUCT' ||
-        completion.meta === 'UNION' ||
-        completion.meta === 'table'
-      );
-    });
-
-    expect(completionsWithCorrectType.length).toEqual(completions.length);
-  });
-
-  it('should suggest only STRING functions when return type is set to STRING for Hive', () => {
-    const completions = [];
-    SqlFunctions.suggestFunctions('hive', ['STRING'], undefined, undefined, completions);
-
-    expect(completions.length).not.toEqual(0);
-
-    const completionsWithCorrectType = completions.filter(completion =>
-      matchesType('hive', ['STRING'], [completion.meta])
-    );
-
-    expect(completionsWithCorrectType.length).toEqual(completions.length);
-  });
-
-  it('should suggest only NUMBER functions when return type is set to NUMBER for Hive', () => {
-    const completions = [];
-    SqlFunctions.suggestFunctions('hive', ['NUMBER'], undefined, undefined, completions);
-
-    expect(completions.length).not.toEqual(0);
-
-    let atleastOneInt = false;
-    let atleastOneString = false;
-    const completionsWithCorrectType = completions.filter(completion => {
-      atleastOneInt = atleastOneInt || completion.meta === 'INT';
-      atleastOneString = atleastOneString || completion.meta === 'STRING';
-      return matchesType('hive', ['NUMBER'], [completion.meta]);
-    });
-
-    expect(atleastOneInt).toBeTruthy();
-    expect(atleastOneString).toBeTruthy();
-    expect(completionsWithCorrectType.length).toEqual(completions.length);
-  });
-
-  it('should suggest only NUMBER functions when return type is set to NUMBER for Impala', () => {
-    const completions = [];
-    SqlFunctions.suggestFunctions('impala', ['NUMBER'], undefined, undefined, completions);
-
-    expect(completions.length).not.toEqual(0);
-
-    let atleastOneInt = false;
-    let stringPresent = false;
-    const completionsWithCorrectType = completions.filter(completion => {
-      atleastOneInt = atleastOneInt || completion.meta === 'INT';
-      stringPresent = stringPresent || completion.meta === 'STRING';
-      return matchesType('hive', ['NUMBER'], [completion.meta]);
-    });
-
-    expect(atleastOneInt).toBeTruthy();
-    expect(stringPresent).toBeFalsy();
-    expect(completionsWithCorrectType.length).toEqual(completions.length);
-  });
-
   it('should give the expected argument types at a specific position', () => {
     expect(SqlFunctions.getArgumentTypes('hive', 'cos', 1)).toEqual(['DECIMAL', 'DOUBLE']);
     expect(SqlFunctions.getArgumentTypes('hive', 'cos', 2)).toEqual([]);
