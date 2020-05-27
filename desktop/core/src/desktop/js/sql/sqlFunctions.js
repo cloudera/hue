@@ -4731,16 +4731,6 @@ const SqlFunctions = (function() {
     }
   };
 
-  const createDocHtml = function(funcDesc) {
-    let html =
-      '<div class="fn-details"><p><span class="fn-sig">' + funcDesc.signature + '</span></p>';
-    if (funcDesc.description) {
-      html += '<p>' + funcDesc.description.replace(/[<]/g, '&lt;').replace(/[>]/g, '&gt;') + '</p>';
-    }
-    html += '<div>';
-    return html;
-  };
-
   const stripPrecision = function(types) {
     const result = [];
     types.forEach(type => {
@@ -4849,39 +4839,6 @@ const SqlFunctions = (function() {
     return result;
   };
 
-  const suggestFunctions = function(
-    dialect,
-    returnTypes,
-    includeAggregate,
-    includeAnalytic,
-    completions,
-    weight
-  ) {
-    const functionsToSuggest = getFunctionsWithReturnTypes(
-      dialect,
-      returnTypes,
-      includeAggregate,
-      includeAnalytic
-    );
-    Object.keys(functionsToSuggest).forEach(name => {
-      completions.push({
-        value: name + '()',
-        meta: functionsToSuggest[name].returnTypes.join('|'),
-        weight:
-          returnTypes.filter(type => {
-            return (
-              functionsToSuggest[name].returnTypes.filter(otherType => {
-                return otherType === type;
-              }).length > 0
-            );
-          }).length > 0
-            ? weight + 1
-            : weight,
-        docHTML: createDocHtml(functionsToSuggest[name])
-      });
-    });
-  };
-
   const findFunction = function(dialect, functionName) {
     return (
       BIT_FUNCTIONS[dialect][functionName] ||
@@ -4941,7 +4898,6 @@ const SqlFunctions = (function() {
   };
 
   return {
-    suggestFunctions: suggestFunctions,
     getArgumentTypes: getArgumentTypes,
     CATEGORIZED_FUNCTIONS: CATEGORIZED_FUNCTIONS,
     getFunctionsWithReturnTypes: getFunctionsWithReturnTypes,
