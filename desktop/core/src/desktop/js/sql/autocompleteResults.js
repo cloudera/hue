@@ -24,12 +24,16 @@ import hueUtils from 'utils/hueUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import sqlUtils from 'sql/sqlUtils';
-import { SqlSetOptions, SqlFunctions } from 'sql/sqlFunctions';
 import { matchesType } from 'sql/reference/typeUtils';
 import { DIALECT } from 'apps/notebook2/snippet';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { findBrowserConnector, getRootFilePath } from 'utils/hueConfig';
-import { getArgumentTypes, getFunctionsWithReturnTypes } from './reference/sqlReferenceRepository';
+import {
+  findFunction,
+  getArgumentTypes,
+  getFunctionsWithReturnTypes,
+  getSetOptions
+} from './reference/sqlReferenceRepository';
 
 const normalizedColors = HueColors.getNormalizedColors();
 
@@ -475,7 +479,7 @@ class AutocompleteResults {
     self.handleIdentifiers();
     self.handleColumnAliases();
     self.handleCommonTableExpressions();
-    self.handleOptions();
+    self.activeDeferrals.push(self.handleOptions());
     self.activeDeferrals.push(self.handleFunctions(colRefDeferred));
     self.handleDatabases(databasesDeferred);
     const tablesDeferred = self.handleTables(databasesDeferred);
@@ -712,11 +716,29 @@ class AutocompleteResults {
 
   handleOptions() {
     const self = this;
+    const setOptionsDeferred = $.Deferred();
     if (self.parseResult.suggestSetOptions) {
-      const suggestions = [];
-      SqlSetOptions.suggestOptions(self.dialect(), suggestions, CATEGORIES.OPTION);
-      self.appendEntries(suggestions);
+      getSetOptions(self.snippet.connector())
+        .then(setOptions => {
+          const suggestions = [];
+          Object.keys(setOptions).forEach(name => {
+            suggestions.push({
+              category: CATEGORIES.OPTION,
+              value: name,
+              meta: '',
+              popular: ko.observable(false),
+              weightAdjust: 0,
+              details: setOptions[name]
+            });
+          });
+          self.appendEntries(suggestions);
+          setOptionsDeferred.resolve();
+        })
+        .catch(setOptionsDeferred.reject);
+    } else {
+      setOptionsDeferred.resolve();
     }
+    return setOptionsDeferred;
   }
 
   handleFunctions(colRefDeferred) {
@@ -1686,9 +1708,9 @@ class AutocompleteResults {
             self.cancellablePromises.push(
               multiTableEntry
                 .getTopAggs({ silenceErrors: true, cancellable: true })
-                .done(topAggs => {
-                  const aggregateFunctionsSuggestions = [];
+                .done(async topAggs => {
                   if (topAggs.values && topAggs.values.length > 0) {
+                    const aggregateFunctionsSuggestions = [];
                     // Expand all column names to the fully qualified name including db and table.
                     topAggs.values.forEach(value => {
                       value.aggregateInfo.forEach(info => {
@@ -1733,16 +1755,20 @@ class AutocompleteResults {
                     });
 
                     let totalCount = 0;
-                    topAggs.values.forEach(value => {
+                    for (let i = 0; i < topAggs.values.length; i++) {
+                      const value = topAggs.values[i];
+                      totalCount += value.totalQueryCount;
+
                       let clean = value.aggregateClause;
                       substitutions.forEach(substitution => {
                         clean = clean.replace(substitution.replace, substitution.with);
                       });
-                      totalCount += value.totalQueryCount;
-                      value.function = SqlFunctions.findFunction(
-                        self.dialect(),
+
+                      value.function = await findFunction(
+                        self.snippet.connector(),
                         value.aggregateFunction
                       );
+
                       aggregateFunctionsSuggestions.push({
                         value: clean,
                         meta: value.function.returnTypes.join('|'),
@@ -1751,7 +1777,7 @@ class AutocompleteResults {
                         popular: ko.observable(true),
                         details: value
                       });
-                    });
+                    }
 
                     aggregateFunctionsSuggestions.forEach(suggestion => {
                       suggestion.details.relativePopularity =
@@ -1760,8 +1786,10 @@ class AutocompleteResults {
                           : Math.round((100 * suggestion.details.totalQueryCount) / totalCount);
                       suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
                     });
+                    aggregateFunctionsDeferred.resolve(aggregateFunctionsSuggestions);
+                  } else {
+                    aggregateFunctionsDeferred.resolve([]);
                   }
-                  aggregateFunctionsDeferred.resolve(aggregateFunctionsSuggestions);
                 })
                 .fail(aggregateFunctionsDeferred.reject)
             );
