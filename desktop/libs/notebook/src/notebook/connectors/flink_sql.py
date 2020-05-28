@@ -201,7 +201,7 @@ class FlinkSqlApi(Api):
 
 
   @query_error_handler
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     response = {}
 
     if database is None:

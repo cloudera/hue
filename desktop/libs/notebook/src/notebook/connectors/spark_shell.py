@@ -366,7 +366,7 @@ class SparkApi(Api):
     else:
       return self._get_standalone_jobs(logs)
 
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     response = {}
 
     # As booting a new SQL session is slow and we don't send the id of the current one in /autocomplete

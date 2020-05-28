@@ -353,6 +353,32 @@ For nested columns:
       console.log(ko.mapping.toJSON(data));
     });
 
+#### Listing Functions
+
+Default functions:
+
+    $.post("/notebook/api/autocomplete/", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      }),
+      "operation": "functions"
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+
+For a specific database:
+
+    $.post("/notebook/api/autocomplete/<DB>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      }),
+      "operation": "functions"
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+
 ### SQL Risk Optimization
 ### Data Browsing
 ### Workflow scheduling

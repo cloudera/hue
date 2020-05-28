@@ -550,7 +550,7 @@ class Api(object):
   def get_log(self, notebook, snippet, startFrom=None, size=None):
     return 'No logs'
 
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     return {}
 
   def progress(self, notebook, snippet, logs=None):

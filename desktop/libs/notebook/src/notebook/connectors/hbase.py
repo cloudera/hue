@@ -50,7 +50,7 @@ def query_error_handler(func):
 class HBaseApi(Api):
 
   @query_error_handler
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     db = HbaseApi(self.user)
     cluster_name = database
 
