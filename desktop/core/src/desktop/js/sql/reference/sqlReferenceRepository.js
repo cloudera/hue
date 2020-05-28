@@ -27,6 +27,16 @@ const UDF_REFS = {
   pig: async () => import(/* webpackChunkName: "pig-ref" */ './pig/udfReference')
 };
 
+export const getSetOptions = async connector => {
+  if (SET_REFS[connector.dialect]) {
+    const module = await SET_REFS[connector.dialect]();
+    if (module.SET_OPTIONS) {
+      return module.SET_OPTIONS;
+    }
+  }
+  return {};
+};
+
 export const hasUdfCategories = connector => typeof UDF_REFS[connector.dialect] !== 'undefined';
 
 export const getUdfCategories = async connector => {
