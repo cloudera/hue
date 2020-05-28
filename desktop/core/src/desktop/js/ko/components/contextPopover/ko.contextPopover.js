@@ -581,6 +581,7 @@ class ContextPopoverViewModel {
     self.topAdjust = ko.observable(0);
 
     self.data = params.data;
+    self.connector = params.connector;
     self.sourceType = params.sourceType;
     self.namespace = params.namespace;
     self.compute = params.compute;
@@ -715,7 +716,7 @@ class ContextPopoverViewModel {
       self.titleTemplate = 'context-catalog-entry-title';
       self.contentsTemplate = 'context-catalog-entry-contents';
     } else if (self.isFunction) {
-      self.contents = new FunctionContextTabs(self.data, self.sourceType);
+      self.contents = new FunctionContextTabs(self.data, self.connector);
       self.title = self.data.function;
       self.iconClass = 'fa-superscript';
     } else if (self.isStorageEntry) {
