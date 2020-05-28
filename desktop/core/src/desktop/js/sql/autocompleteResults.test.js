@@ -238,7 +238,7 @@ describe('AutocompleteResults.js', () => {
         return 'hive';
       },
       connector: function() {
-        return { id: 'hive' };
+        return { id: 'hive', dialect: 'hive' };
       },
       database: function() {
         return 'default';
@@ -372,5 +372,43 @@ describe('AutocompleteResults.js', () => {
     expect(subject.filtered()[0].details.arguments).toBeDefined();
     expect(subject.filtered()[0].details.signature).toBeDefined();
     expect(subject.filtered()[0].details.description).toBeDefined();
+  });
+
+  it('should handle parse results set options', async () => {
+    subject.entries([]);
+
+    const spy = spyOn(sqlReferenceRepository, 'getSetOptions').and.callFake(
+      async connector =>
+        new Promise(resolve => {
+          expect(connector).toEqual(subject.snippet.connector());
+          resolve({
+            OPTION_1: {
+              description: 'Desc 1',
+              type: 'Integer',
+              default: 'Some default'
+            },
+            OPTION_2: {
+              description: 'Desc 2',
+              type: 'Integer',
+              default: 'Some default'
+            }
+          });
+        })
+    );
+
+    expect(subject.filtered().length).toBe(0);
+
+    await subject.update({
+      lowerCase: false,
+      suggestSetOptions: {}
+    });
+
+    await defer();
+
+    expect(spy).toHaveBeenCalled();
+
+    expect(subject.filtered().length).toEqual(2);
+    expect(subject.filtered()[0].details.description).toBeDefined();
+    expect(subject.filtered()[1].details.type).toBeDefined();
   });
 });
