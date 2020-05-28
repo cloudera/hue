@@ -517,7 +517,7 @@ class HS2Api(Api):
 
 
   @query_error_handler
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     db = self._get_db(snippet, interpreter=self.interpreter)
     query = None
 
@@ -531,7 +531,7 @@ class HS2Api(Api):
       query = self._get_current_statement(notebook, snippet)['statement']
       database, table = '', ''
 
-    resp = _autocomplete(db, database, table, column, nested, query=query, cluster=self.interpreter)
+    resp = _autocomplete(db, database, table, column, nested, query=query, cluster=self.interpreter, operation=operation)
 
     if resp.get('error'):
       resp['message'] = resp.pop('error')

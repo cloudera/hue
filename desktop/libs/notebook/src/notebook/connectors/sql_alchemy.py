@@ -335,7 +335,7 @@ class SqlAlchemyApi(Api):
 
 
   @query_error_handler
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     engine = self._get_engine()
     inspector = inspect(engine)
 
