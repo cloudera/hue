@@ -725,9 +725,10 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
+  action = request.POST.get('operation', 'schema')
 
   try:
-    autocomplete_data = get_api(request, snippet).autocomplete(snippet, database, table, column, nested)
+    autocomplete_data = get_api(request, snippet).autocomplete(snippet, database, table, column, nested, action)
     response.update(autocomplete_data)
   except QueryExpired as e:
     LOG.warn('Expired query seen: %s' % e)

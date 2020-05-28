@@ -28,7 +28,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from useradmin.models import User
 
-from beeswax.api import _autocomplete
+from beeswax.api import _autocomplete, get_functions
 
 
 if sys.version_info[0] > 2:
@@ -46,8 +46,8 @@ class TestApi():
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
-  def test_autocomplete_time_out(self):
 
+  def test_autocomplete_time_out(self):
     get_tables_meta=Mock(
       side_effect=ReadTimeout("HTTPSConnectionPool(host='gethue.com', port=10001): Read timed out. (read timeout=120)")
     )
@@ -64,3 +64,36 @@ class TestApi():
         'error': "HTTPSConnectionPool(host='gethue.com', port=10001): Read timed out. (read timeout=120)"
       }
     )
+
+
+  def test_get_functions(self):
+    db = Mock(
+      get_functions=Mock(
+        return_value=Mock(
+          rows=Mock(
+            return_value=[{'name': 'f1'}, {'name': 'f2'}]
+          )
+        )
+      )
+    )
+
+    resp = get_functions(db)
+
+    assert_equal(
+      resp,
+      [{'name': 'f1'}, {'name': 'f2'}]
+    )
+
+
+  def test_get_functions(self):
+    with patch('beeswax.api._get_functions') as _get_functions:
+      db = Mock()
+      _get_functions.return_value = [
+        {'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}
+      ]
+      resp = _autocomplete(db, database='default', operation='functions')
+
+      assert_equal(
+        resp['functions'],
+        [{'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}]
+      )

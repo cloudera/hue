@@ -63,7 +63,7 @@ def query_error_handler(func):
 class HiveMetastoreApi(Api):
 
   @query_error_handler
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     db = self._get_db(snippet, cluster=self.cluster)
 
     return _autocomplete(db, database, table, column, nested, query=None, cluster=self.cluster)
