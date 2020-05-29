@@ -369,6 +369,30 @@ class TestApi():
         assert_equal(e.message, "HTTPSConnectionPool(host='gethue.com', port=10001): Read timed out. (read timeout=120)")
 
 
+  def test_autocomplete_functions_hive(self):
+    snippet = {'type': 'hive', 'properties': {}}
+
+    with patch('notebook.connectors.hiveserver2.HS2Api._get_db') as _get_db:
+      with patch('beeswax.api._get_functions') as _get_functions:
+        db = Mock()
+        _get_functions.return_value = [
+          {'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}
+        ]
+
+        response = self.client.post(reverse('notebook:api_autocomplete_databases'), {
+            'snippet': json.dumps(snippet),
+            'operation': 'functions'
+        })
+
+        assert_equal(response.status_code, 200)
+        data = json.loads(response.content)
+        assert_equal(data['status'], 0)
+
+        assert_equal(
+          data['functions'],
+          [{'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}]
+        )
+
 
 class TestHiveserver2ApiNonMock(object):
 
