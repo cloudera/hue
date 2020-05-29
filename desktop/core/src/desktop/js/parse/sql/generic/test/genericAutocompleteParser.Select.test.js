@@ -6176,7 +6176,7 @@ describe('genericAutocompleteParser.js SELECT statements', () => {
                   columns: [
                     { identifierChain: [{ name: 'testTable' }, { name: 'a' }], type: 'COLREF' },
                     { identifierChain: [{ name: 'testTable' }, { name: 'b' }], type: 'COLREF' },
-                    { alias: 'bla', type: 'T' }
+                    { alias: 'bla', type: 'UDFREF', udfRef: 'abs' }
                   ]
                 }
               ]

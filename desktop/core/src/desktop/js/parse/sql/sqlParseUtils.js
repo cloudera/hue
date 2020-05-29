@@ -32,6 +32,13 @@ export const getSubQuery = cols => {
       col.valueExpression.types.length === 1
     ) {
       result.type = col.valueExpression.types[0];
+      if (result.type === 'UDFREF') {
+        if (col.valueExpression.function) {
+          result.udfRef = col.valueExpression.function;
+        } else {
+          result.type = ['T'];
+        }
+      }
     }
 
     columns.push(result);
@@ -42,15 +49,29 @@ export const getSubQuery = cols => {
   };
 };
 
-export const applyTypeToSuggestions = (parser, types) => {
-  if (types[0] === 'BOOLEAN') {
+const applyTypes = (suggestion, typeDetails) => {
+  suggestion.types = typeDetails.types;
+  if (typeDetails.types && typeDetails.types[0] === 'UDFREF') {
+    if (typeDetails.function) {
+      suggestion.udfRef = typeDetails.function;
+    } else {
+      suggestion.types = ['T'];
+    }
+  }
+};
+
+export const applyTypeToSuggestions = (parser, details) => {
+  if (!details.types) {
+    console.trace();
+  }
+  if (details.types[0] === 'BOOLEAN') {
     return;
   }
-  if (this.yy.result.suggestFunctions && !this.yy.result.suggestFunctions.types) {
-    this.yy.result.suggestFunctions.types = types;
+  if (parser.yy.result.suggestFunctions && !parser.yy.result.suggestFunctions.types) {
+    applyTypes(parser.yy.result.suggestFunctions, details);
   }
-  if (this.yy.result.suggestColumns && !this.yy.result.suggestColumns.types) {
-    this.yy.result.suggestColumns.types = types;
+  if (parser.yy.result.suggestColumns && !parser.yy.result.suggestColumns.types) {
+    applyTypes(parser.yy.result.suggestColumns, details);
   }
 };
 
@@ -71,7 +92,7 @@ export const valueExpressionSuggest = (parser, oppositeValueExpression, operator
     keywords = keywords.concat(['EXISTS', 'NOT']);
   }
   if (oppositeValueExpression && oppositeValueExpression.types[0] === 'NUMBER') {
-    applyTypeToSuggestions(parser, ['NUMBER']);
+    applyTypeToSuggestions(parser, oppositeValueExpression);
   }
   parser.suggestKeywords(keywords);
 };

@@ -25,7 +25,7 @@ describe('druidAutocompleteParser.js locations', () => {
   });
 
   const assertAutoComplete = testDefinition => {
-    const debug = true;
+    const debug = false;
     expect(
       druidAutocompleteParser.parseSql(
         testDefinition.beforeCursor,
