@@ -50,7 +50,7 @@ export const getUdfCategories = async connector => {
   return [];
 };
 
-export const findFunction = async (connector, functionName) => {
+export const findUdf = async (connector, functionName) => {
   const categories = await getUdfCategories(connector);
   let found = undefined;
   categories.some(category => {
@@ -62,7 +62,18 @@ export const findFunction = async (connector, functionName) => {
   return found;
 };
 
-export const getFunctionsWithReturnTypes = async (
+export const getReturnTypesForUdf = async (connector, functionName) => {
+  if (!functionName) {
+    return ['T'];
+  }
+  const udf = await findUdf(connector, functionName);
+  if (!udf || !udf.returnTypes) {
+    return ['T'];
+  }
+  return udf.returnTypes;
+};
+
+export const getUdfsWithReturnTypes = async (
   connector,
   returnTypes,
   includeAggregate,
@@ -87,8 +98,8 @@ export const getFunctionsWithReturnTypes = async (
   return result;
 };
 
-export const getArgumentTypes = async (connector, functionName, argumentPosition) => {
-  const foundFunction = await findFunction(connector, functionName);
+export const getArgumentTypesForUdf = async (connector, functionName, argumentPosition) => {
+  const foundFunction = await findUdf(connector, functionName);
   if (!foundFunction) {
     return ['T'];
   }

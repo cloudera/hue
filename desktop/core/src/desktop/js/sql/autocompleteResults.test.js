@@ -344,17 +344,16 @@ describe('AutocompleteResults.js', () => {
   it('should handle parse results with functions', async () => {
     subject.entries([]);
 
-    const spy = spyOn(sqlReferenceRepository, 'getFunctionsWithReturnTypes').and.callFake(
-      async () =>
-        Promise.resolve({
-          count: {
-            returnTypes: ['BIGINT'],
-            arguments: [[{ type: 'T' }]],
-            signature: 'count(col)',
-            draggable: 'count()',
-            description: 'some desc'
-          }
-        })
+    const spy = spyOn(sqlReferenceRepository, 'getUdfsWithReturnTypes').and.callFake(async () =>
+      Promise.resolve({
+        count: {
+          returnTypes: ['BIGINT'],
+          arguments: [[{ type: 'T' }]],
+          signature: 'count(col)',
+          draggable: 'count()',
+          description: 'some desc'
+        }
+      })
     );
 
     expect(subject.filtered().length).toBe(0);
