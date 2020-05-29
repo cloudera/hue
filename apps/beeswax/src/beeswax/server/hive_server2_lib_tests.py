@@ -96,6 +96,27 @@ class TestHiveServerClient():
         Session.objects.get_session(self.user, self.query_server['server_name']).guid.encode()
       )
 
+  def test_get_configuration(self):
+
+    with patch('beeswax.server.hive_server2_lib.HiveServerClient.execute_query_statement') as execute_query_statement:
+      with patch('beeswax.server.hive_server2_lib.CONFIG_WHITELIST.get') as CONFIG_WHITELIST:
+        execute_query_statement.return_value = Mock(
+          rows=Mock(
+            return_value=[
+              ['hive.server2.tez.default.queues=gethue'],
+              ['hive.server2.tez.initialize.default.sessions=true']
+            ]
+          )
+        )
+        CONFIG_WHITELIST.return_value = ['hive.server2.tez.default.queues']
+
+        configuration = HiveServerClient(self.query_server, self.user).get_configuration()
+
+        assert_equal(
+          configuration,
+          {'hive.server2.tez.default.queues': 'gethue'}
+        )
+
   def test_explain(self):
     query = Mock(
       get_query_statement=Mock(return_value=['SELECT 1']),
