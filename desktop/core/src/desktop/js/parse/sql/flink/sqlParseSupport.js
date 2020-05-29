@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { SqlFunctions } from 'sql/sqlFunctions';
 import { matchesType } from 'sql/reference/typeUtils';
 import stringDistance from 'sql/stringDistance';
 import {
@@ -308,12 +307,6 @@ const initSqlParser = function(parser) {
       return { types: [Object.keys(types)[0]] };
     }
     return { types: ['T'] };
-  };
-
-  parser.findReturnTypes = function(functionName) {
-    return typeof SqlFunctions === 'undefined'
-      ? ['T']
-      : SqlFunctions.getReturnTypes(parser.yy.activeDialect, functionName.toLowerCase());
   };
 
   parser.applyArgumentTypesToSuggestions = function(functionName, position) {
@@ -1966,10 +1959,6 @@ const initSyntaxParser = function(parser) {
 
   parser.findCaseType = function() {
     return { types: ['T'] };
-  };
-
-  parser.findReturnTypes = function() {
-    return ['T'];
   };
 
   parser.expandIdentifierChain = function() {
