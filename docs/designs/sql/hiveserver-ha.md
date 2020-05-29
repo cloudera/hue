@@ -1,7 +1,7 @@
 
 # HiveServer HA discovery and failover
 
-A list of the available HiveServers [can be read](https://docs.cloudera.com/HDPDocuments/HDP3/HDP-3.1.5/fault-tolerance/content/configuring_hiveserver2_high_availability_using_zookeeper.html) from Apache Zookeeper. This enables dynamic configuration as well as managing fail overs.
+A list of the available HiveServers [can be read](https://docs.cloudera.com/HDPDocuments/HDP3/HDP-3.1.5/fault-tolerance/content/configuring_hiveserver2_high_availability_using_zookeeper.html) from Apache Zookeeper. This enables dynamic configuration as well as managing failovers.
 
 ## Discovery only
 
@@ -89,7 +89,7 @@ Questions:
 
 ### Manual HA
 
-On possibiliy would be to require a user Hue page refresh or close of connection and clear the caches in the call. This would be for an immediate solution for the short term.
+One possibiliy would be to require a user Hue page refresh or close of connection and clear the caches in the call. This would be for an immediate solution for the short term.
 
 Advantage:
 

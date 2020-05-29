@@ -531,15 +531,20 @@ Then give Hue the information about the database source:
     [[[bigquery]]]
        name = BigQuery
        interface=sqlalchemy
-       options='{"url": "bigquery://projectName"}'
+       options='{"url": "bigquery://project-XXXXXX", "credentials_json": "{\"type\": \"service_account\", ...}"}'
 
-To restrict to only one dataset:
+Where to get the names? In the 'Resources' panel of Big Query UI:
 
-       options='{"url": "bigquery://projectName/datasetName"}'
+* Project name, e.g. project-XXXXXX, bigquery-public-data..., is the first level
+* Dataset name, e.g. austin_bikeshare, is the second level
+
+To restrict to one dataset:
+
+       options='{"url": "bigquery://project-XXXXXX"/dataset_name"}'
 
 Supporting additional [connection parameters](https://github.com/mxmzdlv/pybigquery#connection-string-parameters):
 
-      options='{"url": "bigquery://", "credentials_path": "/etc/conf/hue/demo-4a0e4e08d81a.json"}'
+      options='{"url": "bigquery://", "use_query_cache": "true"}'
 
 
 ### Apache Drill

@@ -462,7 +462,8 @@ CONNECTOR_TYPES = [
     'dialect': 'bigquery',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'bigquery://projectName/datasetName'},
+      {'name': 'url', 'value': 'bigquery://project-XXXXXX/dataset_name'},
+      {'name': 'credentials_json', 'value': '{"type": "service_account", ...}'}
     ],
     'category': 'editor',
     'description': '',
