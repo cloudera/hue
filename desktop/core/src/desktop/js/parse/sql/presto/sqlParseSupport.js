@@ -369,7 +369,7 @@ const initSqlParser = function(parser) {
     ];
     keywords = keywords.concat(['EXISTS', 'NOT']);
     if (oppositeValueExpression && oppositeValueExpression.types[0] === 'NUMBER') {
-      parser.applyTypeToSuggestions(['NUMBER']);
+      parser.applyTypeToSuggestions(oppositeValueExpression);
     }
     parser.suggestKeywords(keywords);
   };
@@ -387,10 +387,6 @@ const initSqlParser = function(parser) {
       return { types: [Object.keys(types)[0]] };
     }
     return { types: ['T'] };
-  };
-
-  parser.findReturnTypes = function(functionName) {
-    return ['T'];
   };
 
   parser.applyArgumentTypesToSuggestions = function(functionName, position) {
@@ -2180,10 +2176,6 @@ const initSyntaxParser = function(parser) {
 
   parser.findCaseType = function() {
     return { types: ['T'] };
-  };
-
-  parser.findReturnTypes = function() {
-    return ['T'];
   };
 
   parser.expandIdentifierChain = function() {
