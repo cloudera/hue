@@ -17,7 +17,7 @@
 import * as ko from 'knockout';
 
 import I18n from 'utils/i18n';
-import { findFunction } from 'sql/reference/sqlReferenceRepository';
+import { findUdf } from 'sql/reference/sqlReferenceRepository';
 
 const TEMPLATE_NAME = 'context-popover-function-details';
 
@@ -44,7 +44,7 @@ class FunctionContextTabs {
     this.loading = ko.observable(true);
     this.hasErrors = ko.observable(false);
 
-    findFunction(connector, data.function)
+    findUdf(connector, data.function)
       .then(this.details)
       .catch(() => {
         this.hasErrors(true);
