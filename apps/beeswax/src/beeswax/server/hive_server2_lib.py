@@ -15,34 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import next
-from builtins import filter
-from builtins import map
-from builtins import object
+from builtins import next, filter, map, object
 import logging
 import itertools
 import json
 import re
 import sys
 
-
 from operator import itemgetter
 
 from django.utils.translation import ugettext as _
+from TCLIService import TCLIService
+from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq, TStatusCode, TGetResultSetMetadataReq, \
+  TGetColumnsReq, TTypeId, TExecuteStatementReq, TGetOperationStatusReq, TFetchOrientation, \
+  TCloseSessionReq, TGetSchemasReq, TGetLogReq, TCancelOperationReq, TCloseOperationReq, TFetchResultsResp, TRowSet
 
 from desktop.lib import python_util, thrift_util
 from desktop.conf import DEFAULT_USER
-from beeswax import conf
 
-from TCLIService import TCLIService
-from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,\
-  TStatusCode, TGetResultSetMetadataReq, TGetColumnsReq, TTypeId,\
-  TExecuteStatementReq, TGetOperationStatusReq, TFetchOrientation,\
-  TCloseSessionReq, TGetSchemasReq, TGetLogReq, TCancelOperationReq,\
-  TCloseOperationReq, TFetchResultsResp, TRowSet
-
-from beeswax import conf as beeswax_conf
-from beeswax import hive_site
+from beeswax import conf as beeswax_conf, hive_site
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory
@@ -50,7 +41,6 @@ from beeswax.server.dbms import Table, DataTable, QueryServerException, InvalidS
 
 
 LOG = logging.getLogger(__name__)
-
 IMPALA_RESULTSET_CACHE_SIZE = 'impala.resultset.cache.size'
 DEFAULT_USER = DEFAULT_USER.get()
 
@@ -394,7 +384,13 @@ class HiveServerDataTable(DataTable):
 
   def rows(self):
     for row in self.row_set:
-      yield row.fields()
+      try:
+        yield row.fields()
+      except StopIteration as e:
+        if sys.version_info[0] > 2:
+          return  # pep-0479: expected Py3.8 generator raised StopIteration
+        else:
+          raise e
 
 
 
@@ -1097,7 +1093,8 @@ class HiveServerClient(object):
     configuration = self._get_query_configuration(query)
     return self.execute_query_statement(statement='EXPLAIN %s' % query_statement, configuration=configuration, orientation=TFetchOrientation.FETCH_NEXT)
 
-  def get_partitions(self, database, table_name, partition_spec=None, max_parts=None, reverse_sort=True): #TODO execute both requests in same session
+
+  def get_partitions(self, database, table_name, partition_spec=None, max_parts=None, reverse_sort=True): # TODO execute both requests in same session
     table = self.get_table(database, table_name)
 
     query = 'SHOW PARTITIONS `%s`.`%s`' % (database, table_name)
@@ -1159,7 +1156,13 @@ class HiveServerClient(object):
       configuration = dict((row[0], row[1]) for row in results.rows())
     else:  # For Hive, only return white-listed configurations
       query = 'SET -v'
-      results = self.execute_query_statement(query, orientation=TFetchOrientation.FETCH_FIRST, max_rows=-1, close_operation=True, session=session)
+      results = self.execute_query_statement(
+          query,
+          orientation=TFetchOrientation.FETCH_FIRST,
+          max_rows=-1,
+          close_operation=True,
+          session=session
+      )
       config_whitelist = [config.lower() for config in CONFIG_WHITELIST.get()]
       properties = [(row[0].split('=')[0], row[0].split('=')[1]) for row in results.rows() if '=' in row[0]]
       configuration = dict((prop, value) for prop, value in properties if prop.lower() in config_whitelist)
