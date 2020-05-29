@@ -103,11 +103,13 @@ def autocomplete(request, database=None, table=None, column=None, nested=None):
   return JsonResponse(response)
 
 
-def _autocomplete(db, database=None, table=None, column=None, nested=None, query=None, cluster=None):
+def _autocomplete(db, database=None, table=None, column=None, nested=None, query=None, cluster=None, operation='schema'):
   response = {}
 
   try:
-    if database is None:
+    if operation == 'functions':
+      response['functions'] = _get_functions(db, database)
+    elif database is None:
       response['databases'] = db.get_databases()
     elif table is None:
       tables_meta = db.get_tables_meta(database=database)
@@ -171,6 +173,17 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
     response['error'] = str(e)
 
   return response
+
+
+def _get_functions(db, database=None):
+  data = []
+
+  functions = db.get_functions(prefix=database)
+  if functions:
+    rows = escape_rows(functions.rows(), nulls_only=True)
+    data = [{'name': row[0]} for row in rows]
+
+  return data
 
 
 @error_handler

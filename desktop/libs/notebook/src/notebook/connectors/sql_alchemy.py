@@ -80,8 +80,10 @@ from notebook.models import escape_rows
 if sys.version_info[0] > 2:
   from urllib.parse import quote_plus as urllib_quote_plus
   from past.builtins import long
+  from io import StringIO
 else:
   from urllib import quote_plus as urllib_quote_plus
+  from cStringIO import StringIO
 
 
 ENGINES = {}
@@ -176,6 +178,11 @@ class SqlAlchemyApi(Api):
         'driver_name': driver_name,
         'username': self.user.username
       })
+
+    if self.options.get('credentials_json'):
+      self.options['credentials_info'] = json.loads(
+          self.options.pop('credentials_json')
+      )
 
     options = self.options.copy()
     options.pop('session', None)
@@ -328,7 +335,7 @@ class SqlAlchemyApi(Api):
 
 
   @query_error_handler
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     engine = self._get_engine()
     inspector = inspect(engine)
 

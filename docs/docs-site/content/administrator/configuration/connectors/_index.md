@@ -531,15 +531,20 @@ Then give Hue the information about the database source:
     [[[bigquery]]]
        name = BigQuery
        interface=sqlalchemy
-       options='{"url": "bigquery://projectName"}'
+       options='{"url": "bigquery://project-XXXXXX", "credentials_json": "{\"type\": \"service_account\", ...}"}'
 
-To restrict to only one dataset:
+Where to get the names? In the 'Resources' panel of Big Query UI:
 
-       options='{"url": "bigquery://projectName/datasetName"}'
+* Project name, e.g. project-XXXXXX, bigquery-public-data..., is the first level
+* Dataset name, e.g. austin_bikeshare, is the second level
+
+To restrict to one dataset:
+
+       options='{"url": "bigquery://project-XXXXXX"/dataset_name"}'
 
 Supporting additional [connection parameters](https://github.com/mxmzdlv/pybigquery#connection-string-parameters):
 
-      options='{"url": "bigquery://", "credentials_path": "/etc/conf/hue/demo-4a0e4e08d81a.json"}'
+      options='{"url": "bigquery://", "use_query_cache": "true"}'
 
 
 ### Apache Drill
@@ -602,7 +607,7 @@ Then give Hue the information about the database source:
 
 #### SQL
 
-Query collections like we would query a regular database.
+Query Solr collections like you would query a regular database via [Solr SQL](https://gethue.com/sql-editor-for-solr-sql/).
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
@@ -617,17 +622,11 @@ Then give Hue the information about the database source:
        interface=sqlalchemy
        options='{"url": "solr://<username>:<password>@<host>:<port>/solr/<collection>[?use_ssl=true|false]"}'
 
-#### Native
+**Note**
 
-As Solr SQL is pretty recent, the native implementation has some caveats, notably Solr lacks support of:
+There is also a native implementation which has some caveats ([HUE-3686](https://issues.cloudera.org/browse/HUE-3686) but reuses the `Dashboard` configuration which is builtin in CDH/CDP.
 
-* SELECT *
-* WHERE close with a LIKE
-* resultset pagination
-
-which prevents a SQL UX experience comparable to the standard other databases (but we track it in [HUE-3686](https://issues.cloudera.org/browse/HUE-3686)).
-
-First make sure Solr search is [configured](#apache-solr):
+First make sure Solr is configured for Dashboards (cf. section just below):
 
 Then add the interpreter:
 
@@ -637,8 +636,9 @@ Then add the interpreter:
       ## Name of the collection handler
       # options='{"collection": "default"}'
 
-### Dashboards
-Solr provide great [dashboards](/user/querying/#dashboard). Just point to an existing Solr:
+#### Dashboards
+
+Hue ships the [dynamic dashboards](/user/querying/#dashboard)for exploring datasets visually. Just point to an existing Solr server:
 
     [search]
 

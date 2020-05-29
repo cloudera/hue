@@ -81,7 +81,7 @@ class AltusAdbApi(Api):
     return []
 
 
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     url_path = '/notebook/api/autocomplete'
 
     if database is not None:
