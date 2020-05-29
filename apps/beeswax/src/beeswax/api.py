@@ -125,7 +125,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
       cols_extended = massage_columns_for_json(table.cols)
 
       if table.is_impala_only: # Expand Kudu table information
-        if db.client.query_server['server_name'] != 'impala':
+        if db.client.query_server['dialect'] != 'impala':
           query_server = get_query_server_config('impala', connector=cluster)
           db = dbms.get(db.client.user, query_server, cluster=cluster)
 
@@ -180,7 +180,7 @@ def _get_functions(db, database=None):
 
   functions = db.get_functions(prefix=database)
   if functions:
-    rows = escape_rows(functions.rows(), nulls_only=True)
+    rows = escape_rows(functions, nulls_only=True)
     data = [{'name': row[0]} for row in rows]
 
   return data
