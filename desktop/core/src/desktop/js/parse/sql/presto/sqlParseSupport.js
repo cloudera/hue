@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import { matchesType } from 'sql/reference/typeUtils';
+import { applyTypeToSuggestions, getSubQuery } from 'parse/sql/sqlParseUtils';
 
 /**
  * Calculates the Optimal String Alignment distance between two strings. Returns 0 when the strings are equal and the
@@ -373,17 +374,7 @@ const initSqlParser = function(parser) {
     parser.suggestKeywords(keywords);
   };
 
-  parser.applyTypeToSuggestions = function(types) {
-    if (types[0] === 'BOOLEAN') {
-      return;
-    }
-    if (parser.yy.result.suggestFunctions && !parser.yy.result.suggestFunctions.types) {
-      parser.yy.result.suggestFunctions.types = types;
-    }
-    if (parser.yy.result.suggestColumns && !parser.yy.result.suggestColumns.types) {
-      parser.yy.result.suggestColumns.types = types;
-    }
-  };
+  parser.applyTypeToSuggestions = applyTypeToSuggestions.bind(null, parser);
 
   parser.findCaseType = function(whenThenList) {
     const types = {};
@@ -1225,33 +1216,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.getSubQuery = function(cols) {
-    const columns = [];
-    cols.selectList.forEach(col => {
-      const result = {};
-      if (col.alias) {
-        result.alias = col.alias;
-      }
-      if (col.valueExpression && col.valueExpression.columnReference) {
-        result.identifierChain = col.valueExpression.columnReference;
-      } else if (col.asterisk) {
-        result.identifierChain = [{ asterisk: true }];
-      }
-      if (
-        col.valueExpression &&
-        col.valueExpression.types &&
-        col.valueExpression.types.length === 1
-      ) {
-        result.type = col.valueExpression.types[0];
-      }
-
-      columns.push(result);
-    });
-
-    return {
-      columns: columns
-    };
-  };
+  parser.getSubQuery = getSubQuery;
 
   parser.addTablePrimary = function(ref) {
     if (typeof parser.yy.latestTablePrimaries === 'undefined') {
