@@ -28,7 +28,7 @@ from django.utils.translation import ugettext as _
 from TCLIService import TCLIService
 from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq, TStatusCode, TGetResultSetMetadataReq, \
   TGetColumnsReq, TTypeId, TExecuteStatementReq, TGetOperationStatusReq, TFetchOrientation, \
-  TCloseSessionReq, TGetSchemasReq, TGetLogReq, TCancelOperationReq, TCloseOperationReq, TFetchResultsResp, TRowSet
+  TCloseSessionReq, TGetSchemasReq, TGetLogReq, TCancelOperationReq, TCloseOperationReq, TFetchResultsResp, TRowSet, TGetFunctionsReq
 
 from desktop.lib import python_util, thrift_util
 from desktop.conf import DEFAULT_USER
@@ -935,11 +935,18 @@ class HiveServerClient(object):
     return self.execute_query_statement(statement=query.query['query'], max_rows=max_rows, configuration=configuration, session=session)
 
 
-  def execute_query_statement(self, statement, max_rows=1000, configuration=None, orientation=TFetchOrientation.FETCH_FIRST, close_operation=False, session=None):
+  def execute_query_statement(self, statement, max_rows=1000, configuration=None, orientation=TFetchOrientation.FETCH_FIRST,
+      close_operation=False, session=None):
     if configuration is None:
       configuration = {}
 
-    results, schema, operation_handle, session = self.execute_statement(statement=statement, max_rows=max_rows, configuration=configuration, orientation=orientation, session=session)
+    results, schema, operation_handle, session = self.execute_statement(
+        statement=statement,
+        max_rows=max_rows,
+        configuration=configuration,
+        orientation=orientation,
+        session=session
+    )
 
     if close_operation:
       self.close_operation(operation_handle)
@@ -1172,6 +1179,16 @@ class HiveServerClient(object):
 
   def _get_query_configuration(self, query):
     return dict([(setting['key'], setting['value']) for setting in query.settings])
+
+
+  def get_functions(self, database, table):
+    req = TGetFunctionsReq(functionName='.*')
+    (res, session) = self.call(self._client.GetFunctions, req)
+
+    results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT)
+    self._close(res.operationHandle, session)
+
+    return results, schema
 
 
 class HiveServerTableCompatible(HiveServerTable):
@@ -1435,3 +1452,6 @@ class HiveServerClientCompatible(object):
 
   def get_configuration(self):
     return self._client.get_configuration()
+
+  def get_functions(self, database, table):
+    return self._client.get_functions(database, table)

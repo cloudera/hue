@@ -495,9 +495,11 @@ class HiveServer2Dbms(object):
 
 
   def fetch(self, query_handle, start_over=False, rows=None):
-    no_start_over_support = [config_variable for config_variable in self.get_default_configuration(False)
-                                             if config_variable.key == 'support_start_over'
-                                               and config_variable.value == 'false']
+    no_start_over_support = [
+        config_variable
+        for config_variable in self.get_default_configuration(False)
+        if config_variable.key == 'support_start_over' and config_variable.value == 'false'
+    ]
     if no_start_over_support:
       start_over = False
 
@@ -1096,16 +1098,21 @@ class HiveServer2Dbms(object):
     return self.client.get_configuration()
 
 
-  def get_functions(self, prefix=None):
-    filter = '"%s.*"' % prefix if prefix else '".*"'
-    hql = 'SHOW FUNCTIONS %s' % filter
+  def get_functions(self, prefix=None, database=None):
+    if self.client.query_server['dialect'] == 'impala':
+      if database is None:
+        database = '_impala_builtins'
+      filter = '"%s.*"' % prefix if prefix else '".*"'
+      hql = 'SHOW FUNCTIONS %s' % filter
 
-    query = hql_query(hql)
-    handle = self.execute_and_wait(query, timeout_sec=15.0)
+      query = hql_query(hql)
+      handle = self.execute_and_wait(query, timeout_sec=15.0)
 
-    if handle:
-      result = self.fetch(handle, rows=5000)
-      self.close(handle)
+      if handle:
+        result = self.fetch(handle, rows=5000).rows()
+        self.close(handle)
+    else:
+      result = self.client.get_functions('aa', 'bb')
 
     return result
 
