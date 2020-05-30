@@ -1104,21 +1104,25 @@ class HiveServer2Dbms(object):
     '''
     result = None
 
+    function_filter = "'%s*'" % prefix if prefix else ''
+
     if self.client.query_server['dialect'] == 'impala':
       if database is None:
         database = '_impala_builtins'
 
-    filter = '"%s.*"' % prefix if prefix else '".*"'
-    hql = 'SHOW FUNCTIONS %s' % filter
+    hql = 'SHOW FUNCTIONS %(function_filter)s %(database_filter)s' % {
+      'function_filter': "'%s*'" % prefix if prefix else '',
+      'database_filter': (' IN %s' % database) if database else ''
+    }
 
     query = hql_query(hql)
     handle = self.execute_and_wait(query, timeout_sec=5.0)
 
     if handle:
-      result = self.fetch(handle, rows=1000).rows()
+      rows = self.fetch(handle, rows=1000).rows()
       self.close(handle)
 
-    return result
+    return rows
 
 
   def get_query_metadata(self, query):
