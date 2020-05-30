@@ -181,7 +181,19 @@ def _get_functions(db, database=None):
   functions = db.get_functions(prefix=database)
   if functions:
     rows = escape_rows(functions, nulls_only=True)
-    data = [{'name': row[0]} for row in rows]
+
+    if db.client.query_server['dialect'] == 'impala':
+      data = [{
+          'name': row[1].split('(', 1)[0],
+          'signature': '(' + row[1].split('(', 1)[1],
+          'return_type': row[0],
+          'is_builtin': row[2],
+          'is_persistent': row[3]
+        }
+        for row in rows
+      ]
+    else:
+      data = [{'name': row[0]} for row in rows]
 
   return data
 
