@@ -970,7 +970,7 @@ class HiveServerClient(object):
     configuration.update(self._get_query_configuration(query))
     query_statement = query.get_query_statement(statement)
 
-    return self.execute_async_statement(statement=query_statement, confOverlay=configuration, session=session)
+    return self.execute_async_statement(statement=query_statement, conf_overlay=configuration, session=session)
 
 
   def execute_statement(self, statement, max_rows=1000, configuration=None, orientation=TFetchOrientation.FETCH_NEXT, session=None):
@@ -989,15 +989,21 @@ class HiveServerClient(object):
     return results, schema, res.operationHandle, session
 
 
-  def execute_async_statement(self, statement, confOverlay, session=None):
+  def execute_async_statement(self, statement=None, thrift_function=None, thrift_request=None, conf_overlay=None, session=None):
+    if conf_overlay is None:
+      conf_overlay = {}
+    if thrift_function is None:
+      thrift_function = self._client.ExecuteStatement
+    if thrift_request is None:
+      thrift_request = TExecuteStatementReq(statement=statement, confOverlay=conf_overlay, runAsync=True)
+
     if self.query_server.get('dialect') == 'impala' and self.query_server['QUERY_TIMEOUT_S'] > 0:
-      confOverlay['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
+      conf_overlay['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
 
     if sys.version_info[0] == 2:
       statement = statement.encode('utf-8')
 
-    req = TExecuteStatementReq(statement=statement, confOverlay=confOverlay, runAsync=True)
-    (res, session) = self.call_return_result_and_session(self._client.ExecuteStatement, req, session=session)
+    (res, session) = self.call_return_result_and_session(thrift_function, thrift_request, session=session)
 
     return HiveServerQueryHandle(
         secret=res.operationHandle.operationId.secret,
@@ -1181,14 +1187,20 @@ class HiveServerClient(object):
     return dict([(setting['key'], setting['value']) for setting in query.settings])
 
 
-  def get_functions(self, database, table):
+  def get_functions(self):
+    '''
+    Could support parameters.
+
+    Result data is pretty limited, e.g.
+    [None, None, 'histogram_numeric', '', 1, 'org.apache.hadoop.hive.ql.exec.WindowFunctionInfo']
+
+    GetAllFunctionsResponse get_all_functions() would also be nice as more detailed it seems, but this would be a call to HMS.
+    '''
     req = TGetFunctionsReq(functionName='.*')
+    thrift_function = self._client.GetFunctions
     (res, session) = self.call(self._client.GetFunctions, req)
 
-    results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT)
-    self._close(res.operationHandle, session)
-
-    return results, schema
+    return self.execute_async_statement(thrift_function=thrift_function, thrift_request=req)
 
 
 class HiveServerTableCompatible(HiveServerTable):
@@ -1337,8 +1349,8 @@ class HiveServerClientCompatible(object):
     if max_rows is None:
       max_rows = 1000
 
-    if start_over and not (self.query_server.get('dialect') == 'impala' and self.query_server['querycache_rows'] == 0): # Backward compatibility for impala
-      orientation = TFetchOrientation.FETCH_FIRST
+    if start_over and not (self.query_server.get('dialect') == 'impala' and self.query_server['querycache_rows'] == 0):
+      orientation = TFetchOrientation.FETCH_FIRST  # Backward compatibility for impala
     else:
       orientation = TFetchOrientation.FETCH_NEXT
 
@@ -1450,8 +1462,10 @@ class HiveServerClientCompatible(object):
 
   def alter_partition(self, db_name, tbl_name, new_part): raise NotImplementedError()
 
+
   def get_configuration(self):
     return self._client.get_configuration()
 
-  def get_functions(self, database, table):
-    return self._client.get_functions(database, table)
+
+  def get_functions(self):
+    return self._client.get_functions()

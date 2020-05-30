@@ -521,11 +521,17 @@ class HiveServerQueryHandle(QueryHandle):
   def get_rpc_handle(self):
     secret, guid = self.get_decoded(self.secret, self.guid)
 
-    operation = getattr(TOperationType, TOperationType._NAMES_TO_VALUES.get(self.operation_type, 'EXECUTE_STATEMENT'))
-    return TOperationHandle(operationId=THandleIdentifier(guid=guid, secret=secret),
-                            operationType=operation,
-                            hasResultSet=self.has_result_set,
-                            modifiedRowCount=self.modified_row_count)
+    operation = getattr(
+      TOperationType,
+      TOperationType._VALUES_TO_NAMES.get(self.operation_type, 'EXECUTE_STATEMENT')
+    )
+
+    return TOperationHandle(
+        operationId=THandleIdentifier(guid=guid, secret=secret),
+        operationType=operation,
+        hasResultSet=self.has_result_set,
+        modifiedRowCount=self.modified_row_count
+    )
 
   @classmethod
   def get_decoded(cls, secret, guid):
