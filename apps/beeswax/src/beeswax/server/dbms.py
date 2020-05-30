@@ -1099,20 +1099,24 @@ class HiveServer2Dbms(object):
 
 
   def get_functions(self, prefix=None, database=None):
+    '''
+    Not using self.client.get_functions() as pretty limited. More comments there.
+    '''
+    result = None
+
     if self.client.query_server['dialect'] == 'impala':
       if database is None:
         database = '_impala_builtins'
-      filter = '"%s.*"' % prefix if prefix else '".*"'
-      hql = 'SHOW FUNCTIONS %s' % filter
 
-      query = hql_query(hql)
-      handle = self.execute_and_wait(query, timeout_sec=15.0)
+    filter = '"%s.*"' % prefix if prefix else '".*"'
+    hql = 'SHOW FUNCTIONS %s' % filter
 
-      if handle:
-        result = self.fetch(handle, rows=5000).rows()
-        self.close(handle)
-    else:
-      result = self.client.get_functions('aa', 'bb')
+    query = hql_query(hql)
+    handle = self.execute_and_wait(query, timeout_sec=5.0)
+
+    if handle:
+      result = self.fetch(handle, rows=1000).rows()
+      self.close(handle)
 
     return result
 

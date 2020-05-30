@@ -796,8 +796,7 @@ def enum_as_sequence(enum):
   Arguments:
   - `enum`: The class of a Thrift-generated enum
   """
-  return [x for x in dir(enum) if not x.startswith("__")
-                and  x not in ["_VALUES_TO_NAMES", "_NAMES_TO_VALUES", "next"]]
+  return [x for x in dir(enum) if not x.startswith("__") and x not in ["_VALUES_TO_NAMES", "_NAMES_TO_VALUES", "next"]]
 
 def fixup_enums(obj, name_class_map, suffix="AsString"):
   """
