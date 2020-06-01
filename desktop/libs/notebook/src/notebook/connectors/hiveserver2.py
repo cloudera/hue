@@ -332,6 +332,7 @@ class HS2Api(Api):
 
 
   @query_error_handler
+  @ssh_error_handler
   def check_status(self, notebook, snippet):
     response = {}
     db = self._get_db(snippet, interpreter=self.interpreter)
