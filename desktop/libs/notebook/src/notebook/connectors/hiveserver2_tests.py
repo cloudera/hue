@@ -379,14 +379,8 @@ class TestApi():
           {'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}
         ]
 
-        response = self.client.post(reverse('notebook:api_autocomplete_databases'), {
-            'snippet': json.dumps(snippet),
-            'operation': 'functions'
-        })
-
-        assert_equal(response.status_code, 200)
-        data = json.loads(response.content)
-        assert_equal(data['status'], 0)
+        api = HS2Api(self.user)
+        data = api.autocomplete(snippet, operation='functions')
 
         assert_equal(
           data['functions'],
