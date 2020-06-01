@@ -72,10 +72,18 @@ def config_validator(user):
 
   try:
     from desktop.lib.fsmanager import get_filesystem
+    from aws.conf import is_enabled as is_s3_enabled
     warehouse = beeswax.hive_site.get_metastore_warehouse_dir()
     fs = get_filesystem()
+    fs_scheme = fs._get_scheme(warehouse)
     if fs:
-      fs.do_as_superuser(fs.stats, warehouse)
+      if fs_scheme == 's3a':
+        if is_s3_enabled():
+          fs.do_as_user(user, fs.stats, warehouse)
+        else:
+          LOG.warn("Warehouse is in S3, but no credential available.")
+      else:
+        fs.do_as_superuser(fs.stats, warehouse)
   except Exception:
     msg = 'Failed to access Hive warehouse: %s'
     LOG.exception(msg % warehouse)
