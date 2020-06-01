@@ -378,6 +378,35 @@ FROM déclenché c, c.addresses a"""
       assert_equal(data, {'status': 0})  # We get back empty instead of failure with QueryExpired to silence end user messages
 
 
+  def test_autocomplete_functions(self):
+    # Note: better test would be to mock autocomplete() and not get_api() with hive and mysql dialects
+
+    with patch('notebook.api.get_api') as get_api:
+      get_api.return_value = Mock(
+        autocomplete=Mock(
+          return_value={
+            'functions': [
+              {'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}
+            ]
+          }
+        )
+      )
+
+      response = self.client.post(reverse('notebook:api_autocomplete_databases'), {
+          'snippet': json.dumps({'type': 'hive', 'properties': {}}),
+          'operation': 'functions'
+      })
+
+      assert_equal(response.status_code, 200)
+      data = json.loads(response.content)
+      assert_equal(data['status'], 0)
+
+      assert_equal(
+        data['functions'],
+        [{'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}]
+      )
+
+
 class MockedApi(Api):
   def execute(self, notebook, snippet):
     return {
