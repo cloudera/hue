@@ -186,10 +186,11 @@ def ssh_error_handler(f):
             connector_c = args[0].POST['session']
           else:
             connector_c = args[0].POST.get('snippet')
+          if not connector_c:
+            raise e
           connector_json_data = json.loads(connector_c)
         else:
           connector_json_data = args[1]  # Task Server
-
 
         if connector_json_data.get('type') == 'hello':
           connector = connector_json_data['interpreter']
