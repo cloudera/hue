@@ -181,6 +181,18 @@ NAME_ID_FORMAT = Config(
   type=str,
   help=_t("Request this NameID format from the server"))
 
+REQUIRED_GROUPS = Config(
+  key="required_groups",
+  type=coerce_csv,
+  default=[],
+  help=_t("Comma separated list of group names which are all required to complete the authentication. e.g. admin,sales"))
+
+REQUIRED_GROUPS_ATTRIBUTE = Config(
+  key="required_groups_attribute",
+  default="groups",
+  type=str,
+  help=_t("Name of the SAML attribute containing the list of groups the user belongs to."))
+
 
 def get_key_file_password():
   password = os.environ.get('HUE_SAML_KEY_FILE_PASSWORD')

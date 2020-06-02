@@ -1,6 +1,8 @@
 
 # SAML Authentication with additional group checks
 
+[HUE-9366](https://issues.cloudera.org/browse/HUE-9366)
+
 SAML is one of the main solution for offering SSO with LDAP and OpenId Connect. In Hue, this happens with the [SAML2Backend](https://docs.gethue.com/administrator/configuration/server/#saml) [Django Backend](https://docs.djangoproject.com/en/3.0/ref/contrib/auth/).
 
 ## Restricting user authentication via a dedicated 'groups' attribute
@@ -38,5 +40,5 @@ In case of failure to authenticate properly (e.g. bad credentials or user not pa
 Add tests (with the help of the Mock module) to check if:
 
 * Authentication with group list [] --> rejects
-* Authentication with group list missing one group --> rejetcs
+* Authentication with group list missing one group --> rejects
 * Authentication with group list intersecting all the required groups --> succeeds
