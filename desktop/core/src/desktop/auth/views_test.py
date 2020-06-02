@@ -17,12 +17,14 @@
 
 from builtins import object
 import datetime
-from nose.tools import assert_true, assert_false, assert_equal, assert_raises
+import sys
 
 from django_auth_ldap import backend as django_auth_ldap_backend
 from django.db.utils import DataError
 from django.conf import settings
 from django.test.client import Client
+from nose.plugins.skip import SkipTest
+from nose.tools import assert_true, assert_false, assert_equal, assert_raises
 
 from hadoop.test_base import PseudoHdfsTestBase
 from hadoop import pseudo_hdfs4
@@ -36,6 +38,12 @@ from desktop.auth import backend
 from desktop.auth.backend import create_user
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group
+
+
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock, MagicMock
+else:
+  from mock import patch, Mock, MagicMock
 
 
 def get_mocked_config():
