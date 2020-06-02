@@ -392,6 +392,7 @@ def csrf_failure(request, reason=None):
   access_warn(request, reason)
   return render("403_csrf.mako", request, dict(uri=request.build_absolute_uri()), status=403)
 
+@login_notrequired
 def serve_403_error(request, *args, **kwargs):
   """Registered handler for 403. We just return a simple error"""
   access_warn(request, "403 access forbidden")
