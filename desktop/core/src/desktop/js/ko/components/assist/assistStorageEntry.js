@@ -63,11 +63,14 @@ class AssistStorageEntry {
     self.path = '';
     if (self.parent !== null) {
       self.path = self.parent.path;
-      if (self.parent.path !== '/') {
+      if (self.parent.path !== '/' && !/\/$/.test(self.path)) {
         self.path += '/';
       }
     }
+
     self.path += self.definition.name;
+    self.abfsPath = (/^\//.test(self.path) ? 'abfs:/' : 'abfs://') + self.path;
+
     self.currentPage = 1;
     self.hasMorePages = true;
     self.preview = ko.observable();

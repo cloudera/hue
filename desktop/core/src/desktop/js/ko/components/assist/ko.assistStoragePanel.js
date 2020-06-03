@@ -65,8 +65,8 @@ const TEMPLATE = `
       <!-- /ko -->
       <!-- ko if: source.type === 'abfs' && path !== '/' && window.SHOW_UPLOAD_BUTTON -->
       <a class="inactive-action" data-bind="dropzone: {
-            url: '/filebrowser/upload/file?dest=' + 'abfs:/' + path,
-            params: { dest: 'abfs:/' + path },
+            url: '/filebrowser/upload/file?dest=' + abfsPath,
+            params: { dest: abfsPath },
             paramName: 'hdfs_file',
             onError: function(x, e){ $(document).trigger('error', e); },
             onComplete: function () { huePubSub.publish('assist.storage.refresh'); } }" title="${I18n(
