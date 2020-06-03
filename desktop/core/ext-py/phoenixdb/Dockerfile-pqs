@@ -1,0 +1,9 @@
+from maven:3-jdk-8
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yq krb5-user libkrb5-dev
+
+EXPOSE 8765
+
+# copy all the files to the container
+
+CMD mvn clean verify -am -pl queryserver-it -Dtest=foo -Dit.test=QueryServerBasicsIT#startLocalPQS -Ddo.not.randomize.pqs.port=true -Dstart.unsecure.pqs=true
