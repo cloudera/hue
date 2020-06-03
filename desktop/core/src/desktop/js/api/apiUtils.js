@@ -148,12 +148,30 @@ export const simplePost = (url, data, options) => {
     return request.readyState;
   };
 
-  promise.abort = function() {
+  promise.abort = () => {
     request.abort();
   };
 
+  promise.cancel = promise.abort;
+
   return promise;
 };
+
+/**
+ * @param {string} url
+ * @param {Object} data
+ * @param {Object} [options]
+ * @param {boolean} [options.silenceErrors]
+ * @param {string} [options.dataType] - Default: Intelligent Guess (xml, json, script, text, html)
+ *
+ * @return {Promise}
+ */
+export const simplePostAsync = async (url, data, options) =>
+  new Promise((resolve, reject) => {
+    simplePost(url, data, options)
+      .done(resolve)
+      .fail(reject);
+  });
 
 export const cancelActiveRequest = request => {
   if (typeof request !== 'undefined' && request !== null) {

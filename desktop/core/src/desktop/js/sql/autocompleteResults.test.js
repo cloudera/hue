@@ -229,6 +229,8 @@ describe('AutocompleteResults.js', () => {
     return deferred.promise();
   });
 
+  jest.spyOn(ApiHelper, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
+
   const subject = new AutocompleteResults({
     snippet: {
       autocompleteSettings: {

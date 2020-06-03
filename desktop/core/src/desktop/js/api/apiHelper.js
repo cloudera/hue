@@ -22,6 +22,7 @@ import {
   cancelActiveRequest,
   simpleGet,
   simplePost,
+  simplePostAsync,
   successResponseIsError
 } from './apiUtils';
 import apiQueueManager from 'api/apiQueueManager';
@@ -1367,6 +1368,36 @@ class ApiHelper {
     }
 
     return deferred.resolve().promise();
+  }
+
+  /**
+   * @param {Object} options
+   * @param {Connector} options.connector
+   * @param {string} [options.database]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @return {Promise}
+   */
+  async fetchUdfs(options) {
+    let url = AUTOCOMPLETE_API_PREFIX;
+    if (options.database) {
+      url += '/' + options.database;
+    }
+
+    const data = {
+      notebook: {},
+      snippet: JSON.stringify({
+        type: options.connector.id
+      }),
+      operation: 'functions'
+    };
+
+    try {
+      const response = await simplePostAsync(url, data, options);
+      return (response && response.functions) || [];
+    } catch (err) {
+      return [];
+    }
   }
 
   /**
