@@ -15,10 +15,11 @@
 // limitations under the License.
 
 import { getArgumentTypesForUdf } from './sqlReferenceRepository';
+import ApiHelper from 'api/apiHelper';
 
 describe('sqlReferenceRepository.js', () => {
-  const hiveConn = { dialect: 'hive' };
-  const impalaConn = { dialect: 'impala' };
+  const hiveConn = { dialect: 'hive', id: 'hive' };
+  const impalaConn = { dialect: 'impala', id: 'impala' };
 
   jest.mock('sql/reference/impala/udfReference', () => ({
     UDF_CATEGORIES: [
@@ -83,6 +84,8 @@ describe('sqlReferenceRepository.js', () => {
       }
     ]
   }));
+
+  jest.spyOn(ApiHelper, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
 
   it('should give the expected argument types at a specific position', async () => {
     expect(await getArgumentTypesForUdf(hiveConn, 'cos', 1)).toEqual(['DECIMAL', 'DOUBLE']);

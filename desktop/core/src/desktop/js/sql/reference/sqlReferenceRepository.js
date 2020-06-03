@@ -14,7 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import ApiHelper from 'api/apiHelper';
 import { matchesType } from './typeUtils';
+import I18n from 'utils/i18n';
 
 const SET_REFS = {
   impala: async () => import(/* webpackChunkName: "impala-ref" */ './impala/setReference')
@@ -27,27 +29,95 @@ const UDF_REFS = {
   pig: async () => import(/* webpackChunkName: "pig-ref" */ './pig/udfReference')
 };
 
-export const getSetOptions = async connector => {
-  if (SET_REFS[connector.dialect]) {
-    const module = await SET_REFS[connector.dialect]();
-    if (module.SET_OPTIONS) {
-      return module.SET_OPTIONS;
-    }
+const DEFAULT_DESCRIPTION = I18n('No description available.');
+const DEFAULT_RETURN_TYPE = ['T'];
+const DEFAULT_ARGUMENTS = [[{ type: 'T', multiple: true }]];
+const IGNORED_UDF_REGEX = /^[!=$%&*+-/<>^|~]+$/;
+
+const mergedUdfPromises = {};
+
+const getMergedUdfKey = (connector, database) => {
+  let key = connector.id;
+  if (database) {
+    key += '_' + database;
   }
-  return {};
+  return key;
 };
 
 export const hasUdfCategories = connector => typeof UDF_REFS[connector.dialect] !== 'undefined';
 
-export const getUdfCategories = async connector => {
-  if (UDF_REFS[connector.dialect]) {
-    const module = await UDF_REFS[connector.dialect]();
-    if (module.UDF_CATEGORIES) {
-      return module.UDF_CATEGORIES;
+// TODO: Extend with arguments etc reported by the API
+const adaptApiUdf = apiUdf => {
+  const signature = apiUdf.name + '()';
+  return {
+    returnTypes: DEFAULT_RETURN_TYPE,
+    arguments: DEFAULT_ARGUMENTS,
+    signature: signature,
+    draggable: signature,
+    description: DEFAULT_DESCRIPTION
+  };
+};
+
+const findUdfsToAdd = (apiUdfs, existingCategories) => {
+  const existingUdfNames = new Set();
+  existingCategories.forEach(category => {
+    Object.keys(category.functions).forEach(udfName => {
+      existingUdfNames.add(udfName.toUpperCase());
+    });
+  });
+
+  const result = {};
+
+  apiUdfs.forEach(apiUdf => {
+    if (
+      !result[apiUdf.name] &&
+      !existingUdfNames.has(apiUdf.name.toUpperCase()) &&
+      !IGNORED_UDF_REGEX.test(apiUdf.name)
+    ) {
+      result[apiUdf.name] = adaptApiUdf(apiUdf);
+    }
+  });
+
+  return result;
+};
+
+const mergeWithApiUdfs = async (categories, connector, database) => {
+  const apiUdfs = await ApiHelper.fetchUdfs({
+    connector: connector,
+    database: database,
+    silenceErrors: true
+  });
+
+  if (apiUdfs.length) {
+    const additionalUdfs = findUdfsToAdd(apiUdfs, categories);
+    if (Object.keys(additionalUdfs).length) {
+      const generalCategory = {
+        name: I18n('General'),
+        functions: additionalUdfs
+      };
+      categories.unshift(generalCategory);
     }
   }
-  // TODO: Fetch from API and diff/merge
-  return [];
+};
+
+export const getUdfCategories = async (connector, database) => {
+  const promiseKey = getMergedUdfKey(connector, database);
+  if (!mergedUdfPromises[promiseKey]) {
+    mergedUdfPromises[promiseKey] = new Promise(async resolve => {
+      let categories = [];
+      if (UDF_REFS[connector.dialect]) {
+        const module = await UDF_REFS[connector.dialect]();
+        if (module.UDF_CATEGORIES) {
+          categories = module.UDF_CATEGORIES;
+        }
+      }
+      await mergeWithApiUdfs(categories, connector, database);
+
+      resolve(categories);
+    });
+  }
+
+  return await mergedUdfPromises[promiseKey];
 };
 
 export const findUdf = async (connector, functionName) => {
@@ -122,4 +192,14 @@ export const getArgumentTypesForUdf = async (connector, functionName, argumentPo
       return argument.type;
     })
     .sort();
+};
+
+export const getSetOptions = async connector => {
+  if (SET_REFS[connector.dialect]) {
+    const module = await SET_REFS[connector.dialect]();
+    if (module.SET_OPTIONS) {
+      return module.SET_OPTIONS;
+    }
+  }
+  return {};
 };
