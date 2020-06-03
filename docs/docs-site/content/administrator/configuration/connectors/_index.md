@@ -461,6 +461,8 @@ The dialect should be added to the Python system or Hue Python virtual environme
 
     ./build/env/bin/pip install pyPhoenix
 
+Then give Hue the information about the database source:
+
     [[[phoenix]]]
     name=HBase Phoenix
     interface=sqlalchemy
