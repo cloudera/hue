@@ -826,6 +826,9 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
 
   @classmethod
   def setup_class(cls):
+    if not is_live_cluster():
+      raise SkipTest('These tests can only run on a live cluster')
+
     super(TestHiveserver2ApiWithHadoop, cls).setup_class(load_data=False)
 
 
