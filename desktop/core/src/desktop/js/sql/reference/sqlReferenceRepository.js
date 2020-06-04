@@ -14,9 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ApiHelper from 'api/apiHelper';
 import { matchesType } from './typeUtils';
 import I18n from 'utils/i18n';
+import huePubSub from 'utils/huePubSub';
+import { clearUdfCache, getCachedApiUdfs, setCachedApiUdfs } from './apiCache';
+import { adaptApiUdf, fetchUdfs } from './apiUtils';
+
+export const CLEAR_UDF_CACHE_EVENT = 'hue.clear.udf.cache';
 
 const SET_REFS = {
   impala: async () => import(/* webpackChunkName: "impala-ref" */ './impala/setReference')
@@ -29,9 +33,6 @@ const UDF_REFS = {
   pig: async () => import(/* webpackChunkName: "pig-ref" */ './pig/udfReference')
 };
 
-const DEFAULT_DESCRIPTION = I18n('No description available.');
-const DEFAULT_RETURN_TYPE = ['T'];
-const DEFAULT_ARGUMENTS = [[{ type: 'T', multiple: true }]];
 const IGNORED_UDF_REGEX = /^[!=$%&*+-/<>^|~]+$/;
 
 const mergedUdfPromises = {};
@@ -46,18 +47,6 @@ const getMergedUdfKey = (connector, database) => {
 
 export const hasUdfCategories = connector => typeof UDF_REFS[connector.dialect] !== 'undefined';
 
-// TODO: Extend with arguments etc reported by the API
-const adaptApiUdf = apiUdf => {
-  const signature = apiUdf.name + '()';
-  return {
-    returnTypes: DEFAULT_RETURN_TYPE,
-    arguments: DEFAULT_ARGUMENTS,
-    signature: signature,
-    draggable: signature,
-    description: DEFAULT_DESCRIPTION
-  };
-};
-
 const findUdfsToAdd = (apiUdfs, existingCategories) => {
   const existingUdfNames = new Set();
   existingCategories.forEach(category => {
@@ -69,6 +58,7 @@ const findUdfsToAdd = (apiUdfs, existingCategories) => {
   const result = {};
 
   apiUdfs.forEach(apiUdf => {
+    // TODO: Impala reports the same UDF multiple times, once per argument type.
     if (
       !result[apiUdf.name] &&
       !existingUdfNames.has(apiUdf.name.toUpperCase()) &&
@@ -82,11 +72,15 @@ const findUdfsToAdd = (apiUdfs, existingCategories) => {
 };
 
 const mergeWithApiUdfs = async (categories, connector, database) => {
-  const apiUdfs = await ApiHelper.fetchUdfs({
-    connector: connector,
-    database: database,
-    silenceErrors: true
-  });
+  let apiUdfs = await getCachedApiUdfs(connector, database);
+  if (!apiUdfs) {
+    apiUdfs = await fetchUdfs({
+      connector: connector,
+      database: database,
+      silenceErrors: true
+    });
+    await setCachedApiUdfs(connector, database, apiUdfs);
+  }
 
   if (apiUdfs.length) {
     const additionalUdfs = findUdfsToAdd(apiUdfs, categories);
@@ -203,3 +197,15 @@ export const getSetOptions = async connector => {
   }
   return {};
 };
+
+huePubSub.subscribe(CLEAR_UDF_CACHE_EVENT, async details => {
+  await clearUdfCache(details.connector);
+  Object.keys(mergedUdfPromises).forEach(key => {
+    if (key === details.connector.id || key.indexOf(details.connector.id + '_') === 0) {
+      delete mergedUdfPromises[key];
+    }
+  });
+  if (details.callback) {
+    details.callback();
+  }
+});
