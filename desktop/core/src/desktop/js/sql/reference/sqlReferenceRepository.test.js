@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { getArgumentTypesForUdf } from './sqlReferenceRepository';
-import ApiHelper from 'api/apiHelper';
+import * as apiUtils from 'sql/reference/apiUtils';
 
 describe('sqlReferenceRepository.js', () => {
   const hiveConn = { dialect: 'hive', id: 'hive' };
@@ -85,7 +85,7 @@ describe('sqlReferenceRepository.js', () => {
     ]
   }));
 
-  jest.spyOn(ApiHelper, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
+  jest.spyOn(apiUtils, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
 
   it('should give the expected argument types at a specific position', async () => {
     expect(await getArgumentTypesForUdf(hiveConn, 'cos', 1)).toEqual(['DECIMAL', 'DOUBLE']);

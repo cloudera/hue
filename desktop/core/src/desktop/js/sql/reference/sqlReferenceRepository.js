@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ApiHelper from 'api/apiHelper';
 import { matchesType } from './typeUtils';
 import I18n from 'utils/i18n';
 import huePubSub from 'utils/huePubSub';
-import { clearUdfCache, getCachedApiUdfs, setCachedApiUdfs } from './sqlReferenceRepositoryCache';
+import { clearUdfCache, getCachedApiUdfs, setCachedApiUdfs } from './apiCache';
+import { adaptApiUdf, fetchUdfs } from './apiUtils';
 
 export const CLEAR_UDF_CACHE_EVENT = 'hue.clear.udf.cache';
 
@@ -33,9 +33,6 @@ const UDF_REFS = {
   pig: async () => import(/* webpackChunkName: "pig-ref" */ './pig/udfReference')
 };
 
-const DEFAULT_DESCRIPTION = I18n('No description available.');
-const DEFAULT_RETURN_TYPE = ['T'];
-const DEFAULT_ARGUMENTS = [[{ type: 'T', multiple: true }]];
 const IGNORED_UDF_REGEX = /^[!=$%&*+-/<>^|~]+$/;
 
 const mergedUdfPromises = {};
@@ -49,18 +46,6 @@ const getMergedUdfKey = (connector, database) => {
 };
 
 export const hasUdfCategories = connector => typeof UDF_REFS[connector.dialect] !== 'undefined';
-
-// TODO: Extend with arguments etc reported by the API
-const adaptApiUdf = apiUdf => {
-  const signature = apiUdf.name + '()';
-  return {
-    returnTypes: DEFAULT_RETURN_TYPE,
-    arguments: DEFAULT_ARGUMENTS,
-    signature: signature,
-    draggable: signature,
-    description: DEFAULT_DESCRIPTION
-  };
-};
 
 const findUdfsToAdd = (apiUdfs, existingCategories) => {
   const existingUdfNames = new Set();
@@ -89,7 +74,7 @@ const findUdfsToAdd = (apiUdfs, existingCategories) => {
 const mergeWithApiUdfs = async (categories, connector, database) => {
   let apiUdfs = await getCachedApiUdfs(connector, database);
   if (!apiUdfs) {
-    apiUdfs = await ApiHelper.fetchUdfs({
+    apiUdfs = await fetchUdfs({
       connector: connector,
       database: database,
       silenceErrors: true

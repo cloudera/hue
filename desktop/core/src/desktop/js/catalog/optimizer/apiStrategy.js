@@ -19,19 +19,8 @@ import * as ko from 'knockout';
 
 import CancellablePromise from 'api/cancellablePromise';
 import { simplePost } from 'api/apiUtils';
+import { OPTIMIZER_API } from 'api/urls';
 import BaseStrategy from './baseStrategy';
-
-const OPTIMIZER_URLS = {
-  COMPATIBILITY: '/notebook/api/optimizer/statement/compatibility',
-  RISK: '/notebook/api/optimizer/statement/risk',
-  SIMILARITY: '/notebook/api/optimizer/statement/similarity',
-  TOP_AGGS: '/metadata/api/optimizer/top_aggs',
-  TOP_COLUMNS: '/metadata/api/optimizer/top_columns',
-  TOP_FILTERS: '/metadata/api/optimizer/top_filters',
-  TOP_JOINS: '/metadata/api/optimizer/top_joins',
-  TOP_TABLES: '/metadata/api/optimizer/top_tables',
-  TABLE_DETAILS: '/metadata/api/optimizer/table_details'
-};
 
 /**
  * Fetches the popularity for various aspects of the given tables
@@ -65,7 +54,7 @@ const genericOptimizerMultiTableFetch = (options, url) => {
 
 export default class ApiStrategy extends BaseStrategy {
   analyzeCompatibility(options) {
-    return simplePost(OPTIMIZER_URLS.COMPATIBILITY, {
+    return simplePost(OPTIMIZER_API.COMPATIBILITY, {
       notebook: options.notebookJson,
       snippet: options.snippetJson,
       sourcePlatform: options.sourcePlatform,
@@ -74,14 +63,14 @@ export default class ApiStrategy extends BaseStrategy {
   }
 
   analyzeRisk(options) {
-    return simplePost(OPTIMIZER_URLS.RISK, {
+    return simplePost(OPTIMIZER_API.RISK, {
       notebook: options.notebookJson,
       snippet: options.snippetJson
     });
   }
 
   analyzeSimilarity(options) {
-    return simplePost(OPTIMIZER_URLS.SIMILARITY, {
+    return simplePost(OPTIMIZER_API.SIMILARITY, {
       notebook: options.notebookJson,
       snippet: options.snippetJson,
       sourcePlatform: options.sourcePlatform
@@ -93,12 +82,12 @@ export default class ApiStrategy extends BaseStrategy {
     let url, data;
 
     if (options.paths.length === 1 && options.paths[0].length === 1) {
-      url = OPTIMIZER_URLS.TOP_TABLES;
+      url = OPTIMIZER_API.TOP_TABLES;
       data = {
         database: options.paths[0][0]
       };
     } else {
-      url = OPTIMIZER_URLS.TOP_COLUMNS;
+      url = OPTIMIZER_API.TOP_COLUMNS;
       const dbTables = [];
       options.paths.forEach(path => {
         dbTables.push(path.join('.'));
@@ -121,26 +110,26 @@ export default class ApiStrategy extends BaseStrategy {
   }
 
   fetchTopAggs(options) {
-    return genericOptimizerMultiTableFetch(options, OPTIMIZER_URLS.TOP_AGGS);
+    return genericOptimizerMultiTableFetch(options, OPTIMIZER_API.TOP_AGGS);
   }
 
   fetchTopColumns(options) {
-    return genericOptimizerMultiTableFetch(options, OPTIMIZER_URLS.TOP_COLUMNS);
+    return genericOptimizerMultiTableFetch(options, OPTIMIZER_API.TOP_COLUMNS);
   }
 
   fetchTopFilters(options) {
-    return genericOptimizerMultiTableFetch(options, OPTIMIZER_URLS.TOP_FILTERS);
+    return genericOptimizerMultiTableFetch(options, OPTIMIZER_API.TOP_FILTERS);
   }
 
   fetchTopJoins(options) {
-    return genericOptimizerMultiTableFetch(options, OPTIMIZER_URLS.TOP_JOINS);
+    return genericOptimizerMultiTableFetch(options, OPTIMIZER_API.TOP_JOINS);
   }
 
   fetchOptimizerMeta(options) {
     const deferred = $.Deferred();
 
     const request = simplePost(
-      OPTIMIZER_URLS.TABLE_DETAILS,
+      OPTIMIZER_API.TABLE_DETAILS,
       {
         databaseName: options.path[0],
         tableName: options.path[1]
