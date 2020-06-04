@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,4 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-default_app_config = 'notebook.apps.NotebookConfig'
+import logging
+
+from django.apps import AppConfig
+
+
+LOG = logging.getLogger(__name__)
+
+
+class NotebookConfig(AppConfig):
+  name = 'notebook'
+  verbose_name = "Notebook SQL Assistant"
+
+  def ready(self):
+    from notebook.models import install_custom_examples
+
+    install_custom_examples()

@@ -237,6 +237,31 @@ ENABLE_QUERY_ANALYSIS = Config(
 )
 
 
+EXAMPLES = ConfigSection(
+  key='examples',
+  help=_t('Define which query and table examples can be automatically setup for the available dialects.'),
+  members=dict(
+    AUTO_LOAD=Config(
+      'auto_load',
+      help=_t('If installing the examples automatically at startup.'),
+      type=coerce_bool,
+      default=False
+    ),
+    QUERIES=Config(
+      'queries',
+      help='Names of the saved queries to install. All if empty.',
+      type=coerce_csv,
+      default=[]
+    ),
+    TABLES=Config(
+      key='tables',
+      help=_t('Names of the tables to install. All if empty.'),
+      type=coerce_csv,
+      default=[]
+    )
+  )
+)
+
 def _default_interpreters(user):
   interpreters = []
   apps = appmanager.get_apps_dict(user)
