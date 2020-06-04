@@ -5,12 +5,19 @@ draft: false
 weight: -1
 ---
 
-## Dependencies
+### Python
 
 Hue employs some Python modules which use native code and requires certain development libraries be installed on your system. To install from the tarball, you'll need these library development packages and tools installed on your system:
 
+Versions supported:
 * Python 2.7
-* Python 3 (can be tested cf. instructions on [HUE-8737](https://issues.cloudera.org/browse/HUE-8737))
+* Python 3.5+ (can be tested cf. instructions on [HUE-8737](https://issues.cloudera.org/browse/HUE-8737))
+```
+# If you are using Python 3.5+, set PYTHON_VER before the build, like
+export PYTHON_VER=python3.8
+```
+
+### Database
 * [MySQL InnoDB or PostgreSQL or Oracle](https://www.cloudera.com/documentation/enterprise/latest/topics/hue_dbs_0.html)
 
 
@@ -100,6 +107,10 @@ Install Xcode command line tools
 Fix openssl errors (required for MacOS 10.11+)
 
     export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include
+
+If you are getting **"Could not find Python.h"** message
+
+    export SKIP_PYTHONDEV_CHECK=true
 
 On macOS 10.15+, install an older version of openssl
 
