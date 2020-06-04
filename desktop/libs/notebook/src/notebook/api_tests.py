@@ -576,7 +576,7 @@ class TestNotebookApiMocked(object):
 
     data = json.loads(response.content)
     assert_equal(-1, data['status'], data)
-    assert_equal('The destination is not a empty directory!', data['message'], data)
+    assert_equal('The destination is not an empty directory!', data['message'], data)
 
 
   def test_download_result(self):
