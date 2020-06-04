@@ -212,3 +212,15 @@ export const getSetOptions = async connector => {
   }
   return {};
 };
+
+huePubSub.subscribe(CLEAR_UDF_CACHE_EVENT, async details => {
+  await clearUdfCache(details.connector);
+  Object.keys(mergedUdfPromises).forEach(key => {
+    if (key === details.connector.id || key.indexOf(details.connector.id + '_') === 0) {
+      delete mergedUdfPromises[key];
+    }
+  });
+  if (details.callback) {
+    details.callback();
+  }
+});
