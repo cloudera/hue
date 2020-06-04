@@ -24,7 +24,7 @@ describe('impalaAutocompleteParser.js locations', () => {
   });
 
   const assertAutoComplete = testDefinition => {
-    const debug = true;
+    const debug = false;
     expect(
       impalaAutocompleteParser.parseSql(
         testDefinition.beforeCursor,

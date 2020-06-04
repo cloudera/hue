@@ -2960,18 +2960,18 @@ NonParenthesizedValueExpressionPrimary
        delete $1.lastLoc.identifierChain;
      }
      if ($2.expression) {
-       $$ = { function: fn, expression: $2.expression, types: parser.findReturnTypes(fn) }
+       $$ = { function: fn, expression: $2.expression, types: ['UDFREF'] }
      } else {
-       $$ = { function: fn, types: parser.findReturnTypes(fn) }
+       $$ = { function: fn, types: ['UDFREF'] }
      }
    }
  | ArbitraryFunctionName ArbitraryFunctionRightPart
   {
     parser.addFunctionLocation(@1, $1);
     if ($2.expression) {
-      $$ = { function: $1, expression: $2.expression, types: parser.findReturnTypes($1) }
+      $$ = { function: $1, expression: $2.expression, types: ['UDFREF'] }
     } else {
-      $$ = { function: $1, types: parser.findReturnTypes($1) }
+      $$ = { function: $1, types: ['UDFREF'] }
     }
   }
  | UserDefinedFunction
@@ -3008,7 +3008,7 @@ NonParenthesizedValueExpressionPrimary_EDIT
      if ($2.position) {
        parser.applyArgumentTypesToSuggestions(fn, $2.position);
      }
-     $$ = { types: parser.findReturnTypes(fn) };
+     $$ = { function: fn, types: ['UDFREF'] };
    }
  | ArbitraryFunctionName ArbitraryFunctionRightPart_EDIT
    {
@@ -3016,7 +3016,7 @@ NonParenthesizedValueExpressionPrimary_EDIT
      if ($2.position) {
        parser.applyArgumentTypesToSuggestions($1, $2.position);
      }
-     $$ = { types: parser.findReturnTypes($1) };
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | UserDefinedFunction_EDIT
  | ImpalaInterval_EDIT
@@ -3150,7 +3150,7 @@ SelectSpecification
        if (!parser.yy.selectListAliases) {
          parser.yy.selectListAliases = [];
        }
-       parser.yy.selectListAliases.push({ name: $2.alias, types: $1.types || ['T'] });
+       parser.yy.selectListAliases.push($1.function && $1.types && $1.types.length && $1.types[0] === 'UDFREF' ? { name: $2.alias, udfRef: $1.function, types: $1.types } : { name: $2.alias, types: $1.types || ['T'] });
      } else {
        $$ = { valueExpression: $1 }
      }
@@ -3796,18 +3796,18 @@ ArbitraryFunction
    {
      parser.addFunctionLocation(@1, $1);
      if ($2.expression) {
-       $$ = { function: $1, expression: $2.expression, types: parser.findReturnTypes($1) }
+       $$ = { function: $1, expression: $2.expression, types: ['UDFREF'] }
      } else {
-       $$ = { function: $1, types: parser.findReturnTypes($1) }
+       $$ = { function: $1, types: ['UDFREF'] }
      }
    }
  | ArbitraryFunctionName ArbitraryFunctionRightPart
    {
      parser.addFunctionLocation(@1, $1);
      if ($2.expression) {
-       $$ = { function: $1, expression: $2.expression, types: parser.findReturnTypes($1) }
+       $$ = { function: $1, expression: $2.expression, types: ['UDFREF'] }
      } else {
-       $$ = { function: $1, types: parser.findReturnTypes($1) }
+       $$ = { function: $1, types: ['UDFREF'] }
      }
    }
  ;
@@ -3819,7 +3819,7 @@ ArbitraryFunction_EDIT
      if ($2.position) {
        parser.applyArgumentTypesToSuggestions($1, $2.position);
      }
-     $$ = { types: parser.findReturnTypes($1) };
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | ArbitraryFunctionName ArbitraryFunctionRightPart_EDIT
    {
@@ -3827,7 +3827,7 @@ ArbitraryFunction_EDIT
      if ($2.position) {
        parser.applyArgumentTypesToSuggestions($1, $2.position);
      }
-     $$ = { types: parser.findReturnTypes($1) };
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  ;
 
@@ -3872,8 +3872,8 @@ AggregateFunction_EDIT
  ;
 
 AnalyticFunction
- : 'ANALYTIC' '(' ')'                      -> { types: parser.findReturnTypes($1) }
- | 'ANALYTIC' '(' ValueExpressionList ')'  -> { function: $1, expression: $2, types: parser.findReturnTypes($1) }
+ : 'ANALYTIC' '(' ')'                      -> { function: $1, types: ['UDFREF'] }
+ | 'ANALYTIC' '(' ValueExpressionList ')'  -> { function: $1, expression: $2, types: ['UDFREF'] }
  ;
 
 AnalyticFunction_EDIT
@@ -3881,17 +3881,17 @@ AnalyticFunction_EDIT
    {
      parser.valueExpressionSuggest();
      parser.applyArgumentTypesToSuggestions($1, 1);
-     $$ = { types: parser.findReturnTypes($1) };
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | 'ANALYTIC' '(' ValueExpressionList 'CURSOR' RightParenthesisOrError
    {
      parser.suggestValueExpressionKeywords($3);
-     $$ = { types: parser.findReturnTypes($1) };
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | 'ANALYTIC' '(' ValueExpressionList_EDIT RightParenthesisOrError
    {
      parser.applyArgumentTypesToSuggestions($1, $3.position);
-     $$ = { types: parser.findReturnTypes($1) };
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  ;
 
@@ -4218,9 +4218,9 @@ CastFunction_EDIT
  ;
 
 CountFunction
- : 'COUNT' '(' '*' ')'                                        -> { types: parser.findReturnTypes($1) }
- | 'COUNT' '(' ')'                                            -> { types: parser.findReturnTypes($1) }
- | 'COUNT' '(' OptionalAllOrDistinct ValueExpressionList ')'  -> { types: parser.findReturnTypes($1) }
+ : 'COUNT' '(' '*' ')'                                        -> { function: $1, types: ['UDFREF'] }
+ | 'COUNT' '(' ')'                                            -> { function: $1, types: ['UDFREF'] }
+ | 'COUNT' '(' OptionalAllOrDistinct ValueExpressionList ')'  -> { function: $1, types: ['UDFREF'] }
  ;
 
 CountFunction_EDIT
@@ -4238,12 +4238,12 @@ CountFunction_EDIT
        }
      }
      parser.suggestKeywords(keywords);
-     $$ = { types: parser.findReturnTypes($1) };
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | 'COUNT' '(' OptionalAllOrDistinct ValueExpressionList 'CURSOR' RightParenthesisOrError
    {
      parser.suggestValueExpressionKeywords($4);
-     $$ = { types: parser.findReturnTypes($1) };
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | 'COUNT' '(' OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
    {
@@ -4257,7 +4257,7 @@ CountFunction_EDIT
        }
        parser.suggestKeywords(keywords);
      }
-     $$ = { types: parser.findReturnTypes($1) };
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  ;
 
@@ -4307,8 +4307,8 @@ HiveDateField
  ;
 
 OtherAggregateFunction
- : OtherAggregateFunction_Type '(' OptionalAllOrDistinct ')'                      -> { types: parser.findReturnTypes($1) }
- | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ValueExpressionList ')'  -> { types: parser.findReturnTypes($1) }
+ : OtherAggregateFunction_Type '(' OptionalAllOrDistinct ')'                      -> { function: $1, types: ['UDFREF'] }
+ | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ValueExpressionList ')'  -> { function: $1, types: ['UDFREF'] }
  ;
 
 OtherAggregateFunction_EDIT
@@ -4331,12 +4331,12 @@ OtherAggregateFunction_EDIT
      }
      parser.suggestKeywords(keywords);
      parser.applyArgumentTypesToSuggestions($1, 1);
-     $$ = { types: parser.findReturnTypes($1) };
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ValueExpressionList 'CURSOR' RightParenthesisOrError
    {
      parser.suggestValueExpressionKeywords($4);
-     $$ = { types: parser.findReturnTypes($1) };
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
    {
@@ -4360,7 +4360,7 @@ OtherAggregateFunction_EDIT
      if (parser.yy.result.suggestFunctions && !parser.yy.result.suggestFunctions.types) {
        parser.applyArgumentTypesToSuggestions($1, $4.position);
      }
-     $$ = { types: parser.findReturnTypes($1) };
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  ;
 
@@ -4399,57 +4399,57 @@ ImpalaExtractFunction_EDIT
  : '<impala>EXTRACT' '(' AnyCursor FromOrComma ValueExpression RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
-     parser.applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
-     $$ = { types: parser.findReturnTypes($1) };
+     parser.applyTypeToSuggestions({ types: $4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP'] });
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | '<impala>EXTRACT' '(' AnyCursor FromOrComma RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
-     parser.applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
-     $$ = { types: parser.findReturnTypes($1) };
+     parser.applyTypeToSuggestions({ types: $4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP'] });
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | '<impala>EXTRACT' '(' AnyCursor RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
-     parser.applyTypeToSuggestions(['STRING', 'TIMESTAMP']);
-     $$ = { types: parser.findReturnTypes($1) };
+     parser.applyTypeToSuggestions({ types: ['STRING', 'TIMESTAMP'] });
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | '<impala>EXTRACT' '(' ValueExpression_EDIT FromOrComma ValueExpression RightParenthesisOrError
    {
-     parser.applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
-     $$ = { types: parser.findReturnTypes($1) };
+     parser.applyTypeToSuggestions({ types: $4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP'] });
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | '<impala>EXTRACT' '(' ValueExpression_EDIT FromOrComma RightParenthesisOrError
    {
-     parser.applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
-     $$ = { types: parser.findReturnTypes($1) };
+     parser.applyTypeToSuggestions({ types: $4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP'] });
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | '<impala>EXTRACT' '(' ValueExpression_EDIT RightParenthesisOrError
    {
-     parser.applyTypeToSuggestions(['STRING', 'TIMESTAMP']);
-     $$ = { types: parser.findReturnTypes($1) };
+     parser.applyTypeToSuggestions({ types: ['STRING', 'TIMESTAMP'] });
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | '<impala>EXTRACT' '(' ValueExpression FromOrComma AnyCursor RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
-     parser.applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
-     $$ = { types: parser.findReturnTypes($1) };
+     parser.applyTypeToSuggestions({ types: $4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING'] });
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | '<impala>EXTRACT' '(' FromOrComma AnyCursor RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
-     parser.applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
-     $$ = { types: parser.findReturnTypes($1) };
+     parser.applyTypeToSuggestions({ types: $4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING'] });
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | '<impala>EXTRACT' '(' ValueExpression FromOrComma ValueExpression_EDIT RightParenthesisOrError
    {
-     parser.applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
-     $$ = { types: parser.findReturnTypes($1) };
+     parser.applyTypeToSuggestions({ types: $4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING'] });
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | '<impala>EXTRACT' '(' FromOrComma ValueExpression_EDIT RightParenthesisOrError
    {
-    parser.applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
-     $$ = { types: parser.findReturnTypes($1) };
+    parser.applyTypeToSuggestions({ types: $4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING'] });
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | '<impala>EXTRACT' '(' ValueExpression 'CURSOR' ValueExpression RightParenthesisOrError
    {
@@ -4458,7 +4458,7 @@ ImpalaExtractFunction_EDIT
      } else {
        parser.suggestValueExpressionKeywords($3);
      }
-     $$ = { types: parser.findReturnTypes($1) };
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | '<impala>EXTRACT' '(' ValueExpression 'CURSOR' RightParenthesisOrError
    {
@@ -4467,7 +4467,7 @@ ImpalaExtractFunction_EDIT
      } else {
        parser.suggestValueExpressionKeywords($3);
      }
-     $$ = { types: parser.findReturnTypes($1) };
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  ;
 
@@ -4477,8 +4477,8 @@ FromOrComma
  ;
 
 SumFunction
- : 'SUM' '(' OptionalAllOrDistinct ValueExpression ')'  -> { types: parser.findReturnTypes($1) }
- | 'SUM' '(' ')'                                        -> { types: parser.findReturnTypes($1) }
+ : 'SUM' '(' OptionalAllOrDistinct ValueExpression ')'  -> { function: $1, types: ['UDFREF'] }
+ | 'SUM' '(' ')'                                        -> { function: $1, types: ['UDFREF'] }
  ;
 
 SumFunction_EDIT
@@ -4497,19 +4497,19 @@ SumFunction_EDIT
        keywords = parser.yy.result.suggestKeywords.concat(keywords);
      }
      parser.suggestKeywords(keywords);
-     $$ = { types: parser.findReturnTypes($1) };
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | 'SUM' '(' OptionalAllOrDistinct ValueExpression 'CURSOR' RightParenthesisOrError
    {
      parser.suggestValueExpressionKeywords($4);
-     $$ = { types: parser.findReturnTypes($1) };
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  | 'SUM' '(' OptionalAllOrDistinct ValueExpression_EDIT RightParenthesisOrError
    {
      if (parser.yy.result.suggestFunctions && ! parser.yy.result.suggestFunctions.types) {
        parser.applyArgumentTypesToSuggestions($1, 1);
      }
-     $$ = { types: parser.findReturnTypes($1) };
+     $$ = { function: $1, types: ['UDFREF'] };
    }
  ;
 

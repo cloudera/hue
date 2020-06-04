@@ -25,7 +25,7 @@ describe('calciteAutocompleteParser.js locations', () => {
   });
 
   const assertAutoComplete = testDefinition => {
-    const debug = true;
+    const debug = false;
     expect(
       calciteAutocompleteParser.parseSql(
         testDefinition.beforeCursor,
