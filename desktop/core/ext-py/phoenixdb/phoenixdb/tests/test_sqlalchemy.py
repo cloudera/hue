@@ -52,6 +52,25 @@ class SQLAlchemyTest(unittest.TestCase):
             finally:
                 connection.execute('drop table if exists ALCHEMY_TEST')
 
+    def test_reflection(self):
+        engine = self._create_engine()
+        with engine.connect() as connection:
+            try:
+                inspector = db.inspect(engine)
+                columns_result = inspector.get_columns('DOES_NOT_EXIST')
+                self.assertEqual([], columns_result)
+                connection.execute('drop table if exists us_population')
+                connection.execute(text('''create table if not exists US_POPULATION (
+                state CHAR(2) NOT NULL,
+                city VARCHAR NOT NULL,
+                population BIGINT
+                CONSTRAINT my_pk PRIMARY KEY (state, city))'''))
+                columns_result = inspector.get_columns('us_population')
+                self.assertEqual(len(columns_result), 3)
+                print(columns_result)
+            finally:
+                connection.execute('drop table if exists us_population')
+
     @unittest.skip("ORM feature not implemented")
     def test_orm(self):
         pass

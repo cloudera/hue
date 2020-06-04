@@ -137,24 +137,24 @@ class PhoenixDialect(DefaultDialect):
 
     def get_columns(self, connection, table_name, schema=None, **kw):
         if schema is None:
-            query = "SELECT COLUMN_NAME,  DATA_TYPE, NULLABLE " \
-                    "FROM system.catalog " \
-                    "WHERE table_name = ? " \
-                    "ORDER BY ORDINAL_POSITION"
+            query = """SELECT COLUMN_NAME,  DATA_TYPE, NULLABLE
+                    FROM system.catalog
+                    WHERE table_name = ?
+                    AND ORDINAL_POSITION is not null
+                    ORDER BY ORDINAL_POSITION"""
             params = [table_name.upper()]
         else:
-            query = "SELECT COLUMN_NAME, DATA_TYPE, NULLABLE " \
-                    "FROM system.catalog " \
-                    "WHERE TABLE_SCHEM = ? " \
-                    "AND table_name = ? " \
-                    "ORDER BY ORDINAL_POSITION"
+            query = """SELECT COLUMN_NAME, DATA_TYPE, NULLABLE
+                    FROM system.catalog
+                    WHERE TABLE_SCHEM = ?
+                    AND table_name = ?
+                    AND ORDINAL_POSITION is not null
+                    ORDER BY ORDINAL_POSITION"""
             params = [schema.upper(), table_name.upper()]
 
         # get all of the fields for this table
         c = connection.execute(query, params)
         cols = []
-        # first always none
-        c.fetchone()
         while True:
             row = c.fetchone()
             if row is None:
