@@ -11,5 +11,5 @@ Note: in development mode (when using `runserver` and not `runcpserver`), the co
 
 The most important sections to configure are about the:
 
-* [Hue service](/administrator/configuration/server/). e.g. pointing the application to a relational database where Hue saves users and queries, selecting the login method, customizing the look & feel, activating the task server service...
+* [Hue Server](/administrator/configuration/server/). e.g. pointing the application to a relational database where Hue saves users and queries, selecting the login method, customizing the look & feel, activating the task server service...
 * [Connectors](/administrator/configuration/connectors/). e.g. pointing to Data Warehouse services you want to make easy to query or browse. Those are typically which databases we want users to query with SQL or filesystems to browse.
