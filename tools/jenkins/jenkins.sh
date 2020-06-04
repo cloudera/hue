@@ -45,8 +45,10 @@ build_sqoop
 
 make apps
 
-build/env/bin/pip install pylint
-ln -s $(which pylint) build/env/bin/pylint
+if ! [ -x "$(command -v pylint)" ]; then
+    build/env/bin/pip install pylint
+fi
+ln -sf $(which pylint) build/env/bin/pylint
 
 build/env/bin/hue runpylint > PYLINT.txt
 
