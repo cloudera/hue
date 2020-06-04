@@ -14,6 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { matchesType } from './typeUtils';
+import I18n from 'utils/i18n';
+import huePubSub from 'utils/huePubSub';
+import { clearUdfCache, getCachedApiUdfs, setCachedApiUdfs } from './apiCache';
+import { adaptApiUdf, fetchUdfs } from './apiUtils';
+
+export const CLEAR_UDF_CACHE_EVENT = 'hue.clear.udf.cache';
+
 const SET_REFS = {
   impala: async () => import(/* webpackChunkName: "impala-ref" */ './impala/setReference')
 };
@@ -25,20 +33,88 @@ const UDF_REFS = {
   pig: async () => import(/* webpackChunkName: "pig-ref" */ './pig/udfReference')
 };
 
-export const hasUdfCategories = connector => typeof UDF_REFS[connector.dialect] !== 'undefined';
+const IGNORED_UDF_REGEX = /^[!=$%&*+-/<>^|~]+$/;
 
-export const getUdfCategories = async connector => {
-  if (UDF_REFS[connector.dialect]) {
-    const module = await UDF_REFS[connector.dialect]();
-    if (module.UDF_CATEGORIES) {
-      return module.UDF_CATEGORIES;
-    }
+const mergedUdfPromises = {};
+
+const getMergedUdfKey = (connector, database) => {
+  let key = connector.id;
+  if (database) {
+    key += '_' + database;
   }
-  // TODO: Fetch from API and diff/merge
-  return [];
+  return key;
 };
 
-export const findFunction = async (connector, functionName) => {
+export const hasUdfCategories = connector => typeof UDF_REFS[connector.dialect] !== 'undefined';
+
+const findUdfsToAdd = (apiUdfs, existingCategories) => {
+  const existingUdfNames = new Set();
+  existingCategories.forEach(category => {
+    Object.keys(category.functions).forEach(udfName => {
+      existingUdfNames.add(udfName.toUpperCase());
+    });
+  });
+
+  const result = {};
+
+  apiUdfs.forEach(apiUdf => {
+    // TODO: Impala reports the same UDF multiple times, once per argument type.
+    if (
+      !result[apiUdf.name] &&
+      !existingUdfNames.has(apiUdf.name.toUpperCase()) &&
+      !IGNORED_UDF_REGEX.test(apiUdf.name)
+    ) {
+      result[apiUdf.name] = adaptApiUdf(apiUdf);
+    }
+  });
+
+  return result;
+};
+
+const mergeWithApiUdfs = async (categories, connector, database) => {
+  let apiUdfs = await getCachedApiUdfs(connector, database);
+  if (!apiUdfs) {
+    apiUdfs = await fetchUdfs({
+      connector: connector,
+      database: database,
+      silenceErrors: true
+    });
+    await setCachedApiUdfs(connector, database, apiUdfs);
+  }
+
+  if (apiUdfs.length) {
+    const additionalUdfs = findUdfsToAdd(apiUdfs, categories);
+    if (Object.keys(additionalUdfs).length) {
+      const generalCategory = {
+        name: I18n('General'),
+        functions: additionalUdfs
+      };
+      categories.unshift(generalCategory);
+    }
+  }
+};
+
+export const getUdfCategories = async (connector, database) => {
+  const promiseKey = getMergedUdfKey(connector, database);
+  if (!mergedUdfPromises[promiseKey]) {
+    mergedUdfPromises[promiseKey] = new Promise(async resolve => {
+      let categories = [];
+      if (UDF_REFS[connector.dialect]) {
+        const module = await UDF_REFS[connector.dialect]();
+        if (module.UDF_CATEGORIES) {
+          categories = module.UDF_CATEGORIES;
+        }
+      }
+      await mergeWithApiUdfs(categories, connector, database);
+
+      resolve(categories);
+    });
+  }
+
+  return await mergedUdfPromises[promiseKey];
+};
+
+export const findUdf = async (connector, functionName) => {
   const categories = await getUdfCategories(connector);
   let found = undefined;
   categories.some(category => {
@@ -50,8 +126,44 @@ export const findFunction = async (connector, functionName) => {
   return found;
 };
 
-export const getArgumentTypes = async (connector, functionName, argumentPosition) => {
-  const foundFunction = await findFunction(connector, functionName);
+export const getReturnTypesForUdf = async (connector, functionName) => {
+  if (!functionName) {
+    return ['T'];
+  }
+  const udf = await findUdf(connector, functionName);
+  if (!udf || !udf.returnTypes) {
+    return ['T'];
+  }
+  return udf.returnTypes;
+};
+
+export const getUdfsWithReturnTypes = async (
+  connector,
+  returnTypes,
+  includeAggregate,
+  includeAnalytic
+) => {
+  const categories = await getUdfCategories(connector);
+  const result = {};
+  categories.forEach(category => {
+    if (
+      (!category.isAnalytic && !category.isAggregate) ||
+      (includeAggregate && category.isAggregate) ||
+      (includeAnalytic && category.isAnalytic)
+    ) {
+      Object.keys(category.functions).forEach(udfName => {
+        const udf = category.functions[udfName];
+        if (!returnTypes || matchesType(connector, returnTypes, udf.returnTypes)) {
+          result[udfName] = udf;
+        }
+      });
+    }
+  });
+  return result;
+};
+
+export const getArgumentTypesForUdf = async (connector, functionName, argumentPosition) => {
+  const foundFunction = await findUdf(connector, functionName);
   if (!foundFunction) {
     return ['T'];
   }
@@ -75,3 +187,25 @@ export const getArgumentTypes = async (connector, functionName, argumentPosition
     })
     .sort();
 };
+
+export const getSetOptions = async connector => {
+  if (SET_REFS[connector.dialect]) {
+    const module = await SET_REFS[connector.dialect]();
+    if (module.SET_OPTIONS) {
+      return module.SET_OPTIONS;
+    }
+  }
+  return {};
+};
+
+huePubSub.subscribe(CLEAR_UDF_CACHE_EVENT, async details => {
+  await clearUdfCache(details.connector);
+  Object.keys(mergedUdfPromises).forEach(key => {
+    if (key === details.connector.id || key.indexOf(details.connector.id + '_') === 0) {
+      delete mergedUdfPromises[key];
+    }
+  });
+  if (details.callback) {
+    details.callback();
+  }
+});

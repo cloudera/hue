@@ -25,7 +25,7 @@ describe('phoenixAutocompleteParser.js locations', () => {
   });
 
   const assertAutoComplete = testDefinition => {
-    const debug = true;
+    const debug = false;
     expect(
       phoenixAutocompleteParser.parseSql(
         testDefinition.beforeCursor,

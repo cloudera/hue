@@ -16,14 +16,17 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
+import ApiHelper from 'api/apiHelper';
+import * as apiUtils from 'sql/reference/apiUtils';
 import AssistFunctionsPanel from './ko.assistFunctionsPanel';
-import apiHelper from 'api/apiHelper';
 import { refreshConfig } from 'utils/hueConfig';
 import { sleep } from 'utils/hueUtils';
 
 describe('ko.assistFunctionsPanel.js', () => {
+  jest.spyOn(apiUtils, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
+
   it('should handle cluster config updates', async () => {
-    const spy = jest.spyOn(apiHelper, 'getClusterConfig').mockImplementation(() =>
+    const spy = jest.spyOn(ApiHelper, 'getClusterConfig').mockImplementation(() =>
       $.Deferred()
         .resolve({
           status: 0,
@@ -57,7 +60,7 @@ describe('ko.assistFunctionsPanel.js', () => {
 
     spy.mockRestore();
 
-    const changeSpy = jest.spyOn(apiHelper, 'getClusterConfig').mockImplementation(() =>
+    const changeSpy = jest.spyOn(ApiHelper, 'getClusterConfig').mockImplementation(() =>
       $.Deferred()
         .resolve({
           status: 0,
