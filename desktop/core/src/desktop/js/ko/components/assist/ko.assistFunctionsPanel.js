@@ -21,7 +21,11 @@ import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'utils/hueConfig';
-import { getUdfCategories, hasUdfCategories } from 'sql/reference/sqlReferenceRepository';
+import {
+  CLEAR_UDF_CACHE_EVENT,
+  getUdfCategories,
+  hasUdfCategories
+} from 'sql/reference/sqlReferenceRepository';
 import { HUE_DROP_DOWN_COMPONENT } from 'ko/components/ko.dropDown';
 
 export const NAME = 'assist-functions-panel';
@@ -31,7 +35,7 @@ const TEMPLATE = `
     <div class="assist-flex-panel">
       <div class="assist-flex-header">
         <div class="assist-inner-header">
-          <div class="function-dialect-dropdown" data-bind="
+          <div class="function-dialect-dropdown" style="display: inline-block" data-bind="
               component: {
                 name: '${ HUE_DROP_DOWN_COMPONENT }',
                 params: {
@@ -40,8 +44,18 @@ const TEMPLATE = `
                   entries: availableConnectorUdfs,
                   linkTitle: '${I18n('Selected type')}'
                  }
-               }
-             " style="display: inline-block"></div>
+              }
+            "></div>
+            <div class="pull-right" style="margin-right: 15px;" data-bind="with: activeConnectorUdfs">
+               <!-- ko ifnot: loading -->
+                 <a class="inactive-action" href="javascript:void(0)" data-bind="click: refresh" title="${I18n('Refresh')}">
+                   <i class="pointer fa fa-refresh"></i>
+                 </a>
+               <!-- /ko -->
+               <!-- ko if: loading -->
+                 <i class="fa fa-refresh fa-spin blue"></i>
+               <!-- /ko -->
+            </div>
         </div>
       </div>
       <!-- ko with: activeConnectorUdfs -->
@@ -101,9 +115,11 @@ class ConnectorUdfCategories {
   constructor(connector) {
     this.connector = connector;
     this.loading = ko.observable(true);
+    this.initialized = false;
+
     this.label = this.connector.displayName;
 
-    this.categories = [];
+    this.categories = ko.observableArray([]);
 
     this.query = ko.observable().extend({ rateLimit: 400 });
 
@@ -160,13 +176,27 @@ class ConnectorUdfCategories {
       });
       return result;
     });
+  }
 
-    this.fetchUdfs().then(() => {
-      this.loading(false);
+  async init() {
+    if (this.initialized) {
+      return;
+    }
+    await this.fetchUdfs();
+    this.initialized = true;
+  }
+
+  async refresh() {
+    this.loading(true);
+    huePubSub.publish(CLEAR_UDF_CACHE_EVENT, {
+      connector: this.connector,
+      callback: this.fetchUdfs.bind(this)
     });
   }
 
   async fetchUdfs() {
+    this.loading(true);
+    const categories = [];
     const functions = await getUdfCategories(this.connector);
     functions.forEach(category => {
       const koCategory = {
@@ -186,8 +216,10 @@ class ConnectorUdfCategories {
       koCategory.functions.forEach(fn => {
         fn.category = koCategory;
       });
-      this.categories.push(koCategory);
+      categories.push(koCategory);
     });
+    this.categories(categories);
+    this.loading(false);
   }
 }
 
@@ -200,7 +232,8 @@ class AssistFunctionsPanel {
     this.availableConnectorUdfs = ko.observableArray();
     this.activeConnectorUdfs = ko.observable();
 
-    this.activeConnectorUdfs.subscribe(activeConnectorUdfs => {
+    this.activeConnectorUdfs.subscribe(async activeConnectorUdfs => {
+      await activeConnectorUdfs.init();
       apiHelper.setInTotalStorage(
         'assist',
         'function.panel.active.connector.type',
