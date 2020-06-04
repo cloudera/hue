@@ -45,6 +45,9 @@ build_sqoop
 
 make apps
 
+build/env/bin/pip install pylint
+ln -s $(which pylint) build/env/bin/pylint
+
 build/env/bin/hue runpylint > PYLINT.txt
 
 rm -f JAVASCRIPTLINT.txt
