@@ -25,7 +25,7 @@ describe('flinkAutocompleteParser.js locations', () => {
   });
 
   const assertAutoComplete = testDefinition => {
-    const debug = true;
+    const debug = false;
     expect(
       flinkAutocompleteParser.parseSql(
         testDefinition.beforeCursor,

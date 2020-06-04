@@ -242,7 +242,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
-      'trim_statement_semicolon': False,
+      'trim_statement_semicolon': True,
     }
   },
   {
