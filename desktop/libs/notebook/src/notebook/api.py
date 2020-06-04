@@ -127,15 +127,14 @@ def _execute_notebook(request, notebook, snippet):
   response = {'status': -1}
   result = None
   history = None
+  active_executable = None
 
   historify = (notebook['type'] != 'notebook' or snippet.get('wasBatchExecuted')) and not notebook.get('skipHistorify')
 
   try:
     try:
       sessions = notebook.get('sessions') and notebook['sessions'] # Session reference for snippet execution without persisting it
-
       active_executable = json.loads(request.POST.get('executable', '{}')) # Editor v2
-
       # TODO: Use statement, database etc. from active_executable
 
       if historify:
