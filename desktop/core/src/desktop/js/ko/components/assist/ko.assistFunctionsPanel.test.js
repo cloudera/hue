@@ -17,12 +17,13 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import ApiHelper from 'api/apiHelper';
+import * as apiUtils from 'sql/reference/apiUtils';
 import AssistFunctionsPanel from './ko.assistFunctionsPanel';
 import { refreshConfig } from 'utils/hueConfig';
 import { sleep } from 'utils/hueUtils';
 
 describe('ko.assistFunctionsPanel.js', () => {
-  jest.spyOn(ApiHelper, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
+  jest.spyOn(apiUtils, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
 
   it('should handle cluster config updates', async () => {
     const spy = jest.spyOn(ApiHelper, 'getClusterConfig').mockImplementation(() =>
