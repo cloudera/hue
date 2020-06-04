@@ -531,7 +531,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
             <script id="logTemplate" type="text/html">
               <div data-bind="css:{'alert-modified': name != '', 'alert': name != '', 'alert-success': (status == 'SUCCEEDED' || status == 'OK') && isReallyDone, 'alert-error': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}">
                 <div class="pull-right">
-                  ${ _('Status:') } <a data-bind="text: status, visible: absoluteUrl != '', attr: {'href': absoluteUrl}" target="_blank"></a> <i class="fa fa-share"></i>
+                    ${ _('Status:') } <a data-bind="text: status, visible: absoluteUrl != '', attr: {'href': absoluteUrl}" target="_blank"/> <i class="fa fa-share"></i>
                 </div>
                 <h4>${ _('Progress:') } <span data-bind="text: progress"></span>${ _('%') }</h4>
                 <div data-bind="css: {'progress': name != '', 'progress-striped': name != '', 'active': status == 'RUNNING'}" style="margin-top:10px">

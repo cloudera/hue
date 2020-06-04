@@ -451,31 +451,31 @@ const TEMPLATE = `
 
     <div data-bind="visible: hasDataForChart" style="display:none">
       <!-- ko if: isPieChart -->
-      <div class="chart" data-bind="attr: { 'id': chartId }, pieChart: pieChartParams()"></div>
+      <div class="chart" data-bind="attr: { 'id': chartId }, pieChart: pieChartParams()" />
       <!-- /ko -->
 
       <!-- ko if: isBarChart -->
-      <div class="chart" data-bind="attr: { 'id': chartId }, barChart: barChartParams()"></div>
+      <div class="chart" data-bind="attr: { 'id': chartId }, barChart: barChartParams()" />
       <!-- /ko -->
 
       <!-- ko if: isLineChart -->
-      <div class="chart" data-bind="attr: { 'id': chartId }, lineChart: lineChartParams()"></div>
+      <div class="chart" data-bind="attr: { 'id': chartId }, lineChart: lineChartParams()" />
       <!-- /ko -->
 
       <!-- ko if: isTimelineChart -->
-      <div class="chart" data-bind="attr:{ 'id': chartId }, timelineChart: timeLineChartParams()"></div>
+      <div class="chart" data-bind="attr:{ 'id': chartId }, timelineChart: timeLineChartParams()" />
       <!-- /ko -->
 
       <!-- ko if: isMapChart -->
-      <div class="chart" data-bind="attr:{ 'id': chartId }, leafletMapChart: leafletMapChartParams()"></div>
+      <div class="chart" data-bind="attr:{ 'id': chartId }, leafletMapChart: leafletMapChartParams()" />
       <!-- /ko -->
 
       <!-- ko if: isGradientMapChart -->
-      <div class="chart" data-bind="attr:{ 'id': chartId }, mapChart: mapChartParams()"></div>
+      <div class="chart" data-bind="attr:{ 'id': chartId }, mapChart: mapChartParams()" />
       <!-- /ko -->
 
       <!-- ko if: isScatterChart -->
-      <div class="chart" data-bind="attr:{ 'id': chartId }, scatterChart: scatterChartParams()"></div>
+      <div class="chart" data-bind="attr:{ 'id': chartId }, scatterChart: scatterChartParams()" />
       <!-- /ko -->
     </div>
   </div>

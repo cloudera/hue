@@ -1234,9 +1234,9 @@
 
   <script type ="text/html" id="snippet-execution-controls${ suffix }">
     <div class="snippet-actions clearfix">
-      <div class="pull-left" data-bind="component: { name: 'executable-actions', params: { activeExecutable: activeExecutable, beforeExecute: beforeExecute } }"></div>
+      <div class="pull-left" data-bind="component: { name: 'executable-actions', params: { activeExecutable: activeExecutable, beforeExecute: beforeExecute } }" />
       <!-- ko if: isSqlDialect() && !$root.isPresentationMode() -->
-      <div class="pull-right" data-bind="component: { name: 'snippet-editor-actions', params: { snippet: $data } }"></div>
+      <div class="pull-right" data-bind="component: { name: 'snippet-editor-actions', params: { snippet: $data } }" />
       <!-- /ko -->
       <div class="pull-right">
         <!-- ko if: status() === 'loading' -->
