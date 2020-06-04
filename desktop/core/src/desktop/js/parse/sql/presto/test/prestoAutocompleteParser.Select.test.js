@@ -983,7 +983,7 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
           subQueries: [
             {
               alias: 'ttaSum',
-              columns: [{ alias: 'total', type: 'DOUBLE' }]
+              columns: [{ alias: 'total', type: 'UDFREF', udfRef: 'sum' }]
             }
           ],
           suggestIdentifiers: [
@@ -4101,7 +4101,8 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
           lowerCase: false,
           suggestColumns: {
             source: 'where',
-            types: ['DOUBLE'],
+            types: ['UDFREF'],
+            udfRef: 'cos',
             identifierChain: [{ name: 'bla' }],
             tables: [{ identifierChain: [{ name: 'tbl2' }] }]
           }
@@ -5912,7 +5913,7 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
           suggestFunctions: {},
           suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
           suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-          suggestColumnAliases: [{ name: 'boo', types: ['BIGINT'] }]
+          suggestColumnAliases: [{ name: 'boo', udfRef: 'count', types: ['UDFREF'] }]
         }
       });
     });
@@ -7707,7 +7708,7 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
                   columns: [
                     { identifierChain: [{ name: 'testTable' }, { name: 'a' }], type: 'COLREF' },
                     { identifierChain: [{ name: 'testTable' }, { name: 'b' }], type: 'COLREF' },
-                    { alias: 'bla', type: 'DOUBLE' }
+                    { alias: 'bla', type: 'UDFREF', udfRef: 'abs' }
                   ]
                 }
               ]

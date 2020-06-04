@@ -1692,8 +1692,8 @@ const ANALYTIC_FUNCTIONS = {
 };
 
 export const UDF_CATEGORIES = [
-  { name: I18n('Aggregate'), functions: AGGREGATE_FUNCTIONS },
-  { name: I18n('Analytic'), functions: ANALYTIC_FUNCTIONS },
+  { name: I18n('Aggregate'), isAggregate: true, functions: AGGREGATE_FUNCTIONS },
+  { name: I18n('Analytic'), isAnalytic: true, functions: ANALYTIC_FUNCTIONS },
   { name: I18n('Collection'), functions: COLLECTION_FUNCTIONS },
   { name: I18n('Complex Type'), functions: COMPLEX_TYPE_CONSTRUCTS },
   { name: I18n('Conditional'), functions: CONDITIONAL_FUNCTIONS },
