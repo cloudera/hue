@@ -40,25 +40,21 @@ categories:
   - Querying
   - Browsing
   - Version 4
-  # - Version 4.5
+  - Version 4.8
 
 ---
 [Apache Phoenix][1] is a great addon to extent SQL on top of [Apache HBase][2], the non relational distributed data store. On top of the [HBase Browser][3], now the [Editor][4] provides a more common syntax for querying the data. Note that being a key/value store, the SQL can have different idioms, and the Editor interface still requires some polishing to fully support all the SQL UX capabilities of Hue.
 
-In this first blog post about Phoenix, let&#8217;s follow [Phoenix&#8217;s 15-minute tutorial][5] then query the US_POPULATION table via the Editor:
+In this post about Phoenix, let's follow [Phoenix's 15-minute tutorial][5] then query the US_POPULATION table via the Editor:
 
-Hue supports JDBC or SqlAlchemy interfaces as described in the [SQL Connector documentation][6] and we pick SqlAlchemy:
+Hue supports Phoenix the best via the SqlAlchemy interfaces as described in the [SQL Connector documentation][https://docs.gethue.com/administrator/configuration/connectors/#apache-phoenix]. Since [HUE-9367](https://issues.cloudera.org/browse/HUE-9367) the connector is shipped with Hue so it all works out of the box.
 
-On the Hue host:
-
-    ./build/env/bin/pip install pyPhoenix
-
-Then in the desktop/conf/hue.ini config file section:
+In the desktop/conf/hue.ini config file section just add the Phoenix interpreter:
 
     [notebook]
     [[interpreters]]
     [[[phoenix]]]
-    name = phoenix
+    name=phoenix
     interface=sqlalchemy
     options='{"url": "phoenix://sql-phoenix.gethue.com:8765/"}'
 
@@ -74,7 +70,7 @@ Then start the Phoenix queryserver:
 
 And we are ready to query HBase!
 
-    select * from us_population limit 10
+    SELECT * FROM us_population LIMIT 10
 
 <a href="https://cdn.gethue.com/uploads/2019/07/editor_phoenix_select.png"><img src="https://cdn.gethue.com/uploads/2019/07/editor_phoenix_select.png" /></a>
 
@@ -97,13 +93,9 @@ Error: ERROR 505 (42000): Table is read only. (state=42000,code=505)
 0: jdbc:phoenix:&gt; select * from "analytics_demo" where pk = "domain.0" limit 5;
 </code></pre>
 
-**3** Phoenix follows Apache Calcite. Feel free to help improve [the SQL autocomplete][9] support for it.
+**3** Phoenix follows Apache Calcite. Feel free to help improve the [SQL autocomplete](https://docs.gethue.com/developer/parsers/) support for it.
 
-**4** Skip the semicolon &#8216;;&#8217;
-
-**5** Not tested with security
-
-**6** List of some of the known issues are listed on the [Phoenix SqlAlchemy connector page][10]
+**4** The UI (and the underlying SQLAlchemy API) cannot distinguish between 'ANY namespace' and 'empty/Default' namespace
 
 &nbsp;
 
@@ -118,9 +110,3 @@ Feel free to read more about Apache Phoenix capabilities in this Cloudera blog p
  [3]: https://gethue.com/improved-hbase-cell-editor-history/
  [4]: https://gethue.com/sql-editor/
  [5]: https://phoenix.apache.org/Phoenix-in-15-minutes-or-less.html
- [6]: https://docs.gethue.com/administrator/configuration/editor/#phoenix
- [7]: https://cdn.gethue.com/uploads/2019/07/editor_phoenix_select.png
- [8]: https://cdn.gethue.com/uploads/2019/07/phonix_select_shell.png
- [9]: https://docs.gethue.com/developer/parsers/
- [10]: https://github.com/Pirionfr/pyPhoenix
- [11]: https://blog.cloudera.com/blog/2019/07/apache-phoenix-for-cdh/
