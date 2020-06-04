@@ -182,7 +182,7 @@ class ConnectorUdfCategories {
     if (this.initialized) {
       return;
     }
-    await this.fetchUdfs();
+    await this.getUdfs();
     this.initialized = true;
   }
 
@@ -190,11 +190,11 @@ class ConnectorUdfCategories {
     this.loading(true);
     huePubSub.publish(CLEAR_UDF_CACHE_EVENT, {
       connector: this.connector,
-      callback: this.fetchUdfs.bind(this)
+      callback: this.getUdfs.bind(this)
     });
   }
 
-  async fetchUdfs() {
+  async getUdfs() {
     this.loading(true);
     const categories = [];
     const functions = await getUdfCategories(this.connector);

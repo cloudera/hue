@@ -17,6 +17,7 @@
 import $ from 'jquery';
 
 import ApiHelper from 'api/apiHelper';
+import * as apiUtils from 'sql/reference/apiUtils';
 import AutocompleteResults from './autocompleteResults';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
@@ -229,7 +230,7 @@ describe('AutocompleteResults.js', () => {
     return deferred.promise();
   });
 
-  jest.spyOn(ApiHelper, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
+  jest.spyOn(apiUtils, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
 
   const subject = new AutocompleteResults({
     snippet: {
