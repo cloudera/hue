@@ -1861,8 +1861,8 @@ const BIT_FUNCTIONS = {
 };
 
 export const UDF_CATEGORIES = [
-  { name: I18n('Aggregate'), functions: AGGREGATE_FUNCTIONS },
-  { name: I18n('Analytic'), functions: ANALYTIC_FUNCTIONS },
+  { name: I18n('Aggregate'), isAggregate: true, functions: AGGREGATE_FUNCTIONS },
+  { name: I18n('Analytic'), isAnalytic: true, functions: ANALYTIC_FUNCTIONS },
   { name: I18n('Bit'), functions: BIT_FUNCTIONS },
   { name: I18n('Conditional'), functions: CONDITIONAL_FUNCTIONS },
   { name: I18n('Date'), functions: DATE_FUNCTIONS },

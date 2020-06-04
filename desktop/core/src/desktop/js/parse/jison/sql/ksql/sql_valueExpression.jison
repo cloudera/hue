@@ -64,7 +64,7 @@ ValueExpression_EDIT
  | '-' ValueExpression_EDIT %prec NEGATION
    {
      if (!$2.typeSet) {
-       parser.applyTypeToSuggestions('NUMBER');
+       parser.applyTypeToSuggestions({ types: ['NUMBER'] });
      }
      $$ = { types: [ 'NUMBER' ], suggestFilters: $2.suggestFilters };
    }
@@ -167,31 +167,31 @@ ValueExpression_EDIT
  : 'CURSOR' '=' ValueExpression
    {
      parser.valueExpressionSuggest($3, $2);
-     parser.applyTypeToSuggestions($3.types);
+     parser.applyTypeToSuggestions($3);
      $$ = { types: [ 'BOOLEAN' ], typeSet: true };
    }
  | 'CURSOR' '<' ValueExpression
    {
      parser.valueExpressionSuggest($3, $2);
-     parser.applyTypeToSuggestions($3.types);
+     parser.applyTypeToSuggestions($3);
      $$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    }
  | 'CURSOR' '>' ValueExpression
    {
      parser.valueExpressionSuggest($3, $2);
-     parser.applyTypeToSuggestions($3.types);
+     parser.applyTypeToSuggestions($3);
      $$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    }
  | 'CURSOR' 'COMPARISON_OPERATOR' ValueExpression
    {
      parser.valueExpressionSuggest($3, $2);
-     parser.applyTypeToSuggestions($3.types);
+     parser.applyTypeToSuggestions($3);
      $$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    }
  | ValueExpression_EDIT '=' ValueExpression
    {
      if (!$1.typeSet) {
-       parser.applyTypeToSuggestions($3.types);
+       parser.applyTypeToSuggestions($3);
        parser.addColRefIfExists($3);
      }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters }
@@ -199,7 +199,7 @@ ValueExpression_EDIT
  | ValueExpression_EDIT '<' ValueExpression
    {
      if (!$1.typeSet) {
-       parser.applyTypeToSuggestions($3.types);
+       parser.applyTypeToSuggestions($3);
        parser.addColRefIfExists($3);
      }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters }
@@ -207,7 +207,7 @@ ValueExpression_EDIT
  | ValueExpression_EDIT '>' ValueExpression
    {
      if (!$1.typeSet) {
-       parser.applyTypeToSuggestions($3.types);
+       parser.applyTypeToSuggestions($3);
        parser.addColRefIfExists($3);
      }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters }
@@ -215,7 +215,7 @@ ValueExpression_EDIT
  | ValueExpression_EDIT 'COMPARISON_OPERATOR' ValueExpression
    {
      if (!$1.typeSet) {
-       parser.applyTypeToSuggestions($3.types);
+       parser.applyTypeToSuggestions($3);
        parser.addColRefIfExists($3);
      }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters }
@@ -223,31 +223,31 @@ ValueExpression_EDIT
  | ValueExpression '=' PartialBacktickedOrAnyCursor
    {
      parser.valueExpressionSuggest($1, $2);
-     parser.applyTypeToSuggestions($1.types);
+     parser.applyTypeToSuggestions($1);
      $$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    }
  | ValueExpression '<' PartialBacktickedOrAnyCursor
    {
      parser.valueExpressionSuggest($1, $2);
-     parser.applyTypeToSuggestions($1.types);
+     parser.applyTypeToSuggestions($1);
      $$ = { types: [ 'BOOLEAN' ] , typeSet: true, endsWithLessThanOrEqual: true };
    }
  | ValueExpression '>' PartialBacktickedOrAnyCursor
    {
      parser.valueExpressionSuggest($1, $2);
-     parser.applyTypeToSuggestions($1.types);
+     parser.applyTypeToSuggestions($1);
      $$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    }
  | ValueExpression 'COMPARISON_OPERATOR' PartialBacktickedOrAnyCursor
    {
      parser.valueExpressionSuggest($1, $2);
-     parser.applyTypeToSuggestions($1.types);
+     parser.applyTypeToSuggestions($1);
      $$ = { types: [ 'BOOLEAN' ], typeSet: true, endsWithLessThanOrEqual: $2 === '<='  };
    }
  | ValueExpression '=' ValueExpression_EDIT
    {
      if (!$3.typeSet) {
-       parser.applyTypeToSuggestions($1.types);
+       parser.applyTypeToSuggestions($1);
        parser.addColRefIfExists($1);
      }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $3.suggestFilters }
@@ -255,7 +255,7 @@ ValueExpression_EDIT
  | ValueExpression '<' ValueExpression_EDIT
    {
      if (!$3.typeSet) {
-       parser.applyTypeToSuggestions($1.types);
+       parser.applyTypeToSuggestions($1);
        parser.addColRefIfExists($1);
      }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $3.suggestFilters }
@@ -263,7 +263,7 @@ ValueExpression_EDIT
  | ValueExpression '>' ValueExpression_EDIT
    {
      if (!$3.typeSet) {
-       parser.applyTypeToSuggestions($1.types);
+       parser.applyTypeToSuggestions($1);
        parser.addColRefIfExists($1);
      }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $3.suggestFilters }
@@ -271,7 +271,7 @@ ValueExpression_EDIT
  | ValueExpression 'COMPARISON_OPERATOR' ValueExpression_EDIT
    {
      if (!$3.typeSet) {
-       parser.applyTypeToSuggestions($1.types);
+       parser.applyTypeToSuggestions($1);
        parser.addColRefIfExists($1);
      }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $3.suggestFilters }
@@ -293,7 +293,7 @@ ValueExpression_EDIT
    {
      if ($4.inValueEdit) {
        parser.valueExpressionSuggest($1, $2 + ' ' + $3);
-       parser.applyTypeToSuggestions($1.types);
+       parser.applyTypeToSuggestions($1);
      }
      if ($4.cursorAtStart) {
        parser.suggestKeywords(['SELECT']);
@@ -304,7 +304,7 @@ ValueExpression_EDIT
    {
      if ($3.inValueEdit) {
        parser.valueExpressionSuggest($1, $2);
-       parser.applyTypeToSuggestions($1.types);
+       parser.applyTypeToSuggestions($1);
      }
      if ($3.cursorAtStart) {
        parser.suggestKeywords(['SELECT']);
@@ -334,21 +334,21 @@ ValueExpression_EDIT
  : ValueExpression_EDIT 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression
    {
      if ($4.types[0] === $6.types[0] && !$1.typeSet) {
-       parser.applyTypeToSuggestions($4.types);
+       parser.applyTypeToSuggestions($4);
      }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters };
    }
  | ValueExpression 'NOT' 'BETWEEN' ValueExpression_EDIT 'BETWEEN_AND' ValueExpression
    {
      if ($1.types[0] === $6.types[0] && !$4.typeSet) {
-       parser.applyTypeToSuggestions($1.types);
+       parser.applyTypeToSuggestions($1);
      }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $4.suggestFilters };
    }
  | ValueExpression 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression_EDIT
    {
      if ($1.types[0] === $4.types[0] && !$6.typeSet) {
-       parser.applyTypeToSuggestions($1.types);
+       parser.applyTypeToSuggestions($1);
      }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $6.suggestFilters };
    }
@@ -370,28 +370,28 @@ ValueExpression_EDIT
  | ValueExpression_EDIT 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression
    {
      if ($1.types[0] === $3.types[0] && !$1.typeSet) {
-       parser.applyTypeToSuggestions($1.types)
+       parser.applyTypeToSuggestions($1)
      }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters };
    }
  | ValueExpression 'BETWEEN' ValueExpression_EDIT 'BETWEEN_AND' ValueExpression
    {
      if ($1.types[0] === $3.types[0] && !$3.typeSet) {
-       parser.applyTypeToSuggestions($1.types)
+       parser.applyTypeToSuggestions($1)
      }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $3.suggestFilters };
    }
  | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression_EDIT
    {
      if ($1.types[0] === $3.types[0] && !$5.typeSet) {
-       parser.applyTypeToSuggestions($1.types)
+       parser.applyTypeToSuggestions($1)
      }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $5.suggestFilters };
    }
  | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' 'CURSOR'
    {
      parser.valueExpressionSuggest($1, $4);
-     parser.applyTypeToSuggestions($1.types);
+     parser.applyTypeToSuggestions($1);
      $$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    }
  | ValueExpression 'BETWEEN' ValueExpression 'CURSOR'
@@ -402,7 +402,7 @@ ValueExpression_EDIT
  | ValueExpression 'BETWEEN' 'CURSOR'
    {
      parser.valueExpressionSuggest($1, $2);
-     parser.applyTypeToSuggestions($1.types);
+     parser.applyTypeToSuggestions($1);
      $$ = { types: [ 'BOOLEAN' ], typeSet: true };
    }
  ;
@@ -494,19 +494,19 @@ ValueExpression_EDIT
  : 'CURSOR' '*' ValueExpression
    {
      parser.valueExpressionSuggest(undefined, $2);
-     parser.applyTypeToSuggestions([ 'NUMBER' ]);
+     parser.applyTypeToSuggestions({ types: [ 'NUMBER' ] });
      $$ = { types: [ 'NUMBER' ], typeSet: true };
    }
  | 'CURSOR' 'ARITHMETIC_OPERATOR' ValueExpression
    {
      parser.valueExpressionSuggest(undefined, $2);
-     parser.applyTypeToSuggestions([ 'NUMBER' ]);
+     parser.applyTypeToSuggestions({ types: [ 'NUMBER' ] });
      $$ = { types: [ 'NUMBER' ], typeSet: true };
    }
  | ValueExpression_EDIT '-' ValueExpression
    {
      if (!$1.typeSet) {
-       parser.applyTypeToSuggestions(['NUMBER']);
+       parser.applyTypeToSuggestions({ types: ['NUMBER'] });
        parser.addColRefIfExists($3);
      }
      $$ = { types: [ 'NUMBER' ], suggestFilters: $1.suggestFilters }
@@ -514,7 +514,7 @@ ValueExpression_EDIT
  | ValueExpression_EDIT '*' ValueExpression
    {
      if (!$1.typeSet) {
-       parser.applyTypeToSuggestions(['NUMBER']);
+       parser.applyTypeToSuggestions({ types: ['NUMBER'] });
        parser.addColRefIfExists($3);
      }
      $$ = { types: [ 'NUMBER' ], suggestFilters: $1.suggestFilters }
@@ -522,7 +522,7 @@ ValueExpression_EDIT
  | ValueExpression_EDIT 'ARITHMETIC_OPERATOR' ValueExpression
    {
      if (!$1.typeSet) {
-       parser.applyTypeToSuggestions(['NUMBER']);
+       parser.applyTypeToSuggestions({ types: ['NUMBER'] });
        parser.addColRefIfExists($3);
      }
      $$ = { types: [ 'NUMBER' ], suggestFilters: $1.suggestFilters }
@@ -530,25 +530,25 @@ ValueExpression_EDIT
  | ValueExpression '-' PartialBacktickedOrAnyCursor
    {
      parser.valueExpressionSuggest(undefined, $2);
-     parser.applyTypeToSuggestions(['NUMBER']);
+     parser.applyTypeToSuggestions({ types: ['NUMBER'] });
      $$ = { types: [ 'NUMBER' ], typeSet: true };
    }
  | ValueExpression '*' PartialBacktickedOrAnyCursor
    {
      parser.valueExpressionSuggest(undefined, $2);
-     parser.applyTypeToSuggestions(['NUMBER']);
+     parser.applyTypeToSuggestions({ types: ['NUMBER'] });
      $$ = { types: [ 'NUMBER' ], typeSet: true };
    }
  | ValueExpression 'ARITHMETIC_OPERATOR' PartialBacktickedOrAnyCursor
    {
      parser.valueExpressionSuggest(undefined, $2);
-     parser.applyTypeToSuggestions(['NUMBER']);
+     parser.applyTypeToSuggestions({ types: ['NUMBER'] });
      $$ = { types: [ 'NUMBER' ], typeSet: true };
    }
  | ValueExpression '-' ValueExpression_EDIT
    {
      if (!$3.typeSet) {
-       parser.applyTypeToSuggestions(['NUMBER']);
+       parser.applyTypeToSuggestions({ types: ['NUMBER'] });
        parser.addColRefIfExists($1);
      }
      $$ = { types: [ 'NUMBER' ], suggestFilters: $3.suggestFilters };
@@ -556,7 +556,7 @@ ValueExpression_EDIT
  | ValueExpression '*' ValueExpression_EDIT
    {
      if (!$3.typeSet) {
-       parser.applyTypeToSuggestions(['NUMBER']);
+       parser.applyTypeToSuggestions({ types: ['NUMBER'] });
        parser.addColRefIfExists($1);
      }
      $$ = { types: [ 'NUMBER' ], suggestFilters: $3.suggestFilters };
@@ -564,7 +564,7 @@ ValueExpression_EDIT
  | ValueExpression 'ARITHMETIC_OPERATOR' ValueExpression_EDIT
    {
      if (!$3.typeSet) {
-       parser.applyTypeToSuggestions(['NUMBER']);
+       parser.applyTypeToSuggestions({ types: ['NUMBER'] });
        parser.addColRefIfExists($1);
      }
      $$ = { types: [ 'NUMBER' ], suggestFilters: $3.suggestFilters };
@@ -616,13 +616,13 @@ ValueExpression_EDIT
  | 'CURSOR' LikeRightPart
    {
      parser.valueExpressionSuggest(undefined, $2);
-     parser.applyTypeToSuggestions([ 'STRING' ]);
+     parser.applyTypeToSuggestions({ types: [ 'STRING' ] });
      $$ = { types: [ 'BOOLEAN' ], typeSet: true };
    }
  | 'CURSOR' 'NOT' LikeRightPart
    {
      parser.valueExpressionSuggest(undefined, $2 + ' ' + $3);
-     parser.applyTypeToSuggestions([ 'STRING' ]);
+     parser.applyTypeToSuggestions({ types: [ 'STRING' ] });
      $$ = { types: [ 'BOOLEAN' ], typeSet: true };
    }
  ;
