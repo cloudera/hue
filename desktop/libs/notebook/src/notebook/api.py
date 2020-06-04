@@ -729,6 +729,8 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
   try:
     autocomplete_data = get_api(request, snippet).autocomplete(snippet, database, table, column, nested)
     response.update(autocomplete_data)
+    if has_missing_ssh(message=response['message']):
+      raise QueryError('Missing SSH tunnel')
   except QueryExpired as e:
     LOG.warn('Expired query seen: %s' % e)
 
