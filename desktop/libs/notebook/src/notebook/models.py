@@ -42,6 +42,7 @@ from desktop.lib.paths import SAFE_CHARACTERS_URI
 from desktop.models import Document2
 from useradmin.models import User
 
+from notebook.conf import EXAMPLES, get_ordered_interpreters
 from notebook.connectors.base import Notebook, get_api as _get_api, get_interpreter
 
 if sys.version_info[0] > 2:
@@ -633,3 +634,52 @@ class MockRequest():
   def __init__(self, user, ):
     self.user = user
     self.POST = {}
+
+
+def install_custom_examples():
+  if EXAMPLES.AUTO_LOAD.get():
+    from desktop.auth.backend import rewrite_user
+    from beeswax.management.commands import beeswax_install_examples
+    from useradmin.models import get_default_user_group, install_sample_user, User
+
+    user = rewrite_user(
+      install_sample_user()
+    )
+
+    dialects = [
+      interpreter['dialect']
+      for interpreter in get_ordered_interpreters(user)
+      if interpreter['dialect'] in ('hive', 'impala')  # Only for hive/impala currently, would also need to port to Notebook install examples.
+    ]
+
+    queries = EXAMPLES.QUERIES.get()
+    tables = EXAMPLES.TABLES.get()  # No-op. Only for the saved query samples, not the tables currently.
+
+    LOG.info('Installing custom examples queries: %(queries)s, tables: %(tables)s for dialects %(dialects)s belonging to user %(user)s' % {
+      'queries': queries,
+      'tables': tables,
+      'dialects': dialects,
+      'user': user
+    })
+
+    result = []
+
+    for dialect in dialects:
+      interpreter = {'type': dialect, 'dialect': dialect}
+
+      successes, errors = beeswax_install_examples.Command().handle(
+          dialect=dialect,
+          user=user,
+          interpreter=interpreter,
+          queries=queries,
+          tables=tables,
+          request=None
+      )
+      LOG.info('Dialect %(dialect)s: %(successes)s, %(errors)s,' % {
+        'dialect': dialect,
+        'successes': successes,
+        'errors': errors,
+      })
+      result.append((successes, errors))
+
+    return result

@@ -1749,7 +1749,9 @@ class ClusterConfig(object):
     default_interpreter = default_app.get('interpreters')
 
     try:
-      user_default_app = json.loads(UserPreferences.objects.get(user=self.user, key='default_app').value)
+      user_default_app = json.loads(
+        UserPreferences.objects.get(user=self.user, key='default_app').value
+      )
       if apps.get(user_default_app['app']):
         default_interpreter = []
         default_app = apps[user_default_app['app']]
