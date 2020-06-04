@@ -484,7 +484,8 @@ Grant the appropriate hbase rights to the 'hue' user, e.g.:
 
 With impersonation:
 
-        options='{"url": "phoenix://sql-phoenix.gethue.com:8765", "has_impersonation": true}'
+    options='{"url": "phoenix://sql-phoenix.gethue.com:8765", "has_impersonation": true}'
+
 
 **Notes**
 
