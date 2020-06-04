@@ -22,6 +22,8 @@ import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import LOTS_OF_PARSE_RESULTS from './test/lotsOfParseResults';
+import * as sqlReferenceRepository from 'sql/reference/sqlReferenceRepository';
+import { defer } from '../utils/hueUtils';
 
 describe('AutocompleteResults.js', () => {
   const failResponse = {
@@ -227,6 +229,8 @@ describe('AutocompleteResults.js', () => {
     return deferred.promise();
   });
 
+  jest.spyOn(ApiHelper, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
+
   const subject = new AutocompleteResults({
     snippet: {
       autocompleteSettings: {
@@ -236,7 +240,7 @@ describe('AutocompleteResults.js', () => {
         return 'hive';
       },
       connector: function() {
-        return { id: 'hive' };
+        return { id: 'hive', dialect: 'hive' };
       },
       database: function() {
         return 'default';
@@ -339,18 +343,73 @@ describe('AutocompleteResults.js', () => {
     expect(subject.filtered()[1].value).toBe('foo');
   });
 
-  it('should handle parse results with functions', () => {
+  it('should handle parse results with functions', async () => {
     subject.entries([]);
 
+    const spy = spyOn(sqlReferenceRepository, 'getUdfsWithReturnTypes').and.callFake(async () =>
+      Promise.resolve({
+        count: {
+          returnTypes: ['BIGINT'],
+          arguments: [[{ type: 'T' }]],
+          signature: 'count(col)',
+          draggable: 'count()',
+          description: 'some desc'
+        }
+      })
+    );
+
     expect(subject.filtered().length).toBe(0);
-    subject.update({
+
+    await subject.update({
       lowerCase: false,
       suggestFunctions: {}
     });
 
-    expect(subject.filtered().length).toBeGreaterThan(0);
+    await defer();
+
+    expect(spy).toHaveBeenCalled();
+
+    expect(subject.filtered().length).toEqual(1);
     expect(subject.filtered()[0].details.arguments).toBeDefined();
     expect(subject.filtered()[0].details.signature).toBeDefined();
     expect(subject.filtered()[0].details.description).toBeDefined();
+  });
+
+  it('should handle parse results set options', async () => {
+    subject.entries([]);
+
+    const spy = spyOn(sqlReferenceRepository, 'getSetOptions').and.callFake(
+      async connector =>
+        new Promise(resolve => {
+          expect(connector).toEqual(subject.snippet.connector());
+          resolve({
+            OPTION_1: {
+              description: 'Desc 1',
+              type: 'Integer',
+              default: 'Some default'
+            },
+            OPTION_2: {
+              description: 'Desc 2',
+              type: 'Integer',
+              default: 'Some default'
+            }
+          });
+        })
+    );
+
+    expect(subject.filtered().length).toBe(0);
+
+    await subject.update({
+      lowerCase: false,
+      suggestSetOptions: {}
+    });
+
+    await defer();
+
+    expect(spy).toHaveBeenCalled();
+
+    expect(subject.filtered().length).toEqual(2);
+    expect(subject.filtered()[0].details.description).toBeDefined();
+    expect(subject.filtered()[1].details.type).toBeDefined();
   });
 });
