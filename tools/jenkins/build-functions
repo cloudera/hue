@@ -34,44 +34,44 @@ check_mtime() {
 
 ##########
 #
-# Use $CDH_URL to control where to download Hadoop.
+# Use $HADOOP_URL to control where to download Hadoop.
 # If not specified, it uses the $CDH variable to select an archive location.
 # Latest public release URL example: http://archive.cloudera.com/cdh5/cdh/5/hadoop-2.6.0-cdh5.13.0.tar.gz
 #
 
-CDH_URL=${CDH_URL:-http://repos.jenkins.cloudera.com/cdh5-static/cdh/5/hadoop-2.6.0-cdh5.17.0-SNAPSHOT.tar.gz}
+HADOOP_URL=${HADOOP_URL:-http://repos.jenkins.cloudera.com/cdh5-static/cdh/5/hadoop-2.6.0-cdh5.17.0-SNAPSHOT.tar.gz}
 
-CDH_TGZ=$(basename $CDH_URL)
-CDH_VERSION=${CDH_TGZ/.tar.gz/}
-CDH_SHORT_VERSION=${CDH_VERSION/hadoop-/}
-CDH_CACHE="$HOME/.hue_cache/${CDH_TGZ}"
+HADOOP_TGZ=$(basename $HADOOP_URL)
+HADOOP_VERSION=${HADOOP_TGZ/.tar.gz/}
+HADOOP_SHORT_VERSION=${HADOOP_VERSION/hadoop-/}
+HADOOP_CACHE="$HOME/.hue_cache/${HADOOP_TGZ}"
 CDH_MTIME_FILE="$HOME/.hue_cache/.cdh_mtime"
 
 build_hadoop() {
-  if ! check_mtime ${CDH_MTIME_FILE} ${CDH_URL} || [ ! -f $CDH_CACHE ]; then
-    echo "Downloading $CDH_URL..."
-    wget $CDH_URL -O $CDH_CACHE
+  if ! check_mtime ${CDH_MTIME_FILE} ${HADOOP_URL} || [ ! -f $HADOOP_CACHE ]; then
+    echo "Downloading $HADOOP_URL..."
+    wget $HADOOP_URL -O $HADOOP_CACHE
   fi
 
   HADOOP_DIR=$HUE_ROOT/ext/hadoop
-  export YARN_HOME="$HADOOP_DIR/${CDH_VERSION}"
-  export HADOOP_HDFS_HOME="$HADOOP_DIR/${CDH_VERSION}/share/hadoop/hdfs"
-  export HADOOP_BIN="$HADOOP_DIR/${CDH_VERSION}/bin/hadoop"
-  export HADOOP_MAPRED_HOME="$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce2"
-  export HADOOP_MAPRED_BIN="$HADOOP_DIR/${CDH_VERSION}/bin/mapred"
+  export YARN_HOME="$HADOOP_DIR/${HADOOP_VERSION}"
+  export HADOOP_HDFS_HOME="$HADOOP_DIR/${HADOOP_VERSION}/share/hadoop/hdfs"
+  export HADOOP_BIN="$HADOOP_DIR/${HADOOP_VERSION}/bin/hadoop"
+  export HADOOP_MAPRED_HOME="$HADOOP_DIR/${HADOOP_VERSION}/share/hadoop/mapreduce2"
+  export HADOOP_MAPRED_BIN="$HADOOP_DIR/${HADOOP_VERSION}/bin/mapred"
 
   mkdir -p $HADOOP_DIR
-  rm -rf "$HADOOP_DIR/${CDH_VERSION}"
-  echo "Unpacking $CDH_CACHE to $HADOOP_DIR"
-  tar -C $HADOOP_DIR -xzf $CDH_CACHE
-  ln -sf $HADOOP_DIR/${CDH_VERSION} $HADOOP_DIR/hadoop
+  rm -rf "$HADOOP_DIR/${HADOOP_VERSION}"
+  echo "Unpacking $HADOOP_CACHE to $HADOOP_DIR"
+  tar -C $HADOOP_DIR -xzf $HADOOP_CACHE
+  ln -sf $HADOOP_DIR/${HADOOP_VERSION} $HADOOP_DIR/hadoop
   # For Hive
   ln -sf $HADOOP_DIR/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-core-*.jar $HADOOP_DIR/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-core.jar
   ln -sf $HADOOP_DIR/hadoop/share/hadoop/common/hadoop-common-*-SNAPSHOT.jar $HADOOP_DIR/hadoop/share/hadoop/common/hadoop-common.jar
   ln -sf $HADOOP_DIR/hadoop/share/hadoop/common/lib/hadoop-auth-*-SNAPSHOT.jar $HADOOP_DIR/hadoop/share/hadoop/common/lib/hadoop-auth.jar
-  ln -sf $HADOOP_DIR/hadoop/share/hadoop/hdfs/hadoop-hdfs-${CDH_SHORT_VERSION}.jar  $HADOOP_DIR/hadoop/share/hadoop/hdfs/hadoop-hdfs.jar
+  ln -sf $HADOOP_DIR/hadoop/share/hadoop/hdfs/hadoop-hdfs-${HADOOP_SHORT_VERSION}.jar  $HADOOP_DIR/hadoop/share/hadoop/hdfs/hadoop-hdfs.jar
   # For MR2
-  ln -sf "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce2" "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce"
+  ln -sf "$HADOOP_DIR/${HADOOP_VERSION}/share/hadoop/mapreduce2" "$HADOOP_DIR/${HADOOP_VERSION}/share/hadoop/mapreduce"
 }
 
 ##########
@@ -131,7 +131,7 @@ build_oozie() {
 
   mkdir -p $OOZIE_HOME/libext
   tar -C $OOZIE_HOME/libext -zxvf $OOZIE_HOME/oozie-hadooplibs-*.tar.gz
-  HADOOP_LIB=`echo "${CDH_VERSION}" | sed 's/hadoop/hadooplib/g'`
+  HADOOP_LIB=`echo "${HADOOP_VERSION}" | sed 's/hadoop/hadooplib/g'`
   cp $OOZIE_HOME/libext/oozie-*/hadooplibs/${HADOOP_LIB}*/*jar $OOZIE_HOME/libext/
   tar -C $OOZIE_HOME -zxvf $OOZIE_HOME/oozie-examples.tar.gz
   cp  $OOZIE_HOME/oozie-sharelib-*-yarn.tar.gz $OOZIE_HOME/oozie-sharelib.tar.gz
