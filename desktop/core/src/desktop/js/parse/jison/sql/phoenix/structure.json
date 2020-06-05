@@ -19,7 +19,6 @@
     "../generic/sql_alter.jison",
     "../generic/sql_create.jison",
     "../generic/sql_drop.jison",
-    "../generic/sql_error.jison",
     "../generic/sql_insert.jison",
     "../generic/sql_main.jison",
     "../generic/sql_set.jison",
