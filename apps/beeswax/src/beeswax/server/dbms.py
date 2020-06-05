@@ -1125,6 +1125,21 @@ class HiveServer2Dbms(object):
     return rows
 
 
+  def get_function(self, name):
+    hql = 'DESCRIBE FUNCTION EXTENDED `%(name)s`' % {
+      'name': name,
+    }
+
+    query = hql_query(hql)
+    handle = self.execute_and_wait(query, timeout_sec=5.0)
+
+    if handle:
+      rows = self.fetch(handle, rows=100).rows()
+      self.close(handle)
+
+    return rows
+
+
   def get_query_metadata(self, query):
     hql = 'SELECT * FROM ( %(query)s ) t LIMIT 0' % {'query': query.strip(';')}
 

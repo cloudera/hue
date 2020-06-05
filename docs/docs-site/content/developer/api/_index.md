@@ -379,6 +379,18 @@ For a specific database:
     });
 
 
+For a specific function/UDF details (e.g. trunc):
+
+    $.post("/notebook/api/autocomplete/<function_name>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      }),
+      "operation": "function"
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+
 ### SQL Risk Optimization
 ### Data Browsing
 ### Workflow scheduling

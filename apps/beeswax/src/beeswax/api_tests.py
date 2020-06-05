@@ -91,9 +91,43 @@ class TestApi():
       _get_functions.return_value = [
         {'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}
       ]
+
       resp = _autocomplete(db, database='default', operation='functions')
 
       assert_equal(
         resp['functions'],
         [{'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}]
       )
+
+
+  def test_get_function(self):
+    db = Mock()
+    db.client = Mock(query_server = {'dialect': 'hive'})
+    db.get_function = Mock(
+      return_value = [
+        ['floor_month(param) - Returns the timestamp at a month granularity'],
+        ['param needs to be a timestamp value'],
+        ['Example:'],
+        ["> SELECT floor_month(CAST('yyyy-MM-dd HH:mm:ss' AS TIMESTAMP)) FROM src;"],
+        ['yyyy-MM-01 00:00:00']
+      ]
+    )
+
+    data = _autocomplete(db, database='floor_month', operation='function')
+
+    assert_equal(
+      data['function'],
+      {
+        'name': 'floor_month',
+        'signature': 'floor_month(param)',
+        'description':
+            'Returns the timestamp at a month granularity\nparam needs to be a timestamp value\nExample:\n'
+            '> SELECT floor_month(CAST(\'yyyy-MM-dd HH:mm:ss\' AS TIMESTAMP)) FROM src;\nyyyy-MM-01 00:00:00'
+      }
+    )
+
+
+    db.client = Mock(query_server = {'dialect': 'impala'})
+    data = _autocomplete(db, operation='function')
+
+    assert_equal(data['function'], {})

@@ -109,6 +109,8 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
   try:
     if operation == 'functions':
       response['functions'] = _get_functions(db, database)
+    elif operation == 'function':
+      response['function'] = _get_function(db, database)
     elif database is None:
       response['databases'] = db.get_databases()
     elif table is None:
@@ -194,6 +196,26 @@ def _get_functions(db, database=None):
       ]
     else:
       data = [{'name': row[0]} for row in rows]
+
+  return data
+
+
+def _get_function(db, name):
+  data = {}
+
+  if db.client.query_server['dialect'] == 'hive':
+    functions = db.get_function(name=name)
+    rows = escape_rows(functions, nulls_only=True)
+
+    full_description = '\n'.join([col for row in rows for col in row])
+    signature, description = full_description.split(' - ', 1)
+    name = name.split('(', 1)[0]
+
+    data = {
+      'name': name,
+      'signature': signature,
+      'description': description,
+    }
 
   return data
 
