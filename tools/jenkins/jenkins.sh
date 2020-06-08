@@ -45,13 +45,6 @@ build_sqoop
 
 make apps
 
-if ! [ -x "$(command -v pylint)" ]; then
-    build/env/bin/pip install pylint
-fi
-ln -sf $(which pylint) build/env/bin/pylint
-
-build/env/bin/hue runpylint > PYLINT.txt
-
 rm -f JAVASCRIPTLINT.txt
 for FILE in $(find . -name *.js);
 do
