@@ -14,17 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { koSetup } from 'jest/koTestUtils';
-import { NAME } from './ko.savedQueries';
+import componentUtils from 'ko/components/componentUtils';
+import DisposableComponent from 'ko/components/DisposableComponent';
 
-describe('ko.savedQueries.js', () => {
-  const setup = koSetup();
+export const HIVE_QUERY_PLAN_COMPONENT = 'hive-query-plan';
 
-  it('should render component', async () => {
-    const element = await setup.renderComponent(NAME, {
-      currentTab: () => undefined
-    });
+// prettier-ignore
+const TEMPLATE = `
+  <pre data-bind="text: plan"></pre>
+`;
 
-    expect(element.innerHTML).toMatchSnapshot();
-  });
-});
+class HiveQueryPlan extends DisposableComponent {
+  constructor(params) {
+    super();
+    this.plan = params.plan;
+  }
+}
+
+componentUtils.registerComponent(HIVE_QUERY_PLAN_COMPONENT, HiveQueryPlan, TEMPLATE);

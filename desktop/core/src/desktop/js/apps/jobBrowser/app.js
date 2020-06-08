@@ -14,17 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { koSetup } from 'jest/koTestUtils';
-import { NAME } from './ko.savedQueries';
+import './components/ko.hiveQueryPlan';
 
-describe('ko.savedQueries.js', () => {
-  const setup = koSetup();
+import huePubSub from 'utils/huePubSub';
 
-  it('should render component', async () => {
-    const element = await setup.renderComponent(NAME, {
-      currentTab: () => undefined
-    });
+huePubSub.subscribe('app.dom.loaded', app => {
+  if (app !== 'jobbrowser') {
+    return;
+  }
 
-    expect(element.innerHTML).toMatchSnapshot();
-  });
+  // TODO: Move js from job_browser.mako here.
 });

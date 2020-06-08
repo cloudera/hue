@@ -277,6 +277,7 @@ ${ hueIcons.symbols() }
 </div>
 ${ commonshare() | n,unicode }
 
+${ render_bundle('vendors~hue~jobBrowser~notebook~tableBrowser') | n,unicode }
 ${ render_bundle('vendors~hue~notebook~tableBrowser') | n,unicode }
 ${ render_bundle('vendors~hue~notebook') | n,unicode }
 ${ render_bundle('vendors~hue') | n,unicode }
