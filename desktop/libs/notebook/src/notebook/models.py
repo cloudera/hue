@@ -675,7 +675,7 @@ def install_custom_examples():
           tables=tables,
           request=None
       )
-      LOG.info('Dialect %(dialect)s: %(successes)s, %(errors)s,' % {
+      LOG.info('Dialect %(dialect)s installed samples: %(successes)s, %(errors)s,' % {
         'dialect': dialect,
         'successes': successes,
         'errors': errors,
