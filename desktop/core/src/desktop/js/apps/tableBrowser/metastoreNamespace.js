@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import apiHelper from 'api/apiHelper';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
-import MetastoreDatabase from 'apps/table_browser/metastoreDatabase';
+import MetastoreDatabase from 'apps/tableBrowser/metastoreDatabase';
 
 class MetastoreNamespace {
   constructor(options) {

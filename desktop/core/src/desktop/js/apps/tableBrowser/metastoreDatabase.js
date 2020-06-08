@@ -19,7 +19,7 @@ import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
-import MetastoreTable from 'apps/table_browser/metastoreTable';
+import MetastoreTable from 'apps/tableBrowser/metastoreTable';
 
 class MetastoreDatabase {
   /**
