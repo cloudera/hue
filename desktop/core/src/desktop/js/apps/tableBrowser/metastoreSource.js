@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import apiHelper from 'api/apiHelper';
 import contextCatalog, { NAMESPACES_REFRESHED_EVENT } from 'catalog/contextCatalog';
 import huePubSub from 'utils/huePubSub';
-import MetastoreNamespace from 'apps/table_browser/metastoreNamespace';
+import MetastoreNamespace from 'apps/tableBrowser/metastoreNamespace';
 import {
   ASSIST_DB_PANEL_IS_READY_EVENT,
   ASSIST_IS_DB_PANEL_READY_EVENT,

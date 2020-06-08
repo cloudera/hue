@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
-import MetastoreSource from 'apps/table_browser/metastoreSource';
+import MetastoreSource from 'apps/tableBrowser/metastoreSource';
 import dataCatalog from 'catalog/dataCatalog';
 import { findEditorConnector, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 

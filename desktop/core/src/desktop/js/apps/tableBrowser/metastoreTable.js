@@ -20,9 +20,9 @@ import * as ko from 'knockout';
 import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
-import MetastoreColumn from 'apps/table_browser/metastoreColumn';
-import MetastoreTableSamples from 'apps/table_browser/metastoreTableSamples';
-import MetastoreTablePartitions from 'apps/table_browser/metastoreTablePartitions';
+import MetastoreColumn from 'apps/tableBrowser/metastoreColumn';
+import MetastoreTableSamples from 'apps/tableBrowser/metastoreTableSamples';
+import MetastoreTablePartitions from 'apps/tableBrowser/metastoreTablePartitions';
 import I18n from 'utils/i18n';
 
 let contextPopoverTimeout = -1;
