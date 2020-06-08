@@ -285,34 +285,6 @@ const addParsersFromStructure = (structure, dialect) => {
   );
 };
 
-const findParser = (fileIndex, folder, sharedFiles, autocomplete) => {
-  const prefix = autocomplete ? 'autocomplete' : 'syntax';
-  if (fileIndex[prefix + '_header.jison'] && fileIndex[prefix + '_footer.jison']) {
-    addParserDefinition(
-      [
-        'sql/' + folder + '/' + prefix + '_header.jison',
-        ...sharedFiles,
-        'sql/' + folder + '/' + prefix + '_footer.jison'
-      ],
-      folder,
-      autocomplete,
-      'sql.jisonlex'
-    );
-  } else {
-    console.log(
-      "Warn: Could not find '" +
-        prefix +
-        "_header.jison' or '" +
-        prefix +
-        "_footer.jison' in " +
-        JISON_FOLDER +
-        'sql/' +
-        folder +
-        '/'
-    );
-  }
-};
-
 const identifySqlParsers = () =>
   new Promise(resolve => {
     listDir(JISON_FOLDER + 'sql').then(files => {
@@ -326,28 +298,13 @@ const identifySqlParsers = () =>
               );
               addParsersFromStructure(structure, folder);
             } else {
-              const fileIndex = {};
-              jisonFiles.forEach(jisonFile => {
-                fileIndex[jisonFile] = true;
-              });
-
-              const sharedFiles = jisonFiles
-                .filter(jisonFile => jisonFile.indexOf('sql_') !== -1)
-                .map(jisonFile => 'sql/' + folder + '/' + jisonFile);
-
-              if (fileIndex['sql.jisonlex']) {
-                findParser(fileIndex, folder, sharedFiles, true);
-                findParser(
-                  fileIndex,
-                  folder,
-                  sharedFiles.filter(path => path.indexOf('_error.jison') === -1),
-                  false
-                );
-              } else {
-                console.log(
-                  "Warn: Could not find 'sql.jisonlex' in " + JISON_FOLDER + 'sql/' + folder + '/'
-                );
-              }
+              console.log(
+                "Warn: Could not find 'structure.jisonlex' in " +
+                  JISON_FOLDER +
+                  'sql/' +
+                  folder +
+                  '/'
+              );
             }
           })
         );
