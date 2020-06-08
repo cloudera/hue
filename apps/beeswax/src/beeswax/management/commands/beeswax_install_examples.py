@@ -56,6 +56,8 @@ class Command(BaseCommand):
       db_name = args[1] if len(args) > 1 else 'default'
       user = User.objects.get(username=pwd.getpwuid(os.getuid()).pw_name)
       request = None
+      self.queries = None
+      self.tables = None
     else:
       dialect = options['dialect']
       db_name = options.get('db_name', 'default')
@@ -128,20 +130,23 @@ class Command(BaseCommand):
     design_list = [d for d in design_list if int(d['type']) == app_type]
     if app_type == RDBMS:
       design_list = [d for d in design_list if dialect in d['dialects']]
+    if self.queries is None:  # Manual install
+      design_list = [d for d in design_list if not d.get('auto_load_only')]
+    if self.queries:  # Automated install
+      design_list = [d for d in design_list if d['name'] in self.queries]
 
     if not design_list:
       raise InstallException(_('No %s queries are available as samples') % dialect)
 
     for design_dict in design_list:
-      if self.queries is None or design_dict['name'] in self.queries:
-        design = SampleQuery(design_dict)
-        try:
-          design.install(django_user, interpreter=interpreter)
-          self.successes.append(_('Query %s %s installed.') % (design_dict['name'], dialect))
-        except Exception as ex:
-          msg = str(ex)
-          LOG.error(msg)
-          self.errors.append(_('Could not install %s query: %s') % (dialect, msg))
+      design = SampleQuery(design_dict)
+      try:
+        design.install(django_user, interpreter=interpreter)
+        self.successes.append(_('Query %s %s installed.') % (design_dict['name'], dialect))
+      except Exception as ex:
+        msg = str(ex)
+        LOG.error(msg)
+        self.errors.append(_('Could not install %s query: %s') % (dialect, msg))
 
 
 class SampleTable(object):
