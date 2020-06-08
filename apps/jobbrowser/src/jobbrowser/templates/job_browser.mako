@@ -22,6 +22,8 @@ from metadata.conf import PROMETHEUS
 from notebook.conf import ENABLE_QUERY_SCHEDULING
 
 from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER, ENABLE_HIVE_QUERY_BROWSER, ENABLE_HISTORY_V2
+
+from webpack_loader.templatetags.webpack_loader import render_bundle
 %>
 
 <%
@@ -51,11 +53,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <link rel="stylesheet" href="${ static('jobbrowser/css/jobbrowser-embeddable.css') }">
 
-
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-datepicker.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-timepicker.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-spinedit.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-slider.css') }">
+
+${ render_bundle('jobBrowser') | n,unicode }
 
 <script src="${ static('desktop/ext/js/bootstrap-datepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/bootstrap-timepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1803,7 +1806,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
         <!-- ko if: $root.job().mainType() == 'queries-hive' -->
         <div class="tab-pane active" id="queries-page-hive-plan-text${ SUFFIX }" data-profile="plan">
-          <pre data-bind="text: properties.plan && properties.plan().plan"></pre>
+          <!-- ko if: properties.plan && properties.plan().plan -->
+            <!-- ko component: {
+              name: 'hive-query-plan',
+              params: {
+                plan: properties.plan().plan
+              }
+            } --><!-- /ko -->
+          <!-- /ko -->
         </div>
         <div class="tab-pane" id="queries-page-hive-stmt${ SUFFIX }" data-profile="stmt">
           <pre data-bind="text: (properties.plan && properties.plan().stmt) || _('The selected tab has no data')"></pre>
@@ -4138,7 +4148,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
       };
     };
-
 
     $(document).ready(function () {
       var jobBrowserViewModel = new JobBrowserViewModel();
