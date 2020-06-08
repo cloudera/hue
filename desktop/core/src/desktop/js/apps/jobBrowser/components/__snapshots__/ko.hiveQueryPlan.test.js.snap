@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.hiveQueryPlan.js should render component 1`] = `"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;hive-query-plan&quot;, params: params }\\"><pre data-bind=\\"text: plan\\">foo</pre></div>"`;

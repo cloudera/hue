@@ -103,70 +103,70 @@ switch (yystate) {
 case 9:
 
      parser.suggestSetOptions();
-
+   
 break;
 case 15:
 
      parser.suggestKeywords(['TABLE', 'VIEW']);
-
+   
 break;
 case 21: case 30: case 244: case 248: case 250: case 1175:
 
      parser.addTablePrimary($$[$0]);
-
+   
 break;
 case 22: case 239:
 
      if (parser.yy.result.suggestTables) {
        parser.yy.result.suggestTables.onlyTables = true;
      }
-
+   
 break;
 case 23:
 
      parser.suggestTables({ onlyTables: true });
      parser.suggestDatabases({ appendDot: true });
-
+   
 break;
 case 26: case 657:
 
      parser.suggestKeywords(['AS']);
-
+   
 break;
 case 28: case 195: case 204: case 265: case 658: case 995:
 
      parser.suggestKeywords(['SELECT']);
-
+   
 break;
 case 31: case 249:
 
      if (parser.yy.result.suggestTables) {
        parser.yy.result.suggestTables.onlyViews = true;
      }
-
+   
 break;
 case 32:
 
      parser.suggestTables({ onlyViews: true });
      parser.suggestDatabases({ appendDot: true });
-
+   
 break;
 case 40: case 227:
 
      parser.suggestKeywords(['DATABASE', 'ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
-
+   
 break;
 case 42:
 
      parser.addNewDatabaseLocation(_$[$0-1], [{ name: $$[$0-1] }]);
-
+   
 break;
 case 43: case 61:
 
      if (!$$[$0-1]) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
-
+   
 break;
 case 45:
 
@@ -174,24 +174,24 @@ case 45:
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
      parser.addNewDatabaseLocation(_$[$0], [{ name: $$[$0] }]);
-
+   
 break;
 case 46:
 
      parser.addNewDatabaseLocation(_$[$0], [{ name: $$[$0] }]);
-
+   
 break;
 case 47:
 
      parser.addNewDatabaseLocation(_$[$0-2], [{ name: $$[$0-2] }]);
-
+   
 break;
 case 49:
 
      if (!$$[$0]) {
        parser.suggestKeywords(['COMMENT']);
      }
-
+   
 break;
 case 67:
 
@@ -208,13 +208,13 @@ case 67:
      if (keywords.length > 0) {
        parser.suggestKeywords(keywords);
      }
-
+   
 break;
 case 68:
 
      parser.addNewTableLocation(_$[$0-1], $$[$0-1], $$[$0]);
      this.$ = $$[$0];
-
+   
 break;
 case 73:
 this.$ = [];
@@ -223,7 +223,7 @@ case 75: case 559: case 1172: case 1192:
 
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
-
+   
 break;
 case 77: case 213: case 215: case 492: case 495: case 581: case 624: case 745: case 924: case 992: case 1044:
 this.$ = $$[$0-1];
@@ -237,12 +237,12 @@ break;
 case 85: case 87:
 
      parser.checkForKeywords($$[$0-1]);
-
+   
 break;
 case 86: case 88:
 
      parser.checkForKeywords($$[$0-3]);
-
+   
 break;
 case 89:
 
@@ -255,12 +255,12 @@ case 89:
      if (keywords.length > 0) {
        this.$.suggestKeywords = keywords;
      }
-
+   
 break;
 case 90: case 117: case 123: case 124: case 137: case 140: case 149: case 151:
 
      parser.suggestKeywords(parser.getColumnDataTypeKeywords());
-
+   
 break;
 case 93:
 this.$ = {};
@@ -269,12 +269,12 @@ case 95:
 
      this.$ = {};
      this.$[$$[$0]] = true;
-
+   
 break;
 case 96:
 
      $$[$0-1][$$[$0]] = true;
-
+   
 break;
 case 101: case 102:
 this.$ = 'null';
@@ -285,64 +285,64 @@ break;
 case 104:
 
      parser.suggestKeywords(['NULL']);
-
+   
 break;
 case 122:
 
      parser.suggestKeywords(parser.getTypeKeywords());
-
+   
 break;
 case 136: case 139:
 
      parser.suggestKeywords(['COMMENT']);
-
+   
 break;
 case 158: case 1070:
 
      parser.suggestKeywords(['BY']);
-
+   
 break;
 case 159:
 
      parser.suggestKeywords(['RANGE']);
-
+   
 break;
 case 168: case 173: case 174:
 
      parser.suggestKeywords(['PARTITION']);
-
+   
 break;
 case 180:
 
      parser.suggestKeywords(['VALUE', 'VALUES']);
-
+   
 break;
 case 181:
 
      if ($$[$0].endsWithLessThanOrEqual) {
       parser.suggestKeywords(['VALUES']);
      }
-
+   
 break;
 case 182: case 185: case 188:
 
      parser.suggestKeywords(['<', '<=']);
-
+   
 break;
 case 183: case 524: case 527:
 
      parser.suggestKeywords(['VALUES']);
-
+   
 break;
 case 186: case 189:
 
      parser.suggestFunctions();
-
+   
 break;
 case 197:
 
      parser.commitLocations();
-
+   
 break;
 case 199:
 
@@ -350,14 +350,14 @@ case 199:
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
      parser.suggestDatabases({ appendDot: true });
-
+   
 break;
 case 200:
 
      if (!$$[$0-6]) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
-
+   
 break;
 case 203:
 
@@ -366,14 +366,14 @@ case 203:
        keywords.push({ value: 'COMMENT', weight: 3 });
      }
      parser.suggestKeywords(keywords);
-
+   
 break;
 case 210:
 
      if (!$$[$0-1]) {
        parser.suggestKeywords(['COMMENT']);
      }
-
+   
 break;
 case 214: case 216:
 this.$ = $$[$0-3];
@@ -384,24 +384,24 @@ case 231:
        parser.suggestKeywords(['IF EXISTS']);
      }
      parser.suggestDatabases();
-
+   
 break;
 case 232:
 
      parser.suggestKeywords(['CASCADE']);
-
+   
 break;
 case 234:
 
      if (!$$[$0-3]) {
        parser.suggestKeywords(['IF EXISTS']);
      }
-
+   
 break;
 case 236: case 255:
 
      parser.addTablePrimary($$[$0-1]);
-
+   
 break;
 case 238:
 
@@ -412,7 +412,7 @@ case 238:
      parser.suggestDatabases({
        appendDot: true
      });
-
+   
 break;
 case 241:
 
@@ -420,7 +420,7 @@ case 241:
      if (!$$[$0-1]) {
        parser.suggestKeywords(['PURGE']);
      }
-
+   
 break;
 case 245:
 
@@ -429,7 +429,7 @@ case 245:
      }
      parser.suggestTables({ onlyViews: true });
      parser.suggestDatabases({ appendDot: true });
-
+   
 break;
 case 246:
 
@@ -437,12 +437,12 @@ case 246:
      if (!$$[$0-2]) {
        parser.suggestKeywords(['IF EXISTS']);
      }
-
+   
 break;
 case 251:
 
      parser.suggestKeywords(['TABLE']);
-
+   
 break;
 case 252:
 
@@ -451,7 +451,7 @@ case 252:
      if (!$$[$0-1]) {
        parser.suggestKeywords(['IF EXISTS']);
      }
-
+   
 break;
 case 256:
 
@@ -459,34 +459,34 @@ case 256:
      if (!$$[$0-2]) {
        parser.suggestKeywords(['IF EXISTS']);
      }
-
+   
 break;
 case 261: case 363: case 365:
 
      parser.addStatementLocation(_$[$0]);
-
+   
 break;
 case 263: case 264:
 
      parser.suggestDdlAndDmlKeywords();
-
+   
 break;
 case 272:
 
      parser.addClauseLocation('selectList', parser.firstDefined($$[$0-1], _$[$0-1], $$[$0-2], _$[$0-2]), _$[$0]);
      this.$ = { selectList: $$[$0] };
-
+   
 break;
 case 273:
 
      parser.addClauseLocation('selectList', parser.firstDefined($$[$0-2], _$[$0-2], $$[$0-3], _$[$0-3]), _$[$0-1]);
      this.$ = { selectList: $$[$0-1], tableExpression: $$[$0] }
-
+   
 break;
 case 275:
 
      parser.selectListNoTableSuggest($$[$0-1], $$[$0-2]);
-
+   
 break;
 case 277:
 
@@ -518,7 +518,7 @@ case 277:
        parser.suggestAggregateFunctions();
        parser.suggestAnalyticFunctions();
      }
-
+   
 break;
 case 278:
 
@@ -538,12 +538,12 @@ case 278:
      parser.suggestColumns({ identifierChain: [], source: 'select' });
      parser.suggestTables({ prependQuestionMark: true, prependFrom: true });
      parser.suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
-
+   
 break;
 case 279:
 
      parser.addClauseLocation('selectList', parser.firstDefined($$[$0-2], _$[$0-2], $$[$0-3], _$[$0-3]), _$[$0-1]);
-
+   
 break;
 case 280:
 
@@ -552,7 +552,7 @@ case 280:
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.source = 'select';
      }
-
+   
 break;
 case 281:
 
@@ -572,19 +572,19 @@ case 281:
      parser.suggestColumns({ identifierChain: [], source: 'select' });
      parser.suggestTables({ prependQuestionMark: true, prependFrom: true });
      parser.suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
-
+   
 break;
 case 282:
 
      parser.addClauseLocation('selectList', parser.firstDefined($$[$0-3], _$[$0-3], $$[$0-4], _$[$0-4]), _$[$0-2]);
      parser.checkForSelectListKeywords($$[$0-2]);
-
+   
 break;
 case 283:
 
      parser.addClauseLocation('selectList', parser.firstDefined($$[$0-4], _$[$0-4], $$[$0-5], _$[$0-5]), _$[$0-3]);
      parser.checkForSelectListKeywords($$[$0-3]);
-
+   
 break;
 case 284:
 
@@ -597,14 +597,14 @@ case 284:
      parser.suggestKeywords(keywords);
      parser.suggestTables({ prependFrom: true });
      parser.suggestDatabases({ prependFrom: true, appendDot: true });
-
+   
 break;
 case 285:
 
    if (!$$[$0-1]) {
      parser.suggestKeywords(['ALL', 'DISTINCT']);
    }
-
+ 
 break;
 case 291: case 292: case 293: case 648: case 676: case 697: case 710: case 714: case 738: case 763: case 764: case 845: case 847: case 911: case 921: case 928: case 940: case 1069: case 1191: case 1229: case 1230:
 this.$ = $$[$0];
@@ -612,17 +612,17 @@ break;
 case 294: case 295:
 
      this.$ = { cursorAtStart : false, suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true };
-
+   
 break;
 case 296: case 915: case 916:
 
      this.$ = { cursorAtStart : true, suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true };
-
+   
 break;
 case 302: case 303: case 304:
 
      parser.suggestKeywords(['JOIN', 'OUTER JOIN']);
-
+   
 break;
 case 305: case 307: case 308: case 310: case 311: case 312: case 313: case 315: case 316: case 317: case 318:
 this.$ = { suggestKeywords: ['JOIN'] };
@@ -636,7 +636,7 @@ case 319:
        suggestKeywords: parser.getKeywordsForOptionalsLR([$$[$0-3], $$[$0-2], $$[$0-1], $$[$0]], [{ value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'ORDER BY', weight: 5 }, { value: 'LIMIT', weight: 3 }], [true, true, true, true]),
        cursorAtEnd: !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]
      };
-
+   
 break;
 case 320:
 
@@ -644,7 +644,7 @@ case 320:
        suggestKeywords: parser.getKeywordsForOptionalsLR([$$[$0-1], $$[$0]], [{ value: 'ORDER BY', weight: 5 }, { value: 'LIMIT', weight: 3 }], [true, true]),
        cursorAtEnd: !$$[$0-1] && !$$[$0]
      }
-
+   
 break;
 case 321:
 
@@ -652,28 +652,28 @@ case 321:
        suggestKeywords: parser.getKeywordsForOptionalsLR([$$[$0]], [{ value: 'LIMIT', weight: 3 }], [true]),
        cursorAtEnd: !$$[$0]
      }
-
+   
 break;
 case 333:
 
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.source = 'where';
      }
-
+   
 break;
 case 334:
 
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.source = 'group by';
      }
-
+   
 break;
 case 336:
 
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.source = 'order by';
      }
-
+   
 break;
 case 338:
 
@@ -698,7 +698,7 @@ case 338:
      this.$.whereClauseLocation = $$[$0-5] ? _$[$0-5] : undefined;
      this.$.limitClausePreceding = parser.firstDefined($$[$0-1], _$[$0-1], $$[$0-2], _$[$0-2], $$[$0-3], _$[$0-3], $$[$0-5], _$[$0-5]);
      this.$.limitClauseLocation = $$[$0] ? _$[$0] : undefined;
-
+   
 break;
 case 339:
 
@@ -724,7 +724,7 @@ case 339:
      this.$.whereClauseLocation = $$[$0-5] ? _$[$0-5] : undefined;
      this.$.limitClausePreceding = parser.firstDefined($$[$0-1], _$[$0-1], $$[$0-2], _$[$0-2], $$[$0-4], _$[$0-4]);
      this.$.limitClauseLocation = $$[$0] ? _$[$0] : undefined;
-
+   
 break;
 case 340:
 
@@ -739,7 +739,7 @@ case 340:
      this.$.whereClauseLocation = $$[$0-5] ? _$[$0-5] : undefined;
      this.$.limitClausePreceding = parser.firstDefined($$[$0-1], _$[$0-1], $$[$0-3], _$[$0-3]);
      this.$.limitClauseLocation = $$[$0] ? _$[$0] : undefined;
-
+   
 break;
 case 341:
 
@@ -754,7 +754,7 @@ case 341:
      this.$.whereClauseLocation = $$[$0-5] ? _$[$0-5] : undefined;
      this.$.limitClausePreceding = parser.firstDefined($$[$0-2], _$[$0-2]);
      this.$.limitClauseLocation = $$[$0] ? _$[$0] : undefined;
-
+   
 break;
 case 342:
 
@@ -762,18 +762,18 @@ case 342:
      this.$.whereClauseLocation = $$[$0-5] ? _$[$0-5] : undefined;
      this.$.limitClausePreceding = parser.firstDefined($$[$0-2], _$[$0-2], $$[$0-3], _$[$0-3], $$[$0-4], _$[$0-4], $$[$0-5], _$[$0-5]);
      this.$.limitClauseLocation = _$[$0-1];
-
+   
 break;
 case 348:
 
      $$[$0-2].owner = 'insert';
      parser.addTablePrimary($$[$0-2]);
-
+   
 break;
 case 349:
 
      parser.suggestKeywords(['INTO']);
-
+   
 break;
 case 350:
 
@@ -782,29 +782,29 @@ case 350:
      }
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
-
+   
 break;
 case 352:
 
      $$[$0-1].owner = 'insert';
      parser.addTablePrimary($$[$0-1]);
      parser.suggestKeywords(['VALUES']);
-
+   
 break;
 case 360: case 361:
 
      return parser.yy.result;
-
+   
 break;
 case 362:
 
      parser.prepareNewStatement();
-
+   
 break;
 case 364: case 366:
 
      parser.addStatementLocation(_$[$0-3]);
-
+   
 break;
 case 493: case 496: case 582:
 this.$ = '';
@@ -812,51 +812,51 @@ break;
 case 508: case 511:
 
      parser.yy.correlatedSubQuery = false;
-
+   
 break;
 case 509: case 513:
 
      parser.suggestKeywords(['EXISTS']);
-
+   
 break;
 case 512:
 
      parser.suggestKeywords(['NOT EXISTS']);
-
+   
 break;
 case 523: case 525: case 526: case 528:
 
      parser.suggestKeywords(['<', '<=', '<>', '=', '>', '>=']);
-
+   
 break;
 case 549: case 552: case 553: case 578: case 579: case 600: case 603: case 694: case 1186:
 
      parser.suggestColumns();
-
+   
 break;
 case 557: case 583:
 
      parser.addTableLocation(_$[$0], [ { name: $$[$0] } ]);
      this.$ = { identifierChain: [ { name: $$[$0] } ] };
-
+   
 break;
 case 558: case 584:
 
      parser.addDatabaseLocation(_$[$0-2], [ { name: $$[$0-2] } ]);
      parser.addTableLocation(_$[$0], [ { name: $$[$0-2] }, { name: $$[$0] } ]);
      this.$ = { identifierChain: [ { name: $$[$0-2] }, { name: $$[$0] } ] };
-
+   
 break;
 case 560: case 565:
 
      parser.suggestDatabases();
      this.$ = { identifierChain: [{ name: $$[$0-2] }] };
-
+   
 break;
 case 561: case 586:
 
      parser.suggestTablesOrColumns($$[$0-2]);
-
+   
 break;
 case 562:
 this.$ = [{ name: $$[$0] }];
@@ -867,23 +867,23 @@ break;
 case 564:
 
      parser.suggestDatabases({ appendDot: true });
-
+   
 break;
 case 568: case 1195:
 
      parser.suggestDatabases();
-
+   
 break;
 case 577: case 699: case 700: case 706: case 707: case 988: case 1071:
 
      parser.valueExpressionSuggest();
-
+   
 break;
 case 585:
 
      parser.suggestTables();
      parser.suggestDatabases({ prependDot: true });
-
+   
 break;
 case 588:
 this.$ = { identifierChain: $$[$0-1].identifierChain, alias: $$[$0] };
@@ -891,18 +891,18 @@ break;
 case 591:
 
      parser.yy.locations[parser.yy.locations.length - 1].type = 'column';
-
+   
 break;
 case 592: case 879:
 
      parser.addAsteriskLocation(_$[$0], $$[$0-2].concat({ asterisk: true }));
-
+   
 break;
 case 594:
 
      this.$ = [ $$[$0].identifier ];
      parser.yy.firstChainLocation = parser.addUnknownLocation($$[$0].location, [ $$[$0].identifier ]);
-
+   
 break;
 case 595:
 
@@ -912,7 +912,7 @@ case 595:
      }
      $$[$0-2].push($$[$0].identifier);
      parser.addUnknownLocation($$[$0].location, $$[$0-2].concat());
-
+   
 break;
 case 596:
 
@@ -920,7 +920,7 @@ case 596:
        identifierChain: $$[$0-2]
      });
      this.$ = { suggestKeywords: [{ value: '*', weight: 10000 }] };
-
+   
 break;
 case 597:
 
@@ -928,7 +928,7 @@ case 597:
        identifierChain: $$[$0-4]
      });
      this.$ = { suggestKeywords: [{ value: '*', weight: 10000 }] };
-
+   
 break;
 case 598:
 this.$ = [ $$[$0].identifier ];
@@ -936,17 +936,17 @@ break;
 case 599:
 
      $$[$0-2].push($$[$0].identifier);
-
+   
 break;
 case 601:
 
      parser.suggestColumns({ identifierChain: $$[$0-2] });
-
+   
 break;
 case 602:
 
      parser.suggestColumns({ identifierChain: $$[$0-4] });
-
+   
 break;
 case 604:
 this.$ = { identifier: { name: $$[$0] }, location: _$[$0] };
@@ -957,22 +957,22 @@ break;
 case 629:
 
      parser.addCommonTableExpressions($$[$0-3]);
-
+   
 break;
 case 630: case 631: case 653:
 
      parser.addCommonTableExpressions($$[$0-2]);
-
+   
 break;
 case 645:
 
      parser.suggestKeywords(['ALL', 'DISTINCT', 'SELECT']);
-
+   
 break;
 case 646:
 
      parser.suggestKeywords(['ALL', 'DISTINCT']);
-
+   
 break;
 case 651:
 this.$ = $$[$0-2].concat([$$[$0]]);
@@ -980,20 +980,20 @@ break;
 case 655:
 
      parser.addCommonTableExpressions($$[$0-4]);
-
+   
 break;
 case 656:
 
      parser.addCteAliasLocation(_$[$0-4], $$[$0-4]);
      $$[$0-1].alias = $$[$0-4];
      this.$ = $$[$0-1];
-
+   
 break;
 case 663: case 664:
 
      parser.addClauseLocation('whereClause', _$[$0-1], $$[$0].whereClauseLocation);
      parser.addClauseLocation('limitClause', $$[$0].limitClausePreceding || _$[$0-1], $$[$0].limitClauseLocation);
-
+   
 break;
 case 665:
 
@@ -1071,7 +1071,7 @@ case 665:
        { value: 'RIGHT OUTER JOIN', weight: 1 }
      ]);
      parser.suggestKeywords(keywords);
-
+  
 break;
 case 666:
 
@@ -1104,18 +1104,18 @@ case 666:
        keywords.push({ value: 'UNION', weight: 2.11 });
      }
      parser.suggestKeywords(keywords);
-
+   
 break;
 case 670:
 
      this.$ = { tableReferenceList : $$[$0] }
-
+   
 break;
 case 671: case 933:
 
        parser.suggestTables();
        parser.suggestDatabases({ appendDot: true });
-
+   
 break;
 case 673:
 
@@ -1143,14 +1143,14 @@ case 673:
      if (!$$[$0-1] && !$$[$0]) {
        this.$.suggestOrderBys = { prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() };
      }
-
+   
 break;
 case 677:
 
      if ($$[$0].suggestFilters) {
        parser.suggestFilters({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
-
+   
 break;
 case 678:
 
@@ -1158,43 +1158,43 @@ case 678:
      parser.suggestColumns();
      parser.suggestKeywords(['EXISTS', 'NOT EXISTS']);
      parser.suggestFilters({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
-
+   
 break;
 case 681:
 
      this.$ = { valueExpression: $$[$0] };
-
+   
 break;
 case 682: case 721:
 
      parser.suggestSelectListAliases();
-
+   
 break;
 case 683:
 
      parser.valueExpressionSuggest();
      parser.suggestSelectListAliases();
      parser.suggestGroupBys({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
-
+   
 break;
 case 684:
 
      parser.suggestKeywords(['BY']);
      parser.suggestGroupBys({ prefix: 'BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
-
+   
 break;
 case 711:
 
      if ($$[$0].emptyOrderBy) {
        parser.suggestOrderBys({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
-
+   
 break;
 case 712:
 
      parser.suggestKeywords(['BY']);
      parser.suggestOrderBys({ prefix: 'BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
-
+   
 break;
 case 716:
 
@@ -1202,7 +1202,7 @@ case 716:
      parser.valueExpressionSuggest();
      parser.suggestAnalyticFunctions();
      parser.suggestSelectListAliases();
-
+   
 break;
 case 717: case 718: case 719:
 this.$ = { emptyOrderBy: false };
@@ -1216,25 +1216,25 @@ case 722:
      parser.valueExpressionSuggest();
      parser.suggestAnalyticFunctions();
      parser.suggestSelectListAliases();
-
+   
 break;
 case 723:
 
     this.$ = { suggestKeywords: ['ASC', 'DESC'] };
-
+  
 break;
 case 736: case 737:
 
      // verifyType($$[$0], 'BOOLEAN');
      this.$ = { types: [ 'BOOLEAN' ] };
-
+   
 break;
 case 739:
 
      // verifyType($$[$0], 'NUMBER');
      this.$ = $$[$0];
      $$[$0].types = ['NUMBER'];
-
+   
 break;
 case 740: case 741: case 742: case 743: case 750: case 751: case 752: case 753: case 754: case 755: case 761: case 762: case 783: case 841: case 842: case 900:
 this.$ = { types: [ 'BOOLEAN' ] };
@@ -1244,33 +1244,33 @@ case 744:
      this.$ = { types: [ 'BOOLEAN' ] };
      // clear correlated flag after completed sub-query (set by lexer)
      parser.yy.correlatedSubQuery = false;
-
+   
 break;
 case 746: case 747: case 748: case 749:
 
      parser.addColRefToVariableIfExists($$[$0-2], $$[$0]);
      this.$ = { types: [ 'BOOLEAN' ] };
-
+   
 break;
 case 756: case 757:
 
      // verifyType($$[$0-2], 'BOOLEAN');
      // verifyType($$[$0], 'BOOLEAN');
      this.$ = { types: [ 'BOOLEAN' ] };
-
+   
 break;
 case 758: case 759: case 760:
 
      // verifyType($$[$0-2], 'NUMBER');
      // verifyType($$[$0], 'NUMBER');
      this.$ = { types: [ 'NUMBER' ] };
-
+   
 break;
 case 766:
 
      parser.suggestKeywords(['BETWEEN', 'EXISTS', 'IN', 'LIKE', 'REGEXP', 'RLIKE']);
      this.$ = { types: [ 'BOOLEAN' ] };
-
+   
 break;
 case 767: case 769:
 this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0].suggestFilters };
@@ -1281,14 +1281,14 @@ case 768:
      parser.suggestColumns();
      parser.suggestKeywords(['EXISTS']);
      this.$ = { types: [ 'BOOLEAN' ] };
-
+   
 break;
 case 770:
 
      parser.suggestFunctions({ types: [ 'BOOLEAN' ] });
      parser.suggestColumns({ types: [ 'BOOLEAN' ] });
      this.$ = { types: [ 'BOOLEAN' ] };
-
+   
 break;
 case 771:
 this.$ = { types: [ 'T' ], suggestFilters: $$[$0].suggestFilters };
@@ -1298,7 +1298,7 @@ case 772:
      parser.suggestFunctions();
      parser.suggestColumns();
      this.$ = { types: [ 'T' ] };
-
+   
 break;
 case 773:
 
@@ -1306,73 +1306,73 @@ case 773:
        parser.applyTypeToSuggestions({ types: ['NUMBER'] });
      }
      this.$ = { types: [ 'NUMBER' ], suggestFilters: $$[$0].suggestFilters };
-
+   
 break;
 case 774:
 
      parser.suggestFunctions({ types: [ 'NUMBER' ] });
      parser.suggestColumns({ types: [ 'NUMBER' ] });
      this.$ = { types: [ 'NUMBER' ] };
-
+   
 break;
 case 775:
 
      parser.suggestKeywords(['FALSE', 'NOT NULL', 'NOT TRUE', 'NOT FALSE', 'NULL', 'TRUE']);
      this.$ = { types: [ 'BOOLEAN' ] };
-
+   
 break;
 case 776:
 
      parser.suggestKeywords(['FALSE', 'NULL', 'TRUE']);
      this.$ = { types: [ 'BOOLEAN' ] };
-
+   
 break;
 case 777:
 
      this.$ = { types: [ 'BOOLEAN' ] };
-
+   
 break;
 case 778: case 779: case 780:
 
      parser.suggestKeywords(['NOT']);
      this.$ = { types: [ 'BOOLEAN' ] };
-
+   
 break;
 case 781:
 
      parser.valueExpressionSuggest($$[$0-5], $$[$0-3] ? 'IS NOT DISTINCT FROM' : 'IS DISTINCT FROM');
      this.$ = { types: [ 'BOOLEAN' ] };
-
+   
 break;
 case 782:
 
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0].suggestFilters }
-
+   
 break;
 case 784:
 
      this.$ = $$[$0-1];
-
+   
 break;
 case 785:
 
      parser.valueExpressionSuggest();
      this.$ = { types: ['T'], typeSet: true };
-
+   
 break;
 case 786:
 
      parser.valueExpressionSuggest($$[$0], $$[$0-1]);
      parser.applyTypeToSuggestions($$[$0]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
-
+   
 break;
 case 787: case 788: case 789:
 
      parser.valueExpressionSuggest($$[$0], $$[$0-1]);
      parser.applyTypeToSuggestions($$[$0]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
-
+   
 break;
 case 790: case 791: case 792: case 793:
 
@@ -1381,28 +1381,28 @@ case 790: case 791: case 792: case 793:
        parser.addColRefIfExists($$[$0]);
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-2].suggestFilters }
-
+   
 break;
 case 794: case 796:
 
      parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
      parser.applyTypeToSuggestions($$[$0-2]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
-
+   
 break;
 case 795:
 
      parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
      parser.applyTypeToSuggestions($$[$0-2]);
      this.$ = { types: [ 'BOOLEAN' ] , typeSet: true, endsWithLessThanOrEqual: true };
-
+   
 break;
 case 797:
 
      parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
      parser.applyTypeToSuggestions($$[$0-2]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true, endsWithLessThanOrEqual: $$[$0-1] === '<='  };
-
+   
 break;
 case 798: case 799: case 800: case 801:
 
@@ -1411,7 +1411,7 @@ case 798: case 799: case 800: case 801:
        parser.addColRefIfExists($$[$0-2]);
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0].suggestFilters }
-
+   
 break;
 case 802:
 
@@ -1423,7 +1423,7 @@ case 802:
        parser.suggestKeywords(['SELECT']);
      }
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
-
+   
 break;
 case 803:
 
@@ -1435,7 +1435,7 @@ case 803:
        parser.suggestKeywords(['SELECT']);
      }
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
-
+   
 break;
 case 804: case 805:
 this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-5].suggestFilters };
@@ -1449,7 +1449,7 @@ case 808:
        parser.applyTypeToSuggestions($$[$0-2]);
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-5].suggestFilters };
-
+   
 break;
 case 809:
 
@@ -1457,7 +1457,7 @@ case 809:
        parser.applyTypeToSuggestions($$[$0-5]);
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-2].suggestFilters };
-
+   
 break;
 case 810:
 
@@ -1465,25 +1465,25 @@ case 810:
        parser.applyTypeToSuggestions($$[$0-5]);
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0].suggestFilters };
-
+   
 break;
 case 811:
 
      parser.valueExpressionSuggest($$[$0-5], $$[$0-1]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
-
+   
 break;
 case 812: case 818:
 
      parser.suggestValueExpressionKeywords($$[$0-1], ['AND']);
      this.$ = { types: [ 'BOOLEAN' ] };
-
+   
 break;
 case 813:
 
      parser.valueExpressionSuggest($$[$0-3], $$[$0-2] + ' ' + $$[$0-1]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
-
+   
 break;
 case 814:
 
@@ -1491,7 +1491,7 @@ case 814:
        parser.applyTypeToSuggestions($$[$0-4])
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-4].suggestFilters };
-
+   
 break;
 case 815:
 
@@ -1499,7 +1499,7 @@ case 815:
        parser.applyTypeToSuggestions($$[$0-4])
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-2].suggestFilters };
-
+   
 break;
 case 816:
 
@@ -1507,46 +1507,46 @@ case 816:
        parser.applyTypeToSuggestions($$[$0-4])
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0].suggestFilters };
-
+   
 break;
 case 817:
 
      parser.valueExpressionSuggest($$[$0-4], $$[$0-1]);
      parser.applyTypeToSuggestions($$[$0-4]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
-
+   
 break;
 case 819:
 
      parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
      parser.applyTypeToSuggestions($$[$0-2]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
-
+   
 break;
 case 820: case 822: case 824: case 826:
 
      parser.valueExpressionSuggest(undefined, $$[$0-1]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true, suggestFilters: true };
-
+   
 break;
 case 821: case 825:
 
      parser.addColRefIfExists($$[$0]);
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-2].suggestFilters }
-
+   
 break;
 case 823: case 827:
 
      parser.addColRefIfExists($$[$0-2]);
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0].suggestFilters }
-
+   
 break;
 case 828: case 829:
 
      parser.valueExpressionSuggest(undefined, $$[$0-1]);
      parser.applyTypeToSuggestions({ types: [ 'NUMBER' ] });
      this.$ = { types: [ 'NUMBER' ], typeSet: true };
-
+   
 break;
 case 830: case 831: case 832:
 
@@ -1555,14 +1555,14 @@ case 830: case 831: case 832:
        parser.addColRefIfExists($$[$0]);
      }
      this.$ = { types: [ 'NUMBER' ], suggestFilters: $$[$0-2].suggestFilters }
-
+   
 break;
 case 833: case 834: case 835:
 
      parser.valueExpressionSuggest(undefined, $$[$0-1]);
      parser.applyTypeToSuggestions({ types: ['NUMBER'] });
      this.$ = { types: [ 'NUMBER' ], typeSet: true };
-
+   
 break;
 case 836: case 837: case 838:
 
@@ -1571,7 +1571,7 @@ case 836: case 837: case 838:
        parser.addColRefIfExists($$[$0-2]);
      }
      this.$ = { types: [ 'NUMBER' ], suggestFilters: $$[$0].suggestFilters };
-
+   
 break;
 case 839:
 this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-1].suggestFilters };
@@ -1584,33 +1584,33 @@ case 843:
      parser.valueExpressionSuggest(undefined, $$[$0]);
      parser.applyTypeToSuggestions({ types: [ 'STRING' ] });
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
-
+   
 break;
 case 844:
 
      parser.valueExpressionSuggest(undefined, $$[$0-1] + ' ' + $$[$0]);
      parser.applyTypeToSuggestions({ types: [ 'STRING' ] });
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
-
+   
 break;
 case 846:
 
      parser.valueExpressionSuggest();
      parser.suggestKeywords(['WHEN']);
      this.$ = { types: [ 'T' ], typeSet: true };
-
+   
 break;
 case 848:
 
      parser.suggestValueExpressionKeywords($$[$0-2], ['WHEN']);
      this.$ = { types: [ 'T' ], typeSet: true };
-
+   
 break;
 case 849:
 
       this.$ = $$[$0];
       this.$.suggestFilters = $$[$0-1].suggestFilters;
-
+    
 break;
 case 850:
 this.$ = { types: [ 'T' ], suggestFilters: $$[$0-1].suggestFilters };
@@ -1621,57 +1621,57 @@ break;
 case 852: case 854:
 
      $$[$0].position = 1;
-
+   
 break;
 case 853:
 
      $$[$0].position = $$[$0-2].position + 1;
      this.$ = $$[$0];
-
+   
 break;
 case 855:
 
      $$[$0-2].position += 1;
-
+   
 break;
 case 856:
 
      $$[$0-2].position = 1;
-
+   
 break;
 case 857:
 
      $$[$0-4].position += 1;
-
+   
 break;
 case 858:
 
      parser.valueExpressionSuggest();
      $$[$0-2].position += 1;
-
+   
 break;
 case 859:
 
      parser.valueExpressionSuggest();
      $$[$0-4].position += 1;
-
+   
 break;
 case 860:
 
      parser.suggestValueExpressionKeywords($$[$0-3]);
-
+   
 break;
 case 861: case 862:
 
      parser.valueExpressionSuggest();
      this.$ = { cursorAtStart : true, position: 1 };
-
+   
 break;
 case 863: case 864:
 
      parser.valueExpressionSuggest();
      this.$ = { position: 2 };
-
+   
 break;
 case 868:
 this.$ = { types: ['COLREF'], columnReference: $$[$0].chain };
@@ -1699,7 +1699,7 @@ case 869:
      } else {
        this.$ = { function: fn, types: ['UDFREF'] }
      }
-
+   
 break;
 case 870:
 
@@ -1709,7 +1709,7 @@ case 870:
     } else {
       this.$ = { function: $$[$0-1], types: ['UDFREF'] }
     }
-
+  
 break;
 case 872:
 this.$ = { types: [ 'NULL' ] };
@@ -1721,7 +1721,7 @@ case 874:
      } else {
        this.$ = { types: ['COLREF'], columnReference: $$[$0] };
      }
-
+   
 break;
 case 875:
 
@@ -1743,7 +1743,7 @@ case 875:
        parser.applyArgumentTypesToSuggestions(fn, $$[$0].position);
      }
      this.$ = { function: fn, types: ['UDFREF'] };
-
+   
 break;
 case 876: case 1034: case 1035:
 
@@ -1752,7 +1752,7 @@ case 876: case 1034: case 1035:
        parser.applyArgumentTypesToSuggestions($$[$0-1], $$[$0].position);
      }
      this.$ = { function: $$[$0-1], types: ['UDFREF'] };
-
+   
 break;
 case 878:
 
@@ -1763,12 +1763,12 @@ case 878:
      // used for function references with db prefix
      var firstLoc = parser.yy.locations[parser.yy.locations.length - $$[$0].length];
      this.$ = { chain: $$[$0], firstLoc: firstLoc, lastLoc: lastLoc }
-
+   
 break;
 case 885:
 
      parser.suggestValues($$[$0]);
-
+   
 break;
 case 886:
 this.$ = { types: [ 'NUMBER' ] };
@@ -1787,17 +1787,17 @@ case 898: case 899:
      } else {
        this.$ = { types: [ 'STRING' ] }
      }
-
+   
 break;
 case 901:
 
     this.$ = { partialQuote: '\'', missingEndQuote: parser.yy.missingEndQuote };
-
+  
 break;
 case 902:
 
     this.$ = { partialQuote: '"', missingEndQuote: parser.yy.missingEndQuote };
-
+  
 break;
 case 907:
 
@@ -1811,20 +1811,20 @@ case 907:
      } else {
        this.$ = { valueExpression: $$[$0-1] }
      }
-
+   
 break;
 case 908:
 
      parser.addAsteriskLocation(_$[$0], [{ asterisk: true }]);
      this.$ = { asterisk: true }
-
+   
 break;
 case 909:
 
      if ($$[$0]) {
        parser.addColumnAliasLocation($$[$0].location, $$[$0].alias, _$[$0-1]);
      }
-
+   
 break;
 case 910:
 
@@ -1832,7 +1832,7 @@ case 910:
      parser.suggestColumns();
      parser.addColumnAliasLocation(_$[$0], $$[$0], _$[$0-2]);
      this.$ = { suggestAggregateFunctions: true };
-
+   
 break;
 case 912:
 this.$ = [ $$[$0] ];
@@ -1840,27 +1840,27 @@ break;
 case 913:
 
      $$[$0-2].push($$[$0]);
-
+   
 break;
 case 918:
 
      parser.checkForSelectListKeywords($$[$0-2]);
-
+   
 break;
 case 919:
 
      parser.checkForSelectListKeywords($$[$0-3]);
-
+   
 break;
 case 920:
 
      this.$ = { suggestKeywords: parser.getSelectListKeywords(), suggestTables: true, suggestDatabases: true, suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true };
-
+   
 break;
 case 922: case 923: case 925:
 
      this.$ = { suggestKeywords: parser.getSelectListKeywords(), suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
-
+   
 break;
 case 936:
 
@@ -1884,7 +1884,7 @@ case 936:
          };
        }
       }
-
+   
 break;
 case 943:
 
@@ -1903,7 +1903,7 @@ case 943:
      if (parser.yy.latestTablePrimaries.length > 0) {
         parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1].join = true;
      }
-
+   
 break;
 case 944:
 
@@ -1922,7 +1922,7 @@ case 944:
      if (parser.yy.latestTablePrimaries.length > 0) {
        parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1].join = true;
      }
-
+   
 break;
 case 945:
 this.$ = { joinType: $$[$0] };
@@ -1935,14 +1935,14 @@ case 947:
      if ($$[$0-2].suggestKeywords) {
        parser.suggestKeywords($$[$0-2].suggestKeywords);
      }
-
+   
 break;
 case 948:
 
      if ($$[$0].suggestKeywords) {
        parser.suggestKeywords($$[$0].suggestKeywords);
      }
-
+   
 break;
 case 951:
 
@@ -1969,7 +1969,7 @@ case 951:
      parser.suggestDatabases({
        appendDot: true
      });
-
+   
 break;
 case 956:
 this.$ = 'CROSS JOIN';
@@ -2023,7 +2023,7 @@ case 976:
 
      parser.valueExpressionSuggest();
      parser.suggestJoinConditions({ prependOn: false });
-
+   
 break;
 case 977:
 
@@ -2047,7 +2047,7 @@ case 977:
      if (keywords.length > 0) {
        this.$.suggestKeywords = keywords;
      }
-
+   
 break;
 case 978:
 
@@ -2068,14 +2068,14 @@ case 978:
      if (keywords.length > 0) {
        this.$.suggestKeywords = keywords;
      }
-
+   
 break;
 case 979:
 
      if ($$[$0]) {
        parser.addTableAliasLocation($$[$0].location, $$[$0].alias, $$[$0-1].identifierChain);
      }
-
+   
 break;
 case 980:
 
@@ -2083,17 +2083,17 @@ case 980:
        parser.addTablePrimary({ subQueryAlias: $$[$0].alias });
        parser.addSubqueryAliasLocation($$[$0].location, $$[$0].alias);
      }
-
+   
 break;
 case 990:
 
      parser.pushQueryState();
-
+   
 break;
 case 991:
 
      parser.popQueryState();
-
+   
 break;
 case 993:
 
@@ -2103,7 +2103,7 @@ case 993:
        parser.addSubqueryAliasLocation($$[$0-1].location, $$[$0-1].alias, $$[$0-2].identifierChain);
      }
      this.$ = $$[$0-2];
-
+   
 break;
 case 996:
 
@@ -2114,7 +2114,7 @@ case 996:
      });
      parser.popQueryState(subQuery);
      this.$ = subQuery;
-
+   
 break;
 case 1013: case 1014: case 1015: case 1016:
 this.$ = { alias: $$[$0], location: _$[$0] };
@@ -2124,12 +2124,12 @@ case 1022:
      if (!$$[$0]) {
        $$[$0-1].suggestKeywords = ['OVER'];
      }
-
+   
 break;
 case 1029:
 
      parser.suggestKeywords(['OVER']);
-
+   
 break;
 case 1032: case 1033:
 
@@ -2139,7 +2139,7 @@ case 1032: case 1033:
      } else {
        this.$ = { function: $$[$0-1], types: ['UDFREF'] }
      }
-
+   
 break;
 case 1041:
 this.$ = { expression: $$[$0-1] };
@@ -2148,12 +2148,12 @@ case 1042:
 
      parser.valueExpressionSuggest();
      this.$ = { position: 1 }
-
+   
 break;
 case 1043:
 
      parser.suggestValueExpressionKeywords($$[$0-1]);
-
+   
 break;
 case 1051: case 1129: case 1150:
 this.$ = { function: $$[$0-2], types: ['UDFREF'] };
@@ -2166,26 +2166,26 @@ case 1053:
      parser.valueExpressionSuggest();
      parser.applyArgumentTypesToSuggestions($$[$0-3], 1);
      this.$ = { function: $$[$0-3], types: ['UDFREF'] };
-
+   
 break;
 case 1054:
 
      parser.suggestValueExpressionKeywords($$[$0-2]);
      this.$ = { function: $$[$0-4], types: ['UDFREF'] };
-
+   
 break;
 case 1055:
 
      parser.applyArgumentTypesToSuggestions($$[$0-3], $$[$0-1].position);
      this.$ = { function: $$[$0-3], types: ['UDFREF'] };
-
+   
 break;
 case 1063: case 1064:
 
      if (parser.yy.result.suggestFunctions) {
        parser.suggestAggregateFunctions();
      }
-
+   
 break;
 case 1065:
 
@@ -2194,7 +2194,7 @@ case 1065:
      } else if (!$$[$0-2]) {
        parser.suggestKeywords(['PARTITION BY']);
      }
-
+   
 break;
 case 1066:
 
@@ -2203,13 +2203,13 @@ case 1066:
       } else {
         parser.suggestValueExpressionKeywords($$[$0-3]);
       }
-
+    
 break;
 case 1075:
 
       // Only allowed in last order by
       delete parser.yy.result.suggestAnalyticFunctions;
-
+    
 break;
 case 1076:
 
@@ -2221,12 +2221,12 @@ case 1076:
         keywords = keywords.concat([{ value: 'RANGE BETWEEN', weight: 1 }, { value: 'ROWS BETWEEN', weight: 1 }]);
       }
       parser.suggestKeywords(keywords);
-
+    
 break;
 case 1082:
 
      parser.suggestKeywords(['BETWEEN']);
-
+   
 break;
 case 1083:
 
@@ -2235,75 +2235,75 @@ case 1083:
      } else if (!$$[$0-1]) {
        parser.suggestKeywords(['AND']);
      }
-
+   
 break;
 case 1088:
 
     lexer.popState();
-
+  
 break;
 case 1089:
 
     lexer.begin('hdfs');
-
+  
 break;
 case 1091:
 
       parser.suggestHdfs({ path: $$[$0-3] });
-
+    
 break;
 case 1092:
 
      parser.suggestHdfs({ path: $$[$0-2] });
-
+   
 break;
 case 1093:
 
       parser.suggestHdfs({ path: $$[$0-1] });
-
+    
 break;
 case 1094:
 
      parser.suggestHdfs({ path: '' });
-
+   
 break;
 case 1095:
 
       parser.suggestHdfs({ path: '' });
-
+    
 break;
 case 1101:
 
      parser.suggestKeywords(['PRECEDING']);
-
+   
 break;
 case 1102: case 1107:
 
      parser.suggestKeywords(['ROW']);
-
+   
 break;
 case 1106:
 
      parser.suggestKeywords(['CURRENT ROW', 'UNBOUNDED FOLLOWING']);
-
+   
 break;
 case 1108:
 
      parser.suggestKeywords(['FOLLOWING']);
-
+   
 break;
 case 1114:
 
      parser.valueExpressionSuggest();
      parser.suggestAggregateFunctions();
      parser.suggestSelectListAliases(true);
-
+   
 break;
 case 1115:
 
      parser.suggestAggregateFunctions();
      parser.suggestSelectListAliases(true);
-
+   
 break;
 case 1116: case 1121:
 this.$ = { types: [ $$[$0-1].toUpperCase() ] };
@@ -2312,31 +2312,31 @@ case 1118:
 
      parser.valueExpressionSuggest();
      this.$ = { types: [ $$[$0-1].toUpperCase() ] };
-
+   
 break;
 case 1119: case 1120:
 
      parser.valueExpressionSuggest();
      this.$ = { types: [ 'T' ] };
-
+   
 break;
 case 1124:
 
      parser.suggestValueExpressionKeywords($$[$0-3], [{ value: 'AS', weight: 2 }]);
      this.$ =  { types: [ $$[$0-1].toUpperCase() ] };
-
+   
 break;
 case 1125:
 
      parser.suggestValueExpressionKeywords($$[$0-2], [{ value: 'AS', weight: 2 }]);
      this.$ = { types: [ 'T' ] };
-
+   
 break;
 case 1126: case 1127:
 
      parser.suggestKeywords(parser.getTypeKeywords());
      this.$ = { types: [ 'T' ] };
-
+   
 break;
 case 1128: case 1134:
 this.$ = { function: $$[$0-3], types: ['UDFREF'] };
@@ -2356,13 +2356,13 @@ case 1131:
      }
      parser.suggestKeywords(keywords);
      this.$ = { function: $$[$0-4], types: ['UDFREF'] };
-
+   
 break;
 case 1132: case 1137: case 1152:
 
      parser.suggestValueExpressionKeywords($$[$0-2]);
      this.$ = { function: $$[$0-5], types: ['UDFREF'] };
-
+   
 break;
 case 1133:
 
@@ -2374,7 +2374,7 @@ case 1133:
        parser.suggestKeywords(keywords);
      }
      this.$ = { function: $$[$0-4], types: ['UDFREF'] };
-
+   
 break;
 case 1136:
 
@@ -2393,7 +2393,7 @@ case 1136:
      parser.suggestKeywords(keywords);
      parser.applyArgumentTypesToSuggestions($$[$0-4], 1);
      this.$ = { function: $$[$0-4], types: ['UDFREF'] };
-
+   
 break;
 case 1138:
 
@@ -2415,7 +2415,7 @@ case 1138:
        parser.applyArgumentTypesToSuggestions($$[$0-4], $$[$0-1].position);
      }
      this.$ = { function: $$[$0-4], types: ['UDFREF'] };
-
+   
 break;
 case 1151:
 
@@ -2430,7 +2430,7 @@ case 1151:
      }
      parser.suggestKeywords(keywords);
      this.$ = { function: $$[$0-4], types: ['UDFREF'] };
-
+   
 break;
 case 1153:
 
@@ -2438,29 +2438,29 @@ case 1153:
        parser.applyArgumentTypesToSuggestions($$[$0-4], 1);
      }
      this.$ = { function: $$[$0-4], types: ['UDFREF'] };
-
+   
 break;
 case 1168:
 
      parser.suggestKeywords([ 'WHERE' ]);
-
+   
 break;
 case 1169:
 
      parser.suggestKeywords([ 'SET' ]);
-
+   
 break;
 case 1185:
 
      parser.suggestKeywords([ '=' ]);
-
+   
 break;
 case 1194:
 
      if (! parser.yy.cursorFound) {
        parser.yy.result.useDatabase = $$[$0];
      }
-
+   
 break;
 case 1197:
 this.$ = { inValueEdit: true };
@@ -2476,7 +2476,7 @@ case 1205: case 1206: case 1207:
      parser.suggestFunctions({ types: [ 'STRING' ] });
      parser.suggestColumns({ types: [ 'STRING' ] });
      this.$ = { types: ['BOOLEAN'] }
-
+   
 break;
 case 1208: case 1210:
 this.$ = parser.findCaseType($$[$0-1]);
@@ -2485,14 +2485,14 @@ case 1209: case 1212:
 
      $$[$0-3].caseTypes.push($$[$0-1]);
      this.$ = parser.findCaseType($$[$0-3]);
-
+   
 break;
 case 1211:
 
      parser.suggestValueExpressionKeywords($$[$0-1], ['END']);
      $$[$0-3].caseTypes.push($$[$0-1]);
      this.$ = parser.findCaseType($$[$0-3]);
-
+   
 break;
 case 1213:
 this.$ = parser.findCaseType($$[$0-2]);
@@ -2505,7 +2505,7 @@ case 1214:
        parser.suggestValueExpressionKeywords($$[$0-3], [{ value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
      }
      this.$ = parser.findCaseType($$[$0-3]);
-
+   
 break;
 case 1215:
 
@@ -2515,40 +2515,40 @@ case 1215:
        parser.suggestValueExpressionKeywords($$[$0-2], [{ value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
      }
      this.$ = parser.findCaseType($$[$0-2]);
-
+   
 break;
 case 1216:
 
      $$[$0-3].caseTypes.push($$[$0-1]);
      this.$ = parser.findCaseType($$[$0-3]);
      this.$.suggestFilters = $$[$0-1].suggestFilters
-
+   
 break;
 case 1217:
 
      parser.valueExpressionSuggest();
      this.$ = parser.findCaseType($$[$0-3]);
-
+   
 break;
 case 1218:
 
      parser.valueExpressionSuggest();
      this.$ = { types: [ 'T' ], typeSet: true };
-
+   
 break;
 case 1219:
 
      parser.valueExpressionSuggest();
      parser.suggestKeywords(['WHEN']);
      this.$ = $$[$0-1];
-
+   
 break;
 case 1220:
 
      parser.valueExpressionSuggest();
      parser.suggestKeywords(['WHEN']);
      this.$ = { types: [ 'T' ] };
-
+   
 break;
 case 1223:
 this.$ = { caseTypes: [ $$[$0] ], lastType: $$[$0] };
@@ -2557,12 +2557,12 @@ case 1224:
 
      $$[$0-1].caseTypes.push($$[$0]);
      this.$ = { caseTypes: $$[$0-1].caseTypes, lastType: $$[$0] };
-
+   
 break;
 case 1228:
 
      parser.suggestValueExpressionKeywords($$[$0-2], ['WHEN']);
-
+   
 break;
 case 1231:
 this.$ = { caseTypes: [{ types: ['T'] }], suggestFilters: $$[$0].suggestFilters };
@@ -2580,64 +2580,64 @@ case 1236:
 
      parser.suggestKeywords(['WHEN']);
      this.$ = { caseTypes: [{ types: ['T'] }] };
-
+   
 break;
 case 1237:
 
      parser.suggestKeywords(['WHEN']);
      this.$ = { caseTypes: [$$[$0]] };
-
+   
 break;
 case 1238:
 
      parser.valueExpressionSuggest();
      parser.suggestKeywords(['WHEN']);
      this.$ = { caseTypes: [{ types: ['T'] }] };
-
+   
 break;
 case 1239:
 
       parser.valueExpressionSuggest();
       parser.suggestKeywords(['WHEN']);
       this.$ = { caseTypes: [{ types: ['T'] }] };
-
+    
 break;
 case 1240: case 1242:
 
      parser.valueExpressionSuggest();
      this.$ = { caseTypes: [{ types: ['T'] }], suggestFilters: true };
-
+   
 break;
 case 1241:
 
      parser.valueExpressionSuggest();
      parser.suggestKeywords(['THEN']);
      this.$ = { caseTypes: [{ types: ['T'] }], suggestFilters: true };
-
+   
 break;
 case 1243:
 
      parser.valueExpressionSuggest();
      this.$ = { caseTypes: [$$[$0]], suggestFilters: true };
-
+   
 break;
 case 1244:
 
      parser.suggestValueExpressionKeywords($$[$0-1], ['THEN']);
      this.$ = { caseTypes: [{ types: ['T'] }] };
-
+   
 break;
 case 1245:
 
      parser.suggestValueExpressionKeywords($$[$0-2], ['THEN']);
      this.$ = { caseTypes: [{ types: ['T'] }] };
-
+   
 break;
 case 1246: case 1247: case 1248: case 1249:
 
      parser.valueExpressionSuggest();
      this.$ = { caseTypes: [{ types: ['T'] }] };
-
+   
 break;
 }
 },
@@ -3221,363 +3221,361 @@ options: {"case-insensitive":true,"flex":true},
 performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
-case 0: /* skip whitespace */
+case 0: /* skip whitespace */ 
 break;
-case 1: /* skip comments */
+case 1: /* skip comments */ 
 break;
-case 2: /* skip comments */
+case 2: /* skip comments */ 
 break;
-case 3: parser.yy.partialCursor = false; parser.yy.cursorFound = yy_.yylloc; return 14;
+case 3: parser.yy.partialCursor = false; parser.yy.cursorFound = yy_.yylloc; return 14; 
 break;
-case 4: parser.yy.partialCursor = true; parser.yy.cursorFound = yy_.yylloc; return 303;
+case 4: parser.yy.partialCursor = true; parser.yy.cursorFound = yy_.yylloc; return 303; 
 break;
-case 5: this.popState(); return 390;
+case 5: this.popState(); return 390; 
 break;
-case 6: return 186;
+case 6: return 186; 
 break;
-case 7: parser.determineCase(yy_.yytext); parser.addStatementTypeLocation('ALTER', yy_.yylloc, yy.lexer.upcomingInput()); return 20;
+case 7: parser.determineCase(yy_.yytext); parser.addStatementTypeLocation('ALTER', yy_.yylloc, yy.lexer.upcomingInput()); return 20; 
 break;
-case 8: return 240;
+case 8: return 240; 
 break;
-case 9: return 28;
+case 9: return 28; 
 break;
-case 10: return 242;
+case 10: return 242; 
 break;
-case 11: this.begin('between'); return 245;
+case 11: this.begin('between'); return 245; 
 break;
-case 12: return 246;
+case 12: return 246; 
 break;
-case 13: return 247;
+case 13: return 247; 
 break;
-case 14: return 118;
+case 14: return 118; 
 break;
-case 15: return 315;
+case 15: return 315; 
 break;
-case 16: return 248;
+case 16: return 248; 
 break;
-case 17: return 250;
+case 17: return 250; 
 break;
-case 18: return 50;
+case 18: return 50; 
 break;
-case 19: parser.determineCase(yy_.yytext); return 40;
+case 19: parser.determineCase(yy_.yytext); return 40; 
 break;
-case 20: return 191;
+case 20: return 191; 
 break;
-case 21: return 252;
+case 21: return 252; 
 break;
-case 22: return 253;
+case 22: return 253; 
 break;
-case 23: return 254;
+case 23: return 254; 
 break;
-case 24: return 255;
+case 24: return 255; 
 break;
-case 25: return 256;
+case 25: return 256; 
 break;
-case 26: return 241;
+case 26: return 241; 
 break;
-case 27: return 257;
+case 27: return 257; 
 break;
-case 28: parser.determineCase(yy_.yytext); parser.addStatementTypeLocation('DROP', yy_.yylloc, yy.lexer.upcomingInput()); return 152;
+case 28: parser.determineCase(yy_.yytext); parser.addStatementTypeLocation('DROP', yy_.yylloc, yy.lexer.upcomingInput()); return 152; 
 break;
-case 29: return 258;
+case 29: return 258; 
 break;
-case 30: return 259;
+case 30: return 259; 
 break;
-case 31: parser.yy.correlatedSubQuery = true; return 260;
+case 31: parser.yy.correlatedSubQuery = true; return 260; 
 break;
-case 32: return 261;
+case 32: return 261; 
 break;
-case 33: return 262;
+case 33: return 262; 
 break;
-case 34: return 263;
+case 34: return 263; 
 break;
-case 35: parser.determineCase(yy_.yytext); return 264;
+case 35: parser.determineCase(yy_.yytext); return 264; 
 break;
-case 36: return 188;
+case 36: return 188; 
 break;
-case 37: return 265;
+case 37: return 265; 
 break;
-case 38: return 266;
+case 38: return 266; 
 break;
-case 39: return 268;
+case 39: return 268; 
 break;
-case 40: return 269;
+case 40: return 269; 
 break;
-case 41: return 194;
+case 41: return 194; 
 break;
-case 42: return 218;
+case 42: return 218; 
 break;
-case 43: return 270;
+case 43: return 270; 
 break;
-case 44: return 219;
+case 44: return 219; 
 break;
-case 45: return 271;
+case 45: return 271; 
 break;
-case 46: return 192;
+case 46: return 192; 
 break;
-case 47: return 189;
+case 47: return 189; 
 break;
-case 48: return 69;
+case 48: return 69; 
 break;
-case 49: return 272;
+case 49: return 272; 
 break;
-case 50: return 87;
+case 50: return 87; 
 break;
-case 51: return 88;
+case 51: return 88; 
 break;
-case 52: return 275;
+case 52: return 275; 
 break;
-case 53: return 229;
+case 53: return 229; 
 break;
-case 54: return 276;
+case 54: return 276; 
 break;
-case 55: return 277;
+case 55: return 277; 
 break;
-case 56: return 193;
+case 56: return 193; 
 break;
-case 57: return 117;
+case 57: return 117; 
 break;
-case 58: return 279;
+case 58: return 279; 
 break;
-case 59: return 157;
+case 59: return 157; 
 break;
-case 60: return 121;
+case 60: return 121; 
 break;
-case 61: return 280;
+case 61: return 280; 
 break;
-case 62: return 190;
+case 62: return 190; 
 break;
-case 63: return 281;
+case 63: return 281; 
 break;
-case 64: return 282;
+case 64: return 282; 
 break;
-case 65: return 142;
+case 65: return 142; 
 break;
-case 66: return 283;
+case 66: return 283; 
 break;
-case 67: return 284;
+case 67: return 284; 
 break;
-case 68: parser.determineCase(yy_.yytext); parser.addStatementTypeLocation('SELECT', yy_.yylloc); return 170;
+case 68: parser.determineCase(yy_.yytext); parser.addStatementTypeLocation('SELECT', yy_.yylloc); return 170; 
 break;
-case 69: return 195;
+case 69: return 195; 
 break;
-case 70: parser.determineCase(yy_.yytext); parser.addStatementTypeLocation('SET', yy_.yylloc); return 13;
+case 70: parser.determineCase(yy_.yytext); parser.addStatementTypeLocation('SET', yy_.yylloc); return 13; 
 break;
-case 71: parser.determineCase(yy_.yytext); parser.addStatementTypeLocation('SHOW', yy_.yylloc); return 'SHOW';
+case 71: parser.determineCase(yy_.yytext); parser.addStatementTypeLocation('SHOW', yy_.yylloc); return 'SHOW'; 
 break;
-case 72: return 285;
+case 72: return 285; 
 break;
-case 73: return 176;
+case 73: return 288; 
 break;
-case 74: return 288;
+case 74: return 24; 
 break;
-case 75: return 24;
+case 75: return 290; 
 break;
-case 76: return 290;
+case 76: return 291; 
 break;
-case 77: return 291;
+case 77: return 292; 
 break;
-case 78: return 292;
+case 78: return 'TO'; 
 break;
-case 79: return 'TO';
+case 79: return 293; 
 break;
-case 80: return 293;
+case 80: parser.determineCase(yy_.yytext); parser.addStatementTypeLocation('TRUNCATE', yy_.yylloc, yy.lexer.upcomingInput()); return 158; 
 break;
-case 81: parser.determineCase(yy_.yytext); parser.addStatementTypeLocation('TRUNCATE', yy_.yylloc, yy.lexer.upcomingInput()); return 158;
+case 81: return 489; 
 break;
-case 82: return 489;
+case 82: return 294; 
 break;
-case 83: return 294;
+case 83: parser.determineCase(yy_.yytext); return 500; 
 break;
-case 84: parser.determineCase(yy_.yytext); return 500;
+case 84: parser.determineCase(yy_.yytext); parser.addStatementTypeLocation('USE', yy_.yylloc); return 514; 
 break;
-case 85: parser.determineCase(yy_.yytext); parser.addStatementTypeLocation('USE', yy_.yylloc); return 514;
+case 85: return 132; 
 break;
-case 86: return 132;
+case 86: return 299; 
 break;
-case 87: return 299;
+case 87: return 32; 
 break;
-case 88: return 32;
+case 88: return 301; 
 break;
-case 89: return 301;
+case 89: return 302; 
 break;
-case 90: return 302;
+case 90: parser.determineCase(yy_.yytext); parser.addStatementTypeLocation('WITH', yy_.yylloc); return 357; 
 break;
-case 91: parser.determineCase(yy_.yytext); parser.addStatementTypeLocation('WITH', yy_.yylloc); return 357;
+case 91: return 278; 
 break;
-case 92: return 278;
+case 92: return 142; 
 break;
-case 93: return 142;
+case 93: yy.lexer.unput('('); yy_.yytext = 'avg'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 243; 
 break;
-case 94: yy.lexer.unput('('); yy_.yytext = 'avg'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 243;
+case 94: yy.lexer.unput('('); yy_.yytext = 'cast'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 249; 
 break;
-case 95: yy.lexer.unput('('); yy_.yytext = 'cast'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 249;
+case 95: yy.lexer.unput('('); yy_.yytext = 'count'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 251; 
 break;
-case 96: yy.lexer.unput('('); yy_.yytext = 'count'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 251;
+case 96: yy.lexer.unput('('); yy_.yytext = 'max'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 273; 
 break;
-case 97: yy.lexer.unput('('); yy_.yytext = 'max'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 273;
+case 97: yy.lexer.unput('('); yy_.yytext = 'min'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 274; 
 break;
-case 98: yy.lexer.unput('('); yy_.yytext = 'min'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 274;
+case 98: yy.lexer.unput('('); yy_.yytext = 'stddev_pop'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 286; 
 break;
-case 99: yy.lexer.unput('('); yy_.yytext = 'stddev_pop'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 286;
+case 99: yy.lexer.unput('('); yy_.yytext = 'stddev_samp'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 287; 
 break;
-case 100: yy.lexer.unput('('); yy_.yytext = 'stddev_samp'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 287;
+case 100: yy.lexer.unput('('); yy_.yytext = 'sum'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 289; 
 break;
-case 101: yy.lexer.unput('('); yy_.yytext = 'sum'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 289;
+case 101: yy.lexer.unput('('); yy_.yytext = 'var_pop'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 297; 
 break;
-case 102: yy.lexer.unput('('); yy_.yytext = 'var_pop'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 297;
+case 102: yy.lexer.unput('('); yy_.yytext = 'var_samp'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 298; 
 break;
-case 103: yy.lexer.unput('('); yy_.yytext = 'var_samp'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 298;
+case 103: yy.lexer.unput('('); yy_.yytext = 'variance'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 300; 
 break;
-case 104: yy.lexer.unput('('); yy_.yytext = 'variance'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 300;
+case 104: yy.lexer.unput('('); yy_.yytext = 'cume_dist'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 239; 
 break;
-case 105: yy.lexer.unput('('); yy_.yytext = 'cume_dist'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 239;
+case 105: yy.lexer.unput('('); yy_.yytext = 'dense_rank'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 239; 
 break;
-case 106: yy.lexer.unput('('); yy_.yytext = 'dense_rank'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 239;
+case 106: yy.lexer.unput('('); yy_.yytext = 'first_value'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 239; 
 break;
-case 107: yy.lexer.unput('('); yy_.yytext = 'first_value'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 239;
+case 107: yy.lexer.unput('('); yy_.yytext = 'lag'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 239; 
 break;
-case 108: yy.lexer.unput('('); yy_.yytext = 'lag'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 239;
+case 108: yy.lexer.unput('('); yy_.yytext = 'last_value'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 239; 
 break;
-case 109: yy.lexer.unput('('); yy_.yytext = 'last_value'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 239;
+case 109: yy.lexer.unput('('); yy_.yytext = 'lead'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 239; 
 break;
-case 110: yy.lexer.unput('('); yy_.yytext = 'lead'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 239;
+case 110: yy.lexer.unput('('); yy_.yytext = 'rank'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 239; 
 break;
-case 111: yy.lexer.unput('('); yy_.yytext = 'rank'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 239;
+case 111: yy.lexer.unput('('); yy_.yytext = 'row_number'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 239; 
 break;
-case 112: yy.lexer.unput('('); yy_.yytext = 'row_number'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 239;
+case 112: return 295; 
 break;
-case 113: return 295;
+case 113: return 295; 
 break;
-case 114: return 295;
+case 114: return 296; 
 break;
-case 115: return 296;
+case 115: return 230; 
 break;
-case 116: return 230;
+case 116: parser.yy.cursorFound = true; return 14; 
 break;
-case 117: parser.yy.cursorFound = true; return 14;
+case 117: parser.yy.cursorFound = true; return 303; 
 break;
-case 118: parser.yy.cursorFound = true; return 303;
+case 118: return 267; 
 break;
-case 119: return 267;
+case 119: parser.addFileLocation(yy_.yylloc, yy_.yytext); return 494; 
 break;
-case 120: parser.addFileLocation(yy_.yylloc, yy_.yytext); return 494;
+case 120: this.popState(); return 495; 
 break;
-case 121: this.popState(); return 495;
+case 121: return 225; 
 break;
-case 122: return 225;
+case 122: return 240; 
 break;
-case 123: return 240;
+case 123: return 276; 
 break;
-case 124: return 276;
+case 124: return 184; 
 break;
-case 125: return 184;
+case 125: return 100; 
 break;
-case 126: return 100;
+case 126: return 101; 
 break;
-case 127: return 101;
+case 127: return 134; 
 break;
-case 128: return 134;
+case 128: return 134; 
 break;
-case 129: return 134;
+case 129: return 134; 
 break;
-case 130: return 134;
+case 130: return 134; 
 break;
-case 131: return 134;
+case 131: return 134; 
 break;
-case 132: return 134;
+case 132: return 234; 
 break;
-case 133: return 234;
+case 133: return 233; 
 break;
-case 134: return 233;
+case 134: return 241; 
 break;
-case 135: return 241;
+case 135: return 241; 
 break;
-case 136: return 241;
+case 136: return 241; 
 break;
-case 137: return 241;
+case 137: return 241; 
 break;
-case 138: return 241;
+case 138: return 241; 
 break;
-case 139: return 241;
+case 139: return 241; 
 break;
-case 140: return 241;
+case 140: return 77; 
 break;
-case 141: return 77;
+case 141: return 235; 
 break;
-case 142: return 235;
+case 142: return 112; 
 break;
-case 143: return 112;
+case 143: return 163; 
 break;
-case 144: return 163;
+case 144: return 238; 
 break;
-case 145: return 238;
+case 145: return 232; 
 break;
-case 146: return 232;
+case 146: return 71; 
 break;
-case 147: return 71;
+case 147: return 73; 
 break;
-case 148: return 73;
+case 148: return 236; 
 break;
-case 149: return 236;
+case 149: return 237; 
 break;
-case 150: return 237;
+case 150: return 231; 
 break;
-case 151: return 231;
+case 151: this.begin('backtickedValue'); return 244; 
 break;
-case 152: this.begin('backtickedValue'); return 244;
-break;
-case 153:
+case 152:
                                              if (parser.handleQuotedValueWithCursor(this, yy_.yytext, yy_.yylloc, '`')) {
                                                return 307;
                                              }
                                              return 55;
-
+                                           
 break;
-case 154: this.popState(); return 244;
+case 153: this.popState(); return 244; 
 break;
-case 155: this.begin('singleQuotedValue'); return 53;
+case 154: this.begin('singleQuotedValue'); return 53; 
 break;
-case 156:
+case 155:
                                              if (parser.handleQuotedValueWithCursor(this, yy_.yytext, yy_.yylloc, '\'')) {
                                                return 307;
                                              }
                                              return 55;
-
+                                           
 break;
-case 157: this.popState(); return 53;
+case 156: this.popState(); return 53; 
 break;
-case 158: this.begin('doubleQuotedValue'); return 54;
+case 157: this.begin('doubleQuotedValue'); return 54; 
 break;
-case 159:
+case 158:
                                              if (parser.handleQuotedValueWithCursor(this, yy_.yytext, yy_.yylloc, '"')) {
                                                return 307;
                                              }
                                              return 55;
-
+                                           
 break;
-case 160: this.popState(); return 54;
+case 159: this.popState(); return 54; 
 break;
-case 161: return 225;
+case 160: return 225; 
 break;
-case 162: /* To prevent console logging of unknown chars */
+case 161: /* To prevent console logging of unknown chars */ 
 break;
-case 163:
+case 162: 
 break;
-case 164:
+case 163: 
 break;
-case 165:
+case 164: 
 break;
-case 166:
+case 165: 
 break;
-case 167:
+case 166: 
 break;
-case 168:console.log(yy_.yytext);
+case 167:console.log(yy_.yytext);
 break;
 }
 },
-rules: [/^(?:\s)/i,/^(?:--.*)/i,/^(?:[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/])/i,/^(?:\u2020)/i,/^(?:\u2021)/i,/^(?:AND)/i,/^(?:ALL)/i,/^(?:ALTER)/i,/^(?:AND)/i,/^(?:AS)/i,/^(?:ASC)/i,/^(?:BETWEEN)/i,/^(?:BIGINT)/i,/^(?:BOOLEAN)/i,/^(?:BY)/i,/^(?:CASCADE)/i,/^(?:CASE)/i,/^(?:CHAR)/i,/^(?:COMMENT)/i,/^(?:CREATE)/i,/^(?:CROSS)/i,/^(?:CURRENT)/i,/^(?:DATABASE)/i,/^(?:DECIMAL)/i,/^(?:DESC)/i,/^(?:DISTINCT)/i,/^(?:DIV)/i,/^(?:DOUBLE)/i,/^(?:DROP)/i,/^(?:ELSE)/i,/^(?:END)/i,/^(?:EXISTS)/i,/^(?:FALSE)/i,/^(?:FLOAT)/i,/^(?:FOLLOWING)/i,/^(?:FROM)/i,/^(?:FULL)/i,/^(?:GROUP)/i,/^(?:HAVING)/i,/^(?:IF)/i,/^(?:IN)/i,/^(?:INNER)/i,/^(?:INSERT)/i,/^(?:INT)/i,/^(?:INTO)/i,/^(?:IS)/i,/^(?:JOIN)/i,/^(?:LEFT)/i,/^(?:LIKE)/i,/^(?:LIMIT)/i,/^(?:NOT)/i,/^(?:NULL)/i,/^(?:ON)/i,/^(?:OPTION)/i,/^(?:OR)/i,/^(?:ORDER)/i,/^(?:OUTER)/i,/^(?:PARTITION)/i,/^(?:PRECEDING)/i,/^(?:PURGE)/i,/^(?:RANGE)/i,/^(?:REGEXP)/i,/^(?:RIGHT)/i,/^(?:RLIKE)/i,/^(?:ROW)/i,/^(?:ROLE)/i,/^(?:ROWS)/i,/^(?:SCHEMA)/i,/^(?:SELECT)/i,/^(?:SEMI)/i,/^(?:SET)/i,/^(?:SHOW)/i,/^(?:SMALLINT)/i,/^(?:STREAM)/i,/^(?:STRING)/i,/^(?:TABLE)/i,/^(?:THEN)/i,/^(?:TIMESTAMP)/i,/^(?:TINYINT)/i,/^(?:TO)/i,/^(?:TRUE)/i,/^(?:TRUNCATE)/i,/^(?:UNBOUNDED)/i,/^(?:UNION)/i,/^(?:UPDATE)/i,/^(?:USE)/i,/^(?:VALUES)/i,/^(?:VARCHAR)/i,/^(?:VIEW)/i,/^(?:WHEN)/i,/^(?:WHERE)/i,/^(?:WITH)/i,/^(?:OVER)/i,/^(?:ROLE)/i,/^(?:AVG\s*\()/i,/^(?:CAST\s*\()/i,/^(?:COUNT\s*\()/i,/^(?:MAX\s*\()/i,/^(?:MIN\s*\()/i,/^(?:STDDEV_POP\s*\()/i,/^(?:STDDEV_SAMP\s*\()/i,/^(?:SUM\s*\()/i,/^(?:VAR_POP\s*\()/i,/^(?:VAR_SAMP\s*\()/i,/^(?:VARIANCE\s*\()/i,/^(?:CUME_DIST\s*\()/i,/^(?:DENSE_RANK\s*\()/i,/^(?:FIRST_VALUE\s*\()/i,/^(?:LAG\s*\()/i,/^(?:LAST_VALUE\s*\()/i,/^(?:LEAD\s*\()/i,/^(?:RANK\s*\()/i,/^(?:ROW_NUMBER\s*\()/i,/^(?:[0-9]+)/i,/^(?:[0-9]+(?:[YSL]|BD)?)/i,/^(?:[0-9]+E)/i,/^(?:[A-Za-z0-9_]+)/i,/^(?:\u2020)/i,/^(?:\u2021)/i,/^(?:\s+['"])/i,/^(?:[^'"\u2020\u2021]+)/i,/^(?:['"])/i,/^(?:$)/i,/^(?:&&)/i,/^(?:\|\|)/i,/^(?:=)/i,/^(?:<)/i,/^(?:>)/i,/^(?:!=)/i,/^(?:<=)/i,/^(?:>=)/i,/^(?:<>)/i,/^(?:<=>)/i,/^(?:-)/i,/^(?:\*)/i,/^(?:\+)/i,/^(?:\/)/i,/^(?:%)/i,/^(?:\|)/i,/^(?:\^)/i,/^(?:&)/i,/^(?:,)/i,/^(?:\.)/i,/^(?::)/i,/^(?:;)/i,/^(?:~)/i,/^(?:!)/i,/^(?:\()/i,/^(?:\))/i,/^(?:\[)/i,/^(?:\])/i,/^(?:\$\{[^}]*\})/i,/^(?:`)/i,/^(?:[^`]+)/i,/^(?:`)/i,/^(?:')/i,/^(?:(?:\\\\|\\[']|[^'])+)/i,/^(?:')/i,/^(?:")/i,/^(?:(?:\\\\|\\["]|[^"])+)/i,/^(?:")/i,/^(?:$)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i],
-conditions: {"hdfs":{"rules":[117,118,119,120,121,122,164],"inclusive":false},"doubleQuotedValue":{"rules":[159,160,167],"inclusive":false},"singleQuotedValue":{"rules":[156,157,166],"inclusive":false},"backtickedValue":{"rules":[153,154,165],"inclusive":false},"between":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,155,158,161,162,163,168],"inclusive":true},"INITIAL":{"rules":[0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,155,158,161,162,168],"inclusive":true}}
+rules: [/^(?:\s)/i,/^(?:--.*)/i,/^(?:[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/])/i,/^(?:\u2020)/i,/^(?:\u2021)/i,/^(?:AND)/i,/^(?:ALL)/i,/^(?:ALTER)/i,/^(?:AND)/i,/^(?:AS)/i,/^(?:ASC)/i,/^(?:BETWEEN)/i,/^(?:BIGINT)/i,/^(?:BOOLEAN)/i,/^(?:BY)/i,/^(?:CASCADE)/i,/^(?:CASE)/i,/^(?:CHAR)/i,/^(?:COMMENT)/i,/^(?:CREATE)/i,/^(?:CROSS)/i,/^(?:CURRENT)/i,/^(?:DATABASE)/i,/^(?:DECIMAL)/i,/^(?:DESC)/i,/^(?:DISTINCT)/i,/^(?:DIV)/i,/^(?:DOUBLE)/i,/^(?:DROP)/i,/^(?:ELSE)/i,/^(?:END)/i,/^(?:EXISTS)/i,/^(?:FALSE)/i,/^(?:FLOAT)/i,/^(?:FOLLOWING)/i,/^(?:FROM)/i,/^(?:FULL)/i,/^(?:GROUP)/i,/^(?:HAVING)/i,/^(?:IF)/i,/^(?:IN)/i,/^(?:INNER)/i,/^(?:INSERT)/i,/^(?:INT)/i,/^(?:INTO)/i,/^(?:IS)/i,/^(?:JOIN)/i,/^(?:LEFT)/i,/^(?:LIKE)/i,/^(?:LIMIT)/i,/^(?:NOT)/i,/^(?:NULL)/i,/^(?:ON)/i,/^(?:OPTION)/i,/^(?:OR)/i,/^(?:ORDER)/i,/^(?:OUTER)/i,/^(?:PARTITION)/i,/^(?:PRECEDING)/i,/^(?:PURGE)/i,/^(?:RANGE)/i,/^(?:REGEXP)/i,/^(?:RIGHT)/i,/^(?:RLIKE)/i,/^(?:ROW)/i,/^(?:ROLE)/i,/^(?:ROWS)/i,/^(?:SCHEMA)/i,/^(?:SELECT)/i,/^(?:SEMI)/i,/^(?:SET)/i,/^(?:SHOW)/i,/^(?:SMALLINT)/i,/^(?:STRING)/i,/^(?:TABLE)/i,/^(?:THEN)/i,/^(?:TIMESTAMP)/i,/^(?:TINYINT)/i,/^(?:TO)/i,/^(?:TRUE)/i,/^(?:TRUNCATE)/i,/^(?:UNBOUNDED)/i,/^(?:UNION)/i,/^(?:UPDATE)/i,/^(?:USE)/i,/^(?:VALUES)/i,/^(?:VARCHAR)/i,/^(?:VIEW)/i,/^(?:WHEN)/i,/^(?:WHERE)/i,/^(?:WITH)/i,/^(?:OVER)/i,/^(?:ROLE)/i,/^(?:AVG\s*\()/i,/^(?:CAST\s*\()/i,/^(?:COUNT\s*\()/i,/^(?:MAX\s*\()/i,/^(?:MIN\s*\()/i,/^(?:STDDEV_POP\s*\()/i,/^(?:STDDEV_SAMP\s*\()/i,/^(?:SUM\s*\()/i,/^(?:VAR_POP\s*\()/i,/^(?:VAR_SAMP\s*\()/i,/^(?:VARIANCE\s*\()/i,/^(?:CUME_DIST\s*\()/i,/^(?:DENSE_RANK\s*\()/i,/^(?:FIRST_VALUE\s*\()/i,/^(?:LAG\s*\()/i,/^(?:LAST_VALUE\s*\()/i,/^(?:LEAD\s*\()/i,/^(?:RANK\s*\()/i,/^(?:ROW_NUMBER\s*\()/i,/^(?:[0-9]+)/i,/^(?:[0-9]+(?:[YSL]|BD)?)/i,/^(?:[0-9]+E)/i,/^(?:[A-Za-z0-9_]+)/i,/^(?:\u2020)/i,/^(?:\u2021)/i,/^(?:\s+['"])/i,/^(?:[^'"\u2020\u2021]+)/i,/^(?:['"])/i,/^(?:$)/i,/^(?:&&)/i,/^(?:\|\|)/i,/^(?:=)/i,/^(?:<)/i,/^(?:>)/i,/^(?:!=)/i,/^(?:<=)/i,/^(?:>=)/i,/^(?:<>)/i,/^(?:<=>)/i,/^(?:-)/i,/^(?:\*)/i,/^(?:\+)/i,/^(?:\/)/i,/^(?:%)/i,/^(?:\|)/i,/^(?:\^)/i,/^(?:&)/i,/^(?:,)/i,/^(?:\.)/i,/^(?::)/i,/^(?:;)/i,/^(?:~)/i,/^(?:!)/i,/^(?:\()/i,/^(?:\))/i,/^(?:\[)/i,/^(?:\])/i,/^(?:\$\{[^}]*\})/i,/^(?:`)/i,/^(?:[^`]+)/i,/^(?:`)/i,/^(?:')/i,/^(?:(?:\\\\|\\[']|[^'])+)/i,/^(?:')/i,/^(?:")/i,/^(?:(?:\\\\|\\["]|[^"])+)/i,/^(?:")/i,/^(?:$)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i],
+conditions: {"hdfs":{"rules":[116,117,118,119,120,121,163],"inclusive":false},"doubleQuotedValue":{"rules":[158,159,166],"inclusive":false},"singleQuotedValue":{"rules":[155,156,165],"inclusive":false},"backtickedValue":{"rules":[152,153,164],"inclusive":false},"between":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,154,157,160,161,162,167],"inclusive":true},"INITIAL":{"rules":[0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,154,157,160,161,167],"inclusive":true}}
 });
 return lexer;
 })();
