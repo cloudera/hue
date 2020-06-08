@@ -15,14 +15,14 @@
 // limitations under the License.
 
 import { koSetup } from 'jest/koTestUtils';
-import { NAME } from './ko.savedQueries';
+import { HIVE_QUERY_PLAN_COMPONENT } from './ko.hiveQueryPlan';
 
-describe('ko.savedQueries.js', () => {
+describe('ko.hiveQueryPlan.js', () => {
   const setup = koSetup();
 
   it('should render component', async () => {
-    const element = await setup.renderComponent(NAME, {
-      currentTab: () => undefined
+    const element = await setup.renderComponent(HIVE_QUERY_PLAN_COMPONENT, {
+      plan: 'foo'
     });
 
     expect(element.innerHTML).toMatchSnapshot();
