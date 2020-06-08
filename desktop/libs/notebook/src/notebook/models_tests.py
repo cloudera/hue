@@ -47,41 +47,42 @@ class TestInstallCustomExamples():
 
 
   def test_install_only_hive_queries(self):
-    f = EXAMPLES.AUTO_LOAD.set_for_testing(True)
+    finish = [
+      EXAMPLES.AUTO_LOAD.set_for_testing(True),
+      EXAMPLES.QUERIES.set_for_testing(['Sample: Top salary', 'Queries Does not Exist'])
+    ]
 
     try:
       with patch('notebook.models.get_ordered_interpreters') as get_ordered_interpreters:
-        with patch('notebook.models.EXAMPLES.QUERIES.get') as QUERIES:
 
-          QUERIES.return_value = ['Sample: Top salary', 'Queries Does not Exist']
+        get_ordered_interpreters.return_value = [
+          {
+            'name': 'Hive',
+            'type': 11,
+            'dialect': 'hive',
+            'interface': 'hiveserver2',
+          },
+          {
+            'name': 'MySql',
+            'type': 10,
+            'dialect': 'mysql',
+            'interface': 'sqlalchemy',
+          }
+        ]
 
-          get_ordered_interpreters.return_value = [
-            {
-              'name': 'Hive',
-              'type': 11,
-              'dialect': 'hive',
-              'interface': 'hiveserver2',
-            },
-            {
-              'name': 'MySql',
-              'type': 10,
-              'dialect': 'mysql',
-              'interface': 'sqlalchemy',
-            }
-          ]
+        result = install_custom_examples()
 
-          result = install_custom_examples()
+        assert_equal(1, len(result))
+        successes, errors = result[0]
 
-          assert_equal(1, len(result))
-          successes, errors = result[0]
-
-          assert_equal([], errors)
-          assert_equal(
-              ['Query Sample: Top salary hive installed.'],
-              successes,
-          )
+        assert_equal([], errors)
+        assert_equal(
+            ['Query Sample: Top salary hive installed.'],
+            successes,
+        )
     finally:
-      f()
+      for f in finish:
+        f()
 
 
   def test_install_auto_load_disabled(self):
