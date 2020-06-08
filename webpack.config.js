@@ -42,7 +42,8 @@ module.exports = {
   entry: {
     hue: ['./desktop/core/src/desktop/js/hue.js'],
     notebook: ['./desktop/core/src/desktop/js/apps/notebook/app.js'],
-    tableBrowser: ['./desktop/core/src/desktop/js/apps/table_browser/app.js']
+    tableBrowser: ['./desktop/core/src/desktop/js/apps/tableBrowser/app.js'],
+    jobBrowser: ['./desktop/core/src/desktop/js/apps/jobBrowser/app.js']
   },
   optimization: {
     //minimize: true,

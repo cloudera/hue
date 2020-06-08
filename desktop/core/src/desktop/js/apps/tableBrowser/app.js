@@ -19,7 +19,7 @@ import * as ko from 'knockout';
 
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
-import MetastoreViewModel from 'apps/table_browser/metastoreViewModel';
+import MetastoreViewModel from 'apps/tableBrowser/metastoreViewModel';
 import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
 import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';

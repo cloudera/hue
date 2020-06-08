@@ -22,6 +22,8 @@ from metadata.conf import PROMETHEUS
 from notebook.conf import ENABLE_QUERY_SCHEDULING
 
 from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER, ENABLE_HIVE_QUERY_BROWSER, ENABLE_HISTORY_V2
+
+from webpack_loader.templatetags.webpack_loader import render_bundle
 %>
 
 <%
@@ -51,11 +53,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <link rel="stylesheet" href="${ static('jobbrowser/css/jobbrowser-embeddable.css') }">
 
-
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-datepicker.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-timepicker.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-spinedit.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-slider.css') }">
+
+${ render_bundle('jobBrowser') | n,unicode }
 
 <script src="${ static('desktop/ext/js/bootstrap-datepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/bootstrap-timepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -4138,7 +4141,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
       };
     };
-
 
     $(document).ready(function () {
       var jobBrowserViewModel = new JobBrowserViewModel();
