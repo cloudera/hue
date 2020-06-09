@@ -16,7 +16,7 @@
 
 import { matchesType } from 'sql/reference/typeUtils';
 import stringDistance from 'sql/stringDistance';
-import {applyTypeToSuggestions, getSubQuery, suggestKeywords} from 'parse/sql/sqlParseUtils';
+import { applyTypeToSuggestions, getSubQuery, suggestKeywords } from 'parse/sql/sqlParseUtils';
 
 const identifierEquals = (a, b) =>
   a &&

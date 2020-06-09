@@ -10,6 +10,7 @@
     "../generic/sql_main.jison",
     "../generic/sql_set.jison",
     "sql_show.jison",
+    "../generic/sql_udf.jison",
     "../generic/sql_valueExpression.jison",
     "../generic/autocomplete_footer.jison"
   ],
@@ -22,6 +23,7 @@
     "../generic/sql_main.jison",
     "../generic/sql_set.jison",
     "sql_show.jison",
+    "../generic/sql_udf.jison",
     "../generic/sql_valueExpression.jison",
     "../generic/syntax_footer.jison"
   ]
