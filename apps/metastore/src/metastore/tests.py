@@ -77,6 +77,7 @@ class TestApi():
 
 
   def test_show_tables(self):
+    grant_access("test", "default", "metastore")
     with patch('beeswax.server.dbms.get') as get:
       get.return_value=Mock(
         get_databases=Mock(
