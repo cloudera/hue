@@ -477,6 +477,15 @@ If using security:
     options='{"url": "phoenix://sql-phoenix.gethue.com:8765", "tls": true, "connect_args": {"authentication": "SPNEGO", "verify": false }}'
 
 
+Grant the appropriate hbase rights to the 'hue' user, e.g.:
+
+    grant 'hue', 'RWXCA'
+
+
+With impersonation:
+
+        options='{"url": "phoenix://sql-phoenix.gethue.com:8765", "has_impersonation": true}'
+
 **Notes**
 
 1. Existing HBase tables need to be mapped to views
