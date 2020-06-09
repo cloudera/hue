@@ -18,7 +18,8 @@ import { matchesType } from 'sql/reference/typeUtils';
 import stringDistance from 'sql/stringDistance';
 import {
   applyTypeToSuggestions,
-  getSubQuery, suggestKeywords,
+  getSubQuery,
+  suggestKeywords,
   valueExpressionSuggest
 } from 'parse/sql/sqlParseUtils';
 

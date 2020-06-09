@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { matchesType } from 'sql/reference/typeUtils';
-import {applyTypeToSuggestions, getSubQuery, suggestKeywords} from 'parse/sql/sqlParseUtils';
+import { applyTypeToSuggestions, getSubQuery, suggestKeywords } from 'parse/sql/sqlParseUtils';
 
 /**
  * Calculates the Optimal String Alignment distance between two strings. Returns 0 when the strings are equal and the
