@@ -274,35 +274,35 @@ ace:
 # <<<< DEV ONLY
 .PHONY: global-search-parser
 global-search-parser:
-	@pushd tools/jison/ && node tools/jison/generateParsers.js globalSearchParser && popd
+	@pushd tools/jison/ && npm install && node generateParsers.js globalSearchParser && popd
 
 .PHONY: solr-all-parsers
 solr-all-parsers:
-	@pushd tools/jison/ && node tools/jison/generateParsers.js solrQueryParser solrFormulaParser && popd
+	@pushd tools/jison/ && npm install  && node generateParsers.js solrQueryParser solrFormulaParser && popd
 
 .PHONY: solr-query-parser
 solr-query-parser:
-	@pushd tools/jison/ && node tools/jison/generateParsers.js solrQueryParser && popd
+	@pushd tools/jison/ && npm install  && node generateParsers.js solrQueryParser && popd
 
 .PHONY: solr-formula-parser
 solr-formula-parser:
-	@pushd tools/jison/ && node tools/jison/generateParsers.js solrFormulaParser && popd
+	@pushd tools/jison/ && npm install  && node generateParsers.js solrFormulaParser && popd
 
 .PHONY: sql-all-parsers
 sql-all-parsers:
-	@pushd tools/jison/ && node generateParsers.js generic hive impala && popd && popd
+	@pushd tools/jison/ && npm install  && node generateParsers.js generic hive impala && popd
 
 .PHONY: sql-autocomplete-parser
 sql-autocomplete-parser:
-	@pushd tools/jison/ && node tools/jison/generateParsers.js genericAutocomp hiveAutocomp impalaAutocomp && popd
+	@pushd tools/jison/ && npm install  && node generateParsers.js genericAutocomp hiveAutocomp impalaAutocomp && popd
 
 .PHONY: sql-statement-parser
 sql-statement-parser:
-	@pushd tools/jison/ && node tools/jison/generateParsers.js sqlStatementsParser && popd
+	@pushd tools/jison/ && npm install  && node generateParsers.js sqlStatementsParser && popd
 
 .PHONY: sql-syntax-parser
 sql-syntax-parser:
-	@pushd tools/jison/ && node tools/jison/generateParsers.js genericSyntax hiveSyntax impalaSyntax && popd
+	@pushd tools/jison/ && npm install  && node generateParsers.js genericSyntax hiveSyntax impalaSyntax && popd
 # END DEV ONLY >>>>
 
 ###################################
