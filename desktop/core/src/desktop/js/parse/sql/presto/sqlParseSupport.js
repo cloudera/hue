@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { matchesType } from 'sql/reference/typeUtils';
-import { applyTypeToSuggestions, getSubQuery } from 'parse/sql/sqlParseUtils';
+import {applyTypeToSuggestions, getSubQuery, suggestKeywords} from 'parse/sql/sqlParseUtils';
 
 /**
  * Calculates the Optimal String Alignment distance between two strings. Returns 0 when the strings are equal and the
@@ -1342,26 +1342,7 @@ const initSqlParser = function(parser) {
     return result;
   };
 
-  parser.suggestKeywords = function(keywords) {
-    const weightedKeywords = [];
-    if (keywords.length === 0) {
-      return;
-    }
-    keywords.forEach(keyword => {
-      if (typeof keyword.weight !== 'undefined') {
-        weightedKeywords.push(keyword);
-      } else {
-        weightedKeywords.push({ value: keyword, weight: -1 });
-      }
-    });
-    weightedKeywords.sort((a, b) => {
-      if (a.weight !== b.weight) {
-        return b.weight - a.weight;
-      }
-      return a.value.localeCompare(b.value);
-    });
-    parser.yy.result.suggestKeywords = weightedKeywords;
-  };
+  parser.suggestKeywords = suggestKeywords.bind(null, parser);
 
   parser.suggestColRefKeywords = function(colRefKeywords) {
     parser.yy.result.suggestColRefKeywords = colRefKeywords;

@@ -96,3 +96,28 @@ export const valueExpressionSuggest = (parser, oppositeValueExpression, operator
   }
   parser.suggestKeywords(keywords);
 };
+
+export const suggestKeywords = (parser, keywords) => {
+  if (typeof keywords === 'string') {
+    keywords = (parser.KEYWORDS && parser.KEYWORDS[keywords]) || [];
+  }
+
+  const weightedKeywords = [];
+  if (keywords.length === 0) {
+    return;
+  }
+  keywords.forEach(keyword => {
+    if (typeof keyword.weight !== 'undefined') {
+      weightedKeywords.push(keyword);
+    } else {
+      weightedKeywords.push({ value: keyword, weight: -1 });
+    }
+  });
+  weightedKeywords.sort((a, b) => {
+    if (a.weight !== b.weight) {
+      return b.weight - a.weight;
+    }
+    return a.value.localeCompare(b.value);
+  });
+  parser.yy.result.suggestKeywords = weightedKeywords;
+};
