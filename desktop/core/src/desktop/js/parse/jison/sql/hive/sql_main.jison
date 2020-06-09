@@ -2138,6 +2138,9 @@ LimitClause
 
 LimitClause_EDIT
  : 'LIMIT' 'CURSOR'
+   {
+     parser.suggestKeywords([{ value: '10', weight: 10000 }, { value: '100', weight: 10000 }, { value: '1000', weight: 10000 }, { value: '5000', weight: 10000 }, { value: '10000', weight: 10000 }])
+   }
  ;
 
 SearchCondition

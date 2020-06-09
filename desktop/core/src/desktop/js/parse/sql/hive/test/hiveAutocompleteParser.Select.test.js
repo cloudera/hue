@@ -5949,13 +5949,14 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
       });
     });
 
-    it('should not suggest anything for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT |"', () => {
+    it('should suggest values for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT |"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT ',
         afterCursor: '',
         noErrors: true,
         expectedResult: {
-          lowerCase: false
+          lowerCase: false,
+          suggestKeywords: ['10', '100', '1000', '10000', '5000']
         }
       });
     });
