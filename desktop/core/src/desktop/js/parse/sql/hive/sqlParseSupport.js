@@ -14,9 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import KEYWORDS from './keywords.json';
 import { matchesType } from 'sql/reference/typeUtils';
 import stringDistance from 'sql/stringDistance';
-import { applyTypeToSuggestions, getSubQuery } from 'parse/sql/sqlParseUtils';
+import { applyTypeToSuggestions, getSubQuery, suggestKeywords } from 'parse/sql/sqlParseUtils';
 
 const identifierEquals = (a, b) =>
   a &&
@@ -1291,26 +1292,9 @@ const initSqlParser = function(parser) {
     return result;
   };
 
-  parser.suggestKeywords = function(keywords) {
-    const weightedKeywords = [];
-    if (keywords.length === 0) {
-      return;
-    }
-    keywords.forEach(keyword => {
-      if (typeof keyword.weight !== 'undefined') {
-        weightedKeywords.push(keyword);
-      } else {
-        weightedKeywords.push({ value: keyword, weight: -1 });
-      }
-    });
-    weightedKeywords.sort((a, b) => {
-      if (a.weight !== b.weight) {
-        return b.weight - a.weight;
-      }
-      return a.value.localeCompare(b.value);
-    });
-    parser.yy.result.suggestKeywords = weightedKeywords;
-  };
+  parser.KEYWORDS = KEYWORDS;
+
+  parser.suggestKeywords = suggestKeywords.bind(null, parser);
 
   parser.suggestColRefKeywords = function(colRefKeywords) {
     parser.yy.result.suggestColRefKeywords = colRefKeywords;

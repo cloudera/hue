@@ -618,35 +618,6 @@ ConstraintList_EDIT
  | ConstraintList ',' TableConstraint_EDIT
  ;
 
-TableConstraint
- : TableConstraintLeftPart OptionalDisable OptionalNovalidate OptionalRelyOrNorely
- ;
-
-TableConstraint_EDIT
- : TableConstraintLeftPart_EDIT OptionalDisable OptionalNovalidate OptionalRelyOrNorely
- | TableConstraintLeftPart OptionalDisable OptionalNovalidate OptionalRelyOrNorely 'CURSOR'
-   {
-     parser.suggestKeywordsForOptionalsLR([$4, $3, $2], [
-       [{ value: 'RELY', weight: 1 }, { value: 'NORELY', weight: 1 }],
-       { value: 'NOVALIDATE', weight: 2 },
-       { value: 'DISABLE', weight: 3 }
-     ]);
-   }
- ;
-
-TableConstraintLeftPart
- : 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification
- | 'CONSTRAINT' RegularOrBacktickedIdentifier 'CHECK' '(' ValueExpression ')'
- | 'CONSTRAINT' RegularOrBacktickedIdentifier 'UNIQUE' ParenthesizedColumnList
- ;
-
-TableConstraintLeftPart_EDIT
- : 'CONSTRAINT' RegularOrBacktickedIdentifier 'CURSOR'
-   {
-     parser.suggestKeywords(['CHECK', 'FOREIGN KEY', 'UNIQUE']);
-   }
- | 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification_EDIT
- ;
 PrimaryKeySpecification
  : PrimaryKey ParenthesizedColumnList OptionalDisable OptionalNovalidate OptionalRelyOrNorely
  ;

@@ -18,7 +18,7 @@ import { matchesType } from 'sql/reference/typeUtils';
 import stringDistance from 'sql/stringDistance';
 import {
   applyTypeToSuggestions,
-  getSubQuery,
+  getSubQuery, suggestKeywords,
   valueExpressionSuggest
 } from 'parse/sql/sqlParseUtils';
 
@@ -1126,26 +1126,7 @@ const initSqlParser = function(parser) {
     return result;
   };
 
-  parser.suggestKeywords = function(keywords) {
-    const weightedKeywords = [];
-    if (keywords.length === 0) {
-      return;
-    }
-    keywords.forEach(keyword => {
-      if (typeof keyword.weight !== 'undefined') {
-        weightedKeywords.push(keyword);
-      } else {
-        weightedKeywords.push({ value: keyword, weight: -1 });
-      }
-    });
-    weightedKeywords.sort((a, b) => {
-      if (a.weight !== b.weight) {
-        return b.weight - a.weight;
-      }
-      return a.value.localeCompare(b.value);
-    });
-    parser.yy.result.suggestKeywords = weightedKeywords;
-  };
+  parser.suggestKeywords = suggestKeywords.bind(null, parser);
 
   parser.suggestColRefKeywords = function(colRefKeywords) {
     parser.yy.result.suggestColRefKeywords = colRefKeywords;

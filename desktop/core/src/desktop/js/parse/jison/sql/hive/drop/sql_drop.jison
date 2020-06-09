@@ -53,7 +53,7 @@ DropStatement_EDIT
  | TruncateTableStatement_EDIT
  | 'DROP' 'CURSOR'
    {
-     parser.suggestKeywords(['DATABASE', 'FUNCTION', 'INDEX', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'VIEW']);
+     parser.suggestKeywords('DROP');
    }
  ;
 
@@ -157,7 +157,6 @@ OptionalPurge
  :
  | 'PURGE'
  ;
-
 
 DropIndexStatement
  : 'DROP' 'INDEX' OptionalIfExists RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier

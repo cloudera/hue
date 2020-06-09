@@ -25,24 +25,20 @@ DataDefinition_EDIT
 AlterStatement
  : AlterDatabase
  | AlterIndex
- | AlterMaterializedView
  | AlterTable
  | AlterView
- | Msck
  | ReloadFunction
  ;
 
 AlterStatement_EDIT
  : AlterDatabase_EDIT
  | AlterIndex_EDIT
- | AlterMaterializedView_EDIT
  | AlterTable_EDIT
  | AlterView_EDIT
- | Msck_EDIT
  | ReloadFunction_EDIT
  | 'ALTER' 'CURSOR'
    {
-     parser.suggestKeywords(['DATABASE', 'INDEX', 'MATERIALIZED VIEW', 'SCHEMA', 'TABLE', 'VIEW']);
+     parser.suggestKeywords('ALTER');
    }
  ;
 
@@ -124,41 +120,6 @@ AlterIndex_EDIT
    }
  ;
 
-AlterMaterializedView
- : 'ALTER' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier EnableOrDisable 'REWRITE'
-   {
-     parser.addTablePrimary($4);
-   }
- ;
-
-AlterMaterializedView_EDIT
- : 'ALTER' 'MATERIALIZED' 'CURSOR'
-   {
-     parser.suggestKeywords(['VIEW']);
-   }
- | 'ALTER' 'MATERIALIZED' 'VIEW' 'CURSOR'
-   {
-     parser.suggestTables({ onlyViews: true });
-     parser.suggestDatabases({ appendDot: true });
-   }
- | 'ALTER' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier_EDIT
-   {
-     if (parser.yy.result.suggestTables) {
-       parser.yy.result.suggestTables.onlyViews = true;
-     }
-   }
- | 'ALTER' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier 'CURSOR'
-   {
-     parser.addTablePrimary($4);
-     parser.suggestKeywords(['DISABLE REWRITE', 'ENABLE REWRITE']);
-   }
- | 'ALTER' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier EnableOrDisable 'CURSOR'
-   {
-     parser.addTablePrimary($4);
-     parser.suggestKeywords(['REWRITE']);
-   }
- ;
-
 AlterTable
  : AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' RegularOrBacktickedIdentifier PrimaryKeySpecification
@@ -232,7 +193,7 @@ AlterTable_EDIT
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' 'CURSOR'
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' RegularOrBacktickedIdentifier 'CURSOR'
    {
-     parser.suggestKeywords(['CHECK', 'FOREIGN KEY', 'PRIMARY KEY', 'UNIQUE']);
+     parser.suggestKeywords('ALTER TABLE ADD CONSTRAINT identifier');
    }
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' RegularOrBacktickedIdentifier PrimaryKeySpecification_EDIT
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification_EDIT
@@ -785,69 +746,6 @@ AlterViewLeftSide_EDIT
      parser.suggestTables({ onlyViews: true });
      parser.suggestDatabases({ appendDot: true });
    }
- ;
-
-Msck
- : 'MSCK' OptionalRepair 'TABLE' SchemaQualifiedTableIdentifier OptionalAddDropSyncPartitions
-   {
-     parser.addTablePrimary($4);
-   }
- ;
-
-Msck_EDIT
- : 'MSCK' OptionalRepair 'CURSOR'
-   {
-     if (!$2) {
-       parser.suggestKeywords(['TABLE', 'REPAIR TABLE']);
-     } else {
-       parser.suggestKeywords(['TABLE']);
-     }
-   }
- | 'MSCK' OptionalRepair 'TABLE' 'CURSOR'
-   {
-     parser.suggestTables({ onlyTables: true });
-     parser.suggestDatabases({ appendDot: true });
-   }
- | 'MSCK' OptionalRepair 'TABLE' SchemaQualifiedTableIdentifier_EDIT
-   {
-     if (parser.yy.result.suggestTables) {
-       parser.yy.result.suggestTables.onlyViews = true;
-     }
-   }
- | 'MSCK' OptionalRepair 'TABLE' SchemaQualifiedTableIdentifier AddDropSyncPartitions_EDIT
-   {
-     parser.addTablePrimary($4);
-   }
- | 'MSCK' OptionalRepair 'TABLE' SchemaQualifiedTableIdentifier OptionalAddDropSyncPartitions 'CURSOR'
-   {
-     parser.addTablePrimary($4);
-     if (!$5) {
-       parser.suggestKeywords(['ADD PARTITIONS', 'DROP PARTITIONS', 'SYNC PARTITIONS']);
-     }
-   }
- ;
-
-OptionalRepair
- :
- | 'REPAIR'
- ;
-
-OptionalAddDropSyncPartitions
- :
- | AddDropOrSync 'PARTITIONS'
- ;
-
-AddDropSyncPartitions_EDIT
- : AddDropOrSync 'CURSOR'
-   {
-     parser.suggestKeywords(['PARTITIONS']);
-   }
- ;
-
-AddDropOrSync
- : 'ADD'
- | 'DROP'
- | 'SYNC'
  ;
 
 ReloadFunction

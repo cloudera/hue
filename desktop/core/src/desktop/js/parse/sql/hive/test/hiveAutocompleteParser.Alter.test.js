@@ -469,6 +469,17 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
       });
     });
 
+    it('should suggest keywords for "ALTER TABLE bar ADD CONSTRAINT boo |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'ALTER TABLE bar ADD CONSTRAINT boo ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['CHECK', 'FOREIGN KEY', 'PRIMARY KEY', 'UNIQUE']
+        }
+      });
+    });
+
     it('should suggest keywords for "ALTER TABLE bar ADD CONSTRAINT boo FOREIGN |"', () => {
       assertAutoComplete({
         beforeCursor: 'ALTER TABLE bar ADD CONSTRAINT boo FOREIGN ',
