@@ -33,17 +33,16 @@ NonParenthesizedValueExpressionPrimary
      } else {
        delete $1.lastLoc.identifierChain;
      }
-     if ($2.expression) {
-       $$ = { function: fn, expression: $2.expression, types: ['UDFREF'] }
+     if ($2.expressions && $2.expressions.length) {
+       $$ = { function: fn, expression: $2.expressions[$2.expressions.length - 1].expression, types: ['UDFREF'] }
      } else {
        $$ = { function: fn, types: ['UDFREF'] }
      }
    }
  | ArbitraryFunctionName ArbitraryFunctionRightPart
   {
-    parser.addFunctionLocation(@1, $1);
-    if ($2.expression) {
-      $$ = { function: $1, expression: $2.expression, types: ['UDFREF'] }
+    if ($2.expressions && $2.expressions.length) {
+      $$ = { function: $1, expression: $2.expressions[$2.expressions.length - 1].expression, types: ['UDFREF'] }
     } else {
       $$ = { function: $1, types: ['UDFREF'] }
     }
@@ -68,16 +67,16 @@ NonParenthesizedValueExpressionPrimary_EDIT
      } else {
        delete $1.lastLoc.identifierChain;
      }
-     if ($2.position) {
-       parser.applyArgumentTypesToSuggestions(fn, $2.position);
+     if ($2.activePosition) {
+       parser.applyArgumentTypesToSuggestions(fn, $2.activePosition);
      }
      $$ = { function: fn, types: ['UDFREF'] };
    }
  | ArbitraryFunctionName ArbitraryFunctionRightPart_EDIT
    {
      parser.addFunctionLocation(@1, $1);
-     if ($2.position) {
-       parser.applyArgumentTypesToSuggestions($1, $2.position);
+     if ($2.activePosition) {
+       parser.applyArgumentTypesToSuggestions($1, $2.activePosition);
      }
      $$ = { function: $1, types: ['UDFREF'] };
    }
@@ -112,8 +111,8 @@ ArbitraryFunction
  : RegularIdentifier ArbitraryFunctionRightPart
    {
      parser.addFunctionLocation(@1, $1);
-     if ($2.expression) {
-       $$ = { function: $1, expression: $2.expression, types: ['UDFREF'] }
+     if ($2.expressions && $2.expressions.length) {
+       $$ = { function: $1, expression: $2.expressions[$2.expressions.length - 1].expression, types: ['UDFREF'] }
      } else {
        $$ = { function: $1, types: ['UDFREF'] }
      }
@@ -121,8 +120,8 @@ ArbitraryFunction
  | ArbitraryFunctionName ArbitraryFunctionRightPart
    {
      parser.addFunctionLocation(@1, $1);
-     if ($2.expression) {
-       $$ = { function: $1, expression: $2.expression, types: ['UDFREF'] }
+     if ($2.expressions && $2.expressions.length) {
+       $$ = { function: $1, expression: $2.expressions[$2.expressions.length - 1].expression, types: ['UDFREF'] }
      } else {
        $$ = { function: $1, types: ['UDFREF'] }
      }
@@ -133,16 +132,16 @@ ArbitraryFunction_EDIT
  : RegularIdentifier ArbitraryFunctionRightPart_EDIT
    {
      parser.addFunctionLocation(@1, $1);
-     if ($2.position) {
-       parser.applyArgumentTypesToSuggestions($1, $2.position);
+     if ($2.activePosition) {
+       parser.applyArgumentTypesToSuggestions($1, $2.activePosition);
      }
      $$ = { function: $1, types: ['UDFREF'] };
    }
  | ArbitraryFunctionName ArbitraryFunctionRightPart_EDIT
    {
      parser.addFunctionLocation(@1, $1);
-     if ($2.position) {
-       parser.applyArgumentTypesToSuggestions($1, $2.position);
+     if ($2.activePosition) {
+       parser.applyArgumentTypesToSuggestions($1, $2.activePosition);
      }
      $$ = { function: $1, types: ['UDFREF'] };
    }
@@ -157,20 +156,130 @@ ArbitraryFunctionName
 
 ArbitraryFunctionRightPart
  : '(' ')'
- | '(' ValueExpressionList ')'  -> { expression: $2 }
+ | '(' ArgumentList ')'  -> $2
  ;
 
 ArbitraryFunctionRightPart_EDIT
  : '(' AnyCursor RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
-     $$ = { position: 1 }
+     $$ = {
+       activePosition: 1,
+       expressions: [{ expression: undefined, location: @2 }]
+     }
    }
- | '(' ValueExpressionList 'CURSOR' RightParenthesisOrError
+ | '(' ArgumentList 'CURSOR' RightParenthesisOrError
    {
-     parser.suggestValueExpressionKeywords($3);
+     parser.suggestValueExpressionKeywords($2.expressions[$2.expressions.length - 1].expression);
+     $$ = $1;
    }
- | '(' ValueExpressionList_EDIT RightParenthesisOrError      -> $2
+ | '(' ArgumentList_EDIT RightParenthesisOrError      -> $2
+ ;
+
+ArgumentList
+ : ValueExpression
+   {
+     $$ = {
+       activePosition: 1,
+       expressions: [{ expression: $1, location: @1 }]
+     }
+   }
+ | ArgumentList ',' ValueExpression
+   {
+     $$ = {
+       activePosition: $1.activePosition + 1,
+       expressions: $1.expressions.concat([{ expression: $3, location: @3 }])
+     }
+   }
+ ;
+
+ArgumentList_EDIT
+ : ValueExpression_EDIT
+   {
+     $$ = {
+       activePosition: 1,
+       expressions: [{ expression: $1, location: @1 }]
+     }
+   }
+ | ArgumentList ',' ValueExpression_EDIT
+   {
+     $$ = {
+       activePosition: $1.activePosition + 1,
+       expressions: $1.expressions.concat([{ expression: $3, location: @3 }])
+     }
+   }
+ | ValueExpression_EDIT ',' ArgumentList
+   {
+     $$ = {
+       activePosition: 1,
+       expressions: [{ expression: $1, location: @1 }].concat($3.expressions)
+     }
+   }
+ | ArgumentList ',' ValueExpression_EDIT ',' ArgumentList
+   {
+     $$ = {
+       activePosition: $1.activePosition + 1,
+       expressions: $1.expressions.concat([{ expression: $3, location: @3 }]).concat($5.expressions)
+     }
+   }
+ | ArgumentList ',' AnyCursor
+   {
+     parser.valueExpressionSuggest();
+     $$ = {
+       activePosition: $1.activePosition + 1,
+       expressions: $1.expressions.concat([{ expression: undefined, location: @3 }])
+     }
+   }
+ | ArgumentList ',' AnyCursor ',' ArgumentList
+   {
+     parser.valueExpressionSuggest();
+     $$ = {
+       activePosition: $1.activePosition + 1,
+       expressions: $1.expressions.concat([{ expression: undefined, location: @3 }]).concat($5.expressions)
+     }
+   }
+ | ArgumentList 'CURSOR' ',' ArgumentList
+   {
+     parser.suggestValueExpressionKeywords($1.expressions[$1.expressions.length - 1].expression);
+     $$ = {
+       activePosition: $1.activePosition,
+       expressions: $1.expressions.concat($4.expressions)
+     }
+   }
+ | AnyCursor ',' ArgumentList
+   {
+     parser.valueExpressionSuggest();
+     $$ = {
+       cursorAtStart : true,
+       activePosition: 1,
+       expressions: [{ expression: undefined, location: @1 }].concat($3.expressions)
+     };
+   }
+ | AnyCursor ','
+   {
+     parser.valueExpressionSuggest();
+     $$ = {
+       cursorAtStart : true,
+       activePosition: 1,
+       expressions: [{ expression: undefined, location: @1 }, { expression: undefined, location: @2 }]
+     };
+   }
+ | ',' AnyCursor
+   {
+     parser.valueExpressionSuggest();
+     $$ = {
+       activePosition: 2,
+       expressions: [{ expression: undefined, location: @1 }, { expression: undefined, location: @2 }]
+     };
+   }
+ | ',' AnyCursor ',' ArgumentList
+   {
+     parser.valueExpressionSuggest();
+     $$ = {
+       activePosition: 2,
+       expressions: [{ expression: undefined, location: @1 }, { expression: undefined, location: @2 }].concat($4.expressions)
+     };
+   }
  ;
 
 AggregateFunction
@@ -186,8 +295,8 @@ AggregateFunction_EDIT
  ;
 
 AnalyticFunction
- : 'ANALYTIC' '(' ')'                      -> { function: $1, types: ['UDFREF'] }
- | 'ANALYTIC' '(' ValueExpressionList ')'  -> { function: $1, expression: $2, types: ['UDFREF'] }
+ : 'ANALYTIC' '(' ')'               -> { function: $1, types: ['UDFREF'] }
+ | 'ANALYTIC' '(' ArgumentList ')'  -> { function: $1, expression: $3.expressions[$3.expressions.length - 1].expression, types: ['UDFREF'] }
  ;
 
 AnalyticFunction_EDIT
@@ -197,14 +306,14 @@ AnalyticFunction_EDIT
      parser.applyArgumentTypesToSuggestions($1, 1);
      $$ = { function: $1, types: ['UDFREF'] };
    }
- | 'ANALYTIC' '(' ValueExpressionList 'CURSOR' RightParenthesisOrError
+ | 'ANALYTIC' '(' ArgumentList 'CURSOR' RightParenthesisOrError
    {
-     parser.suggestValueExpressionKeywords($3);
+     parser.suggestValueExpressionKeywords($3.expressions[$3.expressions.length - 1].expression);
      $$ = { function: $1, types: ['UDFREF'] };
    }
- | 'ANALYTIC' '(' ValueExpressionList_EDIT RightParenthesisOrError
+ | 'ANALYTIC' '(' ArgumentList_EDIT RightParenthesisOrError
    {
-     parser.applyArgumentTypesToSuggestions($1, $3.position);
+     parser.applyArgumentTypesToSuggestions($1, $3.activePosition);
      $$ = { function: $1, types: ['UDFREF'] };
    }
  ;
@@ -274,9 +383,9 @@ CastFunction_EDIT
  ;
 
 CountFunction
- : 'COUNT' '(' '*' ')'                                        -> { function: $1, types: ['UDFREF'] }
- | 'COUNT' '(' ')'                                            -> { function: $1, types: ['UDFREF'] }
- | 'COUNT' '(' OptionalAllOrDistinct ValueExpressionList ')'  -> { function: $1, types: ['UDFREF'] }
+ : 'COUNT' '(' '*' ')'                                 -> { function: $1, types: ['UDFREF'] }
+ | 'COUNT' '(' ')'                                     -> { function: $1, types: ['UDFREF'] }
+ | 'COUNT' '(' OptionalAllOrDistinct ArgumentList ')'  -> { function: $1, types: ['UDFREF'] }
  ;
 
 CountFunction_EDIT
@@ -293,12 +402,12 @@ CountFunction_EDIT
      parser.suggestKeywords(keywords);
      $$ = { function: $1, types: ['UDFREF'] };
    }
- | 'COUNT' '(' OptionalAllOrDistinct ValueExpressionList 'CURSOR' RightParenthesisOrError
+ | 'COUNT' '(' OptionalAllOrDistinct ArgumentList 'CURSOR' RightParenthesisOrError
    {
-     parser.suggestValueExpressionKeywords($4);
+     parser.suggestValueExpressionKeywords($4.expressions[$4.expressions.length - 1].expression);
      $$ = { function: $1, types: ['UDFREF'] };
    }
- | 'COUNT' '(' OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
+ | 'COUNT' '(' OptionalAllOrDistinct ArgumentList_EDIT RightParenthesisOrError
    {
      if ($4.cursorAtStart) {
        var keywords = parser.getSelectListKeywords();
@@ -312,8 +421,8 @@ CountFunction_EDIT
  ;
 
 OtherAggregateFunction
- : OtherAggregateFunction_Type '(' OptionalAllOrDistinct ')'                      -> { function: $1, types: ['UDFREF'] }
- | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ValueExpressionList ')'  -> { function: $1, types: ['UDFREF'] }
+ : OtherAggregateFunction_Type '(' OptionalAllOrDistinct ')'               -> { function: $1, types: ['UDFREF'] }
+ | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ArgumentList ')'  -> { function: $1, types: ['UDFREF'] }
  ;
 
 OtherAggregateFunction_EDIT
@@ -335,12 +444,12 @@ OtherAggregateFunction_EDIT
      parser.applyArgumentTypesToSuggestions($1, 1);
      $$ = { function: $1, types: ['UDFREF'] };
    }
- | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ValueExpressionList 'CURSOR' RightParenthesisOrError
+ | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ArgumentList 'CURSOR' RightParenthesisOrError
    {
-     parser.suggestValueExpressionKeywords($4);
+     parser.suggestValueExpressionKeywords($4.expressions[$4.expressions.length - 1].expression);
      $$ = { function: $1, types: ['UDFREF'] };
    }
- | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
+ | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ArgumentList_EDIT RightParenthesisOrError
    {
      if ($4.cursorAtStart) {
        var keywords = parser.getSelectListKeywords(true);
@@ -357,7 +466,7 @@ OtherAggregateFunction_EDIT
        parser.suggestKeywords(keywords);
      }
      if (parser.yy.result.suggestFunctions && !parser.yy.result.suggestFunctions.types) {
-       parser.applyArgumentTypesToSuggestions($1, $4.position);
+       parser.applyArgumentTypesToSuggestions($1, $4.activePosition);
      }
      $$ = { function: $1, types: ['UDFREF'] };
    }
