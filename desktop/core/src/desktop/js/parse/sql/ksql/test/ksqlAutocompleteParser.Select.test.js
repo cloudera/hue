@@ -165,6 +165,7 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
           'HAVING',
           'ORDER BY',
           'LIMIT',
+          'UNION',
           'FULL JOIN',
           'FULL OUTER JOIN',
           'INNER JOIN',
@@ -370,6 +371,97 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
   });
 
   describe('Select List Completion', () => {
+    it('should handle "select testUdf(not id), cos(-1), sin(1+id) from autocomp_test;"', () => {
+      assertAutoComplete({
+        beforeCursor: 'select testUdf(not id), cos(-1), sin(1+id) from autocomp_test;',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          locations: [
+            {
+              type: 'statement',
+              location: { first_line: 1, last_line: 1, first_column: 1, last_column: 62 }
+            },
+            {
+              type: 'selectList',
+              missing: false,
+              location: { first_line: 1, last_line: 1, first_column: 8, last_column: 43 }
+            },
+            {
+              type: 'function',
+              location: { first_line: 1, last_line: 1, first_column: 8, last_column: 14 },
+              function: 'testudf'
+            },
+            {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 16, last_column: 22 },
+              function: 'testudf',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'testUdf' }],
+              expression: { types: ['BOOLEAN'], text: 'not id' }
+            },
+            {
+              type: 'column',
+              location: { first_line: 1, last_line: 1, first_column: 20, last_column: 22 },
+              identifierChain: [{ name: 'id' }],
+              qualified: false,
+              tables: [{ identifierChain: [{ name: 'autocomp_test' }] }]
+            },
+            {
+              type: 'function',
+              location: { first_line: 1, last_line: 1, first_column: 25, last_column: 27 },
+              function: 'cos'
+            },
+            {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 29, last_column: 31 },
+              function: 'cos',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'cos' }],
+              expression: { types: ['NUMBER'], text: '- 1' }
+            },
+            {
+              type: 'function',
+              location: { first_line: 1, last_line: 1, first_column: 34, last_column: 36 },
+              function: 'sin'
+            },
+            {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 38, last_column: 42 },
+              function: 'sin',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'sin' }],
+              expression: { types: ['NUMBER'], text: '1 + id' }
+            },
+            {
+              type: 'column',
+              location: { first_line: 1, last_line: 1, first_column: 40, last_column: 42 },
+              identifierChain: [{ name: 'id' }],
+              qualified: false,
+              tables: [{ identifierChain: [{ name: 'autocomp_test' }] }]
+            },
+            {
+              type: 'table',
+              location: { first_line: 1, last_line: 1, first_column: 49, last_column: 62 },
+              identifierChain: [{ name: 'autocomp_test' }]
+            },
+            {
+              type: 'whereClause',
+              missing: true,
+              location: { first_line: 1, last_line: 1, first_column: 62, last_column: 62 }
+            },
+            {
+              type: 'limitClause',
+              missing: true,
+              location: { first_line: 1, last_line: 1, first_column: 62, last_column: 62 }
+            }
+          ],
+          lowerCase: true
+        }
+      });
+    });
+
     it('should handle "select count(*), tst.count, avg (id), avg from autocomp_test tst;"', () => {
       assertAutoComplete({
         beforeCursor: 'select count(*), tst.count, avg (id), avg from autocomp_test tst;',
@@ -393,6 +485,14 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
               function: 'count'
             },
             {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 14, last_column: 15 },
+              function: 'count',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'count' }],
+              expression: { text: '*' }
+            },
+            {
               type: 'table',
               location: { first_line: 1, last_line: 1, first_column: 18, last_column: 21 },
               identifierChain: [{ name: 'autocomp_test' }]
@@ -408,6 +508,14 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
               type: 'function',
               location: { first_line: 1, last_line: 1, first_column: 29, last_column: 32 },
               function: 'avg'
+            },
+            {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 34, last_column: 36 },
+              function: 'avg',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'avg' }],
+              expression: { types: ['COLREF'], columnReference: [{ name: 'id' }] }
             },
             {
               type: 'column',
@@ -1289,6 +1397,391 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
     });
   });
 
+  describe('Window and analytic functions', () => {
+    it('should handle "SELECT row_number() OVER (PARTITION BY a) FROM testTable;|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT row_number() OVER (PARTITION BY a) FROM testTable;',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should handle "SELECT COUNT(DISTINCT a) OVER (PARTITION by c) FROM testTable;|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT COUNT(DISTINCT a) OVER (PARTITION by c) FROM testTable;',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest analytical functions for "SELECT |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT ',
+        afterCursor: '',
+        containsKeywords: ['*'],
+        expectedResult: {
+          lowerCase: false,
+          suggestAggregateFunctions: { tables: [] },
+          suggestAnalyticFunctions: true,
+          suggestFunctions: {},
+          suggestTables: { prependQuestionMark: true, prependFrom: true },
+          suggestDatabases: { prependQuestionMark: true, prependFrom: true, appendDot: true }
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT row_number() ',
+        afterCursor: '',
+        containsKeywords: ['OVER'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() | FROM testTable"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT row_number() ',
+        afterCursor: ' FROM testTable',
+        containsKeywords: ['OVER'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() |, b, c FROM testTable"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT row_number() ',
+        afterCursor: ', b, c FROM testTable',
+        containsKeywords: ['OVER'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT count(DISTINCT a) |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT count(DISTINCT a) ',
+        afterCursor: '',
+        containsKeywords: ['OVER'],
+        expectedResult: {
+          lowerCase: false,
+          suggestTables: { prependFrom: true },
+          suggestDatabases: { prependFrom: true, appendDot: true }
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT count(DISTINCT a) | FROM testTable"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT count(DISTINCT a) ',
+        afterCursor: ' FROM testTable',
+        containsKeywords: ['OVER'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT count(DISTINCT a) |, b, c FROM testTable"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT count(DISTINCT a) ',
+        afterCursor: ', b, c FROM testTable',
+        containsKeywords: ['OVER'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() OVER (| FROM testTable"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT row_number() OVER ( ',
+        afterCursor: ' FROM testTable',
+        containsKeywords: ['PARTITION BY'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() OVER (PARTITION | FROM testTable"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT row_number() OVER (PARTITION ',
+        afterCursor: ' FROM testTable',
+        containsKeywords: ['BY'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a, b ORDER | FROM testTable"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT row_number() OVER (PARTITION BY a, b ORDER ',
+        afterCursor: ' FROM testTable',
+        containsKeywords: ['BY'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest columns for "SELECT row_number() OVER (ORDER BY | FROM testTable"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT row_number() OVER (ORDER BY ',
+        afterCursor: ' FROM testTable',
+        containsKeywords: ['CASE'],
+        expectedResult: {
+          lowerCase: false,
+          suggestAggregateFunctions: { tables: [] },
+          suggestFunctions: {},
+          suggestColumns: {
+            source: 'select',
+            tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          }
+        }
+      });
+    });
+
+    it('should suggest columns for "SELECT row_number() OVER (ORDER BY |) FROM testTable"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT row_number() OVER (ORDER BY ',
+        afterCursor: ') FROM testTable',
+        containsKeywords: ['CASE'],
+        expectedResult: {
+          lowerCase: false,
+          suggestAggregateFunctions: { tables: [] },
+          suggestFunctions: {},
+          suggestColumns: {
+            source: 'select',
+            tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          } // TODO: source: 'order by'
+        }
+      });
+    });
+
+    it('should suggest columns for "SELECT row_number() OVER (ORDER BY foo |) FROM testTable"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT row_number() OVER (ORDER BY a ',
+        afterCursor: ') FROM testTable',
+        containsKeywords: ['ASC', 'DESC'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest columns for "SELECT row_number() OVER (PARTITION BY | FROM testTable"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT row_number() OVER (PARTITION BY ',
+        afterCursor: ' FROM testTable',
+        containsKeywords: ['CASE'],
+        expectedResult: {
+          lowerCase: false,
+          suggestAggregateFunctions: { tables: [] },
+          suggestFunctions: {},
+          suggestColumns: {
+            source: 'select',
+            tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          }
+        }
+      });
+    });
+
+    it('should suggest columns for "SELECT row_number() OVER (PARTITION BY a, | FROM testTable"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT row_number() OVER (PARTITION BY a, ',
+        afterCursor: ' FROM testTable',
+        containsKeywords: ['CASE'],
+        expectedResult: {
+          lowerCase: false,
+          suggestAggregateFunctions: { tables: [] },
+          suggestFunctions: {},
+          suggestColumns: {
+            source: 'select',
+            tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          }
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ',
+        afterCursor: '',
+        containsKeywords: ['ASC', 'ROWS BETWEEN', 'RANGE BETWEEN'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['CURRENT ROW', 'UNBOUNDED PRECEDING']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN 1 |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN 1 ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['PRECEDING']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN UNBOUNDED |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN UNBOUNDED ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['PRECEDING']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN CURRENT |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN CURRENT ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['ROW']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN 1 PRECEDING |"', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN 1 PRECEDING ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['AND']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN UNBOUNDED PRECEDING |"', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN UNBOUNDED PRECEDING ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['AND']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN CURRENT ROW |"', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN CURRENT ROW ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['AND']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN 1 PRECEDING AND |"', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN 1 PRECEDING AND ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['CURRENT ROW', 'UNBOUNDED FOLLOWING']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN UNBOUNDED PRECEDING AND |"', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN UNBOUNDED PRECEDING AND ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['CURRENT ROW', 'UNBOUNDED FOLLOWING']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN CURRENT ROW AND |"', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN CURRENT ROW AND ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['CURRENT ROW', 'UNBOUNDED FOLLOWING']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN 1 PRECEDING AND CURRENT |"', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN 1 PRECEDING AND CURRENT ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['ROW']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED |"', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['FOLLOWING']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN CURRENT ROW AND 1 |"', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS BETWEEN CURRENT ROW AND 1 ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['FOLLOWING']
+        }
+      });
+    });
+  });
+
   describe('Functions', () => {
     it('should suggest tables for "SELECT COUNT(*) |"', () => {
       assertAutoComplete({
@@ -1805,6 +2298,14 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
               location: { first_line: 1, last_line: 1, first_column: 11, last_column: 19 },
               identifierChain: [{ name: 'db' }, { name: 'customUdf' }],
               function: 'customudf'
+            },
+            {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 21, last_column: 24 },
+              function: 'customudf',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'db' }, { name: 'customUdf' }],
+              expression: { types: ['COLREF'], columnReference: [{ name: 'col' }] }
             },
             {
               type: 'column',
@@ -3213,6 +3714,7 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
             'HAVING',
             'ORDER BY',
             'LIMIT',
+            'UNION',
             '<',
             '<=',
             '<=>',
@@ -3250,6 +3752,7 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
             'HAVING',
             'ORDER BY',
             'LIMIT',
+            'UNION',
             '<',
             '<=',
             '<=>',
@@ -3993,7 +4496,7 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['ASC', 'DESC', 'LIMIT']
+          suggestKeywords: ['ASC', 'DESC', 'LIMIT', 'UNION']
         }
       });
     });
@@ -4072,7 +4575,7 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['ASC', 'DESC', 'LIMIT']
+          suggestKeywords: ['ASC', 'DESC', 'LIMIT', 'UNION']
         }
       });
     });
@@ -4088,13 +4591,13 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
       });
     });
 
-    it('should not suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo LIMIT 10 |"', () => {
+    it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo LIMIT 10 |"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo LIMIT 10 ',
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: undefined
+          suggestKeywords: ['UNION']
         }
       });
     });
@@ -4250,13 +4753,290 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
   });
 
   describe('LIMIT clause', () => {
-    it('should not suggest anything for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT |"', () => {
+    it('should suggest values for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT |"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT ',
         afterCursor: '',
         noErrors: true,
         expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['10', '100', '1000', '10000', '5000']
+        }
+      });
+    });
+  });
+
+  describe('UNION clause', () => {
+    // TODO: Fix locations
+    xit('should handle "SELECT * FROM (SELECT x FROM few_ints UNION ALL SELECT x FROM few_ints) AS t1 ORDER BY x;|', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'SELECT * FROM (SELECT x FROM few_ints UNION ALL SELECT x FROM few_ints) AS t1 ORDER BY x;',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
           lowerCase: false
+        }
+      });
+    });
+
+    it('should handle "SELECT key FROM (SELECT key FROM src ORDER BY key LIMIT 10)subq1 UNION SELECT key FROM (SELECT key FROM src1 ORDER BY key LIMIT 10)subq2;|', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'SELECT key FROM (SELECT key FROM src ORDER BY key LIMIT 10)subq1 UNION SELECT key FROM (SELECT key FROM src1 ORDER BY key LIMIT 10)subq2;',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should handle "SELECT * FROM t1 UNION DISTINCT SELECT * FROM t2;|', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM t1 UNION DISTINCT SELECT * FROM t2;',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should handle "SELECT * FROM t1 UNION SELECT * FROM t2;|', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM t1 UNION SELECT * FROM t2;',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT * FROM t1 UNION |', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM t1 UNION ',
+        afterCursor: '',
+        noErrors: true,
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['ALL', 'DISTINCT', 'SELECT']
+        }
+      });
+    });
+
+    it('should suggest tables for "SELECT * FROM t1 UNION ALL SELECT |', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM t1 UNION ALL SELECT ',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['*', 'ALL', 'DISTINCT'],
+        expectedResult: {
+          lowerCase: false,
+          suggestAggregateFunctions: { tables: [] },
+          suggestAnalyticFunctions: true,
+          suggestFunctions: {},
+          suggestTables: {
+            prependQuestionMark: true,
+            prependFrom: true
+          },
+          suggestDatabases: {
+            prependQuestionMark: true,
+            prependFrom: true,
+            appendDot: true
+          }
+        }
+      });
+    });
+  });
+
+  describe('WITH clause', () => {
+    it('should handle "WITH q1 AS ( SELECT key FROM src WHERE something) SELECT * FROM q1;|', () => {
+      assertAutoComplete({
+        beforeCursor: 'WITH q1 AS ( SELECT key FROM src WHERE something) SELECT * FROM q1;',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should handle "WITH q1 AS (SELECT * FROM src WHERE something), q2 AS (SELECT * FROM src s2 WHERE something) SELECT * FROM q1 UNION ALL SELECT * FROM q2;|', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'WITH q1 AS (SELECT * FROM src WHERE something), q2 AS (SELECT * FROM src s2 WHERE something) SELECT * FROM q1 UNION ALL SELECT * FROM q2;',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should handle "WITH t1 AS (SELECT 1) (WITH t2 AS (SELECT 2) SELECT * FROM t2) UNION ALL SELECT * FROM t1;|', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'WITH t1 AS (SELECT 1) (WITH t2 AS (SELECT 2) SELECT * FROM t2) UNION ALL SELECT * FROM t1;',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "WITH t1 |', () => {
+      assertAutoComplete({
+        beforeCursor: 'WITH t1 ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['AS']
+        }
+      });
+    });
+
+    it('should suggest keywords for "WITH t1 AS (|', () => {
+      assertAutoComplete({
+        beforeCursor: 'WITH t1 AS (',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['SELECT']
+        }
+      });
+    });
+
+    it('should suggest keywords for "WITH t1 AS (SELECT * FROM boo) |', () => {
+      assertAutoComplete({
+        beforeCursor: 'WITH t1 AS (SELECT * FROM boo) ',
+        afterCursor: '',
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest identifiers for "WITH t1 AS (SELECT * FROM FOO) SELECT |', () => {
+      assertAutoComplete({
+        beforeCursor: 'WITH t1 AS (SELECT * FROM FOO) SELECT ',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['*', 'ALL', 'DISTINCT'],
+        expectedResult: {
+          lowerCase: false,
+          suggestAggregateFunctions: { tables: [] },
+          suggestAnalyticFunctions: true,
+          suggestFunctions: {},
+          suggestTables: { prependQuestionMark: true, prependFrom: true },
+          suggestDatabases: { prependQuestionMark: true, prependFrom: true, appendDot: true },
+          suggestCommonTableExpressions: [
+            { name: 't1', prependFrom: true, prependQuestionMark: true }
+          ],
+          commonTableExpressions: [
+            { alias: 't1', columns: [{ tables: [{ identifierChain: [{ name: 'FOO' }] }] }] }
+          ]
+        }
+      });
+    });
+
+    it('should suggest identifiers for "WITH t1 AS (SELECT * FROM FOO), t2 AS (SELECT |', () => {
+      assertAutoComplete({
+        beforeCursor: 'WITH t1 AS (SELECT * FROM FOO), t2 AS (SELECT ',
+        afterCursor: '',
+        containsKeywords: ['*', 'ALL', 'DISTINCT'],
+        expectedResult: {
+          suggestAggregateFunctions: { tables: [] },
+          suggestAnalyticFunctions: true,
+          suggestFunctions: {},
+          suggestTables: { prependQuestionMark: true, prependFrom: true },
+          suggestDatabases: { prependQuestionMark: true, prependFrom: true, appendDot: true },
+          lowerCase: false,
+          suggestCommonTableExpressions: [
+            { name: 't1', prependFrom: true, prependQuestionMark: true }
+          ],
+          commonTableExpressions: [
+            { alias: 't1', columns: [{ tables: [{ identifierChain: [{ name: 'FOO' }] }] }] }
+          ]
+        }
+      });
+    });
+
+    it('should suggest identifiers for "WITH t1 AS (SELECT * FROM FOO) SELECT * FROM |', () => {
+      assertAutoComplete({
+        beforeCursor: 'WITH t1 AS (SELECT * FROM FOO) SELECT * FROM ',
+        afterCursor: '',
+        noErrors: true,
+        expectedResult: {
+          lowerCase: false,
+          suggestTables: {},
+          suggestDatabases: { appendDot: true },
+          suggestCommonTableExpressions: [{ name: 't1' }],
+          commonTableExpressions: [
+            { alias: 't1', columns: [{ tables: [{ identifierChain: [{ name: 'FOO' }] }] }] }
+          ]
+        }
+      });
+    });
+
+    it('should suggest keywords for "with s as (select * from foo join bar) select * from |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'with s as (select * from foo join bar) select * from ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: true,
+          suggestTables: {},
+          suggestDatabases: { appendDot: true },
+          commonTableExpressions: [
+            {
+              columns: [
+                {
+                  tables: [
+                    { identifierChain: [{ name: 'foo' }] },
+                    { identifierChain: [{ name: 'bar' }] }
+                  ]
+                }
+              ],
+              alias: 's'
+            }
+          ],
+          suggestCommonTableExpressions: [{ name: 's' }]
+        }
+      });
+    });
+
+    it('should suggest keywords for "with s as (select * from foo join bar) select * from |;', () => {
+      assertAutoComplete({
+        beforeCursor: 'with s as (select * from foo join bar) select * from ',
+        afterCursor: ';',
+        expectedResult: {
+          lowerCase: true,
+          suggestTables: {},
+          suggestDatabases: { appendDot: true },
+          commonTableExpressions: [
+            {
+              columns: [
+                {
+                  tables: [
+                    { identifierChain: [{ name: 'foo' }] },
+                    { identifierChain: [{ name: 'bar' }] }
+                  ]
+                }
+              ],
+              alias: 's'
+            }
+          ],
+          suggestCommonTableExpressions: [{ name: 's' }]
         }
       });
     });
