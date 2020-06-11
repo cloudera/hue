@@ -13,14 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
 import sys
+import unittest
 
 import sqlalchemy as db
 from sqlalchemy import text
 
-from . import TEST_DB_URL, TEST_DB_AUTHENTICATION, TEST_DB_AVATICA_USER, TEST_DB_AVATICA_PASSWORD,\
-        TEST_DB_TRUSTSTORE
+from . import TEST_DB_AUTHENTICATION, TEST_DB_AVATICA_PASSWORD, TEST_DB_AVATICA_USER, \
+    TEST_DB_TRUSTSTORE, TEST_DB_URL
 
 if sys.version_info.major == 3:
     from urllib.parse import urlparse, urlunparse
@@ -67,7 +67,6 @@ class SQLAlchemyTest(unittest.TestCase):
                 CONSTRAINT my_pk PRIMARY KEY (state, city))'''))
                 columns_result = inspector.get_columns('us_population')
                 self.assertEqual(len(columns_result), 3)
-                print(columns_result)
             finally:
                 connection.execute('drop table if exists us_population')
 

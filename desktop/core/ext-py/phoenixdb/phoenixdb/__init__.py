@@ -54,7 +54,7 @@ For example::
 
 
 def connect(url, max_retries=None, auth=None, authentication=None, avatica_user=None, avatica_password=None,
-            truststore=None, verify=None, **kwargs):
+            truststore=None, verify=None, do_as=None, user=None, password=None, **kwargs):
     """Connects to a Phoenix query server.
 
     :param url:
@@ -77,6 +77,14 @@ def connect(url, max_retries=None, auth=None, authentication=None, avatica_user=
         Authentication configuration object as expected by the underlying python_requests and
         python_requests_gssapi library
 
+    :param verify:
+        The path to the PEM file for verifying the server's certificate. It is passed directly to
+        the `~verify` parameter of the underlying python_requests library.
+        Setting it to False disables the server certificate verification.
+
+    :param do_as:
+        Username to impersonate (sets the Hadoop doAs URL parameter)
+
     :param authentication:
         Alternative way to specify the authentication mechanism that mimics
         the semantics of the JDBC drirver
@@ -89,10 +97,12 @@ def connect(url, max_retries=None, auth=None, authentication=None, avatica_user=
         Password for BASIC or DIGEST authentication. Use in conjunction with the
         `~authentication' option.
 
-    :param verify:
-        The path to the PEM file for verifying the server's certificate. It is passed directly to
-        the `~verify` parameter of the underlying python_requests library.
-        Setting it to false disables the server certificate verification.
+    :param user
+        If `~authentication' is BASIC or DIGEST then alias for `~avatica_user`
+        If `~authentication' is NONE or SPNEGO then alias for `~do_as`
+
+    :param password
+        If `~authentication' is BASIC or DIGEST then is alias for `~avatica_password`
 
     :param truststore:
         Alias for verify
@@ -101,33 +111,65 @@ def connect(url, max_retries=None, auth=None, authentication=None, avatica_user=
         :class:`~phoenixdb.connection.Connection` object.
     """
 
+    (url, auth, verify) = _process_args(
+        url, auth=auth, authentication=authentication,
+        avatica_user=avatica_user, avatica_password=avatica_password,
+        truststore=truststore, verify=verify, do_as=do_as, user=user, password=password)
+
+    client = AvaticaClient(url, max_retries=max_retries, auth=auth, verify=verify)
+    client.connect()
+    return Connection(client, **kwargs)
+
+
+def _process_args(
+        url, auth=None, authentication=None, avatica_user=None, avatica_password=None,
+        truststore=None, verify=None, do_as=None, user=None, password=None):
     url_parsed = urlparse(url)
     url_params = parse_qs(url_parsed.query, keep_blank_values=True)
 
-    # Parse supported JDBC compatible options from URL. args have precendece
-    rebuild = False
+    # Parse supported JDBC compatible parameters from URL. args have precendece
+    # Unlike the JDBC driver, we are expecting these as query params, as the avatica java client
+    # has a different idea of what an URL param is than urlparse. (urlparse seems just broken
+    # in this regard)
+    params_changed = False
     if auth is None and authentication is None and 'authentication' in url_params:
         authentication = url_params['authentication'][0]
         del url_params['authentication']
-        rebuild = True
+        params_changed = True
 
     if avatica_user is None and 'avatica_user' in url_params:
         avatica_user = url_params['avatica_user'][0]
         del url_params['avatica_user']
-        rebuild = True
+        params_changed = True
 
     if avatica_password is None and 'avatica_password' in url_params:
         avatica_password = url_params['avatica_password'][0]
         del url_params['avatica_password']
-        rebuild = True
+        params_changed = True
 
     if verify is None and truststore is None and 'truststore' in url_params:
         truststore = url_params['truststore'][0]
         del url_params['truststore']
-        rebuild = True
+        params_changed = True
 
-    if rebuild:
-        url_parsed._replace(query=urlencode(url_params, True))
+    if authentication == 'BASIC' or authentication == 'DIGEST':
+        # Handle standard user and password parameters
+        if user is not None and avatica_user is None:
+            avatica_user = user
+        if password is not None and avatica_password is None:
+            avatica_password = password
+    else:
+        # interpret standard user parameter as do_as for SPNEGO and NONE
+        if user is not None and do_as is None:
+            do_as = user
+
+    # Add doAs
+    if do_as:
+        url_params['doAs'] = do_as
+        params_changed = True
+
+    if params_changed:
+        url_parsed = url_parsed._replace(query=urlencode(url_params))
         url = urlunparse(url_parsed)
 
     if auth == "SPNEGO":
@@ -144,9 +186,4 @@ def connect(url, max_retries=None, auth=None, authentication=None, avatica_user=
     if verify is None and truststore is not None:
         verify = truststore
 
-    client = AvaticaClient(url, max_retries=max_retries,
-                           auth=auth,
-                           verify=verify
-                           )
-    client.connect()
-    return Connection(client, **kwargs)
+    return (url, auth, verify)

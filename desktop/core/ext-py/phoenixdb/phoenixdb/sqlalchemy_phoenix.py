@@ -12,16 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
+import sys
+
+import phoenixdb
+
 from sqlalchemy import types
 from sqlalchemy.engine.default import DefaultDialect, DefaultExecutionContext
 from sqlalchemy.exc import CompileError
 from sqlalchemy.sql.compiler import DDLCompiler
 from sqlalchemy.types import BIGINT, BOOLEAN, CHAR, DATE, DECIMAL, FLOAT, INTEGER, NUMERIC,\
     SMALLINT, TIME, TIMESTAMP, VARBINARY, VARCHAR
-
-import phoenixdb
-import re
-import sys
 
 if sys.version_info.major == 3:
     from urllib.parse import urlunsplit, SplitResult, urlencode
@@ -94,6 +95,13 @@ class PhoenixDialect(DefaultDialect):
     execution_ctx_cls = PhoenixExecutionContext
 
     def __init__(self, tls=False, path='/', **opts):
+        '''
+        :param tls:
+            If True, then use https for connecting, otherwise use http
+
+        :param path:
+            The path component of the connection URL
+        '''
         # There is no way to pass these via the SqlAlchemy url object
         self.tls = tls
         self.path = path
@@ -104,6 +112,11 @@ class PhoenixDialect(DefaultDialect):
         return phoenixdb
 
     def create_connect_args(self, url):
+        connect_args = dict()
+        if url.username is not None:
+            connect_args['user'] = url.username
+            if url.password is not None:
+                connect_args['password'] = url.username
         phoenix_url = urlunsplit(SplitResult(
             scheme='https' if self.tls else 'http',
             netloc='{}:{}'.format(url.host, 8765 if url.port is None else url.port),
@@ -111,7 +124,7 @@ class PhoenixDialect(DefaultDialect):
             query=urlencode(url.query),
             fragment='',
         ))
-        return [phoenix_url], {}
+        return [phoenix_url], connect_args
 
     def has_table(self, connection, table_name, schema=None):
         if schema is None:
