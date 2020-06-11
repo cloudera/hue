@@ -1509,7 +1509,7 @@ InValueList
 NonParenthesizedValueExpressionPrimary
  : UnsignedValueSpecification
  | ColumnOrArbitraryFunctionRef  -> { types: ['COLREF'], columnReference: $1.chain }
- | 'NULL'                        -> { types: [ 'NULL' ] }
+ | 'NULL'                        -> { types: [ 'NULL' ], text: $1 }
  ;
 
 NonParenthesizedValueExpressionPrimary_EDIT
@@ -1563,7 +1563,7 @@ UnsignedValueSpecification_EDIT
  ;
 
 UnsignedLiteral
- : UnsignedNumericLiteral  -> { types: [ 'NUMBER' ] }
+ : UnsignedNumericLiteral  -> { types: [ 'NUMBER' ], text: $1 }
  | GeneralLiteral
  ;
 
@@ -1584,9 +1584,9 @@ ExactNumericLiteral
  ;
 
 ApproximateNumericLiteral
- : UNSIGNED_INTEGER_E 'UNSIGNED_INTEGER'
- | '.' UNSIGNED_INTEGER_E 'UNSIGNED_INTEGER'
- | 'UNSIGNED_INTEGER' '.' UNSIGNED_INTEGER_E 'UNSIGNED_INTEGER'
+ : UNSIGNED_INTEGER_E 'UNSIGNED_INTEGER'                        -> $1 + $2
+ | '.' UNSIGNED_INTEGER_E 'UNSIGNED_INTEGER'                    -> $1 + $2 + $3
+ | 'UNSIGNED_INTEGER' '.' UNSIGNED_INTEGER_E 'UNSIGNED_INTEGER' -> $1 + $2 + $3 + $4
  ;
 
 GeneralLiteral
@@ -1594,7 +1594,7 @@ GeneralLiteral
    {
      if (/\$\{[^}]*\}/.test($1)) {
        parser.addVariableLocation(@1, $1);
-       $$ = { types: [ 'STRING' ], columnReference: [{ name: $1 }] }
+       $$ = { types: [ 'STRING' ], columnReference: [{ name: $1 }], text: "'" + $1 + "'" }
      } else {
        $$ = { types: [ 'STRING' ] }
      }
@@ -1603,12 +1603,12 @@ GeneralLiteral
    {
      if (/\$\{[^}]*\}/.test($1)) {
        parser.addVariableLocation(@1, $1);
-       $$ = { types: [ 'STRING' ], columnReference: [{ name: $1 }] }
+       $$ = { types: [ 'STRING' ], columnReference: [{ name: $1 }], text: '"' + $1 + '"' }
      } else {
-       $$ = { types: [ 'STRING' ] }
+       $$ = { types: [ 'STRING' ], text: '"' + $1 + '"' }
      }
    }
- | TruthValue         -> { types: [ 'BOOLEAN' ] }
+ | TruthValue         -> { types: [ 'BOOLEAN' ], text: $1 }
  ;
 
 GeneralLiteral_EDIT

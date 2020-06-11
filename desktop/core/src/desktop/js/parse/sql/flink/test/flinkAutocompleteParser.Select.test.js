@@ -371,6 +371,97 @@ describe('flinkAutocompleteParser.js SELECT statements', () => {
   });
 
   describe('Select List Completion', () => {
+    it('should handle "select testUdf(not id), cos(-1), sin(1+id) from autocomp_test;"', () => {
+      assertAutoComplete({
+        beforeCursor: 'select testUdf(not id), cos(-1), sin(1+id) from autocomp_test;',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          locations: [
+            {
+              type: 'statement',
+              location: { first_line: 1, last_line: 1, first_column: 1, last_column: 62 }
+            },
+            {
+              type: 'selectList',
+              missing: false,
+              location: { first_line: 1, last_line: 1, first_column: 8, last_column: 43 }
+            },
+            {
+              type: 'function',
+              location: { first_line: 1, last_line: 1, first_column: 8, last_column: 14 },
+              function: 'testudf'
+            },
+            {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 16, last_column: 22 },
+              function: 'testudf',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'testUdf' }],
+              expression: { types: ['BOOLEAN'], text: 'not id' }
+            },
+            {
+              type: 'column',
+              location: { first_line: 1, last_line: 1, first_column: 20, last_column: 22 },
+              identifierChain: [{ name: 'id' }],
+              qualified: false,
+              tables: [{ identifierChain: [{ name: 'autocomp_test' }] }]
+            },
+            {
+              type: 'function',
+              location: { first_line: 1, last_line: 1, first_column: 25, last_column: 27 },
+              function: 'cos'
+            },
+            {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 29, last_column: 31 },
+              function: 'cos',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'cos' }],
+              expression: { types: ['NUMBER'], text: '- 1' }
+            },
+            {
+              type: 'function',
+              location: { first_line: 1, last_line: 1, first_column: 34, last_column: 36 },
+              function: 'sin'
+            },
+            {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 38, last_column: 42 },
+              function: 'sin',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'sin' }],
+              expression: { types: ['NUMBER'], text: '1 + id' }
+            },
+            {
+              type: 'column',
+              location: { first_line: 1, last_line: 1, first_column: 40, last_column: 42 },
+              identifierChain: [{ name: 'id' }],
+              qualified: false,
+              tables: [{ identifierChain: [{ name: 'autocomp_test' }] }]
+            },
+            {
+              type: 'table',
+              location: { first_line: 1, last_line: 1, first_column: 49, last_column: 62 },
+              identifierChain: [{ name: 'autocomp_test' }]
+            },
+            {
+              type: 'whereClause',
+              missing: true,
+              location: { first_line: 1, last_line: 1, first_column: 62, last_column: 62 }
+            },
+            {
+              type: 'limitClause',
+              missing: true,
+              location: { first_line: 1, last_line: 1, first_column: 62, last_column: 62 }
+            }
+          ],
+          lowerCase: true
+        }
+      });
+    });
+
     it('should handle "select count(*), tst.count, avg (id), avg from autocomp_test tst;"', () => {
       assertAutoComplete({
         beforeCursor: 'select count(*), tst.count, avg (id), avg from autocomp_test tst;',
@@ -394,6 +485,14 @@ describe('flinkAutocompleteParser.js SELECT statements', () => {
               function: 'count'
             },
             {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 14, last_column: 15 },
+              function: 'count',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'count' }],
+              expression: { text: '*' }
+            },
+            {
               type: 'table',
               location: { first_line: 1, last_line: 1, first_column: 18, last_column: 21 },
               identifierChain: [{ name: 'autocomp_test' }]
@@ -409,6 +508,14 @@ describe('flinkAutocompleteParser.js SELECT statements', () => {
               type: 'function',
               location: { first_line: 1, last_line: 1, first_column: 29, last_column: 32 },
               function: 'avg'
+            },
+            {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 34, last_column: 36 },
+              function: 'avg',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'avg' }],
+              expression: { types: ['COLREF'], columnReference: [{ name: 'id' }] }
             },
             {
               type: 'column',
@@ -2191,6 +2298,14 @@ describe('flinkAutocompleteParser.js SELECT statements', () => {
               location: { first_line: 1, last_line: 1, first_column: 11, last_column: 19 },
               identifierChain: [{ name: 'db' }, { name: 'customUdf' }],
               function: 'customudf'
+            },
+            {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 21, last_column: 24 },
+              function: 'customudf',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'db' }, { name: 'customUdf' }],
+              expression: { types: ['COLREF'], columnReference: [{ name: 'col' }] }
             },
             {
               type: 'column',
@@ -4638,13 +4753,14 @@ describe('flinkAutocompleteParser.js SELECT statements', () => {
   });
 
   describe('LIMIT clause', () => {
-    it('should not suggest anything for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT |"', () => {
+    it('should suggest values for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT |"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT ',
         afterCursor: '',
         noErrors: true,
         expectedResult: {
-          lowerCase: false
+          lowerCase: false,
+          suggestKeywords: ['10', '100', '1000', '10000', '5000']
         }
       });
     });

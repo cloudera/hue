@@ -19,23 +19,46 @@ ValueExpression
    {
      // verifyType($2, 'BOOLEAN');
      $$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText($$, $1, $2);
    }
  | '!' ValueExpression
    {
      // verifyType($2, 'BOOLEAN');
      $$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText($$, $1, $2);
    }
- | '~' ValueExpression                                                 -> $2
+ | '~' ValueExpression
+   {
+     $$ = $2;
+     parser.extractExpressionText($$, $1, $2);
+   }
  | '-' ValueExpression %prec NEGATION
    {
      // verifyType($2, 'NUMBER');
      $$ = $2;
      $2.types = ['NUMBER'];
+     parser.extractExpressionText($$, $1, $2);
    }
- | ValueExpression 'IS' OptionalNot 'NULL'                             -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'IS' OptionalNot 'TRUE'                             -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'IS' OptionalNot 'FALSE'                            -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'IS' OptionalNot 'DISTINCT' 'FROM' ValueExpression  -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'IS' OptionalNot 'NULL'
+   {
+     $$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText($$, $1, $2, $3, $4);
+   }
+ | ValueExpression 'IS' OptionalNot 'TRUE'
+   {
+     $$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText($$, $1, $2, $3, $4);
+   }
+ | ValueExpression 'IS' OptionalNot 'FALSE'
+   {
+     $$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText($$, $1, $2, $3, $4);
+   }
+ | ValueExpression 'IS' OptionalNot 'DISTINCT' 'FROM' ValueExpression
+   {
+     $$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText($$, $1, $2, $3, $4, $5, $6);
+   }
  ;
 
 ValueExpression_EDIT
@@ -145,21 +168,25 @@ ValueExpression
    {
      parser.addColRefToVariableIfExists($1, $3);
      $$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText($$, $1, $2, $3);
    }
  | ValueExpression '<' ValueExpression
    {
      parser.addColRefToVariableIfExists($1, $3);
      $$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText($$, $1, $2, $3);
    }
  | ValueExpression '>' ValueExpression
    {
      parser.addColRefToVariableIfExists($1, $3);
      $$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText($$, $1, $2, $3);
    }
  | ValueExpression 'COMPARISON_OPERATOR' ValueExpression
    {
      parser.addColRefToVariableIfExists($1, $3);
      $$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText($$, $1, $2, $3);
    }
  ;
 
@@ -326,8 +353,16 @@ ValueExpressionInSecondPart_EDIT
 // ------------------  BETWEEN ------------------
 
 ValueExpression
- : ValueExpression 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression  -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression        -> { types: [ 'BOOLEAN' ] }
+ : ValueExpression 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression
+   {
+     $$ = { types: [ 'BOOLEAN' ] }
+     parser.extractExpressionText($$, $1, $2, $3, $4, $5, $6);
+   }
+ | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression
+   {
+     $$ = { types: [ 'BOOLEAN' ] }
+     parser.extractExpressionText($$, $1, $2, $3, $4, $5);
+   }
  ;
 
 ValueExpression_EDIT
@@ -415,12 +450,14 @@ ValueExpression
      // verifyType($1, 'BOOLEAN');
      // verifyType($3, 'BOOLEAN');
      $$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText($$, $1, $2, $3);
    }
  | ValueExpression 'AND' ValueExpression
    {
      // verifyType($1, 'BOOLEAN');
      // verifyType($3, 'BOOLEAN');
      $$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText($$, $1, $2, $3);
    }
  ;
 
@@ -475,18 +512,21 @@ ValueExpression
      // verifyType($1, 'NUMBER');
      // verifyType($3, 'NUMBER');
      $$ = { types: [ 'NUMBER' ] };
+     parser.extractExpressionText($$, $1, $2, $3);
    }
  | ValueExpression '*' ValueExpression
    {
      // verifyType($1, 'NUMBER');
      // verifyType($3, 'NUMBER');
      $$ = { types: [ 'NUMBER' ] };
+     parser.extractExpressionText($$, $1, $2, $3);
    }
  | ValueExpression 'ARITHMETIC_OPERATOR' ValueExpression
    {
      // verifyType($1, 'NUMBER');
      // verifyType($3, 'NUMBER');
      $$ = { types: [ 'NUMBER' ] };
+     parser.extractExpressionText($$, $1, $2, $3);
    }
  ;
 
@@ -574,14 +614,34 @@ ValueExpression_EDIT
 // ------------------  LIKE, RLIKE and REGEXP ------------------
 
 ValueExpression
- : ValueExpression LikeRightPart          -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'NOT' LikeRightPart    -> { types: [ 'BOOLEAN' ] }
+ : ValueExpression LikeRightPart
+   {
+     $$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText($$, $1, $2);
+   }
+ | ValueExpression 'NOT' LikeRightPart
+   {
+     $$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText($$, $1, $2, $3);
+   }
  ;
 
 LikeRightPart
- : 'LIKE' ValueExpression             -> { suggestKeywords: ['NOT'] }
- | 'RLIKE' ValueExpression            -> { suggestKeywords: ['NOT'] }
- | 'REGEXP' ValueExpression           -> { suggestKeywords: ['NOT'] }
+ : 'LIKE' ValueExpression
+   {
+     $$ = { suggestKeywords: ['NOT'] }
+     parser.extractExpressionText($$, $1, $2);
+   }
+ | 'RLIKE' ValueExpression
+   {
+     $$ = { suggestKeywords: ['NOT'] }
+     parser.extractExpressionText($$, $1, $2);
+   }
+ | 'REGEXP' ValueExpression
+   {
+     $$ = { suggestKeywords: ['NOT'] }
+     parser.extractExpressionText($$, $1, $2);
+   }
  ;
 
 LikeRightPart_EDIT
@@ -630,8 +690,16 @@ ValueExpression_EDIT
 // ------------------  CASE, WHEN, THEN ------------------
 
 ValueExpression
- : 'CASE' CaseRightPart                  -> $2
- | 'CASE' ValueExpression CaseRightPart  -> $3
+ : 'CASE' CaseRightPart
+   {
+     $$ = $2;
+     parser.extractExpressionText($$, $1, $2);
+   }
+ | 'CASE' ValueExpression CaseRightPart
+   {
+     $$ = $3;
+     parser.extractExpressionText($$, $1, $2, $3);
+   }
  ;
 
 ValueExpression_EDIT
@@ -658,11 +726,16 @@ ValueExpression_EDIT
  ;
 
 CaseRightPart
- : CaseWhenThenList 'END'                         -> parser.findCaseType($1)
+ : CaseWhenThenList 'END'
+   {
+     $$ = parser.findCaseType($1)
+     parser.extractExpressionText($$, $1, $2);
+   }
  | CaseWhenThenList 'ELSE' ValueExpression 'END'
    {
      $1.caseTypes.push($3);
      $$ = parser.findCaseType($1);
+     parser.extractExpressionText($$, $1, $2, $3, $4);
    }
  ;
 
@@ -734,11 +807,16 @@ EndOrError
  ;
 
 CaseWhenThenList
- : CaseWhenThenListPartTwo                   -> { caseTypes: [ $1 ], lastType: $1 }
+ : CaseWhenThenListPartTwo
+   {
+     $$ = { caseTypes: [ $1 ], lastType: $1 }
+     parser.extractExpressionText($$, $1);
+   }
  | CaseWhenThenList CaseWhenThenListPartTwo
    {
      $1.caseTypes.push($2);
      $$ = { caseTypes: $1.caseTypes, lastType: $2 };
+     parser.extractExpressionText($$, $1, $2);
    }
  ;
 
@@ -754,7 +832,11 @@ CaseWhenThenList_EDIT
  ;
 
 CaseWhenThenListPartTwo
- : 'WHEN' ValueExpression 'THEN' ValueExpression  -> $4
+ : 'WHEN' ValueExpression 'THEN' ValueExpression
+   {
+     $$ = $4
+     parser.extractExpressionText($$, $1, $2, $3, $4);
+   }
  ;
 
 CaseWhenThenListPartTwo_EDIT

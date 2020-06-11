@@ -574,7 +574,7 @@ case 261:
      parser.suggestDatabases({ prependFrom: true, appendDot: true });
    
 break;
-case 267: case 268: case 269: case 626: case 654: case 675: case 688: case 692: case 716: case 741: case 742: case 823: case 825: case 889: case 899: case 906: case 918: case 1007: case 1191: case 1192:
+case 267: case 268: case 269: case 626: case 654: case 675: case 688: case 692: case 823: case 825: case 889: case 899: case 906: case 918: case 1007: case 1191:
 this.$ = $$[$0];
 break;
 case 270: case 271:
@@ -1210,6 +1210,13 @@ case 714: case 715:
 
      // verifyType($$[$0], 'BOOLEAN');
      this.$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText(this.$, $$[$0-1], $$[$0]);
+   
+break;
+case 716: case 741:
+
+     this.$ = $$[$0];
+     parser.extractExpressionText(this.$, $$[$0-1], $$[$0]);
    
 break;
 case 717:
@@ -1217,10 +1224,20 @@ case 717:
      // verifyType($$[$0], 'NUMBER');
      this.$ = $$[$0];
      $$[$0].types = ['NUMBER'];
+     parser.extractExpressionText(this.$, $$[$0-1], $$[$0]);
    
 break;
-case 718: case 719: case 720: case 721: case 728: case 729: case 730: case 731: case 732: case 733: case 739: case 740: case 761: case 819: case 820: case 878:
-this.$ = { types: [ 'BOOLEAN' ] };
+case 718: case 719: case 720:
+
+     this.$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText(this.$, $$[$0-3], $$[$0-2], $$[$0-1], $$[$0]);
+   
+break;
+case 721:
+
+     this.$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText(this.$, $$[$0-5], $$[$0-4], $$[$0-3], $$[$0-2], $$[$0-1], $$[$0]);
+   
 break;
 case 722:
 
@@ -1233,6 +1250,22 @@ case 724: case 725: case 726: case 727:
 
      parser.addColRefToVariableIfExists($$[$0-2], $$[$0]);
      this.$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText(this.$, $$[$0-2], $$[$0-1], $$[$0]);
+   
+break;
+case 728: case 729: case 730: case 731: case 761: case 819: case 820:
+this.$ = { types: [ 'BOOLEAN' ] };
+break;
+case 732:
+
+     this.$ = { types: [ 'BOOLEAN' ] }
+     parser.extractExpressionText(this.$, $$[$0-5], $$[$0-4], $$[$0-3], $$[$0-2], $$[$0-1], $$[$0]);
+   
+break;
+case 733:
+
+     this.$ = { types: [ 'BOOLEAN' ] }
+     parser.extractExpressionText(this.$, $$[$0-4], $$[$0-3], $$[$0-2], $$[$0-1], $$[$0]);
    
 break;
 case 734: case 735:
@@ -1240,6 +1273,7 @@ case 734: case 735:
      // verifyType($$[$0-2], 'BOOLEAN');
      // verifyType($$[$0], 'BOOLEAN');
      this.$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText(this.$, $$[$0-2], $$[$0-1], $$[$0]);
    
 break;
 case 736: case 737: case 738:
@@ -1247,6 +1281,25 @@ case 736: case 737: case 738:
      // verifyType($$[$0-2], 'NUMBER');
      // verifyType($$[$0], 'NUMBER');
      this.$ = { types: [ 'NUMBER' ] };
+     parser.extractExpressionText(this.$, $$[$0-2], $$[$0-1], $$[$0]);
+   
+break;
+case 739:
+
+     this.$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText(this.$, $$[$0-1], $$[$0]);
+   
+break;
+case 740:
+
+     this.$ = { types: [ 'BOOLEAN' ] };
+     parser.extractExpressionText(this.$, $$[$0-2], $$[$0-1], $$[$0]);
+   
+break;
+case 742:
+
+     this.$ = $$[$0];
+     parser.extractExpressionText(this.$, $$[$0-2], $$[$0-1], $$[$0]);
    
 break;
 case 744:
@@ -1660,13 +1713,14 @@ case 846:
 this.$ = { types: ['COLREF'], columnReference: $$[$0].chain };
 break;
 case 847:
-this.$ = { types: [ 'NULL' ] };
+this.$ = { types: [ 'NULL' ], text: $$[$0] };
 break;
 case 848:
 
      // We need to handle arbitrary UDFs here instead of inside UserDefinedFunction or there will be a conflict
      // with columnReference for functions like: db.udf(foo)
      var fn = $$[$0-1].chain[$$[$0-1].chain.length - 1].name.toLowerCase();
+     parser.addFunctionArgumentLocations(fn, $$[$0].expressions, $$[$0-1].chain);
      $$[$0-1].lastLoc.type = 'function';
      $$[$0-1].lastLoc.function = fn;
      $$[$0-1].lastLoc.location = {
@@ -1708,6 +1762,7 @@ break;
 case 853:
 
      var fn = $$[$0-1].chain[$$[$0-1].chain.length - 1].name.toLowerCase();
+     parser.addFunctionArgumentLocations(fn, $$[$0].expressions, $$[$0-1].chain);
      $$[$0-1].lastLoc.type = 'function';
      $$[$0-1].lastLoc.function = fn;
      $$[$0-1].lastLoc.location = {
@@ -1730,6 +1785,7 @@ break;
 case 854: case 1081: case 1082:
 
      parser.addFunctionLocation(_$[$0-1], $$[$0-1]);
+     parser.addFunctionArgumentLocations($$[$0-1], $$[$0].expressions);
      if ($$[$0].activePosition) {
        parser.applyArgumentTypesToSuggestions($$[$0-1], $$[$0].activePosition);
      }
@@ -1753,23 +1809,39 @@ case 863:
    
 break;
 case 864:
-this.$ = { types: [ 'NUMBER' ] };
+this.$ = { types: [ 'NUMBER' ], text: $$[$0] };
 break;
-case 870: case 872:
+case 870: case 872: case 873:
 this.$ = $$[$0-1] + $$[$0];
 break;
-case 871:
+case 871: case 874:
 this.$ = $$[$0-2] + $$[$0-1] + $$[$0];
 break;
-case 876: case 877:
+case 875:
+this.$ = $$[$0-3] + $$[$0-2] + $$[$0-1] + $$[$0];
+break;
+case 876:
 
      if (/\$\{[^}]*\}/.test($$[$0])) {
        parser.addVariableLocation(_$[$0], $$[$0]);
-       this.$ = { types: [ 'STRING' ], columnReference: [{ name: $$[$0] }] }
+       this.$ = { types: [ 'STRING' ], columnReference: [{ name: $$[$0] }], text: "'" + $$[$0] + "'" }
      } else {
        this.$ = { types: [ 'STRING' ] }
      }
    
+break;
+case 877:
+
+     if (/\$\{[^}]*\}/.test($$[$0])) {
+       parser.addVariableLocation(_$[$0], $$[$0]);
+       this.$ = { types: [ 'STRING' ], columnReference: [{ name: $$[$0] }], text: '"' + $$[$0] + '"' }
+     } else {
+       this.$ = { types: [ 'STRING' ], text: '"' + $$[$0] + '"' }
+     }
+   
+break;
+case 878:
+this.$ = { types: [ 'BOOLEAN' ], text: $$[$0] };
 break;
 case 879:
 
@@ -2246,6 +2318,7 @@ break;
 case 1079: case 1080:
 
      parser.addFunctionLocation(_$[$0-1], $$[$0-1]);
+     parser.addFunctionArgumentLocations($$[$0-1], $$[$0].expressions);
      if ($$[$0].expressions && $$[$0].expressions.length) {
        this.$ = { function: $$[$0-1], expression: $$[$0].expressions[$$[$0].expressions.length - 1].expression, types: ['UDFREF'] }
      } else {
@@ -2258,7 +2331,7 @@ case 1089:
      parser.valueExpressionSuggest();
      this.$ = {
        activePosition: 1,
-       expressions: [{ expression: undefined, location: _$[$0-1] }]
+       expressions: [{ expression: { text: '' }, location: _$[$0-1] }]
      }
    
 break;
@@ -2305,7 +2378,7 @@ case 1098:
      parser.valueExpressionSuggest();
      this.$ = {
        activePosition: $$[$0-2].activePosition + 1,
-       expressions: $$[$0-2].expressions.concat([{ expression: undefined, location: _$[$0] }])
+       expressions: $$[$0-2].expressions.concat([{ expression: { text: '' }, location: _$[$0] }])
      }
    
 break;
@@ -2314,7 +2387,7 @@ case 1099:
      parser.valueExpressionSuggest();
      this.$ = {
        activePosition: $$[$0-4].activePosition + 1,
-       expressions: $$[$0-4].expressions.concat([{ expression: undefined, location: _$[$0-2] }]).concat($$[$0].expressions)
+       expressions: $$[$0-4].expressions.concat([{ expression: { text: '' }, location: _$[$0-2] }]).concat($$[$0].expressions)
      }
    
 break;
@@ -2333,7 +2406,7 @@ case 1101:
      this.$ = {
        cursorAtStart : true,
        activePosition: 1,
-       expressions: [{ expression: undefined, location: _$[$0-2] }].concat($$[$0].expressions)
+       expressions: [{ expression: { text: '' }, location: _$[$0-2] }].concat($$[$0].expressions)
      };
    
 break;
@@ -2343,7 +2416,7 @@ case 1102:
      this.$ = {
        cursorAtStart : true,
        activePosition: 1,
-       expressions: [{ expression: undefined, location: _$[$0-1] }, { expression: undefined, location: _$[$0] }]
+       expressions: [{ expression: { text: '' }, location: _$[$0-1] }, { expression: { text: '' }, location: _$[$0] }]
      };
    
 break;
@@ -2352,7 +2425,7 @@ case 1103:
      parser.valueExpressionSuggest();
      this.$ = {
        activePosition: 2,
-       expressions: [{ expression: undefined, location: _$[$0-1] }, { expression: undefined, location: _$[$0] }]
+       expressions: [{ expression: { text: '' }, location: _$[$0-1] }, { expression: { text: '' }, location: _$[$0] }]
      };
    
 break;
@@ -2361,18 +2434,30 @@ case 1104:
      parser.valueExpressionSuggest();
      this.$ = {
        activePosition: 2,
-       expressions: [{ expression: undefined, location: _$[$0-3] }, { expression: undefined, location: _$[$0-2] }].concat($$[$0].expressions)
+       expressions: [{ expression: { text: '' }, location: _$[$0-3] }, { expression: { text: '' }, location: _$[$0-2] }].concat($$[$0].expressions)
      };
    
 break;
-case 1111: case 1135: case 1154:
-this.$ = { function: $$[$0-2], types: ['UDFREF'] };
+case 1111:
+
+    parser.addFunctionLocation(_$[$0-2], $$[$0-2]);
+    this.$ = { function: $$[$0-2], types: ['UDFREF'] }
+  
 break;
 case 1112:
-this.$ = { function: $$[$0-3], expression: $$[$0-1].expressions[$$[$0-1].expressions.length - 1].expression, types: ['UDFREF'] };
+
+     parser.addFunctionLocation(_$[$0-3], $$[$0-3]);
+     parser.addFunctionArgumentLocations($$[$0-3], $$[$0-1].expressions);
+     this.$ = {
+       function: $$[$0-3],
+       expression: $$[$0-1].expressions[$$[$0-1].expressions.length - 1].expression,
+       types: ['UDFREF']
+     }
+   
 break;
 case 1113:
 
+     parser.addFunctionLocation(_$[$0-3], $$[$0-3]);
      parser.valueExpressionSuggest();
      parser.applyArgumentTypesToSuggestions($$[$0-3], 1);
      this.$ = { function: $$[$0-3], types: ['UDFREF'] };
@@ -2380,18 +2465,35 @@ case 1113:
 break;
 case 1114:
 
+     parser.addFunctionLocation(_$[$0-4], $$[$0-4]);
+     parser.addFunctionArgumentLocations($$[$0-4], $$[$0-2].expressions);
      parser.suggestValueExpressionKeywords($$[$0-2].expressions[$$[$0-2].expressions.length - 1].expression);
      this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 1115:
 
+     parser.addFunctionLocation(_$[$0-3], $$[$0-3]);
+     parser.addFunctionArgumentLocations($$[$0-3], $$[$0-1].expressions);
      parser.applyArgumentTypesToSuggestions($$[$0-3], $$[$0-1].activePosition);
      this.$ = { function: $$[$0-3], types: ['UDFREF'] };
    
 break;
-case 1122: case 1127:
-this.$ = { types: [ $$[$0-1].toUpperCase() ] };
+case 1122:
+
+     var expression = $$[$0-3];
+     parser.extractExpressionText(expression, $$[$0-3], $$[$0-2], $$[$0-1]);
+     parser.addFunctionArgumentLocations($$[$0-5], [{
+       expression: expression,
+       location: {
+         first_line: _$[$0-3].first_line,
+         last_line: _$[$0-1].last_line,
+         first_column: _$[$0-3].first_column,
+         last_column: _$[$0-3].last_column
+       }
+     }]);
+     this.$ = { types: [ $$[$0-1].toUpperCase() ] }
+   
 break;
 case 1124:
 
@@ -2404,6 +2506,9 @@ case 1125: case 1126:
      parser.valueExpressionSuggest();
      this.$ = { types: [ 'T' ] };
    
+break;
+case 1127:
+this.$ = { types: [ $$[$0-1].toUpperCase() ] };
 break;
 case 1130:
 
@@ -2423,11 +2528,25 @@ case 1132: case 1133:
      this.$ = { types: [ 'T' ] };
    
 break;
-case 1134: case 1140:
-this.$ = { function: $$[$0-3], types: ['UDFREF'] };
+case 1134:
+
+     parser.addFunctionArgumentLocations($$[$0-3], [{
+       expression: { text: $$[$0-1] },
+       location: _$[$0-1]
+     }]);
+     this.$ = { function: $$[$0-3], types: ['UDFREF'] }
+   
 break;
-case 1136: case 1141: case 1153:
-this.$ = { function: $$[$0-4], types: ['UDFREF'] };
+case 1135: case 1154:
+
+     this.$ = { function: $$[$0-2], types: ['UDFREF'] }
+   
+break;
+case 1136:
+
+     parser.addFunctionArgumentLocations($$[$0-4], $$[$0-1].expressions);
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] }
+   
 break;
 case 1137:
 
@@ -2458,6 +2577,17 @@ case 1139:
        }
        parser.suggestKeywords(keywords);
      }
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
+   
+break;
+case 1140:
+
+     this.$ = { function: $$[$0-3], types: ['UDFREF'] };
+   
+break;
+case 1141: case 1153:
+
+     parser.addFunctionArgumentLocations($$[$0-4], $$[$0-1].expressions);
      this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
@@ -2538,7 +2668,10 @@ case 1160:
 this.$ = { inValueEdit: true, cursorAtStart: true };
 break;
 case 1161: case 1162: case 1163:
-this.$ = { suggestKeywords: ['NOT'] };
+
+     this.$ = { suggestKeywords: ['NOT'] }
+     parser.extractExpressionText(this.$, $$[$0-1], $$[$0]);
+   
 break;
 case 1167: case 1168: case 1169:
 
@@ -2547,18 +2680,31 @@ case 1167: case 1168: case 1169:
      this.$ = { types: ['BOOLEAN'] }
    
 break;
-case 1170: case 1172:
-this.$ = parser.findCaseType($$[$0-1]);
+case 1170:
+
+     this.$ = parser.findCaseType($$[$0-1])
+     parser.extractExpressionText(this.$, $$[$0-1], $$[$0]);
+   
 break;
-case 1171: case 1174:
+case 1171:
 
      $$[$0-3].caseTypes.push($$[$0-1]);
      this.$ = parser.findCaseType($$[$0-3]);
+     parser.extractExpressionText(this.$, $$[$0-3], $$[$0-2], $$[$0-1], $$[$0]);
    
+break;
+case 1172:
+this.$ = parser.findCaseType($$[$0-1]);
 break;
 case 1173:
 
      parser.suggestValueExpressionKeywords($$[$0-1], ['END']);
+     $$[$0-3].caseTypes.push($$[$0-1]);
+     this.$ = parser.findCaseType($$[$0-3]);
+   
+break;
+case 1174:
+
      $$[$0-3].caseTypes.push($$[$0-1]);
      this.$ = parser.findCaseType($$[$0-3]);
    
@@ -2620,17 +2766,27 @@ case 1182:
    
 break;
 case 1185:
-this.$ = { caseTypes: [ $$[$0] ], lastType: $$[$0] };
+
+     this.$ = { caseTypes: [ $$[$0] ], lastType: $$[$0] }
+     parser.extractExpressionText(this.$, $$[$0]);
+   
 break;
 case 1186:
 
      $$[$0-1].caseTypes.push($$[$0]);
      this.$ = { caseTypes: $$[$0-1].caseTypes, lastType: $$[$0] };
+     parser.extractExpressionText(this.$, $$[$0-1], $$[$0]);
    
 break;
 case 1190:
 
      parser.suggestValueExpressionKeywords($$[$0-2], ['WHEN']);
+   
+break;
+case 1192:
+
+     this.$ = $$[$0]
+     parser.extractExpressionText(this.$, $$[$0-3], $$[$0-2], $$[$0-1], $$[$0]);
    
 break;
 case 1193:
