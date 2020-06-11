@@ -15,7 +15,10 @@
 
 import unittest
 
+import phoenixdb
 from phoenixdb.avatica.client import parse_url, urlparse
+
+from requests.auth import HTTPBasicAuth
 
 
 class ParseUrlTest(unittest.TestCase):
@@ -24,3 +27,25 @@ class ParseUrlTest(unittest.TestCase):
         self.assertEqual(urlparse.urlparse('http://localhost:8765/'), parse_url('localhost'))
         self.assertEqual(urlparse.urlparse('http://localhost:2222/'), parse_url('localhost:2222'))
         self.assertEqual(urlparse.urlparse('http://localhost:2222/'), parse_url('http://localhost:2222/'))
+
+    def test_url_params(self):
+        (url, auth, verify) = phoenixdb._process_args((
+            "https://localhost:8765?authentication=BASIC&"
+            "avatica_user=user&avatica_password=password&truststore=truststore"))
+        self.assertEqual("https://localhost:8765", url)
+        self.assertEqual("truststore", verify)
+        self.assertEqual(auth, HTTPBasicAuth("user", "password"))
+
+        (url, auth, verify) = phoenixdb._process_args(
+            "http://localhost:8765", authentication='BASIC', user='user', password='password',
+            truststore='truststore')
+        self.assertEqual("http://localhost:8765", url)
+        self.assertEqual("truststore", verify)
+        self.assertEqual(auth, HTTPBasicAuth("user", "password"))
+
+        (url, auth, verify) = phoenixdb._process_args(
+            "https://localhost:8765", authentication='SPNEGO', user='user', truststore='truststore')
+        self.assertEqual("https://localhost:8765?doAs=user", url)
+        self.assertEqual("truststore", verify)
+        # SPNEGO auth objects seem to have no working __eq__
+        # self.assertEqual(auth, HTTPSPNEGOAuth(opportunistic_auth=True))
