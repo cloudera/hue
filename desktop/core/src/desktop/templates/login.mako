@@ -107,7 +107,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
         % if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
           hide
         % endif
-        % if form['password'].errors or (login_errors and ('username' in form and not form['username'].errors) and not form['password'].errors):
+        % if form['password'].errors or (login_errors and not form['username'].errors and not form['password'].errors):
           error
         % endif
       ">
@@ -135,7 +135,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
     </div>
     % endif
 
-    % if login_errors and ('username' in form and not form['username'].errors) and not form['password'].errors:
+    % if login_errors and not form['username'].errors and not form['password'].errors:
       % if form.errors:
         % for error in form.errors:
          ${ form.errors[error] | unicode,n }
