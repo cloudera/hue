@@ -92,7 +92,10 @@ OPEN_CONNECTION_PROPERTIES = (
     'auth',
     'authentication',
     'truststore',
-    'verify'
+    'verify',
+    'do_as',
+    'user',
+    'password'
 )
 
 
