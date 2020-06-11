@@ -46,7 +46,7 @@ categories:
 ---
 Managing and viewing data in [HDFS][1] is an important part of Big Data analytics. [Hue][2], the open source web-based interface that makes [Apache Hadoop][3] easier to use, helps you do that through a GUI in your browser —  instead of logging into a Hadoop gateway host with a terminal program and using the command line.
 
-<https://www.youtube.com/watch?v=1iCZ9cKiQ84>
+{{< youtube KYXisq918q0 >}}
 
 The first episode in a new series of Hue demos, the video below demonstrates how to get up and running quickly with HDFS file operations via Hue’s File Browser application.
 
