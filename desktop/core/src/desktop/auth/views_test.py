@@ -136,12 +136,15 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     user.save()
 
     # Deactivate user
+    old_settings = settings.ADMINS
+    settings.ADMINS = []
     response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username,
         'password': "test-hue-foo2",
       }, follow=True)
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_true("Account deactivated. Please contact an administrator." in response.content, response.content)
+    settings.ADMINS = old_settings
 
     # Activate user
     user = User.objects.get(username=self.test_username)
