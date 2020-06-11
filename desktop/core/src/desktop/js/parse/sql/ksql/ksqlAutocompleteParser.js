@@ -1281,7 +1281,7 @@ break;
 case 751:
 
      if (!$$[$0].typeSet) {
-       parser.applyTypeToSuggestions('NUMBER');
+       parser.applyTypeToSuggestions({ types: ['NUMBER'] });
      }
      this.$ = { types: [ 'NUMBER' ], suggestFilters: $$[$0].suggestFilters };
    
@@ -1341,21 +1341,21 @@ break;
 case 764:
 
      parser.valueExpressionSuggest($$[$0], $$[$0-1]);
-     parser.applyTypeToSuggestions($$[$0].types);
+     parser.applyTypeToSuggestions($$[$0]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
    
 break;
 case 765: case 766: case 767:
 
      parser.valueExpressionSuggest($$[$0], $$[$0-1]);
-     parser.applyTypeToSuggestions($$[$0].types);
+     parser.applyTypeToSuggestions($$[$0]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    
 break;
 case 768: case 769: case 770: case 771:
 
      if (!$$[$0-2].typeSet) {
-       parser.applyTypeToSuggestions($$[$0].types);
+       parser.applyTypeToSuggestions($$[$0]);
        parser.addColRefIfExists($$[$0]);
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-2].suggestFilters }
@@ -1364,28 +1364,28 @@ break;
 case 772: case 774:
 
      parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
-     parser.applyTypeToSuggestions($$[$0-2].types);
+     parser.applyTypeToSuggestions($$[$0-2]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    
 break;
 case 773:
 
      parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
-     parser.applyTypeToSuggestions($$[$0-2].types);
+     parser.applyTypeToSuggestions($$[$0-2]);
      this.$ = { types: [ 'BOOLEAN' ] , typeSet: true, endsWithLessThanOrEqual: true };
    
 break;
 case 775:
 
      parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
-     parser.applyTypeToSuggestions($$[$0-2].types);
+     parser.applyTypeToSuggestions($$[$0-2]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true, endsWithLessThanOrEqual: $$[$0-1] === '<='  };
    
 break;
 case 776: case 777: case 778: case 779:
 
      if (!$$[$0].typeSet) {
-       parser.applyTypeToSuggestions($$[$0-2].types);
+       parser.applyTypeToSuggestions($$[$0-2]);
        parser.addColRefIfExists($$[$0-2]);
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0].suggestFilters }
@@ -1395,7 +1395,7 @@ case 780:
 
      if ($$[$0].inValueEdit) {
        parser.valueExpressionSuggest($$[$0-3], $$[$0-2] + ' ' + $$[$0-1]);
-       parser.applyTypeToSuggestions($$[$0-3].types);
+       parser.applyTypeToSuggestions($$[$0-3]);
      }
      if ($$[$0].cursorAtStart) {
        parser.suggestKeywords(['SELECT']);
@@ -1407,7 +1407,7 @@ case 781:
 
      if ($$[$0].inValueEdit) {
        parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
-       parser.applyTypeToSuggestions($$[$0-2].types);
+       parser.applyTypeToSuggestions($$[$0-2]);
      }
      if ($$[$0].cursorAtStart) {
        parser.suggestKeywords(['SELECT']);
@@ -1424,7 +1424,7 @@ break;
 case 786:
 
      if ($$[$0-2].types[0] === $$[$0].types[0] && !$$[$0-5].typeSet) {
-       parser.applyTypeToSuggestions($$[$0-2].types);
+       parser.applyTypeToSuggestions($$[$0-2]);
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-5].suggestFilters };
    
@@ -1432,7 +1432,7 @@ break;
 case 787:
 
      if ($$[$0-5].types[0] === $$[$0].types[0] && !$$[$0-2].typeSet) {
-       parser.applyTypeToSuggestions($$[$0-5].types);
+       parser.applyTypeToSuggestions($$[$0-5]);
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-2].suggestFilters };
    
@@ -1440,7 +1440,7 @@ break;
 case 788:
 
      if ($$[$0-5].types[0] === $$[$0-2].types[0] && !$$[$0].typeSet) {
-       parser.applyTypeToSuggestions($$[$0-5].types);
+       parser.applyTypeToSuggestions($$[$0-5]);
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0].suggestFilters };
    
@@ -1466,7 +1466,7 @@ break;
 case 792:
 
      if ($$[$0-4].types[0] === $$[$0-2].types[0] && !$$[$0-4].typeSet) {
-       parser.applyTypeToSuggestions($$[$0-4].types)
+       parser.applyTypeToSuggestions($$[$0-4])
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-4].suggestFilters };
    
@@ -1474,7 +1474,7 @@ break;
 case 793:
 
      if ($$[$0-4].types[0] === $$[$0-2].types[0] && !$$[$0-2].typeSet) {
-       parser.applyTypeToSuggestions($$[$0-4].types)
+       parser.applyTypeToSuggestions($$[$0-4])
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-2].suggestFilters };
    
@@ -1482,7 +1482,7 @@ break;
 case 794:
 
      if ($$[$0-4].types[0] === $$[$0-2].types[0] && !$$[$0].typeSet) {
-       parser.applyTypeToSuggestions($$[$0-4].types)
+       parser.applyTypeToSuggestions($$[$0-4])
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0].suggestFilters };
    
@@ -1490,14 +1490,14 @@ break;
 case 795:
 
      parser.valueExpressionSuggest($$[$0-4], $$[$0-1]);
-     parser.applyTypeToSuggestions($$[$0-4].types);
+     parser.applyTypeToSuggestions($$[$0-4]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    
 break;
 case 797:
 
      parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
-     parser.applyTypeToSuggestions($$[$0-2].types);
+     parser.applyTypeToSuggestions($$[$0-2]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
    
 break;
@@ -1522,14 +1522,14 @@ break;
 case 806: case 807:
 
      parser.valueExpressionSuggest(undefined, $$[$0-1]);
-     parser.applyTypeToSuggestions([ 'NUMBER' ]);
+     parser.applyTypeToSuggestions({ types: [ 'NUMBER' ] });
      this.$ = { types: [ 'NUMBER' ], typeSet: true };
    
 break;
 case 808: case 809: case 810:
 
      if (!$$[$0-2].typeSet) {
-       parser.applyTypeToSuggestions(['NUMBER']);
+       parser.applyTypeToSuggestions({ types: ['NUMBER'] });
        parser.addColRefIfExists($$[$0]);
      }
      this.$ = { types: [ 'NUMBER' ], suggestFilters: $$[$0-2].suggestFilters }
@@ -1538,14 +1538,14 @@ break;
 case 811: case 812: case 813:
 
      parser.valueExpressionSuggest(undefined, $$[$0-1]);
-     parser.applyTypeToSuggestions(['NUMBER']);
+     parser.applyTypeToSuggestions({ types: ['NUMBER'] });
      this.$ = { types: [ 'NUMBER' ], typeSet: true };
    
 break;
 case 814: case 815: case 816:
 
      if (!$$[$0].typeSet) {
-       parser.applyTypeToSuggestions(['NUMBER']);
+       parser.applyTypeToSuggestions({ types: ['NUMBER'] });
        parser.addColRefIfExists($$[$0-2]);
      }
      this.$ = { types: [ 'NUMBER' ], suggestFilters: $$[$0].suggestFilters };
@@ -1560,14 +1560,14 @@ break;
 case 821:
 
      parser.valueExpressionSuggest(undefined, $$[$0]);
-     parser.applyTypeToSuggestions([ 'STRING' ]);
+     parser.applyTypeToSuggestions({ types: [ 'STRING' ] });
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
    
 break;
 case 822:
 
      parser.valueExpressionSuggest(undefined, $$[$0-1] + ' ' + $$[$0]);
-     parser.applyTypeToSuggestions([ 'STRING' ]);
+     parser.applyTypeToSuggestions({ types: [ 'STRING' ] });
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
    
 break;
@@ -1673,9 +1673,9 @@ case 847:
        delete $$[$0-1].lastLoc.identifierChain;
      }
      if ($$[$0].expression) {
-       this.$ = { function: fn, expression: $$[$0].expression, types: parser.findReturnTypes(fn) }
+       this.$ = { function: fn, expression: $$[$0].expression, types: ['UDFREF'] }
      } else {
-       this.$ = { function: fn, types: parser.findReturnTypes(fn) }
+       this.$ = { function: fn, types: ['UDFREF'] }
      }
    
 break;
@@ -1683,9 +1683,9 @@ case 848:
 
     parser.addFunctionLocation(_$[$0-1], $$[$0-1]);
     if ($$[$0].expression) {
-      this.$ = { function: $$[$0-1], expression: $$[$0].expression, types: parser.findReturnTypes($$[$0-1]) }
+      this.$ = { function: $$[$0-1], expression: $$[$0].expression, types: ['UDFREF'] }
     } else {
-      this.$ = { function: $$[$0-1], types: parser.findReturnTypes($$[$0-1]) }
+      this.$ = { function: $$[$0-1], types: ['UDFREF'] }
     }
   
 break;
@@ -1720,7 +1720,7 @@ case 853:
      if ($$[$0].position) {
        parser.applyArgumentTypesToSuggestions(fn, $$[$0].position);
      }
-     this.$ = { types: parser.findReturnTypes(fn) };
+     this.$ = { function: fn, types: ['UDFREF'] };
    
 break;
 case 854: case 1012: case 1013:
@@ -1729,7 +1729,7 @@ case 854: case 1012: case 1013:
      if ($$[$0].position) {
        parser.applyArgumentTypesToSuggestions($$[$0-1], $$[$0].position);
      }
-     this.$ = { types: parser.findReturnTypes($$[$0-1]) };
+     this.$ = { function: $$[$0-1], types: ['UDFREF'] };
    
 break;
 case 856:
@@ -1785,7 +1785,7 @@ case 885:
        if (!parser.yy.selectListAliases) {
          parser.yy.selectListAliases = [];
        }
-       parser.yy.selectListAliases.push({ name: $$[$0].alias, types: $$[$0-1].types || ['T'] });
+       parser.yy.selectListAliases.push($$[$0-1].function && $$[$0-1].types && $$[$0-1].types.length && $$[$0-1].types[0] === 'UDFREF' ? { name: $$[$0].alias, udfRef: $$[$0-1].function, types: $$[$0-1].types } : { name: $$[$0].alias, types: $$[$0-1].types || ['T'] });
      } else {
        this.$ = { valueExpression: $$[$0-1] }
      }
@@ -2113,9 +2113,9 @@ case 1010: case 1011:
 
      parser.addFunctionLocation(_$[$0-1], $$[$0-1]);
      if ($$[$0].expression) {
-       this.$ = { function: $$[$0-1], expression: $$[$0].expression, types: parser.findReturnTypes($$[$0-1]) }
+       this.$ = { function: $$[$0-1], expression: $$[$0].expression, types: ['UDFREF'] }
      } else {
-       this.$ = { function: $$[$0-1], types: parser.findReturnTypes($$[$0-1]) }
+       this.$ = { function: $$[$0-1], types: ['UDFREF'] }
      }
    
 break;
@@ -2134,28 +2134,28 @@ case 1021:
    
 break;
 case 1029: case 1107: case 1128:
-this.$ = { types: parser.findReturnTypes($$[$0-2]) };
+this.$ = { function: $$[$0-2], types: ['UDFREF'] };
 break;
 case 1030:
-this.$ = { function: $$[$0-3], expression: $$[$0-2], types: parser.findReturnTypes($$[$0-3]) };
+this.$ = { function: $$[$0-3], expression: $$[$0-2], types: ['UDFREF'] };
 break;
 case 1031:
 
      parser.valueExpressionSuggest();
      parser.applyArgumentTypesToSuggestions($$[$0-3], 1);
-     this.$ = { types: parser.findReturnTypes($$[$0-3]) };
+     this.$ = { function: $$[$0-3], types: ['UDFREF'] };
    
 break;
 case 1032:
 
      parser.suggestValueExpressionKeywords($$[$0-2]);
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 1033:
 
      parser.applyArgumentTypesToSuggestions($$[$0-3], $$[$0-1].position);
-     this.$ = { types: parser.findReturnTypes($$[$0-3]) };
+     this.$ = { function: $$[$0-3], types: ['UDFREF'] };
    
 break;
 case 1041: case 1042:
@@ -2317,10 +2317,10 @@ case 1104: case 1105:
    
 break;
 case 1106: case 1112:
-this.$ = { types: parser.findReturnTypes($$[$0-3]) };
+this.$ = { function: $$[$0-3], types: ['UDFREF'] };
 break;
 case 1108: case 1113: case 1127:
-this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+this.$ = { function: $$[$0-4], types: ['UDFREF'] };
 break;
 case 1109:
 
@@ -2333,13 +2333,13 @@ case 1109:
        }
      }
      parser.suggestKeywords(keywords);
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 1110: case 1115: case 1130:
 
      parser.suggestValueExpressionKeywords($$[$0-2]);
-     this.$ = { types: parser.findReturnTypes($$[$0-5]) };
+     this.$ = { function: $$[$0-5], types: ['UDFREF'] };
    
 break;
 case 1111:
@@ -2351,7 +2351,7 @@ case 1111:
        }
        parser.suggestKeywords(keywords);
      }
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 1114:
@@ -2370,7 +2370,7 @@ case 1114:
      }
      parser.suggestKeywords(keywords);
      parser.applyArgumentTypesToSuggestions($$[$0-4], 1);
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 1116:
@@ -2392,7 +2392,7 @@ case 1116:
      if (parser.yy.result.suggestFunctions && !parser.yy.result.suggestFunctions.types) {
        parser.applyArgumentTypesToSuggestions($$[$0-4], $$[$0-1].position);
      }
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 1129:
@@ -2407,7 +2407,7 @@ case 1129:
        keywords = parser.yy.result.suggestKeywords.concat(keywords);
      }
      parser.suggestKeywords(keywords);
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 1131:
@@ -2415,7 +2415,7 @@ case 1131:
      if (parser.yy.result.suggestFunctions && ! parser.yy.result.suggestFunctions.types) {
        parser.applyArgumentTypesToSuggestions($$[$0-4], 1);
      }
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 1146:
@@ -3641,7 +3641,7 @@ case 220:console.log(yy_.yytext);
 break;
 }
 },
-rules: [/^(?:\s)/i,/^(?:--.*)/i,/^(?:[\/][*][^*]*[*]+([^\/*][^*]*[*]+)*[\/])/i,/^(?:\u2020)/i,/^(?:\u2021)/i,/^(?:AND)/i,/^(?:ADVANCE)/i,/^(?:ANALYZE)/i,/^(?:AND)/i,/^(?:ARRAY)/i,/^(?:AS)/i,/^(?:AT)/i,/^(?:BEGINNING)/i,/^(?:BETWEEN)/i,/^(?:BIGINT)/i,/^(?:BOOLEAN)/i,/^(?:BY)/i,/^(?:CASE)/i,/^(?:CAST)/i,/^(?:CATALOG)/i,/^(?:CHANGES)/i,/^(?:COLUMN)/i,/^(?:COLUMNS)/i,/^(?:CONNECTOR)/i,/^(?:CONNECTORS)/i,/^(?:CREATE)/i,/^(?:DATE)/i,/^(?:DAY)/i,/^(?:DECIMAL)/i,/^(?:DELETE)/i,/^(?:DESCRIBE)/i,/^(?:DISTINCT)/i,/^(?:DOUBLE)/i,/^(?:DROP)/i,/^(?:ELSE)/i,/^(?:EMIT)/i,/^(?:END)/i,/^(?:EXISTS)/i,/^(?:EXPLAIN)/i,/^(?:EXPORT)/i,/^(?:EXTENDED)/i,/^(?:FROM)/i,/^(?:FULL)/i,/^(?:FUNCTION)/i,/^(?:FUNCTIONS)/i,/^(?:GROUP)/i,/^(?:HAVING)/i,/^(?:HOPPING)/i,/^(?:HOUR)/i,/^(?:HOURS)/i,/^(?:IF)/i,/^(?:IN)/i,/^(?:INNER)/i,/^(?:INSERT)/i,/^(?:INT)/i,/^(?:INTEGER)/i,/^(?:INTO)/i,/^(?:IS)/i,/^(?:JOIN)/i,/^(?:KEY)/i,/^(?:LEFT)/i,/^(?:LIKE)/i,/^(?:LIMIT)/i,/^(?:LIST)/i,/^(?:LOAD)/i,/^(?:MAP)/i,/^(?:MILLISECOND)/i,/^(?:MILLISECONDS)/i,/^(?:MINUTE)/i,/^(?:MINUTES)/i,/^(?:MONTH)/i,/^(?:MONTHS)/i,/^(?:NOT)/i,/^(?:NULL)/i,/^(?:ON)/i,/^(?:OR)/i,/^(?:OUTER)/i,/^(?:PARTITION)/i,/^(?:PARTITIONS)/i,/^(?:PRINT)/i,/^(?:PROPERTIES)/i,/^(?:QUERIES)/i,/^(?:QUERY)/i,/^(?:RENAME)/i,/^(?:RESET)/i,/^(?:RIGHT)/i,/^(?:RUN)/i,/^(?:SAMPLE)/i,/^(?:SCRIPT)/i,/^(?:SECOND)/i,/^(?:SECOND)/i,/^(?:SELECT)/i,/^(?:SESSION)/i,/^(?:SET)/i,/^(?:SHOW)/i,/^(?:SINK)/i,/^(?:SOURCE)/i,/^(?:STREAM)/i,/^(?:STREAMS)/i,/^(?:STRING)/i,/^(?:STRUCT)/i,/^(?:TABLE)/i,/^(?:TABLES)/i,/^(?:TERMINATE)/i,/^(?:THEN)/i,/^(?:TIME)/i,/^(?:TIMESTAMP)/i,/^(?:TO)/i,/^(?:TRUE)/i,/^(?:TOPIC)/i,/^(?:TOPICS)/i,/^(?:TUMBLING)/i,/^(?:TYPE)/i,/^(?:TYPES)/i,/^(?:UNSET)/i,/^(?:VALUES)/i,/^(?:VARCHAR)/i,/^(?:WHEN)/i,/^(?:WHERE)/i,/^(?:WITH)/i,/^(?:WITHIN)/i,/^(?:YEAR)/i,/^(?:YEARS)/i,/^(?:ZONE)/i,/^(?:ABS\s*\()/i,/^(?:ARRAYCONTAINS\s*\()/i,/^(?:CEIL\s*\()/i,/^(?:CONCAT\s*\()/i,/^(?:DATETOSTRING\s*\()/i,/^(?:ELT\s*\()/i,/^(?:EXTRACTJSONFIELD\s*\()/i,/^(?:FIELD\s*\()/i,/^(?:FLOOR\s*\()/i,/^(?:GEO_DISTANCE\s*\()/i,/^(?:IFNULL\s*\()/i,/^(?:LCASE\s*\()/i,/^(?:LEN\s*\()/i,/^(?:MASK\s*\()/i,/^(?:MASK_KEEP_LEFT\s*\()/i,/^(?:MASK_KEEP_RIGHT\s*\()/i,/^(?:MASK_LEFT\s*\()/i,/^(?:MASK_RIGHT\s*\()/i,/^(?:RANDOM\s*\()/i,/^(?:ROUND\s*\()/i,/^(?:SPLIT\s*\()/i,/^(?:STRINGTODATE\s*\()/i,/^(?:STRINGTOTIMESTAMP\s*\()/i,/^(?:SUBSTRING\s*\()/i,/^(?:TIMESTAMPTOSTRING\s*\()/i,/^(?:TRIM\s*\()/i,/^(?:UCASE\s*\()/i,/^(?:URL_DECODE_PARAM\s*\()/i,/^(?:URL_ENCODE_PARAM\s*\()/i,/^(?:URL_EXTRACT_FRAGMENT\s*\()/i,/^(?:URL_EXTRACT_HOST\s*\()/i,/^(?:URL_EXTRACT_PARAMETER\s*\()/i,/^(?:URL_EXTRACT_PATH\s*\()/i,/^(?:URL_EXTRACT_PORT\s*\()/i,/^(?:URL_EXTRACT_PROTOCOL\s*\()/i,/^(?:URL_EXTRACT_QUERY\s*\()/i,/^(?:COLLECT_LIST\s*\()/i,/^(?:COLLECT_SET\s*\()/i,/^(?:COUNT\s*\()/i,/^(?:HISTOGRAM\s*\()/i,/^(?:MAX\s*\()/i,/^(?:MIN\s*\()/i,/^(?:SUM\s*\()/i,/^(?:TOPK\s*\()/i,/^(?:TOPKDISTINCT\s*\()/i,/^(?:WindowStart\s*\()/i,/^(?:WindowEnd\s*\()/i,/^(?:[0-9]+)/i,/^(?:[0-9]+(?:[YSL]|BD)?)/i,/^(?:[0-9]+E)/i,/^(?:[A-Za-z0-9_]+)/i,/^(?:&&)/i,/^(?:\|\|)/i,/^(?:=)/i,/^(?:<)/i,/^(?:>)/i,/^(?:!=)/i,/^(?:<=)/i,/^(?:>=)/i,/^(?:<>)/i,/^(?:<=>)/i,/^(?:-)/i,/^(?:\*)/i,/^(?:\+)/i,/^(?:\/)/i,/^(?:%)/i,/^(?:\|)/i,/^(?:\^)/i,/^(?:&)/i,/^(?:,)/i,/^(?:\.)/i,/^(?::)/i,/^(?:;)/i,/^(?:~)/i,/^(?:!)/i,/^(?:\()/i,/^(?:\))/i,/^(?:\[)/i,/^(?:\])/i,/^(?:\$\{[^}]*\})/i,/^(?:`)/i,/^(?:[^`]+)/i,/^(?:`)/i,/^(?:')/i,/^(?:(?:\\\\|\\[']|[^'])+)/i,/^(?:')/i,/^(?:")/i,/^(?:(?:\\\\|\\["]|[^"])+)/i,/^(?:")/i,/^(?:$)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i],
+rules: [/^(?:\s)/i,/^(?:--.*)/i,/^(?:[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/])/i,/^(?:\u2020)/i,/^(?:\u2021)/i,/^(?:AND)/i,/^(?:ADVANCE)/i,/^(?:ANALYZE)/i,/^(?:AND)/i,/^(?:ARRAY)/i,/^(?:AS)/i,/^(?:AT)/i,/^(?:BEGINNING)/i,/^(?:BETWEEN)/i,/^(?:BIGINT)/i,/^(?:BOOLEAN)/i,/^(?:BY)/i,/^(?:CASE)/i,/^(?:CAST)/i,/^(?:CATALOG)/i,/^(?:CHANGES)/i,/^(?:COLUMN)/i,/^(?:COLUMNS)/i,/^(?:CONNECTOR)/i,/^(?:CONNECTORS)/i,/^(?:CREATE)/i,/^(?:DATE)/i,/^(?:DAY)/i,/^(?:DECIMAL)/i,/^(?:DELETE)/i,/^(?:DESCRIBE)/i,/^(?:DISTINCT)/i,/^(?:DOUBLE)/i,/^(?:DROP)/i,/^(?:ELSE)/i,/^(?:EMIT)/i,/^(?:END)/i,/^(?:EXISTS)/i,/^(?:EXPLAIN)/i,/^(?:EXPORT)/i,/^(?:EXTENDED)/i,/^(?:FROM)/i,/^(?:FULL)/i,/^(?:FUNCTION)/i,/^(?:FUNCTIONS)/i,/^(?:GROUP)/i,/^(?:HAVING)/i,/^(?:HOPPING)/i,/^(?:HOUR)/i,/^(?:HOURS)/i,/^(?:IF)/i,/^(?:IN)/i,/^(?:INNER)/i,/^(?:INSERT)/i,/^(?:INT)/i,/^(?:INTEGER)/i,/^(?:INTO)/i,/^(?:IS)/i,/^(?:JOIN)/i,/^(?:KEY)/i,/^(?:LEFT)/i,/^(?:LIKE)/i,/^(?:LIMIT)/i,/^(?:LIST)/i,/^(?:LOAD)/i,/^(?:MAP)/i,/^(?:MILLISECOND)/i,/^(?:MILLISECONDS)/i,/^(?:MINUTE)/i,/^(?:MINUTES)/i,/^(?:MONTH)/i,/^(?:MONTHS)/i,/^(?:NOT)/i,/^(?:NULL)/i,/^(?:ON)/i,/^(?:OR)/i,/^(?:OUTER)/i,/^(?:PARTITION)/i,/^(?:PARTITIONS)/i,/^(?:PRINT)/i,/^(?:PROPERTIES)/i,/^(?:QUERIES)/i,/^(?:QUERY)/i,/^(?:RENAME)/i,/^(?:RESET)/i,/^(?:RIGHT)/i,/^(?:RUN)/i,/^(?:SAMPLE)/i,/^(?:SCRIPT)/i,/^(?:SECOND)/i,/^(?:SECOND)/i,/^(?:SELECT)/i,/^(?:SESSION)/i,/^(?:SET)/i,/^(?:SHOW)/i,/^(?:SINK)/i,/^(?:SOURCE)/i,/^(?:STREAM)/i,/^(?:STREAMS)/i,/^(?:STRING)/i,/^(?:STRUCT)/i,/^(?:TABLE)/i,/^(?:TABLES)/i,/^(?:TERMINATE)/i,/^(?:THEN)/i,/^(?:TIME)/i,/^(?:TIMESTAMP)/i,/^(?:TO)/i,/^(?:TRUE)/i,/^(?:TOPIC)/i,/^(?:TOPICS)/i,/^(?:TUMBLING)/i,/^(?:TYPE)/i,/^(?:TYPES)/i,/^(?:UNSET)/i,/^(?:VALUES)/i,/^(?:VARCHAR)/i,/^(?:WHEN)/i,/^(?:WHERE)/i,/^(?:WITH)/i,/^(?:WITHIN)/i,/^(?:YEAR)/i,/^(?:YEARS)/i,/^(?:ZONE)/i,/^(?:ABS\s*\()/i,/^(?:ARRAYCONTAINS\s*\()/i,/^(?:CEIL\s*\()/i,/^(?:CONCAT\s*\()/i,/^(?:DATETOSTRING\s*\()/i,/^(?:ELT\s*\()/i,/^(?:EXTRACTJSONFIELD\s*\()/i,/^(?:FIELD\s*\()/i,/^(?:FLOOR\s*\()/i,/^(?:GEO_DISTANCE\s*\()/i,/^(?:IFNULL\s*\()/i,/^(?:LCASE\s*\()/i,/^(?:LEN\s*\()/i,/^(?:MASK\s*\()/i,/^(?:MASK_KEEP_LEFT\s*\()/i,/^(?:MASK_KEEP_RIGHT\s*\()/i,/^(?:MASK_LEFT\s*\()/i,/^(?:MASK_RIGHT\s*\()/i,/^(?:RANDOM\s*\()/i,/^(?:ROUND\s*\()/i,/^(?:SPLIT\s*\()/i,/^(?:STRINGTODATE\s*\()/i,/^(?:STRINGTOTIMESTAMP\s*\()/i,/^(?:SUBSTRING\s*\()/i,/^(?:TIMESTAMPTOSTRING\s*\()/i,/^(?:TRIM\s*\()/i,/^(?:UCASE\s*\()/i,/^(?:URL_DECODE_PARAM\s*\()/i,/^(?:URL_ENCODE_PARAM\s*\()/i,/^(?:URL_EXTRACT_FRAGMENT\s*\()/i,/^(?:URL_EXTRACT_HOST\s*\()/i,/^(?:URL_EXTRACT_PARAMETER\s*\()/i,/^(?:URL_EXTRACT_PATH\s*\()/i,/^(?:URL_EXTRACT_PORT\s*\()/i,/^(?:URL_EXTRACT_PROTOCOL\s*\()/i,/^(?:URL_EXTRACT_QUERY\s*\()/i,/^(?:COLLECT_LIST\s*\()/i,/^(?:COLLECT_SET\s*\()/i,/^(?:COUNT\s*\()/i,/^(?:HISTOGRAM\s*\()/i,/^(?:MAX\s*\()/i,/^(?:MIN\s*\()/i,/^(?:SUM\s*\()/i,/^(?:TOPK\s*\()/i,/^(?:TOPKDISTINCT\s*\()/i,/^(?:WindowStart\s*\()/i,/^(?:WindowEnd\s*\()/i,/^(?:[0-9]+)/i,/^(?:[0-9]+(?:[YSL]|BD)?)/i,/^(?:[0-9]+E)/i,/^(?:[A-Za-z0-9_]+)/i,/^(?:&&)/i,/^(?:\|\|)/i,/^(?:=)/i,/^(?:<)/i,/^(?:>)/i,/^(?:!=)/i,/^(?:<=)/i,/^(?:>=)/i,/^(?:<>)/i,/^(?:<=>)/i,/^(?:-)/i,/^(?:\*)/i,/^(?:\+)/i,/^(?:\/)/i,/^(?:%)/i,/^(?:\|)/i,/^(?:\^)/i,/^(?:&)/i,/^(?:,)/i,/^(?:\.)/i,/^(?::)/i,/^(?:;)/i,/^(?:~)/i,/^(?:!)/i,/^(?:\()/i,/^(?:\))/i,/^(?:\[)/i,/^(?:\])/i,/^(?:\$\{[^}]*\})/i,/^(?:`)/i,/^(?:[^`]+)/i,/^(?:`)/i,/^(?:')/i,/^(?:(?:\\\\|\\[']|[^'])+)/i,/^(?:')/i,/^(?:")/i,/^(?:(?:\\\\|\\["]|[^"])+)/i,/^(?:")/i,/^(?:$)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i,/^(?:.)/i],
 conditions: {"hdfs":{"rules":[216],"inclusive":false},"doubleQuotedValue":{"rules":[211,212,219],"inclusive":false},"singleQuotedValue":{"rules":[208,209,218],"inclusive":false},"backtickedValue":{"rules":[205,206,217],"inclusive":false},"between":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,207,210,213,214,215,220],"inclusive":true},"INITIAL":{"rules":[0,1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,207,210,213,214,220],"inclusive":true}}
 });
 return lexer;

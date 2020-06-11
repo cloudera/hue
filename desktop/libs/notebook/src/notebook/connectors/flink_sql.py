@@ -64,7 +64,9 @@ class FlinkSqlApi(Api):
     Api.__init__(self, user, interpreter=interpreter)
 
     self.options = interpreter['options']
-    self.db = FlinkSqlClient(user=user, api_url=self.options['api_url'])
+    api_url = self.options['url']
+
+    self.db = FlinkSqlClient(user=user, api_url=api_url)
 
 
   @query_error_handler
@@ -152,8 +154,8 @@ class FlinkSqlApi(Api):
         try:
           resp = self.db.fetch_status(session['id'], statement_id)
           if resp.get('status') == 'RUNNING':
-            status = 'running'
-            response.update(self.fetch_result(notebook, snippet, n, False))
+            status = 'streaming'
+            response['result'] = self.fetch_result(notebook, snippet, n, False)
           elif resp.get('status') == 'FINISHED':
             status = 'available'
           elif resp.get('status') == 'FAILED':
@@ -199,31 +201,23 @@ class FlinkSqlApi(Api):
 
 
   @query_error_handler
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     response = {}
 
-    try:
-      if database is None:
-        response['databases'] = self.show_databases()
-      elif table is None:
-        response['tables_meta'] = self.show_tables(database)
-      elif column is None:
-        columns = self.get_columns(database, table)
-        response['columns'] = [col['name'] for col in columns]
-        response['extended_columns'] = [{
-            'comment': col.get('comment'),
-            'name': col.get('name'),
-            'type': col['type']
-          }
-          for col in columns
-        ]
-      else:
-        response = {}
-
-    except Exception as e:
-      LOG.warn('Autocomplete data fetching error: %s' % e)
-      response['code'] = 500
-      response['error'] = str(e)
+    if database is None:
+      response['databases'] = self.show_databases()
+    elif table is None:
+      response['tables_meta'] = self.show_tables(database)
+    elif column is None:
+      columns = self.get_columns(database, table)
+      response['columns'] = [col['name'] for col in columns]
+      response['extended_columns'] = [{
+          'comment': col.get('comment'),
+          'name': col.get('name'),
+          'type': col['type']
+        }
+        for col in columns
+      ]
 
     return response
 

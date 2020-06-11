@@ -14,8 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { SqlFunctions } from 'sql/sqlFunctions';
+import { matchesType } from 'sql/reference/typeUtils';
 import stringDistance from 'sql/stringDistance';
+import { applyTypeToSuggestions, getSubQuery } from 'parse/sql/sqlParseUtils';
 
 const identifierEquals = (a, b) =>
   a &&
@@ -218,22 +219,13 @@ const initSqlParser = function(parser) {
         }
       };
     }
-    if (
-      typeof SqlFunctions === 'undefined' ||
-      SqlFunctions.matchesType(parser.yy.activeDialect, ['BOOLEAN'], types)
-    ) {
+    if (matchesType(parser.yy.activeDialect, ['BOOLEAN'], types)) {
       keywords = keywords.concat(['AND', 'OR']);
     }
-    if (
-      typeof SqlFunctions === 'undefined' ||
-      SqlFunctions.matchesType(parser.yy.activeDialect, ['NUMBER'], types)
-    ) {
+    if (matchesType(parser.yy.activeDialect, ['NUMBER'], types)) {
       keywords = keywords.concat(['+', '-', '*', '/', '%', 'DIV']);
     }
-    if (
-      typeof SqlFunctions === 'undefined' ||
-      SqlFunctions.matchesType(parser.yy.activeDialect, ['STRING'], types)
-    ) {
+    if (matchesType(parser.yy.activeDialect, ['STRING'], types)) {
       keywords = keywords.concat(['ILIKE', 'IREGEXP', 'LIKE', 'NOT LIKE', 'REGEXP', 'RLIKE']);
     }
     return { suggestKeywords: keywords };
@@ -322,24 +314,14 @@ const initSqlParser = function(parser) {
       keywords = keywords.concat(['EXISTS', 'NOT']);
     }
     if (oppositeValueExpression && oppositeValueExpression.types[0] === 'NUMBER') {
-      parser.applyTypeToSuggestions(['NUMBER']);
+      applyTypeToSuggestions(parser, oppositeValueExpression);
     } else if (typeof operator === 'undefined' || operator === '-' || operator === '+') {
       keywords.push('INTERVAL');
     }
     parser.suggestKeywords(keywords);
   };
 
-  parser.applyTypeToSuggestions = function(types) {
-    if (types[0] === 'BOOLEAN') {
-      return;
-    }
-    if (parser.yy.result.suggestFunctions && !parser.yy.result.suggestFunctions.types) {
-      parser.yy.result.suggestFunctions.types = types;
-    }
-    if (parser.yy.result.suggestColumns && !parser.yy.result.suggestColumns.types) {
-      parser.yy.result.suggestColumns.types = types;
-    }
-  };
+  parser.applyTypeToSuggestions = applyTypeToSuggestions.bind(null, parser);
 
   parser.findCaseType = function(whenThenList) {
     const types = {};
@@ -354,30 +336,12 @@ const initSqlParser = function(parser) {
     return { types: ['T'] };
   };
 
-  parser.findReturnTypes = function(functionName) {
-    return typeof SqlFunctions === 'undefined'
-      ? ['T']
-      : SqlFunctions.getReturnTypes(parser.yy.activeDialect, functionName.toLowerCase());
-  };
-
   parser.applyArgumentTypesToSuggestions = function(functionName, position) {
-    const foundArguments =
-      typeof SqlFunctions === 'undefined'
-        ? ['T']
-        : SqlFunctions.getArgumentTypes(
-            parser.yy.activeDialect,
-            functionName.toLowerCase(),
-            position
-          );
-    if (foundArguments.length === 0 && parser.yy.result.suggestColumns) {
-      delete parser.yy.result.suggestColumns;
-      delete parser.yy.result.suggestKeyValues;
-      delete parser.yy.result.suggestValues;
-      delete parser.yy.result.suggestFunctions;
-      delete parser.yy.result.suggestIdentifiers;
-      delete parser.yy.result.suggestKeywords;
-    } else {
-      parser.applyTypeToSuggestions(foundArguments);
+    if (parser.yy.result.suggestFunctions || parser.yy.result.suggestColumns) {
+      parser.yy.result.udfArgument = {
+        name: functionName.toLowerCase(),
+        position: position
+      };
     }
   };
 
@@ -1277,33 +1241,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.getSubQuery = function(cols) {
-    const columns = [];
-    cols.selectList.forEach(col => {
-      const result = {};
-      if (col.alias) {
-        result.alias = col.alias;
-      }
-      if (col.valueExpression && col.valueExpression.columnReference) {
-        result.identifierChain = col.valueExpression.columnReference;
-      } else if (col.asterisk) {
-        result.identifierChain = [{ asterisk: true }];
-      }
-      if (
-        col.valueExpression &&
-        col.valueExpression.types &&
-        col.valueExpression.types.length === 1
-      ) {
-        result.type = col.valueExpression.types[0];
-      }
-
-      columns.push(result);
-    });
-
-    return {
-      columns: columns
-    };
-  };
+  parser.getSubQuery = getSubQuery;
 
   parser.addTablePrimary = function(ref) {
     if (typeof parser.yy.latestTablePrimaries === 'undefined') {
@@ -2262,10 +2200,6 @@ const initSyntaxParser = function(parser) {
 
   parser.findCaseType = function() {
     return { types: ['T'] };
-  };
-
-  parser.findReturnTypes = function() {
-    return ['T'];
   };
 
   parser.expandImpalaIdentifierChain = function() {

@@ -127,15 +127,14 @@ def _execute_notebook(request, notebook, snippet):
   response = {'status': -1}
   result = None
   history = None
+  active_executable = None
 
   historify = (notebook['type'] != 'notebook' or snippet.get('wasBatchExecuted')) and not notebook.get('skipHistorify')
 
   try:
     try:
       sessions = notebook.get('sessions') and notebook['sessions'] # Session reference for snippet execution without persisting it
-
       active_executable = json.loads(request.POST.get('executable', '{}')) # Editor v2
-
       # TODO: Use statement, database etc. from active_executable
 
       if historify:
@@ -724,9 +723,10 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
+  action = request.POST.get('operation', 'schema')
 
   try:
-    autocomplete_data = get_api(request, snippet).autocomplete(snippet, database, table, column, nested)
+    autocomplete_data = get_api(request, snippet).autocomplete(snippet, database, table, column, nested, action)
     response.update(autocomplete_data)
   except QueryExpired as e:
     LOG.warn('Expired query seen: %s' % e)

@@ -34,6 +34,66 @@ class TestSparkApi(object):
     self.user = 'hue_test'
     self.api = SparkApi(self.user)
 
+  def test_get_livy_props_method(self):
+    test_properties = [{
+        "name": "files",
+        "value": 'file_a,file_b,file_c',
+      }]
+    props = self.api.get_livy_props('scala', test_properties)
+    assert_equal(props['files'],['file_a','file_b','file_c'])
+    
+  def test_create_session_with_config(self):
+    lang = 'pyspark'
+    properties = None
+
+    with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
+      with patch('notebook.connectors.spark_shell.DefaultConfiguration') as DefaultConfiguration:
+        with patch('notebook.connectors.spark_shell.USE_DEFAULT_CONFIGURATION') as USE_DEFAULT_CONFIGURATION:
+          DefaultConfiguration.objects.get_configuration_for_user.return_value = Mock(
+                properties_list=[
+                  {'multiple': False, 'name': 'driverCores', 'defaultValue': 1, 'value': 2, 'nice_name': 'Driver Cores',
+                   'help_text': 'Number of cores used by the driver, only in cluster mode (Default: 1)', 'type': 'number',
+                   'is_yarn': True}]
+          )
+
+          get_spark_api.return_value = Mock(
+            create_session=Mock(
+              return_value={'id': '1'}
+            ),
+            get_session=Mock(
+              return_value={'state': 'idle', 'log': ''}
+            )
+          )
+          # Case with user configuration. Expected 2 driverCores
+          USE_DEFAULT_CONFIGURATION.get.return_value = True
+          session = self.api.create_session(lang=lang, properties=properties)
+          assert_equal(session['type'], 'pyspark')
+          assert_equal(session['id'], '1')
+          for p in session['properties']:
+            if p['name'] == 'driverCores':
+              cores = p['value']
+          assert_equal(cores, 2)
+          
+          # Case without user configuration. Expected 1 driverCores
+          USE_DEFAULT_CONFIGURATION.get.return_value = True
+          DefaultConfiguration.objects.get_configuration_for_user.return_value = None
+          session2 = self.api.create_session(lang=lang, properties=properties)
+          assert_equal(session2['type'], 'pyspark')
+          assert_equal(session2['id'], '1')
+          for p in session2['properties']:
+            if p['name'] == 'driverCores':
+              cores = p['value']
+          assert_equal(cores, 1)
+
+          # Case with no user configuration. Expected 1 driverCores
+          USE_DEFAULT_CONFIGURATION.get.return_value = False
+          session3 = self.api.create_session(lang=lang, properties=properties)
+          assert_equal(session3['type'], 'pyspark')
+          assert_equal(session3['id'], '1')
+          for p in session3['properties']:
+            if p['name'] == 'driverCores':
+              cores = p['value']
+          assert_equal(cores, 1)
 
   def test_create_session_plain(self):
     lang = 'pyspark'
@@ -57,7 +117,6 @@ class TestSparkApi(object):
       files_properties = [prop for prop in session['properties'] if prop['name'] == 'files']
       assert_true(files_properties, session['properties'])
       assert_equal(files_properties[0]['value'], [], session['properties'])
-
 
   def test_get_jobs(self):
     local_jobs = [

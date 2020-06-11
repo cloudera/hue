@@ -151,21 +151,10 @@ class SparkApi(Api):
   STANDALONE_JOB_RE = re.compile("Got job (\d+)")
 
   @staticmethod
-  def get_properties():
-    return SparkConfiguration.PROPERTIES
-
-  def create_session(self, lang='scala', properties=None):
-    if not properties:
-      config = None
-      if USE_DEFAULT_CONFIGURATION.get():
-        config = DefaultConfiguration.objects.get_configuration_for_user(app='spark', user=self.user)
-
-      if config is not None:
-        properties = config.properties_list
-      else:
-        properties = self.get_properties()
-
-    props = dict([(p['name'], p['value']) for p in properties]) if properties is not None else {}
+  def get_livy_props(lang, properties=None):
+    props = dict([(p['name'], p['value']) for p in SparkConfiguration.PROPERTIES])
+    if properties is not None:
+      props.update(dict([(p['name'], p['value']) for p in properties]))
 
     # HUE-4761: Hue's session request is causing Livy to fail with "JsonMappingException: Can not deserialize
     # instance of scala.collection.immutable.List out of VALUE_STRING token" due to List type values
@@ -176,35 +165,46 @@ class SparkApi(Api):
     # empty list '[]' for these four values.
     # Note also that Livy has a 90 second timeout for the session request to complete, this needs to
     # be increased for requests that take longer, for example when loading large archives.
-    tmp_archives = props['archives']
-    if type(tmp_archives) is not list:
-      props['archives'] = tmp_archives.split(",")
-      LOG.debug("Check List type: archives was not a list")
-
-    tmp_jars = props['jars']
-    if type(tmp_jars) is not list:
-      props['jars'] = tmp_jars.split(",")
-      LOG.debug("Check List type: jars was not a list")
-
-    tmp_files = props['files']
-    if type(tmp_files) is not list:
-      props['files'] = tmp_files.split(",")
-      LOG.debug("Check List type: files was not a list")
-
-    tmp_py_files = props['pyFiles']
-    if type(tmp_py_files) is not list:
-      props['pyFiles'] = tmp_py_files.split(",")
-      LOG.debug("Check List type: pyFiles was not a list")
-
+    for key in ['archives','jars','files','pyFiles']:
+      if key not in props:
+        continue
+      if type(props[key]) is list:
+        continue
+      LOG.debug("Check List type: {} was not a list".format(key))
+      _tmp = props[key]
+      props[key] = _tmp.split(",")
+    
     # Convert the conf list to a dict for Livy
     LOG.debug("Property Spark Conf kvp list from UI is: " + str(props['conf']))
     props['conf'] = {conf.get('key'): conf.get('value') for i, conf in enumerate(props['conf'])}
     LOG.debug("Property Spark Conf dictionary is: " + str(props['conf']))
-
+    
     props['kind'] = lang
+      
+    return props
+
+  @staticmethod
+  def to_properties(props=None):
+    properties = list()
+    for p in SparkConfiguration.PROPERTIES:
+      properties.append(p.copy())
+
+    if props is not None:
+      for p in properties:
+        if p['name'] in props:
+          p['value'] = props[p['name']]
+
+    return properties
+
+  def create_session(self, lang='scala', properties=None):
+    if not properties and USE_DEFAULT_CONFIGURATION.get():
+      user_config = DefaultConfiguration.objects.get_configuration_for_user(app='spark', user=self.user)
+      if user_config is not None:
+        properties = user_config.properties_list
+
+    props = self.get_livy_props(lang, properties)
 
     api = get_spark_api(self.user)
-
     response = api.create_session(**props)
 
     status = api.get_session(response['id'])
@@ -222,7 +222,7 @@ class SparkApi(Api):
     return {
         'type': lang,
         'id': response['id'],
-        'properties': properties
+        'properties': self.to_properties(props)
     }
 
   def execute(self, notebook, snippet):
@@ -366,7 +366,7 @@ class SparkApi(Api):
     else:
       return self._get_standalone_jobs(logs)
 
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     response = {}
 
     # As booting a new SQL session is slow and we don't send the id of the current one in /autocomplete

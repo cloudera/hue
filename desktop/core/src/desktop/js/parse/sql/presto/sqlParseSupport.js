@@ -14,348 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const IMPLICIT_TYPE_CONVERSION = {
-  BOOLEAN: {
-    BOOLEAN: true,
-    TIMESTAMP: false,
-    TIME: false,
-    DATE: false,
-    VARBINARY: false,
-    TINYINT: false,
-    SMALLINT: false,
-    INTEGER: false,
-    BIGINT: false,
-    DOUBLE: false,
-    DECIMAL: false,
-    REAL: false,
-    NUMBER: false,
-    CHAR: false,
-    VARCHAR: false,
-    T: true
-  },
-  TIMESTAMP: {
-    BOOLEAN: false,
-    TIMESTAMP: true,
-    TIME: true,
-    DATE: false,
-    VARBINARY: false,
-    TINYINT: false,
-    SMALLINT: false,
-    INTEGER: false,
-    BIGINT: false,
-    DOUBLE: false,
-    DECIMAL: false,
-    REAL: false,
-    NUMBER: false,
-    CHAR: false,
-    VARCHAR: false,
-    T: true
-  },
-  TIME: {
-    BOOLEAN: false,
-    TIMESTAMP: true,
-    TIME: true,
-    DATE: false,
-    VARBINARY: false,
-    TINYINT: false,
-    SMALLINT: false,
-    INTEGER: false,
-    BIGINT: false,
-    DOUBLE: false,
-    DECIMAL: false,
-    REAL: false,
-    NUMBER: false,
-    CHAR: false,
-    VARCHAR: false,
-    T: true
-  },
-  DATE: {
-    BOOLEAN: false,
-    TIMESTAMP: false,
-    TIME: false,
-    DATE: true,
-    VARBINARY: false,
-    TINYINT: false,
-    SMALLINT: false,
-    INTEGER: false,
-    BIGINT: false,
-    DOUBLE: false,
-    DECIMAL: false,
-    REAL: false,
-    NUMBER: false,
-    CHAR: false,
-    VARCHAR: false,
-    T: true
-  },
-  VARBINARY: {
-    BOOLEAN: false,
-    TIMESTAMP: false,
-    TIME: false,
-    DATE: false,
-    VARBINARY: true,
-    TINYINT: false,
-    SMALLINT: false,
-    INTEGER: false,
-    BIGINT: false,
-    DOUBLE: false,
-    DECIMAL: false,
-    REAL: false,
-    NUMBER: false,
-    CHAR: false,
-    VARCHAR: false,
-    T: true
-  },
-  TINYINT: {
-    BOOLEAN: false,
-    TIMESTAMP: false,
-    TIME: false,
-    DATE: false,
-    VARBINARY: false,
-    TINYINT: true,
-    SMALLINT: false,
-    INTEGER: false,
-    BIGINT: false,
-    DOUBLE: false,
-    DECIMAL: false,
-    REAL: false,
-    NUMBER: true,
-    CHAR: false,
-    VARCHAR: false,
-    T: true
-  },
-  SMALLINT: {
-    BOOLEAN: false,
-    TIMESTAMP: false,
-    TIME: false,
-    DATE: false,
-    VARBINARY: false,
-    TINYINT: true,
-    SMALLINT: true,
-    INTEGER: false,
-    BIGINT: false,
-    DOUBLE: false,
-    DECIMAL: false,
-    REAL: false,
-    NUMBER: true,
-    CHAR: false,
-    VARCHAR: false,
-    T: true
-  },
-  INTEGER: {
-    BOOLEAN: false,
-    TIMESTAMP: false,
-    TIME: false,
-    DATE: false,
-    VARBINARY: false,
-    TINYINT: true,
-    SMALLINT: true,
-    INTEGER: true,
-    BIGINT: false,
-    DOUBLE: false,
-    DECIMAL: false,
-    REAL: false,
-    NUMBER: true,
-    CHAR: false,
-    VARCHAR: false,
-    T: true
-  },
-  BIGINT: {
-    BOOLEAN: false,
-    TIMESTAMP: false,
-    TIME: false,
-    DATE: false,
-    VARBINARY: false,
-    TINYINT: true,
-    SMALLINT: true,
-    INTEGER: true,
-    BIGINT: true,
-    DOUBLE: false,
-    DECIMAL: false,
-    REAL: false,
-    NUMBER: true,
-    CHAR: false,
-    VARCHAR: false,
-    T: true
-  },
-  DOUBLE: {
-    BOOLEAN: false,
-    TIMESTAMP: false,
-    TIME: false,
-    DATE: false,
-    VARBINARY: false,
-    TINYINT: true,
-    SMALLINT: true,
-    INTEGER: true,
-    BIGINT: true,
-    DOUBLE: true,
-    DECIMAL: false,
-    REAL: false,
-    NUMBER: true,
-    CHAR: true,
-    VARCHAR: true,
-    T: true
-  },
-  DECIMAL: {
-    BOOLEAN: false,
-    TIMESTAMP: false,
-    TIME: false,
-    DATE: false,
-    VARBINARY: false,
-    TINYINT: true,
-    SMALLINT: true,
-    INTEGER: true,
-    BIGINT: true,
-    DOUBLE: true,
-    DECIMAL: true,
-    REAL: true,
-    NUMBER: true,
-    CHAR: true,
-    VARCHAR: true,
-    T: true
-  },
-  REAL: {
-    BOOLEAN: false,
-    TIMESTAMP: false,
-    TIME: false,
-    DATE: false,
-    VARBINARY: false,
-    TINYINT: true,
-    SMALLINT: true,
-    INTEGER: true,
-    BIGINT: true,
-    DOUBLE: true,
-    DECIMAL: true,
-    REAL: true,
-    NUMBER: true,
-    CHAR: true,
-    VARCHAR: true,
-    T: true
-  },
-  NUMBER: {
-    BOOLEAN: false,
-    TIMESTAMP: false,
-    TIME: false,
-    DATE: false,
-    VARBINARY: false,
-    TINYINT: true,
-    SMALLINT: true,
-    INTEGER: true,
-    BIGINT: true,
-    DOUBLE: true,
-    DECIMAL: true,
-    REAL: true,
-    NUMBER: true,
-    CHAR: true,
-    VARCHAR: true,
-    T: true
-  },
-  CHAR: {
-    BOOLEAN: false,
-    TIMESTAMP: true,
-    TIME: true,
-    DATE: true,
-    VARBINARY: false,
-    TINYINT: true,
-    SMALLINT: true,
-    INTEGER: true,
-    BIGINT: true,
-    DOUBLE: true,
-    DECIMAL: true,
-    REAL: true,
-    NUMBER: true,
-    CHAR: true,
-    VARCHAR: true,
-    T: true
-  },
-  VARCHAR: {
-    BOOLEAN: false,
-    TIMESTAMP: true,
-    TIME: true,
-    DATE: true,
-    VARBINARY: false,
-    TINYINT: true,
-    SMALLINT: true,
-    INTEGER: true,
-    BIGINT: true,
-    DOUBLE: true,
-    DECIMAL: true,
-    REAL: true,
-    NUMBER: true,
-    CHAR: true,
-    VARCHAR: true,
-    T: true
-  },
-  T: {
-    BOOLEAN: true,
-    TIMESTAMP: true,
-    TIME: true,
-    DATE: true,
-    VARBINARY: true,
-    TINYINT: true,
-    SMALLINT: true,
-    INTEGER: true,
-    BIGINT: true,
-    DOUBLE: true,
-    DECIMAL: true,
-    REAL: true,
-    NUMBER: true,
-    CHAR: true,
-    VARCHAR: true,
-    T: true
-  }
-};
-
-const stripPrecision = types => {
-  const result = [];
-  types.forEach(type => {
-    if (type.indexOf('(') > -1) {
-      result.push(type.substring(0, type.indexOf('(')));
-    } else {
-      result.push(type);
-    }
-  });
-  return result;
-};
-
-/**
- * Matches types based on implicit conversion i.e. if you expect a BIGINT then INT is ok but not BOOLEAN etc.
- *
- * @param expectedTypes
- * @param actualRawTypes
- * @returns {boolean}
- */
-const matchesType = function(expectedTypes, actualRawTypes) {
-  if (expectedTypes.length === 1 && expectedTypes[0] === 'T') {
-    return true;
-  }
-  const actualTypes = stripPrecision(actualRawTypes);
-  if (
-    actualTypes.indexOf('ARRAY') !== -1 ||
-    actualTypes.indexOf('MAP') !== -1 ||
-    actualTypes.indexOf('STRUCT') !== -1 ||
-    actualTypes.indexOf('ROW') !== -1
-  ) {
-    return true;
-  }
-  for (let i = 0; i < expectedTypes.length; i++) {
-    for (let j = 0; j < actualTypes.length; j++) {
-      // To support future unknown types
-      if (
-        typeof IMPLICIT_TYPE_CONVERSION[expectedTypes[i]] === 'undefined' ||
-        typeof IMPLICIT_TYPE_CONVERSION[expectedTypes[i]][actualTypes[j]] == 'undefined'
-      ) {
-        return true;
-      }
-      if (
-        IMPLICIT_TYPE_CONVERSION[expectedTypes[i]] &&
-        IMPLICIT_TYPE_CONVERSION[expectedTypes[i]][actualTypes[j]]
-      ) {
-        return true;
-      }
-    }
-  }
-  return false;
-};
+import { matchesType } from 'sql/reference/typeUtils';
+import { applyTypeToSuggestions, getSubQuery } from 'parse/sql/sqlParseUtils';
 
 /**
  * Calculates the Optimal String Alignment distance between two strings. Returns 0 when the strings are equal and the
@@ -709,22 +369,12 @@ const initSqlParser = function(parser) {
     ];
     keywords = keywords.concat(['EXISTS', 'NOT']);
     if (oppositeValueExpression && oppositeValueExpression.types[0] === 'NUMBER') {
-      parser.applyTypeToSuggestions(['NUMBER']);
+      parser.applyTypeToSuggestions(oppositeValueExpression);
     }
     parser.suggestKeywords(keywords);
   };
 
-  parser.applyTypeToSuggestions = function(types) {
-    if (types[0] === 'BOOLEAN') {
-      return;
-    }
-    if (parser.yy.result.suggestFunctions && !parser.yy.result.suggestFunctions.types) {
-      parser.yy.result.suggestFunctions.types = types;
-    }
-    if (parser.yy.result.suggestColumns && !parser.yy.result.suggestColumns.types) {
-      parser.yy.result.suggestColumns.types = types;
-    }
-  };
+  parser.applyTypeToSuggestions = applyTypeToSuggestions.bind(null, parser);
 
   parser.findCaseType = function(whenThenList) {
     const types = {};
@@ -739,20 +389,12 @@ const initSqlParser = function(parser) {
     return { types: ['T'] };
   };
 
-  parser.findReturnTypes = function(functionName) {
-    return ['T'];
-  };
-
   parser.applyArgumentTypesToSuggestions = function(functionName, position) {
-    if (parser.yy.result.suggestColumns) {
-      delete parser.yy.result.suggestColumns;
-      delete parser.yy.result.suggestKeyValues;
-      delete parser.yy.result.suggestValues;
-      delete parser.yy.result.suggestFunctions;
-      delete parser.yy.result.suggestIdentifiers;
-      delete parser.yy.result.suggestKeywords;
-    } else {
-      parser.applyTypeToSuggestions(['T']);
+    if (parser.yy.result.suggestFunctions || parser.yy.result.suggestColumns) {
+      parser.yy.result.udfArgument = {
+        name: functionName.toLowerCase(),
+        position: position
+      };
     }
   };
 
@@ -1570,33 +1212,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.getSubQuery = function(cols) {
-    const columns = [];
-    cols.selectList.forEach(col => {
-      const result = {};
-      if (col.alias) {
-        result.alias = col.alias;
-      }
-      if (col.valueExpression && col.valueExpression.columnReference) {
-        result.identifierChain = col.valueExpression.columnReference;
-      } else if (col.asterisk) {
-        result.identifierChain = [{ asterisk: true }];
-      }
-      if (
-        col.valueExpression &&
-        col.valueExpression.types &&
-        col.valueExpression.types.length === 1
-      ) {
-        result.type = col.valueExpression.types[0];
-      }
-
-      columns.push(result);
-    });
-
-    return {
-      columns: columns
-    };
-  };
+  parser.getSubQuery = getSubQuery;
 
   parser.addTablePrimary = function(ref) {
     if (typeof parser.yy.latestTablePrimaries === 'undefined') {
@@ -2560,10 +2176,6 @@ const initSyntaxParser = function(parser) {
 
   parser.findCaseType = function() {
     return { types: ['T'] };
-  };
-
-  parser.findReturnTypes = function() {
-    return ['T'];
   };
 
   parser.expandIdentifierChain = function() {

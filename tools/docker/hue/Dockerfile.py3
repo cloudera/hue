@@ -58,7 +58,8 @@ RUN rm -rf /hue \
 RUN ./build/env/bin/pip install \
   psycopg2-binary \
   redis==2.10.6 \
-  django_redis \
+  # Avoid Django 3 pulling
+  django_redis==4.11.0 \
   flower \
   git+https://github.com/gethue/PyHive \
   gevent \

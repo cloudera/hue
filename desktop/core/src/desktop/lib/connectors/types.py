@@ -142,7 +142,7 @@ CONNECTOR_TYPES = [
     'dialect': 'flink',
     'interface': 'flink',
     'settings': [
-      {'name': 'api_url', 'value': 'http://127.0.0.1:8083'},
+      {'name': 'url', 'value': 'http://127.0.0.1:8083'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -152,7 +152,7 @@ CONNECTOR_TYPES = [
       'is_sql': True,
       'sql_identifier_quote': '`',
       'sql_identifier_comment_single': '--',
-      'has_catalog': False,
+      'has_catalog': True,
       'has_database': False,
       'has_table': True,
       'has_live_queries': False,
@@ -161,7 +161,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
-      'trim_statement_semicolon': False,
+      'trim_statement_semicolon': True,
     }
   },
   {
@@ -242,7 +242,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
-      'trim_statement_semicolon': False,
+      'trim_statement_semicolon': True,
     }
   },
   {
@@ -307,7 +307,7 @@ CONNECTOR_TYPES = [
       {'name': 'url', 'value': 'presto://host:8080/tpch'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
-      {'name': 'impersonation_enabled', 'value': False},
+      {'name': 'has_impersonation', 'value': False},
     ],
     'category': 'editor',
     'description': '',
@@ -462,7 +462,8 @@ CONNECTOR_TYPES = [
     'dialect': 'bigquery',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'bigquery://projectName/datasetName'},
+      {'name': 'url', 'value': 'bigquery://project-XXXXXX/dataset_name'},
+      {'name': 'credentials_json', 'value': '{"type": "service_account", ...}'}
     ],
     'category': 'editor',
     'description': '',

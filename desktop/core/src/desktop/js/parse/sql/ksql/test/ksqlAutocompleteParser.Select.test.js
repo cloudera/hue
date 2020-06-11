@@ -1840,11 +1840,14 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
           suggestColumns: {
-            types: ['T'],
             source: 'select',
             tables: [{ identifierChain: [{ name: 'bar' }] }]
+          },
+          udfArgument: {
+            name: 'customudf',
+            position: 1
           }
         }
       });
@@ -1857,11 +1860,14 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
           suggestColumns: {
-            types: ['T'],
             source: 'select',
             tables: [{ identifierChain: [{ name: 'bar' }] }]
+          },
+          udfArgument: {
+            name: 'customudf',
+            position: 2
           }
         }
       });
@@ -1897,11 +1903,14 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
         } else {
           const expectedResult = {
             lowerCase: false,
-            suggestFunctions: { types: aggregateFunction.types || ['T'] },
+            suggestFunctions: {},
             suggestColumns: {
               source: 'select',
-              types: aggregateFunction.types || ['T'],
               tables: [{ identifierChain: [{ name: 'testTable' }] }]
+            },
+            udfArgument: {
+              name: aggregateFunction.name.toLowerCase(),
+              position: 1
             }
           };
           assertAutoComplete({
@@ -2745,11 +2754,14 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
           suggestColumns: {
             source: 'select',
-            types: ['T'],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'greatest',
+            position: 5
           }
         }
       });
@@ -2762,11 +2774,14 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
           suggestColumns: {
             source: 'select',
-            types: ['T'],
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          udfArgument: {
+            name: 'greatest',
+            position: 2
           }
         }
       });
@@ -5279,7 +5294,6 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
         expectedResult: {
           suggestColumns: {
             source: 'select',
-            types: ['T'],
             tables: [
               { identifierChain: [{ subQuery: 'boo' }] },
               { identifierChain: [{ subQuery: 'bar' }] }
@@ -5289,7 +5303,11 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
             { name: 'boo.', type: 'sub-query' },
             { name: 'bar.', type: 'sub-query' }
           ],
-          suggestFunctions: { types: ['T'] },
+          suggestFunctions: {},
+          udfArgument: {
+            name: 'cos',
+            position: 1
+          },
           subQueries: [
             {
               alias: 'boo',
@@ -5494,7 +5512,7 @@ describe('ksqlAutocompleteParser.js SELECT statements', () => {
                   columns: [
                     { identifierChain: [{ name: 'testTable' }, { name: 'a' }], type: 'COLREF' },
                     { identifierChain: [{ name: 'testTable' }, { name: 'b' }], type: 'COLREF' },
-                    { alias: 'bla', type: 'T' }
+                    { alias: 'bla', type: 'UDFREF', udfRef: 'abs' }
                   ]
                 }
               ]

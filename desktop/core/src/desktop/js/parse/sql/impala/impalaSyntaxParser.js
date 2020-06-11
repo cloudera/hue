@@ -2092,14 +2092,20 @@ case 1594:
      this.$ = $$[$0];
    
 break;
-case 1600: case 1605:
+case 1600:
 
+     parser.suggestKeywords([{ value: '10', weight: 10000 }, { value: '100', weight: 10000 }, { value: '1000', weight: 10000 }, { value: '5000', weight: 10000 }, { value: '10000', weight: 10000 }])
      parser.suggestFunctions({ types: ['BIGINT'] });
    
 break;
 case 1601: case 1606:
 
      delete parser.yy.result.suggestColumns;
+   
+break;
+case 1605:
+
+     parser.suggestFunctions({ types: ['BIGINT'] });
    
 break;
 case 1610: case 1611:
@@ -2182,7 +2188,7 @@ break;
 case 1648:
 
      if (!$$[$0].typeSet) {
-       parser.applyTypeToSuggestions('NUMBER');
+       parser.applyTypeToSuggestions({ types: ['NUMBER'] });
      }
      this.$ = { types: [ 'NUMBER' ], suggestFilters: $$[$0].suggestFilters };
    
@@ -2245,21 +2251,21 @@ break;
 case 1661:
 
      parser.valueExpressionSuggest($$[$0], $$[$0-1]);
-     parser.applyTypeToSuggestions($$[$0].types);
+     parser.applyTypeToSuggestions($$[$0]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
    
 break;
 case 1662: case 1663: case 1664:
 
      parser.valueExpressionSuggest($$[$0], $$[$0-1]);
-     parser.applyTypeToSuggestions($$[$0].types);
+     parser.applyTypeToSuggestions($$[$0]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    
 break;
 case 1665: case 1666: case 1667: case 1668:
 
      if (!$$[$0-2].typeSet) {
-       parser.applyTypeToSuggestions($$[$0].types);
+       parser.applyTypeToSuggestions($$[$0]);
        parser.addColRefIfExists($$[$0]);
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-2].suggestFilters }
@@ -2268,28 +2274,28 @@ break;
 case 1669: case 1671:
 
      parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
-     parser.applyTypeToSuggestions($$[$0-2].types);
+     parser.applyTypeToSuggestions($$[$0-2]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    
 break;
 case 1670:
 
      parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
-     parser.applyTypeToSuggestions($$[$0-2].types);
+     parser.applyTypeToSuggestions($$[$0-2]);
      this.$ = { types: [ 'BOOLEAN' ] , typeSet: true, endsWithLessThanOrEqual: true };
    
 break;
 case 1672:
 
      parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
-     parser.applyTypeToSuggestions($$[$0-2].types);
+     parser.applyTypeToSuggestions($$[$0-2]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true, endsWithLessThanOrEqual: $$[$0-1] === '<='  };
    
 break;
 case 1673: case 1674: case 1675: case 1676:
 
      if (!$$[$0].typeSet) {
-       parser.applyTypeToSuggestions($$[$0-2].types);
+       parser.applyTypeToSuggestions($$[$0-2]);
        parser.addColRefIfExists($$[$0-2]);
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0].suggestFilters }
@@ -2299,7 +2305,7 @@ case 1677:
 
      if ($$[$0].inValueEdit) {
        parser.valueExpressionSuggest($$[$0-3], $$[$0-2] + ' ' + $$[$0-1]);
-       parser.applyTypeToSuggestions($$[$0-3].types);
+       parser.applyTypeToSuggestions($$[$0-3]);
      }
      if ($$[$0].cursorAtStart) {
        parser.suggestKeywords(['SELECT']);
@@ -2311,7 +2317,7 @@ case 1678:
 
      if ($$[$0].inValueEdit) {
        parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
-       parser.applyTypeToSuggestions($$[$0-2].types);
+       parser.applyTypeToSuggestions($$[$0-2]);
      }
      if ($$[$0].cursorAtStart) {
        parser.suggestKeywords(['SELECT']);
@@ -2350,7 +2356,7 @@ break;
 case 1687:
 
      if ($$[$0-2].types[0] === $$[$0].types[0] && !$$[$0-2].typeSet) {
-       parser.applyTypeToSuggestions($$[$0-2].types)
+       parser.applyTypeToSuggestions($$[$0-2])
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-2].suggestFilters };
    
@@ -2358,7 +2364,7 @@ break;
 case 1688:
 
      if ($$[$0-2].types[0] === $$[$0].types[0] && !$$[$0].typeSet) {
-       parser.applyTypeToSuggestions($$[$0-2].types)
+       parser.applyTypeToSuggestions($$[$0-2])
      }
      this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0].suggestFilters };
    
@@ -2366,7 +2372,7 @@ break;
 case 1690:
 
      parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
-     parser.applyTypeToSuggestions($$[$0-2].types);
+     parser.applyTypeToSuggestions($$[$0-2]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
    
 break;
@@ -2391,14 +2397,14 @@ break;
 case 1699: case 1700:
 
      parser.valueExpressionSuggest(undefined, $$[$0-1]);
-     parser.applyTypeToSuggestions([ 'NUMBER' ]);
+     parser.applyTypeToSuggestions({ types: [ 'NUMBER' ] });
      this.$ = { types: [ 'NUMBER' ], typeSet: true };
    
 break;
 case 1701: case 1702: case 1703:
 
      if (!$$[$0-2].typeSet) {
-       parser.applyTypeToSuggestions(['NUMBER']);
+       parser.applyTypeToSuggestions({ types: ['NUMBER'] });
        parser.addColRefIfExists($$[$0]);
      }
      this.$ = { types: [ 'NUMBER' ], suggestFilters: $$[$0-2].suggestFilters }
@@ -2407,14 +2413,14 @@ break;
 case 1704: case 1705: case 1706:
 
      parser.valueExpressionSuggest(undefined, $$[$0-1]);
-     parser.applyTypeToSuggestions(['NUMBER']);
+     parser.applyTypeToSuggestions({ types: ['NUMBER'] });
      this.$ = { types: [ 'NUMBER' ], typeSet: true };
    
 break;
 case 1707: case 1708: case 1709:
 
      if (!$$[$0].typeSet) {
-       parser.applyTypeToSuggestions(['NUMBER']);
+       parser.applyTypeToSuggestions({ types: ['NUMBER'] });
        parser.addColRefIfExists($$[$0-2]);
      }
      this.$ = { types: [ 'NUMBER' ], suggestFilters: $$[$0].suggestFilters };
@@ -2429,14 +2435,14 @@ break;
 case 1714:
 
      parser.valueExpressionSuggest(undefined, $$[$0]);
-     parser.applyTypeToSuggestions([ 'STRING' ]);
+     parser.applyTypeToSuggestions({ types: [ 'STRING' ] });
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
    
 break;
 case 1715:
 
      parser.valueExpressionSuggest(undefined, $$[$0-1] + ' ' + $$[$0]);
-     parser.applyTypeToSuggestions([ 'STRING' ]);
+     parser.applyTypeToSuggestions({ types: [ 'STRING' ] });
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
    
 break;
@@ -2542,9 +2548,9 @@ case 1740:
        delete $$[$0-1].lastLoc.identifierChain;
      }
      if ($$[$0].expression) {
-       this.$ = { function: fn, expression: $$[$0].expression, types: parser.findReturnTypes(fn) }
+       this.$ = { function: fn, expression: $$[$0].expression, types: ['UDFREF'] }
      } else {
-       this.$ = { function: fn, types: parser.findReturnTypes(fn) }
+       this.$ = { function: fn, types: ['UDFREF'] }
      }
    
 break;
@@ -2552,9 +2558,9 @@ case 1741:
 
     parser.addFunctionLocation(_$[$0-1], $$[$0-1]);
     if ($$[$0].expression) {
-      this.$ = { function: $$[$0-1], expression: $$[$0].expression, types: parser.findReturnTypes($$[$0-1]) }
+      this.$ = { function: $$[$0-1], expression: $$[$0].expression, types: ['UDFREF'] }
     } else {
-      this.$ = { function: $$[$0-1], types: parser.findReturnTypes($$[$0-1]) }
+      this.$ = { function: $$[$0-1], types: ['UDFREF'] }
     }
   
 break;
@@ -2592,7 +2598,7 @@ case 1747:
      if ($$[$0].position) {
        parser.applyArgumentTypesToSuggestions(fn, $$[$0].position);
      }
-     this.$ = { types: parser.findReturnTypes(fn) };
+     this.$ = { function: fn, types: ['UDFREF'] };
    
 break;
 case 1748: case 1940: case 1941:
@@ -2601,7 +2607,7 @@ case 1748: case 1940: case 1941:
      if ($$[$0].position) {
        parser.applyArgumentTypesToSuggestions($$[$0-1], $$[$0].position);
      }
-     this.$ = { types: parser.findReturnTypes($$[$0-1]) };
+     this.$ = { function: $$[$0-1], types: ['UDFREF'] };
    
 break;
 case 1751:
@@ -2662,7 +2668,7 @@ case 1782:
        if (!parser.yy.selectListAliases) {
          parser.yy.selectListAliases = [];
        }
-       parser.yy.selectListAliases.push({ name: $$[$0].alias, types: $$[$0-1].types || ['T'] });
+       parser.yy.selectListAliases.push($$[$0-1].function && $$[$0-1].types && $$[$0-1].types.length && $$[$0-1].types[0] === 'UDFREF' ? { name: $$[$0].alias, udfRef: $$[$0-1].function, types: $$[$0-1].types } : { name: $$[$0].alias, types: $$[$0-1].types || ['T'] });
      } else {
        this.$ = { valueExpression: $$[$0-1] }
      }
@@ -3029,9 +3035,9 @@ case 1938: case 1939:
 
      parser.addFunctionLocation(_$[$0-1], $$[$0-1]);
      if ($$[$0].expression) {
-       this.$ = { function: $$[$0-1], expression: $$[$0].expression, types: parser.findReturnTypes($$[$0-1]) }
+       this.$ = { function: $$[$0-1], expression: $$[$0].expression, types: ['UDFREF'] }
      } else {
-       this.$ = { function: $$[$0-1], types: parser.findReturnTypes($$[$0-1]) }
+       this.$ = { function: $$[$0-1], types: ['UDFREF'] }
      }
    
 break;
@@ -3050,28 +3056,28 @@ case 1951:
    
 break;
 case 1959: case 2037: case 2078:
-this.$ = { types: parser.findReturnTypes($$[$0-2]) };
+this.$ = { function: $$[$0-2], types: ['UDFREF'] };
 break;
 case 1960:
-this.$ = { function: $$[$0-3], expression: $$[$0-2], types: parser.findReturnTypes($$[$0-3]) };
+this.$ = { function: $$[$0-3], expression: $$[$0-2], types: ['UDFREF'] };
 break;
 case 1961:
 
      parser.valueExpressionSuggest();
      parser.applyArgumentTypesToSuggestions($$[$0-3], 1);
-     this.$ = { types: parser.findReturnTypes($$[$0-3]) };
+     this.$ = { function: $$[$0-3], types: ['UDFREF'] };
    
 break;
 case 1962:
 
      parser.suggestValueExpressionKeywords($$[$0-2]);
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 1963:
 
      parser.applyArgumentTypesToSuggestions($$[$0-3], $$[$0-1].position);
-     this.$ = { types: parser.findReturnTypes($$[$0-3]) };
+     this.$ = { function: $$[$0-3], types: ['UDFREF'] };
    
 break;
 case 1971: case 1972:
@@ -3233,10 +3239,10 @@ case 2034: case 2035:
    
 break;
 case 2036: case 2042:
-this.$ = { types: parser.findReturnTypes($$[$0-3]) };
+this.$ = { function: $$[$0-3], types: ['UDFREF'] };
 break;
 case 2038: case 2043: case 2077:
-this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+this.$ = { function: $$[$0-4], types: ['UDFREF'] };
 break;
 case 2039:
 
@@ -3250,13 +3256,13 @@ case 2039:
        }
      }
      parser.suggestKeywords(keywords);
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 2040: case 2045: case 2080:
 
      parser.suggestValueExpressionKeywords($$[$0-2]);
-     this.$ = { types: parser.findReturnTypes($$[$0-5]) };
+     this.$ = { function: $$[$0-5], types: ['UDFREF'] };
    
 break;
 case 2041:
@@ -3269,7 +3275,7 @@ case 2041:
        }
        parser.suggestKeywords(keywords);
      }
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 2044:
@@ -3289,7 +3295,7 @@ case 2044:
      }
      parser.suggestKeywords(keywords);
      parser.applyArgumentTypesToSuggestions($$[$0-4], 1);
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 2046:
@@ -3312,72 +3318,72 @@ case 2046:
      if (parser.yy.result.suggestFunctions && !parser.yy.result.suggestFunctions.types) {
        parser.applyArgumentTypesToSuggestions($$[$0-4], $$[$0-1].position);
      }
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 2063:
 
      parser.valueExpressionSuggest();
-     parser.applyTypeToSuggestions($$[$0-2].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
-     this.$ = { types: parser.findReturnTypes($$[$0-5]) };
+     parser.applyTypeToSuggestions({ types: $$[$0-2].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP'] });
+     this.$ = { function: $$[$0-5], types: ['UDFREF'] };
    
 break;
 case 2064:
 
      parser.valueExpressionSuggest();
-     parser.applyTypeToSuggestions($$[$0-1].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     parser.applyTypeToSuggestions({ types: $$[$0-1].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP'] });
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 2065:
 
      parser.valueExpressionSuggest();
-     parser.applyTypeToSuggestions(['STRING', 'TIMESTAMP']);
-     this.$ = { types: parser.findReturnTypes($$[$0-3]) };
+     parser.applyTypeToSuggestions({ types: ['STRING', 'TIMESTAMP'] });
+     this.$ = { function: $$[$0-3], types: ['UDFREF'] };
    
 break;
 case 2066:
 
-     parser.applyTypeToSuggestions($$[$0-2].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
-     this.$ = { types: parser.findReturnTypes($$[$0-5]) };
+     parser.applyTypeToSuggestions({ types: $$[$0-2].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP'] });
+     this.$ = { function: $$[$0-5], types: ['UDFREF'] };
    
 break;
 case 2067:
 
-     parser.applyTypeToSuggestions($$[$0-1].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     parser.applyTypeToSuggestions({ types: $$[$0-1].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP'] });
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 2068:
 
-     parser.applyTypeToSuggestions(['STRING', 'TIMESTAMP']);
-     this.$ = { types: parser.findReturnTypes($$[$0-3]) };
+     parser.applyTypeToSuggestions({ types: ['STRING', 'TIMESTAMP'] });
+     this.$ = { function: $$[$0-3], types: ['UDFREF'] };
    
 break;
 case 2069:
 
      parser.valueExpressionSuggest();
-     parser.applyTypeToSuggestions($$[$0-2].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
-     this.$ = { types: parser.findReturnTypes($$[$0-5]) };
+     parser.applyTypeToSuggestions({ types: $$[$0-2].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING'] });
+     this.$ = { function: $$[$0-5], types: ['UDFREF'] };
    
 break;
 case 2070:
 
      parser.valueExpressionSuggest();
-     parser.applyTypeToSuggestions($$[$0-1].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     parser.applyTypeToSuggestions({ types: $$[$0-1].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING'] });
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 2071:
 
-     parser.applyTypeToSuggestions($$[$0-2].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
-     this.$ = { types: parser.findReturnTypes($$[$0-5]) };
+     parser.applyTypeToSuggestions({ types: $$[$0-2].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING'] });
+     this.$ = { function: $$[$0-5], types: ['UDFREF'] };
    
 break;
 case 2072:
 
-    parser.applyTypeToSuggestions($$[$0-1].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+    parser.applyTypeToSuggestions({ types: $$[$0-1].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING'] });
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 2073:
@@ -3387,7 +3393,7 @@ case 2073:
      } else {
        parser.suggestValueExpressionKeywords($$[$0-3]);
      }
-     this.$ = { types: parser.findReturnTypes($$[$0-5]) };
+     this.$ = { function: $$[$0-5], types: ['UDFREF'] };
    
 break;
 case 2074:
@@ -3397,7 +3403,7 @@ case 2074:
      } else {
        parser.suggestValueExpressionKeywords($$[$0-2]);
      }
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 2079:
@@ -3413,7 +3419,7 @@ case 2079:
        keywords = parser.yy.result.suggestKeywords.concat(keywords);
      }
      parser.suggestKeywords(keywords);
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 2081:
@@ -3421,7 +3427,7 @@ case 2081:
      if (parser.yy.result.suggestFunctions && ! parser.yy.result.suggestFunctions.types) {
        parser.applyArgumentTypesToSuggestions($$[$0-4], 1);
      }
-     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
+     this.$ = { function: $$[$0-4], types: ['UDFREF'] };
    
 break;
 case 2107:
@@ -3581,7 +3587,7 @@ case 2211:
 break;
 case 2220:
 
-     if (!parser.yy.cursorFound) {
+     if (! parser.yy.cursorFound) {
        parser.yy.result.useDatabase = $$[$0];
      }
    

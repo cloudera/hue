@@ -56,12 +56,16 @@ class Command(BaseCommand):
       db_name = args[1] if len(args) > 1 else 'default'
       user = User.objects.get(username=pwd.getpwuid(os.getuid()).pw_name)
       request = None
+      self.queries = None
+      self.tables = None
     else:
       dialect = options['dialect']
       db_name = options.get('db_name', 'default')
       interpreter = options.get('interpreter')  # Only when connectors are enabled. Later will deprecate `dialect`.
       user = options['user']
       request = options['request']
+      self.queries = options.get('queries')
+      self.tables = options.get('tables')
 
     tables = 'tables_standard.json' if dialect not in ('hive', 'impala') else (
         'tables_transactional.json' if has_concurrency_support() else 'tables.json'
@@ -104,15 +108,16 @@ class Command(BaseCommand):
       raise InstallException(_('No %s tables are available as samples') % dialect)
 
     for table_dict in table_list:
-      full_name = '%s.%s' % (db_name, table_dict['table_name'])
-      try:
-        table = SampleTable(table_dict, dialect, db_name, interpreter=interpreter, request=request)
-        if table.install(django_user):
-          self.successes.append(_('Table %s installed.') % full_name)
-      except Exception as ex:
-        msg = str(ex)
-        LOG.error(msg)
-        self.errors.append(_('Could not install table %s: %s') % (full_name, msg))
+      if self.tables is None or table_dict['table_name'] in self.tables:
+        full_name = '%s.%s' % (db_name, table_dict['table_name'])
+        try:
+          table = SampleTable(table_dict, dialect, db_name, interpreter=interpreter, request=request)
+          if table.install(django_user):
+            self.successes.append(_('Table %s installed.') % full_name)
+        except Exception as ex:
+          msg = str(ex)
+          LOG.error(msg)
+          self.errors.append(_('Could not install table %s: %s') % (full_name, msg))
 
 
   def install_queries(self, django_user, dialect, interpreter=None):
@@ -125,6 +130,10 @@ class Command(BaseCommand):
     design_list = [d for d in design_list if int(d['type']) == app_type]
     if app_type == RDBMS:
       design_list = [d for d in design_list if dialect in d['dialects']]
+    if self.queries is None:  # Manual install
+      design_list = [d for d in design_list if not d.get('auto_load_only')]
+    if self.queries:  # Automated install
+      design_list = [d for d in design_list if d['name'] in self.queries]
 
     if not design_list:
       raise InstallException(_('No %s queries are available as samples') % dialect)

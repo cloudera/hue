@@ -130,7 +130,7 @@ class JdbcApi(Api):
     return {'status': -1}
 
   @query_error_handler
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     if self.db is None:
       raise AuthenticationRequired()
 

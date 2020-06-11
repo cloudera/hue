@@ -18,9 +18,9 @@ import * as ko from 'knockout';
 
 import { MULTI_NAME as SIMPLE_ACE_MULTI } from 'ko/components/simpleAceEditor/ko.simpleAceEditor';
 import { CONTEXT_SELECTOR_COMPONENT } from 'ko/components/ko.contextSelector';
-import { NAME as DROP_DOWN } from 'ko/components/ko.dropDown';
+import { HUE_DROP_DOWN_COMPONENT } from 'ko/components/ko.dropDown';
 import { NAME as EXECUTABLE_ACTIONS } from 'apps/notebook2/components/ko.executableActions';
-import { NAME as SIMPLE_RESULT_GRID } from 'apps/notebook2/components/resultGrid/ko.simpleResultGrid';
+import { SIMPLE_RESULT_GRID_COMPONENT } from 'apps/notebook2/components/resultGrid/ko.simpleResultGrid';
 
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
@@ -36,7 +36,7 @@ const TEMPLATE = `
 <div class="context-popover-flex-fill" style="overflow: auto;">
   <div style="display: inline-block" data-bind="
     component: {
-      name: '${ DROP_DOWN }',
+      name: '${ HUE_DROP_DOWN_COMPONENT }',
       params: {
         value: connector,
         labelAttribute: 'displayName',
@@ -91,7 +91,7 @@ const TEMPLATE = `
       "></div>
       <div data-bind="
         component: {
-          name: '${ SIMPLE_RESULT_GRID }',
+          name: '${ SIMPLE_RESULT_GRID_COMPONENT }',
           params: { activeExecutable: $parent.activeExecutable }
         }
       "></div>

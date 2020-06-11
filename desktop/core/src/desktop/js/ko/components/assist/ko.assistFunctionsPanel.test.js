@@ -16,24 +16,26 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
+import ApiHelper from 'api/apiHelper';
+import * as apiUtils from 'sql/reference/apiUtils';
 import AssistFunctionsPanel from './ko.assistFunctionsPanel';
-import apiHelper from 'api/apiHelper';
 import { refreshConfig } from 'utils/hueConfig';
 import { sleep } from 'utils/hueUtils';
 
 describe('ko.assistFunctionsPanel.js', () => {
+  jest.spyOn(apiUtils, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
+
   it('should handle cluster config updates', async () => {
-    const spy = jest.spyOn(apiHelper, 'getClusterConfig').mockImplementation(() =>
+    const spy = jest.spyOn(ApiHelper, 'getClusterConfig').mockImplementation(() =>
       $.Deferred()
         .resolve({
           status: 0,
           app_config: {
             editor: {
               interpreters: [
-                { dialect: 'pig' },
-                { dialect: 'pig' },
-                { dialect: 'impala' },
-                { dialect: 'banana' }
+                { type: 'pig', dialect: 'pig', displayName: 'Pig' },
+                { type: 'impala', dialect: 'impala', displayName: 'Impala' },
+                { type: 'banana', dialect: 'banana', displayName: 'Banana' }
               ]
             }
           }
@@ -42,21 +44,29 @@ describe('ko.assistFunctionsPanel.js', () => {
     );
     await refreshConfig();
     const connector = ko.observable({ dialect: 'impala' });
-    const subject = new AssistFunctionsPanel({ connector: connector });
+    const subject = new AssistFunctionsPanel({ activeConnector: connector });
     await sleep(0);
 
     expect(spy).toHaveBeenCalled();
-    expect(subject.availableDialects()).toEqual(['impala', 'pig']);
+    expect(subject.availableConnectorUdfs().length).toEqual(2);
+    expect(
+      subject
+        .availableConnectorUdfs()
+        .every(
+          connectorUdfs =>
+            connectorUdfs.connector.type === 'pig' || connectorUdfs.connector.type === 'impala'
+        )
+    ).toBeTruthy();
 
     spy.mockRestore();
 
-    const changeSpy = jest.spyOn(apiHelper, 'getClusterConfig').mockImplementation(() =>
+    const changeSpy = jest.spyOn(ApiHelper, 'getClusterConfig').mockImplementation(() =>
       $.Deferred()
         .resolve({
           status: 0,
           app_config: {
             editor: {
-              interpreters: [{ dialect: 'pig' }]
+              interpreters: [{ type: 'pig', dialect: 'pig', displayName: 'Pig' }]
             }
           }
         })
@@ -68,7 +78,8 @@ describe('ko.assistFunctionsPanel.js', () => {
 
     await sleep(0);
 
-    expect(subject.availableDialects()).toEqual(['pig']);
-    expect(subject.activeDialect()).toEqual('pig');
+    expect(subject.availableConnectorUdfs().length).toEqual(1);
+    expect(subject.availableConnectorUdfs()[0].connector.type).toEqual('pig');
+    expect(subject.activeConnectorUdfs()).toEqual(subject.availableConnectorUdfs()[0]);
   });
 });

@@ -241,22 +241,24 @@ class HS2Api(Api):
     query_server = get_query_server_config(name=app_name)
 
     response = {'status': -1, 'message': ''}
+    session_record = None
 
     try:
       filters = {'id': session_id, 'application': query_server['server_name']}
       if not is_admin(self.user):
         filters['owner'] = self.user
-      session = Session.objects.get(**filters)
+      session_record = Session.objects.get(**filters)
     except Session.DoesNotExist:
       response['message'] = _('Session does not exist or you do not have permissions to close the session.')
 
-    if session:
-      session = dbms.get(self.user, query_server).close_session(session)
+    if session_record:
+      session_record = dbms.get(self.user, query_server).close_session(session_record)
       response['status'] = 0
       response['message'] = _('Session successfully closed.')
-      response['session'] = {'id': session_id, 'application': session.application, 'status': session.status_code}
+      response['session'] = {'id': session_id, 'application': session_record.application, 'status': session_record.status_code}
 
     return response
+
 
   def close_session_idle(self, notebook, session):
     idle = True
@@ -515,7 +517,7 @@ class HS2Api(Api):
 
 
   @query_error_handler
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     db = self._get_db(snippet, interpreter=self.interpreter)
     query = None
 
@@ -529,7 +531,7 @@ class HS2Api(Api):
       query = self._get_current_statement(notebook, snippet)['statement']
       database, table = '', ''
 
-    resp = _autocomplete(db, database, table, column, nested, query=query, cluster=self.interpreter)
+    resp = _autocomplete(db, database, table, column, nested, query=query, cluster=self.interpreter, operation=operation)
 
     if resp.get('error'):
       resp['message'] = resp.pop('error')

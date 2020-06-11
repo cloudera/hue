@@ -71,6 +71,7 @@ export default class ExecutionLogs {
     if (!finalFetch) {
       const delay = this.executable.getExecutionTime() > 45000 ? 5000 : 1000;
       const fetchLogsTimeout = window.setTimeout(async () => {
+        // TODO: Fetch logs for EXECUTION_STATUS.streaming?
         await this.fetchLogs(
           this.executable.status !== EXECUTION_STATUS.running &&
             this.executable.status !== EXECUTION_STATUS.starting &&

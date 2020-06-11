@@ -24,10 +24,17 @@ import hueUtils from 'utils/hueUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import sqlUtils from 'sql/sqlUtils';
-import { SqlSetOptions, SqlFunctions } from 'sql/sqlFunctions';
+import { matchesType } from 'sql/reference/typeUtils';
 import { DIALECT } from 'apps/notebook2/snippet';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { findBrowserConnector, getRootFilePath } from 'utils/hueConfig';
+import {
+  findUdf,
+  getArgumentTypesForUdf,
+  getUdfsWithReturnTypes,
+  getReturnTypesForUdf,
+  getSetOptions
+} from './reference/sqlReferenceRepository';
 
 const normalizedColors = HueColors.getNormalizedColors();
 
@@ -430,7 +437,7 @@ class AutocompleteResults {
     }
   }
 
-  update(parseResult) {
+  async update(parseResult) {
     const self = this;
 
     while (self.activeDeferrals.length > 0) {
@@ -460,6 +467,10 @@ class AutocompleteResults {
 
     self.filter('');
 
+    if (self.parseResult.udfArgument) {
+      await self.adjustForUdfArgument();
+    }
+
     const colRefDeferred = self.handleColumnReference();
     self.activeDeferrals.push(colRefDeferred);
     const databasesDeferred = self.loadDatabases();
@@ -467,10 +478,10 @@ class AutocompleteResults {
 
     self.handleKeywords(colRefDeferred);
     self.handleIdentifiers();
-    self.handleColumnAliases();
+    self.activeDeferrals.push(self.handleColumnAliases());
     self.handleCommonTableExpressions();
-    self.handleOptions();
-    self.handleFunctions(colRefDeferred);
+    self.activeDeferrals.push(self.handleOptions());
+    self.activeDeferrals.push(self.handleFunctions(colRefDeferred));
     self.handleDatabases(databasesDeferred);
     const tablesDeferred = self.handleTables(databasesDeferred);
     self.activeDeferrals.push(tablesDeferred);
@@ -492,6 +503,32 @@ class AutocompleteResults {
 
     $.when.apply($, self.activeDeferrals).always(() => {
       huePubSub.publish('hue.ace.autocompleter.done');
+    });
+  }
+
+  async adjustForUdfArgument() {
+    return new Promise(async resolve => {
+      const foundArgumentTypes = (await getArgumentTypesForUdf(
+        this.snippet.connector(),
+        this.parseResult.udfArgument.name,
+        this.parseResult.udfArgument.position
+      )) || ['T'];
+      if (foundArgumentTypes.length === 0 && this.parseResult.suggestColumns) {
+        delete this.parseResult.suggestColumns;
+        delete this.parseResult.suggestKeyValues;
+        delete this.parseResult.suggestValues;
+        delete this.parseResult.suggestFunctions;
+        delete this.parseResult.suggestIdentifiers;
+        delete this.parseResult.suggestKeywords;
+      } else if (foundArgumentTypes[0] !== 'BOOLEAN') {
+        if (this.parseResult.suggestFunctions && !this.parseResult.suggestFunctions.types) {
+          this.parseResult.suggestFunctions.types = foundArgumentTypes;
+        }
+        if (this.parseResult.suggestColumns && !this.parseResult.suggestColumns.types) {
+          this.parseResult.suggestColumns.types = foundArgumentTypes;
+        }
+      }
+      resolve();
     });
   }
 
@@ -591,9 +628,7 @@ class AutocompleteResults {
       colRefDeferred.done(colRef => {
         const colRefKeywordSuggestions = [];
         Object.keys(self.parseResult.suggestColRefKeywords).forEach(typeForKeywords => {
-          if (
-            SqlFunctions.matchesType(self.dialect(), [typeForKeywords], [colRef.type.toUpperCase()])
-          ) {
+          if (matchesType(self.dialect(), [typeForKeywords], [colRef.type.toUpperCase()])) {
             self.parseResult.suggestColRefKeywords[typeForKeywords].forEach(keyword => {
               colRefKeywordSuggestions.push({
                 value: self.parseResult.lowerCase ? keyword.toLowerCase() : keyword,
@@ -631,8 +666,10 @@ class AutocompleteResults {
 
   handleColumnAliases() {
     const self = this;
+    const deferrals = [];
+    const columnAliasesDeferred = $.Deferred();
+    const columnAliasSuggestions = [];
     if (self.parseResult.suggestColumnAliases) {
-      const columnAliasSuggestions = [];
       self.parseResult.suggestColumnAliases.forEach(columnAlias => {
         const type =
           columnAlias.types && columnAlias.types.length === 1 ? columnAlias.types[0] : 'T';
@@ -644,6 +681,21 @@ class AutocompleteResults {
             popular: ko.observable(false),
             details: columnAlias
           });
+        } else if (type === 'UDFREF') {
+          const udfDeferred = $.Deferred();
+          deferrals.push(udfDeferred);
+          getReturnTypesForUdf(self.snippet.connector(), columnAlias.udfRef)
+            .then(types => {
+              const resolvedType = types.length === 1 ? types[0] : 'T';
+              columnAliasSuggestions.push({
+                value: columnAlias.name,
+                meta: resolvedType,
+                category: CATEGORIES.COLUMN,
+                popular: ko.observable(false),
+                details: columnAlias
+              });
+            })
+            .finally(udfDeferred.resolve);
         } else {
           columnAliasSuggestions.push({
             value: columnAlias.name,
@@ -654,8 +706,14 @@ class AutocompleteResults {
           });
         }
       });
-      self.appendEntries(columnAliasSuggestions);
     }
+    $.when.apply($, deferrals).always(() => {
+      if (columnAliasSuggestions.length) {
+        self.appendEntries(columnAliasSuggestions);
+      }
+      columnAliasesDeferred.resolve();
+    });
+    return columnAliasesDeferred;
   }
 
   handleCommonTableExpressions() {
@@ -682,30 +740,52 @@ class AutocompleteResults {
 
   handleOptions() {
     const self = this;
+    const setOptionsDeferred = $.Deferred();
     if (self.parseResult.suggestSetOptions) {
-      const suggestions = [];
-      SqlSetOptions.suggestOptions(self.dialect(), suggestions, CATEGORIES.OPTION);
-      self.appendEntries(suggestions);
+      getSetOptions(self.snippet.connector())
+        .then(setOptions => {
+          const suggestions = [];
+          Object.keys(setOptions).forEach(name => {
+            suggestions.push({
+              category: CATEGORIES.OPTION,
+              value: name,
+              meta: '',
+              popular: ko.observable(false),
+              weightAdjust: 0,
+              details: setOptions[name]
+            });
+          });
+          self.appendEntries(suggestions);
+          setOptionsDeferred.resolve();
+        })
+        .catch(setOptionsDeferred.reject);
+    } else {
+      setOptionsDeferred.resolve();
     }
+    return setOptionsDeferred;
   }
 
   handleFunctions(colRefDeferred) {
     const self = this;
+    const functionsDeferred = $.Deferred();
     if (self.parseResult.suggestFunctions) {
       const functionSuggestions = [];
       if (
         self.parseResult.suggestFunctions.types &&
-        self.parseResult.suggestFunctions.types[0] === 'COLREF'
+        (self.parseResult.suggestFunctions.types[0] === 'COLREF' ||
+          self.parseResult.suggestFunctions.types[0] === 'UDFREF')
       ) {
         initLoading(self.loadingFunctions, colRefDeferred);
 
-        colRefDeferred.done(colRef => {
-          const functionsToSuggest = SqlFunctions.getFunctionsWithReturnTypes(
-            self.dialect(),
-            [colRef.type.toUpperCase()],
+        const addUdfsOfTypes = async types => {
+          const functionsToSuggest = await getUdfsWithReturnTypes(
+            self.snippet.connector(),
+            types,
             self.parseResult.suggestAggregateFunctions || false,
             self.parseResult.suggestAnalyticFunctions || false
           );
+
+          const firstType = types[0].toUpperCase();
 
           Object.keys(functionsToSuggest).forEach(name => {
             functionSuggestions.push({
@@ -713,10 +793,8 @@ class AutocompleteResults {
               value: name + '()',
               meta: functionsToSuggest[name].returnTypes.join('|'),
               weightAdjust:
-                colRef.type.toUpperCase() !== 'T' &&
-                functionsToSuggest[name].returnTypes.some(otherType => {
-                  return otherType === colRef.type.toUpperCase();
-                })
+                firstType !== 'T' &&
+                functionsToSuggest[name].returnTypes.some(otherType => otherType === firstType)
                   ? 1
                   : 0,
               popular: ko.observable(false),
@@ -725,35 +803,57 @@ class AutocompleteResults {
           });
 
           self.appendEntries(functionSuggestions);
-        });
+          functionsDeferred.resolve();
+        };
+
+        if (self.parseResult.suggestFunctions.types[0] === 'COLREF') {
+          colRefDeferred
+            .done(async colRef => {
+              await addUdfsOfTypes([colRef.type.toUpperCase()]);
+            })
+            .fail(functionsDeferred.reject);
+        } else {
+          getReturnTypesForUdf(self.snippet.connector(), self.parseResult.suggestFunctions.udfRef)
+            .then(addUdfsOfTypes)
+            .catch(async () => {
+              await addUdfsOfTypes(['T']);
+            });
+        }
       } else {
         const types = self.parseResult.suggestFunctions.types || ['T'];
-        const functionsToSuggest = SqlFunctions.getFunctionsWithReturnTypes(
-          self.dialect(),
+
+        getUdfsWithReturnTypes(
+          self.snippet.connector(),
           types,
           self.parseResult.suggestAggregateFunctions || false,
           self.parseResult.suggestAnalyticFunctions || false
-        );
-
-        Object.keys(functionsToSuggest).forEach(name => {
-          functionSuggestions.push({
-            category: CATEGORIES.UDF,
-            value: name + '()',
-            meta: functionsToSuggest[name].returnTypes.join('|'),
-            weightAdjust:
-              types[0].toUpperCase() !== 'T' &&
-              functionsToSuggest[name].returnTypes.some(otherType => {
-                return otherType === types[0].toUpperCase();
-              })
-                ? 1
-                : 0,
-            popular: ko.observable(false),
-            details: functionsToSuggest[name]
-          });
-        });
-        self.appendEntries(functionSuggestions);
+        )
+          .then(functionsToSuggest => {
+            Object.keys(functionsToSuggest).forEach(name => {
+              functionSuggestions.push({
+                category: CATEGORIES.UDF,
+                value: name + '()',
+                meta: functionsToSuggest[name].returnTypes.join('|'),
+                weightAdjust:
+                  types[0].toUpperCase() !== 'T' &&
+                  functionsToSuggest[name].returnTypes.some(otherType => {
+                    return otherType === types[0].toUpperCase();
+                  })
+                    ? 1
+                    : 0,
+                popular: ko.observable(false),
+                details: functionsToSuggest[name]
+              });
+            });
+            self.appendEntries(functionSuggestions);
+            functionsDeferred.resolve();
+          })
+          .catch(functionsDeferred.reject);
       }
+    } else {
+      functionsDeferred.resolve();
     }
+    return functionsDeferred;
   }
 
   handleDatabases(databasesDeferred) {
@@ -929,22 +1029,25 @@ class AutocompleteResults {
           });
         };
 
-        if (suggestColumns.types && suggestColumns.types[0] === 'COLREF') {
-          colRefDeferred.done(colRef => {
-            suggestColumns.tables.forEach(table => {
-              columnDeferrals.push(
-                self.addColumns(table, [colRef.type.toUpperCase()], columnSuggestions)
-              );
-            });
-            waitForCols();
-          });
-        } else {
+        const applyTypes = types => {
           suggestColumns.tables.forEach(table => {
-            columnDeferrals.push(
-              self.addColumns(table, suggestColumns.types || ['T'], columnSuggestions)
-            );
+            columnDeferrals.push(self.addColumns(table, types, columnSuggestions));
           });
           waitForCols();
+        };
+
+        if (suggestColumns.types && suggestColumns.types[0] === 'COLREF') {
+          colRefDeferred.done(colRef => {
+            applyTypes([colRef.type.toUpperCase()]);
+          });
+        } else if (suggestColumns.types && suggestColumns.types[0] === 'UDFREF') {
+          getReturnTypesForUdf(self.snippet.connector(), suggestColumns.udfRef)
+            .then(applyTypes)
+            .catch(() => {
+              applyTypes(['T']);
+            });
+        } else {
+          applyTypes(suggestColumns.types || ['T']);
         }
       } else {
         columnsDeferred.reject();
@@ -1079,14 +1182,8 @@ class AutocompleteResults {
                         name += '[]';
                       }
                       if (
-                        SqlFunctions.matchesType(self.dialect(), types, [
-                          childEntry.getType().toUpperCase()
-                        ]) ||
-                        SqlFunctions.matchesType(
-                          self.dialect(),
-                          [childEntry.getType().toUpperCase()],
-                          types
-                        ) ||
+                        matchesType(self.dialect(), types, [childEntry.getType().toUpperCase()]) ||
+                        matchesType(self.dialect(), [childEntry.getType().toUpperCase()], types) ||
                         childEntry.getType === 'column' ||
                         childEntry.isComplex()
                       ) {
@@ -1651,9 +1748,9 @@ class AutocompleteResults {
             self.cancellablePromises.push(
               multiTableEntry
                 .getTopAggs({ silenceErrors: true, cancellable: true })
-                .done(topAggs => {
-                  const aggregateFunctionsSuggestions = [];
+                .done(async topAggs => {
                   if (topAggs.values && topAggs.values.length > 0) {
+                    const aggregateFunctionsSuggestions = [];
                     // Expand all column names to the fully qualified name including db and table.
                     topAggs.values.forEach(value => {
                       value.aggregateInfo.forEach(info => {
@@ -1698,16 +1795,20 @@ class AutocompleteResults {
                     });
 
                     let totalCount = 0;
-                    topAggs.values.forEach(value => {
+                    for (let i = 0; i < topAggs.values.length; i++) {
+                      const value = topAggs.values[i];
+                      totalCount += value.totalQueryCount;
+
                       let clean = value.aggregateClause;
                       substitutions.forEach(substitution => {
                         clean = clean.replace(substitution.replace, substitution.with);
                       });
-                      totalCount += value.totalQueryCount;
-                      value.function = SqlFunctions.findFunction(
-                        self.dialect(),
+
+                      value.function = await findUdf(
+                        self.snippet.connector(),
                         value.aggregateFunction
                       );
+
                       aggregateFunctionsSuggestions.push({
                         value: clean,
                         meta: value.function.returnTypes.join('|'),
@@ -1716,7 +1817,7 @@ class AutocompleteResults {
                         popular: ko.observable(true),
                         details: value
                       });
-                    });
+                    }
 
                     aggregateFunctionsSuggestions.forEach(suggestion => {
                       suggestion.details.relativePopularity =
@@ -1725,8 +1826,10 @@ class AutocompleteResults {
                           : Math.round((100 * suggestion.details.totalQueryCount) / totalCount);
                       suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
                     });
+                    aggregateFunctionsDeferred.resolve(aggregateFunctionsSuggestions);
+                  } else {
+                    aggregateFunctionsDeferred.resolve([]);
                   }
-                  aggregateFunctionsDeferred.resolve(aggregateFunctionsSuggestions);
                 })
                 .fail(aggregateFunctionsDeferred.reject)
             );
