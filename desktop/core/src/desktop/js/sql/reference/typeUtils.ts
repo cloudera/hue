@@ -18,8 +18,12 @@ import { TYPE_CONVERSION as HIVE_TYPE_CONVERSION } from './hive/typeConversion';
 import { TYPE_CONVERSION as IMPALA_TYPE_CONVERSION } from './impala/typeConversion';
 import { TYPE_CONVERSION as GENERIC_TYPE_CONVERSION } from './generic/typeConversion';
 
-const stripPrecision = function(types) {
-  const result = [];
+export interface TypeConversion {
+  [attr: string]: { [attr: string]: boolean };
+}
+
+const stripPrecision = (types: string[]): string[] => {
+  const result: string[] = [];
   types.forEach(type => {
     if (type.indexOf('(') > -1) {
       result.push(type.substring(0, type.indexOf('(')));
@@ -30,7 +34,7 @@ const stripPrecision = function(types) {
   return result;
 };
 
-const getTypeConversion = dialect => {
+const getTypeConversion = (dialect: string): TypeConversion => {
   if (dialect === 'impala') {
     return IMPALA_TYPE_CONVERSION;
   }
@@ -42,13 +46,12 @@ const getTypeConversion = dialect => {
 
 /**
  * Matches types based on implicit conversion i.e. if you expect a BIGINT then INT is ok but not BOOLEAN etc.
- *
- * @param dialect
- * @param expectedTypes
- * @param actualRawTypes
- * @returns {boolean}
  */
-export const matchesType = function(dialect, expectedTypes, actualRawTypes) {
+export const matchesType = (
+  dialect: string,
+  expectedTypes: string[],
+  actualRawTypes: string[]
+): boolean => {
   if (expectedTypes.length === 1 && expectedTypes[0] === 'T') {
     return true;
   }
