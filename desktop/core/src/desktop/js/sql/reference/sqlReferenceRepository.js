@@ -106,7 +106,11 @@ export const getUdfCategories = async (connector, database) => {
         }
       }
       await mergeWithApiUdfs(categories, connector, database);
-
+      categories.forEach(category => {
+        Object.keys(category.functions).forEach(udfName => {
+          category.functions[udfName].name = udfName;
+        });
+      });
       resolve(categories);
     });
   }
@@ -116,11 +120,10 @@ export const getUdfCategories = async (connector, database) => {
 
 export const findUdf = async (connector, functionName) => {
   const categories = await getUdfCategories(connector);
-  let found = undefined;
-  categories.some(category => {
+  const found = [];
+  categories.forEach(category => {
     if (category.functions[functionName]) {
-      found = category.functions[functionName];
-      return true;
+      found.push(category.functions[functionName]);
     }
   });
   return found;
@@ -130,11 +133,22 @@ export const getReturnTypesForUdf = async (connector, functionName) => {
   if (!functionName) {
     return ['T'];
   }
-  const udf = await findUdf(connector, functionName);
-  if (!udf || !udf.returnTypes) {
-    return ['T'];
+  const udfs = await findUdf(connector, functionName);
+  if (!udfs.length) {
+    let returnTypesPresent = false;
+    const returnTypes = new Set();
+    udfs.forEach(udf => {
+      if (udf.returnTypes) {
+        returnTypesPresent = true;
+        udf.returnTypes.forEach(type => returnTypes.add(type));
+      }
+    });
+    if (returnTypesPresent) {
+      return Array.from(returnTypes.entries());
+    }
   }
-  return udf.returnTypes;
+
+  return ['T'];
 };
 
 export const getUdfsWithReturnTypes = async (
@@ -144,7 +158,7 @@ export const getUdfsWithReturnTypes = async (
   includeAnalytic
 ) => {
   const categories = await getUdfCategories(connector);
-  const result = {};
+  const result = [];
   categories.forEach(category => {
     if (
       (!category.isAnalytic && !category.isAggregate) ||
@@ -154,38 +168,31 @@ export const getUdfsWithReturnTypes = async (
       Object.keys(category.functions).forEach(udfName => {
         const udf = category.functions[udfName];
         if (!returnTypes || matchesType(connector, returnTypes, udf.returnTypes)) {
-          result[udfName] = udf;
+          result.push(udf);
         }
       });
     }
   });
+  result.sort((a, b) => a.name.localeCompare(b.name));
   return result;
 };
 
-export const getArgumentTypesForUdf = async (connector, functionName, argumentPosition) => {
-  const foundFunction = await findUdf(connector, functionName);
-  if (!foundFunction) {
-    return ['T'];
+export const getArgumentDetailsForUdf = async (connector, functionName, argumentPosition) => {
+  const foundFunctions = await findUdf(connector, functionName);
+  if (!foundFunctions.length) {
+    return [{ type: 'T' }];
   }
-  const args = foundFunction.arguments;
-  if (argumentPosition > args.length) {
-    const multiples = args[args.length - 1].filter(type => {
-      return type.multiple;
-    });
-    if (multiples.length > 0) {
-      return multiples
-        .map(argument => {
-          return argument.type;
-        })
-        .sort();
+
+  const possibleArguments = [];
+  foundFunctions.forEach(foundFunction => {
+    const args = foundFunction.arguments;
+    if (argumentPosition > args.length) {
+      possibleArguments.push(...args[args.length - 1].filter(type => type.multiple));
+    } else {
+      possibleArguments.push(...args[argumentPosition - 1]);
     }
-    return [];
-  }
-  return args[argumentPosition - 1]
-    .map(argument => {
-      return argument.type;
-    })
-    .sort();
+  });
+  return possibleArguments;
 };
 
 export const getSetOptions = async connector => {
