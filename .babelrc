@@ -1,10 +1,15 @@
 {
-  "presets": ["@babel/preset-env"],
+  "presets": [
+    "@babel/typescript",
+    "@babel/preset-env"
+  ],
   "plugins": [
     ["module-resolver", {
       "root": ["./desktop/core/src/desktop/js"]
     }],
-    "@babel/plugin-syntax-dynamic-import"
+    "@babel/plugin-syntax-dynamic-import",
+    "@babel/proposal-class-properties",
+    "@babel/proposal-object-rest-spread"
   ],
   "overrides": [{
     "test": "./desktop/core/src/desktop/js/parse/sqlAutocompleteParser.js",
@@ -15,7 +20,7 @@
   }],
   "env": {
     "test": {
-      "presets": ["@babel/preset-env"],
+      "presets": ["@babel/typescript", "@babel/preset-env"],
       "plugins": [
         ["module-resolver", {
           "root": ["./desktop/core/src/desktop/js"]
