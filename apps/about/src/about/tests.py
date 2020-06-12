@@ -41,10 +41,10 @@ class TestAbout(TestAboutBase, OozieBase):
 
   def test_admin_wizard_permissions(self):
     response = self.client_admin.get(reverse('about:index'))
-    assert_true('Check Configuration' in response.content, response.content)
+    assert_true('Step 1: <i class="fa fa-check"></i> Checks' in response.content, response.content)
 
     response = self.client.get(reverse('about:index'))
-    assert_false('Check Configuration' in response.content, response.content)
+    assert_false('Step 1: <i class="fa fa-check"></i> Checks' in response.content, response.content)
 
 
 class TestAboutWithNoCluster(TestAboutBase):
