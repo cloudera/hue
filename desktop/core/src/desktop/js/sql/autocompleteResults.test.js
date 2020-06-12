@@ -348,15 +348,16 @@ describe('AutocompleteResults.js', () => {
     subject.entries([]);
 
     const spy = spyOn(sqlReferenceRepository, 'getUdfsWithReturnTypes').and.callFake(async () =>
-      Promise.resolve({
-        count: {
+      Promise.resolve([
+        {
+          name: 'count',
           returnTypes: ['BIGINT'],
           arguments: [[{ type: 'T' }]],
           signature: 'count(col)',
           draggable: 'count()',
           description: 'some desc'
         }
-      })
+      ])
     );
 
     expect(subject.filtered().length).toBe(0);
@@ -374,6 +375,32 @@ describe('AutocompleteResults.js', () => {
     expect(subject.filtered()[0].details.arguments).toBeDefined();
     expect(subject.filtered()[0].details.signature).toBeDefined();
     expect(subject.filtered()[0].details.description).toBeDefined();
+  });
+
+  it('should handle parse results with udf argument keywords', async () => {
+    subject.entries([]);
+
+    const spy = spyOn(sqlReferenceRepository, 'getArgumentDetailsForUdf').and.callFake(async () =>
+      Promise.resolve([{ type: 'T', keywords: ['a', 'b'] }])
+    );
+
+    expect(subject.filtered().length).toBe(0);
+
+    await subject.update({
+      lowerCase: false,
+      udfArgument: {
+        name: 'someudf',
+        position: 1
+      }
+    });
+
+    await defer();
+
+    expect(spy).toHaveBeenCalled();
+
+    expect(subject.filtered().length).toEqual(2);
+    expect(subject.filtered()[0].value).toEqual('a');
+    expect(subject.filtered()[1].value).toEqual('b');
   });
 
   it('should handle parse results set options', async () => {

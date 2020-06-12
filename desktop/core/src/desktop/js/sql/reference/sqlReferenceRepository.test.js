@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { getArgumentTypesForUdf } from './sqlReferenceRepository';
+import { getArgumentDetailsForUdf } from './sqlReferenceRepository';
 import * as apiUtils from 'sql/reference/apiUtils';
 
 describe('sqlReferenceRepository.js', () => {
@@ -87,44 +87,88 @@ describe('sqlReferenceRepository.js', () => {
 
   jest.spyOn(apiUtils, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
 
-  it('should give the expected argument types at a specific position', async () => {
-    expect(await getArgumentTypesForUdf(hiveConn, 'cos', 1)).toEqual(['DECIMAL', 'DOUBLE']);
-    expect(await getArgumentTypesForUdf(hiveConn, 'cos', 2)).toEqual([]);
-    expect(await getArgumentTypesForUdf(impalaConn, 'cos', 1)).toEqual(['DOUBLE']);
-    expect(await getArgumentTypesForUdf(impalaConn, 'cos', 2)).toEqual([]);
+  const extractType = details => details.type;
 
-    expect(await getArgumentTypesForUdf(hiveConn, 'concat', 10)).toEqual(['BINARY', 'STRING']);
-    expect(await getArgumentTypesForUdf(impalaConn, 'concat', 10)).toEqual(['STRING']);
+  it('should give the expected argument types at a specific position', async () => {
+    expect((await getArgumentDetailsForUdf(hiveConn, 'cos', 1)).map(extractType)).toEqual([
+      'DECIMAL',
+      'DOUBLE'
+    ]);
+    expect((await getArgumentDetailsForUdf(hiveConn, 'cos', 2)).map(extractType)).toEqual([]);
+    expect((await getArgumentDetailsForUdf(impalaConn, 'cos', 1)).map(extractType)).toEqual([
+      'DOUBLE'
+    ]);
+    expect((await getArgumentDetailsForUdf(impalaConn, 'cos', 2)).map(extractType)).toEqual([]);
+
+    expect((await getArgumentDetailsForUdf(hiveConn, 'concat', 10)).map(extractType)).toEqual([
+      'STRING',
+      'BINARY'
+    ]);
+    expect((await getArgumentDetailsForUdf(impalaConn, 'concat', 10)).map(extractType)).toEqual([
+      'STRING'
+    ]);
   });
 
   it('should handle functions with different type of arguments', async () => {
-    expect(await getArgumentTypesForUdf(hiveConn, 'reflect', 1)).toEqual(['STRING']);
-    expect(await getArgumentTypesForUdf(hiveConn, 'reflect', 2)).toEqual(['STRING']);
-    expect(await getArgumentTypesForUdf(hiveConn, 'reflect', 3)).toEqual(['T']);
-    expect(await getArgumentTypesForUdf(hiveConn, 'reflect', 200)).toEqual(['T']);
+    expect((await getArgumentDetailsForUdf(hiveConn, 'reflect', 1)).map(extractType)).toEqual([
+      'STRING'
+    ]);
+    expect((await getArgumentDetailsForUdf(hiveConn, 'reflect', 2)).map(extractType)).toEqual([
+      'STRING'
+    ]);
+    expect((await getArgumentDetailsForUdf(hiveConn, 'reflect', 3)).map(extractType)).toEqual([
+      'T'
+    ]);
+    expect((await getArgumentDetailsForUdf(hiveConn, 'reflect', 200)).map(extractType)).toEqual([
+      'T'
+    ]);
   });
 
   it('should handle functions with an infinite amount of arguments', async () => {
-    expect(await getArgumentTypesForUdf(impalaConn, 'greatest', 1)).toEqual(['T']);
-    expect(await getArgumentTypesForUdf(impalaConn, 'greatest', 200)).toEqual(['T']);
+    expect((await getArgumentDetailsForUdf(impalaConn, 'greatest', 1)).map(extractType)).toEqual([
+      'T'
+    ]);
+    expect((await getArgumentDetailsForUdf(impalaConn, 'greatest', 200)).map(extractType)).toEqual([
+      'T'
+    ]);
 
-    expect(await getArgumentTypesForUdf(hiveConn, 'strleft', 1)).toEqual(['T']);
-    expect(await getArgumentTypesForUdf(hiveConn, 'strleft', 2)).toEqual(['T']);
-    expect(await getArgumentTypesForUdf(hiveConn, 'strleft', 3)).toEqual(['T']);
-    expect(await getArgumentTypesForUdf(hiveConn, 'strleft', 200)).toEqual(['T']);
+    expect((await getArgumentDetailsForUdf(hiveConn, 'strleft', 1)).map(extractType)).toEqual([
+      'T'
+    ]);
+    expect((await getArgumentDetailsForUdf(hiveConn, 'strleft', 2)).map(extractType)).toEqual([
+      'T'
+    ]);
+    expect((await getArgumentDetailsForUdf(hiveConn, 'strleft', 3)).map(extractType)).toEqual([
+      'T'
+    ]);
+    expect((await getArgumentDetailsForUdf(hiveConn, 'strleft', 200)).map(extractType)).toEqual([
+      'T'
+    ]);
   });
 
   it('should not return types for arguments out of bounds', async () => {
-    expect(await getArgumentTypesForUdf(impalaConn, 'strleft', 1)).toEqual(['STRING']);
-    expect(await getArgumentTypesForUdf(impalaConn, 'strleft', 2)).toEqual(['INT']);
-    expect(await getArgumentTypesForUdf(impalaConn, 'strleft', 3)).toEqual([]);
-    expect(await getArgumentTypesForUdf(impalaConn, 'strleft', 200)).toEqual([]);
+    expect((await getArgumentDetailsForUdf(impalaConn, 'strleft', 1)).map(extractType)).toEqual([
+      'STRING'
+    ]);
+    expect((await getArgumentDetailsForUdf(impalaConn, 'strleft', 2)).map(extractType)).toEqual([
+      'INT'
+    ]);
+    expect((await getArgumentDetailsForUdf(impalaConn, 'strleft', 3)).map(extractType)).toEqual([]);
+    expect((await getArgumentDetailsForUdf(impalaConn, 'strleft', 200)).map(extractType)).toEqual(
+      []
+    );
   });
 
   it("should return T for any argument if the udf isn't found", async () => {
-    expect(await getArgumentTypesForUdf(hiveConn, 'blabla', 2)).toEqual(['T']);
-    expect(await getArgumentTypesForUdf(hiveConn, 'blabla', 200)).toEqual(['T']);
-    expect(await getArgumentTypesForUdf(impalaConn, 'blabla', 2)).toEqual(['T']);
-    expect(await getArgumentTypesForUdf(impalaConn, 'blabla', 200)).toEqual(['T']);
+    expect((await getArgumentDetailsForUdf(hiveConn, 'blabla', 2)).map(extractType)).toEqual(['T']);
+    expect((await getArgumentDetailsForUdf(hiveConn, 'blabla', 200)).map(extractType)).toEqual([
+      'T'
+    ]);
+    expect((await getArgumentDetailsForUdf(impalaConn, 'blabla', 2)).map(extractType)).toEqual([
+      'T'
+    ]);
+    expect((await getArgumentDetailsForUdf(impalaConn, 'blabla', 200)).map(extractType)).toEqual([
+      'T'
+    ]);
   });
 });

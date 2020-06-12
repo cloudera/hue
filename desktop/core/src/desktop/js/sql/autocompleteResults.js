@@ -30,7 +30,7 @@ import { cancelActiveRequest } from 'api/apiUtils';
 import { findBrowserConnector, getRootFilePath } from 'utils/hueConfig';
 import {
   findUdf,
-  getArgumentTypesForUdf,
+  getArgumentDetailsForUdf,
   getUdfsWithReturnTypes,
   getReturnTypesForUdf,
   getSetOptions
@@ -508,24 +508,50 @@ class AutocompleteResults {
 
   async adjustForUdfArgument() {
     return new Promise(async resolve => {
-      const foundArgumentTypes = (await getArgumentTypesForUdf(
+      const foundArgumentDetails = (await getArgumentDetailsForUdf(
         this.snippet.connector(),
         this.parseResult.udfArgument.name,
         this.parseResult.udfArgument.position
-      )) || ['T'];
-      if (foundArgumentTypes.length === 0 && this.parseResult.suggestColumns) {
+      )) || [{ type: 'T' }];
+      if (foundArgumentDetails.length === 0 && this.parseResult.suggestColumns) {
         delete this.parseResult.suggestColumns;
         delete this.parseResult.suggestKeyValues;
         delete this.parseResult.suggestValues;
         delete this.parseResult.suggestFunctions;
         delete this.parseResult.suggestIdentifiers;
         delete this.parseResult.suggestKeywords;
-      } else if (foundArgumentTypes[0] !== 'BOOLEAN') {
+      } else if (foundArgumentDetails[0].type !== 'BOOLEAN') {
         if (this.parseResult.suggestFunctions && !this.parseResult.suggestFunctions.types) {
-          this.parseResult.suggestFunctions.types = foundArgumentTypes;
+          this.parseResult.suggestFunctions.types = foundArgumentDetails.map(
+            details => details.type
+          );
         }
         if (this.parseResult.suggestColumns && !this.parseResult.suggestColumns.types) {
-          this.parseResult.suggestColumns.types = foundArgumentTypes;
+          this.parseResult.suggestColumns.types = foundArgumentDetails.map(details => details.type);
+        }
+      }
+      if (foundArgumentDetails.length) {
+        const keywords = [];
+        foundArgumentDetails.forEach(details => {
+          if (details.keywords) {
+            keywords.push(...details.keywords);
+          }
+        });
+        if (keywords.length) {
+          if (!this.parseResult.suggestKeywords) {
+            this.parseResult.suggestKeywords = [];
+          }
+          this.parseResult.suggestKeywords.push(
+            ...keywords.map(keyword => {
+              if (typeof keyword === 'object') {
+                return keyword;
+              }
+              return {
+                value: keyword,
+                weight: 10000 // Bubble up units etc on top
+              };
+            })
+          );
         }
       }
       resolve();
@@ -787,18 +813,17 @@ class AutocompleteResults {
 
           const firstType = types[0].toUpperCase();
 
-          Object.keys(functionsToSuggest).forEach(name => {
+          functionsToSuggest.forEach(udf => {
             functionSuggestions.push({
               category: CATEGORIES.UDF,
-              value: name + '()',
-              meta: functionsToSuggest[name].returnTypes.join('|'),
+              value: udf.name + '()',
+              meta: udf.returnTypes.join('|'),
               weightAdjust:
-                firstType !== 'T' &&
-                functionsToSuggest[name].returnTypes.some(otherType => otherType === firstType)
+                firstType !== 'T' && udf.returnTypes.some(otherType => otherType === firstType)
                   ? 1
                   : 0,
               popular: ko.observable(false),
-              details: functionsToSuggest[name]
+              details: udf
             });
           });
 
@@ -829,20 +854,18 @@ class AutocompleteResults {
           self.parseResult.suggestAnalyticFunctions || false
         )
           .then(functionsToSuggest => {
-            Object.keys(functionsToSuggest).forEach(name => {
+            functionsToSuggest.forEach(udf => {
               functionSuggestions.push({
                 category: CATEGORIES.UDF,
-                value: name + '()',
-                meta: functionsToSuggest[name].returnTypes.join('|'),
+                value: udf.name + '()',
+                meta: udf.returnTypes.join('|'),
                 weightAdjust:
                   types[0].toUpperCase() !== 'T' &&
-                  functionsToSuggest[name].returnTypes.some(otherType => {
-                    return otherType === types[0].toUpperCase();
-                  })
+                  udf.returnTypes.some(otherType => otherType === types[0].toUpperCase())
                     ? 1
                     : 0,
                 popular: ko.observable(false),
-                details: functionsToSuggest[name]
+                details: udf
               });
             });
             self.appendEntries(functionSuggestions);
@@ -1804,10 +1827,14 @@ class AutocompleteResults {
                         clean = clean.replace(substitution.replace, substitution.with);
                       });
 
-                      value.function = await findUdf(
+                      const foundUdfs = await findUdf(
                         self.snippet.connector(),
                         value.aggregateFunction
                       );
+
+                      // TODO: Support showing multiple UDFs with the same name but different category in the autocomplete details.
+                      // For instance, trunc appears both for dates with one description and for numbers with another description.
+                      value.function = foundUdfs.length ? foundUdfs[0] : undefined;
 
                       aggregateFunctionsSuggestions.push({
                         value: clean,
