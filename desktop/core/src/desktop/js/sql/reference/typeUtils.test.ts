@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { matchesType } from 'sql/reference/typeUtils';
+import { matchesType } from './typeUtils';
 
-describe('typeUtils.js', () => {
+describe('typeUtils.ts', () => {
   it('should matchTypes for NUMBER', () => {
     expect(matchesType('hive', ['NUMBER'], ['INT'])).toBeTruthy();
     expect(matchesType('hive', ['NUMBER'], ['BIGINT'])).toBeTruthy();
