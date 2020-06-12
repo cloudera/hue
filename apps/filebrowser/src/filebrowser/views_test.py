@@ -22,6 +22,7 @@ standard_library.install_aliases()
 from builtins import zip
 from builtins import range
 from builtins import object
+from builtins import str
 import json
 import logging
 import os
