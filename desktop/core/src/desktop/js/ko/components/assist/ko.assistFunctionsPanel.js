@@ -138,7 +138,7 @@ class ConnectorUdfCategories {
       }
       const lowerCaseQuery = this.query().toLowerCase();
       const replaceRegexp = new RegExp('(' + lowerCaseQuery + ')', 'i');
-      this.categories.forEach(category => {
+      this.categories().forEach(category => {
         category.functions.forEach(fn => {
           if (fn.signature.toLowerCase().indexOf(lowerCaseQuery) === 0) {
             fn.weight = 2;
