@@ -2319,6 +2319,24 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
       });
     });
 
+    it('should suggest keywords for "SELECT extract(|) FROM bar"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT extract(',
+        afterCursor: ') FROM bar;',
+        containsKeywords: ['CASE'],
+        expectedResult: {
+          lowerCase: false,
+          suggestColumns: {
+            types: ['STRING', 'TIMESTAMP'],
+            source: 'select',
+            tables: [{ identifierChain: [{ name: 'bar' }] }]
+          },
+          suggestFunctions: { types: ['STRING', 'TIMESTAMP'] },
+          udfArgument: { name: 'extract', position: 1 }
+        }
+      });
+    });
+
     it('should suggest columns for "SELECT extract(bla ,|  FROM bar;"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT extract(bla ,',
@@ -2331,7 +2349,8 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
             source: 'select',
             types: ['STRING'],
             tables: [{ identifierChain: [{ name: 'bar' }] }]
-          }
+          },
+          udfArgument: { name: 'extract', position: 2 }
         }
       });
     });
@@ -2348,12 +2367,13 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
             source: 'select',
             types: ['TIMESTAMP'],
             tables: [{ identifierChain: [{ name: 'bar' }] }]
-          }
+          },
+          udfArgument: { name: 'extract', position: 1 }
         }
       });
     });
 
-    it('should suggest columns for "SELECT extract(bla ,|)  FROM bar;"', () => {
+    it('should suggest columns for "SELECT extract(bla ,|) FROM bar;"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT extract(bla ,',
         afterCursor: ') FROM bar;',
@@ -2365,7 +2385,8 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
             source: 'select',
             types: ['STRING'],
             tables: [{ identifierChain: [{ name: 'bar' }] }]
-          }
+          },
+          udfArgument: { name: 'extract', position: 2 }
         }
       });
     });

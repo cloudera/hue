@@ -397,56 +397,67 @@ ExtractFunction_EDIT
  : 'EXTRACT' '(' AnyCursor FromOrComma ValueExpression RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
-     parser.applyTypeToSuggestions({ types: $4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP'] });
+     parser.applyTypeToSuggestions({ types: $4.isFrom ? ['STRING'] : ['TIMESTAMP'] });
+     parser.applyArgumentTypesToSuggestions($1, $4.isFrom ? 2 : 1);
      $$ = { function: $1, types: ['UDFREF'] };
    }
  | 'EXTRACT' '(' AnyCursor FromOrComma RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
-     parser.applyTypeToSuggestions({ types: $4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP'] });
+     var isFrom = $4.toLowerCase() === 'from';
+     parser.applyTypeToSuggestions({ types: $4.isFrom ? ['STRING'] : ['TIMESTAMP'] });
+     parser.applyArgumentTypesToSuggestions($1, $4.isFrom ? 2 : 1);
      $$ = { function: $1, types: ['UDFREF'] };
    }
  | 'EXTRACT' '(' AnyCursor RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
      parser.applyTypeToSuggestions({ types: ['STRING', 'TIMESTAMP'] });
+     parser.applyArgumentTypesToSuggestions($1, 1);
      $$ = { function: $1, types: ['UDFREF'] };
    }
  | 'EXTRACT' '(' ValueExpression_EDIT FromOrComma ValueExpression RightParenthesisOrError
    {
-     parser.applyTypeToSuggestions({ types: $4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP'] });
+     parser.applyTypeToSuggestions({ types: $4.isFrom === 'from' ? ['STRING'] : ['TIMESTAMP'] });
+     parser.applyArgumentTypesToSuggestions($1, $4.isFrom ? 2 : 1);
      $$ = { function: $1, types: ['UDFREF'] };
    }
  | 'EXTRACT' '(' ValueExpression_EDIT FromOrComma RightParenthesisOrError
    {
-     parser.applyTypeToSuggestions({ types: $4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP'] });
+     parser.applyTypeToSuggestions({ types: $4.isFrom ? ['STRING'] : ['TIMESTAMP'] });
+     parser.applyArgumentTypesToSuggestions($1, $4.isFrom ? 2 : 1);
      $$ = { function: $1, types: ['UDFREF'] };
    }
  | 'EXTRACT' '(' ValueExpression_EDIT RightParenthesisOrError
    {
      parser.applyTypeToSuggestions({ types: ['STRING', 'TIMESTAMP'] });
+     parser.applyArgumentTypesToSuggestions($1, 1);
      $$ = { function: $1, types: ['UDFREF'] };
    }
  | 'EXTRACT' '(' ValueExpression FromOrComma AnyCursor RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
-     parser.applyTypeToSuggestions({ types: $4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING'] });
+     parser.applyTypeToSuggestions({ types: $4.isFrom ? ['TIMESTAMP'] : ['STRING'] });
+     parser.applyArgumentTypesToSuggestions($1, $4.isFrom ? 1 : 2);
      $$ = { function: $1, types: ['UDFREF'] };
    }
  | 'EXTRACT' '(' FromOrComma AnyCursor RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
-     parser.applyTypeToSuggestions({ types: $4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING'] });
+     parser.applyTypeToSuggestions({ types: $4.isFrom ? ['TIMESTAMP'] : ['STRING'] });
+     parser.applyArgumentTypesToSuggestions($1, $4.isFrom ? 1 : 2);
      $$ = { function: $1, types: ['UDFREF'] };
    }
  | 'EXTRACT' '(' ValueExpression FromOrComma ValueExpression_EDIT RightParenthesisOrError
    {
-     parser.applyTypeToSuggestions({ types: $4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING'] });
+     parser.applyTypeToSuggestions({ types: $4.isFrom ? ['TIMESTAMP'] : ['STRING'] });
+     parser.applyArgumentTypesToSuggestions($1, $4.isFrom ? 1 : 2);
      $$ = { function: $1, types: ['UDFREF'] };
    }
  | 'EXTRACT' '(' FromOrComma ValueExpression_EDIT RightParenthesisOrError
    {
-    parser.applyTypeToSuggestions({ types: $4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING'] });
+     parser.applyTypeToSuggestions({ types: $4.isFrom ? ['TIMESTAMP'] : ['STRING'] });
+     parser.applyArgumentTypesToSuggestions($1, $4.isFrom ? 1 : 2);
      $$ = { function: $1, types: ['UDFREF'] };
    }
  | 'EXTRACT' '(' ValueExpression 'CURSOR' ValueExpression RightParenthesisOrError
@@ -470,8 +481,8 @@ ExtractFunction_EDIT
  ;
 
 FromOrComma
- : 'FROM'
- | ','
+ : 'FROM' -> { isFrom: true }
+ | ','    -> { isFrom: false }
  ;
 
 SumFunction
