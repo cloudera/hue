@@ -130,11 +130,9 @@ class ClusterMiddleware(object):
     if "fs" in view_kwargs:
       del view_kwargs["fs"]
 
-    request.fs = None
+    request.fs = fsmanager.get_filesystem(request.fs_ref)
 
     if request.user.is_authenticated():
-      request.fs = fsmanager.get_filesystem(request.fs_ref)
-
       if request.fs is not None:
         request.fs.setuser(request.user.username)
 
