@@ -717,7 +717,25 @@ const DATE_FUNCTIONS = {
   },
   date_part: {
     returnTypes: ['TIMESTAMP'],
-    arguments: [[{ type: 'STRING' }], [{ type: 'TIMESTAMP' }]],
+    arguments: [
+      [
+        {
+          type: 'STRING',
+          keywords: [
+            "'epoch'",
+            "'year'",
+            "'quarter'",
+            "'month'",
+            "'day'",
+            "'hour'",
+            "'minute'",
+            "'second'",
+            "'millisecond'"
+          ]
+        }
+      ],
+      [{ type: 'TIMESTAMP' }]
+    ],
     signature: 'date_part(STRING unit, TIMESTAMP timestamp)',
     draggable: 'date_part()',
     description:
@@ -734,7 +752,28 @@ const DATE_FUNCTIONS = {
   },
   date_trunc: {
     returnTypes: ['TIMESTAMP'],
-    arguments: [[{ type: 'STRING' }], [{ type: 'TIMESTAMP' }]],
+    arguments: [
+      [
+        {
+          type: 'STRING',
+          keywords: [
+            "'microseconds'",
+            "'milliseconds'",
+            "'second'",
+            "'minute'",
+            "'hour'",
+            "'day'",
+            "'week'",
+            "'month'",
+            "'year'",
+            "'decade'",
+            "'century'",
+            "'millennium'"
+          ]
+        }
+      ],
+      [{ type: 'TIMESTAMP' }]
+    ],
     signature: 'date_trunc(STRING unit, TIMESTAMP timestamp)',
     draggable: 'date_trunc()',
     description:
@@ -805,7 +844,25 @@ const DATE_FUNCTIONS = {
   },
   extract: {
     returnTypes: ['INT'],
-    arguments: [[{ type: 'TIMESTAMP' }], [{ type: 'STRING' }]],
+    arguments: [
+      [{ type: 'TIMESTAMP' }],
+      [
+        {
+          type: 'STRING',
+          keywords: [
+            "'epoch'",
+            "'year'",
+            "'quarter'",
+            "'month'",
+            "'day'",
+            "'hour'",
+            "'minute'",
+            "'second'",
+            "'millisecond'"
+          ]
+        }
+      ]
+    ],
     signature: 'extract(TIMESTAMP date, STRING unit), extract(STRING unit FROM TIMESTAMP date)',
     draggable: 'extract()',
     description: 'Returns one of the numeric date or time fields from a TIMESTAMP value.'
@@ -981,7 +1038,30 @@ const DATE_FUNCTIONS = {
   },
   next_day: {
     returnTypes: ['TIMESTAMP'],
-    arguments: [[{ type: 'TIMESTAMP' }], [{ type: 'STRING' }]],
+    arguments: [
+      [{ type: 'TIMESTAMP' }],
+      [
+        {
+          type: 'STRING',
+          keywords: [
+            "'Sunday'",
+            "'Sun'",
+            "'Monday'",
+            "'Mon'",
+            "'Tuesday'",
+            "'Tue'",
+            "'Wednesday'",
+            "'Wed'",
+            "'Thursday'",
+            "'Thu'",
+            "'Friday'",
+            "'Fri'",
+            "'Saturday'",
+            "'Sat'"
+          ]
+        }
+      ]
+    ],
     signature: 'next_day(TIMESTAMP date, STRING weekday)',
     draggable: 'next_day()',
     description:
@@ -1073,7 +1153,40 @@ const DATE_FUNCTIONS = {
   },
   trunc: {
     returnTypes: ['TIMESTAMP'],
-    arguments: [[{ type: 'TIMESTAMP' }], [{ type: 'STRING' }]],
+    arguments: [
+      [{ type: 'TIMESTAMP' }],
+      [
+        {
+          type: 'STRING',
+          keywords: [
+            "'SYYYY'",
+            "'YYYY'",
+            "'YEAR'",
+            "'SYEAR'",
+            "'YYY'",
+            "'YY'",
+            "'Y'",
+            "'Q'",
+            "'MONTH'",
+            "'MON'",
+            "'MM'",
+            "'RM'",
+            "'WW'",
+            "'W'",
+            "'DDD'",
+            "'DD'",
+            "'J'",
+            "'DAY'",
+            "'DY'",
+            "'D'",
+            "'HH'",
+            "'HH12'",
+            "'HH24'",
+            "'MI'"
+          ]
+        }
+      ]
+    ],
     signature: 'trunc(TIMESTAMP date, STRING unit)',
     draggable: 'trunc()',
     description:
@@ -1804,7 +1917,7 @@ const BIT_FUNCTIONS = {
   },
   countset: {
     returnTypes: ['T'],
-    arguments: [[{ type: 'T' }], [{ type: 'INT', optional: true }]],
+    arguments: [[{ type: 'T' }], [{ type: 'INT', optional: true, keywords: ['0', '1'] }]],
     signature: 'countset(T<integer_type> a [, INT b])',
     draggable: 'countset()',
     description:
@@ -1836,7 +1949,11 @@ const BIT_FUNCTIONS = {
   },
   setbit: {
     returnTypes: ['T'],
-    arguments: [[{ type: 'T' }], [{ type: 'INT' }], [{ type: 'INT', optional: true }]],
+    arguments: [
+      [{ type: 'T' }],
+      [{ type: 'INT' }],
+      [{ type: 'INT', optional: true, keywords: ['0', '1'] }]
+    ],
     signature: 'setbit(T<integer_type> a, INT b [, INT c])',
     draggable: 'setbit()',
     description:
