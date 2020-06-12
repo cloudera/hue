@@ -34,7 +34,7 @@ module.exports = {
     maxAssetSize: 400 * 1024 // 400kb
   },
   resolve: {
-    extensions: ['.json', '.jsx', '.js', '.vue'],
+    extensions: ['.json', '.jsx', '.js', '.tsx', '.ts', '.vue'],
     modules: ['node_modules', 'js'],
     alias: {
       bootstrap: __dirname + '/node_modules/bootstrap-2.3.2/js',
@@ -65,6 +65,12 @@ module.exports = {
   },
   module: {
     rules: [
+      {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader'
+      },
+      { test: /\.js$/, use: ['source-map-loader'], enforce: 'pre' },
       { test: /\.(html)$/, loader: 'html?interpolate&removeComments=false' },
       { test: /\.less$/, loader: 'style-loader!css-loader!less-loader' },
       { test: /\.css$/, loader: 'style-loader!css-loader' },
