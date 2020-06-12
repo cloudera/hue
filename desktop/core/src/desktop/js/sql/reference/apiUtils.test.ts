@@ -14,45 +14,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { adaptApiFunctions, extractArgumentTypes, mergeArgumentTypes } from './apiUtils';
+import { adaptApiFunctions, ApiUdf, extractArgumentTypes, mergeArgumentTypes } from './apiUtils';
 
 describe('apiUtils.js', () => {
   it('should return the default signature when not defined', () => {
-    const result = extractArgumentTypes({});
+    const result = extractArgumentTypes({ name: 'foo' });
     expect(JSON.stringify(result)).toEqual(JSON.stringify([[{ type: 'T', multiple: true }]]));
   });
 
   it('should extract empty argument types from empty signature', () => {
-    const result = extractArgumentTypes({ signature: '()' });
+    const result = extractArgumentTypes({ name: 'foo', signature: '()' });
     expect(result.length).toEqual(0);
   });
 
   it('should extract single argument type from signature', () => {
-    const result = extractArgumentTypes({ signature: '(INT)' });
+    const result = extractArgumentTypes({ name: 'foo', signature: '(INT)' });
     expect(JSON.stringify(result)).toEqual(JSON.stringify([[{ type: 'INT' }]]));
   });
 
   it('should extract multiple argument types from signature', () => {
-    const result = extractArgumentTypes({ signature: '(INT, BIGINT, TINYINT)' });
+    const result = extractArgumentTypes({ name: 'foo', signature: '(INT, BIGINT, TINYINT)' });
     expect(JSON.stringify(result)).toEqual(
       JSON.stringify([[{ type: 'INT' }], [{ type: 'BIGINT' }], [{ type: 'TINYINT' }]])
     );
   });
 
   it('should ignore precision in the signature', () => {
-    const result = extractArgumentTypes({ signature: '(DECIMAL(*,*))' });
+    const result = extractArgumentTypes({ name: 'foo', signature: '(DECIMAL(*,*))' });
     expect(JSON.stringify(result)).toEqual(JSON.stringify([[{ type: 'DECIMAL' }]]));
   });
 
   it('should support repetitive argument types from signature', () => {
-    const result = extractArgumentTypes({ signature: '(INT, BIGINT...)' });
+    const result = extractArgumentTypes({ name: 'foo', signature: '(INT, BIGINT...)' });
     expect(JSON.stringify(result)).toEqual(
       JSON.stringify([[{ type: 'INT' }], [{ type: 'BIGINT', multiple: true }]])
     );
   });
 
   it('should support repetitive argument types with precision from signature', () => {
-    const result = extractArgumentTypes({ signature: '(INT, CHAR(*)...)' });
+    const result = extractArgumentTypes({ name: 'foo', signature: '(INT, CHAR(*)...)' });
     expect(JSON.stringify(result)).toEqual(
       JSON.stringify([[{ type: 'INT' }], [{ type: 'CHAR', multiple: true }]])
     );
@@ -65,6 +65,24 @@ describe('apiUtils.js', () => {
     mergeArgumentTypes(target, additional);
 
     expect(JSON.stringify(target)).toEqual(JSON.stringify([[{ type: 'INT' }, { type: 'DOUBLE' }]]));
+  });
+
+  it('should merge types with target as T', () => {
+    const target = [[{ type: 'T' }]];
+    const additional = [[{ type: 'DOUBLE' }]];
+
+    mergeArgumentTypes(target, additional);
+
+    expect(JSON.stringify(target)).toEqual(JSON.stringify([[{ type: 'T' }]]));
+  });
+
+  it('should merge types with additional as T', () => {
+    const target = [[{ type: 'STRING' }]];
+    const additional = [[{ type: 'T' }]];
+
+    mergeArgumentTypes(target, additional);
+
+    expect(JSON.stringify(target)).toEqual(JSON.stringify([[{ type: 'T' }]]));
   });
 
   it('should add arguments where missing', () => {
@@ -108,17 +126,13 @@ describe('apiUtils.js', () => {
   });
 
   it('should merge same udf with multiple argument types', () => {
-    const apiFunctions = [
+    const apiFunctions: ApiUdf[] = [
       {
-        is_builtin: 'BUILTIN',
-        is_persistent: 'true',
         name: 'casttochar',
         return_type: 'CHAR(*)',
         signature: '(CHAR(*))'
       },
       {
-        is_builtin: 'BUILTIN',
-        is_persistent: 'true',
         name: 'casttochar',
         return_type: 'CHAR(*)',
         signature: '(INT)'
@@ -135,17 +149,13 @@ describe('apiUtils.js', () => {
   });
 
   it('should merge same udf with multiple return types', () => {
-    const apiFunctions = [
+    const apiFunctions: ApiUdf[] = [
       {
-        is_builtin: 'BUILTIN',
-        is_persistent: 'true',
         name: 'casttochar',
         return_type: 'CHAR(*)',
         signature: '(CHAR(*))'
       },
       {
-        is_builtin: 'BUILTIN',
-        is_persistent: 'true',
         name: 'casttochar',
         return_type: 'VARCHAR(*)',
         signature: '(INT)'

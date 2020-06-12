@@ -16,31 +16,43 @@
 
 import { simplePostAsync } from 'api/apiUtils';
 import { AUTOCOMPLETE_API_PREFIX } from 'api/urls';
+import { Argument, Connector, UdfDetails } from './sqlReferenceRepository';
 import I18n from 'utils/i18n';
+
+export interface ApiUdf {
+  name: string;
+  is_builtin?: string;
+  is_persistent?: string;
+  return_type?: string;
+  signature?: string;
+}
 
 const FUNCTIONS_OPERATION = 'functions';
 const DEFAULT_DESCRIPTION = I18n('No description available.');
-const DEFAULT_RETURN_TYPE = ['T'];
+const DEFAULT_RETURN_TYPES = ['T'];
 const DEFAULT_ARGUMENTS = [[{ type: 'T', multiple: true }]];
 
 const SIGNATURE_REGEX = /([a-z]+(?:\.{3})?)/gi;
 const TYPE_REGEX = /(?<type>[a-z]+)(?<multiple>\.{3})?/i;
 
-const stripPrecision = typeString => typeString.replace(/\(\*(,\*)?\)/g, '');
+const stripPrecision = (typeString: string): string => typeString.replace(/\(\*(,\*)?\)/g, '');
 
-// TODO: Extend with arguments etc reported by the API
-export const adaptApiUdf = apiUdf => {
+const adaptApiUdf = (apiUdf: ApiUdf): UdfDetails => {
   const signature = apiUdf.name + '()';
   return {
-    returnTypes: apiUdf.returnTypes || DEFAULT_RETURN_TYPE,
-    arguments: apiUdf.arguments || DEFAULT_ARGUMENTS,
+    name: apiUdf.name,
+    returnTypes: extractReturnTypes(apiUdf),
+    arguments: extractArgumentTypes(apiUdf),
     signature: signature,
     draggable: signature,
     description: DEFAULT_DESCRIPTION
   };
 };
 
-export const extractArgumentTypes = apiUdf => {
+const extractReturnTypes = (apiUdf: ApiUdf): string[] =>
+  apiUdf.return_type ? [stripPrecision(apiUdf.return_type)] : DEFAULT_RETURN_TYPES;
+
+export const extractArgumentTypes = (apiUdf: ApiUdf): Argument[][] => {
   if (apiUdf.signature) {
     const cleanSignature = stripPrecision(apiUdf.signature);
     if (cleanSignature === '()') {
@@ -50,26 +62,30 @@ export const extractArgumentTypes = apiUdf => {
     if (match) {
       return match.map(argString => {
         const typeMatch = argString.match(TYPE_REGEX);
-        const arg = { type: typeMatch.groups.type };
-        if (typeMatch.groups.multiple) {
-          arg.multiple = true;
+        if (typeMatch && typeMatch.groups) {
+          const arg: Argument = { type: typeMatch.groups.type };
+          if (typeMatch.groups.multiple) {
+            arg.multiple = true;
+          }
+          return [arg];
+        } else {
+          return [];
         }
-        return [arg];
       });
     }
   }
   return DEFAULT_ARGUMENTS;
 };
 
-export const mergeArgumentTypes = (target, additional) => {
+export const mergeArgumentTypes = (target: Argument[][], additional: Argument[][]) => {
   for (let i = 0; i < target.length; i++) {
     if (i >= additional.length) {
       break;
     }
-    if (target[i].type === 'T') {
+    if (target[i][0].type === 'T') {
       continue;
     }
-    if (additional[i].type === 'T') {
+    if (additional[i][0].type === 'T') {
       target[i] = additional[i];
       continue;
     }
@@ -77,39 +93,37 @@ export const mergeArgumentTypes = (target, additional) => {
   }
 };
 
-export const adaptApiFunctions = functions => {
-  const udfs = [];
-  const adapted = {};
+export const adaptApiFunctions = (functions: ApiUdf[]): UdfDetails[] => {
+  const udfs: UdfDetails[] = [];
+  const adapted: { [attr: string]: UdfDetails } = {};
   functions.forEach(apiUdf => {
-    apiUdf.arguments = extractArgumentTypes(apiUdf);
-    apiUdf.returnTypes = apiUdf.return_type ? [stripPrecision(apiUdf.return_type)] : ['T'];
     if (adapted[apiUdf.name]) {
       const adaptedUdf = adapted[apiUdf.name];
-      mergeArgumentTypes(adaptedUdf.arguments, apiUdf.arguments);
+
+      const additionalArgs = extractArgumentTypes(apiUdf);
+      mergeArgumentTypes(adaptedUdf.arguments, additionalArgs);
+
       if (adaptedUdf.returnTypes[0] !== 'T') {
-        if (apiUdf.returnTypes[0] === 'T') {
-          adaptedUdf.returnTypes = ['T'];
-        } else if (adaptedUdf.returnTypes[0] !== apiUdf.returnTypes[0]) {
-          adaptedUdf.returnTypes.push(...apiUdf.returnTypes);
+        const additionalReturnTypes = extractReturnTypes(apiUdf);
+        if (additionalReturnTypes[0] !== 'T') {
+          adaptedUdf.returnTypes.push(...additionalReturnTypes);
+        } else {
+          adaptedUdf.returnTypes = additionalReturnTypes;
         }
       }
     } else {
-      adapted[apiUdf.name] = apiUdf;
-      udfs.push(apiUdf);
+      adapted[apiUdf.name] = adaptApiUdf(apiUdf);
+      udfs.push(adapted[apiUdf.name]);
     }
   });
   return udfs;
 };
 
-/**
- * @param {Object} options
- * @param {Connector} options.connector
- * @param {string} [options.database]
- * @param {boolean} [options.silenceErrors]
- *
- * @return {Promise}
- */
-export const fetchUdfs = async options => {
+export const fetchUdfs = async (options: {
+  connector: Connector;
+  database?: string;
+  silenceErrors: boolean;
+}): Promise<ApiUdf[]> => {
   let url = AUTOCOMPLETE_API_PREFIX;
   if (options.database) {
     url += '/' + options.database;
