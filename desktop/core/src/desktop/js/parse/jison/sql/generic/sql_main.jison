@@ -782,7 +782,7 @@ SelectStatement_EDIT
        }
        parser.suggestKeywords(keywords);
      } else {
-       parser.checkForSelectListKeywords($4);
+       parser.checkForSelectListKeywords($3);
      }
      if ($3.suggestFunctions) {
        parser.suggestFunctions();
@@ -1385,10 +1385,7 @@ OrderByIdentifier_EDIT
  ;
 
 OptionalAscOrDesc
- :
-  {
-    $$ = { suggestKeywords: ['ASC', 'DESC'] };
-  }
+ :                          -> { suggestKeywords: ['ASC', 'DESC'] };
  | 'ASC'
  | 'DESC'
  ;

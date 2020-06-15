@@ -42,6 +42,7 @@ NonParenthesizedValueExpressionPrimary
    }
  | ArbitraryFunctionName ArbitraryFunctionRightPart
   {
+    parser.addFunctionLocation(@1, $1);
     if ($2.expressions && $2.expressions.length) {
       $$ = { function: $1, expression: $2.expressions[$2.expressions.length - 1].expression, types: ['UDFREF'] }
     } else {
@@ -163,7 +164,7 @@ ArbitraryFunctionName
 
 ArbitraryFunctionRightPart
  : '(' ')'
- | '(' ArgumentList ')'  -> $2
+ | '(' UdfArgumentList ')'  -> $2
  ;
 
 ArbitraryFunctionRightPart_EDIT
@@ -175,15 +176,15 @@ ArbitraryFunctionRightPart_EDIT
        expressions: [{ expression: { text: '' }, location: @2 }]
      }
    }
- | '(' ArgumentList 'CURSOR' RightParenthesisOrError
+ | '(' UdfArgumentList 'CURSOR' RightParenthesisOrError
    {
      parser.suggestValueExpressionKeywords($2.expressions[$2.expressions.length - 1].expression);
      $$ = $1;
    }
- | '(' ArgumentList_EDIT RightParenthesisOrError      -> $2
+ | '(' UdfArgumentList_EDIT RightParenthesisOrError      -> $2
  ;
 
-ArgumentList
+UdfArgumentList
  : ValueExpression
    {
      $$ = {
@@ -191,7 +192,7 @@ ArgumentList
        expressions: [{ expression: $1, location: @1 }]
      }
    }
- | ArgumentList ',' ValueExpression
+ | UdfArgumentList ',' ValueExpression
    {
      $$ = {
        activePosition: $1.activePosition + 1,
@@ -200,7 +201,7 @@ ArgumentList
    }
  ;
 
-ArgumentList_EDIT
+UdfArgumentList_EDIT
  : ValueExpression_EDIT
    {
      $$ = {
@@ -208,28 +209,28 @@ ArgumentList_EDIT
        expressions: [{ expression: $1, location: @1 }]
      }
    }
- | ArgumentList ',' ValueExpression_EDIT
+ | UdfArgumentList ',' ValueExpression_EDIT
    {
      $$ = {
        activePosition: $1.activePosition + 1,
        expressions: $1.expressions.concat([{ expression: $3, location: @3 }])
      }
    }
- | ValueExpression_EDIT ',' ArgumentList
+ | ValueExpression_EDIT ',' UdfArgumentList
    {
      $$ = {
        activePosition: 1,
        expressions: [{ expression: $1, location: @1 }].concat($3.expressions)
      }
    }
- | ArgumentList ',' ValueExpression_EDIT ',' ArgumentList
+ | UdfArgumentList ',' ValueExpression_EDIT ',' UdfArgumentList
    {
      $$ = {
        activePosition: $1.activePosition + 1,
        expressions: $1.expressions.concat([{ expression: $3, location: @3 }]).concat($5.expressions)
      }
    }
- | ArgumentList ',' AnyCursor
+ | UdfArgumentList ',' AnyCursor
    {
      parser.valueExpressionSuggest();
      $$ = {
@@ -237,7 +238,7 @@ ArgumentList_EDIT
        expressions: $1.expressions.concat([{ expression: { text: '' }, location: @3 }])
      }
    }
- | ArgumentList ',' AnyCursor ',' ArgumentList
+ | UdfArgumentList ',' AnyCursor ',' UdfArgumentList
    {
      parser.valueExpressionSuggest();
      $$ = {
@@ -245,7 +246,7 @@ ArgumentList_EDIT
        expressions: $1.expressions.concat([{ expression: { text: '' }, location: @3 }]).concat($5.expressions)
      }
    }
- | ArgumentList 'CURSOR' ',' ArgumentList
+ | UdfArgumentList 'CURSOR' ',' UdfArgumentList
    {
      parser.suggestValueExpressionKeywords($1.expressions[$1.expressions.length - 1].expression);
      $$ = {
@@ -253,7 +254,7 @@ ArgumentList_EDIT
        expressions: $1.expressions.concat($4.expressions)
      }
    }
- | AnyCursor ',' ArgumentList
+ | AnyCursor ',' UdfArgumentList
    {
      parser.valueExpressionSuggest();
      $$ = {
@@ -279,7 +280,7 @@ ArgumentList_EDIT
        expressions: [{ expression: { text: '' }, location: @1 }, { expression: { text: '' }, location: @2 }]
      };
    }
- | ',' AnyCursor ',' ArgumentList
+ | ',' AnyCursor ',' UdfArgumentList
    {
      parser.valueExpressionSuggest();
      $$ = {
@@ -304,12 +305,10 @@ AggregateFunction_EDIT
 AnalyticFunction
  : 'ANALYTIC' '(' ')'
   {
-    parser.addFunctionLocation(@1, $1);
     $$ = { function: $1, types: ['UDFREF'] }
   }
- | 'ANALYTIC' '(' ArgumentList ')'
+ | 'ANALYTIC' '(' UdfArgumentList ')'
    {
-     parser.addFunctionLocation(@1, $1);
      parser.addFunctionArgumentLocations($1, $3.expressions);
      $$ = {
        function: $1,
@@ -322,21 +321,18 @@ AnalyticFunction
 AnalyticFunction_EDIT
  : 'ANALYTIC' '(' AnyCursor RightParenthesisOrError
    {
-     parser.addFunctionLocation(@1, $1);
      parser.valueExpressionSuggest();
      parser.applyArgumentTypesToSuggestions($1, 1);
      $$ = { function: $1, types: ['UDFREF'] };
    }
- | 'ANALYTIC' '(' ArgumentList 'CURSOR' RightParenthesisOrError
+ | 'ANALYTIC' '(' UdfArgumentList 'CURSOR' RightParenthesisOrError
    {
-     parser.addFunctionLocation(@1, $1);
      parser.addFunctionArgumentLocations($1, $3.expressions);
      parser.suggestValueExpressionKeywords($3.expressions[$3.expressions.length - 1].expression);
      $$ = { function: $1, types: ['UDFREF'] };
    }
- | 'ANALYTIC' '(' ArgumentList_EDIT RightParenthesisOrError
+ | 'ANALYTIC' '(' UdfArgumentList_EDIT RightParenthesisOrError
    {
-     parser.addFunctionLocation(@1, $1);
      parser.addFunctionArgumentLocations($1, $3.expressions);
      parser.applyArgumentTypesToSuggestions($1, $3.activePosition);
      $$ = { function: $1, types: ['UDFREF'] };
@@ -372,7 +368,7 @@ CastFunction
          first_line: @3.first_line,
          last_line: @5.last_line,
          first_column: @3.first_column,
-         last_column: @3.last_column
+         last_column: @5.last_column
        }
      }]);
      $$ = { types: [ $5.toUpperCase() ] }
@@ -434,7 +430,7 @@ CountFunction
    {
      $$ = { function: $1, types: ['UDFREF'] }
    }
- | 'COUNT' '(' OptionalAllOrDistinct ArgumentList ')'
+ | 'COUNT' '(' OptionalAllOrDistinct UdfArgumentList ')'
    {
      parser.addFunctionArgumentLocations($1, $4.expressions);
      $$ = { function: $1, types: ['UDFREF'] }
@@ -455,12 +451,12 @@ CountFunction_EDIT
      parser.suggestKeywords(keywords);
      $$ = { function: $1, types: ['UDFREF'] };
    }
- | 'COUNT' '(' OptionalAllOrDistinct ArgumentList 'CURSOR' RightParenthesisOrError
+ | 'COUNT' '(' OptionalAllOrDistinct UdfArgumentList 'CURSOR' RightParenthesisOrError
    {
      parser.suggestValueExpressionKeywords($4.expressions[$4.expressions.length - 1].expression);
      $$ = { function: $1, types: ['UDFREF'] };
    }
- | 'COUNT' '(' OptionalAllOrDistinct ArgumentList_EDIT RightParenthesisOrError
+ | 'COUNT' '(' OptionalAllOrDistinct UdfArgumentList_EDIT RightParenthesisOrError
    {
      if ($4.cursorAtStart) {
        var keywords = parser.getSelectListKeywords();
@@ -478,7 +474,7 @@ OtherAggregateFunction
    {
      $$ = { function: $1, types: ['UDFREF'] };
    }
- | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ArgumentList ')'
+ | OtherAggregateFunction_Type '(' OptionalAllOrDistinct UdfArgumentList ')'
    {
      parser.addFunctionArgumentLocations($1, $4.expressions);
      $$ = { function: $1, types: ['UDFREF'] };
@@ -504,12 +500,12 @@ OtherAggregateFunction_EDIT
      parser.applyArgumentTypesToSuggestions($1, 1);
      $$ = { function: $1, types: ['UDFREF'] };
    }
- | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ArgumentList 'CURSOR' RightParenthesisOrError
+ | OtherAggregateFunction_Type '(' OptionalAllOrDistinct UdfArgumentList 'CURSOR' RightParenthesisOrError
    {
      parser.suggestValueExpressionKeywords($4.expressions[$4.expressions.length - 1].expression);
      $$ = { function: $1, types: ['UDFREF'] };
    }
- | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ArgumentList_EDIT RightParenthesisOrError
+ | OtherAggregateFunction_Type '(' OptionalAllOrDistinct UdfArgumentList_EDIT RightParenthesisOrError
    {
      if ($4.cursorAtStart) {
        var keywords = parser.getSelectListKeywords(true);
