@@ -56,7 +56,6 @@ from hadoop import pseudo_hdfs4
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.webhdfs import WebHdfs
 from useradmin.models import User, Group
-from liboozie.oozie_api_tests import OozieServerProvider
 
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE
 from filebrowser.lib.rwx import expand_mode
@@ -253,8 +252,6 @@ class TestFileBrowserWithHadoop(object):
     self.cluster.fs.setuser('test')
     self.prefix = self.cluster.fs_prefix + '/filebrowser'
     self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
-
-    OozieServerProvider.setup_class()
 
   def tearDown(self):
     cleanup_tree(self.cluster, self.prefix)
