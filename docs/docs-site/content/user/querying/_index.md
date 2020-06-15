@@ -182,7 +182,7 @@ Here is an example of SQL for using them:
     TBLPROPERTIES ('kudu.num_tablet_replicas' = '1')
     ;
 
-## Foreign Keys
+#### Foreign Keys
 
 When a column value points to another column in another table. e.g. The head of the business unit must exist in the person table:
 
