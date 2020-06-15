@@ -3964,7 +3964,7 @@ class TExecuteStatementReq(object):
             oprot.writeFieldEnd()
         if self.statement is not None:
             oprot.writeFieldBegin('statement', TType.STRING, 2)
-            oprot.writeString(self.statement.encode('utf-8') if sys.version_info[0] == 2 else self.statement)
+            oprot.writeString(self.statement)
             oprot.writeFieldEnd()
         if self.confOverlay is not None:
             oprot.writeFieldBegin('confOverlay', TType.MAP, 3)
