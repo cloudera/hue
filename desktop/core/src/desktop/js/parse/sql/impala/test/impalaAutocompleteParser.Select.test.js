@@ -419,6 +419,14 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
               function: 'count'
             },
             {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 14, last_column: 15 },
+              function: 'count',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'count' }],
+              expression: { text: '*' }
+            },
+            {
               type: 'table',
               location: { first_line: 1, last_line: 1, first_column: 18, last_column: 21 },
               identifierChain: [{ name: 'autocomp_test' }]
@@ -434,6 +442,14 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
               type: 'function',
               location: { first_line: 1, last_line: 1, first_column: 29, last_column: 32 },
               function: 'avg'
+            },
+            {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 34, last_column: 36 },
+              function: 'avg',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'avg' }],
+              expression: { types: ['COLREF'], columnReference: [{ name: 'id' }] }
             },
             {
               type: 'column',
@@ -2251,6 +2267,14 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
               location: { first_line: 1, last_line: 1, first_column: 11, last_column: 19 },
               identifierChain: [{ name: 'db' }, { name: 'customUdf' }],
               function: 'customudf'
+            },
+            {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 21, last_column: 24 },
+              function: 'customudf',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'db' }, { name: 'customUdf' }],
+              expression: { types: ['COLREF'], columnReference: [{ name: 'col' }] }
             },
             {
               type: 'column',
