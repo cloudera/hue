@@ -158,6 +158,7 @@ INFO  : OK"""
 
   def test_install_examples(self):
     with patch('beeswax.management.commands.beeswax_install_examples.Command') as Command:
+      grant_access("test_hive", "default", "beeswax")
       resp = self.client.get('/beeswax/install_examples')
       assert_true('POST request is required.' in json.loads(resp.content)['message'])
 
