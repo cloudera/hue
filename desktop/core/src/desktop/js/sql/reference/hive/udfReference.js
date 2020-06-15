@@ -828,7 +828,10 @@ const DATE_FUNCTIONS = {
   },
   trunc: {
     returnTypes: ['STRING'],
-    arguments: [[{ type: 'STRING' }], [{ type: 'STRING' }]],
+    arguments: [
+      [{ type: 'STRING' }],
+      [{ type: 'STRING', keywords: ["'MONTH'", "'MON'", "'MM'", "'YEAR'", "'YYYY'", "'YY'"] }]
+    ],
     signature: 'trunc(STRING date, STRING format)',
     draggable: 'trunc()',
     description:
@@ -979,7 +982,22 @@ const STRING_FUNCTIONS = {
   },
   decode: {
     returnTypes: ['STRING'],
-    arguments: [[{ type: 'BINARY' }], [{ type: 'STRING' }]],
+    arguments: [
+      [{ type: 'BINARY' }],
+      [
+        {
+          type: 'STRING',
+          keywords: [
+            "'US-ASCII'",
+            "'ISO-8859-1'",
+            "'UTF-8'",
+            "'UTF-16BE'",
+            "'UTF-16LE'",
+            "'UTF-16'"
+          ]
+        }
+      ]
+    ],
     signature: 'decode(BINARY bin, STRING charset)',
     draggable: 'decode()',
     description:
@@ -995,7 +1013,22 @@ const STRING_FUNCTIONS = {
   },
   encode: {
     returnTypes: ['BINARY'],
-    arguments: [[{ type: 'STRING' }], [{ type: 'STRING' }]],
+    arguments: [
+      [{ type: 'STRING' }],
+      [
+        {
+          type: 'STRING',
+          keywords: [
+            "'US-ASCII'",
+            "'ISO-8859-1'",
+            "'UTF-8'",
+            "'UTF-16BE'",
+            "'UTF-16LE'",
+            "'UTF-16'"
+          ]
+        }
+      ]
+    ],
     signature: 'encode(STRING src, STRING charset)',
     draggable: 'encode()',
     description:
