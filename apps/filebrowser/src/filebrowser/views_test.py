@@ -1155,7 +1155,7 @@ alert("XSS")
       timeout_time = time() + 25
       end_time = time()
       while timeout_time > end_time:
-        resp2 = self.c.post('/jobbrowser/api/job/workflows', {'interface': '"workflows"', 'app_id': responseid}) #error here
+        resp2 = self.c.post('/jobbrowser/api/job/workflows', {'interface': '"workflows"', 'app_id': responseid})
         response2 = json.loads(resp2.content)
         if response2['app']['status'] != 'RUNNING':
           assert_equal(response2['app']['status'] , 'SUCCEEDED', response2)
