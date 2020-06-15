@@ -1763,7 +1763,8 @@ for x in sys.stdin:
 
     history = beeswax.models.QueryHistory.objects.latest('id')
     assert_equal('beeswax', history.server_name)
-    assert_equal(HIVE_SERVER_HOST.get(), history.server_host)
+    assert_true(history.server_host in [HIVE_SERVER_HOST.get(), 'localhost'])
+
 
     query_server = history.get_query_server_config()
     assert_equal('beeswax', query_server['server_name'])
