@@ -53,7 +53,7 @@ function Plugin(element, options) {
   this.init();
 }
 
-Plugin.prototype.setOptions = function(options) {
+Plugin.prototype.setOptions = function (options) {
   this.options = $.extend({}, defaults, options);
   this.options.labels = $.extend(
     {},
@@ -77,31 +77,29 @@ Plugin.prototype.setOptions = function(options) {
   }
 };
 
-Plugin.prototype.resetSource = function() {
+Plugin.prototype.resetSource = function () {
   const _this = this;
   if (_this.options.includeNavigator) {
     const source = [];
     $(this.element)
       .find('th')
-      .each(function() {
+      .each(function () {
         source.push($(this).text());
       });
 
-    $('#jHueTableExtenderNavigator')
-      .find('input')
-      .data('typeahead').source = source;
+    $('#jHueTableExtenderNavigator').find('input').data('typeahead').source = source;
   }
 };
 
-Plugin.prototype.drawHeader = function(skipCreation) {
+Plugin.prototype.drawHeader = function (skipCreation) {
   drawHeader(this, skipCreation);
 };
 
-Plugin.prototype.drawFirstColumn = function() {
+Plugin.prototype.drawFirstColumn = function () {
   drawFirstColumn(this);
 };
 
-Plugin.prototype.drawLockedRows = function(force) {
+Plugin.prototype.drawLockedRows = function (force) {
   const _this = this;
   const $pluginElement = $(_this.element);
   if ($pluginElement.data('lockedRows')) {
@@ -112,8 +110,8 @@ Plugin.prototype.drawLockedRows = function(force) {
   }
 };
 
-Plugin.prototype.init = function() {
-  $.expr[':'].econtains = function(obj, index, meta, stack) {
+Plugin.prototype.init = function () {
+  $.expr[':'].econtains = function (obj, index, meta, stack) {
     return (
       (obj.textContent || obj.innerText || $(obj).text() || '').toLowerCase() ==
       meta[3].toLowerCase()
@@ -127,11 +125,9 @@ Plugin.prototype.init = function() {
       .attr('href', '#')
       .addClass('pull-right')
       .html('&times;')
-      .click(function(e) {
+      .click(function (e) {
         e.preventDefault();
-        $(this)
-          .parent()
-          .hide();
+        $(this).parent().hide();
       })
       .appendTo(jHueTableExtenderNavigator);
     $('<label>')
@@ -154,9 +150,7 @@ Plugin.prototype.init = function() {
             $('.columnSelected').removeClass('columnSelected');
             $('.cellSelected').removeClass('cellSelected');
             $(event.target.parentNode).addClass('rowSelected');
-            $(event.target.parentNode)
-              .find('td')
-              .addClass('rowSelected');
+            $(event.target.parentNode).find('td').addClass('rowSelected');
             jHueTableExtenderNavigator
               .css(
                 'left',
@@ -174,13 +168,13 @@ Plugin.prototype.init = function() {
     const source = [];
     $(_this.element)
       .find('th')
-      .each(function() {
+      .each(function () {
         source.push($(this).text());
       });
 
     jHueTableExtenderNavigator.find('input').typeahead({
       source: source,
-      updater: function(item) {
+      updater: function (item) {
         jHueTableExtenderNavigator.hide();
         $(_this.element)
           .find(
@@ -202,17 +196,10 @@ Plugin.prototype.init = function() {
                   1) +
                 ')'
             )
-            .each(function() {
+            .each(function () {
               $(this)
                 .attr('rel', 'tooltip')
-                .attr(
-                  'title',
-                  '#' +
-                    $(this)
-                      .parent()
-                      .find('td:first-child')
-                      .text()
-                )
+                .attr('title', '#' + $(this).parent().find('td:first-child').text())
                 .tooltip({
                   placement: 'left'
                 });
@@ -226,12 +213,8 @@ Plugin.prototype.init = function() {
                 $(_this.element)
                   .find('th:econtains(' + item + ')')
                   .position().left +
-                $(_this.element)
-                  .parent()
-                  .scrollLeft() -
-                $(_this.element)
-                  .parent()
-                  .offset().left -
+                $(_this.element).parent().scrollLeft() -
+                $(_this.element).parent().offset().left -
                 30
             },
             300
@@ -290,7 +273,7 @@ Plugin.prototype.init = function() {
     drawFirstColumn(_this);
   }
 
-  $(document).on('click dblclick', '.dataTables_wrapper > table tbody tr', function() {
+  $(document).on('click dblclick', '.dataTables_wrapper > table tbody tr', function () {
     $(
       '.dataTables_wrapper > .jHueTableExtenderClonedContainerColumn table tbody tr.selected'
     ).removeClass('selected');
@@ -306,7 +289,7 @@ Plugin.prototype.init = function() {
       ).addClass('selected');
     }
   });
-  $(document).on('dblclick', '.dataTables_wrapper > table tbody tr', function() {
+  $(document).on('dblclick', '.dataTables_wrapper > table tbody tr', function () {
     if (huePubSub) {
       huePubSub.publish('table.row.show.details', {
         idx: $(this).index(),
@@ -329,7 +312,7 @@ function drawLockedRow(plugin, rowNo, force) {
   function unlock($el) {
     $header
       .find('tr td:first-child')
-      .filter(function() {
+      .filter(function () {
         return $(this).text() === rowNo + '';
       })
       .closest('tr')
@@ -372,7 +355,7 @@ function drawLockedRow(plugin, rowNo, force) {
           '</td>'
       )
       .appendTo($headerCounter.find('tbody'));
-    $newTr.find('td').on('click', function() {
+    $newTr.find('td').on('click', function () {
       unlock($(this));
     });
     lockedRows['r' + rowNo] = {
@@ -382,7 +365,7 @@ function drawLockedRow(plugin, rowNo, force) {
   } else {
     lockedRows['r' + rowNo].row.appendTo($header.find('tbody'));
     lockedRows['r' + rowNo].cell.appendTo($headerCounter.find('tbody'));
-    lockedRows['r' + rowNo].cell.find('td').on('click', function() {
+    lockedRows['r' + rowNo].cell.find('td').on('click', function () {
       unlock($(this));
     });
   }
@@ -442,31 +425,24 @@ function drawFirstColumn(plugin) {
     .html('<thead></thead><tbody></tbody>');
   clonedTable.removeClass(plugin.options.classToRemove);
   clonedTable.css('margin-bottom', '0').css('table-layout', 'fixed');
-  $(plugin.element)
-    .find('thead>tr th:eq(0)')
-    .clone()
-    .appendTo(clonedTable.find('thead'));
+  $(plugin.element).find('thead>tr th:eq(0)').clone().appendTo(clonedTable.find('thead'));
   const clonedTBody = clonedTable.find('tbody');
-  const clones = $(plugin.element)
-    .find('tbody>tr td:nth-child(1)')
-    .clone();
+  const clones = $(plugin.element).find('tbody>tr td:nth-child(1)').clone();
   let h = '';
-  clones.each(function() {
+  clones.each(function () {
     h += '<tr><td>' + $(this).html() + '</td></tr>';
   });
   clonedTBody.html(h);
   if (plugin.options.lockSelectedRow) {
-    clonedTBody.find('td').each(function() {
+    clonedTBody.find('td').each(function () {
       const cell = $(this);
       cell
         .attr('title', plugin.options.labels.LOCK)
         .addClass('lockable pointer')
-        .on('click', function() {
+        .on('click', function () {
           drawLockedRow(plugin, $(this).text() * 1);
         });
-      $('<i>')
-        .addClass('fa fa-lock muted')
-        .prependTo(cell);
+      $('<i>').addClass('fa fa-lock muted').prependTo(cell);
     });
   }
   clonedTable
@@ -572,14 +548,14 @@ function drawHeader(plugin, skipCreation) {
 
     clonedTable.find('thead>tr th').wrapInner('<span></span>');
 
-    $pluginElement.find('thead>tr th').each(function(i) {
+    $pluginElement.find('thead>tr th').each(function (i) {
       const originalTh = $(this);
       originalTh.removeAttr('data-bind');
       clonedTable
         .find('thead>tr th:eq(' + i + ')')
         .width(originalTh.width())
         .css('background-color', '#FFFFFF')
-        .click(function() {
+        .click(function () {
           originalTh.click();
           if (plugin.options.headerSorting) {
             clonedTable.find('thead>tr th').attr('class', 'sorting');
@@ -610,31 +586,21 @@ function drawHeader(plugin, skipCreation) {
 
     const throttledHeaderPadding = () => {
       const firstCellWidth = clonedTable.find('thead>tr th:eq(0)').outerWidth();
-      clonedTable.find('thead>tr th').each(function() {
+      clonedTable.find('thead>tr th').each(function () {
         const leftPosition = $(this).position().left - firstCellWidth;
         if (leftPosition + $(this).outerWidth() > 0 && leftPosition < 0) {
-          if (
-            $(this)
-              .find('span')
-              .width() +
-              -leftPosition <
-            $(this).outerWidth() - 20
-          ) {
+          if ($(this).find('span').width() + -leftPosition < $(this).outerWidth() - 20) {
             // 20 is the sorting css width
-            $(this)
-              .find('span')
-              .css('paddingLeft', -leftPosition);
+            $(this).find('span').css('paddingLeft', -leftPosition);
           }
         } else {
-          $(this)
-            .find('span')
-            .css('paddingLeft', 0);
+          $(this).find('span').css('paddingLeft', 0);
         }
       });
     };
 
     let scrollTimeout = -1;
-    $pluginElement.parent().scroll(function() {
+    $pluginElement.parent().scroll(function () {
       const scrollLeft = $(this).scrollLeft();
       clonedTableVisibleContainer.scrollLeft(scrollLeft);
       window.clearTimeout(scrollTimeout);
@@ -655,7 +621,7 @@ function drawHeader(plugin, skipCreation) {
         if ($pluginElement.parent().width() != $pluginElement.parent().data('w')) {
           clonedTableVisibleContainer.width($pluginElement.parent().width());
           $pluginElement.parent().data('w', clonedTableVisibleContainer.width());
-          $pluginElement.find('thead>tr th').each(function(i) {
+          $pluginElement.find('thead>tr th').each(function (i) {
             clonedTable
               .find('thead>tr th:eq(' + i + ')')
               .width($(this).width())
@@ -668,7 +634,7 @@ function drawHeader(plugin, skipCreation) {
     );
     $pluginElement.data('header_interval', headerInt);
 
-    $pluginElement.parent().resize(function() {
+    $pluginElement.parent().resize(function () {
       clonedTableVisibleContainer.width($(this).width());
     });
 
@@ -697,7 +663,7 @@ function drawHeader(plugin, skipCreation) {
     $('#' + $pluginElement.attr('id') + 'jHueTableExtenderClonedContainer')
       .children('div')
       .width($pluginElement.outerWidth());
-    $pluginElement.find('thead>tr th').each(function(i) {
+    $pluginElement.find('thead>tr th').each(function (i) {
       const originalTh = $(this);
       $('#' + $pluginElement.attr('id') + 'jHueTableExtenderClonedContainer')
         .find('thead>tr th:eq(' + i + ')')
@@ -719,8 +685,8 @@ function getSelection() {
   return t.toString();
 }
 
-$.fn[pluginName] = function(options) {
-  return this.each(function() {
+$.fn[pluginName] = function (options) {
+  return this.each(function () {
     if (!$.data(this, 'plugin_' + pluginName)) {
       $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
     } else {

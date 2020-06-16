@@ -60,7 +60,7 @@ class JobBrowserPanel {
     const $jobsPanel = $('#jobsPanel');
     const $toggle = $('.btn-toggle-jobs-panel');
 
-    const reposition = function() {
+    const reposition = function () {
       $jobsPanel.css('top', $toggle.offset().top + $toggle.height() + 15 + 'px');
       $jobsPanel.css('left', $container.offset().left + $container.width() - 630 + 'px');
     };
@@ -107,7 +107,7 @@ class JobBrowserPanel {
     self.onePageViewModel = params.onePageViewModel;
 
     let lastYarnBrowserRequest = null;
-    const checkYarnBrowserStatus = function() {
+    const checkYarnBrowserStatus = function () {
       return $.post('/jobbrowser/jobs/', {
         format: 'json',
         state: 'running',
@@ -125,7 +125,7 @@ class JobBrowserPanel {
         });
     };
     let lastScheduleBrowserRequest = undefined;
-    const checkScheduleBrowserStatus = function() {
+    const checkScheduleBrowserStatus = function () {
       return $.post(
         '/scheduler/api/schedule/list',
         {
@@ -147,7 +147,7 @@ class JobBrowserPanel {
       );
     };
     let lastHistoryBrowserRequest = null;
-    const checkHistoryBrowserStatus = function() {
+    const checkHistoryBrowserStatus = function () {
       return $.post('/jobbrowser/api/jobs/history', {
         interface: ko.mapping.toJSON('history'),
         filters: ko.mapping.toJSON([
@@ -169,7 +169,7 @@ class JobBrowserPanel {
     };
 
     let checkJobBrowserStatusIdx = -1;
-    const checkJobBrowserStatus = function() {
+    const checkJobBrowserStatus = function () {
       lastYarnBrowserRequest = checkYarnBrowserStatus();
       if (window.ENABLE_QUERY_SCHEDULING) {
         lastScheduleBrowserRequest = checkScheduleBrowserStatus();
@@ -195,11 +195,11 @@ class JobBrowserPanel {
     // Load the mini jobbrowser
     $.ajax({
       url: '/jobbrowser/apps?is_embeddable=true&is_mini=true',
-      beforeSend: function(xhr) {
+      beforeSend: function (xhr) {
         xhr.setRequestHeader('X-Requested-With', 'Hue');
       },
       dataType: 'html',
-      success: function(response) {
+      success: function (response) {
         params.onePageViewModel.processHeaders(response).done(rawHtml => {
           $('#mini_jobbrowser').html(rawHtml);
           //ko.bindingHandlers.delayedOverflow.init($('#mini_jobbrowser')[0]);

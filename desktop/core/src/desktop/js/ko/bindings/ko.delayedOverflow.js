@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.delayedOverflow = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const $element = $(element);
 
     $element.css('overflow', 'hidden');

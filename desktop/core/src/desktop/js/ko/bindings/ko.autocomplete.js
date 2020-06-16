@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.autocomplete = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     let options = valueAccessor();
     const $element = $(element);
     const getMenuElement = () => {
@@ -32,14 +32,14 @@ ko.bindingHandlers.autocomplete = {
 
     const delay = 400;
 
-    const showSpinner = function() {
+    const showSpinner = function () {
       if (options.showSpinner) {
         $element.addClass('input-spinner');
       }
     };
 
     let spinThrottle = -1;
-    const hideSpinner = function() {
+    const hideSpinner = function () {
       window.clearTimeout(spinThrottle);
       $element.removeClass('input-spinner');
     };
@@ -55,16 +55,16 @@ ko.bindingHandlers.autocomplete = {
         limitWidthToInput: false,
         minWidth: 200,
         delay: delay,
-        search: function() {
+        search: function () {
           window.clearTimeout(spinThrottle);
           if (!$element.hueAutocomplete('option', 'disabled')) {
             spinThrottle = window.setTimeout(showSpinner, 50);
           }
         },
-        open: function() {
+        open: function () {
           hideSpinner();
         },
-        close: function() {
+        close: function () {
           hideSpinner();
         }
       },
@@ -73,7 +73,7 @@ ko.bindingHandlers.autocomplete = {
 
     if (options.addCount) {
       const oldSource = options.source;
-      options.source = function(request, callback) {
+      options.source = function (request, callback) {
         oldSource(request, values => {
           callback(values);
           const $menu = $($element.data('custom-hueAutocomplete').menu.element);
@@ -95,7 +95,7 @@ ko.bindingHandlers.autocomplete = {
 
     if (typeof $().hueAutocomplete === 'undefined') {
       $.widget('custom.hueAutocomplete', $.ui.autocomplete, {
-        _renderItemData: function(ul, item) {
+        _renderItemData: function (ul, item) {
           if (item.error && this.options.errorTemplate) {
             const $li = $(
               '<li data-bind="template: { name: \'' + this.options.errorTemplate + '\' }">'
@@ -128,13 +128,13 @@ ko.bindingHandlers.autocomplete = {
             ko.applyBindings(item.data, $li[0]);
           }
         },
-        _resizeMenu: function() {
+        _resizeMenu: function () {
           // This overrides the default behaviour of using dropdown width of the same size as input autocomplete box
           if (options.limitWidthToInput) {
             this.menu.element.outerWidth(options.minWidth);
           }
         },
-        _renderMenu: function(ul, items) {
+        _renderMenu: function (ul, items) {
           const self = this;
           hideSpinner();
           if (options.limitWidthToInput) {
@@ -221,7 +221,7 @@ ko.bindingHandlers.autocomplete = {
 
     if (options.reopenPattern || options.valueObservable || options.onSelect) {
       const oldSelect = options.select;
-      options.select = function(event, ui) {
+      options.select = function (event, ui) {
         if (options.reopenPattern && options.reopenPattern.test(ui.item.value)) {
           window.setTimeout(() => {
             $element.hueAutocomplete('search', $element.val());

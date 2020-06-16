@@ -20,7 +20,7 @@ import d3v3 from 'd3v3';
 import nv from 'ext/nv.d3.1.1.15b.custom';
 
 //TODO: consider deprecating by adding necessary features to multiBar model
-nv.models.growingDiscreteBar = function() {
+nv.models.growingDiscreteBar = function () {
   'use strict';
   //============================================================
   // Public Variables with Default Settings
@@ -32,10 +32,10 @@ nv.models.growingDiscreteBar = function() {
     id = Math.floor(Math.random() * 10000), //Create semi-unique ID in case user doesn't select one
     x = d3v3.scale.ordinal(),
     y = d3v3.scale.linear(),
-    getX = function(d) {
+    getX = function (d) {
       return d.x;
     },
-    getY = function(d) {
+    getY = function (d) {
       return d.y;
     },
     forceY = [0], // 0 is forced by default.. this makes sense for the majority of bar graphs... user can always do chart.forceY([]) to remove
@@ -67,7 +67,7 @@ nv.models.growingDiscreteBar = function() {
   //============================================================
 
   function chart(selection) {
-    selection.each(function(data) {
+    selection.each(function (data) {
       const availableWidth = width - margin.left - margin.right,
         availableHeight = height - margin.top - margin.bottom,
         container = d3v3.select(this);
@@ -131,10 +131,7 @@ nv.models.growingDiscreteBar = function() {
       // Setup containers and skeleton of chart
 
       const wrap = container.selectAll('g.nv-wrap.nv-discretebar').data([data]);
-      const wrapEnter = wrap
-        .enter()
-        .append('g')
-        .attr('class', 'nvd3 nv-wrap nv-discretebar');
+      const wrapEnter = wrap.enter().append('g').attr('class', 'nvd3 nv-wrap nv-discretebar');
       const gEnter = wrapEnter.append('g');
       wrap.select('g');
 
@@ -156,17 +153,8 @@ nv.models.growingDiscreteBar = function() {
             return d.key;
           }
         );
-      groups
-        .enter()
-        .append('g')
-        .style('stroke-opacity', 1e-6)
-        .style('fill-opacity', 1e-6);
-      groups
-        .exit()
-        .transition()
-        .style('stroke-opacity', 1e-6)
-        .style('fill-opacity', 1e-6)
-        .remove();
+      groups.enter().append('g').style('stroke-opacity', 1e-6).style('fill-opacity', 1e-6);
+      groups.exit().transition().style('stroke-opacity', 1e-6).style('fill-opacity', 1e-6).remove();
       groups
         .attr('class', (d, i) => {
           return 'nv-group nv-series-' + i;
@@ -174,10 +162,7 @@ nv.models.growingDiscreteBar = function() {
         .classed('hover', d => {
           return d.hover;
         });
-      groups
-        .transition()
-        .style('stroke-opacity', 1)
-        .style('fill-opacity', 0.75);
+      groups.transition().style('stroke-opacity', 1).style('fill-opacity', 0.75);
 
       const bars = groups
         .selectAll('g.nv-bar')
@@ -188,9 +173,9 @@ nv.models.growingDiscreteBar = function() {
 
       bars.exit().remove();
 
-      selectBars = function(selected) {
+      selectBars = function (selected) {
         $(selected).each((cnt, item) => {
-          bars.each(function(d) {
+          bars.each(function (d) {
             if (d.x === item) {
               d3v3.select(this).classed('selected', true);
             }
@@ -204,7 +189,7 @@ nv.models.growingDiscreteBar = function() {
         .attr('transform', (d, i) => {
           return 'translate(' + (x(getX(d, i)) + x.rangeBand() * 0.05) + ', ' + y(0) + ')';
         })
-        .on('mouseover', function(d, i) {
+        .on('mouseover', function (d, i) {
           //TODO: figure out why j works above, but not here
           d3v3.select(this).classed('hover', true);
           dispatch.elementMouseover({
@@ -217,7 +202,7 @@ nv.models.growingDiscreteBar = function() {
             e: d3v3.event
           });
         })
-        .on('mouseout', function(d, i) {
+        .on('mouseout', function (d, i) {
           d3v3.select(this).classed('hover', false);
           dispatch.elementMouseout({
             value: getY(d, i),
@@ -331,7 +316,7 @@ nv.models.growingDiscreteBar = function() {
 
   chart.options = nv.utils.optionsFunc.bind(chart);
 
-  chart.x = function(val) {
+  chart.x = function (val) {
     if (!arguments.length) {
       return getX;
     }
@@ -339,7 +324,7 @@ nv.models.growingDiscreteBar = function() {
     return chart;
   };
 
-  chart.y = function(val) {
+  chart.y = function (val) {
     if (!arguments.length) {
       return getY;
     }
@@ -347,7 +332,7 @@ nv.models.growingDiscreteBar = function() {
     return chart;
   };
 
-  chart.margin = function(val) {
+  chart.margin = function (val) {
     if (!arguments.length) {
       return margin;
     }
@@ -358,7 +343,7 @@ nv.models.growingDiscreteBar = function() {
     return chart;
   };
 
-  chart.width = function(val) {
+  chart.width = function (val) {
     if (!arguments.length) {
       return width;
     }
@@ -366,7 +351,7 @@ nv.models.growingDiscreteBar = function() {
     return chart;
   };
 
-  chart.height = function(val) {
+  chart.height = function (val) {
     if (!arguments.length) {
       return height;
     }
@@ -374,7 +359,7 @@ nv.models.growingDiscreteBar = function() {
     return chart;
   };
 
-  chart.xScale = function(val) {
+  chart.xScale = function (val) {
     if (!arguments.length) {
       return x;
     }
@@ -382,7 +367,7 @@ nv.models.growingDiscreteBar = function() {
     return chart;
   };
 
-  chart.yScale = function(val) {
+  chart.yScale = function (val) {
     if (!arguments.length) {
       return y;
     }
@@ -390,7 +375,7 @@ nv.models.growingDiscreteBar = function() {
     return chart;
   };
 
-  chart.xDomain = function(val) {
+  chart.xDomain = function (val) {
     if (!arguments.length) {
       return xDomain;
     }
@@ -398,7 +383,7 @@ nv.models.growingDiscreteBar = function() {
     return chart;
   };
 
-  chart.yDomain = function(val) {
+  chart.yDomain = function (val) {
     if (!arguments.length) {
       return yDomain;
     }
@@ -406,7 +391,7 @@ nv.models.growingDiscreteBar = function() {
     return chart;
   };
 
-  chart.xRange = function(val) {
+  chart.xRange = function (val) {
     if (!arguments.length) {
       return xRange;
     }
@@ -414,7 +399,7 @@ nv.models.growingDiscreteBar = function() {
     return chart;
   };
 
-  chart.yRange = function(val) {
+  chart.yRange = function (val) {
     if (!arguments.length) {
       return yRange;
     }
@@ -422,7 +407,7 @@ nv.models.growingDiscreteBar = function() {
     return chart;
   };
 
-  chart.forceY = function(val) {
+  chart.forceY = function (val) {
     if (!arguments.length) {
       return forceY;
     }
@@ -430,7 +415,7 @@ nv.models.growingDiscreteBar = function() {
     return chart;
   };
 
-  chart.color = function(val) {
+  chart.color = function (val) {
     if (!arguments.length) {
       return color;
     }
@@ -438,7 +423,7 @@ nv.models.growingDiscreteBar = function() {
     return chart;
   };
 
-  chart.id = function(val) {
+  chart.id = function (val) {
     if (!arguments.length) {
       return id;
     }
@@ -446,7 +431,7 @@ nv.models.growingDiscreteBar = function() {
     return chart;
   };
 
-  chart.showValues = function(val) {
+  chart.showValues = function (val) {
     if (!arguments.length) {
       return showValues;
     }
@@ -454,7 +439,7 @@ nv.models.growingDiscreteBar = function() {
     return chart;
   };
 
-  chart.valueFormat = function(val) {
+  chart.valueFormat = function (val) {
     if (!arguments.length) {
       return valueFormat;
     }
@@ -462,7 +447,7 @@ nv.models.growingDiscreteBar = function() {
     return chart;
   };
 
-  chart.rectClass = function(val) {
+  chart.rectClass = function (val) {
     if (!arguments.length) {
       return rectClass;
     }
@@ -470,7 +455,7 @@ nv.models.growingDiscreteBar = function() {
     return chart;
   };
 
-  chart.selectBars = function(args) {
+  chart.selectBars = function (args) {
     if (!arguments.length) {
       return selectBars;
     }

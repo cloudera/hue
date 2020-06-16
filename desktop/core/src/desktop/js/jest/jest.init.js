@@ -103,7 +103,7 @@ Object.keys(globalVars).forEach(key => {
 });
 
 $.ajaxSetup({
-  beforeSend: function() {
+  beforeSend: function () {
     console.warn('actual jQuery ajax called');
     console.trace();
   }

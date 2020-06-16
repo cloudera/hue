@@ -232,14 +232,14 @@ const POPULAR_CATEGORIES = [
   CATEGORIES.POPULAR_JOIN
 ];
 
-const initLoading = function(loadingObservable, deferred) {
+const initLoading = function (loadingObservable, deferred) {
   loadingObservable(true);
   deferred.always(() => {
     loadingObservable(false);
   });
 };
 
-const locateSubQuery = function(subQueries, subQueryName) {
+const locateSubQuery = function (subQueries, subQueryName) {
   if (typeof subQueries === 'undefined') {
     return null;
   }
@@ -259,7 +259,7 @@ const locateSubQuery = function(subQueries, subQueryName) {
  * @param columnsDeferred
  * @param suggestions
  */
-const mergeWithColumns = function(sourceDeferred, columnsDeferred, suggestions) {
+const mergeWithColumns = function (sourceDeferred, columnsDeferred, suggestions) {
   columnsDeferred.done(columns => {
     const suggestionIndex = {};
     suggestions.forEach(suggestion => {
@@ -316,7 +316,7 @@ class AutocompleteResults {
     self.loadingPopularTables = ko.observable(false);
     self.loadingPopularColumns = ko.observable(false);
 
-    self.appendEntries = function(entries) {
+    self.appendEntries = function (entries) {
       self.entries(self.entries().concat(entries));
     };
 
@@ -354,7 +354,7 @@ class AutocompleteResults {
 
     self.activeCategory = ko.observable(CATEGORIES.ALL);
 
-    const updateCategories = function(suggestions) {
+    const updateCategories = function (suggestions) {
       const newCategories = {};
       suggestions.forEach(suggestion => {
         if (suggestion.popular() && !newCategories[CATEGORIES.POPULAR.label]) {
@@ -570,7 +570,7 @@ class AutocompleteResults {
     const self = this;
     const colRefDeferred = $.Deferred();
     if (self.parseResult.colRef) {
-      const colRefCallback = function(catalogEntry) {
+      const colRefCallback = function (catalogEntry) {
         self.cancellablePromises.push(
           catalogEntry
             .getSourceMeta({ silenceErrors: true, cancellable: true })
@@ -917,7 +917,7 @@ class AutocompleteResults {
 
     if (self.parseResult.suggestTables) {
       const suggestTables = self.parseResult.suggestTables;
-      const fetchTables = function() {
+      const fetchTables = function () {
         initLoading(self.loadingTables, tablesDeferred);
         tablesDeferred.done(self.appendEntries);
 
@@ -1026,7 +1026,7 @@ class AutocompleteResults {
         // For multiple tables we need to merge and make sure identifiers are unique
         const columnDeferrals = [];
 
-        const waitForCols = function() {
+        const waitForCols = function () {
           $.when.apply($, columnDeferrals).always(() => {
             AutocompleteResults.mergeColumns(columnSuggestions);
             if (
@@ -1144,7 +1144,7 @@ class AutocompleteResults {
         table.identifierChain[0].subQuery
       );
 
-      const addSubQueryColumns = function(subQueryColumns) {
+      const addSubQueryColumns = function (subQueryColumns) {
         subQueryColumns.forEach(column => {
           if (column.alias || column.identifierChain) {
             // TODO: Potentially fetch column types for sub-queries, possible performance hit.
@@ -1187,7 +1187,7 @@ class AutocompleteResults {
       }
       addColumnsDeferred.resolve();
     } else if (typeof table.identifierChain !== 'undefined') {
-      const addColumnsFromEntry = function(dataCatalogEntry) {
+      const addColumnsFromEntry = function (dataCatalogEntry) {
         self.cancellablePromises.push(
           dataCatalogEntry
             .getSourceMeta({ silenceErrors: true, cancellable: true })
@@ -1487,7 +1487,7 @@ class AutocompleteResults {
       self.lastKnownRequests.push(
         apiHelper[fetchFunction]({
           pathParts: parts,
-          successCallback: function(data) {
+          successCallback: function (data) {
             if (!data.error) {
               const pathSuggestions = [];
               data.files.forEach(file => {
@@ -2387,7 +2387,7 @@ class AutocompleteResults {
       }
     }
 
-    const fetchFieldsInternal = function(remainingPath, fetchedPath) {
+    const fetchFieldsInternal = function (remainingPath, fetchedPath) {
       if (!fetchedPath) {
         fetchedPath = [];
       }

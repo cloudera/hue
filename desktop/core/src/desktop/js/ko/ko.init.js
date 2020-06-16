@@ -19,7 +19,7 @@ import * as ko from 'knockout';
 const proxiedKoRegister = ko.components.register;
 const registeredComponents = [];
 
-ko.components.register = function() {
+ko.components.register = function () {
   // This guarantees a ko component is only registered once
   // Some currently get registered twice when switching between notebook and editor
   if (registeredComponents.indexOf(arguments[0]) === -1) {

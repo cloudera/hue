@@ -17,11 +17,11 @@
 import * as ko from 'knockout';
 
 ko.bindingHandlers.hueCheckAll = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const allValues = ko.utils.unwrapObservable(valueAccessor()).allValues;
     const selectedValues = ko.utils.unwrapObservable(valueAccessor()).selectedValues;
 
-    const updateCheckedState = function() {
+    const updateCheckedState = function () {
       ko.utils.toggleDomNodeCssClass(
         element,
         'fa-check',

@@ -332,9 +332,7 @@ const copyTests = (source, target) =>
                     )
                   );
                 });
-                Promise.all(copyPromises)
-                  .then(resolve)
-                  .catch(reject);
+                Promise.all(copyPromises).then(resolve).catch(reject);
               })
               .catch(reject);
           })
@@ -393,9 +391,7 @@ const prepareForNewParser = () =>
                                 "parser.yy.activeDialect = '" + target + "';"
                               )
                           ).then(() => {
-                            identifySqlParsers()
-                              .then(resolve)
-                              .catch(reject);
+                            identifySqlParsers().then(resolve).catch(reject);
                           });
                         });
                       });

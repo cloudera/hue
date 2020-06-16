@@ -512,7 +512,7 @@ class Sidebar {
 componentUtils.registerComponent(
   NAME,
   {
-    createViewModel: function(params, componentInfo) {
+    createViewModel: function (params, componentInfo) {
       return new Sidebar(params, componentInfo.element);
     }
   },

@@ -957,7 +957,12 @@ const STRING_FUNCTIONS = {
   },
   concat: {
     returnTypes: ['STRING'],
-    arguments: [[{ type: 'STRING', multiple: true }, { type: 'BINARY', multiple: true }]],
+    arguments: [
+      [
+        { type: 'STRING', multiple: true },
+        { type: 'BINARY', multiple: true }
+      ]
+    ],
     signature: 'concat(STRING|BINARY a, STRING|BINARY b...)',
     draggable: 'concat()',
     description:

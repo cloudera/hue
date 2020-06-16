@@ -59,9 +59,7 @@ class EditorDroppableMenu extends DisposableComponent {
     super();
     this.editor = params.editor;
     const $parentDropTarget = $(params.parentDropTarget);
-    const $tableDropMenu = $(element)
-      .parent()
-      .find('.table-drop-menu');
+    const $tableDropMenu = $(element).parent().find('.table-drop-menu');
 
     this.meta = ko.observable();
 

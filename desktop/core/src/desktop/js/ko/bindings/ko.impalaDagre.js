@@ -21,9 +21,9 @@ import huePubSub from 'utils/huePubSub';
 
 // TODO: Depends on impalaDagre
 
-ko.bindingHandlers.impalaDagre = (function() {
+ko.bindingHandlers.impalaDagre = (function () {
   return {
-    init: function(element, valueAccessor, allBindingsAccessor) {
+    init: function (element, valueAccessor, allBindingsAccessor) {
       const id = $(element).attr('id');
       element._impalaDagre = impalaDagre(id);
       const clickSubscription = huePubSub.subscribe('impala.node.moveto', value => {
@@ -37,7 +37,7 @@ ko.bindingHandlers.impalaDagre = (function() {
         selectSubscription.remove();
       });
     },
-    update: function(element, valueAccessor) {
+    update: function (element, valueAccessor) {
       const props = ko.unwrap(valueAccessor());
       element._impalaDagre.metrics(props.metrics);
       element._impalaDagre.height(props.height);

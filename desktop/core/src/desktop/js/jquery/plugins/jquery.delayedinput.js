@@ -37,11 +37,11 @@ function Plugin(element, options) {
   this.init();
 }
 
-Plugin.prototype.setOptions = function(options) {
+Plugin.prototype.setOptions = function (options) {
   this.options = $.extend({}, defaults, options);
 };
 
-Plugin.prototype.init = function() {
+Plugin.prototype.init = function () {
   const _this = this;
   let _timeout = -1;
   if (_this.options.fn != null) {
@@ -56,13 +56,13 @@ Plugin.prototype.init = function() {
   }
 };
 
-$.fn[pluginName] = function(fn, timeout, skipOnEnterAndKeys) {
+$.fn[pluginName] = function (fn, timeout, skipOnEnterAndKeys) {
   const _options = {
     fn: fn,
     timeout: timeout,
     skipOnEnterAndKeys: typeof skipOnEnterAndKeys !== 'undefined' && skipOnEnterAndKeys
   };
-  return this.each(function() {
+  return this.each(function () {
     if (!$.data(this, 'plugin_' + pluginName)) {
       $.data(this, 'plugin_' + pluginName, new Plugin(this, _options));
     } else {

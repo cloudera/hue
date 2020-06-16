@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.ellipsis = {
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const value = ko.unwrap(valueAccessor());
     const $element = $(element);
     const chopLength = value.length ? value.length : 30;

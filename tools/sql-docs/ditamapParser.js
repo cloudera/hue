@@ -80,12 +80,7 @@ const extractFromMapNode = (mapNode, ditamapFile, docRootPath, parseResult) => {
       switch (node.name()) {
         case 'topicref': {
           if (extractorUtils.hasAttributes(node, 'href')) {
-            if (
-              ~node
-                .attr('href')
-                .value()
-                .indexOf('.ditamap')
-            ) {
+            if (~node.attr('href').value().indexOf('.ditamap')) {
               promises.push(
                 extractFromDitamapFile(node.attr('href').value(), docRootPath, parseResult)
               );
@@ -97,12 +92,7 @@ const extractFromMapNode = (mapNode, ditamapFile, docRootPath, parseResult) => {
             } else {
               parseResult.topics.push(topic);
             }
-            parseResult.topicIndex[
-              node
-                .attr('href')
-                .value()
-                .replace(/#.*$/, '')
-            ] = topic;
+            parseResult.topicIndex[node.attr('href').value().replace(/#.*$/, '')] = topic;
             handleMapNodeChildren(node.childNodes(), topic);
           } else {
             console.log(

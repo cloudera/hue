@@ -23,11 +23,9 @@ describe('ko.pollingCatalogEntriesList.js', () => {
   const setup = koSetup();
 
   it('should render component', async () => {
-    jest.spyOn(ApiHelper, 'fetchSourceMetadata').mockImplementation(() =>
-      $.Deferred()
-        .reject()
-        .promise()
-    );
+    jest
+      .spyOn(ApiHelper, 'fetchSourceMetadata')
+      .mockImplementation(() => $.Deferred().reject().promise());
 
     const element = await setup.renderComponent(NAME, {
       sourceType: 'impala',

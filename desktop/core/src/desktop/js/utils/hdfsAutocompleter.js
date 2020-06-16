@@ -69,7 +69,7 @@ class HdfsAutocompleter {
   autocomplete(beforeCursor, afterCursor, callback, editor) {
     const self = this;
 
-    const onFailure = function() {
+    const onFailure = function () {
       callback([]);
     };
 
@@ -80,7 +80,7 @@ class HdfsAutocompleter {
       // Last one is either partial name or empty
       parts.pop();
 
-      const successCallback = function(data) {
+      const successCallback = function (data) {
         if (!data.error) {
           callback(self.extractFields(data));
         } else {

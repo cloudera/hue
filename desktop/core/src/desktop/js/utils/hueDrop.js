@@ -26,7 +26,7 @@ const hueDrop = () => {
   });
 
   return {
-    fromAssist: function(element, callback) {
+    fromAssist: function (element, callback) {
       if (typeof element === 'function' && !(element instanceof $)) {
         callback = element;
       }
@@ -36,7 +36,7 @@ const hueDrop = () => {
       if (element.length > 0) {
         element.droppable({
           accept: '.draggableText',
-          drop: function(e, ui) {
+          drop: function (e, ui) {
             if (callback) {
               callback({
                 text: ui.helper.text(),
@@ -49,7 +49,7 @@ const hueDrop = () => {
         console.warn('hueDrop.fromAssist could not be attached to the element');
       }
     },
-    fromDesktop: function(element, callback, method) {
+    fromDesktop: function (element, callback, method) {
       if (window.FileReader) {
         if (typeof element === 'function' && !(element instanceof $)) {
           callback = element;
@@ -65,8 +65,8 @@ const hueDrop = () => {
           const files = dt.files;
           for (let i = 0, f; (f = files[i]); i++) {
             const reader = new FileReader();
-            reader.onload = (function(file) {
-              return function(e) {
+            reader.onload = (function (file) {
+              return function (e) {
                 callback(e.target.result);
               };
             })(f);

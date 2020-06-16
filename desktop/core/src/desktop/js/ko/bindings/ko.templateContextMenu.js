@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.templateContextMenu = {
-  init: function(element, valueAccessor, allBindings, viewModel) {
+  init: function (element, valueAccessor, allBindings, viewModel) {
     const options = valueAccessor();
 
     element.addEventListener('contextmenu', event => {
@@ -51,7 +51,7 @@ ko.bindingHandlers.templateContextMenu = {
       $menu.css('opacity', 0);
       $menu.show();
 
-      const hideMenu = function() {
+      const hideMenu = function () {
         if (!$menu.data('active')) {
           $menu.hide();
           ko.cleanNode($menu[0]);
@@ -60,7 +60,7 @@ ko.bindingHandlers.templateContextMenu = {
 
       ko.applyBindings(
         {
-          afterRender: function() {
+          afterRender: function () {
             const menuWidth = $menu.outerWidth(true);
             const menuHeight = $menu.outerHeight(true);
             $menu.css(

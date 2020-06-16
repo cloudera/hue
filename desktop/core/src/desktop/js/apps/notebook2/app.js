@@ -76,25 +76,19 @@ export const initNotebook2 = () => {
             (dt.types &&
               (dt.types.indexOf ? dt.types.indexOf('Files') !== -1 : dt.types.contains('Files'))))
         ) {
-          $(window.EDITOR_BINDABLE_ELEMENT)
-            .find('.hoverMsg')
-            .removeClass('hide');
+          $(window.EDITOR_BINDABLE_ELEMENT).find('.hoverMsg').removeClass('hide');
         }
       };
 
       const hideHoverMsg = vm => {
         if (vm.editorMode()) {
-          $(window.EDITOR_BINDABLE_ELEMENT)
-            .find('.hoverText')
-            .html(I18n('Drop a SQL file here'));
+          $(window.EDITOR_BINDABLE_ELEMENT).find('.hoverText').html(I18n('Drop a SQL file here'));
         } else {
           $(window.EDITOR_BINDABLE_ELEMENT)
             .find('.hoverText')
             .html(I18n('Drop iPython/Zeppelin notebooks here'));
         }
-        $(window.EDITOR_BINDABLE_ELEMENT)
-          .find('.hoverMsg')
-          .addClass('hide');
+        $(window.EDITOR_BINDABLE_ELEMENT).find('.hoverMsg').addClass('hide');
       };
 
       if (ko.options) {
@@ -260,8 +254,8 @@ export const initNotebook2 = () => {
 
           for (let i = 0, f; (f = files[i]); i++) {
             const reader = new FileReader();
-            reader.onload = (function(file) {
-              return function(e) {
+            reader.onload = (function (file) {
+              return function (e) {
                 $('.hoverText').html("<i class='fa fa-spinner fa-spin'></i>");
                 parseExternalJSON(e.target.result);
               };
@@ -270,7 +264,7 @@ export const initNotebook2 = () => {
           }
         };
 
-        const handleDragOver = function(evt) {
+        const handleDragOver = function (evt) {
           evt.stopPropagation();
           evt.preventDefault();
           evt.dataTransfer.dropEffect = 'copy';
@@ -364,7 +358,7 @@ export const initNotebook2 = () => {
       });
 
       // Close the notebook snippets when leaving the page
-      window.onbeforeunload = function(e) {
+      window.onbeforeunload = function (e) {
         if (ignoreNextUnload) {
           ignoreNextUnload = false;
           return;
@@ -393,10 +387,7 @@ export const initNotebook2 = () => {
             viewModel.editorType(),
             null,
             viewModel.selectedNotebook()
-              ? viewModel
-                  .selectedNotebook()
-                  .snippets()[0]
-                  .currentQueryTab()
+              ? viewModel.selectedNotebook().snippets()[0].currentQueryTab()
               : null
           );
         }
@@ -442,10 +433,7 @@ export const initNotebook2 = () => {
         ) {
           if (
             viewModel.editorMode() &&
-            viewModel
-              .selectedNotebook()
-              .snippets()[0]
-              .currentQueryTab() === 'queryResults'
+            viewModel.selectedNotebook().snippets()[0].currentQueryTab() === 'queryResults'
           ) {
             e.preventDefault();
             huePubSub.publish(SHOW_GRID_SEARCH_EVENT);
@@ -469,14 +457,14 @@ export const initNotebook2 = () => {
       const getDraggableOptions = minY => {
         return {
           axis: 'y',
-          start: function(e, ui) {
+          start: function (e, ui) {
             initialResizePosition = ui.offset.top;
             huePubSub.publish(HIDE_FIXED_HEADERS_EVENT);
           },
-          drag: function(e, ui) {
+          drag: function (e, ui) {
             draggableHelper($(this), e, ui);
           },
-          stop: function(e, ui) {
+          stop: function (e, ui) {
             draggableHelper($(this), e, ui, true);
             huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
             ui.helper.first().removeAttr('style');
@@ -485,14 +473,8 @@ export const initNotebook2 = () => {
         };
       };
 
-      $('.resize-panel a').each(function() {
-        $(this).draggable(
-          getDraggableOptions(
-            $(this)
-              .parents('.snippet')
-              .offset().top + 128
-          )
-        );
+      $('.resize-panel a').each(function () {
+        $(this).draggable(getDraggableOptions($(this).parents('.snippet').offset().top + 128));
       });
 
       // ======== PubSub ========
@@ -541,10 +523,7 @@ export const initNotebook2 = () => {
           huePubSub.subscribe(
             'editor.upload.query',
             query_id => {
-              viewModel
-                .selectedNotebook()
-                .snippets()[0]
-                .uploadQuery(query_id);
+              viewModel.selectedNotebook().snippets()[0].uploadQuery(query_id);
             },
             HUE_PUB_SUB_EDITOR_ID
           );
@@ -554,10 +533,7 @@ export const initNotebook2 = () => {
           huePubSub.subscribe(
             'editor.upload.table.stats',
             options => {
-              viewModel
-                .selectedNotebook()
-                .snippets()[0]
-                .uploadTableStats(options);
+              viewModel.selectedNotebook().snippets()[0].uploadTableStats(options);
             },
             HUE_PUB_SUB_EDITOR_ID
           );
@@ -567,10 +543,7 @@ export const initNotebook2 = () => {
           huePubSub.subscribe(
             'editor.upload.history',
             () => {
-              viewModel
-                .selectedNotebook()
-                .snippets()[0]
-                .uploadQueryHistory(5);
+              viewModel.selectedNotebook().snippets()[0].uploadQueryHistory(5);
             },
             HUE_PUB_SUB_EDITOR_ID
           );
@@ -769,15 +742,8 @@ export const initNotebook2 = () => {
           };
           if (viewModel.selectedNotebook()) {
             if (viewModel.selectedNotebook().snippets().length === 1) {
-              result.editor = viewModel
-                .selectedNotebook()
-                .snippets()[0]
-                .ace();
-              result.risks =
-                viewModel
-                  .selectedNotebook()
-                  .snippets()[0]
-                  .complexity() || {};
+              result.editor = viewModel.selectedNotebook().snippets()[0].ace();
+              result.risks = viewModel.selectedNotebook().snippets()[0].complexity() || {};
             } else {
               viewModel
                 .selectedNotebook()
@@ -808,7 +774,7 @@ export const initNotebook2 = () => {
             () => {
               let cumulativeWidth = 0;
               $('.editorComponents .hue-title-bar ul li:not(.skip-width-calculation)').each(
-                function() {
+                function () {
                   cumulativeWidth += $(this).outerWidth();
                 }
               );

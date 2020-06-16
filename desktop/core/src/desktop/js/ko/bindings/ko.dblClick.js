@@ -18,9 +18,9 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.dblclick = {
-  init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+  init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
     const fn = valueAccessor();
-    $(element).dblclick(function() {
+    $(element).dblclick(function () {
       const data = ko.dataFor(this);
       fn.call(viewModel, data);
     });

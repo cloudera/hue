@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.tagsNotAllowed = {
-  update: function(element, valueAccessor, allBindingsAccessor) {
+  update: function (element, valueAccessor, allBindingsAccessor) {
     const $element = $(element);
     const params = allBindingsAccessor();
     const valueObservable = ko.isObservable(params)

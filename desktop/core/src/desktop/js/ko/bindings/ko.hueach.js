@@ -20,15 +20,15 @@ import * as ko from 'knockout';
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.hueach = {
-  init: function(element, valueAccessor, allBindings) {
-    const valueAccessorBuilder = function() {
+  init: function (element, valueAccessor, allBindings) {
+    const valueAccessorBuilder = function () {
       return {
         data: ko.observableArray([])
       };
     };
     ko.bindingHandlers.foreach.init(element, valueAccessorBuilder, allBindings);
   },
-  update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+  update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     const $element = $(element);
     let $parent = $element.parent();
     const data =
@@ -80,7 +80,7 @@ ko.bindingHandlers.hueach = {
 
     let startItem = 0,
       endItem = 0;
-    const valueAccessorBuilder = function() {
+    const valueAccessorBuilder = function () {
       return {
         data: ko.utils.domData.get(element, 'originalData')
           ? ko.observableArray(
@@ -90,7 +90,7 @@ ko.bindingHandlers.hueach = {
       };
     };
 
-    const render = function() {
+    const render = function () {
       if ($parent.parents('.hueach').length === 0) {
         let heightCorrection = 0,
           fluidCorrection = 0;
@@ -133,7 +133,7 @@ ko.bindingHandlers.hueach = {
         startItem = 0;
         endItem = data.length;
       }
-      bindingContext.$indexOffset = function() {
+      bindingContext.$indexOffset = function () {
         return startItem;
       };
       ko.bindingHandlers.foreach.update(

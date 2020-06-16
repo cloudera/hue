@@ -92,9 +92,7 @@ class SidePanelViewModel {
       if ($el.length === 0) {
         $el = $('.content-panel:visible');
       }
-      $('.context-panel')
-        .width($el.width())
-        .css('left', $el.offset().left);
+      $('.context-panel').width($el.width()).css('left', $el.offset().left);
     });
 
     self.sessionsAvailable = ko.observable(false);

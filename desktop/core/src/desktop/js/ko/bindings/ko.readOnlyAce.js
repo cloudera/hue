@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 // TODO: Depends on Ace
 
 ko.bindingHandlers.readOnlyAce = {
-  init: function(element) {
+  init: function (element) {
     $(element).css({
       'min-height': '250px'
     });
@@ -32,7 +32,7 @@ ko.bindingHandlers.readOnlyAce = {
     editor.setTheme($.totalStorage('hue.ace.theme') || 'ace/theme/hue');
     $(element).data('aceEditor', editor);
   },
-  update: function(element, valueAccessor, allBindingsAccessor) {
+  update: function (element, valueAccessor, allBindingsAccessor) {
     let value = ko.unwrap(valueAccessor());
     const options = ko.unwrap(allBindingsAccessor());
     $(element)
@@ -44,9 +44,7 @@ ko.bindingHandlers.readOnlyAce = {
       if (options.path) {
         value = value[options.path];
       }
-      $(element)
-        .data('aceEditor')
-        .setValue(value, -1);
+      $(element).data('aceEditor').setValue(value, -1);
     }
   }
 };

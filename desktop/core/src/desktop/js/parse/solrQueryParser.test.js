@@ -17,7 +17,7 @@
 import solrQueryParser from './solrQueryParser';
 
 describe('solrQueryParser.js', () => {
-  const testAutocomplete = function(beforeCursor, afterCursor, expectedResult) {
+  const testAutocomplete = function (beforeCursor, afterCursor, expectedResult) {
     const result = solrQueryParser.autocompleteSolrQuery(beforeCursor, afterCursor, true);
     if (!expectedResult.locations) {
       delete result.locations;

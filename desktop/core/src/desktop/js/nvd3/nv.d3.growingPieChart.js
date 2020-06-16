@@ -18,7 +18,7 @@ import d3v3 from 'd3v3';
 
 import nv from 'ext/nv.d3.1.1.15b.custom';
 
-nv.models.growingPieChart = function() {
+nv.models.growingPieChart = function () {
   'use strict';
   //============================================================
   // Public Variables with Default Settings
@@ -33,7 +33,7 @@ nv.models.growingPieChart = function() {
     showLegend = true,
     color = nv.utils.defaultColor(),
     tooltips = true,
-    tooltip = function(key, y) {
+    tooltip = function (key, y) {
       return '<h3>' + key + '</h3>' + '<p>' + y + '</p>';
     },
     state = {},
@@ -47,7 +47,7 @@ nv.models.growingPieChart = function() {
   // Private Variables
   //------------------------------------------------------------
 
-  const showTooltip = function(e, offsetElement) {
+  const showTooltip = function (e, offsetElement) {
     const tooltipLabel = pie.description()(e.point) || pie.x()(e.point);
     const left = e.pos[0] + ((offsetElement && offsetElement.offsetLeft) || 0),
       top = e.pos[1] + ((offsetElement && offsetElement.offsetTop) || 0),
@@ -60,7 +60,7 @@ nv.models.growingPieChart = function() {
   //============================================================
 
   function chart(selection) {
-    selection.each(function(data) {
+    selection.each(function (data) {
       const container = d3v3.select(this);
 
       const availableWidth =
@@ -68,7 +68,7 @@ nv.models.growingPieChart = function() {
       let availableHeight =
         (height || parseInt(container.style('height')) || 400) - margin.top - margin.bottom;
 
-      chart.update = function() {
+      chart.update = function () {
         container.transition().call(chart);
       };
       chart.container = this;
@@ -134,11 +134,7 @@ nv.models.growingPieChart = function() {
       // Setup containers and skeleton of chart
 
       const wrap = container.selectAll('g.nv-wrap.nv-pieChart').data([data]);
-      const gEnter = wrap
-        .enter()
-        .append('g')
-        .attr('class', 'nvd3 nv-wrap nv-pieChart')
-        .append('g');
+      const gEnter = wrap.enter().append('g').attr('class', 'nvd3 nv-wrap nv-pieChart').append('g');
       const g = wrap.select('g');
 
       gEnter.append('g').attr('class', 'nv-pieWrap');
@@ -152,10 +148,7 @@ nv.models.growingPieChart = function() {
       if (showLegend) {
         legend.width(availableWidth).key(pie.x());
 
-        wrap
-          .select('.nv-legendWrap')
-          .datum(data)
-          .call(legend);
+        wrap.select('.nv-legendWrap').datum(data).call(legend);
 
         if (legend.height() > 50) {
           wrap.select('.nv-legendWrap').style('visibility', 'hidden');
@@ -272,7 +265,7 @@ nv.models.growingPieChart = function() {
   );
   chart.options = nv.utils.optionsFunc.bind(chart);
 
-  chart.margin = function(_) {
+  chart.margin = function (_) {
     if (!arguments.length) {
       return margin;
     }
@@ -283,7 +276,7 @@ nv.models.growingPieChart = function() {
     return chart;
   };
 
-  chart.width = function(_) {
+  chart.width = function (_) {
     if (!arguments.length) {
       return width;
     }
@@ -291,7 +284,7 @@ nv.models.growingPieChart = function() {
     return chart;
   };
 
-  chart.height = function(_) {
+  chart.height = function (_) {
     if (!arguments.length) {
       return height;
     }
@@ -299,7 +292,7 @@ nv.models.growingPieChart = function() {
     return chart;
   };
 
-  chart.color = function(_) {
+  chart.color = function (_) {
     if (!arguments.length) {
       return color;
     }
@@ -309,7 +302,7 @@ nv.models.growingPieChart = function() {
     return chart;
   };
 
-  chart.showLegend = function(_) {
+  chart.showLegend = function (_) {
     if (!arguments.length) {
       return showLegend;
     }
@@ -317,7 +310,7 @@ nv.models.growingPieChart = function() {
     return chart;
   };
 
-  chart.tooltips = function(_) {
+  chart.tooltips = function (_) {
     if (!arguments.length) {
       return tooltips;
     }
@@ -325,7 +318,7 @@ nv.models.growingPieChart = function() {
     return chart;
   };
 
-  chart.tooltipContent = function(_) {
+  chart.tooltipContent = function (_) {
     if (!arguments.length) {
       return tooltip;
     }
@@ -333,7 +326,7 @@ nv.models.growingPieChart = function() {
     return chart;
   };
 
-  chart.state = function(_) {
+  chart.state = function (_) {
     if (!arguments.length) {
       return state;
     }
@@ -341,7 +334,7 @@ nv.models.growingPieChart = function() {
     return chart;
   };
 
-  chart.defaultState = function(_) {
+  chart.defaultState = function (_) {
     if (!arguments.length) {
       return defaultState;
     }
@@ -349,7 +342,7 @@ nv.models.growingPieChart = function() {
     return chart;
   };
 
-  chart.noData = function(_) {
+  chart.noData = function (_) {
     if (!arguments.length) {
       return noData;
     }
@@ -357,7 +350,7 @@ nv.models.growingPieChart = function() {
     return chart;
   };
 
-  chart.selectSlices = function(args) {
+  chart.selectSlices = function (args) {
     if (!arguments.length) {
       return selectSlices;
     }

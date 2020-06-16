@@ -32,12 +32,12 @@ class SqlAutocompleter {
     this.editor = options.editor;
     this.fixedPrefix =
       options.fixedPrefix ||
-      function() {
+      function () {
         return '';
       };
     this.fixedPostfix =
       options.fixedPostfix ||
-      function() {
+      function () {
         return '';
       };
     this.suggestions = new AutocompleteResults(options);

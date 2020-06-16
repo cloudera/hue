@@ -495,11 +495,7 @@ export default class Snippet {
             option.text = option.text && option.text.trim();
             option.value =
               option.value &&
-              option.value
-                .trim()
-                .replace(',', ',')
-                .replace('(', '(')
-                .replace(')', ')');
+              option.value.trim().replace(',', ',').replace('(', '(').replace(')', ')');
 
             if (value.placeholder || matchList[2]) {
               if (!value.options) {
@@ -825,7 +821,8 @@ export default class Snippet {
               -1 &&
               this.statement() !== '') ||
             ([DIALECT.jar, DIALECT.java].indexOf(this.dialect()) !== -1 &&
-              (this.properties().app_jar() !== '' && this.properties().class() !== '')) ||
+              this.properties().app_jar() !== '' &&
+              this.properties().class() !== '') ||
             (DIALECT.spark2 === this.dialect() && this.properties().jars().length > 0) ||
             (DIALECT.shell === this.dialect() && this.properties().command_path().length > 0) ||
             (DIALECT.mapreduce === this.dialect() && this.properties().app_jar().length > 0) ||

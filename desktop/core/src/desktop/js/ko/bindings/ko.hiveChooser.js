@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.hiveChooser = {
-  init: function(element, valueAccessor, allBindingsAccessor) {
+  init: function (element, valueAccessor, allBindingsAccessor) {
     const self = $(element);
     let options = ko.unwrap(valueAccessor());
     let complexConfiguration = false;
@@ -79,15 +79,15 @@ ko.bindingHandlers.hiveChooser = {
         apiHelperUser: ko.unwrap(options.apiHelperUser) || '',
         apiHelperType: ko.unwrap(options.apiHelperType) || '',
         mainScrollable: ko.unwrap(options.mainScrollable) || $(window),
-        onPathChange: function(path) {
+        onPathChange: function (path) {
           setPathFromAutocomplete(path);
         },
-        onEnter: function(el) {
+        onEnter: function (el) {
           if (!options.skipInvalids) {
             setPathFromAutocomplete(el.val());
           }
         },
-        onBlur: function() {
+        onBlur: function () {
           if (self.val().lastIndexOf('.') === self.val().length - 1) {
             self.val(self.val().substr(0, self.val().length - 1));
           }

@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.assistFileDroppable = {
-  init: function(element, valueAccessor, allBindings, boundEntry) {
+  init: function (element, valueAccessor, allBindings, boundEntry) {
     const $element = $(element);
 
     let dragData;

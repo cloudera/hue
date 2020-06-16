@@ -24,7 +24,7 @@ export const DRAGGABLE_TEXT_META_EVENT = 'draggable.text.meta';
 export const NAME = 'draggableText';
 
 registerBinding(NAME, {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const $element = $(element);
     const options = valueAccessor();
     if ((ko.isObservable(options.text) && !options.text()) || !options.text) {
@@ -39,17 +39,17 @@ registerBinding(NAME, {
     let dragStartY = -1;
     let notifiedOnDragStarted = false;
     $element.draggable({
-      helper: function() {
+      helper: function () {
         return $helper;
       },
       appendTo: 'body',
-      start: function(event) {
+      start: function (event) {
         dragStartX = event.clientX;
         dragStartY = event.clientY;
         huePubSub.publish(DRAGGABLE_TEXT_META_EVENT, options.meta);
         notifiedOnDragStarted = false;
       },
-      drag: function(event) {
+      drag: function (event) {
         huePubSub.publish('draggable.text.drag', {
           event: event,
           meta: options.meta
@@ -65,7 +65,7 @@ registerBinding(NAME, {
           notifiedOnDragStarted = true;
         }
       },
-      stop: function(event) {
+      stop: function (event) {
         if (
           Math.sqrt(
             (dragStartX - event.clientX) * (dragStartX - event.clientX) +
