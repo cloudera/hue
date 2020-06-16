@@ -241,6 +241,14 @@ USE_SASL = Config(
   dynamic_default=get_use_sasl_default
 )
 
+USE_THRIFT_HTTP = Config(
+  key="use_thrift_http",
+  help=_t("Use Thrift over HTTP for the transport mode."),
+  private=False,
+  type=coerce_bool,
+  default=False
+)
+
 
 def config_validator(user):
   # dbms is dependent on beeswax.conf, import in method to avoid circular dependency
