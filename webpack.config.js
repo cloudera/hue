@@ -27,7 +27,7 @@ class RelativeBundleTracker extends BundleTracker {
 }
 
 module.exports = {
-  devtool: 'source-map',
+  devtool: false,
   mode: 'development',
   performance: {
     maxEntrypointSize: 400 * 1024, // 400kb
@@ -95,6 +95,11 @@ module.exports = {
   plugins: [
     // new BundleAnalyzerPlugin({ analyzerPort: 9000 }),
     new CleanObsoleteChunks(),
+    new webpack.SourceMapDevToolPlugin({
+      filename: 'hue/[file].map',
+      publicPath: '/static/desktop/js/bundles/hue/',
+      fileContext: 'public'
+    }),
     new CleanWebpackPlugin([__dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/hue']),
     new RelativeBundleTracker({ path: '.', filename: 'webpack-stats.json' }),
     new webpack.BannerPlugin(

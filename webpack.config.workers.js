@@ -25,7 +25,7 @@ class RelativeBundleTracker extends BundleTracker {
 }
 
 module.exports = {
-  devtool: 'source-map',
+  devtool: false,
   mode: 'development',
   target: 'webworker',
   performance: {
@@ -74,6 +74,11 @@ module.exports = {
 
   plugins: [
     new CleanObsoleteChunks(),
+    new webpack.SourceMapDevToolPlugin({
+      filename: 'workers/[file].map',
+      publicPath: '/static/desktop/js/bundles/workers/',
+      fileContext: 'public'
+    }),
     new CleanWebpackPlugin([
       __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/workers/'
     ]),
