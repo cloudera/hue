@@ -73,7 +73,6 @@ Pygments==2.5.2
 pyOpenSSL==17.5.0
 pysaml2>=4.5.0
 PySocks==1.7.0
-python-crontab==2.3.6
 python-daemon==2.2.3
 python-dateutil==2.4.2
 python-ldap==3.1.0
