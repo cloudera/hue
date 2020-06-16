@@ -213,8 +213,9 @@ install-env:
 	$(MAKE) -C $(INSTALL_DIR)/apps env-install
 	@echo --- Setting up Frontend assets
 	cp $(ROOT)/package.json $(INSTALL_DIR)
-	cp $(ROOT)/.babelrc $(INSTALL_DIR)
 	cp $(ROOT)/webpack.config*.js $(INSTALL_DIR)
+	cp $(ROOT)/.babelrc $(INSTALL_DIR)
+	cp $(ROOT)/tsconfig.json $(INSTALL_DIR)
 	$(MAKE) -C $(INSTALL_DIR) npm-install
 	@if [ "$(MAKECMDGOALS)" = "install" ]; then \
 	  $(MAKE) -C $(INSTALL_DIR) create-static; \
