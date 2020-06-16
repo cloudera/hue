@@ -324,7 +324,7 @@ class NavProperties {
 componentUtils.registerComponent(
   NAME,
   {
-    createViewModel: function(params, componentInfo) {
+    createViewModel: function (params, componentInfo) {
       return new NavProperties(params, componentInfo.element);
     }
   },

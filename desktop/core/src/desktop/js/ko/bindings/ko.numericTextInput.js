@@ -17,7 +17,7 @@
 import * as ko from 'knockout';
 
 ko.bindingHandlers.numericTextInput = {
-  init: function(element, valueAccessor, allBindings) {
+  init: function (element, valueAccessor, allBindings) {
     const bindingOptions = ko.unwrap(valueAccessor());
     const numericValue = ko.observable(bindingOptions.value()).extend({
       numeric: {

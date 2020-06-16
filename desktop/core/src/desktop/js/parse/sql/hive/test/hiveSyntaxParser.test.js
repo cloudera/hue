@@ -17,7 +17,7 @@
 import hiveSyntaxParser from '../hiveSyntaxParser';
 
 describe('hiveSyntaxParser.js', () => {
-  const expectedToStrings = function(expected) {
+  const expectedToStrings = function (expected) {
     return expected.map(ex => ex.text);
   };
 
@@ -221,7 +221,7 @@ describe('hiveSyntaxParser.js', () => {
     expect(result).toBeTruthy();
   });
 
-  const expectEqualIds = function(beforeA, afterA, beforeB, afterB) {
+  const expectEqualIds = function (beforeA, afterA, beforeB, afterB) {
     const resultA = hiveSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = hiveSyntaxParser.parseSyntax(beforeB, afterB);
 
@@ -230,7 +230,7 @@ describe('hiveSyntaxParser.js', () => {
     expect(resultA.ruleId).toEqual(resultB.ruleId);
   };
 
-  const expectNonEqualIds = function(beforeA, afterA, beforeB, afterB) {
+  const expectNonEqualIds = function (beforeA, afterA, beforeB, afterB) {
     const resultA = hiveSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = hiveSyntaxParser.parseSyntax(beforeB, afterB);
 

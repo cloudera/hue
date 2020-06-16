@@ -133,7 +133,7 @@ class AssistDashboardPanel {
             });
         });
 
-      this.autocompleteFromEntries = function(nonPartial, partial) {
+      this.autocompleteFromEntries = function (nonPartial, partial) {
         const added = {};
         const result = [];
         const partialLower = partial.toLowerCase();

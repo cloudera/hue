@@ -43,20 +43,17 @@ function Plugin(element, options) {
   this.init();
 }
 
-Plugin.prototype.setOptions = function(options) {
+Plugin.prototype.setOptions = function (options) {
   this.options = $.extend({}, defaults, options);
   resizeScrollingTable(this);
 };
 
-Plugin.prototype.init = function() {
+Plugin.prototype.init = function () {
   const _this = this;
 
   $(_this.element).data('original-height', $(_this.element).height());
 
-  const disableScrollingTable = $(_this.element)
-    .find('table')
-    .eq(0)
-    .data('tablescroller-disable');
+  const disableScrollingTable = $(_this.element).find('table').eq(0).data('tablescroller-disable');
   if (disableScrollingTable == null || disableScrollingTable !== true) {
     resizeScrollingTable(_this);
     let resizeTimeout = -1;
@@ -74,7 +71,7 @@ Plugin.prototype.init = function() {
   }
 };
 
-Plugin.prototype.destroy = function() {
+Plugin.prototype.destroy = function () {
   const $element = $(this.element);
   this.disposeFunctions.forEach(disposeFunction => {
     disposeFunction();
@@ -84,37 +81,27 @@ Plugin.prototype.destroy = function() {
 
 function resizeScrollingTable(_this) {
   const el = _this.element;
-  $(el)
-    .css('overflow-y', '')
-    .css('height', '');
+  $(el).css('overflow-y', '').css('height', '');
   $(el).css('overflow-x', 'auto');
   let heightAfter = _this.options.heightAfterCorrection;
   $(el)
     .nextAll(':visible')
-    .each(function() {
+    .each(function () {
       heightAfter += $(this).outerHeight(true);
     });
 
   let heightCondition = $(el).height() > $(window).height() - $(el).offset().top - heightAfter;
-  const enforceHeight = $(_this.element)
-    .find('table')
-    .eq(0)
-    .data('tablescroller-enforce-height');
+  const enforceHeight = $(_this.element).find('table').eq(0).data('tablescroller-enforce-height');
   if (enforceHeight !== undefined && enforceHeight == true) {
     heightCondition = true;
   }
 
   const fixedHeight =
-    $(_this.element)
-      .find('table')
-      .eq(0)
-      .data('tablescroller-fixed-height') || _this.options.maxHeight;
+    $(_this.element).find('table').eq(0).data('tablescroller-fixed-height') ||
+    _this.options.maxHeight;
 
   if (heightCondition) {
-    const specificMinHeight = $(el)
-      .find('table')
-      .eq(0)
-      .data('tablescroller-min-height');
+    const specificMinHeight = $(el).find('table').eq(0).data('tablescroller-min-height');
     let minHeightVal = _this.options.minHeight;
     if (!isNaN(parseFloat(specificMinHeight)) && isFinite(specificMinHeight)) {
       minHeightVal = parseFloat(specificMinHeight);
@@ -139,25 +126,19 @@ function resizeScrollingTable(_this) {
         );
     } else {
       if ($(el).data('original-height') > minHeightVal) {
-        $(el)
-          .css('overflow-y', 'auto')
-          .height(minHeightVal);
+        $(el).css('overflow-y', 'auto').height(minHeightVal);
       }
       if (fixedHeight > -1) {
-        $(el)
-          .css('overflow-y', 'auto')
-          .css('maxHeight', fixedHeight);
+        $(el).css('overflow-y', 'auto').css('maxHeight', fixedHeight);
       }
     }
   } else if (fixedHeight > -1) {
-    $(el)
-      .css('overflow-y', 'auto')
-      .css('maxHeight', fixedHeight);
+    $(el).css('overflow-y', 'auto').css('maxHeight', fixedHeight);
   }
 }
 
-$.fn[PLUGIN_NAME] = function(options) {
-  return this.each(function() {
+$.fn[PLUGIN_NAME] = function (options) {
+  return this.each(function () {
     if (!$.data(this, 'plugin_' + PLUGIN_NAME)) {
       $.data(this, 'plugin_' + PLUGIN_NAME, new Plugin(this, options));
     } else {

@@ -19,7 +19,7 @@ import ksqlAutocompleteParser from '../ksqlAutocompleteParser';
 // prettier-ignore-start
 describe('ksqlAutocompleteParser.js locations', () => {
   beforeAll(() => {
-    ksqlAutocompleteParser.yy.parseError = function(msg) {
+    ksqlAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });
@@ -35,7 +35,7 @@ describe('ksqlAutocompleteParser.js locations', () => {
     ).toEqualDefinition(testDefinition);
   };
 
-  const assertLocations = function(options) {
+  const assertLocations = function (options) {
     assertAutoComplete({
       beforeCursor: options.beforeCursor,
       afterCursor: options.afterCursor || '',

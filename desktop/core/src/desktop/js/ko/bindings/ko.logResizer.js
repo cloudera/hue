@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.logResizer = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const options = ko.unwrap(valueAccessor()),
       $resizer = $(element),
       $parent = $resizer.parents(options.parent),
@@ -34,12 +34,12 @@ ko.bindingHandlers.logResizer = {
 
     $resizer.draggable({
       axis: 'y',
-      start: function() {
+      start: function () {
         if (onStart) {
           onStart();
         }
       },
-      drag: function(event, ui) {
+      drag: function (event, ui) {
         let currentHeight = ui.offset.top - $target.offset().top - 20;
         if (options.minHeight && currentHeight < options.minHeight) {
           currentHeight = options.minHeight;
@@ -49,7 +49,7 @@ ko.bindingHandlers.logResizer = {
         ui.offset.top = 0;
         ui.position.top = 0;
       },
-      stop: function(event, ui) {
+      stop: function (event, ui) {
         ui.offset.top = 0;
         ui.position.top = 0;
         if (onResize) {

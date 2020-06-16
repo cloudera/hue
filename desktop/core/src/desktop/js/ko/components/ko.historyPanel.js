@@ -172,7 +172,10 @@ class HistoryPanel {
     self.editorViewModel = new EditorViewModel(null, '', {
       user: window.LOGGED_USERNAME,
       userId: window.LOGGED_USER_ID,
-      languages: [{ name: 'Java', type: 'java' }, { name: 'Hive SQL', type: 'hive' }], // TODO reuse
+      languages: [
+        { name: 'Java', type: 'java' },
+        { name: 'Hive SQL', type: 'hive' }
+      ], // TODO reuse
       snippetViewSettings: {
         hive: {
           placeHolder: I18n('Example: SELECT * FROM tablename, or press CTRL + space'),
@@ -207,7 +210,7 @@ class HistoryPanel {
     self.$toggleElement;
     const $container = $('body');
 
-    self.reposition = function() {
+    self.reposition = function () {
       self.top(self.$toggleElement.offset().top + self.$toggleElement.height() + 15 + 'px');
       self.left($container.offset().left + $container.width() - 630 + 'px');
     };

@@ -19,7 +19,7 @@ import druidAutocompleteParser from '../druidAutocompleteParser';
 // prettier-ignore-start
 describe('druidAutocompleteParser.js locations', () => {
   beforeAll(() => {
-    druidAutocompleteParser.yy.parseError = function(msg) {
+    druidAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });
@@ -35,7 +35,7 @@ describe('druidAutocompleteParser.js locations', () => {
     ).toEqualDefinition(testDefinition);
   };
 
-  const assertLocations = function(options) {
+  const assertLocations = function (options) {
     assertAutoComplete({
       beforeCursor: options.beforeCursor,
       afterCursor: options.afterCursor || '',

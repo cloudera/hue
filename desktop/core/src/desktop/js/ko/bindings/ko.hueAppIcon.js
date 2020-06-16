@@ -67,7 +67,7 @@ const APP_ICON_INDEX = {
 };
 
 ko.bindingHandlers.hueAppIcon = {
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const options = ko.unwrap(valueAccessor());
     const iconName = options.icon ? ko.unwrap(options.icon) : options;
     $(element).html(APP_ICON_INDEX[iconName] || APP_ICON_INDEX.default);

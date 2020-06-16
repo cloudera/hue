@@ -201,7 +201,10 @@ const MATHEMATICAL_FUNCTIONS = {
   },
   fmod: {
     returnTypes: ['T'],
-    arguments: [[{ type: 'DOUBLE' }, { type: 'DOUBLE' }], [{ type: 'FLOAT' }, { type: 'FLOAT' }]],
+    arguments: [
+      [{ type: 'DOUBLE' }, { type: 'DOUBLE' }],
+      [{ type: 'FLOAT' }, { type: 'FLOAT' }]
+    ],
     signature: 'fmod(DOUBLE a, DOUBLE b), fmod(FLOAT a, FLOAT b)',
     draggable: 'fmod()',
     description: 'Returns the modulus of a floating-point number'
@@ -411,7 +414,10 @@ const MATHEMATICAL_FUNCTIONS = {
   },
   quotient: {
     returnTypes: ['INT'],
-    arguments: [[{ type: 'BIGINT' }, { type: 'DOUBLE' }], [{ type: 'BIGINT' }, { type: 'DOUBLE' }]],
+    arguments: [
+      [{ type: 'BIGINT' }, { type: 'DOUBLE' }],
+      [{ type: 'BIGINT' }, { type: 'DOUBLE' }]
+    ],
     signature:
       'quotient(BIGINT numerator, BIGINT denominator), quotient(DOUBLE numerator, DOUBLE denominator)',
     draggable: 'quotient()',

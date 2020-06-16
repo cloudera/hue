@@ -99,16 +99,10 @@ class HueFileEntry {
           return (
             (typeFilter === 'all' || entryType === typeFilter || entryType === 'directory') &&
             (!filter ||
-              entry
-                .definition()
-                .name.toLowerCase()
-                .indexOf(filter) !== -1 ||
+              entry.definition().name.toLowerCase().indexOf(filter) !== -1 ||
               (DOCUMENT_TYPE_I18n[entryType] &&
                 DOCUMENT_TYPE_I18n[entryType].toLowerCase().indexOf(filter) !== -1) ||
-              entry
-                .definition()
-                .description.toLowerCase()
-                .indexOf(filter) !== -1)
+              entry.definition().description.toLowerCase().indexOf(filter) !== -1)
           );
         });
       }
@@ -389,10 +383,7 @@ class HueFileEntry {
     }
     const copyNext = () => {
       if (self.selectedEntries().length > 0) {
-        const nextUuid = self
-          .selectedEntries()
-          .shift()
-          .definition().uuid;
+        const nextUuid = self.selectedEntries().shift().definition().uuid;
         apiHelper.copyDocument({
           uuid: nextUuid,
           successCallback: () => {
@@ -507,7 +498,7 @@ class HueFileEntry {
       uuid: owner.uuid,
       query: query,
       type: self.serverTypeFilter().type,
-      successCallback: function(data) {
+      successCallback: function (data) {
         resultEntry.hasErrors(false);
         const newEntries = [];
 
@@ -629,7 +620,7 @@ class HueFileEntry {
   emptyTrash() {
     if (this.trashEntry()) {
       if (!this.trashEntry().loaded()) {
-        this.trashEntry().load(function() {
+        this.trashEntry().load(function () {
           this.entriesToDelete(this.trashEntry().entries());
           $('#deleteEntriesModal').modal('show');
         });
@@ -668,10 +659,7 @@ class HueFileEntry {
 
     const deleteNext = () => {
       if (self.entriesToDelete().length > 0) {
-        const nextUuid = self
-          .entriesToDelete()
-          .shift()
-          .definition().uuid;
+        const nextUuid = self.entriesToDelete().shift().definition().uuid;
         apiHelper.deleteDocument({
           uuid: nextUuid,
           skipTrash: deleteForever,
@@ -829,7 +817,7 @@ class HueFileEntry {
     const self = this;
     if (name && self.app === 'documents') {
       apiHelper.createDocumentsFolder({
-        successCallback: function() {
+        successCallback: function () {
           huePubSub.publish('assist.document.refresh');
           self.load();
         },
@@ -844,7 +832,7 @@ class HueFileEntry {
     const self = this;
     if (name && self.app === 'documents') {
       apiHelper.updateDocument({
-        successCallback: function() {
+        successCallback: function () {
           huePubSub.publish('assist.document.refresh');
           self.load();
         },

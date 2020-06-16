@@ -18,7 +18,7 @@ import calciteAutocompleteParser from '../calciteAutocompleteParser';
 
 describe('calciteAutocompleteParser.js Error statements', () => {
   beforeAll(() => {
-    calciteAutocompleteParser.yy.parseError = function(msg) {
+    calciteAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });

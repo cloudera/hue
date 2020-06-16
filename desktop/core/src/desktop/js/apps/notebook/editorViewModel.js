@@ -71,7 +71,7 @@ class EditorViewModel {
     });
 
     self.preEditorTogglingSnippet = ko.observable();
-    self.toggleEditorMode = function() {
+    self.toggleEditorMode = function () {
       const notebook = self.selectedNotebook();
       const newSnippets = [];
 
@@ -135,7 +135,7 @@ class EditorViewModel {
         huePubSub.publish('editor.redraw.data', { snippet: snippet });
       });
     };
-    self.togglePresentationMode = function() {
+    self.togglePresentationMode = function () {
       if (self.selectedNotebook().initialType !== 'notebook') {
         self.toggleEditorMode();
       }
@@ -154,10 +154,7 @@ class EditorViewModel {
       return (
         self.selectedNotebook() &&
         self.selectedNotebook().snippets().length === 1 &&
-        self
-          .selectedNotebook()
-          .snippets()[0]
-          .isSqlDialect()
+        self.selectedNotebook().snippets()[0].isSqlDialect()
       );
     });
     self.isResultFullScreenMode = ko.observable(false);
@@ -216,7 +213,7 @@ class EditorViewModel {
       self.activeSqlSourceType = null;
     }
 
-    self.displayCombinedContent = function() {
+    self.displayCombinedContent = function () {
       if (!self.selectedNotebook()) {
         self.combinedContent('');
       } else {
@@ -238,7 +235,7 @@ class EditorViewModel {
     self.isEditing.subscribe(() => {
       $(document).trigger('editingToggled');
     });
-    self.toggleEditing = function() {
+    self.toggleEditing = function () {
       self.isEditing(!self.isEditing());
     };
 
@@ -250,7 +247,7 @@ class EditorViewModel {
 
     self.removeSnippetConfirmation = ko.observable();
 
-    self.removeSnippet = function(notebook, snippet) {
+    self.removeSnippet = function (notebook, snippet) {
       let hasContent = snippet.statement_raw().length > 0;
       if (!hasContent) {
         $.each(snippet.properties(), (key, value) => {
@@ -291,7 +288,7 @@ class EditorViewModel {
       }
     });
 
-    this.withActiveSnippet = function(callback) {
+    this.withActiveSnippet = function (callback) {
       const notebook = self.selectedNotebook();
       let foundSnippet;
       if (notebook) {
@@ -337,7 +334,7 @@ class EditorViewModel {
             contents: activeSnippet.statement()
           };
           const options = {
-            successCallback: function(result) {
+            successCallback: function (result) {
               if (result && result.exists) {
                 $(document).trigger('info', result.path + ' saved successfully.');
               } else {
@@ -387,7 +384,7 @@ class EditorViewModel {
 
     self.editorMode = ko.observable(options.mode === 'editor');
 
-    self.getSnippetViewSettings = function(snippetType) {
+    self.getSnippetViewSettings = function (snippetType) {
       if (options.snippetViewSettings[snippetType]) {
         return options.snippetViewSettings[snippetType];
       }
@@ -400,7 +397,7 @@ class EditorViewModel {
         return item.name != ''; // Could filter out the ones already selected + yarn only or not
       });
     });
-    self.getSessionProperties = function(name) {
+    self.getSessionProperties = function (name) {
       let _prop = null;
       $.each(options.session_properties, (index, prop) => {
         if (prop.name == name) {
@@ -411,7 +408,7 @@ class EditorViewModel {
       return _prop;
     };
 
-    self.getSnippetName = function(snippetType) {
+    self.getSnippetName = function (snippetType) {
       const availableSnippets = self.availableSnippets();
       for (let i = 0; i < availableSnippets.length; i++) {
         if (availableSnippets[i].type() === snippetType) {
@@ -421,13 +418,13 @@ class EditorViewModel {
       return '';
     };
 
-    self.changeURL = function(url) {
+    self.changeURL = function (url) {
       if (!self.isNotificationManager()) {
         hueUtils.changeURL(url);
       }
     };
 
-    self.init = function() {
+    self.init = function () {
       if (editor_id) {
         self.openNotebook(editor_id);
       } else if (window.location.getParameter('gist') !== '') {
@@ -443,7 +440,7 @@ class EditorViewModel {
       }
     };
 
-    self.loadNotebook = function(notebookRaw, queryTab) {
+    self.loadNotebook = function (notebookRaw, queryTab) {
       let currentQueries;
       if (self.selectedNotebook() != null) {
         self.selectedNotebook().close();
@@ -502,7 +499,7 @@ class EditorViewModel {
       huePubSub.publish('recalculate.name.description.width');
     };
 
-    self.getPreviousChartOptions = function(snippet) {
+    self.getPreviousChartOptions = function (snippet) {
       return {
         chartLimit:
           typeof snippet.chartLimit() !== 'undefined'
@@ -559,7 +556,7 @@ class EditorViewModel {
       };
     };
 
-    self.openNotebook = function(uuid, queryTab, skipUrlChange, callback, session) {
+    self.openNotebook = function (uuid, queryTab, skipUrlChange, callback, session) {
       const deferredOpen = new $.Deferred();
       $.get(
         '/desktop/api2/doc/',
@@ -605,7 +602,7 @@ class EditorViewModel {
       return deferredOpen.promise();
     };
 
-    self.newNotebook = function(editorType, callback, queryTab) {
+    self.newNotebook = function (editorType, callback, queryTab) {
       const connectorId = editorType || options.editor_type;
 
       if (!self.isNotificationManager()) {
@@ -649,11 +646,11 @@ class EditorViewModel {
       );
     };
 
-    self.saveNotebook = function() {
+    self.saveNotebook = function () {
       self.selectedNotebook().save();
     };
 
-    self.saveAsNotebook = function() {
+    self.saveAsNotebook = function () {
       self.selectedNotebook().id(null);
       self.selectedNotebook().uuid(hueUtils.UUID());
       self.selectedNotebook().parentSavedQueryUuid(null);
@@ -662,7 +659,7 @@ class EditorViewModel {
       });
     };
 
-    self.showContextPopover = function(field, event) {
+    self.showContextPopover = function (field, event) {
       const $source = $(
         event.target && event.target.nodeName !== 'A' ? event.target.parentElement : event.target
       );

@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.momentFromNow = {
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const options = ko.unwrap(valueAccessor());
     const $element = $(element);
 

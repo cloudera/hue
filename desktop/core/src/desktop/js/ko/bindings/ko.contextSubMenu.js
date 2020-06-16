@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.contextSubMenu = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const menuSelector = valueAccessor();
     const $element = $(element);
 
@@ -28,7 +28,7 @@ ko.bindingHandlers.contextSubMenu = {
     const $parentMenu = $element.parent('.hue-context-menu');
     let open = false;
 
-    const closeSubMenu = function() {
+    const closeSubMenu = function () {
       open = false;
       $menu.hide();
       $element.removeClass('active');

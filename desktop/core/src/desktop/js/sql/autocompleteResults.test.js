@@ -237,31 +237,31 @@ describe('AutocompleteResults.js', () => {
       autocompleteSettings: {
         temporaryOnly: false
       },
-      type: function() {
+      type: function () {
         return 'hive';
       },
-      connector: function() {
+      connector: function () {
         return { id: 'hive', dialect: 'hive' };
       },
-      database: function() {
+      database: function () {
         return 'default';
       },
-      namespace: function() {
+      namespace: function () {
         return { id: 'defaultNamespace' };
       },
-      compute: function() {
+      compute: function () {
         return { id: 'defaultCompute' };
       },
-      whenContextSet: function() {
+      whenContextSet: function () {
         return $.Deferred().resolve();
       }
     },
-    editor: function() {
+    editor: function () {
       return {
-        getTextBeforeCursor: function() {
+        getTextBeforeCursor: function () {
           return 'foo';
         },
-        getTextAfterCursor: function() {
+        getTextAfterCursor: function () {
           return 'bar';
         }
       };
@@ -316,7 +316,10 @@ describe('AutocompleteResults.js', () => {
     expect(subject.filtered().length).toBe(0);
     subject.update({
       lowerCase: true,
-      suggestKeywords: [{ value: 'BAR', weight: 1 }, { value: 'FOO', weight: 2 }]
+      suggestKeywords: [
+        { value: 'BAR', weight: 1 },
+        { value: 'FOO', weight: 2 }
+      ]
     });
 
     expect(subject.filtered().length).toBe(2);
@@ -333,7 +336,10 @@ describe('AutocompleteResults.js', () => {
     expect(subject.filtered().length).toBe(0);
     subject.update({
       lowerCase: false,
-      suggestIdentifiers: [{ name: 'foo', type: 'alias' }, { name: 'bar', type: 'table' }]
+      suggestIdentifiers: [
+        { name: 'foo', type: 'alias' },
+        { name: 'bar', type: 'table' }
+      ]
     });
 
     expect(subject.filtered().length).toBe(2);

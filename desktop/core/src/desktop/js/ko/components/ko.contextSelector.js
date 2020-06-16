@@ -172,7 +172,7 @@ const TYPES = Object.keys(TYPES_INDEX).map(key => {
  * @param {function} [params.onNamespaceSelect] - Callback when a new namespace is selected (after initial set)
  * @constructor
  */
-const HueContextSelector = function(params) {
+const HueContextSelector = function (params) {
   const self = this;
   if (!params.connector || !ko.unwrap(params.connector)) {
     throw new Error('No connector with type provided');
@@ -189,7 +189,7 @@ const HueContextSelector = function(params) {
     self[type.available] = ko.observableArray();
     self[type.hide] = params[type.hide] || !self[type.name];
     self[type.lastPromise] = undefined;
-    self[type.onSelect] = function(selectedVal, previousVal) {
+    self[type.onSelect] = function (selectedVal, previousVal) {
       if (params[type.onSelect]) {
         params[type.onSelect](selectedVal, previousVal);
       }
@@ -216,7 +216,7 @@ const HueContextSelector = function(params) {
 
   let refreshThrottle = -1;
 
-  const refresh = function(connectorId) {
+  const refresh = function (connectorId) {
     if (!connectorId || ko.unwrap(self.connector).id === connectorId) {
       window.clearTimeout(refreshThrottle);
       refreshThrottle = window.setTimeout(() => {
@@ -262,7 +262,7 @@ const HueContextSelector = function(params) {
   });
 };
 
-HueContextSelector.prototype.setMatchingNamespace = function(compute) {
+HueContextSelector.prototype.setMatchingNamespace = function (compute) {
   const self = this;
   if (self[TYPES_INDEX.namespace.name]) {
     // Select the first corresponding namespace when a compute is selected (unless selected)
@@ -293,7 +293,7 @@ HueContextSelector.prototype.setMatchingNamespace = function(compute) {
   }
 };
 
-HueContextSelector.prototype.setMatchingCompute = function(namespace) {
+HueContextSelector.prototype.setMatchingCompute = function (namespace) {
   const self = this;
   if (self[TYPES_INDEX.compute.name]) {
     // Select the first corresponding compute when a namespace is selected (unless selected)
@@ -325,7 +325,7 @@ HueContextSelector.prototype.setMatchingCompute = function(namespace) {
   }
 };
 
-HueContextSelector.prototype.reload = function(type) {
+HueContextSelector.prototype.reload = function (type) {
   const self = this;
   if (self[type.name]) {
     self[type.loading](true);
@@ -401,13 +401,11 @@ HueContextSelector.prototype.reload = function(type) {
         self[type.loading](false);
       });
   } else {
-    self[type.lastPromise] = $.Deferred()
-      .resolve()
-      .promise();
+    self[type.lastPromise] = $.Deferred().resolve().promise();
   }
 };
 
-HueContextSelector.prototype.reloadDatabases = function() {
+HueContextSelector.prototype.reloadDatabases = function () {
   const self = this;
   if (self.database && !self.hideDatabases) {
     self.loadingDatabases(true);
@@ -490,7 +488,7 @@ HueContextSelector.prototype.reloadDatabases = function() {
   }
 };
 
-HueContextSelector.prototype.dispose = function() {
+HueContextSelector.prototype.dispose = function () {
   const self = this;
   while (self.disposals.length) {
     self.disposals.pop()();

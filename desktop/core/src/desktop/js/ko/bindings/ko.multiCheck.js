@@ -18,11 +18,8 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.multiCheck = {
-  init: function(element, valueAccessor) {
-    $(element)
-      .attr('unselectable', 'on')
-      .css('user-select', 'none')
-      .on('selectstart', false);
+  init: function (element, valueAccessor) {
+    $(element).attr('unselectable', 'on').css('user-select', 'none').on('selectstart', false);
 
     const $container = $(ko.unwrap(valueAccessor()));
     $(element).click(e => {
@@ -60,5 +57,5 @@ ko.bindingHandlers.multiCheck = {
       $container.data('last-clicked-checkbox-state', shouldCheck);
     });
   },
-  update: function() {}
+  update: function () {}
 };

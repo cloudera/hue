@@ -23,10 +23,10 @@ import {
   SIMPLE_TABLE_REF_SUGGESTIONS
 } from 'parse/sql/sqlParseUtils';
 
-const initSqlParser = function(parser) {
+const initSqlParser = function (parser) {
   initSharedAutocomplete(parser);
 
-  parser.prepareNewStatement = function() {
+  parser.prepareNewStatement = function () {
     linkTablePrimaries();
     parser.commitLocations();
 
@@ -39,21 +39,21 @@ const initSqlParser = function(parser) {
     prioritizeSuggestions();
   };
 
-  parser.yy.parseError = function(message, error) {
+  parser.yy.parseError = function (message, error) {
     parser.yy.errors.push(error);
     return message;
   };
 
-  parser.addCommonTableExpressions = function(identifiers) {
+  parser.addCommonTableExpressions = function (identifiers) {
     parser.yy.result.commonTableExpressions = identifiers;
     parser.yy.latestCommonTableExpressions = identifiers;
   };
 
-  parser.isInSubquery = function() {
+  parser.isInSubquery = function () {
     return !!parser.yy.primariesStack.length;
   };
 
-  parser.pushQueryState = function() {
+  parser.pushQueryState = function () {
     parser.yy.resultStack.push(parser.yy.result);
     parser.yy.locationsStack.push(parser.yy.locations);
     parser.yy.selectListAliasesStack.push(parser.yy.selectListAliases);
@@ -73,7 +73,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.popQueryState = function(subQuery) {
+  parser.popQueryState = function (subQuery) {
     linkTablePrimaries();
     parser.commitLocations();
 
@@ -96,7 +96,7 @@ const initSqlParser = function(parser) {
     parser.yy.selectListAliases = parser.yy.selectListAliasesStack.pop();
   };
 
-  parser.suggestSelectListAliases = function() {
+  parser.suggestSelectListAliases = function () {
     if (
       parser.yy.selectListAliases &&
       parser.yy.selectListAliases.length > 0 &&
@@ -108,7 +108,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.mergeSuggestKeywords = function() {
+  parser.mergeSuggestKeywords = function () {
     let result = [];
     Array.prototype.slice.call(arguments).forEach(suggestion => {
       if (typeof suggestion !== 'undefined' && typeof suggestion.suggestKeywords !== 'undefined') {
@@ -121,7 +121,7 @@ const initSqlParser = function(parser) {
     return {};
   };
 
-  parser.suggestValueExpressionKeywords = function(valueExpression, extras) {
+  parser.suggestValueExpressionKeywords = function (valueExpression, extras) {
     const expressionKeywords = parser.getValueExpressionKeywords(valueExpression, extras);
     parser.suggestKeywords(expressionKeywords.suggestKeywords);
     if (expressionKeywords.suggestColRefKeywords) {
@@ -134,7 +134,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.getSelectListKeywords = function(excludeAsterisk) {
+  parser.getSelectListKeywords = function (excludeAsterisk) {
     const keywords = [{ value: 'CASE', weight: 450 }, 'FALSE', 'TRUE', 'NULL'];
     if (!excludeAsterisk) {
       keywords.push({ value: '*', weight: 10000 });
@@ -142,7 +142,7 @@ const initSqlParser = function(parser) {
     return keywords;
   };
 
-  parser.getValueExpressionKeywords = function(valueExpression, extras) {
+  parser.getValueExpressionKeywords = function (valueExpression, extras) {
     const types = valueExpression.lastType ? valueExpression.lastType.types : valueExpression.types;
     // We could have valueExpression.columnReference to suggest based on column type
     let keywords = [
@@ -192,7 +192,7 @@ const initSqlParser = function(parser) {
     return { suggestKeywords: keywords };
   };
 
-  parser.getTypeKeywords = function() {
+  parser.getTypeKeywords = function () {
     return [
       'BIGINT',
       'BOOLEAN',
@@ -209,21 +209,24 @@ const initSqlParser = function(parser) {
     ];
   };
 
-  parser.getColumnDataTypeKeywords = function() {
+  parser.getColumnDataTypeKeywords = function () {
     return parser.getTypeKeywords();
   };
 
-  parser.addColRefIfExists = function(valueExpression) {
+  parser.addColRefIfExists = function (valueExpression) {
     if (valueExpression.columnReference) {
       parser.yy.result.colRef = { identifierChain: valueExpression.columnReference };
     }
   };
 
-  parser.selectListNoTableSuggest = function(selectListEdit, hasDistinctOrAll) {
+  parser.selectListNoTableSuggest = function (selectListEdit, hasDistinctOrAll) {
     if (selectListEdit.cursorAtStart) {
       let keywords = parser.getSelectListKeywords();
       if (!hasDistinctOrAll) {
-        keywords = keywords.concat([{ value: 'ALL', weight: 2 }, { value: 'DISTINCT', weight: 2 }]);
+        keywords = keywords.concat([
+          { value: 'ALL', weight: 2 },
+          { value: 'DISTINCT', weight: 2 }
+        ]);
       }
       parser.suggestKeywords(keywords);
     } else {
@@ -244,18 +247,18 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.suggestJoinConditions = function(details) {
+  parser.suggestJoinConditions = function (details) {
     parser.yy.result.suggestJoinConditions = details || {};
     if (parser.yy.latestTablePrimaries && !parser.yy.result.suggestJoinConditions.tablePrimaries) {
       parser.yy.result.suggestJoinConditions.tablePrimaries = parser.yy.latestTablePrimaries.concat();
     }
   };
 
-  parser.suggestJoins = function(details) {
+  parser.suggestJoins = function (details) {
     parser.yy.result.suggestJoins = details || {};
   };
 
-  parser.findCaseType = function(whenThenList) {
+  parser.findCaseType = function (whenThenList) {
     const types = {};
     whenThenList.caseTypes.forEach(valueExpression => {
       valueExpression.types.forEach(type => {
@@ -268,7 +271,7 @@ const initSqlParser = function(parser) {
     return { types: ['T'] };
   };
 
-  parser.applyArgumentTypesToSuggestions = function(functionName, position) {
+  parser.applyArgumentTypesToSuggestions = function (functionName, position) {
     if (parser.yy.result.suggestFunctions || parser.yy.result.suggestColumns) {
       parser.yy.result.udfArgument = {
         name: functionName.toLowerCase(),
@@ -277,7 +280,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.commitLocations = function() {
+  parser.commitLocations = function () {
     if (parser.yy.locations.length === 0) {
       return;
     }
@@ -498,7 +501,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  const prioritizeSuggestions = function() {
+  const prioritizeSuggestions = function () {
     parser.yy.result.lowerCase = parser.yy.lowerCase || false;
 
     const cteIndex = {};
@@ -642,7 +645,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.identifyPartials = function(beforeCursor, afterCursor) {
+  parser.identifyPartials = function (beforeCursor, afterCursor) {
     const beforeMatch = beforeCursor.match(/[0-9a-zA-Z_]*$/);
     const afterMatch = afterCursor.match(/^[0-9a-zA-Z_]*(?:\((?:[^)]*\))?)?/);
     return {
@@ -651,7 +654,7 @@ const initSqlParser = function(parser) {
     };
   };
 
-  const addCleanTablePrimary = function(tables, tablePrimary) {
+  const addCleanTablePrimary = function (tables, tablePrimary) {
     if (tablePrimary.alias) {
       tables.push({ alias: tablePrimary.alias, identifierChain: tablePrimary.identifierChain });
     } else {
@@ -659,7 +662,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.expandIdentifierChain = function(options) {
+  parser.expandIdentifierChain = function (options) {
     const wrapper = options.wrapper;
     const anyOwner = options.anyOwner;
     const isColumnWrapper = options.isColumnWrapper;
@@ -824,7 +827,7 @@ const initSqlParser = function(parser) {
     wrapper.linked = true;
   };
 
-  const filterTablePrimariesForOwner = function(tablePrimaries, owner) {
+  const filterTablePrimariesForOwner = function (tablePrimaries, owner) {
     const result = [];
     tablePrimaries.forEach(primary => {
       if (typeof owner === 'undefined' && typeof primary.owner === 'undefined') {
@@ -836,7 +839,7 @@ const initSqlParser = function(parser) {
     return result;
   };
 
-  const convertTablePrimariesToSuggestions = function(tablePrimaries) {
+  const convertTablePrimariesToSuggestions = function (tablePrimaries) {
     const tables = [];
     const identifiers = [];
     tablePrimaries.forEach(tablePrimary => {
@@ -879,7 +882,7 @@ const initSqlParser = function(parser) {
     parser.yy.result.suggestColumns.linked = true;
   };
 
-  const linkTablePrimaries = function() {
+  const linkTablePrimaries = function () {
     if (!parser.yy.cursorFound || typeof parser.yy.latestTablePrimaries === 'undefined') {
       return;
     }
@@ -969,14 +972,14 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.addTablePrimary = function(ref) {
+  parser.addTablePrimary = function (ref) {
     if (typeof parser.yy.latestTablePrimaries === 'undefined') {
       parser.yy.latestTablePrimaries = [];
     }
     parser.yy.latestTablePrimaries.push(ref);
   };
 
-  parser.suggestFileFormats = function() {
+  parser.suggestFileFormats = function () {
     parser.suggestKeywords([
       'AVRO',
       'KUDU',
@@ -988,7 +991,7 @@ const initSqlParser = function(parser) {
     ]);
   };
 
-  parser.getKeywordsForOptionalsLR = function(optionals, keywords, override) {
+  parser.getKeywordsForOptionalsLR = function (optionals, keywords, override) {
     let result = [];
 
     for (let i = 0; i < optionals.length; i++) {
@@ -1005,7 +1008,7 @@ const initSqlParser = function(parser) {
     return result;
   };
 
-  parser.suggestDdlAndDmlKeywords = function(extraKeywords) {
+  parser.suggestDdlAndDmlKeywords = function (extraKeywords) {
     let keywords = [
       'CREATE',
       'DESCRIBE',
@@ -1025,7 +1028,7 @@ const initSqlParser = function(parser) {
     parser.suggestKeywords(keywords);
   };
 
-  parser.checkForSelectListKeywords = function(selectList) {
+  parser.checkForSelectListKeywords = function (selectList) {
     if (selectList.length === 0) {
       return;
     }
@@ -1053,7 +1056,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.checkForKeywords = function(expression) {
+  parser.checkForKeywords = function (expression) {
     if (expression) {
       if (expression.suggestKeywords && expression.suggestKeywords.length > 0) {
         parser.suggestKeywords(expression.suggestKeywords);
@@ -1065,7 +1068,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.createWeightedKeywords = function(keywords, weight) {
+  parser.createWeightedKeywords = function (keywords, weight) {
     const result = [];
     keywords.forEach(keyword => {
       if (typeof keyword.weight !== 'undefined') {
@@ -1078,11 +1081,11 @@ const initSqlParser = function(parser) {
     return result;
   };
 
-  parser.suggestColRefKeywords = function(colRefKeywords) {
+  parser.suggestColRefKeywords = function (colRefKeywords) {
     parser.yy.result.suggestColRefKeywords = colRefKeywords;
   };
 
-  parser.suggestTablesOrColumns = function(identifier) {
+  parser.suggestTablesOrColumns = function (identifier) {
     if (typeof parser.yy.latestTablePrimaries == 'undefined') {
       parser.suggestTables({ identifierChain: [{ name: identifier }] });
       return;
@@ -1097,11 +1100,11 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.suggestFunctions = function(details) {
+  parser.suggestFunctions = function (details) {
     parser.yy.result.suggestFunctions = details || {};
   };
 
-  parser.suggestAggregateFunctions = function() {
+  parser.suggestAggregateFunctions = function () {
     const primaries = [];
     const aliases = {};
     parser.yy.latestTablePrimaries.forEach(primary => {
@@ -1120,19 +1123,19 @@ const initSqlParser = function(parser) {
     parser.yy.result.suggestAggregateFunctions = { tablePrimaries: primaries };
   };
 
-  parser.suggestAnalyticFunctions = function() {
+  parser.suggestAnalyticFunctions = function () {
     parser.yy.result.suggestAnalyticFunctions = true;
   };
 
-  parser.suggestSetOptions = function() {
+  parser.suggestSetOptions = function () {
     parser.yy.result.suggestSetOptions = true;
   };
 
-  parser.suggestIdentifiers = function(identifiers) {
+  parser.suggestIdentifiers = function (identifiers) {
     parser.yy.result.suggestIdentifiers = identifiers;
   };
 
-  parser.suggestColumns = function(details) {
+  parser.suggestColumns = function (details) {
     if (typeof details === 'undefined') {
       details = { identifierChain: [] };
     } else if (typeof details.identifierChain === 'undefined') {
@@ -1141,27 +1144,27 @@ const initSqlParser = function(parser) {
     parser.yy.result.suggestColumns = details;
   };
 
-  parser.suggestGroupBys = function(details) {
+  parser.suggestGroupBys = function (details) {
     parser.yy.result.suggestGroupBys = details || {};
   };
 
-  parser.suggestOrderBys = function(details) {
+  parser.suggestOrderBys = function (details) {
     parser.yy.result.suggestOrderBys = details || {};
   };
 
-  parser.suggestFilters = function(details) {
+  parser.suggestFilters = function (details) {
     parser.yy.result.suggestFilters = details || {};
   };
 
-  parser.suggestKeyValues = function(details) {
+  parser.suggestKeyValues = function (details) {
     parser.yy.result.suggestKeyValues = details || {};
   };
 
-  parser.suggestTables = function(details) {
+  parser.suggestTables = function (details) {
     parser.yy.result.suggestTables = details || {};
   };
 
-  parser.firstDefined = function() {
+  parser.firstDefined = function () {
     for (let i = 0; i + 1 < arguments.length; i += 2) {
       if (arguments[i]) {
         return arguments[i + 1];
@@ -1169,7 +1172,7 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.addColRefToVariableIfExists = function(left, right) {
+  parser.addColRefToVariableIfExists = function (left, right) {
     if (
       left &&
       left.columnReference &&
@@ -1179,7 +1182,7 @@ const initSqlParser = function(parser) {
       right.columnReference.length &&
       parser.yy.locations.length > 1
     ) {
-      const addColRefToVariableLocation = function(variableValue, colRef) {
+      const addColRefToVariableLocation = function (variableValue, colRef) {
         // See if colref is actually an alias
         if (colRef.length === 1 && colRef[0].name) {
           parser.yy.locations.some(location => {
@@ -1209,26 +1212,26 @@ const initSqlParser = function(parser) {
     }
   };
 
-  parser.suggestDatabases = function(details) {
+  parser.suggestDatabases = function (details) {
     parser.yy.result.suggestDatabases = details || {};
   };
 
-  parser.suggestHdfs = function(details) {
+  parser.suggestHdfs = function (details) {
     parser.yy.result.suggestHdfs = details || {};
   };
 
-  parser.suggestValues = function(details) {
+  parser.suggestValues = function (details) {
     parser.yy.result.suggestValues = details || {};
   };
 
-  parser.determineCase = function(text) {
+  parser.determineCase = function (text) {
     if (!parser.yy.caseDetermined) {
       parser.yy.lowerCase = text.toLowerCase() === text;
       parser.yy.caseDetermined = true;
     }
   };
 
-  parser.handleQuotedValueWithCursor = function(lexer, yytext, yylloc, quoteChar) {
+  parser.handleQuotedValueWithCursor = function (lexer, yytext, yylloc, quoteChar) {
     if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
       parser.yy.partialCursor = yytext.indexOf('\u2021') !== -1;
       const cursorIndex = parser.yy.partialCursor
@@ -1261,7 +1264,7 @@ const initSqlParser = function(parser) {
   /**
    * Main parser function
    */
-  parser.parseSql = function(beforeCursor, afterCursor, debug) {
+  parser.parseSql = function (beforeCursor, afterCursor, debug) {
     // Jison counts CRLF as two lines in the locations
     beforeCursor = beforeCursor.replace(/\r\n|\n\r/gm, '\n');
     afterCursor = afterCursor.replace(/\r\n|\n\r/gm, '\n');
@@ -1288,7 +1291,7 @@ const initSqlParser = function(parser) {
     // Fix for parser bug when switching lexer states
     if (!lexerModified) {
       const originalSetInput = parser.lexer.setInput;
-      parser.lexer.setInput = function(input, yy) {
+      parser.lexer.setInput = function (input, yy) {
         return originalSetInput.bind(parser.lexer)(input, yy);
       };
       lexerModified = true;

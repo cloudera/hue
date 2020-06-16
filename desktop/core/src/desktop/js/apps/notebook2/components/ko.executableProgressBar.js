@@ -73,20 +73,14 @@ class ExecutableProgressBar extends DisposableComponent {
         this.progress(executable.progress);
         if (executable.progress === 100) {
           await sleep(2000);
-          $(element)
-            .parent()
-            .find('.progress-snippet')
-            .animate(
-              {
-                height: '0'
-              },
-              100
-            );
+          $(element).parent().find('.progress-snippet').animate(
+            {
+              height: '0'
+            },
+            100
+          );
         } else {
-          $(element)
-            .parent()
-            .find('.progress-snippet')
-            .css('height', '');
+          $(element).parent().find('.progress-snippet').css('height', '');
         }
       }
     });

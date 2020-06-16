@@ -31,7 +31,7 @@ import { DataCatalog } from './dataCatalog';
  * @param {Function} apiHelperFunction
  * @return {CancellablePromise}
  */
-const genericOptimizerReload = function(
+const genericOptimizerReload = function (
   multiTableEntry,
   options,
   promiseAttribute,
@@ -62,7 +62,7 @@ const genericOptimizerReload = function(
  * @param {Function} apiHelperFunction
  * @return {CancellablePromise}
  */
-const genericOptimizerGet = function(
+const genericOptimizerGet = function (
   multiTableEntry,
   options,
   promiseAttribute,
@@ -72,9 +72,7 @@ const genericOptimizerGet = function(
   if (DataCatalog.cacheEnabled() && options && options.cachedOnly) {
     return (
       catalogUtils.applyCancellable(multiTableEntry[promiseAttribute], options) ||
-      $.Deferred()
-        .reject(false)
-        .promise()
+      $.Deferred().reject(false).promise()
     );
   }
   if (!DataCatalog.cacheEnabled() || (options && options.refreshCache)) {

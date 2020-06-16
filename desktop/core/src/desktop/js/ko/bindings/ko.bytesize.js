@@ -18,25 +18,25 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 import sprintf from 'sprintf-js';
 
-ko.bindingHandlers.bytesize = (function() {
+ko.bindingHandlers.bytesize = (function () {
   let that;
   return (that = {
     units: ['B', 'KB', 'MB', 'GB', 'TB', 'PB'],
-    init: function(element, valueAccessor) {
+    init: function (element, valueAccessor) {
       that.format(element, valueAccessor);
     },
-    update: function(element, valueAccessor) {
+    update: function (element, valueAccessor) {
       that.format(element, valueAccessor);
     },
-    format: function(element, valueAccessor) {
+    format: function (element, valueAccessor) {
       const value = valueAccessor();
       const formatted = that.humanSize(ko.unwrap(value));
       $(element).text(formatted);
     },
-    getBaseLog: function(x, y) {
+    getBaseLog: function (x, y) {
       return Math.log(x) / Math.log(y);
     },
-    humanSize: function(bytes) {
+    humanSize: function (bytes) {
       const isNumber = !isNaN(parseFloat(bytes)) && isFinite(bytes);
       if (!isNumber) {
         return '';

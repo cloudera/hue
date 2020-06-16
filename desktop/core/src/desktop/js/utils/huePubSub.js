@@ -20,7 +20,7 @@ const topics = {};
 const hOP = topics.hasOwnProperty;
 
 const huePubSub = {
-  subscribe: function(topic, listener, app) {
+  subscribe: function (topic, listener, app) {
     if (!hOP.call(topics, topic)) {
       topics[topic] = [];
     }
@@ -33,25 +33,25 @@ const huePubSub = {
       }) - 1;
 
     return {
-      remove: function() {
+      remove: function () {
         delete topics[topic][index];
       }
     };
   },
-  removeAll: function(topic) {
+  removeAll: function (topic) {
     topics[topic] = [];
   },
-  subscribeOnce: function(topic, listener, app) {
+  subscribeOnce: function (topic, listener, app) {
     const ephemeral = this.subscribe(
       topic,
-      function() {
+      function () {
         listener.apply(listener, arguments);
         ephemeral.remove();
       },
       app
     );
   },
-  publish: function(topic, info) {
+  publish: function (topic, info) {
     if (!hOP.call(topics, topic)) {
       return;
     }
@@ -62,10 +62,10 @@ const huePubSub = {
       }
     });
   },
-  getTopics: function() {
+  getTopics: function () {
     return topics;
   },
-  pauseAppSubscribers: function(app) {
+  pauseAppSubscribers: function (app) {
     if (app) {
       Object.keys(topics).forEach(topicName => {
         topics[topicName].forEach(topic => {
@@ -80,7 +80,7 @@ const huePubSub = {
       });
     }
   },
-  resumeAppSubscribers: function(app) {
+  resumeAppSubscribers: function (app) {
     if (app) {
       Object.keys(topics).forEach(topicName => {
         topics[topicName].forEach(topic => {
@@ -95,7 +95,7 @@ const huePubSub = {
       });
     }
   },
-  clearAppSubscribers: function(app) {
+  clearAppSubscribers: function (app) {
     if (app) {
       Object.keys(topics).forEach(topicName => {
         topics[topicName] = topics[topicName].filter(obj => {

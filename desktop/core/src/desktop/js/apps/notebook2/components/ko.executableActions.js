@@ -116,9 +116,8 @@ class ExecutableActions extends DisposableComponent {
 
       return (
         !this.lastSession() ||
-        (!executable ||
-          (executable.parsedStatement &&
-            WHITE_SPACE_REGEX.test(executable.parsedStatement.statement)))
+        !executable ||
+        (executable.parsedStatement && WHITE_SPACE_REGEX.test(executable.parsedStatement.statement))
       );
     });
 

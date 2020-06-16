@@ -18,7 +18,7 @@ import calciteAutocompleteParser from '../calciteAutocompleteParser';
 
 describe('calciteAutocompleteParser.js SELECT STREAM statements', () => {
   beforeAll(() => {
-    calciteAutocompleteParser.yy.parseError = function(msg) {
+    calciteAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });

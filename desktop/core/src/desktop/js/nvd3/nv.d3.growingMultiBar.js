@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 
 import nv from 'ext/nv.d3.1.1.15b.custom';
 
-nv.models.growingMultiBar = function() {
+nv.models.growingMultiBar = function () {
   'use strict';
   //============================================================
   // Public Variables with Default Settings
@@ -32,10 +32,10 @@ nv.models.growingMultiBar = function() {
     x = d3v3.scale.ordinal(),
     y = d3v3.scale.linear(),
     id = Math.floor(Math.random() * 10000), //Create semi-unique ID in case user doesn't select one
-    getX = function(d) {
+    getX = function (d) {
       return d.x;
     },
-    getY = function(d) {
+    getY = function (d) {
       return d.y;
     },
     forceY = [0], // 0 is forced by default.. this makes sense for the majority of bar graphs... user can always do chart.forceY([]) to remove
@@ -71,7 +71,7 @@ nv.models.growingMultiBar = function() {
   //============================================================
 
   function chart(selection) {
-    selection.each(function(data) {
+    selection.each(function (data) {
       const availableWidth = width - margin.left - margin.right,
         availableHeight = height - margin.top - margin.bottom,
         container = d3v3.select(this);
@@ -186,10 +186,7 @@ nv.models.growingMultiBar = function() {
       // Setup containers and skeleton of chart
 
       const wrap = container.selectAll('g.nv-wrap.nv-multibar').data([data]);
-      const wrapEnter = wrap
-        .enter()
-        .append('g')
-        .attr('class', 'nvd3 nv-wrap nv-multibar');
+      const wrapEnter = wrap.enter().append('g').attr('class', 'nvd3 nv-wrap nv-multibar');
       const defsEnter = wrapEnter.append('defs');
       const gEnter = wrapEnter.append('g');
       const g = wrap.select('g');
@@ -225,11 +222,7 @@ nv.models.growingMultiBar = function() {
             return i;
           }
         );
-      groups
-        .enter()
-        .append('g')
-        .style('stroke-opacity', 1e-6)
-        .style('fill-opacity', 1e-6);
+      groups.enter().append('g').style('stroke-opacity', 1e-6).style('fill-opacity', 1e-6);
       groups
         .exit()
         .transition()
@@ -255,10 +248,7 @@ nv.models.growingMultiBar = function() {
         .style('stroke', (d, i) => {
           return color(d, i);
         });
-      groups
-        .transition()
-        .style('stroke-opacity', 1)
-        .style('fill-opacity', 0.75);
+      groups.transition().style('stroke-opacity', 1).style('fill-opacity', 0.75);
 
       const bars = groups
         .selectAll('rect.nv-bar')
@@ -269,10 +259,10 @@ nv.models.growingMultiBar = function() {
 
       bars.exit().remove();
 
-      selectBars = function(selected) {
+      selectBars = function (selected) {
         if (selected.rangeValues) {
           $(selected.rangeValues).each((cnt, item) => {
-            bars.each(function(d) {
+            bars.each(function (d) {
               if (parseInt(d.x) >= parseInt(item.from) && parseInt(d.x_end) <= parseInt(item.to)) {
                 d3v3.select(this).classed('selected', true);
               }
@@ -286,7 +276,7 @@ nv.models.growingMultiBar = function() {
           }
 
           $(selected).each((cnt, item) => {
-            bars.each(function(d) {
+            bars.each(function (d) {
               if (_pivotField != null) {
                 if (
                   (Array.isArray(_pivotField)
@@ -299,11 +289,7 @@ nv.models.growingMultiBar = function() {
                   d3v3.select(this).classed('selected', true);
                 }
               } else if (d.x instanceof Date) {
-                if (
-                  moment(d.x)
-                    .utc()
-                    .format('YYYY-MM-DD[T]HH:mm:ss[Z]') === item
-                ) {
+                if (moment(d.x).utc().format('YYYY-MM-DD[T]HH:mm:ss[Z]') === item) {
                   d3v3.select(this).classed('selected', true);
                 }
               } else if (d.x === item) {
@@ -339,7 +325,7 @@ nv.models.growingMultiBar = function() {
           return color(d, j, i);
         });
       barsEnter
-        .on('mouseover', function(d, i) {
+        .on('mouseover', function (d, i) {
           d3v3.select(this).classed('hover', true);
           dispatch.elementMouseover({
             value: getY(d, i),
@@ -355,7 +341,7 @@ nv.models.growingMultiBar = function() {
             e: d3v3.event
           });
         })
-        .on('mouseout', function(d, i) {
+        .on('mouseout', function (d, i) {
           d3v3.select(this).classed('hover', false);
           dispatch.elementMouseout({
             value: getY(d, i),
@@ -494,7 +480,7 @@ nv.models.growingMultiBar = function() {
 
   chart.options = nv.utils.optionsFunc.bind(chart);
 
-  chart.x = function(_) {
+  chart.x = function (_) {
     if (!arguments.length) {
       return getX;
     }
@@ -502,7 +488,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.y = function(_) {
+  chart.y = function (_) {
     if (!arguments.length) {
       return getY;
     }
@@ -510,7 +496,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.margin = function(_) {
+  chart.margin = function (_) {
     if (!arguments.length) {
       return margin;
     }
@@ -521,7 +507,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.width = function(_) {
+  chart.width = function (_) {
     if (!arguments.length) {
       return width;
     }
@@ -529,7 +515,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.height = function(_) {
+  chart.height = function (_) {
     if (!arguments.length) {
       return height;
     }
@@ -537,7 +523,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.xScale = function(_) {
+  chart.xScale = function (_) {
     if (!arguments.length) {
       return x;
     }
@@ -545,7 +531,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.yScale = function(_) {
+  chart.yScale = function (_) {
     if (!arguments.length) {
       return y;
     }
@@ -553,7 +539,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.xDomain = function(_) {
+  chart.xDomain = function (_) {
     if (!arguments.length) {
       return xDomain;
     }
@@ -561,7 +547,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.yDomain = function(_) {
+  chart.yDomain = function (_) {
     if (!arguments.length) {
       return yDomain;
     }
@@ -569,7 +555,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.xRange = function(_) {
+  chart.xRange = function (_) {
     if (!arguments.length) {
       return xRange;
     }
@@ -577,7 +563,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.yRange = function(_) {
+  chart.yRange = function (_) {
     if (!arguments.length) {
       return yRange;
     }
@@ -585,7 +571,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.forceY = function(_) {
+  chart.forceY = function (_) {
     if (!arguments.length) {
       return forceY;
     }
@@ -593,7 +579,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.stacked = function(_) {
+  chart.stacked = function (_) {
     if (!arguments.length) {
       return stacked;
     }
@@ -601,7 +587,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.stackOffset = function(_) {
+  chart.stackOffset = function (_) {
     if (!arguments.length) {
       return stackOffset;
     }
@@ -609,7 +595,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.clipEdge = function(_) {
+  chart.clipEdge = function (_) {
     if (!arguments.length) {
       return clipEdge;
     }
@@ -617,7 +603,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.color = function(_) {
+  chart.color = function (_) {
     if (!arguments.length) {
       return color;
     }
@@ -625,7 +611,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.barColor = function(_) {
+  chart.barColor = function (_) {
     if (!arguments.length) {
       return barColor;
     }
@@ -633,7 +619,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.disabled = function(_) {
+  chart.disabled = function (_) {
     if (!arguments.length) {
       return disabled;
     }
@@ -641,7 +627,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.id = function(_) {
+  chart.id = function (_) {
     if (!arguments.length) {
       return id;
     }
@@ -649,7 +635,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.hideable = function(_) {
+  chart.hideable = function (_) {
     if (!arguments.length) {
       return hideable;
     }
@@ -657,7 +643,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.delay = function(_) {
+  chart.delay = function (_) {
     if (!arguments.length) {
       return delay;
     }
@@ -665,7 +651,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.groupSpacing = function(_) {
+  chart.groupSpacing = function (_) {
     if (!arguments.length) {
       return groupSpacing;
     }
@@ -673,7 +659,7 @@ nv.models.growingMultiBar = function() {
     return chart;
   };
 
-  chart.selectBars = function(args) {
+  chart.selectBars = function (args) {
     if (!arguments.length) {
       return selectBars;
     }

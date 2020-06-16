@@ -20,8 +20,8 @@ import MultiLineEllipsisHandler from 'utils/multiLineEllipsisHandler';
 
 ko.bindingHandlers.multiLineEllipsis = {
   after: ['text', 'value'],
-  init: function(element, valueAccessor) {},
-  update: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {},
+  update: function (element, valueAccessor) {
     let options = {};
     if (valueAccessor && ko.isObservable(valueAccessor())) {
       options.overflowing = valueAccessor();

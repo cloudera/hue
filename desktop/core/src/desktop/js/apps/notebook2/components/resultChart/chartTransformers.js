@@ -31,7 +31,7 @@ const MAX_LNG = 180;
 
 const isNotNullForCharts = val => val !== 'NULL' && val !== null;
 
-export const pieChartTransformer = function(rawDatum) {
+export const pieChartTransformer = function (rawDatum) {
   let data = [];
 
   if (rawDatum.chartX() != null && rawDatum.chartYSingle() != null) {
@@ -76,7 +76,7 @@ export const pieChartTransformer = function(rawDatum) {
   return data;
 };
 
-export const mapChartTransformer = function(rawDatum) {
+export const mapChartTransformer = function (rawDatum) {
   let datum = [];
   if (rawDatum.chartX() != null && rawDatum.chartYSingle() != null) {
     let regionIndex = -1;
@@ -109,7 +109,7 @@ export const mapChartTransformer = function(rawDatum) {
   return datum;
 };
 
-export const leafletMapChartTransformer = function(rawDatum) {
+export const leafletMapChartTransformer = function (rawDatum) {
   let datum = [];
   if (rawDatum.chartX() != null && rawDatum.chartYSingle() != null) {
     let latIndex = -1;
@@ -154,7 +154,7 @@ export const leafletMapChartTransformer = function(rawDatum) {
   return datum;
 };
 
-export const timelineChartTransformer = function(rawDatum) {
+export const timelineChartTransformer = function (rawDatum) {
   const datum = [];
   let plottedSeries = 0;
 
@@ -211,7 +211,7 @@ export const timelineChartTransformer = function(rawDatum) {
   return datum;
 };
 
-export const multiSerieChartTransformer = function(rawDatum) {
+export const multiSerieChartTransformer = function (rawDatum) {
   let datum = [];
 
   if (rawDatum.chartX() != null && rawDatum.chartYMulti().length > 0) {
@@ -390,7 +390,7 @@ export const multiSerieChartTransformer = function(rawDatum) {
   return datum;
 };
 
-export const scatterChartTransformer = function(rawDatum) {
+export const scatterChartTransformer = function (rawDatum) {
   const datumIndex = {};
 
   if (rawDatum.chartX() != null && rawDatum.chartYSingle() != null) {
@@ -415,7 +415,7 @@ export const scatterChartTransformer = function(rawDatum) {
     });
 
     if (xIndex > -1 && yIndex > -1) {
-      const createAndAddToArray = function(key, item) {
+      const createAndAddToArray = function (key, item) {
         if (!datumIndex[key]) {
           datumIndex[key] = [];
         }

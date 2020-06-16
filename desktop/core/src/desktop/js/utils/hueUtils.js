@@ -84,9 +84,7 @@ export const text2Url = selectors => {
  * @return {*|jQuery}
  */
 export const htmlEncode = value => {
-  return $('<div></div>')
-    .text(value)
-    .html();
+  return $('<div></div>').text(value).html();
 };
 
 export const html2text = value => {
@@ -281,7 +279,7 @@ export const getSearchParameter = (search, name, returnNull) => {
 };
 
 if (!window.location.getParameter) {
-  window.location.getParameter = function(name, returnNull) {
+  window.location.getParameter = function (name, returnNull) {
     return getSearchParameter(window.location.search, name, returnNull);
   };
 }
@@ -354,7 +352,7 @@ export const dfs = (node, callback) => {
 };
 
 export const deleteAllEmptyStringKey = node => {
-  const fDeleteEmptyStringKey = function(node, key) {
+  const fDeleteEmptyStringKey = function (node, key) {
     if (node[key] || typeof node[key] !== 'string') {
       return;
     }
@@ -371,11 +369,7 @@ const s4 = () =>
 export const UUID = () =>
   s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 
-export const escapeOutput = str =>
-  $('<span>')
-    .text(str)
-    .html()
-    .trim();
+export const escapeOutput = str => $('<span>').text(str).html().trim();
 
 export const getFileBrowseButton = (
   inputElement,
@@ -389,14 +383,9 @@ export const getFileBrowseButton = (
 ) => {
   let _btn;
   if (isAddon) {
-    _btn = $('<span>')
-      .addClass('add-on muted pointer filechooser-clickable')
-      .text('..');
+    _btn = $('<span>').addClass('add-on muted pointer filechooser-clickable').text('..');
   } else if (linkMarkup) {
-    _btn = $('<a>')
-      .addClass('btn')
-      .addClass('fileChooserBtn filechooser-clickable')
-      .text('..');
+    _btn = $('<a>').addClass('btn').addClass('fileChooserBtn filechooser-clickable').text('..');
   } else {
     _btn = $('<button>')
       .addClass('btn')
@@ -439,7 +428,7 @@ export const getFileBrowseButton = (
       $('#filechooser').jHueFileChooser({
         suppressErrors: true,
         selectFolder: supportSelectFolder,
-        onFolderChoose: function(filePath) {
+        onFolderChoose: function (filePath) {
           handleChoice(filePath, stripHdfsPrefix);
           if (selectFolder) {
             $('#chooseFile').modal('hide');
@@ -448,7 +437,7 @@ export const getFileBrowseButton = (
             }
           }
         },
-        onFileChoose: function(filePath) {
+        onFileChoose: function (filePath) {
           handleChoice(filePath, stripHdfsPrefix);
           $('#chooseFile').modal('hide');
           if (!isNestedModal) {
@@ -487,7 +476,7 @@ export const getFileBrowseButton = (
       });
       if (window.isIE11) {
         const oldFocus = $().modal.Constructor.prototype.enforceFocus;
-        $().modal.Constructor.prototype.enforceFocus = function() {};
+        $().modal.Constructor.prototype.enforceFocus = function () {};
         $('#chooseFile').modal('show');
         window.setTimeout(() => {
           $().modal.Constructor.prototype.enforceFocus = oldFocus;

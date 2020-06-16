@@ -16,11 +16,11 @@
 
 import * as ko from 'knockout';
 
-ko.toJSONObject = function(koObj) {
+ko.toJSONObject = function (koObj) {
   return JSON.parse(ko.toJSON(koObj));
 };
 
-ko.toCleanJSON = function(koObj) {
+ko.toCleanJSON = function (koObj) {
   return ko.toJSON(koObj, (key, value) => {
     if (key === '__ko_mapping__') {
       return;

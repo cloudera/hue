@@ -55,16 +55,12 @@ const barChartBuilder = (element, options, isTimeline) => {
   const _isPivot = options.isPivot != null ? options.isPivot : false;
 
   if ($(element).find('svg').length > 0 && (_datum.length === 0 || _datum[0].values.length === 0)) {
-    $(element)
-      .find('svg')
-      .remove();
+    $(element).find('svg').remove();
   }
 
   if (_datum.length > 0 && _datum[0].values.length > 0 && isNaN(_datum[0].values[0].y)) {
     _datum = [];
-    $(element)
-      .find('svg')
-      .remove();
+    $(element).find('svg').remove();
   }
 
   nv.addGraph(() => {
@@ -72,9 +68,7 @@ const barChartBuilder = (element, options, isTimeline) => {
       $(element).find('svg').length > 0 &&
       $(element).find('.nv-discreteBarWithAxes').length > 0
     ) {
-      $(element)
-        .find('svg')
-        .empty();
+      $(element).find('svg').empty();
     }
     const _chart = nv.models.multiBarWithBrushChart();
     _chart.noData(_datum.message || I18n('No Data Available.'));
@@ -105,16 +99,14 @@ const barChartBuilder = (element, options, isTimeline) => {
     _chart.multibar.hideable(true);
     _chart.multibar.stacked(typeof options.stacked != 'undefined' ? options.stacked : false);
     if (isTimeline) {
-      _chart.convert = function(d) {
+      _chart.convert = function (d) {
         return isTimeline ? new Date(moment(d[0].obj.from).valueOf()) : parseFloat(d);
       };
       _chart.staggerLabels(false);
       _chart.tooltipContent(values => {
         return values.map(value => {
           value = JSON.parse(JSON.stringify(value));
-          value.x = moment(value.x)
-            .utc()
-            .format('YYYY-MM-DD HH:mm:ss');
+          value.x = moment(value.x).utc().format('YYYY-MM-DD HH:mm:ss');
           value.y = _chart.yAxis.tickFormat()(value.y);
           return value;
         });
@@ -122,7 +114,7 @@ const barChartBuilder = (element, options, isTimeline) => {
       _chart.xAxis.tickFormat(multi(_chart.xAxis));
       _chart.multibar.stacked(typeof options.stacked != 'undefined' ? options.stacked : false);
       _chart.onChartUpdate(() => {
-        _d3.selectAll('g.nv-x.nv-axis g text').each(function(d) {
+        _d3.selectAll('g.nv-x.nv-axis g text').each(function (d) {
           insertLinebreaks(_chart, d, this);
         });
       });
@@ -158,7 +150,7 @@ const barChartBuilder = (element, options, isTimeline) => {
           options.onComplete();
         }
         if (isTimeline) {
-          _d3.selectAll('g.nv-x.nv-axis g text').each(function(d) {
+          _d3.selectAll('g.nv-x.nv-axis g text').each(function (d) {
             insertLinebreaks(_chart, d, this);
           });
         }
@@ -324,9 +316,7 @@ const lineChartBuilder = (element, options, isTimeline) => {
   let _datum = options.transformer(options.datum);
   $(element).height(300);
   if ($(element).find('svg').length > 0 && (_datum.length === 0 || _datum[0].values.length === 0)) {
-    $(element)
-      .find('svg')
-      .empty();
+    $(element).find('svg').empty();
   }
   if (
     _datum.length > 0 &&
@@ -334,9 +324,7 @@ const lineChartBuilder = (element, options, isTimeline) => {
     (isNaN(_datum[0].values[0].x) || isNaN(_datum[0].values[0].y))
   ) {
     _datum = [];
-    $(element)
-      .find('svg')
-      .empty();
+    $(element).find('svg').empty();
   }
 
   if ($(element).is(':visible')) {
@@ -345,7 +333,7 @@ const lineChartBuilder = (element, options, isTimeline) => {
       _chart.noData(_datum.message || I18n('No Data Available.'));
       $(element).data('chart', _chart);
       _chart.transitionDuration(0);
-      _chart.convert = function(d) {
+      _chart.convert = function (d) {
         return isTimeline ? new Date(moment(d[0].obj.from).valueOf()) : parseFloat(d);
       };
       if (options.showControls != null) {
@@ -374,16 +362,14 @@ const lineChartBuilder = (element, options, isTimeline) => {
         _chart.tooltipContent(values => {
           return values.map(value => {
             value = JSON.parse(JSON.stringify(value));
-            value.x = moment(value.x)
-              .utc()
-              .format('YYYY-MM-DD HH:mm:ss');
+            value.x = moment(value.x).utc().format('YYYY-MM-DD HH:mm:ss');
             value.y = _chart.yAxis.tickFormat()(value.y);
             return value;
           });
         });
         _chart.xAxis.tickFormat(multi(_chart.xAxis, _chart));
         _chart.onChartUpdate(() => {
-          _d3.selectAll('g.nv-x.nv-axis g text').each(function(d) {
+          _d3.selectAll('g.nv-x.nv-axis g text').each(function (d) {
             insertLinebreaks(_chart, d, this);
           });
         });
@@ -407,7 +393,7 @@ const lineChartBuilder = (element, options, isTimeline) => {
             options.onComplete();
           }
           if (isTimeline) {
-            _d3.selectAll('g.nv-x.nv-axis g text').each(function(d) {
+            _d3.selectAll('g.nv-x.nv-axis g text').each(function (d) {
               insertLinebreaks(_chart, d, this);
             });
           }
@@ -442,13 +428,9 @@ const multi = xAxis => {
   return d3v3.time.format.utc.multi([
     [
       '%H:%M:%S %Y-%m-%d',
-      function(d) {
+      function (d) {
         const domain = xAxis.domain();
-        const result =
-          (previous > d || d === domain[0]) &&
-          moment(d)
-            .utc()
-            .seconds();
+        const result = (previous > d || d === domain[0]) && moment(d).utc().seconds();
         if (result) {
           previous = d;
         }
@@ -457,7 +439,7 @@ const multi = xAxis => {
     ],
     [
       '%H:%M %Y-%m-%d',
-      function(d) {
+      function (d) {
         const domain = xAxis.domain();
         const result = previous > d || d === domain[0];
         if (result) {
@@ -468,15 +450,11 @@ const multi = xAxis => {
     ],
     [
       '%S %H:%M',
-      function(d) {
+      function (d) {
         const previousDiff = Math.abs(d - previous);
         const result =
-          moment(previous)
-            .utc()
-            .minutes() !==
-            moment(d)
-              .utc()
-              .minutes() && previousDiff < MINUTE_MS;
+          moment(previous).utc().minutes() !== moment(d).utc().minutes() &&
+          previousDiff < MINUTE_MS;
         if (result) {
           previous = d;
         }
@@ -485,15 +463,11 @@ const multi = xAxis => {
     ],
     [
       '%S',
-      function(d) {
+      function (d) {
         const previousDiff = Math.abs(d - previous);
         const result =
-          moment(previous)
-            .utc()
-            .seconds() !==
-            moment(d)
-              .utc()
-              .seconds() && previousDiff < MINUTE_MS;
+          moment(previous).utc().seconds() !== moment(d).utc().seconds() &&
+          previousDiff < MINUTE_MS;
         if (result) {
           previous = d;
         }
@@ -502,19 +476,12 @@ const multi = xAxis => {
     ],
     [
       '%H:%M:%S %Y-%m-%d',
-      function(d) {
+      function (d) {
         const previousDiff = Math.abs(d - previous);
         const result =
-          moment(previous)
-            .utc()
-            .date() !==
-            moment(d)
-              .utc()
-              .date() &&
+          moment(previous).utc().date() !== moment(d).utc().date() &&
           previousDiff < WEEK_MS &&
-          moment(d)
-            .utc()
-            .seconds();
+          moment(d).utc().seconds();
         if (result) {
           previous = d;
         }
@@ -523,15 +490,10 @@ const multi = xAxis => {
     ],
     [
       '%H:%M %Y-%m-%d',
-      function(d) {
+      function (d) {
         const previousDiff = Math.abs(d - previous);
         const result =
-          moment(previous)
-            .utc()
-            .date() !==
-            moment(d)
-              .utc()
-              .date() && previousDiff < WEEK_MS;
+          moment(previous).utc().date() !== moment(d).utc().date() && previousDiff < WEEK_MS;
         if (result) {
           previous = d;
         }
@@ -540,25 +502,13 @@ const multi = xAxis => {
     ],
     [
       '%H:%M:%S',
-      function(d) {
+      function (d) {
         const previousDiff = Math.abs(d - previous);
         const result =
-          (moment(previous)
-            .utc()
-            .hours() !==
-            moment(d)
-              .utc()
-              .hours() ||
-            moment(previous)
-              .utc()
-              .minutes() !==
-              moment(d)
-                .utc()
-                .minutes()) &&
+          (moment(previous).utc().hours() !== moment(d).utc().hours() ||
+            moment(previous).utc().minutes() !== moment(d).utc().minutes()) &&
           previousDiff < WEEK_MS &&
-          moment(d)
-            .utc()
-            .seconds();
+          moment(d).utc().seconds();
         if (result) {
           previous = d;
         }
@@ -567,21 +517,11 @@ const multi = xAxis => {
     ],
     [
       '%H:%M',
-      function(d) {
+      function (d) {
         const previousDiff = Math.abs(d - previous);
         const result =
-          (moment(previous)
-            .utc()
-            .hours() !==
-            moment(d)
-              .utc()
-              .hours() ||
-            moment(previous)
-              .utc()
-              .minutes() !==
-              moment(d)
-                .utc()
-                .minutes()) &&
+          (moment(previous).utc().hours() !== moment(d).utc().hours() ||
+            moment(previous).utc().minutes() !== moment(d).utc().minutes()) &&
           previousDiff < WEEK_MS;
         if (result) {
           previous = d;
@@ -591,15 +531,10 @@ const multi = xAxis => {
     ],
     [
       '%d %Y-%m',
-      function(d) {
+      function (d) {
         const previousDiff = Math.abs(d - previous);
         const result =
-          moment(previous)
-            .utc()
-            .months() !==
-            moment(d)
-              .utc()
-              .months() && previousDiff < MONTH_MS;
+          moment(previous).utc().months() !== moment(d).utc().months() && previousDiff < MONTH_MS;
         if (result) {
           previous = d;
         }
@@ -608,15 +543,10 @@ const multi = xAxis => {
     ],
     [
       '%d',
-      function(d) {
+      function (d) {
         const previousDiff = Math.abs(d - previous);
         const result =
-          moment(previous)
-            .utc()
-            .date() !==
-            moment(d)
-              .utc()
-              .date() && previousDiff < MONTH_MS;
+          moment(previous).utc().date() !== moment(d).utc().date() && previousDiff < MONTH_MS;
         if (result) {
           previous = d;
         }
@@ -625,15 +555,10 @@ const multi = xAxis => {
     ],
     [
       '%m %Y',
-      function(d) {
+      function (d) {
         const previousDiff = Math.abs(d - previous);
         const result =
-          moment(previous)
-            .utc()
-            .years() !==
-            moment(d)
-              .utc()
-              .years() && previousDiff < YEAR_MS;
+          moment(previous).utc().years() !== moment(d).utc().years() && previousDiff < YEAR_MS;
         if (result) {
           previous = d;
         }
@@ -642,15 +567,10 @@ const multi = xAxis => {
     ],
     [
       '%m',
-      function(d) {
+      function (d) {
         const previousDiff = Math.abs(d - previous);
         const result =
-          moment(previous)
-            .utc()
-            .months() !==
-            moment(d)
-              .utc()
-              .months() && previousDiff < YEAR_MS;
+          moment(previous).utc().months() !== moment(d).utc().months() && previousDiff < YEAR_MS;
         if (result) {
           previous = d;
         }
@@ -659,7 +579,7 @@ const multi = xAxis => {
     ],
     [
       '%Y',
-      function(d) {
+      function (d) {
         previous = d;
         return true;
       }

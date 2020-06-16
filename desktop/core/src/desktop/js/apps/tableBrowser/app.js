@@ -91,9 +91,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
                 sZeroRecords: I18n('No matching records')
               },
               fnDrawCallback: () => {
-                $(selector)
-                  .parents('.dataTables_wrapper')
-                  .css('overflow-x', 'hidden');
+                $(selector).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
                 $(selector).jHueTableExtender2({
                   fixedHeader: true,
                   fixedFirstColumn: true,

@@ -90,14 +90,8 @@ class MetastoreSource {
         result.namespaceId = this.namespace().id;
         if (this.namespace().database()) {
           result.database = this.namespace().database().catalogEntry.name;
-          if (
-            this.namespace()
-              .database()
-              .table()
-          ) {
-            result.table = this.namespace()
-              .database()
-              .table().catalogEntry.name;
+          if (this.namespace().database().table()) {
+            result.table = this.namespace().database().table().catalogEntry.name;
           }
         }
       }
@@ -110,9 +104,7 @@ class MetastoreSource {
           if (state.database) {
             this.namespace().setDatabaseByName(state.database, () => {
               if (this.namespace().database() && state.table) {
-                this.namespace()
-                  .database()
-                  .setTableByName(state.table);
+                this.namespace().database().setTableByName(state.table);
               }
             });
           }
@@ -122,16 +114,8 @@ class MetastoreSource {
 
     const completeRefresh = previousState => {
       this.reloading(true);
-      if (
-        this.namespace() &&
-        this.namespace().database() &&
-        this.namespace()
-          .database()
-          .table()
-      ) {
-        this.namespace()
-          .database()
-          .table(null);
+      if (this.namespace() && this.namespace().database() && this.namespace().database().table()) {
+        this.namespace().database().table(null);
       }
       if (this.namespace() && this.namespace().database()) {
         this.namespace().database(null);
@@ -170,7 +154,7 @@ class MetastoreSource {
       } else if (refreshedEntry.isDatabase() && this.namespace()) {
         this.namespace()
           .databases()
-          .some(function(database) {
+          .some(function (database) {
             if (database.catalogEntry === refreshedEntry) {
               database.load(
                 () => {

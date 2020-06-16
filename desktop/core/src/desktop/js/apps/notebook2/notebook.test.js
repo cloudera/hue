@@ -49,7 +49,10 @@ describe('notebook.js', () => {
   });
 
   it('should serialize a notebook to JSON', async () => {
-    const connectors = [{ id: 'hive', dialect: 'hive' }, { id: 'impala', dialect: 'impala' }];
+    const connectors = [
+      { id: 'hive', dialect: 'hive' },
+      { id: 'impala', dialect: 'impala' }
+    ];
     const spy = jest
       .spyOn(hueConfig, 'findEditorConnector')
       .mockImplementation(connectors.find.bind(connectors));
@@ -73,7 +76,10 @@ describe('notebook.js', () => {
 
   it('should serialize a notebook context to JSON', async () => {
     const notebook = new Notebook(viewModel, {});
-    const connectors = [{ id: 'hive', dialect: 'hive' }, { id: 'impala', dialect: 'impala' }];
+    const connectors = [
+      { id: 'hive', dialect: 'hive' },
+      { id: 'impala', dialect: 'impala' }
+    ];
     jest
       .spyOn(hueConfig, 'findEditorConnector')
       .mockImplementation(connectors.find.bind(connectors));

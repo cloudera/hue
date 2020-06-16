@@ -30,7 +30,7 @@ import {
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.barChart = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const _options = ko.unwrap(valueAccessor());
     if (_options.type && _options.type() === 'line') {
       window.setTimeout(() => {
@@ -44,13 +44,11 @@ ko.bindingHandlers.barChart = {
       $(element).data('type', 'bar');
     }
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const _options = ko.unwrap(valueAccessor());
     if (_options.type && _options.type() !== $(element).data('type')) {
       if ($(element).find('svg').length > 0) {
-        $(element)
-          .find('svg')
-          .remove();
+        $(element).find('svg').remove();
       }
       if (_options.type() === 'line') {
         window.setTimeout(() => {

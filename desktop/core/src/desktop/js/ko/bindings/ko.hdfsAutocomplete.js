@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.hdfsAutocomplete = {
-  init: function(element) {
+  init: function (element) {
     const $element = $(element);
     $element.attr('autocomplete', 'off');
     $element.jHueHdfsAutocomplete({

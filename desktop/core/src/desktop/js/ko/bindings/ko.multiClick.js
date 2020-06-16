@@ -17,7 +17,7 @@
 import * as ko from 'knockout';
 
 ko.bindingHandlers.multiClick = {
-  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     const clickHandlerFunction = valueAccessor().click;
     const dblClickHandlerFunction = valueAccessor().dblClick;
     if (!dblClickHandlerFunction && !clickHandlerFunction) {
@@ -28,8 +28,8 @@ ko.bindingHandlers.multiClick = {
     let singleClickTimeout = -1;
     let dblClickTimeout = -1;
 
-    const newValueAccessor = function() {
-      return function() {
+    const newValueAccessor = function () {
+      return function () {
         const clickArgs = arguments;
         if (!dblClickHandlerFunction && clickHandlerFunction) {
           clickHandlerFunction.apply(viewModel, clickArgs);

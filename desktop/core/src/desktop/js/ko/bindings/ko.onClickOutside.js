@@ -18,11 +18,11 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.onClickOutside = {
-  update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+  update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
     const options = valueAccessor();
     const func = typeof options === 'function' ? options : options.onOutside;
 
-    const onDocumentClick = function(event) {
+    const onDocumentClick = function (event) {
       if ($.contains(document, event.target) && !$.contains(element, event.target)) {
         const result = func.bind(viewModel)();
         if (typeof result === 'undefined' || result) {

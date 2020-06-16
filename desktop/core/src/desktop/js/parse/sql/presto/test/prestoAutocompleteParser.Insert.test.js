@@ -17,7 +17,7 @@
 import prestoAutocompleteParser from '../prestoAutocompleteParser';
 describe('prestoAutocompleteParser.js INSERT statements', () => {
   beforeAll(() => {
-    prestoAutocompleteParser.yy.parseError = function(msg) {
+    prestoAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });
@@ -1046,7 +1046,10 @@ describe('prestoAutocompleteParser.js INSERT statements', () => {
             ]
           },
           suggestFunctions: {},
-          suggestIdentifiers: [{ name: 'S.', type: 'alias' }, { name: 'T.', type: 'alias' }]
+          suggestIdentifiers: [
+            { name: 'S.', type: 'alias' },
+            { name: 'T.', type: 'alias' }
+          ]
         }
       });
     });
@@ -1138,7 +1141,10 @@ describe('prestoAutocompleteParser.js INSERT statements', () => {
               { identifierChain: [{ name: 'tbl' }], alias: 'T' }
             ]
           },
-          suggestIdentifiers: [{ name: 'S.', type: 'alias' }, { name: 'T.', type: 'alias' }]
+          suggestIdentifiers: [
+            { name: 'S.', type: 'alias' },
+            { name: 'T.', type: 'alias' }
+          ]
         }
       });
     });

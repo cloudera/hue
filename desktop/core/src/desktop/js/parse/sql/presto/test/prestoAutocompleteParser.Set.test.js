@@ -17,7 +17,7 @@
 import prestoAutocompleteParser from '../prestoAutocompleteParser';
 describe('prestoAutocompleteParser.js SET statements', () => {
   beforeAll(() => {
-    prestoAutocompleteParser.yy.parseError = function(msg) {
+    prestoAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });

@@ -51,7 +51,7 @@ class Result {
       typeof result.meta != 'undefined' && result.meta != null ? result.meta : []
     );
 
-    const adaptMeta = function() {
+    const adaptMeta = function () {
       let i = 0;
       self.meta().forEach(item => {
         if (typeof item.checked === 'undefined') {
@@ -149,7 +149,7 @@ class Result {
       });
     });
 
-    self.autocompleteFromEntries = function(nonPartial, partial) {
+    self.autocompleteFromEntries = function (nonPartial, partial) {
       const result = [];
       const partialLower = partial.toLowerCase();
       self.meta().forEach(column => {
@@ -168,7 +168,7 @@ class Result {
 
       return result;
     };
-    self.clickFilteredMetaCheck = function() {
+    self.clickFilteredMetaCheck = function () {
       self.filteredMeta().forEach(item => {
         item.checked(self.filteredMetaChecked());
       });
@@ -257,7 +257,7 @@ class Result {
       return self.hasResultset() && self.data().length > 0; // status() == 'available'
     });
 
-    self.getContext = function() {
+    self.getContext = function () {
       return {
         id: self.id,
         type: self.type,
@@ -265,7 +265,7 @@ class Result {
       };
     };
 
-    self.clear = function() {
+    self.clear = function () {
       self.fetchedOnce(false);
       self.hasMore(false);
       self.statement_range({

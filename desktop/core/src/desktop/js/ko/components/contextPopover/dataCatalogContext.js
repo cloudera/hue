@@ -56,7 +56,7 @@ class DataCatalogContext {
             isActive: i === catalogEntry.path.length - 1,
             path: catalogEntry.path.slice(0, i + 1),
             catalogEntry: self.catalogEntry,
-            makeActive: function() {
+            makeActive: function () {
               self
                 .catalogEntry()
                 .dataCatalog.getEntry({
@@ -83,10 +83,7 @@ class DataCatalogContext {
 
   refresh() {
     const self = this;
-    self
-      .catalogEntry()
-      .clearCache({ cascade: true })
-      .always(self.load.bind(self));
+    self.catalogEntry().clearCache({ cascade: true }).always(self.load.bind(self));
   }
 
   load() {
@@ -154,10 +151,7 @@ class DataCatalogContext {
     }
 
     self.activePromises.push(
-      self
-        .catalogEntry()
-        .getComment({ silenceErrors: true, cancellable: true })
-        .done(self.comment)
+      self.catalogEntry().getComment({ silenceErrors: true, cancellable: true }).done(self.comment)
     );
 
     $.when.apply($, self.activePromises).always(() => {

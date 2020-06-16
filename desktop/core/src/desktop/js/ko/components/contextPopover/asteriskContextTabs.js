@@ -35,7 +35,7 @@ class AsteriskData {
       });
     });
 
-    self.expand = function() {
+    self.expand = function () {
       const colsToExpand =
         self.selectedColumns().length === 0 ? self.columns : self.selectedColumns();
       const colIndex = {};

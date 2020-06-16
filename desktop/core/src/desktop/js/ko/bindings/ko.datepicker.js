@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.datepicker = {
-  init: function(element, valueAccessor, allBindings) {
+  init: function (element, valueAccessor, allBindings) {
     const _el = $(element);
     const _options = ko.unwrap(valueAccessor());
     _el

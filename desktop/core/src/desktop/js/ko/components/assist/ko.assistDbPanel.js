@@ -588,14 +588,8 @@ class AssistDbPanel {
       }
       if (!this.isSolr && this.selectedSource()) {
         if (this.selectedSource().selectedNamespace()) {
-          if (
-            this.selectedSource()
-              .selectedNamespace()
-              .selectedDatabase()
-          ) {
-            return this.selectedSource()
-              .selectedNamespace()
-              .selectedDatabase().catalogEntry.name;
+          if (this.selectedSource().selectedNamespace().selectedDatabase()) {
+            return this.selectedSource().selectedNamespace().selectedDatabase().catalogEntry.name;
           }
           if (window.HAS_MULTI_CLUSTER) {
             return this.selectedSource().selectedNamespace().name;
@@ -768,9 +762,7 @@ class AssistDbPanel {
         this.selectedSource()
           .selectedNamespace()
           .whenLoaded(() => {
-            this.selectedSource()
-              .selectedNamespace()
-              .setDatabase(databaseName);
+            this.selectedSource().selectedNamespace().setDatabase(databaseName);
           });
       }
     });
@@ -783,17 +775,9 @@ class AssistDbPanel {
     }
     if (this.selectedSource()) {
       if (this.selectedSource() && this.selectedSource().selectedNamespace()) {
-        if (
-          this.selectedSource()
-            .selectedNamespace()
-            .selectedDatabase()
-        ) {
-          this.selectedSource()
-            .selectedNamespace()
-            .selectedDatabase(null);
-          this.selectedSource()
-            .selectedNamespace()
-            .selectedDatabaseChanged();
+        if (this.selectedSource().selectedNamespace().selectedDatabase()) {
+          this.selectedSource().selectedNamespace().selectedDatabase(null);
+          this.selectedSource().selectedNamespace().selectedDatabaseChanged();
         } else if (window.HAS_MULTI_CLUSTER) {
           this.selectedSource().selectedNamespace(null);
         } else {

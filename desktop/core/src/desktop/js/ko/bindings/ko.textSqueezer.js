@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.textSqueezer = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const value = valueAccessor();
     const $element = $(element);
     $element.text(ko.unwrap(value));
@@ -26,7 +26,7 @@ ko.bindingHandlers.textSqueezer = {
       decimalPrecision: 2
     });
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const value = valueAccessor();
     const $element = $(element);
     $element.text(ko.unwrap(value));

@@ -93,7 +93,7 @@ const COMPATIBILITY_TARGET_PLATFORMS = {
   hive: { name: 'Hive', value: 'hive' }
 };
 
-const getDefaultSnippetProperties = function(snippetType) {
+const getDefaultSnippetProperties = function (snippetType) {
   const properties = {};
 
   if (snippetType == 'jar' || snippetType == 'py') {
@@ -240,7 +240,7 @@ class Snippet {
 
     let aceEditor = null;
 
-    self.ace = function(newVal) {
+    self.ace = function (newVal) {
       if (newVal) {
         aceEditor = newVal;
         if (!notebook.isPresentationMode()) {
@@ -272,7 +272,7 @@ class Snippet {
 
     self.editorMode = vm.editorMode;
 
-    self.getAceMode = function() {
+    self.getAceMode = function () {
       return vm.getSnippetViewSettings(self.type()).aceMode;
     };
 
@@ -280,7 +280,7 @@ class Snippet {
 
     self.showExecutionAnalysis = ko.observable(false);
 
-    self.getPlaceHolder = function() {
+    self.getPlaceHolder = function () {
       return vm.getSnippetViewSettings(self.type()).placeHolder;
     };
 
@@ -292,7 +292,7 @@ class Snippet {
       snippet.compute && snippet.compute.id ? snippet.compute : undefined
     );
 
-    self.whenContextSet = function() {
+    self.whenContextSet = function () {
       let namespaceSub;
       const namespaceDeferred = $.Deferred();
       if (self.namespace()) {
@@ -320,7 +320,7 @@ class Snippet {
 
       const result = $.when(namespaceDeferred, computeDeferred);
 
-      result.dispose = function() {
+      result.dispose = function () {
         if (namespaceSub) {
           namespaceSub.dispose();
         }
@@ -364,7 +364,7 @@ class Snippet {
         : []
     );
 
-    self.removeContextTab = function(context) {
+    self.removeContextTab = function (context) {
       if (context.tabId === self.currentQueryTab()) {
         self.currentQueryTab('queryHistory');
       }
@@ -377,18 +377,12 @@ class Snippet {
     self.queriesHasErrors = ko.observable(false);
     self.queriesCurrentPage = ko.observable(
       vm.selectedNotebook() && vm.selectedNotebook().snippets().length > 0
-        ? vm
-            .selectedNotebook()
-            .snippets()[0]
-            .queriesCurrentPage()
+        ? vm.selectedNotebook().snippets()[0].queriesCurrentPage()
         : 1
     );
     self.queriesTotalPages = ko.observable(
       vm.selectedNotebook() && vm.selectedNotebook().snippets().length > 0
-        ? vm
-            .selectedNotebook()
-            .snippets()[0]
-            .queriesTotalPages()
+        ? vm.selectedNotebook().snippets()[0].queriesTotalPages()
         : 1
     );
     self.queries = ko.observableArray([]);
@@ -402,7 +396,7 @@ class Snippet {
 
     let lastFetchQueriesRequest = null;
 
-    self.fetchQueries = function() {
+    self.fetchQueries = function () {
       cancelActiveRequest(lastFetchQueriesRequest);
 
       const QUERIES_PER_PAGE = 50;
@@ -410,13 +404,13 @@ class Snippet {
       self.loadingQueries(true);
       self.queriesHasErrors(false);
       lastFetchQueriesRequest = apiHelper.searchDocuments({
-        successCallback: function(result) {
+        successCallback: function (result) {
           self.queriesTotalPages(Math.ceil(result.count / QUERIES_PER_PAGE));
           self.queries(komapping.fromJS(result.documents)());
           self.loadingQueries(false);
           self.queriesHasErrors(false);
         },
-        errorCallback: function() {
+        errorCallback: function () {
           self.loadingQueries(false);
           self.queriesHasErrors(true);
         },
@@ -440,14 +434,14 @@ class Snippet {
       }
     });
 
-    self.prevQueriesPage = function() {
+    self.prevQueriesPage = function () {
       if (self.queriesCurrentPage() !== 1) {
         self.queriesCurrentPage(self.queriesCurrentPage() - 1);
         self.fetchQueries();
       }
     };
 
-    self.nextQueriesPage = function() {
+    self.nextQueriesPage = function () {
       if (self.queriesCurrentPage() !== self.queriesTotalPages()) {
         self.queriesCurrentPage(self.queriesCurrentPage() + 1);
         self.fetchQueries();
@@ -461,7 +455,7 @@ class Snippet {
     });
 
     let ignoreNextAssistDatabaseUpdate = false;
-    self.handleAssistSelection = function(entry) {
+    self.handleAssistSelection = function (entry) {
       if (ignoreNextAssistDatabaseUpdate) {
         ignoreNextAssistDatabaseUpdate = false;
       } else if (entry.getConnector().id === self.connector().id) {
@@ -501,7 +495,7 @@ class Snippet {
       self.getExternalStatement();
     });
     self.externalStatementLoaded = ko.observable(false);
-    self.getExternalStatement = function() {
+    self.getExternalStatement = function () {
       self.externalStatementLoaded(false);
       $.post(
         '/notebook/api/get_external_statement',
@@ -670,7 +664,7 @@ class Snippet {
     self.hasCurlyBracketParameters = ko.computed(() => {
       return self.type() != 'pig';
     });
-    self.getPigParameters = function() {
+    self.getPigParameters = function () {
       const params = {};
       const variables = self.statement_raw().match(/([^\\]|^)\$[^\d'"](\w*)/g);
       const declares = self.statement_raw().match(/%declare +([^ ])+/gi);
@@ -765,11 +759,7 @@ class Snippet {
             option.text = option.text && option.text.trim();
             option.value =
               option.value &&
-              option.value
-                .trim()
-                .replace(',', ',')
-                .replace('(', '(')
-                .replace(')', ')');
+              option.value.trim().replace(',', ',').replace('(', '(').replace(')', ')');
 
             if (value.placeholder || matchList[2]) {
               if (!value.options) {
@@ -883,7 +873,7 @@ class Snippet {
           variables[name] = location;
           return variables;
         }, {});
-      const updateVariableType = function(variable, sourceMeta) {
+      const updateVariableType = function (variable, sourceMeta) {
         let type;
         if (sourceMeta && sourceMeta.type) {
           type = sourceMeta.type.toLowerCase();
@@ -1037,7 +1027,7 @@ class Snippet {
 
     self.executeNextTimeout = -1;
     const refreshTimeouts = {};
-    self.onDdlExecute = function() {
+    self.onDdlExecute = function () {
       if (self.result.handle() && self.result.handle().has_more_statements) {
         window.clearTimeout(self.executeNextTimeout);
         const previousHash = self.result.handle().previous_statement_hash;
@@ -1377,7 +1367,7 @@ class Snippet {
         ? snippet.isResultSettingsVisible
         : false
     );
-    self.toggleResultSettings = function() {
+    self.toggleResultSettings = function () {
       self.isResultSettingsVisible(!self.isResultSettingsVisible());
     };
     self.isResultSettingsVisible.subscribe(() => {
@@ -1394,7 +1384,7 @@ class Snippet {
     self.checkStatusTimeout = null;
     self.getLogsTimeout = null;
 
-    self.getContext = function() {
+    self.getContext = function () {
       return {
         id: self.id,
         type: self.type,
@@ -1472,7 +1462,7 @@ class Snippet {
         .pureComputed(self.statement)
         .extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 2000 } });
 
-      const handleRiskResponse = function(data) {
+      const handleRiskResponse = function (data) {
         if (data.status == 0) {
           self.hasSuggestion('');
           self.complexity(data.query_complexity);
@@ -1487,7 +1477,7 @@ class Snippet {
         lastCheckedComplexityStatement = self.statement();
       };
 
-      const clearActiveRisks = function() {
+      const clearActiveRisks = function () {
         if (self.hasSuggestion() !== null && typeof self.hasSuggestion() !== 'undefined') {
           self.hasSuggestion(null);
         }
@@ -1521,7 +1511,7 @@ class Snippet {
         }
       });
 
-      self.checkComplexity = function() {
+      self.checkComplexity = function () {
         if (!self.inFocus() || lastCheckedComplexityStatement === self.statement()) {
           return;
         }
@@ -1560,7 +1550,7 @@ class Snippet {
               notebook: komapping.toJSON(notebook.getContext()),
               snippet: komapping.toJSON(self.getContext())
             },
-            success: function(data) {
+            success: function (data) {
               knownResponses.unshift({
                 hash: hash,
                 data: data
@@ -1570,7 +1560,7 @@ class Snippet {
               }
               handleRiskResponse(data);
             },
-            always: function(data) {
+            always: function (data) {
               changeSubscription.dispose();
             }
           });
@@ -1589,7 +1579,7 @@ class Snippet {
       }
     }
 
-    self._ajaxError = function(data, callback) {
+    self._ajaxError = function (data, callback) {
       if (data.status == -2) {
         // Session expired
         const existingSession = notebook.getSession(self.type());
@@ -1607,11 +1597,11 @@ class Snippet {
         }
       } else if (data.status == -4) {
         // Operation timed out
-        notebook.retryModalCancel = function() {
+        notebook.retryModalCancel = function () {
           self.status('failed');
           huePubSub.publish('hide.retry.modal');
         };
-        notebook.retryModalConfirm = function() {
+        notebook.retryModalConfirm = function () {
           if (callback) {
             callback();
           }
@@ -1677,7 +1667,8 @@ class Snippet {
             (['jar', 'java', 'spark2', 'distcp'].indexOf(self.type()) == -1 &&
               self.statement() !== '') ||
             (['jar', 'java'].indexOf(self.type()) != -1 &&
-              (self.properties().app_jar() != '' && self.properties().class() != '')) ||
+              self.properties().app_jar() != '' &&
+              self.properties().class() != '') ||
             (['spark2'].indexOf(self.type()) != -1 && self.properties().jars().length > 0) ||
             (['shell'].indexOf(self.type()) != -1 && self.properties().command_path().length > 0) ||
             (['mapreduce'].indexOf(self.type()) != -1 && self.properties().app_jar().length > 0) ||
@@ -1722,7 +1713,7 @@ class Snippet {
     self.lastExecutedStatements = undefined;
     self.lastExecutedSelectionRange = undefined;
 
-    self.execute = function(automaticallyTriggered) {
+    self.execute = function (automaticallyTriggered) {
       self.clearActiveExecuteRequests();
 
       if (!automaticallyTriggered && self.ace()) {
@@ -1730,8 +1721,8 @@ class Snippet {
 
         if (
           self.lastExecutedSelectionRange &&
-          (selectionRange.start.row !== selectionRange.end.row &&
-            selectionRange.start.column !== selectionRange.end.column) &&
+          selectionRange.start.row !== selectionRange.end.row &&
+          selectionRange.start.column !== selectionRange.end.column &&
           (selectionRange.start.row !== self.lastExecutedSelectionRange.start.row ||
             selectionRange.start.column !== self.lastExecutedSelectionRange.start.column ||
             selectionRange.end.row !== self.lastExecutedSelectionRange.end.row ||
@@ -1948,7 +1939,7 @@ class Snippet {
         });
     };
 
-    self.reexecute = function() {
+    self.reexecute = function () {
       self.result.cancelBatchExecution();
       self.execute();
     };
@@ -1959,7 +1950,7 @@ class Snippet {
       ); // ie: 5000 lines at 80 chars per line
     });
 
-    self.createGist = function() {
+    self.createGist = function () {
       if (self.isSqlDialect()) {
         apiHelper
           .createGist({
@@ -1984,7 +1975,7 @@ class Snippet {
       hueAnalytics.log('gist', self.type());
     };
 
-    self.format = function() {
+    self.format = function () {
       if (self.isSqlDialect()) {
         apiHelper
           .formatSql({
@@ -2014,14 +2005,14 @@ class Snippet {
       hueAnalytics.log('notebook', 'format');
     };
 
-    self.clear = function() {
+    self.clear = function () {
       hueAnalytics.log('notebook', 'clear');
       self.ace().setValue('', 1);
       self.result.clear();
       self.status('ready');
     };
 
-    self.explain = function() {
+    self.explain = function () {
       hueAnalytics.log('notebook', 'explain');
 
       if (self.statement() == '' || self.status() == 'running' || self.status() === 'loading') {
@@ -2053,7 +2044,7 @@ class Snippet {
 
     let lastCompatibilityRequest;
 
-    self.checkCompatibility = function() {
+    self.checkCompatibility = function () {
       self.hasSuggestion(null);
       self.compatibilitySourcePlatform(COMPATIBILITY_SOURCE_PLATFORMS[self.type()]);
       self.compatibilityTargetPlatform(
@@ -2062,7 +2053,7 @@ class Snippet {
       self.queryCompatibility();
     };
 
-    self.queryCompatibility = function(targetPlatform) {
+    self.queryCompatibility = function (targetPlatform) {
       cancelActiveRequest(lastCompatibilityRequest);
 
       hueAnalytics.log('notebook', 'compatibility');
@@ -2136,7 +2127,7 @@ class Snippet {
         });
     };
 
-    self.fetchResult = function(rows, startOver) {
+    self.fetchResult = function (rows, startOver) {
       if (typeof startOver == 'undefined') {
         startOver = true;
       }
@@ -2146,7 +2137,7 @@ class Snippet {
 
     self.isFetchingData = false;
 
-    self.fetchExecutionAnalysis = function() {
+    self.fetchExecutionAnalysis = function () {
       if (self.type() === 'impala') {
         // TODO: Use real query ID
         huePubSub.publish('editor.update.execution.analysis', {
@@ -2162,7 +2153,7 @@ class Snippet {
       }
     };
 
-    self.fetchResultData = function(rows, startOver) {
+    self.fetchResultData = function (rows, startOver) {
       if (!self.isFetchingData) {
         if (self.status() === 'available') {
           startLongOperationTimeout();
@@ -2206,7 +2197,7 @@ class Snippet {
       }
     };
 
-    self.loadData = function(result, rows) {
+    self.loadData = function (result, rows) {
       rows -= result.data.length;
 
       if (result.data.length > 0) {
@@ -2277,7 +2268,7 @@ class Snippet {
       }
     };
 
-    self.fetchResultMetadata = function() {
+    self.fetchResultMetadata = function () {
       $.post(
         '/notebook/api/fetch_result_metadata',
         {
@@ -2299,7 +2290,7 @@ class Snippet {
       });
     };
 
-    self.fetchResultSize = function(n, query_id) {
+    self.fetchResultSize = function (n, query_id) {
       $.post(
         '/notebook/api/fetch_result_size',
         {
@@ -2329,8 +2320,8 @@ class Snippet {
       });
     };
 
-    self.checkStatus = function() {
-      const _checkStatus = function() {
+    self.checkStatus = function () {
+      const _checkStatus = function () {
         self.lastCheckStatusRequest = $.post(
           '/notebook/api/check_status',
           {
@@ -2410,7 +2401,7 @@ class Snippet {
         });
       };
       const activeStatus = ['running', 'starting', 'waiting'];
-      const _getLogs = function(isLastTime) {
+      const _getLogs = function (isLastTime) {
         window.clearTimeout(self.getLogsTimeout);
         self.getLogs().then(() => {
           const lastTime = activeStatus.indexOf(self.status()) < 0; // We to run getLogs at least one time after status is terminated to make sure we have last logs
@@ -2425,7 +2416,7 @@ class Snippet {
       _getLogs(activeStatus.indexOf(self.status()) < 0);
     };
 
-    self.checkDdlNotification = function() {
+    self.checkDdlNotification = function () {
       if (
         self.lastExecutedStatement() &&
         /ALTER|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i.test(
@@ -2440,7 +2431,7 @@ class Snippet {
 
     self.isCanceling = ko.observable(false);
 
-    self.cancel = function() {
+    self.cancel = function () {
       window.clearTimeout(self.executeNextTimeout);
       self.isCanceling(true);
       self.clearActiveExecuteRequests();
@@ -2489,7 +2480,7 @@ class Snippet {
       }
     };
 
-    self.close = function() {
+    self.close = function () {
       self.clearActiveExecuteRequests();
 
       $.post(
@@ -2513,7 +2504,7 @@ class Snippet {
       });
     };
 
-    self.clearActiveExecuteRequests = function() {
+    self.clearActiveExecuteRequests = function () {
       cancelActiveRequest(self.lastGetLogsRequest);
       if (self.getLogsTimeout !== null) {
         window.clearTimeout(self.getLogsTimeout);
@@ -2527,7 +2518,7 @@ class Snippet {
       }
     };
 
-    self.getLogs = function() {
+    self.getLogs = function () {
       cancelActiveRequest(self.lastGetLogsRequest);
 
       self.lastGetLogsRequest = $.post(
@@ -2615,7 +2606,7 @@ class Snippet {
       return self.lastGetLogsRequest;
     };
 
-    self.uploadQueryHistory = function(n) {
+    self.uploadQueryHistory = function (n) {
       hueAnalytics.log('notebook', 'upload_query_history');
 
       $.post(
@@ -2639,14 +2630,14 @@ class Snippet {
       );
     };
 
-    self.uploadQuery = function(query_id) {
+    self.uploadQuery = function (query_id) {
       $.post('/metadata/api/optimizer/upload/query', {
         query_id: query_id,
         sourcePlatform: self.type()
       });
     };
 
-    self.uploadTableStats = function(options) {
+    self.uploadTableStats = function (options) {
       hueAnalytics.log('notebook', 'load_table_stats');
       if (options.showProgress) {
         $(document).trigger('info', 'Preparing table data...');
@@ -2690,7 +2681,7 @@ class Snippet {
       });
     };
 
-    self.watchUploadStatus = function(workloadId, showProgress) {
+    self.watchUploadStatus = function (workloadId, showProgress) {
       $.post(
         '/metadata/api/optimizer/upload/status',
         {
@@ -2724,7 +2715,7 @@ class Snippet {
       );
     };
 
-    self.getSimilarQueries = function() {
+    self.getSimilarQueries = function () {
       hueAnalytics.log('notebook', 'get_query_similarity');
 
       $.post(
@@ -2752,7 +2743,7 @@ class Snippet {
       timeout: vm.autocompleteTimeout
     });
 
-    self.init = function() {
+    self.init = function () {
       if ((self.status() == 'running' || self.status() == 'available') && notebook.isHistory()) {
         self.checkStatus();
       } else if (self.status() == 'loading') {
@@ -2764,7 +2755,7 @@ class Snippet {
       }
     };
 
-    self.onKeydownInVariable = function(context, e) {
+    self.onKeydownInVariable = function (context, e) {
       if ((e.ctrlKey || e.metaKey) && e.which === 13) {
         // Ctrl-enter
         self.ace().commands.commands['execute'].exec();
@@ -2813,27 +2804,21 @@ class Snippet {
   }
 
   toggleAllResultColumns(linkElement) {
-    const $t = $(linkElement)
-      .parents('.snippet')
-      .find('table.resultTable:eq(0)');
+    const $t = $(linkElement).parents('.snippet').find('table.resultTable:eq(0)');
     const dt = $t.hueDataTable();
     dt.fnToggleAllCols(linkElement.checked);
     dt.fnDraw();
   }
 
   toggleResultColumn(linkElement, index) {
-    const $t = $(linkElement)
-      .parents('.snippet')
-      .find('table.resultTable:eq(0)');
+    const $t = $(linkElement).parents('.snippet').find('table.resultTable:eq(0)');
     const dt = $t.hueDataTable();
     dt.fnSetColumnVis(index, linkElement.checked);
   }
   scrollToResultColumn(linkElement) {
-    const $resultTable = $(linkElement)
-      .parents('.snippet')
-      .find('table.resultTable:eq(0)');
+    const $resultTable = $(linkElement).parents('.snippet').find('table.resultTable:eq(0)');
     const _text = $.trim($(linkElement).text());
-    const _col = $resultTable.find('th').filter(function() {
+    const _col = $resultTable.find('th').filter(function () {
       return $.trim($(this).text()) === _text;
     });
     $resultTable.find('.columnSelected').removeClass('columnSelected');

@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const initGlobalSearchParser = function(parser) {
-  parser.identifyPartials = function(beforeCursor, afterCursor) {
+const initGlobalSearchParser = function (parser) {
+  parser.identifyPartials = function (beforeCursor, afterCursor) {
     const beforeMatch = beforeCursor.match(/[0-9a-zA-Z_]*$/);
     const afterMatch = afterCursor.match(/^[0-9a-zA-Z_]*(?:\((?:[^)]*\))?)?/);
     return {
@@ -24,7 +24,7 @@ const initGlobalSearchParser = function(parser) {
     };
   };
 
-  parser.mergeFacets = function(a, b) {
+  parser.mergeFacets = function (a, b) {
     if (!a.facets) {
       a.facets = {};
     }
@@ -42,7 +42,7 @@ const initGlobalSearchParser = function(parser) {
     });
   };
 
-  parser.mergeText = function(a, b) {
+  parser.mergeText = function (a, b) {
     if (!a.text) {
       a.text = [];
     }
@@ -52,7 +52,7 @@ const initGlobalSearchParser = function(parser) {
     a.text = a.text.concat(b.text);
   };
 
-  parser.handleQuotedValueWithCursor = function(lexer, yytext, yylloc, quoteChar) {
+  parser.handleQuotedValueWithCursor = function (lexer, yytext, yylloc, quoteChar) {
     if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
       const cursorIndex = yytext.indexOf('\u2020');
       parser.yy.cursorFound = {
@@ -77,7 +77,7 @@ const initGlobalSearchParser = function(parser) {
     return false;
   };
 
-  parser.parseGlobalSearch = function(beforeCursor, afterCursor, debug) {
+  parser.parseGlobalSearch = function (beforeCursor, afterCursor, debug) {
     delete parser.yy.cursorFound;
 
     let result;

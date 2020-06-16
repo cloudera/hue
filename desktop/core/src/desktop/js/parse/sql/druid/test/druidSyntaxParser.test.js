@@ -17,7 +17,7 @@
 import druidSyntaxParser from '../druidSyntaxParser';
 
 describe('druidSyntaxParser.js', () => {
-  const expectedToStrings = function(expected) {
+  const expectedToStrings = function (expected) {
     return expected.map(ex => ex.text);
   };
 
@@ -168,7 +168,7 @@ describe('druidSyntaxParser.js', () => {
     expect(result.expectedStatementEnd).toBeTruthy();
   });
 
-  const expectEqualIds = function(beforeA, afterA, beforeB, afterB) {
+  const expectEqualIds = function (beforeA, afterA, beforeB, afterB) {
     const resultA = druidSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = druidSyntaxParser.parseSyntax(beforeB, afterB);
 
@@ -177,7 +177,7 @@ describe('druidSyntaxParser.js', () => {
     expect(resultA.ruleId).toEqual(resultB.ruleId);
   };
 
-  const expectNonEqualIds = function(beforeA, afterA, beforeB, afterB) {
+  const expectNonEqualIds = function (beforeA, afterA, beforeB, afterB) {
     const resultA = druidSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = druidSyntaxParser.parseSyntax(beforeB, afterB);
 

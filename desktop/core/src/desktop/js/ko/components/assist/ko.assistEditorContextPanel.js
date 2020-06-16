@@ -474,13 +474,10 @@ class AssistEditorContextPanel {
                             isTableOrView: () => true,
                             getType: () => 'table',
                             hasPossibleChildren: () => true,
-                            getSourceMeta: () =>
-                              $.Deferred()
-                                .resolve({ notFound: true })
-                                .promise(),
+                            getSourceMeta: () => $.Deferred().resolve({ notFound: true }).promise(),
                             getDisplayName: () => dbEntry.catalogEntry.name + '.' + tableName,
                             reloading: ko.observable(false),
-                            reload: function() {
+                            reload: function () {
                               const self = this;
                               if (self.reloading()) {
                                 return;

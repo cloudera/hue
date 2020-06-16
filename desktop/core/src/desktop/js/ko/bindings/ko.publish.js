@@ -19,11 +19,11 @@ import * as ko from 'knockout';
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.publish = {
-  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     ko.bindingHandlers.click.init(
       element,
       () => {
-        return function() {
+        return function () {
           const topicDetails = ko.unwrap(valueAccessor());
           if (typeof topicDetails === 'string') {
             huePubSub.publish(topicDetails);

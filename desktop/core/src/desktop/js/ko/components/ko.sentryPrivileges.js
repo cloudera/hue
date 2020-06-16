@@ -275,7 +275,7 @@ class Privilege {
     );
     self.showAdvanced = ko.observable(false);
     self.path = ko.computed({
-      read: function() {
+      read: function () {
         if (self.columnName().length > 0) {
           return self.dbName() + '.' + self.tableName() + '.' + self.columnName();
         } else if (self.tableName().length > 0) {
@@ -284,7 +284,7 @@ class Privilege {
           return self.dbName();
         }
       },
-      write: function(value) {
+      write: function (value) {
         const _parts = value.split('.');
         this.dbName(_parts[0]);
         this.tableName(_parts.length > 1 ? _parts[1] : '');
@@ -343,7 +343,7 @@ class Privilege {
       self.privilegeScope(getPrivilegeScope());
     });
 
-    self.remove = function(privilege) {
+    self.remove = function (privilege) {
       if (privilege.status() === 'new') {
         privilege.status('alreadydeleted');
       } else {
@@ -376,7 +376,7 @@ class Role {
       }
     });
     self.selected = ko.observable(false);
-    self.handleSelect = function() {
+    self.handleSelect = function () {
       self.selected(!self.selected());
     };
 
@@ -437,18 +437,18 @@ class Role {
       return self.privileges().slice(0, self.privilegesForViewTo());
     });
 
-    self.reset = function() {
+    self.reset = function () {
       self.name('');
       self.groups.removeAll();
       self.privileges.removeAll();
       self.isEditing(false);
     };
 
-    self.addGroup = function() {
+    self.addGroup = function () {
       self.groups.push('');
     };
 
-    self.addPrivilege = function() {
+    self.addPrivilege = function () {
       self.privileges.push(
         new Privilege(vm, {
           serverName: vm.server(),
@@ -461,14 +461,14 @@ class Role {
       );
     };
 
-    self.resetGroups = function() {
+    self.resetGroups = function () {
       self.groups.removeAll();
       $.each(self.originalGroups(), (index, group) => {
         self.groups.push(group);
       });
     };
 
-    self.saveGroups = function() {
+    self.saveGroups = function () {
       $('.jHueNotify').remove();
       $.post(
         '/security/api/hive/update_role_groups',
@@ -491,7 +491,7 @@ class Role {
       });
     };
 
-    self.create = function() {
+    self.create = function () {
       $('.jHueNotify').remove();
       if (self.isValid()) {
         self.isLoading(true);
@@ -524,7 +524,7 @@ class Role {
       }
     };
 
-    self.update = function() {
+    self.update = function () {
       $('.jHueNotify').remove();
       if (self.isValid()) {
         self.isLoading(true);
@@ -553,7 +553,7 @@ class Role {
       }
     };
 
-    self.remove = function(role) {
+    self.remove = function (role) {
       $('.jHueNotify').remove();
       self.isLoading(true);
       $.post(
@@ -579,7 +579,7 @@ class Role {
         });
     };
 
-    self.savePrivileges = function(role) {
+    self.savePrivileges = function (role) {
       $('.jHueNotify').remove();
       $.post(
         '/security/api/hive/save_privileges',
@@ -672,7 +672,7 @@ class SentryPrivilegesViewModel {
 
     self.isLoadingPrivileges = ko.observable(false);
 
-    self.availableActions = function(scope) {
+    self.availableActions = function (scope) {
       let actions = ['SELECT', 'INSERT', 'ALL'];
       const databaseActions = ['CREATE'];
       const tableActions = ['REFRESH', 'ALTER', 'DROP'];
@@ -690,7 +690,7 @@ class SentryPrivilegesViewModel {
       return ko.observableArray(actions.sort());
     };
 
-    self.deletePrivilegeModal = function(role) {
+    self.deletePrivilegeModal = function (role) {
       const cascadeDeletes = role
         .privilegesChanged()
         .filter(
@@ -706,7 +706,7 @@ class SentryPrivilegesViewModel {
       }
     };
 
-    self.listSentryPrivilegesByAuthorizable = function() {
+    self.listSentryPrivilegesByAuthorizable = function () {
       self.isLoadingPrivileges(true);
       $.ajax({
         type: 'POST',
@@ -718,7 +718,7 @@ class SentryPrivilegesViewModel {
             _create_authorizable_from_ko(self.server(), self.path())
           )
         },
-        success: function(data) {
+        success: function (data) {
           if (data.status === 0) {
             self.roles([]);
             const _privileges = [];
@@ -760,7 +760,7 @@ class SentryPrivilegesViewModel {
         });
     };
 
-    self.linkToBrowse = function(path) {
+    self.linkToBrowse = function (path) {
       // TODO: implement smart linking
     };
 

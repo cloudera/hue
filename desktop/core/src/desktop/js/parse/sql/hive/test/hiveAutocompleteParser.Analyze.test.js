@@ -18,7 +18,7 @@ import hiveAutocompleteParser from '../hiveAutocompleteParser';
 
 describe('hiveAutocompleteParser.js ANALYZE statements', () => {
   beforeAll(() => {
-    hiveAutocompleteParser.yy.parseError = function(msg) {
+    hiveAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });

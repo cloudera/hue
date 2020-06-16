@@ -23,7 +23,7 @@
  * @param [ignoreCase]
  * @returns {number} The similarity
  */
-const stringDistance = function(strA, strB, ignoreCase) {
+const stringDistance = function (strA, strB, ignoreCase) {
   if (ignoreCase) {
     strA = strA.toLowerCase();
     strB = strB.toLowerCase();

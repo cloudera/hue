@@ -18,7 +18,7 @@ import stringDistance from 'sql/stringDistance';
 
 // endsWith polyfill from hue_utils.js, needed as workers live in their own js environment
 if (!String.prototype.endsWith) {
-  String.prototype.endsWith = function(searchString, position) {
+  String.prototype.endsWith = function (searchString, position) {
     const subjectString = this.toString();
     if (
       typeof position !== 'number' ||
@@ -37,14 +37,8 @@ if (!String.prototype.endsWith) {
 export const identifierEquals = (a, b) =>
   a &&
   b &&
-  a
-    .replace(/^\s*`/, '')
-    .replace(/`\s*$/, '')
-    .toLowerCase() ===
-    b
-      .replace(/^\s*`/, '')
-      .replace(/`\s*$/, '')
-      .toLowerCase();
+  a.replace(/^\s*`/, '').replace(/`\s*$/, '').toLowerCase() ===
+    b.replace(/^\s*`/, '').replace(/`\s*$/, '').toLowerCase();
 
 export const equalIgnoreCase = (a, b) => a && b && a.toLowerCase() === b.toLowerCase();
 
@@ -659,7 +653,7 @@ const SYNTAX_PARSER_NOOP_FUNCTIONS = [
   'valueExpressionSuggest'
 ];
 
-const SYNTAX_PARSER_NOOP = function() {};
+const SYNTAX_PARSER_NOOP = function () {};
 
 export const initSyntaxParser = parser => {
   // Noop functions for compatibility with the autocomplete parser as the grammar is shared

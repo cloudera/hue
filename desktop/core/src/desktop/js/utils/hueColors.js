@@ -230,30 +230,27 @@ const HueColors = {
     }
   ],
 
-  hexToR: function(h) {
+  hexToR: function (h) {
     return parseInt(this.cutHex(h).substring(0, 2), 16);
   },
 
-  hexToG: function(h) {
+  hexToG: function (h) {
     return parseInt(this.cutHex(h).substring(2, 4), 16);
   },
 
-  hexToB: function(h) {
+  hexToB: function (h) {
     return parseInt(this.cutHex(h).substring(4, 6), 16);
   },
 
-  cutHex: function(h) {
+  cutHex: function (h) {
     return h.charAt(0) === '#' ? h.substring(1, 7) : h;
   },
 
-  decToHex: function(i) {
-    return (i + 0x100)
-      .toString(16)
-      .substr(-2)
-      .toUpperCase();
+  decToHex: function (i) {
+    return (i + 0x100).toString(16).substr(-2).toUpperCase();
   },
 
-  scale: function(from, to, bands) {
+  scale: function (from, to, bands) {
     const fromRGB = [this.hexToR(from), this.hexToG(from), this.hexToB(from)];
     const toRGB = [this.hexToR(to), this.hexToG(to), this.hexToB(to)];
     let i;
@@ -273,7 +270,7 @@ const HueColors = {
     return result;
   },
 
-  getNormalizedColors: function() {
+  getNormalizedColors: function () {
     const normalizedColors = {};
     this.CUIScaleColors.forEach(scaleDef => {
       normalizedColors[scaleDef.name] = scaleDef.colors;
@@ -281,7 +278,7 @@ const HueColors = {
     return normalizedColors;
   },
 
-  getCUIChartColors: function() {
+  getCUIChartColors: function () {
     let i;
 
     const normalizedColors = this.getNormalizedColors();
@@ -325,18 +322,13 @@ const HueColors = {
     return wholeSpectrum;
   },
 
-  d3Scale: function() {
+  d3Scale: function () {
     return d3v3.scale
       .category20()
       .range()
-      .concat(
-        d3v3.scale
-          .category20b()
-          .range()
-          .concat(d3v3.scale.category20c().range())
-      );
+      .concat(d3v3.scale.category20b().range().concat(d3v3.scale.category20c().range()));
   },
-  cuiD3Scale: function(swatch) {
+  cuiD3Scale: function (swatch) {
     let colors = this.getCUIChartColors().map(c => {
       return c.color;
     });

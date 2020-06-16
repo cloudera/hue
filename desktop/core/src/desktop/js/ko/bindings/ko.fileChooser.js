@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import hueUtils from 'utils/hueUtils';
 
 ko.bindingHandlers.filechooser = {
-  init: function(element, valueAccessor, allBindingsAccessor) {
+  init: function (element, valueAccessor, allBindingsAccessor) {
     const $element = $(element);
     const options = ko.unwrap(allBindingsAccessor());
     $element.attr('autocomplete', 'off');

@@ -17,7 +17,7 @@
 import phoenixSyntaxParser from '../phoenixSyntaxParser';
 
 describe('phoenixSyntaxParser.js', () => {
-  const expectedToStrings = function(expected) {
+  const expectedToStrings = function (expected) {
     return expected.map(ex => ex.text);
   };
 
@@ -168,7 +168,7 @@ describe('phoenixSyntaxParser.js', () => {
     expect(result.expectedStatementEnd).toBeTruthy();
   });
 
-  const expectEqualIds = function(beforeA, afterA, beforeB, afterB) {
+  const expectEqualIds = function (beforeA, afterA, beforeB, afterB) {
     const resultA = phoenixSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = phoenixSyntaxParser.parseSyntax(beforeB, afterB);
 
@@ -177,7 +177,7 @@ describe('phoenixSyntaxParser.js', () => {
     expect(resultA.ruleId).toEqual(resultB.ruleId);
   };
 
-  const expectNonEqualIds = function(beforeA, afterA, beforeB, afterB) {
+  const expectNonEqualIds = function (beforeA, afterA, beforeB, afterB) {
     const resultA = phoenixSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = phoenixSyntaxParser.parseSyntax(beforeB, afterB);
 

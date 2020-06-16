@@ -339,10 +339,7 @@ class CatalogEntriesList {
         // Issue with filteredEntries is that it's not updated in time when typing,
         // i.e. type:| doesn't automatically open the suggestion list.
         self.entries().forEach(entry => {
-          const type = entry
-            .catalogEntry()
-            .getType()
-            .toLowerCase();
+          const type = entry.catalogEntry().getType().toLowerCase();
           if (!typeIndex['type'][type]) {
             typeIndex['type'][type] = 1;
           } else {
@@ -369,12 +366,7 @@ class CatalogEntriesList {
 
         if (!isFacetMatch) {
           if (entry.catalogEntry().isField()) {
-            match = !!facets['type'][
-              entry
-                .catalogEntry()
-                .getType()
-                .toLowerCase()
-            ];
+            match = !!facets['type'][entry.catalogEntry().getType().toLowerCase()];
           } else if (entry.catalogEntry().isTableOrView()) {
             match =
               (facets['type']['table'] && entry.catalogEntry().isTable()) ||
@@ -386,15 +378,8 @@ class CatalogEntriesList {
           match = self.querySpec().text.every(text => {
             const textLower = text.toLowerCase();
             return (
-              entry
-                .catalogEntry()
-                .name.toLowerCase()
-                .indexOf(textLower) !== -1 ||
-              entry
-                .catalogEntry()
-                .getResolvedComment()
-                .toLowerCase()
-                .indexOf(textLower) !== -1
+              entry.catalogEntry().name.toLowerCase().indexOf(textLower) !== -1 ||
+              entry.catalogEntry().getResolvedComment().toLowerCase().indexOf(textLower) !== -1
             );
           });
         }
@@ -403,23 +388,18 @@ class CatalogEntriesList {
       });
     });
 
-    self.autocompleteFromEntries = function(nonPartial, partial) {
+    self.autocompleteFromEntries = function (nonPartial, partial) {
       const result = [];
       const partialLower = partial.toLowerCase();
       self.entries().forEach(entry => {
-        if (
-          entry
-            .catalogEntry()
-            .name.toLowerCase()
-            .indexOf(partialLower) === 0
-        ) {
+        if (entry.catalogEntry().name.toLowerCase().indexOf(partialLower) === 0) {
           result.push(nonPartial + partial + entry.catalogEntry().name.substring(partial.length));
         }
       });
       return result;
     };
 
-    const entrySort = function(a, b) {
+    const entrySort = function (a, b) {
       const aIsKey =
         a.catalogEntry().isPrimaryKey() ||
         a.catalogEntry().isPartitionKey() ||
@@ -438,7 +418,7 @@ class CatalogEntriesList {
       return b.popularity() - a.popularity() || a.index - b.index;
     };
 
-    const onClick = function(sampleEnrichedEntry, event) {
+    const onClick = function (sampleEnrichedEntry, event) {
       if (params.onClick) {
         params.onClick(sampleEnrichedEntry.catalogEntry(), event);
       } else if (self.contextPopoverEnabled) {
@@ -448,16 +428,14 @@ class CatalogEntriesList {
       }
     };
 
-    const onRowClick = function(sampleEnrichedEntry, event) {
+    const onRowClick = function (sampleEnrichedEntry, event) {
       if (self.selectedEntries && $(event.target).is('td')) {
-        $(event.currentTarget)
-          .find('.hue-checkbox')
-          .trigger('click');
+        $(event.currentTarget).find('.hue-checkbox').trigger('click');
       }
       return true;
     };
 
-    const loadEntries = function() {
+    const loadEntries = function () {
       self.loading(true);
 
       const entriesAddedDeferred = $.Deferred();
@@ -490,12 +468,10 @@ class CatalogEntriesList {
               entriesAddedDeferred.done(entries => {
                 const entriesIndex = {};
                 entries.forEach(entry => {
-                  entriesIndex[
-                    entry
-                      .catalogEntry()
-                      .path.join('.')
-                      .toLowerCase()
-                  ] = { joinColumnIndex: {}, entry: entry };
+                  entriesIndex[entry.catalogEntry().path.join('.').toLowerCase()] = {
+                    joinColumnIndex: {},
+                    entry: entry
+                  };
                 });
                 topJoins.values.forEach(topJoin => {
                   topJoin.joinCols.forEach(topJoinCols => {
@@ -584,7 +560,7 @@ class CatalogEntriesList {
 
         let firstSampleFetch = true;
 
-        const fetchSamples = function() {
+        const fetchSamples = function () {
           window.clearInterval(self.fetchSampleTimeout);
           self.lastSamplePromise = self
             .catalogEntry()

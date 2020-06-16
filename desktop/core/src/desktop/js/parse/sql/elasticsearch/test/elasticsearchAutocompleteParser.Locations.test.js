@@ -19,7 +19,7 @@ import elasticsearchAutocompleteParser from '../elasticsearchAutocompleteParser'
 // prettier-ignore-start
 describe('elasticsearchAutocompleteParser.js locations', () => {
   beforeAll(() => {
-    elasticsearchAutocompleteParser.yy.parseError = function(msg) {
+    elasticsearchAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });
@@ -35,7 +35,7 @@ describe('elasticsearchAutocompleteParser.js locations', () => {
     ).toEqualDefinition(testDefinition);
   };
 
-  const assertLocations = function(options) {
+  const assertLocations = function (options) {
     assertAutoComplete({
       beforeCursor: options.beforeCursor,
       afterCursor: options.afterCursor || '',

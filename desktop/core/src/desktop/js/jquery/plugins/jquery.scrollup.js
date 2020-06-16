@@ -48,11 +48,11 @@ function Plugin(element, options) {
   }
 }
 
-Plugin.prototype.setOptions = function(options) {
+Plugin.prototype.setOptions = function (options) {
   this.options = $.extend({}, defaults, options);
 };
 
-Plugin.prototype.setupScrollUp = function() {
+Plugin.prototype.setupScrollUp = function () {
   const _this = this;
   let link = null;
 
@@ -78,10 +78,7 @@ Plugin.prototype.setupScrollUp = function() {
   }
 
   function positionOtherAnchors() {
-    const upPosition =
-      $('#jHueScrollUpAnchor')
-        .css('right')
-        .replace(/px/gi, '') * 1;
+    const upPosition = $('#jHueScrollUpAnchor').css('right').replace(/px/gi, '') * 1;
     let right = upPosition - 30;
     if ($('#jHueScrollUpAnchor').is(':visible')) {
       right = upPosition;
@@ -175,12 +172,12 @@ Plugin.prototype.setupScrollUp = function() {
   });
 };
 
-$.fn[pluginName] = function(options) {
-  return this.each(function() {
+$.fn[pluginName] = function (options) {
+  return this.each(function () {
     $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
   });
 };
 
-$[pluginName] = function(options) {
+$[pluginName] = function (options) {
   new Plugin($('body'), options);
 };

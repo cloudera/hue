@@ -19,7 +19,7 @@ import flinkAutocompleteParser from '../flinkAutocompleteParser';
 // prettier-ignore-start
 describe('flinkAutocompleteParser.js locations', () => {
   beforeAll(() => {
-    flinkAutocompleteParser.yy.parseError = function(msg) {
+    flinkAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });
@@ -35,7 +35,7 @@ describe('flinkAutocompleteParser.js locations', () => {
     ).toEqualDefinition(testDefinition);
   };
 
-  const assertLocations = function(options) {
+  const assertLocations = function (options) {
     assertAutoComplete({
       beforeCursor: options.beforeCursor,
       afterCursor: options.afterCursor || '',

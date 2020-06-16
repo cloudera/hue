@@ -46,9 +46,7 @@ class CancellablePromise {
   cancel() {
     const self = this;
     if (self.cancelPrevented || self.cancelled || self.state() !== 'pending') {
-      return $.Deferred()
-        .resolve()
-        .promise();
+      return $.Deferred().resolve().promise();
     }
 
     self.cancelled = true;

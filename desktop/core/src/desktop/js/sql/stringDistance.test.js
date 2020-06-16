@@ -17,7 +17,7 @@
 import stringDistance from './stringDistance';
 
 describe('stringDistance.js', () => {
-  const expectDistance = function(strA, strB, distance, ignoreCase) {
+  const expectDistance = function (strA, strB, distance, ignoreCase) {
     const lr = stringDistance(strA, strB, ignoreCase);
     const rl = stringDistance(strB, strA, ignoreCase);
 

@@ -32,7 +32,7 @@ class AceAutocompleteWrapper {
 
     self.topTables = {};
 
-    const initializeAutocompleter = function() {
+    const initializeAutocompleter = function () {
       self.autocompleter = new HdfsAutocompleter({
         user: options.user,
         snippet: options.snippet,

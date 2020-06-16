@@ -144,7 +144,7 @@ export const simplePost = (url, data, options) => {
 
   const promise = deferred.promise();
 
-  promise.getReadyState = function() {
+  promise.getReadyState = function () {
     return request.readyState;
   };
 
@@ -168,9 +168,7 @@ export const simplePost = (url, data, options) => {
  */
 export const simplePostAsync = async (url, data, options) =>
   new Promise((resolve, reject) => {
-    simplePost(url, data, options)
-      .done(resolve)
-      .fail(reject);
+    simplePost(url, data, options).done(resolve).fail(reject);
   });
 
 export const cancelActiveRequest = request => {

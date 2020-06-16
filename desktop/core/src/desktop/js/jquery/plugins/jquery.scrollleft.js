@@ -44,11 +44,11 @@ function Plugin(element, options) {
   }
 }
 
-Plugin.prototype.setOptions = function(options) {
+Plugin.prototype.setOptions = function (options) {
   this.options = $.extend({}, defaults, options);
 };
 
-Plugin.prototype.setupScrollLeft = function() {
+Plugin.prototype.setupScrollLeft = function () {
   const _this = this;
   let link = null,
     isActive = true;
@@ -75,10 +75,7 @@ Plugin.prototype.setupScrollLeft = function() {
   }
 
   function positionOtherAnchors() {
-    const upPosition =
-      $('#jHueScrollUpAnchor')
-        .css('right')
-        .replace(/px/gi, '') * 1;
+    const upPosition = $('#jHueScrollUpAnchor').css('right').replace(/px/gi, '') * 1;
     let right = upPosition - 30;
     if ($('#jHueScrollUpAnchor').is(':visible')) {
       right = upPosition;
@@ -142,9 +139,7 @@ Plugin.prototype.setupScrollLeft = function() {
       $('#jHueScrollLeftAnchor')
         .data('caller')
         .animate({ scrollLeft: 0 }, 300, () => {
-          $(document)
-            .find("[jHueLeftScrollified='true']")
-            .trigger('scroll_update');
+          $(document).find("[jHueLeftScrollified='true']").trigger('scroll_update');
           if (
             $(document)
               .find("[jHueLeftScrollified='true']")
@@ -173,12 +168,12 @@ Plugin.prototype.setupScrollLeft = function() {
   });
 };
 
-$.fn[pluginName] = function(options) {
-  return this.each(function() {
+$.fn[pluginName] = function (options) {
+  return this.each(function () {
     $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
   });
 };
 
-$[pluginName] = function(options) {
+$[pluginName] = function (options) {
   new Plugin($('body'), options);
 };

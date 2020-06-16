@@ -18,7 +18,7 @@ import flinkAutocompleteParser from '../flinkAutocompleteParser';
 
 describe('flinkAutocompleteParser.js UPDATE statements', () => {
   beforeAll(() => {
-    flinkAutocompleteParser.yy.parseError = function(msg) {
+    flinkAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });

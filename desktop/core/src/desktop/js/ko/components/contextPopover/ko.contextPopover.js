@@ -549,7 +549,7 @@ const HALF_ARROW = 6;
 
 let preventHide = false;
 
-const hidePopover = function() {
+const hidePopover = function () {
   if (!preventHide) {
     const $contextPopover = $('#contextPopover');
     if ($contextPopover.length > 0) {
@@ -613,7 +613,7 @@ class ContextPopoverViewModel {
     }
 
     const windowWidth = $(window).width();
-    const fitHorizontally = function() {
+    const fitHorizontally = function () {
       let left =
         params.source.left +
         Math.round((params.source.right - params.source.left) / 2) -
@@ -631,7 +631,7 @@ class ContextPopoverViewModel {
     };
 
     const windowHeight = $(window).height();
-    const fitVertically = function() {
+    const fitVertically = function () {
       let top =
         params.source.top +
         Math.round((params.source.bottom - params.source.top) / 2) -
@@ -756,7 +756,7 @@ class ContextPopoverViewModel {
 
     if (params.delayedHide) {
       let hideTimeout = -1;
-      const onLeave = function() {
+      const onLeave = function () {
         hideTimeout = window.setTimeout(() => {
           $('.hue-popover').fadeOut(200, () => {
             hidePopover();
@@ -764,7 +764,7 @@ class ContextPopoverViewModel {
         }, 1000);
       };
 
-      const onEnter = function() {
+      const onEnter = function () {
         window.clearTimeout(hideTimeout);
       };
 
@@ -773,7 +773,7 @@ class ContextPopoverViewModel {
         .on('mouseleave', onLeave)
         .on('mouseenter', onEnter);
 
-      const keepPopoverOpenOnClick = function() {
+      const keepPopoverOpenOnClick = function () {
         window.clearTimeout(hideTimeout);
         $(params.delayedHide)
           .add($('.hue-popover'))
@@ -792,7 +792,7 @@ class ContextPopoverViewModel {
       });
     }
 
-    const closeOnEsc = function(e) {
+    const closeOnEsc = function (e) {
       if (e.keyCode === 27) {
         hidePopover();
       }

@@ -66,7 +66,7 @@ class AceLocationHandler {
 
     self.verifyThrottle = -1;
 
-    const updateDatabaseIndex = function(databaseList) {
+    const updateDatabaseIndex = function (databaseList) {
       self.databaseIndex = {};
       databaseList.forEach(database => {
         self.databaseIndex[database.toLowerCase()] = true;
@@ -95,19 +95,19 @@ class AceLocationHandler {
     const activeMarkers = [];
     let keepLastMarker = false;
 
-    const hideContextTooltip = function() {
+    const hideContextTooltip = function () {
       clearTimeout(tooltipTimeout);
       contextTooltip.hide();
     };
 
-    const clearActiveMarkers = function() {
+    const clearActiveMarkers = function () {
       hideContextTooltip();
       while (activeMarkers.length > keepLastMarker ? 1 : 0) {
         self.editor.session.removeMarker(activeMarkers.shift());
       }
     };
 
-    const markLocation = function(parseLocation) {
+    const markLocation = function (parseLocation) {
       let range;
       if (parseLocation.type === 'function') {
         // Todo: Figure out why functions need an extra char at the end
@@ -317,7 +317,7 @@ class AceLocationHandler {
       self.editor.off('input', inputListener);
     });
 
-    const mouseoutListener = function() {
+    const mouseoutListener = function () {
       clearActiveMarkers();
       clearTimeout(tooltipTimeout);
       contextTooltip.hide();
@@ -330,7 +330,7 @@ class AceLocationHandler {
       self.editor.container.removeEventListener('mouseout', mouseoutListener);
     });
 
-    const onContextMenu = function(e) {
+    const onContextMenu = function (e) {
       const selectionRange = self.editor.selection.getRange();
       huePubSub.publish('context.popover.hide');
       huePubSub.publish('sql.syntax.dropdown.hide');
@@ -451,7 +451,7 @@ class AceLocationHandler {
     let lastKnownStatements = [];
     let activeStatement;
 
-    const isPointInside = function(parseLocation, editorPosition) {
+    const isPointInside = function (parseLocation, editorPosition) {
       const row = editorPosition.row + 1; // ace positioning has 0 based rows while the parser has 1
       const column = editorPosition.column;
       return (
@@ -486,7 +486,7 @@ class AceLocationHandler {
     };
 
     let lastExecutingStatement = null;
-    const updateActiveStatement = function(cursorChange) {
+    const updateActiveStatement = function (cursorChange) {
       if (!self.snippet.isSqlDialect()) {
         return;
       }
@@ -597,7 +597,7 @@ class AceLocationHandler {
       }
     };
 
-    const parseForStatements = function() {
+    const parseForStatements = function () {
       if (self.snippet.isSqlDialect()) {
         try {
           const lastChangeTime = self.editor.lastChangeTime;
@@ -746,7 +746,7 @@ class AceLocationHandler {
     const markerId = self.editor.getSession().addMarker(range, clazz);
     const marker = self.editor.getSession().$backMarkers[markerId];
     marker.token = token;
-    marker.dispose = function() {
+    marker.dispose = function () {
       range.start.detach();
       range.end.detach();
       delete marker.token.syntaxError;
@@ -888,7 +888,7 @@ class AceLocationHandler {
       });
       $.when
         .apply($, tablePromises)
-        .done(function() {
+        .done(function () {
           let joined = [];
           for (let i = 0; i < arguments.length; i++) {
             joined = joined.concat(arguments[i]);
@@ -965,14 +965,14 @@ class AceLocationHandler {
       }
     });
 
-    const resolvePathFromTables = function(location) {
+    const resolvePathFromTables = function (location) {
       const promise = $.Deferred();
       if (
         location.type === 'column' &&
         typeof location.tables !== 'undefined' &&
         location.identifierChain.length === 1
       ) {
-        const findIdentifierChainInTable = function(tablesToGo) {
+        const findIdentifierChainInTable = function (tablesToGo) {
           const nextTable = tablesToGo.shift();
           if (typeof nextTable.subQuery === 'undefined') {
             dataCatalog
@@ -1026,7 +1026,7 @@ class AceLocationHandler {
       return promise;
     };
 
-    const verify = function() {
+    const verify = function () {
       if (tokensToVerify.length === 0) {
         return;
       }
