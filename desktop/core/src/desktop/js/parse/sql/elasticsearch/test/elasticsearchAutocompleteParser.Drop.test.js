@@ -18,7 +18,7 @@ import elasticsearchAutocompleteParser from '../elasticsearchAutocompleteParser'
 
 describe('elasticsearchAutocompleteParser.js DROP statements', () => {
   beforeAll(() => {
-    elasticsearchAutocompleteParser.yy.parseError = function(msg) {
+    elasticsearchAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });

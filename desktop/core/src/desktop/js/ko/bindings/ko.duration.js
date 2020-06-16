@@ -18,21 +18,21 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 import sprintf from 'sprintf-js';
 
-ko.bindingHandlers.duration = (function() {
+ko.bindingHandlers.duration = (function () {
   let that;
   return (that = {
-    init: function(element, valueAccessor) {
+    init: function (element, valueAccessor) {
       that.format(element, valueAccessor);
     },
-    update: function(element, valueAccessor) {
+    update: function (element, valueAccessor) {
       that.format(element, valueAccessor);
     },
-    format: function(element, valueAccessor) {
+    format: function (element, valueAccessor) {
       const value = valueAccessor();
       const formatted = that.humanTime(ko.unwrap(value));
       $(element).text(formatted);
     },
-    humanTime: function(value) {
+    humanTime: function (value) {
       value = value * 1;
       if (value < Math.pow(10, 3)) {
         return sprintf.sprintf('%i ns', value);

@@ -60,7 +60,7 @@ import huePubSub from 'utils/huePubSub';
  *
  */
 ko.bindingHandlers.foreachVisible = {
-  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     return ko.bindingHandlers.template.init(
       element,
       () => {
@@ -75,7 +75,7 @@ ko.bindingHandlers.foreachVisible = {
     );
   },
 
-  update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+  update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     const options = valueAccessor();
     let $element = $(element);
     let isTable = false;
@@ -124,7 +124,7 @@ ko.bindingHandlers.foreachVisible = {
     let incrementLimit = 0; // The diff required to re-render, set to visibleCount below
     let elementIncrement = 0; // Elements to add on either side of the visible elements, set to 3x visibleCount
     let endIndex = 0;
-    const updateVisibleEntryCount = function() {
+    const updateVisibleEntryCount = function () {
       // TODO: Drop the window innerHeight limitation.
       // Sometimes after resizeWrapper() is called the reported innerHeight of the $container is the same as
       // the wrapper causing the binding to render all the items. This limits the visibleEntryCount to the
@@ -155,7 +155,7 @@ ko.bindingHandlers.foreachVisible = {
 
     const huePubSubs = [];
 
-    const scrollToIndex = function(idx, offset, instant, callback) {
+    const scrollToIndex = function (idx, offset, instant, callback) {
       const lastKnownHeights = $parentFVOwnerElement.data('lastKnownHeights');
       if (!lastKnownHeights || lastKnownHeights.length <= idx) {
         return;
@@ -205,7 +205,7 @@ ko.bindingHandlers.foreachVisible = {
 
     if (ko.isObservable(viewModel.foreachVisible)) {
       viewModel.foreachVisible({
-        scrollToIndex: function(index) {
+        scrollToIndex: function (index) {
           const offset = depth > 0 ? $parentFVOwnerElement.position().top : 0;
           scrollToIndex(index, offset, true);
         }
@@ -220,7 +220,7 @@ ko.bindingHandlers.foreachVisible = {
           $parentForeachVisible: $element,
           $parentForeachVisibleId: id,
           $depth: depth + 1,
-          $indexOffset: function() {
+          $indexOffset: function () {
             return startIndex;
           }
         });
@@ -264,7 +264,7 @@ ko.bindingHandlers.foreachVisible = {
       $parentFVOwnerElement.data('lastKnownHeights', lastKnownHeights);
     }
 
-    const resizeWrapper = function() {
+    const resizeWrapper = function () {
       let totalHeight = 0;
       const lastKnownHeights = $parentFVOwnerElement.data('lastKnownHeights');
       if (!lastKnownHeights) {
@@ -277,7 +277,7 @@ ko.bindingHandlers.foreachVisible = {
     };
     resizeWrapper();
 
-    const updateLastKnownHeights = function() {
+    const updateLastKnownHeights = function () {
       if ($container.data('busyRendering')) {
         return;
       }
@@ -329,7 +329,7 @@ ko.bindingHandlers.foreachVisible = {
 
     updateLastKnownHeights();
 
-    const positionList = function() {
+    const positionList = function () {
       const lastKnownHeights = $parentFVOwnerElement.data('lastKnownHeights');
       if (!lastKnownHeights) {
         return;
@@ -341,7 +341,7 @@ ko.bindingHandlers.foreachVisible = {
       $element.css('top', top + 'px');
     };
 
-    const afterRender = function() {
+    const afterRender = function () {
       renderedElements = isTable ? $element.children('tbody').children() : $element.children();
       $container.data('busyRendering', false);
       if (typeof options.fetchMore !== 'undefined' && endIndex === allEntries.length - 1) {
@@ -350,7 +350,7 @@ ko.bindingHandlers.foreachVisible = {
       huePubSub.publish('foreach.visible.update.heights', id);
     };
 
-    const render = function() {
+    const render = function () {
       if ((endIndex === 0 && allEntries.length > 1) || endIndex < 0) {
         ko.bindingHandlers.template.update(
           element,
@@ -358,7 +358,7 @@ ko.bindingHandlers.foreachVisible = {
             return {
               foreach: [],
               templateEngine: ko.nativeTemplateEngine.instance,
-              afterRender: function() {
+              afterRender: function () {
                 // This is called once for each added element (not when elements are removed)
                 clearTimeout(throttle);
                 throttle = setTimeout(afterRender, 0);
@@ -387,7 +387,7 @@ ko.bindingHandlers.foreachVisible = {
           return {
             foreach: allEntries.slice(startIndex, endIndex + 1),
             templateEngine: ko.nativeTemplateEngine.instance,
-            afterRender: function() {
+            afterRender: function () {
               // This is called once for each added element (not when elements are removed)
               clearTimeout(throttle);
               throttle = setTimeout(afterRender, 0);
@@ -400,7 +400,7 @@ ko.bindingHandlers.foreachVisible = {
       );
     };
 
-    const setStartAndEndFromScrollTop = function() {
+    const setStartAndEndFromScrollTop = function () {
       const lastKnownHeights = $parentFVOwnerElement.data('lastKnownHeights');
       if (!lastKnownHeights) {
         return;
@@ -413,10 +413,7 @@ ko.bindingHandlers.foreachVisible = {
 
       while ($lastParent) {
         // Include the header, parent() is .foreach-wrapper, parent().parent() is the container (ul or div)
-        const lastRefOffset = $lastRef
-          .parent()
-          .parent()
-          .offset().top;
+        const lastRefOffset = $lastRef.parent().parent().offset().top;
         let lastAddedSpace = 0;
         $lastParent.children().each((idx, child) => {
           const $child = $(child);
@@ -448,7 +445,7 @@ ko.bindingHandlers.foreachVisible = {
     let renderThrottle = -1;
     let preloadGhostThrottle = -1;
     let lastScrollTop = -1;
-    const onScroll = function() {
+    const onScroll = function () {
       if (
         startIndex > incrementLimit &&
         Math.abs(lastScrollTop - $container.scrollTop()) < incrementLimit * options.minHeight

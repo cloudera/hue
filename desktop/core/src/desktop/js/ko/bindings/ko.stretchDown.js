@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.stretchDown = {
-  init: function(element) {
+  init: function (element) {
     const $element = $(element);
     const $parent = $element.parent();
 

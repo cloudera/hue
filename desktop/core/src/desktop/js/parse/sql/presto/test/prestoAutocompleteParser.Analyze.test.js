@@ -19,7 +19,7 @@ import prestoAutocompleteParser from '../prestoAutocompleteParser';
 
 describe('prestoAutocompleteParser.js ANALYZE statements', () => {
   beforeAll(() => {
-    prestoAutocompleteParser.yy.parseError = function(msg) {
+    prestoAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
     jasmine.addMatchers(SqlTestUtils.testDefinitionMatcher);

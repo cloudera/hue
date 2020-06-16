@@ -19,7 +19,7 @@ import * as ko from 'knockout';
 import MediumEditor from 'medium-editor';
 
 ko.bindingHandlers.medium = {
-  init: function(element, valueAccessor, allBindings) {
+  init: function (element, valueAccessor, allBindings) {
     new MediumEditor($(element), {
       buttons: [
         'header1',

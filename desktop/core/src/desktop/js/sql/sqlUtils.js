@@ -565,14 +565,8 @@ const impalaReservedKeywords = {
 const identifierEquals = (a, b) =>
   a &&
   b &&
-  a
-    .replace(/^\s*`/, '')
-    .replace(/`\s*$/, '')
-    .toLowerCase() ===
-    b
-      .replace(/^\s*`/, '')
-      .replace(/`\s*$/, '')
-      .toLowerCase();
+  a.replace(/^\s*`/, '').replace(/`\s*$/, '').toLowerCase() ===
+    b.replace(/^\s*`/, '').replace(/`\s*$/, '').toLowerCase();
 
 const autocompleteFilter = (filter, entries) => {
   const lowerCaseFilter = filter.toLowerCase();

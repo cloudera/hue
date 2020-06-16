@@ -19,7 +19,7 @@ import SqlTestUtils from '../../../spec/sqlTestUtils';
 
 describe('prestoAutocompleteParser.js IMPORT and EXPORT statements', () => {
   beforeAll(() => {
-    prestoAutocompleteParser.yy.parseError = function(msg) {
+    prestoAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
     jasmine.addMatchers(SqlTestUtils.testDefinitionMatcher);

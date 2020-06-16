@@ -95,7 +95,7 @@ class SolrQuerySuggestions {
 
     self.loading = ko.observable(false);
     self.filter = ko.observable();
-    self.cancelRequests = function() {};
+    self.cancelRequests = function () {};
   }
 
   update(parseResult) {
@@ -166,7 +166,7 @@ class SolrQuerySuggestions {
         fieldName: fieldName,
         prefix: prefix || '',
         silenceErrors: true,
-        successCallback: function(result) {
+        successCallback: function (result) {
           const sampleSuggestions = [];
           if (result && result.terms && result.terms.length) {
             let maxCount = 1;
@@ -204,7 +204,7 @@ class SolrQuerySuggestions {
           }
           promise.resolve(sampleSuggestions);
         },
-        errorCallback: function() {
+        errorCallback: function () {
           promise.resolve([]);
         }
       });

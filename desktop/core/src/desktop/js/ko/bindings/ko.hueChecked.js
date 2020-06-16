@@ -18,14 +18,14 @@ import * as ko from 'knockout';
 
 ko.bindingHandlers.hueChecked = {
   after: ['value', 'attr'],
-  init: function(element, valueAccessor, allBindings, viewModel) {
+  init: function (element, valueAccessor, allBindings, viewModel) {
     const selectedValues = valueAccessor();
 
     if (allBindings().checkedValue) {
       viewModel = ko.unwrap(allBindings().checkedValue);
     }
 
-    const updateCheckedState = function() {
+    const updateCheckedState = function () {
       ko.utils.toggleDomNodeCssClass(element, 'fa-check', selectedValues.indexOf(viewModel) > -1);
     };
 

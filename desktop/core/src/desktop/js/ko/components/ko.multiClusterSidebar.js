@@ -54,13 +54,13 @@ const TEMPLATE = `
 `;
 
 ko.bindingHandlers.sidebarSubmenuActivator = {
-  init: function(element) {
+  init: function (element) {
     const $element = $(element);
     const $menu = $element.next();
     let visible = false;
     let hideTimeout = -1;
 
-    const show = function() {
+    const show = function () {
       window.clearTimeout(hideTimeout);
       if (!visible) {
         $menu.css({ top: $element.offset().top + 'px' });
@@ -70,7 +70,7 @@ ko.bindingHandlers.sidebarSubmenuActivator = {
       }
     };
 
-    const hide = function() {
+    const hide = function () {
       hideTimeout = window.setTimeout(() => {
         if (visible) {
           $menu.hide();

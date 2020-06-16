@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import hueUtils from 'utils/hueUtils';
 
 ko.bindingHandlers.fresherEditor = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const _el = $(element);
     const options = $.extend(valueAccessor(), {});
     _el.html(options.data());
@@ -121,10 +121,7 @@ ko.bindingHandlers.fresherEditor = {
       } else if (document.selection && document.selection.type !== 'Control') {
         // IE < 9
         if (_el.data('selection')) {
-          _el
-            .data('selection')
-            .createRange()
-            .pasteHTML(html);
+          _el.data('selection').createRange().pasteHTML(html);
         } else {
           document.selection.createRange().pasteHTML(html);
         }

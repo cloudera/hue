@@ -16,11 +16,11 @@
 
 import * as ko from 'knockout';
 
-ko.extenders.maxLength = function(target, maxLength) {
+ko.extenders.maxLength = function (target, maxLength) {
   const result = ko
     .computed({
       read: target,
-      write: function(val) {
+      write: function (val) {
         let newVal = val;
         if (maxLength > 0 && val.length > maxLength) {
           const limitedVal = val.substring(0, maxLength);

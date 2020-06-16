@@ -142,15 +142,8 @@ class MetastoreViewModel {
           return;
         }
       }
-      if (
-        this.source()
-          .namespace()
-          .database()
-      ) {
-        this.source()
-          .namespace()
-          .database()
-          .table(null);
+      if (this.source().namespace().database()) {
+        this.source().namespace().database().table(null);
       }
       this.source()
         .namespace()
@@ -174,36 +167,16 @@ class MetastoreViewModel {
         if (window.HAS_MULTI_CLUSTER) {
           params.namespace = this.source().namespace().id;
         }
-        if (
-          this.source()
-            .namespace()
-            .database() &&
-          this.source()
-            .namespace()
-            .database()
-            .table()
-        ) {
+        if (this.source().namespace().database() && this.source().namespace().database().table()) {
           hueUtils.changeURL(
             prefix +
               'table/' +
-              this.source()
-                .namespace()
-                .database()
-                .table()
-                .catalogEntry.path.join('/'),
+              this.source().namespace().database().table().catalogEntry.path.join('/'),
             params
           );
-        } else if (
-          this.source()
-            .namespace()
-            .database()
-        ) {
+        } else if (this.source().namespace().database()) {
           hueUtils.changeURL(
-            prefix +
-              'tables/' +
-              this.source()
-                .namespace()
-                .database().catalogEntry.name,
+            prefix + 'tables/' + this.source().namespace().database().catalogEntry.name,
             params
           );
         } else {
@@ -219,27 +192,15 @@ class MetastoreViewModel {
     };
 
     this.databasesBreadcrumb = () => {
-      if (
-        this.source()
-          .namespace()
-          .database()
-      ) {
-        this.source()
-          .namespace()
-          .database()
-          .table(null);
+      if (this.source().namespace().database()) {
+        this.source().namespace().database().table(null);
       }
-      this.source()
-        .namespace()
-        .database(null);
+      this.source().namespace().database(null);
       huePubSub.publish('metastore.url.change');
     };
 
     this.tablesBreadcrumb = () => {
-      this.source()
-        .namespace()
-        .database()
-        .table(null);
+      this.source().namespace().database().table(null);
       huePubSub.publish('metastore.url.change');
     };
 
@@ -252,7 +213,7 @@ class MetastoreViewModel {
           el => el.parent().hasClass('dataTables_wrapper'),
           () => {
             const sampleTable = $('#sampleTable');
-            const sampleCol = sampleTable.find('th').filter(function() {
+            const sampleCol = sampleTable.find('th').filter(function () {
               return $.trim($(this).text()).indexOf(col.catalogEntry.name) > -1;
             });
             sampleTable.find('.columnSelected').removeClass('columnSelected');
@@ -260,7 +221,7 @@ class MetastoreViewModel {
               .find('tr td:nth-child(' + (sampleCol.index() + 1) + ')')
               .addClass('columnSelected');
             let scrollLeft = 0;
-            sampleTable.find('th:lt(' + sampleCol.index() + ')').each(function() {
+            sampleTable.find('th:lt(' + sampleCol.index() + ')').each(function () {
               scrollLeft += $(this).outerWidth();
             });
             scrollLeft = Math.max(0, scrollLeft - 40);
@@ -301,20 +262,10 @@ class MetastoreViewModel {
     this.source()
       .namespace()
       .setDatabaseByName(entry.path[0], () => {
-        if (
-          this.source()
-            .namespace()
-            .database()
-        ) {
+        if (this.source().namespace().database()) {
           if (
-            this.source()
-              .namespace()
-              .database()
-              .table() &&
-            this.source()
-              .namespace()
-              .database()
-              .table().catalogEntry.name === entry.name
+            this.source().namespace().database().table() &&
+            this.source().namespace().database().table().catalogEntry.name === entry.name
           ) {
             if (callback) {
               callback();
@@ -329,14 +280,9 @@ class MetastoreViewModel {
               .tables()
               .filter(table => table.catalogEntry.name === entry.name);
             if (foundTables.length === 1) {
-              this.source()
-                .namespace()
-                .database()
-                .setTable(foundTables[0], callback);
+              this.source().namespace().database().setTable(foundTables[0], callback);
             } else if (clearDbCacheOnMissing) {
-              const dbEntry = this.source()
-                .namespace()
-                .database().catalogEntry;
+              const dbEntry = this.source().namespace().database().catalogEntry;
               dbEntry
                 .getChildren({ refreshCache: true, silenceErrors: true })
                 .then(childEntries => {
@@ -367,12 +313,7 @@ class MetastoreViewModel {
             }
           };
 
-          if (
-            !this.source()
-              .namespace()
-              .database()
-              .loaded()
-          ) {
+          if (!this.source().namespace().database().loaded()) {
             const doOnce = this.source()
               .namespace()
               .database()

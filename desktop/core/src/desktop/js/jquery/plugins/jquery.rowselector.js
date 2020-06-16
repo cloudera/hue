@@ -34,20 +34,18 @@ function Plugin(element, options) {
   this.init();
 }
 
-Plugin.prototype.setOptions = function(options) {
+Plugin.prototype.setOptions = function (options) {
   this.options = $.extend({}, defaults, options);
 };
 
-Plugin.prototype.init = function() {
+Plugin.prototype.init = function () {
   const _this = this;
   $(_this.element)
     .closest('tr')
     .click(e => {
       if (
         $(e.target).data('row-selector-exclude') ||
-        $(e.target)
-          .closest('td')
-          .hasClass('row-selector-exclude')
+        $(e.target).closest('td').hasClass('row-selector-exclude')
       ) {
         return;
       }
@@ -63,8 +61,8 @@ Plugin.prototype.init = function() {
     .css('cursor', 'pointer');
 };
 
-$.fn[pluginName] = function(options) {
-  return this.each(function() {
+$.fn[pluginName] = function (options) {
+  return this.each(function () {
     if (!$.data(this, 'plugin_' + pluginName)) {
       $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
     } else {

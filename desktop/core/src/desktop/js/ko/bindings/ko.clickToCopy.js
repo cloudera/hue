@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.clickToCopy = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     $(element).click(() => {
       const $input = $('<textarea>')
         .css({ opacity: 0 })

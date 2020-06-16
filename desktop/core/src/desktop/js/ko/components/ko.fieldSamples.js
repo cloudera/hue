@@ -112,7 +112,7 @@ class FieldSamples {
       (self.catalogEntry().getDialect() === 'impala' ||
         self.catalogEntry().getDialect() === 'hive');
 
-    self.sampleClick = function(html) {
+    self.sampleClick = function (html) {
       self.onSampleClick(hueUtils.html2text(html));
       huePubSub.publish('context.popover.hide');
     };
@@ -155,26 +155,16 @@ class FieldSamples {
         }
         return self.querySpec().text.every(text => {
           const textLower = text.toLowerCase();
-          return (
-            sampleValue
-              .toString()
-              .toLowerCase()
-              .indexOf(textLower) !== -1
-          );
+          return sampleValue.toString().toLowerCase().indexOf(textLower) !== -1;
         });
       });
     });
 
-    self.autocompleteFromEntries = function(nonPartial, partial) {
+    self.autocompleteFromEntries = function (nonPartial, partial) {
       const result = [];
       const partialLower = partial.toLowerCase();
       self.columnSamples().forEach(sample => {
-        if (
-          sample[0]
-            .toString()
-            .toLowerCase()
-            .indexOf(partialLower) === 0
-        ) {
+        if (sample[0].toString().toLowerCase().indexOf(partialLower) === 0) {
           result.push(nonPartial + partial + sample[0].toString().substring(partial.length));
         }
       });

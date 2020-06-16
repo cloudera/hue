@@ -16,7 +16,7 @@
 
 import $ from 'jquery';
 
-$.fn.dataTableExt.afnSortData['dom-sort-value'] = function(oSettings, iColumn) {
+$.fn.dataTableExt.afnSortData['dom-sort-value'] = function (oSettings, iColumn) {
   const aData = [];
   oSettings.oApi._fnGetTrNodes(oSettings).forEach(nRow => {
     const oElem = $('td:eq(' + iColumn + ')', nRow);

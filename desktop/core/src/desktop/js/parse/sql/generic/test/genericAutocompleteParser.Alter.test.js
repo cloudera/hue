@@ -18,7 +18,7 @@ import genericAutocompleteParser from '../genericAutocompleteParser';
 
 describe('genericAutocompleteParser.js ALTER statements', () => {
   beforeAll(() => {
-    genericAutocompleteParser.yy.parseError = function(msg) {
+    genericAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });

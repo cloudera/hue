@@ -18,7 +18,7 @@ import ksqlAutocompleteParser from '../ksqlAutocompleteParser';
 
 describe('ksqlAutocompleteParser.js Error statements', () => {
   beforeAll(() => {
-    ksqlAutocompleteParser.yy.parseError = function(msg) {
+    ksqlAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });

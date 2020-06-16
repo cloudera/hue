@@ -684,17 +684,13 @@ class ApiHelper {
 
   async fetchFavoriteApp(options) {
     return new Promise((resolve, reject) => {
-      simpleGet('/desktop/api2/user_preferences/default_app')
-        .done(resolve)
-        .fail(reject);
+      simpleGet('/desktop/api2/user_preferences/default_app').done(resolve).fail(reject);
     });
   }
 
   async setFavoriteAppAsync(options) {
     return new Promise((resolve, reject) => {
-      simplePost('/desktop/api2/user_preferences/default_app', options)
-        .done(resolve)
-        .fail(reject);
+      simplePost('/desktop/api2/user_preferences/default_app', options).done(resolve).fail(reject);
     });
   }
 
@@ -1079,9 +1075,7 @@ class ApiHelper {
    */
   async fetchDocumentAsync(options) {
     return new Promise((resolve, reject) => {
-      this.fetchDocument(options)
-        .done(resolve)
-        .fail(reject);
+      this.fetchDocument(options).done(resolve).fail(reject);
     });
   }
 
@@ -1561,9 +1555,7 @@ class ApiHelper {
               promises.pop();
               if (data.isSuccess) {
                 promises.push(
-                  this.fetchAnalysis(options)
-                    .done(deferred.resolve)
-                    .fail(deferred.reject)
+                  this.fetchAnalysis(options).done(deferred.resolve).fail(deferred.reject)
                 );
               } else if (data.isFailure) {
                 deferred.reject(data);
@@ -1769,9 +1761,7 @@ class ApiHelper {
       editorMode: options.editorMode
     };
     return new Promise((resolve, reject) => {
-      simplePost('/notebook/api/notebook/save', data)
-        .then(resolve)
-        .catch(reject);
+      simplePost('/notebook/api/notebook/save', data).then(resolve).catch(reject);
     });
   }
 

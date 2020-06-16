@@ -39,9 +39,7 @@ window.HUE_CHARTS = HUE_CHARTS;
 
 huePubSub.subscribe('charts.state', state => {
   const opacity = state && state.updating ? '0.5' : '1';
-  $('.nvd3')
-    .parents('svg')
-    .css('opacity', opacity);
+  $('.nvd3').parents('svg').css('opacity', opacity);
 });
 
 const tipBuilder = () => {
@@ -62,7 +60,7 @@ const tipBuilder = () => {
   // Public - show the tooltip on the screen
   //
   // Returns a tip
-  tip.show = function() {
+  tip.show = function () {
     const args = Array.prototype.slice.call(arguments);
     if (args[args.length - 1] instanceof SVGElement) {
       target = args.pop();
@@ -91,7 +89,7 @@ const tipBuilder = () => {
   // Public - hide the tooltip
   //
   // Returns a tip
-  tip.hide = function() {
+  tip.hide = function () {
     const nodel = d3v3.select(node);
     nodel.style({ opacity: 0, 'pointer-events': 'none' });
     return tip;
@@ -103,7 +101,7 @@ const tipBuilder = () => {
   // v - value of the attribute
   //
   // Returns tip or attribute value
-  tip.attr = function(n, v) {
+  tip.attr = function (n, v) {
     if (arguments.length < 2 && typeof n === 'string') {
       return d3v3.select(node).attr(n);
     } else {
@@ -120,7 +118,7 @@ const tipBuilder = () => {
   // v - value of the property
   //
   // Returns tip or style property value
-  tip.style = function(n, v) {
+  tip.style = function (n, v) {
     if (arguments.length < 2 && typeof n === 'string') {
       return d3v3.select(node).style(n);
     } else {
@@ -137,7 +135,7 @@ const tipBuilder = () => {
   //     sw(southwest), ne(northeast) or se(southeast)
   //
   // Returns tip or direction
-  tip.direction = function(v) {
+  tip.direction = function (v) {
     if (!arguments.length) {
       return direction;
     }
@@ -151,7 +149,7 @@ const tipBuilder = () => {
   // v - Array of [x, y] offset
   //
   // Returns offset or
-  tip.offset = function(v) {
+  tip.offset = function (v) {
     if (!arguments.length) {
       return offset;
     }
@@ -165,7 +163,7 @@ const tipBuilder = () => {
   // v - String value of the tip
   //
   // Returns html value or tip
-  tip.html = function(v) {
+  tip.html = function (v) {
     if (!arguments.length) {
       return html;
     }

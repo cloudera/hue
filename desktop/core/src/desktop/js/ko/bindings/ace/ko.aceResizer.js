@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.aceResizer = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const options = ko.unwrap(valueAccessor());
     const ace = options.snippet.ace.bind(options.snippet);
     const $target = $(options.target);
@@ -82,8 +82,8 @@ ko.bindingHandlers.aceResizer = {
 
     $resizer.draggable({
       axis: 'y',
-      start: options.onStart ? options.onStart : function() {},
-      drag: function(event, ui) {
+      start: options.onStart ? options.onStart : function () {},
+      drag: function (event, ui) {
         draggedOnce = true;
         const currentHeight =
           ui.offset.top +
@@ -94,7 +94,7 @@ ko.bindingHandlers.aceResizer = {
         ui.offset.top = 0;
         ui.position.top = 0;
       },
-      stop: function(event, ui) {
+      stop: function (event, ui) {
         ui.offset.top = 0;
         ui.position.top = 0;
         $.totalStorage('hue.editor.editor.size', $target.height());

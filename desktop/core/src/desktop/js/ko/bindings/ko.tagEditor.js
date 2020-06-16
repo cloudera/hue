@@ -20,13 +20,13 @@ import * as ko from 'knockout';
 import I18n from 'utils/i18n';
 
 ko.bindingHandlers.tagEditor = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     let options = valueAccessor();
     const $element = $(element);
 
     const validRegExp = options.validRegExp ? new RegExp(options.validRegExp) : undefined;
 
-    const showValidationError = function() {
+    const showValidationError = function () {
       const $errorWrapper = $element.siblings('.selectize-error');
       if (options.invalidMessage && $errorWrapper.length > 0) {
         $errorWrapper.find('.message').text(options.invalidMessage);
@@ -50,7 +50,7 @@ ko.bindingHandlers.tagEditor = {
         closeAfterSelect: true,
         persist: true,
         preload: true,
-        create: function(input) {
+        create: function (input) {
           if (typeof validRegExp !== 'undefined' && !validRegExp.test(input)) {
             showValidationError();
             return false;
@@ -86,7 +86,7 @@ ko.bindingHandlers.tagEditor = {
     let currentSelectize;
     let optionsBeforeEdit = [];
 
-    const saveOnClickOutside = function(event) {
+    const saveOnClickOutside = function (event) {
       if (
         $.contains(document, event.target) &&
         currentSelectize &&
@@ -101,7 +101,7 @@ ko.bindingHandlers.tagEditor = {
       }
     };
 
-    const hideOnEscape = function(event) {
+    const hideOnEscape = function (event) {
       if (event.which === 27) {
         showReadOnly();
       }
@@ -113,7 +113,7 @@ ko.bindingHandlers.tagEditor = {
       window.clearInterval(sizeCheckInterval);
     });
 
-    const showEdit = function() {
+    const showEdit = function () {
       window.clearInterval(sizeCheckInterval);
       optionsBeforeEdit = options.setTags().concat();
       options.options = $.map(options.setTags(), value => {
@@ -121,17 +121,9 @@ ko.bindingHandlers.tagEditor = {
       });
       currentSelectize = $element.selectize(options)[0].selectize;
       $readOnlyContainer.hide();
-      $element
-        .next()
-        .find('.selectize-input')
-        .css('padding-right', '38px');
-      $element
-        .next()
-        .find('input')
-        .focus();
-      const $editActions = $('<div>')
-        .addClass('selectize-actions')
-        .appendTo($element.next());
+      $element.next().find('.selectize-input').css('padding-right', '38px');
+      $element.next().find('input').focus();
+      const $editActions = $('<div>').addClass('selectize-actions').appendTo($element.next());
       $('<i>')
         .addClass('fa fa-check')
         .click(() => {
@@ -156,15 +148,11 @@ ko.bindingHandlers.tagEditor = {
     let lastKnownOffsetWidth = -1;
     let lastKnownOffsetHeight = -1;
 
-    const addReadOnlyTagsTillOverflow = function($readOnlyInner) {
+    const addReadOnlyTagsTillOverflow = function ($readOnlyInner) {
       $readOnlyInner.empty();
       const tagElements = [];
       options.setTags().forEach(tag => {
-        tagElements.push(
-          $('<div>')
-            .text(tag)
-            .appendTo($readOnlyInner)
-        );
+        tagElements.push($('<div>').text(tag).appendTo($readOnlyInner));
       });
 
       if (!options.readOnly && !options.hasErrors()) {
@@ -186,9 +174,7 @@ ko.bindingHandlers.tagEditor = {
         ($readOnlyInner[0].offsetWidth < $readOnlyInner[0].scrollWidth && tagElements.length)
       ) {
         tagElements[tagElements.length - 1].after(
-          $('<div>')
-            .addClass('hue-tag-overflow')
-            .text('...')
+          $('<div>').addClass('hue-tag-overflow').text('...')
         );
       }
 
@@ -204,7 +190,7 @@ ko.bindingHandlers.tagEditor = {
       lastKnownOffsetHeight = $readOnlyInner[0].offsetHeight;
     };
 
-    const showReadOnly = function() {
+    const showReadOnly = function () {
       window.clearInterval(sizeCheckInterval);
       $(document).off('click', saveOnClickOutside);
       $(document).off('keyup', hideOnEscape);

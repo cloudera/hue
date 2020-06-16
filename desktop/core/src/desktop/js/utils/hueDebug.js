@@ -17,9 +17,9 @@
 import localforage from 'localforage';
 
 const hueDebug = {
-  clearCaches: function() {
+  clearCaches: function () {
     const promises = [];
-    const clearInstance = function(prefix) {
+    const clearInstance = function (prefix) {
       promises.push(localforage.createInstance({ name: prefix + window.LOGGED_USERNAME }).clear());
     };
     clearInstance('HueContextCatalog_');

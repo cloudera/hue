@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.chosen = {
-  init: function(element, valueAccessor, allBindings) {
+  init: function (element, valueAccessor, allBindings) {
     const $element = $(element);
     const options = ko.unwrap(valueAccessor());
 

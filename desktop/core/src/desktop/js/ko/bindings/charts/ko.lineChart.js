@@ -24,12 +24,12 @@ import { insertLinebreaks, lineChartBuilder } from 'ko/bindings/charts/chartUtil
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.lineChart = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     window.setTimeout(() => {
       lineChartBuilder(element, valueAccessor(), false);
     }, 0);
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const _options = valueAccessor();
     const _datum = _options.transformer(_options.datum);
     const _chart = $(element).data('chart');
@@ -46,7 +46,7 @@ ko.bindingHandlers.lineChart = {
             return d3v3.time.format('%Y-%m-%d %H:%M:%S')(new Date(d));
           });
           _chart.onChartUpdate(() => {
-            _d3.selectAll('g.nv-x.nv-axis g text').each(function(d) {
+            _d3.selectAll('g.nv-x.nv-axis g text').each(function (d) {
               insertLinebreaks(_chart, d, this);
             });
           });

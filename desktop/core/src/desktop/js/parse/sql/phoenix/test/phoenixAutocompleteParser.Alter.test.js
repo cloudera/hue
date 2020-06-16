@@ -18,7 +18,7 @@ import phoenixAutocompleteParser from '../phoenixAutocompleteParser';
 
 describe('phoenixAutocompleteParser.js ALTER statements', () => {
   beforeAll(() => {
-    phoenixAutocompleteParser.yy.parseError = function(msg) {
+    phoenixAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });

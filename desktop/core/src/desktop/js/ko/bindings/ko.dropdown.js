@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.dropdown = {
-  init: function(element) {
+  init: function (element) {
     $(element).dropdown();
   }
 };

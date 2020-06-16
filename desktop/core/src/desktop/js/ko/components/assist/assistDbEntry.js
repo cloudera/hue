@@ -93,7 +93,8 @@ class AssistDbEntry {
       // Only text match on tables/views or columns if flag is set
       const textMatch =
         (!self.catalogEntry.isDatabase() && !self.filterColumnNames()) ||
-        (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0);
+        !self.filter.querySpec().text ||
+        self.filter.querySpec().text.length === 0;
 
       if (facetMatch && textMatch) {
         return self.entries();

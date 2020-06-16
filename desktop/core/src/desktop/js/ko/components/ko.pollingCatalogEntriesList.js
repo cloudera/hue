@@ -98,7 +98,7 @@ class PollingCatalogEntriesList {
     const self = this;
     window.clearTimeout(self.pollTimeout);
 
-    const pollInternal = function() {
+    const pollInternal = function () {
       self.pollCount++;
       if (self.catalogEntry()) {
         self.lastPollSourceMetaPromise = self

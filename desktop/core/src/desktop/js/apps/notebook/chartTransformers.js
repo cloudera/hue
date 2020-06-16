@@ -23,7 +23,7 @@ const isNotNullForCharts = val => val !== 'NULL' && val !== null;
 
 const jQuery = $;
 
-const pieChartTransformer = function(rawDatum) {
+const pieChartTransformer = function (rawDatum) {
   let _data = [];
 
   if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
@@ -67,7 +67,7 @@ const pieChartTransformer = function(rawDatum) {
   return _data;
 };
 
-const mapChartTransformer = function(rawDatum) {
+const mapChartTransformer = function (rawDatum) {
   let _data = [];
   if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
     let _idxRegion = -1;
@@ -105,7 +105,7 @@ const MAX_LAT = 90;
 const MIN_LNG = -180;
 const MAX_LNG = 180;
 
-const leafletMapChartTransformer = function(rawDatum) {
+const leafletMapChartTransformer = function (rawDatum) {
   let _data = [];
   if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
     let _idxLat = -1;
@@ -163,7 +163,7 @@ const leafletMapChartTransformer = function(rawDatum) {
   return _data;
 };
 
-const timelineChartTransformer = function(rawDatum) {
+const timelineChartTransformer = function (rawDatum) {
   const _datum = [];
   let _plottedSerie = 0;
 
@@ -220,7 +220,7 @@ const timelineChartTransformer = function(rawDatum) {
   return _datum;
 };
 
-const multiSerieChartTransformer = function(rawDatum) {
+const multiSerieChartTransformer = function (rawDatum) {
   let _datum = [];
 
   if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYMulti().length > 0) {
@@ -400,7 +400,7 @@ const multiSerieChartTransformer = function(rawDatum) {
   return _datum;
 };
 
-const scatterChartTransformer = function(rawDatum) {
+const scatterChartTransformer = function (rawDatum) {
   const datum = {};
 
   if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
@@ -424,7 +424,7 @@ const scatterChartTransformer = function(rawDatum) {
     });
 
     if (idxX > -1 && idxY > -1) {
-      const createAndAddToArray = function(key, item) {
+      const createAndAddToArray = function (key, item) {
         if (!datum[key]) {
           datum[key] = [];
         }

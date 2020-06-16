@@ -17,7 +17,7 @@
 import ksqlSyntaxParser from '../ksqlSyntaxParser';
 
 describe('ksqlSyntaxParser.js', () => {
-  const expectedToStrings = function(expected) {
+  const expectedToStrings = function (expected) {
     return expected.map(ex => ex.text);
   };
 
@@ -165,7 +165,7 @@ describe('ksqlSyntaxParser.js', () => {
     expect(result.expectedStatementEnd).toBeTruthy();
   });
 
-  const expectEqualIds = function(beforeA, afterA, beforeB, afterB) {
+  const expectEqualIds = function (beforeA, afterA, beforeB, afterB) {
     const resultA = ksqlSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = ksqlSyntaxParser.parseSyntax(beforeB, afterB);
 
@@ -174,7 +174,7 @@ describe('ksqlSyntaxParser.js', () => {
     expect(resultA.ruleId).toEqual(resultB.ruleId);
   };
 
-  const expectNonEqualIds = function(beforeA, afterA, beforeB, afterB) {
+  const expectNonEqualIds = function (beforeA, afterA, beforeB, afterB) {
     const resultA = ksqlSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = ksqlSyntaxParser.parseSyntax(beforeB, afterB);
 

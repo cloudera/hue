@@ -24,9 +24,7 @@ describe('ko.jobBrowserLinks.js', () => {
   it('should render component', async () => {
     jest.spyOn($, 'post').mockImplementation(url => {
       if (url === '/jobbrowser/jobs/') {
-        return $.Deferred()
-          .resolve({ jobs: [] })
-          .promise();
+        return $.Deferred().resolve({ jobs: [] }).promise();
       }
     });
 

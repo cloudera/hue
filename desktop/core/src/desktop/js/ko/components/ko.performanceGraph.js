@@ -84,7 +84,7 @@ class PerformanceGraph {
     const initialLoadPromise = self.loadData();
     self.appendTimeout = -1;
 
-    self.componentRendered = function(elements) {
+    self.componentRendered = function (elements) {
       elements.some(element => {
         if (element.className === 'performance-graph') {
           self.graphElement = element;
@@ -118,9 +118,7 @@ class PerformanceGraph {
   showLoadingMessage() {
     const self = this;
 
-    d3.select(self.graphElement)
-      .select('svg')
-      .remove();
+    d3.select(self.graphElement).select('svg').remove();
 
     const svg = d3
       .select(self.graphElement)
@@ -179,10 +177,7 @@ class PerformanceGraph {
 
     // Axes
     const mainXAxis = d3.axisBottom(mainXScale).tickPadding(7);
-    const subXAxis = d3
-      .axisBottom(subXScale)
-      .tickPadding(7)
-      .tickSize(0);
+    const subXAxis = d3.axisBottom(subXScale).tickPadding(7).tickSize(0);
 
     const queryYAxis = d3.axisLeft(queryYScale).tickPadding(7);
     const percentageYAxis = d3
@@ -207,9 +202,7 @@ class PerformanceGraph {
     subPercentageYScale.domain(percentageYScale.domain());
     subQueryYScale.domain(queryYScale.domain());
 
-    d3.select(self.graphElement)
-      .select('svg')
-      .remove();
+    d3.select(self.graphElement).select('svg').remove();
 
     // Draw the graphs
     const svg = d3
@@ -244,7 +237,7 @@ class PerformanceGraph {
       .attr('transform', 'translate(' + legendMargin.left + ',' + legendMargin.top + ')');
 
     // Draw the query and resource graphs
-    const createLineGraph = function(options) {
+    const createLineGraph = function (options) {
       let line;
       let enabled = options.enabled;
       if (options.area) {
@@ -311,7 +304,7 @@ class PerformanceGraph {
           .attr('clip-path', 'url(#clip)')
           .classed('line line-' + options.id, true)
           .attr('d', subLine);
-        subRefresh = function() {
+        subRefresh = function () {
           subPath.datum(self.data);
           subPath.attr('d', subLine);
         };
@@ -323,7 +316,7 @@ class PerformanceGraph {
       }
 
       return {
-        refresh: function() {
+        refresh: function () {
           path.datum(self.data);
           path.attr('d', line);
           if (subRefresh) {
@@ -334,13 +327,13 @@ class PerformanceGraph {
           }
         },
         id: options.id,
-        enabled: function() {
+        enabled: function () {
           return enabled;
         },
         color: options.color,
         label: options.label,
         tooltip: options.tooltip,
-        toggle: function() {
+        toggle: function () {
           enabled = !enabled;
           apiHelper.setInTotalStorage('warehouses', options.id + 'GraphEnabled', enabled);
           mainGroup
@@ -369,7 +362,7 @@ class PerformanceGraph {
               .style('opacity', enabled ? 1 : 0);
           }
         },
-        highlightPoint: function(dataPoint) {
+        highlightPoint: function (dataPoint) {
           if (!options.disableHighlight) {
             mainGroup.select('.highlight-point-' + options.id).remove();
 
@@ -401,23 +394,23 @@ class PerformanceGraph {
         subLineColor: '#DCDCDC',
         area: true,
         subLine: true,
-        tooltip: function(d) {
+        tooltip: function (d) {
           return d[4] + (d[5] ? ' (' + d[5] + ' ' + I18n('queued') : '');
         },
-        y: function(d) {
+        y: function (d) {
           return queryYScale(d[4]);
         },
-        subY: function(d) {
+        subY: function (d) {
           return subQueryYScale(d[4]);
         },
-        stackedGraph: function() {
+        stackedGraph: function () {
           return createLineGraph({
             id: 'query-count-queued',
             enabled: true,
             color: '#0B7FAD',
             area: true,
             disableHighlight: true,
-            y: function(d) {
+            y: function (d) {
               return queryYScale(d[5]);
             }
           });
@@ -429,13 +422,13 @@ class PerformanceGraph {
         label: I18n('CPU'),
         color: '#654C94',
         subLine: true,
-        tooltip: function(d) {
+        tooltip: function (d) {
           return d[1] + '%';
         },
-        y: function(d) {
+        y: function (d) {
           return percentageYScale(d[1]);
         },
-        subY: function(d) {
+        subY: function (d) {
           return subPercentageYScale(d[1]);
         }
       }),
@@ -445,13 +438,13 @@ class PerformanceGraph {
         label: I18n('Memory'),
         color: '#83C1B9',
         subLine: true,
-        tooltip: function(d) {
+        tooltip: function (d) {
           return d[2] + '%';
         },
-        y: function(d) {
+        y: function (d) {
           return percentageYScale(d[2]);
         },
-        subY: function(d) {
+        subY: function (d) {
           return subPercentageYScale(d[2]);
         }
       }),
@@ -461,13 +454,13 @@ class PerformanceGraph {
         label: I18n('IO'),
         color: '#D4965E',
         subLine: true,
-        tooltip: function(d) {
+        tooltip: function (d) {
           return d[3] + '%';
         },
-        y: function(d) {
+        y: function (d) {
           return percentageYScale(d[3]);
         },
-        subY: function(d) {
+        subY: function (d) {
           return subPercentageYScale(d[3]);
         }
       })
@@ -515,7 +508,7 @@ class PerformanceGraph {
       .attr('dy', '1em')
       .style('text-anchor', 'middle');
 
-    const updateAxesLabels = function() {
+    const updateAxesLabels = function () {
       let queriesLabel = '';
       let resourcesLabel = '';
       for (let i = 0; i < graphs.length; i++) {
@@ -541,7 +534,7 @@ class PerformanceGraph {
     updateAxesLabels();
 
     // Add brush
-    const brushed = function() {
+    const brushed = function () {
       const s = d3.event.selection || subXScale.range();
       mainXScale.domain(s.map(subXScale.invert, subXScale));
 
@@ -558,13 +551,13 @@ class PerformanceGraph {
 
     const brush = d3
       .brushX()
-      .extent([[0, 0], [width, subHeight]])
+      .extent([
+        [0, 0],
+        [width, subHeight]
+      ])
       .on('start brush end', brushed);
 
-    const brushG = subGroup
-      .append('g')
-      .attr('class', 'brush')
-      .call(brush);
+    const brushG = subGroup.append('g').attr('class', 'brush').call(brush);
 
     const handle = brushG
       .selectAll('.handle--custom')
@@ -593,7 +586,7 @@ class PerformanceGraph {
       return d[0];
     }).left;
 
-    const pointFocus = function(mouseCoord, focusX) {
+    const pointFocus = function (mouseCoord, focusX) {
       const x = focusX;
       const j = dateBisector(self.data, x, 1);
       const d0 = self.data[j - 1];
@@ -604,7 +597,7 @@ class PerformanceGraph {
         graph.highlightPoint(closest);
       });
 
-      const generateTooltipHtml = function(dataPoint) {
+      const generateTooltipHtml = function (dataPoint) {
         let html =
           '<div class="performance-tooltip-time">' + moment(dataPoint[0]).toISOString() + '</div>';
         graphs.forEach(graph => {
@@ -640,16 +633,12 @@ class PerformanceGraph {
       .attr('height', mainHeight)
       .on('mouseout', () => {
         mainGroup.selectAll('.highlight-point').remove();
-        d3.select(self.graphElement)
-          .selectAll('.performance-tooltip')
-          .remove();
+        d3.select(self.graphElement).selectAll('.performance-tooltip').remove();
       })
       .on('mouseover', () => {
-        d3.select(self.graphElement)
-          .append('div')
-          .attr('class', 'performance-tooltip');
+        d3.select(self.graphElement).append('div').attr('class', 'performance-tooltip');
       })
-      .on('mousemove', function() {
+      .on('mousemove', function () {
         lastMouseCoord = d3.mouse(this);
         lastFocusX = mainXScale.invert(lastMouseCoord[0]);
         pointFocus(lastMouseCoord, lastFocusX);
@@ -662,7 +651,7 @@ class PerformanceGraph {
       .enter()
       .append('g')
       .attr('class', 'legend-serie')
-      .on('click', function(d) {
+      .on('click', function (d) {
         d.toggle();
         d3.select(this)
           .select('rect')
@@ -721,13 +710,8 @@ class PerformanceGraph {
 
     const knownLengths = [];
 
-    legendSerie.attr('transform', function(d, j) {
-      knownLengths[j] =
-        d3
-          .select(this)
-          .select('text')
-          .node()
-          .getComputedTextLength() + 28;
+    legendSerie.attr('transform', function (d, j) {
+      knownLengths[j] = d3.select(this).select('text').node().getComputedTextLength() + 28;
       let x = 5;
       for (let i = 0; i < j; i++) {
         x += knownLengths[i];
@@ -736,7 +720,7 @@ class PerformanceGraph {
     });
 
     // Fetch and append data at set interval
-    const appendData = function() {
+    const appendData = function () {
       const currentDomain = mainXScale.domain();
       const currentSubDomain = subXScale.domain();
 

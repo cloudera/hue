@@ -17,7 +17,7 @@
 import prestoAutocompleteParser from '../prestoAutocompleteParser';
 describe('prestoAutocompleteParser.js SELECT statements', () => {
   beforeAll(() => {
-    prestoAutocompleteParser.yy.parseError = function(msg) {
+    prestoAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });
@@ -3512,7 +3512,10 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
         lowerCase: false,
         suggestColumns: {
           source: 'select',
-          identifierChain: [{ name: 'testFoo', keySet: true }, { name: 'testBar', keySet: true }],
+          identifierChain: [
+            { name: 'testFoo', keySet: true },
+            { name: 'testBar', keySet: true }
+          ],
           tables: [{ identifierChain: [{ name: 'testTable' }] }]
         },
         suggestKeywords: ['*']
@@ -3966,7 +3969,10 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
         afterCursor: ' FROM customers LATERAL VIEW explode(baa) boo;',
         expectedResult: {
           lowerCase: false,
-          suggestIdentifiers: [{ name: 'key', type: 'alias' }, { name: 'value', type: 'alias' }]
+          suggestIdentifiers: [
+            { name: 'key', type: 'alias' },
+            { name: 'value', type: 'alias' }
+          ]
         }
       });
     });
@@ -3977,7 +3983,10 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
         afterCursor: ' FROM customers LATERAL VIEW posexplode(baa) boo;',
         expectedResult: {
           lowerCase: false,
-          suggestIdentifiers: [{ name: 'pos', type: 'alias' }, { name: 'val', type: 'alias' }]
+          suggestIdentifiers: [
+            { name: 'pos', type: 'alias' },
+            { name: 'val', type: 'alias' }
+          ]
         }
       });
     });
@@ -4112,7 +4121,10 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
               { identifierChain: [{ name: 'tableTwo' }], alias: 'baa' }
             ]
           },
-          suggestIdentifiers: [{ name: 'boo.', type: 'alias' }, { name: 'baa.', type: 'alias' }]
+          suggestIdentifiers: [
+            { name: 'boo.', type: 'alias' },
+            { name: 'baa.', type: 'alias' }
+          ]
         }
       });
     });
@@ -5015,7 +5027,10 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
               { identifierChain: [{ name: 'bar' }] }
             ]
           },
-          suggestIdentifiers: [{ name: 'bla.', type: 'alias' }, { name: 'bar.', type: 'table' }]
+          suggestIdentifiers: [
+            { name: 'bla.', type: 'alias' },
+            { name: 'bar.', type: 'table' }
+          ]
         }
       });
     });
@@ -7100,7 +7115,10 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
             types: ['COLREF'],
             tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'bar' }] }]
           },
-          suggestIdentifiers: [{ name: 'foo.', type: 'table' }, { name: 'bar.', type: 'table' }],
+          suggestIdentifiers: [
+            { name: 'foo.', type: 'table' },
+            { name: 'bar.', type: 'table' }
+          ],
           colRef: { identifierChain: [{ name: 'bar' }, { name: 'bla' }] }
         }
       });
@@ -7120,7 +7138,10 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
             types: ['COLREF'],
             tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'bar' }] }]
           },
-          suggestIdentifiers: [{ name: 'foo.', type: 'table' }, { name: 'bar.', type: 'table' }],
+          suggestIdentifiers: [
+            { name: 'foo.', type: 'table' },
+            { name: 'bar.', type: 'table' }
+          ],
           colRef: { identifierChain: [{ name: 'bar' }, { name: 'bla' }] }
         }
       });
@@ -7425,7 +7446,10 @@ describe('prestoAutocompleteParser.js SELECT statements', () => {
               { identifierChain: [{ subQuery: 'bar' }] }
             ]
           },
-          suggestIdentifiers: [{ name: 'tt.', type: 'alias' }, { name: 'bar.', type: 'sub-query' }],
+          suggestIdentifiers: [
+            { name: 'tt.', type: 'alias' },
+            { name: 'bar.', type: 'sub-query' }
+          ],
           subQueries: [
             {
               alias: 'bar',

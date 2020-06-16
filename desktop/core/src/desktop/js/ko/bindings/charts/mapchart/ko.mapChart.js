@@ -24,7 +24,7 @@ import HueColors from 'utils/hueColors';
 import HueGeo from 'utils/hueGeo';
 
 ko.bindingHandlers.mapChart = {
-  render: function(element, valueAccessor) {
+  render: function (element, valueAccessor) {
     const _options = valueAccessor();
 
     const $element = $(element);
@@ -224,13 +224,13 @@ ko.bindingHandlers.mapChart = {
           scope: _scope,
           data: mapData,
           legendData: _legend,
-          onClick: function(data) {
+          onClick: function (data) {
             if (typeof options.onClick != 'undefined') {
               huePubSub.publish('charts.state', { updating: true });
               options.onClick(data);
             }
           },
-          done: function() {
+          done: function () {
             const _bubbles = [];
             if (options.enableGeocoding) {
               $(nonCountries).each((cnt, item) => {
@@ -244,7 +244,7 @@ ko.bindingHandlers.mapChart = {
                     longitude: lng
                   });
                   _map.bubbles(_bubbles, {
-                    popupTemplate: function(geo, data) {
+                    popupTemplate: function (geo, data) {
                       return (
                         '<div class="hoverinfo" style="text-align: center"><strong>' +
                         data.label +
@@ -267,7 +267,7 @@ ko.bindingHandlers.mapChart = {
             highlightBorderColor: HueColors.BLUE,
             selectedFillColor: HueColors.DARKER_BLUE,
             selectedBorderColor: HueColors.DARKER_BLUE,
-            popupTemplate: function(geography, data) {
+            popupTemplate: function (geography, data) {
               let _hover = '';
               if (data != null) {
                 _hover = '<br/>';
@@ -326,10 +326,10 @@ ko.bindingHandlers.mapChart = {
 
     $element.data('drawThrottle', timeout);
   },
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     ko.bindingHandlers.mapChart.render(element, valueAccessor);
   },
-  update: function(element, valueAccessor, allBindingsAccessor) {
+  update: function (element, valueAccessor, allBindingsAccessor) {
     if (typeof allBindingsAccessor().mapChart.visible != 'undefined') {
       if (
         (typeof allBindingsAccessor().mapChart.visible == 'boolean' &&

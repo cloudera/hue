@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.clickForAceFocus = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const editor = valueAccessor();
     $(element).on('click', e => {
       if (e.target === element) {

@@ -23,11 +23,9 @@ import * as ko from 'knockout';
  * @type {{init: ko.bindingHandlers.resizable.init}}
  */
 ko.bindingHandlers.resizable = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const options = valueAccessor() || {};
     $(element).resizable(options);
-    $(element)
-      .children('.ui-resizable-handle')
-      .css('z-index', 10000);
+    $(element).children('.ui-resizable-handle').css('z-index', 10000);
   }
 };

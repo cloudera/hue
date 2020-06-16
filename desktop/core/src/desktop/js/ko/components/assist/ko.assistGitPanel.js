@@ -94,7 +94,7 @@ class AssistGitPanel {
     const self = this;
 
     self.selectedGitEntry = ko.observable();
-    self.reload = function() {
+    self.reload = function () {
       const lastKnownPath = apiHelper.getFromTotalStorage(
         'assist',
         'currentGitPath',

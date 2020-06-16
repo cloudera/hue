@@ -19,11 +19,11 @@ import * as ko from 'knockout';
 
 ko.bindingHandlers.hueCheckbox = {
   after: ['value', 'attr'],
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const value = valueAccessor();
     $(element).addClass('hue-checkbox fa');
 
-    const updateCheckedState = function() {
+    const updateCheckedState = function () {
       ko.utils.toggleDomNodeCssClass(element, 'fa-check', value());
     };
 

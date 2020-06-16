@@ -25,8 +25,8 @@ export const POST_FROM_LOCATION_WORKER_EVENT = 'ace.sql.location.worker.message'
 export const POST_TO_SYNTAX_WORKER_EVENT = 'ace.sql.syntax.worker.post';
 export const POST_FROM_SYNTAX_WORKER_EVENT = 'ace.sql.syntax.worker.message';
 
-const attachEntryResolver = function(location, connector, namespace, compute) {
-  location.resolveCatalogEntry = function(options) {
+const attachEntryResolver = function (location, connector, namespace, compute) {
+  location.resolveCatalogEntry = function (options) {
     if (!options) {
       options = {};
     }
@@ -37,9 +37,7 @@ const attachEntryResolver = function(location, connector, namespace, compute) {
 
     if (!location.identifierChain && !location.colRef && !location.colRef.identifierChain) {
       if (!location.resolvePathPromise) {
-        location.resolvePathPromise = $.Deferred()
-          .reject()
-          .promise();
+        location.resolvePathPromise = $.Deferred().reject().promise();
       }
       return location.resolvePathPromise;
     }
@@ -65,10 +63,10 @@ const attachEntryResolver = function(location, connector, namespace, compute) {
 let registered = false;
 
 export default {
-  registerWorkers: function() {
+  registerWorkers: function () {
     if (!registered && window.Worker) {
       // It can take a while before the worker is active
-      const whenWorkerIsReady = function(worker, message) {
+      const whenWorkerIsReady = function (worker, message) {
         message.hueBaseUrl = window.HUE_BASE_URL;
         if (!worker.isReady) {
           window.clearTimeout(worker.pingTimeout);
@@ -88,7 +86,7 @@ export default {
           window.HUE_VERSION +
           '.1'
       );
-      aceSqlSyntaxWorker.onmessage = function(e) {
+      aceSqlSyntaxWorker.onmessage = function (e) {
         if (e.data.ping) {
           aceSqlSyntaxWorker.isReady = true;
         } else {
@@ -107,7 +105,7 @@ export default {
           window.HUE_VERSION +
           '.1'
       );
-      aceSqlLocationWorker.onmessage = function(e) {
+      aceSqlLocationWorker.onmessage = function (e) {
         if (e.data.ping) {
           aceSqlLocationWorker.isReady = true;
         } else {

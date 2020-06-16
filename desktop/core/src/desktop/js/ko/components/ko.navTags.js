@@ -68,7 +68,7 @@ class NavTags {
     self.readOnly =
       !window.USER_HAS_METADATA_WRITE_PERM || !!params.readOnly || window.HAS_READ_ONLY_CATALOG;
 
-    self.getSelectizeTags = function(query, callback) {
+    self.getSelectizeTags = function (query, callback) {
       callback(
         $.map(self.allTags(), tag => {
           return { value: tag, text: tag };
@@ -148,16 +148,12 @@ class NavTags {
     const addTagsPromise =
       tagsToAdd.length > 0
         ? ko.unwrap(self.catalogEntry).addNavigatorTags(tagsToAdd)
-        : $.Deferred()
-            .resolve()
-            .promise();
+        : $.Deferred().resolve().promise();
 
     const deleteTagsPromise =
       tagsToRemove.length > 0
         ? ko.unwrap(self.catalogEntry).deleteNavigatorTags(tagsToRemove)
-        : $.Deferred()
-            .resolve()
-            .promise();
+        : $.Deferred().resolve().promise();
 
     $.when(addTagsPromise, deleteTagsPromise)
       .done(() => {

@@ -34,7 +34,7 @@ import { DataCatalog } from './dataCatalog';
  *
  * @return {CancellablePromise}
  */
-const reloadSourceMeta = function(dataCatalogEntry, options) {
+const reloadSourceMeta = function (dataCatalogEntry, options) {
   if (dataCatalogEntry.dataCatalog.invalidatePromise) {
     const deferred = $.Deferred();
     const cancellablePromises = [];
@@ -67,7 +67,7 @@ const reloadSourceMeta = function(dataCatalogEntry, options) {
  *
  * @return {CancellablePromise}
  */
-const reloadNavigatorMeta = function(dataCatalogEntry, apiOptions) {
+const reloadNavigatorMeta = function (dataCatalogEntry, apiOptions) {
   if (dataCatalogEntry.canHaveNavigatorMetadata()) {
     return dataCatalogEntry
       .trackedPromise(
@@ -99,7 +99,7 @@ const reloadNavigatorMeta = function(dataCatalogEntry, apiOptions) {
  *
  * @return {CancellablePromise}
  */
-const reloadAnalysis = function(dataCatalogEntry, apiOptions) {
+const reloadAnalysis = function (dataCatalogEntry, apiOptions) {
   return dataCatalogEntry.trackedPromise(
     'analysisPromise',
     catalogUtils.fetchAndSave(
@@ -120,7 +120,7 @@ const reloadAnalysis = function(dataCatalogEntry, apiOptions) {
  *
  * @return {CancellablePromise}
  */
-const reloadPartitions = function(dataCatalogEntry, apiOptions) {
+const reloadPartitions = function (dataCatalogEntry, apiOptions) {
   return dataCatalogEntry.trackedPromise(
     'partitionsPromise',
     catalogUtils.fetchAndSave('fetchPartitions', 'partitions', dataCatalogEntry, apiOptions)
@@ -136,7 +136,7 @@ const reloadPartitions = function(dataCatalogEntry, apiOptions) {
  *
  * @return {CancellablePromise}
  */
-const reloadSample = function(dataCatalogEntry, apiOptions) {
+const reloadSample = function (dataCatalogEntry, apiOptions) {
   return dataCatalogEntry.trackedPromise(
     'samplePromise',
     catalogUtils.fetchAndSave('fetchSample', 'sample', dataCatalogEntry, apiOptions)
@@ -152,7 +152,7 @@ const reloadSample = function(dataCatalogEntry, apiOptions) {
  *
  * @return {CancellablePromise}
  */
-const reloadOptimizerMeta = function(dataCatalogEntry, apiOptions) {
+const reloadOptimizerMeta = function (dataCatalogEntry, apiOptions) {
   if (dataCatalogEntry.dataCatalog.canHaveOptimizerMeta()) {
     const optimizer = getOptimizer(dataCatalogEntry.dataCatalog.connector);
     return dataCatalogEntry.trackedPromise(
@@ -181,7 +181,7 @@ const reloadOptimizerMeta = function(dataCatalogEntry, apiOptions) {
  * @param {string} functionName - The function to call, i.e. 'getTopAggs' etc.
  * @return {CancellablePromise}
  */
-const getFromMultiTableCatalog = function(catalogEntry, options, functionName) {
+const getFromMultiTableCatalog = function (catalogEntry, options, functionName) {
   const deferred = $.Deferred();
   if (!catalogEntry.isTableOrView()) {
     return deferred.reject();
@@ -195,9 +195,7 @@ const getFromMultiTableCatalog = function(catalogEntry, options, functionName) {
     })
     .done(multiTableEntry => {
       cancellablePromises.push(
-        multiTableEntry[functionName](options)
-          .done(deferred.resolve)
-          .fail(deferred.reject)
+        multiTableEntry[functionName](options).done(deferred.resolve).fail(deferred.reject)
       );
     })
     .fail(deferred.reject);
@@ -373,9 +371,7 @@ class DataCatalogEntry {
    */
   getParent() {
     if (!this.path.length) {
-      return $.Deferred()
-        .reject()
-        .promise();
+      return $.Deferred().reject().promise();
     }
 
     return this.dataCatalog.getEntry({
@@ -518,7 +514,7 @@ class DataCatalogEntry {
             }
           });
         }
-        $.when.apply($, promises).done(function() {
+        $.when.apply($, promises).done(function () {
           deferred.resolve(Array.prototype.slice.call(arguments));
         });
       })
@@ -549,9 +545,7 @@ class DataCatalogEntry {
     options = catalogUtils.setSilencedErrors(options);
 
     if (!self.canHaveNavigatorMetadata() || self.isField()) {
-      return $.Deferred()
-        .reject()
-        .promise();
+      return $.Deferred().reject().promise();
     }
 
     if (
@@ -594,9 +588,7 @@ class DataCatalogEntry {
             children.forEach(childEntry => {
               if (!childEntry.navigatorMeta) {
                 childEntry.navigatorMeta = {};
-                childEntry.navigatorMetaPromise = $.Deferred()
-                  .reject()
-                  .promise();
+                childEntry.navigatorMetaPromise = $.Deferred().reject().promise();
               }
             });
           };
@@ -692,7 +684,7 @@ class DataCatalogEntry {
             }
           });
         } else if (self.isTableOrView() && response.values) {
-          const addOptimizerPopularity = function(columns, type) {
+          const addOptimizerPopularity = function (columns, type) {
             if (columns) {
               columns.forEach(column => {
                 const matchingChild = entriesByName[column.columnName.toLowerCase()];
@@ -741,9 +733,7 @@ class DataCatalogEntry {
     options = catalogUtils.setSilencedErrors(options);
 
     if (!self.dataCatalog.canHaveOptimizerMeta()) {
-      return $.Deferred()
-        .reject()
-        .promise();
+      return $.Deferred().reject().promise();
     }
     if (
       self.optimizerPopularityForChildrenPromise &&
@@ -875,7 +865,7 @@ class DataCatalogEntry {
     const deferred = $.Deferred();
     const cancellablePromises = [];
 
-    const resolveWithSourceMeta = function() {
+    const resolveWithSourceMeta = function () {
       if (self.sourceMeta) {
         deferred.resolve(self.sourceMeta.comment || '');
       } else if (self.definition && typeof self.definition.comment !== 'undefined') {
@@ -968,9 +958,7 @@ class DataCatalogEntry {
               .done(entity => {
                 if (entity) {
                   self.navigatorMeta = entity;
-                  self.navigatorMetaPromise = $.Deferred()
-                    .resolve(self.navigatorMeta)
-                    .promise();
+                  self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
                   self.saveLater();
                   deferred.resolve(self.navigatorMeta);
                 } else {
@@ -1026,9 +1014,7 @@ class DataCatalogEntry {
               .done(entity => {
                 if (entity) {
                   self.navigatorMeta = entity;
-                  self.navigatorMetaPromise = $.Deferred()
-                    .resolve(self.navigatorMeta)
-                    .promise();
+                  self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
                   self.saveLater();
                 }
                 self.getComment(apiOptions).done(comment => {
@@ -1085,9 +1071,7 @@ class DataCatalogEntry {
               .done(entity => {
                 if (entity) {
                   self.navigatorMeta = entity;
-                  self.navigatorMetaPromise = $.Deferred()
-                    .resolve(self.navigatorMeta)
-                    .promise();
+                  self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
                   self.saveLater();
                 } else {
                   deferred.reject();
@@ -1126,9 +1110,7 @@ class DataCatalogEntry {
               .done(entity => {
                 if (entity) {
                   self.navigatorMeta = entity;
-                  self.navigatorMetaPromise = $.Deferred()
-                    .resolve(self.navigatorMeta)
-                    .promise();
+                  self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
                   self.saveLater();
                 } else {
                   deferred.reject();
@@ -1488,9 +1470,7 @@ class DataCatalogEntry {
     if (options && options.cachedOnly) {
       return (
         catalogUtils.applyCancellable(self.sourceMetaPromise, options) ||
-        $.Deferred()
-          .reject(false)
-          .promise()
+        $.Deferred().reject(false).promise()
       );
     }
     if (options && options.refreshCache) {
@@ -1519,9 +1499,7 @@ class DataCatalogEntry {
     if (options && options.cachedOnly) {
       return (
         catalogUtils.applyCancellable(self.analysisPromise, options) ||
-        $.Deferred()
-          .reject(false)
-          .promise()
+        $.Deferred().reject(false).promise()
       );
     }
     if (options && (options.refreshCache || options.refreshAnalysis)) {
@@ -1547,16 +1525,12 @@ class DataCatalogEntry {
   getPartitions(options) {
     const self = this;
     if (!self.isTableOrView()) {
-      return $.Deferred()
-        .reject(false)
-        .promise();
+      return $.Deferred().reject(false).promise();
     }
     if (options && options.cachedOnly) {
       return (
         catalogUtils.applyCancellable(self.partitionsPromise, options) ||
-        $.Deferred()
-          .reject(false)
-          .promise()
+        $.Deferred().reject(false).promise()
       );
     }
     if (options && options.refreshCache) {
@@ -1585,16 +1559,12 @@ class DataCatalogEntry {
     options = catalogUtils.setSilencedErrors(options);
 
     if (!self.canHaveNavigatorMetadata()) {
-      return $.Deferred()
-        .reject()
-        .promise();
+      return $.Deferred().reject().promise();
     }
     if (options && options.cachedOnly) {
       return (
         catalogUtils.applyCancellable(self.navigatorMetaPromise, options) ||
-        $.Deferred()
-          .reject(false)
-          .promise()
+        $.Deferred().reject(false).promise()
       );
     }
     if (options && options.refreshCache) {
@@ -1623,16 +1593,12 @@ class DataCatalogEntry {
     options = catalogUtils.setSilencedErrors(options);
 
     if (!self.dataCatalog.canHaveOptimizerMeta() || !self.isTableOrView()) {
-      return $.Deferred()
-        .reject()
-        .promise();
+      return $.Deferred().reject().promise();
     }
     if (options && options.cachedOnly) {
       return (
         catalogUtils.applyCancellable(self.optimizerMetaPromise, options) ||
-        $.Deferred()
-          .reject(false)
-          .promise()
+        $.Deferred().reject(false).promise()
       );
     }
     if (options && options.refreshCache) {
@@ -1679,7 +1645,7 @@ class DataCatalogEntry {
       const deferred = $.Deferred();
       const cancellablePromises = [];
 
-      const revertToSpecific = function() {
+      const revertToSpecific = function () {
         if (options && options.cachedOnly) {
           deferred.reject();
         } else {
@@ -1751,9 +1717,7 @@ class DataCatalogEntry {
     if (options && options.cachedOnly) {
       return (
         catalogUtils.applyCancellable(self.samplePromise, options) ||
-        $.Deferred()
-          .reject(false)
-          .promise()
+        $.Deferred().reject(false).promise()
       );
     }
     if (options && options.refreshCache) {

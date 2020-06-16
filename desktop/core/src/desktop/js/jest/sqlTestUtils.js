@@ -15,7 +15,7 @@
 // limitations under the License.
 
 // Needed to compare by val without taking attr order into account
-const resultEquals = function(a, b) {
+const resultEquals = function (a, b) {
   if (typeof a !== typeof b) {
     return false;
   }
@@ -37,7 +37,7 @@ const resultEquals = function(a, b) {
   return a == b;
 };
 
-const jsonStringToJsString = function(jsonString) {
+const jsonStringToJsString = function (jsonString) {
   return jsonString
     .replace(/'([a-zA-Z]+)':/g, (all, group) => {
       return group + ':';
