@@ -66,8 +66,7 @@ from string import Template
 from django.core.cache import caches
 from django.utils.translation import ugettext as _
 from sqlalchemy import create_engine, inspect, Table, MetaData
-from sqlalchemy.exc import OperationalError
-from sqlalchemy.types import NullType
+from sqlalchemy.exc import OperationalError, UnsupportedCompilationError, CompileError
 
 from desktop.lib import export_csvxls
 from desktop.lib.i18n import force_unicode
@@ -362,7 +361,7 @@ class SqlAlchemyApi(Api):
           'default': col.get('default'),
           'name': col.get('name'),
           'nullable': col.get('nullable'),
-          'type': str(col.get('type')) if not isinstance(col.get('type'), NullType) else 'Null',
+          'type': self._get_column_type_name(col),
         }
         for col in columns
       ]
@@ -393,7 +392,7 @@ class SqlAlchemyApi(Api):
       columns = assist.get_columns(database, table)
       response['full_headers'] = [{
           'name': col.get('name'),
-          'type': str(col.get('type')) if not isinstance(col.get('type'), NullType) else 'Null',
+          'type': self._get_column_type_name(col),
           'comment': ''
         } for col in columns
       ]
@@ -418,6 +417,15 @@ class SqlAlchemyApi(Api):
         'table': table,
         'backticks': self.backticks
     })
+
+
+  def _get_column_type_name(self, col):
+    try:
+      name = str(col.get('type'))
+    except (UnsupportedCompilationError, CompileError):
+      name = col.get('type').__visit_name__.lower()
+
+    return name
 
 
   def _fix_phoenix_empty_database(self, database):
