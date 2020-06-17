@@ -14,7 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const TYPE_CONVERSION = {
+import { TypeConversion } from 'sql/reference/types';
+
+export const TYPE_CONVERSION: TypeConversion = {
   BOOLEAN: {
     BOOLEAN: true,
     TIMESTAMP: false,

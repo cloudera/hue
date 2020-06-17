@@ -14,53 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { SetOptions, UdfArgument, UdfCategory, UdfCategoryFunctions, UdfDetails} from 'sql/reference/types';
+import { Connector } from 'types';
 import { matchesType } from './typeUtils';
 import I18n from 'utils/i18n';
 import huePubSub from 'utils/huePubSub';
-import { clearUdfCache, getCachedApiUdfs, setCachedApiUdfs } from './apiCache';
+import { clearUdfCache, getCachedUdfCategories, setCachedUdfCategories } from './apiCache';
 import { fetchUdfs } from './apiUtils';
-
-export interface Connector {
-  id: string;
-  dialect: string;
-}
-
-export interface Argument {
-  type: string;
-  multiple?: boolean;
-  keywords?: string[];
-  optional?: boolean;
-}
-
-export interface UdfDetails {
-  returnTypes: string[];
-  name: string;
-  arguments: Argument[][];
-  signature: string;
-  draggable: string;
-  description?: string;
-}
-
-interface UdfCategoryFunctions {
-  [attr: string]: UdfDetails;
-}
-
-interface UdfCategory {
-  name: string;
-  functions: UdfCategoryFunctions;
-  isAnalytic?: boolean;
-  isAggregate?: boolean;
-}
-
-export interface SetOptions {
-  [attr: string]: SetDetails;
-}
-
-interface SetDetails {
-  default: string;
-  type: string;
-  details: string;
-}
 
 export const CLEAR_UDF_CACHE_EVENT = 'hue.clear.udf.cache';
 
@@ -122,15 +82,11 @@ const mergeWithApiUdfs = async (
   connector: Connector,
   database?: string
 ) => {
-  let apiUdfs = await getCachedApiUdfs(connector, database);
-  if (!apiUdfs) {
-    apiUdfs = await fetchUdfs({
-      connector: connector,
-      database: database,
-      silenceErrors: true
-    });
-    await setCachedApiUdfs(connector, database, apiUdfs);
-  }
+  const apiUdfs = await fetchUdfs({
+    connector: connector,
+    database: database,
+    silenceErrors: true
+  });
 
   if (apiUdfs.length) {
     const additionalUdfs = findUdfsToAdd(apiUdfs, categories);
@@ -151,6 +107,10 @@ export const getUdfCategories = async (
   const promiseKey = getMergedUdfKey(connector, database);
   if (!mergedUdfPromises[promiseKey]) {
     mergedUdfPromises[promiseKey] = new Promise(async resolve => {
+      const cachedCategories = await getCachedUdfCategories(connector, database);
+      if (cachedCategories) {
+        return cachedCategories;
+      }
       let categories: UdfCategory[] = [];
       if (UDF_REFS[connector.dialect]) {
         const module = await UDF_REFS[connector.dialect]();
@@ -159,11 +119,7 @@ export const getUdfCategories = async (
         }
       }
       await mergeWithApiUdfs(categories, connector, database);
-      categories.forEach(category => {
-        Object.keys(category.functions).forEach(udfName => {
-          category.functions[udfName].name = udfName;
-        });
-      });
+      await setCachedUdfCategories(connector, database, categories);
       resolve(categories);
     });
   }
@@ -240,13 +196,13 @@ export const getArgumentDetailsForUdf = async (
   connector: Connector,
   functionName: string,
   argumentPosition: number
-): Promise<Argument[]> => {
+): Promise<UdfArgument[]> => {
   const foundFunctions = await findUdf(connector, functionName);
   if (!foundFunctions.length) {
     return [{ type: 'T' }];
   }
 
-  const possibleArguments: Argument[] = [];
+  const possibleArguments: UdfArgument[] = [];
   foundFunctions.forEach(foundFunction => {
     const args = foundFunction.arguments;
     if (argumentPosition > args.length) {

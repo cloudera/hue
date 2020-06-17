@@ -14,19 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import localForage from 'localforage';
-
-const GLOBAL_UDF_CACHE_KEY = 'HUE_GLOBAL_UDF_KEY';
-
-const getStore = connector =>
-  localForage.createInstance({
-    name: 'HueUdfCatalog_' + connector.id
-  });
-
-export const clearUdfCache = async connector => await getStore(connector).clear();
-
-export const getCachedApiUdfs = async (connector, database) =>
-  await getStore(connector).getItem(database ? database.name : GLOBAL_UDF_CACHE_KEY);
-
-export const setCachedApiUdfs = async (connector, database, apiUdfs) =>
-  await getStore(connector).setItem(database ? database.name : GLOBAL_UDF_CACHE_KEY, apiUdfs);
+export interface Connector {
+  id: string;
+  dialect: string;
+}
