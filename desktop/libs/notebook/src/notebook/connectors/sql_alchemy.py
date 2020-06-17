@@ -426,7 +426,7 @@ class SqlAlchemyApi(Api):
 
   def _fix_bigquery_db_prefixes(self, table_or_column):
     if self.options['url'].startswith('bigquery://'):
-      table_or_column = table_or_column.rsplit('.', 1)[1]
+      table_or_column = table_or_column.rsplit('.', 1)[-1]
     return table_or_column
 
 
