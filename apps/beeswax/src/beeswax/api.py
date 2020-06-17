@@ -203,7 +203,7 @@ def _get_functions(db, database=None):
 def _get_function(db, name):
   data = {}
 
-  if db.client.query_server['dialect'] == 'hive':
+  if db.client.query_server['dialect'] == 'hive' or db.client.query_server['dialect'] == 'beeswax':
     functions = db.get_function(name=name)
     rows = escape_rows(functions, nulls_only=True)
 
