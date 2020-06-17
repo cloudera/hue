@@ -217,9 +217,6 @@ install-env:
 	cp $(ROOT)/.babelrc $(INSTALL_DIR)
 	cp $(ROOT)/tsconfig.json $(INSTALL_DIR)
 	$(MAKE) -C $(INSTALL_DIR) npm-install
-	@if [ "$(MAKECMDGOALS)" = "install" ]; then \
-	  $(MAKE) -C $(INSTALL_DIR) create-static; \
-	fi
 
 
 ###################################
@@ -235,9 +232,7 @@ npm-install:
 	npm run webpack-login
 	npm run webpack-workers
 	node_modules/.bin/removeNPMAbsolutePaths .
-	@if [ "$(MAKECMDGOALS)" = "install" ]; then \
-	  rm -rf node_modules; \
-	fi
+	rm -rf node_modules
 
 .PHONY: create-static
 create-static:
