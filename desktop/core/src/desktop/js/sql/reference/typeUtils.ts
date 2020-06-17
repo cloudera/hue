@@ -14,13 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { TypeConversion } from 'sql/reference/types';
 import { TYPE_CONVERSION as HIVE_TYPE_CONVERSION } from './hive/typeConversion';
 import { TYPE_CONVERSION as IMPALA_TYPE_CONVERSION } from './impala/typeConversion';
 import { TYPE_CONVERSION as GENERIC_TYPE_CONVERSION } from './generic/typeConversion';
-
-export interface TypeConversion {
-  [attr: string]: { [attr: string]: boolean };
-}
 
 const stripPrecision = (types: string[]): string[] => {
   const result: string[] = [];

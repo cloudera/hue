@@ -14,10 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { UdfCategory, UdfCategoryFunctions } from 'sql/reference/types';
 import I18n from 'utils/i18n';
 
-export const AGGREGATE_FUNCTIONS = {
+export const AGGREGATE_FUNCTIONS: UdfCategoryFunctions = {
   count: {
+    name: 'count',
     returnTypes: ['BIGINT'],
     arguments: [[{ type: 'T' }]],
     signature: 'count(col)',
@@ -26,6 +28,7 @@ export const AGGREGATE_FUNCTIONS = {
       'count(*) - Returns the total number of retrieved rows, including rows containing NULL values. count(expr) - Returns the number of rows for which the supplied expression is non-NULL.'
   },
   sum: {
+    name: 'sum',
     returnTypes: ['DOUBLE'],
     arguments: [[{ type: 'T' }]],
     signature: 'sum(col)',
@@ -34,6 +37,7 @@ export const AGGREGATE_FUNCTIONS = {
       'Returns the sum of the elements in the group or the sum of the distinct values of the column in the group.'
   },
   max: {
+    name: 'max',
     returnTypes: ['DOUBLE'],
     arguments: [[{ type: 'T' }]],
     signature: 'max(col)',
@@ -41,6 +45,7 @@ export const AGGREGATE_FUNCTIONS = {
     description: 'Returns the maximum value of the column in the group.'
   },
   min: {
+    name: 'min',
     returnTypes: ['DOUBLE'],
     arguments: [[{ type: 'T' }]],
     signature: 'min(col)',
@@ -49,6 +54,6 @@ export const AGGREGATE_FUNCTIONS = {
   }
 };
 
-export const UDF_CATEGORIES = [
+export const UDF_CATEGORIES: UdfCategory[] = [
   { name: I18n('Aggregate'), isAggregate: true, functions: AGGREGATE_FUNCTIONS }
 ];

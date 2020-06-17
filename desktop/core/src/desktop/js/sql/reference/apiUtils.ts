@@ -16,7 +16,8 @@
 
 import { simplePostAsync } from 'api/apiUtils';
 import { AUTOCOMPLETE_API_PREFIX } from 'api/urls';
-import { Argument, Connector, UdfDetails } from './sqlReferenceRepository';
+import { UdfArgument, UdfDetails } from 'sql/reference/types';
+import { Connector } from 'types';
 import I18n from 'utils/i18n';
 
 export interface ApiUdf {
@@ -52,7 +53,7 @@ const adaptApiUdf = (apiUdf: ApiUdf): UdfDetails => {
 const extractReturnTypes = (apiUdf: ApiUdf): string[] =>
   apiUdf.return_type ? [stripPrecision(apiUdf.return_type)] : DEFAULT_RETURN_TYPES;
 
-export const extractArgumentTypes = (apiUdf: ApiUdf): Argument[][] => {
+export const extractArgumentTypes = (apiUdf: ApiUdf): UdfArgument[][] => {
   if (apiUdf.signature) {
     const cleanSignature = stripPrecision(apiUdf.signature);
     if (cleanSignature === '()') {
@@ -63,7 +64,7 @@ export const extractArgumentTypes = (apiUdf: ApiUdf): Argument[][] => {
       return match.map(argString => {
         const typeMatch = argString.match(TYPE_REGEX);
         if (typeMatch && typeMatch.groups) {
-          const arg: Argument = { type: typeMatch.groups.type };
+          const arg: UdfArgument = { type: typeMatch.groups.type };
           if (typeMatch.groups.multiple) {
             arg.multiple = true;
           }
@@ -77,7 +78,7 @@ export const extractArgumentTypes = (apiUdf: ApiUdf): Argument[][] => {
   return DEFAULT_ARGUMENTS;
 };
 
-export const mergeArgumentTypes = (target: Argument[][], additional: Argument[][]) => {
+export const mergeArgumentTypes = (target: UdfArgument[][], additional: UdfArgument[][]) => {
   for (let i = 0; i < target.length; i++) {
     if (i >= additional.length) {
       break;
@@ -123,7 +124,7 @@ export const fetchUdfs = async (options: {
   connector: Connector;
   database?: string;
   silenceErrors: boolean;
-}): Promise<ApiUdf[]> => {
+}): Promise<UdfDetails[]> => {
   let url = AUTOCOMPLETE_API_PREFIX;
   if (options.database) {
     url += '/' + options.database;
@@ -139,12 +140,9 @@ export const fetchUdfs = async (options: {
 
   try {
     const response = await simplePostAsync(url, data, options);
-
     if (response && response.functions) {
       return adaptApiFunctions(response.functions);
     }
-    return (response && response.functions) || [];
-  } catch (err) {
-    return [];
-  }
+  } catch (err) {}
+  return [];
 };

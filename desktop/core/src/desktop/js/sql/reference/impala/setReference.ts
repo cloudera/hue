@@ -14,7 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const SET_OPTIONS = {
+import { SetOptions } from 'sql/reference/types';
+
+export const SET_OPTIONS: SetOptions = {
   ALLOW_ERASURE_CODED_FILES: {
     description:
       'Use the ALLOW_ERASURE_CODED_FILES query option to enable or disable the support of erasure coded files in Impala. Until Impala is fully tested and certified with erasure coded files, this query option is set to FALSE by default.',

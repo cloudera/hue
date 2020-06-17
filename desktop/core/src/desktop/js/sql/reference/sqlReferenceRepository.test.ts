@@ -14,7 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Argument, getArgumentDetailsForUdf } from './sqlReferenceRepository';
+import { UdfArgument } from 'sql/reference/types';
+import { getArgumentDetailsForUdf } from './sqlReferenceRepository';
 import * as apiUtils from 'sql/reference/apiUtils';
 
 describe('sqlReferenceRepository.js', () => {
@@ -64,7 +65,12 @@ describe('sqlReferenceRepository.js', () => {
           },
           concat: {
             returnTypes: ['STRING'],
-            arguments: [[{ type: 'STRING', multiple: true }, { type: 'BINARY', multiple: true }]],
+            arguments: [
+              [
+                { type: 'STRING', multiple: true },
+                { type: 'BINARY', multiple: true }
+              ]
+            ],
             signature: 'concat(STRING|BINARY a, STRING|BINARY b...)',
             draggable: 'concat()',
             description: ''
@@ -87,7 +93,7 @@ describe('sqlReferenceRepository.js', () => {
 
   jest.spyOn(apiUtils, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
 
-  const extractType = (details: Argument): string => details.type;
+  const extractType = (details: UdfArgument): string => details.type;
 
   it('should give the expected argument types at a specific position', async () => {
     expect((await getArgumentDetailsForUdf(hiveConn, 'cos', 1)).map(extractType)).toEqual([
