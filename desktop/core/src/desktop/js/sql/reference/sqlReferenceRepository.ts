@@ -14,15 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { SetOptions, UdfArgument, UdfCategory, UdfCategoryFunctions, UdfDetails} from 'sql/reference/types';
+import {
+  SetOptions,
+  UdfArgument,
+  UdfCategory,
+  UdfCategoryFunctions,
+  UdfDetails
+} from 'sql/reference/types';
 import { Connector } from 'types';
 import { matchesType } from './typeUtils';
 import I18n from 'utils/i18n';
 import huePubSub from 'utils/huePubSub';
 import { clearUdfCache, getCachedUdfCategories, setCachedUdfCategories } from './apiCache';
-import { fetchUdfs } from './apiUtils';
+import { fetchDescribe, fetchUdfs } from './apiUtils';
 
 export const CLEAR_UDF_CACHE_EVENT = 'hue.clear.udf.cache';
+export const DESCRIBE_UDF_EVENT = 'hue.describe.udf';
+export const UDF_DESCRIBED_EVENT = 'hue.udf.described';
 
 const SET_REFS: { [attr: string]: () => Promise<{ SET_OPTIONS?: SetOptions }> } = {
   impala: async () => import(/* webpackChunkName: "impala-ref" */ './impala/setReference')
@@ -64,7 +72,6 @@ const findUdfsToAdd = (
   const result: UdfCategoryFunctions = {};
 
   apiUdfs.forEach(apiUdf => {
-    // TODO: Impala reports the same UDF multiple times, once per argument type.
     if (
       !result[apiUdf.name] &&
       !existingUdfNames.has(apiUdf.name.toUpperCase()) &&
@@ -82,11 +89,7 @@ const mergeWithApiUdfs = async (
   connector: Connector,
   database?: string
 ) => {
-  const apiUdfs = await fetchUdfs({
-    connector: connector,
-    database: database,
-    silenceErrors: true
-  });
+  const apiUdfs = await fetchUdfs(connector, database);
 
   if (apiUdfs.length) {
     const additionalUdfs = findUdfsToAdd(apiUdfs, categories);
@@ -116,6 +119,11 @@ export const getUdfCategories = async (
         const module = await UDF_REFS[connector.dialect]();
         if (module.UDF_CATEGORIES) {
           categories = module.UDF_CATEGORIES;
+          categories.forEach(category => {
+            Object.values(category.functions).forEach(udf => {
+              udf.described = true;
+            });
+          });
         }
       }
       await mergeWithApiUdfs(categories, connector, database);
@@ -223,6 +231,48 @@ export const getSetOptions = async (connector: Connector): Promise<SetOptions> =
   }
   return {};
 };
+
+const findUdfInCategories = (
+  categories: UdfCategory[],
+  udfName: string
+): UdfDetails | undefined => {
+  let foundUdf = undefined;
+  categories.some(category =>
+    Object.values(category.functions).some(udf => {
+      if (udf.name === udfName) {
+        foundUdf = udf;
+        return true;
+      }
+    })
+  );
+  return foundUdf;
+};
+
+huePubSub.subscribe(
+  DESCRIBE_UDF_EVENT,
+  async (details: { connector: Connector; udfName: string; database?: string }): Promise<void> => {
+    const categories = await getUdfCategories(details.connector, details.database);
+    const foundUdf = findUdfInCategories(categories, details.udfName);
+    if (foundUdf && !foundUdf.described) {
+      const apiUdf = await fetchDescribe(details.connector, foundUdf, details.database);
+      if (apiUdf) {
+        if (apiUdf.description) {
+          foundUdf.description = apiUdf.description;
+        }
+        if (apiUdf.signature) {
+          foundUdf.signature = apiUdf.signature;
+        }
+        foundUdf.described = true;
+        await setCachedUdfCategories(details.connector, details.database, categories);
+        huePubSub.publish(UDF_DESCRIBED_EVENT, {
+          connector: details.connector,
+          database: details.database,
+          udf: foundUdf
+        });
+      }
+    }
+  }
+);
 
 huePubSub.subscribe(
   CLEAR_UDF_CACHE_EVENT,

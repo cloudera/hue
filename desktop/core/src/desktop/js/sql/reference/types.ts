@@ -29,6 +29,7 @@ export interface UdfDetails {
   signature: string;
   draggable: string;
   description?: string;
+  described?: boolean;
 }
 
 export interface UdfCategoryFunctions {
