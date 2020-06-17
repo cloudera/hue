@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { adaptApiFunctions, ApiUdf, extractArgumentTypes, mergeArgumentTypes } from './apiUtils';
+import { adaptApiFunctions, ApiUdf, extractArgumentTypes, mergeArgumentTypes} from './apiUtils';
 
 describe('apiUtils.js', () => {
   it('should return the default signature when not defined', () => {
