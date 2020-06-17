@@ -391,3 +391,29 @@ class TestAutocomplete(object):
 
       assert_true(keys['primary_keys'])  # For some reason could not mock two level to get some colum names
       assert_equal(keys['foreign_keys'][0]['to'], 'db2.table2.col2')
+
+
+class TestUtils():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+
+    self.user = rewrite_user(User.objects.get(username="test"))
+    self.interpreter = {
+      'name': 'hive',
+      'options': {
+        'url': 'mysql://hue:localhost@hue:3306/hue'
+      },
+    }
+
+  def test_fix_bigquery_db_prefixes(self):
+    interpreter = {
+      'name': 'bigquery',
+      'options': {
+        'url': 'bigquery://'
+      },
+    }
+    api = SqlAlchemyApi(self.user, interpreter)
+
+    assert_equal(api._fix_bigquery_db_prefixes('table'), 'table')
+    assert_equal(api._fix_bigquery_db_prefixes('db.table'), 'table')
