@@ -109,7 +109,7 @@ export const getUdfCategories = async (
     mergedUdfPromises[promiseKey] = new Promise(async resolve => {
       const cachedCategories = await getCachedUdfCategories(connector, database);
       if (cachedCategories) {
-        return cachedCategories;
+        resolve(cachedCategories);
       }
       let categories: UdfCategory[] = [];
       if (UDF_REFS[connector.dialect]) {
