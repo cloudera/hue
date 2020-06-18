@@ -86,7 +86,8 @@ module.exports = {
     new webpack.SourceMapDevToolPlugin({
       filename: 'login/[file].map',
       publicPath: '/static/desktop/js/bundles/login/',
-      fileContext: 'public'
+      fileContext: 'public',
+      exclude: ['hotReload.js', 'styleInjection.js']
     }),
     new CleanWebpackPlugin([
       __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/login'
