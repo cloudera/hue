@@ -59,7 +59,7 @@ def get_query_server_config(connector=None):
         'auth_username': conf.AUTH_USERNAME.get(),
         'auth_password': conf.AUTH_PASSWORD.get(),
         'use_sasl': conf.USE_SASL.get(),
-        'transport_mode': 'http' if conf.USE_THRIFT_HTTP else 'socket',
+        'transport_mode': 'http' if conf.USE_THRIFT_HTTP.get() else 'socket',
     }
 
   debug_query_server = query_server.copy()
