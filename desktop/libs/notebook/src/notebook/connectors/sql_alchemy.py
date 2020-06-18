@@ -341,7 +341,11 @@ class SqlAlchemyApi(Api):
     assist = Assist(inspector, engine, backticks=self.backticks)
     response = {'status': -1}
 
-    if database is None:
+    if operation == 'functions':
+      response['functions'] = []
+    elif operation == 'function':
+      response['function'] = {}
+    elif database is None:
       response['databases'] = [db or 'NULL' for db in assist.get_databases()]
     elif table is None:
       tables_meta = []
