@@ -128,6 +128,13 @@ jobs:
 
             npm run check-license
 
+      - run:
+          name: run npm absolute path detection
+          command: |
+            cd /usr/share/hue
+
+            npm run check-absolute-paths
+
       # Run tests
       - run:
           name: run python API tests
