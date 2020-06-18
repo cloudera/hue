@@ -98,7 +98,8 @@ module.exports = {
     new webpack.SourceMapDevToolPlugin({
       filename: 'hue/[file].map',
       publicPath: '/static/desktop/js/bundles/hue/',
-      fileContext: 'public'
+      fileContext: 'public',
+      exclude: ['hotReload.js', 'styleInjection.js']
     }),
     new CleanWebpackPlugin([__dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/hue']),
     new RelativeBundleTracker({ path: '.', filename: 'webpack-stats.json' }),
