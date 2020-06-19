@@ -64,6 +64,36 @@ Below the `[[interpreters]]` of `[notebook]`.
     interface=sqlalchemy
     options='{"url": "mysql://${USER}:${PASSWORD}@localhost:3306/hue"}'
 
+#### Configure Apache Hive
+
+You can connect to an existing Hive instance or setup a new one locally. An easy way to setup Hive locally is using Docker. You could use this container for Hive 2.3.2 - https://github.com/big-data-europe/docker-hive.
+
+    git clone https://github.com/big-data-europe/docker-hive
+    cd docker-hive
+    docker-compose up -d
+
+Just follow the above 3 steps and you would have a running Hive instance on jdbc:hive2://localhost:10000. Follow [testing section](https://github.com/big-data-europe/docker-hive#testing) in the readme of the above repo to check if things are working as expected.
+
+Now under Hue open `desktop/conf/pseudo-distributed.ini` file in a text editor, and modify the following options.
+
+Directly below the `[[beeswax]]` line, add the following.
+
+    # Host where HiveServer2 is running.
+    hive_server_host=localhost
+
+    # Port where HiveServer2 Thrift server runs on.
+    hive_server_port=10000
+
+    thrift_version=7
+
+Below the `[[interpreters]]` of `[notebook]`, add.
+
+    [[[hive]]]
+      name=Hive
+      interface=hiveserver2
+
+Restart Hue and you must be able to run Hive queries.
+
 ### Dev environment
 
 #### Visual Code
