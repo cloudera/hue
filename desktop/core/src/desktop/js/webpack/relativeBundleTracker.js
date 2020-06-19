@@ -14,25 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const { BUNDLES, getPluginConfig } = require('./desktop/core/src/desktop/js/webpack/configUtils');
-const shared = require('./webpack.config');
+const each = require('lodash/fp/each');
+const BundleTracker = require('webpack-bundle-tracker');
+const path = require('path');
 
-module.exports = {
-  devtool: shared.devtool,
-  entry: {
-    login: ['./desktop/core/src/desktop/js/login.js']
-  },
-  mode: shared.mode,
-  module: shared.module,
-  performance: shared.performance,
-  optimization: {
-    minimize: true,
-    splitChunks: {}
-  },
-  output: {
-    path: __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/login',
-    filename: shared.output.filename
-  },
-  plugins: getPluginConfig(BUNDLES.LOGIN),
-  resolve: shared.resolve
-};
+// https://github.com/ezhome/webpack-bundle-tracker/issues/25
+class RelativeBundleTracker extends BundleTracker {
+  convertPathChunks(chunks) {
+    each(
+      each(chunk => {
+        chunk.path = path.relative(this.options.path, chunk.path);
+      })
+    )(chunks);
+  }
+  writeOutput(compiler, contents) {
+    if (contents.status === 'done') {
+      this.convertPathChunks(contents.chunks);
+    }
+
+    super.writeOutput(compiler, contents);
+  }
+}
+
+module.exports = RelativeBundleTracker;
