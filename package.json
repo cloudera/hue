@@ -124,7 +124,8 @@
     "test-coverage": "jest --coverage",
     "test-dev": "jest --watch",
     "test-clearCache": "jest --clearCache",
-    "check-license": "node ./tools/license/checkLicenses.js"
+    "check-license": "node ./tools/license/checkLicenses.js",
+    "check-absolute-paths": "node ./tools/detect-absolute-paths/detectAbsolutePaths.js"
   },
   "files": [
     "desktop/core/src/desktop/js/parse",
