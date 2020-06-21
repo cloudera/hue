@@ -104,6 +104,22 @@ def is_selected(section, matcher):
 <%def name="commons()">
   <link href="${ static('useradmin/css/useradmin.css') }" rel="stylesheet">
   <script>
+    var entityMap = {
+     '&': '&amp;',
+     '<': '&lt;',
+     '': '&gt;',
+     '"': '&quot;',
+     "'": '&#39;',
+     '/': '&#x2F;',
+     '`': '&#x60;',
+     '=': '&#x3D;'
+    };
+
+    function escapeHtml(string) {
+       return String(string).replace(/[&<"'`=\/]/g, function(s) {
+        return entityMap[s];
+       });
+    }
     function renderUseradminErrors(errors) {
       $('.control-group').removeClass('error');
       $('.errorlist').remove();
@@ -113,7 +129,7 @@ def is_selected(section, matcher):
           $el.closest('.control-group').addClass('error');
           var html = '<span class="help-inline"><ul class="errorlist">';
           e.message.forEach(function (message) {
-            html += '<li>' + message + '</li>';
+            html += '<li>' + escapeHtml(message) + '</li>';
           });
           html += '</ul></span>';
           $el.after(html);
