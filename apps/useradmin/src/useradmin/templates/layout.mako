@@ -104,6 +104,9 @@ def is_selected(section, matcher):
 <%def name="commons()">
   <link href="${ static('useradmin/css/useradmin.css') }" rel="stylesheet">
   <script>
+    function sanitizeHTML(text) {
+      return $('<div>').text(text).html();
+    }
     function renderUseradminErrors(errors) {
       $('.control-group').removeClass('error');
       $('.errorlist').remove();
@@ -113,7 +116,7 @@ def is_selected(section, matcher):
           $el.closest('.control-group').addClass('error');
           var html = '<span class="help-inline"><ul class="errorlist">';
           e.message.forEach(function (message) {
-            html += '<li>' + hueUtils.deXSS(message) + '</li>';
+            html += '<li>' + hueUtils.escapeOutput(message) + '</li>';
           });
           html += '</ul></span>';
           $el.after(html);
