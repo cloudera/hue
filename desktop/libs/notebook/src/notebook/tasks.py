@@ -43,7 +43,7 @@ from desktop.settings import CACHES_CELERY_KEY, CACHES_CELERY_QUERY_RESULT_KEY
 from useradmin.models import User
 
 from notebook.api import _get_statement
-from notebook.conf import  ENABLE_NOTEBOOK_2
+from notebook.conf import ENABLE_NOTEBOOK_2
 from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper, QueryError
 from notebook.models import make_notebook, MockedDjangoRequest, Notebook
 from notebook.sql_utils import get_current_statement

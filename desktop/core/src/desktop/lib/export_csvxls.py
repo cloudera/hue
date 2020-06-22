@@ -66,6 +66,8 @@ def file_reader(fh):
 
 def encode_row(row, encoding=None, make_excel_links=False):
   encoded_row = []
+  encoding = encoding or i18n.get_site_encoding()
+
   for cell in row:
     if isinstance(cell, six.string_types):
       cell = re.sub(ILLEGAL_CHARS, '?', cell)
@@ -73,7 +75,7 @@ def encode_row(row, encoding=None, make_excel_links=False):
         cell = re.compile('(https?://.+)', re.IGNORECASE).sub(r'=HYPERLINK("\1")', cell)
     cell = nullify(cell)
     if not isinstance(cell, numbers.Number):
-      cell = smart_str(cell, encoding or i18n.get_site_encoding(), strings_only=True, errors='replace')
+      cell = smart_str(cell, encoding, strings_only=True, errors='replace')
     encoded_row.append(cell)
   return encoded_row
 
