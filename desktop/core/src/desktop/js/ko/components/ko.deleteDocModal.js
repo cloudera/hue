@@ -21,11 +21,11 @@ import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
-export const SHOW_EVENT = 'doc.show.delete.modal';
-export const SHOWN_EVENT = 'doc.delete.modal.shown';
+export const HIDE_DELETE_DOC_MODAL_EVENT = 'doc.hide.delete.modal';
+export const SHOW_DELETE_DOC_MODAL_EVENT = 'doc.show.delete.modal';
+export const DELETE_DOC_MODAL_SHOWN_EVENT = 'doc.delete.modal.shown';
 
 const TEMPLATE = `
-  <!-- ko with: activeEntry -->
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${I18n(
       'Close'
@@ -75,29 +75,49 @@ const TEMPLATE = `
     )}"/>
     <!-- /ko -->
   </div>
-  <!-- /ko -->
 `;
 
 componentUtils.registerComponent('delete-entry', undefined, TEMPLATE).then(() => {
-  huePubSub.subscribe(SHOW_EVENT, docViewModel => {
-    let $deleteEntriesModal = $('#deleteEntriesModal');
+  const removeDeleteDocModal = () => {
+    const $deleteEntriesModal = $('#deleteEntriesModal');
     if ($deleteEntriesModal.length > 0) {
       ko.cleanNode($deleteEntriesModal[0]);
       $deleteEntriesModal.remove();
     }
+  };
+
+  huePubSub.subscribe(SHOW_DELETE_DOC_MODAL_EVENT, docViewModel => {
+    removeDeleteDocModal();
+
+    if (!docViewModel.entriesToDelete().length && docViewModel.selectedEntries().length) {
+      docViewModel.entriesToDelete(docViewModel.selectedEntries());
+    }
+
+    if (
+      docViewModel.entriesToDelete().length === 0 ||
+      (docViewModel.sharedWithMeSelected() && !docViewModel.superuser)
+    ) {
+      return;
+    }
+
+    docViewModel.getSelectedDocsWithDependents();
 
     const data = {
       params: docViewModel,
       descendantsComplete: () => {
-        huePubSub.publish(SHOWN_EVENT);
+        huePubSub.publish(DELETE_DOC_MODAL_SHOWN_EVENT);
       }
     };
 
-    $deleteEntriesModal = $(
+    const $deleteEntriesModal = $(
       '<div id="deleteEntriesModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'delete-entry\', params: params }" data-keyboard="true" class="modal hide fade" tabindex="-1"></div>'
     );
     $('body').append($deleteEntriesModal);
 
     ko.applyBindings(data, $deleteEntriesModal[0]);
+
+    $deleteEntriesModal.modal('show');
   });
+
+  huePubSub.subscribe(HIDE_DELETE_DOC_MODAL_EVENT, removeDeleteDocModal);
 });
