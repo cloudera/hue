@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ko.createDirectoryModal.js should render component 1`] = `
-"<html><head></head><body><div id=\\"createDirectoryModal\\" data-bind=\\"descendantsComplete: descendantsComplete, component: { name: 'create-directory', params: params }\\" data-keyboard=\\"true\\" class=\\"modal hide fade\\" tabindex=\\"-1\\">
+"<html><head></head><body class=\\"modal-open\\"><div id=\\"createDirectoryModal\\" data-bind=\\"descendantsComplete: descendantsComplete, component: { name: 'create-directory', params: params }\\" data-keyboard=\\"true\\" class=\\"modal hide fade in\\" tabindex=\\"-1\\" aria-hidden=\\"false\\">
   <!-- ko with: activeEntry -->
   <form class=\\"form-horizontal\\">
     <div class=\\"modal-header\\">
@@ -17,5 +17,5 @@ exports[`ko.createDirectoryModal.js should render component 1`] = `
     </div>
   </form>
   <!-- /ko -->
-</div></body></html>"
+</div><div class=\\"modal-backdrop fade in\\"></div></body></html>"
 `;
