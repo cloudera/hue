@@ -15,20 +15,22 @@
 // limitations under the License.
 
 import * as ko from 'knockout';
-import { SHOWN_EVENT, SHOW_EVENT } from './ko.deleteDocModal';
+import { DELETE_DOC_MODAL_SHOWN_EVENT, SHOW_DELETE_DOC_MODAL_EVENT } from './ko.deleteDocModal';
 import huePubSub from 'utils/huePubSub';
 
 describe('ko.deleteDocModal.js', () => {
   it('should render component', async () => {
-    huePubSub.publish(SHOW_EVENT, {
-      activeEntry: ko.observable({
-        entriesToDelete: ko.observableArray(),
-        selectedDocsWithDependents: ko.observableArray()
-      })
+    huePubSub.publish(SHOW_DELETE_DOC_MODAL_EVENT, {
+      entriesToDelete: ko.observableArray(),
+      selectedEntries: ko.observableArray([{ selected: ko.observable(true) }]),
+      sharedWithMeSelected: ko.observable(false),
+      selectedDocsWithDependents: ko.observableArray(),
+      deletingEntries: ko.observable(false),
+      getSelectedDocsWithDependents: () => {}
     });
 
     await new Promise(resolve => {
-      huePubSub.subscribeOnce(SHOWN_EVENT, resolve);
+      huePubSub.subscribeOnce(DELETE_DOC_MODAL_SHOWN_EVENT, resolve);
     });
 
     expect(window.document.documentElement.outerHTML).toMatchSnapshot();

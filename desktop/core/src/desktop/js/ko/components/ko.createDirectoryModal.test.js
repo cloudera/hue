@@ -20,7 +20,12 @@ import huePubSub from 'utils/huePubSub';
 
 describe('ko.createDirectoryModal.js', () => {
   it('should render component', async () => {
-    huePubSub.publish(SHOW_EVENT, { activeEntry: ko.observable({}) });
+    huePubSub.publish(SHOW_EVENT, {
+      activeEntry: ko.observable({}),
+      isTrash: ko.observable(false),
+      isTrashed: ko.observable(false),
+      canModify: ko.observable(true)
+    });
 
     await new Promise(resolve => {
       huePubSub.subscribeOnce(SHOWN_EVENT, resolve);

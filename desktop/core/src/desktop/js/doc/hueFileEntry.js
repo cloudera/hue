@@ -21,6 +21,7 @@ import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
 import HueDocument from 'doc/hueDocument';
 import { DOCUMENT_TYPE_I18n, DOCUMENT_TYPES } from 'doc/docSupport';
+import { SHOW_DELETE_DOC_MODAL_EVENT } from 'ko/components/ko.deleteDocModal';
 
 const SORTS = {
   defaultAsc: (a, b) => {
@@ -327,12 +328,6 @@ class HueFileEntry {
     }
   }
 
-  showNewDirectoryModal() {
-    if (!this.isTrash() && !this.isTrashed() && this.canModify()) {
-      $('#createDirectoryModal').modal('show');
-    }
-  }
-
   showRenameDirectoryModal() {
     let selectedEntry = this;
     if (!selectedEntry.selected()) {
@@ -619,14 +614,17 @@ class HueFileEntry {
 
   emptyTrash() {
     if (this.trashEntry()) {
+      const openConfirmation = () => {
+        this.trashEntry()
+          .entries()
+          .forEach(entry => entry.selected(true));
+        huePubSub.publish(SHOW_DELETE_DOC_MODAL_EVENT, this.trashEntry());
+      };
+
       if (!this.trashEntry().loaded()) {
-        this.trashEntry().load(function () {
-          this.entriesToDelete(this.trashEntry().entries());
-          $('#deleteEntriesModal').modal('show');
-        });
+        this.trashEntry().load(openConfirmation);
       } else {
-        this.entriesToDelete(this.trashEntry().entries());
-        $('#deleteEntriesModal').modal('show');
+        openConfirmation();
       }
     }
   }
@@ -641,13 +639,6 @@ class HueFileEntry {
   showRestoreConfirmation() {
     if (this.selectedEntries().length > 0 && (this.superuser || !this.sharedWithMeSelected())) {
       $('#restoreFromTrashModal').modal('show');
-    }
-  }
-
-  showDeleteConfirmation() {
-    if (this.selectedEntries().length > 0 && (this.superuser || !this.sharedWithMeSelected())) {
-      this.entriesToDelete(this.selectedEntries());
-      $('#deleteEntriesModal').modal('show');
     }
   }
 

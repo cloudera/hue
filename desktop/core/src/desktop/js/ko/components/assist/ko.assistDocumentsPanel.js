@@ -42,7 +42,7 @@ const TEMPLATE = `
     <li><a href="javascript: void(0);" data-bind="click: open"><i class="fa fa-fw fa-edit"></i> ${I18n(
       'Open document'
     )}</a></li>
-    <li><a href="javascript: void(0);" data-bind="click: function() { huePubSub.publish('doc.show.delete.modal', $data); activeEntry().getSelectedDocsWithDependents(); activeEntry().showDeleteConfirmation(); }"><i class="fa fa-fw fa-trash-o"></i> ${I18n(
+    <li><a href="javascript: void(0);" data-bind="click: function() { $data.selected(true); huePubSub.publish('doc.show.delete.modal', $data.parent); }"><i class="fa fa-fw fa-trash-o"></i> ${I18n(
       'Delete document'
     )}</a></li>
     <!-- /ko -->
@@ -150,7 +150,7 @@ const TEMPLATE = `
             <!-- /ko -->
             <li class="divider"></li>
             <li data-bind="css: { 'disabled': $data.isTrash() || $data.isTrashed() || !$data.canModify() }">
-              <a href="javascript:void(0);" data-bind="click: function () { $('.new-document-drop-down').removeClass('open'); huePubSub.publish('show.create.directory.modal', $data); $data.showNewDirectoryModal()}"><svg class="hi"><use xlink:href="#hi-folder"></use><use xlink:href="#hi-plus-addon"></use></svg> ${I18n(
+              <a href="javascript:void(0);" data-bind="click: function () { $('.new-document-drop-down').removeClass('open'); huePubSub.publish('show.create.directory.modal', $data); }"><svg class="hi"><use xlink:href="#hi-folder"></use><use xlink:href="#hi-plus-addon"></use></svg> ${I18n(
                 'New folder'
               )}</a>
             </li>

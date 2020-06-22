@@ -22,6 +22,7 @@ import 'apps/notebook2/execution/sessionManager';
 import './jquery.setup';
 import './sqlTestUtils';
 
+import 'ext/bootstrap.2.3.2.min';
 import $ from 'jquery';
 import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
