@@ -104,9 +104,6 @@ def is_selected(section, matcher):
 <%def name="commons()">
   <link href="${ static('useradmin/css/useradmin.css') }" rel="stylesheet">
   <script>
-    function sanitizeHTML(text) {
-      return $('<div>').text(text).html();
-    }
     function renderUseradminErrors(errors) {
       $('.control-group').removeClass('error');
       $('.errorlist').remove();
