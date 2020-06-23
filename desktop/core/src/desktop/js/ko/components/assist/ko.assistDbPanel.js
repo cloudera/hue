@@ -23,7 +23,12 @@ import componentUtils from 'ko/components/componentUtils';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'utils/hueConfig';
+import {
+  CONFIG_REFRESHED_EVENT,
+  filterEditorConnectors,
+  findDashboardConnector,
+  findEditorConnector
+} from 'utils/hueConfig';
 import {
   ASSIST_DB_HIGHLIGHT_EVENT,
   ASSIST_DB_PANEL_IS_READY_EVENT,
@@ -789,16 +794,17 @@ class AssistDbPanel {
     }
   }
 
-  setSingleSource(type, navigationSettings, nonSqlType) {
+  setSingleSource(connector, navigationSettings, nonSqlType) {
     this.sourceIndex = {};
     const source = new AssistDbSource({
       i18n: this.i18n,
-      type: type,
-      name: type,
+      type: connector.id,
+      name: connector.displayName,
+      connector: connector,
       nonSqlType: nonSqlType,
       navigationSettings: navigationSettings
     });
-    this.sourceIndex[type] = source;
+    this.sourceIndex[connector.id] = source;
     this.sources([source]);
     this.selectedSource(source);
 
@@ -815,12 +821,14 @@ class AssistDbPanel {
 
   init(navigationSettings) {
     if (this.isSolr) {
-      this.setSingleSource('solr', navigationSettings, true);
+      const connector = findDashboardConnector(connector => connector.id === 'solr');
+      this.setSingleSource(connector, navigationSettings, true);
       return;
     }
 
     if (this.isStreams) {
-      this.setSingleSource('kafka', navigationSettings, true);
+      const connector = findEditorConnector(connector => connector.dialect === 'kafka sql');
+      this.setSingleSource(connector, navigationSettings, true);
       return;
     }
 

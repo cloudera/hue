@@ -22,6 +22,7 @@ import componentUtils from 'ko/components/componentUtils';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import { TEMPLATE, AssistantUtils } from 'ko/components/assist/ko.assistEditorContextPanel';
+import { findDashboardConnector } from 'utils/hueConfig';
 
 class AssistDashboardPanel {
   constructor() {
@@ -66,12 +67,15 @@ class AssistDashboardPanel {
 
       this.sourceType = ko.observable(collection.engine());
 
+      const connector = findDashboardConnector(connector => connector.id === collection.engine());
+
       const assistDbSource = new AssistDbSource({
         i18n: i18n,
         initialNamespace: collection.activeNamespace,
         initialCompute: collection.activeCompute,
         type: collection.engine(),
         name: collection.engine(),
+        connector: connector,
         nonSqlType: true,
         navigationSettings: navigationSettings
       });
