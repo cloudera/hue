@@ -62,6 +62,8 @@ Which is then easily integrated into the [Hue CI](https://github.com/cloudera/hu
           cd /usr/share/hue
           npm run check-license
 
+![ci nmp license checker](https://cdn.gethue.com/uploads/2020/06/ci-nmp-license-checker.png)
+
 ## Absolute paths
 
 It is good practice to not ship any release artifact containing full file paths of the build machine. This helps guarantee that the artifacts are portable and do not leak unnessary information.
