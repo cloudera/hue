@@ -565,6 +565,10 @@ var Collection = function (vm, collection) {
     self.activeCompute(context.namespaces[0].computes[0]);
   });
 
+  self.simpleAceDatabase = ko.pureComputed(function () {
+    return self.name().split('.')[0];
+  });
+
   self.engine = ko.observable(typeof collection.engine != "undefined" && collection.engine != null ? collection.engine : "solr");
   self.engine.subscribe(function() {
     self.name(null);
