@@ -1846,6 +1846,7 @@ class ClusterConfig(object):
         interpreters.append({
           'name': interpreter['name'],
           'type': interpreter['type'],
+          'id': interpreter['type'],
           'displayName': interpreter['name'],
           'buttonName': _('Query'),
           'tooltip': _('%s Query') % interpreter['type'].title(),
@@ -1864,6 +1865,7 @@ class ClusterConfig(object):
       if HAS_REPORT_ENABLED.get():
         _interpreters.append({
           'type': 'report',
+          'id': 'report',
           'displayName': 'Report',
           'buttonName': 'Report',
           'page': '/dashboard/new_search?engine=report',
@@ -1873,6 +1875,7 @@ class ClusterConfig(object):
 
       _interpreters.extend([{
           'type': interpreter['type'],
+          'id': interpreter['type'],
           'displayName': interpreter['type'].title(),
           'buttonName': interpreter['type'].title(),
           'page': '/dashboard/new_search?engine=%(type)s' % interpreter,
