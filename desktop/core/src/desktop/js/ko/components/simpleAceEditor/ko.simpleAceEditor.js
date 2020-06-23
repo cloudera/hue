@@ -152,7 +152,7 @@ class SimpleAceEditor {
         inFocus: ko.observable()
       };
 
-      if (connector.is_sql) {
+      if (connector.is_sql && !params.disableWorkers) {
         sqlWorkerHandler.registerWorkers();
         const aceLocationHandler = new AceLocationHandler({
           editor: editor,
