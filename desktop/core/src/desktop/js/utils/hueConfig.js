@@ -69,7 +69,8 @@ export const getLastKnownConfig = () => lastKnownConfig;
 
 const CONNECTOR_TYPES = {
   editor: 'editor',
-  browser: 'browser'
+  browser: 'browser',
+  dashboard: 'dashboard'
 };
 
 const findConnector = (connectorTest, type) => {
@@ -89,6 +90,9 @@ const filterConnectors = (connectorTest, type) => {
 
 export const findBrowserConnector = connectorTest =>
   findConnector(connectorTest, CONNECTOR_TYPES.browser);
+
+export const findDashboardConnector = connectorTest =>
+  findConnector(connectorTest, CONNECTOR_TYPES.dashboard);
 
 export const findEditorConnector = connectorTest =>
   findConnector(connectorTest, CONNECTOR_TYPES.editor);
