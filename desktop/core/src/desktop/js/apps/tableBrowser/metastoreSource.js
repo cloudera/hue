@@ -154,7 +154,7 @@ class MetastoreSource {
       } else if (refreshedEntry.isDatabase() && this.namespace()) {
         this.namespace()
           .databases()
-          .some(function (database) {
+          .some(database => {
             if (database.catalogEntry === refreshedEntry) {
               database.load(
                 () => {
