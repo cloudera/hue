@@ -32,8 +32,8 @@ class MetastoreTable {
    * @param {Object} options
    * @param {MetastoreDatabase} options.database
    * @param {DataCatalogEntry} options.catalogEntry
-   * @param {boolean} options.optimizerEnabled
-   * @param {boolean} options.navigatorEnabled
+   * @param {observable} options.optimizerEnabled
+   * @param {observable} options.navigatorEnabled
    * @constructor
    */
   constructor(options) {

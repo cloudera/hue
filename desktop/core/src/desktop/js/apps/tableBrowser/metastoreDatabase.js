@@ -99,8 +99,8 @@ class MetastoreDatabase {
     this.catalogEntry.clearCache().then(() => {
       this.load(
         () => {},
-        this.metastoreViewModel.optimizerEnabled,
-        this.metastoreViewModel.navigatorEnabled
+        this.metastoreViewModel.optimizerEnabled(),
+        this.metastoreViewModel.navigatorEnabled()
       );
     });
   }
