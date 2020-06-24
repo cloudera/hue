@@ -62,7 +62,7 @@ Which is then easily integrated into the [Hue CI](https://github.com/cloudera/hu
           cd /usr/share/hue
           npm run check-license
 
-![ci nmp license checker](https://cdn.gethue.com/uploads/2020/06/ci-nmp-license-checker.png)
+![ci npm license checker](https://cdn.gethue.com/uploads/2020/06/ci-nmp-license-checker.png)
 
 ## Absolute paths
 
@@ -83,3 +83,5 @@ And it was also added in the CI:
 And that's it, more development time is saved for later!
 
 What is your favorite CI process? Any feedback? Feel free to comment here or on [@gethue](https://twitter.com/gethue)!
+
+Johan & Romain from the Hue Team
