@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.parseArguments = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const $el = $(element);
 
     function splitStrings(str) {

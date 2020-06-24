@@ -17,7 +17,7 @@
 import impalaSyntaxParser from '../impalaSyntaxParser';
 
 describe('impalaSyntaxParser.js', () => {
-  const expectedToStrings = function(expected) {
+  const expectedToStrings = function (expected) {
     return expected.map(ex => ex.text);
   };
 
@@ -192,7 +192,7 @@ describe('impalaSyntaxParser.js', () => {
     expect(result.expectedStatementEnd).toBeTruthy();
   });
 
-  const expectEqualIds = function(beforeA, afterA, beforeB, afterB) {
+  const expectEqualIds = function (beforeA, afterA, beforeB, afterB) {
     const resultA = impalaSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = impalaSyntaxParser.parseSyntax(beforeB, afterB);
 
@@ -201,7 +201,7 @@ describe('impalaSyntaxParser.js', () => {
     expect(resultA.ruleId).toEqual(resultB.ruleId);
   };
 
-  const expectNonEqualIds = function(beforeA, afterA, beforeB, afterB) {
+  const expectNonEqualIds = function (beforeA, afterA, beforeB, afterB) {
     const resultA = impalaSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = impalaSyntaxParser.parseSyntax(beforeB, afterB);
 

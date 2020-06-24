@@ -21,7 +21,8 @@ import logging
 import sys
 
 from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false, raises
-from sqlalchemy.types import NullType
+from sqlalchemy.exc import UnsupportedCompilationError
+from sqlalchemy.types import NullType, ARRAY, JSON, VARCHAR
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
@@ -369,7 +370,7 @@ class TestAutocomplete(object):
           data = SqlAlchemyApi(self.user, interpreter).autocomplete(snippet, database='database', table='table')
 
           assert_equal(data['columns'], ['col1', 'col2'])
-          assert_equal([col['type'] for col in data['extended_columns']], ['string', 'Null'])
+          assert_equal([col['type'] for col in data['extended_columns']], ['string', 'null'])
 
   def test_get_keys(self):
 
@@ -391,3 +392,41 @@ class TestAutocomplete(object):
 
       assert_true(keys['primary_keys'])  # For some reason could not mock two level to get some colum names
       assert_equal(keys['foreign_keys'][0]['to'], 'db2.table2.col2')
+
+
+class TestUtils():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+
+    self.user = rewrite_user(User.objects.get(username="test"))
+    self.interpreter = {
+      'name': 'hive',
+      'options': {
+        'url': 'mysql://hue:localhost@hue:3306/hue'
+      },
+    }
+
+  def test_get_column_type_name_complex(self):
+    api = SqlAlchemyApi(self.user, self.interpreter)
+
+    with patch('notebook.connectors.sql_alchemy.str') as str:
+      str.side_effect = UnsupportedCompilationError(None, None)
+
+      assert_equal(api._get_column_type_name({'type': VARCHAR}), 'varchar')  # Not complex but not testable otherwise
+      assert_equal(api._get_column_type_name({'type': NullType}), 'null')
+      assert_equal(api._get_column_type_name({'type': ARRAY}), 'array')
+      assert_equal(api._get_column_type_name({'type': JSON}), 'json')
+
+
+  def test_fix_bigquery_db_prefixes(self):
+    interpreter = {
+      'name': 'bigquery',
+      'options': {
+        'url': 'bigquery://'
+      },
+    }
+    api = SqlAlchemyApi(self.user, interpreter)
+
+    assert_equal(api._fix_bigquery_db_prefixes('table'), 'table')
+    assert_equal(api._fix_bigquery_db_prefixes('db.table'), 'table')

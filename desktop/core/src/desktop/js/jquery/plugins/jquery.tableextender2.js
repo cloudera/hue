@@ -64,7 +64,7 @@ function Plugin(element, options) {
   const sortAdjustment = self.options.noSort ? 10 : 20; // 20 is the sorting css width
 
   let firstCellWidth, leftPosition, th, thi, leftPadding;
-  const throttledHeaderPadding = function() {
+  const throttledHeaderPadding = function () {
     firstCellWidth = self.options.fixedFirstColumn ? self.firstColumnTopCell.outerWidth() : 0;
     for (thi = 0; thi < self.thMapping.length; thi++) {
       th = self.thMapping[thi];
@@ -86,7 +86,7 @@ function Plugin(element, options) {
   };
 
   let scrollTimeout = -1;
-  const headerScroll = function() {
+  const headerScroll = function () {
     self.headerRowContainer.scrollLeft(self.$parent.scrollLeft());
     if (manyColumns) {
       window.clearTimeout(scrollTimeout);
@@ -129,7 +129,7 @@ function Plugin(element, options) {
     hideSubscription.remove();
   });
 
-  const adjustSizes = function() {
+  const adjustSizes = function () {
     if (self.lastHeaderWidth !== self.$parent.width()) {
       self.lastHeaderWidth = self.$parent.width();
       self.headerRowContainer.width(self.lastHeaderWidth);
@@ -156,7 +156,7 @@ function Plugin(element, options) {
     window.clearInterval(sizeInterval);
   });
 
-  const clickHandler = function() {
+  const clickHandler = function () {
     if ($(this).hasClass('selected')) {
       self.$parent.find('.selected').removeClass('selected');
     } else {
@@ -168,13 +168,13 @@ function Plugin(element, options) {
     }
   };
 
-  const overHandler = function() {
+  const overHandler = function () {
     self.$parent
       .find('.fixed-first-column table tbody tr:eq(' + $(this).index() + ') td')
       .addClass('fixed-first-col-hover');
   };
 
-  const outHandler = function() {
+  const outHandler = function () {
     self.$parent.find('.fixed-first-column table tbody tr td').removeClass('fixed-first-col-hover');
   };
 
@@ -197,7 +197,7 @@ function Plugin(element, options) {
   }
 }
 
-Plugin.prototype.redraw = function() {
+Plugin.prototype.redraw = function () {
   const self = this;
   self.drawHeader();
   self.drawFirstColumn();
@@ -209,7 +209,7 @@ Plugin.prototype.redraw = function() {
   }, 300);
 };
 
-Plugin.prototype.destroy = function() {
+Plugin.prototype.destroy = function () {
   const self = this;
   self.disposeFunctions.forEach(disposeFunction => {
     disposeFunction();
@@ -229,7 +229,7 @@ Plugin.prototype.destroy = function() {
   self.$element.data('plugin_' + PLUGIN_NAME, null);
 };
 
-Plugin.prototype.setOptions = function(options) {
+Plugin.prototype.setOptions = function (options) {
   this.options = $.extend({}, DEFAULT_OPTIONS, options);
   this.options.labels = $.extend(
     {},
@@ -245,7 +245,7 @@ Plugin.prototype.setOptions = function(options) {
   );
 };
 
-Plugin.prototype.repositionHeader = function() {
+Plugin.prototype.repositionHeader = function () {
   const self = this;
   if (self.options.disableTopPosition) {
     return;
@@ -298,7 +298,7 @@ Plugin.prototype.repositionHeader = function() {
   }
 };
 
-Plugin.prototype.drawHeader = function() {
+Plugin.prototype.drawHeader = function () {
   const self = this;
   if (!self.$element.attr('id') && self.options.parentId) {
     self.$element.attr('id', 'eT' + self.options.parentId);
@@ -323,11 +323,11 @@ Plugin.prototype.drawHeader = function() {
 
   self.thMapping = [];
   let totalThWidth = 0;
-  self.$element.find('thead>tr th').each(function(i) {
+  self.$element.find('thead>tr th').each(function (i) {
     const originalTh = $(this);
     originalTh.removeAttr('data-bind');
     const clonedTh = $(clonedThs[i]).css('background-color', '#FFFFFF');
-    clonedTh.click(function() {
+    clonedTh.click(function () {
       originalTh.click();
       if (self.options.headerSorting) {
         clonedThs.attr('class', 'sorting');
@@ -373,7 +373,7 @@ Plugin.prototype.drawHeader = function() {
   self.$mainScrollable.trigger('scroll');
 };
 
-Plugin.prototype.drawFirstColumn = function(repositionHeader) {
+Plugin.prototype.drawFirstColumn = function (repositionHeader) {
   const self = this;
   if (!self.options.fixedFirstColumn) {
     self.firstColumnInner = $();
@@ -432,15 +432,12 @@ Plugin.prototype.drawFirstColumn = function(repositionHeader) {
     .html('<thead><tr></tr></thead><tbody></tbody>');
   clonedTable.removeClass(self.options.classToRemove);
   clonedTable.css('margin-bottom', '0').css('table-layout', 'fixed');
-  self.$element
-    .find('thead>tr th:eq(0)')
-    .clone()
-    .appendTo(clonedTable.find('thead tr'));
+  self.$element.find('thead>tr th:eq(0)').clone().appendTo(clonedTable.find('thead tr'));
   const clonedTBody = clonedTable.find('tbody');
   const clones = self.$element.find('tbody>tr td:nth-child(1)').clone();
   let h = '';
   let foundEmptyTh = false;
-  clones.each(function() {
+  clones.each(function () {
     if ($(this).html() === '') {
       foundEmptyTh = true;
     }
@@ -456,18 +453,14 @@ Plugin.prototype.drawFirstColumn = function(repositionHeader) {
   }
   clonedTBody.html(h);
   if (self.options.lockSelectedRow) {
-    clonedTBody.find('td').each(function(idx) {
+    clonedTBody.find('td').each(function (idx) {
       const cell = $(this);
       cell.addClass('lockable');
       $('<i>')
         .addClass('fa fa-lock pointer muted')
         .prependTo(cell)
-        .on('click', function() {
-          self.drawLockedRow(
-            $(this)
-              .parent()
-              .text() * 1
-          );
+        .on('click', function () {
+          self.drawLockedRow($(this).parent().text() * 1);
         })
         .attr('title', self.options.labels.LOCK);
       $('<i>')
@@ -513,7 +506,7 @@ Plugin.prototype.drawFirstColumn = function(repositionHeader) {
   }
 };
 
-Plugin.prototype.drawLockedRows = function(force) {
+Plugin.prototype.drawLockedRows = function (force) {
   const self = this;
   if (Object.keys(self.lockedRows).length === 0) {
     self.headerRowContainer.find('tbody').empty();
@@ -528,13 +521,13 @@ Plugin.prototype.drawLockedRows = function(force) {
   }
 };
 
-Plugin.prototype.drawLockedRow = function(rowNo, force) {
+Plugin.prototype.drawLockedRow = function (rowNo, force) {
   const self = this;
 
   function unlock($el) {
     self.headerRowContainer
       .find('tr td:first-child')
-      .filter(function() {
+      .filter(function () {
         return $(this).text() === rowNo + '';
       })
       .closest('tr')
@@ -575,7 +568,7 @@ Plugin.prototype.drawLockedRow = function(rowNo, force) {
           '</td>'
       )
       .appendTo(self.firstColumnTopCell.find('tbody'));
-    $newTr.find('td').on('click', function() {
+    $newTr.find('td').on('click', function () {
       unlock($(this));
     });
     self.lockedRows['r' + rowNo] = {
@@ -585,14 +578,14 @@ Plugin.prototype.drawLockedRow = function(rowNo, force) {
   } else {
     self.lockedRows['r' + rowNo].row.appendTo(self.headerRowContainer.find('tbody'));
     self.lockedRows['r' + rowNo].cell.appendTo(self.firstColumnTopCell.find('tbody'));
-    self.lockedRows['r' + rowNo].cell.find('td').on('click', function() {
+    self.lockedRows['r' + rowNo].cell.find('td').on('click', function () {
       unlock($(this));
     });
   }
 };
 
-$.fn[PLUGIN_NAME] = function(options) {
-  return this.each(function() {
+$.fn[PLUGIN_NAME] = function (options) {
+  return this.each(function () {
     if ($.data(this, 'plugin_' + PLUGIN_NAME)) {
       $.data(this, 'plugin_' + PLUGIN_NAME).destroy();
     }

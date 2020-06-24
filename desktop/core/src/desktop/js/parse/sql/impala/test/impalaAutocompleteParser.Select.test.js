@@ -18,7 +18,7 @@ import impalaAutocompleteParser from '../impalaAutocompleteParser';
 
 describe('impalaAutocompleteParser.js SELECT statements', () => {
   beforeAll(() => {
-    impalaAutocompleteParser.yy.parseError = function(msg) {
+    impalaAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });
@@ -419,6 +419,14 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
               function: 'count'
             },
             {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 14, last_column: 15 },
+              function: 'count',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'count' }],
+              expression: { text: '*' }
+            },
+            {
               type: 'table',
               location: { first_line: 1, last_line: 1, first_column: 18, last_column: 21 },
               identifierChain: [{ name: 'autocomp_test' }]
@@ -434,6 +442,14 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
               type: 'function',
               location: { first_line: 1, last_line: 1, first_column: 29, last_column: 32 },
               function: 'avg'
+            },
+            {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 34, last_column: 36 },
+              function: 'avg',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'avg' }],
+              expression: { types: ['COLREF'], columnReference: [{ name: 'id' }] }
             },
             {
               type: 'column',
@@ -990,7 +1006,10 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
               { identifierChain: [{ name: 'db' }, { name: 'tbl2' }] }
             ]
           },
-          suggestIdentifiers: [{ name: 'col.', type: 'table' }, { name: 'tbl2.', type: 'table' }]
+          suggestIdentifiers: [
+            { name: 'col.', type: 'table' },
+            { name: 'tbl2.', type: 'table' }
+          ]
         }
       });
     });
@@ -2253,6 +2272,14 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
               function: 'customudf'
             },
             {
+              type: 'functionArgument',
+              location: { first_line: 1, last_line: 1, first_column: 21, last_column: 24 },
+              function: 'customudf',
+              argumentPosition: 0,
+              identifierChain: [{ name: 'db' }, { name: 'customUdf' }],
+              expression: { types: ['COLREF'], columnReference: [{ name: 'col' }] }
+            },
+            {
               type: 'column',
               location: { first_line: 1, last_line: 1, first_column: 21, last_column: 24 },
               identifierChain: [{ name: 'col' }],
@@ -2319,6 +2346,24 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
       });
     });
 
+    it('should suggest keywords for "SELECT extract(|) FROM bar"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT extract(',
+        afterCursor: ') FROM bar;',
+        containsKeywords: ['CASE'],
+        expectedResult: {
+          lowerCase: false,
+          suggestColumns: {
+            types: ['STRING', 'TIMESTAMP'],
+            source: 'select',
+            tables: [{ identifierChain: [{ name: 'bar' }] }]
+          },
+          suggestFunctions: { types: ['STRING', 'TIMESTAMP'] },
+          udfArgument: { name: 'extract', position: 1 }
+        }
+      });
+    });
+
     it('should suggest columns for "SELECT extract(bla ,|  FROM bar;"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT extract(bla ,',
@@ -2331,7 +2376,8 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
             source: 'select',
             types: ['STRING'],
             tables: [{ identifierChain: [{ name: 'bar' }] }]
-          }
+          },
+          udfArgument: { name: 'extract', position: 2 }
         }
       });
     });
@@ -2348,12 +2394,13 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
             source: 'select',
             types: ['TIMESTAMP'],
             tables: [{ identifierChain: [{ name: 'bar' }] }]
-          }
+          },
+          udfArgument: { name: 'extract', position: 1 }
         }
       });
     });
 
-    it('should suggest columns for "SELECT extract(bla ,|)  FROM bar;"', () => {
+    it('should suggest columns for "SELECT extract(bla ,|) FROM bar;"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT extract(bla ,',
         afterCursor: ') FROM bar;',
@@ -2365,7 +2412,8 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
             source: 'select',
             types: ['STRING'],
             tables: [{ identifierChain: [{ name: 'bar' }] }]
-          }
+          },
+          udfArgument: { name: 'extract', position: 2 }
         }
       });
     });
@@ -3292,7 +3340,10 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
           source: 'select',
           tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }]
         },
-        suggestIdentifiers: [{ name: 't.', type: 'alias' }, { name: 'tm.', type: 'alias' }]
+        suggestIdentifiers: [
+          { name: 't.', type: 'alias' },
+          { name: 'tm.', type: 'alias' }
+        ]
       }
     });
   });
@@ -3342,7 +3393,10 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
           types: ['COLREF'],
           tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }]
         },
-        suggestIdentifiers: [{ name: 't.', type: 'alias' }, { name: 'tm.', type: 'alias' }],
+        suggestIdentifiers: [
+          { name: 't.', type: 'alias' },
+          { name: 'tm.', type: 'alias' }
+        ],
         colRef: { identifierChain: [{ name: 'testTable' }, { name: 'testMap' }, { name: 'key' }] }
       }
     });
@@ -3362,7 +3416,10 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
           types: ['COLREF'],
           tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }]
         },
-        suggestIdentifiers: [{ name: 't.', type: 'alias' }, { name: 'm.', type: 'alias' }],
+        suggestIdentifiers: [
+          { name: 't.', type: 'alias' },
+          { name: 'm.', type: 'alias' }
+        ],
         colRef: {
           identifierChain: [{ name: 'testTable' }, { name: 'testMap' }, { name: 'field' }]
         }
@@ -3588,7 +3645,10 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
               { identifierChain: [{ name: 'tableTwo' }], alias: 'baa' }
             ]
           },
-          suggestIdentifiers: [{ name: 'boo.', type: 'alias' }, { name: 'baa.', type: 'alias' }]
+          suggestIdentifiers: [
+            { name: 'boo.', type: 'alias' },
+            { name: 'baa.', type: 'alias' }
+          ]
         }
       });
     });
@@ -4618,7 +4678,10 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
               { identifierChain: [{ name: 'bar' }] }
             ]
           },
-          suggestIdentifiers: [{ name: 'bla.', type: 'alias' }, { name: 'bar.', type: 'table' }]
+          suggestIdentifiers: [
+            { name: 'bla.', type: 'alias' },
+            { name: 'bar.', type: 'table' }
+          ]
         }
       });
     });
@@ -6337,7 +6400,10 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
               { identifierChain: [{ name: 'table2' }], alias: 't2' }
             ]
           },
-          suggestIdentifiers: [{ name: 't1.', type: 'alias' }, { name: 't2.', type: 'alias' }]
+          suggestIdentifiers: [
+            { name: 't1.', type: 'alias' },
+            { name: 't2.', type: 'alias' }
+          ]
         }
       });
     });
@@ -6644,7 +6710,10 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
             types: ['COLREF'],
             tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'bar' }] }]
           },
-          suggestIdentifiers: [{ name: 'foo.', type: 'table' }, { name: 'bar.', type: 'table' }],
+          suggestIdentifiers: [
+            { name: 'foo.', type: 'table' },
+            { name: 'bar.', type: 'table' }
+          ],
           colRef: { identifierChain: [{ name: 'bar' }, { name: 'bla' }] }
         }
       });
@@ -6664,7 +6733,10 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
             types: ['COLREF'],
             tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'bar' }] }]
           },
-          suggestIdentifiers: [{ name: 'foo.', type: 'table' }, { name: 'bar.', type: 'table' }],
+          suggestIdentifiers: [
+            { name: 'foo.', type: 'table' },
+            { name: 'bar.', type: 'table' }
+          ],
           colRef: { identifierChain: [{ name: 'bar' }, { name: 'bla' }] }
         }
       });
@@ -6969,7 +7041,10 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
               { identifierChain: [{ subQuery: 'bar' }] }
             ]
           },
-          suggestIdentifiers: [{ name: 'tt.', type: 'alias' }, { name: 'bar.', type: 'sub-query' }],
+          suggestIdentifiers: [
+            { name: 'tt.', type: 'alias' },
+            { name: 'bar.', type: 'sub-query' }
+          ],
           subQueries: [
             {
               alias: 'bar',

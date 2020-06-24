@@ -22,11 +22,11 @@ describe('aceAutocompleteWrapper.js', () => {
   it('should not throw exceptions', done => {
     const subject = new AceAutocompleteWrapper({
       snippet: {
-        isSqlDialect: function() {
+        isSqlDialect: function () {
           return true;
         },
         type: ko.observable('hive'),
-        database: function() {
+        database: function () {
           return 'default';
         }
       }
@@ -35,17 +35,17 @@ describe('aceAutocompleteWrapper.js', () => {
     try {
       subject.getCompletions(
         {
-          getTextBeforeCursor: function() {
+          getTextBeforeCursor: function () {
             return 'SELECT * FROM (SELECT * FROM tbl) a JOIN (SELECT * FROM tbl) b ON a.c=';
           },
-          getTextAfterCursor: function() {
+          getTextAfterCursor: function () {
             return '';
           },
-          hideSpinner: function() {
+          hideSpinner: function () {
             expect(true).toBeTruthy(); // Prevent jasmine warning
             done();
           },
-          showSpinner: function() {}
+          showSpinner: function () {}
         },
         undefined,
         undefined,

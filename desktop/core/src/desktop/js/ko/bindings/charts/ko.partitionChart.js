@@ -22,7 +22,7 @@ import HueColors from 'utils/hueColors';
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.partitionChart = {
-  render: function(element, valueAccessor) {
+  render: function (element, valueAccessor) {
     huePubSub.publish('charts.state');
     const MIN_HEIGHT_FOR_TOOLTIP = 24;
 
@@ -35,9 +35,7 @@ ko.bindingHandlers.partitionChart = {
       _y = d3v3.scale.linear().range([0, _h]);
 
     if ($(element).find('svg').length > 0) {
-      $(element)
-        .find('svg')
-        .empty();
+      $(element).find('svg').empty();
     }
 
     const _tip = d3v3
@@ -84,7 +82,7 @@ ko.bindingHandlers.partitionChart = {
       .attr('transform', d => {
         return 'translate(' + _x(d.y) + ',' + _y(d.x) + ')';
       })
-      .on('mouseover', function(d, i) {
+      .on('mouseover', function (d, i) {
         if (
           element.querySelectorAll('rect')[i].getBBox().height < MIN_HEIGHT_FOR_TOOLTIP ||
           d.depth === 0
@@ -95,12 +93,9 @@ ko.bindingHandlers.partitionChart = {
         if (typeof this.__data__.parent === 'undefined') {
           return;
         }
-        d3v3
-          .select(this)
-          .select('rect')
-          .classed('mouseover', true);
+        d3v3.select(this).select('rect').classed('mouseover', true);
       })
-      .on('mouseout', function(d, i) {
+      .on('mouseout', function (d, i) {
         if (
           element.querySelectorAll('rect')[i].getBBox().height < MIN_HEIGHT_FOR_TOOLTIP ||
           d.depth === 0
@@ -108,10 +103,7 @@ ko.bindingHandlers.partitionChart = {
           _tip.attr('class', 'd3-tip').show(d);
           _tip.hide();
         }
-        d3v3
-          .select(this)
-          .select('rect')
-          .classed('mouseover', false);
+        d3v3.select(this).select('rect').classed('mouseover', false);
       });
 
     if (typeof _options.zoomable == 'undefined' || _options.zoomable) {
@@ -220,10 +212,10 @@ ko.bindingHandlers.partitionChart = {
       _options.onComplete();
     }
   },
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     ko.bindingHandlers.partitionChart.render(element, valueAccessor);
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     ko.bindingHandlers.partitionChart.render(element, valueAccessor);
   }
 };

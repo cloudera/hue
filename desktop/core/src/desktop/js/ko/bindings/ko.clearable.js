@@ -19,7 +19,7 @@ import * as ko from 'knockout';
 
 ko.bindingHandlers.clearable = {
   after: ['textInput', 'value', 'valueUpdate'],
-  init: function(element, valueAccessor, allBindingsAccessor) {
+  init: function (element, valueAccessor, allBindingsAccessor) {
     const $element = $(element);
 
     const params = valueAccessor();
@@ -33,13 +33,13 @@ ko.bindingHandlers.clearable = {
     $element[tog(valueObservable())]('x');
 
     $element
-      .on('input', function() {
+      .on('input', function () {
         $element[tog(this.value)]('x');
       })
-      .on('mousemove', function(e) {
+      .on('mousemove', function (e) {
         $element[tog(this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left)]('onX');
       })
-      .on('click', function(e) {
+      .on('click', function (e) {
         if (this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left) {
           $element.removeClass('x onX').val('');
           valueObservable('');
@@ -80,7 +80,7 @@ ko.bindingHandlers.clearable = {
       }
     }
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const $element = $(element);
     const params = valueAccessor();
     const valueObservable = ko.isObservable(params) ? params : params.value;

@@ -24,7 +24,7 @@ import 'ext/leaflet/leaflet.zoombox';
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.leafletMapChart = {
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const L = window.L;
     const _options = valueAccessor();
     const _data = _options.transformer(valueAccessor().datum);
@@ -37,18 +37,14 @@ ko.bindingHandlers.leafletMapChart = {
           typeof _options == 'undefined')
       ) {
         $(element).show();
-        $(element)
-          .siblings('.leaflet-nodata')
-          .remove();
+        $(element).siblings('.leaflet-nodata').remove();
       } else {
         $(element).hide();
         if (
           (_data.message || (_options.visible != null && _options.visible)) &&
           !_options.isLoading
         ) {
-          $(element)
-            .siblings('.leaflet-nodata')
-            .remove();
+          $(element).siblings('.leaflet-nodata').remove();
           $(element).before(
             $('<div>')
               .addClass('leaflet-nodata')
@@ -82,11 +78,7 @@ ko.bindingHandlers.leafletMapChart = {
       if (_options.height != null) {
         $(element).height(_options.height * 1);
       } else if ($(element).parents('.tab-pane').length > 0) {
-        $(element).height(
-          $(element)
-            .parents('.tab-pane')
-            .height() - 100
-        );
+        $(element).height($(element).parents('.tab-pane').height() - 100);
       } else {
         $(element).height(300);
       }
@@ -148,16 +140,14 @@ ko.bindingHandlers.leafletMapChart = {
                 position: $(element).width() > 300 ? 'topright' : 'bottomleft'
               });
 
-              _command.onAdd = function(map) {
+              _command.onAdd = function (map) {
                 const div = L.DomUtil.create(
                   'div',
                   'leaflet-search-command leaflet-bar leaflet-move-label'
                 );
                 div.innerHTML =
                   '<button id="command' +
-                  $(element)
-                    .parents('.card-widget')
-                    .attr('id') +
+                  $(element).parents('.card-widget').attr('id') +
                   '" type="button" class="btn btn-mini disable-feedback"><i class="fa fa-fw fa-square-o"></i> ' +
                   (_options.moveCheckboxLabel
                     ? _options.moveCheckboxLabel
@@ -169,37 +159,27 @@ ko.bindingHandlers.leafletMapChart = {
               _command.addTo(_map);
 
               if (_options.onRegionChange == null) {
-                _options.onRegionChange = function() {};
+                _options.onRegionChange = function () {};
               }
 
-              let _onRegionChange = function() {};
+              let _onRegionChange = function () {};
 
-              $(
-                '#command' +
-                  $(element)
-                    .parents('.card-widget')
-                    .attr('id')
-              ).on('click', function(e) {
+              $('#command' + $(element).parents('.card-widget').attr('id')).on('click', function (
+                e
+              ) {
                 $(this).toggleClass('btn-primary');
-                $(this)
-                  .find('.fa-fw')
-                  .toggleClass('fa-check-square');
+                $(this).find('.fa-fw').toggleClass('fa-check-square');
                 if ($(this).hasClass('btn-primary')) {
                   if (_options.onRegionChange != null) {
                     _onRegionChange = _options.onRegionChange;
                   }
                 } else {
-                  _onRegionChange = function() {};
+                  _onRegionChange = function () {};
                 }
               });
 
               ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-                $(
-                  '#command' +
-                    $(element)
-                      .parents('.card-widget')
-                      .attr('id')
-                ).off('click');
+                $('#command' + $(element).parents('.card-widget').attr('id')).off('click');
               });
 
               _map.on('boxzoomend', e => {
@@ -285,21 +265,10 @@ ko.bindingHandlers.leafletMapChart = {
           }
 
           window.setTimeout(() => {
-            if (
-              !$(
-                '#command' +
-                  $(element)
-                    .parents('.card-widget')
-                    .attr('id')
-              ).is(':checked')
-            ) {
+            if (!$('#command' + $(element).parents('.card-widget').attr('id')).is(':checked')) {
               _map.fitBounds(_clusterGroup.getBounds());
             }
-            if (
-              $(element)
-                .find('.leaflet-tile-pane')
-                .children().length > 0
-            ) {
+            if ($(element).find('.leaflet-tile-pane').children().length > 0) {
               if (heatData.length == 0) {
                 _map.addLayer(_clusterGroup);
                 $('.leaflet-heatmap-layer').remove();
@@ -317,18 +286,10 @@ ko.bindingHandlers.leafletMapChart = {
 
           const resizeSubscription = huePubSub.subscribe('resize.leaflet.map', () => {
             if ($(element).data('_map')) {
-              $(element)
-                .data('_map')
-                .invalidateSize();
+              $(element).data('_map').invalidateSize();
               if ($(element).data('_markerLayer')) {
                 try {
-                  $(element)
-                    .data('_map')
-                    .fitBounds(
-                      $(element)
-                        .data('_markerLayer')
-                        .getBounds()
-                    );
+                  $(element).data('_map').fitBounds($(element).data('_markerLayer').getBounds());
                 } catch (e) {}
               }
             }

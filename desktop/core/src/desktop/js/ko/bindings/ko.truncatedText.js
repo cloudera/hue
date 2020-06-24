@@ -17,7 +17,7 @@
 import * as ko from 'knockout';
 
 ko.bindingHandlers.truncatedText = {
-  update: function(element, valueAccessor, allBindingsAccessor) {
+  update: function (element, valueAccessor, allBindingsAccessor) {
     const text = ko.isObservable(valueAccessor())
       ? ko.utils.unwrapObservable(valueAccessor())
       : valueAccessor();

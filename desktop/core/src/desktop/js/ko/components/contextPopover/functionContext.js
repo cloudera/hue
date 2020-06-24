@@ -45,7 +45,11 @@ class FunctionContextTabs {
     this.hasErrors = ko.observable(false);
 
     findUdf(connector, data.function)
-      .then(this.details)
+      .then(udfs => {
+        // TODO: Support showing multiple UDFs with the same name but different category in the context popover.
+        // For instance, trunc appears both for dates with one description and for numbers with another description.
+        this.details = udfs.length ? udfs[0] : undefined;
+      })
       .catch(() => {
         this.hasErrors(true);
       })

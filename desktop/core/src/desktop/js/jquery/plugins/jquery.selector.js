@@ -29,7 +29,7 @@ const pluginName = 'jHueSelector',
     noChoicesFound: 'No choices found for this element',
     width: 300,
     height: 200,
-    onChange: function() {}
+    onChange: function () {}
   };
 
 function Plugin(element, options) {
@@ -40,11 +40,11 @@ function Plugin(element, options) {
   this.init();
 }
 
-Plugin.prototype.setOptions = function(options) {
+Plugin.prototype.setOptions = function (options) {
   this.options = $.extend({}, defaults, options);
 };
 
-Plugin.prototype.init = function() {
+Plugin.prototype.init = function () {
   const _this = this;
   const addressBook = [];
   const selectorContainer = $('<div>');
@@ -55,10 +55,7 @@ Plugin.prototype.init = function() {
   $(_this.element)
     .find('option')
     .each((cnt, opt) => {
-      const initial = $(opt)
-        .text()
-        .substr(0, 1)
-        .toLowerCase();
+      const initial = $(opt).text().substr(0, 1).toLowerCase();
       if (addressBook[initial] == null) {
         addressBook[initial] = [];
       }
@@ -97,15 +94,11 @@ Plugin.prototype.init = function() {
         const chk = $('<input>')
           .attr('type', 'checkbox')
           .addClass('selector')
-          .change(function() {
+          .change(function () {
             if ($(this).is(':checked')) {
-              $(this)
-                .data('opt')
-                .attr('selected', 'selected');
+              $(this).data('opt').attr('selected', 'selected');
             } else {
-              $(this)
-                .data('opt')
-                .removeAttr('selected');
+              $(this).data('opt').removeAttr('selected');
             }
             _this.options.onChange();
           })
@@ -129,19 +122,15 @@ Plugin.prototype.init = function() {
       selectAll.text(this.options.selectAllLabel);
       $('<input>')
         .attr('type', 'checkbox')
-        .change(function() {
+        .change(function () {
           const isChecked = $(this).is(':checked');
-          selectorContainer.find('input.selector:visible').each(function() {
+          selectorContainer.find('input.selector:visible').each(function () {
             if (isChecked) {
               $(this).prop('checked', true);
-              $(this)
-                .data('opt')
-                .attr('selected', 'selected');
+              $(this).data('opt').attr('selected', 'selected');
             } else {
               $(this).prop('checked', false);
-              $(this)
-                .data('opt')
-                .removeAttr('selected');
+              $(this).data('opt').removeAttr('selected');
             }
           });
           if (searchBox.val() != '') {
@@ -157,43 +146,23 @@ Plugin.prototype.init = function() {
     const searchBox = $('<input>')
       .attr('type', 'text')
       .attr('placeholder', this.options.searchPlaceholder)
-      .keyup(function() {
-        body
-          .find('ul')
-          .attr('show', true)
-          .show();
+      .keyup(function () {
+        body.find('ul').attr('show', true).show();
         const q = $.trim($(this).val());
         if (q != '') {
           body.find('li.selectorDivider').hide();
-          body.find('label').each(function() {
-            if (
-              $(this)
-                .text()
-                .toLowerCase()
-                .indexOf(q.toLowerCase()) > -1
-            ) {
-              $(this)
-                .parent()
-                .show();
+          body.find('label').each(function () {
+            if ($(this).text().toLowerCase().indexOf(q.toLowerCase()) > -1) {
+              $(this).parent().show();
             } else {
-              $(this)
-                .parent()
-                .hide();
+              $(this).parent().hide();
             }
           });
           body.find('ul').attr('show', false);
-          body
-            .find('ul > *:visible')
-            .parent()
-            .attr('show', true)
-            .find('li.selectorDivider')
-            .show();
+          body.find('ul > *:visible').parent().attr('show', true).find('li.selectorDivider').show();
         } else {
           body.find('li.selectorDivider').show();
-          body
-            .find('label')
-            .parent()
-            .show();
+          body.find('label').parent().show();
         }
         body.find('ul[show=false]').hide();
         body.find('ul[show=true]').show();
@@ -209,8 +178,8 @@ Plugin.prototype.init = function() {
   }
 };
 
-$.fn[pluginName] = function(options) {
-  return this.each(function() {
+$.fn[pluginName] = function (options) {
+  return this.each(function () {
     if (!$.data(this, 'plugin_' + pluginName)) {
       $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
     } else {

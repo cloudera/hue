@@ -18,12 +18,12 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.fadeVisible = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const value = valueAccessor();
     const toggleValue = typeof value.value === 'undefined' ? value : value.value;
     $(element).toggle(ko.unwrap(toggleValue));
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const value = valueAccessor();
     const toggleValue = typeof value.value === 'undefined' ? value : value.value;
     const speed = typeof value.speed === 'undefined' ? 'normal' : value.speed;

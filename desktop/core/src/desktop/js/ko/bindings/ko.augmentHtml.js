@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 // TODO: less from bootstrap?
 
 ko.bindingHandlers.augmentHtml = {
-  render: function(element, valueAccessor) {
+  render: function (element, valueAccessor) {
     const _val = ko.unwrap(valueAccessor());
     const _enc = $('<span>').html(_val);
     if (_enc.find('style').length > 0) {
@@ -38,10 +38,10 @@ ko.bindingHandlers.augmentHtml = {
       $(element).html(_val);
     }
   },
-  init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+  init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
     ko.bindingHandlers.augmentHtml.render(element, valueAccessor, allBindingsAccessor, viewModel);
   },
-  update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+  update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
     ko.bindingHandlers.augmentHtml.render(element, valueAccessor, allBindingsAccessor, viewModel);
   }
 };

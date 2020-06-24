@@ -17,7 +17,7 @@
 import impalaAutocompleteParser from '../impalaAutocompleteParser';
 describe('impalaAutocompleteParser.js', () => {
   beforeAll(() => {
-    impalaAutocompleteParser.yy.parseError = function(msg) {
+    impalaAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });

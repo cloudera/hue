@@ -434,7 +434,7 @@ class ResultGrid extends DisposableComponent {
     if (this.notebookMode()) {
       $dataTablesWrapper.on(
         'mousewheel.resultGrid DOMMouseScroll.resultGrid wheel.resultGrid',
-        function(event) {
+        function (event) {
           if ($resultTable.closest('.results').css('overflow') === 'hidden') {
             return;
           }
@@ -632,7 +632,7 @@ class ResultGrid extends DisposableComponent {
   scrollToResultColumn(linkElement) {
     const $resultTable = this.getResultTableElement();
     const searchText = $.trim($(linkElement).text());
-    const foundColumn = $resultTable.find('th').filter(function() {
+    const foundColumn = $resultTable.find('th').filter(function () {
       return $.trim($(this).text()) === searchText;
     });
     $resultTable.find('.columnSelected').removeClass('columnSelected');

@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.spinedit = {
-  init: function(element, valueAccessor, allBindingsAccessor) {
+  init: function (element, valueAccessor, allBindingsAccessor) {
     const options = $.extend(
       {
         minimum: 0,
@@ -34,7 +34,7 @@ ko.bindingHandlers.spinedit = {
       valueAccessor()(e.value);
     });
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     $(element).spinedit('setValue', ko.unwrap(valueAccessor()));
   }
 };

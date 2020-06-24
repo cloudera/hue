@@ -18,7 +18,7 @@ import druidAutocompleteParser from '../druidAutocompleteParser';
 
 describe('druidAutocompleteParser.js SET statements', () => {
   beforeAll(() => {
-    druidAutocompleteParser.yy.parseError = function(msg) {
+    druidAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });

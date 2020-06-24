@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.solrChooser = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const self = $(element);
     self.val(valueAccessor()());
 
@@ -37,13 +37,13 @@ ko.bindingHandlers.solrChooser = {
       home: '/',
       serverType: 'SOLR',
       skipTables: true, // No notion of DB actually
-      onPathChange: function(path) {
+      onPathChange: function (path) {
         setPathFromAutocomplete(path);
       },
-      onEnter: function(el) {
+      onEnter: function (el) {
         setPathFromAutocomplete(el.val());
       },
-      onBlur: function() {
+      onBlur: function () {
         if (self.val().lastIndexOf('.') === self.val().length - 1) {
           self.val(self.val().substr(0, self.val().length - 1));
         }

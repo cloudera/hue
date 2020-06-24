@@ -17,7 +17,7 @@
 import hiveAutocompleteParser from '../hiveAutocompleteParser';
 describe('hiveAutocompleteParser.js INSERT statements', () => {
   beforeAll(() => {
-    hiveAutocompleteParser.yy.parseError = function(msg) {
+    hiveAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });
@@ -1046,7 +1046,10 @@ describe('hiveAutocompleteParser.js INSERT statements', () => {
             ]
           },
           suggestFunctions: {},
-          suggestIdentifiers: [{ name: 'S.', type: 'alias' }, { name: 'T.', type: 'alias' }]
+          suggestIdentifiers: [
+            { name: 'S.', type: 'alias' },
+            { name: 'T.', type: 'alias' }
+          ]
         }
       });
     });
@@ -1138,7 +1141,10 @@ describe('hiveAutocompleteParser.js INSERT statements', () => {
               { identifierChain: [{ name: 'tbl' }], alias: 'T' }
             ]
           },
-          suggestIdentifiers: [{ name: 'S.', type: 'alias' }, { name: 'T.', type: 'alias' }]
+          suggestIdentifiers: [
+            { name: 'S.', type: 'alias' },
+            { name: 'T.', type: 'alias' }
+          ]
         }
       });
     });

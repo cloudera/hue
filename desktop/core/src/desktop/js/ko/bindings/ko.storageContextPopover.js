@@ -40,11 +40,11 @@ import huePubSub from 'utils/huePubSub';
  * @type {{init: ko.bindingHandlers.storageContextPopover.init}}
  */
 ko.bindingHandlers.storageContextPopover = {
-  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     ko.bindingHandlers.click.init(
       element,
       () => {
-        return function() {
+        return function () {
           const options = valueAccessor();
           AssistStorageEntry.getEntry(options.path, options.type).done(entry => {
             const $source = $(element);

@@ -41,7 +41,7 @@ const TYPE_MAP = {
 };
 
 ko.bindingHandlers.documentChooser = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const options = valueAccessor();
     let type = 'query-hive';
 
@@ -63,7 +63,7 @@ ko.bindingHandlers.documentChooser = {
       preload: true,
       dropdownParent: 'body',
       render: {
-        option: function(item, escape) {
+        option: function (item, escape) {
           return (
             '<div>' +
             '<strong>' +
@@ -76,7 +76,7 @@ ko.bindingHandlers.documentChooser = {
           );
         }
       },
-      load: function(query, callback) {
+      load: function (query, callback) {
         if (query === '' && options.value && !firstLoad) {
           firstLoad = true;
         }
@@ -85,12 +85,12 @@ ko.bindingHandlers.documentChooser = {
           text: query,
           include_trashed: false,
           limit: 100,
-          successCallback: function(data) {
+          successCallback: function (data) {
             callback(data.documents);
           }
         });
       },
-      onChange: function(val) {
+      onChange: function (val) {
         if (options.value) {
           options.value(val);
         }
@@ -101,7 +101,7 @@ ko.bindingHandlers.documentChooser = {
           options.mappedDocument(ko.mapping.fromJS(this.options[val]));
         }
       },
-      onLoad: function() {
+      onLoad: function () {
         if (options.value) {
           this.setValue(options.value());
         }
@@ -112,7 +112,7 @@ ko.bindingHandlers.documentChooser = {
     });
   },
 
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const options = valueAccessor();
     if (options.value) {
       element.selectize.setValue(options.value());

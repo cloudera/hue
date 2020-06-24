@@ -24,11 +24,9 @@ describe('ko.performanceGraph.js', () => {
   const setup = koSetup();
 
   it('should render component', async () => {
-    jest.spyOn(ApiHelper, 'fetchResourceStats').mockImplementation(() =>
-      $.Deferred()
-        .reject()
-        .promise()
-    );
+    jest
+      .spyOn(ApiHelper, 'fetchResourceStats')
+      .mockImplementation(() => $.Deferred().reject().promise());
 
     const element = await setup.renderComponent(NAME, {});
 

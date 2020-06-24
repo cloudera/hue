@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.oneClickSelect = {
-  init: function(element) {
+  init: function (element) {
     $(element).click(() => {
       if (document.selection) {
         const range = document.body.createTextRange();

@@ -237,31 +237,31 @@ describe('AutocompleteResults.js', () => {
       autocompleteSettings: {
         temporaryOnly: false
       },
-      type: function() {
+      type: function () {
         return 'hive';
       },
-      connector: function() {
+      connector: function () {
         return { id: 'hive', dialect: 'hive' };
       },
-      database: function() {
+      database: function () {
         return 'default';
       },
-      namespace: function() {
+      namespace: function () {
         return { id: 'defaultNamespace' };
       },
-      compute: function() {
+      compute: function () {
         return { id: 'defaultCompute' };
       },
-      whenContextSet: function() {
+      whenContextSet: function () {
         return $.Deferred().resolve();
       }
     },
-    editor: function() {
+    editor: function () {
       return {
-        getTextBeforeCursor: function() {
+        getTextBeforeCursor: function () {
           return 'foo';
         },
-        getTextAfterCursor: function() {
+        getTextAfterCursor: function () {
           return 'bar';
         }
       };
@@ -316,7 +316,10 @@ describe('AutocompleteResults.js', () => {
     expect(subject.filtered().length).toBe(0);
     subject.update({
       lowerCase: true,
-      suggestKeywords: [{ value: 'BAR', weight: 1 }, { value: 'FOO', weight: 2 }]
+      suggestKeywords: [
+        { value: 'BAR', weight: 1 },
+        { value: 'FOO', weight: 2 }
+      ]
     });
 
     expect(subject.filtered().length).toBe(2);
@@ -333,7 +336,10 @@ describe('AutocompleteResults.js', () => {
     expect(subject.filtered().length).toBe(0);
     subject.update({
       lowerCase: false,
-      suggestIdentifiers: [{ name: 'foo', type: 'alias' }, { name: 'bar', type: 'table' }]
+      suggestIdentifiers: [
+        { name: 'foo', type: 'alias' },
+        { name: 'bar', type: 'table' }
+      ]
     });
 
     expect(subject.filtered().length).toBe(2);
@@ -348,15 +354,16 @@ describe('AutocompleteResults.js', () => {
     subject.entries([]);
 
     const spy = spyOn(sqlReferenceRepository, 'getUdfsWithReturnTypes').and.callFake(async () =>
-      Promise.resolve({
-        count: {
+      Promise.resolve([
+        {
+          name: 'count',
           returnTypes: ['BIGINT'],
           arguments: [[{ type: 'T' }]],
           signature: 'count(col)',
           draggable: 'count()',
           description: 'some desc'
         }
-      })
+      ])
     );
 
     expect(subject.filtered().length).toBe(0);
@@ -374,6 +381,32 @@ describe('AutocompleteResults.js', () => {
     expect(subject.filtered()[0].details.arguments).toBeDefined();
     expect(subject.filtered()[0].details.signature).toBeDefined();
     expect(subject.filtered()[0].details.description).toBeDefined();
+  });
+
+  it('should handle parse results with udf argument keywords', async () => {
+    subject.entries([]);
+
+    const spy = spyOn(sqlReferenceRepository, 'getArgumentDetailsForUdf').and.callFake(async () =>
+      Promise.resolve([{ type: 'T', keywords: ['a', 'b'] }])
+    );
+
+    expect(subject.filtered().length).toBe(0);
+
+    await subject.update({
+      lowerCase: false,
+      udfArgument: {
+        name: 'someudf',
+        position: 1
+      }
+    });
+
+    await defer();
+
+    expect(spy).toHaveBeenCalled();
+
+    expect(subject.filtered().length).toEqual(2);
+    expect(subject.filtered()[0].value).toEqual('a');
+    expect(subject.filtered()[1].value).toEqual('b');
   });
 
   it('should handle parse results set options', async () => {

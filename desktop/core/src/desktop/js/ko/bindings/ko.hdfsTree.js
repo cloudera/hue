@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.hdfsTree = {
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const options = ko.unwrap(valueAccessor());
     const $element = $(element);
 
@@ -30,7 +30,7 @@ ko.bindingHandlers.hdfsTree = {
       root: options.root,
       initialPath: options.path,
       withTopPadding: false,
-      onPathChange: function(path) {
+      onPathChange: function (path) {
         options.selectedPath(path);
       }
     });

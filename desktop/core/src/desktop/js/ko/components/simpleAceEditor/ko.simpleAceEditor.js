@@ -142,11 +142,9 @@ class SimpleAceEditor {
             last_column: editor.getValue().length
           }
         }),
-        whenContextSet: function() {
-          const promise = $.Deferred()
-            .resolve()
-            .promise();
-          promise.dispose = function() {};
+        whenContextSet: function () {
+          const promise = $.Deferred().resolve().promise();
+          promise.dispose = function () {};
           return promise;
         },
         isSqlDialect: ko.observable(connector.is_sql),
@@ -154,7 +152,7 @@ class SimpleAceEditor {
         inFocus: ko.observable()
       };
 
-      if (connector.is_sql) {
+      if (connector.is_sql && !params.disableWorkers) {
         sqlWorkerHandler.registerWorkers();
         const aceLocationHandler = new AceLocationHandler({
           editor: editor,
@@ -187,7 +185,7 @@ class SimpleAceEditor {
       });
 
       const autocompleteArgs = {
-        editor: function() {
+        editor: function () {
           return editor;
         },
         snippet: snippet,
@@ -236,7 +234,7 @@ class SimpleAceEditor {
     }
 
     if (params.singleLine) {
-      editor.renderer.screenToTextCoordinates = function(x, y) {
+      editor.renderer.screenToTextCoordinates = function (x, y) {
         const pos = this.pixelToScreenCoordinates(x, y);
         return this.session.screenToDocumentPosition(
           Math.min(this.session.getScreenLength() - 1, Math.max(pos.row, 0)),
@@ -375,7 +373,7 @@ class SimpleAceEditor {
 componentUtils.registerComponent(
   NAME,
   {
-    createViewModel: function(params, componentInfo) {
+    createViewModel: function (params, componentInfo) {
       return new SimpleAceEditor(params, componentInfo.element);
     }
   },
@@ -385,7 +383,7 @@ componentUtils.registerComponent(
 componentUtils.registerComponent(
   MULTI_NAME,
   {
-    createViewModel: function(params, componentInfo) {
+    createViewModel: function (params, componentInfo) {
       return new SimpleAceEditor(params, componentInfo.element);
     }
   },

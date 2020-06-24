@@ -153,12 +153,7 @@ const parseDocElement = (
       domElement = domElement.node('tr');
       break;
     case 'entry':
-      if (
-        docElement
-          .parent()
-          .name()
-          .toLowerCase() === 'row'
-      ) {
+      if (docElement.parent().name().toLowerCase() === 'row') {
         domElement = domElement.node('td');
       } else {
         console.log(

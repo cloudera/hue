@@ -215,6 +215,7 @@ install-env:
 	cp $(ROOT)/package.json $(INSTALL_DIR)
 	cp $(ROOT)/webpack.config*.js $(INSTALL_DIR)
 	cp $(ROOT)/.babelrc $(INSTALL_DIR)
+	cp $(ROOT)/tsconfig.json $(INSTALL_DIR)
 	$(MAKE) -C $(INSTALL_DIR) npm-install
 	@if [ "$(MAKECMDGOALS)" = "install" ]; then \
 	  $(MAKE) -C $(INSTALL_DIR) create-static; \

@@ -113,7 +113,7 @@ def is_selected(section, matcher):
           $el.closest('.control-group').addClass('error');
           var html = '<span class="help-inline"><ul class="errorlist">';
           e.message.forEach(function (message) {
-            html += '<li>' + message + '</li>';
+            html += '<li>' + hueUtils.escapeOutput(message) + '</li>';
           });
           html += '</ul></span>';
           $el.after(html);

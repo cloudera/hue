@@ -20,7 +20,7 @@
 
 import jQuery from 'jquery';
 
-jQuery.uaMatch = function(ua) {
+jQuery.uaMatch = function (ua) {
   ua = ua.toLowerCase();
 
   const match =
@@ -61,7 +61,7 @@ if (!jQuery.browser) {
 if (!jQuery.clean) {
   const rscriptType = /\/(java|ecma)script/i;
 
-  jQuery.clean = function(elems, context, fragment, scripts) {
+  jQuery.clean = function (elems, context, fragment, scripts) {
     // Set context per 1.8 logic
     context = context || document;
     context = (!context.nodeType && context[0]) || context;
@@ -76,7 +76,7 @@ if (!jQuery.clean) {
     // Complex logic lifted directly from jQuery 1.8
     if (fragment) {
       // Special handling of each script element
-      handleScript = function(elem) {
+      handleScript = function (elem) {
         // Check if we consider it executable
         if (!elem.type || rscriptType.test(elem.type)) {
           // Detach the script and store it in the scripts array (if provided) or the fragment
@@ -113,6 +113,6 @@ if (!jQuery.clean) {
 
 const oldSelf = jQuery.fn.andSelf || jQuery.fn.addBack;
 
-jQuery.fn.andSelf = function() {
+jQuery.fn.andSelf = function () {
   return oldSelf.apply(this, arguments);
 };

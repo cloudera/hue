@@ -94,7 +94,7 @@ ko.bindingHandlers.dateRangePicker = {
   ],
   EXTRA_INTERVAL_OPTIONS: [],
 
-  init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+  init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
     const DATE_FORMAT = 'YYYY-MM-DD';
     const TIME_FORMAT = 'HH:mm:ss';
     const DATETIME_FORMAT = DATE_FORMAT + ' ' + TIME_FORMAT;
@@ -336,31 +336,15 @@ ko.bindingHandlers.dateRangePicker = {
 
     _tmpl.find('.start-date-custom').on('change', () => {
       _options.min(_tmpl.find('.start-date-custom').val());
-      _tmpl.find('.start-date').val(
-        moment(_options.min())
-          .utc()
-          .format(DATE_FORMAT)
-      );
-      _tmpl.find('.start-time').val(
-        moment(_options.min())
-          .utc()
-          .format(TIME_FORMAT)
-      );
+      _tmpl.find('.start-date').val(moment(_options.min()).utc().format(DATE_FORMAT));
+      _tmpl.find('.start-time').val(moment(_options.min()).utc().format(TIME_FORMAT));
       _options.start(_options.min());
     });
 
     _tmpl.find('.end-date-custom').on('change', () => {
       _options.max(_tmpl.find('.end-date-custom').val());
-      _tmpl.find('.end-date').val(
-        moment(_options.max())
-          .utc()
-          .format(DATE_FORMAT)
-      );
-      _tmpl.find('.end-time').val(
-        moment(_options.max())
-          .utc()
-          .format(TIME_FORMAT)
-      );
+      _tmpl.find('.end-date').val(moment(_options.max()).utc().format(DATE_FORMAT));
+      _tmpl.find('.end-time').val(moment(_options.max()).utc().format(TIME_FORMAT));
       _options.end(_options.max());
     });
 
@@ -437,10 +421,7 @@ ko.bindingHandlers.dateRangePicker = {
         } else {
           if (_tmpl.find('.end-date').val() === _tmpl.find('.start-date').val()) {
             _tmpl.find('.end-time').val(startDate.utc().format(TIME_FORMAT));
-            _tmpl
-              .find('.end-time')
-              .data('timepicker')
-              .setValues(startDate.format(TIME_FORMAT));
+            _tmpl.find('.end-time').data('timepicker').setValues(startDate.format(TIME_FORMAT));
           } else {
             _tmpl.find('.end-date').val(_tmpl.find('.end-date').data('original-val'));
             _tmpl

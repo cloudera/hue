@@ -19,7 +19,7 @@ import calciteAutocompleteParser from '../calciteAutocompleteParser';
 // prettier-ignore-start
 describe('calciteAutocompleteParser.js locations', () => {
   beforeAll(() => {
-    calciteAutocompleteParser.yy.parseError = function(msg) {
+    calciteAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });
@@ -35,7 +35,7 @@ describe('calciteAutocompleteParser.js locations', () => {
     ).toEqualDefinition(testDefinition);
   };
 
-  const assertLocations = function(options) {
+  const assertLocations = function (options) {
     assertAutoComplete({
       beforeCursor: options.beforeCursor,
       afterCursor: options.afterCursor || '',

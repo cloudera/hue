@@ -18,13 +18,13 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 ko.bindingHandlers.typeahead = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const elem = $(element);
     const options = valueAccessor();
 
     let source = options.nonBindableSource
       ? options.nonBindableSource
-      : function() {
+      : function () {
           let _source = ko.utils.unwrapObservable(valueAccessor.source);
           if (options.extraKeywords) {
             _source = _source.concat(options.extraKeywords.split(' '));
@@ -48,7 +48,7 @@ ko.bindingHandlers.typeahead = {
 
     const _options = {
       source: source,
-      onselect: function(val) {
+      onselect: function (val) {
         if (typeof options.target == 'function') {
           options.target(val);
         } else {
@@ -90,7 +90,7 @@ ko.bindingHandlers.typeahead = {
         });
       };
 
-      _options.updater = function(item) {
+      _options.updater = function (item) {
         const _val = this.$element.val();
         let _separator =
           typeof options.multipleValuesSeparator == 'undefined' ||
@@ -125,7 +125,7 @@ ko.bindingHandlers.typeahead = {
         }
       };
 
-      _options.matcher = function(item) {
+      _options.matcher = function (item) {
         updateExtractors();
         const _tquery = extractor(this.query, _extractorFound);
         if (!_tquery) {
@@ -134,7 +134,7 @@ ko.bindingHandlers.typeahead = {
         return ~item.toLowerCase().indexOf(_tquery.toLowerCase());
       };
 
-      _options.highlighter = function(item) {
+      _options.highlighter = function (item) {
         updateExtractors();
         const _query = extractor(this.query, _extractorFound).replace(
           /[\-\[\]{}()*+?.:\\\^$|#\s]/g,
@@ -196,7 +196,7 @@ ko.bindingHandlers.typeahead = {
       }
     });
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const elem = $(element);
     const options = valueAccessor();
     if (typeof options.completeSolrRanges === 'undefined') {
@@ -207,7 +207,7 @@ ko.bindingHandlers.typeahead = {
       }
     }
     if (options.forceUpdateSource) {
-      element.typeahead.data('typeahead').source = function() {
+      element.typeahead.data('typeahead').source = function () {
         let _source = ko.utils.unwrapObservable(options.source);
         if (options.extraKeywords) {
           _source = _source.concat(options.extraKeywords.split(' '));

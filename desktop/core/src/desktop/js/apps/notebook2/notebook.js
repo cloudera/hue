@@ -364,9 +364,7 @@ export default class Notebook {
 
           if (
             this.snippets()[0].downloadResultViewModel &&
-            this.snippets()[0]
-              .downloadResultViewModel()
-              .saveTarget() === 'dashboard'
+            this.snippets()[0].downloadResultViewModel().saveTarget() === 'dashboard'
           ) {
             huePubSub.publish(
               'open.link',

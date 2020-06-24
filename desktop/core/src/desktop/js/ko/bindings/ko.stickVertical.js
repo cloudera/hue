@@ -11,7 +11,7 @@ import * as ko from 'knockout';
  * @type {{init: ko.bindingHandlers.stickVertical.init}}
  */
 ko.bindingHandlers.stickVertical = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     const options = valueAccessor() || {};
 
     const $scrollContainer = $(options.scrollContainer || window);

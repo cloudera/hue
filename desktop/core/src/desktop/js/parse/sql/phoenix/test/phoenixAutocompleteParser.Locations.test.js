@@ -19,7 +19,7 @@ import phoenixAutocompleteParser from '../phoenixAutocompleteParser';
 // prettier-ignore-start
 describe('phoenixAutocompleteParser.js locations', () => {
   beforeAll(() => {
-    phoenixAutocompleteParser.yy.parseError = function(msg) {
+    phoenixAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
     };
   });
@@ -35,7 +35,7 @@ describe('phoenixAutocompleteParser.js locations', () => {
     ).toEqualDefinition(testDefinition);
   };
 
-  const assertLocations = function(options) {
+  const assertLocations = function (options) {
     assertAutoComplete({
       beforeCursor: options.beforeCursor,
       afterCursor: options.afterCursor || '',

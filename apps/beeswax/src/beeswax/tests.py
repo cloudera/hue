@@ -158,6 +158,7 @@ INFO  : OK"""
 
   def test_install_examples(self):
     with patch('beeswax.management.commands.beeswax_install_examples.Command') as Command:
+      grant_access("test_hive", "default", "beeswax")
       resp = self.client.get('/beeswax/install_examples')
       assert_true('POST request is required.' in json.loads(resp.content)['message'])
 
@@ -1762,7 +1763,8 @@ for x in sys.stdin:
 
     history = beeswax.models.QueryHistory.objects.latest('id')
     assert_equal('beeswax', history.server_name)
-    assert_equal(HIVE_SERVER_HOST.get(), history.server_host)
+    assert_true(history.server_host in [HIVE_SERVER_HOST.get(), 'localhost'])
+
 
     query_server = history.get_query_server_config()
     assert_equal('beeswax', query_server['server_name'])
@@ -1934,7 +1936,8 @@ for x in sys.stdin:
       # Retrieve stats before analyze
       resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': self.db_name, 'table': 'test'}))
       stats = json.loads(resp.content)['stats']
-      assert_true(any([stat for stat in stats if stat['data_type'] == 'numRows' and stat['comment'] == '0']), resp.content)
+      assert_true(any([stat for stat in stats if stat['data_type'] == 'numFiles' and stat['comment'] == '1']), resp.content)
+
 
       resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo'}))
       stats = json.loads(resp.content)['stats']

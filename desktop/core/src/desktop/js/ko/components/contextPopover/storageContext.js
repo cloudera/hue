@@ -52,7 +52,7 @@ class StorageContext {
           originalType: currentEntry.originalType,
           isActive: currentEntry === self.storageEntry(),
           storageEntry: currentEntry,
-          makeActive: function() {
+          makeActive: function () {
             self.storageEntry(this.storageEntry);
           }
         });

@@ -20,23 +20,15 @@ import * as ko from 'knockout';
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.templatePopover = {
-  init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+  init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
     const options = ko.unwrap(valueAccessor());
 
     const clickTrigger = options.trigger === 'click';
     let $container = $('#popover-container');
     if (!$container.length) {
-      $container = $('<div>')
-        .attr('id', 'popover-container')
-        .appendTo('body');
-      $('<div>')
-        .addClass('temp-content')
-        .hide()
-        .appendTo($container);
-      $('<div>')
-        .addClass('temp-title')
-        .hide()
-        .appendTo($container);
+      $container = $('<div>').attr('id', 'popover-container').appendTo('body');
+      $('<div>').addClass('temp-content').hide().appendTo($container);
+      $('<div>').addClass('temp-title').hide().appendTo($container);
     }
 
     const $content = $container.find('.temp-content');
@@ -50,7 +42,7 @@ ko.bindingHandlers.templatePopover = {
 
     let trackElementInterval = -1;
 
-    const hidePopover = function() {
+    const hidePopover = function () {
       if (visible()) {
         window.clearInterval(trackElementInterval);
         $element.popover('hide');
@@ -61,7 +53,7 @@ ko.bindingHandlers.templatePopover = {
 
     const closeSub = huePubSub.subscribe('close.popover', hidePopover);
 
-    const hideOnClickOutside = function(event) {
+    const hideOnClickOutside = function (event) {
       if (
         visible() &&
         $element.data('popover') &&
@@ -78,7 +70,7 @@ ko.bindingHandlers.templatePopover = {
       closeSub.remove();
     });
 
-    const afterRender = function() {
+    const afterRender = function () {
       options.content = $content.html();
       options.title = $title.html();
       let triggerTitle;
@@ -146,7 +138,7 @@ ko.bindingHandlers.templatePopover = {
       visible(true);
     };
 
-    const showPopover = function(preventClose) {
+    const showPopover = function (preventClose) {
       if (!preventClose) {
         huePubSub.publish('close.popover');
       }
@@ -154,13 +146,13 @@ ko.bindingHandlers.templatePopover = {
         options.contentTemplate,
         viewModel,
         {
-          afterRender: function() {
+          afterRender: function () {
             if (options.titleTemplate) {
               ko.renderTemplate(
                 options.titleTemplate,
                 viewModel,
                 {
-                  afterRender: function() {
+                  afterRender: function () {
                     afterRender();
                   }
                 },

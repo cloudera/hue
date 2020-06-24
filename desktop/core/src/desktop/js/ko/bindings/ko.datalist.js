@@ -18,7 +18,7 @@ import * as ko from 'knockout';
 
 // https://stackoverflow.com/questions/19865364/knockoutjs-linking-value-from-a-input-to-a-datalist-value
 
-ko.bindingHandlers.datalist = (function() {
+ko.bindingHandlers.datalist = (function () {
   function getVal(rawItem, prop) {
     const item = ko.unwrap(rawItem);
     return item && prop ? ko.unwrap(item[prop]) : item;
@@ -31,7 +31,7 @@ ko.bindingHandlers.datalist = (function() {
   }
 
   return {
-    init: function(element, valueAccessor, allBindingsAccessor) {
+    init: function (element, valueAccessor, allBindingsAccessor) {
       const setup = valueAccessor(),
         textProperty = ko.unwrap(setup.optionsText),
         valueProperty = ko.unwrap(setup.optionsValue),
@@ -65,7 +65,7 @@ ko.bindingHandlers.datalist = (function() {
         });
       } else {
         const event = allBindingsAccessor().valueUpdate === 'afterkeydown' ? 'input' : 'change';
-        ko.utils.registerEventHandler(element, event, function() {
+        ko.utils.registerEventHandler(element, event, function () {
           onNewValue(this.value);
         });
       }
@@ -79,7 +79,7 @@ ko.bindingHandlers.datalist = (function() {
         onNewValue(koValue());
       }
     },
-    update: function(element, valueAccessor) {
+    update: function (element, valueAccessor) {
       const setup = valueAccessor(),
         datalist = element.list,
         dataItems = ko.unwrap(setup.options),

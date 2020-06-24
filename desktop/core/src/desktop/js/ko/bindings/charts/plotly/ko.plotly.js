@@ -50,7 +50,7 @@ const PLOTLY_COMMON_OPTIONS = {
 };
 
 function resizeHandlers(element) {
-  const resizeEvent = function() {
+  const resizeEvent = function () {
     try {
       if ($(element).is(':visible')) {
         Plotly.Plots.resize(element);
@@ -73,10 +73,10 @@ function eventEmitterSetup(element) {
 }
 
 ko.bindingHandlers.pieChart = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     resizeHandlers(element);
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     const options = valueAccessor();
     window.clearTimeout(element.plotterTimeout);
     element.plotterTimeout = window.setTimeout(() => {
@@ -121,61 +121,61 @@ function basicChartBuilder(element, valueAccessor, chartType) {
 }
 
 ko.bindingHandlers.basicChart = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     resizeHandlers(element);
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     basicChartBuilder(element, valueAccessor);
   }
 };
 
 ko.bindingHandlers.barChart = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     resizeHandlers(element);
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     basicChartBuilder(element, valueAccessor, 'bar');
   }
 };
 
 ko.bindingHandlers.timelineChart = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     resizeHandlers(element);
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     basicChartBuilder(element, valueAccessor, 'scatter');
   }
 };
 
 ko.bindingHandlers.lineChart = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     resizeHandlers(element);
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     basicChartBuilder(element, valueAccessor, 'scatter');
   }
 };
 
 ko.bindingHandlers.mapChart = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     $(element).html('To-do.');
   },
-  update: function(element, valueAccessor, allBindingsAccessor) {
+  update: function (element, valueAccessor, allBindingsAccessor) {
     $(element).html('To-do.');
   }
 };
 
 ko.bindingHandlers.scatterChart = {
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     $(element).html('To-do.');
   }
 };
 
 ko.bindingHandlers.partitionChart = {
-  init: function(element, valueAccessor) {
+  init: function (element, valueAccessor) {
     $(element).html('To-do.');
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     $(element).html('To-do.');
   }
 };

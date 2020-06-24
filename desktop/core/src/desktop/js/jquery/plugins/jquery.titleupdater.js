@@ -34,11 +34,11 @@ function Plugin(options) {
   this.updateStatusBar();
 }
 
-Plugin.prototype.setOptions = function(options) {
+Plugin.prototype.setOptions = function (options) {
   this.options = $.extend({}, defaults, options);
 };
 
-Plugin.prototype.updateStatusBar = function() {
+Plugin.prototype.updateStatusBar = function () {
   const _this = this;
   if (_this.options.reset && $(document).data('jHueTitleUpdaterOriginal') != null) {
     document.title = $(document).data('jHueTitleUpdaterOriginal');
@@ -51,12 +51,12 @@ Plugin.prototype.updateStatusBar = function() {
   }
 };
 
-$[pluginName] = function() {};
+$[pluginName] = function () {};
 
-$[pluginName].reset = function() {
+$[pluginName].reset = function () {
   new Plugin({ reset: true });
 };
 
-$[pluginName].set = function(message) {
+$[pluginName].set = function (message) {
   new Plugin({ message: message });
 };

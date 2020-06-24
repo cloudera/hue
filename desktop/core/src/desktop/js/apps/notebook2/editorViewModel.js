@@ -99,9 +99,7 @@ class EditorViewModel {
       () =>
         this.selectedNotebook() &&
         this.selectedNotebook().snippets().length === 1 &&
-        this.selectedNotebook()
-          .snippets()[0]
-          .isSqlDialect()
+        this.selectedNotebook().snippets()[0].isSqlDialect()
     );
     this.isResultFullScreenMode = ko.observable(false);
     this.isPresentationMode = ko.pureComputed(

@@ -41,11 +41,11 @@ function Plugin(options) {
   this.show();
 }
 
-Plugin.prototype.setOptions = function(options) {
+Plugin.prototype.setOptions = function (options) {
   this.options = $.extend({}, defaults, options);
 };
 
-Plugin.prototype.show = function() {
+Plugin.prototype.show = function () {
   const _this = this;
   const MARGIN = 4;
 
@@ -53,9 +53,7 @@ Plugin.prototype.show = function() {
 
   if (
     _this.options.message !== '' &&
-    $('.jHueNotify .message')
-      .last()
-      .text() !== _this.options.message
+    $('.jHueNotify .message').last().text() !== _this.options.message
   ) {
     const el = $('#jHueNotify').clone();
     el.removeAttr('id');
@@ -65,20 +63,10 @@ Plugin.prototype.show = function() {
     el.attr('class', 'alert jHueNotify');
     el.find('.close').hide();
 
-    if (
-      $('.jHueNotify')
-        .last()
-        .position() != null
-    ) {
+    if ($('.jHueNotify').last().position() != null) {
       el.css(
         'top',
-        $('.jHueNotify')
-          .last()
-          .position().top +
-          $('.jHueNotify')
-            .last()
-            .outerHeight() +
-          MARGIN
+        $('.jHueNotify').last().position().top + $('.jHueNotify').last().outerHeight() + MARGIN
       );
     }
 
@@ -122,7 +110,7 @@ Plugin.prototype.show = function() {
         );
         el.remove();
       }, 3000);
-      el.click(function() {
+      el.click(function () {
         window.clearTimeout(t);
         $(this).stop(true);
         $(this).fadeOut();
@@ -141,20 +129,20 @@ Plugin.prototype.show = function() {
   }
 };
 
-$[pluginName] = function() {};
+$[pluginName] = function () {};
 
-$[pluginName].info = function(message) {
+$[pluginName].info = function (message) {
   new Plugin({ level: TYPES.INFO, message: message });
 };
 
-$[pluginName].warn = function(message) {
+$[pluginName].warn = function (message) {
   new Plugin({ level: TYPES.GENERAL, message: message, sticky: true });
 };
 
-$[pluginName].error = function(message) {
+$[pluginName].error = function (message) {
   new Plugin({ level: TYPES.ERROR, message: message, sticky: true });
 };
 
-$[pluginName].notify = function(options) {
+$[pluginName].notify = function (options) {
   new Plugin(options);
 };

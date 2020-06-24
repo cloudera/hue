@@ -66,8 +66,7 @@ from string import Template
 from django.core.cache import caches
 from django.utils.translation import ugettext as _
 from sqlalchemy import create_engine, inspect, Table, MetaData
-from sqlalchemy.exc import OperationalError
-from sqlalchemy.types import NullType
+from sqlalchemy.exc import OperationalError, UnsupportedCompilationError, CompileError
 
 from desktop.lib import export_csvxls
 from desktop.lib.i18n import force_unicode
@@ -342,7 +341,11 @@ class SqlAlchemyApi(Api):
     assist = Assist(inspector, engine, backticks=self.backticks)
     response = {'status': -1}
 
-    if database is None:
+    if operation == 'functions':
+      response['functions'] = []
+    elif operation == 'function':
+      response['function'] = {}
+    elif database is None:
       response['databases'] = [db or 'NULL' for db in assist.get_databases()]
     elif table is None:
       tables_meta = []
@@ -362,7 +365,7 @@ class SqlAlchemyApi(Api):
           'default': col.get('default'),
           'name': col.get('name'),
           'nullable': col.get('nullable'),
-          'type': str(col.get('type')) if not isinstance(col.get('type'), NullType) else 'Null',
+          'type': self._get_column_type_name(col),
         }
         for col in columns
       ]
@@ -393,7 +396,7 @@ class SqlAlchemyApi(Api):
       columns = assist.get_columns(database, table)
       response['full_headers'] = [{
           'name': col.get('name'),
-          'type': str(col.get('type')) if not isinstance(col.get('type'), NullType) else 'Null',
+          'type': self._get_column_type_name(col),
           'comment': ''
         } for col in columns
       ]
@@ -420,13 +423,22 @@ class SqlAlchemyApi(Api):
     })
 
 
+  def _get_column_type_name(self, col):
+    try:
+      name = str(col.get('type'))
+    except (UnsupportedCompilationError, CompileError):
+      name = col.get('type').__visit_name__.lower()
+
+    return name
+
+
   def _fix_phoenix_empty_database(self, database):
     return None if self.options['url'].startswith('phoenix://') and database == 'NULL' else database
 
 
   def _fix_bigquery_db_prefixes(self, table_or_column):
     if self.options['url'].startswith('bigquery://'):
-      table_or_column = table_or_column.rsplit('.', 1)[1]
+      table_or_column = table_or_column.rsplit('.', 1)[-1]
     return table_or_column
 
 

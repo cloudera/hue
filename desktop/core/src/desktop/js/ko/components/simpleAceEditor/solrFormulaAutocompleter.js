@@ -520,7 +520,7 @@ class SolrFormulaSuggestions {
 
     self.loading = ko.observable(false);
     self.filter = ko.observable();
-    self.cancelRequests = function() {};
+    self.cancelRequests = function () {};
   }
 
   update(parseResult) {

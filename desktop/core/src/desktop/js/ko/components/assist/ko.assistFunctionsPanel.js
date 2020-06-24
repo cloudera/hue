@@ -23,8 +23,10 @@ import I18n from 'utils/i18n';
 import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'utils/hueConfig';
 import {
   CLEAR_UDF_CACHE_EVENT,
+  DESCRIBE_UDF_EVENT,
   getUdfCategories,
-  hasUdfCategories
+  hasUdfCategories,
+  UDF_DESCRIBED_EVENT
 } from 'sql/reference/sqlReferenceRepository';
 import { HUE_DROP_DOWN_COMPONENT } from 'ko/components/ko.dropDown';
 
@@ -98,10 +100,13 @@ const TEMPLATE = `
           </div>
           <!-- ko if: selectedFunction -->
             <div class="assist-flex-half assist-function-details" data-bind="with: selectedFunction">
+              <!-- ko hueSpinner: { spin: !loaded(), center: true, size: 'large' } --><!-- /ko -->
+              <!-- ko if: loaded -->
               <div class="assist-panel-close"><button class="close" data-bind="click: function() { $parent.selectedFunction(null); }">&times;</button></div>
               <div class="assist-function-signature blue" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, text: signature, event: { 'dblclick': function () { huePubSub.publish('editor.insert.at.cursor', { text: draggable }); } }"></div>
               <!-- ko if: description -->
               <div data-bind="html: descriptionMatch"></div>
+              <!-- /ko -->
               <!-- /ko -->
             </div>
           <!-- /ko -->
@@ -125,9 +130,36 @@ class ConnectorUdfCategories {
 
     this.selectedFunction = ko.observable();
 
-    this.selectedFunction.subscribe(newFunction => {
-      if (newFunction && !newFunction.category.open()) {
-        newFunction.category.open(true);
+    this.selectedFunction.subscribe(selectedUdf => {
+      if (selectedUdf) {
+        if (!selectedUdf.category.open()) {
+          selectedUdf.category.open(true);
+        }
+        if (!selectedUdf.loaded()) {
+          huePubSub.publish(DESCRIBE_UDF_EVENT, {
+            connector: this.connector,
+            udfName: selectedUdf.name
+          });
+        }
+      }
+    });
+
+    huePubSub.subscribe(UDF_DESCRIBED_EVENT, details => {
+      // TODO: Show UDFs from databases in the assist functions panel
+      if (!details.database && details.connector.id === this.connector.id) {
+        this.categories().some(category =>
+          category.functions.some(udf => {
+            if (udf.name === details.udf.name) {
+              udf.loaded(details.udf.described);
+              udf.signature(details.udf.signature);
+              udf.signatureMatch(details.udf.signature);
+              udf.description(details.udf.description);
+              udf.descriptionMatch(details.udf.description);
+              udf.loaded(details.udf.described);
+              return true;
+            }
+          })
+        );
       }
     });
 
@@ -138,7 +170,7 @@ class ConnectorUdfCategories {
       }
       const lowerCaseQuery = this.query().toLowerCase();
       const replaceRegexp = new RegExp('(' + lowerCaseQuery + ')', 'i');
-      this.categories.forEach(category => {
+      this.categories().forEach(category => {
         category.functions.forEach(fn => {
           if (fn.signature.toLowerCase().indexOf(lowerCaseQuery) === 0) {
             fn.weight = 2;
@@ -205,11 +237,13 @@ class ConnectorUdfCategories {
         functions: Object.keys(category.functions).map(key => {
           const fn = category.functions[key];
           return {
+            name: fn.name,
             draggable: fn.draggable,
-            signature: fn.signature,
+            signature: ko.observable(fn.signature),
             signatureMatch: ko.observable(fn.signature),
-            description: fn.description,
-            descriptionMatch: ko.observable(fn.description)
+            description: ko.observable(fn.description),
+            descriptionMatch: ko.observable(fn.description),
+            loaded: ko.observable(fn.described)
           };
         })
       };
