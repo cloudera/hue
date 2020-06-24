@@ -2,7 +2,7 @@
   <div>{{title}}</div>
 </template>
 
-<script>
+<script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component'
   import wrap from '@vue/web-component-wrapper'
@@ -11,7 +11,7 @@
 
   @Component
   export default class HiveQueryPlan extends Vue {
-    title = 'Web Components FTW.';
+    title:string = 'Web Components FTW.';
   }
 
   window.customElements.define(HIVE_QUERY_PLAN_COMPONENT, wrap(Vue, HiveQueryPlan))
