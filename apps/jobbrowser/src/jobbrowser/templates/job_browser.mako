@@ -58,6 +58,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-spinedit.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-slider.css') }">
 
+${ render_bundle('vendors~jobBrowser') | n,unicode }
 ${ render_bundle('jobBrowser') | n,unicode }
 
 <script src="${ static('desktop/ext/js/bootstrap-datepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1807,12 +1808,7 @@ ${ render_bundle('jobBrowser') | n,unicode }
         <!-- ko if: $root.job().mainType() == 'queries-hive' -->
         <div class="tab-pane active" id="queries-page-hive-plan-text${ SUFFIX }" data-profile="plan">
           <!-- ko if: properties.plan && properties.plan().plan -->
-            <!-- ko component: {
-              name: 'hive-query-plan',
-              params: {
-                plan: properties.plan().plan
-              }
-            } --><!-- /ko -->
+            <hive-query-plan></hive-query-plan>
           <!-- /ko -->
         </div>
         <div class="tab-pane" id="queries-page-hive-stmt${ SUFFIX }" data-profile="stmt">
