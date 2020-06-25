@@ -26,7 +26,8 @@ const getStore = (connector: Connector) =>
     name: `HueUdfCatalog_${VERSION}_${connector.id}`
   });
 
-export const clearUdfCache = async (connector: Connector) => await getStore(connector).clear();
+export const clearUdfCache = async (connector: Connector): Promise<void> =>
+  await getStore(connector).clear();
 
 export const getCachedUdfCategories = async (
   connector: Connector,
@@ -37,4 +38,5 @@ export const setCachedUdfCategories = async (
   connector: Connector,
   database: string | undefined,
   categories: UdfCategory[]
-) => await getStore(connector).setItem(database || GLOBAL_UDF_CACHE_KEY, categories);
+): Promise<UdfCategory[]> =>
+  await getStore(connector).setItem(database || GLOBAL_UDF_CACHE_KEY, categories);

@@ -33,18 +33,13 @@ export const DESCRIBE_UDF_EVENT = 'hue.describe.udf';
 export const UDF_DESCRIBED_EVENT = 'hue.udf.described';
 
 const SET_REFS: { [attr: string]: () => Promise<{ SET_OPTIONS?: SetOptions }> } = {
-  // @ts-ignore
   impala: async () => import(/* webpackChunkName: "impala-ref" */ './impala/setReference')
 };
 
 const UDF_REFS: { [attr: string]: () => Promise<{ UDF_CATEGORIES?: UdfCategory[] }> } = {
-  // @ts-ignore
   generic: async () => import(/* webpackChunkName: "generic-ref" */ './generic/udfReference'),
-  // @ts-ignore
   hive: async () => import(/* webpackChunkName: "hive-ref" */ './hive/udfReference'),
-  // @ts-ignore
   impala: async () => import(/* webpackChunkName: "impala-ref" */ './impala/udfReference'),
-  // @ts-ignore
   pig: async () => import(/* webpackChunkName: "pig-ref" */ './pig/udfReference')
 };
 
