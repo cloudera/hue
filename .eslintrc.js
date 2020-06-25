@@ -65,15 +65,26 @@ module.exports = {
     es6: true,
     jasmine: true
   },
-  extends: ['plugin:prettier/recommended'],
+  "overrides": [
+    {
+      "files": ["*.vue"],
+    }
+  ],
+  extends: [
+    'plugin:prettier/recommended',
+    'plugin:vue/vue3-recommended'
+  ],
   globals: globals,
-  parser: 'babel-eslint',
+  parser: "vue-eslint-parser",
   parserOptions: {
+    parser: "babel-eslint",
     ecmaVersion: 2017,
     sourceType: 'module',
-    ecmaFeatures: {}
+    ecmaFeatures: {
+      legacyDecorators: true
+    }
   },
-  plugins: ['jest'],
+  plugins: ['vue', 'jest'],
   rules: {
     'jest/no-focused-tests': 'error',
     'jest/valid-expect': 'error',
