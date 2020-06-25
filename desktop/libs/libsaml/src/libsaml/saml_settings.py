@@ -110,6 +110,7 @@ def config_settings_loader(request):
 
 
 SAML_CONFIG_LOADER = 'libsaml.saml_settings.config_settings_loader'
+SAML_ACS_FAILURE_RESPONSE_FUNCTION = 'desktop.views.serve_403_error'
 
 SAML_ATTRIBUTE_MAPPING = libsaml.conf.USER_ATTRIBUTE_MAPPING.get()
 SAML_CREATE_UNKNOWN_USER = libsaml.conf.CREATE_USERS_ON_LOGIN.get()
