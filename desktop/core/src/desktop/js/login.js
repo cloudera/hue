@@ -33,6 +33,6 @@ window.addEventListener('DOMContentLoaded', () => {
     components: {
       'trademark-banner': TrademarkBanner
     },
-    data: {}
+    data: () => ({})
   });
 });
