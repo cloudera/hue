@@ -16,7 +16,8 @@
 
 import { simplePostAsync } from 'api/apiUtils';
 import { AUTOCOMPLETE_API_PREFIX } from 'api/urls';
-import { Argument, Connector, UdfDetails } from './sqlReferenceRepository';
+import { UdfArgument, UdfDetails } from 'sql/reference/types';
+import { Connector } from 'types';
 import I18n from 'utils/i18n';
 
 export interface ApiUdf {
@@ -25,8 +26,10 @@ export interface ApiUdf {
   is_persistent?: string;
   return_type?: string;
   signature?: string;
+  description?: string;
 }
 
+const FUNCTION_OPERATION = 'function';
 const FUNCTIONS_OPERATION = 'functions';
 const DEFAULT_DESCRIPTION = I18n('No description available.');
 const DEFAULT_RETURN_TYPES = ['T'];
@@ -45,14 +48,15 @@ const adaptApiUdf = (apiUdf: ApiUdf): UdfDetails => {
     arguments: extractArgumentTypes(apiUdf),
     signature: signature,
     draggable: signature,
-    description: DEFAULT_DESCRIPTION
+    description: DEFAULT_DESCRIPTION,
+    described: false
   };
 };
 
 const extractReturnTypes = (apiUdf: ApiUdf): string[] =>
   apiUdf.return_type ? [stripPrecision(apiUdf.return_type)] : DEFAULT_RETURN_TYPES;
 
-export const extractArgumentTypes = (apiUdf: ApiUdf): Argument[][] => {
+export const extractArgumentTypes = (apiUdf: ApiUdf): UdfArgument[][] => {
   if (apiUdf.signature) {
     const cleanSignature = stripPrecision(apiUdf.signature);
     if (cleanSignature === '()') {
@@ -63,7 +67,7 @@ export const extractArgumentTypes = (apiUdf: ApiUdf): Argument[][] => {
       return match.map(argString => {
         const typeMatch = argString.match(TYPE_REGEX);
         if (typeMatch && typeMatch.groups) {
-          const arg: Argument = { type: typeMatch.groups.type };
+          const arg: UdfArgument = { type: typeMatch.groups.type };
           if (typeMatch.groups.multiple) {
             arg.multiple = true;
           }
@@ -77,7 +81,7 @@ export const extractArgumentTypes = (apiUdf: ApiUdf): Argument[][] => {
   return DEFAULT_ARGUMENTS;
 };
 
-export const mergeArgumentTypes = (target: Argument[][], additional: Argument[][]) => {
+export const mergeArgumentTypes = (target: UdfArgument[][], additional: UdfArgument[][]): void => {
   for (let i = 0; i < target.length; i++) {
     if (i >= additional.length) {
       break;
@@ -119,32 +123,57 @@ export const adaptApiFunctions = (functions: ApiUdf[]): UdfDetails[] => {
   return udfs;
 };
 
-export const fetchUdfs = async (options: {
-  connector: Connector;
-  database?: string;
-  silenceErrors: boolean;
-}): Promise<ApiUdf[]> => {
-  let url = AUTOCOMPLETE_API_PREFIX;
-  if (options.database) {
-    url += '/' + options.database;
+const createUrl = (database?: string, udf?: UdfDetails): string => {
+  if (database && udf) {
+    return `${AUTOCOMPLETE_API_PREFIX}${database}/${udf.name}`;
   }
+  if (database) {
+    return `${AUTOCOMPLETE_API_PREFIX}${database}`;
+  }
+  if (udf) {
+    return `${AUTOCOMPLETE_API_PREFIX}${udf.name}`;
+  }
+  return AUTOCOMPLETE_API_PREFIX;
+};
 
-  const data = {
-    notebook: {},
-    snippet: JSON.stringify({
-      type: options.connector.id
-    }),
-    operation: FUNCTIONS_OPERATION
-  };
+const createRequestData = (connector: Connector, operation: string) => ({
+  notebook: {},
+  snippet: JSON.stringify({
+    type: connector.id
+  }),
+  operation: operation
+});
+
+export const fetchUdfs = async (
+  connector: Connector,
+  database?: string,
+  silenceErrors = true
+): Promise<UdfDetails[]> => {
+  const url = createUrl(database);
+  const data = createRequestData(connector, FUNCTIONS_OPERATION);
 
   try {
-    const response = await simplePostAsync(url, data, options);
-
+    const response = await simplePostAsync(url, data, { silenceErrors: silenceErrors });
     if (response && response.functions) {
       return adaptApiFunctions(response.functions);
     }
-    return (response && response.functions) || [];
-  } catch (err) {
-    return [];
-  }
+  } catch (err) {}
+  return [];
+};
+
+export const fetchDescribe = async (
+  connector: Connector,
+  udf: UdfDetails,
+  database?: string,
+  silenceErrors = true
+): Promise<ApiUdf | undefined> => {
+  const url = createUrl(database, udf);
+  const data = createRequestData(connector, FUNCTION_OPERATION);
+
+  try {
+    const response = await simplePostAsync(url, data, { silenceErrors: silenceErrors });
+    if (response && response.function) {
+      return response.function;
+    }
+  } catch (err) {}
 };

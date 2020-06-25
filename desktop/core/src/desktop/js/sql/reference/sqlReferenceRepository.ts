@@ -65,18 +65,13 @@ interface SetDetails {
 export const CLEAR_UDF_CACHE_EVENT = 'hue.clear.udf.cache';
 
 const SET_REFS: { [attr: string]: () => Promise<{ SET_OPTIONS?: SetOptions }> } = {
-  // @ts-ignore
   impala: async () => import(/* webpackChunkName: "impala-ref" */ './impala/setReference')
 };
 
 const UDF_REFS: { [attr: string]: () => Promise<{ UDF_CATEGORIES?: UdfCategory[] }> } = {
-  // @ts-ignore
   generic: async () => import(/* webpackChunkName: "generic-ref" */ './generic/udfReference'),
-  // @ts-ignore
   hive: async () => import(/* webpackChunkName: "hive-ref" */ './hive/udfReference'),
-  // @ts-ignore
   impala: async () => import(/* webpackChunkName: "impala-ref" */ './impala/udfReference'),
-  // @ts-ignore
   pig: async () => import(/* webpackChunkName: "pig-ref" */ './pig/udfReference')
 };
 
