@@ -65,26 +65,36 @@ module.exports = {
     es6: true,
     jasmine: true
   },
-  "overrides": [
+  overrides: [
     {
-      "files": ["*.vue"],
+      files: ['*.vue'],
+      extends: [
+        'plugin:prettier/recommended',
+        'plugin:vue/vue3-recommended',
+        'plugin:@typescript-eslint/recommended'
+      ],
+      parser: 'vue-eslint-parser',
+      plugins: ['vue', '@typescript-eslint']
+    },
+    {
+      files: ['*.ts'],
+      extends: ['plugin:@typescript-eslint/recommended'],
+      parser: '@typescript-eslint/parser',
+      plugins: ['jest', '@typescript-eslint']
     }
   ],
-  extends: [
-    'plugin:prettier/recommended',
-    'plugin:vue/vue3-recommended'
-  ],
+  extends: ['plugin:prettier/recommended'],
   globals: globals,
-  parser: "vue-eslint-parser",
+  parser: 'babel-eslint',
   parserOptions: {
-    parser: "babel-eslint",
+    parser: 'babel-eslint',
     ecmaVersion: 2017,
     sourceType: 'module',
     ecmaFeatures: {
       legacyDecorators: true
     }
   },
-  plugins: ['vue', 'jest'],
+  plugins: ['jest'],
   rules: {
     'jest/no-focused-tests': 'error',
     'jest/valid-expect': 'error',
