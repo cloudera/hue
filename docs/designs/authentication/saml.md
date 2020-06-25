@@ -27,6 +27,12 @@ Note: this solution is hardcoded with the concept of groups. We might want or no
 
 Note: we should contribute back some short `def is_authorized` documentation to https://github.com/knaperek/djangosaml2/ as this would be a neat feature to promote.
 
+## Redirecting on forbidden login
+
+In case of failure to authenticate properly (e.g. bad credentials or user not part of the required groups), we could leverage djangosaml2 property that let us specific a custom error view. In the first iteration this could be the standart server 403 page. We could create a more personalized one if needed.
+
+    SAML_ACS_FAILURE_RESPONSE_FUNCTION = 'desktop.views.serve_403_error'
+
 ## Tests
 
 Add tests (with the help of the Mock module) to check if:
