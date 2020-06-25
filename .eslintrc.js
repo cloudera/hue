@@ -65,13 +65,34 @@ module.exports = {
     es6: true,
     jasmine: true
   },
+  overrides: [
+    {
+      files: ['*.vue'],
+      extends: [
+        'plugin:prettier/recommended',
+        'plugin:vue/vue3-recommended',
+        'plugin:@typescript-eslint/recommended'
+      ],
+      parser: 'vue-eslint-parser',
+      plugins: ['vue', '@typescript-eslint']
+    },
+    {
+      files: ['*.ts'],
+      extends: ['plugin:@typescript-eslint/recommended'],
+      parser: '@typescript-eslint/parser',
+      plugins: ['jest', '@typescript-eslint']
+    }
+  ],
   extends: ['plugin:prettier/recommended'],
   globals: globals,
   parser: 'babel-eslint',
   parserOptions: {
+    parser: 'babel-eslint',
     ecmaVersion: 2017,
     sourceType: 'module',
-    ecmaFeatures: {}
+    ecmaFeatures: {
+      legacyDecorators: true
+    }
   },
   plugins: ['jest'],
   rules: {

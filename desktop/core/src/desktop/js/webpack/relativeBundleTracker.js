@@ -14,21 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import componentUtils from 'ko/components/componentUtils';
-import DisposableComponent from 'ko/components/DisposableComponent';
+const each = require('lodash/fp/each');
+const BundleTracker = require('webpack-bundle-tracker');
+const path = require('path');
 
-export const HIVE_QUERY_PLAN_COMPONENT = 'hive-query-plan';
+// https://github.com/ezhome/webpack-bundle-tracker/issues/25
+class RelativeBundleTracker extends BundleTracker {
+  convertPathChunks(chunks) {
+    each(
+      each(chunk => {
+        chunk.path = path.relative(this.options.path, chunk.path);
+      })
+    )(chunks);
+  }
+  writeOutput(compiler, contents) {
+    if (contents.status === 'done') {
+      this.convertPathChunks(contents.chunks);
+    }
 
-// prettier-ignore
-const TEMPLATE = `
-  <pre data-bind="text: plan"></pre>
-`;
-
-class HiveQueryPlan extends DisposableComponent {
-  constructor(params) {
-    super();
-    this.plan = params.plan;
+    super.writeOutput(compiler, contents);
   }
 }
 
-componentUtils.registerComponent(HIVE_QUERY_PLAN_COMPONENT, HiveQueryPlan, TEMPLATE);
+module.exports = RelativeBundleTracker;

@@ -1,17 +1,15 @@
 <template>
   <div>
-    <slot></slot>
+    <slot />
   </div>
 </template>
 
-<script>
-  export default {
-    data() {
-      return {
-      }
-    },
+<script lang="ts">
+export default {
+  data(): {} {
+    return {};
   }
+};
 </script>
 
-<style lang="less" scoped>
-</style>
+<style lang="less" scoped></style>
