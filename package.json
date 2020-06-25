@@ -34,6 +34,7 @@
     "d3": "5.7.0",
     "d3v3": "1.0.3",
     "dropzone": "5.5.1",
+    "eslint-plugin-vue": "next",
     "filesize": "4.0.0",
     "jquery": "3.5.0",
     "jquery-contextmenu": "^2.9.0",
