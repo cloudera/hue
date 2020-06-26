@@ -1,0 +1,691 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    Loading Columns
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+        <link rel="up" title="Loading Objects" href="loading_objects.html" />
+        <link rel="next" title="Relationship Loading Techniques" href="loading_relationships.html" />
+        <link rel="prev" title="Loading Objects" href="loading_objects.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../contents.html">Contents</a> |
+                <a href="../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="index.html" title="SQLAlchemy ORM">SQLAlchemy ORM</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="tutorial.html">Object Relational Tutorial</a></span></li>
+<li><span class="link-container"><a class="reference external" href="mapper_config.html">Mapper Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="relationships.html">Relationship Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="loading_objects.html">Loading Objects</a></span><ul>
+<li class="selected"><span class="link-container"><strong>Loading Columns</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#deferred-column-loading">Deferred Column Loading</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#deferred-column-loader-query-options">Deferred Column Loader Query Options</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#deferred-loading-across-multiple-entities">Deferred Loading across Multiple Entities</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#load-only-and-wildcard-options">Load Only and Wildcard Options</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#wildcard-and-exclusionary-options-with-multiple-entity-queries">Wildcard and Exclusionary Options with Multiple-Entity Queries</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#column-deferral-api">Column Deferral API</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#column-bundles">Column Bundles</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="loading_relationships.html">Relationship Loading Techniques</a></span></li>
+<li><span class="link-container"><a class="reference external" href="inheritance_loading.html">Loading Inheritance Hierarchies</a></span></li>
+<li><span class="link-container"><a class="reference external" href="constructors.html">Constructors and Object Initialization</a></span></li>
+<li><span class="link-container"><a class="reference external" href="query.html">Query API</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="session.html">Using the Session</a></span></li>
+<li><span class="link-container"><a class="reference external" href="extending.html">Events and Internals</a></span></li>
+<li><span class="link-container"><a class="reference external" href="extensions/index.html">ORM Extensions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="examples.html">ORM Examples</a></span></li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="loading-columns">
+<h1>Loading Columns<a class="headerlink" href="#loading-columns" title="Permalink to this headline">¶</a></h1>
+<p>This section presents additional options regarding the loading of columns.</p>
+<div class="section" id="deferred-column-loading">
+<span id="deferred"></span><h2>Deferred Column Loading<a class="headerlink" href="#deferred-column-loading" title="Permalink to this headline">¶</a></h2>
+<p>Deferred column loading allows particular columns of a table be loaded only
+upon direct access, instead of when the entity is queried using
+<a class="reference internal" href="query.html#sqlalchemy.orm.query.Query" title="sqlalchemy.orm.query.Query"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></a>.  This feature is useful when one wants to avoid
+loading a large text or binary field into memory when it’s not needed.
+Individual columns can be lazy loaded by themselves or placed into groups that
+lazy-load together, using the <a class="reference internal" href="#sqlalchemy.orm.deferred" title="sqlalchemy.orm.deferred"><code class="xref py py-func docutils literal notranslate"><span class="pre">deferred()</span></code></a> function to
+mark them as “deferred”. In the example below, we define a mapping that will load each of
+<code class="docutils literal notranslate"><span class="pre">.excerpt</span></code> and <code class="docutils literal notranslate"><span class="pre">.photo</span></code> in separate, individual-row SELECT statements when each
+attribute is first referenced on the individual object instance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">deferred</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="n">Binary</span><span class="p">,</span> <span class="n">Column</span>
+
+<span class="k">class</span> <span class="nc">Book</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;book&#39;</span>
+
+    <span class="n">book_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">summary</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">2000</span><span class="p">))</span>
+    <span class="n">excerpt</span> <span class="o">=</span> <span class="n">deferred</span><span class="p">(</span><span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">))</span>
+    <span class="n">photo</span> <span class="o">=</span> <span class="n">deferred</span><span class="p">(</span><span class="n">Column</span><span class="p">(</span><span class="n">Binary</span><span class="p">))</span></pre></div>
+</div>
+<p>Classical mappings as always place the usage of <a class="reference internal" href="#sqlalchemy.orm.deferred" title="sqlalchemy.orm.deferred"><code class="xref py py-func docutils literal notranslate"><span class="pre">deferred()</span></code></a> in the
+<code class="docutils literal notranslate"><span class="pre">properties</span></code> dictionary against the table-bound <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mapper</span><span class="p">(</span><span class="n">Book</span><span class="p">,</span> <span class="n">book_table</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;photo&#39;</span><span class="p">:</span><span class="n">deferred</span><span class="p">(</span><span class="n">book_table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">photo</span><span class="p">)</span>
+<span class="p">})</span></pre></div>
+</div>
+<p>Deferred columns can be associated with a “group” name, so that they load
+together when any of them are first accessed.  The example below defines a
+mapping with a <code class="docutils literal notranslate"><span class="pre">photos</span></code> deferred group.  When one <code class="docutils literal notranslate"><span class="pre">.photo</span></code> is accessed, all three
+photos will be loaded in one SELECT statement. The <code class="docutils literal notranslate"><span class="pre">.excerpt</span></code> will be loaded
+separately when it is accessed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Book</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;book&#39;</span>
+
+    <span class="n">book_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">summary</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">2000</span><span class="p">))</span>
+    <span class="n">excerpt</span> <span class="o">=</span> <span class="n">deferred</span><span class="p">(</span><span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">))</span>
+    <span class="n">photo1</span> <span class="o">=</span> <span class="n">deferred</span><span class="p">(</span><span class="n">Column</span><span class="p">(</span><span class="n">Binary</span><span class="p">),</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;photos&#39;</span><span class="p">)</span>
+    <span class="n">photo2</span> <span class="o">=</span> <span class="n">deferred</span><span class="p">(</span><span class="n">Column</span><span class="p">(</span><span class="n">Binary</span><span class="p">),</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;photos&#39;</span><span class="p">)</span>
+    <span class="n">photo3</span> <span class="o">=</span> <span class="n">deferred</span><span class="p">(</span><span class="n">Column</span><span class="p">(</span><span class="n">Binary</span><span class="p">),</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;photos&#39;</span><span class="p">)</span></pre></div>
+</div>
+<div class="section" id="deferred-column-loader-query-options">
+<span id="deferred-options"></span><h3>Deferred Column Loader Query Options<a class="headerlink" href="#deferred-column-loader-query-options" title="Permalink to this headline">¶</a></h3>
+<p>Columns can be marked as “deferred” or reset to “undeferred” at query time
+using options which are passed to the <a class="reference internal" href="query.html#sqlalchemy.orm.query.Query.options" title="sqlalchemy.orm.query.Query.options"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Query.options()</span></code></a> method; the most
+basic query options are <a class="reference internal" href="#sqlalchemy.orm.defer" title="sqlalchemy.orm.defer"><code class="xref py py-func docutils literal notranslate"><span class="pre">defer()</span></code></a> and
+<a class="reference internal" href="#sqlalchemy.orm.undefer" title="sqlalchemy.orm.undefer"><code class="xref py py-func docutils literal notranslate"><span class="pre">undefer()</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">defer</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">undefer</span>
+
+<span class="n">query</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Book</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">defer</span><span class="p">(</span><span class="s1">&#39;summary&#39;</span><span class="p">),</span> <span class="n">undefer</span><span class="p">(</span><span class="s1">&#39;excerpt&#39;</span><span class="p">))</span>
+<span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></pre></div>
+</div>
+<p>Above, the “summary” column will not load until accessed, and the “excerpt”
+column will load immediately even if it was mapped as a “deferred” column.</p>
+<p><a class="reference internal" href="#sqlalchemy.orm.deferred" title="sqlalchemy.orm.deferred"><code class="xref py py-func docutils literal notranslate"><span class="pre">deferred()</span></code></a> attributes which are marked with a “group” can be undeferred
+using <a class="reference internal" href="#sqlalchemy.orm.undefer_group" title="sqlalchemy.orm.undefer_group"><code class="xref py py-func docutils literal notranslate"><span class="pre">undefer_group()</span></code></a>, sending in the group name:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">undefer_group</span>
+
+<span class="n">query</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Book</span><span class="p">)</span>
+<span class="n">query</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">undefer_group</span><span class="p">(</span><span class="s1">&#39;photos&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></pre></div>
+</div>
+</div>
+<div class="section" id="deferred-loading-across-multiple-entities">
+<span id="deferred-loading-w-multiple"></span><h3>Deferred Loading across Multiple Entities<a class="headerlink" href="#deferred-loading-across-multiple-entities" title="Permalink to this headline">¶</a></h3>
+<p>To specify column deferral for a <a class="reference internal" href="query.html#sqlalchemy.orm.query.Query" title="sqlalchemy.orm.query.Query"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></a> that loads multiple types of
+entities at once, the deferral options may be specified more explicitly using
+class-bound attributes, rather than string names:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">defer</span>
+
+<span class="n">query</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Book</span><span class="p">,</span> <span class="n">Author</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Book</span><span class="o">.</span><span class="n">author</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">defer</span><span class="p">(</span><span class="n">Author</span><span class="o">.</span><span class="n">bio</span><span class="p">))</span></pre></div>
+</div>
+<p>Column deferral options may also indicate that they take place along various
+relationship paths, which are themselves often <a class="reference internal" href="loading_relationships.html"><span class="std std-ref">eagerly loaded</span></a> with loader options.  All relationship-bound loader options
+support chaining  onto additional loader options, which include loading for
+further levels of relationships, as well as onto column-oriented attributes at
+that path. Such as, to load <code class="docutils literal notranslate"><span class="pre">Author</span></code> instances, then joined-eager-load the
+<code class="docutils literal notranslate"><span class="pre">Author.books</span></code> collection for each author, then apply deferral options to
+column-oriented attributes onto each <code class="docutils literal notranslate"><span class="pre">Book</span></code> entity from that relationship,
+the <a class="reference internal" href="loading_relationships.html#sqlalchemy.orm.joinedload" title="sqlalchemy.orm.joinedload"><code class="xref py py-func docutils literal notranslate"><span class="pre">joinedload()</span></code></a> loader option can be combined with the <a class="reference internal" href="#sqlalchemy.orm.load_only" title="sqlalchemy.orm.load_only"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_only()</span></code></a>
+option (described later in this section) to defer all <code class="docutils literal notranslate"><span class="pre">Book</span></code> columns except
+those explicitly specified:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">joinedload</span>
+
+<span class="n">query</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Author</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+            <span class="n">joinedload</span><span class="p">(</span><span class="n">Author</span><span class="o">.</span><span class="n">books</span><span class="p">)</span><span class="o">.</span><span class="n">load_only</span><span class="p">(</span><span class="n">Book</span><span class="o">.</span><span class="n">summary</span><span class="p">,</span> <span class="n">Book</span><span class="o">.</span><span class="n">excerpt</span><span class="p">),</span>
+        <span class="p">)</span></pre></div>
+</div>
+<p>Option structures as above can also be organized in more complex ways, such
+as hierarchically using the <code class="xref py py-meth docutils literal notranslate"><span class="pre">Load.options()</span></code>
+method, which allows multiple sub-options to be chained to a common parent
+option at once.  Any mixture of string names and class-bound attribute objects
+may be used:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">defer</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">joinedload</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">load_only</span>
+
+<span class="n">query</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Author</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+            <span class="n">joinedload</span><span class="p">(</span><span class="n">Author</span><span class="o">.</span><span class="n">book</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+                <span class="n">load_only</span><span class="p">(</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="s2">&quot;excerpt&quot;</span><span class="p">),</span>
+                <span class="n">joinedload</span><span class="p">(</span><span class="n">Book</span><span class="o">.</span><span class="n">citations</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+                    <span class="n">joinedload</span><span class="p">(</span><span class="n">Citation</span><span class="o">.</span><span class="n">author</span><span class="p">),</span>
+                    <span class="n">defer</span><span class="p">(</span><span class="n">Citation</span><span class="o">.</span><span class="n">fulltext</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span></pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.3.6: </span>Added <code class="xref py py-meth docutils literal notranslate"><span class="pre">Load.options()</span></code> to allow easier
+construction of hierarchies of loader options.</p>
+</div>
+<p>Another way to apply options to a path is to use the <a class="reference internal" href="loading_relationships.html#sqlalchemy.orm.defaultload" title="sqlalchemy.orm.defaultload"><code class="xref py py-func docutils literal notranslate"><span class="pre">defaultload()</span></code></a>
+function.   This function is used to indicate a particular path within a loader
+option structure without actually setting any options at that level, so that further
+sub-options may be applied.  The <a class="reference internal" href="loading_relationships.html#sqlalchemy.orm.defaultload" title="sqlalchemy.orm.defaultload"><code class="xref py py-func docutils literal notranslate"><span class="pre">defaultload()</span></code></a> function can be used
+to create the same structure as we did above using <code class="xref py py-meth docutils literal notranslate"><span class="pre">Load.options()</span></code> as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Author</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+    <span class="n">joinedload</span><span class="p">(</span><span class="n">Author</span><span class="o">.</span><span class="n">book</span><span class="p">)</span><span class="o">.</span><span class="n">load_only</span><span class="p">(</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="s2">&quot;excerpt&quot;</span><span class="p">),</span>
+    <span class="n">defaultload</span><span class="p">(</span><span class="n">Author</span><span class="o">.</span><span class="n">book</span><span class="p">)</span><span class="o">.</span><span class="n">joinedload</span><span class="p">(</span><span class="n">Book</span><span class="o">.</span><span class="n">citations</span><span class="p">)</span><span class="o">.</span><span class="n">joinedload</span><span class="p">(</span><span class="n">Citation</span><span class="o">.</span><span class="n">author</span><span class="p">),</span>
+    <span class="n">defaultload</span><span class="p">(</span><span class="n">Author</span><span class="o">.</span><span class="n">book</span><span class="p">)</span><span class="o">.</span><span class="n">defaultload</span><span class="p">(</span><span class="n">Book</span><span class="o">.</span><span class="n">citations</span><span class="p">)</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="n">Citation</span><span class="o">.</span><span class="n">fulltext</span><span class="p">)</span>
+<span class="p">)</span></pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="loading_relationships.html#relationship-loader-options"><span class="std std-ref">Relationship Loading with Loader Options</span></a> - targeted towards relationship loading</p>
+</div>
+</div>
+<div class="section" id="load-only-and-wildcard-options">
+<h3>Load Only and Wildcard Options<a class="headerlink" href="#load-only-and-wildcard-options" title="Permalink to this headline">¶</a></h3>
+<p>The ORM loader option system supports the concept of “wildcard” loader options,
+in which a loader option can be passed an asterisk <code class="docutils literal notranslate"><span class="pre">&quot;*&quot;</span></code> to indicate that
+a particular option should apply to all applicable attributes of a mapped
+class.   Such as, if we wanted to load the <code class="docutils literal notranslate"><span class="pre">Book</span></code> class but only
+the “summary” and “excerpt” columns, we could say:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">defer</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">undefer</span>
+
+<span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Book</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+    <span class="n">defer</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">),</span> <span class="n">undefer</span><span class="p">(</span><span class="s2">&quot;summary&quot;</span><span class="p">),</span> <span class="n">undefer</span><span class="p">(</span><span class="s2">&quot;excerpt&quot;</span><span class="p">))</span></pre></div>
+</div>
+<p>Above, the <a class="reference internal" href="#sqlalchemy.orm.defer" title="sqlalchemy.orm.defer"><code class="xref py py-func docutils literal notranslate"><span class="pre">defer()</span></code></a> option is applied using a wildcard to all column
+attributes on the <code class="docutils literal notranslate"><span class="pre">Book</span></code> class.   Then, the <a class="reference internal" href="#sqlalchemy.orm.undefer" title="sqlalchemy.orm.undefer"><code class="xref py py-func docutils literal notranslate"><span class="pre">undefer()</span></code></a> option is used
+against the “summary” and “excerpt” fields so that they are the  only columns
+loaded up front. A query for the above entity will include only the “summary”
+and “excerpt” fields in the SELECT, along with the primary key columns which
+are always used by the ORM.</p>
+<p>A similar function is available with less verbosity by using the
+<a class="reference internal" href="#sqlalchemy.orm.load_only" title="sqlalchemy.orm.load_only"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_only()</span></code></a> option.  This is a so-called <strong>exclusionary</strong> option
+which will apply deferred behavior to all column attributes except those
+that are named:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">load_only</span>
+
+<span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Book</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">load_only</span><span class="p">(</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="s2">&quot;excerpt&quot;</span><span class="p">))</span></pre></div>
+</div>
+<div class="section" id="wildcard-and-exclusionary-options-with-multiple-entity-queries">
+<h4>Wildcard and Exclusionary Options with Multiple-Entity Queries<a class="headerlink" href="#wildcard-and-exclusionary-options-with-multiple-entity-queries" title="Permalink to this headline">¶</a></h4>
+<p>Wildcard options and exclusionary options such as <a class="reference internal" href="#sqlalchemy.orm.load_only" title="sqlalchemy.orm.load_only"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_only()</span></code></a> may
+only be applied to a single entity at a time within a <a class="reference internal" href="query.html#sqlalchemy.orm.query.Query" title="sqlalchemy.orm.query.Query"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></a>.  To
+suit the less common case where a <a class="reference internal" href="query.html#sqlalchemy.orm.query.Query" title="sqlalchemy.orm.query.Query"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></a> is returning multiple
+primary entities at once, a special calling style may be required in order
+to apply a wildcard or exclusionary option, which is to use the
+<a class="reference internal" href="loading_relationships.html#sqlalchemy.orm.Load" title="sqlalchemy.orm.Load"><code class="xref py py-class docutils literal notranslate"><span class="pre">Load</span></code></a> object to indicate the starting entity for a deferral option.
+Such as, if we were loading <code class="docutils literal notranslate"><span class="pre">Book</span></code> and <code class="docutils literal notranslate"><span class="pre">Author</span></code> at once, the <a class="reference internal" href="query.html#sqlalchemy.orm.query.Query" title="sqlalchemy.orm.query.Query"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></a>
+will raise an informative error if we try to apply <a class="reference internal" href="#sqlalchemy.orm.load_only" title="sqlalchemy.orm.load_only"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_only()</span></code></a> to
+both at once.  Using <a class="reference internal" href="loading_relationships.html#sqlalchemy.orm.Load" title="sqlalchemy.orm.Load"><code class="xref py py-class docutils literal notranslate"><span class="pre">Load</span></code></a> looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">Load</span>
+
+<span class="n">query</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Book</span><span class="p">,</span> <span class="n">Author</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Book</span><span class="o">.</span><span class="n">author</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+            <span class="n">Load</span><span class="p">(</span><span class="n">Book</span><span class="p">)</span><span class="o">.</span><span class="n">load_only</span><span class="p">(</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="s2">&quot;excerpt&quot;</span><span class="p">)</span>
+        <span class="p">)</span></pre></div>
+</div>
+<p>Above, <a class="reference internal" href="loading_relationships.html#sqlalchemy.orm.Load" title="sqlalchemy.orm.Load"><code class="xref py py-class docutils literal notranslate"><span class="pre">Load</span></code></a> is used in conjunction with the exclusionary option
+<a class="reference internal" href="#sqlalchemy.orm.load_only" title="sqlalchemy.orm.load_only"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_only()</span></code></a> so that the deferral of all other columns only takes
+place for the <code class="docutils literal notranslate"><span class="pre">Book</span></code> class and not the <code class="docutils literal notranslate"><span class="pre">Author</span></code> class.   Again,
+the <a class="reference internal" href="query.html#sqlalchemy.orm.query.Query" title="sqlalchemy.orm.query.Query"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></a> object should raise an informative error message when
+the above calling style is actually required that describes those cases
+where explicit use of <a class="reference internal" href="loading_relationships.html#sqlalchemy.orm.Load" title="sqlalchemy.orm.Load"><code class="xref py py-class docutils literal notranslate"><span class="pre">Load</span></code></a> is needed.</p>
+</div>
+</div>
+<div class="section" id="column-deferral-api">
+<h3>Column Deferral API<a class="headerlink" href="#column-deferral-api" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="sqlalchemy.orm.defer">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.orm.</code><code class="sig-name descname">defer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">addl_attrs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.orm.defer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicate that the given column-oriented attribute should be deferred,
+e.g. not loaded until accessed.</p>
+<p>This function is part of the <a class="reference internal" href="loading_relationships.html#sqlalchemy.orm.Load" title="sqlalchemy.orm.Load"><code class="xref py py-class docutils literal notranslate"><span class="pre">Load</span></code></a> interface and supports
+both method-chained and standalone operation.</p>
+<p>e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">defer</span>
+
+<span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">MyClass</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+                    <span class="n">defer</span><span class="p">(</span><span class="s2">&quot;attribute_one&quot;</span><span class="p">),</span>
+                    <span class="n">defer</span><span class="p">(</span><span class="s2">&quot;attribute_two&quot;</span><span class="p">))</span>
+
+<span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">MyClass</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+                    <span class="n">defer</span><span class="p">(</span><span class="n">MyClass</span><span class="o">.</span><span class="n">attribute_one</span><span class="p">),</span>
+                    <span class="n">defer</span><span class="p">(</span><span class="n">MyClass</span><span class="o">.</span><span class="n">attribute_two</span><span class="p">))</span></pre></div>
+</div>
+<p>To specify a deferred load of an attribute on a related class,
+the path can be specified one token at a time, specifying the loading
+style for each link along the chain.  To leave the loading style
+for a link unchanged, use <a class="reference internal" href="loading_relationships.html#sqlalchemy.orm.defaultload" title="sqlalchemy.orm.defaultload"><code class="xref py py-func docutils literal notranslate"><span class="pre">defaultload()</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">MyClass</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">defaultload</span><span class="p">(</span><span class="s2">&quot;someattr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="s2">&quot;some_column&quot;</span><span class="p">))</span></pre></div>
+</div>
+<p>A <a class="reference internal" href="loading_relationships.html#sqlalchemy.orm.Load" title="sqlalchemy.orm.Load"><code class="xref py py-class docutils literal notranslate"><span class="pre">Load</span></code></a> object that is present on a certain path can have
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">Load.defer()</span></code> called multiple times,
+each will operate on the same
+parent entity:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">MyClass</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+                <span class="n">defaultload</span><span class="p">(</span><span class="s2">&quot;someattr&quot;</span><span class="p">)</span><span class="o">.</span>
+                    <span class="n">defer</span><span class="p">(</span><span class="s2">&quot;some_column&quot;</span><span class="p">)</span><span class="o">.</span>
+                    <span class="n">defer</span><span class="p">(</span><span class="s2">&quot;some_other_column&quot;</span><span class="p">)</span><span class="o">.</span>
+                    <span class="n">defer</span><span class="p">(</span><span class="s2">&quot;another_column&quot;</span><span class="p">)</span>
+    <span class="p">)</span></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.orm.defer.params.key"></span><strong>key</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.defer.params.key">¶</a> – Attribute to be deferred.</p></li>
+<li><p><span class="target" id="sqlalchemy.orm.defer.params.*addl_attrs"></span><strong>*addl_attrs</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.defer.params.*addl_attrs">¶</a> – <p>This option supports the old 0.8 style
+of specifying a path as a series of attributes, which is now superseded
+by the method-chained style.</p>
+<blockquote>
+<div><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.9: </span>The *addl_attrs on <a class="reference internal" href="#sqlalchemy.orm.defer" title="sqlalchemy.orm.defer"><code class="xref py py-func docutils literal notranslate"><span class="pre">defer()</span></code></a> is
+deprecated and will be removed in a future release.   Please
+use method chaining in conjunction with defaultload() to
+indicate a path.</p>
+</div>
+</div></blockquote>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#deferred"><span class="std std-ref">Deferred Column Loading</span></a></p>
+<p><a class="reference internal" href="#sqlalchemy.orm.undefer" title="sqlalchemy.orm.undefer"><code class="xref py py-func docutils literal notranslate"><span class="pre">undefer()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sqlalchemy.orm.deferred">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.orm.</code><code class="sig-name descname">deferred</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">columns</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.orm.deferred" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicate a column-based mapped attribute that by default will
+not load unless accessed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.orm.deferred.params.*columns"></span><strong>*columns</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.deferred.params.*columns">¶</a> – columns to be mapped.  This is typically a single
+<a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a> object,
+however a collection is supported in order
+to support multiple columns mapped under the same attribute.</p></li>
+<li><p><span class="target" id="sqlalchemy.orm.deferred.params.**kw"></span><strong>**kw</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.deferred.params.**kw">¶</a> – additional keyword arguments passed to
+<a class="reference internal" href="internals.html#sqlalchemy.orm.ColumnProperty" title="sqlalchemy.orm.ColumnProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">ColumnProperty</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#deferred"><span class="std std-ref">Deferred Column Loading</span></a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sqlalchemy.orm.query_expression">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.orm.</code><code class="sig-name descname">query_expression</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.orm.query_expression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicate an attribute that populates from a query-time SQL expression.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.2.</span></p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="mapped_sql_expr.html#mapper-querytime-expression"><span class="std std-ref">Query-time SQL expressions as mapped attributes</span></a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sqlalchemy.orm.load_only">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.orm.</code><code class="sig-name descname">load_only</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">attrs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.orm.load_only" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicate that for a particular entity, only the given list
+of column-based attribute names should be loaded; all others will be
+deferred.</p>
+<p>This function is part of the <a class="reference internal" href="loading_relationships.html#sqlalchemy.orm.Load" title="sqlalchemy.orm.Load"><code class="xref py py-class docutils literal notranslate"><span class="pre">Load</span></code></a> interface and supports
+both method-chained and standalone operation.</p>
+<p>Example - given a class <code class="docutils literal notranslate"><span class="pre">User</span></code>, load only the <code class="docutils literal notranslate"><span class="pre">name</span></code> and <code class="docutils literal notranslate"><span class="pre">fullname</span></code>
+attributes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">load_only</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;fullname&quot;</span><span class="p">))</span></pre></div>
+</div>
+<p>Example - given a relationship <code class="docutils literal notranslate"><span class="pre">User.addresses</span> <span class="pre">-&gt;</span> <span class="pre">Address</span></code>, specify
+subquery loading for the <code class="docutils literal notranslate"><span class="pre">User.addresses</span></code> collection, but on each
+<code class="docutils literal notranslate"><span class="pre">Address</span></code> object load only the <code class="docutils literal notranslate"><span class="pre">email_address</span></code> attribute:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+        <span class="n">subqueryload</span><span class="p">(</span><span class="s2">&quot;addresses&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">load_only</span><span class="p">(</span><span class="s2">&quot;email_address&quot;</span><span class="p">)</span>
+<span class="p">)</span></pre></div>
+</div>
+<p>For a <a class="reference internal" href="query.html#sqlalchemy.orm.query.Query" title="sqlalchemy.orm.query.Query"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></a> that has multiple entities,
+the lead entity can be
+specifically referred to using the <a class="reference internal" href="loading_relationships.html#sqlalchemy.orm.Load" title="sqlalchemy.orm.Load"><code class="xref py py-class docutils literal notranslate"><span class="pre">Load</span></code></a> constructor:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">Address</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">addresses</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+            <span class="n">Load</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">load_only</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;fullname&quot;</span><span class="p">),</span>
+            <span class="n">Load</span><span class="p">(</span><span class="n">Address</span><span class="p">)</span><span class="o">.</span><span class="n">load_only</span><span class="p">(</span><span class="s2">&quot;email_addres&quot;</span><span class="p">)</span>
+        <span class="p">)</span></pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sqlalchemy.orm.undefer">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.orm.</code><code class="sig-name descname">undefer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">addl_attrs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.orm.undefer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicate that the given column-oriented attribute should be undeferred,
+e.g. specified within the SELECT statement of the entity as a whole.</p>
+<p>The column being undeferred is typically set up on the mapping as a
+<a class="reference internal" href="#sqlalchemy.orm.deferred" title="sqlalchemy.orm.deferred"><code class="xref py py-func docutils literal notranslate"><span class="pre">deferred()</span></code></a> attribute.</p>
+<p>This function is part of the <a class="reference internal" href="loading_relationships.html#sqlalchemy.orm.Load" title="sqlalchemy.orm.Load"><code class="xref py py-class docutils literal notranslate"><span class="pre">Load</span></code></a> interface and supports
+both method-chained and standalone operation.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># undefer two columns</span>
+<span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">MyClass</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">undefer</span><span class="p">(</span><span class="s2">&quot;col1&quot;</span><span class="p">),</span> <span class="n">undefer</span><span class="p">(</span><span class="s2">&quot;col2&quot;</span><span class="p">))</span>
+
+<span class="c1"># undefer all columns specific to a single class using Load + *</span>
+<span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">MyClass</span><span class="p">,</span> <span class="n">MyOtherClass</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+    <span class="n">Load</span><span class="p">(</span><span class="n">MyClass</span><span class="p">)</span><span class="o">.</span><span class="n">undefer</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">))</span>
+
+<span class="c1"># undefer a column on a related object</span>
+<span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">MyClass</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+    <span class="n">defaultload</span><span class="p">(</span><span class="n">MyClass</span><span class="o">.</span><span class="n">items</span><span class="p">)</span><span class="o">.</span><span class="n">undefer</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">))</span></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.orm.undefer.params.key"></span><strong>key</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.undefer.params.key">¶</a> – Attribute to be undeferred.</p></li>
+<li><p><span class="target" id="sqlalchemy.orm.undefer.params.*addl_attrs"></span><strong>*addl_attrs</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.undefer.params.*addl_attrs">¶</a> – <p>This option supports the old 0.8 style
+of specifying a path as a series of attributes, which is now superseded
+by the method-chained style.</p>
+<blockquote>
+<div><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.9: </span>The *addl_attrs on <a class="reference internal" href="#sqlalchemy.orm.undefer" title="sqlalchemy.orm.undefer"><code class="xref py py-func docutils literal notranslate"><span class="pre">undefer()</span></code></a> is
+deprecated and will be removed in a future release.   Please
+use method chaining in conjunction with defaultload() to
+indicate a path.</p>
+</div>
+</div></blockquote>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#deferred"><span class="std std-ref">Deferred Column Loading</span></a></p>
+<p><a class="reference internal" href="#sqlalchemy.orm.defer" title="sqlalchemy.orm.defer"><code class="xref py py-func docutils literal notranslate"><span class="pre">defer()</span></code></a></p>
+<p><a class="reference internal" href="#sqlalchemy.orm.undefer_group" title="sqlalchemy.orm.undefer_group"><code class="xref py py-func docutils literal notranslate"><span class="pre">undefer_group()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sqlalchemy.orm.undefer_group">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.orm.</code><code class="sig-name descname">undefer_group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.orm.undefer_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicate that columns within the given deferred group name should be
+undeferred.</p>
+<p>The columns being undeferred are set up on the mapping as
+<a class="reference internal" href="#sqlalchemy.orm.deferred" title="sqlalchemy.orm.deferred"><code class="xref py py-func docutils literal notranslate"><span class="pre">deferred()</span></code></a> attributes and include a “group” name.</p>
+<p>E.g:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">MyClass</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">undefer_group</span><span class="p">(</span><span class="s2">&quot;large_attrs&quot;</span><span class="p">))</span></pre></div>
+</div>
+<p>To undefer a group of attributes on a related entity, the path can be
+spelled out using relationship loader options, such as
+<a class="reference internal" href="loading_relationships.html#sqlalchemy.orm.defaultload" title="sqlalchemy.orm.defaultload"><code class="xref py py-func docutils literal notranslate"><span class="pre">defaultload()</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">MyClass</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+    <span class="n">defaultload</span><span class="p">(</span><span class="s2">&quot;someattr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">undefer_group</span><span class="p">(</span><span class="s2">&quot;large_attrs&quot;</span><span class="p">))</span></pre></div>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.9.0: </span><a class="reference internal" href="#sqlalchemy.orm.undefer_group" title="sqlalchemy.orm.undefer_group"><code class="xref py py-func docutils literal notranslate"><span class="pre">undefer_group()</span></code></a> is now specific to a
+particular entity load path.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#deferred"><span class="std std-ref">Deferred Column Loading</span></a></p>
+<p><a class="reference internal" href="#sqlalchemy.orm.defer" title="sqlalchemy.orm.defer"><code class="xref py py-func docutils literal notranslate"><span class="pre">defer()</span></code></a></p>
+<p><a class="reference internal" href="#sqlalchemy.orm.undefer" title="sqlalchemy.orm.undefer"><code class="xref py py-func docutils literal notranslate"><span class="pre">undefer()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sqlalchemy.orm.with_expression">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.orm.</code><code class="sig-name descname">with_expression</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">expression</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.orm.with_expression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply an ad-hoc SQL expression to a “deferred expression” attribute.</p>
+<p>This option is used in conjunction with the <a class="reference internal" href="#sqlalchemy.orm.query_expression" title="sqlalchemy.orm.query_expression"><code class="xref py py-func docutils literal notranslate"><span class="pre">query_expression()</span></code></a>
+mapper-level construct that indicates an attribute which should be the
+target of an ad-hoc SQL expression.</p>
+<p>E.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sess</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">SomeClass</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+    <span class="n">with_expression</span><span class="p">(</span><span class="n">SomeClass</span><span class="o">.</span><span class="n">x_y_expr</span><span class="p">,</span> <span class="n">SomeClass</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">SomeClass</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+<span class="p">)</span></pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.2.</span></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.orm.with_expression.params.key"></span><strong>key</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.with_expression.params.key">¶</a> – Attribute to be undeferred.</p></li>
+<li><p><span class="target" id="sqlalchemy.orm.with_expression.params.expr"></span><strong>expr</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.with_expression.params.expr">¶</a> – SQL expression to be applied to the attribute.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="mapped_sql_expr.html#mapper-querytime-expression"><span class="std std-ref">Query-time SQL expressions as mapped attributes</span></a></p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="column-bundles">
+<span id="bundles"></span><h2>Column Bundles<a class="headerlink" href="#column-bundles" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="query.html#sqlalchemy.orm.query.Bundle" title="sqlalchemy.orm.query.Bundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bundle</span></code></a> may be used to query for groups of columns under one
+namespace.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.0.</span></p>
+</div>
+<p>The bundle allows columns to be grouped together:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">Bundle</span>
+
+<span class="n">bn</span> <span class="o">=</span> <span class="n">Bundle</span><span class="p">(</span><span class="s1">&#39;mybundle&#39;</span><span class="p">,</span> <span class="n">MyClass</span><span class="o">.</span><span class="n">data1</span><span class="p">,</span> <span class="n">MyClass</span><span class="o">.</span><span class="n">data2</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">bn</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">bn</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">data1</span> <span class="o">==</span> <span class="s1">&#39;d1&#39;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">mybundle</span><span class="o">.</span><span class="n">data1</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">mybundle</span><span class="o">.</span><span class="n">data2</span><span class="p">)</span></pre></div>
+</div>
+<p>The bundle can be subclassed to provide custom behaviors when results
+are fetched.  The method <a class="reference internal" href="query.html#sqlalchemy.orm.query.Bundle.create_row_processor" title="sqlalchemy.orm.query.Bundle.create_row_processor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Bundle.create_row_processor()</span></code></a> is given
+the <a class="reference internal" href="query.html#sqlalchemy.orm.query.Query" title="sqlalchemy.orm.query.Query"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></a> and a set of “row processor” functions at query execution
+time; these processor functions when given a result row will return the
+individual attribute value, which can then be adapted into any kind of
+return data structure.  Below illustrates replacing the usual <a class="reference internal" href="query.html#sqlalchemy.util.KeyedTuple" title="sqlalchemy.util.KeyedTuple"><code class="xref py py-class docutils literal notranslate"><span class="pre">KeyedTuple</span></code></a>
+return structure with a straight Python dictionary:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">Bundle</span>
+
+<span class="k">class</span> <span class="nc">DictBundle</span><span class="p">(</span><span class="n">Bundle</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">create_row_processor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">procs</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override create_row_processor to return values as dictionaries&quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">proc</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+                        <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="p">(</span><span class="n">proc</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">proc</span> <span class="ow">in</span> <span class="n">procs</span><span class="p">))</span>
+                    <span class="p">)</span>
+        <span class="k">return</span> <span class="n">proc</span></pre></div>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 1.0: </span>The <code class="docutils literal notranslate"><span class="pre">proc()</span></code> callable passed to the <code class="docutils literal notranslate"><span class="pre">create_row_processor()</span></code>
+method of custom <a class="reference internal" href="query.html#sqlalchemy.orm.query.Bundle" title="sqlalchemy.orm.query.Bundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bundle</span></code></a> classes now accepts only a single
+“row” argument.</p>
+</div>
+<p>A result from the above bundle will return dictionary values:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bn</span> <span class="o">=</span> <span class="n">DictBundle</span><span class="p">(</span><span class="s1">&#39;mybundle&#39;</span><span class="p">,</span> <span class="n">MyClass</span><span class="o">.</span><span class="n">data1</span><span class="p">,</span> <span class="n">MyClass</span><span class="o">.</span><span class="n">data2</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">bn</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">bn</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">data1</span> <span class="o">==</span> <span class="s1">&#39;d1&#39;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">mybundle</span><span class="p">[</span><span class="s1">&#39;data1&#39;</span><span class="p">],</span> <span class="n">row</span><span class="o">.</span><span class="n">mybundle</span><span class="p">[</span><span class="s1">&#39;data2&#39;</span><span class="p">])</span></pre></div>
+</div>
+<p>The <a class="reference internal" href="query.html#sqlalchemy.orm.query.Bundle" title="sqlalchemy.orm.query.Bundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bundle</span></code></a> construct is also integrated into the behavior
+of <a class="reference internal" href="composites.html#sqlalchemy.orm.composite" title="sqlalchemy.orm.composite"><code class="xref py py-func docutils literal notranslate"><span class="pre">composite()</span></code></a>, where it is used to return composite attributes as objects
+when queried as individual attributes.</p>
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="loading_objects.html" title="previous chapter">Loading Objects</a>
+        Next:
+        <a href="loading_relationships.html" title="next chapter">Relationship Loading Techniques</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

@@ -1,0 +1,1288 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    What’s New in SQLAlchemy 0.6?
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+        <link rel="up" title="Changes and Migration" href="index.html" />
+        <link rel="next" title="What’s new in SQLAlchemy 0.5?" href="migration_05.html" />
+        <link rel="prev" title="What’s New in SQLAlchemy 0.7?" href="migration_07.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../contents.html">Contents</a> |
+                <a href="../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="index.html" title="Changes and Migration">Changes and Migration</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="migration_13.html">What’s New in SQLAlchemy 1.3?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_13.html">1.3 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_12.html">1.2 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_11.html">1.1 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_10.html">1.0 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_09.html">0.9 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_08.html">0.8 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_07.html">0.7 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_06.html">0.6 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_05.html">0.5 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_04.html">0.4 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_03.html">0.3 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_02.html">0.2 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="changelog_01.html">0.1 Changelog</a></span></li>
+<li><span class="link-container"><a class="reference external" href="migration_12.html">What’s New in SQLAlchemy 1.2?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="migration_11.html">What’s New in SQLAlchemy 1.1?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="migration_10.html">What’s New in SQLAlchemy 1.0?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="migration_09.html">What’s New in SQLAlchemy 0.9?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="migration_08.html">What’s New in SQLAlchemy 0.8?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="migration_07.html">What’s New in SQLAlchemy 0.7?</a></span></li>
+<li class="selected"><span class="link-container"><strong>What’s New in SQLAlchemy 0.6?</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#platform-support">Platform Support</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#new-dialect-system">New Dialect System</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#dialect-imports">Dialect Imports</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#expression-language-changes">Expression Language Changes</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#an-important-expression-language-gotcha">An Important Expression Language Gotcha</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#stricter-executemany-behavior">Stricter “executemany” Behavior</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#union-and-other-compound-constructs-parenthesize-consistently">UNION and other “compound” constructs parenthesize consistently</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#c-extensions-for-result-fetching">C Extensions for Result Fetching</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#new-schema-capabilities">New Schema Capabilities</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#deprecated-removed-schema-elements">Deprecated/Removed Schema Elements</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#other-behavioral-changes">Other Behavioral Changes</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#logging-opened-up">Logging opened up</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#reflection-inspector-api">Reflection/Inspector API</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#returning-support">RETURNING Support</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#type-system-changes">Type System Changes</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#new-architecture">New Architecture</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#native-unicode-mode">Native Unicode Mode</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#generic-enum-type">Generic Enum Type</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#reflection-returns-dialect-specific-types">Reflection Returns Dialect-Specific Types</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#miscellaneous-api-changes">Miscellaneous API Changes</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#orm-changes">ORM Changes</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#new-unit-of-work">New Unit of Work</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#changes-to-query-update-and-query-delete">Changes to <code class="docutils literal notranslate"><span class="pre">query.update()</span></code> and <code class="docutils literal notranslate"><span class="pre">query.delete()</span></code></a></span></li>
+<li><span class="link-container"><a class="reference external" href="#relation-is-officially-named-relationship"><code class="docutils literal notranslate"><span class="pre">relation()</span></code> is officially named <code class="docutils literal notranslate"><span class="pre">relationship()</span></code></a></span></li>
+<li><span class="link-container"><a class="reference external" href="#subquery-eager-loading">Subquery eager loading</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#eagerload-eagerload-all-is-now-joinedload-joinedload-all"><code class="docutils literal notranslate"><span class="pre">`eagerload()``</span></code>, <code class="docutils literal notranslate"><span class="pre">``eagerload_all()``</span></code> is now <code class="docutils literal notranslate"><span class="pre">``joinedload()``</span></code>, <code class="docutils literal notranslate"><span class="pre">``joinedload_all()`</span></code></a></span></li>
+<li><span class="link-container"><a class="reference external" href="#lazy-false-none-true-dynamic-now-accepts-lazy-noload-joined-subquery-select-dynamic"><code class="docutils literal notranslate"><span class="pre">`lazy=False|None|True|'dynamic'``</span></code> now accepts <code class="docutils literal notranslate"><span class="pre">``lazy='noload'|'joined'|'subquery'|'select'|'dynamic'`</span></code></a></span></li>
+<li><span class="link-container"><a class="reference external" href="#innerjoin-true-on-relation-joinedload">innerjoin=True on relation, joinedload</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#many-to-one-enhancements">Many-to-one Enhancements</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#mutable-primary-keys-with-joined-table-inheritance">Mutable Primary Keys with Joined Table Inheritance</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#beaker-caching">Beaker Caching</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#other-changes">Other Changes</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#deprecated-removed-orm-elements">Deprecated/Removed ORM Elements</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#extensions">Extensions</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#sqlsoup">SQLSoup</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#declarative">Declarative</a></span></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="migration_05.html">What’s new in SQLAlchemy 0.5?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="migration_04.html">What’s new in SQLAlchemy 0.4?</a></span></li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="what-s-new-in-sqlalchemy-0-6">
+<h1>What’s New in SQLAlchemy 0.6?<a class="headerlink" href="#what-s-new-in-sqlalchemy-0-6" title="Permalink to this headline">¶</a></h1>
+<div class="admonition-about-this-document admonition">
+<p class="admonition-title">About this Document</p>
+<p>This document describes changes between SQLAlchemy version 0.5,
+last released January 16, 2010, and SQLAlchemy version 0.6,
+last released May 5, 2012.</p>
+<p>Document date:  June 6, 2010</p>
+</div>
+<p>This guide documents API changes which affect users
+migrating their applications from the 0.5 series of
+SQLAlchemy to 0.6.  Note that SQLAlchemy 0.6 removes some
+behaviors which were deprecated throughout the span of the
+0.5 series, and also deprecates more behaviors specific to
+0.5.</p>
+<div class="section" id="platform-support">
+<h2>Platform Support<a class="headerlink" href="#platform-support" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>cPython versions 2.4 and upwards throughout the 2.xx
+series</p></li>
+<li><p>Jython 2.5.1 - using the zxJDBC DBAPI included with
+Jython.</p></li>
+<li><p>cPython 3.x - see [source:sqlalchemy/trunk/README.py3k]
+for information on how to build for python3.</p></li>
+</ul>
+</div>
+<div class="section" id="new-dialect-system">
+<h2>New Dialect System<a class="headerlink" href="#new-dialect-system" title="Permalink to this headline">¶</a></h2>
+<p>Dialect modules are now broken up into distinct
+subcomponents, within the scope of a single database
+backend.   Dialect implementations are now in the
+<code class="docutils literal notranslate"><span class="pre">sqlalchemy.dialects</span></code> package.  The
+<code class="docutils literal notranslate"><span class="pre">sqlalchemy.databases</span></code> package still exists as a
+placeholder to provide some level of backwards compatibility
+for simple imports.</p>
+<p>For each supported database, a sub-package exists within
+<code class="docutils literal notranslate"><span class="pre">sqlalchemy.dialects</span></code> where several files are contained.
+Each package contains a module called <code class="docutils literal notranslate"><span class="pre">base.py</span></code> which
+defines the specific SQL dialect used by that database.   It
+also contains one or more “driver” modules, each one
+corresponding to a specific DBAPI - these files are named
+corresponding to the DBAPI itself, such as <code class="docutils literal notranslate"><span class="pre">pysqlite</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cx_oracle</span></code>, or <code class="docutils literal notranslate"><span class="pre">pyodbc</span></code>.  The classes used by
+SQLAlchemy dialects are first declared in the <code class="docutils literal notranslate"><span class="pre">base.py</span></code>
+module, defining all behavioral characteristics defined by
+the database.  These include capability mappings, such as
+“supports sequences”, “supports returning”, etc., type
+definitions, and SQL compilation rules.  Each “driver”
+module in turn provides subclasses of those classes as
+needed which override the default behavior to accommodate
+the additional features, behaviors, and quirks of that
+DBAPI.    For DBAPIs that support multiple backends (pyodbc,
+zxJDBC, mxODBC), the dialect module will use mixins from the
+<code class="docutils literal notranslate"><span class="pre">sqlalchemy.connectors</span></code> package, which provide
+functionality common to that DBAPI across all backends, most
+typically dealing with connect arguments.   This means that
+connecting using pyodbc, zxJDBC or mxODBC (when implemented)
+is extremely consistent across supported backends.</p>
+<p>The URL format used by <code class="docutils literal notranslate"><span class="pre">create_engine()</span></code> has been enhanced
+to handle any number of DBAPIs for a particular backend,
+using a scheme that is inspired by that of JDBC.   The
+previous format still works, and will select a “default”
+DBAPI implementation, such as the PostgreSQL URL below that
+will use psycopg2:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;postgresql://scott:tiger@localhost/test&#39;</span><span class="p">)</span></pre></div>
+</div>
+<p>However to specify a specific DBAPI backend such as pg8000,
+add it to the “protocol” section of the URL using a plus
+sign “+”:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;postgresql+pg8000://scott:tiger@localhost/test&#39;</span><span class="p">)</span></pre></div>
+</div>
+<p>Important Dialect Links:</p>
+<ul class="simple">
+<li><p>Documentation on connect arguments:
+<a class="reference external" href="http://www.sqlalchemy.org/docs/06/dbengine.html#create">http://www.sqlalchemy.org/docs/06/dbengine.html#create</a>-
+engine-url-arguments.</p></li>
+<li><p>Reference documentation for individual dialects: <a class="reference external" href="http://ww">http://ww</a>
+w.sqlalchemy.org/docs/06/reference/dialects/index.html</p></li>
+<li><p>The tips and tricks at DatabaseNotes.</p></li>
+</ul>
+<p>Other notes regarding dialects:</p>
+<ul class="simple">
+<li><p>the type system has been changed dramatically in
+SQLAlchemy 0.6.  This has an impact on all dialects
+regarding naming conventions, behaviors, and
+implementations.  See the section on “Types” below.</p></li>
+<li><p>the <code class="docutils literal notranslate"><span class="pre">ResultProxy</span></code> object now offers a 2x speed
+improvement in some cases thanks to some refactorings.</p></li>
+<li><p>the <code class="docutils literal notranslate"><span class="pre">RowProxy</span></code>, i.e. individual result row object, is
+now directly pickleable.</p></li>
+<li><p>the setuptools entrypoint used to locate external dialects
+is now called <code class="docutils literal notranslate"><span class="pre">sqlalchemy.dialects</span></code>.  An external
+dialect written against 0.4 or 0.5 will need to be
+modified to work with 0.6 in any case so this change does
+not add any additional difficulties.</p></li>
+<li><p>dialects now receive an initialize() event on initial
+connection to determine connection properties.</p></li>
+<li><p>Functions and operators generated by the compiler now use
+(almost) regular dispatch functions of the form
+“visit_&lt;opname&gt;” and “visit_&lt;funcname&gt;_fn” to provide
+customed processing. This replaces the need to copy the
+“functions” and “operators” dictionaries in compiler
+subclasses with straightforward visitor methods, and also
+allows compiler subclasses complete control over
+rendering, as the full _Function or _BinaryExpression
+object is passed in.</p></li>
+</ul>
+<div class="section" id="dialect-imports">
+<h3>Dialect Imports<a class="headerlink" href="#dialect-imports" title="Permalink to this headline">¶</a></h3>
+<p>The import structure of dialects has changed.  Each dialect
+now exports its base “dialect” class as well as the full set
+of SQL types supported on that dialect via
+<code class="docutils literal notranslate"><span class="pre">sqlalchemy.dialects.&lt;name&gt;</span></code>.  For example, to import a
+set of PG types:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.dialects.postgresql</span> <span class="k">import</span> <span class="n">INTEGER</span><span class="p">,</span> <span class="n">BIGINT</span><span class="p">,</span> <span class="n">SMALLINT</span><span class="p">,</span>\
+                                            <span class="n">VARCHAR</span><span class="p">,</span> <span class="n">MACADDR</span><span class="p">,</span> <span class="n">DATE</span><span class="p">,</span> <span class="n">BYTEA</span></pre></div>
+</div>
+<p>Above, <code class="docutils literal notranslate"><span class="pre">INTEGER</span></code> is actually the plain <code class="docutils literal notranslate"><span class="pre">INTEGER</span></code> type
+from <code class="docutils literal notranslate"><span class="pre">sqlalchemy.types</span></code>, but the PG dialect makes it
+available in the same way as those types which are specific
+to PG, such as <code class="docutils literal notranslate"><span class="pre">BYTEA</span></code> and <code class="docutils literal notranslate"><span class="pre">MACADDR</span></code>.</p>
+</div>
+</div>
+<div class="section" id="expression-language-changes">
+<h2>Expression Language Changes<a class="headerlink" href="#expression-language-changes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="an-important-expression-language-gotcha">
+<h3>An Important Expression Language Gotcha<a class="headerlink" href="#an-important-expression-language-gotcha" title="Permalink to this headline">¶</a></h3>
+<p>There’s one quite significant behavioral change to the
+expression language which may affect some applications.
+The boolean value of Python boolean expressions, i.e.
+<code class="docutils literal notranslate"><span class="pre">==</span></code>, <code class="docutils literal notranslate"><span class="pre">!=</span></code>, and similar, now evaluates accurately with
+regards to the two clause objects being compared.</p>
+<p>As we know, comparing a <code class="docutils literal notranslate"><span class="pre">ClauseElement</span></code> to any other
+object returns another <code class="docutils literal notranslate"><span class="pre">ClauseElement</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sqlalchemy.sql</span> <span class="k">import</span> <span class="n">column</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">column</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span>
+<span class="go">&lt;sqlalchemy.sql.expression._BinaryExpression object at 0x1252490&gt;</span></pre></div>
+</div>
+<p>This so that Python expressions produce SQL expressions when
+converted to strings:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">column</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">)</span>
+<span class="go">&#39;foo = :foo_1&#39;</span></pre></div>
+</div>
+<p>But what happens if we say this?</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">column</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;yes&quot;</span><span class="p">)</span>
+<span class="gp">...</span></pre></div>
+</div>
+<p>In previous versions of SQLAlchemy, the returned
+<code class="docutils literal notranslate"><span class="pre">_BinaryExpression</span></code> was a plain Python object which
+evaluated to <code class="docutils literal notranslate"><span class="pre">True</span></code>.  Now it evaluates to whether or not
+the actual <code class="docutils literal notranslate"><span class="pre">ClauseElement</span></code> should have the same hash value
+as to that being compared.  Meaning:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">bool</span><span class="p">(</span><span class="n">column</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">bool</span><span class="p">(</span><span class="n">column</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">column</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">))</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">column</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">bool</span><span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="n">c</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="go">&gt;&gt;&gt;</span></pre></div>
+</div>
+<p>That means code such as the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">expression</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;the expression is:&quot;</span><span class="p">,</span> <span class="n">expression</span><span class="p">)</span></pre></div>
+</div>
+<p>Would not evaluate if <code class="docutils literal notranslate"><span class="pre">expression</span></code> was a binary clause.
+Since the above pattern should never be used, the base
+<code class="docutils literal notranslate"><span class="pre">ClauseElement</span></code> now raises an exception if called in a
+boolean context:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">bool</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  <span class="c">...</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Boolean value of this clause is not defined&quot;</span><span class="p">)</span>
+<span class="gr">TypeError</span>: <span class="n">Boolean value of this clause is not defined</span></pre></div>
+</div>
+<p>Code that wants to check for the presence of a
+<code class="docutils literal notranslate"><span class="pre">ClauseElement</span></code> expression should instead say:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">expression</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;the expression is:&quot;</span><span class="p">,</span> <span class="n">expression</span><span class="p">)</span></pre></div>
+</div>
+<p>Keep in mind, <strong>this applies to Table and Column objects
+too</strong>.</p>
+<p>The rationale for the change is twofold:</p>
+<ul class="simple">
+<li><p>Comparisons of the form <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">c1</span> <span class="pre">==</span> <span class="pre">c2:</span>&#160; <span class="pre">&lt;do</span> <span class="pre">something&gt;</span></code>
+can actually be written now</p></li>
+<li><p>Support for correct hashing of <code class="docutils literal notranslate"><span class="pre">ClauseElement</span></code> objects
+now works on alternate platforms, namely Jython.  Up until
+this point SQLAlchemy relied heavily on the specific
+behavior of cPython in this regard (and still had
+occasional problems with it).</p></li>
+</ul>
+</div>
+<div class="section" id="stricter-executemany-behavior">
+<h3>Stricter “executemany” Behavior<a class="headerlink" href="#stricter-executemany-behavior" title="Permalink to this headline">¶</a></h3>
+<p>An “executemany” in SQLAlchemy corresponds to a call to
+<code class="docutils literal notranslate"><span class="pre">execute()</span></code>, passing along a collection of bind parameter
+sets:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">insert</span><span class="p">(),</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span><span class="s1">&#39;row1&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span><span class="s1">&#39;row2&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span><span class="s1">&#39;row3&#39;</span><span class="p">})</span></pre></div>
+</div>
+<p>When the <code class="docutils literal notranslate"><span class="pre">Connection</span></code> object sends off the given
+<code class="docutils literal notranslate"><span class="pre">insert()</span></code> construct for compilation, it passes to the
+compiler the keynames present in the first set of binds
+passed along to determine the construction of the
+statement’s VALUES clause.   Users familiar with this
+construct will know that additional keys present in the
+remaining dictionaries don’t have any impact.   What’s
+different now is that all subsequent dictionaries need to
+include at least <em>every</em> key that is present in the first
+dictionary.  This means that a call like this no longer
+works:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">insert</span><span class="p">(),</span>
+                        <span class="p">{</span><span class="s1">&#39;timestamp&#39;</span><span class="p">:</span><span class="n">today</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span><span class="s1">&#39;row1&#39;</span><span class="p">},</span>
+                        <span class="p">{</span><span class="s1">&#39;timestamp&#39;</span><span class="p">:</span><span class="n">today</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span><span class="s1">&#39;row2&#39;</span><span class="p">},</span>
+                        <span class="p">{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span><span class="s1">&#39;row3&#39;</span><span class="p">})</span></pre></div>
+</div>
+<p>Because the third row does not specify the ‘timestamp’
+column.  Previous versions of SQLAlchemy would simply insert
+NULL for these missing columns.  However, if the
+<code class="docutils literal notranslate"><span class="pre">timestamp</span></code> column in the above example contained a
+Python-side default value or function, it would <em>not</em> be
+used.  This because the “executemany” operation is optimized
+for maximum performance across huge numbers of parameter
+sets, and does not attempt to evaluate Python-side defaults
+for those missing keys.   Because defaults are often
+implemented either as SQL expressions which are embedded
+inline with the INSERT statement, or are server side
+expressions which again are triggered based on the structure
+of the INSERT string, which by definition cannot fire off
+conditionally based on each parameter set, it would be
+inconsistent for Python side defaults to behave differently
+vs. SQL/server side defaults.   (SQL expression based
+defaults are embedded inline as of the 0.5 series, again to
+minimize the impact of huge numbers of parameter sets).</p>
+<p>SQLAlchemy 0.6 therefore establishes predictable consistency
+by forbidding any subsequent parameter sets from leaving any
+fields blank.  That way, there’s no more silent failure of
+Python side default values and functions, which additionally
+are allowed to remain consistent in their behavior versus
+SQL and server side defaults.</p>
+</div>
+<div class="section" id="union-and-other-compound-constructs-parenthesize-consistently">
+<h3>UNION and other “compound” constructs parenthesize consistently<a class="headerlink" href="#union-and-other-compound-constructs-parenthesize-consistently" title="Permalink to this headline">¶</a></h3>
+<p>A rule that was designed to help SQLite has been removed,
+that of the first compound element within another compound
+(such as, a <code class="docutils literal notranslate"><span class="pre">union()</span></code> inside of an <code class="docutils literal notranslate"><span class="pre">except_()</span></code>) wouldn’t
+be parenthesized.   This is inconsistent and produces the
+wrong results on PostgreSQL, which has precedence rules
+regarding INTERSECTION, and its generally a surprise.   When
+using complex composites with SQLite, you now need to turn
+the first element into a subquery (which is also compatible
+on PG).   A new example is in the SQL expression tutorial at
+the end of
+[<a class="reference external" href="http://www.sqlalchemy.org/docs/06/sqlexpression.html">http://www.sqlalchemy.org/docs/06/sqlexpression.html</a>
+#unions-and-other-set-operations].  See <a class="reference external" href="http://www.sqlalchemy.org/trac/ticket/1665">#1665</a> and
+r6690 for more background.</p>
+</div>
+</div>
+<div class="section" id="c-extensions-for-result-fetching">
+<h2>C Extensions for Result Fetching<a class="headerlink" href="#c-extensions-for-result-fetching" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">ResultProxy</span></code> and related elements, including most
+common “row processing” functions such as unicode
+conversion, numerical/boolean conversions and date parsing,
+have been re-implemented as optional C extensions for the
+purposes of performance.   This represents the beginning of
+SQLAlchemy’s path to the “dark side” where we hope to
+continue improving performance by reimplementing critical
+sections in C.   The extensions can be built by specifying
+<code class="docutils literal notranslate"><span class="pre">--with-cextensions</span></code>, i.e. <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">--with-</span>
+<span class="pre">cextensions</span> <span class="pre">install</span></code>.</p>
+<p>The extensions have the most dramatic impact on result
+fetching using direct <code class="docutils literal notranslate"><span class="pre">ResultProxy</span></code> access, i.e. that
+which is returned by <code class="docutils literal notranslate"><span class="pre">engine.execute()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">connection.execute()</span></code>, or <code class="docutils literal notranslate"><span class="pre">session.execute()</span></code>.   Within
+results returned by an ORM <code class="docutils literal notranslate"><span class="pre">Query</span></code> object, result fetching
+is not as high a percentage of overhead, so ORM performance
+improves more modestly, and mostly in the realm of fetching
+large result sets.   The performance improvements highly
+depend on the dbapi in use and on the syntax used to access
+the columns of each row (eg <code class="docutils literal notranslate"><span class="pre">row['name']</span></code> is much faster
+than <code class="docutils literal notranslate"><span class="pre">row.name</span></code>).  The current extensions have no impact
+on the speed of inserts/updates/deletes, nor do they improve
+the latency of SQL execution, that is, an application that
+spends most of its time executing many statements with very
+small result sets will not see much improvement.</p>
+<p>Performance has been improved in 0.6 versus 0.5 regardless
+of the extensions.   A quick overview of what connecting and
+fetching 50,000 rows looks like with SQLite, using mostly
+direct SQLite access, a <code class="docutils literal notranslate"><span class="pre">ResultProxy</span></code>, and a simple mapped
+ORM object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sqlite</span> <span class="n">select</span><span class="o">/</span><span class="n">native</span><span class="p">:</span> <span class="mf">0.260</span><span class="n">s</span>
+
+<span class="mf">0.6</span> <span class="o">/</span> <span class="n">C</span> <span class="n">extension</span>
+
+<span class="n">sqlalchemy</span><span class="o">.</span><span class="n">sql</span> <span class="n">select</span><span class="p">:</span> <span class="mf">0.360</span><span class="n">s</span>
+<span class="n">sqlalchemy</span><span class="o">.</span><span class="n">orm</span> <span class="n">fetch</span><span class="p">:</span> <span class="mf">2.500</span><span class="n">s</span>
+
+<span class="mf">0.6</span> <span class="o">/</span> <span class="n">Pure</span> <span class="n">Python</span>
+
+<span class="n">sqlalchemy</span><span class="o">.</span><span class="n">sql</span> <span class="n">select</span><span class="p">:</span> <span class="mf">0.600</span><span class="n">s</span>
+<span class="n">sqlalchemy</span><span class="o">.</span><span class="n">orm</span> <span class="n">fetch</span><span class="p">:</span> <span class="mf">3.000</span><span class="n">s</span>
+
+<span class="mf">0.5</span> <span class="o">/</span> <span class="n">Pure</span> <span class="n">Python</span>
+
+<span class="n">sqlalchemy</span><span class="o">.</span><span class="n">sql</span> <span class="n">select</span><span class="p">:</span> <span class="mf">0.790</span><span class="n">s</span>
+<span class="n">sqlalchemy</span><span class="o">.</span><span class="n">orm</span> <span class="n">fetch</span><span class="p">:</span> <span class="mf">4.030</span><span class="n">s</span></pre></div>
+</div>
+<p>Above, the ORM fetches the rows 33% faster than 0.5 due to
+in-python performance enhancements.   With the C extensions
+we get another 20%.   However, <code class="docutils literal notranslate"><span class="pre">ResultProxy</span></code> fetches
+improve by 67% with the C extension versus not.   Other
+tests report as much as a 200% speed improvement for some
+scenarios, such as those where lots of string conversions
+are occurring.</p>
+</div>
+<div class="section" id="new-schema-capabilities">
+<h2>New Schema Capabilities<a class="headerlink" href="#new-schema-capabilities" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">sqlalchemy.schema</span></code> package has received some long-
+needed attention.   The most visible change is the newly
+expanded DDL system.   In SQLAlchemy, it was possible since
+version 0.5 to create custom DDL strings and associate them
+with tables or metadata objects:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.schema</span> <span class="k">import</span> <span class="n">DDL</span>
+
+<span class="n">DDL</span><span class="p">(</span><span class="s1">&#39;CREATE TRIGGER users_trigger ...&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">execute_at</span><span class="p">(</span><span class="s1">&#39;after-create&#39;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span></pre></div>
+</div>
+<p>Now the full suite of DDL constructs are available under the
+same system, including those for CREATE TABLE, ADD
+CONSTRAINT, etc.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.schema</span> <span class="k">import</span> <span class="n">Constraint</span><span class="p">,</span> <span class="n">AddConstraint</span>
+
+<span class="n">AddContraint</span><span class="p">(</span><span class="n">CheckConstraint</span><span class="p">(</span><span class="s2">&quot;value &gt; 5&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">execute_at</span><span class="p">(</span><span class="s1">&#39;after-create&#39;</span><span class="p">,</span> <span class="n">mytable</span><span class="p">)</span></pre></div>
+</div>
+<p>Additionally, all the DDL objects are now regular
+<code class="docutils literal notranslate"><span class="pre">ClauseElement</span></code> objects just like any other SQLAlchemy
+expression object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.schema</span> <span class="k">import</span> <span class="n">CreateTable</span>
+
+<span class="n">create</span> <span class="o">=</span> <span class="n">CreateTable</span><span class="p">(</span><span class="n">mytable</span><span class="p">)</span>
+
+<span class="c1"># dumps the CREATE TABLE as a string</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">create</span><span class="p">)</span>
+
+<span class="c1"># executes the CREATE TABLE statement</span>
+<span class="n">engine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">create</span><span class="p">)</span></pre></div>
+</div>
+<p>and using the <code class="docutils literal notranslate"><span class="pre">sqlalchemy.ext.compiler</span></code> extension you can
+make your own:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.schema</span> <span class="k">import</span> <span class="n">DDLElement</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.compiler</span> <span class="k">import</span> <span class="n">compiles</span>
+
+<span class="k">class</span> <span class="nc">AlterColumn</span><span class="p">(</span><span class="n">DDLElement</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">=</span> <span class="n">column</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd</span>
+
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">AlterColumn</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">visit_alter_column</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s2">&quot;ALTER TABLE </span><span class="si">%s</span><span class="s2"> ALTER COLUMN </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> ...&quot;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">element</span><span class="o">.</span><span class="n">column</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">element</span><span class="o">.</span><span class="n">column</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">element</span><span class="o">.</span><span class="n">cmd</span>
+    <span class="p">)</span>
+
+<span class="n">engine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">AlterColumn</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">mycolumn</span><span class="p">,</span> <span class="s2">&quot;SET DEFAULT &#39;test&#39;&quot;</span><span class="p">))</span></pre></div>
+</div>
+<div class="section" id="deprecated-removed-schema-elements">
+<h3>Deprecated/Removed Schema Elements<a class="headerlink" href="#deprecated-removed-schema-elements" title="Permalink to this headline">¶</a></h3>
+<p>The schema package has also been greatly streamlined.   Many
+options and methods which were deprecated throughout 0.5
+have been removed.  Other little known accessors and methods
+have also been removed.</p>
+<ul class="simple">
+<li><p>the “owner” keyword argument is removed from <code class="docutils literal notranslate"><span class="pre">Table</span></code>.
+Use “schema” to represent any namespaces to be prepended
+to the table name.</p></li>
+<li><p>deprecated <code class="docutils literal notranslate"><span class="pre">MetaData.connect()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">ThreadLocalMetaData.connect()</span></code> have been removed - send
+the “bind” attribute to bind a metadata.</p></li>
+<li><p>deprecated metadata.table_iterator() method removed (use
+sorted_tables)</p></li>
+<li><p>the “metadata” argument is removed from
+<code class="docutils literal notranslate"><span class="pre">DefaultGenerator</span></code> and subclasses, but remains locally
+present on <code class="docutils literal notranslate"><span class="pre">Sequence</span></code>, which is a standalone construct
+in DDL.</p></li>
+<li><p>deprecated <code class="docutils literal notranslate"><span class="pre">PassiveDefault</span></code> - use <code class="docutils literal notranslate"><span class="pre">DefaultClause</span></code>.</p></li>
+<li><p>Removed public mutability from <code class="docutils literal notranslate"><span class="pre">Index</span></code> and
+<code class="docutils literal notranslate"><span class="pre">Constraint</span></code> objects:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">ForeignKeyConstraint.append_element()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Index.append_column()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">UniqueConstraint.append_column()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PrimaryKeyConstraint.add()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PrimaryKeyConstraint.remove()</span></code></p></li>
+</ul>
+</li>
+</ul>
+<p>These should be constructed declaratively (i.e. in one
+construction).</p>
+<ul class="simple">
+<li><p>Other removed things:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Table.key</span></code> (no idea what this was for)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Column.bind</span></code>       (get via column.table.bind)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Column.metadata</span></code>   (get via column.table.metadata)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Column.sequence</span></code>   (use column.default)</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="other-behavioral-changes">
+<h3>Other Behavioral Changes<a class="headerlink" href="#other-behavioral-changes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">UniqueConstraint</span></code>, <code class="docutils literal notranslate"><span class="pre">Index</span></code>, <code class="docutils literal notranslate"><span class="pre">PrimaryKeyConstraint</span></code>
+all accept lists of column names or column objects as
+arguments.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">use_alter</span></code> flag on <code class="docutils literal notranslate"><span class="pre">ForeignKey</span></code> is now a shortcut
+option for operations that can be hand-constructed using
+the <code class="docutils literal notranslate"><span class="pre">DDL()</span></code> event system. A side effect of this refactor
+is that <code class="docutils literal notranslate"><span class="pre">ForeignKeyConstraint</span></code> objects with
+<code class="docutils literal notranslate"><span class="pre">use_alter=True</span></code> will <em>not</em> be emitted on SQLite, which
+does not support ALTER for foreign keys. This has no
+effect on SQLite’s behavior since SQLite does not actually
+honor FOREIGN KEY constraints.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Table.primary_key</span></code> is not assignable - use
+<code class="docutils literal notranslate"><span class="pre">table.append_constraint(PrimaryKeyConstraint(...))</span></code></p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">Column</span></code> definition with a <code class="docutils literal notranslate"><span class="pre">ForeignKey</span></code> and no type,
+e.g. <code class="docutils literal notranslate"><span class="pre">Column(name,</span> <span class="pre">ForeignKey(sometable.c.somecol))</span></code>
+used to get the type of the referenced column. Now support
+for that automatic type inference is partial and may not
+work in all cases.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="logging-opened-up">
+<h2>Logging opened up<a class="headerlink" href="#logging-opened-up" title="Permalink to this headline">¶</a></h2>
+<p>At the expense of a few extra method calls here and there,
+you can set log levels for INFO and DEBUG after an engine,
+pool, or mapper has been created, and logging will commence.
+The <code class="docutils literal notranslate"><span class="pre">isEnabledFor(INFO)</span></code> method is now called
+per-<code class="docutils literal notranslate"><span class="pre">Connection</span></code> and <code class="docutils literal notranslate"><span class="pre">isEnabledFor(DEBUG)</span></code>
+per-<code class="docutils literal notranslate"><span class="pre">ResultProxy</span></code> if already enabled on the parent
+connection.  Pool logging sends to <code class="docutils literal notranslate"><span class="pre">log.info()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">log.debug()</span></code> with no check - note that pool
+checkout/checkin is typically once per transaction.</p>
+</div>
+<div class="section" id="reflection-inspector-api">
+<h2>Reflection/Inspector API<a class="headerlink" href="#reflection-inspector-api" title="Permalink to this headline">¶</a></h2>
+<p>The reflection system, which allows reflection of table
+columns via <code class="docutils literal notranslate"><span class="pre">Table('sometable',</span> <span class="pre">metadata,</span> <span class="pre">autoload=True)</span></code>
+has been opened up into its own fine-grained API, which
+allows direct inspection of database elements such as
+tables, columns, constraints, indexes, and more.   This API
+expresses return values as simple lists of strings,
+dictionaries, and <code class="docutils literal notranslate"><span class="pre">TypeEngine</span></code> objects.   The internals of
+<code class="docutils literal notranslate"><span class="pre">autoload=True</span></code> now build upon this system such that the
+translation of raw database information into
+<code class="docutils literal notranslate"><span class="pre">sqlalchemy.schema</span></code> constructs is centralized and the
+contract of individual dialects greatly simplified, vastly
+reducing bugs and inconsistencies across different backends.</p>
+<p>To use an inspector:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.engine.reflection</span> <span class="k">import</span> <span class="n">Inspector</span>
+<span class="n">insp</span> <span class="o">=</span> <span class="n">Inspector</span><span class="o">.</span><span class="n">from_engine</span><span class="p">(</span><span class="n">my_engine</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">insp</span><span class="o">.</span><span class="n">get_schema_names</span><span class="p">())</span></pre></div>
+</div>
+<p>the <code class="docutils literal notranslate"><span class="pre">from_engine()</span></code> method will in some cases provide a
+backend-specific inspector with additional capabilities,
+such as that of PostgreSQL which provides a
+<code class="docutils literal notranslate"><span class="pre">get_table_oid()</span></code> method:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;postgresql://...&#39;</span><span class="p">)</span>
+<span class="n">pg_insp</span> <span class="o">=</span> <span class="n">Inspector</span><span class="o">.</span><span class="n">from_engine</span><span class="p">(</span><span class="n">my_engine</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">pg_insp</span><span class="o">.</span><span class="n">get_table_oid</span><span class="p">(</span><span class="s1">&#39;my_table&#39;</span><span class="p">))</span></pre></div>
+</div>
+</div>
+<div class="section" id="returning-support">
+<h2>RETURNING Support<a class="headerlink" href="#returning-support" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">insert()</span></code>, <code class="docutils literal notranslate"><span class="pre">update()</span></code> and <code class="docutils literal notranslate"><span class="pre">delete()</span></code> constructs
+now support a <code class="docutils literal notranslate"><span class="pre">returning()</span></code> method, which corresponds to
+the SQL RETURNING clause as supported by PostgreSQL, Oracle,
+MS-SQL, and Firebird.   It is not supported for any other
+backend at this time.</p>
+<p>Given a list of column expressions in the same manner as
+that of a <code class="docutils literal notranslate"><span class="pre">select()</span></code> construct, the values of these
+columns will be returned as a regular result set:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="s1">&#39;some data&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">returning</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">timestamp</span><span class="p">)</span>
+        <span class="p">)</span>
+<span class="n">row</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ID:&quot;</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="s2">&quot;Timestamp:&quot;</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">])</span></pre></div>
+</div>
+<p>The implementation of RETURNING across the four supported
+backends varies wildly, in the case of Oracle requiring an
+intricate usage of OUT parameters which are re-routed into a
+“mock” result set, and in the case of MS-SQL using an
+awkward SQL syntax.  The usage of RETURNING is subject to
+limitations:</p>
+<ul class="simple">
+<li><p>it does not work for any “executemany()” style of
+execution.   This is a limitation of all supported DBAPIs.</p></li>
+<li><p>Some backends, such as Oracle, only support RETURNING that
+returns a single row - this includes UPDATE and DELETE
+statements, meaning the update() or delete() construct
+must match only a single row, or an error is raised (by
+Oracle, not SQLAlchemy).</p></li>
+</ul>
+<p>RETURNING is also used automatically by SQLAlchemy, when
+available and when not otherwise specified by an explicit
+<code class="docutils literal notranslate"><span class="pre">returning()</span></code> call, to fetch the value of newly generated
+primary key values for single-row INSERT statements.   This
+means there’s no more “SELECT nextval(sequence)” pre-
+execution for insert statements where the primary key value
+is required.   Truth be told, implicit RETURNING feature
+does incur more method overhead than the old “select
+nextval()” system, which used a quick and dirty
+cursor.execute() to get at the sequence value, and in the
+case of Oracle requires additional binding of out
+parameters.  So if method/protocol overhead is proving to be
+more expensive than additional database round trips, the
+feature can be disabled by specifying
+<code class="docutils literal notranslate"><span class="pre">implicit_returning=False</span></code> to <code class="docutils literal notranslate"><span class="pre">create_engine()</span></code>.</p>
+</div>
+<div class="section" id="type-system-changes">
+<h2>Type System Changes<a class="headerlink" href="#type-system-changes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="new-architecture">
+<h3>New Architecture<a class="headerlink" href="#new-architecture" title="Permalink to this headline">¶</a></h3>
+<p>The type system has been completely reworked behind the
+scenes to provide two goals:</p>
+<ul class="simple">
+<li><p>Separate the handling of bind parameters and result row
+values, typically a DBAPI requirement, from the SQL
+specification of the type itself, which is a database
+requirement.   This is consistent with the overall dialect
+refactor that separates database SQL behavior from DBAPI.</p></li>
+<li><p>Establish a clear and consistent contract for generating
+DDL from a <code class="docutils literal notranslate"><span class="pre">TypeEngine</span></code> object and for constructing
+<code class="docutils literal notranslate"><span class="pre">TypeEngine</span></code> objects based on column reflection.</p></li>
+</ul>
+<p>Highlights of these changes include:</p>
+<ul class="simple">
+<li><p>The construction of types within dialects has been totally
+overhauled. Dialects now define publicly available types
+as UPPERCASE names exclusively, and internal
+implementation types using underscore identifiers (i.e.
+are private). The system by which types are expressed in
+SQL and DDL has been moved to the compiler system. This
+has the effect that there are much fewer type objects
+within most dialects. A detailed document on this
+architecture for dialect authors is in [source:/lib/sqlalc
+hemy/dialects/type_migration_guidelines.txt].</p></li>
+<li><p>Reflection of types now returns the exact UPPERCASE type
+within types.py, or the UPPERCASE type within the dialect
+itself if the type is not a standard SQL type. This means
+reflection now returns more accurate information about
+reflected types.</p></li>
+<li><p>User defined types that subclass <code class="docutils literal notranslate"><span class="pre">TypeEngine</span></code> and wish
+to provide <code class="docutils literal notranslate"><span class="pre">get_col_spec()</span></code> should now subclass
+<code class="docutils literal notranslate"><span class="pre">UserDefinedType</span></code>.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">result_processor()</span></code> method on all type classes now
+accepts an additional argument <code class="docutils literal notranslate"><span class="pre">coltype</span></code>.   This is the
+DBAPI type object attached to cursor.description, and
+should be used when applicable to make better decisions on
+what kind of result-processing callable should be
+returned.  Ideally result processor functions would never
+need to use <code class="docutils literal notranslate"><span class="pre">isinstance()</span></code>, which is an expensive call
+at this level.</p></li>
+</ul>
+</div>
+<div class="section" id="native-unicode-mode">
+<h3>Native Unicode Mode<a class="headerlink" href="#native-unicode-mode" title="Permalink to this headline">¶</a></h3>
+<p>As more DBAPIs support returning Python unicode objects
+directly, the base dialect now performs a check upon the
+first connection which establishes whether or not the DBAPI
+returns a Python unicode object for a basic select of a
+VARCHAR value.   If so, the <code class="docutils literal notranslate"><span class="pre">String</span></code> type and all
+subclasses (i.e. <code class="docutils literal notranslate"><span class="pre">Text</span></code>, <code class="docutils literal notranslate"><span class="pre">Unicode</span></code>, etc.) will skip the
+“unicode” check/conversion step when result rows are
+received.  This offers a dramatic performance increase for
+large result sets.  The “unicode mode” currently is known to
+work with:</p>
+<ul class="simple">
+<li><p>sqlite3 / pysqlite</p></li>
+<li><p>psycopg2 - SQLA 0.6 now uses the “UNICODE” type extension
+by default on each psycopg2 connection object</p></li>
+<li><p>pg8000</p></li>
+<li><p>cx_oracle (we use an output processor - nice feature !)</p></li>
+</ul>
+<p>Other types may choose to disable unicode processing as
+needed, such as the <code class="docutils literal notranslate"><span class="pre">NVARCHAR</span></code> type when used with MS-SQL.</p>
+<p>In particular, if porting an application based on a DBAPI
+that formerly returned non-unicode strings, the “native
+unicode” mode has a plainly different default behavior -
+columns that are declared as <code class="docutils literal notranslate"><span class="pre">String</span></code> or <code class="docutils literal notranslate"><span class="pre">VARCHAR</span></code> now
+return unicode by default whereas they would return strings
+before.   This can break code which expects non-unicode
+strings.   The psycopg2 “native unicode” mode can be
+disabled by passing <code class="docutils literal notranslate"><span class="pre">use_native_unicode=False</span></code> to
+<code class="docutils literal notranslate"><span class="pre">create_engine()</span></code>.</p>
+<p>A more general solution for string columns that explicitly
+do not want a unicode object is to use a <code class="docutils literal notranslate"><span class="pre">TypeDecorator</span></code>
+that converts unicode back to utf-8, or whatever is desired:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">UTF8Encoded</span><span class="p">(</span><span class="n">TypeDecorator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Unicode type which coerces to utf-8.&quot;&quot;&quot;</span>
+
+    <span class="n">impl</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">VARCHAR</span>
+
+    <span class="k">def</span> <span class="nf">process_result_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">dialect</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">unicode</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span></pre></div>
+</div>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">assert_unicode</span></code> flag is now deprecated.
+SQLAlchemy allows the DBAPI and backend database in use to
+handle Unicode parameters when available, and does not add
+operational overhead by checking the incoming type; modern
+systems like sqlite and PostgreSQL will raise an encoding
+error on their end if invalid data is passed.  In those
+cases where SQLAlchemy does need to coerce a bind parameter
+from Python Unicode to an encoded string, or when the
+Unicode type is used explicitly, a warning is raised if the
+object is a bytestring.   This warning can be suppressed or
+converted to an exception using the Python warnings filter
+documented at: <a class="reference external" href="http://docs.python.org/library/warnings.html">http://docs.python.org/library/warnings.html</a></p>
+</div>
+<div class="section" id="generic-enum-type">
+<h3>Generic Enum Type<a class="headerlink" href="#generic-enum-type" title="Permalink to this headline">¶</a></h3>
+<p>We now have an <code class="docutils literal notranslate"><span class="pre">Enum</span></code> in the <code class="docutils literal notranslate"><span class="pre">types</span></code> module.  This is a
+string type that is given a collection of “labels” which
+constrain the possible values given to those labels.  By
+default, this type generates a <code class="docutils literal notranslate"><span class="pre">VARCHAR</span></code> using the size of
+the largest label, and applies a CHECK constraint to the
+table within the CREATE TABLE statement.   When using MySQL,
+the type by default uses MySQL’s ENUM type, and when using
+PostgreSQL the type will generate a user defined type using
+<code class="docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">TYPE</span> <span class="pre">&lt;mytype&gt;</span> <span class="pre">AS</span> <span class="pre">ENUM</span></code>.  In order to create the
+type using PostgreSQL, the <code class="docutils literal notranslate"><span class="pre">name</span></code> parameter must be
+specified to the constructor.  The type also accepts a
+<code class="docutils literal notranslate"><span class="pre">native_enum=False</span></code> option which will issue the
+VARCHAR/CHECK strategy for all databases.  Note that
+PostgreSQL ENUM types currently don’t work with pg8000 or
+zxjdbc.</p>
+</div>
+<div class="section" id="reflection-returns-dialect-specific-types">
+<h3>Reflection Returns Dialect-Specific Types<a class="headerlink" href="#reflection-returns-dialect-specific-types" title="Permalink to this headline">¶</a></h3>
+<p>Reflection now returns the most specific type possible from
+the database. That is, if you create a table using
+<code class="docutils literal notranslate"><span class="pre">String</span></code>, then reflect it back, the reflected column will
+likely be <code class="docutils literal notranslate"><span class="pre">VARCHAR</span></code>. For dialects that support a more
+specific form of the type, that’s what you’ll get. So a
+<code class="docutils literal notranslate"><span class="pre">Text</span></code> type would come back as <code class="docutils literal notranslate"><span class="pre">oracle.CLOB</span></code> on Oracle,
+a <code class="docutils literal notranslate"><span class="pre">LargeBinary</span></code> might be an <code class="docutils literal notranslate"><span class="pre">mysql.MEDIUMBLOB</span></code> etc. The
+obvious advantage here is that reflection preserves as much
+information possible from what the database had to say.</p>
+<p>Some applications that deal heavily in table metadata may
+wish to compare types across reflected tables and/or non-
+reflected tables.  There’s a semi-private accessor available
+on <code class="docutils literal notranslate"><span class="pre">TypeEngine</span></code> called <code class="docutils literal notranslate"><span class="pre">_type_affinity</span></code> and an
+associated comparison helper <code class="docutils literal notranslate"><span class="pre">_compare_type_affinity</span></code>.
+This accessor returns the “generic” <code class="docutils literal notranslate"><span class="pre">types</span></code> class which
+the type corresponds to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="o">.</span><span class="n">_compare_type_affinity</span><span class="p">(</span><span class="n">postgresql</span><span class="o">.</span><span class="n">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Integer</span><span class="p">()</span><span class="o">.</span><span class="n">_compare_type_affinity</span><span class="p">(</span><span class="n">mysql</span><span class="o">.</span><span class="n">REAL</span><span class="p">)</span>
+<span class="go">False</span></pre></div>
+</div>
+</div>
+<div class="section" id="miscellaneous-api-changes">
+<h3>Miscellaneous API Changes<a class="headerlink" href="#miscellaneous-api-changes" title="Permalink to this headline">¶</a></h3>
+<p>The usual “generic” types are still the general system in
+use, i.e. <code class="docutils literal notranslate"><span class="pre">String</span></code>, <code class="docutils literal notranslate"><span class="pre">Float</span></code>, <code class="docutils literal notranslate"><span class="pre">DateTime</span></code>.   There’s a
+few changes there:</p>
+<ul class="simple">
+<li><p>Types no longer make any guesses as to default parameters.
+In particular, <code class="docutils literal notranslate"><span class="pre">Numeric</span></code>, <code class="docutils literal notranslate"><span class="pre">Float</span></code>, as well as
+subclasses NUMERIC, FLOAT, DECIMAL don’t generate any
+length or scale unless specified.   This also continues to
+include the controversial <code class="docutils literal notranslate"><span class="pre">String</span></code> and <code class="docutils literal notranslate"><span class="pre">VARCHAR</span></code> types
+(although MySQL dialect will pre-emptively raise when
+asked to render VARCHAR with no length).   No defaults are
+assumed, and if they are used in a CREATE TABLE statement,
+an error will be raised if the underlying database does
+not allow non-lengthed versions of these types.</p></li>
+<li><p>the <code class="docutils literal notranslate"><span class="pre">Binary</span></code> type has been renamed to <code class="docutils literal notranslate"><span class="pre">LargeBinary</span></code>,
+for BLOB/BYTEA/similar types.  For <code class="docutils literal notranslate"><span class="pre">BINARY</span></code> and
+<code class="docutils literal notranslate"><span class="pre">VARBINARY</span></code>, those are present directly as
+<code class="docutils literal notranslate"><span class="pre">types.BINARY</span></code>, <code class="docutils literal notranslate"><span class="pre">types.VARBINARY</span></code>, as well as in the
+MySQL and MS-SQL dialects.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PickleType</span></code> now uses == for comparison of values when
+mutable=True, unless the “comparator” argument with a
+comparison function is specified to the type.   If you are
+pickling a custom object you should implement an
+<code class="docutils literal notranslate"><span class="pre">__eq__()</span></code> method so that value-based comparisons are
+accurate.</p></li>
+<li><p>The default “precision” and “scale” arguments of Numeric
+and Float have been removed and now default to None.
+NUMERIC and FLOAT will be rendered with no numeric
+arguments by default unless these values are provided.</p></li>
+<li><p>DATE, TIME and DATETIME types on SQLite can now take
+optional “storage_format” and “regexp” argument.
+“storage_format” can be used to store those types using a
+custom string format. “regexp” allows to use a custom
+regular expression to match string values from the
+database.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">__legacy_microseconds__</span></code> on SQLite <code class="docutils literal notranslate"><span class="pre">Time</span></code> and
+<code class="docutils literal notranslate"><span class="pre">DateTime</span></code> types is not supported anymore. You should
+use the new “storage_format” argument instead.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DateTime</span></code> types on SQLite now use by a default a
+stricter regular expression to match strings from the
+database. Use the new “regexp” argument if you are using
+data stored in a legacy format.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="orm-changes">
+<h2>ORM Changes<a class="headerlink" href="#orm-changes" title="Permalink to this headline">¶</a></h2>
+<p>Upgrading an ORM application from 0.5 to 0.6 should require
+little to no changes, as the ORM’s behavior remains almost
+identical.   There are some default argument and name
+changes, and some loading behaviors have been improved.</p>
+<div class="section" id="new-unit-of-work">
+<h3>New Unit of Work<a class="headerlink" href="#new-unit-of-work" title="Permalink to this headline">¶</a></h3>
+<p>The internals for the unit of work, primarily
+<code class="docutils literal notranslate"><span class="pre">topological.py</span></code> and <code class="docutils literal notranslate"><span class="pre">unitofwork.py</span></code>, have been
+completely rewritten and are vastly simplified.   This
+should have no impact on usage, as all existing behavior
+during flush has been maintained exactly (or at least, as
+far as it is exercised by our testsuite and the handful of
+production environments which have tested it heavily).  The
+performance of flush() now uses 20-30% fewer method calls
+and should also use less memory.  The intent and flow of the
+source code should now be reasonably easy to follow, and the
+architecture of the flush is fairly open-ended at this
+point, creating room for potential new areas of
+sophistication.   The flush process no longer has any
+reliance on recursion so flush plans of arbitrary size and
+complexity can be flushed.  Additionally, the mapper’s
+“save” process, which issues INSERT and UPDATE statements,
+now caches the “compiled” form of the two statements so that
+callcounts are further dramatically reduced with very large
+flushes.</p>
+<p>Any changes in behavior observed with flush versus earlier
+versions of 0.6 or 0.5 should be reported to us ASAP - we’ll
+make sure no functionality is lost.</p>
+</div>
+<div class="section" id="changes-to-query-update-and-query-delete">
+<h3>Changes to <code class="docutils literal notranslate"><span class="pre">query.update()</span></code> and <code class="docutils literal notranslate"><span class="pre">query.delete()</span></code><a class="headerlink" href="#changes-to-query-update-and-query-delete" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>the ‘expire’ option on query.update() has been renamed to
+‘fetch’, thus matching that of query.delete()</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">query.update()</span></code> and <code class="docutils literal notranslate"><span class="pre">query.delete()</span></code> both default to
+‘evaluate’ for the synchronize strategy.</p></li>
+<li><p>the ‘synchronize’ strategy for update() and delete()
+raises an error on failure. There is no implicit fallback
+onto “fetch”. Failure of evaluation is based on the
+structure of criteria, so success/failure is deterministic
+based on code structure.</p></li>
+</ul>
+</div>
+<div class="section" id="relation-is-officially-named-relationship">
+<h3><code class="docutils literal notranslate"><span class="pre">relation()</span></code> is officially named <code class="docutils literal notranslate"><span class="pre">relationship()</span></code><a class="headerlink" href="#relation-is-officially-named-relationship" title="Permalink to this headline">¶</a></h3>
+<p>This to solve the long running issue that “relation” means a
+“table or derived table” in relational algebra terms.  The
+<code class="docutils literal notranslate"><span class="pre">relation()</span></code> name, which is less typing, will hang around
+for the foreseeable future so this change should be entirely
+painless.</p>
+</div>
+<div class="section" id="subquery-eager-loading">
+<h3>Subquery eager loading<a class="headerlink" href="#subquery-eager-loading" title="Permalink to this headline">¶</a></h3>
+<p>A new kind of eager loading is added called “subquery”
+loading.   This is a load that emits a second SQL query
+immediately after the first which loads full collections for
+all the parents in the first query, joining upwards to the
+parent using INNER JOIN.   Subquery loading is used similarly
+to the current joined-eager loading, using the
+<code class="docutils literal notranslate"><span class="pre">`subqueryload()``</span></code> and <code class="docutils literal notranslate"><span class="pre">``subqueryload_all()``</span></code> options
+as well as the <code class="docutils literal notranslate"><span class="pre">``lazy='subquery'``</span></code> setting on
+<code class="docutils literal notranslate"><span class="pre">``relationship()`</span></code>.   The subquery load is usually much
+more efficient for loading many larger collections as it
+uses INNER JOIN unconditionally and also doesn’t re-load
+parent rows.</p>
+</div>
+<div class="section" id="eagerload-eagerload-all-is-now-joinedload-joinedload-all">
+<h3><code class="docutils literal notranslate"><span class="pre">`eagerload()``</span></code>, <code class="docutils literal notranslate"><span class="pre">``eagerload_all()``</span></code> is now <code class="docutils literal notranslate"><span class="pre">``joinedload()``</span></code>, <code class="docutils literal notranslate"><span class="pre">``joinedload_all()`</span></code><a class="headerlink" href="#eagerload-eagerload-all-is-now-joinedload-joinedload-all" title="Permalink to this headline">¶</a></h3>
+<p>To make room for the new subquery load feature, the existing
+<code class="docutils literal notranslate"><span class="pre">`eagerload()``</span></code>/<code class="docutils literal notranslate"><span class="pre">``eagerload_all()``</span></code> options are now
+superseded by <code class="docutils literal notranslate"><span class="pre">``joinedload()``</span></code> and
+<code class="docutils literal notranslate"><span class="pre">``joinedload_all()``</span></code>.   The old names will hang around
+for the foreseeable future just like <code class="docutils literal notranslate"><span class="pre">``relation()`</span></code>.</p>
+</div>
+<div class="section" id="lazy-false-none-true-dynamic-now-accepts-lazy-noload-joined-subquery-select-dynamic">
+<h3><code class="docutils literal notranslate"><span class="pre">`lazy=False|None|True|'dynamic'``</span></code> now accepts <code class="docutils literal notranslate"><span class="pre">``lazy='noload'|'joined'|'subquery'|'select'|'dynamic'`</span></code><a class="headerlink" href="#lazy-false-none-true-dynamic-now-accepts-lazy-noload-joined-subquery-select-dynamic" title="Permalink to this headline">¶</a></h3>
+<p>Continuing on the theme of loader strategies opened up, the
+standard keywords for the <code class="docutils literal notranslate"><span class="pre">`lazy``</span></code> option on
+<code class="docutils literal notranslate"><span class="pre">``relationship()``</span></code> are now <code class="docutils literal notranslate"><span class="pre">``select``</span></code> for lazy
+loading (via a SELECT issued on attribute access),
+<code class="docutils literal notranslate"><span class="pre">``joined``</span></code> for joined-eager loading, <code class="docutils literal notranslate"><span class="pre">``subquery``</span></code>
+for subquery-eager loading, <code class="docutils literal notranslate"><span class="pre">``noload``</span></code> for no loading
+should occur, and <code class="docutils literal notranslate"><span class="pre">``dynamic``</span></code> for a “dynamic”
+relationship.   The old <code class="docutils literal notranslate"><span class="pre">``True``</span></code>, <code class="docutils literal notranslate"><span class="pre">``False``</span></code>,
+<code class="docutils literal notranslate"><span class="pre">``None`</span></code> arguments are still accepted with the identical
+behavior as before.</p>
+</div>
+<div class="section" id="innerjoin-true-on-relation-joinedload">
+<h3>innerjoin=True on relation, joinedload<a class="headerlink" href="#innerjoin-true-on-relation-joinedload" title="Permalink to this headline">¶</a></h3>
+<p>Joined-eagerly loaded scalars and collections can now be
+instructed to use INNER JOIN instead of OUTER JOIN.   On
+PostgreSQL this is observed to provide a 300-600% speedup on
+some queries.   Set this flag for any many-to-one which is
+on a NOT NULLable foreign key, and similarly for any
+collection where related items are guaranteed to exist.</p>
+<p>At mapper level:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mapper</span><span class="p">(</span><span class="n">Child</span><span class="p">,</span> <span class="n">child</span><span class="p">)</span>
+<span class="n">mapper</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;child&#39;</span><span class="p">:</span><span class="n">relationship</span><span class="p">(</span><span class="n">Child</span><span class="p">,</span> <span class="n">lazy</span><span class="o">=</span><span class="s1">&#39;joined&#39;</span><span class="p">,</span> <span class="n">innerjoin</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="p">})</span></pre></div>
+</div>
+<p>At query time level:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Parent</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">joinedload</span><span class="p">(</span><span class="n">Parent</span><span class="o">.</span><span class="n">child</span><span class="p">,</span> <span class="n">innerjoin</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">innerjoin=True</span></code> flag at the <code class="docutils literal notranslate"><span class="pre">relationship()</span></code> level
+will also take effect for any <code class="docutils literal notranslate"><span class="pre">joinedload()</span></code> option which
+does not override the value.</p>
+</div>
+<div class="section" id="many-to-one-enhancements">
+<h3>Many-to-one Enhancements<a class="headerlink" href="#many-to-one-enhancements" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>many-to-one relations now fire off a lazyload in fewer
+cases, including in most cases will not fetch the “old”
+value when a new one is replaced.</p></li>
+<li><p>many-to-one relation to a joined-table subclass now uses
+get() for a simple load (known as the “use_get”
+condition), i.e. <code class="docutils literal notranslate"><span class="pre">Related</span></code>-&gt;``Sub(Base)``, without the
+need to redefine the primaryjoin condition in terms of the
+base table. [ticket:1186]</p></li>
+<li><p>specifying a foreign key with a declarative column, i.e.
+<code class="docutils literal notranslate"><span class="pre">ForeignKey(MyRelatedClass.id)</span></code> doesn’t break the
+“use_get” condition from taking place [ticket:1492]</p></li>
+<li><p>relationship(), joinedload(), and joinedload_all() now
+feature an option called “innerjoin”. Specify <code class="docutils literal notranslate"><span class="pre">True</span></code> or
+<code class="docutils literal notranslate"><span class="pre">False</span></code> to control whether an eager join is constructed
+as an INNER or OUTER join. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code> as always.
+The mapper options will override whichever setting is
+specified on relationship(). Should generally be set for
+many-to-one, not nullable foreign key relations to allow
+improved join performance. [ticket:1544]</p></li>
+<li><p>the behavior of joined eager loading such that the main
+query is wrapped in a subquery when LIMIT/OFFSET are
+present now makes an exception for the case when all eager
+loads are many-to-one joins. In those cases, the eager
+joins are against the parent table directly along with the
+limit/offset without the extra overhead of a subquery,
+since a many-to-one join does not add rows to the result.</p>
+<p>For example, in 0.5 this query:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Address</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">eagerload</span><span class="p">(</span><span class="n">Address</span><span class="o">.</span><span class="n">user</span><span class="p">))</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span></pre></div>
+</div>
+<p>would produce SQL like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="o">*</span> <span class="n">FROM</span>
+  <span class="p">(</span><span class="n">SELECT</span> <span class="o">*</span> <span class="n">FROM</span> <span class="n">addresses</span> <span class="n">LIMIT</span> <span class="mi">10</span><span class="p">)</span> <span class="n">AS</span> <span class="n">anon_1</span>
+  <span class="n">LEFT</span> <span class="n">OUTER</span> <span class="n">JOIN</span> <span class="n">users</span> <span class="n">AS</span> <span class="n">users_1</span> <span class="n">ON</span> <span class="n">users_1</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">anon_1</span><span class="o">.</span><span class="n">addresses_user_id</span></pre></div>
+</div>
+<p>This because the presence of any eager loaders suggests
+that some or all of them may relate to multi-row
+collections, which would necessitate wrapping any kind of
+rowcount-sensitive modifiers like LIMIT inside of a
+subquery.</p>
+<p>In 0.6, that logic is more sensitive and can detect if all
+eager loaders represent many-to-ones, in which case the
+eager joins don’t affect the rowcount:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="o">*</span> <span class="n">FROM</span> <span class="n">addresses</span> <span class="n">LEFT</span> <span class="n">OUTER</span> <span class="n">JOIN</span> <span class="n">users</span> <span class="n">AS</span> <span class="n">users_1</span> <span class="n">ON</span> <span class="n">users_1</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">addresses</span><span class="o">.</span><span class="n">user_id</span> <span class="n">LIMIT</span> <span class="mi">10</span></pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="mutable-primary-keys-with-joined-table-inheritance">
+<h3>Mutable Primary Keys with Joined Table Inheritance<a class="headerlink" href="#mutable-primary-keys-with-joined-table-inheritance" title="Permalink to this headline">¶</a></h3>
+<p>A joined table inheritance config where the child table has
+a PK that foreign keys to the parent PK can now be updated
+on a CASCADE-capable database like PostgreSQL.
+<code class="docutils literal notranslate"><span class="pre">mapper()</span></code> now has an option <code class="docutils literal notranslate"><span class="pre">passive_updates=True</span></code>
+which indicates this foreign key is updated automatically.
+If on a non-cascading database like SQLite or MySQL/MyISAM,
+set this flag to <code class="docutils literal notranslate"><span class="pre">False</span></code>.  A future feature enhancement
+will try to get this flag to be auto-configuring based on
+dialect/table style in use.</p>
+</div>
+<div class="section" id="beaker-caching">
+<h3>Beaker Caching<a class="headerlink" href="#beaker-caching" title="Permalink to this headline">¶</a></h3>
+<p>A promising new example of Beaker integration is in
+<code class="docutils literal notranslate"><span class="pre">examples/beaker_caching</span></code>.   This is a straightforward
+recipe which applies a Beaker cache within the result-
+generation engine of <code class="docutils literal notranslate"><span class="pre">Query</span></code>.  Cache parameters are
+provided via <code class="docutils literal notranslate"><span class="pre">query.options()</span></code>, and allows full control
+over the contents of the cache.   SQLAlchemy 0.6 includes
+improvements to the <code class="docutils literal notranslate"><span class="pre">Session.merge()</span></code> method to support
+this and similar recipes, as well as to provide
+significantly improved performance in most scenarios.</p>
+</div>
+<div class="section" id="other-changes">
+<h3>Other Changes<a class="headerlink" href="#other-changes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>the “row tuple” object returned by <code class="docutils literal notranslate"><span class="pre">Query</span></code> when multiple
+column/entities are selected is now picklable as well as
+higher performing.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">query.join()</span></code> has been reworked to provide more
+consistent behavior and more flexibility (includes
+[ticket:1537])</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">query.select_from()</span></code> accepts multiple clauses to
+produce multiple comma separated entries within the FROM
+clause. Useful when selecting from multiple-homed join()
+clauses.</p></li>
+<li><p>the “dont_load=True” flag on <code class="docutils literal notranslate"><span class="pre">Session.merge()</span></code> is
+deprecated and is now “load=False”.</p></li>
+<li><p>added “make_transient()” helper function which transforms
+a persistent/ detached instance into a transient one (i.e.
+deletes the instance_key and removes from any session.)
+[ticket:1052]</p></li>
+<li><p>the allow_null_pks flag on mapper() is deprecated and has
+been renamed to allow_partial_pks.   It is turned “on” by
+default.  This means that a row which has a non-null value
+for any of its primary key columns will be considered an
+identity. The need for this scenario typically only occurs
+when mapping to an outer join.  When set to False, a PK
+that has NULLs in it will not be considered a primary key
+- in particular this means a result row will come back as
+None (or not be filled into a collection), and new in 0.6
+also indicates that session.merge() won’t issue a round
+trip to the database for such a PK value. [ticket:1680]</p></li>
+<li><p>the mechanics of “backref” have been fully merged into the
+finer grained “back_populates” system, and take place
+entirely within the <code class="docutils literal notranslate"><span class="pre">_generate_backref()</span></code> method of
+<code class="docutils literal notranslate"><span class="pre">RelationProperty</span></code>. This makes the initialization
+procedure of <code class="docutils literal notranslate"><span class="pre">RelationProperty</span></code> simpler and allows
+easier propagation of settings (such as from subclasses of
+<code class="docutils literal notranslate"><span class="pre">RelationProperty</span></code>) into the reverse reference. The
+internal <code class="docutils literal notranslate"><span class="pre">BackRef()</span></code> is gone and <code class="docutils literal notranslate"><span class="pre">backref()</span></code> returns a
+plain tuple that is understood by <code class="docutils literal notranslate"><span class="pre">RelationProperty</span></code>.</p></li>
+<li><p>the keys attribute of <code class="docutils literal notranslate"><span class="pre">ResultProxy</span></code> is now a method, so
+references to it (<code class="docutils literal notranslate"><span class="pre">result.keys</span></code>) must be changed to
+method invocations (<code class="docutils literal notranslate"><span class="pre">result.keys()</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ResultProxy.last_inserted_ids</span></code> is now deprecated, use
+<code class="docutils literal notranslate"><span class="pre">ResultProxy.inserted_primary_key</span></code> instead.</p></li>
+</ul>
+</div>
+<div class="section" id="deprecated-removed-orm-elements">
+<h3>Deprecated/Removed ORM Elements<a class="headerlink" href="#deprecated-removed-orm-elements" title="Permalink to this headline">¶</a></h3>
+<p>Most elements that were deprecated throughout 0.5 and raised
+deprecation warnings have been removed (with a few
+exceptions).  All elements that were marked “pending
+deprecation” are now deprecated and will raise a warning
+upon use.</p>
+<ul class="simple">
+<li><p>‘transactional’ flag on sessionmaker() and others is
+removed. Use ‘autocommit=True’ to indicate
+‘transactional=False’.</p></li>
+<li><p>‘polymorphic_fetch’ argument on mapper() is removed.
+Loading can be controlled using the ‘with_polymorphic’
+option.</p></li>
+<li><p>‘select_table’ argument on mapper() is removed.  Use
+‘with_polymorphic=(“*”, &lt;some selectable&gt;)’ for this
+functionality.</p></li>
+<li><p>‘proxy’ argument on synonym() is removed.  This flag   did
+nothing throughout 0.5, as the “proxy generation”
+behavior is now automatic.</p></li>
+<li><p>Passing a single list of elements to joinedload(),
+joinedload_all(), contains_eager(), lazyload(),   defer(),
+and undefer() instead of multiple positional   *args is
+deprecated.</p></li>
+<li><p>Passing a single list of elements to query.order_by(),
+query.group_by(), query.join(), or query.outerjoin()
+instead of multiple positional *args is deprecated.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">query.iterate_instances()</span></code> is removed.  Use
+<code class="docutils literal notranslate"><span class="pre">query.instances()</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Query.query_from_parent()</span></code> is removed.  Use the
+sqlalchemy.orm.with_parent() function to produce a
+“parent” clause, or alternatively <code class="docutils literal notranslate"><span class="pre">query.with_parent()</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">query._from_self()</span></code> is removed, use
+<code class="docutils literal notranslate"><span class="pre">query.from_self()</span></code>   instead.</p></li>
+<li><p>the “comparator” argument to composite() is removed.   Use
+“comparator_factory”.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RelationProperty._get_join()</span></code> is removed.</p></li>
+<li><p>the ‘echo_uow’ flag on Session is removed.  Use   logging
+on the “sqlalchemy.orm.unitofwork” name.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">session.clear()</span></code> is removed.  use
+<code class="docutils literal notranslate"><span class="pre">session.expunge_all()</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">session.save()</span></code>, <code class="docutils literal notranslate"><span class="pre">session.update()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">session.save_or_update()</span></code>   are removed.  Use
+<code class="docutils literal notranslate"><span class="pre">session.add()</span></code> and <code class="docutils literal notranslate"><span class="pre">session.add_all()</span></code>.</p></li>
+<li><p>the “objects” flag on session.flush() remains deprecated.</p></li>
+<li><p>the “dont_load=True” flag on session.merge() is deprecated
+in favor of “load=False”.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ScopedSession.mapper</span></code> remains deprecated.  See the
+usage recipe at   <a class="reference external" href="http://www.sqlalchemy.org/trac/wiki/Usag">http://www.sqlalchemy.org/trac/wiki/Usag</a>
+eRecipes/SessionAwareMapper</p></li>
+<li><p>passing an <code class="docutils literal notranslate"><span class="pre">InstanceState</span></code> (internal SQLAlchemy state
+object) to   <code class="docutils literal notranslate"><span class="pre">attributes.init_collection()</span></code> or
+<code class="docutils literal notranslate"><span class="pre">attributes.get_history()</span></code> is   deprecated.  These
+functions are public API and normally   expect a regular
+mapped object instance.</p></li>
+<li><p>the ‘engine’ parameter to <code class="docutils literal notranslate"><span class="pre">declarative_base()</span></code> is
+removed.   Use the ‘bind’ keyword argument.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="extensions">
+<h2>Extensions<a class="headerlink" href="#extensions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="sqlsoup">
+<h3>SQLSoup<a class="headerlink" href="#sqlsoup" title="Permalink to this headline">¶</a></h3>
+<p>SQLSoup has been modernized and updated to reflect common
+0.5/0.6 capabilities, including well defined session
+integration.  Please read the new docs at [<a class="reference external" href="http://www.sqlalc">http://www.sqlalc</a>
+hemy.org/docs/06/reference/ext/sqlsoup.html].</p>
+</div>
+<div class="section" id="declarative">
+<h3>Declarative<a class="headerlink" href="#declarative" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">DeclarativeMeta</span></code> (default metaclass for
+<code class="docutils literal notranslate"><span class="pre">declarative_base</span></code>) previously allowed subclasses to
+modify <code class="docutils literal notranslate"><span class="pre">dict_</span></code> to add class attributes (e.g. columns).
+This no longer works, the <code class="docutils literal notranslate"><span class="pre">DeclarativeMeta</span></code> constructor
+now ignores <code class="docutils literal notranslate"><span class="pre">dict_</span></code>. Instead, the class attributes should
+be assigned directly, e.g. <code class="docutils literal notranslate"><span class="pre">cls.id=Column(...)</span></code>, or the
+<a class="reference external" href="http://www.sqlalchemy.org/docs/reference/ext/declarative.html#mix-in-classes">MixIn class</a> approach should be used
+instead of the metaclass approach.</p>
+</div>
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="migration_07.html" title="previous chapter">What’s New in SQLAlchemy 0.7?</a>
+        Next:
+        <a href="migration_05.html" title="next chapter">What’s new in SQLAlchemy 0.5?</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

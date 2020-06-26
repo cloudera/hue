@@ -1,0 +1,1118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    Mapping Class Inheritance Hierarchies
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+        <link rel="up" title="Mapper Configuration" href="mapper_config.html" />
+        <link rel="next" title="Non-Traditional Mappings" href="nonstandard_mappings.html" />
+        <link rel="prev" title="Composite Column Types" href="composites.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../contents.html">Contents</a> |
+                <a href="../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="index.html" title="SQLAlchemy ORM">SQLAlchemy ORM</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="tutorial.html">Object Relational Tutorial</a></span></li>
+<li><span class="link-container"><a class="reference external" href="mapper_config.html">Mapper Configuration</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="mapping_styles.html">Types of Mappings</a></span></li>
+<li><span class="link-container"><a class="reference external" href="scalar_mapping.html">Mapping Columns and Expressions</a></span></li>
+<li class="selected"><span class="link-container"><strong>Mapping Class Inheritance Hierarchies</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#joined-table-inheritance">Joined Table Inheritance</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#relationships-with-joined-inheritance">Relationships with Joined Inheritance</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#loading-joined-inheritance-mappings">Loading Joined Inheritance Mappings</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#single-table-inheritance">Single Table Inheritance</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#relationships-with-single-table-inheritance">Relationships with Single Table Inheritance</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#loading-single-inheritance-mappings">Loading Single Inheritance Mappings</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#concrete-table-inheritance">Concrete Table Inheritance</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#concrete-polymorphic-loading-configuration">Concrete Polymorphic Loading Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#abstract-concrete-classes">Abstract Concrete Classes</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#classical-and-semi-classical-concrete-polymorphic-configuration">Classical and Semi-Classical Concrete Polymorphic Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#relationships-with-concrete-inheritance">Relationships with Concrete Inheritance</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#loading-concrete-inheritance-mappings">Loading Concrete Inheritance Mappings</a></span></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="nonstandard_mappings.html">Non-Traditional Mappings</a></span></li>
+<li><span class="link-container"><a class="reference external" href="versioning.html">Configuring a Version Counter</a></span></li>
+<li><span class="link-container"><a class="reference external" href="mapping_api.html">Class Mapping API</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="relationships.html">Relationship Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="loading_objects.html">Loading Objects</a></span></li>
+<li><span class="link-container"><a class="reference external" href="session.html">Using the Session</a></span></li>
+<li><span class="link-container"><a class="reference external" href="extending.html">Events and Internals</a></span></li>
+<li><span class="link-container"><a class="reference external" href="extensions/index.html">ORM Extensions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="examples.html">ORM Examples</a></span></li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="mapping-class-inheritance-hierarchies">
+<span id="inheritance-toplevel"></span><h1>Mapping Class Inheritance Hierarchies<a class="headerlink" href="#mapping-class-inheritance-hierarchies" title="Permalink to this headline">¶</a></h1>
+<p>SQLAlchemy supports three forms of inheritance: <strong>single table inheritance</strong>,
+where several types of classes are represented by a single table, <strong>concrete
+table inheritance</strong>, where each type of class is represented by independent
+tables, and <strong>joined table inheritance</strong>, where the class hierarchy is broken
+up among dependent tables, each class represented by its own table that only
+includes those attributes local to that class.</p>
+<p>The most common forms of inheritance are single and joined table, while
+concrete inheritance presents more configurational challenges.</p>
+<p>When mappers are configured in an inheritance relationship, SQLAlchemy has the
+ability to load elements <a class="reference internal" href="../glossary.html#term-polymorphically"><span class="xref std std-term">polymorphically</span></a>, meaning that a single query can
+return objects of multiple types.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="examples.html#examples-inheritance"><span class="std std-ref">Inheritance Mapping Recipes</span></a> - complete examples of joined, single and
+concrete inheritance</p>
+</div>
+<div class="section" id="joined-table-inheritance">
+<span id="joined-inheritance"></span><h2>Joined Table Inheritance<a class="headerlink" href="#joined-table-inheritance" title="Permalink to this headline">¶</a></h2>
+<p>In joined table inheritance, each class along a hierarchy of classes
+is represented by a distinct table.  Querying for a particular subclass
+in the hierarchy will render as a SQL JOIN along all tables in its
+inheritance path. If the queried class is the base class, the <strong>default behavior
+is to include only the base table</strong> in a SELECT statement.   In all cases, the
+ultimate class to instantiate for a given row is determined by a discriminator
+column or an expression that works against the base table.    When a subclass
+is loaded <strong>only</strong> against a base table, resulting objects will have base attributes
+populated at first; attributes that are local to the subclass will <a class="reference internal" href="../glossary.html#term-lazy-load"><span class="xref std std-term">lazy load</span></a>
+when they are accessed.    Alternatively, there are options which can change
+the default behavior, allowing the query to include columns corresponding to
+multiple tables/subclasses up front.</p>
+<p>The base class in a joined inheritance hierarchy is configured with
+additional arguments that will refer to the polymorphic discriminator
+column as well as the identifier for the base class:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Employee</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;employee&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span><span class="s1">&#39;employee&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;polymorphic_on&#39;</span><span class="p">:</span><span class="nb">type</span>
+    <span class="p">}</span></pre></div>
+</div>
+<p>Above, an additional column <code class="docutils literal notranslate"><span class="pre">type</span></code> is established to act as the
+<strong>discriminator</strong>, configured as such using the <a class="reference internal" href="mapping_api.html#sqlalchemy.orm.mapper.params.polymorphic_on" title="sqlalchemy.orm.mapper"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">mapper.polymorphic_on</span></code></a>
+parameter.  This column will store a value which indicates the type of object
+represented within the row. The column may be of any datatype, though string
+and integer are the most common.  The actual data value to be applied to this
+column for a particular row in the database is specified using the
+<a class="reference internal" href="mapping_api.html#sqlalchemy.orm.mapper.params.polymorphic_identity" title="sqlalchemy.orm.mapper"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">mapper.polymorphic_identity</span></code></a> parameter, described below.</p>
+<p>While a polymorphic discriminator expression is not strictly necessary, it is
+required if polymorphic loading is desired.   Establishing a simple column on
+the base table is the easiest way to achieve this, however very sophisticated
+inheritance mappings may even configure a SQL expression such as a CASE
+statement as the polymorphic discriminator.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Currently, <strong>only one discriminator column or SQL expression may be
+configured for the entire inheritance hierarchy</strong>, typically on the base-
+most class in the hierarchy. “Cascading” polymorphic discriminator
+expressions are not yet supported.</p>
+</div>
+<p>We next define <code class="docutils literal notranslate"><span class="pre">Engineer</span></code> and <code class="docutils literal notranslate"><span class="pre">Manager</span></code> subclasses of <code class="docutils literal notranslate"><span class="pre">Employee</span></code>.
+Each contains columns that represent the attributes unique to the subclass
+they represent. Each table also must contain a primary key column (or
+columns), as well as a foreign key reference to the parent table:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Engineer</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;engineer&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;employee.id&#39;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">engineer_name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">30</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span><span class="s1">&#39;engineer&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Manager</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;manager&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;employee.id&#39;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">manager_name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">30</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span><span class="s1">&#39;manager&#39;</span><span class="p">,</span>
+    <span class="p">}</span></pre></div>
+</div>
+<p>In the above example, each mapping specifies the
+<a class="reference internal" href="mapping_api.html#sqlalchemy.orm.mapper.params.polymorphic_identity" title="sqlalchemy.orm.mapper"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">mapper.polymorphic_identity</span></code></a> parameter within its mapper arguments.
+This value populates the column designated by the
+<a class="reference internal" href="mapping_api.html#sqlalchemy.orm.mapper.params.polymorphic_on" title="sqlalchemy.orm.mapper"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">mapper.polymorphic_on</span></code></a> parameter established on the base  mapper.
+The <a class="reference internal" href="mapping_api.html#sqlalchemy.orm.mapper.params.polymorphic_identity" title="sqlalchemy.orm.mapper"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">mapper.polymorphic_identity</span></code></a>  parameter should be unique to
+each mapped class across the whole hierarchy, and there should only be one
+“identity” per mapped class; as noted above,  “cascading” identities where some
+subclasses introduce a second identity are not supported.</p>
+<p>The ORM uses the value set up by <a class="reference internal" href="mapping_api.html#sqlalchemy.orm.mapper.params.polymorphic_identity" title="sqlalchemy.orm.mapper"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">mapper.polymorphic_identity</span></code></a> in
+order to determine which class a row belongs towards when loading rows
+polymorphically.  In the example above, every row which represents an
+<code class="docutils literal notranslate"><span class="pre">Employee</span></code> will have the value <code class="docutils literal notranslate"><span class="pre">'employee'</span></code> in its <code class="docutils literal notranslate"><span class="pre">type</span></code> row; similarly,
+every <code class="docutils literal notranslate"><span class="pre">Engineer</span></code> will get the value <code class="docutils literal notranslate"><span class="pre">'engineer'</span></code>, and each <code class="docutils literal notranslate"><span class="pre">Manager</span></code> will
+get the value <code class="docutils literal notranslate"><span class="pre">'manager'</span></code>. Regardless of whether the inheritance mapping uses
+distinct joined tables for subclasses as in joined table inheritance, or all
+one table as in single table inheritance, this value is expected to be
+persisted and available to the ORM when querying. The
+<a class="reference internal" href="mapping_api.html#sqlalchemy.orm.mapper.params.polymorphic_identity" title="sqlalchemy.orm.mapper"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">mapper.polymorphic_identity</span></code></a> parameter also applies to concrete
+table inheritance, but is not actually persisted; see the later section at
+<a class="reference internal" href="#concrete-inheritance"><span class="std std-ref">Concrete Table Inheritance</span></a> for details.</p>
+<p>In a polymorphic setup, it is most common that the foreign key constraint is
+established on the same column or columns as the primary key itself, however
+this is not required; a column distinct from the primary key may also be made
+to refer to the parent via foreign key.  The way that a JOIN is constructed
+from the base table to subclasses is also directly customizable, however this
+is rarely necessary.</p>
+<div class="topic">
+<p class="topic-title first">Joined inheritance primary keys</p>
+<p>One natural effect of the joined table inheritance configuration is that
+the identity of any mapped object can be determined entirely from rows  in
+the base table alone. This has obvious advantages, so SQLAlchemy always
+considers the primary key columns of a joined inheritance class to be those
+of the base table only. In other words, the <code class="docutils literal notranslate"><span class="pre">id</span></code> columns of both the
+<code class="docutils literal notranslate"><span class="pre">engineer</span></code> and <code class="docutils literal notranslate"><span class="pre">manager</span></code> tables are not used to locate <code class="docutils literal notranslate"><span class="pre">Engineer</span></code> or
+<code class="docutils literal notranslate"><span class="pre">Manager</span></code> objects - only the value in <code class="docutils literal notranslate"><span class="pre">employee.id</span></code> is considered.
+<code class="docutils literal notranslate"><span class="pre">engineer.id</span></code> and <code class="docutils literal notranslate"><span class="pre">manager.id</span></code> are still of course critical to the
+proper operation of the pattern overall as they are used to locate the
+joined row, once the parent row has been determined within a statement.</p>
+</div>
+<p>With the joined inheritance mapping complete, querying against <code class="docutils literal notranslate"><span class="pre">Employee</span></code>
+will return a combination of <code class="docutils literal notranslate"><span class="pre">Employee</span></code>, <code class="docutils literal notranslate"><span class="pre">Engineer</span></code> and <code class="docutils literal notranslate"><span class="pre">Manager</span></code>
+objects. Newly saved <code class="docutils literal notranslate"><span class="pre">Engineer</span></code>, <code class="docutils literal notranslate"><span class="pre">Manager</span></code>, and <code class="docutils literal notranslate"><span class="pre">Employee</span></code> objects will
+automatically populate the <code class="docutils literal notranslate"><span class="pre">employee.type</span></code> column with the correct
+“discriminator” value in this case <code class="docutils literal notranslate"><span class="pre">&quot;engineer&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;manager&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;employee&quot;</span></code>, as appropriate.</p>
+<div class="section" id="relationships-with-joined-inheritance">
+<h3>Relationships with Joined Inheritance<a class="headerlink" href="#relationships-with-joined-inheritance" title="Permalink to this headline">¶</a></h3>
+<p>Relationships are fully supported with joined table inheritance.   The
+relationship involving a joined-inheritance class should target the class
+in the hierarchy that also corresponds to the foreign key constraint;
+below, as the <code class="docutils literal notranslate"><span class="pre">employee</span></code> table has a foreign key constraint back to
+the <code class="docutils literal notranslate"><span class="pre">company</span></code> table, the relationships are set up between <code class="docutils literal notranslate"><span class="pre">Company</span></code>
+and <code class="docutils literal notranslate"><span class="pre">Employee</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Company</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;company&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">employees</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Employee&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;company&quot;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Employee</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;employee&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">company_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;company.id&#39;</span><span class="p">))</span>
+    <span class="n">company</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Company&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;employees&quot;</span><span class="p">)</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span><span class="s1">&#39;employee&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;polymorphic_on&#39;</span><span class="p">:</span><span class="nb">type</span>
+    <span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Manager</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+
+<span class="k">class</span> <span class="nc">Engineer</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="c1"># ...</span></pre></div>
+</div>
+<p>If the foreign key constraint is on a table corresponding to a subclass,
+the relationship should target that subclass instead.  In the example
+below, there is a foreign
+key constraint from <code class="docutils literal notranslate"><span class="pre">manager</span></code> to <code class="docutils literal notranslate"><span class="pre">company</span></code>, so the relationships are
+established between the <code class="docutils literal notranslate"><span class="pre">Manager</span></code> and <code class="docutils literal notranslate"><span class="pre">Company</span></code> classes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Company</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;company&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">managers</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Manager&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;company&quot;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Employee</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;employee&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span><span class="s1">&#39;employee&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;polymorphic_on&#39;</span><span class="p">:</span><span class="nb">type</span>
+    <span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Manager</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;manager&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;employee.id&#39;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">manager_name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">30</span><span class="p">))</span>
+
+    <span class="n">company_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;company.id&#39;</span><span class="p">))</span>
+    <span class="n">company</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Company&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;managers&quot;</span><span class="p">)</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span><span class="s1">&#39;manager&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Engineer</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="c1"># ...</span></pre></div>
+</div>
+<p>Above, the <code class="docutils literal notranslate"><span class="pre">Manager</span></code> class will have a <code class="docutils literal notranslate"><span class="pre">Manager.company</span></code> attribute;
+<code class="docutils literal notranslate"><span class="pre">Company</span></code> will have a <code class="docutils literal notranslate"><span class="pre">Company.managers</span></code> attribute that always
+loads against a join of the <code class="docutils literal notranslate"><span class="pre">employee</span></code> and <code class="docutils literal notranslate"><span class="pre">manager</span></code> tables together.</p>
+</div>
+<div class="section" id="loading-joined-inheritance-mappings">
+<h3>Loading Joined Inheritance Mappings<a class="headerlink" href="#loading-joined-inheritance-mappings" title="Permalink to this headline">¶</a></h3>
+<p>See the sections <a class="reference internal" href="inheritance_loading.html"><span class="std std-ref">Loading Inheritance Hierarchies</span></a> and
+<a class="reference internal" href="inheritance_loading.html#loading-joined-inheritance"><span class="std std-ref">Loading objects with joined table inheritance</span></a> for background on inheritance
+loading techniques, including configuration of tables
+to be queried both at mapper configuration time as well as query time.</p>
+</div>
+</div>
+<div class="section" id="single-table-inheritance">
+<span id="single-inheritance"></span><h2>Single Table Inheritance<a class="headerlink" href="#single-table-inheritance" title="Permalink to this headline">¶</a></h2>
+<p>Single table inheritance represents all attributes of all subclasses
+within a single table.  A particular subclass that has attributes unique
+to that class will persist them within columns in the table that are otherwise
+NULL if the row refers to a different kind of object.</p>
+<p>Querying for a particular subclass
+in the hierarchy will render as a SELECT against the base table, which
+will include a WHERE clause that limits rows to those with a particular
+value or values present in the discriminator column or expression.</p>
+<p>Single table inheritance has the advantage of simplicity compared to
+joined table inheritance; queries are much more efficient as only one table
+needs to be involved in order to load objects of every represented class.</p>
+<p>Single-table inheritance configuration looks much like joined-table
+inheritance, except only the base class specifies <code class="docutils literal notranslate"><span class="pre">__tablename__</span></code>. A
+discriminator column is also required on the base table so that classes can be
+differentiated from each other.</p>
+<p>Even though subclasses share the base table for all of their attributes,
+when using Declarative,  <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a> objects may still be specified on
+subclasses, indicating that the column is to be mapped only to that subclass;
+the <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a> will be applied to the same base <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Employee</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;employee&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_on&#39;</span><span class="p">:</span><span class="nb">type</span><span class="p">,</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span><span class="s1">&#39;employee&#39;</span>
+    <span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Manager</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">manager_data</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span><span class="s1">&#39;manager&#39;</span>
+    <span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Engineer</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">engineer_info</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span><span class="s1">&#39;engineer&#39;</span>
+    <span class="p">}</span></pre></div>
+</div>
+<p>Note that the mappers for the derived classes Manager and Engineer omit the
+<code class="docutils literal notranslate"><span class="pre">__tablename__</span></code>, indicating they do not have a mapped table of
+their own.</p>
+<div class="section" id="relationships-with-single-table-inheritance">
+<h3>Relationships with Single Table Inheritance<a class="headerlink" href="#relationships-with-single-table-inheritance" title="Permalink to this headline">¶</a></h3>
+<p>Relationships are fully supported with single table inheritance.   Configuration
+is done in the same manner as that of joined inheritance; a foreign key
+attribute should be on the same class that’s the “foreign” side of the
+relationship:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Company</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;company&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">employees</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Employee&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;company&quot;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Employee</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;employee&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">company_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;company.id&#39;</span><span class="p">))</span>
+    <span class="n">company</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Company&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;employees&quot;</span><span class="p">)</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span><span class="s1">&#39;employee&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;polymorphic_on&#39;</span><span class="p">:</span><span class="nb">type</span>
+    <span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">Manager</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">manager_data</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span><span class="s1">&#39;manager&#39;</span>
+    <span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Engineer</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">engineer_info</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span><span class="s1">&#39;engineer&#39;</span>
+    <span class="p">}</span></pre></div>
+</div>
+<p>Also, like the case of joined inheritance, we can create relationships
+that involve a specific subclass.   When queried, the SELECT statement will
+include a WHERE clause that limits the class selection to that subclass
+or subclasses:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Company</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;company&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">managers</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Manager&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;company&quot;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Employee</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;employee&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span><span class="s1">&#39;employee&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;polymorphic_on&#39;</span><span class="p">:</span><span class="nb">type</span>
+    <span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">Manager</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">manager_name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">30</span><span class="p">))</span>
+
+    <span class="n">company_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;company.id&#39;</span><span class="p">))</span>
+    <span class="n">company</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Company&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;managers&quot;</span><span class="p">)</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span><span class="s1">&#39;manager&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">Engineer</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">engineer_info</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span><span class="s1">&#39;engineer&#39;</span>
+    <span class="p">}</span></pre></div>
+</div>
+<p>Above, the <code class="docutils literal notranslate"><span class="pre">Manager</span></code> class will have a <code class="docutils literal notranslate"><span class="pre">Manager.company</span></code> attribute;
+<code class="docutils literal notranslate"><span class="pre">Company</span></code> will have a <code class="docutils literal notranslate"><span class="pre">Company.managers</span></code> attribute that always
+loads against the <code class="docutils literal notranslate"><span class="pre">employee</span></code> with an additional WHERE clause that
+limits rows to those with <code class="docutils literal notranslate"><span class="pre">type</span> <span class="pre">=</span> <span class="pre">'manager'</span></code>.</p>
+</div>
+<div class="section" id="loading-single-inheritance-mappings">
+<h3>Loading Single Inheritance Mappings<a class="headerlink" href="#loading-single-inheritance-mappings" title="Permalink to this headline">¶</a></h3>
+<p>The loading techniques for single-table inheritance are mostly identical to
+those used for joined-table inheritance, and a high degree of abstraction is
+provided between these two mapping types such that it is easy to switch between
+them as well as to intermix them in a single hierarchy (just omit
+<code class="docutils literal notranslate"><span class="pre">__tablename__</span></code> from whichever subclasses are to be single-inheriting). See
+the sections <a class="reference internal" href="inheritance_loading.html"><span class="std std-ref">Loading Inheritance Hierarchies</span></a> and
+<a class="reference internal" href="inheritance_loading.html#loading-single-inheritance"><span class="std std-ref">Loading objects with single table inheritance</span></a> for documentation on inheritance loading
+techniques, including configuration of classes to be queried both at mapper
+configuration time as well as query time.</p>
+</div>
+</div>
+<div class="section" id="concrete-table-inheritance">
+<span id="concrete-inheritance"></span><h2>Concrete Table Inheritance<a class="headerlink" href="#concrete-table-inheritance" title="Permalink to this headline">¶</a></h2>
+<p>Concrete inheritance maps each subclass to its own distinct table, each
+of which contains all columns necessary to produce an instance of that class.
+A concrete inheritance configuration by default queries non-polymorphically;
+a query for a particular class will only query that class’ table
+and only return instances of that class.  Polymorphic loading of concrete
+classes is enabled by configuring within the mapper
+a special SELECT that typically is produced as a UNION of all the tables.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Concrete table inheritance is <strong>much more complicated</strong> than joined
+or single table inheritance, and is <strong>much more limited in functionality</strong>
+especially pertaining to using it with relationships, eager loading,
+and polymorphic loading.  When used polymorphically it produces
+<strong>very large queries</strong> with UNIONS that won’t perform as well as simple
+joins.  It is strongly advised that if flexibility in relationship loading
+and polymorphic loading is required, that joined or single table inheritance
+be used if at all possible.   If polymorphic loading isn’t required, then
+plain non-inheriting mappings can be used if each class refers to its
+own table completely.</p>
+</div>
+<p>Whereas joined and single table inheritance are fluent in “polymorphic”
+loading, it is a more awkward affair in concrete inheritance.  For this
+reason, concrete inheritance is more appropriate when <strong>polymorphic loading
+is not required</strong>.   Establishing relationships that involve concrete inheritance
+classes is also more awkward.</p>
+<p>To establish a class as using concrete inheritance, add the
+<a class="reference internal" href="mapping_api.html#sqlalchemy.orm.mapper.params.concrete" title="sqlalchemy.orm.mapper"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">mapper.concrete</span></code></a> parameter within the <code class="docutils literal notranslate"><span class="pre">__mapper_args__</span></code>.
+This indicates to Declarative as well as the mapping that the superclass
+table should not be considered as part of the mapping:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Employee</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;employee&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+<span class="k">class</span> <span class="nc">Manager</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;manager&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">manager_data</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;concrete&#39;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Engineer</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;engineer&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">engineer_info</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;concrete&#39;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span></pre></div>
+</div>
+<p>Two critical points should be noted:</p>
+<ul class="simple">
+<li><p>We must <strong>define all columns explicitly</strong> on each subclass, even those of
+the same name.  A column such as
+<code class="docutils literal notranslate"><span class="pre">Employee.name</span></code> here is <strong>not</strong> copied out to the tables mapped
+by <code class="docutils literal notranslate"><span class="pre">Manager</span></code> or <code class="docutils literal notranslate"><span class="pre">Engineer</span></code> for us.</p></li>
+<li><p>while the <code class="docutils literal notranslate"><span class="pre">Engineer</span></code> and <code class="docutils literal notranslate"><span class="pre">Manager</span></code> classes are
+mapped in an inheritance relationship with <code class="docutils literal notranslate"><span class="pre">Employee</span></code>, they still <strong>do not
+include polymorphic loading</strong>.  Meaning, if we query for <code class="docutils literal notranslate"><span class="pre">Employee</span></code>
+objects, the <code class="docutils literal notranslate"><span class="pre">manager</span></code> and <code class="docutils literal notranslate"><span class="pre">engineer</span></code> tables are not queried at all.</p></li>
+</ul>
+<div class="section" id="concrete-polymorphic-loading-configuration">
+<span id="concrete-polymorphic"></span><h3>Concrete Polymorphic Loading Configuration<a class="headerlink" href="#concrete-polymorphic-loading-configuration" title="Permalink to this headline">¶</a></h3>
+<p>Polymorphic loading with concrete inheritance requires that a specialized
+SELECT is configured against each base class that should have polymorphic
+loading.  This SELECT needs to be capable of accessing all the
+mapped tables individually, and is typically a UNION statement that is
+constructed using a SQLAlchemy helper <a class="reference internal" href="mapping_api.html#sqlalchemy.orm.polymorphic_union" title="sqlalchemy.orm.polymorphic_union"><code class="xref py py-func docutils literal notranslate"><span class="pre">polymorphic_union()</span></code></a>.</p>
+<p>As discussed in <a class="reference internal" href="inheritance_loading.html"><span class="std std-ref">Loading Inheritance Hierarchies</span></a>, mapper inheritance
+configurations of any type can be configured to load from a special selectable
+by default using the <a class="reference internal" href="mapping_api.html#sqlalchemy.orm.mapper.params.with_polymorphic" title="sqlalchemy.orm.mapper"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">mapper.with_polymorphic</span></code></a> argument.  Current
+public API requires that this argument is set on a <a class="reference internal" href="mapping_api.html#sqlalchemy.orm.Mapper" title="sqlalchemy.orm.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a> when
+it is first constructed.</p>
+<p>However, in the case of Declarative, both the mapper and the <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a>
+that is mapped are created at once, the moment the mapped class is defined.
+This means that the <a class="reference internal" href="mapping_api.html#sqlalchemy.orm.mapper.params.with_polymorphic" title="sqlalchemy.orm.mapper"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">mapper.with_polymorphic</span></code></a> argument cannot
+be provided yet, since the <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> objects that correspond to the
+subclasses haven’t yet been defined.</p>
+<p>There are a few strategies available to resolve this cycle, however
+Declarative provides helper classes <a class="reference internal" href="extensions/declarative/api.html#sqlalchemy.ext.declarative.ConcreteBase" title="sqlalchemy.ext.declarative.ConcreteBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConcreteBase</span></code></a> and
+<a class="reference internal" href="extensions/declarative/api.html#sqlalchemy.ext.declarative.AbstractConcreteBase" title="sqlalchemy.ext.declarative.AbstractConcreteBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConcreteBase</span></code></a> which handle this issue behind the scenes.</p>
+<p>Using <a class="reference internal" href="extensions/declarative/api.html#sqlalchemy.ext.declarative.ConcreteBase" title="sqlalchemy.ext.declarative.ConcreteBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConcreteBase</span></code></a>, we can set up our concrete mapping in
+almost the same way as we do other forms of inheritance mappings:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">ConcreteBase</span>
+
+<span class="k">class</span> <span class="nc">Employee</span><span class="p">(</span><span class="n">ConcreteBase</span><span class="p">,</span> <span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;employee&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;employee&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;concrete&#39;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Manager</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;manager&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">manager_data</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">40</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;manager&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;concrete&#39;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Engineer</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;engineer&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">engineer_info</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">40</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;engineer&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;concrete&#39;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span></pre></div>
+</div>
+<p>Above, Declarative sets up the polymorphic selectable for the
+<code class="docutils literal notranslate"><span class="pre">Employee</span></code> class at mapper “initialization” time; this is the late-configuration
+step for mappers that resolves other dependent mappers.  The <a class="reference internal" href="extensions/declarative/api.html#sqlalchemy.ext.declarative.ConcreteBase" title="sqlalchemy.ext.declarative.ConcreteBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConcreteBase</span></code></a>
+helper uses the
+<a class="reference internal" href="mapping_api.html#sqlalchemy.orm.polymorphic_union" title="sqlalchemy.orm.polymorphic_union"><code class="xref py py-func docutils literal notranslate"><span class="pre">polymorphic_union()</span></code></a> function to create a UNION of all concrete-mapped
+tables after all the other classes are set up, and then configures this statement
+with the already existing base-class mapper.</p>
+<p>Upon select, the polymorphic union produces a query like this:</p>
+<div class="highlight-python+sql notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Employee</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<div class='show_sql'>
+SELECT
+    pjoin.id AS pjoin_id,
+    pjoin.name AS pjoin_name,
+    pjoin.type AS pjoin_type,
+    pjoin.manager_data AS pjoin_manager_data,
+    pjoin.engineer_info AS pjoin_engineer_info
+FROM (
+    SELECT
+        employee.id AS id,
+        employee.name AS name,
+        CAST(NULL AS VARCHAR(50)) AS manager_data,
+        CAST(NULL AS VARCHAR(50)) AS engineer_info,
+        &#39;employee&#39; AS type
+    FROM employee
+    UNION ALL
+    SELECT
+        manager.id AS id,
+        manager.name AS name,
+        manager.manager_data AS manager_data,
+        CAST(NULL AS VARCHAR(50)) AS engineer_info,
+        &#39;manager&#39; AS type
+    FROM manager
+    UNION ALL
+    SELECT
+        engineer.id AS id,
+        engineer.name AS name,
+        CAST(NULL AS VARCHAR(50)) AS manager_data,
+        engineer.engineer_info AS engineer_info,
+        &#39;engineer&#39; AS type
+    FROM engineer
+) AS pjoin</div></pre></div>
+</div>
+<p>The above UNION query needs to manufacture “NULL” columns for each subtable
+in order to accommodate for those columns that aren’t members of that
+particular subclass.</p>
+</div>
+<div class="section" id="abstract-concrete-classes">
+<h3>Abstract Concrete Classes<a class="headerlink" href="#abstract-concrete-classes" title="Permalink to this headline">¶</a></h3>
+<p>The concrete mappings illustrated thus far show both the subclasses as well
+as the base class mapped to individual tables.   In the concrete inheritance
+use case, it is common that the base class is not represented within the
+database, only the subclasses.  In other words, the base class is
+“abstract”.</p>
+<p>Normally, when one would like to map two different subclasses to individual
+tables, and leave the base class unmapped, this can be achieved very easily.
+When using Declarative, just declare the
+base class with the <code class="docutils literal notranslate"><span class="pre">__abstract__</span></code> indicator:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Employee</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__abstract__</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="k">class</span> <span class="nc">Manager</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;manager&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">manager_data</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">40</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;manager&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Engineer</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;engineer&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">engineer_info</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">40</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;engineer&#39;</span><span class="p">,</span>
+    <span class="p">}</span></pre></div>
+</div>
+<p>Above, we are not actually making use of SQLAlchemy’s inheritance mapping
+facilities; we can load and persist instances of <code class="docutils literal notranslate"><span class="pre">Manager</span></code> and <code class="docutils literal notranslate"><span class="pre">Engineer</span></code>
+normally.   The situation changes however when we need to <strong>query polymorphically</strong>,
+that is, we’d like to emit <code class="docutils literal notranslate"><span class="pre">session.query(Employee)</span></code> and get back a collection
+of <code class="docutils literal notranslate"><span class="pre">Manager</span></code> and <code class="docutils literal notranslate"><span class="pre">Engineer</span></code> instances.    This brings us back into the
+domain of concrete inheritance, and we must build a special mapper against
+<code class="docutils literal notranslate"><span class="pre">Employee</span></code> in order to achieve this.</p>
+<div class="topic">
+<p class="topic-title first">Mappers can always SELECT</p>
+<p>In SQLAlchemy, a mapper for a class always has to refer to some
+“selectable”, which is normally a <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> but may also refer to any
+<a class="reference internal" href="../core/selectable.html#sqlalchemy.sql.expression.select" title="sqlalchemy.sql.expression.select"><code class="xref py py-func docutils literal notranslate"><span class="pre">select()</span></code></a> object as well.   While it may appear that a “single table
+inheritance” mapper does not map to a table, these mappers in fact
+implicitly refer to the table that is mapped by a superclass.</p>
+</div>
+<p>To modify our concrete inheritance example to illustrate an “abstract” base
+that is capable of polymorphic loading,
+we will have only an <code class="docutils literal notranslate"><span class="pre">engineer</span></code> and a <code class="docutils literal notranslate"><span class="pre">manager</span></code> table and no <code class="docutils literal notranslate"><span class="pre">employee</span></code>
+table, however the <code class="docutils literal notranslate"><span class="pre">Employee</span></code> mapper will be mapped directly to the
+“polymorphic union”, rather than specifying it locally to the
+<a class="reference internal" href="mapping_api.html#sqlalchemy.orm.mapper.params.with_polymorphic" title="sqlalchemy.orm.mapper"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">mapper.with_polymorphic</span></code></a> parameter.</p>
+<p>To help with this, Declarative offers a variant of the <a class="reference internal" href="extensions/declarative/api.html#sqlalchemy.ext.declarative.ConcreteBase" title="sqlalchemy.ext.declarative.ConcreteBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConcreteBase</span></code></a>
+class called <a class="reference internal" href="extensions/declarative/api.html#sqlalchemy.ext.declarative.AbstractConcreteBase" title="sqlalchemy.ext.declarative.AbstractConcreteBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConcreteBase</span></code></a> which achieves this automatically:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">AbstractConcreteBase</span>
+
+<span class="k">class</span> <span class="nc">Employee</span><span class="p">(</span><span class="n">AbstractConcreteBase</span><span class="p">,</span> <span class="n">Base</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">Manager</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;manager&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">manager_data</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">40</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;manager&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;concrete&#39;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Engineer</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;engineer&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">engineer_info</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">40</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;engineer&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;concrete&#39;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span></pre></div>
+</div>
+<p>The <a class="reference internal" href="extensions/declarative/api.html#sqlalchemy.ext.declarative.AbstractConcreteBase" title="sqlalchemy.ext.declarative.AbstractConcreteBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConcreteBase</span></code></a> helper class has a more complex internal
+process than that of <a class="reference internal" href="extensions/declarative/api.html#sqlalchemy.ext.declarative.ConcreteBase" title="sqlalchemy.ext.declarative.ConcreteBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConcreteBase</span></code></a>, in that the entire mapping
+of the base class must be delayed until all the subclasses have been declared.
+With a mapping like the above, only instances of <code class="docutils literal notranslate"><span class="pre">Manager</span></code> and <code class="docutils literal notranslate"><span class="pre">Engineer</span></code>
+may be persisted; querying against the <code class="docutils literal notranslate"><span class="pre">Employee</span></code> class will always produce
+<code class="docutils literal notranslate"><span class="pre">Manager</span></code> and <code class="docutils literal notranslate"><span class="pre">Engineer</span></code> objects.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="extensions/declarative/inheritance.html#declarative-concrete-table"><span class="std std-ref">Concrete Table Inheritance</span></a> - in the Declarative reference documentation</p>
+</div>
+</div>
+<div class="section" id="classical-and-semi-classical-concrete-polymorphic-configuration">
+<h3>Classical and Semi-Classical Concrete Polymorphic Configuration<a class="headerlink" href="#classical-and-semi-classical-concrete-polymorphic-configuration" title="Permalink to this headline">¶</a></h3>
+<p>The Declarative configurations illustrated with <a class="reference internal" href="extensions/declarative/api.html#sqlalchemy.ext.declarative.ConcreteBase" title="sqlalchemy.ext.declarative.ConcreteBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConcreteBase</span></code></a>
+and <a class="reference internal" href="extensions/declarative/api.html#sqlalchemy.ext.declarative.AbstractConcreteBase" title="sqlalchemy.ext.declarative.AbstractConcreteBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConcreteBase</span></code></a> are equivalent to two other forms
+of configuration that make use of <a class="reference internal" href="mapping_api.html#sqlalchemy.orm.polymorphic_union" title="sqlalchemy.orm.polymorphic_union"><code class="xref py py-func docutils literal notranslate"><span class="pre">polymorphic_union()</span></code></a> explicitly.
+These configurational forms make use of the <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> object explicitly
+so that the “polymorphic union” can be created first, then applied
+to the mappings.   These are illustrated here to clarify the role
+of the <a class="reference internal" href="mapping_api.html#sqlalchemy.orm.polymorphic_union" title="sqlalchemy.orm.polymorphic_union"><code class="xref py py-func docutils literal notranslate"><span class="pre">polymorphic_union()</span></code></a> function in terms of mapping.</p>
+<p>A <strong>semi-classical mapping</strong> for example makes use of Declarative, but
+establishes the <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> objects separately:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">metadata</span> <span class="o">=</span> <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span>
+
+<span class="n">employees_table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span>
+    <span class="s1">&#39;employee&#39;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">)),</span>
+<span class="p">)</span>
+
+<span class="n">managers_table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span>
+    <span class="s1">&#39;manager&#39;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">)),</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;manager_data&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">)),</span>
+<span class="p">)</span>
+
+<span class="n">engineers_table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span>
+    <span class="s1">&#39;engineer&#39;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">)),</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;engineer_info&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">)),</span>
+<span class="p">)</span></pre></div>
+</div>
+<p>Next, the UNION is produced using <a class="reference internal" href="mapping_api.html#sqlalchemy.orm.polymorphic_union" title="sqlalchemy.orm.polymorphic_union"><code class="xref py py-func docutils literal notranslate"><span class="pre">polymorphic_union()</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">polymorphic_union</span>
+
+<span class="n">pjoin</span> <span class="o">=</span> <span class="n">polymorphic_union</span><span class="p">({</span>
+    <span class="s1">&#39;employee&#39;</span><span class="p">:</span> <span class="n">employees_table</span><span class="p">,</span>
+    <span class="s1">&#39;manager&#39;</span><span class="p">:</span> <span class="n">managers_table</span><span class="p">,</span>
+    <span class="s1">&#39;engineer&#39;</span><span class="p">:</span> <span class="n">engineers_table</span>
+<span class="p">},</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;pjoin&#39;</span><span class="p">)</span></pre></div>
+</div>
+<p>With the above <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> objects, the mappings can be produced using “semi-classical” style,
+where we use Declarative in conjunction with the <code class="docutils literal notranslate"><span class="pre">__table__</span></code> argument;
+our polymorphic union above is passed via <code class="docutils literal notranslate"><span class="pre">__mapper_args__</span></code> to
+the <a class="reference internal" href="mapping_api.html#sqlalchemy.orm.mapper.params.with_polymorphic" title="sqlalchemy.orm.mapper"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">mapper.with_polymorphic</span></code></a> parameter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Employee</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__table__</span> <span class="o">=</span> <span class="n">employee_table</span>
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_on&#39;</span><span class="p">:</span> <span class="n">pjoin</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+        <span class="s1">&#39;with_polymorphic&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">pjoin</span><span class="p">),</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;employee&#39;</span>
+    <span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Engineer</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__table__</span> <span class="o">=</span> <span class="n">engineer_table</span>
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;engineer&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;concrete&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Manager</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__table__</span> <span class="o">=</span> <span class="n">manager_table</span>
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;manager&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;concrete&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></pre></div>
+</div>
+<p>Alternatively, the same <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> objects can be used in
+fully “classical” style, without using Declarative at all.
+A constructor similar to that supplied by Declarative is illustrated:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Employee</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kw</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kw</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+
+<span class="k">class</span> <span class="nc">Manager</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">Engineer</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="n">employee_mapper</span> <span class="o">=</span> <span class="n">mapper</span><span class="p">(</span><span class="n">Employee</span><span class="p">,</span> <span class="n">pjoin</span><span class="p">,</span>
+                                    <span class="n">with_polymorphic</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">pjoin</span><span class="p">),</span>
+                                    <span class="n">polymorphic_on</span><span class="o">=</span><span class="n">pjoin</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+<span class="n">manager_mapper</span> <span class="o">=</span> <span class="n">mapper</span><span class="p">(</span><span class="n">Manager</span><span class="p">,</span> <span class="n">managers_table</span><span class="p">,</span>
+                                    <span class="n">inherits</span><span class="o">=</span><span class="n">employee_mapper</span><span class="p">,</span>
+                                    <span class="n">concrete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                    <span class="n">polymorphic_identity</span><span class="o">=</span><span class="s1">&#39;manager&#39;</span><span class="p">)</span>
+<span class="n">engineer_mapper</span> <span class="o">=</span> <span class="n">mapper</span><span class="p">(</span><span class="n">Engineer</span><span class="p">,</span> <span class="n">engineers_table</span><span class="p">,</span>
+                                    <span class="n">inherits</span><span class="o">=</span><span class="n">employee_mapper</span><span class="p">,</span>
+                                    <span class="n">concrete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                    <span class="n">polymorphic_identity</span><span class="o">=</span><span class="s1">&#39;engineer&#39;</span><span class="p">)</span></pre></div>
+</div>
+<p>The “abstract” example can also be mapped using “semi-classical” or “classical”
+style.  The difference is that instead of applying the “polymorphic union”
+to the <a class="reference internal" href="mapping_api.html#sqlalchemy.orm.mapper.params.with_polymorphic" title="sqlalchemy.orm.mapper"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">mapper.with_polymorphic</span></code></a> parameter, we apply it directly
+as the mapped selectable on our basemost mapper.  The semi-classical
+mapping is illustrated below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">polymorphic_union</span>
+
+<span class="n">pjoin</span> <span class="o">=</span> <span class="n">polymorphic_union</span><span class="p">({</span>
+    <span class="s1">&#39;manager&#39;</span><span class="p">:</span> <span class="n">managers_table</span><span class="p">,</span>
+    <span class="s1">&#39;engineer&#39;</span><span class="p">:</span> <span class="n">engineers_table</span>
+<span class="p">},</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;pjoin&#39;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Employee</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__table__</span> <span class="o">=</span> <span class="n">pjoin</span>
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_on&#39;</span><span class="p">:</span> <span class="n">pjoin</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+        <span class="s1">&#39;with_polymorphic&#39;</span><span class="p">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;employee&#39;</span>
+    <span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Engineer</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__table__</span> <span class="o">=</span> <span class="n">engineer_table</span>
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;engineer&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;concrete&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Manager</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__table__</span> <span class="o">=</span> <span class="n">manager_table</span>
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;manager&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;concrete&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></pre></div>
+</div>
+<p>Above, we use <a class="reference internal" href="mapping_api.html#sqlalchemy.orm.polymorphic_union" title="sqlalchemy.orm.polymorphic_union"><code class="xref py py-func docutils literal notranslate"><span class="pre">polymorphic_union()</span></code></a> in the same manner as before, except
+that we omit the <code class="docutils literal notranslate"><span class="pre">employee</span></code> table.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="mapping_styles.html#classical-mapping"><span class="std std-ref">Classical Mappings</span></a> - background information on “classical” mappings</p>
+</div>
+</div>
+<div class="section" id="relationships-with-concrete-inheritance">
+<h3>Relationships with Concrete Inheritance<a class="headerlink" href="#relationships-with-concrete-inheritance" title="Permalink to this headline">¶</a></h3>
+<p>In a concrete inheritance scenario, mapping relationships is challenging
+since the distinct classes do not share a table.    If the relationships
+only involve specific classes, such as a relationship between <code class="docutils literal notranslate"><span class="pre">Company</span></code> in
+our previous examples and <code class="docutils literal notranslate"><span class="pre">Manager</span></code>, special steps aren’t needed as these
+are just two related tables.</p>
+<p>However, if <code class="docutils literal notranslate"><span class="pre">Company</span></code> is to have a one-to-many relationship
+to <code class="docutils literal notranslate"><span class="pre">Employee</span></code>, indicating that the collection may include both
+<code class="docutils literal notranslate"><span class="pre">Engineer</span></code> and <code class="docutils literal notranslate"><span class="pre">Manager</span></code> objects, that implies that <code class="docutils literal notranslate"><span class="pre">Employee</span></code> must
+have polymorphic loading capabilities and also that each table to be related
+must have a foreign key back to the <code class="docutils literal notranslate"><span class="pre">company</span></code> table.  An example of
+such a configuration is as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">ConcreteBase</span>
+
+
+<span class="k">class</span> <span class="nc">Company</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;company&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">employees</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Employee&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Employee</span><span class="p">(</span><span class="n">ConcreteBase</span><span class="p">,</span> <span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;employee&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">company_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;company.id&#39;</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;employee&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;concrete&#39;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">Manager</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;manager&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">manager_data</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">40</span><span class="p">))</span>
+    <span class="n">company_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;company.id&#39;</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;manager&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;concrete&#39;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">Engineer</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;engineer&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">engineer_info</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">40</span><span class="p">))</span>
+    <span class="n">company_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;company.id&#39;</span><span class="p">))</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;engineer&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;concrete&#39;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span></pre></div>
+</div>
+<p>The next complexity with concrete inheritance and relationships involves
+when we’d like one or all of <code class="docutils literal notranslate"><span class="pre">Employee</span></code>, <code class="docutils literal notranslate"><span class="pre">Manager</span></code> and <code class="docutils literal notranslate"><span class="pre">Engineer</span></code> to
+themselves refer back to <code class="docutils literal notranslate"><span class="pre">Company</span></code>.   For this case, SQLAlchemy has
+special behavior in that a <a class="reference internal" href="relationship_api.html#sqlalchemy.orm.relationship" title="sqlalchemy.orm.relationship"><code class="xref py py-func docutils literal notranslate"><span class="pre">relationship()</span></code></a> placed on <code class="docutils literal notranslate"><span class="pre">Employee</span></code>
+which links to <code class="docutils literal notranslate"><span class="pre">Company</span></code> <strong>does not work</strong>
+against the <code class="docutils literal notranslate"><span class="pre">Manager</span></code> and <code class="docutils literal notranslate"><span class="pre">Engineer</span></code> classes, when exercised at the
+instance level.  Instead, a distinct
+<a class="reference internal" href="relationship_api.html#sqlalchemy.orm.relationship" title="sqlalchemy.orm.relationship"><code class="xref py py-func docutils literal notranslate"><span class="pre">relationship()</span></code></a> must be applied to each class.   In order to achieve
+bi-directional behavior in terms of three separate relationships which
+serve as the opposite of <code class="docutils literal notranslate"><span class="pre">Company.employees</span></code>, the
+<a class="reference internal" href="relationship_api.html#sqlalchemy.orm.relationship.params.back_populates" title="sqlalchemy.orm.relationship"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">relationship.back_populates</span></code></a> parameter is used between
+each of the relationships:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">ConcreteBase</span>
+
+
+<span class="k">class</span> <span class="nc">Company</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;company&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">employees</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Employee&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;company&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Employee</span><span class="p">(</span><span class="n">ConcreteBase</span><span class="p">,</span> <span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;employee&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">company_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;company.id&#39;</span><span class="p">))</span>
+    <span class="n">company</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Company&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;employees&quot;</span><span class="p">)</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;employee&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;concrete&#39;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">Manager</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;manager&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">manager_data</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">40</span><span class="p">))</span>
+    <span class="n">company_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;company.id&#39;</span><span class="p">))</span>
+    <span class="n">company</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Company&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;employees&quot;</span><span class="p">)</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;manager&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;concrete&#39;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">Engineer</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;engineer&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">engineer_info</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">40</span><span class="p">))</span>
+    <span class="n">company_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;company.id&#39;</span><span class="p">))</span>
+    <span class="n">company</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Company&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;employees&quot;</span><span class="p">)</span>
+
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;polymorphic_identity&#39;</span><span class="p">:</span> <span class="s1">&#39;engineer&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;concrete&#39;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}</span></pre></div>
+</div>
+<p>The above limitation is related to the current implementation, including
+that concrete inheriting classes do not share any of the attributes of
+the superclass and therefore need distinct relationships to be set up.</p>
+</div>
+<div class="section" id="loading-concrete-inheritance-mappings">
+<h3>Loading Concrete Inheritance Mappings<a class="headerlink" href="#loading-concrete-inheritance-mappings" title="Permalink to this headline">¶</a></h3>
+<p>The options for loading with concrete inheritance are limited; generally,
+if polymorphic loading is configured on the mapper using one of the
+declarative concrete mixins, it can’t be modified at query time
+in current SQLAlchemy versions.   Normally, the <a class="reference internal" href="inheritance_loading.html#sqlalchemy.orm.with_polymorphic" title="sqlalchemy.orm.with_polymorphic"><code class="xref py py-func docutils literal notranslate"><span class="pre">with_polymorphic()</span></code></a>
+function would be able to override the style of loading used by concrete,
+however due to current limitations this is not yet supported.</p>
+</div>
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="composites.html" title="previous chapter">Composite Column Types</a>
+        Next:
+        <a href="nonstandard_mappings.html" title="next chapter">Non-Traditional Mappings</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+
