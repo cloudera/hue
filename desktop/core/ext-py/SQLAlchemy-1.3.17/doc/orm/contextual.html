@@ -1,0 +1,598 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    Contextual/Thread-local Sessions
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+        <link rel="up" title="Using the Session" href="session.html" />
+        <link rel="next" title="Tracking Object and Session Changes with Events" href="session_events.html" />
+        <link rel="prev" title="Additional Persistence Techniques" href="persistence_techniques.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../contents.html">Contents</a> |
+                <a href="../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="index.html" title="SQLAlchemy ORM">SQLAlchemy ORM</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="tutorial.html">Object Relational Tutorial</a></span></li>
+<li><span class="link-container"><a class="reference external" href="mapper_config.html">Mapper Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="relationships.html">Relationship Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="loading_objects.html">Loading Objects</a></span></li>
+<li><span class="link-container"><a class="reference external" href="session.html">Using the Session</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="session_basics.html">Session Basics</a></span></li>
+<li><span class="link-container"><a class="reference external" href="session_state_management.html">State Management</a></span></li>
+<li><span class="link-container"><a class="reference external" href="cascades.html">Cascades</a></span></li>
+<li><span class="link-container"><a class="reference external" href="session_transaction.html">Transactions and Connection Management</a></span></li>
+<li><span class="link-container"><a class="reference external" href="persistence_techniques.html">Additional Persistence Techniques</a></span></li>
+<li class="selected"><span class="link-container"><strong>Contextual/Thread-local Sessions</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#implicit-method-access">Implicit Method Access</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#thread-local-scope">Thread-Local Scope</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#using-thread-local-scope-with-web-applications">Using Thread-Local Scope with Web Applications</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#using-custom-created-scopes">Using Custom Created Scopes</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#contextual-session-api">Contextual Session API</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="session_events.html">Tracking Object and Session Changes with Events</a></span></li>
+<li><span class="link-container"><a class="reference external" href="session_api.html">Session API</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="extending.html">Events and Internals</a></span></li>
+<li><span class="link-container"><a class="reference external" href="extensions/index.html">ORM Extensions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="examples.html">ORM Examples</a></span></li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="contextual-thread-local-sessions">
+<span id="unitofwork-contextual"></span><h1>Contextual/Thread-local Sessions<a class="headerlink" href="#contextual-thread-local-sessions" title="Permalink to this headline">¶</a></h1>
+<p>Recall from the section <a class="reference internal" href="session_basics.html#session-faq-whentocreate"><span class="std std-ref">When do I construct a Session, when do I commit it, and when do I close it?</span></a>, the concept of
+“session scopes” was introduced, with an emphasis on web applications
+and the practice of linking the scope of a <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> with that
+of a web request.   Most modern web frameworks include integration tools
+so that the scope of the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> can be managed automatically,
+and these tools should be used as they are available.</p>
+<p>SQLAlchemy includes its own helper object, which helps with the establishment
+of user-defined <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> scopes.  It is also used by third-party
+integration systems to help construct their integration schemes.</p>
+<p>The object is the <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> object, and it represents a
+<strong>registry</strong> of <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> objects.  If you’re not familiar with the
+registry pattern, a good introduction can be found in <a class="reference external" href="http://martinfowler.com/eaaCatalog/registry.html">Patterns of Enterprise
+Architecture</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> object is a very popular and useful object
+used by many SQLAlchemy applications.  However, it is important to note
+that it presents <strong>only one approach</strong> to the issue of <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>
+management.  If you’re new to SQLAlchemy, and especially if the
+term “thread-local variable” seems strange to you, we recommend that
+if possible you familiarize first with an off-the-shelf integration
+system such as <a class="reference external" href="http://packages.python.org/Flask-SQLAlchemy/">Flask-SQLAlchemy</a>
+or <a class="reference external" href="http://pypi.python.org/pypi/zope.sqlalchemy">zope.sqlalchemy</a>.</p>
+</div>
+<p>A <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> is constructed by calling it, passing it a
+<strong>factory</strong> which can create new <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> objects.   A factory
+is just something that produces a new object when called, and in the
+case of <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>, the most common factory is the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.sessionmaker" title="sqlalchemy.orm.session.sessionmaker"><code class="xref py py-class docutils literal notranslate"><span class="pre">sessionmaker</span></code></a>,
+introduced earlier in this section.  Below we illustrate this usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">scoped_session</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">sessionmaker</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">session_factory</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">some_engine</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Session</span> <span class="o">=</span> <span class="n">scoped_session</span><span class="p">(</span><span class="n">session_factory</span><span class="p">)</span></pre></div>
+</div>
+<p>The <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> object we’ve created will now call upon the
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.sessionmaker" title="sqlalchemy.orm.session.sessionmaker"><code class="xref py py-class docutils literal notranslate"><span class="pre">sessionmaker</span></code></a> when we “call” the registry:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">some_session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span></pre></div>
+</div>
+<p>Above, <code class="docutils literal notranslate"><span class="pre">some_session</span></code> is an instance of <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>, which we
+can now use to talk to the database.   This same <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> is also
+present within the <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> registry we’ve created.   If
+we call upon the registry a second time, we get back the <strong>same</strong> <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">some_other_session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">some_session</span> <span class="ow">is</span> <span class="n">some_other_session</span>
+<span class="go">True</span></pre></div>
+</div>
+<p>This pattern allows disparate sections of the application to call upon a global
+<a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a>, so that all those areas may share the same session
+without the need to pass it explicitly.   The <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> we’ve established
+in our registry will remain, until we explicitly tell our registry to dispose of it,
+by calling <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session.remove" title="sqlalchemy.orm.scoping.scoped_session.remove"><code class="xref py py-meth docutils literal notranslate"><span class="pre">scoped_session.remove()</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Session</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span></pre></div>
+</div>
+<p>The <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session.remove" title="sqlalchemy.orm.scoping.scoped_session.remove"><code class="xref py py-meth docutils literal notranslate"><span class="pre">scoped_session.remove()</span></code></a> method first calls <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.close" title="sqlalchemy.orm.session.Session.close"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.close()</span></code></a> on
+the current <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>, which has the effect of releasing any connection/transactional
+resources owned by the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> first, then discarding the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>
+itself.  “Releasing” here means that connections are returned to their connection pool and any transactional state is rolled back, ultimately using the <code class="docutils literal notranslate"><span class="pre">rollback()</span></code> method of the underlying DBAPI connection.</p>
+<p>At this point, the <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> object is “empty”, and will create
+a <strong>new</strong> <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> when called again.  As illustrated below, this
+is not the same <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> we had before:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">new_session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_session</span> <span class="ow">is</span> <span class="n">some_session</span>
+<span class="go">False</span></pre></div>
+</div>
+<p>The above series of steps illustrates the idea of the “registry” pattern in a
+nutshell.  With that basic idea in hand, we can discuss some of the details
+of how this pattern proceeds.</p>
+<div class="section" id="implicit-method-access">
+<h2>Implicit Method Access<a class="headerlink" href="#implicit-method-access" title="Permalink to this headline">¶</a></h2>
+<p>The job of the <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> is simple; hold onto a <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>
+for all who ask for it.  As a means of producing more transparent access to this
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>, the <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> also includes <strong>proxy behavior</strong>,
+meaning that the registry itself can be treated just like a <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>
+directly; when methods are called on this object, they are <strong>proxied</strong> to the
+underlying <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> being maintained by the registry:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Session</span> <span class="o">=</span> <span class="n">scoped_session</span><span class="p">(</span><span class="n">some_factory</span><span class="p">)</span>
+
+<span class="c1"># equivalent to:</span>
+<span class="c1">#</span>
+<span class="c1"># session = Session()</span>
+<span class="c1"># print(session.query(MyClass).all())</span>
+<span class="c1">#</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">MyClass</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">())</span></pre></div>
+</div>
+<p>The above code accomplishes the same task as that of acquiring the current
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> by calling upon the registry, then using that <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>.</p>
+</div>
+<div class="section" id="thread-local-scope">
+<h2>Thread-Local Scope<a class="headerlink" href="#thread-local-scope" title="Permalink to this headline">¶</a></h2>
+<p>Users who are familiar with multithreaded programming will note that representing
+anything as a global variable is usually a bad idea, as it implies that the
+global object will be accessed by many threads concurrently.   The <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>
+object is entirely designed to be used in a <strong>non-concurrent</strong> fashion, which
+in terms of multithreading means “only in one thread at a time”.   So our
+above example of <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> usage, where the same <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>
+object is maintained across multiple calls, suggests that some process needs
+to be in place such that multiple calls across many threads don’t actually get
+a handle to the same session.   We call this notion <strong>thread local storage</strong>,
+which means, a special object is used that will maintain a distinct object
+per each application thread.   Python provides this via the
+<a class="reference external" href="http://docs.python.org/library/threading.html#threading.local">threading.local()</a>
+construct.  The <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> object by default uses this object
+as storage, so that a single <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> is maintained for all who call
+upon the <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> registry, but only within the scope of a single
+thread.   Callers who call upon the registry in a different thread get a
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> instance that is local to that other thread.</p>
+<p>Using this technique, the <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> provides a quick and relatively
+simple (if one is familiar with thread-local storage) way of providing
+a single, global object in an application that is safe to be called upon
+from multiple threads.</p>
+<p>The <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session.remove" title="sqlalchemy.orm.scoping.scoped_session.remove"><code class="xref py py-meth docutils literal notranslate"><span class="pre">scoped_session.remove()</span></code></a> method, as always, removes the current
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> associated with the thread, if any.  However, one advantage of the
+<code class="docutils literal notranslate"><span class="pre">threading.local()</span></code> object is that if the application thread itself ends, the
+“storage” for that thread is also garbage collected.  So it is in fact “safe” to
+use thread local scope with an application that spawns and tears down threads,
+without the need to call <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session.remove" title="sqlalchemy.orm.scoping.scoped_session.remove"><code class="xref py py-meth docutils literal notranslate"><span class="pre">scoped_session.remove()</span></code></a>.  However, the scope
+of transactions themselves, i.e. ending them via <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.commit" title="sqlalchemy.orm.session.Session.commit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.commit()</span></code></a> or
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.rollback" title="sqlalchemy.orm.session.Session.rollback"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.rollback()</span></code></a>, will usually still be something that must be explicitly
+arranged for at the appropriate time, unless the application actually ties the
+lifespan of a thread to the lifespan of a transaction.</p>
+</div>
+<div class="section" id="using-thread-local-scope-with-web-applications">
+<span id="session-lifespan"></span><h2>Using Thread-Local Scope with Web Applications<a class="headerlink" href="#using-thread-local-scope-with-web-applications" title="Permalink to this headline">¶</a></h2>
+<p>As discussed in the section <a class="reference internal" href="session_basics.html#session-faq-whentocreate"><span class="std std-ref">When do I construct a Session, when do I commit it, and when do I close it?</span></a>, a web application
+is architected around the concept of a <strong>web request</strong>, and integrating
+such an application with the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> usually implies that the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>
+will be associated with that request.  As it turns out, most Python web frameworks,
+with notable exceptions such as the asynchronous frameworks Twisted and
+Tornado, use threads in a simple way, such that a particular web request is received,
+processed, and completed within the scope of a single <em>worker thread</em>.  When
+the request ends, the worker thread is released to a pool of workers where it
+is available to handle another request.</p>
+<p>This simple correspondence of web request and thread means that to associate a
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> with a thread implies it is also associated with the web request
+running within that thread, and vice versa, provided that the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> is
+created only after the web request begins and torn down just before the web request ends.
+So it is a common practice to use <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> as a quick way
+to integrate the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> with a web application.  The sequence
+diagram below illustrates this flow:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Web</span> <span class="n">Server</span>          <span class="n">Web</span> <span class="n">Framework</span>        <span class="n">SQLAlchemy</span> <span class="n">ORM</span> <span class="n">Code</span>
+<span class="o">--------------</span>      <span class="o">--------------</span>       <span class="o">------------------------------</span>
+<span class="n">startup</span>        <span class="o">-&gt;</span>   <span class="n">Web</span> <span class="n">framework</span>        <span class="c1"># Session registry is established</span>
+                    <span class="n">initializes</span>          <span class="n">Session</span> <span class="o">=</span> <span class="n">scoped_session</span><span class="p">(</span><span class="n">sessionmaker</span><span class="p">())</span>
+
+<span class="n">incoming</span>
+<span class="n">web</span> <span class="n">request</span>    <span class="o">-&gt;</span>   <span class="n">web</span> <span class="n">request</span>     <span class="o">-&gt;</span>   <span class="c1"># The registry is *optionally*</span>
+                    <span class="n">starts</span>               <span class="c1"># called upon explicitly to create</span>
+                                         <span class="c1"># a Session local to the thread and/or request</span>
+                                         <span class="n">Session</span><span class="p">()</span>
+
+                                         <span class="c1"># the Session registry can otherwise</span>
+                                         <span class="c1"># be used at any time, creating the</span>
+                                         <span class="c1"># request-local Session() if not present,</span>
+                                         <span class="c1"># or returning the existing one</span>
+                                         <span class="n">Session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">MyClass</span><span class="p">)</span> <span class="c1"># ...</span>
+
+                                         <span class="n">Session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">some_object</span><span class="p">)</span> <span class="c1"># ...</span>
+
+                                         <span class="c1"># if data was modified, commit the</span>
+                                         <span class="c1"># transaction</span>
+                                         <span class="n">Session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+                    <span class="n">web</span> <span class="n">request</span> <span class="n">ends</span>  <span class="o">-&gt;</span> <span class="c1"># the registry is instructed to</span>
+                                         <span class="c1"># remove the Session</span>
+                                         <span class="n">Session</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+
+                    <span class="n">sends</span> <span class="n">output</span>      <span class="o">&lt;-</span>
+<span class="n">outgoing</span> <span class="n">web</span>    <span class="o">&lt;-</span>
+<span class="n">response</span></pre></div>
+</div>
+<p>Using the above flow, the process of integrating the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> with the
+web application has exactly two requirements:</p>
+<ol class="arabic simple">
+<li><p>Create a single <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> registry when the web application
+first starts, ensuring that this object is accessible by the rest of the
+application.</p></li>
+<li><p>Ensure that <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session.remove" title="sqlalchemy.orm.scoping.scoped_session.remove"><code class="xref py py-meth docutils literal notranslate"><span class="pre">scoped_session.remove()</span></code></a> is called when the web request ends,
+usually by integrating with the web framework’s event system to establish
+an “on request end” event.</p></li>
+</ol>
+<p>As noted earlier, the above pattern is <strong>just one potential way</strong> to integrate a <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>
+with a web framework, one which in particular makes the significant assumption
+that the <strong>web framework associates web requests with application threads</strong>.  It is
+however <strong>strongly recommended that the integration tools provided with the web framework
+itself be used, if available</strong>, instead of <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a>.</p>
+<p>In particular, while using a thread local can be convenient, it is preferable that the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> be
+associated <strong>directly with the request</strong>, rather than with
+the current thread.   The next section on custom scopes details a more advanced configuration
+which can combine the usage of <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> with direct request based scope, or
+any kind of scope.</p>
+</div>
+<div class="section" id="using-custom-created-scopes">
+<h2>Using Custom Created Scopes<a class="headerlink" href="#using-custom-created-scopes" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> object’s default behavior of “thread local” scope is only
+one of many options on how to “scope” a <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>.   A custom scope can be defined
+based on any existing system of getting at “the current thing we are working with”.</p>
+<p>Suppose a web framework defines a library function <code class="docutils literal notranslate"><span class="pre">get_current_request()</span></code>.  An application
+built using this framework can call this function at any time, and the result will be
+some kind of <code class="docutils literal notranslate"><span class="pre">Request</span></code> object that represents the current request being processed.
+If the <code class="docutils literal notranslate"><span class="pre">Request</span></code> object is hashable, then this function can be easily integrated with
+<a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> to associate the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> with the request.  Below we illustrate
+this in conjunction with a hypothetical event marker provided by the web framework
+<code class="docutils literal notranslate"><span class="pre">on_request_end</span></code>, which allows code to be invoked whenever a request ends:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">my_web_framework</span> <span class="k">import</span> <span class="n">get_current_request</span><span class="p">,</span> <span class="n">on_request_end</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">scoped_session</span><span class="p">,</span> <span class="n">sessionmaker</span>
+
+<span class="n">Session</span> <span class="o">=</span> <span class="n">scoped_session</span><span class="p">(</span><span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">some_engine</span><span class="p">),</span> <span class="n">scopefunc</span><span class="o">=</span><span class="n">get_current_request</span><span class="p">)</span>
+
+<span class="nd">@on_request_end</span>
+<span class="k">def</span> <span class="nf">remove_session</span><span class="p">(</span><span class="n">req</span><span class="p">):</span>
+    <span class="n">Session</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span></pre></div>
+</div>
+<p>Above, we instantiate <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> in the usual way, except that we pass
+our request-returning function as the “scopefunc”.  This instructs <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a>
+to use this function to generate a dictionary key whenever the registry is called upon
+to return the current <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>.   In this case it is particularly important
+that we ensure a reliable “remove” system is implemented, as this dictionary is not
+otherwise self-managed.</p>
+</div>
+<div class="section" id="contextual-session-api">
+<h2>Contextual Session API<a class="headerlink" href="#contextual-session-api" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="sqlalchemy.orm.scoping.scoped_session">
+<em class="property">class </em><code class="sig-prename descclassname">sqlalchemy.orm.scoping.</code><code class="sig-name descname">scoped_session</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">session_factory</span></em>, <em class="sig-param"><span class="n">scopefunc</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.orm.scoping.scoped_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides scoped management of <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> objects.</p>
+<p>See <a class="reference internal" href="#unitofwork-contextual"><span class="std std-ref">Contextual/Thread-local Sessions</span></a> for a tutorial.</p>
+<dl class="py method">
+<dt id="sqlalchemy.orm.scoping.scoped_session.__call__">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.orm.scoping.scoped_session.</span></code></a><code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.orm.scoping.scoped_session.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>, creating it
+using the <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session.session_factory" title="sqlalchemy.orm.scoping.scoped_session.session_factory"><code class="xref py py-attr docutils literal notranslate"><span class="pre">scoped_session.session_factory</span></code></a> if not present.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="sqlalchemy.orm.scoping.scoped_session.__call__.params.**kw"></span><strong>**kw</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.scoping.scoped_session.__call__.params.**kw">¶</a> – Keyword arguments will be passed to the
+<a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session.session_factory" title="sqlalchemy.orm.scoping.scoped_session.session_factory"><code class="xref py py-attr docutils literal notranslate"><span class="pre">scoped_session.session_factory</span></code></a> callable, if an existing
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> is not present.  If the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> is present
+and keyword arguments have been passed,
+<a class="reference internal" href="../core/exceptions.html#sqlalchemy.exc.InvalidRequestError" title="sqlalchemy.exc.InvalidRequestError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InvalidRequestError</span></code></a> is raised.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.orm.scoping.scoped_session.__init__">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.orm.scoping.scoped_session.</span></code></a><code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">session_factory</span></em>, <em class="sig-param"><span class="n">scopefunc</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.orm.scoping.scoped_session.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a new <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.orm.scoping.scoped_session.params.session_factory"></span><strong>session_factory</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.scoping.scoped_session.params.session_factory">¶</a> – a factory to create new <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>
+instances. This is usually, but not necessarily, an instance
+of <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.sessionmaker" title="sqlalchemy.orm.session.sessionmaker"><code class="xref py py-class docutils literal notranslate"><span class="pre">sessionmaker</span></code></a>.</p></li>
+<li><p><span class="target" id="sqlalchemy.orm.scoping.scoped_session.params.scopefunc"></span><strong>scopefunc</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.orm.scoping.scoped_session.params.scopefunc">¶</a> – optional function which defines
+the current scope.   If not passed, the <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a>
+object assumes “thread-local” scope, and will use
+a Python <code class="docutils literal notranslate"><span class="pre">threading.local()</span></code> in order to maintain the current
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>.  If passed, the function should return
+a hashable token; this token will be used as the key in a
+dictionary in order to store and retrieve the current
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.orm.scoping.scoped_session.configure">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.orm.scoping.scoped_session.</span></code></a><code class="sig-name descname">configure</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.orm.scoping.scoped_session.configure" title="Permalink to this definition">¶</a></dt>
+<dd><p>reconfigure the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.sessionmaker" title="sqlalchemy.orm.session.sessionmaker"><code class="xref py py-class docutils literal notranslate"><span class="pre">sessionmaker</span></code></a> used by this
+<a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a>.</p>
+<p>See <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.sessionmaker.configure" title="sqlalchemy.orm.session.sessionmaker.configure"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sessionmaker.configure()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.orm.scoping.scoped_session.query_property">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.orm.scoping.scoped_session.</span></code></a><code class="sig-name descname">query_property</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query_cls</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.orm.scoping.scoped_session.query_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a class property which produces a <a class="reference internal" href="query.html#sqlalchemy.orm.query.Query" title="sqlalchemy.orm.query.Query"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></a>
+object
+against the class and the current <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> when called.</p>
+<p>e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Session</span> <span class="o">=</span> <span class="n">scoped_session</span><span class="p">(</span><span class="n">sessionmaker</span><span class="p">())</span>
+
+<span class="k">class</span> <span class="nc">MyClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">Session</span><span class="o">.</span><span class="n">query_property</span><span class="p">()</span>
+
+<span class="c1"># after mappers are defined</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">MyClass</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">MyClass</span><span class="o">.</span><span class="n">name</span><span class="o">==</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></pre></div>
+</div>
+<p>Produces instances of the session’s configured query class by
+default.  To override and use a custom implementation, provide
+a <code class="docutils literal notranslate"><span class="pre">query_cls</span></code> callable.  The callable will be invoked with
+the class’s mapper as a positional argument and a session
+keyword argument.</p>
+<p>There is no limit to the number of query properties placed on
+a class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.orm.scoping.scoped_session.remove">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.orm.scoping.scoped_session.</span></code></a><code class="sig-name descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.orm.scoping.scoped_session.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dispose of the current <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>, if present.</p>
+<p>This will first call <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.close" title="sqlalchemy.orm.session.Session.close"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.close()</span></code></a> method
+on the current <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>, which releases any existing
+transactional/connection resources still being held; transactions
+specifically are rolled back.  The <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> is then
+discarded.   Upon next usage within the same scope,
+the <a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session" title="sqlalchemy.orm.scoping.scoped_session"><code class="xref py py-class docutils literal notranslate"><span class="pre">scoped_session</span></code></a> will produce a new
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sqlalchemy.orm.scoping.scoped_session.session_factory">
+<em class="property">attribute </em><a class="reference internal" href="#sqlalchemy.orm.scoping.scoped_session"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.orm.scoping.scoped_session.</span></code></a><code class="sig-name descname">session_factory</code><em class="property"> = None</em><a class="headerlink" href="#sqlalchemy.orm.scoping.scoped_session.session_factory" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <cite>session_factory</cite> provided to <cite>__init__</cite> is stored in this
+attribute and may be accessed at a later time.  This can be useful when
+a new non-scoped <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> or <a class="reference internal" href="../core/connections.html#sqlalchemy.engine.Connection" title="sqlalchemy.engine.Connection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Connection</span></code></a> to the
+database is needed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sqlalchemy.util.ScopedRegistry">
+<em class="property">class </em><code class="sig-prename descclassname">sqlalchemy.util.</code><code class="sig-name descname">ScopedRegistry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">createfunc</span></em>, <em class="sig-param"><span class="n">scopefunc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.util.ScopedRegistry" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Registry that can store one or multiple instances of a single
+class on the basis of a “scope” function.</p>
+<p>The object implements <code class="docutils literal notranslate"><span class="pre">__call__</span></code> as the “getter”, so by
+calling <code class="docutils literal notranslate"><span class="pre">myregistry()</span></code> the contained object is returned
+for the current scope.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.util.ScopedRegistry.params.createfunc"></span><strong>createfunc</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.util.ScopedRegistry.params.createfunc">¶</a> – a callable that returns a new object to be placed in the registry</p></li>
+<li><p><span class="target" id="sqlalchemy.util.ScopedRegistry.params.scopefunc"></span><strong>scopefunc</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.util.ScopedRegistry.params.scopefunc">¶</a> – a callable that will return a key to store/retrieve an object.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sqlalchemy.util.ScopedRegistry.__init__">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.util.ScopedRegistry"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.util.ScopedRegistry.</span></code></a><code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">createfunc</span></em>, <em class="sig-param"><span class="n">scopefunc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.util.ScopedRegistry.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a new <a class="reference internal" href="#sqlalchemy.util.ScopedRegistry" title="sqlalchemy.util.ScopedRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScopedRegistry</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.util.ScopedRegistry.params.createfunc"></span><strong>createfunc</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.util.ScopedRegistry.params.createfunc">¶</a> – A creation function that will generate
+a new value for the current scope, if none is present.</p></li>
+<li><p><span class="target" id="sqlalchemy.util.ScopedRegistry.params.scopefunc"></span><strong>scopefunc</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.util.ScopedRegistry.params.scopefunc">¶</a> – A function that returns a hashable
+token representing the current scope (such as, current
+thread identifier).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.util.ScopedRegistry.clear">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.util.ScopedRegistry"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.util.ScopedRegistry.</span></code></a><code class="sig-name descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.util.ScopedRegistry.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear the current scope, if any.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.util.ScopedRegistry.has">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.util.ScopedRegistry"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.util.ScopedRegistry.</span></code></a><code class="sig-name descname">has</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.util.ScopedRegistry.has" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if an object is present in the current scope.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.util.ScopedRegistry.set">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.util.ScopedRegistry"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.util.ScopedRegistry.</span></code></a><code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.util.ScopedRegistry.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the value for the current scope.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sqlalchemy.util.ThreadLocalRegistry">
+<em class="property">class </em><code class="sig-prename descclassname">sqlalchemy.util.</code><code class="sig-name descname">ThreadLocalRegistry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">createfunc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.util.ThreadLocalRegistry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#sqlalchemy.util.ScopedRegistry" title="sqlalchemy.util.ScopedRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.util.ScopedRegistry</span></code></a></p>
+<p>A <a class="reference internal" href="#sqlalchemy.util.ScopedRegistry" title="sqlalchemy.util.ScopedRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScopedRegistry</span></code></a> that uses a <code class="docutils literal notranslate"><span class="pre">threading.local()</span></code>
+variable for storage.</p>
+</dd></dl>
+
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="persistence_techniques.html" title="previous chapter">Additional Persistence Techniques</a>
+        Next:
+        <a href="session_events.html" title="next chapter">Tracking Object and Session Changes with Events</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+
