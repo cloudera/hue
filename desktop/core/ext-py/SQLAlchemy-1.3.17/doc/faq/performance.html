@@ -1,0 +1,639 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    Performance
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+        <link rel="up" title="Frequently Asked Questions" href="index.html" />
+        <link rel="next" title="Sessions / Queries" href="sessions.html" />
+        <link rel="prev" title="ORM Configuration" href="ormconfiguration.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../contents.html">Contents</a> |
+                <a href="../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="index.html" title="Frequently Asked Questions">Frequently Asked Questions</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="connections.html">Connections / Engines</a></span></li>
+<li><span class="link-container"><a class="reference external" href="metadata_schema.html">MetaData / Schema</a></span></li>
+<li><span class="link-container"><a class="reference external" href="sqlexpressions.html">SQL Expressions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="ormconfiguration.html">ORM Configuration</a></span></li>
+<li class="selected"><span class="link-container"><strong>Performance</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#how-can-i-profile-a-sqlalchemy-powered-application">How can I profile a SQLAlchemy powered application?</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#query-profiling">Query Profiling</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#code-profiling">Code Profiling</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#execution-slowness">Execution Slowness</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#result-fetching-slowness-core">Result Fetching Slowness - Core</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#result-fetching-slowness-orm">Result Fetching Slowness - ORM</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#i-m-inserting-400-000-rows-with-the-orm-and-it-s-really-slow">I’m inserting 400,000 rows with the ORM and it’s really slow!</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="sessions.html">Sessions / Queries</a></span></li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="performance">
+<span id="faq-performance"></span><h1>Performance<a class="headerlink" href="#performance" title="Permalink to this headline">¶</a></h1>
+<div class="contents faq local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#how-can-i-profile-a-sqlalchemy-powered-application" id="id1">How can I profile a SQLAlchemy powered application?</a></p>
+<ul>
+<li><p><a class="reference internal" href="#query-profiling" id="id2">Query Profiling</a></p></li>
+<li><p><a class="reference internal" href="#code-profiling" id="id3">Code Profiling</a></p></li>
+<li><p><a class="reference internal" href="#execution-slowness" id="id4">Execution Slowness</a></p></li>
+<li><p><a class="reference internal" href="#result-fetching-slowness-core" id="id5">Result Fetching Slowness - Core</a></p></li>
+<li><p><a class="reference internal" href="#result-fetching-slowness-orm" id="id6">Result Fetching Slowness - ORM</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#i-m-inserting-400-000-rows-with-the-orm-and-it-s-really-slow" id="id7">I’m inserting 400,000 rows with the ORM and it’s really slow!</a></p></li>
+</ul>
+</div>
+<div class="section" id="how-can-i-profile-a-sqlalchemy-powered-application">
+<span id="faq-how-to-profile"></span><h2>How can I profile a SQLAlchemy powered application?<a class="headerlink" href="#how-can-i-profile-a-sqlalchemy-powered-application" title="Permalink to this headline">¶</a></h2>
+<p>Looking for performance issues typically involves two strategies.  One
+is query profiling, and the other is code profiling.</p>
+<div class="section" id="query-profiling">
+<h3>Query Profiling<a class="headerlink" href="#query-profiling" title="Permalink to this headline">¶</a></h3>
+<p>Sometimes just plain SQL logging (enabled via python’s logging module
+or via the <code class="docutils literal notranslate"><span class="pre">echo=True</span></code> argument on <a class="reference internal" href="../core/engines.html#sqlalchemy.create_engine" title="sqlalchemy.create_engine"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_engine()</span></code></a>) can give an
+idea how long things are taking.  For example, if you log something
+right after a SQL operation, you’d see something like this in your
+log:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">17</span><span class="p">:</span><span class="mi">37</span><span class="p">:</span><span class="mi">48</span><span class="p">,</span><span class="mi">325</span> <span class="n">INFO</span>  <span class="p">[</span><span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">Engine</span><span class="o">.</span><span class="mi">0</span><span class="n">x</span><span class="o">...</span><span class="mi">048</span><span class="n">c</span><span class="p">]</span> <span class="n">SELECT</span> <span class="o">...</span>
+<span class="mi">17</span><span class="p">:</span><span class="mi">37</span><span class="p">:</span><span class="mi">48</span><span class="p">,</span><span class="mi">326</span> <span class="n">INFO</span>  <span class="p">[</span><span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">Engine</span><span class="o">.</span><span class="mi">0</span><span class="n">x</span><span class="o">...</span><span class="mi">048</span><span class="n">c</span><span class="p">]</span> <span class="p">{</span><span class="o">&lt;</span><span class="n">params</span><span class="o">&gt;</span><span class="p">}</span>
+<span class="mi">17</span><span class="p">:</span><span class="mi">37</span><span class="p">:</span><span class="mi">48</span><span class="p">,</span><span class="mi">660</span> <span class="n">DEBUG</span> <span class="p">[</span><span class="n">myapp</span><span class="o">.</span><span class="n">somemessage</span><span class="p">]</span></pre></div>
+</div>
+<p>if you logged <code class="docutils literal notranslate"><span class="pre">myapp.somemessage</span></code> right after the operation, you know
+it took 334ms to complete the SQL part of things.</p>
+<p>Logging SQL will also illustrate if dozens/hundreds of queries are
+being issued which could be better organized into much fewer queries.
+When using the SQLAlchemy ORM, the “eager loading”
+feature is provided to partially (<a class="reference internal" href="../orm/loading_relationships.html#sqlalchemy.orm.contains_eager" title="sqlalchemy.orm.contains_eager"><code class="xref py py-func docutils literal notranslate"><span class="pre">contains_eager()</span></code></a>) or fully
+(<a class="reference internal" href="../orm/loading_relationships.html#sqlalchemy.orm.joinedload" title="sqlalchemy.orm.joinedload"><code class="xref py py-func docutils literal notranslate"><span class="pre">joinedload()</span></code></a>, <a class="reference internal" href="../orm/loading_relationships.html#sqlalchemy.orm.subqueryload" title="sqlalchemy.orm.subqueryload"><code class="xref py py-func docutils literal notranslate"><span class="pre">subqueryload()</span></code></a>)
+automate this activity, but without
+the ORM “eager loading” typically means to use joins so that results across multiple
+tables can be loaded in one result set instead of multiplying numbers
+of queries as more depth is added (i.e. <code class="docutils literal notranslate"><span class="pre">r</span> <span class="pre">+</span> <span class="pre">r*r2</span> <span class="pre">+</span> <span class="pre">r*r2*r3</span></code> …)</p>
+<p>For more long-term profiling of queries, or to implement an application-side
+“slow query” monitor, events can be used to intercept cursor executions,
+using a recipe like the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">event</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.engine</span> <span class="k">import</span> <span class="n">Engine</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">()</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;myapp.sqltime&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+<span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">Engine</span><span class="p">,</span> <span class="s2">&quot;before_cursor_execute&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">before_cursor_execute</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">statement</span><span class="p">,</span>
+                        <span class="n">parameters</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">executemany</span><span class="p">):</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;query_start_time&#39;</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Start Query: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">statement</span><span class="p">)</span>
+
+<span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">Engine</span><span class="p">,</span> <span class="s2">&quot;after_cursor_execute&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">after_cursor_execute</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">statement</span><span class="p">,</span>
+                        <span class="n">parameters</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">executemany</span><span class="p">):</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">conn</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;query_start_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Query Complete!&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Total Time: </span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">total</span><span class="p">)</span></pre></div>
+</div>
+<p>Above, we use the <a class="reference internal" href="../core/events.html#sqlalchemy.events.ConnectionEvents.before_cursor_execute" title="sqlalchemy.events.ConnectionEvents.before_cursor_execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ConnectionEvents.before_cursor_execute()</span></code></a> and
+<a class="reference internal" href="../core/events.html#sqlalchemy.events.ConnectionEvents.after_cursor_execute" title="sqlalchemy.events.ConnectionEvents.after_cursor_execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ConnectionEvents.after_cursor_execute()</span></code></a> events to establish an interception
+point around when a statement is executed.  We attach a timer onto the
+connection using the <code class="xref py py-class docutils literal notranslate"><span class="pre">info</span></code> dictionary; we use a
+stack here for the occasional case where the cursor execute events may be nested.</p>
+</div>
+<div class="section" id="code-profiling">
+<h3>Code Profiling<a class="headerlink" href="#code-profiling" title="Permalink to this headline">¶</a></h3>
+<p>If logging reveals that individual queries are taking too long, you’d
+need a breakdown of how much time was spent within the database
+processing the query, sending results over the network, being handled
+by the <a class="reference internal" href="../glossary.html#term-DBAPI"><span class="xref std std-term">DBAPI</span></a>, and finally being received by SQLAlchemy’s result set
+and/or ORM layer.   Each of these stages can present their own
+individual bottlenecks, depending on specifics.</p>
+<p>For that you need to use the
+<a class="reference external" href="https://docs.python.org/2/library/profile.html">Python Profiling Module</a>.
+Below is a simple recipe which works profiling into a context manager:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cProfile</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">pstats</span>
+<span class="kn">import</span> <span class="nn">contextlib</span>
+
+<span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+<span class="k">def</span> <span class="nf">profiled</span><span class="p">():</span>
+    <span class="n">pr</span> <span class="o">=</span> <span class="n">cProfile</span><span class="o">.</span><span class="n">Profile</span><span class="p">()</span>
+    <span class="n">pr</span><span class="o">.</span><span class="n">enable</span><span class="p">()</span>
+    <span class="k">yield</span>
+    <span class="n">pr</span><span class="o">.</span><span class="n">disable</span><span class="p">()</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+    <span class="n">ps</span> <span class="o">=</span> <span class="n">pstats</span><span class="o">.</span><span class="n">Stats</span><span class="p">(</span><span class="n">pr</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">sort_stats</span><span class="p">(</span><span class="s1">&#39;cumulative&#39;</span><span class="p">)</span>
+    <span class="n">ps</span><span class="o">.</span><span class="n">print_stats</span><span class="p">()</span>
+    <span class="c1"># uncomment this to see who&#39;s calling what</span>
+    <span class="c1"># ps.print_callers()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span></pre></div>
+</div>
+<p>To profile a section of code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">profiled</span><span class="p">():</span>
+    <span class="n">Session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">FooClass</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">FooClass</span><span class="o">.</span><span class="n">somevalue</span><span class="o">==</span><span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></pre></div>
+</div>
+<p>The output of profiling can be used to give an idea where time is
+being spent.   A section of profiling output looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">13726</span> <span class="n">function</span> <span class="n">calls</span> <span class="p">(</span><span class="mi">13042</span> <span class="n">primitive</span> <span class="n">calls</span><span class="p">)</span> <span class="ow">in</span> <span class="mf">0.014</span> <span class="n">seconds</span>
+
+<span class="n">Ordered</span> <span class="n">by</span><span class="p">:</span> <span class="n">cumulative</span> <span class="n">time</span>
+
+<span class="n">ncalls</span>  <span class="n">tottime</span>  <span class="n">percall</span>  <span class="n">cumtime</span>  <span class="n">percall</span> <span class="n">filename</span><span class="p">:</span><span class="n">lineno</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+<span class="mi">222</span><span class="o">/</span><span class="mi">21</span>    <span class="mf">0.001</span>    <span class="mf">0.000</span>    <span class="mf">0.011</span>    <span class="mf">0.001</span> <span class="n">lib</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">/</span><span class="n">orm</span><span class="o">/</span><span class="n">loading</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">26</span><span class="p">(</span><span class="n">instances</span><span class="p">)</span>
+<span class="mi">220</span><span class="o">/</span><span class="mi">20</span>    <span class="mf">0.002</span>    <span class="mf">0.000</span>    <span class="mf">0.010</span>    <span class="mf">0.001</span> <span class="n">lib</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">/</span><span class="n">orm</span><span class="o">/</span><span class="n">loading</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">327</span><span class="p">(</span><span class="n">_instance</span><span class="p">)</span>
+<span class="mi">220</span><span class="o">/</span><span class="mi">20</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.010</span>    <span class="mf">0.000</span> <span class="n">lib</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">/</span><span class="n">orm</span><span class="o">/</span><span class="n">loading</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">284</span><span class="p">(</span><span class="n">populate_state</span><span class="p">)</span>
+   <span class="mi">20</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.010</span>    <span class="mf">0.000</span> <span class="n">lib</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">/</span><span class="n">orm</span><span class="o">/</span><span class="n">strategies</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">987</span><span class="p">(</span><span class="n">load_collection_from_subq</span><span class="p">)</span>
+   <span class="mi">20</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.009</span>    <span class="mf">0.000</span> <span class="n">lib</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">/</span><span class="n">orm</span><span class="o">/</span><span class="n">strategies</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">935</span><span class="p">(</span><span class="n">get</span><span class="p">)</span>
+    <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.009</span>    <span class="mf">0.009</span> <span class="n">lib</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">/</span><span class="n">orm</span><span class="o">/</span><span class="n">strategies</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">940</span><span class="p">(</span><span class="n">_load</span><span class="p">)</span>
+   <span class="mi">21</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.008</span>    <span class="mf">0.000</span> <span class="n">lib</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">/</span><span class="n">orm</span><span class="o">/</span><span class="n">strategies</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">942</span><span class="p">(</span><span class="o">&lt;</span><span class="n">genexpr</span><span class="o">&gt;</span><span class="p">)</span>
+    <span class="mi">2</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.004</span>    <span class="mf">0.002</span> <span class="n">lib</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">/</span><span class="n">orm</span><span class="o">/</span><span class="n">query</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">2400</span><span class="p">(</span><span class="fm">__iter__</span><span class="p">)</span>
+    <span class="mi">2</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.002</span>    <span class="mf">0.001</span> <span class="n">lib</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">/</span><span class="n">orm</span><span class="o">/</span><span class="n">query</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">2414</span><span class="p">(</span><span class="n">_execute_and_instances</span><span class="p">)</span>
+    <span class="mi">2</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.002</span>    <span class="mf">0.001</span> <span class="n">lib</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">/</span><span class="n">engine</span><span class="o">/</span><span class="n">base</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">659</span><span class="p">(</span><span class="n">execute</span><span class="p">)</span>
+    <span class="mi">2</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.002</span>    <span class="mf">0.001</span> <span class="n">lib</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">/</span><span class="n">sql</span><span class="o">/</span><span class="n">elements</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">321</span><span class="p">(</span><span class="n">_execute_on_connection</span><span class="p">)</span>
+    <span class="mi">2</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.002</span>    <span class="mf">0.001</span> <span class="n">lib</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">/</span><span class="n">engine</span><span class="o">/</span><span class="n">base</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">788</span><span class="p">(</span><span class="n">_execute_clauseelement</span><span class="p">)</span>
+
+<span class="o">...</span></pre></div>
+</div>
+<p>Above, we can see that the <code class="docutils literal notranslate"><span class="pre">instances()</span></code> SQLAlchemy function was called 222
+times (recursively, and 21 times from the outside), taking a total of .011
+seconds for all calls combined.</p>
+</div>
+<div class="section" id="execution-slowness">
+<h3>Execution Slowness<a class="headerlink" href="#execution-slowness" title="Permalink to this headline">¶</a></h3>
+<p>The specifics of these calls can tell us where the time is being spent.
+If for example, you see time being spent within <code class="docutils literal notranslate"><span class="pre">cursor.execute()</span></code>,
+e.g. against the DBAPI:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2</span>    <span class="mf">0.102</span>    <span class="mf">0.102</span>    <span class="mf">0.204</span>    <span class="mf">0.102</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;execute&#39;</span> <span class="n">of</span> <span class="s1">&#39;sqlite3.Cursor&#39;</span> <span class="n">objects</span><span class="p">}</span></pre></div>
+</div>
+<p>this would indicate that the database is taking a long time to start returning
+results, and it means your query should be optimized, either by adding indexes
+or restructuring the query and/or underlying schema.  For that task,
+analysis of the query plan is warranted, using a system such as EXPLAIN,
+SHOW PLAN, etc. as is provided by the database backend.</p>
+</div>
+<div class="section" id="result-fetching-slowness-core">
+<h3>Result Fetching Slowness - Core<a class="headerlink" href="#result-fetching-slowness-core" title="Permalink to this headline">¶</a></h3>
+<p>If on the other hand you see many thousands of calls related to fetching rows,
+or very long calls to <code class="docutils literal notranslate"><span class="pre">fetchall()</span></code>, it may
+mean your query is returning more rows than expected, or that the fetching
+of rows itself is slow.   The ORM itself typically uses <code class="docutils literal notranslate"><span class="pre">fetchall()</span></code> to fetch
+rows (or <code class="docutils literal notranslate"><span class="pre">fetchmany()</span></code> if the <a class="reference internal" href="../orm/query.html#sqlalchemy.orm.query.Query.yield_per" title="sqlalchemy.orm.query.Query.yield_per"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Query.yield_per()</span></code></a> option is used).</p>
+<p>An inordinately large number of rows would be indicated
+by a very slow call to <code class="docutils literal notranslate"><span class="pre">fetchall()</span></code> at the DBAPI level:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2</span>    <span class="mf">0.300</span>    <span class="mf">0.600</span>    <span class="mf">0.300</span>    <span class="mf">0.600</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;fetchall&#39;</span> <span class="n">of</span> <span class="s1">&#39;sqlite3.Cursor&#39;</span> <span class="n">objects</span><span class="p">}</span></pre></div>
+</div>
+<p>An unexpectedly large number of rows, even if the ultimate result doesn’t seem
+to have many rows, can be the result of a cartesian product - when multiple
+sets of rows are combined together without appropriately joining the tables
+together.   It’s often easy to produce this behavior with SQLAlchemy Core or
+ORM query if the wrong <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a> objects are used in a complex query,
+pulling in additional FROM clauses that are unexpected.</p>
+<p>On the other hand, a fast call to <code class="docutils literal notranslate"><span class="pre">fetchall()</span></code> at the DBAPI level, but then
+slowness when SQLAlchemy’s <a class="reference internal" href="../core/connections.html#sqlalchemy.engine.ResultProxy" title="sqlalchemy.engine.ResultProxy"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResultProxy</span></code></a> is asked to do a <code class="docutils literal notranslate"><span class="pre">fetchall()</span></code>,
+may indicate slowness in processing of datatypes, such as unicode conversions
+and similar:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># the DBAPI cursor is fast...</span>
+<span class="mi">2</span>    <span class="mf">0.020</span>    <span class="mf">0.040</span>    <span class="mf">0.020</span>    <span class="mf">0.040</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;fetchall&#39;</span> <span class="n">of</span> <span class="s1">&#39;sqlite3.Cursor&#39;</span> <span class="n">objects</span><span class="p">}</span>
+
+<span class="o">...</span>
+
+<span class="c1"># but SQLAlchemy&#39;s result proxy is slow, this is type-level processing</span>
+<span class="mi">2</span>    <span class="mf">0.100</span>    <span class="mf">0.200</span>    <span class="mf">0.100</span>    <span class="mf">0.200</span> <span class="n">lib</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">/</span><span class="n">engine</span><span class="o">/</span><span class="n">result</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">778</span><span class="p">(</span><span class="n">fetchall</span><span class="p">)</span></pre></div>
+</div>
+<p>In some cases, a backend might be doing type-level processing that isn’t
+needed.   More specifically, seeing calls within the type API that are slow
+are better indicators - below is what it looks like when we use a type like
+this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">TypeDecorator</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="n">TypeDecorator</span><span class="p">):</span>
+    <span class="n">impl</span> <span class="o">=</span> <span class="n">String</span>
+
+    <span class="k">def</span> <span class="nf">process_result_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+        <span class="c1"># intentionally add slowness for illustration purposes</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="o">.</span><span class="mi">001</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span></pre></div>
+</div>
+<p>the profiling output of this intentionally slow operation can be seen like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">200</span>    <span class="mf">0.001</span>    <span class="mf">0.000</span>    <span class="mf">0.237</span>    <span class="mf">0.001</span> <span class="n">lib</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">/</span><span class="n">sql</span><span class="o">/</span><span class="n">type_api</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">911</span><span class="p">(</span><span class="n">process</span><span class="p">)</span>
+<span class="mi">200</span>    <span class="mf">0.001</span>    <span class="mf">0.000</span>    <span class="mf">0.236</span>    <span class="mf">0.001</span> <span class="n">test</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">28</span><span class="p">(</span><span class="n">process_result_value</span><span class="p">)</span>
+<span class="mi">200</span>    <span class="mf">0.235</span>    <span class="mf">0.001</span>    <span class="mf">0.235</span>    <span class="mf">0.001</span> <span class="p">{</span><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">}</span></pre></div>
+</div>
+<p>that is, we see many expensive calls within the <code class="docutils literal notranslate"><span class="pre">type_api</span></code> system, and the actual
+time consuming thing is the <code class="docutils literal notranslate"><span class="pre">time.sleep()</span></code> call.</p>
+<p>Make sure to check the <a class="reference internal" href="../dialects/index.html"><span class="std std-ref">Dialect documentation</span></a>
+for notes on known performance tuning suggestions at this level, especially for
+databases like Oracle.  There may be systems related to ensuring numeric accuracy
+or string processing that may not be needed in all cases.</p>
+<p>There also may be even more low-level points at which row-fetching performance is suffering;
+for example, if time spent seems to focus on a call like <code class="docutils literal notranslate"><span class="pre">socket.receive()</span></code>,
+that could indicate that everything is fast except for the actual network connection,
+and too much time is spent with data moving over the network.</p>
+</div>
+<div class="section" id="result-fetching-slowness-orm">
+<h3>Result Fetching Slowness - ORM<a class="headerlink" href="#result-fetching-slowness-orm" title="Permalink to this headline">¶</a></h3>
+<p>To detect slowness in ORM fetching of rows (which is the most common area
+of performance concern), calls like <code class="docutils literal notranslate"><span class="pre">populate_state()</span></code> and <code class="docutils literal notranslate"><span class="pre">_instance()</span></code> will
+illustrate individual ORM object populations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># the ORM calls _instance for each ORM-loaded row it sees, and</span>
+<span class="c1"># populate_state for each ORM-loaded row that results in the population</span>
+<span class="c1"># of an object&#39;s attributes</span>
+<span class="mi">220</span><span class="o">/</span><span class="mi">20</span>    <span class="mf">0.001</span>    <span class="mf">0.000</span>    <span class="mf">0.010</span>    <span class="mf">0.000</span> <span class="n">lib</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">/</span><span class="n">orm</span><span class="o">/</span><span class="n">loading</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">327</span><span class="p">(</span><span class="n">_instance</span><span class="p">)</span>
+<span class="mi">220</span><span class="o">/</span><span class="mi">20</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.009</span>    <span class="mf">0.000</span> <span class="n">lib</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">/</span><span class="n">orm</span><span class="o">/</span><span class="n">loading</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">284</span><span class="p">(</span><span class="n">populate_state</span><span class="p">)</span></pre></div>
+</div>
+<p>The ORM’s slowness in turning rows into ORM-mapped objects is a product
+of the complexity of this operation combined with the overhead of cPython.
+Common strategies to mitigate this include:</p>
+<ul>
+<li><p>fetch individual columns instead of full entities, that is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">User</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></pre></div>
+</div>
+<p>instead of:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span></pre></div>
+</div>
+</li>
+<li><p>Use <a class="reference internal" href="../orm/query.html#sqlalchemy.orm.query.Bundle" title="sqlalchemy.orm.query.Bundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bundle</span></code></a> objects to organize column-based results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">u_b</span> <span class="o">=</span> <span class="n">Bundle</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="n">User</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">User</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="n">a_b</span> <span class="o">=</span> <span class="n">Bundle</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="n">Address</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">Address</span><span class="o">.</span><span class="n">email</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">user</span><span class="p">,</span> <span class="n">address</span> <span class="ow">in</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">u_b</span><span class="p">,</span> <span class="n">a_b</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">addresses</span><span class="p">):</span>
+    <span class="c1"># ...</span></pre></div>
+</div>
+</li>
+<li><p>Use result caching - see <a class="reference internal" href="../orm/examples.html#examples-caching"><span class="std std-ref">Dogpile Caching</span></a> for an in-depth example
+of this.</p></li>
+<li><p>Consider a faster interpreter like that of PyPy.</p></li>
+</ul>
+<p>The output of a profile can be a little daunting but after some
+practice they are very easy to read.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="../orm/examples.html#examples-performance"><span class="std std-ref">Performance</span></a> - a suite of performance demonstrations
+with bundled profiling capabilities.</p>
+</div>
+</div>
+</div>
+<div class="section" id="i-m-inserting-400-000-rows-with-the-orm-and-it-s-really-slow">
+<h2>I’m inserting 400,000 rows with the ORM and it’s really slow!<a class="headerlink" href="#i-m-inserting-400-000-rows-with-the-orm-and-it-s-really-slow" title="Permalink to this headline">¶</a></h2>
+<p>The SQLAlchemy ORM uses the <a class="reference internal" href="../glossary.html#term-unit-of-work"><span class="xref std std-term">unit of work</span></a> pattern when synchronizing
+changes to the database. This pattern goes far beyond simple “inserts”
+of data. It includes that attributes which are assigned on objects are
+received using an attribute instrumentation system which tracks
+changes on objects as they are made, includes that all rows inserted
+are tracked in an identity map which has the effect that for each row
+SQLAlchemy must retrieve its “last inserted id” if not already given,
+and also involves that rows to be inserted are scanned and sorted for
+dependencies as needed. Objects are also subject to a fair degree of
+bookkeeping in order to keep all of this running, which for a very
+large number of rows at once can create an inordinate amount of time
+spent with large data structures, hence it’s best to chunk these.</p>
+<p>Basically, unit of work is a large degree of automation in order to
+automate the task of persisting a complex object graph into a
+relational database with no explicit persistence code, and this
+automation has a price.</p>
+<p>ORMs are basically not intended for high-performance bulk inserts -
+this is the whole reason SQLAlchemy offers the Core in addition to the
+ORM as a first-class component.</p>
+<p>For the use case of fast bulk inserts, the
+SQL generation and execution system that the ORM builds on top of
+is part of the <a class="reference internal" href="../core/tutorial.html"><span class="std std-ref">Core</span></a>.  Using this system directly, we can produce an INSERT that
+is competitive with using the raw database API directly.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When using the psycopg2 dialect, consider making use of the <a class="reference internal" href="../dialects/postgresql.html#psycopg2-batch-mode"><span class="std std-ref">batch
+execution helpers</span></a> feature of psycopg2, now
+supported directly by the SQLAlchemy psycopg2 dialect.</p>
+</div>
+<p>Alternatively, the SQLAlchemy ORM offers the <a class="reference internal" href="../orm/persistence_techniques.html#bulk-operations"><span class="std std-ref">Bulk Operations</span></a>
+suite of methods, which provide hooks into subsections of the unit of
+work process in order to emit Core-level INSERT and UPDATE constructs with
+a small degree of ORM-based automation.</p>
+<p>The example below illustrates time-based tests for several different
+methods of inserting rows, going from the most automated to the least.
+With cPython 2.7, runtimes observed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SQLAlchemy</span> <span class="n">ORM</span><span class="p">:</span> <span class="n">Total</span> <span class="n">time</span> <span class="k">for</span> <span class="mi">100000</span> <span class="n">records</span> <span class="mf">6.89754080772</span> <span class="n">secs</span>
+<span class="n">SQLAlchemy</span> <span class="n">ORM</span> <span class="n">pk</span> <span class="n">given</span><span class="p">:</span> <span class="n">Total</span> <span class="n">time</span> <span class="k">for</span> <span class="mi">100000</span> <span class="n">records</span> <span class="mf">4.09481811523</span> <span class="n">secs</span>
+<span class="n">SQLAlchemy</span> <span class="n">ORM</span> <span class="n">bulk_save_objects</span><span class="p">():</span> <span class="n">Total</span> <span class="n">time</span> <span class="k">for</span> <span class="mi">100000</span> <span class="n">records</span> <span class="mf">1.65821218491</span> <span class="n">secs</span>
+<span class="n">SQLAlchemy</span> <span class="n">ORM</span> <span class="n">bulk_insert_mappings</span><span class="p">():</span> <span class="n">Total</span> <span class="n">time</span> <span class="k">for</span> <span class="mi">100000</span> <span class="n">records</span> <span class="mf">0.466513156891</span> <span class="n">secs</span>
+<span class="n">SQLAlchemy</span> <span class="n">Core</span><span class="p">:</span> <span class="n">Total</span> <span class="n">time</span> <span class="k">for</span> <span class="mi">100000</span> <span class="n">records</span> <span class="mf">0.21024107933</span> <span class="n">secs</span>
+<span class="n">sqlite3</span><span class="p">:</span> <span class="n">Total</span> <span class="n">time</span> <span class="k">for</span> <span class="mi">100000</span> <span class="n">records</span> <span class="mf">0.137335062027</span> <span class="n">sec</span></pre></div>
+</div>
+<p>We can reduce the time by a factor of nearly three using recent versions of <a class="reference external" href="http://pypy.org/">PyPy</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SQLAlchemy</span> <span class="n">ORM</span><span class="p">:</span> <span class="n">Total</span> <span class="n">time</span> <span class="k">for</span> <span class="mi">100000</span> <span class="n">records</span> <span class="mf">2.39429616928</span> <span class="n">secs</span>
+<span class="n">SQLAlchemy</span> <span class="n">ORM</span> <span class="n">pk</span> <span class="n">given</span><span class="p">:</span> <span class="n">Total</span> <span class="n">time</span> <span class="k">for</span> <span class="mi">100000</span> <span class="n">records</span> <span class="mf">1.51412987709</span> <span class="n">secs</span>
+<span class="n">SQLAlchemy</span> <span class="n">ORM</span> <span class="n">bulk_save_objects</span><span class="p">():</span> <span class="n">Total</span> <span class="n">time</span> <span class="k">for</span> <span class="mi">100000</span> <span class="n">records</span> <span class="mf">0.568987131119</span> <span class="n">secs</span>
+<span class="n">SQLAlchemy</span> <span class="n">ORM</span> <span class="n">bulk_insert_mappings</span><span class="p">():</span> <span class="n">Total</span> <span class="n">time</span> <span class="k">for</span> <span class="mi">100000</span> <span class="n">records</span> <span class="mf">0.320806980133</span> <span class="n">secs</span>
+<span class="n">SQLAlchemy</span> <span class="n">Core</span><span class="p">:</span> <span class="n">Total</span> <span class="n">time</span> <span class="k">for</span> <span class="mi">100000</span> <span class="n">records</span> <span class="mf">0.206904888153</span> <span class="n">secs</span>
+<span class="n">sqlite3</span><span class="p">:</span> <span class="n">Total</span> <span class="n">time</span> <span class="k">for</span> <span class="mi">100000</span> <span class="n">records</span> <span class="mf">0.165791988373</span> <span class="n">sec</span></pre></div>
+</div>
+<p>Script:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span>  <span class="n">create_engine</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">scoped_session</span><span class="p">,</span> <span class="n">sessionmaker</span>
+
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+<span class="n">DBSession</span> <span class="o">=</span> <span class="n">scoped_session</span><span class="p">(</span><span class="n">sessionmaker</span><span class="p">())</span>
+<span class="n">engine</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="k">class</span> <span class="nc">Customer</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;customer&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">255</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">init_sqlalchemy</span><span class="p">(</span><span class="n">dbname</span><span class="o">=</span><span class="s1">&#39;sqlite:///sqlalchemy.db&#39;</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">engine</span>
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">dbname</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">DBSession</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+    <span class="n">DBSession</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">,</span> <span class="n">autoflush</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">expire_on_commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">drop_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">test_sqlalchemy_orm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">100000</span><span class="p">):</span>
+    <span class="n">init_sqlalchemy</span><span class="p">()</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">customer</span> <span class="o">=</span> <span class="n">Customer</span><span class="p">()</span>
+        <span class="n">customer</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;NAME &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">DBSession</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">customer</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">1000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">DBSession</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+    <span class="n">DBSession</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;SQLAlchemy ORM: Total time for &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span>
+        <span class="s2">&quot; records &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; secs&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">test_sqlalchemy_orm_pk_given</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">100000</span><span class="p">):</span>
+    <span class="n">init_sqlalchemy</span><span class="p">()</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">customer</span> <span class="o">=</span> <span class="n">Customer</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;NAME &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+        <span class="n">DBSession</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">customer</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">1000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">DBSession</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+    <span class="n">DBSession</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;SQLAlchemy ORM pk given: Total time for &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span>
+        <span class="s2">&quot; records &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; secs&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">test_sqlalchemy_orm_bulk_save_objects</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">100000</span><span class="p">):</span>
+    <span class="n">init_sqlalchemy</span><span class="p">()</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="mi">10000</span><span class="p">):</span>
+        <span class="n">DBSession</span><span class="o">.</span><span class="n">bulk_save_objects</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">Customer</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;NAME &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">chunk</span> <span class="o">+</span> <span class="mi">10000</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">DBSession</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;SQLAlchemy ORM bulk_save_objects(): Total time for &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span>
+        <span class="s2">&quot; records &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; secs&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">test_sqlalchemy_orm_bulk_insert</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">100000</span><span class="p">):</span>
+    <span class="n">init_sqlalchemy</span><span class="p">()</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="mi">10000</span><span class="p">):</span>
+        <span class="n">DBSession</span><span class="o">.</span><span class="n">bulk_insert_mappings</span><span class="p">(</span>
+            <span class="n">Customer</span><span class="p">,</span>
+            <span class="p">[</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;NAME &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">chunk</span> <span class="o">+</span> <span class="mi">10000</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">DBSession</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;SQLAlchemy ORM bulk_insert_mappings(): Total time for &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span>
+        <span class="s2">&quot; records &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; secs&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">test_sqlalchemy_core</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">100000</span><span class="p">):</span>
+    <span class="n">init_sqlalchemy</span><span class="p">()</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">engine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+        <span class="n">Customer</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">insert</span><span class="p">(),</span>
+        <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s1">&#39;NAME &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)}</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;SQLAlchemy Core: Total time for &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span>
+        <span class="s2">&quot; records &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; secs&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">init_sqlite3</span><span class="p">(</span><span class="n">dbname</span><span class="p">):</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dbname</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DROP TABLE IF EXISTS customer&quot;</span><span class="p">)</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+        <span class="s2">&quot;CREATE TABLE customer (id INTEGER NOT NULL, &quot;</span>
+        <span class="s2">&quot;name VARCHAR(255), PRIMARY KEY(id))&quot;</span><span class="p">)</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">conn</span>
+
+
+<span class="k">def</span> <span class="nf">test_sqlite3</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">dbname</span><span class="o">=</span><span class="s1">&#39;sqlite3.db&#39;</span><span class="p">):</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">init_sqlite3</span><span class="p">(</span><span class="n">dbname</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;NAME &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),)</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO customer (name) VALUES (?)&quot;</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;sqlite3: Total time for &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span>
+        <span class="s2">&quot; records &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; sec&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">test_sqlalchemy_orm</span><span class="p">(</span><span class="mi">100000</span><span class="p">)</span>
+    <span class="n">test_sqlalchemy_orm_pk_given</span><span class="p">(</span><span class="mi">100000</span><span class="p">)</span>
+    <span class="n">test_sqlalchemy_orm_bulk_save_objects</span><span class="p">(</span><span class="mi">100000</span><span class="p">)</span>
+    <span class="n">test_sqlalchemy_orm_bulk_insert</span><span class="p">(</span><span class="mi">100000</span><span class="p">)</span>
+    <span class="n">test_sqlalchemy_core</span><span class="p">(</span><span class="mi">100000</span><span class="p">)</span>
+    <span class="n">test_sqlite3</span><span class="p">(</span><span class="mi">100000</span><span class="p">)</span></pre></div>
+</div>
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="ormconfiguration.html" title="previous chapter">ORM Configuration</a>
+        Next:
+        <a href="sessions.html" title="next chapter">Sessions / Queries</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

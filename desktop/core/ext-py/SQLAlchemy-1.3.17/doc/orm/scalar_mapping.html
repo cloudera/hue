@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    Mapping Columns and Expressions
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+        <link rel="up" title="Mapper Configuration" href="mapper_config.html" />
+        <link rel="next" title="Mapping Table Columns" href="mapping_columns.html" />
+        <link rel="prev" title="Types of Mappings" href="mapping_styles.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../contents.html">Contents</a> |
+                <a href="../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="index.html" title="SQLAlchemy ORM">SQLAlchemy ORM</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="tutorial.html">Object Relational Tutorial</a></span></li>
+<li><span class="link-container"><a class="reference external" href="mapper_config.html">Mapper Configuration</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="mapping_styles.html">Types of Mappings</a></span></li>
+<li class="selected"><span class="link-container"><strong>Mapping Columns and Expressions</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="mapping_columns.html">Mapping Table Columns</a></span></li>
+<li><span class="link-container"><a class="reference external" href="mapped_sql_expr.html">SQL Expressions as Mapped Attributes</a></span></li>
+<li><span class="link-container"><a class="reference external" href="mapped_attributes.html">Changing Attribute Behavior</a></span></li>
+<li><span class="link-container"><a class="reference external" href="composites.html">Composite Column Types</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="inheritance.html">Mapping Class Inheritance Hierarchies</a></span></li>
+<li><span class="link-container"><a class="reference external" href="nonstandard_mappings.html">Non-Traditional Mappings</a></span></li>
+<li><span class="link-container"><a class="reference external" href="versioning.html">Configuring a Version Counter</a></span></li>
+<li><span class="link-container"><a class="reference external" href="mapping_api.html">Class Mapping API</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="relationships.html">Relationship Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="loading_objects.html">Loading Objects</a></span></li>
+<li><span class="link-container"><a class="reference external" href="session.html">Using the Session</a></span></li>
+<li><span class="link-container"><a class="reference external" href="extending.html">Events and Internals</a></span></li>
+<li><span class="link-container"><a class="reference external" href="extensions/index.html">ORM Extensions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="examples.html">ORM Examples</a></span></li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="mapping-columns-and-expressions">
+<h1>Mapping Columns and Expressions<a class="headerlink" href="#mapping-columns-and-expressions" title="Permalink to this headline">¶</a></h1>
+<p>The following sections discuss how table columns and SQL expressions are
+mapped to individual object attributes.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mapping_columns.html">Mapping Table Columns</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mapping_columns.html#naming-columns-distinctly-from-attribute-names">Naming Columns Distinctly from Attribute Names</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mapping_columns.html#automating-column-naming-schemes-from-reflected-tables">Automating Column Naming Schemes from Reflected Tables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mapping_columns.html#naming-all-columns-with-a-prefix">Naming All Columns with a Prefix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mapping_columns.html#using-column-property-for-column-level-options">Using column_property for column level options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mapping_columns.html#mapping-a-subset-of-table-columns">Mapping a Subset of Table Columns</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mapped_sql_expr.html">SQL Expressions as Mapped Attributes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mapped_sql_expr.html#using-a-hybrid">Using a Hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mapped_sql_expr.html#using-column-property">Using column_property</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mapped_sql_expr.html#using-a-plain-descriptor">Using a plain descriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mapped_sql_expr.html#query-time-sql-expressions-as-mapped-attributes">Query-time SQL expressions as mapped attributes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mapped_attributes.html">Changing Attribute Behavior</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mapped_attributes.html#simple-validators">Simple Validators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mapped_attributes.html#using-custom-datatypes-at-the-core-level">Using Custom Datatypes at the Core Level</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mapped_attributes.html#using-descriptors-and-hybrids">Using Descriptors and Hybrids</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mapped_attributes.html#synonyms">Synonyms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mapped_attributes.html#operator-customization">Operator Customization</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="composites.html">Composite Column Types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="composites.html#tracking-in-place-mutations-on-composites">Tracking In-Place Mutations on Composites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="composites.html#redefining-comparison-operations-for-composites">Redefining Comparison Operations for Composites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="composites.html#nesting-composites">Nesting Composites</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="mapping_styles.html" title="previous chapter">Types of Mappings</a>
+        Next:
+        <a href="mapping_columns.html" title="next chapter">Mapping Table Columns</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

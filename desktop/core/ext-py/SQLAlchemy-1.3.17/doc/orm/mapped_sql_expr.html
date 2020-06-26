@@ -1,0 +1,503 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    SQL Expressions as Mapped Attributes
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+        <link rel="up" title="Mapping Columns and Expressions" href="scalar_mapping.html" />
+        <link rel="next" title="Changing Attribute Behavior" href="mapped_attributes.html" />
+        <link rel="prev" title="Mapping Table Columns" href="mapping_columns.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../contents.html">Contents</a> |
+                <a href="../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="index.html" title="SQLAlchemy ORM">SQLAlchemy ORM</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="tutorial.html">Object Relational Tutorial</a></span></li>
+<li><span class="link-container"><a class="reference external" href="mapper_config.html">Mapper Configuration</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="mapping_styles.html">Types of Mappings</a></span></li>
+<li><span class="link-container"><a class="reference external" href="scalar_mapping.html">Mapping Columns and Expressions</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="mapping_columns.html">Mapping Table Columns</a></span></li>
+<li class="selected"><span class="link-container"><strong>SQL Expressions as Mapped Attributes</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#using-a-hybrid">Using a Hybrid</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#using-column-property">Using column_property</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#composing-from-column-properties-at-mapping-time">Composing from Column Properties at Mapping Time</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#using-a-plain-descriptor">Using a plain descriptor</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#query-time-sql-expressions-as-mapped-attributes">Query-time SQL expressions as mapped attributes</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="mapped_attributes.html">Changing Attribute Behavior</a></span></li>
+<li><span class="link-container"><a class="reference external" href="composites.html">Composite Column Types</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="inheritance.html">Mapping Class Inheritance Hierarchies</a></span></li>
+<li><span class="link-container"><a class="reference external" href="nonstandard_mappings.html">Non-Traditional Mappings</a></span></li>
+<li><span class="link-container"><a class="reference external" href="versioning.html">Configuring a Version Counter</a></span></li>
+<li><span class="link-container"><a class="reference external" href="mapping_api.html">Class Mapping API</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="relationships.html">Relationship Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="loading_objects.html">Loading Objects</a></span></li>
+<li><span class="link-container"><a class="reference external" href="session.html">Using the Session</a></span></li>
+<li><span class="link-container"><a class="reference external" href="extending.html">Events and Internals</a></span></li>
+<li><span class="link-container"><a class="reference external" href="extensions/index.html">ORM Extensions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="examples.html">ORM Examples</a></span></li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="sql-expressions-as-mapped-attributes">
+<span id="mapper-sql-expressions"></span><h1>SQL Expressions as Mapped Attributes<a class="headerlink" href="#sql-expressions-as-mapped-attributes" title="Permalink to this headline">¶</a></h1>
+<p>Attributes on a mapped class can be linked to SQL expressions, which can
+be used in queries.</p>
+<div class="section" id="using-a-hybrid">
+<h2>Using a Hybrid<a class="headerlink" href="#using-a-hybrid" title="Permalink to this headline">¶</a></h2>
+<p>The easiest and most flexible way to link relatively simple SQL expressions to a class is to use a so-called
+“hybrid attribute”,
+described in the section <a class="reference internal" href="extensions/hybrid.html"><span class="std std-ref">Hybrid Attributes</span></a>.  The hybrid provides
+for an expression that works at both the Python level as well as at the
+SQL expression level.  For example, below we map a class <code class="docutils literal notranslate"><span class="pre">User</span></code>,
+containing attributes <code class="docutils literal notranslate"><span class="pre">firstname</span></code> and <code class="docutils literal notranslate"><span class="pre">lastname</span></code>, and include a hybrid that
+will provide for us the <code class="docutils literal notranslate"><span class="pre">fullname</span></code>, which is the string concatenation of the two:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.ext.hybrid</span> <span class="k">import</span> <span class="n">hybrid_property</span>
+
+<span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;user&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">firstname</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">lastname</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="nd">@hybrid_property</span>
+    <span class="k">def</span> <span class="nf">fullname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">firstname</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lastname</span></pre></div>
+</div>
+<p>Above, the <code class="docutils literal notranslate"><span class="pre">fullname</span></code> attribute is interpreted at both the instance and
+class level, so that it is available from an instance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">some_user</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">some_user</span><span class="o">.</span><span class="n">fullname</span><span class="p">)</span></pre></div>
+</div>
+<p>as well as usable within queries:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">some_user</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">fullname</span> <span class="o">==</span> <span class="s2">&quot;John Smith&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span></pre></div>
+</div>
+<p>The string concatenation example is a simple one, where the Python expression
+can be dual purposed at the instance and class level.  Often, the SQL expression
+must be distinguished from the Python expression, which can be achieved using
+<a class="reference internal" href="extensions/hybrid.html#sqlalchemy.ext.hybrid.hybrid_property.expression" title="sqlalchemy.ext.hybrid.hybrid_property.expression"><code class="xref py py-meth docutils literal notranslate"><span class="pre">hybrid_property.expression()</span></code></a>.  Below we illustrate the case where a conditional
+needs to be present inside the hybrid, using the <code class="docutils literal notranslate"><span class="pre">if</span></code> statement in Python and the
+<a class="reference internal" href="../core/sqlelement.html#sqlalchemy.sql.expression.case" title="sqlalchemy.sql.expression.case"><code class="xref py py-func docutils literal notranslate"><span class="pre">case()</span></code></a> construct for SQL expressions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.ext.hybrid</span> <span class="k">import</span> <span class="n">hybrid_property</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.sql</span> <span class="k">import</span> <span class="n">case</span>
+
+<span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;user&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">firstname</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">lastname</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="nd">@hybrid_property</span>
+    <span class="k">def</span> <span class="nf">fullname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">firstname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">firstname</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lastname</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lastname</span>
+
+    <span class="nd">@fullname</span><span class="o">.</span><span class="n">expression</span>
+    <span class="k">def</span> <span class="nf">fullname</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">case</span><span class="p">([</span>
+            <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">firstname</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">firstname</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">lastname</span><span class="p">),</span>
+        <span class="p">],</span> <span class="n">else_</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">lastname</span><span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="using-column-property">
+<span id="mapper-column-property-sql-expressions"></span><h2>Using column_property<a class="headerlink" href="#using-column-property" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="mapping_columns.html#sqlalchemy.orm.column_property" title="sqlalchemy.orm.column_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">column_property()</span></code></a> function can be used to map a SQL
+expression in a manner similar to a regularly mapped <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>.
+With this technique, the attribute is loaded
+along with all other column-mapped attributes at load time.  This is in some
+cases an advantage over the usage of hybrids, as the value can be loaded
+up front at the same time as the parent row of the object, particularly if
+the expression is one which links to other tables (typically as a correlated
+subquery) to access data that wouldn’t normally be
+available on an already loaded object.</p>
+<p>Disadvantages to using <a class="reference internal" href="mapping_columns.html#sqlalchemy.orm.column_property" title="sqlalchemy.orm.column_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">column_property()</span></code></a> for SQL expressions include that
+the expression must be compatible with the SELECT statement emitted for the class
+as a whole, and there are also some configurational quirks which can occur
+when using <a class="reference internal" href="mapping_columns.html#sqlalchemy.orm.column_property" title="sqlalchemy.orm.column_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">column_property()</span></code></a> from declarative mixins.</p>
+<p>Our “fullname” example can be expressed using <a class="reference internal" href="mapping_columns.html#sqlalchemy.orm.column_property" title="sqlalchemy.orm.column_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">column_property()</span></code></a> as
+follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">column_property</span>
+
+<span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;user&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">firstname</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">lastname</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">fullname</span> <span class="o">=</span> <span class="n">column_property</span><span class="p">(</span><span class="n">firstname</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">lastname</span><span class="p">)</span></pre></div>
+</div>
+<p>Correlated subqueries may be used as well.  Below we use the <a class="reference internal" href="../core/selectable.html#sqlalchemy.sql.expression.select" title="sqlalchemy.sql.expression.select"><code class="xref py py-func docutils literal notranslate"><span class="pre">select()</span></code></a>
+construct to create a SELECT that links together the count of <code class="docutils literal notranslate"><span class="pre">Address</span></code>
+objects available for a particular <code class="docutils literal notranslate"><span class="pre">User</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">column_property</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">select</span><span class="p">,</span> <span class="n">func</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">ForeignKey</span>
+
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">declarative_base</span>
+
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">Address</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;address&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">user_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;user.id&#39;</span><span class="p">))</span>
+
+<span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;user&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">address_count</span> <span class="o">=</span> <span class="n">column_property</span><span class="p">(</span>
+        <span class="n">select</span><span class="p">([</span><span class="n">func</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">Address</span><span class="o">.</span><span class="n">id</span><span class="p">)])</span><span class="o">.</span>\
+            <span class="n">where</span><span class="p">(</span><span class="n">Address</span><span class="o">.</span><span class="n">user_id</span><span class="o">==</span><span class="nb">id</span><span class="p">)</span><span class="o">.</span>\
+            <span class="n">correlate_except</span><span class="p">(</span><span class="n">Address</span><span class="p">)</span>
+    <span class="p">)</span></pre></div>
+</div>
+<p>In the above example, we define a <a class="reference internal" href="../core/selectable.html#sqlalchemy.sql.expression.select" title="sqlalchemy.sql.expression.select"><code class="xref py py-func docutils literal notranslate"><span class="pre">select()</span></code></a> construct like the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span><span class="p">([</span><span class="n">func</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">Address</span><span class="o">.</span><span class="n">id</span><span class="p">)])</span><span class="o">.</span>\
+    <span class="n">where</span><span class="p">(</span><span class="n">Address</span><span class="o">.</span><span class="n">user_id</span><span class="o">==</span><span class="nb">id</span><span class="p">)</span><span class="o">.</span>\
+    <span class="n">correlate_except</span><span class="p">(</span><span class="n">Address</span><span class="p">)</span></pre></div>
+</div>
+<p>The meaning of the above statement is, select the count of <code class="docutils literal notranslate"><span class="pre">Address.id</span></code> rows
+where the <code class="docutils literal notranslate"><span class="pre">Address.user_id</span></code> column is equated to <code class="docutils literal notranslate"><span class="pre">id</span></code>, which in the context
+of the <code class="docutils literal notranslate"><span class="pre">User</span></code> class is the <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a> named <code class="docutils literal notranslate"><span class="pre">id</span></code> (note that <code class="docutils literal notranslate"><span class="pre">id</span></code> is
+also the name of a Python built in function, which is not what we want to use
+here - if we were outside of the <code class="docutils literal notranslate"><span class="pre">User</span></code> class definition, we’d use <code class="docutils literal notranslate"><span class="pre">User.id</span></code>).</p>
+<p>The <code class="xref py py-meth docutils literal notranslate"><span class="pre">select.correlate_except()</span></code> directive indicates that each element in the
+FROM clause of this <a class="reference internal" href="../core/selectable.html#sqlalchemy.sql.expression.select" title="sqlalchemy.sql.expression.select"><code class="xref py py-func docutils literal notranslate"><span class="pre">select()</span></code></a> may be omitted from the FROM list (that is, correlated
+to the enclosing SELECT statement against <code class="docutils literal notranslate"><span class="pre">User</span></code>) except for the one corresponding
+to <code class="docutils literal notranslate"><span class="pre">Address</span></code>.  This isn’t strictly necessary, but prevents <code class="docutils literal notranslate"><span class="pre">Address</span></code> from
+being inadvertently omitted from the FROM list in the case of a long string
+of joins between <code class="docutils literal notranslate"><span class="pre">User</span></code> and <code class="docutils literal notranslate"><span class="pre">Address</span></code> tables where SELECT statements against
+<code class="docutils literal notranslate"><span class="pre">Address</span></code> are nested.</p>
+<p>If import issues prevent the <a class="reference internal" href="mapping_columns.html#sqlalchemy.orm.column_property" title="sqlalchemy.orm.column_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">column_property()</span></code></a> from being defined
+inline with the class, it can be assigned to the class after both
+are configured.   In Declarative this has the effect of calling <a class="reference internal" href="mapping_api.html#sqlalchemy.orm.Mapper.add_property" title="sqlalchemy.orm.Mapper.add_property"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Mapper.add_property()</span></code></a>
+to add an additional property after the fact:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">User</span><span class="o">.</span><span class="n">address_count</span> <span class="o">=</span> <span class="n">column_property</span><span class="p">(</span>
+        <span class="n">select</span><span class="p">([</span><span class="n">func</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">Address</span><span class="o">.</span><span class="n">id</span><span class="p">)])</span><span class="o">.</span>\
+            <span class="n">where</span><span class="p">(</span><span class="n">Address</span><span class="o">.</span><span class="n">user_id</span><span class="o">==</span><span class="n">User</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="p">)</span></pre></div>
+</div>
+<p>For a <a class="reference internal" href="mapping_columns.html#sqlalchemy.orm.column_property" title="sqlalchemy.orm.column_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">column_property()</span></code></a> that refers to columns linked from a
+many-to-many relationship, use <a class="reference internal" href="../core/sqlelement.html#sqlalchemy.sql.expression.and_" title="sqlalchemy.sql.expression.and_"><code class="xref py py-func docutils literal notranslate"><span class="pre">and_()</span></code></a> to join the fields of the
+association table to both tables in a relationship:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">and_</span>
+
+<span class="k">class</span> <span class="nc">Author</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+
+    <span class="n">book_count</span> <span class="o">=</span> <span class="n">column_property</span><span class="p">(</span>
+        <span class="n">select</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">func</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">books</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="p">)]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">and_</span><span class="p">(</span>
+                <span class="n">book_authors</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">author_id</span><span class="o">==</span><span class="n">authors</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="n">book_authors</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">book_id</span><span class="o">==</span><span class="n">books</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span></pre></div>
+</div>
+<div class="section" id="composing-from-column-properties-at-mapping-time">
+<span id="mapper-column-property-sql-expressions-composed"></span><h3>Composing from Column Properties at Mapping Time<a class="headerlink" href="#composing-from-column-properties-at-mapping-time" title="Permalink to this headline">¶</a></h3>
+<p>It is possible to create mappings that combine multiple
+<a class="reference internal" href="internals.html#sqlalchemy.orm.ColumnProperty" title="sqlalchemy.orm.ColumnProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">ColumnProperty</span></code></a> objects together.  The <a class="reference internal" href="internals.html#sqlalchemy.orm.ColumnProperty" title="sqlalchemy.orm.ColumnProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">ColumnProperty</span></code></a> will
+be interpreted as a SQL expression when used in a Core expression context,
+provided that it is targeted by an existing expression object; this works by
+the Core detecting that the object has a <code class="docutils literal notranslate"><span class="pre">__clause_element__()</span></code> method which
+returns a SQL expression.   However, if the <a class="reference internal" href="internals.html#sqlalchemy.orm.ColumnProperty" title="sqlalchemy.orm.ColumnProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">ColumnProperty</span></code></a> is used as
+a lead object in an expression where there is no other Core SQL expression
+object to target it, the <a class="reference internal" href="internals.html#sqlalchemy.orm.ColumnProperty.expression" title="sqlalchemy.orm.ColumnProperty.expression"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ColumnProperty.expression</span></code></a> attribute will
+return the underlying SQL expression so that it can be used to build SQL
+expressions consistently.  Below, the <code class="docutils literal notranslate"><span class="pre">File</span></code> class contains an attribute
+<code class="docutils literal notranslate"><span class="pre">File.path</span></code> that concatenates a string token to the <code class="docutils literal notranslate"><span class="pre">File.filename</span></code>
+attribute, which is itself a <a class="reference internal" href="internals.html#sqlalchemy.orm.ColumnProperty" title="sqlalchemy.orm.ColumnProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">ColumnProperty</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">File</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;file&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">64</span><span class="p">))</span>
+    <span class="n">extension</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">column_property</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">extension</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">column_property</span><span class="p">(</span><span class="s1">&#39;C:/&#39;</span> <span class="o">+</span> <span class="n">filename</span><span class="o">.</span><span class="n">expression</span><span class="p">)</span></pre></div>
+</div>
+<p>When the <code class="docutils literal notranslate"><span class="pre">File</span></code> class is used in expressions normally, the attributes
+assigned to <code class="docutils literal notranslate"><span class="pre">filename</span></code> and <code class="docutils literal notranslate"><span class="pre">path</span></code> are usable directly.  The use of the
+<a class="reference internal" href="internals.html#sqlalchemy.orm.ColumnProperty.expression" title="sqlalchemy.orm.ColumnProperty.expression"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ColumnProperty.expression</span></code></a> attribute is only necessary when using
+the <a class="reference internal" href="internals.html#sqlalchemy.orm.ColumnProperty" title="sqlalchemy.orm.ColumnProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">ColumnProperty</span></code></a> directly within the mapping definition:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">File</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">File</span><span class="o">.</span><span class="n">filename</span> <span class="o">==</span> <span class="s1">&#39;foo.txt&#39;</span><span class="p">)</span></pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="using-a-plain-descriptor">
+<h2>Using a plain descriptor<a class="headerlink" href="#using-a-plain-descriptor" title="Permalink to this headline">¶</a></h2>
+<p>In cases where a SQL query more elaborate than what <a class="reference internal" href="mapping_columns.html#sqlalchemy.orm.column_property" title="sqlalchemy.orm.column_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">column_property()</span></code></a>
+or <a class="reference internal" href="extensions/hybrid.html#sqlalchemy.ext.hybrid.hybrid_property" title="sqlalchemy.ext.hybrid.hybrid_property"><code class="xref py py-class docutils literal notranslate"><span class="pre">hybrid_property</span></code></a> can provide must be emitted, a regular Python
+function accessed as an attribute can be used, assuming the expression
+only needs to be available on an already-loaded instance.   The function
+is decorated with Python’s own <code class="docutils literal notranslate"><span class="pre">&#64;property</span></code> decorator to mark it as a read-only
+attribute.   Within the function, <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.object_session" title="sqlalchemy.orm.session.object_session"><code class="xref py py-func docutils literal notranslate"><span class="pre">object_session()</span></code></a>
+is used to locate the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> corresponding to the current object,
+which is then used to emit a query:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">object_session</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">select</span><span class="p">,</span> <span class="n">func</span>
+
+<span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;user&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">firstname</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">lastname</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">address_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">object_session</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span>\
+            <span class="n">scalar</span><span class="p">(</span>
+                <span class="n">select</span><span class="p">([</span><span class="n">func</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">Address</span><span class="o">.</span><span class="n">id</span><span class="p">)])</span><span class="o">.</span>\
+                    <span class="n">where</span><span class="p">(</span><span class="n">Address</span><span class="o">.</span><span class="n">user_id</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="p">)</span></pre></div>
+</div>
+<p>The plain descriptor approach is useful as a last resort, but is less performant
+in the usual case than both the hybrid and column property approaches, in that
+it needs to emit a SQL query upon each access.</p>
+</div>
+<div class="section" id="query-time-sql-expressions-as-mapped-attributes">
+<span id="mapper-querytime-expression"></span><h2>Query-time SQL expressions as mapped attributes<a class="headerlink" href="#query-time-sql-expressions-as-mapped-attributes" title="Permalink to this headline">¶</a></h2>
+<p>When using <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.query" title="sqlalchemy.orm.session.Session.query"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.query()</span></code></a>, we have the option to specify not just
+mapped entities but ad-hoc SQL expressions as well.  Suppose if a class
+<code class="docutils literal notranslate"><span class="pre">A</span></code> had integer attributes <code class="docutils literal notranslate"><span class="pre">.x</span></code> and <code class="docutils literal notranslate"><span class="pre">.y</span></code>, we could query for <code class="docutils literal notranslate"><span class="pre">A</span></code>
+objects, and additionally the sum of <code class="docutils literal notranslate"><span class="pre">.x</span></code> and <code class="docutils literal notranslate"><span class="pre">.y</span></code>, as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">A</span><span class="o">.</span><span class="n">y</span><span class="p">)</span></pre></div>
+</div>
+<p>The above query returns tuples of the form <code class="docutils literal notranslate"><span class="pre">(A</span> <span class="pre">object,</span> <span class="pre">integer)</span></code>.</p>
+<p>An option exists which can apply the ad-hoc <code class="docutils literal notranslate"><span class="pre">A.x</span> <span class="pre">+</span> <span class="pre">A.y</span></code> expression to the
+returned <code class="docutils literal notranslate"><span class="pre">A</span></code> objects instead of as a separate tuple entry; this is the
+<a class="reference internal" href="loading_columns.html#sqlalchemy.orm.with_expression" title="sqlalchemy.orm.with_expression"><code class="xref py py-func docutils literal notranslate"><span class="pre">with_expression()</span></code></a> query option in conjunction with the
+<a class="reference internal" href="loading_columns.html#sqlalchemy.orm.query_expression" title="sqlalchemy.orm.query_expression"><code class="xref py py-func docutils literal notranslate"><span class="pre">query_expression()</span></code></a> attribute mapping.    The class is mapped
+to include a placeholder attribute where any particular SQL expression
+may be applied:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">query_expression</span>
+
+<span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>
+
+    <span class="n">expr</span> <span class="o">=</span> <span class="n">query_expression</span><span class="p">()</span></pre></div>
+</div>
+<p>We can then query for objects of type <code class="docutils literal notranslate"><span class="pre">A</span></code>, applying an arbitrary
+SQL expression to be populated into <code class="docutils literal notranslate"><span class="pre">A.expr</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">with_expression</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+    <span class="n">with_expression</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">expr</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">A</span><span class="o">.</span><span class="n">y</span><span class="p">))</span></pre></div>
+</div>
+<p>The <a class="reference internal" href="loading_columns.html#sqlalchemy.orm.query_expression" title="sqlalchemy.orm.query_expression"><code class="xref py py-func docutils literal notranslate"><span class="pre">query_expression()</span></code></a> mapping has these caveats:</p>
+<ul>
+<li><p>On an object where <a class="reference internal" href="loading_columns.html#sqlalchemy.orm.query_expression" title="sqlalchemy.orm.query_expression"><code class="xref py py-func docutils literal notranslate"><span class="pre">query_expression()</span></code></a> were not used to populate
+the attribute, the attribute on an object instance will have the value
+<code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p>The query_expression value <strong>does not refresh when the object is
+expired</strong>.  Once the object is expired, either via <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.expire" title="sqlalchemy.orm.session.Session.expire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.expire()</span></code></a>
+or via the expire_on_commit behavior of <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.commit" title="sqlalchemy.orm.session.Session.commit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.commit()</span></code></a>, the value is
+removed from the attribute and will return <code class="docutils literal notranslate"><span class="pre">None</span></code> on subsequent access.
+Only by running a new <a class="reference internal" href="query.html#sqlalchemy.orm.query.Query" title="sqlalchemy.orm.query.Query"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></a> that touches the object which includes
+a new <a class="reference internal" href="loading_columns.html#sqlalchemy.orm.with_expression" title="sqlalchemy.orm.with_expression"><code class="xref py py-func docutils literal notranslate"><span class="pre">with_expression()</span></code></a> directive will the attribute be set to a
+non-None value.</p></li>
+<li><p>The mapped attribute currently <strong>cannot</strong> be applied to other parts of the
+query, such as the WHERE clause, the ORDER BY clause, and make use of the
+ad-hoc expression; that is, this won’t work:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># wont work</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+    <span class="n">with_expression</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">expr</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">A</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">expr</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">expr</span><span class="p">)</span></pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">A.expr</span></code> expression will resolve to NULL in the above WHERE clause
+and ORDER BY clause. To use the expression throughout the query, assign to a
+variable and use that:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a_expr</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">A</span><span class="o">.</span><span class="n">y</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+    <span class="n">with_expression</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">expr</span><span class="p">,</span> <span class="n">a_expr</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">a_expr</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">a_expr</span><span class="p">)</span></pre></div>
+</div>
+</li>
+</ul>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.2.</span></p>
+</div>
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="mapping_columns.html" title="previous chapter">Mapping Table Columns</a>
+        Next:
+        <a href="mapped_attributes.html" title="next chapter">Changing Attribute Behavior</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+
