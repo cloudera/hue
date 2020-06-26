@@ -1,13 +1,13 @@
 <template>
-  <div>
+  <div class="query-plan">
     {{ title }}
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { wrap } from 'vue/webComponentWrapper';
 import Component from 'vue-class-component';
-import wrap from '@vue/web-component-wrapper';
 
 export const HIVE_QUERY_PLAN_COMPONENT = 'hive-query-plan';
 
@@ -16,5 +16,11 @@ export default class HiveQueryPlan extends Vue {
   title: string = 'Web Components FTW.';
 }
 
-window.customElements.define(HIVE_QUERY_PLAN_COMPONENT, wrap(Vue, HiveQueryPlan));
+wrap(HIVE_QUERY_PLAN_COMPONENT, HiveQueryPlan);
 </script>
+
+<style lang="scss" scoped>
+.query-plan {
+  color: #0a78a3;
+}
+</style>

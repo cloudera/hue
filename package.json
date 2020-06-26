@@ -28,7 +28,6 @@
     }
   },
   "dependencies": {
-    "@vue/web-component-wrapper": "^1.2.0",
     "clipboard": "1.7.1",
     "core-js": "^3.4.2",
     "d3": "5.7.0",
@@ -60,6 +59,7 @@
     "sprintf-js": "1.1.2",
     "vue": "2.6.11",
     "vue-class-component": "7.2.3",
+    "vue-custom-element": "3.2.14",
     "vue-template-compiler": "2.6.11"
   },
   "devDependencies": {
@@ -96,7 +96,9 @@
     "jest": "26.0.1",
     "jest-environment-jsdom-sixteen": "1.0.3",
     "jsdom": "16.2.2",
-    "less-loader": "^5.0.0",
+    "node-sass": "4.14.1",
+    "less-loader": "6.1.2",
+    "sass-loader": "8.0.2",
     "lesshint": "6.3.7",
     "license-checker": "^25.0.1",
     "load-grunt-tasks": "4.0.0",
