@@ -1,0 +1,614 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    Tracking Object and Session Changes with Events
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+        <link rel="up" title="Using the Session" href="session.html" />
+        <link rel="next" title="Session API" href="session_api.html" />
+        <link rel="prev" title="Contextual/Thread-local Sessions" href="contextual.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../contents.html">Contents</a> |
+                <a href="../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="index.html" title="SQLAlchemy ORM">SQLAlchemy ORM</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="tutorial.html">Object Relational Tutorial</a></span></li>
+<li><span class="link-container"><a class="reference external" href="mapper_config.html">Mapper Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="relationships.html">Relationship Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="loading_objects.html">Loading Objects</a></span></li>
+<li><span class="link-container"><a class="reference external" href="session.html">Using the Session</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="session_basics.html">Session Basics</a></span></li>
+<li><span class="link-container"><a class="reference external" href="session_state_management.html">State Management</a></span></li>
+<li><span class="link-container"><a class="reference external" href="cascades.html">Cascades</a></span></li>
+<li><span class="link-container"><a class="reference external" href="session_transaction.html">Transactions and Connection Management</a></span></li>
+<li><span class="link-container"><a class="reference external" href="persistence_techniques.html">Additional Persistence Techniques</a></span></li>
+<li><span class="link-container"><a class="reference external" href="contextual.html">Contextual/Thread-local Sessions</a></span></li>
+<li class="selected"><span class="link-container"><strong>Tracking Object and Session Changes with Events</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#persistence-events">Persistence Events</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#before-flush"><code class="docutils literal notranslate"><span class="pre">before_flush()</span></code></a></span></li>
+<li><span class="link-container"><a class="reference external" href="#after-flush"><code class="docutils literal notranslate"><span class="pre">after_flush()</span></code></a></span></li>
+<li><span class="link-container"><a class="reference external" href="#after-flush-postexec"><code class="docutils literal notranslate"><span class="pre">after_flush_postexec()</span></code></a></span></li>
+<li><span class="link-container"><a class="reference external" href="#mapper-level-events">Mapper-level Events</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#object-lifecycle-events">Object Lifecycle Events</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#transient">Transient</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#transient-to-pending">Transient to Pending</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#pending-to-persistent">Pending to Persistent</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#pending-to-transient">Pending to Transient</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#loaded-as-persistent">Loaded as Persistent</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#persistent-to-transient">Persistent to Transient</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#persistent-to-deleted">Persistent to Deleted</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#deleted-to-detached">Deleted to Detached</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#persistent-to-detached">Persistent to Detached</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#detached-to-persistent">Detached to Persistent</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#deleted-to-persistent">Deleted to Persistent</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#transaction-events">Transaction Events</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#attribute-change-events">Attribute Change Events</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="session_api.html">Session API</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="extending.html">Events and Internals</a></span></li>
+<li><span class="link-container"><a class="reference external" href="extensions/index.html">ORM Extensions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="examples.html">ORM Examples</a></span></li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="tracking-object-and-session-changes-with-events">
+<span id="session-events-toplevel"></span><h1>Tracking Object and Session Changes with Events<a class="headerlink" href="#tracking-object-and-session-changes-with-events" title="Permalink to this headline">¶</a></h1>
+<p>SQLAlchemy features an extensive <a class="reference internal" href="../core/event.html"><span class="std std-ref">Event Listening</span></a>
+system used throughout the Core and ORM.   Within the ORM, there are a
+wide variety of event listener hooks, which are documented at an API
+level at <a class="reference internal" href="events.html"><span class="std std-ref">ORM Events</span></a>.   This collection of events has
+grown over the years to include lots of very useful new events as well
+as some older events that aren’t as relevant as they once were.  This
+section will attempt to introduce the major event hooks and when they
+might be used.</p>
+<div class="section" id="persistence-events">
+<span id="session-persistence-events"></span><h2>Persistence Events<a class="headerlink" href="#persistence-events" title="Permalink to this headline">¶</a></h2>
+<p>Probably the most widely used series of events are the “persistence” events,
+which correspond to the <a class="reference internal" href="session_basics.html#session-flushing"><span class="std std-ref">flush process</span></a>.
+The flush is where all the decisions are made about pending changes to
+objects and are then emitted out to the database in the form of INSERT,
+UPDATE, and DELETE statements.</p>
+<div class="section" id="before-flush">
+<h3><code class="docutils literal notranslate"><span class="pre">before_flush()</span></code><a class="headerlink" href="#before-flush" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.before_flush" title="sqlalchemy.orm.events.SessionEvents.before_flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.before_flush()</span></code></a> hook is by far the most generally
+useful event to use when an application wants to ensure that
+additional persistence changes to the database are made when a flush proceeds.
+Use <a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.before_flush" title="sqlalchemy.orm.events.SessionEvents.before_flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.before_flush()</span></code></a> in order to operate
+upon objects to validate their state as well as to compose additional objects
+and references before they are persisted.   Within this event,
+it is <strong>safe to manipulate the Session’s state</strong>, that is, new objects
+can be attached to it, objects can be deleted, and individual attributes
+on objects can be changed freely, and these changes will be pulled into
+the flush process when the event hook completes.</p>
+<p>The typical <a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.before_flush" title="sqlalchemy.orm.events.SessionEvents.before_flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.before_flush()</span></code></a> hook will be tasked with
+scanning the collections <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.new" title="sqlalchemy.orm.session.Session.new"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Session.new</span></code></a>, <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.dirty" title="sqlalchemy.orm.session.Session.dirty"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Session.dirty</span></code></a> and
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.deleted" title="sqlalchemy.orm.session.Session.deleted"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Session.deleted</span></code></a> in order to look for objects
+where something will be happening.</p>
+<p>For illustrations of <a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.before_flush" title="sqlalchemy.orm.events.SessionEvents.before_flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.before_flush()</span></code></a>, see
+examples such as <a class="reference internal" href="examples.html#examples-versioned-history"><span class="std std-ref">Versioning with a History Table</span></a> and
+<a class="reference internal" href="examples.html#examples-versioned-rows"><span class="std std-ref">Versioning using Temporal Rows</span></a>.</p>
+</div>
+<div class="section" id="after-flush">
+<h3><code class="docutils literal notranslate"><span class="pre">after_flush()</span></code><a class="headerlink" href="#after-flush" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.after_flush" title="sqlalchemy.orm.events.SessionEvents.after_flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.after_flush()</span></code></a> hook is called after the SQL has been
+emitted for a flush process, but <strong>before</strong> the state of the objects that
+were flushed has been altered.  That is, you can still inspect
+the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.new" title="sqlalchemy.orm.session.Session.new"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Session.new</span></code></a>, <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.dirty" title="sqlalchemy.orm.session.Session.dirty"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Session.dirty</span></code></a> and
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.deleted" title="sqlalchemy.orm.session.Session.deleted"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Session.deleted</span></code></a> collections to see what was just flushed, and
+you can also use history tracking features like the ones provided
+by <a class="reference internal" href="internals.html#sqlalchemy.orm.state.AttributeState" title="sqlalchemy.orm.state.AttributeState"><code class="xref py py-class docutils literal notranslate"><span class="pre">AttributeState</span></code></a> to see what changes were just persisted.
+In the <a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.after_flush" title="sqlalchemy.orm.events.SessionEvents.after_flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.after_flush()</span></code></a> event, additional SQL can be emitted
+to the database based on what’s observed to have changed.</p>
+</div>
+<div class="section" id="after-flush-postexec">
+<h3><code class="docutils literal notranslate"><span class="pre">after_flush_postexec()</span></code><a class="headerlink" href="#after-flush-postexec" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.after_flush_postexec" title="sqlalchemy.orm.events.SessionEvents.after_flush_postexec"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.after_flush_postexec()</span></code></a> is called soon after
+<a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.after_flush" title="sqlalchemy.orm.events.SessionEvents.after_flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.after_flush()</span></code></a>, but is invoked <strong>after</strong> the state of
+the objects has been modified to account for the flush that just took place.
+The <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.new" title="sqlalchemy.orm.session.Session.new"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Session.new</span></code></a>, <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.dirty" title="sqlalchemy.orm.session.Session.dirty"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Session.dirty</span></code></a> and
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.deleted" title="sqlalchemy.orm.session.Session.deleted"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Session.deleted</span></code></a> collections are normally completely empty here.
+Use <a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.after_flush_postexec" title="sqlalchemy.orm.events.SessionEvents.after_flush_postexec"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.after_flush_postexec()</span></code></a> to inspect the identity map
+for finalized objects and possibly emit additional SQL.   In this hook,
+there is the ability to make new changes on objects, which means the
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> will again go into a “dirty” state; the mechanics of the
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> here will cause it to flush <strong>again</strong> if new changes
+are detected in this hook if the flush were invoked in the context of
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.commit" title="sqlalchemy.orm.session.Session.commit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.commit()</span></code></a>; otherwise, the pending changes will be bundled
+as part of the next normal flush.  When the hook detects new changes within
+a <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.commit" title="sqlalchemy.orm.session.Session.commit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.commit()</span></code></a>, a counter ensures that an endless loop in this
+regard is stopped after 100 iterations, in the case that an
+<a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.after_flush_postexec" title="sqlalchemy.orm.events.SessionEvents.after_flush_postexec"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.after_flush_postexec()</span></code></a>
+hook continually adds new state to be flushed each time it is called.</p>
+</div>
+<div class="section" id="mapper-level-events">
+<span id="session-persistence-mapper"></span><h3>Mapper-level Events<a class="headerlink" href="#mapper-level-events" title="Permalink to this headline">¶</a></h3>
+<p>In addition to the flush-level hooks, there is also a suite of hooks
+that are more fine-grained, in that they are called on a per-object
+basis and are broken out based on INSERT, UPDATE or DELETE.   These
+are the mapper persistence hooks, and they too are very popular,
+however these events need to be approached more cautiously, as they
+proceed within the context of the flush process that is already
+ongoing; many operations are not safe to proceed here.</p>
+<p>The events are:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="events.html#sqlalchemy.orm.events.MapperEvents.before_insert" title="sqlalchemy.orm.events.MapperEvents.before_insert"><code class="xref py py-meth docutils literal notranslate"><span class="pre">MapperEvents.before_insert()</span></code></a></p></li>
+<li><p><a class="reference internal" href="events.html#sqlalchemy.orm.events.MapperEvents.after_insert" title="sqlalchemy.orm.events.MapperEvents.after_insert"><code class="xref py py-meth docutils literal notranslate"><span class="pre">MapperEvents.after_insert()</span></code></a></p></li>
+<li><p><a class="reference internal" href="events.html#sqlalchemy.orm.events.MapperEvents.before_update" title="sqlalchemy.orm.events.MapperEvents.before_update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">MapperEvents.before_update()</span></code></a></p></li>
+<li><p><a class="reference internal" href="events.html#sqlalchemy.orm.events.MapperEvents.after_update" title="sqlalchemy.orm.events.MapperEvents.after_update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">MapperEvents.after_update()</span></code></a></p></li>
+<li><p><a class="reference internal" href="events.html#sqlalchemy.orm.events.MapperEvents.before_delete" title="sqlalchemy.orm.events.MapperEvents.before_delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">MapperEvents.before_delete()</span></code></a></p></li>
+<li><p><a class="reference internal" href="events.html#sqlalchemy.orm.events.MapperEvents.after_delete" title="sqlalchemy.orm.events.MapperEvents.after_delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">MapperEvents.after_delete()</span></code></a></p></li>
+</ul>
+<p>Each event is passed the <a class="reference internal" href="mapping_api.html#sqlalchemy.orm.Mapper" title="sqlalchemy.orm.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a>,
+the mapped object itself, and the <a class="reference internal" href="../core/connections.html#sqlalchemy.engine.Connection" title="sqlalchemy.engine.Connection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Connection</span></code></a> which is being
+used to emit an INSERT, UPDATE or DELETE statement.     The appeal of these
+events is clear, in that if an application wants to tie some activity to
+when a specific type of object is persisted with an INSERT, the hook is
+very specific; unlike the <a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.before_flush" title="sqlalchemy.orm.events.SessionEvents.before_flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.before_flush()</span></code></a> event,
+there’s no need to search through collections like <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.new" title="sqlalchemy.orm.session.Session.new"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Session.new</span></code></a>
+in order to find targets.  However, the flush plan which
+represents the full list of every single INSERT, UPDATE, DELETE statement
+to be emitted has <em>already been decided</em> when these events are called,
+and no changes may be made at this stage.  Therefore the only changes that are
+even possible to the given objects are upon attributes <strong>local</strong> to the
+object’s row.   Any other change to the object or other objects will
+impact the state of the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>, which will fail to function
+properly.</p>
+<p>Operations that are not supported within these mapper-level persistence
+events include:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.add" title="sqlalchemy.orm.session.Session.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.add()</span></code></a></p></li>
+<li><p><a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.delete" title="sqlalchemy.orm.session.Session.delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.delete()</span></code></a></p></li>
+<li><p>Mapped collection append, add, remove, delete, discard, etc.</p></li>
+<li><p>Mapped relationship attribute set/del events,
+i.e. <code class="docutils literal notranslate"><span class="pre">someobject.related</span> <span class="pre">=</span> <span class="pre">someotherobject</span></code></p></li>
+</ul>
+<p>The reason the <a class="reference internal" href="../core/connections.html#sqlalchemy.engine.Connection" title="sqlalchemy.engine.Connection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Connection</span></code></a> is passed is that it is encouraged that
+<strong>simple SQL operations take place here</strong>, directly on the <a class="reference internal" href="../core/connections.html#sqlalchemy.engine.Connection" title="sqlalchemy.engine.Connection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Connection</span></code></a>,
+such as incrementing counters or inserting extra rows within log tables.
+When dealing with the <a class="reference internal" href="../core/connections.html#sqlalchemy.engine.Connection" title="sqlalchemy.engine.Connection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Connection</span></code></a>, it is expected that Core-level
+SQL operations will be used; e.g. those described in <a class="reference internal" href="../core/tutorial.html"><span class="std std-ref">SQL Expression Language Tutorial</span></a>.</p>
+<p>There are also many per-object operations that don’t need to be handled
+within a flush event at all.   The most common alternative is to simply
+establish additional state along with an object inside its <code class="docutils literal notranslate"><span class="pre">__init__()</span></code>
+method, such as creating additional objects that are to be associated with
+the new object.  Using validators as described in <a class="reference internal" href="mapped_attributes.html#simple-validators"><span class="std std-ref">Simple Validators</span></a> is
+another approach; these functions can intercept changes to attributes and
+establish additional state changes on the target object in response to the
+attribute change.   With both of these approaches, the object is in
+the correct state before it ever gets to the flush step.</p>
+</div>
+</div>
+<div class="section" id="object-lifecycle-events">
+<span id="session-lifecycle-events"></span><h2>Object Lifecycle Events<a class="headerlink" href="#object-lifecycle-events" title="Permalink to this headline">¶</a></h2>
+<p>Another use case for events is to track the lifecycle of objects.  This
+refers to the states first introduced at <a class="reference internal" href="session_state_management.html#session-object-states"><span class="std std-ref">Quickie Intro to Object States</span></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.1: </span>added a system of events that intercept all possible
+state transitions of an object within the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>.</p>
+</div>
+<p>All the states above can be tracked fully with events.   Each event
+represents a distinct state transition, meaning, the starting state
+and the destination state are both part of what are tracked.   With the
+exception of the initial transient event, all the events are in terms of
+the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> object or class, meaning they can be associated either
+with a specific <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">event</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">Session</span>
+
+<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+<span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="s1">&#39;transient_to_pending&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">object_is_pending</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;new pending: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">obj</span><span class="p">)</span></pre></div>
+</div>
+<p>Or with the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> class itself, as well as with a specific
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.sessionmaker" title="sqlalchemy.orm.session.sessionmaker"><code class="xref py py-class docutils literal notranslate"><span class="pre">sessionmaker</span></code></a>, which is likely the most useful form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">event</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">sessionmaker</span>
+
+<span class="n">maker</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">()</span>
+
+<span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">maker</span><span class="p">,</span> <span class="s1">&#39;transient_to_pending&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">object_is_pending</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;new pending: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">obj</span><span class="p">)</span></pre></div>
+</div>
+<p>The listeners can of course be stacked on top of one function, as is
+likely to be common.   For example, to track all objects that are
+entering the persistent state:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">maker</span><span class="p">,</span> <span class="s2">&quot;pending_to_persistent&quot;</span><span class="p">)</span>
+<span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">maker</span><span class="p">,</span> <span class="s2">&quot;deleted_to_persistent&quot;</span><span class="p">)</span>
+<span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">maker</span><span class="p">,</span> <span class="s2">&quot;detached_to_persistent&quot;</span><span class="p">)</span>
+<span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">maker</span><span class="p">,</span> <span class="s2">&quot;loaded_as_persistent&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">detect_all_persistent</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;object is now persistent: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">instance</span><span class="p">)</span></pre></div>
+</div>
+<div class="section" id="transient">
+<h3>Transient<a class="headerlink" href="#transient" title="Permalink to this headline">¶</a></h3>
+<p>All mapped objects when first constructed start out as <a class="reference internal" href="../glossary.html#term-transient"><span class="xref std std-term">transient</span></a>.
+In this state, the object exists alone and doesn’t have an association with
+any <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>.   For this initial state, there’s no specific
+“transition” event since there is no <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>, however if one
+wanted to intercept when any transient object is created, the
+<a class="reference internal" href="events.html#sqlalchemy.orm.events.InstanceEvents.init" title="sqlalchemy.orm.events.InstanceEvents.init"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstanceEvents.init()</span></code></a> method is probably the best event.  This
+event is applied to a specific class or superclass.  For example, to
+intercept all new objects for a particular declarative base:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">event</span>
+
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+
+<span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">Base</span><span class="p">,</span> <span class="s2">&quot;init&quot;</span><span class="p">,</span> <span class="n">propagate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">intercept_init</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;new transient: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">instance</span><span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="transient-to-pending">
+<h3>Transient to Pending<a class="headerlink" href="#transient-to-pending" title="Permalink to this headline">¶</a></h3>
+<p>The transient object becomes <a class="reference internal" href="../glossary.html#term-pending"><span class="xref std std-term">pending</span></a> when it is first associated
+with a <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> via the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.add" title="sqlalchemy.orm.session.Session.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.add()</span></code></a> or <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.add_all" title="sqlalchemy.orm.session.Session.add_all"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.add_all()</span></code></a>
+method.  An object may also become part of a <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> as a result
+of a <a class="reference internal" href="cascades.html#unitofwork-cascades"><span class="std std-ref">“cascade”</span></a> from a referencing object that was
+explicitly added.   The transient to pending transition is detectable using
+the <a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.transient_to_pending" title="sqlalchemy.orm.events.SessionEvents.transient_to_pending"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.transient_to_pending()</span></code></a> event:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">sessionmaker</span><span class="p">,</span> <span class="s2">&quot;transient_to_pending&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">intercept_transient_to_pending</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">object_</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;transient to pending: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">object_</span><span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="pending-to-persistent">
+<h3>Pending to Persistent<a class="headerlink" href="#pending-to-persistent" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../glossary.html#term-pending"><span class="xref std std-term">pending</span></a> object becomes <a class="reference internal" href="../glossary.html#term-persistent"><span class="xref std std-term">persistent</span></a> when a flush
+proceeds and an INSERT statement takes place for the instance.  The object
+now has an identity key.   Track pending to persistent with the
+<a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.pending_to_persistent" title="sqlalchemy.orm.events.SessionEvents.pending_to_persistent"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.pending_to_persistent()</span></code></a> event:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">sessionmaker</span><span class="p">,</span> <span class="s2">&quot;pending_to_persistent&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">intercept_pending_to_persistent</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">object_</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pending to persistent: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">object_</span><span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="pending-to-transient">
+<h3>Pending to Transient<a class="headerlink" href="#pending-to-transient" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../glossary.html#term-pending"><span class="xref std std-term">pending</span></a> object can revert back to <a class="reference internal" href="../glossary.html#term-transient"><span class="xref std std-term">transient</span></a> if the
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.rollback" title="sqlalchemy.orm.session.Session.rollback"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.rollback()</span></code></a> method is called before the pending object
+has been flushed, or if the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.expunge" title="sqlalchemy.orm.session.Session.expunge"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.expunge()</span></code></a> method is called
+for the object before it is flushed.  Track pending to transient with the
+<a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.pending_to_transient" title="sqlalchemy.orm.events.SessionEvents.pending_to_transient"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.pending_to_transient()</span></code></a> event:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">sessionmaker</span><span class="p">,</span> <span class="s2">&quot;pending_to_transient&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">intercept_pending_to_transient</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">object_</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;transient to pending: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">object_</span><span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="loaded-as-persistent">
+<h3>Loaded as Persistent<a class="headerlink" href="#loaded-as-persistent" title="Permalink to this headline">¶</a></h3>
+<p>Objects can appear in the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> directly in the <a class="reference internal" href="../glossary.html#term-persistent"><span class="xref std std-term">persistent</span></a>
+state when they are loaded from the database.   Tracking this state transition
+is synonymous with tracking objects as they are loaded, and is synonymous
+with using the <a class="reference internal" href="events.html#sqlalchemy.orm.events.InstanceEvents.load" title="sqlalchemy.orm.events.InstanceEvents.load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InstanceEvents.load()</span></code></a> instance-level event.  However, the
+<a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.loaded_as_persistent" title="sqlalchemy.orm.events.SessionEvents.loaded_as_persistent"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.loaded_as_persistent()</span></code></a> event is provided as a
+session-centric hook for intercepting objects as they enter the persistent
+state via this particular avenue:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">sessionmaker</span><span class="p">,</span> <span class="s2">&quot;loaded_as_persistent&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">intercept_loaded_as_persistent</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">object_</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;object loaded into persistent state: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">object_</span><span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="persistent-to-transient">
+<h3>Persistent to Transient<a class="headerlink" href="#persistent-to-transient" title="Permalink to this headline">¶</a></h3>
+<p>The persistent object can revert to the transient state if the
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.rollback" title="sqlalchemy.orm.session.Session.rollback"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.rollback()</span></code></a> method is called for a transaction where the
+object was first added as pending.   In the case of the ROLLBACK, the
+INSERT statement that made this object persistent is rolled back, and
+the object is evicted from the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> to again become transient.
+Track objects that were reverted to transient from
+persistent using the <a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.persistent_to_transient" title="sqlalchemy.orm.events.SessionEvents.persistent_to_transient"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.persistent_to_transient()</span></code></a>
+event hook:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">sessionmaker</span><span class="p">,</span> <span class="s2">&quot;persistent_to_transient&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">intercept_persistent_to_transient</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">object_</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;persistent to transient: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">object_</span><span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="persistent-to-deleted">
+<h3>Persistent to Deleted<a class="headerlink" href="#persistent-to-deleted" title="Permalink to this headline">¶</a></h3>
+<p>The persistent object enters the <a class="reference internal" href="../glossary.html#term-deleted"><span class="xref std std-term">deleted</span></a> state when an object
+marked for deletion is deleted from the database within the flush
+process.   Note that this is <strong>not the same</strong> as when the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.delete" title="sqlalchemy.orm.session.Session.delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.delete()</span></code></a>
+method is called for a target object.   The <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.delete" title="sqlalchemy.orm.session.Session.delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.delete()</span></code></a>
+method only <strong>marks</strong> the object for deletion; the actual DELETE statement
+is not emitted until the flush proceeds.  It is subsequent to the flush
+that the “deleted” state is present for the target object.</p>
+<p>Within the “deleted” state, the object is only marginally associated
+with the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>.  It is not present in the identity map
+nor is it present in the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.deleted" title="sqlalchemy.orm.session.Session.deleted"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Session.deleted</span></code></a> collection that refers
+to when it was pending for deletion.</p>
+<p>From the “deleted” state, the object can go either to the detached state
+when the transaction is committed, or back to the persistent state
+if the transaction is instead rolled back.</p>
+<p>Track the persistent to deleted transition with
+<a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.persistent_to_deleted" title="sqlalchemy.orm.events.SessionEvents.persistent_to_deleted"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.persistent_to_deleted()</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">sessionmaker</span><span class="p">,</span> <span class="s2">&quot;persistent_to_deleted&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">intercept_persistent_to_deleted</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">object_</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;object was DELETEd, is now in deleted state: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">object_</span><span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="deleted-to-detached">
+<h3>Deleted to Detached<a class="headerlink" href="#deleted-to-detached" title="Permalink to this headline">¶</a></h3>
+<p>The deleted object becomes <a class="reference internal" href="../glossary.html#term-detached"><span class="xref std std-term">detached</span></a> when the session’s transaction
+is committed.  After the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.commit" title="sqlalchemy.orm.session.Session.commit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.commit()</span></code></a> method is called, the
+database transaction is final and the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> now fully discards
+the deleted object and removes all associations to it.   Track
+the deleted to detached transition using <a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.deleted_to_detached" title="sqlalchemy.orm.events.SessionEvents.deleted_to_detached"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.deleted_to_detached()</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">sessionmaker</span><span class="p">,</span> <span class="s2">&quot;deleted_to_detached&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">intercept_deleted_to_detached</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">object_</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;deleted to detached: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">object_</span><span class="p">)</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>While the object is in the deleted state, the <a class="reference internal" href="internals.html#sqlalchemy.orm.state.InstanceState.deleted" title="sqlalchemy.orm.state.InstanceState.deleted"><code class="xref py py-attr docutils literal notranslate"><span class="pre">InstanceState.deleted</span></code></a>
+attribute, accessible using <code class="docutils literal notranslate"><span class="pre">inspect(object).deleted</span></code>, returns True.  However
+when the object is detached, <a class="reference internal" href="internals.html#sqlalchemy.orm.state.InstanceState.deleted" title="sqlalchemy.orm.state.InstanceState.deleted"><code class="xref py py-attr docutils literal notranslate"><span class="pre">InstanceState.deleted</span></code></a> will again
+return False.  To detect that an object was deleted, regardless of whether
+or not it is detached, use the <a class="reference internal" href="internals.html#sqlalchemy.orm.state.InstanceState.was_deleted" title="sqlalchemy.orm.state.InstanceState.was_deleted"><code class="xref py py-attr docutils literal notranslate"><span class="pre">InstanceState.was_deleted</span></code></a>
+accessor.</p>
+</div>
+</div>
+<div class="section" id="persistent-to-detached">
+<h3>Persistent to Detached<a class="headerlink" href="#persistent-to-detached" title="Permalink to this headline">¶</a></h3>
+<p>The persistent object becomes <a class="reference internal" href="../glossary.html#term-detached"><span class="xref std std-term">detached</span></a> when the object is de-associated
+with the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>, via the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.expunge" title="sqlalchemy.orm.session.Session.expunge"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.expunge()</span></code></a>,
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.expunge_all" title="sqlalchemy.orm.session.Session.expunge_all"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.expunge_all()</span></code></a>, or <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.close" title="sqlalchemy.orm.session.Session.close"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.close()</span></code></a> methods.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>An object may also become <strong>implicitly detached</strong> if its owning
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> is dereferenced by the application and discarded due to
+garbage collection. In this case, <strong>no event is emitted</strong>.</p>
+</div>
+<p>Track objects as they move from persistent to detached using the
+<a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.persistent_to_detached" title="sqlalchemy.orm.events.SessionEvents.persistent_to_detached"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.persistent_to_detached()</span></code></a> event:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">sessionmaker</span><span class="p">,</span> <span class="s2">&quot;persistent_to_detached&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">intercept_persistent_to_detached</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">object_</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;object became detached: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">object_</span><span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="detached-to-persistent">
+<h3>Detached to Persistent<a class="headerlink" href="#detached-to-persistent" title="Permalink to this headline">¶</a></h3>
+<p>The detached object becomes persistent when it is re-associated with a
+session using the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.add" title="sqlalchemy.orm.session.Session.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.add()</span></code></a> or equivalent method.  Track
+objects moving back to persistent from detached using the
+<a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.detached_to_persistent" title="sqlalchemy.orm.events.SessionEvents.detached_to_persistent"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.detached_to_persistent()</span></code></a> event:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">sessionmaker</span><span class="p">,</span> <span class="s2">&quot;detached_to_persistent&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">intercept_detached_to_persistent</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">object_</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;object became persistent again: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">object_</span><span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="deleted-to-persistent">
+<h3>Deleted to Persistent<a class="headerlink" href="#deleted-to-persistent" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../glossary.html#term-deleted"><span class="xref std std-term">deleted</span></a> object can be reverted to the <a class="reference internal" href="../glossary.html#term-persistent"><span class="xref std std-term">persistent</span></a>
+state when the transaction in which it was DELETEd was rolled back
+using the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session.rollback" title="sqlalchemy.orm.session.Session.rollback"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Session.rollback()</span></code></a> method.   Track deleted objects
+moving back to the persistent state using the
+<a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.deleted_to_persistent" title="sqlalchemy.orm.events.SessionEvents.deleted_to_persistent"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.deleted_to_persistent()</span></code></a> event:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">sessionmaker</span><span class="p">,</span> <span class="s2">&quot;deleted_to_persistent&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">intercept_deleted_to_persistent</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">object_</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;deleted to persistent: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">object_</span><span class="p">)</span></pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="transaction-events">
+<span id="session-transaction-events"></span><h2>Transaction Events<a class="headerlink" href="#transaction-events" title="Permalink to this headline">¶</a></h2>
+<p>Transaction events allow an application to be notified when transaction
+boundaries occur at the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> level as well as when the
+<a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> changes the transactional state on <a class="reference internal" href="../core/connections.html#sqlalchemy.engine.Connection" title="sqlalchemy.engine.Connection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Connection</span></code></a>
+objects.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.after_transaction_create" title="sqlalchemy.orm.events.SessionEvents.after_transaction_create"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.after_transaction_create()</span></code></a>,
+<a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.after_transaction_end" title="sqlalchemy.orm.events.SessionEvents.after_transaction_end"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.after_transaction_end()</span></code></a> - these events track the
+logical transaction scopes of the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> in a way that is
+not specific to individual database connections.  These events are
+intended to help with integration of transaction-tracking systems such as
+<code class="docutils literal notranslate"><span class="pre">zope.sqlalchemy</span></code>.  Use these
+events when the application needs to align some external scope with the
+transactional scope of the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>.  These hooks mirror
+the “nested” transactional behavior of the <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>, in that they
+track logical “subtransactions” as well as “nested” (e.g. SAVEPOINT)
+transactions.</p></li>
+<li><p><a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.before_commit" title="sqlalchemy.orm.events.SessionEvents.before_commit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.before_commit()</span></code></a>, <a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.after_commit" title="sqlalchemy.orm.events.SessionEvents.after_commit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.after_commit()</span></code></a>,
+<a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.after_begin" title="sqlalchemy.orm.events.SessionEvents.after_begin"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.after_begin()</span></code></a>,
+<a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.after_rollback" title="sqlalchemy.orm.events.SessionEvents.after_rollback"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.after_rollback()</span></code></a>, <a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.after_soft_rollback" title="sqlalchemy.orm.events.SessionEvents.after_soft_rollback"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.after_soft_rollback()</span></code></a> -
+These events allow tracking of transaction events from the perspective
+of database connections.   <a class="reference internal" href="events.html#sqlalchemy.orm.events.SessionEvents.after_begin" title="sqlalchemy.orm.events.SessionEvents.after_begin"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SessionEvents.after_begin()</span></code></a> in particular
+is a per-connection event; a <a class="reference internal" href="session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> that maintains more than
+one connection will emit this event for each connection individually
+as those connections become used within the current transaction.
+The rollback and commit events then refer to when the DBAPI connections
+themselves have received rollback or commit instructions directly.</p></li>
+</ul>
+</div>
+<div class="section" id="attribute-change-events">
+<h2>Attribute Change Events<a class="headerlink" href="#attribute-change-events" title="Permalink to this headline">¶</a></h2>
+<p>The attribute change events allow interception of when specific attributes
+on an object are modified.  These events include <a class="reference internal" href="events.html#sqlalchemy.orm.events.AttributeEvents.set" title="sqlalchemy.orm.events.AttributeEvents.set"><code class="xref py py-meth docutils literal notranslate"><span class="pre">AttributeEvents.set()</span></code></a>,
+<a class="reference internal" href="events.html#sqlalchemy.orm.events.AttributeEvents.append" title="sqlalchemy.orm.events.AttributeEvents.append"><code class="xref py py-meth docutils literal notranslate"><span class="pre">AttributeEvents.append()</span></code></a>, and <a class="reference internal" href="events.html#sqlalchemy.orm.events.AttributeEvents.remove" title="sqlalchemy.orm.events.AttributeEvents.remove"><code class="xref py py-meth docutils literal notranslate"><span class="pre">AttributeEvents.remove()</span></code></a>.  These
+events are extremely useful, particularly for per-object validation operations;
+however, it is often much more convenient to use a “validator” hook, which
+uses these hooks behind the scenes; see <a class="reference internal" href="mapped_attributes.html#simple-validators"><span class="std std-ref">Simple Validators</span></a> for
+background on this.  The attribute events are also behind the mechanics
+of backreferences.   An example illustrating use of attribute events
+is in <a class="reference internal" href="examples.html#examples-instrumentation"><span class="std std-ref">Attribute Instrumentation</span></a>.</p>
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="contextual.html" title="previous chapter">Contextual/Thread-local Sessions</a>
+        Next:
+        <a href="session_api.html" title="next chapter">Session API</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+
