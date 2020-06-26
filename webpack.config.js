@@ -35,6 +35,7 @@ module.exports = {
       { test: /\.js$/, use: ['source-map-loader'], enforce: 'pre' },
       { test: /\.(html)$/, loader: 'html?interpolate&removeComments=false' },
       { test: /\.less$/, loader: 'style-loader!css-loader!less-loader' },
+      { test: /\.s[ac]ss$/, loader: 'style-loader!css-loader!sass-loader' },
       { test: /\.css$/, loader: 'style-loader!css-loader' },
       { test: /\.(woff2?|ttf|eot|svg)$/, loader: 'file-loader' },
       {
@@ -46,8 +47,9 @@ module.exports = {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: {
+          shadowMode: true,
           loaders: {
-            less: ['vue-style-loader', 'css-loader', 'less-loader']
+            less: ['vue-style-loader', 'css-loader', 'less-loader', 'sass-loader']
           }
         }
       }
