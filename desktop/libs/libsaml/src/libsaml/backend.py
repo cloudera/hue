@@ -20,6 +20,7 @@ See desktop/auth/backend.py
 
 from __future__ import absolute_import
 
+import json
 import logging
 
 from django.contrib.auth import logout as auth_logout
@@ -63,8 +64,7 @@ class SAML2Backend(_Saml2Backend):
     """Hook to allow custom authorization policies based on user belonging to a list of SAML groups."""
     LOG.debug('is_authorized() attributes = %s' % attributes)
     LOG.debug('is_authorized() attribute_mapping = %s' % attribute_mapping)
-    return not conf.REQUIRED_GROUPS.get() or set(conf.REQUIRED_GROUPS.get()).issubset(set(attributes[conf.REQUIRED_GROUPS_ATTRIBUTE.get()]))
-
+    return True
 
   def get_user(self, user_id):
     if isinstance(user_id, str):
@@ -97,6 +97,10 @@ class SAML2Backend(_Saml2Backend):
       user.username = force_username_case(user.username)
       profile = get_profile(user)
       profile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
+      json_data = json.loads(profile.json_data)
+      if attributes:
+        json_data['saml_attributes'] = attributes
+        profile.json_data = json.dumps(json_data)
       profile.save()
       user.is_superuser = is_super
       user = rewrite_user(user)

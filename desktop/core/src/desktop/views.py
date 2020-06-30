@@ -16,6 +16,7 @@
 # limitations under the License.
 
 from future import standard_library
+
 standard_library.install_aliases()
 import json
 import logging
@@ -63,6 +64,8 @@ from desktop.lib.thread_util import dump_traceback
 from desktop.log.access import access_log_level, access_warn, AccessInfo
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
 from desktop.models import Settings, hue_version, _get_apps, UserPreferences
+from libsaml.conf import REQUIRED_GROUPS, REQUIRED_GROUPS_ATTRIBUTE
+from useradmin.models import get_profile
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
@@ -76,10 +79,34 @@ LOG = logging.getLogger(__name__)
 def is_alive(request):
   return HttpResponse('')
 
+def samlgroup_check(request):
+  if 'SAML2Backend' in desktop.auth.forms.get_backend_names():
+    if REQUIRED_GROUPS.get():
+      userprofile = get_profile(request.user)
+      json_data = json.loads(userprofile.json_data)
+      if not json_data:
+        LOG.debug("Empty userprofile data for %s user" % (request.user.username))
+        return False
+
+      if json_data.get('saml_attributes', False) and \
+         json_data['saml_attributes'].get(REQUIRED_GROUPS_ATTRIBUTE.get(), False):
+        success = set(REQUIRED_GROUPS.get()).issubset(
+                 set(json_data['saml_attributes'].get(REQUIRED_GROUPS_ATTRIBUTE.get())))
+        if not success:
+          LOG.debug("User %s not found in required SAML groups, %s" % (request.user.username, REQUIRED_GROUPS.get()))
+          return False
+  return True
 
 def hue(request):
   current_app, other_apps, apps_list = _get_apps(request.user, '')
   clusters = list(get_clusters(request.user).values())
+
+  user_permitted = request.session.get('samlgroup_permitted_flag')
+
+  if (not user_permitted) and (not samlgroup_check(request)):
+    return render('403.mako', request, {
+      'is_embeddable': True
+    })
 
   return render('hue.mako', request, {
     'apps': apps_list,
