@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
 
 from future import standard_library
 standard_library.install_aliases()
@@ -48,6 +49,7 @@ from desktop.conf import OAUTH, ENABLE_ORGANIZATIONS
 from desktop.lib.django_util import render, login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.log.access import access_log, access_warn, last_access_map
+from desktop.views import samlgroup_check
 from desktop.settings import LOAD_BALANCER_COOKIE
 
 
@@ -196,6 +198,8 @@ def dt_login(request, from_modal=False):
 
   if not from_modal:
     request.session.set_test_cookie()
+
+  request.session['samlgroup_permitted_flag'] = samlgroup_check(request)
 
   renderable_path = 'login.mako'
   if from_modal:
