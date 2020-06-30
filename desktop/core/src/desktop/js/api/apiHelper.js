@@ -2516,10 +2516,6 @@ class ApiHelper {
     });
   }
 
-  getClusterConfig(data) {
-    return $.post(URLS.FETCH_CONFIG_API, data);
-  }
-
   fetchHueDocsInteractive(query) {
     const deferred = $.Deferred();
     const request = $.post(URLS.INTERACTIVE_SEARCH_API, {

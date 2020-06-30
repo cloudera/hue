@@ -16,7 +16,7 @@
 
 import localForage from 'localforage';
 import { UdfCategory } from 'sql/reference/types';
-import { Connector } from 'types';
+import { Connector } from 'types/config';
 
 const GLOBAL_UDF_CACHE_KEY = 'HUE_GLOBAL_UDF_KEY';
 const VERSION = '0';
