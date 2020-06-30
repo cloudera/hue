@@ -88,11 +88,13 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
             <i class="fa fa-fw fa-folder-open"></i> ${ _('Workspace') }
           </a>
         </li>
+        <!-- ko if: sharingEnabled -->
         <li data-bind="visible: workflow.id() != null && canEdit()">
           <a class="pointer share-link" rel="tooltip" data-placement="bottom" data-bind="click: openShareModal, css: {'isShared': isShared()}">
             <i class="fa fa-fw fa-users"></i> ${ _("Share") }
           </a>
         </li>
+        <!-- /ko -->
       </ul>
     </div>
 

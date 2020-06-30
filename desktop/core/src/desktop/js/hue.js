@@ -71,7 +71,7 @@ import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and notebook.ko
 import HueFileEntry from 'doc/hueFileEntry';
 import HueDocument from 'doc/hueDocument';
-import { refreshConfig } from 'utils/hueConfig';
+import { getLastKnownConfig, refreshConfig } from 'utils/hueConfig';
 import { simpleGet } from 'api/apiUtils'; // In analytics.mako, metrics.mako, threads.mako
 
 // import all the other Vue SFCs here
@@ -110,6 +110,7 @@ if (window.ENABLE_NOTEBOOK_2) {
   window.EditorViewModel = EditorViewModel;
 }
 window.filesize = filesize;
+window.getLastKnownConfig = getLastKnownConfig;
 window.HdfsAutocompleter = HdfsAutocompleter;
 window.hueAnalytics = hueAnalytics;
 window.HueColors = HueColors;

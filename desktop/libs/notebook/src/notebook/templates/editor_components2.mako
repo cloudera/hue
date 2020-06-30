@@ -282,12 +282,14 @@
           </li>
           <li class="divider"></li>
           <!-- ko if: $root.canSave -->
+          <!-- ko if: sharingEnabled -->
           <li>
             <a href="javascript:void(0)" class="share-link" data-bind="click: prepareShareModal,
               css: {'isShared': isShared()}">
               <i class="fa fa-fw fa-users"></i> ${ _('Share') }
             </a>
           </li>
+          <!-- /ko -->
           <!-- /ko -->
           <li>
             <a href="javascript:void(0)" data-bind="click: showSessionPanel">

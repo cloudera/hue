@@ -282,12 +282,14 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         </li>
         <li class="divider"></li>
         <!-- ko if: $root.canSave -->
+        <!-- ko if: sharingEnabled -->
         <li>
           <a class="share-link pointer" data-bind="click: prepareShareModal,
               css: {'isShared': isShared()}">
             <i class="fa fa-fw fa-users"></i> ${ _('Share') }
           </a>
         </li>
+        <!-- /ko -->
         <!-- /ko -->
         <li>
           <a class="pointer" data-bind="publish: {'context.panel.visible': true}">
