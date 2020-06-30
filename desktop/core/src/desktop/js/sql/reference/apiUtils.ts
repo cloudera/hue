@@ -17,7 +17,7 @@
 import { simplePostAsync } from 'api/apiUtils';
 import { AUTOCOMPLETE_API_PREFIX, DESCRIBE_API_PREFIX } from 'api/urls';
 import { UdfArgument, UdfDetails } from 'sql/reference/types';
-import { Connector } from 'types';
+import { Connector } from 'types/types';
 import I18n from 'utils/i18n';
 
 export interface ApiUdf {
