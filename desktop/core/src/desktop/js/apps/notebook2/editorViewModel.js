@@ -59,6 +59,12 @@ class EditorViewModel {
     this.editorMode = ko.observable(options.mode === 'editor');
     this.config = ko.observable();
 
+    this.sharingEnabled = ko.pureComputed(
+      () =>
+        this.config() &&
+        (this.config().hue_config.is_admin || this.config().hue_config.sharing_enabled)
+    );
+
     huePubSub.publish(GET_KNOWN_CONFIG_EVENT, this.config);
     huePubSub.subscribe(CONFIG_REFRESHED_EVENT, this.config);
 
