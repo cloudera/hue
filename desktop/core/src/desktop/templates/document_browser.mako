@@ -159,7 +159,9 @@ from desktop.views import _ko
                 <!-- /ko -->
 
                 <!-- ko if: app === 'documents' -->
+                <!-- ko if: $root.sharingEnabled() -->
                 <a class="btn" title="${_('Share')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function() { showSharingModal() }, css: { 'disabled': selectedEntries().length !== 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }"><i class="fa fa-fw fa-users"></i></a>
+                <!-- /ko -->
                 <!-- /ko -->
 
                 <!-- ko if: app === 'documents' -->
@@ -294,7 +296,9 @@ from desktop.views import _ko
                 <li data-bind="css: { 'disabled' : $parent.sharedWithMeSelected()  && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function () { huePubSub.publish('doc.show.delete.modal', $parent); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }">
                   <i class="fa fa-fw fa-times"></i> ${ _('Move to trash') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a>
                 </li>
+                <!-- ko if: $root.sharingEnabled() -->
                 <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showSharingModal(); }, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i> ${ _('Share') }</a> </li>
+                <!-- /ko -->
                 <!-- /ko -->
               </ul>
               <div class="doc-browser-primary-col">

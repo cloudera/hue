@@ -24,6 +24,17 @@ function HomeViewModel(json_tags, json_docs) {
   self.page = ko.observable(1);
   self.documentsPerPage = ko.observable(50);
 
+  self.sharingEnabled = ko.observable(false);
+
+  var updateFromConfig = function (hueConfig) {
+    self.sharingEnabled(
+      hueConfig && (hueConfig.hue_config.is_admin || hueConfig.hue_config.enable_sharing)
+    );
+  };
+
+  updateFromConfig(window.getLastKnownConfig());
+  huePubSub.subscribe('cluster.config.set.config', updateFromConfig);
+
   self.selectedTag = ko.observable({});
   self.selectedTagForDelete = ko.observable({
     name: ''

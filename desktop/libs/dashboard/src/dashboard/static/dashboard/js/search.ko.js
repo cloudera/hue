@@ -2038,6 +2038,17 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
 
   var self = this;
 
+  self.sharingEnabled = ko.observable(false);
+
+  var updateFromConfig = function (hueConfig) {
+    self.sharingEnabled(
+      hueConfig && (hueConfig.hue_config.is_admin || hueConfig.hue_config.enable_sharing)
+    );
+  };
+
+  updateFromConfig(window.getLastKnownConfig());
+  huePubSub.subscribe('cluster.config.set.config', updateFromConfig);
+
   self.collectionJson = collection_json;
   self.queryJson = query_json;
   self.initialJson = initial_json;
