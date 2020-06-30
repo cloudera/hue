@@ -13,35 +13,33 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import $ from 'jquery';
 import * as ko from 'knockout';
 
-import ApiHelper from 'api/apiHelper';
-import * as apiUtils from 'sql/reference/apiUtils';
+import * as apiUtils from 'api/apiUtils';
+import * as refApiUtils from 'sql/reference/apiUtils';
 import AssistFunctionsPanel from './ko.assistFunctionsPanel';
 import { refreshConfig } from 'utils/hueConfig';
 import { sleep } from 'utils/hueUtils';
 
 describe('ko.assistFunctionsPanel.js', () => {
-  jest.spyOn(apiUtils, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
+  jest.spyOn(refApiUtils, 'fetchUdfs').mockImplementation(() => Promise.resolve([]));
 
   it('should handle cluster config updates', async () => {
-    const spy = jest.spyOn(ApiHelper, 'getClusterConfig').mockImplementation(() =>
-      $.Deferred()
-        .resolve({
-          status: 0,
-          app_config: {
-            editor: {
-              interpreters: [
-                { type: 'pig', dialect: 'pig', displayName: 'Pig' },
-                { type: 'impala', dialect: 'impala', displayName: 'Impala' },
-                { type: 'banana', dialect: 'banana', displayName: 'Banana' }
-              ]
-            }
+    const spy = jest.spyOn(apiUtils, 'simplePostAsync').mockImplementation(async () =>
+      Promise.resolve({
+        status: 0,
+        app_config: {
+          editor: {
+            interpreters: [
+              { type: 'pig', dialect: 'pig', displayName: 'Pig' },
+              { type: 'impala', dialect: 'impala', displayName: 'Impala' },
+              { type: 'banana', dialect: 'banana', displayName: 'Banana' }
+            ]
           }
-        })
-        .promise()
+        }
+      })
     );
+
     await refreshConfig();
     const connector = ko.observable({ dialect: 'impala' });
     const subject = new AssistFunctionsPanel({ activeConnector: connector });
@@ -60,18 +58,17 @@ describe('ko.assistFunctionsPanel.js', () => {
 
     spy.mockRestore();
 
-    const changeSpy = jest.spyOn(ApiHelper, 'getClusterConfig').mockImplementation(() =>
-      $.Deferred()
-        .resolve({
-          status: 0,
-          app_config: {
-            editor: {
-              interpreters: [{ type: 'pig', dialect: 'pig', displayName: 'Pig' }]
-            }
+    const changeSpy = jest.spyOn(apiUtils, 'simplePostAsync').mockImplementation(async () =>
+      Promise.resolve({
+        status: 0,
+        app_config: {
+          editor: {
+            interpreters: [{ type: 'pig', dialect: 'pig', displayName: 'Pig' }]
           }
-        })
-        .promise()
+        }
+      })
     );
+
     await refreshConfig();
     expect(changeSpy).toHaveBeenCalled();
     changeSpy.mockRestore();
