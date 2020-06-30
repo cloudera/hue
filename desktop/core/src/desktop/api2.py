@@ -45,7 +45,7 @@ from useradmin.models import User, Group
 
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import ENABLE_CONNECTORS, ENABLE_GIST_PREVIEW, get_clusters, IS_K8S_ONLY
+from desktop.conf import ENABLE_CONNECTORS, ENABLE_GIST_PREVIEW, get_clusters, IS_K8S_ONLY, ENABLE_SHARING
 from desktop.lib.conf import BoundContainer, GLOBAL_CONFIG, is_anonymous
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.exceptions_renderable import PopupException
@@ -54,6 +54,7 @@ from desktop.lib.i18n import smart_str, force_unicode
 from desktop.lib.paths import get_desktop_root
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, \
   UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config, __paginate, _get_gist_document
+from desktop.views import serve_403_error
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
@@ -83,6 +84,7 @@ def api_error_handler(func):
 @api_error_handler
 def get_config(request):
   config = get_cluster_config(request.user)
+  config['hue_config']['is_admin'] = is_admin(request.user);
   config['clusters'] = list(get_clusters(request.user).values())
   config['documents'] = {
     'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())
@@ -677,6 +679,9 @@ def share_document(request):
 
   Example of input: {'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}}
   """
+  if not is_admin(request.user) and not ENABLE_SHARING.get():
+    return serve_403_error(request)
+
   uuid = request.POST.get('uuid')
   perms_dict = request.POST.get('data')
 
@@ -716,6 +721,9 @@ def share_document_link(request):
 
   Example of input: {"uuid": "xxxx", "perm": "read" / "write" / "off"}
   """
+  if not is_admin(request.user) and not ENABLE_SHARING.get():
+    return serve_403_error(request)
+
   uuid = request.POST.get('uuid')
   perm = request.POST.get('perm')
 
