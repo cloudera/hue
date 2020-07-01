@@ -82,10 +82,14 @@ def is_alive(request):
 def samlgroup_check(request):
   if 'SAML2Backend' in desktop.auth.forms.get_backend_names():
     if REQUIRED_GROUPS.get():
-      userprofile = get_profile(request.user)
+      try:
+        userprofile = get_profile(request.user)
+      except:
+        return True
+
       json_data = json.loads(userprofile.json_data)
       if not json_data:
-        LOG.debug("Empty userprofile data for %s user" % (request.user.username))
+        LOG.info("Empty userprofile data for %s user" % (request.user.username))
         return False
 
       if json_data.get('saml_attributes', False) and \
@@ -93,7 +97,7 @@ def samlgroup_check(request):
         success = set(REQUIRED_GROUPS.get()).issubset(
                  set(json_data['saml_attributes'].get(REQUIRED_GROUPS_ATTRIBUTE.get())))
         if not success:
-          LOG.debug("User %s not found in required SAML groups, %s" % (request.user.username, REQUIRED_GROUPS.get()))
+          LOG.info("User %s not found in required SAML groups, %s" % (request.user.username, REQUIRED_GROUPS.get()))
           return False
   return True
 
