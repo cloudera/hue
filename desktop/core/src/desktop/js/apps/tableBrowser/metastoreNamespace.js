@@ -131,6 +131,9 @@ class MetastoreNamespace {
         this.setDatabase(database, () => {
           huePubSub.publish('metastore.url.change');
         });
+        if (this.database()) {
+          this.database().table(null);
+        }
         return true;
       }
     });

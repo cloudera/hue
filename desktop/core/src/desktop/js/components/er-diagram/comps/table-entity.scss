@@ -1,0 +1,56 @@
+/*
+  Licensed to Cloudera, Inc. under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  Cloudera, Inc. licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+.table-entity {
+  border: 1px solid #d6d8db;
+  border-radius: 5px;
+  padding: 5px;
+
+  cursor: pointer;
+
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05) inset, 0px 0px 8px rgba(0, 0, 0, 0.15);
+
+  background-color: #EFEFEF;
+
+  .db-name {
+    color: rgb(5, 5, 5);
+    font-size: 0.8em;
+    text-align: center;
+  }
+  .table-name {
+    color: #0a78a3;
+    text-align: center;
+    margin-top: -5px;
+  }
+
+  .columns-container {
+    padding: 0 10px;
+
+    .column-entity {
+      padding: 5px;
+      text-align: center;
+      background-color: #FFF;
+
+      border: 1px solid #d6d8db;
+      border-radius: 5px;
+      margin: 5px 0;
+
+      position: relative;
+    }
+  }
+}
