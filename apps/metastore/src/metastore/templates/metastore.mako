@@ -21,6 +21,7 @@ from desktop import conf
 from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter, _ko
+from metastore.conf import SHOW_TABLE_ERD
 from beeswax.conf import LIST_PARTITIONS_LIMIT
 from webpack_loader.templatetags.webpack_loader import render_bundle
 
@@ -61,6 +62,7 @@ ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 
+${ render_bundle('vendors~jobBrowser~tableBrowser') | n,unicode }
 ${ render_bundle('tableBrowser') | n,unicode }
 
 <span class="notebook">
@@ -822,6 +824,11 @@ ${ components.menubar(is_embeddable) }
       <a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('privileges'); }">${ _('Privileges') }</a>
     </li>
     <!-- /ko -->
+    % if SHOW_TABLE_ERD.get():
+    <li data-bind="css: { 'active' : $root.currentTab() === 'erd' || $root.currentTab() === 'erd-animated' }">
+      <a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('erd'); }">${ _('Table Relations') }</a>
+    </li>
+    % endif
   </ul>
 
   <div class="tab-content margin-top-10" style="border: none; overflow: hidden">
@@ -857,6 +864,23 @@ ${ components.menubar(is_embeddable) }
       <!-- ko if: $root.currentTab() === 'privileges' -->
         <div data-bind="component: { name: 'hue-sentry-privileges', params: { isSentryAdmin: false, readOnly: true, server: 'server1', path: catalogEntry.path.join('.')}}"></div>
       <!-- /ko -->
+
+      <!-- ko if: $root.currentTab() === 'erd' || $root.currentTab() === 'erd-animated' -->
+        <!-- ko hueSpinner: { spin: loading, center: true, size: 'xlarge' } --><!-- /ko -->
+        <!-- ko ifnot: loading -->
+          <er-diagram data-bind="
+            vueProps: $root.propsMappers.tableERD(database.table().catalogEntry),
+            vueEvents: {
+              'entity-clicked': function (event){
+                const table = event.detail[0];
+                $root.setDbAndTableByName(table.database, table.name, () => $root.currentTab('erd-animated'));
+              }
+            },
+            class: $root.currentTab()
+          "></er-diagram>
+        <!-- /ko -->
+      <!-- /ko -->
+
     </div>
   </div>
 </script>

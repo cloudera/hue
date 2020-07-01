@@ -24,6 +24,8 @@ import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
 import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
 
+import 'components/er-diagram/webcomp';
+
 const HUE_PUB_SUB_EDITOR_ID = 'metastore';
 
 if (ko.options) {

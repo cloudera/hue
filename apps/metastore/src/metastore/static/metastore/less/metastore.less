@@ -19,6 +19,23 @@
 @import (reference) "hue-mixins.less";
 @import (reference) "hue-helpers.less";
 
+@keyframes erd-slide-in {
+  from {
+    margin-left: 100px;
+    opacity: 0;
+  }
+  to {
+    margin-left: 0px;
+    opacity: 1;
+  }
+}
+
+.erd-animated {
+  .erd-container {
+    animation: erd-slide-in 0.25s;
+  }
+}
+
 #metastoreComponents {
   .divider {
     padding-left: 12px;
