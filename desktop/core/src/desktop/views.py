@@ -85,7 +85,7 @@ def samlgroup_check(request):
       try:
         userprofile = get_profile(request.user)
       except:
-        return True
+        return False
 
       json_data = json.loads(userprofile.json_data)
       if not json_data:
