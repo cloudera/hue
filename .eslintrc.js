@@ -74,7 +74,19 @@ module.exports = {
         'plugin:@typescript-eslint/recommended'
       ],
       parser: 'vue-eslint-parser',
-      plugins: ['vue', '@typescript-eslint']
+      plugins: ['vue', '@typescript-eslint'],
+      rules: {
+        'vue/max-attributes-per-line': [
+          'error',
+          {
+            singleline: 10,
+            multiline: {
+              max: 1,
+              allowFirstLine: false
+            }
+          }
+        ]
+      }
     },
     {
       files: ['*.ts'],

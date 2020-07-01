@@ -22,6 +22,7 @@ import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import MetastoreSource from 'apps/tableBrowser/metastoreSource';
 import dataCatalog from 'catalog/dataCatalog';
+import * as propsMappers from './propsMappers';
 import { findEditorConnector, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 class MetastoreViewModel {
@@ -45,6 +46,8 @@ class MetastoreViewModel {
     this.navigatorEnabled = ko.observable(options.navigatorEnabled || false);
     this.appConfig = ko.observable();
 
+    this.propsMappers = propsMappers;
+
     this.source = ko.observable();
     this.sources = ko.observableArray();
 
@@ -64,6 +67,20 @@ class MetastoreViewModel {
     // When manually changed through dropdown
     this.sourceChanged = () => {
       huePubSub.publish('metastore.url.change');
+    };
+
+    this.setDbAndTableByName = (dbName, tableName, callback) => {
+      this.source()
+        .namespace()
+        .setDatabaseByName(dbName, () => {
+          this.source()
+            .namespace()
+            .database()
+            .setTableByName(tableName, () => {
+              this.sourceChanged();
+              callback();
+            });
+        });
     };
 
     this.loading = ko.pureComputed(() => !this.source() || this.source().loading());
