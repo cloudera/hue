@@ -101,7 +101,10 @@ class HueDocument {
       });
       jsonUserGroups.groups.forEach(group => {
         self.groupMap[group.name] = group;
-        const highLightedLabel = hueUtils.highlight(hueUtils.escapeOutput(group.name), request.term);
+        const highLightedLabel = hueUtils.highlight(
+          hueUtils.escapeOutput(group.name),
+          request.term
+        );
         self.items.push({
           data: {
             icon: 'fa fa-users',
