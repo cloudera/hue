@@ -21,7 +21,7 @@ import {
   UdfCategoryFunctions,
   UdfDetails
 } from 'sql/reference/types';
-import { Connector } from 'types';
+import { Connector } from 'types/config';
 import { matchesType } from './typeUtils';
 import I18n from 'utils/i18n';
 import huePubSub from 'utils/huePubSub';
@@ -33,18 +33,13 @@ export const DESCRIBE_UDF_EVENT = 'hue.describe.udf';
 export const UDF_DESCRIBED_EVENT = 'hue.udf.described';
 
 const SET_REFS: { [attr: string]: () => Promise<{ SET_OPTIONS?: SetOptions }> } = {
-  // @ts-ignore
   impala: async () => import(/* webpackChunkName: "impala-ref" */ './impala/setReference')
 };
 
 const UDF_REFS: { [attr: string]: () => Promise<{ UDF_CATEGORIES?: UdfCategory[] }> } = {
-  // @ts-ignore
   generic: async () => import(/* webpackChunkName: "generic-ref" */ './generic/udfReference'),
-  // @ts-ignore
   hive: async () => import(/* webpackChunkName: "hive-ref" */ './hive/udfReference'),
-  // @ts-ignore
   impala: async () => import(/* webpackChunkName: "impala-ref" */ './impala/udfReference'),
-  // @ts-ignore
   pig: async () => import(/* webpackChunkName: "pig-ref" */ './pig/udfReference')
 };
 
@@ -61,7 +56,7 @@ const getMergedUdfKey = (connector: Connector, database?: string): string => {
 };
 
 export const hasUdfCategories = (connector: Connector): boolean =>
-  typeof UDF_REFS[connector.dialect] !== 'undefined';
+  !!connector.dialect && typeof UDF_REFS[connector.dialect] !== 'undefined';
 
 const findUdfsToAdd = (
   apiUdfs: UdfDetails[],
@@ -120,7 +115,7 @@ export const getUdfCategories = async (
         resolve(cachedCategories);
       }
       let categories: UdfCategory[] = [];
-      if (UDF_REFS[connector.dialect]) {
+      if (connector.dialect && UDF_REFS[connector.dialect]) {
         const module = await UDF_REFS[connector.dialect]();
         if (module.UDF_CATEGORIES) {
           categories = module.UDF_CATEGORIES;
@@ -195,7 +190,10 @@ export const getUdfsWithReturnTypes = async (
     ) {
       Object.keys(category.functions).forEach(udfName => {
         const udf = category.functions[udfName];
-        if (!returnTypes || matchesType(connector.dialect, returnTypes, udf.returnTypes)) {
+        if (
+          !returnTypes ||
+          (connector.dialect && matchesType(connector.dialect, returnTypes, udf.returnTypes))
+        ) {
           result.push(udf);
         }
       });
@@ -228,7 +226,7 @@ export const getArgumentDetailsForUdf = async (
 };
 
 export const getSetOptions = async (connector: Connector): Promise<SetOptions> => {
-  if (SET_REFS[connector.dialect]) {
+  if (connector.dialect && SET_REFS[connector.dialect]) {
     const module = await SET_REFS[connector.dialect]();
     if (module.SET_OPTIONS) {
       return module.SET_OPTIONS;

@@ -1622,6 +1622,13 @@ ENABLE_DOWNLOAD = Config(
   type=coerce_bool,
   default=True)
 
+ENABLE_SHARING = Config(
+  key="enable_sharing",
+  help=_(
+    'Global setting to enable or disable document sharing. Note that this does not affect currently shared documents.'),
+  type=coerce_bool,
+  default=True)
+
 ENABLE_DJANGO_DEBUG_TOOL = Config(
   key="enable_django_debug_tool",
   help=_('Allow use django debug tool with Chrome browser for debugging issue, django_debug_mode must be true also'),

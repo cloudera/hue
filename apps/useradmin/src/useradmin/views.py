@@ -44,11 +44,11 @@ from django.utils.translation import get_language, ugettext as _
 
 import desktop.conf
 from desktop.auth.backend import is_admin
-from desktop.conf import LDAP, ENABLE_ORGANIZATIONS, ENABLE_CONNECTORS
+from desktop.conf import LDAP, ENABLE_ORGANIZATIONS, ENABLE_CONNECTORS, ENABLE_SHARING
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import _get_apps
-from desktop.views import antixss
+from desktop.views import antixss, serve_403_error
 from hadoop.fs.exceptions import WebHdfsException
 
 from useradmin import ldap_access
@@ -130,6 +130,8 @@ def list_for_autocomplete(request):
     groups = Group.objects.filter(name__icontains=autocomplete_filter).order_by('name')
     if request.GET.get('only_mygroups'):
       groups = request.user.groups.filter(name__icontains=autocomplete_filter).order_by('name')
+  elif not ENABLE_SHARING.get():
+    return serve_403_error(request)
   else:
     usergroups = request.user.groups.all()
     # Get all users in the usergroups he belongs to and then filter by username
@@ -154,6 +156,9 @@ def list_for_autocomplete(request):
 
 
 def get_users_by_id(request):
+  if not is_admin(request.user) and not ENABLE_SHARING.get():
+    return serve_403_error(request)
+
   userids = json.loads(request.GET.get('userids', "[]"))
   userids = userids[:100]
   users = User.objects.filter(id__in=userids).order_by('email' if ENABLE_ORGANIZATIONS.get() else 'username')

@@ -50,7 +50,7 @@ from useradmin.organization import _fitered_queryset
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_K8S_ONLY, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS,\
-    has_connectors, TASK_SERVER, ENABLE_GIST, APP_BLACKLIST
+    has_connectors, TASK_SERVER, ENABLE_GIST, APP_BLACKLIST, ENABLE_SHARING
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.connectors.models import Connector
@@ -1721,7 +1721,10 @@ class ClusterConfig(object):
       ],
       'default_sql_interpreter': default_sql_interpreter,
       'cluster_type': self.cluster_type,
-      'has_computes': self.cluster_type in ('altus', 'snowball') # or any grouped engine connectors
+      'has_computes': self.cluster_type in ('altus', 'snowball'), # or any grouped engine connectors
+      'hue_config': {
+        'enable_sharing': ENABLE_SHARING.get()
+      }
     }
 
 
@@ -1846,6 +1849,7 @@ class ClusterConfig(object):
         interpreters.append({
           'name': interpreter['name'],
           'type': interpreter['type'],
+          'id': interpreter['type'],
           'displayName': interpreter['name'],
           'buttonName': _('Query'),
           'tooltip': _('%s Query') % interpreter['type'].title(),
@@ -1864,6 +1868,7 @@ class ClusterConfig(object):
       if HAS_REPORT_ENABLED.get():
         _interpreters.append({
           'type': 'report',
+          'id': 'report',
           'displayName': 'Report',
           'buttonName': 'Report',
           'page': '/dashboard/new_search?engine=report',
@@ -1873,6 +1878,7 @@ class ClusterConfig(object):
 
       _interpreters.extend([{
           'type': interpreter['type'],
+          'id': interpreter['type'],
           'displayName': interpreter['type'].title(),
           'buttonName': interpreter['type'].title(),
           'page': '/dashboard/new_search?engine=%(type)s' % interpreter,

@@ -207,6 +207,10 @@
   # e.g. Query result in Editors and Dashboards, file in File Browser...
   ## enable_download=true
 
+  # Global setting to enable or disable document sharing.
+  # Note that this does not affect currently shared documents.
+  ## enable_sharing=true
+
   # Choose whether to enable the new SQL syntax checker or not
   ## enable_sql_syntax_check=true
 
@@ -1924,6 +1928,12 @@
 
   # Performs the logout or not.
   ## logout_enabled=true
+
+  # Comma separated list of group names which are all required to complete the authentication. e.g. admin,sales.
+  ## required_groups=
+
+  # Name of the SAML attribute containing the list of groups the user belongs to.
+  ## required_groups_attribute=groups
 
 
 ###########################################################################

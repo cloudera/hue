@@ -565,6 +565,10 @@ var Collection = function (vm, collection) {
     self.activeCompute(context.namespaces[0].computes[0]);
   });
 
+  self.simpleAceDatabase = ko.pureComputed(function () {
+    return self.name().split('.')[0];
+  });
+
   self.engine = ko.observable(typeof collection.engine != "undefined" && collection.engine != null ? collection.engine : "solr");
   self.engine.subscribe(function() {
     self.name(null);
@@ -2033,6 +2037,17 @@ var TempDocument = function () {
 var SearchViewModel = function (collection_json, query_json, initial_json, has_gridster_enabled, has_new_add_method) {
 
   var self = this;
+
+  self.sharingEnabled = ko.observable(false);
+
+  var updateFromConfig = function (hueConfig) {
+    self.sharingEnabled(
+      hueConfig && (hueConfig.hue_config.is_admin || hueConfig.hue_config.enable_sharing)
+    );
+  };
+
+  updateFromConfig(window.getLastKnownConfig());
+  huePubSub.subscribe('cluster.config.set.config', updateFromConfig);
 
   self.collectionJson = collection_json;
   self.queryJson = query_json;

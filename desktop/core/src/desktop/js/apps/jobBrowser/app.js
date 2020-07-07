@@ -14,9 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import './components/ko.hiveQueryPlan';
-
 import huePubSub from 'utils/huePubSub';
+import './components/hiveQueryPlan.vue';
 
 huePubSub.subscribe('app.dom.loaded', app => {
   if (app !== 'jobbrowser') {

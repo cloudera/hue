@@ -21,7 +21,7 @@ from django.utils.translation import ugettext as _
   <a>
     <div>
       <i data-bind="css: icon"></i>
-      <span data-bind="html: label"></span>
+      <span data-bind="text: label"></span>
     </div>
   </a>
 </script>

@@ -24,6 +24,7 @@ import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { DOCUMENT_TYPES } from 'doc/docSupport';
 import { ASSIST_DOC_HIGHLIGHT_EVENT, ASSIST_SHOW_DOC_EVENT } from './events';
+import { CONFIG_REFRESHED_EVENT, getLastKnownConfig } from 'utils/hueConfig';
 
 export const REFRESH_DOC_ASSIST_EVENT = 'assist.document.refresh';
 
@@ -42,13 +43,15 @@ const TEMPLATE = `
     <li><a href="javascript: void(0);" data-bind="click: open"><i class="fa fa-fw fa-edit"></i> ${I18n(
       'Open document'
     )}</a></li>
-    <li><a href="javascript: void(0);" data-bind="click: function() { huePubSub.publish('doc.show.delete.modal', $data); activeEntry().getSelectedDocsWithDependents(); activeEntry().showDeleteConfirmation(); }"><i class="fa fa-fw fa-trash-o"></i> ${I18n(
+    <li><a href="javascript: void(0);" data-bind="click: function() { $data.selected(true); huePubSub.publish('doc.show.delete.modal', $data.parent); }"><i class="fa fa-fw fa-trash-o"></i> ${I18n(
       'Delete document'
     )}</a></li>
     <!-- /ko -->
+    <!-- ko if: $containerContext.sharingEnabled -->
     <li><a href="javascript: void(0);" data-bind="publish: { 'doc.show.share.modal': $data }"><i class="fa fa-fw fa-users"></i> ${I18n(
       'Share'
     )}</a></li>
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="assist-document-header-actions">
@@ -150,7 +153,7 @@ const TEMPLATE = `
             <!-- /ko -->
             <li class="divider"></li>
             <li data-bind="css: { 'disabled': $data.isTrash() || $data.isTrashed() || !$data.canModify() }">
-              <a href="javascript:void(0);" data-bind="click: function () { $('.new-document-drop-down').removeClass('open'); huePubSub.publish('show.create.directory.modal', $data); $data.showNewDirectoryModal()}"><svg class="hi"><use xlink:href="#hi-folder"></use><use xlink:href="#hi-plus-addon"></use></svg> ${I18n(
+              <a href="javascript:void(0);" data-bind="click: function () { $('.new-document-drop-down').removeClass('open'); huePubSub.publish('show.create.directory.modal', $data); }"><svg class="hi"><use xlink:href="#hi-folder"></use><use xlink:href="#hi-plus-addon"></use></svg> ${I18n(
                 'New folder'
               )}</a>
             </li>
@@ -198,7 +201,7 @@ const TEMPLATE = `
       </ul>
       <!-- /ko -->
       <ul class="assist-tables" data-bind="foreachVisible: { data: filteredEntries, minHeight: 27, container: '.assist-file-scrollable' }">
-        <li class="assist-entry assist-file-entry" data-bind="appAwareTemplateContextMenu: { template: 'document-context-items', scrollContainer: '.assist-file-scrollable', beforeOpen: beforeContextOpen }, assistFileDroppable, assistFileDraggable, visibleOnHover: { 'selector': '.assist-file-actions' }">
+        <li class="assist-entry assist-file-entry" data-bind="appAwareTemplateContextMenu: { template: 'document-context-items', containerContext: $parents[2], scrollContainer: '.assist-file-scrollable', beforeOpen: beforeContextOpen }, assistFileDroppable, assistFileDraggable, visibleOnHover: { 'selector': '.assist-file-actions' }">
           <div class="assist-file-actions table-actions">
             <a class="inactive-action" href="javascript:void(0)" data-bind="popoverOnHover: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
               'Show details'
@@ -237,6 +240,16 @@ class AssistDocumentsPanel {
     self.activeEntry = ko.observable();
     self.activeSort = ko.observable('defaultAsc');
     self.typeFilter = ko.observable(DOCUMENT_TYPES[0]); // all is first
+    self.sharingEnabled = ko.observable(false);
+
+    const updateFromConfig = hueConfig => {
+      self.sharingEnabled(
+        hueConfig && (hueConfig.hue_config.is_admin || hueConfig.hue_config.enable_sharing)
+      );
+    };
+
+    updateFromConfig(getLastKnownConfig());
+    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, updateFromConfig);
 
     self.highlightTypeFilter = ko.observable(false);
 

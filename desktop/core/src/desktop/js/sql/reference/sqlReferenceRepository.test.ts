@@ -15,12 +15,23 @@
 // limitations under the License.
 
 import { UdfArgument } from 'sql/reference/types';
+import { Connector } from 'types/config';
 import { getArgumentDetailsForUdf } from './sqlReferenceRepository';
 import * as apiUtils from 'sql/reference/apiUtils';
 
 describe('sqlReferenceRepository.js', () => {
-  const hiveConn = { dialect: 'hive', id: 'hive' };
-  const impalaConn = { dialect: 'impala', id: 'impala' };
+  const createTestConnector = (dialect: string, id: string): Connector => ({
+    dialect: dialect,
+    id: id,
+    buttonName: '',
+    displayName: '',
+    page: '',
+    tooltip: '',
+    type: ''
+  });
+
+  const hiveConn: Connector = createTestConnector('hive', 'hive');
+  const impalaConn = createTestConnector('impala', 'impala');
 
   jest.mock('sql/reference/impala/udfReference', () => ({
     UDF_CATEGORIES: [

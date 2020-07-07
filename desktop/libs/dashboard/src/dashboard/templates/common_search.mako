@@ -109,7 +109,8 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
               fixedPostfix: $root.collection.engine() !== 'solr' ? function() { return ' GROUP BY 1;' } : undefined,
               namespace: $root.collection.activeNamespace,
               compute: $root.collection.activeCompute,
-              database: function () { return $root.collection.name().split('.')[0] },
+              database: $root.collection.simpleAceDatabase,
+              disableWorkers: true,
               singleLine: true }
             }"></div>
 ##             <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css: {'input-small': $root.query.qs().length > 1, 'flat-left': $index() === 0, 'input-xlarge': $root.collection.supportAnalytics()}" maxlength="4096" type="text" class="search-query">
@@ -201,11 +202,13 @@ from dashboard.conf import USE_GRIDSTER, USE_NEW_ADD_METHOD, HAS_REPORT_ENABLED,
             </a>
           </li>
           <li data-bind="visible: columns().length != 0" class="divider"></li>
+          <!-- ko if: $root.sharingEnabled -->
           <li data-bind="visible: isSaved()">
             <a class="share-link" data-bind="click: prepareShareModal, css: {'isShared': isShared()}">
               <i class="fa fa-fw fa-users"></i> ${ _('Share') }
             </a>
           </li>
+          <!-- /ko -->
           %if not is_embeddable:
             <li>
               <a class="pointer" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
@@ -2182,7 +2185,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
         fixedPostfix: $root.collection.engine() !== 'solr' ? function() { return ' GROUP BY 1;' } : undefined,
         namespace: $root.collection.activeNamespace,
         compute: $root.collection.activeCompute,
-        database: function () { return $root.collection.name().split('.')[0] },
+        database: $root.collection.simpleAceDatabase,
+        disableWorkers: true,
         singleLine: true }
       }"></div>
     </span>

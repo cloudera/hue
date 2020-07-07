@@ -1,0 +1,495 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    ORM Configuration
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+        <link rel="up" title="Frequently Asked Questions" href="index.html" />
+        <link rel="next" title="Performance" href="performance.html" />
+        <link rel="prev" title="SQL Expressions" href="sqlexpressions.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../contents.html">Contents</a> |
+                <a href="../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="index.html" title="Frequently Asked Questions">Frequently Asked Questions</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="connections.html">Connections / Engines</a></span></li>
+<li><span class="link-container"><a class="reference external" href="metadata_schema.html">MetaData / Schema</a></span></li>
+<li><span class="link-container"><a class="reference external" href="sqlexpressions.html">SQL Expressions</a></span></li>
+<li class="selected"><span class="link-container"><strong>ORM Configuration</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#how-do-i-map-a-table-that-has-no-primary-key">How do I map a table that has no primary key?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#how-do-i-configure-a-column-that-is-a-python-reserved-word-or-similar">How do I configure a Column that is a Python reserved word or similar?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#how-do-i-get-a-list-of-all-columns-relationships-mapped-attributes-etc-given-a-mapped-class">How do I get a list of all columns, relationships, mapped attributes, etc. given a mapped class?</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#i-m-getting-a-warning-or-error-about-implicitly-combining-column-x-under-attribute-y">I’m getting a warning or error about “Implicitly combining column X under attribute Y”</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#i-m-using-declarative-and-setting-primaryjoin-secondaryjoin-using-an-and-or-or-and-i-am-getting-an-error-message-about-foreign-keys">I’m using Declarative and setting primaryjoin/secondaryjoin using an <code class="docutils literal notranslate"><span class="pre">and_()</span></code> or <code class="docutils literal notranslate"><span class="pre">or_()</span></code>, and I am getting an error message about foreign keys.</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#why-is-order-by-required-with-limit-especially-with-subqueryload">Why is <code class="docutils literal notranslate"><span class="pre">ORDER</span> <span class="pre">BY</span></code> required with <code class="docutils literal notranslate"><span class="pre">LIMIT</span></code> (especially with <code class="docutils literal notranslate"><span class="pre">subqueryload()</span></code>)?</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="performance.html">Performance</a></span></li>
+<li><span class="link-container"><a class="reference external" href="sessions.html">Sessions / Queries</a></span></li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="orm-configuration">
+<h1>ORM Configuration<a class="headerlink" href="#orm-configuration" title="Permalink to this headline">¶</a></h1>
+<div class="contents faq local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#how-do-i-map-a-table-that-has-no-primary-key" id="id1">How do I map a table that has no primary key?</a></p></li>
+<li><p><a class="reference internal" href="#how-do-i-configure-a-column-that-is-a-python-reserved-word-or-similar" id="id2">How do I configure a Column that is a Python reserved word or similar?</a></p></li>
+<li><p><a class="reference internal" href="#how-do-i-get-a-list-of-all-columns-relationships-mapped-attributes-etc-given-a-mapped-class" id="id3">How do I get a list of all columns, relationships, mapped attributes, etc. given a mapped class?</a></p></li>
+<li><p><a class="reference internal" href="#i-m-getting-a-warning-or-error-about-implicitly-combining-column-x-under-attribute-y" id="id4">I’m getting a warning or error about “Implicitly combining column X under attribute Y”</a></p></li>
+<li><p><a class="reference internal" href="#i-m-using-declarative-and-setting-primaryjoin-secondaryjoin-using-an-and-or-or-and-i-am-getting-an-error-message-about-foreign-keys" id="id5">I’m using Declarative and setting primaryjoin/secondaryjoin using an <code class="docutils literal notranslate"><span class="pre">and_()</span></code> or <code class="docutils literal notranslate"><span class="pre">or_()</span></code>, and I am getting an error message about foreign keys.</a></p></li>
+<li><p><a class="reference internal" href="#why-is-order-by-required-with-limit-especially-with-subqueryload" id="id6">Why is <code class="docutils literal notranslate"><span class="pre">ORDER</span> <span class="pre">BY</span></code> required with <code class="docutils literal notranslate"><span class="pre">LIMIT</span></code> (especially with <code class="docutils literal notranslate"><span class="pre">subqueryload()</span></code>)?</a></p></li>
+</ul>
+</div>
+<div class="section" id="how-do-i-map-a-table-that-has-no-primary-key">
+<span id="faq-mapper-primary-key"></span><h2>How do I map a table that has no primary key?<a class="headerlink" href="#how-do-i-map-a-table-that-has-no-primary-key" title="Permalink to this headline">¶</a></h2>
+<p>The SQLAlchemy ORM, in order to map to a particular table, needs there to be
+at least one column denoted as a primary key column; multiple-column,
+i.e. composite, primary keys are of course entirely feasible as well.  These
+columns do <strong>not</strong> need to be actually known to the database as primary key
+columns, though it’s a good idea that they are.  It’s only necessary that the columns
+<em>behave</em> as a primary key does, e.g. as a unique and not nullable identifier
+for a row.</p>
+<p>Most ORMs require that objects have some kind of primary key defined
+because the object in memory must correspond to a uniquely identifiable
+row in the database table; at the very least, this allows the
+object can be targeted for UPDATE and DELETE statements which will affect only
+that object’s row and no other.   However, the importance of the primary key
+goes far beyond that.  In SQLAlchemy, all ORM-mapped objects are at all times
+linked uniquely within a <a class="reference internal" href="../orm/session_api.html#sqlalchemy.orm.session.Session" title="sqlalchemy.orm.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>
+to their specific database row using a pattern called the <a class="reference internal" href="../glossary.html#term-identity-map"><span class="xref std std-term">identity map</span></a>,
+a pattern that’s central to the unit of work system employed by SQLAlchemy,
+and is also key to the most common (and not-so-common) patterns of ORM usage.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It’s important to note that we’re only talking about the SQLAlchemy ORM; an
+application which builds on Core and deals only with <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> objects,
+<a class="reference internal" href="../core/selectable.html#sqlalchemy.sql.expression.select" title="sqlalchemy.sql.expression.select"><code class="xref py py-func docutils literal notranslate"><span class="pre">select()</span></code></a> constructs and the like, <strong>does not</strong> need any primary key
+to be present on or associated with a table in any way (though again, in SQL, all tables
+should really have some kind of primary key, lest you need to actually
+update or delete specific rows).</p>
+</div>
+<p>In almost all cases, a table does have a so-called <a class="reference internal" href="../glossary.html#term-candidate-key"><span class="xref std std-term">candidate key</span></a>, which is a column or series
+of columns that uniquely identify a row.  If a table truly doesn’t have this, and has actual
+fully duplicate rows, the table is not corresponding to <a class="reference external" href="http://en.wikipedia.org/wiki/First_normal_form">first normal form</a> and cannot be mapped.   Otherwise, whatever columns comprise the best candidate key can be
+applied directly to the mapper:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SomeClass</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__table__</span> <span class="o">=</span> <span class="n">some_table_with_no_pk</span>
+    <span class="n">__mapper_args__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;primary_key&#39;</span><span class="p">:[</span><span class="n">some_table_with_no_pk</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">uid</span><span class="p">,</span> <span class="n">some_table_with_no_pk</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">bar</span><span class="p">]</span>
+    <span class="p">}</span></pre></div>
+</div>
+<p>Better yet is when using fully declared table metadata, use the <code class="docutils literal notranslate"><span class="pre">primary_key=True</span></code>
+flag on those columns:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SomeClass</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;some_table_with_no_pk&quot;</span>
+
+    <span class="n">uid</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">bar</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></pre></div>
+</div>
+<p>All tables in a relational database should have primary keys.   Even a many-to-many
+association table - the primary key would be the composite of the two association
+columns:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">TABLE</span> <span class="n">my_association</span> <span class="p">(</span>
+  <span class="n">user_id</span> <span class="n">INTEGER</span> <span class="n">REFERENCES</span> <span class="n">user</span><span class="p">(</span><span class="nb">id</span><span class="p">),</span>
+  <span class="n">account_id</span> <span class="n">INTEGER</span> <span class="n">REFERENCES</span> <span class="n">account</span><span class="p">(</span><span class="nb">id</span><span class="p">),</span>
+  <span class="n">PRIMARY</span> <span class="n">KEY</span> <span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">account_id</span><span class="p">)</span>
+<span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="how-do-i-configure-a-column-that-is-a-python-reserved-word-or-similar">
+<h2>How do I configure a Column that is a Python reserved word or similar?<a class="headerlink" href="#how-do-i-configure-a-column-that-is-a-python-reserved-word-or-similar" title="Permalink to this headline">¶</a></h2>
+<p>Column-based attributes can be given any name desired in the mapping. See
+<a class="reference internal" href="../orm/mapping_columns.html#mapper-column-distinct-names"><span class="std std-ref">Naming Columns Distinctly from Attribute Names</span></a>.</p>
+</div>
+<div class="section" id="how-do-i-get-a-list-of-all-columns-relationships-mapped-attributes-etc-given-a-mapped-class">
+<h2>How do I get a list of all columns, relationships, mapped attributes, etc. given a mapped class?<a class="headerlink" href="#how-do-i-get-a-list-of-all-columns-relationships-mapped-attributes-etc-given-a-mapped-class" title="Permalink to this headline">¶</a></h2>
+<p>This information is all available from the <a class="reference internal" href="../orm/mapping_api.html#sqlalchemy.orm.Mapper" title="sqlalchemy.orm.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a> object.</p>
+<p>To get at the <a class="reference internal" href="../orm/mapping_api.html#sqlalchemy.orm.Mapper" title="sqlalchemy.orm.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a> for a particular mapped class, call the
+<a class="reference internal" href="../core/inspection.html#sqlalchemy.inspect" title="sqlalchemy.inspect"><code class="xref py py-func docutils literal notranslate"><span class="pre">inspect()</span></code></a> function on it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">inspect</span>
+
+<span class="n">mapper</span> <span class="o">=</span> <span class="n">inspect</span><span class="p">(</span><span class="n">MyClass</span><span class="p">)</span></pre></div>
+</div>
+<p>From there, all information about the class can be accessed through properties
+such as:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../orm/mapping_api.html#sqlalchemy.orm.Mapper.attrs" title="sqlalchemy.orm.Mapper.attrs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Mapper.attrs</span></code></a> - a namespace of all mapped attributes.  The attributes
+themselves are instances of <a class="reference internal" href="../orm/internals.html#sqlalchemy.orm.interfaces.MapperProperty" title="sqlalchemy.orm.interfaces.MapperProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">MapperProperty</span></code></a>, which contain additional
+attributes that can lead to the mapped SQL expression or column, if applicable.</p></li>
+<li><p><a class="reference internal" href="../orm/mapping_api.html#sqlalchemy.orm.Mapper.column_attrs" title="sqlalchemy.orm.Mapper.column_attrs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Mapper.column_attrs</span></code></a> - the mapped attribute namespace
+limited to column and SQL expression attributes.   You might want to use
+<a class="reference internal" href="../orm/mapping_api.html#sqlalchemy.orm.Mapper.columns" title="sqlalchemy.orm.Mapper.columns"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Mapper.columns</span></code></a> to get at the <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a> objects directly.</p></li>
+<li><p><a class="reference internal" href="../orm/mapping_api.html#sqlalchemy.orm.Mapper.relationships" title="sqlalchemy.orm.Mapper.relationships"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Mapper.relationships</span></code></a> - namespace of all <a class="reference internal" href="../orm/internals.html#sqlalchemy.orm.RelationshipProperty" title="sqlalchemy.orm.RelationshipProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">RelationshipProperty</span></code></a> attributes.</p></li>
+<li><p><a class="reference internal" href="../orm/mapping_api.html#sqlalchemy.orm.Mapper.all_orm_descriptors" title="sqlalchemy.orm.Mapper.all_orm_descriptors"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Mapper.all_orm_descriptors</span></code></a> - namespace of all mapped attributes, plus user-defined
+attributes defined using systems such as <a class="reference internal" href="../orm/extensions/hybrid.html#sqlalchemy.ext.hybrid.hybrid_property" title="sqlalchemy.ext.hybrid.hybrid_property"><code class="xref py py-class docutils literal notranslate"><span class="pre">hybrid_property</span></code></a>, <a class="reference internal" href="../orm/extensions/associationproxy.html#sqlalchemy.ext.associationproxy.AssociationProxy" title="sqlalchemy.ext.associationproxy.AssociationProxy"><code class="xref py py-class docutils literal notranslate"><span class="pre">AssociationProxy</span></code></a> and others.</p></li>
+<li><p><a class="reference internal" href="../orm/mapping_api.html#sqlalchemy.orm.Mapper.columns" title="sqlalchemy.orm.Mapper.columns"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Mapper.columns</span></code></a> - A namespace of <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a> objects and other named
+SQL expressions associated with the mapping.</p></li>
+<li><p><a class="reference internal" href="../orm/mapping_api.html#sqlalchemy.orm.Mapper.mapped_table" title="sqlalchemy.orm.Mapper.mapped_table"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Mapper.mapped_table</span></code></a> - The <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> or other selectable to which
+this mapper is mapped.</p></li>
+<li><p><a class="reference internal" href="../orm/mapping_api.html#sqlalchemy.orm.Mapper.local_table" title="sqlalchemy.orm.Mapper.local_table"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Mapper.local_table</span></code></a> - The <a class="reference internal" href="../core/metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> that is “local” to this mapper;
+this differs from <a class="reference internal" href="../orm/mapping_api.html#sqlalchemy.orm.Mapper.mapped_table" title="sqlalchemy.orm.Mapper.mapped_table"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Mapper.mapped_table</span></code></a> in the case of a mapper mapped
+using inheritance to a composed selectable.</p></li>
+</ul>
+</div>
+<div class="section" id="i-m-getting-a-warning-or-error-about-implicitly-combining-column-x-under-attribute-y">
+<span id="faq-combining-columns"></span><h2>I’m getting a warning or error about “Implicitly combining column X under attribute Y”<a class="headerlink" href="#i-m-getting-a-warning-or-error-about-implicitly-combining-column-x-under-attribute-y" title="Permalink to this headline">¶</a></h2>
+<p>This condition refers to when a mapping contains two columns that are being
+mapped under the same attribute name due to their name, but there’s no indication
+that this is intentional.  A mapped class needs to have explicit names for
+every attribute that is to store an independent value; when two columns have the
+same name and aren’t disambiguated, they fall under the same attribute and
+the effect is that the value from one column is <strong>copied</strong> into the other, based
+on which column was assigned to the attribute first.</p>
+<p>This behavior is often desirable and is allowed without warning in the case
+where the two columns are linked together via a foreign key relationship
+within an inheritance mapping.   When the warning or exception occurs, the
+issue can be resolved by either assigning the columns to differently-named
+attributes, or if combining them together is desired, by using
+<a class="reference internal" href="../orm/mapping_columns.html#sqlalchemy.orm.column_property" title="sqlalchemy.orm.column_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">column_property()</span></code></a> to make this explicit.</p>
+<p>Given the example as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">ForeignKey</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">declarative_base</span>
+
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;b&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">a_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;a.id&#39;</span><span class="p">))</span></pre></div>
+</div>
+<p>As of SQLAlchemy version 0.9.5, the above condition is detected, and will
+warn that the <code class="docutils literal notranslate"><span class="pre">id</span></code> column of <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code> is being combined under
+the same-named attribute <code class="docutils literal notranslate"><span class="pre">id</span></code>, which above is a serious issue since it means
+that a <code class="docutils literal notranslate"><span class="pre">B</span></code> object’s primary key will always mirror that of its <code class="docutils literal notranslate"><span class="pre">A</span></code>.</p>
+<p>A mapping which resolves this is as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;b&#39;</span>
+
+    <span class="n">b_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">a_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;a.id&#39;</span><span class="p">))</span></pre></div>
+</div>
+<p>Suppose we did want <code class="docutils literal notranslate"><span class="pre">A.id</span></code> and <code class="docutils literal notranslate"><span class="pre">B.id</span></code> to be mirrors of each other, despite
+the fact that <code class="docutils literal notranslate"><span class="pre">B.a_id</span></code> is where <code class="docutils literal notranslate"><span class="pre">A.id</span></code> is related.  We could combine
+them together using <a class="reference internal" href="../orm/mapping_columns.html#sqlalchemy.orm.column_property" title="sqlalchemy.orm.column_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">column_property()</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;b&#39;</span>
+
+    <span class="c1"># probably not what you want, but this is a demonstration</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">column_property</span><span class="p">(</span><span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">A</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">a_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;a.id&#39;</span><span class="p">))</span></pre></div>
+</div>
+</div>
+<div class="section" id="i-m-using-declarative-and-setting-primaryjoin-secondaryjoin-using-an-and-or-or-and-i-am-getting-an-error-message-about-foreign-keys">
+<h2>I’m using Declarative and setting primaryjoin/secondaryjoin using an <code class="docutils literal notranslate"><span class="pre">and_()</span></code> or <code class="docutils literal notranslate"><span class="pre">or_()</span></code>, and I am getting an error message about foreign keys.<a class="headerlink" href="#i-m-using-declarative-and-setting-primaryjoin-secondaryjoin-using-an-and-or-or-and-i-am-getting-an-error-message-about-foreign-keys" title="Permalink to this headline">¶</a></h2>
+<p>Are you doing this?:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyClass</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="c1"># ....</span>
+
+    <span class="n">foo</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Dest&quot;</span><span class="p">,</span> <span class="n">primaryjoin</span><span class="o">=</span><span class="n">and_</span><span class="p">(</span><span class="s2">&quot;MyClass.id==Dest.foo_id&quot;</span><span class="p">,</span> <span class="s2">&quot;MyClass.foo==Dest.bar&quot;</span><span class="p">))</span></pre></div>
+</div>
+<p>That’s an <code class="docutils literal notranslate"><span class="pre">and_()</span></code> of two string expressions, which SQLAlchemy cannot apply any mapping towards.  Declarative allows <a class="reference internal" href="../orm/relationship_api.html#sqlalchemy.orm.relationship" title="sqlalchemy.orm.relationship"><code class="xref py py-func docutils literal notranslate"><span class="pre">relationship()</span></code></a> arguments to be specified as strings, which are converted into expression objects using <code class="docutils literal notranslate"><span class="pre">eval()</span></code>.   But this doesn’t occur inside of an <code class="docutils literal notranslate"><span class="pre">and_()</span></code> expression - it’s a special operation declarative applies only to the <em>entirety</em> of what’s passed to primaryjoin or other arguments as a string:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyClass</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="c1"># ....</span>
+
+    <span class="n">foo</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Dest&quot;</span><span class="p">,</span> <span class="n">primaryjoin</span><span class="o">=</span><span class="s2">&quot;and_(MyClass.id==Dest.foo_id, MyClass.foo==Dest.bar)&quot;</span><span class="p">)</span></pre></div>
+</div>
+<p>Or if the objects you need are already available, skip the strings:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyClass</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="c1"># ....</span>
+
+    <span class="n">foo</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="n">Dest</span><span class="p">,</span> <span class="n">primaryjoin</span><span class="o">=</span><span class="n">and_</span><span class="p">(</span><span class="n">MyClass</span><span class="o">.</span><span class="n">id</span><span class="o">==</span><span class="n">Dest</span><span class="o">.</span><span class="n">foo_id</span><span class="p">,</span> <span class="n">MyClass</span><span class="o">.</span><span class="n">foo</span><span class="o">==</span><span class="n">Dest</span><span class="o">.</span><span class="n">bar</span><span class="p">))</span></pre></div>
+</div>
+<p>The same idea applies to all the other arguments, such as <code class="docutils literal notranslate"><span class="pre">foreign_keys</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># wrong !</span>
+<span class="n">foo</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="n">Dest</span><span class="p">,</span> <span class="n">foreign_keys</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Dest.foo_id&quot;</span><span class="p">,</span> <span class="s2">&quot;Dest.bar_id&quot;</span><span class="p">])</span>
+
+<span class="c1"># correct !</span>
+<span class="n">foo</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="n">Dest</span><span class="p">,</span> <span class="n">foreign_keys</span><span class="o">=</span><span class="s2">&quot;[Dest.foo_id, Dest.bar_id]&quot;</span><span class="p">)</span>
+
+<span class="c1"># also correct !</span>
+<span class="n">foo</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="n">Dest</span><span class="p">,</span> <span class="n">foreign_keys</span><span class="o">=</span><span class="p">[</span><span class="n">Dest</span><span class="o">.</span><span class="n">foo_id</span><span class="p">,</span> <span class="n">Dest</span><span class="o">.</span><span class="n">bar_id</span><span class="p">])</span>
+
+<span class="c1"># if you&#39;re using columns from the class that you&#39;re inside of, just use the column objects !</span>
+<span class="k">class</span> <span class="nc">MyClass</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">foo_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="n">bar_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="c1"># ...</span>
+
+    <span class="n">foo</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="n">Dest</span><span class="p">,</span> <span class="n">foreign_keys</span><span class="o">=</span><span class="p">[</span><span class="n">foo_id</span><span class="p">,</span> <span class="n">bar_id</span><span class="p">])</span></pre></div>
+</div>
+</div>
+<div class="section" id="why-is-order-by-required-with-limit-especially-with-subqueryload">
+<span id="faq-subqueryload-limit-sort"></span><h2>Why is <code class="docutils literal notranslate"><span class="pre">ORDER</span> <span class="pre">BY</span></code> required with <code class="docutils literal notranslate"><span class="pre">LIMIT</span></code> (especially with <code class="docutils literal notranslate"><span class="pre">subqueryload()</span></code>)?<a class="headerlink" href="#why-is-order-by-required-with-limit-especially-with-subqueryload" title="Permalink to this headline">¶</a></h2>
+<p>A relational database can return rows in any
+arbitrary order, when an explicit ordering is not set.
+While this ordering very often corresponds to the natural
+order of rows within a table, this is not the case for all databases and
+all queries.   The consequence of this is that any query that limits rows
+using <code class="docutils literal notranslate"><span class="pre">LIMIT</span></code> or <code class="docutils literal notranslate"><span class="pre">OFFSET</span></code> should <strong>always</strong> specify an <code class="docutils literal notranslate"><span class="pre">ORDER</span> <span class="pre">BY</span></code>.
+Otherwise, it is not deterministic which rows will actually be returned.</p>
+<p>When we use a SQLAlchemy method like <a class="reference internal" href="../orm/query.html#sqlalchemy.orm.query.Query.first" title="sqlalchemy.orm.query.Query.first"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Query.first()</span></code></a>, we are in fact
+applying a <code class="docutils literal notranslate"><span class="pre">LIMIT</span></code> of one to the query, so without an explicit ordering
+it is not deterministic what row we actually get back.
+While we may not notice this for simple queries on databases that usually
+returns rows in their natural
+order, it becomes much more of an issue if we also use <a class="reference internal" href="../orm/loading_relationships.html#sqlalchemy.orm.subqueryload" title="sqlalchemy.orm.subqueryload"><code class="xref py py-func docutils literal notranslate"><span class="pre">subqueryload()</span></code></a>
+to load related collections, and we may not be loading the collections
+as intended.</p>
+<p>SQLAlchemy implements <a class="reference internal" href="../orm/loading_relationships.html#sqlalchemy.orm.subqueryload" title="sqlalchemy.orm.subqueryload"><code class="xref py py-func docutils literal notranslate"><span class="pre">subqueryload()</span></code></a> by issuing a separate query,
+the results of which are matched up to the results from the first query.
+We see two queries emitted like this:</p>
+<div class="highlight-python+sql notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">subqueryload</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">addresses</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<div class='show_sql'>-- the &#34;main&#34; query
+SELECT users.id AS users_id
+FROM users
+</div><div class='show_sql'>-- the &#34;load&#34; query issued by subqueryload
+SELECT addresses.id AS addresses_id,
+       addresses.user_id AS addresses_user_id,
+       anon_1.users_id AS anon_1_users_id
+FROM (SELECT users.id AS users_id FROM users) AS anon_1
+JOIN addresses ON anon_1.users_id = addresses.user_id
+ORDER BY anon_1.users_id</div></pre></div>
+</div>
+<p>The second query embeds the first query as a source of rows.
+When the inner query uses <code class="docutils literal notranslate"><span class="pre">OFFSET</span></code> and/or <code class="docutils literal notranslate"><span class="pre">LIMIT</span></code> without ordering,
+the two queries may not see the same results:</p>
+<div class="highlight-python+sql notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">user</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">subqueryload</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">addresses</span><span class="p">))</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+<div class='show_sql'>-- the &#34;main&#34; query
+SELECT users.id AS users_id
+FROM users
+ LIMIT 1
+</div><div class='show_sql'>-- the &#34;load&#34; query issued by subqueryload
+SELECT addresses.id AS addresses_id,
+       addresses.user_id AS addresses_user_id,
+       anon_1.users_id AS anon_1_users_id
+FROM (SELECT users.id AS users_id FROM users LIMIT 1) AS anon_1
+JOIN addresses ON anon_1.users_id = addresses.user_id
+ORDER BY anon_1.users_id</div></pre></div>
+</div>
+<p>Depending on database specifics, there is
+a chance we may get a result like the following for the two queries:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span> <span class="n">query</span> <span class="c1">#1</span>
+<span class="o">+--------+</span>
+<span class="o">|</span><span class="n">users_id</span><span class="o">|</span>
+<span class="o">+--------+</span>
+<span class="o">|</span>       <span class="mi">1</span><span class="o">|</span>
+<span class="o">+--------+</span>
+
+<span class="o">--</span> <span class="n">query</span> <span class="c1">#2</span>
+<span class="o">+------------+-----------------+---------------+</span>
+<span class="o">|</span><span class="n">addresses_id</span><span class="o">|</span><span class="n">addresses_user_id</span><span class="o">|</span><span class="n">anon_1_users_id</span><span class="o">|</span>
+<span class="o">+------------+-----------------+---------------+</span>
+<span class="o">|</span>           <span class="mi">3</span><span class="o">|</span>                <span class="mi">2</span><span class="o">|</span>              <span class="mi">2</span><span class="o">|</span>
+<span class="o">+------------+-----------------+---------------+</span>
+<span class="o">|</span>           <span class="mi">4</span><span class="o">|</span>                <span class="mi">2</span><span class="o">|</span>              <span class="mi">2</span><span class="o">|</span>
+<span class="o">+------------+-----------------+---------------+</span></pre></div>
+</div>
+<p>Above, we receive two <code class="docutils literal notranslate"><span class="pre">addresses</span></code> rows for <code class="docutils literal notranslate"><span class="pre">user.id</span></code> of 2, and none for
+1.  We’ve wasted two rows and failed to actually load the collection.  This
+is an insidious error because without looking at the SQL and the results, the
+ORM will not show that there’s any issue; if we access the <code class="docutils literal notranslate"><span class="pre">addresses</span></code>
+for the <code class="docutils literal notranslate"><span class="pre">User</span></code> we have, it will emit a lazy load for the collection and we
+won’t see that anything actually went wrong.</p>
+<p>The solution to this problem is to always specify a deterministic sort order,
+so that the main query always returns the same set of rows. This generally
+means that you should <a class="reference internal" href="../orm/query.html#sqlalchemy.orm.query.Query.order_by" title="sqlalchemy.orm.query.Query.order_by"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Query.order_by()</span></code></a> on a unique column on the table.
+The primary key is a good choice for this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">subqueryload</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">addresses</span><span class="p">))</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span></pre></div>
+</div>
+<p>Note that the <a class="reference internal" href="../orm/loading_relationships.html#sqlalchemy.orm.joinedload" title="sqlalchemy.orm.joinedload"><code class="xref py py-func docutils literal notranslate"><span class="pre">joinedload()</span></code></a> eager loader strategy does not suffer from
+the same problem because only one query is ever issued, so the load query
+cannot be different from the main query.  Similarly, the <a class="reference internal" href="../orm/loading_relationships.html#sqlalchemy.orm.selectinload" title="sqlalchemy.orm.selectinload"><code class="xref py py-func docutils literal notranslate"><span class="pre">selectinload()</span></code></a>
+eager loader strategy also does not have this issue as it links its collection
+loads directly to primary key values just loaded.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="../orm/loading_relationships.html#subqueryload-ordering"><span class="std std-ref">The Importance of Ordering</span></a></p>
+</div>
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="sqlexpressions.html" title="previous chapter">SQL Expressions</a>
+        Next:
+        <a href="performance.html" title="next chapter">Performance</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+
