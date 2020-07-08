@@ -420,7 +420,7 @@ Via native HiveServer2 API:
 
 ### SQLServer
 
-Microsoft’s SQL Server JDBC drivers can be downloaded from the official site: [Microsoft JDBC Driver](https://msdn.microsoft.com/en-us/sqlserver/aa937724.aspx)
+Microsoft’s SQL Server JDBC drivers can be downloaded from the official site: [Microsoft JDBC Driver](https://docs.microsoft.com/en-us/sql/connect/jdbc/microsoft-jdbc-driver-for-sql-server)
 
     [[[sqlserver]]]
     name=SQLServer JDBC
