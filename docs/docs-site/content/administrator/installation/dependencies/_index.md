@@ -18,8 +18,18 @@ export PYTHON_VER=python3.8
 ```
 
 ### Database
-* [MySQL InnoDB or PostgreSQL or Oracle](https://www.cloudera.com/documentation/enterprise/latest/topics/hue_dbs_0.html)
 
+Hue is being ran the most with [MySQL InnoDB, PostgreSQL or Oracle](https://www.cloudera.com/documentation/enterprise/latest/topics/hue_dbs_0.html)
+
+**Note**: MySQL module
+
+With the recent OSs like Ubuntu 20.04 or using Python 3, the [MySQL-python](https://github.com/cloudera/hue/tree/master/desktop/core/ext-py/MySQL-python-1.2.5) lib won't compile properly and will produce an error similar to:
+
+    _mysql.c: Cannot open include file my_config.h
+
+The lib folder needs to be swapped with https://pypi.org/project/mysqlclient/. Unfortunately for licensing reason (GPL vs Apache) this can't be officially done in the Hue repository.
+
+Read [HUE-9390](https://issues.cloudera.org/browse/HUE-9390) for more details and the two commits doing this change.
 
 ### Ubuntu
 
