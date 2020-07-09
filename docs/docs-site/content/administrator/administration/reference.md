@@ -18,7 +18,9 @@ In practice ~50 users / Hue peak time is the rule of thumb. This is accounting f
 ![Reference Architecture](/images/hue_architecture.png)
 
 
-## General Performance
+## Performance
+
+### General
 
 * Hue must be behing a load balancer proxying static files. e.g. NGINX is used for the containers, Cloudera Hue ships with HTTPD.
 * Adding more Hue instances behind the load balancer will increase performances by 50 concurrent users.
@@ -41,7 +43,7 @@ e.g.
     [24/Jul/2019 14:17:32 +0000] resource     DEBUG    GET /jobs Got response in 151ms: {"total":0,"offset":1,"len":1,"coordinatorjobs":[]}
     [24/Jul/2019 14:17:32 +0000] access       INFO     127.0.0.1 romain - "POST /jobbrowser/api/jobs HTTP/1.1" returned in 157ms (mem: 164mb)
 
-## Query Editor Performance
+### Query Editor
 
 * Compare performance of the Hive Query Editor in Hue with the exact same query in a beeline shell against the exact same HiveServer2 instance that Hue is pointing to. This will determine if Hue needs to be investigated or HiveServer2 needs to be investigated.
 * Check the logging configuration for HiveServer2 by going to Hive service Configuration in Cloudera Manager. Search for HiveServer2 Logging Threshold and make sure that it is not set to DEBUG or TRACE. If it is, drop the logging level to INFO at a minimum.
@@ -58,7 +60,7 @@ Hue is often run with:
 * Gunicorn is coming with [HUE-8739](https://issues.cloudera.org/browse/HUE-8739)
 * [Apache mod Python](http://gethue.com/how-to-run-hue-with-the-apache-server/)
 
-## Hive and Impala queries life cycle
+## Queries life cycle
 
 But what happens to the query results? How long are they kept? Why do they disappear sometimes? Why are some Impala queries are still “in flight” even if they are completed?   Each query is using some resources in Impala or HiveServer2. When the users submit a lot of queries, they are going to add up and crash the servers if nothing is done. Here are the latest settings that you can tweak:
 
