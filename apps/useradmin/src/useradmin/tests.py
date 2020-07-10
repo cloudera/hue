@@ -177,6 +177,7 @@ class LdapTestConnection(object):
 
   class Data(object):
     def __init__(self):
+      long_username = create_long_username()
       self.users = {
         'moe': {'dn': 'uid=moe,ou=People,dc=example,dc=com', 'username':'moe', 'first':'Moe', 'email':'moe@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com']},
         'lårry': {'dn': 'uid=lårry,ou=People,dc=example,dc=com', 'username':'lårry', 'first':'Larry', 'last':'Stooge', 'email':'larry@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
@@ -188,19 +189,19 @@ class LdapTestConnection(object):
         'posix_person2': {'dn': 'uid=posix_person2,ou=People,dc=example,dc=com', 'username': 'posix_person2', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'},
         'user with space': {'dn': 'uid=user with space,ou=People,dc=example,dc=com', 'username': 'user with space', 'first': 'user', 'last': 'space', 'email': 'user@space.com'},
         'spaceless': {'dn': 'uid=user without space,ou=People,dc=example,dc=com', 'username': 'spaceless', 'first': 'user', 'last': 'space', 'email': 'user@space.com'},
-        'test_toolongusernametoolongusername': {'dn': 'uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com', 'username': 'test_toolongusernametoolongusername', 'first': 'toolong', 'last': 'username', 'email': 'toolong@username.com'},
+        long_username: {'dn': 'uid=' + long_username + ',ou=People,dc=example,dc=com', 'username': long_username, 'first': 'toolong', 'last': 'username', 'email': 'toolong@username.com'},
         'test_longfirstname': {'dn': 'uid=test_longfirstname,ou=People,dc=example,dc=com', 'username': 'test_longfirstname', 'first': 'test_longfirstname_test_longfirstname', 'last': 'username', 'email': 'toolong@username.com'},}
 
       self.groups = {
         'TestUsers': {
           'dn': 'cn=TestUsers,ou=Groups,dc=example,dc=com',
           'name':'TestUsers',
-          'members':['uid=moe,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com','uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com'],
+          'members':['uid=moe,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com','uid=' + long_username + ',ou=People,dc=example,dc=com'],
           'posix_members':[]},
         'Test Administrators': {
           'dn': 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com',
           'name':'Test Administrators',
-          'members':['uid=Rock,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com','uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com'],
+          'members':['uid=Rock,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com','uid=' + long_username + ',ou=People,dc=example,dc=com'],
           'posix_members':[]},
         'OtherGroup': {
           'dn': 'cn=OtherGroup,cn=TestUsers,ou=Groups,dc=example,dc=com',
@@ -237,6 +238,8 @@ class LdapTestConnection(object):
           'posix_members':['posix_person2']},
         }
 
+def create_long_username():
+  return "A" * 151
 
 def test_invalid_username():
   BAD_NAMES = ('-foo', 'foo:o', 'foo o', ' foo')
