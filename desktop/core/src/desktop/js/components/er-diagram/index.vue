@@ -32,11 +32,12 @@
               v-if="entity.type === EntityTypes.Table"
               :entity="entity"
               @click="entityClicked(entity)"
+              @updated="plotRelations()"
             />
             <LiteralEntity
               v-else-if="entity.type === EntityTypes.Literal"
               :entity="entity"
-              :data-erd-id="entity.id"
+              :data-entity-id="entity.id"
             />
           </div>
         </div>
@@ -46,8 +47,8 @@
           <path
             v-for="(relation, index) in relations"
             :key="index"
-            :data-erd-left="relation.left.id"
-            :data-erd-right="relation.right.id"
+            :data-entity-id-left="relation.left.id"
+            :data-entity-id-right="relation.right.id"
             class="relation-path"
           />
         </svg>
@@ -92,16 +93,18 @@
 
     getSelectorPosition(selector: string, offset: any): any {
       const element = this.$el.querySelector(selector);
-      const rect = element.getBoundingClientRect();
-      let x = rect.left;
-      let y = rect.top;
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        let x = rect.left;
+        let y = rect.top;
 
-      if (offset) {
-        x = x - offset.x;
-        y = y - offset.y + 1;
+        if (offset) {
+          x = x - offset.x;
+          y = y - offset.y + 1;
+        }
+
+        return { x, y };
       }
-
-      return { x, y };
     }
 
     plotRelations(): void {
@@ -110,18 +113,23 @@
 
       relationPaths.forEach((element: any) => {
         const leftPos = this.getSelectorPosition(
-          `[data-erd-id="${element.dataset.erdLeft}"] .right-point`,
+          `[data-entity-id~="${element.dataset.entityIdLeft}"] .right-point`,
           offset
         );
         const rightPos = this.getSelectorPosition(
-          `[data-erd-id="${element.dataset.erdRight}"] .left-point`,
+          `[data-entity-id~="${element.dataset.entityIdRight}"] .left-point`,
           offset
         );
 
-        const path: string = `M ${leftPos.x},${leftPos.y} C ${leftPos.x + CURVATURE},${leftPos.y}
-            ${rightPos.x - CURVATURE},${rightPos.y} ${rightPos.x},${rightPos.y}`;
+        if (leftPos && rightPos) {
+          const path: string = `M ${leftPos.x},${leftPos.y} C ${leftPos.x + CURVATURE},${leftPos.y}
+              ${rightPos.x - CURVATURE},${rightPos.y} ${rightPos.x},${rightPos.y}`;
+          element.setAttribute('d', path);
 
-        element.setAttribute('d', path);
+          element.style.visibility = 'visible';
+        } else {
+          element.style.visibility = 'hidden';
+        }
       });
     }
     updated(): void {

@@ -18,22 +18,33 @@
 
 <template>
   <div class="table-entity" @click="$emit('click')">
-    <div class="db-name">
+    <div :title="entity.database" class="db-name">
       {{ entity.database }}
     </div>
-    <div class="table-name">
+    <div :title="entity.name" class="table-name">
       {{ entity.name }}
     </div>
     <div class="columns-container">
       <div
-        v-for="column in entity.columns"
-        :key="column"
+        v-for="column in entity.columns.slice(0, maxColumns)"
+        :key="column.id"
+        :data-entity-id="column.id"
+        :title="column.name"
         class="column-entity"
-        :data-erd-id="entity.id + '.' + column"
       >
         <div class="left-point" />
         <div class="right-point" />
-        {{ column }}
+        {{ column.name }}
+      </div>
+      <div
+        v-if="entity.columns.length > maxColumns"
+        :data-entity-id="entity.columns.map(column => column.id).join(' ')"
+        class="grouped-columns"
+        @click.stop="expandColumns()"
+      >
+        <div class="left-point" />
+        <div class="right-point" />
+        +{{ entity.columns.length - maxColumns }} columns
       </div>
     </div>
   </div>
@@ -48,5 +59,14 @@
   @Component
   export default class TableEntity extends Vue {
     @Prop() entity: Table;
+    @Prop({ default: 10 }) maxColumns: number;
+
+    updated(): void {
+      this.$emit('updated');
+    }
+
+    expandColumns(): void {
+      this.maxColumns = Number.MAX_SAFE_INTEGER;
+    }
   }
 </script>
