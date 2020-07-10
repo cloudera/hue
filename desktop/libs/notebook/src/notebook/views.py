@@ -98,7 +98,7 @@ def notebook(request, is_embeddable=False):
       'is_embeddable': request.GET.get('is_embeddable', False),
       'options_json': json.dumps({
           'languages': get_ordered_interpreters(request.user),
-          'session_properties': SparkApi.get_properties(),
+          'session_properties': SparkApi.to_properties(),
           'is_optimizer_enabled': has_optimizer(),
           'is_wa_enabled': has_workload_analytics(),
           'is_navigator_enabled': has_catalog(request.user),
