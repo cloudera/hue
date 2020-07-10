@@ -25,9 +25,9 @@ export class Table implements IEntity {
 
   database: string;
   name: string;
-  columns: Array<string>;
+  columns: Array<Column>;
 
-  constructor(database: string, name: string, columns: Array<string>) {
+  constructor(database: string, name: string, columns: Array<Column>) {
     this.id = Table.buildId(database, name);
     this.database = database;
     this.name = name;

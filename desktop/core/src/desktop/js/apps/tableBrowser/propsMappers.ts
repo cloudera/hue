@@ -18,17 +18,39 @@
 
 import { Table, Column } from '../../components/er-diagram/lib/entities';
 
-function createTable(database: string, name: string, columns: Array<string>) {
+function createTable(database: string, name: string, columnNames: Array<string>) {
+  const tableId: string = Table.buildId(database, name);
+  const columns: Array<Column> = columnNames.map((columnName: string) => {
+    return new Column(tableId, columnName);
+  });
   return new Table(database, name, columns);
+}
+
+function reorderBasedOnKeys(
+  columnNames: Array<string>,
+  primaryKeys: Array<unknown>,
+  foreignKeys: Array<unknown>
+): Array<string> {
+  const keyWeight = {};
+
+  columnNames.forEach((key: unknown) => (keyWeight[key] = 0));
+  foreignKeys.forEach((key: unknown) => (keyWeight[key.name] = 1));
+  primaryKeys.forEach((key: unknown) => (keyWeight[key.name] = 2));
+
+  columnNames.sort((a, b) => keyWeight[b] - keyWeight[a]);
+
+  return columnNames;
 }
 
 function getTables(
   fromDB: string,
   fromTableName: string,
-  columns: Array<string>,
+  columnNames: Array<string>,
+  primaryKeys: Array<unknown>,
   foreignKeys: Array<unknown>
 ) {
-  const fromTable = createTable(fromDB, fromTableName, columns);
+  columnNames = reorderBasedOnKeys(columnNames, primaryKeys, foreignKeys);
+  const fromTable = createTable(fromDB, fromTableName, columnNames);
   const tables = [fromTable];
   const createdTableIdSet = new Set([fromTable.id]);
 
@@ -69,6 +91,7 @@ export function tableERD(catalogEntry: unknown): unknown {
       fromDB,
       fromTable,
       catalogEntry.sourceMeta.columns,
+      catalogEntry.sourceMeta.primary_keys,
       catalogEntry.sourceMeta.foreign_keys
     ),
     relations: getForeignKeyRelations(fromDB, fromTable, catalogEntry.sourceMeta.foreign_keys)
