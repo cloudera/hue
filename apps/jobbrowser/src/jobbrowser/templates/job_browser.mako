@@ -3913,7 +3913,7 @@ ${ render_bundle('jobBrowser') | n,unicode }
           return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
         var queryHiveInterfaceCondition = function () {
-          return '${ ENABLE_HIVE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('hive') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+          return '${ ENABLE_HIVE_QUERY_BROWSER.get() }' == 'True';
         };
         var scheduleHiveInterfaceCondition = function () {
           return '${ ENABLE_QUERY_SCHEDULING.get() }' == 'True';
