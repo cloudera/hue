@@ -39,12 +39,24 @@ class HiveQueryApi(Api):
     self.cluster=cluster
 
   def apps(self, filters):
-    jobs = []
-
-    print(HiveQuery.objects.using('query').all())
 
     apps = {
-      'apps': [],
+      'apps': [{
+          'id': query.query_id,
+          'name': query.query.replace('\r\n', ' ')[:60] + ('...' if len(query.query) > 60 else ''),
+          'status': query.status,
+          'apiStatus': self._api_status(query.status),
+          'type': 'LLAP' if query.llap_app_id else 'Tez',
+          'user': query.request_user,
+          'queue': query.queue_name,
+          'progress': '100',
+          'isRunning': False,
+          'canWrite': False,
+          'duration': query.elapsed_time,
+          'submitted': query.start_time,
+        }
+        for query in HiveQuery.objects.using('query').order_by('-id')[:100]
+      ],
       'total': 0
     }
 
@@ -121,7 +133,7 @@ ListSink
     return 'RUNNING' if job['status'] != 'FINISHED' else "FINISHED"
 
   def _api_status(self, status):
-    if status == 'FINISHED':
+    if status == 'SUCCESS':
       return 'SUCCEEDED'
     elif status == 'EXCEPTION':
       return 'FAILED'
