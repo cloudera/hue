@@ -26,6 +26,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.python_util import current_ms_from_utc
 
 from jobbrowser.apis.base_api import Api
+from jobbrowser.models import HiveQuery
 
 
 LOG = logging.getLogger(__name__)
@@ -39,6 +40,8 @@ class HiveQueryApi(Api):
 
   def apps(self, filters):
     jobs = []
+
+    print(HiveQuery.objects.all())
 
     apps = {
       'apps': [],

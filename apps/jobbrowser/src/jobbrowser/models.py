@@ -24,17 +24,17 @@ import math
 import functools
 import re
 
+from django.db import connection, models
 from django.urls import reverse
-from desktop.conf import REST_CONN_TIMEOUT
-from desktop.lib.view_util import format_duration_in_millis
-from desktop.lib import i18n
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
-from desktop.lib.view_util import location_to_url
+from desktop.auth.backend import is_admin
+from desktop.conf import REST_CONN_TIMEOUT
+from desktop.lib import i18n
+from desktop.lib.view_util import format_duration_in_millis, location_to_url
 
 from jobbrowser.conf import DISABLE_KILLING_JOBS
-from desktop.auth.backend import is_admin
 
 
 LOG = logging.getLogger(__name__)
@@ -83,7 +83,9 @@ def can_kill_job(self, user):
 # Feel free to rename the models, but don't rename db_table values or field names.
 
 class HiveQuery(models.Model):
-    query_id = models.CharField(unique=True, max_length=512, blank=True, null=True)
+    # (mysql.E001) MySQL does not allow unique CharFields to have a max_length > 255.
+    # query_id = models.CharField(unique=True, max_length=512, blank=True, null=True)
+    query_id = models.CharField(unique=True, max_length=255, blank=True, null=True)
     query = models.TextField(blank=True, null=True)
     query_fts = models.TextField(blank=True, null=True)  # This field type is a guess.
     start_time = models.BigIntegerField(blank=True, null=True)
@@ -125,7 +127,7 @@ class HiveQuery(models.Model):
 
 
 class QueryDetails(models.Model):
-    hive_query = models.ForeignKey(HiveQuery, models.HiveQuery, unique=True, blank=True, null=True)
+    hive_query = models.ForeignKey(HiveQuery, HiveQuery, unique=True, blank=True, null=True)
     explain_plan_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
     configuration_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
     perf = models.TextField(blank=True, null=True)  # This field type is a guess.
@@ -137,24 +139,10 @@ class QueryDetails(models.Model):
         db_table = 'query_details'
 
 
-class DagDetails(models.Model):
-    dag_info = models.ForeignKey('DagInfo', models.DagInfo, unique=True, blank=True, null=True)
-    hive_query = models.ForeignKey('HiveQuery', models.HiveQuery, blank=True, null=True)
-    dag_plan_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
-    vertex_name_id_mapping_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
-    diagnostics = models.TextField(blank=True, null=True)
-    counters_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
-    dag_plan_compressed = models.BinaryField(blank=True, null=True)
-    vertex_name_id_mapping_compressed = models.BinaryField(blank=True, null=True)
-    counters_compressed = models.BinaryField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'dag_details'
-
-
 class DagInfo(models.Model):
-    dag_id = models.CharField(unique=True, max_length=512, blank=True, null=True)
+    # (mysql.E001) MySQL does not allow unique CharFields to have a max_length > 255.
+    # dag_id = models.CharField(unique=True, max_length=512, blank=True, null=True)
+    dag_id = models.CharField(unique=True, max_length=255, blank=True, null=True)
     dag_name = models.CharField(max_length=512, blank=True, null=True)
     application_id = models.CharField(max_length=512, blank=True, null=True)
     init_time = models.BigIntegerField(blank=True, null=True)
@@ -167,13 +155,29 @@ class DagInfo(models.Model):
     queue_name = models.CharField(max_length=64, blank=True, null=True)
     caller_id = models.CharField(max_length=512, blank=True, null=True)
     caller_type = models.CharField(max_length=128, blank=True, null=True)
-    hive_query = models.ForeignKey('HiveQuery', models.HiveQuery, blank=True, null=True)
+    hive_query = models.ForeignKey('HiveQuery', HiveQuery, blank=True, null=True)
     created_at = models.DateTimeField(blank=True, null=True)
     source_file = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'dag_info'
+
+
+class DagDetails(models.Model):
+    dag_info = models.ForeignKey('DagInfo', DagInfo, unique=True, blank=True, null=True)
+    hive_query = models.ForeignKey('HiveQuery', HiveQuery, blank=True, null=True)
+    dag_plan_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
+    vertex_name_id_mapping_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
+    diagnostics = models.TextField(blank=True, null=True)
+    counters_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
+    dag_plan_compressed = models.BinaryField(blank=True, null=True)
+    vertex_name_id_mapping_compressed = models.BinaryField(blank=True, null=True)
+    counters_compressed = models.BinaryField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'dag_details'
 
 
 class LinkJobLogs(object):
