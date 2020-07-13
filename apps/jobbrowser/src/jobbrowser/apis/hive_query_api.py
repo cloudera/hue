@@ -41,7 +41,7 @@ class HiveQueryApi(Api):
   def apps(self, filters):
     jobs = []
 
-    print(HiveQuery.objects.all())
+    print(HiveQuery.objects.using('query').all())
 
     apps = {
       'apps': [],
