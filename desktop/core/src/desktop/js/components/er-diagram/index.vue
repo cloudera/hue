@@ -64,7 +64,7 @@
   import { IEntity, IRelation } from './lib/interfaces';
   import { EntityTypes } from './lib/enums';
 
-  import { toggleFullScreen } from 'utils/hueUtils';
+  import { toggleFullScreen } from '../../utils/hueUtils';
 
   import TableEntity from './comps/table-entity.vue';
   import LiteralEntity from './comps/literal-entity.vue';
