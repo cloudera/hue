@@ -58,7 +58,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-spinedit.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-slider.css') }">
 
-${ render_bundle('vendors~jobBrowser') | n,unicode }
+${ render_bundle('vendors~jobBrowser~tableBrowser') | n,unicode }
 ${ render_bundle('jobBrowser') | n,unicode }
 
 <script src="${ static('desktop/ext/js/bootstrap-datepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
