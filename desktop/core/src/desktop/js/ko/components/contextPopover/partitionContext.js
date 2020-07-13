@@ -34,7 +34,7 @@ export const PARTITION_CONTEXT_TEMPLATE = `
         <div class="context-popover-attribute"><div>${ I18n('Created') }</div><div data-bind="text: created"></div></div>
       </div>
       <!-- ko if: description -->
-      <div class="context-popover-doc-description" data-bind="html: description"></div>
+      <div class="context-popover-doc-description" data-bind="text: description"></div>
       <!-- /ko -->
       <div class="context-popover-flex-fill">
         <table id="partitionsTable" class="table table-condensed table-nowrap">

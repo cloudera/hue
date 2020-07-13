@@ -94,32 +94,35 @@ export const html2text = value => {
     .replace(/\u00A0/g, ' ');
 };
 
-export const goFullScreen = () => {
-  if (
-    !document.fullscreenElement &&
-    !document.mozFullScreenElement &&
-    !document.webkitFullscreenElement &&
-    !document.msFullscreenElement
-  ) {
-    if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen();
-    } else if (document.documentElement.msRequestFullscreen) {
-      document.documentElement.msRequestFullscreen();
-    } else if (document.documentElement.mozRequestFullScreen) {
-      document.documentElement.mozRequestFullScreen();
-    } else if (document.documentElement.webkitRequestFullscreen) {
-      document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+export const isFullScreen = () => {
+  return (
+    document.fullscreenElement ||
+    document.mozFullScreenElement ||
+    document.webkitFullscreenElement ||
+    document.msFullscreenElement
+  );
+};
+
+export const goFullScreen = element => {
+  if (!element) {
+    element = document.documentElement;
+  }
+
+  if (!isFullScreen()) {
+    if (element.requestFullscreen) {
+      element.requestFullscreen();
+    } else if (element.msRequestFullscreen) {
+      element.msRequestFullscreen();
+    } else if (element.mozRequestFullScreen) {
+      element.mozRequestFullScreen();
+    } else if (element.webkitRequestFullscreen) {
+      element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
     }
   }
 };
 
 export const exitFullScreen = () => {
-  if (
-    document.fullscreenElement ||
-    document.mozFullScreenElement ||
-    document.webkitFullscreenElement ||
-    document.msFullscreenElement
-  ) {
+  if (isFullScreen()) {
     if (document.exitFullscreen) {
       document.exitFullscreen();
     } else if (document.msExitFullscreen) {
@@ -129,6 +132,14 @@ export const exitFullScreen = () => {
     } else if (document.webkitExitFullscreen) {
       document.webkitExitFullscreen();
     }
+  }
+};
+
+export const toggleFullScreen = element => {
+  if (isFullScreen()) {
+    exitFullScreen();
+  } else {
+    goFullScreen(element);
   }
 };
 
@@ -584,8 +595,10 @@ export default {
   text2Url: text2Url,
   htmlEncode: htmlEncode,
   html2text: html2text,
+  isFullScreen: isFullScreen,
   goFullScreen: goFullScreen,
   exitFullScreen: exitFullScreen,
+  toggleFullScreen: toggleFullScreen,
   changeURL: changeURL,
   replaceURL: replaceURL,
   changeURLParameter: changeURLParameter,

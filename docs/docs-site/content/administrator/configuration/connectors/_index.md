@@ -426,7 +426,7 @@ Then give Hue the information about the database source:
 
 Alternative:
 
-Microsoft’s SQL Server JDBC drivers can be downloaded from the official site: [Microsoft JDBC Driver](https://msdn.microsoft.com/en-us/sqlserver/aa937724.aspx)
+Microsoft’s SQL Server JDBC drivers can be downloaded from the official site: [Microsoft JDBC Driver](https://docs.microsoft.com/en-us/sql/connect/jdbc/microsoft-jdbc-driver-for-sql-server)
 
     [[[sqlserver]]]
     name=SQLServer JDBC
@@ -484,7 +484,8 @@ Grant the appropriate hbase rights to the 'hue' user, e.g.:
 
 With impersonation:
 
-        options='{"url": "phoenix://sql-phoenix.gethue.com:8765", "has_impersonation": true}'
+    options='{"url": "phoenix://sql-phoenix.gethue.com:8765", "has_impersonation": true}'
+
 
 **Notes**
 

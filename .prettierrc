@@ -2,5 +2,6 @@
   "printWidth": 100,
   "singleQuote": true,
   "trailingComma": "none",
-  "arrowParens": "avoid"
+  "arrowParens": "avoid",
+  "vueIndentScriptAndStyle": true
 }

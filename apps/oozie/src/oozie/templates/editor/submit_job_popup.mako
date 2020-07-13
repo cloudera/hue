@@ -39,7 +39,7 @@
           % endfor
           <div class="fieldWrapper">
             <div class="row-fluid
-              % if form['name'].form.initial.get('name') == 'oozie.use.system.libpath':
+              % if form['name'].form.initial.get('name').startswith('oozie.') or form['name'].form.initial.get('name') in form.RERUN_HIDE_PARAMETERS:
                 hide
               % endif
               ">

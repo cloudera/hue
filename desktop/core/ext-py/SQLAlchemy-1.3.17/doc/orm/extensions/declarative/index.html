@@ -1,0 +1,270 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    Declarative
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+        <link rel="copyright" title="Copyright" href="../../../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../../../index.html" />
+        <link rel="up" title="ORM Extensions" href="../index.html" />
+        <link rel="next" title="Basic Use" href="basic_use.html" />
+        <link rel="prev" title="Baked Queries" href="../baked.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../../../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../../../contents.html">Contents</a> |
+                <a href="../../../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../../../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="../../index.html" title="SQLAlchemy ORM">SQLAlchemy ORM</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="../../tutorial.html">Object Relational Tutorial</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../../mapper_config.html">Mapper Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../../relationships.html">Relationship Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../../loading_objects.html">Loading Objects</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../../session.html">Using the Session</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../../extending.html">Events and Internals</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../index.html">ORM Extensions</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="../associationproxy.html">Association Proxy</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../automap.html">Automap</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../baked.html">Baked Queries</a></span></li>
+<li class="selected"><span class="link-container"><strong>Declarative</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="basic_use.html">Basic Use</a></span></li>
+<li><span class="link-container"><a class="reference external" href="relationships.html">Configuring Relationships</a></span></li>
+<li><span class="link-container"><a class="reference external" href="table_config.html">Table Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="inheritance.html">Inheritance Configuration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="mixins.html">Mixin and Custom Base Classes</a></span></li>
+<li><span class="link-container"><a class="reference external" href="api.html">Declarative API</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="../mutable.html">Mutation Tracking</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../orderinglist.html">Ordering List</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../horizontal_shard.html">Horizontal Sharding</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../hybrid.html">Hybrid Attributes</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../indexable.html">Indexable</a></span></li>
+<li><span class="link-container"><a class="reference external" href="../instrumentation.html">Alternate Class Instrumentation</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="../../examples.html">ORM Examples</a></span></li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="declarative">
+<span id="declarative-toplevel"></span><h1>Declarative<a class="headerlink" href="#declarative" title="Permalink to this headline">¶</a></h1>
+<p>The Declarative system is the typically used system provided by the SQLAlchemy
+ORM in order to define classes mapped to relational database tables.  However,
+as noted in <a class="reference internal" href="../../mapping_styles.html#classical-mapping"><span class="std std-ref">Classical Mappings</span></a>, Declarative is in fact a series of
+extensions that ride on top of the SQLAlchemy <a class="reference internal" href="../../mapping_api.html#sqlalchemy.orm.mapper" title="sqlalchemy.orm.mapper"><code class="xref py py-func docutils literal notranslate"><span class="pre">mapper()</span></code></a> construct.</p>
+<p>While the documentation typically refers to Declarative for most examples,
+the following sections will provide detailed information on how the
+Declarative API interacts with the basic <a class="reference internal" href="../../mapping_api.html#sqlalchemy.orm.mapper" title="sqlalchemy.orm.mapper"><code class="xref py py-func docutils literal notranslate"><span class="pre">mapper()</span></code></a> and Core <a class="reference internal" href="../../../core/metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a>
+systems, as well as how sophisticated patterns can be built using systems
+such as mixins.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="basic_use.html">Basic Use</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="basic_use.html#defining-attributes">Defining Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basic_use.html#accessing-the-metadata">Accessing the MetaData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basic_use.html#class-constructor">Class Constructor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basic_use.html#mapper-configuration">Mapper Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basic_use.html#defining-sql-expressions">Defining SQL Expressions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="relationships.html">Configuring Relationships</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="relationships.html#evaluation-of-relationship-arguments">Evaluation of relationship arguments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="relationships.html#configuring-many-to-many-relationships">Configuring Many-to-Many Relationships</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="table_config.html">Table Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="table_config.html#using-a-hybrid-approach-with-table">Using a Hybrid Approach with __table__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="table_config.html#using-reflection-with-declarative">Using Reflection with Declarative</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="inheritance.html">Inheritance Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="inheritance.html#joined-table-inheritance">Joined Table Inheritance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inheritance.html#single-table-inheritance">Single Table Inheritance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inheritance.html#concrete-table-inheritance">Concrete Table Inheritance</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mixins.html">Mixin and Custom Base Classes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mixins.html#augmenting-the-base">Augmenting the Base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mixins.html#mixing-in-columns">Mixing in Columns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mixins.html#mixing-in-relationships">Mixing in Relationships</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mixins.html#mixing-in-deferred-column-property-and-other-mapperproperty-classes">Mixing in deferred(), column_property(), and other MapperProperty classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mixins.html#mixing-in-association-proxy-and-other-attributes">Mixing in Association Proxy and Other Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mixins.html#controlling-table-inheritance-with-mixins">Controlling table inheritance with mixins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mixins.html#mixing-in-columns-in-inheritance-scenarios">Mixing in Columns in Inheritance Scenarios</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mixins.html#combining-table-mapper-arguments-from-multiple-mixins">Combining Table/Mapper Arguments from Multiple Mixins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mixins.html#creating-indexes-with-mixins">Creating Indexes with Mixins</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Declarative API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#api-reference">API Reference</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="../baked.html" title="previous chapter">Baked Queries</a>
+        Next:
+        <a href="basic_use.html" title="next chapter">Basic Use</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../../../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../../../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../../../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../../../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

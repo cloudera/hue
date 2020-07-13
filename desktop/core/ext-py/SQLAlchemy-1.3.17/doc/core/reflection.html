@@ -1,0 +1,814 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    Reflecting Database Objects
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+        <link rel="up" title="Schema Definition Language" href="schema.html" />
+        <link rel="next" title="Column INSERT/UPDATE Defaults" href="defaults.html" />
+        <link rel="prev" title="Describing Databases with MetaData" href="metadata.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../contents.html">Contents</a> |
+                <a href="../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="index.html" title="SQLAlchemy Core">SQLAlchemy Core</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="tutorial.html">SQL Expression Language Tutorial</a></span></li>
+<li><span class="link-container"><a class="reference external" href="expression_api.html">SQL Statements and Expressions API</a></span></li>
+<li><span class="link-container"><a class="reference external" href="schema.html">Schema Definition Language</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="metadata.html">Describing Databases with MetaData</a></span></li>
+<li class="selected"><span class="link-container"><strong>Reflecting Database Objects</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#overriding-reflected-columns">Overriding Reflected Columns</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#reflecting-views">Reflecting Views</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#reflecting-all-tables-at-once">Reflecting All Tables at Once</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#fine-grained-reflection-with-inspector">Fine Grained Reflection with Inspector</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#limitations-of-reflection">Limitations of Reflection</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="defaults.html">Column INSERT/UPDATE Defaults</a></span></li>
+<li><span class="link-container"><a class="reference external" href="constraints.html">Defining Constraints and Indexes</a></span></li>
+<li><span class="link-container"><a class="reference external" href="ddl.html">Customizing DDL</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="types.html">Column and Data Types</a></span></li>
+<li><span class="link-container"><a class="reference external" href="engines_connections.html">Engine and Connection Use</a></span></li>
+<li><span class="link-container"><a class="reference external" href="api_basics.html">Core API Basics</a></span></li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="reflecting-database-objects">
+<span id="metadata-reflection"></span><span id="metadata-reflection-toplevel"></span><h1>Reflecting Database Objects<a class="headerlink" href="#reflecting-database-objects" title="Permalink to this headline">¶</a></h1>
+<p>A <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> object can be instructed to load
+information about itself from the corresponding database schema object already
+existing within the database. This process is called <em>reflection</em>. In the
+most simple case you need only specify the table name, a <a class="reference internal" href="metadata.html#sqlalchemy.schema.MetaData" title="sqlalchemy.schema.MetaData"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetaData</span></code></a>
+object, and the <code class="docutils literal notranslate"><span class="pre">autoload=True</span></code> flag. If the
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.MetaData" title="sqlalchemy.schema.MetaData"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetaData</span></code></a> is not persistently bound, also add the
+<code class="docutils literal notranslate"><span class="pre">autoload_with</span></code> argument:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">messages</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s1">&#39;messages&#39;</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">autoload</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoload_with</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">messages</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+<span class="go">[&#39;message_id&#39;, &#39;message_name&#39;, &#39;date&#39;]</span></pre></div>
+</div>
+<p>The above operation will use the given engine to query the database for
+information about the <code class="docutils literal notranslate"><span class="pre">messages</span></code> table, and will then generate
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>, <a class="reference internal" href="constraints.html#sqlalchemy.schema.ForeignKey" title="sqlalchemy.schema.ForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a>,
+and other objects corresponding to this information as though the
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> object were hand-constructed in Python.</p>
+<p>When tables are reflected, if a given table references another one via foreign
+key, a second <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> object is created within the
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.MetaData" title="sqlalchemy.schema.MetaData"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetaData</span></code></a> object representing the connection.
+Below, assume the table <code class="docutils literal notranslate"><span class="pre">shopping_cart_items</span></code> references a table named
+<code class="docutils literal notranslate"><span class="pre">shopping_carts</span></code>. Reflecting the <code class="docutils literal notranslate"><span class="pre">shopping_cart_items</span></code> table has the
+effect such that the <code class="docutils literal notranslate"><span class="pre">shopping_carts</span></code> table will also be loaded:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">shopping_cart_items</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s1">&#39;shopping_cart_items&#39;</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">autoload</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoload_with</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;shopping_carts&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+<span class="go">True</span></pre></div>
+</div>
+<p>The <a class="reference internal" href="metadata.html#sqlalchemy.schema.MetaData" title="sqlalchemy.schema.MetaData"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetaData</span></code></a> has an interesting “singleton-like”
+behavior such that if you requested both tables individually,
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.MetaData" title="sqlalchemy.schema.MetaData"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetaData</span></code></a> will ensure that exactly one
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> object is created for each distinct table
+name. The <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> constructor actually returns to
+you the already-existing <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> object if one
+already exists with the given name. Such as below, we can access the already
+generated <code class="docutils literal notranslate"><span class="pre">shopping_carts</span></code> table just by naming it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">shopping_carts</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s1">&#39;shopping_carts&#39;</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span></pre></div>
+</div>
+<p>Of course, it’s a good idea to use <code class="docutils literal notranslate"><span class="pre">autoload=True</span></code> with the above table
+regardless. This is so that the table’s attributes will be loaded if they have
+not been already. The autoload operation only occurs for the table if it
+hasn’t already been loaded; once loaded, new calls to
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> with the same name will not re-issue any
+reflection queries.</p>
+<div class="section" id="overriding-reflected-columns">
+<span id="reflection-overriding-columns"></span><h2>Overriding Reflected Columns<a class="headerlink" href="#overriding-reflected-columns" title="Permalink to this headline">¶</a></h2>
+<p>Individual columns can be overridden with explicit values when reflecting
+tables; this is handy for specifying custom datatypes, constraints such as
+primary keys that may not be configured within the database, etc.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mytable</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s1">&#39;mytable&#39;</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span>
+<span class="gp">... </span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>   <span class="c1"># override reflected &#39;id&#39; to have primary key</span>
+<span class="gp">... </span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;mydata&#39;</span><span class="p">,</span> <span class="n">Unicode</span><span class="p">(</span><span class="mi">50</span><span class="p">)),</span>    <span class="c1"># override reflected &#39;mydata&#39; to be Unicode</span>
+<span class="gp">... </span><span class="c1"># additional Column objects which require no change are reflected normally</span>
+<span class="gp">... </span><span class="n">autoload_with</span><span class="o">=</span><span class="n">some_engine</span><span class="p">)</span></pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="custom_types.html#custom-and-decorated-types-reflection"><span class="std std-ref">Working with Custom Types and Reflection</span></a> - illustrates how the above
+column override technique applies to the use of custom datatypes with
+table reflection.</p>
+</div>
+</div>
+<div class="section" id="reflecting-views">
+<h2>Reflecting Views<a class="headerlink" href="#reflecting-views" title="Permalink to this headline">¶</a></h2>
+<p>The reflection system can also reflect views. Basic usage is the same as that
+of a table:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_view</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s2">&quot;some_view&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">autoload</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></pre></div>
+</div>
+<p>Above, <code class="docutils literal notranslate"><span class="pre">my_view</span></code> is a <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> object with
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a> objects representing the names and types of
+each column within the view “some_view”.</p>
+<p>Usually, it’s desired to have at least a primary key constraint when
+reflecting a view, if not foreign keys as well. View reflection doesn’t
+extrapolate these constraints.</p>
+<p>Use the “override” technique for this, specifying explicitly those columns
+which are part of the primary key or have foreign key constraints:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_view</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s2">&quot;some_view&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;view_id&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;related_thing&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;othertable.thing_id&quot;</span><span class="p">)),</span>
+                <span class="n">autoload</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="reflecting-all-tables-at-once">
+<h2>Reflecting All Tables at Once<a class="headerlink" href="#reflecting-all-tables-at-once" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="metadata.html#sqlalchemy.schema.MetaData" title="sqlalchemy.schema.MetaData"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetaData</span></code></a> object can also get a listing of
+tables and reflect the full set. This is achieved by using the
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.MetaData.reflect" title="sqlalchemy.schema.MetaData.reflect"><code class="xref py py-func docutils literal notranslate"><span class="pre">reflect()</span></code></a> method. After calling it, all
+located tables are present within the <a class="reference internal" href="metadata.html#sqlalchemy.schema.MetaData" title="sqlalchemy.schema.MetaData"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetaData</span></code></a>
+object’s dictionary of tables:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">meta</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">()</span>
+<span class="n">meta</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">someengine</span><span class="p">)</span>
+<span class="n">users_table</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="s1">&#39;users&#39;</span><span class="p">]</span>
+<span class="n">addresses_table</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="s1">&#39;addresses&#39;</span><span class="p">]</span></pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">metadata.reflect()</span></code> also provides a handy way to clear or delete all the rows in a database:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">meta</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">()</span>
+<span class="n">meta</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">someengine</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">sorted_tables</span><span class="p">):</span>
+    <span class="n">someengine</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">delete</span><span class="p">())</span></pre></div>
+</div>
+</div>
+<div class="section" id="fine-grained-reflection-with-inspector">
+<span id="metadata-reflection-inspector"></span><h2>Fine Grained Reflection with Inspector<a class="headerlink" href="#fine-grained-reflection-with-inspector" title="Permalink to this headline">¶</a></h2>
+<p>A low level interface which provides a backend-agnostic system of loading
+lists of schema, table, column, and constraint descriptions from a given
+database is also available. This is known as the “Inspector”:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">create_engine</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.engine</span> <span class="k">import</span> <span class="n">reflection</span>
+<span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;...&#39;</span><span class="p">)</span>
+<span class="n">insp</span> <span class="o">=</span> <span class="n">reflection</span><span class="o">.</span><span class="n">Inspector</span><span class="o">.</span><span class="n">from_engine</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">insp</span><span class="o">.</span><span class="n">get_table_names</span><span class="p">())</span></pre></div>
+</div>
+<dl class="py class">
+<dt id="sqlalchemy.engine.reflection.Inspector">
+<em class="property">class </em><code class="sig-prename descclassname">sqlalchemy.engine.reflection.</code><code class="sig-name descname">Inspector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bind</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs database schema inspection.</p>
+<p>The Inspector acts as a proxy to the reflection methods of the
+<a class="reference internal" href="internals.html#sqlalchemy.engine.interfaces.Dialect" title="sqlalchemy.engine.interfaces.Dialect"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dialect</span></code></a>, providing a
+consistent interface as well as caching support for previously
+fetched metadata.</p>
+<p>A <a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector" title="sqlalchemy.engine.reflection.Inspector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Inspector</span></code></a> object is usually created via the
+<a class="reference internal" href="inspection.html#sqlalchemy.inspect" title="sqlalchemy.inspect"><code class="xref py py-func docutils literal notranslate"><span class="pre">inspect()</span></code></a> function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">inspect</span><span class="p">,</span> <span class="n">create_engine</span>
+<span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;...&#39;</span><span class="p">)</span>
+<span class="n">insp</span> <span class="o">=</span> <span class="n">inspect</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span></pre></div>
+</div>
+<p>The inspection method above is equivalent to using the
+<a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector.from_engine" title="sqlalchemy.engine.reflection.Inspector.from_engine"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Inspector.from_engine()</span></code></a> method, i.e.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;...&#39;</span><span class="p">)</span>
+<span class="n">insp</span> <span class="o">=</span> <span class="n">Inspector</span><span class="o">.</span><span class="n">from_engine</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span></pre></div>
+</div>
+<p>Where above, the <a class="reference internal" href="internals.html#sqlalchemy.engine.interfaces.Dialect" title="sqlalchemy.engine.interfaces.Dialect"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dialect</span></code></a> may opt
+to return an <a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector" title="sqlalchemy.engine.reflection.Inspector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Inspector</span></code></a>
+subclass that provides additional
+methods specific to the dialect’s target database.</p>
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.__init__">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bind</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a new <a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector" title="sqlalchemy.engine.reflection.Inspector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Inspector</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.params.bind"></span><strong>bind</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.params.bind">¶</a> – a <a class="reference internal" href="connections.html#sqlalchemy.engine.Connectable" title="sqlalchemy.engine.Connectable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Connectable</span></code></a>,
+which is typically an instance of
+<a class="reference internal" href="connections.html#sqlalchemy.engine.Engine" title="sqlalchemy.engine.Engine"><code class="xref py py-class docutils literal notranslate"><span class="pre">Engine</span></code></a> or
+<a class="reference internal" href="connections.html#sqlalchemy.engine.Connection" title="sqlalchemy.engine.Connection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Connection</span></code></a>.</p>
+</dd>
+</dl>
+<p>For a dialect-specific instance of <a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector" title="sqlalchemy.engine.reflection.Inspector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Inspector</span></code></a>, see
+<a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector.from_engine" title="sqlalchemy.engine.reflection.Inspector.from_engine"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Inspector.from_engine()</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sqlalchemy.engine.reflection.Inspector.default_schema_name">
+<em class="property">attribute </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">default_schema_name</code><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.default_schema_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the default schema name presented by the dialect
+for the current engine’s database user.</p>
+<p>E.g. this is typically <code class="docutils literal notranslate"><span class="pre">public</span></code> for PostgreSQL and <code class="docutils literal notranslate"><span class="pre">dbo</span></code>
+for SQL Server.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.from_engine">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><em class="property">classmethod </em><code class="sig-name descname">from_engine</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bind</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.from_engine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a new dialect-specific Inspector object from the given
+engine or connection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.from_engine.params.bind"></span><strong>bind</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.from_engine.params.bind">¶</a> – a <a class="reference internal" href="connections.html#sqlalchemy.engine.Connectable" title="sqlalchemy.engine.Connectable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Connectable</span></code></a>,
+which is typically an instance of
+<a class="reference internal" href="connections.html#sqlalchemy.engine.Engine" title="sqlalchemy.engine.Engine"><code class="xref py py-class docutils literal notranslate"><span class="pre">Engine</span></code></a> or
+<a class="reference internal" href="connections.html#sqlalchemy.engine.Connection" title="sqlalchemy.engine.Connection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Connection</span></code></a>.</p>
+</dd>
+</dl>
+<p>This method differs from direct a direct constructor call of
+<a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector" title="sqlalchemy.engine.reflection.Inspector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Inspector</span></code></a> in that the
+<a class="reference internal" href="internals.html#sqlalchemy.engine.interfaces.Dialect" title="sqlalchemy.engine.interfaces.Dialect"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dialect</span></code></a> is given a chance to
+provide a dialect-specific <a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector" title="sqlalchemy.engine.reflection.Inspector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Inspector</span></code></a> instance,
+which may
+provide additional methods.</p>
+<p>See the example at <a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector" title="sqlalchemy.engine.reflection.Inspector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Inspector</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.get_check_constraints">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">get_check_constraints</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table_name</span></em>, <em class="sig-param"><span class="n">schema</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.get_check_constraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return information about check constraints in <cite>table_name</cite>.</p>
+<p>Given a string <cite>table_name</cite> and an optional string <cite>schema</cite>, return
+check constraint information as a list of dicts with these keys:</p>
+<dl>
+<dt>name</dt><dd><p>the check constraint’s name</p>
+</dd>
+<dt>sqltext</dt><dd><p>the check constraint’s SQL expression</p>
+</dd>
+<dt>dialect_options</dt><dd><p>may or may not be present; a dictionary with additional
+dialect-specific options for this CHECK constraint</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.3.8.</span></p>
+</div>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_check_constraints.params.table_name"></span><strong>table_name</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_check_constraints.params.table_name">¶</a> – string name of the table.  For special quoting,
+use <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.elements.quoted_name" title="sqlalchemy.sql.elements.quoted_name"><code class="xref py py-class docutils literal notranslate"><span class="pre">quoted_name</span></code></a>.</p></li>
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_check_constraints.params.schema"></span><strong>schema</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_check_constraints.params.schema">¶</a> – string schema name; if omitted, uses the default schema
+of the database connection.  For special quoting,
+use <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.elements.quoted_name" title="sqlalchemy.sql.elements.quoted_name"><code class="xref py py-class docutils literal notranslate"><span class="pre">quoted_name</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.1.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.get_columns">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">get_columns</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table_name</span></em>, <em class="sig-param"><span class="n">schema</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.get_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return information about columns in <cite>table_name</cite>.</p>
+<p>Given a string <cite>table_name</cite> and an optional string <cite>schema</cite>, return
+column information as a list of dicts with these keys:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code> - the column’s name</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">type</span></code> - the type of this column; an instance of
+<a class="reference internal" href="type_api.html#sqlalchemy.types.TypeEngine" title="sqlalchemy.types.TypeEngine"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeEngine</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nullable</span></code> - boolean flag if the column is NULL or NOT NULL</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">default</span></code> - the column’s server default value - this is returned
+as a string SQL expression.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">autoincrement</span></code> - indicates that the column is auto incremented -
+this is returned as a boolean or ‘auto’</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">comment</span></code> - (optional) the commnet on the column. Only some
+dialects return this key</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">computed</span></code> - (optional) when present it indicates that this column
+is computed by the database. Only some dialects return this key.
+Returned as a dict with the keys:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sqltext</span></code> - the expression used to generate this column returned
+as a string SQL expression</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">persisted</span></code> - (optional) boolean that indicates if the column is
+stored in the table</p></li>
+</ul>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.3.16: </span>- added support for computed reflection.</p>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dialect_options</span></code> - (optional) a dict with dialect specific options</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_columns.params.table_name"></span><strong>table_name</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_columns.params.table_name">¶</a> – string name of the table.  For special quoting,
+use <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.elements.quoted_name" title="sqlalchemy.sql.elements.quoted_name"><code class="xref py py-class docutils literal notranslate"><span class="pre">quoted_name</span></code></a>.</p></li>
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_columns.params.schema"></span><strong>schema</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_columns.params.schema">¶</a> – string schema name; if omitted, uses the default schema
+of the database connection.  For special quoting,
+use <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.elements.quoted_name" title="sqlalchemy.sql.elements.quoted_name"><code class="xref py py-class docutils literal notranslate"><span class="pre">quoted_name</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of dictionaries, each representing the definition of
+a database column.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.get_foreign_keys">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">get_foreign_keys</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table_name</span></em>, <em class="sig-param"><span class="n">schema</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.get_foreign_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return information about foreign_keys in <cite>table_name</cite>.</p>
+<p>Given a string <cite>table_name</cite>, and an optional string <cite>schema</cite>, return
+foreign key information as a list of dicts with these keys:</p>
+<dl class="simple">
+<dt>constrained_columns</dt><dd><p>a list of column names that make up the foreign key</p>
+</dd>
+<dt>referred_schema</dt><dd><p>the name of the referred schema</p>
+</dd>
+<dt>referred_table</dt><dd><p>the name of the referred table</p>
+</dd>
+<dt>referred_columns</dt><dd><p>a list of column names in the referred table that correspond to
+constrained_columns</p>
+</dd>
+<dt>name</dt><dd><p>optional name of the foreign key constraint.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_foreign_keys.params.table_name"></span><strong>table_name</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_foreign_keys.params.table_name">¶</a> – string name of the table.  For special quoting,
+use <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.elements.quoted_name" title="sqlalchemy.sql.elements.quoted_name"><code class="xref py py-class docutils literal notranslate"><span class="pre">quoted_name</span></code></a>.</p></li>
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_foreign_keys.params.schema"></span><strong>schema</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_foreign_keys.params.schema">¶</a> – string schema name; if omitted, uses the default schema
+of the database connection.  For special quoting,
+use <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.elements.quoted_name" title="sqlalchemy.sql.elements.quoted_name"><code class="xref py py-class docutils literal notranslate"><span class="pre">quoted_name</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.get_indexes">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">get_indexes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table_name</span></em>, <em class="sig-param"><span class="n">schema</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.get_indexes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return information about indexes in <cite>table_name</cite>.</p>
+<p>Given a string <cite>table_name</cite> and an optional string <cite>schema</cite>, return
+index information as a list of dicts with these keys:</p>
+<dl>
+<dt>name</dt><dd><p>the index’s name</p>
+</dd>
+<dt>column_names</dt><dd><p>list of column names in order</p>
+</dd>
+<dt>unique</dt><dd><p>boolean</p>
+</dd>
+<dt>column_sorting</dt><dd><p>optional dict mapping column names to tuple of sort keywords,
+which may include <code class="docutils literal notranslate"><span class="pre">asc</span></code>, <code class="docutils literal notranslate"><span class="pre">desc</span></code>, <code class="docutils literal notranslate"><span class="pre">nullsfirst</span></code>, <code class="docutils literal notranslate"><span class="pre">nullslast</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.3.5.</span></p>
+</div>
+</dd>
+<dt>dialect_options</dt><dd><p>dict of dialect-specific index options.  May not be present
+for all dialects.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.0.0.</span></p>
+</div>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_indexes.params.table_name"></span><strong>table_name</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_indexes.params.table_name">¶</a> – string name of the table.  For special quoting,
+use <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.elements.quoted_name" title="sqlalchemy.sql.elements.quoted_name"><code class="xref py py-class docutils literal notranslate"><span class="pre">quoted_name</span></code></a>.</p></li>
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_indexes.params.schema"></span><strong>schema</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_indexes.params.schema">¶</a> – string schema name; if omitted, uses the default schema
+of the database connection.  For special quoting,
+use <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.elements.quoted_name" title="sqlalchemy.sql.elements.quoted_name"><code class="xref py py-class docutils literal notranslate"><span class="pre">quoted_name</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.get_pk_constraint">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">get_pk_constraint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table_name</span></em>, <em class="sig-param"><span class="n">schema</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.get_pk_constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return information about primary key constraint on <cite>table_name</cite>.</p>
+<p>Given a string <cite>table_name</cite>, and an optional string <cite>schema</cite>, return
+primary key information as a dictionary with these keys:</p>
+<dl class="simple">
+<dt>constrained_columns</dt><dd><p>a list of column names that make up the primary key</p>
+</dd>
+<dt>name</dt><dd><p>optional name of the primary key constraint.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_pk_constraint.params.table_name"></span><strong>table_name</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_pk_constraint.params.table_name">¶</a> – string name of the table.  For special quoting,
+use <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.elements.quoted_name" title="sqlalchemy.sql.elements.quoted_name"><code class="xref py py-class docutils literal notranslate"><span class="pre">quoted_name</span></code></a>.</p></li>
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_pk_constraint.params.schema"></span><strong>schema</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_pk_constraint.params.schema">¶</a> – string schema name; if omitted, uses the default schema
+of the database connection.  For special quoting,
+use <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.elements.quoted_name" title="sqlalchemy.sql.elements.quoted_name"><code class="xref py py-class docutils literal notranslate"><span class="pre">quoted_name</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.get_primary_keys">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">get_primary_keys</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table_name</span></em>, <em class="sig-param"><span class="n">schema</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.get_primary_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return information about primary keys in <cite>table_name</cite>.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.7: </span>The <a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_primary_keys" title="sqlalchemy.engine.reflection.Inspector.get_primary_keys"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Inspector.get_primary_keys()</span></code></a> method is deprecated and will be removed in a future release.  Please refer to the <a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_pk_constraint" title="sqlalchemy.engine.reflection.Inspector.get_pk_constraint"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Inspector.get_pk_constraint()</span></code></a> method.</p>
+</div>
+<p>Given a string <cite>table_name</cite>, and an optional string <cite>schema</cite>, return
+primary key information as a list of column names.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.get_schema_names">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">get_schema_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.get_schema_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all schema names.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.get_sorted_table_and_fkc_names">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">get_sorted_table_and_fkc_names</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">schema</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.get_sorted_table_and_fkc_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return dependency-sorted table and foreign key constraint names in
+referred to within a particular schema.</p>
+<p>This will yield 2-tuples of
+<code class="docutils literal notranslate"><span class="pre">(tablename,</span> <span class="pre">[(tname,</span> <span class="pre">fkname),</span> <span class="pre">(tname,</span> <span class="pre">fkname),</span> <span class="pre">...])</span></code>
+consisting of table names in CREATE order grouped with the foreign key
+constraint names that are not detected as belonging to a cycle.
+The final element
+will be <code class="docutils literal notranslate"><span class="pre">(None,</span> <span class="pre">[(tname,</span> <span class="pre">fkname),</span> <span class="pre">(tname,</span> <span class="pre">fkname),</span> <span class="pre">..])</span></code>
+which will consist of remaining
+foreign key constraint names that would require a separate CREATE
+step after-the-fact, based on dependencies between tables.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.0.-.</span></p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_table_names" title="sqlalchemy.engine.reflection.Inspector.get_table_names"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Inspector.get_table_names()</span></code></a></p>
+<dl class="simple">
+<dt><a class="reference internal" href="ddl.html#sqlalchemy.schema.sort_tables_and_constraints" title="sqlalchemy.schema.sort_tables_and_constraints"><code class="xref py py-func docutils literal notranslate"><span class="pre">sort_tables_and_constraints()</span></code></a> - similar method which works</dt><dd><p>with an already-given <a class="reference internal" href="metadata.html#sqlalchemy.schema.MetaData" title="sqlalchemy.schema.MetaData"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetaData</span></code></a>.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.get_table_comment">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">get_table_comment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table_name</span></em>, <em class="sig-param"><span class="n">schema</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.get_table_comment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return information about the table comment for <code class="docutils literal notranslate"><span class="pre">table_name</span></code>.</p>
+<p>Given a string <code class="docutils literal notranslate"><span class="pre">table_name</span></code> and an optional string <code class="docutils literal notranslate"><span class="pre">schema</span></code>,
+return table comment information as a dictionary with these keys:</p>
+<dl class="simple">
+<dt>text</dt><dd><p>text of the comment.</p>
+</dd>
+</dl>
+<p>Raises <code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code> for a dialect that does not support
+comments.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.get_table_names">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">get_table_names</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">schema</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">order_by</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.get_table_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all table names in referred to within a particular schema.</p>
+<p>The names are expected to be real tables only, not views.
+Views are instead returned using the
+<a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_view_names" title="sqlalchemy.engine.reflection.Inspector.get_view_names"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Inspector.get_view_names()</span></code></a>
+method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_table_names.params.schema"></span><strong>schema</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_table_names.params.schema">¶</a> – Schema name. If <code class="docutils literal notranslate"><span class="pre">schema</span></code> is left at <code class="docutils literal notranslate"><span class="pre">None</span></code>, the
+database’s default schema is
+used, else the named schema is searched.  If the database does not
+support named schemas, behavior is undefined if <code class="docutils literal notranslate"><span class="pre">schema</span></code> is not
+passed as <code class="docutils literal notranslate"><span class="pre">None</span></code>.  For special quoting, use <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.elements.quoted_name" title="sqlalchemy.sql.elements.quoted_name"><code class="xref py py-class docutils literal notranslate"><span class="pre">quoted_name</span></code></a>.</p></li>
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_table_names.params.order_by"></span><strong>order_by</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_table_names.params.order_by">¶</a> – <p>Optional, may be the string “foreign_key” to sort
+the result on foreign key dependencies.  Does not automatically
+resolve cycles, and will raise <a class="reference internal" href="exceptions.html#sqlalchemy.exc.CircularDependencyError" title="sqlalchemy.exc.CircularDependencyError"><code class="xref py py-class docutils literal notranslate"><span class="pre">CircularDependencyError</span></code></a>
+if cycles exist.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 1.0: </span>The <a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_table_names.params.order_by" title="sqlalchemy.engine.reflection.Inspector.get_table_names"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">get_table_names.order_by</span></code></a> parameter is deprecated and will be removed in a future release.  Please refer to <a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_sorted_table_and_fkc_names" title="sqlalchemy.engine.reflection.Inspector.get_sorted_table_and_fkc_names"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Inspector.get_sorted_table_and_fkc_names()</span></code></a> for a more comprehensive solution to resolving foreign key cycles between tables.</p>
+</div>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_sorted_table_and_fkc_names" title="sqlalchemy.engine.reflection.Inspector.get_sorted_table_and_fkc_names"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Inspector.get_sorted_table_and_fkc_names()</span></code></a></p>
+<p><a class="reference internal" href="metadata.html#sqlalchemy.schema.MetaData.sorted_tables" title="sqlalchemy.schema.MetaData.sorted_tables"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MetaData.sorted_tables</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.get_table_options">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">get_table_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table_name</span></em>, <em class="sig-param"><span class="n">schema</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.get_table_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dictionary of options specified when the table of the
+given name was created.</p>
+<p>This currently includes some options that apply to MySQL tables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_table_options.params.table_name"></span><strong>table_name</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_table_options.params.table_name">¶</a> – string name of the table.  For special quoting,
+use <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.elements.quoted_name" title="sqlalchemy.sql.elements.quoted_name"><code class="xref py py-class docutils literal notranslate"><span class="pre">quoted_name</span></code></a>.</p></li>
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_table_options.params.schema"></span><strong>schema</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_table_options.params.schema">¶</a> – string schema name; if omitted, uses the default schema
+of the database connection.  For special quoting,
+use <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.elements.quoted_name" title="sqlalchemy.sql.elements.quoted_name"><code class="xref py py-class docutils literal notranslate"><span class="pre">quoted_name</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.get_temp_table_names">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">get_temp_table_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.get_temp_table_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a list of temporary table names for the current bind.</p>
+<p>This method is unsupported by most dialects; currently
+only SQLite implements it.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.0.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.get_temp_view_names">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">get_temp_view_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.get_temp_view_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a list of temporary view names for the current bind.</p>
+<p>This method is unsupported by most dialects; currently
+only SQLite implements it.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.0.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.get_unique_constraints">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">get_unique_constraints</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table_name</span></em>, <em class="sig-param"><span class="n">schema</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.get_unique_constraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return information about unique constraints in <cite>table_name</cite>.</p>
+<p>Given a string <cite>table_name</cite> and an optional string <cite>schema</cite>, return
+unique constraint information as a list of dicts with these keys:</p>
+<dl class="simple">
+<dt>name</dt><dd><p>the unique constraint’s name</p>
+</dd>
+<dt>column_names</dt><dd><p>list of column names in order</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_unique_constraints.params.table_name"></span><strong>table_name</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_unique_constraints.params.table_name">¶</a> – string name of the table.  For special quoting,
+use <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.elements.quoted_name" title="sqlalchemy.sql.elements.quoted_name"><code class="xref py py-class docutils literal notranslate"><span class="pre">quoted_name</span></code></a>.</p></li>
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_unique_constraints.params.schema"></span><strong>schema</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_unique_constraints.params.schema">¶</a> – string schema name; if omitted, uses the default schema
+of the database connection.  For special quoting,
+use <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.elements.quoted_name" title="sqlalchemy.sql.elements.quoted_name"><code class="xref py py-class docutils literal notranslate"><span class="pre">quoted_name</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.get_view_definition">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">get_view_definition</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">view_name</span></em>, <em class="sig-param"><span class="n">schema</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.get_view_definition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return definition for <cite>view_name</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_view_definition.params.schema"></span><strong>schema</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_view_definition.params.schema">¶</a> – Optional, retrieve names from a non-default schema.
+For special quoting, use <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.elements.quoted_name" title="sqlalchemy.sql.elements.quoted_name"><code class="xref py py-class docutils literal notranslate"><span class="pre">quoted_name</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.get_view_names">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">get_view_names</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">schema</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.get_view_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all view names in <cite>schema</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.get_view_names.params.schema"></span><strong>schema</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.get_view_names.params.schema">¶</a> – Optional, retrieve names from a non-default schema.
+For special quoting, use <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.elements.quoted_name" title="sqlalchemy.sql.elements.quoted_name"><code class="xref py py-class docutils literal notranslate"><span class="pre">quoted_name</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.engine.reflection.Inspector.reflecttable">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.engine.reflection.Inspector"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.engine.reflection.Inspector.</span></code></a><code class="sig-name descname">reflecttable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">include_columns</span></em>, <em class="sig-param"><span class="n">exclude_columns</span><span class="o">=</span><span class="default_value">()</span></em>, <em class="sig-param"><span class="n">resolve_fks</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">_extend_on</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.engine.reflection.Inspector.reflecttable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a Table object, load its internal constructs based on
+introspection.</p>
+<p>This is the underlying method used by most dialects to produce
+table reflection.  Direct usage is like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">create_engine</span><span class="p">,</span> <span class="n">MetaData</span><span class="p">,</span> <span class="n">Table</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.engine.reflection</span> <span class="k">import</span> <span class="n">Inspector</span>
+
+<span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;...&#39;</span><span class="p">)</span>
+<span class="n">meta</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">()</span>
+<span class="n">user_table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+<span class="n">insp</span> <span class="o">=</span> <span class="n">Inspector</span><span class="o">.</span><span class="n">from_engine</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+<span class="n">insp</span><span class="o">.</span><span class="n">reflecttable</span><span class="p">(</span><span class="n">user_table</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.reflecttable.params.table"></span><strong>table</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.reflecttable.params.table">¶</a> – a <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> instance.</p></li>
+<li><p><span class="target" id="sqlalchemy.engine.reflection.Inspector.reflecttable.params.include_columns"></span><strong>include_columns</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.engine.reflection.Inspector.reflecttable.params.include_columns">¶</a> – a list of string column names to include
+in the reflection process.  If <code class="docutils literal notranslate"><span class="pre">None</span></code>, all columns are reflected.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="limitations-of-reflection">
+<h2>Limitations of Reflection<a class="headerlink" href="#limitations-of-reflection" title="Permalink to this headline">¶</a></h2>
+<p>It’s important to note that the reflection process recreates <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a>
+metadata using only information which is represented in the relational database.
+This process by definition cannot restore aspects of a schema that aren’t
+actually stored in the database.   State which is not available from reflection
+includes but is not limited to:</p>
+<ul class="simple">
+<li><p>Client side defaults, either Python functions or SQL expressions defined using
+the <code class="docutils literal notranslate"><span class="pre">default</span></code> keyword of <a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a> (note this is separate from <code class="docutils literal notranslate"><span class="pre">server_default</span></code>,
+which specifically is what’s available via reflection).</p></li>
+<li><p>Column information, e.g. data that might have been placed into the
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Column.info" title="sqlalchemy.schema.Column.info"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Column.info</span></code></a> dictionary</p></li>
+<li><p>The value of the <code class="docutils literal notranslate"><span class="pre">.quote</span></code> setting for <a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a> or <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a></p></li>
+<li><p>The association of a particular <a class="reference internal" href="defaults.html#sqlalchemy.schema.Sequence" title="sqlalchemy.schema.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> with a given <a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a></p></li>
+</ul>
+<p>The relational database also in many cases reports on table metadata in a
+different format than what was specified in SQLAlchemy.   The <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a>
+objects returned from reflection cannot be always relied upon to produce the identical
+DDL as the original Python-defined <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> objects.   Areas where
+this occurs includes server defaults, column-associated sequences and various
+idiosyncrasies regarding constraints and datatypes.   Server side defaults may
+be returned with cast directives (typically PostgreSQL will include a <code class="docutils literal notranslate"><span class="pre">::&lt;type&gt;</span></code>
+cast) or different quoting patterns than originally specified.</p>
+<p>Another category of limitation includes schema structures for which reflection
+is only partially or not yet defined.  Recent improvements to reflection allow
+things like views, indexes and foreign key options to be reflected.  As of this
+writing, structures like CHECK constraints, table comments, and triggers are
+not reflected.</p>
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="metadata.html" title="previous chapter">Describing Databases with MetaData</a>
+        Next:
+        <a href="defaults.html" title="next chapter">Column INSERT/UPDATE Defaults</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

@@ -73,6 +73,7 @@ def config_validator(user):
   try:
     from desktop.lib.fsmanager import get_filesystem
     from aws.conf import is_enabled as is_s3_enabled
+    from azure.conf import is_abfs_enabled
     warehouse = beeswax.hive_site.get_metastore_warehouse_dir()
     fs = get_filesystem()
     fs_scheme = fs._get_scheme(warehouse)
@@ -82,6 +83,11 @@ def config_validator(user):
           fs.do_as_user(user, fs.stats, warehouse)
         else:
           LOG.warn("Warehouse is in S3, but no credential available.")
+      elif fs_scheme == 'abfs':
+        if is_abfs_enabled():
+          fs.do_as_user(user, fs.stats, warehouse)
+        else:
+          LOG.warn("Warehouse is in ABFS, but no credential available.")
       else:
         fs.do_as_superuser(fs.stats, warehouse)
   except Exception:
