@@ -395,6 +395,24 @@ DATABASES = {
   'default': default_db
 }
 
+    #engine=postgresql_psycopg2
+    #user=hstest
+    #name=hsdev
+    #host=localhost
+    #password=hstest
+    #options='{"options": "-c search_path=das,public"}'
+    #port=15432
+
+DATABASES['query'] = {
+  'ENGINE': 'django.db.backends.postgresql_psycopg2',
+  'HOST': 'localhost',
+  'NAME': 'hsdev',
+  'USER': 'hstest',
+  'PASSWORD': 'hstest',
+  'OPTIONS': {"options": "-c search_path=das,public"},
+  'PORT': 5432
+}
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', # TODO: Parameterize here for all the caches
