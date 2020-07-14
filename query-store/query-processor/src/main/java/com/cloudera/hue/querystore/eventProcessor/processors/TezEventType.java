@@ -1,0 +1,9 @@
+// (c) Copyright 2020-2021 Cloudera, Inc. All rights reserved.
+package com.cloudera.hue.querystore.eventProcessor.processors;
+
+public enum TezEventType {
+  DAG_SUBMITTED, DAG_INITIALIZED, DAG_STARTED, DAG_FINISHED,
+  VERTEX_INITIALIZED, VERTEX_STARTED, VERTEX_CONFIGURE_DONE, VERTEX_FINISHED,
+  TASK_STARTED, TASK_ATTEMPT_STARTED, TASK_ATTEMPT_FINISHED, TASK_FINISHED,
+  APP_LAUNCHED
+}

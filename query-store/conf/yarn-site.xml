@@ -1,0 +1,14 @@
+<configuration>
+
+    <property>
+        <name>yarn.resourcemanager.webapp.address</name>
+        <value>ctr-e149-1597441914630-9361-01-000013.hwx.site:8088</value>
+    </property>
+
+    <property>
+        <name>yarn.timeline-service.webapp.address</name>
+        <value>ctr-e149-1597441914630-9361-01-000013.hwx.site:8188</value>
+    </property>
+
+
+</configuration>

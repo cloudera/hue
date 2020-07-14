@@ -1,0 +1,36 @@
+<!--
+  (c) Copyright 2020-2021 Cloudera, Inc. All rights reserved.
+-->
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+  <id>event-processor</id>
+  <formats>
+    <format>tar.gz</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <files>
+    <file>
+      <source>${project.build.directory}/${project.artifactId}-${project.version}.jar</source>
+      <outputDirectory>/lib/</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>${project.build.directory}/classes/env-version.sh</source>
+      <outputDirectory>/conf/${project.artifactId}/</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+  </files>
+  <!-- <fileSets>
+    <fileSet>
+      <directory>${project.build.directory}/ep_libs</directory>
+      <outputDirectory>/lib/ep_libs</outputDirectory>
+    </fileSet>
+  </fileSets> -->
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/lib/ep_libs</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
+  </dependencySets>
+</assembly>

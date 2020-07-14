@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!--
+  (c) Copyright 2020-2021 Cloudera, Inc. All rights reserved.
+-->
+<configuration>
+  <property>
+    <name>fs.defaultFS</name>
+    <value>hdfs://ctr-e149-1597441914630-9361-01-000013.hwx.site:8020</value>
+  </property>
+</configuration>

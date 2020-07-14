@@ -1,0 +1,79 @@
+{
+    "logging": {
+        "level": "INFO",
+        "loggers": {
+            "com.cloudera.hue.querystore": "DEBUG"
+        },
+        "appenders": [
+            {
+                "type": "file",
+                "currentLogFilename": "{{data_analytics_studio_log_dir}}/das-webapp.log",
+                "archivedLogFilenamePattern": "{{data_analytics_studio_log_dir}}/das-webapp-%i.log.gz",
+                "archivedFileCount": 5,
+                "maxFileSize": "1GB"
+            }
+        ]
+    },
+    "jerseyClient":{
+    },
+    "database": {
+        "driverClass": "org.postgresql.Driver",
+        "url": "{{data_analytics_studio_database_jdbc_url}}",
+        "user": "{{data_analytics_studio_database_username}}",
+        "password": "${data_analytics_studio_database_password}",
+        "properties": {
+        }
+    },
+    "server": {
+        "requestLog": {
+            "appenders": [
+                {
+                    "type": "file",
+                    "currentLogFilename": "{{data_analytics_studio_log_dir}}/das-webapp-access.log",
+                    "archivedLogFilenamePattern": "{{data_analytics_studio_log_dir}}/das-webapp-access-%i.log.gz",
+                    "archivedFileCount": 5,
+                    "maxFileSize": "1GB"
+                }
+            ]
+        },
+        "applicationConnectors": [
+            {
+                "keyStorePath": "{{data_analytics_studio_webapp_keystore_file}}",
+                "keyStorePassword": "${data_analytics_studio_webapp_keystore_password}",
+                "type": "{{data_analytics_studio_webapp_server_protocol}}",
+                "port": 8080
+            }
+        ],
+        "adminConnectors": [
+            {
+                "keyStorePath": "{{data_analytics_studio_webapp_keystore_file}}",
+                "keyStorePassword": "${data_analytics_studio_webapp_keystore_password}",
+                "type": "{{data_analytics_studio_webapp_server_protocol}}",
+                "port": 8080
+            }
+        ]
+    },
+    "akka": {
+        "properties": {
+            "akka.loglevel": "INFO",
+            "akka.stdout-loglevel": "INFO",
+            "akka.actor.jdbc-connector-dispatcher.fork-join-executor.parallelism-factor": 5.0,
+            "akka.actor.result-dispatcher.fork-join-executor.parallelism-factor": 10.0,
+            "akka.actor.misc-dispatcher.fork-join-executor.parallelism-factor": 5.0
+        }
+    },
+    "gaConfiguration": {
+        "enabled": true,
+        "identifier": "UA-22950817-34"
+    },
+    "serviceConfigDirectory" : "/etc/das/conf/",
+    "environment": "production",
+    "smartsenseId": "{{data_analytics_studio_webapp_smartsense_id}}",
+
+    "noPasswordAlias": "${no_password_alias}",
+
+    "hiveSessionParams": "${hive_session_params}",
+    "credentialProviderPath": "{{das_credential_provider_paths}}",
+    "passwordAliases": ["data_analytics_studio_database_password","data_analytics_studio_webapp_keystore_password","hive_session_params", "no_password_alias", "no_alias"]
+
+}

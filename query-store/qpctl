@@ -1,0 +1,129 @@
+#!/bin/bash
+
+SRC_DIR=$(dirname $BASH_SOURCE)
+CONF_DIR=$SRC_DIR/conf
+LOG_DIR=$SRC_DIR/logs
+QP_DIR=$SRC_DIR/query-processor/
+CP_FILE=$QP_DIR/target/classpath
+
+source $QP_DIR/target/classes/env-version.sh
+
+MAIN_CLASS=com.cloudera.hue.querystore.eventProcessor.EventProcessorApplication
+DEBUG_ARGS="-agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=y"
+YJP_ARGS="-agentpath:/Applications/YourKit-Java-Profiler-2019.1.app/Contents/Resources/bin/mac/libyjpagent.jnilib=disablestacktelemetry,exceptions=disable,listen=all"
+JAVA_ARGS="-Dlog4j.configurationFile=$CONF_DIR/log4j2.yml -DHADOOP_USER_NAME=hive"
+
+DB=hue_db
+DBUSER=hue_user
+DBPASS=hue_pass
+DBSCHEMA=hue_schema
+
+export HADOOP_CONF=$CONF_DIR
+PG_PATH=$(echo /usr/local/Cellar/postgresql@9.6/*/bin)
+
+start_postgres() {
+  echo "starting postgres"
+  brew services start postgresql@9.6
+  PATH="$PATH:$PG_PATH"
+  while ! pg_isready -d template1; do
+    echo "waiting for postgres"
+    sleep 2
+  done
+}
+
+stop_postgres() {
+  echo "stopping postgres"
+  brew services stop postgresql@9.6
+}
+
+connect_postgres() {
+  PATH="$PATH:$PG_PATH"
+  PGPASSWORD=$DBPASS psql -U $DBUSER $DB
+}
+
+gen_cp() {
+  if [ ! -f $CP_FILE ]; then
+    echo "Generating classpath"
+    mvn -q -nsu -pl query-processor dependency:build-classpath -Dmdep.outputFile=target/classpath -Dmdep.regenerateFile=true
+    echo -n ":$QP_DIR/target/hue-query-processor-${VERSION}.jar" >> $CP_FILE
+  fi
+}
+
+setup_db() {
+  echo "Setting up das db and users ..."
+  PATH="$PATH:$PG_PATH"
+  psql -d template1 -tc "SELECT 1 FROM pg_database WHERE datname = '$DB'" | grep 1 || (
+      psql -d template1 -c "CREATE ROLE $DBUSER WITH LOGIN PASSWORD '$DBPASS';" &&
+      psql -d template1 -c "ALTER ROLE $DBUSER CREATEDB;" &&
+      psql -d template1 -c "CREATE DATABASE $DB;" &&
+      psql -d template1 -c "GRANT ALL PRIVILEGES ON DATABASE $DB TO $DBUSER;" &&
+      psql -d template1 -c "CREATE SCHEMA IF NOT EXISTS $DBSCHEMA;"
+  )
+  gen_cp
+  echo migrate db ...
+  CLASSPATH=$(cat $CP_FILE) java $MAIN_CLASS db migrate $CONF_DIR/qp_config.json > /dev/null
+}
+
+delete_db() {
+  echo "Dropping das db and users..."
+  PATH="$PATH:$PG_PATH"
+  psql -d template1 -c "DROP database $DB;"
+  psql -d template1 -c "DROP ROLE $DBUSER;"
+  psql -d template1 -c "DROP SCHEMA $DBSCHEMA;"
+}
+
+start_java() {
+  gen_cp
+  echo starting query processor ...
+  CLASSPATH=$SRC_DIR/conf/:$(cat $CP_FILE) java $JAVA_ARGS $MAIN_CLASS server $CONF_DIR/qp_config.json > qp.log 2>&1 &
+  echo $! > qp.pid
+}
+
+stop_java() {
+  echo "Killing java procs ..."
+  kill $(cat qp.pid)
+}
+
+while (($#)); do
+  case $1 in
+  start)
+    set -e
+    start_postgres
+    setup_db
+    start_java
+    ;;
+  stop)
+    stop_java
+    echo "Waiting 5 sec before deleting db"
+    sleep 5
+    delete_db
+    stop_postgres
+    ;;
+  jvstart)
+    start_java
+    ;;
+  jvstop)
+    stop_java
+    ;;
+  pgstart)
+    start_postgres
+    ;;
+  pgstop)
+    stop_postgres
+    ;;
+  pgsetup)
+    setup_db
+    ;;
+  pgreset)
+    delete_db
+    ;;
+  pg)
+    connect_postgres
+    ;;
+  *)
+    echo "Usage: $0 <start|stop|jvstart|jvstop|pgstart|pgstop|pgsetup|pgreset|pg>"
+    exit 1
+    ;;
+  esac
+  shift
+done

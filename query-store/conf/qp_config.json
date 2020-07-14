@@ -1,0 +1,48 @@
+{
+  "logging": {
+    "type": "external"
+  },
+  "jerseyClient":{
+    "timeout": "240s",
+    "connectionTimeout": "2s"
+  },
+  "dasConf": {
+    "scan.folder.delay.millis" : 2000,
+    "hive.hook.proto.base-directory": "/warehouse/tablespace/external/hive/sys.db/query_data/",
+    "tez.history.logging.proto-base-dir": "/warehouse/tablespace/external/hive/sys.db/"
+  },
+  "database": {
+    "driverClass": "org.postgresql.Driver",
+    "url": "jdbc:postgresql://localhost:5432/hue_db?currentSchema=hue_schema",
+    "user": "hue_user",
+    "password": "hue_pass",
+    "properties": {
+    }
+  },
+  "server": {
+    "applicationConnectors": [
+      {
+        "type": "http",
+        "port": 9090
+      }
+    ],
+    "adminConnectors": [],
+    "requestLog": {
+      "type": "external"
+    }
+  },
+  "flyway": {
+    "schemas": ["hue_schema"],
+    "locations": [
+      "db/migrate/common", "db/migrate/dev"
+    ]
+  },
+  "authConfig": {
+    "appUserName": "hive",
+    "serviceAuth": "NONE",
+    "serviceKeytab": "",
+    "servicePrincipal": ""
+  },
+  "credentialProviderPath": "",
+  "passwordAliases": []
+}
