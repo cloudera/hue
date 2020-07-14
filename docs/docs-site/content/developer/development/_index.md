@@ -576,18 +576,18 @@ Re-building the collection of static files should fix it:
 
 ### Running the UI tests
 
-The tests are next to the file under test, the filename of the test has to end with `.test.js`.
+The tests are next to the file under test, the filename of the test has to end with `.test.ts` or `.test.js`.
 
     someFile.js         <- File under test
-    someFile.test.js    <- File containing tests
+    someFile.test.ts    <- File containing tests
 
 Run all the tests once with:
 
-    npm run test
+    npm test
 
 Run tests from a specific file once:
 
-    npm run test -- foo.test.js
+    npm test -- foo.test.js
 
 To run the tests in watch mode:
 
