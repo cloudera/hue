@@ -67,10 +67,10 @@ ENABLE_QUERY_BROWSER = Config(
 
 ENABLE_HIVE_QUERY_BROWSER = Config(
   key="enable_hive_query_browser",
-  help=_("# Show the Hive query section for listing and showing more troubleshooting information."),
+  help=_("Show the Hive section for listing the query history and providing more troubleshooting information."),
   type=coerce_bool,
   default=False
-) 
+)
 
 ENABLE_HISTORY_V2 = Config(
   key="enable_history_v2",

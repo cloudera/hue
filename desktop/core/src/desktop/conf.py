@@ -1968,6 +1968,63 @@ CONNECTORS = UnspecifiedConfigSection(
 )
 
 
+QUERY_DATABASE = ConfigSection(
+  key='query_database',
+  help=_("""Configuration options for specifying the Query History Database."""),
+  members=dict(
+    ENGINE=Config(
+      key='engine',
+      help=_('Database engine, such as postgresql_psycopg2, mysql, or sqlite3.'),
+      type=coerce_database,
+      default='django.db.backends.sqlite3',
+    ),
+    NAME=Config(
+      key='name',
+      help=_('Database name, or path to DB if using sqlite3.'),
+      type=str,
+      default='das',
+    ),
+    USER=Config(
+      key='user',
+      help=_('Database username.'),
+      type=str,
+      default='',
+    ),
+    SCHEMA=Config(
+      key='schema',
+      help=_('Database schema, to be used only when public schema is revoked in postgres.'),
+      type=str,
+      default='public',
+    ),
+    PASSWORD=Config(
+      key='password',
+      help=_('Database password.'),
+      private=True,
+      type=str,
+      default="",
+    ),
+    HOST=Config(
+      key='host',
+      help=_('Database host.'),
+      type=str,
+      default='',
+    ),
+    PORT=Config(
+      key='port',
+      help=_('Database port.'),
+      type=coerce_port,
+      default='',
+    ),
+    OPTIONS=Config(
+      key='options',
+      help=_('Database options to send to the server when connecting.'),
+      type=coerce_json_dict,
+      dynamic_default=default_database_options
+    ),
+  )
+)
+
+
 def validate_ldap(user, config):
   res = []
 

@@ -395,23 +395,17 @@ DATABASES = {
   'default': default_db
 }
 
-    #engine=postgresql_psycopg2
-    #user=hstest
-    #name=hsdev
-    #host=localhost
-    #password=hstest
-    #options='{"options": "-c search_path=das,public"}'
-    #port=15432
-
-DATABASES['query'] = {
-  'ENGINE': 'django.db.backends.postgresql_psycopg2',
-  'HOST': 'localhost',
-  'NAME': 'hsdev',
-  'USER': 'hstest',
-  'PASSWORD': 'hstest',
-  'OPTIONS': {"options": "-c search_path=das,public"},
-  'PORT': 5432
-}
+if desktop.conf.QUERY_DATABASE.HOST.get():
+  DATABASES['query'] = {
+    'ENGINE': desktop.conf.QUERY_DATABASE.ENGINE.get(),
+    'HOST': desktop.conf.QUERY_DATABASE.HOST.get(),
+    'NAME': desktop.conf.QUERY_DATABASE.NAME.get(),
+    'USER': desktop.conf.QUERY_DATABASE.USER.get(),
+    'PASSWORD': desktop.conf.QUERY_DATABASE.PASSWORD.get(),
+    'OPTIONS': desktop.conf.QUERY_DATABASE.OPTIONS.get(),
+    'PORT': desktop.conf.QUERY_DATABASE.PORT.get(),
+    "SCHEMA" : desktop.conf.QUERY_DATABASE.SCHEMA.get(),
+  }
 
 CACHES = {
     'default': {
@@ -667,8 +661,8 @@ if not desktop.conf.DATABASE_LOGGING.get():
     from django.db.backends.utils import CursorWrapper
 
     BaseDatabaseWrapper.make_debug_cursor = lambda self, cursor: CursorWrapper(cursor, self)
-
   disable_database_logging()
+
 
 ############################################################
 # Searching saved documents in Oracle returns following error:
