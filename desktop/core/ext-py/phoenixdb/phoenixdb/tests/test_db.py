@@ -16,6 +16,7 @@
 import unittest
 
 import phoenixdb.cursor
+from phoenixdb.connection import Connection
 from phoenixdb.errors import InternalError
 from phoenixdb.tests import DatabaseTestCase, TEST_DB_URL
 
@@ -107,3 +108,121 @@ class PhoenixDatabaseTest(DatabaseTestCase):
             self.conn.autocommit = True
             cursor.execute("SELECT * FROM test ORDER BY id")
             self.assertEqual(cursor.fetchall(), [[1, 'one'], [2, 'two']])
+
+    def test_conn_props(self):
+        phoenix_args, avatica_args = Connection._map_conn_props(
+            {'autoCommit': True,
+             'readonly': True,
+             'transactionIsolation': 3,
+             'schema': 'bubu',
+             'phoenixArg': 'phoenixArg'})
+        self.assertEqual(phoenix_args, {'phoenixArg': 'phoenixArg'})
+        self.assertEqual(avatica_args, {'autoCommit': True,
+                                        'readOnly': True,
+                                        'transactionIsolation': 3,
+                                        'schema': 'bubu'})
+
+    def test_meta(self):
+        with self.conn.cursor() as cursor:
+            try:
+                cursor.execute('drop table if exists DEFAULT_TABLE')
+                cursor.execute('drop table if exists A_SCHEMA.A_TABLE')
+                cursor.execute('drop table if exists B_SCHMEA.B_TABLE')
+
+                cursor.execute('create table DEFAULT_TABLE (ID integer primary key)')
+                cursor.execute('create table A_SCHEMA.A_TABLE (ID_A integer primary key)')
+                cursor.execute('create table B_SCHEMA.B_TABLE (ID_B integer primary key)')
+
+                meta = self.conn.meta()
+
+                self.assertEqual(meta.get_catalogs(), [])
+
+                self.assertEqual(meta.get_schemas(), [
+                    {'TABLE_SCHEM': '', 'TABLE_CATALOG': ''},
+                    {'TABLE_SCHEM': 'A_SCHEMA', 'TABLE_CATALOG': ''},
+                    {'TABLE_SCHEM': 'B_SCHEMA', 'TABLE_CATALOG': ''},
+                    {'TABLE_SCHEM': 'SYSTEM', 'TABLE_CATALOG': ''}])
+
+                self.assertEqual(meta.get_schemas(schemaPattern=''), [
+                    {'TABLE_SCHEM': '', 'TABLE_CATALOG': ''}])
+
+                self.assertEqual(meta.get_schemas(schemaPattern='A_SCHEMA'), [
+                    {'TABLE_SCHEM': 'A_SCHEMA', 'TABLE_CATALOG': ''}])
+
+                a_tables = meta.get_tables()
+                self.assertTrue(len(a_tables) > 3)  # Don't know how many tables SYSTEM has
+
+                a_tables = meta.get_tables(schemaPattern='')
+                self.assertEqual(len(a_tables), 1)
+                self.assertTrue(a_tables[0]['TABLE_NAME'] == 'DEFAULT_TABLE')
+
+                a_tables = meta.get_tables(schemaPattern='A_SCHEMA')
+                self.assertEqual(len(a_tables), 1)
+                self.assertTrue(a_tables[0]['TABLE_NAME'] == 'A_TABLE')
+
+                a_columns = meta.get_columns(schemaPattern='A_SCHEMA', tableNamePattern='A_TABLE')
+                self.assertEqual(len(a_columns), 1)
+                self.assertTrue(a_columns[0]['COLUMN_NAME'] == 'ID_A')
+
+                self.assertTrue(all(elem in meta.get_table_types() for elem in [
+                    {'TABLE_TYPE': 'INDEX'},
+                    {'TABLE_TYPE': 'SEQUENCE'},
+                    {'TABLE_TYPE': 'SYSTEM TABLE'},
+                    {'TABLE_TYPE': 'TABLE'},
+                    {'TABLE_TYPE': 'VIEW'}]))
+
+                self.assertEqual(meta.get_type_info(), [])
+            finally:
+                cursor.execute('drop table if exists DEFAULT_TABLE')
+                cursor.execute('drop table if exists A_SCHEMA.A_TABLE')
+                cursor.execute('drop table if exists B_SCHEMA.B_TABLE')
+
+    @unittest.skip("https://issues.apache.org/jira/browse/PHOENIX-6004")
+    def test_case_sensitivity(self):
+        with self.conn.cursor() as cursor:
+            try:
+                cursor.execute('drop table if exists AAA')
+                cursor.execute('drop table if exists "aaa"')
+                cursor.execute('drop table if exists "Aaa"')
+
+                cursor.execute('create table AAA (ID integer primary key, YYY integer)')
+                cursor.execute('create table "aaa" ("ID_x" integer primary key, YYY integer, "Yyy" integer, "yyy" integer)')
+                cursor.execute('create table "Aaa" (ID_X integer primary key, ZZZ integer, "Zzz" integer, "zzz" integer)')
+
+                cursor.execute('upsert into AAA values (1, 2)')
+                cursor.execute('upsert into "aaa" values (11, 12, 13, 14)')
+                cursor.execute('upsert into "Aaa" values (21, 22, 23, 24)')
+
+                cursor.execute('select YYY from AAA')
+                self.assertEqual(cursor.fetchone(), [2])
+
+                cursor.execute('select YYY from "aaa"')
+                self.assertEqual(cursor.fetchone(), [12])
+
+                cursor.execute('select "YYY" from "aaa"')
+                self.assertEqual(cursor.fetchone(), [12])
+
+                cursor.execute('select "Yyy" from "aaa"')
+                self.assertEqual(cursor.fetchone(), [13])
+
+                meta = self.conn.meta()
+
+                self.assertEquals(len(meta.get_tables(schemaPattern='')), 3)
+
+                print(meta.get_columns(schemaPattern='',
+                                       tableNamePattern='"aaa"'))
+
+                self.assertEquals(len(meta.get_tables(schemaPattern='',
+                                                      tableNamePattern='AAA')), 1)
+                self.assertEquals(len(meta.get_tables(schemaPattern='',
+                                                      tableNamePattern='"aaa"')), 1)
+                self.assertEquals(meta.get_columns(tableNamePattern='AAA',
+                                                   columnNamePattern='YYY'), 1)
+                self.assertEquals(meta.get_columns(tableNamePattern='AAA',
+                                                   columnNamePattern='yyy'), 1)
+                self.assertEquals(meta.get_columns(tableNamePattern='AAA',
+                                                   columnNamePattern='"yyy"'), 0)
+            finally:
+                cursor.execute('drop table if exists AAA')
+                cursor.execute('drop table if exists "aaa"')
+                cursor.execute('drop table if exists "Aaa"')

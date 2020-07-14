@@ -35,7 +35,7 @@ class SQLAlchemyTest(unittest.TestCase):
         engine = self._create_engine()
         # connection = engine.connect()
         metadata = db.MetaData()
-        catalog = db.Table('CATALOG', metadata, autoload=True, autoload_with=engine)
+        catalog = db.Table('CATALOG', metadata, schema='SYSTEM', autoload=True, autoload_with=engine)
         self.assertIn('TABLE_NAME', catalog.columns.keys())
 
     def test_textual(self):
@@ -52,6 +52,44 @@ class SQLAlchemyTest(unittest.TestCase):
             finally:
                 connection.execute('drop table if exists ALCHEMY_TEST')
 
+    def test_schema_filtering(self):
+        engine = self._create_engine()
+        with engine.connect() as connection:
+            try:
+                inspector = db.inspect(engine)
+
+                connection.execute('drop table if exists ALCHEMY_TEST')
+                connection.execute('drop table if exists A.ALCHEMY_TEST_A')
+                connection.execute('drop table if exists B.ALCHEMY_TEST_B')
+
+                self.assertEqual(inspector.get_schema_names(), ['', 'SYSTEM'])
+
+                connection.execute(text('create table ALCHEMY_TEST (ID integer primary key)'))
+                connection.execute(text('create table A.ALCHEMY_TEST_A (ID_A integer primary key)'))
+                connection.execute(text('create table B.ALCHEMY_TEST_B (ID_B integer primary key)'))
+
+                self.assertEqual(inspector.get_schema_names(), ['', 'A', 'B', 'SYSTEM'])
+
+                self.assertEqual(inspector.get_table_names(), ['ALCHEMY_TEST'])
+                self.assertEqual(inspector.get_table_names(''), ['ALCHEMY_TEST'])
+                self.assertEqual(inspector.get_table_names('A'), ['ALCHEMY_TEST_A'])
+                self.assertEqual(inspector.get_table_names('B'), ['ALCHEMY_TEST_B'])
+
+                self.assertEqual(inspector.get_columns('ALCHEMY_TEST').pop()['name'], 'ID')
+                self.assertEqual(
+                    inspector.get_columns('ALCHEMY_TEST', '').pop()['name'], 'ID')
+                self.assertEqual(
+                    inspector.get_columns('ALCHEMY_TEST_A', 'A').pop()['name'], 'ID_A')
+
+                self.assertTrue(engine.has_table('ALCHEMY_TEST'))
+                self.assertFalse(engine.has_table('ALCHEMY_TEST', 'A'))
+                self.assertTrue(engine.has_table('ALCHEMY_TEST_A', 'A'))
+                self.assertFalse(engine.has_table('ALCHEMY_TEST', 'A'))
+            finally:
+                connection.execute('drop table if exists ALCHEMY_TEST')
+                connection.execute('drop table if exists A.ALCHEMY_TEST_A')
+                connection.execute('drop table if exists B.ALCHEMY_TEST_B')
+
     def test_reflection(self):
         engine = self._create_engine()
         with engine.connect() as connection:
@@ -65,7 +103,7 @@ class SQLAlchemyTest(unittest.TestCase):
                 city VARCHAR NOT NULL,
                 population BIGINT
                 CONSTRAINT my_pk PRIMARY KEY (state, city))'''))
-                columns_result = inspector.get_columns('us_population')
+                columns_result = inspector.get_columns('US_POPULATION')
                 self.assertEqual(len(columns_result), 3)
             finally:
                 connection.execute('drop table if exists us_population')
