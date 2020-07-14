@@ -126,76 +126,70 @@ class PhoenixDialect(DefaultDialect):
         ))
         return [phoenix_url], connect_args
 
-    def has_table(self, connection, table_name, schema=None):
+    def has_table(self, connection, table_name, schema=None, **kw):
         if schema is None:
-            query = "SELECT 1 FROM system.catalog WHERE table_name = ? LIMIT 1"
-            params = [table_name.upper()]
-        else:
-            query = "SELECT 1 FROM system.catalog WHERE table_name = ? AND TABLE_SCHEM = ? LIMIT 1"
-            params = [table_name.upper(), schema.upper()]
-        return connection.execute(query, params).first() is not None
+            schema = ''
+        return bool(connection.connect().connection.meta().get_tables(
+            tableNamePattern=table_name,
+            schemaPattern=schema,
+            typeList=('TABLE', 'SYSTEM_TABLE')))
 
     def get_schema_names(self, connection, **kw):
-        query = "SELECT DISTINCT TABLE_SCHEM FROM SYSTEM.CATALOG"
-        return [row[0] for row in connection.execute(query)]
+        schemas = connection.connect().connection.meta().get_schemas()
+        schema_names = [schema['TABLE_SCHEM'] for schema in schemas]
+        # Phoenix won't return the default schema if there aren't any tables in it
+        if '' not in schema_names:
+            schema_names.insert(0, '')
+        return schema_names
 
-    def get_table_names(self, connection, schema=None, **kw):
+    def get_table_names(self, connection, schema=None, order_by=None, **kw):
+        '''order_by is ignored'''
         if schema is None:
-            query = "SELECT DISTINCT table_name FROM SYSTEM.CATALOG"
-            params = []
-        else:
-            query = "SELECT DISTINCT table_name FROM SYSTEM.CATALOG WHERE TABLE_SCHEM = ? "
-            params = [schema.upper()]
-        return [row[0] for row in connection.execute(query, params)]
+            schema = ''
+        tables = connection.connect().connection.meta().get_tables(
+            schemaPattern=schema, typeList=('TABLE', 'SYSTEM TABLE'))
+        return [table['TABLE_NAME'] for table in tables]
+
+    def get_view_names(self, connection, schema=None, **kw):
+        if schema is None:
+            schema = ''
+        return connection.connect().connection.meta().get_tables(schemaPattern=schema,
+                                                                 typeList=('VIEW'))
 
     def get_columns(self, connection, table_name, schema=None, **kw):
         if schema is None:
-            query = """SELECT COLUMN_NAME,  DATA_TYPE, NULLABLE
-                    FROM system.catalog
-                    WHERE table_name = ?
-                    AND ORDINAL_POSITION is not null
-                    ORDER BY ORDINAL_POSITION"""
-            params = [table_name.upper()]
-        else:
-            query = """SELECT COLUMN_NAME, DATA_TYPE, NULLABLE
-                    FROM system.catalog
-                    WHERE TABLE_SCHEM = ?
-                    AND table_name = ?
-                    AND ORDINAL_POSITION is not null
-                    ORDER BY ORDINAL_POSITION"""
-            params = [schema.upper(), table_name.upper()]
+            schema = ''
+        raw = connection.connect().connection.meta().get_columns(
+            schemaPattern=schema, tableNamePattern=table_name)
+        return [self._map_column(row) for row in raw]
 
-        # get all of the fields for this table
-        c = connection.execute(query, params)
-        cols = []
-        while True:
-            row = c.fetchone()
-            if row is None:
-                break
-            name = row[0]
-            col_type = COLUMN_DATA_TYPE[row[1]]
-            nullable = row[2] == 1 if True else False
+    def get_pk_constraint(self, connection, table_name, schema=None, **kw):
+        if schema is None:
+            schema = ''
+        columns = connection.connect().connection.meta().get_columns(
+            schemaPattern=schema, tableNamePattern=table_name, *kw)
+        pk_columns = [col['COLUMN_NAME'] for col in columns if col['KEY_SEQ'] > 0]
+        return {'constrained_columns': pk_columns}
 
-            col_d = {
-                'name': name,
-                'type': col_type,
-                'nullable': nullable,
-                'default': None
-            }
-
-            cols.append(col_d)
-        return cols
-
-    # TODO This should be possible to implement
-    def get_pk_constraint(self, conn, table_name, schema=None, **kw):
+    def get_indexes(self, conn, table_name, schema=None, **kw):
+        '''This information does not seem to be exposed via Avatica
+        TODO: Implement by directly querying SYSTEM tables ? '''
         return []
 
     def get_foreign_keys(self, conn, table_name, schema=None, **kw):
+        '''Foreign keys are a foreign concept to Phoenix,
+        but SqlAlchemy cannot parse the DB schema if it's not implemented '''
         return []
 
-    # TODO This should be possible to implement
-    def get_indexes(self, conn, table_name, schema=None, **kw):
-        return []
+    def _map_column(self, raw):
+        cooked = {}
+        cooked['name'] = raw['COLUMN_NAME']
+        cooked['type'] = COLUMN_DATA_TYPE[raw['TYPE_ID']]
+        cooked['nullable'] = bool(raw['IS_NULLABLE'])
+        cooked['autoincrement'] = bool(raw['IS_AUTOINCREMENT'])
+        cooked['comment'] = raw['REMARKS']
+        cooked['default'] = None  # Not apparent how to get this from the metatdata
+        return cooked
 
 
 class TINYINT(types.Integer):

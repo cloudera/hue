@@ -1,10 +1,13 @@
 # Copyright 2015 Lukas Lalinsky
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
 #
-#    http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Implementation of the JSON-over-HTTP RPC protocol used by Avatica."""
+"""Implementation of the PROTOBUF-over-HTTP RPC protocol used by Avatica."""
 
 import logging
 import math
@@ -85,24 +88,12 @@ SQLSTATE_ERROR_CLASSES = [
     ('INT', errors.InternalError),  # Phoenix internal error
 ]
 
-# Relevant properties as defined by https://calcite.apache.org/avatica/docs/client_reference.html
-OPEN_CONNECTION_PROPERTIES = (
-    'avatica_user',  # User for the database connection
-    'avatica_password',  # Password for the user
-    'auth',
-    'authentication',
-    'truststore',
-    'verify',
-    'do_as',
-    'user',
-    'password'
-)
-
 
 def raise_sql_error(code, sqlstate, message):
     for prefix, error_class in SQLSTATE_ERROR_CLASSES:
         if sqlstate.startswith(prefix):
             raise error_class(message, code, sqlstate)
+    raise errors.InternalError(message, code, sqlstate)
 
 
 def parse_and_raise_sql_error(message):
@@ -122,15 +113,20 @@ def parse_error_page(html):
 
 
 def parse_error_protobuf(text):
-    message = common_pb2.WireMessage()
-    message.ParseFromString(text)
+    try:
+        message = common_pb2.WireMessage()
+        message.ParseFromString(text)
 
-    err = responses_pb2.ErrorResponse()
-    err.ParseFromString(message.wrapped_message)
+        err = responses_pb2.ErrorResponse()
+        if not err.ParseFromString(message.wrapped_message):
+            raise Exception('No error message found')
+    except Exception:
+        # Not a protobuf error, fall through
+        return
 
     parse_and_raise_sql_error(err.error_message)
     raise_sql_error(err.error_code, err.sql_state, err.error_message)
-    raise errors.InternalError(err.error_message)
+    # Not a protobuf error, fall through
 
 
 class AvaticaClient(object):
@@ -236,7 +232,10 @@ class AvaticaClient(object):
     def get_catalogs(self, connection_id):
         request = requests_pb2.CatalogsRequest()
         request.connection_id = connection_id
-        return self._apply(request)
+        response_data = self._apply(request, 'ResultSetResponse')
+        response = responses_pb2.ResultSetResponse()
+        response.ParseFromString(response_data)
+        return response
 
     def get_schemas(self, connection_id, catalog=None, schemaPattern=None):
         request = requests_pb2.SchemasRequest()
@@ -245,7 +244,10 @@ class AvaticaClient(object):
             request.catalog = catalog
         if schemaPattern is not None:
             request.schema_pattern = schemaPattern
-        return self._apply(request)
+        response_data = self._apply(request, 'ResultSetResponse')
+        response = responses_pb2.ResultSetResponse()
+        response.ParseFromString(response_data)
+        return response
 
     def get_tables(self, connection_id, catalog=None, schemaPattern=None, tableNamePattern=None, typeList=None):
         request = requests_pb2.TablesRequest()
@@ -257,11 +259,12 @@ class AvaticaClient(object):
         if tableNamePattern is not None:
             request.table_name_pattern = tableNamePattern
         if typeList is not None:
-            request.type_list = typeList
-        if typeList is not None:
             request.type_list.extend(typeList)
         request.has_type_list = typeList is not None
-        return self._apply(request)
+        response_data = self._apply(request, 'ResultSetResponse')
+        response = responses_pb2.ResultSetResponse()
+        response.ParseFromString(response_data)
+        return response
 
     def get_columns(self, connection_id, catalog=None, schemaPattern=None, tableNamePattern=None, columnNamePattern=None):
         request = requests_pb2.ColumnsRequest()
@@ -274,17 +277,35 @@ class AvaticaClient(object):
             request.table_name_pattern = tableNamePattern
         if columnNamePattern is not None:
             request.column_name_pattern = columnNamePattern
-        return self._apply(request)
+        response_data = self._apply(request, 'ResultSetResponse')
+        response = responses_pb2.ResultSetResponse()
+        response.ParseFromString(response_data)
+        return response
 
     def get_table_types(self, connection_id):
         request = requests_pb2.TableTypesRequest()
         request.connection_id = connection_id
-        return self._apply(request)
+        response_data = self._apply(request, 'ResultSetResponse')
+        response = responses_pb2.ResultSetResponse()
+        response.ParseFromString(response_data)
+        return response
 
     def get_type_info(self, connection_id):
         request = requests_pb2.TypeInfoRequest()
         request.connection_id = connection_id
-        return self._apply(request)
+        response_data = self._apply(request, 'ResultSetResponse')
+        response = responses_pb2.ResultSetResponse()
+        response.ParseFromString(response_data)
+        return response
+
+    def connection_sync_dict(self, connection_id, connProps=None):
+        conn_props = self.connection_sync(connection_id, connProps)
+        return {
+            'autoCommit': conn_props.auto_commit,
+            'readOnly': conn_props.read_only,
+            'transactionIsolation': conn_props.transaction_isolation,
+            'catalog': conn_props.catalog,
+            'schema': conn_props.schema}
 
     def connection_sync(self, connection_id, connProps=None):
         """Synchronizes connection properties with the server.
@@ -298,18 +319,28 @@ class AvaticaClient(object):
         :returns:
             A ``common_pb2.ConnectionProperties`` object.
         """
-        if connProps is None:
-            connProps = {}
+        if connProps:
+            props = connProps.copy()
+        else:
+            props = {}
 
         request = requests_pb2.ConnectionSyncRequest()
         request.connection_id = connection_id
-        request.conn_props.auto_commit = connProps.get('autoCommit', False)
         request.conn_props.has_auto_commit = True
-        request.conn_props.read_only = connProps.get('readOnly', False)
         request.conn_props.has_read_only = True
-        request.conn_props.transaction_isolation = connProps.get('transactionIsolation', 0)
-        request.conn_props.catalog = connProps.get('catalog', '')
-        request.conn_props.schema = connProps.get('schema', '')
+        if 'autoCommit' in props:
+            request.conn_props.auto_commit = props.pop('autoCommit')
+        if 'readOnly' in props:
+            request.conn_props.read_only = props.pop('readOnly')
+        if 'transactionIsolation' in props:
+            request.conn_props.transaction_isolation = props.pop('transactionIsolation', None)
+        if 'catalog' in props:
+            request.conn_props.catalog = props.pop('catalog', None)
+        if 'schema' in props:
+            request.conn_props.schema = props.pop('schema', None)
+
+        if props:
+            logger.warning("Unhandled connection property:" + props)
 
         response_data = self._apply(request)
         response = responses_pb2.ConnectionSyncResponse()

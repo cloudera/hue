@@ -162,14 +162,16 @@ class Cursor(object):
             offset=offset, frame_max_size=self.itersize)
         self._set_frame(frame)
 
+    def _process_result(self, result):
+        if result.own_statement:
+            self._set_id(result.statement_id)
+        self._set_signature(result.signature if result.HasField('signature') else None)
+        self._set_frame(result.first_frame if result.HasField('first_frame') else None)
+        self._updatecount = result.update_count
+
     def _process_results(self, results):
         if results:
-            result = results[0]
-            if result.own_statement:
-                self._set_id(result.statement_id)
-            self._set_signature(result.signature if result.HasField('signature') else None)
-            self._set_frame(result.first_frame if result.HasField('first_frame') else None)
-            self._updatecount = result.update_count
+            return self._process_result(results[0])
 
     def _transform_parameters(self, parameters):
         typed_parameters = []
