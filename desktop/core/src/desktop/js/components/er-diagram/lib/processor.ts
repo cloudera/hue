@@ -28,6 +28,7 @@ class EntityNode {
   constructor(entity: IEntity) {
     this.entity = entity;
     this.relations = new Array<EntityNode>();
+    this.level = 0;
   }
 }
 
@@ -45,8 +46,8 @@ export function groupEntities(
   let level = 0;
   nodesMap.forEach((node: EntityNode) => {
     // To ensure levels are set even for disjoint graphs
-    if (node.level === undefined) {
-      level = setLevels(node, level);
+    if (node.level === 0) {
+      level = setLevels(node, level + 1);
     }
   });
 
@@ -76,8 +77,8 @@ function generateGraph(
   });
 
   relations.forEach((relation: IRelation) => {
-    const leftEntity: EntityNode = nodesMap.get(getNodeMapId(relation.left));
-    const rightEntity: EntityNode = nodesMap.get(getNodeMapId(relation.right));
+    const leftEntity: EntityNode | undefined = nodesMap.get(getNodeMapId(relation.left));
+    const rightEntity: EntityNode | undefined = nodesMap.get(getNodeMapId(relation.right));
     if (leftEntity && rightEntity) {
       leftEntity.relations.push(rightEntity);
     }
@@ -86,9 +87,9 @@ function generateGraph(
   return nodesMap;
 }
 
-function setLevels(entityNode: EntityNode, level: number) {
-  let maxLevel: number;
-  if (entityNode.level === undefined) {
+function setLevels(entityNode: EntityNode, level: number): number {
+  let maxLevel = 0;
+  if (entityNode.level === 0) {
     entityNode.level = level;
     maxLevel = level++;
     entityNode.relations.forEach((childNode: EntityNode) => {
@@ -102,11 +103,13 @@ function breadthFirstTraverse(nodesMap: Map<string, EntityNode>): Array<Array<IE
   const entities: Array<Array<IEntity>> = new Array<Array<IEntity>>();
 
   nodesMap.forEach((entityNode: EntityNode) => {
-    const level = entityNode.level;
-    if (entities[level] === undefined) {
-      entities[level] = new Array<IEntity>();
+    const level = entityNode.level - 1;
+    if (level >= 0) {
+      if (entities[level] === undefined) {
+        entities[level] = new Array<IEntity>();
+      }
+      entities[level].push(entityNode.entity);
     }
-    entities[level].push(entityNode.entity);
   });
 
   return entities;

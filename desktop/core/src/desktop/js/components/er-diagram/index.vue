@@ -122,8 +122,9 @@
         );
 
         if (leftPos && rightPos) {
-          const path: string = `M ${leftPos.x},${leftPos.y} C ${leftPos.x + CURVATURE},${leftPos.y}
-              ${rightPos.x - CURVATURE},${rightPos.y} ${rightPos.x},${rightPos.y}`;
+          const path: string =
+            `M ${leftPos.x},${leftPos.y} C ${leftPos.x + CURVATURE},${leftPos.y} ` +
+            `${rightPos.x - CURVATURE},${rightPos.y} ${rightPos.x},${rightPos.y}`;
           element.setAttribute('d', path);
 
           element.style.visibility = 'visible';
