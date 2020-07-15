@@ -1,0 +1,183 @@
+{
+  "entities": [
+    {
+      "id": "hue6.desktop_document2",
+      "type": "TABLE",
+      "database": "hue6",
+      "name": "desktop_document2",
+      "columns": [
+        {
+          "id": "hue6.desktop_document2.id",
+          "type": "COLUMN",
+          "tableId": "hue6.desktop_document2",
+          "name": "id"
+        },
+        {
+          "id": "hue6.desktop_document2.owner_id",
+          "type": "COLUMN",
+          "tableId": "hue6.desktop_document2",
+          "name": "owner_id"
+        },
+        {
+          "id": "hue6.desktop_document2.parent_directory_id",
+          "type": "COLUMN",
+          "tableId": "hue6.desktop_document2",
+          "name": "parent_directory_id"
+        },
+        {
+          "id": "hue6.desktop_document2.connector_id",
+          "type": "COLUMN",
+          "tableId": "hue6.desktop_document2",
+          "name": "connector_id"
+        },
+        {
+          "id": "hue6.desktop_document2.name",
+          "type": "COLUMN",
+          "tableId": "hue6.desktop_document2",
+          "name": "name"
+        },
+        {
+          "id": "hue6.desktop_document2.description",
+          "type": "COLUMN",
+          "tableId": "hue6.desktop_document2",
+          "name": "description"
+        },
+        {
+          "id": "hue6.desktop_document2.uuid",
+          "type": "COLUMN",
+          "tableId": "hue6.desktop_document2",
+          "name": "uuid"
+        },
+        {
+          "id": "hue6.desktop_document2.type",
+          "type": "COLUMN",
+          "tableId": "hue6.desktop_document2",
+          "name": "type"
+        },
+        {
+          "id": "hue6.desktop_document2.data",
+          "type": "COLUMN",
+          "tableId": "hue6.desktop_document2",
+          "name": "data"
+        },
+        {
+          "id": "hue6.desktop_document2.extra",
+          "type": "COLUMN",
+          "tableId": "hue6.desktop_document2",
+          "name": "extra"
+        },
+        {
+          "id": "hue6.desktop_document2.search",
+          "type": "COLUMN",
+          "tableId": "hue6.desktop_document2",
+          "name": "search"
+        },
+        {
+          "id": "hue6.desktop_document2.last_modified",
+          "type": "COLUMN",
+          "tableId": "hue6.desktop_document2",
+          "name": "last_modified"
+        },
+        {
+          "id": "hue6.desktop_document2.version",
+          "type": "COLUMN",
+          "tableId": "hue6.desktop_document2",
+          "name": "version"
+        },
+        {
+          "id": "hue6.desktop_document2.is_history",
+          "type": "COLUMN",
+          "tableId": "hue6.desktop_document2",
+          "name": "is_history"
+        },
+        {
+          "id": "hue6.desktop_document2.is_managed",
+          "type": "COLUMN",
+          "tableId": "hue6.desktop_document2",
+          "name": "is_managed"
+        },
+        {
+          "id": "hue6.desktop_document2.is_trashed",
+          "type": "COLUMN",
+          "tableId": "hue6.desktop_document2",
+          "name": "is_trashed"
+        }
+      ]
+    },
+    {
+      "id": "hue6.useradmin_organizationuser",
+      "type": "TABLE",
+      "database": "hue6",
+      "name": "useradmin_organizationuser",
+      "columns": [
+        {
+          "id": "hue6.useradmin_organizationuser.id",
+          "type": "COLUMN",
+          "tableId": "hue6.useradmin_organizationuser",
+          "name": "id"
+        }
+      ]
+    },
+    {
+      "id": "hue6.desktop_connector",
+      "type": "TABLE",
+      "database": "hue6",
+      "name": "desktop_connector",
+      "columns": [
+        {
+          "id": "hue6.desktop_connector.id",
+          "type": "COLUMN",
+          "tableId": "hue6.desktop_connector",
+          "name": "id"
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "desc": "Foreign Key",
+      "left": {
+        "id": "hue6.desktop_document2.parent_directory_id",
+        "type": "COLUMN",
+        "tableId": "hue6.desktop_document2",
+        "name": "parent_directory_id"
+      },
+      "right": {
+        "id": "hue6.desktop_document2.id",
+        "type": "COLUMN",
+        "tableId": "hue6.desktop_document2",
+        "name": "id"
+      }
+    },
+    {
+      "desc": "Foreign Key",
+      "left": {
+        "id": "hue6.desktop_document2.owner_id",
+        "type": "COLUMN",
+        "tableId": "hue6.desktop_document2",
+        "name": "owner_id"
+      },
+      "right": {
+        "id": "hue6.useradmin_organizationuser.id",
+        "type": "COLUMN",
+        "tableId": "hue6.useradmin_organizationuser",
+        "name": "id"
+      }
+    },
+    {
+      "desc": "Foreign Key",
+      "left": {
+        "id": "hue6.desktop_document2.connector_id",
+        "type": "COLUMN",
+        "tableId": "hue6.desktop_document2",
+        "name": "connector_id"
+      },
+      "right": {
+        "id": "hue6.desktop_connector.id",
+        "type": "COLUMN",
+        "tableId": "hue6.desktop_connector",
+        "name": "id"
+      }
+    }
+  ]
+}

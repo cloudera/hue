@@ -10,12 +10,23 @@
     "isolatedModules": true,
     "esModuleInterop": true,
     "baseUrl": "desktop/core/src/desktop/js",
-    "typeRoots": [ "desktop/core/src/desktop/js/types", "./node_modules/@types"]
+    "typeRoots": [ "desktop/core/src/desktop/js/types", "./node_modules/@types"],
+    "lib": ["es2019"]
   },
   "include": [
     "."
   ],
   "exclude": [
-    "node_modules"
+    "apps",
+    "build",
+    "dist",
+    "docs",
+    "ext",
+    "logs",
+    "maven",
+    "node_modules",
+    ".github",
+    ".git",
+    ".circleci"
   ]
 }
