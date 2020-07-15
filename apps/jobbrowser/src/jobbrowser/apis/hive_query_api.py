@@ -35,10 +35,12 @@ LOG = logging.getLogger(__name__)
 class HiveQueryApi(Api):
 
   def __init__(self, user, cluster=None):
-    self.user=user
-    self.cluster=cluster
+    self.user = user
+    self.cluster = cluster
+    self.api = HiveQueryClient()
 
   def apps(self, filters):
+    queries = self.api.get_queries(limit=100)
 
     apps = {
       'apps': [{
@@ -51,47 +53,41 @@ class HiveQueryApi(Api):
           'queue': query.queue_name,
           'progress': '100',
           'isRunning': False,
-          'canWrite': False,
+          'canWrite': True,
           'duration': query.elapsed_time,
           'submitted': query.start_time,
         }
-        for query in HiveQuery.objects.using('query').order_by('-id')[:100]
+        for query in queries
       ],
-      'total': 0
+      'total': self.api.get_query_count()
     }
-
-    apps['total'] = len(apps['apps'])
 
     return apps
 
   def app(self, appid):
-    sql_query = 'SELECT * FROM default.business_unit LIMIT 100'
+    query = self.api.get_query(query_id=appid)
 
-    job = HiveQueryClient().get_query_analysis(sql_query=sql_query)
-
-    if not job:
+    if not query:
       raise PopupException(_('Could not find query id %s' % appid))
 
     app = {
-      'id': job['id'],
-      'name': sql_query[:60] + ('...' if len(sql_query) > 60 else ''),
-      'status': self._get_status(job),
-      'apiStatus': self._api_status(self._get_status(job)),
+      'id': query.query_id,
+      'name': query.query[:60] + ('...' if len(query.query) > 60 else ''),
+      'status': query.status,
+      'apiStatus': self._api_status(query.status),
       'type': 'hive-query',
-      'user': self.user.username,
-      'queue': 'queue',
+      'user': query.request_user,
+      'queue': query.queue_name,
       'progress': '100',
       'isRunning': False,
-      'canWrite': False,
-      'duration': 1,
-      'submitted': 1,
+      'canWrite': True,
+      'duration': query.elapsed_time,
+      'submitted': query.start_time,
       'properties': {
         'plan': {
-          'stmt': sql_query,
+          'stmt': query.query,
           'plan': '''Explain
-OPTIMIZED SQL: SELECT `id`, `head`, `creator`, `created_date`
-FROM `default`.`business_unit`
-LIMIT 100
+OPTIMIZED SQL: %(text_query)s
 STAGE DEPENDENCIES:
 Stage-0 is a root stage
 STAGE PLANS:
@@ -108,7 +104,7 @@ outputColumnNames: _col0, _col1, _col2, _col3
 Limit
 Number of rows: 100
 ListSink
-''', #.replace('\n', ' '),
+''' % {'text_query': query.query},
           'perf': ''
         }
       }
@@ -129,9 +125,6 @@ ListSink
 
     return message;
 
-  def _get_status(self, job):
-    return 'RUNNING' if job['status'] != 'FINISHED' else "FINISHED"
-
   def _api_status(self, status):
     if status == 'SUCCESS':
       return 'SUCCEEDED'
@@ -145,12 +138,16 @@ ListSink
 
 class HiveQueryClient():
 
-  def get_query_analysis(self, sql_query):
-    return {
-      'id': 'dev_20200417220345_3cf5e2a4-a3c9-4056-8bf7-76fb8a75f360',
-      'queryText': sql_query,
-      'status': 'FINISHED'
-    }
+  def get_query_count(self):
+    return HiveQuery.objects.using('query').count()
+
+  def get_queries(self, limit=100):
+    return HiveQuery.objects.using('query').order_by('-id')[:limit]
+
+  def get_query(self, query_id):
+    return HiveQuery.objects.using('query').get(query_id=query_id)
+
+  def get_query_analysis(self, query_id): pass
 
   # EXPLAIN with row count
   # CBO COST

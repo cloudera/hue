@@ -1808,14 +1808,14 @@ ${ render_bundle('jobBrowser') | n,unicode }
         <!-- ko if: $root.job().mainType() == 'queries-hive' -->
         <div class="tab-pane active" id="queries-page-hive-plan-text${ SUFFIX }" data-profile="plan">
           <!-- ko if: properties.plan && properties.plan().plan -->
-            <hive-query-plan></hive-query-plan>
+            <pre data-bind="text: properties.plan().plan || _('The selected tab has no data')"></pre>
           <!-- /ko -->
         </div>
         <div class="tab-pane" id="queries-page-hive-stmt${ SUFFIX }" data-profile="stmt">
           <pre data-bind="text: (properties.plan && properties.plan().stmt) || _('The selected tab has no data')"></pre>
         </div>
         <div class="tab-pane" id="queries-page-hive-perf${ SUFFIX }" data-profile="perf">
-          <pre data-bind="text: (properties.plan && properties.plan().perf && properties.plan().perf && JSON.stringify(JSON.parse(properties.plan().perf), null, 2)) || _('The selected tab has no data')"></pre>
+          <hive-query-plan></hive-query-plan>
         </div>
         <!-- /ko -->
       </div>
