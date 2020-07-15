@@ -336,7 +336,7 @@ class TestAutocomplete(object):
 
           data = SqlAlchemyApi(self.user, interpreter).autocomplete(snippet)
 
-          assert_equal(data['databases'], ['SYSTEM', 'NULL'])
+          assert_equal(data['databases'], ['SYSTEM', ' '])
 
   def test_columns_with_null_type(self):
     interpreter = {
