@@ -26,7 +26,7 @@
     </div>
     <div class="columns-container">
       <div
-        v-for="column in entity.columns.slice(0, maxColumns)"
+        v-for="column in entity.columns.slice(0, maxCols)"
         :key="column.id"
         :data-entity-id="column.id"
         :title="column.name"
@@ -37,14 +37,19 @@
         {{ column.name }}
       </div>
       <div
-        v-if="entity.columns.length > maxColumns"
-        :data-entity-id="entity.columns.map(column => column.id).join(' ')"
+        v-if="entity.columns.length > maxCols"
+        :data-entity-id="
+          entity.columns
+            .slice(maxCols)
+            .map(column => column.id)
+            .join(' ')
+        "
         class="grouped-columns"
         @click.stop="expandColumns()"
       >
         <div class="left-point" />
         <div class="right-point" />
-        +{{ entity.columns.length - maxColumns }} columns
+        +{{ entity.columns.length - maxCols }} columns
       </div>
     </div>
   </div>
@@ -61,12 +66,18 @@
     @Prop() entity: Table;
     @Prop({ default: 10 }) maxColumns: number;
 
-    updated(): void {
-      this.$emit('updated');
+    maxCols: number = 0;
+
+    created(): void {
+      this.maxCols = this.maxColumns;
     }
 
     expandColumns(): void {
-      this.maxColumns = Number.MAX_SAFE_INTEGER;
+      this.maxCols = Number.MAX_SAFE_INTEGER;
+    }
+
+    updated(): void {
+      this.$emit('updated');
     }
   }
 </script>
