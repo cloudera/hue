@@ -47,7 +47,7 @@
     "knockout.validation": "2.0.3",
     "less": "^3.10.3",
     "localforage": "1.7.3",
-    "lodash": "4.17.13",
+    "lodash": "4.17.19",
     "medium-editor": "5.23.3",
     "page": "1.8.6",
     "plotly.js-dist": "1.45.3",
