@@ -1,6 +1,6 @@
 {
   "name": "gethue",
-  "version": "4.7.1",
+  "version": "4.7.5",
   "description": "Hue is an Open source SQL Query Editor for Databases/Warehouses",
   "homepage": "http://gethue.com",
   "repository": {
@@ -86,6 +86,7 @@
     "babel-plugin-module-resolver": "4.0.0",
     "babel-preset-typescript-vue": "1.1.1",
     "clean-webpack-plugin": "1.0.1",
+    "copy-webpack-plugin": "^6.0.3",
     "css-loader": "^3.4.2",
     "eslint": "7.2.0",
     "eslint-config-prettier": "6.11.0",
@@ -127,6 +128,8 @@
     "webpack": "webpack --config webpack.config.js",
     "webpack-login": "webpack --config webpack.config.login.js",
     "webpack-workers": "webpack --config webpack.config.workers.js",
+    "webpack-npm": "webpack --config webpack.config.npm.js",
+    "publish-gethue": "npm run webpack-npm && cd npm_dist && npm publish",
     "dev": "webpack --watch -d",
     "dev-workers": "webpack --config webpack.config.workers.js --watch -d",
     "less": "./node_modules/.bin/grunt less",
@@ -142,9 +145,5 @@
     "test-clearCache": "jest --clearCache",
     "check-license": "node ./tools/license/checkLicenses.js",
     "check-absolute-paths": "node ./tools/detect-absolute-paths/detectAbsolutePaths.js"
-  },
-  "files": [
-    "desktop/core/src/desktop/js/parse",
-    "desktop/core/src/desktop/js/sql"
-  ]
+  }
 }

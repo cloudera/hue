@@ -23,6 +23,7 @@ build
 env
 metastore_db
 VERSION_INFO
+npm_dist
 
 # Generated configuration
 desktop/conf/*.ini

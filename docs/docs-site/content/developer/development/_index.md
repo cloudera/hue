@@ -799,6 +799,12 @@ Release:
 
 Then send release notes to the [Forum](https://discourse.gethue.com/), [hue-user](https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user), https://twitter.com/gethue !
 
+### Publishing GetHue
+
+To publish gethue to NPM registry, the following command would have to be run. Kindly refrain from using `npm publish`.
+
+    npm run publish-gethue
+
 ## Building
 
 ### Dev Docker
