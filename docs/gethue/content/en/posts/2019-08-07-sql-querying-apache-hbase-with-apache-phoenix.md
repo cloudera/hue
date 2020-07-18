@@ -47,7 +47,7 @@ categories:
 
 In this post about Phoenix, let's follow [Phoenix's 15-minute tutorial][5] then query the US_POPULATION table via the Editor:
 
-Hue supports Phoenix the best via the SqlAlchemy interfaces as described in the [SQL Connector documentation][https://docs.gethue.com/administrator/configuration/connectors/#apache-phoenix]. Since [HUE-9367](https://issues.cloudera.org/browse/HUE-9367) the connector is shipped with Hue so it all works out of the box.
+Hue supports Phoenix the best via the SqlAlchemy interfaces as described in the [SQL Connector documentation](https://docs.gethue.com/administrator/configuration/connectors/#apache-phoenix). Since [HUE-9367](https://issues.cloudera.org/browse/HUE-9367) the connector is shipped with Hue so it all works out of the box.
 
 In the desktop/conf/hue.ini config file section just add the Phoenix interpreter:
 
