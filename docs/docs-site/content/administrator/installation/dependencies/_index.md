@@ -101,6 +101,15 @@ for more details, refer to this link: [https://docs.oracle.com/cd/E37670_01/E590
     yum install -y scl-utils
     yum install -y python27
 
+### SLES 12
+
+    zypper in ant asciidoc cyrus-sasl-devel cyrus-sasl-gssapi cyrus-sasl-plain gcc gcc-c++ krb5-devel libffi-devel libxml2-devel libxslt-devel make mysql mysql-devel openldap2-devel python-devel sqlite-devel gmp-devel
+
+Tip: if you run into building kerberos extension issue and see message `krb5-config: command not found`, install and append it to environment variable PATH.
+
+    rpm -ql krb5-devel | grep krb5-config ## find the path of krb5-config
+    export PATH=$PATH:/usr/lib/mit/bin
+
 ### MacOS
 
 * Xcode command line tools
