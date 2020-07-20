@@ -875,7 +875,7 @@ After modifying files under tools/ace-editor run the following to build ace.js
     npm install
     make ace
 
-### Embedded language references
+### Language references
 
 The tools for generating the embedded language reference manuals can be found under `hue/tools/sql-docs/`
 
