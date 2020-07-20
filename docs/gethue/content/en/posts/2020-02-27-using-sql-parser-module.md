@@ -140,9 +140,9 @@ Which then will output keywords suggestions and all the known locations:
 
 * Local dependency
 
-Checkout Hue and cd in the [demo app](https://github.com/cloudera/hue/tree/master/tools/parser/hue_dep):
+Checkout Hue and cd in the [demo app](https://github.com/cloudera/hue/tree/master/tools/examples/api/hue_dep):
 
-    cd tools/parser/hue_dep
+    cd tools/examples/api/hue_dep
 
     npm install
     npm run webpack
