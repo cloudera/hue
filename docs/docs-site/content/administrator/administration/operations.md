@@ -19,8 +19,7 @@ Next in each screen:
 
 ### Configuration
 
-Displays a list of the installed Hue applications and their configuration. The location of the folder containing the Hue
-configuration files is shown at the top of the page. Hue configuration settings are in the hue.ini configuration file.
+Displays a list of the installed Hue applications and their configuration.
 
 Hue ships with a default configuration that assumes a various set of services to be present in the cluster. If you are running on a real cluster, you can customize the `hue.ini` configuration file (`/etc/hue/hue.ini` when installed from the package version) or `pseudo-distributed.ini` in `desktop/conf` when in development mode).
 
@@ -29,24 +28,19 @@ these settings, see [Configuration](/administrator/configuration/).
 
 Hue loads and merges all of the files with extension `.ini` located in the `/etc/hue` directory. Files that are alphabetically later take precedence.
 
-To list all available configuration options, run:
-
-    /usr/share/hue/build/env/bin/hue config_help | less
-
-This commands outlines the various sections and options in the configuration,
-and provides help and information on the default values.
-
-
-To view the current configuration from within Hue, open:
-
-    http://<hue>/hue/dump_config
-
+After editing the ini file, Hue needs to be restarted.
 
 ### Configuration Validation
 
-Hue can detect certain invalid configuration.
+To view the configuration of a running Hue instance, navigate to:
 
-To view the configuration of a running Hue instance, navigate to `http://myserver:8888/hue/dump_config`.
+    http://<hue>/hue/dump_config
+
+The location of the folder containing the Hue ini files is shown at the top of the page as well as all the configuration values with help and information on the default values.
+
+To list all available configuration options via the command line, run:
+
+    /usr/share/hue/build/env/bin/hue config_help | less
 
 ### Server Logs
 
