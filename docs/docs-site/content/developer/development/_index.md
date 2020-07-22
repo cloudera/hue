@@ -30,21 +30,17 @@ Build once:
 
     make apps
 
-[Dependencies documentation](/administrator/installation/dependencies/) must help in troubleshooting build issues.
+The [dependencies documentation](/administrator/installation/dependencies/) is here to help for troubleshooting build issues.
 
-Then start the dev server (which will auto reload):
+Then start the dev server (which will auto reload on file changes):
 
     ./build/env/bin/hue runserver
 
-If you are changing Javascript or CSS files, also start:
+If you are changing JavaScript or CSS files, also start:
 
     npm run dev
 
-### Connecting Database
-
-Once build, you need to connect Hue to a database to start running queries. It is recommended to use MySQL or PostGres for development. Refer [connectors documentation](/administrator/configuration/connectors/) for other supported databases.
-
-#### Configure MySQL
+Once build, in order to avoid the `database is locked` errors, you also need to connect Hue to a transactional database. It is recommended to use MySQL or PostGreSQL for development.
 
 Open the `desktop/conf/pseudo-distributed.ini` file in a text editor. Add the following options (and modify accordingly) for your MySQL setup:
 
@@ -57,26 +53,34 @@ Directly below the `[[database]]` line, add the following.
     password=secretpassword
     name=hue
 
-Below the `[[interpreters]]` of `[notebook]`.
+Read more about how [configurations work](/administrator/configuration/).
+
+### First SQL queries!
+
+Here is how to point the Editor to MySql or [Apache Hive](https://hive.apache.org/) and execute your first SQL queries. For other supported databases refer to the [connectors](/administrator/configuration/connectors/).
+
+#### MySQL
+
+In `desktop/conf/pseudo-distributed.ini`, below the `[[interpreters]]` section of of `[notebook]`.
 
     [[[mysql]]]
     name=MySQL
     interface=sqlalchemy
     options='{"url": "mysql://${USER}:${PASSWORD}@localhost:3306/hue"}'
 
-#### Configure Apache Hive
+#### Apache Hive
 
-You can connect to an existing Hive instance or setup a new one locally. An easy way to setup Hive locally is using Docker. You could use this container for Hive 2.3.2 - https://github.com/big-data-europe/docker-hive.
+You can connect to an existing Hive instance or setup a new one locally. An easy way to setup one is with Docker. You could use this container for Hive 2.3.2 - https://github.com/big-data-europe/docker-hive.
 
     git clone https://github.com/big-data-europe/docker-hive
     cd docker-hive
     docker-compose up -d
 
-Just follow the above 3 steps and you would have a running Hive instance on jdbc:hive2://localhost:10000. Follow [testing section](https://github.com/big-data-europe/docker-hive#testing) in the readme of the above repo to check if things are working as expected.
+Just follow the above 3 steps and you would have a running Hive instance on jdbc:hive2://localhost:10000.
 
 Now under Hue open `desktop/conf/pseudo-distributed.ini` file in a text editor, and modify the following options.
 
-Directly below the `[[beeswax]]` line, add the following.
+Directly below the `[[beeswax]]` line, add the following:
 
     # Host where HiveServer2 is running.
     hive_server_host=localhost
@@ -86,13 +90,13 @@ Directly below the `[[beeswax]]` line, add the following.
 
     thrift_version=7
 
-Below the `[[interpreters]]` of `[notebook]`, add.
+Below the `[[interpreters]]` of `[notebook]`, add:
 
     [[[hive]]]
       name=Hive
       interface=hiveserver2
 
-Restart Hue and you must be able to run Hive queries.
+Restart Hue, open the Editors and start typing your first queries!
 
 ### Dev environment
 

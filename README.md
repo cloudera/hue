@@ -25,15 +25,15 @@ Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.c
 Getting Started
 ---------------
 
-You can start Hue in 3 ways - From source, Docker or Kubernetes. Once setup you would have to configure Hue to connect with the desired database.
+You can start Hue in 3 ways - From source, Docker or Kubernetes. Once setup you would have to configure Hue to point to the desired databases you want to query.
 
 The [Forum](https://discourse.gethue.com/) is here in case you are looking for help.
 
 Building From Source
 -----------
 
-First, install dependencies, clone Hue repo, build and get the development server running.
-[Dependencies documentation](https://docs.gethue.com/administrator/installation/dependencies/) must help you in installing dependencies, and troubleshooting build issues.
+First, clone Hue repo, install the [dependencies](https://docs.gethue.com/administrator/installation/dependencies/), build and get the development server running.
+
 ```
 # Install dependencies
 git clone https://github.com/cloudera/hue.git
@@ -43,8 +43,6 @@ build/env/bin/hue runserver
 ```
 
 Now Hue should be running on [http://localhost:8000](http://localhost:8000)!
-
-Then, configure Hue to connect to a database for running queries. It is recommended to use MySQL or PostGres for development.
 
 Read more about configurations in the [development documentations](https://docs.gethue.com/developer/development/).
 
