@@ -2,7 +2,11 @@
 
 ## Run the image
 
-Hue can run in one line via the `docker` command (but needs to be configured to point to a traditional database instead of Sqlite). To have a zero configuration start use [kubernetes](/tools/kubernetes/) instead.
+Hue can run in one line via the `docker` command.
+
+It also needs to be configured to point to a traditional database instead of Sqlite so see below how to configure the docker image to point to a local MySql or use `docker-compose` which will start both services for you.
+
+To have a zero configuration start use [kubernetes](/tools/kubernetes/) is also a great option.
 
 ### Docker
 
@@ -11,6 +15,8 @@ Directly boot the image:
     docker run -it -p 8888:8888 gethue/hue:latest
 
 Hue should then be up and running on your default Docker IP on the port 8888, so usually [http://127.0.0.1:8888](http://127.0.0.1:8888).
+
+Then to avoid the `database locked` error, please see below [Configuration](#configuration).
 
 ### Docker Compose
 
@@ -33,6 +39,7 @@ And to stop:
     docker-compose down
 
 **Note**
+
 If http://127.0.0.1:8888 does not work, get the IP of the docker container with:
 
     sudo docker ps
@@ -49,12 +56,12 @@ So in our case [http://172.17.0.2:8888](http://172.17.0.2:8888).
 By default the Hue container is using
 [``tools/docker/hue/conf/hue-overrides.ini``](/tools/docker/hue/conf/hue-overrides.ini) on top of [``desktop/conf/hue.ini``](/desktop/conf/hue.ini) which assumes localhost for all the data services and uses and embedded sqlite database that will error out.
 
-The default ini is used for configuration at the image build time (e.g. which apps to always disable or certain settings like [banner customization](http://gethue.com/add-a-top-banner-to-hue/)).
-
-In order to be useful, configure Hue at runtime to point to external services. The simplified ini [``hue-overrides.ini``](/tools/docker/hue/conf/hue-overrides.ini) can be edited before starting Hue via:
+To configure Hue to point to the databases to query, the simplified ini [``hue-overrides.ini``](/tools/docker/hue/conf/hue-overrides.ini) can be edited before starting Hue via:
 
     cd tools/docker/hue
     cp conf/hue-overrides.ini hue.ini
+
+#### Hue's Database
 
 Edit the database settings in `hue.ini` for one of these two databases. Do not forget to create a 'hue' database too.
 
@@ -71,7 +78,6 @@ Postgres
 
 MySql
 
-
     [desktop]
     [[database]]
     engine=mysql
@@ -81,7 +87,9 @@ MySql
     password=secret
     name=hue
 
-If you want to be able to query a database out of the box, update the connector interpreters accordingly, e.g.:
+#### Querying Databases
+
+To be able to query a database, update the connector interpreters accordingly, e.g.:
 
 ```
 [notebook]
