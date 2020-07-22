@@ -813,7 +813,7 @@ To publish gethue to NPM registry, the following command would have to be run. K
 
 ### Dev Docker
 
-Try basic changes in Hue without compiling it locally:
+Try basic changes [in 3 minutes](https://gethue.com/quick-start-a-hue-development-environment-in-3-minutes-with-docker/) without compiling Hue locally hence avoiding the setting up of [dependencies](/developer/):
 
     git clone https://github.com/cloudera/hue.git
     cd hue
@@ -821,7 +821,7 @@ Try basic changes in Hue without compiling it locally:
 
 Then edit the `[[database]]` section to specify a proper database, here MySql:
 
-    host=127.0.0.1 # Not localhost if Docker
+    host=127.0.0.1 # Don't use 'localhost' if Docker
     engine=mysql
     user=hue
     password=hue
