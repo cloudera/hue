@@ -55,7 +55,12 @@ Start Hue in a single click with the [Docker Guide](https://github.com/cloudera/
 
 Now Hue should be up and running on your default Docker IP on the port 8888 [http://localhost:8888](http://localhost:8888)!
 
-Read more about configurations [here](https://github.com/cloudera/hue/tree/master/tools/docker/hue#configuration).
+Read more about [configurations](https://github.com/cloudera/hue/tree/master/tools/docker/hue#configuration) then.
+
+Development Docker
+------------------
+
+For a very Quick Start and not even bother with installing a dev environment, go with the [Dev Docker](https://docs.gethue.com/developer/development/#dev-docker).
 
 Kubernetes
 ----------
