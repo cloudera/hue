@@ -229,24 +229,12 @@ DAEMON_API_USERNAME = Config(
   dynamic_default=get_daemon_api_username
 )
 
-DAEMON_API_PASSWORD = Config(
-  key="daemon_api_password",
-  help=_t("Password for Impala Daemon when username/password authentication is enabled for the Impala Daemon UI."),
-  private=True,
-  default=None)
-
-DAEMON_API_PASSWORD_SCRIPT = Config(
-  key="daemon_api_password_script",
-  help=_t("Execute this script to produce the Impala Daemon Password. This will be used when `daemon_api_password` is not set."),
-  private=True,
-  type=coerce_password_from_script,
-  default=None)
-
-DAEMON_API_USERNAME = Config(
-  key="daemon_api_username",
-  help=_t("Username for Impala Daemon when username/password authentication is enabled for the Impala Daemon UI."),
-  private=True,
-  default=None)
+DAEMON_API_AUTH_SCHEME = Config(
+  key="daemon_api_auth_scheme",
+  help=_t("The authentication scheme to use with 'daemon_api_username' and 'daemon_api_password' when authenticating to the Impala Daemon UI, either 'digest' (default) or 'basic'."),
+  private=False,
+  default="digest"
+)
 
 def get_use_sasl_default():
   """kerberos enabled or password is specified"""

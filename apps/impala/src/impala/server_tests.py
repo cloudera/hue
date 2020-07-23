@@ -53,6 +53,7 @@ class TestImpalaDaemonApi():
 
           server._client.set_digest_auth.assert_called()
           server._client.set_kerberos_auth.assert_not_called()
+          server._client.set_basic_auth.assert_not_called()
 
     with patch('impala.server.DAEMON_API_USERNAME.get') as DAEMON_API_USERNAME_get:
       with patch('impala.server.DAEMON_API_PASSWORD.get') as DAEMON_API_PASSWORD_get:
@@ -64,6 +65,39 @@ class TestImpalaDaemonApi():
 
           server._client.set_digest_auth.assert_not_called()
           server._client.set_kerberos_auth.assert_not_called()
+          server._client.set_basic_auth.assert_not_called()
+
+
+  def test_basic_auth(self):
+
+    with patch('impala.server.DAEMON_API_USERNAME.get') as DAEMON_API_USERNAME_get:
+      with patch('impala.server.DAEMON_API_PASSWORD.get') as DAEMON_API_PASSWORD_get:
+        with patch('impala.server.HttpClient') as HttpClient:
+          with patch('impala.server.DAEMON_API_AUTH_SCHEME.get') as DAEMON_API_AUTH_SCHEME_get:
+            DAEMON_API_USERNAME_get.return_value = 'impala'
+            DAEMON_API_PASSWORD_get.return_value = 'impala'
+            DAEMON_API_AUTH_SCHEME_get.return_value = 'basic'
+
+            server = ImpalaDaemonApi('localhost')
+
+            server._client.set_basic_auth.assert_called()
+            server._client.set_digest_auth.assert_not_called()
+            server._client.set_kerberos_auth.assert_not_called()
+
+    with patch('impala.server.DAEMON_API_USERNAME.get') as DAEMON_API_USERNAME_get:
+      with patch('impala.server.DAEMON_API_PASSWORD.get') as DAEMON_API_PASSWORD_get:
+        with patch('impala.server.HttpClient') as HttpClient:
+          with patch('impala.server.DAEMON_API_AUTH_SCHEME.get') as DAEMON_API_AUTH_SCHEME_get:
+            DAEMON_API_USERNAME_get.return_value = 'impala'
+            DAEMON_API_PASSWORD_get.return_value = None
+            DAEMON_API_AUTH_SCHEME_get.return_value = 'basic'
+
+            server = ImpalaDaemonApi('localhost')
+
+            server._client.set_basic_auth.assert_not_called()
+            server._client.set_digest_auth.assert_not_called()
+            server._client.set_kerberos_auth.assert_not_called()
+
 
   def test_kerberos_auth(self):
 
@@ -80,6 +114,7 @@ class TestImpalaDaemonApi():
 
             server._client.set_digest_auth.assert_called()
             server._client.set_kerberos_auth.assert_not_called()
+            server._client.set_basic_auth.assert_not_called()
 
     with patch('impala.server.DAEMON_API_USERNAME.get') as DAEMON_API_USERNAME_get:
       with patch('impala.server.DAEMON_API_PASSWORD.get') as DAEMON_API_PASSWORD_get:
@@ -95,6 +130,7 @@ class TestImpalaDaemonApi():
 
             server._client.set_digest_auth.assert_not_called()
             server._client.set_kerberos_auth.assert_not_called()
+            server._client.set_basic_auth.assert_not_called()
 
     with patch('impala.server.DAEMON_API_USERNAME.get') as DAEMON_API_USERNAME_get:
       with patch('impala.server.DAEMON_API_PASSWORD.get') as DAEMON_API_PASSWORD_get:
@@ -108,6 +144,7 @@ class TestImpalaDaemonApi():
 
             server._client.set_digest_auth.assert_not_called()
             server._client.set_kerberos_auth.assert_called()
+            server._client.set_basic_auth.assert_not_called()
 
     with patch('impala.server.DAEMON_API_USERNAME.get') as DAEMON_API_USERNAME_get:
       with patch('impala.server.DAEMON_API_PASSWORD.get') as DAEMON_API_PASSWORD_get:
@@ -122,6 +159,7 @@ class TestImpalaDaemonApi():
 
             server._client.set_digest_auth.assert_not_called()
             server._client.set_kerberos_auth.assert_called()
+            server._client.set_basic_auth.assert_not_called()
 
     with patch('impala.server.DAEMON_API_USERNAME.get') as DAEMON_API_USERNAME_get:
       with patch('impala.server.DAEMON_API_PASSWORD.get') as DAEMON_API_PASSWORD_get:
@@ -137,6 +175,7 @@ class TestImpalaDaemonApi():
 
               server._client.set_digest_auth.assert_not_called()
               server._client.set_kerberos_auth.assert_not_called()
+              server._client.set_basic_auth.assert_not_called()
 
     with patch('impala.server.DAEMON_API_USERNAME.get') as DAEMON_API_USERNAME_get:
       with patch('impala.server.DAEMON_API_PASSWORD.get') as DAEMON_API_PASSWORD_get:
@@ -152,3 +191,4 @@ class TestImpalaDaemonApi():
 
               server._client.set_digest_auth.assert_not_called()
               server._client.set_kerberos_auth.assert_called()
+              server._client.set_basic_auth.assert_not_called()
