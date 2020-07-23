@@ -19,7 +19,7 @@ export PYTHON_VER=python3.8
 
 ### Database
 
-Hue is being ran the most with [MySQL InnoDB, PostgreSQL or Oracle](https://www.cloudera.com/documentation/enterprise/latest/topics/hue_dbs_0.html)
+Hue is being ran the most with [MySQL InnoDB, PostgreSQL or Oracle](https://docs.cloudera.com/documentation/enterprise/latest/topics/hue_dbs_0.html)
 
 **Note**: MySQL module
 
@@ -195,7 +195,7 @@ There is more details on this [Apply Temporary Workaround for Oracle 12 Client](
 
 #### Mac
 
-* [Oracle Instant Client](http://www.oracle.com/technetwork/database/database-technologies/instant-client/downloads/index.html)
+* [Oracle Instant Client](https://www.oracle.com/database/technologies/instant-client/downloads.html)
 
 ### Java
 
