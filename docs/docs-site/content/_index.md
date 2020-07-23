@@ -9,23 +9,27 @@ pre = "<b>1. </b>"
 
 <h1>Documentation</h1>
 
-Hue is a mature open source SQL Assistant for querying [Databases & Data Warehouses](https://docs.gethue.com/administrator/configuration/connectors/) and collaborating: [gethue.com](http://gethue.com)
+Hue is a mature open source SQL Assistant for querying [Databases & Data Warehouses](/administrator/configuration/connectors/) and collaborating: [gethue.com](http://gethue.com)
 
 Many companies and organizations use Hue to quickly answer questions via [self-service querying](/user/querying/) e.g.:
 
 * 1000+ customers
 * Top Fortune 500
 
-are executing 100s of 1000s of queries daily. It also [ships](/administrator/installation/) in Cloudera Data Platform, Amazon AWS, Open Data Hub...
+are executing 100s of 1000s of queries daily. It is free to [install](/administrator/installation/dependencies/) and also ships in Cloudera Data Platform, Amazon AWS, Open Data Hub...
 
-Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/parsers/) and any [contributions](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md) are welcome.
+Hue is also ideal for [building your own](https://docs.gethue.com/developer/parsers/) Cloud SQL Editor and any [contributions](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md) are welcome.
 
-!["Hue Editor"](https://cdn.gethue.com/uploads/2019/12/hue4.6.png)
+!["Hue Editor"](https://cdn.gethue.com/uploads/2020/04/hue-4.7.png)
 
+
+Quick Start
+-----------
+[Launch](/quickstart/) a Hue service in 1 minute.
 
 Administrate
 ------------
-The [Administrator guide](administrator/index.html) describes how to install and manage the server and configure connectors to your [Databases, Warehouses, Storages](/administrator/configuration/connectors/).
+The [Administrator guide](administrator/index.html) describes how to install and manage the server and configure [connectors](/administrator/configuration/connectors/) to your Databases, Warehouses, Storages.
 
 Use
 ---
@@ -33,7 +37,7 @@ The [User guide](user/index.html) has instructions about how to leverage Queryin
 
 Develop
 -------
-How to extend SQL connectors, reuse the API or build applications is detailed in the [Developer guide](developer/index.html).
+How to extend connectors, reuse the API and SQL components or build applications is detailed in the [Developer guide](developer/index.html).
 
 Releases
 --------
