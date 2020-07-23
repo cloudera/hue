@@ -53,8 +53,8 @@ def validate_username(username_pattern):
 
   if not username_pattern:
     raise ValidationError(_('Username is required.'))
-  if len(username_pattern) > 30:
-    raise ValidationError(_('Username must be fewer than 30 characters.'))
+  if len(username_pattern) > 150:
+    raise ValidationError(_('Username must be fewer than 150 characters.'))
   if not validator.match(username_pattern):
     raise ValidationError(_("Username must not contain whitespaces and ':'"))
 

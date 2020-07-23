@@ -38,7 +38,7 @@ from useradmin.models import LdapGroup, UserProfile
 from useradmin.models import get_profile, User, Group
 from useradmin.views import sync_ldap_users, sync_ldap_groups, import_ldap_users, import_ldap_groups, \
     add_ldap_users, add_ldap_groups, sync_ldap_users_groups
-from useradmin.tests import BaseUserAdminTests, LdapTestConnection, reset_all_groups, reset_all_users
+from useradmin.tests import BaseUserAdminTests, LdapTestConnection, reset_all_groups, reset_all_users, create_long_username
 
 
 def get_multi_ldap_config():
@@ -678,8 +678,13 @@ class TestUserAdminLdap(BaseUserAdminTests):
       # Import test_longfirstname user
       ldap_access.CACHED_LDAP_CONN.add_user_group_for_test('uid=test_longfirstname,ou=People,dc=example,dc=com', 'TestUsers')
       response = c.post(URL, dict(server='multi_ldap_conf', groupname_pattern='TestUsers', import_members=True), follow=True)
-      user_list_a = b"test_toolongusernametoolongusername, test_longfirstname"
-      user_list_b = b"test_longfirstname, test_toolongusernametoolongusername"
+      if sys.version_info[0] > 2:
+        user_list_a = create_long_username().encode('utf-8') + b", test_longfirstname"
+        user_list_b = b"test_longfirstname, " + create_long_username().encode('utf-8')
+      else:
+        user_list_a = create_long_username() + b", test_longfirstname"
+        user_list_b = b"test_longfirstname, " + create_long_username()
+
       assert_true(b'Failed to import following users: %s' % user_list_a in response.content or b'Failed to import following users: %s' % user_list_b in response.content, response.content)
 
       # Test with space
