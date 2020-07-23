@@ -7,7 +7,10 @@ weight: 1
 
 ## Quick Start
 
-Follow the [Container](/administrator/installation/cloud/) or [Dev Quick Start](https://github.com/cloudera/hue#getting-started) guides.
+If you just want to:
+
+* Start Hue, follow the [Container](/administrator/installation/cloud/) section
+* Test some small code changes, see the [Development Quick Start](https://github.com/cloudera/hue#getting-started)
 
 
 ## Installation
