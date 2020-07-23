@@ -229,6 +229,13 @@ DAEMON_API_USERNAME = Config(
   dynamic_default=get_daemon_api_username
 )
 
+DAEMON_API_AUTH_SCHEME = Config(
+  key="daemon_api_auth_scheme",
+  help=_t("The authentication scheme to use with 'daemon_api_username' and 'daemon_api_password' when authenticating to the Impala Daemon UI, either 'digest' (default) or 'basic'."),
+  private=False,
+  default="digest"
+)
+
 def get_use_sasl_default():
   """kerberos enabled or password is specified"""
   return is_kerberos_enabled() or AUTH_PASSWORD.get() is not None # Maps closely to legacy behavior
