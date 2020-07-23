@@ -5,7 +5,7 @@ draft: false
 weight: 4
 ---
 
-The [parsers](/developer/parsers/) are the flagship part of Hue and power extremely advanced autocompletes and other [SQL functionalities](/user/querying/#autocomplete). They are running on the client side and comes with just a few megabytes of JavaScript that are cached by the browser. This provides a very reactive experience to the end user and allows to [import them](#using-hue-parsers-in-your-project) as classic JavaScript modules for your own development needs.
+The parsers are the flagship part of Hue and power extremely advanced autocompletes and other [SQL functionalities](/user/querying/#autocomplete). They are running on the client side and comes with just a few megabytes of JavaScript that are cached by the browser. This provides a very reactive experience to the end user and allows to [import them](#using-hue-parsers-in-your-project) as classic JavaScript modules for your own development needs.
 
 While the dynamic content like the list of tables, columns is obviously fetched via [remote endpoints](#sql-querying), all the SQL knowledge of the statements is available.
 
