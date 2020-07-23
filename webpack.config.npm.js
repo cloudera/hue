@@ -46,8 +46,8 @@ module.exports = Object.assign({}, webpackConfig, {
         {from:'./desktop/core/src/desktop/js/components', to: `${distDir}/components`},
         {from:'./desktop/core/src/desktop/js/utils/hueUtils.js', to: `${distDir}/utils/hueUtils.js`},
 
-        {from:'./desktop/core/src/desktop/js/parse', to: `${distDir}/js/parse`},
-        {from:'./desktop/core/src/desktop/js/sql', to: `${distDir}/js/sql`},
+        {from:'./desktop/core/src/desktop/js/parse', to: `${distDir}/parse`},
+        {from:'./desktop/core/src/desktop/js/sql', to: `${distDir}/sql`},
       ]
     })
   ]

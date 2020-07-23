@@ -1,6 +1,6 @@
 {
   "name": "gethue",
-  "version": "4.7.5",
+  "version": "4.7.6",
   "description": "Hue is an Open source SQL Query Editor for Databases/Warehouses",
   "homepage": "http://gethue.com",
   "repository": {
