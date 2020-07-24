@@ -2,7 +2,7 @@
   "name": "gethue",
   "version": "4.7.7",
   "description": "Hue is an Open source SQL Query Editor for Databases/Warehouses",
-  "keywwords": [
+  "keywords": [
     "Query Editor",
     "SQL Editor",
     "SQL",
