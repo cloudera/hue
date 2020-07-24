@@ -21,6 +21,6 @@
   },
   "homepage": "https://github.com/cloudera/hue#readme",
   "dependencies": {
-    "gethue": "^4.7.5"
+    "gethue": "4.7.8"
   }
 }
