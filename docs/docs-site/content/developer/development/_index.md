@@ -721,6 +721,10 @@ Historically, the same thing used to be done with the `requires_hadoop` tag:
 
 ## Releasing
 
+The checklist below details the steps. Then send the release notes to the [Forum](https://discourse.gethue.com/), [hue-user](https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user), https://twitter.com/gethue !
+
+### Version
+
 Update the versions to the next release (current release +1):
 
     :100644 100644 4db6d5f... f907d04... M	VERSION
@@ -758,6 +762,8 @@ Push to the CDN:
 
     scp hue-4.7.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
 
+### Websites
+
 Other things to update:
 
 * In Jira, setting the [release as shipped](https://issues.cloudera.org/projects/HUE?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page&status=all) and moving all non finished jiras to another target. Also archiving old releases.
@@ -779,17 +785,13 @@ Instructions:
     docker push gethue/nginx
     docker push gethue/nginx:4.7.0
 
-Documentation
+### Documentation
 
-[Build it](#Documentation) and push it to the docs host.
+Documentation is currently being auto refreshed every morning of the week and run as a container.
 
-Build the doc website:
+The manual process otherwise would be to [build it](#Documentation) and push it to the docs host.
 
-    cd docs/docs-site
-
-    hugo
-
-Release:
+### Release
 
     ssh root@docs.gethue.com
     cd /var/www/docs.gethue.com
@@ -800,10 +802,7 @@ Release:
 
     scp -r hue-4.6/build/release/prod/hue-4.7.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads/
 
-
-Then send release notes to the [Forum](https://discourse.gethue.com/), [hue-user](https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user), https://twitter.com/gethue !
-
-### Publishing GetHue
+### NPM registry
 
 To publish gethue to NPM registry, the following command would have to be run. Kindly refrain from using `npm publish`.
 
@@ -851,6 +850,12 @@ Build the [source](https://github.com/cloudera/hue/tree/master/docs/docs-site) a
 Check for links not working (e.g. returning a 404) with muffet, a fast link checker crawler. It recommended to use the [check links script](https://github.com/cloudera/hue/blob/master/tools/ci/check_for_website_dead_links.sh).
 
 The posts [manual](https://gethue.com/easily-checking-for-deadlinks-on-docs-gethue-com/) and [continuous integration](https://gethue.com/easily-checking-for-deadlinks-on-docs-gethue-com/) contain more information about it.
+
+And then to build the static site just do:
+
+    hugo
+
+and grab the `public` directory.
 
 ### Blog & Website
 
