@@ -127,7 +127,11 @@ Fix openssl errors (required for MacOS 10.11+)
 
     export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include
 
-If you are getting **"Could not find Python.h"** message
+If `runserver` stops abruptly with a  `"zsh: abort"` message
+
+    export DYLD_FALLBACK_LIBRARY_PATH=/usr/local/opt/openssl/lib
+
+If you are getting `Could not find Python.h` message
 
     export SKIP_PYTHONDEV_CHECK=true
 
