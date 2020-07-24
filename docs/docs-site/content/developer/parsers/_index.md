@@ -16,6 +16,7 @@ This guide takes you through the steps necessary to create an autocompleter for 
 * Proposing only valid syntax in the autocomplete
 * Getting the list of tables, columns, UDFs... automatically
 * Suggesting fixes
+* Diffing, formatting... queries
 
 ## Parser Theory
 
