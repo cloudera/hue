@@ -24,6 +24,15 @@ $dot-color: #BBB;
 $dot-size: 1px;
 $dot-space: 10px;
 
+expand-icon{
+  font-size: 13px;
+  font-weight: bold;
+
+  &::before {
+    content: "\2922";
+  }
+}
+
 .er-diagram {
   color: #0a78a3;
   border: 1px solid #d6d8db;
@@ -32,6 +41,10 @@ $dot-space: 10px;
   position: relative;
 
   user-select: none;
+
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  line-height: 20px;
+  font-size: 14px;
 
   background:
     linear-gradient(90deg, $bg-color ($dot-space - $dot-size), transparent 1%) center,
