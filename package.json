@@ -1,18 +1,27 @@
 {
   "name": "gethue",
-  "version": "4.7.6",
+  "version": "4.7.7",
   "description": "Hue is an Open source SQL Query Editor for Databases/Warehouses",
+  "keywwords": [
+    "Query Editor",
+    "SQL Editor",
+    "SQL",
+    "SQL Components",
+    "SQL Autocomplete",
+    "SQL Parsers",
+    "SQL Scratchpad"
+  ],
   "homepage": "http://gethue.com",
   "repository": {
     "type": "git",
     "url": "https://github.com/cloudera/hue"
   },
-  "author": "Cloudera, Inc.",
+  "author": "Gethue.com",
   "contributors": [
     "Romain Rigaux <info@getromain.com>",
     "Prakash Ranade <ranade@cloudera.com>",
     "Ying Chen <yingchen@cloudera.com>",
-    "Weixia Xu <weixia@cloudera.com>",
+    "Sreenath Somarajapuram <ssomarajapuram@cloudera.com>",
     "Johan Ahlen <johan.ahlen@cloudera.com>"
   ],
   "license": "Apache-2.0",
