@@ -1203,7 +1203,7 @@ class HiveServerClient(object):
     return self.execute_async_statement(thrift_function=thrift_function, thrift_request=req)
 
 
-  def get_primary_keys(self, schema_name, table_name, catalog_name=None):
+  def get_primary_keys(self, database_name, table_name, catalog_name=None):
     '''
     Get the Primary Keys of a Table entity (seems like database name is required).
 
@@ -1219,7 +1219,7 @@ class HiveServerClient(object):
     '''
     req = TGetPrimaryKeysReq(
       catalogName=catalog_name,
-      schemaName=schema_name,
+      schemaName=database_name,
       tableName=table_name
     )
 
@@ -1237,14 +1237,14 @@ class HiveServerClient(object):
     return results
 
 
-  def get_foreign_keys(self, parent_catalog_name=None, parent_schema_name=None, parent_table_name=None, foreign_catalog_name=None,
-      foreign_schema_name=None, foreign_table_name=None):
+  def get_foreign_keys(self, parent_catalog_name=None, parent_database_name=None, parent_table_name=None, foreign_catalog_name=None,
+      foreign_database_name=None, foreign_table_name=None):
     '''
-    Get the Foreign Keys between two entities (e.g. Schemas, DB, Tables).
+    Get the Foreign Keys between two entities (e.g. Catalog, DB, Tables).
 
     e.g. Foreign Keys between the two tables people.customers and sales.orders:
-      parent_schema_name='people', parent_table_name='customers'
-      foreign_schema_name='sales', foreign_table_name='orders'
+      parent_database_name='people', parent_table_name='customers'
+      foreign_database_name='sales', foreign_table_name='orders'
 
     Table names are also optional.
 
@@ -1262,10 +1262,10 @@ class HiveServerClient(object):
     '''
     req = TGetCrossReferenceReq(
       parentCatalogName=parent_catalog_name,
-      parentSchemaName=parent_schema_name,
+      parentSchemaName=parent_database_name,
       parentTableName=parent_table_name,
       foreignCatalogName=foreign_catalog_name,
-      foreignSchemaName=foreign_schema_name,
+      foreignSchemaName=foreign_database_name,
       foreignTableName=foreign_table_name
     )
 
