@@ -1157,6 +1157,15 @@ class HiveServer2Dbms(object):
     return self.client.explain(query)
 
 
+  def get_primary_keys(self, schema_name, table_name, catalog_name=None):
+
+    return self.client.get_primary_keys(
+      schema_name=schema_name,
+      table_name=table_name,
+      catalog_name=catalog_name
+    )
+
+
   def get_foreign_keys(self, parent_catalog_name=None, parent_schema_name=None, parent_table_name=None, foreign_catalog_name=None,
       foreign_schema_name=None, foreign_table_name=None):
 
@@ -1168,6 +1177,7 @@ class HiveServer2Dbms(object):
       foreign_schema_name=foreign_schema_name,
       foreign_table_name=foreign_table_name
     )
+
 
   def getStatus(self):
     return self.client.getStatus()
