@@ -147,6 +147,10 @@ When getting an error similar to `OperationalError: (1040, 'Too many connections
 
     mysql> SET GLOBAL max_connections = 1000;
 
+## Scripts
+
+For building custom scripts for managing objects like users or saved documents, check out the [Python API](/developer/api/#python).
+
 ## Database
 
 See the dedicated [Database section](/administrator/administration/database/).
