@@ -28,7 +28,8 @@ from django.utils.translation import ugettext as _
 from TCLIService import TCLIService
 from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq, TStatusCode, TGetResultSetMetadataReq, \
   TGetColumnsReq, TTypeId, TExecuteStatementReq, TGetOperationStatusReq, TFetchOrientation, \
-  TCloseSessionReq, TGetSchemasReq, TGetLogReq, TCancelOperationReq, TCloseOperationReq, TFetchResultsResp, TRowSet, TGetFunctionsReq
+  TCloseSessionReq, TGetSchemasReq, TGetLogReq, TCancelOperationReq, TCloseOperationReq, TFetchResultsResp, TRowSet, TGetFunctionsReq, \
+  TGetCrossReferenceReq
 
 from desktop.lib import python_util, thrift_util
 from desktop.conf import DEFAULT_USER
@@ -1198,9 +1199,56 @@ class HiveServerClient(object):
     '''
     req = TGetFunctionsReq(functionName='.*')
     thrift_function = self._client.GetFunctions
-    (res, session) = self.call(self._client.GetFunctions, req)
 
     return self.execute_async_statement(thrift_function=thrift_function, thrift_request=req)
+
+
+  def get_foreign_keys(self, parent_catalog_name=None, parent_schema_name=None, parent_table_name=None, foreign_catalog_name=None,
+      foreign_schema_name=None, foreign_table_name=None):
+    '''
+    Get the Foreign Keys between two entities (e.g. Schemas, DB, Tables).
+
+    e.g. Foreign Keys between the two tables people.customers and sales.orders:
+      parent_schema_name='people', parent_table_name='customers'
+      foreign_schema_name='sales', foreign_table_name='orders'
+
+    Table names are also optional.
+
+    Example of result:
+    [
+      {
+        'PKTABLE_CAT': None, 'PKTABLE_SCHEM': 'default', 'PKTABLE_NAME': 'person', 'PKCOLUMN_NAME': 'id',
+        'FKTABLE_CAT': None, 'FKTABLE_SCHEM': 'default', 'FKTABLE_NAME': 'business_unit', 'FKCOLUMN_NAME': 'head',
+        'KEQ_SEQ': 1, 'UPDATE_RULE': 0, 'DELETE_RULE': 0,
+        'FK_NAME': 'fk',
+        'PK_NAME': 'pk_146568770_1595688607640_0',
+        'DEFERRABILITY': 0
+      }
+    ]
+    '''
+    req = TGetCrossReferenceReq(
+      parentCatalogName=parent_catalog_name,
+      parentSchemaName=parent_schema_name,
+      parentTableName=parent_table_name,
+      foreignCatalogName=foreign_catalog_name,
+      foreignSchemaName=foreign_schema_name,
+      foreignTableName=foreign_table_name
+    )
+
+    (res, session) = self.call(self._client.GetCrossReference, req)
+    results, schema = self.fetch_result(res.operationHandle, max_rows=100)
+
+    self._close(res.operationHandle, session)
+
+    results = HiveServerTRowSet(results.results, schema.schema).cols(
+      (
+        'PKTABLE_CAT', 'PKTABLE_SCHEM', 'PKTABLE_NAME', 'PKCOLUMN_NAME',
+        'FKTABLE_CAT', 'FKTABLE_SCHEM', 'FKTABLE_NAME', 'FKCOLUMN_NAME',
+        'KEQ_SEQ', 'UPDATE_RULE', 'DELETE_RULE', 'FK_NAME', 'PK_NAME', 'DEFERRABILITY'
+      )
+    )
+
+    return results
 
 
 class HiveServerTableCompatible(HiveServerTable):
