@@ -1,0 +1,206 @@
+<style>
+  .webcomp-sc {
+    position: relative;
+    color: var(--MAIN-TITLES-TEXT-color);
+  }
+
+  .comp-container {
+    margin-right: 30px;
+    transition: margin-right .5s ease-in-out;
+  }
+  .webcomp-sc.expanded .comp-container {
+    margin-right: 250px;
+  }
+
+  // customizer panel
+  .customizer-panel {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+
+    overflow: hidden;
+
+    width: 25px;
+    height: 100%;
+
+    border: 1px solid #d6d8db;
+    border-radius: 5px;
+
+    padding: 3px 5px;
+
+    transition: width .5s ease-in-out;
+  }
+  .webcomp-sc.expanded .customizer-panel {
+    width: 245px;
+  }
+
+  // customizer panel content
+  .customizer-panel .panel-content {
+    height: 100%;
+    margin-left: 20px;
+    transition: margin-left .5s ease-in-out;
+
+    display: flex;
+    flex-direction: column;
+  }
+  .webcomp-sc.expanded .customizer-panel .panel-content {
+    margin-left: 0;
+  }
+  .webcomp-sc.hide-events .wc-events {
+    display: none;
+  }
+
+  .customizer-panel .panel-content textarea {
+    width: 232px;
+    margin-bottom: 5px;
+
+    resize: none;
+
+    font-family: "Lucida Console", Courier, monospace;
+    font-size: .7em;
+    white-space: pre;
+  }
+
+  .customizer-panel .panel-content .attributes-txt {
+    flex: 4;
+  }
+  .customizer-panel .panel-content .events-txt {
+    flex: 1;
+  }
+
+  // Expand collapse button
+  .customizer-panel .exp-collapse-button {
+    position: absolute;
+    right: 5px;
+    top: 3px;
+    height: 100%;
+
+    display: inline-block;
+    user-select: none;
+  }
+  .customizer-panel .exp-collapse-button em.fa-plus {
+    transition: transform .5s ease-in-out;
+  }
+  .webcomp-sc.expanded .customizer-panel .exp-collapse-button em.fa-plus {
+    transform: rotate(45deg);
+  }
+
+  .customizer-panel .exp-collapse-button .cust-txt {
+    position: absolute;
+    left: -5px;
+    top: 50%;
+    margin-top: -50px;
+
+    writing-mode: vertical-rl;
+    color: var(--MAIN-TITLES-TEXT-color);
+    letter-spacing: .15em;
+
+    transition: left .2s ease-in-out;
+  }
+  .webcomp-sc.expanded .customizer-panel .exp-collapse-button .cust-txt {
+    left: 20px;
+  }
+</style>
+
+<div class="webcomp-sc">
+  <script type = "text/javascript" src={{ .Get "src" }}></script>
+
+  <div class="comp-container"></div>
+
+  <div class="customizer-panel">
+    <div class="panel-content">
+      <b>Attributes</b>
+      <textarea class="attributes-txt"></textarea>
+      <b class="wc-events">Events</b>
+      <textarea class="wc-events events-txt" readonly></textarea>
+    </div>
+
+    <div class="exp-collapse-button">
+      <a href="javascript:void(0);"><em class="fa fa-plus"></em></a>
+      <span class="cust-txt">Customize</span>
+    </div>
+  </div>
+</div>
+
+<script type = "text/javascript">
+  function initWebcomp() {
+    const webcomps = document.querySelectorAll(".webcomp-sc");
+    const currentWebcomp = webcomps[webcomps.length - 1];
+
+    currentWebcomp.querySelector(".exp-collapse-button a")
+        .addEventListener("click", event => {
+          currentWebcomp.classList.toggle("expanded");
+        });
+
+    return currentWebcomp;
+  }
+
+  function createComponent(name, innerHTML) {
+    const webcomp = initWebcomp();
+    const container = webcomp.querySelector(".comp-container");
+    const eventsTxtArea = webcomp.querySelector("textarea.events-txt");
+    const attributesTextArea = webcomp.querySelector("textarea.attributes-txt");
+
+    const component = document.createElement(name);
+    component.innerHTML = innerHTML;
+    container.appendChild(component);
+
+    return {webcomp, component, eventsTxtArea, attributesTextArea};
+  }
+
+  function loadAttrs(url, callback) {
+    fetch(url)
+      .then(response => response.json())
+      .then(json => callback(json));
+  }
+
+  (function ({webcomp, component, eventsTxtArea, attributesTextArea}, params){
+    const attrsPrefix = "-";
+
+    // Init attributes
+    function initAttrs(attrs) {
+      Object.assign(component, attrs);
+      attributesTextArea.value = JSON.stringify(attrs, null, 2);
+    }
+
+    if(params.attrSrc) {
+      loadAttrs(params.attrSrc, initAttrs);
+    } else {
+      const attrs = params.filter(param => param.startsWith(attrsPrefix));
+      initAttrs(params);
+    }
+
+    attributesTextArea.addEventListener("input", function () {
+      Object.assign(component, JSON.parse(attributesTextArea.value));
+    });
+
+    // Add event listeners
+    function handleEvent(propertyName, event) {
+      console.log("Event triggered:", event, $);
+
+      let eventTxt = event.type;
+
+      const eventProp = event.detail[0][propertyName];
+
+      if(eventProp) {
+        eventTxt = `${eventTxt} : ${eventProp}`;
+      }
+
+      eventsTxtArea.value +=  `${eventTxt}\r\n`;
+      eventsTxtArea.scrollTop = eventsTxtArea.scrollHeight;
+    }
+
+    if(params.events) {
+      params.events.split(",").forEach(event => {
+        const [eventName, propertyName] = event.split(":");
+        component.addEventListener(eventName, handleEvent.bind(this, propertyName));
+      });
+    } else {
+      webcomp.classList.add("hide-events");
+    }
+
+  })(
+    createComponent({{ .Get "name" }}, {{ .Inner }}),
+    {{ .Params }}
+  );
+</script>

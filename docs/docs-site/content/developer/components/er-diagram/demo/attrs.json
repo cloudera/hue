@@ -1,0 +1,189 @@
+{
+  "entities": [
+    {
+      "id": "default.inventory",
+      "type": "TABLE",
+      "database": "default",
+      "name": "inventory",
+      "columns": [
+        {
+          "id": "default.inventory.id",
+          "type": "COLUMN",
+          "tableId": "default.inventory",
+          "name": "id"
+        },
+        {
+          "id": "default.inventory.quantity",
+          "type": "COLUMN",
+          "tableId": "default.inventory",
+          "name": "quantity"
+        },
+        {
+          "id": "default.inventory.product_id",
+          "type": "COLUMN",
+          "tableId": "default.inventory",
+          "name": "product_id"
+        },
+        {
+          "id": "default.inventory.vendor_id",
+          "type": "COLUMN",
+          "tableId": "default.inventory",
+          "name": "vendor_id"
+        }
+      ]
+    },
+    {
+      "id": "market.products",
+      "type": "TABLE",
+      "database": "market",
+      "name": "products",
+      "columns": [
+        {
+          "id": "market.products.id",
+          "type": "COLUMN",
+          "tableId": "market.products",
+          "name": "id"
+        },
+        {
+          "id": "market.products.name",
+          "type": "COLUMN",
+          "tableId": "market.products",
+          "name": "name"
+        },
+        {
+          "id": "market.products.description",
+          "type": "COLUMN",
+          "tableId": "market.products",
+          "name": "description"
+        },
+        {
+          "id": "market.products.category_id",
+          "type": "COLUMN",
+          "tableId": "market.products",
+          "name": "category_id"
+        }
+      ]
+    },
+    {
+      "id": "market.vendors",
+      "type": "TABLE",
+      "database": "market",
+      "name": "vendors",
+      "columns": [
+        {
+          "id": "market.vendors.id",
+          "type": "COLUMN",
+          "tableId": "market.vendors",
+          "name": "id"
+        },
+        {
+          "id": "market.vendors.name",
+          "type": "COLUMN",
+          "tableId": "market.vendors",
+          "name": "name"
+        }
+      ]
+    },
+    {
+      "id": "market.product_categories",
+      "type": "TABLE",
+      "database": "market",
+      "name": "product_categories",
+      "columns": [
+        {
+          "id": "market.product_categories.id",
+          "type": "COLUMN",
+          "tableId": "market.product_categories",
+          "name": "id"
+        },
+        {
+          "id": "market.product_categories.name",
+          "type": "COLUMN",
+          "tableId": "market.product_categories",
+          "name": "name"
+        },
+        {
+          "id": "market.product_categories.description",
+          "type": "COLUMN",
+          "tableId": "market.product_categories",
+          "name": "description"
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "desc": "Foreign Key",
+      "left": {
+        "id": "default.inventory.product_id",
+        "type": "COLUMN",
+        "tableId": "default.inventory",
+        "name": "product_id"
+      },
+      "right": {
+        "id": "market.products.id",
+        "type": "COLUMN",
+        "tableId": "market.products",
+        "name": "id"
+      }
+    },
+    {
+      "desc": "Foreign Key",
+      "left": {
+        "id": "default.inventory.vendor_id",
+        "type": "COLUMN",
+        "tableId": "default.inventory",
+        "name": "vendor_id"
+      },
+      "right": {
+        "id": "market.vendors.id",
+        "type": "COLUMN",
+        "tableId": "market.vendors",
+        "name": "id"
+      }
+    },
+    {
+      "desc": "Foreign Key",
+      "left": {
+        "id": "market.products.category_id",
+        "type": "COLUMN",
+        "tableId": "market.products",
+        "name": "category_id"
+      },
+      "right": {
+        "id": "market.product_categories.id",
+        "type": "COLUMN",
+        "tableId": "market.product_categories",
+        "name": "id"
+    }
+    },
+    {
+      "desc": "Foreign Key",
+      "left": {
+        "id": "market.product_categories.name",
+        "type": "COLUMN",
+        "tableId": "market.product_categories",
+        "name": "name"
+    },
+      "right": {
+        "id": "Laptop",
+        "type": "LITERAL",
+        "value": "Laptop"
+      }
+    },
+    {
+      "desc": "Foreign Key",
+      "left": {
+        "id": "market.vendors.name",
+        "type": "COLUMN",
+        "tableId": "market.vendors",
+        "name": "name"
+      },
+      "right": {
+        "id": "Apple",
+        "type": "LITERAL",
+        "value": "Apple"
+      }
+    }
+  ]
+}
