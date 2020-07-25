@@ -1179,7 +1179,7 @@ class HiveServer2Dbms(object):
     )
 
 
-  def getStatus(self):
+  def get_status(self):
     return self.client.getStatus()
 
 
