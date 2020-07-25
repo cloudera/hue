@@ -29,7 +29,7 @@ from TCLIService import TCLIService
 from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq, TStatusCode, TGetResultSetMetadataReq, \
   TGetColumnsReq, TTypeId, TExecuteStatementReq, TGetOperationStatusReq, TFetchOrientation, \
   TCloseSessionReq, TGetSchemasReq, TGetLogReq, TCancelOperationReq, TCloseOperationReq, TFetchResultsResp, TRowSet, TGetFunctionsReq, \
-  TGetCrossReferenceReq
+  TGetCrossReferenceReq, TGetPrimaryKeysReq
 
 from desktop.lib import python_util, thrift_util
 from desktop.conf import DEFAULT_USER
@@ -1201,6 +1201,40 @@ class HiveServerClient(object):
     thrift_function = self._client.GetFunctions
 
     return self.execute_async_statement(thrift_function=thrift_function, thrift_request=req)
+
+
+  def get_primary_keys(self, schema_name, table_name, catalog_name=None):
+    '''
+    Get the Primary Keys of a Table entity (seems like database name is required).
+
+    e.g. Primary Keys of the sales.order table: schema_name='sales' table_name='orders'
+
+    Example of result:
+    [
+      {
+        'TABLE_CAT': None, 'TABLE_SCHEM': 'default', 'TABLE_NAME': 'business_unit', 'COLUMN_NAME': 'id',
+        'KEQ_SEQ': 1, 'PK_NAME': 'pk_245553536_1595688608351_0'
+      }
+    ]
+    '''
+    req = TGetPrimaryKeysReq(
+      catalogName=catalog_name,
+      schemaName=schema_name,
+      tableName=table_name
+    )
+
+    (res, session) = self.call(self._client.GetPrimaryKeys, req)
+    results, schema = self.fetch_result(res.operationHandle, max_rows=100)
+
+    self._close(res.operationHandle, session)
+
+    results = HiveServerTRowSet(results.results, schema.schema).cols(
+      (
+        'TABLE_CAT', 'TABLE_SCHEM', 'TABLE_NAME', 'COLUMN_NAME', 'KEQ_SEQ', 'PK_NAME'
+      )
+    )
+
+    return results
 
 
   def get_foreign_keys(self, parent_catalog_name=None, parent_schema_name=None, parent_table_name=None, foreign_catalog_name=None,
