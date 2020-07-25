@@ -5,6 +5,8 @@ draft: false
 weight: 5
 ---
 
+## REST
+
 REST APIs are not all public yet but this is work in progress in [HUE-1450](https://issues.cloudera.org/browse/HUE-1450).
 
 Hue is Ajax based and has a REST API used by the browser to communicate (e.g. submit a query or workflow,
