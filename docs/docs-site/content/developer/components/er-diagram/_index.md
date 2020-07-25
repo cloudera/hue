@@ -5,17 +5,19 @@ draft: false
 
 The [Entity-relationship model](https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model) (ERD) provides an illustration of various SQL entities, and the relationship between them. Entity types supported by the ERD diagram are currently `Table` & `Literal`. It has a very generic architecture, and more types of entities can be supported in the future.
 
-!["EDR Table Component"](https://cdn.gethue.com/uploads/2020/07/erd_table_viz.png)
+{{< webcomp name="er-diagram"
+    src="demo/er-diagram.js"
+    attrSrc="demo/attrs.json"
+    events="entity-clicked:name"
+/>}}
 
-## Import
+### Import
 
 Please refer [here](/developer/components/#using-ui-components-in-your-project) for importing the component in your own project. Also [er-diagram-demo](https://github.com/cloudera/hue/tree/master/tools/examples/components/er-diagram-demo) app have working examples.
 
 Once imported `er-diagram` can be used like a native HTML tag.
 
     <er-diagram id="erd-element-id"/>
-
-## Properties
 
 ### Attributes
 
@@ -28,7 +30,7 @@ Please refer the [interfaces](https://github.com/cloudera/hue/blob/master/deskto
 
 - entity-clicked: Function([IEntity](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/js/components/er-diagram/lib/interfaces.ts#L21)) - Will be triggered when an entity is clicked.
 
-### Resource Files
+#### Resource Files
 
 - Hue
   - **Web Component:** gethue/web/er-diagram.js
