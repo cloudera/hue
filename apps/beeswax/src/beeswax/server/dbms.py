@@ -1157,6 +1157,18 @@ class HiveServer2Dbms(object):
     return self.client.explain(query)
 
 
+  def get_foreign_keys(self, parent_catalog_name=None, parent_schema_name=None, parent_table_name=None, foreign_catalog_name=None,
+      foreign_schema_name=None, foreign_table_name=None):
+
+    return self.client.get_foreign_keys(
+      parent_catalog_name=parent_catalog_name,
+      parent_schema_name=parent_schema_name,
+      parent_table_name=parent_table_name,
+      foreign_catalog_name=foreign_catalog_name,
+      foreign_schema_name=foreign_schema_name,
+      foreign_table_name=foreign_table_name
+    )
+
   def getStatus(self):
     return self.client.getStatus()
 
