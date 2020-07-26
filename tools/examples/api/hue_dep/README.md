@@ -9,10 +9,12 @@
 In package.json there’s a dependency on Hue git project:
 
     "dependencies": {
-      "hue": "file:../../.."
+      "hue": "file:../../../.."
     },
 
-Note that it can also be a GitHub link: “hue”: "git://github.com/cloudera/hue.git” but takes a bit longer to do “npm install"
+Note that it can also be a GitHub link: "hue": "git://github.com/cloudera/hue.git" but takes a bit longer to do `npm install`.
+
+Output:
 
     { locations:
     [ { type: 'statement', location: [Object] },
