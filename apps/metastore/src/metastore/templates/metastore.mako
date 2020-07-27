@@ -824,11 +824,13 @@ ${ components.menubar(is_embeddable) }
             vueProps: $root.propsMappers.tableERD(database.table().catalogEntry),
             vueEvents: {
               'entity-clicked': function (event){
-                const table = event.detail[0];
-                $root.setDbAndTableByName(table.database, table.name, () => $root.currentTab('erd-animated'));
+                const entity = event.detail[0];
+                if(entity.type === 'TABLE') {
+                  $root.setDbAndTableByName(entity.database, entity.name, () => $root.currentTab('erd-animated'));
+                }
               }
             },
-            class: $root.currentTab()
+            class: $root.currentTab() + ' table-erd'
           "></er-diagram>
         <!-- /ko -->
       <!-- /ko -->
