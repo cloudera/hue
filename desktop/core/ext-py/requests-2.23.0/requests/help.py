@@ -8,7 +8,6 @@ import ssl
 
 import idna
 import urllib3
-import chardet
 
 from . import __version__ as requests_version
 
@@ -71,7 +70,6 @@ def info():
 
     implementation_info = _implementation()
     urllib3_info = {'version': urllib3.__version__}
-    chardet_info = {'version': chardet.__version__}
 
     pyopenssl_info = {
         'version': None,
@@ -101,7 +99,6 @@ def info():
         'using_pyopenssl': pyopenssl is not None,
         'pyOpenSSL': pyopenssl_info,
         'urllib3': urllib3_info,
-        'chardet': chardet_info,
         'cryptography': cryptography_info,
         'idna': idna_info,
         'requests': {
