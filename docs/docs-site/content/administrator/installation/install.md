@@ -7,7 +7,7 @@ weight: 2
 
 Start from a [release](/releases/) tarball or [building](https://github.com/cloudera/hue#getting-started) the project yourself.
 
-Makre sure you have the [dependencies](/administrator/installation/dependencies/) for your operating system.
+Make sure you have the [dependencies](/administrator/installation/dependencies/) for your operating system.
 
 Then configure `$PREFIX` with the path where you want to install Hue by running:
 
