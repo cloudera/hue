@@ -57,7 +57,27 @@ const getPluginConfig = (name, withAnalyzer) => {
   return plugins;
 };
 
+const hashCode = str => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const chr = str.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
+    hash |= 0;
+  }
+  return hash;
+};
+
+const splitChunksName = (module, chunks, cacheGroupKey) => {
+  let fullName = cacheGroupKey !== 'default' ? cacheGroupKey + '~' : '';
+  fullName += chunks.map(item => item.name).join('~');
+  if (fullName.length > 80) {
+    return fullName.slice(0, 70).replace(/~[^~]*$/, '') + '~' + hashCode(fullName);
+  }
+  return fullName;
+};
+
 module.exports = {
   BUNDLES: BUNDLES,
-  getPluginConfig: getPluginConfig
+  getPluginConfig: getPluginConfig,
+  splitChunksName: splitChunksName
 };
