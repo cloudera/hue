@@ -21,6 +21,7 @@ from desktop import conf
 from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter, _ko
+from desktop.webpack_utils import get_hue_bundles
 from metastore.conf import SHOW_TABLE_ERD
 from beeswax.conf import LIST_PARTITIONS_LIMIT
 from webpack_loader.templatetags.webpack_loader import render_bundle
@@ -62,8 +63,9 @@ ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 
-${ render_bundle('vendors~tableBrowser~jobBrowser') | n,unicode }
-${ render_bundle('tableBrowser') | n,unicode }
+% for bundle in get_hue_bundles('tableBrowser'):
+  ${ render_bundle(bundle) | n,unicode }
+% endfor
 
 <span class="notebook">
 
