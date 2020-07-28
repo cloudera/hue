@@ -112,7 +112,7 @@ Enable the creation of a coordinator for the current SQL query.
 
 When username or password are not specified in the connection URL, they will be prompted at connection time in the user browser.
 
-Parameters are not saved at any time in the Hue database. The are currently not even cached in the Hue process. The clients serves these parameters
+Parameters are not saved at any time in the Hue database. They are currently not even cached in the Hue process. The clients serves these parameters
 each time a query is sent.
 
 ## Dashboard
