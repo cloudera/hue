@@ -23,6 +23,8 @@
   from desktop.auth.backend import is_admin
   from desktop.lib.i18n import smart_unicode
   from desktop.views import _ko, antixss
+  from desktop.webpack_utils import get_hue_bundles
+
   from metadata.conf import has_optimizer, OPTIMIZER
 
   from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT, ENABLE_PRESENTATION
@@ -87,8 +89,9 @@
     <!-- End query builder imports -->
   % endif
 
-  ${ render_bundle('vendors~notebook') | n,unicode }
-  ${ render_bundle('notebook') | n,unicode }
+  % for bundle in get_hue_bundles('notebook'):
+    ${ render_bundle(bundle) | n,unicode }
+  % endfor
 
   <!--[if IE 9]>
   <script src="${ static('desktop/ext/js/classList.min.js') }" type="text/javascript" charset="utf-8"></script>
