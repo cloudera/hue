@@ -105,7 +105,7 @@ If multiple tables appear in the FROM clause, including derived and joined table
 
 **Smart keyword completion**
 
-The autocompleter suggests keywords based on where the cursor is positioned in the statement. Where possible it will even suggest more than one word at at time, like in the case of IF NOT EXISTS, no one likes to type too much right? In the parts where order matters but the keywords are optional, for instance after FROM tbl, it will list the keyword suggestions in the order they are expected with the first expected one on top. So after FROM tbl the WHERE keyword is listed above GROUP BY etc.
+The autocompleter suggests keywords based on where the cursor is positioned in the statement. Where possible it will even suggest more than one word at a time, like in the case of IF NOT EXISTS, no one likes to type too much right? In the parts where order matters but the keywords are optional, for instance after FROM tbl, it will list the keyword suggestions in the order they are expected with the first expected one on top. So after FROM tbl the WHERE keyword is listed above GROUP BY etc.
 
 **Functions**
 
@@ -119,7 +119,7 @@ When editing subqueries it will only make suggestions within the scope of the su
 
 **Context popup**
 
-Right click on any fragement of the queries (e.g. a table name) to gets all its metadata information. This is a handy shortcut to get more description or check what types of values are contained in the table or columns.
+Right click on any fragment of the queries (e.g. a table name) to gets all its metadata information. This is a handy shortcut to get more description or check what types of values are contained in the table or columns.
 
 It’s quite handy to be able to look at column samples while writing a query to see what type of values you can expect. Hue now has the ability to perform some operations on the sample data, you can now view distinct values as well as min and max values. Expect to see more operations in coming releases.
 
@@ -660,7 +660,7 @@ The main advantage is to be able to add snippets of different dialects (e.g. PyS
 
 ![Notebook mode](https://cdn.gethue.com/uploads/2015/10/notebook-october.png)
 
-Any configured language of the Editor will be available as a dialect. Each snippet has a code editor, wih autocomplete, syntax highlighting and other feature like shortcut links to HDFS paths and Hive tables.
+Any configured language of the Editor will be available as a dialect. Each snippet has a code editor, with autocomplete, syntax highlighting and other feature like shortcut links to HDFS paths and Hive tables.
 
 ![Notebook Screen](https://cdn.gethue.com/uploads/2015/08/notebook.png)
 
