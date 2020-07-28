@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="literal-entity">
+  <div :class="`literal-entity ${entity.className || ''}`">
     <div class="left-point" />
     <div class="right-point" />
     <div class="literal-value">
