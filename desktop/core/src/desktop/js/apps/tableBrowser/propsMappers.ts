@@ -17,60 +17,90 @@
  */
 
 import { Table, Column } from '../../components/er-diagram/lib/entities';
+import { IEntity, IRelation } from '../../components/er-diagram/lib/interfaces';
 
-function createTable(database: string, name: string, columnNames: Array<string>) {
-  const tableId: string = Table.buildId(database, name);
-  const columns: Array<Column> = columnNames.map((columnName: string) => {
-    return new Column(tableId, columnName);
-  });
-  return new Table(database, name, columns);
+interface IPrimaryKey {
+  name: string;
 }
 
-function reorderBasedOnKeys(
-  columnNames: Array<string>,
-  primaryKeys: Array<unknown>,
-  foreignKeys: Array<unknown>
-): Array<string> {
+interface IForeignKey {
+  name: string;
+  to: string;
+}
+
+interface ISourceMeta {
+  columns: string[];
+  primary_keys: IPrimaryKey[];
+  foreign_keys: IForeignKey[];
+}
+
+interface ICatalogEntity {
+  path: string[];
+  sourceMeta: ISourceMeta;
+}
+
+interface IProps {
+  entities: IEntity[];
+  relations: IRelation[];
+}
+
+const createTable = (database: string, fromDB: string, name: string, columnNames: string[]) => {
+  const tableId: string = Table.buildId(database, name);
+  const columns: Column[] = columnNames.map((columnName: string) => {
+    return new Column(tableId, columnName);
+  });
+  const table = new Table(database, name, columns);
+  if (database === fromDB) {
+    table.className = 'hide-db';
+  }
+  return table;
+};
+
+const reorderBasedOnKeys = (
+  columnNames: string[],
+  primaryKeys: IPrimaryKey[],
+  foreignKeys: IForeignKey[]
+): string[] => {
   const keyWeight = {};
 
-  columnNames.forEach((key: unknown) => (keyWeight[key] = 0));
-  foreignKeys.forEach((key: unknown) => (keyWeight[key.name] = 1));
-  primaryKeys.forEach((key: unknown) => (keyWeight[key.name] = 2));
+  columnNames.forEach((key: string) => (keyWeight[key] = 0));
+  foreignKeys.forEach((key: IPrimaryKey) => (keyWeight[key.name] = 1));
+  primaryKeys.forEach((key: IForeignKey) => (keyWeight[key.name] = 2));
 
   columnNames.sort((a, b) => keyWeight[b] - keyWeight[a]);
 
   return columnNames;
-}
+};
 
-function getTables(
+const getTables = (
   fromDB: string,
   fromTableName: string,
-  columnNames: Array<string>,
-  primaryKeys: Array<unknown>,
-  foreignKeys: Array<unknown>
-) {
+  columnNames: string[],
+  primaryKeys: IPrimaryKey[],
+  foreignKeys: IForeignKey[]
+): IEntity[] => {
   columnNames = reorderBasedOnKeys(columnNames, primaryKeys, foreignKeys);
-  const fromTable = createTable(fromDB, fromTableName, columnNames);
+  const fromTable = createTable(fromDB, fromDB, fromTableName, columnNames);
   const tables = [fromTable];
   const createdTableIdSet = new Set([fromTable.id]);
 
-  foreignKeys.forEach((key: unknown) => {
+  foreignKeys.forEach((key: IForeignKey) => {
     const toPath = key.to.split('.');
     const tableId = Table.buildId(toPath[0], toPath[1]);
     if (!createdTableIdSet.has(tableId)) {
       createdTableIdSet.add(tableId);
-      tables.push(createTable(toPath[0], toPath[1], [toPath[2]]));
+      tables.push(createTable(toPath[0], fromDB, toPath[1], [toPath[2]]));
     }
   });
 
   return tables;
-}
+};
 
-function getForeignKeyRelations(
+const getForeignKeyRelations = (
   fromDB: string,
   fromTableName: string,
-  foreignKeys: Array<unknown>
-) {
+  foreignKeys: IForeignKey[]
+) => {
   const fromTableId = Table.buildId(fromDB, fromTableName);
   return foreignKeys.map(key => {
     const toPath = key.to.split('.');
@@ -80,9 +110,9 @@ function getForeignKeyRelations(
       right: new Column(Table.buildId(toPath[0], toPath[1]), toPath[2])
     };
   });
-}
+};
 
-export function tableERD(catalogEntry: unknown): unknown {
+export const tableERD = (catalogEntry: ICatalogEntity): IProps => {
   const fromDB: string = catalogEntry.path[0];
   const fromTable: string = catalogEntry.path[1];
 
@@ -96,4 +126,4 @@ export function tableERD(catalogEntry: unknown): unknown {
     ),
     relations: getForeignKeyRelations(fromDB, fromTable, catalogEntry.sourceMeta.foreign_keys)
   };
-}
+};
