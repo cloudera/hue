@@ -31,7 +31,7 @@ NO_TOC := --xsltproc-opts='--stringparam generate.toc ""'
 # Being lazy/loose with the prerequisite. Include all files except sdk and
 # release notes, which are handled separately below.
 #
-DOC_FILES := $(shell find . -name sdk -prune -o -name release-notes -name user-guide -name admin-manual -o -print)
+DOC_FILES := $(shell find . -name sdk -prune -o -name release-notes -name user-guide -name admin-manual -o -path '*/gethue/*' -prune -o -print)
 $(BLD_DIR_DOC): sdk release-notes user-guide admin-manual $(DOC_FILES)
 	@echo '--- Generating doc at $@'
 	@mkdir -p $@
