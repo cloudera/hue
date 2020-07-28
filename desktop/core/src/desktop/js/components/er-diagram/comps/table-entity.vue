@@ -22,7 +22,7 @@
       {{ entity.database }}
     </div>
     <div :title="entity.name" class="table-name">
-      <span @click="$emit('click')">
+      <span @click="$emit('click', entity)">
         {{ entity.name }}
       </span>
     </div>
@@ -33,6 +33,7 @@
         :data-entity-id="column.id"
         :title="column.name"
         :class="`column-entity ${column.className || ''}`"
+        @click="$emit('click', column)"
       >
         <div class="left-point" />
         <div class="right-point" />

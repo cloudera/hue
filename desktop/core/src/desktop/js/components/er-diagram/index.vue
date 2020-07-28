@@ -31,13 +31,14 @@
             <TableEntity
               v-if="entity.type === EntityTypes.Table"
               :entity="entity"
-              @click="entityClicked(entity)"
+              @click="entityClicked"
               @updated="plotRelations()"
             />
             <LiteralEntity
               v-else-if="entity.type === EntityTypes.Literal"
               :entity="entity"
               :data-entity-id="entity.id"
+              @click="entityClicked"
             />
           </div>
         </div>
@@ -142,6 +143,7 @@
 
     toggleFS(): void {
       toggleFullScreen(this.$el);
+      this.$emit('toggle-fullscreen');
     }
 
     entityClicked(entity: IEntity): void {
