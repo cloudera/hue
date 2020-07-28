@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div :class="`literal-entity ${entity.className || ''}`">
+  <div :class="`literal-entity ${entity.className || ''}`" @click="$emit('click', entity)">
     <div class="left-point" />
     <div class="right-point" />
     <div class="literal-value">
