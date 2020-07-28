@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="table-entity">
+  <div :class="`table-entity ${entity.className || ''}`">
     <div :title="entity.database" class="db-name">
       {{ entity.database }}
     </div>
@@ -32,7 +32,7 @@
         :key="column.id"
         :data-entity-id="column.id"
         :title="column.name"
-        class="column-entity"
+        :class="`column-entity ${column.className || ''}`"
       >
         <div class="left-point" />
         <div class="right-point" />

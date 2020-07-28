@@ -20,7 +20,7 @@
   <div class="er-diagram">
     <div class="buttons-panel">
       <button class="btn btn-default btn-sm" title="Toggle Fullscreen" @click="toggleFS">
-        <expand-icon class="fa fa-expand" />
+        <expand-icon v-pre class="fa fa-expand" />
       </button>
     </div>
 
