@@ -749,41 +749,6 @@ ${ components.menubar(is_embeddable) }
   <!-- /ko -->
 </script>
 
-<script type="text/html" id="metastore-relationships-tab">
-  <!-- ko hueSpinner: { spin: loadingTopJoins, inline: true } --><!-- /ko -->
-  <table data-bind="visible: !loadingTopJoins()" class="table table-condensed">
-    <thead>
-    <tr>
-      <th>${ _('Table') }</th>
-      <th>${ _('Foreign keys') }</th>
-    </tr>
-    </thead>
-    <tbody>
-    <!-- ko if: topJoins().length === 0 -->
-    <tr>
-      <td colspan="2" style="font-style: italic;">${ _('No related tables found.') }</td>
-    </tr>
-    <!-- /ko -->
-    <!-- ko foreach: topJoins -->
-    <tr>
-      <td><a href="javascript:void(0);" data-bind="text: tableName, sqlContextPopover: { sourceType: $parents[1].catalogEntry.getConnector().id, namespace: parents[1].catalogEntry.namespace, compute: parents[1].catalogEntry.compute, path: tablePath, offset: { top: -3, left: 3 }}"></a></td>
-      <td>
-        <table class="metastore-join-column-table">
-          <tbody data-bind="foreach: joinCols">
-          <tr>
-            <td><a href="javascript:void(0);" data-bind="text: target, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getConnector().id, namespace: $parents[2].catalogEntry.namespace, compute: parents[2].catalogEntry.compute, path: targetPath, offset: { top: -3, left: 3 }}"></a></td>
-            <td class="metastore-join-arrow"><i class="fa fa-arrows-h"></i></td>
-            <td><a href="javascript:void(0);" data-bind="text: source, sqlContextPopover: { sourceType: $parents[2].catalogEntry.getConnector().id, namespace: $parents[2].catalogEntry.namespace, compute: parents[2].catalogEntry.compute, path: sourcePath, offset: { top: -3, left: 3 }}"></a></td>
-          </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-    <!-- /ko -->
-    </tbody>
-  </table>
-</script>
-
 <script type="text/html" id="metastore-describe-table">
   <div class="clearfix"></div>
   <!-- ko template: 'metastore-main-description' --><!-- /ko -->
@@ -794,15 +759,11 @@ ${ components.menubar(is_embeddable) }
 
   <ul class="nav nav-tabs nav-tabs-border margin-top-10">
     <li data-bind="css: { 'active': $root.currentTab() === 'overview' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('overview'); }">${_('Overview')}</a></li>
-    <!-- ko if: $root.optimizerEnabled() -->
-      <li data-bind="css: { 'active': $root.currentTab() === 'relationships' }"><a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('relationships'); }">${_('Relationships')} (<span data-bind="text: topJoins().length"></span>)</a></li>
-##       <!-- ko if: $root.database().table().optimizerDetails() -->
-##       <li data-bind="css: { 'active': $root.currentTab() === 'queries' }"><a href="javascript: void(0);" data-bind="click: function(){ $root.currentTab('queries'); }">${_('Queries')} (<span data-bind="text: $root.database().table().optimizerDetails().queryCount"></span>)</a></li>
-##       <li data-bind="css: { 'active': $root.currentTab() === 'joins' }"><a href="javascript: void(0);" data-bind="click: function(){ $root.currentTab('joins'); }">${_('Joins')} (<span data-bind="text: $root.database().table().optimizerDetails().joinCount"></span>)</a></li>
-##       <!-- /ko -->
-##       <!-- ko if: $root.database().table().relationshipsDetails() -->
-##       <!-- /ko -->
-    <!-- /ko -->
+    % if SHOW_TABLE_ERD.get():
+    <li data-bind="css: { 'active' : $root.currentTab() === 'erd' || $root.currentTab() === 'erd-animated' }">
+      <a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('erd'); }">${_('Relationships')} (<span data-bind="text: topJoins().length"></span>)</a>
+    </li>
+    % endif
     <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->
     <li data-bind="css: { 'active': $root.currentTab() === 'partitions' }">
       <a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('partitions'); }">${_('Partitions')} (<span data-bind="text: partitionsCountLabel"></span>)</a>
@@ -824,21 +785,12 @@ ${ components.menubar(is_embeddable) }
       <a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('privileges'); }">${ _('Privileges') }</a>
     </li>
     <!-- /ko -->
-    % if SHOW_TABLE_ERD.get():
-    <li data-bind="css: { 'active' : $root.currentTab() === 'erd' || $root.currentTab() === 'erd-animated' }">
-      <a href="javascript: void(0);" data-bind="click: function() { $root.currentTab('erd'); }">${ _('Table Relations') }</a>
-    </li>
-    % endif
   </ul>
 
   <div class="tab-content margin-top-10" style="border: none; overflow: hidden">
     <div>
       <!-- ko if: $root.currentTab() === 'overview' -->
         <!-- ko template: 'metastore-overview-tab' --><!-- /ko -->
-      <!-- /ko -->
-
-      <!-- ko if: $root.currentTab() === 'relationships' -->
-      <!-- ko template: { name: 'metastore-relationships-tab' } --><!-- /ko -->
       <!-- /ko -->
 
       <!-- ko if: $root.currentTab() === 'partitions' -->
@@ -872,11 +824,13 @@ ${ components.menubar(is_embeddable) }
             vueProps: $root.propsMappers.tableERD(database.table().catalogEntry),
             vueEvents: {
               'entity-clicked': function (event){
-                const table = event.detail[0];
-                $root.setDbAndTableByName(table.database, table.name, () => $root.currentTab('erd-animated'));
+                const entity = event.detail[0];
+                if(entity.type === 'TABLE') {
+                  $root.setDbAndTableByName(entity.database, entity.name, () => $root.currentTab('erd-animated'));
+                }
               }
             },
-            class: $root.currentTab()
+            class: $root.currentTab() + ' table-erd'
           "></er-diagram>
         <!-- /ko -->
       <!-- /ko -->

@@ -18,13 +18,16 @@ import uuid
 import weakref
 
 from phoenixdb import errors
-from phoenixdb.avatica.client import OPEN_CONNECTION_PROPERTIES
 from phoenixdb.cursor import Cursor
 from phoenixdb.errors import ProgrammingError
+from phoenixdb.meta import Meta
 
 __all__ = ['Connection']
 
 logger = logging.getLogger(__name__)
+
+AVATICA_PROPERTIES = ('autoCommit', 'autocommit', 'readOnly', 'readonly', 'transactionIsolation',
+                      'catalog', 'schema')
 
 
 class Connection(object):
@@ -46,17 +49,11 @@ class Connection(object):
         else:
             self.cursor_factory = Cursor
         self._cursors = []
-        # Extract properties to pass to OpenConnectionRequest
-        self._connection_args = {}
-        # The rest of the kwargs
-        self._filtered_args = {}
-        for k in kwargs:
-            if k in OPEN_CONNECTION_PROPERTIES:
-                self._connection_args[k] = kwargs[k]
-            else:
-                self._filtered_args[k] = kwargs[k]
+        self._phoenix_props, avatica_props_init = Connection._map_conn_props(kwargs)
         self.open()
-        self.set_session(**self._filtered_args)
+
+        # TODO we could probably optimize it away if the defaults are not changed
+        self.set_session(**avatica_props_init)
 
     def __del__(self):
         if not self._closed:
@@ -69,10 +66,36 @@ class Connection(object):
         if not self._closed:
             self.close()
 
+    @staticmethod
+    def _default_avatica_props():
+        return {'autoCommit': False,
+                'readOnly': False,
+                'transactionIsolation': 0,
+                'catalog': '',
+                'schema': ''}
+
+    @staticmethod
+    def _map_conn_props(conn_props):
+        """Sorts and prepocesses args that should be passed to Phoenix and Avatica"""
+
+        avatica_props = dict([(k, conn_props[k]) for k in conn_props.keys() if k in AVATICA_PROPERTIES])
+        phoenix_props = dict([(k, conn_props[k]) for k in conn_props.keys() if k not in AVATICA_PROPERTIES])
+        avatica_props = Connection._map_legacy_avatica_props(avatica_props)
+
+        return (phoenix_props, avatica_props)
+
+    @staticmethod
+    def _map_legacy_avatica_props(props):
+        if 'autocommit' in props:
+            props['autoCommit'] = bool(props.pop('autocommit'))
+        if 'readonly' in props:
+            props['readOnly'] = bool(props.pop('readonly'))
+        return props
+
     def open(self):
         """Opens the connection."""
         self._id = str(uuid.uuid4())
-        self._client.open_connection(self._id, info=self._connection_args)
+        self._client.open_connection(self._id, info=self._phoenix_props)
 
     def close(self):
         """Closes the connection.
@@ -83,7 +106,7 @@ class Connection(object):
         be automatically called at the end of the ``with`` block.
         """
         if self._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         for cursor_ref in self._cursors:
             cursor = cursor_ref()
             if cursor is not None and not cursor._closed:
@@ -99,12 +122,12 @@ class Connection(object):
 
     def commit(self):
         if self._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         self._client.commit(self._id)
 
     def rollback(self):
         if self._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         self._client.rollback(self._id)
 
     def cursor(self, cursor_factory=None):
@@ -121,12 +144,12 @@ class Connection(object):
             A :class:`~phoenixdb.cursor.Cursor` object.
         """
         if self._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         cursor = (cursor_factory or self.cursor_factory)(self)
         self._cursors.append(weakref.ref(cursor, self._cursors.remove))
         return cursor
 
-    def set_session(self, autocommit=None, readonly=None):
+    def set_session(self, **props):
         """Sets one or more parameters in the current connection.
 
         :param autocommit:
@@ -135,50 +158,51 @@ class Connection(object):
         :param readonly:
             Switch the connection to read-only mode.
         """
-        props = {}
-        if autocommit is not None:
-            props['autoCommit'] = bool(autocommit)
-        if readonly is not None:
-            props['readOnly'] = bool(readonly)
-        props = self._client.connection_sync(self._id, props)
-        self._autocommit = props.auto_commit
-        self._readonly = props.read_only
-        self._transactionisolation = props.transaction_isolation
+        props = Connection._map_legacy_avatica_props(props)
+        self._avatica_props = self._client.connection_sync_dict(self._id, props)
 
     @property
     def autocommit(self):
         """Read/write attribute for switching the connection's autocommit mode."""
-        return self._autocommit
+        return self._avatica_props['autoCommit']
 
     @autocommit.setter
     def autocommit(self, value):
         if self._closed:
-            raise ProgrammingError('the connection is already closed')
-        props = self._client.connection_sync(self._id, {'autoCommit': bool(value)})
-        self._autocommit = props.auto_commit
+            raise ProgrammingError('The connection is already closed.')
+        self._avatica_props = self._client.connection_sync_dict(self._id, {'autoCommit': bool(value)})
 
     @property
     def readonly(self):
         """Read/write attribute for switching the connection's readonly mode."""
-        return self._readonly
+        return self._avatica_props['readOnly']
 
     @readonly.setter
     def readonly(self, value):
         if self._closed:
-            raise ProgrammingError('the connection is already closed')
-        props = self._client.connection_sync(self._id, {'readOnly': bool(value)})
-        self._readonly = props.read_only
+            raise ProgrammingError('The connection is already closed.')
+        self._avatica_props = self._client.connection_sync_dict(self._id, {'readOnly': bool(value)})
 
     @property
     def transactionisolation(self):
-        return self._transactionisolation
+        return self._avatica_props['_transactionIsolation']
 
     @transactionisolation.setter
     def transactionisolation(self, value):
         if self._closed:
-            raise ProgrammingError('the connection is already closed')
-        props = self._client.connection_sync(self._id, {'transactionIsolation': bool(value)})
-        self._transactionisolation = props.transaction_isolation
+            raise ProgrammingError('The connection is already closed.')
+        self._avatica_props = self._client.connection_sync_dict(self._id, {'transactionIsolation': bool(value)})
+
+    def meta(self):
+        """Creates a new meta.
+
+        :returns:
+            A :class:`~phoenixdb.meta` object.
+        """
+        if self._closed:
+            raise ProgrammingError('The connection is already closed.')
+        meta = Meta(self)
+        return meta
 
 
 for name in errors.__all__:

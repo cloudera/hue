@@ -17,12 +17,14 @@
 -->
 
 <template>
-  <div class="table-entity" @click="$emit('click')">
+  <div :class="`table-entity ${entity.className || ''}`">
     <div :title="entity.database" class="db-name">
       {{ entity.database }}
     </div>
     <div :title="entity.name" class="table-name">
-      {{ entity.name }}
+      <span @click="$emit('click', entity)">
+        {{ entity.name }}
+      </span>
     </div>
     <div class="columns-container">
       <div
@@ -30,7 +32,8 @@
         :key="column.id"
         :data-entity-id="column.id"
         :title="column.name"
-        class="column-entity"
+        :class="`column-entity ${column.className || ''}`"
+        @click="$emit('click', column)"
       >
         <div class="left-point" />
         <div class="right-point" />

@@ -21,6 +21,8 @@ import { EntityTypes } from './enums';
 export interface IEntity {
   readonly id: string;
   readonly type: EntityTypes;
+
+  className: string;
 }
 
 export interface IRelation {
