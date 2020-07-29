@@ -237,6 +237,8 @@ To list all the available commands:
 
 ## Troubleshooting
 
+### Instrumentation
+
 To troubleshoot why Hue is slow or consuming high memory, admin can enable instrumentation by setting the `instrumentation` flag to True.
 
     [desktop]
@@ -244,13 +246,31 @@ To troubleshoot why Hue is slow or consuming high memory, admin can enable instr
 
 If `django_debug_mode` is enabled, instrumentation is automatically enabled. This flag appends the response time and the total peak memory used since Hue started for every logged request.
 
-### Instrumentation enabled
+Instrumentation enabled:
 
     [17/Apr/2018 15:18:43 -0700] access       INFO     127.0.0.1 admin - "POST /jobbrowser/jobs/ HTTP/1.1" `returned in 97ms (mem: 135mb)`
 
-### Instrumentation not enabled
+Instrumentation not enabled:
 
     [23/Apr/2018 10:59:01 -0700] INFO     127.0.0.1 admin - "POST /jobbrowser/jobs/ HTTP/1.1" returned in 88ms
+
+### How to change or reset a forgotten password
+
+Via the Hue commands, to change the password of the currently logged in Unix user:
+
+    build/env/bin/hue changepassword
+
+If you don’t remember the admin username, create a new Hue admin (you will then also be able to login and could change the password of another user in Hue):
+
+    build/env/bin/hue createsuperuser
+
+### How to make a certain user a Hue admin
+
+It is recommended to just do it as an admin via the [Admin UI](https://gethue.com/password-management-in-hue/).
+
+In case this is not possible (e.g. nobody is admin), doing it on the command line is explained in the examples of the [Python API](/developer/api/#python).
+
+At the last recourse, the database user records can be updated via SQL.
 
 ### Exporting Documents
 
