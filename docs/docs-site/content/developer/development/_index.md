@@ -437,7 +437,7 @@ In a nutshell, front-end development is using:
 
 ### Javascript
 
-The javascript files are currently being migrated to webpack bundles, during this process some files will live under src/desktop/static/ and some will live under src/dekstop/js
+The javascript files are currently being migrated to webpack bundles, during this process some files will live under src/desktop/static/ and some will live under src/desktop/js
 
 For changes to the files under src/desktop/js the following applies:
 
@@ -517,7 +517,7 @@ Run the API unit tests
 
     ./build/env/bin/hue test unit
 
-Open a pull request which will automaticlly trigger a [CircleCi](https://circleci.com/gh/cloudera/hue) unit test run.
+Open a pull request which will automatically trigger a [CircleCi](https://circleci.com/gh/cloudera/hue) unit test run.
 
 How to run just some parts of the tests, e.g.:
 
