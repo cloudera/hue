@@ -2541,18 +2541,20 @@ case 1742:
      // with columnReference for functions like: db.udf(foo)
      var fn = $$[$0-1].chain[$$[$0-1].chain.length - 1].name.toLowerCase();
      parser.addFunctionArgumentLocations(fn, $$[$0].expressions, $$[$0-1].chain);
-     $$[$0-1].lastLoc.type = 'function';
-     $$[$0-1].lastLoc.function = fn;
-     $$[$0-1].lastLoc.location = {
-       first_line: $$[$0-1].lastLoc.location.first_line,
-       last_line: $$[$0-1].lastLoc.location.last_line,
-       first_column: $$[$0-1].lastLoc.location.first_column,
-       last_column: $$[$0-1].lastLoc.location.last_column - 1
-     }
-     if ($$[$0-1].lastLoc !== $$[$0-1].firstLoc) {
-        $$[$0-1].firstLoc.type = 'database';
-     } else {
-       delete $$[$0-1].lastLoc.identifierChain;
+     if ($$[$0-1].lastLoc && $$[$0-1].lastLoc.location) {
+       $$[$0-1].lastLoc.type = 'function';
+       $$[$0-1].lastLoc.function = fn;
+       $$[$0-1].lastLoc.location = {
+         first_line: $$[$0-1].lastLoc.location.first_line,
+         last_line: $$[$0-1].lastLoc.location.last_line,
+         first_column: $$[$0-1].lastLoc.location.first_column,
+         last_column: $$[$0-1].lastLoc.location.last_column - 1
+       }
+       if ($$[$0-1].lastLoc !== $$[$0-1].firstLoc) {
+          $$[$0-1].firstLoc.type = 'database';
+       } else {
+         delete $$[$0-1].lastLoc.identifierChain;
+       }
      }
      if ($$[$0].expressions && $$[$0].expressions.length) {
        this.$ = { function: fn, expression: $$[$0].expressions[$$[$0].expressions.length - 1].expression, types: ['UDFREF'] }

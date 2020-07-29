@@ -602,6 +602,7 @@ const SYNTAX_PARSER_NOOP_FUNCTIONS = [
   'addCteAliasLocation',
   'addDatabaseLocation',
   'addFileLocation',
+  'addFunctionArgumentLocations',
   'addFunctionLocation',
   'addNewDatabaseLocation',
   'addNewTableLocation',
@@ -763,9 +764,8 @@ export const initSyntaxParser = parser => {
       parser.parse(beforeCursor + afterCursor);
     } catch (err) {
       if (debug) {
-        console.warn(err);
-        console.warn(err.stack);
         console.warn(parser.yy.error);
+        throw err;
       }
     }
 
