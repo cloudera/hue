@@ -24,7 +24,7 @@ There are several parsers in Hue already (e.g. one for Impala, one for Hive..) a
 
 Building a dedicated work is more effort but it then allows a very rich end user experience, e.g.:
 
-* Handle invalid/imcomplete queries and propose suggestions/fixes
+* Handle invalid/incomplete queries and propose suggestions/fixes
 * date_column = <Date compatible UDF ...>
 * Language reference or data samples just by pointing the cursor on SQL identifiers
 * Leverage the parser for risk alerts (e.g. adding automatic LIMIT) or proper re-formatting
