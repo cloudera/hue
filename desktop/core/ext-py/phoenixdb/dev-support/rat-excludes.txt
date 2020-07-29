@@ -1,0 +1,4 @@
+.*\.pyc
+NEWS\.rst
+RELEASING\.rst
+README\.rst

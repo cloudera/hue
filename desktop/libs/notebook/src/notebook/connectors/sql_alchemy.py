@@ -341,21 +341,22 @@ class SqlAlchemyApi(Api):
     assist = Assist(inspector, engine, backticks=self.backticks)
     response = {'status': -1}
 
+    if database is not None:
+      database = self._fix_phoenix_empty_database(database)
+
     if operation == 'functions':
       response['functions'] = []
     elif operation == 'function':
       response['function'] = {}
     elif database is None:
-      response['databases'] = [db or 'NULL' for db in assist.get_databases()]
+      response['databases'] = [db or ' ' for db in assist.get_databases()]
     elif table is None:
       tables_meta = []
-      database = self._fix_phoenix_empty_database(database)
       for t in assist.get_tables(database):
         t = self._fix_bigquery_db_prefixes(t)
         tables_meta.append({'name': t, 'type': 'Table', 'comment': ''})
       response['tables_meta'] = tables_meta
     elif column is None:
-      database = self._fix_phoenix_empty_database(database)
       columns = assist.get_columns(database, table)
 
       response['columns'] = [col['name'] for col in columns]
@@ -433,7 +434,7 @@ class SqlAlchemyApi(Api):
 
 
   def _fix_phoenix_empty_database(self, database):
-    return None if self.options['url'].startswith('phoenix://') and database == 'NULL' else database
+    return '' if self.options['url'].startswith('phoenix://') and database == ' ' else database
 
 
   def _fix_bigquery_db_prefixes(self, table_or_column):
