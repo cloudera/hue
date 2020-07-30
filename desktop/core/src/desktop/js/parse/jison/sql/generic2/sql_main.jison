@@ -1515,26 +1515,3 @@ IntegerOrUnbounded
  : 'UNSIGNED_INTEGER'
  | 'UNBOUNDED'
  ;
-
-OptionalHavingClause
- :
- | HavingClause
- ;
-
-HavingClause
- : 'HAVING' ValueExpression
- ;
-
-HavingClause_EDIT
- : 'HAVING' 'CURSOR'
-   {
-     parser.valueExpressionSuggest();
-     parser.suggestAggregateFunctions();
-     parser.suggestSelectListAliases(true);
-   }
- | 'HAVING' ValueExpression_EDIT
-   {
-     parser.suggestAggregateFunctions();
-     parser.suggestSelectListAliases(true);
-   }
- ;
