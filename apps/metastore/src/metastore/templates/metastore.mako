@@ -62,7 +62,7 @@ ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 
-${ render_bundle('vendors~jobBrowser~tableBrowser') | n,unicode }
+${ render_bundle('vendors~tableBrowser~jobBrowser') | n,unicode }
 ${ render_bundle('tableBrowser') | n,unicode }
 
 <span class="notebook">
