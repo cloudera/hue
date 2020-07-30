@@ -21,34 +21,37 @@ from webpack_loader.exceptions import WebpackError, WebpackLoaderTimeoutError
 from webpack_loader.utils import get_loader
 
 def get_hue_bundles(app_name, config='DEFAULT'):
-    '''
-    Util function to get all bundles related to app_name including vendor bundles
-    similar to get_bundle in https://github.com/owais/django-webpack-loader/blob/master/webpack_loader/loader.py
-    '''
-    loader = get_loader(config)
-    assets = loader.get_assets()
+  '''
+  Util function to get all bundles related to app_name including vendor bundles
+  similar to get_bundle in https://github.com/owais/django-webpack-loader/blob/master/webpack_loader/loader.py
+  '''
+  loader = get_loader(config)
+  assets = loader.get_assets()
 
-    if settings.DEBUG and assets.get('status') == 'compiling':
-        timeout = loader.config['TIMEOUT'] or 0
-        timed_out = False
-        start = time.time()
+  if settings.DEBUG and assets.get('status') == 'compiling':
+    timeout = loader.config['TIMEOUT'] or 0
+    timed_out = False
+    start = time.time()
 
-        while assets.get('status') == 'compiling' and not timed_out:
-            time.sleep(loader.config['POLL_INTERVAL'])
-            if timeout and (time.time() - timeout > start):
-                timed_out = True
-            assets = loader.get_assets()
+    while assets.get('status') == 'compiling' and not timed_out:
+      time.sleep(loader.config['POLL_INTERVAL'])
+      if timeout and (time.time() - timeout > start):
+        timed_out = True
+      assets = loader.get_assets()
 
-        if timed_out:
-            raise WebpackLoaderTimeoutError(
-                "Timed Out. Bundles for `{0}` took more than {1} seconds "
-                "to compile.".format(app_name, timeout)
-            )
+    if timed_out:
+      raise WebpackLoaderTimeoutError(
+        "Timed Out. Bundles for `{0}` took more than {1} seconds "
+        "to compile.".format(app_name, timeout)
+      )
 
-    if assets.get('status') == 'done':
-        return [chunk for chunk in assets['chunks'] if
-                chunk.startswith(app_name) or
-                chunk.startswith('vendors~' + app_name) or
-                (not chunk.startswith('hue') and not chunk.startswith('vendors~hue') and app_name in chunk)]
+  chunks = []
+  if assets.get('status') == 'done':
+    chunks = [chunk for chunk in assets['chunks'] if
+              chunk.startswith(app_name) or
+              chunk.startswith('vendors~' + app_name) or
+              (not chunk.startswith('hue') and not chunk.startswith('vendors~hue') and app_name in chunk)]
+    if not chunks:
+      raise WebpackError("Failed to find bundles for `{0}` in config `{1}`".format(app_name, config))
 
-    raise WebpackError("Failed to find bundles for `{0}` in config `{1}`".format(app_name, config))
+  return chunks
