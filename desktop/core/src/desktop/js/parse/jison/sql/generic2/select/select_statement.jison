@@ -16,28 +16,11 @@
 
 QuerySpecification
  : SelectStatement OptionalUnions                                   -> $1
- | CommonTableExpression SelectStatement OptionalUnions
- | CommonTableExpression '(' QuerySpecification ')' OptionalUnions  -> $3
  ;
 
 QuerySpecification_EDIT
  : SelectStatement_EDIT OptionalUnions
  | SelectStatement OptionalUnions_EDIT
- | CommonTableExpression '(' QuerySpecification_EDIT ')'
-   {
-     parser.addCommonTableExpressions($1);
-   }
- | CommonTableExpression SelectStatement_EDIT OptionalUnions
-   {
-     parser.addCommonTableExpressions($1);
-   }
- | CommonTableExpression SelectStatement OptionalUnions_EDIT
-   {
-     parser.addCommonTableExpressions($1);
-   }
- | CommonTableExpression_EDIT
- | CommonTableExpression_EDIT '(' QuerySpecification ')'
- | CommonTableExpression_EDIT SelectStatement OptionalUnions
  ;
 
 SelectStatement
@@ -51,43 +34,6 @@ SelectStatement
      parser.addClauseLocation('selectList', parser.firstDefined($2, @2, $1, @1), @3);
      $$ = { selectList: $3, tableExpression: $4 }
    }
- ;
-
-OptionalUnions
- :
- | Unions
- ;
-
-OptionalUnions_EDIT
- : Unions_EDIT
- ;
-
-Unions
- : UnionClause
- | Unions UnionClause
- ;
-
-Unions_EDIT
- : UnionClause_EDIT
- | Unions UnionClause_EDIT
- | UnionClause_EDIT Unions
- | Unions UnionClause_EDIT Unions
- ;
-
-UnionClause
- : 'UNION' NewStatement OptionalAllOrDistinct SelectStatement
- ;
-
-UnionClause_EDIT
- : 'UNION' NewStatement 'CURSOR'
-   {
-     parser.suggestKeywords(['ALL', 'DISTINCT', 'SELECT']);
-   }
- | 'UNION' NewStatement 'CURSOR' SelectStatement
-   {
-     parser.suggestKeywords(['ALL', 'DISTINCT']);
-   }
- | 'UNION' NewStatement OptionalAllOrDistinct SelectStatement_EDIT
  ;
 
 SelectStatement_EDIT
@@ -191,53 +137,6 @@ SelectStatement_EDIT
      parser.suggestTables({ prependFrom: true });
      parser.suggestDatabases({ prependFrom: true, appendDot: true });
    }
- ;
-
-CommonTableExpression
- : 'WITH' WithQueries  -> $2
- ;
-
-CommonTableExpression_EDIT
- : 'WITH' WithQueries_EDIT
- ;
-
-WithQueries
- : WithQuery                   -> [$1]
- | WithQueries ',' WithQuery   -> $1.concat([$3])
- ;
-
-WithQueries_EDIT
- : WithQuery_EDIT
- | WithQueries ',' WithQuery_EDIT
-   {
-     parser.addCommonTableExpressions($1);
-   }
- | WithQuery_EDIT ',' WithQueries
- | WithQueries ',' WithQuery_EDIT ',' WithQueries
-   {
-     parser.addCommonTableExpressions($1);
-   }
- ;
-
-WithQuery
- : RegularOrBacktickedIdentifier 'AS' '(' TableSubQueryInner ')'
-   {
-     parser.addCteAliasLocation(@1, $1);
-     $4.alias = $1;
-     $$ = $4;
-   }
- ;
-
-WithQuery_EDIT
- : RegularOrBacktickedIdentifier 'CURSOR'
-   {
-     parser.suggestKeywords(['AS']);
-   }
- | RegularOrBacktickedIdentifier 'AS' '(' AnyCursor RightParenthesisOrError
-   {
-     parser.suggestKeywords(['SELECT']);
-   }
- | RegularOrBacktickedIdentifier 'AS' '(' TableSubQueryInner_EDIT RightParenthesisOrError
  ;
 
 OptionalAllOrDistinct
@@ -371,67 +270,6 @@ TableExpression_EDIT
    }
  ;
 
-OptionalJoins
- :
- | Joins
- | Joins_INVALID
- ;
-
-FromClause
- : 'FROM' TableReferenceList
-   {
-     $$ = { tableReferenceList : $2 }
-   }
- ;
-
-FromClause_EDIT
- : 'FROM' 'CURSOR'
-   {
-       parser.suggestTables();
-       parser.suggestDatabases({ appendDot: true });
-   }
- | 'FROM' TableReferenceList_EDIT
- ;
-
-SelectSpecification
- : ValueExpression OptionalCorrelationName
-   {
-     if ($2) {
-       parser.addColumnAliasLocation($2.location, $2.alias, @1);
-       $$ = { valueExpression: $1, alias: $2.alias };
-       if (!parser.yy.selectListAliases) {
-         parser.yy.selectListAliases = [];
-       }
-       parser.yy.selectListAliases.push($1.function && $1.types && $1.types.length && $1.types[0] === 'UDFREF' ? { name: $2.alias, udfRef: $1.function, types: $1.types } : { name: $2.alias, types: $1.types || ['T'] });
-     } else {
-       $$ = { valueExpression: $1 }
-     }
-   }
- | '*'
-   {
-     parser.addAsteriskLocation(@1, [{ asterisk: true }]);
-     $$ = { asterisk: true }
-   }
- ;
-
-SelectSpecification_EDIT
- : ValueExpression_EDIT OptionalCorrelationName
-   {
-     if ($2) {
-       parser.addColumnAliasLocation($2.location, $2.alias, @1);
-     }
-   }
-
- | AnyCursor 'AS' RegularOrBacktickedIdentifier
-   {
-     parser.suggestFunctions();
-     parser.suggestColumns();
-     parser.addColumnAliasLocation(@3, $3, @1);
-     $$ = { suggestAggregateFunctions: true };
-   }
- | ValueExpression OptionalCorrelationName_EDIT  -> $2
- ;
-
 SelectList
  : SelectSpecification                 -> [ $1 ]
  | SelectList ',' SelectSpecification
@@ -480,19 +318,41 @@ SelectList_EDIT
  | SelectList ',' SelectSpecification_EDIT ',' SelectList  -> $3
  ;
 
-TableReferenceList
- : TableReference
- | TableReferenceList ',' TableReference  -> $3
+SelectSpecification
+ : ValueExpression OptionalCorrelationName
+   {
+     if ($2) {
+       parser.addColumnAliasLocation($2.location, $2.alias, @1);
+       $$ = { valueExpression: $1, alias: $2.alias };
+       if (!parser.yy.selectListAliases) {
+         parser.yy.selectListAliases = [];
+       }
+       parser.yy.selectListAliases.push($1.function && $1.types && $1.types.length && $1.types[0] === 'UDFREF' ? { name: $2.alias, udfRef: $1.function, types: $1.types } : { name: $2.alias, types: $1.types || ['T'] });
+     } else {
+       $$ = { valueExpression: $1 }
+     }
+   }
+ | '*'
+   {
+     parser.addAsteriskLocation(@1, [{ asterisk: true }]);
+     $$ = { asterisk: true }
+   }
  ;
 
-TableReferenceList_EDIT
- : TableReference_EDIT
- | TableReference_EDIT ',' TableReference
- | TableReferenceList ',' TableReference_EDIT
- | TableReferenceList ',' TableReference_EDIT ',' TableReferenceList
- | TableReferenceList ',' AnyCursor
+SelectSpecification_EDIT
+ : ValueExpression_EDIT OptionalCorrelationName
    {
-       parser.suggestTables();
-       parser.suggestDatabases({ appendDot: true });
+     if ($2) {
+       parser.addColumnAliasLocation($2.location, $2.alias, @1);
+     }
    }
+
+ | AnyCursor 'AS' RegularOrBacktickedIdentifier
+   {
+     parser.suggestFunctions();
+     parser.suggestColumns();
+     parser.addColumnAliasLocation(@3, $3, @1);
+     $$ = { suggestAggregateFunctions: true };
+   }
+ | ValueExpression OptionalCorrelationName_EDIT  -> $2
  ;
