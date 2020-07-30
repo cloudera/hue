@@ -1,0 +1,32 @@
+{
+  "lexer": "../generic/sql.jisonlex",
+  "autocomplete": [
+    "../generic/autocomplete_header.jison",
+    "../generic/sql_alter.jison",
+    "../generic/sql_create.jison",
+    "../generic/sql_drop.jison",
+    "../generic/sql_error.jison",
+    "../generic/sql_insert.jison",
+    "../generic/sql_main.jison",
+    "../generic/sql_set.jison",
+    "../generic/sql_udf.jison",
+    "../generic/sql_update.jison",
+    "../generic/sql_use.jison",
+    "../generic/sql_valueExpression.jison",
+    "../generic/autocomplete_footer.jison"
+  ],
+  "syntax": [
+    "../generic/syntax_header.jison",
+    "../generic/sql_alter.jison",
+    "../generic/sql_create.jison",
+    "../generic/sql_drop.jison",
+    "../generic/sql_insert.jison",
+    "../generic/sql_main.jison",
+    "../generic/sql_set.jison",
+    "../generic/sql_udf.jison",
+    "../generic/sql_update.jison",
+    "../generic/sql_use.jison",
+    "../generic/sql_valueExpression.jison",
+    "../generic/syntax_footer.jison"
+  ]
+}
