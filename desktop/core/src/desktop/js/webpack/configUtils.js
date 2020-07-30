@@ -16,7 +16,6 @@
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CleanObsoleteChunks = require('webpack-clean-obsolete-chunks');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
 const RelativeBundleTracker = require('./relativeBundleTracker');
 const RemoveVueAbsolutePathFromMapPlugin = require('./removeVueAbsolutePathFromMapPlugin');
 const webpack = require('webpack');
@@ -36,9 +35,6 @@ const getPluginConfig = (name, withAnalyzer) => {
       publicPath: `/static/desktop/js/bundles/${name}/`,
       fileContext: 'public'
     }),
-    new CleanWebpackPlugin([
-      `${__dirname}/desktop/core/src/desktop/static/desktop/js/bundles/${name}`
-    ]),
     new RelativeBundleTracker({
       path: '.',
       filename: `webpack-stats${name !== BUNDLES.HUE ? '-' + name : ''}.json`

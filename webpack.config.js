@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 const {
   BUNDLES,
   getPluginConfig,
@@ -79,7 +80,9 @@ module.exports = {
     maxEntrypointSize: 400 * 1024, // 400kb
     maxAssetSize: 400 * 1024 // 400kb
   },
-  plugins: getPluginConfig(BUNDLES.HUE),
+  plugins: getPluginConfig(BUNDLES.HUE).concat([
+    new CleanWebpackPlugin([`${__dirname}/desktop/core/src/desktop/static/desktop/js/bundles/hue`])
+  ]),
   resolve: {
     extensions: ['.json', '.jsx', '.js', '.tsx', '.ts', '.vue'],
     modules: ['node_modules', 'js'],
