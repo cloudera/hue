@@ -46,147 +46,141 @@ Here is a tutorial about how to use the code review tool <a href="https://www.re
 
 # Setup
 
-First, join the 'hue' group in your account <a href="https://review.cloudera.org/account/preferences/" target="_blank" rel="noopener noreferrer">https://review.cloudera.org/account/preferences/</a>!
+First, join the 'hue' group in your account <a href="https://review.cloudera.org/account/preferences/#groups" target="_blank" rel="noopener noreferrer">https://review.cloudera.org/account/preferences/#groups</a>
 
-Then install the Review Board tools:
+Then <a href="https://www.reviewboard.org/downloads/rbtools/" target="_blank" rel="noopener noreferrer">download</a> the Review Board tools and install it.
 
-<pre><code class="bash">sudo pip install -allow-all-external RBTools</code></pre>
 
 Point it to your git repository:
 
-<pre><code class="bash">romain@runreal:~/projects/hue$ rbt setup-repo
+    romain@runreal:~/projects/hue$ rbt setup-repo
 
-Enter the Review Board server URL: https://review.cloudera.org
+    Enter the Review Board server URL: https://review.cloudera.org
 
-Use the Git repository 'hue' (git://github.com/cloudera/hue.git)? [Yes/No]: yes
+    Use the Git repository 'hue' (git://github.com/cloudera/hue.git)? [Yes/No]: yes
 
-Create '/home/romain/projects/hue/.reviewboardrc' with the following?
+    Create '/home/romain/projects/hue/.reviewboardrc' with the following?
 
-REVIEWBOARD_URL = "https://review.cloudera.org"
+    REVIEWBOARD_URL = "https://review.cloudera.org"
 
-REPOSITORY = "hue"
+    REPOSITORY = "hue"
 
-BRANCH = "master"
+    BRANCH = "master"
 
-[Yes/No]: yes
+    [Yes/No]: yes
 
-Config written to /home/romain/projects/hue/.reviewboardrc
-
-</code></pre>
+    Config written to /home/romain/projects/hue/.reviewboardrc
 
 # Post a review
 
 We have wrapped up the typical submission in a dedicated 'tools/scripts/hue-review' script prefilled with all the details of the commits:
 
-<pre><code class="bash">vim tools/scripts/hue-review</code></pre>
+    vim tools/scripts/hue-review
 
-<pre><code class="bash">function hue-review {
+If you use a Linux:
 
-#!/usr/bin/env bash
+    function hue-review {
 
-if [ $# -lt 3 ]; then
+    #!/usr/bin/env bash
 
-echo "Usage: hue-review rev-list reviewer(s) summary ..." 1>&2
+    if [ $# -lt 3 ]; then
 
-exit 1
+    echo "Usage: hue-review rev-list reviewer(s) summary ..." 1>&2
 
-fi
+    exit 1
 
-RBT=\`which rbt\`
+    fi
 
-if [ "$?" -ne "0" ]; then
+    RBT=\`which rbt\`
 
-echo "Please install rbt from https://www.reviewboard.org/" 1&>2
+    if [ "$?" -ne "0" ]; then
 
-exit 1
+    echo "Please install rbt from https://www.reviewboard.org/" 1&>2
 
-fi
+    exit 1
 
-REVLIST=$1;
+    fi
 
-REVRANGE=${REVLIST//\.\./:};
+    REVLIST=$1;
 
-REVIEWER=$2;
+    REVRANGE=${REVLIST//\.\./:};
 
-SUMMARY=$3;
+    REVIEWER=$2;
 
-shift 3;
+    SUMMARY=$3;
 
-exec $RBT post -o -description="$(git whatchanged $REVLIST)" -target-groups=hue -target-people="$REVIEWER" -summary="$SUMMARY" $REVLIST $@
+    shift 3;
 
-}
+    exec $RBT post -o -description="$(git whatchanged $REVLIST)" -target-groups=hue -target-people="$REVIEWER" -summary="$SUMMARY" $REVLIST $@
 
-</code></pre>
+    }
+
 
 If you use a Mac:
 
-<pre><code class="bash">
+    #!/usr/bin/env bash
 
-#!/usr/bin/env bash
+    if [ $# -lt 3 ]; then
 
-if [ $# -lt 3 ]; then
+    echo "Usage: hue-review rev-list reviewer(s) summary ..." 1>&2
 
-echo "Usage: hue-review rev-list reviewer(s) summary ..." 1>&2
+    exit 1
 
-exit 1
+    fi
 
-fi
+    RBT=\`which rbt\`
 
-RBT=\`which rbt\`
+    if [ "$?" -ne "0" ]; then
 
-if [ "$?" -ne "0" ]; then
+    echo "Please install rbt from https://www.reviewboard.org/" 1>&2
 
-echo "Please install rbt from https://www.reviewboard.org/" 1>&2
+    exit 1
 
-exit 1
+    fi
 
-fi
+    REVLIST=$1;
 
-REVLIST=$1;
+    REVRANGE=${REVLIST//\.\./:};
 
-REVRANGE=${REVLIST//\.\./:};
+    REVIEWER=$2;
 
-REVIEWER=$2;
+    SUMMARY=$3;
 
-SUMMARY=$3;
+    shift 3;
 
-shift 3;
+    exec $RBT post \
 
-exec $RBT post \
+    -o \
 
--o \
+    -description="$(git whatchanged $REVLIST)" \
 
--description="$(git whatchanged $REVLIST)" \
+    -target-groups=hue \
 
--target-groups=hue \
+    -target-people="$REVIEWER" \
 
--target-people="$REVIEWER" \
+    -summary="$SUMMARY" \
 
--summary="$SUMMARY" \
+    $@ \
 
-$@ \
+    $REVLIST
 
-$REVLIST
-
-</code></pre>
 
 Then:
 
-<pre><code class="bash">source /home/romain/.bashrc</code></pre>
+    source /home/romain/.bashrc
 
 or put it in your PATH.
 
 Now we post the review:
 
-<pre><code class="bash">tools/scripts/hue-review HEAD~1..HEAD romain,enricoberti,erickt "HUE-2123 [beeswax] Handle cancel state properly" -bugs-closed=HUE-2123
+    tools/scripts/hue-review HEAD~1..HEAD romain,enricoberti,erickt "HUE-2123 [beeswax] Handle cancel state properly" -bugs-closed=HUE-2123
 
-Review request #4501 posted.
+    Review request #4501 posted.
 
-https://review.cloudera.org/r/4501/
+    https://review.cloudera.org/r/4501/
 
-</code></pre>
 
-Et voila! Here is our review <a href="https://review.cloudera.org/r/4501/" target="_blank" rel="noopener noreferrer">https://review.cloudera.org/r/4501/</a>.
+Et voila! Here is our review <a href="https://review.cloudera.org/r/4501" target="_blank" rel="noopener noreferrer">https://review.cloudera.org/r/4501</a>.
 
 **Note**:
 
@@ -196,21 +190,20 @@ If you have more than one diff, update `HEAD~1..HEAD` accordingly (e.g. `HEAD~2.
 
 Modify the previous commit diff:
 
-<pre><code class="bash">git commit -a -amend
+    git commit -a -amend
 
-... Update a file ...
+    ... Update a file ...
 
-[master 9c7c7af] HUE-2123 [beeswax] Handle cancel state properly
+    [master 9c7c7af] HUE-2123 [beeswax] Handle cancel state properly
 
-3 files changed, 10 insertions(+), 4 deletions(-)
+    3 files changed, 10 insertions(+), 4 deletions(-)
 
-</code></pre>
 
 Update the review:
 
-<pre><code class="bash">rbt post -u -r 6092 HEAD~1..HEAD
+    rbt post -u -r 6092 HEAD~1..HEAD
 
-Review request #6092 posted. </code></pre>
+    Review request #6092 posted.
 
 # Sump-up
 
