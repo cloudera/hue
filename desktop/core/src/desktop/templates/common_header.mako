@@ -147,7 +147,7 @@ if USE_NEW_EDITOR.get():
   % endif
 
   % for bundle in get_hue_bundles('login' if section == 'login' else 'hue', 'LOGIN' if section == 'login' else 'DEFAULT'):
-    ${ render_bundle(bundle) | n,unicode }
+    ${ render_bundle(bundle, config='LOGIN' if section == 'login' else 'DEFAULT') | n,unicode }
   % endfor
 
   <script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
