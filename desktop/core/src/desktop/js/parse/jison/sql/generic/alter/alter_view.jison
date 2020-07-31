@@ -14,60 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-DataDefinition
- : AlterStatement
- ;
-
-DataDefinition_EDIT
- : AlterStatement_EDIT
- ;
-
-AlterStatement
- : AlterTable
- | AlterView
- ;
-
-AlterStatement_EDIT
- : AlterTable_EDIT
- | AlterView_EDIT
- | 'ALTER' 'CURSOR'
-   {
-     parser.suggestKeywords(['TABLE', 'VIEW']);
-   }
- ;
-
-AlterTable
- : AlterTableLeftSide PartitionSpec
- ;
-
-AlterTable_EDIT
- : AlterTableLeftSide_EDIT
- | AlterTableLeftSide_EDIT PartitionSpec
- | AlterTableLeftSide 'CURSOR'
- | AlterTableLeftSide PartitionSpec 'CURSOR'
- ;
-
-AlterTableLeftSide
- : 'ALTER' 'TABLE' SchemaQualifiedTableIdentifier
-   {
-     parser.addTablePrimary($3);
-   }
- ;
-
-AlterTableLeftSide_EDIT
- : 'ALTER' 'TABLE' SchemaQualifiedTableIdentifier_EDIT
-   {
-     if (parser.yy.result.suggestTables) {
-       parser.yy.result.suggestTables.onlyTables = true;
-     }
-   }
- | 'ALTER' 'TABLE' 'CURSOR'
-   {
-     parser.suggestTables({ onlyTables: true });
-     parser.suggestDatabases({ appendDot: true });
-   }
- ;
-
 AlterView
  : AlterViewLeftSide 'AS' QuerySpecification
  ;
