@@ -107,4 +107,4 @@ def run():
 
   while True:
     renew_from_kt()
-    time.sleep(CONF.KEYTAB_REINIT_FREQUENCY.get())
+    time.sleep(CONF.REINIT_FREQUENCY.get())
