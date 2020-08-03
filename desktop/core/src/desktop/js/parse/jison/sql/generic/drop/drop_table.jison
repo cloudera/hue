@@ -14,6 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+DropStatement
+ : DropTableStatement
+ ;
+
+DropStatement_EDIT
+ : DropTableStatement_EDIT
+ ;
+
 DropTableStatement
  : 'DROP' 'TABLE' OptionalIfExists SchemaQualifiedTableIdentifier OptionalPurge
    {

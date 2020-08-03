@@ -14,47 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-DataDefinition
- : CreateStatement
- ;
-
-DataDefinition_EDIT
- : CreateStatement_EDIT
- ;
-
-CreateStatement
- : DatabaseDefinition
- | TableDefinition
- | ViewDefinition
- | RoleDefinition
- ;
-
-CreateStatement_EDIT
- : DatabaseDefinition_EDIT
- | TableDefinition_EDIT
- | ViewDefinition_EDIT
- | 'CREATE' 'CURSOR'
-   {
-     parser.suggestKeywords(['DATABASE', 'ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
-   }
- ;
-
-OptionalComment
- :
- | Comment
- ;
-
-Comment
- : 'COMMENT' QuotedValue
- ;
-
-OptionalComment_INVALID
- : Comment_INVALID
- ;
-
-Comment_INVALID
- : 'COMMENT' SINGLE_QUOTE
- | 'COMMENT' DOUBLE_QUOTE
- | 'COMMENT' SINGLE_QUOTE VALUE
- | 'COMMENT' DOUBLE_QUOTE VALUE
+OtherAggregateFunction_Type
+ : 'STDDEV_POP'
  ;
