@@ -66,6 +66,11 @@ export const LOCATION_TYPES = {
 };
 
 export const initSharedAutocomplete = parser => {
+  parser.SELECT_FIRST_OPTIONAL_KEYWORDS = [
+    { value: 'ALL', weight: 2 },
+    { value: 'DISTINCT', weight: 2 }
+  ];
+
   const adjustLocationForCursor = location => {
     // columns are 0-based and lines not, so add 1 to cols
     const newLocation = {

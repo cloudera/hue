@@ -43,8 +43,7 @@ SelectStatement_EDIT
      if ($3.cursorAtStart) {
        var keywords = parser.getSelectListKeywords();
        if (!$2) {
-         keywords.push({ value: 'ALL', weight: 2 });
-         keywords.push({ value: 'DISTINCT', weight: 2 });
+         keywords = keywords.concat(parser.SELECT_FIRST_OPTIONAL_KEYWORDS);
        }
        parser.suggestKeywords(keywords);
      } else {
@@ -76,8 +75,7 @@ SelectStatement_EDIT
        parser.suggestAnalyticFunctions();
      }
      if (!$2) {
-       keywords.push({ value: 'ALL', weight: 2 });
-       keywords.push({ value: 'DISTINCT', weight: 2 });
+       keywords = keywords.concat(parser.SELECT_FIRST_OPTIONAL_KEYWORDS);
      }
      parser.suggestKeywords(keywords);
      parser.suggestFunctions();
@@ -106,8 +104,7 @@ SelectStatement_EDIT
        parser.suggestAnalyticFunctions();
      }
      if (!$2) {
-       keywords.push({ value: 'ALL', weight: 2 });
-       keywords.push({ value: 'DISTINCT', weight: 2 });
+       keywords = keywords.concat(parser.SELECT_FIRST_OPTIONAL_KEYWORDS);
      }
      parser.suggestKeywords(keywords);
      parser.suggestFunctions();
