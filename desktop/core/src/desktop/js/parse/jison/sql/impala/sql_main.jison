@@ -908,6 +908,7 @@ PartitionSpecList_EDIT
 
 PartitionExpression
  : ColumnIdentifier '=' ValueExpression
+ | ColumnIdentifier
  ;
 
 PartitionExpression_EDIT
