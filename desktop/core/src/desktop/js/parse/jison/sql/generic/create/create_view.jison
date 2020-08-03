@@ -14,6 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+CreateStatement
+ : ViewDefinition
+ ;
+
+CreateStatement_EDIT
+ : ViewDefinition_EDIT
+ ;
+
 ViewDefinition
  : 'CREATE' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment 'AS' QuerySpecification
  ;

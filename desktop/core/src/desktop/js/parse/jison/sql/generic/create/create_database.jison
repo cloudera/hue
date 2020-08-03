@@ -14,6 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+CreateStatement
+ : DatabaseDefinition
+ ;
+
+CreateStatement_EDIT
+ : DatabaseDefinition_EDIT
+ ;
+
 DatabaseDefinition
  : 'CREATE' DatabaseOrSchema OptionalIfNotExists
  | 'CREATE' DatabaseOrSchema OptionalIfNotExists RegularIdentifier DatabaseDefinitionOptionals

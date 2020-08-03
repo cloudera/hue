@@ -14,6 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+DataDefinition
+ : TruncateTableStatement
+ ;
+
+DataDefinition_EDIT
+ : TruncateTableStatement_EDIT
+ ;
+
 TruncateTableStatement
  : 'TRUNCATE' 'TABLE' OptionalIfExists SchemaQualifiedTableIdentifier
    {

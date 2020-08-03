@@ -14,6 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+CreateStatement
+ : TableDefinition
+ ;
+
+CreateStatement_EDIT
+ : TableDefinition_EDIT
+ ;
+
 TableDefinition
  : 'CREATE' 'TABLE' OptionalIfNotExists TableDefinitionRightPart
  ;
