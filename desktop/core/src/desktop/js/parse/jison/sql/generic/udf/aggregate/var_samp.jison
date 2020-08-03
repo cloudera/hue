@@ -14,29 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-DataDefinition
- : DropStatement
- ;
-
-DataDefinition_EDIT
- : DropStatement_EDIT
- ;
-
-DropStatement
- : DropDatabaseStatement
- | DropRoleStatement
- | DropTableStatement
- | DropViewStatement
- | TruncateTableStatement
- ;
-
-DropStatement_EDIT
- : DropDatabaseStatement_EDIT
- | DropTableStatement_EDIT
- | DropViewStatement_EDIT
- | TruncateTableStatement_EDIT
- | 'DROP' 'CURSOR'
-   {
-     parser.suggestKeywords(['DATABASE', 'ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
-   }
+OtherAggregateFunction_Type
+ : 'VAR_SAMP'
  ;

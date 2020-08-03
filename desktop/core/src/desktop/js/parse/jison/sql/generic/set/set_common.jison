@@ -14,42 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-AlterStatement
- : AlterTable
+DataDefinition
+ : SetSpecification
  ;
 
-AlterStatement_EDIT
- : AlterTable_EDIT
- ;
-
-AlterTable
- : AlterTableLeftSide PartitionSpec
- ;
-
-AlterTable_EDIT
- : AlterTableLeftSide_EDIT
- | AlterTableLeftSide_EDIT PartitionSpec
- | AlterTableLeftSide 'CURSOR'
- | AlterTableLeftSide PartitionSpec 'CURSOR'
- ;
-
-AlterTableLeftSide
- : 'ALTER' 'TABLE' SchemaQualifiedTableIdentifier
+DataDefinition_EDIT
+ : 'SET' 'CURSOR'
    {
-     parser.addTablePrimary($3);
-   }
- ;
-
-AlterTableLeftSide_EDIT
- : 'ALTER' 'TABLE' SchemaQualifiedTableIdentifier_EDIT
-   {
-     if (parser.yy.result.suggestTables) {
-       parser.yy.result.suggestTables.onlyTables = true;
-     }
-   }
- | 'ALTER' 'TABLE' 'CURSOR'
-   {
-     parser.suggestTables({ onlyTables: true });
-     parser.suggestDatabases({ appendDot: true });
+     parser.suggestSetOptions();
    }
  ;

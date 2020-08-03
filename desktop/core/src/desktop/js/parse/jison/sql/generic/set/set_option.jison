@@ -14,24 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-DataDefinition
- : AlterStatement
+SetSpecification
+ : 'SET' SetOption '=' SetValue
  ;
 
-DataDefinition_EDIT
- : AlterStatement_EDIT
+SetOption
+ : RegularIdentifier
+ | SetOption '.' RegularIdentifier
  ;
 
-AlterStatement
- : AlterTable
- | AlterView
- ;
-
-AlterStatement_EDIT
- : AlterTable_EDIT
- | AlterView_EDIT
- | 'ALTER' 'CURSOR'
-   {
-     parser.suggestKeywords(['TABLE', 'VIEW']);
-   }
+SetValue
+ : RegularIdentifier
+ | SignedInteger
+ | SignedInteger RegularIdentifier
+ | QuotedValue
+ | 'TRUE'
+ | 'FALSE'
+ | 'NULL'
  ;

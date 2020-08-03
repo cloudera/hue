@@ -15,32 +15,36 @@
 // limitations under the License.
 
 DataDefinition
- : SetSpecification
+ : CreateStatement
  ;
 
 DataDefinition_EDIT
- : 'SET' 'CURSOR'
+ : CreateStatement_EDIT
+ ;
+
+CreateStatement_EDIT
+ : 'CREATE' 'CURSOR'
    {
-     parser.suggestSetOptions();
+     parser.suggestKeywords(['DATABASE', 'ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
    }
  ;
 
-SetSpecification
- : 'SET' SetOption '=' SetValue
- | 'SET' 'ALL'
+OptionalComment
+ :
+ | Comment
  ;
 
-SetOption
- : RegularIdentifier
- | SetOption '.' RegularIdentifier
+Comment
+ : 'COMMENT' QuotedValue
  ;
 
-SetValue
- : RegularIdentifier
- | SignedInteger
- | SignedInteger RegularIdentifier
- | QuotedValue
- | 'TRUE'
- | 'FALSE'
- | 'NULL'
+OptionalComment_INVALID
+ : Comment_INVALID
+ ;
+
+Comment_INVALID
+ : 'COMMENT' SINGLE_QUOTE
+ | 'COMMENT' DOUBLE_QUOTE
+ | 'COMMENT' SINGLE_QUOTE VALUE
+ | 'COMMENT' DOUBLE_QUOTE VALUE
  ;
