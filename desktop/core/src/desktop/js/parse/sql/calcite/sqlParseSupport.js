@@ -26,6 +26,12 @@ import {
 const initSqlParser = function (parser) {
   initSharedAutocomplete(parser);
 
+  parser.SELECT_FIRST_OPTIONAL_KEYWORDS = [
+    { value: 'STREAM', weight: 3 },
+    { value: 'ALL', weight: 2 },
+    { value: 'DISTINCT', weight: 2 }
+  ];
+
   parser.prepareNewStatement = function () {
     linkTablePrimaries();
     parser.commitLocations();
