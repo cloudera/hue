@@ -130,7 +130,7 @@ Second step is to configure the debug configuration
 ![Eclipse debug interpreter](/images/eclipse_debug_interpreter.png)
 
 
-## Hue Development Process - How to do code changes and reviews with Review Board and Git
+## Development Process
 
 **Note:**
 
