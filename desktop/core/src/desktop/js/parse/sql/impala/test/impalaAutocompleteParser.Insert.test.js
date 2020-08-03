@@ -484,5 +484,4 @@ describe('impalaAutocompleteParser.js INSERT statements', () => {
       });
     });
   });
-
 });
