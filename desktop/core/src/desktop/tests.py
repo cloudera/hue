@@ -43,7 +43,7 @@ from django.views.static import serve
 from django.http import HttpResponse
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
-from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises, nottest
+from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises, nottest, raises
 
 from dashboard.conf import HAS_SQL_ENABLED
 from desktop.settings import DATABASES
@@ -1524,6 +1524,13 @@ def test_db_migrations_mysql():
       raise e
     finally:
       del DATABASES[name]
+
+
+@raises(ImportError)
+def test_forbidden_libs():
+  if sys.version_info[0] > 2:
+    raise SkipTest
+  import chardet # chardet license (LGPL) is not compatible and should not be bundled
 
 
 class TestGetConfigErrors():
