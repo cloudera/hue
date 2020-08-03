@@ -272,12 +272,40 @@ For a specific function/UDF details (e.g. trunc):
 
 ### SQL Risk Optimization
 ### Data Browsing
-### Workflow scheduling
 
 ## Python
 
+Here is some overview about using the Python commands an shell and some examples below:
+
 * [Hue API: Execute some builtin or shell commands](http://gethue.com/hue-api-execute-some-builtin-commands/).
 * [How to manage the Hue database with the shell](http://gethue.com/how-to-manage-the-hue-database-with-the-shell/).
+
+### How to make a certain user a Hue admin
+
+Via the Hue shell:
+
+    build/env/bin/hue shell
+
+Then type something similar to:
+
+    from django.contrib.auth.models import User
+
+    a = User.objects.get(username='hdfs')
+    a.is_staff = True
+    a.is_superuser = True
+    a.set_password('my_secret')
+    a.save()
+
+### Change the password for a user
+
+In the Hue shell:
+
+    from django.contrib.auth.models import User
+
+    user = User.objects.get(username='example')
+    user.set_password('some password')
+    user.save()
+
 
 ### Count the documents of a user
 
