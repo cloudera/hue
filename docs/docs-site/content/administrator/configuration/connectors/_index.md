@@ -460,7 +460,7 @@ Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Dri
 The official Python [Phoenix dialect](https://github.com/apache/phoenix-queryserver/tree/master/python/phoenixdb) is already shipped in Hue and below is optional. If you want to update it yourself to the very latest:
 
     git clone https://github.com/apache/phoenix-queryserver.git
-    $HUE/build/env/bin/pip install file:///home/gehue/phoenix-queryserver/python/phoenixdb
+    $HUE/build/env/bin/pip install file:///home/gethue/phoenix-queryserver/python-phoenixdb
 
 Then give Hue the information about the database source:
 
