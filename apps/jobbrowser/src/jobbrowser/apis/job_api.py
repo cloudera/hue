@@ -65,18 +65,21 @@ class JobApi(Api):
     return self._get_api(appid).profile(appid, app_type, app_property, app_filters)
 
   def _get_api(self, appid):
-    if type(appid) == list:
-      return self.yarn_api
-    elif appid.startswith('task_'):
-      return YarnMapReduceTaskApi(self.user, appid)
-    elif appid.startswith('attempt_'):
-      return YarnMapReduceTaskAttemptApi(self.user, appid)
-    elif appid.startswith('appattempt_'):
-      return YarnAttemptApi(self.user, appid)
-    elif appid.find('_executor_') > 0:
-      return SparkExecutorApi(self.user, appid)
-    else:
-      return self.yarn_api # application_
+    try:
+      if type(appid) == list:
+        return self.yarn_api
+      elif appid.startswith('task_'):
+        return YarnMapReduceTaskApi(self.user, appid)
+      elif appid.startswith('attempt_'):
+        return YarnMapReduceTaskAttemptApi(self.user, appid)
+      elif appid.startswith('appattempt_'):
+        return YarnAttemptApi(self.user, appid)
+      elif appid.find('_executor_') > 0:
+        return SparkExecutorApi(self.user, appid)
+      else:
+        return self.yarn_api # application_
+    except:
+      raise PopupException("Job would have failed due to which there no attempt or appattempt information available")
 
   def _set_request(self, request):
     self.request = request
