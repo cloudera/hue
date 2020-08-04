@@ -203,7 +203,7 @@ On macOS 10.15.x
 
     sudo ln -s /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/* /usr/local/include/
 
-### NodeJs
+## NodeJs
 
 Version 10+ is needed.
 
@@ -212,7 +212,7 @@ e.g. how to install on Ubuntu:
     curl -sL https://deb.nodesource.com/setup_10.x | sudo bash -
     sudo apt-get install -y nodejs
 
-### Java
+## Java
 
 Optional.
 
@@ -234,7 +234,7 @@ On Mac:
 
     brew cask install adoptopenjdk
 
-### Supported Browsers
+## Supported Browsers
 
 The two latest LTS versions of each browsers:
 
