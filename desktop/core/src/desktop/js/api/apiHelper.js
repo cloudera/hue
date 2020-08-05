@@ -1267,10 +1267,10 @@ class ApiHelper {
     } else {
       let url = URLS.AUTOCOMPLETE_API_PREFIX;
       if (options.databaseName) {
-        url += options.databaseName;
+        url += options.databaseName + '/';
       }
       if (options.tableName) {
-        url += '/' + options.tableName;
+        url += options.tableName + '/';
       }
       if (options.fields) {
         url += options.fields.length > 0 ? '/' + options.fields.join('/') : '';
@@ -1338,7 +1338,9 @@ class ApiHelper {
     const request = $.ajax({
       type: 'POST',
       url:
-        URLS.AUTOCOMPLETE_API_PREFIX + (isQuery ? options.path.slice(1) : options.path).join('/'),
+        URLS.AUTOCOMPLETE_API_PREFIX +
+        (isQuery ? options.path.slice(1) : options.path).join('/') +
+        (options.path.length ? '/' : ''),
       data: {
         notebook: {},
         snippet: ko.mapping.toJSON({
@@ -2145,7 +2147,7 @@ class ApiHelper {
     };
 
     simplePost(
-      URLS.SAMPLE_API_PREFIX + options.path.join('/'),
+      URLS.SAMPLE_API_PREFIX + options.path.join('/') + (options.path.length ? '/' : ''),
       {
         notebook: {},
         snippet: JSON.stringify({

@@ -128,7 +128,7 @@ const createUrl = (database?: string, udf?: UdfDetails): string => {
     return `${AUTOCOMPLETE_API_PREFIX}${database}/${udf.name}`;
   }
   if (database) {
-    return `${AUTOCOMPLETE_API_PREFIX}${database}`;
+    return `${AUTOCOMPLETE_API_PREFIX}${database}/`;
   }
   if (udf) {
     return `${AUTOCOMPLETE_API_PREFIX}${udf.name}`;
