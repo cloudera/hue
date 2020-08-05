@@ -893,18 +893,20 @@ class AutocompleteResults {
 
       databasesDeferred.done(catalogEntries => {
         catalogEntries.forEach(dbEntry => {
-          databaseSuggestions.push({
-            value:
-              prefix +
-              sqlUtils.backTickIfNeeded(self.dialect(), dbEntry.name) +
-              (suggestDatabases.appendDot ? '.' : ''),
-            filterValue: dbEntry.name,
-            meta: META_I18n.database,
-            category: CATEGORIES.DATABASE,
-            popular: ko.observable(false),
-            hasCatalogEntry: true,
-            details: dbEntry
-          });
+          if (dbEntry.name !== '') {
+            databaseSuggestions.push({
+              value:
+                prefix +
+                sqlUtils.backTickIfNeeded(self.dialect(), dbEntry.name) +
+                (suggestDatabases.appendDot ? '.' : ''),
+              filterValue: dbEntry.name,
+              meta: META_I18n.database,
+              category: CATEGORIES.DATABASE,
+              popular: ko.observable(false),
+              hasCatalogEntry: true,
+              details: dbEntry
+            });
+          }
         });
         self.appendEntries(databaseSuggestions);
       });
