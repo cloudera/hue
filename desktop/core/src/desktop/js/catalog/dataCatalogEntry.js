@@ -224,10 +224,7 @@ class DataCatalogEntry {
     self.compute = options.compute;
     self.dataCatalog = options.dataCatalog;
 
-    self.path =
-      typeof options.path === 'string' && options.path
-        ? options.path.split('.')
-        : options.path || [];
+    self.path = typeof options.path === 'string' ? options.path.split('.') : options.path || [];
     self.name = self.path.length ? self.path[self.path.length - 1] : self.getConnector().id;
     self.isTemporary = options.isTemporary;
 
