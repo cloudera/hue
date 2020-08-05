@@ -35,7 +35,7 @@ urlpatterns = [
 
   url(r'^editor/?$', notebook_views.editor, name='editor'),
   url(r'^editor_m/?$', notebook_views.editor_m, name='editor_m'),
-  url(r'^browse/(?P<database>\w+)/(?P<table>\w+)(?:/(?P<partition_spec>.+?))?/?$', notebook_views.browse, name='browse'),
+  url(r'^browse/(?P<database>[^/?]+)/(?P<table>\w+)(?:/(?P<partition_spec>.+?))?/?$', notebook_views.browse, name='browse'),
   url(r'^execute_and_watch/?$', notebook_views.execute_and_watch, name='execute_and_watch'),
 ]
 
@@ -75,24 +75,24 @@ urlpatterns += [
 urlpatterns += [
   # HS2, RDBMS, JDBC
   url(r'^api/autocomplete/?$', notebook_api.autocomplete, name='api_autocomplete_databases'),
-  url(r'^api/autocomplete/(?P<database>[\w_]+)/?$', notebook_api.autocomplete, name='api_autocomplete_tables'),
-  url(r'^api/autocomplete/(?P<database>[\w_]+)/(?P<table>[\w_\-]+)/?$', notebook_api.autocomplete, name='api_autocomplete_columns'),
-  url(r'^api/autocomplete/(?P<database>[\w_]+)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$', notebook_api.autocomplete, name='api_autocomplete_column'),
-  url(r'^api/autocomplete/(?P<database>[\w_]+)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$', notebook_api.autocomplete, name='api_autocomplete_nested'),
-  url(r'^api/sample/(?P<database>[\w_]+)/(?P<table>[\w_\-]+)/?$', notebook_api.get_sample_data, name='api_sample_data'),
-  url(r'^api/sample/(?P<database>[\w_]+)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data_column'),
+  url(r'^api/autocomplete/(?P<database>[^/?]*)/?$', notebook_api.autocomplete, name='api_autocomplete_tables'),
+  url(r'^api/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$', notebook_api.autocomplete, name='api_autocomplete_columns'),
+  url(r'^api/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$', notebook_api.autocomplete, name='api_autocomplete_column'),
+  url(r'^api/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$', notebook_api.autocomplete, name='api_autocomplete_nested'),
+  url(r'^api/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$', notebook_api.get_sample_data, name='api_sample_data'),
+  url(r'^api/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data_column'),
 
   # SQLite
-  url(r'^api/autocomplete//?(?P<server>[\w_\-/]+)/(?P<database>[\w._\-0-9]+)/?$', notebook_api.autocomplete, name='api_autocomplete_tables'),
-  url(r'^api/autocomplete//?(?P<server>[\w_\-/]+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/?$', notebook_api.autocomplete, name='api_autocomplete_columns'),
-  url(r'^api/autocomplete//?(?P<server>[\w_\-/]+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/(?P<column>\w+)/?$', notebook_api.autocomplete, name='api_autocomplete_column'),
-  url(r'^api/sample/(?P<server>[\w_\-/]+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data'),
-  url(r'^api/sample/(?P<server>[\w_\-/]+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/(?P<column>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data_column'),
+  url(r'^api/autocomplete//?(?P<server>[\w_\-/]+)/(?P<database>[^/?]*)/?$', notebook_api.autocomplete, name='api_autocomplete_tables'),
+  url(r'^api/autocomplete//?(?P<server>[\w_\-/]+)/(?P<database>[^/?]*)/(?P<table>\w+)/?$', notebook_api.autocomplete, name='api_autocomplete_columns'),
+  url(r'^api/autocomplete//?(?P<server>[\w_\-/]+)/(?P<database>[^/?]*)/(?P<table>\w+)/(?P<column>\w+)/?$', notebook_api.autocomplete, name='api_autocomplete_column'),
+  url(r'^api/sample/(?P<server>[\w_\-/]+)/(?P<database>[^/?]*)/(?P<table>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data'),
+  url(r'^api/sample/(?P<server>[\w_\-/]+)/(?P<database>[^/?]*)/(?P<table>\w+)/(?P<column>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data_column'),
 ]
 
 # Table API
 urlpatterns += [
-  url(r'^api/describe/(?P<database>\w+)/?$', notebook_api.describe, name='api_describe_database'),
-  url(r'^api/describe/(?P<database>\w+)/(?P<table>[\w_\-]+)/?$', notebook_api.describe, name='api_describe_table'),
-  url(r'^api/describe/(?P<database>\w+)/(?P<table>\w+)/stats(?:/(?P<column>\w+))?/?$', notebook_api.describe, name='api_describe_column'),
+  url(r'^api/describe/(?P<database>[^/]*)/?$', notebook_api.describe, name='api_describe_database'),
+  url(r'^api/describe/(?P<database>[^/]*)/(?P<table>[\w_\-]+)/?$', notebook_api.describe, name='api_describe_table'),
+  url(r'^api/describe/(?P<database>[^/]*)/(?P<table>\w+)/stats(?:/(?P<column>\w+))?/?$', notebook_api.describe, name='api_describe_column'),
 ]
