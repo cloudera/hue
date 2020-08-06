@@ -105,6 +105,15 @@ class SparkConfiguration(object):
       "defaultValue": 1,
       "value": 1,
     }, {
+      "name": "numExecutors",
+      "nice_name": _("numExecutors"),
+      "help_text": _("Number of executors to launch for this session (Default: 2)"),
+      "type": "number",
+      "is_yarn": True,
+      "multiple": False,
+      "defaultValue": 2,
+      "value": 2,
+    }, {
       "name": "executorMemory",
       "nice_name": _("Executor Memory"),
       "help_text": _("Amount of memory to use per executor process in GB. (Default: 1)"),
