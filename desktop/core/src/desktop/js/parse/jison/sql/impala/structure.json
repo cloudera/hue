@@ -2,7 +2,11 @@
   "lexer": "sql.jisonlex",
   "autocomplete": [
     "autocomplete_header.jison",
-    "sql_alter.jison",
+    "alter/alter_common.jison",
+    "alter/alter_database.jison",
+    "alter/alter_table.jison",
+    "alter/alter_view.jison",
+    "alter/comment_on.jison",
     "sql_analyze.jison",
     "sql_create.jison",
     "sql_drop.jison",
@@ -15,13 +19,17 @@
     "sql_show.jison",
     "sql_udf.jison",
     "sql_update.jison",
-    "../generic/sql_use.jison",
+    "../generic/use/use.jison",
     "sql_valueExpression.jison",
     "../generic/autocomplete_footer.jison"
   ],
   "syntax": [
     "syntax_header.jison",
-    "sql_alter.jison",
+    "alter/alter_common.jison",
+    "alter/alter_database.jison",
+    "alter/alter_table.jison",
+    "alter/alter_view.jison",
+    "alter/comment_on.jison",
     "sql_analyze.jison",
     "sql_create.jison",
     "sql_drop.jison",
@@ -33,7 +41,7 @@
     "sql_show.jison",
     "sql_udf.jison",
     "sql_update.jison",
-    "../generic/sql_use.jison",
+    "../generic/use/use.jison",
     "sql_valueExpression.jison",
     "../generic/syntax_footer.jison"
   ]

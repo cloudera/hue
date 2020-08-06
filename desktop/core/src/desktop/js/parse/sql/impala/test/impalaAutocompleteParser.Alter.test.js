@@ -126,7 +126,7 @@ describe('impalaAutocompleteParser.js ALTER statements', () => {
       assertAutoComplete({
         beforeCursor: 'ALTER ',
         afterCursor: '',
-        containsKeywords: ['TABLE'],
+        containsKeywords: ['TABLE', 'DATABASE'],
         expectedResult: {
           lowerCase: false
         }

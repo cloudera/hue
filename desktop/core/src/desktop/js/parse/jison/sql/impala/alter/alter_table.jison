@@ -14,59 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-DataDefinition
- : AlterStatement
- ;
-
-DataDefinition_EDIT
- : AlterStatement_EDIT
- ;
-
 AlterStatement
- : AlterDatabase
- | AlterTable
- | AlterView
- | CommentOn
+ : AlterTable
  ;
 
 AlterStatement_EDIT
- : AlterDatabase_EDIT
- | AlterTable_EDIT
- | AlterView_EDIT
- | CommentOn_EDIT
- | 'ALTER' 'CURSOR'
-   {
-     parser.suggestKeywords(['TABLE', 'VIEW']);
-   }
- ;
-
-AlterDatabase
- : 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' 'OWNER' RoleOrUser RegularOrBacktickedIdentifier
-    {
-      parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-    }
- ;
-
-AlterDatabase_EDIT
- : 'ALTER' DatabaseOrSchema 'CURSOR'
-   {
-     parser.suggestDatabases();
-   }
- | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'CURSOR'
-   {
-     parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-     parser.suggestKeywords(['SET OWNER']);
-   }
- | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' 'CURSOR'
-    {
-      parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-      parser.suggestKeywords(['OWNER']);
-    }
- | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' 'OWNER' 'CURSOR'
-   {
-     parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-     parser.suggestKeywords(['ROLE', 'USER']);
-   }
+ : AlterTable_EDIT
  ;
 
 AlterTable
@@ -254,6 +207,7 @@ OptionalColumn
  :
  | 'COLUMN'
  ;
+
 
 ParenthesizedStatsList
  : '(' StatsList ')'
@@ -474,100 +428,4 @@ PartitionSpecWithLocation
        $$ = { suggestKeywords: ['LOCATION'] };
      }
    }
- ;
-
-AlterView
- : AlterViewLeftSide 'SET' 'OWNER' RoleOrUser RegularOrBacktickedIdentifier
- | AlterViewLeftSide 'AS' QuerySpecification
- | AlterViewLeftSide 'RENAME' 'TO' RegularOrBacktickedIdentifier
- | AlterViewLeftSide 'RENAME' 'TO' RegularOrBacktickedIdentifier '.' RegularOrBacktickedIdentifier
- ;
-
-AlterView_EDIT
- : AlterViewLeftSide_EDIT
- | AlterViewLeftSide 'CURSOR'
-   {
-     parser.suggestKeywords(['AS', 'RENAME TO', 'SET OWNER']);
-   }
- | AlterViewLeftSide 'SET' 'CURSOR'
-   {
-     parser.suggestKeywords(['OWNER ROLE', 'OWNER USER']);
-   }
- | AlterViewLeftSide 'SET' 'OWNER' 'CURSOR'
-   {
-     parser.suggestKeywords(['ROLE', 'USER']);
-   }
- | AlterViewLeftSide 'SET' 'OWNER' RoleOrUser 'CURSOR'
- | AlterViewLeftSide 'AS' 'CURSOR'
-   {
-     parser.suggestKeywords(['SELECT']);
-   }
- | AlterViewLeftSide 'AS' QuerySpecification_EDIT
- | AlterViewLeftSide 'RENAME' 'CURSOR'
-   {
-     parser.suggestKeywords(['TO']);
-   }
- | AlterViewLeftSide 'RENAME' 'TO' 'CURSOR'
-   {
-     parser.suggestDatabases({ appendDot: true });
-   }
- ;
-
-
-AlterViewLeftSide
- : 'ALTER' 'VIEW' SchemaQualifiedTableIdentifier
-   {
-     parser.addTablePrimary($3);
-   }
- ;
-
-AlterViewLeftSide_EDIT
- : 'ALTER' 'VIEW' SchemaQualifiedTableIdentifier_EDIT
-   {
-     if (parser.yy.result.suggestTables) {
-       parser.yy.result.suggestTables.onlyViews = true;
-     }
-   }
- | 'ALTER' 'VIEW' 'CURSOR'
-   {
-     parser.suggestTables({ onlyViews: true });
-     parser.suggestDatabases({ appendDot: true });
-   }
- ;
-
-CommentOn
- : 'COMMENT' 'ON' 'DATABASE' RegularOrBacktickedIdentifier 'IS' NullableComment
-   {
-     parser.addDatabaseLocation(@4, [ { name: $4 } ]);
-   }
- ;
-
-CommentOn_EDIT
- : 'COMMENT' 'CURSOR'
-   {
-     parser.suggestKeywords(['ON DATABASE']);
-   }
- | 'COMMENT' 'ON' 'CURSOR'
-   {
-     parser.suggestKeywords(['DATABASE']);
-   }
- | 'COMMENT' 'ON' 'DATABASE' 'CURSOR'
-   {
-     parser.suggestDatabases();
-   }
- | 'COMMENT' 'ON' 'DATABASE' RegularOrBacktickedIdentifier 'CURSOR'
-   {
-     parser.addDatabaseLocation(@4, [ { name: $4 } ]);
-     parser.suggestKeywords(['IS']);
-   }
- | 'COMMENT' 'ON' 'DATABASE' RegularOrBacktickedIdentifier 'IS' 'CURSOR'
-   {
-     parser.addDatabaseLocation(@4, [ { name: $4 } ]);
-     parser.suggestKeywords(['NULL']);
-   }
- ;
-
-NullableComment
- : QuotedValue
- | 'NULL'
  ;
