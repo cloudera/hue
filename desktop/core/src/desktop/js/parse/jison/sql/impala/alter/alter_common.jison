@@ -14,15 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-DataDefinition
- : AlterStatement
- ;
-
 DataDefinition_EDIT
- : AlterStatement_EDIT
- ;
-
-AlterStatement_EDIT
  : 'ALTER' 'CURSOR'
    {
      parser.suggestKeywords(['DATABASE', 'SCHEMA', 'TABLE', 'VIEW']);

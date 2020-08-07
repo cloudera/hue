@@ -19,10 +19,6 @@ DataDefinition
  ;
 
 DataDefinition_EDIT
- : CreateStatement_EDIT
- ;
-
-CreateStatement_EDIT
  : 'CREATE' OptionalExternal 'CURSOR'
    {
      if ($2) {

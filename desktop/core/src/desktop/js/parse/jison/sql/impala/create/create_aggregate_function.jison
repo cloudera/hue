@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-CreateStatement
+DataDefinition
  : AggregateFunctionDefinition
  ;
 
-CreateStatement
+DataDefinition_EDIT
  : AggregateFunctionDefinition_EDIT
  ;
 

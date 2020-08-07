@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-DropStatement
+DataDefinition
  : DropViewStatement
  ;
 
-DropStatement_EDIT
+DataDefinition_EDIT
  : DropViewStatement_EDIT
  ;
 
