@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-CreateStatement
+DataDefinition
  : FunctionDefinition
  ;
 
-CreateStatement_EDIT
+DataDefinition_EDIT
  : FunctionDefinition_EDIT
  ;
 

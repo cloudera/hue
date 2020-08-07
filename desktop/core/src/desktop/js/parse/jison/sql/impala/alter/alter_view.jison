@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-AlterStatement
+DataDefinition
  : AlterView
  ;
 
-AlterStatement_EDIT
+DataDefinition_EDIT
  : AlterView_EDIT
  ;
 

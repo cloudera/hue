@@ -812,7 +812,8 @@ export const initSyntaxParser = parser => {
             parser.yy.error.possibleReserved = true;
           }
         } else if (!IGNORED_EXPECTED[expected] && /[a-z_]+/i.test(expected)) {
-          if (/^<[a-z]+>/.test(expected)) {
+          // Skip mixed-case expected
+          if (expected.toUpperCase() !== expected) {
             continue;
           }
           expected = CLEAN_EXPECTED[expected] || expected;
