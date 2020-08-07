@@ -553,7 +553,6 @@ DatabasesOrSchemas
  | 'SCHEMAS'
  ;
 
-
 GroupRoleOrUser
  : 'GROUP'
  | 'ROLE'
@@ -951,7 +950,6 @@ OptionalCachedInOrUncached
  | 'UNCACHED'
  ;
 
-
 OptionalCachedIn
  :
  | CachedIn OptionalWithReplication
@@ -1025,7 +1023,6 @@ RegularOrBackTickedSchemaQualifiedName_EDIT
      parser.suggestTablesOrColumns($1);
    }
  ;
-
 
 LocalOrSchemaQualifiedName
  : RegularOrBackTickedSchemaQualifiedName
@@ -2005,7 +2002,6 @@ NullsFirstOrLast_EDIT
      parser.suggestKeywords(['FIRST', 'LAST']);
    }
  ;
-
 
 
 SortByList

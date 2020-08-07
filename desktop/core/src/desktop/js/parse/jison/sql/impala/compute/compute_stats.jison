@@ -15,75 +15,11 @@
 // limitations under the License.
 
 DataDefinition
- : RefreshStatement
- | InvalidateStatement
- | ComputeStatsStatement
+ : ComputeStatsStatement
  ;
 
 DataDefinition_EDIT
- : RefreshStatement_EDIT
- | InvalidateStatement_EDIT
- | ComputeStatsStatement_EDIT
- ;
-
-RefreshStatement
- : 'REFRESH' SchemaQualifiedTableIdentifier OptionalPartitionSpec
-   {
-     parser.addTablePrimary($2);
-   }
- | 'REFRESH' 'FUNCTIONS' DatabaseIdentifier
-   {
-     parser.addDatabaseLocation(@3, [{ name: $3 }]);
-   }
- | 'REFRESH' 'AUTHORIZATION'
- ;
-
-RefreshStatement_EDIT
- : 'REFRESH' 'CURSOR'
-   {
-     parser.suggestTables();
-     parser.suggestDatabases({ appendDot: true });
-     parser.suggestKeywords(['AUTHORIZATION', 'FUNCTIONS']);
-   }
- | 'REFRESH' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
- | 'REFRESH' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
-   {
-     parser.addTablePrimary($2);
-     if (!$3) {
-       parser.suggestKeywords(['PARTITION']);
-     }
-   }
- | 'REFRESH' SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
- | 'REFRESH' 'FUNCTIONS' 'CURSOR'
-   {
-     parser.suggestDatabases();
-   }
- ;
-
-InvalidateStatement
- : 'INVALIDATE' 'METADATA'
- | 'INVALIDATE' 'METADATA' SchemaQualifiedTableIdentifier
-   {
-     parser.addTablePrimary($3);
-   }
- ;
-
-InvalidateStatement_EDIT
- : 'INVALIDATE' 'CURSOR'
-   {
-     parser.suggestKeywords(['METADATA']);
-   }
- | 'INVALIDATE' 'METADATA' 'CURSOR'
-   {
-     parser.suggestTables();
-     parser.suggestDatabases({ appendDot: true });
-   }
- | 'INVALIDATE' 'METADATA' SchemaQualifiedTableIdentifier_EDIT
- | 'INVALIDATE' 'CURSOR' SchemaQualifiedTableIdentifier
-   {
-     parser.addTablePrimary($3);
-     parser.suggestKeywords(['METADATA']);
-   }
+ : ComputeStatsStatement_EDIT
  ;
 
 ComputeStatsStatement
