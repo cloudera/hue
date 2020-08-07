@@ -208,7 +208,6 @@ OptionalColumn
  | 'COLUMN'
  ;
 
-
 ParenthesizedStatsList
  : '(' StatsList ')'
  ;
