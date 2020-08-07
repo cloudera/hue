@@ -14,15 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-DataDefinition
- : CreateStatement
- ;
-
 DataDefinition_EDIT
- : CreateStatement_EDIT
- ;
-
-CreateStatement_EDIT
  : 'CREATE' 'CURSOR'
    {
      parser.suggestKeywords(['DATABASE', 'ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
