@@ -26,11 +26,59 @@ import {
 const initSqlParser = function (parser) {
   initSharedAutocomplete(parser);
 
+  parser.DESCRIBE_KEYWORDS = [
+    { value: 'DATABASE', weight: 2 },
+    { value: 'EXTENDED', weight: 1 },
+    { value: 'FORMATTED', weight: 1 }
+  ];
   parser.GRANT_KEYWORDS = ['ALL', 'ALTER', 'CREATE', 'DROP', 'INSERT', 'REFRESH', 'ROLE', 'SELECT'];
-  parser.REVOKE_KEYWORDS = ['ALL', 'ALTER', 'CREATE', 'DROP', 'INSERT', 'REFRESH', 'ROLE', 'SELECT'];
-  parser.SHOW_KEYWORDS = ['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'COLUMN STATS', 'CREATE TABLE', 'CURRENT ROLES', 'CREATE VIEW', 'DATABASES', 'FILES IN', 'FUNCTIONS', 'GRANT ROLE', 'GRANT USER', 'PARTITIONS', 'RANGE PARTITIONS', 'ROLE GRANT GROUP', 'ROLES', 'SCHEMAS', 'TABLE STATS', 'TABLES'];
-  parser.SHOW_IDENTIFIER_KEYWORDS = ['COLUMN STATS', 'CREATE TABLE', 'CREATE VIEW', 'FILES IN', 'PARTITIONS', 'RANGE PARTITIONS', 'TABLE STATS'];
-  parser.SHOW_LIKE_KEYWORDS = ['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'DATABASES', 'FUNCTIONS', 'SCHEMAS', 'TABLES'];
+  parser.REVOKE_KEYWORDS = [
+    'ALL',
+    'ALTER',
+    'CREATE',
+    'DROP',
+    'INSERT',
+    'REFRESH',
+    'ROLE',
+    'SELECT'
+  ];
+  parser.SHOW_KEYWORDS = [
+    'AGGREGATE FUNCTIONS',
+    'ANALYTIC FUNCTIONS',
+    'COLUMN STATS',
+    'CREATE TABLE',
+    'CURRENT ROLES',
+    'CREATE VIEW',
+    'DATABASES',
+    'FILES IN',
+    'FUNCTIONS',
+    'GRANT ROLE',
+    'GRANT USER',
+    'PARTITIONS',
+    'RANGE PARTITIONS',
+    'ROLE GRANT GROUP',
+    'ROLES',
+    'SCHEMAS',
+    'TABLE STATS',
+    'TABLES'
+  ];
+  parser.SHOW_IDENTIFIER_KEYWORDS = [
+    'COLUMN STATS',
+    'CREATE TABLE',
+    'CREATE VIEW',
+    'FILES IN',
+    'PARTITIONS',
+    'RANGE PARTITIONS',
+    'TABLE STATS'
+  ];
+  parser.SHOW_LIKE_KEYWORDS = [
+    'AGGREGATE FUNCTIONS',
+    'ANALYTIC FUNCTIONS',
+    'DATABASES',
+    'FUNCTIONS',
+    'SCHEMAS',
+    'TABLES'
+  ];
 
   parser.prepareNewStatement = function () {
     linkTablePrimaries();
