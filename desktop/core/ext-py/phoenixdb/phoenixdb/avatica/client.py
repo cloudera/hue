@@ -508,6 +508,39 @@ class AvaticaClient(object):
         response.ParseFromString(response_data)
         return response.results
 
+    def execute_batch(self, connection_id, statement_id, rows):
+        """Returns an array of update counts corresponding to each row written.
+
+        :param connection_id:
+            ID of the current connection.
+
+        :param statement_id:
+            ID of the statement to fetch rows from.
+
+        :param rows:
+            A list of lists corresponding to the columns to bind to the statement
+            for many rows.
+
+        :returns:
+            Update counts for the writes.
+        """
+        request = requests_pb2.ExecuteBatchRequest()
+        request.statement_id = statement_id
+        request.connection_id = connection_id
+        if rows is not None:
+            for row in rows:
+                batch = requests_pb2.UpdateBatch()
+                for col in row:
+                    batch.parameter_values.append(col)
+                request.updates.append(batch)
+
+        response_data = self._apply(request)
+        response = responses_pb2.ExecuteBatchResponse()
+        response.ParseFromString(response_data)
+        if response.missing_statement:
+            raise errors.DatabaseError('ExecuteBatch reported missing statement', -1)
+        return response.update_counts
+
     def fetch(self, connection_id, statement_id, offset=0, frame_max_size=None):
         """Returns a frame of rows.
 
