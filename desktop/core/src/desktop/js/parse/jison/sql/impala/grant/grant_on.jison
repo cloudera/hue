@@ -15,35 +15,20 @@
 // limitations under the License.
 
 DataDefinition
- : GrantStatement
- | RevokeStatement
+ : GrantOnStatement
  ;
 
 DataDefinition_EDIT
- : GrantStatement_EDIT
- | RevokeStatement_EDIT
+ : GrantOnStatement_EDIT
  ;
 
-GrantStatement
- : 'GRANT' 'ROLE' RegularOrBacktickedIdentifier 'TO' 'GROUP' RegularOrBacktickedIdentifier
- | 'GRANT' PrivilegeType 'ON' ObjectSpecification 'TO' RegularOrBacktickedIdentifier OptionalWithGrantOption
+GrantOnStatement
+ : 'GRANT' PrivilegeType 'ON' ObjectSpecification 'TO' RegularOrBacktickedIdentifier OptionalWithGrantOption
  | 'GRANT' PrivilegeType 'ON' ObjectSpecification 'TO' GroupRoleOrUser RegularOrBacktickedIdentifier OptionalWithGrantOption
  ;
 
-GrantStatement_EDIT
- : 'GRANT' 'CURSOR'
-   {
-     parser.suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DROP', 'INSERT', 'REFRESH', 'ROLE', 'SELECT']);
-   }
- | 'GRANT' 'ROLE' RegularOrBacktickedIdentifier 'CURSOR'
-   {
-     parser.suggestKeywords(['TO GROUP']);
-   }
- | 'GRANT' 'ROLE' RegularOrBacktickedIdentifier 'TO' 'CURSOR'
-   {
-     parser.suggestKeywords(['GROUP']);
-   }
- | 'GRANT' PrivilegeType_EDIT
+GrantOnStatement_EDIT
+ : 'GRANT' PrivilegeType_EDIT
  | 'GRANT' PrivilegeType 'CURSOR'
    {
      if ($2.isCreate) {
@@ -143,52 +128,5 @@ WithGrantOption_EDIT
  | 'WITH' 'GRANT' 'CURSOR'
    {
      parser.suggestKeywords(['OPTION']);
-   }
- ;
-
-RevokeStatement
- : 'REVOKE' 'ROLE' RegularOrBacktickedIdentifier 'FROM' 'GROUP' RegularOrBacktickedIdentifier
- | 'REVOKE' PrivilegeType 'ON' ObjectSpecification 'FROM' RegularOrBacktickedIdentifier
- | 'REVOKE' PrivilegeType 'ON' ObjectSpecification 'FROM' GroupRoleOrUser RegularOrBacktickedIdentifier
- ;
-
-RevokeStatement_EDIT
- : 'REVOKE' 'CURSOR'
-   {
-     parser.suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DROP', 'INSERT', 'REFRESH', 'ROLE', 'SELECT']);
-   }
- | 'REVOKE' 'ROLE' RegularOrBacktickedIdentifier 'CURSOR'
-   {
-     parser.suggestKeywords(['FROM GROUP']);
-   }
- | 'REVOKE' 'ROLE' RegularOrBacktickedIdentifier 'FROM' 'CURSOR'
-   {
-     parser.suggestKeywords(['GROUP']);
-   }
- | 'REVOKE' PrivilegeType_EDIT
- | 'REVOKE' PrivilegeType 'CURSOR'
-   {
-     if ($2.isCreate) {
-       parser.suggestKeywords(['ON DATABASE', 'ON SERVER']);
-     } else {
-       parser.suggestKeywords(['ON DATABASE', 'ON SERVER', 'ON TABLE', 'ON URI']);
-     }
-   }
- | 'REVOKE' PrivilegeType 'ON' 'CURSOR'
-   {
-     if ($2.isCreate) {
-       parser.suggestKeywords(['DATABASE', 'SERVER']);
-     } else {
-       parser.suggestKeywords(['DATABASE', 'SERVER', 'TABLE', 'URI']);
-     }
-   }
- | 'REVOKE' PrivilegeType 'ON' ObjectSpecification_EDIT
- | 'REVOKE' PrivilegeType 'ON' ObjectSpecification 'CURSOR'
-   {
-     parser.suggestKeywords(['FROM']);
-   }
- | 'REVOKE' PrivilegeType 'ON' ObjectSpecification 'FROM' 'CURSOR'
-   {
-     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
  ;
