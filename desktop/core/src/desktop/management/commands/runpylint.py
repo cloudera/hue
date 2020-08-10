@@ -27,6 +27,13 @@ from django.utils.translation import ugettext as _
 from desktop.lib import paths
 
 
+RULES = [
+  'C0326(bad-whitespace)',
+  'W0311(bad-indentation)',
+  'C0301(line-too-long)'
+]
+
+
 class Command(BaseCommand):
   help = _("""
   Runs pylint on desktop and app code.
@@ -53,27 +60,33 @@ class Command(BaseCommand):
     parser.add_argument('-f', '--force', dest='force', default='true', action="store_true")
     parser.add_argument('--output-format', action='store', dest='outputformat', default='parseable')
     parser.add_argument('-a', '--app', dest='app', action='store', default='all', choices=self.valid_app())
-    parser.add_argument('-F', '--files', dest='files', action='store', default='')
+    parser.add_argument('-F', '--files', dest='files', action='store', default=None)
 
   def handle(self, *args, **options):
     """Check the source code using PyLint."""
 
     # Note that get_build_dir() is suitable for testing use only.
     pylint_prog = paths.get_build_dir('env', 'bin', 'pylint')
-    pylint_args = [pylint_prog, "--rcfile=" + settings.PYLINTRC, "--load-plugins", "pylint_django"]
-
-    if options['files']:
-      pylint_args.extend(options['files'].split(' '))
-    elif options['app'] == 'all':
-      pylint_args.extend(self.valid_app())
-    else:
-      pylint_args.append(options['app'])
+    pylint_args = [
+      pylint_prog,
+      "--rcfile=" + settings.PYLINTRC,
+      "--disable=all",
+      "--enable=%s" % ','.join([rule.split('(', 1)[0] for rule in RULES]),
+      "--load-plugins=pylint_django"
+    ]
 
     if options['force']:
       pylint_args.append('-f')
 
     if options['outputformat']:
       pylint_args.append(options['outputformat'])
+
+    if options['files'] is not None:
+      pylint_args.extend(options['files'].split())
+    elif options['app'] == 'all':
+      pylint_args.extend(self.valid_app())
+    else:
+      pylint_args.append(options['app'])
 
     if not os.path.exists(pylint_prog):
       msg = _("Cannot find pylint at '%(path)s'. Please install pylint first.") % {'path': pylint_prog}
