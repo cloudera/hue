@@ -15,21 +15,21 @@
 // limitations under the License.
 
 DataManipulation
- : LoadStatement
+ : LoadDataStatement
  ;
 
 DataManipulation_EDIT
- : LoadStatement_EDIT
+ : LoadDataStatement_EDIT
  ;
 
-LoadStatement
+LoadDataStatement
  : 'LOAD' 'DATA' 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec
    {
      parser.addTablePrimary($8);
    }
  ;
 
-LoadStatement_EDIT
+LoadDataStatement_EDIT
  : 'LOAD' 'CURSOR'
    {
      parser.suggestKeywords(['DATA INPATH']);
