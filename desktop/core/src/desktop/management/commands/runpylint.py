@@ -60,7 +60,7 @@ class Command(BaseCommand):
 
     # Note that get_build_dir() is suitable for testing use only.
     pylint_prog = paths.get_build_dir('env', 'bin', 'pylint')
-    pylint_args = [pylint_prog, "--rcfile=" + settings.PYLINTRC]
+    pylint_args = [pylint_prog, "--rcfile=" + settings.PYLINTRC, "--load-plugins", "pylint_django"]
 
     if options['files']:
       pylint_args.extend(options['files'].split(' '))
