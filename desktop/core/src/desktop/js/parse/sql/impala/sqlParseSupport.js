@@ -26,6 +26,9 @@ import {
 const initSqlParser = function (parser) {
   initSharedAutocomplete(parser);
 
+  parser.GRANT_KEYWORDS = ['ALL', 'ALTER', 'CREATE', 'DROP', 'INSERT', 'REFRESH', 'ROLE', 'SELECT'];
+  parser.REVOKE_KEYWORDS = ['ALL', 'ALTER', 'CREATE', 'DROP', 'INSERT', 'REFRESH', 'ROLE', 'SELECT'];
+
   parser.prepareNewStatement = function () {
     linkTablePrimaries();
     parser.commitLocations();
