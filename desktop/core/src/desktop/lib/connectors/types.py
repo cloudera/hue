@@ -231,7 +231,7 @@ CONNECTOR_TYPES = [
     'description': '',
     'properties': {
       'is_sql': True,
-      'sql_identifier_quote': '`',
+      'sql_identifier_quote': '"',
       'sql_identifier_comment_single': '--',
       'has_catalog': False,
       'has_database': False,
