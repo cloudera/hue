@@ -40,7 +40,13 @@ confidence=
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
 # multiple time. See also the "--disable" option for examples.
-enable=use-symbolic-message-instead,useless-supression,fixme
+
+# For some reason not picked-up, please keep in sync and see the `RULES` list in
+# https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/management/commands/runpylint.py#L30
+# enable=
+  # C0326(bad-whitespace)
+  # W0311(bad-indentation)
+  # C0301(line-too-long
 
 # Disable the message, report, category or checker with the given id(s). You
 # can either give multiple identifiers separated by comma (,) or put this
@@ -52,15 +58,16 @@ enable=use-symbolic-message-instead,useless-supression,fixme
 # no Warning level messages displayed, use"--disable=all --enable=classes
 # --disable=W"
 
-disable=
-    attribute-defined-outside-init,
-    duplicate-code,
-    invalid-name,
-    missing-docstring,
-    protected-access,
-    too-few-public-methods,
-    # handled by black
-    format
+disable=all
+
+  #attribute-defined-outside-init,
+  #duplicate-code,
+  #invalid-name,
+  #missing-docstring,
+  #protected-access,
+  #too-few-public-methods,
+  # handled by black
+  #format
 
 
 [REPORTS]
@@ -139,7 +146,7 @@ callbacks=cb_,_cb
 [FORMAT]
 
 # Maximum number of characters on a single line.
-max-line-length=100
+max-line-length=150
 
 # Regexp for a line that is allowed to be longer than the limit.
 ignore-long-lines=^\s*(# )?<?https?://\S+>?$
@@ -149,14 +156,15 @@ ignore-long-lines=^\s*(# )?<?https?://\S+>?$
 single-line-if-stmt=no
 
 # List of optional constructs for which whitespace checking is disabled
-no-space-check=trailing-comma,dict-separator
+# no-space-check=trailing-comma,dict-separator
+no-space-check=
 
 # Maximum number of lines in a module
 max-module-lines=2000
 
 # String used as indentation unit. This is usually " " (4 spaces) or "\t" (1
 # tab).
-indent-string='    '
+indent-string='  '
 
 # Number of spaces of indent required inside a hanging or continued line.
 indent-after-paren=4
