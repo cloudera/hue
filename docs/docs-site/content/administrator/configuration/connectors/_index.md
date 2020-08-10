@@ -17,14 +17,14 @@ Hue connects to any database or warehouse via native or SqlAlchemy connectors. C
     [[[mysql]]]
     name=MySQL
     interface=sqlalchemy
-    options='{"url": "mysql://${USER}:${PASSWORD}@localhost:3306/hue"}'
+    options='{"url": "mysql://user:password@localhost:3306/hue"}'
 
     [[[presto]]]
     name = Presto
     interface=sqlalchemy
     options='{"url": "presto://localhost:8080/hive/default"}'
 
-Note that USER and PASSWORD can be prompted to the user like in the MySQL connector above.
+Note that USER and PASSWORD can be prompted to the user by using variables like `mysql://${USER}:${PASSWORD}@localhost:3306/hue`.
 
 Read about [how to build your own parser](/developer/parsers/) if you are looking at better autocompletes for your own SQL dialects.
 
@@ -146,15 +146,19 @@ Then give Hue the information about the database source following the `presto://
 
 With impersonation:
 
-        options='{"url": "presto://localhost:8080/tpch/default", "has_impersonation": true}'
+    options='{"url": "presto://localhost:8080/tpch/default", "has_impersonation": true}'
 
 With Kerberos:
 
-        options='{"url": "presto://localhost:8080/tpch/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
+    options='{"url": "presto://localhost:8080/tpch/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
 
-Alternatives.
+With credentials:
 
-Direct interface:
+    options='{"url": "presto://username:password@localhost:8080/tpch/default"}'
+
+Alternative interfaces.
+
+Direct:
 
     [[[presto]]]
       name=Presto SQL
