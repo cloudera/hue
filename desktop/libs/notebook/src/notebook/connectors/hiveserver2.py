@@ -548,6 +548,8 @@ class HS2Api(Api):
       resp['message'] = resp.pop('error')
       if 'Read timed out' in resp['message']:
         raise QueryExpired(resp['message'])
+      elif 'Could not connect' in resp['message']:
+        raise QueryError(resp['message'])
 
     return resp
 
