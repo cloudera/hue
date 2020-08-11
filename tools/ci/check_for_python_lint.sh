@@ -21,6 +21,8 @@ FOUND_ISSUE=-1
 
 files=`git diff --name-only origin/master --diff-filter=b | egrep .py$ | grep -v /ext-py/`
 
+cd /usr/share/hue
+
 if [ ! -z "$files" ];
 then
   ./build/env/bin/hue runpylint --files "$files"

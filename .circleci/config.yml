@@ -107,14 +107,23 @@ jobs:
       - run:
           name: run python lints
           command: |
-            cd /usr/share/hue
+            cd ~/repo
 
             ./tools/ci/check_for_python_lint.sh
-            ./tools/ci/check_for_commit_message.sh
+            if [ "$?" -ne "0" ]
+            then
+              exit 1
+            fi
 
             cd ~/repo
 
-            ./tools/ci/check_for_invalid_characters.sh
+            ./tools/ci/check_for_commit_message.sh
+            if [ "$?" -ne "0" ]
+            then
+              exit 1
+            fi
+
+            ./tools/ci/check_for_invalid_characters.sh  # no-op currently
 
       - run:
           name: run js lint
