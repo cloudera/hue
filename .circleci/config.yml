@@ -110,6 +110,7 @@ jobs:
             cd ~/repo
 
             ./tools/ci/check_for_python_lint.sh
+            ./tools/ci/check_for_commit_message.sh
             ./tools/ci/check_for_invalid_characters.sh
 
       - run:
