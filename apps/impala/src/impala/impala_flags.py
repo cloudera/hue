@@ -104,7 +104,7 @@ def is_webserver_spnego_enabled():
   return get_conf().get(_WEBSERVER_REQUIRE_SPNEGO)
 
 def get_hs2_http_port():
-  return get_conf().get(_DEFAULT_HS2_HTTP_PORT, 28000)
+  return get_conf().get(_DEFAULT_HS2_HTTP_PORT, 26000)
 
 
 def _parse_impala_flags():

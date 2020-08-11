@@ -153,7 +153,6 @@ UpsertStatementLeftPart_EDIT
    }
  ;
 
-
 InsertLeftPart
  : 'INSERT' IntoOrOverwrite OptionalTable SchemaQualifiedTableIdentifier OptionalParenthesizedColumnList OptionalPartitionSpec
    {

@@ -93,7 +93,7 @@ class Cursor(object):
         be automatically called at the end of the ``with`` block.
         """
         if self._closed:
-            raise ProgrammingError('the cursor is already closed')
+            raise ProgrammingError('The cursor is already closed.')
         if self._id is not None:
             self._connection._client.close_statement(self._connection._id, self._id)
             self._id = None
@@ -153,7 +153,7 @@ class Cursor(object):
             if frame.rows:
                 self._pos = 0
             elif not frame.done:
-                raise InternalError('got an empty frame, but the statement is not done yet')
+                raise InternalError('Got an empty frame, but the statement is not done yet.')
 
     def _fetch_next_frame(self):
         offset = self._frame.offset + len(self._frame.rows)
@@ -199,7 +199,7 @@ class Cursor(object):
                         typed_value.type = common_pb2.ARRAY
                         typed_value.component_type = rep
                     else:
-                        raise ProgrammingError('scalar value specified for array parameter')
+                        raise ProgrammingError('Scalar value specified for array parameter.')
                 else:
                     if mutate_to is not None:
                         value = mutate_to(value)
@@ -211,7 +211,7 @@ class Cursor(object):
 
     def execute(self, operation, parameters=None):
         if self._closed:
-            raise ProgrammingError('the cursor is already closed')
+            raise ProgrammingError('The cursor is already closed.')
         self._updatecount = -1
         self._set_frame(None)
         if parameters is None:
@@ -235,18 +235,16 @@ class Cursor(object):
 
     def executemany(self, operation, seq_of_parameters):
         if self._closed:
-            raise ProgrammingError('the cursor is already closed')
+            raise ProgrammingError('The cursor is already closed.')
         self._updatecount = -1
         self._set_frame(None)
         statement = self._connection._client.prepare(
             self._connection._id, operation, max_rows_total=0)
         self._set_id(statement.id)
         self._set_signature(statement.signature)
-        for parameters in seq_of_parameters:
-            self._connection._client.execute(
-                self._connection._id, self._id,
-                statement.signature, self._transform_parameters(parameters),
-                first_frame_max_size=0)
+        return self._connection._client.execute_batch(
+            self._connection._id, self._id,
+            [self._transform_parameters(p) for p in seq_of_parameters])
 
     def _transform_row(self, row):
         """Transforms a Row into Python values.
@@ -291,7 +289,7 @@ class Cursor(object):
 
     def fetchone(self):
         if self._frame is None:
-            raise ProgrammingError('no select statement was executed')
+            raise ProgrammingError('No select statement was executed.')
         if self._pos is None:
             return None
         rows = self._frame.rows

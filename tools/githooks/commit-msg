@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+INPUT_FILE=$1
+START_LINE=`head -n1 $INPUT_FILE`
+PATTERN="^(HUE-[[:digit:]]+ \[.+\] .+)|(\[.+\] .+? \(#[[:digit:]]\))"
+
+if ! [[ "$START_LINE" =~ $PATTERN ]]; then
+  echo "Bad commit message, see examples:"
+  echo "  HUE-9374 [impala] Use 26000 as default for thrift-over-http"
+  echo "  [livy] Add numExecutors options (#1238)"
+  exit 1
+fi
+

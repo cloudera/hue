@@ -14,15 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-DataDefinition
- : DropStatement
- ;
-
 DataDefinition_EDIT
- : DropStatement_EDIT
- ;
-
-DropStatement_EDIT
  : 'DROP' 'CURSOR'
    {
      parser.suggestKeywords(['DATABASE', 'ROLE', 'SCHEMA', 'TABLE', 'VIEW']);

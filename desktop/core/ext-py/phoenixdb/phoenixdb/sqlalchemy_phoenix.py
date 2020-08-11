@@ -35,7 +35,7 @@ class PhoenixDDLCompiler(DDLCompiler):
 
     def visit_primary_key_constraint(self, constraint):
         if constraint.name is None:
-            raise CompileError("can't create primary key without a name")
+            raise CompileError("Can't create primary key without a name.")
         return DDLCompiler.visit_primary_key_constraint(self, constraint)
 
 
