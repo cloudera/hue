@@ -100,14 +100,20 @@ Restart Hue, open the Editors and start typing your first queries!
 
 ### Dev environment
 
+#### Lint configs
+
+* [https://github.com/cloudera/hue/blob/master/.eslintrc.js](.eslintrc.js)
+* [https://github.com/cloudera/hue/blob/master/desktop/.pylintrc](.pylintrc)
+* [https://github.com/cloudera/hue/blob/master/.prettierrc](.prettierrc)
+
 #### Visual Code
 
-Adding 'hue' as a workspace, then:
+Adding the 'hue' directory as a workspace, then:
 
 Recommended extensions:
 
 * Python - Microsoft
-* EsLint - Dirk Baeumur https://github.com/cloudera/hue/blob/master/.eslintrc.js
+* EsLint - Dirk Baeumur
 * Mako - tommorris
 * Docker - Microsoft
 
