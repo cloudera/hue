@@ -107,10 +107,13 @@ jobs:
       - run:
           name: run python lints
           command: |
-            cd ~/repo
+            cd /usr/share/hue
 
             ./tools/ci/check_for_python_lint.sh
             ./tools/ci/check_for_commit_message.sh
+
+            cd ~/repo
+
             ./tools/ci/check_for_invalid_characters.sh
 
       - run:
