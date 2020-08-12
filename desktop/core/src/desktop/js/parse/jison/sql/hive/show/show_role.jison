@@ -14,31 +14,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-ShowStatement
- : ShowMaterializedViewsStatement
+DataDefinition
+ : ShowRoleStatement
  ;
 
-ShowStatement_EDIT
- : ShowMaterializedViewsStatement_EDIT
+DataDefinition_EDIT
+ : ShowRoleStatement_EDIT
  ;
 
-ShowMaterializedViewsStatement
- : 'SHOW' 'MATERIALIZED' 'VIEWS' OptionalInOrFromDatabase OptionalLike
+ShowRoleStatement
+ : 'SHOW' 'ROLE' 'GRANT' RoleOrUser RegularIdentifier
  ;
 
-ShowMaterializedViewsStatement_EDIT
- : 'SHOW' 'MATERIALIZED' 'CURSOR'
+ShowRoleStatement_EDIT
+ : 'SHOW' 'ROLE' 'CURSOR'
    {
-     parser.suggestKeywords(['VIEWS']);
+     parser.suggestKeywords(['GRANT']);
    }
- | 'SHOW' 'MATERIALIZED' 'VIEWS' OptionalInOrFromDatabase OptionalLike 'CURSOR'
+ | 'SHOW' 'ROLE' 'CURSOR' RoleOrUser RegularIdentifier
    {
-     if (!$5 && !$4) {
-       parser.suggestKeywords([{ value: 'IN', weight: 2 }, { value: 'FROM', weight: 2 }, { value: 'LIKE', weight: 1 }]);
-     } else if (!$5) {
-       parser.suggestKeywords(['LIKE']);
-     }
+     parser.suggestKeywords(['GRANT']);
    }
- | 'SHOW' 'MATERIALIZED' 'VIEWS' InOrFromDatabase_EDIT OptionalLike
- | 'SHOW' 'MATERIALIZED' 'VIEWS' OptionalInOrFromDatabase Like_EDIT
+ | 'SHOW' 'ROLE' 'GRANT' 'CURSOR'
+   {
+     parser.suggestKeywords(['ROLE', 'USER']);
+   }
+ | 'SHOW' 'ROLE' 'GRANT' 'CURSOR' RegularIdentifier
+   {
+     parser.suggestKeywords(['ROLE', 'USER']);
+   }
  ;
