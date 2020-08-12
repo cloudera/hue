@@ -6,7 +6,7 @@
     npm run webpack   // Build demo app
     npm run app       // Run demo app
 
-In package.json there’s a dependency on Hue git project:
+In package.json there's a dependency on Hue git project:
 
     "dependencies": {
       "hue": "file:../../../.."
