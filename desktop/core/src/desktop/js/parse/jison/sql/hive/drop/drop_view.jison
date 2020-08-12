@@ -14,45 +14,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-AlterStatement
- : AlterMaterializedView
+DataDefinition
+ : DropViewStatement
  ;
 
-AlterStatement_EDIT
- : AlterMaterializedView_EDIT
+DataDefinition_EDIT
+ : DropViewStatement_EDIT
  ;
 
-AlterMaterializedView
- : 'ALTER' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier EnableOrDisable 'REWRITE'
+DropViewStatement
+ : 'DROP' 'VIEW' OptionalIfExists SchemaQualifiedTableIdentifier
    {
      parser.addTablePrimary($4);
    }
  ;
 
-AlterMaterializedView_EDIT
- : 'ALTER' 'MATERIALIZED' 'CURSOR'
+DropViewStatement_EDIT
+ : 'DROP' 'VIEW' OptionalIfExists 'CURSOR'
    {
-     parser.suggestKeywords(['VIEW']);
-   }
- | 'ALTER' 'MATERIALIZED' 'VIEW' 'CURSOR'
-   {
+     if (!$3) {
+       parser.suggestKeywords(['IF EXISTS']);
+     }
      parser.suggestTables({ onlyViews: true });
      parser.suggestDatabases({ appendDot: true });
    }
- | 'ALTER' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier_EDIT
+ | 'DROP' 'VIEW' OptionalIfExists 'CURSOR' SchemaQualifiedTableIdentifier
+   {
+     parser.addTablePrimary($5);
+     if (!$3) {
+       parser.suggestKeywords(['IF EXISTS']);
+     }
+   }
+ | 'DROP' 'VIEW' OptionalIfExists_EDIT
+ | 'DROP' 'VIEW' OptionalIfExists_EDIT SchemaQualifiedTableIdentifier
+   {
+     parser.addTablePrimary($4);
+   }
+ | 'DROP' 'VIEW' OptionalIfExists SchemaQualifiedTableIdentifier_EDIT
    {
      if (parser.yy.result.suggestTables) {
        parser.yy.result.suggestTables.onlyViews = true;
      }
-   }
- | 'ALTER' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier 'CURSOR'
-   {
-     parser.addTablePrimary($4);
-     parser.suggestKeywords(['DISABLE REWRITE', 'ENABLE REWRITE']);
-   }
- | 'ALTER' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier EnableOrDisable 'CURSOR'
-   {
-     parser.addTablePrimary($4);
-     parser.suggestKeywords(['REWRITE']);
    }
  ;
