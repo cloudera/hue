@@ -205,7 +205,7 @@ Now we post the review:
     tools/scripts/hue-review HEAD~1..HEAD <reviewers> "HUE-XXX [component] <Ticket summary>" --bugs-closed=HUE-XXX
 
 * Above command must return the review link as given in below example.
-* Goto the review link and varify details & press publish. All the reviewers will be informed with an email.
+* Go to the review link and varify details & press publish. All the reviewers will be informed with an email.
 
 eg:
 
@@ -219,13 +219,9 @@ eg:
 Et voila! Here is our review https://review.cloudera.org/r/4501.
 
 **Note**:
-
 If you have more than one diff, update `HEAD~1..HEAD` accordingly (e.g. `HEAD~2..HEAD`)
 
-Now go to the ticket and add a comment with content
-
-* Ticket summary
-* Review @ review link
+Now go to the ticket and add the Review Boad review link as a comment.
 
 ### Update a review
 
@@ -238,7 +234,7 @@ Update the review:
 
     rbt post -u -r <Review-board-id> HEAD~1..HEAD
 
-* Again, goto the review link and varify details & press publish.
+Again, go to the review link and varify details & press publish.
 
 ### Ship It
 
@@ -248,7 +244,7 @@ Once we get ship it from at least one reviewer, we can push the changes to maste
     git push origin HEAD:ci-commit-master-<yourname>
 
 * The push will auto run the tests and push it to master
-* Must see testing running @https://circleci.com/gh/cloudera/workflows/hue
+* It can be seen on https://circleci.com/gh/cloudera/workflows/hue
   * Two builds would be made - One for Python 2.7 and another for Python 3.6
   * If successful, the change would be auto merged to master
   * On failure, we will get a mail
