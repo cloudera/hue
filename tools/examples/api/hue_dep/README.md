@@ -24,12 +24,12 @@ You need not have a dependency on the complete Hue project, the parsers are avai
 
        npm install --save gethue
 
-2. In `hue_dep/package.json`, remove `"hue": "file:../../../.."` without touching the newly added gethue dependency.
-3. In `hue_dep/src/app.js`, change the import line to.
+2. In [hue_dep/package.json](package.json), remove `"hue": "file:../../../.."` without touching the newly added gethue dependency.
+3. In [hue_dep/src/app.js(src/app.js), change the import line to.
 
        import sqlAutocompleteParser from 'gethue/parse/sql/hive/hiveAutocompleteParser';
 
-4. In `hue_dep/webpack.config.js`:
+4. In [hue_dep/webpack.config.js](webpack.config.js):
    - Change `'js'` to `'node_modules/gethue'` under `resolve.modules`.
    - Remove `exclude: /node_modules/,` from `babel-loader`.
 
