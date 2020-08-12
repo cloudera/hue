@@ -136,7 +136,7 @@ Update the review:
 
     rbt post -u -r <Review-board-id> HEAD~1..HEAD
 
-* Again, goto the review link and varify details & press publish.
+Again, go to the review link and varify details & press publish.
 
 # Ship It
 
@@ -146,7 +146,7 @@ Once we get ship it from at least one reviewer, we can push the changes to maste
     git push origin HEAD:ci-commit-master-<yourname>
 
 * The push will auto run the tests and push it to master
-* Must see testing running @https://circleci.com/gh/cloudera/workflows/hue
+* It can be seen on https://circleci.com/gh/cloudera/workflows/hue
   * Two builds would be made - One for Python 2.7 and another for Python 3.6
   * If successful, the change would be auto merged to master
   * On failure, we will get a mail
