@@ -14,35 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-DropStatement
- : DropMaterializedViewStatement
+DataDefinition
+ : AbortStatement
  ;
 
-DropStatement_EDIT
- : DropMaterializedViewStatement_EDIT
+DataDefinition_EDIT
+ : AbortStatement_EDIT
  ;
 
-DropMaterializedViewStatement
- : 'DROP' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier
+AbortStatement
+ : 'ABORT' 'TRANSACTIONS' TransactionIdList
+ ;
+
+AbortStatement_EDIT
+ : 'ABORT' 'CURSOR'
    {
-     parser.addTablePrimary($4);
+     parser.suggestKeywords(['TRANSACTIONS']);
    }
  ;
 
-DropMaterializedViewStatement_EDIT
- : 'DROP' 'MATERIALIZED' 'CURSOR'
-   {
-     parser.suggestKeywords(['VIEW']);
-   }
- | 'DROP' 'MATERIALIZED' 'VIEW' 'CURSOR'
-   {
-     parser.suggestTables({ onlyViews: true });
-     parser.suggestDatabases({ appendDot: true });
-   }
- | 'DROP' 'MATERIALIZED' VIEW SchemaQualifiedTableIdentifier_EDIT
-   {
-     if (parser.yy.result.suggestTables) {
-       parser.yy.result.suggestTables.onlyViews = true;
-     }
-   }
+TransactionIdList
+ : UnsignedNumericLiteral
+ | TransactionIdList ',' UnsignedNumericLiteral
  ;

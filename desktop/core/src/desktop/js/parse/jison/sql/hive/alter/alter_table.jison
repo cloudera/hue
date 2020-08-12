@@ -15,109 +15,11 @@
 // limitations under the License.
 
 DataDefinition
- : AlterStatement
+ : AlterTable
  ;
 
 DataDefinition_EDIT
- : AlterStatement_EDIT
- ;
-
-AlterStatement
- : AlterDatabase
- | AlterIndex
- | AlterTable
- | AlterView
- | ReloadFunction
- ;
-
-AlterStatement_EDIT
- : AlterDatabase_EDIT
- | AlterIndex_EDIT
- | AlterTable_EDIT
- | AlterView_EDIT
- | ReloadFunction_EDIT
- | 'ALTER' 'CURSOR'
-   {
-     parser.suggestKeywords('ALTER');
-   }
- ;
-
-AlterDatabase
- : 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' 'DBPROPERTIES' ParenthesizedPropertyAssignmentList
-    {
-      parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-    }
- | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' HdfsLocation
-    {
-      parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-    }
- | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' 'OWNER' PrincipalSpecification
-    {
-      parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-    }
- ;
-
-AlterDatabase_EDIT
- : 'ALTER' DatabaseOrSchema 'CURSOR'
-   {
-     parser.suggestDatabases();
-   }
- | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'CURSOR'
-   {
-     parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-     parser.suggestKeywords(['SET DBPROPERTIES', 'SET LOCATION', 'SET OWNER']);
-   }
- | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' 'CURSOR'
-    {
-      parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-      parser.suggestKeywords(['DBPROPERTIES', 'LOCATION', 'OWNER']);
-    }
- | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' HdfsLocation_EDIT
-   {
-     parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-   }
- | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' 'OWNER' 'CURSOR'
-   {
-     parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
-   }
- | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' 'OWNER' PrincipalSpecification_EDIT
-   {
-     parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-   }
- ;
-
-AlterIndex
- : 'ALTER' 'INDEX' RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'REBUILD'
-   {
-     parser.addTablePrimary($5);
-   }
- ;
-
-AlterIndex_EDIT
- : 'ALTER' 'INDEX' RegularOrBacktickedIdentifier 'CURSOR'
-   {
-     parser.suggestKeywords(['ON']);
-   }
- | 'ALTER' 'INDEX' RegularOrBacktickedIdentifier 'ON' 'CURSOR'
-   {
-     parser.suggestTables();
-     parser.suggestDatabases({ appendDot: true });
-   }
- | 'ALTER' 'INDEX' RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier_EDIT
- | 'ALTER' 'INDEX' RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
-   {
-     parser.addTablePrimary($5);
-   }
- | 'ALTER' 'INDEX' RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
-   {
-     parser.addTablePrimary($5);
-     if (!$6) {
-       parser.suggestKeywords(['PARTITION', 'REBUILD']);
-     } else {
-       parser.suggestKeywords(['REBUILD']);
-     }
-   }
+ : AlterTable_EDIT
  ;
 
 AlterTable
@@ -138,8 +40,8 @@ AlterTable
  | AlterTableLeftSide PartitionSpec 'RENAME' 'TO' PartitionSpec
  | AlterTableLeftSide PartitionSpec 'CHANGE' 'COLUMN' ParenthesizedColumnSpecificationList OptionalCascadeOrRestrict
  | AlterTableLeftSide DropOperations
- | AlterTableLeftSide OptionalPartitionOperations
- | AlterTableLeftSide PartitionSpec OptionalPartitionOperations
+ | AlterTableLeftSide PartitionOperations
+ | AlterTableLeftSide PartitionSpec PartitionOperations
  ;
 
 AlterTable_EDIT
@@ -160,8 +62,8 @@ AlterTable_EDIT
  | AlterTableLeftSide_EDIT PartitionSpec 'RENAME' 'TO' PartitionSpec
  | AlterTableLeftSide_EDIT PartitionSpec 'CHANGE' 'COLUMN' ParenthesizedColumnSpecificationList OptionalCascadeOrRestrict
  | AlterTableLeftSide_EDIT DropOperations
- | AlterTableLeftSide_EDIT OptionalPartitionOperations
- | AlterTableLeftSide_EDIT PartitionSpec OptionalPartitionOperations
+ | AlterTableLeftSide_EDIT PartitionOperations
+ | AlterTableLeftSide_EDIT PartitionSpec PartitionOperations
  | AlterTableLeftSide 'ADD' OptionalIfNotExists 'CURSOR'
    {
      if (!$3) {
@@ -176,7 +78,7 @@ AlterTable_EDIT
    }
  | AlterTableLeftSide 'ADD' OptionalIfNotExists_EDIT
  | AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec HdfsLocation_EDIT OptionalPartitionSpecs
- | AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs_EDIT
+ | AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec OptionalHdfsLocation PartitionSpecs_EDIT
  | AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs 'CURSOR'
    {
      if (!$5 && !$6) {
@@ -254,13 +156,13 @@ AlterTable_EDIT
        parser.suggestKeywords(['STORED AS DIRECTORIES']);
      }
    }
- | AlterTableLeftSide 'SKEWED' 'BY' ParenthesizedColumnList 'ON' ParenthesizedSkewedValueList OptionalStoredAsDirectories_EDIT
+ | AlterTableLeftSide 'SKEWED' 'BY' ParenthesizedColumnList 'ON' ParenthesizedSkewedValueList StoredAsDirectories_EDIT
  | AlterTableLeftSide 'TOUCH' 'CURSOR'
    {
      parser.suggestKeywords(['PARTITION']);
    }
  | AlterTableLeftSide 'TOUCH' OptionalPartitionSpec_EDIT
- | AlterTableLeftSide OptionalPartitionOperations_EDIT
+ | AlterTableLeftSide PartitionOperations_EDIT
  | AlterTableLeftSide DropOperations_EDIT
  | AlterTableLeftSide 'CURSOR'
    {
@@ -288,7 +190,7 @@ AlterTable_EDIT
    {
      parser.suggestKeywords(['FILEFORMAT', 'LOCATION', 'OWNER', 'SERDE', 'SERDEPROPERTIES', 'SKEWED LOCATION', 'TBLPROPERTIES']);
    }
- | AlterTableLeftSide PartitionSpec OptionalPartitionOperations_EDIT
+ | AlterTableLeftSide PartitionSpec PartitionOperations_EDIT
  | AlterTableLeftSide 'RENAME' 'CURSOR'
    {
      parser.suggestKeywords(['TO']);
@@ -299,38 +201,28 @@ AlterTable_EDIT
    }
  ;
 
-ParenthesizedStatsList
- : '(' StatsList ')'
- ;
-
-ParenthesizedStatsList_EDIT
- : '(' StatsList_EDIT RightParenthesisOrError
- ;
-
-StatsList
- : StatsAssignment
- | StatsList ',' StatsAssignment
- ;
-
-StatsList_EDIT
- : StatsAssignment_EDIT
- | StatsList ',' StatsAssignment_EDIT
- | StatsList ',' StatsAssignment_EDIT ',' StatsList
- | StatsAssignment_EDIT ',' StatsList
- ;
-
-StatsAssignment
- : QuotedValue '=' QuotedValue
- ;
-
-StatsAssignment_EDIT
- : 'CURSOR'
+AlterTableLeftSide
+ : 'ALTER' 'TABLE' SchemaQualifiedTableIdentifier
    {
-     parser.suggestIdentifiers(['\'avgSize\'', '\'maxSize\'', '\'numDVs\'', '\'numNulls\'']);
+     parser.addTablePrimary($3);
    }
  ;
 
-OptionalPartitionOperations
+AlterTableLeftSide_EDIT
+ : 'ALTER' 'TABLE' SchemaQualifiedTableIdentifier_EDIT
+   {
+     if (parser.yy.result.suggestTables) {
+       parser.yy.result.suggestTables.onlyTables = true;
+     }
+   }
+ | 'ALTER' 'TABLE' 'CURSOR'
+   {
+     parser.suggestTables({ onlyTables: true });
+     parser.suggestDatabases({ appendDot: true });
+   }
+ ;
+
+PartitionOperations
  : 'SET' 'FILEFORMAT' FileFormat
  | 'SET' HdfsLocation
  | 'SET' 'TBLPROPERTIES' ParenthesizedPropertyAssignmentList
@@ -346,7 +238,7 @@ OptionalPartitionOperations
    }
  ;
 
-OptionalPartitionOperations_EDIT
+PartitionOperations_EDIT
  : AddReplaceColumns_EDIT
  | 'CHANGE' OptionalColumn 'CURSOR'
    {
@@ -374,7 +266,7 @@ OptionalPartitionOperations_EDIT
      }
      parser.addColumnLocation($3.location, [ $3.identifier ]);
    }
- | 'CHANGE' OptionalColumn ColumnIdentifier ColumnSpecification OptionalAfterOrFirst_EDIT OptionalCascadeOrRestrict
+ | 'CHANGE' OptionalColumn ColumnIdentifier ColumnSpecification AfterOrFirst_EDIT OptionalCascadeOrRestrict
    {
      parser.addColumnLocation($3.location, [ $3.identifier ]);
    }
@@ -522,27 +414,6 @@ DropOperations_EDIT
  | 'DROP' ColumnIdentifier_EDIT
  ;
 
-AlterTableLeftSide
- : 'ALTER' 'TABLE' SchemaQualifiedTableIdentifier
-   {
-     parser.addTablePrimary($3);
-   }
- ;
-
-AlterTableLeftSide_EDIT
- : 'ALTER' 'TABLE' SchemaQualifiedTableIdentifier_EDIT
-   {
-     if (parser.yy.result.suggestTables) {
-       parser.yy.result.suggestTables.onlyTables = true;
-     }
-   }
- | 'ALTER' 'TABLE' 'CURSOR'
-   {
-     parser.suggestTables({ onlyTables: true });
-     parser.suggestDatabases({ appendDot: true });
-   }
- ;
-
 AddOrReplace
  : 'ADD'
  | 'REPLACE'
@@ -558,7 +429,7 @@ AfterOrFirst
  | 'FIRST'
  ;
 
-OptionalAfterOrFirst_EDIT
+AfterOrFirst_EDIT
  : AfterOrFirst 'CURSOR'
    {
      parser.suggestColumns();
@@ -569,11 +440,6 @@ OptionalAfterOrFirst_EDIT
 OptionalColumn
  :
  | 'COLUMN'
- ;
-
-EnableOrDisable
- : 'ENABLE'
- | 'DISABLE'
  ;
 
 NoDropOrOffline
@@ -624,16 +490,16 @@ OptionalPartitionSpecs
  | PartitionSpecWithLocationList
  ;
 
-PartitionSpecWithLocationList
- : PartitionSpecWithLocation
- | PartitionSpecWithLocationList PartitionSpecWithLocation  -> $2
- ;
-
-OptionalPartitionSpecs_EDIT
+PartitionSpecs_EDIT
  : PartitionSpecWithLocation_EDIT
  | PartitionSpecWithLocation_EDIT PartitionSpecWithLocationList
  | PartitionSpecWithLocationList PartitionSpecWithLocation_EDIT
  | PartitionSpecWithLocationList PartitionSpecWithLocation_EDIT PartitionSpecWithLocationList
+ ;
+
+PartitionSpecWithLocationList
+ : PartitionSpecWithLocation
+ | PartitionSpecWithLocationList PartitionSpecWithLocation  -> $2
  ;
 
 PartitionSpecWithLocation_EDIT
@@ -693,7 +559,7 @@ OptionalStoredAsDirectories
  | 'STORED_AS_DIRECTORIES'
  ;
 
-OptionalStoredAsDirectories_EDIT
+StoredAsDirectories_EDIT
  : 'STORED' 'CURSOR'
    {
      parser.suggestKeywords(['AS DIRECTORIES']);
@@ -702,64 +568,4 @@ OptionalStoredAsDirectories_EDIT
    {
      parser.suggestKeywords(['DIRECTORIES']);
    }
- ;
-
-AlterView
- : AlterViewLeftSide 'SET' 'TBLPROPERTIES' ParenthesizedPropertyAssignmentList
- | AlterViewLeftSide 'AS' QuerySpecification
- ;
-
-AlterView_EDIT
- : AlterViewLeftSide_EDIT
- | AlterViewLeftSide 'CURSOR'
-   {
-     parser.suggestKeywords(['AS', 'SET TBLPROPERTIES']);
-   }
- | AlterViewLeftSide 'SET' 'CURSOR'
-   {
-     parser.suggestKeywords(['TBLPROPERTIES']);
-   }
- | AlterViewLeftSide 'AS' 'CURSOR'
-   {
-     parser.suggestKeywords(['SELECT']);
-   }
- | AlterViewLeftSide 'AS' QuerySpecification_EDIT
- ;
-
-
-AlterViewLeftSide
- : 'ALTER' 'VIEW' SchemaQualifiedTableIdentifier
-   {
-     parser.addTablePrimary($3);
-   }
- ;
-
-AlterViewLeftSide_EDIT
- : 'ALTER' 'VIEW' SchemaQualifiedTableIdentifier_EDIT
-   {
-     if (parser.yy.result.suggestTables) {
-       parser.yy.result.suggestTables.onlyViews = true;
-     }
-   }
- | 'ALTER' 'VIEW' 'CURSOR'
-   {
-     parser.suggestTables({ onlyViews: true });
-     parser.suggestDatabases({ appendDot: true });
-   }
- ;
-
-ReloadFunction
- : 'RELOAD' 'FUNCTION'
- ;
-
-ReloadFunction_EDIT
- : 'RELOAD' 'CURSOR'
-   {
-     parser.suggestKeywords(['FUNCTION']);
-   }
- ;
-
-NullableComment
- : QuotedValue
- | 'NULL'
  ;
