@@ -39,12 +39,19 @@ and open-up http://localhost:8888
 ### Minimal
 
     microk8s.enable ingress
+
     kubectl edit daemonsets nginx-ingress-microk8s-controller
 
 And can edit `--default-backend-service=$(POD_NAMESPACE)/default-http-backend`.
 
 ### NGINX
 
-    helm install stable/nginx-ingress -n nginx-ingress
+Follow https://kubernetes.github.io/ingress-nginx/deploy/#using-helm
+
+    helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+
+    helm install ingress-nginx ingress-nginx/ingress-nginx
 
 And set `ingress.create=true` and `ingress.type=nginx` in [values.yaml](values.yaml).
+
+For SSL, one option is to check `jetstack/cert-manager`.
