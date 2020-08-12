@@ -46,6 +46,7 @@ Upgrade or delete:
     microk8s.enable dns ingress storage helm3
 
     sudo snap alias microk8s.kubectl kubectl
+
     sudo snap alias microk8s.helm3 helm
 
     microk8s.inspect

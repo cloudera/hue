@@ -1,10 +1,7 @@
 image:
-   registry: "localhost:32000"
+   registry: "gethue"
    tag: "latest"
    pullPolicy: "Always"
-   # registry: "gethue"
-   # tag: "latest"
-   # pullPolicy: "IfNotPresent"
 website:
   enabled: true
   replicas: 1
