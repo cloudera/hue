@@ -254,7 +254,7 @@ Instrumentation not enabled:
 
     [23/Apr/2018 10:59:01 -0700] INFO     127.0.0.1 admin - "POST /jobbrowser/jobs/ HTTP/1.1" returned in 88ms
 
-### How to change or reset a forgotten password
+### Change or reset a forgotten password
 
 Via the Hue commands, to change the password of the currently logged in Unix user:
 
@@ -264,7 +264,7 @@ If you don’t remember the admin username, create a new Hue admin (you will the
 
     build/env/bin/hue createsuperuser
 
-### How to make a certain user a Hue admin
+### Make a certain user a Hue admin
 
 It is recommended to just do it as an admin via the [Admin UI](https://gethue.com/password-management-in-hue/).
 

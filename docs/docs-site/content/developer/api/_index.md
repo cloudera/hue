@@ -280,7 +280,7 @@ Here is some overview about using the Python commands an shell and some examples
 * [Hue API: Execute some builtin or shell commands](http://gethue.com/hue-api-execute-some-builtin-commands/).
 * [How to manage the Hue database with the shell](http://gethue.com/how-to-manage-the-hue-database-with-the-shell/).
 
-### How to make a certain user a Hue admin
+### Make a user a Hue admin
 
 Via the Hue shell:
 
@@ -296,7 +296,7 @@ Then type something similar to:
     a.set_password('my_secret')
     a.save()
 
-### Change the password for a user
+### Change the password of a user
 
 In the Hue shell:
 
