@@ -1,5 +1,5 @@
 ---
-title: "UI Components"
+title: "Components"
 draft: false
 weight: 4
 ---
@@ -10,8 +10,9 @@ Some of the UI elements in Hue are available as generic [Web Components](https:/
 
 Following are the generic components in Hue. Doc for each component must give you a sound idea on the attributes/props that the components accept, and events they generate.
 
-* [er-diagram](/developer/components/er-diagram)
-* [Scratchpad](/developer/components/scratchpad)
+* [SQL Parsers](/developer/components/parsers)
+* [ER-diagram](/developer/components/er-diagram)
+* [SQL Scratchpad](/developer/components/scratchpad)
 
 ## Using UI components in your project
 
