@@ -243,7 +243,7 @@ class LdapConnection(object):
 
           ldap_info = {
             'dn': dn,
-            'username': data[user_name_attr][0]
+            'username': smart_text(data[user_name_attr][0])
           }
 
           if 'givenName' in data:
@@ -257,12 +257,12 @@ class LdapConnection(object):
               LOG.warn('Last name is truncated to 30 characters for [<User: %s>].' % ldap_info['username'])
             ldap_info['last'] = last_name[:30]
           if 'mail' in data:
-            ldap_info['email'] = data['mail'][0]
+            ldap_info['email'] = smart_text(data['mail'][0])
           # memberOf and isMemberOf should be the same if they both exist
           if 'memberOf' in data:
-            ldap_info['groups'] = data['memberOf']
+            ldap_info['groups'] = [smart_text(member) for member in data['memberOf']]
           if 'isMemberOf' in data:
-            ldap_info['groups'] = data['isMemberOf']
+            ldap_info['groups'] = [smart_text(member) for member in data['isMemberOf']]
 
           user_info.append(ldap_info)
     return user_info

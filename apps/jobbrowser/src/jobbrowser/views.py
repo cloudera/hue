@@ -20,6 +20,7 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import filter
 from builtins import str
+import functools
 import logging
 import re
 import string
@@ -423,7 +424,10 @@ def job_single_logs(request, job, offset=LOG_OFFSET_BYTES):
   task = None
 
   failed_tasks = job.filter_tasks(task_states=('failed',))
-  failed_tasks.sort(cmp_exec_time)
+  if sys.version_info[0] > 2:
+    failed_tasks.sort(key=functools.cmp_to_key(cmp_exec_time))
+  else:
+    failed_tasks.sort(cmp_exec_time)
   if failed_tasks:
     task = failed_tasks[0]
     if not task.taskAttemptIds and len(failed_tasks) > 1: # In some cases the last task ends up without any attempt
@@ -433,7 +437,10 @@ def job_single_logs(request, job, offset=LOG_OFFSET_BYTES):
     if job.is_mr2:
       task_states.append('scheduled')
     recent_tasks = job.filter_tasks(task_states=task_states, task_types=('map', 'reduce',))
-    recent_tasks.sort(cmp_exec_time, reverse=True)
+    if sys.version_info[0] > 2:
+      recent_tasks.sort(key=functools.cmp_to_key(cmp_exec_time), reverse=True)
+    else:
+      recent_tasks.sort(cmp_exec_time, reverse=True)
     if recent_tasks:
       task = recent_tasks[0]
 
