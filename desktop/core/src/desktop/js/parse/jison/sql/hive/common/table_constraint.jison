@@ -43,3 +43,32 @@ TableConstraintLeftPart_EDIT
    }
  | 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification_EDIT
  ;
+
+ForeignKeySpecification
+ : 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList
+   {
+     parser.addTablePrimary($5);
+   }
+ ;
+
+ForeignKeySpecification_EDIT
+ : 'FOREIGN' 'CURSOR'
+   {
+     parser.suggestKeywords(['KEY']);
+   }
+ | 'FOREIGN' 'KEY' ParenthesizedColumnList_EDIT
+ | 'FOREIGN' 'KEY' ParenthesizedColumnList 'CURSOR'
+   {
+     parser.suggestKeywords(['REFERENCES']);
+   }
+ | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' 'CURSOR'
+   {
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
+   }
+ | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier_EDIT
+ | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList_EDIT
+   {
+     parser.addTablePrimary($5);
+   }
+ ;
