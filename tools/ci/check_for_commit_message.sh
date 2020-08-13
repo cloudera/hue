@@ -24,7 +24,6 @@ do
 
  if [ "$?" -ne "0" ]
   then
-    echo "Not matching commit title '$commit'"
     FOUND_ISSUE=-1
   fi
 done
