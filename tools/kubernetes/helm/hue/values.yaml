@@ -43,9 +43,9 @@ websocket:
   enabled: false
   replicas: 1
 monitoring:
-  enabled: true
+  enabled: false
 tracing:
-  enabled: true
+  enabled: false
 cron:
   enabled: false
   emailStats: "0 13 * * WED,SUN"
