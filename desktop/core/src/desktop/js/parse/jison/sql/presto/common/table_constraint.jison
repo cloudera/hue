@@ -25,3 +25,49 @@ TableConstraint_EDIT
    }
  | 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification_EDIT
  ;
+
+ForeignKeySpecification
+ : 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList 'DISABLE' 'NOVALIDATE' OptionalRelyOrNorely
+   {
+     parser.addTablePrimary($5);
+   }
+ ;
+
+ForeignKeySpecification_EDIT
+ : 'FOREIGN' 'CURSOR'
+   {
+     parser.suggestKeywords(['KEY']);
+   }
+ | 'FOREIGN' 'KEY' ParenthesizedColumnList_EDIT
+ | 'FOREIGN' 'KEY' ParenthesizedColumnList 'CURSOR'
+   {
+     parser.suggestKeywords(['REFERENCES']);
+   }
+ | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' 'CURSOR'
+   {
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
+   }
+ | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier_EDIT
+ | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList_EDIT
+   {
+     parser.addTablePrimary($5);
+   }
+ | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList 'CURSOR'
+   {
+     parser.addTablePrimary($5);
+     parser.suggestKeywords(['DISABLE NOVALIDATE']);
+   }
+ | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList 'DISABLE' 'CURSOR'
+   {
+     parser.addTablePrimary($5);
+     parser.suggestKeywords(['NOVALIDATE']);
+   }
+ | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList 'DISABLE' 'NOVALIDATE' OptionalRelyOrNorely 'CURSOR'
+   {
+     parser.addTablePrimary($5);
+     if (!$9) {
+       parser.suggestKeywords(['NORELY', 'RELY']);
+     }
+   }
+ ;
