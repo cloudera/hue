@@ -30,6 +30,7 @@ then
   FOUND_ISSUE=$?
 else
   echo "No Python code files changed present"
+  FOUND_ISSUE=0
 fi
 
 if [ "$FOUND_ISSUE" -eq "0" ]
