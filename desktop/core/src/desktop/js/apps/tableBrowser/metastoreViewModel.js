@@ -370,22 +370,30 @@ class MetastoreViewModel {
     loadedDeferred.done(() => {
       let search = location.search;
       let namespaceId;
+      let connectorId;
       let sourceType;
       if (search) {
         search = search.replace('?', '');
         search.split('&').forEach(param => {
           if (param.indexOf('namespace=') === 0) {
             namespaceId = param.replace('namespace=', '');
-          }
-          if (param.indexOf('source_type=') === 0) {
-            sourceType = param.replace('source_type=', '');
+          } else if (param.indexOf('source_type=') === 0) {
+            sourceType = param.replace('source_type=', ''); // Keep old links working
+          } else if (param.indexOf('source=') === 0) {
+            sourceType = param.replace('source=', ''); // Keep old links working
+          } else if (param.indexOf('connector_id=') === 0) {
+            connectorId = param.replace('connector_id=', '');
           }
         });
       }
 
-      if (sourceType && sourceType !== this.source().type) {
+      if (!connectorId && sourceType) {
+        connectorId = sourceType;
+      }
+
+      if (connectorId && connectorId !== this.source().connector().id) {
         const found = this.sources().some(source => {
-          if (source.type === sourceType) {
+          if (connectorId === source.connector().id) {
             this.source(source);
             return true;
           }
