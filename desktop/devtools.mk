@@ -32,8 +32,8 @@ PYPI_MIRROR ?= https://pypi.python.org/simple/
 .PHONY: $(DEVTOOLS)
 $(DEVTOOLS):
 	@echo "--- Installing development tool: $@"
-	$(ENV_EASY_INSTALL) -i $(PYPI_MIRROR) \
-	   -H *.cloudera.com,pypi.python.org,files.pythonhosted.org $(SETUPTOOLS_OPTS) $(subst ],,$(subst [,==,$@))
+	$(ENV_PIP)  \
+	   install $(subst ],,$(subst [,==,$@))
 
 $(BLD_DIR):
 	@mkdir -p $@
