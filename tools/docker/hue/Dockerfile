@@ -65,6 +65,7 @@ RUN ./build/env/bin/pip install \
   flower \
   pyhive \
   gevent \
+  gssapi \
   # Needed for Jaeger
   threadloop \
   thrift-sasl==0.2.1
