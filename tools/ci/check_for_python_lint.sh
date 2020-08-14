@@ -27,11 +27,13 @@ cd $HOME
 if [ ! -z "$files" ];
 then
   ./build/env/bin/hue runpylint --files "$files"
+  FOUND_ISSUE=$?
+else
+  echo "No Python code files changed present"
 fi
 
-if [ -z "$files" ] || [ "$?" -eq "0" ]
+if [ "$FOUND_ISSUE" -eq "0" ]
 then
-  FOUND_ISSUE=0
   echo "No Python code styling issues found"
 else
   echo "Found some Python code styling issues"
