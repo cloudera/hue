@@ -478,7 +478,7 @@ class AssistDbEntry {
       url =
         '/metastore/tables/' +
         self.catalogEntry.name +
-        '?source=' +
+        '?connector_id=' +
         self.catalogEntry.getConnector().id +
         '&namespace=' +
         self.catalogEntry.namespace.id;
@@ -488,7 +488,7 @@ class AssistDbEntry {
         self.parent.catalogEntry.name +
         '/' +
         self.catalogEntry.name +
-        '?source=' +
+        '?connector_id=' +
         self.catalogEntry.getConnector().id +
         '&namespace=' +
         self.catalogEntry.namespace.id;
