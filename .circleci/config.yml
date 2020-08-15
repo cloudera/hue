@@ -108,28 +108,17 @@ jobs:
       - run:
           name: run python lints
           command: |
-            /usr/share/hue/build/env/bin/pip install pylint==1.9.5 pylint-django==0.7.2
-
             cd ~/repo
 
             /usr/share/hue/build/env/bin/pip install pylint==1.7.5 pylint-django==0.7.2
             ./tools/ci/check_for_python_lint.sh /usr/share/hue
 
-            if [ "$?" -ne "0" ]
-            then
-              exit 1
-            fi
-
+      - run:
+          name: run commit title format check
+          command: |
             cd ~/repo
 
             ./tools/ci/check_for_commit_message.sh
-
-            if [ "$?" -ne "0" ]
-            then
-              exit 1
-            fi
-
-            ./tools/ci/check_for_invalid_characters.sh  # no-op currently
 
       - run:
           name: run js lint
