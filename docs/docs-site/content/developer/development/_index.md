@@ -107,6 +107,8 @@ Restart Hue, open the Editors and start typing your first queries!
 * [.prettierrc](https://github.com/cloudera/hue/blob/master/.prettierrc)
 * [Git hooks](https://github.com/cloudera/hue/blob/master/tools/githooks)
 
+For checking git commit message format automatically locally:
+
     cp tools/githooks/* .git/hooks
     chmod +x .git/hooks/*
 
