@@ -46,7 +46,7 @@ confidence=
 # enable=
   # C0326(bad-whitespace)
   # W0311(bad-indentation)
-  # C0301(line-too-long
+  # C0301(line-too-long)
 
 
 # Disable the message, report, category or checker with the given id(s). You
