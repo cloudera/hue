@@ -261,14 +261,14 @@ def has_missing_ssh(message):
 
 
 def rewrite_ssh_api_url(url):
-  m = re.search('(?:.*://|@)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*', url)
+  m = re.search('(?:.*://)(?:[^:]+:[^:]+@)(?P<host>[^:/ ]+):?(?P<port>[0-9]+).*', url)
   server_host = m.group('host')
   server_port = m.group('port')
 
   if not server_host:
-    raise QueryError('Hostname of %(url)s could not be found.' % url)
+    raise QueryError('Hostname of %(url)s could not be found.' % {'url': url})
   if not server_port:
-    raise QueryError('Port of %(url)s could not be found.' % url)
+    raise QueryError('Port of %(url)s could not be found.' % {'url': url})
 
   return {
     'server_host': server_host,
