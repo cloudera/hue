@@ -56,7 +56,13 @@ So in our case [http://172.17.0.2:8888](http://172.17.0.2:8888).
 By default the Hue container is using
 [``tools/docker/hue/conf/hue-overrides.ini``](/tools/docker/hue/conf/hue-overrides.ini) on top of [``desktop/conf/hue.ini``](/desktop/conf/hue.ini) which assumes localhost for all the data services and uses and embedded sqlite database that will error out.
 
-To configure Hue to point to the databases to query, the simplified ini [``hue-overrides.ini``](/tools/docker/hue/conf/hue-overrides.ini) can be edited before starting Hue via:
+To configure Hue to point to the databases to query, the simplified ini [``hue-overrides.ini``](/tools/docker/hue/conf/hue-overrides.ini) can be edited before starting Hue.
+
+Just curl it:
+
+    wget https://raw.githubusercontent.com/cloudera/hue/master/tools/docker/hue/conf/hue-overrides.ini -O hue.ini
+
+ OR get is via the repository:
 
     cd tools/docker/hue
     cp conf/hue-overrides.ini hue.ini
@@ -91,20 +97,19 @@ MySql
 
 To be able to query a database, update the connector interpreters accordingly, e.g.:
 
-```
-[notebook]
 
-  # One entry for each type of snippet.
-  [[interpreters]]
+    [notebook]
+    # One entry for each type of snippet.
+    [[interpreters]]
     # Define the name and how to connect and execute the language.
     # https://docs.gethue.com/administrator/configuration/editor/
 
     [[[mysql]]]
-      name = MySQL
-      interface=sqlalchemy
-      ## https://docs.sqlalchemy.org/en/latest/dialects/mysql.html
-      options='{"url": "mysql://root:secret@database:3306/hue"}'
-```
+    name = MySQL
+    interface=sqlalchemy
+    ## https://docs.sqlalchemy.org/en/latest/dialects/mysql.html
+    options='{"url": "mysql://root:secret@database:3306/hue"}'
+
 
 Then start the Hue server:
 
