@@ -3,15 +3,9 @@ title: "SQL Parsers"
 draft: false
 ---
 
-Parsers generated are JavaScript modules. This makes it easy to import a parser into your own apps (e.g. Webapp, Node.Js...). Importing a parser can be simply done via a npm package.
+## Import
 
-Here is an example on how to use the Hive parser:
-
-    npm install --save gethue
-
-Will install the latest from https://www.npmjs.com/package/gethue. Currently webpack needs to be used. An example of `webpack.config.js` can be found in the demo app [README](https://github.com/cloudera/hue/blob/master/tools/examples/api/hue_dep/README.md#gethue).
-
-Then import the parser you need with something like below and run it on an SQL statement:
+Import the parser you need with something like below and run it on an SQL statement:
 
     import sqlAutocompleteParser from 'gethue/parse/sql/hive/hiveAutocompleteParser';
 
@@ -83,3 +77,7 @@ Which then will output keywords suggestions and all the known locations:
         { value: 'USE', weight: -1 },
         { value: 'WITH', weight: -1 } ],
       definitions: [] }
+
+## Example
+
+A full example on how to use the Hive parser can be found in the demo app [README](https://github.com/cloudera/hue/blob/master/tools/examples/api/hue_dep/README.md).

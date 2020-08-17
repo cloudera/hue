@@ -1,5 +1,7 @@
 
- Using Parser in [src/app.js](src/app.js) app
+## Local dependency
+
+ The Parser is imported and use in the [src/app.js](src/app.js) app.
 
     cd hue_dep
     npm install       // Install dependencies
@@ -16,22 +18,11 @@ Note that it can also be a GitHub link but takes a bit longer to do `npm install
 
     "hue": "git://github.com/cloudera/hue.git"
 
-## GetHue
+## NMP registry
 
-You need not have a dependency on the complete Hue project, the parsers are available as [gethue npm package](https://www.npmjs.com/package/gethue). To run the demo app with gethue please making the following changes:
+Alternatively, instead of requiring a git clone of the repository, the Hue package can be directly pulled from a `npm registry` as detailed in the [Component documentation](/developer/components/#npm-registry).
 
-1. Install gethue NPM package
-
-       npm install --save gethue
-
-2. In [hue_dep/package.json](package.json), remove `"hue": "file:../../../.."` without touching the newly added gethue dependency.
-3. In [hue_dep/src/app.js(src/app.js), change the import line to.
-
-       import sqlAutocompleteParser from 'gethue/parse/sql/hive/hiveAutocompleteParser';
-
-4. In [hue_dep/webpack.config.js](webpack.config.js):
-   - Change `'js'` to `'node_modules/gethue'` under `resolve.modules`.
-   - Remove `exclude: /node_modules/,` from `babel-loader`.
+    npm install --save gethue
 
 ## Output
 
