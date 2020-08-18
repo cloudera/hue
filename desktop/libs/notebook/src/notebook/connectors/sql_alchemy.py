@@ -182,6 +182,13 @@ class SqlAlchemyApi(Api):
       self.options['credentials_info'] = json.loads(
           self.options.pop('credentials_json')
       )
+      
+    # enables various sql alchemy args to be passed along for both hive & presto connection. 
+    # Refer to sqlalchemy pyhive for more details 
+    if self.options.get('connect_args'):
+      self.options['connect_args'] = json.loads(
+          self.options.pop('connect_args')
+      )
 
     options = self.options.copy()
     options.pop('session', None)

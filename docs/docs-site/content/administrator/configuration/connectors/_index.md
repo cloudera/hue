@@ -156,6 +156,19 @@ With credentials:
 
     options='{"url": "presto://username:password@localhost:8080/tpch/default"}'
 
+With LDAPS enabled over HTTPS:
+
+    options='{"url": "presto://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\"}"}'
+
+Pass Presto Session properties along with HTTPS: 
+
+    options='{"url": "presto://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\", \"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
+
+Pass Presto Session Properties without HTTPS enabled:
+
+    options='{"url": "presto://username:password@localhost:8080/tpch/default","connect_args":"{\"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
+
+
 Alternative interfaces.
 
 Direct:
