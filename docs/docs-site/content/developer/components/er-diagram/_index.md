@@ -1,5 +1,5 @@
 ---
-title: "er-diagram"
+title: "ER-diagram"
 draft: false
 ---
 
@@ -30,7 +30,7 @@ Please refer the [interfaces](https://github.com/cloudera/hue/blob/master/deskto
 
 - entity-clicked: Function([IEntity](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/js/components/er-diagram/lib/interfaces.ts#L21)) - Will be triggered when an entity is clicked.
 
-### Resource Files
+## Resource Files
 
 - Hue
   - **Web Component:** gethue/web/er-diagram.js
