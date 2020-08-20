@@ -9,7 +9,14 @@ The parsers are the flagship part of Hue and power extremely advanced autocomple
 
 While the dynamic content like the list of tables, columns is obviously fetched via [remote endpoints](#sql-querying), all the SQL knowledge of the statements is available.
 
-See the currently shipped [SQL dialects](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/sql).
+The main dialects are:
+
+*  Apache Hive
+*  Apache Impala
+*  Presto
+*  Apache Calcite
+
+But there are more! See all the currently shipped [SQL dialects](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/sql).
 
 This guide takes you through the steps necessary to create an autocompleter for any [SQL dialect](/administrator/configuration/connectors/#databases) in Hue. The major benefits are:
 
@@ -84,6 +91,37 @@ Parsers are generated and added to the repository using the command generatePars
 In reality two parsers are generated per dialect, one for syntax and one for autocomplete. The syntax parsers is a subset of the autocomplete parser with no error recovery and without the autocomplete specific grammar.
 
 All the jison grammar files can be found [here](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/jison/sql) and the generated parsers are also committed together with their tests [here](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/sql).
+
+Parsers are sharing a maximum of the common syntax via some modules so that it is easy to improve the specificness of any of them while not starting from sratch.
+
+e.g. in [structure.json](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/js/parse/jison/sql/hive/structure.json):
+
+    {
+      "lexer": "sql.jisonlex",
+      "autocomplete": [
+        "../generic/autocomplete_header.jison",
+        "abort/abort_transactions.jison",
+        "common/table_constraint.jison",
+        "alter/alter_common.jison",
+        "alter/alter_database.jison",
+        "alter/alter_index.jison",
+        "alter/alter_materialized_view.jison",
+        "alter/alter_table.jison",
+        "alter/alter_view.jison",
+        "analyze/analyze_table.jison",
+        ...
+      ],
+      "syntax": [
+        "../generic/syntax_header.jison",
+        "abort/abort_transactions.jison",
+        "common/table_constraint.jison",
+        "alter/alter_common.jison",
+        "alter/alter_database.jison",
+        "alter/alter_index.jison",
+        "alter/alter_materialized_view.jison",
+        ...
+      ]
+    }
 
 ### The grammar
 
