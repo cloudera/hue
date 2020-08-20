@@ -189,6 +189,9 @@ def _execute_notebook(request, notebook, snippet):
         if history: # If _historify failed, history will be None.
           # If we get Atomic block exception, something underneath interpreter.execute() crashed and is not handled.
           history.update_data(notebook)
+          print(response.get('handle'))
+          print('=================================================')  # A query executed from a saved query does not have a statement
+          print(history.search)                                       # and search is all the statement instead of the executed one?
           history.save()
 
           response['history_id'] = history.id
