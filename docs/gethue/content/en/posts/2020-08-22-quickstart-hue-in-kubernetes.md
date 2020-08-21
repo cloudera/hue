@@ -2,8 +2,8 @@
 title: Hue in Kubernetes
 author: Hue Team
 type: post
-date: 2019-07-26T15:21:02+00:00
-url: /hue-in-kubernetes/
+date: 2020-08-22T00:00:00+00:00
+url: /quickstart-hue-in-kubernetes/
 sf_thumbnail_type:
   - none
 sf_thumbnail_link_type:
@@ -40,13 +40,9 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Administration
-  - Version 4
-  # - Version 4.5
+  - Version 4.8
 
 ---
-
-**Note** This post has been replaced by a more [recent Howto](/quickstart-hue-in-kubernetes/).
-
 Let&#8217;s see how to automate the deployment further and run this into a container orchestration like [Kubernetes][1].
 
 &nbsp;
