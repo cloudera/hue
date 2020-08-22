@@ -206,29 +206,9 @@ def ssh_error_handler(f):
         if not connector['options'].get('has_ssh'):
           raise e
 
-        ssh_options = connector['options'].copy()
+        connector['options']['idle_time'] = idle_time
 
-        ssh_options['idle_time'] = idle_time
-
-        if connector['interface'] in ('sqlalchemy', 'ksql', 'flink'):
-          ssh_url = rewrite_ssh_api_url(ssh_options['url'])
-
-          ssh_options['server_host'] = ssh_url['server_host']
-          ssh_options['server_port'] = ssh_url['server_port']
-
-        if '@' in ssh_options['ssh_server_host']:
-          ssh_options['ssh_server_user'], ssh_options['ssh_server_host'] = ssh_options['ssh_server_host'].rsplit('@')
-        else:
-          ssh_options['ssh_server_user'] = 'gethue'
-
-        # Docs: https://gist.github.com/scy/6781836
-        # TODO: local server_port needs to be dynamic (first server_port)
-        # TODO: "Could not request local forwarding" not bubbled up
-        # TODO: grep: no sleep 10: No such file or directory?
-        ssh = "ssh -f -L %(server_port)s:%(server_host)s:%(server_port)s %(ssh_server_user)s@%(ssh_server_host)s -o ExitOnForwardFailure=yes" % ssh_options
-        ssh += ' -4'
-        ssh += ' -o StrictHostKeyChecking=no'
-        ssh += ' sleep %(idle_time)s' % ssh_options
+        ssh = build_ssh_command(connector)
 
         LOG.info(ssh)
 
@@ -253,6 +233,32 @@ def ssh_error_handler(f):
       else:
         raise e
   return wrapper
+
+
+def build_ssh_command(connector):
+  ssh_options = connector['options'].copy()
+
+  if connector['interface'] in ('sqlalchemy', 'ksql', 'flink'):
+    ssh_url = rewrite_ssh_api_url(ssh_options['url'])
+
+    ssh_options['server_host'] = ssh_url['server_host']
+    ssh_options['server_port'] = ssh_url['server_port']
+
+  if '@' in ssh_options['ssh_server_host']:
+    ssh_options['ssh_server_user'], ssh_options['ssh_server_host'] = ssh_options['ssh_server_host'].rsplit('@')
+  else:
+    ssh_options['ssh_server_user'] = 'gethue'
+
+  # Docs: https://gist.github.com/scy/6781836
+  # TODO: local server_port needs to be dynamic (first server_port)
+  # TODO: "Could not request local forwarding" not bubbled up
+  # TODO: grep: no sleep 10: No such file or directory?
+  ssh = "ssh -f -L %(server_port)s:%(server_host)s:%(server_port)s %(ssh_server_user)s@%(ssh_server_host)s -o ExitOnForwardFailure=yes" % ssh_options
+  ssh += ' -4'
+  ssh += ' -o StrictHostKeyChecking=no'
+  ssh += ' sleep %(idle_time)s' % ssh_options
+
+  return ssh
 
 
 def has_missing_ssh(message):
