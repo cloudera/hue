@@ -40,6 +40,8 @@ If you are changing JavaScript or CSS files, also start:
 
     npm run dev
 
+Persistence: Hue needs an existing database with transactions like MySQL to support concurrent requests and also not lose the registered users, saved queries, sharing permissions… when the server gets stopped.
+
 Once build, in order to avoid the `database is locked` errors, you also need to connect Hue to a transactional database. It is recommended to use MySQL or PostGreSQL for development.
 
 Open the `desktop/conf/pseudo-distributed.ini` file in a text editor. Add the following options (and modify accordingly) for your MySQL setup:
@@ -57,7 +59,7 @@ Read more about how [configurations work](/administrator/configuration/).
 
 ### First SQL queries!
 
-Here is how to point the Editor to MySql or [Apache Hive](https://hive.apache.org/) and execute your first SQL queries. For other supported databases refer to the [connectors](/administrator/configuration/connectors/).
+Here is how to point the Editor to either MySql or [Apache Hive](https://hive.apache.org/) and execute your first SQL queries. For other supported databases refer to the [connectors](/administrator/configuration/connectors/).
 
 #### MySQL
 
@@ -70,17 +72,17 @@ In `desktop/conf/pseudo-distributed.ini`, below the `[[interpreters]]` section o
 
 #### Apache Hive
 
-You can connect to an existing Hive instance or setup a new one locally. An easy way to setup one is with Docker. You could use this container for Hive 2.3.2 - https://github.com/big-data-europe/docker-hive.
+You can connect to an existing Hive instance or setup a new one locally. An easy way to setup one is with Docker. You could use this [Hive 2 container](https://github.com/big-data-europe/docker-hive.).
 
     git clone https://github.com/big-data-europe/docker-hive
     cd docker-hive
     docker-compose up -d
 
-Just follow the above 3 steps and you would have a running Hive instance on jdbc:hive2://localhost:10000.
+Just follow the above 3 steps and you would have a running Hive instance on `jdbc:hive2://localhost:10000`.
 
-Now under Hue open `desktop/conf/pseudo-distributed.ini` file in a text editor, and modify the following options.
+Now under Hue open `desktop/conf/pseudo-distributed.ini` file in a text editor, and modify the following properties:
 
-Directly below the `[[beeswax]]` line, add the following:
+1. Directly below the `[[beeswax]]` line, add the following:
 
     # Host where HiveServer2 is running.
     hive_server_host=localhost
@@ -90,13 +92,13 @@ Directly below the `[[beeswax]]` line, add the following:
 
     thrift_version=7
 
-Below the `[[interpreters]]` of `[notebook]`, add:
+2. Below the `[[interpreters]]` of `[notebook]`, add:
 
     [[[hive]]]
       name=Hive
       interface=hiveserver2
 
-Restart Hue, open the Editors and start typing your first queries!
+And restart Hue, open the Editors and start typing your first queries!
 
 ### Dev environment
 
@@ -146,19 +148,17 @@ Second step is to configure the debug configuration
 
 **Note:**
 
-During the development process if you are facing any problem then, it is recommended to check your issues at https://discourse.gethue.com/ and https://github.com/cloudera/hue/issues?q=is%3Aissue+. If the solution is not found then, feel free to create an issue at https://github.com/cloudera/hue/issues.
+During the development process if you are facing any problem then, it is recommended to search for information on the [Forum](https://discourse.gethue.com/) and in the [bug tracker](https://github.com/cloudera/hue/issues?q=is%3Aissue+). If the solution is not found then, feel free to create an issue at https://github.com/cloudera/hue/issues.
 
 Here is a tutorial about how to use the code review tool [Review Board](https://www.reviewboard.org/) for a better productivity!
 
 ### Setup
 
-Hue project uses Review Board and Pull Requests for code reviews. For more complex patches it's advisable to use RB than a plain pull request on github. The advantage of Pull Request is that the CI (syntax check, tests…) automatically runs for you. Along with the web app, a command line tool named RBTool is used to make things easier.
+Hue project uses Review Board and Pull Requests for code reviews. For more complex patches it's advisable to use RB than a plain pull request on github. The advantage of Pull Request is that the CI (syntax check, tests…) automatically runs for you (but the diff interface is not as friendly as Review Board).
 
-Create accounts in https://review.cloudera.org, https://issues.cloudera.org/browse/HUE and https://github.com and share the usernames
-
-Then, join the 'hue' group in your account https://review.cloudera.org/account/preferences/#groups
-
-Then [download](https://www.reviewboard.org/downloads/rbtools/) the Review Board tools and install it.
+* Create accounts in https://review.cloudera.org, https://issues.cloudera.org/browse/HUE and https://github.com and share the usernames
+* Then, join the 'hue' group in your account https://review.cloudera.org/account/preferences/#groups
+* Then [download](https://www.reviewboard.org/downloads/rbtools/) the Review Board tools and install it.
 
 If you've never used git and github before, there are bunch of things you need to [do](https://kbroman.org/github_tutorial/pages/first_time.html) before going further.
 
@@ -171,19 +171,12 @@ Then, go inside your git repository:
     romain@runreal:~/projects/hue$ rbt setup-repo
 
     Enter the Review Board server URL: https://review.cloudera.org
-
     Use the Git repository 'hue' (git://github.com/cloudera/hue.git)? [Yes/No]: yes
-
     Create '/home/romain/projects/hue/.reviewboardrc' with the following?
-
     REVIEWBOARD_URL = "https://review.cloudera.org"
-
     REPOSITORY = "hue"
-
     BRANCH = "master"
-
     [Yes/No]: yes
-
     Config written to /home/romain/projects/hue/.reviewboardrc
 
 Create a new branch with the jira id (HUE-XXX) as the branch name:
