@@ -781,31 +781,33 @@ export const resolveCatalogEntry = options => {
 
 export default {
   autocompleteFilter: autocompleteFilter,
-  backTickIfNeeded: (sourceType, identifier) => {
-    if (identifier.indexOf('`') === 0) {
+  backTickIfNeeded: (connector, identifier) => {
+    const quoteChar =
+      (connector.dialect_properties && connector.dialect_properties.sql_identifier_quote) || '`';
+    if (identifier.indexOf(quoteChar) === 0) {
       return identifier;
     }
     const upperIdentifier = identifier.toUpperCase();
     if (
-      sourceType === 'hive' &&
+      connector.dialect === 'hive' &&
       (hiveReservedKeywords[upperIdentifier] || extraHiveReservedKeywords[upperIdentifier])
     ) {
-      return '`' + identifier + '`';
+      return quoteChar + identifier + quoteChar;
     }
-    if (sourceType === 'impala' && impalaReservedKeywords[upperIdentifier]) {
-      return '`' + identifier + '`';
+    if (connector.dialect === 'impala' && impalaReservedKeywords[upperIdentifier]) {
+      return quoteChar + identifier + quoteChar;
     }
     if (
-      sourceType !== 'impala' &&
-      sourceType !== 'hive' &&
+      connector.dialect !== 'impala' &&
+      connector.dialect !== 'hive' &&
       (impalaReservedKeywords[upperIdentifier] ||
         hiveReservedKeywords[upperIdentifier] ||
         extraHiveReservedKeywords[upperIdentifier])
     ) {
-      return '`' + identifier + '`';
+      return quoteChar + identifier + quoteChar;
     }
     if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(identifier)) {
-      return '`' + identifier + '`';
+      return quoteChar + identifier + quoteChar;
     }
     return identifier;
   },

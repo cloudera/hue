@@ -23,7 +23,7 @@ import I18n from 'utils/i18n';
 import sqlUtils from 'sql/sqlUtils';
 
 class AsteriskData {
-  constructor(data, sourceType, namespace, compute, defaultDatabase) {
+  constructor(data, connector, namespace, compute, defaultDatabase) {
     const self = this;
     self.loading = ko.observable(true);
     self.hasErrors = ko.observable(false);
@@ -64,19 +64,19 @@ class AsteriskData {
         text: $.map(colsToExpand, column => {
           if (column.tableAlias) {
             return (
-              sqlUtils.backTickIfNeeded(sourceType, column.tableAlias) +
+              sqlUtils.backTickIfNeeded(connector, column.tableAlias) +
               '.' +
-              sqlUtils.backTickIfNeeded(sourceType, column.name)
+              sqlUtils.backTickIfNeeded(connector, column.name)
             );
           }
           if (colIndex[column.name]) {
             return (
-              sqlUtils.backTickIfNeeded(sourceType, column.table) +
+              sqlUtils.backTickIfNeeded(connector, column.table) +
               '.' +
-              sqlUtils.backTickIfNeeded(sourceType, column.name)
+              sqlUtils.backTickIfNeeded(connector, column.name)
             );
           }
-          return sqlUtils.backTickIfNeeded(sourceType, column.name);
+          return sqlUtils.backTickIfNeeded(connector, column.name);
         }).join(', ')
       });
       huePubSub.publish('context.popover.hide');
@@ -97,7 +97,7 @@ class AsteriskData {
           .getEntry({
             namespace: namespace,
             compute: compute,
-            connector: { id: sourceType }, // TODO: Add connector to asteriskContextTabs
+            connector: connector,
             path: path
           })
           .done(entry => {
@@ -152,9 +152,9 @@ class AsteriskData {
 }
 
 class AsteriskContextTabs {
-  constructor(data, sourceType, namespace, compute, defaultDatabase) {
+  constructor(data, connector, namespace, compute, defaultDatabase) {
     const self = this;
-    self.data = new AsteriskData(data, sourceType, namespace, compute, defaultDatabase);
+    self.data = new AsteriskData(data, connector, namespace, compute, defaultDatabase);
 
     self.tabs = [
       {
