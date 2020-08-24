@@ -22,6 +22,7 @@ import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
+import { ASSIST_ACTIVE_DB_CHANGED_EVENT, ASSIST_SET_DATABASE_EVENT } from './assist/events';
 
 export const NAME = 'hue-sidebar';
 
@@ -350,6 +351,12 @@ class Sidebar {
       this.footerItems.forEach(testActive);
     };
 
+    const lastAssistDatabase = ko.observable();
+    const lastEditorDatabase = ko.observable();
+
+    huePubSub.subscribe(ASSIST_ACTIVE_DB_CHANGED_EVENT, lastAssistDatabase);
+    huePubSub.subscribe(ASSIST_SET_DATABASE_EVENT, lastEditorDatabase);
+
     const configUpdated = clusterConfig => {
       const items = [];
 
@@ -459,14 +466,35 @@ class Sidebar {
         }
         if (appConfig.browser && appConfig.browser.interpreters) {
           appConfig.browser.interpreters.forEach(browser => {
-            browserItems.push(
-              new SidebarItem({
-                displayName: browser.displayName,
-                url: browser.page,
-                icon: browser.type,
-                type: browser.type
-              })
-            );
+            if (browser.type === 'tables') {
+              browserItems.push(
+                new SidebarItem({
+                  displayName: browser.displayName,
+                  url: ko.pureComputed(() => {
+                    const dbDetails = lastEditorDatabase() || lastAssistDatabase();
+                    let url = browser.page;
+                    if (dbDetails) {
+                      if (dbDetails.name) {
+                        url += '/' + dbDetails.name;
+                      }
+                      url += '?connector_id=' + dbDetails.connector.id;
+                    }
+                    return url;
+                  }),
+                  icon: browser.type,
+                  type: browser.type
+                })
+              );
+            } else {
+              browserItems.push(
+                new SidebarItem({
+                  displayName: browser.displayName,
+                  url: browser.page,
+                  icon: browser.type,
+                  type: browser.type
+                })
+              );
+            }
           });
         }
         if (browserItems.length > 0) {
