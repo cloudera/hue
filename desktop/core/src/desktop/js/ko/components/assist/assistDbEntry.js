@@ -25,7 +25,7 @@ const findNameInHierarchy = (entry, searchCondition) => {
     entry = entry.parent;
   }
   if (entry) {
-    return sqlUtils.backTickIfNeeded(entry.catalogEntry.getDialect(), entry.catalogEntry.name);
+    return sqlUtils.backTickIfNeeded(entry.catalogEntry.getConnector(), entry.catalogEntry.name);
   }
 };
 
@@ -221,7 +221,7 @@ class AssistDbEntry {
           parts.push('[]');
         }
       } else {
-        parts.push(sqlUtils.backTickIfNeeded(sourceType, entry.catalogEntry.name));
+        parts.push(sqlUtils.backTickIfNeeded(entry.getConnector(), entry.catalogEntry.name));
         parts.push('.');
       }
       entry = entry.parent;

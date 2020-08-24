@@ -730,7 +730,7 @@ class ContextPopoverViewModel {
     } else if (self.isAsterisk) {
       self.contents = new AsteriskContextTabs(
         self.data,
-        self.sourceType,
+        self.connector,
         self.namespace,
         self.compute,
         self.defaultDatabase

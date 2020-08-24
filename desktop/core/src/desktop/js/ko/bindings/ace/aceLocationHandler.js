@@ -1096,7 +1096,7 @@ class AceLocationHandler {
               const uniqueValues = [];
               for (let i = 0; i < possibleValues.length; i++) {
                 possibleValues[i].name = sqlUtils.backTickIfNeeded(
-                  self.dialect(),
+                  self.snippet.connector(),
                   possibleValues[i].name
                 );
                 const nameLower = possibleValues[i].name.toLowerCase();
