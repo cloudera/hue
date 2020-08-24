@@ -183,8 +183,8 @@ class SqlAlchemyApi(Api):
           self.options.pop('credentials_json')
       )
 
-    # enables various sql alchemy args to be passed along for both hive & presto connection. 
-    # Refer to sqlalchemy pyhive for more details 
+    # Enables various SqlAlchemy args to be passed along for both Hive & Presto connectors
+    # Refer to SqlAlchemy pyhive for more details
     if self.options.get('connect_args'):
       self.options['connect_args'] = json.loads(
           self.options.pop('connect_args')
@@ -196,6 +196,8 @@ class SqlAlchemyApi(Api):
     options.pop('has_ssh', None)
     options.pop('has_impersonation', None)
     options.pop('ssh_server_host', None)
+
+    options['pool_pre_ping'] = True
 
     return create_engine(url, **options)
 
