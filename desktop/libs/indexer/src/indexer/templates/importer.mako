@@ -1638,7 +1638,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           var statementCols = [];
           var temporaryColumns = [];
           sampleCols.forEach(function (sampleCol) {
-            statementCols.push(sqlUtils.backTickIfNeeded(self.sourceType, sampleCol.name()));
+            statementCols.push(sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, sampleCol.name()));
             var col = {
               name: sampleCol.name(),
               type: sampleCol.type()
@@ -1658,12 +1658,12 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
           var statement = 'SELECT ';
           statement += statementCols.join(',\n    ');
-          statement += '\n FROM ' + sqlUtils.backTickIfNeeded(self.sourceType, tableName) + ';';
+          statement += '\n FROM ' + sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, tableName) + ';';
           if (!wizard.destination.fieldEditorValue() || wizard.destination.fieldEditorValue() === lastStatement) {
             wizard.destination.fieldEditorValue(statement);
           }
           lastStatement = statement;
-          wizard.destination.fieldEditorPlaceHolder('${ _('Example: SELECT') }' + ' * FROM ' + sqlUtils.backTickIfNeeded(self.sourceType, tableName));
+          wizard.destination.fieldEditorPlaceHolder('${ _('Example: SELECT') }' + ' * FROM ' + sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, tableName));
 
           var handle = dataCatalog.addTemporaryTable({
             namespace: self.namespace(),

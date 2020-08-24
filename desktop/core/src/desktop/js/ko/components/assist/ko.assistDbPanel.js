@@ -166,7 +166,7 @@ const ASSIST_TABLE_TEMPLATES = `
           'Open'
         )}"></i></a>
       </div>
-      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': catalogEntry.getTitle(true) }, draggableText: { text: editorText,  meta: {'type': 'sql', 'isView': catalogEntry.isView(), 'table': tableName, 'database': databaseName} }">
+      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': catalogEntry.getTitle(true) }, draggableText: { text: editorText,  meta: { connector: catalogEntry.getConnector(), type: 'sql', isView: catalogEntry.isView(), table: tableName, database: databaseName } }">
         <i class="fa fa-fw muted valign-middle" data-bind="css: iconClass"></i>
         <span class="highlightable" data-bind="text: catalogEntry.getDisplayName(navigationSettings.rightAssist), css: { 'highlight': highlight }"></span>
       </a>
@@ -184,12 +184,12 @@ const ASSIST_TABLE_TEMPLATES = `
       </div>
       <!-- ko if: expandable -->
       <a class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': catalogEntry.getTitle(true) }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: catalogEntry.isKey() --> <!-- ko component: { name: '${ASSIST_KEY_COMPONENT}', params: { entry: catalogEntry } } --><!-- /ko --><!-- /ko -->
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: { connector: catalogEntry.getConnector(), type: 'sql', column: columnName, table: tableName, database: databaseName } }"></span><!-- ko if: catalogEntry.isKey() --> <!-- ko component: { name: '${ASSIST_KEY_COMPONENT}', params: { entry: catalogEntry } } --><!-- /ko --><!-- /ko -->
       </a>
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
       <div class="assist-entry assist-field-link default-cursor" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': catalogEntry.getTitle(true) }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isKey() --> <!-- ko component: { name: '${ASSIST_KEY_COMPONENT}', params: { entry: catalogEntry } } --><!-- /ko --><!-- /ko -->
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: { connector: catalogEntry.getConnector(), type: 'sql', column: columnName, table: tableName, database: databaseName } }"></span><!-- ko if: catalogEntry.isKey() --> <!-- ko component: { name: '${ASSIST_KEY_COMPONENT}', params: { entry: catalogEntry } } --><!-- /ko --><!-- /ko -->
       </div>
       <!-- /ko -->
       <div class="center assist-spinner" data-bind="visible: loading"><i class="fa fa-spinner fa-spin"></i></div>
@@ -207,13 +207,13 @@ const ASSIST_TABLE_TEMPLATES = `
       <!-- ko if: expandable -->
       <a class="assist-entry assist-field-link assist-field-link-dark assist-entry-left-action assist-ellipsis" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': catalogEntry.getTitle(true) }">
         <span data-bind="text: catalogEntry.getType()" class="muted pull-right margin-right-20"></span>
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: catalogEntry.name, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: catalogEntry.isKey() --> <!-- ko component: { name: '${ASSIST_KEY_COMPONENT}', params: { entry: catalogEntry } } --><!-- /ko --><!-- /ko -->
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: { 'column': columnName, 'table': tableName, 'database': databaseName }, text: catalogEntry.name, draggableText: { text: editorText, meta: { connector: catalogEntry.getConnector(), type: 'sql', column: columnName, table: tableName, database: databaseName } }"></span><!-- ko if: catalogEntry.isKey() --> <!-- ko component: { name: '${ASSIST_KEY_COMPONENT}', params: { entry: catalogEntry } } --><!-- /ko --><!-- /ko -->
       </a>
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
       <div class="assist-entry assist-field-link assist-field-link-dark default-cursor assist-ellipsis" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': catalogEntry.getTitle(true) }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
         <span data-bind="text: catalogEntry.getType()" class="muted pull-right margin-right-20"></span>
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.name, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isKey() --> <!-- ko component: { name: '${ASSIST_KEY_COMPONENT}', params: { entry: catalogEntry } } --><!-- /ko --><!-- /ko -->
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.name, draggableText: { text: editorText, meta: { connector: catalogEntry.getConnector(), type: 'sql', column: columnName, table: tableName, database: databaseName } }"></span><!-- ko if: catalogEntry.isKey() --> <!-- ko component: { name: '${ASSIST_KEY_COMPONENT}', params: { entry: catalogEntry } } --><!-- /ko --><!-- /ko -->
       </div>
       <!-- /ko -->
       <div class="center assist-spinner" data-bind="visible: loading"><i class="fa fa-spinner fa-spin"></i></div>
@@ -282,7 +282,7 @@ const TEMPLATE =
   <script type="text/html" id="assist-database-entry">
     <li class="assist-table" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { selector: '.database-actions' }">
       <!-- ko template: { name: 'assist-database-actions' } --><!-- /ko -->
-      <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedDatabase($data); $parent.selectedDatabaseChanged(); }, attr: {'title': catalogEntry.getTitle(true) }, draggableText: { text: editorText,  meta: {'type': 'sql', 'database': databaseName} }"><i class="fa fa-fw fa-database muted valign-middle"></i> <span class="highlightable" data-bind="text: catalogEntry.name, css: { 'highlight': highlight() }"></span></a>
+      <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedDatabase($data); $parent.selectedDatabaseChanged(); }, attr: {'title': catalogEntry.getTitle(true) }, draggableText: { text: editorText,  meta: { connector: catalogEntry.getConnector(), type: 'sql', database: databaseName } }"><i class="fa fa-fw fa-database muted valign-middle"></i> <span class="highlightable" data-bind="text: catalogEntry.name, css: { 'highlight': highlight() }"></span></a>
     </li>
   </script>
 

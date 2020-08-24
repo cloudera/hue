@@ -67,9 +67,9 @@ class EditorDroppableMenu extends DisposableComponent {
       const meta = this.meta();
       if (meta && meta.database && meta.table) {
         return (
-          sqlUtils.backTickIfNeeded(meta.type, meta.database) +
+          sqlUtils.backTickIfNeeded(meta.connector, meta.database) +
           '.' +
-          sqlUtils.backTickIfNeeded(meta.type, meta.table)
+          sqlUtils.backTickIfNeeded(meta.connector, meta.table)
         );
       }
       return '';
