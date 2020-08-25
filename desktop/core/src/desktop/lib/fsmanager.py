@@ -42,13 +42,17 @@ SUPPORTED_FS = ['hdfs', 's3a', 'adl', 'abfs', 'gs']
 CLIENT_CACHE = None
 _DEFAULT_USER = DEFAULT_USER.get()
 
+
 # FIXME: Should we check hue principal for the default user?
-def _get_cache_key(fs, identifier, user=_DEFAULT_USER): # FIXME: Caching via username has issues when users get deleted. Need to switch to userid, but bigger change
+# FIXME: Caching via username has issues when users get deleted. Need to switch to userid, but bigger change
+def _get_cache_key(fs, identifier, user=_DEFAULT_USER):
   return fs + ':' + identifier + ':' + user
+
 
 def clear_cache():
   global CLIENT_CACHE
   CLIENT_CACHE = None
+
 
 def has_access(fs=None, user=None):
   if fs == 'hdfs':
@@ -106,10 +110,12 @@ def _get_client_cached(fs, name, user):
   global CLIENT_CACHE
   if CLIENT_CACHE is None:
     CLIENT_CACHE = {}
-  cache_key = _get_cache_key(fs, name, user) if conf_idbroker.is_idbroker_enabled(fs) else _get_cache_key(fs, name) # We don't want to cache by username when IDBroker not enabled
+  # We don't want to cache by username when IDBroker not enabled
+  cache_key = _get_cache_key(fs, name, user) if conf_idbroker.is_idbroker_enabled(fs) else _get_cache_key(fs, name)
   client = CLIENT_CACHE.get(cache_key)
 
-  if client and (client.expiration is None or client.expiration > int(current_ms_from_utc())): # expiration from IDBroker returns java timestamp in MS
+  # Expiration from IDBroker returns java timestamp in MS
+  if client and (client.expiration is None or client.expiration > int(current_ms_from_utc())):
     return client
   else:
     client = _make_client(fs, name, user)
