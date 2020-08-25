@@ -29,12 +29,12 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
-%if not is_embeddable:
+% if not is_embeddable:
 ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
-%endif
+% endif
 
 <link rel="stylesheet" href="${ static('indexer/css/importer.css') }" type="text/css">
 
@@ -80,11 +80,11 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
   </div>
 </div>
 
-%if not is_embeddable:
+% if not is_embeddable:
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
   <i class="fa fa-chevron-right"></i>
 </a>
-%endif
+% endif
 
 <div class="main-content">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
