@@ -41,11 +41,11 @@ LOG = logging.getLogger(__name__)
 
 class MorphlineIndexer(object):
 
-  def __init__(self, username, fs=None, jt=None, solr_client=None):
+  def __init__(self, user, fs=None, jt=None, solr_client=None):
     self.fs = fs
     self.jt = jt
-    self.username = username
-    self.user = User.objects.get(username=username) # To clean
+    self.user = user
+    self.username = user.username
     self.solr_client = solr_client if solr_client is not None else SolrClient(self.user)
 
   def _upload_workspace(self, morphline):
