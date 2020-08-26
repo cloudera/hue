@@ -849,9 +849,10 @@ export default {
    * @param {Connector} options.connector
    * @param {string|string[]} options.path
    * @param {Object} [options.definition] - Optional initial definition
+   * @param {boolean} [options.cachedOnly] - Default: false
    * @param {boolean} [options.temporaryOnly] - Default: false
    *
-   * @return {Promise}
+   * @return {JQuery.Promise<DataCatalogEntry>}
    */
   getEntry: function (options) {
     return getCatalog(options.connector).getEntry(options);
@@ -882,6 +883,7 @@ export default {
    * @param {Object} [options.definition] - Optional initial definition of the parent entry
    * @param {boolean} [options.silenceErrors]
    * @param {boolean} [options.cachedOnly]
+   * @param {boolean} [options.temporaryOnly]
    * @param {boolean} [options.refreshCache]
    * @param {boolean} [options.cancellable] - Default false
    *

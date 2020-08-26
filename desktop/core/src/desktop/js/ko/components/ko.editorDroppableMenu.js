@@ -63,16 +63,18 @@ class EditorDroppableMenu extends DisposableComponent {
 
     this.meta = ko.observable();
 
-    this.identifier = ko.pureComputed(() => {
-      const meta = this.meta();
+    this.identifier = ko.observable('');
+
+    this.meta.subscribe(async meta => {
       if (meta && meta.database && meta.table) {
-        return (
-          sqlUtils.backTickIfNeeded(meta.connector, meta.database) +
-          '.' +
-          sqlUtils.backTickIfNeeded(meta.connector, meta.table)
+        this.identifier(
+          (await sqlUtils.backTickIfNeeded(meta.connector, meta.database)) +
+            '.' +
+            (await sqlUtils.backTickIfNeeded(meta.connector, meta.table))
         );
+      } else {
+        this.identifier('');
       }
-      return '';
     });
 
     super.subscribe(DRAGGABLE_TEXT_META_EVENT, this.meta);

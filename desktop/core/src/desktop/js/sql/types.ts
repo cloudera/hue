@@ -14,7 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export interface GenericApiResponse {
-  status: number;
-  message?: string;
+export interface Suggestion {
+  value: string;
+  filterValue?: string;
+  filterWeight?: number;
+  details?: {
+    comment?: string;
+  };
+  matchComment?: boolean;
+  matchIndex?: number;
+  matchLength?: number;
+  category: {
+    weight: number;
+  };
+  weightAdjust?: number;
+  partitionKey?: boolean;
 }

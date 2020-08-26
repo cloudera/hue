@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export interface GenericApiResponse {
-  status: number;
-  message?: string;
+export interface CatalogEntry {
+  getType: () => string;
 }
