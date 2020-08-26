@@ -1076,7 +1076,7 @@ class AceLocationHandler {
 
           self
             .fetchPossibleValues(token)
-            .done(possibleValues => {
+            .done(async possibleValues => {
               // Tokens might change while making api calls
               if (!token.parseLocation) {
                 self.verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
@@ -1095,7 +1095,7 @@ class AceLocationHandler {
               const uniqueIndex = {};
               const uniqueValues = [];
               for (let i = 0; i < possibleValues.length; i++) {
-                possibleValues[i].name = sqlUtils.backTickIfNeeded(
+                possibleValues[i].name = await sqlUtils.backTickIfNeeded(
                   self.snippet.connector(),
                   possibleValues[i].name
                 );

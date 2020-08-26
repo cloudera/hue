@@ -32,6 +32,18 @@ export const CLEAR_UDF_CACHE_EVENT = 'hue.clear.udf.cache';
 export const DESCRIBE_UDF_EVENT = 'hue.describe.udf';
 export const UDF_DESCRIBED_EVENT = 'hue.udf.described';
 
+const GENERIC = 'generic';
+
+const KEYWORD_REFS: { [attr: string]: () => Promise<{ RESERVED_WORDS?: Set<string> }> } = {
+  calcite: async () => import(/* webpackChunkName: "calcite-ref" */ './calcite/reservedKeywords'),
+  generic: async () => import(/* webpackChunkName: "generic-ref" */ './generic/reservedKeywords'),
+  hive: async () => import(/* webpackChunkName: "impala-ref" */ './hive/reservedKeywords'),
+  impala: async () => import(/* webpackChunkName: "hive-ref" */ './impala/reservedKeywords'),
+  postgresql: async () =>
+    import(/* webpackChunkName: "generic-ref" */ './postgresql/reservedKeywords'),
+  presto: async () => import(/* webpackChunkName: "generic-ref" */ './presto/reservedKeywords')
+};
+
 const SET_REFS: { [attr: string]: () => Promise<{ SET_OPTIONS?: SetOptions }> } = {
   impala: async () => import(/* webpackChunkName: "impala-ref" */ './impala/setReference')
 };
@@ -233,6 +245,15 @@ export const getSetOptions = async (connector: Connector): Promise<SetOptions> =
     }
   }
   return {};
+};
+
+export const isReserved = async (connector: Connector, word: string): Promise<boolean> => {
+  const module = await KEYWORD_REFS[connector.dialect || GENERIC]();
+  if (module.RESERVED_WORDS) {
+    return module.RESERVED_WORDS.has(word.toUpperCase());
+  }
+
+  return false;
 };
 
 const findUdfInCategories = (

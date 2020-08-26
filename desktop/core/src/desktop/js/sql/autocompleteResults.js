@@ -839,7 +839,7 @@ class AutocompleteResults {
           databaseSuggestions.push({
             value:
               prefix +
-              sqlUtils.backTickIfNeeded(this.snippet.connector(), dbEntry.name) +
+              (await sqlUtils.backTickIfNeeded(this.snippet.connector(), dbEntry.name)) +
               (suggestDatabases.appendDot ? '.' : ''),
             filterValue: dbEntry.name,
             meta: META_I18n.database,
@@ -906,7 +906,8 @@ class AutocompleteResults {
             continue;
           }
           tableSuggestions.push({
-            value: prefix + sqlUtils.backTickIfNeeded(this.snippet.connector(), tableEntry.name),
+            value:
+              prefix + (await sqlUtils.backTickIfNeeded(this.snippet.connector(), tableEntry.name)),
             filterValue: tableEntry.name,
             tableName: tableEntry.name,
             meta: META_I18n[tableEntry.getType().toLowerCase()],
@@ -1024,7 +1025,7 @@ class AutocompleteResults {
         typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
       if (typeof column.alias !== 'undefined') {
         columnSuggestions.push({
-          value: sqlUtils.backTickIfNeeded(this.snippet.connector(), column.alias),
+          value: await sqlUtils.backTickIfNeeded(this.snippet.connector(), column.alias),
           filterValue: column.alias,
           meta: type,
           category: CATEGORIES.COLUMN,
@@ -1038,7 +1039,7 @@ class AutocompleteResults {
         typeof column.identifierChain[column.identifierChain.length - 1].name !== 'undefined'
       ) {
         columnSuggestions.push({
-          value: sqlUtils.backTickIfNeeded(
+          value: await sqlUtils.backTickIfNeeded(
             this.snippet.connector(),
             column.identifierChain[column.identifierChain.length - 1].name
           ),
@@ -1068,7 +1069,7 @@ class AutocompleteResults {
             typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
           if (column.alias) {
             columnSuggestions.push({
-              value: sqlUtils.backTickIfNeeded(connector, column.alias),
+              value: await sqlUtils.backTickIfNeeded(connector, column.alias),
               filterValue: column.alias,
               meta: type,
               category: CATEGORIES.COLUMN,
@@ -1078,7 +1079,7 @@ class AutocompleteResults {
             });
           } else if (column.identifierChain && column.identifierChain.length > 0) {
             columnSuggestions.push({
-              value: sqlUtils.backTickIfNeeded(
+              value: await sqlUtils.backTickIfNeeded(
                 connector,
                 column.identifierChain[column.identifierChain.length - 1].name
               ),
@@ -1144,7 +1145,7 @@ class AutocompleteResults {
         });
 
         for (const childEntry of childEntries) {
-          let name = sqlUtils.backTickIfNeeded(this.snippet.connector(), childEntry.name);
+          let name = await sqlUtils.backTickIfNeeded(this.snippet.connector(), childEntry.name);
           if (this.dialect() === DIALECT.hive && (childEntry.isArray() || childEntry.isMap())) {
             name += '[]';
           }

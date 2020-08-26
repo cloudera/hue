@@ -16,7 +16,7 @@
 
 import $ from 'jquery';
 
-import CancellablePromise from '/api/cancellablePromise';
+import CancellablePromise from 'api/cancellablePromise';
 
 export default class BaseStrategy {
   constructor(connector) {

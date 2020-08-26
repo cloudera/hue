@@ -59,26 +59,32 @@ class AsteriskData {
           delete colIndex[name];
         }
       });
-      huePubSub.publish('ace.replace', {
-        location: data.location,
-        text: $.map(colsToExpand, column => {
+
+      Promise.all(
+        colsToExpand.map(async column => {
           if (column.tableAlias) {
             return (
-              sqlUtils.backTickIfNeeded(connector, column.tableAlias) +
+              (await sqlUtils.backTickIfNeeded(connector, column.tableAlias)) +
               '.' +
-              sqlUtils.backTickIfNeeded(connector, column.name)
+              (await sqlUtils.backTickIfNeeded(connector, column.name))
             );
           }
           if (colIndex[column.name]) {
             return (
-              sqlUtils.backTickIfNeeded(connector, column.table) +
+              (await sqlUtils.backTickIfNeeded(connector, column.table)) +
               '.' +
-              sqlUtils.backTickIfNeeded(connector, column.name)
+              (await sqlUtils.backTickIfNeeded(connector, column.name))
             );
           }
-          return sqlUtils.backTickIfNeeded(connector, column.name);
-        }).join(', ')
+          return await sqlUtils.backTickIfNeeded(connector, column.name);
+        })
+      ).then(backtickedCols => {
+        huePubSub.publish('ace.replace', {
+          location: data.location,
+          text: backtickedCols.join(', ')
+        });
       });
+
       huePubSub.publish('context.popover.hide');
     };
 
