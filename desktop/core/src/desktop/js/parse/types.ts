@@ -14,7 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export interface GenericApiResponse {
-  status: number;
-  message?: string;
+export interface IdentifierChainEntry {
+  name: string;
+}
+
+export interface ParsedTable {
+  identifierChain: IdentifierChainEntry[];
+  subQuery?: unknown; // TODO: Define
+}
+
+export interface ParsedLocation {
+  first_line: number;
+  first_column: number;
+  last_line: number;
+  last_column: number;
 }

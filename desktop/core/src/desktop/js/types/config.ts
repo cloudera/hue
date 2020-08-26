@@ -16,6 +16,20 @@
 
 import { GenericApiResponse } from 'types/types';
 
+export interface Compute {
+  id: string;
+  name: string;
+  type: string;
+  namespace?: string;
+}
+
+export interface Namespace {
+  id: string;
+  name: string;
+  status: string;
+  computes: Compute[];
+}
+
 export interface Cluster {
   credentials: Record<string, unknown>;
   id: string;
@@ -82,7 +96,11 @@ export interface IdentifiableInterpreter extends Interpreter {
 }
 
 /* eslint-disable @typescript-eslint/no-empty-interface */
-export interface Connector extends IdentifiableInterpreter {}
+export interface Connector extends IdentifiableInterpreter {
+  dialect_properties?: {
+    sql_identifier_quote?: string;
+  };
+}
 
 export interface EditorInterpreter extends IdentifiableInterpreter {
   dialect_properties: Record<string, unknown> | null;

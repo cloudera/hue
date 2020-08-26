@@ -1637,44 +1637,54 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
           var statementCols = [];
           var temporaryColumns = [];
+
+          var deferreds = []; // TODO: Move to async/await when in webpack
+
           sampleCols.forEach(function (sampleCol) {
-            statementCols.push(sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, sampleCol.name()));
-            var col = {
-              name: sampleCol.name(),
-              type: sampleCol.type()
-            };
-            temporaryColumns.push(col);
-            var colNameSub = sampleCol.name.subscribe(function () {
-              refreshTemporaryTable(self.sampleCols())
-            });
-            var colTypeSub = sampleCol.type.subscribe(function () {
-              refreshTemporaryTable(self.sampleCols())
+            var deferred = $.Deferred();
+            deferreds.push(deferred);
+            sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, sampleCol.name()).then(function (value) {
+              statementCols.push(value);
+              var col = {
+                name: sampleCol.name(),
+                type: sampleCol.type()
+              };
+              temporaryColumns.push(col);
+              var colNameSub = sampleCol.name.subscribe(function () {
+                refreshTemporaryTable(self.sampleCols())
+              });
+              var colTypeSub = sampleCol.type.subscribe(function () {
+                refreshTemporaryTable(self.sampleCols())
+              });
+              sampleColSubDisposals.push(function () {
+                colNameSub.dispose();
+                colTypeSub.dispose();
+              })
+              deferred.resolve();
+            }).catch(deferred.reject);
+          });
+
+          $.when.apply($, deferreds).done(function () {
+            var statement = 'SELECT ';
+            statement += statementCols.join(',\n    ');
+            statement += '\n FROM ' + sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, tableName) + ';';
+            if (!wizard.destination.fieldEditorValue() || wizard.destination.fieldEditorValue() === lastStatement) {
+              wizard.destination.fieldEditorValue(statement);
+            }
+            lastStatement = statement;
+            wizard.destination.fieldEditorPlaceHolder('${ _('Example: SELECT') }' + ' * FROM ' + sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, tableName));
+
+            var handle = dataCatalog.addTemporaryTable({
+              namespace: self.namespace(),
+              compute: self.compute(),
+              connector: { id: self.sourceType }, // TODO: Migrate importer to connectors
+              name: tableName,
+              columns: temporaryColumns,
+              sample: self.sample()
             });
             sampleColSubDisposals.push(function () {
-              colNameSub.dispose();
-              colTypeSub.dispose();
+              handle.delete();
             })
-          });
-
-          var statement = 'SELECT ';
-          statement += statementCols.join(',\n    ');
-          statement += '\n FROM ' + sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, tableName) + ';';
-          if (!wizard.destination.fieldEditorValue() || wizard.destination.fieldEditorValue() === lastStatement) {
-            wizard.destination.fieldEditorValue(statement);
-          }
-          lastStatement = statement;
-          wizard.destination.fieldEditorPlaceHolder('${ _('Example: SELECT') }' + ' * FROM ' + sqlUtils.backTickIfNeeded({ id: self.sourceType, dialect: self.sourceType }, tableName));
-
-          var handle = dataCatalog.addTemporaryTable({
-            namespace: self.namespace(),
-            compute: self.compute(),
-            connector: { id: self.sourceType }, // TODO: Migrate importer to connectors
-            name: tableName,
-            columns: temporaryColumns,
-            sample: self.sample()
-          });
-          sampleColSubDisposals.push(function () {
-            handle.delete();
           })
         }, 500)
       };
