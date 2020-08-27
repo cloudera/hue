@@ -14,24 +14,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import sessionManager from 'apps/notebook2/execution/sessionManager';
-import { syncExecutables } from 'apps/notebook2/execution/utils';
+import Executable, { ExecutableRaw } from 'apps/notebook2/execution/executable';
+import { syncSqlExecutables } from 'apps/notebook2/execution/utils';
+import { StatementDetails } from 'parse/types';
+import { Compute, Connector, Namespace } from 'types/config';
 
-// TODO: Remove, debug var
-window.sessionManager = sessionManager;
+export interface ExecutorRaw {
+  executables: ExecutableRaw[];
+}
 
-class Executor {
-  /**
-   * @param options
-   * @param {boolean} [options.isSqlEngine] (default false)
-   * @param {observable<Connector>} options.connector
-   * @param {observable<ContextCompute>} options.compute
-   * @param {observable<ContextNamespace>} options.namespace
-   * @param {string} [options.database]
-   * @param {function} [options.defaultLimit]
-   * @param {boolean} [options.isOptimizerEnabled] - Default false
-   */
-  constructor(options) {
+export default class Executor {
+  connector: () => Connector;
+  compute: () => Compute;
+  namespace: () => Namespace;
+  database: () => string;
+  defaultLimit?: () => number;
+  isSqlEngine?: boolean;
+  isOptimizerEnabled?: boolean;
+  executables: Executable[] = [];
+
+  constructor(options: {
+    connector: () => Connector;
+    compute: () => Compute;
+    namespace: () => Namespace;
+    database: () => string;
+    defaultLimit?: () => number;
+    isSqlEngine?: boolean;
+    isOptimizerEnabled?: boolean;
+    executables: Executable[];
+  }) {
     this.connector = options.connector;
     this.compute = options.compute;
     this.namespace = options.namespace;
@@ -39,27 +50,27 @@ class Executor {
     this.isSqlEngine = options.isSqlEngine;
     this.isOptimizerEnabled = options.isOptimizerEnabled;
     this.executables = [];
-    this.defaultLimit = options.defaultLimit || (() => {});
+    this.defaultLimit = options.defaultLimit;
   }
 
-  toJs() {
+  toJs(): ExecutorRaw {
     return {
       executables: this.executables.map(executable => executable.toJs())
     };
   }
 
-  cancelAll() {
+  cancelAll(): void {
     this.executables.forEach(existingExecutable => existingExecutable.cancelBatchChain());
   }
 
-  setExecutables(executables) {
+  setExecutables(executables: Executable[]): void {
     this.cancelAll();
     this.executables = executables;
     this.executables.forEach(executable => executable.notify());
   }
 
-  update(statementDetails, beforeExecute, snippet) {
-    const executables = syncExecutables(this, statementDetails, snippet);
+  update(statementDetails: StatementDetails, beforeExecute: boolean): Executable {
+    const executables = syncSqlExecutables(this, statementDetails);
 
     // Cancel any "lost" executables and any batch chain it's part of
     executables.lost.forEach(lostExecutable => {
@@ -71,7 +82,7 @@ class Executor {
     if (beforeExecute) {
       executables.selected.forEach(executable => executable.cancelBatchChain());
 
-      let previous = undefined;
+      let previous: Executable | undefined;
       executables.selected.forEach(executable => {
         if (previous) {
           executable.previousExecutable = previous;
@@ -89,5 +100,3 @@ class Executor {
     return executables.selected[0];
   }
 }
-
-export default Executor;
