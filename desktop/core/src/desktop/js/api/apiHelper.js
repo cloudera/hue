@@ -25,7 +25,7 @@ import {
   successResponseIsError
 } from './apiUtils';
 import apiQueueManager from 'api/apiQueueManager';
-import CancellablePromise from 'api/cancellablePromise';
+import CancellableJqPromise from 'api/cancellableJqPromise';
 import hueDebug from 'utils/hueDebug';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
@@ -1032,7 +1032,7 @@ class ApiHelper {
    * @param {boolean} [options.silenceErrors]
    * @param {boolean} [options.fetchContents]
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchDocument(options) {
     const deferred = $.Deferred();
@@ -1060,7 +1060,7 @@ class ApiHelper {
         errorCallback: deferred.reject
       })
     );
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   /**
@@ -1312,7 +1312,7 @@ class ApiHelper {
         .done(deferred.resolve)
         .fail(deferred.reject);
 
-      return new CancellablePromise(deferred, request);
+      return new CancellableJqPromise(deferred, request);
     }
 
     return deferred.resolve().promise();
@@ -1327,7 +1327,7 @@ class ApiHelper {
    *
    * @param {string[]} [options.path] - The path to fetch
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchSourceMetadata(options) {
     const deferred = $.Deferred();
@@ -1379,7 +1379,7 @@ class ApiHelper {
         })
       );
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   updateSourceMetadata(options) {
@@ -1431,7 +1431,7 @@ class ApiHelper {
    * @param {string} options.sourceType
    * @param {string[]} options.path
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchAnalysis(options) {
     const deferred = $.Deferred();
@@ -1469,7 +1469,7 @@ class ApiHelper {
       errorCallback: deferred.reject
     });
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   /**
@@ -1481,7 +1481,7 @@ class ApiHelper {
    * @param {string[]} options.path
    * @param {ContextCompute} options.compute
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchPartitions(options) {
     const deferred = $.Deferred();
@@ -1525,7 +1525,7 @@ class ApiHelper {
         }
       });
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   /**
@@ -1538,7 +1538,7 @@ class ApiHelper {
    * @param {ContextCompute} options.compute
    * @param {string[]} options.path
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   refreshAnalysis(options) {
     if (options.path.length === 1) {
@@ -1593,7 +1593,7 @@ class ApiHelper {
       })
     );
 
-    return new CancellablePromise(deferred, undefined, promises);
+    return new CancellableJqPromise(deferred, undefined, promises);
   }
 
   /**
@@ -1605,7 +1605,7 @@ class ApiHelper {
    * @param {Object} options.snippetJson
    * @param {boolean} [options.silenceErrors]
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   whenAvailable(options) {
     const deferred = $.Deferred();
@@ -1645,11 +1645,11 @@ class ApiHelper {
         })
         .fail(deferred.reject);
 
-      cancellablePromises.push(new CancellablePromise(request, request));
+      cancellablePromises.push(new CancellableJqPromise(request, request));
     };
 
     waitForAvailable();
-    return new CancellablePromise(deferred, undefined, cancellablePromises);
+    return new CancellableJqPromise(deferred, undefined, cancellablePromises);
   }
 
   clearNotebookHistory(options) {
@@ -1667,43 +1667,6 @@ class ApiHelper {
       editorMode: options.editorMode
     };
     return simplePost('/notebook/api/notebook/close', data);
-  }
-
-  /**
-   * Creates a new session
-   *
-   * @param {Object} options
-   * @param {String} options.type
-   * @param {Array<SessionProperty>} [options.properties] - Default []
-   * @return {Promise<Session>}
-   */
-  async createSession(options) {
-    return new Promise((resolve, reject) => {
-      const data = {
-        session: JSON.stringify({ type: options.type, properties: options.properties || [] })
-      };
-      $.post({
-        url: '/notebook/api/create_session',
-        data: data
-      })
-        .done(data => {
-          if (data.status === 401) {
-            resolve({ auth: true, message: data.message });
-          } else if (successResponseIsError(data)) {
-            reject(assistErrorCallback(options)(data));
-          } else {
-            resolve(data.session);
-          }
-        })
-        .fail(assistErrorCallback(options));
-    });
-  }
-
-  closeSession(options) {
-    const data = {
-      session: JSON.stringify(options.session)
-    };
-    return simplePost('/notebook/api/close_session', data, options);
   }
 
   async checkStatus(options) {
@@ -1788,97 +1751,11 @@ class ApiHelper {
   }
 
   /**
-   * @typedef {Object} ExecutionHandle
-   * @property {string} guid
-   * @property {boolean} has_more_statements
-   * @property {boolean} has_result_set
-   * @property {Object} log_context
-   * @property {number} modified_row_count
-   * @property {number} operation_type
-   * @property {string} previous_statement_hash
-   * @property {string} secret
-   * @property {string} session_guid
-   * @property {string} statement
-   * @property {number} statement_id
-   * @property {number} statements_count
-   */
-
-  /**
-   * API function to execute an SqlExecutable
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {SqlExecutable} options.executable
-   * @param {Session} options.session
-   *
-   * @return {Promise<ExecutionHandle>}
-   */
-  async executeStatement(options) {
-    const executable = options.executable;
-    const url = URLS.EXECUTE_API_PREFIX + executable.executor.connector().dialect;
-
-    const promise = new Promise(async (resolve, reject) => {
-      let data = {};
-      if (executable.executor.snippet) {
-        // V1
-        // TODO: Refactor away the snippet, it currently works because snippet.statement is a computed from
-        // the active executable, but we n
-        data = {
-          notebook: await executable.executor.snippet.parentNotebook.toJson(),
-          snippet: executable.executor.snippet.toContextJson()
-        };
-      } else {
-        data = await executable.toContext();
-      }
-
-      data.executable = executable.toJson();
-
-      simplePost(url, data, options)
-        .done(response => {
-          const executeResponse = {};
-          if (response.handle) {
-            executeResponse.handle = response.handle;
-            executeResponse.handle.result = response.result;
-          } else {
-            reject('No handle in execute response');
-            return;
-          }
-          if (response.history_id) {
-            executeResponse.history = {
-              id: response.history_id,
-              uuid: response.history_uuid,
-              parentUuid: response.history_parent_uuid
-            };
-          }
-          resolve(executeResponse);
-        })
-        .fail(reject);
-    });
-
-    executable.addCancellable({
-      cancel: async () => {
-        try {
-          const handle = await promise;
-          if (options.executable.handle !== handle) {
-            options.executable.handle = handle;
-          }
-          await this.cancelStatement(options);
-        } catch (err) {
-          console.warn('Failed cancelling statement');
-          console.warn(err);
-        }
-      }
-    });
-
-    return promise;
-  }
-
-  /**
    *
    * @param {Object} options
    * @param {Snippet} options.snippet
    *
-   * @return {CancellablePromise<string>}
+   * @return {CancellableJqPromise<string>}
    */
   async explainAsync(options) {
     const data = {
@@ -1902,7 +1779,7 @@ class ApiHelper {
    * @param {name} options.name
    * @param {description} options.description
    *
-   * @return {CancellablePromise<string>}
+   * @return {CancellableJqPromise<string>}
    */
   async createGistAsync(options) {
     const data = {
@@ -1921,196 +1798,6 @@ class ApiHelper {
   }
 
   /**
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {Executable} options.executable
-   *
-   * @return {CancellablePromise<string>}
-   */
-  checkExecutionStatus(options) {
-    const deferred = $.Deferred();
-
-    const request = $.post({
-      url: '/notebook/api/check_status',
-      data: {
-        operationId: options.executable.operationId
-      }
-    })
-      .done(response => {
-        if (response && response.query_status) {
-          deferred.resolve(response.query_status);
-        } else if (response && response.status === -3) {
-          deferred.resolve({ status: EXECUTION_STATUS.expired });
-        } else {
-          deferred.resolve({ status: EXECUTION_STATUS.failed, message: response.message });
-        }
-      })
-      .fail(err => {
-        deferred.reject(assistErrorCallback(options)(err));
-      });
-
-    return new CancellablePromise(deferred, request);
-  }
-
-  /**
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {Executable} options.executable
-   * @param {number} [options.from]
-   * @param {Object[]} [options.jobs]
-   * @param {string} options.fullLog
-   *
-   * @return {Promise<?>}
-   */
-  fetchLogs(options) {
-    return new Promise(async (resolve, reject) => {
-      const data = await options.executable.toContext();
-      data.full_log = options.fullLog;
-      data.jobs = options.jobs && JSON.stringify(options.jobs);
-      data.from = options.from || 0;
-      data.operationId = options.executable.operationId;
-      const request = simplePost('/notebook/api/get_logs', data, options)
-        .done(response => {
-          resolve({
-            logs: (response.status === 1 && response.message) || response.logs || '',
-            jobs: response.jobs || [],
-            isFullLogs: response.isFullLogs
-          });
-        })
-        .fail(reject);
-
-      options.executable.addCancellable({
-        cancel: () => {
-          cancelActiveRequest(request);
-        }
-      });
-    });
-  }
-
-  /**
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {SqlExecutable} options.executable
-   *
-   * @return {Promise}
-   */
-  async cancelStatement(options) {
-    return new Promise(async (resolve, reject) => {
-      simplePost('/notebook/api/cancel_statement', await options.executable.toContext(), options)
-        .done(resolve)
-        .fail(reject);
-    });
-  }
-
-  /**
-   * @typedef {Object} ResultResponseMeta
-   * @property {string} comment
-   * @property {string} name
-   * @property {string} type
-   */
-
-  /**
-   * @typedef {Object} ResultResponse
-   * @property {Object[]} data
-   * @property {boolean} has_more
-   * @property {boolean} isEscaped
-   * @property {ResultResponseMeta[]} meta
-   * @property {string} type
-   */
-
-  /**
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {SqlExecutable} options.executable
-   * @param {number} options.rows
-   * @param {boolean} options.startOver
-   *
-   * @return {Promise<ResultResponse>}
-   */
-  async fetchResults(options) {
-    return new Promise(async (resolve, reject) => {
-      const data = await options.executable.toContext();
-      data.rows = options.rows;
-      data.startOver = !!options.startOver;
-
-      const request = simplePost(
-        '/notebook/api/fetch_result_data',
-        data,
-        {
-          silenceErrors: options.silenceErrors,
-          dataType: 'text'
-        },
-        options
-      )
-        .done(response => {
-          const data = JSON.bigdataParse(response);
-          resolve(data.result);
-        })
-        .fail(reject);
-
-      options.executable.addCancellable({
-        cancel: () => {
-          cancelActiveRequest(request);
-        }
-      });
-    });
-  }
-
-  /**
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {Executable} options.executable
-   *
-   * @return {Promise<ResultResponse>}
-   */
-  async fetchResultSize2(options) {
-    return new Promise(async (resolve, reject) => {
-      const request = simplePost(
-        '/notebook/api/fetch_result_size',
-        await options.executable.toContext(),
-        options
-      )
-        .done(response => {
-          resolve(response.result);
-        })
-        .fail(reject);
-
-      options.executable.addCancellable({
-        cancel: () => {
-          cancelActiveRequest(request);
-        }
-      });
-    });
-  }
-
-  /**
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {SqlExecutable} options.executable
-   *
-   * @return {Promise}
-   */
-  async closeStatement(options) {
-    return new Promise(async (resolve, reject) => {
-      simplePost(
-        '/notebook/api/close_statement',
-        {
-          operationId: options.executable.operationId
-        },
-        options
-      )
-        .done(resolve)
-        .fail(reject);
-    });
-  }
-
-  /**
    * Fetches samples for the given source and path
    *
    * @param {Object} options
@@ -2122,7 +1809,7 @@ class ApiHelper {
    * @param {string[]} options.path
    * @param {string} [options.operation] - Default 'default'
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchSample(options) {
     const deferred = $.Deferred();
@@ -2234,7 +1921,7 @@ class ApiHelper {
       cancel: cancelQuery
     });
 
-    return new CancellablePromise(deferred, undefined, cancellablePromises);
+    return new CancellableJqPromise(deferred, undefined, cancellablePromises);
   }
 
   /**
@@ -2246,7 +1933,7 @@ class ApiHelper {
    * @param {boolean} [options.isView] - Default false
    * @param {string[]} options.path
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchNavigatorMetadata(options) {
     const deferred = $.Deferred();
@@ -2270,7 +1957,7 @@ class ApiHelper {
         '&name=' +
         options.path[2];
     } else {
-      return new CancellablePromise($.Deferred().reject());
+      return new CancellableJqPromise($.Deferred().reject());
     }
 
     const request = simplePost(
@@ -2292,7 +1979,7 @@ class ApiHelper {
       }
     );
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   /**
@@ -2328,7 +2015,7 @@ class ApiHelper {
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchAllNavigatorTags(options) {
     const deferred = $.Deferred();
@@ -2345,7 +2032,7 @@ class ApiHelper {
       errorCallback: deferred.reject
     });
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   addNavTags(entityId, tags) {
@@ -2367,7 +2054,7 @@ class ApiHelper {
    * @param {boolean} [options.silenceErrors]
    * @param {ContextCompute} options.compute
    * @param {string} options.queryId
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchQueryExecutionAnalysis(options) {
     //var url = '/metadata/api/workload_analytics/get_impala_query/';
@@ -2378,7 +2065,7 @@ class ApiHelper {
 
     const cancellablePromises = [];
 
-    const promise = new CancellablePromise(deferred, undefined, cancellablePromises);
+    const promise = new CancellableJqPromise(deferred, undefined, cancellablePromises);
 
     const pollForAnalysis = () => {
       if (tries === 10) {
@@ -2442,7 +2129,7 @@ class ApiHelper {
       }
     );
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   fetchQueryExecutionStatistics(options) {
@@ -2468,7 +2155,7 @@ class ApiHelper {
       }
     );
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   /**
@@ -2533,7 +2220,7 @@ class ApiHelper {
         }
       })
       .fail(deferred.reject);
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   fetchNavEntitiesInteractive(options) {
@@ -2552,7 +2239,7 @@ class ApiHelper {
         }
       })
       .fail(deferred.reject);
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   searchEntities(options) {
@@ -2573,7 +2260,7 @@ class ApiHelper {
       }
     );
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   /**
@@ -2597,7 +2284,7 @@ class ApiHelper {
       }
     );
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   /**
@@ -2627,7 +2314,7 @@ class ApiHelper {
       }
     );
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 }
 

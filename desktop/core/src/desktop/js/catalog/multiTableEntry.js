@@ -29,7 +29,7 @@ import { DataCatalog } from './dataCatalog';
  * @param {string} promiseAttribute
  * @param {string} dataAttribute
  * @param {Function} apiHelperFunction
- * @return {CancellablePromise}
+ * @return {CancellableJqPromise}
  */
 const genericOptimizerReload = function (
   multiTableEntry,
@@ -60,7 +60,7 @@ const genericOptimizerReload = function (
  * @param {string} promiseAttribute
  * @param {string} dataAttribute
  * @param {Function} apiHelperFunction
- * @return {CancellablePromise}
+ * @return {CancellableJqPromise}
  */
 const genericOptimizerGet = function (
   multiTableEntry,
@@ -155,13 +155,13 @@ class MultiTableEntry {
    * Helper function that ensure that cancellable promises are not tracked anymore when cancelled
    *
    * @param {string} promiseName - The attribute name to use
-   * @param {CancellablePromise} cancellablePromise
+   * @param {CancellableJqPromise} cancellableJqPromise
    */
-  trackedPromise(promiseName, cancellablePromise) {
+  trackedPromise(promiseName, cancellableJqPromise) {
     const self = this;
-    self[promiseName] = cancellablePromise;
-    return cancellablePromise.fail(() => {
-      if (cancellablePromise.cancelled) {
+    self[promiseName] = cancellableJqPromise;
+    return cancellableJqPromise.fail(() => {
+      if (cancellableJqPromise.cancelled) {
         delete self[promiseName];
       }
     });
@@ -194,7 +194,7 @@ class MultiTableEntry {
    * @param {boolean} [options.refreshCache] - Default false
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   getTopAggs(options) {
     const optimizer = getOptimizer(this.dataCatalog.connector);
@@ -216,7 +216,7 @@ class MultiTableEntry {
    * @param {boolean} [options.refreshCache] - Default false
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   getTopColumns(options) {
     const optimizer = getOptimizer(this.dataCatalog.connector);
@@ -238,7 +238,7 @@ class MultiTableEntry {
    * @param {boolean} [options.refreshCache] - Default false
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   getTopFilters(options) {
     const optimizer = getOptimizer(this.dataCatalog.connector);
@@ -260,7 +260,7 @@ class MultiTableEntry {
    * @param {boolean} [options.refreshCache] - Default false
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   getTopJoins(options) {
     const optimizer = getOptimizer(this.dataCatalog.connector);

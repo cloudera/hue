@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ParsedSqlStatement } from './sqlStatementsParser';
+
 export interface IdentifierChainEntry {
   name: string;
 }
@@ -29,3 +31,16 @@ export interface ParsedLocation {
   last_line: number;
   last_column: number;
 }
+
+export interface StatementDetails {
+  selectedStatements: ParsedSqlStatement[];
+  precedingStatements: ParsedSqlStatement[];
+  activeStatement: ParsedSqlStatement;
+  followingStatements: ParsedSqlStatement[];
+}
+
+export interface SqlStatementsParser {
+  parse(text: string): ParsedSqlStatement;
+}
+
+declare const sqlStatementsParser: SqlStatementsParser;

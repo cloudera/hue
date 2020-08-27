@@ -14,23 +14,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import Executable from 'apps/notebook2/execution/executable';
+import Executor from 'apps/notebook2/execution/executor';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
+import { StatementDetails } from 'parse/types';
 
-/**
- * @param executor
- * @param statementDetails
- * @param [Snippet] snippet - Optional Snippet for history
- * @return {{all: [], edited: [], lost: [], selected: []}}
- */
-export const syncExecutables = (executor, statementDetails, snippet) => {
+export interface SyncSqlExecutablesResult {
+  all: SqlExecutable[];
+  edited: SqlExecutable[];
+  lost: SqlExecutable[];
+  selected: SqlExecutable[];
+}
+
+export const syncSqlExecutables = (
+  executor: Executor,
+  statementDetails: StatementDetails
+): SyncSqlExecutablesResult => {
   const allNewStatements = statementDetails.precedingStatements.concat(
     statementDetails.activeStatement,
     statementDetails.followingStatements
   );
 
-  const existingExecutables = executor.executables.concat();
+  const existingExecutables: (Executable | undefined)[] = executor.executables.concat();
 
-  const result = {
+  const result: SyncSqlExecutablesResult = {
     all: [],
     edited: [],
     lost: [],
@@ -47,7 +54,7 @@ export const syncExecutables = (executor, statementDetails, snippet) => {
       }
     }
 
-    let executable = existingExecutables[index];
+    let executable = existingExecutables[index] as SqlExecutable;
     if (executable) {
       const edited =
         executable.database !== activeDatabase ||
@@ -62,8 +69,7 @@ export const syncExecutables = (executor, statementDetails, snippet) => {
       executable = new SqlExecutable({
         parsedStatement: parsedStatement,
         database: activeDatabase,
-        executor: executor,
-        snippet: snippet
+        executor: executor
       });
     }
     result.all.push(executable);
@@ -77,7 +83,9 @@ export const syncExecutables = (executor, statementDetails, snippet) => {
     }
   });
 
-  result.lost = existingExecutables.filter(executable => typeof executable !== 'undefined');
+  result.lost = existingExecutables.filter(
+    executable => typeof executable !== 'undefined'
+  ) as SqlExecutable[];
 
   return result;
 };
