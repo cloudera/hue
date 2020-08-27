@@ -17,7 +17,7 @@
 import DataCatalogEntry from 'catalog/dataCatalogEntry';
 import $ from 'jquery';
 
-import CancellablePromise from 'api/cancellablePromise';
+import CancellableJqPromise from 'api/cancellableJqPromise';
 import dataCatalog from 'catalog/dataCatalog';
 import { IdentifierChainEntry, ParsedLocation, ParsedTable } from 'parse/types';
 import { isReserved } from 'sql/reference/sqlReferenceRepository';
@@ -125,10 +125,10 @@ export const resolveCatalogEntry = (options: {
   cancellable?: boolean;
   identifierChain?: IdentifierChainEntry[];
   tables?: ParsedTable[];
-}): CancellablePromise<DataCatalogEntry> => {
-  const cancellablePromises: CancellablePromise<unknown>[] = [];
+}): CancellableJqPromise<DataCatalogEntry> => {
+  const cancellablePromises: CancellableJqPromise<unknown>[] = [];
   const deferred = $.Deferred();
-  const promise = new CancellablePromise(deferred, undefined, cancellablePromises);
+  const promise = new CancellableJqPromise(deferred, undefined, cancellablePromises);
   dataCatalog.applyCancellable(promise, { cancellable: !!options.cancellable });
 
   if (!options.identifierChain) {

@@ -14,30 +14,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import apiHelper from 'api/apiHelper';
+import { ExecutionJob, fetchLogs } from 'apps/notebook2/execution/apiUtils';
 import huePubSub from 'utils/huePubSub';
-import { EXECUTION_STATUS } from './executable';
+import Executable, { EXECUTION_STATUS } from './executable';
 
 export const LOGS_UPDATED_EVENT = 'hue.executable.logs.updated';
 
+export interface ExecutionLogsRaw {
+  jobs: ExecutionJob[];
+  errors: string[];
+}
+
 export default class ExecutionLogs {
-  /**
-   *
-   * @param {Executable} executable
-   */
-  constructor(executable) {
+  executable: Executable;
+  fullLog = '';
+  logLines = 0;
+  jobs: ExecutionJob[] = [];
+  errors: string[] = [];
+
+  constructor(executable: Executable) {
     this.executable = executable;
-    this.fullLog = '';
-    this.logLines = 0;
-    this.jobs = [];
-    this.errors = [];
   }
 
-  notify() {
+  notify(): void {
     huePubSub.publish(LOGS_UPDATED_EVENT, this);
   }
 
-  reset() {
+  reset(): void {
     this.fullLog = '';
     this.logLines = 0;
     this.jobs = [];
@@ -45,8 +48,12 @@ export default class ExecutionLogs {
     this.notify();
   }
 
-  async fetchLogs(finalFetch) {
-    const logDetails = await apiHelper.fetchLogs(this);
+  async fetchLogs(finalFetch?: boolean): Promise<void> {
+    const logDetails = await fetchLogs({
+      executable: this.executable,
+      fullLog: this.fullLog,
+      jobs: this.jobs
+    });
 
     if (logDetails.logs.indexOf('Unable to locate') === -1 || logDetails.isFullLogs) {
       this.fullLog = logDetails.logs;
@@ -87,7 +94,7 @@ export default class ExecutionLogs {
     }
   }
 
-  toJs() {
+  toJs(): ExecutionLogsRaw {
     return {
       jobs: this.jobs,
       errors: this.errors

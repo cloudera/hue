@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import localforage from 'localforage';
 
-import CancellablePromise from 'api/cancellablePromise';
+import CancellableJqPromise from 'api/cancellableJqPromise';
 import catalogUtils from 'catalog/catalogUtils';
 import DataCatalogEntry from 'catalog/dataCatalogEntry';
 import GeneralDataCatalog from 'catalog/generalDataCatalog';
@@ -276,7 +276,7 @@ export class DataCatalog {
    * @param {boolean} [options.silenceErrors] - Default true
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   loadOptimizerPopularityForTables(options) {
     const deferred = $.Deferred();
@@ -404,7 +404,7 @@ export class DataCatalog {
     });
 
     return catalogUtils.applyCancellable(
-      new CancellablePromise(deferred, cancellablePromises),
+      new CancellableJqPromise(deferred, cancellablePromises),
       options
     );
   }
@@ -887,7 +887,7 @@ export default {
    * @param {boolean} [options.refreshCache]
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   getChildren: function (options) {
     const deferred = $.Deferred();
@@ -900,7 +900,7 @@ export default {
         );
       })
       .fail(deferred.reject);
-    return new CancellablePromise(deferred, undefined, cancellablePromises);
+    return new CancellableJqPromise(deferred, undefined, cancellablePromises);
   },
 
   /**

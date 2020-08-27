@@ -40,6 +40,15 @@ export const TOPO_URL = '/desktop/topo/';
 export const SEARCH_API = '/desktop/api/search/entities';
 export const INTERACTIVE_SEARCH_API = '/desktop/api/search/entities_interactive';
 
+export const CREATE_SESSION_API = '/notebook/api/create_session';
+export const CLOSE_SESSION_API = '/notebook/api/close_session';
+export const FETCH_RESULT_SIZE_API = '/notebook/api/fetch_result_size';
+export const FETCH_RESULT_DATA_API = '/notebook/api/fetch_result_data';
+export const GET_LOGS_API = '/notebook/api/get_logs';
+export const CANCEL_STATEMENT_API = '/notebook/api/cancel_statement';
+export const CLOSE_STATEMENT_API = '/notebook/api/close_statement';
+export const CHECK_STATUS_API = '/notebook/api/check_status';
+
 export const HBASE_API_PREFIX = '/hbase/api/';
 export const SAVE_TO_FILE_API = '/filebrowser/save';
 

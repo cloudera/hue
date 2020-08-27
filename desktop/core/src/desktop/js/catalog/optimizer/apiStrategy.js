@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import CancellablePromise from 'api/cancellablePromise';
+import CancellableJqPromise from 'api/cancellableJqPromise';
 import { simplePost } from 'api/apiUtils';
 import { OPTIMIZER_API } from 'api/urls';
 import BaseStrategy from './baseStrategy';
@@ -27,7 +27,7 @@ import BaseStrategy from './baseStrategy';
  *
  * @param {OptimizerOptions} options
  * @param {string} url
- * @return {CancellablePromise}
+ * @return {CancellableJqPromise}
  */
 const genericOptimizerMultiTableFetch = (options, url) => {
   const deferred = $.Deferred();
@@ -49,7 +49,7 @@ const genericOptimizerMultiTableFetch = (options, url) => {
     errorCallback: deferred.reject
   });
 
-  return new CancellablePromise(deferred, request);
+  return new CancellableJqPromise(deferred, request);
 };
 
 export default class ApiStrategy extends BaseStrategy {
@@ -106,7 +106,7 @@ export default class ApiStrategy extends BaseStrategy {
       errorCallback: deferred.reject
     });
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 
   fetchTopAggs(options) {
@@ -148,6 +148,6 @@ export default class ApiStrategy extends BaseStrategy {
       }
     );
 
-    return new CancellablePromise(deferred, request);
+    return new CancellableJqPromise(deferred, request);
   }
 }

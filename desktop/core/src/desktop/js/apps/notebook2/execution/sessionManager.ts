@@ -14,48 +14,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import apiHelper from 'api/apiHelper';
+import {
+  AuthRequest,
+  closeSession,
+  createSession,
+  Session,
+  SessionProperty
+} from 'apps/notebook2/execution/apiUtils';
 import huePubSub from 'utils/huePubSub';
 
 class SessionManager {
-  constructor() {
-    this.knownSessionPromises = {};
-  }
-  /**
-   * @typedef SessionProperty
-   * @property {Array<*>} [defaultValue]
-   * @property {String} [help_text]
-   * @property {String} key
-   * @property {Boolean} [multiple]
-   * @property {String} [nice_name]
-   * @property {Array<*>} [options]
-   * @property {String} [type]
-   * @property {Array<*>} value
-   */
-
-  /**
-   * @typedef Session
-   * @property {Object.<string, string>} configuration
-   * @property {string} http_addr
-   * @property {number} id
-   * @property {Array<SessionProperty>} properties
-   * @property {boolean} reuse_session
-   * @property {string} session_id
-   * @property {string} type
-   */
+  knownSessionPromises: { [key: string]: Promise<Session> } = {};
 
   /**
    * Gets an existing session or creates a new one if there is no session.
-   *
-   * @param {Object} options
-   * @param {String} options.type
-   * @param {Array<SessionProperty>} [options.properties] - Default []
-   *
-   * @return {Promise<Session>}
    */
-  async getSession(options) {
+  async getSession(options: { type: string; properties?: SessionProperty[] }): Promise<Session> {
     if (!this.knownSessionPromises[options.type]) {
       this.knownSessionPromises[options.type] = this.createDetachedSession(options);
+
       // Sessions that fail
       this.knownSessionPromises[options.type].catch(() => {
         delete this.knownSessionPromises[options.type];
@@ -74,60 +51,61 @@ class SessionManager {
    *
    * @return {Promise<Session>}
    */
-  async createDetachedSession(options) {
-    return new Promise((resolve, reject) => {
+  async createDetachedSession(options: {
+    type: string;
+    properties?: SessionProperty[];
+    preventAuthModal?: boolean;
+  }): Promise<Session> {
+    return new Promise(async (resolve, reject) => {
       const sessionToCreate = {
         type: options.type,
         properties: options.properties || []
       };
-      apiHelper
-        .createSession(sessionToCreate)
-        .then(resolve)
-        .catch(reason => {
-          if (reason && reason.auth) {
-            // The auth modal will resolve or reject
-            if (!options.preventAuthModal) {
-              huePubSub.publish('show.session.auth.modal', {
-                message: reason.message,
-                session: sessionToCreate,
-                resolve: resolve,
-                reject: reject
-              });
-            }
-          } else {
-            reject(reason);
-          }
-        });
+
+      const sessionOrAuth = await createSession(sessionToCreate);
+      if ('auth' in sessionOrAuth && sessionOrAuth.auth) {
+        const auth = sessionOrAuth as AuthRequest;
+        if (!options.preventAuthModal) {
+          huePubSub.publish('show.session.auth.modal', {
+            message: auth.message,
+            session: sessionToCreate,
+            resolve: resolve,
+            reject: reject
+          });
+        } else {
+          reject(auth);
+        }
+      } else {
+        resolve(sessionOrAuth as Session);
+      }
     });
   }
 
-  updateSession(options) {
-    this.knownSessionPromises[options.type] = new Promise((resolve, reject) => {
-      resolve(options);
-    });
+  updateSession(session: Session) {
+    this.knownSessionPromises[session.type] = Promise.resolve(session);
   }
 
-  async getAllSessions() {
+  async getAllSessions(): Promise<Session[]> {
     const promises = Object.keys(this.knownSessionPromises).map(
       key => this.knownSessionPromises[key]
     );
     return Promise.all(promises);
   }
 
-  async restartSession(session) {
+  async restartSession(session: Session): Promise<Session> {
     await this.closeSession(session);
-    return this.getSession({ type: session.type, properties: session.properties });
+    return this.getSession(session);
   }
 
-  hasSession(type) {
+  hasSession(type: string): boolean {
     return !!this.knownSessionPromises[type];
   }
 
-  async closeSession(session) {
+  async closeSession(session: Session): Promise<void> {
     if (this.hasSession(session.type)) {
       delete this.knownSessionPromises[session.type];
     }
-    await apiHelper.closeSession({ session: session, silenceErrors: true });
+    await closeSession({ session: session, silenceErrors: true });
   }
 }
 

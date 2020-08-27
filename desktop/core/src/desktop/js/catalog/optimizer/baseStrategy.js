@@ -16,7 +16,7 @@
 
 import $ from 'jquery';
 
-import CancellablePromise from 'api/cancellablePromise';
+import CancellableJqPromise from 'api/cancellableJqPromise';
 
 export default class BaseStrategy {
   constructor(connector) {
@@ -48,50 +48,50 @@ export default class BaseStrategy {
    * Fetches optimizer popularity for the children of the given path
    *
    * @param {OptimizerOptions} options
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchPopularity(options) {
-    return new CancellablePromise($.Deferred().reject());
+    return new CancellableJqPromise($.Deferred().reject());
   }
 
   /**
    * Fetches the popular aggregate functions for the given tables
    *
    * @param {OptimizerOptions} options
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchTopAggs(options) {
-    return new CancellablePromise($.Deferred().reject());
+    return new CancellableJqPromise($.Deferred().reject());
   }
 
   /**
    * Fetches the popular columns for the given tables
    *
    * @param {OptimizerOptions} options
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchTopColumns(options) {
-    return new CancellablePromise($.Deferred().reject());
+    return new CancellableJqPromise($.Deferred().reject());
   }
 
   /**
    * Fetches the popular filters for the given tables
    *
    * @param {OptimizerOptions} options
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchTopFilters(options) {
-    return new CancellablePromise($.Deferred().reject());
+    return new CancellableJqPromise($.Deferred().reject());
   }
 
   /**
    * Fetches the popular joins for the given tables
    *
    * @param {OptimizerOptions} options
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchTopJoins(options) {
-    return new CancellablePromise($.Deferred().reject());
+    return new CancellableJqPromise($.Deferred().reject());
   }
 
   /**
@@ -101,9 +101,9 @@ export default class BaseStrategy {
    * @param {boolean} [options.silenceErrors]
    * @param {string[]} options.path
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   fetchOptimizerMeta(options) {
-    return new CancellablePromise($.Deferred().reject());
+    return new CancellableJqPromise($.Deferred().reject());
   }
 }

@@ -14,33 +14,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import apiHelper from 'api/apiHelper';
-import Executable from 'apps/notebook2/execution/executable';
+import { ExecuteApiResponse, executeStatement } from 'apps/notebook2/execution/apiUtils';
+import Executable, { ExecutableRaw } from 'apps/notebook2/execution/executable';
+import Executor from 'apps/notebook2/execution/executor';
+import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
 
 const BATCHABLE_STATEMENT_TYPES = /ALTER|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i;
 
 const SELECT_END_REGEX = /([^;]*)([;]?[^;]*)/;
+const ERROR_REGEX = /line ([0-9]+)(:([0-9]+))?/i;
+
+export interface SqlExecutableRaw extends ExecutableRaw {
+  database: string;
+  parsedStatement: ParsedSqlStatement;
+}
 
 export default class SqlExecutable extends Executable {
-  /**
-   * @param options
-   * @param {Executor} options.executor
-   *
-   * @param {string} options.database
-   * @param {SqlStatementsParserResult} options.parsedStatement
-   */
-  constructor(options) {
+  database: string;
+  parsedStatement: ParsedSqlStatement;
+
+  constructor(options: {
+    executor: Executor;
+    database: string;
+    parsedStatement: ParsedSqlStatement;
+  }) {
     super(options);
     this.database = options.database;
     this.parsedStatement = options.parsedStatement;
   }
 
-  getStatement() {
-    let statement = this.statement || this.parsedStatement.statement;
+  getStatement(): string {
+    let statement = this.parsedStatement.statement;
     if (
-      this.parsedStatement &&
       this.parsedStatement.firstToken &&
       this.parsedStatement.firstToken.toLowerCase() === 'select' &&
+      this.executor.defaultLimit &&
       !isNaN(this.executor.defaultLimit()) &&
       this.executor.defaultLimit() > 0 &&
       !/\slimit\s[0-9]/i.test(statement)
@@ -53,25 +61,26 @@ export default class SqlExecutable extends Executable {
         }
       }
     }
+
     return statement;
   }
 
-  async internalExecute() {
-    return await apiHelper.executeStatement({
+  async internalExecute(): Promise<ExecuteApiResponse> {
+    return await executeStatement({
       executable: this,
       silenceErrors: true
     });
   }
 
-  getKey() {
+  getKey(): string {
     return this.database + '_' + this.parsedStatement.statement;
   }
 
-  canExecuteInBatch() {
+  canExecuteInBatch(): boolean {
     return this.parsedStatement && BATCHABLE_STATEMENT_TYPES.test(this.parsedStatement.firstToken);
   }
 
-  static fromJs(executor, executableRaw) {
+  static fromJs(executor: Executor, executableRaw: SqlExecutableRaw): SqlExecutable {
     const executable = new SqlExecutable({
       database: executableRaw.database,
       executor: executor,
@@ -92,21 +101,40 @@ export default class SqlExecutable extends Executable {
     return executable;
   }
 
-  toJs() {
-    const executableJs = super.toJs();
+  toJs(): SqlExecutableRaw {
+    const executableJs = (super.toJs() as unknown) as SqlExecutableRaw;
     executableJs.database = this.database;
     executableJs.parsedStatement = this.parsedStatement;
     executableJs.type = 'sqlExecutable';
     return executableJs;
   }
 
-  // TODO: Use this for execute instead of snippet
-  toJson() {
+  toJson(): string {
     return JSON.stringify({
-      id: this.id,
       statement: this.getStatement(),
       database: this.database
-      // session:
     });
+  }
+
+  adaptError(err: string): string {
+    const match = ERROR_REGEX.exec(err);
+    if (match) {
+      const errorLine = parseInt(match[1]) + this.parsedStatement.location.first_line - 1;
+      let errorCol = match[3] && parseInt(match[3]);
+      if (errorCol && errorLine === 1) {
+        errorCol += this.parsedStatement.location.first_column;
+      }
+
+      const adjustedErr = err.replace(
+        match[0],
+        'line ' + errorLine + (errorCol !== null ? ':' + errorCol : '')
+      );
+
+      this.logs.errors.push(adjustedErr);
+      this.logs.notify();
+
+      return adjustedErr;
+    }
+    return err;
   }
 }
