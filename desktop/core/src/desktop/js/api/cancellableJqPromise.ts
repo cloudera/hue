@@ -14,10 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Cancellable } from 'api/cancellablePromise';
 import $ from 'jquery';
 import { cancelActiveRequest } from './apiUtils';
 
-export default class CancellableJqPromise<T> {
+export default class CancellableJqPromise<T> implements Cancellable {
   cancelCallbacks: (() => void)[] = [];
   deferred: JQuery.Deferred<T>;
   request?: JQuery.jqXHR;
