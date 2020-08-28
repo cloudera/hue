@@ -55,6 +55,7 @@ import {
   ASSIST_SET_SOURCE_EVENT
 } from 'ko/components/assist/events';
 import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
+import { VariableSubstitutionHandler } from './variableSubstitution';
 
 // TODO: Remove for ENABLE_NOTEBOOK_2. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
@@ -439,249 +440,20 @@ export default class Snippet {
         }
       }, 100);
     });
-    if (snippetRaw.variables) {
-      snippetRaw.variables.forEach(variable => {
-        variable.meta = (typeof variable.defaultValue === 'object' && variable.defaultValue) || {
-          type: 'text',
-          placeholder: ''
-        };
-        variable.value = variable.value || '';
-        variable.type = variable.type || 'text';
-        variable.sample = [];
-        variable.sampleUser = variable.sampleUser || [];
-        variable.path = variable.path || '';
-        variable.step = '';
-        delete variable.defaultValue;
-      });
-    }
-    this.variables = komapping.fromJS(snippetRaw.variables || []);
-    this.variables.subscribe(() => {
+
+    this.variableSubstitutionHandler = new VariableSubstitutionHandler(
+      this.connector,
+      this.statement_raw,
+      snippetRaw.variables
+    );
+
+    this.variableSubstitutionHandler.variables.subscribe(() => {
       $(document).trigger('updateResultHeaders', this);
     });
-    this.hasCurlyBracketParameters = ko.pureComputed(() => this.dialect() !== DIALECT.pig);
 
-    this.variableNames = ko.pureComputed(() => {
-      let match,
-        matches = {},
-        matchList;
-      if (this.dialect() === DIALECT.pig) {
-        matches = this.getPigParameters();
-      } else {
-        const re = /(?:^|\W)\${(\w*)=?([^{}]*)}/g;
-        const reComment = /(^\s*--.*)|(\/\*[\s\S]*?\*\/)/gm;
-        const reList = /(?!\s*$)\s*(?:(?:([^,|()\\]*)\(\s*([^,|()\\]*)\)(?:\\[\S\s][^,|()\\]*)?)|([^,|\\]*(?:\\[\S\s][^,|\\]*)*))\s*(?:,|\||$)/g;
-        const statement = this.statement_raw();
-        let matchComment = reComment.exec(statement);
-        // if re is n & reComment is m
-        // finding variables is O(n+m)
-        while ((match = re.exec(statement))) {
-          while (matchComment && match.index > matchComment.index + matchComment[0].length) {
-            // Comments before our match
-            matchComment = reComment.exec(statement);
-          }
-          const isWithinComment = matchComment && match.index >= matchComment.index;
-          if (isWithinComment) {
-            continue;
-          }
-
-          // If 1 match, text value
-          // If multiple matches, list value
-          const value = { type: 'text', placeholder: '' };
-          while ((matchList = reList.exec(match[2]))) {
-            const option = {
-              text: matchList[2] || matchList[3],
-              value: matchList[3] || matchList[1]
-            };
-            option.text = option.text && option.text.trim();
-            option.value =
-              option.value &&
-              option.value.trim().replace(',', ',').replace('(', '(').replace(')', ')');
-
-            if (value.placeholder || matchList[2]) {
-              if (!value.options) {
-                value.options = [];
-                value.type = 'select';
-              }
-              value.options.push(option);
-            }
-            if (!value.placeholder) {
-              value.placeholder = option.value;
-            }
-          }
-          const isPlaceholderInOptions =
-            !value.options || value.options.some(current => current.value === value.placeholder);
-          if (!isPlaceholderInOptions) {
-            value.options.unshift({ text: value.placeholder, value: value.placeholder });
-          }
-          matches[match[1]] = matches[match[1]] || value;
-        }
-      }
-      return $.map(matches, (match, key) => {
-        const isMatchObject = typeof matches[key] === 'object';
-        const meta = isMatchObject ? matches[key] : { type: 'text', placeholder: matches[key] };
-        return { name: key, meta: meta };
-      });
-    });
-    this.variableValues = {};
-    this.variableNames.extend({ rateLimit: 150 });
-    this.variableNames.subscribe(newVal => {
-      const variablesLength = this.variables().length;
-      const diffLengthVariables = variablesLength - newVal.length;
-      const needsMore = diffLengthVariables < 0;
-      const needsLess = diffLengthVariables > 0;
-      this.variableValues = this.variables().reduce((variableValues, variable) => {
-        if (!variableValues[variable.name()]) {
-          variableValues[variable.name()] = { sampleUser: [] };
-        }
-        variableValues[variable.name()].value = variable.value();
-        variableValues[variable.name()].sampleUser = variable.sampleUser();
-        variableValues[variable.name()].catalogEntry = variable.catalogEntry;
-        variableValues[variable.name()].path = variable.path();
-        variableValues[variable.name()].type = variable.type();
-        return variableValues;
-      }, this.variableValues);
-      if (needsMore) {
-        for (let i = 0, length = Math.abs(diffLengthVariables); i < length; i++) {
-          this.variables.push(
-            komapping.fromJS({
-              name: '',
-              value: '',
-              meta: { type: 'text', placeholder: '', options: [] },
-              sample: [],
-              sampleUser: [],
-              type: 'text',
-              step: '',
-              path: ''
-            })
-          );
-        }
-      } else if (needsLess) {
-        this.variables.splice(this.variables().length - diffLengthVariables, diffLengthVariables);
-      }
-      newVal.forEach((item, index) => {
-        const variable = this.variables()[index];
-        variable.name(item.name);
-        window.setTimeout(() => {
-          variable.value(
-            this.variableValues[item.name]
-              ? this.variableValues[item.name].value
-              : (!needsMore && variable.value()) || ''
-          );
-        }, 0);
-        variable.meta = komapping.fromJS(item.meta, {}, variable.meta);
-        variable.sample(
-          variable.meta.options
-            ? variable.meta.options().concat(variable.sampleUser())
-            : variable.sampleUser()
-        );
-        variable.sampleUser(
-          this.variableValues[item.name] ? this.variableValues[item.name].sampleUser : []
-        );
-        variable.type(
-          this.variableValues[item.name] ? this.variableValues[item.name].type || 'text' : 'text'
-        );
-        variable.path(
-          this.variableValues[item.name] ? this.variableValues[item.name].path || '' : ''
-        );
-        variable.catalogEntry =
-          this.variableValues[item.name] && this.variableValues[item.name].catalogEntry;
-      });
-    });
-
-    const activeSourcePromises = [];
     huePubSub.subscribe(POST_FROM_LOCATION_WORKER_EVENT, e => {
-      while (activeSourcePromises.length) {
-        const promise = activeSourcePromises.pop();
-        if (promise.cancel) {
-          promise.cancel();
-        }
-      }
-      const oLocations = e.data.locations
-        .filter(location => {
-          return location.type === 'variable' && location.colRef;
-        })
-        .reduce((variables, location) => {
-          const re = /\${(\w*)=?([^{}]*)}/g;
-          const name = re.exec(location.value)[1];
-          variables[name] = location;
-          return variables;
-        }, {});
-      const updateVariableType = (variable, sourceMeta) => {
-        let type;
-        if (sourceMeta && sourceMeta.type) {
-          type = sourceMeta.type.toLowerCase();
-        } else {
-          type = 'string';
-        }
-        const variablesValues = {};
-        const value = variable.value();
-        switch (type) {
-          case 'timestamp':
-            variablesValues.type = 'datetime-local';
-            variablesValues.step = '1';
-            variablesValues.value =
-              (value && moment.utc(value).format('YYYY-MM-DD HH:mm:ss.S')) ||
-              moment(Date.now()).format('YYYY-MM-DD 00:00:00.0');
-            break;
-          case 'decimal':
-          case 'double':
-          case 'float':
-            variablesValues.type = 'number';
-            variablesValues.step = 'any';
-            break;
-          case 'int':
-          case 'smallint':
-          case 'tinyint':
-          case 'bigint':
-            variablesValues.type = 'number';
-            variablesValues.step = '1';
-            break;
-          case 'date':
-            variablesValues.type = 'date';
-            variablesValues.step = '';
-            variablesValues.value =
-              (value && moment.utc(value).format('YYYY-MM-DD')) ||
-              moment(Date.now()).format('YYYY-MM-DD');
-            break;
-          case 'boolean':
-            variablesValues.type = 'checkbox';
-            variablesValues.step = '';
-            break;
-          default:
-            variablesValues.type = 'text';
-            variablesValues.step = '';
-        }
-        if (variablesValues.value) {
-          setTimeout(() => {
-            variable.value(variablesValues.value);
-          }, 0);
-        }
-        variable.type(variablesValues.type);
-        variable.step(variablesValues.step);
-      };
-      this.variables().forEach(variable => {
-        if (oLocations[variable.name()]) {
-          activeSourcePromises.push(
-            oLocations[variable.name()].resolveCatalogEntry({ cancellable: true }).done(entry => {
-              variable.path(entry.path.join('.'));
-              variable.catalogEntry = entry;
-
-              activeSourcePromises.push(
-                entry
-                  .getSourceMeta({
-                    silenceErrors: true,
-                    cancellable: true
-                  })
-                  .then(updateVariableType.bind(this, variable))
-              );
-            })
-          );
-        } else {
-          updateVariableType(variable, {
-            type: 'text'
-          });
-        }
-      });
+      this.variableSubstitutionHandler.cancelRunningRequests();
+      this.variableSubstitutionHandler.updateFromLocations(e.data.locations);
     });
 
     this.statement = ko.pureComputed(() => {
@@ -696,41 +468,6 @@ export default class Snippet {
         }
       }
 
-      const variables = this.variables().reduce((variables, variable) => {
-        variables[variable.name()] = variable;
-        return variables;
-      }, {});
-      if (this.variables().length) {
-        const variablesString = this.variables()
-          .map(variable => {
-            return variable.name();
-          })
-          .join('|');
-        statement = statement.replace(
-          RegExp(
-            '([^\\\\])?\\$' +
-              (this.hasCurlyBracketParameters() ? '{(' : '(') +
-              variablesString +
-              ')(=[^}]*)?' +
-              (this.hasCurlyBracketParameters() ? '}' : ''),
-            'g'
-          ),
-          (match, p1, p2) => {
-            const variable = variables[p2];
-            const pad =
-              variable.type() === 'datetime-local' && variable.value().length === 16 ? ':00' : ''; // Chrome drops the seconds from the timestamp when it's at 0 second.
-            const value = variable.value();
-            const isValuePresent = //If value is string there is a need to check whether it is empty
-              typeof value === 'string' ? value : value !== undefined && value !== null;
-            return (
-              p1 +
-              (isValuePresent
-                ? value + pad
-                : variable.meta.placeholder && variable.meta.placeholder())
-            );
-          }
-        );
-      }
       return statement;
     });
 
@@ -871,7 +608,8 @@ export default class Snippet {
       defaultLimit: this.defaultLimit,
       isOptimizerEnabled: this.parentVm.isOptimizerEnabled(),
       snippet: this,
-      isSqlEngine: this.isSqlDialect
+      isSqlEngine: this.isSqlDialect,
+      variableSubstitionHandler: this.variableSubstitutionHandler
     });
 
     if (snippetRaw.executor) {
@@ -1149,67 +887,6 @@ export default class Snippet {
           this.handleAjaxError(data);
         }
       });
-  }
-
-  getPigParameters() {
-    const params = {};
-    const variables = this.statement_raw().match(/([^\\]|^)\$[^\d'"](\w*)/g);
-    const declares = this.statement_raw().match(/%declare +([^ ])+/gi);
-    const defaults = this.statement_raw().match(/%default +([^;])+/gi);
-    const macro_defines = this.statement_raw().match(/define [^ ]+ *\(([^)]*)\)/gi); // no multiline
-    const macro_returns = this.statement_raw().match(/returns +([^{]*)/gi); // no multiline
-
-    if (variables) {
-      variables.forEach(param => {
-        const p = param.substring(param.indexOf('$') + 1);
-        params[p] = '';
-      });
-    }
-    if (declares) {
-      declares.forEach(param => {
-        param = param.match(/(\w+)/g);
-        if (param && param.length >= 2) {
-          delete params[param[1]];
-        }
-      });
-    }
-    if (defaults) {
-      defaults.forEach(param => {
-        const line = param.match(/(\w+)/g);
-        if (line && line.length >= 2) {
-          const name = line[1];
-          params[name] = param.substring(param.indexOf(name) + name.length + 1);
-        }
-      });
-    }
-    if (macro_defines) {
-      macro_defines.forEach(params_line => {
-        const param_line = params_line.match(/(\w+)/g);
-        if (param_line && param_line.length > 2) {
-          param_line.forEach((param, index) => {
-            if (index >= 2) {
-              // Skips define NAME
-              delete params[param];
-            }
-          });
-        }
-      });
-    }
-    if (macro_returns) {
-      macro_returns.forEach(params_line => {
-        const param_line = params_line.match(/(\w+)/g);
-        if (param_line) {
-          param_line.forEach((param, index) => {
-            if (index >= 1) {
-              // Skip returns
-              delete params[param];
-            }
-          });
-        }
-      });
-    }
-
-    return params;
   }
 
   getPlaceHolder() {
@@ -1500,20 +1177,7 @@ export default class Snippet {
       statementType: this.statementType(),
       status: this.status(),
       type: this.dialect(), // TODO: Drop once connectors are stable
-      variables: this.variables().map(variable => ({
-        meta: variable.meta && {
-          options: variable.meta.options && variable.meta.options(), // TODO: Map?
-          placeHolder: variable.meta.placeHolder && variable.meta.placeHolder(),
-          type: variable.meta.type && variable.meta.type()
-        },
-        name: variable.name(),
-        path: variable.path(),
-        sample: variable.sample(),
-        sampleUser: variable.sampleUser(),
-        step: variable.step(),
-        type: variable.type(),
-        value: variable.value()
-      })),
+      variables: this.variableSubstitutionHandler.variables().map(variable => variable.toJs()),
       wasBatchExecuted: this.wasBatchExecuted()
     };
   }

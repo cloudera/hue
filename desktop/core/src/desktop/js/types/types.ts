@@ -18,3 +18,12 @@ export interface GenericApiResponse {
   status: number;
   message?: string;
 }
+
+declare global {
+  export interface Moment {
+    utc: (val: unknown) => Moment;
+    format: (format: string) => string;
+  }
+
+  const moment: Moment & ((val: unknown) => Moment);
+}
