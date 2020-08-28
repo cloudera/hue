@@ -111,6 +111,7 @@ export default class SqlExecutable extends Executable {
 
   toJson(): string {
     return JSON.stringify({
+      id: this.id,
       statement: this.getStatement(),
       database: this.database
     });
