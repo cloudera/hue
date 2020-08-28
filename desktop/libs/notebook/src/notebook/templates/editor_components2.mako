@@ -987,7 +987,7 @@
 
 
   <script type="text/html" id="snippet-variables">
-    <div class="variables">
+    <div class="variables" data-bind="with: variableSubstitutionHandler">
       <ul data-bind="foreach: variables" class="unstyled inline">
         <li>
           <div class="input-prepend margin-top-10">

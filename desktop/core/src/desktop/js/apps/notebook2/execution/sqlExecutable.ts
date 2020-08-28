@@ -62,6 +62,10 @@ export default class SqlExecutable extends Executable {
       }
     }
 
+    if (this.executor.variableSubstitionHandler) {
+      statement = this.executor.variableSubstitionHandler.substitute(statement);
+    }
+
     return statement;
   }
 

@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import CancellableJqPromise from 'api/cancellableJqPromise';
+import DataCatalogEntry from 'catalog/dataCatalogEntry';
 import { ParsedSqlStatement } from './sqlStatementsParser';
 
 export interface IdentifierChainEntry {
@@ -30,6 +32,24 @@ export interface ParsedLocation {
   first_column: number;
   last_line: number;
   last_column: number;
+}
+
+export interface IdentifierLocation {
+  type: string;
+  alias?: string;
+  source?: string;
+  location: ParsedLocation;
+  function?: string;
+  missing?: boolean;
+  value?: string;
+  colRef: boolean;
+  argumentPosition?: number;
+  identifierChain?: IdentifierChainEntry[];
+  expression?: { types: string[]; text: string };
+  parentLocation?: ParsedLocation;
+  resolveCatalogEntry?: (options?: {
+    cancellable?: boolean;
+  }) => CancellableJqPromise<DataCatalogEntry>;
 }
 
 export interface StatementDetails {

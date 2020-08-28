@@ -16,6 +16,7 @@
 
 import Executable, { ExecutableRaw } from 'apps/notebook2/execution/executable';
 import { syncSqlExecutables } from 'apps/notebook2/execution/utils';
+import { VariableSubstitutionHandler } from 'apps/notebook2/variableSubstitution';
 import { StatementDetails } from 'parse/types';
 import { Compute, Connector, Namespace } from 'types/config';
 
@@ -32,6 +33,7 @@ export default class Executor {
   isSqlEngine?: boolean;
   isOptimizerEnabled?: boolean;
   executables: Executable[] = [];
+  variableSubstitionHandler?: VariableSubstitutionHandler;
 
   constructor(options: {
     connector: () => Connector;
@@ -42,6 +44,7 @@ export default class Executor {
     isSqlEngine?: boolean;
     isOptimizerEnabled?: boolean;
     executables: Executable[];
+    variableSubstitionHandler?: VariableSubstitutionHandler;
   }) {
     this.connector = options.connector;
     this.compute = options.compute;
@@ -51,6 +54,7 @@ export default class Executor {
     this.isOptimizerEnabled = options.isOptimizerEnabled;
     this.executables = [];
     this.defaultLimit = options.defaultLimit;
+    this.variableSubstitionHandler = options.variableSubstitionHandler;
   }
 
   toJs(): ExecutorRaw {
