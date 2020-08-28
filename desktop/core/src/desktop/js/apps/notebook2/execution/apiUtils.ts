@@ -100,22 +100,22 @@ export interface ExecutionJob {
 }
 
 export interface ExecutionHandle {
-  end: { row: number; col: number };
-  guid: string;
-  has_more_statements: boolean;
-  has_result_set: boolean;
+  end?: { row: number; col: number };
+  guid?: string;
+  has_more_statements?: boolean;
+  has_result_set?: boolean;
   log_context?: unknown;
   modified_row_count?: number;
-  operation_type: number;
+  operation_type?: number;
   previous_statement_hash?: string;
-  secret: string;
-  session_guid: string;
-  session_id: number;
-  session_type: string;
-  start: { row: number; col: number };
-  statement: string;
+  secret?: string;
+  session_guid?: string;
+  session_id?: number;
+  session_type?: string;
+  start?: { row: number; col: number };
+  statement?: string;
   statement_id: number;
-  statements_count: number;
+  statements_count?: number;
   sync?: boolean;
   result?: ResultApiResponse;
 }

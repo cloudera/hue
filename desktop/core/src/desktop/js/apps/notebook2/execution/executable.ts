@@ -74,23 +74,6 @@ interface hueWindow {
 }
 
 const INITIAL_HANDLE: ExecutionHandle = {
-  end: { col: 0, row: 0 },
-  guid: '',
-  has_more_statements: false,
-  has_result_set: false,
-  log_context: undefined,
-  modified_row_count: 0,
-  operation_type: 0,
-  previous_statement_hash: '',
-  result: undefined,
-  secret: '',
-  session_guid: '',
-  session_id: 0,
-  session_type: '',
-  start: { col: 0, row: 0 },
-  statement: '',
-  statements_count: 0,
-  sync: false,
   statement_id: 0
 };
 
@@ -232,7 +215,11 @@ export default abstract class Executable {
         if (response.history) {
           this.operationId = response.history.uuid;
         }
-        if (response.handle.session_id) {
+        if (
+          response.handle.session_id &&
+          response.handle.session_type &&
+          response.handle.session_guid
+        ) {
           sessionManager.updateSession({
             type: response.handle.session_type,
             id: response.handle.session_id,
