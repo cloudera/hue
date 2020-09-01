@@ -115,6 +115,9 @@ export const adaptApiFunctions = (functions: ApiUdf[]): UdfDetails[] => {
           adaptedUdf.returnTypes = additionalReturnTypes;
         }
       }
+
+      // Make sure the return types are unique
+      adaptedUdf.returnTypes = [...new Set(adaptedUdf.returnTypes)];
     } else {
       adapted[apiUdf.name] = adaptApiUdf(apiUdf);
       udfs.push(adapted[apiUdf.name]);
