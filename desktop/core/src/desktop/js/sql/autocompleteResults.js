@@ -268,7 +268,7 @@ class AutocompleteResults {
 
     this.lastKnownRequests = [];
     this.cancellablePromises = [];
-    this.activeRejectables = [];
+    this.onCancelFunctions = [];
 
     this.loadingKeywords = ko.observable(false);
     this.loadingFunctions = ko.observable(false);
@@ -401,10 +401,9 @@ class AutocompleteResults {
   }
 
   async update(parseResult) {
-    while (this.activeRejectables.length > 0) {
-      this.activeRejectables.pop()();
+    while (this.onCancelFunctions.length > 0) {
+      this.onCancelFunctions.pop()();
     }
-
     this.activeDatabase = parseResult.useDatabase || this.snippet.database();
     this.parseResult = parseResult;
 
@@ -435,8 +434,8 @@ class AutocompleteResults {
     const promises = [];
 
     const trackPromise = promise => {
-      const wrapped = new Promise((resolve, reject) => {
-        this.activeRejectables.push(reject);
+      const wrapped = new Promise(resolve => {
+        this.onCancelFunctions.push(resolve);
         promise
           .then(suggestions => {
             if (suggestions && suggestions.length) {
@@ -444,7 +443,7 @@ class AutocompleteResults {
             }
             resolve();
           })
-          .catch(reject);
+          .catch(resolve);
       });
       promises.push(wrapped);
       return promise;
@@ -477,7 +476,7 @@ class AutocompleteResults {
       trackPromise(this.handlePopularColumns(columnsPromise));
     }
 
-    await Promise.allSettled(promises);
+    await Promise.all(promises);
     huePubSub.publish('hue.ace.autocompleter.done');
   }
 
@@ -547,12 +546,12 @@ class AutocompleteResults {
     );
 
     if (!foundVarRef) {
-      const catalogEntry = await this.fetchFieldForIdentifierChain(
-        this.parseResult.colRef.identifierChain
-      );
       try {
+        const catalogEntry = await this.fetchFieldForIdentifierChain(
+          this.parseResult.colRef.identifierChain
+        );
         const sourceMeta = await new Promise((resolve, reject) => {
-          this.activeRejectables.push(reject);
+          this.onCancelFunctions.push(reject);
           const sourceMetaDeferred = catalogEntry.getSourceMeta({
             silenceErrors: true,
             cancellable: true
@@ -571,7 +570,7 @@ class AutocompleteResults {
   async loadDatabases() {
     try {
       const entry = await new Promise((resolve, reject) => {
-        this.activeRejectables.push(reject);
+        this.onCancelFunctions.push(reject);
         dataCatalog
           .getEntry({
             namespace: this.snippet.namespace(),
@@ -585,7 +584,7 @@ class AutocompleteResults {
       });
 
       return await new Promise((resolve, reject) => {
-        this.activeRejectables.push(reject);
+        this.onCancelFunctions.push(reject);
         const childrenDeferred = entry.getChildren({ silenceErrors: true, cancellable: true });
         this.cancellablePromises.push(childrenDeferred);
         childrenDeferred.done(resolve).fail(reject);
@@ -878,7 +877,7 @@ class AutocompleteResults {
 
       try {
         const dbEntry = await new Promise((resolve, reject) => {
-          this.activeRejectables.push(reject);
+          this.onCancelFunctions.push(reject);
           dataCatalog
             .getEntry({
               namespace: this.snippet.namespace(),
@@ -892,7 +891,7 @@ class AutocompleteResults {
         });
 
         const tableEntries = await new Promise((resolve, reject) => {
-          this.activeRejectables.push(reject);
+          this.onCancelFunctions.push(reject);
           const childrenDeferred = dbEntry.getChildren({ silenceErrors: true, cancellable: true });
           this.cancellablePromises.push(childrenDeferred);
           childrenDeferred.done(resolve).fail(reject);
@@ -1125,7 +1124,7 @@ class AutocompleteResults {
     } else if (typeof table.identifierChain !== 'undefined') {
       const addColumnsFromEntry = async dataCatalogEntry => {
         const sourceMeta = await new Promise((resolve, reject) => {
-          this.activeRejectables.push(reject);
+          this.onCancelFunctions.push(reject);
           const sourceMetaDeferred = dataCatalogEntry.getSourceMeta({
             silenceErrors: true,
             cancellable: true
@@ -1135,7 +1134,7 @@ class AutocompleteResults {
         });
 
         const childEntries = await new Promise((resolve, reject) => {
-          this.activeRejectables.push(reject);
+          this.onCancelFunctions.push(reject);
           const childrenDeferred = dataCatalogEntry.getChildren({
             silenceErrors: true,
             cancellable: true
@@ -1215,10 +1214,12 @@ class AutocompleteResults {
       const suggestcolumns = this.parseResult.suggestColumns;
       const identifierChain =
         (suggestcolumns && suggestcolumns.identifierChain) || table.identifierChain;
-      const entry = await this.fetchFieldForIdentifierChain(identifierChain);
-      if (entry) {
-        await addColumnsFromEntry(entry);
-      }
+      try {
+        const entry = await this.fetchFieldForIdentifierChain(identifierChain);
+        if (entry) {
+          await addColumnsFromEntry(entry);
+        }
+      } catch (err) {}
     }
   }
 
@@ -1473,7 +1474,7 @@ class AutocompleteResults {
     const joinSuggestions = [];
     try {
       const multiTableEntry = await new Promise((resolve, reject) => {
-        this.activeRejectables.push(reject);
+        this.onCancelFunctions.push(reject);
         dataCatalog
           .getMultiTableEntry({
             namespace: this.snippet.namespace(),
@@ -1486,7 +1487,7 @@ class AutocompleteResults {
       });
 
       const topJoins = await new Promise((resolve, reject) => {
-        this.activeRejectables.push(reject);
+        this.onCancelFunctions.push(reject);
         const topJoinsDeferred = multiTableEntry.getTopJoins({
           silenceErrors: true,
           cancellable: true,
@@ -1598,7 +1599,7 @@ class AutocompleteResults {
 
     try {
       const multiTableEntry = await new Promise((resolve, reject) => {
-        this.activeRejectables.push(reject);
+        this.onCancelFunctions.push(reject);
         dataCatalog
           .getMultiTableEntry({
             namespace: this.snippet.namespace(),
@@ -1611,7 +1612,7 @@ class AutocompleteResults {
       });
 
       const topJoins = await new Promise((resolve, reject) => {
-        this.activeRejectables.push(reject);
+        this.onCancelFunctions.push(reject);
         const topJoinsDeferred = multiTableEntry.getTopJoins({
           silenceErrors: true,
           cancellable: true,
@@ -1692,7 +1693,7 @@ class AutocompleteResults {
 
     try {
       const multiTableEntry = await new Promise((resolve, reject) => {
-        this.activeRejectables.push(reject);
+        this.onCancelFunctions.push(reject);
         dataCatalog
           .getMultiTableEntry({
             namespace: this.snippet.namespace(),
@@ -1705,7 +1706,7 @@ class AutocompleteResults {
       });
 
       const topAggs = await new Promise((resolve, reject) => {
-        this.activeRejectables.push(reject);
+        this.onCancelFunctions.push(reject);
         const topAggsDeferred = multiTableEntry.getTopAggs({
           silenceErrors: true,
           cancellable: true,
@@ -1817,7 +1818,7 @@ class AutocompleteResults {
 
     try {
       const entries = await new Promise((resolve, reject) => {
-        this.activeRejectables.push(reject);
+        this.onCancelFunctions.push(reject);
         const popularityDeferred = dataCatalog
           .getCatalog(this.snippet.connector())
           .loadOptimizerPopularityForTables({
@@ -1933,7 +1934,7 @@ class AutocompleteResults {
 
     try {
       const multiTableEntry = await new Promise((resolve, reject) => {
-        this.activeRejectables.push(reject);
+        this.onCancelFunctions.push(reject);
         dataCatalog
           .getMultiTableEntry({
             namespace: this.snippet.namespace(),
@@ -1946,7 +1947,7 @@ class AutocompleteResults {
       });
 
       const topFilters = await new Promise((resolve, reject) => {
-        this.activeRejectables.push(reject);
+        this.onCancelFunctions.push(reject);
         const topFiltersDeferred = multiTableEntry.getTopFilters({
           silenceErrors: true,
           cancellable: true,
@@ -2023,54 +2024,56 @@ class AutocompleteResults {
         ? suggestTables.identifierChain[0].name
         : this.activeDatabase;
 
-    const entry = await new Promise((resolve, reject) => {
-      this.activeRejectables.push(reject);
-      dataCatalog
-        .getEntry({
-          namespace: this.snippet.namespace(),
-          compute: this.snippet.compute(),
-          connector: this.snippet.connector(),
-          path: [db],
-          temporaryOnly: this.temporaryOnly
-        })
-        .done(resolve)
-        .fail(reject);
-    });
-
-    const childEntries = await new Promise((resolve, reject) => {
-      this.activeRejectables.push(reject);
-      const popularityDeferred = entry.loadOptimizerPopularityForChildren({
-        silenceErrors: true,
-        cancellable: true
+    try {
+      const entry = await new Promise((resolve, reject) => {
+        this.onCancelFunctions.push(reject);
+        dataCatalog
+          .getEntry({
+            namespace: this.snippet.namespace(),
+            compute: this.snippet.compute(),
+            connector: this.snippet.connector(),
+            path: [db],
+            temporaryOnly: this.temporaryOnly
+          })
+          .done(resolve)
+          .fail(reject);
       });
-      this.cancellablePromises.push(popularityDeferred);
-      popularityDeferred.done(resolve).fail(reject);
-    });
 
-    let totalPopularity = 0;
-    const popularityIndex = {};
+      const childEntries = await new Promise((resolve, reject) => {
+        this.onCancelFunctions.push(reject);
+        const popularityDeferred = entry.loadOptimizerPopularityForChildren({
+          silenceErrors: true,
+          cancellable: true
+        });
+        this.cancellablePromises.push(popularityDeferred);
+        popularityDeferred.done(resolve).fail(reject);
+      });
 
-    childEntries.forEach(childEntry => {
-      if (childEntry.optimizerPopularity && childEntry.optimizerPopularity.popularity) {
-        popularityIndex[childEntry.name] = true;
-        totalPopularity += childEntry.optimizerPopularity.popularity;
-      }
-    });
+      let totalPopularity = 0;
+      const popularityIndex = {};
 
-    if (totalPopularity > 0 && Object.keys(popularityIndex).length) {
-      const tableSuggestions = await tablesPromise;
-      tableSuggestions.forEach(suggestion => {
-        if (popularityIndex[suggestion.details.name]) {
-          suggestion.relativePopularity = Math.round(
-            (100 * suggestion.details.optimizerPopularity.popularity) / totalPopularity
-          );
-          if (suggestion.relativePopularity >= 5) {
-            suggestion.popular(true);
-          }
-          suggestion.weightAdjust = suggestion.relativePopularity;
+      childEntries.forEach(childEntry => {
+        if (childEntry.optimizerPopularity && childEntry.optimizerPopularity.popularity) {
+          popularityIndex[childEntry.name] = true;
+          totalPopularity += childEntry.optimizerPopularity.popularity;
         }
       });
-    }
+
+      if (totalPopularity > 0 && Object.keys(popularityIndex).length) {
+        const tableSuggestions = await tablesPromise;
+        tableSuggestions.forEach(suggestion => {
+          if (popularityIndex[suggestion.details.name]) {
+            suggestion.relativePopularity = Math.round(
+              (100 * suggestion.details.optimizerPopularity.popularity) / totalPopularity
+            );
+            if (suggestion.relativePopularity >= 5) {
+              suggestion.popular(true);
+            }
+            suggestion.weightAdjust = suggestion.relativePopularity;
+          }
+        });
+      }
+    } catch (err) {}
 
     this.loadingPopularTables(false);
     return [];
@@ -2111,7 +2114,7 @@ class AutocompleteResults {
       });
 
       const popularEntries = await new Promise((resolve, reject) => {
-        this.activeRejectables.push(reject);
+        this.onCancelFunctions.push(reject);
         const popularityDeferred = dataCatalog
           .getCatalog(this.snippet.connector())
           .loadOptimizerPopularityForTables({
@@ -2320,7 +2323,7 @@ class AutocompleteResults {
       }
 
       const catalogEntry = await new Promise((resolve, reject) => {
-        this.activeRejectables.push(reject);
+        this.onCancelFunctions.push(reject);
         dataCatalog
           .getEntry({
             namespace: this.snippet.namespace(),
@@ -2334,7 +2337,7 @@ class AutocompleteResults {
       });
 
       const sourceMeta = await new Promise((resolve, reject) => {
-        this.activeRejectables.push(reject);
+        this.onCancelFunctions.push(reject);
         const sourceMetaDeferred = catalogEntry.getSourceMeta({
           silenceErrors: true,
           cancellable: true
@@ -2372,7 +2375,7 @@ class AutocompleteResults {
     // SELECT col.struct FROM db.tbl -or- SELECT col.struct FROM tbl
     if (path.length > 1 && (this.dialect() === DIALECT.impala || this.dialect() === DIALECT.hive)) {
       const catalogEntry = await new Promise((resolve, reject) => {
-        this.activeRejectables.push(reject);
+        this.onCancelFunctions.push(reject);
         dataCatalog
           .getEntry({
             namespace: this.snippet.namespace(),
@@ -2386,7 +2389,7 @@ class AutocompleteResults {
       });
 
       const databaseEntries = await new Promise((resolve, reject) => {
-        this.activeRejectables.push(reject);
+        this.onCancelFunctions.push(reject);
         const childrenDeferred = catalogEntry.getChildren({
           silenceErrors: true,
           cancellable: true
