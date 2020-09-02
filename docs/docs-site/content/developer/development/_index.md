@@ -938,6 +938,12 @@ To publish gethue to NPM registry, the following command would have to be run. K
 
 ## Building
 
+### Custom Webpack Config
+
+You can make webpack build with custom configuration files by setting HUE_WEBPACK_CONFIG environment variable.
+
+    HUE_WEBPACK_CONFIG="webpack.config.custom.js" make apps
+
 ### Dev Docker
 
 Try basic changes [in 3 minutes](https://gethue.com/quick-start-a-hue-development-environment-in-3-minutes-with-docker/) without compiling Hue locally hence avoiding the setting up of [dependencies](/developer/):
