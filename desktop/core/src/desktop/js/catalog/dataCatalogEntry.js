@@ -816,6 +816,9 @@ class DataCatalogEntry {
     if (self.navigatorMeta && (self.getDialect() === 'hive' || self.getDialect() === 'impala')) {
       return self.navigatorMeta.description || self.navigatorMeta.originalDescription || '';
     }
+    if (self.definition && self.definition.comment) {
+      return self.definition.comment;
+    }
     return (self.sourceMeta && self.sourceMeta.comment) || '';
   }
 
