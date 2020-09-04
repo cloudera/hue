@@ -15,7 +15,7 @@
    limitations under the License.
 -->
 
-# DAS-ui
+# Query UI
 
 You would need node 6.9.0 & yarn to run the UI
 
