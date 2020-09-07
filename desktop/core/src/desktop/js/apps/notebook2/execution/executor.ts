@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import Snippet from 'apps/notebook2/snippet';
 import Executable, { ExecutableRaw } from 'apps/notebook2/execution/executable';
 import { syncSqlExecutables } from 'apps/notebook2/execution/utils';
 import { VariableSubstitutionHandler } from 'apps/notebook2/variableSubstitution';
@@ -34,6 +35,7 @@ export default class Executor {
   isOptimizerEnabled?: boolean;
   executables: Executable[] = [];
   variableSubstitionHandler?: VariableSubstitutionHandler;
+  snippet?: Snippet;
 
   constructor(options: {
     connector: () => Connector;
@@ -42,6 +44,7 @@ export default class Executor {
     database: () => string;
     defaultLimit?: () => number;
     isSqlEngine?: boolean;
+    snippet?: Snippet;
     isOptimizerEnabled?: boolean;
     executables: Executable[];
     variableSubstitionHandler?: VariableSubstitutionHandler;
@@ -54,6 +57,7 @@ export default class Executor {
     this.isOptimizerEnabled = options.isOptimizerEnabled;
     this.executables = [];
     this.defaultLimit = options.defaultLimit;
+    this.snippet = options.snippet;
     this.variableSubstitionHandler = options.variableSubstitionHandler;
   }
 

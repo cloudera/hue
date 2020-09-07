@@ -1135,6 +1135,7 @@ export default class Snippet {
       id: this.id(),
       type: this.dialect(),
       connector: this.connector(),
+      defaultLimit: this.defaultLimit(),
       status: this.status(),
       statementType: this.statementType(),
       statement: this.statement(),
