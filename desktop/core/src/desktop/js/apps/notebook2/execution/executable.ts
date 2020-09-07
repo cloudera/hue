@@ -428,6 +428,14 @@ export default abstract class Executable {
 
   async toContext(id?: string): Promise<ExecutableContext> {
     const session = await sessionManager.getSession({ type: this.executor.connector().id });
+    if (this.executor.snippet) {
+      return {
+        operationId: this.operationId,
+        snippet: this.executor.snippet.toContextJson(),
+        notebook: JSON.stringify(await this.executor.snippet.parentNotebook.toJs())
+      };
+    }
+
     const snippet = {
       type: this.executor.connector().id,
       result: {
