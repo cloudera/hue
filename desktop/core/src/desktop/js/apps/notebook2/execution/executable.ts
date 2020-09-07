@@ -348,6 +348,8 @@ export default abstract class Executable {
 
   abstract getKey(): string;
 
+  abstract getRawStatement(): string;
+
   abstract getStatement(): string;
 
   abstract toJson(): string;
@@ -426,7 +428,6 @@ export default abstract class Executable {
 
   async toContext(id?: string): Promise<ExecutableContext> {
     const session = await sessionManager.getSession({ type: this.executor.connector().id });
-    const statement = this.getStatement();
     const snippet = {
       type: this.executor.connector().id,
       result: {
@@ -435,8 +436,8 @@ export default abstract class Executable {
       executor: this.executor.toJs(),
       status: this.status,
       id: id || UUID(),
-      statement_raw: statement,
-      statement: statement,
+      statement_raw: this.getRawStatement(),
+      statement: this.getStatement(),
       lastExecuted: this.executeStarted,
       variables: [],
       compute: this.executor.compute(),

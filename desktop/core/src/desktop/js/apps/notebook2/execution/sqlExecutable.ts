@@ -43,8 +43,12 @@ export default class SqlExecutable extends Executable {
     this.parsedStatement = options.parsedStatement;
   }
 
+  getRawStatement(): string {
+    return this.parsedStatement.statement;
+  }
+
   getStatement(): string {
-    let statement = this.parsedStatement.statement;
+    let statement = this.getRawStatement();
     if (
       this.parsedStatement.firstToken &&
       this.parsedStatement.firstToken.toLowerCase() === 'select' &&
@@ -116,6 +120,7 @@ export default class SqlExecutable extends Executable {
   toJson(): string {
     return JSON.stringify({
       id: this.id,
+      parsedStatement: this.parsedStatement,
       statement: this.getStatement(),
       database: this.database
     });
