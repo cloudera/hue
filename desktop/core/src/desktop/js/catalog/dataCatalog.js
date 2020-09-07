@@ -395,7 +395,10 @@ export class DataCatalog {
       }
       loadDeferred.always(() => {
         $.when
-          .apply($, cancellablePromises)
+          .apply(
+            $,
+            cancellablePromises.map(cancellable => cancellable.deferred)
+          )
           .done(() => {
             deferred.resolve(popularEntries);
           })
