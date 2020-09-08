@@ -16,7 +16,11 @@
 
 
 ## This is a generated file!
-## run "node tools/sql-docs/docExtractor.js -c hue -f ../impala/docs/ -d impala_sqlref.ditamap,impala.ditamap -o desktop/core/src/desktop/static/desktop/docs/impala/ -m desktop/core/src/desktop/templates/impala_doc_index.mako" to generate
+
+## ==== Impala ====
+## 1. Checkout impala from github next to the hue folder
+## 2. Run "npm install" inside tools/sql-docs
+## 3. Then inside the tools/sql-docs folder run: "node docExtractor.js -c hue -f ../../../impala/docs/ -d impala_langref.ditamap,impala_keydefs.ditamap,impala.ditamap -o ../../desktop/core/src/desktop/static/desktop/docs/impala/ -m ../../desktop/core/src/desktop/templates/sql_doc_index.mako"
 
 
 <%def name="sqlDocIndex()">
