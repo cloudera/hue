@@ -68,6 +68,7 @@ _CNF_HIVESERVER2_USE_SASL = 'hive.metastore.sasl.enabled'
 _CNF_HIVE_SUPPORT_CONCURRENCY = 'hive.support.concurrency'
 _CNF_HIVE_HOOK_PROTO_BASE_DIR = 'hive.hook.proto.base-directory'
 _CNF_HIVE_EXECUTION_MODE = 'hive.execution.mode'
+_CNF_HIVE_EXECUTION_ENGINE = 'hive.execution.engine'
 
 
 # Host is whatever up to the colon. Allow and ignore a trailing slash.
@@ -151,7 +152,10 @@ def hiveserver2_impersonation_enabled():
 
 def hiveserver2_jdbc_url():
   is_transport_mode_http = hiveserver2_transport_mode() == 'HTTP'
-  urlbase = 'jdbc:hive2://%s:%s/default' % (beeswax.conf.HIVE_SERVER_HOST.get(), beeswax.conf.HIVE_HTTP_THRIFT_PORT.get() if is_transport_mode_http else beeswax.conf.HIVE_SERVER_PORT.get())
+  urlbase = 'jdbc:hive2://%s:%s/default' % (
+      beeswax.conf.HIVE_SERVER_HOST.get(),
+      beeswax.conf.HIVE_HTTP_THRIFT_PORT.get() if is_transport_mode_http else beeswax.conf.HIVE_SERVER_PORT.get()
+  )
 
   if get_conf().get(_CNF_HIVESERVER2_USE_SSL, 'FALSE').upper() == 'TRUE':
     urlbase += ';ssl=true'
@@ -194,7 +198,8 @@ def get_use_sasl():
 
 
 def has_concurrency_support():
-  '''For SQL transactions like INSERT, DELETE, UPDATE since Hive 3. Possibly use set -v in future to obtain properties hive.create.as.acid=true & hive.create.as.insert.only=true'''
+  '''For SQL transactions like INSERT, DELETE, UPDATE since Hive 3. '''
+  ''''Possibly use set -v in future to obtain properties hive.create.as.acid=true & hive.create.as.insert.only=true'''
   return get_conf().get(_CNF_HIVE_SUPPORT_CONCURRENCY, 'TRUE').upper() == 'TRUE'
 
 def get_hive_hook_proto_base_directory():
@@ -202,6 +207,9 @@ def get_hive_hook_proto_base_directory():
 
 def get_hive_execution_mode():
   return get_conf().get(_CNF_HIVE_EXECUTION_MODE)
+
+def get_hive_execution_engine():
+  return get_conf().get(_CNF_HIVE_EXECUTION_ENGINE)
 
 def _parse_hive_site():
   """
