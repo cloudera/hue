@@ -27,7 +27,7 @@ import ENV from '../config/environment';
 export default ApplicationAdapter.extend({
 
   namespace: Ember.computed(function () {
-    return ENV.rootURL + '/api/query';
+    return ENV.APP.namespaces.webService.studio + '/query';
   }),
   primaryKey: '_id',
 

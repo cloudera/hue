@@ -27,7 +27,7 @@ import ENV from '../config/environment';
 
 export default ApplicationAdapter.extend({
   namespace: Ember.computed(function() {
-    return ENV.rootURL + '/api';
+    return ENV.APP.namespaces.webService.studio;
   }),
 
   pathForType: function(type) {
@@ -35,7 +35,7 @@ export default ApplicationAdapter.extend({
   },
 
   getToken() {
-    return this.ajax(ENV.rootURL + '/api/token', 'GET');
+    return this.ajax(ENV.APP.namespaces.webService.studio + '/token', 'GET');
   }
 
 });

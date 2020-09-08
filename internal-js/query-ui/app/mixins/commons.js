@@ -22,7 +22,6 @@
  *
  */
 import Ember from 'ember';
-import GAINFO from '../configs/GA-info'
 export default Ember.Mixin.create({
     closeAutocompleteSuggestion: function() {
         Ember.$(".CodeMirror-hints").remove();
@@ -59,10 +58,6 @@ export default Ember.Mixin.create({
     getQueryDetailsPage(queryId) {
         return "<a class='query-details-breadcrumbs' href='#/'>Queries </a>/ "+queryId;
     },
-    logGA: function(route) {
-        ga('set', 'page', this.findRoute(route));
-        ga('send', 'pageview');
-    },
     setErrorPageONCompose: function(){
         Ember.run.later(function () {
             let container = Ember.$(".worksheet-container");
@@ -70,35 +65,6 @@ export default Ember.Mixin.create({
                 container.addClass('hide');
             }
         }, 1000);
-    },
-    findRoute: function(route) {
-        var routeName = GAINFO.filter(item => {
-            if(route == item.name) {
-                return item;
-            }
-        });
-        if(routeName && routeName.length) {
-            return routeName[0].info;
-        } else {
-            return route;
-        }
-    },
-    initiateGA(model) {
-        if(model && model.info && model.info.gaDetails && model.info.gaDetails.enabled) {
-            ga('create', model.info.gaDetails.identifier, 'auto');
-            ga('send', 'hivestudio');
-            this.setUserLevelProperty(model);
-        }
-    },
-    logErrorMessagesToGA(response) {
-        let errorCode;
-        if(JSON.parse(response).error) {
-            errorCode = JSON.parse(response).error.status;
-        } else {
-            errorCode = JSON.parse(response).code;
-        }
-        ga('set', 'page', errorCode);
-        ga('send', 'pageview');
     },
     setUserLevelProperty: function(model) {
         ga('set', 'dimension1', model.info.clusterId);

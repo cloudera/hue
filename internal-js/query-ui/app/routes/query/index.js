@@ -112,7 +112,6 @@ export default SingleAmPollsterRoute.extend(commons, ENV, {
 
   setupController: function (controller, model) {
     this._super(controller, model);
-    this.logGA('QUERY_DETAILS');
     this.controllerFor('query.index').set('queryDetailsTabs', queryDetailsTabs);
     this.set('breadCrumb.title', this.getQueryDetailsPage(this.controllerFor('query').get('hiveQueryId')));
     let querymodel = this.modelFor("query");

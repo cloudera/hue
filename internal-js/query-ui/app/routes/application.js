@@ -36,7 +36,6 @@ export default Ember.Route.extend(commons, {
   },
   setupController : function(controller, model) {
     this._super(controller, model);
-    this.appendGA(model);
     controller.set('theRoute', this);
     this.setProductInfoInController(controller);
     this.setContextInController(controller);
@@ -45,9 +44,6 @@ export default Ember.Route.extend(commons, {
 
     controller.set('showSearchQuerySettings', false);
     controller.set('searchQuerySettings', {});
-  },
-  appendGA(model) {
-    this.initiateGA(model);
   },
   setProductInfoInController(controller) {
     this.get('info').getProductInfo().then(data => {

@@ -42,7 +42,6 @@ export default Ember.Route.extend(UILoggerMixin, commons, {
   },
 
   setupController(controller, model) {
-    this.logGA('SAVEDQUERIES');
     this._super(...arguments);
 
     controller.set('savedQuerylist', model);
@@ -64,8 +63,6 @@ export default Ember.Route.extend(UILoggerMixin, commons, {
       this.get('controller').set('sortProp', [sortProp]);
     },
     deleteSavedQuery(){
-      this.logGA('SAVEDQUERIES_DELETE');
-
       let self = this;
       let queryId = this.get('controller').get('selectedSavedQueryId');
 

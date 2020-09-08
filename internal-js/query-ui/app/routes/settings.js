@@ -39,7 +39,6 @@ export default Ember.Route.extend(UILoggerMixin, commons, {
   },
   setupController(controller, model) {
     this._super(...arguments);
-    this.logGA('SETTINGS');
     this.setActiveTab('settings');
     const appendedHiveParams = this.prepareExhaustiveParameters(hiveParams, model);
     controller.set('hiveParameters', appendedHiveParams);
@@ -64,7 +63,6 @@ export default Ember.Route.extend(UILoggerMixin, commons, {
 
   actions: {
     addNewSettings() {
-      this.logGA('SETTINGS_CREATE');
       let model = this.get('controller.model');
       model.forEach(x => x.rollbackAttributes());
       let newItem = this.store.createRecord('setting', {editMode: true});
@@ -76,7 +74,6 @@ export default Ember.Route.extend(UILoggerMixin, commons, {
     },
 
     deleteAction(setting) {
-      this.logGA('SETTINGS_DELETE');
       return setting.destroyRecord().then(data => {
         let model = this.get('controller.model');
         model.removeObject(data);
@@ -91,7 +88,6 @@ export default Ember.Route.extend(UILoggerMixin, commons, {
     },
 
     updateAction(newSetting) {
-      this.logGA('SETTINGS_UPDATE');
       newSetting.save().then(data => {
         data.set('editMode', false);
       }, error => {

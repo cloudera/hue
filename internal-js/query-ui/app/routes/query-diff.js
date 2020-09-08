@@ -126,7 +126,6 @@ export default Ember.Route.extend(commons, {
   setupController: function (controller, model) {
   	console.log(model);
     this._super(controller, model);
-    this.logGA('QUERY_DIFF');
     this.set('breadCrumb.title', this.getQueryDetailsPage('Query Compare'));
     controller.set('queries', model);
 

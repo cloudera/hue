@@ -44,7 +44,7 @@ export default DS.RESTAdapter.extend(commons, {
   },
 
   namespace: Ember.computed(function () {
-    return ENV.rootURL + '/api';
+    return ENV.APP.namespaces.webService.studio + '/api';
   }),
 
   headers: Ember.computed(function () {
@@ -73,8 +73,6 @@ export default DS.RESTAdapter.extend(commons, {
   },
 
   parseErrorResponse(responseText) {
-    this.logErrorMessagesToGA(responseText);
-
     let json = this._super(responseText);
     if (Ember.isEmpty(json.errors)) {
       let error = {}, jsonData = json.error;
