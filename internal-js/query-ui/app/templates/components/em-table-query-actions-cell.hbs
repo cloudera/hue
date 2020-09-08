@@ -21,10 +21,8 @@
 }}
 <table>
     <tr>
-        <td>
-            <a href="javascript:void(0);" title="Open in composer" {{action "editQuery" content.row}} class="query-edit">
-                <i class="fa fa-pencil" aria-hidden="true"></i>
-            </a>
+       <td>
+            {{#link-to "query" content.row.queryID title="Go to Query Details" }}<i class="fa fa-info-circle" aria-hidden="true"></i>{{/link-to}}
         </td>
         <td>
             {{#if isRunnning}}

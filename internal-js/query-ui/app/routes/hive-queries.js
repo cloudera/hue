@@ -331,34 +331,6 @@ export default Ember.Route.extend(commons, {
       //console.log('queryId hive-queries route: ', queryId);
       this.killQuery(record);
     },
-    editQuery: function(query) {
-        let existingWorksheets = this.get('store').peekAll('worksheet');
-        let newWorksheetName = Worksheet.createNewId(existingWorksheets);
-
-        if(!existingWorksheets.filterBy('id', "saved").get('firstObject')) {
-          this.store.createRecord('worksheet', {
-            id: "saved",
-            title: "Saved".capitalize(),
-            isQueryDirty: false,
-            selected: false
-          });
-        }
-        let newWorksheetTitle = newWorksheetName.capitalize();
-
-        let dominantDb = getDominantDatabase(query.get('databasesUsed'));
-
-        this.get('store').createRecord('worksheet', {
-          id: newWorksheetName,
-          title: newWorksheetTitle,
-          isQueryDirty: false,
-          query: query.get('queryText'),
-          selected: true,
-          selectedDb : dominantDb
-        });
-        existingWorksheets.setEach('selected', false);
-        // this.controllerFor('queries').set('worksheets', this.get('store').peekAll('worksheet'));
-        // this.transitionTo('queries.query', newWorksheetTitle);
-    },
 
     refreshCurrentRoute: function() {
       var tableDefinition = this.get("controller.definition")

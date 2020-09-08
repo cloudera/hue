@@ -34,10 +34,6 @@ export default Ember.Component.extend(ENV, {
 		this.set('isDASLITE', ENV.APP.DASLITE);
   },
   actions: {
-    editQuery(query) {
-        console.log(query);
-        this.get("content.parentComponent").send("editQuery", query);
-    },
     killQuery(record){
         this.get("content.parentComponent").send("killQuery", record);
     },

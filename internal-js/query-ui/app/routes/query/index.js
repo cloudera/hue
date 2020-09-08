@@ -269,35 +269,6 @@ export default SingleAmPollsterRoute.extend(commons, ENV, {
       }).catch(function () {
         controller.set("taskAttempts", null);
       });
-    },
-    editQuery: function () {
-      let existingWorksheets = this.get('store').peekAll('worksheet');
-      let newWorksheetName = Worksheet.createNewId(existingWorksheets);
-      let query = this.modelFor("query");
-
-      if(!existingWorksheets.filterBy('id', "saved").get('firstObject')) {
-        this.store.createRecord('worksheet', {
-          id: "saved",
-          title: "Saved".capitalize(),
-          isQueryDirty: false,
-          selected: false
-        });
-      }
-      let newWorksheetTitle = newWorksheetName.capitalize();
-
-      let dominantDb = getDominantDatabase(query.get('databasesUsed'));
-
-      this.get('store').createRecord('worksheet', {
-        id: newWorksheetName,
-        title: newWorksheetTitle,
-        isQueryDirty: false,
-        query: query.get('query'),
-        selected: true,
-        selectedDb : dominantDb
-      });
-      existingWorksheets.setEach('selected', false);
-      // this.controllerFor('queries').set('worksheets', this.get('store').peekAll('worksheet'));
-      // this.transitionTo('queries.query', newWorksheetTitle);
     }
   },
 });

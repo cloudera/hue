@@ -95,11 +95,6 @@ export default Ember.Component.extend({
     if (this.get('codeMirror').getValue() !== info) {
       codeMirror.setValue(sqlFormatter.format(info));
     }
-  }),
-  actions : {
-    editQuery() {
-      this.sendAction('editQuery', this.get("info"));
-    }
-  }
+  })
 
 });
