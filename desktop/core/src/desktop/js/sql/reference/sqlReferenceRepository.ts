@@ -248,7 +248,8 @@ export const getSetOptions = async (connector: Connector): Promise<SetOptions> =
 };
 
 export const isReserved = async (connector: Connector, word: string): Promise<boolean> => {
-  const module = await KEYWORD_REFS[connector.dialect || GENERIC]();
+  const refImport = (connector.dialect && KEYWORD_REFS[connector.dialect]) || KEYWORD_REFS[GENERIC];
+  const module = await refImport();
   if (module.RESERVED_WORDS) {
     return module.RESERVED_WORDS.has(word.toUpperCase());
   }
