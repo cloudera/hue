@@ -25,7 +25,7 @@ from desktop.conf import KERBEROS as CONF
 LOG = logging.getLogger(__name__)
 SPEC = DjangoCommandSupervisee("kt_renewer")
 
-NEED_KRB181_WORKAROUND=None
+NEED_KRB181_WORKAROUND = None
 
 def renew_from_kt():
   cmdv = [CONF.KINIT_PATH.get(),
@@ -36,26 +36,23 @@ def renew_from_kt():
   retries = 0
   max_retries = 3
   while retries < max_retries:
-     LOG.info("Reinitting kerberos retry attempt %s from keytab %s" % (retries, " ".join(cmdv)))
+    LOG.info("Reinitting kerberos retry attempt %s from keytab %s" % (retries, " ".join(cmdv)))
 
-     subp = subprocess.Popen(cmdv,
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.PIPE,
-                          close_fds=True,
-                          bufsize=-1)
-     subp.wait()
-     if subp.returncode != 0:
-       retries = retries + 1
-       LOG.error("Couldn't reinit from keytab! `kinit' exited with %s.\n%s\n%s" % (
-              subp.returncode,
-              "\n".join(subp.stdout.readlines()),
-              "\n".join(subp.stderr.readlines())))
-       if retries >= max_retries:
-          LOG.error("FATAL: max_retries of %s reached. Exiting..." % max_retries)
-          sys.exit(subp.returncode)
-       time.sleep(3)
-     else:
-       break
+    subp = subprocess.Popen(cmdv, stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE, close_fds=True,
+                            bufsize=-1)
+    subp.wait()
+    if subp.returncode != 0:
+      retries = retries + 1
+      LOG.error("Couldn't reinit from keytab! `kinit' exited with %s.\n%s\n%s" % (
+                subp.returncode,
+                "\n".join(subp.stdout.readlines()), "\n".join(subp.stderr.readlines())))
+      if retries >= max_retries:
+        LOG.error("FATAL: max_retries of %s reached. Exiting..." % max_retries)
+        sys.exit(subp.returncode)
+      time.sleep(3)
+    else:
+      break
 
   global NEED_KRB181_WORKAROUND
   if NEED_KRB181_WORKAROUND is None:
