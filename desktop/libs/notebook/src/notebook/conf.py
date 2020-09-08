@@ -36,7 +36,7 @@ SHOW_NOTEBOOKS = Config(
     key="show_notebooks",
     help=_t("Show the notebook menu or not"),
     type=coerce_bool,
-    default=False
+    default=True
 )
 
 def _remove_duplications(a_list):
@@ -183,7 +183,7 @@ ENABLE_QUERY_BUILDER = Config(
   key="enable_query_builder",
   help=_t("Flag to enable the SQL query builder of the table assist."),
   type=coerce_bool,
-  default=False
+  default=True
 )
 
 ENABLE_NOTEBOOK_2 = Config(
@@ -266,14 +266,17 @@ def _default_interpreters(user):
   interpreters = []
   apps = appmanager.get_apps_dict(user)
 
+  if 'hive' in apps:
+    from beeswax.hive_site import get_hive_execution_engine
+    interpreter_name = 'Impala' if get_hive_execution_engine() == 'impala' else 'Hive'  # Until using a proper dialect for 'FENG'
+
+    interpreters.append(('hive', {
+      'name': interpreter_name, 'interface': 'hiveserver2', 'options': {}
+    }),)
+
   if 'impala' in apps:
     interpreters.append(('impala', {
       'name': 'Impala', 'interface': 'hiveserver2', 'options': {}
-    }),)
-
-  if 'hive' in apps:
-    interpreters.append(('hive', {
-      'name': 'Hive', 'interface': 'hiveserver2', 'options': {}
     }),)
 
   if 'pig' in apps:
