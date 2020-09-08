@@ -22,10 +22,11 @@
  *
  */
 import ApplicationAdapter from './application';
+import ENV from '../config/environment';
 
 export default ApplicationAdapter.extend({
   buildURL(){
-    return this._super(...arguments);
+    return ENV.APP.namespaces.webService.studio;
   },
   getProductInfo(){
     let url = `${this.buildURL()}/about`;
