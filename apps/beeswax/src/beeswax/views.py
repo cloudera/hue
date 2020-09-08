@@ -936,6 +936,8 @@ def parse_out_jobs(log, engine='mr', with_state=False):
     start_pattern = SPARK_APPLICATION_RE
   elif engine.lower() == 'tez':
     start_pattern = TEZ_APPLICATION_RE
+  elif engine.lower() == 'impala':
+    return ret
   else:
     raise ValueError(_('Cannot parse job IDs for execution engine %(engine)s') % {'engine': engine})
 
