@@ -35,6 +35,10 @@ AlterDatabase
     {
       parser.addDatabaseLocation(@3, [ { name: $3 } ]);
     }
+ | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' ManagedLocation
+    {
+      parser.addDatabaseLocation(@3, [ { name: $3 } ]);
+    }
  ;
 
 AlterDatabase_EDIT
@@ -45,12 +49,12 @@ AlterDatabase_EDIT
  | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'CURSOR'
    {
      parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-     parser.suggestKeywords(['SET DBPROPERTIES', 'SET LOCATION', 'SET OWNER']);
+     parser.suggestKeywords(['SET DBPROPERTIES', 'SET LOCATION', 'SET MANAGEDLOCATION', 'SET OWNER']);
    }
  | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' 'CURSOR'
     {
       parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-      parser.suggestKeywords(['DBPROPERTIES', 'LOCATION', 'OWNER']);
+      parser.suggestKeywords(['DBPROPERTIES', 'LOCATION', 'MANAGEDLOCATION', 'OWNER']);
     }
  | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' HdfsLocation_EDIT
    {
@@ -62,6 +66,10 @@ AlterDatabase_EDIT
      parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
  | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' 'OWNER' PrincipalSpecification_EDIT
+   {
+     parser.addDatabaseLocation(@3, [ { name: $3 } ]);
+   }
+ | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' ManagedLocation_EDIT
    {
      parser.addDatabaseLocation(@3, [ { name: $3 } ]);
    }

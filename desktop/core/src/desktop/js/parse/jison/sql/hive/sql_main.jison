@@ -157,6 +157,7 @@ NonReservedKeyword
  | 'LOCKS'
  | 'MATCHED'
  | 'MATERIALIZED'
+ | 'MANAGEDLOCATION'
  | 'MERGE'
  | 'METADATA'
  | 'MINUTE'
