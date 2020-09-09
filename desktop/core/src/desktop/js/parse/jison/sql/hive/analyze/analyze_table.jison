@@ -45,7 +45,7 @@ AnalyzeTableStatement_EDIT
        parser.yy.result.suggestTables.onlyTables = true;
      }
    }
- | 'ANALYZE' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
+ | 'ANALYZE' 'TABLE' SchemaQualifiedTableIdentifier PartitionSpec_EDIT
    {
      parser.addTablePrimary($3);
    }
@@ -89,7 +89,7 @@ AnalyzeTableStatement_EDIT
      parser.addTablePrimary($3);
    }
  | 'ANALYZE' 'TABLE' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec 'COMPUTE' 'STATISTICS' OptionalForColumns OptionalCacheMetadata OptionalNoscan
- | 'ANALYZE' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT 'COMPUTE' 'STATISTICS' OptionalForColumns OptionalCacheMetadata OptionalNoscan
+ | 'ANALYZE' 'TABLE' SchemaQualifiedTableIdentifier PartitionSpec_EDIT 'COMPUTE' 'STATISTICS' OptionalForColumns OptionalCacheMetadata OptionalNoscan
  | 'ANALYZE' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'COMPUTE' 'STATISTICS' ForColumns_EDIT OptionalCacheMetadata OptionalNoscan
  | 'ANALYZE' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'COMPUTE' 'STATISTICS' OptionalForColumns CacheMetadata_EDIT OptionalNoscan
  ;

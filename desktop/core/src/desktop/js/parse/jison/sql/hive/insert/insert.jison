@@ -147,7 +147,7 @@ InsertWithoutQuery_EDIT
    {
      $$ = { keepTables: true }
    }
- | 'INSERT' 'OVERWRITE' OptionalTable SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT OptionalIfNotExists
+ | 'INSERT' 'OVERWRITE' OptionalTable SchemaQualifiedTableIdentifier PartitionSpec_EDIT OptionalIfNotExists
    {
      $4.owner = 'insert';
      parser.addTablePrimary($4);
@@ -183,7 +183,7 @@ InsertWithoutQuery_EDIT
    {
      $$ = { keepTables: true }
    }
- | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT OptionalParenthesizedColumnList
+ | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier PartitionSpec_EDIT OptionalParenthesizedColumnList
    {
      $4.owner = 'insert';
      parser.addTablePrimary($4);

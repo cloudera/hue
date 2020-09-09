@@ -161,7 +161,7 @@ AlterTable_EDIT
    {
      parser.suggestKeywords(['PARTITION']);
    }
- | AlterTableLeftSide 'TOUCH' OptionalPartitionSpec_EDIT
+ | AlterTableLeftSide 'TOUCH' PartitionSpec_EDIT
  | AlterTableLeftSide PartitionOperations_EDIT
  | AlterTableLeftSide DropOperations_EDIT
  | AlterTableLeftSide 'CURSOR'

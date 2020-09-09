@@ -23,36 +23,38 @@ DataDefinition_EDIT
  ;
 
 TruncateTableStatement
- : 'TRUNCATE' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec
+ : 'TRUNCATE' OptionalTable SchemaQualifiedTableIdentifier OptionalPartitionSpec
    {
      parser.addTablePrimary($3);
    }
  ;
 
 TruncateTableStatement_EDIT
- : 'TRUNCATE' 'CURSOR'
+ : 'TRUNCATE' OptionalTable 'CURSOR' OptionalPartitionSpec
    {
-     parser.suggestKeywords(['TABLE']);
-   }
- | 'TRUNCATE' 'TABLE' 'CURSOR' OptionalPartitionSpec
-   {
+     if (!$2) {
+       parser.suggestKeywords(['TABLE']);
+     }
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
    }
- | 'TRUNCATE' 'TABLE' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
- | 'TRUNCATE' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
+ | 'TRUNCATE' OptionalTable SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
+ | 'TRUNCATE' OptionalTable SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
    {
      parser.addTablePrimary($3);
      if (!$4) {
        parser.suggestKeywords(['PARTITION']);
      }
    }
- | 'TRUNCATE' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
+ | 'TRUNCATE' OptionalTable SchemaQualifiedTableIdentifier PartitionSpec_EDIT
    {
      parser.addTablePrimary($3);
    }
- | 'TRUNCATE' 'TABLE' 'CURSOR' SchemaQualifiedTableIdentifier OptionalPartitionSpec
+ | 'TRUNCATE' OptionalTable 'CURSOR' SchemaQualifiedTableIdentifier OptionalPartitionSpec
    {
+     if (!$2) {
+       parser.suggestKeywords(['TABLE']);
+     }
      parser.addTablePrimary($4);
    }
  ;
