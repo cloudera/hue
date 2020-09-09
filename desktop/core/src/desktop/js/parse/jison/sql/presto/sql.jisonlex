@@ -211,6 +211,7 @@ DOUBLE\s+PRECISION                   { return 'DOUBLE_PRECISION'; }
 'LOCATION'                           { this.begin('hdfs'); return 'LOCATION'; }
 'LOCK'                               { return 'LOCK'; }
 'LOCKS'                              { return 'LOCKS'; }
+'MANAGEDLOCATION'                    { this.begin('hdfs'); return 'MANAGEDLOCATION'; }
 'MATCHED'                            { return 'MATCHED'; }
 'MERGE'                              { return 'MERGE'; }
 'METADATA'                           { return 'METADATA'; }
@@ -277,6 +278,7 @@ STORED\s+AS\s+DIRECTORIES            { return 'STORED_AS_DIRECTORIES'; }
 'TRANSACTIONS'                       { return 'TRANSACTIONS'; }
 'UNARCHIVE'                          { return 'UNARCHIVE'; }
 'UNIONTYPE'                          { return 'UNIONTYPE'; }
+'UNSET'                              { return 'UNSET'; }
 'USE'                                { parser.determineCase(yytext); return 'USE'; }
 'VIEW'                               { return 'VIEW'; }
 'WAIT'                               { return 'WAIT'; }
