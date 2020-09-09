@@ -48,6 +48,7 @@ class OozieApi(Api):
   RESULTS_PATTERN = "(?P<results>>>> Invoking Beeline command line now >>>.+<<< Invocation of Beeline command completed <<<)"
   RESULTS_PATTERN_GENERIC = "(?P<results>>>> Invoking Main class now >>>.+<<< Invocation of Main class completed <<<)"
   RESULTS_PATTERN_MAPREDUCE = "(?P<results>.+)"
+  RESULTS_PATTERN_SQOOP = "(?P<results>>>> Invoking Main class now >>>.+<<< Invocation of Sqoop command completed <<<)"
   RESULTS_PATTERN_PIG = "(?P<results>>>> Invoking Pig command line now >>>.+<<< Invocation of Pig command completed <<<)"
   BATCH_JOB_PREFIX = 'Batch'
   SCHEDULE_JOB_PREFIX = 'Schedule'
@@ -206,6 +207,8 @@ class OozieApi(Api):
       pattern = self.RESULTS_PATTERN_PIG
     elif action_type == 'mapreduce':
       pattern = self.RESULTS_PATTERN_MAPREDUCE
+    elif action_type == 'sqoop1':
+      pattern = self.RESULTS_PATTERN_SQOOP
     else:
       pattern = self.RESULTS_PATTERN_GENERIC
 
