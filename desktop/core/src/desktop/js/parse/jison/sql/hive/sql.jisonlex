@@ -216,6 +216,7 @@ DOUBLE\s+PRECISION                   { return 'DOUBLE_PRECISION'; }
 'LOCATION'                           { this.begin('hdfs'); return 'LOCATION'; }
 'LOCK'                               { return 'LOCK'; }
 'LOCKS'                              { return 'LOCKS'; }
+'MANAGEDLOCATION'                    { this.begin('hdfs'); return 'MANAGEDLOCATION'; }
 'MATCHED'                            { return 'MATCHED'; }
 'MATERIALIZED'                       { return 'MATERIALIZED'; }
 'MERGE'                              { return 'MERGE'; }
