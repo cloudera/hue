@@ -55,16 +55,19 @@ CreateDatabase_EDIT
  ;
 
 DatabaseDefinitionOptionals
- : OptionalComment OptionalHdfsLocation OptionalDbProperties
+ : OptionalComment OptionalHdfsLocation OptionalManagedLocation OptionalDbProperties
    {
      var keywords = [];
-     if (!$3) {
+     if (!$4) {
        keywords.push('WITH DBPROPERTIES');
      }
-     if (!$2 && !$3) {
+     if (!$3 && !$4) {
+       keywords.push('MANAGEDLOCATION');
+     }
+     if (!$2 && !$3 && !$4) {
        keywords.push('LOCATION');
      }
-     if (!$1 && !$2 && !$3) {
+     if (!$1 && !$2 && !$3 && !$4) {
        keywords.push('COMMENT');
      }
      if (keywords.length > 0) {
@@ -74,8 +77,10 @@ DatabaseDefinitionOptionals
  ;
 
 DatabaseDefinitionOptionals_EDIT
- : Comment_INVALID OptionalHdfsLocation OptionalDbProperties
- | OptionalComment HdfsLocation_EDIT OptionalDbProperties
+ : Comment_INVALID OptionalHdfsLocation OptionalManagedLocation OptionalDbProperties
+ | OptionalComment HdfsLocation_EDIT OptionalManagedLocation OptionalDbProperties
+ | OptionalComment OptionalHdfsLocation ManagedLocation_EDIT OptionalDbProperties
+ | OptionalComment OptionalHdfsLocation OptionalManagedLocation DbProperties_EDIT
  ;
 
 Comment_INVALID
@@ -83,6 +88,19 @@ Comment_INVALID
  | 'COMMENT' DOUBLE_QUOTE
  | 'COMMENT' SINGLE_QUOTE VALUE
  | 'COMMENT' DOUBLE_QUOTE VALUE
+ ;
+
+OptionalManagedLocation
+ :
+ | ManagedLocation
+ ;
+
+ManagedLocation
+ : 'MANAGEDLOCATION' HdfsPath
+ ;
+
+ManagedLocation_EDIT
+ : 'MANAGEDLOCATION' HdfsPath_EDIT
  ;
 
 OptionalDbProperties
@@ -93,7 +111,10 @@ OptionalDbProperties
 DbProperties
  : 'WITH' 'DBPROPERTIES' ParenthesizedPropertyAssignmentList
  | 'WITH' 'DBPROPERTIES'
- | 'WITH' 'CURSOR'
+ ;
+
+DbProperties_EDIT
+ : 'WITH' 'CURSOR'
    {
      parser.suggestKeywords(['DBPROPERTIES']);
    }
