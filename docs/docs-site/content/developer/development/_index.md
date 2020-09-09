@@ -30,21 +30,19 @@ Build once:
 
     make apps
 
-[Dependencies documentation](/administrator/installation/dependencies/) must help in troubleshooting build issues.
+The [dependencies documentation](/administrator/installation/dependencies/) is here to help for troubleshooting build issues.
 
-Then start the dev server (which will auto reload):
+Then start the dev server (which will auto reload on file changes):
 
     ./build/env/bin/hue runserver
 
-If you are changing Javascript or CSS files, also start:
+If you are changing JavaScript or CSS files, also start:
 
     npm run dev
 
-### Connecting Database
+Persistence: Hue needs an existing database with transactions like MySQL to support concurrent requests and also not lose the registered users, saved queries, sharing permissions… when the server gets stopped.
 
-Once build, you need to connect Hue to a database to start running queries. It is recommended to use MySQL or PostGres for development. Refer [connectors documentation](/administrator/configuration/connectors/) for other supported databases.
-
-#### Configure MySQL
+Once build, in order to avoid the `database is locked` errors, you also need to connect Hue to a transactional database. It is recommended to use MySQL or PostGreSQL for development.
 
 Open the `desktop/conf/pseudo-distributed.ini` file in a text editor. Add the following options (and modify accordingly) for your MySQL setup:
 
@@ -57,26 +55,34 @@ Directly below the `[[database]]` line, add the following.
     password=secretpassword
     name=hue
 
-Below the `[[interpreters]]` of `[notebook]`.
+Read more about how [configurations work](/administrator/configuration/).
+
+### First SQL queries!
+
+Here is how to point the Editor to either MySql or [Apache Hive](https://hive.apache.org/) and execute your first SQL queries. For other supported databases refer to the [connectors](/administrator/configuration/connectors/).
+
+#### MySQL
+
+In `desktop/conf/pseudo-distributed.ini`, below the `[[interpreters]]` section of of `[notebook]`.
 
     [[[mysql]]]
     name=MySQL
     interface=sqlalchemy
     options='{"url": "mysql://${USER}:${PASSWORD}@localhost:3306/hue"}'
 
-#### Configure Apache Hive
+#### Apache Hive
 
-You can connect to an existing Hive instance or setup a new one locally. An easy way to setup Hive locally is using Docker. You could use this container for Hive 2.3.2 - https://github.com/big-data-europe/docker-hive.
+You can connect to an existing Hive instance or setup a new one locally. An easy way to setup one is with Docker. You could use this [Hive 2 container](https://github.com/big-data-europe/docker-hive.).
 
     git clone https://github.com/big-data-europe/docker-hive
     cd docker-hive
     docker-compose up -d
 
-Just follow the above 3 steps and you would have a running Hive instance on jdbc:hive2://localhost:10000. Follow [testing section](https://github.com/big-data-europe/docker-hive#testing) in the readme of the above repo to check if things are working as expected.
+Just follow the above 3 steps and you would have a running Hive instance on `jdbc:hive2://localhost:10000`.
 
-Now under Hue open `desktop/conf/pseudo-distributed.ini` file in a text editor, and modify the following options.
+Now under Hue open `desktop/conf/pseudo-distributed.ini` file in a text editor, and modify the following properties:
 
-Directly below the `[[beeswax]]` line, add the following.
+1. Directly below the `[[beeswax]]` line, add the following:
 
     # Host where HiveServer2 is running.
     hive_server_host=localhost
@@ -86,24 +92,36 @@ Directly below the `[[beeswax]]` line, add the following.
 
     thrift_version=7
 
-Below the `[[interpreters]]` of `[notebook]`, add.
+2. Below the `[[interpreters]]` of `[notebook]`, add:
 
     [[[hive]]]
       name=Hive
       interface=hiveserver2
 
-Restart Hue and you must be able to run Hive queries.
+And restart Hue, open the Editors and start typing your first queries!
 
 ### Dev environment
 
+#### Lint configs
+
+* [.eslintrc.js](https://github.com/cloudera/hue/blob/master/.eslintrc.js)
+* [.pylintrc](https://github.com/cloudera/hue/blob/master/.pylintrc)
+* [.prettierrc](https://github.com/cloudera/hue/blob/master/.prettierrc)
+* [Git hooks](https://github.com/cloudera/hue/blob/master/tools/githooks)
+
+For checking git commit message format automatically locally:
+
+    cp tools/githooks/* .git/hooks
+    chmod +x .git/hooks/*
+
 #### Visual Code
 
-Adding 'hue' as a workspace, then:
+Adding the 'hue' directory as a workspace, then:
 
 Recommended extensions:
 
 * Python - Microsoft
-* EsLint - Dirk Baeumur https://github.com/cloudera/hue/blob/master/.eslintrc.js
+* EsLint - Dirk Baeumur
 * Mako - tommorris
 * Docker - Microsoft
 
@@ -124,6 +142,120 @@ Second step is to configure the debug configuration
 ![Eclipse debug](/images/eclipse_debug.png)
 ![Eclipse debug arguments](/images/eclipse_debug_arguments.png)
 ![Eclipse debug interpreter](/images/eclipse_debug_interpreter.png)
+
+
+## Development Process
+
+**Note:**
+
+During the development process if you are facing any problem then, it is recommended to search for information on the [Forum](https://discourse.gethue.com/) and in the [bug tracker](https://github.com/cloudera/hue/issues?q=is%3Aissue+). If the solution is not found then, feel free to create an issue at https://github.com/cloudera/hue/issues.
+
+Here is a tutorial about how to use the code review tool [Review Board](https://www.reviewboard.org/) for a better productivity!
+
+### Setup
+
+Hue project uses Review Board and Pull Requests for code reviews. For more complex patches it's advisable to use RB than a plain pull request on github. The advantage of Pull Request is that the CI (syntax check, tests…) automatically runs for you (but the diff interface is not as friendly as Review Board).
+
+* Create accounts in https://review.cloudera.org, https://issues.cloudera.org/browse/HUE and https://github.com and share the usernames
+* Then, join the 'hue' group in your account https://review.cloudera.org/account/preferences/#groups
+* Then [download](https://www.reviewboard.org/downloads/rbtools/) the Review Board tools and install it.
+
+If you've never used git and github before, there are bunch of things you need to [do](https://kbroman.org/github_tutorial/pages/first_time.html) before going further.
+
+Now, clone cloudera/hue:
+
+    git clone https://github.com/cloudera/hue
+
+Then, go inside your git repository:
+
+    romain@runreal:~/projects/hue$ rbt setup-repo
+
+    Enter the Review Board server URL: https://review.cloudera.org
+    Use the Git repository 'hue' (git://github.com/cloudera/hue.git)? [Yes/No]: yes
+    Create '/home/romain/projects/hue/.reviewboardrc' with the following?
+    REVIEWBOARD_URL = "https://review.cloudera.org"
+    REPOSITORY = "hue"
+    BRANCH = "master"
+    [Yes/No]: yes
+    Config written to /home/romain/projects/hue/.reviewboardrc
+
+Create a new branch with the jira id (HUE-XXX) as the branch name:
+
+    git checkout master
+    git pull --rebase origin master
+    git checkout -b HUE-XXX
+
+Then make your changes in code:
+
+    git add <file>
+    git diff --cached
+    git commit -m "HUE-XXX <Ticket summary>"
+
+### Post a review
+
+We have wrapped up the typical submission in a dedicated [tools/scripts/hue-review](https://github.com/cloudera/hue/blob/master/tools/scripts/hue-review) script prefilled with all the details of the commits:
+
+Now we post the review:
+
+    tools/scripts/hue-review HEAD~1..HEAD <reviewers> "HUE-XXX [component] <Ticket summary>" --bugs-closed=HUE-XXX
+
+* Above command must return the review link as given in below example.
+* Go to the review link and varify details & press publish. All the reviewers will be informed with an email.
+
+eg:
+
+    tools/scripts/hue-review HEAD~1..HEAD romain,enricoberti,erickt "HUE-2123 [beeswax] Handle cancel state properly" -bugs-closed=HUE-2123
+
+    Review request #4501 posted.
+
+    https://review.cloudera.org/r/4501
+
+
+Et voila! Here is our review https://review.cloudera.org/r/4501.
+
+**Note**:
+If you have more than one diff, update `HEAD~1..HEAD` accordingly (e.g. `HEAD~2..HEAD`)
+
+Now go to the ticket and add the Review Boad review link as a comment.
+
+### Update a review
+
+Modify the previous commit diff:
+
+    git add <file>
+    git commit --amend
+
+Update the review:
+
+    rbt post -u -r <Review-board-id> HEAD~1..HEAD
+
+Again, go to the review link and varify details & press publish.
+
+### Ship It
+
+Once we get ship it from at least one reviewer, we can push the changes to master
+
+    git rebase origin/master
+    git push origin HEAD:ci-commit-master-<yourname>
+
+* The push will auto run the tests and push it to master
+* It can be seen on https://circleci.com/gh/cloudera/workflows/hue
+  * Two builds would be made - One for Python 2.7 and another for Python 3.6
+  * If successful, the change would be auto merged to master
+  * On failure, we will get a mail
+  * Runs usually take 10-20 min
+* Once merged mark the review as submitted - **Close > Submitted**
+* Add the commit link to the ticket and mark it as resolved
+
+**Note**:
+
+For lightweight issues, Github [pull requests](https://github.com/cloudera/hue/pulls) are also welcomed! To learn how pull request works please refer this [link](https://github.com/asmeurer/git-workflow).
+
+### Sump-up
+
+We hope that Review Board and these commands will make your life easier and encourage you to [contribute to Hue](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md) 😉
+
+As usual feel free to send feedback on the [hue-user](http://groups.google.com/a/cloudera.org/group/hue-user) list or [@gethue](https://twitter.com/gethue)!
 
 
 ## API Server
@@ -433,7 +565,7 @@ In a nutshell, front-end development is using:
 
 ### Javascript
 
-The javascript files are currently being migrated to webpack bundles, during this process some files will live under src/desktop/static/ and some will live under src/dekstop/js
+The javascript files are currently being migrated to webpack bundles, during this process some files will live under src/desktop/static/ and some will live under src/desktop/js
 
 For changes to the files under src/desktop/js the following applies:
 
@@ -513,7 +645,7 @@ Run the API unit tests
 
     ./build/env/bin/hue test unit
 
-Open a pull request which will automaticlly trigger a [CircleCi](https://circleci.com/gh/cloudera/hue) unit test run.
+Open a pull request which will automatically trigger a [CircleCi](https://circleci.com/gh/cloudera/hue) unit test run.
 
 How to run just some parts of the tests, e.g.:
 
@@ -576,18 +708,18 @@ Re-building the collection of static files should fix it:
 
 ### Running the UI tests
 
-The tests are next to the file under test, the filename of the test has to end with `.test.js`.
+The tests are next to the file under test, the filename of the test has to end with `.test.ts` or `.test.js`.
 
     someFile.js         <- File under test
-    someFile.test.js    <- File containing tests
+    someFile.test.ts    <- File containing tests
 
 Run all the tests once with:
 
-    npm run test
+    npm test
 
 Run tests from a specific file once:
 
-    npm run test -- foo.test.js
+    npm test -- foo.test.js
 
 To run the tests in watch mode:
 
@@ -717,6 +849,10 @@ Historically, the same thing used to be done with the `requires_hadoop` tag:
 
 ## Releasing
 
+The checklist below details the steps. Then send the release notes to the [Forum](https://discourse.gethue.com/), [hue-user](https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user), https://twitter.com/gethue !
+
+### Version
+
 Update the versions to the next release (current release +1):
 
     :100644 100644 4db6d5f... f907d04... M	VERSION
@@ -754,6 +890,8 @@ Push to the CDN:
 
     scp hue-4.7.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
 
+### Websites
+
 Other things to update:
 
 * In Jira, setting the [release as shipped](https://issues.cloudera.org/projects/HUE?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page&status=all) and moving all non finished jiras to another target. Also archiving old releases.
@@ -775,17 +913,13 @@ Instructions:
     docker push gethue/nginx
     docker push gethue/nginx:4.7.0
 
-Documentation
+### Documentation
 
-[Build it](#Documentation) and push it to the docs host.
+Documentation is currently being auto refreshed every morning of the week and run as a container.
 
-Build the doc website:
+The manual process otherwise would be to [build it](#Documentation) and push it to the docs host.
 
-    cd docs/docs-site
-
-    hugo
-
-Release:
+### Release
 
     ssh root@docs.gethue.com
     cd /var/www/docs.gethue.com
@@ -796,14 +930,23 @@ Release:
 
     scp -r hue-4.6/build/release/prod/hue-4.7.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads/
 
+### NPM registry
 
-Then send release notes to the [Forum](https://discourse.gethue.com/), [hue-user](https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user), https://twitter.com/gethue !
+To publish gethue to NPM registry, the following command would have to be run. Kindly refrain from using `npm publish`.
+
+    npm run publish-gethue
 
 ## Building
 
+### Custom Webpack Config
+
+You can make webpack build with custom configuration files by setting HUE_WEBPACK_CONFIG environment variable.
+
+    HUE_WEBPACK_CONFIG="webpack.config.custom.js" make apps
+
 ### Dev Docker
 
-Try basic changes in Hue without compiling it locally:
+Try basic changes [in 3 minutes](https://gethue.com/quick-start-a-hue-development-environment-in-3-minutes-with-docker/) without compiling Hue locally hence avoiding the setting up of [dependencies](/developer/):
 
     git clone https://github.com/cloudera/hue.git
     cd hue
@@ -811,7 +954,7 @@ Try basic changes in Hue without compiling it locally:
 
 Then edit the `[[database]]` section to specify a proper database, here MySql:
 
-    host=127.0.0.1 # Not localhost if Docker
+    host=127.0.0.1 # Don't use 'localhost' if Docker
     engine=mysql
     user=hue
     password=hue
@@ -841,6 +984,12 @@ Build the [source](https://github.com/cloudera/hue/tree/master/docs/docs-site) a
 Check for links not working (e.g. returning a 404) with muffet, a fast link checker crawler. It recommended to use the [check links script](https://github.com/cloudera/hue/blob/master/tools/ci/check_for_website_dead_links.sh).
 
 The posts [manual](https://gethue.com/easily-checking-for-deadlinks-on-docs-gethue-com/) and [continuous integration](https://gethue.com/easily-checking-for-deadlinks-on-docs-gethue-com/) contain more information about it.
+
+And then to build the static site just do:
+
+    hugo
+
+and grab the `public` directory.
 
 ### Blog & Website
 
@@ -875,7 +1024,7 @@ After modifying files under tools/ace-editor run the following to build ace.js
     npm install
     make ace
 
-### Embedded language references
+### Language references
 
 The tools for generating the embedded language reference manuals can be found under `hue/tools/sql-docs/`
 

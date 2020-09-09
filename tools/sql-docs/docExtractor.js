@@ -73,7 +73,7 @@ Promise.all(ditamapParsePromises).then(parseResults => {
 
     console.log('%s: Saving topic tree json files...', LOG_NAME);
     jsonHandler
-      .saveTopics(parseResults[0].topics, ensureTrailingSlash(program.output), program.mako)
+      .saveTopics(parseResults[0].topics, ensureTrailingSlash(program.output), program.mako, true)
       .then(savedFiles => {
         console.log('%s: Done! Saved %d files.', LOG_NAME, savedFiles.length);
       })

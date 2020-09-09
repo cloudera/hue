@@ -471,5 +471,17 @@ describe('impalaAutocompleteParser.js INSERT statements', () => {
         }
       });
     });
+
+    it('should handle "INSERT INTO TABLE boo.t1(a, b) PARTITION (a) VALUES (1, 2);|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'INSERT INTO TABLE boo.t1 (a, b) PARTITION (a) VALUES (1, 2);',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
   });
 });

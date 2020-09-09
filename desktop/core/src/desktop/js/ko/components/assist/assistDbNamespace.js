@@ -21,6 +21,7 @@ import apiHelper from 'api/apiHelper';
 import AssistDbEntry from 'ko/components/assist/assistDbEntry';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
+import { ASSIST_ACTIVE_DB_CHANGED_EVENT } from './events';
 
 class AssistDbNamespace {
   /**
@@ -108,6 +109,14 @@ class AssistDbNamespace {
 
     self.selectedDatabase.subscribe(() => {
       const db = self.selectedDatabase();
+      if (db) {
+        huePubSub.publish(ASSIST_ACTIVE_DB_CHANGED_EVENT, {
+          connector: this.connector,
+          namespace: this.namespace,
+          database: db.name
+        });
+      }
+
       if (window.HAS_OPTIMIZER && db && !db.popularityIndexSet && !self.nonSqlType) {
         db.catalogEntry.loadOptimizerPopularityForChildren({ silenceErrors: true }).done(() => {
           const applyPopularity = () => {

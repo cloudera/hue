@@ -29,7 +29,7 @@ import {
   ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
   GET_ACTIVE_SNIPPET_CONNECTOR_EVENT
 } from 'apps/notebook2/events';
-import { findEditorConnector } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, findEditorConnector, getLastKnownConfig } from 'utils/hueConfig';
 
 class EditorViewModel {
   constructor(editor_id, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -57,6 +57,17 @@ class EditorViewModel {
     };
 
     updateConnector(self.editorType());
+
+    self.sharingEnabled = ko.observable(false);
+
+    const updateFromConfig = hueConfig => {
+      self.sharingEnabled(
+        hueConfig && (hueConfig.hue_config.is_admin || hueConfig.hue_config.enable_sharing)
+      );
+    };
+
+    updateFromConfig(getLastKnownConfig());
+    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, updateFromConfig);
 
     self.editorType.subscribe(newVal => {
       if (!this.activeConnector() || this.activeConnector().id !== newVal) {

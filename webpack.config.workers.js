@@ -14,7 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const { BUNDLES, getPluginConfig } = require('./desktop/core/src/desktop/js/webpack/configUtils');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const {
+  BUNDLES,
+  getPluginConfig,
+  splitChunksName
+} = require('./desktop/core/src/desktop/js/webpack/configUtils');
 const shared = require('./webpack.config');
 
 module.exports = {
@@ -29,7 +34,9 @@ module.exports = {
   },
   optimization: {
     minimize: false,
-    splitChunks: {}
+    splitChunks: {
+      name: splitChunksName
+    }
   },
   output: {
     path: __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/workers',
@@ -38,5 +45,9 @@ module.exports = {
     globalObject: 'this'
   },
   module: shared.module,
-  plugins: getPluginConfig(BUNDLES.WORKERS)
+  plugins: getPluginConfig(BUNDLES.WORKERS).concat([
+    new CleanWebpackPlugin([
+      `${__dirname}/desktop/core/src/desktop/static/desktop/js/bundles/workers`
+    ])
+  ])
 };

@@ -6,11 +6,27 @@
     "allowJs": true,
     "noEmit": true,
     "strict": true,
+    "experimentalDecorators": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "baseUrl": "desktop/core/src/desktop/js"
+    "baseUrl": "desktop/core/src/desktop/js",
+    "typeRoots": [ "desktop/core/src/desktop/js/types", "./node_modules/@types"],
+    "lib": ["es2019", "dom"]
   },
   "include": [
     "."
+  ],
+  "exclude": [
+    "apps",
+    "build",
+    "dist",
+    "docs",
+    "ext",
+    "logs",
+    "maven",
+    "node_modules",
+    ".github",
+    ".git",
+    ".circleci"
   ]
 }

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+INPUT_FILE=$1
+START_LINE=${2:-`head -n1 $INPUT_FILE`}
+PATTERN="^(HUE\-[a-z0-9]+ \[.+\] .+)|(\[.+\] .+? \(#[a-z0-9]+\)|(Merge branch 'master' into master))"
+
+if ! [[ "$START_LINE" =~ $PATTERN ]]; then
+  echo "'$START_LINE' is not a valid commit message, please see for examples:"
+  echo "  HUE-9374 [impala] Use 26000 as default for thrift-over-http"
+  echo "  [livy] Add numExecutors options (#1238)"
+  exit 1
+fi

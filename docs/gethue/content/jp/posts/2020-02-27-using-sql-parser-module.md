@@ -57,9 +57,9 @@ categories:
 
 自分のアプリで自動補完のみをJavaScript モジュールとして使用したい場合はどうしますか?
 
-パーサーのインポートは npm パッケージとしてシンプルに行うことができます。これは Node.js [デモアプリ](https://github.com/cloudera/hue/tree/master/tools/parser/hue_dep) でパーサーを使用する方法の例です:
+パーサーのインポートは npm パッケージとしてシンプルに行うことができます。これは Node.js [デモアプリ](https://github.com/cloudera/hue/tree/master/tools/examples/api/hue_dep) でパーサーを使用する方法の例です:
 
-    cd tools/parser/hue_dep
+    cd tools/examples/api/hue_dep
 
     npm install
     npm run webpack

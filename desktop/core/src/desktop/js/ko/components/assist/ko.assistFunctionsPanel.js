@@ -172,30 +172,30 @@ class ConnectorUdfCategories {
       const replaceRegexp = new RegExp('(' + lowerCaseQuery + ')', 'i');
       this.categories().forEach(category => {
         category.functions.forEach(fn => {
-          if (fn.signature.toLowerCase().indexOf(lowerCaseQuery) === 0) {
+          if (fn.signature().toLowerCase().indexOf(lowerCaseQuery) === 0) {
             fn.weight = 2;
-            fn.signatureMatch(fn.signature.replace(replaceRegexp, '<b>$1</b>'));
-            fn.descriptionMatch(fn.description);
+            fn.signatureMatch(fn.signature().replace(replaceRegexp, '<b>$1</b>'));
+            fn.descriptionMatch(fn.description());
             result.push(fn);
-          } else if (fn.signature.toLowerCase().indexOf(lowerCaseQuery) !== -1) {
+          } else if (fn.signature().toLowerCase().indexOf(lowerCaseQuery) !== -1) {
             fn.weight = 1;
-            fn.signatureMatch(fn.signature.replace(replaceRegexp, '<b>$1</b>'));
-            fn.descriptionMatch(fn.description);
+            fn.signatureMatch(fn.signature().replace(replaceRegexp, '<b>$1</b>'));
+            fn.descriptionMatch(fn.description());
             result.push(fn);
           } else if (
-            fn.description &&
-            fn.description.toLowerCase().indexOf(lowerCaseQuery) !== -1
+            fn.description() &&
+            fn.description().toLowerCase().indexOf(lowerCaseQuery) !== -1
           ) {
-            fn.signatureMatch(fn.signature);
-            fn.descriptionMatch(fn.description.replace(replaceRegexp, '<b>$1</b>'));
+            fn.signatureMatch(fn.signature());
+            fn.descriptionMatch(fn.description().replace(replaceRegexp, '<b>$1</b>'));
             fn.weight = 0;
             result.push(fn);
           } else {
-            if (fn.signatureMatch() !== fn.signature) {
-              fn.signatureMatch(fn.signature);
+            if (fn.signatureMatch() !== fn.signature()) {
+              fn.signatureMatch(fn.signature());
             }
-            if (fn.descriptionMatch() !== fn.desciption) {
-              fn.descriptionMatch(fn.description);
+            if (fn.descriptionMatch() !== fn.description()) {
+              fn.descriptionMatch(fn.description());
             }
           }
         });
@@ -204,7 +204,7 @@ class ConnectorUdfCategories {
         if (a.weight !== b.weight) {
           return b.weight - a.weight;
         }
-        return a.signature.localeCompare(b.signature);
+        return a.signature().localeCompare(b.signature());
       });
       return result;
     });

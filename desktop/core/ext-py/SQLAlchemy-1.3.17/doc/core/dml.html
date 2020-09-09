@@ -1,0 +1,1352 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    Insert, Updates, Deletes
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+        <link rel="up" title="SQL Statements and Expressions API" href="expression_api.html" />
+        <link rel="next" title="SQL and Generic Functions" href="functions.html" />
+        <link rel="prev" title="Selectables, Tables, FROM objects" href="selectable.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../contents.html">Contents</a> |
+                <a href="../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="index.html" title="SQLAlchemy Core">SQLAlchemy Core</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="tutorial.html">SQL Expression Language Tutorial</a></span></li>
+<li><span class="link-container"><a class="reference external" href="expression_api.html">SQL Statements and Expressions API</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="sqlelement.html">Column Elements and Expressions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="selectable.html">Selectables, Tables, FROM objects</a></span></li>
+<li class="selected"><span class="link-container"><strong>Insert, Updates, Deletes</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span></li>
+<li><span class="link-container"><a class="reference external" href="functions.html">SQL and Generic Functions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="compiler.html">Custom SQL Constructs and Compilation Extension</a></span></li>
+<li><span class="link-container"><a class="reference external" href="serializer.html">Expression Serializer Extension</a></span></li>
+<li><span class="link-container"><a class="reference external" href="visitors.html">Visitor and Traversal Utilities</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="schema.html">Schema Definition Language</a></span></li>
+<li><span class="link-container"><a class="reference external" href="types.html">Column and Data Types</a></span></li>
+<li><span class="link-container"><a class="reference external" href="engines_connections.html">Engine and Connection Use</a></span></li>
+<li><span class="link-container"><a class="reference external" href="api_basics.html">Core API Basics</a></span></li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="insert-updates-deletes">
+<h1>Insert, Updates, Deletes<a class="headerlink" href="#insert-updates-deletes" title="Permalink to this headline">¶</a></h1>
+<p>INSERT, UPDATE and DELETE statements build on a hierarchy starting
+with <a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase" title="sqlalchemy.sql.expression.UpdateBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateBase</span></code></a>.   The <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a> and <a class="reference internal" href="#sqlalchemy.sql.expression.Update" title="sqlalchemy.sql.expression.Update"><code class="xref py py-class docutils literal notranslate"><span class="pre">Update</span></code></a>
+constructs build on the intermediary <a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase" title="sqlalchemy.sql.expression.ValuesBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValuesBase</span></code></a>.</p>
+<dl class="py function">
+<dt id="sqlalchemy.sql.expression.delete">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.sql.expression.</code><code class="sig-name descname">delete</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">whereclause</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bind</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">returning</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">prefixes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">dialect_kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct <a class="reference internal" href="#sqlalchemy.sql.expression.Delete" title="sqlalchemy.sql.expression.Delete"><code class="xref py py-class docutils literal notranslate"><span class="pre">Delete</span></code></a> object.</p>
+<p>Similar functionality is available via the
+<a class="reference internal" href="selectable.html#sqlalchemy.sql.expression.TableClause.delete" title="sqlalchemy.sql.expression.TableClause.delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TableClause.delete()</span></code></a> method on
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.sql.expression.delete.params.table"></span><strong>table</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.delete.params.table">¶</a> – The table to delete rows from.</p></li>
+<li><p><span class="target" id="sqlalchemy.sql.expression.delete.params.whereclause"></span><strong>whereclause</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.delete.params.whereclause">¶</a> – <dl class="simple">
+<dt>A <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.expression.ClauseElement" title="sqlalchemy.sql.expression.ClauseElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClauseElement</span></code></a></dt><dd><p>describing the <code class="docutils literal notranslate"><span class="pre">WHERE</span></code>
+condition of the <code class="docutils literal notranslate"><span class="pre">DELETE</span></code> statement. Note that the
+<a class="reference internal" href="#sqlalchemy.sql.expression.Delete.where" title="sqlalchemy.sql.expression.Delete.where"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Delete.where()</span></code></a> generative method may be used instead.</p>
+</dd>
+</dl>
+<p>The WHERE clause can refer to multiple tables.
+For databases which support this, a <code class="docutils literal notranslate"><span class="pre">DELETE..USING</span></code> or similar
+clause will be generated.  The statement
+will fail on databases that don’t have support for multi-table
+delete statements.  A SQL-standard method of referring to
+additional tables in the WHERE clause is to use a correlated
+subquery:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">users</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">users</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="o">==</span><span class="n">select</span><span class="p">([</span><span class="n">addresses</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">email_address</span><span class="p">])</span><span class="o">.</span>\
+                    <span class="n">where</span><span class="p">(</span><span class="n">addresses</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">user_id</span><span class="o">==</span><span class="n">users</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span>\
+                    <span class="n">as_scalar</span><span class="p">()</span>
+        <span class="p">)</span></pre></div>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 1.2.0: </span>The WHERE clause of DELETE can refer to multiple tables.</p>
+</div>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="tutorial.html#deletes"><span class="std std-ref">Deletes</span></a> - SQL Expression Tutorial</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sqlalchemy.sql.expression.insert">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.sql.expression.</code><code class="sig-name descname">insert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">bind</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">prefixes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">returning</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">return_defaults</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">dialect_kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct an <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a> object.</p>
+<p>Similar functionality is available via the
+<a class="reference internal" href="selectable.html#sqlalchemy.sql.expression.TableClause.insert" title="sqlalchemy.sql.expression.TableClause.insert"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TableClause.insert()</span></code></a> method on
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.sql.expression.insert.params.table"></span><strong>table</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.insert.params.table">¶</a> – <a class="reference internal" href="selectable.html#sqlalchemy.sql.expression.TableClause" title="sqlalchemy.sql.expression.TableClause"><code class="xref py py-class docutils literal notranslate"><span class="pre">TableClause</span></code></a>
+which is the subject of the
+insert.</p></li>
+<li><p><span class="target" id="sqlalchemy.sql.expression.insert.params.values"></span><strong>values</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.insert.params.values">¶</a> – collection of values to be inserted; see
+<a class="reference internal" href="#sqlalchemy.sql.expression.Insert.values" title="sqlalchemy.sql.expression.Insert.values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Insert.values()</span></code></a>
+for a description of allowed formats here.
+Can be omitted entirely; a <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a>
+construct will also
+dynamically render the VALUES clause at execution time based on
+the parameters passed to <a class="reference internal" href="connections.html#sqlalchemy.engine.Connection.execute" title="sqlalchemy.engine.Connection.execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Connection.execute()</span></code></a>.</p></li>
+<li><p><span class="target" id="sqlalchemy.sql.expression.insert.params.inline"></span><strong>inline</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.insert.params.inline">¶</a> – if True, no attempt will be made to retrieve the
+SQL-generated default values to be provided within the statement;
+in particular,
+this allows SQL expressions to be rendered ‘inline’ within the
+statement without the need to pre-execute them beforehand; for
+backends that support “returning”, this turns off the “implicit
+returning” feature for the statement.</p></li>
+</ul>
+</dd>
+</dl>
+<p>If both <cite>values</cite> and compile-time bind parameters are present, the
+compile-time bind parameters override the information specified
+within <cite>values</cite> on a per-key basis.</p>
+<p>The keys within <cite>values</cite> can be either
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a> objects or their string
+identifiers. Each key may reference one of:</p>
+<ul class="simple">
+<li><p>a literal data value (i.e. string, number, etc.);</p></li>
+<li><p>a Column object;</p></li>
+<li><p>a SELECT statement.</p></li>
+</ul>
+<p>If a <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> statement is specified which references this
+<code class="docutils literal notranslate"><span class="pre">INSERT</span></code> statement’s table, the statement will be correlated
+against the <code class="docutils literal notranslate"><span class="pre">INSERT</span></code> statement.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="tutorial.html#coretutorial-insert-expressions"><span class="std std-ref">Insert Expressions</span></a> - SQL Expression Tutorial</p>
+<p><a class="reference internal" href="tutorial.html#inserts-and-updates"><span class="std std-ref">Inserts, Updates and Deletes</span></a> - SQL Expression Tutorial</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sqlalchemy.sql.expression.update">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.sql.expression.</code><code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">whereclause</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">bind</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">prefixes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">returning</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">return_defaults</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">preserve_parameter_order</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">dialect_kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct an <a class="reference internal" href="#sqlalchemy.sql.expression.Update" title="sqlalchemy.sql.expression.Update"><code class="xref py py-class docutils literal notranslate"><span class="pre">Update</span></code></a> object.</p>
+<p>E.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">update</span>
+
+<span class="n">stmt</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="n">users</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="o">==</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span>\
+        <span class="n">values</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;user #5&#39;</span><span class="p">)</span></pre></div>
+</div>
+<p>Similar functionality is available via the
+<a class="reference internal" href="selectable.html#sqlalchemy.sql.expression.TableClause.update" title="sqlalchemy.sql.expression.TableClause.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TableClause.update()</span></code></a> method on
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stmt</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">update</span><span class="p">()</span><span class="o">.</span>\
+            <span class="n">where</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="o">==</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span>\
+            <span class="n">values</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;user #5&#39;</span><span class="p">)</span></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.sql.expression.update.params.table"></span><strong>table</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.update.params.table">¶</a> – A <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a>
+object representing the database
+table to be updated.</p></li>
+<li><p><span class="target" id="sqlalchemy.sql.expression.update.params.whereclause"></span><strong>whereclause</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.update.params.whereclause">¶</a> – <p>Optional SQL expression describing the <code class="docutils literal notranslate"><span class="pre">WHERE</span></code>
+condition of the <code class="docutils literal notranslate"><span class="pre">UPDATE</span></code> statement.   Modern applications
+may prefer to use the generative <a class="reference internal" href="#sqlalchemy.sql.expression.Update.where" title="sqlalchemy.sql.expression.Update.where"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Update.where()</span></code></a>
+method to specify the <code class="docutils literal notranslate"><span class="pre">WHERE</span></code> clause.</p>
+<p>The WHERE clause can refer to multiple tables.
+For databases which support this, an <code class="docutils literal notranslate"><span class="pre">UPDATE</span> <span class="pre">FROM</span></code> clause will
+be generated, or on MySQL, a multi-table update.  The statement
+will fail on databases that don’t have support for multi-table
+update statements.  A SQL-standard method of referring to
+additional tables in the WHERE clause is to use a correlated
+subquery:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">users</span><span class="o">.</span><span class="n">update</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;ed&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">users</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="o">==</span><span class="n">select</span><span class="p">([</span><span class="n">addresses</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">email_address</span><span class="p">])</span><span class="o">.</span>\
+                    <span class="n">where</span><span class="p">(</span><span class="n">addresses</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">user_id</span><span class="o">==</span><span class="n">users</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span>\
+                    <span class="n">as_scalar</span><span class="p">()</span>
+        <span class="p">)</span></pre></div>
+</div>
+</p></li>
+<li><p><span class="target" id="sqlalchemy.sql.expression.update.params.values"></span><strong>values</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.update.params.values">¶</a> – <p>Optional dictionary which specifies the <code class="docutils literal notranslate"><span class="pre">SET</span></code> conditions of the
+<code class="docutils literal notranslate"><span class="pre">UPDATE</span></code>.  If left as <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">SET</span></code>
+conditions are determined from those parameters passed to the
+statement during the execution and/or compilation of the
+statement.   When compiled standalone without any parameters,
+the <code class="docutils literal notranslate"><span class="pre">SET</span></code> clause generates for all columns.</p>
+<p>Modern applications may prefer to use the generative
+<a class="reference internal" href="#sqlalchemy.sql.expression.Update.values" title="sqlalchemy.sql.expression.Update.values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Update.values()</span></code></a> method to set the values of the
+UPDATE statement.</p>
+</p></li>
+<li><p><span class="target" id="sqlalchemy.sql.expression.update.params.inline"></span><strong>inline</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.update.params.inline">¶</a> – if True, SQL defaults present on <a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a> objects via
+the <code class="docutils literal notranslate"><span class="pre">default</span></code> keyword will be compiled ‘inline’ into the statement
+and not pre-executed.  This means that their values will not
+be available in the dictionary returned from
+<a class="reference internal" href="connections.html#sqlalchemy.engine.ResultProxy.last_updated_params" title="sqlalchemy.engine.ResultProxy.last_updated_params"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ResultProxy.last_updated_params()</span></code></a>.</p></li>
+<li><p><span class="target" id="sqlalchemy.sql.expression.update.params.preserve_parameter_order"></span><strong>preserve_parameter_order</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.update.params.preserve_parameter_order">¶</a> – <p>if True, the update statement is
+expected to receive parameters <strong>only</strong> via the
+<a class="reference internal" href="#sqlalchemy.sql.expression.Update.values" title="sqlalchemy.sql.expression.Update.values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Update.values()</span></code></a> method,
+and they must be passed as a Python
+<code class="docutils literal notranslate"><span class="pre">list</span></code> of 2-tuples. The rendered UPDATE statement will emit the SET
+clause for each referenced column maintaining this order.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.0.10.</span></p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="tutorial.html#updates-order-parameters"><span class="std std-ref">Parameter-Ordered Updates</span></a> - full example of the
+<a class="reference internal" href="#sqlalchemy.sql.expression.update.params.preserve_parameter_order" title="sqlalchemy.sql.expression.update"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">update.preserve_parameter_order</span></code></a> flag</p>
+</div>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p>If both <code class="docutils literal notranslate"><span class="pre">values</span></code> and compile-time bind parameters are present, the
+compile-time bind parameters override the information specified
+within <code class="docutils literal notranslate"><span class="pre">values</span></code> on a per-key basis.</p>
+<p>The keys within <code class="docutils literal notranslate"><span class="pre">values</span></code> can be either <a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>
+objects or their string identifiers (specifically the “key” of the
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>, normally but not necessarily equivalent to
+its “name”).  Normally, the
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a> objects used here are expected to be
+part of the target <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> that is the table
+to be updated.  However when using MySQL, a multiple-table
+UPDATE statement can refer to columns from any of
+the tables referred to in the WHERE clause.</p>
+<p>The values referred to in <code class="docutils literal notranslate"><span class="pre">values</span></code> are typically:</p>
+<ul class="simple">
+<li><p>a literal data value (i.e. string, number, etc.)</p></li>
+<li><p>a SQL expression, such as a related <a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>,
+a scalar-returning <a class="reference internal" href="selectable.html#sqlalchemy.sql.expression.select" title="sqlalchemy.sql.expression.select"><code class="xref py py-func docutils literal notranslate"><span class="pre">select()</span></code></a> construct,
+etc.</p></li>
+</ul>
+<p>When combining <a class="reference internal" href="selectable.html#sqlalchemy.sql.expression.select" title="sqlalchemy.sql.expression.select"><code class="xref py py-func docutils literal notranslate"><span class="pre">select()</span></code></a> constructs within the values
+clause of an <a class="reference internal" href="#sqlalchemy.sql.expression.update" title="sqlalchemy.sql.expression.update"><code class="xref py py-func docutils literal notranslate"><span class="pre">update()</span></code></a> construct,
+the subquery represented by the <a class="reference internal" href="selectable.html#sqlalchemy.sql.expression.select" title="sqlalchemy.sql.expression.select"><code class="xref py py-func docutils literal notranslate"><span class="pre">select()</span></code></a> should be
+<em>correlated</em> to the parent table, that is, providing criterion
+which links the table inside the subquery to the outer table
+being updated:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">users</span><span class="o">.</span><span class="n">update</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">select</span><span class="p">([</span><span class="n">addresses</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">email_address</span><span class="p">])</span><span class="o">.</span>\
+                <span class="n">where</span><span class="p">(</span><span class="n">addresses</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">user_id</span><span class="o">==</span><span class="n">users</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span>\
+                <span class="n">as_scalar</span><span class="p">()</span>
+    <span class="p">)</span></pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="tutorial.html#inserts-and-updates"><span class="std std-ref">Inserts, Updates and Deletes</span></a> - SQL Expression
+Language Tutorial</p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt id="sqlalchemy.sql.expression.Delete">
+<em class="property">class </em><code class="sig-prename descclassname">sqlalchemy.sql.expression.</code><code class="sig-name descname">Delete</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">whereclause</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bind</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">returning</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">prefixes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">dialect_kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.Delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase" title="sqlalchemy.sql.expression.UpdateBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.UpdateBase</span></code></a></p>
+<p>Represent a DELETE construct.</p>
+<p>The <a class="reference internal" href="#sqlalchemy.sql.expression.Delete" title="sqlalchemy.sql.expression.Delete"><code class="xref py py-class docutils literal notranslate"><span class="pre">Delete</span></code></a>
+object is created using the <a class="reference internal" href="#sqlalchemy.sql.expression.delete" title="sqlalchemy.sql.expression.delete"><code class="xref py py-func docutils literal notranslate"><span class="pre">delete()</span></code></a>
+function.</p>
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.Delete.returning">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.Delete"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.Delete.</span></code></a><code class="sig-name descname">returning</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">cols</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.Delete.returning" title="Permalink to this definition">¶</a></dt>
+<dd><div class="inherited-member docutils container">
+<p><em>inherited from the</em> <a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase.returning" title="sqlalchemy.sql.expression.UpdateBase.returning"><code class="xref py py-meth docutils literal notranslate"><span class="pre">UpdateBase.returning()</span></code></a> <em>method of</em> <a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase" title="sqlalchemy.sql.expression.UpdateBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateBase</span></code></a></p>
+</div>
+<p>Add a <a class="reference internal" href="../glossary.html#term-RETURNING"><span class="xref std std-term">RETURNING</span></a> or equivalent clause to this statement.</p>
+<p>e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stmt</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">update</span><span class="p">()</span><span class="o">.</span>\
+          <span class="n">where</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span><span class="o">.</span>\
+          <span class="n">values</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s1">&#39;X&#39;</span><span class="p">)</span><span class="o">.</span>\
+          <span class="n">returning</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">server_flag</span><span class="p">,</span>
+                    <span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">updated_timestamp</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">server_flag</span><span class="p">,</span> <span class="n">updated_timestamp</span> <span class="ow">in</span> <span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">server_flag</span><span class="p">,</span> <span class="n">updated_timestamp</span><span class="p">)</span></pre></div>
+</div>
+<p>The given collection of column expressions should be derived from
+the table that is
+the target of the INSERT, UPDATE, or DELETE.  While
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>
+objects are typical, the elements can also be expressions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stmt</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">returning</span><span class="p">(</span>
+    <span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">first_name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">last_name</span><span class="p">)</span><span class="o">.</span>
+    <span class="n">label</span><span class="p">(</span><span class="s1">&#39;fullname&#39;</span><span class="p">))</span></pre></div>
+</div>
+<p>Upon compilation, a RETURNING clause, or database equivalent,
+will be rendered within the statement.   For INSERT and UPDATE,
+the values are the newly inserted/updated values.  For DELETE,
+the values are those of the rows which were deleted.</p>
+<p>Upon execution, the values of the columns to be returned are made
+available via the result set and can be iterated using
+<a class="reference internal" href="connections.html#sqlalchemy.engine.ResultProxy.fetchone" title="sqlalchemy.engine.ResultProxy.fetchone"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ResultProxy.fetchone()</span></code></a> and similar.
+For DBAPIs which do not
+natively support returning values (i.e. cx_oracle), SQLAlchemy will
+approximate this behavior at the result level so that a reasonable
+amount of behavioral neutrality is provided.</p>
+<p>Note that not all databases/DBAPIs
+support RETURNING.   For those backends with no support,
+an exception is raised upon compilation and/or execution.
+For those who do support it, the functionality across backends
+varies greatly, including restrictions on executemany()
+and other statements which return multiple rows. Please
+read the documentation notes for the database in use in
+order to determine the availability of RETURNING.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.return_defaults" title="sqlalchemy.sql.expression.ValuesBase.return_defaults"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.return_defaults()</span></code></a> - an alternative method tailored
+towards efficient fetching of server-side defaults and triggers
+for single-row INSERTs or UPDATEs.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.Delete.__init__">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.Delete"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.Delete.</span></code></a><code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">whereclause</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bind</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">returning</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">prefixes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">dialect_kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.Delete.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a new <a class="reference internal" href="#sqlalchemy.sql.expression.Delete" title="sqlalchemy.sql.expression.Delete"><code class="xref py py-class docutils literal notranslate"><span class="pre">Delete</span></code></a> object.</p>
+<p>This constructor is mirrored as a public API function; see <a class="reference internal" href="#sqlalchemy.sql.expression.delete" title="sqlalchemy.sql.expression.delete"><code class="xref py py-func docutils literal notranslate"><span class="pre">delete()</span></code></a> for a full usage and argument description.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.Delete.get_children">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.Delete"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.Delete.</span></code></a><code class="sig-name descname">get_children</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.Delete.get_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return immediate child elements of this
+<a class="reference internal" href="sqlelement.html#sqlalchemy.sql.expression.ClauseElement" title="sqlalchemy.sql.expression.ClauseElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClauseElement</span></code></a>.</p>
+<p>This is used for visit traversal.</p>
+<p>**kwargs may contain flags that change the collection that is
+returned, for example to return a subset of items in order to
+cut down on larger traversals, or to return child items from a
+different context (such as schema-level collections instead of
+clause-level).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.Delete.where">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.Delete"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.Delete.</span></code></a><code class="sig-name descname">where</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">whereclause</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.Delete.where" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the given WHERE clause to a newly returned delete construct.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sqlalchemy.sql.expression.Insert">
+<em class="property">class </em><code class="sig-prename descclassname">sqlalchemy.sql.expression.</code><code class="sig-name descname">Insert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">bind</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">prefixes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">returning</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">return_defaults</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">dialect_kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.Insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase" title="sqlalchemy.sql.expression.ValuesBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.ValuesBase</span></code></a></p>
+<p>Represent an INSERT construct.</p>
+<p>The <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a> object is created using the
+<a class="reference internal" href="#sqlalchemy.sql.expression.insert" title="sqlalchemy.sql.expression.insert"><code class="xref py py-func docutils literal notranslate"><span class="pre">insert()</span></code></a> function.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="tutorial.html#coretutorial-insert-expressions"><span class="std std-ref">Insert Expressions</span></a></p>
+</div>
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.Insert.values">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.Insert"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.Insert.</span></code></a><code class="sig-name descname">values</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.Insert.values" title="Permalink to this definition">¶</a></dt>
+<dd><div class="inherited-member docutils container">
+<p><em>inherited from the</em> <a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.values" title="sqlalchemy.sql.expression.ValuesBase.values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.values()</span></code></a> <em>method of</em> <a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase" title="sqlalchemy.sql.expression.ValuesBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValuesBase</span></code></a></p>
+</div>
+<p>specify a fixed VALUES clause for an INSERT statement, or the SET
+clause for an UPDATE.</p>
+<p>Note that the <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a> and
+<a class="reference internal" href="#sqlalchemy.sql.expression.Update" title="sqlalchemy.sql.expression.Update"><code class="xref py py-class docutils literal notranslate"><span class="pre">Update</span></code></a> constructs support
+per-execution time formatting of the VALUES and/or SET clauses,
+based on the arguments passed to <a class="reference internal" href="connections.html#sqlalchemy.engine.Connection.execute" title="sqlalchemy.engine.Connection.execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Connection.execute()</span></code></a>.
+However, the <a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.values" title="sqlalchemy.sql.expression.ValuesBase.values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.values()</span></code></a> method can be used to “fix” a
+particular set of parameters into the statement.</p>
+<p>Multiple calls to <a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.values" title="sqlalchemy.sql.expression.ValuesBase.values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.values()</span></code></a> will produce a new
+construct, each one with the parameter list modified to include
+the new parameters sent.  In the typical case of a single
+dictionary of parameters, the newly passed keys will replace
+the same keys in the previous construct.  In the case of a list-based
+“multiple values” construct, each new list of values is extended
+onto the existing list of values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.sql.expression.Insert.values.params.**kwargs"></span><strong>**kwargs</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.Insert.values.params.**kwargs">¶</a> – <p>key value pairs representing the string key
+of a <a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>
+mapped to the value to be rendered into the
+VALUES or SET clause:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">users</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;some name&quot;</span><span class="p">)</span>
+
+<span class="n">users</span><span class="o">.</span><span class="n">update</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="o">==</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;some name&quot;</span><span class="p">)</span></pre></div>
+</div>
+</p></li>
+<li><p><span class="target" id="sqlalchemy.sql.expression.Insert.values.params.*args"></span><strong>*args</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.Insert.values.params.*args">¶</a> – <p>As an alternative to passing key/value parameters,
+a dictionary, tuple, or list of dictionaries or tuples can be passed
+as a single positional argument in order to form the VALUES or
+SET clause of the statement.  The forms that are accepted vary
+based on whether this is an <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a> or an
+<a class="reference internal" href="#sqlalchemy.sql.expression.Update" title="sqlalchemy.sql.expression.Update"><code class="xref py py-class docutils literal notranslate"><span class="pre">Update</span></code></a>
+construct.</p>
+<p>For either an <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a> or
+<a class="reference internal" href="#sqlalchemy.sql.expression.Update" title="sqlalchemy.sql.expression.Update"><code class="xref py py-class docutils literal notranslate"><span class="pre">Update</span></code></a> construct, a
+single dictionary can be passed, which works the same as that of
+the kwargs form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">users</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">({</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;some name&quot;</span><span class="p">})</span>
+
+<span class="n">users</span><span class="o">.</span><span class="n">update</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">({</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;some new name&quot;</span><span class="p">})</span></pre></div>
+</div>
+<p>Also for either form but more typically for the
+<a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a>
+construct, a tuple that contains an entry for every column in the
+table is also accepted:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">users</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;some name&quot;</span><span class="p">))</span></pre></div>
+</div>
+<p>The <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a>
+construct also supports being passed a list
+of dictionaries or full-table-tuples, which on the server will
+render the less common SQL syntax of “multiple values” - this
+syntax is supported on backends such as SQLite, PostgreSQL, MySQL,
+but not necessarily others:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">users</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">([</span>
+                    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;some name&quot;</span><span class="p">},</span>
+                    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;some other name&quot;</span><span class="p">},</span>
+                    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;yet another name&quot;</span><span class="p">},</span>
+                <span class="p">])</span></pre></div>
+</div>
+<p>The above form would render a multiple VALUES statement similar to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INSERT</span> <span class="n">INTO</span> <span class="n">users</span> <span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="n">VALUES</span>
+                <span class="p">(:</span><span class="n">name_1</span><span class="p">),</span>
+                <span class="p">(:</span><span class="n">name_2</span><span class="p">),</span>
+                <span class="p">(:</span><span class="n">name_3</span><span class="p">)</span></pre></div>
+</div>
+<p>It is essential to note that <strong>passing multiple values is
+NOT the same as using traditional executemany() form</strong>.  The above
+syntax is a <strong>special</strong> syntax not typically used.  To emit an
+INSERT statement against multiple rows, the normal method is
+to pass a multiple values list to the
+<a class="reference internal" href="connections.html#sqlalchemy.engine.Connection.execute" title="sqlalchemy.engine.Connection.execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Connection.execute()</span></code></a>
+method, which is supported by all database backends and is generally
+more efficient for a very large number of parameters.</p>
+<blockquote>
+<div><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="tutorial.html#execute-multiple"><span class="std std-ref">Executing Multiple Statements</span></a> - an introduction to
+the traditional Core method of multiple parameter set
+invocation for INSERTs and other statements.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 1.0.0: </span>an INSERT that uses a multiple-VALUES
+clause, even a list of length one,
+implies that the <a class="reference internal" href="#sqlalchemy.sql.expression.Insert.params.inline" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">Insert.inline</span></code></a>
+flag is set to
+True, indicating that the statement will not attempt to fetch
+the “last inserted primary key” or other defaults.  The
+statement deals with an arbitrary number of rows, so the
+<a class="reference internal" href="connections.html#sqlalchemy.engine.ResultProxy.inserted_primary_key" title="sqlalchemy.engine.ResultProxy.inserted_primary_key"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ResultProxy.inserted_primary_key</span></code></a>
+accessor does not
+apply.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 1.0.0: </span>A multiple-VALUES INSERT now supports
+columns with Python side default values and callables in the
+same way as that of an “executemany” style of invocation; the
+callable is invoked for each row.   See <a class="reference internal" href="../changelog/migration_10.html#bug-3288"><span class="std std-ref">Python-side defaults invoked for each row individually when using a multivalued insert</span></a>
+for other details.</p>
+</div>
+</div></blockquote>
+<p>The <a class="reference internal" href="#sqlalchemy.sql.expression.Update" title="sqlalchemy.sql.expression.Update"><code class="xref py py-class docutils literal notranslate"><span class="pre">Update</span></code></a>
+construct supports a special form which is a
+list of 2-tuples, which when provided must be passed in conjunction
+with the
+<a class="reference internal" href="#sqlalchemy.sql.expression.update.params.preserve_parameter_order" title="sqlalchemy.sql.expression.update"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">update.preserve_parameter_order</span></code></a>
+parameter.
+This form causes the UPDATE statement to render the SET clauses
+using the order of parameters given to
+<a class="reference internal" href="#sqlalchemy.sql.expression.Update.values" title="sqlalchemy.sql.expression.Update.values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Update.values()</span></code></a>, rather
+than the ordering of columns given in the <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a>.</p>
+<blockquote>
+<div><div class="versionadded">
+<p><span class="versionmodified added">New in version 1.0.10: </span>- added support for parameter-ordered
+UPDATE statements via the
+<a class="reference internal" href="#sqlalchemy.sql.expression.update.params.preserve_parameter_order" title="sqlalchemy.sql.expression.update"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">update.preserve_parameter_order</span></code></a>
+flag.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="tutorial.html#updates-order-parameters"><span class="std std-ref">Parameter-Ordered Updates</span></a> - full example of the
+<a class="reference internal" href="#sqlalchemy.sql.expression.update.params.preserve_parameter_order" title="sqlalchemy.sql.expression.update"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">update.preserve_parameter_order</span></code></a>
+flag</p>
+</div>
+</div></blockquote>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="tutorial.html#inserts-and-updates"><span class="std std-ref">Inserts, Updates and Deletes</span></a> - SQL Expression
+Language Tutorial</p>
+<p><a class="reference internal" href="#sqlalchemy.sql.expression.insert" title="sqlalchemy.sql.expression.insert"><code class="xref py py-func docutils literal notranslate"><span class="pre">insert()</span></code></a> - produce an <code class="docutils literal notranslate"><span class="pre">INSERT</span></code> statement</p>
+<p><a class="reference internal" href="#sqlalchemy.sql.expression.update" title="sqlalchemy.sql.expression.update"><code class="xref py py-func docutils literal notranslate"><span class="pre">update()</span></code></a> - produce an <code class="docutils literal notranslate"><span class="pre">UPDATE</span></code> statement</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.Insert.returning">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.Insert"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.Insert.</span></code></a><code class="sig-name descname">returning</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">cols</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.Insert.returning" title="Permalink to this definition">¶</a></dt>
+<dd><div class="inherited-member docutils container">
+<p><em>inherited from the</em> <a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase.returning" title="sqlalchemy.sql.expression.UpdateBase.returning"><code class="xref py py-meth docutils literal notranslate"><span class="pre">UpdateBase.returning()</span></code></a> <em>method of</em> <a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase" title="sqlalchemy.sql.expression.UpdateBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateBase</span></code></a></p>
+</div>
+<p>Add a <a class="reference internal" href="../glossary.html#term-RETURNING"><span class="xref std std-term">RETURNING</span></a> or equivalent clause to this statement.</p>
+<p>e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stmt</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">update</span><span class="p">()</span><span class="o">.</span>\
+          <span class="n">where</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span><span class="o">.</span>\
+          <span class="n">values</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s1">&#39;X&#39;</span><span class="p">)</span><span class="o">.</span>\
+          <span class="n">returning</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">server_flag</span><span class="p">,</span>
+                    <span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">updated_timestamp</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">server_flag</span><span class="p">,</span> <span class="n">updated_timestamp</span> <span class="ow">in</span> <span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">server_flag</span><span class="p">,</span> <span class="n">updated_timestamp</span><span class="p">)</span></pre></div>
+</div>
+<p>The given collection of column expressions should be derived from
+the table that is
+the target of the INSERT, UPDATE, or DELETE.  While
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>
+objects are typical, the elements can also be expressions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stmt</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">returning</span><span class="p">(</span>
+    <span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">first_name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">last_name</span><span class="p">)</span><span class="o">.</span>
+    <span class="n">label</span><span class="p">(</span><span class="s1">&#39;fullname&#39;</span><span class="p">))</span></pre></div>
+</div>
+<p>Upon compilation, a RETURNING clause, or database equivalent,
+will be rendered within the statement.   For INSERT and UPDATE,
+the values are the newly inserted/updated values.  For DELETE,
+the values are those of the rows which were deleted.</p>
+<p>Upon execution, the values of the columns to be returned are made
+available via the result set and can be iterated using
+<a class="reference internal" href="connections.html#sqlalchemy.engine.ResultProxy.fetchone" title="sqlalchemy.engine.ResultProxy.fetchone"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ResultProxy.fetchone()</span></code></a> and similar.
+For DBAPIs which do not
+natively support returning values (i.e. cx_oracle), SQLAlchemy will
+approximate this behavior at the result level so that a reasonable
+amount of behavioral neutrality is provided.</p>
+<p>Note that not all databases/DBAPIs
+support RETURNING.   For those backends with no support,
+an exception is raised upon compilation and/or execution.
+For those who do support it, the functionality across backends
+varies greatly, including restrictions on executemany()
+and other statements which return multiple rows. Please
+read the documentation notes for the database in use in
+order to determine the availability of RETURNING.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.return_defaults" title="sqlalchemy.sql.expression.ValuesBase.return_defaults"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.return_defaults()</span></code></a> - an alternative method tailored
+towards efficient fetching of server-side defaults and triggers
+for single-row INSERTs or UPDATEs.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.Insert.__init__">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.Insert"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.Insert.</span></code></a><code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">bind</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">prefixes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">returning</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">return_defaults</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">dialect_kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.Insert.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a new <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a> object.</p>
+<p>This constructor is mirrored as a public API function; see <a class="reference internal" href="#sqlalchemy.sql.expression.insert" title="sqlalchemy.sql.expression.insert"><code class="xref py py-func docutils literal notranslate"><span class="pre">insert()</span></code></a> for a full usage and argument description.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.Insert.from_select">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.Insert"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.Insert.</span></code></a><code class="sig-name descname">from_select</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">names</span></em>, <em class="sig-param"><span class="n">select</span></em>, <em class="sig-param"><span class="n">include_defaults</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.Insert.from_select" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a new <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a> construct which represents
+an <code class="docutils literal notranslate"><span class="pre">INSERT...FROM</span> <span class="pre">SELECT</span></code> statement.</p>
+<p>e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sel</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">table1</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">table1</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">b</span><span class="p">])</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">table1</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">c</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">ins</span> <span class="o">=</span> <span class="n">table2</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">from_select</span><span class="p">([</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">],</span> <span class="n">sel</span><span class="p">)</span></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.sql.expression.Insert.from_select.params.names"></span><strong>names</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.Insert.from_select.params.names">¶</a> – a sequence of string column names or
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>
+objects representing the target columns.</p></li>
+<li><p><span class="target" id="sqlalchemy.sql.expression.Insert.from_select.params.select"></span><strong>select</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.Insert.from_select.params.select">¶</a> – a <a class="reference internal" href="selectable.html#sqlalchemy.sql.expression.select" title="sqlalchemy.sql.expression.select"><code class="xref py py-func docutils literal notranslate"><span class="pre">select()</span></code></a> construct,
+<a class="reference internal" href="selectable.html#sqlalchemy.sql.expression.FromClause" title="sqlalchemy.sql.expression.FromClause"><code class="xref py py-class docutils literal notranslate"><span class="pre">FromClause</span></code></a>
+or other construct which resolves into a
+<a class="reference internal" href="selectable.html#sqlalchemy.sql.expression.FromClause" title="sqlalchemy.sql.expression.FromClause"><code class="xref py py-class docutils literal notranslate"><span class="pre">FromClause</span></code></a>,
+such as an ORM <a class="reference internal" href="../orm/query.html#sqlalchemy.orm.query.Query" title="sqlalchemy.orm.query.Query"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></a> object, etc.  The order of
+columns returned from this FROM clause should correspond to the
+order of columns sent as the <code class="docutils literal notranslate"><span class="pre">names</span></code> parameter;  while this
+is not checked before passing along to the database, the database
+would normally raise an exception if these column lists don’t
+correspond.</p></li>
+<li><p><span class="target" id="sqlalchemy.sql.expression.Insert.from_select.params.include_defaults"></span><strong>include_defaults</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.Insert.from_select.params.include_defaults">¶</a> – <p>if True, non-server default values and
+SQL expressions as specified on <a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a> objects
+(as documented in <a class="reference internal" href="defaults.html"><span class="std std-ref">Column INSERT/UPDATE Defaults</span></a>) not
+otherwise specified in the list of names will be rendered
+into the INSERT and SELECT statements, so that these values are also
+included in the data to be inserted.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A Python-side default that uses a Python callable function
+will only be invoked <strong>once</strong> for the whole statement, and <strong>not
+per row</strong>.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.0.0: </span>- <a class="reference internal" href="#sqlalchemy.sql.expression.Insert.from_select" title="sqlalchemy.sql.expression.Insert.from_select"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Insert.from_select()</span></code></a>
+now renders
+Python-side and SQL expression column defaults into the
+SELECT statement for columns otherwise not included in the
+list of column names.</p>
+</div>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 1.0.0: </span>an INSERT that uses FROM SELECT
+implies that the <a class="reference internal" href="#sqlalchemy.sql.expression.insert.params.inline" title="sqlalchemy.sql.expression.insert"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">insert.inline</span></code></a>
+flag is set to
+True, indicating that the statement will not attempt to fetch
+the “last inserted primary key” or other defaults.  The statement
+deals with an arbitrary number of rows, so the
+<a class="reference internal" href="connections.html#sqlalchemy.engine.ResultProxy.inserted_primary_key" title="sqlalchemy.engine.ResultProxy.inserted_primary_key"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ResultProxy.inserted_primary_key</span></code></a>
+accessor does not apply.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.Insert.get_children">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.Insert"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.Insert.</span></code></a><code class="sig-name descname">get_children</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.Insert.get_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return immediate child elements of this
+<a class="reference internal" href="sqlelement.html#sqlalchemy.sql.expression.ClauseElement" title="sqlalchemy.sql.expression.ClauseElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClauseElement</span></code></a>.</p>
+<p>This is used for visit traversal.</p>
+<p>**kwargs may contain flags that change the collection that is
+returned, for example to return a subset of items in order to
+cut down on larger traversals, or to return child items from a
+different context (such as schema-level collections instead of
+clause-level).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sqlalchemy.sql.expression.Update">
+<em class="property">class </em><code class="sig-prename descclassname">sqlalchemy.sql.expression.</code><code class="sig-name descname">Update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">whereclause</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">bind</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">prefixes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">returning</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">return_defaults</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">preserve_parameter_order</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">dialect_kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.Update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase" title="sqlalchemy.sql.expression.ValuesBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.ValuesBase</span></code></a></p>
+<p>Represent an Update construct.</p>
+<p>The <a class="reference internal" href="#sqlalchemy.sql.expression.Update" title="sqlalchemy.sql.expression.Update"><code class="xref py py-class docutils literal notranslate"><span class="pre">Update</span></code></a>
+object is created using the <a class="reference internal" href="#sqlalchemy.sql.expression.update" title="sqlalchemy.sql.expression.update"><code class="xref py py-func docutils literal notranslate"><span class="pre">update()</span></code></a>
+function.</p>
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.Update.returning">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.Update"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.Update.</span></code></a><code class="sig-name descname">returning</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">cols</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.Update.returning" title="Permalink to this definition">¶</a></dt>
+<dd><div class="inherited-member docutils container">
+<p><em>inherited from the</em> <a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase.returning" title="sqlalchemy.sql.expression.UpdateBase.returning"><code class="xref py py-meth docutils literal notranslate"><span class="pre">UpdateBase.returning()</span></code></a> <em>method of</em> <a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase" title="sqlalchemy.sql.expression.UpdateBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateBase</span></code></a></p>
+</div>
+<p>Add a <a class="reference internal" href="../glossary.html#term-RETURNING"><span class="xref std std-term">RETURNING</span></a> or equivalent clause to this statement.</p>
+<p>e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stmt</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">update</span><span class="p">()</span><span class="o">.</span>\
+          <span class="n">where</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span><span class="o">.</span>\
+          <span class="n">values</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s1">&#39;X&#39;</span><span class="p">)</span><span class="o">.</span>\
+          <span class="n">returning</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">server_flag</span><span class="p">,</span>
+                    <span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">updated_timestamp</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">server_flag</span><span class="p">,</span> <span class="n">updated_timestamp</span> <span class="ow">in</span> <span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">server_flag</span><span class="p">,</span> <span class="n">updated_timestamp</span><span class="p">)</span></pre></div>
+</div>
+<p>The given collection of column expressions should be derived from
+the table that is
+the target of the INSERT, UPDATE, or DELETE.  While
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>
+objects are typical, the elements can also be expressions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stmt</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">returning</span><span class="p">(</span>
+    <span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">first_name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">last_name</span><span class="p">)</span><span class="o">.</span>
+    <span class="n">label</span><span class="p">(</span><span class="s1">&#39;fullname&#39;</span><span class="p">))</span></pre></div>
+</div>
+<p>Upon compilation, a RETURNING clause, or database equivalent,
+will be rendered within the statement.   For INSERT and UPDATE,
+the values are the newly inserted/updated values.  For DELETE,
+the values are those of the rows which were deleted.</p>
+<p>Upon execution, the values of the columns to be returned are made
+available via the result set and can be iterated using
+<a class="reference internal" href="connections.html#sqlalchemy.engine.ResultProxy.fetchone" title="sqlalchemy.engine.ResultProxy.fetchone"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ResultProxy.fetchone()</span></code></a> and similar.
+For DBAPIs which do not
+natively support returning values (i.e. cx_oracle), SQLAlchemy will
+approximate this behavior at the result level so that a reasonable
+amount of behavioral neutrality is provided.</p>
+<p>Note that not all databases/DBAPIs
+support RETURNING.   For those backends with no support,
+an exception is raised upon compilation and/or execution.
+For those who do support it, the functionality across backends
+varies greatly, including restrictions on executemany()
+and other statements which return multiple rows. Please
+read the documentation notes for the database in use in
+order to determine the availability of RETURNING.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.return_defaults" title="sqlalchemy.sql.expression.ValuesBase.return_defaults"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.return_defaults()</span></code></a> - an alternative method tailored
+towards efficient fetching of server-side defaults and triggers
+for single-row INSERTs or UPDATEs.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.Update.values">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.Update"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.Update.</span></code></a><code class="sig-name descname">values</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.Update.values" title="Permalink to this definition">¶</a></dt>
+<dd><div class="inherited-member docutils container">
+<p><em>inherited from the</em> <a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.values" title="sqlalchemy.sql.expression.ValuesBase.values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.values()</span></code></a> <em>method of</em> <a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase" title="sqlalchemy.sql.expression.ValuesBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValuesBase</span></code></a></p>
+</div>
+<p>specify a fixed VALUES clause for an INSERT statement, or the SET
+clause for an UPDATE.</p>
+<p>Note that the <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a> and
+<a class="reference internal" href="#sqlalchemy.sql.expression.Update" title="sqlalchemy.sql.expression.Update"><code class="xref py py-class docutils literal notranslate"><span class="pre">Update</span></code></a> constructs support
+per-execution time formatting of the VALUES and/or SET clauses,
+based on the arguments passed to <a class="reference internal" href="connections.html#sqlalchemy.engine.Connection.execute" title="sqlalchemy.engine.Connection.execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Connection.execute()</span></code></a>.
+However, the <a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.values" title="sqlalchemy.sql.expression.ValuesBase.values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.values()</span></code></a> method can be used to “fix” a
+particular set of parameters into the statement.</p>
+<p>Multiple calls to <a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.values" title="sqlalchemy.sql.expression.ValuesBase.values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.values()</span></code></a> will produce a new
+construct, each one with the parameter list modified to include
+the new parameters sent.  In the typical case of a single
+dictionary of parameters, the newly passed keys will replace
+the same keys in the previous construct.  In the case of a list-based
+“multiple values” construct, each new list of values is extended
+onto the existing list of values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.sql.expression.Update.values.params.**kwargs"></span><strong>**kwargs</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.Update.values.params.**kwargs">¶</a> – <p>key value pairs representing the string key
+of a <a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>
+mapped to the value to be rendered into the
+VALUES or SET clause:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">users</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;some name&quot;</span><span class="p">)</span>
+
+<span class="n">users</span><span class="o">.</span><span class="n">update</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="o">==</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;some name&quot;</span><span class="p">)</span></pre></div>
+</div>
+</p></li>
+<li><p><span class="target" id="sqlalchemy.sql.expression.Update.values.params.*args"></span><strong>*args</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.Update.values.params.*args">¶</a> – <p>As an alternative to passing key/value parameters,
+a dictionary, tuple, or list of dictionaries or tuples can be passed
+as a single positional argument in order to form the VALUES or
+SET clause of the statement.  The forms that are accepted vary
+based on whether this is an <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a> or an
+<a class="reference internal" href="#sqlalchemy.sql.expression.Update" title="sqlalchemy.sql.expression.Update"><code class="xref py py-class docutils literal notranslate"><span class="pre">Update</span></code></a>
+construct.</p>
+<p>For either an <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a> or
+<a class="reference internal" href="#sqlalchemy.sql.expression.Update" title="sqlalchemy.sql.expression.Update"><code class="xref py py-class docutils literal notranslate"><span class="pre">Update</span></code></a> construct, a
+single dictionary can be passed, which works the same as that of
+the kwargs form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">users</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">({</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;some name&quot;</span><span class="p">})</span>
+
+<span class="n">users</span><span class="o">.</span><span class="n">update</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">({</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;some new name&quot;</span><span class="p">})</span></pre></div>
+</div>
+<p>Also for either form but more typically for the
+<a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a>
+construct, a tuple that contains an entry for every column in the
+table is also accepted:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">users</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;some name&quot;</span><span class="p">))</span></pre></div>
+</div>
+<p>The <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a>
+construct also supports being passed a list
+of dictionaries or full-table-tuples, which on the server will
+render the less common SQL syntax of “multiple values” - this
+syntax is supported on backends such as SQLite, PostgreSQL, MySQL,
+but not necessarily others:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">users</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">([</span>
+                    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;some name&quot;</span><span class="p">},</span>
+                    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;some other name&quot;</span><span class="p">},</span>
+                    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;yet another name&quot;</span><span class="p">},</span>
+                <span class="p">])</span></pre></div>
+</div>
+<p>The above form would render a multiple VALUES statement similar to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INSERT</span> <span class="n">INTO</span> <span class="n">users</span> <span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="n">VALUES</span>
+                <span class="p">(:</span><span class="n">name_1</span><span class="p">),</span>
+                <span class="p">(:</span><span class="n">name_2</span><span class="p">),</span>
+                <span class="p">(:</span><span class="n">name_3</span><span class="p">)</span></pre></div>
+</div>
+<p>It is essential to note that <strong>passing multiple values is
+NOT the same as using traditional executemany() form</strong>.  The above
+syntax is a <strong>special</strong> syntax not typically used.  To emit an
+INSERT statement against multiple rows, the normal method is
+to pass a multiple values list to the
+<a class="reference internal" href="connections.html#sqlalchemy.engine.Connection.execute" title="sqlalchemy.engine.Connection.execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Connection.execute()</span></code></a>
+method, which is supported by all database backends and is generally
+more efficient for a very large number of parameters.</p>
+<blockquote>
+<div><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="tutorial.html#execute-multiple"><span class="std std-ref">Executing Multiple Statements</span></a> - an introduction to
+the traditional Core method of multiple parameter set
+invocation for INSERTs and other statements.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 1.0.0: </span>an INSERT that uses a multiple-VALUES
+clause, even a list of length one,
+implies that the <a class="reference internal" href="#sqlalchemy.sql.expression.Insert.params.inline" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">Insert.inline</span></code></a>
+flag is set to
+True, indicating that the statement will not attempt to fetch
+the “last inserted primary key” or other defaults.  The
+statement deals with an arbitrary number of rows, so the
+<a class="reference internal" href="connections.html#sqlalchemy.engine.ResultProxy.inserted_primary_key" title="sqlalchemy.engine.ResultProxy.inserted_primary_key"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ResultProxy.inserted_primary_key</span></code></a>
+accessor does not
+apply.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 1.0.0: </span>A multiple-VALUES INSERT now supports
+columns with Python side default values and callables in the
+same way as that of an “executemany” style of invocation; the
+callable is invoked for each row.   See <a class="reference internal" href="../changelog/migration_10.html#bug-3288"><span class="std std-ref">Python-side defaults invoked for each row individually when using a multivalued insert</span></a>
+for other details.</p>
+</div>
+</div></blockquote>
+<p>The <a class="reference internal" href="#sqlalchemy.sql.expression.Update" title="sqlalchemy.sql.expression.Update"><code class="xref py py-class docutils literal notranslate"><span class="pre">Update</span></code></a>
+construct supports a special form which is a
+list of 2-tuples, which when provided must be passed in conjunction
+with the
+<a class="reference internal" href="#sqlalchemy.sql.expression.update.params.preserve_parameter_order" title="sqlalchemy.sql.expression.update"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">update.preserve_parameter_order</span></code></a>
+parameter.
+This form causes the UPDATE statement to render the SET clauses
+using the order of parameters given to
+<a class="reference internal" href="#sqlalchemy.sql.expression.Update.values" title="sqlalchemy.sql.expression.Update.values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Update.values()</span></code></a>, rather
+than the ordering of columns given in the <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a>.</p>
+<blockquote>
+<div><div class="versionadded">
+<p><span class="versionmodified added">New in version 1.0.10: </span>- added support for parameter-ordered
+UPDATE statements via the
+<a class="reference internal" href="#sqlalchemy.sql.expression.update.params.preserve_parameter_order" title="sqlalchemy.sql.expression.update"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">update.preserve_parameter_order</span></code></a>
+flag.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="tutorial.html#updates-order-parameters"><span class="std std-ref">Parameter-Ordered Updates</span></a> - full example of the
+<a class="reference internal" href="#sqlalchemy.sql.expression.update.params.preserve_parameter_order" title="sqlalchemy.sql.expression.update"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">update.preserve_parameter_order</span></code></a>
+flag</p>
+</div>
+</div></blockquote>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="tutorial.html#inserts-and-updates"><span class="std std-ref">Inserts, Updates and Deletes</span></a> - SQL Expression
+Language Tutorial</p>
+<p><a class="reference internal" href="#sqlalchemy.sql.expression.insert" title="sqlalchemy.sql.expression.insert"><code class="xref py py-func docutils literal notranslate"><span class="pre">insert()</span></code></a> - produce an <code class="docutils literal notranslate"><span class="pre">INSERT</span></code> statement</p>
+<p><a class="reference internal" href="#sqlalchemy.sql.expression.update" title="sqlalchemy.sql.expression.update"><code class="xref py py-func docutils literal notranslate"><span class="pre">update()</span></code></a> - produce an <code class="docutils literal notranslate"><span class="pre">UPDATE</span></code> statement</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.Update.__init__">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.Update"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.Update.</span></code></a><code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">whereclause</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">inline</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">bind</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">prefixes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">returning</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">return_defaults</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">preserve_parameter_order</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">dialect_kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.Update.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a new <a class="reference internal" href="#sqlalchemy.sql.expression.Update" title="sqlalchemy.sql.expression.Update"><code class="xref py py-class docutils literal notranslate"><span class="pre">Update</span></code></a> object.</p>
+<p>This constructor is mirrored as a public API function; see <a class="reference internal" href="#sqlalchemy.sql.expression.update" title="sqlalchemy.sql.expression.update"><code class="xref py py-func docutils literal notranslate"><span class="pre">update()</span></code></a> for a full usage and argument description.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.Update.get_children">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.Update"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.Update.</span></code></a><code class="sig-name descname">get_children</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.Update.get_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return immediate child elements of this
+<a class="reference internal" href="sqlelement.html#sqlalchemy.sql.expression.ClauseElement" title="sqlalchemy.sql.expression.ClauseElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClauseElement</span></code></a>.</p>
+<p>This is used for visit traversal.</p>
+<p>**kwargs may contain flags that change the collection that is
+returned, for example to return a subset of items in order to
+cut down on larger traversals, or to return child items from a
+different context (such as schema-level collections instead of
+clause-level).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.Update.where">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.Update"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.Update.</span></code></a><code class="sig-name descname">where</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">whereclause</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.Update.where" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a new update() construct with the given expression added to
+its WHERE clause, joined to the existing clause via AND, if any.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sqlalchemy.sql.expression.UpdateBase">
+<em class="property">class </em><code class="sig-prename descclassname">sqlalchemy.sql.expression.</code><code class="sig-name descname">UpdateBase</code><a class="headerlink" href="#sqlalchemy.sql.expression.UpdateBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="selectable.html#sqlalchemy.sql.expression.HasCTE" title="sqlalchemy.sql.expression.HasCTE"><code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.HasCTE</span></code></a>, <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.base.DialectKWArgs" title="sqlalchemy.sql.base.DialectKWArgs"><code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.sql.base.DialectKWArgs</span></code></a>, <a class="reference internal" href="selectable.html#sqlalchemy.sql.expression.HasPrefixes" title="sqlalchemy.sql.expression.HasPrefixes"><code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.HasPrefixes</span></code></a>, <a class="reference internal" href="selectable.html#sqlalchemy.sql.expression.Executable" title="sqlalchemy.sql.expression.Executable"><code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.Executable</span></code></a>, <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.expression.ClauseElement" title="sqlalchemy.sql.expression.ClauseElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.ClauseElement</span></code></a></p>
+<p>Form the base for <code class="docutils literal notranslate"><span class="pre">INSERT</span></code>, <code class="docutils literal notranslate"><span class="pre">UPDATE</span></code>, and <code class="docutils literal notranslate"><span class="pre">DELETE</span></code> statements.</p>
+<dl class="py attribute">
+<dt id="sqlalchemy.sql.expression.UpdateBase.bind">
+<em class="property">attribute </em><a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.UpdateBase.</span></code></a><code class="sig-name descname">bind</code><a class="headerlink" href="#sqlalchemy.sql.expression.UpdateBase.bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a ‘bind’ linked to this <a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase" title="sqlalchemy.sql.expression.UpdateBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateBase</span></code></a>
+or a <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> associated with it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.UpdateBase.params">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.UpdateBase.</span></code></a><code class="sig-name descname">params</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">arg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.UpdateBase.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters for the statement.</p>
+<p>This method raises <code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code> on the base class,
+and is overridden by <a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase" title="sqlalchemy.sql.expression.ValuesBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValuesBase</span></code></a> to provide the
+SET/VALUES clause of UPDATE and INSERT.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.UpdateBase.returning">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.UpdateBase.</span></code></a><code class="sig-name descname">returning</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">cols</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.UpdateBase.returning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a <a class="reference internal" href="../glossary.html#term-RETURNING"><span class="xref std std-term">RETURNING</span></a> or equivalent clause to this statement.</p>
+<p>e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stmt</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">update</span><span class="p">()</span><span class="o">.</span>\
+          <span class="n">where</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span><span class="o">.</span>\
+          <span class="n">values</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s1">&#39;X&#39;</span><span class="p">)</span><span class="o">.</span>\
+          <span class="n">returning</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">server_flag</span><span class="p">,</span>
+                    <span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">updated_timestamp</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">server_flag</span><span class="p">,</span> <span class="n">updated_timestamp</span> <span class="ow">in</span> <span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">server_flag</span><span class="p">,</span> <span class="n">updated_timestamp</span><span class="p">)</span></pre></div>
+</div>
+<p>The given collection of column expressions should be derived from
+the table that is
+the target of the INSERT, UPDATE, or DELETE.  While
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>
+objects are typical, the elements can also be expressions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stmt</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">returning</span><span class="p">(</span>
+    <span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">first_name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">last_name</span><span class="p">)</span><span class="o">.</span>
+    <span class="n">label</span><span class="p">(</span><span class="s1">&#39;fullname&#39;</span><span class="p">))</span></pre></div>
+</div>
+<p>Upon compilation, a RETURNING clause, or database equivalent,
+will be rendered within the statement.   For INSERT and UPDATE,
+the values are the newly inserted/updated values.  For DELETE,
+the values are those of the rows which were deleted.</p>
+<p>Upon execution, the values of the columns to be returned are made
+available via the result set and can be iterated using
+<a class="reference internal" href="connections.html#sqlalchemy.engine.ResultProxy.fetchone" title="sqlalchemy.engine.ResultProxy.fetchone"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ResultProxy.fetchone()</span></code></a> and similar.
+For DBAPIs which do not
+natively support returning values (i.e. cx_oracle), SQLAlchemy will
+approximate this behavior at the result level so that a reasonable
+amount of behavioral neutrality is provided.</p>
+<p>Note that not all databases/DBAPIs
+support RETURNING.   For those backends with no support,
+an exception is raised upon compilation and/or execution.
+For those who do support it, the functionality across backends
+varies greatly, including restrictions on executemany()
+and other statements which return multiple rows. Please
+read the documentation notes for the database in use in
+order to determine the availability of RETURNING.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.return_defaults" title="sqlalchemy.sql.expression.ValuesBase.return_defaults"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.return_defaults()</span></code></a> - an alternative method tailored
+towards efficient fetching of server-side defaults and triggers
+for single-row INSERTs or UPDATEs.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.UpdateBase.with_hint">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.UpdateBase.</span></code></a><code class="sig-name descname">with_hint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">text</span></em>, <em class="sig-param"><span class="n">selectable</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dialect_name</span><span class="o">=</span><span class="default_value">'*'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.UpdateBase.with_hint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a table hint for a single table to this
+INSERT/UPDATE/DELETE statement.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase.with_hint" title="sqlalchemy.sql.expression.UpdateBase.with_hint"><code class="xref py py-meth docutils literal notranslate"><span class="pre">UpdateBase.with_hint()</span></code></a> currently applies only to
+Microsoft SQL Server.  For MySQL INSERT/UPDATE/DELETE hints, use
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">UpdateBase.prefix_with()</span></code>.</p>
+</div>
+<p>The text of the hint is rendered in the appropriate
+location for the database backend in use, relative
+to the <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> that is the subject of this
+statement, or optionally to that of the given
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> passed as the <code class="docutils literal notranslate"><span class="pre">selectable</span></code> argument.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">dialect_name</span></code> option will limit the rendering of a particular
+hint to a particular backend. Such as, to add a hint
+that only takes effect for SQL Server:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mytable</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">with_hint</span><span class="p">(</span><span class="s2">&quot;WITH (PAGLOCK)&quot;</span><span class="p">,</span> <span class="n">dialect_name</span><span class="o">=</span><span class="s2">&quot;mssql&quot;</span><span class="p">)</span></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.sql.expression.UpdateBase.with_hint.params.text"></span><strong>text</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.UpdateBase.with_hint.params.text">¶</a> – Text of the hint.</p></li>
+<li><p><span class="target" id="sqlalchemy.sql.expression.UpdateBase.with_hint.params.selectable"></span><strong>selectable</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.UpdateBase.with_hint.params.selectable">¶</a> – optional <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a> that specifies
+an element of the FROM clause within an UPDATE or DELETE
+to be the subject of the hint - applies only to certain backends.</p></li>
+<li><p><span class="target" id="sqlalchemy.sql.expression.UpdateBase.with_hint.params.dialect_name"></span><strong>dialect_name</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.UpdateBase.with_hint.params.dialect_name">¶</a> – defaults to <code class="docutils literal notranslate"><span class="pre">*</span></code>, if specified as the name
+of a particular dialect, will apply these hints only when
+that dialect is in use.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sqlalchemy.sql.expression.ValuesBase">
+<em class="property">class </em><code class="sig-prename descclassname">sqlalchemy.sql.expression.</code><code class="sig-name descname">ValuesBase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">values</span></em>, <em class="sig-param"><span class="n">prefixes</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.ValuesBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase" title="sqlalchemy.sql.expression.UpdateBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.UpdateBase</span></code></a></p>
+<p>Supplies support for <a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.values" title="sqlalchemy.sql.expression.ValuesBase.values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.values()</span></code></a> to
+INSERT and UPDATE constructs.</p>
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.ValuesBase.return_defaults">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.ValuesBase.</span></code></a><code class="sig-name descname">return_defaults</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">cols</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.ValuesBase.return_defaults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make use of a <a class="reference internal" href="../glossary.html#term-RETURNING"><span class="xref std std-term">RETURNING</span></a> clause for the purpose
+of fetching server-side expressions and defaults.</p>
+<p>E.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stmt</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="s1">&#39;newdata&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">return_defaults</span><span class="p">()</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+
+<span class="n">server_created_at</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">returned_defaults</span><span class="p">[</span><span class="s1">&#39;created_at&#39;</span><span class="p">]</span></pre></div>
+</div>
+<p>When used against a backend that supports RETURNING, all column
+values generated by SQL expression or server-side-default will be
+added to any existing RETURNING clause, provided that
+<a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase.returning" title="sqlalchemy.sql.expression.UpdateBase.returning"><code class="xref py py-meth docutils literal notranslate"><span class="pre">UpdateBase.returning()</span></code></a> is not used simultaneously.  The column
+values will then be available on the result using the
+<a class="reference internal" href="connections.html#sqlalchemy.engine.ResultProxy.returned_defaults" title="sqlalchemy.engine.ResultProxy.returned_defaults"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ResultProxy.returned_defaults</span></code></a> accessor as a dictionary
+,
+referring to values keyed to the <a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>
+object as well as
+its <code class="docutils literal notranslate"><span class="pre">.key</span></code>.</p>
+<p>This method differs from <a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase.returning" title="sqlalchemy.sql.expression.UpdateBase.returning"><code class="xref py py-meth docutils literal notranslate"><span class="pre">UpdateBase.returning()</span></code></a> in these ways:</p>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.return_defaults" title="sqlalchemy.sql.expression.ValuesBase.return_defaults"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.return_defaults()</span></code></a> is only intended for use with
+an INSERT or an UPDATE statement that matches exactly one row.
+While the RETURNING construct in the general sense supports
+multiple rows for a multi-row UPDATE or DELETE statement, or for
+special cases of INSERT that return multiple rows (e.g. INSERT from
+SELECT, multi-valued VALUES clause),
+<a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.return_defaults" title="sqlalchemy.sql.expression.ValuesBase.return_defaults"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.return_defaults()</span></code></a> is intended only for an
+“ORM-style” single-row INSERT/UPDATE statement.  The row returned
+by the statement is also consumed implicitly when
+<a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.return_defaults" title="sqlalchemy.sql.expression.ValuesBase.return_defaults"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.return_defaults()</span></code></a> is used.  By contrast,
+<a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase.returning" title="sqlalchemy.sql.expression.UpdateBase.returning"><code class="xref py py-meth docutils literal notranslate"><span class="pre">UpdateBase.returning()</span></code></a> leaves the RETURNING result-set
+intact with a collection of any number of rows.</p></li>
+<li><p>It is compatible with the existing logic to fetch auto-generated
+primary key values, also known as “implicit returning”.  Backends
+that support RETURNING will automatically make use of RETURNING in
+order to fetch the value of newly generated primary keys; while the
+<a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase.returning" title="sqlalchemy.sql.expression.UpdateBase.returning"><code class="xref py py-meth docutils literal notranslate"><span class="pre">UpdateBase.returning()</span></code></a> method circumvents this behavior,
+<a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.return_defaults" title="sqlalchemy.sql.expression.ValuesBase.return_defaults"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.return_defaults()</span></code></a> leaves it intact.</p></li>
+<li><p>It can be called against any backend.  Backends that don’t support
+RETURNING will skip the usage of the feature, rather than raising
+an exception.  The return value of
+<a class="reference internal" href="connections.html#sqlalchemy.engine.ResultProxy.returned_defaults" title="sqlalchemy.engine.ResultProxy.returned_defaults"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ResultProxy.returned_defaults</span></code></a> will be <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+</ol>
+<p><a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.return_defaults" title="sqlalchemy.sql.expression.ValuesBase.return_defaults"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.return_defaults()</span></code></a> is used by the ORM to provide
+an efficient implementation for the <code class="docutils literal notranslate"><span class="pre">eager_defaults</span></code> feature of
+<a class="reference internal" href="../orm/mapping_api.html#sqlalchemy.orm.mapper" title="sqlalchemy.orm.mapper"><code class="xref py py-func docutils literal notranslate"><span class="pre">mapper()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><span class="target" id="sqlalchemy.sql.expression.ValuesBase.return_defaults.params.cols"></span><strong>cols</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.ValuesBase.return_defaults.params.cols">¶</a> – optional list of column key names or
+<a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>
+objects.  If omitted, all column expressions evaluated on the server
+are added to the returning list.</p>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.0.</span></p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#sqlalchemy.sql.expression.UpdateBase.returning" title="sqlalchemy.sql.expression.UpdateBase.returning"><code class="xref py py-meth docutils literal notranslate"><span class="pre">UpdateBase.returning()</span></code></a></p>
+<p><a class="reference internal" href="connections.html#sqlalchemy.engine.ResultProxy.returned_defaults" title="sqlalchemy.engine.ResultProxy.returned_defaults"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ResultProxy.returned_defaults</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sqlalchemy.sql.expression.ValuesBase.values">
+<em class="property">method </em><a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase"><code class="docutils literal notranslate"><span class="pre">sqlalchemy.sql.expression.ValuesBase.</span></code></a><code class="sig-name descname">values</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.sql.expression.ValuesBase.values" title="Permalink to this definition">¶</a></dt>
+<dd><p>specify a fixed VALUES clause for an INSERT statement, or the SET
+clause for an UPDATE.</p>
+<p>Note that the <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a> and
+<a class="reference internal" href="#sqlalchemy.sql.expression.Update" title="sqlalchemy.sql.expression.Update"><code class="xref py py-class docutils literal notranslate"><span class="pre">Update</span></code></a> constructs support
+per-execution time formatting of the VALUES and/or SET clauses,
+based on the arguments passed to <a class="reference internal" href="connections.html#sqlalchemy.engine.Connection.execute" title="sqlalchemy.engine.Connection.execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Connection.execute()</span></code></a>.
+However, the <a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.values" title="sqlalchemy.sql.expression.ValuesBase.values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.values()</span></code></a> method can be used to “fix” a
+particular set of parameters into the statement.</p>
+<p>Multiple calls to <a class="reference internal" href="#sqlalchemy.sql.expression.ValuesBase.values" title="sqlalchemy.sql.expression.ValuesBase.values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ValuesBase.values()</span></code></a> will produce a new
+construct, each one with the parameter list modified to include
+the new parameters sent.  In the typical case of a single
+dictionary of parameters, the newly passed keys will replace
+the same keys in the previous construct.  In the case of a list-based
+“multiple values” construct, each new list of values is extended
+onto the existing list of values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="sqlalchemy.sql.expression.ValuesBase.values.params.**kwargs"></span><strong>**kwargs</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.ValuesBase.values.params.**kwargs">¶</a> – <p>key value pairs representing the string key
+of a <a class="reference internal" href="metadata.html#sqlalchemy.schema.Column" title="sqlalchemy.schema.Column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a>
+mapped to the value to be rendered into the
+VALUES or SET clause:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">users</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;some name&quot;</span><span class="p">)</span>
+
+<span class="n">users</span><span class="o">.</span><span class="n">update</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="o">==</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;some name&quot;</span><span class="p">)</span></pre></div>
+</div>
+</p></li>
+<li><p><span class="target" id="sqlalchemy.sql.expression.ValuesBase.values.params.*args"></span><strong>*args</strong><a class="paramlink headerlink reference internal" href="#sqlalchemy.sql.expression.ValuesBase.values.params.*args">¶</a> – <p>As an alternative to passing key/value parameters,
+a dictionary, tuple, or list of dictionaries or tuples can be passed
+as a single positional argument in order to form the VALUES or
+SET clause of the statement.  The forms that are accepted vary
+based on whether this is an <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a> or an
+<a class="reference internal" href="#sqlalchemy.sql.expression.Update" title="sqlalchemy.sql.expression.Update"><code class="xref py py-class docutils literal notranslate"><span class="pre">Update</span></code></a>
+construct.</p>
+<p>For either an <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a> or
+<a class="reference internal" href="#sqlalchemy.sql.expression.Update" title="sqlalchemy.sql.expression.Update"><code class="xref py py-class docutils literal notranslate"><span class="pre">Update</span></code></a> construct, a
+single dictionary can be passed, which works the same as that of
+the kwargs form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">users</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">({</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;some name&quot;</span><span class="p">})</span>
+
+<span class="n">users</span><span class="o">.</span><span class="n">update</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">({</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;some new name&quot;</span><span class="p">})</span></pre></div>
+</div>
+<p>Also for either form but more typically for the
+<a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a>
+construct, a tuple that contains an entry for every column in the
+table is also accepted:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">users</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;some name&quot;</span><span class="p">))</span></pre></div>
+</div>
+<p>The <a class="reference internal" href="#sqlalchemy.sql.expression.Insert" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-class docutils literal notranslate"><span class="pre">Insert</span></code></a>
+construct also supports being passed a list
+of dictionaries or full-table-tuples, which on the server will
+render the less common SQL syntax of “multiple values” - this
+syntax is supported on backends such as SQLite, PostgreSQL, MySQL,
+but not necessarily others:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">users</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">([</span>
+                    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;some name&quot;</span><span class="p">},</span>
+                    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;some other name&quot;</span><span class="p">},</span>
+                    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;yet another name&quot;</span><span class="p">},</span>
+                <span class="p">])</span></pre></div>
+</div>
+<p>The above form would render a multiple VALUES statement similar to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INSERT</span> <span class="n">INTO</span> <span class="n">users</span> <span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="n">VALUES</span>
+                <span class="p">(:</span><span class="n">name_1</span><span class="p">),</span>
+                <span class="p">(:</span><span class="n">name_2</span><span class="p">),</span>
+                <span class="p">(:</span><span class="n">name_3</span><span class="p">)</span></pre></div>
+</div>
+<p>It is essential to note that <strong>passing multiple values is
+NOT the same as using traditional executemany() form</strong>.  The above
+syntax is a <strong>special</strong> syntax not typically used.  To emit an
+INSERT statement against multiple rows, the normal method is
+to pass a multiple values list to the
+<a class="reference internal" href="connections.html#sqlalchemy.engine.Connection.execute" title="sqlalchemy.engine.Connection.execute"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Connection.execute()</span></code></a>
+method, which is supported by all database backends and is generally
+more efficient for a very large number of parameters.</p>
+<blockquote>
+<div><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="tutorial.html#execute-multiple"><span class="std std-ref">Executing Multiple Statements</span></a> - an introduction to
+the traditional Core method of multiple parameter set
+invocation for INSERTs and other statements.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 1.0.0: </span>an INSERT that uses a multiple-VALUES
+clause, even a list of length one,
+implies that the <a class="reference internal" href="#sqlalchemy.sql.expression.Insert.params.inline" title="sqlalchemy.sql.expression.Insert"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">Insert.inline</span></code></a>
+flag is set to
+True, indicating that the statement will not attempt to fetch
+the “last inserted primary key” or other defaults.  The
+statement deals with an arbitrary number of rows, so the
+<a class="reference internal" href="connections.html#sqlalchemy.engine.ResultProxy.inserted_primary_key" title="sqlalchemy.engine.ResultProxy.inserted_primary_key"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ResultProxy.inserted_primary_key</span></code></a>
+accessor does not
+apply.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 1.0.0: </span>A multiple-VALUES INSERT now supports
+columns with Python side default values and callables in the
+same way as that of an “executemany” style of invocation; the
+callable is invoked for each row.   See <a class="reference internal" href="../changelog/migration_10.html#bug-3288"><span class="std std-ref">Python-side defaults invoked for each row individually when using a multivalued insert</span></a>
+for other details.</p>
+</div>
+</div></blockquote>
+<p>The <a class="reference internal" href="#sqlalchemy.sql.expression.Update" title="sqlalchemy.sql.expression.Update"><code class="xref py py-class docutils literal notranslate"><span class="pre">Update</span></code></a>
+construct supports a special form which is a
+list of 2-tuples, which when provided must be passed in conjunction
+with the
+<a class="reference internal" href="#sqlalchemy.sql.expression.update.params.preserve_parameter_order" title="sqlalchemy.sql.expression.update"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">update.preserve_parameter_order</span></code></a>
+parameter.
+This form causes the UPDATE statement to render the SET clauses
+using the order of parameters given to
+<a class="reference internal" href="#sqlalchemy.sql.expression.Update.values" title="sqlalchemy.sql.expression.Update.values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Update.values()</span></code></a>, rather
+than the ordering of columns given in the <a class="reference internal" href="metadata.html#sqlalchemy.schema.Table" title="sqlalchemy.schema.Table"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></a>.</p>
+<blockquote>
+<div><div class="versionadded">
+<p><span class="versionmodified added">New in version 1.0.10: </span>- added support for parameter-ordered
+UPDATE statements via the
+<a class="reference internal" href="#sqlalchemy.sql.expression.update.params.preserve_parameter_order" title="sqlalchemy.sql.expression.update"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">update.preserve_parameter_order</span></code></a>
+flag.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="tutorial.html#updates-order-parameters"><span class="std std-ref">Parameter-Ordered Updates</span></a> - full example of the
+<a class="reference internal" href="#sqlalchemy.sql.expression.update.params.preserve_parameter_order" title="sqlalchemy.sql.expression.update"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">update.preserve_parameter_order</span></code></a>
+flag</p>
+</div>
+</div></blockquote>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="tutorial.html#inserts-and-updates"><span class="std std-ref">Inserts, Updates and Deletes</span></a> - SQL Expression
+Language Tutorial</p>
+<p><a class="reference internal" href="#sqlalchemy.sql.expression.insert" title="sqlalchemy.sql.expression.insert"><code class="xref py py-func docutils literal notranslate"><span class="pre">insert()</span></code></a> - produce an <code class="docutils literal notranslate"><span class="pre">INSERT</span></code> statement</p>
+<p><a class="reference internal" href="#sqlalchemy.sql.expression.update" title="sqlalchemy.sql.expression.update"><code class="xref py py-func docutils literal notranslate"><span class="pre">update()</span></code></a> - produce an <code class="docutils literal notranslate"><span class="pre">UPDATE</span></code> statement</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="selectable.html" title="previous chapter">Selectables, Tables, FROM objects</a>
+        Next:
+        <a href="functions.html" title="next chapter">SQL and Generic Functions</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

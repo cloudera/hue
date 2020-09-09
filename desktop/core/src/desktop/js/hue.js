@@ -40,7 +40,7 @@ import 'parse/parserTypeDefs';
 import 'utils/customIntervals';
 import 'utils/json.bigDataParse';
 import apiHelper from 'api/apiHelper';
-import CancellablePromise from 'api/cancellablePromise';
+import CancellableJqPromise from 'api/cancellableJqPromise';
 import { DOCUMENT_TYPE_I18n, DOCUMENT_TYPES } from 'doc/docSupport';
 import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
@@ -71,7 +71,7 @@ import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and notebook.ko
 import HueFileEntry from 'doc/hueFileEntry';
 import HueDocument from 'doc/hueDocument';
-import { refreshConfig } from 'utils/hueConfig';
+import { getLastKnownConfig, refreshConfig } from 'utils/hueConfig';
 import { simpleGet } from 'api/apiUtils'; // In analytics.mako, metrics.mako, threads.mako
 
 // import all the other Vue SFCs here
@@ -96,7 +96,7 @@ import { simpleGet } from 'api/apiUtils'; // In analytics.mako, metrics.mako, th
 window._ = _;
 window.apiHelper = apiHelper;
 window.simpleGet = simpleGet;
-window.CancellablePromise = CancellablePromise;
+window.CancellableJqPromise = CancellableJqPromise;
 window.contextCatalog = contextCatalog;
 window.d3 = d3;
 window.d3v3 = d3v3;
@@ -110,6 +110,7 @@ if (window.ENABLE_NOTEBOOK_2) {
   window.EditorViewModel = EditorViewModel;
 }
 window.filesize = filesize;
+window.getLastKnownConfig = getLastKnownConfig;
 window.HdfsAutocompleter = HdfsAutocompleter;
 window.hueAnalytics = hueAnalytics;
 window.HueColors = HueColors;

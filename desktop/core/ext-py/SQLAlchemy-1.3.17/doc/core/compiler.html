@@ -1,0 +1,589 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    Custom SQL Constructs and Compilation Extension
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+        <link rel="up" title="SQL Statements and Expressions API" href="expression_api.html" />
+        <link rel="next" title="Expression Serializer Extension" href="serializer.html" />
+        <link rel="prev" title="SQL and Generic Functions" href="functions.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../contents.html">Contents</a> |
+                <a href="../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="index.html" title="SQLAlchemy Core">SQLAlchemy Core</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="tutorial.html">SQL Expression Language Tutorial</a></span></li>
+<li><span class="link-container"><a class="reference external" href="expression_api.html">SQL Statements and Expressions API</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="sqlelement.html">Column Elements and Expressions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="selectable.html">Selectables, Tables, FROM objects</a></span></li>
+<li><span class="link-container"><a class="reference external" href="dml.html">Insert, Updates, Deletes</a></span></li>
+<li><span class="link-container"><a class="reference external" href="functions.html">SQL and Generic Functions</a></span></li>
+<li class="selected"><span class="link-container"><strong>Custom SQL Constructs and Compilation Extension</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#synopsis">Synopsis</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#dialect-specific-compilation-rules">Dialect-specific compilation rules</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#compiling-sub-elements-of-a-custom-expression-construct">Compiling sub-elements of a custom expression construct</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#cross-compiling-between-sql-and-ddl-compilers">Cross Compiling between SQL and DDL compilers</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="#enabling-autocommit-on-a-construct">Enabling Autocommit on a Construct</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#changing-the-default-compilation-of-existing-constructs">Changing the default compilation of existing constructs</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#changing-compilation-of-types">Changing Compilation of Types</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#subclassing-guidelines">Subclassing Guidelines</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#further-examples">Further Examples</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#utc-timestamp-function">“UTC timestamp” function</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#greatest-function">“GREATEST” function</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#false-expression">“false” expression</a></span></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="serializer.html">Expression Serializer Extension</a></span></li>
+<li><span class="link-container"><a class="reference external" href="visitors.html">Visitor and Traversal Utilities</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="schema.html">Schema Definition Language</a></span></li>
+<li><span class="link-container"><a class="reference external" href="types.html">Column and Data Types</a></span></li>
+<li><span class="link-container"><a class="reference external" href="engines_connections.html">Engine and Connection Use</a></span></li>
+<li><span class="link-container"><a class="reference external" href="api_basics.html">Core API Basics</a></span></li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="module-sqlalchemy.ext.compiler">
+<span id="custom-sql-constructs-and-compilation-extension"></span><span id="sqlalchemy-ext-compiler-toplevel"></span><h1>Custom SQL Constructs and Compilation Extension<a class="headerlink" href="#module-sqlalchemy.ext.compiler" title="Permalink to this headline">¶</a></h1>
+<p>Provides an API for creation of custom ClauseElements and compilers.</p>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>Usage involves the creation of one or more
+<a class="reference internal" href="sqlelement.html#sqlalchemy.sql.expression.ClauseElement" title="sqlalchemy.sql.expression.ClauseElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClauseElement</span></code></a> subclasses and one or
+more callables defining its compilation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.ext.compiler</span> <span class="k">import</span> <span class="n">compiles</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.sql.expression</span> <span class="k">import</span> <span class="n">ColumnClause</span>
+
+<span class="k">class</span> <span class="nc">MyColumn</span><span class="p">(</span><span class="n">ColumnClause</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">MyColumn</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">compile_mycolumn</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="n">element</span><span class="o">.</span><span class="n">name</span></pre></div>
+</div>
+<p>Above, <code class="docutils literal notranslate"><span class="pre">MyColumn</span></code> extends <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.expression.ColumnClause" title="sqlalchemy.sql.expression.ColumnClause"><code class="xref py py-class docutils literal notranslate"><span class="pre">ColumnClause</span></code></a>,
+the base expression element for named column objects. The <code class="docutils literal notranslate"><span class="pre">compiles</span></code>
+decorator registers itself with the <code class="docutils literal notranslate"><span class="pre">MyColumn</span></code> class so that it is invoked
+when the object is compiled to a string:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">select</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">MyColumn</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">),</span> <span class="n">MyColumn</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">)])</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">))</span></pre></div>
+</div>
+<p>Produces:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="p">[</span><span class="n">y</span><span class="p">]</span></pre></div>
+</div>
+</div>
+<div class="section" id="dialect-specific-compilation-rules">
+<h2>Dialect-specific compilation rules<a class="headerlink" href="#dialect-specific-compilation-rules" title="Permalink to this headline">¶</a></h2>
+<p>Compilers can also be made dialect-specific. The appropriate compiler will be
+invoked for the dialect in use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.schema</span> <span class="k">import</span> <span class="n">DDLElement</span>
+
+<span class="k">class</span> <span class="nc">AlterColumn</span><span class="p">(</span><span class="n">DDLElement</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">=</span> <span class="n">column</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd</span>
+
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">AlterColumn</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">visit_alter_column</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s2">&quot;ALTER COLUMN </span><span class="si">%s</span><span class="s2"> ...&quot;</span> <span class="o">%</span> <span class="n">element</span><span class="o">.</span><span class="n">column</span><span class="o">.</span><span class="n">name</span>
+
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">AlterColumn</span><span class="p">,</span> <span class="s1">&#39;postgresql&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">visit_alter_column</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s2">&quot;ALTER TABLE </span><span class="si">%s</span><span class="s2"> ALTER COLUMN </span><span class="si">%s</span><span class="s2"> ...&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                                   <span class="n">element</span><span class="o">.</span><span class="n">column</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></pre></div>
+</div>
+<p>The second <code class="docutils literal notranslate"><span class="pre">visit_alter_table</span></code> will be invoked when any <code class="docutils literal notranslate"><span class="pre">postgresql</span></code>
+dialect is used.</p>
+</div>
+<div class="section" id="compiling-sub-elements-of-a-custom-expression-construct">
+<h2>Compiling sub-elements of a custom expression construct<a class="headerlink" href="#compiling-sub-elements-of-a-custom-expression-construct" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">compiler</span></code> argument is the
+<a class="reference internal" href="internals.html#sqlalchemy.engine.interfaces.Compiled" title="sqlalchemy.engine.interfaces.Compiled"><code class="xref py py-class docutils literal notranslate"><span class="pre">Compiled</span></code></a> object in use. This object
+can be inspected for any information about the in-progress compilation,
+including <code class="docutils literal notranslate"><span class="pre">compiler.dialect</span></code>, <code class="docutils literal notranslate"><span class="pre">compiler.statement</span></code> etc. The
+<a class="reference internal" href="internals.html#sqlalchemy.sql.compiler.SQLCompiler" title="sqlalchemy.sql.compiler.SQLCompiler"><code class="xref py py-class docutils literal notranslate"><span class="pre">SQLCompiler</span></code></a> and
+<a class="reference internal" href="internals.html#sqlalchemy.sql.compiler.DDLCompiler" title="sqlalchemy.sql.compiler.DDLCompiler"><code class="xref py py-class docutils literal notranslate"><span class="pre">DDLCompiler</span></code></a> both include a <code class="docutils literal notranslate"><span class="pre">process()</span></code>
+method which can be used for compilation of embedded attributes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.sql.expression</span> <span class="k">import</span> <span class="n">Executable</span><span class="p">,</span> <span class="n">ClauseElement</span>
+
+<span class="k">class</span> <span class="nc">InsertFromSelect</span><span class="p">(</span><span class="n">Executable</span><span class="p">,</span> <span class="n">ClauseElement</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">select</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select</span> <span class="o">=</span> <span class="n">select</span>
+
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">InsertFromSelect</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">visit_insert_from_select</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s2">&quot;INSERT INTO </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">compiler</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">table</span><span class="p">,</span> <span class="n">asfrom</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">),</span>
+        <span class="n">compiler</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">select</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="n">insert</span> <span class="o">=</span> <span class="n">InsertFromSelect</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">select</span><span class="p">([</span><span class="n">t1</span><span class="p">])</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">t1</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">x</span><span class="o">&gt;</span><span class="mi">5</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">insert</span><span class="p">)</span></pre></div>
+</div>
+<p>Produces:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;INSERT INTO mytable (SELECT mytable.x, mytable.y, mytable.z</span>
+                      <span class="n">FROM</span> <span class="n">mytable</span> <span class="n">WHERE</span> <span class="n">mytable</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="p">:</span><span class="n">x_1</span><span class="p">)</span><span class="s2">&quot;</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The above <code class="docutils literal notranslate"><span class="pre">InsertFromSelect</span></code> construct is only an example, this actual
+functionality is already available using the
+<a class="reference internal" href="dml.html#sqlalchemy.sql.expression.Insert.from_select" title="sqlalchemy.sql.expression.Insert.from_select"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Insert.from_select()</span></code></a> method.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The above <code class="docutils literal notranslate"><span class="pre">InsertFromSelect</span></code> construct probably wants to have “autocommit”
+enabled.  See <a class="reference internal" href="#enabling-compiled-autocommit"><span class="std std-ref">Enabling Autocommit on a Construct</span></a> for this step.</p>
+</div>
+<div class="section" id="cross-compiling-between-sql-and-ddl-compilers">
+<h3>Cross Compiling between SQL and DDL compilers<a class="headerlink" href="#cross-compiling-between-sql-and-ddl-compilers" title="Permalink to this headline">¶</a></h3>
+<p>SQL and DDL constructs are each compiled using different base compilers -
+<code class="docutils literal notranslate"><span class="pre">SQLCompiler</span></code> and <code class="docutils literal notranslate"><span class="pre">DDLCompiler</span></code>.   A common need is to access the
+compilation rules of SQL expressions from within a DDL expression. The
+<code class="docutils literal notranslate"><span class="pre">DDLCompiler</span></code> includes an accessor <code class="docutils literal notranslate"><span class="pre">sql_compiler</span></code> for this reason, such as
+below where we generate a CHECK constraint that embeds a SQL expression:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@compiles</span><span class="p">(</span><span class="n">MyConstraint</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">compile_my_constraint</span><span class="p">(</span><span class="n">constraint</span><span class="p">,</span> <span class="n">ddlcompiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;literal_binds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="s2">&quot;CONSTRAINT </span><span class="si">%s</span><span class="s2"> CHECK (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">constraint</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">ddlcompiler</span><span class="o">.</span><span class="n">sql_compiler</span><span class="o">.</span><span class="n">process</span><span class="p">(</span>
+            <span class="n">constraint</span><span class="o">.</span><span class="n">expression</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+    <span class="p">)</span></pre></div>
+</div>
+<p>Above, we add an additional flag to the process step as called by
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">SQLCompiler.process()</span></code>, which is the <code class="docutils literal notranslate"><span class="pre">literal_binds</span></code> flag.  This
+indicates that any SQL expression which refers to a <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.expression.BindParameter" title="sqlalchemy.sql.expression.BindParameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">BindParameter</span></code></a>
+object or other “literal” object such as those which refer to strings or
+integers should be rendered <strong>in-place</strong>, rather than being referred to as
+a bound parameter;  when emitting DDL, bound parameters are typically not
+supported.</p>
+</div>
+</div>
+<div class="section" id="enabling-autocommit-on-a-construct">
+<span id="enabling-compiled-autocommit"></span><h2>Enabling Autocommit on a Construct<a class="headerlink" href="#enabling-autocommit-on-a-construct" title="Permalink to this headline">¶</a></h2>
+<p>Recall from the section <a class="reference internal" href="connections.html#autocommit"><span class="std std-ref">Understanding Autocommit</span></a> that the <a class="reference internal" href="connections.html#sqlalchemy.engine.Engine" title="sqlalchemy.engine.Engine"><code class="xref py py-class docutils literal notranslate"><span class="pre">Engine</span></code></a>,
+when
+asked to execute a construct in the absence of a user-defined transaction,
+detects if the given construct represents DML or DDL, that is, a data
+modification or data definition statement, which requires (or may require,
+in the case of DDL) that the transaction generated by the DBAPI be committed
+(recall that DBAPI always has a transaction going on regardless of what
+SQLAlchemy does).   Checking for this is actually accomplished by checking for
+the “autocommit” execution option on the construct.    When building a
+construct like an INSERT derivation, a new DDL type, or perhaps a stored
+procedure that alters data, the “autocommit” option needs to be set in order
+for the statement to function with “connectionless” execution
+(as described in <a class="reference internal" href="connections.html#dbengine-implicit"><span class="std std-ref">Connectionless Execution, Implicit Execution</span></a>).</p>
+<p>Currently a quick way to do this is to subclass <a class="reference internal" href="selectable.html#sqlalchemy.sql.expression.Executable" title="sqlalchemy.sql.expression.Executable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Executable</span></code></a>, then
+add the “autocommit” flag to the <code class="docutils literal notranslate"><span class="pre">_execution_options</span></code> dictionary (note this
+is a “frozen” dictionary which supplies a generative <code class="docutils literal notranslate"><span class="pre">union()</span></code> method):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.sql.expression</span> <span class="k">import</span> <span class="n">Executable</span><span class="p">,</span> <span class="n">ClauseElement</span>
+
+<span class="k">class</span> <span class="nc">MyInsertThing</span><span class="p">(</span><span class="n">Executable</span><span class="p">,</span> <span class="n">ClauseElement</span><span class="p">):</span>
+    <span class="n">_execution_options</span> <span class="o">=</span> \
+        <span class="n">Executable</span><span class="o">.</span><span class="n">_execution_options</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="s1">&#39;autocommit&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span></pre></div>
+</div>
+<p>More succinctly, if the construct is truly similar to an INSERT, UPDATE, or
+DELETE, <a class="reference internal" href="dml.html#sqlalchemy.sql.expression.UpdateBase" title="sqlalchemy.sql.expression.UpdateBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateBase</span></code></a> can be used, which already is a subclass
+of <a class="reference internal" href="selectable.html#sqlalchemy.sql.expression.Executable" title="sqlalchemy.sql.expression.Executable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Executable</span></code></a>, <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.expression.ClauseElement" title="sqlalchemy.sql.expression.ClauseElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClauseElement</span></code></a> and includes the
+<code class="docutils literal notranslate"><span class="pre">autocommit</span></code> flag:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.sql.expression</span> <span class="k">import</span> <span class="n">UpdateBase</span>
+
+<span class="k">class</span> <span class="nc">MyInsertThing</span><span class="p">(</span><span class="n">UpdateBase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">...</span><span class="p">):</span>
+        <span class="o">...</span></pre></div>
+</div>
+<p>DDL elements that subclass <a class="reference internal" href="ddl.html#sqlalchemy.schema.DDLElement" title="sqlalchemy.schema.DDLElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DDLElement</span></code></a> already have the
+“autocommit” flag turned on.</p>
+</div>
+<div class="section" id="changing-the-default-compilation-of-existing-constructs">
+<h2>Changing the default compilation of existing constructs<a class="headerlink" href="#changing-the-default-compilation-of-existing-constructs" title="Permalink to this headline">¶</a></h2>
+<p>The compiler extension applies just as well to the existing constructs.  When
+overriding the compilation of a built in SQL construct, the &#64;compiles
+decorator is invoked upon the appropriate class (be sure to use the class,
+i.e. <code class="docutils literal notranslate"><span class="pre">Insert</span></code> or <code class="docutils literal notranslate"><span class="pre">Select</span></code>, instead of the creation function such
+as <code class="docutils literal notranslate"><span class="pre">insert()</span></code> or <code class="docutils literal notranslate"><span class="pre">select()</span></code>).</p>
+<p>Within the new compilation function, to get at the “original” compilation
+routine, use the appropriate visit_XXX method - this
+because compiler.process() will call upon the overriding routine and cause
+an endless loop.   Such as, to add “prefix” to all insert statements:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.sql.expression</span> <span class="k">import</span> <span class="n">Insert</span>
+
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">Insert</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">prefix_inserts</span><span class="p">(</span><span class="n">insert</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">compiler</span><span class="o">.</span><span class="n">visit_insert</span><span class="p">(</span><span class="n">insert</span><span class="o">.</span><span class="n">prefix_with</span><span class="p">(</span><span class="s2">&quot;some prefix&quot;</span><span class="p">),</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></pre></div>
+</div>
+<p>The above compiler will prefix all INSERT statements with “some prefix” when
+compiled.</p>
+</div>
+<div class="section" id="changing-compilation-of-types">
+<span id="type-compilation-extension"></span><h2>Changing Compilation of Types<a class="headerlink" href="#changing-compilation-of-types" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">compiler</span></code> works for types, too, such as below where we implement the
+MS-SQL specific ‘max’ keyword for <code class="docutils literal notranslate"><span class="pre">String</span></code>/<code class="docutils literal notranslate"><span class="pre">VARCHAR</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@compiles</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="s1">&#39;mssql&#39;</span><span class="p">)</span>
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">VARCHAR</span><span class="p">,</span> <span class="s1">&#39;mssql&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">compile_varchar</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">element</span><span class="o">.</span><span class="n">length</span> <span class="o">==</span> <span class="s1">&#39;max&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;VARCHAR(&#39;max&#39;)&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">compiler</span><span class="o">.</span><span class="n">visit_VARCHAR</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+
+<span class="n">foo</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="n">VARCHAR</span><span class="p">(</span><span class="s1">&#39;max&#39;</span><span class="p">))</span>
+<span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="subclassing-guidelines">
+<h2>Subclassing Guidelines<a class="headerlink" href="#subclassing-guidelines" title="Permalink to this headline">¶</a></h2>
+<p>A big part of using the compiler extension is subclassing SQLAlchemy
+expression constructs. To make this easier, the expression and
+schema packages feature a set of “bases” intended for common tasks.
+A synopsis is as follows:</p>
+<ul>
+<li><p><a class="reference internal" href="sqlelement.html#sqlalchemy.sql.expression.ClauseElement" title="sqlalchemy.sql.expression.ClauseElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClauseElement</span></code></a> - This is the root
+expression class. Any SQL expression can be derived from this base, and is
+probably the best choice for longer constructs such as specialized INSERT
+statements.</p></li>
+<li><p><a class="reference internal" href="sqlelement.html#sqlalchemy.sql.expression.ColumnElement" title="sqlalchemy.sql.expression.ColumnElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ColumnElement</span></code></a> - The root of all
+“column-like” elements. Anything that you’d place in the “columns” clause of
+a SELECT statement (as well as order by and group by) can derive from this -
+the object will automatically have Python “comparison” behavior.</p>
+<p><a class="reference internal" href="sqlelement.html#sqlalchemy.sql.expression.ColumnElement" title="sqlalchemy.sql.expression.ColumnElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ColumnElement</span></code></a> classes want to have a
+<code class="docutils literal notranslate"><span class="pre">type</span></code> member which is expression’s return type.  This can be established
+at the instance level in the constructor, or at the class level if its
+generally constant:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">timestamp</span><span class="p">(</span><span class="n">ColumnElement</span><span class="p">):</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="n">TIMESTAMP</span><span class="p">()</span></pre></div>
+</div>
+</li>
+<li><p><a class="reference internal" href="functions.html#sqlalchemy.sql.functions.FunctionElement" title="sqlalchemy.sql.functions.FunctionElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">FunctionElement</span></code></a> - This is a hybrid of a
+<code class="docutils literal notranslate"><span class="pre">ColumnElement</span></code> and a “from clause” like object, and represents a SQL
+function or stored procedure type of call. Since most databases support
+statements along the line of “SELECT FROM &lt;some function&gt;”
+<code class="docutils literal notranslate"><span class="pre">FunctionElement</span></code> adds in the ability to be used in the FROM clause of a
+<code class="docutils literal notranslate"><span class="pre">select()</span></code> construct:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.sql.expression</span> <span class="k">import</span> <span class="n">FunctionElement</span>
+
+<span class="k">class</span> <span class="nc">coalesce</span><span class="p">(</span><span class="n">FunctionElement</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;coalesce&#39;</span>
+
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">coalesce</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">compile</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s2">&quot;coalesce(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="n">compiler</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">clauses</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">coalesce</span><span class="p">,</span> <span class="s1">&#39;oracle&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">compile</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">clauses</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;coalesce only supports two arguments on Oracle&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;nvl(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="n">compiler</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">clauses</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></pre></div>
+</div>
+</li>
+<li><p><a class="reference internal" href="ddl.html#sqlalchemy.schema.DDLElement" title="sqlalchemy.schema.DDLElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DDLElement</span></code></a> - The root of all DDL expressions,
+like CREATE TABLE, ALTER TABLE, etc. Compilation of <code class="docutils literal notranslate"><span class="pre">DDLElement</span></code>
+subclasses is issued by a <code class="docutils literal notranslate"><span class="pre">DDLCompiler</span></code> instead of a <code class="docutils literal notranslate"><span class="pre">SQLCompiler</span></code>.
+<code class="docutils literal notranslate"><span class="pre">DDLElement</span></code> also features <code class="docutils literal notranslate"><span class="pre">Table</span></code> and <code class="docutils literal notranslate"><span class="pre">MetaData</span></code> event hooks via the
+<code class="docutils literal notranslate"><span class="pre">execute_at()</span></code> method, allowing the construct to be invoked during CREATE
+TABLE and DROP TABLE sequences.</p></li>
+<li><p><a class="reference internal" href="selectable.html#sqlalchemy.sql.expression.Executable" title="sqlalchemy.sql.expression.Executable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Executable</span></code></a> - This is a mixin which
+should be used with any expression class that represents a “standalone”
+SQL statement that can be passed directly to an <code class="docutils literal notranslate"><span class="pre">execute()</span></code> method.  It
+is already implicit within <code class="docutils literal notranslate"><span class="pre">DDLElement</span></code> and <code class="docutils literal notranslate"><span class="pre">FunctionElement</span></code>.</p></li>
+</ul>
+</div>
+<div class="section" id="further-examples">
+<h2>Further Examples<a class="headerlink" href="#further-examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="utc-timestamp-function">
+<h3>“UTC timestamp” function<a class="headerlink" href="#utc-timestamp-function" title="Permalink to this headline">¶</a></h3>
+<p>A function that works like “CURRENT_TIMESTAMP” except applies the
+appropriate conversions so that the time is in UTC time.   Timestamps are best
+stored in relational databases as UTC, without time zones.   UTC so that your
+database doesn’t think time has gone backwards in the hour when daylight
+savings ends, without timezones because timezones are like character
+encodings - they’re best applied only at the endpoints of an application
+(i.e. convert to UTC upon user input, re-apply desired timezone upon display).</p>
+<p>For PostgreSQL and Microsoft SQL Server:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.sql</span> <span class="k">import</span> <span class="n">expression</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.compiler</span> <span class="k">import</span> <span class="n">compiles</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.types</span> <span class="k">import</span> <span class="n">DateTime</span>
+
+<span class="k">class</span> <span class="nc">utcnow</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">FunctionElement</span><span class="p">):</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="n">DateTime</span><span class="p">()</span>
+
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">utcnow</span><span class="p">,</span> <span class="s1">&#39;postgresql&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">pg_utcnow</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s2">&quot;TIMEZONE(&#39;utc&#39;, CURRENT_TIMESTAMP)&quot;</span>
+
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">utcnow</span><span class="p">,</span> <span class="s1">&#39;mssql&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">ms_utcnow</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s2">&quot;GETUTCDATE()&quot;</span></pre></div>
+</div>
+<p>Example usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="p">(</span>
+            <span class="n">Table</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">,</span> <span class="n">MetaData</span>
+        <span class="p">)</span>
+<span class="n">metadata</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">()</span>
+<span class="n">event</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s2">&quot;event&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">,</span> <span class="n">server_default</span><span class="o">=</span><span class="n">utcnow</span><span class="p">())</span>
+<span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="greatest-function">
+<h3>“GREATEST” function<a class="headerlink" href="#greatest-function" title="Permalink to this headline">¶</a></h3>
+<p>The “GREATEST” function is given any number of arguments and returns the one
+that is of the highest value - its equivalent to Python’s <code class="docutils literal notranslate"><span class="pre">max</span></code>
+function.  A SQL standard version versus a CASE based version which only
+accommodates two arguments:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.sql</span> <span class="k">import</span> <span class="n">expression</span><span class="p">,</span> <span class="n">case</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.compiler</span> <span class="k">import</span> <span class="n">compiles</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.types</span> <span class="k">import</span> <span class="n">Numeric</span>
+
+<span class="k">class</span> <span class="nc">greatest</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">FunctionElement</span><span class="p">):</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="n">Numeric</span><span class="p">()</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;greatest&#39;</span>
+
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">greatest</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">default_greatest</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">compiler</span><span class="o">.</span><span class="n">visit_function</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">greatest</span><span class="p">,</span> <span class="s1">&#39;sqlite&#39;</span><span class="p">)</span>
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">greatest</span><span class="p">,</span> <span class="s1">&#39;mssql&#39;</span><span class="p">)</span>
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">greatest</span><span class="p">,</span> <span class="s1">&#39;oracle&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">case_greatest</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">clauses</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">compiler</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">case</span><span class="p">([(</span><span class="n">arg1</span> <span class="o">&gt;</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg1</span><span class="p">)],</span> <span class="n">else_</span><span class="o">=</span><span class="n">arg2</span><span class="p">),</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></pre></div>
+</div>
+<p>Example usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Account</span><span class="p">)</span><span class="o">.</span>\
+        <span class="nb">filter</span><span class="p">(</span>
+            <span class="n">greatest</span><span class="p">(</span>
+                <span class="n">Account</span><span class="o">.</span><span class="n">checking_balance</span><span class="p">,</span>
+                <span class="n">Account</span><span class="o">.</span><span class="n">savings_balance</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">10000</span>
+        <span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="false-expression">
+<h3>“false” expression<a class="headerlink" href="#false-expression" title="Permalink to this headline">¶</a></h3>
+<p>Render a “false” constant expression, rendering as “0” on platforms that
+don’t have a “false” constant:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.sql</span> <span class="k">import</span> <span class="n">expression</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.compiler</span> <span class="k">import</span> <span class="n">compiles</span>
+
+<span class="k">class</span> <span class="nc">sql_false</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">ColumnElement</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">sql_false</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">default_false</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s2">&quot;false&quot;</span>
+
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">sql_false</span><span class="p">,</span> <span class="s1">&#39;mssql&#39;</span><span class="p">)</span>
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">sql_false</span><span class="p">,</span> <span class="s1">&#39;mysql&#39;</span><span class="p">)</span>
+<span class="nd">@compiles</span><span class="p">(</span><span class="n">sql_false</span><span class="p">,</span> <span class="s1">&#39;oracle&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">int_false</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s2">&quot;0&quot;</span></pre></div>
+</div>
+<p>Example usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">select</span><span class="p">,</span> <span class="n">union_all</span>
+
+<span class="n">exp</span> <span class="o">=</span> <span class="n">union_all</span><span class="p">(</span>
+    <span class="n">select</span><span class="p">([</span><span class="n">users</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">sql_false</span><span class="p">()</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;enrolled&quot;</span><span class="p">)]),</span>
+    <span class="n">select</span><span class="p">([</span><span class="n">customers</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">customers</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">enrolled</span><span class="p">])</span>
+<span class="p">)</span></pre></div>
+</div>
+<dl class="py function">
+<dt id="sqlalchemy.ext.compiler.compiles">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.ext.compiler.</code><code class="sig-name descname">compiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">class_</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">specs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.ext.compiler.compiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a function as a compiler for a
+given <a class="reference internal" href="sqlelement.html#sqlalchemy.sql.expression.ClauseElement" title="sqlalchemy.sql.expression.ClauseElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClauseElement</span></code></a> type.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sqlalchemy.ext.compiler.deregister">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.ext.compiler.</code><code class="sig-name descname">deregister</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">class_</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.ext.compiler.deregister" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all custom compilers associated with a given
+<a class="reference internal" href="sqlelement.html#sqlalchemy.sql.expression.ClauseElement" title="sqlalchemy.sql.expression.ClauseElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClauseElement</span></code></a> type.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="functions.html" title="previous chapter">SQL and Generic Functions</a>
+        Next:
+        <a href="serializer.html" title="next chapter">Expression Serializer Extension</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

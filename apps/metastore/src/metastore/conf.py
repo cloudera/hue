@@ -33,3 +33,10 @@ FORCE_HS2_METADATA = Config(
   type=bool,
   default=False
 )
+
+SHOW_TABLE_ERD = Config(
+  key="show_table_erd",
+  default=False,
+  type=bool,
+  help=_('Choose whether to show the table ERD component.')
+)

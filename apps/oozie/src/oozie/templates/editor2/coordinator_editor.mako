@@ -73,11 +73,13 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user, request) | n,unicode }
             <i class="fa fa-fw fa-cog"></i> ${ _('Settings') }
           </a>
         </li>
+        <!-- ko if: sharingEnabled -->
         <li data-bind="visible: coordinator.id() != null && canEdit()">
           <a class="pointer share-link" rel="tooltip" data-placement="bottom" data-bind="click: openShareModal, css: {'isShared': isShared()}">
             <i class="fa fa-fw fa-users"></i> ${ _("Share") }
           </a>
         </li>
+        <!-- /ko -->
       </ul>
     </div>
 

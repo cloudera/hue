@@ -182,14 +182,14 @@ class MetastoreDatabase {
     apiHelper.setInTotalStorage('metastore', 'last.selected.database', this.name);
   }
 
-  setTableByName(tableName) {
+  setTableByName(tableName, callback) {
     if (this.table() && this.table().catalogEntry.name === tableName) {
       return;
     }
 
     this.tables().some(metastoreTable => {
       if (metastoreTable.catalogEntry.name === tableName) {
-        this.setTable(metastoreTable);
+        this.setTable(metastoreTable, callback);
         return true;
       }
     });
@@ -201,10 +201,10 @@ class MetastoreDatabase {
     if (!metastoreTable.loaded()) {
       metastoreTable.load();
     }
+    this.metastoreViewModel.currentTab('overview');
     if (callback) {
       callback();
     }
-    this.metastoreViewModel.currentTab('overview');
   }
 
   showContextPopover(entry, event, orientation) {

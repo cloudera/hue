@@ -269,6 +269,24 @@ describe('AutocompleteResults.js', () => {
   });
 
   describe('Test a whole lot of different parse results', () => {
+    const LOADING_OBSERVABLES = [
+      'loadingKeywords',
+      'loadingFunctions',
+      'loadingDatabases',
+      'loadingTables',
+      'loadingColumns',
+      'loadingValues',
+      'loadingPaths',
+      'loadingJoins',
+      'loadingJoinConditions',
+      'loadingAggregateFunctions',
+      'loadingGroupBys',
+      'loadingOrderBys',
+      'loadingFilters',
+      'loadingPopularTables',
+      'loadingPopularColumns'
+    ];
+
     beforeEach(() => {
       dataCatalog.disableCache();
       window.AUTOCOMPLETE_TIMEOUT = 1;
@@ -282,8 +300,8 @@ describe('AutocompleteResults.js', () => {
       dataCatalog.enableCache();
     });
 
-    LOTS_OF_PARSE_RESULTS.forEach(parseResult => {
-      it('should handle parse result no. ' + parseResult.index, () => {
+    for (const parseResult of LOTS_OF_PARSE_RESULTS) {
+      it('should handle parse result no. ' + parseResult.index, async () => {
         if (parseResult.suggestKeywords) {
           const cleanedKeywords = [];
           parseResult.suggestKeywords.forEach(keyword => {
@@ -296,25 +314,30 @@ describe('AutocompleteResults.js', () => {
           parseResult.suggestKeywords = cleanedKeywords;
         }
         try {
-          subject.update(parseResult);
+          await subject.update(parseResult);
         } catch (e) {
           fail('Got exception');
           console.error(e);
         }
         if (subject.loading()) {
-          fail('Still loading, missing ajax spec?');
+          LOADING_OBSERVABLES.forEach(observable => {
+            if (subject[observable]()) {
+              fail('Still loading (' + observable + '() == true), missing ajax spec?');
+            }
+          });
         }
 
         expect(subject.loading()).toBeFalsy();
       });
-    });
+    }
   });
 
-  it('should handle parse results with keywords', () => {
+  it('should handle parse results with keywords', async () => {
     subject.entries([]);
 
     expect(subject.filtered().length).toBe(0);
-    subject.update({
+
+    await subject.update({
       lowerCase: true,
       suggestKeywords: [
         { value: 'BAR', weight: 1 },
@@ -330,11 +353,11 @@ describe('AutocompleteResults.js', () => {
     expect(subject.filtered()[1].value).toBe('bar');
   });
 
-  it('should handle parse results with identifiers', () => {
+  it('should handle parse results with identifiers', async () => {
     subject.entries([]);
 
     expect(subject.filtered().length).toBe(0);
-    subject.update({
+    await subject.update({
       lowerCase: false,
       suggestIdentifiers: [
         { name: 'foo', type: 'alias' },

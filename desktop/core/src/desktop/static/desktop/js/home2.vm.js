@@ -33,6 +33,17 @@ var HomeViewModel = (function () {
     // Uncomment to enable the assist panel
     // self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
+    self.sharingEnabled = ko.observable(false);
+
+    var updateFromConfig = function (hueConfig) {
+      self.sharingEnabled(
+        hueConfig && (hueConfig.hue_config.is_admin || hueConfig.hue_config.enable_sharing)
+      );
+    };
+
+    updateFromConfig(window.getLastKnownConfig());
+    huePubSub.subscribe('cluster.config.set.config', updateFromConfig);
+
     self.serverTypeFilter = ko.observable();
 
     var initialType = window.location.getParameter('type') !== '' ? window.location.getParameter('type') : 'all';

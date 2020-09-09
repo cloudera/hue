@@ -24,8 +24,8 @@ const Topic = require('./Topic');
 const libxml = require('libxmljs');
 const extractorUtils = require('./extractorUtils');
 
-const outputPath = './desktop/core/src/desktop/static/desktop/docs/hive/';
-const mako = './desktop/core/src/desktop/templates/sql_doc_index.mako';
+const outputPath = '../../desktop/core/src/desktop/static/desktop/docs/hive/';
+const mako = '../../desktop/core/src/desktop/templates/sql_doc_index.mako';
 
 const jsonHandler = require('./jsonHandler');
 
@@ -86,7 +86,7 @@ const adaptElement = element => {
 
   switch (element.name()) {
     case 'a':
-      if (element.attr('href') && element.attr('href').value().indexOf('/links') == 0) {
+      if (element.attr('href') && element.attr('href').value().indexOf('/links') === 0) {
         // Internal link
         let ref = element
           .attr('href')

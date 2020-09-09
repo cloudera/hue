@@ -35,16 +35,17 @@ import django_opentracing
 from django.utils.translation import ugettext_lazy as _
 
 import desktop.redaction
-from desktop.lib.paths import get_desktop_root
-from desktop.lib.python_util import force_dict_to_strings
+
 from desktop.conf import has_channels
+from desktop.lib.paths import get_desktop_root, get_run_root
+from desktop.lib.python_util import force_dict_to_strings
 
 from aws.conf import is_enabled as is_s3_enabled
 from azure.conf import is_abfs_enabled
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', '..', '..'))
-
 
 HUE_DESKTOP_VERSION = pkg_resources.get_distribution("desktop").version or "Unknown"
 NICE_NAME = "Hue"
@@ -277,7 +278,7 @@ AUTH_PROFILE_MODULE = None
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/" # For djangosaml2 bug.
 
-PYLINTRC = get_desktop_root('.pylintrc')
+PYLINTRC = get_run_root('.pylintrc')
 
 # Custom CSRF Failure View
 CSRF_FAILURE_VIEW = 'desktop.views.csrf_failure'
@@ -394,6 +395,18 @@ else:
 DATABASES = {
   'default': default_db
 }
+
+if desktop.conf.QUERY_DATABASE.HOST.get():
+  DATABASES['query'] = {
+    'ENGINE': desktop.conf.QUERY_DATABASE.ENGINE.get(),
+    'HOST': desktop.conf.QUERY_DATABASE.HOST.get(),
+    'NAME': desktop.conf.QUERY_DATABASE.NAME.get(),
+    'USER': desktop.conf.QUERY_DATABASE.USER.get(),
+    'PASSWORD': desktop.conf.QUERY_DATABASE.PASSWORD.get(),
+    'OPTIONS': desktop.conf.QUERY_DATABASE.OPTIONS.get(),
+    'PORT': desktop.conf.QUERY_DATABASE.PORT.get(),
+    "SCHEMA" : desktop.conf.QUERY_DATABASE.SCHEMA.get(),
+  }
 
 CACHES = {
     'default': {
@@ -649,8 +662,8 @@ if not desktop.conf.DATABASE_LOGGING.get():
     from django.db.backends.utils import CursorWrapper
 
     BaseDatabaseWrapper.make_debug_cursor = lambda self, cursor: CursorWrapper(cursor, self)
-
   disable_database_logging()
+
 
 ############################################################
 # Searching saved documents in Oracle returns following error:

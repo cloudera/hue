@@ -25,6 +25,7 @@ export const ASSIST_GET_DATABASE_EVENT = 'assist.get.database';
 export const ASSIST_SET_DATABASE_EVENT = 'assist.set.database';
 export const ASSIST_DB_HIGHLIGHT_EVENT = 'assist.db.highlight';
 export const ASSIST_DOC_HIGHLIGHT_EVENT = 'assist.doc.highlight';
+export const ASSIST_ACTIVE_DB_CHANGED_EVENT = 'assist.active.db.changed.event';
 
 export const ASSIST_SHOW_DOC_EVENT = 'assist.show.documents';
 export const ASSIST_SHOW_SQL_EVENT = 'assist.show.sql';

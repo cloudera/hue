@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { adaptApiFunctions, ApiUdf, extractArgumentTypes, mergeArgumentTypes} from './apiUtils';
+import { adaptApiFunctions, ApiUdf, extractArgumentTypes, mergeArgumentTypes } from './apiUtils';
 
 describe('apiUtils.js', () => {
   it('should return the default signature when not defined', () => {
@@ -123,6 +123,42 @@ describe('apiUtils.js', () => {
     expect(result[0].returnTypes[0]).toEqual('T');
     expect(result[1].returnTypes.length).toEqual(1);
     expect(result[1].returnTypes[0]).toEqual('T');
+  });
+
+  it('should merge return types when equal', () => {
+    const apiFunctions = [
+      {
+        name: 'cos',
+        return_type: 'INT'
+      },
+      {
+        name: 'sin',
+        return_type: 'INT'
+      },
+      {
+        name: 'cos',
+        return_type: 'DOUBLE'
+      },
+      {
+        name: 'cos',
+        return_type: 'DOUBLE'
+      },
+      {
+        name: 'sin',
+        return_type: 'INT'
+      }
+    ];
+
+    const result = adaptApiFunctions(apiFunctions);
+
+    expect(result.length).toEqual(2);
+    expect(result[0].name).toEqual('cos');
+    expect(result[0].returnTypes.length).toEqual(2);
+    expect(result[0].returnTypes).toContain('INT');
+    expect(result[0].returnTypes).toContain('DOUBLE');
+    expect(result[1].name).toEqual('sin');
+    expect(result[1].returnTypes.length).toEqual(1);
+    expect(result[0].returnTypes).toContain('INT');
   });
 
   it('should merge same udf with multiple argument types', () => {

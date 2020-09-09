@@ -65,6 +65,8 @@ RUN ./build/env/bin/pip install \
   flower \
   pyhive \
   gevent \
+  # For Phoenix Python 2
+  gssapi==1.5.1 protobuf requests-gssapi \
   # Needed for Jaeger
   threadloop \
   thrift-sasl==0.2.1

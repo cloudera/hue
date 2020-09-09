@@ -1,0 +1,515 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>
+            
+    
+    Events
+ &mdash;
+    SQLAlchemy 1.3 Documentation
+
+        </title>
+
+        
+            <!-- begin iterate through site-imported + sphinx environment css_files -->
+                <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/docs.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/changelog.css" type="text/css" />
+                <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+            <!-- end iterate through site-imported + sphinx environment css_files -->
+        
+
+        
+
+    
+
+    <!-- begin layout.mako headers -->
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+        <link rel="copyright" title="Copyright" href="../copyright.html" />
+    <link rel="top" title="SQLAlchemy 1.3 Documentation" href="../index.html" />
+        <link rel="up" title="Core API Basics" href="api_basics.html" />
+        <link rel="next" title="Runtime Inspection API" href="inspection.html" />
+        <link rel="prev" title="Core API Basics" href="api_basics.html" />
+    <!-- end layout.mako headers -->
+
+
+    </head>
+    <body>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+
+
+<div id="docs-top-navigation-container" class="body-background">
+<div id="docs-header">
+    <div id="docs-version-header">
+        Release: <span class="version-num">1.3.17</span>
+
+
+        | Release Date: May 13, 2020
+
+    </div>
+
+    <h1>SQLAlchemy 1.3 Documentation</h1>
+
+</div>
+</div>
+
+<div id="docs-body-container">
+
+    <div id="fixed-sidebar" class="withsidebar">
+
+
+        <div id="docs-sidebar-popout">
+            <h3><a href="../index.html">SQLAlchemy 1.3 Documentation</a></h3>
+            <p id="sidebar-topnav">
+                <a href="../contents.html">Contents</a> |
+                <a href="../genindex.html">Index</a>
+            </p>
+
+            <div id="sidebar-search">
+                <form class="search" action="../search.html" method="get">
+                  <label>
+                  Search terms:
+                  <input type="text" placeholder="search..." name="q" size="12" />
+                  </label>
+                  <input type="hidden" name="check_keywords" value="yes" />
+                  <input type="hidden" name="area" value="default" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="docs-sidebar">
+
+        <div id="sidebar-banner">
+            
+        </div>
+
+        <div id="docs-sidebar-inner">
+
+        
+        <h3>
+            <a href="index.html" title="SQLAlchemy Core">SQLAlchemy Core</a>
+        </h3>
+
+        <ul>
+<li><span class="link-container"><a class="reference external" href="tutorial.html">SQL Expression Language Tutorial</a></span></li>
+<li><span class="link-container"><a class="reference external" href="expression_api.html">SQL Statements and Expressions API</a></span></li>
+<li><span class="link-container"><a class="reference external" href="schema.html">Schema Definition Language</a></span></li>
+<li><span class="link-container"><a class="reference external" href="types.html">Column and Data Types</a></span></li>
+<li><span class="link-container"><a class="reference external" href="engines_connections.html">Engine and Connection Use</a></span></li>
+<li><span class="link-container"><a class="reference external" href="api_basics.html">Core API Basics</a></span><ul>
+<li class="selected"><span class="link-container"><strong>Events</strong><a class="paramlink headerlink reference internal" href="#">¶</a></span><ul>
+<li><span class="link-container"><a class="reference external" href="#event-registration">Event Registration</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#named-argument-styles">Named Argument Styles</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#targets">Targets</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#modifiers">Modifiers</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#event-reference">Event Reference</a></span></li>
+<li><span class="link-container"><a class="reference external" href="#api-reference">API Reference</a></span></li>
+</ul>
+</li>
+<li><span class="link-container"><a class="reference external" href="inspection.html">Runtime Inspection API</a></span></li>
+<li><span class="link-container"><a class="reference external" href="interfaces.html">Deprecated Event Interfaces</a></span></li>
+<li><span class="link-container"><a class="reference external" href="exceptions.html">Core Exceptions</a></span></li>
+<li><span class="link-container"><a class="reference external" href="internals.html">Core Internals</a></span></li>
+</ul>
+</li>
+</ul>
+
+
+
+        </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="events">
+<span id="event-toplevel"></span><h1>Events<a class="headerlink" href="#events" title="Permalink to this headline">¶</a></h1>
+<p>SQLAlchemy includes an event API which publishes a wide variety of hooks into
+the internals of both SQLAlchemy Core and ORM.</p>
+<div class="section" id="event-registration">
+<h2>Event Registration<a class="headerlink" href="#event-registration" title="Permalink to this headline">¶</a></h2>
+<p>Subscribing to an event occurs through a single API point, the <a class="reference internal" href="#sqlalchemy.event.listen" title="sqlalchemy.event.listen"><code class="xref py py-func docutils literal notranslate"><span class="pre">listen()</span></code></a> function,
+or alternatively the <a class="reference internal" href="#sqlalchemy.event.listens_for" title="sqlalchemy.event.listens_for"><code class="xref py py-func docutils literal notranslate"><span class="pre">listens_for()</span></code></a> decorator.   These functions accept a
+target, a string identifier which identifies the event to be intercepted, and
+a user-defined listening function.  Additional positional and keyword arguments to these
+two functions may be supported by
+specific types of events, which may specify alternate interfaces for the given event function, or provide
+instructions regarding secondary event targets based on the given target.</p>
+<p>The name of an event and the argument signature of a corresponding listener function is derived from
+a class bound specification method, which exists bound to a marker class that’s described in the documentation.
+For example, the documentation for <a class="reference internal" href="events.html#sqlalchemy.events.PoolEvents.connect" title="sqlalchemy.events.PoolEvents.connect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PoolEvents.connect()</span></code></a> indicates that the event name is <code class="docutils literal notranslate"><span class="pre">&quot;connect&quot;</span></code>
+and that a user-defined listener function should receive two positional arguments:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.event</span> <span class="k">import</span> <span class="n">listen</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.pool</span> <span class="k">import</span> <span class="n">Pool</span>
+
+<span class="k">def</span> <span class="nf">my_on_connect</span><span class="p">(</span><span class="n">dbapi_con</span><span class="p">,</span> <span class="n">connection_record</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;New DBAPI connection:&quot;</span><span class="p">,</span> <span class="n">dbapi_con</span><span class="p">)</span>
+
+<span class="n">listen</span><span class="p">(</span><span class="n">Pool</span><span class="p">,</span> <span class="s1">&#39;connect&#39;</span><span class="p">,</span> <span class="n">my_on_connect</span><span class="p">)</span></pre></div>
+</div>
+<p>To listen with the <a class="reference internal" href="#sqlalchemy.event.listens_for" title="sqlalchemy.event.listens_for"><code class="xref py py-func docutils literal notranslate"><span class="pre">listens_for()</span></code></a> decorator looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.event</span> <span class="k">import</span> <span class="n">listens_for</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.pool</span> <span class="k">import</span> <span class="n">Pool</span>
+
+<span class="nd">@listens_for</span><span class="p">(</span><span class="n">Pool</span><span class="p">,</span> <span class="s2">&quot;connect&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">my_on_connect</span><span class="p">(</span><span class="n">dbapi_con</span><span class="p">,</span> <span class="n">connection_record</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;New DBAPI connection:&quot;</span><span class="p">,</span> <span class="n">dbapi_con</span><span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="named-argument-styles">
+<h2>Named Argument Styles<a class="headerlink" href="#named-argument-styles" title="Permalink to this headline">¶</a></h2>
+<p>There are some varieties of argument styles which can be accepted by listener
+functions.  Taking the example of <a class="reference internal" href="events.html#sqlalchemy.events.PoolEvents.connect" title="sqlalchemy.events.PoolEvents.connect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PoolEvents.connect()</span></code></a>, this function
+is documented as receiving <code class="docutils literal notranslate"><span class="pre">dbapi_connection</span></code> and <code class="docutils literal notranslate"><span class="pre">connection_record</span></code> arguments.
+We can opt to receive these arguments by name, by establishing a listener function
+that accepts <code class="docutils literal notranslate"><span class="pre">**keyword</span></code> arguments, by passing <code class="docutils literal notranslate"><span class="pre">named=True</span></code> to either
+<a class="reference internal" href="#sqlalchemy.event.listen" title="sqlalchemy.event.listen"><code class="xref py py-func docutils literal notranslate"><span class="pre">listen()</span></code></a> or <a class="reference internal" href="#sqlalchemy.event.listens_for" title="sqlalchemy.event.listens_for"><code class="xref py py-func docutils literal notranslate"><span class="pre">listens_for()</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.event</span> <span class="k">import</span> <span class="n">listens_for</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.pool</span> <span class="k">import</span> <span class="n">Pool</span>
+
+<span class="nd">@listens_for</span><span class="p">(</span><span class="n">Pool</span><span class="p">,</span> <span class="s2">&quot;connect&quot;</span><span class="p">,</span> <span class="n">named</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">my_on_connect</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;New DBAPI connection:&quot;</span><span class="p">,</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;dbapi_connection&#39;</span><span class="p">])</span></pre></div>
+</div>
+<p>When using named argument passing, the names listed in the function argument
+specification will be used as keys in the dictionary.</p>
+<p>Named style passes all arguments by name regardless of the function
+signature, so specific arguments may be listed as well, in any order,
+as long as the names match up:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.event</span> <span class="k">import</span> <span class="n">listens_for</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.pool</span> <span class="k">import</span> <span class="n">Pool</span>
+
+<span class="nd">@listens_for</span><span class="p">(</span><span class="n">Pool</span><span class="p">,</span> <span class="s2">&quot;connect&quot;</span><span class="p">,</span> <span class="n">named</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">my_on_connect</span><span class="p">(</span><span class="n">dbapi_connection</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;New DBAPI connection:&quot;</span><span class="p">,</span> <span class="n">dbapi_connection</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Connection record:&quot;</span><span class="p">,</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;connection_record&#39;</span><span class="p">])</span></pre></div>
+</div>
+<p>Above, the presence of <code class="docutils literal notranslate"><span class="pre">**kw</span></code> tells <a class="reference internal" href="#sqlalchemy.event.listens_for" title="sqlalchemy.event.listens_for"><code class="xref py py-func docutils literal notranslate"><span class="pre">listens_for()</span></code></a> that
+arguments should be passed to the function by name, rather than positionally.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.0: </span>Added optional <code class="docutils literal notranslate"><span class="pre">named</span></code> argument dispatch to
+event calling.</p>
+</div>
+</div>
+<div class="section" id="targets">
+<h2>Targets<a class="headerlink" href="#targets" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="#sqlalchemy.event.listen" title="sqlalchemy.event.listen"><code class="xref py py-func docutils literal notranslate"><span class="pre">listen()</span></code></a> function is very flexible regarding targets.  It
+generally accepts classes, instances of those classes, and related
+classes or objects from which the appropriate target can be derived.
+For example, the above mentioned <code class="docutils literal notranslate"><span class="pre">&quot;connect&quot;</span></code> event accepts
+<a class="reference internal" href="connections.html#sqlalchemy.engine.Engine" title="sqlalchemy.engine.Engine"><code class="xref py py-class docutils literal notranslate"><span class="pre">Engine</span></code></a> classes and objects as well as <a class="reference internal" href="pooling.html#sqlalchemy.pool.Pool" title="sqlalchemy.pool.Pool"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pool</span></code></a> classes
+and objects:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy.event</span> <span class="k">import</span> <span class="n">listen</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.pool</span> <span class="k">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">QueuePool</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">create_engine</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.engine</span> <span class="k">import</span> <span class="n">Engine</span>
+<span class="kn">import</span> <span class="nn">psycopg2</span>
+
+<span class="k">def</span> <span class="nf">connect</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;ed&#39;</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">dbname</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+
+<span class="n">my_pool</span> <span class="o">=</span> <span class="n">QueuePool</span><span class="p">(</span><span class="n">connect</span><span class="p">)</span>
+<span class="n">my_engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;postgresql://ed@localhost/test&#39;</span><span class="p">)</span>
+
+<span class="c1"># associate listener with all instances of Pool</span>
+<span class="n">listen</span><span class="p">(</span><span class="n">Pool</span><span class="p">,</span> <span class="s1">&#39;connect&#39;</span><span class="p">,</span> <span class="n">my_on_connect</span><span class="p">)</span>
+
+<span class="c1"># associate listener with all instances of Pool</span>
+<span class="c1"># via the Engine class</span>
+<span class="n">listen</span><span class="p">(</span><span class="n">Engine</span><span class="p">,</span> <span class="s1">&#39;connect&#39;</span><span class="p">,</span> <span class="n">my_on_connect</span><span class="p">)</span>
+
+<span class="c1"># associate listener with my_pool</span>
+<span class="n">listen</span><span class="p">(</span><span class="n">my_pool</span><span class="p">,</span> <span class="s1">&#39;connect&#39;</span><span class="p">,</span> <span class="n">my_on_connect</span><span class="p">)</span>
+
+<span class="c1"># associate listener with my_engine.pool</span>
+<span class="n">listen</span><span class="p">(</span><span class="n">my_engine</span><span class="p">,</span> <span class="s1">&#39;connect&#39;</span><span class="p">,</span> <span class="n">my_on_connect</span><span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="modifiers">
+<h2>Modifiers<a class="headerlink" href="#modifiers" title="Permalink to this headline">¶</a></h2>
+<p>Some listeners allow modifiers to be passed to <a class="reference internal" href="#sqlalchemy.event.listen" title="sqlalchemy.event.listen"><code class="xref py py-func docutils literal notranslate"><span class="pre">listen()</span></code></a>.  These
+modifiers sometimes provide alternate calling signatures for
+listeners.  Such as with ORM events, some event listeners can have a
+return value which modifies the subsequent handling.   By default, no
+listener ever requires a return value, but by passing <code class="docutils literal notranslate"><span class="pre">retval=True</span></code>
+this value can be supported:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">validate_phone</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">oldvalue</span><span class="p">,</span> <span class="n">initiator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Strip non-numeric characters from a phone number&quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\D&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<span class="c1"># setup listener on UserContact.phone attribute, instructing</span>
+<span class="c1"># it to use the return value</span>
+<span class="n">listen</span><span class="p">(</span><span class="n">UserContact</span><span class="o">.</span><span class="n">phone</span><span class="p">,</span> <span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="n">validate_phone</span><span class="p">,</span> <span class="n">retval</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></pre></div>
+</div>
+</div>
+<div class="section" id="event-reference">
+<h2>Event Reference<a class="headerlink" href="#event-reference" title="Permalink to this headline">¶</a></h2>
+<p>Both SQLAlchemy Core and SQLAlchemy ORM feature a wide variety of event hooks:</p>
+<ul class="simple">
+<li><p><strong>Core Events</strong> - these are described in
+<a class="reference internal" href="events.html"><span class="std std-ref">Core Events</span></a> and include event hooks specific to
+connection pool lifecycle, SQL statement execution,
+transaction lifecycle, and schema creation and teardown.</p></li>
+<li><p><strong>ORM Events</strong> - these are described in
+<a class="reference internal" href="../orm/events.html"><span class="std std-ref">ORM Events</span></a>, and include event hooks specific to
+class and attribute instrumentation, object initialization
+hooks, attribute on-change hooks, session state, flush, and
+commit hooks, mapper initialization, object/result population,
+and per-instance persistence hooks.</p></li>
+</ul>
+</div>
+<div class="section" id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="sqlalchemy.event.listen">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.event.</code><code class="sig-name descname">listen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target</span></em>, <em class="sig-param"><span class="n">identifier</span></em>, <em class="sig-param"><span class="n">fn</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.event.listen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a listener function for the given target.</p>
+<p>The <a class="reference internal" href="#sqlalchemy.event.listen" title="sqlalchemy.event.listen"><code class="xref py py-func docutils literal notranslate"><span class="pre">listen()</span></code></a> function is part of the primary interface for the
+SQLAlchemy event system, documented at <a class="reference internal" href="#"><span class="std std-ref">Events</span></a>.</p>
+<p>e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">event</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.schema</span> <span class="k">import</span> <span class="n">UniqueConstraint</span>
+
+<span class="k">def</span> <span class="nf">unique_constraint_name</span><span class="p">(</span><span class="n">const</span><span class="p">,</span> <span class="n">table</span><span class="p">):</span>
+    <span class="n">const</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;uq_</span><span class="si">%s</span><span class="s2">_</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="nb">list</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">columns</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+    <span class="p">)</span>
+<span class="n">event</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span>
+        <span class="n">UniqueConstraint</span><span class="p">,</span>
+        <span class="s2">&quot;after_parent_attach&quot;</span><span class="p">,</span>
+        <span class="n">unique_constraint_name</span><span class="p">)</span></pre></div>
+</div>
+<p>A given function can also be invoked for only the first invocation
+of the event using the <code class="docutils literal notranslate"><span class="pre">once</span></code> argument:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">on_config</span><span class="p">():</span>
+    <span class="n">do_config</span><span class="p">()</span>
+
+<span class="n">event</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="n">Mapper</span><span class="p">,</span> <span class="s2">&quot;before_configure&quot;</span><span class="p">,</span> <span class="n">on_config</span><span class="p">,</span> <span class="n">once</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.4: </span>Added <code class="docutils literal notranslate"><span class="pre">once=True</span></code> to <a class="reference internal" href="#sqlalchemy.event.listen" title="sqlalchemy.event.listen"><code class="xref py py-func docutils literal notranslate"><span class="pre">listen()</span></code></a>
+and <a class="reference internal" href="#sqlalchemy.event.listens_for" title="sqlalchemy.event.listens_for"><code class="xref py py-func docutils literal notranslate"><span class="pre">listens_for()</span></code></a>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">once</span></code> argument does not imply automatic de-registration
+of the listener function after it has been invoked a first time; a
+listener entry will remain associated with the target object.
+Associating an arbitrarily high number of listeners without explictitly
+removing them will cause memory to grow unbounded even if <code class="docutils literal notranslate"><span class="pre">once=True</span></code>
+is specified.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <a class="reference internal" href="#sqlalchemy.event.listen" title="sqlalchemy.event.listen"><code class="xref py py-func docutils literal notranslate"><span class="pre">listen()</span></code></a> function cannot be called at the same time
+that the target event is being run.   This has implications
+for thread safety, and also means an event cannot be added
+from inside the listener function for itself.  The list of
+events to be run are present inside of a mutable collection
+that can’t be changed during iteration.</p>
+<p>Event registration and removal is not intended to be a “high
+velocity” operation; it is a configurational operation.  For
+systems that need to quickly associate and deassociate with
+events at high scale, use a mutable structure that is handled
+from inside of a single listener.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 1.0.0: </span>- a <code class="docutils literal notranslate"><span class="pre">collections.deque()</span></code> object is now
+used as the container for the list of events, which explicitly
+disallows collection mutation while the collection is being
+iterated.</p>
+</div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#sqlalchemy.event.listens_for" title="sqlalchemy.event.listens_for"><code class="xref py py-func docutils literal notranslate"><span class="pre">listens_for()</span></code></a></p>
+<p><a class="reference internal" href="#sqlalchemy.event.remove" title="sqlalchemy.event.remove"><code class="xref py py-func docutils literal notranslate"><span class="pre">remove()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sqlalchemy.event.listens_for">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.event.</code><code class="sig-name descname">listens_for</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target</span></em>, <em class="sig-param"><span class="n">identifier</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.event.listens_for" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorate a function as a listener for the given target + identifier.</p>
+<p>The <a class="reference internal" href="#sqlalchemy.event.listens_for" title="sqlalchemy.event.listens_for"><code class="xref py py-func docutils literal notranslate"><span class="pre">listens_for()</span></code></a> decorator is part of the primary interface for the
+SQLAlchemy event system, documented at <a class="reference internal" href="#"><span class="std std-ref">Events</span></a>.</p>
+<p>e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">event</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.schema</span> <span class="k">import</span> <span class="n">UniqueConstraint</span>
+
+<span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">UniqueConstraint</span><span class="p">,</span> <span class="s2">&quot;after_parent_attach&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">unique_constraint_name</span><span class="p">(</span><span class="n">const</span><span class="p">,</span> <span class="n">table</span><span class="p">):</span>
+    <span class="n">const</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;uq_</span><span class="si">%s</span><span class="s2">_</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="nb">list</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">columns</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+    <span class="p">)</span></pre></div>
+</div>
+<p>A given function can also be invoked for only the first invocation
+of the event using the <code class="docutils literal notranslate"><span class="pre">once</span></code> argument:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">Mapper</span><span class="p">,</span> <span class="s2">&quot;before_configure&quot;</span><span class="p">,</span> <span class="n">once</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">on_config</span><span class="p">():</span>
+    <span class="n">do_config</span><span class="p">()</span></pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.4: </span>Added <code class="docutils literal notranslate"><span class="pre">once=True</span></code> to <a class="reference internal" href="#sqlalchemy.event.listen" title="sqlalchemy.event.listen"><code class="xref py py-func docutils literal notranslate"><span class="pre">listen()</span></code></a>
+and <a class="reference internal" href="#sqlalchemy.event.listens_for" title="sqlalchemy.event.listens_for"><code class="xref py py-func docutils literal notranslate"><span class="pre">listens_for()</span></code></a>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">once</span></code> argument does not imply automatic de-registration
+of the listener function after it has been invoked a first time; a
+listener entry will remain associated with the target object.
+Associating an arbitrarily high number of listeners without explictitly
+removing them will cause memory to grow unbounded even if <code class="docutils literal notranslate"><span class="pre">once=True</span></code>
+is specified.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#sqlalchemy.event.listen" title="sqlalchemy.event.listen"><code class="xref py py-func docutils literal notranslate"><span class="pre">listen()</span></code></a> - general description of event listening</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sqlalchemy.event.remove">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.event.</code><code class="sig-name descname">remove</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target</span></em>, <em class="sig-param"><span class="n">identifier</span></em>, <em class="sig-param"><span class="n">fn</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.event.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove an event listener.</p>
+<p>The arguments here should match exactly those which were sent to
+<a class="reference internal" href="#sqlalchemy.event.listen" title="sqlalchemy.event.listen"><code class="xref py py-func docutils literal notranslate"><span class="pre">listen()</span></code></a>; all the event registration which proceeded as a result
+of this call will be reverted by calling <a class="reference internal" href="#sqlalchemy.event.remove" title="sqlalchemy.event.remove"><code class="xref py py-func docutils literal notranslate"><span class="pre">remove()</span></code></a> with the same
+arguments.</p>
+<p>e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># if a function was registered like this...</span>
+<span class="nd">@event</span><span class="o">.</span><span class="n">listens_for</span><span class="p">(</span><span class="n">SomeMappedClass</span><span class="p">,</span> <span class="s2">&quot;before_insert&quot;</span><span class="p">,</span> <span class="n">propagate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">my_listener_function</span><span class="p">(</span><span class="o">*</span><span class="n">arg</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="c1"># ... it&#39;s removed like this</span>
+<span class="n">event</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">SomeMappedClass</span><span class="p">,</span> <span class="s2">&quot;before_insert&quot;</span><span class="p">,</span> <span class="n">my_listener_function</span><span class="p">)</span></pre></div>
+</div>
+<p>Above, the listener function associated with <code class="docutils literal notranslate"><span class="pre">SomeMappedClass</span></code> was also
+propagated to subclasses of <code class="docutils literal notranslate"><span class="pre">SomeMappedClass</span></code>; the <a class="reference internal" href="#sqlalchemy.event.remove" title="sqlalchemy.event.remove"><code class="xref py py-func docutils literal notranslate"><span class="pre">remove()</span></code></a>
+function will revert all of these operations.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.0.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <a class="reference internal" href="#sqlalchemy.event.remove" title="sqlalchemy.event.remove"><code class="xref py py-func docutils literal notranslate"><span class="pre">remove()</span></code></a> function cannot be called at the same time
+that the target event is being run.   This has implications
+for thread safety, and also means an event cannot be removed
+from inside the listener function for itself.  The list of
+events to be run are present inside of a mutable collection
+that can’t be changed during iteration.</p>
+<p>Event registration and removal is not intended to be a “high
+velocity” operation; it is a configurational operation.  For
+systems that need to quickly associate and deassociate with
+events at high scale, use a mutable structure that is handled
+from inside of a single listener.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 1.0.0: </span>- a <code class="docutils literal notranslate"><span class="pre">collections.deque()</span></code> object is now
+used as the container for the list of events, which explicitly
+disallows collection mutation while the collection is being
+iterated.</p>
+</div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#sqlalchemy.event.listen" title="sqlalchemy.event.listen"><code class="xref py py-func docutils literal notranslate"><span class="pre">listen()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sqlalchemy.event.contains">
+<em class="property">function </em><code class="sig-prename descclassname">sqlalchemy.event.</code><code class="sig-name descname">contains</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target</span></em>, <em class="sig-param"><span class="n">identifier</span></em>, <em class="sig-param"><span class="n">fn</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sqlalchemy.event.contains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if the given target/ident/fn is set up to listen.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.0.</span></p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links, withsidebar">
+        Previous:
+        <a href="api_basics.html" title="previous chapter">Core API Basics</a>
+        Next:
+        <a href="inspection.html" title="next chapter">Runtime Inspection API</a>
+
+    <div id="docs-copyright">
+        &copy; <a href="../copyright.html">Copyright</a> 2007-2020, the SQLAlchemy authors and contributors.
+        Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 3.0.3.
+    </div>
+</div>
+
+</div>
+
+
+
+        
+        
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '../',
+          VERSION:     '1.3.17',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+
+    <!-- begin iterate through sphinx environment script_files -->
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    <!-- end iterate through sphinx environment script_files -->
+
+    <script type="text/javascript" src="../_static/detectmobile.js"></script>
+    <script type="text/javascript" src="../_static/init.js"></script>
+
+
+    </body>
+</html>
+
+

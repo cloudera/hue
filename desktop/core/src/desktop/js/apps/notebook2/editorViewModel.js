@@ -31,7 +31,8 @@ import {
 import {
   CONFIG_REFRESHED_EVENT,
   GET_KNOWN_CONFIG_EVENT,
-  findEditorConnector
+  findEditorConnector,
+  getLastKnownConfig
 } from 'utils/hueConfig';
 
 class EditorViewModel {
@@ -58,6 +59,12 @@ class EditorViewModel {
 
     this.editorMode = ko.observable(options.mode === 'editor');
     this.config = ko.observable();
+
+    this.sharingEnabled = ko.pureComputed(
+      () =>
+        this.config() &&
+        (this.config().hue_config.is_admin || this.config().hue_config.sharing_enabled)
+    );
 
     huePubSub.publish(GET_KNOWN_CONFIG_EVENT, this.config);
     huePubSub.subscribe(CONFIG_REFRESHED_EVENT, this.config);
@@ -271,20 +278,20 @@ class EditorViewModel {
     return this.snippetViewSettings.default;
   }
 
-  init() {
+  async init() {
     if (this.editorId) {
-      this.openNotebook(this.editorId);
+      await this.openNotebook(this.editorId);
     } else if (
       window.location.getParameter('gist') !== '' ||
       window.location.getParameter('type') !== ''
     ) {
-      this.newNotebook(window.location.getParameter('type'));
+      await this.newNotebook(window.location.getParameter('type'));
     } else if (window.location.getParameter('editor') !== '') {
-      this.openNotebook(window.location.getParameter('editor'));
+      await this.openNotebook(window.location.getParameter('editor'));
     } else if (this.notebooks.length > 0) {
       this.loadNotebook(this.notebooks[0]); // Old way of loading json for /browse
     } else {
-      this.newNotebook();
+      await this.newNotebook();
     }
   }
 
@@ -314,7 +321,18 @@ class EditorViewModel {
   }
 
   async newNotebook(connectorId, callback, queryTab) {
-    const connector = findEditorConnector(connector => connector.id === connectorId);
+    if (!connectorId) {
+      connectorId = getLastKnownConfig().default_sql_interpreter;
+    }
+    let connector;
+    if (connectorId) {
+      connector = findEditorConnector(connector => connector.id === connectorId);
+    } else {
+      const connectors = getLastKnownConfig().app_config.editor.interpreters;
+      if (connectors.length) {
+        connector = connectors[0];
+      }
+    }
     if (!connector) {
       console.warn('No connector found for ID ' + connectorId);
     } else {

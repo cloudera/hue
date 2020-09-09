@@ -466,10 +466,10 @@ def get_api(request, snippet):
       from notebook.connectors.jdbc import JdbcApi
       return JdbcApi(request.user, interpreter=interpreter)
   elif interface == 'teradata':
-    from notebook.connectors.jdbc import JdbcApiTeradata
+    from notebook.connectors.jdbc_teradata import JdbcApiTeradata
     return JdbcApiTeradata(request.user, interpreter=interpreter)
   elif interface == 'athena':
-    from notebook.connectors.jdbc import JdbcApiAthena
+    from notebook.connectors.jdbc_athena import JdbcApiAthena
     return JdbcApiAthena(request.user, interpreter=interpreter)
   elif interface == 'presto':
     from notebook.connectors.jdbc_presto import JdbcApiPresto

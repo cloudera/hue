@@ -14,7 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const { BUNDLES, getPluginConfig } = require('./desktop/core/src/desktop/js/webpack/configUtils');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const {
+  BUNDLES,
+  getPluginConfig,
+  splitChunksName
+} = require('./desktop/core/src/desktop/js/webpack/configUtils');
 
 module.exports = {
   devtool: false,
@@ -35,6 +40,7 @@ module.exports = {
       { test: /\.js$/, use: ['source-map-loader'], enforce: 'pre' },
       { test: /\.(html)$/, loader: 'html?interpolate&removeComments=false' },
       { test: /\.less$/, loader: 'style-loader!css-loader!less-loader' },
+      { test: /\.s[ac]ss$/, loader: 'style-loader!css-loader!sass-loader' },
       { test: /\.css$/, loader: 'style-loader!css-loader' },
       { test: /\.(woff2?|ttf|eot|svg)$/, loader: 'file-loader' },
       {
@@ -46,8 +52,9 @@ module.exports = {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: {
+          shadowMode: true,
           loaders: {
-            less: ['vue-style-loader', 'css-loader', 'less-loader']
+            less: ['vue-style-loader', 'css-loader', 'less-loader', 'sass-loader']
           }
         }
       }
@@ -57,7 +64,8 @@ module.exports = {
     //minimize: true,
     minimize: false,
     splitChunks: {
-      chunks: 'all'
+      chunks: 'all',
+      name: splitChunksName
     },
     runtimeChunk: {
       name: 'hue'
@@ -72,7 +80,9 @@ module.exports = {
     maxEntrypointSize: 400 * 1024, // 400kb
     maxAssetSize: 400 * 1024 // 400kb
   },
-  plugins: getPluginConfig(BUNDLES.HUE),
+  plugins: getPluginConfig(BUNDLES.HUE).concat([
+    new CleanWebpackPlugin([`${__dirname}/desktop/core/src/desktop/static/desktop/js/bundles/hue`])
+  ]),
   resolve: {
     extensions: ['.json', '.jsx', '.js', '.tsx', '.ts', '.vue'],
     modules: ['node_modules', 'js'],

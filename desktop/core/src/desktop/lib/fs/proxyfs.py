@@ -132,7 +132,7 @@ class ProxyFS(object):
 
   def do_as_superuser(self, fn, *args, **kwargs):
     scheme = self._get_scheme(args[0])
-    fs = self._fs_dict[scheme](self._name)
+    fs = self._fs_dict[scheme](self._name, user=DEFAULT_USER)
     user = fs.superuser if fs.superuser else DEFAULT_USER
     return self.do_as_user(user, fn, *args, **kwargs)
 

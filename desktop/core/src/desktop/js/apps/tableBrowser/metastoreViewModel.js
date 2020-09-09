@@ -22,6 +22,7 @@ import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import MetastoreSource from 'apps/tableBrowser/metastoreSource';
 import dataCatalog from 'catalog/dataCatalog';
+import * as propsMappers from './propsMappers';
 import { findEditorConnector, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 class MetastoreViewModel {
@@ -45,6 +46,8 @@ class MetastoreViewModel {
     this.navigatorEnabled = ko.observable(options.navigatorEnabled || false);
     this.appConfig = ko.observable();
 
+    this.propsMappers = propsMappers;
+
     this.source = ko.observable();
     this.sources = ko.observableArray();
 
@@ -64,6 +67,20 @@ class MetastoreViewModel {
     // When manually changed through dropdown
     this.sourceChanged = () => {
       huePubSub.publish('metastore.url.change');
+    };
+
+    this.setDbAndTableByName = (dbName, tableName, callback) => {
+      this.source()
+        .namespace()
+        .setDatabaseByName(dbName, () => {
+          this.source()
+            .namespace()
+            .database()
+            .setTableByName(tableName, () => {
+              this.sourceChanged();
+              callback();
+            });
+        });
     };
 
     this.loading = ko.pureComputed(() => !this.source() || this.source().loading());
@@ -353,22 +370,30 @@ class MetastoreViewModel {
     loadedDeferred.done(() => {
       let search = location.search;
       let namespaceId;
+      let connectorId;
       let sourceType;
       if (search) {
         search = search.replace('?', '');
         search.split('&').forEach(param => {
           if (param.indexOf('namespace=') === 0) {
             namespaceId = param.replace('namespace=', '');
-          }
-          if (param.indexOf('source_type=') === 0) {
-            sourceType = param.replace('source_type=', '');
+          } else if (param.indexOf('source_type=') === 0) {
+            sourceType = param.replace('source_type=', ''); // Keep old links working
+          } else if (param.indexOf('source=') === 0) {
+            sourceType = param.replace('source=', ''); // Keep old links working
+          } else if (param.indexOf('connector_id=') === 0) {
+            connectorId = param.replace('connector_id=', '');
           }
         });
       }
 
-      if (sourceType && sourceType !== this.source().type) {
+      if (!connectorId && sourceType) {
+        connectorId = sourceType;
+      }
+
+      if (connectorId && connectorId !== this.source().connector().id) {
         const found = this.sources().some(source => {
-          if (source.type === sourceType) {
+          if (connectorId === source.connector().id) {
             this.source(source);
             return true;
           }

@@ -1,5 +1,12 @@
 module.exports = {
-  moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx'],
+  moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx', 'json', 'vue'],
+  transform: {
+    "^.+\\.(js|ts)$": "babel-jest",
+    "^.+\\.vue$": "vue-jest"
+  },
+  "moduleNameMapper": {
+    "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+  },
   moduleDirectories: ['node_modules', 'desktop/core/src/desktop/js'],
   modulePaths: ['desktop/core/src/desktop/js'],
   testMatch: ['<rootDir>/desktop/core/src/desktop/js/**/*.test.(js|jsx|ts|tsx)'],
@@ -16,5 +23,5 @@ module.exports = {
     '<rootDir>/desktop/core/src/desktop/js/parse/sql/calcite/test',
     '<rootDir>/desktop/core/src/desktop/js/parse/sql/flink/test',
   ],
-  collectCoverageFrom: ['<rootDir>/desktop/core/src/desktop/js/**/*.{js,jsx}']
+  collectCoverageFrom: ['<rootDir>/desktop/core/src/desktop/js/**/*.{js,jsx,vue}']
 };

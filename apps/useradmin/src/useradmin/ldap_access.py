@@ -177,7 +177,7 @@ class LdapConnection(object):
     else:
       try:
         # Do anonymous bind
-        self.ldap_handle.simple_bind_s('','')
+        self.ldap_handle.simple_bind_s('', '')
       except Exception as e:
         self.handle_bind_exception(e)
 
@@ -216,8 +216,10 @@ class LdapConnection(object):
   @classmethod
   def _transform_find_user_results(cls, result_data, user_name_attr):
     """
-    :param result_data: List of dictionaries that have ldap attributes and their associated values. Generally the result list from an ldapsearch request.
-    :param user_name_attr: The ldap attribute that is returned by the server to map to ``username`` in the return dictionary.
+    :param result_data: List of dictionaries that have ldap attributes and their associated values.
+                        Generally the result list from an ldapsearch request.
+    :param user_name_attr: The ldap attribute that is returned by the server to map to ``username``
+                           in the return dictionary.
 
     :returns list of dictionaries that take on the following form: {
       'dn': <distinguished name of entry>,
@@ -243,7 +245,7 @@ class LdapConnection(object):
 
           ldap_info = {
             'dn': dn,
-            'username': data[user_name_attr][0]
+            'username': smart_text(data[user_name_attr][0])
           }
 
           if 'givenName' in data:
@@ -257,12 +259,12 @@ class LdapConnection(object):
               LOG.warn('Last name is truncated to 30 characters for [<User: %s>].' % ldap_info['username'])
             ldap_info['last'] = last_name[:30]
           if 'mail' in data:
-            ldap_info['email'] = data['mail'][0]
+            ldap_info['email'] = smart_text(data['mail'][0])
           # memberOf and isMemberOf should be the same if they both exist
           if 'memberOf' in data:
-            ldap_info['groups'] = data['memberOf']
+            ldap_info['groups'] = [smart_text(member) for member in data['memberOf']]
           if 'isMemberOf' in data:
-            ldap_info['groups'] = data['isMemberOf']
+            ldap_info['groups'] = [smart_text(member) for member in data['isMemberOf']]
 
           user_info.append(ldap_info)
     return user_info
@@ -296,13 +298,15 @@ class LdapConnection(object):
           if group_member_attr in data and group_member_attr.lower() != 'memberuid':
             ldap_info['members'] = data[group_member_attr]
           else:
-            LOG.warn('Skipping import of non-posix users from group %s since group_member_attr is memberUid or group did not contain any members' % group_name)
+            LOG.warn('Skipping import of non-posix users from group %s since group_member_attr '
+                     'is memberUid or group did not contain any members' % group_name)
             ldap_info['members'] = []
 
           if 'posixgroup' in (item.lower() for item in data['objectClass']) and 'memberUid' in data:
             ldap_info['posix_members'] = data['memberUid']
           else:
-            LOG.warn('Skipping import of posix users from group %s since posixGroup not an objectClass or no memberUids found' % group_name)
+            LOG.warn('Skipping import of posix users from group %s since posixGroup '
+                     'not an objectClass or no memberUids found' % group_name)
             ldap_info['posix_members'] = []
 
           group_info.append(ldap_info)
@@ -368,11 +372,12 @@ class LdapConnection(object):
       else:
         return []
     except ldap.LDAPError as e:
-       LOG.warn("LDAP Error: %s" % e)
+      LOG.warn("LDAP Error: %s" % e)
 
     return None
 
-  def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None, group_member_attr=None, group_filter=None, find_by_dn=False, scope=SCOPE_SUBTREE):
+  def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None,
+                  group_member_attr=None, group_filter=None, find_by_dn=False, scope=SCOPE_SUBTREE):
     """
     LDAP search helper method for finding groups
 

@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import localforage from 'localforage';
 
-import CancellablePromise from 'api/cancellablePromise';
+import CancellableJqPromise from 'api/cancellableJqPromise';
 import catalogUtils from 'catalog/catalogUtils';
 import DataCatalogEntry from 'catalog/dataCatalogEntry';
 import GeneralDataCatalog from 'catalog/generalDataCatalog';
@@ -276,7 +276,7 @@ export class DataCatalog {
    * @param {boolean} [options.silenceErrors] - Default true
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   loadOptimizerPopularityForTables(options) {
     const deferred = $.Deferred();
@@ -395,7 +395,10 @@ export class DataCatalog {
       }
       loadDeferred.always(() => {
         $.when
-          .apply($, cancellablePromises)
+          .apply(
+            $,
+            cancellablePromises.map(cancellable => cancellable.deferred)
+          )
           .done(() => {
             deferred.resolve(popularEntries);
           })
@@ -404,7 +407,7 @@ export class DataCatalog {
     });
 
     return catalogUtils.applyCancellable(
-      new CancellablePromise(deferred, cancellablePromises),
+      new CancellableJqPromise(deferred, cancellablePromises),
       options
     );
   }
@@ -849,9 +852,10 @@ export default {
    * @param {Connector} options.connector
    * @param {string|string[]} options.path
    * @param {Object} [options.definition] - Optional initial definition
+   * @param {boolean} [options.cachedOnly] - Default: false
    * @param {boolean} [options.temporaryOnly] - Default: false
    *
-   * @return {Promise}
+   * @return {JQuery.Promise<DataCatalogEntry>}
    */
   getEntry: function (options) {
     return getCatalog(options.connector).getEntry(options);
@@ -882,10 +886,11 @@ export default {
    * @param {Object} [options.definition] - Optional initial definition of the parent entry
    * @param {boolean} [options.silenceErrors]
    * @param {boolean} [options.cachedOnly]
+   * @param {boolean} [options.temporaryOnly]
    * @param {boolean} [options.refreshCache]
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   getChildren: function (options) {
     const deferred = $.Deferred();
@@ -898,7 +903,7 @@ export default {
         );
       })
       .fail(deferred.reject);
-    return new CancellablePromise(deferred, undefined, cancellablePromises);
+    return new CancellableJqPromise(deferred, undefined, cancellablePromises);
   },
 
   /**

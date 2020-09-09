@@ -17,16 +17,27 @@
 
 # Checking all python changes in the new commits
 
-FOUND_ISSUE=0
+HOME=${1:-"."}
+FOUND_ISSUE=-1
 
 files=`git diff --name-only origin/master --diff-filter=b | egrep .py$ | grep -v /ext-py/`
 
-./build/env/bin/hue runpylint --files="$files"
+cd $HOME
 
-if [ "$?" -eq "0" ]
+if [ ! -z "$files" ];
 then
-  echo "Found some Python Code styling issues"
-  FOUND_ISSUE=-1
+  ./build/env/bin/hue runpylint --files "$files"
+  FOUND_ISSUE=$?
+else
+  echo "No Python code files changed present"
+  FOUND_ISSUE=0
+fi
+
+if [ "$FOUND_ISSUE" -eq "0" ]
+then
+  echo "No Python code styling issues found"
+else
+  echo "Found some Python code styling issues"
 fi
 
 exit $FOUND_ISSUE

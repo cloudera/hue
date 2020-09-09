@@ -868,8 +868,8 @@ KERBEROS = ConfigSection(
       help=_("Kerberos principal name for Hue. Typically 'hue/hostname.foo.com'."),
       type=str,
       default="hue/%s" % socket.getfqdn()),
-    KEYTAB_REINIT_FREQUENCY=Config(
-      key='keytab_reinit_frequency',
+    REINIT_FREQUENCY=Config(
+      key='reinit_frequency',
       help=_("Frequency in seconds with which Hue will renew its keytab."),
       type=int,
       default=60*60), #1h
@@ -1622,6 +1622,13 @@ ENABLE_DOWNLOAD = Config(
   type=coerce_bool,
   default=True)
 
+ENABLE_SHARING = Config(
+  key="enable_sharing",
+  help=_(
+    'Global setting to enable or disable document sharing. Note that this does not affect currently shared documents.'),
+  type=coerce_bool,
+  default=True)
+
 ENABLE_DJANGO_DEBUG_TOOL = Config(
   key="enable_django_debug_tool",
   help=_('Allow use django debug tool with Chrome browser for debugging issue, django_debug_mode must be true also'),
@@ -1957,6 +1964,63 @@ CONNECTORS = UnspecifiedConfigSection(
           type=coerce_json_dict,
       ),
     )
+  )
+)
+
+
+QUERY_DATABASE = ConfigSection(
+  key='query_database',
+  help=_("""Configuration options for specifying the Query History Database."""),
+  members=dict(
+    ENGINE=Config(
+      key='engine',
+      help=_('Database engine, such as postgresql_psycopg2, mysql, or sqlite3.'),
+      type=coerce_database,
+      default='django.db.backends.sqlite3',
+    ),
+    NAME=Config(
+      key='name',
+      help=_('Database name, or path to DB if using sqlite3.'),
+      type=str,
+      default='das',
+    ),
+    USER=Config(
+      key='user',
+      help=_('Database username.'),
+      type=str,
+      default='',
+    ),
+    SCHEMA=Config(
+      key='schema',
+      help=_('Database schema, to be used only when public schema is revoked in postgres.'),
+      type=str,
+      default='public',
+    ),
+    PASSWORD=Config(
+      key='password',
+      help=_('Database password.'),
+      private=True,
+      type=str,
+      default="",
+    ),
+    HOST=Config(
+      key='host',
+      help=_('Database host.'),
+      type=str,
+      default='',
+    ),
+    PORT=Config(
+      key='port',
+      help=_('Database port.'),
+      type=coerce_port,
+      default='',
+    ),
+    OPTIONS=Config(
+      key='options',
+      help=_('Database options to send to the server when connecting.'),
+      type=coerce_json_dict,
+      dynamic_default=default_database_options
+    ),
   )
 )
 

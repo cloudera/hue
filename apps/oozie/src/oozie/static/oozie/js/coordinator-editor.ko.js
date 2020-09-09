@@ -186,6 +186,18 @@ var CoordinatorEditorViewModel = (function () {
     if (! coordinator_json['properties']['timezone']) {
       coordinator_json['properties']['timezone'] = tzdetect.matches()[0];
     }
+
+    self.sharingEnabled = ko.observable(false);
+
+    var updateFromConfig = function (hueConfig) {
+      self.sharingEnabled(
+        hueConfig && (hueConfig.hue_config.is_admin || hueConfig.hue_config.enable_sharing)
+      );
+    };
+
+    updateFromConfig(window.getLastKnownConfig());
+    huePubSub.subscribe('cluster.config.set.config', updateFromConfig);
+
     self.canEdit = ko.mapping.fromJS(can_edit_json);
     self.isEditing = ko.observable(coordinator_json.id == null);
     self.isEditing.subscribe(function (newVal) {

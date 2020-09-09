@@ -43,24 +43,24 @@ class ParameterForm(forms.Form):
   value = forms.CharField(max_length=12288, required=False)
 
   NON_PARAMETERS = (
-      'user.name',
-      'mapreduce.job.user.name',
-      'wf_application_path',
-      'jobTracker',
-      'nameNode',
       'hue-id-w',
       'hue-id-c',
       'hue-id-b',
       'hue-id-b',
       'security_enabled',
-      'oozie.wf.rerun.failnodes',
-      'dryrun',
-      'send_email'
+      'dryrun'
   )
 
   RERUN_HIDE_PARAMETERS = (
       'security_enabled',
-      'dryrun'
+      'dryrun',
+      'user.name',
+      'mapreduce.job.user.name',
+      'wf_application_path',
+      'jobTracker',
+      'nameNode',
+      'oozie.wf.rerun.failnodes',
+      'send_email'
   )
 
   @staticmethod

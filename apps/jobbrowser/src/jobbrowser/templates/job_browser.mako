@@ -18,6 +18,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.conf import CUSTOM, IS_K8S_ONLY
 from desktop.views import commonheader, commonfooter, _ko
+from desktop.webpack_utils import get_hue_bundles
 from metadata.conf import PROMETHEUS
 from notebook.conf import ENABLE_QUERY_SCHEDULING
 
@@ -58,7 +59,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-spinedit.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-slider.css') }">
 
-${ render_bundle('jobBrowser') | n,unicode }
+% for bundle in get_hue_bundles('jobBrowser'):
+  ${ render_bundle(bundle) | n,unicode }
+% endfor
 
 <script src="${ static('desktop/ext/js/bootstrap-datepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/bootstrap-timepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1807,19 +1810,14 @@ ${ render_bundle('jobBrowser') | n,unicode }
         <!-- ko if: $root.job().mainType() == 'queries-hive' -->
         <div class="tab-pane active" id="queries-page-hive-plan-text${ SUFFIX }" data-profile="plan">
           <!-- ko if: properties.plan && properties.plan().plan -->
-            <!-- ko component: {
-              name: 'hive-query-plan',
-              params: {
-                plan: properties.plan().plan
-              }
-            } --><!-- /ko -->
+            <pre data-bind="text: properties.plan().plan || _('The selected tab has no data')"></pre>
           <!-- /ko -->
         </div>
         <div class="tab-pane" id="queries-page-hive-stmt${ SUFFIX }" data-profile="stmt">
           <pre data-bind="text: (properties.plan && properties.plan().stmt) || _('The selected tab has no data')"></pre>
         </div>
         <div class="tab-pane" id="queries-page-hive-perf${ SUFFIX }" data-profile="perf">
-          <pre data-bind="text: (properties.plan && properties.plan().perf && properties.plan().perf && JSON.stringify(JSON.parse(properties.plan().perf), null, 2)) || _('The selected tab has no data')"></pre>
+          <hive-query-plan></hive-query-plan>
         </div>
         <!-- /ko -->
       </div>
@@ -3917,7 +3915,7 @@ ${ render_bundle('jobBrowser') | n,unicode }
           return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
         var queryHiveInterfaceCondition = function () {
-          return '${ ENABLE_HIVE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('hive') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+          return '${ ENABLE_HIVE_QUERY_BROWSER.get() }' == 'True';
         };
         var scheduleHiveInterfaceCondition = function () {
           return '${ ENABLE_QUERY_SCHEDULING.get() }' == 'True';

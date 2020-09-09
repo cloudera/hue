@@ -75,6 +75,12 @@ describe('hiveSyntaxParser.js', () => {
     expect(result).toBeFalsy();
   });
 
+  it('should not throw exceptions for "SELECT cos(1) from test"', () => {
+    const result = hiveSyntaxParser.parseSyntax('SELECT cos(1) from test', '', true);
+
+    expect(result).toBeFalsy();
+  });
+
   it('should not report incomplete statement for "SELECT * FR"', () => {
     const result = hiveSyntaxParser.parseSyntax('SELECT * FR', '');
 
