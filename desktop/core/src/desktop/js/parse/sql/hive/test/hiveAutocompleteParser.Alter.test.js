@@ -442,7 +442,8 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
             'SET TBLPROPERTIES',
             'SKEWED BY',
             'TOUCH',
-            'UNARCHIVE PARTITION'
+            'UNARCHIVE PARTITION',
+            'UNSET SERDEPROPERTIES',
           ]
         }
       });
@@ -1059,7 +1060,8 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
             'SET FILEFORMAT',
             'SET LOCATION',
             'SET SERDE',
-            'SET SERDEPROPERTIES'
+            'SET SERDEPROPERTIES',
+            'UNSET SERDEPROPERTIES'
           ]
         }
       });
@@ -1665,6 +1667,17 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
         expectedResult: {
           lowerCase: false,
           suggestKeywords: ['PARTITION']
+        }
+      });
+    });
+
+    it('should suggest keywords for "ALTER TABLE bar UNSET |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'ALTER TABLE bar UNSET ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['SERDEPROPERTIES']
         }
       });
     });

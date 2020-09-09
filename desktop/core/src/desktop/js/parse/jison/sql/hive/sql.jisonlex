@@ -290,6 +290,7 @@ STORED\s+AS\s+DIRECTORIES            { return 'STORED_AS_DIRECTORIES'; }
 'UNARCHIVE'                          { return 'UNARCHIVE'; }
 'UNIONTYPE'                          { return 'UNIONTYPE'; }
 'UNIQUE'                             { return 'UNIQUE'; }
+'UNSET'                              { return 'UNSET'; }
 'USE'                                { parser.determineCase(yytext); parser.addStatementTypeLocation('USE', yylloc); return 'USE'; }
 'VECTORIZATION'                      { return 'VECTORIZATION'; }
 'VIEW'                               { return 'VIEW'; }
