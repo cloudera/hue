@@ -11,7 +11,7 @@ source $QP_DIR/target/classes/env-version.sh
 MAIN_CLASS=com.cloudera.hue.querystore.eventProcessor.EventProcessorApplication
 DEBUG_ARGS="-agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=y"
 YJP_ARGS="-agentpath:/Applications/YourKit-Java-Profiler-2019.1.app/Contents/Resources/bin/mac/libyjpagent.jnilib=disablestacktelemetry,exceptions=disable,listen=all"
-JAVA_ARGS="-Dlog4j.configurationFile=$CONF_DIR/log4j2.yml -DHADOOP_USER_NAME=hive"
+JAVA_ARGS="-Dlog4j.configurationFile=$CONF_DIR/hue-query-processor-log4j2.yml -DHADOOP_USER_NAME=hive"
 
 DB=hue_db
 DBUSER=hue_user
@@ -61,7 +61,7 @@ setup_db() {
   )
   gen_cp
   echo migrate db ...
-  CLASSPATH=$(cat $CP_FILE) java $MAIN_CLASS db migrate $CONF_DIR/qp_config.json > /dev/null
+  CLASSPATH=$(cat $CP_FILE) java $MAIN_CLASS db migrate $CONF_DIR/hue-query-processor.json > /dev/null
 }
 
 delete_db() {
@@ -75,7 +75,7 @@ delete_db() {
 start_java() {
   gen_cp
   echo starting query processor ...
-  CLASSPATH=$SRC_DIR/conf/:$(cat $CP_FILE) java $JAVA_ARGS $MAIN_CLASS server $CONF_DIR/qp_config.json > qp.log 2>&1 &
+  CLASSPATH=$SRC_DIR/conf/:$(cat $CP_FILE) java $JAVA_ARGS $MAIN_CLASS server $CONF_DIR/hue-query-processor.json > qp.log 2>&1 &
   echo $! > qp.pid
 }
 

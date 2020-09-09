@@ -1,0 +1,219 @@
+#!/usr/bin/env bash
+
+# description: Script to work with hue query processor. Enables to start/stop the server.
+
+# (c) Copyright 2020-2021 Cloudera, Inc. All rights reserved.
+
+set -u -e -x
+
+# Constants.
+HUE_DIR_NAME=${HUE_DIR_NAME:-hue}
+HUE_QP_NAME="hue-query-processor"
+HUE_QP_DISPLAY_NAME="Hue Query Processor"
+HUE_QP_CONF_FILENAME="${HUE_QP_NAME}.json"
+HUE_QP_LOG_FILENAME="${HUE_QP_NAME}-log4j2.yaml"
+HUE_QP_MAIN_CLASS="com.cloudera.hue.querystore.eventProcessor.EventProcessorApplication"
+
+# Env vars which are input parameters.
+#   HUE_QP_HOME (required) should point to the directory where the app is installed.
+#   HADOOP_CONF should have the core-site.xml, yarn-site.xml and hive-site.xml directories.
+#   JAVA_HOME should point to JAVA_HOME if java is not in path or another path should be used.
+#   FOREGROUND=true will keep the app in the foreground.
+#   NO_REDIRECT=true will not use the log dir for logs, in effect only if FOREGROUND=true
+HUE_QP_CONF_DIR=${HUE_QP_CONF_DIR:-/etc/${HUE_DIR_NAME}/conf}
+HUE_QP_PID_DIR=${HUE_QP_PID_DIR:-/var/run/${HUE_DIR_NAME}}
+HUE_QP_LOG_DIR=${HUE_QP_LOG_DIR:-/var/log/${HUE_DIR_NAME}}
+FOREGROUND=${FOREGROUND:-false}
+NO_REDIRECT=${NO_REDIRECT:-false}
+
+HUE_QP_PID_FILE="${HUE_QP_PID_DIR}/${HUE_QP_NAME}.pid"
+HUE_QP_OUTPUT_FILE="${HUE_QP_LOG_DIR}/${HUE_QP_NAME}.out"
+
+# resolve_path VAR_NAME FILE_NAME DIR_LIST
+# Find a dir which contains the file and set the VAR_NAME to the file name.
+function resolve_path() {
+    local var_name file_name;
+    var_name=$1; shift;
+    file_name=$1; shift;
+
+    if eval "[[ -e \${$var_name:-} ]]"; then
+        return
+    fi
+
+    for d in "$@"; do
+        if [[ -e $d/$file_name ]]; then
+            eval "$var_name=$d/$file_name"
+            return
+        fi
+    done
+
+    echo "Unable to resolve file: $file_name in "$@", please set: $var_name"
+    exit 1
+}
+
+resolve_path HUE_QP_LIB_DIR lib $HUE_QP_HOME
+resolve_path HUE_QP_ARTIFACT_VERSION_FILE env-version.sh $HUE_QP_HOME/conf $HUE_QP_CONF_DIR
+resolve_path HUE_QP_LOG4J_CONFIG_FILE ${HUE_QP_NAME}-log4j2.yml $HUE_QP_CONF_DIR
+resolve_path HUE_QP_CONF_FILE ${HUE_QP_NAME}.json $HUE_QP_CONF_DIR
+
+source ${HUE_QP_ARTIFACT_VERSION_FILE}
+
+case "${1:-}" in
+    --version)
+        echo "========== $HUE_QP_DISPLAY_NAME ============="
+        echo "    Version: ${HUE_QP_VERSION}"
+        echo "    Package created at: ${HUE_QP_TIMESTAMP}"
+        echo "============================================"
+        exit 0
+        ;;
+esac
+
+# Resolve java
+if [[ -z ${JAVA_HOME:-} ]]; then
+    if which -s java; then
+        JAVA=$(which -s java)
+        JAVA_HOME=""
+    fi
+fi
+resolve_path JAVA java ${JAVA_HOME} ${JAVA_HOME}/bin
+
+# Setup JAVA_OPTS
+JAVA_OPTS="${JAVA_OPTS:-} -Dlog4j.configurationFile=${HUE_QP_LOG4J_CONFIG_FILE}"
+if [[ "${DEBUG:-false}" = true ]]; then
+    JAVA_OPTS="${JAVA_OPTS} -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=${DEBUG_PORT:-5005}"
+fi
+
+# Setup classpath
+CLASSPATH="${HUE_QP_LIB_DIR}/*:${HADOOP_CONF}:${HUE_QP_CONF_DIR}"
+if [[ ! -z "${HUE_CLASSPATH_PREFIX:-}" ]]; then
+    echo "Adding classpath prefix"
+    CLASSPATH="$HUE_CLASSPATH_PREFIX:$CLASSPATH"
+fi
+
+if [[ ! -z "${HUE_CLASSPATH_SUFFIX:-}" ]]; then
+    echo "Adding classpath suffix"
+    CLASSPATH="$CLASSPATH:$HUE_CLASSPATH_SUFFIX"
+fi
+JAVA_OPTS="${JAVA_OPTS} -classpath $CLASSPATH"
+
+function start_server() {
+    echo "Starting $HUE_QP_DISPLAY_NAME Server"
+    if [[ ${FOREGROUND} = "false" && -f ${HUE_QP_PID_FILE} ]]; then
+        PID=`cat ${HUE_QP_PID_FILE}`
+        if ps -p ${PID} > /dev/null 2>&1; then
+            echo "$HUE_QP_DISPLAY_NAME is already running. PID: ${PID}"
+            exit 1
+        fi
+    fi
+
+    mkdir -p ${HUE_QP_LOG_DIR}
+
+    migrate_db
+
+    if [[ ${FOREGROUND} = "false" ]]; then
+        nohup ${JAVA} ${JAVA_OPTS} ${HUE_QP_MAIN_CLASS} server ${HUE_QP_CONF_FILE} > ${HUE_QP_OUTPUT_FILE} 2>&1 &
+        PID=$!
+        mkdir -p ${HUE_QP_PID_DIR}
+        echo "${PID}" > ${HUE_QP_PID_FILE}
+    else
+        if [[ ${NO_REDIRECT} = "false" ]]; then
+            echo "Running in foreground with logs written to ${HUE_QP_OUTPUT_FILE}"
+            ${JAVA} ${JAVA_OPTS} ${HUE_QP_MAIN_CLASS} server ${HUE_QP_CONF_FILE} >$HUE_QP_OUTPUT_FILE 2>&1
+        else
+            echo "Running in foreground with logs written to console"
+            exec ${JAVA} ${JAVA_OPTS} ${HUE_QP_MAIN_CLASS} server ${HUE_QP_CONF_FILE}
+        fi
+    fi
+}
+
+function stop_server() {
+    echo "Stopping $HUE_QP_DISPLAY_NAME Server"
+    if [[ ! -f ${HUE_QP_PID_FILE} ]]; then
+        echo "$HUE_QP_DISPLAY_NAME is not running or was started in foreground."
+        return
+    fi
+
+    PID=$(cat ${HUE_QP_PID_FILE})
+    if ps -p $PID >/dev/null 2>&1; then
+        echo "Found $HUE_QP_DISPLAY_NAME with pid: ${PID}, killing it"
+        kill $PID
+        while ! ps -p $PID > /dev/null 2>&1; do
+            sleep 1
+        done
+        if ps -p $PID > /dev/null 2>&1; then
+            kill -9 $PID
+        fi
+    else
+        echo "Process not found, ignoring stop"
+    fi
+    rm ${HUE_QP_PID_FILE}
+}
+
+function restart_server() {
+    stop_server
+    start_server
+}
+
+function server_status() {
+    if [[ ! -f ${HUE_QP_PID_FILE} ]]; then
+        echo "$HUE_QP_DISPLAY_NAME is not running or was started in foreground."
+    else
+        PID=`cat ${HUE_QP_PID_FILE}`
+        if ps -p $PID > /dev/null 2>&1; then
+            echo "$HUE_QP_DISPLAY_NAME is running. PID: ${PID}"
+        else
+            echo "$HUE_QP_DISPLAY_NAME is not running."
+        fi
+    fi
+}
+
+function schema_tool() {
+    echo "Running schema tool"
+    ${JAVA} ${JAVA_OPTS} ${HUE_QP_MAIN_CLASS} schema-tool --sqlfile "$1" ${HUE_QP_CONF_FILE}
+}
+
+function migrate_db() {
+    echo "Migrating database for $HUE_QP_DISPLAY_NAME"
+    ${JAVA} ${JAVA_OPTS} ${HUE_QP_MAIN_CLASS} db migrate ${HUE_QP_CONF_FILE}
+}
+
+function clean_db() {
+    echo "Clearing database for $HUE_QP_DISPLAY_NAME"
+    ${JAVA} ${JAVA_OPTS} ${HUE_QP_MAIN_CLASS} db clean ${HUE_QP_CONF_FILE}
+}
+
+function info_db() {
+    echo "Database migration information for $HUE_QP_DISPLAY_NAME"
+    ${JAVA} ${JAVA_OPTS} ${HUE_QP_MAIN_CLASS} db info ${HUE_QP_CONF_FILE}
+}
+
+# Options menu
+case "${1:-}" in
+    start)
+        start_server
+        ;;
+    stop)
+        stop_server
+        ;;
+    restart)
+        restart_server
+        ;;
+    status)
+        server_status
+        ;;
+    schema-tool)
+        schema_tool "$2"
+        ;;
+    db-migrate)
+        migrate_db
+        ;;
+    db-clean)
+        clean_db
+        ;;
+    db-info)
+        info_db
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|status|schema-tool|db-migrate|db-clean|db-info}"
+        exit 1
+esac

@@ -11,26 +11,19 @@
   <includeBaseDirectory>false</includeBaseDirectory>
   <files>
     <file>
-      <source>${project.build.directory}/${project.artifactId}-${project.version}.jar</source>
-      <outputDirectory>/lib/</outputDirectory>
-      <fileMode>0644</fileMode>
+      <source>bin/hue-query-processor</source>
+      <outputDirectory>/bin/</outputDirectory>
+      <fileMode>0755</fileMode>
     </file>
     <file>
       <source>${project.build.directory}/classes/env-version.sh</source>
-      <outputDirectory>/conf/${project.artifactId}/</outputDirectory>
+      <outputDirectory>/conf/</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
   </files>
-  <!-- <fileSets>
-    <fileSet>
-      <directory>${project.build.directory}/ep_libs</directory>
-      <outputDirectory>/lib/ep_libs</outputDirectory>
-    </fileSet>
-  </fileSets> -->
   <dependencySets>
     <dependencySet>
-      <outputDirectory>/lib/ep_libs</outputDirectory>
-      <useProjectArtifact>false</useProjectArtifact>
+      <outputDirectory>/lib/</outputDirectory>
     </dependencySet>
   </dependencySets>
 </assembly>

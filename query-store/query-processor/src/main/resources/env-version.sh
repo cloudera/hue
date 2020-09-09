@@ -2,5 +2,5 @@
 #
 # (c) Copyright 2020-2021 Cloudera, Inc. All rights reserved.
 
-VERSION="${pom.version}"
-TIMESTAMP="${creation.time}"
+HUE_QP_VERSION="${pom.version}"
+HUE_QP_TIMESTAMP="${creation.time}"
