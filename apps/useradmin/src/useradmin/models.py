@@ -33,9 +33,9 @@ check a permission. Thirdly, you may wish to do so manually, by using something 
 Permissions may be granted to groups, but not, currently, to users. A user's abilities is the union of all permissions the group
 has access to.
 
-Note that Django itself has a notion of users, groups, and permissions. We re-use Django's notion of users and groups, but ignore its notion of
-permissions. The permissions notion in Django is strongly tied to what models you may or may not edit, and there are elaborations to
-manipulate this row by row. This does not map nicely onto actions which may not relate to database models.
+Note that Django itself has a notion of users, groups, and permissions. We re-use Django's notion of users and groups, but ignore its
+notion of permissions. The permissions notion in Django is strongly tied to what models you may or may not edit, and there are
+elaborations to manipulate this row by row. This does not map nicely onto actions which may not relate to database models.
 """
 import collections
 import json
@@ -57,6 +57,8 @@ from desktop.lib.connectors.models import _get_installed_connectors, Connector
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.idbroker.conf import is_idbroker_enabled
 from desktop.monkey_patches import monkey_patch_username_validator
+
+from filebrowser.conf import REMOTE_STORAGE_HOME
 
 from useradmin.conf import DEFAULT_USER_GROUP
 from useradmin.permissions import HuePermission, GroupPermission, LdapGroup
@@ -173,7 +175,7 @@ def create_profile_for_user(user):
   p = UserProfile()
   p.user = user
   p.last_activity = dtz.now()
-  p.home_directory = "/user/%s" % p.user.username
+  p.home_directory = REMOTE_STORAGE_HOME.get() if REMOTE_STORAGE_HOME.get() else  "/user/%s" % p.user.username
   try:
     p.save()
     return p
