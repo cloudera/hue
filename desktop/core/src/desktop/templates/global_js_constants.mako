@@ -27,7 +27,7 @@
   from beeswax.conf import DOWNLOAD_BYTES_LIMIT, DOWNLOAD_ROW_LIMIT, LIST_PARTITIONS_LIMIT, CLOSE_SESSIONS
   from dashboard.conf import HAS_SQL_ENABLED
   from jobbrowser.conf import ENABLE_HISTORY_V2
-  from filebrowser.conf import SHOW_UPLOAD_BUTTON
+  from filebrowser.conf import SHOW_UPLOAD_BUTTON, REMOTE_STORAGE_HOME
   from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_catalog, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER, get_optimizer_url, \
       get_catalog_url, get_optimizer_mode
@@ -655,7 +655,7 @@
     # TODO remove
     # Code moved from assist.mako
     try:
-      home_dir = user.get_home_directory()
+      home_dir = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else user.get_home_directory()
       if not request.fs.isdir(home_dir):
         home_dir = '/'
     except:
