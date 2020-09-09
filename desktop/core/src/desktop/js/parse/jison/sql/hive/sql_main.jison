@@ -670,10 +670,6 @@ OptionalPartitionSpec
  | PartitionSpec
  ;
 
-OptionalPartitionSpec_EDIT
- : PartitionSpec_EDIT
- ;
-
 PartitionSpec
  : 'PARTITION' '(' PartitionSpecList ')'
  ;
