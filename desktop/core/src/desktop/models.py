@@ -1915,8 +1915,10 @@ class ClusterConfig(object):
     elif 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('hdfs', self.user):
       hdfs_connectors.append(_('Files'))
 
+    remote_home_storage = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else None
+
     for hdfs_connector in hdfs_connectors:
-      home_path = REMOTE_STORAGE_HOME.get() if REMOTE_STORAGE_HOME.get() else self.user.get_home_directory().encode('utf-8')
+      home_path = remote_home_storage if remote_home_storage else self.user.get_home_directory().encode('utf-8')
       interpreters.append({
         'type': 'hdfs',
         'displayName': hdfs_connector,
@@ -1929,7 +1931,7 @@ class ClusterConfig(object):
       })
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('s3a', self.user):
-      home_path = REMOTE_STORAGE_HOME.get() if REMOTE_STORAGE_HOME.get() else 'S3A://'.encode('utf-8')
+      home_path = remote_home_storage if remote_home_storage else 'S3A://'.encode('utf-8')
       interpreters.append({
         'type': 's3',
         'displayName': _('S3'),
@@ -1939,7 +1941,7 @@ class ClusterConfig(object):
       })
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('adl', self.user):
-      home_path = REMOTE_STORAGE_HOME.get() if REMOTE_STORAGE_HOME.get() else 'adl:/'.encode('utf-8')
+      home_path = remote_home_storage if remote_home_storage else 'adl:/'.encode('utf-8')
       interpreters.append({
         'type': 'adls',
         'displayName': _('ADLS'),
@@ -1950,7 +1952,7 @@ class ClusterConfig(object):
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
       from azure.abfs.__init__ import get_home_dir_for_ABFS
-      home_path = REMOTE_STORAGE_HOME.get() if REMOTE_STORAGE_HOME.get() else get_home_dir_for_ABFS().encode('utf-8')
+      home_path = remote_home_storage if remote_home_storage else get_home_dir_for_ABFS().encode('utf-8')
       interpreters.append({
         'type': 'abfs',
         'displayName': _('ABFS'),

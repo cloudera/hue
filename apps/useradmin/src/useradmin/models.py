@@ -58,8 +58,6 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.idbroker.conf import is_idbroker_enabled
 from desktop.monkey_patches import monkey_patch_username_validator
 
-from filebrowser.conf import REMOTE_STORAGE_HOME
-
 from useradmin.conf import DEFAULT_USER_GROUP
 from useradmin.permissions import HuePermission, GroupPermission, LdapGroup
 
@@ -175,7 +173,7 @@ def create_profile_for_user(user):
   p = UserProfile()
   p.user = user
   p.last_activity = dtz.now()
-  p.home_directory = REMOTE_STORAGE_HOME.get() if REMOTE_STORAGE_HOME.get() else  "/user/%s" % p.user.username
+  p.home_directory = "/user/%s" % p.user.username
   try:
     p.save()
     return p
