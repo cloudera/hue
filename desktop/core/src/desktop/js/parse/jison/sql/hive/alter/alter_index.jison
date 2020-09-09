@@ -40,7 +40,7 @@ AlterIndex_EDIT
      parser.suggestDatabases({ appendDot: true });
    }
  | 'ALTER' 'INDEX' RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier_EDIT
- | 'ALTER' 'INDEX' RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
+ | 'ALTER' 'INDEX' RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier PartitionSpec_EDIT
    {
      parser.addTablePrimary($5);
    }

@@ -70,7 +70,7 @@ LoadDataStatement_EDIT
        parser.suggestKeywords(['INPUTFORMAT']);
      }
    }
- | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT OptionalInputFormat
+ | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier PartitionSpec_EDIT OptionalInputFormat
    {
      parser.addTablePrimary($9);
    }
