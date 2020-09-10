@@ -17,6 +17,7 @@
 from builtins import object
 import logging
 import posixpath
+import sys
 
 from desktop.conf import TIME_ZONE
 from desktop.conf import DEFAULT_USER
@@ -194,7 +195,10 @@ class OozieApi(object):
         raise ValueError('"%s" is not a valid filter for job logs' % (key,))
       filter_list.append('%s=%s' % (key, val))
     params['logfilter'] = ';'.join(filter_list)
-    return self._root.get('job/%s' % (jobid,), params)
+    log = self._root.get('job/%s' % (jobid,), params)
+    if sys.version_info[0] > 2:
+      log = log.decode()
+    return log
 
 
   def get_job_graph(self, jobid, format='svg'):
