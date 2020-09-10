@@ -27,6 +27,33 @@ import {
 const initSqlParser = function (parser) {
   initSharedAutocomplete(parser);
 
+  parser.DDL_AND_DML_KEYWORDS = [
+    'ABORT',
+    'ALTER',
+    'ANALYZE TABLE',
+    'CREATE',
+    'DELETE',
+    'DESCRIBE',
+    'DROP',
+    'EXPORT',
+    'GRANT',
+    'IMPORT',
+    'INSERT',
+    'LOAD',
+    'MERGE',
+    'MSCK',
+    'RELOAD FUNCTION',
+    'RESET',
+    'REVOKE',
+    'SELECT',
+    'SET',
+    'SHOW',
+    'TRUNCATE',
+    'UPDATE',
+    'USE',
+    'WITH'
+  ];
+
   parser.prepareNewStatement = function () {
     linkTablePrimaries();
     parser.commitLocations();
@@ -1168,39 +1195,11 @@ const initSqlParser = function (parser) {
   };
 
   parser.suggestDdlAndDmlKeywords = function (extraKeywords) {
-    let keywords = [
-      'ALTER',
-      'CREATE',
-      'DESCRIBE',
-      'DROP',
-      'GRANT',
-      'INSERT',
-      'REVOKE',
-      'SELECT',
-      'SET',
-      'SHOW',
-      'TRUNCATE',
-      'UPDATE',
-      'USE',
-      'WITH'
-    ];
+    let keywords = parser.DDL_AND_DML_KEYWORDS;
 
     if (extraKeywords) {
       keywords = keywords.concat(extraKeywords);
     }
-
-    keywords = keywords.concat([
-      'ABORT',
-      'ANALYZE TABLE',
-      'DELETE',
-      'EXPORT',
-      'IMPORT',
-      'LOAD',
-      'MERGE',
-      'MSCK',
-      'RELOAD FUNCTION',
-      'RESET'
-    ]);
 
     parser.suggestKeywords(keywords);
   };
