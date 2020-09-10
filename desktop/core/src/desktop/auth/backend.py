@@ -556,7 +556,7 @@ class LdapBackend(object):
     try:
       allowed_group = self.check_ldap_access_groups(server, username)
       if allowed_group:
-        user = self._backend.authenticate(username, password)
+        user = self._backend.authenticate(username=username, password=password)
       else:
         LOG.warn("%s not in an allowed login group" % username)
         return None
@@ -795,7 +795,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
 
     if verified_id:
       self.save_refresh_tokens(refresh_token)
-      user =  self.get_or_create_user(access_token, id_token, verified_id)
+      user = self.get_or_create_user(access_token, id_token, verified_id)
       user = rewrite_user(user)
       return user
 
