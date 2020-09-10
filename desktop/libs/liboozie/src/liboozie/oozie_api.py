@@ -177,7 +177,10 @@ class OozieApi(object):
     """
     params = self._get_params()
     params['show'] = 'definition'
-    return self._root.get('job/%s' % (jobid,), params)
+    job_def = self._root.get('job/%s' % (jobid,), params)
+    if sys.version_info[0] > 2:
+      job_def = job_def.decode()
+    return job_def
 
 
   def get_job_log(self, jobid, logfilter=None):
