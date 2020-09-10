@@ -71,6 +71,7 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
           'INDEX',
           'MATERIALIZED VIEW',
           'ROLE',
+          'SCHEDULED QUERY',
           'SCHEMA',
           'TABLE',
           'TEMPORARY EXTERNAL TABLE',

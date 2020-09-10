@@ -443,7 +443,7 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
             'SKEWED BY',
             'TOUCH',
             'UNARCHIVE PARTITION',
-            'UNSET SERDEPROPERTIES',
+            'UNSET SERDEPROPERTIES'
           ]
         }
       });
