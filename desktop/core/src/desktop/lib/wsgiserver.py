@@ -641,7 +641,7 @@ class HTTPRequest(object):
       if x.args[0] not in socket_errors_to_ignore:
         raise
 
-  def start_response(self, status, headers, exc_info = None):
+  def start_response(self, status, headers, exc_info=None):
     """WSGI callable to begin the HTTP response."""
     # "The application may call start_response more than once,
     # if and only if the exc_info argument is provided."
@@ -1715,7 +1715,7 @@ class CherryPyWSGIServer(object):
         ctx.use_privatekey_file(self.ssl_private_key)
         ctx.use_certificate_file(self.ssl_certificate)
         if self.ssl_certificate_chain:
-        ctx.use_certificate_chain_file(self.ssl_certificate_chain)
+          ctx.use_certificate_chain_file(self.ssl_certificate_chain)
       except Exception as ex:
         logging.exception('SSL key and certificate could not be found or have a problem')
         raise ex
