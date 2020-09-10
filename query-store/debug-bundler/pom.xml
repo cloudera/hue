@@ -11,7 +11,7 @@
   <parent>
     <groupId>com.cloudera.hue</groupId>
     <artifactId>hue-query-processor-parent</artifactId>
-    <version>1.4.2.7.2.2.0-SNAPSHOT</version>
+    <version>1.4.6.7.2.3.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>

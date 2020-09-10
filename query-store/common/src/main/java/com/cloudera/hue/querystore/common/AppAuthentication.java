@@ -3,7 +3,6 @@ package com.cloudera.hue.querystore.common;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -75,7 +74,7 @@ public class AppAuthentication {
       return Role.ADMIN;
     }
     try {
-      List<String> groups = Groups.getUserToGroupsMappingService().getGroups(user);
+      Set<String> groups = Groups.getUserToGroupsMappingService().getGroupsSet(user);
       for (String group : groups) {
         if (adminGroups.contains(group)) {
           return Role.ADMIN;
