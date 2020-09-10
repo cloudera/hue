@@ -1715,7 +1715,7 @@ class CherryPyWSGIServer(object):
         ctx.use_privatekey_file(self.ssl_private_key)
         ctx.use_certificate_file(self.ssl_certificate)
         if self.ssl_certificate_chain:
-        ctx.use_certificate_chain_file(self.ssl_certificate_chain)
+          ctx.use_certificate_chain_file(self.ssl_certificate_chain)
       except Exception as ex:
         logging.exception('SSL key and certificate could not be found or have a problem')
         raise ex
