@@ -69,7 +69,11 @@ ScheduleSpecification_EDIT
 
 OptionalExecutedAs
  :
- | 'EXECUTED' 'AS' QuotedValue
+ | ExecutedAs
+ ;
+
+ExecutedAs
+ : 'EXECUTED' 'AS' QuotedValue
  | 'EXECUTED' 'AS' RegularOrBacktickedIdentifier
  ;
 
@@ -79,7 +83,11 @@ ExecutedAs_EDIT
 
 OptionalEnabledOrDisabled
  :
- | 'ENABLE'
+ | EnabledOrDisabled
+ ;
+
+EnabledOrDisabled
+ : 'ENABLE'
  | 'ENABLED'
  | 'DISABLE'
  | 'DISABLED'

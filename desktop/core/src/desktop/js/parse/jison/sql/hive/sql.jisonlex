@@ -192,6 +192,7 @@ DOUBLE\s+PRECISION                   { return 'DOUBLE_PRECISION'; }
 'ESCAPED'                            { return 'ESCAPED'; }
 'EVERY'                              { return 'EVERY'; }
 'EXCHANGE'                           { return 'EXCHANGE'; }
+'EXECUTE'                            { return 'EXECUTE'; }
 'EXECUTED'                           { return 'EXECUTED'; }
 'EXPLAIN'                            { parser.determineCase(yytext); return 'EXPLAIN'; }
 'EXPORT'                             { parser.determineCase(yytext); return 'EXPORT'; }
