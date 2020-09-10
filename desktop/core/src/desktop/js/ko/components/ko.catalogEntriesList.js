@@ -121,7 +121,7 @@ const TEMPLATE = `
       <tbody data-bind="foreach: filteredEntries">
         <tr data-bind="click: onRowClick">
           <!-- ko template: 'entries-table-shared-columns' --><!-- /ko -->
-          <td><a href="javascript: void(0);" data-bind="text: catalogEntry().name, click: onClick, attr: { 'title': catalogEntry().getTitle() }"></a></td>
+          <td data-bind="click: onClick"><a href="javascript: void(0);" data-bind="text: catalogEntry().name, click: onClick, attr: { 'title': catalogEntry().getTitle() }"></a></td>
           <!-- ko template: 'entries-table-td-description' --><!-- /ko -->
         </tr>
       </tbody>
@@ -149,7 +149,7 @@ const TEMPLATE = `
       <tbody data-bind="foreach: filteredEntries">
       <tr data-bind="click: onRowClick">
         <!-- ko template: 'entries-table-shared-columns' --><!-- /ko -->
-        <td><a href="javascript: void(0);" data-bind="text: catalogEntry().name, click: onClick, attr: { 'title': catalogEntry().getTitle() }"></a></td>
+        <td data-bind="click: onClick"><a href="javascript: void(0);" data-bind="text: catalogEntry().name, click: onClick, attr: { 'title': catalogEntry().getTitle() }"></a></td>
         <!-- ko template: 'entries-table-td-description' --><!-- /ko -->
       </tr>
       </tbody>
