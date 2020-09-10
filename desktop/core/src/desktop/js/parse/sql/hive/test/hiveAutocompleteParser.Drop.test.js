@@ -46,6 +46,7 @@ describe('hiveAutocompleteParser.js DROP statements', () => {
           'INDEX',
           'MATERIALIZED VIEW',
           'ROLE',
+          'SCHEDULED QUERY',
           'SCHEMA',
           'TABLE',
           'TEMPORARY FUNCTION',
