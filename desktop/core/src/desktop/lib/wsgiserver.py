@@ -641,7 +641,7 @@ class HTTPRequest(object):
       if x.args[0] not in socket_errors_to_ignore:
         raise
 
-  def start_response(self, status, headers, exc_info = None):
+  def start_response(self, status, headers, exc_info=None):
     """WSGI callable to begin the HTTP response."""
     # "The application may call start_response more than once,
     # if and only if the exc_info argument is provided."

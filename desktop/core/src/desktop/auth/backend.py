@@ -795,7 +795,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
 
     if verified_id:
       self.save_refresh_tokens(refresh_token)
-      user =  self.get_or_create_user(access_token, id_token, verified_id)
+      user = self.get_or_create_user(access_token, id_token, verified_id)
       user = rewrite_user(user)
       return user
 
