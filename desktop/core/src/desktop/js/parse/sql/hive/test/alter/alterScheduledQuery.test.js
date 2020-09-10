@@ -16,7 +16,7 @@
 
 import hiveAutocompleteParser from '../../hiveAutocompleteParser';
 
-describe('hiveAutocompleteParser.js CREATE SCHEDULED QUERY statements', () => {
+describe('hiveAutocompleteParser.js ALTER SCHEDULED QUERY statements', () => {
   beforeAll(() => {
     hiveAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
@@ -34,10 +34,9 @@ describe('hiveAutocompleteParser.js CREATE SCHEDULED QUERY statements', () => {
     ).toEqualDefinition(testDefinition);
   };
 
-  it('should handle "CREATE SCHEDULED QUERY sc1 CRON \'0 */10 * * * ? *\' AS INSERT INTO t VALUES (1); |"', () => {
+  it('should handle "ALTER SCHEDULED QUERY sc1 CRON \'0 */10 * * * ? *\'; |"', () => {
     assertAutoComplete({
-      beforeCursor:
-        "CREATE SCHEDULED QUERY sc1 CRON '0 */10 * * * ? *' AS INSERT INTO t VALUES (1); ",
+      beforeCursor: "ALTER SCHEDULED QUERY sc1 CRON '0 */10 * * * ? *'; ",
       afterCursor: '',
       containsKeywords: ['SELECT'],
       expectedResult: {
@@ -46,10 +45,9 @@ describe('hiveAutocompleteParser.js CREATE SCHEDULED QUERY statements', () => {
     });
   });
 
-  it('should handle "CREATE SCHEDULED QUERY test EVERY 10 MINUTES EXECUTED AS bar DISABLED DEFINED AS SELECT * FROM foo; |', () => {
+  it('should handle "ALTER SCHEDULED QUERY sc1 AS INSERT INTO t VALUES (1); |"', () => {
     assertAutoComplete({
-      beforeCursor:
-        'CREATE SCHEDULED QUERY test EVERY 10 MINUTES EXECUTED AS bar DISABLED DEFINED AS SELECT * FROM foo; ',
+      beforeCursor: 'ALTER SCHEDULED QUERY sc1 AS INSERT INTO t VALUES (1); ',
       afterCursor: '',
       containsKeywords: ['SELECT'],
       expectedResult: {
@@ -58,9 +56,64 @@ describe('hiveAutocompleteParser.js CREATE SCHEDULED QUERY statements', () => {
     });
   });
 
-  it('should suggest keywords for "CREATE |"', () => {
+  it('should handle "ALTER SCHEDULED QUERY sc1 EXECUTE; |"', () => {
     assertAutoComplete({
-      beforeCursor: 'CREATE ',
+      beforeCursor: 'ALTER SCHEDULED QUERY sc1 EXECUTE; ',
+      afterCursor: '',
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
+
+  it('should handle "ALTER SCHEDULED QUERY test EVERY 10 MINUTES; |', () => {
+    assertAutoComplete({
+      beforeCursor: 'ALTER SCHEDULED QUERY test EVERY 10 MINUTES; ',
+      afterCursor: '',
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
+
+  it('should handle "ALTER SCHEDULED QUERY test EXECUTED AS bar; |', () => {
+    assertAutoComplete({
+      beforeCursor: 'ALTER SCHEDULED QUERY test EXECUTED AS bar; ',
+      afterCursor: '',
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
+
+  it('should handle "ALTER SCHEDULED QUERY test ENABLE; |', () => {
+    assertAutoComplete({
+      beforeCursor: 'ALTER SCHEDULED QUERY test ENABLE; ',
+      afterCursor: '',
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
+
+  it('should handle "ALTER SCHEDULED QUERY test DEFINED AS SELECT * FROM foo; |', () => {
+    assertAutoComplete({
+      beforeCursor: 'ALTER SCHEDULED QUERY test DEFINED AS SELECT * FROM foo; ',
+      afterCursor: '',
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
+
+  it('should suggest keywords for "ALTER |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'ALTER ',
       afterCursor: '',
       containsKeywords: ['SCHEDULED QUERY'],
       expectedResult: {
@@ -69,9 +122,9 @@ describe('hiveAutocompleteParser.js CREATE SCHEDULED QUERY statements', () => {
     });
   });
 
-  it('should suggest keywords for "CREATE SCHEDULED |"', () => {
+  it('should suggest keywords for "ALTER SCHEDULED |"', () => {
     assertAutoComplete({
-      beforeCursor: 'CREATE SCHEDULED ',
+      beforeCursor: 'ALTER SCHEDULED ',
       afterCursor: '',
       expectedResult: {
         lowerCase: false,
@@ -80,20 +133,20 @@ describe('hiveAutocompleteParser.js CREATE SCHEDULED QUERY statements', () => {
     });
   });
 
-  it('should suggest keywords for "CREATE SCHEDULED QUERY foo |"', () => {
+  it('should suggest keywords for "ALTER SCHEDULED QUERY foo |"', () => {
     assertAutoComplete({
-      beforeCursor: 'CREATE SCHEDULED QUERY foo ',
+      beforeCursor: 'ALTER SCHEDULED QUERY foo ',
       afterCursor: '',
+      containsKeywords: ['CRON', 'EVERY', 'EXECUTE', 'ENABLE', 'DEFINED AS', 'EXECUTED AS'],
       expectedResult: {
-        lowerCase: false,
-        suggestKeywords: ['CRON', 'EVERY']
+        lowerCase: false
       }
     });
   });
 
-  it('should suggest keywords for "CREATE SCHEDULED QUERY foo EVERY 10 |"', () => {
+  it('should suggest keywords for "ALTER SCHEDULED QUERY foo EVERY 10 |"', () => {
     assertAutoComplete({
-      beforeCursor: 'CREATE SCHEDULED QUERY foo EVERY 10 ',
+      beforeCursor: 'ALTER SCHEDULED QUERY foo EVERY 10 ',
       afterCursor: '',
       containsKeywords: ['MINUTE', 'DAY'],
       expectedResult: {
@@ -102,31 +155,9 @@ describe('hiveAutocompleteParser.js CREATE SCHEDULED QUERY statements', () => {
     });
   });
 
-  it('should suggest keywords for "CREATE SCHEDULED QUERY foo EVERY 10 DAY |"', () => {
+  it('should suggest keywords for "ALTER SCHEDULED QUERY foo EXECUTED |"', () => {
     assertAutoComplete({
-      beforeCursor: 'CREATE SCHEDULED QUERY foo EVERY 10 DAY ',
-      afterCursor: '',
-      containsKeywords: ['EXECUTED AS', 'ENABLED', 'DISABLE', 'DEFINED AS', 'AS'],
-      expectedResult: {
-        lowerCase: false
-      }
-    });
-  });
-
-  it('should suggest keywords for "CREATE SCHEDULED QUERY foo CRON \'Some cron\' |"', () => {
-    assertAutoComplete({
-      beforeCursor: "CREATE SCHEDULED QUERY foo CRON 'Some cron' ",
-      afterCursor: '',
-      containsKeywords: ['EXECUTED AS', 'ENABLED', 'DISABLE', 'DEFINED AS', 'AS'],
-      expectedResult: {
-        lowerCase: false
-      }
-    });
-  });
-
-  it('should suggest keywords for "CREATE SCHEDULED QUERY foo CRON \'Some cron\' EXECUTED |"', () => {
-    assertAutoComplete({
-      beforeCursor: "CREATE SCHEDULED QUERY foo CRON 'Some cron' EXECUTED ",
+      beforeCursor: 'ALTER SCHEDULED QUERY foo EXECUTED ',
       afterCursor: '',
       expectedResult: {
         lowerCase: false,
@@ -135,43 +166,9 @@ describe('hiveAutocompleteParser.js CREATE SCHEDULED QUERY statements', () => {
     });
   });
 
-  it('should suggest keywords for "CREATE SCHEDULED QUERY foo EVERY 1 MINUTE EXECUTED AS bar |"', () => {
+  it('should suggest keywords for "ALTER SCHEDULED QUERY foo DEFINED |"', () => {
     assertAutoComplete({
-      beforeCursor: 'CREATE SCHEDULED QUERY foo EVERY 1 MINUTE EXECUTED AS bar ',
-      afterCursor: '',
-      containsKeywords: ['ENABLED', 'DISABLE', 'DEFINED AS', 'AS'],
-      doesNotContainKeywords: ['EXECUTED AS'],
-      expectedResult: {
-        lowerCase: false
-      }
-    });
-  });
-
-  it('should suggest keywords for "CREATE SCHEDULED QUERY foo EVERY 1 MINUTE EXECUTED AS bar DISABLE |"', () => {
-    assertAutoComplete({
-      beforeCursor: 'CREATE SCHEDULED QUERY foo EVERY 1 MINUTE EXECUTED AS bar DISABLE ',
-      afterCursor: '',
-      expectedResult: {
-        lowerCase: false,
-        suggestKeywords: ['AS', 'DEFINED AS']
-      }
-    });
-  });
-
-  it('should suggest keywords for "CREATE SCHEDULED QUERY foo EVERY 1 MINUTE ENABLED |"', () => {
-    assertAutoComplete({
-      beforeCursor: 'CREATE SCHEDULED QUERY foo EVERY 1 MINUTE ENABLED ',
-      afterCursor: '',
-      expectedResult: {
-        lowerCase: false,
-        suggestKeywords: ['AS', 'DEFINED AS']
-      }
-    });
-  });
-
-  it('should suggest keywords for "CREATE SCHEDULED QUERY foo EVERY 1 MINUTE ENABLED DEFINED |"', () => {
-    assertAutoComplete({
-      beforeCursor: 'CREATE SCHEDULED QUERY foo EVERY 1 MINUTE ENABLED DEFINED ',
+      beforeCursor: 'ALTER SCHEDULED QUERY foo DEFINED ',
       afterCursor: '',
       expectedResult: {
         lowerCase: false,
@@ -180,9 +177,9 @@ describe('hiveAutocompleteParser.js CREATE SCHEDULED QUERY statements', () => {
     });
   });
 
-  it('should suggest keywords for "CREATE SCHEDULED QUERY foo EVERY 1 MINUTE ENABLED DEFINED AS |"', () => {
+  it('should suggest keywords for "ALTER SCHEDULED QUERY foo DEFINED AS |"', () => {
     assertAutoComplete({
-      beforeCursor: 'CREATE SCHEDULED QUERY foo EVERY 1 MINUTE ENABLED DEFINED AS ',
+      beforeCursor: 'ALTER SCHEDULED QUERY foo DEFINED AS ',
       afterCursor: '',
       containsKeywords: ['SELECT', 'INSERT'],
       expectedResult: {
@@ -191,20 +188,9 @@ describe('hiveAutocompleteParser.js CREATE SCHEDULED QUERY statements', () => {
     });
   });
 
-  it('should suggest keywords for "CREATE SCHEDULED QUERY foo EVERY 1 MINUTE ENABLED AS |"', () => {
+  it('should suggest keywords for "ALTER SCHEDULED QUERY foo AS SELECT |"', () => {
     assertAutoComplete({
-      beforeCursor: 'CREATE SCHEDULED QUERY foo EVERY 1 MINUTE ENABLED AS ',
-      afterCursor: '',
-      containsKeywords: ['SELECT', 'INSERT'],
-      expectedResult: {
-        lowerCase: false
-      }
-    });
-  });
-
-  it('should suggest keywords for "CREATE SCHEDULED QUERY foo EVERY 1 MINUTE ENABLED AS SELECT |"', () => {
-    assertAutoComplete({
-      beforeCursor: 'CREATE SCHEDULED QUERY foo EVERY 1 MINUTE ENABLED AS SELECT ',
+      beforeCursor: 'ALTER SCHEDULED QUERY foo AS SELECT ',
       afterCursor: '',
       containsKeywords: ['*'],
       expectedResult: {
