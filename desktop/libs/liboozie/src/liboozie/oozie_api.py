@@ -78,8 +78,8 @@ class OozieApi(object):
 
   def _get_params(self):
     if self.security_enabled:
-      return { 'doAs': self.user, 'timezone': TIME_ZONE.get() }
-    return { 'user.name': DEFAULT_USER, 'doAs': self.user, 'timezone': TIME_ZONE.get() }
+      return {'doAs': self.user, 'timezone': TIME_ZONE.get()}
+    return {'user.name': DEFAULT_USER, 'doAs': self.user, 'timezone': TIME_ZONE.get()}
 
   def _get_oozie_properties(self, properties=None):
     defaults = {
@@ -246,7 +246,7 @@ class OozieApi(object):
     if parameters is not None:
       params.update(parameters)
 
-    return self._root.put('job/%s' % jobid, params,  data=config_gen(properties), contenttype=_XML_CONTENT_TYPE)
+    return self._root.put('job/%s' % jobid, params, data=config_gen(properties), contenttype=_XML_CONTENT_TYPE)
 
   def submit_workflow(self, application_path, properties=None):
     """
