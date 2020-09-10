@@ -268,7 +268,10 @@ class HiveServerTRowSet2(object):
     if self.row_set.columns:
       return HiveServerTRow2(self.row_set.columns, self.schema)
     else:
-      raise StopIteration
+      if sys.version_info[0] > 2:
+        return  # pep-0479: expected Py3.8 generator raised StopIteration
+      else:
+        raise StopIteration
 
 
 class HiveServerTRow2(object):
@@ -291,7 +294,10 @@ class HiveServerTRow2(object):
     try:
       return [HiveServerTColumnValue2(field).val.pop(0) for field in self.cols]
     except IndexError:
-      raise StopIteration
+      if sys.version_info[0] > 2:
+        return  # pep-0479: expected Py3.8 generator raised StopIteration
+      else:
+        raise StopIteration
 
 
 class HiveServerTColumnValue2(object):
@@ -466,7 +472,10 @@ else:
       if self.rows:
         return HiveServerTRow(self.rows.pop(0), self.schema)
       else:
-        raise StopIteration
+        if sys.version_info[0] > 2:
+          return  # pep-0479: expected Py3.8 generator raised StopIteration
+        else:
+          raise StopIteration
 
 
 class HiveServerTColumnValue(object):
