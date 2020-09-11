@@ -130,9 +130,9 @@ As detailed in the [connector](https://docs.gethue.com/administrator/configurati
     [[interpreters]]
 
     [[[flink]]]
-      name=Flink
-      interface=flink
-      options='{"api_url": "http://172.18.0.7:8993"}'
+    name=Flink
+    interface=flink
+    options='{"url": "http://172.18.0.7:8083"}'
 
 If we are setting up the gateway in the client container and want to access it via your localhost, we need to update its bind IP with the IP of the SQL client container.
 
