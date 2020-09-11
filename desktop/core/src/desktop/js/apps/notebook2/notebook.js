@@ -438,7 +438,6 @@ export default class Notebook {
     if (isPresentationMode) {
       const sourceSnippet = this.snippets()[0];
       this.prePresentationModeSnippet = sourceSnippet;
-      const variables = sourceSnippet.variables();
       const statementKeys = {};
 
       const database = sourceSnippet.database();
@@ -466,9 +465,12 @@ export default class Notebook {
             connector: sourceSnippet.connector(),
             statement_raw: statementLines.join('\n'),
             database: database,
-            name: titleLines.join('\n'),
-            variables: komapping.toJS(variables)
+            name: titleLines.join('\n')
           });
+          presentationSnippet.variableSubstitutionHandler =
+            sourceSnippet.variableSubstitutionHandler;
+          presentationSnippet.executor.variableSubstitionHandler =
+            sourceSnippet.variableSubstitutionHandler;
           window.setTimeout(() => {
             const executableRaw = executable.toJs();
             const reattachedExecutable = SqlExecutable.fromJs(
@@ -484,7 +486,6 @@ export default class Notebook {
         } else {
           presentationSnippet = this.presentationSnippets()[statementKey];
         }
-        presentationSnippet.variables(variables);
         statementKeys[statementKey] = true;
         newSnippets.push(presentationSnippet);
       });

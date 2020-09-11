@@ -331,8 +331,8 @@
 
     <div class="margin-left-30 margin-top-10 padding-left-5 margin-bottom-20">
       <!-- ko template: { name: 'notebook-actions' } --><!-- /ko -->
-      <!-- ko if: $root.preEditorTogglingSnippet -->
-      <!-- ko template: { if: $root.isPresentationMode(), name: 'snippet-variables', data: $root.preEditorTogglingSnippet }--><!-- /ko -->
+      <!-- ko if: selectedNotebook().prePresentationModeSnippet -->
+      <!-- ko template: { if: $root.isPresentationMode(), name: 'snippet-variables', data: selectedNotebook().prePresentationModeSnippet }--><!-- /ko -->
       <!-- /ko -->
     </div>
 
