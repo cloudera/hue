@@ -31,6 +31,15 @@ def test_rewrite_ssh_api_url():
     rewrite_ssh_api_url('postgresql://hue:hue@ip-172-31-6-77:31676/hue')
   )
 
+  assert_equal(
+    {
+      'server_host': 'ip-10-0-135-100',
+      'server_port': '31006',
+      'url': 'phoenix://127.0.0.1:31006'
+    },
+    rewrite_ssh_api_url('phoenix://ip-10-0-135-100:31006')
+  )
+
 
 def test_build_ssh_command():
   assert_equal(
