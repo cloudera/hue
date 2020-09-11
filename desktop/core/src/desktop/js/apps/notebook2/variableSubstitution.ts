@@ -135,9 +135,7 @@ export class VariableSubstitutionHandler {
       this.variables(rawVariables.map(rawVariable => new Variable(rawVariable)));
     }
 
-    this.variableNames = ko.pureComputed(() => {
-      return this.extractVariables(this.statementRaw());
-    });
+    this.variableNames = ko.pureComputed(() => this.extractVariables(this.statementRaw()));
 
     this.variableNames.extend({ rateLimit: 150 });
 
