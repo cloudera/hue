@@ -7,21 +7,35 @@ weight: 5
 
 ## REST
 
-REST APIs are not all public yet but this is work in progress in [HUE-1450](https://issues.cloudera.org/browse/HUE-1450).
+REST APIs are not all public yet and can be simplified but this is work in progress in [HUE-1450](https://issues.cloudera.org/browse/HUE-1450).
 
-Hue is Ajax based and has a REST API used by the browser to communicate (e.g. submit a query or workflow,
-list some S3 files, export a document...). Currently this API is private and subject to change but
-can be easily reused. You would need to GET */accounts/login* to get the CSRF token
-and POST it back along *username* and *password* and reuse the *sessionid* cookie in next
-communication calls.
+Hue is Ajax based and has a REST API used by the browser to communicate (e.g. submit a query or workflow, list some S3 files, export a document...). Currently this API is private and subject to change but can be easily reused. You would need to GET */accounts/login* to get the CSRF token and POST it back along *username* and *password* and reuse the *sessionid* cookie in next communication calls.
 
 ### Quickstart
 
-Hue is based on the Django Web Framework. Django comes with user authentication system. Django uses sessions and middleware to hook the authentication system into request object. Hue uses stock auth form which uses *username* and *password* and *csrftoken* form variables to authenticate.
+Hue is based on the [Django Web Framework](https://www.djangoproject.com/). Django comes with user authentication system. Django uses sessions and middleware to hook the authentication system into request object. Hue uses stock auth form which uses *username* and *password* and *csrftoken* form variables to authenticate.
 
 In this code snippet, we will use well-known python *requests* library. We will first acquire *csrftoken* by GET *login_url* and then create a dictionary of form data which contains *username*, *password* and *csrftoken* and the *next_url* and another dictionary for header which contains the *Referer* url and an empty dictionary for the cookies. After the POST request to *login_url* we will check the response code, which should be *r.status_code == 200*.
 
 Once the request is successful then capture headers and cookies for subsequent requests. Subsequent *request.session* calls can be made by providing *cookies=session.cookies* and *headers=session.headers*.
+
+#### Curl
+
+First get the `CSRF` token:
+
+    curl -v -X GET https://demo.gethue.com/hue/accounts/login/
+
+Then authenticate with the credendials (note: `CRSF` currently needs to be repeated twice):
+
+    curl -v -X POST https://demo.gethue.com/hue/accounts/login/ -d 'username=demo&password=demo' -H "X-CSRFToken: CZOt9VFK7X6OUpqrLk4URW9DI69FxVKnsRnuaDgsDqZS9GpXzuVehxMnH1gvheWU" --cookie "csrftoken=CZOt9VFK7X6OUpqrLk4URW9DI69FxVKnsRnuaDgsDqZS9GpXzuVehxMnH1gvheWU"
+
+Then you can perform any operation by provising the `CSRF` and the `sessionid` tokens. Here for example we list all the databases of the `hive` connector:
+
+    curl -X POST https://demo.gethue.com/notebook/api/autocomplete/ --cookie "csrftoken=zfOhD8roDLI7mEgakmBDCy7LDMvkEE2z3uUTIyyVnurhqLZhluhjO76K541MRwAw;sessionid=tzx37xo7izrdfs35o30grdf9u0b2999q" -H "X-CSRFToken: zfOhD8roDLI7mEgakmBDCy7LDMvkEE2z3uUTIyyVnurhqLZhluhjO76K541MRwAw" --data 'snippet={"type":"hive"}'
+
+    {"status": 0, "databases": ["a0817", "arunso", "ath", "athlete", "beingdatum_db", "bharath_practice", "chungu", "darth", "default", "demo", "diwakar", "emp", "hadooptest", "hebe", "hello", "hivedataset", "hivemap", "hivetesting", "hr_db", "icedb", "lib", "libdemo", "lti", "m", "m1", "movie", "movie1", "movielens", "mscda", "my_database", "mydb", "mydemo", "noo", "prizesh", "rajeev", "ram", "retail", "ruban", "sept9", "sept9_2020", "student", "test", "test21", "test123", "ticktick", "userdb", "vidu"]}
+
+#### Python
 
     import requests
 
@@ -48,11 +62,141 @@ Once the request is successful then capture headers and cookies for subsequent r
     print(response.status_code)
     print(response.text)
 
+### Authentication
+
+**Note** There is currently no error on bad authentication but instead a redirect to the login page, e.g.:
+
+    [12/Sep/2020 10:12:44 -0700] middleware   INFO     Redirecting to login page: /hue/useradmin/users/edit/romain
+    [12/Sep/2020 10:12:44 -0700] access       INFO     127.0.0.1 -anon- - "POST /hue/useradmin/users/edit/romain HTTP/1.1" - (mem: 169mb)-- login redirection
+    [12/Sep/2020 10:12:44 -0700] access       INFO     127.0.0.1 -anon- - "POST /hue/useradmin/users/edit/romain HTTP/1.1" returned in 0ms 302 0 (mem: 169mb)
+
+#### Login
+
+    curl -v -X POST demo.gethue.com/hue/accounts/login/ -d 'username=demo&password=demo'
+
+    ...
+    * We are completely uploaded and fine
+    * TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+    * TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+    * old SSL session ID is stale, removing
+    * Connection state changed (MAX_CONCURRENT_STREAMS == 128)!
+    < HTTP/2 302
+    < server: nginx/1.19.0
+    < date: Sat, 12 Sep 2020 17:53:18 GMT
+    < content-type: text/html; charset=utf-8
+    < content-length: 0
+    < set-cookie: hue-balancer=1599933199.854.37.877815; Expires=Mon, 14-Sep-20 17:53:18 GMT; Max-Age=172800; Path=/; Secure; HttpOnly
+    < x-xss-protection: 1; mode=block
+    < content-security-policy: script-src 'self' 'unsafe-inline' 'unsafe-eval' *.google-analytics.com *.doubleclick.net data:;img-src 'self' *.google-analytics.com *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;style-src 'self' 'unsafe-inline' fonts.googleapis.com;connect-src 'self';frame-src *;child-src 'self' data: *.vimeo.com;object-src 'none'
+    < x-content-type-options: nosniff
+    < content-language: en-us
+    < vary: Cookie, Accept-Language
+    < location: /
+    < x-frame-options: SAMEORIGIN
+    < set-cookie: csrftoken=zfOhD8roDLI7mEgakmBDCy7LDMvkEE2z3uUTIyyVnurhqLZhluhjO76K541MRwAw; expires=Sat, 11-Sep-2021 17:53:18 GMT; httponly; Max-Age=31449600; Path=/
+    < set-cookie: sessionid=tzx37xo7izrdfs35o30grdf9u0b2999q; expires=Sat, 12-Sep-2020 18:53:18 GMT; httponly; Max-Age=3600; Path=/
+    < strict-transport-security: max-age=15724800; includeSubDomains
+    <
+    * Connection #0 to host demo.gethue.com left intact
+
+**Note** In certain cases an initial GET is needed in order to retrieve the CSRF token, which can then be provided in the POST with the credentials.
+
+#### Logout
+
+    curl -v -X POST https://demo.gethue.com/hue/accounts/logout/ -H "X-CSRFToken: CZOt9VFK7X6OUpqrLk4URW9DI69FxVKnsRnuaDgsDqZS9GpXzuVehxMnH1gvheWU" --cookie "csrftoken=CZOt9VFK7X6OUpqrLk4URW9DI69FxVKnsRnuaDgsDqZS9GpXzuVehxMnH1gvheWU"
+
+### SQL Querying
+
+#### Listing Databases
+
+    $.post("/notebook/api/autocomplete/", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+#### Listing Tables
+
+    $.post("/notebook/api/autocomplete/<DB>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+#### Table details and Columns
+
+    $.post("/notebook/api/autocomplete/<DB>/<TABLE>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+#### Column details
+
+    $.post("/notebook/api/autocomplete/<DB>/<TABLE>/<COL1>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+For nested columns:
+
+    $.post("/notebook/api/autocomplete/<DB>/<TABLE>/<COL1>/<COL2>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+#### Listing Functions
+
+Default functions:
+
+    $.post("/notebook/api/autocomplete/", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      }),
+      "operation": "functions"
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+
+For a specific database:
+
+    $.post("/notebook/api/autocomplete/<DB>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      }),
+      "operation": "functions"
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+
+For a specific function/UDF details (e.g. trunc):
+
+    $.post("/notebook/api/autocomplete/<function_name>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      }),
+      "operation": "function"
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
 ### Data Catalog
 
 The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata) is powering the external [Catalog integrations](/user/browsing/#data-catalogs).
-
-Additional catalogs can be integrated via some [connectors](/developer/connectors/#data-catalog).
 
 #### Searching for entities
 
@@ -176,95 +320,6 @@ Adding/updating a comment with the dummy backend:
           namespace: "huecatalog",
           name: "relatedQueries"
       }])
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
-
-### SQL Querying
-
-#### Listing Databases
-
-    $.post("/notebook/api/autocomplete/", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      })
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
-
-#### Listing Tables
-
-    $.post("/notebook/api/autocomplete/<DB>", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      })
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
-
-#### Table details and Columns
-
-    $.post("/notebook/api/autocomplete/<DB>/<TABLE>", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      })
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
-
-#### Column details
-
-    $.post("/notebook/api/autocomplete/<DB>/<TABLE>/<COL1>", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      })
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
-
-For nested columns:
-
-    $.post("/notebook/api/autocomplete/<DB>/<TABLE>/<COL1>/<COL2>", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      })
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
-
-#### Listing Functions
-
-Default functions:
-
-    $.post("/notebook/api/autocomplete/", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      }),
-      "operation": "functions"
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
-
-
-For a specific database:
-
-    $.post("/notebook/api/autocomplete/<DB>", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      }),
-      "operation": "functions"
-    }, function(data) {
-      console.log(ko.mapping.toJSON(data));
-    });
-
-
-For a specific function/UDF details (e.g. trunc):
-
-    $.post("/notebook/api/autocomplete/<function_name>", {
-      "snippet": ko.mapping.toJSON({
-          type: "hive"
-      }),
-      "operation": "function"
     }, function(data) {
       console.log(ko.mapping.toJSON(data));
     });
