@@ -38,6 +38,7 @@ import logging
 from lxml import etree
 import os
 import re
+import sys
 
 from django.core import serializers
 from django.utils.encoding import smart_str
@@ -687,7 +688,13 @@ def import_workflow_root(workflow, workflow_definition_root, metadata=None, fs=N
 
 def import_workflow(workflow, workflow_definition, metadata=None, fs=None):
   # Parse Workflow Definition
-  workflow_definition_root = etree.fromstring(workflow_definition)
+  if sys.version_info[0] > 2:
+    # In Py3 anything like <?xml version="1.0" encoding="UTF-8"?> at the beginning
+    # of a workflow XML cannot be parsed via etree.fromstring(), since the
+    # workflow_definition string needs to be encoded.
+    workflow_definition_root = etree.XML(workflow_definition.encode())
+  else:
+    workflow_definition_root = etree.fromstring(workflow_definition)
   if workflow_definition_root is None:
     raise RuntimeError(_("Could not find any nodes in Workflow definition. Maybe it's malformed?"))
 
