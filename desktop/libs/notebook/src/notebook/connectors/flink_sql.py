@@ -248,11 +248,11 @@ class FlinkSqlApi(Api):
     resp = self.db.execute_statement(session_id=session_id, statement='USE %(database)s' % {'database': database})
     resp = self.db.execute_statement(session_id=session_id, statement='DESCRIBE %(table)s' % {'table': table})
 
-    columns = json.loads(resp['results'][0]['data'][0][0])['columns']
+    columns = resp['results'][0]['columns']
 
     return [{
-        'name': col['field_name'],
-        'type': col['field_type'],  # Types to unify
+        'name': col['name'],
+        'type': col['type'],  # Types to unify
         'comment': '',
       }
       for col in columns
