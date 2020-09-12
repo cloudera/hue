@@ -325,8 +325,85 @@ Adding/updating a comment with the dummy backend:
     });
 
 
-### SQL Risk Optimization
-### Data Browsing
+### File Browsing
+
+#### List
+
+List path `S3A://gethue-demo`:
+
+    curl -X GET "https://demo.gethue.com/filebrowser/view=S3A://gethue-demo?pagesize=45&pagenum=1&filter=&sortby=name&descending=false&format=json" --cookie "csrftoken=oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI;sessionid=nkblu68xfofabfsjctdwseaubfbkiwlg" -H "X-CSRFToken: oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI"
+
+    {
+      ...........
+      "files": [
+      {
+      "humansize": "0\u00a0bytes",
+      "url": "/filebrowser/view=s3a%3A%2F%2Fdemo-hue",
+      "stats": {
+      "size": 0,
+      "aclBit": false,
+      "group": "",
+      "user": "",
+      "mtime": null,
+      "path": "s3a://demo-hue",
+      "atime": null,
+      "mode": 16895
+      },
+      "name": "demo-hue",
+      "mtime": "",
+      "rwx": "drwxrwxrwx",
+      "path": "s3a://demo-hue",
+      "is_sentry_managed": false,
+      "type": "dir",
+      "mode": "40777"
+      },
+      {
+      "humansize": "0\u00a0bytes",
+      "url": "/filebrowser/view=S3A%3A%2F%2F",
+      "stats": {
+      "size": 0,
+      "aclBit": false,
+      "group": "",
+      "user": "",
+      "mtime": null,
+      "path": "S3A://",
+      "atime": null,
+      "mode": 16895
+      },
+      "name": ".",
+      "mtime": "",
+      "rwx": "drwxrwxrwx",
+      "path": "S3A://",
+      "is_sentry_managed": false,
+      "type": "dir",
+      "mode": "40777"
+      }
+      ],
+      ...........
+    }
+
+#### Get file content
+
+Get the content and metadata of `s3a://demo-hue/web_log_data/index_data.csv`:
+
+Note: it needs the `XMLHttpRequest` header to return the data in json:
+
+    curl  -X GET "https://demo.gethue.com/filebrowser/view=s3a://demo-hue/web_log_data/index_data.csv?offset=0&length=204800&compression=none&mode=text" --cookie "csrftoken=oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI;sessionid=nkblu68xfofabfsjctdwseaubfbkiwlg" -H "X-CSRFToken: oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI" -H "x-requested-with: XMLHttpRequest"
+
+    {
+      "show_download_button": true,
+      "is_embeddable": false,
+      "editable": false,
+      "mtime": "October 31, 2016 03:34 PM",
+      "rwx": "-rw-rw-rw-",
+      "path": "s3a://demo-hue/web_log_data/index_data.csv",
+      "stats": {
+      "size": 6199593,
+      "aclBit": false,
+      ...............
+      "contents": "code,protocol,request,app,user_agent..........
+      ...............
+    }
 
 ## Python
 
