@@ -107,6 +107,33 @@ Then you can perform any operation by provising the `CSRF` and the `sessionid` t
 
 ### SQL Querying
 
+#### Execute a Query
+
+Until Editor v2 is out [HUE-8768](https://issues.cloudera.org/browse/HUE-8768), the API is pretty complicated but still functional:
+
+For a `SHOW TABLES`, first we send the statement:
+
+    curl -X POST https://demo.gethue.com/notebook/api/execute/hive --cookie "csrftoken=lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3;sessionid=5msr9s45o4emem1zt009kw64ni6uso3e" -H "X-CSRFToken: lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3" --data 'executable={"statement":"SHOW TABLES","database":"default"}&notebook={"type":"query","snippets":[{"id":1,"statement_raw":"SHOW TABLES","type":"hive","variables":[]}],"name":"","isSaved":false,"sessions":[]}&snippet={"id":1,"type":"hive","result":{},"statement":"SHOW TABLES","properties":{}}'
+
+    {"status": 0, "history_id": 17880, "handle": {"statement_id": 0, "session_type": "hive", "has_more_statements": false, "guid": "EUI32vrfTkSOBXET6Eaa+A==\n", "previous_statement_hash": "3070952e55d733fb5bef249277fb8674989e40b6f86c5cc8b39cc415", "log_context": null, "statements_count": 1, "end": {"column": 10, "row": 0}, "session_id": 63, "start": {"column": 0, "row": 0}, "secret": "RuiF0LEkRn+Yok/gjXWSqg==\n", "has_result_set": true, "session_guid": "c845bb7688dca140:859a5024fb284ba2", "statement": "SHOW TABLES", "operation_type": 0, "modified_row_count": null}, "history_uuid": "63ce87ba-ca0f-4653-8aeb-e9f5c1781b78"}
+
+Then check status if the operation is now available for fetching its result:
+
+    curl -X POST https://demo.gethue.com/notebook/api/check_status --cookie "csrftoken=lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3;sessionid=5msr9s45o4emem1zt009kw64ni6uso3e" -H "X-CSRFToken: lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3" --data 'notebook={"type":"hive"}&snippet={"history_id": 17886,"type":"hive","result":{"handle":{"guid": "0J6PwGcSQaCJjagzYUBHzA==\n","secret": "uiP3IS4fR/mxkLJER5wRCg==\n","has_result_set": true}},"status":""}'
+    {"status": 0, "query_status": {"status": "available", "has_result_set": true}}
+
+And now ask for the result set for the statement:
+
+    curl -X POST https://demo.gethue.com/notebook/api/fetch_result_data --cookie "csrftoken=lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3;sessionid=5msr9s45o4emem1zt009kw64ni6uso3e" -H "X-CSRFToken: lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3" --data 'notebook={"type":"hive"}&snippet={"history_id": 17886,"type":"hive","result":{"handle":{"guid": "0J6PwGcSQaCJjagzYUBHzA==\n","secret": "uiP3IS4fR/mxkLJER5wRCg==\n","has_result_set": true}},"status":""}'
+
+    {"status": 0, "result": {"has_more": true, "type": "table", "meta": [{"comment": "from deserializer", "type": "STRING_TYPE", "name": "tab_name"}], "data": [["adavi"], ["adavi1"], ["adavi2"], ["ambs_feed"], ["apx_adv_deduction_data_process_total"], ["avro_table"], ["avro_table1"], ["bb"], ["bharath_info1"], ["bucknew"], ["bucknew1"], ["chungu"], ["cricket3"], ["cricket4"], ["cricket5_view"], ["cricketer"], ["cricketer_view"], ["cricketer_view1"], ["demo1"], ["demo12345"], ["dummy"], ["embedded"], ["emp"], ["emp1_sept9"], ["emp_details"], ["emp_sept"], ["emp_tbl1"], ["emp_tbl2"], ["empdtls"], ["empdtls_ext"], ["empdtls_ext_v2"], ["employee"], ["employee1"], ["employee_ins"], ["empppp"], ["events"], ["final"], ["flight_data"], ["gopalbhar"], ["guruhive_internaltable"], ["hell"], ["info1"], ["lost_messages"], ["mnewmyak"], ["mortality"], ["mscda"], ["myak"], ["mysample"], ["mysample1"], ["mysample2"], ["network"], ["ods_t_exch_recv_rel_wfz_stat_szy"], ["olympicdata"], ["p_table"], ["partition_cricket"], ["partitioned_user"], ["s"], ["sample"], ["sample_07"], ["sample_08"], ["score"], ["stg_t_exch_recv_rel_wfz_stat_szy"], ["stocks"], ["students"], ["studentscores"], ["studentscores2"], ["t1"], ["table_name"], ["tablex"], ["tabley"], ["temp"], ["test1"], ["test2"], ["test21"], ["test_info"], ["topage"], ["txnrecords"], ["u_data"], ["udata"], ["user_session"], ["user_test"], ["v_empdtls"], ["v_empdtls_ext"], ["v_empdtls_ext_v2"], ["web_logs"]], "isEscaped": true}}
+
+And if we wanted to get the execution log for this statement:
+
+    curl -X POST https://demo.gethue.com/notebook/api/get_logs --cookie "csrftoken=lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3;sessionid=5msr9s45o4emem1zt009kw64ni6uso3e" -H "X-CSRFToken: lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3" --data 'notebook={"type":"hive","sessions":[]}&snippet={"history_id": 17886,"type":"hive","result":{"handle":{"guid": "0J6PwGcSQaCJjagzYUBHzA==\n","secret": "uiP3IS4fR/mxkLJER5wRCg==\n","has_result_set": true}},"status":"","properties":{},"sessions":[]}'
+
+    {"status": 0, "progress": 5, "jobs": [], "logs": "", "isFullLogs": false}
+
 #### Listing Databases
 
     $.post("/notebook/api/autocomplete/", {
