@@ -405,6 +405,33 @@ Note: it needs the `XMLHttpRequest` header to return the data in json:
       ...............
     }
 
+### Data Importer
+
+#### File import
+
+First guessing the format of the file `s3a://demo-hue/web_log_data/index_data.csv`:
+
+    curl -X POST https://demo.gethue.com/indexer/api/indexer/guess_format --cookie "csrftoken=oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI;sessionid=nkblu68xfofabfsjctdwseaubfbkiwlg" -H "X-CSRFToken: oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI" --data 'fileFormat={"inputFormat":"file","path":"s3a://demo-hue/web_log_data/index_data.csv"}'
+
+    {"status": 0, "fieldSeparator": ",", "hasHeader": true, "quoteChar": "\"", "recordSeparator": "\\n", "type": "csv"}
+
+Then getting some data sample as well as the column types (column names will be picked from the header line if present):
+
+    curl -X POST https://demo.gethue.com/indexer/api/indexer/guess_field_types --cookie "csrftoken=oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI;sessionid=nkblu68xfofabfsjctdwseaubfbkiwlg" -H "X-CSRFToken: oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI" --data 'fileFormat={"inputFormat":"file","path":"s3a://demo-hue/web_log_data/index_data.csv","format":{"type":"csv","fieldSeparator":",","recordSeparator":"\\n","quoteChar":"\"","hasHeader":true,"status":0}}'
+
+    {
+      "sample": [["200", "HTTP/1.1", "GET /metastore/table/default/sample_07 HTTP/1.1", "metastore", "", "00", "SG", "8836e6ce-9a21-449f-a372-9e57641389b3", "Singapore", "table", "1.2931000000000097", "GET", "128.199.234.236", "Other", "1041", "-", "Singapore", "", "/metastore/table/default/sample_07", "", "103.85579999999999", "Other", "demo.gethue.com:80 128.199.234.236 - - [04/May/2014:06:35:49 +0000] \"GET /metastore/table/default/sample_07 HTTP/1.1\" 200 1041 \"-\" \"Mozilla/5.0 (compatible; phpservermon/3.0.1; +http://www.phpservermonitor.org)\"\n", "Mozilla/5.0 (compatible; phpservermon/3.0.1; +http://www.phpservermonitor.org)", "2014-05-04T06:35:49Z", "Other", "SGP"],
+      ....
+      "columns": [{"operations": [], "comment": "", "nested": [], "name": "code", "level": 0, "keyType": "string", "required": false, "precision": 10, "keep": true, "isPartition": false, "length": 100, "partitionValue": "", "multiValued": false, "unique": false, "type": "long", "showProperties": false, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "protocol", "level": 0, "keyType": "string", "required": false, "precision": 10, "keep": true, "isPartition": false, "length": 100, "partitionValue": "", "multiValued": false, "unique": false, "type": "string", "showProperties": false, "scale": 0},
+      .....
+    }
+
+Then we submit via `https://demo.gethue.com/indexer/api/importer/submit` and provide the `source` and `destination` parameters. We get back an `operation id` (i.e. some SQL Editor query history id).
+
+If the `show_command` parameter is given, the API call will instead return the generated SQL queries that will import the data.
+
+    {"status": 0, "history_id": 17820, "handle": {"statement_id": 0, "session_type": "hive", "has_more_statements": true, "guid": "uu6K3SSWSY6mx/fbh0nm2w==\n", "previous_statement_hash": "4bee3a62b3c7142c60475021469483bff81ba09bd07b8e527179e617", "log_context": null, "statements_count": 4, "end": {"column": 53, "row": 0}, "session_id": 55, "start": {"column": 0, "row": 0}, "secret": "8mKu1bhdRtWXu82DXjDZdg==\n", "has_result_set": false, "session_guid": "fd4c667f3a5e4507:0335af7716db3d9e", "statement": "DROP TABLE IF EXISTS `default`.`hue__tmp_index_data`", "operation_type": 0, "modified_row_count": null}, "history_uuid": "bf5804f5-6f12-47a8-8ba6-0ed7032ebe93"}
+
 ## Python
 
 Here is some overview about using the Python commands an shell and some examples below:
