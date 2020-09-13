@@ -2,16 +2,16 @@
 title: "API"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 5
+weight: 4
 ---
 
-## REST
+# REST
 
 REST APIs are not all public yet and can be simplified but this is work in progress in [HUE-1450](https://issues.cloudera.org/browse/HUE-1450).
 
 Hue is Ajax based and has a REST API used by the browser to communicate (e.g. submit a query or workflow, list some S3 files, export a document...). Currently this API is private and subject to change but can be easily reused. You would need to GET */accounts/login* to get the CSRF token and POST it back along *username* and *password* and reuse the *sessionid* cookie in next communication calls.
 
-### Quickstart
+## Quickstart
 
 Hue is based on the [Django Web Framework](https://www.djangoproject.com/). Django comes with user authentication system. Django uses sessions and middleware to hook the authentication system into request object. Hue uses stock auth form which uses *username* and *password* and *csrftoken* form variables to authenticate.
 
@@ -19,7 +19,7 @@ In this code snippet, we will use well-known python *requests* library. We will 
 
 Once the request is successful then capture headers and cookies for subsequent requests. Subsequent *request.session* calls can be made by providing *cookies=session.cookies* and *headers=session.headers*.
 
-#### Curl
+### Curl
 
 First get the `CSRF` token:
 
@@ -35,7 +35,7 @@ Then you can perform any operation by provising the `CSRF` and the `sessionid` t
 
     {"status": 0, "databases": ["a0817", "arunso", "ath", "athlete", "beingdatum_db", "bharath_practice", "chungu", "darth", "default", "demo", "diwakar", "emp", "hadooptest", "hebe", "hello", "hivedataset", "hivemap", "hivetesting", "hr_db", "icedb", "lib", "libdemo", "lti", "m", "m1", "movie", "movie1", "movielens", "mscda", "my_database", "mydb", "mydemo", "noo", "prizesh", "rajeev", "ram", "retail", "ruban", "sept9", "sept9_2020", "student", "test", "test21", "test123", "ticktick", "userdb", "vidu"]}
 
-#### Python
+### Python
 
     import requests
 
@@ -62,7 +62,19 @@ Then you can perform any operation by provising the `CSRF` and the `sessionid` t
     print(response.status_code)
     print(response.text)
 
-### Authentication
+### jQuery
+
+Login to a Hue and open up the browser developer console and just type the JavaScript snippets, e.g.:
+
+    $.post("/notebook/api/autocomplete/", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+## Authentication
 
 **Note** There is currently no error on bad authentication but instead a redirect to the login page, e.g.:
 
@@ -70,7 +82,7 @@ Then you can perform any operation by provising the `CSRF` and the `sessionid` t
     [12/Sep/2020 10:12:44 -0700] access       INFO     127.0.0.1 -anon- - "POST /hue/useradmin/users/edit/romain HTTP/1.1" - (mem: 169mb)-- login redirection
     [12/Sep/2020 10:12:44 -0700] access       INFO     127.0.0.1 -anon- - "POST /hue/useradmin/users/edit/romain HTTP/1.1" returned in 0ms 302 0 (mem: 169mb)
 
-#### Login
+### Login
 
     curl -v -X POST demo.gethue.com/hue/accounts/login/ -d 'username=demo&password=demo'
 
@@ -101,13 +113,13 @@ Then you can perform any operation by provising the `CSRF` and the `sessionid` t
 
 **Note** In certain cases an initial GET is needed in order to retrieve the CSRF token, which can then be provided in the POST with the credentials.
 
-#### Logout
+### Logout
 
     curl -v -X POST https://demo.gethue.com/hue/accounts/logout/ -H "X-CSRFToken: CZOt9VFK7X6OUpqrLk4URW9DI69FxVKnsRnuaDgsDqZS9GpXzuVehxMnH1gvheWU" --cookie "csrftoken=CZOt9VFK7X6OUpqrLk4URW9DI69FxVKnsRnuaDgsDqZS9GpXzuVehxMnH1gvheWU"
 
-### SQL Querying
+## SQL Querying
 
-#### Execute a Query
+### Execute a Query
 
 Until Editor v2 is out [HUE-8768](https://issues.cloudera.org/browse/HUE-8768), the API is pretty complicated but still functional:
 
@@ -134,7 +146,7 @@ And if we wanted to get the execution log for this statement:
 
     {"status": 0, "progress": 5, "jobs": [], "logs": "", "isFullLogs": false}
 
-#### Listing Databases
+### Listing Databases
 
     $.post("/notebook/api/autocomplete/", {
       "snippet": ko.mapping.toJSON({
@@ -144,7 +156,7 @@ And if we wanted to get the execution log for this statement:
       console.log(ko.mapping.toJSON(data));
     });
 
-#### Listing Tables
+### Listing Tables
 
     $.post("/notebook/api/autocomplete/<DB>", {
       "snippet": ko.mapping.toJSON({
@@ -154,7 +166,7 @@ And if we wanted to get the execution log for this statement:
       console.log(ko.mapping.toJSON(data));
     });
 
-#### Table details and Columns
+### Table details and Columns
 
     $.post("/notebook/api/autocomplete/<DB>/<TABLE>", {
       "snippet": ko.mapping.toJSON({
@@ -164,7 +176,7 @@ And if we wanted to get the execution log for this statement:
       console.log(ko.mapping.toJSON(data));
     });
 
-#### Column details
+### Column details
 
     $.post("/notebook/api/autocomplete/<DB>/<TABLE>/<COL1>", {
       "snippet": ko.mapping.toJSON({
@@ -184,7 +196,7 @@ For nested columns:
       console.log(ko.mapping.toJSON(data));
     });
 
-#### Listing Functions
+### Listing Functions
 
 Default functions:
 
@@ -221,11 +233,11 @@ For a specific function/UDF details (e.g. trunc):
       console.log(ko.mapping.toJSON(data));
     });
 
-### Data Catalog
+## Data Catalog
 
 The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata) is powering the external [Catalog integrations](/user/browsing/#data-catalogs).
 
-#### Searching for entities
+### Searching for entities
 
     $.post("/metadata/api/catalog/search_entities_interactive/", {
         query_s: ko.mapping.toJSON("*sample"),
@@ -245,7 +257,7 @@ Searching for entities with the dummy backend:
         console.log(ko.mapping.toJSON(data));
     });
 
-#### Finding an entity in order to get its id
+### Finding an entity in order to get its id
 
     $.get("/metadata/api/navigator/find_entity", {
         type: "table",
@@ -266,7 +278,7 @@ Adding/updating a comment with the dummy backend:
         console.log(ko.mapping.toJSON(data));
     });
 
-#### Adding a tag with the dummy backend
+### Adding a tag with the dummy backend
 
     $.post("/metadata/api/catalog/add_tags/", {
       id: "22",
@@ -276,7 +288,7 @@ Adding/updating a comment with the dummy backend:
         console.log(ko.mapping.toJSON(data));
     });
 
-#### Deleting a key/value property
+### Deleting a key/value property
 
     $.post("/metadata/api/catalog/delete_metadata_properties/", {
        "id": "32",
@@ -285,7 +297,7 @@ Adding/updating a comment with the dummy backend:
        console.log(ko.mapping.toJSON(data));
     });
 
-#### Deleting a key/value property
+### Deleting a key/value property
 
     $.post("/metadata/api/catalog/delete_metadata_properties/", {
       "id": "32",
@@ -295,14 +307,14 @@ Adding/updating a comment with the dummy backend:
     });
 
 
-#### Getting the model mapping
+### Getting the model mapping
 
     $.get("/metadata/api/catalog/models/properties/mappings/", function(data) {
       console.log(ko.mapping.toJSON(data));
     });
 
 
-#### Getting a namespace
+### Getting a namespace
 
     $.post("/metadata/api/catalog/namespace/", {
       namespace: 'huecatalog'
@@ -310,7 +322,7 @@ Adding/updating a comment with the dummy backend:
       console.log(ko.mapping.toJSON(data));
     });
 
-#### Creating a namespace
+### Creating a namespace
 
     $.post("/metadata/api/catalog/namespace/create/", {
       "namespace": "huecatalog",
@@ -320,7 +332,7 @@ Adding/updating a comment with the dummy backend:
     });
 
 
-#### Creating a namespace property
+### Creating a namespace property
 
     $.post("/metadata/api/catalog/namespace/property/create/", {
       "namespace": "huecatalog",
@@ -338,8 +350,7 @@ Adding/updating a comment with the dummy backend:
       console.log(ko.mapping.toJSON(data));
     });
 
-
-#### Map a namespace property to a class
+### Map a namespace property to a class
 
     $.post("/metadata/api/catalog/namespace/property/map/", {
       "class": "hv_view",
@@ -352,9 +363,9 @@ Adding/updating a comment with the dummy backend:
     });
 
 
-### File Browsing
+## File Browsing
 
-#### List
+### List
 
 List path `S3A://gethue-demo`:
 
@@ -409,7 +420,7 @@ List path `S3A://gethue-demo`:
       ...........
     }
 
-#### Get file content
+### Get file content
 
 Get the content and metadata of `s3a://demo-hue/web_log_data/index_data.csv`:
 
@@ -432,9 +443,9 @@ Note: it needs the `XMLHttpRequest` header to return the data in json:
       ...............
     }
 
-### Data Importer
+## Data Importer
 
-#### File import
+### File import
 
 First guessing the format of the file `s3a://demo-hue/web_log_data/index_data.csv`:
 
@@ -459,14 +470,14 @@ If the `show_command` parameter is given, the API call will instead return the g
 
     {"status": 0, "history_id": 17820, "handle": {"statement_id": 0, "session_type": "hive", "has_more_statements": true, "guid": "uu6K3SSWSY6mx/fbh0nm2w==\n", "previous_statement_hash": "4bee3a62b3c7142c60475021469483bff81ba09bd07b8e527179e617", "log_context": null, "statements_count": 4, "end": {"column": 53, "row": 0}, "session_id": 55, "start": {"column": 0, "row": 0}, "secret": "8mKu1bhdRtWXu82DXjDZdg==\n", "has_result_set": false, "session_guid": "fd4c667f3a5e4507:0335af7716db3d9e", "statement": "DROP TABLE IF EXISTS `default`.`hue__tmp_index_data`", "operation_type": 0, "modified_row_count": null}, "history_uuid": "bf5804f5-6f12-47a8-8ba6-0ed7032ebe93"}
 
-## Python
+# Python
 
 Here is some overview about using the Python commands an shell and some examples below:
 
 * [Hue API: Execute some builtin or shell commands](http://gethue.com/hue-api-execute-some-builtin-commands/).
 * [How to manage the Hue database with the shell](http://gethue.com/how-to-manage-the-hue-database-with-the-shell/).
 
-### Make a user a Hue admin
+## Making a user admin
 
 Via the Hue shell:
 
@@ -482,7 +493,7 @@ Then type something similar to:
     a.set_password('my_secret')
     a.save()
 
-### Change the password of a user
+## Changing user password
 
 In the Hue shell:
 
@@ -493,7 +504,7 @@ In the Hue shell:
     user.save()
 
 
-### Count the documents of a user
+## Counting user documents
 
 On the command line:
 
