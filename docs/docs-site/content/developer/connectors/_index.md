@@ -2,7 +2,7 @@
 title: "Connectors"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 3
+weight: 5
 ---
 
 Connectors provide pluggable integration to any external data service so that an admin can easily allow end users to interact with them.
