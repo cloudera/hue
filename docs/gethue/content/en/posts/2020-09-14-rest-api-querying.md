@@ -45,6 +45,10 @@ categories:
 ---
 Hi Data App Builders,
 
+Are you looking at executing some SQL queries of Browsing S3 files programatically? (so that it can be automated for example)
+
+![Curling Hue API](https://cdn.gethue.com/uploads/2020/09/hue-curl.png)
+
 The Hue development flow continues to mature ([Docker Quick Start](https://gethue.com/quickstart-hue-in-docker/), [improved CI](https://gethue.com/automated-checking-python-style-and-title-format-of-git-commits-continuous-integration/), shareable [Web Components](https://docs.gethue.com/developer/components/)...) and is now getting more help on how to reuse its API.
 
 ## Concept
