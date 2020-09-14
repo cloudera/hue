@@ -7,35 +7,45 @@ weight: 4
 
 # REST
 
-REST APIs are not all public yet and can be simplified but this is work in progress in [HUE-1450](https://issues.cloudera.org/browse/HUE-1450).
+The REST API is not properly public yet and can (will) be simplified in the current work in progress [HUE-1450](https://issues.cloudera.org/browse/HUE-1450).
 
-Hue is Ajax based and has a REST API used by the browser to communicate (e.g. submit a query or workflow, list some S3 files, export a document...). Currently this API is private and subject to change but can be easily reused. You would need to GET */accounts/login* to get the CSRF token and POST it back along *username* and *password* and reuse the *sessionid* cookie in next communication calls.
+Hue is Ajax based and has a REST API used by the browser to communicate (e.g. submit an SQL query, list some S3 files in a buck...) with the Hue server which will then perform the operation with the remote services. Currently this API is private and subject to change but can already be reused for prove of concepts until the proper public API is released.
+
+In general we want to authenticate with a username and password, retrieve a cookie and [CSRF](https://docs.djangoproject.com/en/3.1/ref/csrf/) token and provide them in the follow-up calls so that Hue knows who we are and won't block you.
+
+The [API documentation](https://docs.gethue.com/developer/api/) has been refreshed and list new endpoints.
 
 ## Quickstart
 
 Hue is based on the [Django Web Framework](https://www.djangoproject.com/). Django comes with user authentication system. Django uses sessions and middleware to hook the authentication system into request object. Hue uses stock auth form which uses *username* and *password* and *csrftoken* form variables to authenticate.
 
-In this code snippet, we will use well-known python *requests* library. We will first acquire *csrftoken* by GET *login_url* and then create a dictionary of form data which contains *username*, *password* and *csrftoken* and the *next_url* and another dictionary for header which contains the *Referer* url and an empty dictionary for the cookies. After the POST request to *login_url* we will check the response code, which should be *r.status_code == 200*.
-
-Once the request is successful then capture headers and cookies for subsequent requests. Subsequent *request.session* calls can be made by providing *cookies=session.cookies* and *headers=session.headers*.
-
 ### Curl
 
 First get the `CSRF` token:
 
-    curl -v -X GET https://demo.gethue.com/hue/accounts/login/
+    curl -i -X GET https://demo.gethue.com/hue/accounts/login/?fromModal=true -o /dev/null -D -
 
-Then authenticate with the credendials (note: `CRSF` currently needs to be repeated twice):
+It is important to note the `csrftoken` and `sessionid` values from the response:
 
-    curl -v -X POST https://demo.gethue.com/hue/accounts/login/ -d 'username=demo&password=demo' -H "X-CSRFToken: CZOt9VFK7X6OUpqrLk4URW9DI69FxVKnsRnuaDgsDqZS9GpXzuVehxMnH1gvheWU" --cookie "csrftoken=CZOt9VFK7X6OUpqrLk4URW9DI69FxVKnsRnuaDgsDqZS9GpXzuVehxMnH1gvheWU"
+    set-cookie: csrftoken=XUFgN1WPZNlaJtBeBDtBvwzrOFqRXIaMlNJv4mdvsS2bIE2Lb8LRmCh5cPUBnBdk; expires=Mon, 13-Sep-2021 20:43:47 GMT; httponly; Max-Age=31449600; Path=/
+    set-cookie: sessionid=9cdltfee1q1zmt8b7slsjcomtxzgvgfz; expires=Mon, 14-Sep-2020 21:43:47 GMT; httponly; Max-Age=3600; Path=/
 
-Then you can perform any operation by provising the `CSRF` and the `sessionid` tokens. Here for example we list all the databases of the `hive` connector:
 
-    curl -X POST https://demo.gethue.com/notebook/api/autocomplete/ --cookie "csrftoken=zfOhD8roDLI7mEgakmBDCy7LDMvkEE2z3uUTIyyVnurhqLZhluhjO76K541MRwAw;sessionid=tzx37xo7izrdfs35o30grdf9u0b2999q" -H "X-CSRFToken: zfOhD8roDLI7mEgakmBDCy7LDMvkEE2z3uUTIyyVnurhqLZhluhjO76K541MRwAw" --data 'snippet={"type":"hive"}'
+Then authenticate with the credendials and provide the `csrftoken` and `sessionid`  as well (note: `CRSF` currently needs to be repeated twice):
+
+    curl -i -X POST https://demo.gethue.com/hue/accounts/login/?fromModal=true -d 'username=demo&password=demo' -o /dev/null -D - --cookie "csrftoken=XUFgN1WPZNlaJtBeBDtBvwzrOFqRXIaMlNJv4mdvsS2bIE2Lb8LRmCh5cPUBnBdk;sessionid=9cdltfee1q1zmt8b7slsjcomtxzgvgfz" -H "X-CSRFToken: XUFgN1WPZNlaJtBeBDtBvwzrOFqRXIaMlNJv4mdvsS2bIE2Lb8LRmCh5cPUBnBdk"
+
+Then you can perform any operation as the `demo` user by providing the latest `CSRF` and the `sessionid` tokens. Here for example we list all the databases of the `hive` connector:
+
+    curl -X POST https://demo.gethue.com/notebook/api/autocomplete/ --data 'snippet={"type":"hive"}' --cookie "csrftoken=XUFgN1WPZNlaJtBeBDtBvwzrOFqRXIaMlNJv4mdvsS2bIE2Lb8LRmCh5cPUBnBdk;sessionid=9cdltfee1q1zmt8b7slsjcomtxzgvgfz" -H "X-CSRFToken: XUFgN1WPZNlaJtBeBDtBvwzrOFqRXIaMlNJv4mdvsS2bIE2Lb8LRmCh5cPUBnBdk"
 
     {"status": 0, "databases": ["a0817", "arunso", "ath", "athlete", "beingdatum_db", "bharath_practice", "chungu", "darth", "default", "demo", "diwakar", "emp", "hadooptest", "hebe", "hello", "hivedataset", "hivemap", "hivetesting", "hr_db", "icedb", "lib", "libdemo", "lti", "m", "m1", "movie", "movie1", "movielens", "mscda", "my_database", "mydb", "mydemo", "noo", "prizesh", "rajeev", "ram", "retail", "ruban", "sept9", "sept9_2020", "student", "test", "test21", "test123", "ticktick", "userdb", "vidu"]}
 
 ### Python
+
+In this code snippet, we will use well-known python *requests* library. We will first acquire *csrftoken* by GET *login_url* and then create a dictionary of form data which contains *username*, *password* and *csrftoken* and the *next_url* and another dictionary for header which contains the *Referer* url and an empty dictionary for the cookies. After the POST request to *login_url* we will check the response code, which should be *r.status_code == 200*.
+
+Once the request is successful then capture headers and cookies for subsequent requests. Subsequent *request.session* calls can be made by providing *cookies=session.cookies* and *headers=session.headers*.
 
     import requests
 
@@ -76,11 +86,13 @@ Login to a Hue and open up the browser developer console and just type the JavaS
 
 ## Authentication
 
-**Note** There is currently no error on bad authentication but instead a redirect to the login page, e.g.:
+**Note** There is currently no error on bad authentication but instead a 302 redirect to the login page, e.g.:
 
     [12/Sep/2020 10:12:44 -0700] middleware   INFO     Redirecting to login page: /hue/useradmin/users/edit/romain
     [12/Sep/2020 10:12:44 -0700] access       INFO     127.0.0.1 -anon- - "POST /hue/useradmin/users/edit/romain HTTP/1.1" - (mem: 169mb)-- login redirection
     [12/Sep/2020 10:12:44 -0700] access       INFO     127.0.0.1 -anon- - "POST /hue/useradmin/users/edit/romain HTTP/1.1" returned in 0ms 302 0 (mem: 169mb)
+
+**Note** The public API should be simpler with only one POST call and will return back only one token
 
 ### Login
 
@@ -121,28 +133,31 @@ Login to a Hue and open up the browser developer console and just type the JavaS
 
 ### Execute a Query
 
+Now that we are logged-in, here is how to execute a `SHOW TABLES` SQL query via the `hive` connector. You could repeat the steps with any query you want, e.g. `SELECT * FROM web_logs LIMIT 100`.
+
 Until Editor v2 is out [HUE-8768](https://issues.cloudera.org/browse/HUE-8768), the API is pretty complicated but still functional:
 
-For a `SHOW TABLES`, first we send the statement:
+For a `SHOW TABLES`, first we send the query statement:
 
-    curl -X POST https://demo.gethue.com/notebook/api/execute/hive --cookie "csrftoken=lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3;sessionid=5msr9s45o4emem1zt009kw64ni6uso3e" -H "X-CSRFToken: lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3" --data 'executable={"statement":"SHOW TABLES","database":"default"}&notebook={"type":"query","snippets":[{"id":1,"statement_raw":"SHOW TABLES","type":"hive","variables":[]}],"name":"","isSaved":false,"sessions":[]}&snippet={"id":1,"type":"hive","result":{},"statement":"SHOW TABLES","properties":{}}'
+    curl -X POST https://demo.gethue.com/notebook/api/execute/hive --data 'executable={"statement":"SHOW TABLES","database":"default"}&notebook={"type":"query","snippets":[{"id":1,"statement_raw":"SHOW TABLES","type":"hive","variables":[]}],"name":"","isSaved":false,"sessions":[]}&snippet={"id":1,"type":"hive","result":{},"statement":"SHOW TABLES","properties":{}}' --cookie "csrftoken=lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3;sessionid=5msr9s45o4emem1zt009kw64ni6uso3e" -H "X-CSRFToken: lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3"
 
     {"status": 0, "history_id": 17880, "handle": {"statement_id": 0, "session_type": "hive", "has_more_statements": false, "guid": "EUI32vrfTkSOBXET6Eaa+A==\n", "previous_statement_hash": "3070952e55d733fb5bef249277fb8674989e40b6f86c5cc8b39cc415", "log_context": null, "statements_count": 1, "end": {"column": 10, "row": 0}, "session_id": 63, "start": {"column": 0, "row": 0}, "secret": "RuiF0LEkRn+Yok/gjXWSqg==\n", "has_result_set": true, "session_guid": "c845bb7688dca140:859a5024fb284ba2", "statement": "SHOW TABLES", "operation_type": 0, "modified_row_count": null}, "history_uuid": "63ce87ba-ca0f-4653-8aeb-e9f5c1781b78"}
 
-Then check status if the operation is now available for fetching its result:
+Then check the operation status until it is available for fetching its result:
 
-    curl -X POST https://demo.gethue.com/notebook/api/check_status --cookie "csrftoken=lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3;sessionid=5msr9s45o4emem1zt009kw64ni6uso3e" -H "X-CSRFToken: lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3" --data 'notebook={"type":"hive"}&snippet={"history_id": 17886,"type":"hive","result":{"handle":{"guid": "0J6PwGcSQaCJjagzYUBHzA==\n","secret": "uiP3IS4fR/mxkLJER5wRCg==\n","has_result_set": true}},"status":""}'
+    curl -X POST https://demo.gethue.com/notebook/api/check_status --data 'notebook={"type":"hive"}&snippet={"history_id": 17886,"type":"hive","result":{"handle":{"guid": "0J6PwGcSQaCJjagzYUBHzA==\n","secret": "uiP3IS4fR/mxkLJER5wRCg==\n","has_result_set": true}},"status":""}' --cookie "csrftoken=lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3;sessionid=5msr9s45o4emem1zt009kw64ni6uso3e" -H "X-CSRFToken: lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3"
+
     {"status": 0, "query_status": {"status": "available", "has_result_set": true}}
 
-And now ask for the result set for the statement:
+And now ask for the resultset of the statement:
 
-    curl -X POST https://demo.gethue.com/notebook/api/fetch_result_data --cookie "csrftoken=lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3;sessionid=5msr9s45o4emem1zt009kw64ni6uso3e" -H "X-CSRFToken: lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3" --data 'notebook={"type":"hive"}&snippet={"history_id": 17886,"type":"hive","result":{"handle":{"guid": "0J6PwGcSQaCJjagzYUBHzA==\n","secret": "uiP3IS4fR/mxkLJER5wRCg==\n","has_result_set": true}},"status":""}'
+    curl -X POST https://demo.gethue.com/notebook/api/fetch_result_data --data 'notebook={"type":"hive"}&snippet={"history_id": 17886,"type":"hive","result":{"handle":{"guid": "0J6PwGcSQaCJjagzYUBHzA==\n","secret": "uiP3IS4fR/mxkLJER5wRCg==\n","has_result_set": true}},"status":""}' --cookie "csrftoken=lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3;sessionid=5msr9s45o4emem1zt009kw64ni6uso3e" -H "X-CSRFToken: lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3"
 
     {"status": 0, "result": {"has_more": true, "type": "table", "meta": [{"comment": "from deserializer", "type": "STRING_TYPE", "name": "tab_name"}], "data": [["adavi"], ["adavi1"], ["adavi2"], ["ambs_feed"], ["apx_adv_deduction_data_process_total"], ["avro_table"], ["avro_table1"], ["bb"], ["bharath_info1"], ["bucknew"], ["bucknew1"], ["chungu"], ["cricket3"], ["cricket4"], ["cricket5_view"], ["cricketer"], ["cricketer_view"], ["cricketer_view1"], ["demo1"], ["demo12345"], ["dummy"], ["embedded"], ["emp"], ["emp1_sept9"], ["emp_details"], ["emp_sept"], ["emp_tbl1"], ["emp_tbl2"], ["empdtls"], ["empdtls_ext"], ["empdtls_ext_v2"], ["employee"], ["employee1"], ["employee_ins"], ["empppp"], ["events"], ["final"], ["flight_data"], ["gopalbhar"], ["guruhive_internaltable"], ["hell"], ["info1"], ["lost_messages"], ["mnewmyak"], ["mortality"], ["mscda"], ["myak"], ["mysample"], ["mysample1"], ["mysample2"], ["network"], ["ods_t_exch_recv_rel_wfz_stat_szy"], ["olympicdata"], ["p_table"], ["partition_cricket"], ["partitioned_user"], ["s"], ["sample"], ["sample_07"], ["sample_08"], ["score"], ["stg_t_exch_recv_rel_wfz_stat_szy"], ["stocks"], ["students"], ["studentscores"], ["studentscores2"], ["t1"], ["table_name"], ["tablex"], ["tabley"], ["temp"], ["test1"], ["test2"], ["test21"], ["test_info"], ["topage"], ["txnrecords"], ["u_data"], ["udata"], ["user_session"], ["user_test"], ["v_empdtls"], ["v_empdtls_ext"], ["v_empdtls_ext_v2"], ["web_logs"]], "isEscaped": true}}
 
 And if we wanted to get the execution log for this statement:
 
-    curl -X POST https://demo.gethue.com/notebook/api/get_logs --cookie "csrftoken=lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3;sessionid=5msr9s45o4emem1zt009kw64ni6uso3e" -H "X-CSRFToken: lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3" --data 'notebook={"type":"hive","sessions":[]}&snippet={"history_id": 17886,"type":"hive","result":{"handle":{"guid": "0J6PwGcSQaCJjagzYUBHzA==\n","secret": "uiP3IS4fR/mxkLJER5wRCg==\n","has_result_set": true}},"status":"","properties":{},"sessions":[]}'
+    curl -X POST https://demo.gethue.com/notebook/api/get_logs --data 'notebook={"type":"hive","sessions":[]}&snippet={"history_id": 17886,"type":"hive","result":{"handle":{"guid": "0J6PwGcSQaCJjagzYUBHzA==\n","secret": "uiP3IS4fR/mxkLJER5wRCg==\n","has_result_set": true}},"status":"","properties":{},"sessions":[]}' --cookie "csrftoken=lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3;sessionid=5msr9s45o4emem1zt009kw64ni6uso3e" -H "X-CSRFToken: lFpBt6uaa8isgjIthEFZdUbofKPI7wJaXpWS0q54YKORs8zWvKgvrKzwUnTjsFt3"
 
     {"status": 0, "progress": 5, "jobs": [], "logs": "", "isFullLogs": false}
 
@@ -367,7 +382,9 @@ Adding/updating a comment with the dummy backend:
 
 ### List
 
-List path `S3A://gethue-demo`:
+Hue's [File Browser](https://docs.gethue.com/user/browsing/#data) offer uploads, downloads and listing of data in HDFS, S3, ADLS storages.
+
+Here is how to list the content of a path, here the S3 bucket `S3A://gethue-demo`:
 
     curl -X GET "https://demo.gethue.com/filebrowser/view=S3A://gethue-demo?pagesize=45&pagenum=1&filter=&sortby=name&descending=false&format=json" --cookie "csrftoken=oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI;sessionid=nkblu68xfofabfsjctdwseaubfbkiwlg" -H "X-CSRFToken: oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI"
 
@@ -422,11 +439,11 @@ List path `S3A://gethue-demo`:
 
 ### Get file content
 
-Get the content and metadata of `s3a://demo-hue/web_log_data/index_data.csv`:
+How to get the file content and its metadata. Here with the public file of demo.gethue.com [s3a://demo-hue/web_log_data/index_data.csv](https://demo.gethue.com/hue/filebrowser/view=s3a%3A%2F%2Fdemo-hue%2Fweb_log_data%2Findex_data.csv):
 
-Note: it needs the `XMLHttpRequest` header to return the data in json:
+**Note** It needs the `XMLHttpRequest` header to return the data in json:
 
-    curl  -X GET "https://demo.gethue.com/filebrowser/view=s3a://demo-hue/web_log_data/index_data.csv?offset=0&length=204800&compression=none&mode=text" --cookie "csrftoken=oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI;sessionid=nkblu68xfofabfsjctdwseaubfbkiwlg" -H "X-CSRFToken: oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI" -H "x-requested-with: XMLHttpRequest"
+    curl  -X GET "https://demo.gethue.com/filebrowser/view=s3a://demo-hue/web_log_data/index_data.csv?offset=0&length=204800&compression=none&mode=text" --cookie "csrftoken=oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI;sessionid=nkblu68xfofabfsjctdwseaubfbkiwlg" -H "X-CSRFToken: oT8C5cQCbmpuoKcUZ2YaxybfLhtRShEO9UcvRWetx4HVatLuf6qicgJnbEHxfJNI" -H "X-requested-with: XMLHttpRequest"
 
     {
       "show_download_button": true,
@@ -439,7 +456,11 @@ Note: it needs the `XMLHttpRequest` header to return the data in json:
       "size": 6199593,
       "aclBit": false,
       ...............
-      "contents": "code,protocol,request,app,user_agent..........
+      "contents": "code,protocol,request,app,user_agent_major,region_code,country_code,id,city,subapp,latitude,method,client_ip,  user_agent_family,bytes,referer,country_name,extension,url,os_major,longitude,device_family,record,user_agent,time,os_family,country_code3
+        200,HTTP/1.1,GET /metastore/table/default/sample_07 HTTP/1.1,metastore,,00,SG,8836e6ce-9a21-449f-a372-9e57641389b3,Singapore,table,1.2931000000000097,GET,128.199.234.236,Other,1041,-,Singapore,,/metastore/table/default/sample_07,,103.85579999999999,Other,"demo.gethue.com:80 128.199.234.236 - - [04/May/2014:06:35:49 +0000] ""GET /metastore/table/default/sample_07 HTTP/1.1"" 200 1041 ""-"" ""Mozilla/5.0 (compatible; phpservermon/3.0.1; +http://www.phpservermonitor.org)""
+        ",Mozilla/5.0 (compatible; phpservermon/3.0.1; +http://www.phpservermonitor.org),2014-05-04T06:35:49Z,Other,SGP
+        200,HTTP/1.1,GET /metastore/table/default/sample_07 HTTP/1.1,metastore,,00,SG,6ddf6e38-7b83-423c-8873-39842dca2dbb,Singapore,table,1.2931000000000097,GET,128.199.234.236,Other,1041,-,Singapore,,/metastore/table/default/sample_07,,103.85579999999999,Other,"demo.gethue.com:80 128.199.234.236 - - [04/May/2014:06:35:50 +0000] ""GET /metastore/table/default/sample_07 HTTP/1.1"" 200 1041 ""-"" ""Mozilla/5.0 (compatible; phpservermon/3.0.1; +http://www.phpservermonitor.org)""
+        ",Mozilla/5.0 (compatible; phpservermon/3.0.1; +http://www.phpservermonitor.org),2014-05-04T06:35:50Z,Other,SGP
       ...............
     }
 
