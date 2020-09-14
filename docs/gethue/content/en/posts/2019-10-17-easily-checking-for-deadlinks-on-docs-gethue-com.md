@@ -38,7 +38,8 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Administration
-  - Version 4.6
+  - Version 4
+# - Version 4.6
 
 ---
 [docs.gethue.com][1] are getting some refreshed content continuously. In addition, a series of links not working (returning a 404) have been fixed. Here is how it was done.

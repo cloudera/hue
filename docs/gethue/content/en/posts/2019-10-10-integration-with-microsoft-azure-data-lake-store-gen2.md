@@ -38,7 +38,8 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Browsing
-  - Version 4.6
+  - Version 4
+# - Version 4.6
 
 ---
 Hue continues its progress to make the Cloud platforms easier to use.
