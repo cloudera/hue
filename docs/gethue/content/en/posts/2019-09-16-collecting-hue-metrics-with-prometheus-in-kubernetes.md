@@ -38,7 +38,8 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Administration
-  - Version 4.6
+  - Version 4
+# - Version 4.6
 
 ---
 Hue is getting easy to run with its [Docker][1] container and Kubernetes [Helm package][2]. Hue metrics are useful for checking the load (how many users), slowness (average or percentile times taken by requests)&#8230; Those have been available via the [/metrics page][3], but here is how to collect and aggregate this information in Kubernetes.
