@@ -20,7 +20,7 @@
   <div id="query-details" class="target detail-panel">
     <div class="row">
       <div class="col-md-12">
-        <div class="query-title">Query Details</div>
+        <div class="query-title">Query Details <span v-if="title">- {{ title }}</span></div>
       </div>
     </div>
     <div class="row" >
@@ -128,30 +128,16 @@
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
+  import {Prop} from 'vue-property-decorator';
   import { QueryModel } from '../index';
 
   @Component
   export default class QueryInfo extends Vue {
-    queryModel: QueryModel;
+    @Prop({ required: true })
+    queryModel!: QueryModel;
 
-    constructor() {
-      super();
-
-      this.queryModel = {
-        appIds: [],
-        dagIds: [],
-        details: {},
-        duration: 0,
-        endTime: 0,
-        queryId: '',
-        requestUser: '',
-        sessionId: '',
-        startTime: 0,
-        status: '',
-        threadId: '',
-        dags: []
-      }
-    }
+    @Prop({ required: false })
+    title?: string;
   }
 </script>
 

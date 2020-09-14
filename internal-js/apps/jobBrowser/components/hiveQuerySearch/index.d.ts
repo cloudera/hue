@@ -22,16 +22,35 @@ export interface Dag {
   }
 }
 
+export interface QueryPerf {
+  compile?: number;
+  parse?: number;
+  PostHiveProtoLoggingHook?: number;
+  RemoveTempOrDuplicateFiles?: number;
+  RenameOrMoveFiles?: number;
+  TezBuildDag?: number;
+  TezRunDag?: number;
+  TezSubmitDag?: number;
+  TezSubmitToRunningDag?: number;
+}
+
+export interface DiffQueryModel {
+  queryOne: QueryModel;
+  queryTwo: QueryModel;
+}
+
 export interface QueryModel {
   appIds: string[]; // TODO: string[]?
   dagIds: string[]; // TODO: string[]?
   dags: Dag[];
   details: {
     diagnostics?: string;
+    perf?: QueryPerf;
   };
   duration: number; // TODO: number?
   endTime: number; // TODO: number?
   llapAppId?: string;
+  query: string;
   queryId: string;
   queueName?: string;
   requestUser: string;
