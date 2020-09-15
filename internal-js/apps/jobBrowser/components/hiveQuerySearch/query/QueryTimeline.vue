@@ -17,42 +17,24 @@
 -->
 
 <template>
-  <div id="timeline" class="target detail-panel" >
-    <div class="row">
-      <div class="col-md-12">
-        <div class="title">Timeline - A</div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-12">
-        <div class="body">
-          <timeline-diff-bars
-              v-if="explainPlanOne && explainPlanOne.details && explainPlanOne.details.perf"
-              :perf="perfOne"
-          ></timeline-diff-bars>
-          <h4 v-else>Data not available to display Timeline!</h4>
+  <div id="timeline" class="target detail-panel">
+    <template v-for='(perf, index) in perfs' :key='perf.title'>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="title">{{ perf.title }}</div>
         </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="col-md-12">
-        <div class="title">Timeline - B</div>
-      </div>
-    </div>
 
-    <div class="row">
-      <div class="col-md-12">
-        <div class="body">
-          <timeline-diff-bars
-              v-if="explainPlanTwo && explainPlanTwo.details && explainPlanTwo.details.perf"
-              :perf="perfTwo"
-          ></timeline-diff-bars>
-          <h4 v-else>Data not available to display Timeline!</h4>
-          <timeline-diff-legend :perf-one="perfOne" :perf-two="perfTwo"></timeline-diff-legend>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="body">
+            <query-timeline-bars v-if="perf" :perf="perf"></query-timeline-bars>
+            <h4 v-else>Data not available to display Timeline!</h4>
+            <query-timeline-legend v-if="perfs.length > 1 && index === perfs.length - 1" :perfs="perfs"></query-timeline-legend>
+          </div>
         </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -60,11 +42,8 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
-  import TimelineDiffLegend from './TimelineDiffLegend.vue';
-  import TimelineDiffBars from './TimelineDiffBars.vue';
-  import TimelineBar from '../../common/TimelineBar.vue';
-  import TimelineBarGroups from '../../common/TimelineBarGroups.vue';
-  import TimelineBars from '../../common/TimelineBars.vue';
+  import QueryTimelineBars from '../query/QueryTimelineBars.vue';
+  import QueryTimelineLegend from '../query/QueryTimelineLegend.vue';
   import { NormalizedQueryPerf, QueryModel } from '../index';
 
   const normalizePerf = (queryModel?: QueryModel): NormalizedQueryPerf => {
@@ -101,28 +80,33 @@
   }
 
   @Component({
-    components: { TimelineDiffLegend, TimelineDiffBars, TimelineBar, TimelineBarGroups, TimelineBars }
+    components: { QueryTimelineLegend, QueryTimelineBars }
   })
-  export default class TimelineDiff extends Vue {
+  export default class QueryTimeline extends Vue {
     @Prop({ required: false })
-    explainPlanOne?: QueryModel;
-
+    queryModels: QueryModel[] = [];
     @Prop({ required: false })
-    explainPlanTwo?: QueryModel;
+    queryModel?: QueryModel;
 
     constructor() {
       super();
+
+      // TODO: Does queryModel change for this component?
+      if (this.queryModel) {
+        this.queryModels.push(this.queryModel);
+      }
     }
 
-    get perfOne(): NormalizedQueryPerf {
-      return normalizePerf(this.explainPlanOne);
-    }
-
-    get perfTwo(): NormalizedQueryPerf {
-      return normalizePerf(this.explainPlanTwo);
+    get perfs(): { title: string, perf: NormalizedQueryPerf }[] {
+      return this.queryModels.map((model, index) => {
+        let title = 'Timeline';
+        if (this.queryModels.length > 1) {
+          title += ' - ' + String.fromCharCode(65 + index);
+        }
+        return { title: title, perf: normalizePerf(model) }
+      });
     }
   }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

@@ -23,16 +23,16 @@
 
     <tabs>
       <tab title="QUERY INFO">
-        <query-info />
+        <query-info :query-model="queryModel"></query-info>
       </tab>
       <tab title="VISUAL EXPLAIN">
         <visual-explain />
       </tab>
       <tab title="QUERY CONFIG">
-        <query-config :query-model="query" />
+        <query-config :query-model="queryModel"></query-config>
       </tab>
       <tab title="TIMELINE">
-        <timeline />
+        <query-timeline :query-model="queryModel"></query-timeline>
       </tab>
     </tabs>
 
@@ -46,19 +46,19 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
+  import QueryTimeline from './QueryTimeline.vue';
   import { QueryModel } from '../index';
   import DagDetails from './DagDetails.vue';
   import QueryConfig from './QueryConfig.vue';
   import QueryInfo from './QueryInfo.vue';
-  import Timeline from './Timeline.vue';
   import VisualExplain from './VisualExplain.vue';
 
   @Component({
-    components: { DagDetails, Timeline, QueryConfig, VisualExplain, QueryInfo }
+    components: { QueryTimeline, DagDetails, QueryConfig, VisualExplain, QueryInfo }
   })
   export default class Query extends Vue {
     @Prop({ required: true })
-    query!: QueryModel;
+    queryModel!: QueryModel;
 
     isDagEmpty(): boolean {
       return false; // TODO: Implement

@@ -52,7 +52,7 @@
   @Component({
     components: { TimelineBarSubGroups, TimelineBar, TimelineBarGroups, TimelineBars }
   })
-  export default class TimelineDiffBars extends Vue {
+  export default class QueryTimelineBars extends Vue {
     @Prop({ required: true })
     perf!: NormalizedQueryPerf;
   }

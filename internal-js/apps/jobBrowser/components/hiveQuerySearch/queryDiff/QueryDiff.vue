@@ -28,8 +28,7 @@
     </div>
     <visual-explain-diff :explain-plan-one="diffModel.queryOne" :explain-plan-two="diffModel.queryTwo"></visual-explain-diff>
     <query-config :query-models="[diffModel.queryOne, diffModel.queryTwo]"></query-config>
-    <config-diff :explain-plan-one="diffModel.queryOne" :explain-plan-two="diffModel.queryTwo"></config-diff>
-    <timeline-diff :explain-plan-one="diffModel.queryOne" :explain-plan-two="diffModel.queryTwo"></timeline-diff>
+    <query-timeline :query-models="[diffModel.queryOne, diffModel.queryTwo]"></query-timeline>
     <div v-if="!isDagEmpty()" id="dag-panel" class="target detail-panel dag-panel">
       <div class="row">
         <div class="col-xs-6">
@@ -60,8 +59,8 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
+  import QueryTimeline from '../query/QueryTimeline.vue';
   import QueryConfig from '../query/QueryConfig.vue';
-  import TimelineDiff from './TimelineDiff.vue';
   import VisualExplainDiff from '../queryDiff/VisualExplainDiff.vue';
   import QueryTextDiff from '../../common/QueryTextDiff.vue';
   import Tab from '../../common/Tab.vue';
@@ -75,13 +74,13 @@
 
   @Component({
     components: {
-      QueryConfig, TimelineDiff, VisualExplainDiff, QueryTextDiff, DagConfigs, DagCounters,
+      QueryTimeline, QueryConfig, VisualExplainDiff, QueryTextDiff, DagConfigs, DagCounters,
       DagGraphicalView, DagSwimlane, Tab, Tabs, QueryInfo
     }
   })
   export default class QueryDiff extends Vue {
     @Prop({ required: true })
-    diffModel!: DiffQueryModel
+    diffModel!: DiffQueryModel; // TODO: Consider diffModel: QueryModel[]
 
     selectedDagId1?: string;
     selectedDagId2?: string;
