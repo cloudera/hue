@@ -18,56 +18,42 @@
 
 <template>
   <div id="dag-panel" class="target detail-panel dag-panel">
+    <select v-if="queryModel.dags.length > 1" v-model="selectedDagId" @change="dagSelected($event.target.value)" class="form-control">
+      <option v-for="dag in queryModel.dags" v-bind:value="dag.dagInfo.dagId">{{ dag.dagInfo.dagId }}</option>
+    </select>
 
-  <select v-if="queryModel.dags.length > 1" v-model="selectedDagId" @change="dagSelected($event.target.value)" class="form-control">
-    <option v-for="dag in queryModel.dags" v-bind:value="dag.dagInfo.dagId">{{ dag.dagInfo.dagId }}</option>
-  </select>
+    <br/>
 
-  <br/>
-
-  <!-- {{#bs-tab fade=false as |tab|}} -->
-  <tabs>
-    <tab title="DAG INFO"><dag-swimlane></dag-swimlane></tab>
-    <tab title="DAG FLOW"><dag-graphical-view></dag-graphical-view></tab>
-    <tab title="DAG COUNTERS"><dag-counters></dag-counters></tab>
-    <tab title="DAG CONFIGURATIONS"><dag-configs></dag-configs></tab>
-  </tabs>
-  <!-- {{/bs-tab}} -->
-</div>
+    <!-- {{#bs-tab fade=false as |tab|}} -->
+    <tabs>
+      <tab title="DAG INFO"><dag-swimlane></dag-swimlane></tab>
+      <tab title="DAG FLOW"><dag-graphical-view></dag-graphical-view></tab>
+      <tab title="DAG COUNTERS"><dag-counters></dag-counters></tab>
+      <tab title="DAG CONFIGURATIONS"><dag-configs></dag-configs></tab>
+    </tabs>
+    <!-- {{/bs-tab}} -->
+  </div>
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
   import Component from 'vue-class-component';
+  import QueryComponent from './QueryComponent.vue';
   import Tab from '../../common/Tab.vue';
   import Tabs from '../../common/Tabs.vue';
-  import { Dag, QueryModel } from '../index';
+  import { Dag } from '../index';
   import DagConfigs from './DagConfigs.vue';
   import DagCounters from './DagCounters.vue';
   import DagGraphicalView from './DagGraphicalView.vue';
   import DagSwimlane from './DagSwimlane.vue';
-  import QueryConfig from './QueryConfig.vue';
-  import QueryInfo from './QueryInfo.vue';
-  import Timeline from './Timeline.vue';
-  import VisualExplain from './VisualExplain.vue';
 
   @Component({
     components: {
-      Tab, Tabs, DagConfigs, DagCounters, DagGraphicalView, DagSwimlane, Timeline, QueryConfig,
-      VisualExplain, QueryInfo
+      Tab, Tabs, DagConfigs, DagCounters, DagGraphicalView, DagSwimlane
     }
   })
 
-  export default class DagDetails extends Vue {
+  export default class DagDetails extends QueryComponent {
     selectedDagId?: string;
-    queryModel: QueryModel;
-
-    constructor() {
-      super();
-      this.queryModel = {
-        dags: []
-      }
-    }
 
     dagSelected(dag: Dag) {
       // TODO: Implement

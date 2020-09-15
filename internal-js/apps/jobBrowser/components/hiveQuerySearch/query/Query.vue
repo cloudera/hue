@@ -26,7 +26,7 @@
         <query-info :query-model="queryModel"></query-info>
       </tab>
       <tab title="VISUAL EXPLAIN">
-        <visual-explain />
+        <visual-explain :query-model="queryModel"></visual-explain>
       </tab>
       <tab title="QUERY CONFIG">
         <query-config :query-model="queryModel"></query-config>

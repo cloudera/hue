@@ -53,11 +53,6 @@ export interface QueryPerf {
   TezSubmitToRunningDag?: number;
 }
 
-export interface DiffQueryModel {
-  queryOne: QueryModel;
-  queryTwo: QueryModel;
-}
-
 export interface QueryModel {
   appIds: string[]; // TODO: string[]?
   dagIds: string[]; // TODO: string[]?

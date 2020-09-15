@@ -17,7 +17,8 @@
 -->
 
 <template>
-  <div />
+  <div>DagCounters - Not Implemented</div>
+  <!-- TODO: Implement -->
 </template>
 
 <script lang="ts">

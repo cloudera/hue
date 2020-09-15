@@ -17,15 +17,16 @@
 -->
 
 <template>
-  <div />
+  <div>VisualExplain - Not Implemented</div>
+  <!-- TODO: Implement -->
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
   import Component from 'vue-class-component';
+  import QueryComponent from './QueryComponent.vue';
 
   @Component
-  export default class VisualExplain extends Vue {}
+  export default class VisualExplain extends QueryComponent {}
 </script>
 
 <style lang="scss" scoped></style>

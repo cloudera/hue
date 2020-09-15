@@ -27,12 +27,12 @@
       <div class="col-md-4">
         <div class="query-details-row">
           <label class="query-details-label">Query ID</label>
-          <div class="query-details-value">{{ querymodel.queryId }}</div>
+          <div class="query-details-value">{{ queryModel.queryId }}</div>
         </div>
 
         <div class="query-details-row">
           <label class="query-details-label">User</label>
-          <div class="query-details-value">{{ querymodel.requestUser }}</div>
+          <div class="query-details-value">{{ queryModel.requestUser }}</div>
         </div>
 
         <div class="query-details-row">
@@ -89,12 +89,12 @@
 
         <div class="query-details-row">
           <label class="query-details-label">Session ID</label>
-          <div class="query-details-value">{{ querymodel.sessionId }}</div>
+          <div class="query-details-value">{{ queryModel.sessionId }}</div>
         </div>
 
         <div v-if="queryModel.llapAppId" class="query-details-row">
           <label class="query-details-label">LLAP App ID</label>
-          <div class="query-details-value">{{ querymodel.llapAppId }}</div>
+          <div class="query-details-value">{{ queryModel.llapAppId }}</div>
         </div>
 
         <div class="query-details-row">
@@ -126,15 +126,12 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
   import Component from 'vue-class-component';
   import {Prop} from 'vue-property-decorator';
-  import { QueryModel } from '../index';
+  import QueryComponent from './QueryComponent.vue';
 
   @Component
-  export default class QueryInfo extends Vue {
-    @Prop({ required: true })
-    queryModel!: QueryModel;
+  export default class QueryInfo extends QueryComponent {
 
     @Prop({ required: false })
     title?: string;

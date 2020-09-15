@@ -20,25 +20,25 @@
   <div class="query-diff">
     <div style="clear:both"></div>
     <div id="query-details" class="target">
-      <div class="diff-panel"><query-info title="A" :query-model="diffModel.queryOne"></query-info></div>
-      <div class="diff-panel"><query-info title="B" :query-model="diffModel.queryTwo"></query-info></div>
+      <div class="diff-panel"><query-info title="A" :query-model="queryModels[0]"></query-info></div>
+      <div class="diff-panel"><query-info title="B" :query-model="queryModels[1]"></query-info></div>
       <div class="query-diff-highlighter" style="clear:both;">
-        <query-text-diff :query-one="diffModel.queryOne.query" :query-two="diffModel.queryTwo.query"></query-text-diff>
+        <query-text-diff :query-one="queryModels[0].query" :query-two="queryModels[1]"></query-text-diff>
       </div>
     </div>
-    <visual-explain-diff :explain-plan-one="diffModel.queryOne" :explain-plan-two="diffModel.queryTwo"></visual-explain-diff>
-    <query-config :query-models="[diffModel.queryOne, diffModel.queryTwo]"></query-config>
-    <query-timeline :query-models="[diffModel.queryOne, diffModel.queryTwo]"></query-timeline>
+    <query-visual-explain :query-models="queryModels"></query-visual-explain>
+    <query-config :query-models="queryModels"></query-config>
+    <query-timeline :query-models="queryModels"></query-timeline>
     <div v-if="!isDagEmpty()" id="dag-panel" class="target detail-panel dag-panel">
       <div class="row">
         <div class="col-xs-6">
-          <select v-if="diffModel.queryOne.dags.length > 1" v-model="selectedDagId1" @change="dagSelected1($event.target.value)" class="form-control">
-            <option v-for="dag in diffModel.queryOne.dags" v-bind:value="dag.dagInfo.dagId">{{ dag.dagInfo.dagId }}</option>
+          <select v-if="queryModels[0].dags.length > 1" v-model="selectedDagId1" @change="dagSelected1($event.target.value)" class="form-control">
+            <option v-for="dag in queryModels[0].dags" v-bind:value="dag.dagInfo.dagId">{{ dag.dagInfo.dagId }}</option>
           </select>
         </div>
         <div class="col-xs-6">
-          <select v-if="diffModel.queryTwo.dags.length > 1" v-model="selectedDagId2" @change="dagSelected2($event.target.value)" class="form-control">
-            <option v-for="dag in diffModel.queryTwo.dags" v-bind:value="dag.dagInfo.dagId">{{ dag.dagInfo.dagId }}</option>
+          <select v-if="queryModels[1].dags.length > 1" v-model="selectedDagId2" @change="dagSelected2($event.target.value)" class="form-control">
+            <option v-for="dag in queryModels[1].dags" v-bind:value="dag.dagInfo.dagId">{{ dag.dagInfo.dagId }}</option>
           </select>
         </div>
       </div>
@@ -56,12 +56,11 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
   import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import QueryComponent from '../query/QueryComponent.vue';
+  import QueryVisualExplain from '../query/QueryVisualExplain.vue';
   import QueryTimeline from '../query/QueryTimeline.vue';
   import QueryConfig from '../query/QueryConfig.vue';
-  import VisualExplainDiff from '../queryDiff/VisualExplainDiff.vue';
   import QueryTextDiff from '../../common/QueryTextDiff.vue';
   import Tab from '../../common/Tab.vue';
   import Tabs from '../../common/Tabs.vue';
@@ -69,21 +68,25 @@
   import DagCounters from '../query/DagCounters.vue';
   import DagGraphicalView from '../query/DagGraphicalView.vue';
   import DagSwimlane from '../query/DagSwimlane.vue';
-  import { Dag, DiffQueryModel } from '../index';
+  import { Dag } from '../index';
   import QueryInfo from '../query/QueryInfo.vue';
 
   @Component({
     components: {
-      QueryTimeline, QueryConfig, VisualExplainDiff, QueryTextDiff, DagConfigs, DagCounters,
+      QueryVisualExplain, QueryTimeline, QueryConfig, QueryTextDiff, DagConfigs, DagCounters,
       DagGraphicalView, DagSwimlane, Tab, Tabs, QueryInfo
     }
   })
-  export default class QueryDiff extends Vue {
-    @Prop({ required: true })
-    diffModel!: DiffQueryModel; // TODO: Consider diffModel: QueryModel[]
-
+  export default class QueryDiff extends QueryComponent {
     selectedDagId1?: string;
     selectedDagId2?: string;
+
+    constructor() {
+      super();
+      if (this.queryModels.length !== 2) {
+        throw new Error(`Got ${this.queryModels.length}, expected 2 for diff.`)
+      }
+    }
 
     isDagEmpty(): boolean {
       return false; // TODO: Implement
