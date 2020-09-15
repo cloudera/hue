@@ -17,17 +17,30 @@
 -->
 
 <template>
-  <div class="timeline-bars">
-    <slot />
-  </div>
+  <div class="bar" v-bind:style="{ width: barWidth + '%' }" title="{{ title }}">{{ title }}</div>
 </template>
 
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
+  import { Prop } from 'vue-property-decorator';
 
   @Component
-  export default class TimelineBars extends Vue {}
+  export default class Bar extends Vue {
+    @Prop({ required: false })
+    title?: string;
+    @Prop({ required: true })
+    value!: number;
+    @Prop({ required: true })
+    total!: number;
+
+    barWidth: number = 0;
+
+    mounted() {
+      this.barWidth = Math.round((this.value / this.total) * 100);
+    }
+  }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+</style>

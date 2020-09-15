@@ -17,27 +17,35 @@
 -->
 
 <template>
-  <div class="bar" v-bind:style="{ width: barWidth + '%' }" title="{{ title }}">{{ title }}</div>
+  <a href="javascript: void(0);" class="btn btn-success btn-sm">Queries (implement)</a>
+
+  <div class="buttons">
+    <template v-if="!queryModel.isComplete">
+      <button v-if="stoppingQuery" type="button" class="btn btn-default btn-sm disabled">
+        <i class="fa fa-spinner fa-pulse fa-fw"></i> Stopping query
+      </button>
+      <button v-else type="button" class="btn btn-warning btn-sm" v-on:click="stopQuery">Stop</button>
+    </template>
+
+    <button type="button" class="btn btn-success btn-sm" v-on:click="downloadLogs">DOWNLOAD</button>
+  </div>
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
   import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import QueryComponent from './QueryComponent.vue';
 
   @Component
-  export default class TimelineBar extends Vue {
-    @Prop({ required: false })
-    title?: string;
-    @Prop({ required: true })
-    value!: number;
-    @Prop({ required: true })
-    total!: number;
+  export default class FixedAnchorNav extends QueryComponent {
+    stoppingQuery: boolean = false;
 
-    barWidth: number = 0;
+    stopQuery() {
+      this.stoppingQuery = true;
+      // TODO: Implement (see fixed-anchor-nav.js)
+    }
 
-    mounted() {
-      this.barWidth = Math.round((this.value / this.total) * 100);
+    downloadLogs() {
+      // TODO: Implement (see fixed-anchor-nav.js)
     }
   }
 </script>

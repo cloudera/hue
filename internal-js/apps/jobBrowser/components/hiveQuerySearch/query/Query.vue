@@ -18,7 +18,7 @@
 
 <template>
   <div class="dag-panel">
-    <!-- {{fixed-anchor-nav anchors=queryDetailsTabsMod querymodel=querymodel}} -->
+    <fixed-anchor-nav :query-model="queryModel"></fixed-anchor-nav>
     <!-- {{#bs-tab fade=false as |tab|}} -->
 
     <tabs>
@@ -46,6 +46,7 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
+  import FixedAnchorNav from './FixedAnchorNav.vue';
   import QueryTimeline from './QueryTimeline.vue';
   import { QueryModel } from '../index';
   import DagDetails from './DagDetails.vue';
@@ -54,7 +55,7 @@
   import VisualExplain from './VisualExplain.vue';
 
   @Component({
-    components: { QueryTimeline, DagDetails, QueryConfig, VisualExplain, QueryInfo }
+    components: { FixedAnchorNav, QueryTimeline, DagDetails, QueryConfig, VisualExplain, QueryInfo }
   })
   export default class Query extends Vue {
     @Prop({ required: true })

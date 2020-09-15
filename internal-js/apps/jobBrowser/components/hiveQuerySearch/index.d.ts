@@ -64,6 +64,7 @@ export interface QueryModel {
   };
   duration: number; // TODO: number?
   endTime: number; // TODO: number?
+  isComplete: boolean;
   llapAppId?: string;
   query: string;
   queryId: string;
