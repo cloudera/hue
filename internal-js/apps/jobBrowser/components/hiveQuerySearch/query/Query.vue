@@ -23,23 +23,23 @@
 
     <tabs>
       <tab title="QUERY INFO">
-        <query-info></query-info>
+        <query-info />
       </tab>
       <tab title="VISUAL EXPLAIN">
-        <visual-explain></visual-explain>
+        <visual-explain />
       </tab>
       <tab title="QUERY CONFIG">
-        <query-config></query-config>
+        <query-config />
       </tab>
       <tab title="TIMELINE">
-        <timeline></timeline>
+        <timeline />
       </tab>
     </tabs>
 
     <!-- {{/bs-tab}} -->
   </div>
 
-  <dag-details v-if="!isDagEmpty()"></dag-details>
+  <dag-details v-if="!isDagEmpty()" />
 </template>
 
 <script lang="ts">
@@ -54,13 +54,11 @@
   @Component({
     components: { DagDetails, Timeline, QueryConfig, VisualExplain, QueryInfo }
   })
-
   export default class Query extends Vue {
     isDagEmpty(): boolean {
       return false; // TODO: Implement
     }
   }
-
 </script>
 
 <style lang="scss" scoped>

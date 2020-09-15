@@ -17,8 +17,8 @@
 -->
 
 <template>
-  <div v-show='isActive'>
-    <slot></slot>
+  <div v-show="isActive">
+    <slot />
   </div>
 </template>
 
@@ -32,5 +32,4 @@
   }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

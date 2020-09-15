@@ -19,7 +19,7 @@
 export interface Dag {
   dagInfo: {
     dagId: string;
-  }
+  };
 }
 
 export interface NormalizedQueryPerf {
@@ -65,6 +65,7 @@ export interface QueryModel {
   details: {
     diagnostics?: string;
     perf?: QueryPerf;
+    configuration?: { [key: string]: string }; // TODO: value always string?
   };
   duration: number; // TODO: number?
   endTime: number; // TODO: number?

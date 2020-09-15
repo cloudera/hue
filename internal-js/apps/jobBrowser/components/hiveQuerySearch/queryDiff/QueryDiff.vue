@@ -26,11 +26,8 @@
         <query-text-diff :query-one="diffModel.queryOne.query" :query-two="diffModel.queryTwo.query"></query-text-diff>
       </div>
     </div>
-    <div>
-      <visual-explain-diff :explain-plan-one="diffModel.queryOne" :explain-plan-two="diffModel.queryTwo"></visual-explain-diff>
-      <!-- {{vs-exp-diff explainPlan1=query1 explainPlan2=query2 planId1="vs-exp-container1" planId2="vs-exp-container2"}} -->
-    </div>
-    <!-- {{outlet 'configs'}} -->
+    <visual-explain-diff :explain-plan-one="diffModel.queryOne" :explain-plan-two="diffModel.queryTwo"></visual-explain-diff>
+    <config-diff :explain-plan-one="diffModel.queryOne" :explain-plan-two="diffModel.queryTwo"></config-diff>
     <timeline-diff :explain-plan-one="diffModel.queryOne" :explain-plan-two="diffModel.queryTwo"></timeline-diff>
     <div v-if="!isDagEmpty()" id="dag-panel" class="target detail-panel dag-panel">
       <div class="row">
@@ -62,6 +59,7 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
+  import ConfigDiff from './ConfigDiff.vue';
   import TimelineDiff from './TimelineDiff.vue';
   import VisualExplainDiff from '../queryDiff/VisualExplainDiff.vue';
   import QueryTextDiff from '../../common/QueryTextDiff.vue';
@@ -76,7 +74,7 @@
 
   @Component({
     components: {
-      TimelineDiff, VisualExplainDiff, QueryTextDiff, DagConfigs, DagCounters,
+      ConfigDiff, TimelineDiff, VisualExplainDiff, QueryTextDiff, DagConfigs, DagCounters,
       DagGraphicalView, DagSwimlane, Tab, Tabs, QueryInfo
     }
   })

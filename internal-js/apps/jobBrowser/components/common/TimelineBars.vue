@@ -18,7 +18,7 @@
 
 <template>
   <div class="timeline-bars">
-    <slot></slot>
+    <slot />
   </div>
 </template>
 
@@ -30,5 +30,4 @@
   export default class TimelineBars extends Vue {}
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div></div>
+  <div />
 </template>
 
 <script lang="ts">
@@ -28,5 +28,4 @@
   export default class DagGraphicalView extends Vue {}
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>
