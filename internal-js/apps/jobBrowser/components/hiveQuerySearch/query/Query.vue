@@ -29,7 +29,7 @@
         <visual-explain />
       </tab>
       <tab title="QUERY CONFIG">
-        <query-config />
+        <query-config :query-model="query" />
       </tab>
       <tab title="TIMELINE">
         <timeline />
@@ -45,6 +45,8 @@
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
+  import { Prop } from 'vue-property-decorator';
+  import { QueryModel } from '../index';
   import DagDetails from './DagDetails.vue';
   import QueryConfig from './QueryConfig.vue';
   import QueryInfo from './QueryInfo.vue';
@@ -55,6 +57,9 @@
     components: { DagDetails, Timeline, QueryConfig, VisualExplain, QueryInfo }
   })
   export default class Query extends Vue {
+    @Prop({ required: true })
+    query!: QueryModel;
+
     isDagEmpty(): boolean {
       return false; // TODO: Implement
     }
