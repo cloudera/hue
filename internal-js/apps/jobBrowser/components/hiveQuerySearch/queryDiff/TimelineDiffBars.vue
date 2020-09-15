@@ -19,22 +19,22 @@
 <template>
   <timeline-bars>
     <timeline-bar-groups>
-      <timeline-bar :total="extendedPerf.total" :value="extendedPerf.groupTotal.pre" title="Pre-Execution + DAG construction"></timeline-bar>
-      <timeline-bar :total="extendedPerf.total" :value="extendedPerf.groupTotal.submit" title="DAG Submission"></timeline-bar>
-      <timeline-bar :total="extendedPerf.total" :value="extendedPerf.groupTotal.running" title="DAG Runtime"></timeline-bar>
-      <timeline-bar :total="extendedPerf.total" :value="extendedPerf.groupTotal.pre" title="Pre-Execution + DAG construction"></timeline-bar>
-      <timeline-bar :total="extendedPerf.total" :value="extendedPerf.groupTotal.post" title="Post Execution"></timeline-bar>
+      <timeline-bar :total="perf.total" :value="perf.groupTotal.pre" title="Pre-Execution + DAG construction"></timeline-bar>
+      <timeline-bar :total="perf.total" :value="perf.groupTotal.submit" title="DAG Submission"></timeline-bar>
+      <timeline-bar :total="perf.total" :value="perf.groupTotal.running" title="DAG Runtime"></timeline-bar>
+      <timeline-bar :total="perf.total" :value="perf.groupTotal.pre" title="Pre-Execution + DAG construction"></timeline-bar>
+      <timeline-bar :total="perf.total" :value="perf.groupTotal.post" title="Post Execution"></timeline-bar>
     </timeline-bar-groups>
     <timeline-bar-sub-groups>
-      <timeline-bar :total="extendedPerf.total" :value="extendedPerf.compile" title="Compile"></timeline-bar>
-      <timeline-bar :total="extendedPerf.total" :value="extendedPerf.parse" title="Parse"></timeline-bar>
-      <timeline-bar :total="extendedPerf.total" :value="extendedPerf.TezBuildDag" title="Build Dag"></timeline-bar>
-      <timeline-bar :total="extendedPerf.total" :value="extendedPerf.TezSubmitDag" title="Submit Dag"></timeline-bar>
-      <timeline-bar :total="extendedPerf.total" :value="extendedPerf.TezSubmitToRunningDag" title="Submit To Running"></timeline-bar>
-      <timeline-bar :total="extendedPerf.total" :value="extendedPerf.TezRunDag" title="Run Dag"></timeline-bar>
-      <timeline-bar :total="extendedPerf.total" :value="extendedPerf.PostHiveProtoLoggingHook" title="Post ATS Hook"></timeline-bar>
-      <timeline-bar :total="extendedPerf.total" :value="extendedPerf.RemoveTempOrDuplicateFiles" title="Remove Files"></timeline-bar>
-      <timeline-bar :total="extendedPerf.total" :value="extendedPerf.RenameOrMoveFiles" title="Rename Or Move Files"></timeline-bar>
+      <timeline-bar :total="perf.total" :value="perf.compile" title="Compile"></timeline-bar>
+      <timeline-bar :total="perf.total" :value="perf.parse" title="Parse"></timeline-bar>
+      <timeline-bar :total="perf.total" :value="perf.TezBuildDag" title="Build Dag"></timeline-bar>
+      <timeline-bar :total="perf.total" :value="perf.TezSubmitDag" title="Submit Dag"></timeline-bar>
+      <timeline-bar :total="perf.total" :value="perf.TezSubmitToRunningDag" title="Submit To Running"></timeline-bar>
+      <timeline-bar :total="perf.total" :value="perf.TezRunDag" title="Run Dag"></timeline-bar>
+      <timeline-bar :total="perf.total" :value="perf.PostHiveProtoLoggingHook" title="Post ATS Hook"></timeline-bar>
+      <timeline-bar :total="perf.total" :value="perf.RemoveTempOrDuplicateFiles" title="Remove Files"></timeline-bar>
+      <timeline-bar :total="perf.total" :value="perf.RenameOrMoveFiles" title="Rename Or Move Files"></timeline-bar>
     </timeline-bar-sub-groups>
   </timeline-bars>
 </template>
@@ -47,48 +47,14 @@
   import TimelineBarGroups from '../../common/TimelineBarGroups.vue';
   import TimelineBars from '../../common/TimelineBars.vue';
   import TimelineBarSubGroups from '../../common/TimelineBarSubGroups.vue';
-  import { QueryPerf } from '../index';
+  import { NormalizedQueryPerf } from '../index';
 
   @Component({
     components: { TimelineBarSubGroups, TimelineBar, TimelineBarGroups, TimelineBars }
   })
-  export default class TimelineDiff extends Vue {
-    @Prop({ required: false })
-    perf?: QueryPerf;
-
-    extendedPerf = {
-      compile: 0,
-      groupTotal: {
-        pre: 0,
-        submit: 0,
-        running: 0,
-        post: 0
-      },
-      parse: 0,
-      PostHiveProtoLoggingHook: 0,
-      RemoveTempOrDuplicateFiles: 0,
-      RenameOrMoveFiles: 0,
-      TezBuildDag: 0,
-      TezRunDag: 0,
-      TezSubmitDag: 0,
-      TezSubmitToRunningDag: 0,
-      total: 0
-    }
-
-    constructor() {
-      super();
-      Object.assign(this.extendedPerf, this.perf);
-
-      this.extendedPerf.groupTotal.post = this.extendedPerf.PostHiveProtoLoggingHook + this.extendedPerf.RemoveTempOrDuplicateFiles + this.extendedPerf.RenameOrMoveFiles;
-      this.extendedPerf.groupTotal.pre = this.extendedPerf.compile + this.extendedPerf.parse + this.extendedPerf.TezBuildDag;
-      this.extendedPerf.groupTotal.running = this.extendedPerf.TezRunDag;
-      this.extendedPerf.groupTotal.submit = this.extendedPerf.TezSubmitDag + this.extendedPerf.TezSubmitToRunningDag;
-
-      this.extendedPerf.total = this.extendedPerf.groupTotal.pre +
-          this.extendedPerf.groupTotal.submit +
-          this.extendedPerf.groupTotal.running +
-          this.extendedPerf.groupTotal.post;
-    }
+  export default class TimelineDiffBars extends Vue {
+    @Prop({ required: true })
+    perf!: NormalizedQueryPerf;
   }
 </script>
 

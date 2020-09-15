@@ -49,7 +49,7 @@
           <div v-if="!explainPlanTwo" class="explain--error">
             <div>No Visual Explain available.</div>
           </div>
-          <visual-explain v-else ></visual-explain>
+          <visual-explain v-else></visual-explain>
           <!-- {{visual-explain planId=planId2
             expandQueryResultPanel='expandQueryResultPanel'
             visualExplainJson=explainPlanTwo

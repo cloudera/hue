@@ -31,7 +31,7 @@
       <!-- {{vs-exp-diff explainPlan1=query1 explainPlan2=query2 planId1="vs-exp-container1" planId2="vs-exp-container2"}} -->
     </div>
     <!-- {{outlet 'configs'}} -->
-    <timeline-diff :explainPlanOne="diffModel.queryOne" :explainPlanTwo="diffModel.queryTwo"></timeline-diff>
+    <timeline-diff :explain-plan-one="diffModel.queryOne" :explain-plan-two="diffModel.queryTwo"></timeline-diff>
     <div v-if="!isDagEmpty()" id="dag-panel" class="target detail-panel dag-panel">
       <div class="row">
         <div class="col-xs-6">

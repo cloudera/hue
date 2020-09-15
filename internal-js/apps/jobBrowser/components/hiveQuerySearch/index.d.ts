@@ -22,6 +22,25 @@ export interface Dag {
   }
 }
 
+export interface NormalizedQueryPerf {
+  compile: number;
+  groupTotal: {
+    pre: number;
+    submit: number;
+    running: number;
+    post: number;
+  };
+  parse: number;
+  PostHiveProtoLoggingHook: number;
+  RemoveTempOrDuplicateFiles: number;
+  RenameOrMoveFiles: number;
+  TezBuildDag: number;
+  TezRunDag: number;
+  TezSubmitDag: number;
+  TezSubmitToRunningDag: number;
+  total: number;
+}
+
 export interface QueryPerf {
   compile?: number;
   parse?: number;
