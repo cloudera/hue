@@ -715,7 +715,13 @@ def import_workflow(workflow, workflow_definition, metadata=None, fs=None):
 
 def generate_v2_graph_nodes(workflow_definition):
   # Parse Workflow Definition
-  workflow_definition_root = etree.fromstring(workflow_definition)
+  if sys.version_info[0] > 2:
+    # In Py3 anything like <?xml version="1.0" encoding="UTF-8"?> at the beginning
+    # of a workflow XML cannot be parsed via etree.fromstring(), since the
+    # workflow_definition string needs to be encoded.
+    workflow_definition_root = etree.XML(workflow_definition.encode())
+  else:
+    workflow_definition_root = etree.fromstring(workflow_definition)
   if workflow_definition_root is None:
     raise MalformedWfDefException()
 
