@@ -654,7 +654,10 @@ class HTTPRequest(object):
         # exc_info tuple."
         if self.sent_headers:
             try:
-                raise exc_info[0], exc_info[1], exc_info[2]
+                if sys.version_info[0] > 2:
+                    raise (exc_info[0], exc_info[1], exc_info[2])
+                else:
+                    raise exc_info[0], exc_info[1], exc_info[2]
             finally:
                 exc_info = None
 
