@@ -20,7 +20,7 @@
   <a href="javascript: void(0);" class="btn btn-success btn-sm">Queries (implement)</a>
 
   <div class="buttons">
-    <template v-if="!queryModel.isComplete">
+    <template v-if="!query.isComplete">
       <button v-if="stoppingQuery" type="button" class="btn btn-default btn-sm disabled">
         <i class="fa fa-spinner fa-pulse fa-fw"></i> Stopping query
       </button>

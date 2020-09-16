@@ -50,9 +50,9 @@
   import QueryComponent from './QueryComponent.vue';
   import QueryTimelineBars from '../query/QueryTimelineBars.vue';
   import QueryTimelineLegend from '../query/QueryTimelineLegend.vue';
-  import { NormalizedQueryPerf, QueryModel } from '../index';
+  import { NormalizedQueryPerf, Query } from '../index';
 
-  const normalizePerf = (queryModel?: QueryModel): NormalizedQueryPerf => {
+  const normalizePerf = (query?: Query): NormalizedQueryPerf => {
     const result = Object.assign(
       {
         compile: 0,
@@ -72,7 +72,7 @@
         TezSubmitToRunningDag: 0,
         total: 0
       },
-      queryModel && queryModel.details && queryModel.details.perf
+      query && query.details && query.details.perf
     );
 
     result.groupTotal.post =
@@ -97,12 +97,12 @@
   })
   export default class QueryTimeline extends QueryComponent {
     get perfs(): { title: string; perf: NormalizedQueryPerf }[] {
-      return this.queryModels.map((model, index) => {
+      return this.queries.map((query, index) => {
         let title = 'Timeline';
-        if (this.queryModels.length > 1) {
+        if (this.queries.length > 1) {
           title += ' - ' + this.numberToLetter(index);
         }
-        return { title: title, perf: normalizePerf(model) };
+        return { title: title, perf: normalizePerf(query) };
       });
     }
   }

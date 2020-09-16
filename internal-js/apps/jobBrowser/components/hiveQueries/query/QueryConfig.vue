@@ -23,7 +23,7 @@
         <div class="title">
           Configurations
         </div>
-        <label v-if="queryModels.length > 1"><input v-model="showDifferences" type="checkbox" > Show Differences</label>
+        <label v-if="queries.length > 1"><input v-model="showDifferences" type="checkbox" > Show Differences</label>
       </div>
     </div>
 
@@ -55,9 +55,9 @@
           key: 'configName'
         }
       ];
-      this.queryModels.forEach((model, index) => {
+      this.queries.forEach((query, index) => {
         let label = 'Configuration Value';
-        if (this.queryModels.length > 1) {
+        if (this.queries.length > 1) {
           label += ' - ' + this.numberToLetter(index);
         }
         columns.push({
@@ -71,9 +71,9 @@
     get configRows(): Row[] {
       const allConfigKeys: string[] = [];
 
-      this.queryModels.forEach(model => {
-        if (model.details && model.details.configuration) {
-          allConfigKeys.push(...Object.keys(model.details.configuration));
+      this.queries.forEach(query => {
+        if (query.details && query.details.configuration) {
+          allConfigKeys.push(...Object.keys(query.details.configuration));
         }
       });
       allConfigKeys.sort((a, b) => a.localeCompare(b));
@@ -86,8 +86,8 @@
 
         let hasDifferences = false;
         let previousConfigValue: unknown = undefined;
-        this.queryModels.forEach((model, index) => {
-          const config = (model.details && model.details.configuration) || {};
+        this.queries.forEach((query, index) => {
+          const config = (query.details && query.details.configuration) || {};
           row['configurationValue' + index] = config[configKey];
           if (index > 0 && !hasDifferences) {
             hasDifferences = previousConfigValue !== config[configKey];
@@ -95,7 +95,7 @@
           previousConfigValue = config[configKey];
         });
 
-        if (this.queryModels.length === 1 || !this.showDifferences || hasDifferences) {
+        if (this.queries.length === 1 || !this.showDifferences || hasDifferences) {
           result.push(row);
         }
       });

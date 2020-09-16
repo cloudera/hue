@@ -20,25 +20,25 @@
   <div class="query-diff">
     <div style="clear:both"></div>
     <div id="query-details" class="target">
-      <div class="diff-panel"><query-info title="A" :query-model="queryModels[0]"></query-info></div>
-      <div class="diff-panel"><query-info title="B" :query-model="queryModels[1]"></query-info></div>
+      <div class="diff-panel"><query-info title="A" :query="queries[0]"></query-info></div>
+      <div class="diff-panel"><query-info title="B" :query="queries[1]"></query-info></div>
       <div class="query-diff-highlighter" style="clear:both;">
-        <query-text-diff :query-one="queryModels[0].query" :query-two="queryModels[1]"></query-text-diff>
+        <query-text-diff :query-one="queries[0].query" :query-two="queries[1]"></query-text-diff>
       </div>
     </div>
-    <query-visual-explain :query-models="queryModels"></query-visual-explain>
-    <query-config :query-models="queryModels"></query-config>
-    <query-timeline :query-models="queryModels"></query-timeline>
+    <query-visual-explain :queries="queries"></query-visual-explain>
+    <query-config :queries="queries"></query-config>
+    <query-timeline :queries="queries"></query-timeline>
     <div v-if="!isDagEmpty()" id="dag-panel" class="target detail-panel dag-panel">
       <div class="row">
         <div class="col-xs-6">
-          <select v-if="queryModels[0].dags.length > 1" v-model="selectedDagId1" @change="dagSelected1($event.target.value)" class="form-control">
-            <option v-for="dag in queryModels[0].dags" v-bind:value="dag.dagInfo.dagId">{{ dag.dagInfo.dagId }}</option>
+          <select v-if="queries[0].dags.length > 1" v-model="selectedDagId1" @change="dagSelected1($event.target.value)" class="form-control">
+            <option v-for="dag in queries[0].dags" v-bind:value="dag.dagInfo.dagId">{{ dag.dagInfo.dagId }}</option>
           </select>
         </div>
         <div class="col-xs-6">
-          <select v-if="queryModels[1].dags.length > 1" v-model="selectedDagId2" @change="dagSelected2($event.target.value)" class="form-control">
-            <option v-for="dag in queryModels[1].dags" v-bind:value="dag.dagInfo.dagId">{{ dag.dagInfo.dagId }}</option>
+          <select v-if="queries[1].dags.length > 1" v-model="selectedDagId2" @change="dagSelected2($event.target.value)" class="form-control">
+            <option v-for="dag in queries[1].dags" v-bind:value="dag.dagInfo.dagId">{{ dag.dagInfo.dagId }}</option>
           </select>
         </div>
       </div>
@@ -83,8 +83,8 @@
 
     constructor() {
       super();
-      if (this.queryModels.length !== 2) {
-        throw new Error(`Got ${this.queryModels.length}, expected 2 for diff.`)
+      if (this.queries.length !== 2) {
+        throw new Error(`Got ${cthis.queries.length }, expected 2 for diff.`)
       }
     }
 

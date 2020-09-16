@@ -18,8 +18,8 @@
 
 <template>
   <div id="dag-panel" class="target detail-panel dag-panel">
-    <select v-if="queryModel.dags.length > 1" v-model="selectedDagId" @change="dagSelected($event.target.value)" class="form-control">
-      <option v-for="dag in queryModel.dags" v-bind:value="dag.dagInfo.dagId">{{ dag.dagInfo.dagId }}</option>
+    <select v-if="query.dags.length > 1" v-model="selectedDagId" @change="dagSelected($event.target.value)" class="form-control">
+      <option v-for="dag in query.dags" v-bind:value="dag.dagInfo.dagId">{{ dag.dagInfo.dagId }}</option>
     </select>
 
     <br/>

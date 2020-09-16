@@ -27,38 +27,38 @@
       <div class="col-md-4">
         <div class="query-details-row">
           <label class="query-details-label">Query ID</label>
-          <div class="query-details-value">{{ queryModel.queryId }}</div>
+          <div class="query-details-value">{{ query.queryId }}</div>
         </div>
 
         <div class="query-details-row">
           <label class="query-details-label">User</label>
-          <div class="query-details-value">{{ queryModel.requestUser }}</div>
+          <div class="query-details-value">{{ query.requestUser }}</div>
         </div>
 
         <div class="query-details-row">
           <label class="query-details-label">Status</label>
-          <div class="query-details-value">{{ queryModel.status }}<!-- {{em-table-status-cell content=querymodel.status}} --></div>
+          <div class="query-details-value">{{ query.status }}<!-- {{em-table-status-cell content=query.status}} --></div>
         </div>
 
         <div class="query-details-row">
           <label class="query-details-label">Start Time</label>
-          <div class="query-details-value">{{ queryModel.startTime }}<!-- {{date-formatter content=querymodel.startTime}} --></div>
+          <div class="query-details-value">{{ query.startTime }}<!-- {{date-formatter content=query.startTime}} --></div>
         </div>
 
         <div class="query-details-row">
           <label class="query-details-label">End Time</label>
-          <div class="query-details-value">{{ queryModel.endTime }}<!-- {{date-formatter content=querymodel.endTime}} --></div>
+          <div class="query-details-value">{{ query.endTime }}<!-- {{date-formatter content=query.endTime}} --></div>
         </div>
 
         <div class="query-details-row">
           <label class="query-details-label">Duration</label>
-          <div class="query-details-value">{{ queryModel.duration }}<!-- {{txt querymodel.duration type="duration"}} --></div>
+          <div class="query-details-value">{{ query.duration }}<!-- {{txt query.duration type="duration"}} --></div>
         </div>
 
         <div class="query-details-row">
           <label class="query-details-label">Tables Read</label>
           <div class="query-details-value">
-            <span v-if="queryModel.tablesReadWithDatabase">{{ queryModel.tablesReadWithDatabase }}</span>
+            <span v-if="query.tablesReadWithDatabase">{{ query.tablesReadWithDatabase }}</span>
             <span v-else class="txt-message">Not Available!</span>
           </div>
         </div>
@@ -66,7 +66,7 @@
         <div class="query-details-row">
           <label class="query-details-label">Tables Written</label>
           <div class="query-details-value">
-            <span v-if="queryModel.tablesWrittenWithDatabase">{{ queryModel.tablesWrittenWithDatabase }}</span>
+            <span v-if="query.tablesWrittenWithDatabase">{{ query.tablesWrittenWithDatabase }}</span>
             <span v-else class="txt-message">Not Available!</span>
           </div>
         </div>
@@ -74,7 +74,7 @@
         <div class="query-details-row">
           <label class="query-details-label">Application ID</label>
           <div class="query-details-value">
-            <span v-if="queryModel.appIds.length">{{ queryModel.appIds }}</span>
+            <span v-if="query.appIds.length">{{ query.appIds }}</span>
             <span v-else class="txt-message">Not Available!</span>
           </div>
         </div>
@@ -82,44 +82,44 @@
         <div class="query-details-row">
           <label class="query-details-label">DAG ID</label>
           <div class="query-details-value">
-            <span v-if="queryModel.dagIds.length">{{ queryModel.dagIds }}</span>
+            <span v-if="query.dagIds.length">{{ query.dagIds }}</span>
             <span v-else class="txt-message">Not Available!</span>
           </div>
         </div>
 
         <div class="query-details-row">
           <label class="query-details-label">Session ID</label>
-          <div class="query-details-value">{{ queryModel.sessionId }}</div>
+          <div class="query-details-value">{{ query.sessionId }}</div>
         </div>
 
-        <div v-if="queryModel.llapAppId" class="query-details-row">
+        <div v-if="query.llapAppId" class="query-details-row">
           <label class="query-details-label">LLAP App ID</label>
-          <div class="query-details-value">{{ queryModel.llapAppId }}</div>
+          <div class="query-details-value">{{ query.llapAppId }}</div>
         </div>
 
         <div class="query-details-row">
           <label class="query-details-label">Thread Id</label>
-          <div class="query-details-value">{{ queryModel.threadId }}</div>
+          <div class="query-details-value">{{ query.threadId }}</div>
         </div>
 
         <div class="query-details-row">
           <label class="query-details-label">Queue</label>
           <div class="query-details-value">
-            <span v-if="queryModel.queueName">{{ queryModel.queueName }}</span>
+            <span v-if="query.queueName">{{ query.queueName }}</span>
             <span v-else>None</span>
           </div>
         </div>
       </div>
 
       <div class="col-md-8">
-        <sql-text :value="queryModel.query"></sql-text>
+        <sql-text :value="query.query"></sql-text>
       </div>
     </div>
   </div>
 
-  <div v-if="queryModel.details.diagnostics" class="panel panel-danger">
+  <div v-if="query.details.diagnostics" class="panel panel-danger">
     <div class="panel-heading">DAG Diagnostics</div>
-    <div class="diagnostics">{{ queryModel.details.diagnostics }}</div>
+    <div class="diagnostics">{{ query.details.diagnostics }}</div>
   </div>
 </template>
 
@@ -133,7 +133,6 @@
     components: { SqlText }
   })
   export default class QueryInfo extends QueryComponent {
-
     @Prop({ required: false })
     title?: string;
   }

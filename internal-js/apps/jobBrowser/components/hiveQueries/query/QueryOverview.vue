@@ -18,21 +18,21 @@
 
 <template>
   <div class="dag-panel">
-    <fixed-anchor-nav :query-model="queryModel"></fixed-anchor-nav>
+    <fixed-anchor-nav :query="query"></fixed-anchor-nav>
     <!-- {{#bs-tab fade=false as |tab|}} -->
 
     <tabs>
       <tab title="QUERY INFO">
-        <query-info :query-model="queryModel"></query-info>
+        <query-info :query="query"></query-info>
       </tab>
       <tab title="VISUAL EXPLAIN">
-        <visual-explain :query-model="queryModel"></visual-explain>
+        <visual-explain :query="query"></visual-explain>
       </tab>
       <tab title="QUERY CONFIG">
-        <query-config :query-model="queryModel"></query-config>
+        <query-config :query="query"></query-config>
       </tab>
       <tab title="TIMELINE">
-        <query-timeline :query-model="queryModel"></query-timeline>
+        <query-timeline :query="query"></query-timeline>
       </tab>
     </tabs>
 
@@ -50,7 +50,7 @@
   import Tabs from '../../common/Tabs.vue';
   import FixedAnchorNav from './FixedAnchorNav.vue';
   import QueryTimeline from './QueryTimeline.vue';
-  import { QueryModel } from '../index';
+  import { Query } from '../index';
   import DagDetails from './DagDetails.vue';
   import QueryConfig from './QueryConfig.vue';
   import QueryInfo from './QueryInfo.vue';
@@ -59,9 +59,9 @@
   @Component({
     components: { Tab, Tabs, FixedAnchorNav, QueryTimeline, DagDetails, QueryConfig, VisualExplain, QueryInfo }
   })
-  export default class Query extends Vue {
+  export default class QueryOverview extends Vue {
     @Prop({ required: true })
-    queryModel!: QueryModel;
+    query!: Query;
 
     isDagEmpty(): boolean {
       return false; // TODO: Implement

@@ -20,21 +20,21 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
-import { QueryModel } from '../index';
+import { Query } from '../index';
 
 @Component
 export default class QueryComponent extends Vue {
   @Prop({ required: false })
-  queryModels: QueryModel[] = [];
+  queries: Query[] = [];
   @Prop({ required: false })
-  queryModel?: QueryModel;
+  query?: Query;
 
   constructor() {
     super();
 
-    // TODO: Does queryModel change for this component?
-    if (this.queryModel) {
-      this.queryModels.push(this.queryModel);
+    // TODO: Does query change for this component?
+    if (this.query) {
+      this.queries.push(this.query);
     }
   }
 

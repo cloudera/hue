@@ -18,10 +18,10 @@
 
 <template>
   <div id="visual-explain" class="target detail-panel query-details-visualExplain">
-    <template v-for="(queryModel, index) in queryModels" :key="index">
+    <template v-for="(query, index) in queries" :key="index">
       <div class="row">
         <div class="col-md-12">
-          <div v-if="queryModels.length > 1" class="title">
+          <div v-if="queries.length > 1" class="title">
             Visual Explain - {{ numberToLetter(index) }}
           </div>
           <div v-else class="title">
@@ -32,10 +32,10 @@
       <div class="row">
         <div class="col-md-12">
           <div class="body">
-            <div v-if="!queryModel" class="explain--error">
+            <div v-if="!query" class="explain--error">
               <div>No Visual Explain available.</div>
             </div>
-            <visual-explain v-else :query-model="queryModel" />
+            <visual-explain v-else :query="query" />
           </div>
         </div>
       </div>
