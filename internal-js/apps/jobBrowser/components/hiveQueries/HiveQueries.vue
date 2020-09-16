@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="query-search">
+  <div>
     {{ title }}
   </div>
 </template>
@@ -33,7 +33,4 @@
 </script>
 
 <style lang="scss" scoped>
-  .query-search {
-    color: #0a78a3;
-  }
 </style>

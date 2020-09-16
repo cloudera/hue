@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import HiveQuerySearch from './HiveQuerySearch.vue';
+import HiveQuerySearch from './HiveQueries.vue';
 import { wrap } from 'vue/webComponentWrapper';
 
 export const COMPONENT_NAME = 'hive-query-search';
