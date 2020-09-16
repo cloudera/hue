@@ -448,7 +448,8 @@ class CSVFormat(FileFormat):
         sample_data_lines = ''
         for line in lines:
           sample_data_lines += line
-        dialect, has_header = cls._guess_dialect(sample_data_lines) # Only use first few lines for guessing. Greatly improves performance of CSV library.
+        # Only use first few lines for guessing. Greatly improves performance of CSV library.
+        dialect, has_header = cls._guess_dialect(sample_data_lines)
         delimiter = dialect.delimiter
         line_terminator = dialect.lineterminator
         quote_char = dialect.quotechar
@@ -621,6 +622,8 @@ class TextFileReader(object):
   def readlines(fileobj, encoding):
     try:
       data = fileobj.read(IMPORT_PEEK_SIZE)
+      if not isinstance(data, str):
+        data = data.decode('utf-8')
       return data, itertools.islice(csv.reader(string_io(data)), IMPORT_PEEK_NLINES)
     except UnicodeError:
       return None, None
@@ -669,7 +672,7 @@ class HiveFormat(CSVFormat):
       ))
 
     return cls(**{
-      "delimiter":',',
+      "delimiter": ',',
       "line_terminator": '\n',
       "quote_char": '"',
       "has_header": False,

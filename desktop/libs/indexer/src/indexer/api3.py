@@ -84,7 +84,7 @@ except ImportError as e:
   LOG.warn('Solr Search interface is not enabled')
 
 
-def _escape_white_space_characters(s, inverse = False):
+def _escape_white_space_characters(s, inverse=False):
   MAPPINGS = {
     "\n": "\\n",
     "\t": "\\t",
@@ -96,7 +96,10 @@ def _escape_white_space_characters(s, inverse = False):
   from_ = 0 if inverse else 1
 
   for pair in MAPPINGS.items():
-    s = s.replace(pair[to], pair[from_]).encode('utf-8')
+    if sys.version_info[0] > 2:
+      s = s.replace(pair[to], pair[from_])
+    else:
+      s = s.replace(pair[to], pair[from_]).encode('utf-8')
 
   return s
 
@@ -140,7 +143,9 @@ def guess_format(request):
         else:
           storage[delim['data_type']] = delim['comment']
     if table_metadata.details['properties']['format'] == 'text':
-      format_ = {"quoteChar": "\"", "recordSeparator": '\\n', "type": "csv", "hasHeader": False, "fieldSeparator": storage.get('field.delim', ',')}
+      format_ = {
+        "quoteChar": "\"", "recordSeparator": '\\n', "type": "csv", "hasHeader": False, "fieldSeparator": storage.get('field.delim', ',')
+      }
     elif table_metadata.details['properties']['format'] == 'parquet':
       format_ = {"type": "parquet", "hasHeader": False,}
     else:
@@ -151,7 +156,9 @@ def guess_format(request):
     format_ = {"type": "csv"}
   elif file_format['inputFormat'] == 'stream':
     if file_format['streamSelection'] == 'kafka':
-      format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n", 'topics': get_topics()}
+      format_ = {
+        "type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n", 'topics': get_topics()
+      }
     elif file_format['streamSelection'] == 'flume':
       format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n"}
   elif file_format['inputFormat'] == 'connector':
@@ -161,7 +168,14 @@ def guess_format(request):
           password=file_format['streamPassword'],
           security_token=file_format['streamToken']
       )
-      format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n", 'objects': [sobject['name'] for sobject in sf.restful('sobjects/')['sobjects'] if sobject['queryable']]}
+      format_ = {
+        "type": "csv",
+        "fieldSeparator": ",",
+        "hasHeader": True,
+        "quoteChar": "\"",
+        "recordSeparator": "\\n",
+        'objects': [sobject['name'] for sobject in sf.restful('sobjects/')['sobjects'] if sobject['queryable']]
+      }
     else:
       raise PopupException(_('Input format %(inputFormat)s connector not recognized: $(connectorSelection)s') % file_format)
   else:
@@ -197,7 +211,9 @@ def guess_field_types(request):
       col['name'] = smart_unicode(col['name'], errors='replace', encoding=encoding)
 
   elif file_format['inputFormat'] == 'table':
-    sample = get_api(request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database=file_format['databaseName'], table=file_format['tableName'])
+    sample = get_api(
+      request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database=file_format['databaseName'], table=file_format['tableName']
+    )
     db = dbms.get(request.user)
     table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
 
@@ -347,7 +363,7 @@ def guess_field_types(request):
     else:
       raise PopupException(_('Connector format not recognized: %(connectorSelection)s') % file_format)
   else:
-      raise PopupException(_('Input format not recognized: %(inputFormat)s') % file_format)
+    raise PopupException(_('Input format not recognized: %(inputFormat)s') % file_format)
 
   return JsonResponse(format_)
 
@@ -366,7 +382,8 @@ def importer_submit(request):
       source['path'] = request.fs.netnormpath(path)
 
   if destination['ouputFormat'] in ('database', 'table'):
-    destination['nonDefaultLocation'] = request.fs.netnormpath(destination['nonDefaultLocation']) if destination['nonDefaultLocation'] else destination['nonDefaultLocation']
+    destination['nonDefaultLocation'] = request.fs.netnormpath(destination['nonDefaultLocation']) \
+                                        if destination['nonDefaultLocation'] else destination['nonDefaultLocation']
 
   if destination['ouputFormat'] == 'index':
     source['columns'] = destination['columns']
@@ -374,7 +391,9 @@ def importer_submit(request):
 
     if destination['indexerRunJob'] or source['inputFormat'] == 'stream':
       _convert_format(source["format"], inverse=True)
-      job_handle = _large_indexing(request, source, index_name, start_time=start_time, lib_path=destination['indexerJobLibPath'], destination=destination)
+      job_handle = _large_indexing(
+        request, source, index_name, start_time=start_time, lib_path=destination['indexerJobLibPath'], destination=destination
+      )
     else:
       client = SolrClient(request.user)
       job_handle = _small_indexing(request.user, request.fs, client, source, destination, index_name)
@@ -438,7 +457,8 @@ def _small_indexing(user, fs, client, source, destination, index_name):
 
       searcher = CollectionManagerController(user)
       columns = [field['name'] for field in fields if field['name'] != 'hue_id']
-      fetch_handle = lambda rows, start_over: get_api(request, snippet).fetch_result(notebook, snippet, rows=rows, start_over=start_over) # Assumes handle still live
+      # Assumes handle still live
+      fetch_handle = lambda rows, start_over: get_api(request, snippet).fetch_result(notebook, snippet, rows=rows, start_over=start_over)
       rows = searcher.update_data_from_hive(index_name, columns, fetch_handle=fetch_handle, indexing_options=kwargs)
       # TODO if rows == MAX_ROWS truncation warning
     elif source['inputFormat'] == 'manual':
@@ -453,7 +473,13 @@ def _small_indexing(user, fs, client, source, destination, index_name):
       LOG.warn('Error while cleaning-up config of failed collection creation %s: %s' % (index_name, e2))
     raise e
 
-  return {'status': 0, 'on_success_url': reverse('indexer:indexes', kwargs={'index': index_name}), 'pub_sub_url': 'assist.collections.refresh', 'errors': errors}
+  return {
+    'status': 0,
+    'on_success_url': reverse('indexer:indexes',
+    kwargs={'index': index_name}),
+    'pub_sub_url': 'assist.collections.refresh',
+    'errors': errors
+  }
 
 
 def _create_database(request, source, destination, start_time):
