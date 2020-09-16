@@ -20,7 +20,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
-import HueTable, { Column, Row } from '../../common/HueTable.vue';
 import { QueryModel } from '../index';
 
 @Component

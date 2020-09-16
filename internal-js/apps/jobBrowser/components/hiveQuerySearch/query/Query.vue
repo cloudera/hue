@@ -46,6 +46,8 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
+  import Tab from '../../common/Tab.vue';
+  import Tabs from '../../common/Tabs.vue';
   import FixedAnchorNav from './FixedAnchorNav.vue';
   import QueryTimeline from './QueryTimeline.vue';
   import { QueryModel } from '../index';
@@ -55,7 +57,7 @@
   import VisualExplain from './VisualExplain.vue';
 
   @Component({
-    components: { FixedAnchorNav, QueryTimeline, DagDetails, QueryConfig, VisualExplain, QueryInfo }
+    components: { Tab, Tabs, FixedAnchorNav, QueryTimeline, DagDetails, QueryConfig, VisualExplain, QueryInfo }
   })
   export default class Query extends Vue {
     @Prop({ required: true })
