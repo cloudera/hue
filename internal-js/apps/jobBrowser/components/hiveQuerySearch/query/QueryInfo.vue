@@ -111,11 +111,9 @@
         </div>
       </div>
 
-      <!--
       <div class="col-md-8">
-        {{caller-info title="Query Text" type="Hive" info=querymodel.query}}
+        <sql-text :value="queryModel.query"></sql-text>
       </div>
-      -->
     </div>
   </div>
 
@@ -128,9 +126,12 @@
 <script lang="ts">
   import Component from 'vue-class-component';
   import {Prop} from 'vue-property-decorator';
+  import SqlText from '../../common/SqlText.vue';
   import QueryComponent from './QueryComponent.vue';
 
-  @Component
+  @Component({
+    components: { SqlText }
+  })
   export default class QueryInfo extends QueryComponent {
 
     @Prop({ required: false })
