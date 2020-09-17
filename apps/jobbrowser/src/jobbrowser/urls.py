@@ -20,6 +20,8 @@ from django.conf.urls import url
 from jobbrowser import views as jobbrowser_views
 from jobbrowser import api2 as jobbrowser_api2
 
+from jobbrowser.conf import QUERY_STORE
+
 urlpatterns = [
   # "Default"
   url(r'^$', jobbrowser_views.jobs),
@@ -30,16 +32,20 @@ urlpatterns = [
   url(r'^jobs/(?P<job>\w+)/single_logs$', jobbrowser_views.job_single_logs, name='jobbrowser.views.job_single_logs'),
   url(r'^jobs/(?P<job>\w+)/tasks$', jobbrowser_views.tasks, name='jobbrowser.views.tasks'),
   url(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)$', jobbrowser_views.single_task, name='jobbrowser.views.single_task'), # TODO s/single// ?
-  url(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)/attempts/(?P<attemptid>\w+)$', jobbrowser_views.single_task_attempt, name='single_task_attempt'),
-  url(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)/attempts/(?P<attemptid>\w+)/counters$', jobbrowser_views.task_attempt_counters, name='task_attempt_counters'),
-  url(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)/attempts/(?P<attemptid>\w+)/logs$', jobbrowser_views.single_task_attempt_logs, name='single_task_attempt_logs'),
+  url(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)/attempts/(?P<attemptid>\w+)$',
+  jobbrowser_views.single_task_attempt, name='single_task_attempt'),
+  url(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)/attempts/(?P<attemptid>\w+)/counters$',
+  jobbrowser_views.task_attempt_counters, name='task_attempt_counters'),
+  url(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)/attempts/(?P<attemptid>\w+)/logs$',
+  jobbrowser_views.single_task_attempt_logs, name='single_task_attempt_logs'),
   url(r'^jobs/(\w+)/tasks/(\w+)/attempts/(?P<attemptid>\w+)/kill$', jobbrowser_views.kill_task_attempt, name='kill_task_attempt'),
   url(r'^trackers/(?P<trackerid>.+)$', jobbrowser_views.single_tracker, name='single_tracker'),
   url(r'^container/(?P<node_manager_http_address>.+)/(?P<containerid>.+)$', jobbrowser_views.container, name='jobbrowser.views.container'),
 
   # MR2 specific
   url(r'^jobs/(?P<job>\w+)/job_attempt_logs/(?P<attempt_index>\d+)$', jobbrowser_views.job_attempt_logs, name='job_attempt_logs'),
-  url(r'^jobs/(?P<job>\w+)/job_attempt_logs_json/(?P<attempt_index>\d+)(?:/(?P<name>\w+))?(?:/(?P<offset>[\d-]+))?/?$', jobbrowser_views.job_attempt_logs_json, name='job_attempt_logs_json'),
+  url(r'^jobs/(?P<job>\w+)/job_attempt_logs_json/(?P<attempt_index>\d+)(?:/(?P<name>\w+))?(?:/(?P<offset>[\d-]+))?/?$',
+  jobbrowser_views.job_attempt_logs_json, name='job_attempt_logs_json'),
   url(r'^jobs/(?P<jobid>\w+)/job_not_assigned/(?P<path>.+)$', jobbrowser_views.job_not_assigned, name='job_not_assigned'),
 
   # Unused
@@ -63,3 +69,8 @@ urlpatterns += [
   url(r'api/job/action(?:/(?P<interface>.+))?(?:/(?P<action>.+))?/?', jobbrowser_api2.action, name='action'),
   url(r'api/job(?:/(?P<interface>.+))?/?', jobbrowser_api2.job, name='job'),
 ]
+
+if QUERY_STORE.SERVER_URL.get():
+  urlpatterns += [
+    url(r'^query-proxy/(?P<path>.*)$', jobbrowser_api2.query_store_proxy),
+  ]

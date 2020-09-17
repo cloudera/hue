@@ -19,15 +19,16 @@ import json
 import logging
 
 from django.http import HttpResponse
+from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.django_util import JsonResponse
-from django.utils.translation import ugettext as _
+from desktop.lib.rest.http_client import HttpClient
+from desktop.lib.rest.resource import Resource
 from desktop.views import serve_403_error
 
 from jobbrowser.apis.base_api import get_api
-from jobbrowser.conf import DISABLE_KILLING_JOBS
-
+from jobbrowser.conf import DISABLE_KILLING_JOBS, QUERY_STORE
 
 LOG = logging.getLogger(__name__)
 
@@ -161,3 +162,14 @@ def profile(request):
     response[app_property] = resp
     response['status'] = 0
     return JsonResponse(response)
+
+
+@api_error_handler
+def query_store_proxy(request, path=None):
+  content_type = 'application/json; charset=UTF-8'
+  headers = {'X-Requested-By': 'das', 'Content-Type': content_type}
+
+  client = HttpClient(QUERY_STORE.SERVER_URL.get())
+  resource = Resource(client)
+
+  return JsonResponse(resource.invoke(request.method, path, request.GET.dict(), request.body, headers));
