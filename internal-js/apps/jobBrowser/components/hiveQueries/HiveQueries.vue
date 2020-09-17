@@ -20,6 +20,8 @@
   <div>
     {{ title }}
   </div>
+  <!-- queryDetails/QueryDetails.vue for an "active" query -->
+  <!-- queryDiff/queryDiff.vue for a diff of two queries -->
 </template>
 
 <script lang="ts">

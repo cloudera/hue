@@ -59,7 +59,7 @@
   @Component({
     components: { Tab, Tabs, FixedAnchorNav, QueryTimeline, DagDetails, QueryConfig, VisualExplain, QueryInfo }
   })
-  export default class QueryOverview extends Vue {
+  export default class QueryDetails extends Vue {
     @Prop({ required: true })
     query!: Query;
 
