@@ -152,3 +152,9 @@ export interface SearchMeta {
   offset: number;
   size: number;
 }
+
+interface TableDefinition {
+  rangeData: {
+    title: string;
+  }
+}
