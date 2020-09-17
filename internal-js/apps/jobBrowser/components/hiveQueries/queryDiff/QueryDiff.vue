@@ -57,19 +57,19 @@
 
 <script lang="ts">
   import Component from 'vue-class-component';
-  import QueryComponent from '../query/QueryComponent.vue';
-  import QueryVisualExplain from '../query/QueryVisualExplain.vue';
-  import QueryTimeline from '../query/QueryTimeline.vue';
-  import QueryConfig from '../query/QueryConfig.vue';
+  import QueryComponent from '../queryDetails/QueryComponent.vue';
+  import QueryVisualExplain from '../queryDetails/QueryVisualExplain.vue';
+  import QueryTimeline from '../queryDetails/QueryTimeline.vue';
+  import QueryConfig from '../queryDetails/QueryConfig.vue';
   import QueryTextDiff from '../../common/QueryTextDiff.vue';
   import Tab from '../../common/Tab.vue';
   import Tabs from '../../common/Tabs.vue';
-  import DagConfigs from '../query/DagConfigs.vue';
-  import DagCounters from '../query/DagCounters.vue';
-  import DagGraphicalView from '../query/DagGraphicalView.vue';
-  import DagSwimlane from '../query/DagSwimlane.vue';
+  import DagConfigs from '../queryDetails/DagConfigs.vue';
+  import DagCounters from '../queryDetails/DagCounters.vue';
+  import DagGraphicalView from '../queryDetails/DagGraphicalView.vue';
+  import DagSwimlane from '../queryDetails/DagSwimlane.vue';
   import { Dag } from '../index';
-  import QueryInfo from '../query/QueryInfo.vue';
+  import QueryInfo from '../queryDetails/QueryInfo.vue';
 
   @Component({
     components: {
@@ -84,7 +84,7 @@
     constructor() {
       super();
       if (this.queries.length !== 2) {
-        throw new Error(`Got ${cthis.queries.length }, expected 2 for diff.`)
+        throw new Error(`Got ${this.queries.length}, expected 2 for diff.`)
       }
     }
 

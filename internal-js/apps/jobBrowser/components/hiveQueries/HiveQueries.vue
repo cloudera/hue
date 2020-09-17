@@ -17,20 +17,38 @@
 -->
 
 <template>
-  <div>
-    {{ title }}
-  </div>
-  <!-- queryDetails/QueryDetails.vue for an "active" query -->
-  <!-- queryDiff/queryDiff.vue for a diff of two queries -->
+  <query-table v-if="!selectedQuery && !queriesToDiff" @diff-queries="diffQueries" @query-selected="querySelected"></query-table>
+  <query-details v-else-if="selectedQuery" :query="selectedQuery"></query-details>
+  <query-diff v-else :queries="queriesToDiff"></query-diff>
 </template>
 
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
+  import QueryDiff from './queryDiff/QueryDiff.vue';
+  import QueryDetails from './queryDetails/QueryDetails.vue';
+  import { Query } from './index';
+  import QueryTable from './queryTable/QueryTable.vue';
 
-  @Component
+  @Component({
+    components: { QueryDiff, QueryDetails, QueryTable }
+  })
   export default class HiveQuerySearch extends Vue {
-    title: string = 'The search page!';
+    selectedQuery?: Query;
+    queriesToDiff?: Query[];
+
+    showTable() {
+      this.selectedQuery = undefined;
+      this.queriesToDiff = undefined;
+    }
+
+    diffQueries(queries: Query[]) {
+      this.queriesToDiff = queries;
+    }
+
+    querySelected(query: Query) {
+      this.selectedQuery = query;
+    }
   }
 </script>
 
