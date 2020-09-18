@@ -38,14 +38,15 @@
 </template>
 
 <script lang="ts">
-  import QueryComponent from './QueryComponent.vue';
+  import MultiQueryComponent from './MultiQueryComponent.vue';
   import Component from 'vue-class-component';
-  import HueTable, { Column, Row } from '../../common/HueTable.vue';
+  import { Column, Row } from '../../common/HueTable';
+  import HueTable from '../../common/HueTable.vue';
 
   @Component({
     components: { HueTable }
   })
-  export default class QueryConfig extends QueryComponent {
+  export default class QueryConfig extends MultiQueryComponent {
     showDifferences: boolean = true;
 
     get configColumns(): Column[] {

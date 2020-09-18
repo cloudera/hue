@@ -57,7 +57,7 @@
 
 <script lang="ts">
   import Component from 'vue-class-component';
-  import QueryComponent from '../queryDetails/QueryComponent.vue';
+  import MultiQueryComponent from '../queryDetails/MultiQueryComponent.vue';
   import QueryVisualExplain from '../queryDetails/QueryVisualExplain.vue';
   import QueryTimeline from '../queryDetails/QueryTimeline.vue';
   import QueryConfig from '../queryDetails/QueryConfig.vue';
@@ -77,7 +77,7 @@
       DagGraphicalView, DagSwimlane, Tab, Tabs, QueryInfo
     }
   })
-  export default class QueryDiff extends QueryComponent {
+  export default class QueryDiff extends MultiQueryComponent {
     selectedDagId1?: string;
     selectedDagId2?: string;
 

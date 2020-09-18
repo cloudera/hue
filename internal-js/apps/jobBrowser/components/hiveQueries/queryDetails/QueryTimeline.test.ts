@@ -14,27 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Vue from 'vue';
-import { mount, shallowMount } from '@vue/test-utils'
-import Tabs from './Tabs.vue'
-import Tab from './Tab.vue'
+import { shallowMount } from '@vue/test-utils'
+import { Query } from '../index';
+import QueryTimeline from './QueryTimeline.vue'
 
-describe('Tabs.vue', () => {
-  it('should render empty tabs', () => {
-    const wrapper = shallowMount(Tabs);
-    expect(wrapper.element).toMatchSnapshot();
-  })
-
-  it('should render tabs', async () => {
-    const wrapper = mount(Tabs, {
-      slots: {
-        default: '<tab title="foo">foo</tab><tab title="bar">bar</tab>'
-      },
-      stubs: {
-        'tab': Tab
+describe('QueryTimeline.vue', () => {
+  it('should render', () => {
+    const wrapper = shallowMount(QueryTimeline, {
+      propsData: {
+        queries: <Query[]>[{}]
       }
     });
-    await Vue.nextTick();
     expect(wrapper.element).toMatchSnapshot();
   })
 })

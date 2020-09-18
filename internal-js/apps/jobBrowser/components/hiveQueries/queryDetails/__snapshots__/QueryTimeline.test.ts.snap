@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryTimeline.vue should render 1`] = `
+<div
+  class="target detail-panel"
+  id="timeline"
+>
+  <div>
+    <div
+      class="row"
+    >
+      <div
+        class="col-md-12"
+      >
+        <div
+          class="title"
+        >
+          
+          Timeline
+        
+        </div>
+      </div>
+    </div>
+     
+    <div
+      class="row"
+    >
+      <div
+        class="col-md-12"
+      >
+        <div
+          class="body"
+        >
+          <query-timeline-bars-stub
+            perf="[object Object]"
+          />
+           
+          <!---->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

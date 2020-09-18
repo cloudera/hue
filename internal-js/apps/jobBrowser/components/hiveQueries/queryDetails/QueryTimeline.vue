@@ -18,7 +18,7 @@
 
 <template>
   <div id="timeline" class="target detail-panel">
-    <template v-for="(perf, index) in perfs" :key="perf.title">
+    <div v-for="(perf, index) in perfs" :key="perf.title">
       <div class="row">
         <div class="col-md-12">
           <div class="title">
@@ -41,15 +41,15 @@
           </div>
         </div>
       </div>
-    </template>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
   import Component from 'vue-class-component';
-  import QueryComponent from './QueryComponent.vue';
-  import QueryTimelineBars from '../query/QueryTimelineBars.vue';
-  import QueryTimelineLegend from '../query/QueryTimelineLegend.vue';
+  import MultiQueryComponent from './MultiQueryComponent.vue';
+  import QueryTimelineBars from './QueryTimelineBars.vue';
+  import QueryTimelineLegend from './QueryTimelineLegend.vue';
   import { NormalizedQueryPerf, Query } from '../index';
 
   const normalizePerf = (query?: Query): NormalizedQueryPerf => {
@@ -95,7 +95,7 @@
   @Component({
     components: { QueryTimelineLegend, QueryTimelineBars }
   })
-  export default class QueryTimeline extends QueryComponent {
+  export default class QueryTimeline extends MultiQueryComponent {
     get perfs(): { title: string; perf: NormalizedQueryPerf }[] {
       return this.queries.map((query, index) => {
         let title = 'Timeline';

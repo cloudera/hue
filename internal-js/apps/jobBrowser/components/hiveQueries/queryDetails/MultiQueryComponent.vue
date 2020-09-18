@@ -16,17 +16,19 @@
   limitations under the License.
 -->
 
-<template>
-  <div>VisualExplain - Not Implemented</div>
-  <!-- TODO: Implement -->
-</template>
-
 <script lang="ts">
-  import Component from 'vue-class-component';
-  import MultiQueryComponent from './MultiQueryComponent.vue';
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import { Prop } from 'vue-property-decorator';
+import { Query } from '../index';
 
-  @Component
-  export default class VisualExplain extends MultiQueryComponent {}
+@Component
+export default class MultiQueryComponent extends Vue {
+  @Prop({ required: true })
+  queries!: Query[]
+
+  numberToLetter(value: number): string {
+    return String.fromCharCode(65 + value);  // A, B, C, ...
+  }
+}
 </script>
-
-<style lang="scss" scoped></style>

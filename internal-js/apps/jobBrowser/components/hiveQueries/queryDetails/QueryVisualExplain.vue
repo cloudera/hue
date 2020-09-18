@@ -46,11 +46,12 @@
 <script lang="ts">
   import Component from 'vue-class-component';
   import VisualExplain from './VisualExplain.vue';
-  import QueryComponent from './QueryComponent.vue';
+  import MultiQueryComponent from './MultiQueryComponent.vue';
+
   @Component({
     components: { VisualExplain }
   })
-  export default class QueryVisualExplain extends QueryComponent {}
+  export default class QueryVisualExplain extends MultiQueryComponent {}
 </script>
 
 <style lang="scss" scoped></style>

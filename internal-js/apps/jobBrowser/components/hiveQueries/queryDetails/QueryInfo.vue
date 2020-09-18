@@ -125,14 +125,14 @@
 
 <script lang="ts">
   import Component from 'vue-class-component';
-  import {Prop} from 'vue-property-decorator';
+  import { Prop } from 'vue-property-decorator';
   import SqlText from '../../common/SqlText.vue';
-  import QueryComponent from './QueryComponent.vue';
+  import SingleQueryComponent from './SingleQueryComponent.vue';
 
   @Component({
     components: { SqlText }
   })
-  export default class QueryInfo extends QueryComponent {
+  export default class QueryInfo extends SingleQueryComponent {
     @Prop({ required: false })
     title?: string;
   }

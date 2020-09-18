@@ -1,0 +1,371 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RangePanel.vue should render 1`] = `
+<div
+  class="row"
+>
+  <div
+    class="col-md-4 time-range-panel"
+  >
+    <div
+      class="title"
+    >
+      Time Range
+    </div>
+    
+    FROM
+    
+    <div
+      class="form-group"
+    >
+      <div
+        class="input-group date"
+        id="from-date"
+      >
+        <input
+          class="form-control"
+          type="text"
+        />
+         
+        <span
+          class="input-group-addon"
+        >
+          <span
+            class="glyphicon glyphicon-calendar"
+          />
+        </span>
+      </div>
+    </div>
+    
+    TO
+    
+    <div
+      class="form-group"
+    >
+      <div
+        class="input-group date"
+        id="to-date"
+      >
+        <input
+          class="form-control"
+          type="text"
+        />
+         
+        <span
+          class="input-group-addon"
+        >
+          <span
+            class="glyphicon glyphicon-calendar"
+          />
+        </span>
+      </div>
+    </div>
+     
+    <div
+      class="input-group-btn"
+    >
+      <button
+        class="btn btn-success"
+        type="button"
+      >
+        APPLY
+      </button>
+    </div>
+  </div>
+   
+  <div
+    class="col-md-8 quick-range-panel"
+  >
+    <div
+      class="title"
+    >
+      Quick Range
+    </div>
+     
+    <div
+      class="row"
+    >
+      <div
+        class="col-md-3"
+      >
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Last 7 days
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Last 30 days
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Last 60 days
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Last 90 days
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Last 6 months
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Last 1 year
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Last 2 year
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Last 5 year
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div
+      class="row"
+    >
+      <div
+        class="col-md-3"
+      >
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Yesterday
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Day before yesterday
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              This day last week
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Previous week
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Previous month
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Previous year
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div
+      class="row"
+    >
+      <div
+        class="col-md-3"
+      >
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Today
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Today so far
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              This week
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              This week so far
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              This month
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              This year
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div
+      class="row"
+    >
+      <div
+        class="col-md-3"
+      >
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Last 5 minutes
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Last 15 minutes
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Last 30 minutes
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Last 1 hour
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Last 3 hours
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Last 6 hours
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Last 12 hours
+            </a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a
+              href="#"
+            >
+              Last 24 hours
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+`;

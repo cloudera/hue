@@ -33,10 +33,10 @@
 
 <script lang="ts">
   import Component from 'vue-class-component';
-  import QueryComponent from './QueryComponent.vue';
+  import SingleQueryComponent from './SingleQueryComponent.vue';
 
   @Component
-  export default class FixedAnchorNav extends QueryComponent {
+  export default class FixedAnchorNav extends SingleQueryComponent {
     stoppingQuery: boolean = false;
 
     stopQuery() {

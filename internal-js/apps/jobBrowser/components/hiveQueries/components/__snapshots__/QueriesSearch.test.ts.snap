@@ -1,0 +1,128 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueriesSearch.vue should render 1`] = `
+<div>
+  <div
+    class="input-group"
+  >
+    <div
+      class="input-group-btn"
+    >
+      <button
+        aria-expanded="false"
+        aria-haspopup="true"
+        class="btn btn-default dropdown-toggle"
+        data-toggle="dropdown"
+        type="button"
+      >
+        
+        Searches 
+        <span
+          class="caret"
+        />
+      </button>
+       
+      <ul
+        class="dropdown-menu"
+      >
+        <li
+          class="dropdown-header"
+        >
+          Suggested
+        </li>
+         
+        <li>
+          <a
+            href="javascript: void(0);"
+          >
+            Suggested search
+          </a>
+        </li>
+         
+        <!---->
+         
+        <li
+          class="dropdown-header"
+        >
+          Saved Searches
+        </li>
+         
+        <li
+          class="saved-search"
+        >
+          <a
+            href="javascript: void(0);"
+          >
+            Saved search
+          </a>
+           
+          <i
+            aria-hidden="true"
+            class="fa fa-times"
+          />
+        </li>
+         
+        <!---->
+      </ul>
+    </div>
+     
+    <input
+      class="form-control"
+      placeholder="Search Queries"
+      type="search"
+    />
+     
+    <div
+      class="input-group-btn time-dropdown"
+    >
+      <button
+        aria-expanded="false"
+        aria-haspopup="true"
+        class="btn btn-default dropdown-toggle"
+        data-toggle="dropdown"
+        type="button"
+      >
+        
+        Some title 
+        <span
+          class="caret"
+        />
+      </button>
+       
+      <div
+        class="dropdown-menu range-panel pull-right"
+      >
+        <range-panel-stub
+          tabledefinition="[object Object]"
+        />
+      </div>
+       
+      <button
+        class="btn btn-default search"
+        type="button"
+      >
+        <i
+          aria-hidden="true"
+          class="fa fa-search"
+        />
+      </button>
+    </div>
+     
+    <div
+      class="input-group-btn save-button"
+    >
+      <button
+        class="btn btn-default"
+        type="button"
+      >
+        <i
+          aria-hidden="true"
+          class="fa fa-save"
+        />
+      </button>
+    </div>
+  </div>
+   
+  <!---->
+</div>
+`;

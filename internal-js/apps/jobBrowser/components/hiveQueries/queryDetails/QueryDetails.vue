@@ -46,6 +46,8 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
+  import SingleQueryComponent
+    from '../../../../../internal-js/apps/jobBrowser/components/hiveQueries/queryDetails/SingleQueryComponent.vue';
   import Tab from '../../common/Tab.vue';
   import Tabs from '../../common/Tabs.vue';
   import FixedAnchorNav from './FixedAnchorNav.vue';
@@ -59,11 +61,8 @@
   @Component({
     components: { Tab, Tabs, FixedAnchorNav, QueryTimeline, DagDetails, QueryConfig, VisualExplain, QueryInfo }
   })
-  export default class QueryDetails extends Vue {
-    @Prop({ required: true })
-    query!: Query;
-
-    isDagEmpty(): boolean {
+  export default class QueryDetails extends SingleQueryComponent {
+    get isDagEmpty(): boolean {
       return false; // TODO: Implement
     }
   }

@@ -14,27 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Vue from 'vue';
-import { mount, shallowMount } from '@vue/test-utils'
-import Tabs from './Tabs.vue'
+import { shallowMount } from '@vue/test-utils'
 import Tab from './Tab.vue'
 
-describe('Tabs.vue', () => {
-  it('should render empty tabs', () => {
-    const wrapper = shallowMount(Tabs);
-    expect(wrapper.element).toMatchSnapshot();
-  })
-
-  it('should render tabs', async () => {
-    const wrapper = mount(Tabs, {
-      slots: {
-        default: '<tab title="foo">foo</tab><tab title="bar">bar</tab>'
+describe('Tab.vue', () => {
+  it('should render', () => {
+    let reportedTab: Tab | undefined;
+    const wrapper = shallowMount(Tab, {
+      propsData: { title: 'Tab title' },
+      provide: {
+        addTab: (tab: Tab): void => { reportedTab = tab },
+        removeTab: () => {}
       },
-      stubs: {
-        'tab': Tab
+      slots: {
+        default: '<div>Some tab content</div>'
       }
     });
-    await Vue.nextTick();
     expect(wrapper.element).toMatchSnapshot();
+    if (reportedTab) {
+      expect(reportedTab.title).toEqual('Tab title');
+    } else {
+      fail('provided addTab not called with the tab');
+    }
   })
 })

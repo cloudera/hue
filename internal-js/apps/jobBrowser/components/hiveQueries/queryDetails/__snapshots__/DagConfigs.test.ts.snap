@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DagConfigs.vue should render 1`] = `
+<div>
+  DagConfigs - Not Implemented
+</div>
+`;

@@ -37,7 +37,7 @@
 
 <script lang="ts">
   import Component from 'vue-class-component';
-  import QueryComponent from './QueryComponent.vue';
+  import SingleQueryComponent from './SingleQueryComponent.vue';
   import Tab from '../../common/Tab.vue';
   import Tabs from '../../common/Tabs.vue';
   import { Dag } from '../index';
@@ -52,7 +52,7 @@
     }
   })
 
-  export default class DagDetails extends QueryComponent {
+  export default class DagDetails extends SingleQueryComponent {
     selectedDagId?: string;
 
     dagSelected(dag: Dag) {

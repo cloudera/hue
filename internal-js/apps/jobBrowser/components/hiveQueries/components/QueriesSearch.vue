@@ -17,51 +17,51 @@
 -->
 
 <template>
-  <div class="input-group">
-    <div class="input-group-btn">
-      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Searches <span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu">
-        <li class="dropdown-header">Suggested</li>
-        <template v-for="search in listedSearches.suggested">
-          <li @click="searchSelected(search)"><a href="javascript: void(0);">{{ search.name }}</a></li>
-        </template>
-        <li v-if="listedSearches.suggested.length === 0" class="message">No suggestions!</li>
-        <li class="dropdown-header">Saved Searches</li>
-        <template v-for="search in listedSearches.saved">
-          <li class="saved-search">
-            <a href="javascript: void(0);" @click="searchSelected(search)">{{ search.name }}</a>
-            <i @click="deleteSearch(search)" class="fa fa-times" aria-hidden="true"></i>
-          </li>
-        </template>
-        <li v-if="listedSearches.saved.length === 0" class="message">No saved searches</li>
-      </ul>
-    </div>
-
-    <input type="search" class="form-control" placeholder="Search Queries" v-model="searchText" @keyup.enter="search">
-
-    <div class="input-group-btn time-dropdown">
-      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        {{ tableDefinition.rangeData.title }} <span class="caret"></span>
-      </button>
-      <div class="dropdown-menu range-panel pull-right">
-        <range-panel :table-definition="tableDefinition"></range-panel>
+  <div>
+    <div class="input-group">
+      <div class="input-group-btn">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Searches <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li class="dropdown-header">Suggested</li>
+          <template v-for="search in listedSearches.suggested">
+            <li @click="searchSelected(search)"><a href="javascript: void(0);">{{ search.name }}</a></li>
+          </template>
+          <li v-if="listedSearches.suggested.length === 0" class="message">No suggestions!</li>
+          <li class="dropdown-header">Saved Searches</li>
+          <template v-for="search in listedSearches.saved">
+            <li class="saved-search">
+              <a href="javascript: void(0);" @click="searchSelected(search)">{{ search.name }}</a>
+              <i @click="deleteSearch(search)" class="fa fa-times" aria-hidden="true"></i>
+            </li>
+          </template>
+          <li v-if="listedSearches.saved.length === 0" class="message">No saved searches</li>
+        </ul>
       </div>
 
-      <button class="btn btn-default search" type="button" @click="search">
-        <i class="fa fa-search" aria-hidden="true"></i>
-      </button>
-    </div>
+      <input type="search" class="form-control" placeholder="Search Queries" v-model="searchText" @keyup.enter="search">
 
-    <div class="input-group-btn save-button">
-      <button class="btn btn-default" type="button" @click="toggleSaveModal">
-        <i class="fa fa-save" aria-hidden="true"></i>
-      </button>
-    </div>
-  </div>
+      <div class="input-group-btn time-dropdown">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{ tableDefinition.rangeData.title }} <span class="caret"></span>
+        </button>
+        <div class="dropdown-menu range-panel pull-right">
+          <range-panel :table-definition="tableDefinition"></range-panel>
+        </div>
 
-  <modal v-if="isShowingSaveModal" @close="toggleSaveModal">
+        <button class="btn btn-default search" type="button" @click="search">
+          <i class="fa fa-search" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="input-group-btn save-button">
+        <button class="btn btn-default" type="button" @click="toggleSaveModal">
+          <i class="fa fa-save" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+    <modal v-if="isShowingSaveModal" @close="toggleSaveModal">
     <template slot="header">
       <span class="modal-title">Save Search</span>
       <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
@@ -78,6 +78,7 @@
       <button type="button" class="" @click="saveSearch">SAVE</button>
     </template>
   </modal>
+  </div>
 </template>
 
 <script lang="ts">

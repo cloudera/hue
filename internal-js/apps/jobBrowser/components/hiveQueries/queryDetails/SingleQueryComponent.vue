@@ -23,20 +23,9 @@ import { Prop } from 'vue-property-decorator';
 import { Query } from '../index';
 
 @Component
-export default class QueryComponent extends Vue {
-  @Prop({ required: false })
-  queries: Query[] = [];
-  @Prop({ required: false })
-  query?: Query;
-
-  constructor() {
-    super();
-
-    // TODO: Does query change for this component?
-    if (this.query) {
-      this.queries.push(this.query);
-    }
-  }
+export default class SingleQueryComponent extends Vue {
+  @Prop({ required: true })
+  query!: Query;
 
   numberToLetter(value: number): string {
     return String.fromCharCode(65 + value);  // A, B, C, ...
