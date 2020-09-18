@@ -25,16 +25,12 @@
   <table>
     <thead>
       <tr>
-        <th v-for="(column, colIndex) in columns" :key="colIndex">
-          {{ column.label }}>
-        </th>
+        <th v-for="(column, colIndex) in columns" :key="colIndex">{{ column.label }}</th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="(row, rowIndex) in rows" :key="rowIndex">
-        <td v-for="(column, colIndex) in columns" :key="colIndex">
-          {{ column[row.key] }}
-        </td>
+        <td v-for="(column, colIndex) in columns" :key="colIndex">{{ row[column.key] }}</td>
       </tr>
     </tbody>
   </table>
@@ -44,19 +40,14 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
-
-  export interface Column {
-    label: string;
-    key: string;
-  }
-  export type Row = { [key: string]: unknown };
+  import { Column, Row } from './HueTable';
 
   @Component
   export default class HueTable extends Vue {
-    @Prop({ required: false })
-    rows: Row[] = [];
-    @Prop({ required: false })
-    columns: Column[] = [];
+    @Prop({ required: false, default: () => [] })
+    rows?: Row[];
+    @Prop({ required: false, default: () => [] })
+    columns?: Column[];
   }
 </script>
 

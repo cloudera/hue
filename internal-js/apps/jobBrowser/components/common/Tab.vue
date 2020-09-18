@@ -25,10 +25,31 @@
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
+  import { Inject, Prop } from 'vue-property-decorator';
 
   @Component
   export default class Tab extends Vue {
+    @Inject()
+    addTab?: (tab: Tab) => void;
+    @Inject()
+    removeTab?: (tab: Tab) => void;
+
+    @Prop({ required: true })
+    title!: string;
+
     isActive: boolean = false;
+
+    mounted() {
+      if (this.addTab) {
+        this.addTab(this)
+      }
+    }
+
+    destroyed() {
+      if (this.removeTab) {
+        this.removeTab(this);
+      }
+    }
   }
 </script>
 

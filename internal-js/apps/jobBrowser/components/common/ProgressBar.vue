@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="bar" v-bind:style="{ width: barWidth + '%' }" title="{{ title }}">{{ title }}</div>
+  <div class="bar" v-bind:style="{ width: barWidth + '%' }" :title="title">{{ title }}</div>
 </template>
 
 <script lang="ts">
@@ -34,10 +34,11 @@
     @Prop({ required: true })
     total!: number;
 
-    barWidth: number = 0;
-
-    mounted() {
-      this.barWidth = Math.round((this.value / this.total) * 100);
+    get barWidth(): number {
+      if (this.total === 0) {
+        return 0;
+      }
+      return Math.round((this.value / this.total) * 100);
     }
   }
 </script>

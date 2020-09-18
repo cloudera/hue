@@ -61,7 +61,7 @@
     </div>
   </div>
 
-  <modal-dialog v-if="isShowingSaveModal" @close="toggleSaveModal">
+  <modal v-if="isShowingSaveModal" @close="toggleSaveModal">
     <template slot="header">
       <span class="modal-title">Save Search</span>
       <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
@@ -77,20 +77,20 @@
       <button type="button" class="modal-default-button" @click="toggleSaveModal">CANCEL</button>
       <button type="button" class="" @click="saveSearch">SAVE</button>
     </template>
-  </modal-dialog>
+  </modal>
 </template>
 
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
-  import ModalDialog from '../../common/ModalDialog.vue';
+  import Modal from '../../common/Modal.vue';
   import RangePanel from './RangePanel.vue';
   import { Search, TableDefinition } from '../index';
   import * as api from '../apiUtils';
 
   @Component({
-    components: {ModalDialog, RangePanel}
+    components: { Modal, RangePanel }
   })
   export default class QueriesSearch extends Vue {
     @Prop({ required: true })

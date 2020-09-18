@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ProgressBar.vue should render a progress bar 1`] = `
+<div
+  class="bar"
+  style="width: 63%;"
+  title="Some title"
+>
+  Some title
+</div>
+`;
+
+exports[`ProgressBar.vue should render a progress bar with 0 total (div 0 check) 1`] = `
+<div
+  class="bar"
+  style="width: 0%;"
+>
+  
+</div>
+`;

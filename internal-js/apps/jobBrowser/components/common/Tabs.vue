@@ -19,30 +19,38 @@
 <template>
   <div>
     <ul>
-      <li v-for='tab in tabs' :key='tab.title' @click='selectTab(tab)'>
-        {{ tab.title }}
-      </li>
+      <li v-for='tab in tabs' :key='tab.title' @click='selectTab(tab)'>{{ tab.title }}</li>
     </ul>
+    <slot></slot>
   </div>
-  <slot></slot>
 </template>
 
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
+  import { Provide } from 'vue-property-decorator';
   import Tab from './Tab.vue';
 
   @Component
   export default class Tabs extends Vue {
     tabs: Tab[] = [];
 
-    created() {
-      this.tabs = this.$children as Tab[];
+    @Provide()
+    addTab(tab: Tab) {
+      this.tabs.push(tab);
+      if (this.tabs.length === 1) {
+        this.selectTab(this.tabs[0]);
+      }
     }
 
-    mounted () {
-      if (this.tabs.length) {
-        this.selectTab(this.tabs[0]);
+    @Provide()
+    removeTab(tab: Tab) {
+      const index = this.tabs.indexOf(tab);
+      if (index !== -1) {
+        this.$delete(this.tabs, index);
+        if (tab.isActive && this.tabs.length) {
+          this.tabs[Math.max(0, index - 1)].isActive = true;
+        }
       }
     }
 

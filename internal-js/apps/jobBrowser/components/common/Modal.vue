@@ -46,7 +46,7 @@
   // Based on https://vuejs.org/v2/examples/modal.html
 
   @Component
-  export default class ModalDialog extends Vue {}
+  export default class Modal extends Vue {}
 </script>
 
 <style lang="scss" scoped>
