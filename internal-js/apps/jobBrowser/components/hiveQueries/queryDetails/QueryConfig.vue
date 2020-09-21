@@ -17,11 +17,11 @@
 -->
 
 <template>
-  <div id="configs" class="target detail-panel">
+  <div class="target detail-panel">
     <div class="row">
       <div class="col-md-12">
         <div class="title">
-          Configurations
+          {{ title }}
         </div>
         <label v-if="queries.length > 1"><input v-model="showDifferences" type="checkbox" > Show Differences</label>
       </div>
@@ -38,6 +38,8 @@
 </template>
 
 <script lang="ts">
+  import {Prop} from 'vue-property-decorator';
+  import { Query } from '../index';
   import { numberToLetter } from './utils';
   import MultiQueryComponent from './MultiQueryComponent.vue';
   import Component from 'vue-class-component';
@@ -49,6 +51,14 @@
   })
   export default class QueryConfig extends MultiQueryComponent {
     showDifferences: boolean = true;
+
+    @Prop({ required: false, default: 'Configurations' })
+    title!: string;
+
+    // Should be abstract but Vue doesn't like abstract components for some reason
+    getConfigs(query: Query): { [key: string]: unknown } {
+      return query.details && query.details.configuration || {};
+    }
 
     get configColumns(): Column[] {
       const columns = [
@@ -74,9 +84,7 @@
       const allConfigKeys: string[] = [];
 
       this.queries.forEach(query => {
-        if (query.details && query.details.configuration) {
-          allConfigKeys.push(...Object.keys(query.details.configuration));
-        }
+        allConfigKeys.push(...Object.keys(this.getConfigs(query)));
       });
       allConfigKeys.sort((a, b) => a.localeCompare(b));
 
@@ -89,7 +97,7 @@
         let hasDifferences = false;
         let previousConfigValue: unknown = undefined;
         this.queries.forEach((query, index) => {
-          const config = (query.details && query.details.configuration) || {};
+          const config = this.getConfigs(query);
           row['configurationValue' + index] = config[configKey];
           if (index > 0 && !hasDifferences) {
             hasDifferences = previousConfigValue !== config[configKey];

@@ -31,6 +31,7 @@ exports[`QueryDetails.vue should render 1`] = `
       >
         <query-config-stub
           queries="[object Object]"
+          title="Configurations"
         />
       </tab-stub>
        

@@ -38,11 +38,11 @@ export default TableController.extend({
   breadcrumbs: [],
 
   definition: Ember.computed(function () {
-    return TableDefinition.create({
+    return TableDefinition.create({
       rowCount: 25,
       searchText: "tez."
-    });
-  }),
+    });
+  }),
 
   columns: ColumnDefinition.make([{
     id: 'configName',

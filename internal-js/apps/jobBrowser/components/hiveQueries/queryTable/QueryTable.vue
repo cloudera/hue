@@ -22,14 +22,15 @@
   <div class="table-component">
     <queries-search :searches="searches" :table-definition="tableDefinition"></queries-search>
     <div class="left-panel">
-      <div v-if="!columnSelectorIsVisible" class="refine-header">
-        Refine
-        <i v-if="!dataProcessor.facets.fieldCount" class="fa fa-spinner fa-pulse fa-fw"></i>
-        <i class='fa fa-plus' title="Customize" @click="toggleColumnSelector"></i>
-      </div>
-      <!-- {{em-table-facet-panel tableDefinition=definition dataProcessor=dataProcessor}} -->
+      <template v-if="!columnSelectorIsVisible" >
+        <div class="refine-header">
+          Refine
+          <i v-if="!dataProcessor.facets.fieldCount" class="fa fa-spinner fa-pulse fa-fw"></i>
+          <i class='fa fa-plus' title="Customize" @click="toggleColumnSelector"></i>
+        </div>
+        <!-- {{em-table-facet-panel tableDefinition=definition dataProcessor=dataProcessor}} -->
+      </template>
       <column-selector-panel v-else :columns="columns" @set-checked-columns="checkedColumnsChanged"  @close="toggleColumnSelector"></column-selector-panel>
-      <!-- {{column-selector-panel tableDefinition=definition dataProcessor=dataProcessor columnPrefDef=columnPrefDef}}-->
     </div>
     <div class="table">
       <hue-table :columns="visibleColumns" :rows="queries"></hue-table>
@@ -122,7 +123,6 @@
 
     @Emit('diff-queries')
     diffQueries(queries: Query[]) {
-
     }
   }
 </script>

@@ -44,7 +44,10 @@ exports[`DagDetails.vue should render 1`] = `
     <tab-stub
       title="DAG CONFIGURATIONS"
     >
-      <dag-configs-stub />
+      <dag-configs-stub
+        queries="[object Object]"
+        title="Configurations"
+      />
     </tab-stub>
   </tabs-stub>
 </div>

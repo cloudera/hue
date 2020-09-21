@@ -3,7 +3,6 @@
 exports[`QueryConfig.vue should render 1`] = `
 <div
   class="target detail-panel"
-  id="configs"
 >
   <div
     class="row"

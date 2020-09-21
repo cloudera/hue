@@ -15,7 +15,6 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils'
-import Vue from 'vue';
 import { Column } from '../../common/HueTable';
 import ColumnSelectorPanel from './ColumnSelectorPanel.vue'
 

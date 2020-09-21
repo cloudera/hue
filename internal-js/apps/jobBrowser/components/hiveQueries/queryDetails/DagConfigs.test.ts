@@ -19,7 +19,11 @@ import DagConfigs from './DagConfigs.vue'
 
 describe('DagConfigs.vue', () => {
   it('should render', () => {
-    const wrapper = shallowMount(DagConfigs);
+    const wrapper = shallowMount(DagConfigs, {
+      propsData: {
+        queries: []
+      }
+    });
     expect(wrapper.element).toMatchSnapshot();
   })
 })

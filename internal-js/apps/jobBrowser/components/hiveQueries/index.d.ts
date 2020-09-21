@@ -20,6 +20,7 @@ export interface Dag {
   dagInfo: {
     dagId: string;
   };
+  config?: { [key: string]: string }; // TODO: value always string?
 }
 
 export interface NormalizedQueryPerf {
@@ -66,7 +67,7 @@ export interface Query {
   details?: {
     diagnostics?: string;
     perf?: QueryPerf;
-    configuration?: { [key: string]: string }; // TODO: value always string?
+    configuration?: { [key: string]: unknown }; // TODO: value type string?
   };
   domainId?: unknown; // TODO: type?
   duration?: number; // TODO: From API or adaption? number?

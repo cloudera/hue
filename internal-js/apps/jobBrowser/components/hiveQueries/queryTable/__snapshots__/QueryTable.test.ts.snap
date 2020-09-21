@@ -16,8 +16,8 @@ exports[`QueryTable.vue should render 1`] = `
       class="refine-header"
     >
       
-      Refine
-      
+        Refine
+        
       <i
         class="fa fa-spinner fa-pulse fa-fw"
       />

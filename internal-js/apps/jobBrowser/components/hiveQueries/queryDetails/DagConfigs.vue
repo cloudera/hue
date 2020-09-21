@@ -16,17 +16,25 @@
   limitations under the License.
 -->
 
-<template>
-  <div>DagConfigs - Not Implemented</div>
-  <!-- TODO: Implement -->
-</template>
-
 <script lang="ts">
-  import Vue from 'vue';
   import Component from 'vue-class-component';
+  import { Query } from '../index';
+  import QueryConfig from './QueryConfig.vue';
 
   @Component
-  export default class DagConfigs extends Vue {}
+  export default class DagConfigs extends QueryConfig {
+    getConfigs(query: Query): { [configName: string]: unknown } {
+      const configs: { [configName: string]: unknown } = {};
+      query.dags.forEach(dag => {
+        if (dag.config) {
+          Object.keys(dag.config).forEach(configName => {
+            configs[configName] = dag.config![configName];
+          })
+        }
+      })
+      return configs;
+    }
+  }
 </script>
 
 <style lang="scss" scoped></style>

@@ -46,6 +46,7 @@ exports[`QueryDiff.vue should render 1`] = `
    
   <query-config-stub
     queries="[object Object],[object Object]"
+    title="Configurations"
   />
    
   <query-timeline-stub
@@ -94,7 +95,10 @@ exports[`QueryDiff.vue should render 1`] = `
       <tab-stub
         title="DAG CONFIGURATIONS"
       >
-        <dag-configs-stub />
+        <dag-configs-stub
+          queries="[object Object],[object Object]"
+          title="Configurations"
+        />
       </tab-stub>
     </tabs-stub>
   </div>

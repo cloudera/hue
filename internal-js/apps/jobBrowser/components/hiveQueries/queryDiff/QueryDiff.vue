@@ -48,7 +48,7 @@
         <tab title="DAG SWIMLANE"><dag-swimlane></dag-swimlane></tab>
         <tab title="DAG FLOW"><dag-graphical-view></dag-graphical-view></tab>
         <tab title="DAG COUNTERS"><dag-counters></dag-counters></tab>
-        <tab title="DAG CONFIGURATIONS"><dag-configs></dag-configs></tab>
+        <tab title="DAG CONFIGURATIONS"><dag-configs :queries="queries"></dag-configs></tab>
       </tabs>
       <!-- {{/bs-tab}} -->
     </div>
