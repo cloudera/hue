@@ -17,7 +17,13 @@
 -->
 
 <template>
-  <query-table v-if="!selectedQuery && !queriesToDiff" @diff-queries="diffQueries" @query-selected="querySelected"></query-table>
+  <query-table
+      v-if="!selectedQuery && !queriesToDiff"
+      :queries="queries"
+      :columns="columns"
+      @diff-queries="diffQueries"
+      @query-selected="querySelected"
+  ></query-table>
   <query-details v-else-if="selectedQuery" :query="selectedQuery"></query-details>
   <query-diff v-else :queries="queriesToDiff"></query-diff>
 </template>
@@ -25,6 +31,7 @@
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
+  import { Column } from '../common/HueTable';
   import QueryDiff from './queryDiff/QueryDiff.vue';
   import QueryDetails from './queryDetails/QueryDetails.vue';
   import { Query } from './index';
@@ -36,6 +43,9 @@
   export default class HiveQuerySearch extends Vue {
     selectedQuery?: Query;
     queriesToDiff?: Query[];
+
+    queries: Query[] = [];
+    columns: Column[] = []; // TODO: Move to QueryTable?
 
     showTable() {
       this.selectedQuery = undefined;

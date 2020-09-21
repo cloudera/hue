@@ -15,14 +15,24 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils'
-import QueryTable from './QueryTable.vue'
+import Vue from 'vue';
+import { Column } from '../../common/HueTable';
+import ColumnSelectorPanel from './ColumnSelectorPanel.vue'
 
-describe('QueryTable.vue', () => {
+describe('ColumnSelectorPanel.vue', () => {
   it('should render', () => {
-    const wrapper = shallowMount(QueryTable, {
+    const wrapper = shallowMount(ColumnSelectorPanel, {
       propsData: {
-        columns: [],
-        queries: []
+        columns: []
+      }
+    });
+    expect(wrapper.element).toMatchSnapshot();
+  })
+
+  it('should render with checkboxes', () => {
+    const wrapper = shallowMount(ColumnSelectorPanel, {
+      propsData: {
+        columns: <Column[]>[{ key: 'a', label: 'A' }, { key: 'b', label: 'B' }]
       }
     });
     expect(wrapper.element).toMatchSnapshot();

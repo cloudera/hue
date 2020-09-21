@@ -156,5 +156,12 @@ export interface SearchMeta {
 interface TableDefinition {
   rangeData: {
     title: string;
+  },
+  columnPreferences: { id: string }[]
+}
+
+interface DataProcessor {
+  facets: {
+    fieldCount?: number;
   }
 }
