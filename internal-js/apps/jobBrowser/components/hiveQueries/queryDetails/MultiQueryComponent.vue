@@ -26,9 +26,5 @@ import { Query } from '../index';
 export default class MultiQueryComponent extends Vue {
   @Prop({ required: true })
   queries!: Query[]
-
-  numberToLetter(value: number): string {
-    return String.fromCharCode(65 + value);  // A, B, C, ...
-  }
 }
 </script>

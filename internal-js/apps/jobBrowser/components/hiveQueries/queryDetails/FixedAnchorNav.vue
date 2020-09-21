@@ -17,17 +17,19 @@
 -->
 
 <template>
-  <a href="javascript: void(0);" class="btn btn-success btn-sm">Queries (implement)</a>
+  <div>
+    <a href="javascript: void(0);" class="btn btn-success btn-sm">Queries (implement)</a>
 
-  <div class="buttons">
-    <template v-if="!query.isComplete">
-      <button v-if="stoppingQuery" type="button" class="btn btn-default btn-sm disabled">
-        <i class="fa fa-spinner fa-pulse fa-fw"></i> Stopping query
-      </button>
-      <button v-else type="button" class="btn btn-warning btn-sm" v-on:click="stopQuery">Stop</button>
-    </template>
+    <div class="buttons">
+      <template v-if="!query.isComplete">
+        <button v-if="stoppingQuery" type="button" class="btn btn-default btn-sm disabled">
+          <i class="fa fa-spinner fa-pulse fa-fw"></i> Stopping query
+        </button>
+        <button v-else type="button" class="btn btn-warning btn-sm" v-on:click="stopQuery">Stop</button>
+      </template>
 
-    <button type="button" class="btn btn-success btn-sm" v-on:click="downloadLogs">DOWNLOAD</button>
+      <button type="button" class="btn btn-success btn-sm" v-on:click="downloadLogs">DOWNLOAD</button>
+    </div>
   </div>
 </template>
 

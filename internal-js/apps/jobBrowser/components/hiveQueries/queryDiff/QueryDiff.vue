@@ -32,12 +32,12 @@
     <div v-if="!isDagEmpty()" id="dag-panel" class="target detail-panel dag-panel">
       <div class="row">
         <div class="col-xs-6">
-          <select v-if="queries[0].dags.length > 1" v-model="selectedDagId1" @change="dagSelected1($event.target.value)" class="form-control">
+          <select v-if="queries[0].dags && queries[0].dags.length > 1" v-model="selectedDagId1" @change="dagSelected1($event.target.value)" class="form-control">
             <option v-for="dag in queries[0].dags" v-bind:value="dag.dagInfo.dagId">{{ dag.dagInfo.dagId }}</option>
           </select>
         </div>
         <div class="col-xs-6">
-          <select v-if="queries[1].dags.length > 1" v-model="selectedDagId2" @change="dagSelected2($event.target.value)" class="form-control">
+          <select v-if="queries[1].dags && queries[1].dags.length > 1" v-model="selectedDagId2" @change="dagSelected2($event.target.value)" class="form-control">
             <option v-for="dag in queries[1].dags" v-bind:value="dag.dagInfo.dagId">{{ dag.dagInfo.dagId }}</option>
           </select>
         </div>

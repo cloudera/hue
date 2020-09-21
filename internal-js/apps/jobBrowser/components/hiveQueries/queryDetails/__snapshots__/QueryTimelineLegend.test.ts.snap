@@ -1,0 +1,175 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryTimelineLegend.vue should render 1`] = `
+<div>
+  <div
+    class="title"
+  >
+    
+    Duration
+  
+  </div>
+   
+  <table
+    class="detail-list"
+  >
+    <thead>
+      <tr>
+        <th>
+          Pre-Execution + DAG construction
+        </th>
+         
+        <th>
+          A - 0
+        </th>
+      </tr>
+    </thead>
+     
+    <tbody>
+      <tr>
+        <td>
+          Compile
+        </td>
+         
+        <td>
+          0
+        </td>
+      </tr>
+       
+      <tr>
+        <td>
+          Parse
+        </td>
+         
+        <td>
+          0
+        </td>
+      </tr>
+       
+      <tr>
+        <td>
+          Build Dag
+        </td>
+         
+        <td>
+          0
+        </td>
+      </tr>
+    </tbody>
+  </table>
+   
+  <table
+    class="detail-list"
+  >
+    <thead>
+      <tr>
+        <th>
+          DAG Submission
+        </th>
+         
+        <th>
+          A - 0
+        </th>
+      </tr>
+    </thead>
+     
+    <tbody>
+      <tr>
+        <td>
+          Submit Dag
+        </td>
+         
+        <td>
+          0
+        </td>
+      </tr>
+       
+      <tr>
+        <td>
+          Submit To Running
+        </td>
+         
+        <td>
+          0
+        </td>
+      </tr>
+    </tbody>
+  </table>
+   
+  <table
+    class="detail-list"
+  >
+    <thead>
+      <tr>
+        <th>
+          DAG Runtime
+        </th>
+         
+        <th>
+          A - 0
+        </th>
+      </tr>
+    </thead>
+     
+    <tbody>
+      <tr>
+        <td>
+          Run Dag
+        </td>
+         
+        <td>
+          0
+        </td>
+      </tr>
+    </tbody>
+  </table>
+   
+  <table
+    class="detail-list"
+  >
+    <thead>
+      <tr>
+        <th>
+          Post Execution
+        </th>
+         
+        <th>
+          A - 0
+        </th>
+      </tr>
+    </thead>
+     
+    <tbody>
+      <tr>
+        <td>
+          Post Hive Hook
+        </td>
+         
+        <td>
+          0
+        </td>
+      </tr>
+       
+      <tr>
+        <td>
+          Remove Files
+        </td>
+         
+        <td>
+          0
+        </td>
+      </tr>
+       
+      <tr>
+        <td>
+          Rename Or Move Files
+        </td>
+         
+        <td>
+          0
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+`;

@@ -38,6 +38,7 @@
 </template>
 
 <script lang="ts">
+  import { numberToLetter } from './utils';
   import MultiQueryComponent from './MultiQueryComponent.vue';
   import Component from 'vue-class-component';
   import { Column, Row } from '../../common/HueTable';
@@ -59,7 +60,7 @@
       this.queries.forEach((query, index) => {
         let label = 'Configuration Value';
         if (this.queries.length > 1) {
-          label += ' - ' + this.numberToLetter(index);
+          label += ' - ' + numberToLetter(index);
         }
         columns.push({
           label: label,

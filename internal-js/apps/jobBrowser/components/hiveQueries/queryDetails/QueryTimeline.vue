@@ -47,50 +47,11 @@
 
 <script lang="ts">
   import Component from 'vue-class-component';
+  import { normalizePerf, numberToLetter } from './utils';
   import MultiQueryComponent from './MultiQueryComponent.vue';
   import QueryTimelineBars from './QueryTimelineBars.vue';
   import QueryTimelineLegend from './QueryTimelineLegend.vue';
-  import { NormalizedQueryPerf, Query } from '../index';
-
-  const normalizePerf = (query?: Query): NormalizedQueryPerf => {
-    const result = Object.assign(
-      {
-        compile: 0,
-        groupTotal: {
-          pre: 0,
-          submit: 0,
-          running: 0,
-          post: 0
-        },
-        parse: 0,
-        PostHiveProtoLoggingHook: 0,
-        RemoveTempOrDuplicateFiles: 0,
-        RenameOrMoveFiles: 0,
-        TezBuildDag: 0,
-        TezRunDag: 0,
-        TezSubmitDag: 0,
-        TezSubmitToRunningDag: 0,
-        total: 0
-      },
-      query && query.details && query.details.perf
-    );
-
-    result.groupTotal.post =
-      result.PostHiveProtoLoggingHook +
-      result.RemoveTempOrDuplicateFiles +
-      result.RenameOrMoveFiles;
-    result.groupTotal.pre = result.compile + result.parse + result.TezBuildDag;
-    result.groupTotal.running = result.TezRunDag;
-    result.groupTotal.submit = result.TezSubmitDag + result.TezSubmitToRunningDag;
-
-    result.total =
-      result.groupTotal.pre +
-      result.groupTotal.submit +
-      result.groupTotal.running +
-      result.groupTotal.post;
-
-    return result;
-  };
+  import { NormalizedQueryPerf } from '../index';
 
   @Component({
     components: { QueryTimelineLegend, QueryTimelineBars }
@@ -100,7 +61,7 @@
       return this.queries.map((query, index) => {
         let title = 'Timeline';
         if (this.queries.length > 1) {
-          title += ' - ' + this.numberToLetter(index);
+          title += ' - ' + numberToLetter(index);
         }
         return { title: title, perf: normalizePerf(query) };
       });

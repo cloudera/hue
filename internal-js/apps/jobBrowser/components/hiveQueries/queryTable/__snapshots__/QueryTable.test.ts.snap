@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryTable.vue should render 1`] = `
+<div
+  class="table-component"
+>
+  <queries-search-stub
+    searches=""
+    tabledefinition="[object Object]"
+  />
+   
+  <div
+    class="left-panel"
+  >
+    <div
+      class="refine-header"
+    >
+      
+      Refine
+      
+      <i
+        class="fa fa-spinner fa-pulse fa-fw"
+      />
+       
+      <i
+        class="fa fa-plus"
+        title="Customize"
+      />
+    </div>
+  </div>
+   
+  <div
+    class="table"
+  />
+</div>
+`;

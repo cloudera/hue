@@ -17,42 +17,40 @@
 -->
 
 <template>
-  <div class="dag-panel">
-    <fixed-anchor-nav :query="query"></fixed-anchor-nav>
-    <!-- {{#bs-tab fade=false as |tab|}} -->
+  <div>
+    <div class="dag-panel">
+      <fixed-anchor-nav :query="query"></fixed-anchor-nav>
+      <!-- {{#bs-tab fade=false as |tab|}} -->
 
-    <tabs>
-      <tab title="QUERY INFO">
-        <query-info :query="query"></query-info>
-      </tab>
-      <tab title="VISUAL EXPLAIN">
-        <visual-explain :query="query"></visual-explain>
-      </tab>
-      <tab title="QUERY CONFIG">
-        <query-config :query="query"></query-config>
-      </tab>
-      <tab title="TIMELINE">
-        <query-timeline :query="query"></query-timeline>
-      </tab>
-    </tabs>
+      <tabs>
+        <tab title="QUERY INFO">
+          <query-info :query="query"></query-info>
+        </tab>
+        <tab title="VISUAL EXPLAIN">
+          <visual-explain :queries="[query]"></visual-explain>
+        </tab>
+        <tab title="QUERY CONFIG">
+          <query-config :queries="[query]"></query-config>
+        </tab>
+        <tab title="TIMELINE">
+          <query-timeline :queries="[query]"></query-timeline>
+        </tab>
+      </tabs>
 
-    <!-- {{/bs-tab}} -->
+      <!-- {{/bs-tab}} -->
+    </div>
+
+    <dag-details v-if="!isDagEmpty" :query="query" />
   </div>
-
-  <dag-details v-if="!isDagEmpty()" />
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
   import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
-  import SingleQueryComponent
-    from '../../../../../internal-js/apps/jobBrowser/components/hiveQueries/queryDetails/SingleQueryComponent.vue';
+  import SingleQueryComponent from './SingleQueryComponent.vue';
   import Tab from '../../common/Tab.vue';
   import Tabs from '../../common/Tabs.vue';
   import FixedAnchorNav from './FixedAnchorNav.vue';
   import QueryTimeline from './QueryTimeline.vue';
-  import { Query } from '../index';
   import DagDetails from './DagDetails.vue';
   import QueryConfig from './QueryConfig.vue';
   import QueryInfo from './QueryInfo.vue';

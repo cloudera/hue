@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryDetails.vue should render 1`] = `
+<div>
+  <div
+    class="dag-panel"
+  >
+    <fixed-anchor-nav-stub
+      query="[object Object]"
+    />
+     
+    <tabs-stub>
+      <tab-stub
+        title="QUERY INFO"
+      >
+        <query-info-stub
+          query="[object Object]"
+        />
+      </tab-stub>
+       
+      <tab-stub
+        title="VISUAL EXPLAIN"
+      >
+        <visual-explain-stub
+          queries="[object Object]"
+        />
+      </tab-stub>
+       
+      <tab-stub
+        title="QUERY CONFIG"
+      >
+        <query-config-stub
+          queries="[object Object]"
+        />
+      </tab-stub>
+       
+      <tab-stub
+        title="TIMELINE"
+      >
+        <query-timeline-stub
+          queries="[object Object]"
+        />
+      </tab-stub>
+    </tabs-stub>
+  </div>
+   
+  <dag-details-stub
+    query="[object Object]"
+  />
+</div>
+`;

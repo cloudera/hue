@@ -1,0 +1,102 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryDiff.vue should render 1`] = `
+<div
+  class="query-diff"
+>
+  <div
+    style="clear: both;"
+  />
+   
+  <div
+    class="target"
+    id="query-details"
+  >
+    <div
+      class="diff-panel"
+    >
+      <query-info-stub
+        query="[object Object]"
+        title="A"
+      />
+    </div>
+     
+    <div
+      class="diff-panel"
+    >
+      <query-info-stub
+        query="[object Object]"
+        title="B"
+      />
+    </div>
+     
+    <div
+      class="query-diff-highlighter"
+      style="clear: both;"
+    >
+      <query-text-diff-stub
+        querytwo="[object Object]"
+      />
+    </div>
+  </div>
+   
+  <query-visual-explain-stub
+    queries="[object Object],[object Object]"
+  />
+   
+  <query-config-stub
+    queries="[object Object],[object Object]"
+  />
+   
+  <query-timeline-stub
+    queries="[object Object],[object Object]"
+  />
+   
+  <div
+    class="target detail-panel dag-panel"
+    id="dag-panel"
+  >
+    <div
+      class="row"
+    >
+      <div
+        class="col-xs-6"
+      >
+        <!---->
+      </div>
+       
+      <div
+        class="col-xs-6"
+      >
+        <!---->
+      </div>
+    </div>
+     
+    <tabs-stub>
+      <tab-stub
+        title="DAG SWIMLANE"
+      >
+        <dag-swimlane-stub />
+      </tab-stub>
+       
+      <tab-stub
+        title="DAG FLOW"
+      >
+        <dag-graphical-view-stub />
+      </tab-stub>
+       
+      <tab-stub
+        title="DAG COUNTERS"
+      >
+        <dag-counters-stub />
+      </tab-stub>
+       
+      <tab-stub
+        title="DAG CONFIGURATIONS"
+      >
+        <dag-configs-stub />
+      </tab-stub>
+    </tabs-stub>
+  </div>
+</div>
+`;

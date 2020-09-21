@@ -1,0 +1,99 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryTimelineBars.vue should render 1`] = `
+<div
+  class="timeline-bars"
+>
+  <div
+    class="groups"
+  >
+    <progress-bar-stub
+      title="Pre-Execution + DAG construction"
+      total="0"
+      value="0"
+    />
+     
+    <progress-bar-stub
+      title="DAG Submission"
+      total="0"
+      value="0"
+    />
+     
+    <progress-bar-stub
+      title="DAG Runtime"
+      total="0"
+      value="0"
+    />
+     
+    <progress-bar-stub
+      title="Pre-Execution + DAG construction"
+      total="0"
+      value="0"
+    />
+     
+    <progress-bar-stub
+      title="Post Execution"
+      total="0"
+      value="0"
+    />
+  </div>
+   
+  <div
+    class="sub-groups"
+  >
+    <progress-bar-stub
+      title="Compile"
+      total="0"
+      value="0"
+    />
+     
+    <progress-bar-stub
+      title="Parse"
+      total="0"
+      value="0"
+    />
+     
+    <progress-bar-stub
+      title="Build Dag"
+      total="0"
+      value="0"
+    />
+     
+    <progress-bar-stub
+      title="Submit Dag"
+      total="0"
+      value="0"
+    />
+     
+    <progress-bar-stub
+      title="Submit To Running"
+      total="0"
+      value="0"
+    />
+     
+    <progress-bar-stub
+      title="Run Dag"
+      total="0"
+      value="0"
+    />
+     
+    <progress-bar-stub
+      title="Post ATS Hook"
+      total="0"
+      value="0"
+    />
+     
+    <progress-bar-stub
+      title="Remove Files"
+      total="0"
+      value="0"
+    />
+     
+    <progress-bar-stub
+      title="Rename Or Move Files"
+      total="0"
+      value="0"
+    />
+  </div>
+</div>
+`;

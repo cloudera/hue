@@ -27,7 +27,7 @@
         <tr>
           <th>Pre-Execution + DAG construction</th>
           <template v-for="(perf, index) in perfs">
-            <th :key="index">{{ String.fromCharCode(65 + index) + ' - ' + perf.groupTotal.pre }}</th>
+            <th :key="index">{{ numberToLetter(index) + ' - ' + perf.groupTotal.pre }}</th>
           </template>
         </tr>
       </thead>
@@ -58,7 +58,7 @@
         <tr>
           <th>DAG Submission</th>
           <template v-for="(perf, index) in perfs">
-            <th :key="index">{{ String.fromCharCode(65 + index) + ' - ' + perf.groupTotal.submit }}</th>
+            <th :key="index">{{ numberToLetter(index) + ' - ' + perf.groupTotal.submit }}</th>
           </template>
         </tr>
       </thead>
@@ -83,7 +83,7 @@
         <tr>
           <th>DAG Runtime</th>
           <template v-for="(perf, index) in perfs">
-            <th :key="index">{{ String.fromCharCode(65 + index) + ' - ' + perf.groupTotal.running }}</th>
+            <th :key="index">{{ numberToLetter(index) + ' - ' + perf.groupTotal.running }}</th>
           </template>
         </tr>
       </thead>
@@ -102,7 +102,7 @@
         <tr>
           <th>Post Execution</th>
           <template v-for="(perf, index) in perfs">
-            <th :key="index">{{ String.fromCharCode(65 + index) + ' - ' + perf.groupTotal.post }}</th>
+            <th :key="index">{{ numberToLetter(index) + ' - ' + perf.groupTotal.post }}</th>
           </template>
         </tr>
       </thead>
@@ -131,15 +131,18 @@
 </template>
 
 <script lang="ts">
+  import { numberToLetter } from './utils';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
   import { NormalizedQueryPerf } from '../index';
 
-  @Component
+  @Component({
+    methods: { numberToLetter }
+  })
   export default class QueryTimelineLegend extends Vue {
-    @Prop({ required: false })
-    perfs: NormalizedQueryPerf[] = [];
+    @Prop({ required: true })
+    perfs!: NormalizedQueryPerf[];
   }
 </script>
 

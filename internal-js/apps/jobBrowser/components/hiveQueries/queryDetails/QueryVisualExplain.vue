@@ -17,25 +17,27 @@
 -->
 
 <template>
-  <div id="visual-explain" class="target detail-panel query-details-visualExplain">
-    <template v-for="(query, index) in queries" :key="index">
-      <div class="row">
-        <div class="col-md-12">
-          <div v-if="queries.length > 1" class="title">
-            Visual Explain - {{ numberToLetter(index) }}
-          </div>
-          <div v-else class="title">
-            Visual Explain
+  <div class="target detail-panel query-details-visualExplain">
+    <template v-for="(query, index) in queries">
+      <div :key="id">
+        <div class="row">
+          <div class="col-md-12">
+            <div v-if="queries.length > 1" class="title">
+              Visual Explain - {{ numberToLetter(index) }}
+            </div>
+            <div v-else class="title">
+              Visual Explain
+            </div>
           </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-md-12">
-          <div class="body">
-            <div v-if="!query" class="explain--error">
-              <div>No Visual Explain available.</div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="body">
+              <div v-if="!query" class="explain--error">
+                <div>No Visual Explain available.</div>
+              </div>
+              <visual-explain v-else :queries="queries" />
             </div>
-            <visual-explain v-else :query="query" />
           </div>
         </div>
       </div>
@@ -44,12 +46,14 @@
 </template>
 
 <script lang="ts">
+  import { numberToLetter } from './utils';
   import Component from 'vue-class-component';
   import VisualExplain from './VisualExplain.vue';
   import MultiQueryComponent from './MultiQueryComponent.vue';
 
   @Component({
-    components: { VisualExplain }
+    components: { VisualExplain },
+    methods: { numberToLetter }
   })
   export default class QueryVisualExplain extends MultiQueryComponent {}
 </script>
