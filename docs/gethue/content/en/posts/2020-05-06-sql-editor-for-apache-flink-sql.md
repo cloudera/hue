@@ -73,9 +73,9 @@ Here we start a SQL client container and install the gateway inside (to avoid in
 We grab a [release](https://github.com/ververica/flink-sql-gateway/releases) of the gateway:
 
     cd /opt
-    wget https://github.com/ververica/flink-sql-gateway/releases/download/v0.1-snapshot/flink-sql-gateway-0.1-SNAPSHOT-bin.zip
-    unzip flink-sql-gateway-0.1-SNAPSHOT-bin.zip
-    cd flink-sql-gateway-0.1-SNAPSHOT
+    wget https://github.com/ververica/flink-sql-gateway/releases/download/flink-1.11.1/flink-sql-gateway-0.2-SNAPSHOT-bin.zip
+    unzip flink-sql-gateway-0.2-SNAPSHOT-bin.zip
+    cd flink-sql-gateway-0.2-SNAPSHOT
 
     echo $FLINK_HOME
 
@@ -83,7 +83,7 @@ Then from another shell we copy the Flink SQL config to the gateway so that we g
 
     wget https://raw.githubusercontent.com/romainr/flink-sql-gateway/master/docs/demo/sql-gateway-defaults.yaml
 
-    docker cp sql-gateway-defaults.yaml sql-training_sql-client_1:/opt/flink-sql-gateway-0.1-SNAPSHOT/conf/
+    docker cp sql-gateway-defaults.yaml sql-training_sql-client_1:/opt/flink-sql-gateway-0.2-SNAPSHOT/conf/
 
 Now we can go back to the shell in the container and are ready to start it:
 
@@ -96,10 +96,10 @@ Putting the server in the background with `CTRL-Z` and then:
 
 And now we can issue a few commands to validate the setup:
 
-    curl localhost:8083/v1/info
+    curl sql-training_sql-client_1:8083/v1/info
     > {"product_name":"Apache Flink","version":"1.10.0"}
 
-    curl -X POST localhost:8083/v1/sessions -d '{"planner":"blink","execution_type":"streaming"}'
+    curl -X POST sql-training_sql-client_1:8083/v1/sessions -d '{"planner":"blink","execution_type":"streaming"}'
     > {"session_id":"7eea0827c249e5a8fcbe129422f049e8"}
 
 
@@ -130,9 +130,9 @@ As detailed in the [connector](https://docs.gethue.com/administrator/configurati
     [[interpreters]]
 
     [[[flink]]]
-      name=Flink
-      interface=flink
-      options='{"api_url": "http://172.18.0.7:8993"}'
+    name=Flink
+    interface=flink
+    options='{"url": "http://172.18.0.7:8083"}'
 
 If we are setting up the gateway in the client container and want to access it via your localhost, we need to update its bind IP with the IP of the SQL client container.
 

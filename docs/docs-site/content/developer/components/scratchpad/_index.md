@@ -1,5 +1,5 @@
 ---
-title: "Scratchpad"
+title: "SQL Scratchpad"
 draft: false
 ---
 

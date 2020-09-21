@@ -38,6 +38,7 @@ import logging
 from lxml import etree
 import os
 import re
+import sys
 
 from django.core import serializers
 from django.utils.encoding import smart_str
@@ -52,7 +53,8 @@ from oozie.models import Workflow, Node, Link, Start, End,\
 
 LOG = logging.getLogger(__name__)
 
-OOZIE_NAMESPACES = ['uri:oozie:workflow:0.1', 'uri:oozie:workflow:0.2', 'uri:oozie:workflow:0.3', 'uri:oozie:workflow:0.4', 'uri:oozie:workflow:0.5']
+OOZIE_NAMESPACES = ['uri:oozie:workflow:0.1', 'uri:oozie:workflow:0.2', 'uri:oozie:workflow:0.3',
+                    'uri:oozie:workflow:0.4', 'uri:oozie:workflow:0.5']
 
 LINKS = ('ok', 'error', 'path')
 
@@ -147,11 +149,13 @@ def _save_links(workflow, root):
 
     tag = etree.QName(child_el).localname
     name = child_el.attrib.get('name', tag)
-    LOG.debug("Getting node with data - XML TAG: %(tag)s\tLINK NAME: %(node_name)s\tWORKFLOW NAME: %(workflow_name)s" % {
-      'tag': smart_str(tag),
-      'node_name': smart_str(name),
-      'workflow_name': smart_str(workflow.name)
-    })
+    LOG.debug(
+      "Getting node with data - XML TAG: %(tag)s\tLINK NAME: %(node_name)s\t"
+      "WORKFLOW NAME: %(workflow_name)s" % {
+        'tag': smart_str(tag),
+        'node_name': smart_str(name),
+        'workflow_name': smart_str(workflow.name)
+      })
 
     # Iterate over node members
     # Join nodes have attributes which point to the next node
@@ -407,7 +411,7 @@ def _resolve_decision_relationships(workflow):
       link = Link(name='related', parent=decision, child=end)
       link.save()
 
-    children = [_link.child.get_full_node() for _link in decision.get_children_links().exclude(name__in=['error','default'])]
+    children = [_link.child.get_full_node() for _link in decision.get_children_links().exclude(name__in=['error', 'default'])]
 
     ends = set()
     for child in children:
@@ -418,17 +422,19 @@ def _resolve_decision_relationships(workflow):
     # A single end means that we've found a unique end for this decision.
     # Multiple ends mean that we've found a bad decision.
     if len(ends) > 1:
-      raise RuntimeError(_('Cannot import workflows that have decisions paths with multiple terminal nodes that converge on a single terminal node.'))
+      raise RuntimeError(_(
+        'Cannot import workflows that have decisions paths with multiple '
+        'terminal nodes that converge on a single terminal node.'))
     elif len(ends) == 1:
       end = ends.pop()
       # Branch count will vary with each call if we have multiple decision nodes embedded within decision paths.
       # This is because parents are replaced with DecisionEnd nodes.
-      fan_in_count = len(end.get_parent_links().exclude(name__in=['error','default']))
+      fan_in_count = len(end.get_parent_links().exclude(name__in=['error', 'default']))
       # IF it covers all branches, then it is an end that perfectly matches this decision.
       # ELSE it is an end for a decision path that the current decision node is a part of as well.
       # The unhandled case is multiple ends for a single decision that converge on a single end.
       # This is not handled in Hue.
-      fan_out_count = len(decision.get_children_links().exclude(name__in=['error','default']))
+      fan_out_count = len(decision.get_children_links().exclude(name__in=['error', 'default']))
       if fan_in_count > fan_out_count:
         insert_end(end, decision)
         return end
@@ -446,7 +452,9 @@ def _resolve_decision_relationships(workflow):
         # Can do this because we've replace all its parents with a single DecisionEnd node.
         return helper(end, subgraphs)
       else:
-        raise RuntimeError(_('Cannot import workflows that have decisions paths with multiple terminal nodes that converge on a single terminal node.'))
+        raise RuntimeError(
+          _('Cannot import workflows that have decisions paths with multiple '
+            'terminal nodes that converge on a single terminal node.'))
     else:
       raise RuntimeError(_('Cannot import workflows that have decisions paths that never end.'))
 
@@ -458,11 +466,11 @@ def _resolve_decision_relationships(workflow):
       return subgraphs[node.name]
 
     # Assume receive full node.
-    children = [link.child.get_full_node() for link in node.get_children_links().exclude(name__in=['error','default'])]
+    children = [link.child.get_full_node() for link in node.get_children_links().exclude(name__in=['error', 'default'])]
 
     # Multiple parents means that we've potentially found an end.
     # Joins will always have more than one parent.
-    fan_in_count = len(node.get_parent_links().exclude(name__in=['error','default']))
+    fan_in_count = len(node.get_parent_links().exclude(name__in=['error', 'default']))
     if fan_in_count > 1 and not isinstance(node, Join) and not isinstance(node, DecisionEnd):
       return node
     elif isinstance(node, Decision):
@@ -515,7 +523,7 @@ def _prepare_nodes(workflow, root):
       node.node_type = obj.object.node_type
       full_node = obj.object
       for k, v in list(vars(node).items()):
-        if not k.startswith('_') and k not in ('node_type','workflow','node_ptr_id'):
+        if not k.startswith('_') and k not in ('node_type', 'workflow', 'node_ptr_id'):
           setattr(full_node, k, v)
       full_node.workflow = workflow
       full_node.node_type = type(full_node).node_type
@@ -591,7 +599,9 @@ def _resolve_subworkflow_from_deployment_dir(fs, workflow, app_path):
   except (KeyError, AttributeError) as e:
     raise RuntimeError(_("Could not find workflow name when resolving subworkflow."))
   except Workflow.DoesNotExist as e:
-    raise RuntimeError(_("Could not find workflow with name %s extracted from subworkflow path %s") % (root.attrib['name'], app_path))
+    raise RuntimeError(
+      _("Could not find workflow with name %s extracted "
+        "from subworkflow path %s") % (root.attrib['name'], app_path))
   except Exception as e:
     raise RuntimeError(_("Could not find workflow at path %s: %s") % (app_path, e))
 
@@ -653,10 +663,12 @@ def import_workflow_root(workflow, workflow_definition_root, metadata=None, fs=N
 
     # Ensure namespace exists
     if schema_version not in OOZIE_NAMESPACES:
-      raise RuntimeError(_("Tag with namespace %(namespace)s is not valid. Please use one of the following namespaces: %(namespaces)s") % {
-        'namespace': workflow_definition_root.tag,
-        'namespaces': ', '.join(OOZIE_NAMESPACES)
-      })
+      raise RuntimeError(_(
+        "Tag with namespace %(namespace)s is not valid. Please use one of "
+        "the following namespaces: %(namespaces)s") % {
+          'namespace': workflow_definition_root.tag,
+          'namespaces': ', '.join(OOZIE_NAMESPACES)
+        })
 
     # Get XSLT
     parser = etree.XMLParser(resolve_entities=False)
@@ -687,16 +699,29 @@ def import_workflow_root(workflow, workflow_definition_root, metadata=None, fs=N
 
 def import_workflow(workflow, workflow_definition, metadata=None, fs=None):
   # Parse Workflow Definition
-  workflow_definition_root = etree.fromstring(workflow_definition)
+  if sys.version_info[0] > 2:
+    # In Py3 anything like <?xml version="1.0" encoding="UTF-8"?> at the beginning
+    # of a workflow XML cannot be parsed via etree.fromstring(), since the
+    # workflow_definition string needs to be encoded.
+    workflow_definition_root = etree.XML(workflow_definition.encode())
+  else:
+    workflow_definition_root = etree.fromstring(workflow_definition)
   if workflow_definition_root is None:
-    raise RuntimeError(_("Could not find any nodes in Workflow definition. Maybe it's malformed?"))
+    raise RuntimeError(
+      _("Could not find any nodes in Workflow definition. Maybe it's malformed?"))
 
   return import_workflow_root(workflow, workflow_definition_root, metadata, fs)
 
 
 def generate_v2_graph_nodes(workflow_definition):
   # Parse Workflow Definition
-  workflow_definition_root = etree.fromstring(workflow_definition)
+  if sys.version_info[0] > 2:
+    # In Py3 anything like <?xml version="1.0" encoding="UTF-8"?> at the beginning
+    # of a workflow XML cannot be parsed via etree.fromstring(), since the
+    # workflow_definition string needs to be encoded.
+    workflow_definition_root = etree.XML(workflow_definition.encode())
+  else:
+    workflow_definition_root = etree.fromstring(workflow_definition)
   if workflow_definition_root is None:
     raise MalformedWfDefException()
 

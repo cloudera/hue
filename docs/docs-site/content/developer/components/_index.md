@@ -1,7 +1,7 @@
 ---
 title: "Components"
 draft: false
-weight: 4
+weight: 3
 ---
 
 Some of the UI elements in Hue are available as generic [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components). They are library/framework agnostic, and can be used in any web project irrespective of what its built upon - React, Angular, Ember or something else.

@@ -161,7 +161,7 @@ AlterTable_EDIT
    {
      parser.suggestKeywords(['PARTITION']);
    }
- | AlterTableLeftSide 'TOUCH' OptionalPartitionSpec_EDIT
+ | AlterTableLeftSide 'TOUCH' PartitionSpec_EDIT
  | AlterTableLeftSide PartitionOperations_EDIT
  | AlterTableLeftSide DropOperations_EDIT
  | AlterTableLeftSide 'CURSOR'
@@ -170,13 +170,14 @@ AlterTable_EDIT
        'CLUSTERED BY', 'CONCATENATE', 'COMPACT', 'DISABLE NO_DROP', 'DISABLE OFFLINE', 'DROP', 'ENABLE NO_DROP',
        'ENABLE OFFLINE', 'EXCHANGE PARTITION', 'NOT SKEWED', 'NOT STORED AS DIRECTORIES', 'PARTITION',
        'RECOVER PARTITIONS', 'RENAME TO', 'REPLACE COLUMNS', 'SET FILEFORMAT', 'SET LOCATION', 'SET OWNER', 'SET SERDE',
-       'SET SERDEPROPERTIES', 'SET SKEWED LOCATION', 'SET TBLPROPERTIES', 'SKEWED BY', 'TOUCH', 'UNARCHIVE PARTITION']);
+       'SET SERDEPROPERTIES', 'SET SKEWED LOCATION', 'SET TBLPROPERTIES', 'SKEWED BY', 'TOUCH', 'UNARCHIVE PARTITION',
+       'UNSET SERDEPROPERTIES']);
    }
  | AlterTableLeftSide PartitionSpec 'CURSOR'
    {
      parser.suggestKeywords(['ADD COLUMNS', 'CHANGE', 'COMPACT', 'CONCATENATE', 'DISABLE NO_DROP', 'DISABLE OFFLINE',
        'ENABLE NO_DROP', 'ENABLE OFFLINE', 'RENAME TO PARTITION', 'REPLACE COLUMNS', 'SET FILEFORMAT', 'SET LOCATION',
-       'SET SERDE', 'SET SERDEPROPERTIES']);
+       'SET SERDE', 'SET SERDEPROPERTIES', 'UNSET SERDEPROPERTIES']);
    }
  | AlterTableLeftSide PartitionSpec AddOrReplace 'CURSOR'
    {
@@ -198,6 +199,10 @@ AlterTable_EDIT
  | AlterTableLeftSide 'RENAME' 'TO' 'CURSOR'
    {
      parser.suggestDatabases({ appendDot: true });
+   }
+ | AlterTableLeftSide 'UNSET' 'CURSOR'
+   {
+     parser.suggestKeywords(['SERDEPROPERTIES']);
    }
  ;
 
@@ -228,6 +233,7 @@ PartitionOperations
  | 'SET' 'TBLPROPERTIES' ParenthesizedPropertyAssignmentList
  | 'SET' 'SERDE' QuotedValue OptionalWithSerdeproperties
  | 'SET' 'SERDEPROPERTIES' ParenthesizedPropertyAssignmentList
+ | 'UNSET' 'SERDEPROPERTIES' ParenthesizedPropertyAssignmentList
  | AddReplaceColumns
  | 'CONCATENATE'
  | 'COMPACT' QuotedValue OptionalAndWait OptionalWithOverwriteTblProperties

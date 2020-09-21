@@ -66,8 +66,8 @@ DescribeStatement_EDIT
        parser.suggestKeywords(['PARTITION']);
      }
    }
- | 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain OptionalPartitionSpec_EDIT
- | 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
+ | 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain PartitionSpec_EDIT
+ | 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier PartitionSpec_EDIT
 
  | 'DESCRIBE' OptionalExtendedOrFormatted 'CURSOR'
    {
