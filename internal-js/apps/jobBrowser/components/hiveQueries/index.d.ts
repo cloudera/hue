@@ -101,9 +101,14 @@ export interface Query {
   virtualMemory?: unknown; // TODO: type?
 }
 
+export interface FacetValue {
+  key: string;
+  value: number;
+}
+
 export interface Facet {
   facetField: string;
-  values: { key: string; value: number; }[]
+  values: FacetValue[]
 }
 
 export interface SearchFacet {

@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FacetsPanel.vue should render 1`] = `
+<div
+  class="em-table-facet-panel hide-filter"
+>
+  <ul
+    class="field-list"
+  >
+    <!---->
+     
+    <facet-value-list-stub
+      facet="[object Object]"
+      selectedvalues="[object Object],[object Object]"
+    />
+    <facet-value-list-stub
+      facet="[object Object]"
+      selectedvalues="[object Object]"
+    />
+    <facet-value-list-stub
+      facet="[object Object]"
+      selectedvalues="[object Object]"
+    />
+  </ul>
+   
+  <div
+    class="buttons"
+  >
+    <button
+      class="btn btn-primary"
+      type="button"
+    >
+      Apply
+    </button>
+     
+    <button
+      class="btn btn-default"
+      type="button"
+    >
+      Clear
+    </button>
+  </div>
+</div>
+`;

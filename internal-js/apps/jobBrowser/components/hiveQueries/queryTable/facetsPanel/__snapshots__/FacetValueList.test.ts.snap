@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FacetValueList.vue should render 1`] = `
+<div
+  class="em-table-facet-panel-values"
+>
+  <div
+    class="field-name"
+    title="status"
+  >
+    <div
+      class="field-title"
+    >
+      status
+    </div>
+     
+    <div
+      class="field-count"
+    >
+      2
+    </div>
+     
+    <!---->
+  </div>
+   
+  <!---->
+</div>
+`;
