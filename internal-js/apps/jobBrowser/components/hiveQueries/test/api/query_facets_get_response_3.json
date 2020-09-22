@@ -1,0 +1,22 @@
+{
+  "facets": [
+    {
+      "facetField": "tablesWritten",
+      "values": []
+    },
+    {
+      "facetField": "usedCBO",
+      "values": [
+        {
+          "key": "Yes",
+          "value": 2
+        },
+        {
+          "key": "No",
+          "value": 1
+        }
+      ]
+    }
+  ],
+  "rangeFacets": []
+}

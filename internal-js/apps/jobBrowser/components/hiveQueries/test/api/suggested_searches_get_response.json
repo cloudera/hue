@@ -1,0 +1,111 @@
+{
+  "searches": [
+    {
+      "id": 5,
+      "name": "Queries didn't use a CBO",
+      "category": "SUGGEST",
+      "type": "BASIC",
+      "entity": "query",
+      "owner": "DEFAULT",
+      "clause": "",
+      "facet": {
+        "usedCBO": {
+          "in": [
+            "No"
+          ]
+        }
+      },
+      "columns": null,
+      "range": null,
+      "sort": null
+    },
+    {
+      "id": 4,
+      "name": "Failed or cancelled queries",
+      "category": "SUGGEST",
+      "type": "BASIC",
+      "entity": "query",
+      "owner": "DEFAULT",
+      "clause": "",
+      "facet": {
+        "status": {
+          "in": [
+            "FAILED",
+            "CANCELED"
+          ]
+        }
+      },
+      "columns": null,
+      "range": null,
+      "sort": null
+    },
+    {
+      "id": 3,
+      "name": "Queries that use LEFT JOIN",
+      "category": "SUGGEST",
+      "type": "BASIC",
+      "entity": "query",
+      "owner": "DEFAULT",
+      "clause": "LEFT JOIN",
+      "facet": null,
+      "columns": null,
+      "range": null,
+      "sort": null
+    },
+    {
+      "id": 2,
+      "name": "Most expensive queries",
+      "category": "SUGGEST",
+      "type": "BASIC",
+      "entity": "query",
+      "owner": "DEFAULT",
+      "clause": "",
+      "facet": null,
+      "columns": null,
+      "range": null,
+      "sort": {
+        "sortOrder": "desc",
+        "sortColumnId": "cpuTime"
+      }
+    },
+    {
+      "id": 1,
+      "name": "Longest running queries",
+      "category": "SUGGEST",
+      "type": "BASIC",
+      "entity": "query",
+      "owner": "DEFAULT",
+      "clause": "",
+      "facet": null,
+      "columns": null,
+      "range": null,
+      "sort": {
+        "sortOrder": "desc",
+        "sortColumnId": "duration"
+      }
+    },
+    {
+      "id": 6,
+      "name": "test",
+      "category": "SAVED",
+      "type": "ADVANCED",
+      "entity": "query",
+      "owner": "some_user",
+      "clause": "compact",
+      "facet": null,
+      "columns": {
+        "preferences": []
+      },
+      "range": {
+        "to": -1,
+        "base": "day",
+        "from": 30,
+        "title": "Last 30 days"
+      },
+      "sort": {
+        "sortOrder": "desc",
+        "sortColumnId": "startTime"
+      }
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "facets": [
+    {
+      "facetField": "requestUser",
+      "values": [
+        {
+          "key": "some_user",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "facetField": "executionMode",
+      "values": [
+        {
+          "key": "LLAP",
+          "value": 2
+        },
+        {
+          "key": "NONE",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "facetField": "tablesRead",
+      "values": [
+        {
+          "key": "sys.compaction_queue",
+          "value": 2
+        },
+        {
+          "key": "sys.tbl_privs",
+          "value": 2
+        },
+        {
+          "key": "sys.completed_compactions",
+          "value": 2
+        },
+        {
+          "key": "sys.dbs",
+          "value": 2
+        },
+        {
+          "key": "information_schema.compactions",
+          "value": 2
+        },
+        {
+          "key": "sys.tbls",
+          "value": 2
+        },
+        {
+          "key": "sys.compactions",
+          "value": 2
+        }
+      ]
+    }
+  ],
+  "rangeFacets": []
+}

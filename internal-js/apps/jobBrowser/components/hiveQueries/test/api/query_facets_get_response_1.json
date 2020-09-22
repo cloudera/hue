@@ -1,0 +1,36 @@
+{
+  "facets": [
+    {
+      "facetField": "status",
+      "values": [
+        {
+          "key": "SUCCESS",
+          "value": 2
+        },
+        {
+          "key": "ERROR",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "facetField": "queueName",
+      "values": [
+        {
+          "key": "",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "facetField": "userId",
+      "values": [
+        {
+          "key": "hive",
+          "value": 3
+        }
+      ]
+    }
+  ],
+  "rangeFacets": []
+}

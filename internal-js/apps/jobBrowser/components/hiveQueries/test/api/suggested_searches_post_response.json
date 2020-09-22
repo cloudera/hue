@@ -1,0 +1,25 @@
+{
+  "search": {
+    "id": 6,
+    "name": "test",
+    "category": "SAVED",
+    "type": "ADVANCED",
+    "entity": "query",
+    "owner": "some_user",
+    "clause": "compact",
+    "facet": null,
+    "columns": {
+      "preferences": []
+    },
+    "range": {
+      "title": "Last 30 days",
+      "from": 30,
+      "to": -1,
+      "base": "day"
+    },
+    "sort": {
+      "sortColumnId": "startTime",
+      "sortOrder": "desc"
+    }
+  }
+}

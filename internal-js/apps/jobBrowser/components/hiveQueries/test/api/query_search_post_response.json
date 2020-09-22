@@ -1,0 +1,208 @@
+{
+  "queries": [
+    {
+      "details": null,
+      "dags": [],
+      "id": 1132,
+      "queryId": "hive_20200921164736_8793e958-0f2b-4558-a633-96b5eee111f5",
+      "startTime": 1600706856844,
+      "query": "select * from compactions limit 10",
+      "highlightedQuery": null,
+      "endTime": 1600706897987,
+      "elapsedTime": 41143,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "some_user",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "6lAX9u20Rb-e-OERS6Lxsw",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "1.2.3.4",
+      "hiveInstanceType": null,
+      "sessionId": "81b44f70-1b03-434e-8cea-11ba68e969eb",
+      "logId": null,
+      "threadId": "HiveServer2-Background-Pool: Thread-13973",
+      "executionMode": "LLAP",
+      "tablesRead": [
+        {
+          "table": "compactions",
+          "database": "sys"
+        },
+        {
+          "table": "completed_compactions",
+          "database": "sys"
+        },
+        {
+          "table": "compaction_queue",
+          "database": "sys"
+        },
+        {
+          "table": "dbs",
+          "database": "sys"
+        },
+        {
+          "table": "tbls",
+          "database": "sys"
+        },
+        {
+          "table": "compactions",
+          "database": "information_schema"
+        },
+        {
+          "table": "tbl_privs",
+          "database": "sys"
+        }
+      ],
+      "tablesWritten": [],
+      "databasesUsed": [
+        {
+          "sys": 6,
+          "information_schema": 1
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "Yes",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        21,
+        16,
+        47,
+        43
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 1131,
+      "queryId": "hive_20200921164733_5af56d4d-18b4-4f40-9dbb-4e4fcb522ebb",
+      "startTime": 1600706853245,
+      "query": "KILL QUERY 'hive_20200921164714_ea4a83d3-c2d1-4be9-8ab1-50aa37ecf70a'",
+      "highlightedQuery": null,
+      "endTime": 1600706853913,
+      "elapsedTime": 668,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "some_user",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "RqW7HN_OTGyMFqT8IFBZig",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "1.2.3.4",
+      "hiveInstanceType": null,
+      "sessionId": "5782298a-4381-456f-a5f3-edb055948de5",
+      "logId": null,
+      "threadId": "HiveServer2-Background-Pool: Thread-13958",
+      "executionMode": "NONE",
+      "tablesRead": [],
+      "tablesWritten": [],
+      "databasesUsed": [
+        {}
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        21,
+        16,
+        47,
+        35
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 1130,
+      "queryId": "hive_20200921164714_ea4a83d3-c2d1-4be9-8ab1-50aa37ecf70a",
+      "startTime": 1600706834430,
+      "query": "select * from compactions",
+      "highlightedQuery": null,
+      "endTime": 1600706853890,
+      "elapsedTime": 19460,
+      "status": "ERROR",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "some_user",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "h9wGW3muTnao0LRcSZAlWA",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "1.2.3.4",
+      "hiveInstanceType": null,
+      "sessionId": "f26e9dfa-89bb-42d0-b453-bc856b6dc381",
+      "logId": null,
+      "threadId": "HiveServer2-Background-Pool: Thread-13947",
+      "executionMode": "LLAP",
+      "tablesRead": [
+        {
+          "table": "compactions",
+          "database": "sys"
+        },
+        {
+          "table": "completed_compactions",
+          "database": "sys"
+        },
+        {
+          "table": "compaction_queue",
+          "database": "sys"
+        },
+        {
+          "table": "dbs",
+          "database": "sys"
+        },
+        {
+          "table": "tbls",
+          "database": "sys"
+        },
+        {
+          "table": "compactions",
+          "database": "information_schema"
+        },
+        {
+          "table": "tbl_privs",
+          "database": "sys"
+        }
+      ],
+      "tablesWritten": [],
+      "databasesUsed": [
+        {
+          "sys": 6,
+          "information_schema": 1
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "Yes",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        21,
+        16,
+        47,
+        21
+      ]
+    }
+  ],
+  "meta": {
+    "limit": 25,
+    "offset": 0,
+    "size": 3
+  }
+}

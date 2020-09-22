@@ -1,0 +1,29 @@
+{
+  "recommendations": [
+    {
+      "message": "Table dbs is not optimized. Hive works best with ORC or Parquet file formats. Create a new table using CREATE TABLE new_table ( columns ) STORED AS ORC; and run INSERT OVERWRITE TABLE new_table SELECT * from dbs to convert existing table to ORC file format. Note this creates a copy of your table, for large tables this will be an expensive operation. Consult your database administrator before doing conversion on large tables to avoid running out of space.",
+      "type": "table",
+      "id": 1900606172
+    },
+    {
+      "message": "Table tbls is not optimized. Hive works best with ORC or Parquet file formats. Create a new table using CREATE TABLE new_table ( columns ) STORED AS ORC; and run INSERT OVERWRITE TABLE new_table SELECT * from tbls to convert existing table to ORC file format. Note this creates a copy of your table, for large tables this will be an expensive operation. Consult your database administrator before doing conversion on large tables to avoid running out of space.",
+      "type": "table",
+      "id": 88254594
+    },
+    {
+      "message": "Table compaction_queue is not optimized. Hive works best with ORC or Parquet file formats. Create a new table using CREATE TABLE new_table ( columns ) STORED AS ORC; and run INSERT OVERWRITE TABLE new_table SELECT * from compaction_queue to convert existing table to ORC file format. Note this creates a copy of your table, for large tables this will be an expensive operation. Consult your database administrator before doing conversion on large tables to avoid running out of space.",
+      "type": "table",
+      "id": 923460286
+    },
+    {
+      "message": "Table tbl_privs is not optimized. Hive works best with ORC or Parquet file formats. Create a new table using CREATE TABLE new_table ( columns ) STORED AS ORC; and run INSERT OVERWRITE TABLE new_table SELECT * from tbl_privs to convert existing table to ORC file format. Note this creates a copy of your table, for large tables this will be an expensive operation. Consult your database administrator before doing conversion on large tables to avoid running out of space.",
+      "type": "table",
+      "id": 2044440016
+    },
+    {
+      "message": "Table completed_compactions is not optimized. Hive works best with ORC or Parquet file formats. Create a new table using CREATE TABLE new_table ( columns ) STORED AS ORC; and run INSERT OVERWRITE TABLE new_table SELECT * from completed_compactions to convert existing table to ORC file format. Note this creates a copy of your table, for large tables this will be an expensive operation. Consult your database administrator before doing conversion on large tables to avoid running out of space.",
+      "type": "table",
+      "id": 1596753814
+    }
+  ]
+}
