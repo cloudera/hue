@@ -22,7 +22,7 @@ from desktop.webpack_utils import get_hue_bundles
 from metadata.conf import PROMETHEUS
 from notebook.conf import ENABLE_QUERY_SCHEDULING
 
-from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER, ENABLE_HIVE_QUERY_BROWSER, ENABLE_HISTORY_V2
+from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER, ENABLE_HIVE_QUERY_BROWSER, ENABLE_QUERIES_LIST, ENABLE_HISTORY_V2
 
 from webpack_loader.templatetags.webpack_loader import render_bundle
 %>
@@ -328,7 +328,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div data-bind="template: { name: 'breadcrumbs${ SUFFIX }' }"></div>
               <!-- /ko -->
 
-              <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' -->
+              <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' && interface() !== 'queries'-->
               <!-- ko if: !$root.job() -->
               <form class="form-inline">
                 <!-- ko if: !$root.isMini() && interface() == 'queries-impala' -->
@@ -479,6 +479,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <!-- ko hueSpinner: { spin: slasLoading(), center: true, size: 'xlarge' } --><!-- /ko -->
               <!-- /ko -->
               <div id="slas" data-bind="visible: interface() === 'slas'"></div>
+
+              <div id="queries" data-bind="visible: interface() === 'queries'">
+                <queries-list></queries-list>
+              </div>
 
               <!-- ko if: interface() === 'oozie-info' -->
                 <!-- ko hueSpinner: { spin: oozieInfoLoading(), center: true, size: 'xlarge' } --><!-- /ko -->
@@ -3686,6 +3690,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.fetchJobs = function () {
+        if(vm.interface() === 'queries') {
+          return;
+        }
+
         vm.apiHelper.cancelActiveRequest(lastUpdateJobsRequest);
         vm.apiHelper.cancelActiveRequest(lastFetchJobsRequest);
 
@@ -3706,6 +3714,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       }
 
       self.updateJobs = function () {
+        if(vm.interface() === 'queries') {
+          return;
+        }
+
         vm.apiHelper.cancelActiveRequest(lastUpdateJobsRequest);
 
         lastFetchJobsRequest = self._fetchJobs(function(data) {
@@ -3920,6 +3932,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         var scheduleHiveInterfaceCondition = function () {
           return '${ ENABLE_QUERY_SCHEDULING.get() }' == 'True';
         };
+        var queriesInterfaceCondition = function () {
+          return '${ ENABLE_QUERIES_LIST.get() }' == 'True';
+        };
 
         var interfaces = [
           {'interface': 'jobs', 'label': '${ _ko('Jobs') }', 'condition': jobsInterfaceCondition},
@@ -3938,6 +3953,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           {'interface': 'bundles', 'label': '${ _ko('Bundles') }', 'condition': schedulerExtraInterfaceCondition},
           {'interface': 'slas', 'label': '${ _ko('SLAs') }', 'condition': schedulerExtraInterfaceCondition},
           {'interface': 'livy-sessions', 'label': '${ _ko('Livy') }', 'condition': livyInterfaceCondition},
+          {'interface': 'queries', 'label': '${ _ko('Queries') }', 'condition': queriesInterfaceCondition},
         ];
 
         return interfaces.filter(function (i) {
@@ -4025,7 +4041,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             self.loadOozieInfoPage();
           % endif
         }
-        else {
+        else if(interface !== 'queries'){
           self.jobs.fetchJobs();
         }
       };
@@ -4052,7 +4068,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.monitorJob = function(job) {
         window.clearTimeout(updateJobTimeout);
         window.clearTimeout(updateJobsTimeout);
-        if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info'){
+        if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info' && self.interface !== 'queries'){
           if (job) {
             if (job.apiStatus() === 'RUNNING') {
               var _updateJob = function () {
@@ -4134,6 +4150,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           case 'engines':
           case 'dataeng-jobs':
           case 'livy-sessions':
+          case 'queries':
             self.selectInterface(h);
             break;
           default:
