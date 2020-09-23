@@ -15,6 +15,7 @@ exports[`QueryInfo.vue should render 1`] = `
         <div
           class="query-title"
         >
+          
           Query Details 
           <!---->
         </div>
@@ -40,6 +41,8 @@ exports[`QueryInfo.vue should render 1`] = `
             class="query-details-value"
           >
             
+            
+          
           </div>
         </div>
          
@@ -56,6 +59,8 @@ exports[`QueryInfo.vue should render 1`] = `
             class="query-details-value"
           >
             
+            
+          
           </div>
         </div>
          
@@ -71,6 +76,7 @@ exports[`QueryInfo.vue should render 1`] = `
           <div
             class="query-details-value"
           >
+            
             
           </div>
         </div>
@@ -88,6 +94,7 @@ exports[`QueryInfo.vue should render 1`] = `
             class="query-details-value"
           >
             
+            
           </div>
         </div>
          
@@ -104,6 +111,7 @@ exports[`QueryInfo.vue should render 1`] = `
             class="query-details-value"
           >
             
+            
           </div>
         </div>
          
@@ -119,6 +127,7 @@ exports[`QueryInfo.vue should render 1`] = `
           <div
             class="query-details-value"
           >
+            
             
           </div>
         </div>
@@ -216,6 +225,8 @@ exports[`QueryInfo.vue should render 1`] = `
             class="query-details-value"
           >
             
+            
+          
           </div>
         </div>
          
@@ -234,6 +245,8 @@ exports[`QueryInfo.vue should render 1`] = `
             class="query-details-value"
           >
             
+            
+          
           </div>
         </div>
          

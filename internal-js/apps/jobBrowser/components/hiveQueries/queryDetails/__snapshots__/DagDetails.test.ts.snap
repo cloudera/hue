@@ -11,12 +11,16 @@ exports[`DagDetails.vue should render 1`] = `
     <option
       value="dag 1"
     >
+      
       dag 1
+    
     </option>
     <option
       value="dag 2"
     >
+      
       dag 2
+    
     </option>
   </select>
    

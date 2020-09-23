@@ -17,7 +17,9 @@
 -->
 
 <template>
-  <div class="bar" v-bind:style="{ width: barWidth + '%' }" :title="title">{{ title }}</div>
+  <div class="bar" :style="{ width: barWidth + '%' }" :title="title">
+    {{ title }}
+  </div>
 </template>
 
 <script lang="ts">
@@ -43,5 +45,4 @@
   }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

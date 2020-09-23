@@ -18,37 +18,35 @@
 
 <template>
   <div>
-    <div class="title">
-      Duration
-    </div>
+    <div class="title">Duration</div>
 
     <table class="detail-list">
       <thead>
         <tr>
           <th>Pre-Execution + DAG construction</th>
-          <template v-for="(perf, index) in perfs">
-            <th :key="index">{{ numberToLetter(index) + ' - ' + perf.groupTotal.pre }}</th>
-          </template>
+          <th v-for="(perf, index) in perfs" :key="index">
+            {{ numberToLetter(index) + ' - ' + perf.groupTotal.pre }}
+          </th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>Compile</td>
-          <template v-for="(perf, index) in perfs">
-            <td :key="index">{{ perf.compile }}</td>
-          </template>
+          <td v-for="(perf, index) in perfs" :key="index">
+            {{ perf.compile }}
+          </td>
         </tr>
         <tr>
           <td>Parse</td>
-          <template v-for="(perf, index) in perfs">
-            <td :key="index">{{ perf.parse }}</td>
-          </template>
+          <td v-for="(perf, index) in perfs" :key="index">
+            {{ perf.parse }}
+          </td>
         </tr>
         <tr>
           <td>Build Dag</td>
-          <template v-for="(perf, index) in perfs">
-            <td :key="index">{{ perf.TezBuildDag }}</td>
-          </template>
+          <td v-for="(perf, index) in perfs" :key="index">
+            {{ perf.TezBuildDag }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -57,23 +55,23 @@
       <thead>
         <tr>
           <th>DAG Submission</th>
-          <template v-for="(perf, index) in perfs">
-            <th :key="index">{{ numberToLetter(index) + ' - ' + perf.groupTotal.submit }}</th>
-          </template>
+          <th v-for="(perf, index) in perfs" :key="index">
+            {{ numberToLetter(index) + ' - ' + perf.groupTotal.submit }}
+          </th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>Submit Dag</td>
-          <template v-for="(perf, index) in perfs">
-            <td :key="index">{{ perf.TezSubmitDag }}</td>
-          </template>
+          <td v-for="(perf, index) in perfs" :key="index">
+            {{ perf.TezSubmitDag }}
+          </td>
         </tr>
         <tr>
           <td>Submit To Running</td>
-          <template v-for="(perf, index) in perfs">
-            <td :key="index">{{ perf.TezSubmitToRunningDag }}</td>
-          </template>
+          <td v-for="(perf, index) in perfs" :key="index">
+            {{ perf.TezSubmitToRunningDag }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -82,17 +80,17 @@
       <thead>
         <tr>
           <th>DAG Runtime</th>
-          <template v-for="(perf, index) in perfs">
-            <th :key="index">{{ numberToLetter(index) + ' - ' + perf.groupTotal.running }}</th>
-          </template>
+          <th v-for="(perf, index) in perfs" :key="index">
+            {{ numberToLetter(index) + ' - ' + perf.groupTotal.running }}
+          </th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>Run Dag</td>
-          <template v-for="(perf, index) in perfs">
-            <td :key="index">{{ perf.TezRunDag }}</td>
-          </template>
+          <td v-for="(perf, index) in perfs" :key="index">
+            {{ perf.TezRunDag }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -101,29 +99,29 @@
       <thead>
         <tr>
           <th>Post Execution</th>
-          <template v-for="(perf, index) in perfs">
-            <th :key="index">{{ numberToLetter(index) + ' - ' + perf.groupTotal.post }}</th>
-          </template>
+          <th v-for="(perf, index) in perfs" :key="index">
+            {{ numberToLetter(index) + ' - ' + perf.groupTotal.post }}
+          </th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>Post Hive Hook</td>
-          <template v-for="(perf, index) in perfs">
-            <td :key="index">{{ perf.PostHiveProtoLoggingHook }}</td>
-          </template>
+          <td v-for="(perf, index) in perfs" :key="index">
+            {{ perf.PostHiveProtoLoggingHook }}
+          </td>
         </tr>
         <tr>
           <td>Remove Files</td>
-          <template v-for="(perf, index) in perfs">
-            <td :key="index">{{ perf.RemoveTempOrDuplicateFiles }}</td>
-          </template>
+          <td v-for="(perf, index) in perfs" :key="index">
+            {{ perf.RemoveTempOrDuplicateFiles }}
+          </td>
         </tr>
         <tr>
           <td>Rename Or Move Files</td>
-          <template v-for="(perf, index) in perfs">
-            <td :key="index">{{ perf.RenameOrMoveFiles }}</td>
-          </template>
+          <td v-for="(perf, index) in perfs" :key="index">
+            {{ perf.RenameOrMoveFiles }}
+          </td>
         </tr>
       </tbody>
     </table>

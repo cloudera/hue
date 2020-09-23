@@ -17,14 +17,14 @@
 -->
 
 <script lang="ts">
-import Vue from 'vue';
-import Component from 'vue-class-component';
-import { Prop } from 'vue-property-decorator';
-import { Query } from '../index';
+  import Vue from 'vue';
+  import Component from 'vue-class-component';
+  import { Prop } from 'vue-property-decorator';
+  import { Query } from '../index';
 
-@Component
-export default class MultiQueryComponent extends Vue {
-  @Prop({ required: true })
-  queries!: Query[]
-}
+  @Component
+  export default class MultiQueryComponent extends Vue {
+    @Prop({ required: true })
+    queries!: Query[];
+  }
 </script>

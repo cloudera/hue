@@ -21,5 +21,5 @@ describe('utils.ts', () => {
     expect(numberToLetter(0)).toEqual('A');
     expect(numberToLetter(1)).toEqual('B');
     expect(numberToLetter(10)).toEqual('K');
-  })
-})
+  });
+});

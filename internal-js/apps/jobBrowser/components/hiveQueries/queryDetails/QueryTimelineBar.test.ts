@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils'
-import QueryTimelineBar from './QueryTimelineBar.vue'
+import { shallowMount } from '@vue/test-utils';
+import QueryTimelineBar from './QueryTimelineBar.vue';
 
 describe('QueryTimelineBar.vue', () => {
   it('should render a timeline bar', () => {
@@ -27,7 +27,7 @@ describe('QueryTimelineBar.vue', () => {
       }
     });
     expect(wrapper.element).toMatchSnapshot();
-  })
+  });
 
   it('should render a timeline bar with 0 total (div 0 check)', () => {
     const wrapper = shallowMount(QueryTimelineBar, {
@@ -37,5 +37,5 @@ describe('QueryTimelineBar.vue', () => {
       }
     });
     expect(wrapper.element).toMatchSnapshot();
-  })
-})
+  });
+});

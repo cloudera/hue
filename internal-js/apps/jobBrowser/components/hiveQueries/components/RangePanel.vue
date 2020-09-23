@@ -22,20 +22,20 @@
       <div class="title">Time Range</div>
       FROM
       <div class="form-group">
-        <div class='input-group date' id="from-date">
-          <input type='text' class="form-control">
+        <div id="from-date" class="input-group date">
+          <input type="text" class="form-control" />
           <span class="input-group-addon">
-          <span class="glyphicon glyphicon-calendar"></span>
-        </span>
+            <span class="glyphicon glyphicon-calendar" />
+          </span>
         </div>
       </div>
       TO
       <div class="form-group">
-        <div class='input-group date' id="to-date">
-          <input type='text' class="form-control">
+        <div id="to-date" class="input-group date">
+          <input type="text" class="form-control" />
           <span class="input-group-addon">
-          <span class="glyphicon glyphicon-calendar"></span>
-        </span>
+            <span class="glyphicon glyphicon-calendar" />
+          </span>
         </div>
       </div>
 
@@ -45,10 +45,12 @@
     </div>
     <div class="col-md-8 quick-range-panel">
       <div class="title">Quick Range</div>
-      <div class="row" v-for="(set, index) in rangeSets" :key="index">
-        <div class="col-md-3">
-          <ul v-for="range in set" :key="set.title">
-            <li><a href="#" @click="setRange(range)">{{ range.title }}</a></li>
+      <div class="row">
+        <div v-for="(set, index) in rangeSets" :key="index" class="col-md-3">
+          <ul>
+            <li v-for="range in set" :key="range.title">
+              <a href="#" @click="setRange(range)">{{ range.title }}</a>
+            </li>
           </ul>
         </div>
       </div>
@@ -87,22 +89,25 @@
       { title: 'Last 6 months', from: 183, to: -1, base: BASE.DAY },
       { title: 'Last 1 year', from: 365, to: -1, base: BASE.DAY },
       { title: 'Last 2 year', from: 365 * 2, to: -1, base: BASE.DAY },
-      { title: 'Last 5 year', from: 365 * 5, to: -1, base: BASE.DAY },
-    ], [
+      { title: 'Last 5 year', from: 365 * 5, to: -1, base: BASE.DAY }
+    ],
+    [
       { title: 'Yesterday', from: 1, to: 1, base: BASE.DAY },
       { title: 'Day before yesterday', from: 2, to: 2, base: BASE.DAY },
       { title: 'This day last week', from: 7, to: 7, base: BASE.DAY },
       { title: 'Previous week', from: 1, to: 1, base: BASE.WEEK },
       { title: 'Previous month', from: 1, to: 1, base: BASE.MONTH },
-      { title: 'Previous year', from: 1, to: 1, base: BASE.YEAR },
-    ], [
+      { title: 'Previous year', from: 1, to: 1, base: BASE.YEAR }
+    ],
+    [
       { title: 'Today', from: 0, to: 0, base: BASE.DAY },
       { title: 'Today so far', from: 0, to: -1, base: BASE.DAY },
       { title: 'This week', from: 0, to: 0, base: BASE.WEEK },
       { title: 'This week so far', from: 0, to: -1, base: BASE.WEEK },
       { title: 'This month', from: 0, to: 0, base: BASE.MONTH },
-      { title: 'This year', from: 0, to: 0, base: BASE.YEAR },
-    ], [
+      { title: 'This year', from: 0, to: 0, base: BASE.YEAR }
+    ],
+    [
       { title: 'Last 5 minutes', from: 5, to: -1, base: BASE.MINUTE },
       { title: 'Last 15 minutes', from: 15, to: -1, base: BASE.MINUTE },
       { title: 'Last 30 minutes', from: 30, to: -1, base: BASE.MINUTE },
@@ -110,20 +115,20 @@
       { title: 'Last 3 hours', from: 60 * 3, to: -1, base: BASE.MINUTE },
       { title: 'Last 6 hours', from: 60 * 6, to: -1, base: BASE.MINUTE },
       { title: 'Last 12 hours', from: 60 * 12, to: -1, base: BASE.MINUTE },
-      { title: 'Last 24 hours', from: 60 * 24, to: -1, base: BASE.MINUTE },
-    ],
+      { title: 'Last 24 hours', from: 60 * 24, to: -1, base: BASE.MINUTE }
+    ]
   ];
 
-  const CUSTOM_RANGE = {
-    title: 'Custom Range',
-    base: BASE.CUSTOM
-  };
+  // const CUSTOM_RANGE = {
+  //   title: 'Custom Range',
+  //   base: BASE.CUSTOM
+  // };
 
-  const DATEPICKER_OPTIONS = {
-    minView: 2,
-    format: 'mm/dd/yyyy',
-    autoclose: true
-  };
+  // const DATEPICKER_OPTIONS = {
+  //   minView: 2,
+  //   format: 'mm/dd/yyyy',
+  //   autoclose: true
+  // };
 
   // TODO: Add date picker component
 
@@ -134,15 +139,15 @@
 
     rangeSets = RANGE_SETS;
 
-    setCustomRange() {
-
+    setCustomRange(): void {
+      // TODO: Implement
     }
 
-    setRange(range: Range) {
-
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    setRange(range: Range): void {
+      // TODO: Implement
     }
   }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

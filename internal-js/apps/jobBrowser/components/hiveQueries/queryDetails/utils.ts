@@ -19,8 +19,8 @@
 import { NormalizedQueryPerf, Query } from '../index';
 
 export const numberToLetter = (value: number): string => {
-  return String.fromCharCode(65 + value);  // A, B, C, ...
-}
+  return String.fromCharCode(65 + value); // A, B, C, ...
+};
 
 export const normalizePerf = (query?: Query): NormalizedQueryPerf => {
   const result = Object.assign(
@@ -46,9 +46,7 @@ export const normalizePerf = (query?: Query): NormalizedQueryPerf => {
   );
 
   result.groupTotal.post =
-    result.PostHiveProtoLoggingHook +
-    result.RemoveTempOrDuplicateFiles +
-    result.RenameOrMoveFiles;
+    result.PostHiveProtoLoggingHook + result.RemoveTempOrDuplicateFiles + result.RenameOrMoveFiles;
   result.groupTotal.pre = result.compile + result.parse + result.TezBuildDag;
   result.groupTotal.running = result.TezRunDag;
   result.groupTotal.submit = result.TezSubmitDag + result.TezSubmitToRunningDag;

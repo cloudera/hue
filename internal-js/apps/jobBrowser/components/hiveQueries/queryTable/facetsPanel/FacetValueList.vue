@@ -19,23 +19,38 @@
 <template>
   <div class="em-table-facet-panel-values">
     <div class="field-name" :title="facet.facetField" @click="toggleOpen">
-      <div class="field-title">{{ facet.facetField }}</div>
-      <div class="field-count">{{ facet.values.length }}</div>
-      <a v-if="facet.values.length !== selectedFacetValues.length"class="all-button" title="Select all" @click="selectAll">All</a>
+      <div class="field-title">
+        {{ facet.facetField }}
+      </div>
+      <div class="field-count">
+        {{ facet.values.length }}
+      </div>
+      <a
+        v-if="facet.values.length !== selectedFacetValues.length"
+        class="all-button"
+        title="Select all"
+        @click="selectAll"
+      >
+        All
+      </a>
     </div>
     <ul v-if="open" class="value-list">
       <li v-if="facet.values.length > 10">
-        <input placeholder="Filter" type="text" v-model="filter" class="filter-box">
+        <input v-model="filter" placeholder="Filter" type="text" class="filter-box" />
       </li>
-      <template v-for="selectableValue in filteredFacetValues">
-        <li :key="selectableValue.facetValue.key" :title="selectableValue.facetValue.key">
-          <div class="checkbox-container">
-            <input v-model="selectableValue.selected" type="checkbox" @change="onChange">
-          </div>
-          <div class="facet-value">{{ selectableValue.facetValue.value }}</div>
-          <a class="only-button" @click="onlySelect(selectableValue)">only</a>
-        </li>
-      </template>
+      <li
+        v-for="selectableValue in filteredFacetValues"
+        :key="selectableValue.facetValue.key"
+        :title="selectableValue.facetValue.key"
+      >
+        <div class="checkbox-container">
+          <input v-model="selectableValue.selected" type="checkbox" @change="onChange" />
+        </div>
+        <div class="facet-value">
+          {{ selectableValue.facetValue.value }}
+        </div>
+        <a class="only-button" @click="onlySelect(selectableValue)">only</a>
+      </li>
     </ul>
   </div>
 </template>
@@ -56,7 +71,7 @@
     @Prop({ required: true })
     facet!: Facet;
     @Prop({ required: true })
-    selectedValues!: FacetValue[]
+    selectedValues!: FacetValue[];
 
     open = false;
     filter = '';
@@ -65,7 +80,7 @@
       return this.facet.values.map(facetValue => ({
         facetValue,
         selected: this.selectedValues.indexOf(facetValue) !== -1
-      }))
+      }));
     }
 
     get selectedFacetValues(): FacetValue[] {
@@ -74,7 +89,7 @@
         if (selectable.selected) {
           selectedFacetValues.push(selectable.facetValue);
         }
-      })
+      });
       return selectedFacetValues;
     }
 
@@ -83,30 +98,33 @@
         return this.selectableFacetValues;
       }
       const filterLower = this.filter.toLowerCase();
-      return this.selectableFacetValues.filter(val => val.facetValue.key.toLowerCase().indexOf(filterLower) != -1)
+      return this.selectableFacetValues.filter(
+        val => val.facetValue.key.toLowerCase().indexOf(filterLower) != -1
+      );
     }
 
-    toggleOpen() {
+    toggleOpen(): void {
       this.open = !this.open;
     }
 
-    onChange() {
+    onChange(): void {
       this.$emit('values-selected', this.selectedFacetValues);
     }
 
-    selectAll() {
-      this.selectableFacetValues.forEach(selectable => { selectable.selected = true });
+    selectAll(): void {
+      this.selectableFacetValues.forEach(selectable => {
+        selectable.selected = true;
+      });
       this.onChange();
     }
 
-    onlySelect(selectable: SelectableFacetValue) {
+    onlySelect(selectable: SelectableFacetValue): void {
       this.selectableFacetValues.forEach(otherSelectable => {
         otherSelectable.selected = otherSelectable === selectable;
-      })
+      });
       this.onChange();
     }
   }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

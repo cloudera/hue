@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils'
-import QueryTable from './QueryTable.vue'
+import { shallowMount } from '@vue/test-utils';
+import QueryTable from './QueryTable.vue';
 
 describe('QueryTable.vue', () => {
   it('should render', () => {
@@ -26,5 +26,5 @@ describe('QueryTable.vue', () => {
       }
     });
     expect(wrapper.element).toMatchSnapshot();
-  })
-})
+  });
+});

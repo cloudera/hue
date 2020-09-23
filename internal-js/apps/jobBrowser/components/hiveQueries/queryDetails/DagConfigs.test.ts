@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils'
-import DagConfigs from './DagConfigs.vue'
+import { shallowMount } from '@vue/test-utils';
+import DagConfigs from './DagConfigs.vue';
 
 describe('DagConfigs.vue', () => {
   it('should render', () => {
@@ -25,5 +25,5 @@ describe('DagConfigs.vue', () => {
       }
     });
     expect(wrapper.element).toMatchSnapshot();
-  })
-})
+  });
+});

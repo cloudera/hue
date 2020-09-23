@@ -23,7 +23,9 @@
         <div class="title">
           {{ title }}
         </div>
-        <label v-if="queries.length > 1"><input v-model="showDifferences" type="checkbox" > Show Differences</label>
+        <label v-if="queries.length > 1">
+          <input v-model="showDifferences" type="checkbox" /> Show Differences
+        </label>
       </div>
     </div>
 
@@ -38,7 +40,7 @@
 </template>
 
 <script lang="ts">
-  import {Prop} from 'vue-property-decorator';
+  import { Prop } from 'vue-property-decorator';
   import { Query } from '../index';
   import { numberToLetter } from './utils';
   import MultiQueryComponent from './MultiQueryComponent.vue';
@@ -50,14 +52,14 @@
     components: { HueTable }
   })
   export default class QueryConfig extends MultiQueryComponent {
-    showDifferences: boolean = true;
+    showDifferences = true;
 
     @Prop({ required: false, default: 'Configurations' })
     title!: string;
 
     // Should be abstract but Vue doesn't like abstract components for some reason
     getConfigs(query: Query): { [key: string]: unknown } {
-      return query.details && query.details.configuration || {};
+      return (query.details && query.details.configuration) || {};
     }
 
     get configColumns(): Column[] {

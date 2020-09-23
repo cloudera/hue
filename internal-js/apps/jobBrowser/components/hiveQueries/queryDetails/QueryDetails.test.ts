@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils'
-import QueryDetails from './QueryDetails.vue'
+import { shallowMount } from '@vue/test-utils';
+import QueryDetails from './QueryDetails.vue';
 
 describe('QueryDetails.vue', () => {
   it('should render', () => {
@@ -25,5 +25,5 @@ describe('QueryDetails.vue', () => {
       }
     });
     expect(wrapper.element).toMatchSnapshot();
-  })
-})
+  });
+});

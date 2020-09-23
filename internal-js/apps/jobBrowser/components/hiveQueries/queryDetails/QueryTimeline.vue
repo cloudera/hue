@@ -31,9 +31,7 @@
         <div class="col-md-12">
           <div class="body">
             <query-timeline-bars v-if="perf" :perf="perf" />
-            <h4 v-else>
-              Data not available to display Timeline!
-            </h4>
+            <h4 v-else>Data not available to display Timeline!</h4>
             <query-timeline-legend
               v-if="perfs.length > 1 && index === perfs.length - 1"
               :perfs="perfs"

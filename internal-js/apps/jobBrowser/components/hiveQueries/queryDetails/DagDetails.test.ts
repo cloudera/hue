@@ -14,19 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils';
 import { Query } from '../index';
-import DagDetails from './DagDetails.vue'
+import DagDetails from './DagDetails.vue';
 
 describe('DagDetails.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(DagDetails, {
       propsData: {
         query: <Query>{
-          dags: [{ dagInfo: { dagId: 'dag 1' }}, { dagInfo: { dagId: 'dag 2' }}]
+          dags: [{ dagInfo: { dagId: 'dag 1' } }, { dagInfo: { dagId: 'dag 2' } }]
         }
       }
     });
     expect(wrapper.element).toMatchSnapshot();
-  })
-})
+  });
+});

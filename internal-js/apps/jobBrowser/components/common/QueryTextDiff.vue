@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div></div>
+  <div />
 </template>
 
 <script lang="ts">
@@ -27,18 +27,16 @@
 
   @Component
   export default class QueryTextDiff extends Vue {
-
     @Prop({ required: true })
     queryOne!: string;
     @Prop({ required: true })
     queryTwo!: string;
 
-    mounted() {
+    mounted(): void {
       // TODO: Implement Diff view this.queryOne vs this.queryTwo
       this.$el.innerHTML = '<span>Diff goes here</span>';
     }
   }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

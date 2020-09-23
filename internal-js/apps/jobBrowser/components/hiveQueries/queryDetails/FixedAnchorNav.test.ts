@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils'
-import FixedAnchorNav from './FixedAnchorNav.vue'
+import { shallowMount } from '@vue/test-utils';
+import FixedAnchorNav from './FixedAnchorNav.vue';
 
 describe('FixedAnchorNav.vue', () => {
   it('should render', () => {
@@ -25,5 +25,5 @@ describe('FixedAnchorNav.vue', () => {
       }
     });
     expect(wrapper.element).toMatchSnapshot();
-  })
-})
+  });
+});

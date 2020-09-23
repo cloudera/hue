@@ -18,30 +18,26 @@
 
 <template>
   <div class="target detail-panel query-details-visualExplain">
-    <template v-for="(query, index) in queries">
-      <div :key="id">
-        <div class="row">
-          <div class="col-md-12">
-            <div v-if="queries.length > 1" class="title">
-              Visual Explain - {{ numberToLetter(index) }}
-            </div>
-            <div v-else class="title">
-              Visual Explain
-            </div>
+    <div v-for="(query, index) in queries" :key="query.id">
+      <div class="row">
+        <div class="col-md-12">
+          <div v-if="queries.length > 1" class="title">
+            Visual Explain - {{ numberToLetter(index) }}
           </div>
+          <div v-else class="title">Visual Explain</div>
         </div>
-        <div class="row">
-          <div class="col-md-12">
-            <div class="body">
-              <div v-if="!query" class="explain--error">
-                <div>No Visual Explain available.</div>
-              </div>
-              <visual-explain v-else :queries="queries" />
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="body">
+            <div v-if="!query" class="explain--error">
+              <div>No Visual Explain available.</div>
             </div>
+            <visual-explain v-else :queries="queries" />
           </div>
         </div>
       </div>
-    </template>
+    </div>
   </div>
 </template>
 

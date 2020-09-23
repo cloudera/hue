@@ -23,12 +23,12 @@
     <div class="buttons">
       <template v-if="!query.isComplete">
         <button v-if="stoppingQuery" type="button" class="btn btn-default btn-sm disabled">
-          <i class="fa fa-spinner fa-pulse fa-fw"></i> Stopping query
+          <i class="fa fa-spinner fa-pulse fa-fw" /> Stopping query
         </button>
-        <button v-else type="button" class="btn btn-warning btn-sm" v-on:click="stopQuery">Stop</button>
+        <button v-else type="button" class="btn btn-warning btn-sm" @click="stopQuery">Stop</button>
       </template>
 
-      <button type="button" class="btn btn-success btn-sm" v-on:click="downloadLogs">DOWNLOAD</button>
+      <button type="button" class="btn btn-success btn-sm" @click="downloadLogs">DOWNLOAD</button>
     </div>
   </div>
 </template>
@@ -39,18 +39,17 @@
 
   @Component
   export default class FixedAnchorNav extends SingleQueryComponent {
-    stoppingQuery: boolean = false;
+    stoppingQuery = false;
 
-    stopQuery() {
+    stopQuery(): void {
       this.stoppingQuery = true;
       // TODO: Implement (see fixed-anchor-nav.js)
     }
 
-    downloadLogs() {
+    downloadLogs(): void {
       // TODO: Implement (see fixed-anchor-nav.js)
     }
   }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

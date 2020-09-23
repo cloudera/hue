@@ -19,21 +19,21 @@
 <template>
   <div>
     <div class="dag-panel">
-      <fixed-anchor-nav :query="query"></fixed-anchor-nav>
+      <fixed-anchor-nav :query="query" />
       <!-- {{#bs-tab fade=false as |tab|}} -->
 
       <tabs>
         <tab title="QUERY INFO">
-          <query-info :query="query"></query-info>
+          <query-info :query="query" />
         </tab>
         <tab title="VISUAL EXPLAIN">
-          <visual-explain :queries="[query]"></visual-explain>
+          <visual-explain :queries="[query]" />
         </tab>
         <tab title="QUERY CONFIG">
-          <query-config :queries="[query]"></query-config>
+          <query-config :queries="[query]" />
         </tab>
         <tab title="TIMELINE">
-          <query-timeline :queries="[query]"></query-timeline>
+          <query-timeline :queries="[query]" />
         </tab>
       </tabs>
 
@@ -57,7 +57,16 @@
   import VisualExplain from './VisualExplain.vue';
 
   @Component({
-    components: { Tab, Tabs, FixedAnchorNav, QueryTimeline, DagDetails, QueryConfig, VisualExplain, QueryInfo }
+    components: {
+      Tab,
+      Tabs,
+      FixedAnchorNav,
+      QueryTimeline,
+      DagDetails,
+      QueryConfig,
+      VisualExplain,
+      QueryInfo
+    }
   })
   export default class QueryDetails extends SingleQueryComponent {
     get isDagEmpty(): boolean {

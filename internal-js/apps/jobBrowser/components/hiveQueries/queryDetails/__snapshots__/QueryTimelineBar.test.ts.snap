@@ -6,7 +6,9 @@ exports[`QueryTimelineBar.vue should render a timeline bar 1`] = `
   style="width: 63%;"
   title="Some title"
 >
+  
   Some title
+
 </div>
 `;
 
@@ -16,5 +18,7 @@ exports[`QueryTimelineBar.vue should render a timeline bar with 0 total (div 0 c
   style="width: 0%;"
 >
   
+  
+
 </div>
 `;

@@ -18,18 +18,25 @@
 
 <template>
   <div id="dag-panel" class="target detail-panel dag-panel">
-    <select v-if="query.dags.length > 1" v-model="selectedDagId" @change="dagSelected($event.target.value)" class="form-control">
-      <option v-for="dag in query.dags" v-bind:value="dag.dagInfo.dagId">{{ dag.dagInfo.dagId }}</option>
+    <select
+      v-if="query.dags.length > 1"
+      v-model="selectedDagId"
+      class="form-control"
+      @change="dagSelected($event.target.value)"
+    >
+      <option v-for="dag in query.dags" :key="dag.dagInfo.dagId" :value="dag.dagInfo.dagId">
+        {{ dag.dagInfo.dagId }}
+      </option>
     </select>
 
-    <br/>
+    <br />
 
     <!-- {{#bs-tab fade=false as |tab|}} -->
     <tabs>
-      <tab title="DAG INFO"><dag-swimlane></dag-swimlane></tab>
-      <tab title="DAG FLOW"><dag-graphical-view></dag-graphical-view></tab>
-      <tab title="DAG COUNTERS"><dag-counters></dag-counters></tab>
-      <tab title="DAG CONFIGURATIONS"><dag-configs :queries="[query]"></dag-configs></tab>
+      <tab title="DAG INFO"><dag-swimlane /></tab>
+      <tab title="DAG FLOW"><dag-graphical-view /></tab>
+      <tab title="DAG COUNTERS"><dag-counters /></tab>
+      <tab title="DAG CONFIGURATIONS"><dag-configs :queries="[query]" /></tab>
     </tabs>
     <!-- {{/bs-tab}} -->
   </div>
@@ -48,19 +55,22 @@
 
   @Component({
     components: {
-      Tab, Tabs, DagConfigs, DagCounters, DagGraphicalView, DagSwimlane
+      Tab,
+      Tabs,
+      DagConfigs,
+      DagCounters,
+      DagGraphicalView,
+      DagSwimlane
     }
   })
-
   export default class DagDetails extends SingleQueryComponent {
     selectedDagId?: string;
 
-    dagSelected(dag: Dag) {
-      Tab
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    dagSelected(dag: Dag): void {
       // TODO: Implement
     }
   }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils';
 import { normalizePerf } from './utils';
-import QueryTimelineBars from './QueryTimelineBars.vue'
+import QueryTimelineBars from './QueryTimelineBars.vue';
 
 describe('QueryTimelineBars.vue', () => {
   it('should render', () => {
@@ -26,5 +26,5 @@ describe('QueryTimelineBars.vue', () => {
       }
     });
     expect(wrapper.element).toMatchSnapshot();
-  })
-})
+  });
+});

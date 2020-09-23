@@ -14,9 +14,7 @@ exports[`QueryVisualExplain.vue should render 1`] = `
         <div
           class="title"
         >
-          
-            Visual Explain
-          
+          Visual Explain
         </div>
       </div>
     </div>

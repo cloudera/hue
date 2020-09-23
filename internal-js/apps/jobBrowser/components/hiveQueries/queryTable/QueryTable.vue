@@ -20,20 +20,25 @@
 
 <template>
   <div class="table-component">
-    <queries-search :searches="searches" :table-definition="tableDefinition"></queries-search>
+    <queries-search :searches="searches" :table-definition="tableDefinition" />
     <div class="left-panel">
-      <template v-if="!columnSelectorIsVisible" >
+      <template v-if="!columnSelectorIsVisible">
         <div class="refine-header">
           Refine
-          <i v-if="!dataProcessor.facets.fieldCount" class="fa fa-spinner fa-pulse fa-fw"></i>
-          <i class='fa fa-plus' title="Customize" @click="toggleColumnSelector"></i>
+          <i v-if="!dataProcessor.facets.fieldCount" class="fa fa-spinner fa-pulse fa-fw" />
+          <i class="fa fa-plus" title="Customize" @click="toggleColumnSelector" />
         </div>
         <!-- {{em-table-facet-panel tableDefinition=definition dataProcessor=dataProcessor}} -->
       </template>
-      <column-selector-panel v-else :columns="columns" @set-checked-columns="checkedColumnsChanged"  @close="toggleColumnSelector"></column-selector-panel>
+      <column-selector-panel
+        v-else
+        :columns="columns"
+        @set-checked-columns="checkedColumnsChanged"
+        @close="toggleColumnSelector"
+      />
     </div>
     <div class="table">
-      <hue-table :columns="visibleColumns" :rows="queries"></hue-table>
+      <hue-table :columns="visibleColumns" :rows="queries" />
       <!-- {{em-table
         title=title
 
@@ -68,7 +73,7 @@
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
-  import { Emit, Prop } from 'vue-property-decorator';
+  import { Prop } from 'vue-property-decorator';
   import HueTable from '../../../../../../desktop/core/src/desktop/js/components/HueTable.vue';
   import { Column } from '../../../../../../desktop/core/src/desktop/js/components/HueTable';
   import ColumnSelectorPanel from '../../../../../../desktop/core/src/desktop/js/components/ColumnSelectorPanel.vue';
@@ -88,7 +93,7 @@
         title: 'Some title'
       },
       columnPreferences: [{ id: 'some id' }]
-    }
+    };
 
     // TODO: Properly initiate DataProcessor
     dataProcessor: DataProcessor = {
@@ -105,27 +110,26 @@
 
     columnSelectorIsVisible = false;
 
-    async created() {
+    async created(): Promise<void> {
       this.searches = await fetchSuggestedSearches({ entityType: 'query' });
     }
 
-    checkedColumnsChanged(checkedColumns: Column[]) {
+    checkedColumnsChanged(checkedColumns: Column[]): void {
       this.visibleColumns = checkedColumns;
     }
 
-    toggleColumnSelector() {
+    toggleColumnSelector(): void {
       this.columnSelectorIsVisible = !this.columnSelectorIsVisible;
     }
 
-    @Emit('query-selected')
-    querySelected(query: Query) {
+    querySelected(query: Query): void {
+      this.$emit('query-selected', query);
     }
 
-    @Emit('diff-queries')
-    diffQueries(queries: Query[]) {
+    diffQueries(queries: Query[]): void {
+      this.$emit('diff-queries', queries);
     }
   }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

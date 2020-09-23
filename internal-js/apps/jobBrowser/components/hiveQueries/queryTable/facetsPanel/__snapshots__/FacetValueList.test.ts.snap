@@ -11,13 +11,17 @@ exports[`FacetValueList.vue should render 1`] = `
     <div
       class="field-title"
     >
+      
       status
+    
     </div>
      
     <div
       class="field-count"
     >
+      
       2
+    
     </div>
      
     <!---->

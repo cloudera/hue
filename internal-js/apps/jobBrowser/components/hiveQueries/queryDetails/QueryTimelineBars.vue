@@ -19,22 +19,58 @@
 <template>
   <div class="timeline-bars">
     <div class="groups">
-      <query-timeline-bar :total="perf.total" :value="perf.groupTotal.pre" title="Pre-Execution + DAG construction"></query-timeline-bar>
-      <query-timeline-bar :total="perf.total" :value="perf.groupTotal.submit" title="DAG Submission"></query-timeline-bar>
-      <query-timeline-bar :total="perf.total" :value="perf.groupTotal.running" title="DAG Runtime"></query-timeline-bar>
-      <query-timeline-bar :total="perf.total" :value="perf.groupTotal.pre" title="Pre-Execution + DAG construction"></query-timeline-bar>
-      <query-timeline-bar :total="perf.total" :value="perf.groupTotal.post" title="Post Execution"></query-timeline-bar>
+      <query-timeline-bar
+        :total="perf.total"
+        :value="perf.groupTotal.pre"
+        title="Pre-Execution + DAG construction"
+      />
+      <query-timeline-bar
+        :total="perf.total"
+        :value="perf.groupTotal.submit"
+        title="DAG Submission"
+      />
+      <query-timeline-bar
+        :total="perf.total"
+        :value="perf.groupTotal.running"
+        title="DAG Runtime"
+      />
+      <query-timeline-bar
+        :total="perf.total"
+        :value="perf.groupTotal.pre"
+        title="Pre-Execution + DAG construction"
+      />
+      <query-timeline-bar
+        :total="perf.total"
+        :value="perf.groupTotal.post"
+        title="Post Execution"
+      />
     </div>
     <div class="sub-groups">
-      <query-timeline-bar :total="perf.total" :value="perf.compile" title="Compile"></query-timeline-bar>
-      <query-timeline-bar :total="perf.total" :value="perf.parse" title="Parse"></query-timeline-bar>
-      <query-timeline-bar :total="perf.total" :value="perf.TezBuildDag" title="Build Dag"></query-timeline-bar>
-      <query-timeline-bar :total="perf.total" :value="perf.TezSubmitDag" title="Submit Dag"></query-timeline-bar>
-      <query-timeline-bar :total="perf.total" :value="perf.TezSubmitToRunningDag" title="Submit To Running"></query-timeline-bar>
-      <query-timeline-bar :total="perf.total" :value="perf.TezRunDag" title="Run Dag"></query-timeline-bar>
-      <query-timeline-bar :total="perf.total" :value="perf.PostHiveProtoLoggingHook" title="Post ATS Hook"></query-timeline-bar>
-      <query-timeline-bar :total="perf.total" :value="perf.RemoveTempOrDuplicateFiles" title="Remove Files"></query-timeline-bar>
-      <query-timeline-bar :total="perf.total" :value="perf.RenameOrMoveFiles" title="Rename Or Move Files"></query-timeline-bar>
+      <query-timeline-bar :total="perf.total" :value="perf.compile" title="Compile" />
+      <query-timeline-bar :total="perf.total" :value="perf.parse" title="Parse" />
+      <query-timeline-bar :total="perf.total" :value="perf.TezBuildDag" title="Build Dag" />
+      <query-timeline-bar :total="perf.total" :value="perf.TezSubmitDag" title="Submit Dag" />
+      <query-timeline-bar
+        :total="perf.total"
+        :value="perf.TezSubmitToRunningDag"
+        title="Submit To Running"
+      />
+      <query-timeline-bar :total="perf.total" :value="perf.TezRunDag" title="Run Dag" />
+      <query-timeline-bar
+        :total="perf.total"
+        :value="perf.PostHiveProtoLoggingHook"
+        title="Post ATS Hook"
+      />
+      <query-timeline-bar
+        :total="perf.total"
+        :value="perf.RemoveTempOrDuplicateFiles"
+        title="Remove Files"
+      />
+      <query-timeline-bar
+        :total="perf.total"
+        :value="perf.RenameOrMoveFiles"
+        title="Rename Or Move Files"
+      />
     </div>
   </div>
 </template>
@@ -55,5 +91,4 @@
   }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

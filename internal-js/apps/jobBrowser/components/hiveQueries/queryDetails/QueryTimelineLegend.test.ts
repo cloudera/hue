@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils';
 import { normalizePerf } from './utils';
-import QueryTimelineLegend from './QueryTimelineLegend.vue'
+import QueryTimelineLegend from './QueryTimelineLegend.vue';
 
 describe('QueryTimelineLegend.vue', () => {
   it('should render', () => {
@@ -26,5 +26,5 @@ describe('QueryTimelineLegend.vue', () => {
       }
     });
     expect(wrapper.element).toMatchSnapshot();
-  })
-})
+  });
+});

@@ -96,8 +96,6 @@ exports[`RangePanel.vue should render 1`] = `
               Last 7 days
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -105,8 +103,6 @@ exports[`RangePanel.vue should render 1`] = `
               Last 30 days
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -114,8 +110,6 @@ exports[`RangePanel.vue should render 1`] = `
               Last 60 days
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -123,8 +117,6 @@ exports[`RangePanel.vue should render 1`] = `
               Last 90 days
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -132,8 +124,6 @@ exports[`RangePanel.vue should render 1`] = `
               Last 6 months
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -141,8 +131,6 @@ exports[`RangePanel.vue should render 1`] = `
               Last 1 year
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -150,8 +138,6 @@ exports[`RangePanel.vue should render 1`] = `
               Last 2 year
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -161,10 +147,6 @@ exports[`RangePanel.vue should render 1`] = `
           </li>
         </ul>
       </div>
-    </div>
-    <div
-      class="row"
-    >
       <div
         class="col-md-3"
       >
@@ -176,8 +158,6 @@ exports[`RangePanel.vue should render 1`] = `
               Yesterday
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -185,8 +165,6 @@ exports[`RangePanel.vue should render 1`] = `
               Day before yesterday
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -194,8 +172,6 @@ exports[`RangePanel.vue should render 1`] = `
               This day last week
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -203,8 +179,6 @@ exports[`RangePanel.vue should render 1`] = `
               Previous week
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -212,8 +186,6 @@ exports[`RangePanel.vue should render 1`] = `
               Previous month
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -223,10 +195,6 @@ exports[`RangePanel.vue should render 1`] = `
           </li>
         </ul>
       </div>
-    </div>
-    <div
-      class="row"
-    >
       <div
         class="col-md-3"
       >
@@ -238,8 +206,6 @@ exports[`RangePanel.vue should render 1`] = `
               Today
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -247,8 +213,6 @@ exports[`RangePanel.vue should render 1`] = `
               Today so far
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -256,8 +220,6 @@ exports[`RangePanel.vue should render 1`] = `
               This week
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -265,8 +227,6 @@ exports[`RangePanel.vue should render 1`] = `
               This week so far
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -274,8 +234,6 @@ exports[`RangePanel.vue should render 1`] = `
               This month
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -285,10 +243,6 @@ exports[`RangePanel.vue should render 1`] = `
           </li>
         </ul>
       </div>
-    </div>
-    <div
-      class="row"
-    >
       <div
         class="col-md-3"
       >
@@ -300,8 +254,6 @@ exports[`RangePanel.vue should render 1`] = `
               Last 5 minutes
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -309,8 +261,6 @@ exports[`RangePanel.vue should render 1`] = `
               Last 15 minutes
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -318,8 +268,6 @@ exports[`RangePanel.vue should render 1`] = `
               Last 30 minutes
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -327,8 +275,6 @@ exports[`RangePanel.vue should render 1`] = `
               Last 1 hour
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -336,8 +282,6 @@ exports[`RangePanel.vue should render 1`] = `
               Last 3 hours
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -345,8 +289,6 @@ exports[`RangePanel.vue should render 1`] = `
               Last 6 hours
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"
@@ -354,8 +296,6 @@ exports[`RangePanel.vue should render 1`] = `
               Last 12 hours
             </a>
           </li>
-        </ul>
-        <ul>
           <li>
             <a
               href="#"

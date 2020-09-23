@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils';
 import { Query } from '../index';
-import VisualExplain from './VisualExplain.vue'
+import VisualExplain from './VisualExplain.vue';
 
 describe('VisualExplain.vue', () => {
   it('should render', () => {
@@ -26,5 +26,5 @@ describe('VisualExplain.vue', () => {
       }
     });
     expect(wrapper.element).toMatchSnapshot();
-  })
-})
+  });
+});

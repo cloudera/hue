@@ -18,37 +18,63 @@
 
 <template>
   <div class="query-diff">
-    <div style="clear:both"></div>
+    <div style="clear: both;" />
     <div id="query-details" class="target">
-      <div class="diff-panel"><query-info title="A" :query="queries[0]"></query-info></div>
-      <div class="diff-panel"><query-info title="B" :query="queries[1]"></query-info></div>
-      <div class="query-diff-highlighter" style="clear:both;">
-        <query-text-diff :query-one="queries[0].query" :query-two="queries[1]"></query-text-diff>
+      <div class="diff-panel">
+        <query-info title="A" :query="queries[0]" />
+      </div>
+      <div class="diff-panel">
+        <query-info title="B" :query="queries[1]" />
+      </div>
+      <div class="query-diff-highlighter" style="clear: both;">
+        <query-text-diff :query-one="queries[0].query" :query-two="queries[1]" />
       </div>
     </div>
-    <query-visual-explain :queries="queries"></query-visual-explain>
-    <query-config :queries="queries"></query-config>
-    <query-timeline :queries="queries"></query-timeline>
+    <query-visual-explain :queries="queries" />
+    <query-config :queries="queries" />
+    <query-timeline :queries="queries" />
     <div v-if="!isDagEmpty()" id="dag-panel" class="target detail-panel dag-panel">
       <div class="row">
         <div class="col-xs-6">
-          <select v-if="queries[0].dags && queries[0].dags.length > 1" v-model="selectedDagId1" @change="dagSelected1($event.target.value)" class="form-control">
-            <option v-for="dag in queries[0].dags" v-bind:value="dag.dagInfo.dagId">{{ dag.dagInfo.dagId }}</option>
+          <select
+            v-if="queries[0].dags && queries[0].dags.length > 1"
+            v-model="selectedDagId1"
+            class="form-control"
+            @change="dagSelected1($event.target.value)"
+          >
+            <option
+              v-for="dag in queries[0].dags"
+              :key="dag.dagInfo.dagId"
+              :value="dag.dagInfo.dagId"
+            >
+              {{ dag.dagInfo.dagId }}
+            </option>
           </select>
         </div>
         <div class="col-xs-6">
-          <select v-if="queries[1].dags && queries[1].dags.length > 1" v-model="selectedDagId2" @change="dagSelected2($event.target.value)" class="form-control">
-            <option v-for="dag in queries[1].dags" v-bind:value="dag.dagInfo.dagId">{{ dag.dagInfo.dagId }}</option>
+          <select
+            v-if="queries[1].dags && queries[1].dags.length > 1"
+            v-model="selectedDagId2"
+            class="form-control"
+            @change="dagSelected2($event.target.value)"
+          >
+            <option
+              v-for="dag in queries[1].dags"
+              :key="dag.dagInfo.dagId"
+              :value="dag.dagInfo.dagId"
+            >
+              {{ dag.dagInfo.dagId }}
+            </option>
           </select>
         </div>
       </div>
 
       <!-- {{#bs-tab as |tab|}} -->
       <tabs>
-        <tab title="DAG SWIMLANE"><dag-swimlane></dag-swimlane></tab>
-        <tab title="DAG FLOW"><dag-graphical-view></dag-graphical-view></tab>
-        <tab title="DAG COUNTERS"><dag-counters></dag-counters></tab>
-        <tab title="DAG CONFIGURATIONS"><dag-configs :queries="queries"></dag-configs></tab>
+        <tab title="DAG SWIMLANE"><dag-swimlane /></tab>
+        <tab title="DAG FLOW"><dag-graphical-view /></tab>
+        <tab title="DAG COUNTERS"><dag-counters /></tab>
+        <tab title="DAG CONFIGURATIONS"><dag-configs :queries="queries" /></tab>
       </tabs>
       <!-- {{/bs-tab}} -->
     </div>
@@ -73,8 +99,17 @@
 
   @Component({
     components: {
-      QueryVisualExplain, QueryTimeline, QueryConfig, QueryTextDiff, DagConfigs, DagCounters,
-      DagGraphicalView, DagSwimlane, Tab, Tabs, QueryInfo
+      QueryVisualExplain,
+      QueryTimeline,
+      QueryConfig,
+      QueryTextDiff,
+      DagConfigs,
+      DagCounters,
+      DagGraphicalView,
+      DagSwimlane,
+      Tab,
+      Tabs,
+      QueryInfo
     }
   })
   export default class QueryDiff extends MultiQueryComponent {
@@ -84,7 +119,7 @@
     constructor() {
       super();
       if (this.queries.length !== 2) {
-        throw new Error(`Got ${this.queries.length}, expected 2 for diff.`)
+        throw new Error(`Got ${this.queries.length}, expected 2 for diff.`);
       }
     }
 
@@ -92,15 +127,16 @@
       return false; // TODO: Implement
     }
 
-    dagSelected1(dag: Dag) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    dagSelected1(dag: Dag): void {
       // TODO: Implement
     }
 
-    dagSelected2(dag: Dag) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    dagSelected2(dag: Dag): void {
       // TODO: Implement
     }
   }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

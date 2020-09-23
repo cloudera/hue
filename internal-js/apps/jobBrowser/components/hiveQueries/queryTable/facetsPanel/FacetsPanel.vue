@@ -20,15 +20,19 @@
   <div class="em-table-facet-panel hide-filter">
     <ul class="field-list">
       <li v-if="facets.length > 10">
-        <input placeholder="Filter" type="text" v-model="filter" class="field-filter-box">
+        <input v-model="filter" placeholder="Filter" type="text" class="field-filter-box" />
       </li>
-      <template v-for="selection in filteredFacets">
-        <facet-value-list
-            :facet="selection.facet"
-            :selected-values="selection.selectedValues"
-            v-on:values-selected="selectedValues => { selection.selectedValues = selectedValues }"
-        ></facet-value-list>
-      </template>
+      <facet-value-list
+        v-for="selection in filteredFacets"
+        :key="selection.facet.facetField"
+        :facet="selection.facet"
+        :selected-values="selection.selectedValues"
+        @values-selected="
+          selectedValues => {
+            selection.selectedValues = selectedValues;
+          }
+        "
+      />
     </ul>
     <div class="buttons">
       <button type="button" class="btn btn-primary" @click="apply">Apply</button>
@@ -59,7 +63,7 @@
     filter = '';
 
     get facetSelection(): FacetSelection[] {
-      return this.facets.map(facet => ({ facet, selectedValues: [...facet.values] }))
+      return this.facets.map(facet => ({ facet, selectedValues: [...facet.values] }));
     }
 
     get filteredFacets(): FacetSelection[] {
@@ -67,27 +71,30 @@
         return this.facetSelection;
       }
       const filterLower = this.filter.toLowerCase();
-      return this.facetSelection.filter(selection => selection.facet.facetField.toLowerCase().indexOf(filterLower) !== -1);
+      return this.facetSelection.filter(
+        selection => selection.facet.facetField.toLowerCase().indexOf(filterLower) !== -1
+      );
     }
 
-    apply() {
-      const searchFacets: { field: string, values: string []}[] = [];
+    apply(): void {
+      const searchFacets: { field: string; values: string[] }[] = [];
       this.facetSelection.forEach(selection => {
         if (selection.facet.values.length !== selection.selectedValues.length) {
           searchFacets.push({
             field: selection.facet.facetField,
             values: selection.selectedValues.map(value => value.key)
-          })
+          });
         }
-      })
+      });
       this.$emit('search-facets-changed', searchFacets);
     }
 
-    clear() {
-      this.facetSelection.forEach(selection => { selection.selectedValues = [...selection.facet.values]})
+    clear(): void {
+      this.facetSelection.forEach(selection => {
+        selection.selectedValues = [...selection.facet.values];
+      });
     }
   }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

@@ -28,10 +28,10 @@
       query.dags.forEach(dag => {
         if (dag.config) {
           Object.keys(dag.config).forEach(configName => {
-            configs[configName] = dag.config![configName];
-          })
+            configs[configName] = dag.config && dag.config[configName];
+          });
         }
-      })
+      });
       return configs;
     }
   }

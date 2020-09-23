@@ -5,9 +5,7 @@ exports[`QueryTimelineLegend.vue should render 1`] = `
   <div
     class="title"
   >
-    
     Duration
-  
   </div>
    
   <table
@@ -20,7 +18,9 @@ exports[`QueryTimelineLegend.vue should render 1`] = `
         </th>
          
         <th>
+          
           A - 0
+        
         </th>
       </tr>
     </thead>
@@ -32,7 +32,9 @@ exports[`QueryTimelineLegend.vue should render 1`] = `
         </td>
          
         <td>
+          
           0
+        
         </td>
       </tr>
        
@@ -42,7 +44,9 @@ exports[`QueryTimelineLegend.vue should render 1`] = `
         </td>
          
         <td>
+          
           0
+        
         </td>
       </tr>
        
@@ -52,7 +56,9 @@ exports[`QueryTimelineLegend.vue should render 1`] = `
         </td>
          
         <td>
+          
           0
+        
         </td>
       </tr>
     </tbody>
@@ -68,7 +74,9 @@ exports[`QueryTimelineLegend.vue should render 1`] = `
         </th>
          
         <th>
+          
           A - 0
+        
         </th>
       </tr>
     </thead>
@@ -80,7 +88,9 @@ exports[`QueryTimelineLegend.vue should render 1`] = `
         </td>
          
         <td>
+          
           0
+        
         </td>
       </tr>
        
@@ -90,7 +100,9 @@ exports[`QueryTimelineLegend.vue should render 1`] = `
         </td>
          
         <td>
+          
           0
+        
         </td>
       </tr>
     </tbody>
@@ -106,7 +118,9 @@ exports[`QueryTimelineLegend.vue should render 1`] = `
         </th>
          
         <th>
+          
           A - 0
+        
         </th>
       </tr>
     </thead>
@@ -118,7 +132,9 @@ exports[`QueryTimelineLegend.vue should render 1`] = `
         </td>
          
         <td>
+          
           0
+        
         </td>
       </tr>
     </tbody>
@@ -134,7 +150,9 @@ exports[`QueryTimelineLegend.vue should render 1`] = `
         </th>
          
         <th>
+          
           A - 0
+        
         </th>
       </tr>
     </thead>
@@ -146,7 +164,9 @@ exports[`QueryTimelineLegend.vue should render 1`] = `
         </td>
          
         <td>
+          
           0
+        
         </td>
       </tr>
        
@@ -156,7 +176,9 @@ exports[`QueryTimelineLegend.vue should render 1`] = `
         </td>
          
         <td>
+          
           0
+        
         </td>
       </tr>
        
@@ -166,7 +188,9 @@ exports[`QueryTimelineLegend.vue should render 1`] = `
         </td>
          
         <td>
+          
           0
+        
         </td>
       </tr>
     </tbody>

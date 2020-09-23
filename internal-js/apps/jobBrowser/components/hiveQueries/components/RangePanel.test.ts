@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils'
-import {TableDefinition} from '../index';
-import RangePanel from './RangePanel.vue'
+import { shallowMount } from '@vue/test-utils';
+import { TableDefinition } from '../index';
+import RangePanel from './RangePanel.vue';
 
 describe('RangePanel.vue', () => {
   it('should render', () => {
@@ -30,5 +30,5 @@ describe('RangePanel.vue', () => {
       }
     });
     expect(wrapper.element).toMatchSnapshot();
-  })
-})
+  });
+});

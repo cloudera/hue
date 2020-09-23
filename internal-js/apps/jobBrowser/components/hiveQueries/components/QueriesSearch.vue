@@ -20,64 +20,87 @@
   <div>
     <div class="input-group">
       <div class="input-group-btn">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Searches <span class="caret"></span>
+        <button
+          type="button"
+          class="btn btn-default dropdown-toggle"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          Searches <span class="caret" />
         </button>
         <ul class="dropdown-menu">
           <li class="dropdown-header">Suggested</li>
-          <template v-for="search in listedSearches.suggested">
-            <li @click="searchSelected(search)"><a href="javascript: void(0);">{{ search.name }}</a></li>
-          </template>
+          <li
+            v-for="search in listedSearches.suggested"
+            :key="search.name"
+            @click="searchSelected(search)"
+          >
+            <a href="javascript: void(0);">{{ search.name }}</a>
+          </li>
           <li v-if="listedSearches.suggested.length === 0" class="message">No suggestions!</li>
           <li class="dropdown-header">Saved Searches</li>
-          <template v-for="search in listedSearches.saved">
-            <li class="saved-search">
-              <a href="javascript: void(0);" @click="searchSelected(search)">{{ search.name }}</a>
-              <i @click="deleteSearch(search)" class="fa fa-times" aria-hidden="true"></i>
-            </li>
-          </template>
+          <li v-for="search in listedSearches.saved" :key="search.name" class="saved-search">
+            <a href="javascript: void(0);" @click="searchSelected(search)">{{ search.name }}</a>
+            <i class="fa fa-times" aria-hidden="true" @click="deleteSearch(search)" />
+          </li>
           <li v-if="listedSearches.saved.length === 0" class="message">No saved searches</li>
         </ul>
       </div>
 
-      <input type="search" class="form-control" placeholder="Search Queries" v-model="searchText" @keyup.enter="search">
+      <input
+        v-model="searchText"
+        type="search"
+        class="form-control"
+        placeholder="Search Queries"
+        @keyup.enter="search"
+      />
 
       <div class="input-group-btn time-dropdown">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          {{ tableDefinition.rangeData.title }} <span class="caret"></span>
+        <button
+          type="button"
+          class="btn btn-default dropdown-toggle"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          {{ tableDefinition.rangeData.title }} <span class="caret" />
         </button>
         <div class="dropdown-menu range-panel pull-right">
-          <range-panel :table-definition="tableDefinition"></range-panel>
+          <range-panel :table-definition="tableDefinition" />
         </div>
 
         <button class="btn btn-default search" type="button" @click="search">
-          <i class="fa fa-search" aria-hidden="true"></i>
+          <i class="fa fa-search" aria-hidden="true" />
         </button>
       </div>
 
       <div class="input-group-btn save-button">
         <button class="btn btn-default" type="button" @click="toggleSaveModal">
-          <i class="fa fa-save" aria-hidden="true"></i>
+          <i class="fa fa-save" aria-hidden="true" />
         </button>
       </div>
     </div>
     <modal v-if="isShowingSaveModal" @close="toggleSaveModal">
-    <template slot="header">
-      <span class="modal-title">Save Search</span>
-      <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-    </template>
-    <template slot="body">
-      NAME *
-      <input type="text" class="form-control" v-model="searchName">
-      <div>
-        <label><input type="checkbox" class="form-control" v-model="includeFilterAndColumns"> Include Filters and Columns</label>
-      </div>
-    </template>
-    <template slot="footer">
-      <button type="button" class="modal-default-button" @click="toggleSaveModal">CANCEL</button>
-      <button type="button" class="" @click="saveSearch">SAVE</button>
-    </template>
-  </modal>
+      <template #header>
+        <span class="modal-title">Save Search</span>
+        <i class="fa fa-exclamation-circle" aria-hidden="true" />
+      </template>
+      <template #body>
+        NAME *
+        <input v-model="searchName" type="text" class="form-control" />
+        <div>
+          <label>
+            <input v-model="includeFilterAndColumns" type="checkbox" class="form-control" />
+            Include Filters and Columns
+          </label>
+        </div>
+      </template>
+      <template #footer>
+        <button type="button" class="modal-default-button" @click="toggleSaveModal">CANCEL</button>
+        <button type="button" class="" @click="saveSearch">SAVE</button>
+      </template>
+    </modal>
   </div>
 </template>
 
@@ -97,7 +120,7 @@
     @Prop({ required: true })
     searches!: Search[];
     @Prop({ required: true })
-    tableDefinition!: TableDefinition
+    tableDefinition!: TableDefinition;
 
     searchText = '';
     searchName = '';
@@ -105,7 +128,7 @@
 
     isShowingSaveModal = false;
 
-    get listedSearches() {
+    get listedSearches(): { suggested: Search[]; saved: Search[] } {
       const result = { suggested: <Search[]>[], saved: <Search[]>[] };
       this.searches.forEach(search => {
         if (search.category === 'SUGGEST') {
@@ -117,23 +140,23 @@
       return result;
     }
 
-    async deleteSearch(search: Search) {
+    async deleteSearch(search: Search): Promise<void> {
       await api.deleteSearch(search);
     }
 
-    searchSelected(search: Search) {
+    searchSelected(search: Search): void {
       this.searchText = search.clause;
     }
 
-    async search() {
+    search(): void {
       this.$emit('search', this.searchText);
     }
 
-    toggleSaveModal() {
+    toggleSaveModal(): void {
       this.isShowingSaveModal = !this.isShowingSaveModal;
     }
 
-    async saveSearch() {
+    async saveSearch(): Promise<void> {
       this.toggleSaveModal();
       if (this.searchName) {
         await api.saveSearch({
@@ -142,12 +165,11 @@
           type: 'ADVANCED',
           entity: 'query',
           clause: this.searchText
-        })
+        });
         this.searchName = '';
       }
     }
   }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

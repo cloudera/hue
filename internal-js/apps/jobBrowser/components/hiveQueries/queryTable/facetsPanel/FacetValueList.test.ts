@@ -14,13 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils';
 import { Facet } from '../../index';
-import FacetValueList from './FacetValueList.vue'
+import FacetValueList from './FacetValueList.vue';
 
 describe('FacetValueList.vue', () => {
   it('should render', () => {
-    const testFacet: Facet = { facetField: 'status', values: [{ key: 'SUCCESS', value: 2 }, { key: 'ERROR', value: 1 }] };
+    const testFacet: Facet = {
+      facetField: 'status',
+      values: [
+        { key: 'SUCCESS', value: 2 },
+        { key: 'ERROR', value: 1 }
+      ]
+    };
     const wrapper = shallowMount(FacetValueList, {
       propsData: {
         facet: testFacet,
@@ -28,5 +34,5 @@ describe('FacetValueList.vue', () => {
       }
     });
     expect(wrapper.element).toMatchSnapshot();
-  })
-})
+  });
+});

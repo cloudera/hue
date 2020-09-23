@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils'
-import {Search, TableDefinition} from '../index';
-import QueriesSearch from './QueriesSearch.vue'
+import { shallowMount } from '@vue/test-utils';
+import { Search, TableDefinition } from '../index';
+import QueriesSearch from './QueriesSearch.vue';
 
 describe('QueriesSearch.vue', () => {
   it('should render', () => {
@@ -34,5 +34,5 @@ describe('QueriesSearch.vue', () => {
       }
     });
     expect(wrapper.element).toMatchSnapshot();
-  })
-})
+  });
+});

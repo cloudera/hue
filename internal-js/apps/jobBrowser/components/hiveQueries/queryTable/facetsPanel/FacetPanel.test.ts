@@ -14,23 +14,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils';
 import { Facet } from '../../index';
-import FacetsPanel from './FacetsPanel.vue'
+import FacetsPanel from './FacetsPanel.vue';
 
 describe('FacetsPanel.vue', () => {
   it('should render', () => {
     const testFacets: Facet[] = [
-      { facetField: 'status', values: [{ key: 'SUCCESS', value: 2 }, { key: 'ERROR', value: 1 }] },
+      {
+        facetField: 'status',
+        values: [
+          { key: 'SUCCESS', value: 2 },
+          { key: 'ERROR', value: 1 }
+        ]
+      },
       { facetField: 'queueName', values: [{ key: '', value: 3 }] },
       { facetField: 'userId', values: [{ key: 'hive', value: 3 }] }
     ];
-    testFacets.push()
+    testFacets.push();
     const wrapper = shallowMount(FacetsPanel, {
       propsData: {
         facets: testFacets
       }
     });
     expect(wrapper.element).toMatchSnapshot();
-  })
-})
+  });
+});
