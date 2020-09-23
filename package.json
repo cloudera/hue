@@ -37,6 +37,7 @@
     }
   },
   "dependencies": {
+    "axios": "0.20.0",
     "clipboard": "1.7.1",
     "core-js": "^3.4.2",
     "d3": "5.7.0",
