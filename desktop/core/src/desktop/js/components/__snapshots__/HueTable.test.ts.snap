@@ -1,0 +1,81 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HueTable.vue should render a table 1`] = `
+<table>
+  <thead>
+    <tr>
+      <th>
+        A
+      </th>
+      <th>
+        D
+      </th>
+      <th>
+        C
+      </th>
+      <th>
+        B
+      </th>
+    </tr>
+  </thead>
+   
+  <tbody>
+    <tr>
+      <td>
+        1
+      </td>
+      <td>
+        
+      </td>
+      <td>
+        false
+      </td>
+      <td>
+        5
+      </td>
+    </tr>
+    <tr>
+      <td>
+        2
+      </td>
+      <td>
+        
+      </td>
+      <td>
+        true
+      </td>
+      <td>
+        6
+      </td>
+    </tr>
+    <tr>
+      <td>
+        3
+      </td>
+      <td>
+        
+      </td>
+      <td>
+        false
+      </td>
+      <td>
+        7
+      </td>
+    </tr>
+    <tr>
+      <td>
+        4
+      </td>
+      <td>
+        
+      </td>
+      <td>
+        true
+      </td>
+      <td>
+        8
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
