@@ -1,0 +1,89 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ColumnSelectorPanel.vue should render 1`] = `
+<div>
+  
+  Columns 
+  <i
+    class="fa fa-times"
+    title="Close"
+  />
+   
+  <ul
+    class="column-list"
+  >
+    <li>
+      <input
+        class="filter-box"
+        placeholder="Filter"
+        type="text"
+      />
+    </li>
+     
+  </ul>
+   
+  <div
+    class="buttons"
+  >
+    <button
+      class="btn btn-default"
+      type="button"
+    >
+      Apply
+    </button>
+  </div>
+</div>
+`;
+
+exports[`ColumnSelectorPanel.vue should render with checkboxes 1`] = `
+<div>
+  
+  Columns 
+  <i
+    class="fa fa-times"
+    title="Close"
+  />
+   
+  <ul
+    class="column-list"
+  >
+    <li>
+      <input
+        class="filter-box"
+        placeholder="Filter"
+        type="text"
+      />
+    </li>
+     
+    <li>
+      <label>
+        <input
+          type="checkbox"
+          value="[object Object]"
+        />
+        A
+      </label>
+    </li>
+    <li>
+      <label>
+        <input
+          type="checkbox"
+          value="[object Object]"
+        />
+        B
+      </label>
+    </li>
+  </ul>
+   
+  <div
+    class="buttons"
+  >
+    <button
+      class="btn btn-default"
+      type="button"
+    >
+      Apply
+    </button>
+  </div>
+</div>
+`;
