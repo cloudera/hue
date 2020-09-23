@@ -882,6 +882,7 @@ Tagging the release:
 
 Building the tarball release:
 
+    git checkout -b release-4.8.0 release-4.8.0
     make prod
 
 Source of the release: https://github.com/cloudera/hue/archive/release-4.8.0.zip
