@@ -71,6 +71,7 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
           'INDEX',
           'MATERIALIZED VIEW',
           'ROLE',
+          'SCHEDULED QUERY',
           'SCHEMA',
           'TABLE',
           'TEMPORARY EXTERNAL TABLE',
@@ -135,7 +136,7 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['COMMENT', 'LOCATION', 'WITH DBPROPERTIES']
+          suggestKeywords: ['COMMENT', 'LOCATION', 'MANAGEDLOCATION', 'WITH DBPROPERTIES']
         }
       });
     });
@@ -146,7 +147,7 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['LOCATION', 'WITH DBPROPERTIES']
+          suggestKeywords: ['LOCATION', 'MANAGEDLOCATION', 'WITH DBPROPERTIES']
         }
       });
     });
@@ -154,6 +155,17 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
     it("should suggest keywords for \"CREATE DATABASE foo COMMENT 'bla' LOCATION '/bla' |\"", () => {
       assertAutoComplete({
         beforeCursor: "CREATE DATABASE foo COMMENT 'bla' LOCATION '/bla' ",
+        afterCursor: '',
+        containsKeywords: ['WITH DBPROPERTIES'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it("should suggest keywords for \"CREATE DATABASE foo COMMENT 'bla' MANAGEDLOCATION '/bla' |\"", () => {
+      assertAutoComplete({
+        beforeCursor: "CREATE DATABASE foo COMMENT 'bla' MANAGEDLOCATION '/bla' ",
         afterCursor: '',
         expectedResult: {
           lowerCase: false,

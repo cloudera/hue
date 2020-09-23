@@ -72,6 +72,18 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
       });
     });
 
+    it('should handle "ALTER DATABASE baa SET MANAGEDLOCATION \'/baa/boo\';|"', () => {
+      assertAutoComplete({
+        beforeCursor: "ALTER DATABASE baa SET MANAGEDLOCATION '/baa/boo';",
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
     it('should suggest keywords for "ALTER |"', () => {
       assertAutoComplete({
         beforeCursor: 'ALTER ',
@@ -111,7 +123,7 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['SET DBPROPERTIES', 'SET LOCATION', 'SET OWNER']
+          suggestKeywords: ['SET DBPROPERTIES', 'SET LOCATION', 'SET MANAGEDLOCATION', 'SET OWNER']
         }
       });
     });
@@ -122,7 +134,7 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['DBPROPERTIES', 'LOCATION', 'OWNER']
+          suggestKeywords: ['DBPROPERTIES', 'LOCATION', 'MANAGEDLOCATION', 'OWNER']
         }
       });
     });
@@ -141,6 +153,17 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
     it('should suggest hdfs for "ALTER DATABASE boo SET LOCATION \'/|"', () => {
       assertAutoComplete({
         beforeCursor: "ALTER DATABASE boo SET LOCATION '/",
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestHdfs: { path: '/' }
+        }
+      });
+    });
+
+    it('should suggest hdfs for "ALTER DATABASE boo SET MANAGEDLOCATION \'/|"', () => {
+      assertAutoComplete({
+        beforeCursor: "ALTER DATABASE boo SET MANAGEDLOCATION '/",
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
@@ -419,7 +442,8 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
             'SET TBLPROPERTIES',
             'SKEWED BY',
             'TOUCH',
-            'UNARCHIVE PARTITION'
+            'UNARCHIVE PARTITION',
+            'UNSET SERDEPROPERTIES'
           ]
         }
       });
@@ -1036,7 +1060,8 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
             'SET FILEFORMAT',
             'SET LOCATION',
             'SET SERDE',
-            'SET SERDEPROPERTIES'
+            'SET SERDEPROPERTIES',
+            'UNSET SERDEPROPERTIES'
           ]
         }
       });
@@ -1642,6 +1667,17 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
         expectedResult: {
           lowerCase: false,
           suggestKeywords: ['PARTITION']
+        }
+      });
+    });
+
+    it('should suggest keywords for "ALTER TABLE bar UNSET |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'ALTER TABLE bar UNSET ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['SERDEPROPERTIES']
         }
       });
     });

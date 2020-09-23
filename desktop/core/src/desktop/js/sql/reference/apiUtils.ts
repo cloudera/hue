@@ -115,6 +115,9 @@ export const adaptApiFunctions = (functions: ApiUdf[]): UdfDetails[] => {
           adaptedUdf.returnTypes = additionalReturnTypes;
         }
       }
+
+      // Make sure the return types are unique
+      adaptedUdf.returnTypes = [...new Set(adaptedUdf.returnTypes)];
     } else {
       adapted[apiUdf.name] = adaptApiUdf(apiUdf);
       udfs.push(adapted[apiUdf.name]);
@@ -128,7 +131,7 @@ const createUrl = (database?: string, udf?: UdfDetails): string => {
     return `${AUTOCOMPLETE_API_PREFIX}${database}/${udf.name}`;
   }
   if (database) {
-    return `${AUTOCOMPLETE_API_PREFIX}${database}`;
+    return `${AUTOCOMPLETE_API_PREFIX}${database}/`;
   }
   if (udf) {
     return `${AUTOCOMPLETE_API_PREFIX}${udf.name}`;

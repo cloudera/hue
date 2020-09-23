@@ -16,6 +16,7 @@
 <%!
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
+from desktop.webpack_utils import get_hue_bundles
 from django.utils.translation import ugettext as _
 from metadata.conf import has_optimizer, OPTIMIZER
 
@@ -112,7 +113,9 @@ if USE_NEW_EDITOR.get():
     }
   </script>
 
-  ${ render_bundle('hue') | n,unicode }
+  % for bundle in get_hue_bundles('hue'):
+    ${ render_bundle(bundle) | n,unicode }
+  % endfor
 
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.touchSwipe.min.js') }"></script>
   <script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>

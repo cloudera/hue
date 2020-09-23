@@ -718,7 +718,7 @@
     # Kerberos principal name for Hue
     ## hue_principal=hue/hostname.foo.com
     # Frequency in seconds with which Hue will renew its keytab
-    ## keytab_reinit_frequency=3600
+    ## REINIT_FREQUENCY=3600
     # Path to keep Kerberos credentials cached
     ## ccache_path=/var/run/hue/hue_krb5_ccache
     # Path to kinit
@@ -1013,6 +1013,12 @@
     # # options='{"url": "presto://localhost:8080/hive/default", "has_impersonation": true}'
     # ## Kerberos.
     # # options='{"url": "presto://localhost:8080/hive/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
+    # ## LDAPS enabled over HTTPS.
+    # # options='{"url": "presto://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\"}"}'
+    # ## Presto Session properties along with HTTPS.
+    # # options='{"url": "presto://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\", \"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
+    # ## Presto Session properties when HTTPS is not enabled.
+    # # options='{"url": "presto://username:password@localhost:8080/tpch/default","connect_args":"{\"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
 
     # [[[clickhouse]]]
     #   name=ClickHouse
@@ -1348,11 +1354,13 @@
   ## auth_password=
 
   # Username and password for Impala Daemon Web interface for getting Impala queries in JobBrowser
-  # Set when webserver_htpassword_user and webserver_htpassword_password are set for Impala
   ## daemon_api_username=
   ## daemon_api_password=
   # Execute this script to produce the password to avoid entering in clear text
   ## daemon_api_password_script=
+  # Set to 'digest' when webserver_htpassword_user and webserver_htpassword_password are set for Impala, or set to
+  # 'basic' if webserver_require_ldap is set
+  ## daemon_api_auth_scheme=digest
 
   # A comma-separated list of white-listed Impala configuration properties that users are authorized to set.
   ## config_whitelist=debug_action,explain_level,mem_limit,optimize_partition_key_scans,query_timeout_s,request_pool
@@ -1457,6 +1465,9 @@
 
   # Redirect client to WebHdfs or S3 for file download. Note: Turning this on will override notebook/redirect_whitelist for user selected file downloads on WebHdfs & S3.
   ## redirect_download=false
+
+  # Optionally set this if you want a different home directory path. e.g. s3a://gethue.
+  ## remote_storage_home=s3a://gethue
 
 
 ###########################################################################
@@ -1620,9 +1631,11 @@
   # Show the Impala query section for listing and showing more troubleshooting information.
   ## enable_query_browser=true
 
-  # Show the Hive query section for listing and showing more troubleshooting information.
+  # Show the Hive section for listing the query history and providing more troubleshooting information.
   ## enable_hive_query_browser=false
 
+  # Show the Queries section for listing Hive/Impala query history and providing more troubleshooting information.
+  ## enable_queries_list=false
 
 ###########################################################################
 # Settings to configure Sentry / Security App.

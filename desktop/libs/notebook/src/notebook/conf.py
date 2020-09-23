@@ -267,8 +267,11 @@ def _default_interpreters(user):
   apps = appmanager.get_apps_dict(user)
 
   if 'hive' in apps:
+    from beeswax.hive_site import get_hive_execution_engine
+    interpreter_name = 'Impala' if get_hive_execution_engine() == 'impala' else 'Hive'  # Until using a proper dialect for 'FENG'
+
     interpreters.append(('hive', {
-      'name': 'Hive', 'interface': 'hiveserver2', 'options': {}
+      'name': interpreter_name, 'interface': 'hiveserver2', 'options': {}
     }),)
 
   if 'impala' in apps:

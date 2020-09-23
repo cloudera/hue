@@ -8,7 +8,7 @@
 Query. Explore. Share.
 ----------------------
 
-Hue is a mature open source SQL Assistant for [querying](https://docs.gethue.com/user/querying/) any [Databases & Data Warehouses](https://docs.gethue.com/administrator/configuration/connectors/) and collaborating: [gethue.com](http://gethue.com)
+Hue Editor is a mature open source SQL Assistant for [querying](https://docs.gethue.com/user/querying/) any [Databases & Data Warehouses](https://docs.gethue.com/administrator/configuration/connectors/) and collaborating: [gethue.com](http://gethue.com)
 
 Many companies and organizations use Hue to quickly answer questions via self-service querying e.g.:
 
@@ -20,20 +20,20 @@ are executing 100s of 1000s of queries daily. It also [ships](https://docs.gethu
 Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/api/) and any [contributions](https://docs.gethue.com/developer/) are welcome.
 
 
-![Hue Editor](https://cdn.gethue.com/uploads/2020/04/hue-4.7.png)
+![Hue Editor](https://cdn.gethue.com/uploads/2020/09/hue-4.8.png)
 
 Getting Started
 ---------------
 
-You can start Hue in 3 ways - From source, Docker or Kubernetes. Once setup you would have to configure Hue to connect with the desired database.
+You can start Hue in 3 ways - From source, Docker or Kubernetes. Once setup you would have to configure Hue to point to the desired databases you want to query.
 
 The [Forum](https://discourse.gethue.com/) is here in case you are looking for help.
 
 Building From Source
 -----------
 
-First, install dependencies, clone Hue repo, build and get the development server running.
-[Dependencies documentation](https://docs.gethue.com/administrator/installation/dependencies/) must help you in installing dependencies, and troubleshooting build issues.
+First, clone Hue repo, install the [dependencies](https://docs.gethue.com/administrator/installation/dependencies/), build and get the development server running.
+
 ```
 # Install dependencies
 git clone https://github.com/cloudera/hue.git
@@ -43,8 +43,6 @@ build/env/bin/hue runserver
 ```
 
 Now Hue should be running on [http://localhost:8000](http://localhost:8000)!
-
-Then, configure Hue to connect to a database for running queries. It is recommended to use MySQL or PostGres for development.
 
 Read more about configurations in the [development documentations](https://docs.gethue.com/developer/development/).
 
@@ -57,7 +55,12 @@ Start Hue in a single click with the [Docker Guide](https://github.com/cloudera/
 
 Now Hue should be up and running on your default Docker IP on the port 8888 [http://localhost:8888](http://localhost:8888)!
 
-Read more about configurations [here](https://github.com/cloudera/hue/tree/master/tools/docker/hue#configuration).
+Read more about [configurations](https://github.com/cloudera/hue/tree/master/tools/docker/hue#configuration) then.
+
+Development Docker
+------------------
+
+For a very Quick Start and not even bother with installing a dev environment, go with the [Dev Docker](https://docs.gethue.com/developer/development/#dev-docker).
 
 Kubernetes
 ----------

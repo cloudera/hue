@@ -48,6 +48,8 @@ tags:
   - docker
 
 ---
+**Note** This post has been replaced by a more [recent Howto](/quickstart-hue-in-docker/).
+
 [Containers][1] offer a modern way to isolate and run applications. This post is the first one of a series showing how to run Hue as a service. Here, we will explore how to build, run and configure a [Hue][2] server image with [Docker][3].
 
 For impatient people, the source is available at [tools/docker.][4]

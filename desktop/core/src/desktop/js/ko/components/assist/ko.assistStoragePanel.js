@@ -210,7 +210,7 @@ class AssistStoragePanel {
 
     huePubSub.subscribe('assist.selectStorageEntry', entry => {
       this.selectedStorageEntry(entry);
-      apiHelper.setInTotalStorage('assist', 'currentStoragePath_' + entry.type, entry.path);
+      apiHelper.setInTotalStorage('assist', 'currentStoragePath_' + entry.source.type, entry.path);
     });
 
     huePubSub.subscribe('assist.storage.refresh', () => {

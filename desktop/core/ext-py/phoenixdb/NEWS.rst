@@ -16,6 +16,9 @@ Unreleased
 - Removed shell example, as it was python2 only
 - Updated documentation
 - Added SQLAlchemy dialect
+- Implemented Avatica Metadata API
+- Misc fixes
+- Licensing cleanup
 
 Version 0.7
 -----------

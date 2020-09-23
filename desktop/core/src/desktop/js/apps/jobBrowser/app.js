@@ -15,7 +15,8 @@
 // limitations under the License.
 
 import huePubSub from 'utils/huePubSub';
-import './components/hiveQueryPlan.vue';
+import './components/hiveQueryPlan/webcomp';
+import './components/queriesList/webcomp';
 
 huePubSub.subscribe('app.dom.loaded', app => {
   if (app !== 'jobbrowser') {

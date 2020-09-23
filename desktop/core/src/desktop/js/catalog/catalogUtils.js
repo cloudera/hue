@@ -62,11 +62,11 @@ const setSilencedErrors = options => {
 /**
  * Helper function to apply the cancellable option to an existing or new promise
  *
- * @param {CancellablePromise} [promise]
+ * @param {CancellableJqPromise} [promise]
  * @param {Object} [options]
  * @param {boolean} [options.cancellable] - Default false
  *
- * @return {CancellablePromise}
+ * @return {CancellableJqPromise}
  */
 const applyCancellable = (promise, options) => {
   if (promise && promise.preventCancel && (!options || !options.cancellable)) {

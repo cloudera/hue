@@ -17,9 +17,9 @@ data:
     [aws]
     [[aws_accounts]]
     [[[default]]]
-    access_key_id={{ .Values.aws.awsAccessKeyId }}
-    secret_access_key={{ .Values.aws.awsSecretAccessKey }}
-    region={{ .Values.aws.awsRegion }}
+    access_key_id={{ .Values.aws.accessKeyId }}
+    secret_access_key={{ .Values.aws.secretAccessKey }}
+    region={{ .Values.aws.region }}
 
     [notebook]
     [[interpreters]]

@@ -32,6 +32,7 @@ RUN set -eux; \
         cyrus-sasl-plain \
         gettext \
         gmp-devel \
+        java-1.8.0-openjdk-devel \
         krb5-devel \
         krb5-libs \
         krb5-workstation \

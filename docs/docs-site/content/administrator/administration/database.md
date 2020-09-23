@@ -5,22 +5,20 @@ draft: false
 weight: 4
 ---
 
-Hue requires a SQL database to store small amounts of data, including user
-account information as well as history of queries.
+Hue requires a SQL database to store small amounts of data, including user account information as well as history of queries and sharing permissions.
 
 By default, Hue is configured to use an embedded SQLite database so that it starts but many errors will come up due to the lack of transactions.
 
 This section contains instructions for configuring Hue with another database.
 
-## Configuring to Access Another Database
+## Configuring with another Database
 
 Although SQLite is the default database type, some advanced users may prefer
 to have Hue access an alternate database type. Note that if you elect to
 configure Hue to use an external database, upgrades may require more manual
 steps in the future.
 
-The following instructions are for MySQL, though you can also configure Hue to
-work with other common databases such as PostgreSQL and Oracle.
+The following instructions are for MySQL, though you can also configure Hue to work with other common databases such as PostgreSQL and Oracle.
 
 
 ### MySQL
@@ -145,60 +143,49 @@ If the above does not work, then use the below config info `hue_safety_valve_ser
     password=<password>
     name=(DESCRIPTION=(LOAD_BALANCE=off)(FAILOVER=on)(CONNECT_TIMEOUT=5)(TRANSPORT_CONNECT_TIMEOUT=3)(RETRY_COUNT=3)(ADDRESS=(PROTOCOL=TCP)(HOST=<scan ip>)(PORT=<port>))(CONNECT_DATA=(SERVICE_NAME=<service name>)))
 
-## Inspecting
+## Operation
 
-The default SQLite database used by Hue is located in: `/usr/share/hue/desktop/desktop.db`.
-You can inspect this database from the command line using the `sqlite3`
-program or typing `/usr/share/hue/build/env/bin/hue dbshell'. For example:
+### Inspecting
 
-    sqlite3 /usr/share/hue/desktop/desktop.db
-    SQLite version 3.6.22
-    Enter ".help" for instructions
-    Enter SQL statements terminated with a ";"
-    sqlite> select username from auth_user;
-    admin
-    test
-    sample
-    sqlite>
+You can inspect your database via its standard own Shell, Hue [SQL Editor](/administrator/configuration/connectors/#databases) itself, or from the command line using the db shell:
 
-It is strongly recommended that you avoid making any modifications to the
-database directly using SQLite, though this trick can be useful for management
-or troubleshooting.
+    /usr/share/hue/build/env/bin/hue dbshell
 
-## Backing up
+It is strongly recommended that you avoid making any modifications to the database directly, though this trick can be useful for management or troubleshooting.
 
-If you use the default SQLite database, then copy the `desktop.db` file to
-another node for backup. It is recommended that you back it up on a regular
-schedule, and also that you back it up before any upgrade to a new version of
-Hue.
+### Backing up
 
-## Clean up
+It is recommended that you back it up on a regular schedule, and also that you back it up before any upgrade to a new version or doing a data change in the database.
 
-When the database has too many entries in certain tables, it will cause performance issue. Now Hue config check will help superuser to find this issue. Login as superuser and go to “Hue Administration”, this sample screenshot will be displayed in the quick start wizard when the tables have too many entries.
+Backing up can be done the standard way of the chosen database or via dumping the records similarly to doing a [migration](#migrating).
+
+### Clean up
+
+When the database has too many entries in certain tables, it will cause performance issue. Now Hue config check will help superuser to find this issue. Login as superuser and go to "Administration, this sample screenshot will be displayed in the quick start wizard when the tables have too many entries:
+
+[<img class="size-full wp-image-5802 aligncenter" src="https://cdn.gethue.com/uploads/2019/03/Doc2CountCheck.png"/>][1]
 
 Run following clean up command:
 
-  cd /opt/cloudera/parcels/CDH/lib/hue # Hue home directory
-  ./build/env/bin/hue desktop_document_cleanup
+    cd /opt/cloudera/parcels/CDH/lib/hue  # Hue home directory
+    ./build/env/bin/hue desktop_document_cleanup
 
-## Migrating
+### Migrating
 
-Note: Hue Custom Databases includes database-specific pages on how to migrate from an old to a new database. This page summarizes across supported database types.
-When you change Hue databases, you can migrate the existing data to your new database. If the data is dispensable, there is no need to migrate.
+Hue Custom Databases includes database-specific pages on how to migrate from an old to a new database (e.g. sqlite to Oracle or MySQL). This page summarizes across supported database types.
 
-The Hue database stores things like user accounts, SQL queries, and Oozie workflows, and you may have accounts, queries, and workflows worth saving. See How to Populate the Hue Database.
+When you change Hue databases, you can migrate the existing data to your new database.
 
-Dump Database
+#### Dump Database
 
-Note: Refresh the page to ensure that the Hue service is stopped: Service Stopped icon.
-Select Actions > Dump Database and click Dump Database. The file is written to /tmp/hue_database_dump.json on the host of the Hue server.
+Ensure that the Hue service is stopped and dump the database content like explained in the top section and the `dumpdata` command.
 
-Log on to the host of the Hue server in a command-line terminal. You can find the hostname on the Dump Database window and at Hue > Hosts.
-Edit /tmp/hue_database_dump.json by removing all objects with useradmin.userprofile in the model field. For example:
+Edit `/tmp/hue_database_dump.json` by removing all objects with useradmin.userprofile in the model field.
 
-Count number of objects
+For example:
 
     grep -c useradmin.userprofile /tmp/hue_database_dump.json
+
     vi /tmp/hue_database_dump.json
     {
       "pk": 1,
@@ -212,7 +199,7 @@ Count number of objects
       }
     },
 
-Connect New Database
+#### Connect to the new Database
 
 Set the appropriate database parameters :
 
@@ -225,7 +212,8 @@ Set the appropriate database parameters :
 
 Oracle users only should add support for a multithreaded environment:
 
-Add support for a multithreaded environment by setting Hue Service Advanced Configuration Snippet (Safety Valve) for hue_safety_valve.ini:
+Add support for a multithreaded environment by setting in the hue.ini:
+
     [desktop]
     [[database]]
     options={"threaded":True}
@@ -240,7 +228,7 @@ In the Hue Web UI, click the home icon Hue Home icon to ensure that all document
 
 Drop the foreign key constraint from the hue.auth_permission table:
 
-Execute the following statement to find the content_type_id_refs_id_<value> in the CONSTRAINT clause of the CREATE TABLE statement for the hue.auth_permission table:
+Execute the following statement to find the `content_type_id_refs_id_<value>` in the CONSTRAINT clause of the CREATE TABLE statement for the `hue.auth_permission` table:
 
     SHOW CREATE TABLE hue.auth_permission;
 

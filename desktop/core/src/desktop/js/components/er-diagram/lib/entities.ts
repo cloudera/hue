@@ -27,6 +27,8 @@ export class Table implements IEntity {
   name: string;
   columns: Array<Column>;
 
+  className: string;
+
   constructor(database: string, name: string, columns: Array<Column>) {
     this.id = Table.buildId(database, name);
     this.database = database;
@@ -46,6 +48,8 @@ export class Column implements IEntity {
   tableId: string;
   name: string;
 
+  className: string;
+
   constructor(tableId: string, name: string) {
     this.id = Column.buildId(tableId, name);
     this.tableId = tableId;
@@ -62,6 +66,8 @@ export class Literal implements IEntity {
   readonly type: EntityTypes = EntityTypes.Literal;
 
   value: string;
+
+  className: string;
 
   constructor(value: string) {
     this.id = value;

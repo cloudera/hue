@@ -66,6 +66,11 @@ export const LOCATION_TYPES = {
 };
 
 export const initSharedAutocomplete = parser => {
+  parser.SELECT_FIRST_OPTIONAL_KEYWORDS = [
+    { value: 'ALL', weight: 2 },
+    { value: 'DISTINCT', weight: 2 }
+  ];
+
   const adjustLocationForCursor = location => {
     // columns are 0-based and lines not, so add 1 to cols
     const newLocation = {
@@ -602,6 +607,7 @@ const SYNTAX_PARSER_NOOP_FUNCTIONS = [
   'addCteAliasLocation',
   'addDatabaseLocation',
   'addFileLocation',
+  'addFunctionArgumentLocations',
   'addFunctionLocation',
   'addNewDatabaseLocation',
   'addNewTableLocation',
@@ -763,9 +769,8 @@ export const initSyntaxParser = parser => {
       parser.parse(beforeCursor + afterCursor);
     } catch (err) {
       if (debug) {
-        console.warn(err);
-        console.warn(err.stack);
         console.warn(parser.yy.error);
+        throw err;
       }
     }
 
@@ -807,7 +812,8 @@ export const initSyntaxParser = parser => {
             parser.yy.error.possibleReserved = true;
           }
         } else if (!IGNORED_EXPECTED[expected] && /[a-z_]+/i.test(expected)) {
-          if (/^<[a-z]+>/.test(expected)) {
+          // Skip mixed-case expected
+          if (expected.toUpperCase() !== expected) {
             continue;
           }
           expected = CLEAN_EXPECTED[expected] || expected;

@@ -18,10 +18,11 @@ from django.utils.translation import ugettext as _
 
 from desktop.conf import CUSTOM, IS_K8S_ONLY
 from desktop.views import commonheader, commonfooter, _ko
+from desktop.webpack_utils import get_hue_bundles
 from metadata.conf import PROMETHEUS
 from notebook.conf import ENABLE_QUERY_SCHEDULING
 
-from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER, ENABLE_HIVE_QUERY_BROWSER, ENABLE_HISTORY_V2
+from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER, ENABLE_HIVE_QUERY_BROWSER, ENABLE_QUERIES_LIST, ENABLE_HISTORY_V2
 
 from webpack_loader.templatetags.webpack_loader import render_bundle
 %>
@@ -58,8 +59,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-spinedit.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-slider.css') }">
 
-${ render_bundle('vendors~jobBrowser~tableBrowser') | n,unicode }
-${ render_bundle('jobBrowser') | n,unicode }
+% for bundle in get_hue_bundles('jobBrowser'):
+  ${ render_bundle(bundle) | n,unicode }
+% endfor
 
 <script src="${ static('desktop/ext/js/bootstrap-datepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/bootstrap-timepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -326,7 +328,7 @@ ${ render_bundle('jobBrowser') | n,unicode }
               <div data-bind="template: { name: 'breadcrumbs${ SUFFIX }' }"></div>
               <!-- /ko -->
 
-              <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' -->
+              <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' && interface() !== 'queries'-->
               <!-- ko if: !$root.job() -->
               <form class="form-inline">
                 <!-- ko if: !$root.isMini() && interface() == 'queries-impala' -->
@@ -477,6 +479,10 @@ ${ render_bundle('jobBrowser') | n,unicode }
                 <!-- ko hueSpinner: { spin: slasLoading(), center: true, size: 'xlarge' } --><!-- /ko -->
               <!-- /ko -->
               <div id="slas" data-bind="visible: interface() === 'slas'"></div>
+
+              <div id="queries" data-bind="visible: interface() === 'queries'">
+                <queries-list></queries-list>
+              </div>
 
               <!-- ko if: interface() === 'oozie-info' -->
                 <!-- ko hueSpinner: { spin: oozieInfoLoading(), center: true, size: 'xlarge' } --><!-- /ko -->
@@ -1808,14 +1814,14 @@ ${ render_bundle('jobBrowser') | n,unicode }
         <!-- ko if: $root.job().mainType() == 'queries-hive' -->
         <div class="tab-pane active" id="queries-page-hive-plan-text${ SUFFIX }" data-profile="plan">
           <!-- ko if: properties.plan && properties.plan().plan -->
-            <hive-query-plan></hive-query-plan>
+            <pre data-bind="text: properties.plan().plan || _('The selected tab has no data')"></pre>
           <!-- /ko -->
         </div>
         <div class="tab-pane" id="queries-page-hive-stmt${ SUFFIX }" data-profile="stmt">
           <pre data-bind="text: (properties.plan && properties.plan().stmt) || _('The selected tab has no data')"></pre>
         </div>
         <div class="tab-pane" id="queries-page-hive-perf${ SUFFIX }" data-profile="perf">
-          <pre data-bind="text: (properties.plan && properties.plan().perf && properties.plan().perf && JSON.stringify(JSON.parse(properties.plan().perf), null, 2)) || _('The selected tab has no data')"></pre>
+          <hive-query-plan></hive-query-plan>
         </div>
         <!-- /ko -->
       </div>
@@ -3684,6 +3690,10 @@ ${ render_bundle('jobBrowser') | n,unicode }
       });
 
       self.fetchJobs = function () {
+        if(vm.interface() === 'queries') {
+          return;
+        }
+
         vm.apiHelper.cancelActiveRequest(lastUpdateJobsRequest);
         vm.apiHelper.cancelActiveRequest(lastFetchJobsRequest);
 
@@ -3704,6 +3714,10 @@ ${ render_bundle('jobBrowser') | n,unicode }
       }
 
       self.updateJobs = function () {
+        if(vm.interface() === 'queries') {
+          return;
+        }
+
         vm.apiHelper.cancelActiveRequest(lastUpdateJobsRequest);
 
         lastFetchJobsRequest = self._fetchJobs(function(data) {
@@ -3913,10 +3927,13 @@ ${ render_bundle('jobBrowser') | n,unicode }
           return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
         var queryHiveInterfaceCondition = function () {
-          return '${ ENABLE_HIVE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('hive') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+          return '${ ENABLE_HIVE_QUERY_BROWSER.get() }' == 'True';
         };
         var scheduleHiveInterfaceCondition = function () {
           return '${ ENABLE_QUERY_SCHEDULING.get() }' == 'True';
+        };
+        var queriesInterfaceCondition = function () {
+          return '${ ENABLE_QUERIES_LIST.get() }' == 'True';
         };
 
         var interfaces = [
@@ -3936,6 +3953,7 @@ ${ render_bundle('jobBrowser') | n,unicode }
           {'interface': 'bundles', 'label': '${ _ko('Bundles') }', 'condition': schedulerExtraInterfaceCondition},
           {'interface': 'slas', 'label': '${ _ko('SLAs') }', 'condition': schedulerExtraInterfaceCondition},
           {'interface': 'livy-sessions', 'label': '${ _ko('Livy') }', 'condition': livyInterfaceCondition},
+          {'interface': 'queries', 'label': '${ _ko('Queries') }', 'condition': queriesInterfaceCondition},
         ];
 
         return interfaces.filter(function (i) {
@@ -4023,7 +4041,7 @@ ${ render_bundle('jobBrowser') | n,unicode }
             self.loadOozieInfoPage();
           % endif
         }
-        else {
+        else if(interface !== 'queries'){
           self.jobs.fetchJobs();
         }
       };
@@ -4050,7 +4068,7 @@ ${ render_bundle('jobBrowser') | n,unicode }
       self.monitorJob = function(job) {
         window.clearTimeout(updateJobTimeout);
         window.clearTimeout(updateJobsTimeout);
-        if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info'){
+        if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info' && self.interface !== 'queries'){
           if (job) {
             if (job.apiStatus() === 'RUNNING') {
               var _updateJob = function () {
@@ -4132,6 +4150,7 @@ ${ render_bundle('jobBrowser') | n,unicode }
           case 'engines':
           case 'dataeng-jobs':
           case 'livy-sessions':
+          case 'queries':
             self.selectInterface(h);
             break;
           default:

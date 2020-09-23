@@ -20,6 +20,7 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import filter
 from builtins import str
+import functools
 import logging
 import re
 import string
@@ -229,7 +230,8 @@ def massage_task_for_json(task):
     'id': task.taskId,
     'shortId': task.taskId_short,
     'url': task.taskId and reverse('jobbrowser.views.single_task', kwargs={'job': task.jobId, 'taskid': task.taskId}) or '',
-    'logs': task.taskAttemptIds and reverse('single_task_attempt_logs', kwargs={'job': task.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1]}) or '',
+    'logs': task.taskAttemptIds and reverse('single_task_attempt_logs', kwargs={'job': task.jobId, 'taskid': task.taskId,
+                                                                                'attemptid': task.taskAttemptIds[-1]}) or '',
     'type': task.taskType
   }
   return task
@@ -423,7 +425,10 @@ def job_single_logs(request, job, offset=LOG_OFFSET_BYTES):
   task = None
 
   failed_tasks = job.filter_tasks(task_states=('failed',))
-  failed_tasks.sort(cmp_exec_time)
+  if sys.version_info[0] > 2:
+    failed_tasks.sort(key=functools.cmp_to_key(cmp_exec_time))
+  else:
+    failed_tasks.sort(cmp_exec_time)
   if failed_tasks:
     task = failed_tasks[0]
     if not task.taskAttemptIds and len(failed_tasks) > 1: # In some cases the last task ends up without any attempt
@@ -433,7 +438,10 @@ def job_single_logs(request, job, offset=LOG_OFFSET_BYTES):
     if job.is_mr2:
       task_states.append('scheduled')
     recent_tasks = job.filter_tasks(task_states=task_states, task_types=('map', 'reduce',))
-    recent_tasks.sort(cmp_exec_time, reverse=True)
+    if sys.version_info[0] > 2:
+      recent_tasks.sort(key=functools.cmp_to_key(cmp_exec_time), reverse=True)
+    else:
+      recent_tasks.sort(cmp_exec_time, reverse=True)
     if recent_tasks:
       task = recent_tasks[0]
 
@@ -544,7 +552,7 @@ def single_task_attempt_logs(request, job, taskid, attemptid, offset=LOG_OFFSET_
     elif job_link.is_mr2:
       diagnostic_log = attempt.diagnostics
     else:
-      diagnostic_log =  ", ".join(task.diagnosticMap[attempt.attemptId])
+      diagnostic_log = ", ".join(task.diagnosticMap[attempt.attemptId])
     logs = [diagnostic_log]
     # Add remaining logs
     logs += [section.strip() for section in attempt.get_task_log(offset=offset)]
@@ -591,7 +599,7 @@ def task_attempt_counters(request, job, taskid, attemptid):
   counters = {}
   if attempt:
     counters = attempt.counters
-  return render("counters.html", request, {'counters':counters})
+  return render("counters.html", request, {'counters': counters})
 
 @access_log_level(logging.WARN)
 def kill_task_attempt(request, attemptid):
@@ -608,7 +616,7 @@ def trackers(request):
   """
   trackers = get_tasktrackers(request)
 
-  return render("tasktrackers.mako", request, {'trackers':trackers})
+  return render("tasktrackers.mako", request, {'trackers': trackers})
 
 def single_tracker(request, trackerid):
   jt = get_api(request.user, request.jt)
@@ -617,7 +625,7 @@ def single_tracker(request, trackerid):
     tracker = jt.get_tracker(trackerid)
   except Exception as e:
     raise PopupException(_('The tracker could not be contacted.'), detail=e)
-  return render("tasktracker.mako", request, {'tracker':tracker})
+  return render("tasktracker.mako", request, {'tracker': tracker})
 
 def container(request, node_manager_http_address, containerid):
   jt = get_api(request.user, request.jt)
@@ -627,7 +635,7 @@ def container(request, node_manager_http_address, containerid):
   except Exception as e:
     # TODO: add a redirect of some kind
     raise PopupException(_('The container disappears as soon as the job finishes.'), detail=e)
-  return render("container.mako", request, {'tracker':tracker})
+  return render("container.mako", request, {'tracker': tracker})
 
 
 def clusterstatus(request):
@@ -640,7 +648,7 @@ def queues(request):
   """
   We get here from /queues
   """
-  return render("queues.html", request, { "queuelist" : request.jt.queues()})
+  return render("queues.html", request, {"queuelist": request.jt.queues()})
 
 @check_job_permission
 def set_job_priority(request, job):
@@ -701,7 +709,7 @@ def format_counter_name(s):
   return string.capwords(re.sub('_', ' ', splitCamels(s)).lower())
 
 
-def get_state_link(request, option=None, val='', VALID_OPTIONS = ("state", "user", "text", "taskstate")):
+def get_state_link(request, option=None, val='', VALID_OPTIONS=("state", "user", "text", "taskstate")):
   """
     constructs the query string for the state of the current query for the jobs page.
     pass in the request, and an optional option/value pair; these are used for creating
@@ -719,7 +727,7 @@ def get_state_link(request, option=None, val='', VALID_OPTIONS = ("state", "user
   if option is not None:
     states[option] = val
 
-  return "&".join([ "%s=%s" % (key, quote_plus(value)) for key, value in states.items() ])
+  return "&".join(["%s=%s" % (key, quote_plus(value)) for key, value in states.items()])
 
 
 ## All Unused below
@@ -738,7 +746,7 @@ def get_tasktrackers(request):
   """
   Return a ThriftTaskTrackerStatusList object containing all task trackers
   """
-  return [ Tracker(tracker) for tracker in request.jt.all_task_trackers().trackers]
+  return [Tracker(tracker) for tracker in request.jt.all_task_trackers().trackers]
 
 
 def get_single_job(request, jobid):
@@ -786,11 +794,11 @@ def jobbrowser(request):
   jobqueues = request.jt.queues()
 
   return render("jobbrowser.html", request, {
-      "clusterstatus" : status,
-      "queues" : jobqueues,
-      "alljobs" : alljobs,
-      "runningjobs" : runningjobs,
-      "failedjobs" : failedjobs,
-      "killedjobs" : killedjobs,
-      "completedjobs" : completedjobs
+      "clusterstatus": status,
+      "queues": jobqueues,
+      "alljobs": alljobs,
+      "runningjobs": runningjobs,
+      "failedjobs": failedjobs,
+      "killedjobs": killedjobs,
+      "completedjobs": completedjobs
   })

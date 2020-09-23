@@ -210,6 +210,7 @@ NonReservedKeyword
  | 'TRANSACTIONS'
  | 'UNARCHIVE'
  | 'UNIONTYPE'
+ | 'UNSET'
  | 'USE'
  | 'USER'
  | 'VIEW'
@@ -389,6 +390,7 @@ NonStartingToken
  | 'LOCK'
  | 'LOCKS'
  | 'MACRO'
+ | 'MANAGEDLOCATION'
  | 'MAP'
  | 'MATCHED'
  | 'MAX'
@@ -480,6 +482,7 @@ NonStartingToken
  | 'TRUE'
  | 'UNION'
  | 'UNIONTYPE'
+ | 'UNSET'
  | 'UNSIGNED_INTEGER'
  | 'UNSIGNED_INTEGER_E'
  | 'USER'
@@ -499,14 +502,6 @@ NonStartingToken
  | 'WINDOW'
  | 'YEAR'
  | '~'
- ;
-
-DataDefinition
- : DescribeStatement
- ;
-
-DataDefinition_EDIT
- : DescribeStatement_EDIT
  ;
 
 // ===================================== Commonly used constructs =====================================
@@ -1139,94 +1134,6 @@ OptionalTypePrecision
  :
  | '(' 'UNSIGNED_INTEGER' ')'
  | '(' 'UNSIGNED_INTEGER' ',' 'UNSIGNED_INTEGER' ')'
- ;
-
-// ===================================== DESCRIBE statement =====================================
-
-DescribeStatement
- : 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain OptionalPartitionSpec
-   {
-     parser.addTablePrimary($3);
-     parser.addColumnLocation(@4, $4);
-   }
- | 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier OptionalPartitionSpec
-   {
-     parser.addTablePrimary($3);
-   }
- | 'DESCRIBE' DatabaseOrSchema OptionalExtended DatabaseIdentifier
-   {
-     parser.addDatabaseLocation(@4, [{ name: $4 }]);
-   }
- | 'DESCRIBE' 'FUNCTION' OptionalExtended RegularIdentifier
- ;
-
-DescribeStatement_EDIT
- : 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
- | 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain_EDIT OptionalPartitionSpec
-   {
-     parser.addTablePrimary($3);
-   }
- | 'DESCRIBE' OptionalExtendedOrFormatted 'CURSOR' SchemaQualifiedTableIdentifier DerivedColumnChain OptionalPartitionSpec
-   {
-     if (!$2) {
-       parser.suggestKeywords(['EXTENDED', 'FORMATTED']);
-     }
-   }
- | 'DESCRIBE' OptionalExtendedOrFormatted 'CURSOR' SchemaQualifiedTableIdentifier OptionalPartitionSpec
-   {
-     if (!$2) {
-       parser.suggestKeywords(['EXTENDED', 'FORMATTED']);
-     }
-   }
- | 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier 'CURSOR' OptionalPartitionSpec
-   {
-     parser.addTablePrimary($3);
-     parser.suggestColumns();
-     if (!$5) {
-       parser.suggestKeywords(['PARTITION']);
-     }
-   }
- | 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain 'CURSOR' OptionalPartitionSpec
-   {
-     if (!$6) {
-       parser.suggestKeywords(['PARTITION']);
-     }
-   }
- | 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain OptionalPartitionSpec_EDIT
- | 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
-
- | 'DESCRIBE' OptionalExtendedOrFormatted 'CURSOR'
-   {
-     if (!$2) {
-       parser.suggestKeywords(['DATABASE', 'EXTENDED', 'FORMATTED', 'FUNCTION', 'SCHEMA']);
-     }
-     parser.suggestTables();
-     parser.suggestDatabases({ appendDot: true });
-    }
- | 'DESCRIBE' DatabaseOrSchema OptionalExtended DatabaseIdentifier_EDIT
-   {
-     if (!$3) {
-       parser.suggestKeywords(['EXTENDED']);
-     }
-   }
- | 'DESCRIBE' DatabaseOrSchema OptionalExtended 'CURSOR' DatabaseIdentifier
-    {
-      if (!$3) {
-        parser.suggestKeywords(['EXTENDED']);
-      }
-    }
- | 'DESCRIBE' 'FUNCTION' OptionalExtended 'CURSOR'
-   {
-     if (!$3) {
-       parser.suggestKeywords(['EXTENDED']);
-     }
-   }
- | 'DESCRIBE' 'FUNCTION' OptionalExtended 'CURSOR' RegularIdentifier
-    {
-      if (!$3) {
-        parser.suggestKeywords(['EXTENDED']);
-      }
-    }
  ;
 
 // ===================================== SELECT statement =====================================

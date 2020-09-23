@@ -269,7 +269,7 @@ Configure Hue for SAML Authentication
 
 The Service Provider (Hue) and the Identity Provider use a metadata file to confirm each other's identity. Hue stores metadata from the SAML server, and the IdP stores metadata from Hue server.
 
-In Configure Hue at the Command Line, you must copy the metadata from your IdP's SAML server and store it in an XML file on every ost with a Hue server.
+In Configure Hue at the Command Line, you must copy the metadata from your IdP's SAML server and store it in an XML file on every host with a Hue server.
 Important: Read the documentation of your Identity Provider for details on how to procure the XML of the SAML server metadata.
 
 Configure Hue at the Command Line

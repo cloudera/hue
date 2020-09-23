@@ -1,0 +1,26 @@
+{
+  "name": "er-diagram-demo",
+  "version": "1.0.0",
+  "description": "Demo app for er-diagram component",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cloudera/hue.git"
+  },
+  "keywords": [
+    "er-diagram",
+    "ERD"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/cloudera/hue/issues"
+  },
+  "homepage": "https://github.com/cloudera/hue#readme",
+  "dependencies": {
+    "gethue": "4.7.8"
+  }
+}

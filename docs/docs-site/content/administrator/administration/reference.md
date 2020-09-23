@@ -22,7 +22,7 @@ In practice ~50 users / Hue peak time is the rule of thumb. This is accounting f
 
 ### General
 
-* Hue must be behing a load balancer proxying static files. e.g. NGINX is used for the containers, Cloudera Hue ships with HTTPD.
+* Hue must be behind a load balancer proxying static files. e.g. NGINX is used for the containers, Cloudera Hue ships with HTTPD.
 * Adding more Hue instances behind the load balancer will increase performances by 50 concurrent users.
 * Database backend should be such as MySql/Postgres/Oracle. Hue does not work on SQLite as it makes concurrent write calls to the database.
 * Check the number of documents in the Hue database. If they are too many (more than 100 000), delete the old records:

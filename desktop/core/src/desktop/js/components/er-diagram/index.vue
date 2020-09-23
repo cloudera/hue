@@ -20,7 +20,7 @@
   <div class="er-diagram">
     <div class="buttons-panel">
       <button class="btn btn-default btn-sm" title="Toggle Fullscreen" @click="toggleFS">
-        <em class="fa fa-expand" />
+        <expand-icon v-pre class="fa fa-expand" />
       </button>
     </div>
 
@@ -31,13 +31,14 @@
             <TableEntity
               v-if="entity.type === EntityTypes.Table"
               :entity="entity"
-              @click="entityClicked(entity)"
+              @click="entityClicked"
               @updated="plotRelations()"
             />
             <LiteralEntity
               v-else-if="entity.type === EntityTypes.Literal"
               :entity="entity"
               :data-entity-id="entity.id"
+              @click="entityClicked"
             />
           </div>
         </div>
@@ -122,8 +123,9 @@
         );
 
         if (leftPos && rightPos) {
-          const path: string = `M ${leftPos.x},${leftPos.y} C ${leftPos.x + CURVATURE},${leftPos.y}
-              ${rightPos.x - CURVATURE},${rightPos.y} ${rightPos.x},${rightPos.y}`;
+          const path: string =
+            `M ${leftPos.x},${leftPos.y} C ${leftPos.x + CURVATURE},${leftPos.y} ` +
+            `${rightPos.x - CURVATURE},${rightPos.y} ${rightPos.x},${rightPos.y}`;
           element.setAttribute('d', path);
 
           element.style.visibility = 'visible';
@@ -141,6 +143,7 @@
 
     toggleFS(): void {
       toggleFullScreen(this.$el);
+      this.$emit('toggle-fullscreen');
     }
 
     entityClicked(entity: IEntity): void {

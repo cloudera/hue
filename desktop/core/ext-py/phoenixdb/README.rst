@@ -1,13 +1,14 @@
 Phoenix database adapter for Python
 ===================================
 
-``phoenixdb`` is a Python library for accessing the
-`Phoenix SQL database <http://phoenix.apache.org/>`_
+``phoenixdb`` is a Python library for accessing 
+`Apache Phoenix <http://phoenix.apache.org/>`_
 using the
 `remote query server <http://phoenix.apache.org/server.html>`_.
-The library implements the
-standard `DB API 2.0 <https://www.python.org/dev/peps/pep-0249/>`_ interface,
-which should be familiar to most Python programmers.
+This library implements the
+standard `DB API 2.0 <https://www.python.org/dev/peps/pep-0249/>`_ interface and a
+subset of `SQLAlchemy <https://www.sqlalchemy.org/>`_, either of which should be familiar
+to most Python programmers.
 
 Installation
 ------------
@@ -59,18 +60,18 @@ necessary requirements::
 You can start a Phoenix QueryServer instance on http://localhost:8765 for testing by running
 the following command in the phoenix-queryserver directory::
 
-    mvn clean verify -am -pl queryserver-it -Dtest=foo \
+    mvn clean verify -am -pl phoenix-queryserver-it -Dtest=foo \
     -Dit.test=QueryServerBasicsIT\#startLocalPQS \
     -Ddo.not.randomize.pqs.port=true -Dstart.unsecure.pqs=true
 
 You can start a secure (https+kerberos) Phoenix QueryServer instance on https://localhost:8765
 for testing by running the following command in the phoenix-queryserver directory::
 
-    mvn clean verify -am -pl queryserver-it -Dtest=foo \
+    mvn clean verify -am -pl phoenix-queryserver-it -Dtest=foo \
     -Dit.test=SecureQueryServerPhoenixDBIT\#startLocalPQS \
     -Ddo.not.randomize.pqs.port=true -Dstart.secure.pqs=true
 
-this will also create a shell script in queryserver-it/target/krb_setup.sh, that you can use to set
+this will also create a shell script in phoenix-queryserver-it/target/krb_setup.sh, that you can use to set
 up the environment for the tests.
 
 If you want to use the library without installing the phoenixdb library, you can use
@@ -118,7 +119,7 @@ environments locally::
 You can also run the test suite from maven as part of the Java build by setting the 
 run.full.python.testsuite property. You DO NOT need to set the PHOENIXDB_* enviroment variables,
 maven will set them up for you. The output of the test run will be saved in
-phoenix-queryserver/queryserver-it/target/python-stdout.log and python-stderr.log::
+phoenix-queryserver/phoenix-queryserver-it/target/python-stdout.log and python-stderr.log::
 
     mvn clean verify -Drun.full.python.testsuite=true
 
@@ -129,3 +130,15 @@ Known issues
   but the remote protocol only exposes the time (hour/minute/second) or date (year/month/day)
   parts of the columns. (`CALCITE-797 <https://issues.apache.org/jira/browse/CALCITE-797>`_, `CALCITE-798 <https://issues.apache.org/jira/browse/CALCITE-798>`_)
 - TIMESTAMP columns in Phoenix are stored with a nanosecond accuracy, but the remote protocol truncates them to milliseconds. (`CALCITE-796 <https://issues.apache.org/jira/browse/CALCITE-796>`_)
+
+
+SQLAlchemy feature support
+--------------------------
+
+SQLAlchemy has a wide breadth of API, ranging from basic SQL commands to object-relational mapping support.
+
+Today, python-phoenixdb only supports the following subset of the complete SQLAlchemy API:
+
+- `Textual SQL <https://docs.sqlalchemy.org/en/13/core/tutorial.html#using-textual-sql>`_
+
+All other API should be considered not implemented.

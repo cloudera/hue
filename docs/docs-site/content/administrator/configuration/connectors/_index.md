@@ -17,14 +17,14 @@ Hue connects to any database or warehouse via native or SqlAlchemy connectors. C
     [[[mysql]]]
     name=MySQL
     interface=sqlalchemy
-    options='{"url": "mysql://${USER}:${PASSWORD}@localhost:3306/hue"}'
+    options='{"url": "mysql://user:password@localhost:3306/hue"}'
 
     [[[presto]]]
     name = Presto
     interface=sqlalchemy
     options='{"url": "presto://localhost:8080/hive/default"}'
 
-Note that USER and PASSWORD can be prompted to the user like in the MySQL connector above.
+Note that USER and PASSWORD can be prompted to the user by using variables like `mysql://${USER}:${PASSWORD}@localhost:3306/hue`.
 
 Read about [how to build your own parser](/developer/parsers/) if you are looking at better autocompletes for your own SQL dialects.
 
@@ -146,15 +146,31 @@ Then give Hue the information about the database source following the `presto://
 
 With impersonation:
 
-        options='{"url": "presto://localhost:8080/tpch/default", "has_impersonation": true}'
+    options='{"url": "presto://localhost:8080/tpch/default", "has_impersonation": true}'
 
 With Kerberos:
 
-        options='{"url": "presto://localhost:8080/tpch/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
+    options='{"url": "presto://localhost:8080/tpch/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
 
-Alternatives.
+With credentials:
 
-Direct interface:
+    options='{"url": "presto://username:password@localhost:8080/tpch/default"}'
+
+With LDAPS enabled over HTTPS:
+
+    options='{"url": "presto://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\"}"}'
+
+Pass Presto Session properties along with HTTPS: 
+
+    options='{"url": "presto://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\", \"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
+
+Pass Presto Session Properties without HTTPS enabled:
+
+    options='{"url": "presto://username:password@localhost:8080/tpch/default","connect_args":"{\"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
+
+Alternative interfaces.
+
+Direct:
 
     [[[presto]]]
       name=Presto SQL
@@ -457,10 +473,10 @@ Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Dri
 
 ### Apache Phoenix
 
-The official Python [Phoenix dialect](https://github.com/apache/phoenix-queryserver/tree/master/python/phoenixdb) is already shipped in Hue and below is optional. If you want to update it yourself to the very latest:
+The official Python [Phoenix dialect](https://github.com/apache/phoenix-queryserver/tree/master/python/phoenixdb) is already shipped in Hue and below is optional except when using Python 3 until [PHOENIX-5939](https://issues.apache.org/jira/browse/PHOENIX-5939) is available. Also, if you want to update it yourself to the very latest:
 
     git clone https://github.com/apache/phoenix-queryserver.git
-    $HUE/build/env/bin/pip install file:///home/gehue/phoenix-queryserver/python/phoenixdb
+    $HUE/build/env/bin/pip install file:///home/gethue/phoenix-queryserver/python-phoenixdb
 
 Then give Hue the information about the database source:
 

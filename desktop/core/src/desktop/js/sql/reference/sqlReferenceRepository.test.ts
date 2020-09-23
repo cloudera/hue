@@ -16,7 +16,7 @@
 
 import { UdfArgument } from 'sql/reference/types';
 import { Connector } from 'types/config';
-import { getArgumentDetailsForUdf } from './sqlReferenceRepository';
+import { getArgumentDetailsForUdf, isReserved } from './sqlReferenceRepository';
 import * as apiUtils from 'sql/reference/apiUtils';
 
 describe('sqlReferenceRepository.js', () => {
@@ -187,5 +187,32 @@ describe('sqlReferenceRepository.js', () => {
     expect((await getArgumentDetailsForUdf(impalaConn, 'blabla', 200)).map(extractType)).toEqual([
       'T'
     ]);
+  });
+
+  it("Should return generic keywords if the dialect isn't defined", async () => {
+    jest.mock('sql/reference/generic/reservedKeywords', () => ({
+      RESERVED_WORDS: new Set<string>(['GENERICRESERVED'])
+    }));
+
+    const reserved = await isReserved({ dialect: 'foo' } as Connector, 'GENERICRESERVED');
+    expect(reserved).toBeTruthy();
+
+    const notReserved = await isReserved({ dialect: 'foo' } as Connector, 'not_reserved');
+    expect(notReserved).toBeFalsy();
+  });
+
+  it('Should use custom keywords if defined for dialect', async () => {
+    jest.mock('sql/reference/calcite/reservedKeywords', () => ({
+      RESERVED_WORDS: new Set<string>(['CUSTOM'])
+    }));
+    jest.mock('sql/reference/generic/reservedKeywords', () => ({
+      RESERVED_WORDS: new Set<string>(['OTHER'])
+    }));
+
+    const reserved = await isReserved({ dialect: 'calcite' } as Connector, 'CUSTOM');
+    expect(reserved).toBeTruthy();
+
+    const notReserved = await isReserved({ dialect: 'calcite' } as Connector, 'OTHER');
+    expect(notReserved).toBeFalsy();
   });
 });

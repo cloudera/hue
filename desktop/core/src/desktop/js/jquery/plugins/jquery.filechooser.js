@@ -299,7 +299,7 @@ Plugin.prototype.navigateTo = function (path) {
       float: 'left',
       'white-space': 'nowrap'
     });
-    const _home = $('<li>');
+    const _home = $('<li>').css({ 'padding-top': '6px' });
     //var filesysteminfo = self.options.filesysteminfo;
     const fs = _parent.options.filesysteminfo[_parent.options.fsSelected || 'hdfs'];
     const el = fs.icon.svg
@@ -363,11 +363,11 @@ Plugin.prototype.navigateTo = function (path) {
 
       const $search = $('<div>')
         .html(
-          '<i class="fa fa-refresh inactive-action pointer" style="position: absolute; top: 3px; margin-left: -16px"></i> <i class="fa fa-search inactive-action pointer" style="position: absolute; top: 3px"></i><input type="text" class="small-search" style="display: none; width: 0; padding: 2px; padding-left: 20px">'
+          '<i class="fa fa-refresh inactive-action pointer" style="position: absolute; top: 8px; margin-left: -18px"></i> <i class="fa fa-search inactive-action pointer" style="position: absolute; top: 8px"></i><input type="text" class="small-search" style="display: none; width: 0; padding: 2px; padding-left: 20px">'
         )
         .css({
           position: 'absolute',
-          right: '20px',
+          right: '10px',
           'background-color': '#FFF'
         });
 
@@ -433,10 +433,11 @@ Plugin.prototype.navigateTo = function (path) {
       $search.appendTo($(_parent.element).find('.filechooser-tree'));
 
       const $scrollingBreadcrumbs = $('<ul>').addClass('hue-breadcrumbs editable-breadcrumbs').css({
-        padding: '0',
+        padding: '5px 4px',
+        border: '1px solid #CCC',
+        'border-radius': '3px',
         marginLeft: '10px',
         marginBottom: '0',
-        paddingRight: '10px',
         float: 'left',
         width: '300px',
         'overflow-x': 'scroll',

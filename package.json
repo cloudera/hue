@@ -1,18 +1,27 @@
 {
   "name": "gethue",
-  "version": "4.7.1",
+  "version": "4.8.0",
   "description": "Hue is an Open source SQL Query Editor for Databases/Warehouses",
+  "keywords": [
+    "Query Editor",
+    "SQL Editor",
+    "SQL",
+    "SQL Components",
+    "SQL Autocomplete",
+    "SQL Parsers",
+    "SQL Scratchpad"
+  ],
   "homepage": "http://gethue.com",
   "repository": {
     "type": "git",
     "url": "https://github.com/cloudera/hue"
   },
-  "author": "Cloudera, Inc.",
+  "author": "Gethue.com",
   "contributors": [
     "Romain Rigaux <info@getromain.com>",
     "Prakash Ranade <ranade@cloudera.com>",
     "Ying Chen <yingchen@cloudera.com>",
-    "Weixia Xu <weixia@cloudera.com>",
+    "Sreenath Somarajapuram <ssomarajapuram@cloudera.com>",
     "Johan Ahlen <johan.ahlen@cloudera.com>"
   ],
   "license": "Apache-2.0",
@@ -47,7 +56,7 @@
     "knockout.validation": "2.0.3",
     "less": "^3.10.3",
     "localforage": "1.7.3",
-    "lodash": "4.17.13",
+    "lodash": "4.17.19",
     "medium-editor": "5.23.3",
     "page": "1.8.6",
     "plotly.js-dist": "1.45.3",
@@ -86,6 +95,7 @@
     "babel-plugin-module-resolver": "4.0.0",
     "babel-preset-typescript-vue": "1.1.1",
     "clean-webpack-plugin": "1.0.1",
+    "copy-webpack-plugin": "^6.0.3",
     "css-loader": "^3.4.2",
     "eslint": "7.2.0",
     "eslint-config-prettier": "6.11.0",
@@ -124,11 +134,13 @@
   },
   "scripts": {
     "devinstall": "npm cache clean && npm install && npm prune",
-    "webpack": "webpack --config webpack.config.js",
-    "webpack-login": "webpack --config webpack.config.login.js",
-    "webpack-workers": "webpack --config webpack.config.workers.js",
-    "dev": "webpack --watch -d",
-    "dev-workers": "webpack --config webpack.config.workers.js --watch -d",
+    "webpack": "webpack --config ${HUE_WEBPACK_CONFIG:-webpack.config.js}",
+    "webpack-login": "webpack --config ${HUE_WEBPACK_CONFIG_LOGIN:-webpack.config.login.js}",
+    "webpack-workers": "webpack --config ${HUE_WEBPACK_CONFIG_WORKERS:-webpack.config.workers.js}",
+    "webpack-npm": "webpack --config ${HUE_WEBPACK_CONFIG_NPM:-webpack.config.npm.js}",
+    "publish-gethue": "npm run webpack-npm && cd npm_dist && npm publish",
+    "dev": "webpack --watch --config ${HUE_WEBPACK_CONFIG:-webpack.config.js} -d",
+    "dev-workers": "webpack --config ${HUE_WEBPACK_CONFIG_WORKERS:-webpack.config.workers.js} --watch -d",
     "less": "./node_modules/.bin/grunt less",
     "less-dev": "./node_modules/.bin/grunt watch",
     "less-lint": "stylelint \"desktop/core/src/desktop/static/desktop/less/**/*.less\"",
@@ -142,9 +154,5 @@
     "test-clearCache": "jest --clearCache",
     "check-license": "node ./tools/license/checkLicenses.js",
     "check-absolute-paths": "node ./tools/detect-absolute-paths/detectAbsolutePaths.js"
-  },
-  "files": [
-    "desktop/core/src/desktop/js/parse",
-    "desktop/core/src/desktop/js/sql"
-  ]
+  }
 }

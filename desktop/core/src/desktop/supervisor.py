@@ -333,7 +333,10 @@ def main():
     pidfile_context.break_lock()
 
   if options.daemonize:
-    outfile = open_file(os.path.join(log_dir, 'supervisor.out'), 'a+', 0)
+    if sys.version_info[0] > 2:
+      outfile = open_file(os.path.join(log_dir, 'supervisor.out'), 'ba+', 0)
+    else:
+      outfile = open_file(os.path.join(log_dir, 'supervisor.out'), 'a+', 0)
     context = daemon.DaemonContext(
         working_directory=root,
         pidfile=pidfile_context,
@@ -365,7 +368,10 @@ def main():
         preexec_fn = None
 
       if options.daemonize:
-        log_stdout = open_file(os.path.join(log_dir, name + '.out'), 'a+', 0)
+        if sys.version_info[0] > 2:
+          log_stdout = open_file(os.path.join(log_dir, name + '.out'), 'ba+', 0)
+        else:
+          log_stdout = open_file(os.path.join(log_dir, name + '.out'), 'a+', 0)
         log_stderr = log_stdout
       else:
         # Passing None to subprocess.Popen later makes the subprocess inherit the

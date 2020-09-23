@@ -16,7 +16,6 @@
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CleanObsoleteChunks = require('webpack-clean-obsolete-chunks');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
 const RelativeBundleTracker = require('./relativeBundleTracker');
 const RemoveVueAbsolutePathFromMapPlugin = require('./removeVueAbsolutePathFromMapPlugin');
 const webpack = require('webpack');
@@ -36,9 +35,6 @@ const getPluginConfig = (name, withAnalyzer) => {
       publicPath: `/static/desktop/js/bundles/${name}/`,
       fileContext: 'public'
     }),
-    new CleanWebpackPlugin([
-      `${__dirname}/desktop/core/src/desktop/static/desktop/js/bundles/${name}`
-    ]),
     new RelativeBundleTracker({
       path: '.',
       filename: `webpack-stats${name !== BUNDLES.HUE ? '-' + name : ''}.json`
@@ -57,7 +53,27 @@ const getPluginConfig = (name, withAnalyzer) => {
   return plugins;
 };
 
+const hashCode = str => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const chr = str.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
+    hash |= 0;
+  }
+  return hash;
+};
+
+const splitChunksName = (module, chunks, cacheGroupKey) => {
+  let fullName = cacheGroupKey !== 'default' ? cacheGroupKey + '~' : '';
+  fullName += chunks.map(item => item.name).join('~');
+  if (fullName.length > 80) {
+    return fullName.slice(0, 70).replace(/~[^~]*$/, '') + '~' + hashCode(fullName);
+  }
+  return fullName;
+};
+
 module.exports = {
   BUNDLES: BUNDLES,
-  getPluginConfig: getPluginConfig
+  getPluginConfig: getPluginConfig,
+  splitChunksName: splitChunksName
 };

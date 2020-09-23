@@ -124,7 +124,7 @@ class SqlAlchemyApi(Api):
     if interpreter.get('dialect_properties'):
       self.backticks = interpreter['dialect_properties']['sql_identifier_quote']
     else:
-      self.backticks = '"' if re.match('^(postgresql://|awsathena|elasticsearch)', self.options.get('url', '')) else '`'
+      self.backticks = '"' if re.match('^(postgresql://|awsathena|elasticsearch|phoenix)', self.options.get('url', '')) else '`'
 
   def _get_engine(self):
     engine_key = ENGINE_KEY % {
@@ -181,6 +181,13 @@ class SqlAlchemyApi(Api):
     if self.options.get('credentials_json'):
       self.options['credentials_info'] = json.loads(
           self.options.pop('credentials_json')
+      )
+
+    # enables various sql alchemy args to be passed along for both hive & presto connection. 
+    # Refer to sqlalchemy pyhive for more details 
+    if self.options.get('connect_args'):
+      self.options['connect_args'] = json.loads(
+          self.options.pop('connect_args')
       )
 
     options = self.options.copy()
@@ -346,16 +353,14 @@ class SqlAlchemyApi(Api):
     elif operation == 'function':
       response['function'] = {}
     elif database is None:
-      response['databases'] = [db or 'NULL' for db in assist.get_databases()]
+      response['databases'] = [db or '' for db in assist.get_databases()]
     elif table is None:
       tables_meta = []
-      database = self._fix_phoenix_empty_database(database)
       for t in assist.get_tables(database):
         t = self._fix_bigquery_db_prefixes(t)
         tables_meta.append({'name': t, 'type': 'Table', 'comment': ''})
       response['tables_meta'] = tables_meta
     elif column is None:
-      database = self._fix_phoenix_empty_database(database)
       columns = assist.get_columns(database, table)
 
       response['columns'] = [col['name'] for col in columns]
@@ -430,10 +435,6 @@ class SqlAlchemyApi(Api):
       name = col.get('type').__visit_name__.lower()
 
     return name
-
-
-  def _fix_phoenix_empty_database(self, database):
-    return None if self.options['url'].startswith('phoenix://') and database == 'NULL' else database
 
 
   def _fix_bigquery_db_prefixes(self, table_or_column):

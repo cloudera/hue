@@ -93,6 +93,7 @@ NonReservedKeyword
  | 'ANALYZE'
  | 'ARCHIVE'
  | 'AST'
+ | 'AT'
  | 'AVRO'
  | 'BUCKET'
  | 'BUCKETS'
@@ -109,6 +110,7 @@ NonReservedKeyword
  | 'COMPUTE'
  | 'CONCATENATE'
  | 'COST'
+ | 'CRON'
  | 'CURRENT_DATE'
  | 'CURRENT_TIMESTAMP'
  | 'CURRENT_USER'
@@ -125,11 +127,16 @@ NonReservedKeyword
  | 'DETAIL'
  | 'DIRECTORY'
  | 'DISABLE'
+ | 'DISABLED'
  | 'DISTRIBUTED'
  | 'DOUBLE_PRECISION'
  | 'ENABLE'
+ | 'ENABLED'
  | 'ESCAPED'
+ | 'EVERY'
  | 'EXCHANGE'
+ | 'EXECUTE'
+ | 'EXECUTED'
  | 'EXPLAIN'
  | 'EXPORT'
  | 'EXPRESSION'
@@ -157,6 +164,7 @@ NonReservedKeyword
  | 'LOCKS'
  | 'MATCHED'
  | 'MATERIALIZED'
+ | 'MANAGEDLOCATION'
  | 'MERGE'
  | 'METADATA'
  | 'MINUTE'
@@ -167,6 +175,7 @@ NonReservedKeyword
  | 'NOSCAN'
  | 'NOVALIDATE'
  | 'OFFLINE'
+ | 'OFFSET'
  | 'ONLY'
  | 'OPERATOR'
  | 'OPTION'
@@ -182,6 +191,7 @@ NonReservedKeyword
  | 'PRIVILEGES'
  | 'PURGE'
  | 'QUARTER'
+ | 'QUERY'
  | 'RCFILE'
  | 'REBUILD'
  | 'RECOVER'
@@ -195,6 +205,7 @@ NonReservedKeyword
  | 'REWRITE'
  | 'ROLE'
  | 'ROLES'
+ | 'SCHEDULED'
  | 'SCHEMAS'
  | 'SECOND'
  | 'SEQUENCEFILE'
@@ -275,6 +286,7 @@ NonStartingToken
  | 'ARRAY'
  | 'AS'
  | 'ASC'
+ | 'AT'
  | 'AUTHORIZATION'
  | 'AVG'
  | 'AVRO'
@@ -306,6 +318,7 @@ NonStartingToken
  | 'COUNT'
  | 'COVAR_POP'
  | 'COVAR_SAMP'
+ | 'CRON'
  | 'CROSS'
  | 'CUBE'
  | 'CURRENT'
@@ -323,6 +336,7 @@ NonStartingToken
  | 'DEPENDENCY'
  | 'DESC'
  | 'DIRECTORY'
+ | 'DISABLED'
  | 'DISTINCT'
  | 'DISTRIBUTE'
  | 'DISTRIBUTED'
@@ -330,8 +344,12 @@ NonStartingToken
  | 'DOUBLE_PRECISION'
  | 'DOUBLE_QUOTE'
  | 'ELSE'
+ | 'ENABLED'
  | 'END'
  | 'ESCAPED'
+ | 'EVERY'
+ | 'EXECUTE'
+ | 'EXECUTED'
  | 'EXISTS'
  | 'EXTENDED'
  | 'EXTERNAL'
@@ -400,6 +418,7 @@ NonStartingToken
  | 'NULL'
  | 'NULLS'
  | 'OF'
+ | 'OFFSET'
  | 'ON'
  | 'OPTION'
  | 'OR'
@@ -423,6 +442,7 @@ NonStartingToken
  | 'PRIVILEGES'
  | 'PURGE'
  | 'QUARTER'
+ | 'QUERY'
  | 'RANGE'
  | 'RCFILE'
  | 'REBUILD'
@@ -439,6 +459,7 @@ NonStartingToken
  | 'ROLLUP'
  | 'ROW'
  | 'ROWS'
+ | 'SCHEDULED'
  | 'SCHEMA'
  | 'SCHEMAS'
  | 'SECOND'
@@ -495,14 +516,6 @@ NonStartingToken
  | 'WINDOW'
  | 'YEAR'
  | '~'
- ;
-
-DataDefinition
- : DescribeStatement
- ;
-
-DataDefinition_EDIT
- : DescribeStatement_EDIT
  ;
 
 // ===================================== Commonly used constructs =====================================
@@ -675,10 +688,6 @@ OptionalInDatabase
 OptionalPartitionSpec
  :
  | PartitionSpec
- ;
-
-OptionalPartitionSpec_EDIT
- : PartitionSpec_EDIT
  ;
 
 PartitionSpec
@@ -1135,94 +1144,6 @@ OptionalTypePrecision
  :
  | '(' 'UNSIGNED_INTEGER' ')'
  | '(' 'UNSIGNED_INTEGER' ',' 'UNSIGNED_INTEGER' ')'
- ;
-
-// ===================================== DESCRIBE statement =====================================
-
-DescribeStatement
- : 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain OptionalPartitionSpec
-   {
-     parser.addTablePrimary($3);
-     parser.addColumnLocation(@4, $4);
-   }
- | 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier OptionalPartitionSpec
-   {
-     parser.addTablePrimary($3);
-   }
- | 'DESCRIBE' DatabaseOrSchema OptionalExtended DatabaseIdentifier
-   {
-     parser.addDatabaseLocation(@4, [{ name: $4 }]);
-   }
- | 'DESCRIBE' 'FUNCTION' OptionalExtended RegularIdentifier
- ;
-
-DescribeStatement_EDIT
- : 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
- | 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain_EDIT OptionalPartitionSpec
-   {
-     parser.addTablePrimary($3);
-   }
- | 'DESCRIBE' OptionalExtendedOrFormatted 'CURSOR' SchemaQualifiedTableIdentifier DerivedColumnChain OptionalPartitionSpec
-   {
-     if (!$2) {
-       parser.suggestKeywords(['EXTENDED', 'FORMATTED']);
-     }
-   }
- | 'DESCRIBE' OptionalExtendedOrFormatted 'CURSOR' SchemaQualifiedTableIdentifier OptionalPartitionSpec
-   {
-     if (!$2) {
-       parser.suggestKeywords(['EXTENDED', 'FORMATTED']);
-     }
-   }
- | 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier 'CURSOR' OptionalPartitionSpec
-   {
-     parser.addTablePrimary($3);
-     parser.suggestColumns();
-     if (!$5) {
-       parser.suggestKeywords(['PARTITION']);
-     }
-   }
- | 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain 'CURSOR' OptionalPartitionSpec
-   {
-     if (!$6) {
-       parser.suggestKeywords(['PARTITION']);
-     }
-   }
- | 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain OptionalPartitionSpec_EDIT
- | 'DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
-
- | 'DESCRIBE' OptionalExtendedOrFormatted 'CURSOR'
-   {
-     if (!$2) {
-       parser.suggestKeywords(['DATABASE', 'EXTENDED', 'FORMATTED', 'FUNCTION', 'SCHEMA']);
-     }
-     parser.suggestTables();
-     parser.suggestDatabases({ appendDot: true });
-    }
- | 'DESCRIBE' DatabaseOrSchema OptionalExtended DatabaseIdentifier_EDIT
-   {
-     if (!$3) {
-       parser.suggestKeywords(['EXTENDED']);
-     }
-   }
- | 'DESCRIBE' DatabaseOrSchema OptionalExtended 'CURSOR' DatabaseIdentifier
-    {
-      if (!$3) {
-        parser.suggestKeywords(['EXTENDED']);
-      }
-    }
- | 'DESCRIBE' 'FUNCTION' OptionalExtended 'CURSOR'
-   {
-     if (!$3) {
-       parser.suggestKeywords(['EXTENDED']);
-     }
-   }
- | 'DESCRIBE' 'FUNCTION' OptionalExtended 'CURSOR' RegularIdentifier
-    {
-      if (!$3) {
-        parser.suggestKeywords(['EXTENDED']);
-      }
-    }
  ;
 
 // ===================================== SELECT statement =====================================

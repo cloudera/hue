@@ -303,13 +303,13 @@ class TestDialects(object):
 
 
   def test_backticks_without_connectors(self):
-    interpreter = {'name': 'hive', 'options': {'url': 'phoenix://'}}
+    interpreter = {'name': 'hive', 'options': {'url': 'hive://'}}
     data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
 
     assert_equal(data, 'SELECT *\nFROM `db1`.`table1`\nLIMIT 1000\n')
 
 
-    interpreter = {'name': 'hive', 'options': {'url': 'postgresql://'}}
+    interpreter = {'name': 'postgresql', 'options': {'url': 'postgresql://'}}
     data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
 
     assert_equal(data, 'SELECT *\nFROM "db1"."table1"\nLIMIT 1000\n')
@@ -336,7 +336,7 @@ class TestAutocomplete(object):
 
           data = SqlAlchemyApi(self.user, interpreter).autocomplete(snippet)
 
-          assert_equal(data['databases'], ['SYSTEM', 'NULL'])
+          assert_equal(data['databases'], ['SYSTEM', ''])
 
   def test_columns_with_null_type(self):
     interpreter = {

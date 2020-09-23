@@ -25,7 +25,7 @@ from desktop.conf import KERBEROS as CONF
 LOG = logging.getLogger(__name__)
 SPEC = DjangoCommandSupervisee("kt_renewer")
 
-NEED_KRB181_WORKAROUND=None
+NEED_KRB181_WORKAROUND = None
 
 def renew_from_kt():
   cmdv = [CONF.KINIT_PATH.get(),
@@ -36,26 +36,23 @@ def renew_from_kt():
   retries = 0
   max_retries = 3
   while retries < max_retries:
-     LOG.info("Reinitting kerberos retry attempt %s from keytab %s" % (retries, " ".join(cmdv)))
+    LOG.info("Reinitting kerberos retry attempt %s from keytab %s" % (retries, " ".join(cmdv)))
 
-     subp = subprocess.Popen(cmdv,
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.PIPE,
-                          close_fds=True,
-                          bufsize=-1)
-     subp.wait()
-     if subp.returncode != 0:
-       retries = retries + 1
-       LOG.error("Couldn't reinit from keytab! `kinit' exited with %s.\n%s\n%s" % (
-              subp.returncode,
-              "\n".join(subp.stdout.readlines()),
-              "\n".join(subp.stderr.readlines())))
-       if retries >= max_retries:
-          LOG.error("FATAL: max_retries of %s reached. Exiting..." % max_retries)
-          sys.exit(subp.returncode)
-       time.sleep(3)
-     else:
-       break
+    subp = subprocess.Popen(cmdv, stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE, close_fds=True,
+                            bufsize=-1)
+    subp.wait()
+    if subp.returncode != 0:
+      retries = retries + 1
+      LOG.error("Couldn't reinit from keytab! `kinit' exited with %s.\n%s\n%s" % (
+                subp.returncode,
+                "\n".join(subp.stdout.readlines()), "\n".join(subp.stderr.readlines())))
+      if retries >= max_retries:
+        LOG.error("FATAL: max_retries of %s reached. Exiting..." % max_retries)
+        sys.exit(subp.returncode)
+      time.sleep(3)
+    else:
+      break
 
   global NEED_KRB181_WORKAROUND
   if NEED_KRB181_WORKAROUND is None:
@@ -92,11 +89,17 @@ def detect_conf_var():
   Sun Java Krb5LoginModule in Java6, so we need to take an action to work
   around it.
   """
-  f = file(CONF.CCACHE_PATH.get(), "rb")
-
   try:
-    data = f.read()
-    return "X-CACHECONF:" in data
+    # TODO: the binary check for X-CACHECONF seems fragile, it should be replaced
+    # with something more robust.
+    if sys.version_info[0] > 2:
+      f = open(CONF.CCACHE_PATH.get(), "rb")
+      data = f.read()
+      return b"X-CACHECONF:" in data
+    else:
+      f = file(CONF.CCACHE_PATH.get(), "rb")
+      data = f.read()
+      return "X-CACHECONF:" in data
   finally:
     f.close()
 
@@ -107,4 +110,4 @@ def run():
 
   while True:
     renew_from_kt()
-    time.sleep(CONF.KEYTAB_REINIT_FREQUENCY.get())
+    time.sleep(CONF.REINIT_FREQUENCY.get())

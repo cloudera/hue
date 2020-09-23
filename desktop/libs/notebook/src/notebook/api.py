@@ -177,11 +177,14 @@ def _execute_notebook(request, notebook, snippet):
           _snippet['result']['handle'] = response['handle']
           _snippet['result']['statements_count'] = response['handle'].get('statements_count', 1)
           _snippet['result']['statement_id'] = response['handle'].get('statement_id', 0)
-          _snippet['result']['handle']['statement'] = response['handle'].get('statement', snippet['statement']).strip() # For non HS2, as non multi query yet
+          _snippet['result']['handle']['statement'] = response['handle'].get(
+              'statement', snippet['statement']
+          ).strip() # For non HS2, as non multi query yet
         else:
           _snippet['status'] = 'failed'
 
-        if history: # If _historify failed, history will be None. If we get Atomic block exception, something underneath interpreter.execute() crashed and is not handled.
+        if history: # If _historify failed, history will be None.
+          # If we get Atomic block exception, something underneath interpreter.execute() crashed and is not handled.
           history.update_data(notebook)
           history.save()
 
@@ -474,7 +477,9 @@ def _save_notebook(notebook, user):
     notebook_doc = Document2.objects.get(id=notebook['id'])
   else:
     notebook_doc = Document2.objects.create(name=notebook['name'], uuid=notebook['uuid'], type=notebook_type, owner=user)
-    Document.objects.link(notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra=notebook_type)
+    Document.objects.link(
+        notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra=notebook_type
+    )
     save_as = True
 
     if notebook.get('directoryUuid'):
@@ -539,7 +544,8 @@ def _historify(notebook, user):
 
   # Link history of saved query
   if notebook['isSaved']:
-    parent_doc = Document2.objects.get(uuid=notebook.get('parentSavedQueryUuid') or notebook['uuid']) # From previous history query or initial saved query
+    # From previous history query or initial saved query
+    parent_doc = Document2.objects.get(uuid=notebook.get('parentSavedQueryUuid') or notebook['uuid'])
     notebook['parentSavedQueryUuid'] = parent_doc.uuid
     history_doc.dependencies.add(parent_doc)
 
@@ -555,7 +561,7 @@ def _historify(notebook, user):
   notebook['uuid'] = history_doc.uuid
   _clear_sessions(notebook)
   if ENABLE_CONNECTORS.get():
-    history_doc.connector_id = int(notebook['type'])
+    history_doc.connector_id = int(notebook['type'].split('-')[1])
   history_doc.update_data(notebook)
   history_doc.search = _get_statement(notebook)
   history_doc.save()
@@ -607,7 +613,7 @@ def get_history(request):
         'data': {
             'statement': statement[:1001] if statement else '',
             'lastExecuted': notebook['snippets'][0].get('lastExecuted', -1),
-            'status':  notebook['snippets'][0]['status'],
+            'status': notebook['snippets'][0]['status'],
             'parentSavedQueryUuid': notebook.get('parentSavedQueryUuid', '')
         } if notebook['snippets'] else {},
         'absoluteUrl': doc.get_absolute_url(),

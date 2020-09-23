@@ -22,6 +22,7 @@
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
   from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, hue_version, get_cluster_config
+  from desktop.webpack_utils import get_hue_bundles
 
   from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
   from filebrowser.conf import SHOW_UPLOAD_BUTTON
@@ -277,13 +278,9 @@ ${ hueIcons.symbols() }
 </div>
 ${ commonshare() | n,unicode }
 
-${ render_bundle('vendors~hue~notebook~tableBrowser') | n,unicode }
-${ render_bundle('vendors~hue~notebook') | n,unicode }
-${ render_bundle('vendors~hue') | n,unicode }
-${ render_bundle('hue~notebook~tableBrowser') | n,unicode }
-${ render_bundle('hue~notebook') | n,unicode }
-${ render_bundle('hue~tableBrowser') | n,unicode }
-${ render_bundle('hue') | n,unicode }
+% for bundle in get_hue_bundles('hue'):
+  ${ render_bundle(bundle) | n,unicode }
+% endfor
 
 <script src="${ static('desktop/js/polyfills.js') }"></script>
 <script src="${ static('desktop/ext/js/tether.js') }"></script>

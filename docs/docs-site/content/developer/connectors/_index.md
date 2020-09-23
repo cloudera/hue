@@ -2,7 +2,7 @@
 title: "Connectors"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 3
+weight: 5
 ---
 
 Connectors provide pluggable integration to any external data service so that an admin can easily allow end users to interact with them.
@@ -15,7 +15,7 @@ Connectors provide pluggable integration to any external data service so that an
 
 ### SqlAlchemy
 
-[SqlAlchemy](https://www.sqlalchemy.org) is the prefered way if the Hive API is not supported by the database. The core implementation is in [`sql_alchemy.py`](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/sql_alchemy.py) and relies on each repective SqlAlchemy dialect.
+[SqlAlchemy](https://www.sqlalchemy.org) is the prefered way if the Hive API is not supported by the database. The core implementation is in [`sql_alchemy.py`](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/sql_alchemy.py) and relies on each respective SqlAlchemy dialect.
 
 ### Hive Interface
 

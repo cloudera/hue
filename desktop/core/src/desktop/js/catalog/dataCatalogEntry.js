@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
-import CancellablePromise from 'api/cancellablePromise';
+import CancellableJqPromise from 'api/cancellableJqPromise';
 import catalogUtils from 'catalog/catalogUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
@@ -32,7 +32,7 @@ import { DataCatalog } from './dataCatalog';
  * @param {Object} [options]
  * @param {boolean} [options.silenceErrors]
  *
- * @return {CancellablePromise}
+ * @return {CancellableJqPromise}
  */
 const reloadSourceMeta = function (dataCatalogEntry, options) {
   if (dataCatalogEntry.dataCatalog.invalidatePromise) {
@@ -48,7 +48,7 @@ const reloadSourceMeta = function (dataCatalogEntry, options) {
     });
     return dataCatalogEntry.trackedPromise(
       'sourceMetaPromise',
-      new CancellablePromise(deferred, undefined, cancellablePromises)
+      new CancellableJqPromise(deferred, undefined, cancellablePromises)
     );
   }
 
@@ -65,7 +65,7 @@ const reloadSourceMeta = function (dataCatalogEntry, options) {
  * @param {Object} [apiOptions]
  * @param {boolean} [apiOptions.silenceErrors] - Default true
  *
- * @return {CancellablePromise}
+ * @return {CancellableJqPromise}
  */
 const reloadNavigatorMeta = function (dataCatalogEntry, apiOptions) {
   if (dataCatalogEntry.canHaveNavigatorMetadata()) {
@@ -97,7 +97,7 @@ const reloadNavigatorMeta = function (dataCatalogEntry, apiOptions) {
  * @param {boolean} [apiOptions.silenceErrors]
  * @param {boolean} [apiOptions.refreshAnalysis]
  *
- * @return {CancellablePromise}
+ * @return {CancellableJqPromise}
  */
 const reloadAnalysis = function (dataCatalogEntry, apiOptions) {
   return dataCatalogEntry.trackedPromise(
@@ -118,7 +118,7 @@ const reloadAnalysis = function (dataCatalogEntry, apiOptions) {
  * @param {Object} [apiOptions]
  * @param {boolean} [apiOptions.silenceErrors]
  *
- * @return {CancellablePromise}
+ * @return {CancellableJqPromise}
  */
 const reloadPartitions = function (dataCatalogEntry, apiOptions) {
   return dataCatalogEntry.trackedPromise(
@@ -134,7 +134,7 @@ const reloadPartitions = function (dataCatalogEntry, apiOptions) {
  * @param {Object} [apiOptions]
  * @param {boolean} [apiOptions.silenceErrors]
  *
- * @return {CancellablePromise}
+ * @return {CancellableJqPromise}
  */
 const reloadSample = function (dataCatalogEntry, apiOptions) {
   return dataCatalogEntry.trackedPromise(
@@ -150,7 +150,7 @@ const reloadSample = function (dataCatalogEntry, apiOptions) {
  * @param {Object} [apiOptions]
  * @param {boolean} [apiOptions.silenceErrors] - Default true
  *
- * @return {CancellablePromise}
+ * @return {CancellableJqPromise}
  */
 const reloadOptimizerMeta = function (dataCatalogEntry, apiOptions) {
   if (dataCatalogEntry.dataCatalog.canHaveOptimizerMeta()) {
@@ -179,7 +179,7 @@ const reloadOptimizerMeta = function (dataCatalogEntry, apiOptions) {
  * @param {boolean} [options.refreshCache] - Default false
  * @param {boolean} [options.cancellable] - Default false
  * @param {string} functionName - The function to call, i.e. 'getTopAggs' etc.
- * @return {CancellablePromise}
+ * @return {CancellableJqPromise}
  */
 const getFromMultiTableCatalog = function (catalogEntry, options, functionName) {
   const deferred = $.Deferred();
@@ -199,7 +199,7 @@ const getFromMultiTableCatalog = function (catalogEntry, options, functionName) 
       );
     })
     .fail(deferred.reject);
-  return new CancellablePromise(deferred, undefined, cancellablePromises);
+  return new CancellableJqPromise(deferred, undefined, cancellablePromises);
 };
 
 /**
@@ -224,10 +224,7 @@ class DataCatalogEntry {
     self.compute = options.compute;
     self.dataCatalog = options.dataCatalog;
 
-    self.path =
-      typeof options.path === 'string' && options.path
-        ? options.path.split('.')
-        : options.path || [];
+    self.path = typeof options.path === 'string' ? options.path.split('.') : options.path || [];
     self.name = self.path.length ? self.path[self.path.length - 1] : self.getConnector().id;
     self.isTemporary = options.isTemporary;
 
@@ -293,13 +290,13 @@ class DataCatalogEntry {
    * Helper function that ensure that cancellable promises are not tracked anymore when cancelled
    *
    * @param {string} promiseName - The attribute name to use
-   * @param {CancellablePromise} cancellablePromise
+   * @param {CancellableJqPromise} cancellableJqPromise
    */
-  trackedPromise(promiseName, cancellablePromise) {
+  trackedPromise(promiseName, cancellableJqPromise) {
     const self = this;
-    self[promiseName] = cancellablePromise;
-    return cancellablePromise.fail(() => {
-      if (cancellablePromise.cancelled) {
+    self[promiseName] = cancellableJqPromise;
+    return cancellableJqPromise.fail(() => {
+      if (cancellableJqPromise.cancelled) {
         delete self[promiseName];
       }
     });
@@ -312,7 +309,7 @@ class DataCatalogEntry {
    * @param {boolean} [options.cascade] - Default false, only used when the entry is for the source
    * @param {boolean} [options.silenceErrors] - Default false
    * @param {string} [options.targetChild] - Optional specific child to invalidate
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   clearCache(options) {
     const self = this;
@@ -337,7 +334,7 @@ class DataCatalogEntry {
       });
     });
 
-    return new CancellablePromise(saveDeferred, undefined, []);
+    return new CancellableJqPromise(saveDeferred, undefined, []);
   }
 
   /**
@@ -390,7 +387,7 @@ class DataCatalogEntry {
    * @param {boolean} [options.refreshCache]
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   getChildren(options) {
     const self = this;
@@ -523,7 +520,7 @@ class DataCatalogEntry {
     return catalogUtils.applyCancellable(
       self.trackedPromise(
         'childrenPromise',
-        new CancellablePromise(deferred, undefined, [sourceMetaPromise])
+        new CancellableJqPromise(deferred, undefined, [sourceMetaPromise])
       ),
       options
     );
@@ -537,7 +534,7 @@ class DataCatalogEntry {
    * @param {boolean} [options.silenceErrors] - Default true
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   loadNavigatorMetaForChildren(options) {
     const self = this;
@@ -641,7 +638,7 @@ class DataCatalogEntry {
     return catalogUtils.applyCancellable(
       self.trackedPromise(
         'navigatorMetaForChildrenPromise',
-        new CancellablePromise(deferred, null, cancellablePromises)
+        new CancellableJqPromise(deferred, null, cancellablePromises)
       ),
       options
     );
@@ -654,7 +651,7 @@ class DataCatalogEntry {
    * @param {Object} [options]
    * @param {boolean} [options.silenceErrors] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   applyOptimizerResponseToChildren(response, options) {
     const self = this;
@@ -714,7 +711,7 @@ class DataCatalogEntry {
       })
       .fail(deferred.reject);
 
-    return new CancellablePromise(deferred, undefined, [childPromise]);
+    return new CancellableJqPromise(deferred, undefined, [childPromise]);
   }
 
   /**
@@ -725,7 +722,7 @@ class DataCatalogEntry {
    * @param {boolean} [options.silenceErrors] - Default true
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   loadOptimizerPopularityForChildren(options) {
     const self = this;
@@ -787,7 +784,7 @@ class DataCatalogEntry {
     return catalogUtils.applyCancellable(
       self.trackedPromise(
         'optimizerPopularityForChildrenPromise',
-        new CancellablePromise(deferred, undefined, cancellablePromises)
+        new CancellableJqPromise(deferred, undefined, cancellablePromises)
       ),
       options
     );
@@ -818,6 +815,9 @@ class DataCatalogEntry {
     // TODO: Move to connector attributes
     if (self.navigatorMeta && (self.getDialect() === 'hive' || self.getDialect() === 'impala')) {
       return self.navigatorMeta.description || self.navigatorMeta.originalDescription || '';
+    }
+    if (self.definition && self.definition.comment) {
+      return self.definition.comment;
     }
     return (self.sourceMeta && self.sourceMeta.comment) || '';
   }
@@ -858,7 +858,7 @@ class DataCatalogEntry {
    * @param {boolean} [options.refreshCache]
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   getComment(options) {
     const self = this;
@@ -916,7 +916,7 @@ class DataCatalogEntry {
     }
 
     return catalogUtils.applyCancellable(
-      new CancellablePromise(deferred, undefined, cancellablePromises),
+      new CancellableJqPromise(deferred, undefined, cancellablePromises),
       options
     );
   }
@@ -1463,7 +1463,7 @@ class DataCatalogEntry {
    * @param {boolean} [options.refreshCache]
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   getSourceMeta(options) {
     const self = this;
@@ -1492,7 +1492,7 @@ class DataCatalogEntry {
    * @param {boolean} [options.refreshAnalysis] - Performs a hard refresh on the source level
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   getAnalysis(options) {
     const self = this;
@@ -1520,7 +1520,7 @@ class DataCatalogEntry {
    * @param {boolean} [options.refreshCache] - Clears the browser cache
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   getPartitions(options) {
     const self = this;
@@ -1551,7 +1551,7 @@ class DataCatalogEntry {
    * @param {boolean} [options.refreshCache]
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   getNavigatorMeta(options) {
     const self = this;
@@ -1585,7 +1585,7 @@ class DataCatalogEntry {
    * @param {boolean} [options.refreshCache] - Default false
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   getOptimizerMeta(options) {
     const self = this;
@@ -1621,7 +1621,7 @@ class DataCatalogEntry {
    * @param {boolean} [options.cancellable] - Default false
    * @oaram {string} [options.operation]
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   getSample(options) {
     const self = this;
@@ -1708,7 +1708,7 @@ class DataCatalogEntry {
       return catalogUtils.applyCancellable(
         self.trackedPromise(
           'samplePromise',
-          new CancellablePromise(deferred, undefined, cancellablePromises)
+          new CancellableJqPromise(deferred, undefined, cancellablePromises)
         ),
         options
       );
@@ -1738,7 +1738,7 @@ class DataCatalogEntry {
    * @param {boolean} [options.refreshCache] - Default false
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   getTopAggs(options) {
     const self = this;
@@ -1754,7 +1754,7 @@ class DataCatalogEntry {
    * @param {boolean} [options.refreshCache] - Default false
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   getTopFilters(options) {
     const self = this;
@@ -1770,7 +1770,7 @@ class DataCatalogEntry {
    * @param {boolean} [options.refreshCache] - Default false
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellablePromise}
+   * @return {CancellableJqPromise}
    */
   getTopJoins(options) {
     const self = this;
