@@ -62,8 +62,8 @@
   import QueryTimeline from '../queryDetails/QueryTimeline.vue';
   import QueryConfig from '../queryDetails/QueryConfig.vue';
   import QueryTextDiff from '../../common/QueryTextDiff.vue';
-  import Tab from '../../common/Tab.vue';
-  import Tabs from '../../common/Tabs.vue';
+  import Tab from '../../../../../../desktop/core/src/desktop/js/components/Tab.vue';
+  import Tabs from '../../../../../../desktop/core/src/desktop/js/components/Tabs.vue';
   import DagConfigs from '../queryDetails/DagConfigs.vue';
   import DagCounters from '../queryDetails/DagCounters.vue';
   import DagGraphicalView from '../queryDetails/DagGraphicalView.vue';

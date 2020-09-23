@@ -31,7 +31,7 @@
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
-  import { Column } from '../common/HueTable';
+  import { Column } from '../../../../../desktop/core/src/desktop/js/components/HueTable';
   import QueryDiff from './queryDiff/QueryDiff.vue';
   import QueryDetails from './queryDetails/QueryDetails.vue';
   import { Query } from './index';

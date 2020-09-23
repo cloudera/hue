@@ -69,9 +69,9 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Emit, Prop } from 'vue-property-decorator';
-  import HueTable from '../../common/HueTable.vue';
-  import { Column } from '../../common/HueTable';
-  import ColumnSelectorPanel from './ColumnSelectorPanel.vue';
+  import HueTable from '../../../../../../desktop/core/src/desktop/js/components/HueTable.vue';
+  import { Column } from '../../../../../../desktop/core/src/desktop/js/components/HueTable';
+  import ColumnSelectorPanel from '../../../../../../desktop/core/src/desktop/js/components/ColumnSelectorPanel.vue';
   import { fetchSuggestedSearches } from '../apiUtils';
   import QueriesSearch from '../components/QueriesSearch.vue';
   import { DataProcessor, Query, Search, TableDefinition } from '../index';

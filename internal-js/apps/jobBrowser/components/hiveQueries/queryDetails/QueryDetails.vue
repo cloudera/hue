@@ -47,8 +47,8 @@
 <script lang="ts">
   import Component from 'vue-class-component';
   import SingleQueryComponent from './SingleQueryComponent.vue';
-  import Tab from '../../common/Tab.vue';
-  import Tabs from '../../common/Tabs.vue';
+  import Tab from '../../../../../../desktop/core/src/desktop/js/components/Tab.vue';
+  import Tabs from '../../../../../../desktop/core/src/desktop/js/components/Tabs.vue';
   import FixedAnchorNav from './FixedAnchorNav.vue';
   import QueryTimeline from './QueryTimeline.vue';
   import DagDetails from './DagDetails.vue';

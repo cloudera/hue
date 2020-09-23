@@ -128,7 +128,7 @@
 <script lang="ts">
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
-  import SqlText from '../../common/SqlText.vue';
+  import SqlText from '../../../../../../desktop/core/src/desktop/js/components/SqlText.vue';
   import SingleQueryComponent from './SingleQueryComponent.vue';
 
   @Component({

@@ -38,8 +38,8 @@
 <script lang="ts">
   import Component from 'vue-class-component';
   import SingleQueryComponent from './SingleQueryComponent.vue';
-  import Tab from '../../common/Tab.vue';
-  import Tabs from '../../common/Tabs.vue';
+  import Tab from '../../../../../../desktop/core/src/desktop/js/components/Tab.vue';
+  import Tabs from '../../../../../../desktop/core/src/desktop/js/components/Tabs.vue';
   import { Dag } from '../index';
   import DagConfigs from './DagConfigs.vue';
   import DagCounters from './DagCounters.vue';
@@ -56,6 +56,7 @@
     selectedDagId?: string;
 
     dagSelected(dag: Dag) {
+      Tab
       // TODO: Implement
     }
   }

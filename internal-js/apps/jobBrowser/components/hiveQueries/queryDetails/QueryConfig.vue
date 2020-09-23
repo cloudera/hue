@@ -43,8 +43,8 @@
   import { numberToLetter } from './utils';
   import MultiQueryComponent from './MultiQueryComponent.vue';
   import Component from 'vue-class-component';
-  import { Column, Row } from '../../common/HueTable';
-  import HueTable from '../../common/HueTable.vue';
+  import { Column, Row } from '../../../../../../desktop/core/src/desktop/js/components/HueTable';
+  import HueTable from '../../../../../../desktop/core/src/desktop/js/components/HueTable.vue';
 
   @Component({
     components: { HueTable }

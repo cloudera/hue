@@ -85,7 +85,7 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
-  import Modal from '../../common/Modal.vue';
+  import Modal from '../../../../../../desktop/core/src/desktop/js/components/Modal.vue';
   import RangePanel from './RangePanel.vue';
   import { Search, TableDefinition } from '../index';
   import * as api from '../apiUtils';
