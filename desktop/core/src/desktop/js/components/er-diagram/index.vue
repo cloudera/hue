@@ -72,7 +72,7 @@
 
   import './er-diagram.scss';
 
-  const CURVATURE: number = 40;
+  const CURVATURE = 40;
 
   @Component({
     components: {
@@ -81,18 +81,23 @@
     }
   })
   export default class ERDiagram extends Vue {
-    @Prop() entities: Array<IEntity>;
-    @Prop() relations: Array<IRelation>;
+    @Prop()
+    entities: IEntity[];
+    @Prop()
+    relations: IRelation[];
 
     EntityTypes = EntityTypes;
 
-    get groups(): Object {
+    get groups(): IEntity[][] | undefined {
       if (this.entities && this.relations) {
         return groupEntities(this.entities, this.relations);
       }
     }
 
-    getSelectorPosition(selector: string, offset: any): any {
+    getSelectorPosition(
+      selector: string,
+      offset: { x: number; y: number }
+    ): { x: number; y: number } {
       const element = this.$el.querySelector(selector);
       if (element) {
         const rect = element.getBoundingClientRect();
@@ -109,10 +114,10 @@
     }
 
     plotRelations(): void {
-      const relationPaths: Array<any> = this.$el.querySelectorAll('.relation-path');
+      const relationPaths: HTMLElement[] = this.$el.querySelectorAll<HTMLElement>('.relation-path');
       const offset = this.getSelectorPosition('.erd-relations');
 
-      relationPaths.forEach((element: any) => {
+      relationPaths.forEach(element => {
         const leftPos = this.getSelectorPosition(
           `[data-entity-id~="${element.dataset.entityIdLeft}"] .right-point`,
           offset

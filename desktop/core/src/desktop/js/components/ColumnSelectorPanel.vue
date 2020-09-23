@@ -18,20 +18,27 @@
 
 <template>
   <div>
-    Columns <i class='fa fa-times' title="Close" @click="$emit('close')"></i>
-    <ul class='column-list'>
+    Columns <i class="fa fa-times" title="Close" @click="$emit('close')" />
+    <ul class="column-list">
       <li>
-        <input type="text" class="filter-box" v-model="filterText" placeholder="Filter">
+        <input v-model="filterText" type="text" class="filter-box" placeholder="Filter" />
       </li>
-      <template v-for="column in filteredColumns">
-        <li :key="column.key">
-          <label><input type="checkbox" :value="column" v-model="checkedColumns">{{ column.label }}</label>
-        </li>
-      </template>
+      <li v-for="column in filteredColumns" :key="column.key">
+        <label>
+          <input v-model="checkedColumns" type="checkbox" :value="column" />
+          {{ column.label }}
+        </label>
+      </li>
     </ul>
 
     <div class="buttons">
-      <button type="button" class="btn btn-default" @click="$emit('set-checked-columns', checkedColumns)">Apply</button>
+      <button
+        type="button"
+        class="btn btn-default"
+        @click="$emit('set-checked-columns', checkedColumns)"
+      >
+        Apply
+      </button>
     </div>
   </div>
 </template>
@@ -50,7 +57,7 @@
     checkedColumns: Column[] = [];
     filterText = '';
 
-    mounted() {
+    mounted(): void {
       this.checkedColumns.push(...this.columns);
     }
 
@@ -59,10 +66,9 @@
         return this.columns;
       }
       const lowerFilter = this.filterText.toLowerCase();
-      return this.columns.filter(col => col.label.toLowerCase().indexOf(lowerFilter) !== -1)
+      return this.columns.filter(col => col.label.toLowerCase().indexOf(lowerFilter) !== -1);
     }
   }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

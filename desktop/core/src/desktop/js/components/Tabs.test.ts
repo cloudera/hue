@@ -15,15 +15,15 @@
 // limitations under the License.
 
 import Vue from 'vue';
-import { mount, shallowMount } from '@vue/test-utils'
-import Tabs from './Tabs.vue'
-import Tab from './Tab.vue'
+import { mount, shallowMount } from '@vue/test-utils';
+import Tabs from './Tabs.vue';
+import Tab from './Tab.vue';
 
 describe('Tabs.vue', () => {
   it('should render empty tabs', () => {
     const wrapper = shallowMount(Tabs);
     expect(wrapper.element).toMatchSnapshot();
-  })
+  });
 
   it('should render tabs', async () => {
     const wrapper = mount(Tabs, {
@@ -31,10 +31,10 @@ describe('Tabs.vue', () => {
         default: '<tab title="foo">foo</tab><tab title="bar">bar</tab>'
       },
       stubs: {
-        'tab': Tab
+        tab: Tab
       }
     });
     await Vue.nextTick();
     expect(wrapper.element).toMatchSnapshot();
-  })
-})
+  });
+});

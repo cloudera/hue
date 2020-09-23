@@ -6,7 +6,7 @@
 
 <script lang="ts">
   export default {
-    data(): {} {
+    data(): unknown {
       return {};
     }
   };

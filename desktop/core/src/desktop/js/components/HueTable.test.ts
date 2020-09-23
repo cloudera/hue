@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils';
 import { Column, Row } from './HueTable';
-import HueTable from './HueTable.vue'
+import HueTable from './HueTable.vue';
 
 describe('HueTable.vue', () => {
   it('should render a table', () => {
@@ -32,10 +32,10 @@ describe('HueTable.vue', () => {
           { a: '1', b: 5, c: false, d: undefined },
           { a: '2', b: 6, c: true, d: null },
           { a: '3', b: 7, c: false },
-          { a: '4', b: 8, c: true },
+          { a: '4', b: 8, c: true }
         ]
       }
     });
     expect(wrapper.element).toMatchSnapshot();
-  })
-})
+  });
+});

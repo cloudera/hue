@@ -22,11 +22,11 @@
       <div class="modal-wrapper">
         <div class="modal-container">
           <div class="modal-header">
-            <slot name="header"></slot>
-            <i class="fa fa-times" aria-hidden="true" @click="$emit('close')"></i>
+            <slot name="header" />
+            <i class="fa fa-times" aria-hidden="true" @click="$emit('close')" />
           </div>
           <div class="modal-body">
-            <slot name="body"></slot>
+            <slot name="body" />
           </div>
           <div class="modal-footer">
             <slot name="footer">
