@@ -13,7 +13,7 @@ Hue is an open source SQL Cloud Assistant for developing and accessing [Database
 
 ### Summary
 
-This release brings all these improvements on top of [4.7](https://gethue.com/hue-4-7-and-its-improvements-are-out/).
+This release brings all these improvements on top of [4.7](https://gethue.com/blog/hue-4-7-and-its-improvements-are-out/).
 
 Download the [tarball](https://cdn.gethue.com/downloads/hue-4.8.0.tgz) or [source](https://github.com/cloudera/hue/archive/release-4.8.0.zip) releases.
 
