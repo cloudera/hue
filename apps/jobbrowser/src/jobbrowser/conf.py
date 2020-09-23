@@ -72,6 +72,13 @@ ENABLE_HIVE_QUERY_BROWSER = Config(
   default=False
 )
 
+ENABLE_QUERIES_LIST = Config(
+  key="enable_queries_list",
+  help=_("Show the Queries section for listing Hive/Impala query history and providing more troubleshooting information."),
+  type=coerce_bool,
+  default=False
+)
+
 ENABLE_HISTORY_V2 = Config(
   key="enable_history_v2",
   help=_("Show the version 2 of job/query History which unifies the all into one."),
