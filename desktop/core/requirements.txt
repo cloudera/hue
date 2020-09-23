@@ -41,6 +41,8 @@ openpyxl==2.6.2
 phoenixdb==1.0.0
 pyformance==0.3.2
 pysaml2>=4.5.0
+pytest==6.0.2
+pytest-django==3.10.0
 python-dateutil==2.4.2
 python-daemon==2.2.4
 python-ldap==3.1.0

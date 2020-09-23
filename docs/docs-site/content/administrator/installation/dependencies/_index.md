@@ -25,13 +25,20 @@ Hue is being ran the most with [MySQL InnoDB, PostgreSQL or Oracle](https://docs
 
 The client lib [MySQL-python](https://github.com/cloudera/hue/tree/master/desktop/core/ext-py/MySQL-python-1.2.5) is already included so it should work out of the box.
 
+**Note**
+
 With the recent OSs like Ubuntu 20.04 or using Python 3, the MySQL-python lib won't compile properly and will produce an error similar to:
 
     _mysql.c: Cannot open include file my_config.h
 
 The lib folder needs to be swapped with https://pypi.org/project/mysqlclient/. Unfortunately for licensing reason (GPL vs Apache) this can't be officially done in the Hue repository.
 
-Read [HUE-9390](https://issues.cloudera.org/browse/HUE-9390) for more details and the two commits doing this change.
+Remove and add the compatible MySql lib with these two commands:
+
+    git cherry-pick 7a9100d4a7f38eaef7bd4bd7c715ac1f24a969a8
+    git cherry-pick e67c1105b85b815346758ef1b9cd714dd91d7ea3
+
+Read [HUE-9390](https://issues.cloudera.org/browse/HUE-9390) for more details.
 
 ### PostgreSQL
 
