@@ -1,20 +1,30 @@
 {
   "query": {
     "details": {
-      "id": 1128,
+      "id": 13,
       "perf": {
         "parse": 1,
-        "compile": 18,
-        "runTasks": 646,
-        "releaseLocks": 7,
-        "doAuthorization": 0,
-        "semanticAnalyze": 17,
+        "compile": 512,
+        "TezRunDag": 7448,
+        "optimizer": 0,
+        "TezBuildDag": 384,
+        "TezCompiler": 13,
+        "TezSubmitDag": 8,
+        "TezGetSession": 141,
+        "serializePlan": 6,
+        "doAuthorization": 2,
+        "semanticAnalyze": 509,
+        "TezRunVertex.Map 1": 2013,
+        "partition-retrieving": 0,
+        "TezCreateVertex.Map 1": 12,
+        "TezSubmitToRunningDag": 116,
+        "acquireReadWriteLocks": 0,
+        "TezCreateVertex.Reducer 2": 369,
         "PreHook.com.github.cloudera.ComputeUnidlingHook": 0,
-        "PreHook.org.apache.hadoop.hive.ql.hooks.HiveProtoLoggingHook": 4,
-        "PostHook.org.apache.hadoop.hive.ql.stats.OperatorStatsReaderHook": 0,
+        "PreHook.org.apache.hadoop.hive.ql.hooks.HiveProtoLoggingHook": 10,
         "PreHook.org.apache.hadoop.hive.ql.security.authorization.plugin.DisallowTransformHook": 0
       },
-      "hiveQueryId": 1131,
+      "hiveQueryId": 13,
       "configuration": {
         "hadoop.security.group.mapping.ldap.posix.attr.uid.name": "uidNumber",
         "dfs.block.invalidate.limit": "1000",
@@ -37,7 +47,6 @@
         "hive.server2.metrics.enabled": "true",
         "yarn.webapp.api-service.enable": "false",
         "hive.privilege.synchronizer": "false",
-        "hive.server2.proxy.user": "some_user",
         "hive.metastore.wm.default.pool.size": "1",
         "dfs.provided.storage.id": "DS-PROVIDED",
         "fs.s3a.path.style.access": "false",
@@ -52,6 +61,7 @@
         "stream.stderr.reporter.prefix": "reporter:",
         "hive.llap.task.scheduler.preempt.independent": "false",
         "hive.druid.storage.storageDirectory": "/druid/segments",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-managed.server-side-encryption.key": "74fb1c43-0867-42dd-aae1-bbd2355c5ca9",
         "hadoop.http.sni.host.check.enabled": "false",
         "hive.llap.output.format.arrow": "true",
         "hive.llap.io.cvb.memory.consumption.": "1073741824",
@@ -62,7 +72,6 @@
         "hive.tez.dynamic.semijoin.reduction.threshold": "0.5",
         "dfs.provided.aliasmap.load.retries": "0",
         "yarn.nodemanager.node-attributes.resync-interval-ms": "120000",
-        "startcode": "1600703039176",
         "dfs.balancer.getBlocks.size": "2147483648",
         "mapreduce.am.max-attempts": "2",
         "hive.tez.dynamic.semijoin.reduction": "true",
@@ -76,6 +85,7 @@
         "hive.arrow.root.allocator.limit": "9223372036854775807",
         "dfs.client.write.byte-array-manager.count-threshold": "128",
         "hive.optimize.topnkey.max": "128",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-external.s3guard.ddb.table.tag.envId": "crn:cdp:environments:us-west-1:9d74eee4-1cad-45d7-b645-7ccf9edbb73d:environment:e8645138-753c-44e3-a0f5-cad2cf15505e",
         "dfs.datanode.bp-ready.timeout": "20s",
         "yarn.nodemanager.amrmproxy.ha.enable": "false",
         "yarn.app.mapreduce.client.job.max-retries": "3",
@@ -161,7 +171,6 @@
         "hive.optimize.reducededuplication": "true",
         "fs.s3a.impl": "org.apache.hadoop.fs.s3a.S3AFileSystem",
         "hive.repl.partitions.dump.parallelism": "100",
-        "tez.am.registry.enable.compute.groups": "false",
         "hive.llap.daemon.am.liveness.heartbeat.interval.ms": "10000ms",
         "dfs.namenode.fs-limits.max-blocks-per-file": "10000",
         "yarn.resourcemanager.delegation.key.update-interval": "86400000",
@@ -181,9 +190,8 @@
         "hive.metastore.txn.store.impl": "org.apache.hadoop.hive.metastore.txn.CompactionTxnHandler",
         "yarn.nodemanager.resource.system-reserved-memory-mb": "-1",
         "dfs.journalnode.edits.dir.perm": "700",
-        "list.sink.output.formatter": "org.apache.hadoop.hive.serde2.thrift.ThriftFormatter",
         "hive.llap.object.cache.enabled": "true",
-        "hive.server2.tez.external.sessions.namespace": "/compute-1600697412-wcr7",
+        "hive.server2.tez.external.sessions.namespace": "/compute-1600861760-w9rh",
         "hive.map.groupby.sorted": "true",
         "mapreduce.job.speculative.retry-after-no-speculate": "1000",
         "hive.server2.idle.operation.timeout": "6h",
@@ -198,6 +206,7 @@
         "fs.AbstractFileSystem.wasbs.impl": "org.apache.hadoop.fs.azure.Wasbs",
         "yarn.resourcemanager.nm-container-queuing.min-queue-length": "5",
         "mapreduce.reduce.cpu.vcores": "1",
+        "tez.job.name": "HIVE-%s",
         "hadoop.ssl.enabled": "false",
         "hive.server2.webui.xframe.enabled": "true",
         "dfs.namenode.name.dir": "file://${hadoop.tmp.dir}/dfs/name",
@@ -208,6 +217,7 @@
         "mapreduce.task.local-fs.write-limit.bytes": "-1",
         "yarn.resourcemanager.configuration.file-system-based-store": "/yarn/conf",
         "hive.compactor.delta.num.threshold": "10",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-managed.s3guard.ddb.region": "us-west-2",
         "dfs.block.access.token.enable": "false",
         "hive.llap.daemon.web.xframe.enabled": "true",
         "dfs.webhdfs.rest-csrf.methods-to-ignore": "GET,OPTIONS,HEAD,TRACE",
@@ -269,7 +279,7 @@
         "hive.test.acid.key.index.skip": "false",
         "yarn.app.attempt.diagnostics.limit.kc": "64",
         "hive.stats.fetch.bitvector": "true",
-        "hive.query.string": "KILL+QUERY+%27hive_20200921164714_ea4a83d3-c2d1-4be9-8ab1-50aa37ecf70a%27",
+        "hive.query.string": "INSERT+into+table+delta_default_tmp_compactor_test_compact_1600862199967_result+select+%60operation%60%2C+%60originalTransaction%60%2C+%60bucket%60%2C+%60rowId%60%2C+%60currentTransaction%60%2C+%60row%60+from+delta_default_tmp_compactor_test_compact_1600862199967",
         "dfs.namenode.checkpoint.check.period": "60s",
         "hive.auto.convert.join.use.nonstaged": "false",
         "dfs.namenode.max-num-blocks-to-log": "1000",
@@ -291,9 +301,10 @@
         "hive.optimize.metadataonly": "true",
         "hive.llap.daemon.output.service.max.pending.writes": "8",
         "hadoop.security.groups.negative-cache.secs": "30",
-        "_hive.hdfs.session.path": "file:/efs/tmp/hive/hive/5782298a-4381-456f-a5f3-edb055948de5",
+        "_hive.hdfs.session.path": "file:/efs/tmp/hive/hive/f69516af-3a40-4963-be37-5b0814e2616d",
         "yarn.client.nodemanager-client-async.thread-pool-max-size": "500",
         "hive.metastore.event.db.notification.api.auth": "true",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-managed.metadatastore.impl": "org.apache.hadoop.fs.s3a.s3guard.DynamoDBMetadataStore",
         "yarn.minicluster.yarn.nodemanager.resource.memory-mb": "4096",
         "dfs.namenode.checkpoint.max-retries": "3",
         "hive.exec.orc.delta.streaming.optimizations.enabled": "false",
@@ -318,10 +329,10 @@
         "hive.optimize.ppd": "true",
         "hive.exec.script.maxerrsize": "100000",
         "hive.llap.task.scheduler.am.collect.daemon.metrics.ms": "0ms",
-        "hive.session.id": "5782298a-4381-456f-a5f3-edb055948de5",
+        "hive.session.id": "f69516af-3a40-4963-be37-5b0814e2616d",
         "hive.spark.client.connect.timeout": "1000ms",
         "hive.auto.convert.join.noconditionaltask": "true",
-        "hive.stats.fetch.column.stats": "true",
+        "hive.stats.fetch.column.stats": "false",
         "hive.skewjoin.mapjoin.map.tasks": "10000",
         "hive.llap.hs2.coordinator.enabled": "true",
         "hive.msck.repair.batch.max.retries": "4",
@@ -390,8 +401,8 @@
         "yarn.nodemanager.resourcemanager.minimum.version": "NONE",
         "hive.repl.replica.external.table.base.dir": "/",
         "hive.test.bucketcodec.version": "1",
-        "hive.query.id": "hive_20200921164733_5af56d4d-18b4-4f40-9dbb-4e4fcb522ebb",
-        "hive.transactional.table.scan": "false",
+        "hive.query.id": "hive_20200923115641_4eaa9303-d8d6-4d9e-a7d9-dec969781b35",
+        "hive.transactional.table.scan": "true",
         "mapreduce.job.ubertask.maxreduces": "1",
         "dfs.image.parallel.target.sections": "12",
         "hadoop.security.group.mapping.ldap.search.group.hierarchy.levels": "0",
@@ -445,7 +456,7 @@
         "hive.join.inner.residual": "false",
         "yarn.nodemanager.pmem-check-enabled": "true",
         "dfs.namenode.inotify.max.events.per.rpc": "1000",
-        "hive.server2.authentication.ldap.groupDNPattern": "cn=%s,cn=groups,cn=accounts,dc=cslaws96,dc=xcu2-8y8x,dc=dev,dc=cldr,dc=work",
+        "hive.server2.authentication.ldap.groupDNPattern": "cn=%s,cn=groups,cn=accounts,dc=dwx-s0sc,dc=xcu2-8y8x,dc=dev,dc=cldr,dc=work",
         "hive.server2.active.passive.ha.enable": "false",
         "hive.llap.remote.token.requires.signing": "true",
         "fs.abfs.impl": "org.apache.hadoop.fs.azurebfs.AzureBlobFileSystem",
@@ -468,8 +479,9 @@
         "hadoop.http.cross-origin.max-age": "1800",
         "hive.mm.allow.originals": "true",
         "mapreduce.jobhistory.principal": "jhs/_HOST@REALM.TLD",
-        "hive.hook.proto.base-directory": "s3a://cslaws96/clusters/env-hj7mc8/warehouse-1600696790-pfb5/warehouse/tablespace/external/hive/sys.db/query_data",
+        "hive.hook.proto.base-directory": "s3a://qe-s3-bucket-weekly-vxr2-dwx-external/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/external/hive/sys.db/query_data",
         "hive.exec.mode.local.auto.inputbytes.max": "134217728",
+        "hive.optimize.shared.work.merge.ts.schema": "true",
         "hive.llap.auto.enforce.vectorized": "true",
         "hive.mapjoin.localtask.max.memory.usage": "0.9",
         "hive.writeset.reaper.interval": "60s",
@@ -486,7 +498,7 @@
         "mapreduce.job.queuename": "default",
         "mapreduce.jobhistory.max-age-ms": "604800000",
         "fs.azure.authorization": "false",
-        "hive.server2.authentication.kerberos.principal": "hive/compute-1600697412-wcr7.svc@CSLAWS96.XCU2-8Y8X.DEV.CLDR.WORK",
+        "hive.server2.authentication.kerberos.principal": "hive/compute-1600861760-w9rh.svc@DWX-S0SC.XCU2-8Y8X.DEV.CLDR.WORK",
         "hive.new.job.grouping.set.cardinality": "30",
         "tez.dag.recovery.enabled": "false",
         "hive.enforce.sortmergebucketmapjoin": "true",
@@ -565,6 +577,7 @@
         "fs.viewfs.overload.scheme.target.abfs.impl": "org.apache.hadoop.fs.azurebfs.AzureBlobFileSystem",
         "hive.distcp.privileged.doAs": "hive",
         "hive.strict.checks.orderby.no.limit": "false",
+        "mapred.input.dir.recursive": "true",
         "fs.s3a.multipart.threshold": "128M",
         "mapreduce.reduce.shuffle.memory.limit.percent": "0.25",
         "yarn.scheduler.include-port-in-node-name": "false",
@@ -595,9 +608,9 @@
         "yarn.resourcemanager.hostname": "0.0.0.0",
         "hadoop.registry.jaas.context": "Client",
         "hive.tez.min.partition.factor": "0.25",
-        "hive.server2.authentication.ldap.userDNPattern": "uid=%s,cn=users,cn=accounts,dc=cslaws96,dc=xcu2-8y8x,dc=dev,dc=cldr,dc=work",
+        "hive.server2.authentication.ldap.userDNPattern": "uid=%s,cn=users,cn=accounts,dc=dwx-s0sc,dc=xcu2-8y8x,dc=dev,dc=cldr,dc=work",
         "hadoop.security.group.mapping.ldap.search.filter.group": "(objectClass=groupOfNames)",
-        "yarn.resourcemanager.principal": "hive/compute-1600697412-wcr7.svc@CSLAWS96.XCU2-8Y8X.DEV.CLDR.WORK",
+        "yarn.resourcemanager.principal": "hive/compute-1600861760-w9rh.svc@DWX-S0SC.XCU2-8Y8X.DEV.CLDR.WORK",
         "hadoop.shell.safely.delete.limit.num.files": "100",
         "dfs.namenode.storageinfo.defragment.timeout.ms": "4",
         "yarn.client.failover-retries-on-socket-timeouts": "0",
@@ -633,7 +646,6 @@
         "yarn.nodemanager.runtime.linux.allowed-runtimes": "default",
         "hive.metastore.client.cache.max.capacity": "50",
         "mapreduce.cluster.acls.enabled": "false",
-        "fs.s3a.s3guard.ddb.table": "cdp-cslaws96",
         "mapreduce.job.encrypted-intermediate-data-key-size-bits": "128",
         "hive.compactor.crud.query.based": "true",
         "hive.hook.proto.events.ttl": "7d",
@@ -665,8 +677,10 @@
         "dfs.datanode.cached-dfsused.check.interval.ms": "600000",
         "yarn.nodemanager.delete.debug-delay-sec": "0",
         "hive.compute.query.using.stats": "true",
+        "hive.llap.max.concurrent.requests.per.daemon": "12",
         "fs.trash.interval": "0",
         "dfs.mover.moverThreads": "1000",
+        "mapreduce.job.name": "",
         "fs.s3a.change.detection.version.required": "true",
         "hive.tez.max.bloom.filter.entries": "100000000",
         "dfs.net.topology.impl": "org.apache.hadoop.hdfs.net.DFSNetworkTopology",
@@ -677,6 +691,7 @@
         "hive.llap.nodehealthckecks.executorratio": "2.0",
         "nfs.rtmax": "1048576",
         "dfs.namenode.backup.address": "0.0.0.0:50100",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-external.server-side-encryption-algorithm": "AES256",
         "yarn.resourcemanager.container.liveness-monitor.interval-ms": "600000",
         "dfs.client.failover.random.order": "false",
         "dfs.datanode.readahead.bytes": "4194304",
@@ -687,6 +702,7 @@
         "hive.exec.max.created.files": "100000",
         "hive.repl.include.authorization.metadata": "false",
         "hive.cli.prompt": "hive",
+        "mapreduce.input.fileinputformat.input.dir.recursive": "true",
         "yarn.nodemanager.disk-health-checker.enable": "true",
         "yarn.nodemanager.container-monitor.enabled": "true",
         "hadoop.security.java.secure.random.algorithm": "SHA1PRNG",
@@ -718,7 +734,7 @@
         "hive.spark.dynamic.partition.pruning": "false",
         "hive.server2.thrift.http.cookie.is.httponly": "true",
         "yarn.nodemanager.linux-container-executor.nonsecure-mode.user-pattern": "^[_.A-Za-z0-9][-@_.A-Za-z0-9]{0,255}?[$]?$",
-        "hive.metastore.uris": "thrift://metastore-service.warehouse-1600696790-pfb5.svc.cluster.local:9083",
+        "hive.metastore.uris": "thrift://metastore-service.warehouse-1600861700-vhvh.svc.cluster.local:9083",
         "yarn.resourcemanager.max-completed-applications": "1000",
         "yarn.federation.registry.base-dir": "yarnfederation/",
         "dfs.xframe.value": "SAMEORIGIN",
@@ -744,7 +760,7 @@
         "dfs.client.https.keystore.resource": "ssl-client.xml",
         "yarn.timeline-service.webapp.address": "${yarn.timeline-service.hostname}:8188",
         "yarn.sharedcache.cleaner.resource-sleep-ms": "0",
-        "hive.server2.authentication.ldap.url": "ldaps://ldap.cslaws96.xcu2-8y8x.dev.cldr.work:636",
+        "hive.server2.authentication.ldap.url": "ldaps://ldap.dwx-s0sc.xcu2-8y8x.dev.cldr.work:636",
         "io.seqfile.compress.blocksize": "1000000",
         "dfs.namenode.checkpoint.edits.dir": "${dfs.namenode.checkpoint.dir}",
         "hive.query.reexecution.max.count": "1",
@@ -761,6 +777,7 @@
         "fs.s3a.list.version": "2",
         "hive.tez.session.events.print.summary": "none",
         "yarn.resourcemanager.delegation.token.renew-interval": "86400000",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-managed.s3guard.ddb.table.tag.envId": "crn:cdp:environments:us-west-1:9d74eee4-1cad-45d7-b645-7ccf9edbb73d:environment:e8645138-753c-44e3-a0f5-cad2cf15505e",
         "hive.analyze.stmt.collect.partlevel.stats": "true",
         "hadoop.http.authentication.kerberos.keytab": "${user.home}/hadoop.keytab",
         "fs.azure.saskey.usecontainersaskeyforallaccess": "true",
@@ -791,7 +808,7 @@
         "hive.metastore.use.SSL": "false",
         "yarn.log-aggregation.retain-check-interval-seconds": "-1",
         "fs.viewfs.overload.scheme.target.wasb.impl": "org.apache.hadoop.fs.azure.NativeAzureFileSystem",
-        "hive.repl.replica.functions.root.dir": "s3a://cslaws96/clusters/env-hj7mc8/warehouse-1600696790-pfb5/warehouse/tablespace/external/hive/user/hive/repl/functions/",
+        "hive.repl.replica.functions.root.dir": "s3a://qe-s3-bucket-weekly-vxr2-dwx-external/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/external/hive/user/hive/repl/functions/",
         "mapreduce.jobhistory.intermediate-user-done-dir.permissions": "770",
         "hive.metastore.execute.setugi": "true",
         "hive.mapjoin.testing.no.hash.table.load": "false",
@@ -822,7 +839,7 @@
         "hadoop.security.kms.client.failover.sleep.base.millis": "100",
         "hive.auto.convert.sortmerge.join.bigtable.selection.policy": "org.apache.hadoop.hive.ql.optimizer.AvgPartitionSizeBasedBigTableSelectorForAutoSMJ",
         "yarn.node-labels.configuration-type": "centralized",
-        "hive.llap.daemon.service.hosts": "@compute-1600697412-wcr7",
+        "hive.llap.daemon.service.hosts": "@compute-1600861760-w9rh",
         "yarn.timeline-service.ttl-ms": "604800000",
         "hive.timedout.txn.reaper.interval": "180s",
         "mapreduce.task.exit.timeout.check-interval-ms": "20000",
@@ -852,7 +869,7 @@
         "hive.query.reexecution.always.collect.operator.stats": "false",
         "mapreduce.reduce.input.buffer.percent": "0.0",
         "hive.repl.cm.retain": "24h",
-        "tez.am.registry.namespace": "/compute-1600697412-wcr7",
+        "tez.am.registry.namespace": "/compute-1600861760-w9rh",
         "hive.merge.cardinality.check": "true",
         "hive.repl.dumpdir.ttl": "7d",
         "hive.server2.thrift.min.worker.threads": "5",
@@ -862,7 +879,7 @@
         "yarn.timeline-service.webapp.rest-csrf.enabled": "false",
         "hive.server2.thrift.http.port": "10010",
         "hive.server2.logging.operation.log.location": "/tmp/hive/operation_logs",
-        "javax.jdo.option.ConnectionURL": "jdbc:postgresql://postgres-service-default-warehouse:5432/hive?createDatabaseIfNotExist=true&sslmode=require",
+        "javax.jdo.option.ConnectionURL": "jdbc:postgresql://postgres-service:5432/warehouse-1600861700-vhvh-metastore?createDatabaseIfNotExist=true&sslmode=require",
         "yarn.timeline-service.reader.class": "org.apache.hadoop.yarn.server.timelineservice.storage.HBaseTimelineReaderImpl",
         "yarn.app.mapreduce.am.staging-dir.erasurecoding.enabled": "false",
         "dfs.datanode.network.counts.cache.max.size": "2147483647",
@@ -893,9 +910,11 @@
         "hive.exec.script.allow.partial.consumption": "false",
         "yarn.resourcemanager.rm.container-allocation.expiry-interval-ms": "600000",
         "ipc.server.max.connections": "0",
-        "hive.zookeeper.namespace": "compute-1600697412-wcr7-lock-manager",
+        "hive.zookeeper.namespace": "compute-1600861760-w9rh-lock-manager",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-external.metadatastore.authoritative": "false",
         "hive.server2.long.polling.timeout": "5000ms",
         "yarn.app.mapreduce.am.resource.mb": "1536",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-managed.s3guard.ddb.table.tag.clusterName": "dwx-s0scvy",
         "mapreduce.shuffle.transfer.buffer.size": "131072",
         "hive.server2.thrift.worker.keepalive.time": "60s",
         "hive.server2.allow.user.substitution": "true",
@@ -918,12 +937,12 @@
         "dfs.qjm.operations.timeout": "60s",
         "dfs.namenode.stale.datanode.minimum.interval": "3",
         "hive.lock.numretries": "100",
-        "hive.server2.active.passive.ha.registry.namespace": "hs2ActivePassiveHA/compute-1600697412-wcr7",
+        "hive.server2.active.passive.ha.registry.namespace": "hs2ActivePassiveHA/compute-1600861760-w9rh",
         "hadoop.security.groups.cache.background.reload.threads": "3",
         "hive.auto.convert.join": "true",
         "hive.server2.support.dynamic.service.discovery": "false",
         "mapreduce.input.fileinputformat.list-status.num-threads": "1",
-        "hadoop.security.group.mapping.ldap.bind.user": "uid=admin,cn=users,cn=accounts,dc=cslaws96,dc=xcu2-8y8x,dc=dev,dc=cldr,dc=work",
+        "hadoop.security.group.mapping.ldap.bind.user": "uid=admin,cn=users,cn=accounts,dc=dwx-s0sc,dc=xcu2-8y8x,dc=dev,dc=cldr,dc=work",
         "hadoop.security.group.mapping.ldap.posix.attr.gid.name": "gidNumber",
         "dfs.datanode.du.reserved.pct": "0",
         "hive.llap.io.encode.slice.row.count": "100000",
@@ -960,6 +979,7 @@
         "hive.exec.compress.output": "false",
         "fs.viewfs.rename.strategy": "SAME_MOUNTPOINT",
         "hadoop.proxyuser.hive.hosts": "*",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-external.s3guard.ddb.table.tag.accountId": "9d74eee4-1cad-45d7-b645-7ccf9edbb73d",
         "yarn.resourcemanager.node-labels.provider.fetch-interval-ms": "1800000",
         "yarn.nodemanager.container-metrics.enable": "true",
         "hive.explain.dependency.append.tasktype": "false",
@@ -1046,6 +1066,7 @@
         "dfs.xframe.enabled": "true",
         "hive.default.fileformat.managed": "ORC",
         "dfs.datanode.http.address": "0.0.0.0:9864",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-managed.server-side-encryption-algorithm": "SSE-KMS",
         "fs.s3a.s3guard.cli.prune.age": "86400000",
         "hive.llap.task.scheduler.num.schedulable.tasks.per.node": "0",
         "dfs.web.authentication.filter": "org.apache.hadoop.hdfs.web.AuthFilter",
@@ -1075,7 +1096,7 @@
         "hive.orc.splits.allow.synthetic.fileid": "true",
         "yarn.timeline-service.enabled": "false",
         "hive.zookeeper.session.timeout": "150000ms",
-        "hive.fetch.output.serde": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
+        "hive.fetch.output.serde": "org.apache.hadoop.hive.serde2.DelimitedJSONSerDe",
         "hadoop.http.cross-origin.allowed-headers": "X-Requested-With,Content-Type,Accept,Origin",
         "mapreduce.task.profile": "false",
         "yarn.router.webapp.address": "0.0.0.0:8089",
@@ -1141,7 +1162,7 @@
         "hive.orc.cache.stripe.details.mem.size": "256Mb",
         "hive.llap.task.scheduler.locality.delay": "60s",
         "hadoop.proxyuser.impala.users": "*",
-        "hive.repl.cmrootdir": "s3a://cslaws96/clusters/env-hj7mc8/warehouse-1600696790-pfb5/warehouse/tablespace/external/hive/user/hive/cmroot/",
+        "hive.repl.cmrootdir": "s3a://qe-s3-bucket-weekly-vxr2-dwx-external/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/external/hive/user/hive/cmroot/",
         "yarn.intermediate-data-encryption.enable": "false",
         "hive.llap.task.scheduler.node.disable.backoff.factor": "1.5",
         "hive.map.aggr.hash.force.flush.memory.threshold": "0.9",
@@ -1172,7 +1193,7 @@
         "yarn.sharedcache.uploader.server.address": "0.0.0.0:8046",
         "hive.metastore.db.type": "POSTGRES",
         "hive.tez.cpu.vcores": "-1",
-        "hive.txn.acid.dir.cache.duration": "120",
+        "hive.txn.acid.dir.cache.duration": "0",
         "hive.parquet.timestamp.skip.conversion": "true",
         "hive.tez.task.scale.memory.reserve.fraction": "-1.0",
         "hadoop.registry.zk.quorum": "localhost:2181",
@@ -1197,7 +1218,7 @@
         "dfs.namenode.full.block.report.lease.length.ms": "300000",
         "hive.llap.io.encode.vector.serde.async.enabled": "true",
         "hive.map.aggr.hash.min.reduction.stats": "true",
-        "tez.application.tags": "hive_20200921164733_5af56d4d-18b4-4f40-9dbb-4e4fcb522ebb,userid=some_user",
+        "tez.application.tags": "hive_20200923115641_4eaa9303-d8d6-4d9e-a7d9-dec969781b35,userid=hive",
         "hive.server2.in.place.progress": "true",
         "hive.zookeeper.connection.timeout": "15s",
         "hadoop.http.logs.enabled": "true",
@@ -1205,11 +1226,11 @@
         "hadoop.security.group.mapping.ldap.read.timeout.ms": "60000",
         "yarn.resourcemanager.activities-manager.app-activities.max-queue-length": "100",
         "dfs.namenode.delegation.token.always-use": "false",
-        "hive.server2.zookeeper.namespace": "compute-1600697412-wcr7-hiveserver2",
+        "hive.server2.zookeeper.namespace": "compute-1600861760-w9rh-hiveserver2",
         "yarn.resourcemanager.max-log-aggregation-diagnostics-in-memory": "10",
         "hive.druid.indexer.memory.rownum.max": "75000",
         "hive.llap.daemon.work.dirs": "/apps/llap/work",
-        "hive.query.reexecution.strategies": "overlay,reoptimize",
+        "hive.query.reexecution.strategies": "overlay,reoptimize,reexecute_lost_am,dagsubmit",
         "dfs.client.read.striped.threadpool.size": "18",
         "hive.llap.daemon.metrics.simple.average.data.points": "0",
         "hive.server2.xsrf.filter.enabled": "false",
@@ -1241,13 +1262,13 @@
         "dfs.namenode.https-address": "0.0.0.0:9871",
         "dfs.mover.max-no-move-interval": "60000",
         "hive.server2.limit.connections.per.user.ipaddress": "0",
-        "hive.scheduled.queries.namespace": "compute-1600697412-wcr7",
+        "hive.scheduled.queries.namespace": "compute-1600861760-w9rh",
         "mapreduce.task.profile.reduces": "0-2",
         "dfs.namenode.ec.policies.max.cellsize": "4194304",
         "hadoop.util.hash.type": "murmur",
         "hive.metastore.event.message.factory": "org.apache.hadoop.hive.metastore.messaging.json.gzip.GzipJSONMessageEncoder",
         "dfs.namenode.replication.min": "1",
-        "hive.split.grouping.mode": "query",
+        "hive.split.grouping.mode": "compactor",
         "fs.AbstractFileSystem.file.impl": "org.apache.hadoop.fs.local.LocalFs",
         "net.topology.script.number.args": "100",
         "hive.exec.post.hooks": "org.apache.hadoop.hive.ql.hooks.HiveProtoLoggingHook,com.github.cloudera.ComputeUnidlingHook,org.apache.atlas.hive.hook.HiveHook",
@@ -1281,10 +1302,11 @@
         "hive.multi.insert.move.tasks.share.dependencies": "false",
         "hive.tez.max.partition.factor": "2.0",
         "dfs.datanode.data.dir.perm": "700",
-        "hive.stats.estimate": "true",
+        "hive.stats.estimate": "false",
         "hive.optimize.clustered.sort": "true",
         "dfs.balancer.movedWinWidth": "5400000",
         "yarn.nodemanager.env-whitelist": "JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_HOME,PATH,HADOOP_MAPRED_HOME,LANG,TZ",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-managed.metadatastore.authoritative": "true",
         "dfs.namenode.xattrs.enabled": "true",
         "dfs.datanode.transfer.socket.send.buffer.size": "0",
         "hive.query.isolation.split.size": "128MB",
@@ -1356,8 +1378,9 @@
         "hive.merge.split.update": "false",
         "hive.llap.daemon.output.service.port": "25003",
         "hive.privilege.synchronizer.interval": "1800s",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-external.s3guard.ddb.table.tag.owner": "dwxtestuser@dwxtests.cloudera.com",
         "dfs.balancer.getBlocks.min-block-size": "10485760",
-        "hive.llap.io.encode.enabled": "true",
+        "hive.llap.io.encode.enabled": "false",
         "hive.test.mode.prefix": "test_",
         "hive.metastore.housekeeping.threads.on": "true",
         "yarn.scheduler.maximum-allocation-mb": "8192",
@@ -1379,7 +1402,7 @@
         "hive.vectorized.execution.enabled": "true",
         "hive.exec.copyfile.maxsize": "33554432",
         "dfs.balancer.keytab.enabled": "false",
-        "hive.server2.trusted.domain": "compute-1600697412-wcr7.svc.cluster.local",
+        "hive.server2.trusted.domain": "compute-1600861760-w9rh.svc.cluster.local",
         "io.compression.codec.bzip2.library": "system-native",
         "hive.groupby.position.alias": "false",
         "dfs.client.retry.window.base": "3000",
@@ -1397,10 +1420,11 @@
         "hive.query.results.cache.max.entry.size": "10485760",
         "yarn.resourcemanager.webapp.delegation-token-auth-filter.enabled": "true",
         "hive.test.vectorizer.suppress.fatal.exceptions": "true",
-        "hive.metastore.warehouse.external.dir": "s3a://cslaws96/warehouse/tablespace/external/hive",
+        "hive.metastore.warehouse.external.dir": "s3a://qe-s3-bucket-weekly-vxr2-dwx-external/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/external/hive",
         "io.seqfile.local.dir": "${hadoop.tmp.dir}/io/local",
         "hive.spark.client.server.connect.timeout": "90000ms",
         "yarn.nodemanager.webapp.rest-csrf.methods-to-ignore": "GET,OPTIONS,HEAD",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-external.s3guard.ddb.table.tag.endDate": "09282020",
         "hive.spark.stage.max.tasks": "-1",
         "dfs.encrypt.data.transfer.cipher.key.bitlength": "128",
         "yarn.nodemanager.log-aggregation.roll-monitoring-interval-seconds.min": "3600",
@@ -1414,7 +1438,6 @@
         "mapreduce.task.io.sort.mb": "100",
         "hive.groupby.limit.extrastep": "true",
         "yarn.resourcemanager.zk-state-store.parent-path": "/rmstore",
-        "fs.s3a.s3guard.ddb.region": "us-west-2",
         "hive.server2.webui.use.ssl": "false",
         "hive.druid.kerberos.enable": "false",
         "hadoop.ssl.enabled.protocols": "TLSv1,SSLv2Hello,TLSv1.1,TLSv1.2",
@@ -1428,11 +1451,13 @@
         "dfs.namenode.block.deletion.increment": "1000",
         "ipc.client.connect.max.retries": "10",
         "yarn.nodemanager.container.stderr.tail.bytes": "4096",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-managed.s3guard.ddb.table": "qe-s3-bucket-weekly-vxr2-dwx-managed",
         "hive.server2.thrift.client.retry.delay.seconds": "1s",
         "hive.driver.parallel.compilation.global.limit": "",
         "dfs.webhdfs.rest-csrf.custom-header": "X-XSRF-HEADER",
         "hive.materializedview.fileformat": "ORC",
         "mapreduce.job.heap.memory-mb.ratio": "0.8",
+        "dfs.protected.subdirectories.enable": "false",
         "yarn.nodemanager.log-container-debug-info.enabled": "true",
         "mapreduce.task.profile.map.params": "${mapreduce.task.profile.params}",
         "yarn.resourcemanager.nm-container-queuing.min-queue-wait-time-ms": "10",
@@ -1449,7 +1474,7 @@
         "hive.udtf.auto.progress": "false",
         "hive.archive.enabled": "false",
         "fs.trash.checkpoint.interval": "0",
-        "_hive.tmp_table_space": "file:/efs/tmp/hive/hive/5782298a-4381-456f-a5f3-edb055948de5/_tmp_space.db",
+        "_hive.tmp_table_space": "file:/efs/tmp/hive/hive/f69516af-3a40-4963-be37-5b0814e2616d/_tmp_space.db",
         "yarn.nodemanager.resource.memory.cgroups.soft-limit-percentage": "90.0",
         "dfs.journalnode.http-address": "0.0.0.0:8480",
         "yarn.app.mapreduce.am.staging-dir": "/tmp/hadoop-yarn/staging",
@@ -1478,7 +1503,7 @@
         "dfs.namenode.edit.log.autoroll.multiplier.threshold": "0.5",
         "hadoop.security.group.mapping.ldap.ssl": "false",
         "hive.server2.webui.port": "10100",
-        "fs.defaultFS": "s3a://cslaws96",
+        "fs.defaultFS": "s3a://qe-s3-bucket-weekly-vxr2-dwx-managed",
         "hive.compactor.initiator.failed.compacts.threshold": "2",
         "yarn.nodemanager.disk-health-checker.max-disk-utilization-per-disk-percentage": "90.0",
         "yarn.nodemanager.container-monitor.procfs-tree.smaps-based-rss.enabled": "false",
@@ -1489,8 +1514,8 @@
         "yarn.log-aggregation.file-controller.TFile.class": "org.apache.hadoop.yarn.logaggregation.filecontroller.tfile.LogAggregationTFileController",
         "dfs.namenode.http-address": "0.0.0.0:9870",
         "hadoop.security.crypto.codec.classes.aes.ctr.nopadding": "org.apache.hadoop.crypto.OpensslAesCtrCryptoCodec, org.apache.hadoop.crypto.JceAesCtrCryptoCodec",
-        "_hive.local.session.path": "/tmp/hive/5782298a-4381-456f-a5f3-edb055948de5",
-        "fs.s3a.metadatastore.impl": "org.apache.hadoop.fs.s3a.s3guard.DynamoDBMetadataStore",
+        "_hive.local.session.path": "/tmp/hive/f69516af-3a40-4963-be37-5b0814e2616d",
+        "fs.s3a.metadatastore.impl": "org.apache.hadoop.fs.s3a.s3guard.NullMetadataStore",
         "hive.insert.into.multilevel.dirs": "false",
         "hive.txn.read.locks": "true",
         "hive.hmshandler.retry.attempts": "10",
@@ -1538,6 +1563,7 @@
         "hive.support.quoted.identifiers": "column",
         "yarn.resourcemanager.configuration.provider-class": "org.apache.hadoop.yarn.LocalConfigurationProvider",
         "hive.optimize.filter.stats.reduction": "false",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-external.s3guard.ddb.table.tag.clusterName": "dwx-s0scvy",
         "hadoop.registry.zk.session.timeout.ms": "60000",
         "tfile.io.chunk.size": "1048576",
         "yarn.timeline-service.http-cross-origin.enabled": "false",
@@ -1599,7 +1625,7 @@
         "dfs.namenode.list.openfiles.num.responses": "1000",
         "hive.metastore.stats.ndv.tuner": "0.0",
         "hive.direct.sql.max.query.length": "100",
-        "hive.server2.thrift.bind.host": "hiveserver2-0.hiveserver2-service.compute-1600697412-wcr7.svc.cluster.local",
+        "hive.server2.thrift.bind.host": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local",
         "yarn.timeline-service.client.fd-flush-interval-secs": "10",
         "hive.server2.tez.initialize.default.sessions": "false",
         "hive.txn.max.open.batch": "1000",
@@ -1617,6 +1643,7 @@
         "dfs.quota.by.storage.type.enabled": "true",
         "yarn.nodemanager.collector-service.address": "${yarn.nodemanager.hostname}:8048",
         "fs.abfss.impl": "org.apache.hadoop.fs.azurebfs.SecureAzureBlobFileSystem",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-external.s3guard.ddb.table": "qe-s3-bucket-weekly-vxr2-dwx-external",
         "yarn.sharedcache.client-server.address": "0.0.0.0:8045",
         "hive.server2.tez.external.sessions.assignment.strategy": "BIN_PACK",
         "hive.start.cleanup.scratchdir": "false",
@@ -1628,6 +1655,7 @@
         "hive.server2.webui.host": "0.0.0.0",
         "yarn.timeline-service.webapp.rest-csrf.custom-header": "X-XSRF-Header",
         "hive.query.result.fileformat": "SequenceFile",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-managed.s3guard.ddb.table.tag.accountId": "9d74eee4-1cad-45d7-b645-7ccf9edbb73d",
         "dfs.journalnode.enable.sync": "true",
         "yarn.nodemanager.linux-container-executor.resources-handler.class": "org.apache.hadoop.yarn.server.nodemanager.util.DefaultLCEResourcesHandler",
         "dfs.client.retry.times.get-last-block-length": "3",
@@ -1706,6 +1734,7 @@
         "fs.s3a.select.input.csv.record.delimiter": "\\n",
         "dfs.batched.ls.limit": "100",
         "hive.scheduled.queries.max.executors": "4",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-managed.s3guard.ddb.table.tag.endDate": "09282020",
         "fs.s3a.retry.limit": "7",
         "hive.compute.splits.in.am": "true",
         "hive.compactor.worker.timeout": "86400",
@@ -1751,6 +1780,7 @@
         "dfs.mover.keytab.enabled": "false",
         "hive.metastore.expression.proxy": "org.apache.hadoop.hive.ql.optimizer.ppr.PartitionExpressionForMetastore",
         "yarn.resourcemanager.scheduler.address": "${yarn.resourcemanager.hostname}:8030",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-external.s3guard.ddb.table.create": "true",
         "yarn.timeline-service.leveldb-timeline-store.start-time-write-cache-size": "10000",
         "hive.script.recordreader": "org.apache.hadoop.hive.ql.exec.TextRecordReader",
         "hive.server2.tez.external.sessions.http.port.healthcheck": "35001",
@@ -1789,7 +1819,7 @@
         "yarn.resourcemanager.application-https.policy": "NONE",
         "hive.constraint.notnull.enforce": "true",
         "hive.cluster.delegation.token.store.zookeeper.znode": "/hive/cluster/delegation",
-        "fs.s3a.ssl.channel.mode": "default_jsse",
+        "fs.s3a.ssl.channel.mode": "openssl",
         "hive.query.timeout.seconds": "0s",
         "map.sort.class": "org.apache.hadoop.util.QuickSort",
         "hive.service.metrics.hadoop2.frequency": "30s",
@@ -1835,6 +1865,7 @@
         "hive.cli.print.escape.crlf": "false",
         "dfs.ha.automatic-failover.enabled": "false",
         "hive.trigger.validation.interval": "500ms",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-external.s3guard.ddb.table.tag.clusterId": "env-nsvxr2",
         "yarn.resourcemanager.scheduler.monitor.policies": "org.apache.hadoop.yarn.server.resourcemanager.monitor.capacity.ProportionalCapacityPreemptionPolicy",
         "yarn.router.webapp.interceptor-class.pipeline": "org.apache.hadoop.yarn.server.router.webapp.DefaultRequestInterceptorREST",
         "dfs.use.dfs.network.topology": "true",
@@ -1915,7 +1946,7 @@
         "hive.test.mode": "false",
         "hadoop.rpc.socket.factory.class.default": "org.apache.hadoop.net.StandardSocketFactory",
         "hive.metastore.client.cache.stats.enabled": "false",
-        "hive.metastore.warehouse.dir": "s3a://cslaws96/warehouse/tablespace/managed/hive",
+        "hive.metastore.warehouse.dir": "s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive",
         "fs.AbstractFileSystem.swebhdfs.impl": "org.apache.hadoop.fs.SWebHdfs",
         "yarn.resourcemanager.client.thread-count": "50",
         "hive.tez.skip.local.xml": "true",
@@ -1930,7 +1961,7 @@
         "hive.transactional.concatenate.noblock": "false",
         "yarn.app.mapreduce.am.resource.cpu-vcores": "1",
         "hive.cluster.delegation.token.store.class": "org.apache.hadoop.hive.thrift.MemoryTokenStore",
-        "hive.repl.rootdir": "s3a://cslaws96/clusters/env-hj7mc8/warehouse-1600696790-pfb5/warehouse/tablespace/external/hive/user/hive/repl/",
+        "hive.repl.rootdir": "s3a://qe-s3-bucket-weekly-vxr2-dwx-external/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/external/hive/user/hive/repl/",
         "dfs.namenode.redundancy.queue.restart.iterations": "2400",
         "yarn.resourcemanager.placement-constraints.algorithm.iterator": "SERIAL",
         "fs.viewfs.overload.scheme.target.webhdfs.impl": "org.apache.hadoop.hdfs.web.WebHdfsFileSystem",
@@ -2057,6 +2088,7 @@
         "dfs.namenode.snapshotdiff.listing.limit": "1000",
         "fs.s3a.retry.interval": "500ms",
         "dfs.datanode.http.internal-proxy.port": "0",
+        "hive.txn.valid.txns": "74:67:67,68:",
         "hive.exec.temporary.table.storage": "default",
         "hive.vectorized.groupby.maxentries": "1000000",
         "hive.mapjoin.optimized.hashtable": "true",
@@ -2076,6 +2108,7 @@
         "dfs.datanode.ec.reconstruction.threads": "8",
         "yarn.app.mapreduce.am.scheduler.heartbeat.interval-ms": "1000",
         "hadoop.fuse.timer.period": "5",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-external.s3guard.ddb.region": "us-west-2",
         "hive.spark.client.rpc.max.size": "52428800",
         "ha.health-monitor.check-interval.ms": "1000",
         "hive.optimize.topnkey.partitions.max": "64",
@@ -2105,11 +2138,12 @@
         "hive.hmshandler.force.reload.conf": "false",
         "dfs.blockreport.incremental.intervalMsec": "0",
         "datanucleus.schema.validateColumns": "false",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-external.metadatastore.impl": "org.apache.hadoop.fs.s3a.s3guard.DynamoDBMetadataStore",
         "mapreduce.ifile.readahead": "true",
         "hive.prewarm.numcontainers": "3",
         "datanucleus.identifierFactory": "datanucleus1",
         "hive.cli.errors.ignore": "false",
-        "fs.s3a.s3guard.ddb.table.create": "true",
+        "fs.s3a.s3guard.ddb.table.create": "false",
         "dfs.client.socketcache.capacity": "16",
         "hive.llap.io.vrb.queue.limit.min": "1",
         "hive.txn.manager.dump.lock.state.on.acquire.timeout": "false",
@@ -2118,6 +2152,7 @@
         "hive.optimize.sampling.orderby.number": "1000",
         "dfs.namenode.reencrypt.batch.size": "1000",
         "hive.server2.wm.pool.metrics": "true",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-managed.s3guard.ddb.table.tag.clusterId": "env-nsvxr2",
         "fs.s3a.connection.ssl.enabled": "true",
         "hive.txn.xlock.write": "true",
         "hive.repl.add.raw.reserved.namespace": "false",
@@ -2146,6 +2181,7 @@
         "dfs.namenode.acls.enabled": "false",
         "hive.repl.cm.encryptionzone.rootdir": ".cmroot",
         "dfs.client.short.circuit.replica.stale.threshold.ms": "1800000",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-external.s3guard.ddb.table.tag.actorCrn": "crn:altus:iam:us-west-1:9d74eee4-1cad-45d7-b645-7ccf9edbb73d:user:c49ad06f-59d6-4719-97e2-77cc22ac050e",
         "mapreduce.jobhistory.intermediate-done-dir": "${yarn.app.mapreduce.am.staging-dir}/history/done_intermediate",
         "dfs.client.server-defaults.validity.period.ms": "3600000",
         "mapreduce.client.libjars.wildcard": "true",
@@ -2156,7 +2192,7 @@
         "dfs.namenode.audit.loggers": "default",
         "hive.llap.io.acid": "true",
         "io.serializations": "org.apache.hadoop.io.serializer.WritableSerialization, org.apache.hadoop.io.serializer.avro.AvroSpecificSerialization, org.apache.hadoop.io.serializer.avro.AvroReflectSerialization",
-        "hive.metastore.kerberos.principal": "hive/warehouse-1600696790-pfb5.svc@CSLAWS96.XCU2-8Y8X.DEV.CLDR.WORK",
+        "hive.metastore.kerberos.principal": "hive/warehouse-1600861700-vhvh.svc@DWX-S0SC.XCU2-8Y8X.DEV.CLDR.WORK",
         "hadoop.http.cross-origin.allowed-methods": "GET,POST,HEAD",
         "hive.llap.task.scheduler.node.reenable.min.timeout.ms": "200ms",
         "dfs.namenode.snapshot.capture.openfiles": "false",
@@ -2167,7 +2203,6 @@
         "yarn.nodemanager.container.stderr.pattern": "{*stderr*,*STDERR*}",
         "mapreduce.cluster.local.dir": "${hadoop.tmp.dir}/mapred/local",
         "hadoop.kerberos.kinit.command": "kinit",
-        "list.sink.output.protocol": "9",
         "dfs.namenode.metrics.logger.period.seconds": "600",
         "hive.txn.filter.delete.events": "true",
         "fs.viewfs.overload.scheme.target.abfss.impl": "org.apache.hadoop.fs.azurebfs.SecureAzureBlobFileSystem",
@@ -2197,7 +2232,7 @@
         "fs.swift.impl": "org.apache.hadoop.fs.swift.snative.SwiftNativeFileSystem",
         "yarn.app.mapreduce.shuffle.log.backups": "0",
         "dfs.namenode.kerberos.principal.pattern": "*",
-        "hadoop.security.group.mapping.ldap.base": "cn=users,cn=accounts,dc=cslaws96,dc=xcu2-8y8x,dc=dev,dc=cldr,dc=work",
+        "hadoop.security.group.mapping.ldap.base": "cn=users,cn=accounts,dc=dwx-s0sc,dc=xcu2-8y8x,dc=dev,dc=cldr,dc=work",
         "hive.vectorized.execution.reduce.enabled": "true",
         "dfs.webhdfs.socket.connect-timeout": "60s",
         "yarn.resourcemanager.scheduler.monitor.enable": "false",
@@ -2208,13 +2243,14 @@
         "hive.optimize.index.filter": "true",
         "hive.optimize.dynamic.partition.hashjoin": "true",
         "yarn.timeline-service.version": "1.0f",
-        "hive.llap.task.scheduler.am.registry": "compute-1600697412-wcr7",
+        "hive.llap.task.scheduler.am.registry": "compute-1600861760-w9rh",
         "hive.exec.copyfile.maxnumfiles": "1",
         "yarn.am.liveness-monitor.expiry-interval-ms": "600000",
         "hive.druid.overlord.address.default": "druid-router-service..svc.cluster.local:9888",
         "hive.tez.dynamic.partition.pruning.max.event.size": "1048576",
         "hive.cbo.enable": "true",
         "hive.optimize.remove.sq_count_check": "true",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-managed.s3guard.ddb.table.tag.owner": "dwxtestuser@dwxtests.cloudera.com",
         "hive.optimize.reducededuplication.min.reducer": "4",
         "mapreduce.job.reduce.slowstart.completedmaps": "0.05",
         "yarn.timeline-service.leveldb-timeline-store.path": "${hadoop.tmp.dir}/yarn/timeline",
@@ -2224,6 +2260,7 @@
         "yarn.resourcemanager.delegation.token.max-lifetime": "604800000",
         "yarn.resourcemanager.ha.automatic-failover.enabled": "true",
         "hive.cbo.costmodel.network": "150.0",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-managed.s3guard.ddb.table.tag.actorCrn": "crn:altus:iam:us-west-1:9d74eee4-1cad-45d7-b645-7ccf9edbb73d:user:c49ad06f-59d6-4719-97e2-77cc22ac050e",
         "dfs.datanode.socket.write.timeout": "480000",
         "dfs.namenode.accesstime.precision": "3600000",
         "hadoop.security.group.mapping.ldap.conversion.rule": "none",
@@ -2245,10 +2282,9 @@
         "fs.s3a.retry.throttle.interval": "100ms",
         "mapreduce.jobhistory.webapp.rest-csrf.custom-header": "X-XSRF-Header",
         "yarn.webapp.xfs-filter.enabled": "true",
-        "fs.s3a.authoritative.path": "s3a://cslaws96/warehouse/tablespace/managed/hive",
         "dfs.client.cached.conn.retry": "3",
         "hive.optimize.constraints.join": "true",
-        "hadoop.security.group.mapping.ldap.url": "ldaps://ldap.cslaws96.xcu2-8y8x.dev.cldr.work:636",
+        "hadoop.security.group.mapping.ldap.url": "ldaps://ldap.dwx-s0sc.xcu2-8y8x.dev.cldr.work:636",
         "hive.exec.perf.logger": "org.apache.hadoop.hive.ql.log.PerfLogger",
         "hive.vectorized.row.serde.inputformat.excludes": "org.apache.parquet.hadoop.ParquetInputFormat,org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
         "hadoop.system.tags": "YARN,HDFS,NAMENODE,DATANODE,REQUIRED,SECURITY,KERBEROS,PERFORMANCE,CLIENT\n      ,SERVER,DEBUG,DEPRICATED,COMMON,OPTIONAL",
@@ -2261,11 +2297,12 @@
         "dfs.ha.log-roll.period": "120s",
         "yarn.nodemanager.distributed-scheduling.enabled": "false",
         "yarn.minicluster.fixed.ports": "false",
+        "dfs.namenode.snapshot.filesystem.limit": "65536",
         "hive.metastore.aggregate.stats.cache.max.reader.wait": "1000ms",
         "hive.security.metastore.authenticator.manager": "org.apache.hadoop.hive.ql.security.HadoopDefaultMetastoreAuthenticator",
         "hive.query.reexecution.stats.cache.size": "100000",
         "yarn.nodemanager.resource.percentage-physical-cpu-limit": "100",
-        "mapreduce.job.tags": "hive_20200921164733_5af56d4d-18b4-4f40-9dbb-4e4fcb522ebb,userid=some_user",
+        "mapreduce.job.tags": "hive_20200923115641_4eaa9303-d8d6-4d9e-a7d9-dec969781b35,userid=hive",
         "hive.server2.thrift.http.request.header.size": "6144",
         "dfs.namenode.fs-limits.max-xattr-size": "16384",
         "hive.server2.webui.max.threads": "50",
@@ -2341,7 +2378,7 @@
         "dfs.disk.balancer.enabled": "true",
         "yarn.nodemanager.health-checker.script.timeout-ms": "1200000",
         "hive.hook.proto.events.clean.freq": "1d",
-        "hive.query.isolation.scan.size.threshold": "2000GB",
+        "hive.query.isolation.scan.size.threshold": "400GB",
         "yarn.resourcemanager.fs.state-store.num-retries": "0",
         "hive.use.orc.codec.pool": "true",
         "hadoop.security.uid.cache.secs": "14400",
@@ -2350,7 +2387,7 @@
         "hive.txn.heartbeat.threadpool.size": "5",
         "hive.lock.sleep.between.retries": "60s",
         "hive.test.mode.samplefreq": "32",
-        "hive.server2.authentication": "LDAP",
+        "hive.server2.authentication": "NONE",
         "mapreduce.job.speculative.speculative-cap-running-tasks": "0.1",
         "dfs.datanode.du.reserved.calculator": "org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.ReservedSpaceCalculator$ReservedSpaceCalculatorAbsolute",
         "dfs.datanode.block.id.layout.upgrade.threads": "12",
@@ -2379,9 +2416,10 @@
         "hive.server2.authentication.kerberos.keytab": "/etc/security/keytabs/hive.service.keytab",
         "dfs.http.client.failover.max.attempts": "15",
         "hive.security.authorization.scheduled.queries.serviceadmin.check": "true",
-        "hive.server2.authentication.ldap.baseDN": "cn=users,cn=accounts,dc=cslaws96,dc=xcu2-8y8x,dc=dev,dc=cldr,dc=work",
+        "hive.server2.authentication.ldap.baseDN": "cn=users,cn=accounts,dc=dwx-s0sc,dc=xcu2-8y8x,dc=dev,dc=cldr,dc=work",
         "hive.msck.path.validation": "throw",
         "hadoop.proxyuser.impala.groups": "*",
+        "fs.s3a.bucket.qe-s3-bucket-weekly-vxr2-dwx-managed.s3guard.ddb.table.create": "true",
         "dfs.client.block.write.locateFollowingBlock.retries": "5",
         "fs.s3a.socket.send.buffer": "8192",
         "mapreduce.jvm.system-properties-to-log": "os.name,os.version,java.home,java.runtime.version,java.vendor,java.version,java.vm.name,java.class.path,java.io.tmpdir,user.dir,user.name",
@@ -2406,66 +2444,662 @@
         "yarn.resourcemanager.webapp.https.address": "${yarn.resourcemanager.hostname}:8090",
         "hive.server2.enable.doAs": "false",
         "fs.s3a.retry.throttle.limit": "20",
-        "hive.server2.idle.session.timeout": "1d"
+        "hive.server2.idle.session.timeout": "1d",
+        "fs.s3a.endpoint": "s3.us-west-2.amazonaws.com"
       },
       "explainPlan": {
+        "cboInfo": "Plan optimized by CBO.",
         "STAGE DEPENDENCIES": {
-          "Stage-0": {
+          "Stage-1": {
             "ROOT STAGE": "TRUE"
+          },
+          "Stage-2": {
+            "DEPENDENT STAGES": "Stage-1"
+          },
+          "Stage-0": {
+            "DEPENDENT STAGES": "Stage-2"
+          },
+          "Stage-3": {
+            "DEPENDENT STAGES": "Stage-0"
           }
         },
         "STAGE PLANS": {
-          "Stage-0": {
-            "Kill Query": {
-              "Query IDs:": [
-                "hive_20200921164714_ea4a83d3-c2d1-4be9-8ab1-50aa37ecf70a"
-              ]
+          "Stage-1": {
+            "Tez": {
+              "DagId:": "hive_20200923115641_4eaa9303-d8d6-4d9e-a7d9-dec969781b35:8",
+              "Edges:": {
+                "Reducer 2": {
+                  "parent": "Map 1",
+                  "type": "SIMPLE_EDGE"
+                }
+              },
+              "DagName:": "",
+              "Vertices:": {
+                "Map 1": {
+                  "Map Operator Tree:": [
+                    {
+                      "TableScan": {
+                        "alias:": "delta_default_tmp_compactor_test_compact_1600862199967",
+                        "columns:": [
+                          "operation",
+                          "originaltransaction",
+                          "bucket",
+                          "rowid",
+                          "currenttransaction",
+                          "row"
+                        ],
+                        "database:": "default",
+                        "Statistics:": "Num rows: 1 Data size: 0 Basic stats: PARTIAL Column stats: NONE",
+                        "table:": "delta_default_tmp_compactor_test_compact_1600862199967",
+                        "isTempTable:": "true",
+                        "OperatorId:": "TS_0",
+                        "children": {
+                          "Select Operator": {
+                            "expressions:": "operation (type: int), originaltransaction (type: bigint), bucket (type: int), rowid (type: bigint), currenttransaction (type: bigint), row (type: struct<name:varchar(50),age:tinyint,num_clicks:bigint>)",
+                            "columnExprMap:": {
+                              "_col0": "operation",
+                              "_col1": "originaltransaction",
+                              "_col2": "bucket",
+                              "_col3": "rowid",
+                              "_col4": "currenttransaction",
+                              "_col5": "row"
+                            },
+                            "outputColumnNames:": [
+                              "_col0",
+                              "_col1",
+                              "_col2",
+                              "_col3",
+                              "_col4",
+                              "_col5"
+                            ],
+                            "Statistics:": "Num rows: 1 Data size: 0 Basic stats: PARTIAL Column stats: NONE",
+                            "OperatorId:": "SEL_5",
+                            "children": {
+                              "Reduce Output Operator": {
+                                "columnExprMap:": {
+                                  "KEY.reducesinkkey0": "_col2",
+                                  "KEY.reducesinkkey1": "_col1",
+                                  "KEY.reducesinkkey2": "_col3",
+                                  "VALUE._col0": "_col0",
+                                  "VALUE._col1": "_col4",
+                                  "VALUE._col2": "_col5"
+                                },
+                                "key expressions:": "_col2 (type: int), _col1 (type: bigint), _col3 (type: bigint)",
+                                "null sort order:": "aaa",
+                                "sort order:": "+++",
+                                "Map-reduce partition columns:": "_col2 (type: int)",
+                                "Statistics:": "Num rows: 1 Data size: 0 Basic stats: PARTIAL Column stats: NONE",
+                                "value expressions:": "_col0 (type: int), _col4 (type: bigint), _col5 (type: struct<name:varchar(50),age:tinyint,num_clicks:bigint>)",
+                                "OperatorId:": "RS_6",
+                                "outputname:": "Reducer 2"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "Execution mode:": "vectorized, llap",
+                  "LLAP IO:": "all inputs"
+                },
+                "Reducer 2": {
+                  "Execution mode:": "vectorized, llap",
+                  "Reduce Operator Tree:": {
+                    "Select Operator": {
+                      "expressions:": "VALUE._col0 (type: int), KEY.reducesinkkey1 (type: bigint), KEY.reducesinkkey0 (type: int), KEY.reducesinkkey2 (type: bigint), VALUE._col1 (type: bigint), VALUE._col2 (type: struct<name:varchar(50),age:tinyint,num_clicks:bigint>)",
+                      "columnExprMap:": {
+                        "_col0": "VALUE._col0",
+                        "_col1": "KEY.reducesinkkey1",
+                        "_col2": "KEY.reducesinkkey0",
+                        "_col3": "KEY.reducesinkkey2",
+                        "_col4": "VALUE._col1",
+                        "_col5": "VALUE._col2"
+                      },
+                      "outputColumnNames:": [
+                        "_col0",
+                        "_col1",
+                        "_col2",
+                        "_col3",
+                        "_col4",
+                        "_col5"
+                      ],
+                      "Statistics:": "Num rows: 1 Data size: 0 Basic stats: PARTIAL Column stats: NONE",
+                      "OperatorId:": "SEL_7",
+                      "children": {
+                        "File Output Operator": {
+                          "compressed:": "false",
+                          "Statistics:": "Num rows: 1 Data size: 0 Basic stats: PARTIAL Column stats: NONE",
+                          "table:": {
+                            "input format:": "org.apache.hadoop.hive.ql.io.orc.OrcInputFormat",
+                            "output format:": "org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat",
+                            "serde:": "org.apache.hadoop.hive.ql.io.orc.OrcSerde",
+                            "name:": "default.delta_default_tmp_compactor_test_compact_1600862199967_result"
+                          },
+                          "OperatorId:": "FS_8"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
+          },
+          "Stage-2": {
+            "Dependency Collection": {}
+          },
+          "Stage-0": {
+            "Move Operator": {
+              "tables:": {
+                "replace:": "false",
+                "table:": {
+                  "input format:": "org.apache.hadoop.hive.ql.io.orc.OrcInputFormat",
+                  "output format:": "org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat",
+                  "serde:": "org.apache.hadoop.hive.ql.io.orc.OrcSerde",
+                  "name:": "default.delta_default_tmp_compactor_test_compact_1600862199967_result"
+                }
+              }
+            }
+          },
+          "Stage-3": {
+            "Stats Work": {}
           }
         }
       }
     },
-    "dags": [],
-    "id": 1131,
-    "queryId": "hive_20200921164733_5af56d4d-18b4-4f40-9dbb-4e4fcb522ebb",
-    "startTime": 1600706853245,
-    "query": "KILL QUERY 'hive_20200921164714_ea4a83d3-c2d1-4be9-8ab1-50aa37ecf70a'",
+    "dags": [
+      {
+        "dagInfo": {
+          "id": 8,
+          "dagId": "dag_1600862070512_0001_8",
+          "dagName": "INSERT into table del...ompact_1600862199967 (Stage-1)",
+          "applicationId": "application_1600862070512_0001",
+          "initTime": 1600862202406,
+          "startTime": 1600862202406,
+          "endTime": 1600862209843,
+          "status": "FAILED",
+          "amWebserviceVer": "2",
+          "amLogUrl": null,
+          "queueName": null,
+          "callerId": "hive_20200923115641_4eaa9303-d8d6-4d9e-a7d9-dec969781b35",
+          "callerType": "HIVE_QUERY_ID",
+          "hiveQueryId": 13,
+          "sourceFile": "s3a://qe-s3-bucket-weekly-vxr2-dwx-external/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/external/hive/sys.db/dag_data/date=2020-09-23/dag_1600862070512_0001_8_1_1"
+        },
+        "dagDetails": {
+          "id": 8,
+          "dagInfoId": 8,
+          "hiveQueryId": 13,
+          "diagnostics": "Vertex failed, vertexName=Reducer 2, vertexId=vertex_1600862070512_0001_8_01, diagnostics=[Task failed, taskId=task_1600862070512_0001_8_01_000000, diagnostics=[TaskAttempt 0 failed, info=[Error: Error while running task ( failure ) : attempt_1600862070512_0001_8_01_000000_0:java.lang.RuntimeException: java.lang.RuntimeException: Hive Runtime Error while closing operators: Unable to rename output from: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_task_tmp.-ext-10000/_tmp.000000_0 to: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_tmp.-ext-10000/000000_0/bucket_00001\n\tat org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:296)\n\tat org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:250)\n\tat org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:374)\n\tat org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:75)\n\tat org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:62)\n\tat java.security.AccessController.doPrivileged(Native Method)\n\tat javax.security.auth.Subject.doAs(Subject.java:422)\n\tat org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1898)\n\tat org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:62)\n\tat org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:38)\n\tat org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)\n\tat org.apache.hadoop.hive.llap.daemon.impl.StatsRecordingThreadPool$WrappedCallable.call(StatsRecordingThreadPool.java:118)\n\tat java.util.concurrent.FutureTask.run(FutureTask.java:266)\n\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)\n\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)\n\tat java.lang.Thread.run(Thread.java:748)\nCaused by: java.lang.RuntimeException: Hive Runtime Error while closing operators: Unable to rename output from: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_task_tmp.-ext-10000/_tmp.000000_0 to: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_tmp.-ext-10000/000000_0/bucket_00001\n\tat org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.close(ReduceRecordProcessor.java:407)\n\tat org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:284)\n\t... 15 more\nCaused by: org.apache.hadoop.hive.ql.metadata.HiveException: Unable to rename output from: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_task_tmp.-ext-10000/_tmp.000000_0 to: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_tmp.-ext-10000/000000_0/bucket_00001\n\tat org.apache.hadoop.hive.ql.exec.FileSinkOperator$FSPaths.commitOneOutPath(FileSinkOperator.java:286)\n\tat org.apache.hadoop.hive.ql.exec.FileSinkOperator$FSPaths.commit(FileSinkOperator.java:244)\n\tat org.apache.hadoop.hive.ql.exec.FileSinkOperator$FSPaths.access$500(FileSinkOperator.java:156)\n\tat org.apache.hadoop.hive.ql.exec.FileSinkOperator.closeOp(FileSinkOperator.java:1402)\n\tat org.apache.hadoop.hive.ql.exec.Operator.close(Operator.java:732)\n\tat org.apache.hadoop.hive.ql.exec.Operator.close(Operator.java:756)\n\tat org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.close(ReduceRecordProcessor.java:383)\n\t... 16 more\n], TaskAttempt 1 failed, info=[Error: Error while running task ( failure ) : attempt_1600862070512_0001_8_01_000000_1:java.lang.RuntimeException: java.lang.RuntimeException: Hive Runtime Error while closing operators: Unable to rename output from: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_task_tmp.-ext-10000/_tmp.000000_1 to: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_tmp.-ext-10000/000000_1/bucket_00001\n\tat org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:296)\n\tat org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:250)\n\tat org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:374)\n\tat org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:75)\n\tat org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:62)\n\tat java.security.AccessController.doPrivileged(Native Method)\n\tat javax.security.auth.Subject.doAs(Subject.java:422)\n\tat org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1898)\n\tat org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:62)\n\tat org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:38)\n\tat org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)\n\tat org.apache.hadoop.hive.llap.daemon.impl.StatsRecordingThreadPool$WrappedCallable.call(StatsRecordingThreadPool.java:118)\n\tat java.util.concurrent.FutureTask.run(FutureTask.java:266)\n\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)\n\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)\n\tat java.lang.Thread.run(Thread.java:748)\nCaused by: java.lang.RuntimeException: Hive Runtime Error while closing operators: Unable to rename output from: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_task_tmp.-ext-10000/_tmp.000000_1 to: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_tmp.-ext-10000/000000_1/bucket_00001\n\tat org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.close(ReduceRecordProcessor.java:407)\n\tat org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:284)\n\t... 15 more\nCaused by: org.apache.hadoop.hive.ql.metadata.HiveException: Unable to rename output from: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_task_tmp.-ext-10000/_tmp.000000_1 to: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_tmp.-ext-10000/000000_1/bucket_00001\n\tat org.apache.hadoop.hive.ql.exec.FileSinkOperator$FSPaths.commitOneOutPath(FileSinkOperator.java:286)\n\tat org.apache.hadoop.hive.ql.exec.FileSinkOperator$FSPaths.commit(FileSinkOperator.java:244)\n\tat org.apache.hadoop.hive.ql.exec.FileSinkOperator$FSPaths.access$500(FileSinkOperator.java:156)\n\tat org.apache.hadoop.hive.ql.exec.FileSinkOperator.closeOp(FileSinkOperator.java:1402)\n\tat org.apache.hadoop.hive.ql.exec.Operator.close(Operator.java:732)\n\tat org.apache.hadoop.hive.ql.exec.Operator.close(Operator.java:756)\n\tat org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.close(ReduceRecordProcessor.java:383)\n\t... 16 more\n], TaskAttempt 2 failed, info=[Error: Error while running task ( failure ) : attempt_1600862070512_0001_8_01_000000_2:java.lang.RuntimeException: java.lang.RuntimeException: Hive Runtime Error while closing operators: Unable to rename output from: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_task_tmp.-ext-10000/_tmp.000000_2 to: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_tmp.-ext-10000/000000_2/bucket_00001\n\tat org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:296)\n\tat org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:250)\n\tat org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:374)\n\tat org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:75)\n\tat org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:62)\n\tat java.security.AccessController.doPrivileged(Native Method)\n\tat javax.security.auth.Subject.doAs(Subject.java:422)\n\tat org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1898)\n\tat org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:62)\n\tat org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:38)\n\tat org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)\n\tat org.apache.hadoop.hive.llap.daemon.impl.StatsRecordingThreadPool$WrappedCallable.call(StatsRecordingThreadPool.java:118)\n\tat java.util.concurrent.FutureTask.run(FutureTask.java:266)\n\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)\n\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)\n\tat java.lang.Thread.run(Thread.java:748)\nCaused by: java.lang.RuntimeException: Hive Runtime Error while closing operators: Unable to rename output from: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_task_tmp.-ext-10000/_tmp.000000_2 to: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_tmp.-ext-10000/000000_2/bucket_00001\n\tat org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.close(ReduceRecordProcessor.java:407)\n\tat org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:284)\n\t... 15 more\nCaused by: org.apache.hadoop.hive.ql.metadata.HiveException: Unable to rename output from: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_task_tmp.-ext-10000/_tmp.000000_2 to: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_tmp.-ext-10000/000000_2/bucket_00001\n\tat org.apache.hadoop.hive.ql.exec.FileSinkOperator$FSPaths.commitOneOutPath(FileSinkOperator.java:286)\n\tat org.apache.hadoop.hive.ql.exec.FileSinkOperator$FSPaths.commit(FileSinkOperator.java:244)\n\tat org.apache.hadoop.hive.ql.exec.FileSinkOperator$FSPaths.access$500(FileSinkOperator.java:156)\n\tat org.apache.hadoop.hive.ql.exec.FileSinkOperator.closeOp(FileSinkOperator.java:1402)\n\tat org.apache.hadoop.hive.ql.exec.Operator.close(Operator.java:732)\n\tat org.apache.hadoop.hive.ql.exec.Operator.close(Operator.java:756)\n\tat org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.close(ReduceRecordProcessor.java:383)\n\t... 16 more\n], TaskAttempt 3 failed, info=[Error: Error while running task ( failure ) : attempt_1600862070512_0001_8_01_000000_3:java.lang.RuntimeException: java.lang.RuntimeException: Hive Runtime Error while closing operators: Unable to rename output from: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_task_tmp.-ext-10000/_tmp.000000_3 to: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_tmp.-ext-10000/000000_3/bucket_00001\n\tat org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:296)\n\tat org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:250)\n\tat org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:374)\n\tat org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:75)\n\tat org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:62)\n\tat java.security.AccessController.doPrivileged(Native Method)\n\tat javax.security.auth.Subject.doAs(Subject.java:422)\n\tat org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1898)\n\tat org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:62)\n\tat org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:38)\n\tat org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)\n\tat org.apache.hadoop.hive.llap.daemon.impl.StatsRecordingThreadPool$WrappedCallable.call(StatsRecordingThreadPool.java:118)\n\tat java.util.concurrent.FutureTask.run(FutureTask.java:266)\n\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)\n\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)\n\tat java.lang.Thread.run(Thread.java:748)\nCaused by: java.lang.RuntimeException: Hive Runtime Error while closing operators: Unable to rename output from: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_task_tmp.-ext-10000/_tmp.000000_3 to: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_tmp.-ext-10000/000000_3/bucket_00001\n\tat org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.close(ReduceRecordProcessor.java:407)\n\tat org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:284)\n\t... 15 more\nCaused by: org.apache.hadoop.hive.ql.metadata.HiveException: Unable to rename output from: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_task_tmp.-ext-10000/_tmp.000000_3 to: s3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068/.hive-staging_hive_2020-09-23_11-56-41_347_8900019784544041433-9/_tmp.-ext-10000/000000_3/bucket_00001\n\tat org.apache.hadoop.hive.ql.exec.FileSinkOperator$FSPaths.commitOneOutPath(FileSinkOperator.java:286)\n\tat org.apache.hadoop.hive.ql.exec.FileSinkOperator$FSPaths.commit(FileSinkOperator.java:244)\n\tat org.apache.hadoop.hive.ql.exec.FileSinkOperator$FSPaths.access$500(FileSinkOperator.java:156)\n\tat org.apache.hadoop.hive.ql.exec.FileSinkOperator.closeOp(FileSinkOperator.java:1402)\n\tat org.apache.hadoop.hive.ql.exec.Operator.close(Operator.java:732)\n\tat org.apache.hadoop.hive.ql.exec.Operator.close(Operator.java:756)\n\tat org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.close(ReduceRecordProcessor.java:383)\n\t... 16 more\n]], Vertex did not succeed due to OWN_TASK_FAILURE, failedTasks:1 killedTasks:1, Vertex vertex_1600862070512_0001_8_01 [Reducer 2] killed/failed due to:OWN_TASK_FAILURE]\nDAG did not succeed due to VERTEX_FAILURE. failedVertices:1 killedVertices:0",
+          "counters": [
+            {
+              "counterGroupName": "org.apache.tez.common.counters.DAGCounter",
+              "counters": [
+                {
+                  "counterName": "NUM_FAILED_TASKS",
+                  "counterValue": 6,
+                  "counterInstanceCount": 1,
+                  "counterMaxValue": 6,
+                  "counterMinValue": 6
+                },
+                {
+                  "counterName": "NUM_KILLED_TASKS",
+                  "counterValue": 1,
+                  "counterInstanceCount": 1,
+                  "counterMaxValue": 1,
+                  "counterMinValue": 1
+                },
+                {
+                  "counterName": "NUM_SUCCEEDED_TASKS",
+                  "counterValue": 2,
+                  "counterInstanceCount": 1,
+                  "counterMaxValue": 2,
+                  "counterMinValue": 2
+                },
+                {
+                  "counterName": "TOTAL_LAUNCHED_TASKS",
+                  "counterValue": 9,
+                  "counterInstanceCount": 1,
+                  "counterMaxValue": 9,
+                  "counterMinValue": 9
+                },
+                {
+                  "counterName": "OTHER_LOCAL_TASKS",
+                  "counterValue": 2,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 1,
+                  "counterMinValue": 1
+                },
+                {
+                  "counterName": "AM_CPU_MILLISECONDS",
+                  "counterValue": 1460,
+                  "counterInstanceCount": 1,
+                  "counterMaxValue": 1460,
+                  "counterMinValue": 1460
+                }
+              ]
+            },
+            {
+              "counterGroupName": "org.apache.tez.common.counters.FileSystemCounter",
+              "counterGroupDisplayName": "File System Counters",
+              "counters": [
+                {
+                  "counterName": "FILE_BYTES_WRITTEN",
+                  "counterValue": 323,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 181,
+                  "counterMinValue": 142
+                },
+                {
+                  "counterName": "S3A_BYTES_READ",
+                  "counterValue": 7141,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 4727,
+                  "counterMinValue": 2414
+                }
+              ]
+            },
+            {
+              "counterGroupName": "org.apache.tez.common.counters.TaskCounter",
+              "counters": [
+                {
+                  "counterName": "SPILLED_RECORDS",
+                  "counterValue": 6,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 4,
+                  "counterMinValue": 2
+                },
+                {
+                  "counterName": "TASK_DURATION_MILLIS",
+                  "counterValue": 2501,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 1814,
+                  "counterMinValue": 687
+                },
+                {
+                  "counterName": "INPUT_RECORDS_PROCESSED",
+                  "counterValue": 6,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 4,
+                  "counterMinValue": 2
+                },
+                {
+                  "counterName": "INPUT_SPLIT_LENGTH_BYTES",
+                  "counterValue": 4921,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 3255,
+                  "counterMinValue": 1666
+                },
+                {
+                  "counterName": "OUTPUT_RECORDS",
+                  "counterValue": 6,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 4,
+                  "counterMinValue": 2
+                },
+                {
+                  "counterName": "OUTPUT_BYTES",
+                  "counterValue": 247,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 161,
+                  "counterMinValue": 86
+                },
+                {
+                  "counterName": "OUTPUT_BYTES_WITH_OVERHEAD",
+                  "counterValue": 271,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 175,
+                  "counterMinValue": 96
+                },
+                {
+                  "counterName": "OUTPUT_BYTES_PHYSICAL",
+                  "counterValue": 211,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 125,
+                  "counterMinValue": 86
+                },
+                {
+                  "counterName": "SHUFFLE_CHUNK_COUNT",
+                  "counterValue": 2,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 1,
+                  "counterMinValue": 1
+                }
+              ]
+            },
+            {
+              "counterGroupName": "HIVE",
+              "counters": [
+                {
+                  "counterName": "RECORDS_IN_Map_1",
+                  "counterValue": 6,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 4,
+                  "counterMinValue": 2
+                },
+                {
+                  "counterName": "RECORDS_OUT_INTERMEDIATE_Map_1",
+                  "counterValue": 6,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 4,
+                  "counterMinValue": 2
+                },
+                {
+                  "counterName": "RECORDS_OUT_OPERATOR_RS_6",
+                  "counterValue": 6,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 4,
+                  "counterMinValue": 2
+                },
+                {
+                  "counterName": "RECORDS_OUT_OPERATOR_SEL_5",
+                  "counterValue": 6,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 4,
+                  "counterMinValue": 2
+                },
+                {
+                  "counterName": "RECORDS_OUT_OPERATOR_TS_0",
+                  "counterValue": 6,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 4,
+                  "counterMinValue": 2
+                }
+              ]
+            },
+            {
+              "counterGroupName": "org.apache.hadoop.hive.llap.counters.LlapIOCounters",
+              "counters": [
+                {
+                  "counterName": "ALLOCATED_BYTES",
+                  "counterValue": 3735552,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 2490368,
+                  "counterMinValue": 1245184
+                },
+                {
+                  "counterName": "ALLOCATED_USED_BYTES",
+                  "counterValue": 1466,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 959,
+                  "counterMinValue": 507
+                },
+                {
+                  "counterName": "CACHE_MISS_BYTES",
+                  "counterValue": 1739,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 1151,
+                  "counterMinValue": 588
+                },
+                {
+                  "counterName": "CONSUMER_TIME_NS",
+                  "counterValue": 3061458,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 1881506,
+                  "counterMinValue": 1179952
+                },
+                {
+                  "counterName": "DECODE_TIME_NS",
+                  "counterValue": 26542911,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 25289126,
+                  "counterMinValue": 1253785
+                },
+                {
+                  "counterName": "HDFS_TIME_NS",
+                  "counterValue": 2235369680,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 1713197450,
+                  "counterMinValue": 522172230
+                },
+                {
+                  "counterName": "IO_CPU_NS",
+                  "counterValue": 97150630,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 68144789,
+                  "counterMinValue": 29005841
+                },
+                {
+                  "counterName": "IO_USER_NS",
+                  "counterValue": 40000000,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 40000000,
+                  "counterMinValue": 0
+                },
+                {
+                  "counterName": "METADATA_CACHE_MISS",
+                  "counterValue": 12,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 8,
+                  "counterMinValue": 4
+                },
+                {
+                  "counterName": "NUM_DECODED_BATCHES",
+                  "counterValue": 6,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 4,
+                  "counterMinValue": 2
+                },
+                {
+                  "counterName": "NUM_DECODED_ROWS",
+                  "counterValue": 6,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 4,
+                  "counterMinValue": 2
+                },
+                {
+                  "counterName": "NUM_VECTOR_BATCHES",
+                  "counterValue": 6,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 4,
+                  "counterMinValue": 2
+                },
+                {
+                  "counterName": "ROWS_EMITTED",
+                  "counterValue": 6,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 4,
+                  "counterMinValue": 2
+                },
+                {
+                  "counterName": "SELECTED_ROWGROUPS",
+                  "counterValue": 6,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 4,
+                  "counterMinValue": 2
+                },
+                {
+                  "counterName": "TOTAL_IO_TIME_NS",
+                  "counterValue": 441710251,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 238836530,
+                  "counterMinValue": 202873721
+                }
+              ]
+            },
+            {
+              "counterGroupName": "org.apache.hadoop.hive.llap.counters.LlapWmCounters",
+              "counters": [
+                {
+                  "counterName": "SPECULATIVE_QUEUED_NS",
+                  "counterValue": 672316,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 594088,
+                  "counterMinValue": 78228
+                },
+                {
+                  "counterName": "SPECULATIVE_RUNNING_NS",
+                  "counterValue": 2481872681,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 1805038560,
+                  "counterMinValue": 676834121
+                }
+              ]
+            },
+            {
+              "counterGroupName": "org.apache.hadoop.hive.llap.daemon.impl.StatsRecordingThreadPool$WrappedCallable$LlapExecutorCounters",
+              "counters": [
+                {
+                  "counterName": "EXECUTOR_CPU_NS",
+                  "counterValue": 426576107,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 269300793,
+                  "counterMinValue": 157275314
+                },
+                {
+                  "counterName": "EXECUTOR_USER_NS",
+                  "counterValue": 320000000,
+                  "counterInstanceCount": 2,
+                  "counterMaxValue": 220000000,
+                  "counterMinValue": 100000000
+                }
+              ]
+            },
+            {
+              "counterGroupName": "org.apache.hadoop.hive.ql.exec.tez.HiveInputCounters",
+              "counters": [
+                {
+                  "counterName": "GROUPED_INPUT_SPLITS_Map_1",
+                  "counterValue": 2,
+                  "counterInstanceCount": 1,
+                  "counterMaxValue": 2,
+                  "counterMinValue": 2
+                },
+                {
+                  "counterName": "INPUT_DIRECTORIES_Map_1",
+                  "counterValue": 6,
+                  "counterInstanceCount": 1,
+                  "counterMaxValue": 6,
+                  "counterMinValue": 6
+                },
+                {
+                  "counterName": "INPUT_FILES_Map_1",
+                  "counterValue": 6,
+                  "counterInstanceCount": 1,
+                  "counterMaxValue": 6,
+                  "counterMinValue": 6
+                },
+                {
+                  "counterName": "RAW_INPUT_SPLITS_Map_1",
+                  "counterValue": 6,
+                  "counterInstanceCount": 1,
+                  "counterMaxValue": 6,
+                  "counterMinValue": 6
+                }
+              ]
+            }
+          ],
+          "dagPlan": {
+            "dagName": "INSERT into table del...ompact_1600862199967 (Stage-1)",
+            "dagInfo": "{\"context\":\"Hive\",\"description\":\"INSERT into table delta_default_tmp_compactor_test_compact_1600862199967_result select `operation`, `originalTransaction`, `bucket`, `rowId`, `currentTransaction`, `row` from delta_default_tmp_compactor_test_compact_1600862199967\"}",
+            "dagContext": {
+              "callerId": "hive_20200923115641_4eaa9303-d8d6-4d9e-a7d9-dec969781b35",
+              "callerType": "HIVE_QUERY_ID",
+              "context": "HIVE",
+              "description": "INSERT into table delta_default_tmp_compactor_test_compact_1600862199967_result select `operation`, `originalTransaction`, `bucket`, `rowId`, `currentTransaction`, `row` from delta_default_tmp_compactor_test_compact_1600862199967"
+            },
+            "version": 2,
+            "vertices": [
+              {
+                "vertexName": "Map 1",
+                "processorClass": "org.apache.hadoop.hive.ql.exec.tez.MapTezProcessor",
+                "outEdgeIds": [
+                  "563042772"
+                ],
+                "additionalInputs": [
+                  {
+                    "name": "delta_default_tmp_compactor_test_compact_1600862199967",
+                    "class": "org.apache.tez.mapreduce.input.MRInputLegacy",
+                    "initializer": "org.apache.hadoop.hive.ql.exec.tez.HiveSplitGenerator"
+                  }
+                ]
+              },
+              {
+                "vertexName": "Reducer 2",
+                "processorClass": "org.apache.hadoop.hive.ql.exec.tez.ReduceTezProcessor",
+                "inEdgeIds": [
+                  "563042772"
+                ],
+                "additionalOutputs": [
+                  {
+                    "name": "out_Reducer 2",
+                    "class": "org.apache.hadoop.hive.ql.exec.tez.NullMROutput"
+                  }
+                ]
+              }
+            ],
+            "edges": [
+              {
+                "edgeId": "563042772",
+                "inputVertexName": "Map 1",
+                "outputVertexName": "Reducer 2",
+                "dataMovementType": "SCATTER_GATHER",
+                "dataSourceType": "PERSISTED",
+                "schedulingType": "SEQUENTIAL",
+                "edgeSourceClass": "org.apache.tez.runtime.library.output.OrderedPartitionedKVOutput",
+                "edgeDestinationClass": "org.apache.tez.runtime.library.input.OrderedGroupedKVInput"
+              }
+            ]
+          },
+          "vertexNameIdMapping": {
+            "Map 1": "vertex_1600862070512_0001_8_00",
+            "Reducer 2": "vertex_1600862070512_0001_8_01"
+          }
+        },
+        "config": null
+      }
+    ],
+    "id": 13,
+    "queryId": "hive_20200923115641_4eaa9303-d8d6-4d9e-a7d9-dec969781b35",
+    "startTime": 1600862201347,
+    "query": "INSERT into table delta_default_tmp_compactor_test_compact_1600862199967_result select `operation`, `originalTransaction`, `bucket`, `rowId`, `currentTransaction`, `row` from delta_default_tmp_compactor_test_compact_1600862199967",
     "highlightedQuery": null,
-    "endTime": 1600706853913,
-    "elapsedTime": 668,
-    "status": "SUCCESS",
+    "endTime": 1600862213500,
+    "elapsedTime": 12153,
+    "status": "ERROR",
     "queueName": "",
     "userId": "hive",
-    "requestUser": "some_user",
-    "cpuTime": null,
-    "physicalMemory": null,
-    "virtualMemory": null,
-    "dataRead": null,
-    "dataWritten": null,
-    "operationId": "RqW7HN_OTGyMFqT8IFBZig",
+    "requestUser": "hive",
+    "cpuTime": 0,
+    "physicalMemory": 0,
+    "virtualMemory": 0,
+    "dataRead": 0,
+    "dataWritten": 7141,
+    "operationId": "",
     "clientIpAddress": null,
-    "hiveInstanceAddress": "100.100.152.2",
+    "hiveInstanceAddress": "10.117.122.144",
     "hiveInstanceType": null,
-    "sessionId": "5782298a-4381-456f-a5f3-edb055948de5",
+    "sessionId": "f69516af-3a40-4963-be37-5b0814e2616d",
     "logId": null,
-    "threadId": "HiveServer2-Background-Pool: Thread-13958",
-    "executionMode": "NONE",
-    "tablesRead": [],
-    "tablesWritten": [],
+    "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-50_executor",
+    "executionMode": "LLAP",
+    "tablesRead": [
+      {
+        "table": "delta_default_tmp_compactor_test_compact_1600862199967",
+        "database": "default"
+      }
+    ],
+    "tablesWritten": [
+      {
+        "table": "delta_default_tmp_compactor_test_compact_1600862199967_result",
+        "database": "default"
+      }
+    ],
     "databasesUsed": [
-      {}
+      {
+        "default": 2
+      }
     ],
     "domainId": null,
     "llapAppId": null,
-    "usedCBO": "No",
+    "usedCBO": "Yes",
     "processed": true,
     "createdAt": [
       2020,
       9,
-      21,
-      16,
-      47,
-      35
+      23,
+      11,
+      56,
+      44
     ]
   }
 }
