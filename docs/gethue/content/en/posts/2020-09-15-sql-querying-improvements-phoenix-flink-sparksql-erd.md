@@ -55,7 +55,7 @@ Hue is getting a more polished experience with [Apache Phoenix](https://phoenix.
 
 ### Apache Phoenix
 
-Apache Phoenix makes it easy to query the [Apache HBase](https://hbase.apache.org/) database via SQL. Now the integration is fully working out of the box and several corner cases (e.g. handle the default Phoenix database, list tables and column in the left assist, impersonation support...) have been fixed.
+Apache Phoenix makes it easy to query the [Apache HBase](https://hbase.apache.org/) database via SQL. Now the [integration](/sql-querying-apache-hbase-with-apache-phoenix/) is fully working out of the box and several corner cases (e.g. handle the default Phoenix database, list tables and column in the left assist, impersonation support...) have been fixed.
 
 ### Apache Flink SQL
 
@@ -65,7 +65,7 @@ Apache Flink support for [SQL querying](https://ci.apache.org/projects/flink/fli
 
 ### Apache SparkSql
 
-SparkSql is very popular and getting a [round of improvements](https://gethue.com/blog/quick-task-sql-editor-for-apache-spark-sql-with-livy/) when executing SQL queries via Apache Livy. Note that the traditional SqlAlchemy [connectors](https://docs.gethue.com/administrator/configuration/connectors/#apache-spark-sql) or HiveServer Thrift are working too.
+SparkSql is very popular and getting a [round of improvements](/blog/quick-task-sql-editor-for-apache-spark-sql-with-livy/) when executing SQL queries via Apache Livy. Note that the traditional SqlAlchemy [connectors](https://docs.gethue.com/administrator/configuration/connectors/#apache-spark-sql) or HiveServer Thrift are working too.
 
 ## UDF / Functions
 
