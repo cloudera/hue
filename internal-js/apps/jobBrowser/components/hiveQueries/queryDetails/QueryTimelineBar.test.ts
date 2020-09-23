@@ -15,11 +15,11 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils'
-import ProgressBar from './ProgressBar.vue'
+import QueryTimelineBar from './QueryTimelineBar.vue'
 
-describe('ProgressBar.vue', () => {
-  it('should render a progress bar', () => {
-    const wrapper = shallowMount(ProgressBar, {
+describe('QueryTimelineBar.vue', () => {
+  it('should render a timeline bar', () => {
+    const wrapper = shallowMount(QueryTimelineBar, {
       propsData: {
         title: 'Some title',
         value: 132,
@@ -29,8 +29,8 @@ describe('ProgressBar.vue', () => {
     expect(wrapper.element).toMatchSnapshot();
   })
 
-  it('should render a progress bar with 0 total (div 0 check)', () => {
-    const wrapper = shallowMount(ProgressBar, {
+  it('should render a timeline bar with 0 total (div 0 check)', () => {
+    const wrapper = shallowMount(QueryTimelineBar, {
       propsData: {
         value: 0,
         total: 0

@@ -19,22 +19,22 @@
 <template>
   <div class="timeline-bars">
     <div class="groups">
-      <progress-bar :total="perf.total" :value="perf.groupTotal.pre" title="Pre-Execution + DAG construction"></progress-bar>
-      <progress-bar :total="perf.total" :value="perf.groupTotal.submit" title="DAG Submission"></progress-bar>
-      <progress-bar :total="perf.total" :value="perf.groupTotal.running" title="DAG Runtime"></progress-bar>
-      <progress-bar :total="perf.total" :value="perf.groupTotal.pre" title="Pre-Execution + DAG construction"></progress-bar>
-      <progress-bar :total="perf.total" :value="perf.groupTotal.post" title="Post Execution"></progress-bar>
+      <query-timeline-bar :total="perf.total" :value="perf.groupTotal.pre" title="Pre-Execution + DAG construction"></query-timeline-bar>
+      <query-timeline-bar :total="perf.total" :value="perf.groupTotal.submit" title="DAG Submission"></query-timeline-bar>
+      <query-timeline-bar :total="perf.total" :value="perf.groupTotal.running" title="DAG Runtime"></query-timeline-bar>
+      <query-timeline-bar :total="perf.total" :value="perf.groupTotal.pre" title="Pre-Execution + DAG construction"></query-timeline-bar>
+      <query-timeline-bar :total="perf.total" :value="perf.groupTotal.post" title="Post Execution"></query-timeline-bar>
     </div>
     <div class="sub-groups">
-      <progress-bar :total="perf.total" :value="perf.compile" title="Compile"></progress-bar>
-      <progress-bar :total="perf.total" :value="perf.parse" title="Parse"></progress-bar>
-      <progress-bar :total="perf.total" :value="perf.TezBuildDag" title="Build Dag"></progress-bar>
-      <progress-bar :total="perf.total" :value="perf.TezSubmitDag" title="Submit Dag"></progress-bar>
-      <progress-bar :total="perf.total" :value="perf.TezSubmitToRunningDag" title="Submit To Running"></progress-bar>
-      <progress-bar :total="perf.total" :value="perf.TezRunDag" title="Run Dag"></progress-bar>
-      <progress-bar :total="perf.total" :value="perf.PostHiveProtoLoggingHook" title="Post ATS Hook"></progress-bar>
-      <progress-bar :total="perf.total" :value="perf.RemoveTempOrDuplicateFiles" title="Remove Files"></progress-bar>
-      <progress-bar :total="perf.total" :value="perf.RenameOrMoveFiles" title="Rename Or Move Files"></progress-bar>
+      <query-timeline-bar :total="perf.total" :value="perf.compile" title="Compile"></query-timeline-bar>
+      <query-timeline-bar :total="perf.total" :value="perf.parse" title="Parse"></query-timeline-bar>
+      <query-timeline-bar :total="perf.total" :value="perf.TezBuildDag" title="Build Dag"></query-timeline-bar>
+      <query-timeline-bar :total="perf.total" :value="perf.TezSubmitDag" title="Submit Dag"></query-timeline-bar>
+      <query-timeline-bar :total="perf.total" :value="perf.TezSubmitToRunningDag" title="Submit To Running"></query-timeline-bar>
+      <query-timeline-bar :total="perf.total" :value="perf.TezRunDag" title="Run Dag"></query-timeline-bar>
+      <query-timeline-bar :total="perf.total" :value="perf.PostHiveProtoLoggingHook" title="Post ATS Hook"></query-timeline-bar>
+      <query-timeline-bar :total="perf.total" :value="perf.RemoveTempOrDuplicateFiles" title="Remove Files"></query-timeline-bar>
+      <query-timeline-bar :total="perf.total" :value="perf.RenameOrMoveFiles" title="Rename Or Move Files"></query-timeline-bar>
     </div>
   </div>
 </template>
@@ -43,11 +43,11 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
-  import ProgressBar from '../../common/ProgressBar.vue';
+  import QueryTimelineBar from './QueryTimelineBar.vue';
   import { NormalizedQueryPerf } from '../index';
 
   @Component({
-    components: { ProgressBar }
+    components: { QueryTimelineBar }
   })
   export default class QueryTimelineBars extends Vue {
     @Prop({ required: true })

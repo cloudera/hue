@@ -26,7 +26,7 @@
   import { Prop } from 'vue-property-decorator';
 
   @Component
-  export default class ProgressBar extends Vue {
+  export default class QueryTimelineBar extends Vue {
     @Prop({ required: false })
     title?: string;
     @Prop({ required: true })
