@@ -862,7 +862,7 @@ Update the versions to the next release (current release +1):
 
 How to count the number of commits since the last release:
 
-    git log --oneline --since=2019-08-01 | grep 'release' -n -i
+    git log --oneline --since=2020-01-01 | grep 'release' -n -i
     git log --oneline -449 > commits.txt
 
     cat commits.txt | sed 's/\(HUE\-[[:digit:]][[:digit:]][[:digit:]][[:digit:]]\)/\[\1\]\(https:\/\/issues.cloudera.org\/browse\/\1\)/' | sed 's/^\(.*\)/* \1/' > commits.md
@@ -873,22 +873,22 @@ And add them and the authors to the release notes:
 
 Pushing the release branch:
 
-    git push origin HEAD:branch-4.7.0
+    git push origin HEAD:branch-4.8.0
 
 Tagging the release:
 
-    git tag -a release-4.7.0 -m "release-4.7.0"
-    git push origin release-4.7.0
+    git tag -a release-4.8.0 -m "release-4.8.0"
+    git push origin release-4.8.0
 
 Building the tarball release:
 
     make prod
 
-Source of the release: https://github.com/cloudera/hue/archive/release-4.7.0.zip
+Source of the release: https://github.com/cloudera/hue/archive/release-4.8.0.zip
 
 Push to the CDN:
 
-    scp hue-4.7.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
+    scp hue-4.8.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
 
 ### Websites
 
@@ -901,17 +901,17 @@ Other things to update:
 
 Instructions:
 
-    docker build https://github.com/cloudera/hue.git#release-4.7.0 -t gethue/hue:4.7.0 -f tools/docker/hue/Dockerfile
-    docker tag gethue/hue:4.7.0 gethue/hue:latest
+    docker build https://github.com/cloudera/hue.git#release-4.8.0 -t gethue/hue:4.8.0 -f tools/docker/hue/Dockerfile
+    docker tag gethue/hue:4.8.0 gethue/hue:latest
     docker images
     docker login
     docker push gethue/hue
-    docker push gethue/hue:4.7.0
+    docker push gethue/hue:4.8.0
 
-    docker build . -t gethue/nginx:4.7.0 -f tools/docker/nginx/Dockerfile;
-    docker tag gethue/nginx:4.7.0 gethue/nginx:latest
+    docker build . -t gethue/nginx:4.8.0 -f tools/docker/nginx/Dockerfile;
+    docker tag gethue/nginx:4.8.0 gethue/nginx:latest
     docker push gethue/nginx
-    docker push gethue/nginx:4.7.0
+    docker push gethue/nginx:4.8.0
 
 ### Documentation
 
@@ -923,12 +923,12 @@ The manual process otherwise would be to [build it](#Documentation) and push it 
 
     ssh root@docs.gethue.com
     cd /var/www/docs.gethue.com
-    mkdir 4.7.0
-    rm latest; ln -s 4.7.0 latest
+    mkdir 4.8.0
+    rm latest; ln -s 4.8.0 latest
 
-    scp -r docs/docs-site/public/* root@docs.gethue.com:/var/www/docs.gethue.com/4.7.0
+    scp -r docs/docs-site/public/* root@docs.gethue.com:/var/www/docs.gethue.com/4.8.0
 
-    scp -r hue-4.6/build/release/prod/hue-4.7.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads/
+    scp -r hue-4.6/build/release/prod/hue-4.8.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads/
 
 ### NPM registry
 
