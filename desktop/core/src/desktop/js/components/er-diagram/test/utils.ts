@@ -22,13 +22,13 @@ export const dbName = 'db-name';
 export const tableNamePrefix = 'table-name';
 export const columnNamePrefix = 'column-name';
 
-export function createTables(tableCount: number, columnCount: number): Array<Table> {
-  const entities: Array<Table> = [];
+export function createTables(tableCount: number, columnCount: number): Table[] {
+  const entities: Table[] = [];
   for (let t = 0; t < tableCount; t++) {
     const tableName = `${tableNamePrefix}-${t}`;
     const tableId: string = Table.buildId(dbName, tableName);
 
-    const columns: Array<Column> = [];
+    const columns: Column[] = [];
 
     for (let c = 0; c < columnCount; c++) {
       columns.push(new Column(tableId, `${columnNamePrefix}-${c}`));

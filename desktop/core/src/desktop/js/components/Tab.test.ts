@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils'
-import Tab from './Tab.vue'
+import { shallowMount } from '@vue/test-utils';
+import Tab from './Tab.vue';
 
 describe('Tab.vue', () => {
   it('should render', () => {
@@ -23,8 +23,12 @@ describe('Tab.vue', () => {
     const wrapper = shallowMount(Tab, {
       propsData: { title: 'Tab title' },
       provide: {
-        addTab: (tab: Tab): void => { reportedTab = tab },
-        removeTab: () => {}
+        addTab: (tab: Tab): void => {
+          reportedTab = tab;
+        },
+        removeTab: () => {
+          // Empty
+        }
       },
       slots: {
         default: '<div>Some tab content</div>'
@@ -36,5 +40,5 @@ describe('Tab.vue', () => {
     } else {
       fail('provided addTab not called with the tab');
     }
-  })
-})
+  });
+});

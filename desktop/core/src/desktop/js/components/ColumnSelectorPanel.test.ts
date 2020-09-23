@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils';
 import { Column } from 'components/HueTable';
-import ColumnSelectorPanel from './ColumnSelectorPanel.vue'
+import ColumnSelectorPanel from './ColumnSelectorPanel.vue';
 
 describe('ColumnSelectorPanel.vue', () => {
   it('should render', () => {
@@ -26,14 +26,17 @@ describe('ColumnSelectorPanel.vue', () => {
       }
     });
     expect(wrapper.element).toMatchSnapshot();
-  })
+  });
 
   it('should render with checkboxes', () => {
     const wrapper = shallowMount(ColumnSelectorPanel, {
       propsData: {
-        columns: <Column[]>[{ key: 'a', label: 'A' }, { key: 'b', label: 'B' }]
+        columns: <Column[]>[
+          { key: 'a', label: 'A' },
+          { key: 'b', label: 'B' }
+        ]
       }
     });
     expect(wrapper.element).toMatchSnapshot();
-  })
-})
+  });
+});

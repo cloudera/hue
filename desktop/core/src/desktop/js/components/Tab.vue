@@ -37,15 +37,15 @@
     @Prop({ required: true })
     title!: string;
 
-    isActive: boolean = false;
+    isActive = false;
 
-    mounted() {
+    mounted(): void {
       if (this.addTab) {
-        this.addTab(this)
+        this.addTab(this);
       }
     }
 
-    destroyed() {
+    destroyed(): void {
       if (this.removeTab) {
         this.removeTab(this);
       }

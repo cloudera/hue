@@ -19,9 +19,11 @@
 <template>
   <div>
     <ul>
-      <li v-for='tab in tabs' :key='tab.title' @click='selectTab(tab)'>{{ tab.title }}</li>
+      <li v-for="tab in tabs" :key="tab.title" @click="selectTab(tab)">
+        {{ tab.title }}
+      </li>
     </ul>
-    <slot></slot>
+    <slot />
   </div>
 </template>
 
@@ -36,7 +38,7 @@
     tabs: Tab[] = [];
 
     @Provide()
-    addTab(tab: Tab) {
+    addTab(tab: Tab): void {
       this.tabs.push(tab);
       if (this.tabs.length === 1) {
         this.selectTab(this.tabs[0]);
@@ -44,7 +46,7 @@
     }
 
     @Provide()
-    removeTab(tab: Tab) {
+    removeTab(tab: Tab): void {
       const index = this.tabs.indexOf(tab);
       if (index !== -1) {
         this.$delete(this.tabs, index);
@@ -54,11 +56,12 @@
       }
     }
 
-    selectTab(tab: Tab) {
-      this.tabs.forEach(other => { other.isActive = other === tab });
+    selectTab(tab: Tab): void {
+      this.tabs.forEach(other => {
+        other.isActive = other === tab;
+      });
     }
   }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

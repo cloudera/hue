@@ -11,10 +11,14 @@ exports[`Tabs.vue should render tabs 1`] = `
 <div>
   <ul>
     <li>
+      
       foo
+    
     </li>
     <li>
+      
       bar
+    
     </li>
   </ul>
    

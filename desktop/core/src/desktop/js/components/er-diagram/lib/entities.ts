@@ -25,7 +25,7 @@ export class Table implements IEntity {
 
   database: string;
   name: string;
-  columns: Array<Column>;
+  columns: Column[];
 
   className: string;
 

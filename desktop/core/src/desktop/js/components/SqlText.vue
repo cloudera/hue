@@ -19,7 +19,7 @@
 <!-- This one is based on ko.highlight.js -->
 
 <template>
-  <div class="ace-highlight"></div>
+  <div class="ace-highlight" />
 </template>
 
 <script lang="ts">
@@ -30,11 +30,11 @@
 
   interface Ace {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    require: (module: string) => any
+    require: (module: string) => any;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const getAce = (): Ace => (window as any).ace
+  const getAce = (): Ace => (window as any).ace;
 
   @Component
   export default class SqlText extends Vue {
@@ -50,7 +50,7 @@
     splitLines = false;
 
     @Watch('value')
-    renderAce() {
+    renderAce(): void {
       if (this.value) {
         const ace = getAce();
         const impalaRules = ace.require('ace/mode/impala_highlight_rules');
@@ -60,10 +60,14 @@
         const config = ace.require('ace/config');
 
         const Tokenizer = tokenizer.Tokenizer;
-        const Rules = this.dialect === 'impala' ? impalaRules.ImpalaHighlightRules : hiveRules.HiveHighlightRules;
+        const Rules =
+          this.dialect === 'impala'
+            ? impalaRules.ImpalaHighlightRules
+            : hiveRules.HiveHighlightRules;
 
         const res: string[] = [];
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore: totalStorage interface missing
         config.loadModule(['theme', $.totalStorage('hue.ace.theme') || 'ace/theme/hue']);
 
@@ -82,8 +86,8 @@
               screenColumn = txt.$renderToken(stringBuilder, screenColumn, token, value);
             } catch (e) {
               console.warn(
-                  value,
-                  'Failed to get screen column due to some parsing errors, skip rendering.'
+                value,
+                'Failed to get screen column due to some parsing errors, skip rendering.'
               );
             }
           }
@@ -95,8 +99,8 @@
             } catch (e) {
               if (console && console.warn) {
                 console.warn(
-                    value,
-                    'This token has some parsing errors and it has been rendered without highlighting.'
+                  value,
+                  'This token has some parsing errors and it has been rendered without highlighting.'
                 );
               }
               stringBuilder.push(value);
@@ -118,14 +122,14 @@
 
           if (tokens && tokens.tokens.length) {
             renderSimpleLine(
-                new Text(document.createElement('div')),
-                renderedTokens,
-                tokens.tokens
+              new Text(document.createElement('div')),
+              renderedTokens,
+              tokens.tokens
             );
           }
 
           res.push(
-              '<div class="ace_line ' +
+            '<div class="ace_line ' +
               additionalClass +
               '">' +
               renderedTokens.join('') +
@@ -138,13 +142,13 @@
           return;
         }
         element.innerHTML =
-            '<div class="ace_editor ace-hue"' +
-            (this.enableOverflow ? ' style="overflow: initial !important;"' : '') +
-            '><div class="ace_layer" style="position: static;' +
-            (this.enableOverflow ? ' overflow: initial !important;' : '') +
-            '">' +
-            res.join('') +
-            '</div></div>';
+          '<div class="ace_editor ace-hue"' +
+          (this.enableOverflow ? ' style="overflow: initial !important;"' : '') +
+          '><div class="ace_layer" style="position: static;' +
+          (this.enableOverflow ? ' overflow: initial !important;' : '') +
+          '">' +
+          res.join('') +
+          '</div></div>';
         if (this.enableOverflow) {
           $(element).css({ overflow: 'auto' });
         }
@@ -152,11 +156,10 @@
       }
     }
 
-    mounted() {
+    mounted(): void {
       this.renderAce();
     }
   }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

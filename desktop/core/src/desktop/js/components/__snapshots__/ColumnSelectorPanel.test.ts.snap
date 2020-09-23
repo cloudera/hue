@@ -29,7 +29,9 @@ exports[`ColumnSelectorPanel.vue should render 1`] = `
       class="btn btn-default"
       type="button"
     >
+      
       Apply
+    
     </button>
   </div>
 </div>
@@ -61,7 +63,9 @@ exports[`ColumnSelectorPanel.vue should render with checkboxes 1`] = `
           type="checkbox"
           value="[object Object]"
         />
+        
         A
+      
       </label>
     </li>
     <li>
@@ -70,7 +74,9 @@ exports[`ColumnSelectorPanel.vue should render with checkboxes 1`] = `
           type="checkbox"
           value="[object Object]"
         />
+        
         B
+      
       </label>
     </li>
   </ul>
@@ -82,7 +88,9 @@ exports[`ColumnSelectorPanel.vue should render with checkboxes 1`] = `
       class="btn btn-default"
       type="button"
     >
+      
       Apply
+    
     </button>
   </div>
 </div>
