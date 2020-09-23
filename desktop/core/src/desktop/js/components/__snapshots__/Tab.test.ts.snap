@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Tab.vue should render 1`] = `
+<div
+  style="display: none;"
+>
+  <div>
+    Some tab content
+  </div>
+</div>
+`;
