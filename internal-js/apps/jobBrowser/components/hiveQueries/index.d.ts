@@ -91,8 +91,8 @@ export interface Query {
   sessionId: string;
   startTime: number;
   status: string;
-  tablesRead: { table: string, database: string }[];
-  tablesWritten: { table: string, database: string }[];
+  tablesRead: { table: string; database: string }[];
+  tablesWritten: { table: string; database: string }[];
   tablesReadWithDatabase?: string; // TODO: From API or adaption? type?
   tablesWrittenWithDatabase?: string; // TODO: From API or adaption? type?
   threadId: string;
@@ -108,7 +108,7 @@ export interface FacetValue {
 
 export interface Facet {
   facetField: string;
-  values: FacetValue[]
+  values: FacetValue[];
 }
 
 export interface SearchFacet {
@@ -143,16 +143,6 @@ export interface FieldInfo {
   sortable: boolean;
 }
 
-export interface SearchRequest {
-  endTime: number;
-  limit: number;
-  offset: number;
-  text?: string;
-  sortText: string;
-  startTime: number;
-  type: string;
-}
-
 export interface SearchMeta {
   limit: number;
   offset: number;
@@ -162,12 +152,12 @@ export interface SearchMeta {
 interface TableDefinition {
   rangeData: {
     title: string;
-  },
-  columnPreferences: { id: string }[]
+  };
+  columnPreferences: { id: string }[];
 }
 
 interface DataProcessor {
   facets: {
     fieldCount?: number;
-  }
+  };
 }

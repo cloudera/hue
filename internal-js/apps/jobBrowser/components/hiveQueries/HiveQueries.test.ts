@@ -14,12 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils'
-import HiveQueries from './HiveQueries.vue'
+import { SearchResponse } from './apiUtils';
+import * as apiUtils from './apiUtils';
+import { shallowMount } from '@vue/test-utils';
+import HiveQueries from './HiveQueries.vue';
 
 describe('HiveQueries.vue', () => {
   it('should render', () => {
+    jest
+      .spyOn(apiUtils, 'search')
+      .mockImplementation(
+        async (): Promise<SearchResponse> =>
+          Promise.resolve({ meta: { limit: 25, offset: 0, size: 0 }, queries: [] })
+      );
     const wrapper = shallowMount(HiveQueries);
     expect(wrapper.element).toMatchSnapshot();
-  })
-})
+  });
+});

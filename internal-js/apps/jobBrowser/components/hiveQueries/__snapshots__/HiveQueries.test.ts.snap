@@ -2,7 +2,7 @@
 
 exports[`HiveQueries.vue should render 1`] = `
 <query-table-stub
-  columns=""
+  columns="[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]"
   queries=""
 />
 `;

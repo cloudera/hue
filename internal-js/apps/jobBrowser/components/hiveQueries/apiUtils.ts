@@ -16,38 +16,59 @@
  * limitations under the License.
  */
 
-import { Facet, FieldInfo, Query, Search, SearchMeta, SearchRequest } from './index';
+import axios from 'axios';
+import { Facet, FieldInfo, Query, Search, SearchMeta } from './index';
 
-export const fetchSuggestedSearches = async (options: { entityType: string }): Promise<Search[]> => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const fetchSuggestedSearches = async (options: {
+  entityType: string;
+}): Promise<Search[]> => {
   // TODO: Implement GET 'api/suggested-searches?entityType=x'
   const response = { searches: [] };
   return response.searches;
-}
+};
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const fetchFacets = async (options: {
   startTime: number;
   endTime: number;
   facetFields: string;
-}): Promise<{ facets: Facet[], rangeFacets: unknown[] }> => {
+}): Promise<{ facets: Facet[]; rangeFacets: unknown[] }> => {
   // TODO: Implement GET '/api/query/facets?startTime=x&endTime=y&facetFields=z'
   return { facets: [], rangeFacets: [] };
-}
+};
 
 export const fetchFieldsInfo = async (): Promise<FieldInfo[]> => {
   // TODO: Implement GET '/api/query/fields-information'
   const response = { fieldsInfo: [] };
   return response.fieldsInfo;
+};
+
+export interface SearchRequest {
+  endTime: number;
+  limit: number;
+  offset: number;
+  text?: string;
+  sortText: string;
+  startTime: number;
+  type: string;
 }
 
-export const search = async (options: SearchRequest): Promise<{ meta: SearchMeta; queries: Query[] }> => {
-  // TODO: Implement POST '/api/query/search' ({ search: options } in body)
-  return { meta: { limit: 0, offset: 0, size:0 }, queries: [] }
+export interface SearchResponse {
+  meta: SearchMeta;
+  queries: Query[];
 }
 
+export const search = async (options: SearchRequest): Promise<SearchResponse> => {
+  return await axios.post<SearchRequest, SearchResponse>('proxy/api/query/search', options);
+};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const deleteSearch = async (search: Search): Promise<void> => {
   // TODO: Implement POST ...
-}
+};
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const saveSearch = async (options: {
   name: string;
   category: string;
@@ -56,4 +77,4 @@ export const saveSearch = async (options: {
   clause: string;
 }): Promise<void> => {
   // TODO: Implement POST ...
-}
+};

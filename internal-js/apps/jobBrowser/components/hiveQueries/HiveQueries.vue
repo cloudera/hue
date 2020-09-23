@@ -18,20 +18,21 @@
 
 <template>
   <query-table
-      v-if="!selectedQuery && !queriesToDiff"
-      :queries="queries"
-      :columns="columns"
-      @diff-queries="diffQueries"
-      @query-selected="querySelected"
-  ></query-table>
-  <query-details v-else-if="selectedQuery" :query="selectedQuery"></query-details>
-  <query-diff v-else :queries="queriesToDiff"></query-diff>
+    v-if="!selectedQuery && !queriesToDiff"
+    :queries="queries"
+    :columns="columns"
+    @diff-queries="diffQueries"
+    @query-selected="querySelected"
+  />
+  <query-details v-else-if="selectedQuery" :query="selectedQuery" />
+  <query-diff v-else :queries="queriesToDiff" />
 </template>
 
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Column } from '../../../../../desktop/core/src/desktop/js/components/HueTable';
+  import { search } from '../../../../../internal-js/apps/jobBrowser/components/hiveQueries/apiUtils';
   import QueryDiff from './queryDiff/QueryDiff.vue';
   import QueryDetails from './queryDetails/QueryDetails.vue';
   import { Query } from './index';
@@ -44,23 +45,53 @@
     selectedQuery?: Query;
     queriesToDiff?: Query[];
 
+    // TODO: Move to QueryTable?
     queries: Query[] = [];
-    columns: Column[] = []; // TODO: Move to QueryTable?
+    columns: Column[] = [
+      { key: 'status', label: 'Status' },
+      { key: 'query', label: 'Query' },
+      { key: 'queueName', label: 'Queue' },
+      { key: 'requestUser', label: 'User' },
+      { key: 'tablesRead', label: 'Tables Read' },
+      { key: 'tablesWritten', label: 'Tables Written' },
+      { key: 'startTime', label: 'Start Time' },
+      { key: 'dagID', label: 'DAG ID' },
+      { key: 'appID', label: 'Application ID' },
+      { key: 'cpuTime', label: 'CPU Time' },
+      { key: 'physicalMemory', label: 'Physical Memory' },
+      { key: 'virtualMemory', label: 'Virtual Memory' },
+      { key: 'dataRead', label: 'Data Read' },
+      { key: 'dataWritten', label: 'Data Written' },
+      { key: 'executionMode', label: 'Execution Mode' },
+      { key: 'usedCBO', label: 'Cost Based Optimizer (CBO)' }
+    ];
 
-    showTable() {
+    async created(): void {
+      const now = Date.now();
+      const searchResponse = await search({
+        endTime: now,
+        limit: 25,
+        offset: 0,
+        sortText: 'startTime:DESC',
+        startTime: now - 1000 * 60 * 60 * 24 * 7,
+        type: 'basic'
+      });
+      this.queries = searchResponse.queries;
+    }
+
+    showTable(): void {
       this.selectedQuery = undefined;
       this.queriesToDiff = undefined;
     }
 
-    diffQueries(queries: Query[]) {
+    diffQueries(queries: Query[]): void {
       this.queriesToDiff = queries;
     }
 
-    querySelected(query: Query) {
+    querySelected(query: Query): void {
       this.selectedQuery = query;
     }
   }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>
