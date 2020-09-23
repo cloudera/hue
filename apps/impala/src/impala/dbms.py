@@ -40,17 +40,18 @@ def get_query_server_config(connector=None):
   if connector and has_connectors():
     query_server = get_query_server_config_via_connector(connector)
   else:
-    server_port = get_hs2_http_port() if conf.USE_THRIFT_HTTP.get() else conf.SERVER_PORT.get()
+    server_port = get_hs2_http_port() if conf.USE_THRIFT_HTTP.get() and not conf.PROXY_ENDPOINT.get() else conf.SERVER_PORT.get()
     query_server = {
         'server_name': 'impala',
         'dialect': 'impala',
         'server_host': conf.SERVER_HOST.get(),
         'server_port': server_port,
         'principal': conf.IMPALA_PRINCIPAL.get(),
-        'http_url': '%(protocol)s://%(host)s:%(port)s' % {
+        'http_url': '%(protocol)s://%(host)s:%(port)s%(cli_endpoint)s' % {
             'protocol': 'https' if conf.SSL.ENABLED.get() else 'http',
             'host': conf.SERVER_HOST.get(),
-            'port': server_port
+            'port': server_port,
+            'cli_endpoint': conf.PROXY_ENDPOINT.get()
           },
         'impersonation_enabled': conf.IMPERSONATION_ENABLED.get(),
         'querycache_rows': conf.QUERYCACHE_ROWS.get(),
