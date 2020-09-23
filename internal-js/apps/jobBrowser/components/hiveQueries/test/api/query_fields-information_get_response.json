@@ -1,0 +1,356 @@
+{
+  "fieldsInfo": [
+    {
+      "fieldName": "queryId",
+      "displayName": "Query Id",
+      "searchable": true,
+      "sortable": true,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "query",
+      "displayName": "Query",
+      "searchable": false,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "startTime",
+      "displayName": "Start Time",
+      "searchable": true,
+      "sortable": true,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "endTime",
+      "displayName": "End Time",
+      "searchable": true,
+      "sortable": true,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "elapsedTime",
+      "displayName": "Elapsed Time",
+      "searchable": true,
+      "sortable": true,
+      "facetable": false,
+      "rangeFacetable": true
+    },
+    {
+      "fieldName": "status",
+      "displayName": "Status",
+      "searchable": true,
+      "sortable": true,
+      "facetable": true,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "queueName",
+      "displayName": "Queue Name",
+      "searchable": true,
+      "sortable": true,
+      "facetable": true,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "userId",
+      "displayName": "User Id",
+      "searchable": true,
+      "sortable": true,
+      "facetable": true,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "requestUser",
+      "displayName": "Request User",
+      "searchable": true,
+      "sortable": true,
+      "facetable": true,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "cpuTime",
+      "displayName": "Cpu Time",
+      "searchable": true,
+      "sortable": true,
+      "facetable": false,
+      "rangeFacetable": true
+    },
+    {
+      "fieldName": "physicalMemory",
+      "displayName": "Physical Memory",
+      "searchable": true,
+      "sortable": true,
+      "facetable": false,
+      "rangeFacetable": true
+    },
+    {
+      "fieldName": "virtualMemory",
+      "displayName": "Virtual Memory",
+      "searchable": true,
+      "sortable": true,
+      "facetable": false,
+      "rangeFacetable": true
+    },
+    {
+      "fieldName": "dataRead",
+      "displayName": "Data Read",
+      "searchable": true,
+      "sortable": true,
+      "facetable": false,
+      "rangeFacetable": true
+    },
+    {
+      "fieldName": "dataWritten",
+      "displayName": "Data Written",
+      "searchable": true,
+      "sortable": true,
+      "facetable": false,
+      "rangeFacetable": true
+    },
+    {
+      "fieldName": "operationId",
+      "displayName": "Operation Id",
+      "searchable": true,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "clientIpAddress",
+      "displayName": "Client Ip Address",
+      "searchable": true,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "hiveInstanceAddress",
+      "displayName": "Hive Instance Address",
+      "searchable": true,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "hiveInstanceType",
+      "displayName": "Hive Instance Type",
+      "searchable": true,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "sessionId",
+      "displayName": "Session Id",
+      "searchable": true,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "logId",
+      "displayName": "Log Id",
+      "searchable": true,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "threadId",
+      "displayName": "Thread Id",
+      "searchable": true,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "executionMode",
+      "displayName": "Execution Mode",
+      "searchable": true,
+      "sortable": false,
+      "facetable": true,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "tablesRead",
+      "displayName": "Tables Read",
+      "searchable": true,
+      "sortable": false,
+      "facetable": true,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "tablesWritten",
+      "displayName": "Tables Written",
+      "searchable": true,
+      "sortable": false,
+      "facetable": true,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "databasesUsed",
+      "displayName": "Databases Used",
+      "searchable": false,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "domainId",
+      "displayName": "Domain Id",
+      "searchable": true,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "llapAppId",
+      "displayName": "Llap App Id",
+      "searchable": true,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "usedCBO",
+      "displayName": "Used C B O",
+      "searchable": true,
+      "sortable": false,
+      "facetable": true,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "waitingTime",
+      "displayName": "Waiting Time",
+      "searchable": true,
+      "sortable": true,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "resourceUtilization",
+      "displayName": "Resource Utilization",
+      "searchable": true,
+      "sortable": true,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "dagId",
+      "displayName": "Dag Id",
+      "searchable": true,
+      "sortable": true,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "dagName",
+      "displayName": "Dag Name",
+      "searchable": true,
+      "sortable": true,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "applicationId",
+      "displayName": "Application Id",
+      "searchable": true,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "dagInitTime",
+      "displayName": "Dag Init Time",
+      "searchable": false,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "dagStartTime",
+      "displayName": "Dag Start Time",
+      "searchable": false,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "dagEndTime",
+      "displayName": "Dag End Time",
+      "searchable": false,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "dagStatus",
+      "displayName": "Dag Status",
+      "searchable": false,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "amWebserviceVer",
+      "displayName": "Am Webservice Ver",
+      "searchable": true,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "amLogUrl",
+      "displayName": "Am Log Url",
+      "searchable": true,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "dagQueueName",
+      "displayName": "Dag Queue Name",
+      "searchable": true,
+      "sortable": true,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "callerId",
+      "displayName": "Caller Id",
+      "searchable": true,
+      "sortable": true,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "callerType",
+      "displayName": "Caller Type",
+      "searchable": false,
+      "sortable": true,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "hiveQueryId",
+      "displayName": "Hive Query Id",
+      "searchable": false,
+      "sortable": false,
+      "facetable": false,
+      "rangeFacetable": false
+    },
+    {
+      "fieldName": "sourceFile",
+      "displayName": "Source File",
+      "searchable": false,
+      "sortable": true,
+      "facetable": false,
+      "rangeFacetable": false
+    }
+  ]
+}
