@@ -93,698 +93,629 @@ Runs with Python 2.7+. 3.6+.
 
 ### List of commits
 
-* 58ef4c0d12 [HUE-9181](https://issues.cloudera.org/browse/HUE-9181) [gethue] Add more examples of DB connector configurations
-* 173d728ef6 [HUE-9181](https://issues.cloudera.org/browse/HUE-9181) [docs] Perform release 4.8
-* daf8d0784c [HUE-9181](https://issues.cloudera.org/browse/HUE-9181) [docs] 4.8 release notes
-* 9682b0be42 [HUE-9181](https://issues.cloudera.org/browse/HUE-9181) [blog] 4.8 release post
-* 64b1e07e97 [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [frontend] Initial clean-up of local optimizer strategy
-* f2637c4741 [HUE-9247](https://issues.cloudera.org/browse/HUE-9247) [editor] Fix issue where the location webworker throws exception for non-active statements
-* a73055cbd7 [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [frontend] Check complexity for all dialects when configured in editor V2
-* 1199c6480d [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [frontend] Improve instantiation of optimizer strategies
-* c5b27a73b3 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Fix js exception in the admin examples page
-* cca37e1a7d [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [frontend] Fix exceptions in the connector page filter
-* e8c45bf095 [HUE-9246](https://issues.cloudera.org/browse/HUE-9246) [core] Enable SAML certificate creation with passphrase support. (#1096)
-* b99879b7a0 Hue Aquascan CVEs (#1095)
-* cdad7c7b24 [HUE-9243](https://issues.cloudera.org/browse/HUE-9243) [jobbrowser] Adding new TestHS2Api unit test suite
-* 5b6021caf9 [HUE-9243](https://issues.cloudera.org/browse/HUE-9243) [jobbrowser] improve get_jobs to handle jobbrowser on blacklist
-* dc237ca7d8 [HUE-9297](https://issues.cloudera.org/browse/HUE-9297) [optimizer] Adding localStrategy with LIMIT alert
-* 3cee6411ad [HUE-8824](https://issues.cloudera.org/browse/HUE-8824) [optimizer] Refactor optimization mode selection
-* 7a89e7580c [HUE-8824](https://issues.cloudera.org/browse/HUE-8824) [optimizer] Precent empty risk alerts
-* c4f18c1ca5 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Prepare get_logs API to support connector
-* 590572fded [HUE-9235](https://issues.cloudera.org/browse/HUE-9235) [metrics] Format long lines and remove noisy LOG
-* 876f68706e [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Use impersonation value from setting
-* 41a27e2ee7 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Fix test connection result logic display
-* baecc0a68d [HUE-9216](https://issues.cloudera.org/browse/HUE-9216) [core] Upgrade SqlAlchemy to support Foreign Keys API
-* b861b1d8f0 [HUE-9219](https://issues.cloudera.org/browse/HUE-9219) [parser] Improve PartitionBy rules in impala (#1088)
-* a1bb893868 [HUE-9235](https://issues.cloudera.org/browse/HUE-9235) [core] Change prometheus metric log level to debug
-* 48e3c92632 [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [frontend] Use the real connector in the context selector in editor v2
-* 5e61caebfb [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Fix issue with loading back a snippet from history in editor v2
-* 879aba379e [HUE-9221](https://issues.cloudera.org/browse/HUE-9221) [tools] Mark open jiras as "in progress" when using hueJira.js
-* d3146ed861 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [api] Remove duplicated document types in get_config
-* fb2c7f0986 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Add a patch method to simplify compatibilities
-* df1f7df3f6 [HUE-9176](https://issues.cloudera.org/browse/HUE-9176) [core] Introduce Vue dependency (#1080)
-* 640687d143 [HUE-9239](https://issues.cloudera.org/browse/HUE-9239) [frontend] Add custom package.json for parser generation
-* 9578cc73e0 [HUE-9239](https://issues.cloudera.org/browse/HUE-9239) [frontend] Fix simpleGet reference for the threads and metrics pages
-* 32a5638a26 [HUE-9236](https://issues.cloudera.org/browse/HUE-9236) [frontend] Remove Ace build related packages from the main package.json
-* ad024c3307 [HUE-9236](https://issues.cloudera.org/browse/HUE-9236) [frontend] Remove tools related packages from the main package.json
-* 7dc21fab35 [HUE-8993](https://issues.cloudera.org/browse/HUE-8993) [editor] Do not propose export result when there is no FS
-* 6c3ade1292 [HUE-8738](https://issues.cloudera.org/browse/HUE-8738) [task] Do not error when caching and empty query result
-* 629a76d32f [HUE-8768](https://issues.cloudera.org/browse/HUE-8768) [editor] Avoid error when trying to close non existing past query
-* 2ac2915a4c [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [phoenix] Adding Phoenix connector dialect
-* 9beeacbc9e [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [s3] Avoid 500 with Python3 on exception catching
-* e3dfba6478 [HUE-9240](https://issues.cloudera.org/browse/HUE-9240) [hive] Do no skip first table column on LLAP upstream
-* ed95c75f5e [HUE-9181](https://issues.cloudera.org/browse/HUE-9181) [blog] Localized blogs into Japanese (#1092)
-* 5e6aa8d885 [HUE-9235](https://issues.cloudera.org/browse/HUE-9235) [core] Clean up metrics for exporting to prometheus
-* bc99874027 [HUE-9181](https://issues.cloudera.org/browse/HUE-9181) [blog] Document the admin improvements coming in 4.8
-* 05c548f87a [HUE-8824](https://issues.cloudera.org/browse/HUE-8824) [optimizer] Simplify api to just require user instead of request
-* 5b60570493 [HUE-8824](https://issues.cloudera.org/browse/HUE-8824) [editor] Refactor optimizer API to follow notebook API
-* 55867053cb [HUE-9217](https://issues.cloudera.org/browse/HUE-9217) [editor] SQL Highlight for JOIN autocomplete
-* bd88a4ea68 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Fix npm blog post output indentation
-* 8affbd3804 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Fix wrong title level for Apache Solr
-* 8ab0e5f863 [HUE-8993](https://issues.cloudera.org/browse/HUE-8993) [importer] Do not propose file import when there is no fs
-* 007140a213 [HUE-9238](https://issues.cloudera.org/browse/HUE-9238) [design] Apache Phoenix SQL support
-* 1d7598c9b9 [HUE-8993](https://issues.cloudera.org/browse/HUE-8993) [core] Globally disabled sqoop importer
-* 6ec4a536fa [HUE-9236](https://issues.cloudera.org/browse/HUE-9236) [core] Log the npm and node versions on make
-* 70088f878b [HUE-9224](https://issues.cloudera.org/browse/HUE-9224) [frontend] Move the connectors category filter to a dropdown
-* 12c5057c9e [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Add README to the source of the docs
-* 505a7933f5 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Update the docs and blog post about parser npm module
-* 87a5cd37bb [HUE-9192](https://issues.cloudera.org/browse/HUE-9192) [tools] Remove old impala helm charts
-* 7d3e34ac0a [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [notebook] Small code formatting
-* 756907b6e6 [HUE-9216](https://issues.cloudera.org/browse/HUE-9216) [sqlalchemy] Primary keys
-* e9491cf873 [HUE-9216](https://issues.cloudera.org/browse/HUE-9216) [sqlalchemy] Foreign keys
-* 5cff7b99c1 [HUE-9223](https://issues.cloudera.org/browse/HUE-9223) [frontend] Fix high risk npm package vulnerabilities
-* 1313689812 [HUE-8993](https://issues.cloudera.org/browse/HUE-8993) [core] Avoid hardcoding an hdfs cluster in the image
-* 266d67bda9 [HUE-9234](https://issues.cloudera.org/browse/HUE-9234) [core] Add coordinator_url in hue.ini config in impala section (#1089)
-* 65e4a85cf6 [HUE-9210](https://issues.cloudera.org/browse/HUE-9210) [blog] Add post hue active users metrics imporvements
-* 3f03736957 [HUE-9194](https://issues.cloudera.org/browse/HUE-9194) [blog] Add post on setting up prometheus server
-* 906062aff6 [HUE-9221](https://issues.cloudera.org/browse/HUE-9221) [tools] Add a tool that automatically adds review and commit urls to Jira comments
-* 68c38c7902 [HUE-9218](https://issues.cloudera.org/browse/HUE-9218) [frontend] Remove unused wysihtml lib
-* 21e5ff752e [HUE-9220](https://issues.cloudera.org/browse/HUE-9220) [editor] Fix issue where query error messages are not shown in the UI
-* 55cc9b0aa5 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [editor] Add missing canceled status in checkStatus check
-* 3672582db9 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [impala] Do not hardcode impersonation setting to true
-* 4e90cd052b [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [impala] Do not hardcode impersonation setting to true
-* 7a3d3a93d6 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [optimizer] Convert queries to bytes if needed
-* 4a74295c48 [HUE-8768](https://issues.cloudera.org/browse/HUE-8768) [editor] cancel and close statements can error
-* 1249063112 [HUE-9209](https://issues.cloudera.org/browse/HUE-9209) [Hue] Adding SAML dependancies for Hue docker container (#1087)
-* 5aa0fa0e48 [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [frontend] Improve connector component stability
-* 5113c05f59 [HUE-9215](https://issues.cloudera.org/browse/HUE-9215) [assist] Prevent loading namespaces for indexes and streams in the assist panel
-* 040753d9a9 [HUE-9214](https://issues.cloudera.org/browse/HUE-9214) [search] Fix invalid contents of clipboard.min.js
-* b3c6766c84 [HUE-9213](https://issues.cloudera.org/browse/HUE-9213) [ui] Fix js exception in multiLineEllipsisHandler
-* 030d96b39e [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [tb] Fix optimizer related js exception in the table browser
-* 7c1c7ff90f [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [frontend] Fix ko context issues in the connectors component
-* 834ab6b990 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [blog] Fix titles in getting started with Docker post
-* 94c9504cbd [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [design] Adding tasks for Editor 3
-* 438cc0fa83 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [notebook] Add tests for sql utils
-* a037d0746d [HUE-9212](https://issues.cloudera.org/browse/HUE-9212) [core] Fix missing login-modal causes auto logout failed
-* 0ac734b51d [HUE-9209](https://issues.cloudera.org/browse/HUE-9209) [Hue] Adding SAML dependancies for Hue docker container (#1086)
-* 384692587b [HUE-9211](https://issues.cloudera.org/browse/HUE-9211) [editor] Saving a query gets a popup exception saying 'dialect'
-* 73f4d61878 [HUE-8824](https://issues.cloudera.org/browse/HUE-8824) [metadata] Simplify optimizer interface names
-* 2606c874b3 [HUE-8824](https://issues.cloudera.org/browse/HUE-8824) [metadata] Small config styling refactoring
-* 282f6bceed [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [core] Rename export_csvxls with tests suffix
-* 800e902aab replace wrong syntax in insertValuesList (#1082)
-* 1a784b983c [HUE-9208](https://issues.cloudera.org/browse/HUE-9208) [tasks] Python 2 compatibility for cache delimiter char
-* cbcd4b7a33 [HUE-9208](https://issues.cloudera.org/browse/HUE-9208) [tasks] Properly rename task tests with correct prefix
-* 842d6a90ee [HUE-9208](https://issues.cloudera.org/browse/HUE-9208) [tasks] Mock celery task to enable tests without celery
-* 9fe414c8cf [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Light roadmap update
-* ddd013daa1 [HUE-9208](https://issues.cloudera.org/browse/HUE-9208) [editor] Port get log call to v2 and sql task
-* 214dd41369 [HUE-9208](https://issues.cloudera.org/browse/HUE-9208) [editor] Port close statement to v2 and sql task
-* 105af052f2 [HUE-8768](https://issues.cloudera.org/browse/HUE-8768) [task] First basic unit test for async SQL query task
-* 79c85468c8 [HUE-8768](https://issues.cloudera.org/browse/HUE-8768) [task] Adding first unit test for sync SQL query task
-* 11313cbc41 [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Also send batch results via WS if available
-* f34ada1cab [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Log connector dialect name instead of connector id
-* 5d9f15deff [HUE-8768](https://issues.cloudera.org/browse/HUE-8768) [editor] Send websocket channel in v2
-* 9b275e914e [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [frontend] Introduce optimizer strategies
-* 2abca579ed [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [frontend] Extract optimizer logic from the ApiHelper
-* b473dfc636 [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [frontend] Move the connectors page into a component
-* 804f86568e [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [frontend] Extract shared ApiHelper logic to a separate module
-* a9683e3aa0 [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [frontend] Rename navopt to optimizer throughout
-* 3e3e02b6a1 [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Drop the mako json usage of "languages" in editor v2
-* e07282c8db [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Remove mako dependency on interface in editor v2
-* fd19ac5fb2 [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Fix issue where the editor view model is out of sync with the snippet in editor v2
-* 4233118951 [HUE-9210](https://issues.cloudera.org/browse/HUE-9210) [useradmin] Display number of local active users in Cloudera Manager
-* 1530e575de [HUE-9202](https://issues.cloudera.org/browse/HUE-9202) [core] Adding number of queries metric
-* 38aeaa9616 [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Keep default css width for sql limit input
-* 421278840a [HUE-8768](https://issues.cloudera.org/browse/HUE-8768) [task] Make SQL task compatible with Editor 2
-* d053143409 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [py3] Task server SQL tasks compatibility
-* f16b12350f [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Larger limit box auto growing to support two more digits
-* 50ff4c40cb [HUE-9206](https://issues.cloudera.org/browse/HUE-9206) [tools] First npm release with parser module
-* 07523600ae [HUE-9206](https://issues.cloudera.org/browse/HUE-9206) [tools] Change npm to public and gethue name
-* 0578b37ce1 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Link to npm demo app properly
-* c415aef3e3 [HUE-9205](https://issues.cloudera.org/browse/HUE-9205) [hive] Avoid stack trace when querying a table with missing permission
-* ad570cdf25 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [model] Test checking get document history with connector
-* b5b5ac22ba [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [model] Adding Document2 connector FK migration org on
-* 2c5947c7de [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [model] Adding Document2 connector FK migration org off
-* 4b6c17e06d [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Fix the quick query context connector
-* 65a348e648 [HUE-9203](https://issues.cloudera.org/browse/HUE-9203) [editor] Improve drag and drop from the left assist into the editor
-* 514d9b9bb1 [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Add action to reset the executable from the error log in editor v2
-* 55410e8408 [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Prevent thrown exception on execution in editor v2
-* eb96d0a1e7 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Properly rename api test file
-* 29a666ff1e [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [model] Adding first get_history model test
-* d87b59834f [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [api] Rename document2 to models test
-* 90718ffc6b [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [api] Adding connector_id to editor get_history
-* f39674bee6 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Add back dialect name to Editor API
-* fcb90acc7c PR1079 [k8s] Add podAnnotations section (#1079)
-* 63e68465a2 [HUE-9204](https://issues.cloudera.org/browse/HUE-9204) [useradmin] Filter not yet login users out of active users metric
-* 3c17378c34 [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [design] Update for better connector integration
-* 9743ce78e2 [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [design] Information on Editor v2 and connector convergence
-* 7be9392eb6 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [api] Add list of document types to config
-* d7209ad85e [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Use proper query type when saving a query
-* e929a6d142 PR1076 [blog] Localized three blogs into Japanese (#1076)
-* 0fdc985c59 [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Switch to connector instead of sourceType in the executor
-* 226a3a80fb [HUE-9197](https://issues.cloudera.org/browse/HUE-9197) [abfs] Add missing interface attributes
-* ac932665a1 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Simplify developer landing page
-* c78eaf1dc9 [HUE-9194](https://issues.cloudera.org/browse/HUE-9194) [useradmin] Make active users metrics available to prometheus
-* b29e66324c [HUE-9201](https://issues.cloudera.org/browse/HUE-9201) [Hue] Add which command in Hue Docker (#1075)
-* 170f7e907d [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [py3] Add back ldap module to requirements
-* 355d343b9c [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [docker] Run with gunicorn for Python 3
-* 30bc4cb9eb [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [docker] Python3 clean-up and run as hue user
-* 047ec23b29 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [py3] Port rfc822 to email.utils
-* 482a3a5a71 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [py3] Make jdbc and saml imports optional
-* b3414b1b7e [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [py3] Make liboauth modules optional
-* e4853b6f1e [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [py3] Make a lot of non essnential modules optional
-* b364698ac7 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [py3] Refactor and remove dependencies in makefile
-* b5b963f1df [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [docker] Python 3 Dockerfile skeleton
-* 51beb02a15 [HUE-9199](https://issues.cloudera.org/browse/HUE-9199) [core] Remove internationalization of log message in runcherrypy
-* 832b256837 [HUE-9199](https://issues.cloudera.org/browse/HUE-9199) [core] Log list of SSL ciphers used by OpenSSL (#1072)
-* dea04d4c0a [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Emphasize the parser API
-* fa49f68dd2 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [sqlalchemy] Remove enum lib and list columns properly
-* 73070b2e4c [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Tweak ksql for push queries
-* 73171d27f5 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Keep userprofile migrations in sync
-* 61fb41d075 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Add bug description in the create new issue template
-* 11d0a8adc9 [HUE-9195](https://issues.cloudera.org/browse/HUE-9195) [Hue] Perform database connection check in when docker container booting up in kubernetes environment (#1071)
-* 825cabfd56 [HUE-9198](https://issues.cloudera.org/browse/HUE-9198) [assist] Add support for assist file panels where the root path can't be listed
-* bef86057af [HUE-9197](https://issues.cloudera.org/browse/HUE-9197) [frontend] Use the correct icon for ABFS
-* 74170d6e67 [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Remove presentation mode type dependency to prepare for connectors in editor v2
-* 340955328f [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Fix issue with multiple Hive executions in notebook 2
-* 3300d74b6e [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Move snippet handle to executable
-* fa659d978c [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Fix garbled editor after clicking "new" in editor v2
-* 27a6df6ece [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Only notify dialect change on actual change
-* 862c4978d7 [HUE-9190](https://issues.cloudera.org/browse/HUE-9190) [ui] Fix js error when displaying documents in the top search results
-* 8f9329bc1b [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Don't publish snippet changes from the history panel
-* 33202f33bd [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [ui] Prevent publishing app name to all listeners on the get current app event
-* d82a97b88b [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Prevent js exception when clicking outside the ace editor element
-* fab7f90b30 [HUE-9187](https://issues.cloudera.org/browse/HUE-9187) [editor] Prevent error message from expired queries in the history in editor v2
-* 019aef3cc1 [HUE-9186](https://issues.cloudera.org/browse/HUE-9186) [editor] Fix issue with missing credentials in the editor v2 session auth modal
-* 66e38a3881 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [blog] localized blog into Japanese "sql-editor-user-experience" (#1070)
-* fb4a123f76 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [core] Bump minimist from 1.2.0 to 1.2.2 (#1068)
-* 334af1371d [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [core] Bump acorn from 6.0.5 to 6.4.1 (#1067)
-* d69dfff818 [HUE-9195](https://issues.cloudera.org/browse/HUE-9195) [Hue] Perform database connection check in when docker container booting up in kubernetes environment (#1065)
-* 3129828010 [HUE-9196](https://issues.cloudera.org/browse/HUE-9196) [docker] Run serially hue command: supervisor based wrapper script command (#1066)
-* cb224696c0 [HUE-9194](https://issues.cloudera.org/browse/HUE-9194) [useradmin] Set active_users_per_instance callback correctly
-* 589b448da1 [HUE-9194](https://issues.cloudera.org/browse/HUE-9194) [useradmin] Get active users per instance
-* 8edec160bc [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [sqlalchemy] Pick proper backtick depending on dialect
-* 8c371f886a [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [sqlalchemy] Do not error when type of column is Null
-* fa24f3ebf8 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Adding missing default input fields
-* a386437a98 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [api] Small code formatting in the log view template
-* 5361a5a228 [HUE-9192](https://issues.cloudera.org/browse/HUE-9192) [blog] Adding post on CI for documentation link checking
-* 0dc207094b [HUE-9193](https://issues.cloudera.org/browse/HUE-9193) [oozie] Allow workflow argument mixed with single and double quotes
-* fd07dc2986 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [beeswax] Avoid KeyError on install examples
-* 5c55098d42 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [gethue] Add last modified date from git info (#1062)
-* b736152907 [HUE-9191](https://issues.cloudera.org/browse/HUE-9191) [blog] Adding reference to foreign keys
-* ff60175a83 [HUE-9191](https://issues.cloudera.org/browse/HUE-9191) [ui] Add table Foreign Keys icons to the assist
-* cbf25fe35f [HUE-9191](https://issues.cloudera.org/browse/HUE-9191) [hive] API to retrieve table Foreign Keys
-* c1a1f09c15 [HUE-9192](https://issues.cloudera.org/browse/HUE-9192) [docs] Fixing series of dead links in the blog
-* dcb570f3f8 [HUE-9192](https://issues.cloudera.org/browse/HUE-9192) [ci] Automatically check for dead links in the website
-* ce1b2a8e4b [HUE-9192](https://issues.cloudera.org/browse/HUE-9192) [ci] Util to check dead links in websites
-* c2747ed995 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [api] Remove old hardcoded version of Python3 module
-* 880f3e2c7f [HUE-9191](https://issues.cloudera.org/browse/HUE-9191) [ui] Add table Foreign Keys icons to the assist
-* 3ffc3de8ac [HUE-9191](https://issues.cloudera.org/browse/HUE-9191) [hive] API to retrieve table Foreign Keys
-* bd447e1b40 [HUE-9185](https://issues.cloudera.org/browse/HUE-9185) [core] Update tests to work with gist turned on
-* 71560acdb2 [HUE-9185](https://issues.cloudera.org/browse/HUE-9185) [api] Enable gist and link sharing
-* 4eae9fdeb8 [HUE-9189](https://issues.cloudera.org/browse/HUE-9189) [hive] Support expanding tables with single Primary Keys
-* cb39639930 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Workaround sortings hardcoded to username
-* 4306c260dd [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [gethue] Fix the SQL highlighting of several posts
-* 2e91db30ad [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Fix a series of dead links in the 4.6 release notes
-* ac887d2c90 [HUE-9188](https://issues.cloudera.org/browse/HUE-9188) [notebook] Connection leakage in sqlalchemy connector (#1059)
-* f813c58d45 [HUE-8883](https://issues.cloudera.org/browse/HUE-8883) [docs] Update the requirements and headers troubleshoot for MacOS 10.15 (#1058)
-* e089a6564d [HUE-9185](https://issues.cloudera.org/browse/HUE-9185) [blog] SQL query sharing via links or gists
-* 1242c26513 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Give more information on how to add connectors
-* 2f4fd4763a [HUE-9185](https://issues.cloudera.org/browse/HUE-9185) [blog] SQL query sharing via links or gists
-* eba90715cd [HUE-8790](https://issues.cloudera.org/browse/HUE-8790) [core] Reset write perm when only read sharing a link
-* 95aba200d4 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [editor] Refresh document assist on save as
-* c8356a92d6 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Refactoring of the connector developer section
-* 7d04038339 [HUE-7581](https://issues.cloudera.org/browse/HUE-7581) [editor] typo fix: "... any saved query." -> "... queries." (#926)
-* 32ead86c2f [HUE-9183](https://issues.cloudera.org/browse/HUE-9183) [impala] communicate securely with Impala when webserver_require_spnego or is_kerberos_enabled is on
-* db807aa2e7 [HUE-9152](https://issues.cloudera.org/browse/HUE-9152) [filebrowser] Fix operations on directories with Cyrillic names
-* fa81dea1b9 [HUE-9183](https://issues.cloudera.org/browse/HUE-9183) [impala] Add unit test to the server module
-* 40ec71638d [HUE-9180](https://issues.cloudera.org/browse/HUE-9180) [useradmin] Convert LDAP names to unicode to reduce length
-* 642e7ffcab [HUE-9184](https://issues.cloudera.org/browse/HUE-9184) [editor] Fix js exception from the assist panel "open in editor" action
-* e9d7e213f7 [HUE-9182](https://issues.cloudera.org/browse/HUE-9182) [assist] Show the context popover on hover in the assist panels
-* ea37d07c17 [HUE-9182](https://issues.cloudera.org/browse/HUE-9182) [ui] Add a binding that triggers the context popover on hover
-* 4e5227196a [HUE-9141](https://issues.cloudera.org/browse/HUE-9141) [frontend] Only show owner if other than the user in the document context popover
-* b67efe98aa [HUE-9141](https://issues.cloudera.org/browse/HUE-9141) [frontend] Switch to modified from now time in the document context popover
-* ec86bfe4d1 [HUE-8740](https://issues.cloudera.org/browse/HUE-8740) [editor] Add postgresql to SQL samples
-* bb51358888 [HUE-8740](https://issues.cloudera.org/browse/HUE-8740) [sqlalchemy] Remove execution_options(stream_results=True)
-* 96b12781c1 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Promote connector credentials parameterization
-* 12024633a2 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [editor] Avoid 500 error when opening a non existing saved query
-* 312b6adcc9 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [core] Remove windwill tests
-* 40a7c43d7d [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [jb] Avoid oozie related stack trace when oozie is blacklisted
-* c8f3b208b3 [HUE-9183](https://issues.cloudera.org/browse/HUE-9183) [impala] Update hue to use kerberos principal to communicate with impala when either webserver_require_spnego or is_kerberos_enabled flag is on
-* 03c7e4c476 PR1056 [editor] Support session properties for the SqlAlchemy connector (#1056)
-* c058b051d0 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Update test to provide an execute status code
-* 306b388e9a [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Admin are requivalent to superuser when flag off
-* 46c674ae87 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [hive] Update use_sasl tests
-* 7ec0de6515 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Add test to install_connector_examples API
-* 83b30fa41b [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Add install samples test with hive inserts
-* 0d82c87b8e [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Add install samples test via load with hive
-* 8d0d75c4d2 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Add install samples via inserts with mysql test
-* 48c59d7f42 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Port to suppor the make_logged_in_client test util
-* 1710570568 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Inform the user from correctly installed or not samples
-* 33a24c8abe [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [hive] Start adding the notion of dialect to simplify the logic
-* 79bcbdf0d8 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Fix default use_sasl value for impala dialect
-* 44d88b55f6 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [hive] Do not convert statement to bytes twice with Py3
-* 7a251eb796 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Remove the notion of default organization
-* 8f4beb5b01 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Simplify the user auth lookup attributes
-* 3b929d25a6 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Fix Hive Server test connections
-* 3bb43032fc [HUE-9162](https://issues.cloudera.org/browse/HUE-9162) [sqlalchemy] Avoid API error on data sampling popup
-* 25e7b54ef1 [HUE-9162](https://issues.cloudera.org/browse/HUE-9162) [sqlalchemy] Do not fetch result on query without a resultset
-* a8683ec696 [HUE-9150](https://issues.cloudera.org/browse/HUE-9150) [editor] Filter out tables not compatible with selected dialect
-* b56ac362b1 [HUE-9150](https://issues.cloudera.org/browse/HUE-9150) [editor] Refresh the unit tests with latest APIs
-* f341876611 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Replace notion of beeswax by hive in install examples
-* b7b9be6307 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Add notion of dialects to sample tables
-* 1b21a00b1b [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Using editor API to install SQL samples
-* ee29f226e3 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Supporting installing SQL query samples based on the dialect
-* 4545fa717e [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Add a test for check_status Notebook API
-* afacea8ac2 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Refactor to move out the check_status call
-* 9c26a0f421 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Add a skeleton of sync notebook api to submit a query
-* 62542d842e [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Refactoring for generic SQL samples queries
-* e536660157 [HUE-9175](https://issues.cloudera.org/browse/HUE-9175) [core] Upgrade thrift-0.9.1 to thrift-0.13.0
-* c605d8c172 [HUE-9175](https://issues.cloudera.org/browse/HUE-9175) [editor] Regenerate impala and hive thrift from 0.9 to 0.13 (#1053)
-* 66509f1373 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [blog] Adding Re-using the JavaScript SQL Parser post
-* 0ed92ba528 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Adding basic SQL autocomplete API
-* cbfd175326 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Adding notion of quick query component
-* 8eca90edbc [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [api] Documenting how to import parsers
-* f38acada6e [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [editor] Adding autocompleter npm plugin example
-* ab00a62d6f [HUE-8740](https://issues.cloudera.org/browse/HUE-8740) [librdbms] Make jdbc plugin build fully off by default
-* 6f6bf9b359 [HUE-8740](https://issues.cloudera.org/browse/HUE-8740) [librdbms] Make the build of dbproxy.jar optional
-* e5ff8c98a9 [HUE-9178](https://issues.cloudera.org/browse/HUE-9178) [autocomplete] Move implicit type conversion into sqlParseSupport
-* 18eb09231e [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [doc] Add tests to the linkSharing component
-* fc52e8084d [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [doc] Improve doc sharing modal layout and wording
-* 3a80a06446 [HUE-9177](https://issues.cloudera.org/browse/HUE-9177) [doc] Fix issue where the user/group autocomplete doesn't initially show in the doc sharing modal
-* 6117e5cf4f [HUE-9154](https://issues.cloudera.org/browse/HUE-9154) [aws] Move EC2 detection safeguard to proper section
-* cfaf559f8b [HUE-9154](https://issues.cloudera.org/browse/HUE-9154) [aws] Turn off EC2 instance autodetection
-* 9ebd5034c0 [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [doc] Create a link sharing component and add it to the doc sharing modal
-* 5a88c0cacf [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [doc] Clean up the document sharing component
-* 9dd0b424ed [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [doc] Fix incorrect link sharing status after deactivation
-* 877f5e96ba [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [doc] Add link sharing to the ApiHelper
-* d0dc38224c [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [doc] Fix js exception when opening share modal for an already shared document
-* aae98da735 [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [doc] Move doc sharing view model into sharing component
-* f9c8980bf1 [HUE-9166](https://issues.cloudera.org/browse/HUE-9166) [editor] Use the selected database in presentation mode
-* 13fae08a1b [HUE-9143](https://issues.cloudera.org/browse/HUE-9143) [editor] Enable ctrl-enter execution in the quick query context
-* 0395adca8d [HUE-9143](https://issues.cloudera.org/browse/HUE-9143) [editor] Prevent exception when executing an Impala query in editor v2
-* 891f42bc19 [HUE-9143](https://issues.cloudera.org/browse/HUE-9143) [frontend] Fix issue with grayed out result after executing a hive query in editor v2
-* 919fc710e4 [HUE-9143](https://issues.cloudera.org/browse/HUE-9143) [frontend] Create a simplified result grid for the quick query component
-* 208a9b20a1 [HUE-9143](https://issues.cloudera.org/browse/HUE-9143) [editor] Extract result tracking logic to the state handling utils
-* d56c13123e [HUE-9143](https://issues.cloudera.org/browse/HUE-9143) [editor] Move common meta adaptions into executionResult
-* 057f5e580a [HUE-9143](https://issues.cloudera.org/browse/HUE-9143) [frontend] Improve layout in the quick query component
-* 6327b27ad0 [HUE-9143](https://issues.cloudera.org/browse/HUE-9143) [frontend] Connect the executor to the quick query component
-* daf62425b2 [HUE-9143](https://issues.cloudera.org/browse/HUE-9143) [frontend] Improve autocomplete logic in the simple ace editor
-* ddb1552429 [HUE-9143](https://issues.cloudera.org/browse/HUE-9143) [frontend] Adjust the executor to support the quick query component
-* 52e9f4198d [HUE-9143](https://issues.cloudera.org/browse/HUE-9143) [frontend] Add interpreter and context selection to the quick query component
-* 63649cd82e [HUE-9143](https://issues.cloudera.org/browse/HUE-9143) [frontend] Create initial quick query component with an ace editor
-* d76543c1e7 [HUE-9143](https://issues.cloudera.org/browse/HUE-9143) [frontend] Fix JS exception in the simple ace editor for editor v2
-* e19524a1d5 [HUE-9143](https://issues.cloudera.org/browse/HUE-9143) [frontend] Add quick query action button component
-* b16c74cdd6 [HUE-9143](https://issues.cloudera.org/browse/HUE-9143) [frontend] Extract templates for doc, udf and partition context popovers
-* 60264e5893 [HUE-9165](https://issues.cloudera.org/browse/HUE-9165) [tool] Supported kerberos config when use hue on docker (#1051)
-* dbc78f2bef [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Refactoring of the connector developer section
-* 032b0fcb40 [HUE-9163](https://issues.cloudera.org/browse/HUE-9163) [core] Enable HUE image to be runnable in OpenShift environment (#1050)
-* 0439fdba9a [HUE-9125](https://issues.cloudera.org/browse/HUE-9125) [liboozie] Avoid Error in config validation by liboozie
-* abf1873a48 [HUE-9125](https://issues.cloudera.org/browse/HUE-9125) [core] Avoid unicode error in some config checks with Python 2
-* 0d20d65532 [HUE-9150](https://issues.cloudera.org/browse/HUE-9150) [importer] Simplify SQL statement test comparison
-* d27396d0ee [HUE-9150](https://issues.cloudera.org/browse/HUE-9150) [py3] Use OrderedDict to avoid non deterministic ordering in tests
-* 4a996b591f [HUE-9150](https://issues.cloudera.org/browse/HUE-9150) [importer] First Mock test for TestSQLIndexer with file_to_csv
-* effb727eea [HUE-9154](https://issues.cloudera.org/browse/HUE-9154) [ci] Comment why AWS EC2 IAM role auto detection is disabled
-* 6bf9002097 [HUE-9154](https://issues.cloudera.org/browse/HUE-9154) [desktop] Small code formatting of lines too long
-* 6a4eb789dc [HUE-9154](https://issues.cloudera.org/browse/HUE-9154) [ci] Disable AWS EC2 IAM role auto detection
-* bf2aa97ff7 [HUE-9154](https://issues.cloudera.org/browse/HUE-9154) [aws] Flag to enable auto detection of IAM role on the EC2 instance
-* 3519790327 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [ci] Adding additional check for Python 3.6
-* 707ef83346 [HUE-9125](https://issues.cloudera.org/browse/HUE-9125) [core] Port dump config test to also work with Python 3
-* ec67365087 [HUE-9153](https://issues.cloudera.org/browse/HUE-9153) [core] Avoid logging failure when data contains non unicode in REST resource lib
-* 08cbff1f4c [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [task] Reformating of the sql task code
-* 2030f937aa [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [py3] Support editing a file in File Browser
-* 14fd3dda9b [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [fs] Light style refactoring and fixing non lazy translations
-* 9e63a74e2f [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [py3] Upgrade some dependencies to avoid security warnings
-* 2e0c120de5 [HUE-9149](https://issues.cloudera.org/browse/HUE-9149) [fb] Fist unit test with mock of an empty directory
-* 5bc65013ef [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Wire-in the test connection API to the UI
-* 91693a43ba [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Refactoring for connector connection testing
-* 90f34cdb0a [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Adding a test connector API
-* ee8fd7638d [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [blog] Moving the language choose to a footer flag (#1044)
-* 07f69a6328 PR1045 [py3] Bump django from 1.11.20 to 1.11.28 in /desktop/core (#1045)
-* a7afe21a5f [HUE-9148](https://issues.cloudera.org/browse/HUE-9148) [assist] Switch to using the config API in the DB assist panel
-* 4a76e810f3 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Add more tests for check notebook config
-* 9db92be3bc [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Add user org filtering to User.objects.get API
-* 4cf20dc958 [japanese] localized the blogs since Dec 2019
-* 7424f0a018 [japanese] improved the localization of Japanese page
-* 4eb6c40b18 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docker] Do not assume any Hadoop configuration are set
-* 86d3677c11 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Fix TestCheckConfig suit and make it run all the time
-* 7bea5497ab [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Provide connector name and dialect in config check
-* 6ce5fa2cc8 [HUE-9146](https://issues.cloudera.org/browse/HUE-9146) [aws] Auto detection of EC2 instance if flaky
-* a7150a383a [HUE-9146](https://issues.cloudera.org/browse/HUE-9146) [gc] Refactoring to restyle and avoid calling boto init lib
-* 68544cb432 [HUE-9144](https://issues.cloudera.org/browse/HUE-9144) [jobbrowser] Data column which was present in Hue 3 is missing in Hue 4
-* 172c665e98 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [blog] #2 Series - The Hue SQL Editor Experience for your Data Warehouse
-* f460c059ae [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Add Presentation mode content
-* 8ac8a38a5d [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Refactoring and update of the result refining content
-* 2a08752d0a [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Fix dead link in the contributing guide
-* 4c7059f6ee [HUE-9100](https://issues.cloudera.org/browse/HUE-9100) [hive] Fix test suite and make it part of global test suite
-* aa95e6e134 [HUE-9100](https://issues.cloudera.org/browse/HUE-9100) [hive] Light style refactoring while browsing over the logic
-* 99edc12dc8 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Help about test run failing because of collect static
-* 3e9e6617ed [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Move Connector section to the left of Hue config
-* c0ef563f1a [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Revamp the test suite to use real objects
-* 04a9a794fd [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Do not load connectors with None interface
-* 809adb5e11 [HUE-9141](https://issues.cloudera.org/browse/HUE-9141) [frontend] Improve description rendering in the document context popover
-* a30b31cb40 [HUE-9141](https://issues.cloudera.org/browse/HUE-9141) [frontend] Add owner and modified data in the context popover footer for documents
-* 5c48ac123a [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [org] Adding beeswax DB migration
-* 689f3568d4 [HUE-9140](https://issues.cloudera.org/browse/HUE-9140) [useradmin] Add ability to display isActive status
-* 14fd95bb0e [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Trigger the check config on initial page load
-* 2e7dc9c3f0 [HUE-9139](https://issues.cloudera.org/browse/HUE-9139) [editor] Add statement parser support for escaped \ in quoted values
-* aa0cc34d08 [HUE-9136](https://issues.cloudera.org/browse/HUE-9136) [scheduler] Fix arrow positioning when adding widgets with horizontal scroll
-* fad4f2eadb [HUE-9136](https://issues.cloudera.org/browse/HUE-9136) [scheduler] Switch to flex layout in the workflow editor to keep the top actions visible on scroll
-* b2de6ec101 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Document how to build the blog with multi language
-* 7d086d9390 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Avoid hyphen in helm values
-* 2a03e0aebe [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docker] Updating gethue image build for multi language
-* 94c795ab38 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Adding Japanese version of gethue
-* b39f374d68 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [blog] Support for i18n and Japanese port (#1042)
-* c727943327 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Fix typo in install Hive examples
-* 0debd5665e [HUE-9112](https://issues.cloudera.org/browse/HUE-9112) [lib] Protect against more unicode errors in REST logging
-* 58f1aeca90 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Do not show the connector count when flag is off
-* 9f4ad6fc5d [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Adding migration when flag is on
-* 5a1e98b9c5 [HUE-9131](https://issues.cloudera.org/browse/HUE-9131) [jb] Query browser does not load interfaces anymore
-* 3e26b088da [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [core] Adding crequest to thridparty README
-* 8a8b3d72b9 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Fixes post rebase
-* 65a4c38e36 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Link to add connector page when no snippet configured and admin
-* f7fbdefc8c [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Update migration scripts part 2
-* 407b12e8c5 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Update migration scripts part 1
-* 39caa9600b [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Consolidate all the logic into the organization module
-* 94dda0f280 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Install examples for the particular connector
-* 8d17cfafc1 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] API to install data examples
-* c450537e5f [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Port the Hive table sample install to kojs
-* 5d0f32fe32 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Allow organization admin to install connector examples
-* 7b4fdebdf3 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] API to install connector examples
-* 5e72ac1c30 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Auto install example connectors for the Hue admin
-* 6468dab6ce [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [useradmin] Properly display the organization page
-* c6bb73d922 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [useradmin] Adding basic organization page
-* fbf2dad8ff [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [auth] Fix some wrong styling indentation
-* e0416464f2 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Patching for combining query set filter
-* 2fec2c033c [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Make ORM filter chaining backward compatible
-* ffbe9b2b47 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Backward compatibility for User.objects.values_list
-* a74ce89ae2 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Properly create new users in the current  organization
-* 6da571b558 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] List organization name when editing users and groups
-* 92ae1cb61f [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Only list the group of the user organization
-* adf6b00111 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Hide ensure home directory creation input for now
-* 000172ce49 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Unify permissions for the admin wizard
-* ca258d9418 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Hide ini location when user not a Hue admin
-* 0f8656875a [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Prepare split of is_admin and is_hue_admin
-* 6c1afc2c59 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Offer to safely blacklist the importer like a traditional app
-* 0f33c41cd3 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Do not 403 when there is no snippet configured
-* c2aa745b1f [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Try to log failed user login email if username is empty
-* 3d93b6f647 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Fill-up the connector FK of a Permission
-* 8d32f4394a [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Fix a series of bad imports
-* 5ddf526516 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Add org filtering to get document API
-* 8a43497226 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Add org filtering to get user API
-* 1a466bba83 [HUE-9130](https://issues.cloudera.org/browse/HUE-9130) [about] Fix the update setting API and its test
-* 0ff06f1118 [HUE-9130](https://issues.cloudera.org/browse/HUE-9130) [useradmin] Deactivate user by default instead of deleting
-* 2a05b22914 [HUE-9130](https://issues.cloudera.org/browse/HUE-9130) [useradmin] Harmonize add user icons
-* 8c4211d85e [HUE-9129](https://issues.cloudera.org/browse/HUE-9129) [useradmin] Remove threading locks
-* f13b68f356 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [useradmin] Adding a test suite for is_admin
-* c6d3a7ca6a [HUE-9129](https://issues.cloudera.org/browse/HUE-9129) [useradmin] Add a is_admin column to the list user page
-* 9928284e28 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Fix rebasing issues
-* 3a2dbe8164 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Avoid filtering querysets when off
-* ddbecaefe1 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Avoid model instanciations when flag is off
-* 9fea9fc11b [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Fix a series of bad imports
-* f4a804df43 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [oganization] Update org DB migrations
-* 828977d930 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Moving perms to a permission module
-* bdbbae0c1d [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] filter_queryset backward compatibility when flag is off
-* 2462535868 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Add DB migration for Connector model
-* c30ee040fa [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Avoid dependency in organization when not in used
-* fe107eb673 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Support Connector models via inheritance
-* dea528ddb4 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Support permission persistence via FK
-* e6155013b7 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Permission model pointing to a Connector
-* f19b398d07 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Make numeric ids compatible with string matching
-* f2257d6547 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Adding test for ORM compatibility
-* e9e813e9ea [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Adding crequest module dependency
-* 02ca81558c [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Check admin permission for connector updates
-* b15dc5f378 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Remove more dictionary attributes in User constructor
-* 0762291862 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Remove need of orm_user_lookup util
-* ad1a93509f [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [core] Adding a is_admin auth decorator
-* 3db939a2db [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [useradmin] Revert HuePermission creation to be simpler
-* 5716e79079 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Refactoring to move out inter module dependencies
-* 6d625bd47e [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Refactor to switch to Hue permissions
-* 5cea20d062 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [connectors] Unify the API for listing types and instances
-* f15cda2197 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Series of typo fixes
-* 63db68fb18 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [connectors] DB migrations in organization mode
-* a906f8d2c3 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [connector] Persist connectors setting in the database
-* 12b0a49b41 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [core] Light restyling of the appmanager
-* 3049e36839 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Auto add missing organization to Group and Permission
-* 38739187a4 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [connector] Initial DB migrations
-* ec58efa377 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Initial permission support
-* d39dd5c5e6 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Add org filtering to get document API
-* bf3cba6daf [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Add org filtering to Group manager
-* d4cdc24380 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Add org filtering to get user API
-* 65c4850746 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Avoid infinite recursion when overriding User queryset
-* 174562ddaa [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Add proper default group to users
-* 9afe4088a5 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Use full email for single user organizations
-* e7248bdb43 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Builtin filtering of users within an org
-* f10934d97a [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Allow connector page to be displayed
-* d05d74385a [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Revert skipping desktop lib UI conversion
-* 4c347cc76c [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Make user superuser only explicitly
-* adce4f66ef [HUE-9125](https://issues.cloudera.org/browse/HUE-9125) [backend] Fix failing test related to configuration page changes
-* 58c1dea2a1 [HUE-9127](https://issues.cloudera.org/browse/HUE-9127) [frontend] Add ability to set a custom dashboard app
-* 68e70a6b96 [HUE-9125](https://issues.cloudera.org/browse/HUE-9125) [about] Create a component for the configuration page with filter
-* f411ea14c0 [HUE-9125](https://issues.cloudera.org/browse/HUE-9125) [api] Add API endpoint for fetching the hue config in json
-* 93fa7f8499 [HUE-9124](https://issues.cloudera.org/browse/HUE-9124) [frontend] Have the assist stay in the db list if it was visible prior to a refresh
-* dfcc2b0671 [HUE-9117](https://issues.cloudera.org/browse/HUE-9117) [editor] Set the default SELECT limit to 5000 by default with 0 to disable
-* 242d47e6df [HUE-9117](https://issues.cloudera.org/browse/HUE-9117) [editor] Persist default limit when saving snippets in editor v2
-* d1fc1e032c [HUE-9117](https://issues.cloudera.org/browse/HUE-9117) [editor] Add config option to set default limit for SELECT statements
-* f65625679c [HUE-9117](https://issues.cloudera.org/browse/HUE-9117) [editor] Add default limit input next to execute in editor v2
-* 4f1ae8c15f PR1032 [jb] fix template error (#1032)
-* def7150c15 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [blog] Fix the content not showing-up in Hue 4.0 post
-* b1b8b122e1 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Fix the link pointing to CONTRIBUTING.md
-* 1bd5703b43 [HUE-9128](https://issues.cloudera.org/browse/HUE-9128) [site] Upgrade GA js code
-* 32cd1a0d03 PR1040 [spark] Set spark use_sasl flag dynamically (#1040)
-* b91c599871  [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [beeswax] Fix unit test test_column_format_values_nulls
-* 158f8cef52 [HUE-9128](https://issues.cloudera.org/browse/HUE-9128) [site] Update the GA id to propagate to blog posts
-* 2db7701797 [HUE-9123](https://issues.cloudera.org/browse/HUE-9123) [hive] Create session can get stuck when the connector server address changes
-* 86155d1503 [HUE-9122](https://issues.cloudera.org/browse/HUE-9122) [impala] Caching of impala job browser client can brake in HA
-* 34699e09e2 [HUE-9128](https://issues.cloudera.org/browse/HUE-9128) [blog] 10 years of Data Platform Evolution
-* 7109943d86 [HUE-9126](https://issues.cloudera.org/browse/HUE-9126) [docs] Move blog videos from Vimeo to Youtube (#1039)
-* f9dbc61f4f [HUE-9089](https://issues.cloudera.org/browse/HUE-9089) [thrift] Fix e.message in py3
-* 2c201186fe [HUE-9113](https://issues.cloudera.org/browse/HUE-9113) [hive] Show the view icon for materialized views in the left assist
-* 8df3bcd2f7 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Grab connector id and use it as snippet type
-* 296b9f8afe [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Pick-up connector name from POST data
-* 1288d14ef9 [HUE-9120](https://issues.cloudera.org/browse/HUE-9120) [core] Light refactoring of the SQL session clossing on logout
-* e798441630 [HUE-9121](https://issues.cloudera.org/browse/HUE-9121) [hbase] Handle HBase Thrift SPNEGO HTTP/hostname principal (#1037)
-* 523f6a4e28 [HUE-9120](https://issues.cloudera.org/browse/HUE-9120) [core] Fix issue in Hue with closing impala session on logout
-* 3bca8afb99 [HUE-8985](https://issues.cloudera.org/browse/HUE-8985) [core] Debug logging responses missing
-* b095cb2486 [HUE-9118](https://issues.cloudera.org/browse/HUE-9118) [impala] INTEGER is introduced as a synonym for INT
-* 69beb299e9 [HUE-9116](https://issues.cloudera.org/browse/HUE-9116) [hive] Check if destination empty before export data to hdfs
-* c1fc72edb3 [HUE-9114](https://issues.cloudera.org/browse/HUE-9114) [frontend] Improve active marking of sidebar items
-* 79bbcbc562 [HUE-9114](https://issues.cloudera.org/browse/HUE-9114) [frontend] Show sidebar user and help sub menus on hover
-* cee94d9c35 [HUE-9114](https://issues.cloudera.org/browse/HUE-9114) [frontend] Improve left sidebar hover logic
-* d6130a436d [HUE-9114](https://issues.cloudera.org/browse/HUE-9114) [frontend] Open left nav sub menus on hover
-* 3248571896 [HUE-9084](https://issues.cloudera.org/browse/HUE-9084) [frontend] Fix parser test utils exception when there are no keywords
-* 6125870f66 [HUE-9115](https://issues.cloudera.org/browse/HUE-9115) [editor] Revert the flink parser to its originally cloned state to fix the failing tests
-* e15a1c5c6b [HUE-9115](https://issues.cloudera.org/browse/HUE-9115) [editor] Re-generate the parsers based on current  state of the jison files
-* bb1bf040f6 [HUE-9114](https://issues.cloudera.org/browse/HUE-9114) [frontend] Show the actual name of the favourite editor and not "Editor" in the editor sub menu
-* 1bf1ea3568 [HUE-9115](https://issues.cloudera.org/browse/HUE-9115) [ksql] Fix test SHOW test suite
-* 6def09324b [HUE-9115](https://issues.cloudera.org/browse/HUE-9115) [ksql] Move SHOW test suite to tests folder
-* af1d17067a [HUE-9115](https://issues.cloudera.org/browse/HUE-9115) [ksql] Simplify grammar and remove 40 test failures
-* eacb319483 [HUE-9084](https://issues.cloudera.org/browse/HUE-9084) [calcite] Update generated parser
-* d898f1c718 [HUE-9084](https://issues.cloudera.org/browse/HUE-9084) [calcite] Adding support for SELECT STREAM
-* d4396e66ac [HUE-9084](https://issues.cloudera.org/browse/HUE-9084) [calcite] Adding STREAM keyword to the lexer
-* 5d215187c2 [HUE-9084](https://issues.cloudera.org/browse/HUE-9084) [docs] Show how to run tests for parsers not in the CI
-* 0ce290ae70 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [oozie] Fix Failed oozie unit tests in py3
-* 84270c5352 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Converting last SQL dialects to connector types
-* a5b095abad [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] First user or single user org as org admin
-* 56b05cc00a [HUE-9112](https://issues.cloudera.org/browse/HUE-9112) [hdfs] Avoid potential log trace failure similarly to Resource
-* a8e6a7a6ae [HUE-9112](https://issues.cloudera.org/browse/HUE-9112) [lib] Light restyling to avoid inconsitent long lines
-* 3edbef9e0d [HUE-9112](https://issues.cloudera.org/browse/HUE-9112) [lib] Avoid unicode decode error in Resource logging
-* c058746ea2 [HUE-9112](https://issues.cloudera.org/browse/HUE-9112) [fs] Better exception logging when an upload fails
-* eb599909ef [HUE-9112](https://issues.cloudera.org/browse/HUE-9112) [lib] New basic test for Resource class
-* e571cae3cb [HUE-9114](https://issues.cloudera.org/browse/HUE-9114) [frontend] Move the top quick action button with dropdown into left nav submenus
-* c14f7f466b [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Use the dialect from the connector for autocomplete in editor v2
-* 404854554e [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Switch from type to connector/dialect in editor v2
-* 4bfda743c5 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Move cluster config into webpack
-* 5cc20c4efc [HUE-9113](https://issues.cloudera.org/browse/HUE-9113) [hive] Support listing SQL materialized views
-* 944801dcfb [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Add calcite as connector dialect
-* a75b35ce48 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [ksql] Pickup API url via the connector config
-* 4fb98476d4 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Expanding the default SQL types
-* bd6622eae7 [HUE-7474](https://issues.cloudera.org/browse/HUE-7474) [impala] Log query plan only in debug mode
-* 2814e1ed02 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Make optional the interface used in connector configuration
-* d7de4f5f87 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Adding elastic connector properties
-* 3d719de968 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [sqlalchemy] Handle when column metadata if of Column type
-* 653bcc0398 [HUE-9110](https://issues.cloudera.org/browse/HUE-9110) [oozie] Fix widget progress bar caused by PR798
-* 6bc6e8228d [HUE-9111](https://issues.cloudera.org/browse/HUE-9111) [core] Light coding restyle of wsgiserver
-* 34008e7881 [HUE-9111](https://issues.cloudera.org/browse/HUE-9111) [core] Light coding restyle of the file
-* 7d2e0a0b1b [HUE-9111](https://issues.cloudera.org/browse/HUE-9111) [core] Simplify import of timeout pidfile compatibility
-* 01217c389c [HUE-9111](https://issues.cloudera.org/browse/HUE-9111) [core] Fix typo in pidfile_context import
-* 70bc31c9eb [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Unify get_organization function
-* 492f887985 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Make logic of login error fields more explicit
-* 944db9af44 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [core] Fix desktop unit tests in py3
-* 6195e21472 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [dashboard] Fix dashboard unit test in py3
-* ee63cab8f7 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [notebook] Fix notebook unit test in py3
-* 3f5b11633e [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [indexer] Fix indexer unit tests in py3
-* e1c3faf803 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [rdbms] Fix rdbms unit tests in py3
-* db72f9bfc4 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [useradmin] Fix useradmin unit tests in py3
-* b45a6bc3b3 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [security] Fix security unit test in py3
-* ee10b2eed2 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [search] Fix search unit tests in py3
-* 70568e2bac [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [core] Fix unit tests in pig and proxy for py3
-* 2b4ea999b0 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [core] Use explicit encoding open file to fix failed unit test in py3
-* 1f717d68e3 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [oozie] Fix Oozie tests TestEditor for py3
-* 7060796f1e [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [oozie] Fix Oozie tests TestDashboard for py3
-* affe8bb672 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [jb] Fix job browser tests for py3
-* 533a4bdcd7 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [beeswax] Fix beeswax and Impala tests for py3
-* 7ef66615d0 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [core] Fix desktop tests for py3
-* dcd3303cc7 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [core] Fix desktop lib py3 issues   desktop.lib.django_util_test   desktop.lib.test_export_csvxls
-* bded94ed86 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Point to dedicated migrations
-* e3349fe89e [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organizations] Add migrations and patch Desktop prometheus Mixin base class
-* d17fa8efef [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Proper error highlighting on login
-* 91d6cab561 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Make logic of login error fields more explicit
-* f8d9c69fab [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Do not try to monkeypatch the User username
-* 31e30ed658 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Small Model update
-* fa7854cb45 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Light style reformatting
-* c8e2ed10a6 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Update tests and also fix bug in test login client
-* 88a7936933 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Port make_logged_in_client util
-* 330042741e [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Adding postgres connector properties
-* 7fbb926964 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Start adding the dialect properties to cluster get_config
-* 1809d02d8d [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Show to how run single test file in parser guide
-* 7b9d10836e [HUE-9077](https://issues.cloudera.org/browse/HUE-9077) [ksql] Make grammar
-* eb107da652 [HUE-9077](https://issues.cloudera.org/browse/HUE-9077) [ksql] Adding udf and aggregates to the grammar
-* a3984b5a9f [HUE-9077](https://issues.cloudera.org/browse/HUE-9077) [ksql] Adding reserved keywords to grammar
-* 5848e55bec [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Refresh the dev testing section
-* a57979f50e [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Refresh the high level architecture diagram
-* 0fc591b43d [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Refresh install README and update syncdb references
-* 1724551b0b PR1029 [docs] Fix tools/kubernetes link typo (#1029)
-* 48ae788d4a PR1028 [docs] Presto isn't Apache Project (#1028)
-* 398aba98c6 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Skip test to avoid deleting old perms for now
-* 4d4de70bca [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [wizard] Properly link to gethue website
-* 265c6b3e28 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Port check config to support sqlalchemy interface
-* 7d70f9d132 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Port check config to support hiveserver2 interface
-* 724937f2d6 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Preparing config check for connectors
-* 8798b32891 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Combine app permissions with connector permissions
-* 3f48b27a77 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [auth] Clean-up config imports to be explicit in middleware module
-* 54abb85c82 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [useradmin] Sync permissions when updating connectors
-* 30abb5aab7 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Add the notion of organization admin
-* 7665990e55 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Prepare the DB model
-* 9f1559e6f5 [HUE-9077](https://issues.cloudera.org/browse/HUE-9077) [ksql] Properly handle SELECT that fails
-* a55df7db4b [HUE-9077](https://issues.cloudera.org/browse/HUE-9077) [connector] Add column listing to ksql autocomplete
-* e3cb042671 [HUE-9077](https://issues.cloudera.org/browse/HUE-9077) [ksql] List topics, tables, streams in the left assist
-* c4623cf3cd [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Avoid tests deleting traditional permissions for now
-* b48c976b34 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Configure some tests to be able to run on master
-* d0216b3361 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [auth] Update test_get_profile to be more robust
-* 4cbdcf0f93 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Add permission to connector listing
-* 3a0d4f9118 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Cleaner logic for removig old connector perms
-* 369675a3e1 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Display the name of the connector in the permissions
-* 2f1b40bc60 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [useradmin] Port group_has_permission resultset check to exists()
-* e474cd2c7f [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Little line style formatting
-* 69e109fe99 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [useradmin] Simplify the titles of the app
-* 82af732bdf [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [useradmin] Sync permissions when updating connectors
-* 829020c9d7 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Add permissions for available connector instances
-* 41db606f20 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Small styling updates in useradmin and desktop
-* 92d7327f68 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Add the notion of organization admin
-* df8b13ae70 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Prepare the DB model
-* 8661c1e064 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [auth] Also augment the user with some of the profile properties
-* e7cfd58d5d [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [auth] Persist the backend used by the user when logging-in
-* 9dbfa67baf [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [useradmin] Add test to uderprofile data field
-* 207d09b1ed [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [useradmin] Adding custom data field to user profile
-* 31839a2c58 [HUE-8530](https://issues.cloudera.org/browse/HUE-8530) [organization] Refactor to not hardcode user attribute lookup
-* 6231742eb0 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Avoid 500 on page opening when not in dev mode
-* ebd78772ca [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [auth] Style formatting of the views and user
-* fd2455deb0 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Rename Documents to Queries when connectors are enabled
-* 70633f24d8 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [core] Add query icon
-* 790fe6456c [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [ui] Harmonize the file and table icons to be consistent
-* d84d04110f [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [ui] Base sidebar home link properties with cluster config API
-* 8ab4c4010d [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Moving connector types to its own module
-* 9e7b4e255e [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Offer to white/black list available connector types
-* 1c884ccd8e [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Upgrade hugo version to fix table display issue
-* 227be01247 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Link to list of SQL connectors in the dev parser section
-* 1f55c1e1fa [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Add analytics to gethue
-* 85e94a8422 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Clarify about the upstream distribution install
-* c8b087cd92 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Refresh of the configuration and operation sections
-* 644b5bc7b1 [HUE-9100](https://issues.cloudera.org/browse/HUE-9100) [editor] Reuse session when opening notebook
-* 10cdfc2cca [HUE-9100](https://issues.cloudera.org/browse/HUE-9100) [editor] Close dangling sessions
-* 9247744d1c [HUE-9100](https://issues.cloudera.org/browse/HUE-9100) [editor] Delay execute until session create is completed
-* 1797ecc88d [HUE-9100](https://issues.cloudera.org/browse/HUE-9100) [editor] Update session after execute
-* bb0a842df7 [HUE-9100](https://issues.cloudera.org/browse/HUE-9100) [beeswax] Multi-session support
-* 7be0e36bdc [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Update README about distributions shipping Hue
-* fae76907ce [HUE-9106](https://issues.cloudera.org/browse/HUE-9106) [core] Compare Python version by tuple and not string
-* 325639e22a [HUE-9066](https://issues.cloudera.org/browse/HUE-9066) [frontend] Prevent history panel from opening gist links
-* ecba66299e [HUE-9066](https://issues.cloudera.org/browse/HUE-9066) [frontend] Improve gist sharing layout
-* 2d4decb517 [HUE-9066](https://issues.cloudera.org/browse/HUE-9066) [frontend] Prevent password managers affecting the gist link
-* 0189da2079 [HUE-9066](https://issues.cloudera.org/browse/HUE-9066) [frontend] Create a separate component for the gist modal
-* 9496dee329 [HUE-9109](https://issues.cloudera.org/browse/HUE-9109) [editor] Switch to index-based tracking of executables in editor v2
-* 9b3f2df643 [HUE-9107](https://issues.cloudera.org/browse/HUE-9107) [editor] Reuse existing executables in presentation mode for editor v2
-* c5fb9b41af [HUE-9107](https://issues.cloudera.org/browse/HUE-9107) [editor] Fix history update after existing presentation mode in editor v2
-* e7c367f518 [HUE-9107](https://issues.cloudera.org/browse/HUE-9107) [editor] Fix JS exception when entering presentation mode
-* 2ed6fae0e6 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [knox] Enable XHR URL rewrite only if Knox is there
-* eb38ea0d0a [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Fix last set of links pointing to old latest
-* 59565ca728 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [blog] Fix links to quickstart documentation
-* 2c7fb20024 [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [doc] Wire the link sharing on and off calls in the modal
-* b34cf8499f [HUE-9103](https://issues.cloudera.org/browse/HUE-9103) [core] set settings.LOGGING_CONFIG to None
-* 29ee0b05ed [HUE-9108](https://issues.cloudera.org/browse/HUE-9108) [core] Revert prettify unifying the general log level
-* f50511054a [HUE-9106](https://issues.cloudera.org/browse/HUE-9106) [core] Add SSL_NO_RENEGOCIATION option
-* 6652e152a2 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [hive] Skip warehouse path config check when no FS configured
-* 6c4ecb79fc [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [core] Ini description about backends is outdated
-* d1a0ac8e7f [HUE-9099](https://issues.cloudera.org/browse/HUE-9099) [frontend] Update the Ace Hive highligher with the latest keywords
-* b37c442b6d [HUE-9099](https://issues.cloudera.org/browse/HUE-9099) [frontend] Fix out-of-sync ksql highlighter
-* 132e881d46 [HUE-9099](https://issues.cloudera.org/browse/HUE-9099) [frontend] Add missing options to the Hive EXPLAIN grammar
-* b0c1815872 [HUE-9099](https://issues.cloudera.org/browse/HUE-9099) [frontend] Extend the Hive parser ORDER BY clause
-* fd11736eef [HUE-9099](https://issues.cloudera.org/browse/HUE-9099) [frontend] Extend the Hive LOAD statement syntax in the parser
-* 8ceb7843d5 [HUE-9099](https://issues.cloudera.org/browse/HUE-9099) [frontend] Add parser support for Hive SHOW MATERIALIZED VIEW
-* 4590099e79 [HUE-9099](https://issues.cloudera.org/browse/HUE-9099) [frontend] Add parser support for Hive ALTER MATERIALIZED VIEW
-* aa9158d220 [HUE-9099](https://issues.cloudera.org/browse/HUE-9099) [frontend] Add parser support for Hive DROP MATERIALIZED VIEW
-* d7ef03a478 [HUE-9089](https://issues.cloudera.org/browse/HUE-9089) [editor] Allow manual close_statement even if CLOSE_QUERIES is false.
-* bd544cf6bb [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [gist] Adding initial test suite
-* 6f8ed0d362 [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [gist] Optional public gist link unfurling
-* b9494aa40a [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [gethue] Fix list styling issues in blog conflicting with top menu
-* 7a7aaf313e Revert "[HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Avoid huge font on second levels of lists"
-* 5bf4cc6d2d [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [blog] Aggregate together more catagories
-* d003c151cd [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docker] Adding hive sqlalchemy connector to base image
-* 17262a313c [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [doc] Test update and prettify printing Permission objects
-* 01437e3b36 [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [doc] Avoid fail on document deletion when there is no FS configured
-* d1c2147afa [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [doc] Wire the link sharing API to the permission modal
-* b09b3f19d2 [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [doc] Display link perms in the sharing modal
-* be8206b46a [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [doc] Update HueFileEntry js model permission logic
-* d24cfe1a19 [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [doc] Integrate top level READ and WRITE permissions
-* e98ab0597d [HUE-9096](https://issues.cloudera.org/browse/HUE-9096) [doc] Optimize a little perm checking logic order
-* f5b6b9c92f [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Logo and main screenshot are reversed in the README
-* e44eeafbff [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [core] Adding a bunch of missing files
-* 71b47c0f7d [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Update main screenshot with 4.6 version
-* 4c299a7820 [HUE-9101](https://issues.cloudera.org/browse/HUE-9101) [editor] Create a separate component for the saved queries tab in editor v2
-* fb9a5c557a [HUE-8727](https://issues.cloudera.org/browse/HUE-8727) [frontend] Consolidate Chrome autofill prevention attributes into a global variable
-* 0f35eee78b [HUE-9101](https://issues.cloudera.org/browse/HUE-9101) [frontend] Allow observables in the ko.ellipsis binding
-* 1c2491e517 [HUE-9101](https://issues.cloudera.org/browse/HUE-9101) [editor] Extract common paginator component
-* fa1a85c442 [HUE-9101](https://issues.cloudera.org/browse/HUE-9101) [editor] Move the import and export actions into the new history component
-* dd6e5307cc [HUE-9101](https://issues.cloudera.org/browse/HUE-9101) [editor] Refresh the history after execution in notebook 2
-* b4b8e1c8a0 [HUE-9101](https://issues.cloudera.org/browse/HUE-9101) [editor] Move clear history logic into the new history component
-* 8da347825d [HUE-9101](https://issues.cloudera.org/browse/HUE-9101) [editor] Move history search into the query history panel
-* f8a5930783 [HUE-9101](https://issues.cloudera.org/browse/HUE-9101) [editor] Create generic snippet tab styles
-* 54d9a443fe [HUE-9101](https://issues.cloudera.org/browse/HUE-9101) [editor] Extract the query history to a contained component for editor v2
-* d2955f791e [HUE-9000](https://issues.cloudera.org/browse/HUE-9000) [editor] Prevent error message on history status checks
-* 119306aac8 [HUE-9099](https://issues.cloudera.org/browse/HUE-9099) [frontend] Add parser support for Hive CREATE MATERIALIZED VIEW
-* c82f1d4c93 [HUE-9099](https://issues.cloudera.org/browse/HUE-9099) [frontend] Extend the Hive parser MSCK syntax
-* d55d9a1034 [HUE-9099](https://issues.cloudera.org/browse/HUE-9099) [frontend] Add new table constraints to Hive ALTER and CREATE statements
-* 292e6be694 [HUE-9099](https://issues.cloudera.org/browse/HUE-9099) [frontend] Add column constraints to Hive ALTER and CREATE statements
-* 96801be962 [HUE-9090](https://issues.cloudera.org/browse/HUE-9090) [docs] Add details on running specific js test files to the docs
-* b17c9a98a8 [HUE-9090](https://issues.cloudera.org/browse/HUE-9090) [frontend] Fix exceptions in parser related test utils
-* 96d41105a3 [HUE-9100](https://issues.cloudera.org/browse/HUE-9100) [hive] Adding a set of tests to the hiveserver2 lib
-* 357f25e907 [HUE-9066](https://issues.cloudera.org/browse/HUE-9066) [gist] Lazily create user gist directory
-* 4bbd6bff29 [HUE-9098](https://issues.cloudera.org/browse/HUE-9098) [docs] Fix mistake about points in administrator documentation
-* 7597e2255e [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [connectors] Move template to absolute path in desktop
-* 7739245a82 HUE 9096 [doc] Add a feature flag to link sharing
-* bf5d432d19 HUE 9096 [share] Raw template skeleton of link sharing
-* 6f446c6faf [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Avoid huge font on second levels of lists
-* 8b8a7ac420 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Hide reference to direct IP to cdn
-* ba527089b4 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Still use NodePort for now for website services
-* 81811d5c0c [HUE-9084](https://issues.cloudera.org/browse/HUE-9084) [editor] Adding Apache Flink parser skeleton
-* bcfb0389bb [HUE-9084](https://issues.cloudera.org/browse/HUE-9084) [ace] Adding latest languages files
-* 1a5d4c6acc [HUE-9084](https://issues.cloudera.org/browse/HUE-9084) [editor] Adding highlighter skeleton to Flink SQL
-* bc032d9737 [HUE-9084](https://issues.cloudera.org/browse/HUE-9084) [notebook] Adding a skeleton of Flink SQL interpreter
-* 31140f24fd [HUE-9066](https://issues.cloudera.org/browse/HUE-9066) [gist] Add a feature flag off for now
-* 1077441e60 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Port DB from replicationcontroller to deployment
-* 7761991010 [HUE-9077](https://issues.cloudera.org/browse/HUE-9077) [connector] Protect boot against when no fs is configured
-* f54990e64e [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Add checksum of config for helm upgrade hue pod restart
-* 0c0d05820b [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Simplify NOTES.txt of helm chart
-* 4bb746da2d [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Add additional potential auth via ingress
-* 26fe7ecd55 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Adding missing resource requirement for nginx and postgres
-* d6db2e5db3 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Harmonize TLS certificates generation
-* 29c56307c6 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Avoid hardcoding the storage of PostGreSQL PV
-* 98f4e962ae [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Update the cert annotation for the website ingress
-* e6e1692ac5 [HUE-9064](https://issues.cloudera.org/browse/HUE-9064) [editor] Skeleton of sending back live query results via WS
-* 5a5431893b PR1009 [oozie] Added the ability to filter workflows against id: and name: parameters (#1009)
-* 0d6bbec088 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [py3] Fix useradmin and libs unit tests and fix urllib import in mako   liboozie.tests.test_config_gen   liboozie.tests.test_config_gen_negative   librdbms.tests.TestDatabasePasswordConfig.test_read_password_from_script   libsaml.tests.test_xmlsec_dynamic_default_no_which   useradmin.tests
-* 467955164b [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [hdfs] Fix webhdfs unit tests in py3   test_with_core_site (azure.tests.TestAzureAbfs)   test_with_credentials (azure.tests.TestAzureAbfs)   test_with_core_site (azure.tests.TestAzureAdl)   test_with_credentials (azure.tests.TestAzureAdl)   hadoop.tests.test_tricky_confparse   hadoop.tests.test_config_validator_basic
-* bc27235408 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Fix the website service ports
-* 8899b9d38c [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Adding CPU limits to the website deployments
-* dacdc5bad0 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docker] Adding website image building
-* bfeec59e71 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Fix spacing in website ingress with two domains
-* bb7c8828c6 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [connector] Avoid stack trace when Oozie is disabled
-* 17b5fa7ea6 [HUE-9097](https://issues.cloudera.org/browse/HUE-9097) [frontend] Limit webpack chunk name length to less than 128 chars
-* b0722bfb4d [HUE-9000](https://issues.cloudera.org/browse/HUE-9000) [editor] Have the column selection stick to top of window when scrolling the results
-* 50214498e7 [HUE-9000](https://issues.cloudera.org/browse/HUE-9000) [frontend] Unify result status messages in one component
-* f0cf0df20c [HUE-9088](https://issues.cloudera.org/browse/HUE-9088) [frontend] Fix no default export warning after ko upgrade
-* 217792fb92 [HUE-9000](https://issues.cloudera.org/browse/HUE-9000) [editor] Properly position result headers after query tab switching
-* a2aae7041d [gethue] Add highlight.js and port all the highlights to it, fix the list styling
-* 93d1151ed2 [HUE-9095](https://issues.cloudera.org/browse/HUE-9095) [docs] Perform release 4.6
+* f017739444 [HUE-9276](https://issues.cloudera.org/browse/HUE-9276) [release] Perform 4.8 release
+* 235e7f4ba3 [HUE-9276](https://issues.cloudera.org/browse/HUE-9276) [docs] Update README screenshot with 4.8
+* a176efb0fd [HUE-9276](https://issues.cloudera.org/browse/HUE-9276) [release] Adding the 4.8 release notes
+* e9324a0308 [HUE-9276](https://issues.cloudera.org/browse/HUE-9276) [blog] 4.8 release post
+* 69b8b662b0 [HUE-9477](https://issues.cloudera.org/browse/HUE-9477) [ci] Allow rebase on master in Pull Requests
+* 3933571b28 [HUE-9483](https://issues.cloudera.org/browse/HUE-9483) [test] Adding pytest libs to requirements.txt
+* 15a321b919 [HUE-9483](https://issues.cloudera.org/browse/HUE-9483) [test] Adding pytest configuration
+* cf328f371d [HUE-9483](https://issues.cloudera.org/browse/HUE-9483) [test] Adding pytest-django compatible with Python 2
+* 95a2d35f15 [HUE-9483](https://issues.cloudera.org/browse/HUE-9483) [test] Adding pytest 4.6 compatible with Python 2
+* 739cc9e746 [HUE-9482](https://issues.cloudera.org/browse/HUE-9482) [ui] Add queries interface in Job Browser
+* 369b2986cc [HUE-9455](https://issues.cloudera.org/browse/HUE-9455) [filebrowser] part-1 File system user home directory is wrong in S3 only configuration
+* 802bfe24e3 [HUE-9476](https://issues.cloudera.org/browse/HUE-9476) [importer] Indexer file format guess API call errors with Python 3
+* 481393a563 [HUE-9468](https://issues.cloudera.org/browse/HUE-9468) [phoenix] Pull phoenixdb module from pypy with Python 3
+* 82f132a2b7 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Renaming Hue to Hue Editor
+* afd4601b77 [HUE-9477](https://issues.cloudera.org/browse/HUE-9477) [indexer] SQL code formatting errors with StopIteration with Python 3
+* b196a43762 [HUE-9276](https://issues.cloudera.org/browse/HUE-9276) [blog] SQL improvements overview in 4.8
+* e48f518a8d [HUE-9475](https://issues.cloudera.org/browse/HUE-9475) [core] Add JCEKS keystore reading capability in Hue (#1268)
+* 0a1e9128ce [HUE-9276](https://issues.cloudera.org/browse/HUE-9276) [blog] Adding image to API blog post
+* 5616dba057 [ci] Skip wsgiserver.py from the CI (#1244)
+* 99ad0fde71 [core] Add back Python 3 compatibility to wsgiserver (#1244)
+* d9a0662d87 [core] Revert re-formating of wsgiserver (#1244)
+* e02ef1e5d3 [oozie] Fix workflow graph rendering with Python 3 - part 2 (#1262) (#1267)
+* 5c1b422d6e [HUE-9276](https://issues.cloudera.org/browse/HUE-9276) [docs] Refresh REST API with more details on the authentication
+* 02369f7774 [HUE-9276](https://issues.cloudera.org/browse/HUE-9276) [blog] REST API for sending SQL queries and browsing files
+* c8b7ba97bf [HUE-9276](https://issues.cloudera.org/browse/HUE-9276) [blog] Consolidate 4.6 version tag into the global 4
+* e996974da1 [HUE-9474](https://issues.cloudera.org/browse/HUE-9474) [importer] Error with Python 3 when trying to upload file to S3 bucket
+* fbbc08ce22 [HUE-9456](https://issues.cloudera.org/browse/HUE-9456) [editor] Update backend to get proper connector type id
+* 4627408002 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [blog] Update Flink connector URL
+* c68dea5f5e [HUE-9468](https://issues.cloudera.org/browse/HUE-9468) [ui] Empty database cannot be open in Browser as link is on empty string
+* fca954f03b [HUE-1450](https://issues.cloudera.org/browse/HUE-1450) [docs] Add SQL prefix to the Scratchpad component page
+* 01c1594965 [HUE-1450](https://issues.cloudera.org/browse/HUE-1450) [docs] Display the TOC on the API page
+* 6399333863 [HUE-1450](https://issues.cloudera.org/browse/HUE-1450) [docs] Document the current Execute Query API
+* 9079de385d [HUE-1450](https://issues.cloudera.org/browse/HUE-1450) [docs] Document the File Importer API with curl
+* 71e7b87684 [HUE-1450](https://issues.cloudera.org/browse/HUE-1450) [docs] Document the File Browser API with curl
+* 82eebc416c [HUE-1450](https://issues.cloudera.org/browse/HUE-1450) [docs] Document the API authentication with curl
+* 238846f9b8 [HUE-9473](https://issues.cloudera.org/browse/HUE-9473) [flink] Listing table column fails with release 0.2
+* 4d72314392 [oozie] Fix workflow graph rendering with Python 3 (#1262) (#1266)
+* b4b515b700 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [blog] Updating the Flink SQL gateway setup instruction
+* 845403de65 [desktop] Fix oozie api when Py3 is used (#1262) (#1263)
+* 8a5731c1ba [HUE-9464](https://issues.cloudera.org/browse/HUE-9464) [editor] Add Hive parser support for DROP SCHEDULED QUERY
+* cff3b41bdd [HUE-9464](https://issues.cloudera.org/browse/HUE-9464) [editor] Add Hive parser support for ALTER SCHEDULED QUERY
+* 6356585cdc [HUE-9464](https://issues.cloudera.org/browse/HUE-9464) [editor] Add Hive parser support for CREATE SCHEDULED QUERY
+* ab96d016cb [HUE-9464](https://issues.cloudera.org/browse/HUE-9464) [editor] Update Hive ALTER parser with the latest syntax
+* a12a075ae9 [HUE-9464](https://issues.cloudera.org/browse/HUE-9464) [editor] Update TRUNCATE syntax for the Hive parser
+* 298d58ac70 [HUE-9464](https://issues.cloudera.org/browse/HUE-9464) [editor] Add support for MANAGEDLOCATION in the Hive parser
+* 798b247de7 [desktop] Fix code not compatible with py3 (#1239) (#1260)
+* 5e83f68915 [HUE-9455](https://issues.cloudera.org/browse/HUE-9455) [filebrowser] part-1 File system user home directory is wrong in S3 only configuration
+* f72022a938 [HUE-9455](https://issues.cloudera.org/browse/HUE-9455) [filebrowser] part-2 fixed the bug of manual refresh button
+* 84e3d1870e [HUE-9465](https://issues.cloudera.org/browse/HUE-9465) [editor] Update the Hive documentation to the latest version
+* 59e3a54196 [HUE-9465](https://issues.cloudera.org/browse/HUE-9465) [editor] Update paths in the Hive documentation extractor
+* a0f4372dd1 [HUE-9466](https://issues.cloudera.org/browse/HUE-9466) [impala] Use Impala as the name of the editor when FENG is on
+* 53a004339f [HUE-9466](https://issues.cloudera.org/browse/HUE-9466) [impala] Avoid Cannot parse job IDs for execution engine impala
+* c04d89a277 [core] Fix some code not compatible with python 3 (#1244)
+* aa45633e79 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [ci] Allow rebase commit message in pull requests
+* 44b3e9ef72 [HUE-9461](https://issues.cloudera.org/browse/HUE-9461) [editor] Update the Impala documentation to the latest version
+* 181f650a21 [HUE-9461](https://issues.cloudera.org/browse/HUE-9461) [tools] Fix the sql reference generator tool for Impala
+* dc6e28041f [HUE-9463](https://issues.cloudera.org/browse/HUE-9463) [assist] Fix js exception in the reference repository for non-defined dialects
+* c601ba99a1 [HUE-9456](https://issues.cloudera.org/browse/HUE-9456) [editor] Use the default editor if not specified in the URL in editor v2
+* 8cad54283c [HUE-9456](https://issues.cloudera.org/browse/HUE-9456) [editor] Fix issue with constant spinner in autocompletion of popular entries
+* 85c6f5f386 [HUE-9456](https://issues.cloudera.org/browse/HUE-9456) [editor] Send the actual snippet and notebook for executables in the editor
+* 866cf29236 [HUE-9456](https://issues.cloudera.org/browse/HUE-9456) [editor] Include the raw statement when executing in editor v2
+* 7b8cfe9b8f [HUE-9454](https://issues.cloudera.org/browse/HUE-9454) [editor] Always resolve promises in the autocompleter when closed or re-opened
+* d4ffa8332e [HUE-9457](https://issues.cloudera.org/browse/HUE-9457) [importer] Improve visibility of path input in the importer file chooser
+* 259136abba [HUE-9456](https://issues.cloudera.org/browse/HUE-9456) [editor] Implement variable substitution in editor V2
+* 08ea596d88 [HUE-9456](https://issues.cloudera.org/browse/HUE-9456) [editor] Make sure executable ID doesn't change after loading from history in editor v2
+* d5d7211729 [HUE-9456](https://issues.cloudera.org/browse/HUE-9456) [editor] Set initial handle optionals and add session verification in editor v2
+* 24578d96b8 [HUE-9456](https://issues.cloudera.org/browse/HUE-9456) [editor] Clean up editor V2 execution logic and enable roundtrip test
+* 2b7b7b97ce [HUE-9454](https://issues.cloudera.org/browse/HUE-9454) [editor] Make it possible to define reserved keyword per dialect
+* beadebba66 [HUE-9454](https://issues.cloudera.org/browse/HUE-9454) [editor] Refactor the autocompleter to use async/await instead of jQuery deferred
+* 526e74ffae [HUE-9408](https://issues.cloudera.org/browse/HUE-9408) [ui] Column comments are not displayed in Table browser
+* 35d3e9fdb0 [HUE-9458](https://issues.cloudera.org/browse/HUE-9458) [ui] UI build - Support custom webpack config files (sree)
+* 307cdec392 [HUE-9460](https://issues.cloudera.org/browse/HUE-9460) [ui] HiveQueryPlan - Split Vue component and web-component wrapper (sree)
+* 09ae1da0bc [HUE-9454](https://issues.cloudera.org/browse/HUE-9454) [editor] Use the identifier escape char from the connector properties in the editor
+* f569327cfa [HUE-9449](https://issues.cloudera.org/browse/HUE-9449) [tb] Use the last active editor or assist database as default when opening the table browser from the left nav
+* 4ab093738b [HUE-9459](https://issues.cloudera.org/browse/HUE-9459) [editor] Make sure return types are unique when UDFs are merged
+* 0f1315f6dc [HUE-9459](https://issues.cloudera.org/browse/HUE-9459) [editor] Set a max width on the autocomplete meta column in the suggestions
+* 07f1909a8f [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Extract and split DESCRIBE, INSERT, MERGE, SET and UPDATE for Hive and Presto
+* 3bd95c2484 [HUE-9449](https://issues.cloudera.org/browse/HUE-9449) [tb] Include connector id in "Open in table browser" links
+* 7c49cf4c36 [HUE-9445](https://issues.cloudera.org/browse/HUE-9445) [docker] Adding modules for Phoenix connector
+* a63f69088b [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Format onboarding to be easier to read
+* cdbc212ae3 [HUE-9453](https://issues.cloudera.org/browse/HUE-9453) [docs] Refresh the docker How To
+* e1a9ed258d [HUE-9453](https://issues.cloudera.org/browse/HUE-9453) [blog] Quickstart Hue in Docker and query any of your Database
+* ea739b2082 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Upper case ER diagram name
+* c819792658 [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [docs] Add the concept of structure.json syntax modules
+* 6332c98626 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [blog] Remove duplicated post
+* cdbe8ae145 [HUE-1246](https://issues.cloudera.org/browse/HUE-1246) [presto] Support additional arguments for pyhive sqlalchemy library (#1250)
+* 13f33561d4 [HUE-9451](https://issues.cloudera.org/browse/HUE-9451) [blog] Adding python syntax and commit title checking to CI
+* 9ffaab59cb [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Refactor the component registry sections
+* df74ef0e59 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Docker ini example styling
+* 89dc3f6d0b [HUE-9452](https://issues.cloudera.org/browse/HUE-9452) [core] Python2 no longer compile because of ipython and traitlets
+* abee0ba12f [HUE-9451](https://issues.cloudera.org/browse/HUE-9451) [blog] CI for python lint and git commit format
+* 172e34be7d [HUE-9451](https://issues.cloudera.org/browse/HUE-9451) [ci] Split pytlint and commit format checks into sections
+* c4c77540ee [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Clean-up of the database op section
+* 0ee86e9203 [HUE-9450](https://issues.cloudera.org/browse/HUE-9450) [k8s] Add checksum of both ini configs
+* 19831a70b5 [HUE-9371](https://issues.cloudera.org/browse/HUE-9371) [pylint] Get linting return code result just after the linting
+* a5cfb6e85c [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Fix wrong prefix for AWS section in config map
+* 7b46ca50ac [HUE-9450](https://issues.cloudera.org/browse/HUE-9450) [jb] Avoid failure to start when app is blacklisted
+* ece65d4c43 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Do not use localhost in nginx config map
+* b69a9d9917 [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Extract and split GRANT, REVOKE, LOAD, IMPORT, MSCK and EXPORT for Hive and Presto
+* afc9105efd [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Extract and split CREATE for Hive and Presto
+* c5dbbf3752 [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Extract and split ALTER, SHOW and DROP for Hive and Presto
+* a5a994c7df [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Split Impala SELECT grammar and reduce duplication with the generic parser
+* 94875014af [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Split Impala UDF grammar and reduce duplication with the generic parser
+* 157385d93b [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Extract SHOW and UPDATE into separate grammar files for Impala
+* 7506957ace [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Extract INSERT, UPSERT and SET into separate grammar files for Impala
+* c4750f8f45 [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Extract GRANT, REVOKE and LOAD into separate grammar files for Impala
+* 082b1c7bb4 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docker] Expect api to run on standart port 8888
+* cef644d603 [HUE-9447](https://issues.cloudera.org/browse/HUE-9447) [ci] Allow more than one digit number to github PR
+* f8986b9a26 [HUE-9371](https://issues.cloudera.org/browse/HUE-9371) [ci] Sync-up the .pylintrc
+* e4afbb8288 [HUE-9447](https://issues.cloudera.org/browse/HUE-9447) [ci] Add pip install of pylint and pylint_django
+* e0abb85a76 [HUE-9371](https://issues.cloudera.org/browse/HUE-9371) [ci] Extract the git home path so that it is not hardcoded
+* c5e0dd2e66 [HUE-9371](https://issues.cloudera.org/browse/HUE-9371) [ci] Whitelist demo.gethue.com links for now
+* 8f0c1f038a [HUE-9371](https://issues.cloudera.org/browse/HUE-9371) [ci] Make sure that failing lints fail the CI
+* 7c4bfdb85f [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Disable monitoring and tracing by default
+* e69c1d9218 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Fix typos in the code review section
+* 7b81844696 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Moving how to register components to main section
+* 030bebae78 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Move the parser component section to its own page
+* 1522399d76 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Refresh the website install instructions
+* f4a10466fc [HUE-9423](https://issues.cloudera.org/browse/HUE-9423). [editor] Parser demo app build is failing with gethue (sree)
+* b433b9285e Merge branch 'master' into ci-commit-master-ayush
+* 96aba14cf3 [HUE-9445](https://issues.cloudera.org/browse/HUE-9445) [phoenix] Listing table sample in Table Browser errors
+* e1ef3bd769 [HUE-9371](https://issues.cloudera.org/browse/HUE-9371) [pylint] Move .pylintrc to repo root
+* 9edcbd254b [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Show how to use credentials with SqlAlchemy
+* 5483984624 [HUE-9371](https://issues.cloudera.org/browse/HUE-9371) [docs] Reference the commit message hooks
+* de26b79603 [HUE-9446](https://issues.cloudera.org/browse/HUE-9446) [docs] Add linter config files locations
+* 1acafd5743 [HUE-9371](https://issues.cloudera.org/browse/HUE-9371) [ci] Running both linters in the repo
+* 2aada27088 [HUE-9371](https://issues.cloudera.org/browse/HUE-9371) [ci] Add commit message check to the ci
+* cb8512489a [HUE-9371](https://issues.cloudera.org/browse/HUE-9371) [ci] Adding script to validate commit messages
+* 50d533053f [HUE-9447](https://issues.cloudera.org/browse/HUE-9447) [ci] Check for commit message
+* dd0100915b [HUE-9371](https://issues.cloudera.org/browse/HUE-9371) [pylint] Add 3 rules to get started
+* e80a41bb43 CDPD-15032 [metastore] Drop selected Databases errors
+* e638982a12 [HUE-9446](https://issues.cloudera.org/browse/HUE-9446) [ci] Add python linting to the ci
+* cdea845d9a [HUE-9446](https://issues.cloudera.org/browse/HUE-9446) [ci] Improve Python lint checking detection script
+* a7c02b8798 [HUE-9374](https://issues.cloudera.org/browse/HUE-9374) [impala] Use 26000 as default for thrift-over-http
+* 59dd1d13f0 [HUE-9367](https://issues.cloudera.org/browse/HUE-9367) [lib] Get addendum for 2 bugs in PHOENIX-5994
+* e0d6825e6b [HUE-9444](https://issues.cloudera.org/browse/HUE-9444) [notebook] Teradata and Athena jdbc interfaces are not working (#1240)
+* 954aa6bc9b [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Remove intermediary parser rules for each statement type to improve pluggability
+* aaa697307f [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Extract and split DROP statements for the impala parser
+* 2f509089c8 [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Extract and split CREATE and analyze type statements for Impala
+* e332d3304e [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Fix issue with structure definition of hive related parsers
+* 28da7be2e6 [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Extract and split ALTER for Impala
+* e7c494a72b [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Delete old unused jison files
+* 605abaa154 [livy] Add numExecutors options (#1238)
+* 15eaa59861 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Add note about phoenix connector and Python 3
+* f00377a7eb [HUE-9441](https://issues.cloudera.org/browse/HUE-9441) [editor] Don't suggest empty database in the autocomplete
+* c7009e8ea3 [HUE-9441](https://issues.cloudera.org/browse/HUE-9441) [editor] Support empty database URLs for Notebook and Table Browser APIs
+* 557d631355 [HUE-9441](https://issues.cloudera.org/browse/HUE-9441) [editor] Switch to empty string when there's no database name for Phoenix
+* a07a74659f [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Adjust path for phoenix connector example
+* 4765f2f28b [HUE-9434](https://issues.cloudera.org/browse/HUE-9434) [jb] Fix issue in getting the logs if the job had failed
+* 4e10db173b [HUE-9435](https://issues.cloudera.org/browse/HUE-9435) [aws] Fix issue with aws behind proxy and make S3_USE_SIGV4 default when region is set
+* 111416a2bf [HUE-9432](https://issues.cloudera.org/browse/HUE-9432) [core] Detect if chardet is installed
+* 19e43ee69a [HUE-9433](https://issues.cloudera.org/browse/HUE-9433) [assist] Fix exceptions in the UDF assist filter
+* 6c5f768841 [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Remove all duplication from the Calcite parser
+* eba122bd89 [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Split out all the UDFs and make most of the statements pluggable via structure.json in the generic parser
+* c8030b46d6 [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Split ALTER, CREATE and DROP into parts for the generic parser
+* bafbb8ea9e [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Merge the generic2 parser back into generic
+* 5a6af42023 [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Extract cte, joins, from and union to separate grammar files for the generic 2 parser
+* 8e0cc1a4e2 [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Extract the generic 2 select conditions to separate jison files
+* b39e355563 [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Extract SELECT grammar to a separate file in generic 2
+* 8fcc5660d3 [HUE-9429](https://issues.cloudera.org/browse/HUE-9429) [editor] Introduce a new generic2 parser as base for improved structure
+* ed834efc38 [HUE-9425](https://issues.cloudera.org/browse/HUE-9425) [ui] Fix issue with rendering dynamic bundles in the login page
+* e4c296b743 [HUE-9425](https://issues.cloudera.org/browse/HUE-9425) [ui] Don't throw exception when detecting bundles if webpack isn't ready
+* 542f0f6bfb [HUE-9425](https://issues.cloudera.org/browse/HUE-9425) [ui] Automatically detect and load webpack chunks per app
+* fdf029bf1e [HUE-9425](https://issues.cloudera.org/browse/HUE-9425) [ui] Fix issue with the CleanWebpackPlugin trying to clean the wrong folder
+* d91655b458 [HUE-9409](https://issues.cloudera.org/browse/HUE-9409) [docs] Add the Development Process to development guide
+* 4bf7ed0ac7 [HUE-9409](https://issues.cloudera.org/browse/HUE-9409) [blog] Fix links and bad formatting in the code review blog post
+* 58d8e23599 hue-9409-RBTools
+* e10ddd1abd [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Harmonize link sections in developer index
+* 086395e9ae [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Reorganize the list of dependencies
+* 181e5afdb8 [parser] Handle partition columns only in Impala insert statement (#1231)
+* 7af5cced77 [HUE-9373](https://issues.cloudera.org/browse/HUE-9373) [core] Rename keytab_reinit_frequency variable at Python level
+* 89d4bded51 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Adding example of ops command to reset a user password
+* 6b7060ad50 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Give output of the command listing
+* bdcab12926 Revert "[HUE-9373](https://issues.cloudera.org/browse/HUE-9373) [core] keytab_reinit_frequency is ignored in hue.ini (#1161)"
+* a4a734312b [HUE-9425](https://issues.cloudera.org/browse/HUE-9425) [ui] Fix issue with bundle loading in table and job browser
+* a7ebd79d88 Bump elliptic from 6.5.2 to 6.5.3 (#1229)
+* 8394ac0f39 [HUE-9426](https://issues.cloudera.org/browse/HUE-9426) [doc] Exclude gethue content from 'make docs'
+* faf09df471 [HUE-9422](https://issues.cloudera.org/browse/HUE-9422) [core] Apply HUE-9045 on requests-2.23.0
+* d2a2298599 [HUE-9421](https://issues.cloudera.org/browse/HUE-9421) [core] Remove ext lib chardet-3.0.4 * revert partial commit of PR 1095
+* 8ba5f91a66 [HUE-9428](https://issues.cloudera.org/browse/HUE-9428) [editor] Fix issue where the syntax parsers fails parsing statements with UDFs
+* 2b63f2e617 [HUE-9427](https://issues.cloudera.org/browse/HUE-9427) [ui] Fix the hue_dep API example
+* 27e0109470 [docs] Fix some typographical errors (#1228)
+* 7ff706e96e [HUE-9367](https://issues.cloudera.org/browse/HUE-9367) [phoenix] Handle empty DB as ' ' (not 'NULL'?)
+* 76bd01532c [HUE-9367](https://issues.cloudera.org/browse/HUE-9367) [lib] Update phoenixdb with PHOENIX-5994
+* 66fdfa46a8 [HUE-9381](https://issues.cloudera.org/browse/HUE-9381). ERD - Add event listeners for all entities (sree)
+* 8ede4cd9e9 [HUE-9420](https://issues.cloudera.org/browse/HUE-9420) [ui] Limit webpack chunk name length
+* 210c557935 [HUE-9381](https://issues.cloudera.org/browse/HUE-9381). ERD - Hide current DB name in table box (sree)
+* cf7e3ccb03 [HUE-9381](https://issues.cloudera.org/browse/HUE-9381). ERD - Add className based styling for each entity (sree)
+* 745126ba90 [HUE-9381](https://issues.cloudera.org/browse/HUE-9381). ERD - Table box interaction changes (sree)
+* 35ed72d6cc [HUE-9381](https://issues.cloudera.org/browse/HUE-9381). Replace Relationships tab with ERD (sree)
+* 524c489d07 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Fix hue dependency path in the parser demo project
+* 6d07836395 [HUE-8390](https://issues.cloudera.org/browse/HUE-8390) [hive] Use database instead of schema for argument names
+* 0faba5c6e3 [HUE-8390](https://issues.cloudera.org/browse/HUE-8390) [hive] Rename getStatus() to get_status()
+* 434138a479 [HUE-8390](https://issues.cloudera.org/browse/HUE-8390) [hive] Implement Get Primary Keys via Thrift GetPrimaryKeys
+* 4509256382 [HUE-8390](https://issues.cloudera.org/browse/HUE-8390) [hive] Implement Get Foreign Keys via Thrift TGetCrossReferenceReq
+* c2b92df630 [doc] Fix typo in install section (#1216)
+* 952cafb4d3 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Adding link to Python API in the Operation section
+* e13e9b5b86 [HUE-9418](https://issues.cloudera.org/browse/HUE-9418). [docs] Tech to render web components in docs (sree)
+* dd68c85d4e [HUE-9414](https://issues.cloudera.org/browse/HUE-9414). Remove style tags in ERD demo app (sree)
+* b10c9fcda8 [HUE-9381](https://issues.cloudera.org/browse/HUE-9381). [ui] ERD: Add fallback for font awesome (sree)
+* c50b3c4f53 [HUE-9414](https://issues.cloudera.org/browse/HUE-9414) [npm] Adding screenshots to each category
+* 71befaf166 [HUE-9414](https://issues.cloudera.org/browse/HUE-9414) [docs] Clean-up the release checklist
+* ee67ff180a [HUE-9414](https://issues.cloudera.org/browse/HUE-9414) [npm] Add some description and keywords
+* 6cc1169078 [HUE-9368](https://issues.cloudera.org/browse/HUE-9368). [docs] Fix for runserver stopping abruptly (sree)
+* 353fd2c29d [HUE-9417](https://issues.cloudera.org/browse/HUE-9417). Make NPM-README generic (sree)
+* 586e332b10 [HUE-9414](https://issues.cloudera.org/browse/HUE-9414). Fixed parse path in npm package (sree)
+* 600d245852 [HUE-9415](https://issues.cloudera.org/browse/HUE-9415) [impala] Adding default value to daemon_api_auth_scheme in inis
+* 61a92137ae [HUE-9415](https://issues.cloudera.org/browse/HUE-9415) [impala] Support connecting to Impala's webui with basic auth (#1214)
+* 2155207715 [HUE-9417](https://issues.cloudera.org/browse/HUE-9417). [docs] Introduce the Web components (sree)
+* bf2a8467d9 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Refactoring and simplifying the quick start guide
+* 054c26fe75 [HUE-8020](https://issues.cloudera.org/browse/HUE-8020) [core] Increase username length to 150 characters (#1208)
+* fe4aba768c [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Promote more the quick docker dev setup
+* 5d382e8e84 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Rewrite the dev onboarding to be simpler
+* d47543208c [HUE-9413](https://issues.cloudera.org/browse/HUE-9413) [qb] Adding test suites for the Hive dialect
+* 1649459b6d [HUE-9416](https://issues.cloudera.org/browse/HUE-9416) [doc] Add SLES 12 dependencies
+* cabdc5e3a2 [HUE-9414](https://issues.cloudera.org/browse/HUE-9414). [ui] Add ERD demo app (sree)
+* cefe6179e3 [HUE-9414](https://issues.cloudera.org/browse/HUE-9414). [ui] Publish ERD component to NPM (sree)
+* 9cde62d7ca [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Shorten-up language reference build section title
+* c3e5a374c3 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [gethue] Fix link pointing to Phoenix connector install
+* ac98e2a257 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [gethue] Fix anchor link to ksqlDB connector doc
+* d14f14f2e6 [HUE-9413](https://issues.cloudera.org/browse/HUE-9413) [qb] Add minimal info to the query detail page
+* 39b01a8813 [HUE-9413](https://issues.cloudera.org/browse/HUE-9413) [qb] Parameterize the Query History DB connection
+* 274a6ed2bb [HUE-9413](https://issues.cloudera.org/browse/HUE-9413) [qb] Plug in the ORM into the list query API
+* bcc61ada1a [HUE-9413](https://issues.cloudera.org/browse/HUE-9413) [qb] Add query DB routing
+* 3426d62e0e [HUE-9413](https://issues.cloudera.org/browse/HUE-9413) [qb] Just show the Hive Query browser when flag is on
+* 1653140f85 [HUE-9413](https://issues.cloudera.org/browse/HUE-9413) [qb] Schema model tweaks to be valid
+* f999ac696c [HUE-9413](https://issues.cloudera.org/browse/HUE-9413) [qb] First model for HiveQuery
+* 0502e4caab [HUE-9412](https://issues.cloudera.org/browse/HUE-9412). [ui] Add tests for ERD component (sree)
+* b9e3934d53 [core] Bump lodash from 4.17.13 to 4.17.19 (#1213)
+* 87e9ff3d13 [HUE-9411](https://issues.cloudera.org/browse/HUE-9411) [core] Add missing oozie and pig migrations (sree)
+* 40f9a18fec [HUE-9410](https://issues.cloudera.org/browse/HUE-9410). Doc changes for - Add unit testing base to vue components (sree)
+* 7a6ed40112 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [jb] Rename webpack bundle not built to avoid 500
+* 2466670e43 [HUE-9410](https://issues.cloudera.org/browse/HUE-9410). [ui] Add unit testing base to vue components (sree)
+* 86b4f07add [blog] Localized in Japanese monitoring activity with Grafana blog (#1211)
+* f757edb26d git commit -m "[HUE-9381](https://issues.cloudera.org/browse/HUE-9381) [ui] Add limits and ellipsis to ERD component (sree)
+* b6f769d83e [notebook] Fix Deleted method SparkApi.get_properties #1206 (#1209)
+* 635805574a [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Harmonize titles of reference section
+* 85e179cf99 [HUE-9381](https://issues.cloudera.org/browse/HUE-9381). [frontend] Table ERD (sree)
+* 171a4e5156 [HUE-9367](https://issues.cloudera.org/browse/HUE-9367) [docs] Properly indent Note about connector impersonation
+* d4af4b684d [HUE-9390](https://issues.cloudera.org/browse/HUE-9390) [docs] Update some MS sqlserver connector dead links
+* 12435be4d1 [HUE-9390](https://issues.cloudera.org/browse/HUE-9390) [docs] Explains the mysqllib update to do with latest OSs
+* f7c68d3f2a [HUE-9369](https://issues.cloudera.org/browse/HUE-9369) [editor] Fix some missing tokens in the Airline SQL query sample   - change MONTH to month   - change count to count(*)
+* a2d46e1b7f [HUE-9394](https://issues.cloudera.org/browse/HUE-9394). [ui] Cannot pass complex data into web components (sree)
+* 45153325c9 [HUE-9383](https://issues.cloudera.org/browse/HUE-9383) [core] Avoid potential script execution in Share Document UI  (#1203)
+* de7e0b6ac7 Revert "[HUE-9383](https://issues.cloudera.org/browse/HUE-9383) potential Script execution in Share Document UI (asnaik) (#1190)" (#1204)
+* c3d0a6fa63 [HUE-9392](https://issues.cloudera.org/browse/HUE-9392) [ui] Adjust Vue indentation linter rules
+* 52af454fe0 [HUE-9392](https://issues.cloudera.org/browse/HUE-9392) [ui] Switch Vue web component wrapper to support styling
+* 3d45d9c56a [HUE-9392](https://issues.cloudera.org/browse/HUE-9392) [core] Move UI config repo to Typescript
+* 163cfbfecd [HUE-9396](https://issues.cloudera.org/browse/HUE-9396) [core] Implement SAML groups check and redirect them to 403 page if not permitted. (#1202)
+* b00308afdf [HUE-9396](https://issues.cloudera.org/browse/HUE-9396) [core] Implement SAML groups check and redirect them to 403 page if not permitted. (#1201)
+* f83a017722 [HUE-9386](https://issues.cloudera.org/browse/HUE-9386) [blog] Add post of Hue Grafana dashboard
+* 8eae082a7e [HUE-9399](https://issues.cloudera.org/browse/HUE-9399) [fs] Run the config check for ABFS as the logged in user
+* c74260530b [HUE-9399](https://issues.cloudera.org/browse/HUE-9399) [fs] Fix issue with missing user argument in _get_client_cached
+* beaa889d7f [HUE-9397](https://issues.cloudera.org/browse/HUE-9397) [ui] Only show share action when sharing is enabled or for admins
+* e56ec82de3 [HUE-9397](https://issues.cloudera.org/browse/HUE-9397) [core] Have the sharing related APIs serve a 403 if document sharing is disabled for non-admins
+* fc822ba779 [HUE-9397](https://issues.cloudera.org/browse/HUE-9397) [core] Add a config flag to enable/disable document sharing
+* 24c0344d07 [HUE-9398](https://issues.cloudera.org/browse/HUE-9398) [core] Add attribute_map_dir saml configuration. (#1196)
+* cd12de9cef [HUE-9396](https://issues.cloudera.org/browse/HUE-9396) [core] Implement SAML groups check and redirect them to 403 page if not permitted. (#1195)
+* c4a9150c86 [HUE-9395](https://issues.cloudera.org/browse/HUE-9395) [core] Update the notice file
+* 8b46e3a54e [HUE-9366](https://issues.cloudera.org/browse/HUE-9366) [libsaml] SAML Authentication with additional group checks
+* 778c7c8709 [HUE-9366](https://issues.cloudera.org/browse/HUE-9366) [saml] Add redirect of denied SAML login to a 403 page
+* 09a8044ff1 [HUE-9393](https://issues.cloudera.org/browse/HUE-9393) [core] Upgrade SQLAlchemy to SQLAlchemy-1.3.17 (#1194)
+* 9fdbc3abcc [HUE-9366](https://issues.cloudera.org/browse/HUE-9366) [design] Redirect denied SAML login to a 403 page
+* 9d0136c135 [oozie] Fixing UnboundLocalError issue in coordinator from HDFS submission (#1191)
+* 97041e5b7a [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [site] Adding link to Apache Flink Editor
+* 52c75305f1 [HUE-9392](https://issues.cloudera.org/browse/HUE-9392) [ui] Include Typescript files in the linter
+* 5f8c150ea5 [HUE-9392](https://issues.cloudera.org/browse/HUE-9392) [ui] Apply new TS linter rules
+* 5a30e411ae [HUE-9392](https://issues.cloudera.org/browse/HUE-9392) [ui] Include Vue files in the linter
+* 3433438a31 [HUE-9392](https://issues.cloudera.org/browse/HUE-9392) [ui] Apply new Vue related linting rules
+* 1d070ac86c [HUE-9379](https://issues.cloudera.org/browse/HUE-9379) [ui] Add absolute path in file detection to ci checks
+* 21ed570fe2 [HUE-9266](https://issues.cloudera.org/browse/HUE-9266) [ui] Enable Typescript for vue components
+* 65adceb01b [HUE-9266](https://issues.cloudera.org/browse/HUE-9266) [ui] Switch the hive query plan component from ko to a vue web component
+* b58139ccde [HUE-9391](https://issues.cloudera.org/browse/HUE-9391) [ui] Possible Script Execution on Documents Page in Description Field	 (#1193)
+* 2f5a563892 [HUE-9385](https://issues.cloudera.org/browse/HUE-9385) [blog] Fix typo in nmp license screenshot title
+* 0ca7241dc5 [blog] Translated licence and absolute path CI blog into Japanese (#1192)
+* b554c8ec8c [HUE-9385](https://issues.cloudera.org/browse/HUE-9385) [blog] Adding ci nmp license checker screenshot
+* ed020d94d1 [HUE-9389](https://issues.cloudera.org/browse/HUE-9389) [ui] Fix missing connector id for the indexes and streams assist panels
+* dd13bbacf8 [HUE-9388](https://issues.cloudera.org/browse/HUE-9388) [search] Disable webworkers in the dashboard ace editor
+* 1533466dd2 [HUE-9387](https://issues.cloudera.org/browse/HUE-9387) [tb] Fix bug where the Table browser always thinks navigator and optimizer is enabled
+* 429a6a2123 [HUE-9387](https://issues.cloudera.org/browse/HUE-9387) [tb] Fix js exception for undefined metastoreViewodel
+* df10924d81 [HUE-9384](https://issues.cloudera.org/browse/HUE-9384) [ui] Fix js exceptions from document empty trash and create folder
+* 41d0f83058 [HUE-9377](https://issues.cloudera.org/browse/HUE-9377) [ui] Reduce webpack config duplication
+* cc661b00ee [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [useradmin] Light refactoring of message strings
+* e81e94fd3c [HUE-9385](https://issues.cloudera.org/browse/HUE-9385) [blog] Automated checks for JavaScript modules compatible licenses and non absolute paths
+* 70c3224075 [HUE-9382](https://issues.cloudera.org/browse/HUE-9382) Possible Script Execution on Add/Sync LDAP users (asnaik) (#1189)
+* 2ffd30378f [HUE-9383](https://issues.cloudera.org/browse/HUE-9383) potential Script execution in Share Document UI (asnaik) (#1190)
+* 621d95ee0a [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [core] Small CSV export lib restyling
+* 4264dea710 [HUE-9368](https://issues.cloudera.org/browse/HUE-9368) [docs] How to run Hive queries in dev section (sree) (#1188)
+* 86b2077b24 [HUE-9379](https://issues.cloudera.org/browse/HUE-9379) [ui] Add a tool for absolute path in file detection
+* 19089ffa12 [HUE-9377](https://issues.cloudera.org/browse/HUE-9377) [ui] Translate all absolute paths added by Vue to relative paths in the js.map files
+* 6dbf75b902 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [sqlalchemy] Return empty functions instead of error
+* e97e4f582e [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Fix link to gethue in 4.6 release note
+* 04db0b7677 [HUE-8740](https://issues.cloudera.org/browse/HUE-8740) [sqlalchemy] Support complex types in the autocomplete
+* ca8d13c094 [HUE-9374](https://issues.cloudera.org/browse/HUE-9374) [editor] Fix transport mode error in query_server config
+* 608b1287d3 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Add 'beeswax' to supported describe udf dialects
+* 4982839577 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Describe functions if needed when opened in the UDF assist panel
+* 421231651e [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Add pub sub events for describing individual UDFs
+* 61c10c148c [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [assist] Fix cache issue in the assist udf reference panel
+* c9a2789a51 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Cache the UDF categories instead of the API response to support individual describe
+* d8437091a2 [HUE-9377](https://issues.cloudera.org/browse/HUE-9377) [ui] Prevent absolute paths from Vue in the js.map files
+* 9a3909d352 [HUE-9374](https://issues.cloudera.org/browse/HUE-9374) [editor] Support Thrift on HTTP to Impala
+* 5f53b669ee [HUE-8740](https://issues.cloudera.org/browse/HUE-8740) [sqlalchemy] Do not fail autocomplete on non DB prefixed tables
+* 505a84e82f [HUE-9378](https://issues.cloudera.org/browse/HUE-9378) [core] Removing python-crontab lib
+* 3c5df49881 [HUE-9377](https://issues.cloudera.org/browse/HUE-9377) [ui] Improve source map generation
+* 9c33e2d9c0 [HUE-9376](https://issues.cloudera.org/browse/HUE-9376) [ui] Include tsconfig.json in the build scripts
+* 6d34924d40 [HUE-9377](https://issues.cloudera.org/browse/HUE-9377) [ui] Apply new linting rules
+* ed826b50f1 [HUE-9377](https://issues.cloudera.org/browse/HUE-9377) [ui] Upgrade jest and linters to latest versions
+* 22fbea5b77 [HUE-9377](https://issues.cloudera.org/browse/HUE-9377) [ui] Upgrade webpack and babel to the latest versions
+* 3be8d30d38 [HUE-9376](https://issues.cloudera.org/browse/HUE-9376) [ui] Move the SQL reference repository to Typescript
+* 9efb96f7dc [HUE-9376](https://issues.cloudera.org/browse/HUE-9376) [ui] Add Typescript support
+* 750073b49e [HUE-9370](https://issues.cloudera.org/browse/HUE-9370) [editor] Add details about UDF argument locations to the Hive, Presto and Impala parsers
+* 441af44217 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Add keywords suggestions to the Hive UDF reference
+* aaaa2a2032 [fb] Changed assert target stat from numRows to numFiles (#1178)
+* becfdbf7c1 [beeswax] Set localhost for default expected value (#1181)
+* ea4cbeb23b [filebrowser] test_compress_hdfs_files need to access jobbrowser (#1174)
+* 7f0becea9b [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Fix title of foreign key section in Editor
+* 7d8210b6ea [hive] TestHive.test_install_examples need to access to beeswax (#1176)
+* fc8a5a1ac8 added builtin str for compatiblity with python2 and python3 (#1172)
+* d3cc8ff366 [HUE-9375](https://issues.cloudera.org/browse/HUE-9375) [editor] Fix js exception on filter in the UDF assist panel
+* a885302aee [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Add keywords suggestions to the Impala UDF reference
+* 762d1762c8 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Add support for UDF keyword suggestions in the autocompleter
+* f30d7051d5 [blog] Localize phoenix post (#1169)
+* 413277e440 [about] Update admin_wizard.mako content test case (#1168)
+* 6ff04f3c57 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Add function description in autocomplete API
+* c8a0a031cc [HUE-9370](https://issues.cloudera.org/browse/HUE-9370) [editor] Fix npm webworker bundle generation
+* 4a3ca309d0 [HUE-9370](https://issues.cloudera.org/browse/HUE-9370) [editor] Add details about UDF argument locations to the generic parser and its relatives
+* 3e950bcdd7 [HUE-9370](https://issues.cloudera.org/browse/HUE-9370) [editor] Improve the structure of shared parse support utils and extract additional functions
+* 6077d9bde2 [HUE-9370](https://issues.cloudera.org/browse/HUE-9370) [editor] Add UDF argument grammar to the generic parser
+* 3c73d709cf [HUE-9370](https://issues.cloudera.org/browse/HUE-9370) [editor] Extract UDF grammar to separate files
+* 936a3aefeb [HUE-9370](https://issues.cloudera.org/browse/HUE-9370) [editor] Reduce duplication for ALTER, DROP and SHOW in the Presto parser
+* e2c9cd929f [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [blog] Update video link of HDFS Browser post
+* c9043a35e0 [auth] Deactivate login error's form doesn't have 'username'. (related to #1164) (#1165)
+* 57a24ccc06 [HUE-9367](https://issues.cloudera.org/browse/HUE-9367) [phoenix] Adding PHOENIX-5938 Support impersonation in the python driver
+* 0ed12f7c19 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Add Phoenix impersonation example
+* 97fb3b3043 [HUE-9372](https://issues.cloudera.org/browse/HUE-9372). [frontend] Auto complete values for LIMIT Clause (sree)
+* 8e8f270193 [metastore] Added grant_access to TestApi.test_show_tables (#1162)
+* f15be02274 [HUE-9373](https://issues.cloudera.org/browse/HUE-9373) [core] keytab_reinit_frequency is ignored in hue.ini (#1161)
+* 332fa7c0cd [HUE-9369](https://issues.cloudera.org/browse/HUE-9369) [editor] Adding Airline sample queries
+* 71e1a9542e [HUE-9369](https://issues.cloudera.org/browse/HUE-9369) [editor] Configuration to auto install sample queries and tables
+* d4541e1006 [HUE-9365](https://issues.cloudera.org/browse/HUE-9365) [core] Fix check config if warehouse is in S3
+* 711ebe31d8 [proxy] Changed login to make_logged_in_client with is_superuser=True in proxy_test (#1158)
+* 1315356ea7 [tools] Removed pylint from jenkins.sh (#1154)
+* dde4d07b6b [HUE-9266](https://issues.cloudera.org/browse/HUE-9266) [jb] Add a skeleton Hive query plan component
+* 9e7ee7d38e [HUE-9266](https://issues.cloudera.org/browse/HUE-9266) [ui] Enable webpack for the job browser code
+* 133f7f571b [HUE-9370](https://issues.cloudera.org/browse/HUE-9370) [frontend] Switch to structure.json for hive, impala and the generic parsers
+* 5edddcead1 [HUE-9370](https://issues.cloudera.org/browse/HUE-9370) [frontend] Switch to structure.json for the elasticsearch parser
+* b5ad2a58e8 [HUE-9370](https://issues.cloudera.org/browse/HUE-9370) [frontend] Switch to structure.json for the druid parser
+* 0280d489e7 [HUE-9370](https://issues.cloudera.org/browse/HUE-9370) [frontend] Switch to structure.json for the flink parser
+* beedb684b1 [HUE-9370](https://issues.cloudera.org/browse/HUE-9370) [frontend] Switch to structure.json for the calcite parser
+* 18b8a4abe8 [HUE-9370](https://issues.cloudera.org/browse/HUE-9370) [frontend] Switch to structure.json for the presto parser
+* 365e970cb8 [HUE-9370](https://issues.cloudera.org/browse/HUE-9370) [frontend] Switch to structure.json for the phoenix parser
+* 2dbf3b6ead [HUE-9370](https://issues.cloudera.org/browse/HUE-9370) [frontend] Switch to structure.json for the ksql parser
+* 8ce1d058c3 [HUE-9370](https://issues.cloudera.org/browse/HUE-9370) [frontend] Add parser generation based on structure.json file definition
+* 0823db268a [core] Changed jenkins.sh variable names to be more general (#1153)
+* 572815e65b [HUE-9346](https://issues.cloudera.org/browse/HUE-9346) [ui] Add npm license checker to circleci config
+* c0c404f732 [editor] Updated test with proper exception message (#1141)
+* a795011efd [HUE-9368](https://issues.cloudera.org/browse/HUE-9368) [docs] Improve dev onboarding experience (sree) (#1151)
+* ed3c2fe249 [HUE-9367](https://issues.cloudera.org/browse/HUE-9367) [phoenix] Include PHOENIX-5936 sqlAlchemy get_columns KeyError
+* 24ee8960f9 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Extract argument and return types from the UDF API response
+* 344604a551 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Add a refresh button in the assist UDF panel
+* 0bd98e8673 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Cache the responses from the UDF autocomplete endpoint
+* 6e99ff3b34 [#1149] added a filebrowse_action method to MockFS for oozie.models2_tests.TestEditor.test_create_new_workflow (#1150)
+* 965e50f2e2 IS-1142 [test] Added install pylint for jenkin.sh (#1143)
+* 0040dba555 IS-1147 [hive] Fixed TestHiveserver2ApiWithHadoop failed during unit tests (#1148)
+* db4b01d884 IS-1139 [core] Fixed ERROR: desktop.auth.views_test.TestMultipleBackendLoginNoHadoop.test_login (#1144)
+* 5dcaeeafdb IS1146 [filebrowser] Fixed XxdTest:test_compare_to_xxd failed (#1146)
+* f061e63b5a [HUE-9367](https://issues.cloudera.org/browse/HUE-9367) [phoenix] Updating connector blog post and documentation
+* 2ce46f129c [HUE-9367](https://issues.cloudera.org/browse/HUE-9367) [phoenix] Bundle SqlAlchemy connector
+* 52946f02fe [HUE-9367](https://issues.cloudera.org/browse/HUE-9367) [phoenix] Trim the semi colon in the dialect
+* 2c18427dd1 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Fix phoenix pip install command section
+* ee4e5ff207 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Add result from the autocomplete functions API to the udf repository
+* 19dddfab7d [HUE-9198](https://issues.cloudera.org/browse/HUE-9198) [assist] Fix ABFS upload issue in left assist
+* 85f0f7d0bc [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Use async UDF return type resolution for the autocompleter results
+* 13961a69c8 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Remove the dependency on sqlFunctions from all parsers
+* bc9968e21d [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Extract shared type logic from the parsers into one place
+* ada62a31b1 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Switch autocompleter to async set option resolution
+* 2bface0f0b [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Switch to the async functions repository in the function context popover
+* 23592fad4c [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Remove argument type resolution from sqlFunctions
+* 5840203300 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Switch to async function resolution in the autocomplete results
+* 604e2eef57 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Remove unused suggestFunctions from SqlFunctions
+* 3485c7f144 [HUE-9364](https://issues.cloudera.org/browse/HUE-9364) [editor] Use spaces instead of tab in the compose area
+* c06f39cae9 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [notebook] Adding new api and hiveserver2 tests
+* c861e1e9a9 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [impala] Adding function listing for Impala
+* 214b0efdc6 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [hive] Support GetFunction execution and fetching
+* 8e261a8161 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [hive] Adding Thrift call to GetFunctions
+* 94ed383ec6 [HUE-9295](https://issues.cloudera.org/browse/HUE-9295) [docker] Avoid pulling Django 3 by mistake with Python 3
+* dd82d768d4 [HUE-9295](https://issues.cloudera.org/browse/HUE-9295) [hive] Python 3.8 support on initial create session
+* 2a92e3fd5b [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [hive] Fix missing % typo in log printing
+* bf4cefe6ab [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Function autocomplete test in hiveserver connector
+* b12709aec8 PR1125 [spark] Fix merging of custom configuration for connectors with default (#1125)
+* 4e69ffe3aa [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Add function listing in autocomplete API
+* a26094172e [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [bquery] Load credentials via json text instead of file
+* 9fb9b827e6 [HUE-9358](https://issues.cloudera.org/browse/HUE-9358) [design] Adding HiveServer2 HA failover
+* d521ee60e5 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Refactor Solr connector configuration section
+* 5d6c5383cf [HUE-9355](https://issues.cloudera.org/browse/HUE-9355) [design] Restrict access based on a list of SAML groups
+* 7f7edc4c02 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Align dialect impersonation flag name
+* 29ff3952d7 [HUE-9280](https://issues.cloudera.org/browse/HUE-9280) [flink] Bubble up autocomplete errors
+* 5086985bcf [HUE-9280](https://issues.cloudera.org/browse/HUE-9280) [flink] Extract server url from the connector options
+* 814aedacae [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Move type resolution from parsers to the autocompleter
+* 8c9648fbb6 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Extract type conversion tables from SqlFunctions to one per dialect
+* 0ff59cd0f4 [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Update the functions panel to use the new sql functions repository
+* 865210556a [HUE-7738](https://issues.cloudera.org/browse/HUE-7738) [editor] Extract udf and set option reference to a per dialect structure
+* 589201b4ff [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Fix js exception from jobs panel
+* 775b3efe7f [HUE-9354](https://issues.cloudera.org/browse/HUE-9354) [editor] Prevent grayed out result when fetch_result_data returns empty data in editor v2
+* f2dd9f6a54 [HUE-9291](https://issues.cloudera.org/browse/HUE-9291) [editor] Fix issue where non streaming results are flagged as streaming in editor v2
+* 3e44df0295 [HUE-9358](https://issues.cloudera.org/browse/HUE-9358) [hive] Proper message with LLAP HA discovery when all servers down
+* 497a933ec9 [#1133] variables in REMOTE_DEPLOYMENT_DIR is not properly replaced (#1135)
+* 1eb103ae4d [HUE-9357](https://issues.cloudera.org/browse/HUE-9357) [hive] Add logging to HIVE_DISCOVERY_HIVESERVER2_ZNODE discovery
+* 677514c551 [HUE-9356](https://issues.cloudera.org/browse/HUE-9356) [core] 4.7.1 release
+* 33f8b4d956 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Refresh latest microk8s install step
+* cf6b898030 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [blog] Rename container name to just 'sql-training'
+* 96381e8914 [HUE-9353](https://issues.cloudera.org/browse/HUE-9353) [ranger] how to grant ranger permissions for a new user on a secure cluster
+* cd0cd2f237 [HUE-9291](https://issues.cloudera.org/browse/HUE-9291) [editor] Show a message while waiting for streaming data
+* efadcdca9f [HUE-9291](https://issues.cloudera.org/browse/HUE-9291) [editor] Add live filtering of streaming data in the result grid
+* c168d73c7e [HUE-9291](https://issues.cloudera.org/browse/HUE-9291) [editor] Disable result search for streaming data
+* 2d1c3fbc96 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Refresh the install instructions
+* 470290b62f [HUE-9291](https://issues.cloudera.org/browse/HUE-9291) [editor] Add a default limit of 1000 records for streaming data in the result grid
+* 7a5f68fa5f [HUE-9352](https://issues.cloudera.org/browse/HUE-9352) [editor] Wait with showing the execute button until the session is loaded in editor v2
+* e9250141f3 [HUE-9291](https://issues.cloudera.org/browse/HUE-9291) [editor] Reverse the result table rows for streaming results
+* 2a43dc2bb9 [HUE-9351](https://issues.cloudera.org/browse/HUE-9351) [editor] Insert history records after execute instead of refetching all
+* a5327836e8 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Prevent js exception for "missing snippets" on jobs update
+* d583c9b1b7 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [blog] Adding Druid SQL Editor demo video
+* 9623d985e8 [HUE-9291](https://issues.cloudera.org/browse/HUE-9291) [flink] Set semicolon stripping to true for the dialect
+* cb6d034be3 [HUE-9291](https://issues.cloudera.org/browse/HUE-9291) [flink] Provide check_status results in a result attribute
+* 530e1819a3 [HUE-9291](https://issues.cloudera.org/browse/HUE-9291) [flink] Add streaming status in check status
+* bfaeeb88fa [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [hive] Avoid trying to close a session not found
+* 84c50fdde2 [HUE-9291](https://issues.cloudera.org/browse/HUE-9291) [editor] Append streaming results in the result grid component
+* 434ed73a1c [HUE-9291](https://issues.cloudera.org/browse/HUE-9291) [editor] Introduce 'streaming' execution status in the UI
+* 56c17be270 [HUE-9064](https://issues.cloudera.org/browse/HUE-9064) [ui] Add a global js flag for web sockets
+* 60d5ef43df PR1130 [helm] Fix typo in Chart.yml description (#1130)
+* 0c24e6347e [HUE-9350](https://issues.cloudera.org/browse/HUE-9350) [core] Update notice and license files
+* 0596c9955e [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [gethue] Remove extra right parenthesis in links
+* 61b8ed5b8c ISSUE-1127 [oozie] Submit a coordinator from HDFS does not work  (#1128)
+* ef8c8da113 PR1129 [blog] Localized Knox and Flink SQL in posts in Japanese (#1129)
+* 6c280d66f0 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Use quotes as identifier quotes in Druid dialect
+* 3cc3dd349e [HUE-9347](https://issues.cloudera.org/browse/HUE-9347) [task] Use getattr and not __getattr__
+* 92a8dbe8df [HUE-8768](https://issues.cloudera.org/browse/HUE-8768) [editor] Initial handling of runtime query errors
+* fc01add284 [HUE-9349](https://issues.cloudera.org/browse/HUE-9349) [editor] Fix flaky result header in editor v2
+* a0cbd3e148 [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [frontend] Don't persist local optimizer results in the IndexedDB
+* e5ee775264 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Switch to using connectors in the web workers
+* 65f4b01c49 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Switch to using connector id in the UI where applicable
+* bcdd410468 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Use is_sql check in simple ace editor to determine if syntax checking is active
+* 777b8eae72 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [assist] Switch to connectors in the get assist database event
+* f9797730b4 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [assist] Use connector when remembering last opened db in the assist panel
+* 318b59ce6d [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [assist] Publish catalog entry with connector on assist selections
+* 38e7cc6bbe [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [frontend] Fix popular joins in the local optimizer strategy
+* a03775b53d [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Fix issue with popular columns and tables in editor v2
+* 94ced036a4 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [frontend] Use connector instead of sourceType in the contextCatalog
+* 3e669d12ed [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Switch from sourceType to connector only in the data catalog and entries
+* 0af0dd3388 [HUE-9347](https://issues.cloudera.org/browse/HUE-9347) [task] Avoid importing the celery libs when task server if off
+* af799e546a [HUE-9347](https://issues.cloudera.org/browse/HUE-9347) [task] Raise QueryError with an argument
+* 335cfef9d2 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [spark] Add a create session test to the connector
+* 419c0a3a35 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Adding id attribute to deprecate type one
+* 1244b9db02 PR1126 [hive] Retrieve the proper LLAP session (#1126)
+* b82defbdb1 [HUE-9345](https://issues.cloudera.org/browse/HUE-9345) [knox] how to configure hue to use knoxspnegodjango backend on secure cluster
+* 4bd9699855 [HUE-9280](https://issues.cloudera.org/browse/HUE-9280) [blog] Fix docker cp typo in Flink SQL Editor post
+* 2292e896d1 [HUE-9287](https://issues.cloudera.org/browse/HUE-9287) [frontend] Adjust jquery plugins for recent jquery upgrade
+* 6280f8e185 [HUE-9290](https://issues.cloudera.org/browse/HUE-9290) [frontend] Properly terminate additional html elements
+* 1da6589d99 [HUE-9346](https://issues.cloudera.org/browse/HUE-9346) [ui] Add licence-checker tool for npm packages
+* 4313352e59 [HUE-9280](https://issues.cloudera.org/browse/HUE-9280) [flink] Blog post on initial SQL Editor
+* 957de0e75e [HUE-9280](https://issues.cloudera.org/browse/HUE-9280) [flink] Design update with first version
+* 68a40540ef [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Strip semicolon in Druid dialect
+* e3ed4b62e9 PR1124 [blog] Translate the Impala SQL editor blog into Japanese (#1124)
+* acbb4d77e0 PR1123 [aws] s3datetime_to_timestamp parse timestamp with Z(minio.io) (#1123)
+* 436704c40b [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Prepare a is Hive LLAP flag
+* 043977fb17 [HUE-9280](https://issues.cloudera.org/browse/HUE-9280) [flink] Send live results via check status
+* 81498725f3 [HUE-9280](https://issues.cloudera.org/browse/HUE-9280) [flink] Support describe table in left assist
+* 11a13829cd [HUE-9280](https://issues.cloudera.org/browse/HUE-9280) [flink] Cancel and check status calls
+* 6b4b6b1463 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Prepare a is Hive LLAP flag
+* ebde13a188 [HUE-9293](https://issues.cloudera.org/browse/HUE-9293) [editor] Fix issue where additional fetched rows are not rendered after scroll in editor v2
+* 56a5529c34 [HUE-9191](https://issues.cloudera.org/browse/HUE-9191) [ui] Make sure entries are loaded when clicking on the key in the context popover
+* 033acbb3ec [HUE-9292](https://issues.cloudera.org/browse/HUE-9292) [editor] Support autocompletion of files from the root for adl, abfs and s3a
+* ae46f57b90 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [frontend] Add connector support in the quick query component
+* fcc76001c3 [HUE-9291](https://issues.cloudera.org/browse/HUE-9291) [editor] Only set the result type when defined
+* 1ebdf5a124 [HUE-9291](https://issues.cloudera.org/browse/HUE-9291) [editor] Don't error for sync results
+* f411939ff7 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [py3] Handle PEP 479 Py3.8 generator raised StopIteration
+* 48f2f2df9b [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [py3] Support rendering template with Python 3.8
+* 5b48b92029 [HUE-8738](https://issues.cloudera.org/browse/HUE-8738) [task] Avoid blind TypeError concatenating 'NoneType' and 'str'
+* e1296ea83f [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [blog] How to quick start querying Apache Impala in 3 minutes
+* baf21fb0fd [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [py3] Support compiling with Python 3.8
+* d70fbcc72f [HUE-9290](https://issues.cloudera.org/browse/HUE-9290) [frontend] Properly close certain html tags
+* 531f000ef7 [HUE-9289](https://issues.cloudera.org/browse/HUE-9289) [assist] Fix HDFS file preview in the left assist
+* c5d920c60e [HUE-9289](https://issues.cloudera.org/browse/HUE-9289) [editor] Fix editor context popover for files with a root path other than /
+* 080fb745ca [HUE-9267](https://issues.cloudera.org/browse/HUE-9267) [editor] Add sanity check for delayed ddl execution
+* 611ad1b12b [HUE-9288](https://issues.cloudera.org/browse/HUE-9288) [editor] Fix selection type variable substitution in the editor
+* bdc2527840 [HUE-9287](https://issues.cloudera.org/browse/HUE-9287) [frontend] Upgrade jQuery to 3.5
+* 57f78ffda4 [HUE-9280](https://issues.cloudera.org/browse/HUE-9280) [flink] Remove wrong import of has ssh missing util
+* 8ed2e0ee6e [HUE-9286](https://issues.cloudera.org/browse/HUE-9286) [sqlalchemy] Provide an ability to configure outbound impersonation (#1120)
+* 523a342d93 [HUE-9285](https://issues.cloudera.org/browse/HUE-9285) [editor] Properly dispose the jquery tablescroller plugin
+* 8817ef4c9e [HUE-9285](https://issues.cloudera.org/browse/HUE-9285) [editor] Limit result grid rows in notebook mode for editor v2
+* da042ff66d [HUE-9285](https://issues.cloudera.org/browse/HUE-9285) [editor] Only show result controls after execution in presentation mode for editor v2
+* 8527fe4f14 [HUE-9284](https://issues.cloudera.org/browse/HUE-9284) [editor] Only update the history panel when the status of an executable has changed in editor v2
+* f5d6b4efd0 [HUE-9249](https://issues.cloudera.org/browse/HUE-9249) [browser] Enable highlight overflow in the query browser
+* 1afc620638 [HUE-9249](https://issues.cloudera.org/browse/HUE-9249) [browser] Prevent onbeforeunload when downloading the query profile
+* fbf1a6df6b [HUE-9182](https://issues.cloudera.org/browse/HUE-9182) [ui] Have the left assist context popover stick if clicked to open
+* 6636cf0530 [HUE-9141](https://issues.cloudera.org/browse/HUE-9141) [frontend] Indicate read-only status in the document context popover
+* 0cbe8b945b [HUE-9283](https://issues.cloudera.org/browse/HUE-9283) [ui] Fix issue with missing source map slowing down initial render
+* e41446f258 [HUE-9283](https://issues.cloudera.org/browse/HUE-9283) [ui] Use the correct SPDX licence expression in package.json
+* 8695a02c03 I1116 [notebook] Fix not rendering Markdown in notebook's snippet (Issue #1116) (#1117)
+* 786003ac9c [HUE-9280](https://issues.cloudera.org/browse/HUE-9280) [flink] Support async fetch results
+* b7dcf4406a [HUE-9280](https://issues.cloudera.org/browse/HUE-9280) [flink] Create and cache session
+* c283218fc3 [HUE-9280](https://issues.cloudera.org/browse/HUE-9280) [flink] List tables of tables with underscore in the name
+* 75235033ce [HUE-9280](https://issues.cloudera.org/browse/HUE-9280) [flink] Fetch result in a sync way
+* bf32ab86e0 [HUE-9280](https://issues.cloudera.org/browse/HUE-9280) [flink] Properly send back SQL error messages
+* 08b2553280 [HUE-9280](https://issues.cloudera.org/browse/HUE-9280) [docs] Adding proper link to image mockup
+* 5fd2ef6967 [HUE-9280](https://issues.cloudera.org/browse/HUE-9280) [docs] Adding more scoping for Flink SQL
+* ba0335ca96 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [k8s] Add CPU limit to email stats cron and flower
+* 43e893eef5 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Add connector id to document when saving query
+* f40198dbe4 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [admin] Link to configuration section when hitting misconfig
+* 19748b25b8 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Fix connector initialization in editor v2
+* 7ea17da197 [HUE-9191](https://issues.cloudera.org/browse/HUE-9191) [tb] Use the key component for keys in column lists
+* cc7739c67a [HUE-9191](https://issues.cloudera.org/browse/HUE-9191) [ui] Use the key component in the context popover
+* 48dc4465f7 [HUE-9281](https://issues.cloudera.org/browse/HUE-9281) [core] Users home directory becomes created with the wrong owner on LDAP environment (#1115)
+* b126ead3a5 PR1114 [blog] Localized Editor for Spark SQL with Livy into Japanese (#1114)
+* 5b36ae0ba5 [HUE-9191](https://issues.cloudera.org/browse/HUE-9191) [ui] Show foreign key details in a tooltip for entries in the DB assist
+* 31322751dc [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Prevent js exception when the editor is opened for a non-existing connector
+* ca0a5a5e9c [HUE-9274](https://issues.cloudera.org/browse/HUE-9274) [ui] Prevent real ajax requests from the jest tests
+* 4edcb07bdb [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Switch to synchronized initial hueConfig
+* ae6711191b [HUE-9277](https://issues.cloudera.org/browse/HUE-9277) [docs] Scope Livy Spark Sql Editor
+* f84016f993 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Scope SQL autocomplete for Livy
+* 7f44c7fcec [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Avoid key error when saving query without connector
+* 8b443dd091 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Clear executables when saving a query
+* 4da4fbbd75 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Show Livy Sql as a SQL supporting dialect
+* 814e26cd7a [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Avoid js error when refreshing right assist
+* 911408940b [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Adding check connection to livy dialect
+* 8740cc04cc [HUE-8738](https://issues.cloudera.org/browse/HUE-8738) [task] Protect against missing query key in check status
+* acd1ab23b5 [HUE-8737](https://issues.cloudera.org/browse/HUE-8737) [py3] Bump jaeger lib thas has a simpler tornado dependency
+* cbbbf639bb [HUE-9275](https://issues.cloudera.org/browse/HUE-9275) [editor] Silence end user autocomplete calls that timeout
+* 5561edf832 PR111 [docs] Grammar improvements in CONTRIBUTING.md (#1111)
+* baeccd42c8 PR1109 [jdbc] Fix next() interface in result iteration (#1109)
+* c3adc42a91 [HUE-8020](https://issues.cloudera.org/browse/HUE-8020) [admin] Adding test of username login length
+* 1ca909f1eb [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [test] Avoid all the debug output of the DB migrations
+* ea0b39982f [HUE-8020](https://issues.cloudera.org/browse/HUE-8020) [core] Increase username login input length (#1104)
+* a9756c709c [HUE-9273](https://issues.cloudera.org/browse/HUE-9273) [notebook] Encoding Error when use non-ascii characters in sql-editor-variables (#1108)
+* 61c1cdbaee [HUE-9273](https://issues.cloudera.org/browse/HUE-9273) [editor] Add test to check for backend variable replacement
+* 3bdf4f2ba3 [HUE-9271](https://issues.cloudera.org/browse/HUE-9271) [core] Use UBI base images for Hue images (#1107)
+* 36b85ea45d [HUE-9272](https://issues.cloudera.org/browse/HUE-9272) [core] Reduce Hue docker image size (#1106)
+* 49e20f2475 [HUE-9271](https://issues.cloudera.org/browse/HUE-9271) [core] Use UBI base images for Hue images (#1105)
+* a058e41cb2 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [sqlalchemy] Fix missing self.interpreter in rebase
+* 10df3fbfda [HUE-9266](https://issues.cloudera.org/browse/HUE-9266) [hive] Skeleton of mini job browser interface
+* 116fd6e938 [HUE-9266](https://issues.cloudera.org/browse/HUE-9266) [jb] Do not show live history job counter when flag is off
+* 99354c6dd2 [HUE-9084](https://issues.cloudera.org/browse/HUE-9084) [core] Fix eslint in jobBrowserLinks
+* 97324505d5 [HUE-9266](https://issues.cloudera.org/browse/HUE-9266) [history] Change job counter to be about running queries
+* d5918f94ea [HUE-9266](https://issues.cloudera.org/browse/HUE-9266) [history] Show submission time
+* 822cb3d77a [HUE-9266](https://issues.cloudera.org/browse/HUE-9266) [history] Left zero pad history ids so that sorting and refresh are consistent
+* 3970d457cc [HUE-9266](https://issues.cloudera.org/browse/HUE-9266) [history] Allow to fetch the history for all the type of queries
+* 91b6c5423f [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Persist query history status changes
+* e4e6c1ad58 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Add has_impersonation setting to sqlalchemy
+* 0a33d80099 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [sqlalchemy] Add support for connector semicolon statement trim
+* 98c9a858da [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [ci] Add apt-get update to unblock missing dev packages
+* e4d046ab60 [HUE-9270](https://issues.cloudera.org/browse/HUE-9270) [sqlalchemy] Add impersonation flag
+* 0d0b0a89c5 [HUE-9270](https://issues.cloudera.org/browse/HUE-9270) [sqlalchemy] Update tests with new parameters
+* b846fc7a16 [HUE-9270](https://issues.cloudera.org/browse/HUE-9270) [sqlalchemy] Close session of a user closes his engine
+* 92857c1f75 [HUE-9270](https://issues.cloudera.org/browse/HUE-9270) [sqlalchemy] Rename CONNECTION_CACHE to CONNECTIONS
+* c46b8ad8c9 [HUE-9270](https://issues.cloudera.org/browse/HUE-9270) [sqlalchemy] Reuse close_statement in cancel API
+* a0610f34dc [HUE-9270](https://issues.cloudera.org/browse/HUE-9270) [sqlalchemy] Proper engine cache
+* b04de721c8 [HUE-9270](https://issues.cloudera.org/browse/HUE-9270) [sqlalchemy] Session revamp
+* 57c8bc8ee7 [HUE-9077](https://issues.cloudera.org/browse/HUE-9077) [ksql] Rely on error decorator to catch autocomplete exception
+* a4433618ce [HUE-9077](https://issues.cloudera.org/browse/HUE-9077) [ksql] Move API connection out of constructor
+* 3033026a9a [HUE-9077](https://issues.cloudera.org/browse/HUE-9077) [ksql] Fix metadata format of query result
+* 90ab6708cb [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [editor] Remove unused SavedQuery import
+* a9e3c295c8 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Update execute_and_wait base tests
+* 16657f22eb [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Save connector id of saved and history queries
+* 7645ebbf00 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Adding connector to saved queries
+* 6cd67f1cba [HUE-3797](https://issues.cloudera.org/browse/HUE-3797) [notebook] Option to avoid HTML escaping the query result
+* 52e653e933 [HUE-3797](https://issues.cloudera.org/browse/HUE-3797) [browser] Hive query browser query syntax highlight
+* f82d5937f1 [HUE-3797](https://issues.cloudera.org/browse/HUE-3797) [browser] Add listing of past Hive schedule executions
+* 29e079d7bb [HUE-3797](https://issues.cloudera.org/browse/HUE-3797) [scheduler] Skeleton of Hive Scheduled queries browser
+* 79a2af292c [HUE-9266](https://issues.cloudera.org/browse/HUE-9266) [jb] Adding skeleton of Query History as Job Browser type
+* f2e47ecd0c [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Show human friendly title in the left assist
+* 13032037fd [HUE-9182](https://issues.cloudera.org/browse/HUE-9182) [ui] Improve click handling for left assist context popover
+* 69a88ec49d [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [editor] Remove function usage in editor v2
+* c254bba123 [HUE-9263](https://issues.cloudera.org/browse/HUE-9263) [frontend] Prevent disposal of static components
+* f128a19d71 [HUE-9263](https://issues.cloudera.org/browse/HUE-9263) [assist] Fix issue where the reference panels won't update after editor type change
+* 11dd055152 [HUE-9263](https://issues.cloudera.org/browse/HUE-9263) [assist] Switch from type to connector when setting assist source via events
+* d963142d65 [HUE-9263](https://issues.cloudera.org/browse/HUE-9263) [assist] Consolidate assist events into constants to prevent spelling mistakes
+* 5e423f4e9a [HUE-9262](https://issues.cloudera.org/browse/HUE-9262) [editor] Set the lastExecuted timestamp in editor v2
+* 74e1262de0 [HUE-9265](https://issues.cloudera.org/browse/HUE-9265) [assist] Add multiline statement to drag and drop from left assist
+* 215a266446 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Revamp the admin database page
+* 0bbaf0db7f [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [docs] Support for Oracle RAC
+* 8beacf19af [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [core] Avoid AttributeError when logging REST call
+* a6a614202d [HUE-9758](https://issues.cloudera.org/browse/HUE-9758) [connector] Set SQL dialect optimization flags to true
+* cfa2b3c6fa [HUE-9259](https://issues.cloudera.org/browse/HUE-9259) [impala] Removing incremental refresh
+* 3dbf982a8f [HUE-8738](https://issues.cloudera.org/browse/HUE-8738) [task] Use https for websocket accordingly
+* 471b0079f6 [HUE-9264](https://issues.cloudera.org/browse/HUE-9264) [parser] Add impala missing string function (#1103)
+* a44cbf710e [HUE-9758](https://issues.cloudera.org/browse/HUE-9758) [metastore] Avoid 'Config' error when refreshing the page
+* 27b3e146ad [HUE-9758](https://issues.cloudera.org/browse/HUE-9758) [connector] Flags if dialect language and function available
+* f52078fb53 [HUE-9249](https://issues.cloudera.org/browse/HUE-9249) [browser] Trim impala query and protect when missing
+* 19e7f1b437 [HUE-9238](https://issues.cloudera.org/browse/HUE-9238) [docs] Adding SqlAlchemy connector specific tasks
+* 20fc250071 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Flink sql v1
+* 1393866fda [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [spark] Add Livy sql connector type
+* e4fd81769b [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [spark] Properly rename job server to LivyClient
+* 92967a2d14 [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [catalog] Support window.dataCatalog.disableCache() for optimizer calls
+* ede69d2b3a [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [editor] Use connector dialect_properties to determine if risks should be shown or not
+* f689920fcb [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Track connector changes instead of dialect changes
+* 247b708051 [HUE-9256](https://issues.cloudera.org/browse/HUE-9256) [editor] Fix js exception in the file preview context popover
+* 812cd39fa4 [HUE-9225](https://issues.cloudera.org/browse/HUE-9225) [core] Upgrade certain third party python libraries that has identified vulnerabilities (#1102)
+* e0dcda9619 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [core] Removing deprecated yaml files
+* 1b1accbbe3 [HUE-9205](https://issues.cloudera.org/browse/HUE-9205) [editor] Add query error propagation test in hive connector
+* c5bbb86374 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Fix autocomplete issue when connectors are enabled
+* 515e540f85 [HUE-9297](https://issues.cloudera.org/browse/HUE-9297) [optimizer] Prevent constant autocomplete spinner if top columns call is rejected
+* 6f0052a2e0 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Ensure config is always loaded
+* 3547be28b5 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connectors] Consolidate common connector logic into hueConfig
+* 922ed37479 [HUE-9255](https://issues.cloudera.org/browse/HUE-9255) [assist] Use dialect instead of type in the language reference assist panel
+* 672ac98b27 [HUE-9255](https://issues.cloudera.org/browse/HUE-9255) [assist] Switch from connector type to dialect in the right assist functions panel
+* dcc96a0159 [HUE-9207](https://issues.cloudera.org/browse/HUE-9207) [frontend] Fix context issues for local optimizer strategy
+* 857bd707cd [HUE-9249](https://issues.cloudera.org/browse/HUE-9249) [browser] API to download a query profile
+* fc82768e27 [HUE-9249](https://issues.cloudera.org/browse/HUE-9249) [browser] Download or copy Impala profile
+* 5f05bffcfe [HUE-9249](https://issues.cloudera.org/browse/HUE-9249) [browser] Add SQL highlighting to Impala query profile
+* 7b8e2b408b [HUE-9246](https://issues.cloudera.org/browse/HUE-9246) [core] Enable SAML certificate creation with passphrase support. (#1099)
+* 92c3c06a0d [HUE-9254](https://issues.cloudera.org/browse/HUE-9254) [doc] Remove flickity from gethue as GPL
+* a62c397383 [HUE-9181](https://issues.cloudera.org/browse/HUE-9181) [blog] Localize Hue 4.7 blog into Japanese (#1100)
+* 560a233721 [HUE-9250](https://issues.cloudera.org/browse/HUE-9250) [useradmin] Prevent login failed due to user.last_login is None type
+* ca356c56d9 [HUE-8888](https://issues.cloudera.org/browse/HUE-8888) [editor] Do not show no result message when filtering matches all values
+* 8f29487358 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Add a spinner when performing test connection
+* 60572cc272 [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) [connector] Reset connector test result when changing section
+* 738bdb80b0 [HUE-9181](https://issues.cloudera.org/browse/HUE-9181) [docs] Update README screenshot with 4.7
+* 3b275b1bfe [HUE-3797](https://issues.cloudera.org/browse/HUE-3797) [scheduler] Fix wrong url prefix of list schedules
+* 3f126a1d94 [HUE-9246](https://issues.cloudera.org/browse/HUE-9246) [core] Enable SAML certificate creation with passphrase support. (#1096) (#1098)
+* b7bc3ac98d [HUE-9251](https://issues.cloudera.org/browse/HUE-9251) [core] Fix Hue can't be launched under openshift (#1097)
+* 2d56caefd7 [HUE-9245](https://issues.cloudera.org/browse/HUE-9245) [core] Add back Django Database metrics from clean up list
+* c0691f4ac7 [HUE-9181](https://issues.cloudera.org/browse/HUE-9181) [docs] Fix version number in release notes page title
+* ed5a333e8e [HUE-9181](https://issues.cloudera.org/browse/HUE-9181) [docs] Update links to connector docs on gethue
 
 ### Contributors
 
@@ -798,6 +729,7 @@ This Hue release is made possible thanks to the contribution from:
 * Abraham Elmahrek
 * Aditya Acharya
 * Adrian Yavorskyy
+* agl29
 * aig
 * airokey
 * Ajay Jadhav
@@ -805,6 +737,7 @@ This Hue release is made possible thanks to the contribution from:
 * Alex Newman
 * Alex (posi) Newman
 * alheio
+* Aliaksei
 * alphaskade
 * Ambreen Kazi
 * Amit Kabra
@@ -817,8 +750,11 @@ This Hue release is made possible thanks to the contribution from:
 * Antonio Bellezza
 * arahuja
 * Ashu Pachauri
+* Asnaik HWX
 * Atupal
 * Avindra Goolcharan
+* ayush.goyal
+* Ayush Goyal
 * batou9150
 * bcwalrus
 * bc Wong
@@ -847,6 +783,7 @@ This Hue release is made possible thanks to the contribution from:
 * Derek Chen-Becker
 * Diego Sevilla Ruiz
 * Dominik Gehl
+* e11it
 * Eli Collins
 * Emmanuel Bessah
 * Enrico Berti
@@ -856,6 +793,7 @@ This Hue release is made possible thanks to the contribution from:
 * fatherfox
 * gdgt
 * Gilad Wolff
+* gnieto
 * grundprinzip
 * Grzegorz Kokosiński
 * Guido Serra
@@ -900,7 +838,9 @@ This Hue release is made possible thanks to the contribution from:
 * linchan-ms
 * Linden Hillenbrand
 * linwukang
+* Louis de Charsonville
 * Luca Natali
+* Luca Toscano
 * Luke Carmichael
 * lvziling
 * Mahesh Balakrishnan
@@ -947,6 +887,7 @@ This Hue release is made possible thanks to the contribution from:
 * Qi Xiao
 * rainysia
 * raphi
+* rdeva
 * Rentao Wu
 * Renxia Wang
 * Rick Bernotas
@@ -959,6 +900,7 @@ This Hue release is made possible thanks to the contribution from:
 * Roohi Syeda
 * rpoluri
 * Rui Pereira
+* sachinunravel
 * Sai Chirravuri
 * sandeepreddy3647
 * Santiago Ciciliani
@@ -979,18 +921,23 @@ This Hue release is made possible thanks to the contribution from:
 * sky4star
 * skyyws
 * spaztic1215
+* sreenaths
+* Sreenath Somarajapuram
 * Stefano Palazzo
 * Stephanie Bodoff
 * Suhas Satish
+* Sungpeo Kook
 * TAKLON STEPHEN WU
 * TAK LON WU
 * Tamas Sule
 * Tatsuo Kawasaki
 * Taylor Ainsworth
 * Thai Bui
+* theyaa
 * thinker0
 * Thomas Aylott
 * Thomas Poepping
+* Thomas Tauber-Marshall
 * Tianjin Gu
 * tjphilpot
 * todaychi
@@ -1003,6 +950,7 @@ This Hue release is made possible thanks to the contribution from:
 * voyageth
 * vybs
 * Wang, Xiaozhe
+* weixia
 * Weixia
 * Weixia Xu
 * William Bourque
@@ -1016,6 +964,8 @@ This Hue release is made possible thanks to the contribution from:
 * Ying Chen
 * Yixiao Lin
 * Yoer
+* Yuanhao Lu
+* Yubi Lee
 * Yuriy Hupalo
 * ywheel
 * z00484332
@@ -1027,5 +977,6 @@ This Hue release is made possible thanks to the contribution from:
 * Zhihai Xu
 * z-york
 * 小龙哥
+* 王添
 * 白菜
 * 鸿斌
