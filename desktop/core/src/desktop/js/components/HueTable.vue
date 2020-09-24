@@ -29,7 +29,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(row, rowIndex) in rows" :key="rowIndex">
+      <tr v-for="(row, rowIndex) in rows" :key="rowIndex" @click="$emit('row-clicked', row)">
         <td v-for="(column, colIndex) in columns" :key="colIndex">
           <component
             :is="column.cellComponent"
