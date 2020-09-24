@@ -17,15 +17,17 @@
 -->
 
 <template>
-  <query-table
-    v-if="!selectedQuery && !queriesToDiff"
-    :queries="queries"
-    :columns="columns"
-    @diff-queries="diffQueries"
-    @query-selected="querySelected"
-  />
-  <query-details v-else-if="selectedQuery" :query="selectedQuery" />
-  <query-diff v-else :queries="queriesToDiff" />
+  <div>
+    <query-table
+      v-if="!selectedQuery && !queriesToDiff"
+      :queries="queries"
+      :columns="columns"
+      @diff-queries="diffQueries"
+      @query-selected="querySelected"
+    />
+    <query-details v-else-if="selectedQuery" :query="selectedQuery" />
+    <query-diff v-else :queries="queriesToDiff" />
+  </div>
 </template>
 
 <script lang="ts">
