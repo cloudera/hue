@@ -1,0 +1,194 @@
+// Mixins
+@mixin hue-bkg($hue) {
+  background-color: hsl($hue, 90, 65);
+}
+
+@mixin nth-hue-bkg($index, $hue) {
+  &:nth-child(#{$index}) {
+    @include hue-bkg($hue);
+  }
+}
+
+// Colors
+$bg-color: #FFF;
+$dot-color: #BBB;
+$border-color: #d6d8db;
+
+.hive-timeline {
+
+  .timeline-bars {
+    font-size: 0;
+    margin: 20px 0 20px 0;
+    overflow: hidden;
+
+    user-select: none;
+
+    box-sizing: border-box;
+
+    .bar {
+      display: inline-block;
+
+      font-size: 12px;
+      text-align: center;
+      white-space: nowrap;
+
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      box-sizing: border-box;
+
+      vertical-align: top;
+    }
+
+    .groups {
+      height: 30px;
+
+      white-space: nowrap;
+
+      overflow: hidden;
+
+      box-sizing: border-box;
+
+      .bar {
+        width: 25%;
+        height: 30px;
+        font-weight: bold;
+
+        padding-top: 5px;
+
+        border: solid $border-color;
+        border-width: 1px 1px 0px 1px;
+        border-radius: 10px 10px 0 0;
+
+        box-sizing: border-box;
+
+        background-color: #F7F7F7;
+      }
+    }
+
+    .sub-groups {
+      height: 40px;
+      border: 1px solid $border-color;
+
+      white-space: nowrap;
+
+      border-radius: 0 0 10px 10px;
+      overflow: hidden;
+
+      .bar {
+        width: 10%;
+        height: 40px;
+
+        padding-top: 10px;
+
+        border-left: 1px solid $border-color;
+
+        &:first-child {
+          border: none;
+        }
+
+        @include nth-hue-bkg(1, 0);
+        @include nth-hue-bkg(2, 40);
+        @include nth-hue-bkg(3, 80);
+        @include nth-hue-bkg(4, 200);
+        @include nth-hue-bkg(5, 160);
+        @include nth-hue-bkg(6, 120);
+        @include nth-hue-bkg(7, 240);
+        @include nth-hue-bkg(8, 280);
+        @include nth-hue-bkg(9, 320);
+      }
+    }
+  }
+
+  table.detail-list {
+    i {
+      display: inline-block;
+
+      width: .85em;
+      height: .85em;
+      border: 1px solid $border-color;
+      border-radius: .5em;
+
+      margin-right: 5px;
+      margin-top: 1px;
+    }
+
+    &:nth-of-type(1) tbody tr {
+      &:nth-of-type(1) i {
+        @include hue-bkg(0);
+      }
+      &:nth-of-type(2) i {
+        @include hue-bkg(40);
+      }
+      &:nth-of-type(3) i {
+        @include hue-bkg(80);
+      }
+    }
+
+    &:nth-of-type(2) tbody tr {
+      &:nth-of-type(1) i {
+        @include hue-bkg(200);
+      }
+      &:nth-of-type(2) i {
+        @include hue-bkg(160);
+      }
+    }
+
+    &:nth-of-type(3) tbody tr {
+      &:nth-of-type(1) i {
+        @include hue-bkg(120);
+      }
+    }
+
+    &:nth-of-type(4) tbody tr {
+      &:nth-of-type(1) i {
+        @include hue-bkg(240);
+      }
+      &:nth-of-type(2) i {
+        @include hue-bkg(280);
+      }
+      &:nth-of-type(3) i {
+        @include hue-bkg(320);
+      }
+    }
+  }
+
+  .detail-list {
+    display: inline-block;
+    vertical-align: top;
+    background-color: #FFF;
+    margin: 0 10px 10px 0;
+    table-layout: fixed;
+
+    border-collapse: collapse;
+    border-spacing: 0;
+
+    thead {
+      background-color: #f0f0f0;
+      font-weight: bold;
+
+      th {
+        padding: 5px;
+        text-align: left;
+      }
+    }
+
+    tr {
+      margin: 0px 0px 0px 15px;
+      overflow: hidden;
+    }
+
+    td {
+      border: 1px solid #e5e5e5;
+      padding: 5px;
+
+      min-width: 50px;
+      max-width: 600px;
+
+      white-space: nowrap;
+      overflow: auto;
+
+      padding: 5px;
+    }
+  }
+}

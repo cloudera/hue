@@ -1,0 +1,301 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HiveTimeline.vue should render 1`] = `
+<div
+  class="hive-timeline"
+>
+  <div
+    class="timeline-bars"
+  >
+    <div
+      class="groups"
+    >
+      <div
+        class="bar"
+        data-value="0"
+        title="Pre-Execution + DAG construction"
+      >
+        
+        Pre-Execution + DAG construction
+      
+      </div>
+       
+      <div
+        class="bar"
+        data-value="0"
+        title="DAG Submission"
+      >
+        
+        DAG Submission
+      
+      </div>
+       
+      <div
+        class="bar"
+        data-value="0"
+        title="DAG Runtime"
+      >
+        
+        DAG Runtime
+      
+      </div>
+       
+      <div
+        class="bar"
+        data-value="0"
+        title="Post Execution"
+      >
+        
+        Post Execution
+      
+      </div>
+    </div>
+     
+    <div
+      class="sub-groups"
+    >
+      <div
+        class="bar"
+        data-value="0"
+        title="Compile"
+      >
+        
+        Compile
+      
+      </div>
+       
+      <div
+        class="bar"
+        data-value="0"
+        title="Parse"
+      >
+        
+        Parse
+      
+      </div>
+       
+      <div
+        class="bar"
+        data-value="0"
+        title="Build Dag"
+      >
+        
+        Build Dag
+      
+      </div>
+       
+      <div
+        class="bar"
+        data-value="0"
+        title="Submit Dag"
+      >
+        
+        Submit Dag
+      
+      </div>
+       
+      <div
+        class="bar"
+        data-value="0"
+        title="Submit To Running"
+      >
+        
+        Submit To Running
+      
+      </div>
+       
+      <div
+        class="bar"
+        data-value="0"
+        title="Run Dag"
+      >
+        
+        Run Dag
+      
+      </div>
+       
+      <div
+        class="bar"
+        data-value="0"
+        title="Post ATS Hook"
+      >
+        
+        Post ATS Hook
+      
+      </div>
+       
+      <div
+        class="bar"
+        data-value="0"
+        title="Remove Files"
+      >
+        
+        Remove Files
+      
+      </div>
+       
+      <div
+        class="bar"
+        data-value="0"
+        title="Rename Or Move Files"
+      >
+        
+        Rename Or Move Files
+      
+      </div>
+    </div>
+  </div>
+   
+  <table
+    aria-describedby="Pre-Execution + DAG construction"
+    class="detail-list"
+  >
+    <thead>
+      <tr>
+        <th
+          colspan="2"
+          scope="colgroup"
+        >
+          
+          Pre-Execution + DAG construction : 0ms
+        
+        </th>
+      </tr>
+    </thead>
+     
+    <tbody>
+      <tr>
+        <td>
+          <i />
+          Compile
+        </td>
+         
+        <td>
+          0ms
+        </td>
+      </tr>
+       
+      <tr>
+        <td>
+          <i />
+          Parse
+        </td>
+         
+        <td>
+          0ms
+        </td>
+      </tr>
+       
+      <tr>
+        <td>
+          <i />
+          Build Dag
+        </td>
+         
+        <td>
+          0ms
+        </td>
+      </tr>
+    </tbody>
+  </table>
+   
+  <table
+    aria-describedby="DAG Submission"
+    class="detail-list"
+  >
+    <thead>
+      <tr>
+        <th
+          colspan="2"
+          scope="colgroup"
+        >
+          
+          DAG Submission : 0ms
+        
+        </th>
+      </tr>
+    </thead>
+     
+    <tbody>
+      <tr>
+        <td>
+          <i />
+          Submit Dag
+        </td>
+         
+        <td>
+          0ms
+        </td>
+      </tr>
+       
+      <tr>
+        <td>
+          <i />
+          Submit To Running
+        </td>
+         
+        <td>
+          0ms
+        </td>
+      </tr>
+    </tbody>
+  </table>
+   
+  <table
+    aria-describedby="DAG Runtime"
+    class="detail-list"
+  >
+    <thead>
+      <tr>
+        <th
+          colspan="2"
+          scope="colgroup"
+        >
+          
+          DAG Runtime : 0ms
+        
+        </th>
+      </tr>
+    </thead>
+     
+    <tbody>
+      <tr>
+        <td>
+          <i />
+          Run Dag
+        </td>
+         
+        <td>
+          0ms
+        </td>
+      </tr>
+    </tbody>
+  </table>
+   
+  <table
+    aria-describedby="Post Execution"
+    class="detail-list"
+  >
+    <thead>
+      <tr>
+        <th
+          colspan="2"
+          scope="colgroup"
+        >
+          
+          Post Execution : 0ms
+        
+        </th>
+      </tr>
+    </thead>
+     
+    <tbody>
+      <!---->
+       
+      <!---->
+       
+      <!---->
+    </tbody>
+  </table>
+</div>
+`;
