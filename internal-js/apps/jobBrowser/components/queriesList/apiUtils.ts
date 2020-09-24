@@ -18,8 +18,10 @@
 
 import axios, { AxiosResponse } from 'axios';
 import searchMockResponse from './test/api/query_search_post_response.json';
+import queryMockResponse from './test/api/hive_query_get_response_2.json';
 import { Facet, FieldInfo, Query, Search, SearchMeta } from './index';
 
+const QUERY_URL = 'proxy/api/hive/query';
 const SEARCH_URL = 'proxy/api/query/search';
 
 const JSON_RESPONSE = {
@@ -36,6 +38,11 @@ axios.defaults.adapter = config =>
       resolve(<AxiosResponse>{
         ...JSON_RESPONSE,
         data: JSON.stringify(searchMockResponse)
+      });
+    } else if (config.url && config.url.indexOf(QUERY_URL) !== -1) {
+      resolve(<AxiosResponse>{
+        ...JSON_RESPONSE,
+        data: JSON.stringify(queryMockResponse)
       });
     } else {
       axios
@@ -92,6 +99,14 @@ export const search = async (options: SearchRequest): Promise<SearchResponse> =>
     options
   );
   return response.data;
+};
+
+export const fetchExtendedQuery = async (options: { queryId: string }): Promise<Query> => {
+  const response = await axios.post<
+    { queryId: string; extended: boolean },
+    AxiosResponse<{ query: Query }>
+  >(QUERY_URL, { ...options, extended: true });
+  return response.data.query;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

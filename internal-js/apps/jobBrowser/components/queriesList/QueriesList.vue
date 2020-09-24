@@ -37,7 +37,7 @@
   import Component from 'vue-class-component';
   import { Column } from '../../../../../desktop/core/src/desktop/js/components/HueTable';
   import TimeAgo from '../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
-  import { search } from './apiUtils';
+  import { fetchExtendedQuery, search } from './apiUtils';
   import QueryDiff from './queryDiff/QueryDiff.vue';
   import QueryDetails from './query-details/QueryDetails.vue';
   import { Query } from './index';
@@ -47,9 +47,8 @@
     components: { QueryDiff, QueryDetails, QueryTable, TimeAgo, HumanByteSize }
   })
   export default class QueriesList extends Vue {
-    selectedQuery?: Query;
-    queriesToDiff?: Query[];
-
+    selectedQuery: Query | null = null;
+    queriesToDiff: Query[] | null = null;
     queries: Query[] = [];
 
     // TODO: Move to QueryTable?
@@ -102,16 +101,16 @@
     }
 
     showTable(): void {
-      this.selectedQuery = undefined;
-      this.queriesToDiff = undefined;
+      this.selectedQuery = null;
+      this.queriesToDiff = null;
     }
 
     diffQueries(queries: Query[]): void {
       this.queriesToDiff = queries;
     }
 
-    querySelected(query: Query): void {
-      this.selectedQuery = query;
+    async querySelected(query: Query): Promise<void> {
+      this.selectedQuery = await fetchExtendedQuery({ queryId: query.queryId });
     }
   }
 </script>

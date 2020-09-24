@@ -39,7 +39,7 @@
       />
     </div>
     <div class="table">
-      <hue-table :columns="visibleColumns" :rows="queries" />
+      <hue-table :columns="visibleColumns" :rows="queries" @row-clicked="querySelected" />
       <!-- {{em-table
         title=title
 
