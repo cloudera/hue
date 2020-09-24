@@ -3,65 +3,295 @@
     {
       "details": null,
       "dags": [],
-      "id": 1132,
-      "queryId": "hive_20200921164736_8793e958-0f2b-4558-a633-96b5eee111f5",
-      "startTime": 1600706856844,
-      "query": "select * from compactions limit 10",
+      "id": 61,
+      "queryId": "hive_20200923124339_0324170c-7c8f-4112-93a4-fe1c837e56d2",
+      "startTime": 1600865019821,
+      "query": "DROP table if exists delete_delta_default_tmp_compactor_test_compact_1600864783563_result",
       "highlightedQuery": null,
-      "endTime": 1600706897987,
-      "elapsedTime": 41143,
+      "endTime": 1600865019849,
+      "elapsedTime": 28,
       "status": "SUCCESS",
       "queueName": "",
       "userId": "hive",
-      "requestUser": "some_user",
+      "requestUser": "hive",
       "cpuTime": null,
       "physicalMemory": null,
       "virtualMemory": null,
       "dataRead": null,
       "dataWritten": null,
-      "operationId": "6lAX9u20Rb-e-OERS6Lxsw",
+      "operationId": "",
       "clientIpAddress": null,
-      "hiveInstanceAddress": "1.2.3.4",
+      "hiveInstanceAddress": "10.117.122.144",
       "hiveInstanceType": null,
-      "sessionId": "81b44f70-1b03-434e-8cea-11ba68e969eb",
+      "sessionId": "369a17d4-f4ef-4276-aaf5-11e0afd4470e",
       "logId": null,
-      "threadId": "HiveServer2-Background-Pool: Thread-13973",
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-51_executor",
+      "executionMode": "NONE",
+      "tablesRead": [
+        {
+          "table": "delete_delta_default_tmp_compactor_test_compact_1600864783563_result",
+          "database": "default"
+        }
+      ],
+      "tablesWritten": [
+        {
+          "table": "delete_delta_default_tmp_compactor_test_compact_1600864783563_result",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 2
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        12,
+        43,
+        43
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 62,
+      "queryId": "hive_20200923124339_48ea730c-3fbc-47b0-9a0c-ac441edb2436",
+      "startTime": 1600865019776,
+      "query": "DROP table if exists delta_default_tmp_compactor_test_compact_1600864783563_result",
+      "highlightedQuery": null,
+      "endTime": 1600865019805,
+      "elapsedTime": 29,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "369a17d4-f4ef-4276-aaf5-11e0afd4470e",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-51_executor",
+      "executionMode": "NONE",
+      "tablesRead": [
+        {
+          "table": "delta_default_tmp_compactor_test_compact_1600864783563_result",
+          "database": "default"
+        }
+      ],
+      "tablesWritten": [
+        {
+          "table": "delta_default_tmp_compactor_test_compact_1600864783563_result",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 2
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        12,
+        43,
+        43
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 59,
+      "queryId": "hive_20200923124339_f692109e-33ce-439d-a861-5383b29dd015",
+      "startTime": 1600865019732,
+      "query": "DROP table if exists delete_delta_default_tmp_compactor_test_compact_1600864783563",
+      "highlightedQuery": null,
+      "endTime": 1600865019760,
+      "elapsedTime": 28,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "369a17d4-f4ef-4276-aaf5-11e0afd4470e",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-51_executor",
+      "executionMode": "NONE",
+      "tablesRead": [
+        {
+          "table": "delete_delta_default_tmp_compactor_test_compact_1600864783563",
+          "database": "default"
+        }
+      ],
+      "tablesWritten": [
+        {
+          "table": "delete_delta_default_tmp_compactor_test_compact_1600864783563",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 2
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        12,
+        43,
+        41
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 60,
+      "queryId": "hive_20200923124339_d52bd070-4339-499b-9464-feb11bbb475b",
+      "startTime": 1600865019597,
+      "query": "DROP table if exists delta_default_tmp_compactor_test_compact_1600864783563",
+      "highlightedQuery": null,
+      "endTime": 1600865019716,
+      "elapsedTime": 119,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "369a17d4-f4ef-4276-aaf5-11e0afd4470e",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-51_executor",
+      "executionMode": "NONE",
+      "tablesRead": [
+        {
+          "table": "delta_default_tmp_compactor_test_compact_1600864783563",
+          "database": "default"
+        }
+      ],
+      "tablesWritten": [
+        {
+          "table": "delta_default_tmp_compactor_test_compact_1600864783563",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 2
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        12,
+        43,
+        41
+      ]
+    },
+    {
+      "details": null,
+      "dags": [
+        {
+          "dagInfo": {
+            "id": 31,
+            "dagId": "dag_1600864997017_0001_1",
+            "dagName": "INSERT into table del...ompact_1600864783563 (Stage-1)",
+            "applicationId": "application_1600864997017_0001",
+            "initTime": 1600865006635,
+            "startTime": 1600865006647,
+            "endTime": 1600865018354,
+            "status": "FAILED",
+            "amWebserviceVer": "2",
+            "amLogUrl": null,
+            "queueName": null,
+            "callerId": "hive_20200923123944_240444c8-6c87-47bc-aa45-0a815ff73c06",
+            "callerType": "HIVE_QUERY_ID",
+            "hiveQueryId": 58,
+            "sourceFile": "s3a://qe-s3-bucket-weekly-vxr2-dwx-external/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/external/hive/sys.db/dag_data/date=2020-09-23/dag_1600864997017_0001_1_1_1"
+          },
+          "dagDetails": null,
+          "config": null
+        }
+      ],
+      "id": 58,
+      "queryId": "hive_20200923123944_240444c8-6c87-47bc-aa45-0a815ff73c06",
+      "startTime": 1600864784994,
+      "query": "INSERT into table delta_default_tmp_compactor_test_compact_1600864783563_result select `operation`, `originalTransaction`, `bucket`, `rowId`, `currentTransaction`, `row` from delta_default_tmp_compactor_test_compact_1600864783563",
+      "highlightedQuery": null,
+      "endTime": 1600865019272,
+      "elapsedTime": 234278,
+      "status": "ERROR",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": 0,
+      "physicalMemory": 0,
+      "virtualMemory": 0,
+      "dataRead": 0,
+      "dataWritten": 7141,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "369a17d4-f4ef-4276-aaf5-11e0afd4470e",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-51_executor",
       "executionMode": "LLAP",
       "tablesRead": [
         {
-          "table": "compactions",
-          "database": "sys"
-        },
-        {
-          "table": "completed_compactions",
-          "database": "sys"
-        },
-        {
-          "table": "compaction_queue",
-          "database": "sys"
-        },
-        {
-          "table": "dbs",
-          "database": "sys"
-        },
-        {
-          "table": "tbls",
-          "database": "sys"
-        },
-        {
-          "table": "compactions",
-          "database": "information_schema"
-        },
-        {
-          "table": "tbl_privs",
-          "database": "sys"
+          "table": "delta_default_tmp_compactor_test_compact_1600864783563",
+          "database": "default"
         }
       ],
-      "tablesWritten": [],
+      "tablesWritten": [
+        {
+          "table": "delta_default_tmp_compactor_test_compact_1600864783563_result",
+          "database": "default"
+        }
+      ],
       "databasesUsed": [
         {
-          "sys": 6,
-          "information_schema": 1
+          "default": 2
         }
       ],
       "domainId": null,
@@ -71,38 +301,298 @@
       "createdAt": [
         2020,
         9,
-        21,
-        16,
-        47,
-        43
+        23,
+        12,
+        39,
+        49
       ]
     },
     {
       "details": null,
       "dags": [],
-      "id": 1131,
-      "queryId": "hive_20200921164733_5af56d4d-18b4-4f40-9dbb-4e4fcb522ebb",
-      "startTime": 1600706853245,
-      "query": "KILL QUERY 'hive_20200921164714_ea4a83d3-c2d1-4be9-8ab1-50aa37ecf70a'",
+      "id": 57,
+      "queryId": "hive_20200923123944_7d1ea2d6-1a6b-4e49-921b-1bd69549669b",
+      "startTime": 1600864784574,
+      "query": "CREATE temporary external table delete_delta_default_tmp_compactor_test_compact_1600864783563_result(`operation` int, `originalTransaction` bigint, `bucket` int, `rowId` bigint, `currentTransaction` bigint, `row` struct<`name` :varchar(50), `age` :tinyint, `num_clicks` :bigint>)  clustered by (`bucket`) sorted by (`bucket`, `originalTransaction`, `rowId`) into 2 buckets stored as orc LOCATION 's3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delete_delta_0000001_0000007_v0000123' TBLPROPERTIES ('compactiontable'='true', 'bucketing_version'='2', 'transactional'='false')",
       "highlightedQuery": null,
-      "endTime": 1600706853913,
-      "elapsedTime": 668,
+      "endTime": 1600864784969,
+      "elapsedTime": 395,
       "status": "SUCCESS",
       "queueName": "",
       "userId": "hive",
-      "requestUser": "some_user",
+      "requestUser": "hive",
       "cpuTime": null,
       "physicalMemory": null,
       "virtualMemory": null,
       "dataRead": null,
       "dataWritten": null,
-      "operationId": "RqW7HN_OTGyMFqT8IFBZig",
+      "operationId": "",
       "clientIpAddress": null,
-      "hiveInstanceAddress": "1.2.3.4",
+      "hiveInstanceAddress": "10.117.122.144",
       "hiveInstanceType": null,
-      "sessionId": "5782298a-4381-456f-a5f3-edb055948de5",
+      "sessionId": "369a17d4-f4ef-4276-aaf5-11e0afd4470e",
       "logId": null,
-      "threadId": "HiveServer2-Background-Pool: Thread-13958",
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-51_executor",
+      "executionMode": "NONE",
+      "tablesRead": [],
+      "tablesWritten": [
+        {
+          "table": "delete_delta_default_tmp_compactor_test_compact_1600864783563_result",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 1
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        12,
+        39,
+        47
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 56,
+      "queryId": "hive_20200923123944_1cbaecf1-38fe-4d41-9a55-6b5105fc5c1c",
+      "startTime": 1600864784481,
+      "query": "CREATE temporary external table delete_delta_default_tmp_compactor_test_compact_1600864783563(`operation` int, `originalTransaction` bigint, `bucket` int, `rowId` bigint, `currentTransaction` bigint, `row` struct<`name` :varchar(50), `age` :tinyint, `num_clicks` :bigint>)  PARTITIONED BY (`file_name` STRING)  stored as orc TBLPROPERTIES ('compactiontable'='true', 'transactional'='false')",
+      "highlightedQuery": null,
+      "endTime": 1600864784551,
+      "elapsedTime": 70,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "369a17d4-f4ef-4276-aaf5-11e0afd4470e",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-51_executor",
+      "executionMode": "NONE",
+      "tablesRead": [],
+      "tablesWritten": [
+        {
+          "table": "delete_delta_default_tmp_compactor_test_compact_1600864783563",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 1
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        12,
+        39,
+        47
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 55,
+      "queryId": "hive_20200923123944_6bcb3521-7ee1-4b67-ae27-79481a04b1fb",
+      "startTime": 1600864784050,
+      "query": "CREATE temporary external table delta_default_tmp_compactor_test_compact_1600864783563_result(`operation` int, `originalTransaction` bigint, `bucket` int, `rowId` bigint, `currentTransaction` bigint, `row` struct<`name` :varchar(50), `age` :tinyint, `num_clicks` :bigint>)  clustered by (`bucket`) sorted by (`bucket`, `originalTransaction`, `rowId`) into 2 buckets stored as orc LOCATION 's3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000123' TBLPROPERTIES ('compactiontable'='true', 'bucketing_version'='2', 'transactional'='false')",
+      "highlightedQuery": null,
+      "endTime": 1600864784457,
+      "elapsedTime": 407,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "369a17d4-f4ef-4276-aaf5-11e0afd4470e",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-51_executor",
+      "executionMode": "NONE",
+      "tablesRead": [],
+      "tablesWritten": [
+        {
+          "table": "delta_default_tmp_compactor_test_compact_1600864783563_result",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 1
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        12,
+        39,
+        47
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 54,
+      "queryId": "hive_20200923123943_da9a21d9-56c3-470e-b820-1828cc6701c1",
+      "startTime": 1600864783961,
+      "query": "ALTER table delta_default_tmp_compactor_test_compact_1600864783563 add partition (file_name='delta_0000001_0000001_0000') location 's3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000001_0000' partition (file_name='delta_0000002_0000002_0000') location 's3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000002_0000002_0000' partition (file_name='delta_0000003_0000003_0000') location 's3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000003_0000003_0000' partition (file_name='delta_0000004_0000004_0000') location 's3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000004_0000004_0000' partition (file_name='delta_0000005_0000005_0000') location 's3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000005_0000005_0000' partition (file_name='delta_0000006_0000006_0000') location 's3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000006_0000006_0000' ",
+      "highlightedQuery": null,
+      "endTime": 1600864784034,
+      "elapsedTime": 73,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "369a17d4-f4ef-4276-aaf5-11e0afd4470e",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-51_executor",
+      "executionMode": "NONE",
+      "tablesRead": [],
+      "tablesWritten": [
+        {
+          "table": "delta_default_tmp_compactor_test_compact_1600864783563",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 1
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        12,
+        39,
+        45
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 53,
+      "queryId": "hive_20200923123943_6ffd210e-8b4d-49c8-9f63-4b86b891e88c",
+      "startTime": 1600864783677,
+      "query": "CREATE temporary external table delta_default_tmp_compactor_test_compact_1600864783563(`operation` int, `originalTransaction` bigint, `bucket` int, `rowId` bigint, `currentTransaction` bigint, `row` struct<`name` :varchar(50), `age` :tinyint, `num_clicks` :bigint>)  PARTITIONED BY (`file_name` STRING)  stored as orc TBLPROPERTIES ('compactiontable'='true', 'transactional'='false')",
+      "highlightedQuery": null,
+      "endTime": 1600864783894,
+      "elapsedTime": 217,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "369a17d4-f4ef-4276-aaf5-11e0afd4470e",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-51_executor",
+      "executionMode": "NONE",
+      "tablesRead": [],
+      "tablesWritten": [
+        {
+          "table": "delta_default_tmp_compactor_test_compact_1600864783563",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 1
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        12,
+        39,
+        45
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 52,
+      "queryId": "hive_20200923123937_b356ae48-ecb9-46a1-bb25-e856ab5cf579",
+      "startTime": 1600864777433,
+      "query": "ALTER TABLE test_compact PARTITION (phoneNumber='12345678') COMPACT 'minor'",
+      "highlightedQuery": null,
+      "endTime": 1600864777664,
+      "elapsedTime": 231,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "XEwOd9-WTSSzMvkToJmAzA",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "ea64724d-ba95-4b1b-b074-98179449d4a6",
+      "logId": null,
+      "threadId": "HiveServer2-Background-Pool: Thread-398",
       "executionMode": "NONE",
       "tablesRead": [],
       "tablesWritten": [],
@@ -116,74 +606,133 @@
       "createdAt": [
         2020,
         9,
-        21,
-        16,
-        47,
-        35
+        23,
+        12,
+        39,
+        39
       ]
     },
     {
       "details": null,
       "dags": [],
-      "id": 1130,
-      "queryId": "hive_20200921164714_ea4a83d3-c2d1-4be9-8ab1-50aa37ecf70a",
-      "startTime": 1600706834430,
-      "query": "select * from compactions",
+      "id": 33,
+      "queryId": "hive_20200923120244_b437e609-3d2f-425f-a857-d34a35a842e7",
+      "startTime": 1600862564532,
+      "query": "DROP table if exists default_tmp_compactor_test_compact_1600862554448",
       "highlightedQuery": null,
-      "endTime": 1600706853890,
-      "elapsedTime": 19460,
-      "status": "ERROR",
+      "endTime": 1600862564590,
+      "elapsedTime": 58,
+      "status": "SUCCESS",
       "queueName": "",
       "userId": "hive",
-      "requestUser": "some_user",
+      "requestUser": "hive",
       "cpuTime": null,
       "physicalMemory": null,
       "virtualMemory": null,
       "dataRead": null,
       "dataWritten": null,
-      "operationId": "h9wGW3muTnao0LRcSZAlWA",
+      "operationId": "",
       "clientIpAddress": null,
-      "hiveInstanceAddress": "1.2.3.4",
+      "hiveInstanceAddress": "10.117.122.144",
       "hiveInstanceType": null,
-      "sessionId": "f26e9dfa-89bb-42d0-b453-bc856b6dc381",
+      "sessionId": "f69516af-3a40-4963-be37-5b0814e2616d",
       "logId": null,
-      "threadId": "HiveServer2-Background-Pool: Thread-13947",
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-50_executor",
+      "executionMode": "NONE",
+      "tablesRead": [
+        {
+          "table": "default_tmp_compactor_test_compact_1600862554448",
+          "database": "default"
+        }
+      ],
+      "tablesWritten": [
+        {
+          "table": "default_tmp_compactor_test_compact_1600862554448",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 2
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        12,
+        2,
+        46
+      ]
+    },
+    {
+      "details": null,
+      "dags": [
+        {
+          "dagInfo": {
+            "id": 16,
+            "dagId": "dag_1600862070512_0001_16",
+            "dagName": "INSERT into table def...nenumber`='12345678' (Stage-1)",
+            "applicationId": "application_1600862070512_0001",
+            "initTime": 1600862556472,
+            "startTime": 1600862556472,
+            "endTime": 1600862560379,
+            "status": "FAILED",
+            "amWebserviceVer": "2",
+            "amLogUrl": null,
+            "queueName": null,
+            "callerId": "hive_20200923120235_dd31a3e0-235b-4f4f-a247-c169393f6cb5",
+            "callerType": "HIVE_QUERY_ID",
+            "hiveQueryId": 32,
+            "sourceFile": "s3a://qe-s3-bucket-weekly-vxr2-dwx-external/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/external/hive/sys.db/dag_data/date=2020-09-23/dag_1600862070512_0001_16_1_1"
+          },
+          "dagDetails": null,
+          "config": null
+        }
+      ],
+      "id": 32,
+      "queryId": "hive_20200923120235_dd31a3e0-235b-4f4f-a247-c169393f6cb5",
+      "startTime": 1600862555085,
+      "query": "INSERT into table default_tmp_compactor_test_compact_1600862554448 select validate_acid_sort_order(ROW__ID.writeId, ROW__ID.bucketId, ROW__ID.rowId), ROW__ID.writeId, ROW__ID.bucketId, ROW__ID.rowId, ROW__ID.writeId, NAMED_STRUCT('name', name, 'age', age, 'num_clicks', num_clicks)  from default.test_compact where `phonenumber`='12345678'",
+      "highlightedQuery": null,
+      "endTime": 1600862564098,
+      "elapsedTime": 9013,
+      "status": "ERROR",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": 0,
+      "physicalMemory": 0,
+      "virtualMemory": 0,
+      "dataRead": 0,
+      "dataWritten": 0,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "f69516af-3a40-4963-be37-5b0814e2616d",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-50_executor",
       "executionMode": "LLAP",
       "tablesRead": [
         {
-          "table": "compactions",
-          "database": "sys"
-        },
-        {
-          "table": "completed_compactions",
-          "database": "sys"
-        },
-        {
-          "table": "compaction_queue",
-          "database": "sys"
-        },
-        {
-          "table": "dbs",
-          "database": "sys"
-        },
-        {
-          "table": "tbls",
-          "database": "sys"
-        },
-        {
-          "table": "compactions",
-          "database": "information_schema"
-        },
-        {
-          "table": "tbl_privs",
-          "database": "sys"
+          "table": "test_compact",
+          "database": "default"
         }
       ],
-      "tablesWritten": [],
+      "tablesWritten": [
+        {
+          "table": "default_tmp_compactor_test_compact_1600862554448",
+          "database": "default"
+        }
+      ],
       "databasesUsed": [
         {
-          "sys": 6,
-          "information_schema": 1
+          "default": 2
         }
       ],
       "domainId": null,
@@ -193,16 +742,635 @@
       "createdAt": [
         2020,
         9,
-        21,
-        16,
-        47,
-        21
+        23,
+        12,
+        2,
+        38
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 31,
+      "queryId": "hive_20200923120234_21df9a25-f5e7-4078-8dcd-550881963b95",
+      "startTime": 1600862554449,
+      "query": "CREATE temporary external table default_tmp_compactor_test_compact_1600862554448(`operation` int, `originalTransaction` bigint, `bucket` int, `rowId` bigint, `currentTransaction` bigint, `row` struct<`name` :varchar(50), `age` :tinyint, `num_clicks` :bigint>)  stored as orc LOCATION 's3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/base_0000007_v0000098' TBLPROPERTIES ('compactiontable'='true', 'transactional'='false')",
+      "highlightedQuery": null,
+      "endTime": 1600862555062,
+      "elapsedTime": 613,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "f69516af-3a40-4963-be37-5b0814e2616d",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-50_executor",
+      "executionMode": "NONE",
+      "tablesRead": [],
+      "tablesWritten": [
+        {
+          "table": "default_tmp_compactor_test_compact_1600862554448",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 1
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        12,
+        2,
+        36
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 19,
+      "queryId": "hive_20200923115654_8bb82d7a-8187-4500-989e-ec0100575e6c",
+      "startTime": 1600862214114,
+      "query": "DROP table if exists delete_delta_default_tmp_compactor_test_compact_1600862199967_result",
+      "highlightedQuery": null,
+      "endTime": 1600862214141,
+      "elapsedTime": 27,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "f69516af-3a40-4963-be37-5b0814e2616d",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-50_executor",
+      "executionMode": "NONE",
+      "tablesRead": [
+        {
+          "table": "delete_delta_default_tmp_compactor_test_compact_1600862199967_result",
+          "database": "default"
+        }
+      ],
+      "tablesWritten": [
+        {
+          "table": "delete_delta_default_tmp_compactor_test_compact_1600862199967_result",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 2
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        11,
+        56,
+        56
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 17,
+      "queryId": "hive_20200923115654_988d24c5-d174-49f2-bed2-1f16b940569b",
+      "startTime": 1600862214073,
+      "query": "DROP table if exists delta_default_tmp_compactor_test_compact_1600862199967_result",
+      "highlightedQuery": null,
+      "endTime": 1600862214100,
+      "elapsedTime": 27,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "f69516af-3a40-4963-be37-5b0814e2616d",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-50_executor",
+      "executionMode": "NONE",
+      "tablesRead": [
+        {
+          "table": "delta_default_tmp_compactor_test_compact_1600862199967_result",
+          "database": "default"
+        }
+      ],
+      "tablesWritten": [
+        {
+          "table": "delta_default_tmp_compactor_test_compact_1600862199967_result",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 2
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        11,
+        56,
+        56
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 20,
+      "queryId": "hive_20200923115654_346a985d-efa0-40ef-a174-b56b834b3511",
+      "startTime": 1600862214031,
+      "query": "DROP table if exists delete_delta_default_tmp_compactor_test_compact_1600862199967",
+      "highlightedQuery": null,
+      "endTime": 1600862214058,
+      "elapsedTime": 27,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "f69516af-3a40-4963-be37-5b0814e2616d",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-50_executor",
+      "executionMode": "NONE",
+      "tablesRead": [
+        {
+          "table": "delete_delta_default_tmp_compactor_test_compact_1600862199967",
+          "database": "default"
+        }
+      ],
+      "tablesWritten": [
+        {
+          "table": "delete_delta_default_tmp_compactor_test_compact_1600862199967",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 2
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        11,
+        56,
+        57
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 18,
+      "queryId": "hive_20200923115653_8a23a315-1cfd-4ffc-b31d-4ec2741a63d8",
+      "startTime": 1600862213870,
+      "query": "DROP table if exists delta_default_tmp_compactor_test_compact_1600862199967",
+      "highlightedQuery": null,
+      "endTime": 1600862214015,
+      "elapsedTime": 145,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "f69516af-3a40-4963-be37-5b0814e2616d",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-50_executor",
+      "executionMode": "NONE",
+      "tablesRead": [
+        {
+          "table": "delta_default_tmp_compactor_test_compact_1600862199967",
+          "database": "default"
+        }
+      ],
+      "tablesWritten": [
+        {
+          "table": "delta_default_tmp_compactor_test_compact_1600862199967",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 2
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        11,
+        56,
+        56
+      ]
+    },
+    {
+      "details": null,
+      "dags": [
+        {
+          "dagInfo": {
+            "id": 8,
+            "dagId": "dag_1600862070512_0001_8",
+            "dagName": "INSERT into table del...ompact_1600862199967 (Stage-1)",
+            "applicationId": "application_1600862070512_0001",
+            "initTime": 1600862202406,
+            "startTime": 1600862202406,
+            "endTime": 1600862209843,
+            "status": "FAILED",
+            "amWebserviceVer": "2",
+            "amLogUrl": null,
+            "queueName": null,
+            "callerId": "hive_20200923115641_4eaa9303-d8d6-4d9e-a7d9-dec969781b35",
+            "callerType": "HIVE_QUERY_ID",
+            "hiveQueryId": 13,
+            "sourceFile": "s3a://qe-s3-bucket-weekly-vxr2-dwx-external/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/external/hive/sys.db/dag_data/date=2020-09-23/dag_1600862070512_0001_8_1_1"
+          },
+          "dagDetails": null,
+          "config": null
+        }
+      ],
+      "id": 13,
+      "queryId": "hive_20200923115641_4eaa9303-d8d6-4d9e-a7d9-dec969781b35",
+      "startTime": 1600862201347,
+      "query": "INSERT into table delta_default_tmp_compactor_test_compact_1600862199967_result select `operation`, `originalTransaction`, `bucket`, `rowId`, `currentTransaction`, `row` from delta_default_tmp_compactor_test_compact_1600862199967",
+      "highlightedQuery": null,
+      "endTime": 1600862213500,
+      "elapsedTime": 12153,
+      "status": "ERROR",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": 0,
+      "physicalMemory": 0,
+      "virtualMemory": 0,
+      "dataRead": 0,
+      "dataWritten": 7141,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "f69516af-3a40-4963-be37-5b0814e2616d",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-50_executor",
+      "executionMode": "LLAP",
+      "tablesRead": [
+        {
+          "table": "delta_default_tmp_compactor_test_compact_1600862199967",
+          "database": "default"
+        }
+      ],
+      "tablesWritten": [
+        {
+          "table": "delta_default_tmp_compactor_test_compact_1600862199967_result",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 2
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "Yes",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        11,
+        56,
+        44
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 16,
+      "queryId": "hive_20200923115640_193db8fe-f285-4ea1-80dd-f80ffe963c6b",
+      "startTime": 1600862200919,
+      "query": "CREATE temporary external table delete_delta_default_tmp_compactor_test_compact_1600862199967_result(`operation` int, `originalTransaction` bigint, `bucket` int, `rowId` bigint, `currentTransaction` bigint, `row` struct<`name` :varchar(50), `age` :tinyint, `num_clicks` :bigint>)  clustered by (`bucket`) sorted by (`bucket`, `originalTransaction`, `rowId`) into 2 buckets stored as orc LOCATION 's3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delete_delta_0000001_0000007_v0000068' TBLPROPERTIES ('compactiontable'='true', 'bucketing_version'='2', 'transactional'='false')",
+      "highlightedQuery": null,
+      "endTime": 1600862201323,
+      "elapsedTime": 404,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "f69516af-3a40-4963-be37-5b0814e2616d",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-50_executor",
+      "executionMode": "NONE",
+      "tablesRead": [],
+      "tablesWritten": [
+        {
+          "table": "delete_delta_default_tmp_compactor_test_compact_1600862199967_result",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 1
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        11,
+        56,
+        44
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 15,
+      "queryId": "hive_20200923115640_3503b7e3-0805-4be1-8e8d-d6cc2181364a",
+      "startTime": 1600862200837,
+      "query": "CREATE temporary external table delete_delta_default_tmp_compactor_test_compact_1600862199967(`operation` int, `originalTransaction` bigint, `bucket` int, `rowId` bigint, `currentTransaction` bigint, `row` struct<`name` :varchar(50), `age` :tinyint, `num_clicks` :bigint>)  PARTITIONED BY (`file_name` STRING)  stored as orc TBLPROPERTIES ('compactiontable'='true', 'transactional'='false')",
+      "highlightedQuery": null,
+      "endTime": 1600862200897,
+      "elapsedTime": 60,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "f69516af-3a40-4963-be37-5b0814e2616d",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-50_executor",
+      "executionMode": "NONE",
+      "tablesRead": [],
+      "tablesWritten": [
+        {
+          "table": "delete_delta_default_tmp_compactor_test_compact_1600862199967",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 1
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        11,
+        56,
+        44
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 14,
+      "queryId": "hive_20200923115640_37e2aaf9-e5af-417d-9ee6-8003c8def33c",
+      "startTime": 1600862200447,
+      "query": "CREATE temporary external table delta_default_tmp_compactor_test_compact_1600862199967_result(`operation` int, `originalTransaction` bigint, `bucket` int, `rowId` bigint, `currentTransaction` bigint, `row` struct<`name` :varchar(50), `age` :tinyint, `num_clicks` :bigint>)  clustered by (`bucket`) sorted by (`bucket`, `originalTransaction`, `rowId`) into 2 buckets stored as orc LOCATION 's3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000007_v0000068' TBLPROPERTIES ('compactiontable'='true', 'bucketing_version'='2', 'transactional'='false')",
+      "highlightedQuery": null,
+      "endTime": 1600862200814,
+      "elapsedTime": 367,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "f69516af-3a40-4963-be37-5b0814e2616d",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-50_executor",
+      "executionMode": "NONE",
+      "tablesRead": [],
+      "tablesWritten": [
+        {
+          "table": "delta_default_tmp_compactor_test_compact_1600862199967_result",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 1
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        11,
+        56,
+        44
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 12,
+      "queryId": "hive_20200923115640_f7b45e52-c5ce-490c-a8ed-e75135213100",
+      "startTime": 1600862200380,
+      "query": "ALTER table delta_default_tmp_compactor_test_compact_1600862199967 add partition (file_name='delta_0000001_0000001_0000') location 's3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000001_0000001_0000' partition (file_name='delta_0000002_0000002_0000') location 's3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000002_0000002_0000' partition (file_name='delta_0000003_0000003_0000') location 's3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000003_0000003_0000' partition (file_name='delta_0000004_0000004_0000') location 's3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000004_0000004_0000' partition (file_name='delta_0000005_0000005_0000') location 's3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000005_0000005_0000' partition (file_name='delta_0000006_0000006_0000') location 's3a://qe-s3-bucket-weekly-vxr2-dwx-managed/clusters/env-nsvxr2/warehouse-1600861700-vhvh/warehouse/tablespace/managed/hive/test_compact/phonenumber=12345678/delta_0000006_0000006_0000' ",
+      "highlightedQuery": null,
+      "endTime": 1600862200432,
+      "elapsedTime": 52,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "f69516af-3a40-4963-be37-5b0814e2616d",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-50_executor",
+      "executionMode": "NONE",
+      "tablesRead": [],
+      "tablesWritten": [
+        {
+          "table": "delta_default_tmp_compactor_test_compact_1600862199967",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 1
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        11,
+        56,
+        43
+      ]
+    },
+    {
+      "details": null,
+      "dags": [],
+      "id": 11,
+      "queryId": "hive_20200923115640_a11ef95d-cbe9-4006-a7b4-8e2e01421c6e",
+      "startTime": 1600862200075,
+      "query": "CREATE temporary external table delta_default_tmp_compactor_test_compact_1600862199967(`operation` int, `originalTransaction` bigint, `bucket` int, `rowId` bigint, `currentTransaction` bigint, `row` struct<`name` :varchar(50), `age` :tinyint, `num_clicks` :bigint>)  PARTITIONED BY (`file_name` STRING)  stored as orc TBLPROPERTIES ('compactiontable'='true', 'transactional'='false')",
+      "highlightedQuery": null,
+      "endTime": 1600862200355,
+      "elapsedTime": 280,
+      "status": "SUCCESS",
+      "queueName": "",
+      "userId": "hive",
+      "requestUser": "hive",
+      "cpuTime": null,
+      "physicalMemory": null,
+      "virtualMemory": null,
+      "dataRead": null,
+      "dataWritten": null,
+      "operationId": "",
+      "clientIpAddress": null,
+      "hiveInstanceAddress": "10.117.122.144",
+      "hiveInstanceType": null,
+      "sessionId": "f69516af-3a40-4963-be37-5b0814e2616d",
+      "logId": null,
+      "threadId": "hiveserver2-0.hiveserver2-service.compute-1600861760-w9rh.svc.cluster.local-50_executor",
+      "executionMode": "NONE",
+      "tablesRead": [],
+      "tablesWritten": [
+        {
+          "table": "delta_default_tmp_compactor_test_compact_1600862199967",
+          "database": "default"
+        }
+      ],
+      "databasesUsed": [
+        {
+          "default": 1
+        }
+      ],
+      "domainId": null,
+      "llapAppId": null,
+      "usedCBO": "No",
+      "processed": true,
+      "createdAt": [
+        2020,
+        9,
+        23,
+        11,
+        56,
+        42
       ]
     }
   ],
   "meta": {
     "limit": 25,
     "offset": 0,
-    "size": 3
+    "size": 24
   }
 }
