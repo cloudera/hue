@@ -22,19 +22,22 @@ describe('ColumnSelectorPanel.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(ColumnSelectorPanel, {
       propsData: {
-        columns: []
+        columns: [],
+        visibleColumns: []
       }
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('should render with checkboxes', () => {
+    const columns = <Column[]>[
+      { key: 'a', label: 'A' },
+      { key: 'b', label: 'B' }
+    ];
     const wrapper = shallowMount(ColumnSelectorPanel, {
       propsData: {
-        columns: <Column[]>[
-          { key: 'a', label: 'A' },
-          { key: 'b', label: 'B' }
-        ]
+        columns,
+        visibleColumns: [...columns]
       }
     });
     expect(wrapper.element).toMatchSnapshot();

@@ -23,20 +23,16 @@
       <li>
         <input v-model="filterText" type="text" class="filter-box" placeholder="Filter" />
       </li>
-      <li v-for="column in filteredColumns" :key="column.key">
+      <li v-for="selectableColumn in filteredColumns" :key="selectableColumn.column.key">
         <label>
-          <input v-model="checkedColumns" type="checkbox" :value="column" />
-          {{ column.label }}
+          <input v-model="selectableColumn.checked" type="checkbox" />
+          {{ selectableColumn.column.label }}
         </label>
       </li>
     </ul>
 
     <div class="buttons">
-      <button
-        type="button"
-        class="btn btn-default"
-        @click="$emit('set-checked-columns', checkedColumns)"
-      >
+      <button type="button" class="btn btn-default" @click="apply">
         Apply
       </button>
     </div>
@@ -49,24 +45,42 @@
   import { Prop } from 'vue-property-decorator';
   import { Column } from 'components/HueTable';
 
+  interface SelectableColumn {
+    column: Column;
+    checked: boolean;
+  }
+
   @Component
   export default class ColumnSelectorPanel extends Vue {
     @Prop({ required: true })
     columns!: Column[];
+    @Prop({ required: true })
+    visibleColumns!: Column[];
 
-    checkedColumns: Column[] = [];
-    filterText = '';
-
-    mounted(): void {
-      this.checkedColumns.push(...this.columns);
+    get selectableColumns(): SelectableColumn[] {
+      const visibleColsSet = new Set<Column>(this.visibleColumns);
+      return this.columns.map(column => ({ column, checked: visibleColsSet.has(column) }));
     }
 
-    get filteredColumns(): Column[] {
+    filterText = '';
+
+    get filteredColumns(): SelectableColumn[] {
       if (!this.filterText) {
-        return this.columns;
+        return this.selectableColumns;
       }
       const lowerFilter = this.filterText.toLowerCase();
-      return this.columns.filter(col => col.label.toLowerCase().indexOf(lowerFilter) !== -1);
+      return this.selectableColumns.filter(
+        col => col.column.label.toLowerCase().indexOf(lowerFilter) !== -1
+      );
+    }
+
+    apply(): void {
+      this.$emit(
+        'update:visible-columns',
+        this.selectableColumns
+          .filter(selectable => selectable.checked)
+          .map(selectable => selectable.column)
+      );
     }
   }
 </script>
