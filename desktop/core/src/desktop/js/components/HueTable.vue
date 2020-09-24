@@ -30,7 +30,20 @@
     </thead>
     <tbody>
       <tr v-for="(row, rowIndex) in rows" :key="rowIndex">
-        <td v-for="(column, colIndex) in columns" :key="colIndex">{{ row[column.key] }}</td>
+        <td v-for="(column, colIndex) in columns" :key="colIndex">
+          <component
+            :is="column.cellComponent"
+            v-if="column.cellComponent"
+            v-bind="
+              column.cellProps
+                ? column.cellProps(column.key, row)
+                : { value: column.adapter ? column.adapter(column.key, row) : row[column.key] }
+            "
+          />
+          <template v-else>
+            {{ column.adapter ? column.adapter(column.key, row) : row[column.key] }}
+          </template>
+        </td>
       </tr>
     </tbody>
   </table>
