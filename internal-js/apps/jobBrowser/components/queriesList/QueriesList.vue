@@ -68,7 +68,7 @@
       { key: 'usedCBO', label: 'Cost Based Optimizer (CBO)' }
     ];
 
-    async created(): void {
+    async created(): Promise<void> {
       const now = Date.now();
       const searchResponse = await search({
         endTime: now,

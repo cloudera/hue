@@ -33,7 +33,8 @@
       <column-selector-panel
         v-else
         :columns="columns"
-        @set-checked-columns="checkedColumnsChanged"
+        :visible-columns="visibleColumns"
+        @update:visible-columns="updateVisibleColumns"
         @close="toggleColumnSelector"
       />
     </div>
@@ -85,7 +86,14 @@
     components: { HueTable, ColumnSelectorPanel, QueriesSearch }
   })
   export default class QueryTable extends Vue {
+    @Prop({ required: true })
+    columns!: Column[];
+    @Prop({ required: true })
+    queries!: Query[];
+
     searches: Search[] = [];
+    visibleColumns: Column[] = [];
+    columnSelectorIsVisible = false;
 
     // TODO: Properly initiate TableDefinition
     tableDefinition: TableDefinition = {
@@ -100,22 +108,17 @@
       facets: { fieldCount: 0 }
     };
 
-    visibleColumns: Column[] = [];
-
-    @Prop({ required: true })
-    columns!: Column[];
-
-    @Prop({ required: true })
-    queries!: Query[];
-
-    columnSelectorIsVisible = false;
+    mounted(): void {
+      this.visibleColumns = [...this.columns];
+    }
 
     async created(): Promise<void> {
       this.searches = await fetchSuggestedSearches({ entityType: 'query' });
     }
 
-    checkedColumnsChanged(checkedColumns: Column[]): void {
-      this.visibleColumns = checkedColumns;
+    updateVisibleColumns(columns: Column[]): void {
+      this.visibleColumns = columns;
+      this.columnSelectorIsVisible = false;
     }
 
     toggleColumnSelector(): void {
