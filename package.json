@@ -109,7 +109,7 @@
     "identity-obj-proxy": "^3.0.0",
     "jest": "26.0.1",
     "jest-environment-jsdom-sixteen": "1.0.3",
-    "jsdom": "16.2.2",
+    "jsdom": "16.4.0",
     "less-loader": "6.1.2",
     "lesshint": "6.3.7",
     "license-checker": "^25.0.1",
