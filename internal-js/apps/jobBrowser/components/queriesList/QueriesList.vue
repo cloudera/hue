@@ -34,6 +34,7 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Column } from '../../../../../desktop/core/src/desktop/js/components/HueTable';
+  import TimeAgo from '../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
   import { search } from './apiUtils';
   import QueryDiff from './queryDiff/QueryDiff.vue';
   import QueryDetails from './queryDetails/QueryDetails.vue';
@@ -41,7 +42,7 @@
   import QueryTable from './queryTable/QueryTable.vue';
 
   @Component({
-    components: { QueryDiff, QueryDetails, QueryTable }
+    components: { QueryDiff, QueryDetails, QueryTable, TimeAgo }
   })
   export default class QueriesList extends Vue {
     selectedQuery?: Query;
@@ -56,7 +57,7 @@
       { key: 'requestUser', label: 'User' },
       { key: 'tablesRead', label: 'Tables Read' },
       { key: 'tablesWritten', label: 'Tables Written' },
-      { key: 'startTime', label: 'Start Time' },
+      { key: 'startTime', label: 'Start Time', cellComponent: TimeAgo },
       { key: 'dagID', label: 'DAG ID' },
       { key: 'appID', label: 'Application ID' },
       { key: 'cpuTime', label: 'CPU Time' },
