@@ -61,7 +61,6 @@ exports[`ColumnSelectorPanel.vue should render with checkboxes 1`] = `
       <label>
         <input
           type="checkbox"
-          value="[object Object]"
         />
         
         A
@@ -72,7 +71,6 @@ exports[`ColumnSelectorPanel.vue should render with checkboxes 1`] = `
       <label>
         <input
           type="checkbox"
-          value="[object Object]"
         />
         
         B
