@@ -92,7 +92,7 @@ export interface Query {
   startTime: number;
   status: string;
   tablesRead: { table: string; database: string }[];
-  tablesWritten: { table: string; database: string }[];
+  tablesWritten?: { table: string; database: string }[];
   tablesReadWithDatabase?: string; // TODO: From API or adaption? type?
   tablesWrittenWithDatabase?: string; // TODO: From API or adaption? type?
   threadId: string;
