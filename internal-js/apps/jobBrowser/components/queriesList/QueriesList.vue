@@ -37,7 +37,7 @@
   import TimeAgo from '../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
   import { search } from './apiUtils';
   import QueryDiff from './queryDiff/QueryDiff.vue';
-  import QueryDetails from './queryDetails/QueryDetails.vue';
+  import QueryDetails from './query-details/QueryDetails.vue';
   import { Query } from './index';
   import QueryTable from './queryTable/QueryTable.vue';
 

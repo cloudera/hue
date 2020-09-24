@@ -83,19 +83,19 @@
 
 <script lang="ts">
   import Component from 'vue-class-component';
-  import MultiQueryComponent from '../queryDetails/MultiQueryComponent.vue';
-  import QueryVisualExplain from '../queryDetails/QueryVisualExplain.vue';
-  import QueryTimeline from '../queryDetails/QueryTimeline.vue';
-  import QueryConfig from '../queryDetails/QueryConfig.vue';
+  import MultiQueryComponent from '../query-details/MultiQueryComponent.vue';
+  import QueryVisualExplain from '../query-details/QueryVisualExplain.vue';
+  import QueryTimeline from '../query-details/QueryTimeline.vue';
+  import QueryConfig from '../query-details/QueryConfig.vue';
   import QueryTextDiff from '../../common/QueryTextDiff.vue';
   import Tab from '../../../../../../desktop/core/src/desktop/js/components/Tab.vue';
   import Tabs from '../../../../../../desktop/core/src/desktop/js/components/Tabs.vue';
-  import DagConfigs from '../queryDetails/DagConfigs.vue';
-  import DagCounters from '../queryDetails/DagCounters.vue';
-  import DagGraphicalView from '../queryDetails/DagGraphicalView.vue';
-  import DagSwimlane from '../queryDetails/DagSwimlane.vue';
+  import DagConfigs from '../query-details/DagConfigs.vue';
+  import DagCounters from '../query-details/DagCounters.vue';
+  import DagGraphicalView from '../query-details/DagGraphicalView.vue';
+  import DagSwimlane from '../query-details/DagSwimlane.vue';
   import { Dag } from '../index';
-  import QueryInfo from '../queryDetails/QueryInfo.vue';
+  import QueryInfo from '../query-details/QueryInfo.vue';
 
   @Component({
     components: {
