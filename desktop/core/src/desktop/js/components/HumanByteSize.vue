@@ -17,44 +17,38 @@
 -->
 
 <template>
-  <span>{{ timeAgo }}</span>
+  <span>{{ humanSize }}</span>
 </template>
 
 <script lang="ts">
-  import I18n from '../utils/i18n';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
 
-  const SECOND = { val: 1000, text: 'second' };
-  const MINUTE = { val: SECOND.val * 60, text: 'minute' };
-  const HOUR = { val: MINUTE.val * 60, text: 'hour' };
-  const DAY = { val: HOUR.val * 24, text: 'day' };
-  const MONTH = { val: DAY.val * (365 / 12), text: 'month' };
-  const YEAR = { val: DAY.val * 365, text: 'year' };
+  const UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'];
 
-  const LIMITS = [YEAR, MONTH, DAY, HOUR, MINUTE, SECOND];
-
-  export const timeAgo = (value: number): string => {
-    const diff = Date.now() - value;
-    for (const limit of LIMITS) {
-      if (diff >= limit.val) {
-        const val = Math.round(diff / limit.val);
-        const postfix = I18n(`${limit.text}${val > 1 ? 's' : ''} ago`);
-        return `${val} ${postfix}`;
-      }
+  export const humanSize = (value?: number): string => {
+    if (value === 0) {
+      return '0 B';
     }
-    return I18n('now');
+    if (!value) {
+      return '';
+    }
+    if (value < 1024) {
+      return `${value} B`;
+    }
+    const unitIndex = Math.min(Math.floor(Math.log(value) / Math.log(1024)), UNITS.length - 1);
+    const unitValue = Math.round((value / Math.pow(1024, unitIndex)) * 10) / 10;
+    return `${unitValue} ${UNITS[unitIndex]}`;
   };
 
   @Component
   export default class TimeAgo extends Vue {
-    @Prop({ required: true })
-    value!: number;
+    @Prop({ required: false })
+    value?: number;
 
-    // TODO: Add timezone support
-    get timeAgo(): string {
-      return timeAgo(this.value);
+    get humanSize(): string {
+      return humanSize(this.value);
     }
   }
 </script>

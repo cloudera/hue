@@ -16,12 +16,12 @@
 
 import { Component } from 'vue';
 
-export interface Column {
+export interface Column<T> {
   label: string;
   key: string;
   cellComponent?: Component;
-  cellProps?: (key: string, row: Row) => { [attr: string]: unknown };
-  adapter?: (key: string, row: Row) => string | number | boolean | undefined;
+  cellProps?: (key: string, row: T) => { [attr: string]: unknown };
+  adapter?: (key: string, row: T) => string | number | boolean | undefined;
 }
 
 export type Row = { [key: string]: unknown };
