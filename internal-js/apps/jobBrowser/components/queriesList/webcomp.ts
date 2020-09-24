@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-import HiveQuerySearch from './HiveQueries.vue';
+import QueriesList from './QueriesList.vue';
 import { wrap } from 'vue/webComponentWrapper';
 
-export const COMPONENT_NAME = 'hive-query-search';
-wrap(COMPONENT_NAME, HiveQuerySearch);
+export const COMPONENT_NAME = 'queries-list';
+wrap(COMPONENT_NAME, QueriesList);

@@ -32,7 +32,7 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Column } from '../../../../../desktop/core/src/desktop/js/components/HueTable';
-  import { search } from '../../../../../internal-js/apps/jobBrowser/components/hiveQueries/apiUtils';
+  import { search } from './apiUtils';
   import QueryDiff from './queryDiff/QueryDiff.vue';
   import QueryDetails from './queryDetails/QueryDetails.vue';
   import { Query } from './index';
@@ -41,7 +41,7 @@
   @Component({
     components: { QueryDiff, QueryDetails, QueryTable }
   })
-  export default class HiveQuerySearch extends Vue {
+  export default class QueriesList extends Vue {
     selectedQuery?: Query;
     queriesToDiff?: Query[];
 

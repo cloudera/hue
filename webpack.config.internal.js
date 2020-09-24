@@ -20,7 +20,7 @@ const path = require('path');
 const baseDir = path.resolve(__dirname, 'desktop/core/src/desktop/js');
 const internalBaseDir = path.resolve(__dirname, 'internal-js');
 
-const COMPONENTS = ['apps/jobBrowser/components/hiveQueryPlan/HiveQueryPlan.vue'];
+const COMPONENTS = ['apps/jobBrowser/components/queriesList/QueriesList.vue'];
 
 COMPONENTS.forEach(componentPath => {
   shared.resolve.alias[path.resolve(baseDir, componentPath)] = path.resolve(

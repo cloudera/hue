@@ -17,9 +17,9 @@
 import { SearchResponse } from './apiUtils';
 import * as apiUtils from './apiUtils';
 import { shallowMount } from '@vue/test-utils';
-import HiveQueries from './HiveQueries.vue';
+import QueriesList from './QueriesList.vue';
 
-describe('HiveQueries.vue', () => {
+describe('QueriesList.vue', () => {
   it('should render', () => {
     jest
       .spyOn(apiUtils, 'search')
@@ -27,7 +27,7 @@ describe('HiveQueries.vue', () => {
         async (): Promise<SearchResponse> =>
           Promise.resolve({ meta: { limit: 25, offset: 0, size: 0 }, queries: [] })
       );
-    const wrapper = shallowMount(HiveQueries);
+    const wrapper = shallowMount(QueriesList);
     expect(wrapper.element).toMatchSnapshot();
   });
 });
