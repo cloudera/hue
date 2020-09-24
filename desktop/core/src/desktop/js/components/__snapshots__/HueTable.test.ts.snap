@@ -111,3 +111,111 @@ exports[`HueTable.vue should render a table 1`] = `
   </tbody>
 </table>
 `;
+
+exports[`HueTable.vue should render a table with a custom component for a cell 1`] = `
+<table>
+  <thead>
+    <tr>
+      <th>
+        A
+      </th>
+      <th>
+        B
+      </th>
+    </tr>
+  </thead>
+   
+  <tbody>
+    <tr>
+      <td>
+        
+          1
+        
+      </td>
+      <td>
+        <span>
+          now
+        </span>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        
+          4
+        
+      </td>
+      <td>
+        <span>
+          now
+        </span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`HueTable.vue should render a table with adapter 1`] = `
+<table>
+  <thead>
+    <tr>
+      <th>
+        A
+      </th>
+      <th>
+        B + C
+      </th>
+    </tr>
+  </thead>
+   
+  <tbody>
+    <tr>
+      <td>
+        
+          1
+        
+      </td>
+      <td>
+        
+          14
+        
+      </td>
+    </tr>
+    <tr>
+      <td>
+        
+          2
+        
+      </td>
+      <td>
+        
+          16
+        
+      </td>
+    </tr>
+    <tr>
+      <td>
+        
+          3
+        
+      </td>
+      <td>
+        
+          18
+        
+      </td>
+    </tr>
+    <tr>
+      <td>
+        
+          4
+        
+      </td>
+      <td>
+        
+          20
+        
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
