@@ -22,58 +22,90 @@ exports[`HueTable.vue should render a table 1`] = `
   <tbody>
     <tr>
       <td>
-        1
-      </td>
-      <td>
+        
+          1
         
       </td>
       <td>
-        false
+        
+          
+        
       </td>
       <td>
-        5
+        
+          false
+        
+      </td>
+      <td>
+        
+          5
+        
       </td>
     </tr>
     <tr>
       <td>
-        2
-      </td>
-      <td>
+        
+          2
         
       </td>
       <td>
-        true
+        
+          
+        
       </td>
       <td>
-        6
+        
+          true
+        
+      </td>
+      <td>
+        
+          6
+        
       </td>
     </tr>
     <tr>
       <td>
-        3
-      </td>
-      <td>
+        
+          3
         
       </td>
       <td>
-        false
+        
+          
+        
       </td>
       <td>
-        7
+        
+          false
+        
+      </td>
+      <td>
+        
+          7
+        
       </td>
     </tr>
     <tr>
       <td>
-        4
-      </td>
-      <td>
+        
+          4
         
       </td>
       <td>
-        true
+        
+          
+        
       </td>
       <td>
-        8
+        
+          true
+        
+      </td>
+      <td>
+        
+          8
+        
       </td>
     </tr>
   </tbody>
