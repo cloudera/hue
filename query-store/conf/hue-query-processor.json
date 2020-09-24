@@ -7,7 +7,7 @@
     "connectionTimeout": "2s"
   },
   "dasConf": {
-    "scan.folder.delay.millis" : 2000,
+    "hue.query-processor.event-pipeline.folder-scan-delay-millis" : 2000,
     "hive.hook.proto.base-directory": "/warehouse/tablespace/external/hive/sys.db/query_data/",
     "tez.history.logging.proto-base-dir": "/warehouse/tablespace/external/hive/sys.db/"
   },
