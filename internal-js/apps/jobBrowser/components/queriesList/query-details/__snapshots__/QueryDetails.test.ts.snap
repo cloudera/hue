@@ -39,7 +39,7 @@ exports[`QueryDetails.vue should render 1`] = `
         title="TIMELINE"
       >
         <query-timeline-stub
-          query="[object Object]"
+          queries="[object Object]"
         />
       </tab-stub>
     </tabs-stub>

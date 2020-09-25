@@ -18,26 +18,27 @@
 
 <template>
   <div id="timeline" class="target detail-panel">
-    <HiveTimeline v-if="perf" :perf="perf" />
+    <div v-if="perfs.length">
+      <HiveTimeline v-for="(perf, index) in perfs" :key="index" :perf="perf" />
+    </div>
     <h4 v-else>Data not available to display Timeline!</h4>
   </div>
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { Component } from 'vue-property-decorator';
   import HiveTimeline from './hive-timeline/HiveTimeline';
-  import { Query } from '../index';
+  import MultiQueryComponent from './MultiQueryComponent.vue';
 
-  // Just a wrapper over HiveTimeline, could add ImpalaTimeline in the future
   @Component({
     components: { HiveTimeline }
   })
-  export default class QueryTimeline extends Vue {
-    @Prop() query: Query | undefined;
-
-    get perf(): unknown {
-      if (this.query && this.query.details) {
-        return this.query.details.perf;
+  export default class QueryTimeline extends MultiQueryComponent {
+    get perfs(): unknown {
+      if (this.queries) {
+        return this.queries
+          .map(query => query && query.details && query.details.perf)
+          .filter(perf => perf);
       }
     }
   }

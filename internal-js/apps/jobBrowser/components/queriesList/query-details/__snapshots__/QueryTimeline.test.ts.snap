@@ -4,7 +4,6 @@ exports[`QueryTimeline.vue should render 1`] = `
 <div
   class="target detail-panel"
   id="timeline"
-  queries="[object Object]"
 >
   <h4>
     Data not available to display Timeline!
