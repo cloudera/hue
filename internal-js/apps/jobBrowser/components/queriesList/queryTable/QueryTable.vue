@@ -75,7 +75,7 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
-  import Duration from '../../../../../../desktop/core/src/desktop/js/components/HumanByteSize.vue';
+  import Duration from '../../../../../../desktop/core/src/desktop/js/components/Duration.vue';
   import HumanByteSize from '../../../../../../desktop/core/src/desktop/js/components/HumanByteSize.vue';
   import TimeAgo from '../../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
   import HueTable from '../../../../../../desktop/core/src/desktop/js/components/HueTable.vue';

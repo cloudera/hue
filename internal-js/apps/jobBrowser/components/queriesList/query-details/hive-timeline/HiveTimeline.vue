@@ -177,18 +177,19 @@
 
 <script lang="ts">
   import { Component, Prop, Vue } from 'vue-property-decorator';
-  import { fmtDuration } from 'vue-meth';
+  import { duration } from '../../../../../../../desktop/core/src/desktop/js/components/Duration.vue';
   import NormalizedHivePerf from './NormalizedHivePerf';
 
   import './hive-timeline.scss';
 
   @Component({
     methods: {
-      fmtDuration
+      fmtDuration: val => duration(val, true)
     }
   })
   export default class HiveTimeline extends Vue {
-    @Prop() perf: unknown;
+    @Prop()
+    perf: unknown;
 
     get normalizedPerf(): NormalizedHivePerf {
       return new NormalizedHivePerf(this.perf);
