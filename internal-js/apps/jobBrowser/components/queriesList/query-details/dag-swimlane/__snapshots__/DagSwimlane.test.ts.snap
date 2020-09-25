@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DagSwimlane.vue should render 1`] = `
+<div
+  class="dag-swimlane"
+>
+  <div
+    class="process-names"
+  >
+     
+    <div
+      class="consolidated-view-label"
+    >
+      
+      Consolidated
+    
+    </div>
+  </div>
+  <div
+    class="process-visuals"
+  >
+    <div
+      class="zoom-panel"
+      style="width: 100%;"
+    >
+       
+      <!---->
+       
+      <ruler-stub
+        processor="[object Object]"
+        scroll="0"
+        zoom="100"
+      />
+    </div>
+  </div>
+</div>
+`;

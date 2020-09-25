@@ -18,7 +18,7 @@
 
 <template>
   <div id="dag-panel" class="target detail-panel dag-panel">
-    <div>{{ dag.dagInfo.dagId }}</div>
+    <div>{{ dag && dag.dagInfo.dagId }}</div>
     <tabs>
       <tab title="DAG SWIMLANE"><dag-swimlane :dag="dag" /></tab>
       <tab title="DAG FLOW"><dag-graphical-view /></tab>

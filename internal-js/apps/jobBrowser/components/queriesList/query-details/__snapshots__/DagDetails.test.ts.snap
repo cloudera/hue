@@ -4,31 +4,15 @@ exports[`DagDetails.vue should render 1`] = `
 <div
   class="target detail-panel dag-panel"
   id="dag-panel"
+  query="[object Object]"
 >
-  <select
-    class="form-control"
-  >
-    <option
-      value="dag 1"
-    >
-      
-      dag 1
+  <div>
     
-    </option>
-    <option
-      value="dag 2"
-    >
-      
-      dag 2
-    
-    </option>
-  </select>
-   
-  <br />
+  </div>
    
   <tabs-stub>
     <tab-stub
-      title="DAG INFO"
+      title="DAG SWIMLANE"
     >
       <dag-swimlane-stub />
     </tab-stub>
@@ -49,7 +33,6 @@ exports[`DagDetails.vue should render 1`] = `
       title="DAG CONFIGURATIONS"
     >
       <dag-configs-stub
-        queries="[object Object]"
         title="Configurations"
       />
     </tab-stub>

@@ -101,26 +101,32 @@
 
     // Watch : "processes.@each.startEvent"
     get startTime(): number {
-      let startTime = this.processes[0].startEvent.time;
-      this.processes.forEach(process => {
-        const time = process.startEvent.time;
-        if (startTime > time) {
-          startTime = time;
-        }
-      });
-      return startTime;
+      if (this.processes.length) {
+        let startTime = this.processes[0].startEvent.time;
+        this.processes.forEach(process => {
+          const time = process.startEvent.time;
+          if (startTime > time) {
+            startTime = time;
+          }
+        });
+        return startTime;
+      }
+      return 0;
     }
 
     // Watch - "processes.@each.endEvent"
     get endTime(): number {
-      let endTime = this.processes[0].endEvent.time;
-      this.processes.forEach(process => {
-        const time = process.endEvent.time;
-        if (endTime < time) {
-          endTime = time;
-        }
-      });
-      return endTime;
+      if (this.processes.length) {
+        let endTime = this.processes[0].endEvent.time;
+        this.processes.forEach(process => {
+          const time = process.endEvent.time;
+          if (endTime < time) {
+            endTime = time;
+          }
+        });
+        return endTime;
+      }
+      return 0;
     }
 
     // Watch - "startTime", "endTime", "processes.length"

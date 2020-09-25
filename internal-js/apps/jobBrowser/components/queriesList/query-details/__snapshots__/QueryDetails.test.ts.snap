@@ -45,8 +45,5 @@ exports[`QueryDetails.vue should render 1`] = `
     </tabs-stub>
   </div>
    
-  <dag-details-stub
-    query="[object Object]"
-  />
 </div>
 `;

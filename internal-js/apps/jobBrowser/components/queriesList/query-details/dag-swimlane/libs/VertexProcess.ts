@@ -291,25 +291,27 @@ export function createProcesses(dag: Dag): Process[] {
   const processes: Process[] = [];
   const processHash: any = {};
 
-  const dagPlanEdges = dag.dagDetails.dagPlan.edges;
+  if (dag) {
+    const dagPlanEdges = dag.dagDetails.dagPlan.edges;
 
-  // TODO : Create this from vertex entities list
-  // Create process instances for each vertices
-  dag.vertices.forEach((vertex: any) => {
-    const process = new VertexProcess(vertex, () => this.visibleColumns, []);
-    processHash[vertex.name] = process;
-    processes.push(process);
-  });
-
-  // Add process(vertex) dependencies based on dagPlan
-  if (dagPlanEdges) {
-    dagPlanEdges.forEach((edge: any) => {
-      const process = processHash[edge.outputVertexName];
-      if (process && processHash[edge.inputVertexName]) {
-        process.blockers.push(processHash[edge.inputVertexName]);
-        process.edgeHash[edge.inputVertexName] = edge;
-      }
+    // TODO : Create this from vertex entities list
+    // Create process instances for each vertices
+    dag.vertices.forEach((vertex: any) => {
+      const process = new VertexProcess(vertex, () => this.visibleColumns, []);
+      processHash[vertex.name] = process;
+      processes.push(process);
     });
+
+    // Add process(vertex) dependencies based on dagPlan
+    if (dagPlanEdges) {
+      dagPlanEdges.forEach((edge: any) => {
+        const process = processHash[edge.outputVertexName];
+        if (process && processHash[edge.inputVertexName]) {
+          process.blockers.push(processHash[edge.inputVertexName]);
+          process.edgeHash[edge.inputVertexName] = edge;
+        }
+      });
+    }
   }
 
   return processes;
