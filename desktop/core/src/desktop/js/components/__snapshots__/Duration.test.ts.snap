@@ -5,3 +5,9 @@ exports[`Duration.vue should render 1`] = `
   342:56:07
 </span>
 `;
+
+exports[`Duration.vue should render short format 1`] = `
+<span>
+  14days
+</span>
+`;

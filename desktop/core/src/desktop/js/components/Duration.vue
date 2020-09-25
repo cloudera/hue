@@ -21,21 +21,44 @@
 </template>
 
 <script lang="ts">
-  import { Duration as LuxonDuration } from 'luxon';
+  import { Duration as LuxonDuration, DurationUnit } from 'luxon';
+  import I18n from '../utils/i18n';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
 
-  export const duration = (value: number): string =>
-    LuxonDuration.fromMillis(value).toFormat('hh:mm:ss');
+  const SHORT_LIMITS = [
+    { unit: <DurationUnit>'years', postfix: 'year', appendS: true },
+    { unit: <DurationUnit>'days', postfix: 'day', appendS: true },
+    { unit: <DurationUnit>'hours', postfix: 'h', appendS: false },
+    { unit: <DurationUnit>'minutes', postfix: 'm', appendS: false },
+    { unit: <DurationUnit>'seconds', postfix: 's', appendS: false },
+    { unit: <DurationUnit>'milliseconds', postfix: 'ms', appendS: false }
+  ];
+
+  export const duration = (value: number, short?: boolean): string => {
+    const luxonDuration = LuxonDuration.fromMillis(value);
+    if (short) {
+      for (const limit of SHORT_LIMITS) {
+        const val = luxonDuration.as(limit.unit);
+        if (val >= 1) {
+          return Math.floor(val) + I18n(limit.postfix + (limit.appendS && val > 1 ? 's' : ''));
+        }
+      }
+      return `0${I18n('ms')}`;
+    }
+    return luxonDuration.toFormat('hh:mm:ss');
+  };
 
   @Component
   export default class Duration extends Vue {
     @Prop({ required: true })
     value!: number;
+    @Prop({ required: false })
+    short?: boolean;
 
     get duration(): string {
-      return duration(this.value);
+      return duration(this.value, this.short);
     }
   }
 </script>

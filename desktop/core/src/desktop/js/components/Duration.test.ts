@@ -15,13 +15,23 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
-import Duration from './Duration.vue';
+import Duration, { duration } from './Duration.vue';
 
 describe('Duration.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(Duration, {
       propsData: {
         value: 1234567890
+      }
+    });
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('should render short format', () => {
+    const wrapper = shallowMount(Duration, {
+      propsData: {
+        value: 1234567890,
+        short: true
       }
     });
     expect(wrapper.element).toMatchSnapshot();
@@ -52,5 +62,9 @@ describe('Duration.vue', () => {
       }
     });
     expect(wrapper.element.firstChild?.textContent).toContain('100:01:01');
+  });
+
+  it('should render 4days short duration', () => {
+    expect(duration(1000 * 60 * 60 * 24 * 4, true)).toEqual('4days');
   });
 });
