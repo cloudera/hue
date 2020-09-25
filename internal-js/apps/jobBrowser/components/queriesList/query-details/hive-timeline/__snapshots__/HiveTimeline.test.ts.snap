@@ -117,7 +117,7 @@ exports[`HiveTimeline.vue should render 1`] = `
       <div
         class="bar"
         data-value="0"
-        title="Post ATS Hook"
+        title="Post Logging Hook"
       >
         
         Post ATS Hook

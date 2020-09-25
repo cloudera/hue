@@ -1,0 +1,42 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryConfig.vue should render 1`] = `
+<div
+  class="target detail-panel"
+>
+  <div
+    class="row"
+  >
+    <div
+      class="col-md-12"
+    >
+      <div
+        class="title"
+      >
+        
+        Configurations
+      
+      </div>
+       
+      <!---->
+    </div>
+  </div>
+   
+  <div
+    class="row"
+  >
+    <div
+      class="col-md-12 table-component"
+    >
+      <div
+        class="body"
+      >
+        <hue-table-stub
+          columns="[object Object],[object Object]"
+          rows=""
+        />
+      </div>
+    </div>
+  </div>
+</div>
+`;
