@@ -33,7 +33,7 @@
           <query-config :queries="[query]" />
         </tab>
         <tab title="TIMELINE">
-          <query-timeline :queries="[query]" />
+          <query-timeline :query="query" />
         </tab>
       </tabs>
 

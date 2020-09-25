@@ -23,37 +23,6 @@ export interface Dag {
   config?: { [key: string]: string }; // TODO: value always string?
 }
 
-export interface NormalizedQueryPerf {
-  compile: number;
-  groupTotal: {
-    pre: number;
-    submit: number;
-    running: number;
-    post: number;
-  };
-  parse: number;
-  PostHiveProtoLoggingHook: number;
-  RemoveTempOrDuplicateFiles: number;
-  RenameOrMoveFiles: number;
-  TezBuildDag: number;
-  TezRunDag: number;
-  TezSubmitDag: number;
-  TezSubmitToRunningDag: number;
-  total: number;
-}
-
-export interface QueryPerf {
-  compile?: number;
-  parse?: number;
-  PostHiveProtoLoggingHook?: number;
-  RemoveTempOrDuplicateFiles?: number;
-  RenameOrMoveFiles?: number;
-  TezBuildDag?: number;
-  TezRunDag?: number;
-  TezSubmitDag?: number;
-  TezSubmitToRunningDag?: number;
-}
-
 export interface Query {
   appIds?: string[]; // TODO: From API or adaption? Type?
   clientIpAddress?: unknown; // TODO: string?
@@ -66,7 +35,7 @@ export interface Query {
   databasesUsed: { [name: string]: number }[];
   details?: {
     diagnostics?: string;
-    perf?: QueryPerf;
+    perf?: unknown;
     configuration?: { [key: string]: unknown }; // TODO: value type string?
   };
   domainId?: unknown; // TODO: type?

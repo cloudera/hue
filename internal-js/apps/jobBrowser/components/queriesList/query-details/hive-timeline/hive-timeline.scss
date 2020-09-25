@@ -47,8 +47,6 @@ $border-color: #d6d8db;
 
       overflow: hidden;
 
-      box-sizing: border-box;
-
       .bar {
         width: 25%;
         height: 30px;
@@ -82,6 +80,7 @@ $border-color: #d6d8db;
         padding-top: 10px;
 
         border-left: 1px solid $border-color;
+        box-sizing: border-box;
 
         &:first-child {
           border: none;
@@ -101,6 +100,10 @@ $border-color: #d6d8db;
   }
 
   table.detail-list {
+    th {
+      border: 1px solid $border-color;
+    }
+
     i {
       display: inline-block;
 

@@ -18,51 +18,27 @@
 
 <template>
   <div id="timeline" class="target detail-panel">
-    <div v-for="(perf, index) in perfs" :key="perf.title">
-      <div class="row">
-        <div class="col-md-12">
-          <div class="title">
-            {{ perf.title }}
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-12">
-          <div class="body">
-            <query-timeline-bars v-if="perf" :perf="perf" />
-            <h4 v-else>Data not available to display Timeline!</h4>
-            <query-timeline-legend
-              v-if="perfs.length > 1 && index === perfs.length - 1"
-              :perfs="perfs"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+    <HiveTimeline v-if="perf" :perf="perf" />
+    <h4 v-else>Data not available to display Timeline!</h4>
   </div>
 </template>
 
 <script lang="ts">
-  import Component from 'vue-class-component';
-  import { normalizePerf, numberToLetter } from './utils';
-  import MultiQueryComponent from './MultiQueryComponent.vue';
-  import QueryTimelineBars from './QueryTimelineBars.vue';
-  import QueryTimelineLegend from './QueryTimelineLegend.vue';
-  import { NormalizedQueryPerf } from '../index';
+  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import HiveTimeline from './hive-timeline/HiveTimeline';
+  import { Query } from '../index';
 
+  // Just a wrapper over HiveTimeline, could add ImpalaTimeline in the future
   @Component({
-    components: { QueryTimelineLegend, QueryTimelineBars }
+    components: { HiveTimeline }
   })
-  export default class QueryTimeline extends MultiQueryComponent {
-    get perfs(): { title: string; perf: NormalizedQueryPerf }[] {
-      return this.queries.map((query, index) => {
-        let title = 'Timeline';
-        if (this.queries.length > 1) {
-          title += ' - ' + numberToLetter(index);
-        }
-        return { title: title, perf: normalizePerf(query) };
-      });
+  export default class QueryTimeline extends Vue {
+    @Prop() query: Query | undefined;
+
+    get perf(): unknown {
+      if (this.query && this.query.details) {
+        return this.query.details.perf;
+      }
     }
   }
 </script>

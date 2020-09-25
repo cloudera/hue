@@ -67,7 +67,7 @@
         <div
           class="bar"
           :data-value="normalizedPerf.PostHiveProtoLoggingHook"
-          title="Post ATS Hook"
+          title="Post Logging Hook"
         >
           Post ATS Hook
         </div>
@@ -178,6 +178,7 @@
 <script lang="ts">
   import { Component, Prop, Vue } from 'vue-property-decorator';
   import { fmtDuration } from 'vue-meth';
+  import NormalizedHivePerf from './NormalizedHivePerf';
 
   import './hive-timeline.scss';
 
@@ -187,63 +188,23 @@
     }
   })
   export default class HiveTimeline extends Vue {
-    @Prop() perf: any;
+    @Prop() perf: unknown;
 
-    get normalizedPerf(): any {
-      let perf = this.perf || {};
-
-      perf['PostHiveProtoLoggingHook'] =
-        perf['PostHook.org.apache.hadoop.hive.ql.hooks.HiveProtoLoggingHook'] || 0;
-
-      // Create a copy of perf with default values
-      perf = Object.assign(
-        {
-          compile: 0,
-          parse: 0,
-          TezBuildDag: 0,
-
-          TezSubmitDag: 0,
-          TezSubmitToRunningDag: 0,
-
-          TezRunDag: 0,
-
-          PostHiveProtoLoggingHook: 0,
-          RemoveTempOrDuplicateFiles: 0,
-          RenameOrMoveFiles: 0
-        },
-        perf
-      );
-
-      perf.groupTotal = {
-        pre: perf.compile + perf.parse + perf.TezBuildDag,
-        submit: perf.TezSubmitDag + perf.TezSubmitToRunningDag,
-        running: perf.TezRunDag,
-        post:
-          perf.PostHiveProtoLoggingHook + perf.RemoveTempOrDuplicateFiles + perf.RenameOrMoveFiles
-      };
-
-      perf.total =
-        perf.groupTotal.pre +
-        perf.groupTotal.submit +
-        perf.groupTotal.running +
-        perf.groupTotal.post;
-
-      return perf;
+    get normalizedPerf(): NormalizedHivePerf {
+      return new NormalizedHivePerf(this.perf);
     }
 
-    // eslint-disable-next-line no-undef
-    alignBars(bars: NodeListOf<HTMLElement>, perf: any): void {
+    alignBars(bars: NodeListOf<HTMLElement>, perf: NormalizedHivePerf): void {
       bars.forEach((bar: HTMLElement) => {
-        const width = (parseInt(bar.dataset.value || '0') / perf.total) * 100;
-        bar.style.width = `${width}%`;
+        const perfValue = parseInt(bar.dataset.value || '0');
+        const widthPercent = (perfValue / perf.total) * 100;
+        bar.style.width = `${widthPercent}%`;
       });
     }
 
     alignTimeline(): void {
-      const perf = this.normalizedPerf;
-
-      this.alignBars(this.$el.querySelectorAll('.sub-groups .bar'), perf);
-      this.alignBars(this.$el.querySelectorAll('.groups .bar'), perf);
+      this.alignBars(this.$el.querySelectorAll('.sub-groups .bar'), this.normalizedPerf);
+      this.alignBars(this.$el.querySelectorAll('.groups .bar'), this.normalizedPerf);
     }
 
     mounted(): void {
