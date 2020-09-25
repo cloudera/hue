@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Duration.vue should render 1`] = `
+<span>
+  342:56:07
+</span>
+`;

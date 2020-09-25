@@ -56,11 +56,11 @@
   import { Column, Row } from './HueTable';
 
   @Component
-  export default class HueTable extends Vue {
+  export default class HueTable<T> extends Vue {
     @Prop({ required: false, default: () => [] })
     rows?: Row[];
     @Prop({ required: false, default: () => [] })
-    columns?: Column[];
+    columns?: Column<T>[];
   }
 </script>
 
