@@ -3,6 +3,7 @@
 exports[`QueryTable.vue should render 1`] = `
 <div
   class="table-component"
+  columns=""
 >
   <queries-search-stub
     searches=""

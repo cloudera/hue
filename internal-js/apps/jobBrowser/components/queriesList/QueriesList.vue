@@ -21,7 +21,6 @@
     <query-table
       v-if="!selectedQuery && !queriesToDiff"
       :queries="queries"
-      :columns="columns"
       @diff-queries="diffQueries"
       @query-selected="querySelected"
     />
@@ -31,11 +30,9 @@
 </template>
 
 <script lang="ts">
-  import { Duration } from 'luxon';
-  import HumanByteSize from '../../../../../desktop/core/src/desktop/js/components/HumanByteSize.vue';
   import Vue from 'vue';
   import Component from 'vue-class-component';
-  import { Column } from '../../../../../desktop/core/src/desktop/js/components/HueTable';
+  import HumanByteSize from '../../../../../desktop/core/src/desktop/js/components/HumanByteSize.vue';
   import TimeAgo from '../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
   import { fetchExtendedQuery, search } from './apiUtils';
   import QueryDiff from './queryDiff/QueryDiff.vue';
@@ -50,42 +47,6 @@
     selectedQuery: Query | null = null;
     queriesToDiff: Query[] | null = null;
     queries: Query[] = [];
-
-    // TODO: Move to QueryTable?
-    columns: Column<Query>[] = [
-      { key: 'status', label: 'Status' },
-      { key: 'query', label: 'Query' },
-      { key: 'queueName', label: 'Queue' },
-      { key: 'requestUser', label: 'User' },
-      {
-        key: 'tablesRead',
-        label: 'Tables Read',
-        adapter: (key: string, query: Query): string =>
-          (query.tablesRead || []).map(data => `${data.table} (${data.database})`).join(', ')
-      },
-      {
-        key: 'tablesWritten',
-        label: 'Tables Written',
-        adapter: (key: string, query: Query): string =>
-          (query.tablesWritten || []).map(data => `${data.table} (${data.database})`).join(', ')
-      },
-      { key: 'startTime', label: 'Start Time', cellComponent: TimeAgo },
-      {
-        key: 'duration',
-        label: 'Duration',
-        adapter: (key: string, query: Query): string =>
-          (query.duration && Duration.fromMillis(query.duration).toFormat('hh:mm:ss')) || ''
-      },
-      { key: 'dagID', label: 'DAG ID' },
-      { key: 'appID', label: 'Application ID' },
-      { key: 'cpuTime', label: 'CPU Time' },
-      { key: 'physicalMemory', label: 'Physical Memory', cellComponent: HumanByteSize },
-      { key: 'virtualMemory', label: 'Virtual Memory', cellComponent: HumanByteSize },
-      { key: 'dataRead', label: 'Data Read', cellComponent: HumanByteSize },
-      { key: 'dataWritten', label: 'Data Written', cellComponent: HumanByteSize },
-      { key: 'executionMode', label: 'Execution Mode' },
-      { key: 'usedCBO', label: 'Cost Based Optimizer (CBO)' }
-    ];
 
     async created(): Promise<void> {
       const now = Date.now();
