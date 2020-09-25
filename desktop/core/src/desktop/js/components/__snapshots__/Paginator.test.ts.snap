@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Paginator.vue should render 1`] = `
+<div>
+  <div>
+    
+    Rows per page:
+    
+    <a
+      href="javascript: void(0);"
+    >
+      25
+    </a>
+     
+    <a
+      href="javascript: void(0);"
+    >
+      50
+    </a>
+     
+    <a
+      href="javascript: void(0);"
+    >
+      100
+    </a>
+  </div>
+   
+  <div>
+    1-25 of 500
+  </div>
+   
+  <div>
+    <a
+      href="javascript: void(0);"
+    >
+      |&lt;
+    </a>
+     
+    <a
+      href="javascript: void(0);"
+    >
+      &lt;
+    </a>
+     
+    <a
+      href="javascript: void(0);"
+    >
+      &gt;
+    </a>
+     
+    <a
+      href="javascript: void(0);"
+    >
+      &gt;|
+    </a>
+  </div>
+</div>
+`;
