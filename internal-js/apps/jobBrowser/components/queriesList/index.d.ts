@@ -20,7 +20,16 @@ export interface Dag {
   dagInfo: {
     dagId: string;
   };
+  dagDetails: {
+    counters: any[]; // TODO: type?
+    dagPlan: any; // TODO: type?
+    diagnostics: string;
+    hiveQueryId: number;
+    id: number;
+    vertexNameIdMapping: { [key: string]: string };
+  };
   config?: { [key: string]: string }; // TODO: value always string?
+  vertices: any[]; // TODO: type?
 }
 
 export interface Query {

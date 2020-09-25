@@ -17,16 +17,226 @@
 -->
 
 <template>
-  <div>Dag Swimlane - Not Implemented</div>
-  <!-- TODO: Implement -->
+  <div class="dag-swimlane">
+    <div class="process-names">
+      <ProcessName
+        v-for="process in normalizedProcesses"
+        :key="process._id"
+        :process="process"
+        @showTooltip="showTooltip"
+        @hideTooltip="hideTooltip"
+        @click="click"
+      />
+      <div class="consolidated-view-label">
+        Consolidated
+      </div>
+    </div><div class="process-visuals">
+      <div class="zoom-panel">
+        <ProcessVisual
+          v-for="process in normalizedProcesses"
+          :key="process._id"
+          :process="process"
+          :processor="processor"
+          @showTooltip="showTooltip"
+          @hideTooltip="hideTooltip"
+          @click="click"
+        />
+        <div v-if="consolidate" class="consolidated-view">
+          <ConsolidatedProcess
+            v-for="process in normalizedProcesses"
+            :key="process._id"
+            :focused-process="focusedProcess"
+            :process="process"
+            :processor="processor"
+            @showTooltip="showTooltip"
+            @hideTooltip="hideTooltip"
+            @click="click"
+          />
+        </div>
+        <Ruler :scroll="scroll" :processor="processor" :zoom="zoom" />
+      </div>
+    </div>
+    <!-- {{em-tooltip contents=tooltipContents}} -->
+  </div>
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
+  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+  import { Dag } from '../../index';
 
-  @Component
-  export default class DagSwimlane extends Vue {}
+  import ProcessName from './components/ProcessName.vue';
+  import ProcessVisual from './components/ProcessVisual.vue';
+  import ConsolidatedProcess from './components/ConsolidatedProcess.vue';
+  import Ruler from './components/Ruler.vue';
+  import { createProcesses } from './libs/VertexProcess';
+
+  import Processor from './libs/Processor';
+  import Process from './libs/Process';
+
+  import './dag-swimlane.scss';
+
+  @Component({
+    components: {
+      ProcessName,
+      ProcessVisual,
+      ConsolidatedProcess,
+      Ruler
+    }
+  })
+  export default class DagSwimlane extends Vue {
+    @Prop({ required: true }) dag!: Dag;
+    @Prop() consolidate = false;
+
+    processor: Processor = new Processor();
+    focusedProcess: Process | undefined;
+
+    tooltipContents = null;
+
+    scroll = 0;
+    zoom = 100;
+
+    get processes(): Process[] {
+      return createProcesses(this.dag);
+    }
+
+    // Watch : "processes.@each.startEvent"
+    get startTime(): number {
+      let startTime = this.processes[0].startEvent.time;
+      this.processes.forEach(process => {
+        const time = process.startEvent.time;
+        if (startTime > time) {
+          startTime = time;
+        }
+      });
+      return startTime;
+    }
+
+    // Watch - "processes.@each.endEvent"
+    get endTime(): number {
+      let endTime = this.processes[0].endEvent.time;
+      this.processes.forEach(process => {
+        const time = process.endEvent.time;
+        if (endTime < time) {
+          endTime = time;
+        }
+      });
+      return endTime;
+    }
+
+    // Watch - "startTime", "endTime", "processes.length"
+    // On - Init
+    processorSetup(): void {
+      this.processor.startTime = this.startTime;
+      this.processor.endTime = this.endTime;
+      this.processor.processCount = this.processes.length;
+    }
+
+    mounted(): void {
+      // Ember.run.scheduleOnce('afterRender', this, function() {
+      this.processorSetup();
+      this.onZoom();
+      this.listenScroll();
+    }
+
+    // Watch - "zoom"
+    @Watch('zoom')
+    onZoom(): void {
+      const zoomPanel: HTMLElement = <HTMLElement>this.$el.querySelector('.zoom-panel');
+      zoomPanel.style.width = `${this.zoom}%`;
+    }
+
+    listenScroll(): void {
+      const processVisuals: HTMLElement = <HTMLElement>this.$el.querySelector('.process-visuals');
+      processVisuals.onscroll = () => {
+        this.scroll = processVisuals.scrollLeft;
+      };
+    }
+
+    willDestroy(): void {
+      // Release listeners
+    }
+
+    // Watch - "processes.@each.blockers"
+    get normalizedProcesses(): any[] {
+      const processes = this.processes;
+      let normalizedProcesses: any[];
+      const idHash: any = {};
+      let containsBlockers = false;
+      const processor = this.processor;
+
+      // Validate and reset blocking
+      processes.forEach(function (process) {
+        if (!(process instanceof Process)) {
+          console.error('em-swimlane : Unknown type, must be of type Process');
+        }
+
+        if (process.blockers.length) {
+          containsBlockers = true;
+        }
+        process.blocking = [];
+      });
+
+      if (containsBlockers) {
+        normalizedProcesses = [];
+
+        // Recreate blocking list
+        processes.forEach(process => {
+          const blockers = process.blockers;
+          if (blockers) {
+            blockers.forEach((blocker: any) => {
+              blocker.blocking.push(process);
+            });
+          }
+        });
+
+        // Give an array of the processes in blocking order
+        processes.forEach((process: Process) => {
+          if (process.blocking.length === 0) {
+            // The root processes
+            normalizedProcesses.push(process);
+            normalizedProcesses.push.apply(normalizedProcesses, process.getAllBlockers());
+          }
+        });
+        normalizedProcesses.reverse();
+        normalizedProcesses = normalizedProcesses.filter((process: Process, index: number) => {
+          // Filters out the recurring processes in the list (after graph traversal), we just
+          // need the top processes
+          const id = process._id;
+          if (idHash[id] === undefined) {
+            idHash[id] = index;
+          }
+          return idHash[id] === index;
+        });
+      } else {
+        normalizedProcesses = processes;
+      }
+
+      // Set process colors & index
+      normalizedProcesses.forEach(function (process, index) {
+        process.index = index;
+        process.color = processor.createProcessColor(index, 0);
+      });
+
+      return normalizedProcesses; // Note: Was an Ember Array
+    }
+
+    showTooltip(type: string, process: Process, options: any): void {
+      this.tooltipContents = process.getTooltipContents(type, options);
+      this.focusedProcess = process;
+    }
+
+    hideTooltip(): void {
+      this.tooltipContents = null;
+      this.focusedProcess = undefined;
+    }
+
+    sendAction(a: string, b: string, c: any, d: any): void {
+      // eslint-disable-next-line no-restricted-syntax
+      console.log(a, b, c, d);
+    }
+
+    click(type: string, process: Process, options: any): void {
+      this.sendAction('click', type, process, options);
+    }
+  }
 </script>
-
-<style lang="scss" scoped></style>

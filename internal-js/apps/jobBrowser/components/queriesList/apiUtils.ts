@@ -18,7 +18,7 @@
 
 import axios, { AxiosResponse } from 'axios';
 import searchMockResponse from './test/api/query_search_post_response.json';
-import queryMockResponse from './test/api/hive_query_get_response_2.json';
+import queryMockResponse from './test/api/hive_query_get_response_3.json';
 import { Facet, FieldInfo, Query, Search, SearchMeta } from './index';
 
 const QUERY_URL = 'proxy/api/hive/query';
