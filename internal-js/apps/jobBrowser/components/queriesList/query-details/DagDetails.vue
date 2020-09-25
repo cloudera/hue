@@ -18,40 +18,25 @@
 
 <template>
   <div id="dag-panel" class="target detail-panel dag-panel">
-    <select
-      v-if="query.dags.length > 1"
-      v-model="selectedDagId"
-      class="form-control"
-      @change="dagSelected($event.target.value)"
-    >
-      <option v-for="dag in query.dags" :key="dag.dagInfo.dagId" :value="dag.dagInfo.dagId">
-        {{ dag.dagInfo.dagId }}
-      </option>
-    </select>
-
-    <br />
-
-    <!-- {{#bs-tab fade=false as |tab|}} -->
+    <div>{{ dag.dagInfo.dagId }}</div>
     <tabs>
-      <tab title="DAG INFO"><dag-swimlane /></tab>
+      <tab title="DAG SWIMLANE"><dag-swimlane :dag="dag" /></tab>
       <tab title="DAG FLOW"><dag-graphical-view /></tab>
       <tab title="DAG COUNTERS"><dag-counters /></tab>
-      <tab title="DAG CONFIGURATIONS"><dag-configs :queries="[query]" /></tab>
+      <tab title="DAG CONFIGURATIONS"><dag-configs :dag="dag" /></tab>
     </tabs>
-    <!-- {{/bs-tab}} -->
   </div>
 </template>
 
 <script lang="ts">
-  import Component from 'vue-class-component';
-  import SingleQueryComponent from './SingleQueryComponent.vue';
+  import { Component, Prop, Vue } from 'vue-property-decorator';
   import Tab from '../../../../../../desktop/core/src/desktop/js/components/Tab.vue';
   import Tabs from '../../../../../../desktop/core/src/desktop/js/components/Tabs.vue';
   import { Dag } from '../index';
   import DagConfigs from './DagConfigs.vue';
   import DagCounters from './DagCounters.vue';
   import DagGraphicalView from './DagGraphicalView.vue';
-  import DagSwimlane from './DagSwimlane.vue';
+  import DagSwimlane from './dag-swimlane/DagSwimlane.vue';
 
   @Component({
     components: {
@@ -63,13 +48,8 @@
       DagSwimlane
     }
   })
-  export default class DagDetails extends SingleQueryComponent {
-    selectedDagId?: string;
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    dagSelected(dag: Dag): void {
-      // TODO: Implement
-    }
+  export default class DagDetails extends Vue {
+    @Prop({ required: true }) dag!: Dag;
   }
 </script>
 

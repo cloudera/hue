@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div>DagGraphicalView - Not Implemented</div>
+  <div>Dag Swimlane - Not Implemented</div>
   <!-- TODO: Implement -->
 </template>
 

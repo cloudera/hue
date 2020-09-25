@@ -17,12 +17,15 @@
 -->
 
 <script lang="ts">
-  import Component from 'vue-class-component';
+  import { Component, Prop } from 'vue-property-decorator';
   import { Query } from '../index';
   import QueryConfig from './QueryConfig.vue';
+  import { Dag } from '../index';
 
   @Component
   export default class DagConfigs extends QueryConfig {
+    @Prop() dag!: Dag;
+
     getConfigs(query: Query): { [configName: string]: unknown } {
       const configs: { [configName: string]: unknown } = {};
       query.dags.forEach(dag => {

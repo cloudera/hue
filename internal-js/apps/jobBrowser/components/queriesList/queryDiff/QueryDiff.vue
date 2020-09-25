@@ -93,7 +93,7 @@
   import DagConfigs from '../query-details/DagConfigs.vue';
   import DagCounters from '../query-details/DagCounters.vue';
   import DagGraphicalView from '../query-details/DagGraphicalView.vue';
-  import DagSwimlane from '../query-details/DagSwimlane.vue';
+  import DagSwimlane from '../query-details/dag-swimlane/DagSwimlane.vue';
   import { Dag } from '../index';
   import QueryInfo from '../query-details/QueryInfo.vue';
 

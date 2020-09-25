@@ -40,7 +40,7 @@
       <!-- {{/bs-tab}} -->
     </div>
 
-    <dag-details v-if="!isDagEmpty" :query="query" />
+    <dag-details v-for="dag in query.dags" :key="dag.dagInfo.id" :dag="dag" />
   </div>
 </template>
 
@@ -68,11 +68,7 @@
       QueryInfo
     }
   })
-  export default class QueryDetails extends SingleQueryComponent {
-    get isDagEmpty(): boolean {
-      return false; // TODO: Implement
-    }
-  }
+  export default class QueryDetails extends SingleQueryComponent {}
 </script>
 
 <style lang="scss" scoped>
