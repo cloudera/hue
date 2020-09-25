@@ -35,6 +35,9 @@ const defaultAdapter = axios.defaults.adapter;
 axios.defaults.adapter = config =>
   new Promise((resolve, reject) => {
     if (config.url && config.url.indexOf(SEARCH_URL) !== -1) {
+      const request = JSON.parse(config.data);
+      searchMockResponse.meta.offset = request.offset;
+      searchMockResponse.meta.limit = request.limit;
       resolve(<AxiosResponse>{
         ...JSON_RESPONSE,
         data: JSON.stringify(searchMockResponse)

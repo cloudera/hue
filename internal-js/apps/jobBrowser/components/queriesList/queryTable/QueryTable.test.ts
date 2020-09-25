@@ -21,8 +21,8 @@ describe('QueryTable.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(QueryTable, {
       propsData: {
-        columns: [],
-        queries: []
+        queries: [],
+        totalQueries: 0
       }
     });
     expect(wrapper.element).toMatchSnapshot();

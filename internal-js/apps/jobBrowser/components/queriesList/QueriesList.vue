@@ -21,8 +21,10 @@
     <query-table
       v-if="!selectedQuery && !queriesToDiff"
       :queries="queries"
+      :total-queries="(searchMeta && searchMeta.size) || 0"
       @diff-queries="diffQueries"
       @query-selected="querySelected"
+      @page-changed="fetch"
     />
     <query-details v-else-if="selectedQuery" :query="selectedQuery" />
     <query-diff v-else :queries="queriesToDiff" />
@@ -30,6 +32,7 @@
 </template>
 
 <script lang="ts">
+  import { Page } from 'components/Paginator';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import HumanByteSize from '../../../../../desktop/core/src/desktop/js/components/HumanByteSize.vue';
@@ -37,7 +40,7 @@
   import { fetchExtendedQuery, search } from './apiUtils';
   import QueryDiff from './queryDiff/QueryDiff.vue';
   import QueryDetails from './query-details/QueryDetails.vue';
-  import { Query } from './index';
+  import { Query, SearchMeta } from './index';
   import QueryTable from './queryTable/QueryTable.vue';
 
   @Component({
@@ -47,17 +50,20 @@
     selectedQuery: Query | null = null;
     queriesToDiff: Query[] | null = null;
     queries: Query[] = [];
+    searchMeta: SearchMeta | null = null;
 
-    async created(): Promise<void> {
+    async fetch(page: Page): Promise<void> {
+      // Initial fetch triggered by the paginator
       const now = Date.now();
       const searchResponse = await search({
         endTime: now,
-        limit: 25,
-        offset: 0,
+        limit: page.limit,
+        offset: page.offset,
         sortText: 'startTime:DESC',
         startTime: now - 1000 * 60 * 60 * 24 * 7,
         type: 'basic'
       });
+      this.searchMeta = searchResponse.meta;
       this.queries = searchResponse.queries;
     }
 

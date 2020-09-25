@@ -40,38 +40,13 @@
     </div>
     <div class="table">
       <hue-table :columns="visibleColumns" :rows="queries" @row-clicked="querySelected" />
-      <!-- {{em-table
-        title=title
-
-        rows=rows
-        rowCount=rowCount
-
-        classNames=classNames
-
-        headerComponentNames=headerComponentNames
-        footerComponentNames=footerComponentNames
-
-        leftPanelComponentName=""
-
-        enableSort=enableSort
-        enableSearch=enableSearch
-        enableFaceting=enableFaceting
-
-        definition=definition
-        dataProcessor=dataProcessor
-
-        columnWidthChangeAction="columnWidthChanged"
-        scrollChangeAction="scrollChange"
-
-        showScrollShadow=true
-
-        rowAction=rowAction
-      }} -->
+      <paginator :total-entries="totalQueries" @page-changed="pageChanged" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
+  import { Page } from 'components/Paginator';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
@@ -79,6 +54,7 @@
   import HumanByteSize from '../../../../../../desktop/core/src/desktop/js/components/HumanByteSize.vue';
   import TimeAgo from '../../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
   import HueTable from '../../../../../../desktop/core/src/desktop/js/components/HueTable.vue';
+  import Paginator from '../../../../../../desktop/core/src/desktop/js/components/Paginator.vue';
   import { Column } from '../../../../../../desktop/core/src/desktop/js/components/HueTable';
   import ColumnSelectorPanel from '../../../../../../desktop/core/src/desktop/js/components/ColumnSelectorPanel.vue';
   import { fetchSuggestedSearches } from '../apiUtils';
@@ -86,11 +62,13 @@
   import { DataProcessor, Query, Search, TableDefinition } from '../index';
 
   @Component({
-    components: { HueTable, ColumnSelectorPanel, QueriesSearch }
+    components: { HueTable, ColumnSelectorPanel, QueriesSearch, Paginator }
   })
   export default class QueryTable extends Vue {
     @Prop({ required: true })
     queries!: Query[];
+    @Prop({ required: true })
+    totalQueries!: number;
 
     searches: Search[] = [];
     visibleColumns: Column<Query>[] = [];
@@ -158,6 +136,10 @@
 
     toggleColumnSelector(): void {
       this.columnSelectorIsVisible = !this.columnSelectorIsVisible;
+    }
+
+    pageChanged(page: Page): void {
+      this.$emit('page-changed', page);
     }
 
     querySelected(query: Query): void {

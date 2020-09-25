@@ -3,7 +3,6 @@
 exports[`QueryTable.vue should render 1`] = `
 <div
   class="table-component"
-  columns=""
 >
   <queries-search-stub
     searches=""
@@ -36,6 +35,10 @@ exports[`QueryTable.vue should render 1`] = `
     <hue-table-stub
       columns=""
       rows=""
+    />
+     
+    <paginator-stub
+      totalentries="0"
     />
   </div>
 </div>
