@@ -23,7 +23,7 @@
         <div class="title">
           {{ title }}
         </div>
-        <label v-if="queries.length > 1">
+        <label v-if="queries && queries.length > 1">
           <input v-model="showDifferences" type="checkbox" /> Show Differences
         </label>
       </div>
@@ -69,7 +69,9 @@
           key: 'configName'
         }
       ];
-      this.queries.forEach((query, index) => {
+
+      const queries = this.queries || [];
+      queries.forEach((query, index) => {
         let label = 'Configuration Value';
         if (this.queries.length > 1) {
           label += ' - ' + numberToLetter(index);
@@ -84,8 +86,9 @@
 
     get configRows(): Row[] {
       const allConfigKeys: string[] = [];
+      const queries = this.queries || [];
 
-      this.queries.forEach(query => {
+      queries.forEach(query => {
         allConfigKeys.push(...Object.keys(this.getConfigs(query)));
       });
       allConfigKeys.sort((a, b) => a.localeCompare(b));
@@ -98,7 +101,7 @@
 
         let hasDifferences = false;
         let previousConfigValue: unknown = undefined;
-        this.queries.forEach((query, index) => {
+        queries.forEach((query, index) => {
           const config = this.getConfigs(query);
           row['configurationValue' + index] = config[configKey];
           if (index > 0 && !hasDifferences) {
@@ -107,7 +110,7 @@
           previousConfigValue = config[configKey];
         });
 
-        if (this.queries.length === 1 || !this.showDifferences || hasDifferences) {
+        if (queries.length === 1 || !this.showDifferences || hasDifferences) {
           result.push(row);
         }
       });
