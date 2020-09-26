@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`DagGraphicalView.vue should render 1`] = `
-<div>
-  DagGraphicalView - Not Implemented
-</div>
-`;

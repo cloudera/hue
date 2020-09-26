@@ -77,7 +77,7 @@ exports[`QueryDiff.vue should render 1`] = `
       <tab-stub
         title="DAG SWIMLANE"
       >
-        <dag-swimlane-stub
+        <dagswimlane-stub
           consolidate="true"
         />
       </tab-stub>
@@ -85,7 +85,7 @@ exports[`QueryDiff.vue should render 1`] = `
       <tab-stub
         title="DAG FLOW"
       >
-        <dag-graphical-view-stub />
+        <daggraph-stub />
       </tab-stub>
        
       <tab-stub

@@ -71,8 +71,8 @@
 
       <!-- {{#bs-tab as |tab|}} -->
       <tabs>
-        <tab title="DAG SWIMLANE"><dag-swimlane /></tab>
-        <tab title="DAG FLOW"><dag-graphical-view /></tab>
+        <tab title="DAG SWIMLANE"><DagSwimlane /></tab>
+        <tab title="DAG FLOW"><DagGraph /></tab>
         <tab title="DAG COUNTERS"><dag-counters /></tab>
         <tab title="DAG CONFIGURATIONS"><dag-configs :queries="queries" /></tab>
       </tabs>
@@ -92,7 +92,7 @@
   import Tabs from '../../../../../../desktop/core/src/desktop/js/components/Tabs.vue';
   import DagConfigs from '../query-details/DagConfigs.vue';
   import DagCounters from '../query-details/DagCounters.vue';
-  import DagGraphicalView from '../query-details/DagGraphicalView.vue';
+  import DagGraph from '../query-details/dag-graph/DagGraph.vue';
   import DagSwimlane from '../query-details/dag-swimlane/DagSwimlane.vue';
   import { Dag } from '../index';
   import QueryInfo from '../query-details/QueryInfo.vue';
@@ -105,7 +105,7 @@
       QueryTextDiff,
       DagConfigs,
       DagCounters,
-      DagGraphicalView,
+      DagGraph,
       DagSwimlane,
       Tab,
       Tabs,

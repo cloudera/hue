@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div>DagGraphicalView - Not Implemented</div>
+  <div>DagGraph - Not Implemented</div>
   <!-- TODO: Implement -->
 </template>
 
@@ -26,7 +26,5 @@
   import Component from 'vue-class-component';
 
   @Component
-  export default class DagGraphicalView extends Vue {}
+  export default class DagGraph extends Vue {}
 </script>
-
-<style lang="scss" scoped></style>

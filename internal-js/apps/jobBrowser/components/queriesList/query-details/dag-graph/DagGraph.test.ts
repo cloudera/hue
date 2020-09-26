@@ -15,11 +15,11 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
-import DagGraphicalView from './DagGraphicalView.vue';
+import DagGraph from './DagGraph.vue';
 
-describe('DagGraphicalView.vue', () => {
+describe('DagGraph.vue', () => {
   it('should render', () => {
-    const wrapper = shallowMount(DagGraphicalView);
+    const wrapper = shallowMount(DagGraph);
     expect(wrapper.element).toMatchSnapshot();
   });
 });

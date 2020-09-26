@@ -20,8 +20,8 @@
   <div id="dag-panel" class="target detail-panel dag-panel">
     <div>{{ dag && dag.dagInfo.dagId }}</div>
     <tabs>
-      <tab title="DAG SWIMLANE"><dag-swimlane :dag="dag" /></tab>
-      <tab title="DAG FLOW"><dag-graphical-view /></tab>
+      <tab title="DAG SWIMLANE"><DagSwimlane :dag="dag" /></tab>
+      <tab title="DAG FLOW"><DagGraph :dag="dag" /></tab>
       <tab title="DAG COUNTERS"><dag-counters /></tab>
       <tab title="DAG CONFIGURATIONS"><dag-configs :dag="dag" /></tab>
     </tabs>
@@ -35,7 +35,7 @@
   import { Dag } from '../index';
   import DagConfigs from './DagConfigs.vue';
   import DagCounters from './DagCounters.vue';
-  import DagGraphicalView from './DagGraphicalView.vue';
+  import DagGraph from './dag-graph/DagGraph.vue';
   import DagSwimlane from './dag-swimlane/DagSwimlane.vue';
 
   @Component({
@@ -44,7 +44,7 @@
       Tabs,
       DagConfigs,
       DagCounters,
-      DagGraphicalView,
+      DagGraph,
       DagSwimlane
     }
   })
