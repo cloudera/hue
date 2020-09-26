@@ -55,15 +55,17 @@
 
     // Watch : "fromEvent.time", "toEvent.time", "barIndex", "processor.timeWindow"
     mounted(): void {
-      const fromEventPos = this.processor.timeToPositionPercent(this.fromEvent.time);
-      const toEventPos = this.processor.timeToPositionPercent(this.toEvent.time);
+      const fromEventPos = this.fromEvent
+        ? this.processor.timeToPositionPercent(this.fromEvent.time)
+        : 0;
+      const toEventPos = this.toEvent ? this.processor.timeToPositionPercent(this.toEvent.time) : 0;
       const color = this.bar.color || this.process.getBarColor(this.barIndex);
 
       const currentComp: HTMLElement = <HTMLElement>this.$el;
       const eventBar: HTMLElement = <HTMLElement>this.$el.querySelector('.event-bar');
 
       if (fromEventPos && toEventPos) {
-        currentComp.style.visibility = 'visible';
+        currentComp.style.display = 'block';
         Object.assign(eventBar.style, {
           left: fromEventPos + '%',
           right: `${100 - toEventPos}%`,
@@ -71,7 +73,7 @@
           borderColor: this.process.getColor()
         });
       } else {
-        currentComp.style.visibility = 'hidden';
+        currentComp.style.display = 'none';
       }
     }
 

@@ -75,6 +75,8 @@
 
   import './dag-swimlane.scss';
 
+  // TODO: Refactor - This is just a direct port from Ember.js and many things can be optimised using Vue.js features
+
   @Component({
     components: {
       ProcessName,
@@ -85,8 +87,9 @@
   })
   export default class DagSwimlane extends Vue {
     @Prop({ required: true }) dag!: Dag;
-    @Prop() consolidate = false;
+    @Prop({ default: true }) consolidate!: boolean;
 
+    processes!: Process[];
     processor: Processor = new Processor();
     focusedProcess: Process | undefined;
 
@@ -95,15 +98,11 @@
     scroll = 0;
     zoom = 100;
 
-    get processes(): Process[] {
-      return createProcesses(this.dag);
-    }
-
     // Watch : "processes.@each.startEvent"
-    get startTime(): number {
-      if (this.processes.length) {
-        let startTime = this.processes[0].startEvent.time;
-        this.processes.forEach(process => {
+    startTime(processes: Process[]): number {
+      if (processes.length) {
+        let startTime = processes[0].startEvent.time;
+        processes.forEach(process => {
           const time = process.startEvent.time;
           if (startTime > time) {
             startTime = time;
@@ -115,10 +114,10 @@
     }
 
     // Watch - "processes.@each.endEvent"
-    get endTime(): number {
-      if (this.processes.length) {
-        let endTime = this.processes[0].endEvent.time;
-        this.processes.forEach(process => {
+    endTime(processes: Process[]): number {
+      if (processes.length) {
+        let endTime = processes[0].endEvent.time;
+        processes.forEach(process => {
           const time = process.endEvent.time;
           if (endTime < time) {
             endTime = time;
@@ -132,14 +131,20 @@
     // Watch - "startTime", "endTime", "processes.length"
     // On - Init
     processorSetup(): void {
-      this.processor.startTime = this.startTime;
-      this.processor.endTime = this.endTime;
+      const processes = createProcesses(this.dag);
+
+      this.processes = processes;
+      this.processor.startTime = this.startTime(processes);
+      this.processor.endTime = this.endTime(processes);
       this.processor.processCount = this.processes.length;
+    }
+
+    created(): void {
+      this.processorSetup();
     }
 
     mounted(): void {
       // Ember.run.scheduleOnce('afterRender', this, function() {
-      this.processorSetup();
       this.onZoom();
       this.listenScroll();
     }

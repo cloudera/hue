@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div :class="'dag-swimlane-consolidated-process' + focused ? 'focused' : ''">&nbsp;</div>
+  <div :class="'dag-swimlane-consolidated-process ' + (focused ? 'focused' : '')">&nbsp;</div>
 </template>
 
 <script lang="ts">
@@ -60,16 +60,15 @@
       const toPos = this.toPos;
 
       if (fromPos && toPos) {
-        currentComp.style.visibility = 'visible';
         Object.assign(currentComp.style, {
           visibility: 'visible',
           left: `${fromPos}%`,
           right: `${100 - toPos}%`,
-          backgroundVolor: this.process.getConsolidateColor(),
+          backgroundColor: this.process.getConsolidateColor(),
           zIndex: Math.floor(toPos - fromPos)
         });
       } else {
-        currentComp.style.visibility = 'hidden';
+        currentComp.style.display = 'none';
       }
     }
 

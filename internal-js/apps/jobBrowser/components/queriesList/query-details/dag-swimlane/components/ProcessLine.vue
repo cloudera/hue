@@ -17,7 +17,9 @@
 -->
 
 <template>
-  <div class="process-line" />
+  <div>
+    <div class="process-line" />
+  </div>
 </template>
 
 <script lang="ts">

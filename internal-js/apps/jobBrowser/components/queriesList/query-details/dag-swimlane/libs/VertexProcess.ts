@@ -38,14 +38,14 @@ export default class VertexProcess extends Process {
 
   edgeHash: any;
 
-  eventBars: [
+  eventBars = [
     {
-      fromEvent: 'FIRST_TASK_STARTED';
-      toEvent: 'LAST_TASK_FINISHED';
+      fromEvent: 'FIRST_TASK_STARTED',
+      toEvent: 'LAST_TASK_FINISHED'
     },
     {
-      fromEvent: 'DEPENDENT_VERTICES_COMPLETE';
-      toEvent: 'LAST_TASK_FINISHED';
+      fromEvent: 'DEPENDENT_VERTICES_COMPLETE',
+      toEvent: 'LAST_TASK_FINISHED'
     }
   ];
 
@@ -82,12 +82,12 @@ export default class VertexProcess extends Process {
   get events(): any[] {
     const eventsHash = this.eventsHash;
 
-    const initTime = this.vertex.initTime;
+    const initTime = this.vertex.initRequestedTime;
     const startTime = this.vertex.startTime;
     const endTime = this.vertex.endTime;
 
-    const firstTaskStartTime = this.vertex.firstTaskStartTime;
-    const lastTaskFinishTime = this.vertex.lastTaskFinishTime;
+    const firstTaskStartTime = this.vertex.stats.firstTaskStartTime;
+    const lastTaskFinishTime = this.vertex.stats.lastTaskFinishTime;
     const unblockDetails = this.unblockDetails;
 
     if (initTime > 0) {
@@ -273,7 +273,7 @@ export default class VertexProcess extends Process {
   // Watch : "vertex.firstTaskStartTime", "unblockDetails.time"
   get consolidateStartTime(): number {
     return Math.max(
-      this.vertex.firstTaskStartTime || 0,
+      this.vertex.stats.firstTaskStartTime || 0,
       (this.unblockDetails && this.unblockDetails.time) || 0
     );
   }
