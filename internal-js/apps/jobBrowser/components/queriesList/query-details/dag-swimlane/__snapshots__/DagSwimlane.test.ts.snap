@@ -24,7 +24,9 @@ exports[`DagSwimlane.vue should render 1`] = `
       style="width: 100%;"
     >
        
-      <!---->
+      <div
+        class="consolidated-view"
+      />
        
       <ruler-stub
         processor="[object Object]"
