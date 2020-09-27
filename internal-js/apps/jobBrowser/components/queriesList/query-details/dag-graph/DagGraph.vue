@@ -169,6 +169,8 @@
 
   import './dag-graph.scss';
 
+  // TODO: Refactor - This is just a direct port from Ember.js and many things can be improved using Vue.js features
+
   @Component
   export default class DagGraph extends Vue {
     @Prop({ required: true }) dag!: Dag;

@@ -15,7 +15,7 @@ exports[`DagGraph.vue should render 1`] = `
           id="vertex-bg"
           rx="5"
           ry="5"
-          style="fill: url(/hue#vertex-grad);;"
+          style="fill: url(/hue#vertex-grad);"
           width="80"
           x="-40"
           y="-15"
@@ -27,7 +27,7 @@ exports[`DagGraph.vue should render 1`] = `
           id="input-bg"
           rx="15"
           ry="15"
-          style="fill: url(/hue#input-grad);;"
+          style="fill: url(/hue#input-grad);"
           width="80"
           x="-40"
           y="-15"
@@ -39,7 +39,7 @@ exports[`DagGraph.vue should render 1`] = `
           id="output-bg"
           rx="15"
           ry="15"
-          style="fill: url(/hue#output-grad);;"
+          style="fill: url(/hue#output-grad);"
           width="80"
           x="-40"
           y="-15"
@@ -49,21 +49,21 @@ exports[`DagGraph.vue should render 1`] = `
           class="task-bubble-bg"
           id="task-bubble"
           r="10"
-          style="fill: url(/hue#task-grad);;"
+          style="fill: url(/hue#task-grad);"
         />
          
         <circle
           class="input-node-bg"
           id="io-bubble"
           r="10"
-          style="fill: url(/hue#input-grad);;"
+          style="fill: url(/hue#input-grad);"
         />
          
         <circle
           class="group-bubble-bg"
           id="group-bubble"
           r="8"
-          style="fill: url(/hue#group-grad);;"
+          style="fill: url(/hue#group-grad);"
         />
          
         <marker
