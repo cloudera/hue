@@ -11,18 +11,18 @@ exports[`QueryDetails.vue should render 1`] = `
      
     <tabs-stub>
       <tab-stub
-        title="QUERY INFO"
+        title="VISUAL EXPLAIN"
       >
-        <query-info-stub
+        <visualexplain-stub
           query="[object Object]"
         />
       </tab-stub>
        
       <tab-stub
-        title="VISUAL EXPLAIN"
+        title="QUERY INFO"
       >
-        <visual-explain-stub
-          queries="[object Object]"
+        <query-info-stub
+          query="[object Object]"
         />
       </tab-stub>
        

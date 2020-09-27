@@ -23,11 +23,11 @@
       <!-- {{#bs-tab fade=false as |tab|}} -->
 
       <tabs>
+        <tab title="VISUAL EXPLAIN">
+          <VisualExplain :query="query" />
+        </tab>
         <tab title="QUERY INFO">
           <query-info :query="query" />
-        </tab>
-        <tab title="VISUAL EXPLAIN">
-          <visual-explain :queries="[query]" />
         </tab>
         <tab title="QUERY CONFIG">
           <query-config :queries="[query]" />
@@ -54,7 +54,7 @@
   import DagDetails from './DagDetails.vue';
   import QueryConfig from './QueryConfig.vue';
   import QueryInfo from './QueryInfo.vue';
-  import VisualExplain from './VisualExplain.vue';
+  import VisualExplain from './visual-explain/VisualExplain.vue';
 
   @Component({
     components: {

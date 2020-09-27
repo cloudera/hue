@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
-import { Query } from '../index';
+import { Query } from '../../index';
 import VisualExplain from './VisualExplain.vue';
 
 describe('VisualExplain.vue', () => {

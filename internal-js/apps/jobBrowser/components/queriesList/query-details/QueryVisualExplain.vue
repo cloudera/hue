@@ -44,7 +44,7 @@
 <script lang="ts">
   import { numberToLetter } from './utils';
   import Component from 'vue-class-component';
-  import VisualExplain from './VisualExplain.vue';
+  import VisualExplain from './visual-explain/VisualExplain.vue';
   import MultiQueryComponent from './MultiQueryComponent.vue';
 
   @Component({

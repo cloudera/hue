@@ -17,16 +17,18 @@
 -->
 
 <template>
-  <div>VisualExplain - Not Implemented</div>
+  <div>Visual Explain - Not Implemented</div>
   <!-- TODO: Implement -->
 </template>
 
 <script lang="ts">
-  import Component from 'vue-class-component';
-  import MultiQueryComponent from './MultiQueryComponent.vue';
+  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { Query } from '../..';
 
   @Component
-  export default class VisualExplain extends MultiQueryComponent {}
+  export default class VisualExplain extends Vue {
+    @Prop({ required: true }) query!: Query;
+  }
 </script>
 
 <style lang="scss" scoped></style>

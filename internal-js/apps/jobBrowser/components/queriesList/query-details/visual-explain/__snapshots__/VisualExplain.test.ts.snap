@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`VisualExplain.vue should render 1`] = `
-<div>
-  VisualExplain - Not Implemented
+<div
+  queries="[object Object]"
+>
+  Visual Explain - Not Implemented
 </div>
 `;
