@@ -159,10 +159,10 @@ class TestImpalaIntegration(object):
     ]
 
     for query in queries:
-       resp = _make_query(cls.client, query, database='default', local=False, server_name='impala')
-       resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
-       content = json.loads(resp.content)
-       assert_true(content['status'] == 0, resp.content)
+      resp = _make_query(cls.client, query, database='default', local=False, server_name='impala')
+      resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
+      content = json.loads(resp.content)
+      assert_true(content['status'] == 0, resp.content)
 
     queries = ["""
       CREATE TABLE tweets (row_num INTEGER, id_str STRING, text STRING) STORED AS PARQUET;
@@ -179,10 +179,10 @@ class TestImpalaIntegration(object):
     """]
 
     for query in queries:
-       resp = _make_query(cls.client, query, database=cls.DATABASE, local=False, server_name='impala')
-       resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
-       content = json.loads(resp.content)
-       assert_true(content['status'] == 0, resp.content)
+      resp = _make_query(cls.client, query, database=cls.DATABASE, local=False, server_name='impala')
+      resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
+      content = json.loads(resp.content)
+      assert_true(content['status'] == 0, resp.content)
 
 
   @classmethod
@@ -227,7 +227,8 @@ class TestImpalaIntegration(object):
 
     # Check that we multiple fetches get all the result set
     while len(results) < 5:
-      content = fetch_query_result_data(self.client, response, n=len(results), server_name='impala') # We get less than 5 results most of the time, so increase offset
+      # We get less than 5 results most of the time, so increase offset
+      content = fetch_query_result_data(self.client, response, n=len(results), server_name='impala')
       results += content['results']
 
     assert_equal([1, 2, 3, 4, 5], [col[0] for col in results])
@@ -347,7 +348,8 @@ class TestImpalaIntegration(object):
 
     impala_tables, beeswax_tables = get_impala_beeswax_tables()
     assert_equal(impala_tables, beeswax_tables,
-      "\ntest_invalidate_tables: `%s`\nImpala Tables: %s\nBeeswax Tables: %s" % (self.DATABASE, ','.join(impala_tables), ','.join(beeswax_tables)))
+      "\ntest_invalidate_tables: `%s`\nImpala Tables: %s\nBeeswax Tables: %s"
+      % (self.DATABASE, ','.join(impala_tables), ','.join(beeswax_tables)))
 
     hql = """
       CREATE TABLE new_table (a INT);
@@ -364,7 +366,8 @@ class TestImpalaIntegration(object):
     impala_tables, beeswax_tables = get_impala_beeswax_tables()
     # Invalidate picks up new table
     assert_equal(impala_tables, beeswax_tables,
-      "\ntest_invalidate_tables: `%s`\nImpala Tables: %s\nBeeswax Tables: %s" % (self.DATABASE, ','.join(impala_tables), ','.join(beeswax_tables)))
+      "\ntest_invalidate_tables: `%s`\nImpala Tables: %s\nBeeswax Tables: %s"
+      % (self.DATABASE, ','.join(impala_tables), ','.join(beeswax_tables)))
 
 
   def test_refresh_table(self):
@@ -378,7 +381,8 @@ class TestImpalaIntegration(object):
 
     impala_columns, beeswax_columns = get_impala_beeswax_columns()
     assert_equal(impala_columns, beeswax_columns,
-      "\ntest_refresh_table: `%s`.`%s`\nImpala Columns: %s\nBeeswax Columns: %s" % (self.DATABASE, 'tweets', ','.join(impala_columns), ','.join(beeswax_columns)))
+      "\ntest_refresh_table: `%s`.`%s`\nImpala Columns: %s\nBeeswax Columns: %s"
+      % (self.DATABASE, 'tweets', ','.join(impala_columns), ','.join(beeswax_columns)))
 
     hql = """
       ALTER TABLE tweets ADD COLUMNS (new_column INT);
@@ -395,7 +399,8 @@ class TestImpalaIntegration(object):
     impala_columns, beeswax_columns = get_impala_beeswax_columns()
     # Invalidate picks up new column
     assert_equal(impala_columns, beeswax_columns,
-      "\ntest_refresh_table: `%s`.`%s`\nImpala Columns: %s\nBeeswax Columns: %s" % (self.DATABASE, 'tweets', ','.join(impala_columns), ','.join(beeswax_columns)))
+      "\ntest_refresh_table: `%s`.`%s`\nImpala Columns: %s\nBeeswax Columns: %s"
+      % (self.DATABASE, 'tweets', ','.join(impala_columns), ','.join(beeswax_columns)))
 
 
   def test_get_exec_summary(self):
@@ -442,17 +447,17 @@ class TestImpalaIntegration(object):
 
 # Could be refactored with SavedQuery.create_empty()
 def create_saved_query(app_name, owner):
-    query_type = SavedQuery.TYPES_MAPPING[app_name]
-    design = SavedQuery(owner=owner, type=query_type)
-    design.name = 'create_saved_query'
-    design.desc = ''
-    design.data = hql_query('show $tables', database='db1').dumps()
-    design.is_auto = False
-    design.save()
+  query_type = SavedQuery.TYPES_MAPPING[app_name]
+  design = SavedQuery(owner=owner, type=query_type)
+  design.name = 'create_saved_query'
+  design.desc = ''
+  design.data = hql_query('show $tables', database='db1').dumps()
+  design.is_auto = False
+  design.save()
 
-    Document.objects.link(design, owner=design.owner, extra=design.type, name=design.name, description=design.desc)
+  Document.objects.link(design, owner=design.owner, extra=design.type, name=design.name, description=design.desc)
 
-    return design
+  return design
 
 
 def test_ssl_cacerts():
@@ -516,6 +521,25 @@ def test_thrift_over_http_config():
       assert_equal(query_server['server_port'], 30000)
       assert_equal(query_server['transport_mode'], 'http')
       assert_equal(query_server['http_url'], 'http://impalad_host:30000')
+    finally:
+      for reset in resets:
+        reset()
+
+
+def test_thrift_over_http_config_with_proxy_endpoint():
+  resets = [
+      conf.SERVER_HOST.set_for_testing('impala_proxy'),
+      conf.SERVER_PORT.set_for_testing(36000),
+      conf.USE_THRIFT_HTTP.set_for_testing(True),
+      conf.PROXY_ENDPOINT.set_for_testing('/endpoint')
+  ]
+  with patch('impala.dbms.get_hs2_http_port') as get_hs2_http_port:
+    get_hs2_http_port.return_value = 30000
+    try:
+      query_server = get_query_server_config(name='impala')
+      assert_equal(query_server['server_port'], 36000)
+      assert_equal(query_server['transport_mode'], 'http')
+      assert_equal(query_server['http_url'], 'http://impala_proxy:36000/endpoint')
     finally:
       for reset in resets:
         reset()

@@ -46,25 +46,32 @@ SERVER_PORT = Config(
   default=21050,
   type=int)
 
+PROXY_ENDPOINT = Config(
+  key="proxy_endpoint",
+  help=_t("Endpoint of the Impala Proxy Server, "
+          "for example: '/endpoint'. Note that SERVER_PORT will be used when set."),
+  type=str,
+  default="")
+
 COORDINATOR_URL = Config(
   key="coordinator_url",
   help=_t("URL of the Impala Coordinator Server."),
   type=str,
   default="")
 
-IMPALA_PRINCIPAL=Config(
+IMPALA_PRINCIPAL = Config(
   key='impala_principal',
   help=_t("Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."),
   type=str,
   default="impala/%s" % socket.getfqdn())
 
-IMPERSONATION_ENABLED=Config(
+IMPERSONATION_ENABLED = Config(
   key='impersonation_enabled',
   help=_t("Turn on/off impersonation mechanism when talking to Impala."),
   type=coerce_bool,
   dynamic_default=is_impersonation_enabled)
 
-QUERYCACHE_ROWS=Config(
+QUERYCACHE_ROWS = Config(
   key='querycache_rows',
   help=_t("Number of initial rows of a resultset to ask Impala to cache in order to"
           " support re-fetching them for downloading them."
@@ -120,31 +127,31 @@ SSL = ConfigSection(
   key='ssl',
   help=_t('SSL configuration for the server.'),
   members=dict(
-    ENABLED = Config(
+    ENABLED=Config(
       key="enabled",
       help=_t("SSL communication enabled for this server."),
       type=coerce_bool,
       default=False
     ),
-    CACERTS = Config(
+    CACERTS=Config(
       key="cacerts",
       help=_t("Path to Certificate Authority certificates."),
       type=str,
       dynamic_default=default_ssl_cacerts,
     ),
-    KEY = Config(
+    KEY=Config(
       key="key",
       help=_t("Path to the private key file, e.g. /etc/hue/key.pem"),
       type=str,
       default=None
     ),
-    CERT = Config(
+    CERT=Config(
       key="cert",
       help=_t("Path to the public certificate file, e.g. /etc/hue/cert.pem"),
       type=str,
       default=None
     ),
-    VALIDATE = Config(
+    VALIDATE=Config(
       key="validate",
       help=_t("Choose whether Hue should validate certificates received from the server."),
       type=coerce_bool,
@@ -216,7 +223,8 @@ DAEMON_API_PASSWORD = Config(
 
 DAEMON_API_PASSWORD_SCRIPT = Config(
   key="daemon_api_password_script",
-  help=_t("Execute this script to produce the Impala Daemon Password. This will be used when `daemon_api_password` is not set."),
+  help=_t("Execute this script to produce the Impala Daemon Password. "
+          "This will be used when `daemon_api_password` is not set."),
   private=True,
   type=coerce_password_from_script,
   default=None
@@ -231,7 +239,8 @@ DAEMON_API_USERNAME = Config(
 
 DAEMON_API_AUTH_SCHEME = Config(
   key="daemon_api_auth_scheme",
-  help=_t("The authentication scheme to use with 'daemon_api_username' and 'daemon_api_password' when authenticating to the Impala Daemon UI, either 'digest' (default) or 'basic'."),
+  help=_t("The authentication scheme to use with 'daemon_api_username' and 'daemon_api_password' "
+          "when authenticating to the Impala Daemon UI, either 'digest' (default) or 'basic'."),
   private=False,
   default="digest"
 )
