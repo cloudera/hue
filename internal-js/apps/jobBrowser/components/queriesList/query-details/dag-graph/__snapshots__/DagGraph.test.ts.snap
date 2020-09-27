@@ -1,7 +1,253 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`DagGraph.vue should render 1`] = `
-<div>
-  DagGraph - Not Implemented
+<div
+  class="dag-view-container"
+>
+  <div
+    class="svg-container"
+  >
+    <svg>
+      <defs>
+        <rect
+          class="vertex-node-bg"
+          height="30"
+          id="vertex-bg"
+          rx="5"
+          ry="5"
+          style="fill: url(/hue#vertex-grad);;"
+          width="80"
+          x="-40"
+          y="-15"
+        />
+         
+        <rect
+          class="input-node-bg"
+          height="30"
+          id="input-bg"
+          rx="15"
+          ry="15"
+          style="fill: url(/hue#input-grad);;"
+          width="80"
+          x="-40"
+          y="-15"
+        />
+         
+        <rect
+          class="output-node-bg"
+          height="30"
+          id="output-bg"
+          rx="15"
+          ry="15"
+          style="fill: url(/hue#output-grad);;"
+          width="80"
+          x="-40"
+          y="-15"
+        />
+         
+        <circle
+          class="task-bubble-bg"
+          id="task-bubble"
+          r="10"
+          style="fill: url(/hue#task-grad);;"
+        />
+         
+        <circle
+          class="input-node-bg"
+          id="io-bubble"
+          r="10"
+          style="fill: url(/hue#input-grad);;"
+        />
+         
+        <circle
+          class="group-bubble-bg"
+          id="group-bubble"
+          r="8"
+          style="fill: url(/hue#group-grad);;"
+        />
+         
+        <marker
+          id="arrow-marker"
+          markerHeight="2"
+          markerWidth="2"
+          orient="auto"
+          viewBox="0 -5 10 10"
+        >
+          <path
+            d="M0,-5L10,0L0,5"
+            style="fill: #aaa;"
+          />
+        </marker>
+         
+        <radialgradient
+          cx="50%"
+          cy="50%"
+          fx="50%"
+          fy="50%"
+          id="vertex-grad"
+          r="100%"
+        >
+          <stop
+            offset="0%"
+            style="stop-color: rgb(176, 196, 222);"
+          />
+           
+          <stop
+            offset="100%"
+            style="stop-color: rgb(118, 156, 205);"
+          />
+        </radialgradient>
+         
+        <radialgradient
+          cx="50%"
+          cy="50%"
+          fx="50%"
+          fy="50%"
+          id="input-grad"
+          r="100%"
+        >
+          <stop
+            offset="0%"
+            style="stop-color: rgb(173, 255, 46);"
+          />
+           
+          <stop
+            offset="100%"
+            style="stop-color: rgb(145, 215, 35);"
+          />
+        </radialgradient>
+         
+        <radialgradient
+          cx="50%"
+          cy="50%"
+          fx="50%"
+          fy="50%"
+          id="output-grad"
+          r="100%"
+        >
+          <stop
+            offset="0%"
+            style="stop-color: rgb(250, 128, 114);"
+          />
+           
+          <stop
+            offset="100%"
+            style="stop-color: rgb(210, 100, 87);"
+          />
+        </radialgradient>
+         
+        <radialgradient
+          cx="50%"
+          cy="50%"
+          fx="50%"
+          fy="50%"
+          id="task-grad"
+          r="100%"
+        >
+          <stop
+            offset="0%"
+            style="stop-color: rgb(208, 191, 209);"
+          />
+           
+          <stop
+            offset="100%"
+            style="stop-color: rgb(175, 143, 177);"
+          />
+        </radialgradient>
+         
+        <radialgradient
+          cx="50%"
+          cy="50%"
+          fx="50%"
+          fy="50%"
+          id="group-grad"
+          r="100%"
+        >
+          <stop
+            offset="0%"
+            style="stop-color: rgb(187, 187, 187);"
+          />
+           
+          <stop
+            offset="100%"
+            style="stop-color: rgb(153, 153, 153);"
+          />
+        </radialgradient>
+         
+        <filter
+          id="grey-glow"
+        >
+          <fecolormatrix
+            type="matrix"
+            values="0 0 0 0   0
+                    0 0 0 0   0
+                    0 0 0 0   0
+                    0 0 0 0.3 0"
+          />
+           
+          <fegaussianblur
+            result="coloredBlur"
+            stdDeviation="2.5"
+          />
+           
+          <femerge>
+            <femergenode
+              in="coloredBlur"
+            />
+             
+            <femergenode
+              in="SourceGraphic"
+            />
+          </femerge>
+        </filter>
+      </defs>
+    </svg>
+  </div>
+   
+  <div
+    class="button-panel"
+  >
+    <em
+      class="tgl-additionals fa fa-circle "
+      title="Toggle source/sink visibility"
+    />
+     
+    <em
+      class="tgl-orientation fa fa-share-alt fa-rotate-180"
+      title="Toggle orientation"
+    />
+     
+    <em
+      class="fit-graph fa fa-arrows-alt"
+      title="Fit DAG to viewport"
+    />
+     
+    <em
+      class="tgl-fullscreen fa fa-expand"
+      title="Toggle fullscreen"
+    />
+  </div>
+   
+  <div
+    class="tool-tip"
+  >
+    <div
+      class="bubble"
+    >
+      <div
+        class="tip-title"
+      >
+        Title
+      </div>
+       
+      <div
+        class="tip-text"
+      />
+       
+      <div
+        class="tip-list"
+      />
+    </div>
+  </div>
 </div>
 `;

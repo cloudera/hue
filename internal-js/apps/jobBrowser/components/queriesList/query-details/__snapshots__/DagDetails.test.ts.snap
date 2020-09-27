@@ -12,17 +12,17 @@ exports[`DagDetails.vue should render 1`] = `
    
   <tabs-stub>
     <tab-stub
+      title="DAG FLOW"
+    >
+      <daggraph-stub />
+    </tab-stub>
+     
+    <tab-stub
       title="DAG SWIMLANE"
     >
       <dagswimlane-stub
         consolidate="true"
       />
-    </tab-stub>
-     
-    <tab-stub
-      title="DAG FLOW"
-    >
-      <daggraph-stub />
     </tab-stub>
      
     <tab-stub

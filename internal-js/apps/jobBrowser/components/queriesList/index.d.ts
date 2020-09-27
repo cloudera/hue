@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+// TODO: Flatten and cleanup DAG object
 export interface Dag {
   dagInfo: {
     dagId: string;

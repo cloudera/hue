@@ -20,8 +20,8 @@
   <div id="dag-panel" class="target detail-panel dag-panel">
     <div>{{ dag && dag.dagInfo.dagId }}</div>
     <tabs>
-      <tab title="DAG SWIMLANE"><DagSwimlane :dag="dag" /></tab>
       <tab title="DAG FLOW"><DagGraph :dag="dag" /></tab>
+      <tab title="DAG SWIMLANE"><DagSwimlane :dag="dag" /></tab>
       <tab title="DAG COUNTERS"><dag-counters /></tab>
       <tab title="DAG CONFIGURATIONS"><dag-configs :dag="dag" /></tab>
     </tabs>
