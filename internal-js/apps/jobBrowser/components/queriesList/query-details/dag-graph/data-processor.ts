@@ -166,9 +166,11 @@ export enum NodeType {
   OUTPUT = 'output'
 }
 
-class Edge {
+export class Edge {
   data: any;
 
+  source!: DataNode;
+  target!: DataNode;
   sourceId!: string;
   targetId!: string;
 
@@ -277,12 +279,14 @@ export abstract class DataNode {
    * its elements using the callback.
    * @param functionName {String} Name of the function to be called
    */
-  // recursivelyCall(functionName: string): void {
-  //   if (this[functionName]) {
-  //     this[functionName]();
-  //   }
-  //   this.ifForEach('children', (child: DataNode) => child.recursivelyCall(functionName));
-  // }
+  recursivelyCall(functionName: string): void {
+    if (this[functionName]) {
+      this[functionName]();
+    }
+    if (this.children) {
+      this.children.forEach((child: DataNode) => child.recursivelyCall(functionName));
+    }
+  }
 }
 
 class DummyNode extends DataNode {
@@ -335,7 +339,7 @@ export class VertexDataNode extends DataNode {
     }
 
     if (data.additionalOutputs) {
-      data.additionalInputs.forEach((output: DataNode) => {
+      data.additionalOutputs.forEach((output: DataNode) => {
         this.outputs.push(new OutputDataNode(this, output));
       });
     }
@@ -448,7 +452,7 @@ function _treefyData(vertex: VertexDataNode, depth: number, data: any) {
   depth++;
 
   children = centericMap(vertex.data.inEdgeIds, (edgeId: any) => {
-    const child: VertexDataNode = data.vertices.get(data.edges.get(edgeId).get('inputVertexName'));
+    const child: VertexDataNode = data.vertices.get(data.edges.get(edgeId).data.inputVertexName);
 
     if (!child.isSelfOrAncestor(vertex)) {
       if (child.depth) {
@@ -594,7 +598,7 @@ function _getLinks(node: DataNode, data: any): Edge[] {
 
   if (node.data.inEdgeIds) {
     node.data.inEdgeIds.forEach((inEdge: string) => {
-      const edge: Edge = data.edges[inEdge];
+      const edge: Edge = data.edges.get(inEdge);
       edge.sourceId = edge.data.inputVertexName;
       edge.targetId = edge.data.outputVertexName;
       links.push(edge);
@@ -605,10 +609,12 @@ function _getLinks(node: DataNode, data: any): Edge[] {
     const edge: Edge = new Edge(null);
     edge.sourceId = node.id;
     edge.targetId = node.vertex.id;
+    links.push(edge);
   } else if (node instanceof OutputDataNode) {
     const edge: Edge = new Edge(null);
     edge.sourceId = node.vertex.id;
     edge.targetId = node.id;
+    links.push(edge);
   }
 
   return links;

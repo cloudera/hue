@@ -43,9 +43,9 @@ function _createList(list: any[]) {
 
   if (list) {
     listContent.push('<table>');
-    list.forEach((property, value) => {
-      listContent.push('<tr><td>', property, '</td><td>', value, '</td></tr>');
-    });
+    for (const property in list) {
+      listContent.push('<tr><td>', property, '</td><td>', list[property], '</td></tr>');
+    }
     listContent.push('</table>');
     return listContent.join('');
   }
@@ -66,10 +66,10 @@ function _createList(list: any[]) {
  * }
  */
 function _setData(data) {
-  _element.find('.tip-title').html(data.title || '');
-  _element.find('.tip-text').html(data.text || '');
-  _element.find('.tip-text')[data.text ? 'show' : 'hide']();
-  _element.find('.tip-list').html(_createList(data.kvList) || '');
+  _element.querySelector('.tip-title').innerHTML = data.title || '';
+  _element.querySelector('.tip-text').innerHTML = data.text || '';
+  _element.querySelector('.tip-list').innerHTML = _createList(data.kvList) || '';
+  _element.querySelector('.tip-text').style.visibility = data.text ? 'visible' : 'hidden';
 }
 
 export default {
@@ -81,13 +81,13 @@ export default {
    */
   init(tipElement: any, svg: any): void {
     _element = tipElement;
-    _bubble = _element.find('.bubble');
+    _bubble = _element.querySelector('.bubble');
     _svg = svg;
-    _svgPoint = svg[0].createSVGPoint();
+    _svgPoint = svg.createSVGPoint();
   },
   showTip: debounce((): void => {
     if (_data) {
-      _element.addClass('show');
+      _element.classList.add('show');
     }
   }, 500),
 
@@ -131,16 +131,16 @@ export default {
     }
 
     if (showAbove) {
-      _element.removeClass('below');
-      _element.addClass('above');
+      _element.classList.remove('below');
+      _element.classList.add('above');
     } else {
-      _element.removeClass('above');
-      _element.addClass('below');
+      _element.classList.remove('above');
+      _element.classList.add('below');
 
-      point.y -= _element.height();
+      point.y -= _element.getBoundingClientRect().height;
     }
 
-    width = _element.width();
+    width = _element.getBoundingClientRect().width;
     offsetX = (width - 11) >> 1;
 
     if (point.x - offsetX < 0) {
@@ -149,16 +149,12 @@ export default {
       offsetX = point.x - (winWidth - 10 - width);
     }
 
-    _bubble.css({
-      left: -offsetX
-    });
+    _bubble.style.left = -offsetX;
 
     this.showTip();
 
-    _element.css({
-      left: point.x,
-      top: point.y
-    });
+    _element.style.left = point.x;
+    _element.style.top = point.y;
   },
   /**
    * Reposition the tooltip based on last passed data & node.
@@ -173,6 +169,6 @@ export default {
    */
   hide(): void {
     _data = _node = null;
-    _element.removeClass('show');
+    _element.classList.remove('show');
   }
 };

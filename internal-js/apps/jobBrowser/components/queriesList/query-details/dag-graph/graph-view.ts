@@ -18,8 +18,9 @@
 
 import { DateTime } from 'luxon';
 import d3 from 'd3v3';
+import { get } from 'lodash';
 
-import { NodeType, DataNode, VertexDataNode, OutputDataNode } from './data-processor';
+import { NodeType, DataNode, VertexDataNode, OutputDataNode, Edge } from './data-processor';
 import Tip from './tip';
 
 /**
@@ -196,6 +197,7 @@ export default function createGraphView() {
     const group = node.append('g');
     group.attr('class', 'task-bubble');
     group.append('use').attr('xlink:href', '#task-bubble');
+    group.append('text').text(_trimText(d.data.data.taskCount || 0, 3));
   }
 
   /**
@@ -208,6 +210,7 @@ export default function createGraphView() {
       const group: any = node.append('g');
       group.attr('class', 'io-bubble');
       group.append('use').attr('xlink:href', '#io-bubble');
+      group.append('text').text(_trimText(`${d.inputs.length}/${d.outputs.length}`, 3));
     }
   }
 
@@ -221,6 +224,7 @@ export default function createGraphView() {
       const group: any = node.append('g');
       group.attr('class', 'group-bubble');
       group.append('use').attr('xlink:href', '#group-bubble');
+      group.append('text').text(_trimText(d.vertexGroup.groupMembers.length, 2));
     }
   }
 
@@ -251,8 +255,11 @@ export default function createGraphView() {
   function _addBasicContents(node: any, d: DataNode, titleProperty?: string) {
     const className: string = d.type;
 
+    titleProperty = titleProperty || 'name';
+
     node.attr('class', `node ${className}`);
     node.append('use').attr('xlink:href', `#${className}-bg`);
+    node.append('text').attr('class', 'title').text(_trimText(d.data[titleProperty], 12));
   }
 
   /**
@@ -295,7 +302,7 @@ export default function createGraphView() {
       const target: any = nodeHash.get(link.targetId);
 
       if (source && target) {
-        link.setProperties({
+        Object.assign(link, {
           source: source,
           target: target,
           isBackwardLink: source.isSelfOrAncestor(target)
@@ -328,13 +335,13 @@ export default function createGraphView() {
     });
 
     //Remove space occupied by dummy
-    const rootChildren = _treeData.get('children');
+    const rootChildren = _treeData.children;
     const rootChildCount = rootChildren.length;
     let dummyIndex: number;
     let i: number;
 
     if (rootChildCount % 2 === 0) {
-      dummyIndex = rootChildren.indexOf(_treeData.get('dummy'));
+      dummyIndex = rootChildren.indexOf(_treeData.dummy);
       if (dummyIndex >= rootChildCount / 2) {
         for (i = 0; i < dummyIndex; i++) {
           rootChildren[i].x = rootChildren[i + 1].x;
@@ -353,9 +360,9 @@ export default function createGraphView() {
     nodes.forEach((node: any) => {
       if (
         node instanceof OutputDataNode &&
-        node.vertex.outputs.length === 1 &&
-        !node.vertex.data.outEdgeIds.length &&
-        node.treeParent.data.x !== node.data.x
+        get(node, 'vertex.outputs.length') === 1 &&
+        !get(node, 'vertex.data.outEdgeIds.length') &&
+        get(node, 'treeParent.data.x') !== node.data.x
       ) {
         node.data.x = node.vertex.data.x;
       }
@@ -378,7 +385,7 @@ export default function createGraphView() {
    * Later the implementation will be refactored and moved into the respective DataNode.
    * d {DataNode} Contains data to be displayed
    */
-  function _onMouseOver(d: DataNode) {
+  function _onMouseOver(d: any) {
     const event = d3.event;
     let tooltipData: any = {}; // Will be populated with {title/text/kvList}.
     let node = event.target;
@@ -464,8 +471,8 @@ export default function createGraphView() {
         };
         break;
       case 'path':
-        const sourceName = d.data.source.name || d.data.source.vertexName;
-        const targetName = d.data.target.name || d.data.target.vertexName;
+        const sourceName = d.source.name || d.source.vertexName;
+        const targetName = d.target.name || d.target.vertexName;
 
         tooltipData = {
           position: {
@@ -474,7 +481,7 @@ export default function createGraphView() {
           },
           title: `${sourceName} - ${targetName}`
         };
-        if (d.data.edgeId) {
+        if (d.data && d.data.edgeId) {
           tooltipData.kvList = {
             'Edge Id': d.data.edgeId,
             'Data Movement Type': d.data.dataMovementType,
@@ -484,7 +491,7 @@ export default function createGraphView() {
             'Edge Destination Class': _getEndName(d.data.edgeDestinationClass)
           };
         } else {
-          tooltipData.text = d.data.source.type === 'input' ? 'Source link' : 'Sink link';
+          tooltipData.text = get(d, 'data.source.type') === 'input' ? 'Source link' : 'Sink link';
         }
         break;
     }
@@ -616,8 +623,9 @@ export default function createGraphView() {
    * @return vertex node
    */
   function _getVertexNode(d: DataNode, property: string): any {
-    if (d.data.vertex[property]) {
-      return d.get('vertex');
+    //d.data.vertex[property]
+    if (d[property]) {
+      return d; //d.get('vertex');
     }
   }
   /**
@@ -675,12 +683,12 @@ export default function createGraphView() {
    * @param property {String} Property to be checked for
    * @return node
    */
-  function _getTargetNode(d: DataNode, property: string) {
-    if (d.data.target.type === NodeType.OUTPUT && d.data.source[property]) {
-      return d.data.source;
+  function _getTargetNode(d: Edge, property: string) {
+    if (d.target.type === NodeType.OUTPUT && d.source[property]) {
+      return d.source;
     }
-    if (d.data.target[property]) {
-      return d.data.target;
+    if (d.target[property]) {
+      return d.target;
     }
   }
   /**
@@ -694,7 +702,7 @@ export default function createGraphView() {
       .enter()
       .insert('path', 'g')
       .attr('class', (d: any) => {
-        const type = d.get('dataMovementType') || '';
+        const type = get(d, 'data.dataMovementType', '');
         return 'link ' + type.toLowerCase();
       })
       .attr('style', 'marker-mid: url(' + window.location.pathname + '#arrow-marker);')
@@ -786,7 +794,7 @@ export default function createGraphView() {
      */
     function visibilityCheck() {
       const graphBound = g.node().getBoundingClientRect();
-      const containerBound = container[0].getBoundingClientRect();
+      const containerBound = container.getBoundingClientRect();
 
       if (
         graphBound.right < containerBound.left ||
@@ -830,9 +838,8 @@ export default function createGraphView() {
     function onWheel(event: any) {
       const prevScale = scale;
 
-      const offset = container.offset();
-      const mouseX = event.pageX - offset.left;
-      const mouseY = event.pageY - offset.top;
+      const mouseX = event.pageX - container.clientLeft;
+      const mouseY = event.pageY - container.clientTop;
       let factor = 0;
 
       scale += event.deltaY * SCALE_TUNER;
@@ -853,22 +860,22 @@ export default function createGraphView() {
       event.preventDefault();
     }
 
-    window.addEventListener('wheel', onWheel); // Was element.add....
+    element.addEventListener('wheel', onWheel);
 
-    container
-      .mousedown((event: MouseEvent) => {
-        prevX = event.pageX;
-        prevY = event.pageY;
+    container.addEventListener('mousedown', (event: MouseEvent) => {
+      prevX = event.pageX;
+      prevY = event.pageY;
 
-        container.on('mousemove', onMouseMove);
-        container.parent().addClass('panning');
-      })
-      .mouseup(() => {
-        container.off('mousemove', onMouseMove);
-        container.parent().removeClass('panning');
+      container.addEventListener('mousemove', onMouseMove);
+      container.parentElement.classList.add('panning');
+    });
 
-        scheduleVisibilityCheck();
-      });
+    container.addEventListener('mouseup', (event: MouseEvent) => {
+      container.removeEventListener('mousemove', onMouseMove);
+      container.parentElement.classList.remove('panning');
+
+      scheduleVisibilityCheck();
+    });
 
     /**
      * A closure to reset/modify panZoom based on an external event
@@ -949,9 +956,10 @@ export default function createGraphView() {
      * Calling this function would fit the graph to the available space.
      */
     fitGraph: function () {
+      const bound: any = _svg.getBoundingClientRect();
       const scale = Math.min(
-        (_svg.width() - PADDING * 2) / _width,
-        (_svg.height() - PADDING * 2) / _height
+        (bound.width - PADDING * 2) / _width,
+        (bound.height - PADDING * 2) / _height
       );
       const panZoomValues = _panZoom();
 

@@ -28,7 +28,7 @@
           <rect
             id="vertex-bg"
             class="vertex-node-bg"
-            :style="{ fill: `url(${pathname}#vertex-grad);`, filter: `url(${pathname}#grey-glow)` }"
+            :style="{ fill: `url(${pathname}#vertex-grad)`, filter: `url(${pathname}#grey-glow)` }"
             rx="5"
             ry="5"
             width="80"
@@ -39,7 +39,7 @@
           <rect
             id="input-bg"
             class="input-node-bg"
-            :style="{ fill: `url(${pathname}#input-grad);`, filter: `url(${pathname}#grey-glow)` }"
+            :style="{ fill: `url(${pathname}#input-grad)`, filter: `url(${pathname}#grey-glow)` }"
             rx="15"
             ry="15"
             width="80"
@@ -50,7 +50,7 @@
           <rect
             id="output-bg"
             class="output-node-bg"
-            :style="{ fill: `url(${pathname}#output-grad);`, filter: `url(${pathname}#grey-glow)` }"
+            :style="{ fill: `url(${pathname}#output-grad)`, filter: `url(${pathname}#grey-glow)` }"
             rx="15"
             ry="15"
             width="80"
@@ -61,19 +61,19 @@
           <circle
             id="task-bubble"
             class="task-bubble-bg"
-            :style="{ fill: `url(${pathname}#task-grad);`, filter: `url(${pathname}#grey-glow)` }"
+            :style="{ fill: `url(${pathname}#task-grad)`, filter: `url(${pathname}#grey-glow)` }"
             r="10"
           />
           <circle
             id="io-bubble"
             class="input-node-bg"
-            :style="{ fill: `url(${pathname}#input-grad);`, filter: `url(${pathname}#grey-glow)` }"
+            :style="{ fill: `url(${pathname}#input-grad)`, filter: `url(${pathname}#grey-glow)` }"
             r="10"
           />
           <circle
             id="group-bubble"
             class="group-bubble-bg"
-            :style="{ fill: `url(${pathname}#group-grad);`, filter: `url(${pathname}#grey-glow)` }"
+            :style="{ fill: `url(${pathname}#group-grad)`, filter: `url(${pathname}#grey-glow)` }"
             r="8"
           />
 
@@ -241,8 +241,8 @@
         this.errMessage = 'Sink vertex not found!';
       } else {
         this.graphView = createGraphView();
-        // const graph = graphifyData(this.vertices, this.edges, this.vertexGroups);
-        // this.graphView.create(this, this.$el, graph);
+        const graph = graphifyData(this.vertices, this.edges, this.vertexGroups);
+        this.graphView.create(this, this.$el, graph);
       }
     }
   }
