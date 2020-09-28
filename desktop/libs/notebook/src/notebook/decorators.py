@@ -19,7 +19,10 @@ from past.builtins import basestring
 import json
 import logging
 import math
+import os
 import re
+import subprocess
+import time
 
 from django.forms import ValidationError
 from django.http import Http404
@@ -179,6 +182,7 @@ def ssh_error_handler(f):
       if has_missing_ssh(message=str(e)):
         LOG.info('Opening SSH tunnel')
         from notebook.conf import _connector_to_iterpreter
+        from desktop.lib.connectors.api import _get_installed_connectors
         from desktop.lib.connectors.models import _augment_connector_properties
 
         if hasattr(args[0], 'POST'):
@@ -197,7 +201,7 @@ def ssh_error_handler(f):
           idle_time = 10
         else:
           connector_id = int(connector_json_data.get('type'))
-          connector_data = _get_installed_connectors(connector_id=connector_id)[0]
+          connector_data = _get_installed_connectors(user=args[0].user, connector_id=connector_id)[0]
           connector = _connector_to_iterpreter(
             _augment_connector_properties(connector_data)
           )
