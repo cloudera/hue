@@ -178,6 +178,7 @@ def browse(request, database, table, partition_spec=None):
         name='Execute and watch',
         editor_type=editor_type,
         statement=statement,
+        database=database,
         status='ready-execute',
         is_task=True,
         namespace=namespace,
