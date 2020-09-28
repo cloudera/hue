@@ -41,7 +41,7 @@
   @import '../styles/colors';
 
   .dropdown-group-header {
-    color: $cui-gray-800;
+    color: $fluid-gray-800;
     font-weight: 500;
     padding: 6px 10px;
   }

@@ -40,6 +40,6 @@
 
   .hue-dropdown-item-text {
     padding: 6px 16px;
-    color: $cui-gray-800;
+    color: $fluid-gray-800;
   }
 </style>
