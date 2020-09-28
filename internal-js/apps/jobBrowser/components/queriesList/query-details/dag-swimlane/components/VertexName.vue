@@ -27,6 +27,9 @@
 </template>
 
 <script lang="ts">
+  /* eslint-disable  @typescript-eslint/no-explicit-any */
+  /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
   @Component

@@ -19,7 +19,11 @@ import DagSwimlane from './DagSwimlane.vue';
 
 describe('DagSwimlane.vue', () => {
   it('should render', () => {
-    const wrapper = shallowMount(DagSwimlane);
+    const wrapper = shallowMount(DagSwimlane, {
+      propsData: {
+        dag: null
+      }
+    });
     expect(wrapper.element).toMatchSnapshot();
   });
 });

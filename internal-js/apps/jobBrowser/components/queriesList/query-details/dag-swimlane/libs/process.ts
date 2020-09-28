@@ -24,10 +24,13 @@
  *
  */
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+
 let processIndex = 1;
 
 export default class Process {
-  _id: string = null;
+  _id = '';
 
   name = null;
   private _events = []; // An array of objects with name and time as mandatory(else error) properties.
@@ -130,7 +133,7 @@ export default class Process {
     return blockers;
   }
 
-  getTooltipContents(type: string, options): any {
+  getTooltipContents(type: string): any {
     return [
       {
         title: this.name,

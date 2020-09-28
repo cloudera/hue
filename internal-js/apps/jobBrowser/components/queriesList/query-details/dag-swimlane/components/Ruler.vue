@@ -40,6 +40,9 @@
 </template>
 
 <script lang="ts">
+  /* eslint-disable  @typescript-eslint/no-explicit-any */
+  /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+
   import { Component, Prop, Vue } from 'vue-property-decorator';
   import { unitOfTime } from 'moment';
   import { duration } from '../../../../../../../../desktop/core/src/desktop/js/components/Duration.vue';

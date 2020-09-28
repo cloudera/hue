@@ -22,6 +22,9 @@
  *
  */
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+
 function getVibrantHSL(colorNum: number, totalColors: number): any {
   if (totalColors < 1) {
     totalColors = 1;

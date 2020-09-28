@@ -30,7 +30,8 @@
       <div class="consolidated-view-label">
         Consolidated
       </div>
-    </div><div class="process-visuals">
+    </div>
+    <div class="process-visuals">
       <div class="zoom-panel">
         <ProcessVisual
           v-for="process in normalizedProcesses"
@@ -61,6 +62,9 @@
 </template>
 
 <script lang="ts">
+  /* eslint-disable  @typescript-eslint/no-explicit-any */
+  /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+
   import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
   import { Dag } from '../../index';
 

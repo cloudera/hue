@@ -24,6 +24,10 @@
  *
  */
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+
 import Process from './Process';
 import { Dag } from '../../../index';
 
@@ -49,7 +53,7 @@ export default class VertexProcess extends Process {
     }
   ];
 
-  constructor(vertex: any, getVisibleProps: any, blockers: any[]) {
+  constructor(vertex: any) {
     super();
 
     this.vertex = vertex;
@@ -224,7 +228,8 @@ export default class VertexProcess extends Process {
       case 'event':
         let edge;
         contents = options.events.map(function (event) {
-          let properties = [{
+          let properties = [
+            {
               name: 'Time',
               value: event.time,
               type: 'date'

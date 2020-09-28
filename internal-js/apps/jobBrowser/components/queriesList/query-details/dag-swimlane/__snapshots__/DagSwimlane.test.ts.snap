@@ -16,6 +16,7 @@ exports[`DagSwimlane.vue should render 1`] = `
     
     </div>
   </div>
+   
   <div
     class="process-visuals"
   >
