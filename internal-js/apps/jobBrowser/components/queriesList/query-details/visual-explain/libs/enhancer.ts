@@ -16,6 +16,9 @@
  * limitations under the License.
  */
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable  @typescript-eslint/explicit-module-boundary-types*/
+
 function doEnhanceNode(node: any): any {
   return Object.assign({}, node, {
     _uuid: uuid(),

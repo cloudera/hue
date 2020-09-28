@@ -28,9 +28,7 @@ exports[`QueryVisualExplain.vue should render 1`] = `
         <div
           class="body"
         >
-          <visual-explain-stub
-            queries="[object Object]"
-          />
+          <visual-explain-stub />
         </div>
       </div>
     </div>

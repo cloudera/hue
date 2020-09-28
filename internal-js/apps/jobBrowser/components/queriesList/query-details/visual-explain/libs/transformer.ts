@@ -16,6 +16,9 @@
  * limitations under the License.
  */
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+
 import doEnhance from './enhancer';
 import {
   getProcessedVertices,
@@ -422,7 +425,7 @@ function getTreeWithOffsetYInHiererchy(node: any, connections: any[]): any {
   });
 }
 
-function getEdges(plan: any, vertices: any[]): any {
+function getEdges(plan: any): any {
   const edgeObj = plan['Edges:'] || [];
 
   const edges = Object.keys(edgeObj).reduce((accumulator: any, cEdgeKey: string) => {

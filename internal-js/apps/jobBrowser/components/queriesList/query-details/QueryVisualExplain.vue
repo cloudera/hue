@@ -33,7 +33,7 @@
             <div v-if="!query" class="explain--error">
               <div>No Visual Explain available.</div>
             </div>
-            <visual-explain v-else :queries="queries" />
+            <visual-explain v-else :query="query[0]" />
           </div>
         </div>
       </div>

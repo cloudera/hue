@@ -16,6 +16,9 @@
  * limitations under the License.
  */
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+
 import d3 from 'd3v3';
 
 export function isExplainable(data: any): boolean {

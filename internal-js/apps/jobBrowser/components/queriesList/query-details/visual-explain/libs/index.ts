@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+
 import doTransform from './transformer';
 import doRender from './renderer';
 import { isExplainable, doRenderError } from './fallback';
-import { Query } from '../../..';
 
 export default function draw(
   data: any,

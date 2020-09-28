@@ -16,6 +16,9 @@
  * limitations under the License.
  */
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+
 export function getProcessedVertices(vertices: any[], edges: any[]): any[] {
   const edgedVertices = processEdges(vertices, edges);
   return processSource(edgedVertices);
@@ -399,7 +402,6 @@ function findPatterns(
 export function getAdjustedVerticesAndEdges(vertices: any[], edges: any[]) {
   const operatorIdList = [];
   const pattern = [];
-  const edges_opOperator = [];
   const edges_operatorId = [];
   const patterns = [];
   // findAllOutputOperators(vertices, edges_opOperator, patterns);

@@ -15,14 +15,15 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
-import { Query } from '../../index';
 import VisualExplain from './VisualExplain.vue';
+
+import queryMockResponse from '../../test/api/hive_query_get_response_3.json';
 
 describe('VisualExplain.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(VisualExplain, {
       propsData: {
-        queries: <Query[]>[{}]
+        query: queryMockResponse.query
       }
     });
     expect(wrapper.element).toMatchSnapshot();

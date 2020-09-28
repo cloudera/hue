@@ -3,7 +3,6 @@
 exports[`VisualExplain.vue should render 1`] = `
 <div
   class="visual-explain-container"
-  queries="[object Object]"
 >
   <div
     class="visual-explain-header"

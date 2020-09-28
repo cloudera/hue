@@ -16,12 +16,15 @@
  * limitations under the License.
  */
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+
 import d3 from 'd3v3';
 
 export default function doRender(
   data: any,
   containerElement: HTMLElement,
-  onRequestDetail: any,
+  onRequestDetail: any
 ): void {
   const width = '100%';
   const height = '400';
@@ -102,7 +105,7 @@ function isSingleReducerAvailable(data: any): boolean {
 }
 
 function recurseV(vertices: any, onRequestDetail: any, isSingleReducer: boolean): void {
-  vertices.each(function (cVertx: any): void {
+  vertices.each(function (): void {
     const vertex = d3.select(this);
 
     const vertices = vertex
@@ -123,7 +126,7 @@ function recurseV(vertices: any, onRequestDetail: any, isSingleReducer: boolean)
 }
 
 function recurseC(children: any, onRequestDetail: any, isSingleReducer: boolean): void {
-  children.each(function (d: any): void {
+  children.each(function (): void {
     const child = d3.select(this);
 
     const children = child
@@ -289,25 +292,6 @@ function getOperatorIcon(operator: any): string {
   }
 }
 
-function getIcon(type: string): string {
-  switch (type) {
-    case 'join':
-      return 'fa-code-fork';
-    case 'vectorization':
-    case 'job':
-      return '';
-    case 'broadcast':
-    case 'partition-sort':
-      return 'fa-compress';
-    case 'source':
-    case 'sink':
-    case 'group-by':
-    case 'select':
-      return 'fa-table';
-  }
-  return '';
-}
-
 function abbreviate(value: number): string {
   let newValue = '' + value;
   if (value >= 1000) {
@@ -361,8 +345,7 @@ function abbreviate(value: number): string {
 //   svg.transition().delay(750).call(zoom.event);
 // }
 
-function getConnectionPath(connector: any, svg: any, container: any, data: any): string {
-  const operators = container.selectAll('.operator');
+function getConnectionPath(connector: any, svg: any, container: any): string {
   const source = container.select(`#${connector._source._uuid}`);
   const target = container.select(`#${connector._target._uuid}`);
   const rSource = source.node().getBoundingClientRect();
@@ -378,7 +361,6 @@ function getConnectionPath(connector: any, svg: any, container: any, data: any):
   };
   const path = [pTarget];
   const junctionXMultiplier = pTarget.x - pSource.x < 0 ? +1 : -1;
-  const padding = 20;
 
   if (pSource.y !== pTarget.y) {
     path.push(
@@ -421,7 +403,6 @@ function getConnectionPath(connector: any, svg: any, container: any, data: any):
 }
 
 function getConnectionPathArrow(connector: any, svg: any, container: any) {
-  const operators = container.selectAll('.operator');
   const source = container.select(`#${connector._source._uuid}`);
   const target = container.select(`#${connector._target._uuid}`);
   const rSource = source.node().getBoundingClientRect();
