@@ -92,11 +92,11 @@
       min-height: 34px;
       max-height: 200px;
 
-      background-color: $cui-white;
+      background-color: $fluid-white;
       overflow-x: hidden;
       overflow-y: auto;
       list-style: none;
-      border: 1px solid $cui-gray;
+      border: 1px solid $hue-border-color;
       border-radius: $hue-panel-border-radius;
 
       @include box-shadow(0, 5px, 10px, rgba(0, 0, 0, 0.2));
@@ -109,7 +109,7 @@
         font-size: 13px;
 
         li {
-          color: $cui-gray-800;
+          color: $fluid-gray-800;
 
           button,
           a {
