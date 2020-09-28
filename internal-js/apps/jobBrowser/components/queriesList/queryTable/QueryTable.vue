@@ -39,7 +39,11 @@
       />
     </div>
     <div class="table">
-      <hue-table :columns="visibleColumns" :rows="queries" @row-clicked="querySelected" />
+      <hue-table :columns="visibleColumns" :rows="queries">
+        <template #cell-query="query">
+          <hue-link @click="querySelected">{{ query.query }}</hue-link>
+        </template>
+      </hue-table>
     </div>
     <paginator :total-entries="totalQueries" @page-changed="pageChanged" />
   </div>
@@ -50,9 +54,10 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
-  import Duration from '../../../../../../desktop/core/src/desktop/js/components/Duration.vue';
-  import HumanByteSize from '../../../../../../desktop/core/src/desktop/js/components/HumanByteSize.vue';
-  import TimeAgo from '../../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
+  import { duration } from '../../../../../../desktop/core/src/desktop/js/components/Duration.vue';
+  import { humanSize } from '../../../../../../desktop/core/src/desktop/js/components/HumanByteSize.vue';
+  import HueLink from '../../../../../../desktop/core/src/desktop/js/components/HueLink.vue';
+  import { timeAgo } from '../../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
   import HueTable from '../../../../../../desktop/core/src/desktop/js/components/HueTable.vue';
   import Paginator from '../../../../../../desktop/core/src/desktop/js/components/Paginator.vue';
   import { Column } from '../../../../../../desktop/core/src/desktop/js/components/HueTable';
@@ -62,7 +67,13 @@
   import { DataProcessor, Query, Search, TableDefinition } from '../index';
 
   @Component({
-    components: { HueTable, ColumnSelectorPanel, QueriesSearch, Paginator }
+    components: {
+      HueLink,
+      HueTable,
+      ColumnSelectorPanel,
+      QueriesSearch,
+      Paginator
+    }
   })
   export default class QueryTable extends Vue {
     @Prop({ required: true })
@@ -91,19 +102,40 @@
         adapter: (key: string, query: Query): string =>
           (query.tablesWritten || []).map(data => `${data.table} (${data.database})`).join(', ')
       },
-      { key: 'startTime', label: 'Start Time', cellComponent: TimeAgo },
+      {
+        key: 'startTime',
+        label: 'Start Time',
+        adapter: (key: string, query: Query): string => timeAgo(query.startTime)
+      },
       {
         key: 'duration',
         label: 'Duration',
-        cellComponent: Duration
+        adapter: (key: string, query: Query): string =>
+          (query.duration && duration(query.duration)) || ''
       },
       { key: 'dagID', label: 'DAG ID' },
       { key: 'appID', label: 'Application ID' },
       { key: 'cpuTime', label: 'CPU Time' },
-      { key: 'physicalMemory', label: 'Physical Memory', cellComponent: HumanByteSize },
-      { key: 'virtualMemory', label: 'Virtual Memory', cellComponent: HumanByteSize },
-      { key: 'dataRead', label: 'Data Read', cellComponent: HumanByteSize },
-      { key: 'dataWritten', label: 'Data Written', cellComponent: HumanByteSize },
+      {
+        key: 'physicalMemory',
+        label: 'Physical Memory',
+        adapter: (key: string, query: Query): string => humanSize(query.physicalMemory)
+      },
+      {
+        key: 'virtualMemory',
+        label: 'Virtual Memory',
+        adapter: (key: string, query: Query): string => humanSize(query.virtualMemory)
+      },
+      {
+        key: 'dataRead',
+        label: 'Data Read',
+        adapter: (key: string, query: Query): string => humanSize(query.dataRead)
+      },
+      {
+        key: 'dataWritten',
+        label: 'Data Written',
+        adapter: (key: string, query: Query): string => humanSize(query.dataWritten)
+      },
       { key: 'executionMode', label: 'Execution Mode' },
       { key: 'usedCBO', label: 'Cost Based Optimizer (CBO)' }
     ];

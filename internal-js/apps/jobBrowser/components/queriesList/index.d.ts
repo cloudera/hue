@@ -40,8 +40,8 @@ export interface Query {
   createdAt: number[];
   dagIds?: string[]; // TODO: From API or adaption? Type[]?
   dags: Dag[];
-  dataRead?: unknown; // TODO: type?
-  dataWritten?: unknown; // TODO: type?
+  dataRead?: number; // TODO: type?
+  dataWritten?: number; // TODO: type?
   databasesUsed: { [name: string]: number }[];
   details?: {
     diagnostics?: string;
@@ -62,7 +62,7 @@ export interface Query {
   llapAppId?: string;
   logId?: unknown; // TODO: type?
   operationId: string; // TODO: can be undefined?
-  physicalMemory?: unknown; // TODO: type?
+  physicalMemory?: number; // TODO: type?
   processed: boolean; // TODO: can be undefined?
   query: string;
   queryId: string;
@@ -78,7 +78,7 @@ export interface Query {
   threadId: string;
   usedCBO: string; // TODO: can be undefined?
   userId: string;
-  virtualMemory?: unknown; // TODO: type?
+  virtualMemory?: number; // TODO: type?
 }
 
 export interface FacetValue {
