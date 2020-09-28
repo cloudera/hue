@@ -31,15 +31,7 @@
     <tbody>
       <tr v-for="(row, rowIndex) in rows" :key="rowIndex" @click="$emit('row-clicked', row)">
         <td v-for="(column, colIndex) in columns" :key="colIndex">
-          <component
-            :is="column.cellComponent"
-            v-if="column.cellComponent"
-            v-bind="
-              column.cellProps
-                ? column.cellProps(column.key, row)
-                : { value: column.adapter ? column.adapter(column.key, row) : row[column.key] }
-            "
-          />
+          <slot v-if="hasCellSlot(column)" :name="cellSlotName(column)" v-bind="row" />
           <template v-else>
             {{ column.adapter ? column.adapter(column.key, row) : row[column.key] }}
           </template>
@@ -61,6 +53,14 @@
     rows?: Row[];
     @Prop({ required: false, default: () => [] })
     columns?: Column<T>[];
+
+    hasCellSlot(column: Column<T>): boolean {
+      return !!this.$scopedSlots[this.cellSlotName(column)];
+    }
+
+    cellSlotName(column: Column<T>): string {
+      return 'cell-' + column.key;
+    }
   }
 </script>
 
