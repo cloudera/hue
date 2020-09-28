@@ -5,51 +5,27 @@ exports[`QueriesSearch.vue should render 1`] = `
   <div
     class="input-group"
   >
-    <div
-      class="input-group-btn"
+    <dropdown-stub
+      text="Searches"
     >
-      <button
-        aria-expanded="false"
-        aria-haspopup="true"
-        class="btn btn-default dropdown-toggle"
-        data-toggle="dropdown"
-        type="button"
+      <dropdown-group-stub
+        header="Suggested"
       >
-        
-        Searches 
-        <span
-          class="caret"
-        />
-      </button>
-       
-      <ul
-        class="dropdown-menu"
-      >
-        <li
-          class="dropdown-header"
-        >
-          Suggested
-        </li>
-         
-        <li>
-          <a
-            href="javascript: void(0);"
-          >
-            Suggested search
-          </a>
-        </li>
-         
         <!---->
          
-        <li
-          class="dropdown-header"
-        >
-          Saved Searches
-        </li>
+        <dropdown-item-button-stub>
+          
+          Suggested search
+        
+        </dropdown-item-button-stub>
+      </dropdown-group-stub>
+       
+      <dropdown-group-stub
+        header="Suggested"
+      >
+        <!---->
          
-        <li
-          class="saved-search"
-        >
+        <dropdown-item-stub>
           <a
             href="javascript: void(0);"
           >
@@ -60,11 +36,12 @@ exports[`QueriesSearch.vue should render 1`] = `
             aria-hidden="true"
             class="fa fa-times"
           />
-        </li>
-         
-        <!---->
-      </ul>
-    </div>
+          
+          Saved search
+        
+        </dropdown-item-stub>
+      </dropdown-group-stub>
+    </dropdown-stub>
      
     <input
       class="form-control"

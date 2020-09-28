@@ -36,10 +36,10 @@ exports[`QueryTable.vue should render 1`] = `
       columns=""
       rows=""
     />
-     
-    <paginator-stub
-      totalentries="0"
-    />
   </div>
+   
+  <paginator-stub
+    totalentries="0"
+  />
 </div>
 `;

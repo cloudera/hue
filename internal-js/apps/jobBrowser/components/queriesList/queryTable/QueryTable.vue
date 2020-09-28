@@ -40,8 +40,8 @@
     </div>
     <div class="table">
       <hue-table :columns="visibleColumns" :rows="queries" @row-clicked="querySelected" />
-      <paginator :total-entries="totalQueries" @page-changed="pageChanged" />
     </div>
+    <paginator :total-entries="totalQueries" @page-changed="pageChanged" />
   </div>
 </template>
 

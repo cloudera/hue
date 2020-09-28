@@ -19,34 +19,30 @@
 <template>
   <div>
     <div class="input-group">
-      <div class="input-group-btn">
-        <button
-          type="button"
-          class="btn btn-default dropdown-toggle"
-          data-toggle="dropdown"
-          aria-haspopup="true"
-          aria-expanded="false"
-        >
-          Searches <span class="caret" />
-        </button>
-        <ul class="dropdown-menu">
-          <li class="dropdown-header">Suggested</li>
-          <li
+      <dropdown :text="'Searches'">
+        <dropdown-group header="Suggested">
+          <dropdown-item-text v-if="!listedSearches.suggested.length">
+            No suggestions
+          </dropdown-item-text>
+          <dropdown-item-button
             v-for="search in listedSearches.suggested"
             :key="search.name"
             @click="searchSelected(search)"
           >
-            <a href="javascript: void(0);">{{ search.name }}</a>
-          </li>
-          <li v-if="listedSearches.suggested.length === 0" class="message">No suggestions!</li>
-          <li class="dropdown-header">Saved Searches</li>
-          <li v-for="search in listedSearches.saved" :key="search.name" class="saved-search">
+            {{ search.name }}
+          </dropdown-item-button>
+        </dropdown-group>
+        <dropdown-group header="Suggested">
+          <dropdown-item-text v-if="!listedSearches.saved.length">
+            No saved searches
+          </dropdown-item-text>
+          <dropdown-item v-for="search in listedSearches.saved" :key="search.name">
             <a href="javascript: void(0);" @click="searchSelected(search)">{{ search.name }}</a>
             <i class="fa fa-times" aria-hidden="true" @click="deleteSearch(search)" />
-          </li>
-          <li v-if="listedSearches.saved.length === 0" class="message">No saved searches</li>
-        </ul>
-      </div>
+            {{ search.name }}
+          </dropdown-item>
+        </dropdown-group>
+      </dropdown>
 
       <input
         v-model="searchText"
@@ -105,16 +101,30 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
+
+  import Dropdown from '../../../../../../desktop/core/src/desktop/js/components/dropdown/Dropdown.vue';
+  import DropdownGroup from '../../../../../../desktop/core/src/desktop/js/components/dropdown/DropdownGroup.vue';
+  import DropdownItem from '../../../../../../desktop/core/src/desktop/js/components/dropdown/DropdownItem.vue';
+  import DropdownItemButton from '../../../../../../desktop/core/src/desktop/js/components/dropdown/DropdownItemButton.vue';
+  import DropdownItemText from '../../../../../../desktop/core/src/desktop/js/components/dropdown/DropdownItemText.vue';
   import Modal from '../../../../../../desktop/core/src/desktop/js/components/Modal.vue';
+  import Vue from 'vue';
   import RangePanel from './RangePanel.vue';
   import { Search, TableDefinition } from '../index';
   import * as api from '../apiUtils';
 
   @Component({
-    components: { Modal, RangePanel }
+    components: {
+      DropdownItem,
+      DropdownItemText,
+      DropdownItemButton,
+      DropdownGroup,
+      Dropdown,
+      Modal,
+      RangePanel
+    }
   })
   export default class QueriesSearch extends Vue {
     @Prop({ required: true })
