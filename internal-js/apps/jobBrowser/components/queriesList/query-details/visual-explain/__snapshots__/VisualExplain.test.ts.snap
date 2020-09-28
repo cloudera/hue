@@ -2,8 +2,21 @@
 
 exports[`VisualExplain.vue should render 1`] = `
 <div
+  class="visual-explain-container"
   queries="[object Object]"
 >
-  Visual Explain - Not Implemented
+  <div
+    class="visual-explain-header"
+  >
+    <h2>
+      Reder failed!
+    </h2>
+  </div>
+   
+  <div
+    class="explain-container"
+  />
+   
+  <!---->
 </div>
 `;

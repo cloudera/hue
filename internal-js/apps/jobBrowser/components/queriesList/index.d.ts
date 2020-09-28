@@ -47,6 +47,7 @@ export interface Query {
     diagnostics?: string;
     perf?: unknown;
     configuration?: { [key: string]: unknown }; // TODO: value type string?
+    explainPlan?: any; // TODO: type?
   };
   domainId?: unknown; // TODO: type?
   duration?: number; // TODO: From API or adaption? number?

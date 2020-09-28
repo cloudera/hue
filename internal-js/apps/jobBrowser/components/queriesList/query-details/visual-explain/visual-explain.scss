@@ -1,0 +1,259 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ // TODO: Directly copied from app.scss in query-ui. Must be refactored.
+
+.visual-explain-container {
+  height: 100%;
+  margin-bottom: 10px;
+
+  .button-container {
+    padding: 3px;
+
+    text-align: right;
+
+    button {
+      width: 33px;
+      height: 33px;
+      font-size: 1.5em;
+      padding: 4px;
+    }
+  }
+
+  border: 1px solid #CCC;
+  border-radius: 5px;
+  overflow: hidden;
+
+  .running-anim {
+    text-align: center;
+
+    margin: auto;
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+  }
+}
+
+.visual-explain-container {
+  background-color: white;
+  position: relative;
+
+  &:fullscreen {
+    .fa-ellipsis-v, .download-button {
+      display: none;
+    }
+  }
+}
+
+.visual-explain-header {
+  height: 40px;
+  background-color: rgb(246, 246, 246);
+
+  padding: 0px 10px;
+  position: relative;
+
+  &__title {
+    font-size: 18px;
+    margin-top: 5px;
+
+    position: relative;
+    top: 7px;
+  }
+}
+
+#explain-container {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+}
+
+// ---- Details popup ---------------------------------------
+
+.visual-explain-detail-container {
+  width: 500px;
+  position: absolute;
+  top: 50px;
+  background-color: #FFF;
+  z-index: 100000;
+
+  position: absolute;
+  display: block;
+
+  max-height: 200px;
+}
+.visual-explain-detail-container .close {
+  margin: 10px 15px;
+  z-index: 9999;
+}
+.visual-explain-detail-container .visual-explain-detail {
+  border: 1px solid #DDD;
+  border-radius: 5px;
+}
+.visual-explain-detail-container {
+  right: 50px;
+}
+
+rect.operator__box {
+  fill: rgb(255, 255, 255);
+  stroke: rgb(223, 223, 223);
+  stroke-width: 1;
+
+  &:hover {
+    fill: rgb(223, 240, 247);
+  }
+
+  &.operator__box--TableScan {
+    fill: rgb(85, 100, 105);
+  }
+
+  &.operator__box--Fetch_Operator {
+    fill: rgb(42, 179, 119);
+  }
+}
+
+.operator body {
+  cursor: pointer;
+
+  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  padding: 8px 10px;
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.operator--Fetch_Operator body {
+  color: rgb(255, 255, 255);
+  padding: 12px;
+}
+
+.operator--Fetch_Operator .operator-body {
+  //font-weight: lighter;
+}
+
+.operator--TableScan>div {
+  color: rgb(255, 255, 255);
+}
+
+.operator-caption {
+  font-size: 10px;
+}
+
+.operator-body {
+  font-size: 12px;
+}
+
+.edge--hidden {
+  display: none;
+}
+
+.edge {
+  stroke: rgb(83, 100, 106);
+  stroke-width: 2px;
+  fill: none;
+}
+
+ #visual-explain {
+  background-color: #FFF;
+  padding: 10px 5px;
+  border: 1px solid #DDD;
+  border-radius: 5px;
+
+  .title{
+      padding: 0 10px 10px 10px;
+      color: #464646;
+      font-size: 20px;
+      font-weight: 500px;
+   }
+ }
+
+.detail-panel{
+  background-color: #FFF;
+  padding: 10px 5px;
+
+  .query-title{
+      padding: 0 10px 10px 10px;
+      color: #464646;
+      font-size: 20px;
+      font-weight: 500;
+   }
+   .body{
+      padding: 0 10px 10px 10px;
+   }
+
+   .query-details-row{
+      margin-bottom: 15px; margin-left: 10px;
+     .query-details-label{
+      text-transform: uppercase;color: #999;font-weight: normal;font-size: 12px;margin: 0;
+    }
+
+    .query-details-value{
+      color: #666;
+     }
+   }
+}
+
+.visual-explain-detail {
+  border: 1px solid #DDD;
+  position: absolute;
+  display: block;
+
+  background-color: #FFF;
+
+  .close {
+    margin: 10px 15px;
+  }
+
+  .vector-info {
+    background-color: #EEE;
+    font-weight: bold;
+    border: none;
+    padding: 10px;
+  }
+
+  .prettyprint {
+    max-height: 200px;
+    overflow: scroll;
+    background: #FFF;
+
+    width: 500px;
+    border: none !important;
+    margin: 0 0 0 0 !important;
+  }
+
+  .block {
+    border: 1px solid #DDD;
+    padding: 20px;
+    margin: 10px 0;
+
+    .block-header {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .block-body {
+      padding: 10px 0;
+    }
+
+    .divider {
+      height: 1px;
+      border-top: 1px solid #DDD;
+      margin: 10px 0;
+    }
+  }
+
+}
