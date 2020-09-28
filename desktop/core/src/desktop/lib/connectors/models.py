@@ -95,7 +95,7 @@ else:
   class Connector(BaseConnector): pass
 
 
-def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None, user=None):
+def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None, user=None, connector_id=None):
   from desktop.auth.backend import is_admin
 
   connectors_objects = Connector.objects.all()
@@ -113,7 +113,7 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
         'settings': json.loads(connector.settings),
         'is_demo': False,
       }
-      for connector in connectors_objects
+      for connector in connectors_objects if connector_id is None or connector_id == connector.id
   ]
   connectors = []
 
