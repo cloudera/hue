@@ -128,26 +128,26 @@ exports[`HueTable.vue should render a table with a custom component for a cell 1
   <tbody>
     <tr>
       <td>
-        
-          1
-        
+        <div>
+          3
+        </div>
       </td>
       <td>
-        <span>
-          now
-        </span>
+        
+          2
+        
       </td>
     </tr>
     <tr>
       <td>
-        
-          4
-        
+        <div>
+          9
+        </div>
       </td>
       <td>
-        <span>
-          now
-        </span>
+        
+          5
+        
       </td>
     </tr>
   </tbody>

@@ -15,7 +15,6 @@
 // limitations under the License.
 
 import { mount, shallowMount } from '@vue/test-utils';
-import TimeAgo from 'components/TimeAgo.vue';
 import { Column, Row } from './HueTable';
 import HueTable from './HueTable.vue';
 
@@ -23,7 +22,7 @@ describe('HueTable.vue', () => {
   it('should render a table', () => {
     const wrapper = shallowMount(HueTable, {
       propsData: {
-        columns: <Column[]>[
+        columns: <Column<unknown>[]>[
           { key: 'a', label: 'A' },
           { key: 'd', label: 'D' },
           { key: 'c', label: 'C' },
@@ -41,22 +40,18 @@ describe('HueTable.vue', () => {
   });
 
   it('should render a table with a custom component for a cell', () => {
-    const now = Date.now() + 30000000000; // Guarantees future ~year, i.e, TimeAgo will show "now"
     const wrapper = mount(HueTable, {
-      components: { 'time-ago': TimeAgo },
+      scopedSlots: {
+        'cell-a': '<div>{{ props.a + props.b }}</div>'
+      },
       propsData: {
-        columns: <Column[]>[
+        columns: <Column<unknown>[]>[
           { key: 'a', label: 'A' },
-          {
-            key: 'b',
-            label: 'B',
-            cellComponent: TimeAgo,
-            cellProps: (key, row) => ({ value: row[key] })
-          }
+          { key: 'b', label: 'B' }
         ],
         rows: <Row[]>[
-          { a: '1', b: now },
-          { a: '4', b: now }
+          { a: 1, b: 2 },
+          { a: 4, b: 5 }
         ]
       }
     });
