@@ -173,7 +173,7 @@ def _create_connector_examples():
   skipped = []
 
   for connector in _get_connector_examples():
-    name ='%(nice_name)s (%(dialect)s)' % connector
+    name = '%(nice_name)s (%(dialect)s)' % connector
     if not Connector.objects.filter(name=connector['nice_name']).exists():
       connector = Connector.objects.create(
         name=connector['nice_name'],
@@ -192,7 +192,7 @@ def _get_connector_examples():
   return [
     {
       'id': i,
-      'nice_name':  CONNECTORS.get()[i].NICE_NAME.get() or i,
+      'nice_name': CONNECTORS.get()[i].NICE_NAME.get() or i,
       'description': '',
       'dialect': CONNECTORS.get()[i].DIALECT.get(),
       'interface': CONNECTORS.get()[i].INTERFACE.get(),

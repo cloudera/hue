@@ -36,7 +36,6 @@ from django.utils.translation import ugettext_lazy as _
 
 import desktop.redaction
 
-from desktop.conf import has_channels
 from desktop.lib.paths import get_desktop_root, get_run_root
 from desktop.lib.python_util import force_dict_to_strings
 
@@ -376,20 +375,20 @@ else:
   logging.debug("DESKTOP_DB_TEST_USER SET: %s" % test_user)
 
   default_db = {
-    "ENGINE" : desktop.conf.DATABASE.ENGINE.get(),
-    "NAME" : desktop.conf.DATABASE.NAME.get(),
-    "USER" : desktop.conf.DATABASE.USER.get(),
-    "SCHEMA" : desktop.conf.DATABASE.SCHEMA.get(),
-    "PASSWORD" : desktop.conf.get_database_password(),
-    "HOST" : desktop.conf.DATABASE.HOST.get(),
-    "PORT" : str(desktop.conf.DATABASE.PORT.get()),
+    "ENGINE": desktop.conf.DATABASE.ENGINE.get(),
+    "NAME": desktop.conf.DATABASE.NAME.get(),
+    "USER": desktop.conf.DATABASE.USER.get(),
+    "SCHEMA": desktop.conf.DATABASE.SCHEMA.get(),
+    "PASSWORD": desktop.conf.get_database_password(),
+    "HOST": desktop.conf.DATABASE.HOST.get(),
+    "PORT": str(desktop.conf.DATABASE.PORT.get()),
     "OPTIONS": force_dict_to_strings(desktop.conf.DATABASE.OPTIONS.get()),
     # DB used for tests
-    "TEST_NAME" : test_name,
-    "TEST_USER" : test_user,
+    "TEST_NAME": test_name,
+    "TEST_USER": test_user,
     # Wrap each request in a transaction.
-    "ATOMIC_REQUESTS" : True,
-    "CONN_MAX_AGE" : desktop.conf.DATABASE.CONN_MAX_AGE.get(),
+    "ATOMIC_REQUESTS": True,
+    "CONN_MAX_AGE": desktop.conf.DATABASE.CONN_MAX_AGE.get(),
   }
 
 DATABASES = {
@@ -405,7 +404,7 @@ if desktop.conf.QUERY_DATABASE.HOST.get():
     'PASSWORD': desktop.conf.QUERY_DATABASE.PASSWORD.get(),
     'OPTIONS': desktop.conf.QUERY_DATABASE.OPTIONS.get(),
     'PORT': desktop.conf.QUERY_DATABASE.PORT.get(),
-    "SCHEMA" : desktop.conf.QUERY_DATABASE.SCHEMA.get(),
+    "SCHEMA": desktop.conf.QUERY_DATABASE.SCHEMA.get(),
   }
 
 CACHES = {
@@ -438,7 +437,7 @@ SESSION_COOKIE_HTTPONLY = desktop.conf.SESSION.HTTP_ONLY.get()
 
 CSRF_COOKIE_SECURE = desktop.conf.SESSION.SECURE.get()
 CSRF_COOKIE_HTTPONLY = desktop.conf.SESSION.HTTP_ONLY.get()
-CSRF_COOKIE_NAME='csrftoken'
+CSRF_COOKIE_NAME = 'csrftoken'
 
 TRUSTED_ORIGINS = []
 if desktop.conf.SESSION.TRUSTED_ORIGINS.get():
@@ -448,7 +447,9 @@ if desktop.conf.SESSION.TRUSTED_ORIGINS.get():
 if desktop.conf.KNOX.KNOX_PROXYHOSTS.get(): # The hosts provided here don't have port. Add default knox port
   if desktop.conf.KNOX.KNOX_PORTS.get():
     hostport = []
-    ports = [host.split(':')[1] for host in desktop.conf.KNOX.KNOX_PROXYHOSTS.get() if len(host.split(':')) > 1] # In case the ports are in hostname
+    ports = [  # In case the ports are in hostname
+        host.split(':')[1] for host in desktop.conf.KNOX.KNOX_PROXYHOSTS.get() if len(host.split(':')) > 1
+    ]
     for port in ports + desktop.conf.KNOX.KNOX_PORTS.get():
       if port == '80':
         port = '' # Default port needs to be empty
@@ -502,7 +503,7 @@ if EMAIL_BACKEND == 'sendgrid_backend.SendgridBackend':
   SENDGRID_SANDBOX_MODE_IN_DEBUG = DEBUG
 
 
-if has_channels():
+if desktop.conf.has_channels():
   INSTALLED_APPS.append('channels')
   ASGI_APPLICATION = 'desktop.routing.application'
   CHANNEL_LAYERS = {
@@ -514,7 +515,8 @@ if has_channels():
     },
   }
 
-# Used for securely creating sessions. Should be unique and not shared with anybody. Changing auth backends will invalidate all open sessions.
+# Used for securely creating sessions. Should be unique and not shared with anybody.
+# Changing auth backends will invalidate all open sessions.
 SECRET_KEY = desktop.conf.get_secret_key()
 if SECRET_KEY:
   SECRET_KEY += str(AUTHENTICATION_BACKENDS)
@@ -580,11 +582,11 @@ if is_oidc_configured():
   OIDC_USERNAME_ATTRIBUTE = desktop.conf.OIDC.OIDC_USERNAME_ATTRIBUTE.get()
 
 # OAuth
-OAUTH_AUTHENTICATION='liboauth.backend.OAuthBackend' in AUTHENTICATION_BACKENDS
+OAUTH_AUTHENTICATION = 'liboauth.backend.OAuthBackend' in AUTHENTICATION_BACKENDS
 if OAUTH_AUTHENTICATION:
-    INSTALLED_APPS.append('liboauth')
-    LOGIN_URL = '/oauth/accounts/login'
-    SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+  INSTALLED_APPS.append('liboauth')
+  LOGIN_URL = '/oauth/accounts/login'
+  SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # URL Redirection white list.
 if desktop.conf.REDIRECT_WHITELIST.get():
@@ -645,7 +647,8 @@ if desktop.conf.SSL_CACERTS.get() and os.environ.get('REQUESTS_CA_BUNDLE') is No
   os.environ['REQUESTS_CA_BUNDLE'] = desktop.conf.SSL_CACERTS.get()
 
 # Preventing local build failure by not validating the default value of REQUESTS_CA_BUNDLE
-if os.environ.get('REQUESTS_CA_BUNDLE') and os.environ.get('REQUESTS_CA_BUNDLE') != desktop.conf.SSL_CACERTS.config.default and not os.path.isfile(os.environ['REQUESTS_CA_BUNDLE']):
+if os.environ.get('REQUESTS_CA_BUNDLE') and os.environ.get('REQUESTS_CA_BUNDLE') != desktop.conf.SSL_CACERTS.config.default \
+    and not os.path.isfile(os.environ['REQUESTS_CA_BUNDLE']):
   raise Exception(_('SSL Certificate pointed by REQUESTS_CA_BUNDLE does not exist: %s') % os.environ['REQUESTS_CA_BUNDLE'])
 
 # Instrumentation
@@ -775,20 +778,20 @@ if desktop.conf.TRACING.ENABLED.get():
   OPENTRACING_TRACER_CALLABLE = __name__ + '.tracer'
 
   def tracer():
-      from jaeger_client import Config
-      config = Config(
-          config={
-              'sampler': {
-                  'type': 'const',
-                  'param': 1,
-              },
-          },
-          # metrics_factory=PrometheusMetricsFactory(namespace='hue-api'),
-          service_name='hue-api',
-          validate=True,
-      )
-      return config.initialize_tracer()
+    from jaeger_client import Config
+    config = Config(
+      config={
+        'sampler': {
+          'type': 'const',
+          'param': 1,
+        },
+      },
+      # metrics_factory=PrometheusMetricsFactory(namespace='hue-api'),
+      service_name='hue-api',
+      validate=True,
+    )
+    return config.initialize_tracer()
 
-  OPENTRACING_TRACED_ATTRIBUTES = ['META'] # Only valid if OPENTRACING_TRACE_ALL == True
+  OPENTRACING_TRACED_ATTRIBUTES = ['META']  # Only valid if OPENTRACING_TRACE_ALL == True
   if desktop.conf.TRACING.TRACE_ALL.get():
     MIDDLEWARE_CLASSES.insert(0, 'django_opentracing.OpenTracingMiddleware')
