@@ -1,21 +1,32 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Tabs.vue should render empty tabs 1`] = `
-<div>
+<div
+  class="hue-tabs"
+>
   <ul />
    
+  <div
+    class="hue-tab-container"
+  />
 </div>
 `;
 
 exports[`Tabs.vue should render tabs 1`] = `
-<div>
+<div
+  class="hue-tabs"
+>
   <ul>
-    <li>
+    <li
+      class="active"
+    >
       
       foo
     
     </li>
-    <li>
+    <li
+      class=""
+    >
       
       bar
     
@@ -23,14 +34,18 @@ exports[`Tabs.vue should render tabs 1`] = `
   </ul>
    
   <div
-    style=""
+    class="hue-tab-container"
   >
-    foo
-  </div>
-  <div
-    style="display: none;"
-  >
-    bar
+    <div
+      style=""
+    >
+      foo
+    </div>
+    <div
+      style="display: none;"
+    >
+      bar
+    </div>
   </div>
 </div>
 `;

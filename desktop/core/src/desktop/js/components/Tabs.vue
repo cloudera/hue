@@ -17,13 +17,20 @@
 -->
 
 <template>
-  <div>
+  <div class="hue-tabs">
     <ul>
-      <li v-for="tab in tabs" :key="tab.title" @click="selectTab(tab)">
+      <li
+        v-for="tab in tabs"
+        :key="tab.title"
+        :class="{ active: tab.isActive }"
+        @click="selectTab(tab)"
+      >
         {{ tab.title }}
       </li>
     </ul>
-    <slot />
+    <div class="hue-tab-container">
+      <slot />
+    </div>
   </div>
 </template>
 
@@ -64,4 +71,38 @@
   }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  @import './styles/colors';
+
+  .hue-tabs {
+    ul {
+      border-bottom: 1px solid $hue-border-color;
+      list-style: none;
+      margin: 20px 12px;
+
+      li {
+        display: inline-block;
+        font-size: 14px;
+        padding: 10px;
+        border-bottom: 3px solid transparent;
+        cursor: pointer;
+        margin-right: 10px;
+        color: $fluid-gray-700;
+
+        &:hover {
+          color: $fluid-blue-500;
+        }
+
+        &.active {
+          color: $fluid-blue-500;
+          border-bottom: 3px solid $fluid-blue-400;
+        }
+      }
+    }
+    .hue-tab-container {
+      position: relative;
+      margin: 12px;
+      background-color: $fluid-white;
+    }
+  }
+</style>
