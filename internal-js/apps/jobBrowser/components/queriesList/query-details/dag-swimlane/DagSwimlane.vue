@@ -76,6 +76,7 @@
   import './dag-swimlane.scss';
 
   // TODO: Refactor - This is just a direct port from Ember.js and many things can be optimised using Vue.js features
+  // TODO: Use dag-swimlane-vertex-name.scss
 
   @Component({
     components: {
