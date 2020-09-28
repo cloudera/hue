@@ -1,0 +1,218 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+@import './colors.scss';
+
+/*
+
+  TODO: Replace with CUI equivalents where possible
+
+*/
+
+$hue-primary-color-dark: #0B7FAD;
+$hue-primary-color-light: #DBE8F1;
+$hue-trunk: $cui-purple-300;
+
+$hue-disabled-color: $cui-gray-100;
+$hue-error-color: $cui-red-500;
+$hue-warning-color: $cui-orange-400;
+
+$hue-panel-border-radius: 2px;
+
+@mixin hue-transform($transform) {
+  -webkit-transform: $transform;
+  -moz-transform: $transform;
+  -ms-transform: $transform;
+  -o-transform: $transform;
+}
+
+.nowrap-ellipsis {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+
+.no-select {
+  // Every browser except IE 9
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+@mixin transition($args...) {
+  -webkit-transition: $args;
+  -moz-transition: $args;
+  -ms-transition: $args;
+  -o-transition: $args;
+  transition: $args;
+}
+
+@mixin ease-transition($arg) {
+  @include transition($arg 0.2s ease)
+}
+
+@mixin box-shadow($top, $left, $blur, $color, $inset: false) {
+  @if $inset {
+    -webkit-box-shadow:inset $top $left $blur $color;
+    -moz-box-shadow:inset $top $left $blur $color;
+    box-shadow:inset $top $left $blur $color;
+  } @else {
+    -webkit-box-shadow: $top $left $blur $color;
+    -moz-box-shadow: $top $left $blur $color;
+    box-shadow: $top $left $blur $color;
+  }
+}
+
+@mixin simple-box-shadow($left: 2px, $top: 2px) {
+  @include box-shadow($top, $left, 8px, rgba(0, 0, 0, 0.18));
+}
+
+.box-shadow-top {
+  @include simple-box-shadow(0, -2px);
+}
+
+.box-shadow-right {
+  @include simple-box-shadow(2px, 0);
+}
+
+.box-shadow-bottom {
+  @include simple-box-shadow(0, 2px);
+}
+
+.box-shadow-left {
+  @include simple-box-shadow(-2px, 0);
+}
+
+.inset-box-shadow {
+  -webkit-box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.125) !important;
+  -moz-box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.125) !important;
+  box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.125) !important;
+}
+
+.no-box-shadow {
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  box-shadow: none !important;
+}
+
+@mixin animation($str) {
+  -webkit-animation: #{$str};
+  -moz-animation: #{$str};
+  -ms-animation: #{$str};
+  -o-animation: #{$str};
+  animation: #{$str};
+}
+
+@mixin keyframes($animation-name) {
+  @-webkit-keyframes #{$animation-name} {
+    @content;
+  }
+  @-moz-keyframes #{$animation-name} {
+    @content;
+  }
+  @-ms-keyframes #{$animation-name} {
+    @content;
+  }
+  @-o-keyframes #{$animation-name} {
+    @content;
+  }
+  @keyframes #{$animation-name} {
+    @content;
+  }
+}
+
+@include keyframes(fade-in-frames) {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@mixin fade-in {
+  @include animation('fade-in-frames 2s');
+}
+
+// Flexbox mixins
+
+@mixin display-flex() {
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+}
+
+@mixin flex($flex: initial) {
+  -ms-flex: $flex;
+  -webkit-flex: $flex;
+  flex: $flex;
+}
+
+@mixin flex-align-items($align: stretch) {
+  -webkit-align-items: $align;
+  -ms-align-items: $align;
+  align-items: $align;
+}
+
+@mixin flex-basis($basis) {
+  -webkit-flex-basis: $basis;
+  -ms-flex-basis: $basis;
+  flex-basis: $basis;
+}
+
+@mixin flex-box-flex($flex) {
+  -webkit-box-flex: $flex;
+  -moz-box-flex: $flex;
+  box-flex: $flex; /* stylelint-disable-line */
+}
+
+@mixin flex-box-align($align) {
+  -webkit-box-align: $align;
+  -moz-box-align: $align;
+  box-align: $align; /* stylelint-disable-line */
+}
+
+@mixin flex-box-pack($pack) {
+  -webkit-box-pack: $pack;
+  -moz-box-pack: $pack;
+  box-pack: $pack; /* stylelint-disable-line */
+}
+
+@mixin flex-shrink($shrink) {
+  -webkit-flex-shrink: $shrink;
+  -ms-flex-shrink: $shrink;
+  flex-shrink: $shrink;
+}
+
+@mixin flex-direction($direction: row) {
+  -webkit-flex-direction: $direction;
+  -ms-flex-direction: $direction;
+  flex-direction: $direction;
+}
+
+@mixin flex-flow($flow) {
+  -webkit-flex-flow: $flow;
+  -ms-flex-flow: $flow;
+  flex-flow: $flow;
+}
+
+@mixin flex-wrap($wrap: nowrap) {
+  -webkit-flex-wrap: $wrap;
+  -ms-flex-wrap: $wrap;
+  flex-wrap: $wrap;
+}
