@@ -17,11 +17,13 @@
 import { shallowMount } from '@vue/test-utils';
 import DagSwimlane from './DagSwimlane.vue';
 
+import queryMockResponse from '../../test/api/hive_query_get_response_3.json';
+
 describe('DagSwimlane.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(DagSwimlane, {
       propsData: {
-        dag: null
+        dag: queryMockResponse.query.dags[0]
       }
     });
     expect(wrapper.element).toMatchSnapshot();
