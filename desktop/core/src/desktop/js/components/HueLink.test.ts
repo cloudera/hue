@@ -15,16 +15,16 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
-import Link from './Link.vue';
+import HueLink from './HueLink.vue';
 
-describe('Link.vue', () => {
+describe('HueLink.vue', () => {
   it('should render a Link', () => {
-    const wrapper = shallowMount(Link);
+    const wrapper = shallowMount(HueLink);
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('should pass attributes to the a element', () => {
-    const wrapper = shallowMount(Link, {
+    const wrapper = shallowMount(HueLink, {
       attrs: {
         target: '_blank'
       }
@@ -33,7 +33,7 @@ describe('Link.vue', () => {
   });
 
   it('should not pass href attribute to the a element', () => {
-    const wrapper = shallowMount(Link, {
+    const wrapper = shallowMount(HueLink, {
       attrs: {
         href: 'http://gethue.com'
       }
