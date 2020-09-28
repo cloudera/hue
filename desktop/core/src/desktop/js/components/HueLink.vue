@@ -31,7 +31,7 @@
   }
 
   @Component
-  export default class Link extends Vue {
+  export default class HueLink extends Vue {
     @Prop({ required: false })
     url?: string;
 

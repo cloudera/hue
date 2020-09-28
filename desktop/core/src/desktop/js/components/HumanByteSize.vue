@@ -43,7 +43,7 @@
   };
 
   @Component
-  export default class TimeAgo extends Vue {
+  export default class HumanByteSize extends Vue {
     @Prop({ required: false })
     value?: number;
 
