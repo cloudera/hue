@@ -17,15 +17,17 @@
 -->
 
 <template>
-  <div>
-    <div>
-      Rows per page:
-      <a href="javascript: void(0);" @click="setLimit(25)">25</a>
-      <a href="javascript: void(0);" @click="setLimit(50)">50</a>
-      <a href="javascript: void(0);" @click="setLimit(100)">100</a>
+  <div class="hue-paginator">
+    <div class="page-status">
+      {{ offset + 1 }}-{{ Math.min(offset + limit, totalEntries) }} of {{ totalEntries }}
     </div>
-    <div>{{ offset + 1 }}-{{ Math.min(offset + limit, totalEntries) }} of {{ totalEntries }}</div>
-    <div>
+    Rows per page:
+    <dropdown :inline="true" :text="limit">
+      <dropdown-item-button @click="setLimit(25)">25</dropdown-item-button>
+      <dropdown-item-button @click="setLimit(50)">50</dropdown-item-button>
+      <dropdown-item-button @click="setLimit(100)">100</dropdown-item-button>
+    </dropdown>
+    <div class="navigation-actions">
       <a href="javascript: void(0);" @click="gotoFirstPage">|&lt;</a>
       <a href="javascript: void(0);" @click="gotoPreviousPage">&lt;</a>
       <a href="javascript: void(0);" @click="gotoNextPage">&gt;</a>
@@ -35,11 +37,15 @@
 </template>
 
 <script lang="ts">
+  import Dropdown from './dropdown/Dropdown.vue';
+  import DropdownItemButton from './dropdown/DropdownItemButton.vue';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop, Watch } from 'vue-property-decorator';
 
-  @Component
+  @Component({
+    components: { Dropdown, DropdownItemButton }
+  })
   export default class Paginator extends Vue {
     @Prop({ required: true })
     totalEntries!: number;
@@ -102,4 +108,22 @@
   }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .hue-paginator {
+    width: 100%;
+    height: 25px;
+    text-align: right;
+    padding: 10px 0;
+
+    .page-status {
+      display: inline-block;
+      margin-right: 15px;
+    }
+
+    .navigation-actions {
+      margin-left: 15px;
+      margin-right: 20px;
+      display: inline-block;
+    }
+  }
+</style>
