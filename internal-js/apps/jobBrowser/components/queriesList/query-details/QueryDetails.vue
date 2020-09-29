@@ -22,16 +22,16 @@
       <fixed-anchor-nav :query="query" />
 
       <tabs>
-        <tab title="VISUAL EXPLAIN">
+        <tab title="Visual Explain">
           <VisualExplain :query="query" />
         </tab>
-        <tab title="QUERY INFO">
+        <tab title="Query Info">
           <query-info :query="query" />
         </tab>
-        <tab title="QUERY CONFIG">
+        <tab title="Query Config">
           <query-config :queries="[query]" />
         </tab>
-        <tab title="TIMELINE">
+        <tab title="Timeline">
           <HiveTimeline :perf="query.details.perf" />
         </tab>
       </tabs>
@@ -44,12 +44,12 @@
     >
       <div>Dag {{ index + 1 }} : {{ dag && dag.dagInfo.dagId }}</div>
       <tabs>
-        <tab title="DAG COUNTERS">
+        <tab title="DAG Counters">
           <CountersTable :counters="[{ counters: dag.dagDetails.counters }]" />
         </tab>
-        <tab title="DAG FLOW"><DagGraph :dag="dag" /></tab>
-        <tab title="DAG SWIMLANE"><DagSwimlane :dag="dag" /></tab>
-        <tab title="DAG CONFIGURATIONS"><dag-configs :dag="dag" /></tab>
+        <tab title="DAG Flow"><DagGraph :dag="dag" /></tab>
+        <tab title="DAG Swimlane"><DagSwimlane :dag="dag" /></tab>
+        <tab title="DAG Configurations"><dag-configs :dag="dag" /></tab>
       </tabs>
     </div>
   </div>

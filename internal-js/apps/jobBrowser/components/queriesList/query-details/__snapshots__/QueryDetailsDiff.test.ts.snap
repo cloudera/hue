@@ -7,31 +7,35 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
   >
     <tabs-stub>
       <tab-stub
-        title="VISUAL EXPLAIN"
+        title="Visual Explain"
       >
         <visualexplain-stub
+          class="side-by-side"
           query="[object Object]"
         />
          
         <visualexplain-stub
+          class="side-by-side"
           query="[object Object]"
         />
       </tab-stub>
        
       <tab-stub
-        title="QUERY INFO"
+        title="Query Info"
       >
         <query-info-stub
+          class="side-by-side"
           query="[object Object]"
         />
          
         <query-info-stub
+          class="side-by-side"
           query="[object Object]"
         />
       </tab-stub>
        
       <tab-stub
-        title="QUERY CONFIG"
+        title="Query Config"
       >
         <query-config-stub
           queries="[object Object],[object Object]"
@@ -40,7 +44,7 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
       </tab-stub>
        
       <tab-stub
-        title="TIMELINE"
+        title="Timeline"
       >
         <hivetimeline-stub
           perf="[object Object]"
@@ -65,7 +69,7 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
      
     <tabs-stub>
       <tab-stub
-        title="DAG COUNTERS"
+        title="DAG Counters"
       >
         <counterstable-stub
           counters="[object Object],[object Object]"
@@ -73,19 +77,21 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
       </tab-stub>
        
       <tab-stub
-        title="DAG FLOW"
+        title="DAG Flow"
       >
         <daggraph-stub
+          class="side-by-side"
           dag="[object Object]"
         />
          
         <daggraph-stub
+          class="side-by-side"
           dag="[object Object]"
         />
       </tab-stub>
        
       <tab-stub
-        title="DAG SWIMLANE"
+        title="DAG Swimlane"
       >
         <dagswimlane-stub
           consolidate="true"
@@ -99,7 +105,7 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
       </tab-stub>
        
       <tab-stub
-        title="DAG CONFIGURATIONS"
+        title="DAG Configurations"
       >
         <dag-configs-stub
           dag="[object Object]"

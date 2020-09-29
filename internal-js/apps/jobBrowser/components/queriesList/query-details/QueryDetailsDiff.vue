@@ -20,19 +20,19 @@
   <div>
     <div class="dag-panel">
       <tabs>
-        <tab title="VISUAL EXPLAIN">
+        <tab title="Visual Explain">
           <!-- Can be converted to a loop if we have to compare more than 2 queries. But thats verry unlikely to happen. -->
           <VisualExplain :query="queries[0]" class="side-by-side" />
           <VisualExplain :query="queries[1]" class="side-by-side" />
         </tab>
-        <tab title="QUERY INFO">
+        <tab title="Query Info">
           <query-info :query="queries[0]" class="side-by-side" />
           <query-info :query="queries[1]" class="side-by-side" />
         </tab>
-        <tab title="QUERY CONFIG">
+        <tab title="Query Config">
           <query-config :queries="queries" />
         </tab>
-        <tab title="TIMELINE">
+        <tab title="Timeline">
           <HiveTimeline :perf="queries[0].details.perf" />
           <HiveTimeline :perf="queries[1].details.perf" />
         </tab>
@@ -49,7 +49,7 @@
         {{ dagSet.dagB && dagSet.dagB.dagInfo.dagId }}
       </div>
       <tabs>
-        <tab title="DAG COUNTERS">
+        <tab title="DAG Counters">
           <CountersTable
             :counters="[
               {
@@ -63,15 +63,15 @@
             ]"
           />
         </tab>
-        <tab title="DAG FLOW">
+        <tab title="DAG Flow">
           <DagGraph :dag="dagSet.dagA" class="side-by-side" />
           <DagGraph :dag="dagSet.dagB" class="side-by-side" />
         </tab>
-        <tab title="DAG SWIMLANE">
+        <tab title="DAG Swimlane">
           <DagSwimlane :dag="dagSet.dagA" />
           <DagSwimlane :dag="dagSet.dagB" />
         </tab>
-        <tab title="DAG CONFIGURATIONS">
+        <tab title="DAG Configurations">
           <dag-configs :dag="dagSet.dagA" />
           <dag-configs :dag="dagSet.dagA" />
         </tab>
