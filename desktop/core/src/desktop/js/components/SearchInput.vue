@@ -1,0 +1,143 @@
+<!--
+  Licensed to Cloudera, Inc. under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  Cloudera, Inc. licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<template>
+  <div class="hue-search-input">
+    <div>
+      <i v-if="showMagnify && !spin" style="top: 6px;" class="magnify-icon fa fa-fw fa-search" />
+      <i v-else lass="magnify-icon fa fa-fw fa-spinner fa-spin" />
+      <form autocomplete="off">
+        <!-- attr: { 'placeHolder' : hasFocus() ? '' : placeHolder }, -->
+        <input
+          v-model="query"
+          class="hue-search-input-el"
+          autocorrect="off"
+          autocomplete="do-not-autocomplete"
+          autocapitalize="off"
+          spellcheck="false"
+          type="text"
+          :placeholder="(!hasFocus && placeholder) || ''"
+          :class="{ 'magnify-icon-input': showMagnify }"
+          @focusin="hasFocus = true"
+          @focusout="hasFocus = false"
+          @keyup.enter="$emit('search', query)"
+        />
+        <input
+          v-model="autocomplete"
+          class="hue-search-input-overlay"
+          disabled
+          type="text"
+          autocomplete="do-not-autocomplete"
+          :class="{ 'magnify-icon-input': showMagnify }"
+        />
+      </form>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+  import I18n from '../utils/i18n';
+  import Vue from 'vue';
+  import Component from 'vue-class-component';
+  import { Prop, Watch } from 'vue-property-decorator';
+
+  @Component
+  export default class SearchInput extends Vue {
+    @Prop({ required: false, default: true })
+    showMagnify: boolean;
+    @Prop({ required: false, default: I18n('Search...') })
+    placeholder: string;
+
+    spin = false;
+    query = '';
+    autocomplete = '';
+    throttle = -1;
+    hasFocus = false;
+
+    // TODO: Add autocomplete logic...
+
+    @Watch('query')
+    queryChanged(): void {
+      window.clearTimeout(this.throttle);
+      this.throttle = window.setTimeout(() => {
+        this.$emit('query-changed', this.query);
+      }, 300);
+    }
+  }
+</script>
+
+<style lang="scss" scoped>
+  @import './styles/colors';
+  @import './styles/mixins';
+
+  .hue-search-input {
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    border-radius: $hue-panel-border-radius;
+    border: 1px solid $hue-border-color;
+    background-color: $fluid-white;
+    height: 30px;
+    width: 250px;
+
+    > div {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 30px;
+
+      form {
+        margin: 0;
+      }
+
+      .magnify-icon {
+        position: absolute;
+        left: 10px;
+        top: 7px;
+        font-size: 16px;
+        color: $fluid-gray-700;
+      }
+
+      input {
+        display: block;
+        position: absolute;
+        border: none;
+        box-shadow: none;
+        padding: 5px;
+        margin: 0;
+        font-size: 15px;
+        line-height: 15px;
+        background-color: transparent;
+
+        &.magnify-icon-input {
+          padding-left: 35px;
+        }
+
+        &.hue-search-input-el {
+          z-index: 2;
+        }
+
+        &.hue-search-input-overlay {
+          color: $fluid-gray-500;
+          outline: none;
+          z-index: 1;
+        }
+      }
+    }
+  }
+</style>
