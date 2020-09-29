@@ -19,38 +19,42 @@
 <!-- from table-component.hbs -->
 
 <template>
-  <div class="table-component">
+  <div class="query-table">
     <!-- <queries-search :searches="searches" :table-definition="tableDefinition" /> -->
-    <search-input @search="searchQueryChanged" />
-    <hue-button :disabled="selectedQueries.length !== 2" @click="diffQueries(selectedQueries)">
-      {{ I18n('Compare') }}
-    </hue-button>
-    <div class="left-panel">
-      <template v-if="!columnSelectorIsVisible">
-        <div class="refine-header">
-          Refine
-          <i v-if="!dataProcessor.facets.fieldCount" class="fa fa-spinner fa-pulse fa-fw" />
-          <i class="fa fa-plus" title="Customize" @click="toggleColumnSelector" />
-        </div>
-        <!-- {{em-table-facet-panel tableDefinition=definition dataProcessor=dataProcessor}} -->
-      </template>
-      <column-selector-panel
-        v-else
-        :columns="columns"
-        :visible-columns="visibleColumns"
-        @update:visible-columns="updateVisibleColumns"
-        @close="toggleColumnSelector"
-      />
+    <div class="query-table-actions">
+      <search-input @search="searchQueryChanged" />
+      <hue-button @click="toggleColumnSelector">
+        {{ I18n('Columns') }}
+      </hue-button>
+      <hue-button
+        class="compare-button"
+        :disabled="selectedQueries.length !== 2"
+        @click="diffQueries(selectedQueries)"
+      >
+        {{ I18n('Compare') }}
+      </hue-button>
     </div>
-    <div class="table" style="width: 100%; overflow-x: auto;">
-      <hue-table :columns="visibleColumns" :rows="queries">
-        <template #cell-select="query">
-          <input v-model="selectedQueries" type="checkbox" :value="query" />
-        </template>
-        <template #cell-query="query">
-          <hue-link @click="querySelected(query)">{{ query.query }}</hue-link>
-        </template>
-      </hue-table>
+    <div class="query-table-container">
+      <div v-if="columnSelectorIsVisible" class="query-table-left-panel">
+        <column-selector-panel
+          :columns="columns"
+          :visible-columns="visibleColumns"
+          @update:visible-columns="updateVisibleColumns"
+          @close="toggleColumnSelector"
+        />
+      </div>
+      <div class="query-table-right-panel">
+        <div class="table">
+          <hue-table :columns="visibleColumns" :rows="queries">
+            <template #cell-select="query">
+              <input v-model="selectedQueries" type="checkbox" :value="query" />
+            </template>
+            <template #cell-query="query">
+              <hue-link @click="querySelected(query)">{{ query.query }}</hue-link>
+            </template>
+          </hue-table>
+        </div>
+      </div>
     </div>
     <paginator
       ref="paginator"
@@ -229,4 +233,37 @@
   }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .query-table {
+    .query-table-actions {
+      margin-bottom: 20px;
+      width: 100%;
+
+      button {
+        margin-left: 15px;
+      }
+
+      .compare-button {
+        float: right;
+      }
+    }
+    .query-table-container {
+      display: flex;
+      flex-direction: row;
+
+      .query-table-left-panel {
+        flex: 0 0 100px;
+      }
+
+      .query-table-right-panel {
+        flex: 1 1 100%;
+        max-width: 100%;
+
+        .table {
+          width: 100%;
+          overflow-x: auto;
+        }
+      }
+    }
+  }
+</style>

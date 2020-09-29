@@ -2,49 +2,49 @@
 
 exports[`QueryTable.vue should render 1`] = `
 <div
-  class="table-component"
+  class="query-table"
 >
-  <search-input-stub
-    placeholder="Search..."
-    showmagnify="true"
-  />
-   
-  <hue-button-stub
-    disabled="true"
-  >
-    
-    Compare
-  
-  </hue-button-stub>
-   
   <div
-    class="left-panel"
+    class="query-table-actions"
   >
-    <div
-      class="refine-header"
+    <search-input-stub
+      placeholder="Search..."
+      showmagnify="true"
+    />
+     
+    <hue-button-stub>
+      
+      Columns
+    
+    </hue-button-stub>
+     
+    <hue-button-stub
+      class="compare-button"
+      disabled="true"
     >
       
-        Refine
-        
-      <i
-        class="fa fa-spinner fa-pulse fa-fw"
-      />
-       
-      <i
-        class="fa fa-plus"
-        title="Customize"
-      />
-    </div>
+      Compare
+    
+    </hue-button-stub>
   </div>
    
   <div
-    class="table"
-    style="width: 100%; overflow-x: auto;"
+    class="query-table-container"
   >
-    <hue-table-stub
-      columns=""
-      rows=""
-    />
+    <!---->
+     
+    <div
+      class="query-table-right-panel"
+    >
+      <div
+        class="table"
+      >
+        <hue-table-stub
+          columns=""
+          rows=""
+        />
+      </div>
+    </div>
   </div>
    
   <paginator-stub
