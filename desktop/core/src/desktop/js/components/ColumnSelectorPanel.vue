@@ -17,8 +17,7 @@
 -->
 
 <template>
-  <div>
-    Columns <i class="fa fa-times" title="Close" @click="$emit('close')" />
+  <div class="column-selector-panel">
     <ul class="column-list">
       <li>
         <input v-model="filterText" type="text" class="filter-box" placeholder="Filter" />
@@ -31,45 +30,52 @@
       </li>
     </ul>
 
-    <div class="buttons">
-      <button type="button" class="btn btn-default" @click="apply">
+    <div class="column-selector-actions">
+      <hue-button type="button" @click="apply">
         Apply
-      </button>
+      </hue-button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+  import HueButton from './HueButton.vue';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
   import { Column } from 'components/HueTable';
 
   interface SelectableColumn {
-    column: Column;
+    column: Column<unknown>;
     checked: boolean;
   }
 
-  @Component
+  @Component({
+    components: { HueButton }
+  })
   export default class ColumnSelectorPanel extends Vue {
     @Prop({ required: true })
-    columns!: Column[];
+    columns!: Column<unknown>[];
     @Prop({ required: true })
-    visibleColumns!: Column[];
+    visibleColumns!: Column<unknown>[];
 
     get selectableColumns(): SelectableColumn[] {
-      const visibleColsSet = new Set<Column>(this.visibleColumns);
+      const visibleColsSet = new Set<Column<unknown>>(this.visibleColumns);
       return this.columns.map(column => ({ column, checked: visibleColsSet.has(column) }));
     }
 
     filterText = '';
 
+    get columnsWithLabels(): SelectableColumn[] {
+      return this.selectableColumns.filter(column => column.column.label);
+    }
+
     get filteredColumns(): SelectableColumn[] {
       if (!this.filterText) {
-        return this.selectableColumns;
+        return this.columnsWithLabels;
       }
       const lowerFilter = this.filterText.toLowerCase();
-      return this.selectableColumns.filter(
+      return this.columnsWithLabels.filter(
         col => col.column.label.toLowerCase().indexOf(lowerFilter) !== -1
       );
     }
@@ -85,4 +91,18 @@
   }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .column-selector-panel {
+    padding: 15px;
+
+    ul {
+      list-style: none;
+      margin: 0;
+    }
+
+    .column-selector-actions {
+      margin-top: 10px;
+      text-align: right;
+    }
+  }
+</style>

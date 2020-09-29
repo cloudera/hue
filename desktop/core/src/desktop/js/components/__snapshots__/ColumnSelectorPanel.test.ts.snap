@@ -1,14 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ColumnSelectorPanel.vue should render 1`] = `
-<div>
-  
-  Columns 
-  <i
-    class="fa fa-times"
-    title="Close"
-  />
-   
+<div
+  class="column-selector-panel"
+>
   <ul
     class="column-list"
   >
@@ -23,29 +18,23 @@ exports[`ColumnSelectorPanel.vue should render 1`] = `
   </ul>
    
   <div
-    class="buttons"
+    class="column-selector-actions"
   >
-    <button
-      class="btn btn-default"
+    <hue-button-stub
       type="button"
     >
       
       Apply
     
-    </button>
+    </hue-button-stub>
   </div>
 </div>
 `;
 
 exports[`ColumnSelectorPanel.vue should render with checkboxes 1`] = `
-<div>
-  
-  Columns 
-  <i
-    class="fa fa-times"
-    title="Close"
-  />
-   
+<div
+  class="column-selector-panel"
+>
   <ul
     class="column-list"
   >
@@ -80,16 +69,15 @@ exports[`ColumnSelectorPanel.vue should render with checkboxes 1`] = `
   </ul>
    
   <div
-    class="buttons"
+    class="column-selector-actions"
   >
-    <button
-      class="btn btn-default"
+    <hue-button-stub
       type="button"
     >
       
       Apply
     
-    </button>
+    </hue-button-stub>
   </div>
 </div>
 `;
