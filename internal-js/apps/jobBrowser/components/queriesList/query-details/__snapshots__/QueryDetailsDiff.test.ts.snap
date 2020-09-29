@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`QueryDiff.vue should render 1`] = `
+exports[`QueryDetailsDiff.vue should render 1`] = `
 <div
   class="query-diff"
 >

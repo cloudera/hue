@@ -15,13 +15,13 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
-import QueryDiff from './QueryDiff.vue';
+import QueryDetailsDiff from './QueryDetailsDiff.vue';
 
 import queryMockResponse from '../test/api/hive_query_get_response_3.json';
 
-describe('QueryDiff.vue', () => {
+describe('QueryDetailsDiff.vue', () => {
   it('should render', () => {
-    const wrapper = shallowMount(QueryDiff, {
+    const wrapper = shallowMount(QueryDetailsDiff, {
       propsData: {
         queries: [queryMockResponse.query, queryMockResponse.query]
       }

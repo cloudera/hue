@@ -40,7 +40,17 @@
       <!-- {{/bs-tab}} -->
     </div>
 
-    <dag-details v-for="dag in query.dags" :key="dag.dagInfo.id" :dag="dag" />
+    <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="target detail-panel dag-panel">
+      <div>{{ dag && dag.dagInfo.dagId }}</div>
+      <tabs>
+        <tab title="DAG COUNTERS">
+          <CountersTable :counters="[{ counters: dag.dagDetails.counters }]" />
+        </tab>
+        <tab title="DAG FLOW"><DagGraph :dag="dag" /></tab>
+        <tab title="DAG SWIMLANE"><DagSwimlane :dag="dag" /></tab>
+        <tab title="DAG CONFIGURATIONS"><dag-configs :dag="dag" /></tab>
+      </tabs>
+    </div>
   </div>
 </template>
 
@@ -51,10 +61,14 @@
   import Tabs from '../../../../../../desktop/core/src/desktop/js/components/Tabs.vue';
   import FixedAnchorNav from './FixedAnchorNav.vue';
   import QueryTimeline from './QueryTimeline.vue';
-  import DagDetails from './DagDetails.vue';
   import QueryConfig from './QueryConfig.vue';
   import QueryInfo from './QueryInfo.vue';
   import VisualExplain from './visual-explain/VisualExplain.vue';
+
+  import DagConfigs from './DagConfigs.vue';
+  import CountersTable from './counters-table/CountersTable.vue';
+  import DagGraph from './dag-graph/DagGraph.vue';
+  import DagSwimlane from './dag-swimlane/DagSwimlane.vue';
 
   @Component({
     components: {
@@ -62,10 +76,14 @@
       Tabs,
       FixedAnchorNav,
       QueryTimeline,
-      DagDetails,
       QueryConfig,
       VisualExplain,
-      QueryInfo
+      QueryInfo,
+
+      DagConfigs,
+      CountersTable,
+      DagGraph,
+      DagSwimlane
     }
   })
   export default class QueryDetails extends SingleQueryComponent {}

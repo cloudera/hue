@@ -27,7 +27,7 @@
       @page-changed="fetch"
     />
     <query-details v-else-if="selectedQuery" :query="selectedQuery" />
-    <query-diff v-else :queries="queriesToDiff" />
+    <QueryDetailsDiff v-else :queries="queriesToDiff" />
   </div>
 </template>
 
@@ -38,13 +38,13 @@
   import HumanByteSize from '../../../../../desktop/core/src/desktop/js/components/HumanByteSize.vue';
   import TimeAgo from '../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
   import { fetchExtendedQuery, search } from './apiUtils';
-  import QueryDiff from './queryDiff/QueryDiff.vue';
+  import QueryDetailsDiff from './query-details/QueryDetailsDiff.vue';
   import QueryDetails from './query-details/QueryDetails.vue';
   import { Query, SearchMeta } from './index';
   import QueryTable from './queryTable/QueryTable.vue';
 
   @Component({
-    components: { QueryDiff, QueryDetails, QueryTable, TimeAgo, HumanByteSize }
+    components: { QueryDetailsDiff, QueryDetails, QueryTable, TimeAgo, HumanByteSize }
   })
   export default class QueriesList extends Vue {
     selectedQuery: Query | null = null;
