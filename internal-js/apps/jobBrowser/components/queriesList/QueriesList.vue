@@ -27,7 +27,7 @@
       @search="fetch"
     />
     <query-details v-else-if="selectedQuery" :query="selectedQuery" />
-    <QueryDetailsDiff v-else :queries="queriesToDiff" />
+    <query-details-diff v-else :queries="queriesToDiff" />
   </div>
 </template>
 
@@ -35,6 +35,7 @@
   import { Page } from 'components/Paginator';
   import Vue from 'vue';
   import Component from 'vue-class-component';
+  import { Provide } from 'vue-property-decorator';
   import HumanByteSize from '../../../../../desktop/core/src/desktop/js/components/HumanByteSize.vue';
   import TimeAgo from '../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
   import { fetchExtendedQuery, search } from './apiUtils';
@@ -68,7 +69,8 @@
       this.queries = searchResponse.queries;
     }
 
-    showTable(): void {
+    @Provide()
+    showQueries(): void {
       this.selectedQuery = null;
       this.queriesToDiff = null;
     }

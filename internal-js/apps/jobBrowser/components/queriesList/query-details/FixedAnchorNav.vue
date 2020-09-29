@@ -17,28 +17,32 @@
 -->
 
 <template>
-  <div>
-    <a href="javascript: void(0);" class="btn btn-success btn-sm">Queries (implement)</a>
+  <div class="buttons">
+    <hue-button @click="showQueries">Queries</hue-button>
+    <template v-if="!query.isComplete">
+      <hue-button v-if="stoppingQuery">
+        <i class="fa fa-spinner fa-pulse fa-fw" /> Stopping query
+      </hue-button>
+      <hue-button v-else @click="stopQuery">Stop</hue-button>
+    </template>
 
-    <div class="buttons">
-      <template v-if="!query.isComplete">
-        <button v-if="stoppingQuery" type="button" class="btn btn-default btn-sm disabled">
-          <i class="fa fa-spinner fa-pulse fa-fw" /> Stopping query
-        </button>
-        <button v-else type="button" class="btn btn-warning btn-sm" @click="stopQuery">Stop</button>
-      </template>
-
-      <button type="button" class="btn btn-success btn-sm" @click="downloadLogs">DOWNLOAD</button>
-    </div>
+    <hue-button @click="downloadLogs">Download</hue-button>
   </div>
 </template>
 
 <script lang="ts">
+  import { Inject } from 'vue-property-decorator';
+  import HueButton from '../../../../../../desktop/core/src/desktop/js/components/HueButton.vue';
   import Component from 'vue-class-component';
   import SingleQueryComponent from './SingleQueryComponent.vue';
 
-  @Component
+  @Component({
+    components: { HueButton }
+  })
   export default class FixedAnchorNav extends SingleQueryComponent {
+    @Inject()
+    showQueries?: () => void;
+
     stoppingQuery = false;
 
     stopQuery(): void {
