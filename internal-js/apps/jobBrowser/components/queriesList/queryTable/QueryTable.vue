@@ -42,7 +42,7 @@
         @close="toggleColumnSelector"
       />
     </div>
-    <div class="table">
+    <div class="table" style="width: 100%; overflow-x: auto;">
       <hue-table :columns="visibleColumns" :rows="queries">
         <template #cell-select="query">
           <input v-model="selectedQueries" type="checkbox" :value="query" />

@@ -39,6 +39,7 @@ exports[`QueryTable.vue should render 1`] = `
    
   <div
     class="table"
+    style="width: 100%; overflow-x: auto;"
   >
     <hue-table-stub
       columns=""
