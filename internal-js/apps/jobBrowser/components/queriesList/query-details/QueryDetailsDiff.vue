@@ -22,12 +22,12 @@
       <tabs>
         <tab title="VISUAL EXPLAIN">
           <!-- Can be converted to a loop if we have to compare more than 2 queries. But thats verry unlikely to happen. -->
-          <VisualExplain :query="queries[0]" />
-          <VisualExplain :query="queries[1]" />
+          <VisualExplain :query="queries[0]" class="side-by-side" />
+          <VisualExplain :query="queries[1]" class="side-by-side" />
         </tab>
         <tab title="QUERY INFO">
-          <query-info :query="queries[0]" />
-          <query-info :query="queries[1]" />
+          <query-info :query="queries[0]" class="side-by-side" />
+          <query-info :query="queries[1]" class="side-by-side" />
         </tab>
         <tab title="QUERY CONFIG">
           <query-config :queries="queries" />
@@ -64,8 +64,8 @@
           />
         </tab>
         <tab title="DAG FLOW">
-          <DagGraph :dag="dagSet.dagA" />
-          <DagGraph :dag="dagSet.dagB" />
+          <DagGraph :dag="dagSet.dagA" class="side-by-side" />
+          <DagGraph :dag="dagSet.dagB" class="side-by-side" />
         </tab>
         <tab title="DAG SWIMLANE">
           <DagSwimlane :dag="dagSet.dagA" />
@@ -143,5 +143,9 @@
 <style lang="scss" scoped>
   .query-search {
     color: #0a78a3;
+  }
+  .side-by-side {
+    display: inline-block;
+    width: calc(50% - 5px);
   }
 </style>
