@@ -17,11 +17,13 @@
 import { shallowMount } from '@vue/test-utils';
 import QueryDetails from './QueryDetails.vue';
 
+import queryMockResponse from '../test/api/hive_query_get_response_3.json';
+
 describe('QueryDetails.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(QueryDetails, {
       propsData: {
-        query: {}
+        query: queryMockResponse.query
       }
     });
     expect(wrapper.element).toMatchSnapshot();

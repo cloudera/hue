@@ -20,7 +20,6 @@
   <div>
     <div class="dag-panel">
       <fixed-anchor-nav :query="query" />
-      <!-- {{#bs-tab fade=false as |tab|}} -->
 
       <tabs>
         <tab title="VISUAL EXPLAIN">
@@ -33,15 +32,17 @@
           <query-config :queries="[query]" />
         </tab>
         <tab title="TIMELINE">
-          <query-timeline :queries="[query]" />
+          <HiveTimeline :perf="query.details.perf" />
         </tab>
       </tabs>
-
-      <!-- {{/bs-tab}} -->
     </div>
 
-    <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="target detail-panel dag-panel">
-      <div>{{ dag && dag.dagInfo.dagId }}</div>
+    <div
+      v-for="(dag, index) in query.dags"
+      :key="dag.dagInfo.id"
+      class="target detail-panel dag-panel"
+    >
+      <div>Dag {{ index + 1 }} : {{ dag && dag.dagInfo.dagId }}</div>
       <tabs>
         <tab title="DAG COUNTERS">
           <CountersTable :counters="[{ counters: dag.dagDetails.counters }]" />
@@ -55,12 +56,12 @@
 </template>
 
 <script lang="ts">
-  import Component from 'vue-class-component';
-  import SingleQueryComponent from './SingleQueryComponent.vue';
+  import { Component, Prop, Vue } from 'vue-property-decorator';
+
   import Tab from '../../../../../../desktop/core/src/desktop/js/components/Tab.vue';
   import Tabs from '../../../../../../desktop/core/src/desktop/js/components/Tabs.vue';
   import FixedAnchorNav from './FixedAnchorNav.vue';
-  import QueryTimeline from './QueryTimeline.vue';
+  import HiveTimeline from './hive-timeline/HiveTimeline.vue';
   import QueryConfig from './QueryConfig.vue';
   import QueryInfo from './QueryInfo.vue';
   import VisualExplain from './visual-explain/VisualExplain.vue';
@@ -70,12 +71,14 @@
   import DagGraph from './dag-graph/DagGraph.vue';
   import DagSwimlane from './dag-swimlane/DagSwimlane.vue';
 
+  import { Query } from '..';
+
   @Component({
     components: {
       Tab,
       Tabs,
       FixedAnchorNav,
-      QueryTimeline,
+      HiveTimeline,
       QueryConfig,
       VisualExplain,
       QueryInfo,
@@ -86,7 +89,9 @@
       DagSwimlane
     }
   })
-  export default class QueryDetails extends SingleQueryComponent {}
+  export default class QueryDetails extends Vue {
+    @Prop({ required: true }) query!: Query;
+  }
 </script>
 
 <style lang="scss" scoped>

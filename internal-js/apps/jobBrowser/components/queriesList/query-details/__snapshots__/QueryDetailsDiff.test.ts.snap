@@ -1,86 +1,74 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`QueryDetailsDiff.vue should render 1`] = `
-<div
-  class="query-diff"
->
+<div>
   <div
-    style="clear: both;"
-  />
-   
-  <div
-    class="target"
-    id="query-details"
+    class="dag-panel"
   >
-    <div
-      class="diff-panel"
-    >
-      <query-info-stub
-        query="[object Object]"
-        title="A"
-      />
-    </div>
-     
-    <div
-      class="diff-panel"
-    >
-      <query-info-stub
-        query="[object Object]"
-        title="B"
-      />
-    </div>
-     
-    <div
-      class="query-diff-highlighter"
-      style="clear: both;"
-    >
-      <query-text-diff-stub
-        queryone="select count(*) from product LEFT JOIN productcategories ON product.id = productcategories.id"
-        querytwo="[object Object]"
-      />
-    </div>
+    <tabs-stub>
+      <tab-stub
+        title="VISUAL EXPLAIN"
+      >
+        <visualexplain-stub
+          query="[object Object]"
+        />
+         
+        <visualexplain-stub
+          query="[object Object]"
+        />
+      </tab-stub>
+       
+      <tab-stub
+        title="QUERY INFO"
+      >
+        <query-info-stub
+          query="[object Object]"
+        />
+         
+        <query-info-stub
+          query="[object Object]"
+        />
+      </tab-stub>
+       
+      <tab-stub
+        title="QUERY CONFIG"
+      >
+        <query-config-stub
+          queries="[object Object],[object Object]"
+          title="Configurations"
+        />
+      </tab-stub>
+       
+      <tab-stub
+        title="TIMELINE"
+      >
+        <hivetimeline-stub
+          perf="[object Object]"
+        />
+         
+        <hivetimeline-stub
+          perf="[object Object]"
+        />
+      </tab-stub>
+    </tabs-stub>
   </div>
-   
-  <query-visual-explain-stub
-    queries="[object Object],[object Object]"
-  />
-   
-  <query-config-stub
-    queries="[object Object],[object Object]"
-    title="Configurations"
-  />
-   
-  <query-timeline-stub
-    queries="[object Object],[object Object]"
-  />
    
   <div
     class="target detail-panel dag-panel"
-    id="dag-panel"
   >
-    <div
-      class="row"
-    >
-      <div
-        class="col-xs-6"
-      >
-        <!---->
-      </div>
-       
-      <div
-        class="col-xs-6"
-      >
-        <!---->
-      </div>
+    <div>
+      
+      Dag 1 : dag_1600683331174_0003_2 |
+      dag_1600683331174_0003_2
+    
     </div>
      
     <tabs-stub>
       <tab-stub
-        title="DAG SWIMLANE"
+        title="DAG COUNTERS"
       >
-        <dagswimlane-stub
-          consolidate="true"
-          dag="[object Object]"
+        <counterstable-stub
+          counters="[object Object],[object Object]"
         />
       </tab-stub>
        
@@ -90,13 +78,23 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
         <daggraph-stub
           dag="[object Object]"
         />
+         
+        <daggraph-stub
+          dag="[object Object]"
+        />
       </tab-stub>
        
       <tab-stub
-        title="DAG COUNTERS"
+        title="DAG SWIMLANE"
       >
-        <counterstable-stub
-          counters=""
+        <dagswimlane-stub
+          consolidate="true"
+          dag="[object Object]"
+        />
+         
+        <dagswimlane-stub
+          consolidate="true"
+          dag="[object Object]"
         />
       </tab-stub>
        
@@ -104,7 +102,12 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
         title="DAG CONFIGURATIONS"
       >
         <dag-configs-stub
-          queries="[object Object],[object Object]"
+          dag="[object Object]"
+          title="Configurations"
+        />
+         
+        <dag-configs-stub
+          dag="[object Object]"
           title="Configurations"
         />
       </tab-stub>

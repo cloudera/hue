@@ -17,126 +17,131 @@
 -->
 
 <template>
-  <div class="query-diff">
-    <div style="clear: both;" />
-    <div id="query-details" class="target">
-      <div class="diff-panel">
-        <query-info title="A" :query="queries[0]" />
-      </div>
-      <div class="diff-panel">
-        <query-info title="B" :query="queries[1]" />
-      </div>
-      <div class="query-diff-highlighter" style="clear: both;">
-        <query-text-diff :query-one="queries[0].query" :query-two="queries[1]" />
-      </div>
-    </div>
-    <query-visual-explain :queries="queries" />
-    <query-config :queries="queries" />
-    <query-timeline :queries="queries" />
-    <div v-if="!isDagEmpty()" id="dag-panel" class="target detail-panel dag-panel">
-      <div class="row">
-        <div class="col-xs-6">
-          <select
-            v-if="queries[0].dags && queries[0].dags.length > 1"
-            v-model="selectedDagId1"
-            class="form-control"
-            @change="dagSelected1($event.target.value)"
-          >
-            <option
-              v-for="dag in queries[0].dags"
-              :key="dag.dagInfo.dagId"
-              :value="dag.dagInfo.dagId"
-            >
-              {{ dag.dagInfo.dagId }}
-            </option>
-          </select>
-        </div>
-        <div class="col-xs-6">
-          <select
-            v-if="queries[1].dags && queries[1].dags.length > 1"
-            v-model="selectedDagId2"
-            class="form-control"
-            @change="dagSelected2($event.target.value)"
-          >
-            <option
-              v-for="dag in queries[1].dags"
-              :key="dag.dagInfo.dagId"
-              :value="dag.dagInfo.dagId"
-            >
-              {{ dag.dagInfo.dagId }}
-            </option>
-          </select>
-        </div>
-      </div>
-
-      <!-- {{#bs-tab as |tab|}} -->
+  <div>
+    <div class="dag-panel">
       <tabs>
-        <tab title="DAG SWIMLANE"><DagSwimlane :dag="queries[0].dags[0]" /></tab>
-        <tab title="DAG FLOW"><DagGraph :dag="queries[0].dags[0]" /></tab>
-        <tab title="DAG COUNTERS"><CountersTable :counters="[]" /></tab>
-        <tab title="DAG CONFIGURATIONS"><dag-configs :queries="queries" /></tab>
+        <tab title="VISUAL EXPLAIN">
+          <!-- Can be converted to a loop if we have to compare more than 2 queries. But thats verry unlikely to happen. -->
+          <VisualExplain :query="queries[0]" />
+          <VisualExplain :query="queries[1]" />
+        </tab>
+        <tab title="QUERY INFO">
+          <query-info :query="queries[0]" />
+          <query-info :query="queries[1]" />
+        </tab>
+        <tab title="QUERY CONFIG">
+          <query-config :queries="queries" />
+        </tab>
+        <tab title="TIMELINE">
+          <HiveTimeline :perf="queries[0].details.perf" />
+          <HiveTimeline :perf="queries[1].details.perf" />
+        </tab>
       </tabs>
-      <!-- {{/bs-tab}} -->
+    </div>
+
+    <div
+      v-for="(dagSet, index) in constructDagSets(queries[0], queries[1])"
+      :key="index"
+      class="target detail-panel dag-panel"
+    >
+      <div>
+        Dag {{ index + 1 }} : {{ dagSet.dagA && dagSet.dagA.dagInfo.dagId }} |
+        {{ dagSet.dagB && dagSet.dagB.dagInfo.dagId }}
+      </div>
+      <tabs>
+        <tab title="DAG COUNTERS">
+          <CountersTable
+            :counters="[
+              {
+                title: `DAG : ${dagSet.dagA.dagInfo.dagId}`,
+                counters: dagSet.dagA.dagDetails.counters
+              },
+              {
+                title: `DAG : ${dagSet.dagB.dagInfo.dagId}`,
+                counters: dagSet.dagB.dagDetails.counters
+              }
+            ]"
+          />
+        </tab>
+        <tab title="DAG FLOW">
+          <DagGraph :dag="dagSet.dagA" />
+          <DagGraph :dag="dagSet.dagB" />
+        </tab>
+        <tab title="DAG SWIMLANE">
+          <DagSwimlane :dag="dagSet.dagA" />
+          <DagSwimlane :dag="dagSet.dagB" />
+        </tab>
+        <tab title="DAG CONFIGURATIONS">
+          <dag-configs :dag="dagSet.dagA" />
+          <dag-configs :dag="dagSet.dagA" />
+        </tab>
+      </tabs>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-  import Component from 'vue-class-component';
-  import MultiQueryComponent from './MultiQueryComponent.vue';
-  import QueryVisualExplain from './QueryVisualExplain.vue';
-  import QueryTimeline from './QueryTimeline.vue';
-  import QueryConfig from './QueryConfig.vue';
-  import QueryTextDiff from '../../common/QueryTextDiff.vue';
+  import { Component, Prop, Vue } from 'vue-property-decorator';
+
   import Tab from '../../../../../../desktop/core/src/desktop/js/components/Tab.vue';
   import Tabs from '../../../../../../desktop/core/src/desktop/js/components/Tabs.vue';
+
+  import FixedAnchorNav from './FixedAnchorNav.vue';
+  import HiveTimeline from './hive-timeline/HiveTimeline.vue';
+  import QueryConfig from './QueryConfig.vue';
+  import QueryInfo from './QueryInfo.vue';
+  import VisualExplain from './visual-explain/VisualExplain.vue';
+
   import DagConfigs from './DagConfigs.vue';
   import CountersTable from './counters-table/CountersTable.vue';
   import DagGraph from './dag-graph/DagGraph.vue';
   import DagSwimlane from './dag-swimlane/DagSwimlane.vue';
-  import { Dag } from '../index';
-  import QueryInfo from './QueryInfo.vue';
+
+  import { Dag, Query } from '..';
+
+  interface DagSet {
+    dagA: Dag;
+    dagB: Dag;
+  }
+
+  const constructDagSets = (queryA: Query, queryB: Query): DagSet[] => {
+    const dagSets: DagSet[] = [];
+    const setCount: number = Math.max(queryA.dags.length, queryB.dags.length);
+    for (let i = 0; i < setCount; i++) {
+      dagSets.push({
+        dagA: queryA.dags[i],
+        dagB: queryB.dags[i]
+      });
+    }
+    return dagSets;
+  };
 
   @Component({
     components: {
-      QueryVisualExplain,
-      QueryTimeline,
+      Tab,
+      Tabs,
+      FixedAnchorNav,
+      HiveTimeline,
       QueryConfig,
-      QueryTextDiff,
+      VisualExplain,
+      QueryInfo,
+
       DagConfigs,
       CountersTable,
       DagGraph,
-      DagSwimlane,
-      Tab,
-      Tabs,
-      QueryInfo
+      DagSwimlane
+    },
+    methods: {
+      constructDagSets
     }
   })
-  export default class QueryDetailsDiff extends MultiQueryComponent {
-    selectedDagId1?: string;
-    selectedDagId2?: string;
-
-    constructor() {
-      super();
-      if (this.queries.length !== 2) {
-        throw new Error(`Got ${this.queries.length}, expected 2 for diff.`);
-      }
-    }
-
-    isDagEmpty(): boolean {
-      return false; // TODO: Implement
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    dagSelected1(dag: Dag): void {
-      // TODO: Implement
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    dagSelected2(dag: Dag): void {
-      // TODO: Implement
-    }
+  export default class QueryDetails extends Vue {
+    @Prop({ required: true }) queries!: Query[];
   }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .query-search {
+    color: #0a78a3;
+  }
+</style>
