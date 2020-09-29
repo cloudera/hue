@@ -29,7 +29,7 @@
           <query-info :query="query" />
         </tab>
         <tab title="Query Config">
-          <query-config :queries="[query]" />
+          <ConfigsTable :configs="[{ configs: query.details.configuration }]" />
         </tab>
         <tab title="Timeline">
           <HiveTimeline :perf="query.details.perf" />
@@ -49,7 +49,7 @@
         </tab>
         <tab title="DAG Flow"><DagGraph :dag="dag" /></tab>
         <tab title="DAG Swimlane"><DagSwimlane :dag="dag" /></tab>
-        <tab title="DAG Configurations"><dag-configs :dag="dag" /></tab>
+        <tab title="DAG Configurations"><ConfigsTable :configs="[{ configs: dag.config }]" /></tab>
       </tabs>
     </div>
   </div>
@@ -62,11 +62,10 @@
   import Tabs from '../../../../../../desktop/core/src/desktop/js/components/Tabs.vue';
   import FixedAnchorNav from './FixedAnchorNav.vue';
   import HiveTimeline from './hive-timeline/HiveTimeline.vue';
-  import QueryConfig from './QueryConfig.vue';
+  import ConfigsTable from './configs-table/ConfigsTable.vue';
   import QueryInfo from './QueryInfo.vue';
   import VisualExplain from './visual-explain/VisualExplain.vue';
 
-  import DagConfigs from './DagConfigs.vue';
   import CountersTable from './counters-table/CountersTable.vue';
   import DagGraph from './dag-graph/DagGraph.vue';
   import DagSwimlane from './dag-swimlane/DagSwimlane.vue';
@@ -79,11 +78,10 @@
       Tabs,
       FixedAnchorNav,
       HiveTimeline,
-      QueryConfig,
+      ConfigsTable,
       VisualExplain,
       QueryInfo,
 
-      DagConfigs,
       CountersTable,
       DagGraph,
       DagSwimlane

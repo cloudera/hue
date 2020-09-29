@@ -3,6 +3,9 @@
 exports[`FixedAnchorNav.vue should render 1`] = `
 <div
   class="buttons"
+  showqueries="function showQueries() {
+          return {};
+        }"
 >
   <hue-button-stub>
     Queries

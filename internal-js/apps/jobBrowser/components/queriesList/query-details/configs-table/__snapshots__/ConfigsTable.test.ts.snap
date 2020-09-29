@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ConfigsTable.vue should render 1`] = `
+<div
+  class="table"
+>
+  <huetable-stub
+    columns="[object Object]"
+    rows=""
+  />
+</div>
+`;

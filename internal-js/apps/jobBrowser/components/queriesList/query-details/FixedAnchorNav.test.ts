@@ -21,7 +21,8 @@ describe('FixedAnchorNav.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(FixedAnchorNav, {
       propsData: {
-        query: {}
+        query: {},
+        showQueries: () => ({})
       }
     });
     expect(wrapper.element).toMatchSnapshot();

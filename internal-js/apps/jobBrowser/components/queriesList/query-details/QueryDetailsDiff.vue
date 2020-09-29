@@ -19,6 +19,8 @@
 <template>
   <div>
     <div class="dag-panel">
+      <fixed-anchor-nav :query="queries[0]" />
+
       <tabs>
         <tab title="Visual Explain">
           <!-- Can be converted to a loop if we have to compare more than 2 queries. But thats verry unlikely to happen. -->
@@ -30,7 +32,12 @@
           <query-info :query="queries[1]" class="side-by-side" />
         </tab>
         <tab title="Query Config">
-          <query-config :queries="queries" />
+          <ConfigsTable
+            :configs="[
+              { title: 'Query A', configs: queries[0].details.configuration },
+              { title: 'Query B', configs: queries[1].details.configuration }
+            ]"
+          />
         </tab>
         <tab title="Timeline">
           <HiveTimeline :perf="queries[0].details.perf" />
@@ -72,8 +79,12 @@
           <DagSwimlane :dag="dagSet.dagB" />
         </tab>
         <tab title="DAG Configurations">
-          <dag-configs :dag="dagSet.dagA" />
-          <dag-configs :dag="dagSet.dagA" />
+          <ConfigsTable
+            :configs="[
+              { title: `DAG : ${dagSet.dagA.dagInfo.dagId}`, configs: dagSet.dagA.config },
+              { title: `DAG : ${dagSet.dagB.dagInfo.dagId}`, configs: dagSet.dagA.config }
+            ]"
+          />
         </tab>
       </tabs>
     </div>
@@ -88,11 +99,10 @@
 
   import FixedAnchorNav from './FixedAnchorNav.vue';
   import HiveTimeline from './hive-timeline/HiveTimeline.vue';
-  import QueryConfig from './QueryConfig.vue';
+  import ConfigsTable from './configs-table/ConfigsTable.vue';
   import QueryInfo from './QueryInfo.vue';
   import VisualExplain from './visual-explain/VisualExplain.vue';
 
-  import DagConfigs from './DagConfigs.vue';
   import CountersTable from './counters-table/CountersTable.vue';
   import DagGraph from './dag-graph/DagGraph.vue';
   import DagSwimlane from './dag-swimlane/DagSwimlane.vue';
@@ -122,11 +132,10 @@
       Tabs,
       FixedAnchorNav,
       HiveTimeline,
-      QueryConfig,
+      ConfigsTable,
       VisualExplain,
       QueryInfo,
 
-      DagConfigs,
       CountersTable,
       DagGraph,
       DagSwimlane
