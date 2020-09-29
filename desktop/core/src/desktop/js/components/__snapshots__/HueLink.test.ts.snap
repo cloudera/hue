@@ -2,19 +2,19 @@
 
 exports[`HueLink.vue should not pass href attribute to the a element 1`] = `
 <a
-  href="javsscript:void(0);"
+  href="javascript:void(0);"
 />
 `;
 
 exports[`HueLink.vue should pass attributes to the a element 1`] = `
 <a
-  href="javsscript:void(0);"
+  href="javascript:void(0);"
   target="_blank"
 />
 `;
 
 exports[`HueLink.vue should render a Link 1`] = `
 <a
-  href="javsscript:void(0);"
+  href="javascript:void(0);"
 />
 `;

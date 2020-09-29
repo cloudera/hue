@@ -19,15 +19,19 @@ exports[`Paginator.vue should render 1`] = `
     text="25"
   >
     <dropdown-item-button-stub>
+      
       25
+    
     </dropdown-item-button-stub>
-     
     <dropdown-item-button-stub>
+      
       50
+    
     </dropdown-item-button-stub>
-     
     <dropdown-item-button-stub>
+      
       100
+    
     </dropdown-item-button-stub>
   </dropdown-stub>
    

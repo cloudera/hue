@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <a href="javsscript:void(0);" @click="clicked"><slot /></a>
+  <a href="javascript:void(0);" @click="clicked"><slot /></a>
 </template>
 
 <script lang="ts">
