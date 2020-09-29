@@ -23,9 +23,13 @@
     </div>
     Rows per page:
     <dropdown :inline="true" :text="limit">
-      <dropdown-item-button @click="setLimit(25)">25</dropdown-item-button>
-      <dropdown-item-button @click="setLimit(50)">50</dropdown-item-button>
-      <dropdown-item-button @click="setLimit(100)">100</dropdown-item-button>
+      <dropdown-item-button
+        v-for="presetLimit of presetLimits"
+        :key="presetLimit"
+        @click="setLimit(presetLimit)"
+      >
+        {{ presetLimit }}
+      </dropdown-item-button>
     </dropdown>
     <div class="navigation-actions">
       <a href="javascript: void(0);" @click="gotoFirstPage">|&lt;</a>
@@ -43,6 +47,9 @@
   import Component from 'vue-class-component';
   import { Prop, Watch } from 'vue-property-decorator';
 
+  const DEFAULT_LIMIT = 25;
+  const PRESET_LIMITS = [DEFAULT_LIMIT, 50, 100];
+
   @Component({
     components: { Dropdown, DropdownItemButton }
   })
@@ -51,7 +58,8 @@
     totalEntries!: number;
 
     currentPage = 1;
-    limit = 25;
+    limit = DEFAULT_LIMIT;
+    presetLimits = PRESET_LIMITS;
 
     mounted(): void {
       this.notifyPageChanged();
