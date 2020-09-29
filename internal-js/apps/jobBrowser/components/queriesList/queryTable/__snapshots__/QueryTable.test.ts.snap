@@ -4,10 +4,13 @@ exports[`QueryTable.vue should render 1`] = `
 <div
   class="table-component"
 >
-  <queries-search-stub
-    searches=""
-    tabledefinition="[object Object]"
-  />
+  <hue-button-stub
+    disabled="true"
+  >
+    
+    Compare
+  
+  </hue-button-stub>
    
   <div
     class="left-panel"

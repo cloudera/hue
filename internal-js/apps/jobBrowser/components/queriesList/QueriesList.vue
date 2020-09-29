@@ -72,8 +72,11 @@
       this.queriesToDiff = null;
     }
 
-    diffQueries(queries: Query[]): void {
-      this.queriesToDiff = queries;
+    async diffQueries(queriesToDiff: Query[]): Promise<void> {
+      const fetchPromises = queriesToDiff.map(query =>
+        fetchExtendedQuery({ queryId: query.queryId })
+      );
+      this.queriesToDiff = await Promise.all(fetchPromises);
     }
 
     async querySelected(query: Query): Promise<void> {

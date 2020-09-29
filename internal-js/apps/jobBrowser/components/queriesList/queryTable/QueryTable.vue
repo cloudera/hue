@@ -20,7 +20,10 @@
 
 <template>
   <div class="table-component">
-    <queries-search :searches="searches" :table-definition="tableDefinition" />
+    <!-- <queries-search :searches="searches" :table-definition="tableDefinition" /> -->
+    <hue-button :disabled="selectedQueries.length !== 2" @click="diffQueries(selectedQueries)">
+      {{ I18n('Compare') }}
+    </hue-button>
     <div class="left-panel">
       <template v-if="!columnSelectorIsVisible">
         <div class="refine-header">
@@ -40,6 +43,9 @@
     </div>
     <div class="table">
       <hue-table :columns="visibleColumns" :rows="queries">
+        <template #cell-select="query">
+          <input v-model="selectedQueries" type="checkbox" :value="query" />
+        </template>
         <template #cell-query="query">
           <hue-link @click="querySelected(query)">{{ query.query }}</hue-link>
         </template>
@@ -51,11 +57,13 @@
 
 <script lang="ts">
   import { Page } from 'components/Paginator';
+  import I18n from '../../../../../../desktop/core/src/desktop/js/utils/i18n';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
   import { duration } from '../../../../../../desktop/core/src/desktop/js/components/Duration.vue';
   import { humanSize } from '../../../../../../desktop/core/src/desktop/js/components/HumanByteSize.vue';
+  import HueButton from '../../../../../../desktop/core/src/desktop/js/components/HueButton.vue';
   import HueLink from '../../../../../../desktop/core/src/desktop/js/components/HueLink.vue';
   import { timeAgo } from '../../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
   import HueTable from '../../../../../../desktop/core/src/desktop/js/components/HueTable.vue';
@@ -68,11 +76,15 @@
 
   @Component({
     components: {
+      HueButton,
       HueLink,
       HueTable,
       ColumnSelectorPanel,
       QueriesSearch,
       Paginator
+    },
+    methods: {
+      I18n: I18n
     }
   })
   export default class QueryTable extends Vue {
@@ -84,8 +96,10 @@
     searches: Search[] = [];
     visibleColumns: Column<Query>[] = [];
     columnSelectorIsVisible = false;
+    selectedQueries: Query[] = [];
 
     columns: Column<Query>[] = [
+      { key: 'select', label: '' },
       { key: 'status', label: 'Status' },
       { key: 'query', label: 'Query' },
       { key: 'queueName', label: 'Queue' },
