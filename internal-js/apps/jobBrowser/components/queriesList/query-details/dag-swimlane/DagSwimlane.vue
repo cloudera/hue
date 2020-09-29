@@ -70,7 +70,7 @@
   /* eslint-disable  @typescript-eslint/no-explicit-any */
   /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
 
-  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+  import { Component, Prop, Vue } from 'vue-property-decorator';
   import { Dag } from '../../index';
 
   import ProcessName from './components/ProcessName.vue';

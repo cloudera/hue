@@ -88,7 +88,8 @@
     }
   })
   export default class QueryDetails extends Vue {
-    @Prop({ required: true }) query!: Query;
+    @Prop({ required: true })
+    query!: Query;
   }
 </script>
 
