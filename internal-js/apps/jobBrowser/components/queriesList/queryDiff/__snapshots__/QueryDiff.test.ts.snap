@@ -35,6 +35,7 @@ exports[`QueryDiff.vue should render 1`] = `
       style="clear: both;"
     >
       <query-text-diff-stub
+        queryone="select count(*) from product LEFT JOIN productcategories ON product.id = productcategories.id"
         querytwo="[object Object]"
       />
     </div>
@@ -79,13 +80,16 @@ exports[`QueryDiff.vue should render 1`] = `
       >
         <dagswimlane-stub
           consolidate="true"
+          dag="[object Object]"
         />
       </tab-stub>
        
       <tab-stub
         title="DAG FLOW"
       >
-        <daggraph-stub />
+        <daggraph-stub
+          dag="[object Object]"
+        />
       </tab-stub>
        
       <tab-stub

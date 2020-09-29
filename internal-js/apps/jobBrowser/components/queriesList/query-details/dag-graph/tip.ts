@@ -16,6 +16,9 @@
  * limitations under the License.
  */
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable  @typescript-eslint/explicit-module-boundary-types*/
+
 import debounce from '../../../../../../common/debounce';
 
 /**
@@ -82,6 +85,7 @@ export default {
   init(tipElement: any, svg: any): void {
     _element = tipElement;
     _bubble = _element.querySelector('.bubble');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _svg = svg;
     _svgPoint = svg.createSVGPoint();
   },
@@ -108,6 +112,10 @@ export default {
    */
   show(node: any, data: any, event: MouseEvent): void {
     let point: any = data.position;
+
+    if (!_element) {
+      return;
+    }
 
     if (!point) {
       point = node.getScreenCTM
@@ -168,6 +176,10 @@ export default {
    * Hide the tooltip.
    */
   hide(): void {
+    if (!_element) {
+      return;
+    }
+
     _data = _node = null;
     _element.classList.remove('show');
   }

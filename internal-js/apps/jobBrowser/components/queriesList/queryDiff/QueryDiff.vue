@@ -71,8 +71,8 @@
 
       <!-- {{#bs-tab as |tab|}} -->
       <tabs>
-        <tab title="DAG SWIMLANE"><DagSwimlane :dag="null" /></tab>
-        <tab title="DAG FLOW"><DagGraph /></tab>
+        <tab title="DAG SWIMLANE"><DagSwimlane :dag="queries[0].dags[0]" /></tab>
+        <tab title="DAG FLOW"><DagGraph :dag="queries[0].dags[0]" /></tab>
         <tab title="DAG COUNTERS"><dag-counters /></tab>
         <tab title="DAG CONFIGURATIONS"><dag-configs :queries="queries" /></tab>
       </tabs>

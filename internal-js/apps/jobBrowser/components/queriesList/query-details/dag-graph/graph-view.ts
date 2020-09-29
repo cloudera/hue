@@ -16,6 +16,9 @@
  * limitations under the License.
  */
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable  @typescript-eslint/explicit-module-boundary-types*/
+
 import { DateTime } from 'luxon';
 import d3 from 'd3v3';
 import { get } from 'lodash';
@@ -518,6 +521,7 @@ export default function createGraphView() {
    * @param node {D3 element} Element that was clicked
    */
   function _scheduledClick(d: DataNode, node: any) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     node = node.correspondingUseElement || node;
 
     // TODO: Emit click action -------------------------------------------------------------------------------------------------------------
@@ -870,7 +874,7 @@ export default function createGraphView() {
       container.parentElement.classList.add('panning');
     });
 
-    container.addEventListener('mouseup', (event: MouseEvent) => {
+    container.addEventListener('mouseup', () => {
       container.removeEventListener('mousemove', onMouseMove);
       container.parentElement.classList.remove('panning');
 
@@ -941,7 +945,7 @@ export default function createGraphView() {
       _svg = svg.node();
       _tip = Tip;
 
-      _tip.init(element.querySelector('.tool-tip'), _svg);
+      //_tip.init(element.querySelector('.tool-tip'), _svg);
 
       _treeData = data.tree;
       _treeData.x0 = 0;

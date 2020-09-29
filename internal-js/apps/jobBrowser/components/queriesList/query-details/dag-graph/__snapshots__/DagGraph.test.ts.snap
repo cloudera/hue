@@ -201,6 +201,236 @@ exports[`DagGraph.vue should render 1`] = `
           </femerge>
         </filter>
       </defs>
+      <g
+        transform="translate(30,30)"
+      >
+        <path
+          class="link "
+          d="M 0 0 Q 0 0 0 0 Q 0 0 0 0"
+          style="marker-mid: url(/hue#arrow-marker);"
+        />
+        <path
+          class="link scatter_gather"
+          d="M 0 0 Q 0 0 0 0 Q 0 0 0 0"
+          style="marker-mid: url(/hue#arrow-marker);"
+        />
+        <path
+          class="link broadcast"
+          d="M 0 0 Q 0 0 0 0 Q 0 0 0 0"
+          style="marker-mid: url(/hue#arrow-marker);"
+        />
+        <path
+          class="link "
+          d="M 0 0 Q 0 0 0 0 Q 0 0 0 0"
+          style="marker-mid: url(/hue#arrow-marker);"
+        />
+        <path
+          class="link "
+          d="M 0 0 Q 0 0 0 0 Q 0 0 0 0"
+          style="marker-mid: url(/hue#arrow-marker);"
+        />
+        <g
+          style="opacity: 0.000001;"
+          transform="translate(0,0)"
+        />
+        <g
+          class="node output"
+          style="opacity: 0.000001;"
+          transform="translate(0,0)"
+        >
+          <use
+            href="#output-bg"
+          />
+          <text
+            class="title"
+          >
+            out_Reducer..
+          </text>
+        </g>
+        <g
+          style="opacity: 0.000001;"
+          transform="translate(0,0)"
+        />
+        <g
+          class="node vertex"
+          style="opacity: 0.000001;"
+          transform="translate(0,0)"
+        >
+          <use
+            href="#vertex-bg"
+          />
+          <text
+            class="title"
+          >
+            Reducer 2
+          </text>
+          <g
+            class="status-bar"
+          >
+            <foreignobject
+              class="status"
+              height="15"
+              width="70"
+            >
+              <span
+                class="msg-container"
+              >
+                SUCCEEDED
+              </span>
+            </foreignobject>
+          </g>
+          <g
+            class="task-bubble"
+          >
+            <use
+              href="#task-bubble"
+            />
+            <text>
+              1
+            </text>
+          </g>
+          <g
+            class="io-bubble"
+          >
+            <use
+              href="#io-bubble"
+            />
+            <text>
+              0/1
+            </text>
+          </g>
+        </g>
+        <g
+          class="node vertex"
+          style="opacity: 0.000001;"
+          transform="translate(0,0)"
+        >
+          <use
+            href="#vertex-bg"
+          />
+          <text
+            class="title"
+          >
+            Map 1
+          </text>
+          <g
+            class="status-bar"
+          >
+            <foreignobject
+              class="status"
+              height="15"
+              width="70"
+            >
+              <span
+                class="msg-container"
+              >
+                SUCCEEDED
+              </span>
+            </foreignobject>
+          </g>
+          <g
+            class="task-bubble"
+          >
+            <use
+              href="#task-bubble"
+            />
+            <text>
+              0
+            </text>
+          </g>
+          <g
+            class="io-bubble"
+          >
+            <use
+              href="#io-bubble"
+            />
+            <text>
+              1/0
+            </text>
+          </g>
+        </g>
+        <g
+          class="node vertex"
+          style="opacity: 0.000001;"
+          transform="translate(0,0)"
+        >
+          <use
+            href="#vertex-bg"
+          />
+          <text
+            class="title"
+          >
+            Map 3
+          </text>
+          <g
+            class="status-bar"
+          >
+            <foreignobject
+              class="status"
+              height="15"
+              width="70"
+            >
+              <span
+                class="msg-container"
+              >
+                SUCCEEDED
+              </span>
+            </foreignobject>
+          </g>
+          <g
+            class="task-bubble"
+          >
+            <use
+              href="#task-bubble"
+            />
+            <text>
+              0
+            </text>
+          </g>
+          <g
+            class="io-bubble"
+          >
+            <use
+              href="#io-bubble"
+            />
+            <text>
+              1/0
+            </text>
+          </g>
+        </g>
+        <g
+          class="node input"
+          style="opacity: 0.000001;"
+          transform="translate(0,0)"
+        >
+          <use
+            href="#input-bg"
+          />
+          <text
+            class="title"
+          >
+            productcate..
+          </text>
+        </g>
+        <g
+          class="node input"
+          style="opacity: 0.000001;"
+          transform="translate(0,0)"
+        >
+          <use
+            href="#input-bg"
+          />
+          <text
+            class="title"
+          >
+            product
+          </text>
+        </g>
+        <g
+          style="opacity: 0.000001;"
+          transform="translate(0,0)"
+        />
+      </g>
     </svg>
   </div>
    

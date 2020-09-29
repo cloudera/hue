@@ -16,6 +16,9 @@
  * limitations under the License.
  */
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable  @typescript-eslint/explicit-module-boundary-types*/
+
 /**
  * The data processing part of Dag View.
  *
@@ -183,9 +186,6 @@ export class Edge {
  * Abstract class for all types of data nodes
  */
 export abstract class DataNode {
-  get(arg0: string) {
-    throw new Error('Method not implemented.');
-  }
   type: NodeType;
   data: any;
 

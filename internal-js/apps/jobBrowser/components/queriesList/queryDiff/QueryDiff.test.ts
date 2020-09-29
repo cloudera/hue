@@ -15,14 +15,15 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
-import { Query } from '../index';
 import QueryDiff from './QueryDiff.vue';
+
+import queryMockResponse from '../test/api/hive_query_get_response_3.json';
 
 describe('QueryDiff.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(QueryDiff, {
       propsData: {
-        queries: <Query[]>[{}, {}]
+        queries: [queryMockResponse.query, queryMockResponse.query]
       }
     });
     expect(wrapper.element).toMatchSnapshot();
