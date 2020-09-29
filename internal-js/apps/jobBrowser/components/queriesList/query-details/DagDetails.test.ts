@@ -15,16 +15,15 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
-import { Query } from '../index';
 import DagDetails from './DagDetails.vue';
+
+import queryMockResponse from '../test/api/hive_query_get_response_3.json';
 
 describe('DagDetails.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(DagDetails, {
       propsData: {
-        query: <Query>{
-          dags: [{ dagInfo: { dagId: 'dag 1' } }, { dagInfo: { dagId: 'dag 2' } }]
-        }
+        dag: queryMockResponse.query.dags[0]
       }
     });
     expect(wrapper.element).toMatchSnapshot();

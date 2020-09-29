@@ -22,15 +22,15 @@ export interface Dag {
     dagId: string;
   };
   dagDetails: {
-    counters: any[]; // TODO: type?
-    dagPlan: any; // TODO: type?
+    counters: unknown[]; // TODO: type?
+    dagPlan: unknown; // TODO: type?
     diagnostics: string;
     hiveQueryId: number;
     id: number;
     vertexNameIdMapping: { [key: string]: string };
   };
   config?: { [key: string]: string }; // TODO: value always string?
-  vertices: any[]; // TODO: type?
+  vertices: unknown[]; // TODO: type?
 }
 
 export interface Query {
@@ -47,7 +47,7 @@ export interface Query {
     diagnostics?: string;
     perf?: unknown;
     configuration?: { [key: string]: unknown }; // TODO: value type string?
-    explainPlan?: any; // TODO: type?
+    explainPlan?: unknown; // TODO: type?
   };
   domainId?: unknown; // TODO: type?
   duration?: number; // TODO: From API or adaption? number?

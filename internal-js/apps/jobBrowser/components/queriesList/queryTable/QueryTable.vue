@@ -41,7 +41,7 @@
     <div class="table">
       <hue-table :columns="visibleColumns" :rows="queries">
         <template #cell-query="query">
-          <hue-link @click="querySelected">{{ query.query }}</hue-link>
+          <hue-link @click="querySelected(query)">{{ query.query }}</hue-link>
         </template>
       </hue-table>
     </div>
