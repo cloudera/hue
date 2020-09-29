@@ -24,6 +24,11 @@ describe('QueryDetailsDiff.vue', () => {
     const wrapper = shallowMount(QueryDetailsDiff, {
       propsData: {
         queries: [queryMockResponse.query, queryMockResponse.query]
+      },
+      provide: {
+        showQueries: () => {
+          // Empty
+        }
       }
     });
     expect(wrapper.element).toMatchSnapshot();

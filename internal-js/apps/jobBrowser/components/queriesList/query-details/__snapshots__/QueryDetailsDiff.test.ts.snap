@@ -3,6 +3,14 @@
 exports[`QueryDetailsDiff.vue should render 1`] = `
 <div>
   <div
+    style="margin-bottom: 20px;"
+  >
+    <hue-button-stub>
+      Queries
+    </hue-button-stub>
+  </div>
+   
+  <div
     class="dag-panel"
   >
     <fixed-anchor-nav-stub

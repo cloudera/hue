@@ -18,6 +18,9 @@
 
 <template>
   <div>
+    <div style="margin-bottom: 20px;">
+      <hue-button @click="showQueries">Queries</hue-button>
+    </div>
     <div class="dag-panel">
       <fixed-anchor-nav :query="queries[0]" />
 
@@ -92,8 +95,9 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { Component, Inject, Prop, Vue } from 'vue-property-decorator';
 
+  import HueButton from '../../../../../../desktop/core/src/desktop/js/components/HueButton.vue';
   import Tab from '../../../../../../desktop/core/src/desktop/js/components/Tab.vue';
   import Tabs from '../../../../../../desktop/core/src/desktop/js/components/Tabs.vue';
 
@@ -128,6 +132,7 @@
 
   @Component({
     components: {
+      HueButton,
       Tab,
       Tabs,
       FixedAnchorNav,
@@ -145,7 +150,10 @@
     }
   })
   export default class QueryDetails extends Vue {
-    @Prop({ required: true }) queries!: Query[];
+    @Prop({ required: true })
+    queries!: Query[];
+    @Inject()
+    showQueries?: () => void;
   }
 </script>
 
