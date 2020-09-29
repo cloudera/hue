@@ -26,6 +26,10 @@ $border-lite: #e6e8eb;
 
   margin: 5px 0px 40px 0px;
 
+  border: 1px solid $border-color;
+  border-radius: 5px;
+  padding: 10px;
+
   .process-names {
     width: 100px;
     border-right: 1px solid $border-color;

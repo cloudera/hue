@@ -18,46 +18,51 @@
 
 <template>
   <div class="dag-swimlane">
-    <div class="process-names">
-      <ProcessName
-        v-for="process in normalizedProcesses"
-        :key="process._id"
-        :process="process"
-        @showTooltip="showTooltip"
-        @hideTooltip="hideTooltip"
-        @click="click"
-      />
-      <div class="consolidated-view-label">
-        Consolidated
-      </div>
+    <div v-if="errMessage">
+      {{ errMessage }}
     </div>
-    <div class="process-visuals">
-      <div class="zoom-panel">
-        <ProcessVisual
+    <div v-else>
+      <div class="process-names">
+        <ProcessName
           v-for="process in normalizedProcesses"
           :key="process._id"
           :process="process"
-          :processor="processor"
           @showTooltip="showTooltip"
           @hideTooltip="hideTooltip"
           @click="click"
         />
-        <div v-if="consolidate" class="consolidated-view">
-          <ConsolidatedProcess
+        <div class="consolidated-view-label">
+          Consolidated
+        </div>
+      </div>
+      <div class="process-visuals">
+        <div class="zoom-panel">
+          <ProcessVisual
             v-for="process in normalizedProcesses"
             :key="process._id"
-            :focused-process="focusedProcess"
             :process="process"
             :processor="processor"
             @showTooltip="showTooltip"
             @hideTooltip="hideTooltip"
             @click="click"
           />
+          <div v-if="consolidate" class="consolidated-view">
+            <ConsolidatedProcess
+              v-for="process in normalizedProcesses"
+              :key="process._id"
+              :focused-process="focusedProcess"
+              :process="process"
+              :processor="processor"
+              @showTooltip="showTooltip"
+              @hideTooltip="hideTooltip"
+              @click="click"
+            />
+          </div>
+          <Ruler :scroll="scroll" :processor="processor" :zoom="zoom" />
         </div>
-        <Ruler :scroll="scroll" :processor="processor" :zoom="zoom" />
       </div>
+      <!-- {{em-tooltip contents=tooltipContents}} -->
     </div>
-    <!-- {{em-tooltip contents=tooltipContents}} -->
   </div>
 </template>
 
@@ -99,6 +104,8 @@
     focusedProcess: Process | undefined;
 
     tooltipContents = null;
+
+    errMessage = '';
 
     scroll = 0;
     zoom = 100;
@@ -145,28 +152,31 @@
     }
 
     created(): void {
-      this.processorSetup();
+      try {
+        this.processorSetup();
+      } catch (e) {
+        this.errMessage = 'Invalid data!';
+      }
     }
 
-    mounted(): void {
-      // Ember.run.scheduleOnce('afterRender', this, function() {
-      this.onZoom();
-      this.listenScroll();
-    }
+    // mounted(): void {
+    //   this.onZoom();
+    //   this.listenScroll();
+    // }
 
-    // Watch - "zoom"
-    @Watch('zoom')
-    onZoom(): void {
-      const zoomPanel: HTMLElement = <HTMLElement>this.$el.querySelector('.zoom-panel');
-      zoomPanel.style.width = `${this.zoom}%`;
-    }
+    // // Watch - "zoom"
+    // @Watch('zoom')
+    // onZoom(): void {
+    //   const zoomPanel: HTMLElement = <HTMLElement>this.$el.querySelector('.zoom-panel');
+    //   zoomPanel.style.width = `${this.zoom}%`;
+    // }
 
-    listenScroll(): void {
-      const processVisuals: HTMLElement = <HTMLElement>this.$el.querySelector('.process-visuals');
-      processVisuals.onscroll = () => {
-        this.scroll = processVisuals.scrollLeft;
-      };
-    }
+    // listenScroll(): void {
+    //   const processVisuals: HTMLElement = <HTMLElement>this.$el.querySelector('.process-visuals');
+    //   processVisuals.onscroll = () => {
+    //     this.scroll = processVisuals.scrollLeft;
+    //   };
+    // }
 
     willDestroy(): void {
       // Release listeners
