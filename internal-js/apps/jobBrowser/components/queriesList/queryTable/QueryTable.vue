@@ -21,6 +21,7 @@
 <template>
   <div class="table-component">
     <!-- <queries-search :searches="searches" :table-definition="tableDefinition" /> -->
+    <search-input @search="searchQueryChanged" />
     <hue-button :disabled="selectedQueries.length !== 2" @click="diffQueries(selectedQueries)">
       {{ I18n('Compare') }}
     </hue-button>
@@ -51,7 +52,12 @@
         </template>
       </hue-table>
     </div>
-    <paginator :total-entries="totalQueries" @page-changed="pageChanged" />
+    <paginator
+      ref="paginator"
+      :total-entries="totalQueries"
+      :current-page="currentPage"
+      @page-changed="pageChanged"
+    />
   </div>
 </template>
 
@@ -68,6 +74,7 @@
   import { timeAgo } from '../../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
   import HueTable from '../../../../../../desktop/core/src/desktop/js/components/HueTable.vue';
   import Paginator from '../../../../../../desktop/core/src/desktop/js/components/Paginator.vue';
+  import SearchInput from '../../../../../../desktop/core/src/desktop/js/components/SearchInput.vue';
   import { Column } from '../../../../../../desktop/core/src/desktop/js/components/HueTable';
   import ColumnSelectorPanel from '../../../../../../desktop/core/src/desktop/js/components/ColumnSelectorPanel.vue';
   import { fetchSuggestedSearches } from '../apiUtils';
@@ -76,6 +83,7 @@
 
   @Component({
     components: {
+      SearchInput,
       HueButton,
       HueLink,
       HueTable,
@@ -97,6 +105,9 @@
     visibleColumns: Column<Query>[] = [];
     columnSelectorIsVisible = false;
     selectedQueries: Query[] = [];
+
+    currentPage?: Page;
+    searchQuery = '';
 
     columns: Column<Query>[] = [
       { key: 'select', label: '' },
@@ -167,6 +178,8 @@
       facets: { fieldCount: 0 }
     };
 
+    notifyThrottle = -1;
+
     mounted(): void {
       this.visibleColumns = [...this.columns];
     }
@@ -184,8 +197,26 @@
       this.columnSelectorIsVisible = !this.columnSelectorIsVisible;
     }
 
+    notifySearch(): void {
+      window.clearTimeout(this.notifyThrottle);
+      this.notifyThrottle = window.setTimeout(() => {
+        this.$emit('search', { page: this.currentPage, text: this.searchQuery });
+      }, 0);
+    }
+
     pageChanged(page: Page): void {
-      this.$emit('page-changed', page);
+      this.currentPage = page;
+      this.notifySearch();
+    }
+
+    searchQueryChanged(searchQuery: string): void {
+      this.searchQuery = searchQuery;
+      if (this.currentPage && this.currentPage.offset !== 0) {
+        // pageChanged will notify
+        (<Paginator>this.$refs.paginator).gotoFirstPage();
+      } else {
+        this.notifySearch();
+      }
     }
 
     querySelected(query: Query): void {

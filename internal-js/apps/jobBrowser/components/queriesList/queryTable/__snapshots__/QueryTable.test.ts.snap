@@ -4,6 +4,11 @@ exports[`QueryTable.vue should render 1`] = `
 <div
   class="table-component"
 >
+  <search-input-stub
+    placeholder="Search..."
+    showmagnify="true"
+  />
+   
   <hue-button-stub
     disabled="true"
   >

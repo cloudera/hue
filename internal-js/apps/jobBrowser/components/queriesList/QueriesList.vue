@@ -24,7 +24,7 @@
       :total-queries="(searchMeta && searchMeta.size) || 0"
       @diff-queries="diffQueries"
       @query-selected="querySelected"
-      @page-changed="fetch"
+      @search="fetch"
     />
     <query-details v-else-if="selectedQuery" :query="selectedQuery" />
     <QueryDetailsDiff v-else :queries="queriesToDiff" />
@@ -52,13 +52,14 @@
     queries: Query[] = [];
     searchMeta: SearchMeta | null = null;
 
-    async fetch(page: Page): Promise<void> {
+    async fetch(options: { page: Page; text?: string }): Promise<void> {
       // Initial fetch triggered by the paginator
       const now = Date.now();
       const searchResponse = await search({
         endTime: now,
-        limit: page.limit,
-        offset: page.offset,
+        limit: options.page.limit,
+        offset: options.page.offset,
+        text: options.text,
         sortText: 'startTime:DESC',
         startTime: now - 1000 * 60 * 60 * 24 * 7,
         type: 'basic'
