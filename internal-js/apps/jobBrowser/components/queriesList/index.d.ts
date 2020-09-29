@@ -16,13 +16,23 @@
  * limitations under the License.
  */
 
+export interface CounterDetails {
+  counterName: string;
+  counterValue: string;
+}
+
+export interface CounterGroup {
+  counterGroupName: string;
+  counters: CounterDetails[];
+}
+
 // TODO: Flatten and cleanup DAG object
 export interface Dag {
   dagInfo: {
     dagId: string;
   };
   dagDetails: {
-    counters: unknown[]; // TODO: type?
+    counters: CounterGroup[];
     dagPlan: unknown; // TODO: type?
     diagnostics: string;
     hiveQueryId: number;

@@ -13,7 +13,9 @@ exports[`DagDetails.vue should render 1`] = `
     <tab-stub
       title="DAG COUNTERS"
     >
-      <dag-counters-stub />
+      <counterstable-stub
+        counters="[object Object]"
+      />
     </tab-stub>
      
     <tab-stub

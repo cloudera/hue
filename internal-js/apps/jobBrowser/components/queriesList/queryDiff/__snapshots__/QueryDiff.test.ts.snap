@@ -95,7 +95,9 @@ exports[`QueryDiff.vue should render 1`] = `
       <tab-stub
         title="DAG COUNTERS"
       >
-        <dag-counters-stub />
+        <counterstable-stub
+          counters=""
+        />
       </tab-stub>
        
       <tab-stub
