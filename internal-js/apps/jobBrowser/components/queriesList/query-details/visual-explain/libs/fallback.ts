@@ -40,5 +40,5 @@ export function doRenderError(containerElement: HTMLElement): void {
     .append('div')
     .attr('class', 'explain--error')
     .append('div')
-    .text('No valid explain plan found.');
+    .text('No valid explain plan found!');
 }
