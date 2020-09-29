@@ -147,5 +147,6 @@
   .side-by-side {
     display: inline-block;
     width: calc(50% - 5px);
+    vertical-align: top;
   }
 </style>
