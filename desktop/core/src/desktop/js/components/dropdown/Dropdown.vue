@@ -18,12 +18,10 @@
 
 <template>
   <div :class="{ 'dropdown-inline': inline }">
-    <a v-if="inline" href="javascript: void(0);" @click="toggleMenu">
+    <hue-link v-if="inline" @click="toggleMenu">
       {{ text }} <i class="fa fa-caret-down" />
-    </a>
-    <button v-else class="btn" type="button" @click="toggleMenu">
-      {{ text }} <i class="fa fa-caret-down" />
-    </button>
+    </hue-link>
+    <hue-button v-else @click="toggleMenu"> {{ text }} <i class="fa fa-caret-down" /> </hue-button>
     <div :class="{ open: menuOpen }" class="hue-dropdown-container" @click="toggleMenu">
       <div class="hue-dropdown-menu">
         <ul>
@@ -35,11 +33,14 @@
 </template>
 
 <script lang="ts">
+  import HueButton from '../HueButton.vue';
+  import HueLink from '../HueLink.vue';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
-
-  @Component
+  @Component({
+    components: { HueButton, HueLink }
+  })
   export default class Dropdown extends Vue {
     @Prop({ required: false, default: '' })
     text: string;
