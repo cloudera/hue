@@ -18,7 +18,7 @@
 
 <template>
   <div class="dag-view-container">
-    <div v-if="errMessage" class="text-align-center">
+    <div v-if="errMessage" class="err-message">
       <h1>Rendering failed!</h1>
       <h5>{{ errMessage }}</h5>
     </div>
@@ -130,7 +130,7 @@
       </svg>
     </div>
 
-    <div class="button-panel">
+    <div v-if="!errMessage" class="button-panel">
       <em
         :class="
           'tgl-additionals fa fa-circle ' + (hideAdditionals ? 'hide-additionals fa-circle-o' : '')
@@ -165,6 +165,8 @@
   /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
 
   import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { get } from 'lodash';
+
   import { Dag } from '../../index';
   import { toggleFullScreen } from '../../../../../../../desktop/core/src/desktop/js/utils/hueUtils.js';
   import { graphifyData } from './data-processor';
@@ -186,7 +188,7 @@
 
     pathname = window.location.pathname;
 
-    errMessage: string | undefined;
+    errMessage = '';
 
     // Butto controls
     isHorizontal = false;
@@ -213,8 +215,7 @@
     }
 
     created(): void {
-      // TODO: Must remove this check. dag is a mandatory property
-      if (this.dag) {
+      if (get(this, 'dag.dagDetails.dagPlan') && get(this, 'dag.vertices')) {
         const dagPlan: any = this.dag.dagDetails.dagPlan;
         this.vertices = this.combineVertexData(dagPlan.vertices, this.dag.vertices);
         this.edges = dagPlan.edges;
