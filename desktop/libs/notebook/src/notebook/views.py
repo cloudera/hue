@@ -55,7 +55,8 @@ def notebooks(request):
 
   if editor_type != 'notebook':
     if USE_NEW_EDITOR.get():
-      notebooks = [doc.to_dict() for doc in Document2.objects.documents(user=request.user).search_documents(types=['query-%s' % editor_type])]
+      notebooks = [doc.to_dict() for doc in Document2.objects.documents(
+          user=request.user).search_documents(types=['query-%s' % editor_type])]
     else:
       notebooks = [
         d.content_object.to_dict()
@@ -178,6 +179,7 @@ def browse(request, database, table, partition_spec=None):
         name='Execute and watch',
         editor_type=editor_type,
         statement=statement,
+        database=database,
         status='ready-execute',
         is_task=True,
         namespace=namespace,
@@ -268,7 +270,8 @@ def execute_and_watch(request):
 
     if live_indexing:
       file_format['inputFormat'] = 'hs2_handle'
-      file_format['fetch_handle'] = lambda rows, start_over: get_api(request, snippet).fetch_result(notebook, snippet, rows=rows, start_over=start_over)
+      file_format['fetch_handle'] = lambda rows, start_over: get_api(
+          request, snippet).fetch_result(notebook, snippet, rows=rows, start_over=start_over)
 
     job_handle = _index(request, file_format, destination, query=notebook['uuid'])
 
@@ -311,7 +314,8 @@ def delete(request):
         ctr += 1
       except FilesystemException as e:
         failures.append(notebook['uuid'])
-        LOG.exception("Failed to delete document with UUID %s that is writable by user %s, skipping." % (notebook['uuid'], request.user.username))
+        LOG.exception("Failed to delete document with UUID %s that is writable by user %s, skipping." % (
+            notebook['uuid'], request.user.username))
 
     response['status'] = 0
     if failures:
