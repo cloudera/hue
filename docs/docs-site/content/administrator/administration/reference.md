@@ -283,7 +283,7 @@ Here is one way to do it with [NGINX](http://gethue.com/using-nginx-to-speed-up-
 
 ## Task Server
 
-** Not supported yet**
+**Beta Feature**
 
 The task server is currently a work in progress to outsource all the blocking or resource intensive operations
 outside of the API server. Follow [HUE-8738](https://issues.cloudera.org/browse/HUE-8738) for more information

@@ -611,6 +611,16 @@ If set, limits the number of concurrent user sessions. 1 represents 1 browser se
 
 [Read more about it here](http://gethue.com/restrict-number-of-concurrent-sessions-per-user/).
 
+## Task Server
+
+Execute long blocking or resource intensive operations in tasks outside of the server. This is particularly useful for querying databases other than Hive or Impala that uses the SqlAlchemy interface which is blocking until the query actually finishes.
+
+i.e. if the SQL query takes more than 30 seconds, it might timeout without it:
+
+    504 Gateway Time-out 504 Gateway Time-out nginx/1.17.10
+
+Read more in the [Task Server section](/administrator/administration/reference/#task-server) of the Reference Guide.
+
 ## Customize the UI
 
 ### Maps look and feel
@@ -657,42 +667,43 @@ Read more about it in [Hue with a custom logo](http://gethue.com/hue-with-a-cust
 
 By default Hue stores the [saved documents](/user/concept/#documents) in its database. This features aims at pointing to any source versioning systems like GitHub, BitBucket... to open and save queries.
 
-**Note** This feature is experiemental and tracked in [HUE-951](https://issues.cloudera.org/browse/HUE-951).
+**Note** This feature is experimental and tracked in [HUE-951](https://issues.cloudera.org/browse/HUE-951).
 
     [desktop]
 
     [[vcs]]
 
     ## [[[git-read-only]]]
-        ## Base URL to Remote Server
-        # remote_url=https://github.com/cloudera/hue/tree/master
+    ## Base URL to Remote Server
+    # remote_url=https://github.com/cloudera/hue/tree/master
 
-        ## Base URL to Version Control API
-        # api_url=https://api.github.com
+    ## Base URL to Version Control API
+    # api_url=https://api.github.com
+
     ## [[[github]]]
+    ## Base URL to Remote Server
+    # remote_url=https://github.com/cloudera/hue/tree/master
 
-        ## Base URL to Remote Server
-        # remote_url=https://github.com/cloudera/hue/tree/master
+    ## Base URL to Version Control API
+    # api_url=https://api.github.com
 
-        ## Base URL to Version Control API
-        # api_url=https://api.github.com
+    # These will be necessary when you want to write back to the repository.
+    ## Client ID for Authorized Application
+    # client_id=
 
-        # These will be necessary when you want to write back to the repository.
-        ## Client ID for Authorized Application
-        # client_id=
+    ## Client Secret for Authorized Application
+    # client_secret=
 
-        ## Client Secret for Authorized Application
-        # client_secret=
     ## [[[svn]]
-        ## Base URL to Remote Server
-        # remote_url=https://github.com/cloudera/hue/tree/master
+    ## Base URL to Remote Server
+    # remote_url=https://github.com/cloudera/hue/tree/master
 
-        ## Base URL to Version Control API
-        # api_url=https://api.github.com
+    ## Base URL to Version Control API
+    # api_url=https://api.github.com
 
-        # These will be necessary when you want to write back to the repository.
-        ## Client ID for Authorized Application
-        # client_id=
+    # These will be necessary when you want to write back to the repository.
+    ## Client ID for Authorized Application
+    # client_id=
 
-        ## Client Secret for Authorized Application
-        # client_secret=
+    ## Client Secret for Authorized Application
+    # client_secret=
