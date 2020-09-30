@@ -16,11 +16,6 @@
   limitations under the License.
 -->
 
-<!--
-  TODO: Decide whether we should have our own or replace with vue-good-table, vue-tables-2, bootstrap-vue etc.
-        More at https://awesome-vue.js.org/components-and-libraries/ui-components.html
--->
-
 <template>
   <table class="hue-table">
     <thead>
@@ -33,7 +28,7 @@
     <tbody>
       <tr v-for="(row, rowIndex) in rows" :key="rowIndex" @click="$emit('row-clicked', row)">
         <td v-for="(column, colIndex) in columns" :key="colIndex">
-          <div class="cell-content" :class="{ small: column.small }">
+          <div class="cell-content" :class="{ small: column.small, nowrap: column.noWrap }">
             <slot v-if="hasCellSlot(column)" :name="cellSlotName(column)" v-bind="row" />
             <template v-else>
               {{ column.adapter ? column.adapter(column.key, row) : row[column.key] }}
@@ -105,6 +100,10 @@
             align-items: center;
             padding: 5px;
             text-align: left;
+
+            &.nowrap {
+              white-space: nowrap;
+            }
 
             &.small {
               font-size: 12px;
