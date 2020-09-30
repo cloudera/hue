@@ -32,15 +32,40 @@
       </dropdown-item-button>
     </dropdown>
     <div class="navigation-actions">
-      <a href="javascript: void(0);" @click="gotoFirstPage">|&lt;</a>
-      <a href="javascript: void(0);" @click="gotoPreviousPage">&lt;</a>
-      <a href="javascript: void(0);" @click="gotoNextPage">&gt;</a>
-      <a href="javascript: void(0);" @click="gotoLastPage">&gt;|</a>
+      <a
+        href="javascript: void(0);"
+        :class="{ disabled: currentPage === 1 }"
+        @click="gotoFirstPage"
+      >
+        <hue-icon type="hi-chevron-left-limit" />
+      </a>
+      <a
+        href="javascript: void(0);"
+        :class="{ disabled: currentPage === 1 }"
+        @click="gotoPreviousPage"
+      >
+        <hue-icon type="hi-chevron-left" />
+      </a>
+      <a
+        href="javascript: void(0);"
+        :class="{ disabled: currentPage === totalPages }"
+        @click="gotoNextPage"
+      >
+        <hue-icon type="hi-chevron-right" />
+      </a>
+      <a
+        href="javascript: void(0);"
+        :class="{ disabled: currentPage === totalPages }"
+        @click="gotoLastPage"
+      >
+        <hue-icon type="hi-chevron-right-limit" />
+      </a>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+  import HueIcon from './HueIcon.vue';
   import Dropdown from './dropdown/Dropdown.vue';
   import DropdownItemButton from './dropdown/DropdownItemButton.vue';
   import Vue from 'vue';
@@ -51,7 +76,7 @@
   const PRESET_LIMITS = [DEFAULT_LIMIT, 50, 100];
 
   @Component({
-    components: { Dropdown, DropdownItemButton }
+    components: { HueIcon, Dropdown, DropdownItemButton }
   })
   export default class Paginator extends Vue {
     @Prop({ required: true })
@@ -117,6 +142,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @import 'styles/colors';
+
   .hue-paginator {
     width: 100%;
     height: 25px;
@@ -129,6 +156,20 @@
     }
 
     .navigation-actions {
+      a {
+        color: $fluid-gray-700;
+
+        &.disabled {
+          cursor: default;
+          color: $hue-action-disabled;
+        }
+
+        &:hover:not(.disabled) {
+          color: $hue-action-primary-hover;
+        }
+      }
+
+      font-size: 23px;
       margin-left: 15px;
       margin-right: 20px;
       display: inline-block;
