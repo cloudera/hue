@@ -37,7 +37,7 @@ exports[`QueryTable.vue should render 1`] = `
       class="query-table-right-panel"
     >
       <div
-        class="table"
+        class="table-container"
       >
         <hue-table-stub
           columns=""

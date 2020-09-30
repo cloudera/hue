@@ -44,7 +44,7 @@
         />
       </div>
       <div class="query-table-right-panel">
-        <div class="table">
+        <div class="table-container">
           <hue-table :columns="visibleColumns" :rows="queries">
             <template #cell-select="query">
               <input v-model="selectedQueries" type="checkbox" :value="query" />
@@ -122,12 +122,14 @@
       {
         key: 'tablesRead',
         label: 'Tables Read',
+        small: true,
         adapter: (key: string, query: Query): string =>
           (query.tablesRead || []).map(data => `${data.table} (${data.database})`).join(', ')
       },
       {
         key: 'tablesWritten',
         label: 'Tables Written',
+        small: true,
         adapter: (key: string, query: Query): string =>
           (query.tablesWritten || []).map(data => `${data.table} (${data.database})`).join(', ')
       },
@@ -259,7 +261,7 @@
         flex: 1 1 100%;
         max-width: 100%;
 
-        .table {
+        .table-container {
           width: 100%;
           overflow-x: auto;
         }
