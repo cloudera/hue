@@ -479,6 +479,25 @@
       <path d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z"></path>
     </symbol>
 
+    <symbol id="hi-status-error" viewBox="0 0 24 24">
+      <path fill="#D9150C" d="M10 0C4.478 0 0 4.478 0 10s4.478 10 10 10 10-4.478 10-10S15.522 0 10 0z" transform="translate(-143 -246) translate(77 121) translate(2) translate(0 120) translate(64 5) translate(2 2)"></path>
+      <path fill="#FFF" d="M10 13.75c.69 0 1.25.56 1.25 1.25s-.56 1.25-1.25 1.25-1.25-.56-1.25-1.25.56-1.25 1.25-1.25zM11 4v8H9V4h2z" transform="translate(-143 -246) translate(77 121) translate(2) translate(0 120) translate(64 5) translate(2 2)"></path>
+    </symbol>
+
+    <symbol id="hi-status-success" viewBox="0 0 24 24">
+      <path fill="#3A870E" d="M9.675 15.899L5.413 11.637 4 13.052 9.656 18.709 20.974 7.399 19.574 6z" transform="translate(-143 -164) translate(77 121) translate(2) translate(0 38) translate(64 5)"></path>
+    </symbol>
+
+    <symbol id="hi-status-stopped" viewBox="0 0 24 24">
+      <path fill="#D9150C" d="M8.272 3L3 8.272 3 15.728 8.272 21 15.728 21 21 15.728 21 8.272 15.728 3z" transform="translate(-143 -410) translate(77 121) translate(2) translate(0 284) translate(64 5)"></path>
+      <path fill="#FFF" d="M15.707 9.707L14.293 8.293 12 10.586 9.707 8.293 8.293 9.707 10.586 12 8.293 14.293 9.707 15.707 12 13.414 14.293 15.707 15.707 14.293 13.414 12z" transform="translate(-143 -410) translate(77 121) translate(2) translate(0 284) translate(64 5)"></path>
+    </symbol>
+
+    <symbol id="hi-status-warning" viewBox="0 0 24 24">
+      <path fill="#FFA319" d="M10 0L0 20 20 20z" transform="translate(-143 -492) translate(77 121) translate(2) translate(0 366) translate(64 5) translate(2 2)"></path>
+      <path fill="#260D00" d="M10 13.75c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zM9 12h2V7H9v5z" transform="translate(-143 -492) translate(77 121) translate(2) translate(0 366) translate(64 5) translate(2 2)"></path>
+    </symbol>
+
     <defs>
       <filter id="dropshadow" height="130%">
         <feGaussianBlur in="SourceAlpha" stdDeviation="3"></feGaussianBlur> <!-- stdDeviation is how much to blur -->
