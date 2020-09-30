@@ -114,7 +114,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
 
   meta = {'row_counter': 0, 'handle': {}, 'status': '', 'truncated': False}
 
-  with storage.open(_log_key(notebook, snippet), 'w') as f_log:
+  with storage.open(_log_key(notebook, snippet), 'wb') as f_log:
     result_wrapper = ExecutionWrapper(
         api,
         notebook,
@@ -128,12 +128,12 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
     )
     response = export_csvxls.create_generator(content_generator, file_format)
 
-    with storage.open(result_key, 'w') as f:
+    with storage.open(result_key, 'wb') as f:
       for chunk in response:
         f.write(chunk)
 
     if TASK_SERVER.RESULT_CACHE.get():
-      with storage.open(result_key, 'r') as f:
+      with storage.open(result_key, 'rb') as f:
         delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
         csv_reader = csv.reader(f, delimiter=delimiter)
         caches[CACHES_CELERY_QUERY_RESULT_KEY].set(result_key, [row for row in csv_reader], 60 * 5)
@@ -218,7 +218,7 @@ def download(*args, **kwargs):
   return export_csvxls.file_reader(  # TODO: Convert csv to excel if needed
     storage.open(
       _result_key(task_id),
-      'r'
+      'rb'
     )
   )
 
@@ -287,12 +287,12 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
     return ''
   else:
     if not startFrom:
-      with storage.open(_log_key(notebook, snippet), 'r') as f:
+      with storage.open(_log_key(notebook, snippet), 'rb') as f:
         return f.read()
     else:
       count = 0
       output = string_io()
-      with storage.open(_log_key(notebook, snippet), 'r') as f:
+      with storage.open(_log_key(notebook, snippet), 'rb') as f:
         for line in f:
           count += 1
           if count <= startFrom:
@@ -402,7 +402,7 @@ def _get_data(task_id):
     headers = csv_reader[0] if csv_reader else []  # TODO check size
     csv_reader = csv_reader[1:] if csv_reader else []
   else:
-    f = storage.open(result_key)
+    f = storage.open(result_key, 'rb')
     delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
     csv_reader = csv.reader(f, delimiter=delimiter)
     headers = next(csv_reader, [])
