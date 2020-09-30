@@ -18,6 +18,7 @@ export interface Column<T> {
   label: string;
   key: string;
   small?: boolean;
+  noWrap?: boolean;
   adapter?: (key: string, row: T) => string | number | boolean | undefined;
 }
 
