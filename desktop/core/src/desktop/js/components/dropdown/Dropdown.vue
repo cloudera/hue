@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div :class="{ 'dropdown-inline': inline }">
+  <div v-click-outside="clickOutside" :class="{ 'dropdown-inline': inline }">
     <hue-link v-if="inline" @click="toggleMenu">
       {{ text }} <i class="fa fa-caret-down" />
     </hue-link>
@@ -33,13 +33,18 @@
 </template>
 
 <script lang="ts">
+  import { clickOutsideDirective } from '../directives/clickOutsideDirective';
   import HueButton from '../HueButton.vue';
   import HueLink from '../HueLink.vue';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
+
   @Component({
-    components: { HueButton, HueLink }
+    components: { HueButton, HueLink },
+    directives: {
+      'click-outside': clickOutsideDirective
+    }
   })
   export default class Dropdown extends Vue {
     @Prop({ required: false, default: '' })
@@ -51,6 +56,12 @@
 
     toggleMenu(): void {
       this.menuOpen = !this.menuOpen;
+    }
+
+    clickOutside(): void {
+      if (this.menuOpen) {
+        this.menuOpen = false;
+      }
     }
   }
 </script>
