@@ -81,7 +81,7 @@ describe('ERDiagram UTs', () => {
   test('Related entities - 3 levels (t0-t1, t0-t2, t0-t3, t3-t4, t3-t5)', () => {
     const tableCount = 6;
 
-    const tables: Array<Table> = createTables(tableCount, 4);
+    const tables = createTables(tableCount, 4);
     const wrapper = shallowMount(ERDiagram, {
       propsData: {
         entities: tables,
@@ -129,7 +129,7 @@ describe('ERDiagram integration tests', () => {
   test('Check plotting of relation paths (t0-t1, t0-t2)', () => {
     const tableCount = 3;
 
-    const tables: Array<Table> = createTables(tableCount, 3);
+    const tables = createTables(tableCount, 3);
     const wrapper = mount(ERDiagram, {
       propsData: {
         entities: tables,

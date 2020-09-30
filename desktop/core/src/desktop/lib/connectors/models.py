@@ -95,7 +95,7 @@ else:
   class Connector(BaseConnector): pass
 
 
-def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None, user=None):
+def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None, user=None, connector_id=None):
   from desktop.auth.backend import is_admin
 
   connectors_objects = Connector.objects.all()
@@ -113,7 +113,7 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
         'settings': json.loads(connector.settings),
         'is_demo': False,
       }
-      for connector in connectors_objects
+      for connector in connectors_objects if connector_id is None or connector_id == connector.id
   ]
   connectors = []
 
@@ -173,7 +173,7 @@ def _create_connector_examples():
   skipped = []
 
   for connector in _get_connector_examples():
-    name ='%(nice_name)s (%(dialect)s)' % connector
+    name = '%(nice_name)s (%(dialect)s)' % connector
     if not Connector.objects.filter(name=connector['nice_name']).exists():
       connector = Connector.objects.create(
         name=connector['nice_name'],
@@ -192,7 +192,7 @@ def _get_connector_examples():
   return [
     {
       'id': i,
-      'nice_name':  CONNECTORS.get()[i].NICE_NAME.get() or i,
+      'nice_name': CONNECTORS.get()[i].NICE_NAME.get() or i,
       'description': '',
       'dialect': CONNECTORS.get()[i].DIALECT.get(),
       'interface': CONNECTORS.get()[i].INTERFACE.get(),

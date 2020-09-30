@@ -23,8 +23,8 @@ import { sleep } from '../test/utils';
 
 const dbName = 'DB_NAME';
 const tableName = 'TABLE_NAME';
-const tableId: string = Table.buildId(dbName, tableName);
-const columnNames: Array<string> = ['id', 'name'];
+const tableId = Table.buildId(dbName, tableName);
+const columnNames = ['id', 'name'];
 const defaultMaxColumns = 10;
 
 describe('TableEntity UTs', () => {
@@ -88,7 +88,7 @@ describe('TableEntity UTs', () => {
   });
 
   test('With number of columns more than maxColumns', () => {
-    const columns: Array<Column> = [];
+    const columns: Column[] = [];
     const columnCount = 20;
 
     for (let i = 0; i < columnCount; i++) {
@@ -135,7 +135,7 @@ describe('TableEntity UTs', () => {
   });
 
   test('With custom maxColumns', () => {
-    const columns: Array<Column> = [];
+    const columns: Column[] = [];
     const columnCount = 10;
     const maxColumns = 5;
 
@@ -161,7 +161,7 @@ describe('TableEntity UTs', () => {
   });
 
   test('Column expansion test', async () => {
-    const columns: Array<Column> = [];
+    const columns: Column[] = [];
     const columnCount = 10;
     const maxColumns = 5;
 

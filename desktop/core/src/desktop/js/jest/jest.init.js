@@ -23,6 +23,7 @@ import './jquery.setup';
 import './sqlTestUtils';
 
 import 'ext/bootstrap.2.3.2.min';
+import axios from 'axios';
 import $ from 'jquery';
 import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
@@ -108,4 +109,10 @@ $.ajaxSetup({
     console.warn('actual jQuery ajax called');
     console.trace();
   }
+});
+
+axios.interceptors.request.use(config => {
+  console.warn('Actual axios ajax request made to url: ' + config.url);
+  console.trace();
+  return config;
 });

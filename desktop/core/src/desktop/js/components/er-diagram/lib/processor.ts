@@ -22,13 +22,11 @@ import { Column } from './entities';
 
 class EntityNode {
   entity: IEntity;
-  level: number;
-  relations: Array<EntityNode>;
+  level = 0;
+  relations: EntityNode[] = [];
 
   constructor(entity: IEntity) {
     this.entity = entity;
-    this.relations = new Array<EntityNode>();
-    this.level = 0;
   }
 }
 
@@ -37,10 +35,7 @@ class EntityNode {
  * it's level (Distance from root entity) in the relationship graph. entities[0] will be
  * taken as the root entity.
  */
-export function groupEntities(
-  entities: Array<IEntity>,
-  relations: Array<IRelation>
-): Array<Array<IEntity>> {
+export function groupEntities(entities: IEntity[], relations: IRelation[]): IEntity[][] {
   const nodesMap: Map<string, EntityNode> = generateGraph(entities, relations);
 
   let level = 0;
@@ -61,10 +56,7 @@ function getNodeMapId(entity: IEntity) {
   return entity.id;
 }
 
-function generateGraph(
-  entities: Array<IEntity>,
-  relations: Array<IRelation>
-): Map<string, EntityNode> {
+function generateGraph(entities: IEntity[], relations: IRelation[]): Map<string, EntityNode> {
   const nodesMap = new Map<string, EntityNode>();
 
   entities.forEach((entity: IEntity) => {
@@ -99,14 +91,14 @@ function setLevels(entityNode: EntityNode, level: number): number {
   return maxLevel;
 }
 
-function breadthFirstTraverse(nodesMap: Map<string, EntityNode>): Array<Array<IEntity>> {
-  const entities: Array<Array<IEntity>> = new Array<Array<IEntity>>();
+function breadthFirstTraverse(nodesMap: Map<string, EntityNode>): IEntity[][] {
+  const entities: IEntity[][] = [];
 
   nodesMap.forEach((entityNode: EntityNode) => {
     const level = entityNode.level - 1;
     if (level >= 0) {
       if (entities[level] === undefined) {
-        entities[level] = new Array<IEntity>();
+        entities[level] = [];
       }
       entities[level].push(entityNode.entity);
     }
