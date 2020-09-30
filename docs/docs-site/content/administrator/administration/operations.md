@@ -254,7 +254,7 @@ Instrumentation not enabled:
 
     [23/Apr/2018 10:59:01 -0700] INFO     127.0.0.1 admin - "POST /jobbrowser/jobs/ HTTP/1.1" returned in 88ms
 
-### Change or reset a forgotten password
+### Change or reset a password
 
 Via the Hue commands, to change the password of the currently logged in Unix user:
 
@@ -264,7 +264,7 @@ If you don’t remember the admin username, create a new Hue admin (you will the
 
     build/env/bin/hue createsuperuser
 
-### Make a certain user a Hue admin
+### Make a certain user admin
 
 It is recommended to just do it as an admin via the [Admin UI](https://gethue.com/password-management-in-hue/).
 
@@ -308,6 +308,79 @@ To clean up Hue database, go to Hue directory and run following clean up command
 When getting an error similar to `OperationalError: (1040, 'Too many connections')`, this indicates that the Hue database is overloaded and out of connections. Hue only needs 2 but often the database is used by other services that might "hog" them. Increasing max_connections to around 1000 should be sufficient. e.g. for MySQL, connect to it and set below parameter:
 
     mysql> SET GLOBAL max_connections = 1000;
+
+### Testing SQL connection from a Pod
+
+First check your Hive version in the SQL Editor:
+
+    SELECT version()
+    > 2.3.2 r857a9fd8ad725a53bd95c1b2d6612f9b1155f44d
+
+Then list the Hue pods:
+
+    kubectl get pods
+    > NAME                                        READY   STATUS      RESTARTS   AGE
+    hue-758466dc77-wpcx8                        2/2     Running     0          22h
+    ingress-nginx-controller-5d6fbbddb6-8kd86   1/1     Running     0          23h
+    postgres-hue-64c9cc8744-dpk47               1/1     Running     1          47d
+
+Connect to it:
+
+    kubectl exec -it hue-758466dc77-wpcx8 hue -- bash
+
+Then get the client files of the same Hive version from:
+
+    https://archive.apache.org/dist/hadoop/core
+    https://archive.apache.org/dist/hive
+
+And install them:
+
+    sudo apt-get install wget
+    wget https://archive.apache.org/dist/hadoop/core/hadoop-2.7.4/hadoop-2.7.4.tar.gz
+    wget https://archive.apache.org/dist/hive/hive-2.3.2/apache-hive-2.3.2-bin.tar.gz
+
+    tar -xvzf hadoop-2.7.4.tar.gz
+    tar -xvzf apache-hive-2.3.2-bin.tar.gz
+
+    export HADOOP_HOME=`pwd`/hadoop-2.7.4
+    export HIVE_HOME=`pwd`/apache-hive-2.3.2-bin
+    export JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64
+
+    PATH=$PATH:$HIVE_HOME/bin
+
+And now you are ready to connect:
+
+    beeline -u 'jdbc:hive2://172.21.0.3:10000'
+    > SLF4J: Class path contains multiple SLF4J bindings.
+    SLF4J: Found binding in [jar:file:/usr/share/hue/apache-hive-2.3.2-bin/lib/log4j-slf4j-impl-2.6.2.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+    SLF4J: Found binding in [jar:file:/usr/share/hue/hadoop-2.7.4/share/hadoop/common/lib/slf4j-log4j12-1.7.10.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+    SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+    SLF4J: Actual binding is of type [org.apache.logging.slf4j.Log4jLoggerFactory]
+    Connecting to jdbc:hive2://172.21.0.3:10000
+    Connected to: Apache Hive (version 2.3.2)
+    Driver: Hive JDBC (version 2.3.2)
+    Transaction isolation: TRANSACTION_REPEATABLE_READ
+    Beeline version 2.3.2 by Apache Hive
+    0: jdbc:hive2://172.21.0.3:10000> SHOW TABLES;
+    +--------------------+
+    |      tab_name      |
+    +--------------------+
+    | about              |
+    | amandine_test      |
+    | city_cases         |
+    | cricketer          |
+    | cust1              |
+    | cust2              |
+    | customer           |
+    | customers          |
+    | student_info       |
+    | ........           |
+    | web_logs           |
+    | yash_contact_test  |
+    +--------------------+
+    52 rows selected (0.098 seconds)
+
+Read more on the Hive wiki about the [beeline command line](https://cwiki.apache.org/confluence/display/Hive/HiveServer2+Clients#HiveServer2Clients-Beeline%E2%80%93CommandLineShell).
 
 ## Scripts
 
