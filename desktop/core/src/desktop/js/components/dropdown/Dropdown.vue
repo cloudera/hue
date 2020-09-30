@@ -21,9 +21,12 @@
     <hue-link v-if="inline" @click="toggleMenu">
       {{ text }} <i class="fa fa-caret-down" />
     </hue-link>
-    <hue-button v-else @click="toggleMenu"> {{ text }} <i class="fa fa-caret-down" /> </hue-button>
+    <hue-button v-else @click="toggleMenu"> {{ text }} <i class="fa fa-caret-down" /></hue-button>
     <div :class="{ open: menuOpen }" class="hue-dropdown-container" @click="toggleMenu">
-      <div class="hue-dropdown-menu">
+      <div
+        class="hue-dropdown-menu"
+        :class="{ 'position-top': positionTop, 'position-left': positionLeft }"
+      >
         <ul>
           <slot />
         </ul>
@@ -40,6 +43,23 @@
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
 
+  interface OutsideStatus {
+    left: boolean;
+    right: boolean;
+    top: boolean;
+    bottom: boolean;
+  }
+
+  const isOutsideViewport = (element: Element): OutsideStatus => {
+    const clientRect = element.getBoundingClientRect();
+    return {
+      top: clientRect.top < 0,
+      right: clientRect.right > window.innerWidth,
+      bottom: clientRect.bottom > window.innerHeight,
+      left: clientRect.left < 0
+    };
+  };
+
   @Component({
     components: { HueButton, HueLink },
     directives: {
@@ -51,10 +71,20 @@
     text: string;
     @Prop({ required: false, default: false })
     inline: boolean;
-
     menuOpen = false;
 
+    positionTop = false;
+    positionLeft = false;
+
     toggleMenu(): void {
+      if (!this.menuOpen) {
+        const dropdownElement = this.$el.getElementsByClassName('hue-dropdown-container');
+        if (dropdownElement.length) {
+          const outsideStatus = isOutsideViewport(dropdownElement[0]);
+          this.positionTop = outsideStatus.bottom;
+          this.positionLeft = outsideStatus.right;
+        }
+      }
       this.menuOpen = !this.menuOpen;
     }
 
@@ -89,14 +119,13 @@
       position: fixed !important;
     }
 
-    /deep/ .hue-dropdown-menu {
+    .hue-dropdown-menu {
       display: none;
       z-index: 1000;
       float: left;
 
       position: absolute;
-      top: 100%;
-      left: 0;
+
       margin: 2px 0 0;
       padding: 0;
       min-width: 160px;
@@ -113,7 +142,23 @@
 
       @include box-shadow(0, 5px, 10px, rgba(0, 0, 0, 0.2));
 
-      ul {
+      &:not(.position-top) {
+        top: 100%;
+      }
+
+      &.position-top {
+        bottom: 20px; // TODO: Calculate based on link/button dimensions
+      }
+
+      &:not(.position-left) {
+        left: 0;
+      }
+
+      &.position-left {
+        right: 0; // TODO: Calculate based on link/button dimensions
+      }
+
+      /deep/ ul {
         overflow-x: hidden;
         margin: 0 !important;
         padding: 0;
