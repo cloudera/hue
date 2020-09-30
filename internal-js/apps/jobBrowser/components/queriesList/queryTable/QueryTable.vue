@@ -46,6 +46,9 @@
       <div class="query-table-right-panel">
         <div class="table-container">
           <hue-table :columns="visibleColumns" :rows="queries">
+            <template #cell-status="query">
+              <status-indicator class="status-indicator" :value="query.status" />
+            </template>
             <template #cell-select="query">
               <input v-model="selectedQueries" type="checkbox" :value="query" />
             </template>
@@ -79,6 +82,7 @@
   import HueTable from '../../../../../../desktop/core/src/desktop/js/components/HueTable.vue';
   import Paginator from '../../../../../../desktop/core/src/desktop/js/components/Paginator.vue';
   import SearchInput from '../../../../../../desktop/core/src/desktop/js/components/SearchInput.vue';
+  import StatusIndicator from '../../../../../../desktop/core/src/desktop/js/components/StatusIndicator.vue';
   import { Column } from '../../../../../../desktop/core/src/desktop/js/components/HueTable';
   import ColumnSelectorPanel from '../../../../../../desktop/core/src/desktop/js/components/ColumnSelectorPanel.vue';
   import { fetchSuggestedSearches } from '../apiUtils';
@@ -87,6 +91,7 @@
 
   @Component({
     components: {
+      StatusIndicator,
       SearchInput,
       HueButton,
       HueLink,
@@ -250,6 +255,7 @@
         float: right;
       }
     }
+
     .query-table-container {
       display: flex;
       flex-direction: row;
@@ -267,6 +273,11 @@
           overflow-x: auto;
         }
       }
+    }
+
+    .status-indicator {
+      font-size: 24px;
+      margin: 4px;
     }
   }
 </style>
