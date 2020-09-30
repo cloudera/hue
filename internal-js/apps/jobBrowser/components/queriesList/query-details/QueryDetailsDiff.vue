@@ -22,8 +22,6 @@
       <hue-button @click="showQueries">Queries</hue-button>
     </div>
     <div class="dag-panel">
-      <fixed-anchor-nav :query="queries[0]" />
-
       <tabs>
         <tab title="Visual Explain">
           <!-- Can be converted to a loop if we have to compare more than 2 queries. But thats verry unlikely to happen. -->
@@ -101,7 +99,6 @@
   import Tab from '../../../../../../desktop/core/src/desktop/js/components/Tab.vue';
   import Tabs from '../../../../../../desktop/core/src/desktop/js/components/Tabs.vue';
 
-  import FixedAnchorNav from './FixedAnchorNav.vue';
   import HiveTimeline from './hive-timeline/HiveTimeline.vue';
   import ConfigsTable from './configs-table/ConfigsTable.vue';
   import QueryInfo from './QueryInfo.vue';
@@ -135,7 +132,6 @@
       HueButton,
       Tab,
       Tabs,
-      FixedAnchorNav,
       HiveTimeline,
       ConfigsTable,
       VisualExplain,

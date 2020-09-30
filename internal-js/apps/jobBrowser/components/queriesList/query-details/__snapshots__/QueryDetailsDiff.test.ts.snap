@@ -13,10 +13,6 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
   <div
     class="dag-panel"
   >
-    <fixed-anchor-nav-stub
-      query="[object Object]"
-    />
-     
     <tabs-stub>
       <tab-stub
         title="Visual Explain"
