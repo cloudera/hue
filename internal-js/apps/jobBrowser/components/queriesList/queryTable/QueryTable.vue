@@ -136,6 +136,7 @@
       {
         key: 'startTime',
         label: 'Start Time',
+        noWrap: true,
         adapter: (key: string, query: Query): string => timeAgo(query.startTime)
       },
       {
