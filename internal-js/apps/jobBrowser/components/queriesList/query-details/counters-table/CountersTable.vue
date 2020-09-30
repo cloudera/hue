@@ -17,9 +17,7 @@
 -->
 
 <template>
-  <div class="table">
-    <HueTable :columns="columns" :rows="rows" />
-  </div>
+  <HueTable :columns="columns" :rows="rows" />
 </template>
 
 <script lang="ts">
