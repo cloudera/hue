@@ -14,13 +14,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, unicode_literals
 
+from __future__ import absolute_import, unicode_literals
 from future import standard_library
 standard_library.install_aliases()
+
 from builtins import next, object
+
 import csv
 import datetime
+import io
 import json
 import logging
 import sys
@@ -91,7 +94,7 @@ class ExecutionWrapperCallback(object):
     self.meta['handle'] = handle_without_data
 
   def on_log(self, log):
-    self.f_log.write(log)
+    self.f_log.write(log.encode('utf-8'))
     self.f_log.flush()
 
   def on_status(self, status):
@@ -130,14 +133,15 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
 
     with storage.open(result_key, 'wb') as f:
       for chunk in response:
-        f.write(chunk)
+        f.write(chunk.encode('utf-8'))
 
     if TASK_SERVER.RESULT_CACHE.get():
-      with storage.open(result_key, 'rb') as f:
-        delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
-        csv_reader = csv.reader(f, delimiter=delimiter)
-        caches[CACHES_CELERY_QUERY_RESULT_KEY].set(result_key, [row for row in csv_reader], 60 * 5)
-        LOG.info('Caching results %s.' % result_key)
+      with storage.open(result_key, 'rb') as store:
+        with io.TextIOWrapper(store, encoding='utf-8') as text_file:
+          delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
+          csv_reader = csv.reader(text_file, delimiter=delimiter)
+          caches[CACHES_CELERY_QUERY_RESULT_KEY].set(result_key, [row for row in csv_reader], 60 * 5)
+          LOG.info('Caching results %s.' % result_key)
 
     meta['row_counter'] = content_generator.row_counter
     meta['truncated'] = content_generator.is_truncated
@@ -297,7 +301,7 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
           count += 1
           if count <= startFrom:
             continue
-          output.write(line)
+          output.write(line.decode('utf-8'))
       return output.getvalue()
 
 
