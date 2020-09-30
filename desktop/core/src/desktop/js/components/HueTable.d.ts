@@ -14,13 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Component } from 'vue';
-
 export interface Column<T> {
   label: string;
   key: string;
-  cellComponent?: Component;
-  cellProps?: (key: string, row: T) => { [attr: string]: unknown };
+  small?: boolean;
   adapter?: (key: string, row: T) => string | number | boolean | undefined;
 }
 

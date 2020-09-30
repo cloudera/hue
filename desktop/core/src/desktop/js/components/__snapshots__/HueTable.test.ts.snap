@@ -1,20 +1,40 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`HueTable.vue should render a table 1`] = `
-<table>
+<table
+  class="hue-table"
+>
   <thead>
-    <tr>
+    <tr
+      class="header-row"
+    >
       <th>
-        A
+        <div
+          class="cell-content"
+        >
+          A
+        </div>
       </th>
       <th>
-        D
+        <div
+          class="cell-content"
+        >
+          D
+        </div>
       </th>
       <th>
-        C
+        <div
+          class="cell-content"
+        >
+          C
+        </div>
       </th>
       <th>
-        B
+        <div
+          class="cell-content"
+        >
+          B
+        </div>
       </th>
     </tr>
   </thead>
@@ -22,90 +42,154 @@ exports[`HueTable.vue should render a table 1`] = `
   <tbody>
     <tr>
       <td>
-        
-          1
-        
-      </td>
-      <td>
-        
+        <div
+          class="cell-content"
+        >
           
-        
+            1
+          
+        </div>
       </td>
       <td>
-        
-          false
-        
+        <div
+          class="cell-content"
+        >
+          
+            
+          
+        </div>
       </td>
       <td>
-        
-          5
-        
+        <div
+          class="cell-content"
+        >
+          
+            false
+          
+        </div>
+      </td>
+      <td>
+        <div
+          class="cell-content"
+        >
+          
+            5
+          
+        </div>
       </td>
     </tr>
     <tr>
       <td>
-        
-          2
-        
-      </td>
-      <td>
-        
+        <div
+          class="cell-content"
+        >
           
-        
+            2
+          
+        </div>
       </td>
       <td>
-        
-          true
-        
+        <div
+          class="cell-content"
+        >
+          
+            
+          
+        </div>
       </td>
       <td>
-        
-          6
-        
+        <div
+          class="cell-content"
+        >
+          
+            true
+          
+        </div>
+      </td>
+      <td>
+        <div
+          class="cell-content"
+        >
+          
+            6
+          
+        </div>
       </td>
     </tr>
     <tr>
       <td>
-        
-          3
-        
-      </td>
-      <td>
-        
+        <div
+          class="cell-content"
+        >
           
-        
+            3
+          
+        </div>
       </td>
       <td>
-        
-          false
-        
+        <div
+          class="cell-content"
+        >
+          
+            
+          
+        </div>
       </td>
       <td>
-        
-          7
-        
+        <div
+          class="cell-content"
+        >
+          
+            false
+          
+        </div>
+      </td>
+      <td>
+        <div
+          class="cell-content"
+        >
+          
+            7
+          
+        </div>
       </td>
     </tr>
     <tr>
       <td>
-        
-          4
-        
-      </td>
-      <td>
-        
+        <div
+          class="cell-content"
+        >
           
-        
+            4
+          
+        </div>
       </td>
       <td>
-        
-          true
-        
+        <div
+          class="cell-content"
+        >
+          
+            
+          
+        </div>
       </td>
       <td>
-        
-          8
-        
+        <div
+          class="cell-content"
+        >
+          
+            true
+          
+        </div>
+      </td>
+      <td>
+        <div
+          class="cell-content"
+        >
+          
+            8
+          
+        </div>
       </td>
     </tr>
   </tbody>
@@ -113,14 +197,26 @@ exports[`HueTable.vue should render a table 1`] = `
 `;
 
 exports[`HueTable.vue should render a table with a custom component for a cell 1`] = `
-<table>
+<table
+  class="hue-table"
+>
   <thead>
-    <tr>
+    <tr
+      class="header-row"
+    >
       <th>
-        A
+        <div
+          class="cell-content"
+        >
+          A
+        </div>
       </th>
       <th>
-        B
+        <div
+          class="cell-content"
+        >
+          B
+        </div>
       </th>
     </tr>
   </thead>
@@ -128,26 +224,42 @@ exports[`HueTable.vue should render a table with a custom component for a cell 1
   <tbody>
     <tr>
       <td>
-        <div>
-          3
+        <div
+          class="cell-content"
+        >
+          <div>
+            3
+          </div>
         </div>
       </td>
       <td>
-        
-          2
-        
+        <div
+          class="cell-content"
+        >
+          
+            2
+          
+        </div>
       </td>
     </tr>
     <tr>
       <td>
-        <div>
-          9
+        <div
+          class="cell-content"
+        >
+          <div>
+            9
+          </div>
         </div>
       </td>
       <td>
-        
-          5
-        
+        <div
+          class="cell-content"
+        >
+          
+            5
+          
+        </div>
       </td>
     </tr>
   </tbody>
@@ -155,14 +267,26 @@ exports[`HueTable.vue should render a table with a custom component for a cell 1
 `;
 
 exports[`HueTable.vue should render a table with adapter 1`] = `
-<table>
+<table
+  class="hue-table"
+>
   <thead>
-    <tr>
+    <tr
+      class="header-row"
+    >
       <th>
-        A
+        <div
+          class="cell-content"
+        >
+          A
+        </div>
       </th>
       <th>
-        B + C
+        <div
+          class="cell-content"
+        >
+          B + C
+        </div>
       </th>
     </tr>
   </thead>
@@ -170,50 +294,82 @@ exports[`HueTable.vue should render a table with adapter 1`] = `
   <tbody>
     <tr>
       <td>
-        
-          1
-        
+        <div
+          class="cell-content"
+        >
+          
+            1
+          
+        </div>
       </td>
       <td>
-        
-          14
-        
-      </td>
-    </tr>
-    <tr>
-      <td>
-        
-          2
-        
-      </td>
-      <td>
-        
-          16
-        
+        <div
+          class="cell-content"
+        >
+          
+            14
+          
+        </div>
       </td>
     </tr>
     <tr>
       <td>
-        
-          3
-        
+        <div
+          class="cell-content"
+        >
+          
+            2
+          
+        </div>
       </td>
       <td>
-        
-          18
-        
+        <div
+          class="cell-content"
+        >
+          
+            16
+          
+        </div>
       </td>
     </tr>
     <tr>
       <td>
-        
-          4
-        
+        <div
+          class="cell-content"
+        >
+          
+            3
+          
+        </div>
       </td>
       <td>
-        
-          20
-        
+        <div
+          class="cell-content"
+        >
+          
+            18
+          
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div
+          class="cell-content"
+        >
+          
+            4
+          
+        </div>
+      </td>
+      <td>
+        <div
+          class="cell-content"
+        >
+          
+            20
+          
+        </div>
       </td>
     </tr>
   </tbody>
