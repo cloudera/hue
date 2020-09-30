@@ -1,0 +1,54 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Modal.vue should render a modal 1`] = `
+<transition-stub
+  name="modal"
+>
+  <div
+    class="modal-mask"
+  >
+    <div
+      class="modal-wrapper"
+    >
+      <div
+        class="modal-container"
+      >
+        <div
+          class="modal-header"
+        >
+          <div
+            id="test-header"
+          >
+            Some Header
+          </div>
+           
+          <i
+            aria-hidden="true"
+            class="fa fa-times"
+          />
+        </div>
+         
+        <div
+          class="modal-body"
+        >
+          <div
+            id="test-body"
+          >
+            Some Body
+          </div>
+        </div>
+         
+        <div
+          class="modal-footer"
+        >
+          <div
+            id="test-footer"
+          >
+            Some Footer
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</transition-stub>
+`;

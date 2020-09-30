@@ -69,7 +69,7 @@
     @Prop() entity: Table;
     @Prop({ default: 10 }) maxColumns: number;
 
-    maxCols: number = 0;
+    maxCols = 0;
 
     created(): void {
       this.maxCols = this.maxColumns;

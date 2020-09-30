@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DropdownItemText.vue should render 1`] = `
+<li
+  class="hue-dropdown-item-text"
+>
+  
+  
+  
+</li>
+`;

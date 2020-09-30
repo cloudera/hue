@@ -1,0 +1,221 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HueTable.vue should render a table 1`] = `
+<table>
+  <thead>
+    <tr>
+      <th>
+        A
+      </th>
+      <th>
+        D
+      </th>
+      <th>
+        C
+      </th>
+      <th>
+        B
+      </th>
+    </tr>
+  </thead>
+   
+  <tbody>
+    <tr>
+      <td>
+        
+          1
+        
+      </td>
+      <td>
+        
+          
+        
+      </td>
+      <td>
+        
+          false
+        
+      </td>
+      <td>
+        
+          5
+        
+      </td>
+    </tr>
+    <tr>
+      <td>
+        
+          2
+        
+      </td>
+      <td>
+        
+          
+        
+      </td>
+      <td>
+        
+          true
+        
+      </td>
+      <td>
+        
+          6
+        
+      </td>
+    </tr>
+    <tr>
+      <td>
+        
+          3
+        
+      </td>
+      <td>
+        
+          
+        
+      </td>
+      <td>
+        
+          false
+        
+      </td>
+      <td>
+        
+          7
+        
+      </td>
+    </tr>
+    <tr>
+      <td>
+        
+          4
+        
+      </td>
+      <td>
+        
+          
+        
+      </td>
+      <td>
+        
+          true
+        
+      </td>
+      <td>
+        
+          8
+        
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`HueTable.vue should render a table with a custom component for a cell 1`] = `
+<table>
+  <thead>
+    <tr>
+      <th>
+        A
+      </th>
+      <th>
+        B
+      </th>
+    </tr>
+  </thead>
+   
+  <tbody>
+    <tr>
+      <td>
+        
+          1
+        
+      </td>
+      <td>
+        <span>
+          now
+        </span>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        
+          4
+        
+      </td>
+      <td>
+        <span>
+          now
+        </span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`HueTable.vue should render a table with adapter 1`] = `
+<table>
+  <thead>
+    <tr>
+      <th>
+        A
+      </th>
+      <th>
+        B + C
+      </th>
+    </tr>
+  </thead>
+   
+  <tbody>
+    <tr>
+      <td>
+        
+          1
+        
+      </td>
+      <td>
+        
+          14
+        
+      </td>
+    </tr>
+    <tr>
+      <td>
+        
+          2
+        
+      </td>
+      <td>
+        
+          16
+        
+      </td>
+    </tr>
+    <tr>
+      <td>
+        
+          3
+        
+      </td>
+      <td>
+        
+          18
+        
+      </td>
+    </tr>
+    <tr>
+      <td>
+        
+          4
+        
+      </td>
+      <td>
+        
+          20
+        
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;

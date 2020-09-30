@@ -48,6 +48,7 @@ class OozieApi(Api):
   RESULTS_PATTERN = "(?P<results>>>> Invoking Beeline command line now >>>.+<<< Invocation of Beeline command completed <<<)"
   RESULTS_PATTERN_GENERIC = "(?P<results>>>> Invoking Main class now >>>.+<<< Invocation of Main class completed <<<)"
   RESULTS_PATTERN_MAPREDUCE = "(?P<results>.+)"
+  RESULTS_PATTERN_SQOOP = "(?P<results>>>> Invoking Main class now >>>.+<<< Invocation of Sqoop command completed <<<)"
   RESULTS_PATTERN_PIG = "(?P<results>>>> Invoking Pig command line now >>>.+<<< Invocation of Pig command completed <<<)"
   BATCH_JOB_PREFIX = 'Batch'
   SCHEDULE_JOB_PREFIX = 'Schedule'
@@ -66,12 +67,14 @@ class OozieApi(Api):
 
     if notebook['type'] == 'notebook' or notebook['type'] == 'query-java':
       # Convert notebook to workflow
-      workflow_doc = WorkflowBuilder().create_notebook_workflow(notebook=notebook, user=self.user, managed=True, name=_("%s for %s") % (OozieApi.BATCH_JOB_PREFIX, notebook['name'] or notebook['type']))
+      workflow_doc = WorkflowBuilder().create_notebook_workflow(notebook=notebook, user=self.user, managed=True,
+                                                  name=_("%s for %s") % (OozieApi.BATCH_JOB_PREFIX, notebook['name'] or notebook['type']))
       workflow = Workflow(document=workflow_doc, user=self.user)
     else:
       notebook_doc = Document2.objects.get_by_uuid(user=self.user, uuid=notebook['uuid'], perm_type='read')
       # Create a managed workflow from the notebook doc
-      workflow_doc = WorkflowBuilder().create_workflow(document=notebook_doc, user=self.user, managed=True, name=_("Batch job for %s") % (notebook_doc.name or notebook_doc.type))
+      workflow_doc = WorkflowBuilder().create_workflow(document=notebook_doc, user=self.user,
+                                                       managed=True, name=_("Batch job for %s") % (notebook_doc.name or notebook_doc.type))
       workflow = Workflow(document=workflow_doc, user=self.user)
 
     # Submit workflow
@@ -113,7 +116,7 @@ class OozieApi(Api):
     results = self._get_results(log_output, snippet['type'])
 
     return {
-        'data':  [[line] for line in results.split('\n')],  # hdfs_link()
+        'data': [[line] for line in results.split('\n')],  # hdfs_link()
         'meta': [{'name': 'Header', 'type': 'STRING_TYPE', 'comment': ''}],
         'type': 'table',
         'has_more': False,
@@ -206,6 +209,8 @@ class OozieApi(Api):
       pattern = self.RESULTS_PATTERN_PIG
     elif action_type == 'mapreduce':
       pattern = self.RESULTS_PATTERN_MAPREDUCE
+    elif action_type == 'sqoop1':
+      pattern = self.RESULTS_PATTERN_SQOOP
     else:
       pattern = self.RESULTS_PATTERN_GENERIC
 

@@ -28,7 +28,7 @@
 
   @Component
   export default class HiveQueryPlan extends Vue {
-    title: string = 'Web Component';
+    title = 'Web Component';
   }
 </script>
 

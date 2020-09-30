@@ -18,14 +18,12 @@
 
 import { groupEntities } from './processor';
 import { createTables } from '../test/utils';
-import { Table } from './entities';
-import { IEntity } from './interfaces';
 
 describe('processor UTs', () => {
   test('Multiple unrelated entities (t0, t1, t2, t3, t4)', () => {
     const tableCount = 5;
 
-    const entityGroups: Array<Array<IEntity>> = groupEntities(createTables(tableCount, 0), []);
+    const entityGroups = groupEntities(createTables(tableCount, 0), []);
 
     expect(entityGroups).toHaveLength(5);
     expect(entityGroups.flat()).toHaveLength(tableCount);
@@ -34,8 +32,8 @@ describe('processor UTs', () => {
   test('Related entities - Linked list (t0-t1-t2-t3-t4)', () => {
     const tableCount = 5;
 
-    const tables: Array<Table> = createTables(tableCount, 2);
-    const entityGroups: Array<Array<IEntity>> = groupEntities(tables, [
+    const tables = createTables(tableCount, 2);
+    const entityGroups = groupEntities(tables, [
       {
         desc: '',
         left: tables[0].columns[1],
@@ -65,8 +63,8 @@ describe('processor UTs', () => {
   test('Related entities - Binary tree (t0-t1, t0-t2, t2-t3, t2-t4)', () => {
     const tableCount = 5;
 
-    const tables: Array<Table> = createTables(tableCount, 3);
-    const entityGroups: Array<Array<IEntity>> = groupEntities(tables, [
+    const tables = createTables(tableCount, 3);
+    const entityGroups = groupEntities(tables, [
       {
         desc: '',
         left: tables[0].columns[1],
@@ -97,8 +95,8 @@ describe('processor UTs', () => {
     // Adding back links in the above binary tree to simulate graph
     const tableCount = 5;
 
-    const tables: Array<Table> = createTables(tableCount, 3);
-    const entityGroups: Array<Array<IEntity>> = groupEntities(tables, [
+    const tables = createTables(tableCount, 3);
+    const entityGroups = groupEntities(tables, [
       {
         desc: '',
         left: tables[0].columns[1],
@@ -140,8 +138,8 @@ describe('processor UTs', () => {
   test('Related entities - Self relation (t0-t0, t1)', () => {
     const tableCount = 2;
 
-    const tables: Array<Table> = createTables(tableCount, 2);
-    const entityGroups: Array<Array<IEntity>> = groupEntities(tables, [
+    const tables = createTables(tableCount, 2);
+    const entityGroups = groupEntities(tables, [
       {
         desc: '',
         left: tables[0].columns[1],
@@ -156,8 +154,8 @@ describe('processor UTs', () => {
   test('Related entities - Self relation + external reference (t0-t0, t0-t1)', () => {
     const tableCount = 2;
 
-    const tables: Array<Table> = createTables(tableCount, 3);
-    const entityGroups: Array<Array<IEntity>> = groupEntities(tables, [
+    const tables = createTables(tableCount, 3);
+    const entityGroups = groupEntities(tables, [
       {
         desc: '',
         left: tables[0].columns[1],
@@ -177,8 +175,8 @@ describe('processor UTs', () => {
   test('Related entities - Cyclic relation (t0-t1, t1-t0)', () => {
     const tableCount = 2;
 
-    const tables: Array<Table> = createTables(tableCount, 3);
-    const entityGroups: Array<Array<IEntity>> = groupEntities(tables, [
+    const tables = createTables(tableCount, 3);
+    const entityGroups = groupEntities(tables, [
       {
         desc: '',
         left: tables[0].columns[1],
@@ -198,8 +196,8 @@ describe('processor UTs', () => {
   test('Unrelated entity groups (t0-t1, t2-t3, t2-t4)', () => {
     const tableCount = 5;
 
-    const tables: Array<Table> = createTables(tableCount, 2);
-    const entityGroups: Array<Array<IEntity>> = groupEntities(tables, [
+    const tables = createTables(tableCount, 2);
+    const entityGroups = groupEntities(tables, [
       {
         desc: '',
         left: tables[0].columns[1],

@@ -160,7 +160,7 @@ With LDAPS enabled over HTTPS:
 
     options='{"url": "presto://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\"}"}'
 
-Pass Presto Session properties along with HTTPS: 
+Pass Presto Session properties along with HTTPS:
 
     options='{"url": "presto://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\", \"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
 
@@ -555,6 +555,11 @@ Then give Hue the information about the database source:
        name = BigQuery
        interface=sqlalchemy
        options='{"url": "bigquery://project-XXXXXX", "credentials_json": "{\"type\": \"service_account\", ...}"}'
+
+Where to get the Json credentials? By creating a service account:
+
+* https://googleapis.dev/python/google-api-core/latest/auth.html
+* https://console.cloud.google.com/iam-admin/serviceaccounts
 
 Where to get the names? In the 'Resources' panel of Big Query UI:
 

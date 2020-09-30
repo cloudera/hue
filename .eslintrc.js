@@ -74,6 +74,9 @@ module.exports = {
         'plugin:@typescript-eslint/recommended'
       ],
       parser: 'vue-eslint-parser',
+      parserOptions: {
+        parser: "@typescript-eslint/parser"
+      },
       plugins: ['vue', '@typescript-eslint'],
       rules: {
         'vue/max-attributes-per-line': [
@@ -85,7 +88,16 @@ module.exports = {
               allowFirstLine: false
             }
           }
-        ]
+        ],
+        'vue/html-self-closing': [
+          "error",
+          {
+            "html": {
+              "void": "any"
+            }
+          }
+        ],
+        'vue/singleline-html-element-content-newline': 0, // Conflicts with prettier
       }
     },
     {
