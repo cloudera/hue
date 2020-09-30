@@ -19,15 +19,15 @@ spec:
           image: postgres:9.5
           env:
             - name: POSTGRES_USER
-              value: hue
+              value: {{ .Values.hue.database.user }}
             - name: POSTGRES_PASSWORD
-              value: hue
+              value: {{ .Values.hue.database.password }}
             - name: POSTGRES_DB
-              value: hue
+              value: {{ .Values.hue.database.name }}
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
           ports:
-            - containerPort: 5432
+            - containerPort: {{ .Values.hue.database.port }}
           resources:
             requests:
               # memory: "350Mi"
