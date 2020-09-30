@@ -24,6 +24,20 @@ spec:
 {{ toYaml . | indent 8 }}
 {{- end }}
     spec:
+{{ if eq .Values.hue.database.engine "postgresql_psycopg2" }}
+      initContainers:
+        - name: hue-init
+          image: {{ .Values.image.registry }}/hue:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - /bin/sh
+            - -c
+            - >
+              set -x;
+              while [ $(curl -s --connect-timeout 1 {{ .Values.hue.database.host }}:{{ .Values.hue.database.port }} || echo $?) -ne 52 ]; do
+                sleep 1;
+              done
+{{ end }}
       containers:
       - name: hue
         image: {{ .Values.image.registry }}/hue:{{ .Values.image.tag }}
