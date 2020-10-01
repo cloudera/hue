@@ -429,5 +429,5 @@ class TestUtils():
     }
     api = SqlAlchemyApi(self.user, interpreter)
 
-    assert_equal(api._fix_bigquery_db_prefixes('table'), 'table')
-    assert_equal(api._fix_bigquery_db_prefixes('db.table'), 'table')
+    assert_equal(api._fix_bigquery_db_prefixes({'name': 'table'}), {'name': 'table'})
+    assert_equal(api._fix_bigquery_db_prefixes({'name': 'db.table'}), {'name': 'table'})

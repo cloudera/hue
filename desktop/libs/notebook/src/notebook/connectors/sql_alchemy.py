@@ -392,8 +392,12 @@ class SqlAlchemyApi(Api):
     elif table is None:
       tables_meta = []
       for t in assist.get_tables(database):
+        if isinstance(t, dict):
+          t = {'name': t['name'], 'type': t.get('type', 'Table'), 'comment': t.get('comment', '')}
+        else:
+          t = {'name': t, 'type': 'Table', 'comment': ''}
         t = self._fix_bigquery_db_prefixes(t)
-        tables_meta.append({'name': t, 'type': 'Table', 'comment': ''})
+        tables_meta.append(t)
       response['tables_meta'] = tables_meta
     elif column is None:
       columns = assist.get_columns(database, table)
@@ -472,10 +476,14 @@ class SqlAlchemyApi(Api):
     return name
 
 
-  def _fix_bigquery_db_prefixes(self, table_or_column):
+  def _fix_bigquery_db_prefixes(self, identifier):
+    if identifier.get('type') == 'model':
+      identifier['type'] = 'Model'
+
     if self.options['url'].startswith('bigquery://'):
-      table_or_column = table_or_column.rsplit('.', 1)[-1]
-    return table_or_column
+      identifier['name'] = identifier['name'].rsplit('.', 1)[-1]
+
+    return identifier
 
 
 class Assist(object):
@@ -490,6 +498,9 @@ class Assist(object):
 
   def get_tables(self, database, table_names=[]):
     return self.db.get_table_names(database)
+
+  def get_models(self, database):
+    return self.db.get_model_names(database)
 
   def get_columns(self, database, table):
     return self.db.get_columns(table, database)
