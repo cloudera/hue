@@ -15,11 +15,11 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
-import DropdownItemButton from './DropdownItemButton.vue';
+import DropdownMenuText from './DropdownMenuText.vue';
 
-describe('DropdownItemButton.vue', () => {
+describe('DropdownMenuText.vue', () => {
   it('should render', () => {
-    const wrapper = shallowMount(DropdownItemButton);
+    const wrapper = shallowMount(DropdownMenuText);
     expect(wrapper.element).toMatchSnapshot();
   });
 });

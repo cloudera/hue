@@ -22,15 +22,15 @@
       {{ offset + 1 }}-{{ Math.min(offset + limit, totalEntries) }} of {{ totalEntries }}
     </div>
     Rows per page:
-    <dropdown :inline="true" :text="limit">
-      <dropdown-item-button
+    <dropdown-menu :inline="true" :text="limit">
+      <dropdown-menu-button
         v-for="presetLimit of presetLimits"
         :key="presetLimit"
         @click="setLimit(presetLimit)"
       >
         {{ presetLimit }}
-      </dropdown-item-button>
-    </dropdown>
+      </dropdown-menu-button>
+    </dropdown-menu>
     <div class="navigation-actions">
       <a
         href="javascript: void(0);"
@@ -66,8 +66,8 @@
 
 <script lang="ts">
   import HueIcon from './HueIcon.vue';
-  import Dropdown from './dropdown/Dropdown.vue';
-  import DropdownItemButton from './dropdown/DropdownItemButton.vue';
+  import DropdownMenu from './dropdown/DropdownMenu.vue';
+  import DropdownMenuButton from './dropdown/DropdownMenuButton.vue';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop, Watch } from 'vue-property-decorator';
@@ -76,7 +76,7 @@
   const PRESET_LIMITS = [DEFAULT_LIMIT, 50, 100];
 
   @Component({
-    components: { HueIcon, Dropdown, DropdownItemButton }
+    components: { HueIcon, DropdownMenu, DropdownMenuButton }
   })
   export default class Paginator extends Vue {
     @Prop({ required: true })

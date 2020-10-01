@@ -15,11 +15,15 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
-import DropdownItemText from './DropdownItemText.vue';
+import DropdownMenuGroup from './DropdownMenuGroup.vue';
 
-describe('DropdownItemText.vue', () => {
+describe('DropdownMenuGroup.vue', () => {
   it('should render', () => {
-    const wrapper = shallowMount(DropdownItemText);
+    const wrapper = shallowMount(DropdownMenuGroup, {
+      propsData: {
+        header: 'Some Header'
+      }
+    });
     expect(wrapper.element).toMatchSnapshot();
   });
 });

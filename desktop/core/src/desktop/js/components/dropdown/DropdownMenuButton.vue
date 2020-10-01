@@ -18,8 +18,7 @@
 
 <template>
   <li>
-    {{ text }}
-    <slot />
+    <button @click="$emit('click')"><slot /></button>
   </li>
 </template>
 
@@ -28,7 +27,7 @@
   import Component from 'vue-class-component';
 
   @Component
-  export default class DropdownItem extends Vue {}
+  export default class DropdownMenuButton extends Vue {}
 </script>
 
 <style lang="scss" scoped></style>

@@ -14,26 +14,26 @@ exports[`Paginator.vue should render 1`] = `
   
   Rows per page:
   
-  <dropdown-stub
+  <dropdown-menu-stub
     inline="true"
     text="25"
   >
-    <dropdown-item-button-stub>
+    <dropdown-menu-button-stub>
       
       25
     
-    </dropdown-item-button-stub>
-    <dropdown-item-button-stub>
+    </dropdown-menu-button-stub>
+    <dropdown-menu-button-stub>
       
       50
     
-    </dropdown-item-button-stub>
-    <dropdown-item-button-stub>
+    </dropdown-menu-button-stub>
+    <dropdown-menu-button-stub>
       
       100
     
-    </dropdown-item-button-stub>
-  </dropdown-stub>
+    </dropdown-menu-button-stub>
+  </dropdown-menu-stub>
    
   <div
     class="navigation-actions"
