@@ -44,6 +44,7 @@ class MetastoreTable {
 
     // TODO: Check if enough or if we need to fetch additional details
     this.isView = ko.observable(this.catalogEntry.isView());
+    this.isModel = ko.observable(this.catalogEntry.isModel());
     this.viewSql = ko.observable();
 
     this.optimizerStats = ko.observable();

@@ -1350,6 +1350,21 @@ class DataCatalogEntry {
   }
 
   /**
+   * Returns true if the entry is a ML Model. It will be accurate once the source meta has been loaded.
+   *
+   * @return {boolean}
+   */
+  isModel() {
+    const self = this;
+    return (
+      self.path.length === 2 &&
+      self.definition &&
+      self.definition.type &&
+      self.definition.type.toLowerCase() === 'model'
+    );
+  }
+
+  /**
    * Returns true if the entry is a column.
    *
    * @return {boolean}
