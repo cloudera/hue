@@ -19,99 +19,104 @@
 <template>
   <div>
     <div>
-      <div class="query-details-row">
-        <div class="query-details-label">Query ID</div>
-        <div class="query-details-value">{{ query.queryId }}</div>
+      <div class="query-info-row">
+        <div class="query-info-label">Query ID</div>
+        <div class="query-info-value">{{ query.queryId }}</div>
       </div>
 
-      <div class="query-details-row">
-        <div class="query-details-label">User</div>
-        <div class="query-details-value">{{ query.requestUser }}</div>
+      <div class="query-info-row">
+        <div class="query-info-label">User</div>
+        <div class="query-info-value">{{ query.requestUser }}</div>
       </div>
 
-      <div class="query-details-row">
-        <div class="query-details-label">Status</div>
-        <div class="query-details-value">{{ query.status }}</div>
+      <div class="query-info-row">
+        <div class="query-info-label">Status</div>
+        <div class="query-info-value">{{ query.status }}</div>
       </div>
 
-      <div class="query-details-row">
-        <div class="query-details-label">Start Time</div>
-        <div class="query-details-value">
+      <div class="query-info-row">
+        <div class="query-info-label">Start Time</div>
+        <div class="query-info-value">
           <time-ago :value="query.startTime" />
         </div>
       </div>
 
-      <div class="query-details-row">
-        <div class="query-details-label">End Time</div>
-        <div class="query-details-value">
+      <div class="query-info-row">
+        <div class="query-info-label">End Time</div>
+        <div class="query-info-value">
           <time-ago :value="query.endTime" />
         </div>
       </div>
 
-      <div class="query-details-row">
-        <div class="query-details-label">Duration</div>
-        <div class="query-details-value">
+      <div class="query-info-row">
+        <div class="query-info-label">Duration</div>
+        <div class="query-info-value">
           <duration v-if="query.duration" :value="query.duration" />
           <span v-else>-</span>
         </div>
       </div>
 
-      <div class="query-details-row">
-        <div class="query-details-label">Tables Read</div>
-        <div class="query-details-value">
+      <div class="query-info-row">
+        <div class="query-info-label">Tables Read</div>
+        <div class="query-info-value">
           <span v-if="query.tablesReadWithDatabase">{{ query.tablesReadWithDatabase }}</span>
           <span v-else>-</span>
         </div>
       </div>
 
-      <div class="query-details-row">
-        <div class="query-details-label">Tables Written</div>
-        <div class="query-details-value">
+      <div class="query-info-row">
+        <div class="query-info-label">Tables Written</div>
+        <div class="query-info-value">
           <span v-if="query.tablesWrittenWithDatabase">{{ query.tablesWrittenWithDatabase }}</span>
           <span v-else>-</span>
         </div>
       </div>
 
-      <div class="query-details-row">
-        <div class="query-details-label">Application ID</div>
-        <div class="query-details-value">
+      <div class="query-info-row">
+        <div class="query-info-label">Application ID</div>
+        <div class="query-info-value">
           <span v-if="query.appIds && query.appIds.length">{{ query.appIds }}</span>
           <span v-else>-</span>
         </div>
       </div>
 
-      <div class="query-details-row">
-        <div class="query-details-label">DAG ID</div>
-        <div class="query-details-value">
+      <div class="query-info-row">
+        <div class="query-info-label">DAG ID</div>
+        <div class="query-info-value">
           <span v-if="query.dagIds && query.dagIds.length">{{ query.dagIds }}</span>
           <span v-else>-</span>
         </div>
       </div>
 
-      <div class="query-details-row">
-        <div class="query-details-label">Session ID</div>
-        <div class="query-details-value">{{ query.sessionId }}</div>
+      <div class="query-info-row">
+        <div class="query-info-label">Session ID</div>
+        <div class="query-info-value">{{ query.sessionId }}</div>
       </div>
 
-      <div v-if="query.llapAppId" class="query-details-row">
-        <div class="query-details-label">LLAP App ID</div>
-        <div class="query-details-value">{{ query.llapAppId }}</div>
+      <div v-if="query.llapAppId" class="query-info-row">
+        <div class="query-info-label">LLAP App ID</div>
+        <div class="query-info-value">{{ query.llapAppId }}</div>
       </div>
 
-      <div class="query-details-row">
-        <div class="query-details-label">Thread Id</div>
-        <div class="query-details-value">{{ query.threadId }}</div>
+      <div class="query-info-row">
+        <div class="query-info-label">Thread Id</div>
+        <div class="query-info-value">{{ query.threadId }}</div>
       </div>
 
-      <div class="query-details-row">
-        <div class="query-details-label">Queue</div>
-        <div class="query-details-value">
+      <div class="query-info-row">
+        <div class="query-info-label">Queue</div>
+        <div class="query-info-value">
           <span v-if="query.queueName">{{ query.queueName }}</span>
           <span v-else>None</span>
         </div>
       </div>
 
-      <sql-text :value="query.query" />
+      <div class="query-info-row">
+        <div class="query-info-label">Query</div>
+        <div class="query-info-query">
+          <sql-text :enable-overflow="true" :format="true" :value="query.query" />
+        </div>
+      </div>
     </div>
 
     <div v-if="query.details.diagnostics" class="panel panel-danger">
@@ -131,11 +136,16 @@
   @Component({
     components: { Duration, TimeAgo, SqlText }
   })
-  export default class QueryInfo extends SingleQueryComponent {}
+  export default class QueryInfo extends SingleQueryComponent {
+    get formattedQuery(): string {
+      return this.query.query;
+    }
+  }
 </script>
 
 <style lang="scss" scoped>
   @import '../../../../../../desktop/core/src/desktop/js/components/styles/colors';
+  @import '../../../../../../desktop/core/src/desktop/js/components/styles/mixins';
 
   .query-title {
     padding: 0 10px 10px 10px;
@@ -144,11 +154,11 @@
     font-weight: 500;
   }
 
-  .query-details-row {
+  .query-info-row {
     margin-bottom: 15px;
     margin-left: 10px;
 
-    .query-details-label {
+    .query-info-label {
       text-transform: uppercase;
       color: $fluid-gray-500;
       font-weight: normal;
@@ -156,8 +166,12 @@
       margin: 0;
     }
 
-    .query-details-value {
+    .query-info-value {
       color: $fluid-gray-700;
+    }
+
+    .query-info-query {
+      padding: 5px;
     }
   }
 </style>

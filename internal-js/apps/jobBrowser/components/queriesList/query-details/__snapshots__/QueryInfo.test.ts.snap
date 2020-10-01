@@ -4,96 +4,96 @@ exports[`QueryInfo.vue should render 1`] = `
 <div>
   <div>
     <div
-      class="query-details-row"
+      class="query-info-row"
     >
       <div
-        class="query-details-label"
+        class="query-info-label"
       >
         Query ID
       </div>
        
       <div
-        class="query-details-value"
+        class="query-info-value"
       >
         
       </div>
     </div>
      
     <div
-      class="query-details-row"
+      class="query-info-row"
     >
       <div
-        class="query-details-label"
+        class="query-info-label"
       >
         User
       </div>
        
       <div
-        class="query-details-value"
+        class="query-info-value"
       >
         
       </div>
     </div>
      
     <div
-      class="query-details-row"
+      class="query-info-row"
     >
       <div
-        class="query-details-label"
+        class="query-info-label"
       >
         Status
       </div>
        
       <div
-        class="query-details-value"
+        class="query-info-value"
       >
         
       </div>
     </div>
      
     <div
-      class="query-details-row"
+      class="query-info-row"
     >
       <div
-        class="query-details-label"
+        class="query-info-label"
       >
         Start Time
       </div>
        
       <div
-        class="query-details-value"
+        class="query-info-value"
       >
         <time-ago-stub />
       </div>
     </div>
      
     <div
-      class="query-details-row"
+      class="query-info-row"
     >
       <div
-        class="query-details-label"
+        class="query-info-label"
       >
         End Time
       </div>
        
       <div
-        class="query-details-value"
+        class="query-info-value"
       >
         <time-ago-stub />
       </div>
     </div>
      
     <div
-      class="query-details-row"
+      class="query-info-row"
     >
       <div
-        class="query-details-label"
+        class="query-info-label"
       >
         Duration
       </div>
        
       <div
-        class="query-details-value"
+        class="query-info-value"
       >
         <span>
           -
@@ -102,16 +102,16 @@ exports[`QueryInfo.vue should render 1`] = `
     </div>
      
     <div
-      class="query-details-row"
+      class="query-info-row"
     >
       <div
-        class="query-details-label"
+        class="query-info-label"
       >
         Tables Read
       </div>
        
       <div
-        class="query-details-value"
+        class="query-info-value"
       >
         <span>
           -
@@ -120,16 +120,16 @@ exports[`QueryInfo.vue should render 1`] = `
     </div>
      
     <div
-      class="query-details-row"
+      class="query-info-row"
     >
       <div
-        class="query-details-label"
+        class="query-info-label"
       >
         Tables Written
       </div>
        
       <div
-        class="query-details-value"
+        class="query-info-value"
       >
         <span>
           -
@@ -138,16 +138,16 @@ exports[`QueryInfo.vue should render 1`] = `
     </div>
      
     <div
-      class="query-details-row"
+      class="query-info-row"
     >
       <div
-        class="query-details-label"
+        class="query-info-label"
       >
         Application ID
       </div>
        
       <div
-        class="query-details-value"
+        class="query-info-value"
       >
         <span>
           -
@@ -156,16 +156,16 @@ exports[`QueryInfo.vue should render 1`] = `
     </div>
      
     <div
-      class="query-details-row"
+      class="query-info-row"
     >
       <div
-        class="query-details-label"
+        class="query-info-label"
       >
         DAG ID
       </div>
        
       <div
-        class="query-details-value"
+        class="query-info-value"
       >
         <span>
           -
@@ -174,16 +174,16 @@ exports[`QueryInfo.vue should render 1`] = `
     </div>
      
     <div
-      class="query-details-row"
+      class="query-info-row"
     >
       <div
-        class="query-details-label"
+        class="query-info-label"
       >
         Session ID
       </div>
        
       <div
-        class="query-details-value"
+        class="query-info-value"
       >
         
       </div>
@@ -192,32 +192,32 @@ exports[`QueryInfo.vue should render 1`] = `
     <!---->
      
     <div
-      class="query-details-row"
+      class="query-info-row"
     >
       <div
-        class="query-details-label"
+        class="query-info-label"
       >
         Thread Id
       </div>
        
       <div
-        class="query-details-value"
+        class="query-info-value"
       >
         
       </div>
     </div>
      
     <div
-      class="query-details-row"
+      class="query-info-row"
     >
       <div
-        class="query-details-label"
+        class="query-info-label"
       >
         Queue
       </div>
        
       <div
-        class="query-details-value"
+        class="query-info-value"
       >
         <span>
           None
@@ -225,7 +225,24 @@ exports[`QueryInfo.vue should render 1`] = `
       </div>
     </div>
      
-    <sql-text-stub />
+    <div
+      class="query-info-row"
+    >
+      <div
+        class="query-info-label"
+      >
+        Query
+      </div>
+       
+      <div
+        class="query-info-query"
+      >
+        <sql-text-stub
+          enableoverflow="true"
+          format="true"
+        />
+      </div>
+    </div>
   </div>
    
   <!---->
