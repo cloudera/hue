@@ -33,6 +33,7 @@
 
 <script lang="ts">
   import { Page } from 'components/Paginator';
+  import hueUtils from '../../../../../desktop/core/src/desktop/js/utils/hueUtils';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Provide } from 'vue-property-decorator';
@@ -43,6 +44,8 @@
   import QueryDetails from './query-details/QueryDetails.vue';
   import { Query, SearchMeta } from './index';
   import QueryTable from './queryTable/QueryTable.vue';
+
+  const QUERY_ID_PARAM = 'queryId';
 
   @Component({
     components: { QueryDetailsDiff, QueryDetails, QueryTable, TimeAgo, HumanByteSize }
@@ -73,9 +76,36 @@
     showQueries(): void {
       this.selectedQuery = null;
       this.queriesToDiff = null;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      let index = 0;
+      while (urlParams.get(QUERY_ID_PARAM + index)) {
+        hueUtils.removeURLParameter(QUERY_ID_PARAM + index);
+        index++;
+      }
+    }
+
+    async created(): Promise<void> {
+      const urlParams = new URLSearchParams(window.location.search);
+
+      const queryIdValues = [];
+      let queryIndex = 0;
+      while (urlParams.get(QUERY_ID_PARAM + queryIndex)) {
+        queryIdValues.push(urlParams.get(QUERY_ID_PARAM + queryIndex));
+        queryIndex++;
+      }
+
+      if (queryIdValues.length === 1) {
+        await this.querySelected(<Query>{ queryId: queryIdValues[0] });
+      } else if (queryIdValues.length > 1) {
+        await this.diffQueries(<Query[]>queryIdValues.map(queryId => ({ queryId })));
+      }
     }
 
     async diffQueries(queriesToDiff: Query[]): Promise<void> {
+      queriesToDiff.forEach((query, index) => {
+        hueUtils.changeURLParameter(QUERY_ID_PARAM + index, query.queryId);
+      });
       const fetchPromises = queriesToDiff.map(query =>
         fetchExtendedQuery({ queryId: query.queryId })
       );
@@ -83,6 +113,7 @@
     }
 
     async querySelected(query: Query): Promise<void> {
+      hueUtils.changeURLParameter(QUERY_ID_PARAM + 0, query.queryId);
       this.selectedQuery = await fetchExtendedQuery({ queryId: query.queryId });
     }
   }
