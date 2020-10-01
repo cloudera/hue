@@ -5,27 +5,27 @@ exports[`QueriesSearch.vue should render 1`] = `
   <div
     class="input-group"
   >
-    <dropdown-stub
+    <dropdown-menu-stub
       text="Searches"
     >
-      <dropdown-group-stub
+      <dropdown-menu-group-stub
         header="Suggested"
       >
         <!---->
          
-        <dropdown-item-button-stub>
+        <dropdown-menu-button-stub>
           
           Suggested search
         
-        </dropdown-item-button-stub>
-      </dropdown-group-stub>
+        </dropdown-menu-button-stub>
+      </dropdown-menu-group-stub>
        
-      <dropdown-group-stub
+      <dropdown-menu-group-stub
         header="Suggested"
       >
         <!---->
          
-        <dropdown-item-stub>
+        <dropdown-menu-item-stub>
           <a
             href="javascript: void(0);"
           >
@@ -39,9 +39,9 @@ exports[`QueriesSearch.vue should render 1`] = `
           
           Saved search
         
-        </dropdown-item-stub>
-      </dropdown-group-stub>
-    </dropdown-stub>
+        </dropdown-menu-item-stub>
+      </dropdown-menu-group-stub>
+    </dropdown-menu-stub>
      
     <input
       class="form-control"

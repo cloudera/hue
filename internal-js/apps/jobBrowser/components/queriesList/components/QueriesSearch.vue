@@ -19,30 +19,30 @@
 <template>
   <div>
     <div class="input-group">
-      <dropdown :text="'Searches'">
-        <dropdown-group header="Suggested">
-          <dropdown-item-text v-if="!listedSearches.suggested.length">
+      <dropdown-menu :text="'Searches'">
+        <dropdown-menu-group header="Suggested">
+          <dropdown-menu-text v-if="!listedSearches.suggested.length">
             No suggestions
-          </dropdown-item-text>
-          <dropdown-item-button
+          </dropdown-menu-text>
+          <dropdown-menu-button
             v-for="search in listedSearches.suggested"
             :key="search.name"
             @click="searchSelected(search)"
           >
             {{ search.name }}
-          </dropdown-item-button>
-        </dropdown-group>
-        <dropdown-group header="Suggested">
-          <dropdown-item-text v-if="!listedSearches.saved.length">
+          </dropdown-menu-button>
+        </dropdown-menu-group>
+        <dropdown-menu-group header="Suggested">
+          <dropdown-menu-text v-if="!listedSearches.saved.length">
             No saved searches
-          </dropdown-item-text>
-          <dropdown-item v-for="search in listedSearches.saved" :key="search.name">
+          </dropdown-menu-text>
+          <dropdown-menu-item v-for="search in listedSearches.saved" :key="search.name">
             <a href="javascript: void(0);" @click="searchSelected(search)">{{ search.name }}</a>
             <i class="fa fa-times" aria-hidden="true" @click="deleteSearch(search)" />
             {{ search.name }}
-          </dropdown-item>
-        </dropdown-group>
-      </dropdown>
+          </dropdown-menu-item>
+        </dropdown-menu-group>
+      </dropdown-menu>
 
       <input
         v-model="searchText"
@@ -104,11 +104,11 @@
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
 
-  import Dropdown from '../../../../../../desktop/core/src/desktop/js/components/dropdown/Dropdown.vue';
-  import DropdownGroup from '../../../../../../desktop/core/src/desktop/js/components/dropdown/DropdownGroup.vue';
-  import DropdownItem from '../../../../../../desktop/core/src/desktop/js/components/dropdown/DropdownItem.vue';
-  import DropdownItemButton from '../../../../../../desktop/core/src/desktop/js/components/dropdown/DropdownItemButton.vue';
-  import DropdownItemText from '../../../../../../desktop/core/src/desktop/js/components/dropdown/DropdownItemText.vue';
+  import DropdownMenu from '../../../../../../desktop/core/src/desktop/js/components/dropdown/DropdownMenu.vue';
+  import DropdownMenuGroup from '../../../../../../desktop/core/src/desktop/js/components/dropdown/DropdownMenuGroup.vue';
+  import DropdownMenuItem from '../../../../../../desktop/core/src/desktop/js/components/dropdown/DropdownMenuItem.vue';
+  import DropdownMenuButton from '../../../../../../desktop/core/src/desktop/js/components/dropdown/DropdownMenuButton.vue';
+  import DropdownMenuText from '../../../../../../desktop/core/src/desktop/js/components/dropdown/DropdownMenuText.vue';
   import Modal from '../../../../../../desktop/core/src/desktop/js/components/Modal.vue';
   import Vue from 'vue';
   import RangePanel from './RangePanel.vue';
@@ -117,11 +117,11 @@
 
   @Component({
     components: {
-      DropdownItem,
-      DropdownItemText,
-      DropdownItemButton,
-      DropdownGroup,
-      Dropdown,
+      DropdownMenuItem,
+      DropdownMenuText,
+      DropdownMenuButton,
+      DropdownMenuGroup,
+      DropdownMenu,
       Modal,
       RangePanel
     }
