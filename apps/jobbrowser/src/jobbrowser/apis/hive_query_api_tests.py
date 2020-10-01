@@ -20,6 +20,7 @@ import json
 import logging
 import sys
 
+from django.db import connection
 from django.urls import reverse
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_raises
@@ -31,6 +32,7 @@ from useradmin.models import User
 
 from jobbrowser.apis.hive_query_api import HiveQueryApi, HiveQueryClient
 from jobbrowser.models import HiveQuery
+
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock
@@ -50,6 +52,16 @@ class TestHiveQueryApi():
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test"))
 
+    with connection.schema_editor() as schema_editor:
+      schema_editor.create_model(HiveQuery)
+
+      if HiveQuery._meta.db_table not in connection.introspection.table_names():
+        raise ValueError("Table `{table_name}` is missing in test database.".format(table_name=HiveQuery._meta.db_table))
+
+  def tearDown(self):
+    with connection.schema_editor() as schema_editor:
+      schema_editor.delete_model(HiveQuery)
+
 
   def test_apps_empty(self):
     with patch('jobbrowser.apis.hive_query_api.HiveQueryClient.get_queries') as get_queries:
@@ -57,25 +69,25 @@ class TestHiveQueryApi():
         get_queries.return_value = []
         get_query_count.return_value = 0
 
-        app_filters = []
+        response = self.client.post("/jobbrowser/api/jobs/queries-hive")  # TODO: add POST parameters
+        data = json.loads(response.content)
 
-        queries = HiveQueryApi(self.user).apps(app_filters)
+        assert_equal([], data['queries'])
+        assert_equal(100, data['meta']['limit'])
 
-        assert_equal({'apps': [], 'total': 0}, queries)
+  # TODO
+  # def test_app(self):
+  #   with patch('jobbrowser.apis.hive_query_api.HiveQueryClient.get_query') as get_query:
+  #     query_id = 'd94d2fb4815a05c4:b1ccec1500000000'
 
+  #     get_query.return_value = Mock(
+  #       query_id=query_id,
+  #       query='SELECT'
+  #     )
 
-  def test_app(self):
-    with patch('jobbrowser.apis.hive_query_api.HiveQueryClient.get_query') as get_query:
-      query_id = 'd94d2fb4815a05c4:b1ccec1500000000'
+  #     query = HiveQueryApi(self.user).app(query_id)
 
-      get_query.return_value = Mock(
-        query_id=query_id,
-        query='SELECT'
-      )
-
-      query = HiveQueryApi(self.user).app(query_id)
-
-      assert_equal(query_id, query['id'])
+  #     assert_equal(query_id, query['id'])
 
 
 class TestHiveQueryClient():
