@@ -183,7 +183,7 @@ def run_sync_query(doc_id, user):
   editor_type = snippet['type']
   sql = _get_statement(notebook)
   request = MockedDjangoRequest(user=user)
-  last_executed=time.mktime(datetime.datetime.now().timetuple()) * 1000
+  last_executed = time.mktime(datetime.datetime.now().timetuple()) * 1000
 
   notebook = make_notebook(
       name='Scheduled query %s at %s' % (query_document.name, last_executed),
@@ -229,7 +229,8 @@ def download(*args, **kwargs):
 
 # Why we need this:
 # 1) There is no way in celery to differentiate between a task that was submitted, but not yet started and a task that has been GCed.
-# 2) The client will keep checking for data until the query is expired. The new definition for expired in this case is a task that has been GCed.
+# 2) The client will keep checking for data until the query is expired. The new definition for expired in this case is a task
+#    that has been GCed.
 def _patch_status(notebook):
   result = download_to_file.AsyncResult(notebook['uuid'])
   result.backend.store_result(notebook['uuid'], None, "SUBMITTED")

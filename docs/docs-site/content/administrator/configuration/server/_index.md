@@ -611,15 +611,21 @@ If set, limits the number of concurrent user sessions. 1 represents 1 browser se
 
 [Read more about it here](http://gethue.com/restrict-number-of-concurrent-sessions-per-user/).
 
-## Task Server
-
-Execute long blocking or resource intensive operations in tasks outside of the server. This is particularly useful for querying databases other than Hive or Impala that uses the SqlAlchemy interface which is blocking until the query actually finishes.
+## Query execution timeouts
 
 i.e. if the SQL query takes more than 30 seconds, it might timeout without it:
 
     504 Gateway Time-out 504 Gateway Time-out nginx/1.17.10
 
+One solution is to  execute long blocking or resource intensive operations in tasks outside of the server. This is particularly useful for querying databases other than Hive or Impala that uses the SqlAlchemy interface which is blocking until the query actually finishes.
+
 Read more in the [Task Server section](/administrator/administration/reference/#task-server) of the Reference Guide.
+
+An alternative is to increase the NGINX timeouts from 30s to more minutes:
+
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: '900'
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '900'
+    nginx.ingress.kubernetes.io/proxy-send-timeout: '900'
 
 ## Customize the UI
 
