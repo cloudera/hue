@@ -18,154 +18,146 @@
 
 <template>
   <div>
-    <div id="query-details" class="target detail-panel">
-      <div class="row">
-        <div class="col-md-12">
-          <div class="query-title">
-            Query Details <span v-if="title">- {{ title }}</span>
-          </div>
+    <div>
+      <div class="query-details-row">
+        <div class="query-details-label">Query ID</div>
+        <div class="query-details-value">{{ query.queryId }}</div>
+      </div>
+
+      <div class="query-details-row">
+        <div class="query-details-label">User</div>
+        <div class="query-details-value">{{ query.requestUser }}</div>
+      </div>
+
+      <div class="query-details-row">
+        <div class="query-details-label">Status</div>
+        <div class="query-details-value">{{ query.status }}</div>
+      </div>
+
+      <div class="query-details-row">
+        <div class="query-details-label">Start Time</div>
+        <div class="query-details-value">
+          <time-ago :value="query.startTime" />
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-4">
-          <div class="query-details-row">
-            <label class="query-details-label">Query ID</label>
-            <div class="query-details-value">
-              {{ query.queryId }}
-            </div>
-          </div>
 
-          <div class="query-details-row">
-            <label class="query-details-label">User</label>
-            <div class="query-details-value">
-              {{ query.requestUser }}
-            </div>
-          </div>
-
-          <div class="query-details-row">
-            <label class="query-details-label">Status</label>
-            <div class="query-details-value">
-              {{ query.status
-              }}<!-- {{em-table-status-cell content=query.status}} -->
-            </div>
-          </div>
-
-          <div class="query-details-row">
-            <label class="query-details-label">Start Time</label>
-            <div class="query-details-value">
-              {{ query.startTime
-              }}<!-- {{date-formatter content=query.startTime}} -->
-            </div>
-          </div>
-
-          <div class="query-details-row">
-            <label class="query-details-label">End Time</label>
-            <div class="query-details-value">
-              {{ query.endTime
-              }}<!-- {{date-formatter content=query.endTime}} -->
-            </div>
-          </div>
-
-          <div class="query-details-row">
-            <label class="query-details-label">Duration</label>
-            <div class="query-details-value">
-              {{ query.duration
-              }}<!-- {{txt query.duration type="duration"}} -->
-            </div>
-          </div>
-
-          <div class="query-details-row">
-            <label class="query-details-label">Tables Read</label>
-            <div class="query-details-value">
-              <span v-if="query.tablesReadWithDatabase">{{ query.tablesReadWithDatabase }}</span>
-              <span v-else class="txt-message">Not Available!</span>
-            </div>
-          </div>
-
-          <div class="query-details-row">
-            <label class="query-details-label">Tables Written</label>
-            <div class="query-details-value">
-              <span v-if="query.tablesWrittenWithDatabase">{{
-                query.tablesWrittenWithDatabase
-              }}</span>
-              <span v-else class="txt-message">Not Available!</span>
-            </div>
-          </div>
-
-          <div class="query-details-row">
-            <label class="query-details-label">Application ID</label>
-            <div class="query-details-value">
-              <span v-if="query.appIds && query.appIds.length">{{ query.appIds }}</span>
-              <span v-else class="txt-message">Not Available!</span>
-            </div>
-          </div>
-
-          <div class="query-details-row">
-            <label class="query-details-label">DAG ID</label>
-            <div class="query-details-value">
-              <span v-if="query.dagIds && query.dagIds.length">{{ query.dagIds }}</span>
-              <span v-else class="txt-message">Not Available!</span>
-            </div>
-          </div>
-
-          <div class="query-details-row">
-            <label class="query-details-label">Session ID</label>
-            <div class="query-details-value">
-              {{ query.sessionId }}
-            </div>
-          </div>
-
-          <div v-if="query.llapAppId" class="query-details-row">
-            <label class="query-details-label">LLAP App ID</label>
-            <div class="query-details-value">
-              {{ query.llapAppId }}
-            </div>
-          </div>
-
-          <div class="query-details-row">
-            <label class="query-details-label">Thread Id</label>
-            <div class="query-details-value">
-              {{ query.threadId }}
-            </div>
-          </div>
-
-          <div class="query-details-row">
-            <label class="query-details-label">Queue</label>
-            <div class="query-details-value">
-              <span v-if="query.queueName">{{ query.queueName }}</span>
-              <span v-else>None</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-8">
-          <sql-text :value="query.query" />
+      <div class="query-details-row">
+        <div class="query-details-label">End Time</div>
+        <div class="query-details-value">
+          <time-ago :value="query.endTime" />
         </div>
       </div>
+
+      <div class="query-details-row">
+        <div class="query-details-label">Duration</div>
+        <div class="query-details-value">
+          <duration v-if="query.duration" :value="query.duration" />
+          <span v-else>-</span>
+        </div>
+      </div>
+
+      <div class="query-details-row">
+        <div class="query-details-label">Tables Read</div>
+        <div class="query-details-value">
+          <span v-if="query.tablesReadWithDatabase">{{ query.tablesReadWithDatabase }}</span>
+          <span v-else>-</span>
+        </div>
+      </div>
+
+      <div class="query-details-row">
+        <div class="query-details-label">Tables Written</div>
+        <div class="query-details-value">
+          <span v-if="query.tablesWrittenWithDatabase">{{ query.tablesWrittenWithDatabase }}</span>
+          <span v-else>-</span>
+        </div>
+      </div>
+
+      <div class="query-details-row">
+        <div class="query-details-label">Application ID</div>
+        <div class="query-details-value">
+          <span v-if="query.appIds && query.appIds.length">{{ query.appIds }}</span>
+          <span v-else>-</span>
+        </div>
+      </div>
+
+      <div class="query-details-row">
+        <div class="query-details-label">DAG ID</div>
+        <div class="query-details-value">
+          <span v-if="query.dagIds && query.dagIds.length">{{ query.dagIds }}</span>
+          <span v-else>-</span>
+        </div>
+      </div>
+
+      <div class="query-details-row">
+        <div class="query-details-label">Session ID</div>
+        <div class="query-details-value">{{ query.sessionId }}</div>
+      </div>
+
+      <div v-if="query.llapAppId" class="query-details-row">
+        <div class="query-details-label">LLAP App ID</div>
+        <div class="query-details-value">{{ query.llapAppId }}</div>
+      </div>
+
+      <div class="query-details-row">
+        <div class="query-details-label">Thread Id</div>
+        <div class="query-details-value">{{ query.threadId }}</div>
+      </div>
+
+      <div class="query-details-row">
+        <div class="query-details-label">Queue</div>
+        <div class="query-details-value">
+          <span v-if="query.queueName">{{ query.queueName }}</span>
+          <span v-else>None</span>
+        </div>
+      </div>
+
+      <sql-text :value="query.query" />
     </div>
 
     <div v-if="query.details.diagnostics" class="panel panel-danger">
       <div class="panel-heading">DAG Diagnostics</div>
-      <div class="diagnostics">
-        {{ query.details.diagnostics }}
-      </div>
+      <div class="diagnostics">{{ query.details.diagnostics }}</div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
   import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import Duration from '../../../../../../desktop/core/src/desktop/js/components/Duration.vue';
   import SqlText from '../../../../../../desktop/core/src/desktop/js/components/SqlText.vue';
+  import TimeAgo from '../../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
   import SingleQueryComponent from './SingleQueryComponent.vue';
 
   @Component({
-    components: { SqlText }
+    components: { Duration, TimeAgo, SqlText }
   })
-  export default class QueryInfo extends SingleQueryComponent {
-    @Prop({ required: false })
-    title?: string;
-  }
+  export default class QueryInfo extends SingleQueryComponent {}
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  @import '../../../../../../desktop/core/src/desktop/js/components/styles/colors';
+
+  .query-title {
+    padding: 0 10px 10px 10px;
+    color: $fluid-gray-800;
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  .query-details-row {
+    margin-bottom: 15px;
+    margin-left: 10px;
+
+    .query-details-label {
+      text-transform: uppercase;
+      color: $fluid-gray-500;
+      font-weight: normal;
+      font-size: 12px;
+      margin: 0;
+    }
+
+    .query-details-value {
+      color: $fluid-gray-700;
+    }
+  }
+</style>

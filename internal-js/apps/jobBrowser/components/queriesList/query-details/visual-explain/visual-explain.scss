@@ -186,25 +186,8 @@ rect.operator__box {
   background-color: #FFF;
   padding: 10px 5px;
 
-  .query-title{
-      padding: 0 10px 10px 10px;
-      color: #464646;
-      font-size: 20px;
-      font-weight: 500;
-   }
    .body{
       padding: 0 10px 10px 10px;
-   }
-
-   .query-details-row{
-      margin-bottom: 15px; margin-left: 10px;
-     .query-details-label{
-      text-transform: uppercase;color: #999;font-weight: normal;font-size: 12px;margin: 0;
-    }
-
-    .query-details-value{
-      color: #666;
-     }
    }
 }
 
