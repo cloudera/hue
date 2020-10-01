@@ -17,19 +17,21 @@
 -->
 
 <template>
-  <div v-click-outside="clickOutside" :class="{ 'dropdown-inline': inline }">
-    <hue-link v-if="inline" @click="toggleMenu">
+  <div
+    v-click-outside="clickOutside"
+    class="hue-dropdown-panel"
+    :class="{ 'dropdown-inline': inline }"
+  >
+    <hue-link v-if="inline" @click="togglePanel">
       {{ text }} <i class="fa fa-caret-down" />
     </hue-link>
-    <hue-button v-else @click="toggleMenu"> {{ text }} <i class="fa fa-caret-down" /></hue-button>
-    <div :class="{ open: menuOpen }" class="hue-dropdown-container" @click="toggleMenu">
+    <hue-button v-else @click="togglePanel"> {{ text }} <i class="fa fa-caret-down" /></hue-button>
+    <div class="hue-dropdown-container" :class="{ open: panelOpen }" @click="togglePanel">
       <div
-        class="hue-dropdown-menu"
+        class="hue-dropdown-inner"
         :class="{ 'position-top': positionTop, 'position-left': positionLeft }"
       >
-        <ul>
-          <slot />
-        </ul>
+        <slot />
       </div>
     </div>
   </div>
@@ -66,18 +68,18 @@
       'click-outside': clickOutsideDirective
     }
   })
-  export default class Dropdown extends Vue {
+  export default class DropdownPanel extends Vue {
     @Prop({ required: false, default: '' })
     text: string;
     @Prop({ required: false, default: false })
     inline: boolean;
-    menuOpen = false;
+    panelOpen = false;
 
     positionTop = false;
     positionLeft = false;
 
-    toggleMenu(): void {
-      if (!this.menuOpen) {
+    togglePanel(): void {
+      if (!this.panelOpen) {
         const dropdownElement = this.$el.getElementsByClassName('hue-dropdown-container');
         if (dropdownElement.length) {
           const outsideStatus = isOutsideViewport(dropdownElement[0]);
@@ -85,12 +87,12 @@
           this.positionLeft = outsideStatus.right;
         }
       }
-      this.menuOpen = !this.menuOpen;
+      this.panelOpen = !this.panelOpen;
     }
 
     clickOutside(): void {
-      if (this.menuOpen) {
-        this.menuOpen = false;
+      if (this.panelOpen) {
+        this.panelOpen = false;
       }
     }
   }
@@ -100,94 +102,49 @@
   @import '../styles/colors';
   @import '../styles/mixins';
 
-  .dropdown-inline {
-    display: inline-block;
-  }
-
-  .hue-dropdown-container {
-    position: fixed;
-    z-index: 1061;
-
-    &.open {
-      position: absolute;
-      .hue-dropdown-menu {
-        display: block;
-      }
+  .hue-dropdown-panel {
+    &.dropdown-inline {
+      display: inline-block;
     }
 
-    &.hue-dropdown-fixed {
-      position: fixed !important;
-    }
+    .hue-dropdown-container {
+      position: fixed;
+      z-index: 1061;
 
-    .hue-dropdown-menu {
-      display: none;
-      z-index: 1000;
-      float: left;
-
-      position: absolute;
-
-      margin: 2px 0 0;
-      padding: 0;
-      min-width: 160px;
-      max-width: 250px;
-      min-height: 34px;
-      max-height: 200px;
-
-      background-color: $fluid-white;
-      overflow-x: hidden;
-      overflow-y: auto;
-      list-style: none;
-      border: 1px solid $hue-border-color;
-      border-radius: $hue-panel-border-radius;
-
-      @include box-shadow(0, 5px, 10px, rgba(0, 0, 0, 0.2));
-
-      &:not(.position-top) {
-        top: 100%;
+      &.open {
+        position: absolute;
+        .hue-dropdown-inner {
+          display: block;
+        }
       }
 
-      &.position-top {
-        bottom: 20px; // TODO: Calculate based on link/button dimensions
-      }
-
-      &:not(.position-left) {
-        left: 0;
-      }
-
-      &.position-left {
-        right: 0; // TODO: Calculate based on link/button dimensions
-      }
-
-      /deep/ ul {
-        overflow-x: hidden;
-        margin: 0 !important;
+      .hue-dropdown-inner {
+        display: none;
+        z-index: 1000;
+        float: left;
+        position: absolute;
+        margin: 2px 0 0;
         padding: 0;
-        list-style: none;
-        font-size: 13px;
+        background-color: $fluid-white;
+        border: 1px solid $hue-border-color;
+        border-radius: $hue-panel-border-radius;
 
-        li {
-          color: $fluid-gray-800;
+        @include box-shadow(0, 5px, 10px, rgba(0, 0, 0, 0.2));
 
-          button,
-          a {
-            display: block;
-            width: 100%;
-            padding: 6px 16px;
-            clear: both;
-            font-weight: 400;
-            text-align: inherit;
-            white-space: nowrap;
-            background-color: transparent;
-            border: 0;
-            position: relative;
-            outline: 0;
+        &:not(.position-top) {
+          top: 100%;
+        }
 
-            &:hover,
-            &.active,
-            &.focus {
-              background-color: $hue-primary-color-light;
-            }
-          }
+        &.position-top {
+          bottom: 20px; // TODO: Calculate based on link/button dimensions
+        }
+
+        &:not(.position-left) {
+          left: 0;
+        }
+
+        &.position-left {
+          right: 0; // TODO: Calculate based on link/button dimensions
         }
       }
     }

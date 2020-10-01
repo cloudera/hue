@@ -18,16 +18,31 @@
 
 <template>
   <li>
-    <button @click="$emit('click')"><slot /></button>
+    <header class="dropdown-group-header">{{ header }}</header>
+    <ul>
+      <slot />
+    </ul>
   </li>
 </template>
 
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
+  import { Prop } from 'vue-property-decorator';
 
   @Component
-  export default class DropdownItemButton extends Vue {}
+  export default class DropdownMenuGroup extends Vue {
+    @Prop({ required: true })
+    header!: string;
+  }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  @import '../styles/colors';
+
+  .dropdown-group-header {
+    color: $fluid-gray-800;
+    font-weight: 500;
+    padding: 6px 10px;
+  }
+</style>

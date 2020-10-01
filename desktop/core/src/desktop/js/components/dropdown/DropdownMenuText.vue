@@ -29,7 +29,7 @@
   import { Prop } from 'vue-property-decorator';
 
   @Component
-  export default class DropdownItemText extends Vue {
+  export default class DropdownMenuText extends Vue {
     @Prop({ required: false, default: '' })
     text;
   }

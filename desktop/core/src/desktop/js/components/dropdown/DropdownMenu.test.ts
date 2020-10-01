@@ -15,16 +15,16 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
-import Dropdown from './Dropdown.vue';
+import DropdownMenu from './DropdownMenu.vue';
 
-describe('Dropdown.vue', () => {
+describe('DropdownMenu.vue', () => {
   it('should render empty dropdown', () => {
-    const wrapper = shallowMount(Dropdown);
+    const wrapper = shallowMount(DropdownMenu);
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('should render dropdown with slots', () => {
-    const wrapper = shallowMount(Dropdown, {
+    const wrapper = shallowMount(DropdownMenu, {
       scopedSlots: {
         default: '<div>Some item</div>'
       }

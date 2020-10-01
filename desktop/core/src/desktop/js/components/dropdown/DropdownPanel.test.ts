@@ -15,13 +15,18 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
-import DropdownGroup from './DropdownGroup.vue';
+import DropdownPanel from './DropdownPanel.vue';
 
-describe('DropdownGroup.vue', () => {
-  it('should render', () => {
-    const wrapper = shallowMount(DropdownGroup, {
-      propsData: {
-        header: 'Some Header'
+describe('DropdownPanel.vue', () => {
+  it('should render empty dropdown panel', () => {
+    const wrapper = shallowMount(DropdownPanel);
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('should render dropdown panel with slots', () => {
+    const wrapper = shallowMount(DropdownPanel, {
+      scopedSlots: {
+        default: '<div>Some item</div>'
       }
     });
     expect(wrapper.element).toMatchSnapshot();
