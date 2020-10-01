@@ -21,9 +21,9 @@ standard_library.install_aliases()
 
 from builtins import next, object
 
+import codecs
 import csv
 import datetime
-import io
 import json
 import logging
 import sys
@@ -137,7 +137,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
 
     if TASK_SERVER.RESULT_CACHE.get():
       with storage.open(result_key, 'rb') as store:
-        with io.TextIOWrapper(store, encoding='utf-8') as text_file:
+        with codecs.getreader('utf-8')(store) as text_file:
           delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
           csv_reader = csv.reader(text_file, delimiter=delimiter)
           caches[CACHES_CELERY_QUERY_RESULT_KEY].set(result_key, [row for row in csv_reader], 60 * 5)

@@ -77,7 +77,8 @@ class TestApi(object):
     interpreter = {
       'name': 'hive',
       'options': {
-        'url': 'awsathena+rest://XXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch'
+        'url': 'awsathena+rest://XXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?'
+            's3_staging_dir=s3://gethue-athena/scratch'
       }
     }
 
@@ -332,7 +333,7 @@ class TestAutocomplete(object):
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
       with patch('notebook.connectors.sql_alchemy.inspect') as inspect:
         with patch('notebook.connectors.sql_alchemy.Assist') as Assist:
-          Assist.return_value=Mock(get_databases=Mock(return_value=['SYSTEM', None]))
+          Assist.return_value = Mock(get_databases=Mock(return_value=['SYSTEM', None]))
 
           data = SqlAlchemyApi(self.user, interpreter).autocomplete(snippet)
 
@@ -365,7 +366,7 @@ class TestAutocomplete(object):
           col2.__getitem__.side_effect = col2_dict
           col2.get = col2_dict
 
-          Assist.return_value=Mock(get_columns=Mock(return_value=[col1, col2]), get_keys=Mock(return_value={}))
+          Assist.return_value = Mock(get_columns=Mock(return_value=[col1, col2]), get_keys=Mock(return_value={}))
 
           data = SqlAlchemyApi(self.user, interpreter).autocomplete(snippet, database='database', table='table')
 
