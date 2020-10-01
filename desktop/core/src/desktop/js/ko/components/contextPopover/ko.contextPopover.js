@@ -274,7 +274,7 @@ const SUPPORT_TEMPLATES = `
 
   <script type="text/html" id="context-catalog-entry-title">
     <div class="hue-popover-title">
-      <i class="hue-popover-title-icon fa muted" data-bind="css: catalogEntry() && catalogEntry().isView() ? 'fa-eye' : 'fa-table'"></i>
+      <i class="hue-popover-title-icon fa muted" data-bind="css: catalogEntry() && catalogEntry().isView() ? 'fa-eye' : (catalogEntry().isModel() ? 'fa-puzzle-piece' : 'fa-table')"></i>
       <span class="hue-popover-title-text" data-bind="foreach: breadCrumbs">
         <!-- ko ifnot: isActive --><div><a href="javascript: void(0);" data-bind="click: makeActive, text: name"></a>.</div><!-- /ko -->
         <!-- ko if: isActive -->
