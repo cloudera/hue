@@ -186,7 +186,7 @@
 
     graphView: any = null;
 
-    pathname = window.location.pathname;
+    pathname = window.location.pathname + window.location.search;
 
     errMessage = '';
 
