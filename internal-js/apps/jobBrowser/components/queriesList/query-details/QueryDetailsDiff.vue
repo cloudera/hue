@@ -33,7 +33,11 @@
           <query-info :query="queries[1]" class="side-by-side" />
         </tab>
         <tab title="Query Config">
+          <label class="hide-similar">
+            <input v-model="hideSimilarValues" type="checkbox" /> Hide Similar Values
+          </label>
           <ConfigsTable
+            :hide-similar-values="hideSimilarValues"
             :configs="[
               { title: 'Query A', configs: queries[0].details.configuration },
               { title: 'Query B', configs: queries[1].details.configuration }
@@ -58,7 +62,11 @@
       </div>
       <tabs>
         <tab title="DAG Counters">
+          <label class="hide-similar">
+            <input v-model="hideSimilarValues" type="checkbox" /> Hide Similar Values
+          </label>
           <CountersTable
+            :hide-similar-values="hideSimilarValues"
             :counters="[
               {
                 title: `DAG : ${dagSet.dagA.dagInfo.dagId}`,
@@ -80,7 +88,11 @@
           <DagSwimlane :dag="dagSet.dagB" />
         </tab>
         <tab title="DAG Configurations">
+          <label class="hide-similar">
+            <input v-model="hideSimilarValues" type="checkbox" /> Hide Similar Values
+          </label>
           <ConfigsTable
+            :hide-similar-values="hideSimilarValues"
             :configs="[
               { title: `DAG : ${dagSet.dagA.dagInfo.dagId}`, configs: dagSet.dagA.config },
               { title: `DAG : ${dagSet.dagB.dagInfo.dagId}`, configs: dagSet.dagA.config }
@@ -146,10 +158,10 @@
     }
   })
   export default class QueryDetails extends Vue {
-    @Prop({ required: true })
-    queries!: Query[];
-    @Inject()
-    showQueries?: () => void;
+    @Prop({ required: true }) queries!: Query[];
+    @Inject() showQueries?: () => void;
+
+    hideSimilarValues = false;
   }
 </script>
 
@@ -161,5 +173,11 @@
     display: inline-block;
     width: calc(50% - 5px);
     vertical-align: top;
+  }
+  .hide-similar {
+    text-align: right;
+    input {
+      vertical-align: top;
+    }
   }
 </style>

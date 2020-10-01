@@ -46,8 +46,9 @@
   })
   export default class ConfigsTable extends Vue {
     @Prop({ required: true }) configs!: ConfigSet[];
+    @Prop({ default: false }) hideSimilarValues!: boolean;
 
-    generateConfigSetkey(index: number): string {
+    generateValueColumnkey(index: number): string {
       return `configSet_${index}`;
     }
 
@@ -57,18 +58,27 @@
       this.configs.forEach((configSet: ConfigSet, index: number) => {
         valueColumns.push({
           label: configSet.title || DEFAULT_VALUE_COLUMN_TITLE,
-          key: this.generateConfigSetkey(index)
+          key: this.generateValueColumnkey(index)
         });
       });
 
       return NAME_COLUMNS.concat(valueColumns);
     }
 
+    countValues(row: Row, valueCount: number): number {
+      const values: Set<string | unknown> = new Set();
+      for (let i = 0; i < valueCount; i++) {
+        values.add(row[this.generateValueColumnkey(i)]);
+      }
+      return values.size;
+    }
+
     get rows(): Row[] {
       const rowHash: Map<string, Row> = new Map();
+      let rows: Row[];
 
       this.configs.forEach((configSet: ConfigSet, index: number) => {
-        const configKey: string = this.generateConfigSetkey(index);
+        const configKey: string = this.generateValueColumnkey(index);
 
         for (const configName in configSet.configs) {
           let row: Row | undefined = rowHash.get(configName);
@@ -80,7 +90,15 @@
         }
       });
 
-      return Array.from(rowHash.values());
+      rows = Array.from(rowHash.values());
+
+      if (this.hideSimilarValues) {
+        rows = rows.filter((row: Row) => {
+          return this.countValues(row, this.configs.length) > 1;
+        });
+      }
+
+      return rows;
     }
   }
 </script>

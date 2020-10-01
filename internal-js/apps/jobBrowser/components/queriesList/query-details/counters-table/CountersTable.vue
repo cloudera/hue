@@ -52,8 +52,9 @@
   })
   export default class CountersTable extends Vue {
     @Prop({ required: true }) counters!: CounterSet[];
+    @Prop({ default: false }) hideSimilarValues!: boolean;
 
-    generateCounterSetkey(index: number): string {
+    generateValueColumnkey(index: number): string {
       return `counterSet_${index}`;
     }
 
@@ -63,18 +64,27 @@
       this.counters.forEach((counterSet: CounterSet, index: number) => {
         valueColumns.push({
           label: counterSet.title || DEFAULT_VALUE_COLUMN_TITLE,
-          key: this.generateCounterSetkey(index)
+          key: this.generateValueColumnkey(index)
         });
       });
 
       return NAME_COLUMNS.concat(valueColumns);
     }
 
+    countValues(row: Row, valueCount: number): number {
+      const values: Set<string | unknown> = new Set();
+      for (let i = 0; i < valueCount; i++) {
+        values.add(row[this.generateValueColumnkey(i)]);
+      }
+      return values.size;
+    }
+
     get rows(): Row[] {
       const rowHash: Map<string, Row> = new Map();
+      let rows: Row[];
 
       this.counters.forEach((counterSet: CounterSet, index: number) => {
-        const counterKey: string = this.generateCounterSetkey(index);
+        const counterKey: string = this.generateValueColumnkey(index);
         counterSet.counters.forEach((counterGroup: CounterGroup) => {
           counterGroup.counters.forEach((counter: CounterDetails) => {
             const counterId: string = counterGroup.counterGroupName + counter.counterName;
@@ -91,7 +101,15 @@
         });
       });
 
-      return Array.from(rowHash.values());
+      rows = Array.from(rowHash.values());
+
+      if (this.hideSimilarValues) {
+        rows = rows.filter((row: Row) => {
+          return this.countValues(row, this.counters.length) > 1;
+        });
+      }
+
+      return rows;
     }
   }
 </script>

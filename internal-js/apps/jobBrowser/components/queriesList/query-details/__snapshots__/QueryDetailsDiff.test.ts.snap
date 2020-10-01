@@ -45,6 +45,16 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
       <tab-stub
         title="Query Config"
       >
+        <label
+          class="hide-similar"
+        >
+          <input
+            type="checkbox"
+          />
+           Hide Similar Values
+        
+        </label>
+         
         <configstable-stub
           configs="[object Object],[object Object]"
         />
@@ -78,6 +88,16 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
       <tab-stub
         title="DAG Counters"
       >
+        <label
+          class="hide-similar"
+        >
+          <input
+            type="checkbox"
+          />
+           Hide Similar Values
+        
+        </label>
+         
         <counterstable-stub
           counters="[object Object],[object Object]"
         />
@@ -114,6 +134,16 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
       <tab-stub
         title="DAG Configurations"
       >
+        <label
+          class="hide-similar"
+        >
+          <input
+            type="checkbox"
+          />
+           Hide Similar Values
+        
+        </label>
+         
         <configstable-stub
           configs="[object Object],[object Object]"
         />
