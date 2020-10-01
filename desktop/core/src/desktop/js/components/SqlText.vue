@@ -23,6 +23,7 @@
 </template>
 
 <script lang="ts">
+  import { formatSql } from 'apps/notebook2/apiUtils';
   import $ from 'jquery';
   import Vue from 'vue';
   import Component from 'vue-class-component';
@@ -43,117 +44,113 @@
     @Prop({ required: false })
     value = '';
     @Prop({ required: false })
-    formatted = false;
+    format = false;
     @Prop({ required: false })
     enableOverflow = false;
     @Prop({ required: false })
     splitLines = false;
 
     @Watch('value')
-    renderAce(): void {
-      if (this.value) {
-        const ace = getAce();
-        const impalaRules = ace.require('ace/mode/impala_highlight_rules');
-        const hiveRules = ace.require('ace/mode/hive_highlight_rules');
-        const tokenizer = ace.require('ace/tokenizer');
-        const text = ace.require('ace/layer/text');
-        const config = ace.require('ace/config');
+    async renderAce(): Promise<void> {
+      if (!this.value) {
+        return;
+      }
+      const ace = getAce();
+      const impalaRules = ace.require('ace/mode/impala_highlight_rules');
+      const hiveRules = ace.require('ace/mode/hive_highlight_rules');
+      const tokenizer = ace.require('ace/tokenizer');
+      const text = ace.require('ace/layer/text');
+      const config = ace.require('ace/config');
 
-        const Tokenizer = tokenizer.Tokenizer;
-        const Rules =
-          this.dialect === 'impala'
-            ? impalaRules.ImpalaHighlightRules
-            : hiveRules.HiveHighlightRules;
+      const Tokenizer = tokenizer.Tokenizer;
+      const Rules =
+        this.dialect === 'impala' ? impalaRules.ImpalaHighlightRules : hiveRules.HiveHighlightRules;
 
-        const res: string[] = [];
+      const res: string[] = [];
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore: totalStorage interface missing
-        config.loadModule(['theme', $.totalStorage('hue.ace.theme') || 'ace/theme/hue']);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore: totalStorage interface missing
+      config.loadModule(['theme', $.totalStorage('hue.ace.theme') || 'ace/theme/hue']);
 
-        const Text = text.Text;
+      const Text = text.Text;
 
-        const tok = new Tokenizer(new Rules().getRules());
-        const lines = this.value.split('\n');
+      const tok = new Tokenizer(new Rules().getRules());
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const renderSimpleLine = (txt: any, stringBuilder: string[], tokens: any[]) => {
-          let screenColumn = 0;
-          let token = tokens[0];
-          let value = token.value;
-          if (value) {
-            try {
-              screenColumn = txt.$renderToken(stringBuilder, screenColumn, token, value);
-            } catch (e) {
-              console.warn(
-                value,
-                'Failed to get screen column due to some parsing errors, skip rendering.'
-              );
-            }
-          }
-          for (let i = 1; i < tokens.length; i++) {
-            token = tokens[i];
-            value = token.value;
-            try {
-              screenColumn = txt.$renderToken(stringBuilder, screenColumn, token, value);
-            } catch (e) {
-              if (console && console.warn) {
-                console.warn(
-                  value,
-                  'This token has some parsing errors and it has been rendered without highlighting.'
-                );
-              }
-              stringBuilder.push(value);
-              screenColumn = screenColumn + value.length;
-            }
-          }
-        };
+      let editorText = this.value;
+      if (this.format) {
+        editorText = await formatSql({ statements: this.value, silenceErrors: true });
+      }
+      const lines = editorText.split('\n');
 
-        let additionalClass = '';
-        if (!this.splitLines && !this.formatted) {
-          additionalClass = 'pull-left';
-        } else if (this.formatted) {
-          additionalClass = 'ace-highlight-pre';
-        }
-
-        lines.forEach(line => {
-          const renderedTokens: string[] = [];
-          const tokens = tok.getLineTokens(line);
-
-          if (tokens && tokens.tokens.length) {
-            renderSimpleLine(
-              new Text(document.createElement('div')),
-              renderedTokens,
-              tokens.tokens
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const renderSimpleLine = (txt: any, stringBuilder: string[], tokens: any[]) => {
+        let screenColumn = 0;
+        let token = tokens[0];
+        let value = token.value;
+        if (value) {
+          try {
+            screenColumn = txt.$renderToken(stringBuilder, screenColumn, token, value);
+          } catch (e) {
+            console.warn(
+              value,
+              'Failed to get screen column due to some parsing errors, skip rendering.'
             );
           }
-
-          res.push(
-            '<div class="ace_line ' +
-              additionalClass +
-              '">' +
-              renderedTokens.join('') +
-              '&nbsp;</div>'
-          );
-        });
-
-        const element = this.$el.firstElementChild;
-        if (!element) {
-          return;
         }
-        element.innerHTML =
-          '<div class="ace_editor ace-hue"' +
-          (this.enableOverflow ? ' style="overflow: initial !important;"' : '') +
-          '><div class="ace_layer" style="position: static;' +
-          (this.enableOverflow ? ' overflow: initial !important;' : '') +
-          '">' +
-          res.join('') +
-          '</div></div>';
-        if (this.enableOverflow) {
-          $(element).css({ overflow: 'auto' });
+        for (let i = 1; i < tokens.length; i++) {
+          token = tokens[i];
+          value = token.value;
+          try {
+            screenColumn = txt.$renderToken(stringBuilder, screenColumn, token, value);
+          } catch (e) {
+            if (console && console.warn) {
+              console.warn(
+                value,
+                'This token has some parsing errors and it has been rendered without highlighting.'
+              );
+            }
+            stringBuilder.push(value);
+            screenColumn = screenColumn + value.length;
+          }
         }
-        $(element).find('.ace_invisible_space').remove();
+      };
+
+      let additionalClass = 'pull-left';
+      if (!this.splitLines && !this.format) {
+        additionalClass = 'pull-left';
+      } else if (this.format) {
+        additionalClass = 'ace-highlight-pre';
       }
+
+      lines.forEach(line => {
+        const renderedTokens: string[] = [];
+        const tokens = tok.getLineTokens(line);
+
+        if (tokens && tokens.tokens.length) {
+          renderSimpleLine(new Text(document.createElement('div')), renderedTokens, tokens.tokens);
+        }
+
+        res.push(
+          '<div class="ace_line ' +
+            additionalClass +
+            '">' +
+            renderedTokens.join('') +
+            '&nbsp;</div>'
+        );
+      });
+
+      this.$el.innerHTML =
+        '<div class="ace_editor ace-hue"' +
+        (this.enableOverflow ? ' style="overflow: initial !important;"' : '') +
+        '><div class="ace_layer" style="position: static;' +
+        (this.enableOverflow ? ' overflow: initial !important;' : '') +
+        '">' +
+        res.join('') +
+        '</div></div>';
+      if (this.enableOverflow) {
+        $(this.$el).css({ overflow: 'auto' });
+      }
+      $(this.$el).find('.ace_invisible_space').remove();
     }
 
     mounted(): void {
