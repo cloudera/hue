@@ -77,6 +77,8 @@ class AssistDbEntry {
         self.iconClass = 'fa-sitemap';
       } else if (self.catalogEntry.isView()) {
         self.iconClass = 'fa-eye';
+      } else if (self.catalogEntry.isModel()) {
+        self.iconClass = 'fa-puzzle-piece';
       } else {
         self.iconClass = 'fa-table';
       }
