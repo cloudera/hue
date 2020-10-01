@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div v-show="isActive">
+  <div v-if="!lazy || rendered" v-show="isActive">
     <slot />
   </div>
 </template>
@@ -25,7 +25,7 @@
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
-  import { Inject, Prop } from 'vue-property-decorator';
+  import { Inject, Prop, Watch } from 'vue-property-decorator';
 
   @Component
   export default class Tab extends Vue {
@@ -36,8 +36,18 @@
 
     @Prop({ required: true })
     title!: string;
+    @Prop({ default: false })
+    lazy!: boolean;
 
     isActive = false;
+    rendered = false;
+
+    @Watch('isActive')
+    onActive(): void {
+      if (this.isActive) {
+        this.rendered = true;
+      }
+    }
 
     mounted(): void {
       if (this.addTab) {
