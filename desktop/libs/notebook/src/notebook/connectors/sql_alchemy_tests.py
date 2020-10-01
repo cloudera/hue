@@ -193,7 +193,7 @@ class TestApi(object):
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
       engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
 
-      create_engine.assert_called_with('presto://hue:8080/hue')
+      create_engine.assert_called_with('presto://hue:8080/hue', pool_pre_ping=True)
 
 
     interpreter['options']['has_impersonation'] = True  # On
@@ -201,7 +201,7 @@ class TestApi(object):
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
       engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
 
-      create_engine.assert_called_with('presto://test@hue:8080/hue')
+      create_engine.assert_called_with('presto://test@hue:8080/hue', pool_pre_ping=True)
 
 
   def test_check_status(self):
