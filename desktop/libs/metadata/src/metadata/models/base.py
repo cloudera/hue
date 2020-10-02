@@ -32,6 +32,9 @@ def get_api(user, connector_id):
 
   if dialect == 'dummy':
     return Base(user, connector_id)
+  elif dialect == 'bigquery':
+    from metadata.models.bigquery_client import BigQueryClient
+    return BigQueryClient(user, connector_id)
   else:
     raise PopupException(_('Model connector dialect not recognized: %s') % dialect)
 
