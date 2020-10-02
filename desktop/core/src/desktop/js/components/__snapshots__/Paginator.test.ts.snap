@@ -15,7 +15,7 @@ exports[`Paginator.vue should render 1`] = `
   Rows per page:
   
   <dropdown-menu-stub
-    inline="true"
+    link="true"
     text="25"
   >
     <dropdown-menu-button-stub>
