@@ -23,9 +23,16 @@
     <!-- <queries-search :searches="searches" :table-definition="tableDefinition" /> -->
     <div class="query-table-actions">
       <search-input @search="searchQueryChanged" />
-      <hue-button @click="toggleColumnSelector">
+
+      <div class="query-table-filters">
+        <hue-icon type="hi-filter" /> Filter by:
+        <date-range-picker @date-range-changed="timeRangeChanged" />
+      </div>
+
+      <hue-button class="columns-button" @click="toggleColumnSelector">
         {{ I18n('Columns') }}
       </hue-button>
+
       <hue-button
         class="compare-button"
         :disabled="selectedQueries.length !== 2"
@@ -69,14 +76,17 @@
 </template>
 
 <script lang="ts">
+  import { Range } from 'components/DateRangePicker';
   import { Page } from 'components/Paginator';
   import I18n from '../../../../../../desktop/core/src/desktop/js/utils/i18n';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
+  import DateRangePicker from '../../../../../../desktop/core/src/desktop/js/components/DateRangePicker.vue';
   import { duration } from '../../../../../../desktop/core/src/desktop/js/components/Duration.vue';
   import { humanSize } from '../../../../../../desktop/core/src/desktop/js/components/HumanByteSize.vue';
   import HueButton from '../../../../../../desktop/core/src/desktop/js/components/HueButton.vue';
+  import HueIcon from '../../../../../../desktop/core/src/desktop/js/components/HueIcon.vue';
   import HueLink from '../../../../../../desktop/core/src/desktop/js/components/HueLink.vue';
   import { timeAgo } from '../../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
   import HueTable from '../../../../../../desktop/core/src/desktop/js/components/HueTable.vue';
@@ -91,6 +101,8 @@
 
   @Component({
     components: {
+      HueIcon,
+      DateRangePicker,
       StatusIndicator,
       SearchInput,
       HueButton,
@@ -117,6 +129,7 @@
 
     currentPage?: Page;
     searchQuery = '';
+    timeRange?: Range;
 
     columns: Column<Query>[] = [
       { key: 'select', label: '' },
@@ -212,12 +225,21 @@
     notifySearch(): void {
       window.clearTimeout(this.notifyThrottle);
       this.notifyThrottle = window.setTimeout(() => {
-        this.$emit('search', { page: this.currentPage, text: this.searchQuery });
+        this.$emit('search', {
+          page: this.currentPage,
+          text: this.searchQuery,
+          timeRange: this.timeRange
+        });
       }, 0);
     }
 
     pageChanged(page: Page): void {
       this.currentPage = page;
+      this.notifySearch();
+    }
+
+    timeRangeChanged(timeRange: Range): void {
+      this.timeRange = timeRange;
       this.notifySearch();
     }
 
@@ -247,10 +269,20 @@
       margin-bottom: 20px;
       width: 100%;
 
+      .query-table-filters {
+        display: inline-block;
+        margin-left: 30px;
+
+        /deep/ button {
+          margin-left: 5px;
+        }
+      }
+
       button {
         margin-left: 15px;
       }
 
+      .columns-button,
       .compare-button {
         float: right;
       }

@@ -56,16 +56,20 @@
     queries: Query[] = [];
     searchMeta: SearchMeta | null = null;
 
-    async fetch(options: { page: Page; text?: string }): Promise<void> {
+    async fetch(options: {
+      page: Page;
+      text?: string;
+      timeRange?: { from: number; to: number };
+    }): Promise<void> {
       // Initial fetch triggered by the paginator
       const now = Date.now();
       const searchResponse = await search({
-        endTime: now,
+        endTime: (options.timeRange && options.timeRange.to) || now,
         limit: options.page.limit,
         offset: options.page.offset,
         text: options.text,
         sortText: 'startTime:DESC',
-        startTime: now - 1000 * 60 * 60 * 24 * 7,
+        startTime: (options.timeRange && options.timeRange.from) || now - 1000 * 60 * 60 * 24 * 7,
         type: 'basic'
       });
       this.searchMeta = searchResponse.meta;

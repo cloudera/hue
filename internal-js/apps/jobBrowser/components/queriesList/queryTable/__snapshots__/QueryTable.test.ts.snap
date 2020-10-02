@@ -12,7 +12,20 @@ exports[`QueryTable.vue should render 1`] = `
       showmagnify="true"
     />
      
-    <hue-button-stub>
+    <div
+      class="query-table-filters"
+    >
+      <hue-icon-stub
+        type="hi-filter"
+      />
+       Filter by:
+      
+      <date-range-picker-stub />
+    </div>
+     
+    <hue-button-stub
+      class="columns-button"
+    >
       
       Columns
     
