@@ -29,17 +29,19 @@
         <date-range-picker @date-range-changed="timeRangeChanged" />
       </div>
 
-      <hue-button class="columns-button" @click="toggleColumnSelector">
-        {{ I18n('Columns') }}
-      </hue-button>
+      <div class="query-table-actions-right">
+        <hue-button @click="toggleColumnSelector">
+          {{ I18n('Columns') }}
+        </hue-button>
 
-      <hue-button
-        class="compare-button"
-        :disabled="selectedQueries.length !== 2"
-        @click="diffQueries(selectedQueries)"
-      >
-        {{ I18n('Compare') }}
-      </hue-button>
+        <hue-button :disabled="selectedQueries.length !== 2" @click="diffQueries(selectedQueries)">
+          {{ I18n('Compare') }}
+        </hue-button>
+
+        <hue-button :disabled="selectedQueries.length === 0" @click="killQueries(selectedQueries)">
+          {{ I18n('Kill') }}
+        </hue-button>
+      </div>
     </div>
     <div class="query-table-container">
       <div v-if="columnSelectorIsVisible" class="query-table-left-panel">
@@ -260,6 +262,10 @@
     diffQueries(queries: Query[]): void {
       this.$emit('diff-queries', queries);
     }
+
+    killQueries(queries: Query[]): void {
+      this.$emit('kill-queries', queries);
+    }
   }
 </script>
 
@@ -269,22 +275,18 @@
       margin-bottom: 20px;
       width: 100%;
 
+      /deep/ button {
+        margin-left: 10px;
+      }
+
       .query-table-filters {
         display: inline-block;
         margin-left: 30px;
-
-        /deep/ button {
-          margin-left: 5px;
-        }
       }
 
-      button {
-        margin-left: 15px;
-      }
-
-      .columns-button,
-      .compare-button {
+      .query-table-actions-right {
         float: right;
+        display: inline-block;
       }
     }
 

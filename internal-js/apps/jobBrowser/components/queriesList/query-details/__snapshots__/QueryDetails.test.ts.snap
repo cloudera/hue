@@ -5,9 +5,19 @@ exports[`QueryDetails.vue should render 1`] = `
   <div
     class="dag-panel"
   >
-    <fixed-anchor-nav-stub
-      query="[object Object]"
-    />
+    <div>
+      <hue-button-stub>
+        Queries
+      </hue-button-stub>
+       
+      <hue-button-stub>
+        Stop
+      </hue-button-stub>
+       
+      <hue-button-stub>
+        Download
+      </hue-button-stub>
+    </div>
      
     <tabs-stub>
       <tab-stub

@@ -19,7 +19,16 @@
 <template>
   <div>
     <div class="dag-panel">
-      <fixed-anchor-nav :query="query" />
+      <div>
+        <hue-button @click="showQueries">Queries</hue-button>
+
+        <hue-button v-if="!query.isComplete && stoppingQuery" disabled>
+          <i class="fa fa-spinner fa-pulse fa-fw" /> Stopping query
+        </hue-button>
+        <hue-button v-else-if="!query.isComplete" @click="stopQuery">Stop</hue-button>
+
+        <hue-button @click="downloadLogs">Download</hue-button>
+      </div>
 
       <tabs>
         <tab title="Visual Explain">
@@ -56,11 +65,13 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import Vue from 'vue';
+  import { Component, Inject, Prop } from 'vue-property-decorator';
 
+  import HueButton from '../../../../../../desktop/core/src/desktop/js/components/HueButton.vue';
   import Tab from '../../../../../../desktop/core/src/desktop/js/components/Tab.vue';
   import Tabs from '../../../../../../desktop/core/src/desktop/js/components/Tabs.vue';
-  import FixedAnchorNav from './FixedAnchorNav.vue';
+  import { kill } from '../apiUtils';
   import HiveTimeline from './hive-timeline/HiveTimeline.vue';
   import ConfigsTable from './configs-table/ConfigsTable.vue';
   import QueryInfo from './QueryInfo.vue';
@@ -76,8 +87,8 @@
     components: {
       Tab,
       Tabs,
-      FixedAnchorNav,
       HiveTimeline,
+      HueButton,
       ConfigsTable,
       VisualExplain,
       QueryInfo,
@@ -90,6 +101,21 @@
   export default class QueryDetails extends Vue {
     @Prop({ required: true })
     query!: Query;
+
+    @Inject()
+    showQueries?: () => void;
+
+    stoppingQuery = false;
+
+    async stopQuery(): void {
+      this.stoppingQuery = true;
+      await kill([this.query]);
+      this.stoppingQuery = false;
+    }
+
+    downloadLogs(): void {
+      // TODO: Implement
+    }
   }
 </script>
 

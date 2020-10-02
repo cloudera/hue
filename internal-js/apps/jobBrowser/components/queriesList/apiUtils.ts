@@ -127,3 +127,9 @@ export const saveSearch = async (options: {
 }): Promise<void> => {
   // TODO: Implement POST ...
 };
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const kill = async (queries: Query[]): Promise<void> => {
+  // const queryIds = queries.map(query => query.queryId );
+  // TODO: Implement POST ...
+};

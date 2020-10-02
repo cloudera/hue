@@ -23,6 +23,7 @@
       :queries="queries"
       :total-queries="(searchMeta && searchMeta.size) || 0"
       @diff-queries="diffQueries"
+      @kill-queries="killQueries"
       @query-selected="querySelected"
       @search="fetch"
     />
@@ -39,7 +40,7 @@
   import { Provide } from 'vue-property-decorator';
   import HumanByteSize from '../../../../../desktop/core/src/desktop/js/components/HumanByteSize.vue';
   import TimeAgo from '../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
-  import { fetchExtendedQuery, search } from './apiUtils';
+  import { fetchExtendedQuery, kill, search } from './apiUtils';
   import QueryDetailsDiff from './query-details/QueryDetailsDiff.vue';
   import QueryDetails from './query-details/QueryDetails.vue';
   import { Query, SearchMeta } from './index';
@@ -114,6 +115,11 @@
         fetchExtendedQuery({ queryId: query.queryId })
       );
       this.queriesToDiff = await Promise.all(fetchPromises);
+    }
+
+    async killQueries(queriesToKill: Query[]): Promise<void> {
+      await kill(queriesToKill);
+      // TODO: Refresh the queries?
     }
 
     async querySelected(query: Query): Promise<void> {

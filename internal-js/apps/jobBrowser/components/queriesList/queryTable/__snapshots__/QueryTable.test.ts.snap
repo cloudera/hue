@@ -23,22 +23,31 @@ exports[`QueryTable.vue should render 1`] = `
       <date-range-picker-stub />
     </div>
      
-    <hue-button-stub
-      class="columns-button"
+    <div
+      class="query-table-actions-right"
     >
+      <hue-button-stub>
+        
+        Columns
       
-      Columns
-    
-    </hue-button-stub>
-     
-    <hue-button-stub
-      class="compare-button"
-      disabled="true"
-    >
+      </hue-button-stub>
+       
+      <hue-button-stub
+        disabled="true"
+      >
+        
+        Compare
       
-      Compare
-    
-    </hue-button-stub>
+      </hue-button-stub>
+       
+      <hue-button-stub
+        disabled="true"
+      >
+        
+        Kill
+      
+      </hue-button-stub>
+    </div>
   </div>
    
   <div
