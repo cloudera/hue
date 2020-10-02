@@ -28,6 +28,7 @@ from useradmin.organization import _fitered_queryset, get_user_request_organizat
 from desktop.conf import CONNECTORS, ENABLE_ORGANIZATIONS
 from desktop.lib.connectors.types import get_connectors_types
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_unicode
 
 
 LOG = logging.getLogger(__name__)
@@ -136,6 +137,9 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
   if interface is not None:
     connectors = [connector for connector in connectors if connector['interface'] == interface]
 
+  if connector_id and user and not connectors:
+    raise ConnectorNotFoundException(_('Connector %s not found for user %s') % (connector_id, user))
+
   return connectors
 
 
@@ -181,7 +185,7 @@ def _create_connector_examples():
         dialect=connector['dialect'],
         settings=json.dumps(connector['settings'])
       )
-      result.append(name)
+      added.append(name)
     else:
       skipped.append(name)
 
@@ -201,3 +205,14 @@ def _get_connector_examples():
     }
     for i in CONNECTORS.get()
   ]
+
+
+class ConnectorNotFoundException(Exception):
+  def __init__(self, message=None):
+    self.message = message or _('No error message, please check the logs.')
+
+  def __str__(self):
+    return str(self.message)
+
+  def __unicode__(self):
+    return smart_unicode(self.message)
