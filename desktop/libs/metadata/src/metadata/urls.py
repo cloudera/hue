@@ -21,6 +21,7 @@ from metadata import catalog_api as metadata_catalog_api, analytic_db_api, datae
 from metadata import optimizer_api as metadata_optimizer_api
 from metadata import workload_analytics_api as metadata_workload_analytics_api
 from metadata import manager_api as metadata_manager_api
+from metadata import models_api as metadata_models_api
 
 
 # Catalog
@@ -88,6 +89,12 @@ urlpatterns += [
 # Prometheus API
 urlpatterns += [
   url(r'^api/prometheus/query?$', prometheus_api.query, name='prometheus_query'),
+]
+
+
+# Model API
+urlpatterns += [
+  url(r'^api/models/list/?$', metadata_models_api.list_models, name='list_models'),
 ]
 
 
