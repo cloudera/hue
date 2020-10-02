@@ -42,7 +42,7 @@ class Base():
     self.user = user
     self.connector_id = connector_id
 
-  def list_models(self): pass
+  def list_models(self, database=None): pass
 
 
 class ModelsApiException(Exception):

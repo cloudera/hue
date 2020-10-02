@@ -54,13 +54,13 @@ def error_handler(view_fn):
 
 @require_POST
 @error_handler
-def list_models(request):
+def list_models(request, database=None):
   response = {'status': -1}
 
   connector_id = request.POST.get('connector')
 
   api = get_api(request.user, connector_id)
 
-  data = api.list_models()
+  data = api.list_models(database)
 
   return JsonResponse({'models': data})
