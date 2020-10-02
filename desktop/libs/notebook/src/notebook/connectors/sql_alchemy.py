@@ -389,6 +389,8 @@ class SqlAlchemyApi(Api):
       response['function'] = {}
     elif database is None:
       response['databases'] = [db or '' for db in assist.get_databases()]
+    elif table is None and operation == 'models':
+      response['models'] = [t for t in assist.get_models(database)]
     elif table is None:
       tables_meta = []
       for t in assist.get_tables(database):
@@ -500,7 +502,7 @@ class Assist(object):
     return self.db.get_table_names(database)
 
   def get_models(self, database):
-    return self.db.get_model_names(database)
+    return [t for t in self.db.get_table_names(database) if isinstance(t, dict)]  # Currently only supported by pybigquery
 
   def get_columns(self, database, table):
     return self.db.get_columns(table, database)
