@@ -17,21 +17,17 @@
 -->
 
 <template>
-  <div
-    v-click-outside="clickOutside"
-    class="hue-dropdown-panel"
-    :class="{ 'dropdown-inline': inline }"
-  >
-    <hue-link v-if="inline" @click="togglePanel">
+  <div v-click-outside="clickOutside" class="hue-dropdown-panel">
+    <hue-link v-if="link" @click="togglePanel">
       {{ text }} <i class="fa fa-caret-down" />
     </hue-link>
     <hue-button v-else @click="togglePanel"> {{ text }} <i class="fa fa-caret-down" /></hue-button>
-    <div class="hue-dropdown-container" :class="{ open: panelOpen }" @click="togglePanel">
+    <div class="hue-dropdown-container" :class="{ open: panelOpen }">
       <div
         class="hue-dropdown-inner"
         :class="{ 'position-top': positionTop, 'position-left': positionLeft }"
       >
-        <slot />
+        <slot name="contents" :closePanel="closePanel" />
       </div>
     </div>
   </div>
@@ -70,9 +66,10 @@
   })
   export default class DropdownPanel extends Vue {
     @Prop({ required: false, default: '' })
-    text: string;
+    text!: string;
     @Prop({ required: false, default: false })
-    inline: boolean;
+    link!: boolean;
+
     panelOpen = false;
 
     positionTop = false;
@@ -90,6 +87,12 @@
       this.panelOpen = !this.panelOpen;
     }
 
+    closePanel(): void {
+      if (this.panelOpen) {
+        this.togglePanel();
+      }
+    }
+
     clickOutside(): void {
       if (this.panelOpen) {
         this.panelOpen = false;
@@ -103,9 +106,7 @@
   @import '../styles/mixins';
 
   .hue-dropdown-panel {
-    &.dropdown-inline {
-      display: inline-block;
-    }
+    display: inline-block;
 
     .hue-dropdown-container {
       position: fixed;

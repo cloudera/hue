@@ -16,11 +16,7 @@ exports[`DropdownPanel.vue should render dropdown panel with slots 1`] = `
   >
     <div
       class="hue-dropdown-inner"
-    >
-      <div>
-        Some item
-      </div>
-    </div>
+    />
   </div>
 </div>
 `;
