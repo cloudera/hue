@@ -17,18 +17,30 @@
 
 from django.utils.translation import ugettext as _
 
+from desktop.conf import has_connectors
+from desktop.lib.connectors.models import _get_installed_connectors
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 
 
-def get_api(user, interface=None):
-  raise PopupException(_('Model connector interface not recognized: %s') % interface)
+def get_api(user, connector_id):
+  if has_connectors() and connector_id != 'dummy':
+    connectors = _get_installed_connectors(user=user, connector_id=int(connector_id))
+    dialect = connectors[0]['dialect']
+  else:
+    dialect = connector_id
+
+  if dialect == 'dummy':
+    return Base(user, connector_id)
+  else:
+    raise PopupException(_('Model connector dialect not recognized: %s') % dialect)
 
 
 class Base():
 
-  def __init__(self, user):
+  def __init__(self, user, connector_id):
     self.user = user
+    self.connector_id = connector_id
 
   def list_models(self): pass
 
