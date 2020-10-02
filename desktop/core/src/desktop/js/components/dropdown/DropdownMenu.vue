@@ -17,12 +17,14 @@
 -->
 
 <template>
-  <dropdown-panel class="hue-dropdown-menu" :text="text" :inline="inline">
-    <div class="hue-dropdown-menu-inner">
-      <ul>
-        <slot />
-      </ul>
-    </div>
+  <dropdown-panel class="hue-dropdown-menu" :text="text" :link="link">
+    <template #contents="{ closePanel }">
+      <div class="hue-dropdown-menu-inner" @click="closePanel">
+        <ul>
+          <slot />
+        </ul>
+      </div>
+    </template>
   </dropdown-panel>
 </template>
 
@@ -37,9 +39,9 @@
   })
   export default class DropdownMenu extends Vue {
     @Prop({ required: false, default: '' })
-    text: string;
+    text!: string;
     @Prop({ required: false, default: false })
-    inline: boolean;
+    link!: boolean;
   }
 </script>
 

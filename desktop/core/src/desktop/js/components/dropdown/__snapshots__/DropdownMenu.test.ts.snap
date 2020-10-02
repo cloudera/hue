@@ -1,31 +1,65 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`DropdownMenu.vue should render dropdown with slots 1`] = `
-<dropdown-panel-stub
-  class="hue-dropdown-menu"
-  text=""
+<div
+  class="hue-dropdown-panel hue-dropdown-menu"
 >
-  <div
-    class="hue-dropdown-menu-inner"
+  <button
+    class="btn"
+    type="button"
   >
-    <ul>
-      <div>
-        Some item
+      
+    <i
+      class="fa fa-caret-down"
+    />
+  </button>
+   
+  <div
+    class="hue-dropdown-container"
+  >
+    <div
+      class="hue-dropdown-inner"
+    >
+      <div
+        class="hue-dropdown-menu-inner"
+      >
+        <ul>
+          <div>
+            Some item
+          </div>
+        </ul>
       </div>
-    </ul>
+    </div>
   </div>
-</dropdown-panel-stub>
+</div>
 `;
 
 exports[`DropdownMenu.vue should render empty dropdown 1`] = `
-<dropdown-panel-stub
-  class="hue-dropdown-menu"
-  text=""
+<div
+  class="hue-dropdown-panel hue-dropdown-menu"
 >
-  <div
-    class="hue-dropdown-menu-inner"
+  <button
+    class="btn"
+    type="button"
   >
-    <ul />
+      
+    <i
+      class="fa fa-caret-down"
+    />
+  </button>
+   
+  <div
+    class="hue-dropdown-container"
+  >
+    <div
+      class="hue-dropdown-inner"
+    >
+      <div
+        class="hue-dropdown-menu-inner"
+      >
+        <ul />
+      </div>
+    </div>
   </div>
-</dropdown-panel-stub>
+</div>
 `;
