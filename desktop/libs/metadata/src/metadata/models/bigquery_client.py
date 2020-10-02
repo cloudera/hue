@@ -39,7 +39,21 @@ class BigQueryClient(Base):
       'operation': 'models'
     }
 
-    return _get_notebook_api(self.user, 40).autocomplete(**params)
+    return _get_notebook_api(self.user, self.connector_id).autocomplete(**params)
+
+
+  def predict(self, params):
+    data = {
+      'snippet': {},
+      'operation': '''
+          SELECT * FROM ML.PREDICT(
+            MODEL `%(model)s`, (
+              %(statement)s
+            )
+          )
+        ''' % params
+    }
+    return _get_notebook_api(self.user, self.connector_id).get_sample_data(**data)
 
 
 def _get_notebook_api(user, connector_id, interpreter=None):
