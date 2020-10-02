@@ -1,0 +1,288 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DateRangePicker.vue should render 1`] = `
+<div
+  class="hue-dropdown-panel"
+>
+  <button
+    class="btn"
+    type="button"
+  >
+     Last 7 days 
+    <i
+      class="fa fa-caret-down"
+    />
+  </button>
+   
+  <div
+    class="hue-dropdown-container"
+  >
+    <div
+      class="hue-dropdown-inner"
+    >
+      <div
+        class="date-range-picker-panel"
+      >
+        <div
+          class="date-range-picker-body"
+        >
+          <div
+            class="date-range-picker-preset"
+          >
+            <div
+              style="border-right: 1px solid gray;"
+            >
+              <header>
+                Quick Ranges
+              </header>
+               
+              <div
+                class="preset-list"
+              >
+                <div
+                  class="preset-column"
+                >
+                  <div
+                    class="preset-value selected"
+                  >
+                    <hue-link-stub>
+                      Last 7 days
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last 30 days
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last 60 days
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last 90 days
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last 6 months
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last 1 year
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last 2 years
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last 5 years
+                    </hue-link-stub>
+                  </div>
+                </div>
+                <div
+                  class="preset-column"
+                >
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last 5 minutes
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last 15 minutes
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last 30 minutes
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last 1 hour
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last 3 hours
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last 6 hours
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last 12 hours
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last 24 hours
+                    </hue-link-stub>
+                  </div>
+                </div>
+                <div
+                  class="preset-column"
+                >
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Today
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Yesterday
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      This week
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last week
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      This month
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last month
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      This year
+                    </hue-link-stub>
+                  </div>
+                  <div
+                    class="preset-value"
+                  >
+                    <hue-link-stub>
+                      Last year
+                    </hue-link-stub>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+           
+          <div
+            class="date-range-picker-custom"
+          >
+            <header>
+              Time Range
+            </header>
+             
+            <div>
+              <div
+                class="range-header"
+              >
+                FROM:
+              </div>
+               
+              <datepicker-stub
+                calendarclass="range-calendar"
+                format="dd/MM/yyyy"
+                inputclass="range-input"
+                language="[object Object]"
+                maximumview="year"
+                minimumview="day"
+                placeholder="DD/MM/YYYY"
+                typeable="true"
+              />
+            </div>
+             
+            <div>
+              <div
+                class="range-header"
+              >
+                TO:
+              </div>
+               
+              <datepicker-stub
+                calendarclass="range-calendar"
+                format="dd/MM/yyyy"
+                inputclass="range-input"
+                language="[object Object]"
+                maximumview="year"
+                minimumview="day"
+                placeholder="DD/MM/YYYY"
+                typeable="true"
+              />
+            </div>
+          </div>
+        </div>
+         
+        <div
+          class="date-range-picker-footer"
+        >
+          <hue-button-stub>
+            Cancel
+          </hue-button-stub>
+           
+          <hue-button-stub>
+            Apply
+          </hue-button-stub>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
