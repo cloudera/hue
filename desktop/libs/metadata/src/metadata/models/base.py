@@ -47,6 +47,8 @@ class Base():
 
   def list_models(self, database=None): pass
 
+  def predict(self, params): pass
+
 
 class ModelsApiException(Exception):
   def __init__(self, message=None):

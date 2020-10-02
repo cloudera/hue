@@ -92,9 +92,10 @@ urlpatterns += [
 ]
 
 
-# Model API
+# Models API
 urlpatterns += [
   url(r'^api/models/list/(?P<database>[^/?]*)/?$', metadata_models_api.list_models, name='list_models'),
+  url(r'^api/models/predict/?$', metadata_models_api.predict, name='model_predict'),
 ]
 
 

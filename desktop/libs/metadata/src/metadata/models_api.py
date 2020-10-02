@@ -64,3 +64,17 @@ def list_models(request, database=None):
   data = api.list_models(database)
 
   return JsonResponse({'models': data})
+
+
+@require_POST
+@error_handler
+def predict(request):
+  response = {'status': -1}
+
+  connector_id = request.POST.get('connector')
+
+  api = get_api(request.user, connector_id)
+
+  data = api.predict(request.POST)
+
+  return JsonResponse({'data': data})
