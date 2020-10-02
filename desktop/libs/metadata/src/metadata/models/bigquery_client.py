@@ -32,10 +32,10 @@ LOG = logging.getLogger(__name__)
 
 class BigQueryClient(Base):
 
-  def list_models(self):
+  def list_models(self, database):
     params = {
       'snippet': {},
-      'database': 'bqml_tutorial',
+      'database': database,
       'operation': 'models'
     }
 
