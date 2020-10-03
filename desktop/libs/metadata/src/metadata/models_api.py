@@ -68,6 +68,20 @@ def list_models(request, database=None):
 
 @require_POST
 @error_handler
+def train(request):
+  response = {'status': -1}
+
+  connector_id = request.POST.get('connector')
+
+  api = get_api(request.user, connector_id)
+
+  data = api.train(request.POST)
+
+  return JsonResponse({'data': data})
+
+
+@require_POST
+@error_handler
 def predict(request):
   response = {'status': -1}
 
