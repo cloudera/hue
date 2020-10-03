@@ -300,7 +300,7 @@ class Notebook(object):
     handle = self.execute(request, batch=False)
 
     if handle['status'] != 0:
-      raise QueryError(e, message='SQL statement failed.', handle=handle)
+      raise QueryError(message='SQL statement failed.', handle=handle)
 
     operation_id = handle['history_uuid']
     curr = time.time()
