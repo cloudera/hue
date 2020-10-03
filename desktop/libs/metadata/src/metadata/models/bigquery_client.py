@@ -72,6 +72,14 @@ class BigQueryClient(Base):
     return _get_notebook_api(self.user, self.connector_id).get_sample_data(**data)
 
 
+  def delete_model(self, name):
+    data = {
+      'snippet': {},
+      'operation': 'DROP MODEL IF EXISTS `%s`' % name
+    }
+    return _get_notebook_api(self.user, self.connector_id).get_sample_data(**data)
+
+
 def _get_notebook_api(user, connector_id, interpreter=None):
   '''
   Helper utils until the API gets simplified.
