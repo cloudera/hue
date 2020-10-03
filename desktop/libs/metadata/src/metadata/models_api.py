@@ -92,3 +92,17 @@ def predict(request):
   data = api.predict(request.POST)
 
   return JsonResponse({'data': data})
+
+
+@require_POST
+@error_handler
+def delete_model(request, name):
+  response = {'status': -1}
+
+  connector_id = request.POST.get('connector')
+
+  api = get_api(request.user, connector_id)
+
+  data = api.delete_model(name)
+
+  return JsonResponse({'info': data})

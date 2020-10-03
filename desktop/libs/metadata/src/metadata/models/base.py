@@ -51,6 +51,8 @@ class Base():
 
   def predict(self, params): pass
 
+  def delete_model(self, name): pass
+
 
 class ModelsApiException(Exception):
   def __init__(self, message=None):
