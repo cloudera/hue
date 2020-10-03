@@ -166,7 +166,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
       <input type="hidden" name="id_token"/>
 
       <div class="center">
-        ${ _('No account yet?') } <a href="https://datagen.iquery.io/create_account">[${ _('Sign  Up') }]</a>
+        ${ _('No account yet?') } <a href="https://dataquery.iquery.ai/register">${ _('Sign  Up') }</a>
       </div>
     % endif
 
@@ -244,7 +244,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
 
       $("input").bind('click', function () {
         var credentials = {
-          email: 'romain@iquery.io',
+          email: 'romain@iquery.ai',
           password: 'romain',
         };
         // window.JwtAuth. // to clean-up
