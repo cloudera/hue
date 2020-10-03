@@ -42,6 +42,22 @@ class BigQueryClient(Base):
     return _get_notebook_api(self.user, self.connector_id).autocomplete(**params)
 
 
+  def train(self, params):
+    data = {
+      'snippet': {},
+      'operation': '''
+          CREATE or replace MODEL `%(model)s`
+          OPTIONS (
+            model_type='linear_reg',
+            input_label_cols=['weight_pounds']
+          )
+          AS
+          %(statement)s
+        ''' % params
+    }
+    return _get_notebook_api(self.user, self.connector_id).get_sample_data(**data)
+
+
   def predict(self, params):
     data = {
       'snippet': {},
