@@ -510,6 +510,8 @@ class Assist(object):
   def get_sample_data(self, database, table, column=None, operation=None):
     if operation == 'hello':
       statement = "SELECT 'Hello World!'"
+    elif operation is not None:
+      statement = "SELECT * FROM (%s) LIMIT 1000" % operation if operation.strip().lower().startswith('select') else operation
     else:
       column = '%(backticks)s%(column)s%(backticks)s' % {'backticks': self.backticks, 'column': column} if column else '*'
       statement = textwrap.dedent('''\
