@@ -163,6 +163,8 @@
     'Add': '${ _('Add') }',
     'Admin': '${ _('Admin') }',
     'Administration': '${ _('Administration') }',
+    'Administer Server': '${ _('Administer Server') }',
+    'Administer Users': '${ _('Administer Users') }',
     'aggregate': '${ _('aggregate') }',
     'Aggregate': '${ _('Aggregate') }',
     'alias': '${ _('alias') }',
