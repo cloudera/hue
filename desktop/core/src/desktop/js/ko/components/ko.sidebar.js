@@ -284,12 +284,12 @@ class Sidebar {
 
     if (window.USER_IS_ADMIN || window.USER_IS_HUE_ADMIN) {
       userChildren.push(
-        new SidebarItem({ url: '/useradmin/users/', displayName: I18n('Manage Users') })
+        new SidebarItem({ url: '/useradmin/users/', displayName: I18n('Administer Users') })
       );
       userChildren.push(
         new SidebarItem({
           url: '/about/',
-          displayName: I18n('Administration'),
+          displayName: I18n('Administer Server'),
           type: 'admin_wizard'
         })
       );
