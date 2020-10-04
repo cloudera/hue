@@ -73,9 +73,10 @@ ${ layout.menubar(section='organizations') }
             <div class="select-all hue-checkbox fa"></div>
           </th>
         %endif
-        <th>${_('Organization Name')}</th>
+        <th>${_('Name')}</th>
         <th>${_('Members')}</th>
-        <th>${_('Group & Permissions Counts')}</th>
+        <th>${_('Groups')}</th>
+        <th>${_('Permissions')}</th>
       </tr>
       </thead>
       <tbody>
@@ -91,7 +92,8 @@ ${ layout.menubar(section='organizations') }
             <strong>${ group.name }</strong>
           </td>
           <td>${ ', '.join([group_user.username for group_user in group.organizationuser_set.all()]) }</td>
-          <td>${ group.organizationgroup_set.count() } ${ group.huepermission_set.count() }</td>
+          <td>${ ', '.join([org.name for org in group.organizationgroup_set.all()]) }</td>
+          <td>${ ', '.join([perm.connector.name for perm in group.huepermission_set.all()]) }</td>
         </tr>
         % endfor
       </tbody>
@@ -156,6 +158,7 @@ ${ layout.menubar(section='organizations') }
         % if is_admin(user):
             { "bSortable": false },
         % endif
+        { "sWidth": "20%" },
         { "sWidth": "20%" },
         { "sWidth": "20%" },
         null
