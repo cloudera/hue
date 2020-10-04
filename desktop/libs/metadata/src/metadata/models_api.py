@@ -82,14 +82,16 @@ def train(request):
 
 @require_POST
 @error_handler
-def predict(request):
+def predict(request, name):
   response = {'status': -1}
 
   connector_id = request.POST.get('connector')
+  params = request.POST.copy()
+  params['model'] = name
 
   api = get_api(request.user, connector_id)
 
-  data = api.predict(request.POST)
+  data = api.predict(params)
 
   return JsonResponse({'data': data})
 
