@@ -18,7 +18,7 @@
 
 <template>
   <div>
-    <div class="dag-panel">
+    <div>
       <div>
         <hue-button @click="showQueries">Queries</hue-button>
 
@@ -46,11 +46,7 @@
       </tabs>
     </div>
 
-    <div
-      v-for="(dag, index) in query.dags"
-      :key="dag.dagInfo.id"
-      class="target detail-panel dag-panel"
-    >
+    <div v-for="(dag, index) in query.dags" :key="dag.dagInfo.id" class="target detail-panel">
       <div>Dag {{ index + 1 }} : {{ dag && dag.dagInfo.dagId }}</div>
       <tabs>
         <tab title="DAG Flow"><DagGraph :dag="dag" /></tab>

@@ -21,7 +21,7 @@
     <div style="margin-bottom: 20px;">
       <hue-button @click="showQueries">Queries</hue-button>
     </div>
-    <div class="dag-panel">
+    <div>
       <tabs>
         <tab title="Query Info">
           <query-info :query="queries[0]" class="side-by-side" />
@@ -54,7 +54,7 @@
     <div
       v-for="(dagSet, index) in constructDagSets(queries[0], queries[1])"
       :key="index"
-      class="target detail-panel dag-panel"
+      class="target detail-panel"
     >
       <div>
         Dag {{ index + 1 }} : {{ dagSet.dagA && dagSet.dagA.dagInfo.dagId }} |
