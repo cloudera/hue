@@ -44,7 +44,7 @@
   import QueryDetailsDiff from './query-details/QueryDetailsDiff.vue';
   import QueryDetails from './query-details/QueryDetails.vue';
   import { Query, SearchMeta } from './index';
-  import QueryTable from './queryTable/QueryTable.vue';
+  import QueryTable from './query-table/QueryTable.vue';
 
   const QUERY_ID_PARAM = 'queryId';
 
