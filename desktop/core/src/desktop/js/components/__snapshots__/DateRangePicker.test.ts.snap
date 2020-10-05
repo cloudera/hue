@@ -273,11 +273,14 @@ exports[`DateRangePicker.vue should render 1`] = `
         <div
           class="date-range-picker-footer"
         >
-          <hue-button-stub>
+          <hue-link-stub>
             Cancel
-          </hue-button-stub>
+          </hue-link-stub>
            
-          <hue-button-stub>
+          <hue-button-stub
+            primary="true"
+            small="true"
+          >
             Apply
           </hue-button-stub>
         </div>
