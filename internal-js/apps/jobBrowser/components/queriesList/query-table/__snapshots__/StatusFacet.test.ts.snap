@@ -49,6 +49,19 @@ exports[`StatusFacet.vue should render 1`] = `
                 value="[object Object]"
               />
               
+            Started
+          
+            </label>
+          </div>
+          <div
+            class="status-list-entry"
+          >
+            <label>
+              <input
+                type="checkbox"
+                value="[object Object]"
+              />
+              
             Running
           
             </label>
@@ -62,7 +75,7 @@ exports[`StatusFacet.vue should render 1`] = `
                 value="[object Object]"
               />
               
-            Succeeded
+            Success
           
             </label>
           </div>
@@ -75,33 +88,7 @@ exports[`StatusFacet.vue should render 1`] = `
                 value="[object Object]"
               />
               
-            Stopped
-          
-            </label>
-          </div>
-          <div
-            class="status-list-entry"
-          >
-            <label>
-              <input
-                type="checkbox"
-                value="[object Object]"
-              />
-              
-            Failed
-          
-            </label>
-          </div>
-          <div
-            class="status-list-entry"
-          >
-            <label>
-              <input
-                type="checkbox"
-                value="[object Object]"
-              />
-              
-            Cancelled
+            Error
           
             </label>
           </div>

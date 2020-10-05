@@ -22,12 +22,17 @@
   <div class="query-table">
     <!-- <queries-search :searches="searches" :table-definition="tableDefinition" /> -->
     <div class="query-table-actions">
-      <search-input @search="searchQueryChanged" />
+      <search-input v-model="searchQuery" @search="searchQueryEnter" />
 
       <div class="query-table-filters">
         <hue-icon type="hi-filter" /> Filter by:
-        <status-facet @facet-removed="facetRemoved" @facet-changed="facetChanged" />
-        <date-range-picker @date-range-changed="timeRangeChanged" />
+        <status-facet
+          ref="statusFacet"
+          @facet-removed="facetRemoved"
+          @facet-changed="facetChanged"
+        />
+        <date-range-picker ref="rangePicker" @date-range-changed="timeRangeChanged" />
+        <hue-link class="clear-link" @click="clearSearch">Clear All</hue-link>
       </div>
 
       <div class="query-table-actions-right">
@@ -240,6 +245,12 @@
       }, 0);
     }
 
+    clearSearch(): void {
+      this.searchQuery = '';
+      (<DateRangePicker>this.$refs.rangePicker).clear();
+      (<StatusFacet>this.$refs.statusFacet).clear();
+    }
+
     pageChanged(page: Page): void {
       this.currentPage = page;
       this.notifySearch();
@@ -262,7 +273,7 @@
       this.notifySearch();
     }
 
-    searchQueryChanged(searchQuery: string): void {
+    searchQueryEnter(searchQuery: string): void {
       this.searchQuery = searchQuery;
       if (this.currentPage && this.currentPage.offset !== 0) {
         // pageChanged will notify
@@ -299,6 +310,10 @@
       .query-table-filters {
         display: inline-block;
         margin-left: 30px;
+
+        .clear-link {
+          margin-left: 30px;
+        }
       }
 
       .query-table-actions-right {

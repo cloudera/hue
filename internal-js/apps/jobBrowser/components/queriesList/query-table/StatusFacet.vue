@@ -58,7 +58,7 @@
   import HueLink from '../../../../../../desktop/core/src/desktop/js/components/HueLink.vue';
   import Vue from 'vue';
   import Component from 'vue-class-component';
-  import { SearchFacet } from '../../../../../internal-js/apps/jobBrowser/components/queriesList/apiUtils';
+  import { SearchFacet } from '../apiUtils';
 
   interface Status {
     label: string;
@@ -71,24 +71,20 @@
   export default class StatusFacet extends Vue {
     statuses: Status[] = [
       {
+        label: I18n('Started'),
+        value: 'STARTED'
+      },
+      {
         label: I18n('Running'),
         value: 'RUNNING'
       },
       {
-        label: I18n('Succeeded'),
+        label: I18n('Success'),
         value: 'SUCCESS'
       },
       {
-        label: I18n('Stopped'),
-        value: 'STOPPED'
-      },
-      {
-        label: I18n('Failed'),
-        value: 'FAILED'
-      },
-      {
-        label: I18n('Cancelled'),
-        value: 'CANCELLED'
+        label: I18n('Error'),
+        value: 'ERROR'
       }
     ];
 
@@ -98,6 +94,11 @@
     mounted(): void {
       this.selectedStatuses = [...this.statuses];
       this.previousSelection = [...this.statuses];
+    }
+
+    clear(): void {
+      this.selectedStatuses = [...this.statuses];
+      this.$emit('facet-removed', 'status');
     }
 
     get allSelected(): boolean {

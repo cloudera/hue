@@ -10,6 +10,7 @@ exports[`QueryTable.vue should render 1`] = `
     <search-input-stub
       placeholder="Search..."
       showmagnify="true"
+      value=""
     />
      
     <div
@@ -23,6 +24,12 @@ exports[`QueryTable.vue should render 1`] = `
       <status-facet-stub />
        
       <date-range-picker-stub />
+       
+      <hue-link-stub
+        class="clear-link"
+      >
+        Clear All
+      </hue-link-stub>
     </div>
      
     <div
