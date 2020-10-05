@@ -53,6 +53,8 @@ class Base():
 
   def delete_model(self, model): pass
 
+  def get_model(self, model): pass
+
 
 class ModelsApiException(Exception):
   def __init__(self, message=None):

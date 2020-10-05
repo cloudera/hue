@@ -110,3 +110,17 @@ def delete_model(request, model):
   data = api.delete_model(model)
 
   return JsonResponse({'info': data})
+
+
+@require_POST
+@error_handler
+def get_model(request, model):
+  response = {'status': -1}
+
+  connector_id = request.POST.get('connector')
+
+  api = get_api(request.user, connector_id)
+
+  data = api.get_model(model)
+
+  return JsonResponse({'model': data})
