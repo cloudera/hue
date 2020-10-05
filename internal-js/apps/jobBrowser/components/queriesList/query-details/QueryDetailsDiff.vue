@@ -23,14 +23,18 @@
     </div>
     <div class="dag-panel">
       <tabs>
-        <tab title="Visual Explain">
+        <tab title="Query Info">
+          <query-info :query="queries[0]" class="side-by-side" />
+          <query-info :query="queries[1]" class="side-by-side" />
+        </tab>
+        <tab title="Visual Explain" lazy="true">
           <!-- Can be converted to a loop if we have to compare more than 2 queries. But thats verry unlikely to happen. -->
           <VisualExplain :query="queries[0]" class="side-by-side" />
           <VisualExplain :query="queries[1]" class="side-by-side" />
         </tab>
-        <tab title="Query Info">
-          <query-info :query="queries[0]" class="side-by-side" />
-          <query-info :query="queries[1]" class="side-by-side" />
+        <tab title="Timeline">
+          <HiveTimeline :perf="queries[0].details.perf" />
+          <HiveTimeline :perf="queries[1].details.perf" />
         </tab>
         <tab title="Query Config">
           <label class="hide-similar">
@@ -43,10 +47,6 @@
               { title: 'Query B', configs: queries[1].details.configuration }
             ]"
           />
-        </tab>
-        <tab title="Timeline">
-          <HiveTimeline :perf="queries[0].details.perf" />
-          <HiveTimeline :perf="queries[1].details.perf" />
         </tab>
       </tabs>
     </div>
@@ -61,6 +61,14 @@
         {{ dagSet.dagB && dagSet.dagB.dagInfo.dagId }}
       </div>
       <tabs>
+        <tab title="DAG Flow">
+          <DagGraph :dag="dagSet.dagA" class="side-by-side" />
+          <DagGraph :dag="dagSet.dagB" class="side-by-side" />
+        </tab>
+        <tab title="DAG Swimlane">
+          <DagSwimlane :dag="dagSet.dagA" />
+          <DagSwimlane :dag="dagSet.dagB" />
+        </tab>
         <tab title="DAG Counters">
           <label class="hide-similar">
             <input v-model="hideSimilarValues" type="checkbox" /> Hide Similar Values
@@ -78,14 +86,6 @@
               }
             ]"
           />
-        </tab>
-        <tab title="DAG Flow">
-          <DagGraph :dag="dagSet.dagA" class="side-by-side" />
-          <DagGraph :dag="dagSet.dagB" class="side-by-side" />
-        </tab>
-        <tab title="DAG Swimlane">
-          <DagSwimlane :dag="dagSet.dagA" />
-          <DagSwimlane :dag="dagSet.dagB" />
         </tab>
         <tab title="DAG Configurations">
           <label class="hide-similar">

@@ -21,14 +21,6 @@ exports[`QueryDetails.vue should render 1`] = `
      
     <tabs-stub>
       <tab-stub
-        title="Visual Explain"
-      >
-        <visualexplain-stub
-          query="[object Object]"
-        />
-      </tab-stub>
-       
-      <tab-stub
         title="Query Info"
       >
         <query-info-stub
@@ -37,10 +29,11 @@ exports[`QueryDetails.vue should render 1`] = `
       </tab-stub>
        
       <tab-stub
-        title="Query Config"
+        lazy="true"
+        title="Visual Explain"
       >
-        <configstable-stub
-          configs="[object Object]"
+        <visualexplain-stub
+          query="[object Object]"
         />
       </tab-stub>
        
@@ -49,6 +42,14 @@ exports[`QueryDetails.vue should render 1`] = `
       >
         <hivetimeline-stub
           perf="[object Object]"
+        />
+      </tab-stub>
+       
+      <tab-stub
+        title="Query Config"
+      >
+        <configstable-stub
+          configs="[object Object]"
         />
       </tab-stub>
     </tabs-stub>
@@ -63,14 +64,6 @@ exports[`QueryDetails.vue should render 1`] = `
      
     <tabs-stub>
       <tab-stub
-        title="DAG Counters"
-      >
-        <counterstable-stub
-          counters="[object Object]"
-        />
-      </tab-stub>
-       
-      <tab-stub
         title="DAG Flow"
       >
         <daggraph-stub
@@ -84,6 +77,14 @@ exports[`QueryDetails.vue should render 1`] = `
         <dagswimlane-stub
           consolidate="true"
           dag="[object Object]"
+        />
+      </tab-stub>
+       
+      <tab-stub
+        title="DAG Counters"
+      >
+        <counterstable-stub
+          counters="[object Object]"
         />
       </tab-stub>
        

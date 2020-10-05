@@ -15,6 +15,21 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
   >
     <tabs-stub>
       <tab-stub
+        title="Query Info"
+      >
+        <query-info-stub
+          class="side-by-side"
+          query="[object Object]"
+        />
+         
+        <query-info-stub
+          class="side-by-side"
+          query="[object Object]"
+        />
+      </tab-stub>
+       
+      <tab-stub
+        lazy="true"
         title="Visual Explain"
       >
         <visualexplain-stub
@@ -29,16 +44,14 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
       </tab-stub>
        
       <tab-stub
-        title="Query Info"
+        title="Timeline"
       >
-        <query-info-stub
-          class="side-by-side"
-          query="[object Object]"
+        <hivetimeline-stub
+          perf="[object Object]"
         />
          
-        <query-info-stub
-          class="side-by-side"
-          query="[object Object]"
+        <hivetimeline-stub
+          perf="[object Object]"
         />
       </tab-stub>
        
@@ -59,18 +72,6 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
           configs="[object Object],[object Object]"
         />
       </tab-stub>
-       
-      <tab-stub
-        title="Timeline"
-      >
-        <hivetimeline-stub
-          perf="[object Object]"
-        />
-         
-        <hivetimeline-stub
-          perf="[object Object]"
-        />
-      </tab-stub>
     </tabs-stub>
   </div>
    
@@ -85,24 +86,6 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
     </div>
      
     <tabs-stub>
-      <tab-stub
-        title="DAG Counters"
-      >
-        <label
-          class="hide-similar"
-        >
-          <input
-            type="checkbox"
-          />
-           Hide Similar Values
-        
-        </label>
-         
-        <counterstable-stub
-          counters="[object Object],[object Object]"
-        />
-      </tab-stub>
-       
       <tab-stub
         title="DAG Flow"
       >
@@ -128,6 +111,24 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
         <dagswimlane-stub
           consolidate="true"
           dag="[object Object]"
+        />
+      </tab-stub>
+       
+      <tab-stub
+        title="DAG Counters"
+      >
+        <label
+          class="hide-similar"
+        >
+          <input
+            type="checkbox"
+          />
+           Hide Similar Values
+        
+        </label>
+         
+        <counterstable-stub
+          counters="[object Object],[object Object]"
         />
       </tab-stub>
        

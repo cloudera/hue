@@ -31,17 +31,17 @@
       </div>
 
       <tabs>
-        <tab title="Visual Explain">
-          <VisualExplain :query="query" />
-        </tab>
         <tab title="Query Info">
           <query-info :query="query" />
         </tab>
-        <tab title="Query Config">
-          <ConfigsTable :configs="[{ configs: query.details.configuration }]" />
+        <tab title="Visual Explain" lazy="true">
+          <VisualExplain :query="query" />
         </tab>
         <tab title="Timeline">
           <HiveTimeline :perf="query.details.perf" />
+        </tab>
+        <tab title="Query Config">
+          <ConfigsTable :configs="[{ configs: query.details.configuration }]" />
         </tab>
       </tabs>
     </div>
@@ -53,11 +53,11 @@
     >
       <div>Dag {{ index + 1 }} : {{ dag && dag.dagInfo.dagId }}</div>
       <tabs>
+        <tab title="DAG Flow"><DagGraph :dag="dag" /></tab>
+        <tab title="DAG Swimlane"><DagSwimlane :dag="dag" /></tab>
         <tab title="DAG Counters">
           <CountersTable :counters="[{ counters: dag.dagDetails.counters }]" />
         </tab>
-        <tab title="DAG Flow"><DagGraph :dag="dag" /></tab>
-        <tab title="DAG Swimlane"><DagSwimlane :dag="dag" /></tab>
         <tab title="DAG Configurations"><ConfigsTable :configs="[{ configs: dag.config }]" /></tab>
       </tabs>
     </div>
