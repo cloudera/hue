@@ -136,6 +136,8 @@
     ]
   ];
 
+  const DEFAULT_RANGE = RANGE_SETS[0][0];
+
   @Component({
     components: { Datepicker, DropdownPanel, HueButton, HueLink }
   })
@@ -144,7 +146,7 @@
     inline?: boolean;
 
     rangeSets = RANGE_SETS;
-    selectedRange: Range = RANGE_SETS[0][0];
+    selectedRange: Range = DEFAULT_RANGE;
 
     customRange: Range = {
       title: I18n('Custom Range'),
@@ -162,6 +164,14 @@
     get customTo(): number | undefined {
       if (this.selectedRange.custom) {
         return this.selectedRange.to;
+      }
+    }
+
+    // TODO: Switch to v-model and value prop
+    clear(): void {
+      if (this.selectedRange !== DEFAULT_RANGE) {
+        this.selectedRange = DEFAULT_RANGE;
+        this.notify();
       }
     }
 
@@ -185,7 +195,7 @@
       }
     }
 
-    apply(closePanel: () => void): void {
+    notify(): void {
       let range: Range;
       if (this.selectedRange.custom) {
         range = {
@@ -203,6 +213,10 @@
         };
       }
       this.$emit('date-range-changed', range);
+    }
+
+    apply(closePanel: () => void): void {
+      this.notify();
       closePanel();
     }
   }
