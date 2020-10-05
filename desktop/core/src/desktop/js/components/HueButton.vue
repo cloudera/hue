@@ -17,15 +17,28 @@
 -->
 
 <template>
-  <button class="btn" type="button" @click="$emit('click')"><slot /></button>
+  <button
+    class="btn"
+    type="button"
+    :class="{ 'btn-primary': primary, 'btn-xs': small }"
+    @click="$emit('click')"
+  >
+    <slot />
+  </button>
 </template>
 
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
+  import { Prop } from 'vue-property-decorator';
 
   @Component
-  export default class HueButton extends Vue {}
+  export default class HueButton extends Vue {
+    @Prop({ required: false })
+    primary?: boolean;
+    @Prop({ required: false })
+    small?: boolean;
+  }
 </script>
 
 <style lang="scss" scoped>

@@ -67,8 +67,8 @@
           </div>
         </div>
         <div class="date-range-picker-footer">
-          <hue-button @click="closePanel">Cancel</hue-button>
-          <hue-button @click="apply(closePanel)">Apply</hue-button>
+          <hue-link @click="closePanel">Cancel</hue-link>
+          <hue-button :primary="true" :small="true" @click="apply(closePanel)">Apply</hue-button>
         </div>
       </div>
     </template>
@@ -76,6 +76,7 @@
 </template>
 
 <script lang="ts">
+  import { Range } from './DateRangePicker';
   import { DateTime } from 'luxon';
   import Datepicker from 'vuejs-datepicker';
   import HueLink from './HueLink.vue';
@@ -284,8 +285,13 @@
     }
 
     .date-range-picker-footer {
+      line-height: 24px;
       text-align: right;
-      padding: 5px;
+      padding: 6px 10px;
+
+      a {
+        font-size: 12px;
+      }
     }
   }
 </style>
