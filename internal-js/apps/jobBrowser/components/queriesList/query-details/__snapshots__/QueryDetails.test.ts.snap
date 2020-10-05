@@ -2,9 +2,7 @@
 
 exports[`QueryDetails.vue should render 1`] = `
 <div>
-  <div
-    class="dag-panel"
-  >
+  <div>
     <div>
       <hue-button-stub>
         Queries
@@ -56,7 +54,7 @@ exports[`QueryDetails.vue should render 1`] = `
   </div>
    
   <div
-    class="target detail-panel dag-panel"
+    class="target detail-panel"
   >
     <div>
       Dag 1 : dag_1600683331174_0003_2

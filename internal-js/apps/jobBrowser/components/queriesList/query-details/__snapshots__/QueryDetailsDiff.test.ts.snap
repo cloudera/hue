@@ -10,9 +10,7 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
     </hue-button-stub>
   </div>
    
-  <div
-    class="dag-panel"
-  >
+  <div>
     <tabs-stub>
       <tab-stub
         title="Query Info"
@@ -76,7 +74,7 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
   </div>
    
   <div
-    class="target detail-panel dag-panel"
+    class="target detail-panel"
   >
     <div>
       
