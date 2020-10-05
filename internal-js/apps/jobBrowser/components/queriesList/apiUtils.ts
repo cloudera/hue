@@ -81,11 +81,17 @@ export const fetchFieldsInfo = async (): Promise<FieldInfo[]> => {
   return response.fieldsInfo;
 };
 
+export interface SearchFacet {
+  field: string;
+  values: string[];
+}
+
 export interface SearchRequest {
   endTime: number;
   limit: number;
   offset: number;
   text?: string;
+  facets?: SearchFacet[];
   sortText: string;
   startTime: number;
   type: string;

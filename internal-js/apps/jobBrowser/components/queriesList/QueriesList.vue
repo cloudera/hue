@@ -40,7 +40,7 @@
   import { Provide } from 'vue-property-decorator';
   import HumanByteSize from '../../../../../desktop/core/src/desktop/js/components/HumanByteSize.vue';
   import TimeAgo from '../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
-  import { fetchExtendedQuery, kill, search } from './apiUtils';
+  import { fetchExtendedQuery, kill, search, SearchFacet } from './apiUtils';
   import QueryDetailsDiff from './query-details/QueryDetailsDiff.vue';
   import QueryDetails from './query-details/QueryDetails.vue';
   import { Query, SearchMeta } from './index';
@@ -61,6 +61,7 @@
       page: Page;
       text?: string;
       timeRange?: { from: number; to: number };
+      facets: SearchFacet[];
     }): Promise<void> {
       // Initial fetch triggered by the paginator
       const now = Date.now();
@@ -68,6 +69,7 @@
         endTime: (options.timeRange && options.timeRange.to) || now,
         limit: options.page.limit,
         offset: options.page.offset,
+        facets: options.facets,
         text: options.text,
         sortText: 'startTime:DESC',
         startTime: (options.timeRange && options.timeRange.from) || now - 1000 * 60 * 60 * 24 * 7,

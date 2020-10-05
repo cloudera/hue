@@ -101,7 +101,7 @@ export interface Facet {
   values: FacetValue[];
 }
 
-export interface SearchFacet {
+export interface SearchResultFacet {
   [key: string]: { in: string[] };
 }
 
@@ -115,7 +115,7 @@ export interface Search {
   clause: string;
   columns: unknown; // TODO: Type? Was null in test
   entity: string;
-  facet: SearchFacet;
+  facet: SearchResultFacet;
   id: number;
   name: string;
   owner: string;

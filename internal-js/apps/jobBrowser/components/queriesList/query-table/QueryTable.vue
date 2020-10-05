@@ -26,6 +26,7 @@
 
       <div class="query-table-filters">
         <hue-icon type="hi-filter" /> Filter by:
+        <status-facet @facet-removed="facetRemoved" @facet-changed="facetChanged" />
         <date-range-picker @date-range-changed="timeRangeChanged" />
       </div>
 
@@ -97,12 +98,14 @@
   import StatusIndicator from '../../../../../../desktop/core/src/desktop/js/components/StatusIndicator.vue';
   import { Column } from '../../../../../../desktop/core/src/desktop/js/components/HueTable';
   import ColumnSelectorPanel from '../../../../../../desktop/core/src/desktop/js/components/ColumnSelectorPanel.vue';
-  import { fetchSuggestedSearches } from '../apiUtils';
+  import StatusFacet from './StatusFacet.vue';
+  import { fetchSuggestedSearches, SearchFacet } from '../apiUtils';
   import QueriesSearch from '../components/QueriesSearch.vue';
   import { DataProcessor, Query, Search, TableDefinition } from '../index';
 
   @Component({
     components: {
+      StatusFacet,
       HueIcon,
       DateRangePicker,
       StatusIndicator,
@@ -132,6 +135,7 @@
     currentPage?: Page;
     searchQuery = '';
     timeRange?: Range;
+    facets: { [field: string]: SearchFacet } = {};
 
     columns: Column<Query>[] = [
       { key: 'select', label: '' },
@@ -230,7 +234,8 @@
         this.$emit('search', {
           page: this.currentPage,
           text: this.searchQuery,
-          timeRange: this.timeRange
+          timeRange: this.timeRange,
+          facets: Object.values(this.facets)
         });
       }, 0);
     }
@@ -242,6 +247,18 @@
 
     timeRangeChanged(timeRange: Range): void {
       this.timeRange = timeRange;
+      this.notifySearch();
+    }
+
+    facetRemoved(field: string): void {
+      if (this.facets[field]) {
+        delete this.facets[field];
+        this.notifySearch();
+      }
+    }
+
+    facetChanged(searchFacet: SearchFacet): void {
+      this.facets[searchFacet.field] = searchFacet;
       this.notifySearch();
     }
 

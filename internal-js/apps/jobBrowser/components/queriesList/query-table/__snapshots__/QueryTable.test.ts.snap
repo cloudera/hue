@@ -20,6 +20,8 @@ exports[`QueryTable.vue should render 1`] = `
       />
        Filter by:
       
+      <status-facet-stub />
+       
       <date-range-picker-stub />
     </div>
      
