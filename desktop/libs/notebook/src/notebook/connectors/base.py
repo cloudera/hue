@@ -138,7 +138,7 @@ class Notebook(object):
         p2 = match.group(2)
         variable = variables[p2]
         value = smart_str(variable['value'])
-        return smart_str(p1) + smart_str(value if value is not None else variable['meta'].get('placeholder',''))
+        return smart_str(p1) + smart_str(value if value is not None else variable['meta'].get('placeholder', ''))
 
       return re.sub(
           "([^\\\\])\\$" + (
@@ -176,7 +176,7 @@ class Notebook(object):
     _data['snippets'].append(self._make_snippet({
         u'type': u'java',
         u'status': u'running',
-        u'properties':  {
+        u'properties': {
           u'files': files,
           u'class': clazz,
           u'app_jar': app_jar,
@@ -194,7 +194,7 @@ class Notebook(object):
     _data['snippets'].append(self._make_snippet({
         u'type': u'sqoop1',
         u'status': u'running',
-        u'properties':  {
+        u'properties': {
           u'files': files,
           u'arguments': arguments,
           u'archives': [],
@@ -211,7 +211,7 @@ class Notebook(object):
     _data['snippets'].append(self._make_snippet({
         u'type': u'spark',
         u'status': u'running',
-        u'properties':  {
+        u'properties': {
           u'files': files,
           u'class': clazz,
           u'app_jar': jars,
@@ -224,7 +224,8 @@ class Notebook(object):
 
     self.data = json.dumps(_data)
 
-  def add_shell_snippet(self, shell_command, arguments=None, archives=None, files=None, env_var=None, last_executed=None, capture_output=True):
+  def add_shell_snippet(self, shell_command, arguments=None, archives=None, files=None, env_var=None, last_executed=None,
+        capture_output=True):
     _data = json.loads(self.data)
 
     if arguments is None:
@@ -239,7 +240,7 @@ class Notebook(object):
     _data['snippets'].append(self._make_snippet({
         u'type': u'shell',
         u'status': u'running',
-        u'properties':  {
+        u'properties': {
           u'files': files,
           u'shell_command': shell_command,
           u'arguments': arguments,
