@@ -68,26 +68,28 @@ def list_models(request, database=None):
 
 @require_POST
 @error_handler
-def train(request):
+def train(request, model):
   response = {'status': -1}
 
   connector_id = request.POST.get('connector')
+  params = request.POST.copy()
+  params['model'] = model
 
   api = get_api(request.user, connector_id)
 
-  data = api.train(request.POST)
+  data = api.train(params)
 
   return JsonResponse({'data': data})
 
 
 @require_POST
 @error_handler
-def predict(request, name):
+def predict(request, model):
   response = {'status': -1}
 
   connector_id = request.POST.get('connector')
   params = request.POST.copy()
-  params['model'] = name
+  params['model'] = model
 
   api = get_api(request.user, connector_id)
 
@@ -98,13 +100,13 @@ def predict(request, name):
 
 @require_POST
 @error_handler
-def delete_model(request, name):
+def delete_model(request, model):
   response = {'status': -1}
 
   connector_id = request.POST.get('connector')
 
   api = get_api(request.user, connector_id)
 
-  data = api.delete_model(name)
+  data = api.delete_model(model)
 
   return JsonResponse({'info': data})

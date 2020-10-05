@@ -95,9 +95,9 @@ urlpatterns += [
 # Models API
 urlpatterns += [
   url(r'^api/models/list/(?P<database>[^/?]*)/?$', metadata_models_api.list_models, name='list_models'),
-  url(r'^api/models/train/?$', metadata_models_api.train, name='model_train'),
-  url(r'^api/models/predict/(?P<name>[^/?]*)/?$', metadata_models_api.predict, name='model_predict'),
-  url(r'^api/models/delete/(?P<name>[^/?]*)/?$', metadata_models_api.delete_model, name='delete_model'),
+  url(r'^api/models/train/(?P<model>[^/?]*)/?$', metadata_models_api.train, name='model_train'),
+  url(r'^api/models/predict/(?P<model>[^/?]*)/?$', metadata_models_api.predict, name='model_predict'),
+  url(r'^api/models/delete/(?P<model>[^/?]*)/?$', metadata_models_api.delete_model, name='delete_model'),
 ]
 
 
