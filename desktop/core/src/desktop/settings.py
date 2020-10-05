@@ -795,3 +795,18 @@ if desktop.conf.TRACING.ENABLED.get():
   OPENTRACING_TRACED_ATTRIBUTES = ['META']  # Only valid if OPENTRACING_TRACE_ALL == True
   if desktop.conf.TRACING.TRACE_ALL.get():
     MIDDLEWARE_CLASSES.insert(0, 'django_opentracing.OpenTracingMiddleware')
+
+MODULES_TO_PATCH = (
+    'django.contrib.staticfiles.storage',
+    'django.core.cache.backends.filebased',
+    'django.core.cache.utils',
+    'django.db.backends.utils',
+    'django.utils.cache',
+)
+
+try:
+  import hashlib
+  hashlib.md5()
+except ValueError:
+  from desktop.monkey_patches import monkey_patch_md5
+  monkey_patch_md5(MODULES_TO_PATCH)
