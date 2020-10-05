@@ -20,7 +20,9 @@ import json
 import logging
 
 from django.utils.translation import ugettext as _
-from django.urls import reverse
+
+from google.oauth2 import service_account
+from google.cloud import bigquery
 
 from notebook.models import make_notebook, MockRequest, get_api
 
@@ -31,6 +33,11 @@ LOG = logging.getLogger(__name__)
 
 
 class BigQueryClient(Base):
+
+  def __init__(self, user, connector_id, connector):
+    super(BigQueryClient, self).__init__(user, connector_id)
+    self.connector = connector
+
 
   def list_models(self, database):
     params = {
@@ -75,12 +82,29 @@ class BigQueryClient(Base):
     return _get_notebook_api(self.user, self.connector_id).get_sample_data(**data)
 
 
-  def delete_model(self, name):
+  def delete_model(self, model):
     data = {
       'snippet': {},
-      'operation': 'DROP MODEL IF EXISTS `%s`' % name
+      'operation': 'DROP MODEL IF EXISTS `%s`' % model
     }
     return _get_notebook_api(self.user, self.connector_id).get_sample_data(**data)
+
+
+  def get_model(self, name):
+    credentials_json = json.loads(
+      [setting['value'] for setting in self.connector['settings'] if setting['name'] == 'credentials_json'][0]
+    )
+    credentials = service_account.Credentials.from_service_account_info(credentials_json)
+
+    client = bigquery.Client(
+        project =credentials_json['project_id'],
+        credentials=credentials
+    )
+
+    # https://cloud.google.com/bigquery/docs/reference/rest/v2/models
+    model = client.get_model(name)
+
+    return model._properties
 
 
 def _get_notebook_api(user, connector_id, interpreter=None):
