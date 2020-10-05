@@ -1334,6 +1334,8 @@ class ApiHelper {
 
     const isQuery = options.sourceType.indexOf('-query') !== -1;
     const sourceType = isQuery ? options.sourceType.replace('-query', '') : options.sourceType;
+    const source = isQuery ? 'query' : 'data';
+    const operation = options.isModel ? 'model' : 'schema';
 
     const request = $.ajax({
       type: 'POST',
@@ -1345,8 +1347,9 @@ class ApiHelper {
         notebook: {},
         snippet: ko.mapping.toJSON({
           type: sourceType,
-          source: isQuery ? 'query' : 'data'
+          source: source
         }),
+        operation: operation,
         cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
       },
       timeout: options.timeout

@@ -37,7 +37,8 @@ const fetchAndSave = (apiHelperFunction, attributeName, entry, apiOptions) => {
     paths: entry.paths, // Set for MultiTableEntry
     silenceErrors: apiOptions && apiOptions.silenceErrors,
     connector: entry.dataCatalog.connector,
-    isView: entry.isView && entry.isView() // MultiTable entries don't have this property
+    isView: entry.isView && entry.isView(), // MultiTable entries don't have this property
+    isModel: entry.isModel && entry.isModel()
   }).done(data => {
     entry[attributeName] = data;
     entry.saveLater();
