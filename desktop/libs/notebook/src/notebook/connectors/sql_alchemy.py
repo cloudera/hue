@@ -402,7 +402,14 @@ class SqlAlchemyApi(Api):
         tables_meta.append(t)
       response['tables_meta'] = tables_meta
     elif column is None:
-      columns = assist.get_columns(database, table)
+      if operation == 'model':
+        from metadata.models.base import get_api as _get_model_api
+        connector_id = snippet['type']
+        name = '%s.%s' % (database, table)
+        model = _get_model_api(self.user, connector_id).get_model(name)
+        columns = [{'name': col['name'], 'type': 'string'} for col in model['featureColumns']]
+      else:
+        columns = assist.get_columns(database, table)
 
       response['columns'] = [col['name'] for col in columns]
       response['extended_columns'] = [{
@@ -415,7 +422,8 @@ class SqlAlchemyApi(Api):
         }
         for col in columns
       ]
-      response.update(assist.get_keys(database, table))
+      if operation != 'model':
+        response.update(assist.get_keys(database, table))
     else:
       columns = assist.get_columns(database, table)
       response['name'] = next((col['name'] for col in columns if column == col['name']), '')
