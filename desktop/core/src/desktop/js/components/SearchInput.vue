@@ -22,9 +22,8 @@
       <i v-if="showMagnify && !spin" style="top: 6px;" class="magnify-icon fa fa-fw fa-search" />
       <i v-else lass="magnify-icon fa fa-fw fa-spinner fa-spin" />
       <form autocomplete="off">
-        <!-- attr: { 'placeHolder' : hasFocus() ? '' : placeHolder }, -->
         <input
-          v-model="query"
+          :value="value"
           class="hue-search-input-el"
           autocorrect="off"
           autocomplete="do-not-autocomplete"
@@ -33,9 +32,10 @@
           type="text"
           :placeholder="(!hasFocus && placeholder) || ''"
           :class="{ 'magnify-icon-input': showMagnify }"
+          @input="$emit('input', $event.target.value)"
           @focusin="hasFocus = true"
           @focusout="hasFocus = false"
-          @keyup.enter="$emit('search', query)"
+          @keyup.enter="$emit('search', value)"
         />
         <input
           v-model="autocomplete"
@@ -54,30 +54,23 @@
   import I18n from '../utils/i18n';
   import Vue from 'vue';
   import Component from 'vue-class-component';
-  import { Prop, Watch } from 'vue-property-decorator';
+  import { Prop } from 'vue-property-decorator';
 
   @Component
   export default class SearchInput extends Vue {
     @Prop({ required: false, default: true })
-    showMagnify: boolean;
+    showMagnify?: boolean;
     @Prop({ required: false, default: I18n('Search...') })
-    placeholder: string;
+    placeholder?: string;
+    @Prop({ required: false, default: '' })
+    value?: string;
 
     spin = false;
-    query = '';
     autocomplete = '';
     throttle = -1;
     hasFocus = false;
 
     // TODO: Add autocomplete logic...
-
-    @Watch('query')
-    queryChanged(): void {
-      window.clearTimeout(this.throttle);
-      this.throttle = window.setTimeout(() => {
-        this.$emit('query-changed', this.query);
-      }, 300);
-    }
   }
 </script>
 
