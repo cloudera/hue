@@ -26,8 +26,10 @@ from desktop.lib.i18n import smart_unicode
 def get_api(user, connector_id):
   if has_connectors() and connector_id != 'dummy':
     connectors = _get_installed_connectors(user=user, connector_id=int(connector_id))
-    dialect = connectors[0]['dialect']
+    connector = connectors[0]
+    dialect = connector['dialect']
   else:
+    connector = None  # Could get the interpreter if Connectors are off
     dialect = connector_id
 
   if dialect == 'dummy':
