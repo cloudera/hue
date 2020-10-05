@@ -43,18 +43,21 @@ class BigQueryClient(Base):
 
 
   def train(self, params):
+    options = json.loads(params.get('options', '{}'))
+
+    params['options'] = ',\n'.join(['%s=%s' % (k, v) for k, v in options.items()])
     data = {
       'snippet': {},
       'operation': '''
-          CREATE or replace MODEL `%(model)s`
+          CREATE OR REPLACE MODEL `%(model)s`
           OPTIONS (
-            model_type='linear_reg',
-            input_label_cols=['weight_pounds']
+            %(options)s
           )
           AS
           %(statement)s
         ''' % params
     }
+
     return _get_notebook_api(self.user, self.connector_id).get_sample_data(**data)
 
 
