@@ -692,7 +692,7 @@ class HiveServerClient(object):
 
     session = Session.objects.create(
         owner=user,
-        application=self.query_server['server_name'],
+        application='sql' if self.query_server['server_name'] == 'sparksql' else self.query_server['server_name'],
         status_code=res.status.statusCode,
         secret=encoded_status,
         guid=encoded_guid,
