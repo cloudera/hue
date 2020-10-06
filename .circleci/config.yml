@@ -111,7 +111,7 @@ jobs:
           command: |
             cd ~/repo
 
-            /usr/share/hue/build/env/bin/pip install pylint==1.7.5 pylint-django==0.7.2
+            /usr/share/hue/build/env/bin/pip install pylint==1.7.5 pylint-django==0.7.2 configparser==4.0.2
             ./tools/ci/check_for_python_lint.sh /usr/share/hue
 
       - run:
