@@ -36,7 +36,7 @@ KAFKA = ConfigSection(
   key='kafka',
   help=_t("""Configuration options for Kafka API integration"""),
   members=dict(
-    IS_ENABLED = Config(
+    IS_ENABLED=Config(
       key="is_enabled",
       help=_t("Enable the Kafka integration."),
       type=coerce_bool,
@@ -50,7 +50,7 @@ KAFKA = ConfigSection(
     ),
     KSQL_API_URL=Config(
       key='ksql_api_url',
-      help=_t('Base URL of Kafka Ksql API.'),
+      help=_t('Base URL of ksqlDB API.'),
       default='http://127.0.0.1:8088'),
   )
 )

@@ -108,8 +108,7 @@ def get_topics():
       broker_host = manager.get_kafka_brokers().split(',')[0].split(':')[0]
       return [name for name in list(manager.get_kafka_topics(broker_host).keys()) if not name.startswith('__')]
     except Exception as e:
-      print(e)
-      return ["traffic", "hueAccessLogs"]
+      return ['user_behavior']
 
 
 def get_topic(name):
