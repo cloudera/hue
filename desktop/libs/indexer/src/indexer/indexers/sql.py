@@ -28,6 +28,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from azure.abfs.__init__ import abfspath
+from hadoop.fs.hadoopfs import Hdfs
 from notebook.models import make_notebook
 from useradmin.models import User
 
@@ -148,10 +149,11 @@ class SQLIndexer(object):
 
     if external or (load_data and table_format in ('parquet', 'orc', 'kudu')): # We'll use location to load data
       if not self.fs.isdir(external_path): # File selected
-        external_path, external_file_name = self.fs.split(external_path)
+        external_path, external_file_name = Hdfs.split(external_path)
 
         if len(self.fs.listdir(external_path)) > 1:
-          external_path = external_path + '/%s%s_table' % (external_file_name, str(uuid.uuid4()))  # If dir not just the file, create data dir and move file there. Make sure it's unique.
+          # If dir not just the file, create data dir and move file there. Make sure it's unique.
+          external_path = external_path + '/%s%s_table' % (external_file_name, str(uuid.uuid4()))
           self.fs.mkdir(external_path)
           self.fs.rename(source_path, external_path)
     elif load_data: # We'll use load data command
@@ -211,7 +213,11 @@ class SQLIndexer(object):
     if load_data and use_temp_table:
       file_format = 'TextFile' if table_format == 'text' else table_format
       if table_format == 'kudu':
-        columns_list = ['`%s`' % col for col in primary_keys + [col['name'] for col in destination['columns'] if col['name'] not in primary_keys and col['keep']]]
+        columns_list = [
+            '`%s`' % col for col in primary_keys
+            +
+            [col['name'] for col in destination['columns'] if col['name'] not in primary_keys and col['keep']]
+        ]
         extra_create_properties = """PRIMARY KEY (%(primary_keys)s)
         PARTITION BY HASH PARTITIONS 16
         STORED AS %(file_format)s
@@ -225,7 +231,8 @@ class SQLIndexer(object):
         columns_list = ['*']
         extra_create_properties = 'STORED AS %(file_format)s' % {'file_format': file_format}
         if is_transactional:
-          extra_create_properties += '\nTBLPROPERTIES("transactional"="true", "transactional_properties"="%s")' % default_transactional_type
+          extra_create_properties += '\nTBLPROPERTIES("transactional"="true", "transactional_properties"="%s")' % \
+              default_transactional_type
 
       sql += '''\n\nCREATE TABLE `%(database)s`.`%(final_table_name)s`%(comment)s
         %(extra_create_properties)s
@@ -243,7 +250,9 @@ class SQLIndexer(object):
           'table_name': table_name
       }
 
-    on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': final_table_name}) + '?source_type=' + source_type
+    on_success_url = reverse(
+        'metastore:describe_table', kwargs={'database': database, 'table': final_table_name}
+    ) + '?source_type=' + source_type
 
     return make_notebook(
         name=_('Creating table %(database)s.%(table)s') % {'database': database, 'table': final_table_name},
