@@ -382,28 +382,28 @@ And as always, make sure you have an interpreter configured:
 
 The ksql Python module should be added to the system or Hue Python virtual environment:
 
-    ./build/env/bin/pip install git+https://github.com/romainr/ksql-python
+    ./build/env/bin/pip install git+https://github.com/bryanyang0528/ksql-python
 
-Then give Hue the information about the interpreter and ksql API:
+Then give Hue the information about the interpreter and ksqlDB API:
 
 To add to the list of interpreters:
 
     [[interpreters]]
 
     [[[ksql]]]
-      name=ksql
-      interface=ksql
+    name=ksql
+    interface=ksql
 
     ...
 
     [kafka]
 
-      [[kafka]]
-        # Enable the Kafka integration.
-        is_enabled=true
+    [[kafka]]
+    # Enable the Kafka integration.
+    is_enabled=true
 
-        # Base URL of Kafka Ksql API.
-        ## ksql_api_url=http://127.0.0.1:8088
+    # Base URL of Kafka Ksql API.
+    ## ksql_api_url=http://127.0.0.1:8088
 
 
 Note: the configuration will be much simpler after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758).
