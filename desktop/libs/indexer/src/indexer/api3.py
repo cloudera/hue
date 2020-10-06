@@ -53,10 +53,11 @@ from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from indexer.indexers.envelope import EnvelopeIndexer
-from indexer.models import _save_pipeline
+from indexer.indexers.flink_sql import FlinkIndexer
 from indexer.indexers.morphline import MorphlineIndexer
 from indexer.indexers.rdbms import run_sqoop, _get_api
 from indexer.indexers.sql import SQLIndexer
+from indexer.models import _save_pipeline
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 from indexer.indexers.flume import FlumeIndexer
 
@@ -144,7 +145,11 @@ def guess_format(request):
           storage[delim['data_type']] = delim['comment']
     if table_metadata.details['properties']['format'] == 'text':
       format_ = {
-        "quoteChar": "\"", "recordSeparator": '\\n', "type": "csv", "hasHeader": False, "fieldSeparator": storage.get('field.delim', ',')
+        "quoteChar": "\"",
+        "recordSeparator": '\\n',
+        "type": "csv",
+        "hasHeader": False,
+        "fieldSeparator": storage.get('field.delim', ',')
       }
     elif table_metadata.details['properties']['format'] == 'parquet':
       format_ = {"type": "parquet", "hasHeader": False,}
@@ -157,7 +162,12 @@ def guess_format(request):
   elif file_format['inputFormat'] == 'stream':
     if file_format['streamSelection'] == 'kafka':
       format_ = {
-        "type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n", 'topics': get_topics()
+        "type": "csv",
+        "fieldSeparator": ",",
+        "hasHeader": True,
+        "quoteChar": "\"",
+        "recordSeparator": "\\n",
+        'topics': get_topics()
       }
     elif file_format['streamSelection'] == 'flume':
       format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n"}
@@ -263,23 +273,20 @@ def guess_field_types(request):
     }
   elif file_format['inputFormat'] == 'stream':
     if file_format['streamSelection'] == 'kafka':
-      if file_format.get('kafkaSelectedTopics') == 'NavigatorAuditEvents':
+      if file_format.get('kafkaSelectedTopics') == 'user_behavior':
         kafkaFieldNames = [
-          'id',
-          'additionalInfo', 'allowed', 'collectionName', 'databaseName', 'db',
-          'DELEGATION_TOKEN_ID', 'dst', 'entityId', 'family', 'impersonator',
-          'ip', 'name', 'objectType', 'objType', 'objUsageType',
-          'operationParams', 'operationText', 'op', 'opText', 'path',
-          'perms', 'privilege', 'qualifier', 'QUERY_ID', 'resourcePath',
-          'service', 'SESSION_ID', 'solrVersion', 'src', 'status',
-          'subOperation', 'tableName', 'table', 'time', 'type',
-          'url', 'user'
+          'user_id',
+          'item_id',
+          'category_id',
+          'behavior',
+          'ts'
         ]
-        kafkaFieldTypes = [
-          'string'
-        ] * len(kafkaFieldNames)
-        kafkaFieldNames.append('timeDate')
-        kafkaFieldTypes.append('date')
+        kafkaFieldTypes = ['BIGINT'] * len(kafkaFieldNames)
+
+        kafkaFieldNames.append('proctime')
+        kafkaFieldTypes.append('TIMESTAMP')
+        kafkaFieldNames.append('WATERMARK')
+        kafkaFieldTypes.append('WATERMARK')
       else:
         # Note: mocked here, should come from SFDC or Kafka API or sampling job
         kafkaFieldNames = file_format.get('kafkaFieldNames', '').split(',')
@@ -303,7 +310,11 @@ def guess_field_types(request):
         },
         "format": file_format['format']
       })
-      type_mapping = dict(list(zip(kafkaFieldNames, kafkaFieldTypes)))
+      type_mapping = dict(
+        list(
+          zip(kafkaFieldNames, kafkaFieldTypes)
+        )
+      )
 
       for col in format_['columns']:
         col['keyType'] = type_mapping[col['name']]
@@ -373,7 +384,7 @@ def importer_submit(request):
   source = json.loads(request.POST.get('source', '{}'))
   outputFormat = json.loads(request.POST.get('destination', '{}'))['outputFormat']
   destination = json.loads(request.POST.get('destination', '{}'))
-  destination['ouputFormat'] = outputFormat # Workaround a very weird bug
+  destination['ouputFormat'] = outputFormat  # Workaround a very weird bug
   start_time = json.loads(request.POST.get('start_time', '-1'))
 
   if source['inputFormat'] == 'file':
@@ -383,7 +394,7 @@ def importer_submit(request):
 
   if destination['ouputFormat'] in ('database', 'table'):
     destination['nonDefaultLocation'] = request.fs.netnormpath(destination['nonDefaultLocation']) \
-                                        if destination['nonDefaultLocation'] else destination['nonDefaultLocation']
+        if destination['nonDefaultLocation'] else destination['nonDefaultLocation']
 
   if destination['ouputFormat'] == 'index':
     source['columns'] = destination['columns']
@@ -392,23 +403,66 @@ def importer_submit(request):
     if destination['indexerRunJob'] or source['inputFormat'] == 'stream':
       _convert_format(source["format"], inverse=True)
       job_handle = _large_indexing(
-        request, source, index_name, start_time=start_time, lib_path=destination['indexerJobLibPath'], destination=destination
+          request,
+          source,
+          index_name,
+          start_time=start_time,
+          lib_path=destination['indexerJobLibPath'],
+          destination=destination
       )
     else:
       client = SolrClient(request.user)
-      job_handle = _small_indexing(request.user, request.fs, client, source, destination, index_name)
+      job_handle = _small_indexing(
+          request.user,
+          request.fs,
+          client,
+          source,
+          destination, index_name
+      )
   elif source['inputFormat'] in ('stream', 'connector') or destination['ouputFormat'] == 'stream':
-    job_handle = _envelope_job(request, source, destination, start_time=start_time, lib_path=destination['indexerJobLibPath'])
+    args = {
+      'source': source,
+      'destination': destination,
+      'start_time': start_time,
+      'dry_run': request.POST.get('show_command')
+    }
+    api = FlinkIndexer(
+      request.user,
+      request.fs
+    )
+    
+    job_handle = api.create_table_from_kafka(**args)
+
+    if request.POST.get('show_command'):
+      job_handle = {
+        'status': 0,
+        'commands': job_handle
+      }
   elif source['inputFormat'] == 'altus':
     # BDR copy or DistCP + DDL + Sentry DDL copy
     pass
   elif source['inputFormat'] == 'rdbms':
     if destination['outputFormat'] in ('database', 'file', 'table', 'hbase'):
-      job_handle = run_sqoop(request, source, destination, start_time)
+      job_handle = run_sqoop(
+        request,
+        source,
+        destination,
+        start_time
+      )
   elif destination['ouputFormat'] == 'database':
-    job_handle = _create_database(request, source, destination, start_time)
+    job_handle = _create_database(
+      request,
+      source,
+      destination,
+      start_time
+    )
   else:
-    job_handle = _create_table(request, source, destination, start_time)
+    job_handle = _create_table(
+      request,
+      source,
+      destination,
+      start_time
+    )
 
   request.audit = {
     'operation': 'EXPORT',
@@ -458,8 +512,20 @@ def _small_indexing(user, fs, client, source, destination, index_name):
       searcher = CollectionManagerController(user)
       columns = [field['name'] for field in fields if field['name'] != 'hue_id']
       # Assumes handle still live
-      fetch_handle = lambda rows, start_over: get_api(request, snippet).fetch_result(notebook, snippet, rows=rows, start_over=start_over)
-      rows = searcher.update_data_from_hive(index_name, columns, fetch_handle=fetch_handle, indexing_options=kwargs)
+      fetch_handle = lambda rows, start_over: get_api(
+          request, snippet
+      ).fetch_result(
+          notebook,
+          snippet,
+          rows=rows,
+          start_over=start_over
+      )
+      rows = searcher.update_data_from_hive(
+          index_name,
+          columns,
+          fetch_handle=fetch_handle,
+          indexing_options=kwargs
+      )
       # TODO if rows == MAX_ROWS truncation warning
     elif source['inputFormat'] == 'manual':
       pass # No need to do anything
@@ -501,7 +567,10 @@ def _create_database(request, source, destination, start_time):
   )
 
   editor_type = destination['apiHelperType']
-  on_success_url = reverse('metastore:show_tables', kwargs={'database': database}) + "?source_type=" + source.get('sourceType', 'hive')
+  on_success_url = reverse(
+      'metastore:show_tables',
+      kwargs={'database': database}) + "?source_type=" + source.get('sourceType', 'hive'
+  )
 
   notebook = make_notebook(
       name=_('Creating database %(name)s') % destination,
@@ -567,7 +636,15 @@ def _large_indexing(request, file_format, collection_name, query=None, start_tim
 
   morphline = indexer.generate_morphline_config(collection_name, file_format, unique_field, lib_path=lib_path)
 
-  return indexer.run_morphline(request, collection_name, morphline, input_path, query, start_time=start_time, lib_path=lib_path)
+  return indexer.run_morphline(
+      request,
+      collection_name,
+      morphline,
+      input_path,
+      query,
+      start_time=start_time,
+      lib_path=lib_path
+  )
 
 
 def _envelope_job(request, file_format, destination, start_time=None, lib_path=None):
@@ -647,7 +724,13 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
         properties['kafkaFieldNames'] = properties['kafkaFieldNames'].lower() # Kudu names should be all lowercase
       # Create table
       if not request.POST.get('show_command'):
-        SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(file_format, destination).execute(request)
+        SQLIndexer(
+            user=request.user,
+            fs=request.fs
+        ).create_table_from_a_file(
+            file_format,
+            destination
+        ).execute(request)
 
     if destination['tableFormat'] == 'kudu':
       manager = ManagerApi()
