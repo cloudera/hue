@@ -5,7 +5,8 @@ exports[`DropdownPanel.vue should render dropdown panel with slots 1`] = `
   class="hue-dropdown-panel"
 >
   <hue-button-stub>
-      
+    
+     
     <i
       class="fa fa-caret-down"
     />
@@ -26,7 +27,8 @@ exports[`DropdownPanel.vue should render empty dropdown panel 1`] = `
   class="hue-dropdown-panel"
 >
   <hue-button-stub>
-      
+    
+     
     <i
       class="fa fa-caret-down"
     />

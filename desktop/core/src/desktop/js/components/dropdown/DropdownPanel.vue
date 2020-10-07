@@ -18,10 +18,12 @@
 
 <template>
   <div v-click-outside="clickOutside" class="hue-dropdown-panel">
-    <hue-link v-if="link" @click="togglePanel" :disabled="disabled">
+    <hue-link v-if="link" :disabled="disabled" @click="togglePanel">
       {{ text }} <i class="fa fa-caret-down" />
     </hue-link>
-    <hue-button v-else @click="togglePanel" :disabled="disabled"> {{ text }} <i class="fa fa-caret-down" /></hue-button>
+    <hue-button v-else :disabled="disabled" @click="togglePanel">
+      {{ text }} <i class="fa fa-caret-down" />
+    </hue-button>
     <div class="hue-dropdown-container" :class="{ open: panelOpen }">
       <div
         class="hue-dropdown-inner"
