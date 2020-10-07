@@ -70,7 +70,8 @@ ENTITY_ID = Config(
   key="entity_id",
   default="<base_url>/saml2/metadata/",
   type=str,
-  help=_t("Entity ID for Hue acting as service provider. Can also accept a pattern where '<base_url>' will be replaced with server URL base."))
+  help=_t("Entity ID for Hue acting as service provider."
+  "Can also accept a pattern where '<base_url>' will be replaced with server URL base."))
 
 CREATE_USERS_ON_LOGIN = Config(
   key="create_users_on_login",
@@ -80,7 +81,7 @@ CREATE_USERS_ON_LOGIN = Config(
 
 ATTRIBUTE_MAP_DIR = Config(
   key="attribute_map_dir",
-  default=os.path.abspath( os.path.join(BASEDIR, '..', '..', 'attribute-maps') ),
+  default=os.path.abspath(os.path.join(BASEDIR, '..', '..', 'attribute-maps')),
   type=str,
   private=True,
   help=_t("Attribute map directory contains files that map SAML attributes to pysaml2 attributes."))
@@ -106,7 +107,7 @@ OPTIONAL_ATTRIBUTES = Config(
 
 METADATA_FILE = Config(
   key="metadata_file",
-  default=os.path.abspath( os.path.join(BASEDIR, '..', '..', 'examples', 'idp.xml') ),
+  default=os.path.abspath(os.path.join(BASEDIR, '..', '..', 'examples', 'idp.xml')),
   type=str,
   help=_t("IdP metadata in the form of a file. This is generally an XML file containing metadata that the Identity Provider generates."))
 
@@ -114,7 +115,8 @@ KEY_FILE = Config(
   key="key_file",
   default="",
   type=str,
-  help=_t("key_file is the name of a PEM formatted file that contains the private key of the Hue service. This is presently used both to encrypt/sign assertions and as client key in a HTTPS session."))
+  help=_t("key_file is the name of a PEM formatted file that contains the private key of the Hue service."
+  "This is presently used both to encrypt/sign assertions and as client key in a HTTPS session."))
 
 KEY_FILE_PASSWORD = Config(
   key="key_file_password",
@@ -133,9 +135,16 @@ CERT_FILE = Config(
   type=str,
   help=_t("This is the public part of the service private/public key pair. cert_file must be a PEM formatted certificate chain file."))
 
+ACCEPTED_TIME_DIFF = Config(
+  key="accepted_time_diff",
+  default=0,
+  type=int,
+  help=_t("If your computer and another computer that you are communicating with are not in synch regarding the computer clock,"
+  "then here you can state how big a difference you are prepared to accept in milliseconds.")
+)
 USER_ATTRIBUTE_MAPPING = Config(
   key="user_attribute_mapping",
-  default={'uid': ('username', )},
+  default={'uid': ('username',)},
   type=dict_list_map,
   help=_t("A mapping from attributes in the response from the IdP to django user attributes."))
 

@@ -35,7 +35,7 @@ def config_settings_loader(request):
   if base_url is None:
     base_url = "%(protocol)s%(host)s" % {
       'protocol': 'https://' if (request.is_secure() or request.META.get('HTTP_X_FORWARDED_PROTO') == 'https') else 'http://',
-      'host':  request.get_host(),
+      'host': request.get_host(),
     }
 
   entity_id = libsaml.conf.ENTITY_ID.get().replace('<base_url>', base_url)
@@ -53,7 +53,7 @@ def config_settings_loader(request):
 
     # this block states what services we provide
     'service': {
-      'sp' : {
+      'sp': {
         'name': 'hue',
         'name_id_format': libsaml.conf.NAME_ID_FORMAT.get(),
         'endpoints': {
@@ -87,7 +87,7 @@ def config_settings_loader(request):
 
     # where the remote metadata is stored
     'metadata': {
-      'local': [ libsaml.conf.METADATA_FILE.get() ],
+      'local': [libsaml.conf.METADATA_FILE.get()],
     },
 
     # set to 1 to output debugging information
@@ -103,6 +103,7 @@ def config_settings_loader(request):
       'key_file': libsaml.conf.KEY_FILE.get(),  # private part
       'key_file_passphrase': libsaml.conf.get_key_file_password(),
       'cert_file': libsaml.conf.CERT_FILE.get(),  # public part
+      'accepted_time_diff': libsaml.conf.ACCEPTED_TIME_DIFF.get(),
     }],
   })
 
