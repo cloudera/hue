@@ -18,6 +18,8 @@
 
 import axios, { AxiosResponse } from 'axios';
 import { Facet, FieldInfo, Query, Search, SearchMeta } from '../index';
+// Uncomment to serve mock response instead of calling the API endpoints
+// import '../test/mockSearchHelper';
 
 const SEARCH_URL = '/jobbrowser/query-proxy/api/query/search';
 
