@@ -53,6 +53,7 @@ from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from indexer.indexers.envelope import EnvelopeIndexer
+from indexer.indexers.base import get_api
 from indexer.indexers.flink_sql import FlinkIndexer
 from indexer.indexers.morphline import MorphlineIndexer
 from indexer.indexers.rdbms import run_sqoop, _get_api
@@ -430,7 +431,7 @@ def importer_submit(request):
       request.user,
       request.fs
     )
-    
+
     job_handle = api.create_table_from_kafka(**args)
 
     if request.POST.get('show_command'):
@@ -476,6 +477,31 @@ def importer_submit(request):
   }
 
   return JsonResponse(job_handle)
+
+
+@require_POST
+@api_error_handler
+def index(request):
+  '''
+  Input: pasted data, CSV/json files, Kafka topic
+  Output: tables
+  '''
+  response = {'status': -1}
+
+  source = json.loads(request.POST.get('source', '{}'))
+  destination = json.loads(request.POST.get('destination', '{}'))
+  options = json.loads(request.POST.get('options', '{}'))
+  connector_id = request.POST.get('connector')
+
+  api = get_api(request.user, connector_id)
+
+  if request.FILES.get('data'):
+    data = request.FILES['data'].read()
+    print(data)
+
+  result = api.index(source, destination, options)
+
+  return JsonResponse({'result': result})
 
 
 def _small_indexing(user, fs, client, source, destination, index_name):
