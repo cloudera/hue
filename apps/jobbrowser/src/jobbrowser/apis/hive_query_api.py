@@ -45,7 +45,7 @@ class HiveQueryApi(Api):
     self.api = HiveQueryClient()
 
   def apps(self, filters):
-    queries = self.api.get_queries(limit=100)
+    queries = self.api.get_queries(filters)
 
     apps = {
       "apps": {
@@ -88,9 +88,9 @@ class HiveQueryApi(Api):
           for query in queries
         ],
         "meta": {
-            "limit": 100,
-            "offset": 0,
-            "size": self.api.get_query_count()
+            "limit": filters['limit'],
+            "offset": filters['offset'],
+            "size": self.api.get_query_count(filters)
           }
       }
     }
@@ -140,11 +140,24 @@ class HiveQueryApi(Api):
 
 class HiveQueryClient():
 
-  def get_query_count(self):
-    return HiveQuery.objects.using('query').count()
+  def _get_queries(self, filters):
+    queries = HiveQuery.objects.using('query').order_by('-id')
+    queries = queries.filter(start_time__gte = filters['startTime'], end_time__lte = filters['endTime'])
+    if filters['text']:
+      queries = queries.filter(query__icontains = filters['text'])
 
-  def get_queries(self, limit=100):
-    return HiveQuery.objects.using('query').order_by('-id')[:limit]
+    return queries
+
+  def get_query_count(self, filters):
+    filtered_query_list = self._get_queries(filters)
+
+    return filtered_query_list.count()
+
+  def get_queries(self, filters):
+    filtered_query_list = self._get_queries(filters)
+    paginated_query_list  = filtered_query_list[filters['offset']:filters['offset'] + filters['limit']]
+
+    return paginated_query_list
 
   def get_query(self, query_id):
     return HiveQuery.objects.using('query').get(query_id=query_id)
