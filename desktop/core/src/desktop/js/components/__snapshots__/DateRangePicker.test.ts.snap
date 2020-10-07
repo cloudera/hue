@@ -8,7 +8,8 @@ exports[`DateRangePicker.vue should render 1`] = `
     class="btn"
     type="button"
   >
-     Last 7 days 
+    
+    Last 7 days 
     <i
       class="fa fa-caret-down"
     />
