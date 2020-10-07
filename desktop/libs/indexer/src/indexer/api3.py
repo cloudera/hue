@@ -486,8 +486,6 @@ def index(request):
   Input: pasted data, CSV/json files, Kafka topic
   Output: tables
   '''
-  response = {'status': -1}
-
   source = json.loads(request.POST.get('source', '{}'))
   destination = json.loads(request.POST.get('destination', '{}'))
   options = json.loads(request.POST.get('options', '{}'))
@@ -496,8 +494,7 @@ def index(request):
   api = get_api(request.user, connector_id)
 
   if request.FILES.get('data'):
-    data = request.FILES['data'].read()
-    print(data)
+    source['file'] = request.FILES['data']
 
   result = api.index(source, destination, options)
 
