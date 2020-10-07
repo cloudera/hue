@@ -34,6 +34,9 @@ def get_api(user, connector_id):
 
   if dialect == 'dummy':
     return Base(user, connector_id)
+  elif dialect == 'bigquery':
+    from indexer.indexers.bigquery import BigQueryIndexer
+    return BigQueryIndexer(user, connector_id)
   else:
     raise PopupException(_('Indexer connector dialect not recognized: %s') % dialect)
 
