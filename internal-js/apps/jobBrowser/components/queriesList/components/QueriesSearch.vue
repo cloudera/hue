@@ -113,7 +113,7 @@
   import Vue from 'vue';
   import RangePanel from './RangePanel.vue';
   import { Search, TableDefinition } from '../index';
-  import * as api from '../apiUtils';
+  import * as api from '../api-utils/search';
 
   @Component({
     components: {

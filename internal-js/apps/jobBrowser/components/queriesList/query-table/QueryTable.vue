@@ -104,7 +104,7 @@
   import { Column } from '../../../../../../desktop/core/src/desktop/js/components/HueTable';
   import ColumnSelectorPanel from '../../../../../../desktop/core/src/desktop/js/components/ColumnSelectorPanel.vue';
   import StatusFacet from './StatusFacet.vue';
-  import { fetchSuggestedSearches, SearchFacet } from '../apiUtils';
+  import { fetchSuggestedSearches, SearchFacet } from '../api-utils/search';
   import QueriesSearch from '../components/QueriesSearch.vue';
   import { DataProcessor, Query, Search, TableDefinition } from '../index';
 

@@ -40,7 +40,8 @@
   import { Provide } from 'vue-property-decorator';
   import HumanByteSize from '../../../../../desktop/core/src/desktop/js/components/HumanByteSize.vue';
   import TimeAgo from '../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
-  import { fetchExtendedQuery, kill, search, SearchFacet } from './apiUtils';
+  import { searchQueries, SearchFacet } from './api-utils/search';
+  import { fetchExtendedQuery, kill } from './api-utils/query';
   import QueryDetailsDiff from './query-details/QueryDetailsDiff.vue';
   import QueryDetails from './query-details/QueryDetails.vue';
   import { Query, SearchMeta } from './index';
@@ -65,15 +66,14 @@
     }): Promise<void> {
       // Initial fetch triggered by the paginator
       const now = Date.now();
-      const searchResponse = await search({
+      const searchResponse = await searchQueries({
         endTime: (options.timeRange && options.timeRange.to) || now,
         limit: options.page.limit,
         offset: options.page.offset,
         facets: options.facets,
         text: options.text,
         sortText: 'startTime:DESC',
-        startTime: (options.timeRange && options.timeRange.from) || now - 1000 * 60 * 60 * 24 * 7,
-        type: 'basic'
+        startTime: (options.timeRange && options.timeRange.from) || now - 1000 * 60 * 60 * 24 * 7
       });
       this.searchMeta = searchResponse.meta;
       this.queries = searchResponse.queries;
@@ -113,9 +113,7 @@
       queriesToDiff.forEach((query, index) => {
         hueUtils.changeURLParameter(QUERY_ID_PARAM + index, query.queryId);
       });
-      const fetchPromises = queriesToDiff.map(query =>
-        fetchExtendedQuery({ queryId: query.queryId })
-      );
+      const fetchPromises = queriesToDiff.map(query => fetchExtendedQuery(query.queryId));
       this.queriesToDiff = await Promise.all(fetchPromises);
     }
 
@@ -126,7 +124,7 @@
 
     async querySelected(query: Query): Promise<void> {
       hueUtils.changeURLParameter(QUERY_ID_PARAM + 0, query.queryId);
-      this.selectedQuery = await fetchExtendedQuery({ queryId: query.queryId });
+      this.selectedQuery = await fetchExtendedQuery(query.queryId);
     }
   }
 </script>

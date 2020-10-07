@@ -67,7 +67,7 @@
   import HueButton from '../../../../../../desktop/core/src/desktop/js/components/HueButton.vue';
   import Tab from '../../../../../../desktop/core/src/desktop/js/components/Tab.vue';
   import Tabs from '../../../../../../desktop/core/src/desktop/js/components/Tabs.vue';
-  import { kill } from '../apiUtils';
+  import { kill } from '../api-utils/query';
   import HiveTimeline from './hive-timeline/HiveTimeline.vue';
   import ConfigsTable from './configs-table/ConfigsTable.vue';
   import QueryInfo from './QueryInfo.vue';

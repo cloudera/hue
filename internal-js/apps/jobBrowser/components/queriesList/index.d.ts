@@ -26,6 +26,37 @@ export interface CounterGroup {
   counters: CounterDetails[];
 }
 
+export interface Vertex {
+  id: number;
+  name: string;
+  vertexId: string;
+  dagId: number;
+  taskCount: number;
+
+  succeededTaskCount: number;
+  completedTaskCount: number;
+  failedTaskCount: number;
+  killedTaskCount: number;
+  failedTaskAttemptCount: number;
+  killedTaskAttemptCount: number;
+
+  className: string;
+
+  startTime: number;
+  endTime: number;
+  initRequestedTime: number;
+  startRequestedTime: number;
+  status: string;
+  counters: CounterGroup[];
+  stats: {
+    firstTaskStartTime: number;
+    lastTaskFinishTime: number;
+    minTaskDuration: number;
+    maxTaskDuration: number;
+    avgTaskDuration: number;
+  };
+}
+
 // TODO: Flatten and cleanup DAG object
 export interface Dag {
   dagInfo: {
@@ -40,7 +71,7 @@ export interface Dag {
     vertexNameIdMapping: { [key: string]: string };
   };
   config?: { [key: string]: string }; // TODO: value always string?
-  vertices: unknown[]; // TODO: type?
+  vertices: Vertex[];
 }
 
 export interface Query {

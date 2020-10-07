@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { SearchResponse } from './apiUtils';
-import * as apiUtils from './apiUtils';
+import { SearchResponse } from './api-utils/search';
+import * as searchApis from './api-utils/search';
 import { shallowMount } from '@vue/test-utils';
 import QueriesList from './QueriesList.vue';
 
 describe('QueriesList.vue', () => {
   it('should render', () => {
     jest
-      .spyOn(apiUtils, 'search')
+      .spyOn(searchApis, 'searchQueries')
       .mockImplementation(
         async (): Promise<SearchResponse> =>
           Promise.resolve({ meta: { limit: 25, offset: 0, size: 0 }, queries: [] })

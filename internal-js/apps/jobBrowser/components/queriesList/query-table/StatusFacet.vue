@@ -58,7 +58,7 @@
   import HueLink from '../../../../../../desktop/core/src/desktop/js/components/HueLink.vue';
   import Vue from 'vue';
   import Component from 'vue-class-component';
-  import { SearchFacet } from '../apiUtils';
+  import { SearchFacet } from '../api-utils/search';
 
   interface Status {
     label: string;
