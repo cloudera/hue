@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import io
 import json
 import logging
 
@@ -51,6 +52,18 @@ class BigQueryClient(Base):
 
   def train(self, params):
     options = json.loads(params.get('options', '{}'))
+
+    if params.get('data'):
+      source = {
+        'file': io.StringIO(params['data'])
+      }
+      # Make it tmp?
+      destination = {
+        'name': '%(model)s_training' % params
+      }
+      params['statement'] = 'SELECT * FROM `%(name)s`' % destination
+
+      self.upload_data(source, destination)
 
     params['options'] = ',\n'.join(['%s=%s' % (k, v) for k, v in options.items()])
     data = {
@@ -124,7 +137,6 @@ class BigQueryClient(Base):
         source_format=bigquery.SourceFormat.CSV, skip_leading_rows=1, autodetect=True,
     )
 
-    # with open('/home/romain/data/index_data.csv', 'rb') as source_file:
     job = client.load_table_from_file(source['file'], table_id, job_config=job_config)
 
     job.result()
