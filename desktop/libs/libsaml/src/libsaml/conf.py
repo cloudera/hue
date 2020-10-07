@@ -140,7 +140,7 @@ ACCEPTED_TIME_DIFF = Config(
   default=0,
   type=int,
   help=_t("If your computer and another computer that you are communicating with are not in synch regarding the computer clock,"
-  "then here you can state how big a difference you are prepared to accept.")
+  "then here you can state how big a difference you are prepared to accept in milliseconds.")
 )
 USER_ATTRIBUTE_MAPPING = Config(
   key="user_attribute_mapping",
