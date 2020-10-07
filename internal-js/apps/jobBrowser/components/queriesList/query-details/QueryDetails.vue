@@ -23,7 +23,7 @@
         <hue-button @click="showQueries">Queries</hue-button>
 
         <hue-button v-if="!query.isComplete && stoppingQuery" disabled>
-          <i class="fa fa-spinner fa-pulse fa-fw" /> Stopping query
+          <em class="fa fa-spinner fa-pulse fa-fw" /> Stopping query
         </hue-button>
         <hue-button v-else-if="!query.isComplete" @click="stopQuery">Stop</hue-button>
 
@@ -32,7 +32,7 @@
 
       <tabs>
         <tab title="Query Info">
-          <query-info :query="query" />
+          <QueryInfo :query="query" />
         </tab>
         <tab title="Visual Explain" lazy="true">
           <VisualExplain :query="query" />
@@ -49,6 +49,7 @@
     <div v-for="(dag, index) in query.dags" :key="dag.dagInfo.id" class="target detail-panel">
       <div>Dag {{ index + 1 }} : {{ dag && dag.dagInfo.dagId }}</div>
       <tabs>
+        <tab title="DAG Info"><DagInfo :dag="dag" /></tab>
         <tab title="DAG Flow"><DagGraph :dag="dag" /></tab>
         <tab title="DAG Swimlane"><DagSwimlane :dag="dag" /></tab>
         <tab title="DAG Counters">
@@ -74,6 +75,7 @@
   import VisualExplain from './visual-explain/VisualExplain.vue';
 
   import CountersTable from './counters-table/CountersTable.vue';
+  import DagInfo from './DagInfo.vue';
   import DagGraph from './dag-graph/DagGraph.vue';
   import DagSwimlane from './dag-swimlane/DagSwimlane.vue';
 
@@ -90,6 +92,7 @@
       QueryInfo,
 
       CountersTable,
+      DagInfo,
       DagGraph,
       DagSwimlane
     }

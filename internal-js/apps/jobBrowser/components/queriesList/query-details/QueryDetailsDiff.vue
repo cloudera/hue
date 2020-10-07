@@ -24,8 +24,8 @@
     <div>
       <tabs>
         <tab title="Query Info">
-          <query-info :query="queries[0]" class="side-by-side" />
-          <query-info :query="queries[1]" class="side-by-side" />
+          <QueryInfo :query="queries[0]" class="side-by-side" />
+          <QueryInfo :query="queries[1]" class="side-by-side" />
         </tab>
         <tab title="Visual Explain" lazy="true">
           <!-- Can be converted to a loop if we have to compare more than 2 queries. But thats verry unlikely to happen. -->
@@ -61,6 +61,10 @@
         {{ dagSet.dagB && dagSet.dagB.dagInfo.dagId }}
       </div>
       <tabs>
+        <tab title="DAG Info">
+          <DagInfo :dag="dagSet.dagA" class="side-by-side" />
+          <DagInfo :dag="dagSet.dagB" class="side-by-side" />
+        </tab>
         <tab title="DAG Flow">
           <DagGraph :dag="dagSet.dagA" class="side-by-side" />
           <DagGraph :dag="dagSet.dagB" class="side-by-side" />
@@ -117,6 +121,7 @@
   import VisualExplain from './visual-explain/VisualExplain.vue';
 
   import CountersTable from './counters-table/CountersTable.vue';
+  import DagInfo from './DagInfo.vue';
   import DagGraph from './dag-graph/DagGraph.vue';
   import DagSwimlane from './dag-swimlane/DagSwimlane.vue';
 
@@ -150,6 +155,7 @@
       QueryInfo,
 
       CountersTable,
+      DagInfo,
       DagGraph,
       DagSwimlane
     },

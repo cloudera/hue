@@ -15,12 +15,12 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
       <tab-stub
         title="Query Info"
       >
-        <query-info-stub
+        <queryinfo-stub
           class="side-by-side"
           query="[object Object]"
         />
          
-        <query-info-stub
+        <queryinfo-stub
           class="side-by-side"
           query="[object Object]"
         />
@@ -84,6 +84,20 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
     </div>
      
     <tabs-stub>
+      <tab-stub
+        title="DAG Info"
+      >
+        <daginfo-stub
+          class="side-by-side"
+          dag="[object Object]"
+        />
+         
+        <daginfo-stub
+          class="side-by-side"
+          dag="[object Object]"
+        />
+      </tab-stub>
+       
       <tab-stub
         title="DAG Flow"
       >

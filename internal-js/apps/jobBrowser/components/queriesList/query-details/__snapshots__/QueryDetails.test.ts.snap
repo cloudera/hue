@@ -21,7 +21,7 @@ exports[`QueryDetails.vue should render 1`] = `
       <tab-stub
         title="Query Info"
       >
-        <query-info-stub
+        <queryinfo-stub
           query="[object Object]"
         />
       </tab-stub>
@@ -61,6 +61,14 @@ exports[`QueryDetails.vue should render 1`] = `
     </div>
      
     <tabs-stub>
+      <tab-stub
+        title="DAG Info"
+      >
+        <daginfo-stub
+          dag="[object Object]"
+        />
+      </tab-stub>
+       
       <tab-stub
         title="DAG Flow"
       >

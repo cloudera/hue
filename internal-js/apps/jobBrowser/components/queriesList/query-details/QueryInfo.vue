@@ -127,19 +127,20 @@
 </template>
 
 <script lang="ts">
-  import Component from 'vue-class-component';
+  import Vue from 'vue';
+  import { Component, Prop } from 'vue-property-decorator';
+
   import Duration from '../../../../../../desktop/core/src/desktop/js/components/Duration.vue';
   import SqlText from '../../../../../../desktop/core/src/desktop/js/components/SqlText.vue';
   import TimeAgo from '../../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
-  import SingleQueryComponent from './SingleQueryComponent.vue';
+
+  import { Query } from '..';
 
   @Component({
     components: { Duration, TimeAgo, SqlText }
   })
-  export default class QueryInfo extends SingleQueryComponent {
-    get formattedQuery(): string {
-      return this.query.query;
-    }
+  export default class QueryInfoTab extends Vue {
+    @Prop({ required: true }) query!: Query;
   }
 </script>
 

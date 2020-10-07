@@ -1,0 +1,109 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DagInfo.vue should render 1`] = `
+<div>
+  <div
+    class="info-inline"
+  >
+    <div
+      class="info-label"
+    >
+      DAG ID
+    </div>
+     
+    <div
+      class="info-value"
+    >
+      dag_1600683331174_0003_2
+    </div>
+  </div>
+   
+  <div
+    class="info-inline"
+  >
+    <div
+      class="info-label"
+    >
+      DAG Name
+    </div>
+     
+    <div
+      class="info-value"
+    >
+      select count(*) from ...productcategories.id (Stage-1)
+    </div>
+  </div>
+   
+  <div
+    class="info-inline"
+  >
+    <div
+      class="info-label"
+    >
+      Status
+    </div>
+     
+    <div
+      class="info-value"
+    >
+      SUCCEEDED
+    </div>
+  </div>
+   
+  <div
+    class="info-inline"
+  >
+    <div
+      class="info-label"
+    >
+      Start Time
+    </div>
+     
+    <div
+      class="info-value"
+    >
+      <time-ago-stub
+        value="1601036209263"
+      />
+    </div>
+  </div>
+   
+  <div
+    class="info-inline"
+  >
+    <div
+      class="info-label"
+    >
+      End Time
+    </div>
+     
+    <div
+      class="info-value"
+    >
+      <time-ago-stub
+        value="1601036209523"
+      />
+    </div>
+  </div>
+   
+  <div
+    class="info-inline"
+  >
+    <div
+      class="info-label"
+    >
+      Duration
+    </div>
+     
+    <div
+      class="info-value"
+    >
+      <duration-stub
+        value="260"
+      />
+    </div>
+  </div>
+   
+  <!---->
+</div>
+`;
