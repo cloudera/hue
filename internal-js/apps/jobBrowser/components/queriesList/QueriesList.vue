@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div>
+  <div class="queries-list">
     <query-table
       v-if="!selectedQuery && !queriesToDiff"
       :queries="queries"
@@ -129,4 +129,8 @@
   }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .queries-list {
+    margin: 10px;
+  }
+</style>

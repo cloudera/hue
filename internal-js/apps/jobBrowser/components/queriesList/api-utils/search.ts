@@ -17,11 +17,13 @@
  */
 
 import axios, { AxiosResponse } from 'axios';
-import { Facet, FieldInfo, Query, Search, SearchMeta } from '../index';
+import { Facet } from 'components/FacetSelector';
+import { FieldInfo, Query, Search, SearchMeta } from '../index';
 // Uncomment to serve mock response instead of calling the API endpoints
 // import '../test/mockSearchHelper';
 
 const SEARCH_URL = '/jobbrowser/query-proxy/api/query/search';
+const FACETS_URL = '/jobbrowser/query-proxy/api/query/facets';
 
 export interface SearchFacet {
   field: string;
@@ -75,14 +77,24 @@ export const fetchSuggestedSearches = async (options: {
   return response.searches;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const fetchFacets = async (options: {
+export interface FacetsParams {
   startTime: number;
   endTime: number;
   facetFields: string;
-}): Promise<{ facets: Facet[]; rangeFacets: unknown[] }> => {
+}
+
+export interface FacetsResponse {
+  facets: Facet[];
+  rangeFacets: unknown[];
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const fetchFacets = async (params: FacetsParams): Promise<FacetsResponse> => {
   // TODO: Implement GET '/api/query/facets?startTime=x&endTime=y&facetFields=z'
-  return { facets: [], rangeFacets: [] };
+  const response = await axios.get<FacetsParams, AxiosResponse<FacetsResponse>>(FACETS_URL, {
+    params
+  });
+  return response.data;
 };
 
 export const fetchFieldsInfo = async (): Promise<FieldInfo[]> => {

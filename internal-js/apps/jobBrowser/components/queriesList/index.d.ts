@@ -122,16 +122,6 @@ export interface Query {
   virtualMemory?: number; // TODO: type?
 }
 
-export interface FacetValue {
-  key: string;
-  value: number;
-}
-
-export interface Facet {
-  facetField: string;
-  values: FacetValue[];
-}
-
 export interface SearchResultFacet {
   [key: string]: { in: string[] };
 }

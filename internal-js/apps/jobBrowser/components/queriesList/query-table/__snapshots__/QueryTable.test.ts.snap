@@ -21,7 +21,18 @@ exports[`QueryTable.vue should render 1`] = `
       />
        Filter by:
       
-      <status-facet-stub />
+      <facet-selector-stub
+        facet="[object Object]"
+        fieldlabel="Status"
+        valuelabels="[object Object]"
+      />
+       
+      <facet-selector-stub
+        disabled="true"
+        facet="[object Object]"
+        fieldlabel="User"
+        valuelabels="[object Object]"
+      />
        
       <date-range-picker-stub />
        
@@ -30,17 +41,19 @@ exports[`QueryTable.vue should render 1`] = `
       >
         Clear All
       </hue-link-stub>
+       
+      <hue-link-stub
+        class="columns-link"
+      >
+        
+        Columns
+      
+      </hue-link-stub>
     </div>
      
     <div
       class="query-table-actions-right"
     >
-      <hue-button-stub>
-        
-        Columns
-      
-      </hue-button-stub>
-       
       <hue-button-stub
         disabled="true"
       >

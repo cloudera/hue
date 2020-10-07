@@ -26,20 +26,30 @@
 
       <div class="query-table-filters">
         <hue-icon type="hi-filter" /> Filter by:
-        <status-facet
-          ref="statusFacet"
+        <facet-selector
+          ref="statusFacetSelector"
+          :facet="statusFacet"
+          :value-labels="statusValueLabels"
+          field-label="Status"
+          @facet-removed="facetRemoved"
+          @facet-changed="facetChanged"
+        />
+        <facet-selector
+          ref="userFacetSelector"
+          :facet="userFacet"
+          field-label="User"
+          :disabled="userFacet.values.length === 0"
           @facet-removed="facetRemoved"
           @facet-changed="facetChanged"
         />
         <date-range-picker ref="rangePicker" @date-range-changed="timeRangeChanged" />
-        <hue-link class="clear-link" @click="clearSearch">Clear All</hue-link>
+        <hue-link class="clear-link" @click="clearSearch">{{ I18n('Clear All') }}</hue-link>
+        <hue-link class="columns-link" @click="toggleColumnSelector">
+          {{ I18n('Columns') }}
+        </hue-link>
       </div>
 
       <div class="query-table-actions-right">
-        <hue-button @click="toggleColumnSelector">
-          {{ I18n('Columns') }}
-        </hue-button>
-
         <hue-button :disabled="selectedQueries.length !== 2" @click="diffQueries(selectedQueries)">
           {{ I18n('Compare') }}
         </hue-button>
@@ -103,14 +113,27 @@
   import StatusIndicator from '../../../../../../desktop/core/src/desktop/js/components/StatusIndicator.vue';
   import { Column } from '../../../../../../desktop/core/src/desktop/js/components/HueTable';
   import ColumnSelectorPanel from '../../../../../../desktop/core/src/desktop/js/components/ColumnSelectorPanel.vue';
-  import StatusFacet from './StatusFacet.vue';
-  import { fetchSuggestedSearches, SearchFacet } from '../api-utils/search';
+  import FacetSelector from '../../../../../../desktop/core/src/desktop/js/components/FacetSelector.vue';
+  import {
+    Facet,
+    FacetValue,
+    FacetValueLabels,
+    SearchFacet
+  } from '../../../../../../desktop/core/src/desktop/js/components/FacetSelector';
+  import { fetchFacets } from '../api-utils/search';
   import QueriesSearch from '../components/QueriesSearch.vue';
   import { DataProcessor, Query, Search, TableDefinition } from '../index';
 
+  const DEFAULT_STATUS_FACET_VALUES: FacetValue[][] = [
+    ['STARTED', { key: 'STARTED', value: 0 }],
+    ['RUNNING', { key: 'RUNNING', value: 0 }],
+    ['SUCCESS', { key: 'SUCCESS', value: 0 }],
+    ['ERROR', { key: 'ERROR', value: 0 }]
+  ];
+
   @Component({
     components: {
-      StatusFacet,
+      FacetSelector,
       HueIcon,
       DateRangePicker,
       StatusIndicator,
@@ -142,12 +165,29 @@
     timeRange?: Range;
     facets: { [field: string]: SearchFacet } = {};
 
+    statusFacet: Facet = {
+      facetField: 'status',
+      values: []
+    };
+
+    statusValueLabels: FacetValueLabels = {
+      STARTED: I18n('Started'),
+      RUNNING: I18n('Running'),
+      SUCCESS: I18n('Success'),
+      ERROR: I18n('Error')
+    };
+
+    userFacet: Facet = {
+      facetField: 'userId',
+      values: []
+    };
+
     columns: Column<Query>[] = [
       { key: 'select', label: '' },
       { key: 'status', label: 'Status' },
       { key: 'query', label: 'Query' },
       { key: 'queueName', label: 'Queue' },
-      { key: 'requestUser', label: 'User' },
+      { key: 'userId', label: 'User' },
       {
         key: 'tablesRead',
         label: 'Tables Read',
@@ -216,12 +256,13 @@
 
     notifyThrottle = -1;
 
-    mounted(): void {
+    async mounted(): void {
       this.visibleColumns = [...this.columns];
+      this.setStatusFacetValues([]);
     }
 
     async created(): Promise<void> {
-      this.searches = await fetchSuggestedSearches({ entityType: 'query' });
+      // this.searches = await fetchSuggestedSearches({ entityType: 'query' });
     }
 
     updateVisibleColumns(columns: Column<Query>[]): void {
@@ -235,20 +276,49 @@
 
     notifySearch(): void {
       window.clearTimeout(this.notifyThrottle);
-      this.notifyThrottle = window.setTimeout(() => {
+      this.notifyThrottle = window.setTimeout(async () => {
         this.$emit('search', {
           page: this.currentPage,
           text: this.searchQuery,
           timeRange: this.timeRange,
           facets: Object.values(this.facets)
         });
+
+        const now = Date.now();
+        try {
+          const facetResponse = await fetchFacets({
+            startTime: this.timeRange?.from || now - 1000 * 60 * 60 * 24 * 7,
+            endTime: this.timeRange?.to || now,
+            facetFields: ['status', 'userId']
+          });
+          facetResponse.facets.forEach(facet => {
+            if (facet.facetField === 'userId') {
+              this.$set(this.userFacet, 'values', facet.values);
+            } else if (facet.facetField === 'status') {
+              this.setStatusFacetValues(facet.values);
+            }
+          });
+        } catch (err) {
+          this.setStatusFacetValues([]);
+        }
       }, 0);
+    }
+
+    setStatusFacetValues(values: FacetValue[]): void {
+      const valueMap = new Map<string, FacetValue>(DEFAULT_STATUS_FACET_VALUES);
+
+      values.forEach(val => {
+        valueMap.get(val.key).value = val.value;
+      });
+
+      this.$set(this.statusFacet, 'values', [...valueMap.values()]);
     }
 
     clearSearch(): void {
       this.searchQuery = '';
       (<DateRangePicker>this.$refs.rangePicker).clear();
-      (<StatusFacet>this.$refs.statusFacet).clear();
+      (<FacetSelector>this.$refs.statusFacetSelector).clear();
+      (<FacetSelector>this.$refs.userFacetSelector).clear();
     }
 
     pageChanged(page: Page): void {
@@ -298,6 +368,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @import '../../../../../../desktop/core/src/desktop/js/components/styles/colors';
+
   .query-table {
     .query-table-actions {
       margin-bottom: 20px;
@@ -311,6 +383,7 @@
         display: inline-block;
         margin-left: 30px;
 
+        .columns-link,
         .clear-link {
           margin-left: 30px;
         }
@@ -344,6 +417,12 @@
     .status-indicator {
       font-size: 24px;
       margin: 4px;
+
+      /deep/ i {
+        font-size: 20px;
+        padding: 2px;
+        color: $fluid-gray-500;
+      }
     }
   }
 </style>
