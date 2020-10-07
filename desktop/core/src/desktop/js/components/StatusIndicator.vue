@@ -17,7 +17,10 @@
 -->
 
 <template>
-  <hue-icon v-if="icon" :type="icon" />
+  <span>
+    <i v-if="spin" class="fa fa-spinner fa-spin" />
+    <hue-icon v-else-if="icon" :type="icon" />
+  </span>
 </template>
 
 <script lang="ts">
@@ -44,6 +47,11 @@
 
     get icon(): string | null {
       return ICON_MAPPING[this.value.toLowerCase()];
+    }
+
+    get spin(): boolean {
+      const lowerValue = this.value.toLowerCase();
+      return lowerValue === 'started' || lowerValue === 'running';
     }
   }
 </script>
