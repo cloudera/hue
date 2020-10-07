@@ -71,6 +71,7 @@ urlpatterns += [
   # Importer
   url(r'^api/indexer/guess_format/?$', indexer_api3.guess_format, name='guess_format'),
   url(r'^api/indexer/guess_field_types/?$', indexer_api3.guess_field_types, name='guess_field_types'),
+  url(r'^api/indexer/index/?$', indexer_api3.index, name='index'),
 
   url(r'^api/importer/submit', indexer_api3.importer_submit, name='importer_submit'),
   url(r'^api/importer/save/?$', indexer_api3.save_pipeline, name='save_pipeline'),
