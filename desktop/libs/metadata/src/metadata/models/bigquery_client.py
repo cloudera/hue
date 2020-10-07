@@ -107,6 +107,35 @@ class BigQueryClient(Base):
     return model._properties
 
 
+  def upload_data(self):
+    credentials_json = json.loads(
+      [setting['value'] for setting in self.connector['settings'] if setting['name'] == 'credentials_json'][0]
+    )
+    credentials = service_account.Credentials.from_service_account_info(credentials_json)
+
+    client = bigquery.Client(
+        project =credentials_json['project_id'],
+        credentials=credentials
+    )
+
+    table_id = "ml.logs_upload"
+
+    job_config = bigquery.LoadJobConfig(
+        source_format=bigquery.SourceFormat.CSV, skip_leading_rows=1, autodetect=True,
+    )
+
+    with open('/home/romain/data/index_data.csv', "rb") as source_file:
+        job = client.load_table_from_file(source_file, table_id, job_config=job_config)
+
+    job.result()
+
+    table = client.get_table(table_id)
+    print(
+        "Loaded {} rows and {} columns to {}".format(
+            table.num_rows, len(table.schema), table_id
+        )
+    )
+
 def _get_notebook_api(user, connector_id, interpreter=None):
   '''
   Helper utils until the API gets simplified.
