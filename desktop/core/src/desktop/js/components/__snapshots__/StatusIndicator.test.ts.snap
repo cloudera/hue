@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`StatusIndicator.vue should render 1`] = `
-<hue-icon-stub
-  type="hi-status-success"
-/>
+<span>
+  <hue-icon-stub
+    type="hi-status-success"
+  />
+</span>
 `;
