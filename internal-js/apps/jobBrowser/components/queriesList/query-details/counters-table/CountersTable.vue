@@ -29,7 +29,7 @@
   } from '../../../../../../../desktop/core/src/desktop/js/components/HueTable';
   import HueTable from '../../../../../../../desktop/core/src/desktop/js/components/HueTable.vue';
 
-  import { CounterGroup, CounterDetails } from '../..';
+  import { CounterGroup, CounterDetails } from '../../index';
 
   import CounterSet from './CounterSet';
 

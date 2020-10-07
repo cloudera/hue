@@ -44,7 +44,6 @@
   /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
 
   import { Component, Prop, Vue } from 'vue-property-decorator';
-  import { unitOfTime } from 'moment';
   import { duration } from '../../../../../../../../desktop/core/src/desktop/js/components/Duration.vue';
 
   const DEFAULT_MARK_COUNT = 10;
@@ -90,9 +89,7 @@
         markBaseValue = Math.floor(markBaseValue / 10) * 10;
       }
 
-      markWindow = moment
-        .duration(markBaseValue, <unitOfTime.DurationConstructor>markUnit.toLowerCase())
-        .asMilliseconds();
+      markWindow = moment.duration(markBaseValue, markUnit.toLowerCase()).asMilliseconds();
       styleWidth = (markWindow / timeWindow) * 100;
 
       return {

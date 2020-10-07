@@ -59,7 +59,10 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
-  import { Facet, FacetValue } from '../../index';
+  import {
+    Facet,
+    FacetValue
+  } from '../../../../../../../desktop/core/src/desktop/js/components/FacetSelector';
 
   interface SelectableFacetValue {
     selected: boolean;

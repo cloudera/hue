@@ -33,11 +33,11 @@
 </template>
 
 <script lang="ts">
-  import { Page } from 'components/Paginator';
-  import hueUtils from '../../../../../desktop/core/src/desktop/js/utils/hueUtils';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Provide } from 'vue-property-decorator';
+  import { Page } from '../../../../../desktop/core/src/desktop/js/components/Paginator';
+  import hueUtils from '../../../../../desktop/core/src/desktop/js/utils/hueUtils';
   import HumanByteSize from '../../../../../desktop/core/src/desktop/js/components/HumanByteSize.vue';
   import TimeAgo from '../../../../../desktop/core/src/desktop/js/components/TimeAgo.vue';
   import { searchQueries, SearchFacet } from './api-utils/search';

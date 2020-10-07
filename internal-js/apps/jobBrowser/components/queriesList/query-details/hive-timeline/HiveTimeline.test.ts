@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
-import HiveTimeline from './HiveTimeline';
+import HiveTimeline from './HiveTimeline.vue';
 
 describe('HiveTimeline.vue', () => {
   it('should render', () => {

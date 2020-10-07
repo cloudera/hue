@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
-import { Facet } from '../../index';
+import { Facet } from '../../../../../../../desktop/core/src/desktop/js/components/FacetSelector';
 import FacetValueList from './FacetValueList.vue';
 
 describe('FacetValueList.vue', () => {

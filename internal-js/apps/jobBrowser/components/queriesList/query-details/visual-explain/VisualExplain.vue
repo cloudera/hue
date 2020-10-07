@@ -66,7 +66,7 @@
 
   import { saveAs } from 'file-saver';
 
-  import explain from './libs';
+  import explain from './libs/index';
 
   import './visual-explain.scss';
 

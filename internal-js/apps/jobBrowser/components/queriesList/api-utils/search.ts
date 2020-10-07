@@ -17,7 +17,7 @@
  */
 
 import axios, { AxiosResponse } from 'axios';
-import { Facet } from 'components/FacetSelector';
+import { Facet } from '../../../../../../desktop/core/src/desktop/js/components/FacetSelector';
 import { FieldInfo, Query, Search, SearchMeta } from '../index';
 // Uncomment to serve mock response instead of calling the API endpoints
 // import '../test/mockSearchHelper';

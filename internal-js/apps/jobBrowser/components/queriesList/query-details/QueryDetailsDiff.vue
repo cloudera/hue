@@ -120,7 +120,7 @@
   import DagGraph from './dag-graph/DagGraph.vue';
   import DagSwimlane from './dag-swimlane/DagSwimlane.vue';
 
-  import { Dag, Query } from '..';
+  import { Dag, Query } from '../index';
 
   interface DagSet {
     dagA: Dag;

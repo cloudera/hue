@@ -77,7 +77,7 @@
   import DagGraph from './dag-graph/DagGraph.vue';
   import DagSwimlane from './dag-swimlane/DagSwimlane.vue';
 
-  import { Query } from '..';
+  import { Query } from '../index';
 
   @Component({
     components: {

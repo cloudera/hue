@@ -42,11 +42,14 @@
 </template>
 
 <script lang="ts">
+  import {
+    Facet,
+    FacetValue
+  } from '../../../../../../../desktop/core/src/desktop/js/components/FacetSelector';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
   import FacetValueList from './FacetValueList.vue';
-  import { Facet, FacetValue } from '../../index';
 
   interface FacetSelection {
     facet: Facet;

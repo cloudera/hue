@@ -16,8 +16,6 @@
  * limitations under the License.
  */
 
-import { number } from "yargs";
-
 export default function debounce(func: any, wait: number): any {
   let timeout: any;
 

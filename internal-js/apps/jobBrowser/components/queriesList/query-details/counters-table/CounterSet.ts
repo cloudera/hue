@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { CounterGroup } from '../..';
+import { CounterGroup } from '../../index';
 
 export default interface CounterSet {
   title: string;

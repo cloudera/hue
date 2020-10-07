@@ -94,12 +94,12 @@
 </template>
 
 <script lang="ts">
-  import { Range } from 'components/DateRangePicker';
-  import { Page } from 'components/Paginator';
-  import I18n from '../../../../../../desktop/core/src/desktop/js/utils/i18n';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
+  import { Range } from '../../../../../../desktop/core/src/desktop/js/components/DateRangePicker';
+  import { Page } from '../../../../../../desktop/core/src/desktop/js/components/Paginator';
+  import I18n from '../../../../../../desktop/core/src/desktop/js/utils/i18n';
   import DateRangePicker from '../../../../../../desktop/core/src/desktop/js/components/DateRangePicker.vue';
   import { duration } from '../../../../../../desktop/core/src/desktop/js/components/Duration.vue';
   import { humanSize } from '../../../../../../desktop/core/src/desktop/js/components/HumanByteSize.vue';

@@ -101,6 +101,7 @@
 </template>
 
 <script lang="ts">
+  import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
 
@@ -110,7 +111,6 @@
   import DropdownMenuButton from '../../../../../../desktop/core/src/desktop/js/components/dropdown/DropdownMenuButton.vue';
   import DropdownMenuText from '../../../../../../desktop/core/src/desktop/js/components/dropdown/DropdownMenuText.vue';
   import Modal from '../../../../../../desktop/core/src/desktop/js/components/Modal.vue';
-  import Vue from 'vue';
   import RangePanel from './RangePanel.vue';
   import { Search, TableDefinition } from '../index';
   import * as api from '../api-utils/search';
