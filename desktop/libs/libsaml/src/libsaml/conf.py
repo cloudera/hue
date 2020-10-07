@@ -133,6 +133,12 @@ CERT_FILE = Config(
   type=str,
   help=_t("This is the public part of the service private/public key pair. cert_file must be a PEM formatted certificate chain file."))
 
+ACCEPTED_TIME_DIFF = Config(
+  key="accepted_time_diff",
+  default=0,
+  type=int,
+  help=_t("If your computer and another computer that you are communicating with are not in synch regarding the computer clock, then here you can state how big a difference you are prepared to accept.")
+)
 USER_ATTRIBUTE_MAPPING = Config(
   key="user_attribute_mapping",
   default={'uid': ('username', )},
