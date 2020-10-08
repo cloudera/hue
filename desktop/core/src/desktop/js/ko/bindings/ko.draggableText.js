@@ -23,56 +23,52 @@ import { registerBinding } from './bindingUtils';
 export const DRAGGABLE_TEXT_META_EVENT = 'draggable.text.meta';
 export const NAME = 'draggableText';
 
+const moreThanTenPixels = (startX, startY, event) =>
+  Math.sqrt(
+    (startX - event.clientX) * (startX - event.clientX) +
+      (startY - event.clientY) * (startY - event.clientY)
+  ) > 10;
+
 registerBinding(NAME, {
-  init: function (element, valueAccessor) {
+  init: (element, valueAccessor) => {
     const $element = $(element);
     const options = valueAccessor();
-    if ((ko.isObservable(options.text) && !options.text()) || !options.text) {
-      return;
-    }
-    $element.addClass('draggableText');
 
-    const $helper = $('<div>')
-      .text(ko.isObservable(options.text) ? options.text() : options.text)
-      .css('z-index', '99999');
     let dragStartX = -1;
     let dragStartY = -1;
     let notifiedOnDragStarted = false;
+    let $helper;
+
+    $element.addClass('draggableText');
+
     $element.draggable({
-      helper: function () {
+      helper: () => {
+        $helper = $('<div>').text(ko.unwrap(options.text)).css('z-index', '99999');
         return $helper;
       },
       appendTo: 'body',
-      start: function (event) {
+      start: event => {
         dragStartX = event.clientX;
         dragStartY = event.clientY;
         huePubSub.publish(DRAGGABLE_TEXT_META_EVENT, options.meta);
         notifiedOnDragStarted = false;
       },
-      drag: function (event) {
+      drag: event => {
         huePubSub.publish('draggable.text.drag', {
           event: event,
           meta: options.meta
         });
-        if (
-          !notifiedOnDragStarted &&
-          Math.sqrt(
-            (dragStartX - event.clientX) * (dragStartX - event.clientX) +
-              (dragStartY - event.clientY) * (dragStartY - event.clientY)
-          ) >= 10
-        ) {
+        if (!notifiedOnDragStarted && moreThanTenPixels(dragStartX, dragStartY, event)) {
           huePubSub.publish('draggable.text.started', options.meta);
           notifiedOnDragStarted = true;
         }
       },
-      stop: function (event) {
-        if (
-          Math.sqrt(
-            (dragStartX - event.clientX) * (dragStartX - event.clientX) +
-              (dragStartY - event.clientY) * (dragStartY - event.clientY)
-          ) < 10
-        ) {
+      stop: event => {
+        if ($helper) {
           $helper.remove();
+        }
+
+        if (!moreThanTenPixels(dragStartX, dragStartY, event)) {
           const elementAtStart = document.elementFromPoint(dragStartX, dragStartY);
           const elementAtStop = document.elementFromPoint(event.clientX, event.clientY);
           if (elementAtStart === elementAtStop) {
@@ -82,6 +78,10 @@ registerBinding(NAME, {
         notifiedOnDragStarted = false;
         huePubSub.publish('draggable.text.stopped');
       }
+    });
+
+    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
+      $element.draggable('destroy');
     });
   }
 });
