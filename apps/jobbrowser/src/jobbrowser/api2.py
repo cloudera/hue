@@ -59,6 +59,8 @@ def jobs(request, interface=None):
   filters = dict([(key, value) for _filter in json.loads(
       request.POST.get('filters', '[]')) for key, value in list(_filter.items()) if value
   ])
+  if interface == 'queries-hive':
+    filters = json.loads(request.body)
 
   jobs = get_api(request.user, interface, cluster=cluster).apps(filters)
 

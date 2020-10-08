@@ -142,20 +142,20 @@ class HiveQueryClient():
 
   def _get_queries(self, filters):
     queries = HiveQuery.objects.using('query').order_by('-id')
-    queries = queries.filter(start_time__gte = filters['startTime'], end_time__lte = filters['endTime'])
+    queries = queries.filter(start_time__gte=filters['startTime'], end_time__lte=filters['endTime'])
     if filters['text']:
-      queries = queries.filter(query__icontains = filters['text'])
+      queries = queries.filter(query__icontains=filters['text'])
 
     return queries
 
   def get_query_count(self, filters):
     filtered_query_list = self._get_queries(filters)
 
-    return filtered_query_list.count()
+    return len(filtered_query_list)
 
   def get_queries(self, filters):
     filtered_query_list = self._get_queries(filters)
-    paginated_query_list  = filtered_query_list[filters['offset']:filters['offset'] + filters['limit']]
+    paginated_query_list = filtered_query_list[filters['offset']:filters['offset'] + filters['limit']]
 
     return paginated_query_list
 
