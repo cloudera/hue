@@ -57,7 +57,7 @@ from indexer.indexers.base import get_api
 from indexer.indexers.flink_sql import FlinkIndexer
 from indexer.indexers.morphline import MorphlineIndexer
 from indexer.indexers.rdbms import run_sqoop, _get_api
-from indexer.indexers.sql import SQLIndexer
+from indexer.indexers.sql import SQLIndexer, _create_database
 from indexer.models import _save_pipeline
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 from indexer.indexers.flume import FlumeIndexer
@@ -569,51 +569,6 @@ def _small_indexing(user, fs, client, source, destination, index_name):
     'pub_sub_url': 'assist.collections.refresh',
     'errors': errors
   }
-
-
-def _create_database(request, source, destination, start_time):
-  database = destination['name']
-  comment = destination['description']
-
-  use_default_location = destination['useDefaultLocation']
-  external_path = destination['nonDefaultLocation']
-
-  sql = django_mako.render_to_string("gen/create_database_statement.mako", {
-      'database': {
-          'name': database,
-          'comment': comment,
-          'use_default_location': use_default_location,
-          'external_location': external_path,
-          'properties': [],
-      }
-    }
-  )
-
-  editor_type = destination['apiHelperType']
-  on_success_url = reverse(
-      'metastore:show_tables',
-      kwargs={'database': database}) + "?source_type=" + source.get('sourceType', 'hive'
-  )
-
-  notebook = make_notebook(
-      name=_('Creating database %(name)s') % destination,
-      editor_type=editor_type,
-      statement=sql,
-      status='ready',
-      on_success_url=on_success_url,
-      last_executed=start_time,
-      is_task=True
-  )
-  return notebook.execute(request, batch=False)
-
-
-def _create_table(request, source, destination, start_time=-1):
-  notebook = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination, start_time)
-
-  if request.POST.get('show_command'):
-    return {'status': 0, 'commands': notebook.get_str()}
-  else:
-    return notebook.execute(request, batch=False)
 
 
 def _large_indexing(request, file_format, collection_name, query=None, start_time=None, lib_path=None, destination=None):
