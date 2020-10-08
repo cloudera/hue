@@ -45,7 +45,7 @@ gen_cp() {
   if [ ! -f $CP_FILE ]; then
     echo "Generating classpath"
     mvn -q -nsu -pl query-processor dependency:build-classpath -Dmdep.outputFile=target/classpath -Dmdep.regenerateFile=true
-    echo -n ":$QP_DIR/target/hue-query-processor-${VERSION}.jar" >> $CP_FILE
+    echo -n ":$QP_DIR/target/hue-query-processor-${HUE_QP_VERSION}.jar" >> $CP_FILE
   fi
 }
 
