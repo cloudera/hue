@@ -264,7 +264,7 @@ class TestIndexer(object):
     # guess the format of the file
     file_type_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
 
-    field_types = indexer.guess_field_types({"file":{"stream": stream, "name": "test.csv"}, "format": file_type_format})
+    field_types = indexer.guess_field_types({"file": {"stream": stream, "name": "test.csv"}, "format": file_type_format})
 
     format_ = field_types.copy()
     format_['format'] = file_type_format
