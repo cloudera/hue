@@ -407,7 +407,14 @@ class SqlAlchemyApi(Api):
         connector_id = snippet['type']
         name = '%s.%s' % (database, table)
         model = _get_model_api(self.user, connector_id).get_model(name)
-        columns = [{'name': col['name'], 'type': 'string'} for col in model['featureColumns']]
+        columns = [
+          {'name': col['name'], 'type': 'string', 'is_label': True, 'is_feature': False}
+          for col in model['labelColumns']
+        ]
+        columns.extend(
+            [{'name': col['name'], 'type': 'string', 'is_label': False, 'is_feature': True}
+            for col in model['featureColumns']]
+        )
       else:
         columns = assist.get_columns(database, table)
 
@@ -446,7 +453,7 @@ class SqlAlchemyApi(Api):
     response['status'] = 0
     response['rows'] = escape_rows(sample_data)
 
-    if table and operation != 'hello':
+    if table and operation != 'hello' and operation != 'model':
       columns = assist.get_columns(database, table)
       response['full_headers'] = [{
           'name': col.get('name'),
@@ -518,7 +525,10 @@ class Assist(object):
   def get_sample_data(self, database, table, column=None, operation=None):
     if operation == 'hello':
       statement = "SELECT 'Hello World!'"
-    elif operation is not None:
+    elif operation == 'model':
+      # WIP --> model feature info instead
+      statement = "SELECT 'Hello World!' as is_male, 'Hello World!' as gestation_weeks, 'Hello World!' as mother_age, 'Hello World!' as mother_race"
+    elif operation is not None and operation != 'default':
       statement = "SELECT * FROM (%s) LIMIT 1000" % operation if operation.strip().lower().startswith('select') else operation
     else:
       column = '%(backticks)s%(column)s%(backticks)s' % {'backticks': self.backticks, 'column': column} if column else '*'
