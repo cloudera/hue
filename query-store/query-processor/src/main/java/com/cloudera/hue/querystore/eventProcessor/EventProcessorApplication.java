@@ -26,6 +26,7 @@ import com.cloudera.hue.querystore.eventProcessor.lifecycle.EventProcessorManage
 import com.cloudera.hue.querystore.eventProcessor.module.EventProcessorModule;
 import com.cloudera.hue.querystore.eventProcessor.resources.AboutResource;
 import com.cloudera.hue.querystore.eventProcessor.resources.BundleResource;
+import com.cloudera.hue.querystore.eventProcessor.resources.HiveQueryResource;
 import com.codahale.metrics.jdbi3.InstrumentedSqlLogger;
 import com.codahale.metrics.jdbi3.strategies.SmartNameStrategy;
 import com.codahale.metrics.jmx.JmxReporter;
@@ -50,7 +51,7 @@ public class EventProcessorApplication extends Application<EventProcessorConfigu
       new ConfVar<>("hue.query-processor.session-cookie-name", "HUE_QP_SESSIONID");
   private static final ConfVar<Boolean> ENABLE_EVENT_PROCESSOR =
       new ConfVar<>("hue.query-processor.event-pipeline.enabled", true);
-  private static final ConfVar<Boolean> ENABLE_DEBUG_BUNDLER =
+  private static final ConfVar<Boolean> ENABLE_REST_APIS =
       new ConfVar<>("hue.query-processor.debug-bundler.enabled", true);
 
   @Override
@@ -145,8 +146,9 @@ public class EventProcessorApplication extends Application<EventProcessorConfigu
     JerseyEnvironment jersey = environment.jersey();
     jersey.register(new HealthCheckResource(environment.healthChecks()));
     jersey.register(injector.getInstance(AboutResource.class));
-    if (dasConfig.getConf(ENABLE_DEBUG_BUNDLER)) {
+    if (dasConfig.getConf(ENABLE_REST_APIS)) {
       jersey.register(injector.getInstance(BundleResource.class));
+      jersey.register(injector.getInstance(HiveQueryResource.class));
     }
   }
 }

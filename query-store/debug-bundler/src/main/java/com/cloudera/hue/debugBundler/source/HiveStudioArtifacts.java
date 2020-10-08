@@ -14,6 +14,7 @@ import com.cloudera.hue.debugBundler.framework.ArtifactSource;
 import com.cloudera.hue.debugBundler.framework.Params;
 import com.cloudera.hue.debugBundler.framework.Params.DagParams;
 import com.cloudera.hue.debugBundler.framework.ZipStream;
+import com.cloudera.hue.querystore.common.dto.DagDto;
 import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
 import com.cloudera.hue.querystore.common.entities.HiveQueryExtendedInfo;
 import com.cloudera.hue.querystore.common.entities.TezAppInfo;
@@ -27,19 +28,9 @@ import com.cloudera.hue.querystore.common.repository.TezDagBasicInfoRepository;
 import com.cloudera.hue.querystore.common.repository.TezDagExtendedInfoRepository;
 import com.cloudera.hue.querystore.common.repository.VertexInfoRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.inject.Inject;
 
-import lombok.Getter;
-
 public class HiveStudioArtifacts implements ArtifactSource {
-
-  @Getter
-  public static class DagDto {
-    private TezDagBasicInfo dagInfo;
-    private TezDagExtendedInfo dagDetails;
-    private ObjectNode config;
-  }
 
   private static final String FILE_EXT = "json";
 
@@ -108,14 +99,14 @@ public class HiveStudioArtifacts implements ArtifactSource {
           : new DagParams(i, dagInfo.getDagId(), dagInfo.getApplicationId());
       i++;
       DagDto dagDto = new DagDto();
-      dagDto.dagInfo = dagInfo;
+      dagDto.setDagInfo(dagInfo);
       Optional<TezDagExtendedInfo> extInfo = dagExtRepo.findByDagId(dagInfo.getDagId());
       Optional<TezAppInfo> appInfo = tezAppRepo.findByDagInfoId(dagInfo.getId());
       if (extInfo.isPresent()) {
-        dagDto.dagDetails = extInfo.get();
+        dagDto.setDagDetails(extInfo.get());
       }
       if (appInfo.isPresent()) {
-        dagDto.config = appInfo.get().getConfig();
+        dagDto.setConfig(appInfo.get().getConfig());
       }
       artifacts.add(new Artifact() {
         @Override
