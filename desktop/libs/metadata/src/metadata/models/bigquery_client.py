@@ -54,16 +54,8 @@ class BigQueryClient(Base):
     options = json.loads(params.get('options', '{}'))
 
     if params.get('data'):
-      source = {
-        'file': io.StringIO(params['data'])
-      }
-      # Make it tmp?
-      destination = {
-        'name': '%(model)s_training' % params
-      }
-      params['statement'] = 'SELECT * FROM `%(name)s`' % destination
-
-      self.upload_data(source, destination)
+      name = self.create_table_from_text(name=params['model'], data=params['data'])
+      params['statement'] = 'SELECT * FROM `%(name)s`' % {'name': name}
 
     params['options'] = ',\n'.join(['%s=%s' % (k, v) for k, v in options.items()])
     data = {
@@ -82,6 +74,10 @@ class BigQueryClient(Base):
 
 
   def predict(self, params):
+    if params.get('data'):
+      name = self.create_table_from_text(name=params['model'], data=params['data'])
+      params['statement'] = 'SELECT * FROM `%(name)s`' % {'name': name}
+
     data = {
       'snippet': {},
       'operation': '''
@@ -150,6 +146,20 @@ class BigQueryClient(Base):
       'table': table_id,
       'message': "Loaded {} rows and {} columns to {}".format(table.num_rows, len(table.schema), table_id)
     }
+
+
+  def create_table_from_text(self, name, data):
+    source = {
+      'file': io.StringIO(data)
+    }
+    # Make it tmp?
+    destination = {
+      'name': '%(name)s_training' % {'name': name}
+    }
+
+    self.upload_data(source, destination)
+
+    return destination['name']
 
 
 def _get_notebook_api(user, connector_id, interpreter=None):
