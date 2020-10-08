@@ -18,7 +18,14 @@
 
 <template>
   <div>
-    <div>
+    <div class="query-info-row query-info-box">
+      <div class="query-info-label">Query</div>
+      <div class="query-info-query">
+        <sql-text :enable-overflow="true" :format="true" :value="query.query" />
+      </div>
+    </div>
+
+    <div class="query-info-box">
       <div class="query-info-row">
         <div class="query-info-label">Query ID</div>
         <div class="query-info-value">{{ query.queryId }}</div>
@@ -110,18 +117,6 @@
           <span v-else>None</span>
         </div>
       </div>
-
-      <div class="query-info-row">
-        <div class="query-info-label">Query</div>
-        <div class="query-info-query">
-          <sql-text :enable-overflow="true" :format="true" :value="query.query" />
-        </div>
-      </div>
-    </div>
-
-    <div v-if="query.details.diagnostics" class="panel panel-danger">
-      <div class="panel-heading">DAG Diagnostics</div>
-      <div class="diagnostics">{{ query.details.diagnostics }}</div>
     </div>
   </div>
 </template>
@@ -157,7 +152,6 @@
 
   .query-info-row {
     margin-bottom: 15px;
-    margin-left: 10px;
 
     .query-info-label {
       text-transform: uppercase;
@@ -173,6 +167,19 @@
 
     .query-info-query {
       padding: 5px;
+      width: 570px;
     }
+  }
+
+  .query-info-box {
+    display: inline-block;
+    min-width: 580px;
+    padding: 10px;
+    margin-right: 5px;
+
+    vertical-align: top;
+
+    border: 1px solid $fluid-gray-300;
+    border-radius: 5px;
   }
 </style>
