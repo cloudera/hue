@@ -24,6 +24,7 @@ import componentUtils from 'ko/components/componentUtils';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import DataCatalogEntry from 'catalog/dataCatalogEntry';
 
 const TEMPLATE =
   ASSIST_TABLE_TEMPLATES +
@@ -82,7 +83,7 @@ const TEMPLATE =
               <i class="hue-warning fa fa-fw muted valign-middle fa-warning"></i>
               <!-- ko with: catalogEntry -->
               <!-- ko if: typeof reload !== 'undefined' -->
-              <span data-bind="text: getDisplayName()"></span> <a class="inactive-action" href="javascript: void(0);" data-bind="click: reload"><i class="fa fa-refresh" data-bind="css: { 'fa-spin': reloading }"></i></a>
+              <span data-bind="text: getDisplayName(true)"></span> <a class="inactive-action" href="javascript: void(0);" data-bind="click: reload"><i class="fa fa-refresh" data-bind="css: { 'fa-spin': reloading }"></i></a>
               <!-- /ko -->
               <!-- /ko -->
             </span>
@@ -467,71 +468,69 @@ class AssistEditorContextPanel {
                       });
 
                       if (!found) {
-                        const missingEntry = new AssistDbEntry(
-                          {
-                            path: [dbEntry.catalogEntry.name, tableName],
-                            name: tableName,
-                            isTableOrView: () => true,
-                            getType: () => 'table',
-                            hasPossibleChildren: () => true,
-                            getSourceMeta: () => $.Deferred().resolve({ notFound: true }).promise(),
-                            getDisplayName: () => dbEntry.catalogEntry.name + '.' + tableName,
-                            reloading: ko.observable(false),
-                            reload: function () {
-                              const self = this;
-                              if (self.reloading()) {
-                                return;
-                              }
-                              self.reloading(true);
-                              huePubSub.subscribeOnce('data.catalog.entry.refreshed', data => {
-                                data.entry.getSourceMeta({ silenceErrors: true }).always(() => {
-                                  self.reloading(false);
-                                });
-                              });
-                              dataCatalog
-                                .getEntry({
-                                  namespace: activeLocations.namespace,
-                                  compute: activeLocations.compute,
-                                  connector: activeLocations.connector,
-                                  path: []
-                                })
-                                .done(sourceEntry => {
-                                  sourceEntry
-                                    .getChildren()
-                                    .done(dbEntries => {
-                                      let clearPromise;
-                                      // Clear the database first if it exists without cascade
-                                      const hasDb = dbEntries.some(dbEntry => {
-                                        if (
-                                          dbEntry.name.toLowerCase() === self.path[0].toLowerCase()
-                                        ) {
-                                          clearPromise = dbEntry.clearCache({
-                                            invalidate: 'invalidate',
-                                            cascade: false
-                                          });
-                                          return true;
-                                        }
+                        const catalogEntry = new DataCatalogEntry({
+                          path: [dbEntry.catalogEntry.name, tableName],
+                          dataCatalog: dbEntry.catalogEntry.dataCatalog,
+                          namespace: dbEntry.catalogEntry.namespace,
+                          compute: dbEntry.catalogEntry.namespace
+                        });
+
+                        catalogEntry.reloading = ko.observable(false);
+                        catalogEntry.reload = function () {
+                          const self = this;
+                          if (self.reloading()) {
+                            return;
+                          }
+                          self.reloading(true);
+                          huePubSub.subscribeOnce('data.catalog.entry.refreshed', data => {
+                            data.entry.getSourceMeta({ silenceErrors: true }).always(() => {
+                              self.reloading(false);
+                            });
+                          });
+                          dataCatalog
+                            .getEntry({
+                              namespace: activeLocations.namespace,
+                              compute: activeLocations.compute,
+                              connector: activeLocations.connector,
+                              path: []
+                            })
+                            .done(sourceEntry => {
+                              sourceEntry
+                                .getChildren()
+                                .done(dbEntries => {
+                                  let clearPromise;
+                                  // Clear the database first if it exists without cascade
+                                  const hasDb = dbEntries.some(dbEntry => {
+                                    if (dbEntry.name.toLowerCase() === self.path[0].toLowerCase()) {
+                                      clearPromise = dbEntry.clearCache({
+                                        invalidate: 'invalidate',
+                                        cascade: false
                                       });
-                                      if (!hasDb) {
-                                        // If the database is missing clear the source without cascade
-                                        clearPromise = sourceEntry.clearCache({
-                                          invalidate: 'invalidate',
-                                          cascade: false
-                                        });
-                                      }
-                                      clearPromise.fail(() => {
-                                        self.reloading(false);
-                                      });
-                                    })
-                                    .fail(() => {
-                                      self.reloading(false);
+                                      return true;
+                                    }
+                                  });
+                                  if (!hasDb) {
+                                    // If the database is missing clear the source without cascade
+                                    clearPromise = sourceEntry.clearCache({
+                                      invalidate: 'invalidate',
+                                      cascade: false
                                     });
+                                  }
+                                  clearPromise.fail(() => {
+                                    self.reloading(false);
+                                  });
                                 })
                                 .fail(() => {
                                   self.reloading(false);
                                 });
-                            }
-                          },
+                            })
+                            .fail(() => {
+                              self.reloading(false);
+                            });
+                        };
+
+                        const missingEntry = new AssistDbEntry(
+                          catalogEntry,
                           dbEntry,
                           assistDbSource,
                           this.filter,
