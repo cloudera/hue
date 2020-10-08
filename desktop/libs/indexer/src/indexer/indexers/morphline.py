@@ -86,7 +86,7 @@ class MorphlineIndexer(object):
       api = get_api(request, snippet)
 
       destination = '__hue_%s' % notebook_data['uuid'][:4]
-      location = '/user/%s/__hue-%s' % (request.user,  notebook_data['uuid'][:4])
+      location = '/user/%s/__hue-%s' % (request.user, notebook_data['uuid'][:4])
       sql, _success_url = api.export_data_as_table(notebook_data, snippet, destination, is_temporary=True, location=location)
       input_path = '${nameNode}%s' % location
 
@@ -189,13 +189,13 @@ class MorphlineIndexer(object):
       "collection_name": collection_name,
       "fields": self.get_field_list(data['columns'], is_converting_types=True),
       "num_base_fields": len(data['columns']),
-      "uuid_name" : uuid_name,
+      "uuid_name": uuid_name,
       "get_regex": MorphlineIndexer._get_regex_for_type,
       "format_settings": data['format'],
       "format_class": get_file_format_class(data['format']['type']),
       "get_kept_args": get_checked_args,
-      "grok_dictionaries_location" : grok_dicts_loc if self.fs and self.fs.exists(grok_dicts_loc) else None,
-      "geolite_db_location" : geolite_loc if self.fs and self.fs.exists(geolite_loc) else None,
+      "grok_dictionaries_location": grok_dicts_loc if self.fs and self.fs.exists(grok_dicts_loc) else None,
+      "geolite_db_location": geolite_loc if self.fs and self.fs.exists(geolite_loc) else None,
       "zk_host": self.solr_client.get_zookeeper_host() ## offline test?
     }
 
