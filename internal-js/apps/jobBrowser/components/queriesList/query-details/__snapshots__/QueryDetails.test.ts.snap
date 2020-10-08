@@ -56,8 +56,20 @@ exports[`QueryDetails.vue should render 1`] = `
   <div
     class="target detail-panel"
   >
-    <div>
-      Dag 1 : dag_1600683331174_0003_2
+    <div
+      class="dag-title"
+    >
+      <div
+        class="dag-label"
+      >
+        Dag
+      </div>
+       
+      <div
+        class="dag-name"
+      >
+        dag_1600683331174_0003_2
+      </div>
     </div>
      
     <tabs-stub>

@@ -56,9 +56,15 @@
       :key="index"
       class="target detail-panel"
     >
-      <div>
-        Dag {{ index + 1 }} : {{ dagSet.dagA && dagSet.dagA.dagInfo.dagId }} |
-        {{ dagSet.dagB && dagSet.dagB.dagInfo.dagId }}
+      <div class="dag-title">
+        <div>
+          <div class="dag-label">Dag</div>
+          <div class="dag-name">{{ dagSet.dagA && dagSet.dagA.dagInfo.dagId }}</div>
+        </div>
+        <div class="position-right">
+          <div class="dag-label">Dag</div>
+          <div class="dag-name">{{ dagSet.dagB && dagSet.dagB.dagInfo.dagId }}</div>
+        </div>
       </div>
       <tabs>
         <tab title="DAG Info">
@@ -172,6 +178,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @import '../../../../../../desktop/core/src/desktop/js/components/styles/colors';
+
   .query-search {
     color: #0a78a3;
   }
@@ -184,6 +192,37 @@
     text-align: right;
     input {
       vertical-align: top;
+    }
+  }
+
+  .detail-panel {
+    border-top: 1px dotted $fluid-gray-300;
+  }
+
+  .dag-title {
+    position: relative;
+    margin: 10px 0 -10px 0;
+
+    font-size: 1.1em;
+    padding-left: 10px;
+
+    .dag-label {
+      text-transform: uppercase;
+      color: $fluid-gray-500;
+      font-weight: normal;
+      font-size: 12px;
+      margin: 0;
+    }
+
+    .dag-name {
+      color: $fluid-gray-700;
+    }
+
+    .position-right {
+      position: absolute;
+      text-align: right;
+      top: 0;
+      right: 0;
     }
   }
 </style>

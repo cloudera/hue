@@ -46,8 +46,11 @@
       </tabs>
     </div>
 
-    <div v-for="(dag, index) in query.dags" :key="dag.dagInfo.id" class="target detail-panel">
-      <div>Dag {{ index + 1 }} : {{ dag && dag.dagInfo.dagId }}</div>
+    <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="target detail-panel">
+      <div class="dag-title">
+        <div class="dag-label">Dag</div>
+        <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
+      </div>
       <tabs>
         <tab title="DAG Info"><DagInfo :dag="dag" /></tab>
         <tab title="DAG Flow"><DagGraph :dag="dag" /></tab>
@@ -119,7 +122,32 @@
 </script>
 
 <style lang="scss" scoped>
+  @import '../../../../../../desktop/core/src/desktop/js/components/styles/colors';
+
   .query-search {
     color: #0a78a3;
+  }
+
+  .detail-panel {
+    border-top: 1px dotted $fluid-gray-300;
+  }
+
+  .dag-title {
+    margin: 10px 0 -10px 0;
+
+    font-size: 1.1em;
+    padding-left: 10px;
+
+    .dag-label {
+      text-transform: uppercase;
+      color: $fluid-gray-500;
+      font-weight: normal;
+      font-size: 12px;
+      margin: 0;
+    }
+
+    .dag-name {
+      color: $fluid-gray-700;
+    }
   }
 </style>
