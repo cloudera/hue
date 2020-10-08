@@ -1845,7 +1845,7 @@ class ApiHelper {
           compute: options.compute
         }),
         async: true,
-        operation: '"' + (options.operation || 'default') + '"',
+        operation: '"' + (options.isModel ? 'model' : options.operation || 'default') + '"',
         cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
       },
       {
