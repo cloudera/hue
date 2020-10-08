@@ -55,7 +55,7 @@ from indexer.fields import Field
 from indexer.indexers.envelope import EnvelopeIndexer
 from indexer.indexers.base import get_api
 from indexer.indexers.flink_sql import FlinkIndexer
-from indexer.indexers.morphline import MorphlineIndexer
+from indexer.indexers.morphline import MorphlineIndexer, _create_solr_collection
 from indexer.indexers.rdbms import run_sqoop, _get_api
 from indexer.indexers.sql import SQLIndexer, _create_database
 from indexer.models import _save_pipeline
@@ -744,47 +744,6 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
   else:
     return indexer.run(request, collection_name, configs, input_path, start_time=start_time, lib_path=lib_path)
 
-
-def _create_solr_collection(user, fs, client, destination, index_name, kwargs):
-  unique_key_field = destination['indexerPrimaryKey'] and destination['indexerPrimaryKey'][0] or None
-  df = destination['indexerDefaultField'] and destination['indexerDefaultField'][0] or None
-
-  indexer = MorphlineIndexer(user, fs)
-  fields = indexer.get_field_list(destination['columns'])
-  skip_fields = [field['name'] for field in fields if not field['keep']]
-
-  kwargs['fieldnames'] = ','.join([field['name'] for field in fields])
-  for field in fields:
-    for operation in field['operations']:
-      if operation['type'] == 'split':
-        field['multiValued'] = True # Solr requires multiValued to be set when splitting
-        kwargs['f.%(name)s.split' % field] = 'true'
-        kwargs['f.%(name)s.separator' % field] = operation['settings']['splitChar'] or ','
-
-  if skip_fields:
-    kwargs['skip'] = ','.join(skip_fields)
-    fields = [field for field in fields if field['name'] not in skip_fields]
-
-  if not unique_key_field:
-    unique_key_field = 'hue_id'
-    fields += [{"name": unique_key_field, "type": "string"}]
-    kwargs['rowid'] = unique_key_field
-
-  if not destination['hasHeader']:
-    kwargs['header'] = 'false'
-  else:
-    kwargs['skipLines'] = 1
-
-  if not client.exists(index_name):
-    client.create_index(
-        name=index_name,
-        config_name=destination.get('indexerConfigSet'),
-        fields=fields,
-        unique_key_field=unique_key_field,
-        df=df,
-        shards=destination['indexerNumShards'],
-        replication=destination['indexerReplicationFactor']
-    )
 
 @api_error_handler
 @require_POST

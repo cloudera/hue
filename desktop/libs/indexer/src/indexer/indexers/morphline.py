@@ -205,3 +205,45 @@ class MorphlineIndexer(object):
     morphline = lookup.get_template("morphline_template.conf").render(**properties)
 
     return morphline
+
+
+def _create_solr_collection(user, fs, client, destination, index_name, kwargs):
+  unique_key_field = destination['indexerPrimaryKey'] and destination['indexerPrimaryKey'][0] or None
+  df = destination['indexerDefaultField'] and destination['indexerDefaultField'][0] or None
+
+  indexer = MorphlineIndexer(user, fs)
+  fields = indexer.get_field_list(destination['columns'])
+  skip_fields = [field['name'] for field in fields if not field['keep']]
+
+  kwargs['fieldnames'] = ','.join([field['name'] for field in fields])
+  for field in fields:
+    for operation in field['operations']:
+      if operation['type'] == 'split':
+        field['multiValued'] = True # Solr requires multiValued to be set when splitting
+        kwargs['f.%(name)s.split' % field] = 'true'
+        kwargs['f.%(name)s.separator' % field] = operation['settings']['splitChar'] or ','
+
+  if skip_fields:
+    kwargs['skip'] = ','.join(skip_fields)
+    fields = [field for field in fields if field['name'] not in skip_fields]
+
+  if not unique_key_field:
+    unique_key_field = 'hue_id'
+    fields += [{"name": unique_key_field, "type": "string"}]
+    kwargs['rowid'] = unique_key_field
+
+  if not destination['hasHeader']:
+    kwargs['header'] = 'false'
+  else:
+    kwargs['skipLines'] = 1
+
+  if not client.exists(index_name):
+    client.create_index(
+        name=index_name,
+        config_name=destination.get('indexerConfigSet'),
+        fields=fields,
+        unique_key_field=unique_key_field,
+        df=df,
+        shards=destination['indexerNumShards'],
+        replication=destination['indexerReplicationFactor']
+    )
