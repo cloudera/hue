@@ -79,8 +79,8 @@
   import Ruler from './components/Ruler.vue';
   import { createProcesses } from './libs/VertexProcess';
 
-  import Processor from './libs/processor';
-  import Process from './libs/process';
+  import Processor from './libs/Processor';
+  import Process from './libs/Process';
 
   import './dag-swimlane.scss';
 

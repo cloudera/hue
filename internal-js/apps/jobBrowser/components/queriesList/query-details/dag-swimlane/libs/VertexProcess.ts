@@ -28,7 +28,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
 
-import Process from './process';
+import Process from './Process';
 import { Dag } from '../../../index';
 
 export default class VertexProcess extends Process {
