@@ -56,7 +56,8 @@ class BigQueryClient(Base):
     options['model_type'] = "'%(model_type)s'" % options
 
     if params.get('data'):
-      name = self.create_table_from_text(name=params['model'], data=params['data'])
+      table = self.create_table_from_text(name=params['model'], data=params['data'])
+      name = table['name']
       params['statement'] = 'SELECT * FROM `%(name)s`' % {'name': name}
 
     params['options'] = ',\n'.join(['%s=%s' % (k, v) for k, v in options.items()])
@@ -72,12 +73,15 @@ class BigQueryClient(Base):
         ''' % params
     }
 
-    return _get_notebook_api(self.user, self.connector_id).get_sample_data(**data)
+    _get_notebook_api(self.user, self.connector_id).get_sample_data(**data)
+
+    return self.get_model(name=params['model'])
 
 
   def predict(self, params):
     if params.get('data'):
-      name = self.create_table_from_text(name=params['model'], data=params['data'])
+      table = self.create_table_from_text(name=params['model'], data=params['data'])
+      name = table['name']
       params['statement'] = 'SELECT * FROM `%(name)s`' % {'name': name}
 
     data = {
@@ -137,17 +141,23 @@ class BigQueryClient(Base):
 
     job = client.load_table_from_file(source['file'], table_id, job_config=job_config)
 
+    # [OPTIONS(table_option_list)] or ALTER TABLE [IF EXISTS] [[project_name.]dataset_name.]table_name SET OPTIONS(table_set_options_list)
+    # description="a table that expires in 2025"
+    # labels=[("org_unit", "development")]
+    # expiration_timestamp=TIMESTAMP "2025-01-01 00:00:00 UTC"
+
     job.result()
-    print(job.to_api_repr())
 
     table = client.get_table(table_id)
 
-    return {
-      'num_rows': table.num_rows,
+    response = {
+      'num_rows': job.output_rows,
       'num_cols': len(table.schema),
       'table': table_id,
-      'message': "Loaded {} rows and {} columns to {}".format(table.num_rows, len(table.schema), table_id)
+      'stats': job.to_api_repr()
     }
+    response['message'] = "Loaded %(num_rows)s rows and %(num_cols)s columns to %(table)s" % response
+    return response
 
 
   def create_table_from_text(self, name, data):
@@ -159,9 +169,12 @@ class BigQueryClient(Base):
       'name': '%(name)s_training' % {'name': name}
     }
 
-    self.upload_data(source, destination)
+    stats = self.upload_data(source, destination)
 
-    return destination['name']
+    return {
+      'name': destination['name'],
+      'stats': stats
+    }
 
 
 def _get_notebook_api(user, connector_id, interpreter=None):
