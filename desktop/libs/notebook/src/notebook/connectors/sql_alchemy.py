@@ -105,6 +105,8 @@ def query_error_handler(func):
         raise e
     except AuthenticationRequired:
       raise
+    except QueryExpired:
+      raise
     except Exception as e:
       message = force_unicode(e)
       if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
