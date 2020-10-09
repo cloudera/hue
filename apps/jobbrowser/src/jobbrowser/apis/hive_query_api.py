@@ -140,11 +140,17 @@ class HiveQueryApi(Api):
 
 class HiveQueryClient():
 
+  def _get_all_queries(self):
+    return HiveQuery.objects.using('query').order_by('-start_time')
+
   def _get_queries(self, filters):
-    queries = HiveQuery.objects.using('query').order_by('-id')
+    queries = self._get_all_queries()
     queries = queries.filter(start_time__gte=filters['startTime'], end_time__lte=filters['endTime'])
     if filters['text']:
       queries = queries.filter(query__icontains=filters['text'])
+
+    for facet in filters['facets']:
+      queries = queries.filter(**{facet['field']+'__in': facet['values']})
 
     return queries
 
