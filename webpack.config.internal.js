@@ -17,6 +17,8 @@
 const shared = require('./webpack.config');
 const path = require('path');
 
+console.info('--- Internal webpack config active ---');
+
 const baseDir = path.resolve(__dirname, 'desktop/core/src/desktop/js');
 const internalBaseDir = path.resolve(__dirname, 'internal-js');
 
