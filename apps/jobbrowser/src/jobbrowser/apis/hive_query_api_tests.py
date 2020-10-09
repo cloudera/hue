@@ -51,6 +51,15 @@ class TestHiveQueryApi():
 
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test"))
+    self.filters = {
+      "endTime": 10,
+      "facets": [{"field": "status", "values": ["SUCCESS"]}],
+      "limit": 2,
+      "offset": 0,
+      "sortText": "",
+      "startTime": 1,
+      "text": "select"
+    }
 
     with connection.schema_editor() as schema_editor:
       schema_editor.create_model(HiveQuery)
@@ -64,51 +73,27 @@ class TestHiveQueryApi():
 
 
   def test_search_pagination(self):
-    with patch('jobbrowser.apis.hive_query_api.HiveQueryClient._get_queries') as _get_queries:
-      with patch('jobbrowser.apis.hive_query_api.HiveQueryClient.get_query_count') as get_query_count:
-        query1 = HiveQuery()
-        query1.query_id = 10
-        query1.start_time = 5
-        query1.query = "select * from employee"
-        query1.end_time = 8
-        query1.elapsed_time = 28
-        query1.status = "SUCCESS"
-        query1.user_id = "hive"
-        query1.request_user = "hive"
+    with patch('jobbrowser.apis.hive_query_api.HiveQueryClient._get_all_queries') as _get_all_queries:
 
-        query2 = HiveQuery()
-        query2.query_id = 12
-        query2.start_time = 4
-        query2.query = "select * from employee1"
-        query2.end_time = 6
-        query2.elapsed_time = 28
-        query2.status = "SUCCESS"
-        query2.user_id = "hive"
-        query2.request_user = "hive"
+      HiveQuery.objects.create(query_id='1', start_time=6, end_time=8, query="select * from employee1", status="SUCCESS")
+      HiveQuery.objects.create(query_id='2', start_time=4, end_time=8, query="select * from employee2", status="ERROR")
+      HiveQuery.objects.create(query_id='3', start_time=7, end_time=9, query="select * from employee3)", status="SUCCESS")
+      HiveQuery.objects.create(query_id='4', start_time=2, end_time=9, query="select * from employee4", status="SUCCESS")
+      HiveQuery.objects.create(query_id='5', start_time=8, end_time=9, query="create table xyz2()", status="SUCCESS")
+      HiveQuery.objects.create(query_id='6', start_time=1, end_time=12, query="create table xyz3()", status="SUCCESS")
 
-        query3 = HiveQuery()
-        query3.query_id = 14
-        query3.start_time = 6
-        query3.query = "select * from employee2"
-        query3.end_time = 7
-        query3.elapsed_time = 28
-        query3.status = "FAIL"
-        query3.user_id = "hive"
-        query3.request_user = "hive"
+      _get_all_queries.return_value = HiveQuery.objects.order_by('-start_time')
 
-        get_query_count.return_value = 3
-        _get_queries.return_value = [query1, query2, query3]
-        filters = {"endTime": 10, "facets": [], "limit": 2, "offset": 0, "sortText": "", "startTime": 1, "text": "", "type": "basic"}
-        _data = json.dumps(filters)
-        response = self.client.post("/jobbrowser/api/jobs/queries-hive", content_type='applecation/json', data=_data)
-        data = json.loads(response.content)
-        paginated_query_list = HiveQueryClient().get_queries(filters)
+      _data = json.dumps(self.filters)
+      response = self.client.post("/jobbrowser/api/jobs/queries-hive", content_type='application/json', data=_data)
+      data = json.loads(response.content)
 
-        assert_equal(2, len(paginated_query_list))
-        assert_equal(10, data['queries'][0]['queryId'])
-        assert_equal("SUCCESS", data['queries'][1]['status'])
-        assert_equal(3, data['meta']['size'])
-        assert_equal(2, data['meta']['limit'])
+      assert_equal(2, len(data['queries'])) # pagination
+      assert_equal('3', data['queries'][0]['queryId']) # query id (with order_by)
+      assert_equal("SUCCESS", data['queries'][0]['status']) # facet selection
+      assert_true("select" in data['queries'][0]['query']) # search text
+      assert_equal(3, data['meta']['size']) # total filtered queries count
+      assert_equal(2, data['meta']['limit']) # limit value of filter
 
 
   # TODO
@@ -141,8 +126,7 @@ class TestHiveQueryClient():
       'offset': 0,
       'sortText': "startTime:DESC",
       'startTime': 1601541314116,
-      'text': "select",
-      'type': "basic",
+      'text': "select"
     }
     self.query1 = HiveQuery()
     self.query2 = HiveQuery()
@@ -159,8 +143,8 @@ class TestHiveQueryClient():
       schema_editor.delete_model(HiveQuery)
 
 
-  def test__get_queries(self):
-    HiveQueryClient()._get_queries(self.filters)
+  def test__get_all_queries(self):
+    HiveQueryClient()._get_all_queries()
 
 
   def test_get_query_count(self):
