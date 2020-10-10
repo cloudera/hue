@@ -52,12 +52,12 @@ from notebook.models import make_notebook, MockedDjangoRequest, escape_rows
 from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
-from indexer.indexers.envelope import EnvelopeIndexer
+from indexer.indexers.envelope import EnvelopeIndexer, _envelope_job
 from indexer.indexers.base import get_api
 from indexer.indexers.flink_sql import FlinkIndexer
-from indexer.indexers.morphline import MorphlineIndexer
+from indexer.indexers.morphline import MorphlineIndexer, _create_solr_collection
 from indexer.indexers.rdbms import run_sqoop, _get_api
-from indexer.indexers.sql import SQLIndexer
+from indexer.indexers.sql import SQLIndexer, _create_database
 from indexer.models import _save_pipeline
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 from indexer.indexers.flume import FlumeIndexer
@@ -486,8 +486,6 @@ def index(request):
   Input: pasted data, CSV/json files, Kafka topic
   Output: tables
   '''
-  response = {'status': -1}
-
   source = json.loads(request.POST.get('source', '{}'))
   destination = json.loads(request.POST.get('destination', '{}'))
   options = json.loads(request.POST.get('options', '{}'))
@@ -496,8 +494,7 @@ def index(request):
   api = get_api(request.user, connector_id)
 
   if request.FILES.get('data'):
-    data = request.FILES['data'].read()
-    print(data)
+    source['file'] = request.FILES['data']
 
   result = api.index(source, destination, options)
 
@@ -574,51 +571,6 @@ def _small_indexing(user, fs, client, source, destination, index_name):
   }
 
 
-def _create_database(request, source, destination, start_time):
-  database = destination['name']
-  comment = destination['description']
-
-  use_default_location = destination['useDefaultLocation']
-  external_path = destination['nonDefaultLocation']
-
-  sql = django_mako.render_to_string("gen/create_database_statement.mako", {
-      'database': {
-          'name': database,
-          'comment': comment,
-          'use_default_location': use_default_location,
-          'external_location': external_path,
-          'properties': [],
-      }
-    }
-  )
-
-  editor_type = destination['apiHelperType']
-  on_success_url = reverse(
-      'metastore:show_tables',
-      kwargs={'database': database}) + "?source_type=" + source.get('sourceType', 'hive'
-  )
-
-  notebook = make_notebook(
-      name=_('Creating database %(name)s') % destination,
-      editor_type=editor_type,
-      statement=sql,
-      status='ready',
-      on_success_url=on_success_url,
-      last_executed=start_time,
-      is_task=True
-  )
-  return notebook.execute(request, batch=False)
-
-
-def _create_table(request, source, destination, start_time=-1):
-  notebook = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination, start_time)
-
-  if request.POST.get('show_command'):
-    return {'status': 0, 'commands': notebook.get_str()}
-  else:
-    return notebook.execute(request, batch=False)
-
-
 def _large_indexing(request, file_format, collection_name, query=None, start_time=None, lib_path=None, destination=None):
   indexer = MorphlineIndexer(request.user, request.fs)
 
@@ -672,167 +624,6 @@ def _large_indexing(request, file_format, collection_name, query=None, start_tim
       lib_path=lib_path
   )
 
-
-def _envelope_job(request, file_format, destination, start_time=None, lib_path=None):
-  collection_name = destination['name']
-  indexer = EnvelopeIndexer(request.user, request.fs)
-
-  lib_path = None # Todo optional input field
-  input_path = None
-
-  if file_format['inputFormat'] == 'table':
-    db = dbms.get(request.user)
-    table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
-    input_path = table_metadata.path_location
-  elif file_format['inputFormat'] == 'file':
-    input_path = file_format["path"]
-    properties = {
-      'input_path': input_path,
-      'format': 'csv'
-    }
-  elif file_format['inputFormat'] == 'stream' and file_format['streamSelection'] == 'flume':
-    pass
-  elif file_format['inputFormat'] == 'stream':
-    if file_format['streamSelection'] == 'kafka':
-      manager = ManagerApi()
-      properties = {
-        "brokers": manager.get_kafka_brokers(),
-        "topics": file_format['kafkaSelectedTopics'],
-        "kafkaFieldType": file_format['kafkaFieldType'],
-        "kafkaFieldDelimiter": file_format['kafkaFieldDelimiter'],
-      }
-
-      if file_format.get('kafkaSelectedTopics') == 'NavigatorAuditEvents':
-        schema_fields = MorphlineIndexer.get_kept_field_list(file_format['sampleCols'])
-        properties.update({
-          "kafkaFieldNames": ', '.join([_field['name'] for _field in schema_fields]),
-          "kafkaFieldTypes": ', '.join([_field['type'] for _field in schema_fields])
-        })
-      else:
-        properties.update({
-          "kafkaFieldNames": file_format['kafkaFieldNames'],
-          "kafkaFieldTypes": file_format['kafkaFieldTypes']
-        })
-
-      if True:
-        properties['window'] = ''
-      else: # For "KafkaSQL"
-        properties['window'] = '''
-            window {
-                enabled = true
-                milliseconds = 60000
-            }'''
-  elif file_format['inputFormat'] == 'connector':
-    if file_format['streamSelection'] == 'flume':
-      properties = {
-        'streamSelection': file_format['streamSelection'],
-        'channelSourceHosts': file_format['channelSourceHosts'],
-        'channelSourceSelectedHosts': file_format['channelSourceSelectedHosts'],
-        'channelSourcePath': file_format['channelSourcePath'],
-      }
-    else:
-      # sfdc
-      properties = {
-        'streamSelection': file_format['streamSelection'],
-        'streamUsername': file_format['streamUsername'],
-        'streamPassword': file_format['streamPassword'],
-        'streamToken': file_format['streamToken'],
-        'streamEndpointUrl': file_format['streamEndpointUrl'],
-        'streamObject': file_format['streamObject'],
-      }
-
-  if destination['outputFormat'] == 'table':
-    if destination['isTargetExisting']: # Todo: check if format matches
-      pass
-    else:
-      destination['importData'] = False # Avoid LOAD DATA
-      if destination['tableFormat'] == 'kudu':
-        properties['kafkaFieldNames'] = properties['kafkaFieldNames'].lower() # Kudu names should be all lowercase
-      # Create table
-      if not request.POST.get('show_command'):
-        SQLIndexer(
-            user=request.user,
-            fs=request.fs
-        ).create_table_from_a_file(
-            file_format,
-            destination
-        ).execute(request)
-
-    if destination['tableFormat'] == 'kudu':
-      manager = ManagerApi()
-      properties["output_table"] = "impala::%s" % collection_name
-      properties["kudu_master"] = manager.get_kudu_master()
-    else:
-      properties['output_table'] = collection_name
-  elif destination['outputFormat'] == 'stream':
-    manager = ManagerApi()
-    properties['brokers'] = manager.get_kafka_brokers()
-    properties['topics'] = file_format['kafkaSelectedTopics']
-    properties['kafkaFieldDelimiter'] = file_format['kafkaFieldDelimiter']
-  elif destination['outputFormat'] == 'file':
-    properties['path'] = file_format["path"]
-    if file_format['inputFormat'] == 'stream':
-      properties['format'] = 'csv'
-    else:
-      properties['format'] = file_format['tableFormat'] # or csv
-  elif destination['outputFormat'] == 'index':
-    properties['collectionName'] = collection_name
-    properties['connection'] = SOLR_URL.get()
-
-
-  properties["app_name"] = 'Data Ingest'
-  properties["inputFormat"] = file_format['inputFormat']
-  properties["ouputFormat"] = destination['ouputFormat']
-  properties["streamSelection"] = file_format["streamSelection"]
-
-  configs = indexer.generate_config(properties)
-
-  if request.POST.get('show_command'):
-    return {'status': 0, 'commands': configs['envelope.conf']}
-  else:
-    return indexer.run(request, collection_name, configs, input_path, start_time=start_time, lib_path=lib_path)
-
-
-def _create_solr_collection(user, fs, client, destination, index_name, kwargs):
-  unique_key_field = destination['indexerPrimaryKey'] and destination['indexerPrimaryKey'][0] or None
-  df = destination['indexerDefaultField'] and destination['indexerDefaultField'][0] or None
-
-  indexer = MorphlineIndexer(user, fs)
-  fields = indexer.get_field_list(destination['columns'])
-  skip_fields = [field['name'] for field in fields if not field['keep']]
-
-  kwargs['fieldnames'] = ','.join([field['name'] for field in fields])
-  for field in fields:
-    for operation in field['operations']:
-      if operation['type'] == 'split':
-        field['multiValued'] = True # Solr requires multiValued to be set when splitting
-        kwargs['f.%(name)s.split' % field] = 'true'
-        kwargs['f.%(name)s.separator' % field] = operation['settings']['splitChar'] or ','
-
-  if skip_fields:
-    kwargs['skip'] = ','.join(skip_fields)
-    fields = [field for field in fields if field['name'] not in skip_fields]
-
-  if not unique_key_field:
-    unique_key_field = 'hue_id'
-    fields += [{"name": unique_key_field, "type": "string"}]
-    kwargs['rowid'] = unique_key_field
-
-  if not destination['hasHeader']:
-    kwargs['header'] = 'false'
-  else:
-    kwargs['skipLines'] = 1
-
-  if not client.exists(index_name):
-    client.create_index(
-        name=index_name,
-        config_name=destination.get('indexerConfigSet'),
-        fields=fields,
-        unique_key_field=unique_key_field,
-        df=df,
-        shards=destination['indexerNumShards'],
-        replication=destination['indexerReplicationFactor']
-    )
 
 @api_error_handler
 @require_POST

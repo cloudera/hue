@@ -117,7 +117,7 @@ class TestIndexer(object):
 
   def test_guess_csv_format(self):
     stream = string_io(TestIndexer.simpleCSVString)
-    indexer = MorphlineIndexer("test", solr_client=self.solr_client)
+    indexer = MorphlineIndexer(self.user, solr_client=self.solr_client)
 
     guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
 
@@ -135,7 +135,7 @@ class TestIndexer(object):
         assert_equal(expected[key], actual[key])
 
   def test_guess_format_invalid_csv_format(self):
-    indexer = MorphlineIndexer("test", solr_client=self.solr_client)
+    indexer = MorphlineIndexer(self.user, solr_client=self.solr_client)
     stream = string_io(TestIndexer.simpleCSVString)
 
     guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
@@ -146,7 +146,7 @@ class TestIndexer(object):
     assert_equal(fields, [])
 
     stream.seek(0)
-    guessed_format = indexer.guess_format({'file':  {"stream": stream, "name": "test.csv"}})
+    guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
 
     guessed_format["recordSeparator"] = "invalid separator"
 
@@ -154,7 +154,7 @@ class TestIndexer(object):
     assert_equal(fields, [])
 
     stream.seek(0)
-    guessed_format = indexer.guess_format({'file':  {"stream": stream, "name": "test.csv"}})
+    guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
 
     guessed_format["quoteChar"] = "invalid quoteChar"
 
@@ -162,7 +162,7 @@ class TestIndexer(object):
     assert_equal(fields, [])
 
   def test_generate_csv_morphline(self):
-    indexer = MorphlineIndexer("test", solr_client=self.solr_client)
+    indexer = MorphlineIndexer(self.user, solr_client=self.solr_client)
     morphline = indexer.generate_morphline_config("test_collection", {
         "columns": deepcopy(self.simpleCSVFields),
         "format": self.simpleCSVFormat
@@ -233,7 +233,7 @@ class TestIndexer(object):
       Field("test_field_2", "string").to_dict()
     ]
 
-    translate_dict['settings']['mapping'].append({"key":"key","value":"value"})
+    translate_dict['settings']['mapping'].append({"key": "key", "value": "value"})
 
     self._test_generate_field_operation_morphline(translate_dict)
 
@@ -252,7 +252,7 @@ class TestIndexer(object):
     make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     user = User.objects.get(username="test")
     collection_name = "test_collection"
-    indexer = MorphlineIndexer("test", fs=fs, jt=cluster.jt, solr_client=self.solr_client)
+    indexer = MorphlineIndexer(self.user, fs=fs, jt=cluster.jt, solr_client=self.solr_client)
     input_loc = "/tmp/test.csv"
 
     # upload the test file to hdfs
@@ -264,7 +264,7 @@ class TestIndexer(object):
     # guess the format of the file
     file_type_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
 
-    field_types = indexer.guess_field_types({"file":{"stream": stream, "name": "test.csv"}, "format": file_type_format})
+    field_types = indexer.guess_field_types({"file": {"stream": stream, "name": "test.csv"}, "format": file_type_format})
 
     format_ = field_types.copy()
     format_['format'] = file_type_format
@@ -291,7 +291,7 @@ class TestIndexer(object):
     indexer.run_morphline(MockedRequest(user=user, fs=cluster.fs, jt=cluster.jt), collection_name, morphline, input_loc)
 
   def _test_fixed_type_format_generate_morphline(self, format_):
-    indexer = MorphlineIndexer("test", solr_client=self.solr_client)
+    indexer = MorphlineIndexer(self.user, solr_client=self.solr_client)
     format_instance = format_()
 
     morphline = indexer.generate_morphline_config("test_collection", {
@@ -305,8 +305,8 @@ class TestIndexer(object):
     fields = deepcopy(TestIndexer.simpleCSVFields)
     fields[0]['operations'].append(operation_format)
 
-    indexer = MorphlineIndexer("test", solr_client=self.solr_client)
-    morphline =indexer.generate_morphline_config("test_collection", {
+    indexer = MorphlineIndexer(self.user, solr_client=self.solr_client)
+    morphline = indexer.generate_morphline_config("test_collection", {
         "columns": fields,
         "format": TestIndexer.simpleCSVFormat
       })
