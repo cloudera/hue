@@ -5,10 +5,15 @@ try:
 except ImportError:
     from distutils.core import setup
 
+with open('README.rst') as f:
+    readme = f.read()
+
 setup(
     name='parquet',
-    version='1.1',
+    version='1.3.1',
     description='Python support for Parquet file format',
+    long_description_content_type="text/x-rst",
+    long_description=readme,
     author='Joe Crobak',
     author_email='joecrow@gmail.com',
     url='https://github.com/jcrobak/parquet-python',
@@ -22,20 +27,22 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
     packages=['parquet'],
     install_requires=[
-        'thriftpy>=0.3.6',
+        'thriftpy2',
     ],
     extras_require={
         ':python_version=="2.7"': [
             "backports.csv",
         ],
-        'snappy support': ['python-snappy']
+        'snappy': [
+            'python-snappy',
+        ],
     },
     entry_points={
         'console_scripts': [

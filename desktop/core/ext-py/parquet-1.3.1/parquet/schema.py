@@ -1,26 +1,22 @@
 """Utils for working with the parquet thrift models."""
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 import os
 
-import thriftpy
-
+import thriftpy2 as thriftpy
 
 THRIFT_FILE = os.path.join(os.path.dirname(__file__), "parquet.thrift")
 parquet_thrift = thriftpy.load(THRIFT_FILE, module_name=str("parquet_thrift"))  # pylint: disable=invalid-name
 
 
-class SchemaHelper(object):
+class SchemaHelper:
     """Utility providing convenience methods for schema_elements."""
 
     def __init__(self, schema_elements):
         """Initialize with the specified schema_elements."""
         self.schema_elements = schema_elements
-        self.schema_elements_by_name = dict(
-            [(se.name, se) for se in schema_elements])
+        self.schema_elements_by_name = {se.name: se for se in schema_elements}
         assert len(self.schema_elements) == len(self.schema_elements_by_name)
 
     def schema_element(self, name):

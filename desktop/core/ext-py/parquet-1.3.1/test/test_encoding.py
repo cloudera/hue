@@ -28,9 +28,9 @@ class TestPlain(unittest.TestCase):
     def test_int96(self):
         """Test reading bytes containing int96 data."""
         self.assertEqual(
-            999,
+            [999, 1 << 32 | 1000],
             parquet.encoding.read_plain_int96(
-                io.BytesIO(struct.pack(b"<qi", 0, 999)), 1)[0])
+                io.BytesIO(struct.pack(b"<qiqi", 0, 999, 1, 1000)), 2))
 
     def test_float(self):
         """Test reading bytes containing float data."""
@@ -116,6 +116,13 @@ class TestBitPacked(unittest.TestCase):
         count = 3 << 1
         res = parquet.encoding.read_bitpacked(fo, count, 3, True)
         self.assertEqual(list(range(8)), res)
+
+    def test_width_zero(self):
+        """Test a zero-width item."""
+        fo = io.BytesIO()
+        count = 1 << 1
+        res = parquet.encoding.read_bitpacked(fo, count, 0, True)
+        self.assertEqual([0] * 8, res)
 
 
 class TestBitPackedDeprecated(unittest.TestCase):
