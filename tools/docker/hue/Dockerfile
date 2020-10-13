@@ -71,6 +71,9 @@ RUN ./build/env/bin/pip install \
   threadloop \
   thrift-sasl==0.2.1
 
+# LGPL so removing
+RUN ./build/env/bin/pip uninstall chardet
+
 COPY tools/docker/hue/conf desktop/conf
 COPY tools/docker/hue/startup.sh .
 
