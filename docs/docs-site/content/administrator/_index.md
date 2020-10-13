@@ -8,6 +8,9 @@ pre = "<b>1. </b>"
 
 ### Guide
 
-The following instructions describe how to [install](/administrator/installation/) Hue and [configure it](/administrator/configuration/server/) to point to external services (e.g. Databases, Hadoop, S3, ...) via [connectors](/administrator/configuration/connectors/).
+The following instructions describe how to:
+
+* [Install](/administrator/installation/) the server
+* [Configure](/administrator/configuration/server/) to point to external services (e.g. Databases, Hadoop, S3, ...) via [connectors](/administrator/configuration/connectors/)
 
 Then find more details about [administrating](/administrator/administration/reference/) the service.
