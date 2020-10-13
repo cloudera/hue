@@ -527,6 +527,22 @@ With impersonation:
 4. The UI (and the underlying SQLAlchemy API) cannot distinguish between 'ANY namespace' and 'empty/Default' namespace
 
 
+### Apache Flink
+
+The dialect currently requires the Flink SQL Gateway to submit queries: https://github.com/ververica/flink-sql-gateway/releases. The [tutorial](https://gethue.com/blog/sql-editor-for-apache-flink-sql/) demoes how to set it up.
+
+Then add a Flink interpreter in the Hue configuration:
+
+    [notebook]
+
+    [[interpreters]]
+
+    [[[flink]]]
+    name=Flink
+    interface=flink
+    options='{"url": "http://172.18.0.7:8083"}'
+
+
 ### AWS Redshift
 
 The dialect should be added to the Python system or Hue Python virtual environment:
