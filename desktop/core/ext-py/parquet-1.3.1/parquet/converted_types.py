@@ -6,10 +6,8 @@ The implementations in this class are pure python for the widest compatibility,
 but they're not necessarily the most performant.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 import codecs
 import datetime
@@ -20,7 +18,7 @@ import struct
 import sys
 from decimal import Decimal
 
-import thriftpy
+import thriftpy2 as thriftpy
 
 THRIFT_FILE = os.path.join(os.path.dirname(__file__), "parquet.thrift")
 parquet_thrift = thriftpy.load(THRIFT_FILE, module_name=str("parquet_thrift"))  # pylint: disable=invalid-name
@@ -33,7 +31,7 @@ try:
 except ImportError:
     pass
 
-PY3 = sys.version_info > (3,)
+PY3 = sys.version_info.major > 2
 
 # define bytes->int for non 2, 4, 8 byte ints
 if PY3:
@@ -53,8 +51,8 @@ def _convert_unsigned(data, fmt):
     """Convert data from signed to unsigned in bulk."""
     num = len(data)
     return struct.unpack(
-        b"{0}{0}".format(num, fmt.upper()).encode("utf-8"),
-        struct.pack(b"{0}{0}".format(num, fmt).encode("utf-8"), *data)
+        "{}{}".format(num, fmt.upper()).encode("utf-8"),
+        struct.pack("{}{}".format(num, fmt).encode("utf-8"), *data)
     )
 
 
@@ -66,27 +64,27 @@ def convert_column(data, schemae):
         if schemae.type == parquet_thrift.Type.INT32 or schemae.type == parquet_thrift.Type.INT64:
             return [Decimal(unscaled) * scale_factor for unscaled in data]
         return [Decimal(intbig(unscaled)) * scale_factor for unscaled in data]
-    elif ctype == parquet_thrift.ConvertedType.DATE:
+    if ctype == parquet_thrift.ConvertedType.DATE:
         return [datetime.date.fromordinal(d) for d in data]
-    elif ctype == parquet_thrift.ConvertedType.TIME_MILLIS:
+    if ctype == parquet_thrift.ConvertedType.TIME_MILLIS:
         return [datetime.timedelta(milliseconds=d) for d in data]
-    elif ctype == parquet_thrift.ConvertedType.TIMESTAMP_MILLIS:
+    if ctype == parquet_thrift.ConvertedType.TIMESTAMP_MILLIS:
         return [datetime.datetime.utcfromtimestamp(d / 1000.0) for d in data]
-    elif ctype == parquet_thrift.ConvertedType.UTF8:
-        return list(codecs.iterdecode(data, "utf-8"))
-    elif ctype == parquet_thrift.ConvertedType.UINT_8:
+    if ctype == parquet_thrift.ConvertedType.UTF8:
+        return [codecs.decode(item, "utf-8") for item in data]
+    if ctype == parquet_thrift.ConvertedType.UINT_8:
         return _convert_unsigned(data, 'b')
-    elif ctype == parquet_thrift.ConvertedType.UINT_16:
+    if ctype == parquet_thrift.ConvertedType.UINT_16:
         return _convert_unsigned(data, 'h')
-    elif ctype == parquet_thrift.ConvertedType.UINT_32:
+    if ctype == parquet_thrift.ConvertedType.UINT_32:
         return _convert_unsigned(data, 'i')
-    elif ctype == parquet_thrift.ConvertedType.UINT_64:
+    if ctype == parquet_thrift.ConvertedType.UINT_64:
         return _convert_unsigned(data, 'q')
-    elif ctype == parquet_thrift.ConvertedType.JSON:
+    if ctype == parquet_thrift.ConvertedType.JSON:
         return [json.loads(s) for s in codecs.iterdecode(data, "utf-8")]
-    elif ctype == parquet_thrift.ConvertedType.BSON and bson:
+    if ctype == parquet_thrift.ConvertedType.BSON and bson:
         return [bson.BSON(s).decode() for s in data]
-    else:
-        logger.info("Converted type '%s'' not handled",
-                    parquet_thrift.ConvertedType._VALUES_TO_NAMES[ctype])  # pylint:disable=protected-access
+
+    logger.info("Converted type '%s'' not handled",
+                parquet_thrift.ConvertedType._VALUES_TO_NAMES[ctype])  # pylint:disable=protected-access
     return data

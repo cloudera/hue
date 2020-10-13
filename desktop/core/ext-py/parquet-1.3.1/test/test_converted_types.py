@@ -134,6 +134,19 @@ class TestSBytes(unittest.TestCase):
             'foo👾'
         )
 
+    def test_utf8_empty_string(self):
+        """Test bytes representing utf-8 string with empty strings."""
+        schema = pt.SchemaElement(
+            type=pt.Type.BYTE_ARRAY,
+            name="test",
+            converted_type=pt.ConvertedType.UTF8
+        )
+        data = [b'', b'foo\xf0\x9f\x91\xbe', b'']
+        self.assertEqual(
+            convert_column(data, schema),
+            ['', 'foo👾', '']
+        )
+
     def test_json(self):
         """Test bytes representing json."""
         schema = pt.SchemaElement(

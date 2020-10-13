@@ -13,14 +13,14 @@ import os
 import struct
 import sys
 
-import thriftpy
+import thriftpy2 as thriftpy
 
 THRIFT_FILE = os.path.join(os.path.dirname(__file__), "parquet.thrift")
 parquet_thrift = thriftpy.load(THRIFT_FILE, module_name=str("parquet_thrift"))  # pylint: disable=invalid-name
 
 logger = logging.getLogger("parquet")  # pylint: disable=invalid-name
 
-PY3 = sys.version_info > (3,)
+PY3 = sys.version_info.major > 2
 
 ARRAY_BYTE_STR = u'B' if PY3 else b'B'
 
@@ -38,31 +38,30 @@ def read_plain_int32(file_obj, count):
     length = 4 * count
     data = file_obj.read(length)
     if len(data) != length:
-        raise EOFError("Expected {0} bytes but got {1} bytes".format(length, len(data)))
-    res = struct.unpack(b"<{0}i".format(count).encode("utf-8"), data)
+        raise EOFError("Expected {} bytes but got {} bytes".format(length, len(data)))
+    res = struct.unpack("<{}i".format(count).encode("utf-8"), data)
     return res
 
 
 def read_plain_int64(file_obj, count):
     """Read `count` 64-bit ints using the plain encoding."""
-    return struct.unpack(b"<{0}q".format(count).encode("utf-8"), file_obj.read(8 * count))
+    return struct.unpack("<{}q".format(count).encode("utf-8"), file_obj.read(8 * count))
 
 
 def read_plain_int96(file_obj, count):
     """Read `count` 96-bit ints using the plain encoding."""
-    items = struct.unpack(b"<qi" * count, file_obj.read(12) * count)
-    args = [iter(items)] * 2
-    return [q << 32 | i for (q, i) in zip(*args)]
+    items = struct.unpack(b"<" + b"qi" * count, file_obj.read(12 * count))
+    return [q << 32 | i for (q, i) in zip(items[0::2], items[1::2])]
 
 
 def read_plain_float(file_obj, count):
     """Read `count` 32-bit floats using the plain encoding."""
-    return struct.unpack(b"<{0}f".format(count).encode("utf-8"), file_obj.read(4 * count))
+    return struct.unpack("<{}f".format(count).encode("utf-8"), file_obj.read(4 * count))
 
 
 def read_plain_double(file_obj, count):
     """Read `count` 64-bit float (double) using the plain encoding."""
-    return struct.unpack(b"<{0}d".format(count).encode("utf-8"), file_obj.read(8 * count))
+    return struct.unpack("<{}d".format(count).encode("utf-8"), file_obj.read(8 * count))
 
 
 def read_plain_byte_array(file_obj, count):
@@ -148,6 +147,8 @@ def read_bitpacked(file_obj, header, width, debug_logging):
     if debug_logging:
         logger.debug("Reading a bit-packed run with: %s groups, count %s, bytes %s",
                      num_groups, count, byte_count)
+    if width == 0:
+        return [0 for _ in range(count)]
     raw_bytes = array.array(ARRAY_BYTE_STR, file_obj.read(byte_count)).tolist()
     current_byte = 0
     data = raw_bytes[current_byte]

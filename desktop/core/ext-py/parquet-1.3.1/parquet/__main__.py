@@ -1,9 +1,6 @@
 """parquet - tool for inspecting parquet files."""
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 import argparse
 import logging
@@ -53,12 +50,14 @@ def main(argv=None):
 
     setup_logging(args)
 
+    # pylint: disable=import-outside-toplevel
     import parquet
 
     if args.metadata:
         parquet.dump_metadata(args.file, args.row_group_metadata)
     if not args.no_data:
         parquet.dump(args.file, args)
+
 
 if __name__ == '__main__':
     main()

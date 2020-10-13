@@ -1,8 +1,6 @@
 """parquet - read parquet files."""
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 import gzip
 import io
@@ -11,18 +9,12 @@ import logging
 import os
 import struct
 import sys
+from collections import OrderedDict, defaultdict
 
-from collections import defaultdict
-try:
-  from collections import OrderedDict
-except ImportError:
-  from ordereddict import OrderedDict # Python 2.6
+import thriftpy2 as thriftpy
+from thriftpy2.protocol.compact import TCompactProtocolFactory
 
-import thriftpy
-from thriftpy.protocol.compact import TCompactProtocolFactory
-
-from . import encoding
-from . import schema
+from . import encoding, schema
 from .converted_types import convert_column
 from .thrift_filetransport import TFileTransport
 
@@ -39,7 +31,6 @@ parquet_thrift = thriftpy.load(THRIFT_FILE, module_name="parquet_thrift")  # pyl
 
 logger = logging.getLogger("parquet")  # pylint: disable=invalid-name
 
-
 try:
     import snappy
 except ImportError:
@@ -49,7 +40,6 @@ except ImportError:
 
 class ParquetFormatException(Exception):
     """Generic Exception related to unexpected data format when reading parquet file."""
-    pass
 
 
 def _check_header_magic_bytes(file_obj):
@@ -139,7 +129,7 @@ def dump_metadata(filename, show_row_group_metadata, out=sys.stdout):
     println("  Version: {0}".format(footer.version))
     println("  Num Rows: {0}".format(footer.num_rows))
     println("  k/v metadata: ")
-    if footer.key_value_metadata and len(footer.key_value_metadata) > 0:
+    if footer.key_value_metadata:
         for item in footer.key_value_metadata:
             println("    {0}={1}".format(item.key, item.value))
     else:
@@ -281,12 +271,12 @@ def _read_data(file_obj, fo_encoding, value_count, bit_width):
 
 
 def read_data_page(file_obj, schema_helper, page_header, column_metadata,
-                       dictionary):
-
-
+                   dictionary):
     """Read the data page from the given file-like object based upon the parameters.
+
     Metadata in the the schema_helper, page_header, column_metadata, and (optional) dictionary
     are used for parsing data.
+
     Returns a list of values.
     """
     daph = page_header.data_page_header
@@ -383,13 +373,14 @@ def read_data_page(file_obj, schema_helper, page_header, column_metadata,
                          len(vals), num_nulls)
 
     else:
-        raise ParquetFormatException("Unsupported encoding: %s",
-                                     _get_name(parquet_thrift.Encoding, daph.encoding))
+        raise ParquetFormatException("Unsupported encoding: {}".format(
+            _get_name(parquet_thrift.Encoding, daph.encoding)))
     return vals
 
 
 def _read_dictionary_page(file_obj, schema_helper, page_header, column_metadata):
     """Read a page containing dictionary data.
+
     Consumes data using the plain encoding and returns an array of values.
     """
     raw_bytes = _read_page(file_obj, page_header, column_metadata)
@@ -413,7 +404,7 @@ def DictReader(file_obj, columns=None):  # pylint: disable=invalid-name
     top-level dict and can be referenced with '.' notation (e.g. 'foo' -> 'bar'
     is referenced as 'foo.bar')
 
-    :param fo: the file containing parquet data
+    :param file_obj: the file containing parquet data
     :param columns: the columns to include. If None (default), all columns
                     are included. Nested values are referenced with "." notation
     """
@@ -432,7 +423,7 @@ def reader(file_obj, columns=None):
     This function is a generator returning a list of values for each row
     of data in the parquet file.
 
-    :param fo: the file containing parquet data
+    :param file_obj: the file containing parquet data
     :param columns: the columns to include. If None (default), all columns
                     are included. Nested values are referenced with "." notation
     """
@@ -489,7 +480,7 @@ def reader(file_obj, columns=None):
             yield [res[k][i] for k in keys if res[k]]
 
 
-class JsonWriter(object):  # pylint: disable=too-few-public-methods
+class JsonWriter:  # pylint: disable=too-few-public-methods
     """Utility for dumping rows as JSON objects."""
 
     def __init__(self, out):
@@ -500,7 +491,7 @@ class JsonWriter(object):  # pylint: disable=too-few-public-methods
         """Write a single row."""
         json_text = json.dumps(row)
         if isinstance(json_text, bytes):
-            json_text = json_text.decode('utf-8', 'ignore')
+            json_text = json_text.decode('utf-8')
         self._out.write(json_text)
         self._out.write(u'\n')
 
@@ -524,7 +515,7 @@ def _dump(file_obj, options, out=sys.stdout):
             writer.writeheader()
         if options.limit != -1 and total_count >= options.limit:
             return
-        row_unicode = dict((k, (v.decode("utf-8", "ignore") if type(v) is bytes else v)) for k, v in row.items())
+        row_unicode = {k: v.decode("utf-8") if isinstance(v, bytes) else v for k, v in row.items()}
         writer.writerow(row_unicode)
         total_count += 1
 
