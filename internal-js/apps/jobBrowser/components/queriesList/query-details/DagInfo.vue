@@ -86,7 +86,6 @@
   .info-inline,
   .info-row {
     margin-bottom: 15px;
-    margin-left: 10px;
 
     .info-label {
       text-transform: uppercase;

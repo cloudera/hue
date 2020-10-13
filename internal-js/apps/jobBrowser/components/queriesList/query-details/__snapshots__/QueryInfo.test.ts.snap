@@ -1,0 +1,202 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryInfo.vue should render 1`] = `
+<div>
+  <div
+    class="query-info-row query-info-box"
+  >
+    <div
+      class="query-info-label"
+    >
+      Query
+    </div>
+     
+    <div
+      class="query-info-query"
+    >
+      <sql-text-stub
+        enableoverflow="true"
+        format="true"
+      />
+    </div>
+  </div>
+   
+  <div
+    class="query-info-box"
+  >
+    <div
+      class="query-info-row"
+    >
+      <div
+        class="query-info-label"
+      >
+        Start Time
+      </div>
+       
+      <div
+        class="query-info-value"
+      >
+        <time-ago-stub />
+      </div>
+    </div>
+     
+    <div
+      class="query-info-row"
+    >
+      <div
+        class="query-info-label"
+      >
+        End Time
+      </div>
+       
+      <div
+        class="query-info-value"
+      >
+        <time-ago-stub />
+      </div>
+    </div>
+     
+    <div
+      class="query-info-row"
+    >
+      <div
+        class="query-info-label"
+      >
+        Duration
+      </div>
+       
+      <div
+        class="query-info-value"
+      >
+        <span>
+          -
+        </span>
+      </div>
+    </div>
+     
+    <div
+      class="query-info-row"
+    >
+      <div
+        class="query-info-label"
+      >
+        Tables Read
+      </div>
+       
+      <div
+        class="query-info-value"
+      >
+        <span>
+          -
+        </span>
+      </div>
+    </div>
+     
+    <div
+      class="query-info-row"
+    >
+      <div
+        class="query-info-label"
+      >
+        Tables Written
+      </div>
+       
+      <div
+        class="query-info-value"
+      >
+        <span>
+          -
+        </span>
+      </div>
+    </div>
+     
+    <div
+      class="query-info-row"
+    >
+      <div
+        class="query-info-label"
+      >
+        Application ID
+      </div>
+       
+      <div
+        class="query-info-value"
+      >
+        <span>
+          -
+        </span>
+      </div>
+    </div>
+     
+    <div
+      class="query-info-row"
+    >
+      <div
+        class="query-info-label"
+      >
+        DAG ID
+      </div>
+       
+      <div
+        class="query-info-value"
+      >
+        <span>
+          -
+        </span>
+      </div>
+    </div>
+     
+    <div
+      class="query-info-row"
+    >
+      <div
+        class="query-info-label"
+      >
+        Session ID
+      </div>
+       
+      <div
+        class="query-info-value"
+      >
+        
+      </div>
+    </div>
+     
+    <!---->
+     
+    <div
+      class="query-info-row"
+    >
+      <div
+        class="query-info-label"
+      >
+        Thread Id
+      </div>
+       
+      <div
+        class="query-info-value"
+      >
+        
+      </div>
+    </div>
+     
+    <div
+      class="query-info-row"
+    >
+      <div
+        class="query-info-label"
+      >
+        Queue
+      </div>
+       
+      <div
+        class="query-info-value"
+      >
+        <span>
+          None
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+`;

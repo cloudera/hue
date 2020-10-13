@@ -27,21 +27,6 @@
 
     <div class="query-info-box">
       <div class="query-info-row">
-        <div class="query-info-label">Query ID</div>
-        <div class="query-info-value">{{ query.queryId }}</div>
-      </div>
-
-      <div class="query-info-row">
-        <div class="query-info-label">User</div>
-        <div class="query-info-value">{{ query.requestUser }}</div>
-      </div>
-
-      <div class="query-info-row">
-        <div class="query-info-label">Status</div>
-        <div class="query-info-value">{{ query.status }}</div>
-      </div>
-
-      <div class="query-info-row">
         <div class="query-info-label">Start Time</div>
         <div class="query-info-value">
           <time-ago :value="query.startTime" />

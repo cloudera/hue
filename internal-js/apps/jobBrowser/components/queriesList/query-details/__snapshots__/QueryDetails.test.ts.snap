@@ -17,6 +17,10 @@ exports[`QueryDetails.vue should render 1`] = `
       </hue-button-stub>
     </div>
      
+    <queryinfotop-stub
+      query="[object Object]"
+    />
+     
     <tabs-stub>
       <tab-stub
         title="Query Info"
@@ -50,68 +54,230 @@ exports[`QueryDetails.vue should render 1`] = `
           configs="[object Object]"
         />
       </tab-stub>
-    </tabs-stub>
-  </div>
-   
-  <div
-    class="target detail-panel"
-  >
-    <div
-      class="dag-title"
-    >
-      <div
-        class="dag-label"
-      >
-        Dag
-      </div>
        
-      <div
-        class="dag-name"
-      >
-        dag_1600683331174_0003_2
-      </div>
-    </div>
-     
-    <tabs-stub>
       <tab-stub
         title="DAG Info"
       >
-        <daginfo-stub
-          dag="[object Object]"
-        />
+        <div
+          class="dag-info"
+        >
+          <daginfo-stub
+            dag="[object Object]"
+          />
+        </div>
+        <div
+          class="dag-info"
+        >
+          <daginfo-stub
+            dag="[object Object]"
+          />
+        </div>
       </tab-stub>
        
       <tab-stub
         title="DAG Flow"
       >
-        <daggraph-stub
-          dag="[object Object]"
-        />
+        <div
+          class="dag-details"
+        >
+          <div
+            class="dag-title"
+          >
+            <div
+              class="dag-label"
+            >
+              Dag
+            </div>
+             
+            <div
+              class="dag-name"
+            >
+              dag_1600683331174_0003_2
+            </div>
+          </div>
+           
+          <daggraph-stub
+            dag="[object Object]"
+          />
+        </div>
+        <div
+          class="dag-details"
+        >
+          <div
+            class="dag-title"
+          >
+            <div
+              class="dag-label"
+            >
+              Dag
+            </div>
+             
+            <div
+              class="dag-name"
+            >
+              dag_1600683331174_0003_4
+            </div>
+          </div>
+           
+          <daggraph-stub
+            dag="[object Object]"
+          />
+        </div>
       </tab-stub>
        
       <tab-stub
         title="DAG Swimlane"
       >
-        <dagswimlane-stub
-          consolidate="true"
-          dag="[object Object]"
-        />
+        <div
+          class="dag-details"
+        >
+          <div
+            class="dag-title"
+          >
+            <div
+              class="dag-label"
+            >
+              Dag
+            </div>
+             
+            <div
+              class="dag-name"
+            >
+              dag_1600683331174_0003_2
+            </div>
+          </div>
+           
+          <dagswimlane-stub
+            consolidate="true"
+            dag="[object Object]"
+          />
+        </div>
+        <div
+          class="dag-details"
+        >
+          <div
+            class="dag-title"
+          >
+            <div
+              class="dag-label"
+            >
+              Dag
+            </div>
+             
+            <div
+              class="dag-name"
+            >
+              dag_1600683331174_0003_4
+            </div>
+          </div>
+           
+          <dagswimlane-stub
+            consolidate="true"
+            dag="[object Object]"
+          />
+        </div>
       </tab-stub>
        
       <tab-stub
         title="DAG Counters"
       >
-        <counterstable-stub
-          counters="[object Object]"
-        />
+        <div
+          class="dag-details"
+        >
+          <div
+            class="dag-title"
+          >
+            <div
+              class="dag-label"
+            >
+              Dag
+            </div>
+             
+            <div
+              class="dag-name"
+            >
+              dag_1600683331174_0003_2
+            </div>
+          </div>
+           
+          <counterstable-stub
+            counters="[object Object]"
+          />
+        </div>
+        <div
+          class="dag-details"
+        >
+          <div
+            class="dag-title"
+          >
+            <div
+              class="dag-label"
+            >
+              Dag
+            </div>
+             
+            <div
+              class="dag-name"
+            >
+              dag_1600683331174_0003_4
+            </div>
+          </div>
+           
+          <counterstable-stub
+            counters="[object Object]"
+          />
+        </div>
       </tab-stub>
        
       <tab-stub
         title="DAG Configurations"
       >
-        <configstable-stub
-          configs="[object Object]"
-        />
+        <div
+          class="dag-details"
+        >
+          <div
+            class="dag-title"
+          >
+            <div
+              class="dag-label"
+            >
+              Dag
+            </div>
+             
+            <div
+              class="dag-name"
+            >
+              dag_1600683331174_0003_2
+            </div>
+          </div>
+           
+          <configstable-stub
+            configs="[object Object]"
+          />
+        </div>
+        <div
+          class="dag-details"
+        >
+          <div
+            class="dag-title"
+          >
+            <div
+              class="dag-label"
+            >
+              Dag
+            </div>
+             
+            <div
+              class="dag-name"
+            >
+              dag_1600683331174_0003_4
+            </div>
+          </div>
+           
+          <configstable-stub
+            configs="[object Object]"
+          />
+        </div>
       </tab-stub>
     </tabs-stub>
   </div>

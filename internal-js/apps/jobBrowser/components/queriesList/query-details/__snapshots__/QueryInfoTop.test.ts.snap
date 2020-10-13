@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryInfoTop.vue should render 1`] = `
+<div
+  class="query-info-box"
+>
+  <div
+    class="query-info-row"
+  >
+    <div
+      class="query-info-label"
+    >
+      Query ID
+    </div>
+     
+    <div
+      class="query-info-value"
+    >
+      
+    </div>
+  </div>
+   
+  <div
+    class="query-info-row"
+  >
+    <div
+      class="query-info-label"
+    >
+      User
+    </div>
+     
+    <div
+      class="query-info-value"
+    >
+      
+    </div>
+  </div>
+   
+  <div
+    class="query-info-row"
+  >
+    <div
+      class="query-info-label"
+    >
+      Status
+    </div>
+     
+    <div
+      class="query-info-value"
+    >
+      <statusindicator-stub
+        value="unknown"
+      />
+      
+      
+    
+    </div>
+  </div>
+</div>
+`;

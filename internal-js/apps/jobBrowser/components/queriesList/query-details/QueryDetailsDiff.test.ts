@@ -17,13 +17,14 @@
 import { shallowMount } from '@vue/test-utils';
 import QueryDetailsDiff from './QueryDetailsDiff.vue';
 
-import queryMockResponse from '../test/api/hive_query_get_response_3.json';
+import queryMockResponseA from '../test/api/hive_query_get_response_2.json';
+import queryMockResponseB from '../test/api/hive_query_get_response_3.json';
 
 describe('QueryDetailsDiff.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(QueryDetailsDiff, {
       propsData: {
-        queries: [queryMockResponse.query, queryMockResponse.query]
+        queries: [queryMockResponseA.query, queryMockResponseB.query]
       },
       provide: {
         showQueries: () => {

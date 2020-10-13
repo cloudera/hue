@@ -30,7 +30,10 @@
         <hue-button @click="downloadLogs">Download</hue-button>
       </div>
 
+      <QueryInfoTop :query="query" />
+
       <tabs>
+        <!-- Query Tabs -->
         <tab title="Query Info">
           <QueryInfo :query="query" />
         </tab>
@@ -43,22 +46,49 @@
         <tab title="Query Config">
           <ConfigsTable :configs="[{ configs: query.details.configuration }]" />
         </tab>
-      </tabs>
-    </div>
 
-    <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="target detail-panel">
-      <div class="dag-title">
-        <div class="dag-label">Dag</div>
-        <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
-      </div>
-      <tabs>
-        <tab title="DAG Info"><DagInfo :dag="dag" /></tab>
-        <tab title="DAG Flow"><DagGraph :dag="dag" /></tab>
-        <tab title="DAG Swimlane"><DagSwimlane :dag="dag" /></tab>
-        <tab title="DAG Counters">
-          <CountersTable :counters="[{ counters: dag.dagDetails.counters }]" />
+        <!-- DAG Tabs -->
+        <tab title="DAG Info">
+          <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-info">
+            <DagInfo :dag="dag" />
+          </div>
         </tab>
-        <tab title="DAG Configurations"><ConfigsTable :configs="[{ configs: dag.config }]" /></tab>
+        <tab title="DAG Flow">
+          <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-details">
+            <div class="dag-title">
+              <div class="dag-label">Dag</div>
+              <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
+            </div>
+            <DagGraph :dag="dag" />
+          </div>
+        </tab>
+        <tab title="DAG Swimlane">
+          <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-details">
+            <div class="dag-title">
+              <div class="dag-label">Dag</div>
+              <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
+            </div>
+            <DagSwimlane :dag="dag" />
+          </div>
+        </tab>
+        <tab title="DAG Counters">
+          <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-details">
+            <div class="dag-title">
+              <div class="dag-label">Dag</div>
+              <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
+            </div>
+            <CountersTable :counters="[{ counters: dag.dagDetails.counters }]" />
+          </div>
+        </tab>
+        <tab title="DAG Configurations">
+          <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-details">
+            <div class="dag-title">
+              <div class="dag-label">Dag</div>
+              <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
+            </div>
+            <ConfigsTable :configs="[{ configs: dag.config }]" />
+          </div>
+        </tab>
       </tabs>
     </div>
   </div>
@@ -75,6 +105,7 @@
   import HiveTimeline from './hive-timeline/HiveTimeline.vue';
   import ConfigsTable from './configs-table/ConfigsTable.vue';
   import QueryInfo from './QueryInfo.vue';
+  import QueryInfoTop from './QueryInfoTop.vue';
   import VisualExplain from './visual-explain/VisualExplain.vue';
 
   import CountersTable from './counters-table/CountersTable.vue';
@@ -93,6 +124,7 @@
       ConfigsTable,
       VisualExplain,
       QueryInfo,
+      QueryInfoTop,
 
       CountersTable,
       DagInfo,
@@ -128,15 +160,22 @@
     color: #0a78a3;
   }
 
-  .detail-panel {
-    border-top: 1px dotted $fluid-gray-300;
+  .dag-details,
+  .dag-info {
+    padding: 10px;
+  }
+
+  .dag-info {
+    border-top: 1px solid $fluid-gray-200;
+
+    &:first-child {
+      border: none;
+    }
   }
 
   .dag-title {
-    margin: 10px 0 -10px 0;
-
     font-size: 1.1em;
-    padding-left: 10px;
+    margin-bottom: 10px;
 
     .dag-label {
       text-transform: uppercase;
@@ -148,6 +187,7 @@
 
     .dag-name {
       color: $fluid-gray-700;
+      font-size: 14px;
     }
   }
 </style>
