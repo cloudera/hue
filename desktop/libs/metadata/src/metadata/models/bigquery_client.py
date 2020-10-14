@@ -106,15 +106,7 @@ class BigQueryClient(Base):
 
 
   def get_model(self, name):
-    credentials_json = json.loads(
-      [setting['value'] for setting in self.connector['settings'] if setting['name'] == 'credentials_json'][0]
-    )
-    credentials = service_account.Credentials.from_service_account_info(credentials_json)
-
-    client = bigquery.Client(
-        project =credentials_json['project_id'],
-        credentials=credentials
-    )
+    client = self._get_client()
 
     # https://cloud.google.com/bigquery/docs/reference/rest/v2/models
     model = client.get_model(name)
@@ -123,15 +115,7 @@ class BigQueryClient(Base):
 
 
   def upload_data(self, source, destination):
-    credentials_json = json.loads(
-      [setting['value'] for setting in self.connector['settings'] if setting['name'] == 'credentials_json'][0]
-    )
-    credentials = service_account.Credentials.from_service_account_info(credentials_json)
-
-    client = bigquery.Client(
-        project=credentials_json['project_id'],
-        credentials=credentials
-    )
+    client = self._get_client()
 
     table_id = destination['name']
 
@@ -175,6 +159,18 @@ class BigQueryClient(Base):
       'name': destination['name'],
       'stats': stats
     }
+
+
+  def _get_client(self):
+    credentials_json = json.loads(
+      [setting['value'] for setting in self.connector['settings'] if setting['name'] == 'credentials_json'][0]
+    )
+    credentials = service_account.Credentials.from_service_account_info(credentials_json)
+
+    return bigquery.Client(
+        project=credentials_json['project_id'],
+        credentials=credentials
+    )
 
 
 def _get_notebook_api(user, connector_id, interpreter=None):
