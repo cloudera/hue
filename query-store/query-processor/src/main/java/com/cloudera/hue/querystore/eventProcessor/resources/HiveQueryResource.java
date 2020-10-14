@@ -44,14 +44,25 @@ public class HiveQueryResource {
   private final DagInfoService dagInfoService;
   private final HiveQueryExtendedInfoRepository queryDetailsService;
   private final VertexInfoRepository vertexInfoService;
+  private final TaskAttemptInfoService taskAttemptInfoService;
+
+
+  private final YarnConfiguration yarnConfiguration;
+
+  private static final String LOG_EXT = ".log";
 
   @Inject
   public HiveQueryResource(HiveQueryBasicInfoRepository hiveQueryRepo, DagInfoService dagInfoService,
-                           HiveQueryExtendedInfoRepository queryDetailsService, VertexInfoRepository vertexInfoService) {
+                           HiveQueryExtendedInfoRepository queryDetailsService, VertexInfoRepository vertexInfoService,
+                           TaskAttemptInfoService taskAttemptInfoService,
+                           YarnConfiguration yarnConfiguration) {
     this.hiveQueryRepo = hiveQueryRepo;
     this.dagInfoService = dagInfoService;
     this.queryDetailsService = queryDetailsService;
     this.vertexInfoService = vertexInfoService;
+    this.taskAttemptInfoService = taskAttemptInfoService;
+
+    this.yarnConfiguration = yarnConfiguration;
   }
 
   private boolean userCheck(HiveQueryBasicInfo hiveQuery, SecurityContext securityContext) {
@@ -152,6 +163,52 @@ public class HiveQueryResource {
       Collection<VertexInfo> vertices = vertexInfoService.findAllByDagId(dagId);
       response.put("vertices", vertices);
     }
+    return Response.ok(response).build();
+  }
+
+  /**
+   * Gets task attempts
+ * @throws IOException
+ * @throws URISyntaxException
+   */
+  @GET
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("/task-attempts")
+  public Response getTaskAttemptsUnderVertex(@QueryParam("vertexId") String vertexId,
+                                             @QueryParam("status") String status,
+                                             @QueryParam("sort") String sort,
+                                             @QueryParam("limit") int limit,
+                                             @Context SecurityContext securityContext)
+                                                 throws IOException, URISyntaxException {
+    if (StringUtils.isEmpty(vertexId)) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("Query parameter 'vertexId' is required.").build();
+    }
+
+    if (limit == 0) {
+      limit = 20;
+    }
+
+    Map<String, Object> response = new HashMap<>();
+    Collection<HashMap<String, String>> taskAttempts = taskAttemptInfoService.getAttempts(vertexId, status, sort, limit);
+
+    for (HashMap<String, String> taskAttempt : taskAttempts) {
+      String logUrl = taskAttempt.get("inProgressLogsURL");
+      String taskAttemptId = taskAttempt.get("taskAttemptId");
+
+      if (!StringUtils.isEmpty(logUrl) && !logUrl.contains("://")) {
+        String yarnHTTPPolicy = yarnConfiguration.get(YarnConfiguration.YARN_HTTP_POLICY_KEY,
+            YarnConfiguration.YARN_HTTP_POLICY_DEFAULT);
+        String protocol = Policy.HTTPS_ONLY == Policy.fromString(yarnHTTPPolicy) ? "https" : "http";
+        logUrl = String.format("%s://%s/syslog_%s/?start=0&start.time=0", protocol, logUrl, taskAttemptId);
+      }
+
+      String fileName = taskAttemptId + LOG_EXT;
+      taskAttempt.put("inProgressLogsURL", HTTPProxyResource.constructProxyPath(fileName, logUrl, securityContext));
+    }
+
+    response.put("taskAttempts", taskAttempts);
+    response.put("taskAttemptsCount", taskAttempts.size());
     return Response.ok(response).build();
   }
 }
