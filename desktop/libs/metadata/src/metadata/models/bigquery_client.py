@@ -41,13 +41,13 @@ class BigQueryClient(Base):
 
 
   def list_models(self, database):
-    params = {
-      'snippet': {},
-      'database': database,
-      'operation': 'models'
-    }
+    client = self._get_client()
 
-    return _get_notebook_api(self.user, self.connector_id).autocomplete(**params)
+    # Missing columns and more until https://github.com/googleapis/python-bigquery/issues/324
+    return [
+      model._properties
+      for model in client.list_models(dataset=database)
+    ]
 
 
   def train(self, params):
