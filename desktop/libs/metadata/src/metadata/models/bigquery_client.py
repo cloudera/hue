@@ -53,6 +53,8 @@ class BigQueryClient(Base):
   def train(self, params):
     options = json.loads(params.get('options', '{}'))
 
+    options['model_type'] = "'%(model_type)s'" % options
+
     if params.get('data'):
       name = self.create_table_from_text(name=params['model'], data=params['data'])
       params['statement'] = 'SELECT * FROM `%(name)s`' % {'name': name}
