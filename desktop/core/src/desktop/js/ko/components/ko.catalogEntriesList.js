@@ -160,7 +160,93 @@ const TEMPLATE = `
     </table>
     <!-- /ko -->
 
-    <!-- ko if: !loading() && (catalogEntry().isTableOrView() || catalogEntry().isComplex()) -->
+    <!-- ko if: !loading() && catalogEntry().isModel() -->
+      ${I18n('Labels')}
+      <table class="table table-condensed table-nowrap">
+      <thead>
+      <tr>
+        <!-- ko template: 'entries-table-shared-headers' --><!-- /ko -->
+        <th>${I18n('Columns')} (<span data-bind="text: filteredEntries().length"></span>)</th>
+        <th>${I18n('Type')}</th>
+        <th with="25%">${I18n(
+          'Description'
+        )} <!-- ko if: loadingNav --><i class="fa fa-spinner fa-spin"></i><!-- /ko --></th>
+      </tr>
+      </thead>
+      <!-- ko if: filteredEntries().length -->
+      <tbody data-bind="foreach: filteredEntries">
+      <tr data-bind="click: onRowClick">
+        <!-- ko template: 'entries-table-shared-columns' --><!-- /ko -->
+        <td class="name-column" data-bind="attr: { 'title': catalogEntry().name + ' - ${I18n(
+          'Click for more details'
+        )}' }">
+          <a href="javascript: void(0);" data-bind="click: onClick">
+            <span data-bind="text: catalogEntry().name"></span>
+            <!-- ko if: isKey -->
+              <!-- ko component: { name: '${ ASSIST_KEY_COMPONENT }', params: { entry: catalogEntry } } --><!-- /ko -->
+            <!-- /ko -->
+            <!-- ko if: popularity && popularity() >= 5 -->
+            &nbsp;<i data-bind="tooltip: { title: '${I18n(
+              'Popularity'
+            )}: ' + popularity() + '%' }" class="fa fa-star-o"></i>
+            <!-- /ko -->
+          </a>
+        </td>
+        <td class="type-column" data-bind="text: catalogEntry().getType(), attr: { 'title': catalogEntry().getRawType() }"></td>
+        <!-- ko template: 'entries-table-td-description' --><!-- /ko -->
+      </tr>
+      </tbody>
+      <!-- /ko -->
+
+      <!-- ko if: filteredEntries().length === 0 -->
+      <!-- ko template: { name: 'entries-table-tbody-no-entries', data: { colCount: 4, hasErrors: hasErrors } } --><!-- /ko -->
+      <!-- /ko -->
+      </table>
+
+      ${I18n('Features')}
+      <table class="table table-condensed table-nowrap">
+      <thead>
+      <tr>
+        <!-- ko template: 'entries-table-shared-headers' --><!-- /ko -->
+        <th>${I18n('Columns')} (<span data-bind="text: filteredEntries().length"></span>)</th>
+        <th>${I18n('Type')}</th>
+        <th with="25%">${I18n(
+          'Description'
+        )} <!-- ko if: loadingNav --><i class="fa fa-spinner fa-spin"></i><!-- /ko --></th>
+      </tr>
+      </thead>
+      <!-- ko if: filteredEntries().length -->
+      <tbody data-bind="foreach: filteredEntries">
+      <tr data-bind="click: onRowClick">
+        <!-- ko template: 'entries-table-shared-columns' --><!-- /ko -->
+        <td class="name-column" data-bind="attr: { 'title': catalogEntry().name + ' - ${I18n(
+          'Click for more details'
+        )}' }">
+          <a href="javascript: void(0);" data-bind="click: onClick">
+            <span data-bind="text: catalogEntry().name"></span>
+            <!-- ko if: isKey -->
+              <!-- ko component: { name: '${ ASSIST_KEY_COMPONENT }', params: { entry: catalogEntry } } --><!-- /ko -->
+            <!-- /ko -->
+            <!-- ko if: popularity && popularity() >= 5 -->
+            &nbsp;<i data-bind="tooltip: { title: '${I18n(
+              'Popularity'
+            )}: ' + popularity() + '%' }" class="fa fa-star-o"></i>
+            <!-- /ko -->
+          </a>
+        </td>
+        <td class="type-column" data-bind="text: catalogEntry().getType(), attr: { 'title': catalogEntry().getRawType() }"></td>
+        <!-- ko template: 'entries-table-td-description' --><!-- /ko -->
+      </tr>
+      </tbody>
+      <!-- /ko -->
+
+      <!-- ko if: filteredEntries().length === 0 -->
+      <!-- ko template: { name: 'entries-table-tbody-no-entries', data: { colCount: 4, hasErrors: hasErrors } } --><!-- /ko -->
+      <!-- /ko -->
+      </table>
+    <!-- /ko -->
+
+    <!-- ko if: !loading() && !catalogEntry().isModel() && (catalogEntry().isTableOrView() || catalogEntry().isComplex()) -->
     <table class="table table-condensed table-nowrap">
       <thead>
       <tr>
@@ -200,11 +286,13 @@ const TEMPLATE = `
         </td>
         <td class="type-column" data-bind="text: catalogEntry().getType(), attr: { 'title': catalogEntry().getRawType() }"></td>
         <!-- ko template: 'entries-table-td-description' --><!-- /ko -->
+
         <td class="sample-column" data-bind="html: firstSample, attr: { 'title': hueUtils.html2text(firstSample()) }"></td>
         <td class="sample-column" data-bind="html: secondSample, attr: { 'title': hueUtils.html2text(secondSample()) }"></td>
       </tr>
       </tbody>
       <!-- /ko -->
+
       <!-- ko if: filteredEntries().length === 0 -->
       <!-- ko template: { name: 'entries-table-tbody-no-entries', data: { colCount: 5, hasErrors: hasErrors } } --><!-- /ko -->
       <!-- /ko -->

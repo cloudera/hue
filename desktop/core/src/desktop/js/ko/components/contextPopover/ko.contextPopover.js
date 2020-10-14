@@ -322,9 +322,9 @@ const SUPPORT_TEMPLATES = `
           <!-- /ko -->
 
           <!-- ko ifnot: $parent.commentExpanded -->
-              <!-- ko if: window.HAS_CATALOG && !isTemporary && (getDialect() === 'hive' || getDialect() === 'impala') -->
-              <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, overflowEllipsis: true } }"></div>
-              <!-- /ko -->
+            <!-- ko if: window.HAS_CATALOG && !isTemporary && (getDialect() === 'hive' || getDialect() === 'impala') -->
+            <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, overflowEllipsis: true } }"></div>
+            <!-- /ko -->
 
             <!-- ko if: isView() && $parent.viewSql() -->
             <a href="javascript:void(0);" style="text-align: right; margin-bottom: 5px;" data-bind="toggle: $parent.viewSqlVisible, text: $parent.viewSqlVisible() ? '${I18n(
