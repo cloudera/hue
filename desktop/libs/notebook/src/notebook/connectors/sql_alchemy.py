@@ -526,8 +526,7 @@ class Assist(object):
     if operation == 'hello':
       statement = "SELECT 'Hello World!'"
     elif operation == 'model':
-      # WIP --> model feature info instead
-      statement = "SELECT 'Hello World!' as is_male, 'Hello World!' as gestation_weeks, 'Hello World!' as mother_age, 'Hello World!' as mother_race"
+      return [], []
     elif operation is not None and operation != 'default':
       statement = "SELECT * FROM (%s) LIMIT 1000" % operation if operation.strip().lower().startswith('select') else operation
     else:
