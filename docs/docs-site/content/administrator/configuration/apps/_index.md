@@ -1,5 +1,5 @@
 ---
-title: "Apps"
+title: "Editor"
 date: 2019-03-13T18:28:09-07:00
 draft: false
 weight: 3
@@ -33,7 +33,7 @@ The editor supports some global settings.
 
 ### Downloads
 
-Download and export options with limited scalability can be limited in the number of rows or bytes transferred using the following options respectively in your hue.ini:
+Download and export options with limited scalability by restricting the number of rows or bytes transferred using the following properties:
 
         [beeswax]
         # A limit to the number of rows that can be downloaded from a query before it is truncated.
