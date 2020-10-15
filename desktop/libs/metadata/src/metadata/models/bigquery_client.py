@@ -19,6 +19,7 @@
 import io
 import json
 import logging
+import textwrap
 
 from django.utils.translation import ugettext as _
 
@@ -37,16 +38,16 @@ class BigQueryClient(Base):
 
   def __init__(self, user, connector_id, connector):
     super(BigQueryClient, self).__init__(user, connector_id)
+
     self.connector = connector
+    self.client = self._get_client()
 
 
   def list_models(self, database):
-    client = self._get_client()
-
     # Missing columns and more until https://github.com/googleapis/python-bigquery/issues/324
     return [
       model._properties
-      for model in client.list_models(dataset=database)
+      for model in self.client.list_models(dataset=database)
     ]
 
 
@@ -56,21 +57,28 @@ class BigQueryClient(Base):
     options['model_type'] = "'%(model_type)s'" % options
 
     if params.get('data'):
-      table = self.create_table_from_text(name=params['model'], data=params['data'])
-      name = table['name']
-      params['statement'] = 'SELECT * FROM `%(name)s`' % {'name': name}
+      table_name = '%(model)s_training' % params
+      # params['data']['name'] = table_name
+      table = self.create_table_from_text(
+        name=table_name,
+        data=params['data'],
+        recreate=True
+      )
+      params['statement'] = 'SELECT * FROM `%(name)s`' % {'name': table_name}
 
     params['options'] = ',\n'.join(['%s=%s' % (k, v) for k, v in options.items()])
     data = {
       'snippet': {},
-      'operation': '''
-          CREATE OR REPLACE MODEL `%(model)s`
-          OPTIONS (
-            %(options)s
-          )
-          AS
-          %(statement)s
-        ''' % params
+      'operation':
+        textwrap.dedent('''
+            CREATE OR REPLACE MODEL `%(model)s`
+            OPTIONS (
+              %(options)s
+            )
+            AS
+            %(statement)s
+          ''' % params
+        )
     }
 
     _get_notebook_api(self.user, self.connector_id).get_sample_data(**data)
@@ -80,20 +88,28 @@ class BigQueryClient(Base):
 
   def predict(self, params):
     if params.get('data'):
-      table = self.create_table_from_text(name=params['model'], data=params['data'])
-      name = table['name']
-      params['statement'] = 'SELECT * FROM `%(name)s`' % {'name': name}
+      table_name = '%(model)s_predict' % params
+      # params['data']['name'] = table_name
+      table = self.create_table_from_text(
+        name=table_name,
+        data=params['data'],
+        recreate=True
+      )
+      params['statement'] = 'SELECT * FROM `%(name)s`' % {'name': table_name}
 
     data = {
       'snippet': {},
-      'operation': '''
-          SELECT * FROM ML.PREDICT(
-            MODEL `%(model)s`, (
-              %(statement)s
+      'operation':
+        textwrap.dedent('''
+            SELECT * FROM ML.PREDICT(
+              MODEL `%(model)s`, (
+                %(statement)s
+              )
             )
-          )
-        ''' % params
+          ''' % params
+        )
     }
+
     return _get_notebook_api(self.user, self.connector_id).get_sample_data(**data)
 
 
@@ -106,52 +122,47 @@ class BigQueryClient(Base):
 
 
   def get_model(self, name):
-    client = self._get_client()
-
-    # https://cloud.google.com/bigquery/docs/reference/rest/v2/models
-    model = client.get_model(name)
+    model = self.client.get_model(name)
 
     return model._properties
 
 
   def upload_data(self, source, destination):
-    client = self._get_client()
-
-    table_id = destination['name']
+    table_name = destination['name']
 
     job_config = bigquery.LoadJobConfig(
-        source_format=bigquery.SourceFormat.CSV, skip_leading_rows=1, autodetect=True,
+      source_format=bigquery.SourceFormat.CSV,
+      skip_leading_rows=1,
+      autodetect=True
     )
 
-    job = client.load_table_from_file(source['file'], table_id, job_config=job_config)
-
-    # [OPTIONS(table_option_list)] or ALTER TABLE [IF EXISTS] [[project_name.]dataset_name.]table_name SET OPTIONS(table_set_options_list)
-    # description="a table that expires in 2025"
-    # labels=[("org_unit", "development")]
-    # expiration_timestamp=TIMESTAMP "2025-01-01 00:00:00 UTC"
+    job = self.client.load_table_from_file(source['file'], table_name, job_config=job_config)
 
     job.result()
 
-    table = client.get_table(table_id)
+    table = self.client.get_table(table_name)
 
     response = {
       'num_rows': job.output_rows,
       'num_cols': len(table.schema),
-      'table': table_id,
+      'table': table_name,
       'stats': job.to_api_repr()
     }
     response['message'] = "Loaded %(num_rows)s rows and %(num_cols)s columns to %(table)s" % response
+
     return response
 
 
-  def create_table_from_text(self, name, data):
+  def create_table_from_text(self, name, data, recreate=False):
     source = {
       'file': io.StringIO(data)
     }
-    # Make it tmp?
     destination = {
-      'name': '%(name)s_training' % {'name': name}
+      'name': name
     }
+
+    if recreate:
+      self.client.delete_table(name, not_found_ok=True)
 
     stats = self.upload_data(source, destination)
 
@@ -162,14 +173,15 @@ class BigQueryClient(Base):
 
 
   def _get_client(self):
+    # https://cloud.google.com/bigquery/docs/reference/rest/v2/
     credentials_json = json.loads(
       [setting['value'] for setting in self.connector['settings'] if setting['name'] == 'credentials_json'][0]
     )
     credentials = service_account.Credentials.from_service_account_info(credentials_json)
 
     return bigquery.Client(
-        project=credentials_json['project_id'],
-        credentials=credentials
+      project=credentials_json['project_id'],
+      credentials=credentials
     )
 
 
