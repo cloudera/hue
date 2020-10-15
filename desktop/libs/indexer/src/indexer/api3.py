@@ -57,7 +57,7 @@ from indexer.indexers.base import get_api
 from indexer.indexers.flink_sql import FlinkIndexer
 from indexer.indexers.morphline import MorphlineIndexer, _create_solr_collection
 from indexer.indexers.rdbms import run_sqoop, _get_api
-from indexer.indexers.sql import SQLIndexer, _create_database
+from indexer.indexers.sql import SQLIndexer, _create_database, _create_table
 from indexer.models import _save_pipeline
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 from indexer.indexers.flume import FlumeIndexer
