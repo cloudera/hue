@@ -293,6 +293,10 @@ Load the documents:
     ./build/env/bin/hue loaddata data.json
 
 
+### Large downloads
+
+Download and export options with limited scalability unless using the [Task Server](/administrator/administration/reference/#task-server) is enabled. Restrict the number of rows or bytes transferred using the [following options](/administrator/configuration/apps/#downloads) respectively in your hue.ini.
+
 ### Slow because too documents
 
 When the database has too many entries, it will cause performance issue. The config check will help superuser to find this issue. Login as superuser and go to “Hue Administration”, this sample screenshot will be displayed in the quick start wizard when the tables have too many entries.
