@@ -57,6 +57,8 @@ class Base():
 
   def get_model(self, model): pass
 
+  def export_model(self, model, params): pass
+
 
 class ModelsApiException(Exception):
   def __init__(self, message=None):

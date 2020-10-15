@@ -124,3 +124,19 @@ def get_model(request, model):
   data = api.get_model(model)
 
   return JsonResponse({'model': data})
+
+
+@require_POST
+@error_handler
+def export_model(request, model):
+  response = {'status': -1}
+
+  connector_id = request.POST.get('connector')
+  params = request.POST.copy()
+  params['model'] = model
+
+  api = get_api(request.user, connector_id)
+
+  data = api.export_model(model, params)
+
+  return JsonResponse({'model': data})
