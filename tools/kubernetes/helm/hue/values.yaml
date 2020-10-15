@@ -66,3 +66,6 @@ aws:
 
 ## Pod Annotations
 # podAnnotations: {}
+
+## Pod Labels
+# podLabels: {}
