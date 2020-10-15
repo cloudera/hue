@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const fs = require('fs');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const {
   BUNDLES,
@@ -21,7 +22,7 @@ const {
   splitChunksName
 } = require('./desktop/core/src/desktop/js/webpack/configUtils');
 
-module.exports = {
+const config = {
   devtool: false,
   entry: {
     hue: ['./desktop/core/src/desktop/js/hue.js'],
@@ -92,3 +93,13 @@ module.exports = {
     }
   }
 };
+
+// To customize build configurations
+const EXTEND_CONFIG_FILE = './webpack.config.extend.js';
+if (fs.existsSync(EXTEND_CONFIG_FILE)) {
+  const endedConfig = require(EXTEND_CONFIG_FILE);
+  endedConfig(config);
+  console.info('Webpack extended!');
+}
+
+module.exports = config;
