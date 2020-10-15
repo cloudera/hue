@@ -503,14 +503,16 @@ Adding/updating a comment with the dummy backend:
 
 
 
-# Python
+# Programming
 
 Here is some overview about using the Python commands an shell and some examples below:
 
 * [Hue API: Execute some builtin or shell commands](http://gethue.com/hue-api-execute-some-builtin-commands/).
 * [How to manage the Hue database with the shell](http://gethue.com/how-to-manage-the-hue-database-with-the-shell/).
 
-## Making a user admin
+## Python
+
+### Making a user admin
 
 Via the Hue shell:
 
@@ -526,7 +528,7 @@ Then type something similar to:
     a.set_password('my_secret')
     a.save()
 
-## Changing user password
+### Changing user password
 
 In the Hue shell:
 
@@ -537,7 +539,7 @@ In the Hue shell:
     user.save()
 
 
-## Counting user documents
+### Counting user documents
 
 On the command line:
 
