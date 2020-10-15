@@ -20,6 +20,7 @@ import io
 import json
 import logging
 import textwrap
+import uuid
 
 from django.utils.translation import ugettext as _
 
@@ -125,6 +126,20 @@ class BigQueryClient(Base):
     model = self.client.get_model(name)
 
     return model._properties
+
+
+  def export_model(self, model, params):
+
+    job = bigquery.ExtractJob(
+      job_id='download_model_%(uuid)s' % {'uuid': uuid.uuid4()},
+      source=self.client.get_model(model),
+      destination_uris=[params['destination']],
+      client=self.client
+    )
+
+    job.result()
+
+    return job.to_api_repr()
 
 
   def upload_data(self, source, destination):
