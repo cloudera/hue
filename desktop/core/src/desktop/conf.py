@@ -2309,6 +2309,10 @@ GC_ACCOUNTS = UnspecifiedConfigSection(
   )
 )
 
+def is_cm_managed():
+  return 'cloudera-scm-agent' in os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf")))
+
+
 def is_gs_enabled():
   from desktop.lib.idbroker import conf as conf_idbroker # Circular dependencies  desktop.conf -> idbroker.conf -> desktop.conf
   return ('default' in list(GC_ACCOUNTS.keys()) and GC_ACCOUNTS['default'].JSON_CREDENTIALS.get()) or conf_idbroker.is_idbroker_enabled('gs')
