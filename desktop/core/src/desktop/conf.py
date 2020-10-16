@@ -286,19 +286,24 @@ SSL_VALIDATE = Config(
 
 SECURE_HSTS_SECONDS = Config(
   key="secure_hsts_seconds",
-  help=_('Strict-Transport-Security: max-age=31536000 This is a HTTP response header, Once a supported browser receives this header that browser will prevent any communications from being sent over HTTP to the specified domain and will instead send all communications over HTTPS.'),
+  help=_('Strict-Transport-Security: max-age=31536000 This is a HTTP response header. '
+  'Once a supported browser receives this header that browser will prevent any communications from being sent over HTTP to the '
+  'specified domain and will instead send all communications over HTTPS.'),
   type=int,
   default=31536000)
 
 SECURE_HSTS_INCLUDE_SUBDOMAINS = Config(
   key="secure_hsts_include_subdomains",
-  help=_('Strict-Transport-Security: This is a HTTP response header, Once a supported browser receives this header that browser will prevent any communications from being sent over HTTP to the specified domain and will instead send all communications over HTTPS.'),
+  help=_('Strict-Transport-Security: This is a HTTP response header. '
+  'Once a supported browser receives this header that browser will prevent any communications from being sent over HTTP to the '
+  'specified domain and will instead send all communications over HTTPS.'),
   type=coerce_bool,
   default=True)
 
 SECURE_CONTENT_TYPE_NOSNIFF = Config(
   key="secure_content_type_nosniff",
-  help=_('X-Content-Type-Options: nosniff This is a HTTP response header feature that helps prevent attacks based on MIME-type confusion.'),
+  help=_('X-Content-Type-Options: nosniff. This is a HTTP response header feature that helps prevent attacks '
+  'based on MIME-type confusion.'),
   type=coerce_bool,
   default=True)
 
@@ -310,7 +315,8 @@ SECURE_BROWSER_XSS_FILTER = Config(
 
 SECURE_CONTENT_SECURITY_POLICY = Config(
   key="secure_content_security_policy",
-  help=_('X-Content-Type-Options: nosniff This is a HTTP response header feature that helps prevent attacks based on MIME-type confusion.'),
+  help=_('X-Content-Type-Options: nosniff. This is a HTTP response header feature that helps prevent attacks '
+    'based on MIME-type confusion.'),
   type=str,
   default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.google-analytics.com *.doubleclick.net data:;"+
           "img-src 'self' *.google-analytics.com *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;"+
@@ -392,7 +398,8 @@ def get_auth_password():
 
 AUTH_PASSWORD = Config(
   key="auth_password",
-  help=_("LDAP/PAM/.. password of the hue user used for authentications. Inactive if empty. For example for LDAP Authentication with HiveServer2/Impala."),
+  help=_("LDAP/PAM/.. password of the hue user used for authentications. Inactive if empty. "
+  "For example for LDAP Authentication with HiveServer2/Impala."),
   private=True,
   dynamic_default=get_auth_password)
 
@@ -448,7 +455,8 @@ REST_RESPONSE_SIZE = Config(
 
 LEAFLET_TILE_LAYER = Config(
   key="leaflet_tile_layer",
-  help=_("Tile layer server URL for the Leaflet map charts. Read more on http://leafletjs.com/reference.html#tilelayer. Make sure you add the tile domain to the img-src section of the 'secure_content_security_policy' configuration parameter as well."),
+  help=_("Tile layer server URL for the Leaflet map charts. Read more on http://leafletjs.com/reference.html#tilelayer. "
+  "Make sure you add the tile domain to the img-src section of the 'secure_content_security_policy' configuration parameter as well."),
   type=str,
   default="http://{s}.tile.osm.org/{z}/{x}/{y}.png")
 
@@ -459,7 +467,8 @@ LEAFLET_TILE_LAYER_ATTRIBUTION = Config(
 
 LEAFLET_MAP_OPTIONS = Config(
   key="leaflet_map_options",
-  help=_("All the map options, accordingly to http://leafletjs.com/reference-0.7.7.html#map-options. To change CRS, just use the name, ie. 'EPSG4326'"),
+  help=_("All the map options, accordingly to http://leafletjs.com/reference-0.7.7.html#map-options. "
+  "To change CRS, just use the name, ie. 'EPSG4326'"),
   type=coerce_json_dict,
   default="{}")
 
@@ -551,25 +560,25 @@ VCS = UnspecifiedConfigSection(
     help="""Configuration options for source version control used to list and
             save files from the editor. Example: Git, SVN""",
     members=dict(
-      REMOTE_URL = Config(
+      REMOTE_URL=Config(
         key="remote_url",
         help=_("Base URL to Interface Remote Server"),
         default='https://github.com/cloudera/hue/tree/master',
         type=coerce_string,
       ),
-      API_URL = Config(
+      API_URL=Config(
         key="api_url",
         help=_("Base URL to Interface API"),
         default='https://api.github.com',
         type=coerce_string,
       ),
-      CLIENT_ID = Config(
+      CLIENT_ID=Config(
         key="client_id",
         help=_("The Client ID of the Interface application."),
         type=coerce_string,
         default=""
       ),
-      CLIENT_SECRET = Config(
+      CLIENT_SECRET=Config(
         key="client_secret",
         help=_("The Client Secret of the Interface application."),
         type=coerce_string,
@@ -626,45 +635,45 @@ SMTP = ConfigSection(
   key='smtp',
   help=_('Configuration options for connecting to an external SMTP server.'),
   members=dict(
-    HOST = Config(
+    HOST=Config(
       key="host",
       help=_("The SMTP server for email notification delivery."),
       type=str,
       default="localhost"
     ),
-    PORT = Config(
+    PORT=Config(
       key="port",
       help=_("The SMTP server port."),
       type=int,
       default=25
     ),
-    USER = Config(
+    USER=Config(
       key="user",
       help=_("The username for the SMTP host."),
       type=str,
       default=""
     ),
-    PASSWORD = Config(
+    PASSWORD=Config(
       key="password",
       help=_("The password for the SMTP user."),
       type=str,
       private=True,
       default="",
     ),
-    PASSWORD_SCRIPT = Config(
+    PASSWORD_SCRIPT=Config(
       key="password_script",
       help=_("Execute this script to produce the SMTP user password. This will be used when the SMTP `password` is not set."),
       type=coerce_password_from_script,
       private=True,
       default="",
     ),
-    USE_TLS = Config(
+    USE_TLS=Config(
       key="tls",
       help=_("Whether to use a TLS (secure) connection when talking to the SMTP server."),
       type=coerce_bool,
       default=False
     ),
-    DEFAULT_FROM= Config(
+    DEFAULT_FROM=Config(
       key="default_from_email",
       help=_("Default email address to use for various automated notifications from Hue."),
       type=str,
@@ -814,13 +823,14 @@ SESSION = ConfigSection(
       type=coerce_bool,
       default=False
     ),
-    CONCURRENT_USER_SESSION_LIMIT = Config(
+    CONCURRENT_USER_SESSION_LIMIT=Config(
       key="concurrent_user_session_limit",
-      help=_("If set, limits the number of concurrent user sessions. 1 represents 1 session per user. Default: 0 (unlimited sessions per user)"),
+      help=_("If set, limits the number of concurrent user sessions. 1 represents 1 session per user. "
+        "Default: 0 (unlimited sessions per user)"),
       type=int,
       default=0,
     ),
-    TRUSTED_ORIGINS = Config(
+    TRUSTED_ORIGINS=Config(
       key="trusted_origins",
       help=_("A list of hosts which are trusted origins for unsafe requests. See django's CSRF_TRUSTED_ORIGINS for more information"),
       type=coerce_csv,
@@ -838,13 +848,13 @@ KNOX = ConfigSection(
       help=_("Comma separated list of Kerberos principal name for Hue. Typically 'knox/hostname.foo.com'."),
       type=coerce_csv,
       default="knox/%s" % socket.getfqdn()),
-    KNOX_PROXYHOSTS = Config(
+    KNOX_PROXYHOSTS=Config(
       key='knox_proxyhosts',
       default="%s" % socket.getfqdn(),
       type=coerce_csv,
       help=_('Comma separated list of strings representing the host names that the Hue server can trust as knox hosts.')
     ),
-    KNOX_PORTS = Config(
+    KNOX_PORTS=Config(
       key='knox_ports',
       default=['80', '8443'],
       type=coerce_csv,
@@ -906,7 +916,8 @@ ENABLE_SMART_THRIFT_POOL = Config(
   key="enable_smart_thrift_pool",
   help=_("Hue will try to get the actual host of the Service, even if it resides behind a load balancer. "
          "This will enable an automatic configuration of the service without requiring custom configuration of the service load balancer. "
-         "This is available for the Impala service only currently. It is highly recommended to only point to a series of coordinator-only nodes only."),
+         "This is available for the Impala service only currently. "
+         "It is highly recommended to only point to a series of coordinator-only nodes only."),
   type=coerce_bool,
   default=False
 )
@@ -1000,33 +1011,33 @@ AUTH = ConfigSection(
                                "all characters to uppercase, replacing any hyphens with underscores "
                                "and adding an HTTP_ prefix to the name. So, for example, if the header "
                                "is called Remote-User that would be configured as HTTP_REMOTE_USER")),
-    IGNORE_USERNAME_CASE = Config("ignore_username_case",
+    IGNORE_USERNAME_CASE=Config("ignore_username_case",
                                   help=_("Ignore the case of usernames when searching for existing users in Hue."),
                                   type=coerce_bool,
                                   default=True),
-    FORCE_USERNAME_LOWERCASE = Config("force_username_lowercase",
+    FORCE_USERNAME_LOWERCASE=Config("force_username_lowercase",
                                       help=_("Force usernames to lowercase when creating new users."),
                                       type=coerce_bool,
                                       default=True),
-    FORCE_USERNAME_UPPERCASE = Config("force_username_uppercase",
+    FORCE_USERNAME_UPPERCASE=Config("force_username_uppercase",
                                       help=_("Force usernames to uppercase when creating new users."),
                                       type=coerce_bool,
                                       default=False),
-    EXPIRES_AFTER = Config("expires_after",
+    EXPIRES_AFTER=Config("expires_after",
                             help=_("Users will expire after they have not logged in for 'n' amount of seconds."
                                    "A negative number means that users will never expire."),
                             type=int,
                             default=-1),
-    EXPIRE_SUPERUSERS = Config("expire_superusers",
+    EXPIRE_SUPERUSERS=Config("expire_superusers",
                                 help=_("Apply 'expires_after' to superusers."),
                                 type=coerce_bool,
                                 default=True),
-    IDLE_SESSION_TIMEOUT = Config("idle_session_timeout",
+    IDLE_SESSION_TIMEOUT=Config("idle_session_timeout",
                             help=_("Users will automatically be logged out after 'n' seconds of inactivity."
                                    "A negative number means that idle sessions will not be timed out."),
                             type=int,
                             default=-1),
-    CHANGE_DEFAULT_PASSWORD = Config(
+    CHANGE_DEFAULT_PASSWORD=Config(
                             key="change_default_password",
                             help=_("When set to true this will allow you to specify a password for "
                                    "the user when you create the user and then force them to change "
@@ -1034,19 +1045,19 @@ AUTH = ConfigSection(
                             type=coerce_bool,
                             default=False,
     ),
-    LOGIN_FAILURE_LIMIT = Config(
+    LOGIN_FAILURE_LIMIT=Config(
       key="login_failure_limit",
       help=_("Number of login attempts allowed before a record is created for failed logins"),
       type=int,
       default=3,
     ),
-    LOGIN_LOCK_OUT_AT_FAILURE = Config(
+    LOGIN_LOCK_OUT_AT_FAILURE=Config(
       key="login_lock_out_at_failure",
       help=_("After number of allowed login attempts are exceeded, do we lock out this IP and optionally user agent?"),
       type=coerce_bool,
       default=False,
     ),
-    LOGIN_COOLOFF_TIME = Config(
+    LOGIN_COOLOFF_TIME=Config(
       key="login_cooloff_time",
       help=_("If set, defines period of inactivity in hours after which failed logins will be forgotten."
              "A value of 0 or None will disable this check. Default: None."),
@@ -1060,26 +1071,26 @@ AUTH = ConfigSection(
       type=coerce_bool,
       default=False,
     ),
-    LOGIN_LOCK_OUT_USE_USER_AGENT = Config(
+    LOGIN_LOCK_OUT_USE_USER_AGENT=Config(
       key="login_lock_out_use_user_agent",
       help=_("If True, lock out based on an IP address AND a user agent."
              "This means requests from different user agents but from the same IP are treated differently."),
       type=coerce_bool,
       dynamic_default=get_deprecated_login_lock_out_by_combination_browser_user_agent
     ),
-    LOGIN_LOCK_OUT_BY_COMBINATION_USER_AND_IP = Config(
+    LOGIN_LOCK_OUT_BY_COMBINATION_USER_AND_IP=Config(
       key="login_lock_out_by_combination_user_and_ip",
       help=_("If True, lock out based on IP and user"),
       type=coerce_bool,
       default=False,
     ),
-    BEHIND_REVERSE_PROXY = Config(
+    BEHIND_REVERSE_PROXY=Config(
       key="behind_reverse_proxy",
       help=_("If True, it will look for the IP address from the header defined at reverse_proxy_header."),
       type=coerce_bool,
       dynamic_default=is_lb_enabled,
     ),
-    REVERSE_PROXY_HEADER = Config(
+    REVERSE_PROXY_HEADER=Config(
       key="reverse_proxy_header",
       help=_("If behind_reverse_proxy is True, it will look for the IP address from this header. Default: HTTP_X_FORWARDED_FOR"),
       type=str,
@@ -1092,56 +1103,57 @@ LDAP = ConfigSection(
   key="ldap",
   help=_("Configuration options for LDAP connectivity."),
   members=dict(
-    CREATE_USERS_ON_LOGIN = Config("create_users_on_login",
+    CREATE_USERS_ON_LOGIN=Config("create_users_on_login",
       help=_("Create users when they login with their LDAP credentials."),
       type=coerce_bool,
       default=True),
-    SYNC_GROUPS_ON_LOGIN = Config("sync_groups_on_login",
+    SYNC_GROUPS_ON_LOGIN=Config("sync_groups_on_login",
       help=_("Synchronize a users groups when they login."),
       type=coerce_bool,
       default=True),
-    IGNORE_USERNAME_CASE = Config("ignore_username_case",
+    IGNORE_USERNAME_CASE=Config("ignore_username_case",
       help=_("Ignore the case of usernames when searching for existing users in Hue."),
       type=coerce_bool,
       default=True),
-    FORCE_USERNAME_LOWERCASE = Config("force_username_lowercase",
+    FORCE_USERNAME_LOWERCASE=Config("force_username_lowercase",
       help=_("Force usernames to lowercase when creating new users from LDAP."),
       type=coerce_bool,
       default=True),
-    FORCE_USERNAME_UPPERCASE = Config("force_username_uppercase",
+    FORCE_USERNAME_UPPERCASE=Config("force_username_uppercase",
       help=_("Force usernames to uppercase when creating new users from LDAP."),
       type=coerce_bool,
       default=False),
-    SUBGROUPS = Config("subgroups",
+    SUBGROUPS=Config("subgroups",
       help=_("Choose which kind of subgrouping to use: nested or suboordinate (deprecated)."),
       type=coerce_str_lowercase,
       default="suboordinate"),
-    NESTED_MEMBERS_SEARCH_DEPTH = Config("nested_members_search_depth",
+    NESTED_MEMBERS_SEARCH_DEPTH=Config("nested_members_search_depth",
       help=_("Define the number of levels to search for nested members."),
       type=int,
       default=10),
-    FOLLOW_REFERRALS = Config("follow_referrals",
+    FOLLOW_REFERRALS=Config("follow_referrals",
       help=_("Whether or not to follow referrals."),
       type=coerce_bool,
       default=False),
-    LOGIN_GROUPS = Config("login_groups",
+    LOGIN_GROUPS=Config("login_groups",
       help=_("A comma-separated list of Ldap groups with users that can login"),
       type=coerce_csv,
       default=[]),
-    DEBUG = Config("debug",
+    DEBUG=Config("debug",
       type=coerce_bool,
       default=False,
       help=_("Set to a value to enable python-ldap debugging.")),
-    DEBUG_LEVEL = Config("debug_level",
+    DEBUG_LEVEL=Config("debug_level",
       default=255,
       type=int,
       help=_("Sets the debug level within the underlying LDAP C lib.")),
-    TRACE_LEVEL = Config("trace_level",
+    TRACE_LEVEL=Config("trace_level",
       default=0,
       type=int,
       help=_("Possible values for trace_level are 0 for no logging, 1 for only logging the method calls with arguments,"
-             "2 for logging the method calls with arguments and the complete results and 9 for also logging the traceback of method calls.")),
-    LDAP_SERVERS = UnspecifiedConfigSection(
+             "2 for logging the method calls with arguments and the complete results and "
+             "9 for also logging the traceback of method calls.")),
+    LDAP_SERVERS=UnspecifiedConfigSection(
       key="ldap_servers",
       help=_("LDAP server record."),
       each=ConfigSection(
@@ -1161,7 +1173,9 @@ LDAP = ConfigSection(
                                help=_("Use StartTLS when communicating with LDAP server.")),
           LDAP_CERT=Config("ldap_cert",
                            default=None,
-                           help=_("A PEM-format file containing certificates for the CA's that Hue will trust for authentication over TLS. The certificate for the CA that signed the LDAP server certificate must be included among these certificates. See more here http://www.openldap.org/doc/admin24/tls.html.")),
+                           help=_("A PEM-format file containing certificates for the CA's that Hue will trust "
+                           "for authentication over TLS. The certificate for the CA that signed the LDAP server certificate must "
+                           "be included among these certificates. See more here http://www.openldap.org/doc/admin24/tls.html.")),
           LDAP_USERNAME_PATTERN=Config("ldap_username_pattern",
                                        default=None,
                                        help=_("A pattern to use for constructing LDAP usernames.")),
@@ -1176,12 +1190,13 @@ LDAP = ConfigSection(
                                     default=None,
                                     private=True,
                                     type=coerce_password_from_script,
-                                    help=_("Execute this script to produce the LDAP bind user password. This will be used when `bind_password` is not set.")),
+                                    help=_("Execute this script to produce the LDAP bind user password. "
+                                      "This will be used when `bind_password` is not set.")),
           SEARCH_BIND_AUTHENTICATION=Config("search_bind_authentication",
                                             default=True,
                                             type=coerce_bool,
                                             help=_("Use search bind authentication.")),
-          FOLLOW_REFERRALS = Config("follow_referrals",
+          FOLLOW_REFERRALS=Config("follow_referrals",
                                     help=_("Whether or not to follow referrals."),
                                     type=coerce_bool,
                                     default=False),
@@ -1192,21 +1207,22 @@ LDAP = ConfigSection(
                             default=None,
                             help=_("The test group name to use for LDAP search.")),
 
-          DEBUG = Config("debug",
+          DEBUG=Config("debug",
             type=coerce_bool,
             default=False,
             help=_("Set to a value to enable python-ldap debugging.")),
-          DEBUG_LEVEL = Config("debug_level",
+          DEBUG_LEVEL=Config("debug_level",
             default=255,
             type=int,
             help=_("Sets the debug level within the underlying LDAP C lib.")),
-          TRACE_LEVEL = Config("trace_level",
+          TRACE_LEVEL=Config("trace_level",
             default=0,
             type=int,
             help=_("Possible values for trace_level are 0 for no logging, 1 for only logging the method calls with arguments,"
-                   "2 for logging the method calls with arguments and the complete results and 9 for also logging the traceback of method calls.")),
+                   "2 for logging the method calls with arguments and the complete results and 9 for also logging the traceback "
+                   "of method calls.")),
 
-          USERS = ConfigSection(
+          USERS=ConfigSection(
             key="users",
             help=_("Configuration for LDAP user schema and search."),
             members=dict(
@@ -1221,7 +1237,7 @@ LDAP = ConfigSection(
             )
           ),
 
-          GROUPS = ConfigSection(
+          GROUPS=ConfigSection(
             key="groups",
             help=_("Configuration for LDAP group schema and search."),
             members=dict(
@@ -1254,7 +1270,9 @@ LDAP = ConfigSection(
                          help=_("Use StartTLS when communicating with LDAP server.")),
     LDAP_CERT=Config("ldap_cert",
                      default=None,
-                     help=_("A PEM-format file containing certificates for the CA's that Hue will trust for authentication over TLS. The certificate for the CA that signed the LDAP server certificate must be included among these certificates. See more here http://www.openldap.org/doc/admin24/tls.html.")),
+                     help=_("A PEM-format file containing certificates for the CA's that Hue will trust for authentication "
+                     "over TLS. The certificate for the CA that signed the LDAP server certificate must be included among "
+                     "these certificates. See more here http://www.openldap.org/doc/admin24/tls.html.")),
     LDAP_USERNAME_PATTERN=Config("ldap_username_pattern",
                                  default=None,
                                  help=_("A pattern to use for constructing LDAP usernames.")),
@@ -1269,7 +1287,8 @@ LDAP = ConfigSection(
                    default=None,
                    private=True,
                    type=coerce_password_from_script,
-                   help=_("Execute this script to produce the LDAP bind user password. This will be used when `bind_password` is not set.")),
+                   help=_("Execute this script to produce the LDAP bind user password. "
+                   "This will be used when `bind_password` is not set.")),
     SEARCH_BIND_AUTHENTICATION=Config("search_bind_authentication",
                    default=True,
                    type=coerce_bool,
@@ -1281,7 +1300,7 @@ LDAP = ConfigSection(
                    default=None,
                    help=_("The test group name to use for LDAP search.")),
 
-    USERS = ConfigSection(
+    USERS=ConfigSection(
       key="users",
       help=_("Configuration for LDAP user schema and search."),
       members=dict(
@@ -1295,7 +1314,7 @@ LDAP = ConfigSection(
                                    "for other LDAP systems.")),
       )),
 
-    GROUPS = ConfigSection(
+    GROUPS=ConfigSection(
       key="groups",
       help=_("Configuration for LDAP group schema and search."),
       members=dict(
@@ -1317,35 +1336,35 @@ OAUTH = ConfigSection(
   key='oauth',
   help=_('Configuration options for Oauth 1.0 authentication'),
   members=dict(
-    CONSUMER_KEY = Config(
+    CONSUMER_KEY=Config(
       key="consumer_key",
       help=_("The Consumer key of the application."),
       type=str,
       default="XXXXXXXXXXXXXXXXXXXXX"
     ),
 
-    CONSUMER_SECRET = Config(
+    CONSUMER_SECRET=Config(
       key="consumer_secret",
       help=_("The Consumer secret of the application."),
       type=str,
       default="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     ),
 
-    REQUEST_TOKEN_URL = Config(
+    REQUEST_TOKEN_URL=Config(
       key="request_token_url",
       help=_("The Request token URL."),
       type=str,
       default="https://api.twitter.com/oauth/request_token"
     ),
 
-    ACCESS_TOKEN_URL = Config(
+    ACCESS_TOKEN_URL=Config(
       key="access_token_url",
       help=_("The Access token URL."),
       type=str,
       default="https://api.twitter.com/oauth/access_token"
     ),
 
-    AUTHENTICATE_URL = Config(
+    AUTHENTICATE_URL=Config(
       key="authenticate_url",
       help=_("The Authorize URL."),
       type=str,
@@ -1359,35 +1378,35 @@ OIDC = ConfigSection(
   key='oidc',
   help=_('Configuration options for OpenID Connect authentication'),
   members=dict(
-    OIDC_RP_CLIENT_ID = Config(
+    OIDC_RP_CLIENT_ID=Config(
       key="oidc_rp_client_id",
       help=_("The client ID as relay party set in OpenID provider."),
       type=str,
       default="XXXXXXXXXXXXXXXXXXXXX"
     ),
 
-    OIDC_RP_CLIENT_SECRET = Config(
+    OIDC_RP_CLIENT_SECRET=Config(
       key="oidc_rp_client_secret",
       help=_("The client secret as relay party set in OpenID provider."),
       type=str,
       default="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     ),
 
-    OIDC_OP_AUTHORIZATION_ENDPOINT = Config(
+    OIDC_OP_AUTHORIZATION_ENDPOINT=Config(
       key="oidc_op_authorization_endpoint",
       help=_("The OpenID provider authoriation endpoint."),
       type=str,
       default="https://keycloak.example.com/auth/realms/Cloudera/protocol/openid-connect/auth"
     ),
 
-    OIDC_OP_TOKEN_ENDPOINT = Config(
+    OIDC_OP_TOKEN_ENDPOINT=Config(
       key="oidc_op_token_endpoint",
       help=_("The OpenID provider token endpoint."),
       type=str,
       default="https://keycloak.example.com/auth/realms/cloudera/protocol/openid-connect/token"
     ),
 
-    AUTHENTICATE_URL = Config(
+    AUTHENTICATE_URL=Config(
       key="authenticate_url",
       help=_("The Authorize URL."),
       type=str,
@@ -1618,7 +1637,8 @@ USE_NEW_EDITOR = Config( # To remove in Hue 4
 ENABLE_DOWNLOAD = Config(
   key="enable_download",
   help=_(
-    'Global setting to allow or disable end user downloads in all Hue (e.g. Query result in editors and dashboard, file in File Browser browsers...).'),
+    'Global setting to allow or disable end user downloads in all Hue (e.g. Query result in editors and dashboard, '
+    'file in File Browser browsers...).'),
   type=coerce_bool,
   default=True)
 
@@ -1699,13 +1719,13 @@ TRACING = ConfigSection(
   key="tracing",
   help=_("Tracing configuration."),
   members=dict(
-    ENABLED= Config(
+    ENABLED=Config(
       key='enabled',
       default=False,
       type=coerce_bool,
       help=_('If tracing is enabled.')
     ),
-    TRACE_ALL = Config(
+    TRACE_ALL=Config(
       key='trace_all',
       default=False,
       type=coerce_bool,
@@ -1723,61 +1743,63 @@ TASK_SERVER = ConfigSection(
   key="task_server",
   help=_("Task Server configuration."),
   members=dict(
-    ENABLED= Config(
+    ENABLED=Config(
       key='enabled',
       default=False,
       type=coerce_bool,
       help=_('If resource intensive or blocking can be delegated to an already running task server.')
     ),
-    BROKER_URL = Config(
+    BROKER_URL=Config(
       key='broker_url',
       default='amqp://guest:guest@localhost//',
       help=_('How the task server and tasks communicate.')
     ),
-    CELERY_RESULT_BACKEND = Config(
+    CELERY_RESULT_BACKEND=Config(
       key='celery_result_backend',
       dynamic_default=task_server_default_result_directory,
       help=_('Where to store task results. Defaults to local file system path. Celery comes with a several other backends.')
     ),
-    RESULT_CELERYD_OPTS = Config(
+    RESULT_CELERYD_OPTS=Config(
       key='celeryd_opts',
       default='--time-limit=300',
       help=_('Default options provided to the task server at startup.')
     ),
-    BEAT_ENABLED = Config(
+    BEAT_ENABLED=Config(
       key='beat_enabled',
       default=False,
       type=coerce_bool,
       help=_('Switch on the integration with the Task Scheduler.')
     ),
-    BEAT_SCHEDULES_FILE = Config(
+    BEAT_SCHEDULES_FILE=Config(
       key='beat_schedules_file',
       default='',
       type=str,
       help=_('Path to a file containing a list of beat schedules.')
     ),
-    FETCH_RESULT_LIMIT = Config(
+    FETCH_RESULT_LIMIT=Config(
       key='fetch_result_limit',
       default=2000,
       type=coerce_positive_integer,
       help=_('Number of query results rows to fetch into the result storage.')
     ),
-    RESULT_CACHE = Config(
+    RESULT_CACHE=Config(
       key='result_cache',
       type=str,
       help=_('Django file cache class to use to temporarily store query results'),
-      default='{"BACKEND": "django_redis.cache.RedisCache", "LOCATION": "redis://localhost:6379/0", "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},"KEY_PREFIX": "queries"}'
+      default='{"BACKEND": "django_redis.cache.RedisCache", "LOCATION": "redis://localhost:6379/0", '
+      '"OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},"KEY_PREFIX": "queries"}'
     ),
-    RESULT_STORAGE = Config(
+    RESULT_STORAGE=Config(
       key='result_storage',
       type=str,
       help=_('Django file storage class to use to persist query results'),
       default='{"backend": "django.core.files.storage.FileSystemStorage", "properties": {"location": "./logs"}}'
     ),
-    EXECUTION_STORAGE = Config(
+    EXECUTION_STORAGE=Config(
       key='execution_storage',
       type=str,
-      help=_('Django cache to use to store temporarily used data during query execution. This is in addition to result_file_storage and result_backend.'),
+      help=_('Django cache to use to store temporarily used data during query execution. '
+      'This is in addition to result_file_storage and result_backend.'),
       default='{"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "celery-hue"}'
     ),
 ))
@@ -1791,18 +1813,18 @@ WEBSOCKETS = ConfigSection(
   key="websockets",
   help=_("Django channels Websockets configuration. Requires Python 3."),
   members=dict(
-    ENABLED= Config(
+    ENABLED=Config(
       key='enabled',
       default=False,
       type=coerce_bool,
       help=_('If websockets channels are to be used for communicating with clients.')
     ),
-    LAYER_HOST = Config(
+    LAYER_HOST=Config(
       key='layer_host',
       default='127.0.0.1',
       help=_('Layer backend host.')
     ),
-    LAYER_PORT = Config(
+    LAYER_PORT=Config(
       key='layer_port',
       type=int,
       default=6379,
@@ -1959,7 +1981,8 @@ CONNECTORS = UnspecifiedConfigSection(
       ),
       SETTINGS=Config(
           "settings",
-          help=_("Json string of a list of name/value settings to configure the connector. e.g. '{\"name\": \"url\", \"value\": \"mysql://hue:hue@host:3306/hue\"}]'"),
+          help=_("Json string of a list of name/value settings to configure the connector. "
+          "e.g. '{\"name\": \"url\", \"value\": \"mysql://hue:hue@host:3306/hue\"}]'"),
           default='{}',
           type=coerce_json_dict,
       ),
@@ -2056,9 +2079,9 @@ def validate_ldap(user, config):
 
     if config.LDAP_USERNAME_PATTERN.get() is not None and \
         '<username>' not in config.LDAP_USERNAME_PATTERN.get():
-        res.append((config.LDAP_USERNAME_PATTERN,
-                   new_str(_("The LDAP username pattern should contain the special"
-                   "<username> replacement string for authentication."))))
+      res.append((config.LDAP_USERNAME_PATTERN,
+                  new_str(_("The LDAP username pattern should contain the special"
+                  "<username> replacement string for authentication."))))
 
   return res
 
@@ -2107,11 +2130,13 @@ def validate_database(user):
         for migration_file_name in glob.iglob(app.migrations_path + '/*.py'):
           migration_name = os.path.splitext(os.path.basename(migration_file_name))[0]
           if migration_name != "__init__" and (app.name, migration_name) not in migration_history_entries:
-              missing_migration_entries.append((app.name, migration_name))
+            missing_migration_entries.append((app.name, migration_name))
 
     if missing_migration_entries:
-      res.append(('django_migrations', new_str(_('''django_migrations table seems to be corrupted or incomplete.
-                                                        %s entries are missing in the table: %s''') % (len(missing_migration_entries), missing_migration_entries))))
+      res.append(('django_migrations', new_str(_(
+        '''django_migrations table seems to be corrupted or incomplete.
+        %s entries are missing in the table: %s''') % (len(missing_migration_entries), missing_migration_entries)))
+      )
   except Exception:
     LOG.exception("Error in config validation of django_migrations")
 
@@ -2215,8 +2240,11 @@ def config_validator(user):
   try:
     notebook_doc, save_as = _save_notebook(notebook.get_data(), user)
   except:
-    res.append(('DATABASE_CHARACTER_SET', new_str(_('Character set of <i>search</i> field in <i>desktop_document2</i> table is not UTF-8. <br>'
-                                                    '<b>NOTE:</b> Configure the database for character set AL32UTF8 and national character set UTF8.'))))
+    res.append(('DATABASE_CHARACTER_SET', new_str(
+      _('Character set of <i>search</i> field in <i>desktop_document2</i> table is not UTF-8. <br>'
+        '<b>NOTE:</b> Configure the database for character set AL32UTF8 and national character set UTF8.'))
+      )
+    )
   if notebook_doc:
     notebook_doc.delete()
 
@@ -2315,7 +2343,8 @@ def is_cm_managed():
 
 def is_gs_enabled():
   from desktop.lib.idbroker import conf as conf_idbroker # Circular dependencies  desktop.conf -> idbroker.conf -> desktop.conf
-  return ('default' in list(GC_ACCOUNTS.keys()) and GC_ACCOUNTS['default'].JSON_CREDENTIALS.get()) or conf_idbroker.is_idbroker_enabled('gs')
+  return ('default' in list(GC_ACCOUNTS.keys()) and GC_ACCOUNTS['default'].JSON_CREDENTIALS.get()) or \
+      conf_idbroker.is_idbroker_enabled('gs')
 
 def has_gs_access(user):
   from desktop.auth.backend import is_admin
