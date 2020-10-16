@@ -33,8 +33,8 @@ from desktop.lib.i18n import smart_unicode
 from desktop.lib.rest.http_client import RestException
 from desktop.models import Document2, Document, FilesystemException
 
-from notebook.conf import check_permissions
-from notebook.connectors.base import QueryExpired, QueryError, SessionExpired, AuthenticationRequired, OperationTimeout,\
+from notebook.conf import check_has_missing_permission
+from notebook.connectors.base import QueryExpired, QueryError, SessionExpired, AuthenticationRequired, OperationTimeout, \
   OperationNotSupported
 from notebook.models import _get_editor_type
 
@@ -58,7 +58,7 @@ def check_editor_access_permission():
           except Document2.DoesNotExist:
             raise PopupException(_('Query id %s can not be found, please open a new editor') % editor_id)
 
-        if check_permissions(request.user, editor_type):
+        if check_has_missing_permission(request.user, editor_type):
           raise PopupException(_('Missing permission to access the %s Editor' % editor_type), error_code=401)
 
       return view_func(request, *args, **kwargs)

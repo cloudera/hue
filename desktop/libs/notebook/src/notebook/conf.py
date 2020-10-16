@@ -39,10 +39,12 @@ SHOW_NOTEBOOKS = Config(
     default=True
 )
 
+
 def _remove_duplications(a_list):
   return list(OrderedDict.fromkeys(a_list))
 
-def check_permissions(user, interpreter, user_apps=None):
+
+def check_has_missing_permission(user, interpreter, user_apps=None):
   # TODO: port to cluster config
   if user_apps is None:
     user_apps = appmanager.get_apps_dict(user)  # Expensive method
@@ -82,7 +84,7 @@ def get_ordered_interpreters(user=None):
     user_apps = appmanager.get_apps_dict(user)
     user_interpreters = []
     for interpreter in interpreters:
-      if check_permissions(user, interpreter, user_apps=user_apps):
+      if check_has_missing_permission(user, interpreter, user_apps=user_apps):
         pass  # Not allowed
       else:
         user_interpreters.append(interpreter)
