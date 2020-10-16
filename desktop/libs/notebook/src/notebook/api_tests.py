@@ -77,7 +77,14 @@ class TestApi(object):
         ],
         "type": "query-hive",
         "id": 50010,
-        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement_raw":"select * from default.web_logs where app = '${app_name}';","variables":[{"name":"app_name","value":"metastore"}],"statement":"select * from default.web_logs where app = 'metastore';","properties":{"settings":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from default.web_logs where app = 'metastore';","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
+        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement_raw":""" \
+        """"select * from default.web_logs where app = '${app_name}';","variables":[{"name":"app_name","value":"metastore"}],""" \
+        """"statement":"select * from default.web_logs where app = 'metastore';","properties":{"settings":[],"files":[],""" \
+        """"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,""" \
+        """"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,""" \
+        """"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":""" \
+        """"select * from default.web_logs where app = 'metastore';","operation_type":0,"modified_row_count":null,""" \
+        """"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
         "uuid": "5982a274-de78-083c-2efc-74f53dce744c",
         "isSaved": false,
         "parentUuid": null
@@ -125,7 +132,15 @@ class TestApi(object):
         ],
         "type": "query-hive",
         "id": null,
-        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement_raw":"select * from default.web_logs where app = '${app_name}';","variables":[{"name":"app_name","value":"metastore"}],"statement":"select * from default.web_logs where app = 'metastore';","properties":{"settings":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from default.web_logs where app = 'metastore';","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
+        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement_raw":""" \
+        """"select * from default.web_logs where app = '${app_name}';","variables":""" \
+        """[{"name":"app_name","value":"metastore"}],"statement":""" \
+        """"select * from default.web_logs where app = 'metastore';","properties":{"settings":[],"files":[],"functions":[]},""" \
+        """"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,""" \
+        """"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,""" \
+        """"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,""" \
+        """"statement":"select * from default.web_logs where app = 'metastore';","operation_type":0,""" \
+        """"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
         "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
     }
     """
@@ -269,7 +284,9 @@ class TestApi(object):
           ],
           "type": "query-hive",
           "id": null,
-          "snippets": [{"id": "e069ef32-5c95-4507-b961-e79c090b5abf","type":"hive","status":"ready","database":"default","statement":"select * from web_logs","statement_raw":"select * from web_logs","variables":[],"properties":{"settings":[],"files":[],"functions":[]},"result":{}}],
+          "snippets": [{"id": "e069ef32-5c95-4507-b961-e79c090b5abf","type":"hive","status":"ready","database":"default",""" \
+          """"statement":"select * from web_logs","statement_raw":"select * from web_logs","variables":[],"properties":""" \
+          """{"settings":[],"files":[],"functions":[]},"result":{}}],
           "uuid": "8a20da5f-b69c-4843-b17d-dea5c74c41d1"
       }
       """
@@ -522,7 +539,13 @@ class TestNotebookApiMocked(object):
         ],
         "type": "query-hive",
         "id": null,
-        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement":"select * from web_logs","properties":{"settings":[],"variables":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
+        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement":""" \
+        """"select * from web_logs","properties":{"settings":[],"variables":[],"files":[],"functions":[]},""" \
+        """"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":""" \
+        """{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,""" \
+        """"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an",""" \
+        """"has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":""" \
+        """null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
         "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
     }
     """
@@ -595,7 +618,13 @@ class TestNotebookApiMocked(object):
         ],
         "type": "query-hive",
         "id": null,
-        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement":"select * from web_logs","properties":{"settings":[],"variables":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
+        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement":""" \
+        """"select * from web_logs","properties":{"settings":[],"variables":[],"files":[],"functions":[]},""" \
+        """"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,""" \
+        """"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,""" \
+        """"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"""\
+        """"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},""" \
+        """"lastExecuted": 1462554843817,"database":"default"}],
         "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
     }
     """
@@ -611,31 +640,39 @@ class TestNotebookApiMocked(object):
 def test_get_interpreters_to_show():
   default_interpreters = OrderedDict((
       ('hive', {
-          'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
+          'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True, 'options': {}, 'dialect_properties': None,
+          'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
       }),
       ('spark', {
-          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
+          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': None,
+          'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
       }),
       ('pig', {
-          'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
+          'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {}, 'dialect_properties': None,
+          'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
       }),
       ('java', {
-          'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'java'
+          'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': None,
+          'is_catalog': False, 'category': 'editor', 'dialect': 'java'
       })
     ))
 
   expected_interpreters = OrderedDict((
       ('java', {
-        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'java'
+        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': None,
+        'is_catalog': False, 'category': 'editor', 'dialect': 'java'
       }),
       ('pig', {
-        'name': 'Pig', 'interface': 'pig', 'is_sql': False, 'type': 'pig', 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
+        'name': 'Pig', 'interface': 'pig', 'is_sql': False, 'type': 'pig', 'options': {}, 'dialect_properties': None,
+        'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
       }),
       ('hive', {
-          'name': 'Hive', 'interface': 'hiveserver2', 'is_sql': True, 'type': 'hive', 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
+          'name': 'Hive', 'interface': 'hiveserver2', 'is_sql': True, 'type': 'hive', 'options': {}, 'dialect_properties': None,
+          'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
       }),
       ('spark', {
-          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
+          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': None,
+          'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
       })
     ))
 
@@ -649,7 +686,8 @@ def test_get_interpreters_to_show():
     assert_equal(
       list(default_interpreters.values()),
       interpreters_shown_on_wheel_unset,
-      'get_interpreters_to_show should return the same as get_interpreters when interpreters_shown_on_wheel is unset. expected: %s, actual: %s' % (
+      'get_interpreters_to_show should return the same as get_interpreters when interpreters_shown_on_wheel '
+      'is unset. expected: %s, actual: %s' % (
           list(default_interpreters.values()), interpreters_shown_on_wheel_unset
       )
     )
@@ -673,19 +711,24 @@ def test_get_interpreters_to_show():
 def test_get_ordered_interpreters():
   default_interpreters = OrderedDict((
     ('hive', {
-        'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
+        'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True, 'options': {}, 'dialect_properties': None,
+        'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
     }),
     ('impala', {
-        'name': 'Impala', 'interface': 'hiveserver2', 'type': 'impala', 'is_sql': True, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'impala'
+        'name': 'Impala', 'interface': 'hiveserver2', 'type': 'impala', 'is_sql': True, 'options': {}, 'dialect_properties': None,
+        'is_catalog': False, 'category': 'editor', 'dialect': 'impala'
     }),
     ('spark', {
-        'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
+        'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': None,
+        'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
     }),
     ('pig', {
-        'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
+        'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {}, 'dialect_properties': None,
+        'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
     }),
     ('java', {
-        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'java'
+        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': None,
+        'is_catalog': False, 'category': 'editor', 'dialect': 'java'
     })
   ))
 
