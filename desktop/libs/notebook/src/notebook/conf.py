@@ -25,7 +25,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop import appmanager
-from desktop.conf import is_oozie_enabled, has_connectors
+from desktop.conf import is_oozie_enabled, has_connectors, is_cm_managed
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_json_dict, coerce_bool, coerce_csv
 
 
@@ -77,9 +77,17 @@ def get_ordered_interpreters(user=None):
       for connector in _get_installed_connectors(categories=['editor', 'catalogs'], user=user)
     ]
   else:
+    if is_cm_managed() and INTERPRETERS.get():
+      extra_interpreters = INTERPRETERS.get()
+      _default_interpreters(user)
+    else:
+      extra_interpreters = {}
+
     if not INTERPRETERS.get():
       _default_interpreters(user)
+
     interpreters = INTERPRETERS.get()
+    interpreters.update(extra_interpreters)
 
     user_apps = appmanager.get_apps_dict(user)
     user_interpreters = []

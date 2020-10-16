@@ -670,6 +670,84 @@ def test_get_interpreters_to_show():
     appmanager.load_apps(APP_BLACKLIST.get())
 
 
+def test_get_ordered_interpreters():
+  default_interpreters = OrderedDict((
+    ('hive', {
+        'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
+    }),
+    ('impala', {
+        'name': 'Impala', 'interface': 'hiveserver2', 'type': 'impala', 'is_sql': True, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'impala'
+    }),
+    ('spark', {
+        'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
+    }),
+    ('pig', {
+        'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
+    }),
+    ('java', {
+        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'java'
+    })
+  ))
+
+  try:
+    resets = [APP_BLACKLIST.set_for_testing('')]
+    appmanager.DESKTOP_MODULES = []
+    appmanager.DESKTOP_APPS = None
+    appmanager.load_apps(APP_BLACKLIST.get())
+
+    with patch('notebook.conf.is_cm_managed') as is_cm_managed:
+      with patch('notebook.conf.appmanager.get_apps_dict') as get_apps_dict:
+        with patch('notebook.conf.has_connectors') as has_connectors:
+          get_apps_dict.return_value = {'hive': {}}
+          has_connectors.return_value = False
+
+          is_cm_managed.return_value = False
+
+          # No CM --> Verbatim
+          INTERPRETERS.set_for_testing(
+            OrderedDict((
+              ('phoenix', {
+                  'name': 'Phoenix', 'interface': 'sqlalchemy', 'dialect': 'phoenix'
+              }),)
+            )
+          )
+          assert_equal(
+            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+            ['phoenix']
+          )
+
+          is_cm_managed.return_value = True
+
+          # CM --> Append []
+          INTERPRETERS.set_for_testing(
+            OrderedDict(()
+            )
+          )
+          assert_equal(
+            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+            ['hive']
+          )
+
+          # CM --> Append [Phoenix]
+          INTERPRETERS.set_for_testing(
+            OrderedDict((
+              ('phoenix', {
+                  'name': 'Phoenix', 'interface': 'sqlalchemy', 'dialect': 'phoenix'
+              }),)
+            )
+          )
+          assert_equal(
+            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+            ['hive', 'phoenix']
+          )
+  finally:
+    for reset in resets:
+      reset()
+    appmanager.DESKTOP_MODULES = []
+    appmanager.DESKTOP_APPS = None
+    appmanager.load_apps(APP_BLACKLIST.get())
+
+
 class TestQueriesMetrics(object):
 
   def test_queries_num(self):
