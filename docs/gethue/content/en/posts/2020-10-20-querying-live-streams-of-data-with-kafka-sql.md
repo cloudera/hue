@@ -132,7 +132,7 @@ The SQL syntax is a bit different but here is one way to create a similar table 
       behavior STRING,
       ts STRING
     ) WITH (kafka_topic='user_behavior', value_format='json', partitions=1)
-    ;
+
 
 And peek at it:
 
@@ -140,7 +140,7 @@ And peek at it:
     FROM user_behavior
     EMIT CHANGES
     LIMIT 30
-    ;
+
 
 In another statement within Hue's Editor or by booting the SQL shell:
 
@@ -157,7 +157,7 @@ You can also insert your own records and notice the live updates of the results:
     )
     VALUES
     (1, 10, 20, 'buy', '1602998392')
-    ;
+
 
 
 &nbsp;
