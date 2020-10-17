@@ -64,6 +64,7 @@ RUN ./build/env/bin/pip install \
   django_redis \
   flower \
   pyhive \
+  git+https://github.com/bryanyang0528/ksql-python \
   gevent \
   # Needed for Jaeger
   threadloop \

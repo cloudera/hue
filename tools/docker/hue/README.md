@@ -22,13 +22,13 @@ Then to avoid the `database locked` error, please see below [Configuration](#con
 
 Docker compose allows to start all the required services in one command line.
 
-This will start a Hue server as well as a MySQL database by default. Only the MySQL interpreter is configured in [``tools/docker/hue/conf/hue-overrides.ini``](/tools/docker/hue/conf/hue-overrides.ini).
+This will start a Hue server as well as a MySQL database by default. Only the MySQL interpreter is configured in [``tools/docker/hue/conf/z-hue-overrides.ini``](/tools/docker/hue/conf/z-hue-overrides.ini).
 
 Assuming we have a local ``hue.ini`` as shown in the previous section:
 
     cd tools/docker/hue
 
-Edit `conf/hue-overrides.ini` and ucomment the MySql section in `[[database]]`.
+Edit `conf/z-hue-overrides.ini` and ucomment the MySql section in `[[database]]`.
 
 Then:
 
@@ -56,18 +56,18 @@ So in our case [http://172.17.0.2:8888](http://172.17.0.2:8888).
 #### Via local file
 
 By default the Hue container is using
-[``tools/docker/hue/conf/hue-overrides.ini``](/tools/docker/hue/conf/hue-overrides.ini) on top of [``desktop/conf/hue.ini``](/desktop/conf/hue.ini) which assumes localhost for all the data services and uses and embedded sqlite database that will error out.
+[``tools/docker/hue/conf/z-hue-overrides.ini``](/tools/docker/hue/conf/z-hue-overrides.ini) on top of [``desktop/conf/hue.ini``](/desktop/conf/hue.ini) which assumes localhost for all the data services and uses and embedded sqlite database that will error out.
 
-To configure Hue to point to the databases to query, the simplified ini [``hue-overrides.ini``](/tools/docker/hue/conf/hue-overrides.ini) can be edited before starting Hue.
+To configure Hue to point to the databases to query, the simplified ini [``z-hue-overrides.ini``](/tools/docker/hue/conf/z-hue-overrides.ini) can be edited before starting Hue.
 
 Just curl it:
 
-    wget https://raw.githubusercontent.com/cloudera/hue/master/tools/docker/hue/conf/hue-overrides.ini -O hue.ini
+    wget https://raw.githubusercontent.com/cloudera/hue/master/tools/docker/hue/conf/z-hue-overrides.ini -O hue.ini
 
  Or get is via the repository:
 
     cd tools/docker/hue
-    cp conf/hue-overrides.ini hue.ini
+    cp conf/z-hue-overrides.ini hue.ini
 
 #### Via the Image
 
