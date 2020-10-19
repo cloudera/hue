@@ -103,7 +103,7 @@ from django.utils.translation import ugettext as _
       height: 4px;
       width: 100%;
     }
-	
+
 	.btn.btn-large {
 			min-width: 38%;
 			margin: 8px 0 0 0;
@@ -219,7 +219,7 @@ from django.utils.translation import ugettext as _
   </div>
 </div>
 
-<script src="${ static('desktop/ext/js/jquery/jquery-2.2.4.min.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/jquery-3.5.1.min.js') }"></script>
 <script>
   var $buttonsGroup = $("#buttons_group");
   if($buttonsGroup.children().length > 2) {
@@ -242,20 +242,20 @@ from django.utils.translation import ugettext as _
     });
 
         $("input").css({"display": "block", "margin-left": "auto", "margin-right": "auto"});
-        $("span.google").bind('click', function () {
+        $("span.google").on('click', function () {
           window.location.replace('/oauth/social_login/oauth?social=google');
           return false;
         });
-        $("span.facebook").bind('click', function () {
+        $("span.facebook").on('click', function () {
           window.location.replace('/oauth/social_login/oauth?social=facebook');
           return false;
         });
 
-        $("span.linkedin").bind('click', function () {
+        $("span.linkedin").on('click', function () {
           window.location.replace('/oauth/social_login/oauth?social=linkedin');
           return false;
         });
-        $("span.twitter").bind('click', function () {
+        $("span.twitter").on('click', function () {
           window.location.replace('/oauth/social_login/oauth?social=twitter');
           return false;
         });
