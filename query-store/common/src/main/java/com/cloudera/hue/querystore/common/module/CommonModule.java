@@ -1,6 +1,10 @@
 // (c) Copyright 2020-2021 Cloudera, Inc. All rights reserved.
 package com.cloudera.hue.querystore.common.module;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.hadoop.conf.Configuration;
@@ -14,12 +18,21 @@ import com.cloudera.hue.querystore.common.dao.TezAppInfoDao;
 import com.cloudera.hue.querystore.common.dao.TezDagBasicInfoDao;
 import com.cloudera.hue.querystore.common.dao.TezDagExtendedInfoDao;
 import com.cloudera.hue.querystore.common.dao.VertexInfoDao;
+import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
+import com.cloudera.hue.querystore.common.entities.TezDagBasicInfo;
 import com.cloudera.hue.querystore.common.persistence.mappers.JsonArgumentFactory;
 import com.cloudera.hue.querystore.common.persistence.mappers.JsonColumnMapper;
 import com.cloudera.hue.querystore.common.repository.transaction.DASTransaction;
 import com.cloudera.hue.querystore.common.repository.transaction.TransactionManager;
 import com.cloudera.hue.querystore.common.resource.AdminOnly;
 import com.cloudera.hue.querystore.common.resource.AdminOnlyInterceptor;
+import com.cloudera.hue.querystore.common.services.SearchService;
+import com.cloudera.hue.querystore.parsers.BasicSearchParser;
+import com.cloudera.hue.querystore.parsers.FacetInputParser;
+import com.cloudera.hue.querystore.parsers.RangeFacetInputParser;
+import com.cloudera.hue.querystore.parsers.SearchQueryParser;
+import com.cloudera.hue.querystore.parsers.SortInputParser;
+import com.cloudera.hue.querystore.parsers.TimeRangeInputParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -28,6 +41,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.matcher.Matchers;
+import com.google.inject.name.Names;
 
 import io.dropwizard.jackson.Jackson;
 
@@ -66,6 +80,57 @@ public class CommonModule extends AbstractModule {
 
     bind(Jdbi.class).toInstance(jdbi);
     bind(AppAuthentication.class).toInstance(appAuth);
+
+    bind(SearchQueryParser.class)
+      .annotatedWith(Names.named("Basic"))
+      .toProvider(BasicSearchParserProvider.class)
+      .in(Singleton.class);
+  }
+
+  public static class BasicSearchParserProvider implements Provider<SearchQueryParser> {
+    @Override
+    public SearchQueryParser get() {
+      return new BasicSearchParser(HiveQueryBasicInfo.TABLE_INFORMATION,
+        TezDagBasicInfo.TABLE_INFORMATION);
+    }
+  }
+
+  @Provides
+  @Singleton
+  public SortInputParser getSortParser() {
+    return new SortInputParser(Stream.concat(
+      HiveQueryBasicInfo.TABLE_INFORMATION.getFields().stream(),
+      TezDagBasicInfo.TABLE_INFORMATION.getFields().stream())
+      .collect(Collectors.toList())
+    );
+  }
+
+  @Provides
+  @Singleton
+  public FacetInputParser getFacetParser() {
+    return new FacetInputParser(Stream.concat(
+      HiveQueryBasicInfo.TABLE_INFORMATION.getFields().stream(),
+      TezDagBasicInfo.TABLE_INFORMATION.getFields().stream())
+      .collect(Collectors.toList())
+      , SearchService.getFieldsInformation()
+    );
+  }
+
+  @Provides
+  @Singleton
+  public RangeFacetInputParser getRangeFacetParser() {
+    return new RangeFacetInputParser(Stream.concat(
+      HiveQueryBasicInfo.TABLE_INFORMATION.getFields().stream(),
+      TezDagBasicInfo.TABLE_INFORMATION.getFields().stream())
+      .collect(Collectors.toList())
+      , SearchService.getFieldsInformation()
+    );
+  }
+
+  @Provides
+  @Singleton
+  public TimeRangeInputParser getTimeRangeParser() {
+    return new TimeRangeInputParser(HiveQueryBasicInfo.TABLE_INFORMATION);
   }
 
   @Provides
@@ -117,4 +182,5 @@ public class CommonModule extends AbstractModule {
   public Configuration provideHadoopConfiguration() {
     return new Configuration();
   }
+
 }

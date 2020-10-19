@@ -80,8 +80,6 @@ public class TaskAttemptInfoService {
     HashMap<String, HashMap<String, String>> startEventHash = new HashMap<>();
     HashMap<String, String> data;
 
-    System.out.println("DAG DETAILS: " + dag);
-    
     if (StringUtils.isEmpty(sort)) {
       sort = "startTime";
     }

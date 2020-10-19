@@ -3,6 +3,10 @@ package com.cloudera.hue.querystore.common.entities;
 
 import java.time.LocalDateTime;
 
+import com.cloudera.hue.querystore.orm.EntityTable;
+import com.cloudera.hue.querystore.orm.annotation.ColumnInfo;
+import com.cloudera.hue.querystore.orm.annotation.EntityFieldProcessor;
+import com.cloudera.hue.querystore.orm.annotation.SearchQuery;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -14,7 +18,9 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
+@SearchQuery(prefix = "hq", table="hive_query")
 public class HiveQueryBasicInfo implements JdbiEntity {
+  public static final EntityTable TABLE_INFORMATION = EntityFieldProcessor.process(HiveQueryBasicInfo.class);
   public HiveQueryBasicInfo(Long id,
                    String queryId,
                    String query,
@@ -81,45 +87,109 @@ public class HiveQueryBasicInfo implements JdbiEntity {
     this.waitingTime = waitingTime;
   }
 
+  @ColumnInfo(columnName="id", exclude = true, id=true)
   private Long id;
+
+  @ColumnInfo(columnName="query_id", searchable = true, sortable = true)
   private String queryId;
+
+  @ColumnInfo(columnName="query", tsVectorColumnName = "query_fts", highlightRequired = true,
+	      highlightProjectionName = "highlighted_query")
   private String query;
+
+
   private String highlightedQuery;
+
+  @ColumnInfo(columnName="start_time", searchable = true, sortable = true)
   private Long startTime;
+
+  @ColumnInfo(columnName="end_time", searchable = true, sortable = true)
   private Long endTime;
+
+  @ColumnInfo(columnName="elapsed_time", searchable = true, sortable = true, rangeFacetable = true)
   private Long elapsedTime;
+
+  @ColumnInfo(columnName="status", searchable = true, sortable = true, facetable = true)
   private String status;
+
+  @ColumnInfo(columnName="queue_name", searchable = true, sortable = true, facetable = true)
   private String queueName;
+
+  @ColumnInfo(columnName="user_id", searchable = true, sortable = true, facetable = true)
   private String userId;
+
+  @ColumnInfo(columnName="request_user", searchable = true, sortable = true, facetable = true)
   private String requestUser;
+
+  @ColumnInfo(columnName="cpu_time", searchable = true, sortable = true, rangeFacetable = true)
   private Long cpuTime;
+
+  @ColumnInfo(columnName="physical_memory", searchable = true, sortable = true, rangeFacetable = true)
   private Long physicalMemory;
+
+  @ColumnInfo(columnName="virtual_memory", searchable = true, sortable = true, rangeFacetable = true)
   private Long virtualMemory;
+
+  @ColumnInfo(columnName="data_read", searchable = true, sortable = true, rangeFacetable = true)
   private Long dataRead;
+
+  @ColumnInfo(columnName="data_written", searchable = true, sortable = true, rangeFacetable = true)
   private Long dataWritten;
+
+  @ColumnInfo(columnName="operation_id", searchable = true)
   private String operationId;
+
+  @ColumnInfo(columnName="client_ip_address", searchable = true)
   private String clientIpAddress;
+
+  @ColumnInfo(columnName="hive_instance_address", searchable = true)
   private String hiveInstanceAddress;
+
+  @ColumnInfo(columnName="hive_instance_type", searchable = true)
   private String hiveInstanceType;
+
+  @ColumnInfo(columnName="session_id", searchable = true)
   private String sessionId;
+
+  @ColumnInfo(columnName="log_id", searchable = true)
   private String logId;
+
+  @ColumnInfo(columnName="thread_id", searchable = true)
   private String threadId;
+
+  @ColumnInfo(columnName="execution_mode", searchable = true, facetable = true)
   private String executionMode;
+
+  @ColumnInfo(columnName="tables_read", searchable = true, facetable = true)
   private ArrayNode tablesRead;
+
+  @ColumnInfo(columnName="tables_written", searchable = true, facetable = true)
   private ArrayNode tablesWritten;
+
+  @ColumnInfo(columnName="databases_used", searchable = false, facetable = false)
   private ArrayNode databasesUsed;
+
+  @ColumnInfo(columnName="domain_id", searchable = true)
   private String domainId;
+
+  @ColumnInfo(columnName="llap_app_id", searchable = true)
   private String llapAppId;
+
+  @ColumnInfo(columnName="used_cbo", searchable = true, facetable = true)
   private boolean usedCBO = false;
+
+  @ColumnInfo(columnName="first_task_started_time", exclude = true)
   private Long firstTaskStartedTime;
 
   /*
    * This is a derived field. Its value is firstTaskStartedTime - startTime -
    *    (queryDetails.perf.parse + queryDetails.perf.compile + queryDetails.perf.TezBuildDag)
    */
+  @ColumnInfo(columnName="waiting_time", searchable = true, sortable = true)
   private Long waitingTime;
 
   @JsonIgnore
+  @ColumnInfo(columnName="created_at", exclude = true)
   private LocalDateTime createdAt;
 
   /*
@@ -130,11 +200,13 @@ public class HiveQueryBasicInfo implements JdbiEntity {
    * For LLAP Queries : org.apache.hadoop.hive.llap.counters.LlapWmCounters:SPECULATIVE_RUNNING_NS +
    *        org.apache.tez.common.counters.DAGCounter:AM_CPU_MILLISECONDS
    */
+  @ColumnInfo(columnName="resource_utilization", searchable = true, sortable = true)
   private Long resourceUtilization;
 
   /**
    * version field for tracking and failing on dirty writes
     */
+  @ColumnInfo(columnName="version", exclude = true)
   private Integer version;
 
   @JsonIgnore

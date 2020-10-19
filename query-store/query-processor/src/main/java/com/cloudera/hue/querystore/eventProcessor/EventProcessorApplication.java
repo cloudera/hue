@@ -27,6 +27,7 @@ import com.cloudera.hue.querystore.eventProcessor.module.EventProcessorModule;
 import com.cloudera.hue.querystore.eventProcessor.resources.AboutResource;
 import com.cloudera.hue.querystore.eventProcessor.resources.BundleResource;
 import com.cloudera.hue.querystore.eventProcessor.resources.HiveQueryResource;
+import com.cloudera.hue.querystore.eventProcessor.resources.QuerySearchResource;
 import com.codahale.metrics.jdbi3.InstrumentedSqlLogger;
 import com.codahale.metrics.jdbi3.strategies.SmartNameStrategy;
 import com.codahale.metrics.jmx.JmxReporter;
@@ -149,6 +150,7 @@ public class EventProcessorApplication extends Application<EventProcessorConfigu
     if (dasConfig.getConf(ENABLE_REST_APIS)) {
       jersey.register(injector.getInstance(BundleResource.class));
       jersey.register(injector.getInstance(HiveQueryResource.class));
+      jersey.register(injector.getInstance(QuerySearchResource.class));
     }
   }
 }
