@@ -21,6 +21,7 @@ import logging
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
+from desktop.lib.rest.http_client import RestException
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.rest.http_client import HttpClient
@@ -168,10 +169,19 @@ def profile(request):
 
 @api_error_handler
 def query_store_proxy(request, path=None):
+  response = {'status': -1}
   content_type = 'application/json; charset=UTF-8'
   headers = {'X-Requested-By': 'das', 'Content-Type': content_type}
 
   client = HttpClient(QUERY_STORE.SERVER_URL.get())
   resource = Resource(client)
 
-  return JsonResponse(resource.invoke(request.method, path, request.GET.dict(), request.body, headers));
+  try:
+    response = resource.invoke(request.method, path, request.GET.dict(), request.body, headers)
+  except RestException as e:
+    ex_response = e.get_parent_ex().response
+    response['code'] = ex_response.status_code
+    response['message'] = ex_response.reason
+    response['content'] = ex_response.text
+
+  return JsonResponse(response);
