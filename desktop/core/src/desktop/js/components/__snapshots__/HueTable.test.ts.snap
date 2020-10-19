@@ -1,377 +1,350 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`HueTable.vue should render a table 1`] = `
-<table
-  class="hue-table"
+<div
+  class="hue-table-container"
 >
-  <thead>
-    <tr
-      class="header-row"
-    >
-      <th>
-        <div
-          class="cell-content"
+  <table
+    class="hue-table"
+  >
+    <caption>
+      
+      
+    
+    </caption>
+     
+    <thead>
+      <tr
+        class="header-row"
+      >
+        <th
+          scope="col"
         >
+          
           A
-        </div>
-      </th>
-      <th>
-        <div
-          class="cell-content"
+        
+        </th>
+        <th
+          scope="col"
         >
+          
           D
-        </div>
-      </th>
-      <th>
-        <div
-          class="cell-content"
+        
+        </th>
+        <th
+          scope="col"
         >
+          
           C
-        </div>
-      </th>
-      <th>
-        <div
-          class="cell-content"
+        
+        </th>
+        <th
+          scope="col"
         >
+          
           B
-        </div>
-      </th>
-    </tr>
-  </thead>
-   
-  <tbody>
-    <tr>
-      <td>
-        <div
-          class="cell-content"
-        >
+        
+        </th>
+         
+        <th
+          class="column-flush"
+          scope="col"
+        />
+      </tr>
+    </thead>
+     
+    <tbody>
+      <tr>
+        <td>
           
             1
           
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             
           
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             false
           
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             5
           
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+      <tr>
+        <td>
           
             2
           
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             
           
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             true
           
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             6
           
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+      <tr>
+        <td>
           
             3
           
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             
           
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             false
           
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             7
           
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+      <tr>
+        <td>
           
             4
           
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             
           
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             true
           
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             8
           
-        </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+    </tbody>
+  </table>
+</div>
 `;
 
 exports[`HueTable.vue should render a table with a custom component for a cell 1`] = `
-<table
-  class="hue-table"
+<div
+  class="hue-table-container"
 >
-  <thead>
-    <tr
-      class="header-row"
-    >
-      <th>
-        <div
-          class="cell-content"
+  <table
+    class="hue-table"
+  >
+    <caption>
+      
+      
+    
+    </caption>
+     
+    <thead>
+      <tr
+        class="header-row"
+      >
+        <th
+          scope="col"
         >
+          
           A
-        </div>
-      </th>
-      <th>
-        <div
-          class="cell-content"
+        
+        </th>
+        <th
+          scope="col"
         >
+          
           B
-        </div>
-      </th>
-    </tr>
-  </thead>
-   
-  <tbody>
-    <tr>
-      <td>
-        <div
-          class="cell-content"
-        >
+        
+        </th>
+         
+        <th
+          class="column-flush"
+          scope="col"
+        />
+      </tr>
+    </thead>
+     
+    <tbody>
+      <tr>
+        <td>
           <div>
             3
           </div>
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             2
           
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+      <tr>
+        <td>
           <div>
             9
           </div>
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             5
           
-        </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+    </tbody>
+  </table>
+</div>
 `;
 
 exports[`HueTable.vue should render a table with adapter 1`] = `
-<table
-  class="hue-table"
+<div
+  class="hue-table-container"
 >
-  <thead>
-    <tr
-      class="header-row"
-    >
-      <th>
-        <div
-          class="cell-content"
+  <table
+    class="hue-table"
+  >
+    <caption>
+      
+      
+    
+    </caption>
+     
+    <thead>
+      <tr
+        class="header-row"
+      >
+        <th
+          scope="col"
         >
+          
           A
-        </div>
-      </th>
-      <th>
-        <div
-          class="cell-content"
+        
+        </th>
+        <th
+          scope="col"
         >
+          
           B + C
-        </div>
-      </th>
-    </tr>
-  </thead>
-   
-  <tbody>
-    <tr>
-      <td>
-        <div
-          class="cell-content"
-        >
+        
+        </th>
+         
+        <th
+          class="column-flush"
+          scope="col"
+        />
+      </tr>
+    </thead>
+     
+    <tbody>
+      <tr>
+        <td>
           
             1
           
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             14
           
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+      <tr>
+        <td>
           
             2
           
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             16
           
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+      <tr>
+        <td>
           
             3
           
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             18
           
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+      <tr>
+        <td>
           
             4
           
-        </div>
-      </td>
-      <td>
-        <div
-          class="cell-content"
-        >
+        </td>
+        <td>
           
             20
           
-        </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+    </tbody>
+  </table>
+</div>
 `;

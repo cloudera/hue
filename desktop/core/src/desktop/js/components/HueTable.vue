@@ -17,27 +17,41 @@
 -->
 
 <template>
-  <table class="hue-table">
-    <thead>
-      <tr class="header-row">
-        <th v-for="(column, colIndex) in columns" :key="colIndex">
-          <div class="cell-content">{{ column.label }}</div>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="(row, rowIndex) in rows" :key="rowIndex" @click="$emit('row-clicked', row)">
-        <td v-for="(column, colIndex) in columns" :key="colIndex">
-          <div class="cell-content" :class="{ small: column.small, nowrap: column.noWrap }">
+  <div class="hue-table-container">
+    <table class="hue-table">
+      <caption>
+        <!-- Because of Web:TableWithoutCaptionCheck -->
+        {{
+          caption
+        }}
+      </caption>
+      <thead>
+        <tr class="header-row">
+          <th
+            v-for="(column, colIndex) in columns"
+            :key="colIndex"
+            :class="column.headerCssClass"
+            scope="col"
+          >
+            {{ column.label }}
+          </th>
+          <!-- To fill the blank space to the right when table width is smaller than available horizontal space -->
+          <th class="column-flush" scope="col" />
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(row, rowIndex) in rows" :key="rowIndex" @click="$emit('row-clicked', row)">
+          <td v-for="(column, colIndex) in columns" :key="colIndex" :class="column.cssClass">
             <slot v-if="hasCellSlot(column)" :name="cellSlotName(column)" v-bind="row" />
             <template v-else>
               {{ column.adapter ? column.adapter(column.key, row) : row[column.key] }}
             </template>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+          </td>
+          <td class="column-flush" />
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script lang="ts">
@@ -52,6 +66,8 @@
     rows?: Row[];
     @Prop({ required: false, default: () => [] })
     columns?: Column<T>[];
+    @Prop()
+    caption?: string;
 
     hasCellSlot(column: Column<T>): boolean {
       return !!this.$scopedSlots[this.cellSlotName(column)];
@@ -67,83 +83,70 @@
   @import './styles/colors';
   @import './styles/mixins';
 
-  .hue-table {
-    background: none;
-    margin: 0 0 15px 0;
-    border-radius: $hue-panel-border-radius;
-    border-spacing: 0;
+  .hue-table-container {
+    overflow-x: auto;
     width: 100%;
-    line-height: 14px;
-    vertical-align: baseline;
+    margin: 0 0 15px 0;
 
-    * {
-      box-sizing: border-box;
-    }
+    .hue-table {
+      line-height: 14px;
+      table-layout: auto;
 
-    thead,
-    tbody {
-      tr {
-        height: auto;
-        background: none;
+      thead,
+      tbody {
+        tr {
+          height: 40px;
 
-        th,
-        td {
-          padding: 0;
-          border: none;
-          text-align: left;
-          vertical-align: middle;
+          th,
+          td {
+            @include nowrap-ellipsis;
 
-          .cell-content {
-            min-height: 41px;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            padding: 5px;
+            padding: 12px;
+            border: none;
             text-align: left;
 
-            &.nowrap {
-              white-space: nowrap;
-            }
+            height: 16px;
+            max-width: 300px;
 
-            &.small {
-              font-size: 12px;
+            &.column-flush {
+              width: 100%;
             }
           }
         }
       }
-    }
 
-    thead {
-      tr {
-        border-bottom: 1px solid $fluid-gray-300;
+      thead {
+        tr {
+          border-bottom: 1px solid $fluid-gray-300;
 
-        th {
-          color: $fluid-gray-700;
-          font-size: 12px;
-          font-weight: 400;
-          white-space: nowrap;
+          th {
+            color: $fluid-gray-700;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
 
-          .sort-header {
-            display: flex;
-            cursor: pointer;
-            align-items: center;
-            letter-spacing: normal;
-            outline: 0;
+            .sort-header {
+              display: flex;
+              cursor: pointer;
+              align-items: center;
+              letter-spacing: normal;
+              outline: 0;
+            }
           }
         }
       }
-    }
 
-    tbody {
-      tr {
-        border-bottom: 1px solid $fluid-gray-200;
+      tbody {
+        tr {
+          border-bottom: 1px solid $fluid-gray-200;
 
-        td {
-          color: $fluid-gray-900;
-          font-size: 14px;
+          td {
+            color: $fluid-gray-900;
+            font-size: 14px;
 
-          &:last-of-type {
-            padding-right: 8px;
+            &:last-of-type {
+              padding-right: 8px;
+            }
           }
         }
       }
