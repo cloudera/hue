@@ -812,12 +812,12 @@ class DataCatalogEntry {
    */
   getResolvedComment() {
     const self = this;
+    if (self.definition && self.definition.comment) {
+      return self.definition.comment;
+    }
     // TODO: Move to connector attributes
     if (self.navigatorMeta && (self.getDialect() === 'hive' || self.getDialect() === 'impala')) {
       return self.navigatorMeta.description || self.navigatorMeta.originalDescription || '';
-    }
-    if (self.definition && self.definition.comment) {
-      return self.definition.comment;
     }
     return (self.sourceMeta && self.sourceMeta.comment) || '';
   }
