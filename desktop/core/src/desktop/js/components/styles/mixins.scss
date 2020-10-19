@@ -32,7 +32,7 @@ $hue-panel-border-radius: 2px;
   -o-transform: $transform;
 }
 
-.nowrap-ellipsis {
+@mixin nowrap-ellipsis {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow-x: hidden;
