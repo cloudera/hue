@@ -813,7 +813,11 @@ class DataCatalogEntry {
   getResolvedComment() {
     const self = this;
     // TODO: Move to connector attributes
-    if (self.navigatorMeta && (self.getDialect() === 'hive' || self.getDialect() === 'impala') && (self.navigatorMeta.description || self.navigatorMeta.originalDescription)) {
+    if (
+      self.navigatorMeta &&
+      (self.getDialect() === 'hive' || self.getDialect() === 'impala') &&
+      (self.navigatorMeta.description || self.navigatorMeta.originalDescription)
+    ) {
       return self.navigatorMeta.description || self.navigatorMeta.originalDescription;
     }
     if (self.definition && self.definition.comment) {
