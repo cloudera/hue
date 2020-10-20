@@ -108,7 +108,9 @@ class FlinkSqlApi(Api):
     session_id = session['id']
     job_id = None
 
-    resp = self.db.execute_statement(session_id=session_id, statement=snippet['statement'])
+    statement = snippet['statement'].strip().rstrip(';')
+
+    resp = self.db.execute_statement(session_id=session_id, statement=statement)
 
     if resp['statement_types'][0] == 'SELECT':
       job_id = resp['results'][0]['data'][0][0]
