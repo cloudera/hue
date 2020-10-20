@@ -33,7 +33,7 @@ from desktop.lib.i18n import smart_unicode
 from desktop.lib.rest.http_client import RestException
 from desktop.models import Document2, Document, FilesystemException
 
-from notebook.conf import check_has_missing_permission
+from notebook.conf import check_has_missing_permission, ENABLE_NOTEBOOK_2
 from notebook.connectors.base import QueryExpired, QueryError, SessionExpired, AuthenticationRequired, OperationTimeout, \
   OperationNotSupported
 from notebook.models import _get_editor_type
@@ -115,7 +115,11 @@ def api_error_handler(f):
     except SessionExpired as e:
       response['status'] = -2
     except QueryExpired as e:
-      response['status'] = -3
+      if ENABLE_NOTEBOOK_2.get():
+        response['query_status'] = {'status': 'expired'}
+        response['status'] = 0
+      else:
+        response['status'] = -3
       if e.message and isinstance(e.message, basestring):
         response['message'] = e.message
     except AuthenticationRequired as e:
