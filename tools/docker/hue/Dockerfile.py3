@@ -61,7 +61,11 @@ RUN ./build/env/bin/pip install \
   # Avoid Django 3 pulling
   django_redis==4.11.0 \
   flower \
-  git+https://github.com/gethue/PyHive \
+  pyhive \
+  ksql \
+  pydruid \
+  pybigquery \
+  pyasn1==0.4.1 \
   gevent \
   eventlet \
   threadloop  # Needed for Jaeger \
