@@ -26,20 +26,9 @@ Hue connects to any database or warehouse via native or SqlAlchemy connectors. C
 
 Note that USER and PASSWORD can be prompted to the user by using variables like `mysql://${USER}:${PASSWORD}@localhost:3306/hue`.
 
+Most of the interpreters require to install their SqlAlchemy dialect either in the global Python environment or in the Hue virtual environment.
+
 Read about [how to build your own parser](/developer/parsers/) if you are looking at better autocompletes for your own SQL dialects.
-
-### Apache Impala
-
-Support is native via a dedicated section.
-
-    [impala]
-      # Host of the Impala Server (one of the Impalad)
-      server_host=localhost
-
-      # Port of the Impala Server
-      server_port=21050
-
-Read more about [LDAP or PAM pass-through authentication](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/) and [High Availability](../server/).
 
 ### Apache Hive
 
@@ -72,9 +61,9 @@ When the LLAP interpreter is added, there are 2 ways to enable connectivity (dir
 
     [notebook]
     [[interpreters]]
-      [[[llap]]]
-      name=LLAP
-      interface=hiveserver2
+    [[[llap]]]
+    name=LLAP
+    interface=hiveserver2
 
     [beeswax]
     # Direct Configuration
@@ -103,6 +92,20 @@ In order to prevent spamming zookeeper, HiveServer2 is cached for the life of th
 
     [beeswax]
     cache_timeout = 60
+
+### Apache Impala
+
+Support is native via a dedicated section.
+
+    [impala]
+    # Host of the Impala Server (one of the Impalad)
+    server_host=localhost
+
+    # Port of the Impala Server
+    server_port=21050
+
+Read more about [LDAP or PAM pass-through authentication](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/) and [High Availability](../server/).
+
 
 ### MySQL
 
@@ -140,9 +143,9 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source following the `presto://{presto-coordinator}:{port}/{catalog}/{schema}` format:
 
     [[[presto]]]
-       name = Presto
-       interface=sqlalchemy
-       options='{"url": "presto://localhost:8080/tpch/default"}'
+      name = Presto
+      interface=sqlalchemy
+      options='{"url": "presto://localhost:8080/tpch/default"}'
 
 With impersonation:
 
@@ -173,14 +176,14 @@ Alternative interfaces.
 Direct:
 
     [[[presto]]]
-      name=Presto SQL
-      interface=presto
-      ## Specific options for connecting to the Presto server.
-      ## To connect to Presto over HTTPS/SSL you will need to construct connection string like below:
-      ## "url": "jdbc:presto://localhost:8080/catalog/schema?SSL=true&SSLTrustStorePath=/path/to/key_file&SSLTrustStorePassword=${password}"
-      ## The JDBC driver presto-jdbc.jar need to be in the CLASSPATH environment variable.
-      ## If 'user' and 'password' are omitted, they will be prompted in the UI.
-      options='{"url": "jdbc:presto://localhost:8080/catalog/schema", "driver": "io.prestosql.jdbc.PrestoDriver", "user": "root", "password": "root"}'
+    name=Presto SQL
+    interface=presto
+    ## Specific options for connecting to the Presto server.
+    ## To connect to Presto over HTTPS/SSL you will need to construct connection string like below:
+    ## "url": "jdbc:presto://localhost:8080/catalog/schema?SSL=true&SSLTrustStorePath=/path/to/key_file&SSLTrustStorePassword=${password}"
+    ## The JDBC driver presto-jdbc.jar need to be in the CLASSPATH environment variable.
+    ## If 'user' and 'password' are omitted, they will be prompted in the UI.
+    options='{"url": "jdbc:presto://localhost:8080/catalog/schema", "driver": "io.prestosql.jdbc.PrestoDriver", "user": "root", "password": "root"}'
 
 JDBC:
 
@@ -215,32 +218,10 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source:
 
     [[[postgresql]]]
-       name = PostgreSql
-       interface=sqlalchemy
-       options='{"url": "postgresql+psycopg2://user:password@host:31335/database"}'
+    name = PostgreSql
+    interface=sqlalchemy
+    options='{"url": "postgresql+psycopg2://user:password@host:31335/database"}'
 
-Alternative:
-
-First, in your hue.ini file, you will need to add the relevant database connection information under the librdbms section:
-
-    [librdbms]
-      [[databases]]
-        [[[postgresql]]]
-        nice_name=PostgreSQL
-        name=music
-        engine=postgresql_psycopg2
-        port=5432
-        user=hue
-        password=hue
-        options={}
-
-Secondly, we need to add a new interpreter to the notebook app. This will allow the new database type to be registered as a snippet-type in the Notebook app. For query editors that use a Django-compatible database, the name in the brackets should match the database configuration name in the librdbms section (e.g. – postgresql). The interface will be set to rdbms. This tells Hue to use the librdbms driver and corresponding connection information to connect to the database. For example, with the above postgresql connection configuration in the librdbms section, we can add a PostgreSQL interpreter with the following notebook configuration:
-
-    [notebook]
-      [[interpreters]]
-        [[[postgresql]]]
-        name=PostgreSQL
-        interface=rdbms
 
 ### AWS Athena
 
@@ -261,13 +242,68 @@ e.g.
 
 Note: Keys and S3 buckets need to be URL quoted but Hue does it automatically for you.
 
+
+
+### Apache Phoenix
+
+The official Phoenix dialect is already shipped in Hue. However if you want to update it yourself:
+
+    ./build/env/bin/pip install phoenixdb
+
+Then give Hue the information about the database source:
+
+    [[[phoenix]]]
+    name=HBase Phoenix
+    interface=sqlalchemy
+    options='{"url": "phoenix://sql-phoenix.gethue.com:8765/"}'
+
+If using security:
+
+    [[[phoenix]]]
+    name=HBase Phoenix
+    interface=sqlalchemy
+    options='{"url": "phoenix://sql-phoenix.gethue.com:8765", "tls": true, "connect_args": {"authentication": "SPNEGO", "verify": false }}'
+
+
+Grant the appropriate hbase rights to the 'hue' user, e.g.:
+
+    grant 'hue', 'RWXCA'
+
+
+With impersonation:
+
+    options='{"url": "phoenix://sql-phoenix.gethue.com:8765", "has_impersonation": true}'
+
+
+**Notes**
+
+1. Existing HBase tables need to be mapped to views
+
+    ```
+    0: jdbc:phoenix:> CREATE VIEW if not exists "analytics_demo_view" ( pk VARCHAR PRIMARY KEY, "hours"."01-Total" VARCHAR );
+    Error: ERROR 505 (42000): Table is read only. (state=42000,code=505)
+    -->
+    0: jdbc:phoenix:> CREATE Table if not exists "analytics_demo" ( pk VARCHAR PRIMARY KEY, "hours"."01-Total" VARCHAR );
+    ```
+
+2. Tables are seeing as uppercase by Phoenix. When getting started, it is simpler to just create the table via Phoenix.
+
+    ```
+    Error: ERROR 1012 (42M03): Table undefined. tableName=ANALYTICS_DEMO (state=42M03,code=1012)
+    -->
+    0: jdbc:phoenix:> select * from "analytics_demo" where pk = "domain.0" limit 5;
+    ```
+
+3. Phoenix follows Apache Calcite. Feel free to help improve the [SQL autocomplete](https://docs.gethue.com/developer/parsers/) support for it.
+
+4. The UI (and the underlying SQLAlchemy API) cannot distinguish between 'ANY namespace' and 'empty/Default' namespace
+
+
 ### Apache Druid
 
-First, make sure that Hue can talk to Druid via the [pydruid SqlAlchemy connector](https://github.com/druid-io/pydruid). Either make sure it is in the global Python environment or install it in the Hue virtual environment.
+First, make sure that Hue can talk to Druid via the [pydruid SqlAlchemy connector](https://github.com/druid-io/pydruid).
 
     ./build/env/bin/pip install pydruid
-
-**Note** Make sure the version is equal or more to 0.4.1 if not you will get a "Can't load plugin: sqlalchemy.dialects:druid".
 
 In the hue.ini configuration file, now let's add the interpreter. Here 'druid-host.com' would be the machine where Druid is running.
 
@@ -282,6 +318,75 @@ In the hue.ini configuration file, now let's add the interpreter. Here 'druid-ho
 Adding the `+https` prefix will use HTTPS e.g.:
 
     druid+https://druid-host.com:8082/druid/v2/sql/?header=true
+
+
+### Apache Flink
+
+The dialect currently requires the Flink SQL Gateway to submit queries: https://github.com/ververica/flink-sql-gateway/releases. The [tutorial](https://gethue.com/blog/sql-editor-for-apache-flink-sql/) demoes how to set it up.
+
+Then add a Flink interpreter in the Hue configuration:
+
+    [notebook]
+
+    [[interpreters]]
+
+    [[[flink]]]
+    name=Flink
+    interface=flink
+    options='{"url": "http://172.18.0.7:8083"}'
+
+
+### ksqlDB
+
+The ksql Python module should be added to the system or Hue Python virtual environment:
+
+    ./build/env/bin/pip install ksql
+
+
+**Note** The connector requires [Hue with Python 3](/administrator/installation/dependencies/#python)
+
+Then give Hue the information about the interpreter and ksqlDB server. To add to the list of interpreters:
+
+    [[[ksqlDB]]]
+    name=ksqlDB
+    interface=ksql
+    options='{"url": "http://ksqldb-server:8088"}'
+
+
+### Google BigQuery
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+    ./build/env/bin/pip install pybigquery
+    ./build/env/bin/pip install pyasn1==0.4.1
+
+From https://github.com/mxmzdlv/pybigquery.
+
+Then give Hue the information about the database source:
+
+    [[[bigquery]]]
+       name = BigQuery
+       interface=sqlalchemy
+       options='{"url": "bigquery://project-XXXXXX", "credentials_json": "{\"type\": \"service_account\", ...}"}'
+
+Where to get the Json credentials? By creating a service account:
+
+* https://googleapis.dev/python/google-api-core/latest/auth.html
+* https://console.cloud.google.com/iam-admin/serviceaccounts
+
+Where to get the names? In the 'Resources' panel of Big Query UI:
+
+* Project name, e.g. project-XXXXXX, bigquery-public-data..., is the first level
+* Dataset name, e.g. austin_bikeshare, is the second level
+
+To restrict to one dataset:
+
+       options='{"url": "bigquery://project-XXXXXX"/dataset_name"}'
+
+Supporting additional [connection parameters](https://github.com/mxmzdlv/pybigquery#connection-string-parameters):
+
+      options='{"url": "bigquery://", "use_query_cache": "true"}'
+
 
 ### Teradata
 
@@ -378,36 +483,6 @@ And as always, make sure you have an interpreter configured:
     interface=livy
 
 
-### ksqlDB
-
-The ksql Python module should be added to the system or Hue Python virtual environment:
-
-    ./build/env/bin/pip install git+https://github.com/bryanyang0528/ksql-python
-
-Then give Hue the information about the interpreter and ksqlDB API:
-
-To add to the list of interpreters:
-
-    [[interpreters]]
-
-    [[[ksql]]]
-    name=ksql
-    interface=ksql
-
-    ...
-
-    [kafka]
-
-    [[kafka]]
-    # Enable the Kafka integration.
-    is_enabled=true
-
-    # Base URL of Kafka Ksql API.
-    ## ksql_api_url=http://127.0.0.1:8088
-
-
-Note: the configuration will be much simpler after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758).
-
 ### Azure SQL Database
 
 The dialect should be added to the Python system or Hue Python virtual environment:
@@ -419,9 +494,9 @@ Then configure ODBC according to the [documentation](https://github.com/mkleeham
 Then give Hue the information about the database source:
 
     [[[azuresql]]]
-       name = Azure SQL Server
-       interface=sqlalchemy
-       options='{"url": "mssql+pyodbc://<user>@<server-host>:<password>@<server-host>.database.windows.net:1433/<database>?driver=ODBC+Driver+13+for+SQL+Server"}'
+    name = Azure SQL Server
+    interface=sqlalchemy
+    options='{"url": "mssql+pyodbc://<user>@<server-host>:<password>@<server-host>.database.windows.net:1433/<database>?driver=ODBC+Driver+13+for+SQL+Server"}'
 
 Note: Properties need to be URL quoted (e.g. with `urllib.quote_plus(...)` in Python).
 
@@ -471,77 +546,6 @@ Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Dri
     interface=jdbc
     options='{"url": "jdbc:vertica://localhost:5433/example", "driver": "com.vertica.jdbc.Driver", "user": "admin", "password": "pass"}'
 
-### Apache Phoenix
-
-The official Python [Phoenix dialect](https://github.com/apache/phoenix-queryserver/tree/master/python/phoenixdb) is already shipped in Hue and below is optional except when using Python 3 until [PHOENIX-5939](https://issues.apache.org/jira/browse/PHOENIX-5939) is available. Also, if you want to update it yourself to the very latest:
-
-    git clone https://github.com/apache/phoenix-queryserver.git
-    $HUE/build/env/bin/pip install file:///home/gethue/phoenix-queryserver/python-phoenixdb
-
-Then give Hue the information about the database source:
-
-    [[[phoenix]]]
-    name=HBase Phoenix
-    interface=sqlalchemy
-    options='{"url": "phoenix://sql-phoenix.gethue.com:8765/"}'
-
-If using security:
-
-    [[[phoenix]]]
-    name=HBase Phoenix
-    interface=sqlalchemy
-    options='{"url": "phoenix://sql-phoenix.gethue.com:8765", "tls": true, "connect_args": {"authentication": "SPNEGO", "verify": false }}'
-
-
-Grant the appropriate hbase rights to the 'hue' user, e.g.:
-
-    grant 'hue', 'RWXCA'
-
-
-With impersonation:
-
-    options='{"url": "phoenix://sql-phoenix.gethue.com:8765", "has_impersonation": true}'
-
-
-**Notes**
-
-1. Existing HBase tables need to be mapped to views
-
-    ```
-    0: jdbc:phoenix:> CREATE VIEW if not exists "analytics_demo_view" ( pk VARCHAR PRIMARY KEY, "hours"."01-Total" VARCHAR );
-    Error: ERROR 505 (42000): Table is read only. (state=42000,code=505)
-    -->
-    0: jdbc:phoenix:> CREATE Table if not exists "analytics_demo" ( pk VARCHAR PRIMARY KEY, "hours"."01-Total" VARCHAR );
-    ```
-
-2. Tables are seeing as uppercase by Phoenix. When getting started, it is simpler to just create the table via Phoenix.
-
-    ```
-    Error: ERROR 1012 (42M03): Table undefined. tableName=ANALYTICS_DEMO (state=42M03,code=1012)
-    -->
-    0: jdbc:phoenix:> select * from "analytics_demo" where pk = "domain.0" limit 5;
-    ```
-
-3. Phoenix follows Apache Calcite. Feel free to help improve the [SQL autocomplete](https://docs.gethue.com/developer/parsers/) support for it.
-
-4. The UI (and the underlying SQLAlchemy API) cannot distinguish between 'ANY namespace' and 'empty/Default' namespace
-
-
-### Apache Flink
-
-The dialect currently requires the Flink SQL Gateway to submit queries: https://github.com/ververica/flink-sql-gateway/releases. The [tutorial](https://gethue.com/blog/sql-editor-for-apache-flink-sql/) demoes how to set it up.
-
-Then add a Flink interpreter in the Hue configuration:
-
-    [notebook]
-
-    [[interpreters]]
-
-    [[[flink]]]
-    name=Flink
-    interface=flink
-    options='{"url": "http://172.18.0.7:8083"}'
-
 
 ### AWS Redshift
 
@@ -555,40 +559,6 @@ Then give Hue the information about the database source:
        name = Redshift
        interface=sqlalchemy
        options='{"url": "redshift+psycopg2://username@host.amazonaws.com:5439/database"}'
-
-### Google BigQuery
-
-The dialect should be added to the Python system or Hue Python virtual environment:
-
-    ./build/env/bin/pip install pybigquery
-    ./build/env/bin/pip install pyasn1==0.4.1
-
-From https://github.com/mxmzdlv/pybigquery.
-
-Then give Hue the information about the database source:
-
-    [[[bigquery]]]
-       name = BigQuery
-       interface=sqlalchemy
-       options='{"url": "bigquery://project-XXXXXX", "credentials_json": "{\"type\": \"service_account\", ...}"}'
-
-Where to get the Json credentials? By creating a service account:
-
-* https://googleapis.dev/python/google-api-core/latest/auth.html
-* https://console.cloud.google.com/iam-admin/serviceaccounts
-
-Where to get the names? In the 'Resources' panel of Big Query UI:
-
-* Project name, e.g. project-XXXXXX, bigquery-public-data..., is the first level
-* Dataset name, e.g. austin_bikeshare, is the second level
-
-To restrict to one dataset:
-
-       options='{"url": "bigquery://project-XXXXXX"/dataset_name"}'
-
-Supporting additional [connection parameters](https://github.com/mxmzdlv/pybigquery#connection-string-parameters):
-
-      options='{"url": "bigquery://", "use_query_cache": "true"}'
 
 
 ### Apache Drill
