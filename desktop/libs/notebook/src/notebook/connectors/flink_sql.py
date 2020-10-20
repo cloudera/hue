@@ -71,7 +71,7 @@ class FlinkSqlApi(Api):
 
   @query_error_handler
   def create_session(self, lang=None, properties=None):
-    session = self.db.create_session()
+    session = self._get_session()
 
     response = {
       'type': lang,
@@ -87,18 +87,21 @@ class FlinkSqlApi(Api):
     }
 
     if session_key not in SESSIONS:
-      SESSIONS[session_key] = self.create_session()
+      SESSIONS[session_key] = self.db.create_session()
 
     try:
-      self.db.session_heartbeat(session_id=SESSIONS[session_key]['id'])
+      self.db.session_heartbeat(session_id=SESSIONS[session_key]['session_id'])
     except Exception as e:
       if 'Session: %(id)s does not exist' % SESSIONS[session_key] in str(e):
         LOG.warn('Session: %(id)s does not exist, opening a new one' % SESSIONS[session_key])
-        SESSIONS[session_key] = self.create_session()
+        SESSIONS[session_key] = self.db.create_session()
       else:
         raise e
 
+    SESSIONS[session_key]['id'] = SESSIONS[session_key]['session_id']
+
     return SESSIONS[session_key]
+
 
   @query_error_handler
   def execute(self, notebook, snippet):
