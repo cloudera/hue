@@ -42,5 +42,7 @@
 </script>
 
 <style lang="scss" scoped>
-  // TODO: Scope the button styles.
+  .btn {
+    border-radius: 3px;
+  }
 </style>

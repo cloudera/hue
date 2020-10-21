@@ -1,0 +1,78 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ExecutableActions.vue should render 1`] = `
+<div
+  class="snippet-execute-actions"
+>
+  <hue-button-stub
+    disabled="true"
+    small="true"
+    title="Creating session"
+  >
+    <i
+      class="fa fa-fw fa-spinner fa-spin"
+    />
+     Loading
+  
+  </hue-button-stub>
+   
+  <!---->
+   
+  <!---->
+   
+  <!---->
+   
+  <form
+    autocomplete="off"
+    class="inline-block margin-left-10"
+  >
+    <input
+      autocapitalize="off"
+      autocomplete="do-not-autocomplete"
+      autocorrect="off"
+      class="input-small limit-input"
+      placeholder="Limit"
+      spellcheck="false"
+      type="number"
+    />
+  </form>
+</div>
+`;
+
+exports[`ExecutableActions.vue should show execute once the session is loaded 1`] = `
+<div
+  class="snippet-execute-actions"
+>
+  <!---->
+   
+  <hue-button-stub
+    primary="true"
+    small="true"
+  >
+    <i
+      class="fa fa-play fa-fw"
+    />
+     Execute
+  
+  </hue-button-stub>
+   
+  <!---->
+   
+  <!---->
+   
+  <form
+    autocomplete="off"
+    class="inline-block margin-left-10"
+  >
+    <input
+      autocapitalize="off"
+      autocomplete="do-not-autocomplete"
+      autocorrect="off"
+      class="input-small limit-input"
+      placeholder="Limit"
+      spellcheck="false"
+      type="number"
+    />
+  </form>
+</div>
+`;

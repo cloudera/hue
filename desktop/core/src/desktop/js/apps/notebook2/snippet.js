@@ -19,12 +19,13 @@ import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
 import { markdown } from 'markdown';
 
-import 'apps/notebook2/components/ko.executableActions';
 import 'apps/notebook2/components/ko.executableLogs';
 import 'apps/notebook2/components/ko.executableProgressBar';
 import 'apps/notebook2/components/ko.snippetEditorActions';
 import 'apps/notebook2/components/ko.snippetResults';
 import 'apps/notebook2/components/ko.queryHistory';
+
+import './components/SqlEditor.vue';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';
@@ -44,7 +45,7 @@ import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
-import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from 'apps/notebook2/components/ko.executableActions';
+import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from './components/ExecutableActions.vue';
 import { ADD_TO_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
 import { findEditorConnector, getLastKnownConfig } from 'utils/hueConfig';
 import { cancelActiveRequest } from 'api/apiUtils';

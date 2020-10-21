@@ -16,6 +16,13 @@
 
 import * as ko from 'knockout';
 
+ko.bindingHandlers.vueKoProps = {
+  init: (element, valueAccessor) => {
+    const data = valueAccessor();
+    Object.assign(element, data);
+  }
+};
+
 ko.bindingHandlers.vueProps = {
   init: (element, valueAccessor) => {
     const data = valueAccessor();

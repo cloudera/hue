@@ -30,7 +30,7 @@ export default class Executor {
   compute: () => Compute;
   namespace: () => Namespace;
   database: () => string;
-  defaultLimit?: () => number;
+  defaultLimit?: KnockoutObservable<number>;
   isSqlEngine?: boolean;
   isOptimizerEnabled?: boolean;
   executables: Executable[] = [];
@@ -42,7 +42,7 @@ export default class Executor {
     compute: () => Compute;
     namespace: () => Namespace;
     database: () => string;
-    defaultLimit?: () => number;
+    defaultLimit?: KnockoutObservable<number>;
     isSqlEngine?: boolean;
     snippet?: Snippet;
     isOptimizerEnabled?: boolean;
