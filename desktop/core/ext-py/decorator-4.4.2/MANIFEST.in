@@ -1,0 +1,2 @@
+include README.rst LICENSE.txt CHANGES.md performance.sh documentation.pdf
+recursive-include src/tests *.py
