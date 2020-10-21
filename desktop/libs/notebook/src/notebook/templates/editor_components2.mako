@@ -1237,7 +1237,12 @@
 
   <script type ="text/html" id="snippet-execution-controls${ suffix }">
     <div class="snippet-actions clearfix">
-      <div class="pull-left" data-bind="component: { name: 'executable-actions', params: { activeExecutable: activeExecutable, beforeExecute: beforeExecute } }"></div>
+      <div class="pull-left">
+        <sql-editor data-bind="vueKoProps: {
+          executableObservable: activeExecutable,
+          beforeExecute: beforeExecute
+        }"></sql-editor>
+      </div>
       <!-- ko if: isSqlDialect() && !$root.isPresentationMode() -->
       <div class="pull-right" data-bind="component: { name: 'snippet-editor-actions', params: { snippet: $data } }"></div>
       <!-- /ko -->
