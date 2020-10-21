@@ -1,11 +1,12 @@
 module.exports = {
   moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx', 'json', 'vue'],
   transform: {
-    "^.+\\.(js|ts)$": "babel-jest",
-    "^.+\\.vue$": "vue-jest"
+    '^.+\\.(js|ts)$': 'babel-jest',
+    '^.+\\.vue$': 'vue-jest'
   },
-  "moduleNameMapper": {
-    "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+  moduleNameMapper: {
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    '^\\./desktop/core/src/desktop/js/(.*)$': '<rootDir>/desktop/core/src/desktop/js/$1'
   },
   moduleDirectories: ['node_modules', 'desktop/core/src/desktop/js'],
   modulePaths: ['desktop/core/src/desktop/js'],
@@ -21,7 +22,7 @@ module.exports = {
     '<rootDir>/desktop/core/src/desktop/js/parse/sql/druid/test',
     '<rootDir>/desktop/core/src/desktop/js/parse/sql/presto/test',
     '<rootDir>/desktop/core/src/desktop/js/parse/sql/calcite/test',
-    '<rootDir>/desktop/core/src/desktop/js/parse/sql/flink/test',
+    '<rootDir>/desktop/core/src/desktop/js/parse/sql/flink/test'
   ],
   collectCoverageFrom: ['<rootDir>/desktop/core/src/desktop/js/**/*.{js,jsx,vue}']
 };
