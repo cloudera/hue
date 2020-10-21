@@ -19,8 +19,9 @@ import * as ko from 'knockout';
 import { MULTI_NAME as SIMPLE_ACE_MULTI } from 'ko/components/simpleAceEditor/ko.simpleAceEditor';
 import { CONTEXT_SELECTOR_COMPONENT } from 'ko/components/ko.contextSelector';
 import { HUE_DROP_DOWN_COMPONENT } from 'ko/components/ko.dropDown';
-import { NAME as EXECUTABLE_ACTIONS } from 'apps/notebook2/components/ko.executableActions';
 import { SIMPLE_RESULT_GRID_COMPONENT } from 'apps/notebook2/components/resultGrid/ko.simpleResultGrid';
+
+import 'apps/notebook2/components/SqlEditor.vue';
 
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
@@ -83,12 +84,9 @@ const TEMPLATE = `
           }
         }
       "></div>
-      <div data-bind="
-        component: {
-          name: '${ EXECUTABLE_ACTIONS }',
-          params: { activeExecutable: $parent.activeExecutable }
-        }
-      "></div>
+      <sql-editor data-bind="vueKoProps: {
+          executableObservable: $parent.activeExecutable
+        }"></sql-editor>
       <div data-bind="
         component: {
           name: '${ SIMPLE_RESULT_GRID_COMPONENT }',
