@@ -60,7 +60,7 @@ def list_topics(request):
   return JsonResponse({
     'status': 0,
     'topics': [
-      {'name': topic} for topic in get_topics()
+      {'name': topic} for topic in get_topics(request.user)
     ]
   })
 
@@ -97,19 +97,21 @@ def create_topic(request):
   })
 
 
-def get_topics():
+def get_topics(user):
   if has_kafka_api():
     return KafkaApi().topics()
   else:
-    try:
-      manager = ManagerApi()
-      broker_host = manager.get_kafka_brokers().split(',')[0].split(':')[0]
-      return [
-        name
-        for name in list(manager.get_kafka_topics(broker_host).keys()) if not name.startswith('__')
-      ]
-    except Exception as e:
-      return ['user_behavior']
+    from metadata.models.bigquery_client import _get_notebook_api
+    data = {
+      'snippet': {},
+      'database': 'topics'
+    }
+
+    return [
+      topic['name']
+      for topic in _get_notebook_api(user, connector_id=56).autocomplete(**data)['tables_meta']
+      if not topic['name'].startswith('__')
+    ]
 
 
 def get_topic(name):
