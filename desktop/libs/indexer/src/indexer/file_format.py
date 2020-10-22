@@ -48,7 +48,10 @@ IMPORT_PEEK_NLINES = 20
 
 
 def get_format_types():
-  formats = [CSVFormat]
+  formats = [
+    CSVFormat,
+    JsonFormat
+  ]
 
   if ENABLE_SCALABLE_INDEXER.get():
     formats.extend([
@@ -597,6 +600,15 @@ class CSVFormat(FileFormat):
       fields = []
 
     return fields
+
+
+class JsonFormat(CSVFormat):
+  _name = "json"
+  _description = _("Json")
+  _args = [
+    CheckboxArgument("hasHeader", "Has Header")
+  ]
+  _extensions = ["json"]
 
 
 class GzipFileReader(object):
