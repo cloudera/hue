@@ -305,7 +305,16 @@ def connect_to_thrift(conf):
     mode.set_verify(conf.validate)
   else:
     if conf.use_ssl:
-      mode = TSSLSocketWithWildcardSAN(conf.host, conf.port, validate=conf.validate, ca_certs=conf.ca_certs, keyfile=conf.keyfile, certfile=conf.certfile)
+      try:
+         from ssl import PROTOCOL_TLS
+         PROTOCOL_SSLv23 = PROTOCOL_TLS
+      except ImportError:
+        try:
+          from ssl import PROTOCOL_SSLv23 as PROTOCOL_TLS
+          PROTOCOL_SSLv23 = PROTOCOL_TLS
+        except ImportError:
+          PROTOCOL_SSLv23 = PROTOCOL_TLS = 2
+      mode = TSSLSocketWithWildcardSAN(conf.host, conf.port, validate=conf.validate, ca_certs=conf.ca_certs, keyfile=conf.keyfile, certfile=conf.certfile,ssl_version=PROTOCOL_SSLv23)
     else:
       mode = TSocket(conf.host, conf.port)
 

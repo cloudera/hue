@@ -40,9 +40,9 @@ class TSSLSocketWithWildcardSAN(TSSLSocket.TSSLSocket):
       validate=True,
       ca_certs=None,
       unix_socket=None,
-      keyfile=None, certfile=None
+      keyfile=None, certfile=None,ssl_version=None
       ):
-    TSSLSocket.TSSLSocket.__init__(self, host, port, validate, ca_certs, keyfile, certfile, unix_socket)
+    TSSLSocket.TSSLSocket.__init__(self, host, port, validate, ca_certs, keyfile, certfile, unix_socket,ssl_version=ssl_version)
 
   def _validate_cert(self):
     cert = self.handle.getpeercert()
