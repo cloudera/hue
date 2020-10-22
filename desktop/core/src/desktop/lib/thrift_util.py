@@ -632,26 +632,26 @@ def thrift2json(tft):
       JSON protocol only supports key types that are base types.
   I believe this ought to be true for sets, as well.
   """
-  if isinstance(tft,type(None)):
+  if isinstance(tft, type(None)):
     return None
-  if isinstance(tft,(float,int,complex,basestring)):
+  if isinstance(tft, (float,int,complex,basestring)):
     return tft
-  if isinstance(tft,dict):
+  if isinstance(tft, dict):
     d = {}
     for key, val in tft.items():
       d[key] = thrift2json(val)
     return d
-  if isinstance(tft,list):
+  if isinstance(tft, list):
     return [thrift2json(x) for x in tft]
   if isinstance(tft, set):
-    return dict( (x, True) for x in tft )
+    return dict((x, True) for x in tft)
 
   json = {}
   d = {}
-  if hasattr(tft,"__dict__"):
+  if hasattr(tft, "__dict__"):
     d = tft.__dict__
   else:
-    if hasattr(tft,"__slots__"):
+    if hasattr(tft, "__slots__"):
       d = tft.__slots__
     else:
       return {}
@@ -819,7 +819,7 @@ def fixup_enums(obj, name_class_map, suffix="AsString"):
   """
   for n in list(name_class_map.keys()):
     c = name_class_map[n]
-    setattr(obj, n + suffix, c._VALUES_TO_NAMES[getattr(obj,n)])
+    setattr(obj, n + suffix, c._VALUES_TO_NAMES[getattr(obj, n)])
   return obj
 
 def is_thrift_struct(o):
