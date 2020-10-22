@@ -3,31 +3,37 @@
 // distributed with this work for additional information
 // regarding copyright ownership.  Cloudera, Inc. licenses this file
 // to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
+// 'License'); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
+// distributed under the License is distributed on an 'AS IS' BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
 import huePubSub from 'utils/huePubSub';
-import { koSetup } from 'jest/koTestUtils';
-import { NAME } from './ko.executableActions';
+import Vue from 'vue';
+import { mount, shallowMount } from '@vue/test-utils';
 import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
-import { sleep } from 'utils/hueUtils';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
+import ExecutableActions from './ExecutableActions.vue';
 
-describe('ko.executableActions.js', () => {
-  const setup = koSetup();
+/* eslint-disable @typescript-eslint/no-empty-function */
 
-  it('should render component', async () => {
+describe('ExecutableActions.vue', () => {
+  it('should render', () => {
+    const wrapper = shallowMount(ExecutableActions);
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('should show execute once the session is loaded', async () => {
     const spy = spyOn(sessionManager, 'getSession').and.returnValue(
       Promise.resolve({ type: 'foo' })
     );
+
     const mockExecutable = {
       cancel: () => {},
       cancelBatchChain: () => {},
@@ -44,14 +50,17 @@ describe('ko.executableActions.js', () => {
       },
       status: EXECUTION_STATUS.ready
     };
-    const activeExecutable = () => mockExecutable;
-    activeExecutable.prototype.subscribe = () => {};
-    const element = await setup.renderComponent(NAME, {
-      activeExecutable: activeExecutable
+
+    const wrapper = shallowMount(ExecutableActions, {
+      propsData: {
+        executable: mockExecutable
+      }
     });
 
+    await Vue.nextTick();
+
     expect(spy).toHaveBeenCalled();
-    expect(element.querySelector('[data-test="' + NAME + '"]')).toBeTruthy();
+    expect(wrapper.element).toMatchSnapshot();
   });
 
   it('should handle execute and stop clicks', async () => {
@@ -77,38 +86,42 @@ describe('ko.executableActions.js', () => {
       executor: {
         defaultLimit: () => {},
         connector: () => ({
-          id: 'foo'
+          id: 'foo',
+          type: 'foo'
         })
       },
       status: EXECUTION_STATUS.ready
     };
-    const activeExecutable = () => mockExecutable;
-    activeExecutable.prototype.subscribe = () => {};
-    const wrapper = await setup.renderComponent(NAME, {
-      activeExecutable: activeExecutable
+
+    const wrapper = mount(ExecutableActions, {
+      propsData: {
+        executable: mockExecutable
+      }
     });
 
     expect(spy).toHaveBeenCalled();
 
+    await Vue.nextTick();
+
     // Click play
     expect(executeCalled).toBeFalsy();
-    expect(wrapper.querySelector('[data-test="execute"]')).toBeTruthy();
-    expect(wrapper.querySelector('[data-test="stop"]')).toBeFalsy();
-    wrapper.querySelector('[data-test="execute"]').click();
+    expect(wrapper.get('button').text()).toContain('Execute');
+    wrapper.get('button').trigger('click');
 
-    await sleep(0);
+    await Vue.nextTick();
 
     expect(executeCalled).toBeTruthy();
     mockExecutable.status = EXECUTION_STATUS.running;
     huePubSub.publish(EXECUTABLE_UPDATED_EVENT, mockExecutable);
 
-    await setup.waitForKoUpdate();
+    await Vue.nextTick();
 
     // Click stop
     expect(cancelCalled).toBeFalsy();
-    expect(wrapper.querySelector('[data-test="execute"]')).toBeFalsy();
-    expect(wrapper.querySelector('[data-test="stop"]')).toBeTruthy();
-    wrapper.querySelector('[data-test="stop"]').click();
+    expect(wrapper.get('button').text()).toContain('Stop');
+    wrapper.get('button').trigger('click');
+
+    await Vue.nextTick();
 
     expect(cancelCalled).toBeTruthy();
   });
