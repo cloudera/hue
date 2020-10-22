@@ -19,7 +19,6 @@ from __future__ import absolute_import
 
 import logging
 
-from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import force_unicode
@@ -82,7 +81,8 @@ class KSqlApi(Api):
             'name': col['name'],
             'type': col['type'],
             'comment': ''
-          } for col in description
+          }
+          for col in description
         ] if has_result_set else [],
         'type': 'table'
       }
