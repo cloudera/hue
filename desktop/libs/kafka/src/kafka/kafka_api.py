@@ -107,6 +107,8 @@ def get_topics(user):
       'database': 'topics'
     }
 
+    print(_get_notebook_api(user, connector_id=56).get_sample_data(snippet={}))
+
     return [
       topic['name']
       for topic in _get_notebook_api(user, connector_id=56).autocomplete(**data)['tables_meta']
