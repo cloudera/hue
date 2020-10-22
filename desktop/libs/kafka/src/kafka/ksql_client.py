@@ -143,7 +143,7 @@ class KSqlApi(object):
           elif 'header' in line:
             continue
           else:
-            line = line.strip()[:-1]
+            line = line.strip()
 
           if is_select:
             data_line = json.loads(line)
