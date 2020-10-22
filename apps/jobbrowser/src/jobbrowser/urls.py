@@ -72,5 +72,10 @@ urlpatterns += [
 
 if QUERY_STORE.SERVER_URL.get():
   urlpatterns += [
+    url(r'^query-proxy/data-bundle/(?P<id>.*)$', jobbrowser_api2.download_zip),
+  ]
+
+if QUERY_STORE.SERVER_URL.get():
+  urlpatterns += [
     url(r'^query-proxy/(?P<path>.*)$', jobbrowser_api2.query_store_proxy),
   ]

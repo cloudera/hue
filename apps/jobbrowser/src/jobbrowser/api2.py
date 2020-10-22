@@ -18,7 +18,7 @@
 import json
 import logging
 
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.rest.http_client import RestException
@@ -185,3 +185,16 @@ def query_store_proxy(request, path=None):
     response['content'] = ex_response.text
 
   return JsonResponse(response);
+
+
+@api_error_handler
+def download_zip(request, id=None):
+
+  client = HttpClient(QUERY_STORE.SERVER_URL.get())
+  resource = Resource(client)
+  app = resource.get('api/data-bundle/' + id)
+
+  response = FileResponse((app, 'rb'), content_type='application/octet-stream')
+  response['Content-Disposition'] = 'attachment; filename='+id+'.zip'
+
+  return response
