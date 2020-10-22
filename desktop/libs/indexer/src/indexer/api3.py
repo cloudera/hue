@@ -168,7 +168,7 @@ def guess_format(request):
         "hasHeader": True,
         "quoteChar": "\"",
         "recordSeparator": "\\n",
-        'topics': get_topics()
+        'topics': get_topics(request.user)
       }
     elif file_format['streamSelection'] == 'flume':
       format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n"}
