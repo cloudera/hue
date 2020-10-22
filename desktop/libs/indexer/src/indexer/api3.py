@@ -274,24 +274,24 @@ def guess_field_types(request):
     }
   elif file_format['inputFormat'] == 'stream':
     if file_format['streamSelection'] == 'kafka':
-      if file_format.get('kafkaSelectedTopics') == 'user_behavior':
-        kafkaFieldNames = [
-          'user_id',
-          'item_id',
-          'category_id',
-          'behavior',
-          'ts'
-        ]
-        kafkaFieldTypes = ['BIGINT'] * len(kafkaFieldNames)
+      # if file_format.get('kafkaSelectedTopics') == 'user_behavior':
+      #   kafkaFieldNames = [
+      #     'user_id',
+      #     'item_id',
+      #     'category_id',
+      #     'behavior',
+      #     'ts'
+      #   ]
+      #   kafkaFieldTypes = ['BIGINT'] * len(kafkaFieldNames)
 
-        kafkaFieldNames.append('proctime')
-        kafkaFieldTypes.append('TIMESTAMP')
-        kafkaFieldNames.append('WATERMARK')
-        kafkaFieldTypes.append('WATERMARK')
-      else:
-        # Note: mocked here, should come from SFDC or Kafka API or sampling job
-        kafkaFieldNames = file_format.get('kafkaFieldNames', '').split(',')
-        kafkaFieldTypes = file_format.get('kafkaFieldTypes', '').split(',')
+      #   kafkaFieldNames.append('proctime')
+      #   kafkaFieldTypes.append('TIMESTAMP')
+      #   kafkaFieldNames.append('WATERMARK')
+      #   kafkaFieldTypes.append('WATERMARK')
+      # else:
+
+      kafkaFieldNames = file_format.get('kafkaFieldNames', '').split(',')
+      kafkaFieldTypes = file_format.get('kafkaFieldTypes', '').split(',')
 
       data = """%(kafkaFieldNames)s
 %(data)s""" % {
