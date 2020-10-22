@@ -142,6 +142,12 @@ def download(request, path):
     This is inspired by django.views.static.serve.
     ?disposition={attachment, inline}
     """
+    # check if protocol missing / and add it back
+    if path.startswith('abfs:/') and not path.startswith('abfs://'):
+      path = path.replace('abfs:/', 'abfs://')
+    if path.startswith('s3a:/') and not path.startswith('s3a://'):
+      path = path.replace('s3a:/', 's3a://')
+
     decoded_path = urllib_unquote(path)
     if path != decoded_path:
       path = decoded_path
