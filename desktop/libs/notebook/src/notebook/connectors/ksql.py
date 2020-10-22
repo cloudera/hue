@@ -128,6 +128,50 @@ class KSqlApi(Api):
 
     return response
 
+  @query_error_handler
+  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+    notebook = {}
+    snippet = {'statement': 'print user_behavior FROM BEGINNING limit 10'}
+    a = self.execute(notebook, snippet)
+
+    # 'result': {'has_more': False, 'data':
+    [
+      ['Key format: ¯\\_(ツ)_/¯ - no data processe'],
+      ['Value format: JSON or KAFKA_STRIN'],
+      [
+        'rowtime: 2020/10/22 05:25:10.639 Z, '
+        'key: <null>, '
+        'value: {"user_id": "952483", "item_id":"310884", "category_id": "4580532", "behavior": "pv", "ts": "2017-11-27 00:00:00"'
+      ]
+    ]
+    # 'meta': [{'name': 'Row', 'type': 'STRING', 'comment': ''}], 'type': 'table'}
+
+    print(a)
+    return a
+    # db = self._get_db()
+
+    # data, description = db.query(
+    #     snippet['statement'],
+    #     channel_name=channel_name
+    # )
+
+    # if table and operation != 'hello' and operation != 'model':
+    #   columns = assist.get_columns(database, table)
+    #   response['full_headers'] = [{
+    #       'name': col.get('name'),
+    #       'type': self._get_column_type_name(col),
+    #       'comment': ''
+    #     } for col in columns
+    #   ]
+    # elif metadata:
+    #   response['full_headers'] = [{
+    #     'name': col[0] if type(col) is dict or type(col) is tuple else col.name if hasattr(col, 'name') else col,
+    #     'type': 'STRING_TYPE',
+    #     'comment': ''
+    #   } for col in metadata
+    # ]
+
+    # return response
 
   def fetch_result(self, notebook, snippet, rows, start_over):
     """Only called at the end of a live query."""
