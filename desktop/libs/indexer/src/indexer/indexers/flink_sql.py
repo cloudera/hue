@@ -52,7 +52,7 @@ class FlinkIndexer():
     final_table_name = table_name
 
     source_type = source['sourceType']
-    editor_type = '51'  # destination['sourceType']
+    editor_type = '55'  # destination['sourceType']
 
     sql = '''CREATE TABLE %(table_name)s (
     user_id BIGINT,
@@ -76,9 +76,8 @@ class FlinkIndexer():
     if dry_run:
       return sql
     else:
-      on_success_url = reverse(
-          'metastore:describe_table', kwargs={'database': database, 'table': final_table_name}
-      ) + '?source_type=' + source_type
+      on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': final_table_name}) + \
+          '?source_type=' + source_type
 
       return make_notebook(
           name=_('Creating table %(database)s.%(table)s') % {'database': database, 'table': final_table_name},
