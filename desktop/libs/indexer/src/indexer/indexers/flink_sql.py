@@ -54,23 +54,21 @@ class FlinkIndexer():
     source_type = source['sourceType']
     editor_type = '55'  # destination['sourceType']
 
+    columns = destination['columns']
+
     sql = '''CREATE TABLE %(table_name)s (
-    user_id BIGINT,
-    item_id BIGINT,
-    category_id BIGINT,
-    behavior STRING,
-    ts TIMESTAMP(3),
-    proctime AS PROCTIME(),
-    WATERMARK FOR ts AS ts - INTERVAL '5' SECOND
+%(columns)s
 ) WITH (
-    'connector' = 'kafka',
-    'topic' = 'user_behavior',
-    'scan.startup.mode' = 'earliest-offset',
-    'properties.bootstrap.servers' = 'kafka:9094',
-    'format' = 'json'
+  'connector' = 'kafka',
+  'topic' = '%(topic)s',
+  'scan.startup.mode' = 'earliest-offset',
+  'properties.bootstrap.servers' = 'kafka:9094',
+  'format' = 'json'
 );''' % {
           'database': database,
-          'table_name': table_name
+          'table_name': table_name,
+          'columns': ',\n'.join(['  %(name)s %(type)s' % col for col in columns]),
+          'topic': source.get('kafkaSelectedTopics')
       }
 
     if dry_run:
