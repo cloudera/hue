@@ -442,13 +442,15 @@ def importer_submit(request):
       request.fs
     )
 
-    job_handle = api.create_table_from_kafka(**args)
+    job_nb = api.create_table_from_kafka(**args)
 
     if request.POST.get('show_command'):
       job_handle = {
         'status': 0,
-        'commands': job_handle
+        'commands': job_nb
       }
+    else:
+      job_handle = job_nb.execute(request, batch=False)
   elif source['inputFormat'] == 'altus':
     # BDR copy or DistCP + DDL + Sentry DDL copy
     pass

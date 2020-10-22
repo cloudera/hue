@@ -167,6 +167,10 @@ def make_notebook(
     ] if not is_notebook else []
   }
 
+  if has_connectors():  # To improve
+    data['dialect'] = interpreter['dialect']
+    data['type'] = 'flink-' + editor_connector
+
   if snippet_properties:
     data['snippets'][0]['properties'].update(snippet_properties)
   if result_properties:
