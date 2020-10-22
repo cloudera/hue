@@ -34,6 +34,12 @@ from indexer.indexers.morphline_operations import OPERATORS
 LOG = logging.getLogger(__name__)
 
 
+HIVE_PRIMITIVE_TYPES = (
+  "string", "tinyint", "smallint", "int", "bigint", "boolean", "float", "double", "decimal", "timestamp", "date", "char", "varchar"
+)
+HIVE_TYPES = HIVE_PRIMITIVE_TYPES + ("array", "map", "struct")
+
+
 def collections(request, is_redirect=False):
   if not request.user.has_hue_permission(action="access", app='indexer'):
     raise PopupException(_('Missing permission.'), error_code=403)
@@ -81,12 +87,6 @@ def indexer(request):
       'file_types_json' : json.dumps([format_.format_info() for format_ in get_file_indexable_format_types()]),
       'default_field_type' : json.dumps(Field().to_dict())
   })
-
-
-HIVE_PRIMITIVE_TYPES = \
-    ("string", "tinyint", "smallint", "int", "bigint", "boolean",
-      "float", "double", "decimal", "timestamp", "date", "char", "varchar")
-HIVE_TYPES = HIVE_PRIMITIVE_TYPES + ("array", "map", "struct")
 
 
 def importer(request):
