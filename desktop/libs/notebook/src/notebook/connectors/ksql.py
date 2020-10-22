@@ -18,6 +18,7 @@
 from __future__ import absolute_import
 
 import logging
+import json
 
 from django.utils.translation import ugettext as _
 
@@ -131,47 +132,47 @@ class KSqlApi(Api):
   @query_error_handler
   def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
     notebook = {}
-    snippet = {'statement': 'print user_behavior FROM BEGINNING limit 10'}
-    a = self.execute(notebook, snippet)
+
+    snippet = {
+      'statement': 'PRINT user_behavior FROM BEGINNING LIMIT 10'  # From beginning in case no new data is coming
+    }
+    sample = self.execute(notebook, snippet)['result']['data']
 
     # 'result': {'has_more': False, 'data':
-    [
-      ['Key format: ¯\\_(ツ)_/¯ - no data processe'],
-      ['Value format: JSON or KAFKA_STRIN'],
-      [
-        'rowtime: 2020/10/22 05:25:10.639 Z, '
-        'key: <null>, '
-        'value: {"user_id": "952483", "item_id":"310884", "category_id": "4580532", "behavior": "pv", "ts": "2017-11-27 00:00:00"'
-      ]
-    ]
+    # [
+    #   ['Key format: ¯\\_(ツ)_/¯ - no data processed'], #     Key format: JSON or SESSION(KAFKA_STRING) or HOPPING(KAFKA_STRING) or TUMBLING(KAFKA_STRING) or KAFKA_STRING
+    #   ['Value format: JSON or KAFKA_STRING']
+    #   [
+    #     'rowtime: 2020/10/22 05:25:10.639 Z, '
+    #     'key: <null>, '
+    #     'value: {"user_id": "952483", "item_id":"310884", "category_id": "4580532", "behavior": "pv", "ts": "2017-11-27 00:00:00"}'
+    #   ]
+    # ]
     # 'meta': [{'name': 'Row', 'type': 'STRING', 'comment': ''}], 'type': 'table'}
 
-    print(a)
-    return a
-    # db = self._get_db()
+    response = {
+      'status': 0,
+      'result': {}
+    }
+    print(sample[2:12])
+    print(sample[2:12][0])
+    print(sample[2:12][0][0].rsplit(', value: ', 1))
+    response['rows'] = [
+      list(json.loads(row[0].rsplit(', value: ', 1)[1]).values())
+      for row in sample[2:12]
+    ]
 
-    # data, description = db.query(
-    #     snippet['statement'],
-    #     channel_name=channel_name
-    # )
+    columns = json.loads(sample[2][0].rsplit(', value: ', 1)[1]).keys()
 
-    # if table and operation != 'hello' and operation != 'model':
-    #   columns = assist.get_columns(database, table)
-    #   response['full_headers'] = [{
-    #       'name': col.get('name'),
-    #       'type': self._get_column_type_name(col),
-    #       'comment': ''
-    #     } for col in columns
-    #   ]
-    # elif metadata:
-    #   response['full_headers'] = [{
-    #     'name': col[0] if type(col) is dict or type(col) is tuple else col.name if hasattr(col, 'name') else col,
-    #     'type': 'STRING_TYPE',
-    #     'comment': ''
-    #   } for col in metadata
-    # ]
+    response['full_headers'] = [{
+        'name': col,
+        'type': 'string',
+        'comment': ''
+      } for col in columns
+    ]
 
-    # return response
+    print(response)
+    return response
 
   def fetch_result(self, notebook, snippet, rows, start_over):
     """Only called at the end of a live query."""

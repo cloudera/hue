@@ -60,14 +60,14 @@ class FlinkIndexer():
     category_id BIGINT,
     behavior STRING,
     ts TIMESTAMP(3),
-    proctime AS PROCTIME(),   -- generates processing-time attribute using computed column
-    WATERMARK FOR ts AS ts - INTERVAL '5' SECOND  -- defines watermark on ts column, marks ts as event-time attribute
+    proctime AS PROCTIME(),
+    WATERMARK FOR ts AS ts - INTERVAL '5' SECOND
 ) WITH (
-    'connector' = 'kafka',  -- using kafka connector
-    'topic' = 'user_behavior',  -- kafka topic
-    'scan.startup.mode' = 'earliest-offset',  -- reading from the beginning
-    'properties.bootstrap.servers' = 'kafka:9094',  -- kafka broker address
-    'format' = 'json'  -- the data format is json
+    'connector' = 'kafka',
+    'topic' = 'user_behavior',
+    'scan.startup.mode' = 'earliest-offset',
+    'properties.bootstrap.servers' = 'kafka:9094',
+    'format' = 'json'
 );''' % {
           'database': database,
           'table_name': table_name

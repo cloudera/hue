@@ -443,13 +443,16 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       <!-- ko ifnot: createWizard.isGuessingFormat -->
       <h4>${_('Format')}</h4>
       <div class="card-body">
-        <label data-bind="visible: (createWizard.prefill.source_type().length == 0 || createWizard.prefill.target_type() == 'index') && (createWizard.source.inputFormat() == 'file' || createWizard.source.inputFormat() == 'stream')">
+        <label data-bind="visible: (createWizard.prefill.source_type().length == 0 || createWizard.prefill.target_type() == 'index') &&
+            (createWizard.source.inputFormat() == 'file' || createWizard.source.inputFormat() == 'stream')">
           <div>${_('File Type')}</div>
-          <select data-bind="selectize: $root.createWizard.fileTypes, value: $root.createWizard.fileTypeName, optionsText: 'description', optionsValue: 'name'"></select>
+          <select data-bind="selectize: $root.createWizard.fileTypes, value: $root.createWizard.fileTypeName,
+              optionsText: 'description', optionsValue: 'name'"></select>
         </label>
         <span class="inline-labels" data-bind="with: createWizard.source.format, visible: createWizard.source.show">
           <span data-bind="foreach: getArguments()">
-            <!-- ko template: {name: 'arg-' + $data.type, data: {description: $data.description, value: $parent[$data.name]}}--><!-- /ko -->
+            <!-- ko template: { name: 'arg-' + $data.type, data: {description: $data.description, value: $parent[$data.name]} }-->
+            <!-- /ko -->
           </span>
         </span>
       </div>
@@ -528,7 +531,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             <input type="text" class="form-control name input-xxlarge" id="collectionName" data-bind="value: name, filechooser: name, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: true, displayOnlyFolders: true, uploadFile: false}" placeholder="${ _('Name') }" title="${ _('Directory must not exist in the path') }">
             <!-- /ko -->
 
-            <!-- ko if: outputFormat() == 'index' -->
+            <!-- ko if: ['index', 'stream-table'].indexOf(outputFormat()) != -1 -->
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
             <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
             <!-- /ko -->
@@ -562,7 +565,6 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             <!-- /ko -->
 
             <!-- ko if: outputFormat() == 'flume' -->
-
             <h4>${ _('Sink') }</h4>
             <div class="row-fluid">
               <div>
@@ -606,7 +608,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       </div>
 
 
-        <!-- ko if: outputFormat() == 'table' && $root.createWizard.source.inputFormat() != 'rdbms' -->
+        <!-- ko if: ['table'].indexOf(outputFormat()) != -1 && $root.createWizard.source.inputFormat() != 'rdbms' -->
         <div class="card step">
           <h4>${_('Properties')}</h4>
           <div class="card-body">
@@ -692,7 +694,6 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             </div>
 
             <label class="control-label"><div>${ _('Partitions') }</div>
-
               <!-- ko if: tableFormat() != 'kudu' && $root.createWizard.source.inputFormat() != 'rdbms' -->
               <div class="inline-table">
                 <div class="form-inline" data-bind="foreach: partitionColumns">
@@ -934,7 +935,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         </div>
         <!-- /ko -->
 
-        <!-- ko if: ['table', 'index', 'hbase'].indexOf(outputFormat()) != -1 -->
+        <!-- ko if: ['table', 'index', 'hbase', 'stream-table'].indexOf(outputFormat()) != -1 -->
           <div class="card step">
             <h4>
               <!-- ko if: fieldEditorEnabled -->
@@ -979,17 +980,23 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                   mode: sourceType
                 }}"></div>
               <!-- /ko -->
+
               <!-- ko ifnot: useFieldEditor -->
               <!-- ko if: $root.createWizard.source.inputFormat() === 'manual' -->
+
                 <form class="form-inline inline-table" data-bind="foreach: columns">
-                  <!-- ko if: $parent.outputFormat() == 'table' -->
-                    <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
+                  <!-- ko if: ['table'].indexOf(outputFormat()) != -1 -->
+                    <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }">
+                      <i class="fa fa-minus"></i>
+                    </a>
                     <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field inline-block"></div>
                     <div class="clearfix"></div>
                   <!-- /ko -->
 
                   <!-- ko if: $parent.outputFormat() == 'index' -->
-                    <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
+                    <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }">
+                      <i class="fa fa-minus"></i>
+                    </a>
                     <div data-bind="template: { name: 'index-field-template', data: $data }, css: { 'disabled': !keep() }" class="margin-top-10 field inline-block index-field"></div>
                     <div class="clearfix"></div>
                   <!-- /ko -->
@@ -998,13 +1005,14 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                 <div class="clearfix"></div>
 
                 <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
-                  <a data-bind="click: function() { columns.push($root.loadDefaultField({})); }" class="pointer" title="${_('Add Field')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
+                  <a data-bind="click: function() { columns.push($root.loadDefaultField({})); }" class="pointer" title="${_('Add Field')}">
+                  <i class="fa fa-plus"></i> ${_('Add Field')}</a>
                 <!-- /ko -->
               <!-- /ko -->
 
-              <!-- ko ifnot: $root.createWizard.source.inputFormat() === 'manual' -->
+              <!-- ko if: $root.createWizard.source.inputFormat() !== 'manual' -->
               <form class="form-inline inline-table" data-bind="foreachVisible: { data: columns, minHeight: 54, container: MAIN_SCROLLABLE }">
-                <!-- ko if: $parent.outputFormat() == 'table' && $root.createWizard.source.inputFormat() != 'rdbms' -->
+                <!-- ko if: ['table', 'stream-table'].indexOf($parent.outputFormat()) != -1 && $root.createWizard.source.inputFormat() != 'rdbms' -->
                   <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
                 <!-- /ko -->
 
@@ -1321,11 +1329,13 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
     <label class="control-group" data-bind="visible: createWizard.source.kafkaSelectedTopics">
       <label class="control-label"><div>${ _('Schema') }</div>
-        <label class="radio margin-right-10">
-          <input type="radio" name="kafkaSchemaManual" value="manual" data-bind="checked: createWizard.source.kafkaSchemaManual" /> ${_('Manual')}
-        </label>
         <label class="radio">
-          <input type="radio" name="kafkaSchemaManual" value="detect" data-bind="checked: createWizard.source.kafkaSchemaManual" /> ${_('Guess')}
+          <input type="radio" name="kafkaSchemaManual" value="detect" data-bind="checked: createWizard.source.kafkaSchemaManual" />
+          ${_('Guess')}
+        </label>
+        <label class="radio margin-right-10">
+          <input type="radio" name="kafkaSchemaManual" value="manual" data-bind="checked: createWizard.source.kafkaSchemaManual" />
+          ${_('Manual')}
         </label>
       </label>
 
@@ -1342,11 +1352,13 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       </label>
       <br/>
       <label class="control-label"><div>${ _('Field names') }</div>
-        <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldNames" placeholder="${ _('The list of fields to consume, e.g. orders,returns') }">
+        <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldNames"
+          placeholder="${ _('The list of fields to consume, e.g. orders,returns') }">
       </label>
       <br/>
       <label class="control-label"><div>${ _('Field types') }</div>
-        <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.kafkaFieldTypes" placeholder="${ _('The list of field typs, e.g. string,int') }">
+        <input type="text" class="input-xxlarge"
+          data-bind="value: createWizard.source.kafkaFieldTypes" placeholder="${ _('The list of field typs, e.g. string,int') }">
       </label>
       <br/>
       <label class="control-label" data-bind="visible: createWizard.source.hasStreamSelected"><div></div>
@@ -2013,7 +2025,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           self.kafkaFieldTypes($.totalStorage('pai' + '_kafka_topics_' + newValue + '_kafkaFieldTypes'));
         }
       });
-      self.kafkaSchemaManual = ko.observable('manual');
+      self.kafkaSchemaManual = ko.observable('detect');
       self.kafkaFieldType = ko.observable('delimited');
       self.kafkaFieldDelimiter = ko.observable(',');
       self.kafkaFieldNames = ko.observable('');
@@ -2232,11 +2244,12 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           {'name': '${ _("Search index") }', 'value': 'index'},
           % endif
           {'name': '${ _("Database") }', 'value': 'database'},
+          % if ENABLE_KAFKA.get():
+          {'name': '${ _("Stream Table") }', 'value': 'stream-table'},
+          {'name': '${ _("Stream Topic") }', 'value': 'stream'},
+          % endif
           % if ENABLE_SQOOP.get() or ENABLE_KAFKA.get():
           {'name': '${ _("Folder") }', 'value': 'file'},
-          % endif
-          % if ENABLE_KAFKA.get():
-          {'name': '${ _("Stream") }', 'value': 'stream'},
           % endif
           % if ENABLE_ALTUS.get():
           {'name': '${ _("Altus SDX") }', 'value': 'altus'},
@@ -2250,22 +2263,36 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       ]);
       self.outputFormats = ko.pureComputed(function() {
         return $.grep(self.outputFormatsList(), function(format) {
-          if (format.value === 'database' && wizard.source.inputFormat() !== 'manual' && (wizard.source.inputFormat() !== 'rdbms' || !wizard.source.rdbmsAllTablesSelected())) {
+          if (
+              format.value === 'database' &&
+              wizard.source.inputFormat() !== 'manual' &&
+              (wizard.source.inputFormat() !== 'rdbms' || !wizard.source.rdbmsAllTablesSelected())) {
             return false;
           }
-          if (format.value === 'file' && ['manual', 'rdbms', 'stream'].indexOf(wizard.source.inputFormat()) === -1) {
+          if (format.value === 'file' && (
+              wizard.source.inputFormat() === 'stream' ||
+              ['manual', 'rdbms', 'stream'].indexOf(wizard.source.inputFormat()) === -1)) {
             return false;
           }
-          if (format.value === 'index' && ['file', 'query', 'stream', 'manual'].indexOf(wizard.source.inputFormat()) === -1) {
+          if (format.value === 'index' && (
+              wizard.source.inputFormat() === 'stream' ||
+              ['file', 'query', 'stream', 'manual'].indexOf(wizard.source.inputFormat()) === -1)) {
             return false;
           }
-          if (format.value === 'table' && (wizard.source.inputFormat() === 'table' || (wizard.source.inputFormat() === 'rdbms' && wizard.source.rdbmsAllTablesSelected()))) {
+          if (format.value === 'table' &&
+              wizard.source.inputFormat() === 'stream' ||
+              (wizard.source.inputFormat() === 'table' || (
+                wizard.source.inputFormat() === 'rdbms' && wizard.source.rdbmsAllTablesSelected()))) {
             return false;
           }
           if (format.value === 'altus' && ['table'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
-          if (format.value === 'stream' && ['file', 'stream'].indexOf(wizard.source.inputFormat()) === -1) {
+          if (format.value === 'stream' &&
+              (wizard.source.inputFormat() === 'stream' || ['file', 'stream'].indexOf(wizard.source.inputFormat()) === -1)) {
+            return false;
+          }
+          if (format.value === 'stream-table' && ['stream'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
           if (format.value === 'hbase' && (wizard.source.inputFormat() !== 'rdbms' || wizard.source.rdbmsAllTablesSelected())) {
@@ -2280,7 +2307,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         }
       });
       wizard.prefill.target_type.subscribe(function(newValue) {
-        setTimeout(function() { // target_type gets updated by the router (onePageViewModelModel.js) and delaying allow the notification to go through
+        // Target_type gets updated by the router (onePageViewModelModel.js) and delaying allow the notification to go through
+        setTimeout(function() {
           self.outputFormat(newValue || 'table');
         },0);
         if (newValue === 'database') {
@@ -2797,7 +2825,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         $(".jHueNotify").remove();
 
         self.indexingStarted(true);
-%if not is_embeddable:
+% if not is_embeddable:
         viewModel.isLoading(true);
         self.isIndexing(true);
 
