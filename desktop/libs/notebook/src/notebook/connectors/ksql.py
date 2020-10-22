@@ -78,12 +78,12 @@ class KSqlApi(Api):
           'has_more': False,
           'data': data if has_result_set else [],
           'meta': [{
-            'name': col['name'],
-            'type': col['type'],
-            'comment': ''
-          }
-          for col in description
-        ] if has_result_set else [],
+              'name': col['name'],
+              'type': col['type'],
+              'comment': ''
+            }
+            for col in description
+          ] if has_result_set else [],
         'type': 'table'
       }
     }
