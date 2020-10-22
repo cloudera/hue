@@ -103,8 +103,8 @@ class KSqlApi(object):
 
   def ksql(self, statement):
     response = self.client.ksql(statement)
-    print(response)
-    return response[0]
+    LOG.debug('ksqlDB response: %s' % response)
+    return response[0] if response else {'@type': 'queries', 'queries': []}  # INSERTs return empty currently
 
 
   def query(self, statement, channel_name=None):
