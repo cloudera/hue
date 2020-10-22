@@ -18,11 +18,11 @@
 from future import standard_library
 standard_library.install_aliases()
 
-from builtins import oct, zip
+from builtins import zip
 from past.builtins import basestring
 import json
 import logging
-import urllib.request, urllib.error
+import urllib.error
 import sys
 
 from django.urls import reverse
@@ -37,30 +37,29 @@ try:
 except ImportError:
   LOG.warn('simple_salesforce module not found')
 
-from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.python_util import check_encoding
 from desktop.models import Document2
-from kafka.kafka_api import get_topics
-from metadata.manager_client import ManagerApi
+from kafka.kafka_api import get_topics, get_topic_data
 from notebook.connectors.base import get_api, Notebook
 from notebook.decorators import api_error_handler
-from notebook.models import make_notebook, MockedDjangoRequest, escape_rows
+from notebook.models import MockedDjangoRequest, escape_rows
 
 from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
-from indexer.indexers.envelope import EnvelopeIndexer, _envelope_job
+from indexer.indexers.envelope import _envelope_job
 from indexer.indexers.base import get_api
 from indexer.indexers.flink_sql import FlinkIndexer
 from indexer.indexers.morphline import MorphlineIndexer, _create_solr_collection
 from indexer.indexers.rdbms import run_sqoop, _get_api
-from indexer.indexers.sql import SQLIndexer, _create_database, _create_table
+from indexer.indexers.sql import _create_database, _create_table
 from indexer.models import _save_pipeline
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 from indexer.indexers.flume import FlumeIndexer
+
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
@@ -157,21 +156,33 @@ def guess_format(request):
     else:
       raise PopupException('Hive table format %s is not supported.' % table_metadata.details['properties']['format'])
   elif file_format['inputFormat'] == 'query':
-    format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\u0001"}
+    format_ = {
+      "quoteChar": "\"",
+      "recordSeparator": "\\n",
+      "type": "csv",
+      "hasHeader": False,
+      "fieldSeparator": "\u0001"
+    }
   elif file_format['inputFormat'] == 'rdbms':
     format_ = {"type": "csv"}
   elif file_format['inputFormat'] == 'stream':
     if file_format['streamSelection'] == 'kafka':
       format_ = {
+        "type": "json",
+        # "fieldSeparator": ",",
+        # "hasHeader": True,
+        # "quoteChar": "\"",
+        # "recordSeparator": "\\n",
+        'topics': get_topics(request.user)
+      }
+    elif file_format['streamSelection'] == 'flume':
+      format_ = {
         "type": "csv",
         "fieldSeparator": ",",
         "hasHeader": True,
         "quoteChar": "\"",
-        "recordSeparator": "\\n",
-        'topics': get_topics(request.user)
+        "recordSeparator": "\\n"
       }
-    elif file_format['streamSelection'] == 'flume':
-      format_ = {"type": "csv", "fieldSeparator": ",", "hasHeader": True, "quoteChar": "\"", "recordSeparator": "\\n"}
   elif file_format['inputFormat'] == 'connector':
     if file_format['connectorSelection'] == 'sfdc':
       sf = Salesforce(
@@ -274,52 +285,51 @@ def guess_field_types(request):
     }
   elif file_format['inputFormat'] == 'stream':
     if file_format['streamSelection'] == 'kafka':
-      # if file_format.get('kafkaSelectedTopics') == 'user_behavior':
-      #   kafkaFieldNames = [
-      #     'user_id',
-      #     'item_id',
-      #     'category_id',
-      #     'behavior',
-      #     'ts'
-      #   ]
-      #   kafkaFieldTypes = ['BIGINT'] * len(kafkaFieldNames)
-
-      #   kafkaFieldNames.append('proctime')
-      #   kafkaFieldTypes.append('TIMESTAMP')
-      #   kafkaFieldNames.append('WATERMARK')
-      #   kafkaFieldTypes.append('WATERMARK')
-      # else:
-
-      kafkaFieldNames = file_format.get('kafkaFieldNames', '').split(',')
-      kafkaFieldTypes = file_format.get('kafkaFieldTypes', '').split(',')
-
-      data = """%(kafkaFieldNames)s
-%(data)s""" % {
-        'kafkaFieldNames': ','.join(kafkaFieldNames),
-        'data': '\n'.join([','.join(['...'] * len(kafkaFieldTypes))] * 5)
-      }
-      stream = string_io()
-      stream.write(data)
-
-      _convert_format(file_format["format"], inverse=True)
-
-      indexer = MorphlineIndexer(request.user, request.fs)
-      format_ = indexer.guess_field_types({
-        "file": {
-            "stream": stream,
-            "name": file_format['path']
-        },
-        "format": file_format['format']
-      })
-      type_mapping = dict(
-        list(
-          zip(kafkaFieldNames, kafkaFieldTypes)
-        )
+      data = get_topic_data(
+        request.user,
+        file_format.get('kafkaSelectedTopics')
       )
 
-      for col in format_['columns']:
-        col['keyType'] = type_mapping[col['name']]
-        col['type'] = type_mapping[col['name']]
+      kafkaFieldNames = [col['name'] for col in data['full_headers']]
+      kafkaFieldTypes = [col['type'] for col in data['full_headers']]
+      topics_data = data['rows']
+
+      format_ = {
+          "sample": topics_data,
+          "columns": [
+              Field(col, 'string', unique=False).to_dict()
+              for col in kafkaFieldNames
+          ]
+      }
+
+#       data = """%(kafkaFieldNames)s
+# %(data)s""" % {
+#         'kafkaFieldNames': ','.join(kafkaFieldNames),
+#         'data': '\n'.join([','.join(cols) for cols in topics_data])
+#       }
+#       stream = string_io()
+#       stream.write(data)
+
+#       _convert_format(file_format["format"], inverse=True)
+
+#       indexer = MorphlineIndexer(request.user, request.fs)
+
+#       format_ = indexer.guess_field_types({
+#         "file": {
+#             "stream": stream,
+#             "name": file_format['path']
+#         },
+#         "format": file_format['format']
+#       })
+#       type_mapping = dict(
+#         list(
+#           zip(kafkaFieldNames, kafkaFieldTypes)
+#         )
+#       )
+
+#       for col in format_['columns']:
+#         col['keyType'] = type_mapping[col['name']]
+#         col['type'] = type_mapping[col['name']]
     elif file_format['streamSelection'] == 'flume':
       if 'hue-httpd/access_log' in file_format['channelSourcePath']:
         columns = [

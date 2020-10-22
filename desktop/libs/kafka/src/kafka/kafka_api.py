@@ -107,13 +107,19 @@ def get_topics(user):
       'database': 'topics'
     }
 
-    print(_get_notebook_api(user, connector_id=56).get_sample_data(snippet={}))
-
     return [
       topic['name']
       for topic in _get_notebook_api(user, connector_id=56).autocomplete(**data)['tables_meta']
       if not topic['name'].startswith('__')
     ]
+
+
+def get_topic_data(user, name):
+  from metadata.models.bigquery_client import _get_notebook_api
+
+  data = _get_notebook_api(user, connector_id=56).get_sample_data(snippet={})
+  print(data)
+  return data
 
 
 def get_topic(name):
