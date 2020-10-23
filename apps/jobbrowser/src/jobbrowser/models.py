@@ -83,101 +83,100 @@ def can_kill_job(self, user):
 # Feel free to rename the models, but don't rename db_table values or field names.
 
 class HiveQuery(models.Model):
-    # (mysql.E001) MySQL does not allow unique CharFields to have a max_length > 255.
-    # query_id = models.CharField(unique=True, max_length=512, blank=True, null=True)
-    query_id = models.CharField(unique=True, max_length=255, blank=True, null=True)
-    query = models.TextField(blank=True, null=True)
-    query_fts = models.TextField(blank=True, null=True)  # This field type is a guess.
-    start_time = models.BigIntegerField(blank=True, null=True)
-    end_time = models.BigIntegerField(blank=True, null=True)
-    elapsed_time = models.BigIntegerField(blank=True, null=True)
-    status = models.CharField(max_length=32, blank=True, null=True)
-    queue_name = models.CharField(max_length=767, blank=True, null=True)
-    user_id = models.CharField(max_length=256, blank=True, null=True)
-    request_user = models.CharField(max_length=256, blank=True, null=True)
-    cpu_time = models.BigIntegerField(blank=True, null=True)
-    physical_memory = models.BigIntegerField(blank=True, null=True)
-    virtual_memory = models.BigIntegerField(blank=True, null=True)
-    data_read = models.BigIntegerField(blank=True, null=True)
-    data_written = models.BigIntegerField(blank=True, null=True)
-    operation_id = models.CharField(max_length=512, blank=True, null=True)
-    client_ip_address = models.CharField(max_length=64, blank=True, null=True)
-    hive_instance_address = models.CharField(max_length=512, blank=True, null=True)
-    hive_instance_type = models.CharField(max_length=512, blank=True, null=True)
-    session_id = models.CharField(max_length=512, blank=True, null=True)
-    log_id = models.CharField(max_length=512, blank=True, null=True)
-    thread_id = models.CharField(max_length=512, blank=True, null=True)
-    execution_mode = models.CharField(max_length=16, blank=True, null=True)
-    tables_read = models.TextField(blank=True, null=True)  # This field type is a guess.
-    tables_written = models.TextField(blank=True, null=True)  # This field type is a guess.
-    domain_id = models.CharField(max_length=512, blank=True, null=True)
-    llap_app_id = models.CharField(max_length=512, blank=True, null=True)
-    used_cbo = models.CharField(max_length=16, blank=True, null=True)
-    processed = models.NullBooleanField()
-    created_at = models.DateTimeField(blank=True, null=True)
-    databases_used = models.TextField(blank=True, null=True)  # This field type is a guess.
-    first_task_started_time = models.BigIntegerField(blank=True, null=True)
-    waiting_time = models.BigIntegerField(blank=True, null=True)
-    resource_utilization = models.BigIntegerField(blank=True, null=True)
-    version = models.SmallIntegerField(blank=True, null=True)
+  # (mysql.E001) MySQL does not allow unique CharFields to have a max_length > 255.
+  # query_id = models.CharField(unique=True, max_length=512, blank=True, null=True)
+  query_id = models.CharField(unique=True, max_length=255, blank=True, null=True)
+  query = models.TextField(blank=True, null=True)
+  query_fts = models.TextField(blank=True, null=True)  # This field type is a guess.
+  start_time = models.BigIntegerField(blank=True, null=True)
+  end_time = models.BigIntegerField(blank=True, null=True)
+  elapsed_time = models.BigIntegerField(blank=True, null=True)
+  status = models.CharField(max_length=32, blank=True, null=True)
+  queue_name = models.CharField(max_length=767, blank=True, null=True)
+  user_id = models.CharField(max_length=256, blank=True, null=True)
+  request_user = models.CharField(max_length=256, blank=True, null=True)
+  cpu_time = models.BigIntegerField(blank=True, null=True)
+  physical_memory = models.BigIntegerField(blank=True, null=True)
+  virtual_memory = models.BigIntegerField(blank=True, null=True)
+  data_read = models.BigIntegerField(blank=True, null=True)
+  data_written = models.BigIntegerField(blank=True, null=True)
+  operation_id = models.CharField(max_length=512, blank=True, null=True)
+  client_ip_address = models.CharField(max_length=64, blank=True, null=True)
+  hive_instance_address = models.CharField(max_length=512, blank=True, null=True)
+  hive_instance_type = models.CharField(max_length=512, blank=True, null=True)
+  session_id = models.CharField(max_length=512, blank=True, null=True)
+  log_id = models.CharField(max_length=512, blank=True, null=True)
+  thread_id = models.CharField(max_length=512, blank=True, null=True)
+  execution_mode = models.CharField(max_length=16, blank=True, null=True)
+  tables_read = models.TextField(blank=True, null=True)  # This field type is a guess.
+  tables_written = models.TextField(blank=True, null=True)  # This field type is a guess.
+  domain_id = models.CharField(max_length=512, blank=True, null=True)
+  llap_app_id = models.CharField(max_length=512, blank=True, null=True)
+  used_cbo = models.CharField(max_length=16, blank=True, null=True)
+  created_at = models.DateTimeField(blank=True, null=True)
+  databases_used = models.TextField(blank=True, null=True)  # This field type is a guess.
+  first_task_started_time = models.BigIntegerField(blank=True, null=True)
+  waiting_time = models.BigIntegerField(blank=True, null=True)
+  resource_utilization = models.BigIntegerField(blank=True, null=True)
+  version = models.SmallIntegerField(blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'hive_query'
+  class Meta:
+    managed = False
+    db_table = 'hive_query'
 
 
 class QueryDetails(models.Model):
-    hive_query = models.ForeignKey(HiveQuery, HiveQuery, unique=True, blank=True, null=True)
-    explain_plan_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
-    configuration_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
-    perf = models.TextField(blank=True, null=True)  # This field type is a guess.
-    configuration_compressed = models.BinaryField(blank=True, null=True)
-    explain_plan_compressed = models.BinaryField(blank=True, null=True)
+  hive_query = models.ForeignKey(HiveQuery, HiveQuery, unique=True, blank=True, null=True)
+  explain_plan_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
+  configuration_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
+  perf = models.TextField(blank=True, null=True)  # This field type is a guess.
+  configuration_compressed = models.BinaryField(blank=True, null=True)
+  explain_plan_compressed = models.BinaryField(blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'query_details'
+  class Meta:
+    managed = False
+    db_table = 'query_details'
 
 
 class DagInfo(models.Model):
-    # (mysql.E001) MySQL does not allow unique CharFields to have a max_length > 255.
-    # dag_id = models.CharField(unique=True, max_length=512, blank=True, null=True)
-    dag_id = models.CharField(unique=True, max_length=255, blank=True, null=True)
-    dag_name = models.CharField(max_length=512, blank=True, null=True)
-    application_id = models.CharField(max_length=512, blank=True, null=True)
-    init_time = models.BigIntegerField(blank=True, null=True)
-    start_time = models.BigIntegerField(blank=True, null=True)
-    end_time = models.BigIntegerField(blank=True, null=True)
-    time_taken = models.BigIntegerField(blank=True, null=True)
-    status = models.CharField(max_length=64, blank=True, null=True)
-    am_webservice_ver = models.CharField(max_length=16, blank=True, null=True)
-    am_log_url = models.CharField(max_length=512, blank=True, null=True)
-    queue_name = models.CharField(max_length=64, blank=True, null=True)
-    caller_id = models.CharField(max_length=512, blank=True, null=True)
-    caller_type = models.CharField(max_length=128, blank=True, null=True)
-    hive_query = models.ForeignKey('HiveQuery', HiveQuery, blank=True, null=True)
-    created_at = models.DateTimeField(blank=True, null=True)
-    source_file = models.TextField(blank=True, null=True)
+  # (mysql.E001) MySQL does not allow unique CharFields to have a max_length > 255.
+  # dag_id = models.CharField(unique=True, max_length=512, blank=True, null=True)
+  dag_id = models.CharField(unique=True, max_length=255, blank=True, null=True)
+  dag_name = models.CharField(max_length=512, blank=True, null=True)
+  application_id = models.CharField(max_length=512, blank=True, null=True)
+  init_time = models.BigIntegerField(blank=True, null=True)
+  start_time = models.BigIntegerField(blank=True, null=True)
+  end_time = models.BigIntegerField(blank=True, null=True)
+  time_taken = models.BigIntegerField(blank=True, null=True)
+  status = models.CharField(max_length=64, blank=True, null=True)
+  am_webservice_ver = models.CharField(max_length=16, blank=True, null=True)
+  am_log_url = models.CharField(max_length=512, blank=True, null=True)
+  queue_name = models.CharField(max_length=64, blank=True, null=True)
+  caller_id = models.CharField(max_length=512, blank=True, null=True)
+  caller_type = models.CharField(max_length=128, blank=True, null=True)
+  hive_query = models.ForeignKey('HiveQuery', HiveQuery, blank=True, null=True)
+  created_at = models.DateTimeField(blank=True, null=True)
+  source_file = models.TextField(blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'dag_info'
+  class Meta:
+    managed = False
+    db_table = 'dag_info'
 
 
 class DagDetails(models.Model):
-    dag_info = models.ForeignKey('DagInfo', DagInfo, unique=True, blank=True, null=True)
-    hive_query = models.ForeignKey('HiveQuery', HiveQuery, blank=True, null=True)
-    dag_plan_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
-    vertex_name_id_mapping_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
-    diagnostics = models.TextField(blank=True, null=True)
-    counters_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
-    dag_plan_compressed = models.BinaryField(blank=True, null=True)
-    vertex_name_id_mapping_compressed = models.BinaryField(blank=True, null=True)
-    counters_compressed = models.BinaryField(blank=True, null=True)
+  dag_info = models.ForeignKey('DagInfo', DagInfo, unique=True, blank=True, null=True)
+  hive_query = models.ForeignKey('HiveQuery', HiveQuery, blank=True, null=True)
+  dag_plan_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
+  vertex_name_id_mapping_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
+  diagnostics = models.TextField(blank=True, null=True)
+  counters_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
+  dag_plan_compressed = models.BinaryField(blank=True, null=True)
+  vertex_name_id_mapping_compressed = models.BinaryField(blank=True, null=True)
+  counters_compressed = models.BinaryField(blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'dag_details'
+  class Meta:
+    managed = False
+    db_table = 'dag_details'
 
 
 class LinkJobLogs(object):
