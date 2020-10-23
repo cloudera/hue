@@ -21,7 +21,6 @@ import json
 import sys
 
 from collections import OrderedDict
-from datetime import datetime
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false
@@ -39,6 +38,7 @@ from desktop.models import Directory, Document, Document2
 from hadoop import cluster as originalCluster
 from useradmin.models import User
 
+import notebook.conf
 import notebook.connectors.hiveserver2
 
 from notebook.api import _historify
@@ -677,28 +677,27 @@ def test_get_interpreters_to_show():
     ))
 
   try:
-    resets = [INTERPRETERS.set_for_testing(default_interpreters), APP_BLACKLIST.set_for_testing('')]
+    resets = [
+      INTERPRETERS.set_for_testing(default_interpreters),
+      APP_BLACKLIST.set_for_testing(''),
+      ENABLE_CONNECTORS.set_for_testing(False)
+    ]
     appmanager.DESKTOP_MODULES = []
     appmanager.DESKTOP_APPS = None
     appmanager.load_apps(APP_BLACKLIST.get())
+    notebook.conf.INTERPRETERS_CACHE = None
 
-    interpreters_shown_on_wheel_unset = get_ordered_interpreters()
     assert_equal(
-      list(default_interpreters.values()),
-      interpreters_shown_on_wheel_unset,
-      'get_interpreters_to_show should return the same as get_interpreters when interpreters_shown_on_wheel '
-      'is unset. expected: %s, actual: %s' % (
-          list(default_interpreters.values()), interpreters_shown_on_wheel_unset
-      )
+      list(default_interpreters.values()), get_ordered_interpreters(),
+      'get_interpreters_to_show should return the same as get_interpreters when interpreters_shown_on_wheel is unset'
     )
 
+
     resets.append(INTERPRETERS_SHOWN_ON_WHEEL.set_for_testing('java,pig'))
+
     assert_equal(
-      list(expected_interpreters.values()),
-      get_ordered_interpreters(),
-      'get_interpreters_to_show did not return interpreters in the correct order expected: %s, actual: %s' % (
-          list(expected_interpreters.values()), get_ordered_interpreters()
-      )
+      list(expected_interpreters.values()), get_ordered_interpreters(),
+      'get_interpreters_to_show did not return interpreters in the correct order expected'
     )
   finally:
     for reset in resets:
@@ -706,6 +705,7 @@ def test_get_interpreters_to_show():
     appmanager.DESKTOP_MODULES = []
     appmanager.DESKTOP_APPS = None
     appmanager.load_apps(APP_BLACKLIST.get())
+    notebook.conf.INTERPRETERS_CACHE = None
 
 
 def test_get_ordered_interpreters():
@@ -743,6 +743,7 @@ def test_get_ordered_interpreters():
         with patch('notebook.conf.has_connectors') as has_connectors:
           get_apps_dict.return_value = {'hive': {}}
           has_connectors.return_value = False
+          notebook.conf.INTERPRETERS_CACHE = None
 
           is_cm_managed.return_value = False
 
@@ -758,18 +759,30 @@ def test_get_ordered_interpreters():
             [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
             ['phoenix']
           )
+          assert_equal(  # Check twice because of cache
+            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+            ['phoenix']
+          )
 
           is_cm_managed.return_value = True
+          notebook.conf.INTERPRETERS_CACHE = None
 
           # CM --> Append []
           INTERPRETERS.set_for_testing(
             OrderedDict(()
             )
           )
+
           assert_equal(
             [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
             ['hive']
           )
+          assert_equal(  # Check twice
+            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+            ['hive']
+          )
+
+          notebook.conf.INTERPRETERS_CACHE = None
 
           # CM --> Append [Phoenix]
           INTERPRETERS.set_for_testing(
@@ -783,12 +796,17 @@ def test_get_ordered_interpreters():
             [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
             ['hive', 'phoenix']
           )
+          assert_equal(  # Check twice
+            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
+            ['hive', 'phoenix']
+          )
   finally:
     for reset in resets:
       reset()
     appmanager.DESKTOP_MODULES = []
     appmanager.DESKTOP_APPS = None
     appmanager.load_apps(APP_BLACKLIST.get())
+    notebook.conf.INTERPRETERS_CACHE = None
 
 
 class TestQueriesMetrics(object):
