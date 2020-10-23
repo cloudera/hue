@@ -72,17 +72,17 @@ class LifoQueue(queue.Queue):
   '''
 
   def _init(self, maxsize):
-      self.queue = []
-      self.maxsize = maxsize
+    self.queue = []
+    self.maxsize = maxsize
 
   def _qsize(self, len=len):
-      return len(self.queue)
+    return len(self.queue)
 
   def _put(self, item):
-      self.queue.append(item)
+    self.queue.append(item)
 
   def _get(self):
-      return self.queue.pop()
+    return self.queue.pop()
 
 
 class ConnectionConfig(object):
@@ -308,8 +308,8 @@ def connect_to_thrift(conf):
   else:
     if conf.use_ssl:
       try:
-         from ssl import PROTOCOL_TLS
-         PROTOCOL_SSLv23 = PROTOCOL_TLS
+        from ssl import PROTOCOL_TLS
+        PROTOCOL_SSLv23 = PROTOCOL_TLS
       except ImportError:
         try:
           from ssl import PROTOCOL_SSLv23 as PROTOCOL_TLS
