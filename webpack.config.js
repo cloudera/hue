@@ -66,7 +66,9 @@ const config = {
     minimize: false,
     splitChunks: {
       chunks: 'all',
-      name: splitChunksName
+      name: splitChunksName,
+      maxSize: 1000000,
+      hidePathInfo: true
     },
     runtimeChunk: {
       name: 'hue'
