@@ -294,13 +294,6 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
 
-<script src="${ static('desktop/js/ace/ace.js') }"></script>
-<script src="${ static('desktop/js/ace/mode-impala.js') }"></script>
-<script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
-<script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
-<script src="${ static('desktop/js/ace.extended.js') }"></script>
-<script>ace.config.set("basePath", "${ static('desktop/js/ace') }");</script>
-
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
 
 <script>

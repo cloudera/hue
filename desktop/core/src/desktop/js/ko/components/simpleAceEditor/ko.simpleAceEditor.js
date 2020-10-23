@@ -16,6 +16,7 @@
 
 import $ from 'jquery';
 import * as ko from 'knockout';
+import ace from 'ext/aceHelper';
 
 import AceLocationHandler from 'ko/bindings/ace/aceLocationHandler';
 import componentUtils from 'ko/components/componentUtils';

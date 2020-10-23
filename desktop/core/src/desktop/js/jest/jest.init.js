@@ -27,6 +27,10 @@ import axios from 'axios';
 import $ from 'jquery';
 import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
+import Vue from 'vue';
+
+Vue.config.productionTip = false;
+Vue.config.devtools = false;
 
 ko.mapping = komapping;
 

@@ -63,11 +63,17 @@ const hashCode = str => {
   return hash;
 };
 
+/**
+ * @param {webpack.Module} module
+ * @param {compilation.Chunk[]} chunks
+ * @param {string} cacheGroupKey
+ * @return {string}
+ */
 const splitChunksName = (module, chunks, cacheGroupKey) => {
   let fullName = cacheGroupKey !== 'default' ? cacheGroupKey + '~' : '';
   fullName += chunks.map(item => item.name).join('~');
-  if (fullName.length > 80) {
-    return fullName.slice(0, 70).replace(/~[^~]*$/, '') + '~' + hashCode(fullName);
+  if (fullName.length > 75) {
+    return fullName.slice(0, 65).replace(/~[^~]*$/, '') + '~' + hashCode(fullName);
   }
   return fullName;
 };
