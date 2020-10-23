@@ -64,25 +64,25 @@ MAX_RECURSION_DEPTH = 50
 
 
 class LifoQueue(queue.Queue):
-    '''
-    Variant of Queue that retrieves most recently added entries first.
+  '''
+  Variant of Queue that retrieves most recently added entries first.
 
-    This LIFO Queue is included in python2.7 (or 2.6) and later,
-    but it's a simple subclass, so we "backport" it here.
-    '''
+  This LIFO Queue is included in python2.7 (or 2.6) and later,
+  but it's a simple subclass, so we "backport" it here.
+  '''
 
-    def _init(self, maxsize):
-        self.queue = []
-        self.maxsize = maxsize
+  def _init(self, maxsize):
+      self.queue = []
+      self.maxsize = maxsize
 
-    def _qsize(self, len=len):
-        return len(self.queue)
+  def _qsize(self, len=len):
+      return len(self.queue)
 
-    def _put(self, item):
-        self.queue.append(item)
+  def _put(self, item):
+      self.queue.append(item)
 
-    def _get(self):
-        return self.queue.pop()
+  def _get(self):
+      return self.queue.pop()
 
 
 class ConnectionConfig(object):
@@ -150,8 +150,9 @@ class ConnectionConfig(object):
     self.coordinator_host = coordinator_host
 
   def __str__(self):
-    return ', '.join(map(str, [self.klass, self.host, self.port, self.service_name, self.use_sasl, self.kerberos_principal, self.timeout_seconds,
-                               self.mechanism, self.username, self.use_ssl, self.ca_certs, self.keyfile, self.certfile, self.validate, self.transport,
+    return ', '.join(map(str, [self.klass, self.host, self.port, self.service_name, self.use_sasl, self.kerberos_principal,
+                               self.timeout_seconds, self.mechanism, self.username, self.use_ssl, self.ca_certs, self.keyfile,
+                               self.certfile, self.validate, self.transport,
                                self.multiple, self.transport_mode, self.http_url, self.coordinator_host]))
 
   def update_coordinator_host(self, coordinator_host):
@@ -259,7 +260,8 @@ class ConnectionPooler(object):
           raise socket.timeout(
             ("Timed out after %.2f seconds waiting to retrieve a %s client from the pool.") % (has_waited_for, conf.service_name))
         else:
-          message = "Waited %d seconds for a Thrift client to %s:%d %s" % (has_waited_for, conf.host, conf.port, conf.get_coordinator_host())
+          message = "Waited %d seconds for a Thrift client to %s:%d %s" % (has_waited_for,
+                                                                           conf.host, conf.port, conf.get_coordinator_host())
           log_if_slow_call(duration=has_waited_for, message=message)
 
     return connection
@@ -314,7 +316,8 @@ def connect_to_thrift(conf):
           PROTOCOL_SSLv23 = PROTOCOL_TLS
         except ImportError:
           PROTOCOL_SSLv23 = PROTOCOL_TLS = 2
-      mode = TSSLSocketWithWildcardSAN(conf.host, conf.port, validate=conf.validate, ca_certs=conf.ca_certs, keyfile=conf.keyfile, certfile=conf.certfile,ssl_version=PROTOCOL_SSLv23)
+      mode = TSSLSocketWithWildcardSAN(conf.host, conf.port, validate=conf.validate, ca_certs=conf.ca_certs,
+                                       keyfile=conf.keyfile, certfile=conf.certfile, ssl_version=PROTOCOL_SSLv23)
     else:
       mode = TSocket(conf.host, conf.port)
 
@@ -634,7 +637,7 @@ def thrift2json(tft):
   """
   if isinstance(tft, type(None)):
     return None
-  if isinstance(tft, (float,int,complex,basestring)):
+  if isinstance(tft, (float, int, complex, basestring)):
     return tft
   if isinstance(tft, dict):
     d = {}

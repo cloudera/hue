@@ -13,7 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This file comes from the Apache2 licenced file source code file https://github.com/apache/incubator-impala/blob/45ff0f9e674f54b35afb2b5eced0d6ec346890d6/shell/TSSLSocketWithWildcardSAN.py
+# This file comes from the Apache2 licenced file source code file
+# https://github.com/apache/incubator-impala/blob/45ff0f9e674f54b35afb2b5eced0d6ec346890d6/shell/TSSLSocketWithWildcardSAN.py
 
 from builtins import map
 import re
