@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-import axios, { AxiosResponse } from 'axios';
+import api from './api';
+import { AxiosResponse } from 'axios';
 import { Query } from '..';
 
 import { searchQueries, SearchRequest, SearchResponse } from './search';
@@ -26,7 +27,7 @@ import queryMockResponse3 from '../test/api/hive_query_get_response_3.json';
 
 describe('search.ts', () => {
   it('Should load queries data', async () => {
-    jest.spyOn(axios, 'post').mockImplementation(
+    jest.spyOn(api, 'post').mockImplementation(
       async (): Promise<AxiosResponse<{ queries: Query[] }>> =>
         Promise.resolve(<AxiosResponse>{
           data: { queries: [queryMockResponse2.query, queryMockResponse3.query] }

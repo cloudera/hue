@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-import axios, { AxiosResponse } from 'axios';
+import api from './api';
+import { AxiosResponse } from 'axios';
 import { fetchExtendedQuery } from './query';
 import { Query, Vertex } from '..';
 
@@ -27,7 +28,7 @@ const TEST_QUERY_ID = 'hive_1234';
 describe('query.ts', () => {
   it('Should load query data', async () => {
     jest
-      .spyOn(axios, 'get')
+      .spyOn(api, 'get')
       .mockImplementation(
         async (): Promise<AxiosResponse<{ query: Query }>> =>
           Promise.resolve(<AxiosResponse>{ data: queryMockResponse })
@@ -43,7 +44,7 @@ describe('query.ts', () => {
   it('Should load query & vertices data', async () => {
     const TEST_VERTEX_DATA = {};
 
-    jest.spyOn(axios, 'get').mockImplementation(
+    jest.spyOn(api, 'get').mockImplementation(
       async (): Promise<AxiosResponse<{ query: Query; vertices: Vertex[] }>> =>
         Promise.resolve(<AxiosResponse>{
           data: { query: queryMockResponse.query, vertices: [TEST_VERTEX_DATA] }

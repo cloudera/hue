@@ -18,8 +18,15 @@
 
 <template>
   <div class="queries-list">
+    <InlineAlert
+      v-if="error"
+      :type="AlertType.Error"
+      :message="error.message"
+      show-close="true"
+      @close="showQueries"
+    />
     <query-table
-      v-if="!selectedQuery && !queriesToDiff"
+      v-else-if="!selectedQuery && !queriesToDiff"
       :queries="queries"
       :total-queries="(searchMeta && searchMeta.size) || 0"
       @diff-queries="diffQueries"
@@ -46,17 +53,22 @@
   import QueryDetails from './query-details/QueryDetails.vue';
   import { Query, SearchMeta } from './index';
   import QueryTable from './query-table/QueryTable.vue';
+  import InlineAlert from '../../../../../components/InlineAlert.vue';
+  import { AlertType } from '../../../../../components/InlineAlert.vue';
 
   const QUERY_ID_PARAM = 'queryId';
 
   @Component({
-    components: { QueryDetailsDiff, QueryDetails, QueryTable, TimeAgo, HumanByteSize }
+    components: { QueryDetailsDiff, QueryDetails, QueryTable, TimeAgo, HumanByteSize, InlineAlert }
   })
   export default class QueriesList extends Vue {
     selectedQuery: Query | null = null;
     queriesToDiff: Query[] | null = null;
     queries: Query[] = [];
     searchMeta: SearchMeta | null = null;
+    error: Error | null = null;
+
+    AlertType = AlertType;
 
     async fetch(options: {
       page: Page;
@@ -66,23 +78,28 @@
     }): Promise<void> {
       // Initial fetch triggered by the paginator
       const now = Date.now();
-      const searchResponse = await searchQueries({
-        endTime: (options.timeRange && options.timeRange.to) || now,
-        limit: options.page.limit,
-        offset: options.page.offset,
-        facets: options.facets,
-        text: options.text,
-        sortText: 'startTime:DESC',
-        startTime: (options.timeRange && options.timeRange.from) || now - 1000 * 60 * 60 * 24 * 7
-      });
-      this.searchMeta = searchResponse.meta;
-      this.queries = searchResponse.queries;
+      try {
+        const searchResponse = await searchQueries({
+          endTime: (options.timeRange && options.timeRange.to) || now,
+          limit: options.page.limit,
+          offset: options.page.offset,
+          facets: options.facets,
+          text: options.text,
+          sortText: 'startTime:DESC',
+          startTime: (options.timeRange && options.timeRange.from) || now - 1000 * 60 * 60 * 24 * 7
+        });
+        this.searchMeta = searchResponse.meta;
+        this.queries = searchResponse.queries;
+      } catch (error) {
+        this.error = error;
+      }
     }
 
     @Provide()
     showQueries(): void {
       this.selectedQuery = null;
       this.queriesToDiff = null;
+      this.error = null;
 
       const urlParams = new URLSearchParams(window.location.search);
       let index = 0;
@@ -113,8 +130,12 @@
       queriesToDiff.forEach((query, index) => {
         hueUtils.changeURLParameter(QUERY_ID_PARAM + index, query.queryId);
       });
-      const fetchPromises = queriesToDiff.map(query => fetchExtendedQuery(query.queryId));
-      this.queriesToDiff = await Promise.all(fetchPromises);
+      try {
+        const fetchPromises = queriesToDiff.map(query => fetchExtendedQuery(query.queryId));
+        this.queriesToDiff = await Promise.all(fetchPromises);
+      } catch (error) {
+        this.error = error;
+      }
     }
 
     async killQueries(queriesToKill: Query[]): Promise<void> {
@@ -124,7 +145,11 @@
 
     async querySelected(query: Query): Promise<void> {
       hueUtils.changeURLParameter(QUERY_ID_PARAM + 0, query.queryId);
-      this.selectedQuery = await fetchExtendedQuery(query.queryId);
+      try {
+        this.selectedQuery = await fetchExtendedQuery(query.queryId);
+      } catch (error) {
+        this.error = error;
+      }
     }
   }
 </script>

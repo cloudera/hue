@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-import axios, { AxiosResponse } from 'axios';
+import api from './api';
+import { AxiosResponse } from 'axios';
 import { Facet } from '../../../../../../components/FacetSelector';
 import { FieldInfo, Query, Search, SearchMeta } from '../index';
 // Uncomment to serve mock response instead of calling the API endpoints
@@ -46,7 +47,7 @@ export interface SearchResponse {
 }
 
 export const searchQueries = async (options: SearchRequest): Promise<SearchResponse> => {
-  const response = await axios.post<SearchRequest, AxiosResponse<SearchResponse>>(SEARCH_URL, {
+  const response = await api.post<SearchRequest, AxiosResponse<SearchResponse>>(SEARCH_URL, {
     search: { ...options, type: 'BASIC' }
   });
   return response.data;
@@ -91,7 +92,7 @@ export interface FacetsResponse {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const fetchFacets = async (params: FacetsParams): Promise<FacetsResponse> => {
   // TODO: Implement GET '/api/query/facets?startTime=x&endTime=y&facetFields=z'
-  const response = await axios.get<FacetsParams, AxiosResponse<FacetsResponse>>(FACETS_URL, {
+  const response = await api.get<FacetsParams, AxiosResponse<FacetsResponse>>(FACETS_URL, {
     params
   });
   return response.data;

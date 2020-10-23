@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-import axios, { AxiosResponse } from 'axios';
+import api from './api';
+import { AxiosResponse } from 'axios';
 import { Query, Vertex } from '../index';
 
 const QUERY_URL = '/jobbrowser/query-proxy/api/hive/query';
@@ -32,18 +33,19 @@ interface VerticesRequest {
 }
 
 const fetchDagVertices = async (dagId: string): Promise<Vertex[]> => {
-  const response = await axios.get<VerticesRequest, AxiosResponse<{ vertices: Vertex[] }>>(
+  const params = { dagId: dagId };
+  const response = await api.get<VerticesRequest, AxiosResponse<{ vertices: Vertex[] }>>(
     VERTICES_URL,
-    { params: { dagId: dagId } }
+    { params }
   );
   return response.data.vertices;
 };
 
 export const fetchExtendedQuery = async (queryId: string): Promise<Query> => {
-  const response = await axios.get<ExtendedQueryRequest, AxiosResponse<{ query: Query }>>(
-    QUERY_URL,
-    { params: { queryId: queryId, extended: true } }
-  );
+  const params = { queryId: queryId, extended: true };
+  const response = await api.get<ExtendedQueryRequest, AxiosResponse<{ query: Query }>>(QUERY_URL, {
+    params
+  });
   const query: Query = response.data.query;
 
   for (const dag of query.dags) {
