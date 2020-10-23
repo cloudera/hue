@@ -183,7 +183,6 @@ if USE_NEW_EDITOR.get():
         });
       }
       else {
-        top.location = self.location;
       }
 
       %if conf.AUTH.IDLE_SESSION_TIMEOUT.get() > -1 and not skip_idle_timeout:

@@ -1590,7 +1590,8 @@ AUDIT_EVENT_LOG_DIR = Config(
   key="audit_event_log_dir",
   help=_("The directory where to store the auditing logs. Auditing is disable if the value is empty."),
   type=str,
-  dynamic_default=get_navigator_audit_log_dir
+  default=''
+  #dynamic_default=get_navigator_audit_log_dir
 )
 
 AUDIT_LOG_MAX_FILE_SIZE = Config(
