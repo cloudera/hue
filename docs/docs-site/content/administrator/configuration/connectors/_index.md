@@ -26,11 +26,14 @@ Hue connects to any database or warehouse via native or SqlAlchemy connectors. C
 
 Note that USER and PASSWORD can be prompted to the user by using variables like `mysql://${USER}:${PASSWORD}@localhost:3306/hue`.
 
-Most of the interpreters require to install their SqlAlchemy dialect either in the global Python environment or in the Hue virtual environment.
+Most of the interpreters require to install their SqlAlchemy dialect (e.g. `./build/env/bin/pip install pyhive`) either in the global Python environment or in the Hue virtual environment.
 
-Read about [how to build your own parser](/developer/parsers/) if you are looking at better autocompletes for your own SQL dialects.
+Read about [how to build your own parser](/developer/parsers/) if you are looking at better autocompletes for your the SQL dialects you use.
+
 
 ### Apache Hive
+
+The [Dev Onboarding](https://docs.gethue.com/developer/development/#apache-hive) documentation demoes the integration.
 
 Support is native via a dedicated section.
 
@@ -301,6 +304,8 @@ With impersonation:
 
 ### Apache Druid
 
+This [SQL Editor with Druid](https://gethue.com/quick-task-how-to-query-apache-druid-analytic-database/) post demoes the integration.
+
 First, make sure that Hue can talk to Druid via the [pydruid SqlAlchemy connector](https://github.com/druid-io/pydruid).
 
     ./build/env/bin/pip install pydruid
@@ -322,7 +327,9 @@ Adding the `+https` prefix will use HTTPS e.g.:
 
 ### Apache Flink
 
-The dialect currently requires the Flink SQL Gateway to submit queries: https://github.com/ververica/flink-sql-gateway/releases. The [tutorial](https://gethue.com/blog/sql-editor-for-apache-flink-sql/) demoes how to set it up.
+This [Stream SQL Editor with Flink](https://gethue.com/blog/tutorial-query-live-data-stream-with-flink-sql/) post demoes the integration.
+
+The dialect currently requires the [Flink SQL Gateway](https://github.com/ververica/flink-sql-gateway/releases) in order to submit queries.
 
 Then add a Flink interpreter in the Hue configuration:
 
@@ -337,6 +344,8 @@ Then add a Flink interpreter in the Hue configuration:
 
 
 ### ksqlDB
+
+This [Stream SQL Editor with ksqlDB](https://gethue.com/blog/tutorial-query-live-data-stream-with-kafka-sql/) post demoes the integration.
 
 The ksql Python module should be added to the system or Hue Python virtual environment:
 
@@ -434,12 +443,14 @@ Alternative:
 
 There are two ways to connect depending on your infrastructure:
 
-* [Thrift Server](https://spark.apache.org/docs/latest/sql-distributed-sql-engine.html)
+* [Distributed SQL Engine / Thrift Server](https://spark.apache.org/docs/latest/sql-distributed-sql-engine.html)
 * [Apache Livy REST API](https://livy.apache.org/)
 
-#### Thrift Server
+#### Distributed SQL Engine
 
-Either via SqlAlchemy or HiveServer Thrift interface:
+Hue supports two interfaces: SqlAlchemy and native Thrift. Native Thrift should support better long running queries better, but might have some nits here and there.
+
+##### SqlAlchemy
 
 With SqlAlchemy the dialect should be added to the Python system or Hue Python virtual environment:
 
@@ -451,6 +462,8 @@ Then give Hue the information about the database source:
     name = Spark SQL
     interface=sqlalchemy
     options='{"url": "hive://user:password@host:10000/database"}'
+
+##### Distributed SQL Engine / Thrift Server
 
 With the HiveServer Thrift (same as the one used by Hive and Impala so more robust depending on the use cases):
 
@@ -470,7 +483,9 @@ And make sure you have a `sparksql` interpreter configured:
 
 #### Apache Livy
 
-[Apache Livy](https://livy.incubator.apache.org/) provides a bridge to a running Spark interpreter so that SQL, pyspark and scala snippets can be executed interactively:
+[Apache Livy](https://livy.incubator.apache.org/) provides a bridge to a running Spark interpreter so that SQL, pyspark and Scala snippets can be executed interactively.
+
+This [Spark SQL Editor with Livy](https://gethue.com/blog/quick-task-sql-editor-for-apache-spark-sql-with-livy/) post demoes the integration.
 
     [spark]
     # The Livy Server URL.
