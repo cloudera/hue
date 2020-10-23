@@ -16,14 +16,13 @@
 
 import $ from 'jquery';
 import * as ko from 'knockout';
+import ace from 'ext/aceHelper';
 
 import apiHelper from 'api/apiHelper';
 import AceLocationHandler from 'ko/bindings/ace/aceLocationHandler';
 import huePubSub from 'utils/huePubSub';
 import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
 import { registerBinding } from 'ko/bindings/bindingUtils';
-
-// TODO: Depends on Ace
 
 export const NAME = 'aceEditor';
 export const INSERT_AT_CURSOR_EVENT = 'editor.insert.at.cursor';
