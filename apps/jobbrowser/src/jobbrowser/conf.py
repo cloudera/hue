@@ -97,3 +97,10 @@ QUERY_STORE = ConfigSection(
     )
   )
 )
+
+USE_PROXY = Config(
+  key="use_proxy",
+  help=_("Use the proxy API instead of the ORM to access the query_store."),
+  type=coerce_bool,
+  default=True
+)

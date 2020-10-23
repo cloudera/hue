@@ -29,7 +29,7 @@ from desktop.lib.rest.resource import Resource
 from desktop.views import serve_403_error
 
 from jobbrowser.apis.base_api import get_api
-from jobbrowser.conf import DISABLE_KILLING_JOBS, QUERY_STORE
+from jobbrowser.conf import DISABLE_KILLING_JOBS, QUERY_STORE, USE_PROXY
 
 LOG = logging.getLogger(__name__)
 
@@ -168,27 +168,30 @@ def profile(request):
 
 
 @api_error_handler
-def query_store_proxy(request, path=None):
+def query_store_api(request, path=None):
   response = {'status': -1}
-  content_type = 'application/json; charset=UTF-8'
-  headers = {'X-Requested-By': 'das', 'Content-Type': content_type}
 
-  client = HttpClient(QUERY_STORE.SERVER_URL.get())
-  resource = Resource(client)
+  if USE_PROXY.get():
+    content_type = 'application/json; charset=UTF-8'
+    headers = {'X-Requested-By': 'das', 'Content-Type': content_type}
 
-  try:
-    response = resource.invoke(request.method, path, request.GET.dict(), request.body, headers)
-  except RestException as e:
-    ex_response = e.get_parent_ex().response
-    response['code'] = ex_response.status_code
-    response['message'] = ex_response.reason
-    response['content'] = ex_response.text
+    client = HttpClient(QUERY_STORE.SERVER_URL.get())
+    resource = Resource(client)
 
-  return JsonResponse(response);
+    try:
+      response = resource.invoke(request.method, path, request.GET.dict(), request.body, headers)
+    except RestException as e:
+      ex_response = e.get_parent_ex().response
+      response['code'] = ex_response.status_code
+      response['message'] = ex_response.reason
+      response['content'] = ex_response.text
+
+  return JsonResponse(response)
 
 
 @api_error_handler
-def download_zip(request, id=None):
+def query_store_download_bundle(request, id=None):
+  response = {}
 
   client = HttpClient(QUERY_STORE.SERVER_URL.get())
   resource = Resource(client)
