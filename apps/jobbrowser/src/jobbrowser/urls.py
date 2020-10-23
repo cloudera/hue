@@ -20,8 +20,6 @@ from django.conf.urls import url
 from jobbrowser import views as jobbrowser_views
 from jobbrowser import api2 as jobbrowser_api2
 
-from jobbrowser.conf import QUERY_STORE
-
 urlpatterns = [
   # "Default"
   url(r'^$', jobbrowser_views.jobs),
@@ -70,12 +68,7 @@ urlpatterns += [
   url(r'api/job(?:/(?P<interface>.+))?/?', jobbrowser_api2.job, name='job'),
 ]
 
-if QUERY_STORE.SERVER_URL.get():
-  urlpatterns += [
-    url(r'^query-proxy/data-bundle/(?P<id>.*)$', jobbrowser_api2.download_zip),
-  ]
-
-if QUERY_STORE.SERVER_URL.get():
-  urlpatterns += [
-    url(r'^query-proxy/(?P<path>.*)$', jobbrowser_api2.query_store_proxy),
-  ]
+urlpatterns += [
+  url(r'^query-store/data-bundle/(?P<id>.*)$', jobbrowser_api2.query_store_download_bundle),
+  url(r'^query-store/(?P<path>.*)$', jobbrowser_api2.query_store_api),
+]
