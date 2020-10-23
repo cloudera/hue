@@ -25,8 +25,8 @@
     <dropwizard.version>2.0.10</dropwizard.version>
     <guava.version>28.1-jre</guava.version>
     <junit.version>4.13</junit.version>
-    <jackson.version>2.9.10.4</jackson.version>
-    <jackson.modules.version>2.9.10</jackson.modules.version>
+    <jackson.version>2.10.5</jackson.version>
+    <jackson.modules.version>2.10.5</jackson.modules.version>
     <jersey.version>2.31</jersey.version>
     <lombok.version>1.18.10</lombok.version>
     <protobuf.version>2.5.0</protobuf.version>
@@ -34,7 +34,7 @@
     <log4j2.version>2.13.3</log4j2.version>
     <postgres.version>42.2.14</postgres.version>
     <pg-embedded.version>0.7.1</pg-embedded.version>
-    <jetty.version>9.4.29.v20200521</jetty.version>
+    <jetty.version>9.4.31.v20200723</jetty.version>
   </properties>
 
   <modules>
@@ -45,6 +45,44 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-io</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-servlet</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-servlets</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-security</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-server</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-util</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+
+
+
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-http</artifactId>
@@ -355,6 +393,17 @@
       </dependency>
 
       <!-- Hive dependencies -->
+      <dependency>
+        <groupId>org.apache.hive</groupId>
+        <artifactId>hive-shims</artifactId>
+        <version>${hive.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.hive.shims</groupId>
+            <artifactId>hive-shims-0.20</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
       <dependency>
         <groupId>org.apache.hive</groupId>
         <artifactId>hive-jdbc</artifactId>
