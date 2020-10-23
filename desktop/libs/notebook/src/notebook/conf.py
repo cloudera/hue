@@ -31,6 +31,9 @@ from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, co
 
 LOG = logging.getLogger(__name__)
 
+# Not used when connector are on
+INTERPRETERS_CACHE = None
+
 
 SHOW_NOTEBOOKS = Config(
     key="show_notebooks",
@@ -70,6 +73,8 @@ def _connector_to_iterpreter(connector):
 
 
 def get_ordered_interpreters(user=None):
+  global INTERPRETERS_CACHE
+
   if has_connectors():
     from desktop.lib.connectors.api import _get_installed_connectors
     interpreters = [
@@ -77,21 +82,22 @@ def get_ordered_interpreters(user=None):
       for connector in _get_installed_connectors(categories=['editor', 'catalogs'], user=user)
     ]
   else:
-    if is_cm_managed() and INTERPRETERS.get():
-      extra_interpreters = INTERPRETERS.get()
-      _default_interpreters(user)
-    else:
-      extra_interpreters = {}
+    if INTERPRETERS_CACHE is None:
+      if is_cm_managed():
+        extra_interpreters = INTERPRETERS.get()  # Combine the other apps interpreters
+        _default_interpreters(user)
+      else:
+        extra_interpreters = {}
 
-    if not INTERPRETERS.get():
-      _default_interpreters(user)
+      if not INTERPRETERS.get():
+        _default_interpreters(user)
 
-    interpreters = INTERPRETERS.get()
-    interpreters.update(extra_interpreters)
+      INTERPRETERS_CACHE = INTERPRETERS.get()
+      INTERPRETERS_CACHE.update(extra_interpreters)
 
     user_apps = appmanager.get_apps_dict(user)
     user_interpreters = []
-    for interpreter in interpreters:
+    for interpreter in INTERPRETERS_CACHE:
       if check_has_missing_permission(user, interpreter, user_apps=user_apps):
         pass  # Not allowed
       else:
@@ -106,11 +112,12 @@ def get_ordered_interpreters(user=None):
     reordered_interpreters = interpreters_shown_on_wheel + [i for i in user_interpreters if i not in interpreters_shown_on_wheel]
 
     interpreters = [{
-        'name': interpreters[i].NAME.get(),
+        'name': INTERPRETERS_CACHE[i].NAME.get(),
         'type': i,
-        'interface': interpreters[i].INTERFACE.get(),
-        'options': interpreters[i].OPTIONS.get()
-      } for i in reordered_interpreters
+        'interface': INTERPRETERS_CACHE[i].INTERFACE.get(),
+        'options': INTERPRETERS_CACHE[i].OPTIONS.get()
+      }
+      for i in reordered_interpreters
     ]
 
   return [{
