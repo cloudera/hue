@@ -42,7 +42,7 @@ if sys.argv[-1] == 'publish':
 packages = ['requests']
 
 requires = [
-    'chardet>=3.0.2,<4',
+    #'chardet>=3.0.2,<4',  # LGPL and imports have been removed
     'idna>=2.5,<3',
     'urllib3>=1.21.1,<1.26,!=1.25.0,!=1.25.1',
     'certifi>=2017.4.17'
