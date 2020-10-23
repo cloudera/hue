@@ -90,6 +90,7 @@
     "@types/jquery": "3.5.0",
     "@types/knockout": "3.4.67",
     "@types/luxon": "1.25.0",
+    "@types/webpack": "4.41.23",
     "@typescript-eslint/eslint-plugin": "3.4.0",
     "@typescript-eslint/parser": "3.4.0",
     "@vue/test-utils": "^1.0.3",
