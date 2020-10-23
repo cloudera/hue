@@ -23,9 +23,9 @@ else
 fi
 
 echo "Compiling and copying Ace Editor for Hue"
-npm install
-rm -rf ../../desktop/core/src/desktop/static/desktop/js/ace/* || echo "Skipping removal of folder"
-$NODE_BIN ./Makefile.dryice.js minimal --m --nc --s --target ../../desktop/core/src/desktop/static/desktop/js/ace/
-mv ../../desktop/core/src/desktop/static/desktop/js/ace/src-min-noconflict/* ../../desktop/core/src/desktop/static/desktop/js/ace/
-rmdir ../../desktop/core/src/desktop/static/desktop/js/ace/src-min-noconflict
+#npm install
+rm -rf ../../desktop/core/src/desktop/js/ext/ace/* || echo "Skipping removal of folder"
+$NODE_BIN ./Makefile.dryice.js --nc --s --target ../../desktop/core/src/desktop/js/ext/ace/
+mv ../../desktop/core/src/desktop/js/ext/ace/src-noconflict/* ../../desktop/core/src/desktop/js/ext/ace/
+rmdir ../../desktop/core/src/desktop/js/ext/ace/src-noconflict
 echo "Done!"

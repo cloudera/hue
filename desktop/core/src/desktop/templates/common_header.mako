@@ -159,17 +159,6 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
 
 % if user.is_authenticated():
-
-  <script src="${ static('desktop/js/ace/ace.js') }"></script>
-  <script src="${ static('desktop/js/ace/mode-impala.js') }"></script>
-  <script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
-  <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
-  <script src="${ static('desktop/js/ace.extended.js') }"></script>
-
-  <script>
-    ace.config.set("basePath", "${ static('desktop/js/ace') }");
-  </script>
-
   ${ hueAceAutocompleter.hueAceAutocompleter() }
 %endif
 
