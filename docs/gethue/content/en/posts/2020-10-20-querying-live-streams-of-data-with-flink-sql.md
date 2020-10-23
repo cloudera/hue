@@ -70,7 +70,7 @@ For fetching the configurations and starting everything:
 
     mkdir stream-sql-demo
     cd stream-sql-demo
-    wget https://raw.githubusercontent.com/romainr/query-demo/stream-sql-demo/docker-compose.yml
+    wget https://raw.githubusercontent.com/romainr/query-demo/master/stream-sql-demo/docker-compose.yml
 
 
     docker-compose up -d
