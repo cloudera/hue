@@ -187,6 +187,17 @@ class BigQueryClient(Base):
     }
 
 
+  def dry_run(self, statement):
+    job_config = bigquery.QueryJobConfig(dry_run=True, use_query_cache=False)
+
+    query_job = self.client.query(
+        statement,
+        job_config=job_config,
+    )
+
+    return query_job._properties
+
+
   def _get_client(self):
     # https://cloud.google.com/bigquery/docs/reference/rest/v2/
     credentials_json = json.loads(
