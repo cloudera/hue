@@ -226,6 +226,14 @@ class HiveServerTable(Table):
     if self._details is None:
       props = dict([(stat['col_name'], stat['data_type']) for stat in self.properties if stat['col_name'] != 'Table Parameters:'])
       serde = props.get('SerDe Library:', '')
+      if 'ParquetHiveSerDe' in serde:
+        details_format = 'parquet'
+      elif 'LazySimpleSerDe' in serde:
+        details_format = 'text'
+      elif self.is_impala_only:
+        details_format = 'kudu'
+      else:
+        details_format = serde.rsplit('.', 1)[-1]
 
       self._details = {
           'stats': dict([(stat['data_type'], stat['comment']) for stat in self.stats]),
@@ -233,7 +241,7 @@ class HiveServerTable(Table):
             'owner': props.get('Owner:'),
             'create_time': props.get('CreateTime:'),
             'table_type': props.get('Table Type:', 'MANAGED_TABLE'),
-            'format': 'parquet' if 'ParquetHiveSerDe' in serde else ('text' if 'LazySimpleSerDe' in serde else ('kudu' if self.is_impala_only else serde.rsplit('.', 1)[-1])),
+            'format': details_format,
         }
       }
 
@@ -552,7 +560,8 @@ class HiveServerClient(object):
     use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username, auth_password = self.get_security()
     LOG.info(
         '%s: server_host=%s, use_sasl=%s, mechanism=%s, kerberos_principal_short_name=%s, impersonation_enabled=%s, auth_username=%s' % (
-        self.query_server['server_name'], self.query_server['server_host'], use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username)
+        self.query_server['server_name'], self.query_server['server_host'], use_sasl, mechanism, kerberos_principal_short_name,
+        impersonation_enabled, auth_username)
     )
 
     self.use_sasl = use_sasl
@@ -813,7 +822,8 @@ class HiveServerClient(object):
   def get_database(self, database):
     query = 'DESCRIBE DATABASE EXTENDED `%s`' % (database)
 
-    desc_results, desc_schema, operation_handle, session = self.execute_statement(query, max_rows=5000, orientation=TFetchOrientation.FETCH_NEXT)
+    desc_results, desc_schema, operation_handle, session = self.execute_statement(query, max_rows=5000,
+                                                                                  orientation=TFetchOrientation.FETCH_NEXT)
     self._close(operation_handle, session)
 
     if self.query_server.get('dialect') == 'impala':
@@ -910,7 +920,8 @@ class HiveServerClient(object):
         desc_results.results.columns[2].stringVal.values.insert(1, None)
         try:
           part_index = desc_results.results.columns[0].stringVal.values.index('# Partition Information')
-          desc_results.results.columns[0].stringVal.values = desc_results.results.columns[0].stringVal.values[:part_index] # Strip duplicate columns of partitioned tables
+          # Strip duplicate columns of partitioned tables
+          desc_results.results.columns[0].stringVal.values = desc_results.results.columns[0].stringVal.values[:part_index]
           desc_results.results.columns[1].stringVal.values = desc_results.results.columns[1].stringVal.values[:part_index]
           desc_results.results.columns[2].stringVal.values = desc_results.results.columns[2].stringVal.values[:part_index]
 
@@ -1016,7 +1027,8 @@ class HiveServerClient(object):
         session_id=session.id
     )
 
-  # Note: An operation_handle is attached to a session. All operations that require operation_handle cannot recover if the session is closed. Passing the session is not required
+  # Note: An operation_handle is attached to a session. All operations that require operation_handle cannot recover if the session is
+  # closed. Passing the session is not required
   def fetch_data(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=1000):
     # Fetch until the result is empty dues to a HS2 bug instead of looking at hasMoreRows
     results, schema = self.fetch_result(operation_handle, orientation, max_rows)
@@ -1105,10 +1117,12 @@ class HiveServerClient(object):
   def explain(self, query):
     query_statement = query.get_query_statement(0)
     configuration = self._get_query_configuration(query)
-    return self.execute_query_statement(statement='EXPLAIN %s' % query_statement, configuration=configuration, orientation=TFetchOrientation.FETCH_NEXT)
+    return self.execute_query_statement(statement='EXPLAIN %s' % query_statement, configuration=configuration,
+                                        orientation=TFetchOrientation.FETCH_NEXT)
 
 
-  def get_partitions(self, database, table_name, partition_spec=None, max_parts=None, reverse_sort=True): # TODO execute both requests in same session
+  # TODO execute both requests in same session
+  def get_partitions(self, database, table_name, partition_spec=None, max_parts=None, reverse_sort=True):
     table = self.get_table(database, table_name)
 
     query = 'SHOW PARTITIONS `%s`.`%s`' % (database, table_name)
