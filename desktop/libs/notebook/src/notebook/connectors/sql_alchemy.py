@@ -263,7 +263,6 @@ class SqlAlchemyApi(Api):
 
 
   @query_error_handler
-<<<<<<< HEAD
   def explain(self, notebook, snippet):
     session = self._get_session(notebook, snippet)
     if session is not None:
