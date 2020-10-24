@@ -276,7 +276,13 @@ class SqlAlchemyApi(Api):
 
     if statement:
       if self.options['url'].startswith('bigquery://'):
-        explanation = ''
+        from metadata.models.base import get_api
+        from google.api_core.exceptions import BadRequest
+        connector_id = snippet['type']
+        try:
+          explanation = 'Using cache' % get_api(self.user, connector_id).dry_run(statement)['statistics']['query']
+        except BadRequest as e:
+          explanation = '. '.join([error['message'] for error in e.errors])
 
     return {
       'status': 0,
