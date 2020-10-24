@@ -277,11 +277,58 @@ class SqlAlchemyApi(Api):
     if statement:
       if self.options['url'].startswith('bigquery://'):
         from metadata.models.base import get_api
-        from google.api_core.exceptions import BadRequest
+        from google.api_core.exceptions import GoogleAPICallError
         connector_id = snippet['type']
+        
         try:
-          explanation = 'Using cache' % get_api(self.user, connector_id).dry_run(statement)['statistics']['query']
-        except BadRequest as e:
+          query_stats = get_api(self.user, connector_id).dry_run(statement)['statistics']['query']
+
+          query_stats['totalKBytesProcessed'] = round(int(query_stats['totalBytesProcessed']) / 1024, 1)
+          query_stats['price'] = round(int(query_stats['totalBytesProcessed']) / (1024 * 1024 * 1024 * 1024 * 5), 2)  # 5$ per TB
+          explanation = (
+              'KB processed: %(totalKBytesProcessed)s ' \
+              + 'price: $%(price).2f ' \
+              + 'totalBytesBilled: %(totalBytesBilled)s ' \
+              + 'Using cache: %(cacheHit)s'
+          ) % query_stats
+
+          #https://cloud.google.com/bigquery/pricing#pricing_summary
+          # $5.00 per TB	The first 1 TB per month is free.
+          # Storage ...
+          # Inserst $0.010 per 200 MB (1kb rows min)
+
+          # from desktop.lib.rest.http_client import HttpClient
+          # from desktop.lib.rest.resource import Resource
+          # client = HttpClient('https://cloudpricingcalculator.appspot.com')
+          # resource = Resource(client)
+          # _JSON_CONTENT_TYPE = 'application/json'
+          # # Total Estimated Cost: USD 0.00 per 1 month
+          # ## -->
+          # app = resource.post('/api/set', data=json.dumps({
+          #   "project":"",
+          #   "total_price":0,
+          #   "cart":[
+          #     {
+          #       "sku":"CP-BIGQUERY-GENERAL","region":"us","displayName":"","quantity":0,"quantityLabel":"GiB","displayDescription":"BigQuery",
+          #       "items":{
+          #         "storage":0,
+          #         "streamingInserts":0,
+          #         "interactiveQueries":0.0498046875,
+          #         "editHook":{
+          #           "initialInputs":{"name":"","location":"us","storage":{"value":0,"unit":2},
+          #           "streamingInserts":{"value":0,"unit":1},
+          #           "interactiveQueries":{"value":51,"unit":2},"submitted":True
+          #         },
+          #         "product":"bigQuery","tab":"big-data"
+          #         }
+          #       },
+          #       "uniqueId": 0.5367602234544837,"price":0
+          #     }
+          #   ],
+          #   "requested_currency":"USD"
+          # }), contenttype=_JSON_CONTENT_TYPE)
+          # print(app)
+        except GoogleAPICallError as e:
           explanation = '. '.join([error['message'] for error in e.errors])
 
     return {
