@@ -257,6 +257,29 @@ class SqlAlchemyApi(Api):
     }
 
   @query_error_handler
+  def explain(self, notebook, snippet):
+    session = self._get_session(notebook, snippet)
+    if session is not None:
+      self.options['session'] = session
+
+    engine = self._get_engine()
+    connection = engine.connect()
+    statement = snippet['statement']
+
+    if self.options['url'].startswith('bigquery://'):
+      explanation = ''
+    else:
+      explanation = ''
+
+
+    return {
+      'status': 0,
+      'explanation': explanation,
+      'statement': statement
+    }
+
+
+  @query_error_handler
   def check_status(self, notebook, snippet):
     guid = snippet['result']['handle']['guid']
     connection = CONNECTIONS.get(guid)
