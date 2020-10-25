@@ -198,6 +198,6 @@ def query_store_download_bundle(request, id=None):
   app = resource.get('api/data-bundle/' + id)
 
   response = FileResponse((app, 'rb'), content_type='application/octet-stream')
-  response['Content-Disposition'] = 'attachment; filename='+id+'.zip'
+  response['Content-Disposition'] = 'attachment; filename=' + id + '.zip'
 
   return response
