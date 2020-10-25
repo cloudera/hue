@@ -765,12 +765,28 @@ export default class Snippet {
           return true;
         });
         if (unknownResponse) {
-          lastComplexityRequest = getOptimizer(this.connector())
-            .analyzeRisk({
-              notebookJson: await this.parentNotebook.toContextJson(),
-              snippetJson: this.toContextJson()
-            })
-            .then(data => {
+          lastComplexityRequest = getOptimizer(this.connector()).analyzeRisk({
+            notebookJson: await this.parentNotebook.toContextJson(),
+            snippetJson: this.toContextJson()
+          });
+
+          $.when(lastComplexityRequest, apiHelper.explainAsync({ snippet: this }))
+            .then((data, explanation) => {
+              // Note: should set Green if just time prediction
+              const validator = {
+                riskTables: ['default.customer_scheduled'],
+                riskAnalysis: explanation,
+                riskId: 1,
+                risk: 'low',
+                riskRecommendation: ''
+              };
+
+              if (explanation.includes('Syntax error')) {
+                data.query_complexity.hints.push(validator);
+              } else {
+                data.query_complexity.hints = [validator];
+              }
+
               knownResponses.unshift({
                 hash: hash,
                 data: data
