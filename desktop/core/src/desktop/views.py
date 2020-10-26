@@ -92,13 +92,19 @@ def samlgroup_check(request):
         LOG.info("Empty userprofile data for %s user" % (request.user.username))
         return False
 
-      if json_data.get('saml_attributes', False) and \
-         json_data['saml_attributes'].get(REQUIRED_GROUPS_ATTRIBUTE.get(), False):
-        success = set(REQUIRED_GROUPS.get()).issubset(
-                 set(json_data['saml_attributes'].get(REQUIRED_GROUPS_ATTRIBUTE.get())))
-        if not success:
-          LOG.info("User %s not found in required SAML groups, %s" % (request.user.username, REQUIRED_GROUPS.get()))
-          return False
+      if json_data.get('saml_attributes', False):
+        LOG.info("Empty saml_attributes data for %s user" % request.user.username)
+        return False
+
+      if json_data['saml_attributes'].get(REQUIRED_GROUPS_ATTRIBUTE.get(), False):
+        LOG.info("Missing %s in SAMLResponse for %s user" % (REQUIRED_GROUPS_ATTRIBUTE.get(), request.user.username))
+        return False
+
+      saml_group_found = set(REQUIRED_GROUPS.get()).issubset(
+                         set(json_data['saml_attributes'].get(REQUIRED_GROUPS_ATTRIBUTE.get())))
+      if not saml_group_found:
+        LOG.info("User %s not found in required SAML groups, %s" % (request.user.username, REQUIRED_GROUPS.get()))
+        return False
   return True
 
 def hue(request):
