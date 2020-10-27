@@ -823,6 +823,12 @@ SESSION = ConfigSection(
       type=coerce_bool,
       default=False
     ),
+    CSRF_COOKIE_AGE=Config(
+      key='csrf_cookie_age',
+      help=_("CRSF cookie age defaults to 1 year. If the value is set to 0, it means per session. Time in seconds"),
+      type=int,
+      default=60*60*24*7*52,
+    ),
     CONCURRENT_USER_SESSION_LIMIT=Config(
       key="concurrent_user_session_limit",
       help=_("If set, limits the number of concurrent user sessions. 1 represents 1 session per user. "
