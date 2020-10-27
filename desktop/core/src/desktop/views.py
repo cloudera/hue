@@ -554,7 +554,8 @@ def get_banner_message(request):
       LOG.warn('User %s is bypassing the load balancer' % request.user.username)
 
     if message:
-      banner_message = '<div style="padding: 4px; text-align: center; background-color: #003F6C; height: 24px; color: #DBE8F1">%s</div>' % message
+      banner_message = '<div style="padding: 4px; text-align: center; background-color: #003F6C; height: 24px; color: #DBE8F1">%s</div>' \
+          % message
 
   return banner_message
 
@@ -701,7 +702,7 @@ def collect_validation_messages(conf, error_list):
     'hadoop_mapred_home': [('hadoop', 'yarn_clusters', 'default'), ('hadoop', 'yarn_clusters', 'ha')],
     'hadoop_conf_dir': [('hadoop', 'yarn_clusters', 'default'), ('hadoop', 'yarn_clusters', 'ha')],
     'ssl_cacerts': [('beeswax', 'ssl'), ('impala', 'ssl')],
-    'remote_data_dir': [('liboozie', )],
+    'remote_data_dir': [('liboozie',)],
     'shell': [()],
   }
 
