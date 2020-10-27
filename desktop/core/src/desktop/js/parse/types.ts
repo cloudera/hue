@@ -34,6 +34,13 @@ export interface ParsedLocation {
   last_column: number;
 }
 
+export interface SyntaxError {
+  expected: { text: string }[];
+  expectedStatementEnd?: boolean;
+  loc: ParsedLocation;
+  text: string;
+}
+
 export interface IdentifierLocation {
   type: string;
   alias?: string;
@@ -47,8 +54,10 @@ export interface IdentifierLocation {
   identifierChain?: IdentifierChainEntry[];
   expression?: { types: string[]; text: string };
   parentLocation?: ParsedLocation;
-  resolveCatalogEntry?: (options?: {
+  path?: string;
+  resolveCatalogEntry: (options?: {
     cancellable?: boolean;
+    temporaryOnly?: boolean;
   }) => CancellableJqPromise<DataCatalogEntry>;
 }
 
