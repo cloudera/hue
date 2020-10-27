@@ -13,7 +13,7 @@ channels==2.1.6
 channels-redis==2.3.2
 colorama==0.3.2
 configobj==5.0.6
-cryptography==2.8
+cryptography==3.2
 cx_Oracle==7.1.2
 defusedxml==0.5.0
 Django==1.11.29
