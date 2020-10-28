@@ -140,7 +140,8 @@ class KSqlApi(Api):
 
     # 'result': {'has_more': False, 'data':
     # [
-    #   ['Key format: ¯\\_(ツ)_/¯ - no data processed'], #     Key format: JSON or SESSION(KAFKA_STRING) or HOPPING(KAFKA_STRING) or TUMBLING(KAFKA_STRING) or KAFKA_STRING
+    #    Key format --> JSON or SESSION(KAFKA_STRING) or HOPPING(KAFKA_STRING) or TUMBLING(KAFKA_STRING) or KAFKA_STRING
+    #   ['Key format: ¯\\_(ツ)_/¯ - no data processed'],
     #   ['Value format: JSON or KAFKA_STRING']
     #   [
     #     'rowtime: 2020/10/22 05:25:10.639 Z, '
