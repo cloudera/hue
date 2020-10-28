@@ -20,8 +20,8 @@ import api from './api';
 import { AxiosResponse } from 'axios';
 import { Query, Vertex } from '../index';
 
-const QUERY_URL = '/jobbrowser/query-proxy/api/hive/query';
-const VERTICES_URL = '/jobbrowser/query-proxy/api/hive/vertices';
+const QUERY_URL = '/jobbrowser/query-store/api/hive/query';
+const VERTICES_URL = '/jobbrowser/query-store/api/hive/vertices';
 
 export interface ExtendedQueryRequest {
   queryId: string;

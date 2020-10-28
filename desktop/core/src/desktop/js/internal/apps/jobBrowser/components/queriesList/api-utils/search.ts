@@ -23,8 +23,8 @@ import { FieldInfo, Query, Search, SearchMeta } from '../index';
 // Uncomment to serve mock response instead of calling the API endpoints
 // import '../test/mockSearchHelper';
 
-const SEARCH_URL = '/jobbrowser/query-proxy/api/query/search';
-const FACETS_URL = '/jobbrowser/query-proxy/api/query/facets';
+const SEARCH_URL = '/jobbrowser/query-store/api/query/search';
+const FACETS_URL = '/jobbrowser/query-store/api/query/facets';
 
 export interface SearchFacet {
   field: string;
