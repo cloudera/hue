@@ -22,6 +22,7 @@
       v-if="error"
       :type="AlertType.Error"
       :message="error.message"
+      :details="error.details"
       show-close="true"
       @close="showQueries"
     />

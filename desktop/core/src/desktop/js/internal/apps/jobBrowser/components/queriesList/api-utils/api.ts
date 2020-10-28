@@ -32,19 +32,10 @@ api.interceptors.response.use(
 );
 
 export class ApiError extends Error {
-  trace!: string;
+  details!: string;
 
   constructor(response: AxiosResponse) {
-    let message: string = response.data.message;
-    let trace = '';
-
-    if (response.data.content) {
-      const content = JSON.parse(response.data.content);
-      message = `${message} : ${content.error.message}`;
-      trace = content.trace;
-    }
-
-    super(message);
-    this.trace = trace;
+    super(response.data.message);
+    this.details = response.data.content;
   }
 }

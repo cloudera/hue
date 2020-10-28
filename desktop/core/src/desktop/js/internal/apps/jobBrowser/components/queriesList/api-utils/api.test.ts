@@ -22,6 +22,9 @@ import { AxiosAdapter, AxiosPromise, AxiosRequestConfig } from 'axios';
 
 const TEST_URL = 'http://test-url';
 
+const TEST_MSG = 'Test msg';
+const TEST_DETAILS = 'Test details';
+
 describe('api.ts', () => {
   it('interceptors.response', async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,8 +34,8 @@ describe('api.ts', () => {
         const response = {
           data: {
             status: -1,
-            message: 'Test msg',
-            content: '{"error": {"message": "Test inner msg"}, "trace":"TraceStr"}'
+            message: TEST_MSG,
+            content: TEST_DETAILS
           },
           status: 200,
           statusText: '',
@@ -52,8 +55,8 @@ describe('api.ts', () => {
     }
 
     expect(response).toBeTruthy();
-    expect(response.message).toBe('Test msg : Test inner msg');
-    expect(response.trace).toBe('TraceStr');
+    expect(response.message).toBe(TEST_MSG);
+    expect(response.details).toBe(TEST_DETAILS);
   });
 
   it('ApiError', async () => {
