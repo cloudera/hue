@@ -27,6 +27,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 from desktop.views import serve_403_error
+from beeswax.conf import USE_SASL
 
 from jobbrowser.apis.base_api import get_api
 from jobbrowser.conf import DISABLE_KILLING_JOBS, QUERY_STORE, USE_PROXY
@@ -177,6 +178,8 @@ def query_store_api(request, path=None):
 
     client = HttpClient(QUERY_STORE.SERVER_URL.get())
     resource = Resource(client)
+    if USE_SASL.get():
+      client.set_kerberos_auth()
 
     try:
       response = resource.invoke(request.method, path, request.GET.dict(), request.body, headers)
@@ -195,6 +198,9 @@ def query_store_download_bundle(request, id=None):
 
   client = HttpClient(QUERY_STORE.SERVER_URL.get())
   resource = Resource(client)
+  if USE_SASL.get():
+    client.set_kerberos_auth()
+
   app = resource.get('api/data-bundle/' + id)
 
   response = FileResponse((app, 'rb'), content_type='application/octet-stream')
