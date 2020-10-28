@@ -22,10 +22,10 @@
       <div>
         <hue-button @click="showQueries">Queries</hue-button>
 
-        <hue-button v-if="!query.isComplete && stoppingQuery" disabled>
+        <!-- <hue-button v-if="!query.isComplete && stoppingQuery" disabled>
           <em class="fa fa-spinner fa-pulse fa-fw" /> Stopping query
         </hue-button>
-        <hue-button v-else-if="!query.isComplete" @click="stopQuery">Stop</hue-button>
+        <hue-button v-else-if="!query.isComplete" @click="stopQuery">Stop</hue-button> -->
 
         <a
           :href="`${HUE_BASE_URL}/jobbrowser/query-store/data-bundle/${query.queryId}`"
@@ -54,48 +54,50 @@
           <ConfigsTable :configs="[{ configs: query.details.configuration }]" />
         </tab>
 
-        <!-- DAG Tabs -->
-        <tab title="DAG Info">
-          <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-info">
-            <DagInfo :dag="dag" />
-          </div>
-        </tab>
-        <tab title="DAG Flow">
-          <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-details">
-            <div class="dag-title">
-              <div class="dag-label">Dag</div>
-              <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
+        <template v-if="query.dags.length">
+          <!-- DAG Tabs -->
+          <tab title="DAG Info">
+            <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-info">
+              <DagInfo :dag="dag" />
             </div>
-            <DagGraph :dag="dag" />
-          </div>
-        </tab>
-        <tab title="DAG Swimlane">
-          <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-details">
-            <div class="dag-title">
-              <div class="dag-label">Dag</div>
-              <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
+          </tab>
+          <tab title="DAG Flow">
+            <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-details">
+              <div class="dag-title">
+                <div class="dag-label">Dag</div>
+                <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
+              </div>
+              <DagGraph :dag="dag" />
             </div>
-            <DagSwimlane :dag="dag" />
-          </div>
-        </tab>
-        <tab title="DAG Counters">
-          <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-details">
-            <div class="dag-title">
-              <div class="dag-label">Dag</div>
-              <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
+          </tab>
+          <tab title="DAG Swimlane">
+            <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-details">
+              <div class="dag-title">
+                <div class="dag-label">Dag</div>
+                <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
+              </div>
+              <DagSwimlane :dag="dag" />
             </div>
-            <CountersTable :counters="[{ counters: dag.dagDetails.counters }]" />
-          </div>
-        </tab>
-        <tab title="DAG Configurations">
-          <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-details">
-            <div class="dag-title">
-              <div class="dag-label">Dag</div>
-              <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
+          </tab>
+          <tab title="DAG Counters">
+            <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-details">
+              <div class="dag-title">
+                <div class="dag-label">Dag</div>
+                <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
+              </div>
+              <CountersTable :counters="[{ counters: dag.dagDetails.counters }]" />
             </div>
-            <ConfigsTable :configs="[{ configs: dag.config }]" />
-          </div>
-        </tab>
+          </tab>
+          <tab title="DAG Configurations">
+            <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-details">
+              <div class="dag-title">
+                <div class="dag-label">Dag</div>
+                <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
+              </div>
+              <ConfigsTable :configs="[{ configs: dag.config }]" />
+            </div>
+          </tab>
+        </template>
       </tabs>
     </div>
   </div>

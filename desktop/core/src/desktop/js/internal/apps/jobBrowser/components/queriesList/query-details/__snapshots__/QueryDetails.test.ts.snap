@@ -9,10 +9,6 @@ exports[`QueryDetails.vue should render 1`] = `
       </hue-button-stub>
        
       <hue-button-stub>
-        Stop
-      </hue-button-stub>
-       
-      <hue-button-stub>
         Download
       </hue-button-stub>
     </div>
