@@ -80,14 +80,10 @@ exports[`QueryTable.vue should render 1`] = `
     <div
       class="query-table-right-panel"
     >
-      <div
-        class="table-container"
-      >
-        <hue-table-stub
-          columns=""
-          rows=""
-        />
-      </div>
+      <hue-table-stub
+        columns=""
+        rows=""
+      />
     </div>
   </div>
    

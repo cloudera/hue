@@ -61,6 +61,8 @@ export interface Vertex {
 export interface Dag {
   dagInfo: {
     dagId: string;
+    applicationId: string;
+    status: string;
   };
   dagDetails: {
     counters: CounterGroup[];

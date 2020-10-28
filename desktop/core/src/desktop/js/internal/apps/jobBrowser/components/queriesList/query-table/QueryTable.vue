@@ -69,19 +69,17 @@
         />
       </div>
       <div class="query-table-right-panel">
-        <div class="table-container">
-          <hue-table :columns="visibleColumns" :rows="queries">
-            <template #cell-status="query">
-              <status-indicator class="status-indicator" :value="query.status" />
-            </template>
-            <template #cell-select="query">
-              <input v-model="selectedQueries" type="checkbox" :value="query" />
-            </template>
-            <template #cell-query="query">
-              <hue-link @click="querySelected(query)">{{ query.query }}</hue-link>
-            </template>
-          </hue-table>
-        </div>
+        <hue-table :columns="visibleColumns" :rows="queries">
+          <template #cell-status="query">
+            <status-indicator class="status-indicator" :value="query.status" />
+          </template>
+          <template #cell-select="query">
+            <input v-model="selectedQueries" type="checkbox" :value="query" />
+          </template>
+          <template #cell-query="query">
+            <hue-link @click="querySelected(query)">{{ query.query }}</hue-link>
+          </template>
+        </hue-table>
       </div>
     </div>
     <paginator
@@ -209,13 +207,23 @@
         adapter: (key: string, query: Query): string => timeAgo(query.startTime)
       },
       {
-        key: 'duration',
+        key: 'elapsedTime',
         label: 'Duration',
         adapter: (key: string, query: Query): string =>
-          (query.duration && duration(query.duration)) || ''
+          (query.elapsedTime && duration(query.elapsedTime)) || ''
       },
-      { key: 'dagID', label: 'DAG ID' },
-      { key: 'appID', label: 'Application ID' },
+      {
+        key: 'dagIDs',
+        label: 'DAG IDs',
+        adapter: (key: string, query: Query): string =>
+          query.dags.map(dag => dag.dagInfo.dagId).join(',')
+      },
+      {
+        key: 'appID',
+        label: 'Application ID',
+        adapter: (key: string, query: Query): string =>
+          query.dags[0] && query.dags[0].dagInfo.applicationId
+      },
       { key: 'cpuTime', label: 'CPU Time' },
       {
         key: 'physicalMemory',
@@ -406,11 +414,6 @@
       .query-table-right-panel {
         flex: 1 1 100%;
         max-width: 100%;
-
-        .table-container {
-          width: 100%;
-          overflow-x: auto;
-        }
       }
     }
 
