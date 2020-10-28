@@ -11,6 +11,7 @@ import 'ext/ace/mode-impala';
 import 'ext/ace/mode-ksql';
 import 'ext/ace/mode-phoenix';
 import 'ext/ace/mode-presto';
+import 'ext/ace/mode-pgsql'
 import 'ext/ace/mode-sql';
 import 'ext/ace/mode-text';
 import 'ext/ace/snippets/bigquery';
@@ -22,6 +23,7 @@ import 'ext/ace/snippets/impala';
 import 'ext/ace/snippets/ksql';
 import 'ext/ace/snippets/phoenix';
 import 'ext/ace/snippets/presto';
+import 'ext/ace/snippets/pgsql';
 import 'ext/ace/snippets/sql';
 import 'ext/ace/snippets/text';
 import 'ext/ace/theme-hue';
