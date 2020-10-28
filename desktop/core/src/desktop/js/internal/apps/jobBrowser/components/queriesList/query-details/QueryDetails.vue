@@ -27,7 +27,14 @@
         </hue-button>
         <hue-button v-else-if="!query.isComplete" @click="stopQuery">Stop</hue-button>
 
-        <hue-button @click="downloadLogs">Download</hue-button>
+        <a
+          :href="`${HUE_BASE_URL}/jobbrowser/query-store/data-bundle/${query.queryId}`"
+          target="_blank"
+          download
+          class="btn btn-outline-primary download-link"
+        >
+          Download
+        </a>
       </div>
 
       <QueryInfoTop :query="query" />
@@ -115,6 +122,13 @@
 
   import { Query } from '../index';
 
+  // TODO: Move it to a better place
+  declare global {
+    interface Window {
+      HUE_BASE_URL: string;
+    }
+  }
+
   @Component({
     components: {
       Tab,
@@ -139,16 +153,14 @@
     @Inject()
     showQueries?: () => void;
 
+    HUE_BASE_URL = window.HUE_BASE_URL;
+
     stoppingQuery = false;
 
     async stopQuery(): void {
       this.stoppingQuery = true;
       await kill([this.query]);
       this.stoppingQuery = false;
-    }
-
-    downloadLogs(): void {
-      // TODO: Implement
     }
   }
 </script>
@@ -158,6 +170,10 @@
 
   .query-search {
     color: #0a78a3;
+  }
+
+  .download-link {
+    border-radius: 3px;
   }
 
   .dag-details,
