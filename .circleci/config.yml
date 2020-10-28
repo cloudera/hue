@@ -199,7 +199,7 @@ jobs:
       # Download and cache dependencies
       # - restore_cache:
       #     keys:
-      #       - v1-dependencies-{{ checksum "desktop/core/requirements_py3.txt" }}
+      #       - v1-dependencies-{{ checksum "desktop/core/requirements.txt" }}
       #       # fallback to using the latest cache if no exact match is found
       #       - v1-dependencies-
 
@@ -225,7 +225,7 @@ jobs:
       # - save_cache:
       #     paths:
       #       - ./build/venv
-      #     key: v1-dependencies-{{ checksum "esktop/core/requirements_py3.txt" }}
+      #     key: v1-dependencies-{{ checksum "esktop/core/requirements.txt" }}
 
 
   build-py3.8:
