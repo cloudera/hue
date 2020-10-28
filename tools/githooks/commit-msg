@@ -2,10 +2,12 @@
 
 INPUT_FILE=$1
 START_LINE=${2:-`head -n1 $INPUT_FILE`}
-PATTERN="^(HUE\-[a-z0-9]+ \[.+\] .+)|(\[.+\] .+?( \(#[a-z0-9]+\))?|(Merge branch 'master' into .+))|(Revert \".+?\")"
+PATTERN="^.+{0,71}[^.]$"
 
 if ! [[ "$START_LINE" =~ $PATTERN ]]; then
   echo "'$START_LINE' is not a valid commit message, please see for examples:"
+  echo ""
+  echo "  50 characters max recommended, 72 is the hard limit"
   echo ""
   echo "  [hive] Add numExecutors options"
   echo "  [hive] Add numExecutors options (#1000)"
