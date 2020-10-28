@@ -92,13 +92,19 @@ def samlgroup_check(request):
         LOG.info("Empty userprofile data for %s user" % (request.user.username))
         return False
 
-      if json_data.get('saml_attributes', False) and \
-         json_data['saml_attributes'].get(REQUIRED_GROUPS_ATTRIBUTE.get(), False):
-        success = set(REQUIRED_GROUPS.get()).issubset(
-                 set(json_data['saml_attributes'].get(REQUIRED_GROUPS_ATTRIBUTE.get())))
-        if not success:
-          LOG.info("User %s not found in required SAML groups, %s" % (request.user.username, REQUIRED_GROUPS.get()))
-          return False
+      if json_data.get('saml_attributes', False):
+        LOG.info("Empty saml_attributes data for %s user" % request.user.username)
+        return False
+
+      if json_data['saml_attributes'].get(REQUIRED_GROUPS_ATTRIBUTE.get(), False):
+        LOG.info("Missing %s in SAMLResponse for %s user" % (REQUIRED_GROUPS_ATTRIBUTE.get(), request.user.username))
+        return False
+
+      saml_group_found = set(REQUIRED_GROUPS.get()).issubset(
+                         set(json_data['saml_attributes'].get(REQUIRED_GROUPS_ATTRIBUTE.get())))
+      if not saml_group_found:
+        LOG.info("User %s not found in required SAML groups, %s" % (request.user.username, REQUIRED_GROUPS.get()))
+        return False
   return True
 
 def hue(request):
@@ -548,7 +554,8 @@ def get_banner_message(request):
       LOG.warn('User %s is bypassing the load balancer' % request.user.username)
 
     if message:
-      banner_message = '<div style="padding: 4px; text-align: center; background-color: #003F6C; height: 24px; color: #DBE8F1">%s</div>' % message
+      banner_message = '<div style="padding: 4px; text-align: center; background-color: #003F6C; height: 24px; color: #DBE8F1">%s</div>' \
+          % message
 
   return banner_message
 
@@ -695,7 +702,7 @@ def collect_validation_messages(conf, error_list):
     'hadoop_mapred_home': [('hadoop', 'yarn_clusters', 'default'), ('hadoop', 'yarn_clusters', 'ha')],
     'hadoop_conf_dir': [('hadoop', 'yarn_clusters', 'default'), ('hadoop', 'yarn_clusters', 'ha')],
     'ssl_cacerts': [('beeswax', 'ssl'), ('impala', 'ssl')],
-    'remote_data_dir': [('liboozie', )],
+    'remote_data_dir': [('liboozie',)],
     'shell': [()],
   }
 
