@@ -82,10 +82,10 @@ def indexer(request):
   return render('indexer.mako', request, {
       'is_embeddable': request.GET.get('is_embeddable', False),
       'indexes_json': json.dumps(indexes),
-      'fields_json' : json.dumps([field.name for field in FIELD_TYPES]),
-      'operators_json' : json.dumps([operator.to_dict() for operator in OPERATORS]),
-      'file_types_json' : json.dumps([format_.format_info() for format_ in get_file_indexable_format_types()]),
-      'default_field_type' : json.dumps(Field().to_dict())
+      'fields_json': json.dumps([field.name for field in FIELD_TYPES]),
+      'operators_json': json.dumps([operator.to_dict() for operator in OPERATORS]),
+      'file_types_json': json.dumps([format_.format_info() for format_ in get_file_indexable_format_types()]),
+      'default_field_type': json.dumps(Field().to_dict())
   })
 
 
