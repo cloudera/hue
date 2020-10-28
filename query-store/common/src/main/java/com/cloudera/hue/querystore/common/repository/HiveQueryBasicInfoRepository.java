@@ -13,6 +13,7 @@ import org.jdbi.v3.core.mapper.JoinRowMapper;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 
 import com.cloudera.hue.querystore.common.dao.HiveQueryBasicInfoDao;
+import com.cloudera.hue.querystore.common.dto.FacetEntry;
 import com.cloudera.hue.querystore.common.entities.HiveQueryBasicInfo;
 import com.cloudera.hue.querystore.common.entities.TezDagBasicInfo;
 import com.cloudera.hue.querystore.common.exception.DBUpdateFailedException;
@@ -42,6 +43,13 @@ public class HiveQueryBasicInfoRepository extends JdbiRepository<HiveQueryBasicI
   public Long executeSearchCountQuery(String countQuery, Map<String, Object> parameters) {
     return getDao().withHandle(handle -> handle.createQuery(countQuery).bindMap(parameters)
         .mapTo(Long.class).findFirst().orElse(0l));
+  }
+
+  public List<FacetEntry> executeFacetQuery(String query, Map<String, Object> parameters) {
+    return getDao().withHandle(handle -> {
+      handle.registerRowMapper(BeanMapper.factory(FacetEntry.class));
+        return handle.createQuery(query).bindMap(parameters).mapTo(FacetEntry.class).list();
+    });
   }
 
   public Optional<HiveQueryBasicInfo> findByHiveQueryId(String queryId) {

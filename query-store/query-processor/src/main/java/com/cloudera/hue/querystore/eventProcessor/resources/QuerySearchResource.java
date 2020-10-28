@@ -1,9 +1,12 @@
 // (c) Copyright 2020-2021 Cloudera, Inc. All rights reserved.
 package com.cloudera.hue.querystore.eventProcessor.resources;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -16,13 +19,17 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.cloudera.hue.querystore.common.AppAuthentication;
+import com.cloudera.hue.querystore.common.dto.FacetValue;
 import com.cloudera.hue.querystore.common.dto.FieldInformation;
 import com.cloudera.hue.querystore.common.dto.HiveQueryDto;
 import com.cloudera.hue.querystore.common.dto.SearchRequest;
 import com.cloudera.hue.querystore.common.repository.PageData;
 import com.cloudera.hue.querystore.common.services.SearchService;
 import com.cloudera.hue.querystore.common.util.MetaInfo;
+import com.cloudera.hue.querystore.common.util.Pair;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.extern.slf4j.Slf4j;
@@ -100,5 +107,35 @@ public class QuerySearchResource {
       return null;
     }
     return securityContext.getUserPrincipal().getName();
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("/facets")
+  public Response getFacetValues(@QueryParam("text") String queryText,
+                                 @QueryParam("facetFields") String facetFields,
+                                 @QueryParam("startTime") Long startTime,
+                                 @QueryParam("endTime") Long endTime,
+                                 @Context SecurityContext securityContext) {
+    if (StringUtils.isEmpty(facetFields)) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("'facetField' query parameter is required.").build();
+    }
+    Set<String> facetFieldSets = extractFacetFields(facetFields);
+    if (facetFieldSets.size() > MAX_FACET_FIELDS_SEARCH_ALLOWED) {
+      log.error("Max allowed facets to be queries is {}. Current queried fields is {}",
+          MAX_FACET_FIELDS_SEARCH_ALLOWED, facetFieldSets.size());
+      return Response.status(Response.Status.BAD_REQUEST).entity("Max allowed facets to be queries is " +
+          MAX_FACET_FIELDS_SEARCH_ALLOWED + ". Current queried fields is " + facetFieldSets.size()).build();
+    }
+    Pair<List<FacetValue>, List<FacetValue>> facetsPair = searchService.getFacetValues(
+        queryText, facetFieldSets, startTime, endTime, getEffectiveUser(securityContext));
+    List<FacetValue> facets = facetsPair.getFirst();
+    List<FacetValue> rangeFacets = facetsPair.getSecond();
+    Map<String, Object> response = ImmutableMap.of("facets", facets, "rangeFacets", rangeFacets);
+    return Response.ok(response).build();
+  }
+
+  private Set<String> extractFacetFields(String facetFieldsText) {
+    return Arrays.stream(facetFieldsText.split(",")).map(String::trim).collect(Collectors.toSet());
   }
 }
