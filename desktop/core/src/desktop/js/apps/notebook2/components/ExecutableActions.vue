@@ -39,13 +39,19 @@
       <i class="fa fa-play fa-fw" /> {{ I18n('Execute') }}
     </hue-button>
 
-    <hue-button v-if="showStop && !stopping" key="stop-button" small="true" @click="stop">
+    <hue-button
+      v-if="showStop && !stopping"
+      key="stop-button"
+      small="true"
+      alert="true"
+      @click="stop"
+    >
       <i class="fa fa-stop fa-fw" />
       <span v-if="waiting">{{ I18n('Stop batch') }}</span>
       <span v-else>{{ I18n('Stop') }}</span>
     </hue-button>
 
-    <hue-button v-if="showStop && stopping" key="stopping-button" small="true">
+    <hue-button v-if="showStop && stopping" key="stopping-button" small="true" alert="true">
       <i class="fa fa-fw fa-spinner fa-spin" /> {{ I18n('Stopping') }}
     </hue-button>
 
