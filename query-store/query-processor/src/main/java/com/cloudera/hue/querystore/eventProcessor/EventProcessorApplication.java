@@ -53,7 +53,7 @@ public class EventProcessorApplication extends Application<EventProcessorConfigu
   private static final ConfVar<Boolean> ENABLE_EVENT_PROCESSOR =
       new ConfVar<>("hue.query-processor.event-pipeline.enabled", true);
   private static final ConfVar<Boolean> ENABLE_REST_APIS =
-      new ConfVar<>("hue.query-processor.debug-bundler.enabled", true);
+      new ConfVar<>("hue.query-processor.rest-apis.enabled", true);
 
   @Override
   protected void bootstrapLogging() {
