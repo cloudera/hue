@@ -200,7 +200,10 @@ def ssh_error_handler(f):
           connector = connector_json_data['interpreter']
           idle_time = 10
         else:
-          connector_id = int(connector_json_data.get('type'))
+          connector_id = connector_json_data.get('type')
+          if '-' in connector_id:  # Not consistent on SSH re-connect
+            connector_id.rsplit('-')[1]
+          connector_id = int(connector_id)
           connector_data = _get_installed_connectors(user=args[0].user, connector_id=connector_id)[0]
           connector = _connector_to_iterpreter(
             _augment_connector_properties(connector_data)
