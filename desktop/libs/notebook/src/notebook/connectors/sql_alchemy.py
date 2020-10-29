@@ -256,6 +256,7 @@ class SqlAlchemyApi(Api):
       }
     }
 
+
   @query_error_handler
   def explain(self, notebook, snippet):
     session = self._get_session(notebook, snippet)
@@ -266,11 +267,11 @@ class SqlAlchemyApi(Api):
     connection = engine.connect()
     statement = snippet['statement']
 
-    if self.options['url'].startswith('bigquery://'):
-      explanation = ''
-    else:
-      explanation = ''
+    explanation = ''
 
+    if statement:
+      if self.options['url'].startswith('bigquery://'):
+        explanation = ''
 
     return {
       'status': 0,
