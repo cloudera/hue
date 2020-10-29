@@ -531,7 +531,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             <input type="text" class="form-control name input-xxlarge" id="collectionName" data-bind="value: name, filechooser: name, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: true, displayOnlyFolders: true, uploadFile: false}" placeholder="${ _('Name') }" title="${ _('Directory must not exist in the path') }">
             <!-- /ko -->
 
-            <!-- ko if: ['index', 'stream-table'].indexOf(outputFormat()) != -1 -->
+            <!-- ko if: ['index', 'big-table', 'stream-table'].indexOf(outputFormat()) != -1 -->
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
             <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
             <!-- /ko -->
@@ -757,16 +757,23 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         </div>
         <!-- /ko -->
 
-        <!-- ko if: outputFormat() == 'index' -->
+        <!-- ko if: ['index', 'big-table'].indexOf(outputFormat()) != -1 -->
         <div class="card step">
           <h4>${_('Properties')}</h4>
           <div class="card-body">
             % if ENABLE_SCALABLE_INDEXER.get():
             <div class="control-group">
               <label class="checkbox inline-block" title="${ _('Execute a cluster job to index a large dataset.') }" data-bind="visible: $root.createWizard.source.inputFormat() == 'file'">
-                <input type="checkbox" data-bind="checked: indexerRunJob"> ${_('Index with a job')}
+                <input type="checkbox" data-bind="checked: indexerRunJob">
+                  <!-- ko if: outputFormat() == 'index' -->
+                    ${_('Index with a job')}
+                  <!-- /ko -->
+                  <!-- ko if: outputFormat() == 'big-table' -->
+                    ${_('Load data')}
+                  <!-- /ko -->
               </label>
 
+              <!-- ko if: outputFormat() == 'index' -->
               <label for="path" class="control-label" data-bind="visible: indexerRunJob"><div>${ _('Libs') }</div>
                 <input type="text" class="form-control path filechooser-input input-xlarge" data-bind="value: indexerJobLibPath, filechooser: indexerJobLibPath, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
               </label>
@@ -774,6 +781,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                 <a data-bind="hueLink: '/filebrowser/view=' + indexerJobLibPath()" title="${ _('Open') }" style="font-size: 14px" class="margin-left-10">
                   <i class="fa fa-external-link-square"></i>
                 </a>
+              <!-- /ko -->
               <!-- /ko -->
             </div>
             % endif
@@ -784,6 +792,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               </label>
             </div>
 
+            <!-- ko if: ['index'].indexOf(outputFormat()) != -1 -->
             <div class="control-group">
               <label for="kuduDefaultField" class="control-label"><div>${ _('Default field') }</div>
                 <select id="kuduDefaultField" data-bind="selectize: columns, selectedOptions: indexerDefaultField, selectedObjects: indexerDefaultFieldObject, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
@@ -825,6 +834,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
                 </label>
               </div>
             </span>
+            <!-- /ko -->
           </div>
         </div>
         <!-- /ko -->
@@ -935,7 +945,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         </div>
         <!-- /ko -->
 
-        <!-- ko if: ['table', 'index', 'hbase', 'stream-table'].indexOf(outputFormat()) != -1 -->
+        <!-- ko if: ['table', 'index', 'hbase', 'big-table', 'stream-table'].indexOf(outputFormat()) != -1 -->
           <div class="card step">
             <h4>
               <!-- ko if: fieldEditorEnabled -->
@@ -1012,11 +1022,11 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
               <!-- ko if: $root.createWizard.source.inputFormat() !== 'manual' -->
               <form class="form-inline inline-table" data-bind="foreachVisible: { data: columns, minHeight: 54, container: MAIN_SCROLLABLE }">
-                <!-- ko if: ['table', 'stream-table'].indexOf($parent.outputFormat()) != -1 && $root.createWizard.source.inputFormat() != 'rdbms' -->
+                <!-- ko if: ['table', 'big-table', 'stream-table'].indexOf($parent.outputFormat()) != -1 && $root.createWizard.source.inputFormat() != 'rdbms' -->
                   <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
                 <!-- /ko -->
 
-                <!-- ko if: (['file', 'table', 'hbase'].indexOf($parent.outputFormat()) != -1 && $root.createWizard.source.inputFormat() == 'rdbms') || $parent.outputFormat() == 'index' -->
+                <!-- ko if: ['index'].indexOf($parent.outputFormat()) != -1 || (['file', 'table', 'hbase'].indexOf($parent.outputFormat()) != -1 && $root.createWizard.source.inputFormat() == 'rdbms') -->
                   <div data-bind="template: { name: 'index-field-template', data: $data }, css: { 'disabled': !keep() }" class="margin-top-10 field index-field"></div>
                 <!-- /ko -->
               </form>
@@ -2247,6 +2257,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           % if ENABLE_KAFKA.get():
           {'name': '${ _("Stream Table") }', 'value': 'stream-table'},
           {'name': '${ _("Stream Topic") }', 'value': 'stream'},
+          {'name': '${ _("Phoenix Table") }', 'value': 'big-table'},
           % endif
           % if ENABLE_SQOOP.get() or ENABLE_KAFKA.get():
           {'name': '${ _("Folder") }', 'value': 'file'},
@@ -2293,6 +2304,9 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             return false;
           }
           if (format.value === 'stream-table' && ['stream'].indexOf(wizard.source.inputFormat()) === -1) {
+            return false;
+          }
+          if (format.value === 'big-table' && ['file'].indexOf(wizard.source.inputFormat()) === -1) {
             return false;
           }
           if (format.value === 'hbase' && (wizard.source.inputFormat() !== 'rdbms' || wizard.source.rdbmsAllTablesSelected())) {
@@ -2685,11 +2699,14 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             || (self.source.inputFormat() === 'stream' && self.destination.outputFormat() === 'table' && self.destination.tableFormat() === 'kudu')
           ;
         }
-        var isValidTable = self.destination.outputFormat() !== 'table' || (
+        var isValidTable = ((self.destination.outputFormat() !== 'table' || (
           self.destination.tableFormat() !== 'kudu' || (
               $.grep(self.destination.kuduPartitionColumns(), function(partition) {
                 return partition.columns().length > 0
-              }).length === self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0
+              }
+            ).length === self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0
+          ) && (self.destination.outputFormat() !== 'big-table' || self.destination.primaryKeys().length > 0)
+        )
           )
         );
         var validIndexFields = self.destination.outputFormat() !== 'index' || ($.grep(self.destination.columns(), function(column) {
