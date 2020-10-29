@@ -83,14 +83,15 @@ def get_ordered_interpreters(user=None):
     ]
   else:
     if INTERPRETERS_CACHE is None:
+      none_user = None # for getting full list of interpreters
       if is_cm_managed():
         extra_interpreters = INTERPRETERS.get()  # Combine the other apps interpreters
-        _default_interpreters(user)
+        _default_interpreters(none_user)
       else:
         extra_interpreters = {}
 
       if not INTERPRETERS.get():
-        _default_interpreters(user)
+        _default_interpreters(none_user)
 
       INTERPRETERS_CACHE = INTERPRETERS.get()
       INTERPRETERS_CACHE.update(extra_interpreters)
