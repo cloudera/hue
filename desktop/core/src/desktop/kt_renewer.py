@@ -42,6 +42,7 @@ def renew_from_kt():
                             stderr=subprocess.PIPE, close_fds=True,
                             bufsize=-1)
     subp.wait()
+    max_retries = 0 if subp.returncode == 0 else max_retries
     if subp.returncode != 0:
       retries = retries + 1
       LOG.error("Couldn't reinit from keytab! `kinit' exited with %s.\n%s\n%s" % (
@@ -51,13 +52,13 @@ def renew_from_kt():
         LOG.error("FATAL: max_retries of %s reached. Exiting..." % max_retries)
         sys.exit(subp.returncode)
       time.sleep(3)
-    else:
+    elif CONF.ENABLE_RENEWLIFETIME.get() and max_retries == 0:
       break
 
   global NEED_KRB181_WORKAROUND
   if NEED_KRB181_WORKAROUND is None:
     NEED_KRB181_WORKAROUND = detect_conf_var()
-  if NEED_KRB181_WORKAROUND:
+  if NEED_KRB181_WORKAROUND and CONF.ENABLE_RENEWLIFETIME.get():
     # HUE-640. Kerberos clock have seconds level granularity. Make sure we
     # renew the ticket after the initial valid time.
     time.sleep(1.5)
