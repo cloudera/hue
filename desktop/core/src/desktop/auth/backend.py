@@ -69,6 +69,7 @@ from desktop import metrics
 from desktop.conf import AUTH, LDAP, OIDC, ENABLE_ORGANIZATIONS
 from desktop.settings import LOAD_BALANCER_COOKIE
 
+from filebrowser.conf import REMOTE_STORAGE_HOME
 from useradmin import ldap_access
 from useradmin.models import get_profile, get_default_user_group, UserProfile, User
 from useradmin.organization import get_organization
@@ -166,7 +167,7 @@ class DefaultUserAugmentor(object):
     return self._get_profile().get_groups()
 
   def get_home_directory(self):
-    return self._get_profile().home_directory
+    return REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else self._get_profile().home_directory
 
   def has_hue_permission(self, action, app):
     return self._get_profile().has_hue_permission(action=action, app=app)
