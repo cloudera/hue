@@ -723,6 +723,8 @@
     ## ccache_path=/var/run/hue/hue_krb5_ccache
     # Path to kinit
     ## kinit_path=/path/to/kinit
+    # Set to false if renew_lifetime in krb5.conf is set to 0m
+    ## krb5_renewlifetime_enabled=true
 
     # Mutual authentication from the server, attaches HTTP GSSAPI/Kerberos Authentication to the given Request object
     ## mutual_authentication="OPTIONAL" or "REQUIRED" or "DISABLED"
