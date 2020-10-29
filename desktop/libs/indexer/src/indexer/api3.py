@@ -529,6 +529,7 @@ def _small_indexing(user, fs, client, source, destination, index_name):
   _create_solr_collection(user, fs, client, destination, index_name, kwargs)
 
   if source['inputFormat'] == 'file':
+    kwargs['separator'] = source['format']['fieldSeparator']
     path = urllib_unquote(source["path"])
     data = fs.read(path, 0, MAX_UPLOAD_SIZE)
 
