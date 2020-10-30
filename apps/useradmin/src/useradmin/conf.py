@@ -27,6 +27,12 @@ HOME_DIR_PERMISSIONS = Config(
     type=str,
     default="0755")
 
+USE_HOME_DIR_PERMISSIONS = Config(
+    key="use_home_dir_permissions",
+    help=_("Disable to use umask from hdfs else new user home directory would be created with the permissions from home_dir_permissions"),
+    type=coerce_bool,
+    default=True)
+
 DEFAULT_USER_GROUP = Config(
     key="default_user_group",
     help=_("The name of a default group for users at creation time, or at first login "
@@ -38,13 +44,13 @@ PASSWORD_POLICY = ConfigSection(
   key="password_policy",
   help=_("Configuration options for user password policy"),
   members=dict(
-    IS_ENABLED = Config(
+    IS_ENABLED=Config(
       key="is_enabled",
       help=_("Enable user password policy."),
       type=coerce_bool,
       default=False),
 
-    PWD_RULE = Config(
+    PWD_RULE=Config(
       key="pwd_regex",
       help=_("The regular expression of password rule. The default rule requires that "
              "a password  must be at least 8 characters long, and must contain both "
@@ -53,7 +59,7 @@ PASSWORD_POLICY = ConfigSection(
       type=str,
       default="^(?=.*?[A-Z])(?=(.*[a-z]){1,})(?=(.*[\d]){1,})(?=(.*[\W_]){1,}).{8,}$"),
 
-    PWD_HINT = Config(
+    PWD_HINT=Config(
       key="pwd_hint",
       help=_("Message about the password rule defined in pwd_regex"),
       type=str,
@@ -61,7 +67,7 @@ PASSWORD_POLICY = ConfigSection(
               "uppercase and lowercase letters, at least one number, and at least " + \
               "one special character."),
 
-    PWD_ERROR_MESSAGE = Config(
+    PWD_ERROR_MESSAGE=Config(
       key="pwd_error_message",
       help=_("The error message displayed if the provided password does not "
              "meet the enhanced password rule"),

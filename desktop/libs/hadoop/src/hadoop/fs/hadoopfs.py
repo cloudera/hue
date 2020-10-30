@@ -179,8 +179,9 @@ class Hdfs(object):
     if home_path is None:
       home_path = self.get_home_dir()
 
-    from useradmin.conf import HOME_DIR_PERMISSIONS
-    mode = int(HOME_DIR_PERMISSIONS.get(), 8)
+    from hadoop.hdfs_site import get_umask_mode
+    from useradmin.conf import HOME_DIR_PERMISSIONS, USE_HOME_DIR_PERMISSIONS
+    mode = int(HOME_DIR_PERMISSIONS.get(), 8) if USE_HOME_DIR_PERMISSIONS.get() else (0o777 & (0o1777 ^ get_umask_mode()))
     if not self.exists(home_path):
       user = self.user
       try:
@@ -546,7 +547,7 @@ class BlockCache(object):
     # We could do a more efficient merge here since both lists
     # are already sorted, but these data structures are small, so let's
     # do the easy thing.
-    blocks_dict = dict( (b.blockId, b) for b in self.blocks )
+    blocks_dict = dict((b.blockId, b) for b in self.blocks)
 
     # Merge in new data to dictionary
     for nb in new_blocks:
@@ -554,7 +555,7 @@ class BlockCache(object):
 
     # Convert back to sorted list
     block_list = list(blocks_dict.values())
-    block_list.sort(cmp=lambda a,b: cmp(a.startOffset, b.startOffset))
+    block_list.sort(cmp=lambda a, b: cmp(a.startOffset, b.startOffset))
 
     # Update cache with new data
     self.blocks = block_list
