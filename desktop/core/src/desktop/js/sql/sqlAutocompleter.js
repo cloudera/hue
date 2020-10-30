@@ -122,7 +122,7 @@ class SqlAutocompleter {
             locations &&
             this.snippet.ace().lastChangeTime !== locations.editorChangeTime
           ) {
-            huePubSub.publish('editor.refresh.statement.locations', this.snippet);
+            huePubSub.publish('editor.refresh.statement.locations', this.snippet.id());
           }
         },
         this.snippet

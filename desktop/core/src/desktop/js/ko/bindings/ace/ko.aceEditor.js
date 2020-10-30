@@ -19,7 +19,9 @@ import * as ko from 'knockout';
 import ace from 'ext/aceHelper';
 
 import apiHelper from 'api/apiHelper';
-import AceLocationHandler from 'ko/bindings/ace/aceLocationHandler';
+import AceLocationHandler, {
+  REFRESH_STATEMENT_LOCATIONS_EVENT
+} from 'ko/bindings/ace/aceLocationHandler';
 import huePubSub from 'utils/huePubSub';
 import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
 import { registerBinding } from 'ko/bindings/bindingUtils';
@@ -720,12 +722,12 @@ registerBinding(NAME, {
               editor.getCursorPosition().column - (questionMarkMatch[1].length - 1)
             );
             editor.removeTextBeforeCursor(1);
-            huePubSub.publish('editor.refresh.statement.locations', snippet);
+            huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, snippet.id());
             window.setTimeout(() => {
               editor.execCommand('startAutocomplete');
             }, 1);
           } else if (/\.$/.test(textBeforeCursor)) {
-            huePubSub.publish('editor.refresh.statement.locations', snippet);
+            huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, snippet.id());
             window.setTimeout(() => {
               editor.execCommand('startAutocomplete');
             }, 1);
