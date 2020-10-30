@@ -43,6 +43,7 @@ import {
 } from 'apps/notebook2/execution/executable';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
+  CURSOR_POSITION_CHANGED_EVENT,
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
 import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from './components/ExecutableActions.vue';
@@ -281,7 +282,7 @@ export default class Snippet {
       if (newValue !== null) {
         apiHelper.setInTotalStorage('editor', 'last.selected.database', newValue);
         if (previousDatabase !== null && previousDatabase !== newValue) {
-          huePubSub.publish('editor.refresh.statement.locations', this);
+          huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this.id());
         }
         previousDatabase = newValue;
       }
@@ -354,6 +355,12 @@ export default class Snippet {
       beforeExecute = true;
       huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this);
     };
+
+    huePubSub.subscribe(CURSOR_POSITION_CHANGED_EVENT, details => {
+      if (details.editorId === this.id()) {
+        this.aceCursorPosition(details.position);
+      }
+    });
 
     huePubSub.subscribe(
       ACTIVE_STATEMENT_CHANGED_EVENT,
