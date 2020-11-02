@@ -85,6 +85,7 @@ def can_kill_job(self, user):
 class HiveQuery(models.Model):
   # (mysql.E001) MySQL does not allow unique CharFields to have a max_length > 255.
   # query_id = models.CharField(unique=True, max_length=512, blank=True, null=True)
+  id = models.IntegerField(unique=True, blank=True, null=False, primary_key=True)
   query_id = models.CharField(unique=True, max_length=255, blank=True, null=True)
   query = models.TextField(blank=True, null=True)
   query_fts = models.TextField(blank=True, null=True)  # This field type is a guess.
@@ -108,17 +109,17 @@ class HiveQuery(models.Model):
   log_id = models.CharField(max_length=512, blank=True, null=True)
   thread_id = models.CharField(max_length=512, blank=True, null=True)
   execution_mode = models.CharField(max_length=16, blank=True, null=True)
+  databases_used = models.TextField(blank=True, null=True)  # This field type is a guess.
   tables_read = models.TextField(blank=True, null=True)  # This field type is a guess.
   tables_written = models.TextField(blank=True, null=True)  # This field type is a guess.
   domain_id = models.CharField(max_length=512, blank=True, null=True)
   llap_app_id = models.CharField(max_length=512, blank=True, null=True)
   used_cbo = models.CharField(max_length=16, blank=True, null=True)
-  created_at = models.DateTimeField(blank=True, null=True)
-  databases_used = models.TextField(blank=True, null=True)  # This field type is a guess.
   first_task_started_time = models.BigIntegerField(blank=True, null=True)
   waiting_time = models.BigIntegerField(blank=True, null=True)
   resource_utilization = models.BigIntegerField(blank=True, null=True)
   version = models.SmallIntegerField(blank=True, null=True)
+  created_at = models.DateTimeField(blank=True, null=True)
 
   class Meta:
     managed = False
