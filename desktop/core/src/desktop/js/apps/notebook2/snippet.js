@@ -26,6 +26,7 @@ import 'apps/notebook2/components/ko.snippetResults';
 import 'apps/notebook2/components/ko.queryHistory';
 
 import './components/ExecutableActionsKoBridge.vue';
+import './components/aceEditor/AceEditorKoBridge.vue';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';

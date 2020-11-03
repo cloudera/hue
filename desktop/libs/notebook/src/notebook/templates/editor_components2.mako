@@ -900,37 +900,58 @@
         <div class="clearfix margin-bottom-20"></div>
         <!-- /ko -->
 
-        <div class="ace-editor" data-bind="
-            visible: statementType() === 'text' || statementType() !== 'text' && externalStatementLoaded(),
-            css: {
-              'single-snippet-editor ace-editor-resizable' : $root.editorMode(),
-              'active-editor': inFocus
-            },
-            attr: {
-              id: id
-            },
-            delayedOverflow: 'slow',
-            aceEditor: {
-              snippet: $data,
-              contextTooltip: '${ _ko("Right-click for details") }',
-              expandStar: '${ _ko("Right-click to expand with columns") }',
-##               highlightedRange: result.statement_range,
-              readOnly: $root.isPresentationMode(),
-              aceOptions: {
-                showLineNumbers: $root.editorMode(),
-                showGutter: $root.editorMode(),
-                maxLines: $root.editorMode() ? null : 25,
-                minLines: $root.editorMode() ? null : 3
-              }
-            },
-            style: {
-              'opacity': statementType() !== 'text' || $root.isPresentationMode() ? '0.75' : '1',
-              'min-height': $root.editorMode() ? '0' : '48px',
-              'top': $root.editorMode() && statementType() !== 'text' ? '60px' : '0'
+        <ace-editor-ko-bridge data-bind="
+          vueEvents: {
+            'ace-created': function (event) {
+              ace(event.detail);
             }
-          "></div>
+          },
+          vueKoProps: {
+            executor: executor,
+            valueObservable: statement_raw,
+            idObservable: id,
+            aceOptions: {
+              showLineNumbers: $root.editorMode(),
+              showGutter: $root.editorMode(),
+              maxLines: $root.editorMode() ? null : 25,
+              minLines: $root.editorMode() ? null : 3
+            }
+          }
+        "></ace-editor-ko-bridge>
         <!-- ko component: { name: 'hueAceAutocompleter', params: { editor: ace.bind($data), snippet: $data } } --><!-- /ko -->
         <!-- ko component: { name: 'hue-editor-droppable-menu', params: { editor: ace.bind($data), parentDropTarget: '.editor' } } --><!-- /ko -->
+
+##         <div class="ace-editor" data-bind="
+##             visible: statementType() === 'text' || statementType() !== 'text' && externalStatementLoaded(),
+##             css: {
+##               'single-snippet-editor ace-editor-resizable' : $root.editorMode(),
+##               'active-editor': inFocus
+##             },
+##             attr: {
+##               id: id
+##             },
+##             delayedOverflow: 'slow',
+##             aceEditor: {
+##               snippet: $data,
+##               contextTooltip: '${ _ko("Right-click for details") }',
+##               expandStar: '${ _ko("Right-click to expand with columns") }',
+## ##               highlightedRange: result.statement_range,
+##               readOnly: $root.isPresentationMode(),
+##               aceOptions: {
+##                 showLineNumbers: $root.editorMode(),
+##                 showGutter: $root.editorMode(),
+##                 maxLines: $root.editorMode() ? null : 25,
+##                 minLines: $root.editorMode() ? null : 3
+##               }
+##             },
+##             style: {
+##               'opacity': statementType() !== 'text' || $root.isPresentationMode() ? '0.75' : '1',
+##               'min-height': $root.editorMode() ? '0' : '48px',
+##               'top': $root.editorMode() && statementType() !== 'text' ? '60px' : '0'
+##             }
+##           "></div>
+##         <!-- ko component: { name: 'hueAceAutocompleter', params: { editor: ace.bind($data), snippet: $data } } --><!-- /ko -->
+##         <!-- ko component: { name: 'hue-editor-droppable-menu', params: { editor: ace.bind($data), parentDropTarget: '.editor' } } --><!-- /ko -->
       </div>
 
       <div class="clearfix"></div>
@@ -1209,15 +1230,15 @@
   </script>
 
   <script type="text/html" id="snippet-code-resizer${ suffix }">
-    <div class="snippet-code-resizer" data-bind="
-        aceResizer : {
-          snippet: $data,
-          target: '.ace-container-resizable',
-          onStart: function () { huePubSub.publish('result.grid.hide.fixed.headers') },
-          onStop: function () { huePubSub.publish('result.grid.redraw.fixed.headers') }
-        }">
-      <i class="fa fa-ellipsis-h"></i>
-    </div>
+##     <div class="snippet-code-resizer" data-bind="
+##         aceResizer : {
+##           snippet: $data,
+##           target: '.ace-container-resizable',
+##           onStart: function () { huePubSub.publish('result.grid.hide.fixed.headers') },
+##           onStop: function () { huePubSub.publish('result.grid.redraw.fixed.headers') }
+##         }">
+##       <i class="fa fa-ellipsis-h"></i>
+##     </div>
   </script>
 
   <script type="text/html" id="notebook-snippet-type-controls${ suffix }">
