@@ -16,6 +16,10 @@
 
 import huePubSub from 'utils/huePubSub';
 
+export interface Disposable {
+  dispose(): void;
+}
+
 export default class SubscriptionTracker {
   disposals: (() => void)[] = [];
 
@@ -35,6 +39,16 @@ export default class SubscriptionTracker {
         sub.dispose();
       });
     }
+  }
+
+  addDisposable(disposable: Disposable): void {
+    this.disposals.push(disposable.dispose.bind(disposable));
+  }
+
+  trackTimeout(timeout: number): void {
+    this.disposals.push(() => {
+      window.clearTimeout(timeout);
+    });
   }
 
   dispose(): void {

@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
+import ace from 'ext/aceHelper';
 
 import AssistStorageEntry from 'ko/components/assist/assistStorageEntry';
 import dataCatalog from 'catalog/dataCatalog';
@@ -1299,7 +1300,7 @@ class AceLocationHandler {
             .getSession()
             .getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
         }
-        if (token && token.value && /^\s*\$\{\s*$/.test(token.value)) {
+        if (token && token.value && /^\s*\${\s*$/.test(token.value)) {
           token = null;
         }
         if (token && token.value) {

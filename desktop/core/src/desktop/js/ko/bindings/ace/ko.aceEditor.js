@@ -22,6 +22,9 @@ import apiHelper from 'api/apiHelper';
 import AceLocationHandler, {
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
+
+import AceLocationHandlerV2 from 'apps/notebook2/components/aceEditor/aceLocationHandler';
+
 import huePubSub from 'utils/huePubSub';
 import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
 import { registerBinding } from 'ko/bindings/bindingUtils';
@@ -68,13 +71,18 @@ registerBinding(NAME, {
       resizePubSub.remove();
     });
 
-    const aceLocationHandler = new AceLocationHandler({
-      editor: editor,
-      editorId: $el.attr('id'),
-      snippet: snippet,
-      executor: snippet.executor,
-      i18n: { expandStar: options.expandStar, contextTooltip: options.contextTooltip }
-    });
+    const aceLocationHandler = window.ENABLE_NOTEBOOK_2
+      ? new AceLocationHandlerV2({
+          editor: editor,
+          editorId: $el.attr('id'),
+          executor: snippet.executor
+        })
+      : new AceLocationHandler({
+          editor: editor,
+          editorId: $el.attr('id'),
+          snippet: snippet,
+          i18n: { expandStar: options.expandStar, contextTooltip: options.contextTooltip }
+        });
 
     const aceGutterHandler = new AceGutterHandler({
       editor: editor,
