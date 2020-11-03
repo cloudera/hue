@@ -23,7 +23,7 @@
 
 */
 
-$hue-panel-border-radius: 2px;
+$hue-panel-border-radius: 3px;
 
 @mixin hue-transform($transform) {
   -webkit-transform: $transform;
@@ -207,4 +207,16 @@ $hue-panel-border-radius: 2px;
   -webkit-flex-wrap: $wrap;
   -ms-flex-wrap: $wrap;
   flex-wrap: $wrap;
+}
+
+@mixin hue-flex-layout($direction: row) {
+  display: flex;
+  @include flex-direction($direction);
+
+  column-gap: 10px;
+  row-gap: 10px;
+
+  > * {
+    flex: 1;
+  }
 }
