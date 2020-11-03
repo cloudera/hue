@@ -15,12 +15,22 @@
 // limitations under the License.
 
 import localforage from 'localforage';
+import { hueWindow } from 'types/types';
 
-const hueDebug = {
-  clearCaches: function () {
-    const promises = [];
-    const clearInstance = function (prefix) {
-      promises.push(localforage.createInstance({ name: prefix + window.LOGGED_USERNAME }).clear());
+export interface HueDebug {
+  lastChangeTime?: number;
+  logStatementLocations?: boolean;
+  clearCaches(): void;
+  showSyntaxParseResult?: boolean;
+}
+
+const hueDebug: HueDebug = {
+  clearCaches: () => {
+    const promises: Promise<void>[] = [];
+    const clearInstance = (prefix: string) => {
+      promises.push(
+        localforage.createInstance({ name: prefix + (<hueWindow>window).LOGGED_USERNAME }).clear()
+      );
     };
     clearInstance('HueContextCatalog_');
     clearInstance('HueDataCatalog_');

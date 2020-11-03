@@ -63,7 +63,7 @@ const removeAll = (topic: string): void => {
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-const publish = (topic: string, info: any): void => {
+const publish = (topic: string, info?: any): void => {
   if (!hOP.call(topics, topic)) {
     return;
   }

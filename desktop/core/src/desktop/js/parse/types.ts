@@ -23,6 +23,7 @@ export interface IdentifierChainEntry {
 }
 
 export interface ParsedTable {
+  alias?: string;
   identifierChain: IdentifierChainEntry[];
   subQuery?: unknown; // TODO: Define
 }
@@ -49,12 +50,15 @@ export interface IdentifierLocation {
   function?: string;
   missing?: boolean;
   value?: string;
+  active?: boolean;
+  tables?: ParsedTable[];
   colRef: boolean;
   argumentPosition?: number;
   identifierChain?: IdentifierChainEntry[];
   expression?: { types: string[]; text: string };
   parentLocation?: ParsedLocation;
   path?: string;
+  qualified?: boolean;
   resolveCatalogEntry: (options?: {
     cancellable?: boolean;
     temporaryOnly?: boolean;
