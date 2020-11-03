@@ -46,7 +46,7 @@
   export default class AceEditor extends Vue {
     @Prop()
     value!: string;
-    @Prop({ default: UUID() })
+    @Prop()
     id!: string;
     @Prop()
     executor!: Executor;
