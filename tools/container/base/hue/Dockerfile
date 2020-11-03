@@ -56,7 +56,9 @@ RUN set -eux; \
         which \
         xmlsec1 \
         xmlsec1-openssl \
-        zlib-devel
+        zlib-devel && \
+      yum clean all && \
+      rm -rf /var/cache/yum
 
 RUN set -eux; easy_install supervisor pip
 

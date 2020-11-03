@@ -11,7 +11,9 @@ RUN set -eux; \
         httpd \
         httpd-tools \
         gettext \
-        nmap-ncat
+        nmap-ncat && \
+      yum clean all && \
+      rm -rf /var/cache/yum
 
 # kubernetes pod health check
 COPY healthz.sh /
