@@ -25,7 +25,7 @@ import 'apps/notebook2/components/ko.snippetEditorActions';
 import 'apps/notebook2/components/ko.snippetResults';
 import 'apps/notebook2/components/ko.queryHistory';
 
-import './components/SqlEditor.vue';
+import './components/ExecutableActionsKoBridge.vue';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';
