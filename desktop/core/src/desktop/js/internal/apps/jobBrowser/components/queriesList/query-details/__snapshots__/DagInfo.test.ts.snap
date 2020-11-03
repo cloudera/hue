@@ -1,108 +1,62 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`DagInfo.vue should render 1`] = `
-<div>
-  <div
-    class="info-inline"
+<div
+  class="hue-info-box"
+>
+  <labeledinfo-stub
+    class="inline-info"
+    label="DAG ID"
   >
-    <div
-      class="info-label"
-    >
-      DAG ID
-    </div>
-     
-    <div
-      class="info-value"
-    >
-      dag_1600683331174_0003_2
-    </div>
-  </div>
+    
+    dag_1600683331174_0003_2
+  
+  </labeledinfo-stub>
    
-  <div
-    class="info-inline"
+  <labeledinfo-stub
+    class="inline-info"
+    label="DAG Name"
   >
-    <div
-      class="info-label"
-    >
-      DAG Name
-    </div>
-     
-    <div
-      class="info-value"
-    >
-      select count(*) from ...productcategories.id (Stage-1)
-    </div>
-  </div>
+    
+    select count(*) from ...productcategories.id (Stage-1)
+  
+  </labeledinfo-stub>
    
-  <div
-    class="info-inline"
+  <labeledinfo-stub
+    class="inline-info"
+    label="Status"
   >
-    <div
-      class="info-label"
-    >
-      Status
-    </div>
-     
-    <div
-      class="info-value"
-    >
-      SUCCEEDED
-    </div>
-  </div>
+    
+    SUCCEEDED
+  
+  </labeledinfo-stub>
    
-  <div
-    class="info-inline"
+  <labeledinfo-stub
+    class="inline-info"
+    label="Duration"
   >
-    <div
-      class="info-label"
-    >
-      Start Time
-    </div>
-     
-    <div
-      class="info-value"
-    >
-      <time-ago-stub
-        value="1601036209263"
-      />
-    </div>
-  </div>
+    <duration-stub
+      value="260"
+    />
+  </labeledinfo-stub>
    
-  <div
-    class="info-inline"
+  <labeledinfo-stub
+    class="inline-info"
+    label="Start Time"
   >
-    <div
-      class="info-label"
-    >
-      End Time
-    </div>
-     
-    <div
-      class="info-value"
-    >
-      <time-ago-stub
-        value="1601036209523"
-      />
-    </div>
-  </div>
+    <time-ago-stub
+      value="1601036209263"
+    />
+  </labeledinfo-stub>
    
-  <div
-    class="info-inline"
+  <labeledinfo-stub
+    class="inline-info"
+    label="End Time"
   >
-    <div
-      class="info-label"
-    >
-      Duration
-    </div>
-     
-    <div
-      class="info-value"
-    >
-      <duration-stub
-        value="260"
-      />
-    </div>
-  </div>
+    <time-ago-stub
+      value="1601036209523"
+    />
+  </labeledinfo-stub>
    
   <!---->
 </div>

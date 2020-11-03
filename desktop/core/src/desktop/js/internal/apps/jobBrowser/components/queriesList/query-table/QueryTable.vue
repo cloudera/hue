@@ -79,6 +79,12 @@
           <template #cell-query="query">
             <hue-link @click="querySelected(query)">{{ query.query }}</hue-link>
           </template>
+          <template #cell-tablesRead="query">
+            <TablesList :tables="query.tablesRead" />
+          </template>
+          <template #cell-tablesWritten="query">
+            <TablesList :tables="query.tablesWritten" />
+          </template>
         </hue-table>
       </div>
     </div>
@@ -112,6 +118,7 @@
   import { Column } from '../../../../../../components/HueTable';
   import ColumnSelectorPanel from '../../../../../../components/ColumnSelectorPanel.vue';
   import FacetSelector from '../../../../../../components/FacetSelector.vue';
+  import TablesList from '../components/TablesList.vue';
   import {
     Facet,
     FacetValue,
@@ -139,6 +146,7 @@
       HueButton,
       HueLink,
       HueTable,
+      TablesList,
       ColumnSelectorPanel,
       QueriesSearch,
       Paginator
@@ -188,22 +196,15 @@
       { key: 'userId', label: 'User' },
       {
         key: 'tablesRead',
-        label: 'Tables Read',
-        small: true,
-        adapter: (key: string, query: Query): string =>
-          (query.tablesRead || []).map(data => `${data.table} (${data.database})`).join(', ')
+        label: 'Tables Read'
       },
       {
         key: 'tablesWritten',
-        label: 'Tables Written',
-        small: true,
-        adapter: (key: string, query: Query): string =>
-          (query.tablesWritten || []).map(data => `${data.table} (${data.database})`).join(', ')
+        label: 'Tables Written'
       },
       {
         key: 'startTime',
         label: 'Start Time',
-        noWrap: true,
         adapter: (key: string, query: Query): string => timeAgo(query.startTime)
       },
       {

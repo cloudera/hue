@@ -864,7 +864,10 @@ export default function createGraphView() {
       event.preventDefault();
     }
 
-    element.addEventListener('wheel', onWheel);
+    // Disabling zoom temporarily. Making this a condition to prevent lint errors
+    if (false) {
+      element.addEventListener('wheel', onWheel);
+    }
 
     container.addEventListener('mousedown', (event: MouseEvent) => {
       prevX = event.pageX;
@@ -974,7 +977,8 @@ export default function createGraphView() {
       ) {
         _panZoomValues = _panZoom(PADDING, PADDING, scale);
       } else {
-        _panZoomValues = _panZoom(_panZoomValues.panX, _panZoomValues.panY, _panZoomValues.scale);
+        // _panZoomValues = _panZoom(_panZoomValues.panX, _panZoomValues.panY, _panZoomValues.scale);
+        _panZoomValues = _panZoom(_panZoomValues.panX, _panZoomValues.panY, 2); // Temporarily till zoom is enabled
       }
     },
 

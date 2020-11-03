@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TablesList.vue should render 1`] = `
+<span
+  class="tables-list"
+>
+  -
+</span>
+`;

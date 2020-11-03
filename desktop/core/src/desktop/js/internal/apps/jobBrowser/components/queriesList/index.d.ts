@@ -76,6 +76,11 @@ export interface Dag {
   vertices: Vertex[];
 }
 
+export interface Table {
+  table: string;
+  database: string;
+}
+
 export interface Query {
   appIds?: string[]; // TODO: From API or adaption? Type?
   clientIpAddress?: unknown; // TODO: string?
@@ -114,8 +119,8 @@ export interface Query {
   sessionId: string;
   startTime: number;
   status: string;
-  tablesRead: { table: string; database: string }[];
-  tablesWritten?: { table: string; database: string }[];
+  tablesRead: Table[];
+  tablesWritten?: Table[];
   tablesReadWithDatabase?: string; // TODO: From API or adaption? type?
   tablesWrittenWithDatabase?: string; // TODO: From API or adaption? type?
   threadId: string;

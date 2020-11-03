@@ -19,7 +19,7 @@
 <template>
   <div>
     <div>
-      <div>
+      <div class="buttons-container">
         <hue-button @click="showQueries">Queries</hue-button>
 
         <!-- <hue-button v-if="!query.isComplete && stoppingQuery" disabled>
@@ -56,44 +56,32 @@
 
         <template v-if="query.dags.length">
           <!-- DAG Tabs -->
-          <tab title="DAG Info">
-            <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-info">
+          <tab title="DAG Info" class="hue-layout-column">
+            <div v-for="dag in query.dags" :key="dag.dagInfo.id">
               <DagInfo :dag="dag" />
             </div>
           </tab>
-          <tab title="DAG Flow">
-            <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-details">
-              <div class="dag-title">
-                <div class="dag-label">Dag</div>
-                <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
-              </div>
+          <tab title="DAG Flow" class="hue-layout-column">
+            <div v-for="dag in query.dags" :key="dag.dagInfo.id">
+              <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
               <DagGraph :dag="dag" />
             </div>
           </tab>
-          <tab title="DAG Swimlane">
-            <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-details">
-              <div class="dag-title">
-                <div class="dag-label">Dag</div>
-                <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
-              </div>
+          <tab title="DAG Swimlane" class="hue-layout-column">
+            <div v-for="dag in query.dags" :key="dag.dagInfo.id">
+              <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
               <DagSwimlane :dag="dag" />
             </div>
           </tab>
-          <tab title="DAG Counters">
-            <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-details">
-              <div class="dag-title">
-                <div class="dag-label">Dag</div>
-                <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
-              </div>
+          <tab title="DAG Counters" class="hue-layout-column">
+            <div v-for="dag in query.dags" :key="dag.dagInfo.id">
+              <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
               <CountersTable :counters="[{ counters: dag.dagDetails.counters }]" />
             </div>
           </tab>
-          <tab title="DAG Configurations">
-            <div v-for="dag in query.dags" :key="dag.dagInfo.id" class="dag-details">
-              <div class="dag-title">
-                <div class="dag-label">Dag</div>
-                <div class="dag-name">{{ dag && dag.dagInfo.dagId }}</div>
-              </div>
+          <tab title="DAG Configurations" class="hue-layout-column">
+            <div v-for="dag in query.dags" :key="dag.dagInfo.id">
+              <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
               <ConfigsTable :configs="[{ configs: dag.config }]" />
             </div>
           </tab>
@@ -122,6 +110,8 @@
   import DagGraph from './dag-graph/DagGraph.vue';
   import DagSwimlane from './dag-swimlane/DagSwimlane.vue';
 
+  import LabeledInfo from '../components/LabeledInfo.vue';
+
   import { Query } from '../index';
 
   // TODO: Move it to a better place
@@ -145,7 +135,9 @@
       CountersTable,
       DagInfo,
       DagGraph,
-      DagSwimlane
+      DagSwimlane,
+
+      LabeledInfo
     }
   })
   export default class QueryDetails extends Vue {
@@ -169,43 +161,17 @@
 
 <style lang="scss" scoped>
   @import '../../../../../../components/styles/colors';
+  @import '../../../../../../components/styles/mixins';
 
-  .query-search {
-    color: #0a78a3;
+  .buttons-container {
+    margin-bottom: 20px;
   }
 
   .download-link {
-    border-radius: 3px;
+    border-radius: $hue-panel-border-radius;
   }
 
-  .dag-details,
-  .dag-info {
-    padding: 10px;
-  }
-
-  .dag-info {
-    border-top: 1px solid $fluid-gray-200;
-
-    &:first-child {
-      border: none;
-    }
-  }
-
-  .dag-title {
-    font-size: 1.1em;
-    margin-bottom: 10px;
-
-    .dag-label {
-      text-transform: uppercase;
-      color: $fluid-gray-500;
-      font-weight: normal;
-      font-size: 12px;
-      margin: 0;
-    }
-
-    .dag-name {
-      color: $fluid-gray-700;
-      font-size: 14px;
-    }
+  .hue-layout-column {
+    @include hue-flex-layout(column);
   }
 </style>

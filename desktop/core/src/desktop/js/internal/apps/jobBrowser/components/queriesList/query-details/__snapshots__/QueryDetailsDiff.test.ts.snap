@@ -3,7 +3,7 @@
 exports[`QueryDetailsDiff.vue should render 1`] = `
 <div>
   <div
-    style="margin-bottom: 20px;"
+    class="buttons-container"
   >
     <hue-button-stub>
       Queries
@@ -11,407 +11,283 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
   </div>
    
   <div
-    class="query-top"
+    class="hue-layout-row"
   >
     <queryinfotop-stub
-      class="side-by-side"
       query="[object Object]"
     />
      
     <queryinfotop-stub
-      class="side-by-side"
+      class="query-b"
       query="[object Object]"
     />
   </div>
    
-  <div>
-    <tabs-stub>
-      <tab-stub
-        title="Query Info"
-      >
-        <queryinfo-stub
-          class="side-by-side"
-          query="[object Object]"
-        />
-         
-        <queryinfo-stub
-          class="side-by-side"
-          query="[object Object]"
-        />
-      </tab-stub>
+  <tabs-stub>
+    <tab-stub
+      class="query-info"
+      title="Query Info"
+    >
+      <queryinfo-stub
+        layout="column"
+        query="[object Object]"
+      />
        
-      <tab-stub
-        lazy="true"
-        title="Visual Explain"
-      >
-        <visualexplain-stub
-          class="side-by-side"
-          query="[object Object]"
-        />
-         
-        <visualexplain-stub
-          class="side-by-side"
-          query="[object Object]"
-        />
-      </tab-stub>
+      <queryinfo-stub
+        class="query-b-deep"
+        layout="column"
+        query="[object Object]"
+      />
+    </tab-stub>
+     
+    <tab-stub
+      class="hue-layout-row"
+      lazy="true"
+      title="Visual Explain"
+    >
+      <visualexplain-stub
+        query="[object Object]"
+      />
        
-      <tab-stub
-        title="Timeline"
+      <visualexplain-stub
+        class="query-b"
+        query="[object Object]"
+      />
+    </tab-stub>
+     
+    <tab-stub
+      class="hue-layout-column"
+      title="Timeline"
+    >
+      <div
+        class="hue-info-box"
       >
-        <div
-          class="dag-title"
-        >
-          <div>
-            <div
-              class="dag-label"
-            >
-              Query
-            </div>
-             
-            <div
-              class="dag-name"
-            >
-              hive_20200923115641_4eaa9303-d8d6-4d9e-a7d9-dec969781b35
-            </div>
-          </div>
-        </div>
-         
         <hivetimeline-stub
           perf="[object Object]"
         />
-         
-        <div
-          class="dag-title"
-        >
-          <div>
-            <div
-              class="dag-label"
-            >
-              Query
-            </div>
-             
-            <div
-              class="dag-name"
-            >
-              hive_20200925121648_f613ce22-571c-4650-b594-8ee37f2adbe8
-            </div>
-          </div>
-        </div>
-         
+      </div>
+       
+      <div
+        class="hue-info-box query-b"
+      >
         <hivetimeline-stub
           perf="[object Object]"
         />
-      </tab-stub>
-       
-      <tab-stub
-        title="Query Config"
+      </div>
+    </tab-stub>
+     
+    <tab-stub
+      title="Query Config"
+    >
+      <label
+        class="hide-similar"
       >
-        <label
-          class="hide-similar"
-        >
-          <input
-            type="checkbox"
+        <input
+          type="checkbox"
+        />
+         Hide Similar Values
+      
+      </label>
+       
+      <configstable-stub
+        configs="[object Object],[object Object]"
+      />
+    </tab-stub>
+     
+    <tab-stub
+      class="hue-layout-row"
+      title="DAG Info"
+    >
+      <div
+        class="hue-layout-column"
+      >
+        <daginfo-stub
+          dag="[object Object]"
+        />
+         
+        <!---->
+      </div>
+       
+      <div
+        class="hue-layout-column"
+      >
+        <daginfo-stub
+          class="query-b"
+          dag="[object Object]"
+        />
+        <daginfo-stub
+          class="query-b"
+          dag="[object Object]"
+        />
+         
+        <!---->
+      </div>
+    </tab-stub>
+     
+    <tab-stub
+      class="hue-layout-row"
+      title="DAG Flow"
+    >
+      <div
+        class="hue-layout-column"
+      >
+        <div>
+          <labeledinfo-stub
+            label="DAG"
+          >
+            dag_1600862070512_0001_8
+          </labeledinfo-stub>
+           
+          <daggraph-stub
+            dag="[object Object]"
           />
-           Hide Similar Values
-        
-        </label>
+        </div>
          
+        <!---->
+      </div>
+       
+      <div
+        class="hue-layout-column query-b-deep"
+      >
+        <div>
+          <labeledinfo-stub
+            label="DAG"
+          >
+            dag_1600683331174_0003_2
+          </labeledinfo-stub>
+           
+          <daggraph-stub
+            dag="[object Object]"
+          />
+        </div>
+        <div>
+          <labeledinfo-stub
+            label="DAG"
+          >
+            dag_1600683331174_0003_4
+          </labeledinfo-stub>
+           
+          <daggraph-stub
+            dag="[object Object]"
+          />
+        </div>
+         
+        <!---->
+      </div>
+    </tab-stub>
+     
+    <tab-stub
+      class="hue-layout-column"
+      title="DAG Swimlane"
+    >
+      <div
+        class="hue-layout-column hue-info-box"
+      >
+        <div>
+          <labeledinfo-stub
+            label="DAG"
+          >
+            dag_1600862070512_0001_8
+          </labeledinfo-stub>
+           
+          <dagswimlane-stub
+            consolidate="true"
+            dag="[object Object]"
+          />
+        </div>
+         
+        <!---->
+      </div>
+       
+      <div
+        class="hue-layout-column hue-info-box query-b"
+      >
+        <div>
+          <labeledinfo-stub
+            label="DAG"
+          >
+            dag_1600683331174_0003_2
+          </labeledinfo-stub>
+           
+          <dagswimlane-stub
+            consolidate="true"
+            dag="[object Object]"
+          />
+        </div>
+        <div>
+          <labeledinfo-stub
+            label="DAG"
+          >
+            dag_1600683331174_0003_4
+          </labeledinfo-stub>
+           
+          <dagswimlane-stub
+            consolidate="true"
+            dag="[object Object]"
+          />
+        </div>
+         
+        <!---->
+      </div>
+    </tab-stub>
+     
+    <tab-stub
+      title="DAG Counters"
+    >
+      <label
+        class="hide-similar"
+      >
+        <input
+          type="checkbox"
+        />
+         Hide Similar Values
+      
+      </label>
+       
+      <div
+        class="dag-details"
+      >
+        <counterstable-stub
+          counters="[object Object],[object Object]"
+        />
+      </div>
+      <div
+        class="dag-details"
+      >
+        <counterstable-stub
+          counters="[object Object],[object Object]"
+        />
+      </div>
+    </tab-stub>
+     
+    <tab-stub
+      title="DAG Configurations"
+    >
+      <label
+        class="hide-similar"
+      >
+        <input
+          type="checkbox"
+        />
+         Hide Similar Values
+      
+      </label>
+       
+      <div
+        class="dag-details"
+      >
         <configstable-stub
           configs="[object Object],[object Object]"
         />
-      </tab-stub>
-       
-      <tab-stub
-        title="DAG Info"
+      </div>
+      <div
+        class="dag-details"
       >
-        <div
-          class="dag-info"
-        >
-          <daginfo-stub
-            class="side-by-side"
-            dag="[object Object]"
-          />
-           
-          <daginfo-stub
-            class="side-by-side"
-            dag="[object Object]"
-          />
-        </div>
-        <div
-          class="dag-info"
-        >
-          <daginfo-stub
-            class="side-by-side"
-            dag="[object Object]"
-          />
-           
-          <daginfo-stub
-            class="side-by-side"
-            dag="[object Object]"
-          />
-        </div>
-      </tab-stub>
-       
-      <tab-stub
-        title="DAG Flow"
-      >
-        <div
-          class="dag-details"
-        >
-          <div
-            class="dag-title"
-          >
-            <div>
-              <div
-                class="dag-label"
-              >
-                Dag
-              </div>
-               
-              <div
-                class="dag-name"
-              >
-                dag_1600862070512_0001_8
-              </div>
-            </div>
-             
-            <div
-              class="position-right"
-            >
-              <div
-                class="dag-label"
-              >
-                Dag
-              </div>
-               
-              <div
-                class="dag-name"
-              >
-                dag_1600683331174_0003_2
-              </div>
-            </div>
-          </div>
-           
-          <daggraph-stub
-            class="side-by-side"
-            dag="[object Object]"
-          />
-           
-          <daggraph-stub
-            class="side-by-side"
-            dag="[object Object]"
-          />
-        </div>
-        <div
-          class="dag-details"
-        >
-          <div
-            class="dag-title"
-          >
-            <div>
-              <div
-                class="dag-label"
-              >
-                Dag
-              </div>
-               
-              <div
-                class="dag-name"
-              >
-                -
-              </div>
-            </div>
-             
-            <div
-              class="position-right"
-            >
-              <div
-                class="dag-label"
-              >
-                Dag
-              </div>
-               
-              <div
-                class="dag-name"
-              >
-                dag_1600683331174_0003_4
-              </div>
-            </div>
-          </div>
-           
-          <daggraph-stub
-            class="side-by-side"
-            dag="[object Object]"
-          />
-           
-          <daggraph-stub
-            class="side-by-side"
-            dag="[object Object]"
-          />
-        </div>
-      </tab-stub>
-       
-      <tab-stub
-        title="DAG Swimlane"
-      >
-        <div
-          class="dag-details"
-        >
-          <div
-            class="dag-title"
-          >
-            <div>
-              <div
-                class="dag-label"
-              >
-                Dag
-              </div>
-               
-              <div
-                class="dag-name"
-              >
-                dag_1600862070512_0001_8
-              </div>
-            </div>
-          </div>
-           
-          <dagswimlane-stub
-            consolidate="true"
-            dag="[object Object]"
-          />
-           
-          <div
-            class="dag-title"
-          >
-            <div>
-              <div
-                class="dag-label"
-              >
-                Dag
-              </div>
-               
-              <div
-                class="dag-name"
-              >
-                dag_1600683331174_0003_2
-              </div>
-            </div>
-          </div>
-           
-          <dagswimlane-stub
-            consolidate="true"
-            dag="[object Object]"
-          />
-        </div>
-        <div
-          class="dag-details"
-        >
-          <div
-            class="dag-title"
-          >
-            <div>
-              <div
-                class="dag-label"
-              >
-                Dag
-              </div>
-               
-              <div
-                class="dag-name"
-              >
-                -
-              </div>
-            </div>
-          </div>
-           
-          <dagswimlane-stub
-            consolidate="true"
-            dag="[object Object]"
-          />
-           
-          <div
-            class="dag-title"
-          >
-            <div>
-              <div
-                class="dag-label"
-              >
-                Dag
-              </div>
-               
-              <div
-                class="dag-name"
-              >
-                dag_1600683331174_0003_4
-              </div>
-            </div>
-          </div>
-           
-          <dagswimlane-stub
-            consolidate="true"
-            dag="[object Object]"
-          />
-        </div>
-      </tab-stub>
-       
-      <tab-stub
-        title="DAG Counters"
-      >
-        <label
-          class="hide-similar"
-        >
-          <input
-            type="checkbox"
-          />
-           Hide Similar Values
-        
-        </label>
-         
-        <div
-          class="dag-details"
-        >
-          <counterstable-stub
-            counters="[object Object],[object Object]"
-          />
-        </div>
-        <div
-          class="dag-details"
-        >
-          <counterstable-stub
-            counters="[object Object],[object Object]"
-          />
-        </div>
-      </tab-stub>
-       
-      <tab-stub
-        title="DAG Configurations"
-      >
-        <label
-          class="hide-similar"
-        >
-          <input
-            type="checkbox"
-          />
-           Hide Similar Values
-        
-        </label>
-         
-        <div
-          class="dag-details"
-        >
-          <configstable-stub
-            configs="[object Object],[object Object]"
-          />
-        </div>
-        <div
-          class="dag-details"
-        >
-          <configstable-stub
-            configs="[object Object],[object Object]"
-          />
-        </div>
-      </tab-stub>
-    </tabs-stub>
-  </div>
+        <configstable-stub
+          configs="[object Object],[object Object]"
+        />
+      </div>
+    </tab-stub>
+  </tabs-stub>
 </div>
 `;

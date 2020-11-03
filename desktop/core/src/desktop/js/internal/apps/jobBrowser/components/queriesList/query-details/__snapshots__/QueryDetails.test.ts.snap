@@ -3,14 +3,23 @@
 exports[`QueryDetails.vue should render 1`] = `
 <div>
   <div>
-    <div>
+    <div
+      class="buttons-container"
+    >
       <hue-button-stub>
         Queries
       </hue-button-stub>
        
-      <hue-button-stub>
+      <a
+        class="btn btn-outline-primary download-link"
+        download=""
+        href="/jobbrowser/query-store/data-bundle/hive_20200925121648_f613ce22-571c-4650-b594-8ee37f2adbe8"
+        target="_blank"
+      >
+        
         Download
-      </hue-button-stub>
+      
+      </a>
     </div>
      
     <queryinfotop-stub
@@ -22,6 +31,7 @@ exports[`QueryDetails.vue should render 1`] = `
         title="Query Info"
       >
         <queryinfo-stub
+          layout="row"
           query="[object Object]"
         />
       </tab-stub>
@@ -52,18 +62,15 @@ exports[`QueryDetails.vue should render 1`] = `
       </tab-stub>
        
       <tab-stub
+        class="hue-layout-column"
         title="DAG Info"
       >
-        <div
-          class="dag-info"
-        >
+        <div>
           <daginfo-stub
             dag="[object Object]"
           />
         </div>
-        <div
-          class="dag-info"
-        >
+        <div>
           <daginfo-stub
             dag="[object Object]"
           />
@@ -71,49 +78,26 @@ exports[`QueryDetails.vue should render 1`] = `
       </tab-stub>
        
       <tab-stub
+        class="hue-layout-column"
         title="DAG Flow"
       >
-        <div
-          class="dag-details"
-        >
-          <div
-            class="dag-title"
+        <div>
+          <labeledinfo-stub
+            label="DAG"
           >
-            <div
-              class="dag-label"
-            >
-              Dag
-            </div>
-             
-            <div
-              class="dag-name"
-            >
-              dag_1600683331174_0003_2
-            </div>
-          </div>
+            dag_1600683331174_0003_2
+          </labeledinfo-stub>
            
           <daggraph-stub
             dag="[object Object]"
           />
         </div>
-        <div
-          class="dag-details"
-        >
-          <div
-            class="dag-title"
+        <div>
+          <labeledinfo-stub
+            label="DAG"
           >
-            <div
-              class="dag-label"
-            >
-              Dag
-            </div>
-             
-            <div
-              class="dag-name"
-            >
-              dag_1600683331174_0003_4
-            </div>
-          </div>
+            dag_1600683331174_0003_4
+          </labeledinfo-stub>
            
           <daggraph-stub
             dag="[object Object]"
@@ -122,50 +106,27 @@ exports[`QueryDetails.vue should render 1`] = `
       </tab-stub>
        
       <tab-stub
+        class="hue-layout-column"
         title="DAG Swimlane"
       >
-        <div
-          class="dag-details"
-        >
-          <div
-            class="dag-title"
+        <div>
+          <labeledinfo-stub
+            label="DAG"
           >
-            <div
-              class="dag-label"
-            >
-              Dag
-            </div>
-             
-            <div
-              class="dag-name"
-            >
-              dag_1600683331174_0003_2
-            </div>
-          </div>
+            dag_1600683331174_0003_2
+          </labeledinfo-stub>
            
           <dagswimlane-stub
             consolidate="true"
             dag="[object Object]"
           />
         </div>
-        <div
-          class="dag-details"
-        >
-          <div
-            class="dag-title"
+        <div>
+          <labeledinfo-stub
+            label="DAG"
           >
-            <div
-              class="dag-label"
-            >
-              Dag
-            </div>
-             
-            <div
-              class="dag-name"
-            >
-              dag_1600683331174_0003_4
-            </div>
-          </div>
+            dag_1600683331174_0003_4
+          </labeledinfo-stub>
            
           <dagswimlane-stub
             consolidate="true"
@@ -175,49 +136,26 @@ exports[`QueryDetails.vue should render 1`] = `
       </tab-stub>
        
       <tab-stub
+        class="hue-layout-column"
         title="DAG Counters"
       >
-        <div
-          class="dag-details"
-        >
-          <div
-            class="dag-title"
+        <div>
+          <labeledinfo-stub
+            label="DAG"
           >
-            <div
-              class="dag-label"
-            >
-              Dag
-            </div>
-             
-            <div
-              class="dag-name"
-            >
-              dag_1600683331174_0003_2
-            </div>
-          </div>
+            dag_1600683331174_0003_2
+          </labeledinfo-stub>
            
           <counterstable-stub
             counters="[object Object]"
           />
         </div>
-        <div
-          class="dag-details"
-        >
-          <div
-            class="dag-title"
+        <div>
+          <labeledinfo-stub
+            label="DAG"
           >
-            <div
-              class="dag-label"
-            >
-              Dag
-            </div>
-             
-            <div
-              class="dag-name"
-            >
-              dag_1600683331174_0003_4
-            </div>
-          </div>
+            dag_1600683331174_0003_4
+          </labeledinfo-stub>
            
           <counterstable-stub
             counters="[object Object]"
@@ -226,49 +164,26 @@ exports[`QueryDetails.vue should render 1`] = `
       </tab-stub>
        
       <tab-stub
+        class="hue-layout-column"
         title="DAG Configurations"
       >
-        <div
-          class="dag-details"
-        >
-          <div
-            class="dag-title"
+        <div>
+          <labeledinfo-stub
+            label="DAG"
           >
-            <div
-              class="dag-label"
-            >
-              Dag
-            </div>
-             
-            <div
-              class="dag-name"
-            >
-              dag_1600683331174_0003_2
-            </div>
-          </div>
+            dag_1600683331174_0003_2
+          </labeledinfo-stub>
            
           <configstable-stub
             configs="[object Object]"
           />
         </div>
-        <div
-          class="dag-details"
-        >
-          <div
-            class="dag-title"
+        <div>
+          <labeledinfo-stub
+            label="DAG"
           >
-            <div
-              class="dag-label"
-            >
-              Dag
-            </div>
-             
-            <div
-              class="dag-name"
-            >
-              dag_1600683331174_0003_4
-            </div>
-          </div>
+            dag_1600683331174_0003_4
+          </labeledinfo-stub>
            
           <configstable-stub
             configs="[object Object]"

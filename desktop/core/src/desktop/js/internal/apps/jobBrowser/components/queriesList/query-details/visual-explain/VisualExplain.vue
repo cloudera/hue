@@ -18,22 +18,19 @@
 
 <template>
   <div class="visual-explain-container">
-    <div class="visual-explain-header">
-      <div v-if="explainRendered" class="button-container">
-        <button class="btn btn-default" title="Full screen" @click="toggleFullscreen">
-          <em class="fa fa-expand" />
-        </button>
-        <em class="fa fa-ellipsis-v" />
-        <button
-          class="download-button btn btn-default"
-          title="Download explain JSON"
-          @click="downloadExplain"
-        >
-          <em class="fa fa-download" aria-hidden="true" />
-        </button>
-      </div>
-      <h2 v-else>Reder failed!</h2>
+    <div v-if="explainRendered" class="button-container">
+      <button class="btn btn-default" title="Full screen" @click="toggleFullscreen">
+        <em class="fa fa-expand" />
+      </button>
+      <button
+        class="download-button btn btn-default"
+        title="Download explain JSON"
+        @click="downloadExplain"
+      >
+        <em class="fa fa-download" aria-hidden="true" />
+      </button>
     </div>
+    <h2 v-else class="error-title">Reder failed!</h2>
 
     <div v-if="isQueryRunning">
       <div style="running-anim">
@@ -79,7 +76,7 @@
     explainDetailData = '';
     vectorizedInfo = '';
 
-    explainRendered: any = false;
+    explainRendered: any = true;
 
     created(): void {
       if (this.query && this.query.details) {
@@ -100,8 +97,12 @@
       setTimeout(() => {
         const container: HTMLElement | null = this.$el.querySelector('.explain-container');
         if (container) {
-          explain(this.explainPlan, container, onRequestDetail, this.query.details);
-          this.explainRendered = true;
+          this.explainRendered = explain(
+            this.explainPlan,
+            container,
+            onRequestDetail,
+            this.query.details
+          );
         }
       }, 200);
     }

@@ -22,19 +22,6 @@
   height: 100%;
   margin-bottom: 10px;
 
-  .button-container {
-    padding: 3px;
-
-    text-align: right;
-
-    button {
-      width: 33px;
-      height: 33px;
-      font-size: 1.5em;
-      padding: 4px;
-    }
-  }
-
   border: 1px solid #CCC;
   border-radius: 5px;
   overflow: hidden;
@@ -50,6 +37,10 @@
     bottom: 0;
     right: 0;
   }
+
+  .error-title {
+    margin: 10px 0 0 10px;
+  }
 }
 
 .visual-explain-container {
@@ -63,19 +54,16 @@
   }
 }
 
-.visual-explain-header {
-  height: 40px;
-  background-color: rgb(246, 246, 246);
+.button-container {
+  position: absolute;
+  right: 5px;
+  top: 5px;
 
-  padding: 0px 10px;
-  position: relative;
-
-  &__title {
-    font-size: 18px;
-    margin-top: 5px;
-
-    position: relative;
-    top: 7px;
+  button {
+    width: 33px;
+    height: 33px;
+    font-size: 1.5em;
+    padding: 4px;
   }
 }
 

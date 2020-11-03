@@ -17,90 +17,60 @@
 -->
 
 <template>
-  <div>
-    <div class="query-info-row query-info-box">
-      <div class="query-info-label">Query</div>
-      <div class="query-info-query">
-        <sql-text :enable-overflow="true" :format="true" :value="query.query" />
+  <div :class="`query-info layout-${layout}`">
+    <div>
+      <div class="hue-info-box">
+        <LabeledInfo label="Query">
+          <sql-text :enable-overflow="true" :format="true" :value="query.query" />
+        </LabeledInfo>
       </div>
     </div>
+    <div>
+      <div class="hue-info-box">
+        <LabeledInfo label="Start Time">
+          <time-ago v-if="query.startTime" :value="query.startTime" />
+        </LabeledInfo>
 
-    <div class="query-info-box">
-      <div class="query-info-row">
-        <div class="query-info-label">Start Time</div>
-        <div class="query-info-value">
-          <time-ago :value="query.startTime" />
-        </div>
-      </div>
+        <LabeledInfo label="End Time">
+          <time-ago v-if="query.endTime" :value="query.endTime" />
+        </LabeledInfo>
 
-      <div class="query-info-row">
-        <div class="query-info-label">End Time</div>
-        <div class="query-info-value">
-          <time-ago :value="query.endTime" />
-        </div>
-      </div>
+        <LabeledInfo label="Duration">
+          <duration v-if="query.elapsedTime" :value="query.elapsedTime" />
+        </LabeledInfo>
 
-      <div class="query-info-row">
-        <div class="query-info-label">Duration</div>
-        <div class="query-info-value">
-          <duration v-if="query.duration" :value="query.duration" />
-          <span v-else>-</span>
-        </div>
-      </div>
+        <LabeledInfo label="Tables Read">
+          <TablesList :tables="query.tablesRead" />
+        </LabeledInfo>
 
-      <div class="query-info-row">
-        <div class="query-info-label">Tables Read</div>
-        <div class="query-info-value">
-          <span v-if="query.tablesReadWithDatabase">{{ query.tablesReadWithDatabase }}</span>
-          <span v-else>-</span>
-        </div>
-      </div>
+        <LabeledInfo label="Tables Written">
+          <TablesList :tables="query.tablesWritten" />
+        </LabeledInfo>
 
-      <div class="query-info-row">
-        <div class="query-info-label">Tables Written</div>
-        <div class="query-info-value">
-          <span v-if="query.tablesWrittenWithDatabase">{{ query.tablesWrittenWithDatabase }}</span>
-          <span v-else>-</span>
-        </div>
-      </div>
+        <LabeledInfo label="Application ID">
+          {{ query.dags[0] && query.dags[0].dagInfo.applicationId }}
+        </LabeledInfo>
 
-      <div class="query-info-row">
-        <div class="query-info-label">Application ID</div>
-        <div class="query-info-value">
-          <span v-if="query.appIds && query.appIds.length">{{ query.appIds }}</span>
-          <span v-else>-</span>
-        </div>
-      </div>
+        <LabeledInfo label="DAG ID">
+          {{ query.dags && query.dags.map(dag => dag.dagInfo.dagId).join(',') }}
+        </LabeledInfo>
 
-      <div class="query-info-row">
-        <div class="query-info-label">DAG ID</div>
-        <div class="query-info-value">
-          <span v-if="query.dagIds && query.dagIds.length">{{ query.dagIds }}</span>
-          <span v-else>-</span>
-        </div>
-      </div>
+        <LabeledInfo label="Session ID">
+          {{ query.sessionId }}
+        </LabeledInfo>
 
-      <div class="query-info-row">
-        <div class="query-info-label">Session ID</div>
-        <div class="query-info-value">{{ query.sessionId }}</div>
-      </div>
+        <LabeledInfo label="LLAP App ID">
+          {{ query.llapAppId }}
+        </LabeledInfo>
 
-      <div v-if="query.llapAppId" class="query-info-row">
-        <div class="query-info-label">LLAP App ID</div>
-        <div class="query-info-value">{{ query.llapAppId }}</div>
-      </div>
+        <LabeledInfo label="Thread Id">
+          {{ query.threadId }}
+        </LabeledInfo>
 
-      <div class="query-info-row">
-        <div class="query-info-label">Thread Id</div>
-        <div class="query-info-value">{{ query.threadId }}</div>
-      </div>
-
-      <div class="query-info-row">
-        <div class="query-info-label">Queue</div>
-        <div class="query-info-value">
+        <LabeledInfo label="Queue">
           <span v-if="query.queueName">{{ query.queueName }}</span>
           <span v-else>None</span>
-        </div>
+        </LabeledInfo>
       </div>
     </div>
   </div>
@@ -113,14 +83,20 @@
   import Duration from '../../../../../../components/Duration.vue';
   import SqlText from '../../../../../../components/SqlText.vue';
   import TimeAgo from '../../../../../../components/TimeAgo.vue';
+  import TablesList from '../components/TablesList.vue';
+  import LabeledInfo from '../components/LabeledInfo.vue';
 
   import { Query } from '..';
 
   @Component({
-    components: { Duration, TimeAgo, SqlText }
+    components: { Duration, TimeAgo, SqlText, TablesList, LabeledInfo }
   })
   export default class QueryInfoTab extends Vue {
-    @Prop({ required: true }) query!: Query;
+    @Prop({ required: true })
+    query!: Query;
+
+    @Prop({ default: 'row' })
+    layout!: string;
   }
 </script>
 
@@ -128,43 +104,43 @@
   @import '../../../../../../components/styles/colors';
   @import '../../../../../../components/styles/mixins';
 
-  .query-title {
-    padding: 0 10px 10px 10px;
-    color: $fluid-gray-800;
-    font-size: 20px;
-    font-weight: 500;
-  }
+  .query-info {
+    &.layout-row {
+      white-space: nowrap;
 
-  .query-info-row {
-    margin-bottom: 15px;
+      > div {
+        width: 50%;
+        display: inline-block;
+        vertical-align: top;
 
-    .query-info-label {
-      text-transform: uppercase;
-      color: $fluid-gray-500;
-      font-weight: normal;
-      font-size: 12px;
-      margin: 0;
+        &:first-child {
+          width: calc(50% - 14px);
+          margin-right: 10px;
+        }
+      }
+    }
+    &.layout-column {
+      display: inline-block;
+      width: calc(50% - 7px);
+      vertical-align: top;
+      margin-right: 10px;
+
+      > div {
+        width: 100%;
+
+        &:first-child {
+          margin-bottom: 10px;
+        }
+      }
     }
 
-    .query-info-value {
-      color: $fluid-gray-700;
+    .hue-info-box {
+      @include hue-flex-layout(column);
+
+      padding: 10px;
+
+      border: 1px solid $fluid-gray-300;
+      border-radius: $hue-panel-border-radius;
     }
-
-    .query-info-query {
-      padding: 5px;
-      width: 570px;
-    }
-  }
-
-  .query-info-box {
-    display: inline-block;
-    min-width: 580px;
-    padding: 10px;
-    margin-right: 5px;
-
-    vertical-align: top;
-
-    border: 1px solid $fluid-gray-300;
-    border-radius: 5px;
   }
 </style>

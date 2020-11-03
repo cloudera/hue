@@ -15,17 +15,13 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
-import { Query, Dag } from '..';
-import QueryInfo from './QueryInfo.vue';
+import LabeledInfo from './LabeledInfo.vue';
 
-describe('QueryInfo.vue', () => {
+describe('LabeledInfo.vue', () => {
   it('should render', () => {
-    const wrapper = shallowMount(QueryInfo, {
+    const wrapper = shallowMount(LabeledInfo, {
       propsData: {
-        query: <Query>{
-          details: {},
-          dags: <Dag[]>[]
-        }
+        label: 'TestLable'
       }
     });
     expect(wrapper.element).toMatchSnapshot();

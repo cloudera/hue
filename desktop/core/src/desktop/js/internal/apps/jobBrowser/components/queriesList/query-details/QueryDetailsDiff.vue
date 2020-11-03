@@ -18,132 +18,130 @@
 
 <template>
   <div>
-    <div style="margin-bottom: 20px;">
+    <div class="buttons-container">
       <hue-button @click="showQueries">Queries</hue-button>
     </div>
 
-    <div class="query-top">
-      <QueryInfoTop :query="queries[0]" class="side-by-side" />
-      <QueryInfoTop :query="queries[1]" class="side-by-side" />
+    <div class="hue-layout-row">
+      <QueryInfoTop :query="queries[0]" />
+      <QueryInfoTop :query="queries[1]" class="query-b" />
     </div>
 
-    <div>
-      <tabs>
-        <!-- Query Tabs -->
-        <tab title="Query Info">
-          <QueryInfo :query="queries[0]" class="side-by-side" />
-          <QueryInfo :query="queries[1]" class="side-by-side" />
-        </tab>
-        <tab title="Visual Explain" lazy="true">
-          <VisualExplain :query="queries[0]" class="side-by-side" />
-          <VisualExplain :query="queries[1]" class="side-by-side" />
-        </tab>
-        <tab title="Timeline">
-          <div class="dag-title">
-            <div>
-              <div class="dag-label">Query</div>
-              <div class="dag-name">{{ queries[0].queryId }}</div>
-            </div>
-          </div>
+    <tabs>
+      <!-- Query Tabs -->
+      <tab title="Query Info" class="query-info">
+        <QueryInfo :query="queries[0]" layout="column" />
+        <QueryInfo :query="queries[1]" layout="column" class="query-b-deep" />
+      </tab>
+      <tab title="Visual Explain" lazy="true" class="hue-layout-row">
+        <VisualExplain :query="queries[0]" />
+        <VisualExplain :query="queries[1]" class="query-b" />
+      </tab>
+      <tab title="Timeline" class="hue-layout-column">
+        <div class="hue-info-box">
           <HiveTimeline :perf="queries[0].details.perf" />
-          <div class="dag-title">
-            <div>
-              <div class="dag-label">Query</div>
-              <div class="dag-name">{{ queries[1].queryId }}</div>
-            </div>
-          </div>
+        </div>
+        <div class="hue-info-box query-b">
           <HiveTimeline :perf="queries[1].details.perf" />
-        </tab>
-        <tab title="Query Config">
-          <label class="hide-similar">
-            <input v-model="hideSimilarValues" type="checkbox" /> Hide Similar Values
-          </label>
+        </div>
+      </tab>
+      <tab title="Query Config">
+        <label class="hide-similar">
+          <input v-model="hideSimilarValues" type="checkbox" /> Hide Similar Values
+        </label>
+        <ConfigsTable
+          :hide-similar-values="hideSimilarValues"
+          :configs="[
+            { title: `Query ${queries[0].queryId}`, configs: queries[0].details.configuration },
+            { title: `Query ${queries[1].queryId}`, configs: queries[1].details.configuration }
+          ]"
+        />
+      </tab>
+
+      <!-- DAG Tabs -->
+      <tab title="DAG Info" class="hue-layout-row">
+        <div class="hue-layout-column">
+          <DagInfo v-for="dag in queries[0].dags" :key="dag.dagInfo.dagId" :dag="dag" />
+          <div v-if="!get(queries, '[0].dags.length')" class="hue-info-box">No DAGs!</div>
+        </div>
+        <div class="hue-layout-column">
+          <DagInfo
+            v-for="dag in queries[1].dags"
+            :key="dag.dagInfo.dagId"
+            :dag="dag"
+            class="query-b"
+          />
+          <div v-if="!get(queries, '[1].dags.length')" class="hue-info-box query-b">No DAGs!</div>
+        </div>
+      </tab>
+      <tab title="DAG Flow" class="hue-layout-row">
+        <div class="hue-layout-column">
+          <div v-for="dag in queries[0].dags" :key="dag.dagInfo.dagId">
+            <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
+            <DagGraph :dag="dag" />
+          </div>
+          <div v-if="!get(queries, '[0].dags.length')" class="hue-info-box">No DAGs!</div>
+        </div>
+        <div class="hue-layout-column query-b-deep">
+          <div v-for="dag in queries[1].dags" :key="dag.dagInfo.dagId">
+            <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
+            <DagGraph :dag="dag" />
+          </div>
+          <div v-if="!get(queries, '[1].dags.length')" class="hue-info-box query-b">No DAGs!</div>
+        </div>
+      </tab>
+      <tab title="DAG Swimlane" class="hue-layout-column">
+        <div class="hue-layout-column hue-info-box">
+          <div v-for="dag in queries[0].dags" :key="dag.dagInfo.dagId">
+            <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
+            <DagSwimlane :dag="dag" />
+          </div>
+          <div v-if="!get(queries, '[0].dags.length')">No DAGs!</div>
+        </div>
+        <div class="hue-layout-column hue-info-box query-b">
+          <div v-for="dag in queries[1].dags" :key="dag.dagInfo.dagId">
+            <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
+            <DagSwimlane :dag="dag" />
+          </div>
+          <div v-if="!get(queries, '[1].dags.length')">No DAGs!</div>
+        </div>
+      </tab>
+
+      <tab title="DAG Counters">
+        <label class="hide-similar">
+          <input v-model="hideSimilarValues" type="checkbox" /> Hide Similar Values
+        </label>
+        <div v-for="(dagSet, index) in buildDagSets(queries)" :key="index" class="dag-details">
+          <CountersTable
+            :hide-similar-values="hideSimilarValues"
+            :counters="[
+              {
+                title: `DAG : ${dagSet.dagA.dagInfo.dagId}`,
+                counters: dagSet.dagA.dagDetails.counters
+              },
+              {
+                title: `DAG : ${dagSet.dagB.dagInfo.dagId}`,
+                counters: dagSet.dagB.dagDetails.counters
+              }
+            ]"
+          />
+        </div>
+      </tab>
+      <tab title="DAG Configurations">
+        <label class="hide-similar">
+          <input v-model="hideSimilarValues" type="checkbox" /> Hide Similar Values
+        </label>
+        <div v-for="(dagSet, index) in buildDagSets(queries)" :key="index" class="dag-details">
           <ConfigsTable
             :hide-similar-values="hideSimilarValues"
             :configs="[
-              { title: `Query ${queries[0].queryId}`, configs: queries[0].details.configuration },
-              { title: `Query ${queries[1].queryId}`, configs: queries[1].details.configuration }
+              { title: `DAG : ${dagSet.dagA.dagInfo.dagId}`, configs: dagSet.dagA.config },
+              { title: `DAG : ${dagSet.dagB.dagInfo.dagId}`, configs: dagSet.dagB.config }
             ]"
           />
-        </tab>
-
-        <!-- DAG Tabs -->
-        <tab title="DAG Info">
-          <div v-for="(dagSet, index) in buildDagSets(queries)" :key="index" class="dag-info">
-            <DagInfo :dag="dagSet.dagA" class="side-by-side" />
-            <DagInfo :dag="dagSet.dagB" class="side-by-side" />
-          </div>
-        </tab>
-        <tab title="DAG Flow">
-          <div v-for="(dagSet, index) in buildDagSets(queries)" :key="index" class="dag-details">
-            <div class="dag-title">
-              <div>
-                <div class="dag-label">Dag</div>
-                <div class="dag-name">{{ dagSet.dagA.dagInfo.dagId }}</div>
-              </div>
-              <div class="position-right">
-                <div class="dag-label">Dag</div>
-                <div class="dag-name">{{ dagSet.dagB.dagInfo.dagId }}</div>
-              </div>
-            </div>
-            <DagGraph :dag="dagSet.dagA" class="side-by-side" />
-            <DagGraph :dag="dagSet.dagB" class="side-by-side" />
-          </div>
-        </tab>
-        <tab title="DAG Swimlane">
-          <div v-for="(dagSet, index) in buildDagSets(queries)" :key="index" class="dag-details">
-            <div class="dag-title">
-              <div>
-                <div class="dag-label">Dag</div>
-                <div class="dag-name">{{ dagSet.dagA.dagInfo.dagId }}</div>
-              </div>
-            </div>
-            <DagSwimlane :dag="dagSet.dagA" />
-            <div class="dag-title">
-              <div>
-                <div class="dag-label">Dag</div>
-                <div class="dag-name">{{ dagSet.dagB.dagInfo.dagId }}</div>
-              </div>
-            </div>
-            <DagSwimlane :dag="dagSet.dagB" />
-          </div>
-        </tab>
-        <tab title="DAG Counters">
-          <label class="hide-similar">
-            <input v-model="hideSimilarValues" type="checkbox" /> Hide Similar Values
-          </label>
-          <div v-for="(dagSet, index) in buildDagSets(queries)" :key="index" class="dag-details">
-            <CountersTable
-              :hide-similar-values="hideSimilarValues"
-              :counters="[
-                {
-                  title: `DAG : ${dagSet.dagA.dagInfo.dagId}`,
-                  counters: dagSet.dagA.dagDetails.counters
-                },
-                {
-                  title: `DAG : ${dagSet.dagB.dagInfo.dagId}`,
-                  counters: dagSet.dagB.dagDetails.counters
-                }
-              ]"
-            />
-          </div>
-        </tab>
-        <tab title="DAG Configurations">
-          <label class="hide-similar">
-            <input v-model="hideSimilarValues" type="checkbox" /> Hide Similar Values
-          </label>
-          <div v-for="(dagSet, index) in buildDagSets(queries)" :key="index" class="dag-details">
-            <ConfigsTable
-              :hide-similar-values="hideSimilarValues"
-              :configs="[
-                { title: `DAG : ${dagSet.dagA.dagInfo.dagId}`, configs: dagSet.dagA.config },
-                { title: `DAG : ${dagSet.dagB.dagInfo.dagId}`, configs: dagSet.dagB.config }
-              ]"
-            />
-          </div>
-        </tab>
-      </tabs>
-    </div>
+        </div>
+      </tab>
+    </tabs>
   </div>
 </template>
 
@@ -165,7 +163,11 @@
   import DagGraph from './dag-graph/DagGraph.vue';
   import DagSwimlane from './dag-swimlane/DagSwimlane.vue';
 
+  import LabeledInfo from '../components/LabeledInfo.vue';
+
   import { Dag, Query } from '../index';
+
+  import { get } from 'lodash';
 
   interface DagSet {
     dagA: Dag;
@@ -203,10 +205,13 @@
       CountersTable,
       DagInfo,
       DagGraph,
-      DagSwimlane
+      DagSwimlane,
+
+      LabeledInfo
     },
     methods: {
-      buildDagSets
+      buildDagSets,
+      get
     }
   })
   export default class QueryDetails extends Vue {
@@ -219,73 +224,44 @@
 
 <style lang="scss" scoped>
   @import '../../../../../../components/styles/colors';
+  @import '../../../../../../components/styles/mixins';
 
-  .query-search {
-    color: #0a78a3;
+  .hue-info-box {
+    padding: 10px;
+
+    border: 1px solid $fluid-gray-300;
+    border-radius: $hue-panel-border-radius;
   }
 
-  .side-by-side {
-    display: inline-block;
-    width: calc(50% - 5px);
+  .buttons-container {
+    margin-bottom: 20px;
+  }
+
+  .hue-layout-row {
+    @include hue-flex-layout(row);
+  }
+
+  .hue-layout-column {
     vertical-align: top;
+    @include hue-flex-layout(column);
   }
 
-  .query-top {
-    .side-by-side {
-      width: calc(50% - 30px);
-    }
+  .query-info {
+    white-space: nowrap;
+  }
+
+  .query-b,
+  /deep/ .query-b-deep .hue-info-box,
+  /deep/ .query-b-deep .dag-view-container {
+    background-color: $fluid-blue-050;
+    border: 1px solid $fluid-blue-700;
+    border-radius: $hue-panel-border-radius;
   }
 
   .hide-similar {
     text-align: right;
     input {
       vertical-align: top;
-    }
-  }
-
-  .dag-details,
-  .dag-info {
-    padding: 10px;
-  }
-
-  .dag-details {
-    &:first-child {
-      padding-top: 0;
-    }
-  }
-
-  .dag-info {
-    border-top: 1px solid $fluid-gray-200;
-
-    &:first-child {
-      border: none;
-    }
-  }
-
-  .dag-title {
-    position: relative;
-
-    font-size: 1.1em;
-    padding: 10px 0;
-
-    .dag-label {
-      text-transform: uppercase;
-      color: $fluid-gray-500;
-      font-weight: normal;
-      font-size: 12px;
-      margin: 0;
-    }
-
-    .dag-name {
-      color: $fluid-gray-700;
-      font-size: 14px;
-    }
-
-    .position-right {
-      position: absolute;
-      text-align: right;
-      top: 0;
-      right: 0;
     }
   }
 </style>

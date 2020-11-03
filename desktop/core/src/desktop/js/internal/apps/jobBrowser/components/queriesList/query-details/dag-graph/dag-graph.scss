@@ -46,9 +46,8 @@ $unknown-color: crimson;
 // -- HTML styles ---
 .dag-view-container {
   user-select: none;
-  // .well;
 
-  background-color: $bg-liter;
+  background-color: #FFF;
 
   border: 1px solid $border-lite;
   border-radius: 5px;
@@ -57,8 +56,7 @@ $unknown-color: crimson;
 
   padding: 0px;
   width:100%;
-  height: 100%;
-  min-height: 500px;
+  height: 500px;
 
   .message {
     text-align: center;
@@ -72,8 +70,7 @@ $unknown-color: crimson;
     overflow:hidden;
 
     width:100%;
-    height: 100%;
-    min-height: 500px;
+    height: 500px;
 
     // cursor: -moz-grab;
     // cursor: -webkit-grab;

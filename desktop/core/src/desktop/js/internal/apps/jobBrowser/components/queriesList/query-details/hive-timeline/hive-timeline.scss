@@ -33,10 +33,10 @@ $dot-color: #BBB;
 $border-color: #d6d8db;
 
 .hive-timeline {
-
   .timeline-bars {
+    margin-bottom: 10px;
+
     font-size: 0;
-    margin: 0px 0 10px 0;
     overflow: hidden;
 
     user-select: none;
@@ -118,8 +118,38 @@ $border-color: #d6d8db;
   }
 
   table.detail-list {
+    background-color: #FFF;
+
     th {
       border: 1px solid $border-color;
+    }
+
+    thead {
+      background-color: #f0f0f0;
+      font-weight: bold;
+
+      th {
+        padding: 5px;
+        text-align: left;
+      }
+    }
+
+    tr {
+      margin: 0px 0px 0px 15px;
+      overflow: hidden;
+    }
+
+    td {
+      border: 1px solid #e5e5e5;
+      padding: 5px;
+
+      min-width: 50px;
+      max-width: 600px;
+
+      white-space: nowrap;
+      overflow: auto;
+
+      padding: 5px;
     }
 
     i {
@@ -174,42 +204,13 @@ $border-color: #d6d8db;
     }
   }
 
-  .detail-list {
-    display: inline-block;
-    vertical-align: top;
-    background-color: #FFF;
-    margin: 0 10px 10px 0;
-    table-layout: fixed;
+  .timeline-details {
+    display: flex;
+    flex-wrap: wrap;
 
-    border-collapse: collapse;
-    border-spacing: 0;
+    column-gap: 10px;
+    row-gap: 10px;
 
-    thead {
-      background-color: #f0f0f0;
-      font-weight: bold;
-
-      th {
-        padding: 5px;
-        text-align: left;
-      }
-    }
-
-    tr {
-      margin: 0px 0px 0px 15px;
-      overflow: hidden;
-    }
-
-    td {
-      border: 1px solid #e5e5e5;
-      padding: 5px;
-
-      min-width: 50px;
-      max-width: 600px;
-
-      white-space: nowrap;
-      overflow: auto;
-
-      padding: 5px;
-    }
+    align-items: flex-start;
   }
 }

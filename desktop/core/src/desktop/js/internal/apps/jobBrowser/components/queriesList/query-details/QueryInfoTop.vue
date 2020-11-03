@@ -17,24 +17,19 @@
 -->
 
 <template>
-  <div class="query-info-box">
-    <div class="query-info-row">
-      <div class="query-info-label">Query ID</div>
-      <div class="query-info-value">{{ query.queryId }}</div>
-    </div>
+  <div class="hue-info-box">
+    <LabeledInfo label="Query ID" class="inline-info">
+      {{ query.queryId }}
+    </LabeledInfo>
 
-    <div class="query-info-row">
-      <div class="query-info-label">User</div>
-      <div class="query-info-value">{{ query.requestUser }}</div>
-    </div>
+    <LabeledInfo label="User" class="inline-info">
+      {{ query.requestUser }}
+    </LabeledInfo>
 
-    <div class="query-info-row">
-      <div class="query-info-label">Status</div>
-      <div class="query-info-value">
-        <StatusIndicator :value="query.status" />
-        {{ query.status }}
-      </div>
-    </div>
+    <LabeledInfo label="Status" class="inline-info">
+      <StatusIndicator :value="query.status" />
+      {{ query.status }}
+    </LabeledInfo>
   </div>
 </template>
 
@@ -43,11 +38,12 @@
   import { Component, Prop } from 'vue-property-decorator';
 
   import StatusIndicator from '../../../../../../components/StatusIndicator.vue';
+  import LabeledInfo from '../components/LabeledInfo.vue';
 
   import { Query } from '..';
 
   @Component({
-    components: { StatusIndicator }
+    components: { StatusIndicator, LabeledInfo }
   })
   export default class QueryInfoTab extends Vue {
     @Prop({ required: true }) query!: Query;
@@ -58,35 +54,21 @@
   @import '../../../../../../components/styles/colors';
   @import '../../../../../../components/styles/mixins';
 
-  .query-info-row {
-    display: inline-block;
-    margin-right: 20px;
-
-    .query-info-label {
-      text-transform: uppercase;
-      color: $fluid-gray-500;
-      font-weight: normal;
-      font-size: 12px;
-      margin: 0;
-    }
-
-    .query-info-value {
-      color: $fluid-gray-700;
-    }
-
-    .query-info-query {
-      padding: 5px;
-      width: 570px;
-    }
-  }
-
-  .query-info-box {
+  .hue-info-box {
     padding: 10px;
-    margin: 20px 0 -10px 0;
-
-    vertical-align: top;
 
     border: 1px solid $fluid-gray-300;
-    border-radius: 5px;
+    border-radius: $hue-panel-border-radius;
+
+    @include nowrap-ellipsis;
+
+    margin-bottom: 10px;
+
+    .inline-info {
+      display: inline-block;
+      margin-right: 30px;
+
+      vertical-align: baseline;
+    }
   }
 </style>

@@ -5,11 +5,26 @@ exports[`VisualExplain.vue should render 1`] = `
   class="visual-explain-container"
 >
   <div
-    class="visual-explain-header"
+    class="button-container"
   >
-    <h2>
-      Reder failed!
-    </h2>
+    <button
+      class="btn btn-default"
+      title="Full screen"
+    >
+      <em
+        class="fa fa-expand"
+      />
+    </button>
+     
+    <button
+      class="download-button btn btn-default"
+      title="Download explain JSON"
+    >
+      <em
+        aria-hidden="true"
+        class="fa fa-download"
+      />
+    </button>
   </div>
    
   <div

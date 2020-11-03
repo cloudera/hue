@@ -17,48 +17,34 @@
 -->
 
 <template>
-  <div>
-    <div class="info-inline">
-      <div class="info-label">DAG ID</div>
-      <div class="info-value">{{ dag.dagInfo.dagId }}</div>
-    </div>
+  <div class="hue-info-box">
+    <LabeledInfo label="DAG ID" class="inline-info">
+      {{ dag.dagInfo.dagId }}
+    </LabeledInfo>
 
-    <div class="info-inline">
-      <div class="info-label">DAG Name</div>
-      <div class="info-value">{{ dag.dagInfo.dagName }}</div>
-    </div>
+    <LabeledInfo label="DAG Name" class="inline-info">
+      {{ dag.dagInfo.dagName }}
+    </LabeledInfo>
 
-    <div class="info-inline">
-      <div class="info-label">Status</div>
-      <div class="info-value">{{ dag.dagInfo.status }}</div>
-    </div>
+    <LabeledInfo label="Status" class="inline-info">
+      {{ dag.dagInfo.status }}
+    </LabeledInfo>
 
-    <div class="info-inline">
-      <div class="info-label">Start Time</div>
-      <div class="info-value">
-        <time-ago :value="dag.dagInfo.startTime" />
-      </div>
-    </div>
+    <LabeledInfo label="Duration" class="inline-info">
+      <duration v-if="dag.dagInfo.endTime" :value="dag.dagInfo.endTime - dag.dagInfo.startTime" />
+    </LabeledInfo>
 
-    <div class="info-inline">
-      <div class="info-label">End Time</div>
-      <div class="info-value">
-        <time-ago :value="dag.dagInfo.endTime" />
-      </div>
-    </div>
+    <LabeledInfo label="Start Time" class="inline-info">
+      <time-ago :value="dag.dagInfo.startTime" />
+    </LabeledInfo>
 
-    <div class="info-inline">
-      <div class="info-label">Duration</div>
-      <div class="info-value">
-        <duration v-if="dag.dagInfo.endTime" :value="dag.dagInfo.endTime - dag.dagInfo.startTime" />
-        <span v-else>-</span>
-      </div>
-    </div>
+    <LabeledInfo label="End Time" class="inline-info">
+      <time-ago v-if="dag.dagInfo.endTime" :value="dag.dagInfo.endTime" />
+    </LabeledInfo>
 
-    <div v-if="dag.dagDetails.diagnostics" class="info-row">
-      <div class="info-label">Diagnostics</div>
-      <pre class="info-value">{{ dag.dagDetails.diagnostics }}</pre>
-    </div>
+    <LabeledInfo v-if="dag.dagDetails.diagnostics" label="Diagnostics">
+      <pre>{{ dag.dagDetails.diagnostics }}</pre>
+    </LabeledInfo>
   </div>
 </template>
 
@@ -68,11 +54,12 @@
 
   import Duration from '../../../../../../components/Duration.vue';
   import TimeAgo from '../../../../../../components/TimeAgo.vue';
+  import LabeledInfo from '../components/LabeledInfo.vue';
 
   import { Dag } from '..';
 
   @Component({
-    components: { Duration, TimeAgo }
+    components: { Duration, TimeAgo, LabeledInfo }
   })
   export default class DagInfo extends Vue {
     @Prop({ required: true }) dag!: Dag;
@@ -83,25 +70,24 @@
   @import '../../../../../../components/styles/colors';
   @import '../../../../../../components/styles/mixins';
 
-  .info-inline,
-  .info-row {
-    margin-bottom: 15px;
+  .hue-info-box {
+    padding: 10px;
+    border: 1px solid $fluid-gray-300;
+    border-radius: $hue-panel-border-radius;
 
-    .info-label {
-      text-transform: uppercase;
-      color: $fluid-gray-500;
-      font-weight: normal;
-      font-size: 12px;
-      margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+
+    column-gap: 10px;
+    row-gap: 10px;
+
+    > * {
+      flex: 1;
+      flex-basis: 100%;
     }
 
-    .info-value {
-      color: $fluid-gray-700;
+    > .inline-info {
+      flex-basis: 600px;
     }
-  }
-
-  .info-inline {
-    display: inline-block;
-    min-width: 600px;
   }
 </style>

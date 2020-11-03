@@ -146,156 +146,160 @@ exports[`HiveTimeline.vue should render 1`] = `
     </div>
   </div>
    
-  <table
-    aria-describedby="Pre-Execution + DAG construction"
-    class="detail-list"
+  <div
+    class="timeline-details"
   >
-    <thead>
-      <tr>
-        <th
-          colspan="2"
-          scope="colgroup"
-        >
+    <table
+      aria-describedby="Pre-Execution + DAG construction"
+      class="detail-list"
+    >
+      <thead>
+        <tr>
+          <th
+            colspan="2"
+            scope="colgroup"
+          >
+            
+            Pre-Execution + DAG construction : 0ms
           
-          Pre-Execution + DAG construction : 0ms
-        
-        </th>
-      </tr>
-    </thead>
+          </th>
+        </tr>
+      </thead>
+       
+      <tbody>
+        <tr>
+          <td>
+            <i />
+            Compile
+          </td>
+           
+          <td>
+            0ms
+          </td>
+        </tr>
+         
+        <tr>
+          <td>
+            <i />
+            Parse
+          </td>
+           
+          <td>
+            0ms
+          </td>
+        </tr>
+         
+        <tr>
+          <td>
+            <i />
+            Build Dag
+          </td>
+           
+          <td>
+            0ms
+          </td>
+        </tr>
+      </tbody>
+    </table>
      
-    <tbody>
-      <tr>
-        <td>
-          <i />
-          Compile
-        </td>
-         
-        <td>
-          0ms
-        </td>
-      </tr>
-       
-      <tr>
-        <td>
-          <i />
-          Parse
-        </td>
-         
-        <td>
-          0ms
-        </td>
-      </tr>
-       
-      <tr>
-        <td>
-          <i />
-          Build Dag
-        </td>
-         
-        <td>
-          0ms
-        </td>
-      </tr>
-    </tbody>
-  </table>
-   
-  <table
-    aria-describedby="DAG Submission"
-    class="detail-list"
-  >
-    <thead>
-      <tr>
-        <th
-          colspan="2"
-          scope="colgroup"
-        >
+    <table
+      aria-describedby="DAG Submission"
+      class="detail-list"
+    >
+      <thead>
+        <tr>
+          <th
+            colspan="2"
+            scope="colgroup"
+          >
+            
+            DAG Submission : 0ms
           
-          DAG Submission : 0ms
-        
-        </th>
-      </tr>
-    </thead>
-     
-    <tbody>
-      <tr>
-        <td>
-          <i />
-          Submit Dag
-        </td>
-         
-        <td>
-          0ms
-        </td>
-      </tr>
+          </th>
+        </tr>
+      </thead>
        
-      <tr>
-        <td>
-          <i />
-          Submit To Running
-        </td>
+      <tbody>
+        <tr>
+          <td>
+            <i />
+            Submit Dag
+          </td>
+           
+          <td>
+            0ms
+          </td>
+        </tr>
          
-        <td>
-          0ms
-        </td>
-      </tr>
-    </tbody>
-  </table>
-   
-  <table
-    aria-describedby="DAG Runtime"
-    class="detail-list"
-  >
-    <thead>
-      <tr>
-        <th
-          colspan="2"
-          scope="colgroup"
-        >
+        <tr>
+          <td>
+            <i />
+            Submit To Running
+          </td>
+           
+          <td>
+            0ms
+          </td>
+        </tr>
+      </tbody>
+    </table>
+     
+    <table
+      aria-describedby="DAG Runtime"
+      class="detail-list"
+    >
+      <thead>
+        <tr>
+          <th
+            colspan="2"
+            scope="colgroup"
+          >
+            
+            DAG Runtime : 0ms
           
-          DAG Runtime : 0ms
-        
-        </th>
-      </tr>
-    </thead>
+          </th>
+        </tr>
+      </thead>
+       
+      <tbody>
+        <tr>
+          <td>
+            <i />
+            Run Dag
+          </td>
+           
+          <td>
+            0ms
+          </td>
+        </tr>
+      </tbody>
+    </table>
      
-    <tbody>
-      <tr>
-        <td>
-          <i />
-          Run Dag
-        </td>
-         
-        <td>
-          0ms
-        </td>
-      </tr>
-    </tbody>
-  </table>
-   
-  <table
-    aria-describedby="Post Execution"
-    class="detail-list"
-  >
-    <thead>
-      <tr>
-        <th
-          colspan="2"
-          scope="colgroup"
-        >
+    <table
+      aria-describedby="Post Execution"
+      class="detail-list"
+    >
+      <thead>
+        <tr>
+          <th
+            colspan="2"
+            scope="colgroup"
+          >
+            
+            Post Execution : 0ms
           
-          Post Execution : 0ms
-        
-        </th>
-      </tr>
-    </thead>
-     
-    <tbody>
-      <!---->
+          </th>
+        </tr>
+      </thead>
        
-      <!---->
-       
-      <!---->
-    </tbody>
-  </table>
+      <tbody>
+        <!---->
+         
+        <!---->
+         
+        <!---->
+      </tbody>
+    </table>
+  </div>
 </div>
 `;

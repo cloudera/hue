@@ -28,11 +28,13 @@ export default function draw(
   containerElement: HTMLElement,
   onRequestDetail: any,
   queryDetails: any
-): any {
-  if (isExplainable(data)) {
+): boolean {
+  const explainable = isExplainable(data);
+  if (explainable) {
     const transformed = doTransform(data, queryDetails);
     doRender(transformed, containerElement, onRequestDetail);
   } else {
     doRenderError(containerElement);
   }
+  return explainable;
 }

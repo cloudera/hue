@@ -88,90 +88,92 @@
       </div>
     </div>
 
-    <table class="detail-list" aria-describedby="Pre-Execution + DAG construction">
-      <thead>
-        <tr>
-          <th scope="colgroup" colspan="2">
-            Pre-Execution + DAG construction : {{ fmtDuration(normalizedPerf.groupTotal.pre) }}
-          </th>
-        </tr>
-      </thead>
+    <div class="timeline-details">
+      <table class="detail-list" aria-describedby="Pre-Execution + DAG construction">
+        <thead>
+          <tr>
+            <th scope="colgroup" colspan="2">
+              Pre-Execution + DAG construction : {{ fmtDuration(normalizedPerf.groupTotal.pre) }}
+            </th>
+          </tr>
+        </thead>
 
-      <tbody>
-        <tr>
-          <td><i />Compile</td>
-          <td>{{ fmtDuration(normalizedPerf.compile) }}</td>
-        </tr>
-        <tr>
-          <td><i />Parse</td>
-          <td>{{ fmtDuration(normalizedPerf.parse) }}</td>
-        </tr>
-        <tr>
-          <td><i />Build Dag</td>
-          <td>{{ fmtDuration(normalizedPerf.TezBuildDag) }}</td>
-        </tr>
-      </tbody>
-    </table>
+        <tbody>
+          <tr>
+            <td><i />Compile</td>
+            <td>{{ fmtDuration(normalizedPerf.compile) }}</td>
+          </tr>
+          <tr>
+            <td><i />Parse</td>
+            <td>{{ fmtDuration(normalizedPerf.parse) }}</td>
+          </tr>
+          <tr>
+            <td><i />Build Dag</td>
+            <td>{{ fmtDuration(normalizedPerf.TezBuildDag) }}</td>
+          </tr>
+        </tbody>
+      </table>
 
-    <table class="detail-list" aria-describedby="DAG Submission">
-      <thead>
-        <tr>
-          <th scope="colgroup" colspan="2">
-            DAG Submission : {{ fmtDuration(normalizedPerf.groupTotal.submit) }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><i />Submit Dag</td>
-          <td>{{ fmtDuration(normalizedPerf.TezSubmitDag) }}</td>
-        </tr>
-        <tr>
-          <td><i />Submit To Running</td>
-          <td>{{ fmtDuration(normalizedPerf.TezSubmitToRunningDag) }}</td>
-        </tr>
-      </tbody>
-    </table>
+      <table class="detail-list" aria-describedby="DAG Submission">
+        <thead>
+          <tr>
+            <th scope="colgroup" colspan="2">
+              DAG Submission : {{ fmtDuration(normalizedPerf.groupTotal.submit) }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><i />Submit Dag</td>
+            <td>{{ fmtDuration(normalizedPerf.TezSubmitDag) }}</td>
+          </tr>
+          <tr>
+            <td><i />Submit To Running</td>
+            <td>{{ fmtDuration(normalizedPerf.TezSubmitToRunningDag) }}</td>
+          </tr>
+        </tbody>
+      </table>
 
-    <table class="detail-list" aria-describedby="DAG Runtime">
-      <thead>
-        <tr>
-          <th scope="colgroup" colspan="2">
-            DAG Runtime : {{ fmtDuration(normalizedPerf.groupTotal.running) }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><i />Run Dag</td>
-          <td>{{ fmtDuration(normalizedPerf.TezRunDag) }}</td>
-        </tr>
-      </tbody>
-    </table>
+      <table class="detail-list" aria-describedby="DAG Runtime">
+        <thead>
+          <tr>
+            <th scope="colgroup" colspan="2">
+              DAG Runtime : {{ fmtDuration(normalizedPerf.groupTotal.running) }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><i />Run Dag</td>
+            <td>{{ fmtDuration(normalizedPerf.TezRunDag) }}</td>
+          </tr>
+        </tbody>
+      </table>
 
-    <table class="detail-list" aria-describedby="Post Execution">
-      <thead>
-        <tr>
-          <th scope="colgroup" colspan="2">
-            Post Execution : {{ fmtDuration(normalizedPerf.groupTotal.post) }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-if="normalizedPerf.PostHiveProtoLoggingHook">
-          <td><i />Post Hive Hook</td>
-          <td>{{ fmtDuration(normalizedPerf.PostHiveProtoLoggingHook) }}</td>
-        </tr>
-        <tr v-if="normalizedPerf.RemoveTempOrDuplicateFiles">
-          <td><i />Remove Files</td>
-          <td>{{ fmtDuration(normalizedPerf.RemoveTempOrDuplicateFiles) }}</td>
-        </tr>
-        <tr v-if="normalizedPerf.RenameOrMoveFiles">
-          <td><i />Rename Or Move Files</td>
-          <td>{{ fmtDuration(normalizedPerf.RenameOrMoveFiles) }}</td>
-        </tr>
-      </tbody>
-    </table>
+      <table class="detail-list" aria-describedby="Post Execution">
+        <thead>
+          <tr>
+            <th scope="colgroup" colspan="2">
+              Post Execution : {{ fmtDuration(normalizedPerf.groupTotal.post) }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="normalizedPerf.PostHiveProtoLoggingHook">
+            <td><i />Post Hive Hook</td>
+            <td>{{ fmtDuration(normalizedPerf.PostHiveProtoLoggingHook) }}</td>
+          </tr>
+          <tr v-if="normalizedPerf.RemoveTempOrDuplicateFiles">
+            <td><i />Remove Files</td>
+            <td>{{ fmtDuration(normalizedPerf.RemoveTempOrDuplicateFiles) }}</td>
+          </tr>
+          <tr v-if="normalizedPerf.RenameOrMoveFiles">
+            <td><i />Rename Or Move Files</td>
+            <td>{{ fmtDuration(normalizedPerf.RenameOrMoveFiles) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 

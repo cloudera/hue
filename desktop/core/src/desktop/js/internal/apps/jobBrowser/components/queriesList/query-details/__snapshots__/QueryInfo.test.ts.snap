@@ -1,201 +1,105 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`QueryInfo.vue should render 1`] = `
-<div>
-  <div
-    class="query-info-row query-info-box"
-  >
+<div
+  class="query-info layout-row"
+>
+  <div>
     <div
-      class="query-info-label"
+      class="hue-info-box"
     >
-      Query
-    </div>
-     
-    <div
-      class="query-info-query"
-    >
-      <sql-text-stub
-        enableoverflow="true"
-        format="true"
-      />
+      <labeledinfo-stub
+        label="Query"
+      >
+        <sql-text-stub
+          enableoverflow="true"
+          format="true"
+        />
+      </labeledinfo-stub>
     </div>
   </div>
    
-  <div
-    class="query-info-box"
-  >
+  <div>
     <div
-      class="query-info-row"
+      class="hue-info-box"
     >
-      <div
-        class="query-info-label"
+      <labeledinfo-stub
+        label="Start Time"
       >
-        Start Time
-      </div>
+        <!---->
+      </labeledinfo-stub>
        
-      <div
-        class="query-info-value"
+      <labeledinfo-stub
+        label="End Time"
       >
-        <time-ago-stub />
-      </div>
-    </div>
-     
-    <div
-      class="query-info-row"
-    >
-      <div
-        class="query-info-label"
-      >
-        End Time
-      </div>
+        <!---->
+      </labeledinfo-stub>
        
-      <div
-        class="query-info-value"
+      <labeledinfo-stub
+        label="Duration"
       >
-        <time-ago-stub />
-      </div>
-    </div>
-     
-    <div
-      class="query-info-row"
-    >
-      <div
-        class="query-info-label"
-      >
-        Duration
-      </div>
+        <!---->
+      </labeledinfo-stub>
        
-      <div
-        class="query-info-value"
+      <labeledinfo-stub
+        label="Tables Read"
       >
-        <span>
-          -
-        </span>
-      </div>
-    </div>
-     
-    <div
-      class="query-info-row"
-    >
-      <div
-        class="query-info-label"
-      >
-        Tables Read
-      </div>
+        <tableslist-stub />
+      </labeledinfo-stub>
        
-      <div
-        class="query-info-value"
+      <labeledinfo-stub
+        label="Tables Written"
       >
-        <span>
-          -
-        </span>
-      </div>
-    </div>
-     
-    <div
-      class="query-info-row"
-    >
-      <div
-        class="query-info-label"
-      >
-        Tables Written
-      </div>
+        <tableslist-stub />
+      </labeledinfo-stub>
        
-      <div
-        class="query-info-value"
-      >
-        <span>
-          -
-        </span>
-      </div>
-    </div>
-     
-    <div
-      class="query-info-row"
-    >
-      <div
-        class="query-info-label"
-      >
-        Application ID
-      </div>
-       
-      <div
-        class="query-info-value"
-      >
-        <span>
-          -
-        </span>
-      </div>
-    </div>
-     
-    <div
-      class="query-info-row"
-    >
-      <div
-        class="query-info-label"
-      >
-        DAG ID
-      </div>
-       
-      <div
-        class="query-info-value"
-      >
-        <span>
-          -
-        </span>
-      </div>
-    </div>
-     
-    <div
-      class="query-info-row"
-    >
-      <div
-        class="query-info-label"
-      >
-        Session ID
-      </div>
-       
-      <div
-        class="query-info-value"
+      <labeledinfo-stub
+        label="Application ID"
       >
         
-      </div>
-    </div>
-     
-    <!---->
-     
-    <div
-      class="query-info-row"
-    >
-      <div
-        class="query-info-label"
-      >
-        Thread Id
-      </div>
+        
+      
+      </labeledinfo-stub>
        
-      <div
-        class="query-info-value"
+      <labeledinfo-stub
+        label="DAG ID"
       >
         
-      </div>
-    </div>
-     
-    <div
-      class="query-info-row"
-    >
-      <div
-        class="query-info-label"
-      >
-        Queue
-      </div>
+        
+      
+      </labeledinfo-stub>
        
-      <div
-        class="query-info-value"
+      <labeledinfo-stub
+        label="Session ID"
+      >
+        
+        
+      
+      </labeledinfo-stub>
+       
+      <labeledinfo-stub
+        label="LLAP App ID"
+      >
+        
+        
+      
+      </labeledinfo-stub>
+       
+      <labeledinfo-stub
+        label="Thread Id"
+      >
+        
+        
+      
+      </labeledinfo-stub>
+       
+      <labeledinfo-stub
+        label="Queue"
       >
         <span>
           None
         </span>
-      </div>
+      </labeledinfo-stub>
     </div>
   </div>
 </div>
