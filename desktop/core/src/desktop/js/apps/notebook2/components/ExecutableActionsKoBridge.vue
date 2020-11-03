@@ -29,19 +29,16 @@
 <script lang="ts">
   import ExecutableActions from './ExecutableActions.vue';
   import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
-  import HueButton from 'components/HueButton.vue';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
-  import I18n from 'utils/i18n';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
   import { wrap } from 'vue/webComponentWrapper';
 
   @Component({
-    components: { HueButton, ExecutableActions },
-    methods: { I18n }
+    components: { ExecutableActions }
   })
-  export default class SqlEditor extends Vue {
+  export default class ExecutableActionsKoBridge extends Vue {
     @Prop()
     executableObservable?: KnockoutObservable<SqlExecutable | undefined>;
     @Prop()
@@ -57,6 +54,7 @@
         this.subTracker.subscribe(this.executableObservable, (executable: SqlExecutable) => {
           this.executable = executable;
         });
+        this.initialized = true;
       }
     }
 
@@ -71,6 +69,6 @@
     }
   }
 
-  export const COMPONENT_NAME = 'sql-editor';
-  wrap(COMPONENT_NAME, SqlEditor);
+  export const COMPONENT_NAME = 'executable-actions-ko-bridge';
+  wrap(COMPONENT_NAME, ExecutableActionsKoBridge);
 </script>
