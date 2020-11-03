@@ -26,10 +26,10 @@ export interface ExecutorRaw {
 }
 
 export default class Executor {
-  connector: () => Connector;
-  compute: () => Compute;
-  namespace: () => Namespace;
-  database: () => string;
+  connector: KnockoutObservable<Connector>;
+  compute: KnockoutObservable<Compute>;
+  namespace: KnockoutObservable<Namespace>;
+  database: KnockoutObservable<string>;
   defaultLimit?: KnockoutObservable<number>;
   isSqlEngine?: boolean;
   isOptimizerEnabled?: boolean;
@@ -38,10 +38,10 @@ export default class Executor {
   snippet?: Snippet;
 
   constructor(options: {
-    connector: () => Connector;
-    compute: () => Compute;
-    namespace: () => Namespace;
-    database: () => string;
+    connector: KnockoutObservable<Connector>;
+    compute: KnockoutObservable<Compute>;
+    namespace: KnockoutObservable<Namespace>;
+    database: KnockoutObservable<string>;
     defaultLimit?: KnockoutObservable<number>;
     isSqlEngine?: boolean;
     snippet?: Snippet;
