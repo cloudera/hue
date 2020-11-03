@@ -366,7 +366,7 @@ export default class Snippet {
     huePubSub.subscribe(
       ACTIVE_STATEMENT_CHANGED_EVENT,
       statementDetails => {
-        if (this.ace() && this.ace().container.id === statementDetails.id) {
+        if (this.id() === statementDetails.id) {
           for (let i = statementDetails.precedingStatements.length - 1; i >= 0; i--) {
             if (statementDetails.precedingStatements[i].database) {
               this.availableDatabases().some(availableDatabase => {
