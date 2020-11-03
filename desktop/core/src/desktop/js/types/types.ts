@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { HueDebug } from 'utils/hueDebug';
+
 export interface GenericApiResponse {
   status: number;
   message?: string;
@@ -26,4 +28,12 @@ declare global {
   }
 
   const moment: Moment & ((val: unknown) => Moment);
+}
+
+export interface hueWindow {
+  ENABLE_SQL_SYNTAX_CHECK?: boolean;
+  LOGGED_USERNAME?: string;
+  WEB_SOCKETS_ENABLED?: boolean;
+  WS_CHANNEL?: string;
+  hueDebug?: HueDebug;
 }
