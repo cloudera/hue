@@ -563,6 +563,13 @@ class Api(object):
   def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
     raise NotImplementedError()
 
+  def explain(self, notebook, snippet):
+    return {
+      'status': 0,
+      'explanation': '',
+      'statement': '',
+    }
+
   def export_data_as_hdfs_file(self, snippet, target_file, overwrite):
     raise NotImplementedError()
 
