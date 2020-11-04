@@ -424,12 +424,21 @@ class Sidebar {
 
               if (appName === 'editor' && window.SHOW_ADD_MORE_EDITORS) {
                 subApps.push(new SidebarItem({ isDivider: true }));
-                subApps.push(
-                  new SidebarItem({
-                    displayName: I18n('Add more...'),
-                    href: 'https://docs.gethue.com/administrator/configuration/connectors/'
-                  })
-                );
+                if (window.HAS_CONNECTORS) {
+                  subApps.push(
+                    new SidebarItem({
+                      displayName: I18n('Add more...'),
+                      url: '/desktop/connectors'
+                    })
+                  );
+                } else {
+                  subApps.push(
+                    new SidebarItem({
+                      displayName: I18n('Add more...'),
+                      href: 'https://docs.gethue.com/administrator/configuration/connectors/'
+                    })
+                  );
+                }
               }
               appsItems.push(
                 new SidebarItem({
