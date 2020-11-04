@@ -148,30 +148,31 @@ class FlinkSqlApi(Api):
     global n
     response = {}
     session = self._get_session()
-    statement_id = snippet['result']['handle']['guid']
 
     status = 'expired'
 
-    if session:
-      if not statement_id:  # Sync result
-        status = 'available'
-      else:
-        try:
-          resp = self.db.fetch_status(session['id'], statement_id)
-          if resp.get('status') == 'RUNNING':
-            status = 'streaming'
-            response['result'] = self.fetch_result(notebook, snippet, n, False)
-          elif resp.get('status') == 'FINISHED':
-            status = 'available'
-          elif resp.get('status') == 'FAILED':
-            status = 'failed'
-          elif resp.get('status') == 'CANCELED':
-            status = 'expired'
-        except Exception as e:
-          if '%s does not exist in current session' % statement_id in str(e):
-            LOG.warn('Job: %s does not exist' % statement_id)
-          else:
-            raise e
+    if snippet.get('result'):
+      statement_id = snippet['result']['handle']['guid']
+      if session:
+        if not statement_id:  # Sync result
+          status = 'available'
+        else:
+          try:
+            resp = self.db.fetch_status(session['id'], statement_id)
+            if resp.get('status') == 'RUNNING':
+              status = 'streaming'
+              response['result'] = self.fetch_result(notebook, snippet, n, False)
+            elif resp.get('status') == 'FINISHED':
+              status = 'available'
+            elif resp.get('status') == 'FAILED':
+              status = 'failed'
+            elif resp.get('status') == 'CANCELED':
+              status = 'expired'
+          except Exception as e:
+            if '%s does not exist in current session' % statement_id in str(e):
+              LOG.warn('Job: %s does not exist' % statement_id)
+            else:
+              raise e
 
     response['status'] = status
 
