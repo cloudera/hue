@@ -281,8 +281,10 @@ class FlinkSqlApi(Api):
 
 
   def close_session(self, session):
-    session = self._get_session()
-    self.db.close_session(session['id'])
+    # Avoid closing session on page refresh or editor close for now
+    pass
+    # session = self._get_session()
+    # self.db.close_session(session['id'])
 
 
 class FlinkSqlClient():
