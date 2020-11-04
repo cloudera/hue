@@ -139,14 +139,14 @@
         );
       });
 
-      this.$el.innerHTML =
-        '<div class="ace_editor ace-hue"' +
-        (this.enableOverflow ? ' style="overflow: initial !important;"' : '') +
-        '><div class="ace_layer" style="position: static;' +
-        (this.enableOverflow ? ' overflow: initial !important;' : '') +
-        '">' +
-        res.join('') +
-        '</div></div>';
+      const overflowStyle = this.enableOverflow ? ' overflow: initial !important;' : '';
+      //TODO - Move inline styles to CSS class
+      this.$el.innerHTML = `
+        <div class="ace_editor ace-hue" style="background-color: transparent; ${overflowStyle}">
+          <div class="ace_layer" style="position: static; ${overflowStyle}">${res.join('')}</div>
+        </div>
+      `;
+
       if (this.enableOverflow) {
         $(this.$el).css({ overflow: 'auto' });
       }

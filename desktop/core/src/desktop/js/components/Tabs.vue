@@ -78,7 +78,7 @@
     ul {
       border-bottom: 1px solid $hue-border-color;
       list-style: none;
-      margin: 20px 12px;
+      margin: 0;
 
       li {
         display: inline-block;
@@ -101,7 +101,7 @@
     }
     .hue-tab-container {
       position: relative;
-      margin: 12px;
+      margin: 12px 0;
       background-color: $fluid-white;
     }
   }

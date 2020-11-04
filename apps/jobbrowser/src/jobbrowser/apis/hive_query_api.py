@@ -52,7 +52,7 @@ class HiveQueryApi(Api):
         "queries": [{
             "details": None,
             "dags": [],
-            "id": query.query_id,
+            "id": query.id,
             "queryId": query.query_id,
             "startTime": query.start_time,
             "query": query.query.replace('\r\n', ' ')[:60] + ('...' if len(query.query) > 60 else ''),
@@ -82,7 +82,6 @@ class HiveQueryApi(Api):
             "domainId": query.domain_id,
             "llapAppId": query.llap_app_id,
             "usedCBO": query.used_cbo,
-            "processed": query.processed,
             "createdAt": query.created_at
           }
           for query in queries
