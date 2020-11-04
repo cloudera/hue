@@ -5,7 +5,7 @@ exports[`DateRangePicker.vue should render 1`] = `
   class="hue-dropdown-panel"
 >
   <button
-    class="btn"
+    class="hue-btn"
     type="button"
   >
     

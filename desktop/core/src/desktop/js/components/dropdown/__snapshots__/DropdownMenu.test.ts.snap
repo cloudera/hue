@@ -5,7 +5,7 @@ exports[`DropdownMenu.vue should render dropdown with slots 1`] = `
   class="hue-dropdown-panel hue-dropdown-menu"
 >
   <button
-    class="btn"
+    class="hue-btn"
     type="button"
   >
     
@@ -40,7 +40,7 @@ exports[`DropdownMenu.vue should render empty dropdown 1`] = `
   class="hue-dropdown-panel hue-dropdown-menu"
 >
   <button
-    class="btn"
+    class="hue-btn"
     type="button"
   >
     

@@ -189,6 +189,13 @@ def query_store_api(request, path=None):
       response['message'] = ex_response.reason
       response['content'] = ex_response.text
 
+  else:
+
+    if path == 'api/query/search':
+      filters = json.loads(request.body)
+      resp = get_api(request.user, interface='queries-hive').apps(filters['search'])
+      response = resp['apps']
+
   return JsonResponse(response)
 
 

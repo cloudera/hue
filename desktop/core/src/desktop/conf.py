@@ -896,6 +896,12 @@ KERBEROS = ConfigSection(
       type=str,
       default="/var/run/hue/hue_krb5_ccache",
     ),
+    ENABLE_RENEWLIFETIME=Config(
+      key='krb5_renewlifetime_enabled',
+      help=_("set this to false if renew_lifetime in krb5.conf is set to 0m"),
+      type=coerce_bool,
+      default=True,
+    ),
     KINIT_PATH=Config(
       key='kinit_path',
       help=_("Path to Kerberos 'kinit' command."),

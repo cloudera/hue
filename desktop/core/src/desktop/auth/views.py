@@ -46,6 +46,7 @@ from desktop.auth import forms as auth_forms
 from desktop.auth.backend import OIDCBackend
 from desktop.auth.forms import ImpersonationAuthenticationForm, OrganizationUserCreationForm, OrganizationAuthenticationForm
 from desktop.conf import OAUTH, ENABLE_ORGANIZATIONS
+from desktop.lib import fsmanager
 from desktop.lib.django_util import render, login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.log.access import access_log, access_warn, last_access_map
@@ -65,7 +66,7 @@ LOG = logging.getLogger(__name__)
 def get_current_users():
   """Return dictionary of User objects and
   a dictionary of the user's IP address and last access time"""
-  current_users = { }
+  current_users = {}
   for session in Session.objects.all():
     try:
       uid = session.get_decoded().get(django.contrib.auth.SESSION_KEY)
@@ -146,7 +147,8 @@ def dt_login(request, from_modal=False):
 
         if request.session.test_cookie_worked():
           request.session.delete_test_cookie()
-
+        if request.fs is None:
+          request.fs = fsmanager.get_filesystem(request.fs_ref)
         try:
           ensure_home_directory(request.fs, user)
         except (IOError, WebHdfsException) as e:
@@ -180,10 +182,12 @@ def dt_login(request, from_modal=False):
     first_user_form = None
     auth_form = AuthenticationForm()
     # SAML/OIDC user is already authenticated in djangosaml2.views.login
-    if hasattr(request,'fs') and (
+    if hasattr(request, 'fs') and (
         'KnoxSpnegoDjangoBackend' in backend_names or 'SpnegoDjangoBackend' in backend_names or 'OIDCBackend' in backend_names or
         'SAML2Backend' in backend_names
       ) and request.user.is_authenticated():
+      if request.fs is None:
+        request.fs = fsmanager.get_filesystem(request.fs_ref)
       try:
         ensure_home_directory(request.fs, request.user)
       except (IOError, WebHdfsException) as e:
@@ -234,7 +238,7 @@ def dt_logout(request, next_page=None):
   # Close Impala session on logout
   session_app = "impala"
   if request.user.has_hue_permission(action='access', app=session_app):
-    session = {"type": session_app, "sourceMethod":" dt_logout"}
+    session = {"type": session_app, "sourceMethod": " dt_logout"}
     try:
       get_api(request, session).close_session(session)
     except PopupException as e:
@@ -308,7 +312,7 @@ def oauth_authenticated(request):
 
   resp, content = client.request(OAUTH.ACCESS_TOKEN_URL.get(), "GET")
   if resp['status'] != '200':
-      raise Exception(_("Invalid response from OAuth provider: %s") % resp)
+    raise Exception(_("Invalid response from OAuth provider: %s") % resp)
 
   access_token = dict(cgi.parse_qsl(content))
 
