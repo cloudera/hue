@@ -5,15 +5,17 @@ draft: false
 weight: -1
 ---
 
+You will need Python, some OS packages, a Database and Node.js.
+
 ## Python
 
 Hue employs some Python modules which use native code and requires certain development libraries be installed on your system. To install from the tarball, you'll need these library development packages and tools installed on your system:
 
 Versions supported:
 * Python 2.7
-* Python 3.5+ (can be tested cf. instructions on [HUE-8737](https://issues.cloudera.org/browse/HUE-8737))
+* Python 3.6+
 ```
-# If you are using Python 3.5+, set PYTHON_VER before the build, like
+# If you are using Python 3.6+, set PYTHON_VER before the build, like
 export PYTHON_VER=python3.8
 ```
 
@@ -103,6 +105,11 @@ There is more details on this [Apply Temporary Workaround for Oracle 12 Client](
 
     sudo apt-get install git ant gcc g++ libffi-dev libkrb5-dev libmysqlclient-dev libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libssl-dev libxml2-dev libxslt-dev make maven libldap2-dev python-dev python-setuptools libgmp3-dev
 
+With Python 3, also:
+
+    sudo apt-get install python3.8-dev python3-distutils
+
+
 ### CentOS/RHEL
 
     sudo yum install ant asciidoc cyrus-sasl-devel cyrus-sasl-gssapi cyrus-sasl-plain gcc gcc-c++ krb5-devel libffi-devel libxml2-devel libxslt-devel make mysql mysql-devel openldap-devel python-devel sqlite-devel gmp-devel
@@ -110,57 +117,6 @@ There is more details on this [Apply Temporary Workaround for Oracle 12 Client](
 * mvn (from [``apache-maven``](https://gist.github.com/sebsto/19b99f1fa1f32cae5d00) package or maven3 tarball)
 * libtidy (for unit tests only)
 * openssl-devel (for version 7+)
-
-Installing Python 2.7:
-
-### CentOS 6.8 / 6.9 OS
-
-Check your OS Version:
-
-    cat /etc/redhat-release
-
-Make sure "/etc/redhat-release" contains "CentOS 6.8 or 6.9" version. These instructions are tested on CentOS 6.8 and 6.9 versions only. It may or may not work on previous CentOS 6 series OS.
-
-    yum install -y centos-release-SCL
-    yum install -y scl-utils
-    yum install -y python27
-
-### RedHat 6.8 / 6.9 OS
-
-Check your OS Version
-
-    cat /etc/redhat-release
-
-Make sure `/etc/redhat-release` contains "RedHat 6.8 or 6.9" version. These instructions are tested on RedHat 6.8 and 6.9 versions only. It may or may not work on previous RedHat 6 series OS.
-
-    wget http://mirror.infra.cloudera.com/centos/6/extras/x86_64/Packages/centos-release-scl-rh-2-3.el6.centos.noarch.rpm
-    rpm -ivh centos-release-scl-rh-2-3.el6.centos.noarch.rpm
-    yum install -y scl-utils
-    yum install -y python27
-
-### Oracle 6.8 / 6.9 OS
-
-Check your OS Version
-
-    cat /etc/redhat-release
-
-Make sure `/etc/redhat-release` contains "Oracle 6.8 or 6.9" version. These instructions are tested on Oracle 6.8 and 6.9 versions only. It may or may not work on previous Oracle 6 series OS.
-
-    wget -O /etc/yum.repos.d/public-yum-ol6.repo http://yum.oracle.com/public-yum-ol6.repo
-
-Set the value of the enabled parameter for the software_collections repository to 1: for file `/etc/yum.repos.d/public-yum-ol6.repo`
-
-    [ol6_software_collections]
-    name=Software Collection Library release 3.0 packages for Oracle Linux 6 (x86_64)
-    baseurl=http://yum.oracle.com/repo/OracleLinux/OL6/SoftwareCollections/x86_64/
-    gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
-    gpgcheck=1
-    enabled=1
-
-for more details, refer to this link: [https://docs.oracle.com/cd/E37670_01/E59096/html/section_e3v_nbl_cr.html](https://docs.oracle.com/cd/E37670_01/E59096/html/section_e3v_nbl_cr.html)
-
-    yum install -y scl-utils
-    yum install -y python27
 
 ### SLES 12
 
@@ -218,6 +174,57 @@ e.g. how to install on Ubuntu:
 
     curl -sL https://deb.nodesource.com/setup_10.x | sudo bash -
     sudo apt-get install -y nodejs
+
+## Installing Python 2.7
+
+### CentOS 6.8 / 6.9 OS
+
+Check your OS Version:
+
+    cat /etc/redhat-release
+
+Make sure "/etc/redhat-release" contains "CentOS 6.8 or 6.9" version. These instructions are tested on CentOS 6.8 and 6.9 versions only. It may or may not work on previous CentOS 6 series OS.
+
+    yum install -y centos-release-SCL
+    yum install -y scl-utils
+    yum install -y python27
+
+### RedHat 6.8 / 6.9 OS
+
+Check your OS Version
+
+    cat /etc/redhat-release
+
+Make sure `/etc/redhat-release` contains "RedHat 6.8 or 6.9" version. These instructions are tested on RedHat 6.8 and 6.9 versions only. It may or may not work on previous RedHat 6 series OS.
+
+    wget http://mirror.infra.cloudera.com/centos/6/extras/x86_64/Packages/centos-release-scl-rh-2-3.el6.centos.noarch.rpm
+    rpm -ivh centos-release-scl-rh-2-3.el6.centos.noarch.rpm
+    yum install -y scl-utils
+    yum install -y python27
+
+### Oracle 6.8 / 6.9 OS
+
+Check your OS Version
+
+    cat /etc/redhat-release
+
+Make sure `/etc/redhat-release` contains "Oracle 6.8 or 6.9" version. These instructions are tested on Oracle 6.8 and 6.9 versions only. It may or may not work on previous Oracle 6 series OS.
+
+    wget -O /etc/yum.repos.d/public-yum-ol6.repo http://yum.oracle.com/public-yum-ol6.repo
+
+Set the value of the enabled parameter for the software_collections repository to 1: for file `/etc/yum.repos.d/public-yum-ol6.repo`
+
+    [ol6_software_collections]
+    name=Software Collection Library release 3.0 packages for Oracle Linux 6 (x86_64)
+    baseurl=http://yum.oracle.com/repo/OracleLinux/OL6/SoftwareCollections/x86_64/
+    gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-oracle
+    gpgcheck=1
+    enabled=1
+
+for more details, refer to this link: [https://docs.oracle.com/cd/E37670_01/E59096/html/section_e3v_nbl_cr.html](https://docs.oracle.com/cd/E37670_01/E59096/html/section_e3v_nbl_cr.html)
+
+    yum install -y scl-utils
+    yum install -y python27
 
 ## Java
 
