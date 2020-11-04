@@ -232,6 +232,13 @@ class SqlAlchemyApi(Api):
         self.interpreter.get('dialect_properties') and self.interpreter['dialect_properties']['trim_statement_semicolon']:
       statement = statement.strip().rstrip(';')
 
+    if self.options['url'].startswith('bigquery://'):
+      statement = ''' SELECT * FROM ML.PREDICT(
+                MODEL `%(model)s`, (
+                  %(statement)s
+                )
+              )''' % {'statement': statement.strip(';'), 'model': 'ml.natality_model'}
+
     result = connection.execute(statement)
 
     cache = {
@@ -279,7 +286,7 @@ class SqlAlchemyApi(Api):
         from metadata.models.base import get_api
         from google.api_core.exceptions import GoogleAPICallError
         connector_id = snippet['type']
-        
+
         try:
           query_stats = get_api(self.user, connector_id).dry_run(statement)['statistics']['query']
 

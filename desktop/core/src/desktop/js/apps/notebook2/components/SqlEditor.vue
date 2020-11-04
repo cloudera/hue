@@ -23,11 +23,17 @@
       :before-execute="beforeExecute"
       @limit-changed="limitChanged"
     />
+    <model-executable-actions
+      :executable="executable"
+      :before-execute="beforeExecute"
+      @limit-changed="limitChanged"
+    />
   </div>
 </template>
 
 <script lang="ts">
   import ExecutableActions from './ExecutableActions.vue';
+  import ModelExecutableActions from './ModelExecutableActions.vue';
   import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
   import HueButton from 'components/HueButton.vue';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
@@ -38,7 +44,7 @@
   import { wrap } from 'vue/webComponentWrapper';
 
   @Component({
-    components: { HueButton, ExecutableActions },
+    components: { HueButton, ExecutableActions, ModelExecutableActions },
     methods: { I18n }
   })
   export default class SqlEditor extends Vue {
