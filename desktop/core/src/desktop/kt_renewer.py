@@ -45,9 +45,15 @@ def renew_from_kt():
     max_retries = 0 if subp.returncode == 0 else max_retries
     if subp.returncode != 0:
       retries = retries + 1
+      subp_stdout = subp.stdout.readlines()
+      subp_stderr = subp.stderr.readlines()
+
+      if sys.version_info[0] > 2:
+        subp_stdout = [line.decode() for line in subp.stdout.readlines()]
+        subp_stderr = [line.decode() for line in subp.stderr.readlines()]
+
       LOG.error("Couldn't reinit from keytab! `kinit' exited with %s.\n%s\n%s" % (
-                subp.returncode,
-                "\n".join(subp.stdout.readlines()), "\n".join(subp.stderr.readlines())))
+                subp.returncode, "\n".join(subp_stdout), "\n".join(subp_stderr)))
       if retries >= max_retries:
         LOG.error("FATAL: max_retries of %s reached. Exiting..." % max_retries)
         sys.exit(subp.returncode)
