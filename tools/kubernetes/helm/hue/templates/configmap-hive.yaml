@@ -4,11 +4,11 @@ metadata:
   name: hive-config
 data:
   hive-site: |
-  <?xml version="1.0"?>
-  <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+    <?xml version="1.0"?>
+    <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 
-  <configuration>
+    <configuration>
 
-  {{ .Values.hive.site | indent 4 | trim }}
+    {{ .Values.hive.site | indent 4 | trim }}
 
-  </configuration>
+    </configuration>
