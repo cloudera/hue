@@ -58,6 +58,9 @@ spec:
         - name: config-volume-extra
           mountPath: /usr/share/hue/desktop/conf/zz-hue.ini
           subPath: hue-ini
+        - name: hive-config-volume
+          mountPath: /etc/hive/conf/hive-site.xml
+          subPath: hive-site
         readinessProbe:
           httpGet:
             path: /desktop/debug/is_alive
@@ -87,6 +90,9 @@ spec:
         - name: config-volume-extra
           configMap:
             name: hue-config-extra
+        - name: hive-config-volume
+          configMap:
+            name: hive-config
 {{ if .Values.balancer.enabled }}
         - name: nginx-config
           configMap:
