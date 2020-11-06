@@ -70,7 +70,7 @@ class HDFStemporaryUploadedFile(object):
 
     # We want to set the user to be the user doing the upload
     self._fs.setuser(request.user.username)
-    self._path = self._fs.mkswap(name, suffix='tmp', basedir=destination)
+    self._path = self._fs.mkswap(name, suffix='tmp', basedir=self._fs._temp_dir)
 
     # Check access permissions before attempting upload
     try:
