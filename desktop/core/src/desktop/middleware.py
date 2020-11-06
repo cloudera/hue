@@ -246,7 +246,7 @@ class AppSpecificMiddleware(object):
         mw_class = getattr(mod, mw_classname)
       except AttributeError:
         raise exceptions.ImproperlyConfigured(
-          _('Middleware module "%(module)s" does not define a "%(class)s" class.') % {'module': mw_module, 'class':mw_classname}
+          _('Middleware module "%(module)s" does not define a "%(class)s" class.') % {'module': mw_module, 'class': mw_classname}
         )
 
       try:

@@ -40,6 +40,10 @@ Remove and add the compatible MySql lib with these two commands:
     git cherry-pick 7a9100d4a7f38eaef7bd4bd7c715ac1f24a969a8
     git cherry-pick e67c1105b85b815346758ef1b9cd714dd91d7ea3
 
+    git clean -fdx
+
+    make apps
+
 Read [HUE-9390](https://issues.cloudera.org/browse/HUE-9390) for more details.
 
 ### PostgreSQL
