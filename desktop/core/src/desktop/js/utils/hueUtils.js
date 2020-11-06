@@ -168,7 +168,8 @@ export const changeURL = (newURL, params) => {
     url += (url.indexOf('?') === -1 ? '?' : '&') + extraSearch;
   }
   if (hashSplit.length > 1) {
-    url += '#' + hashSplit[1];
+    //the foldername may contain # , so create substring ignoring first #
+    url += '#' + newURL.substring(newURL.indexOf('#') + 1);
   } else if (window.location.hash) {
     url += window.location.hash;
   }
