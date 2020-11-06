@@ -597,6 +597,49 @@ When idle_session_timeout is set, users will automatically be logged out after N
 
 [Read more about it here](http://gethue.com/introducing-the-new-login-modal-and-idle-session-timeout/).
 
+### Login
+
+In the section:
+
+    [desktop]
+    [[auth]]
+
+Users will expire after they have not logged in for 'n' amount of seconds. A negative number means that users will never expire.
+
+    expires_after=-1
+
+Apply 'expires_after' to superusers.
+
+    expire_superusers=true
+
+Users will automatically be logged out after 'n' seconds of inactivity. A negative number means that idle sessions will not be timed out.
+
+    idle_session_timeout=-1
+
+Force users to change password on first login with desktop.auth.backend.AllowFirstUserDjangoBackend
+
+    change_default_password=false
+
+Number of login attempts allowed before a record is created for failed logins
+
+    login_failure_limit=3
+
+After number of allowed login attempts are exceeded, do we lock out this IP and optionally user agent?
+
+    login_lock_out_at_failure=false
+
+If set, defines period of inactivity in hours after which failed logins will be forgotten. A value of 0 or None will disable this check. Default: None
+
+    login_cooloff_time=None
+
+If True, lock out based on an IP address AND a user agent. This means requests from different user agents but from the same IP are treated differently.
+
+    login_lock_out_use_user_agent=false
+
+If True, lock out based on IP and user
+
+    login_lock_out_by_combination_user_and_ip=false
+
 ### Auditing
 
 Read more about [Auditing User Administration Operations with Hue and Cloudera Navigator](http://gethue.com/auditing-user-administration-operations-with-hue-and-cloudera-navigator-2/).
