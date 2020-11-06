@@ -171,7 +171,8 @@ class HDFSfileUploadHandler(FileUploadHandler):
     LOG.debug("HDFSfileUploadHandler receive_data_chunk")
 
     if not self._activated:
-      if self.request.META.get('PATH_INFO').startswith('/filebrowser') and self.request.META.get('PATH_INFO') != '/filebrowser/upload/archive':
+      if self.request.META.get('PATH_INFO').startswith('/filebrowser')\
+              and self.request.META.get('PATH_INFO') != '/filebrowser/upload/archive':
         raise SkipFile()
       return raw_data
 
