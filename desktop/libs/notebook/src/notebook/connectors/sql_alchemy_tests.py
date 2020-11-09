@@ -219,6 +219,19 @@ class TestApi(object):
       assert_equal(response['status'], 'available')
 
 
+  def test_explain(self):
+    snippet = Mock()
+    notebook = Mock()
+    with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi.explain') as explain:
+      output  = ('id: 1\nselect_type: SIMPLE\ntable: server_cost\npartitions: None\ntype: ALL\npossible_keys: None\n' +
+        'key: None\nkey_len: None\nref: None\nrows: 6\nfiltered: 100.0\nExtra: None')
+      explain.return_value = output
+
+      response = SqlAlchemyApi(self.user, self. interpreter).explain(notebook, snippet)
+
+      assert_equal(response, output)
+
+
   def test_get_sample_data(self):
     snippet = Mock()
 
