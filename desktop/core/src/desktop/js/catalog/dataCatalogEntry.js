@@ -212,7 +212,7 @@ const getFromMultiTableCatalog = function (catalogEntry, options, functionName) 
  *
  * @constructor
  */
-class DataCatalogEntry {
+export default class DataCatalogEntry {
   constructor(options) {
     const self = this;
 
@@ -1482,7 +1482,7 @@ class DataCatalogEntry {
    * @param {boolean} [options.refreshCache]
    * @param {boolean} [options.cancellable] - Default false
    *
-   * @return {CancellableJqPromise}
+   * @return {CancellableJqPromise<SourceMeta>}
    */
   getSourceMeta(options) {
     const self = this;
@@ -1796,5 +1796,3 @@ class DataCatalogEntry {
     return getFromMultiTableCatalog(self, options, 'getTopJoins');
   }
 }
-
-export default DataCatalogEntry;
