@@ -271,7 +271,6 @@ export class DataCatalog {
    * @param {Object} options
    * @param {ContextNamespace} options.namespace - The context namespace
    * @param {ContextCompute} options.compute - The context compute
-   * @param {Connector} options.connector
    * @param {string[][]} options.paths
    * @param {boolean} [options.silenceErrors] - Default true
    * @param {boolean} [options.cancellable] - Default false
@@ -719,7 +718,7 @@ export class DataCatalog {
    * @param {Connector} options.connector
    * @param {string[][]} options.paths
    *
-   * @return {Promise}
+   * @return {JQueryPromise}
    */
   getMultiTableEntry(options) {
     const self = this;
@@ -868,7 +867,7 @@ export default {
    * @param {Connector} options.connector
    * @param {string[][]} options.paths
    *
-   * @return {Promise}
+   * @return {JQueryPromise}
    */
   getMultiTableEntry: function (options) {
     return getCatalog(options.connector).getMultiTableEntry(options);

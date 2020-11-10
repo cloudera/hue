@@ -20,12 +20,20 @@ import { ParsedSqlStatement } from './sqlStatementsParser';
 
 export interface IdentifierChainEntry {
   name: string;
+  cte?: string;
+  subQuery?: string;
+}
+
+export interface SubQuery {
+  alias: string;
+  columns: ColumnDetails[];
+  subQueries?: SubQuery[];
 }
 
 export interface ParsedTable {
   alias?: string;
   identifierChain: IdentifierChainEntry[];
-  subQuery?: unknown; // TODO: Define
+  subQuery?: SubQuery; // TODO: Define
 }
 
 export interface ParsedLocation {
@@ -70,6 +78,108 @@ export interface StatementDetails {
   precedingStatements: ParsedSqlStatement[];
   activeStatement: ParsedSqlStatement;
   followingStatements: ParsedSqlStatement[];
+}
+
+export interface ColumnAliasDetails {
+  name: string;
+  udfRef?: string;
+  types: string[];
+}
+
+export interface ColumnDetails {
+  type: string;
+  alias: string;
+  identifierChain: IdentifierChainEntry[];
+  subQuery?: string;
+}
+
+export interface CommonPopularSuggestion {
+  tables: ParsedTable[];
+  prefix?: string;
+}
+
+export interface AutocompleteParseResult {
+  colRef?: {
+    identifierChain: IdentifierChainEntry[];
+  };
+  commonTableExpressions?: {
+    alias: string;
+    columns: ColumnDetails[];
+  }[];
+  lowerCase: boolean;
+  subQueries: SubQuery[];
+  suggestAggregateFunctions?: {
+    tables: ParsedTable[];
+  };
+  suggestAnalyticFunctions?: boolean;
+  suggestColRefKeywords?: {
+    [type: string]: string[];
+  };
+  suggestColumnAliases?: ColumnAliasDetails[];
+  suggestColumns?: {
+    identifierChain?: IdentifierChainEntry[];
+    source?: string;
+    tables: ParsedTable[];
+    types?: string[];
+    udfRef?: string;
+  };
+  suggestCommonTableExpressions: {
+    name: string;
+    prependFrom: boolean;
+    prependQuestionMark: boolean;
+  }[];
+  suggestDatabases: {
+    appendDot?: boolean;
+    prependFrom?: boolean;
+    prependQuestionMark?: boolean;
+  };
+  suggestFilters?: {
+    tables: ParsedTable[];
+    prefix?: string;
+  };
+  suggestFunctions?: {
+    types: string[];
+    udfRef?: string;
+  };
+  suggestGroupBys?: CommonPopularSuggestion;
+  suggestHdfs?: {
+    path: string;
+  };
+  suggestJoins?: {
+    prependJoin?: boolean;
+    tables: ParsedTable[];
+  };
+  suggestJoinConditions: {
+    prependOn?: boolean;
+    tables: ParsedTable[];
+  };
+  suggestIdentifiers?: {
+    name: string;
+    type: string;
+  }[];
+  suggestKeyValues?: unknown;
+  suggestKeywords?: {
+    value: string;
+    weight: number;
+  }[];
+  suggestOrderBys?: CommonPopularSuggestion;
+  suggestSetOptions?: boolean;
+  suggestTables?: {
+    identifierChain: IdentifierChainEntry[];
+    onlyTables?: boolean;
+    onlyViews?: boolean;
+    prependFrom?: boolean;
+    prependQuestionMark?: boolean;
+  };
+  suggestValues?: {
+    missingEndQuote?: boolean;
+    partialQuote?: boolean;
+  };
+  udfArgument: {
+    name: string;
+    position: number;
+  };
+  useDatabase?: string;
 }
 
 export interface SqlStatementsParser {
