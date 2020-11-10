@@ -22,11 +22,13 @@ export interface IEntity {
   readonly id: string;
   readonly type: EntityTypes;
 
-  className: string;
+  cssClassName: string;
 }
 
 export interface IRelation {
   desc: string;
   left: IEntity;
   right: IEntity;
+
+  cssClassName: string;
 }
