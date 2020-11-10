@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import { Dictionary } from 'lodash';
 import { Table, Column } from '../../components/er-diagram/lib/entities';
 import { IEntity, IRelation } from '../../components/er-diagram/lib/interfaces';
 
@@ -51,7 +52,7 @@ const createTable = (database: string, fromDB: string, name: string, columnNames
   });
   const table = new Table(database, name, columns);
   if (database === fromDB) {
-    table.className = 'hide-db';
+    table.cssClassName = 'hide-db';
   }
   return table;
 };
@@ -61,11 +62,11 @@ const reorderBasedOnKeys = (
   primaryKeys: IPrimaryKey[],
   foreignKeys: IForeignKey[]
 ): string[] => {
-  const keyWeight = {};
+  const keyWeight: Dictionary<number> = {};
 
   columnNames.forEach((key: string) => (keyWeight[key] = 0));
-  foreignKeys.forEach((key: IPrimaryKey) => (keyWeight[key.name] = 1));
-  primaryKeys.forEach((key: IForeignKey) => (keyWeight[key.name] = 2));
+  foreignKeys.forEach((key: IForeignKey) => (keyWeight[key.name] = 1));
+  primaryKeys.forEach((key: IPrimaryKey) => (keyWeight[key.name] = 2));
 
   columnNames.sort((a, b) => keyWeight[b] - keyWeight[a]);
 
@@ -100,9 +101,9 @@ const getForeignKeyRelations = (
   fromDB: string,
   fromTableName: string,
   foreignKeys: IForeignKey[]
-) => {
+): IRelation[] => {
   const fromTableId = Table.buildId(fromDB, fromTableName);
-  return foreignKeys.map(key => {
+  return foreignKeys.map((key: IForeignKey) => {
     const toPath = key.to.split('.');
     return {
       desc: 'Foreign Key',

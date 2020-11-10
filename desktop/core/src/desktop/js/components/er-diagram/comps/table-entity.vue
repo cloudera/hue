@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div :class="`table-entity ${entity.className || ''}`">
+  <div :class="`table-entity ${entity.cssClassName || ''}`">
     <div :title="entity.database" class="db-name">
       {{ entity.database }}
     </div>
@@ -32,7 +32,7 @@
         :key="column.id"
         :data-entity-id="column.id"
         :title="column.name"
-        :class="`column-entity ${column.className || ''}`"
+        :class="`column-entity ${column.cssClassName || ''}`"
         @click="$emit('click', column)"
       >
         <div class="left-point" />
