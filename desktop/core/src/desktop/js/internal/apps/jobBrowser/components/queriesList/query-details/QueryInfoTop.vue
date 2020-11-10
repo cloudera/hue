@@ -66,7 +66,7 @@
 
     .inline-info {
       display: inline-block;
-      margin-right: 30px;
+      margin-right: 20px;
 
       vertical-align: baseline;
     }

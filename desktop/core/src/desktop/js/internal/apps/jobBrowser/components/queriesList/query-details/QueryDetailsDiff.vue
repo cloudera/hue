@@ -39,9 +39,11 @@
       </tab>
       <tab title="Timeline" class="hue-layout-column">
         <div class="hue-info-box">
+          <LabeledInfo label="Query">{{ queries[0].queryId }}</LabeledInfo>
           <HiveTimeline :perf="queries[0].details.perf" />
         </div>
         <div class="hue-info-box query-b">
+          <LabeledInfo label="Query">{{ queries[1].queryId }}</LabeledInfo>
           <HiveTimeline :perf="queries[1].details.perf" />
         </div>
       </tab>
@@ -254,7 +256,6 @@
   /deep/ .query-b-deep .hue-info-box,
   /deep/ .query-b-deep .dag-view-container {
     background-color: $fluid-blue-050;
-    border: 1px solid $fluid-blue-700;
     border-radius: $hue-panel-border-radius;
   }
 
