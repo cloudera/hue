@@ -31,6 +31,8 @@ declare global {
 }
 
 export interface hueWindow {
+  HAS_OPTIMIZER?: boolean;
+  AUTOCOMPLETE_TIMEOUT?: number;
   ENABLE_SQL_SYNTAX_CHECK?: boolean;
   LOGGED_USERNAME?: string;
   WEB_SOCKETS_ENABLED?: boolean;
