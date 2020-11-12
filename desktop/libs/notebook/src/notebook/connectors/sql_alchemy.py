@@ -227,6 +227,9 @@ class SqlAlchemyApi(Api):
         self.interpreter.get('dialect_properties') and self.interpreter['dialect_properties']['trim_statement_semicolon']:
       statement = statement.strip().rstrip(';')
 
+    if 'database' in snippet and snippet['database']:
+      connection.execute('USE ' + snippet['database'])
+
     result = connection.execute(statement)
 
     cache = {
