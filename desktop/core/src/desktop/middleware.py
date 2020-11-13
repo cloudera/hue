@@ -232,18 +232,22 @@ class AppSpecificMiddleware(object):
     for middleware_path in mw_classes:
       # This code brutally lifted from django.core.handlers
       try:
-          dot = middleware_path.rindex('.')
+        dot = middleware_path.rindex('.')
       except ValueError:
-          raise exceptions.ImproperlyConfigured(_('%(module)s isn\'t a middleware module.') % {'module': middleware_path})
+        raise exceptions.ImproperlyConfigured(_('%(module)s isn\'t a middleware module.') % {'module': middleware_path})
       mw_module, mw_classname = middleware_path[:dot], middleware_path[dot+1:]
       try:
-          mod = __import__(mw_module, {}, {}, [''])
+        mod = __import__(mw_module, {}, {}, [''])
       except ImportError as e:
-          raise exceptions.ImproperlyConfigured(_('Error importing middleware %(module)s: "%(error)s".') % {'module': mw_module, 'error': e})
+        raise exceptions.ImproperlyConfigured(
+          _('Error importing middleware %(module)s: "%(error)s".') % {'module': mw_module, 'error': e}
+        )
       try:
-          mw_class = getattr(mod, mw_classname)
+        mw_class = getattr(mod, mw_classname)
       except AttributeError:
-          raise exceptions.ImproperlyConfigured(_('Middleware module "%(module)s" does not define a "%(class)s" class.') % {'module': mw_module, 'class':mw_classname})
+        raise exceptions.ImproperlyConfigured(
+          _('Middleware module "%(module)s" does not define a "%(class)s" class.') % {'module': mw_module, 'class': mw_classname}
+        )
 
       try:
         mw_instance = mw_class()
@@ -357,7 +361,13 @@ class LoginAndPermissionMiddleware(object):
       return response
     else:
       if request.GET.get('is_embeddable'):
-        return JsonResponse({'url': "%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote('/hue' + request.get_full_path().replace('is_embeddable=true', '').replace('&&','&')))}) # Remove embeddable so redirect from & to login works. Login page is not embeddable
+        return JsonResponse({
+          'url': "%s?%s=%s" % (
+              settings.LOGIN_URL,
+              REDIRECT_FIELD_NAME,
+              urlquote('/hue' + request.get_full_path().replace('is_embeddable=true', '').replace('&&', '&'))
+          )
+        }) # Remove embeddable so redirect from & to login works. Login page is not embeddable
       else:
         return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote(request.get_full_path())))
 
@@ -412,7 +422,7 @@ class AuditLoggingMiddleware(object):
   def _get_client_ip(self, request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
-        x_forwarded_for = x_forwarded_for.split(',')[0]
+      x_forwarded_for = x_forwarded_for.split(',')[0]
     return request.META.get('HTTP_CLIENT_IP') or x_forwarded_for or request.META.get('REMOTE_ADDR')
 
   def _get_username(self, request):
@@ -522,7 +532,7 @@ class HtmlValidationMiddleware(object):
 
   def _filter_warnings(self, err_list):
     """A hacky way to filter out things that we don't care about."""
-    res = [ ]
+    res = []
     for err in err_list:
       for ignore in self._to_ignore:
         if ignore.search(err):
@@ -660,10 +670,10 @@ class SpnegoMiddleware(object):
           if result != 1:
             return
 
-          gssstring=''
-          r=kerberos.authGSSServerStep(context,authstr)
+          gssstring = ''
+          r = kerberos.authGSSServerStep(context, authstr)
           if r == 1:
-            gssstring=kerberos.authGSSServerResponse(context)
+            gssstring = kerberos.authGSSServerResponse(context)
             request.META['GSS-String'] = 'Negotiate %s' % gssstring
           else:
             kerberos.authGSSServerClean(context)
@@ -681,7 +691,8 @@ class SpnegoMiddleware(object):
             principal = self.clean_principal(username)
             if principal.intersection(principals):
               # This may contain chain of reverse proxies, e.g. knox proxy, hue load balancer
-              # Compare hostname on both HTTP_X_FORWARDED_HOST & KNOX_PROXYHOSTS. Both of these can be configured to use either hostname or IPs and we have to normalize to one or the other
+              # Compare hostname on both HTTP_X_FORWARDED_HOST & KNOX_PROXYHOSTS.
+              # Both of these can be configured to use either hostname or IPs and we have to normalize to one or the other
               req_hosts = self.clean_host(request.META['HTTP_X_FORWARDED_HOST'])
               knox_proxy = self.clean_host(KNOX.KNOX_PROXYHOSTS.get())
               if req_hosts.intersection(knox_proxy):
