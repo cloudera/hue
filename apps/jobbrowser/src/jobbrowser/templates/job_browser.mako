@@ -1616,7 +1616,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Id') }</li>
           <li>
-            % if not IMPALA_COORDINATOR_URL.get():
+            % if hasattr(IMPALA_COORDINATOR_URL, 'get') and not IMPALA_COORDINATOR_URL.get():
             <a data-bind="attr: { href: doc_url_modified }" target="_blank" title="${ _('Open in Impalad') }">
               <span data-bind="text: id"></span>
             </a>
