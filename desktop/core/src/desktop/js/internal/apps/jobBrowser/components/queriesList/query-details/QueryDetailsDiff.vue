@@ -52,10 +52,15 @@
           <input v-model="hideSimilarValues" type="checkbox" /> Hide Similar Values
         </label>
         <ConfigsTable
+          class="query-b-deep"
           :hide-similar-values="hideSimilarValues"
           :configs="[
             { title: `Query ${queries[0].queryId}`, configs: queries[0].details.configuration },
-            { title: `Query ${queries[1].queryId}`, configs: queries[1].details.configuration }
+            {
+              title: `Query ${queries[1].queryId}`,
+              configs: queries[1].details.configuration,
+              cssClass: 'query-b'
+            }
           ]"
         />
       </tab>
@@ -113,35 +118,41 @@
         <label class="hide-similar">
           <input v-model="hideSimilarValues" type="checkbox" /> Hide Similar Values
         </label>
-        <div v-for="(dagSet, index) in buildDagSets(queries)" :key="index" class="dag-details">
-          <CountersTable
-            :hide-similar-values="hideSimilarValues"
-            :counters="[
-              {
-                title: `DAG : ${dagSet.dagA.dagInfo.dagId}`,
-                counters: dagSet.dagA.dagDetails.counters
-              },
-              {
-                title: `DAG : ${dagSet.dagB.dagInfo.dagId}`,
-                counters: dagSet.dagB.dagDetails.counters
-              }
-            ]"
-          />
-        </div>
+        <CountersTable
+          class="query-b-deep"
+          :hide-similar-values="hideSimilarValues"
+          :counters="
+            queries
+              .map((query, queryIndex) =>
+                query.dags.map(dag => ({
+                  title: `DAG : ${dag.dagInfo.dagId}`,
+                  counters: dag.dagDetails.counters,
+                  cssClass: queryIndex ? 'query-b' : ''
+                }))
+              )
+              .flat()
+          "
+        />
       </tab>
       <tab title="DAG Configurations">
         <label class="hide-similar">
           <input v-model="hideSimilarValues" type="checkbox" /> Hide Similar Values
         </label>
-        <div v-for="(dagSet, index) in buildDagSets(queries)" :key="index" class="dag-details">
-          <ConfigsTable
-            :hide-similar-values="hideSimilarValues"
-            :configs="[
-              { title: `DAG : ${dagSet.dagA.dagInfo.dagId}`, configs: dagSet.dagA.config },
-              { title: `DAG : ${dagSet.dagB.dagInfo.dagId}`, configs: dagSet.dagB.config }
-            ]"
-          />
-        </div>
+        <ConfigsTable
+          class="query-b-deep"
+          :hide-similar-values="hideSimilarValues"
+          :configs="
+            queries
+              .map((query, queryIndex) =>
+                query.dags.map(dag => ({
+                  title: `DAG : ${dag.dagInfo.dagId}`,
+                  configs: dag.config,
+                  cssClass: queryIndex ? 'query-b' : ''
+                }))
+              )
+              .flat()
+          "
+        />
       </tab>
     </tabs>
   </div>
@@ -167,31 +178,9 @@
 
   import LabeledInfo from '../components/LabeledInfo.vue';
 
-  import { Dag, Query } from '../index';
+  import { Query } from '../index';
 
   import { get } from 'lodash';
-
-  interface DagSet {
-    dagA: Dag;
-    dagB: Dag;
-  }
-
-  const DUMMY_DAG: Dag = <Dag>{
-    dagInfo: { dagId: '-' },
-    dagDetails: { counters: <unknown[]>[] },
-    config: {}
-  };
-  const buildDagSets = ([queryA, queryB]: Query[]): DagSet[] => {
-    const dagSets: DagSet[] = [];
-    const setCount: number = Math.max(queryA.dags.length, queryB.dags.length);
-    for (let i = 0; i < setCount; i++) {
-      dagSets.push({
-        dagA: queryA.dags[i] || DUMMY_DAG,
-        dagB: queryB.dags[i] || DUMMY_DAG
-      });
-    }
-    return dagSets;
-  };
 
   @Component({
     components: {
@@ -212,7 +201,6 @@
       LabeledInfo
     },
     methods: {
-      buildDagSets,
       get
     }
   })
@@ -253,6 +241,7 @@
   }
 
   .query-b,
+  /deep/ .query-b-deep .query-b,
   /deep/ .query-b-deep .hue-info-box,
   /deep/ .query-b-deep .dag-view-container {
     background-color: $fluid-blue-050;

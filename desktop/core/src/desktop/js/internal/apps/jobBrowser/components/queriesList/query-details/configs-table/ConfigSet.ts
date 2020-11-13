@@ -19,4 +19,5 @@
 export default interface ConfigSet {
   title: string;
   configs: { [key: string]: unknown };
+  cssClass: string;
 }

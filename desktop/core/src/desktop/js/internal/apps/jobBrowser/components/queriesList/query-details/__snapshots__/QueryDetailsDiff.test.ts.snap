@@ -62,6 +62,12 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
       <div
         class="hue-info-box"
       >
+        <labeledinfo-stub
+          label="Query"
+        >
+          hive_20200923115641_4eaa9303-d8d6-4d9e-a7d9-dec969781b35
+        </labeledinfo-stub>
+         
         <hivetimeline-stub
           perf="[object Object]"
         />
@@ -70,6 +76,12 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
       <div
         class="hue-info-box query-b"
       >
+        <labeledinfo-stub
+          label="Query"
+        >
+          hive_20200925121648_f613ce22-571c-4650-b594-8ee37f2adbe8
+        </labeledinfo-stub>
+         
         <hivetimeline-stub
           perf="[object Object]"
         />
@@ -90,6 +102,7 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
       </label>
        
       <configstable-stub
+        class="query-b-deep"
         configs="[object Object],[object Object]"
       />
     </tab-stub>
@@ -244,20 +257,10 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
       
       </label>
        
-      <div
-        class="dag-details"
-      >
-        <counterstable-stub
-          counters="[object Object],[object Object]"
-        />
-      </div>
-      <div
-        class="dag-details"
-      >
-        <counterstable-stub
-          counters="[object Object],[object Object]"
-        />
-      </div>
+      <counterstable-stub
+        class="query-b-deep"
+        counters="[object Object],[object Object],[object Object]"
+      />
     </tab-stub>
      
     <tab-stub
@@ -273,20 +276,10 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
       
       </label>
        
-      <div
-        class="dag-details"
-      >
-        <configstable-stub
-          configs="[object Object],[object Object]"
-        />
-      </div>
-      <div
-        class="dag-details"
-      >
-        <configstable-stub
-          configs="[object Object],[object Object]"
-        />
-      </div>
+      <configstable-stub
+        class="query-b-deep"
+        configs="[object Object],[object Object],[object Object]"
+      />
     </tab-stub>
   </tabs-stub>
 </div>

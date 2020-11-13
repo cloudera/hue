@@ -21,4 +21,5 @@ import { CounterGroup } from '../../index';
 export default interface CounterSet {
   title: string;
   counters: CounterGroup[];
+  cssClass: string;
 }

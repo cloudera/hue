@@ -29,7 +29,7 @@
   import ConfigSet from './ConfigSet';
 
   const DEFAULT_VALUE_COLUMN_TITLE = 'Config Value';
-  const NAME_COLUMNS: Column[] = [
+  const NAME_COLUMNS: Column<Row>[] = [
     {
       label: 'Config Name',
       key: 'configName'
@@ -49,13 +49,15 @@
       return `configSet_${index}`;
     }
 
-    get columns(): Column[] {
-      const valueColumns: Column[] = [];
+    get columns(): Column<Row>[] {
+      const valueColumns: Column<Row>[] = [];
 
       this.configs.forEach((configSet: ConfigSet, index: number) => {
         valueColumns.push({
           label: configSet.title || DEFAULT_VALUE_COLUMN_TITLE,
-          key: this.generateValueColumnkey(index)
+          key: this.generateValueColumnkey(index),
+          headerCssClass: configSet.cssClass,
+          cssClass: configSet.cssClass
         });
       });
 

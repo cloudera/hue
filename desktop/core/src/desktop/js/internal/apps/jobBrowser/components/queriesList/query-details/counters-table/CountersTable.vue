@@ -31,7 +31,7 @@
   import CounterSet from './CounterSet';
 
   const DEFAULT_VALUE_COLUMN_TITLE = 'Counter Value';
-  const NAME_COLUMNS: Column[] = [
+  const NAME_COLUMNS: Column<Row>[] = [
     {
       label: 'Group Name',
       key: 'groupName'
@@ -55,13 +55,15 @@
       return `counterSet_${index}`;
     }
 
-    get columns(): Column[] {
-      const valueColumns: Column[] = [];
+    get columns(): Column<Row>[] {
+      const valueColumns: Column<Row>[] = [];
 
       this.counters.forEach((counterSet: CounterSet, index: number) => {
         valueColumns.push({
           label: counterSet.title || DEFAULT_VALUE_COLUMN_TITLE,
-          key: this.generateValueColumnkey(index)
+          key: this.generateValueColumnkey(index),
+          headerCssClass: counterSet.cssClass,
+          cssClass: counterSet.cssClass
         });
       });
 

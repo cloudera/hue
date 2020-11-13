@@ -74,16 +74,24 @@
             </div>
           </tab>
           <tab title="DAG Counters" class="hue-layout-column">
-            <div v-for="dag in query.dags" :key="dag.dagInfo.id">
-              <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
-              <CountersTable :counters="[{ counters: dag.dagDetails.counters }]" />
-            </div>
+            <CountersTable
+              :counters="
+                query.dags.map(dag => ({
+                  title: `DAG : ${dag.dagInfo.dagId}`,
+                  counters: dag.dagDetails.counters
+                }))
+              "
+            />
           </tab>
           <tab title="DAG Configurations" class="hue-layout-column">
-            <div v-for="dag in query.dags" :key="dag.dagInfo.id">
-              <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
-              <ConfigsTable :configs="[{ configs: dag.config }]" />
-            </div>
+            <ConfigsTable
+              :configs="
+                query.dags.map(dag => ({
+                  title: `DAG : ${dag.dagInfo.dagId}`,
+                  configs: dag.config
+                }))
+              "
+            />
           </tab>
         </template>
       </tabs>

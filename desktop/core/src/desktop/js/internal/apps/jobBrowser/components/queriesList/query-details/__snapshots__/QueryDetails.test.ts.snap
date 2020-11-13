@@ -139,56 +139,18 @@ exports[`QueryDetails.vue should render 1`] = `
         class="hue-layout-column"
         title="DAG Counters"
       >
-        <div>
-          <labeledinfo-stub
-            label="DAG"
-          >
-            dag_1600683331174_0003_2
-          </labeledinfo-stub>
-           
-          <counterstable-stub
-            counters="[object Object]"
-          />
-        </div>
-        <div>
-          <labeledinfo-stub
-            label="DAG"
-          >
-            dag_1600683331174_0003_4
-          </labeledinfo-stub>
-           
-          <counterstable-stub
-            counters="[object Object]"
-          />
-        </div>
+        <counterstable-stub
+          counters="[object Object],[object Object]"
+        />
       </tab-stub>
        
       <tab-stub
         class="hue-layout-column"
         title="DAG Configurations"
       >
-        <div>
-          <labeledinfo-stub
-            label="DAG"
-          >
-            dag_1600683331174_0003_2
-          </labeledinfo-stub>
-           
-          <configstable-stub
-            configs="[object Object]"
-          />
-        </div>
-        <div>
-          <labeledinfo-stub
-            label="DAG"
-          >
-            dag_1600683331174_0003_4
-          </labeledinfo-stub>
-           
-          <configstable-stub
-            configs="[object Object]"
-          />
-        </div>
+        <configstable-stub
+          configs="[object Object],[object Object]"
+        />
       </tab-stub>
     </tabs-stub>
   </div>
