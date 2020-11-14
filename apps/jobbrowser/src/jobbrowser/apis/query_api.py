@@ -148,7 +148,6 @@ class QueryApi(Api):
     message = {'message': '', 'status': 0}
 
     if action.get('action') == 'kill':
-
       for _id in appid:
         result = self.api.kill(_id)
         if result.get('error'):
