@@ -24,9 +24,10 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.python_util import current_ms_from_utc
-
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
+
+from notebook.models import _get_notebook_api
 
 from jobbrowser.apis.base_api import Api
 from jobbrowser.models import HiveQuery
@@ -116,7 +117,17 @@ class HiveQueryApi(Api):
   def action(self, appid, action):
     message = {'message': '', 'status': 0}
 
-    return message;
+    if action.get('action') == 'kill':
+      for queryid in appid:
+        notebook = {}
+        snippet = {'result': {'handle': {'secret': queryid, 'guid': queryid}}}
+        connector_id = 'hive'
+
+        response = _get_notebook_api(self.user, connector_id).cancel(notebook, snippet)
+        message['status'] = response['status'] if response['status'] != 0 else message['status']
+        message['message'] = _('kill action performed')
+
+    return message
 
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
