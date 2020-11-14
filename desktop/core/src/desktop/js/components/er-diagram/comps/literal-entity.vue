@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div :class="`literal-entity ${entity.className || ''}`" @click="$emit('click', entity)">
+  <div :class="`literal-entity ${entity.cssClassName || ''}`" @click="$emit('click', entity)">
     <div class="left-point" />
     <div class="right-point" />
     <div class="literal-value">
@@ -34,6 +34,7 @@
 
   @Component
   export default class LiteralEntity extends Vue {
-    @Prop() entity: Literal;
+    @Prop()
+    entity!: Literal;
   }
 </script>

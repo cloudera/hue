@@ -168,7 +168,7 @@ def group_has_permission(group, perm):
 def group_permissions(group):
   return HuePermission.objects.filter(grouppermission__group=group).all()
 
-# Create a user profile for the given user
+
 def create_profile_for_user(user):
   p = UserProfile()
   p.user = user

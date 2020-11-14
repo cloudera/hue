@@ -50,7 +50,7 @@
             :key="index"
             :data-entity-id-left="relation.left.id"
             :data-entity-id-right="relation.right.id"
-            class="relation-path"
+            :class="`relation-path ${relation.cssClassName || ''}`"
           />
         </svg>
       </div>
@@ -74,6 +74,11 @@
 
   const CURVATURE = 40;
 
+  interface IPos {
+    x: number;
+    y: number;
+  }
+
   @Component({
     components: {
       TableEntity,
@@ -82,9 +87,9 @@
   })
   export default class ERDiagram extends Vue {
     @Prop()
-    entities: IEntity[];
+    entities!: IEntity[];
     @Prop()
-    relations: IRelation[];
+    relations!: IRelation[];
 
     EntityTypes = EntityTypes;
 
@@ -94,10 +99,7 @@
       }
     }
 
-    getSelectorPosition(
-      selector: string,
-      offset: { x: number; y: number }
-    ): { x: number; y: number } {
+    getSelectorPosition(selector: string, offset: IPos | undefined = undefined): IPos | undefined {
       const element = this.$el.querySelector(selector);
       if (element) {
         const rect = element.getBoundingClientRect();
@@ -114,8 +116,10 @@
     }
 
     plotRelations(): void {
-      const relationPaths: HTMLElement[] = this.$el.querySelectorAll<HTMLElement>('.relation-path');
-      const offset = this.getSelectorPosition('.erd-relations');
+      const relationPaths: NodeListOf<HTMLElement> = this.$el.querySelectorAll<HTMLElement>(
+        '.relation-path'
+      );
+      const offset: IPos | undefined = this.getSelectorPosition('.erd-relations');
 
       relationPaths.forEach(element => {
         const leftPos = this.getSelectorPosition(
