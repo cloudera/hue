@@ -676,10 +676,12 @@ DROP TABLE IF EXISTS `%(table)s`;
 
 
   def _get_session(self, notebook, type='hive'):
+    type = 'sparksql' if type == 'sql' else type
     session = next((session for session in notebook['sessions'] if session['type'] == type), None)
     return session
 
   def _get_session_by_id(self, notebook, type='hive'):
+    type = 'sparksql' if type == 'sql' else type
     session = self._get_session(notebook, type)
     if session:
       session_id = session.get('id')

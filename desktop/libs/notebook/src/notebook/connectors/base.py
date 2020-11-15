@@ -348,6 +348,7 @@ class Notebook(object):
 
 
 def get_interpreter(connector_type, user=None):
+  connector_type = 'sql' if connector_type == 'sparksql' else connector_type
   interpreter = [
     interpreter for interpreter in get_ordered_interpreters(user) if connector_type == interpreter['type']
   ]
