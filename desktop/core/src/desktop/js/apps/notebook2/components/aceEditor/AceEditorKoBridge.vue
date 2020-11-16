@@ -18,7 +18,12 @@
 
 <template>
   <div v-if="initialized && editorId">
-    <ace-editor :id="editorId" :executor="executor" :ace-options="aceOptions" @ace-created="aceCreated" />
+    <ace-editor
+      :id="editorId"
+      :executor="executor"
+      :ace-options="aceOptions"
+      @ace-created="aceCreated"
+    />
   </div>
 </template>
 

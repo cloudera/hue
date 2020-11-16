@@ -17,10 +17,14 @@
 -->
 
 <template>
-  <div :id="id" class="ace-editor" />
+  <div>
+    <div :id="id" class="ace-editor" />
+    <ace-autocomplete v-if="editor" :editor="editor" :editor-id="id" :executor="executor" />
+  </div>
 </template>
 
 <script lang="ts">
+  import AceAutocomplete from './autocomplete/AceAutocomplete.vue';
   import $ from 'jquery';
   import { EditorInterpreter } from 'types/config';
   import Vue from 'vue';
@@ -36,11 +40,12 @@
 
   import Executor from 'apps/notebook2/execution/executor';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
-  import AceLocationHandler from './aceLocationHandler';
-  import { defer, UUID } from 'utils/hueUtils';
+  import AceLocationHandler from './AceLocationHandler';
+  import { defer } from 'utils/hueUtils';
   import I18n from 'utils/i18n';
 
   @Component({
+    components: { AceAutocomplete },
     methods: { I18n }
   })
   export default class AceEditor extends Vue {
@@ -54,14 +59,19 @@
     aceOptions?: Ace.Options;
 
     subTracker = new SubscriptionTracker();
+    editor: Ace.Editor | null = null;
 
     private isSqlDialect(): boolean {
       return (<EditorInterpreter>this.executor.connector()).is_sql;
     }
 
     mounted(): void {
-      this.$el.textContent = this.value;
-      const editor = <Ace.Editor>ace.edit(this.$el);
+      const editorElement = this.$el.querySelector('.ace-editor');
+      if (!editorElement) {
+        return;
+      }
+      editorElement.textContent = this.value;
+      const editor = <Ace.Editor>ace.edit(editorElement);
 
       const resizeAce = () => {
         defer(() => {
@@ -287,6 +297,10 @@
       window.setTimeout(() => {
         this.$emit('ace-created', editor);
       }, 3000);
+
+      editor.$blockScrolling = Infinity;
+
+      this.editor = editor;
     }
 
     destroyed(): void {

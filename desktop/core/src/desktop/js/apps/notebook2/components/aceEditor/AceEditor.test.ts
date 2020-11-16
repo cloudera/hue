@@ -20,9 +20,7 @@ import AceEditor from './AceEditor.vue';
 
 describe('AceEditor.vue', () => {
   it('should render', () => {
-    const spy = spyOn(dataCatalog, 'getChildren').and.returnValue(
-      Promise.resolve([])
-    );
+    spyOn(dataCatalog, 'getChildren').and.returnValue(Promise.resolve([]));
 
     const wrapper = shallowMount(AceEditor, {
       propsData: {
