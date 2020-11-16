@@ -223,7 +223,7 @@ class SqlAlchemyApi(Api):
     connection = engine.connect()
     statement = snippet['statement']
 
-    if self.options['url'].startswith('presto://') or \
+    if self.options['url'].startswith('phoenix://') or self.options['url'].startswith('presto://') or \
         self.interpreter.get('dialect_properties') and self.interpreter['dialect_properties']['trim_statement_semicolon']:
       statement = statement.strip().rstrip(';')
 
