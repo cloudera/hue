@@ -62,12 +62,12 @@ import {
 const COLORS = {
   POPULAR: '#61bbff',
   KEYWORD: '#0074d2',
-  COLUMN: '#4ccf4c',
+  COLUMN: '#2fae2f',
   TABLE: '#ffa139',
   DATABASE: '#517989',
   SAMPLE: '#fea7a7',
   IDENT_CTE_VAR: '#ca4f01',
-  UDF: '#19323c',
+  UDF: '#acfbac',
   HDFS: '#9e1414'
 };
 
@@ -346,12 +346,7 @@ class AutocompleteResults {
   loadingPopularTables = false;
   loadingPopularColumns = false;
 
-  constructor(options: {
-    executor: Executor;
-    editor: Ace.Editor;
-    temporaryOnly: boolean;
-    databaseObservable: () => string;
-  }) {
+  constructor(options: { executor: Executor; editor: Ace.Editor; temporaryOnly: boolean }) {
     this.executor = options.executor;
     this.editor = options.editor;
     this.temporaryOnly = options.temporaryOnly;

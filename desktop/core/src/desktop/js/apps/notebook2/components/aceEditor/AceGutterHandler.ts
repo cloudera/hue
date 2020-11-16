@@ -19,7 +19,7 @@ import SubscriptionTracker, { Disposable } from 'components/utils/SubscriptionTr
 import { Ace } from 'ext/ace';
 import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
 import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
-import { ACTIVE_STATEMENT_CHANGED_EVENT } from 'ko/bindings/ace/aceLocationHandler';
+import { ACTIVE_STATEMENT_CHANGED_EVENT } from './AceLocationHandler';
 import AceAnchoredRange from 'ko/bindings/ace/aceAnchoredRange';
 
 const LINE_BREAK_REGEX = /(\r\n)|(\n)|(\r)/g;

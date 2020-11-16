@@ -23,7 +23,13 @@ import DataCatalogEntry from 'catalog/dataCatalogEntry';
 import SubscriptionTracker, { Disposable } from 'components/utils/SubscriptionTracker';
 import AssistStorageEntry from 'ko/components/assist/assistStorageEntry';
 import dataCatalog from 'catalog/dataCatalog';
-import { IdentifierChainEntry, IdentifierLocation, ParsedLocation, ParsedTable } from 'parse/types';
+import {
+  IdentifierChainEntry,
+  IdentifierLocation,
+  ParsedLocation,
+  ParsedTable,
+  SyntaxError
+} from 'parse/types';
 import { EditorInterpreter } from 'types/config';
 import { hueWindow } from 'types/types';
 import huePubSub, { HueSubscription } from 'utils/huePubSub';
@@ -39,9 +45,20 @@ import {
   POST_TO_SYNTAX_WORKER_EVENT
 } from 'sql/sqlWorkerHandler';
 
+export interface ActiveStatementChangedEvent {
+  id: string;
+  editorChangeTime: number;
+  activeStatementIndex: number;
+  totalStatementCount: number;
+  precedingStatements: ParsedSqlStatement[];
+  activeStatement: ParsedSqlStatement;
+  selectedStatements: ParsedSqlStatement[];
+  followingStatements: ParsedSqlStatement[];
+}
 export const REFRESH_STATEMENT_LOCATIONS_EVENT = 'editor.refresh.statement.locations';
 export const ACTIVE_STATEMENT_CHANGED_EVENT = 'editor.active.statement.changed';
 export const CURSOR_POSITION_CHANGED_EVENT = 'editor.cursor.position.changed';
+export const GET_ACTIVE_LOCATIONS_EVENT = 'get.active.editor.locations';
 
 const STATEMENT_COUNT_AROUND_ACTIVE = 10;
 
@@ -121,12 +138,12 @@ export default class AceLocationHandler implements Disposable {
         connector: this.executor.connector(),
         namespace: this.executor.namespace(),
         compute: this.executor.compute(),
-        path: []
+        path: <string[]>[]
       })
       .then(children => {
         this.availableDatabases.clear();
         children.forEach((dbEntry: DataCatalogEntry) => {
-          this.availableDatabases.add(dbEntry.getDisplayName(false).toLowerCase());
+          this.availableDatabases.add(dbEntry.name.toLowerCase());
         });
       });
   }
@@ -451,7 +468,7 @@ export default class AceLocationHandler implements Disposable {
             // Asterisk, function etc.
             if (parseLocation.type === 'file' && parseLocation.path) {
               AssistStorageEntry.getEntry(parseLocation.path).then(entry => {
-                entry.open(true);
+                (<{ open: KnockoutObservable<boolean> }>(<unknown>entry)).open(true);
                 huePubSub.publish('context.popover.show', {
                   data: {
                     type: 'storageEntry',
@@ -599,7 +616,7 @@ export default class AceLocationHandler implements Disposable {
         selectedStatements.push(activeStatement);
       }
 
-      huePubSub.publish(ACTIVE_STATEMENT_CHANGED_EVENT, {
+      huePubSub.publish(ACTIVE_STATEMENT_CHANGED_EVENT, <ActiveStatementChangedEvent>{
         id: this.editorId,
         editorChangeTime: lastKnownStatements.editorChangeTime,
         activeStatementIndex: statementIndex,
@@ -1007,10 +1024,7 @@ export default class AceLocationHandler implements Disposable {
                   const containsColumn = entries.some(
                     entry =>
                       location.identifierChain &&
-                      sqlUtils.identifierEquals(
-                        entry.getDisplayName(false),
-                        location.identifierChain[0].name
-                      )
+                      sqlUtils.identifierEquals(entry.name, location.identifierChain[0].name)
                   );
 
                   if (containsColumn) {
@@ -1151,7 +1165,7 @@ export default class AceLocationHandler implements Disposable {
               weightedExpected.sort((a, b) =>
                 a.distance === b.distance ? a.text.localeCompare(b.text) : a.distance - b.distance
               );
-              token.syntaxError = {
+              token.syntaxError = <SyntaxError>{
                 loc: token.parseLocation.location,
                 text: token.value,
                 expected: weightedExpected.slice(0, 50)
@@ -1210,7 +1224,7 @@ export default class AceLocationHandler implements Disposable {
 
     let lastKnownLocations = {};
 
-    this.subTracker.subscribe('get.active.editor.locations', callback => {
+    this.subTracker.subscribe(GET_ACTIVE_LOCATIONS_EVENT, callback => {
       callback(lastKnownLocations);
     });
 
