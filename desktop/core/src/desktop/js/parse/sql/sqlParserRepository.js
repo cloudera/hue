@@ -62,6 +62,10 @@ class SqlParserRepository {
     return this.modulePromises[dialect + parserType];
   }
 
+  /**
+   * @param dialect
+   * @return {Promise<*>}
+   */
   async getAutocompleter(dialect) {
     return this.getParser(dialect, 'Autocomplete');
   }

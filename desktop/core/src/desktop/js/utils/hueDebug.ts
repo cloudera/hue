@@ -22,6 +22,7 @@ export interface HueDebug {
   logStatementLocations?: boolean;
   clearCaches(): void;
   showSyntaxParseResult?: boolean;
+  showParseResult?: boolean;
 }
 
 const hueDebug: HueDebug = {

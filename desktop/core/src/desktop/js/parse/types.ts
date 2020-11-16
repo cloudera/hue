@@ -44,7 +44,7 @@ export interface ParsedLocation {
 }
 
 export interface SyntaxError {
-  expected: { text: string }[];
+  expected: { text: string; distance: number }[];
   expectedStatementEnd?: boolean;
   loc: ParsedLocation;
   text: string;
@@ -184,6 +184,10 @@ export interface AutocompleteParseResult {
 
 export interface SqlStatementsParser {
   parse(text: string): ParsedSqlStatement;
+}
+
+export interface AutocompleteParser {
+  parseSql(beforeCursor: string, afterCursor: string): AutocompleteParseResult;
 }
 
 declare const sqlStatementsParser: SqlStatementsParser;
