@@ -878,8 +878,8 @@ export default {
    * getEntry then getChildren.
    *
    * @param {Object} options
-   * @param {ContextNamespace} options.namespace - The context namespace
-   * @param {ContextCompute} options.compute - The context compute
+   * @param {Namespace} options.namespace - The context namespace
+   * @param {Compute} options.compute - The context compute
    * @param {Connector} options.connector
    * @param {string|string[]} options.path
    * @param {Object} [options.definition] - Optional initial definition of the parent entry

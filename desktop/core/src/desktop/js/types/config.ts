@@ -108,6 +108,7 @@ export interface EditorInterpreter extends IdentifiableInterpreter {
   is_sql: boolean;
   name: string;
   optimizer: string;
+  dialect: string;
 }
 
 /* eslint-disable @typescript-eslint/no-empty-interface */
