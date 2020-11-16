@@ -23,7 +23,7 @@ import AceLocationHandler, {
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
 
-import AceLocationHandlerV2 from 'apps/notebook2/components/aceEditor/aceLocationHandler';
+import AceLocationHandlerV2 from 'apps/notebook2/components/aceEditor/AceLocationHandler';
 
 import huePubSub from 'utils/huePubSub';
 import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
