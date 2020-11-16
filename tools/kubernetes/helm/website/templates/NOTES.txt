@@ -3,7 +3,7 @@ Congratulations, you've launched the website of Hue!
 
 To check the status of your installation run:
 
-  helm list {{ .Release.Name }}
+  helm list --filter {{ .Release.Name }}
 
 Run below commands to get the recommended URLs:
 {{ if true }}
