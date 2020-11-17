@@ -24,10 +24,12 @@ declare class DataCatalogEntry {
   optimizerPopularity: {
     [attr: string]: DataCatalogEntry.OptimizerPopularity | number;
   };
+  getComment(options: DataCatalogEntry.CatalogGetOptions): CancellableJqPromise<string>;
   getChildren(
     options: DataCatalogEntry.CatalogGetOptions
   ): CancellableJqPromise<DataCatalogEntry[]>;
   getQualifiedPath(): string;
+  getResolvedComment(): string;
   getSourceMeta(
     options: DataCatalogEntry.CatalogGetOptions
   ): CancellableJqPromise<DataCatalogEntry.SourceMeta>;
@@ -41,6 +43,7 @@ declare class DataCatalogEntry {
   getTopFilters(
     options: DataCatalogEntry.CatalogGetOptions
   ): CancellableJqPromise<DataCatalogEntry.TopFilters>;
+  hasResolvedComment(): boolean;
   isArray(): boolean;
   isComplex(): boolean;
   isMap(): boolean;
