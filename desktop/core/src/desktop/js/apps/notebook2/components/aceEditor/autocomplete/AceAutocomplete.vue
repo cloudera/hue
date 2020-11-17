@@ -24,37 +24,30 @@
     :style="{ top: top + 'px', left: left + 'px' }"
   >
     <div class="autocompleter-suggestions">
-      <div
-        v-if="autocompleteResults.availableCategories.length > 1 || autocompleteResults.loading"
-        class="autocompleter-header"
-      >
+      <div v-if="availableCategories.length > 1 || loading" class="autocompleter-header">
         <!-- ko if: suggestions.availableCategories().length > 1 -->
-        <div
-          v-if="autocompleteResults.availableCategories.length > 1"
-          class="autocompleter-categories"
-        >
+        <div v-if="availableCategories.length > 1" class="autocompleter-categories">
           <div
-            v-for="category in autocompleteResults.availableCategories"
+            v-for="category in availableCategories"
             :key="category.label"
             :style="{
-              'border-color':
-                autocompleteResults.activeCategory === category ? category.color : 'transparent'
+              'border-color': activeCategory === category ? category.color : 'transparent'
             }"
-            :class="{ active: autocompleteResults.activeCategory === category }"
+            :class="{ active: activeCategory === category }"
             @click="categoryClick(category, $event)"
           >
             {{ category.label }}
           </div>
         </div>
         <div class="autocompleter-spinner">
-          <spinner :spin="autocompleteResults.loading" size="small" />
+          <spinner :spin="loading" size="small" />
         </div>
       </div>
       <div class="autocompleter-entries">
         <div>
           <div
-            v-for="(suggestion, index) in autocompleteResults.filtered"
-            :key="suggestion.category.label + suggestion.value"
+            v-for="(suggestion, index) in filtered"
+            :key="activeCategory.categoryId + suggestion.category.categoryId + suggestion.value"
             class="autocompleter-suggestion"
             :class="{ selected: index === selectedIndex }"
             @click="clickToInsert(index)"
@@ -66,7 +59,7 @@
                 class="autocompleter-dot"
                 :style="{ 'background-color': suggestion.category.color }"
               />
-              <matched-text :suggestion="suggestion" :filter="autocompleteResults.filter" />
+              <matched-text :suggestion="suggestion" :filter="filter" />
               <i v-if="suggestion.details && suggestion.details.primary_key" class="fa fa-key" />
             </div>
             <div class="autocompleter-suggestion-meta">
@@ -81,7 +74,10 @@
 </template>
 
 <script lang="ts">
-  import MatchedText from 'apps/notebook2/components/aceEditor/autocomplete/MatchedText.vue';
+  import sqlUtils, { SortOverride } from 'sql/sqlUtils';
+  import huePubSub from 'utils/huePubSub';
+  import { Category, CategoryId, CategoryInfo, extractCategories } from './Category';
+  import MatchedText from './MatchedText.vue';
   import Executor from 'apps/notebook2/execution/executor';
   import { clickOutsideDirective } from 'components/directives/clickOutsideDirective';
   import Spinner from 'components/Spinner.vue';
@@ -91,7 +87,7 @@
   import SqlAutocompleter from './SqlAutocompleter';
   import { defer } from 'utils/hueUtils';
   import { Prop } from 'vue-property-decorator';
-  import AutocompleteResults, { Category } from './AutocompleteResults';
+  import AutocompleteResults, { Suggestion } from './AutocompleteResults';
   import Vue from 'vue';
   import Component from 'vue-class-component';
 
@@ -117,12 +113,17 @@
     @Prop({ required: false, default: false })
     temporaryOnly?: boolean;
 
+    filter = '';
+    availableCategories = [Category.All];
+    activeCategory = Category.All;
+
     active = false;
     left = 0;
     top = 0;
     selectedIndex: number | null = null;
     hoveredIndex: number | null = null;
     base: Ace.Anchor | null = null;
+    sortOverride?: SortOverride | null = null;
 
     autocompleter?: SqlAutocompleter;
     autocompleteResults?: AutocompleteResults;
@@ -137,13 +138,14 @@
 
     subTracker = new SubscriptionTracker();
 
-    // TODO: Move filter, filtered, categories, activeCategory from AutocompleteResults to this component
-
     created(): void {
       this.keyboardHandler = new HashHandler();
       this.registerKeybindings(this.keyboardHandler);
 
       this.changeListener = () => {
+        if (!this.autocompleteResults) {
+          return;
+        }
         window.clearTimeout(this.changeTimeout);
         const cursor = this.editor.selection.lead;
         if (this.base && (cursor.row !== this.base.row || cursor.column < this.base.column)) {
@@ -162,18 +164,10 @@
                 )
               );
             }
-            this.autocompleteResults.filter = this.editor.session.getTextRange({
-              start: this.base,
-              end: pos
-            });
-
+            this.updateFilter();
             this.positionAutocompleteDropdown();
 
-            // TODO: Vue does not react on changes to autocompleteResults.filter could be because we initialize it
-            // in mounted
-            this.$forceUpdate();
-
-            if (!this.autocompleteResults.filtered.length) {
+            if (!this.filtered.length) {
               this.detach();
             }
           }, 200);
@@ -181,13 +175,163 @@
       };
     }
 
+    mounted(): void {
+      this.autocompleter = new SqlAutocompleter({
+        editorId: this.editorId,
+        executor: this.executor,
+        editor: this.editor,
+        temporaryOnly: this.temporaryOnly
+      });
+
+      this.subTracker.addDisposable(this.autocompleter);
+
+      this.autocompleteResults = this.autocompleter.autocompleteResults;
+
+      this.subTracker.subscribe('hue.ace.autocompleter.done', () => {
+        defer(() => {
+          if (this.active && !this.filtered.length && !this.loading) {
+            this.detach();
+          }
+        });
+      });
+
+      this.subTracker.subscribe(
+        'hue.ace.autocompleter.show',
+        async (details: {
+          editor: Ace.Editor;
+          lineHeight: number;
+          position: { top: number; left: number };
+        }) => {
+          if (details.editor !== this.editor || !this.autocompleter) {
+            return;
+          }
+          const session = this.editor.getSession();
+          const pos = this.editor.getCursorPosition();
+          const line = session.getLine(pos.row);
+          const prefix = aceUtil.retrievePrecedingIdentifier(line, pos.column);
+          const newBase = session.doc.createAnchor(pos.row, pos.column - prefix.length);
+
+          this.positionAutocompleteDropdown();
+
+          const afterAutocomplete = () => {
+            newBase.$insertRight = true;
+            this.base = newBase;
+            if (this.autocompleteResults) {
+              this.filter = prefix;
+            }
+            this.active = true;
+            this.selectedIndex = 0;
+          };
+
+          if (
+            !this.active ||
+            !this.base ||
+            newBase.column !== this.base.column ||
+            newBase.row !== this.base.row
+          ) {
+            try {
+              await this.autocompleter.autocomplete();
+              afterAutocomplete();
+              this.attach();
+            } catch (err) {
+              afterAutocomplete();
+            }
+          } else {
+            afterAutocomplete();
+          }
+        }
+      );
+
+      this.subTracker.subscribe(
+        'editor.autocomplete.temporary.sort.override',
+        (sortOverride: SortOverride): void => {
+          this.sortOverride = sortOverride;
+        }
+      );
+    }
+
+    get loading(): boolean {
+      return (
+        !this.autocompleteResults ||
+        this.autocompleteResults.loadingKeywords ||
+        this.autocompleteResults.loadingFunctions ||
+        this.autocompleteResults.loadingDatabases ||
+        this.autocompleteResults.loadingTables ||
+        this.autocompleteResults.loadingColumns ||
+        this.autocompleteResults.loadingValues ||
+        this.autocompleteResults.loadingPaths ||
+        this.autocompleteResults.loadingJoins ||
+        this.autocompleteResults.loadingJoinConditions ||
+        this.autocompleteResults.loadingAggregateFunctions ||
+        this.autocompleteResults.loadingGroupBys ||
+        this.autocompleteResults.loadingOrderBys ||
+        this.autocompleteResults.loadingFilters ||
+        this.autocompleteResults.loadingPopularTables ||
+        this.autocompleteResults.loadingPopularColumns
+      );
+    }
+
+    updateFilter(): void {
+      if (this.base) {
+        const pos = this.editor.getCursorPosition();
+        this.filter = this.editor.session.getTextRange({
+          start: this.base,
+          end: pos
+        });
+      }
+    }
+
+    get filtered(): Suggestion[] {
+      if (!this.autocompleteResults) {
+        return [];
+      }
+
+      let result = this.autocompleteResults.entries;
+
+      if (this.filter) {
+        result = sqlUtils.autocompleteFilter(this.filter, result);
+        huePubSub.publish('hue.ace.autocompleter.match.updated');
+      }
+
+      const categories = extractCategories(result);
+      if (categories.indexOf(this.activeCategory) === -1) {
+        this.activeCategory = Category.All;
+      }
+      this.availableCategories = categories;
+
+      const activeCategory = this.activeCategory;
+
+      const categoriesCount = new Map<CategoryId, number>();
+
+      result = result.filter(suggestion => {
+        categoriesCount.set(
+          suggestion.category.categoryId,
+          (categoriesCount.get(suggestion.category.categoryId) || 0) + 1
+        );
+        if (
+          activeCategory !== Category.Popular &&
+          (categoriesCount.get(suggestion.category.categoryId) || 0) >= 10 &&
+          suggestion.category.popular
+        ) {
+          return false;
+        }
+        return (
+          activeCategory === Category.All ||
+          activeCategory === suggestion.category ||
+          (activeCategory === Category.Popular && suggestion.popular)
+        );
+      });
+
+      sqlUtils.sortSuggestions(result, this.filter, this.sortOverride);
+      this.sortOverride = undefined;
+
+      return result;
+    }
+
     registerKeybindings(keyboardHandler: Ace.HashHandler): void {
       keyboardHandler.bindKeys({
         Up: () => {
-          if (!this.autocompleteResults) {
-            return;
-          }
-          if (this.autocompleteResults.filtered.length <= 1) {
+          if (this.filtered.length <= 1) {
             this.detach();
             this.editor.execCommand('golineup');
           } else if (this.selectedIndex) {
@@ -195,22 +339,16 @@
             this.hoveredIndex = null;
             this.scrollSelectionIntoView();
           } else {
-            this.selectedIndex = this.autocompleteResults.filtered.length - 1;
+            this.selectedIndex = this.filtered.length - 1;
             this.hoveredIndex = null;
             this.scrollSelectionIntoView();
           }
         },
         Down: () => {
-          if (!this.autocompleteResults) {
-            return;
-          }
-          if (this.autocompleteResults.filtered.length <= 1) {
+          if (this.filtered.length <= 1) {
             this.detach();
             this.editor.execCommand('golinedown');
-          } else if (
-            this.selectedIndex !== null &&
-            this.selectedIndex < this.autocompleteResults.filtered.length - 1
-          ) {
+          } else if (this.selectedIndex !== null && this.selectedIndex < this.filtered.length - 1) {
             this.selectedIndex = this.selectedIndex + 1;
             this.hoveredIndex = null;
             this.scrollSelectionIntoView();
@@ -221,10 +359,7 @@
           }
         },
         'Ctrl-Up|Ctrl-Home': () => {
-          if (!this.autocompleteResults) {
-            return;
-          }
-          if (this.autocompleteResults.filtered.length <= 1) {
+          if (this.filtered.length <= 1) {
             this.detach();
             this.editor.execCommand('gotostart');
           } else {
@@ -234,14 +369,11 @@
           }
         },
         'Ctrl-Down|Ctrl-End': () => {
-          if (!this.autocompleteResults) {
-            return;
-          }
-          if (this.autocompleteResults.filtered.length <= 1) {
+          if (this.filtered.length <= 1) {
             this.detach();
             this.editor.execCommand('gotoend');
-          } else if (this.autocompleteResults.filtered.length > 0) {
-            this.selectedIndex = this.autocompleteResults.filtered.length - 1;
+          } else if (this.filtered.length > 0) {
+            this.selectedIndex = this.filtered.length - 1;
             this.hoveredIndex = null;
             this.scrollSelectionIntoView();
           }
@@ -273,13 +405,7 @@
     }
 
     insertSuggestion(emptyCallback?: () => void): void {
-      if (!this.autocompleteResults) {
-        return;
-      }
-
-      const results = this.autocompleteResults;
-
-      if (this.selectedIndex === null || !results.filtered.length) {
+      if (this.selectedIndex === null || !this.filtered.length) {
         this.detach();
         if (emptyCallback) {
           emptyCallback();
@@ -287,20 +413,20 @@
         return;
       }
 
-      const selectedSuggestion = results.filtered[this.selectedIndex];
+      const selectedSuggestion = this.filtered[this.selectedIndex];
       const valueToInsert = selectedSuggestion.value;
 
       // Not always the case as we also match in comments
-      if (valueToInsert.toLowerCase() === results.filter.toLowerCase()) {
+      if (valueToInsert.toLowerCase() === this.filter.toLowerCase()) {
         // Close the autocomplete when the user has typed a complete suggestion
         this.detach();
         return;
       }
 
-      if (results.filter) {
+      if (this.filter) {
         const ranges = this.editor.selection.getAllRanges();
         ranges.forEach(range => {
-          range.start.column -= results.filter.length;
+          range.start.column -= this.filter.length;
           this.editor.session.remove(range);
         });
       }
@@ -309,79 +435,6 @@
       this.editor.execCommand('insertstring', valueToInsert);
       this.editor.renderer.scrollCursorIntoView();
       this.detach();
-    }
-
-    mounted(): void {
-      this.autocompleter = new SqlAutocompleter({
-        editorId: this.editorId,
-        executor: this.executor,
-        editor: this.editor,
-        temporaryOnly: this.temporaryOnly
-      });
-
-      this.subTracker.addDisposable(this.autocompleter);
-
-      this.autocompleteResults = this.autocompleter.autocompleteResults;
-
-      this.subTracker.subscribe('hue.ace.autocompleter.done', () => {
-        defer(() => {
-          if (
-            this.active &&
-            (!this.autocompleteResults ||
-              ((!this.autocompleteResults.filtered || !this.autocompleteResults.filtered.length) &&
-                !this.autocompleteResults.loading))
-          ) {
-            this.detach();
-          }
-        });
-      });
-
-      this.subTracker.subscribe(
-        'hue.ace.autocompleter.show',
-        async (details: {
-          editor: Ace.Editor;
-          lineHeight: number;
-          position: { top: number; left: number };
-        }) => {
-          if (details.editor !== this.editor || !this.autocompleter) {
-            return;
-          }
-          const session = this.editor.getSession();
-          const pos = this.editor.getCursorPosition();
-          const line = session.getLine(pos.row);
-          const prefix = aceUtil.retrievePrecedingIdentifier(line, pos.column);
-          const newBase = session.doc.createAnchor(pos.row, pos.column - prefix.length);
-
-          this.positionAutocompleteDropdown();
-
-          const afterAutocomplete = () => {
-            newBase.$insertRight = true;
-            this.base = newBase;
-            if (this.autocompleteResults) {
-              this.autocompleteResults.filter = prefix;
-            }
-            this.active = true;
-            this.selectedIndex = 0;
-          };
-
-          if (
-            !this.active ||
-            !this.base ||
-            newBase.column !== this.base.column ||
-            newBase.row !== this.base.row
-          ) {
-            try {
-              await this.autocompleter.autocomplete();
-              afterAutocomplete();
-              this.attach();
-            } catch (err) {
-              afterAutocomplete();
-            }
-          } else {
-            afterAutocomplete();
-          }
-        }
-      );
     }
 
     positionAutocompleteDropdown(): void {
@@ -394,13 +447,7 @@
     }
 
     get visible(): boolean {
-      return (
-        this.active &&
-        !!(
-          this.autocompleteResults &&
-          (this.autocompleteResults.loading || this.autocompleteResults.filtered.length)
-        )
-      );
+      return this.active && (this.loading || !!this.filtered.length);
     }
 
     scrollSelectionIntoView(): void {
@@ -409,10 +456,12 @@
 
     suggestionSelected(index: number): void {
       this.selectedIndex = index;
-      //$parent.insertSuggestion(); $parent.editor().focus();
+      this.insertSuggestion();
+      this.editor.focus();
     }
 
     attach(): void {
+      this.updateFilter();
       this.disposeEventHandlers();
 
       if (this.keyboardHandler) {
@@ -447,14 +496,11 @@
       }, 300);
     }
 
-    categoryClick(category: Category, event: Event): void {
+    categoryClick(category: CategoryInfo, event: Event): void {
       if (!this.autocompleteResults) {
         return;
       }
-      this.autocompleteResults.activeCategory = category;
-
-      // TODO: Why doesn't Vue reactivity pick up the change?
-      this.$forceUpdate();
+      this.activeCategory = category;
 
       event.stopPropagation();
       this.editor.focus();

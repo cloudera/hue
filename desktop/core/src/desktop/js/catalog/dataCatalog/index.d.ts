@@ -18,11 +18,9 @@ import CancellableJqPromise from 'api/cancellableJqPromise';
 import DataCatalogEntry from 'catalog/dataCatalogEntry';
 import { Compute, Connector, Namespace } from 'types/config';
 
-interface options {
+interface BaseOptions {
   namespace: Namespace;
   compute: Compute;
-  connector: Connector;
-  path: string | string[];
   definition?: unknown;
   silenceErrors?: boolean;
   cachedOnly?: boolean;
@@ -31,9 +29,40 @@ interface options {
   temporaryOnly?: boolean;
 }
 
+interface SingleEntryOptions extends BaseOptions {
+  path: string | string[];
+}
+
+interface MultiEntryOptions extends BaseOptions {
+  paths: (string | string[])[];
+}
+
+interface StaticSingleEntryOptions extends SingleEntryOptions {
+  connector: Connector;
+}
+
+interface StaticMultiEntryOptions extends MultiEntryOptions {
+  connector: Connector;
+}
+
+interface DataCatalog {
+  getChildren(options: SingleEntryOptions): CancellableJqPromise<DataCatalogEntry[]>;
+  getEntry(options: SingleEntryOptions): CancellableJqPromise<DataCatalogEntry>;
+  getMultiTableEntry(options: MultiEntryOptions): CancellableJqPromise<DataCatalogEntry>;
+  loadOptimizerPopularityForTables(
+    options: MultiEntryOptions
+  ): CancellableJqPromise<DataCatalogEntry[]>;
+}
+
 declare const dataCatalog: {
-  getChildren(options: options): CancellableJqPromise<DataCatalogEntry[]>;
-  getEntry(options: options): CancellableJqPromise<DataCatalogEntry>;
+  getChildren(options: StaticSingleEntryOptions): CancellableJqPromise<DataCatalogEntry[]>;
+  getEntry(options: StaticSingleEntryOptions): CancellableJqPromise<DataCatalogEntry>;
+  getMultiTableEntry(options: StaticMultiEntryOptions): CancellableJqPromise<DataCatalogEntry>;
+  loadOptimizerPopularityForTables(
+    options: StaticMultiEntryOptions
+  ): CancellableJqPromise<DataCatalogEntry[]>;
+  getCatalog(connector: Connector): DataCatalog;
+  applyCancellable(promise: CancellableJqPromise<unknown>, options: { cancellable: boolean }): void;
 };
 
 export = dataCatalog;

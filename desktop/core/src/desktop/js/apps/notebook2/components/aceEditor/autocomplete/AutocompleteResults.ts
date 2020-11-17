@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import CancellableJqPromise from 'api/cancellableJqPromise';
+import { Category, CategoryInfo } from 'apps/notebook2/components/aceEditor/autocomplete/Category';
 import Executor from 'apps/notebook2/execution/executor';
 import DataCatalogEntry, {
   Field,
@@ -46,7 +47,7 @@ import { hueWindow } from 'types/types';
 import hueUtils from 'utils/hueUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import sqlUtils, { SortOverride } from 'sql/sqlUtils';
+import sqlUtils from 'sql/sqlUtils';
 import { matchesType } from 'sql/reference/typeUtils';
 import { DIALECT } from 'apps/notebook2/snippet';
 import { cancelActiveRequest } from 'api/apiUtils';
@@ -59,44 +60,9 @@ import {
   getSetOptions
 } from 'sql/reference/sqlReferenceRepository';
 
-const COLORS = {
-  POPULAR: '#61bbff',
-  KEYWORD: '#0074d2',
-  COLUMN: '#2fae2f',
-  TABLE: '#ffa139',
-  DATABASE: '#517989',
-  SAMPLE: '#fea7a7',
-  IDENT_CTE_VAR: '#ca4f01',
-  UDF: '#acfbac',
-  HDFS: '#9e1414'
-};
-
-const META_I18n: { [type: string]: string } = {
-  aggregateFunction: I18n('aggregate'),
-  alias: I18n('alias'),
-  commonTableExpression: I18n('cte'),
-  database: I18n('database'),
-  dir: I18n('dir'),
-  filter: I18n('filter'),
-  groupBy: I18n('group by'),
-  join: I18n('join'),
-  joinCondition: I18n('condition'),
-  keyword: I18n('keyword'),
-  orderBy: I18n('order by'),
-  sample: I18n('sample'),
-  table: I18n('table'),
-  variable: I18n('variable'),
-  view: I18n('view'),
-  virtual: I18n('virtual')
-};
-
-export interface Category {
-  id: string;
-  color: string;
-  label: string;
-  detailsTemplate?: string;
-  weight?: number;
-  popular?: boolean;
+interface ColumnReference {
+  type: string;
+  samples?: (string | number)[];
 }
 
 export interface ColRefKeywordDetails {
@@ -106,6 +72,10 @@ export interface ColRefKeywordDetails {
 export interface FileDetails {
   name: string;
   type: string;
+}
+
+export interface CommentDetails {
+  comment: string;
 }
 
 export interface Suggestion {
@@ -123,7 +93,7 @@ export interface Suggestion {
     | TopAggValue
     | TopFilterValue
     | Field
-    | { comment?: string }
+    | CommentDetails
     | { name: string };
   matchComment?: boolean;
   matchIndex?: number;
@@ -131,7 +101,7 @@ export interface Suggestion {
   hasCatalogEntry?: boolean;
   meta: string;
   relativePopularity?: number;
-  category: Category;
+  category: CategoryInfo;
   table?: ParsedTable;
   popular?: boolean;
   tableName?: string;
@@ -140,164 +110,23 @@ export interface Suggestion {
   isColumn?: boolean;
 }
 
-const CATEGORIES: { [category: string]: Category } = {
-  ALL: {
-    id: 'all',
-    color: '#90ceff',
-    label: I18n('All')
-  },
-  POPULAR: {
-    id: 'popular',
-    color: COLORS.POPULAR,
-    label: I18n('Popular'),
-    popular: true
-  },
-  POPULAR_AGGREGATE: {
-    id: 'popularAggregate',
-    weight: 1500,
-    color: COLORS.POPULAR,
-    label: I18n('Popular'),
-    detailsTemplate: 'agg-udf',
-    popular: true
-  },
-  POPULAR_GROUP_BY: {
-    id: 'popularGroupBy',
-    weight: 1300,
-    color: COLORS.POPULAR,
-    label: I18n('Popular'),
-    detailsTemplate: 'group-by',
-    popular: true
-  },
-  POPULAR_ORDER_BY: {
-    id: 'popularOrderBy',
-    weight: 1200,
-    color: COLORS.POPULAR,
-    label: I18n('Popular'),
-    detailsTemplate: 'order-by',
-    popular: true
-  },
-  POPULAR_FILTER: {
-    id: 'popularFilter',
-    weight: 1400,
-    color: COLORS.POPULAR,
-    label: I18n('Popular'),
-    detailsTemplate: 'filter',
-    popular: true
-  },
-  POPULAR_ACTIVE_JOIN: {
-    id: 'popularActiveJoin',
-    weight: 1500,
-    color: COLORS.POPULAR,
-    label: I18n('Popular'),
-    detailsTemplate: 'join',
-    popular: true
-  },
-  POPULAR_JOIN_CONDITION: {
-    id: 'popularJoinCondition',
-    weight: 1500,
-    color: COLORS.POPULAR,
-    label: I18n('Popular'),
-    detailsTemplate: 'join-condition',
-    popular: true
-  },
-  COLUMN: {
-    id: 'column',
-    weight: 1000,
-    color: COLORS.COLUMN,
-    label: I18n('Columns'),
-    detailsTemplate: 'column'
-  },
-  SAMPLE: {
-    id: 'sample',
-    weight: 900,
-    color: COLORS.SAMPLE,
-    label: I18n('Samples'),
-    detailsTemplate: 'value'
-  },
-  IDENTIFIER: {
-    id: 'identifier',
-    weight: 800,
-    color: COLORS.IDENT_CTE_VAR,
-    label: I18n('Identifiers'),
-    detailsTemplate: 'identifier'
-  },
-  CTE: {
-    id: 'cte',
-    weight: 700,
-    color: COLORS.IDENT_CTE_VAR,
-    label: I18n('CTEs'),
-    detailsTemplate: 'cte'
-  },
-  TABLE: {
-    id: 'table',
-    weight: 600,
-    color: COLORS.TABLE,
-    label: I18n('Tables'),
-    detailsTemplate: 'table'
-  },
-  DATABASE: {
-    id: 'database',
-    weight: 500,
-    color: COLORS.DATABASE,
-    label: I18n('Databases'),
-    detailsTemplate: 'database'
-  },
-  UDF: {
-    id: 'udf',
-    weight: 400,
-    color: COLORS.UDF,
-    label: I18n('UDFs'),
-    detailsTemplate: 'udf'
-  },
-  OPTION: {
-    id: 'option',
-    weight: 400,
-    color: COLORS.UDF,
-    label: I18n('Options'),
-    detailsTemplate: 'option'
-  },
-  HDFS: {
-    id: 'hdfs',
-    weight: 300,
-    color: COLORS.HDFS,
-    label: I18n('Files'),
-    detailsTemplate: 'hdfs'
-  },
-  VIRTUAL_COLUMN: {
-    id: 'virtualColumn',
-    weight: 200,
-    color: COLORS.COLUMN,
-    label: I18n('Columns'),
-    detailsTemplate: 'column'
-  },
-  COLREF_KEYWORD: {
-    id: 'colrefKeyword',
-    weight: 100,
-    color: COLORS.KEYWORD,
-    label: I18n('Keywords'),
-    detailsTemplate: 'keyword'
-  },
-  VARIABLE: {
-    id: 'variable',
-    weight: 50,
-    color: COLORS.IDENT_CTE_VAR,
-    label: I18n('Variables'),
-    detailsTemplate: 'variable'
-  },
-  KEYWORD: {
-    id: 'keyword',
-    weight: 0,
-    color: COLORS.KEYWORD,
-    label: I18n('Keywords'),
-    detailsTemplate: 'keyword'
-  },
-  POPULAR_JOIN: {
-    id: 'popularJoin',
-    weight: 1500,
-    color: COLORS.POPULAR,
-    label: I18n('Popular'),
-    detailsTemplate: 'join'
-  }
+const MetaLabels = {
+  AggregateFunction: I18n('aggregate'),
+  Alias: I18n('alias'),
+  CTE: I18n('cte'),
+  Database: I18n('database'),
+  Dir: I18n('dir'),
+  Filter: I18n('filter'),
+  GroupBy: I18n('group by'),
+  Join: I18n('join'),
+  JoinCondition: I18n('condition'),
+  Keyword: I18n('keyword'),
+  OrderBy: I18n('order by'),
+  Sample: I18n('sample'),
+  Table: I18n('table'),
+  Variable: I18n('variable'),
+  View: I18n('view'),
+  Virtual: I18n('virtual')
 };
 
 const locateSubQuery = (subQueries: SubQuery[], subQueryName: string): SubQuery | undefined => {
@@ -308,11 +137,6 @@ const locateSubQuery = (subQueries: SubQuery[], subQueryName: string): SubQuery 
   }
 };
 
-interface ColumnReference {
-  type: string;
-  samples?: (string | number)[];
-}
-
 class AutocompleteResults {
   executor: Executor;
   editor: Ace.Editor;
@@ -320,12 +144,8 @@ class AutocompleteResults {
   activeDatabase: string;
 
   parseResult!: AutocompleteParseResult;
-  sortOverride?: SortOverride;
   entries: Suggestion[] = [];
   subTracker = new SubscriptionTracker();
-  filter = '';
-  availableCategories = [CATEGORIES.ALL];
-  activeCategory = CATEGORIES.ALL;
   onCancelFunctions: (() => void)[] = [];
   lastKnownRequests: JQueryXHR[] = [];
   cancellablePromises: CancellableJqPromise<unknown>[] = [];
@@ -351,97 +171,6 @@ class AutocompleteResults {
     this.editor = options.editor;
     this.temporaryOnly = options.temporaryOnly;
     this.activeDatabase = this.executor.database();
-
-    this.subTracker.subscribe(
-      'editor.autocomplete.temporary.sort.override',
-      (sortOverride: SortOverride): void => {
-        this.sortOverride = sortOverride;
-      }
-    );
-  }
-
-  updateAvailableCategories(suggestions: Suggestion[]): void {
-    const categoriesIndex: typeof CATEGORIES = {};
-    suggestions.forEach(suggestion => {
-      if (suggestion.popular && !categoriesIndex.POPULAR) {
-        categoriesIndex.POPULAR = CATEGORIES.POPULAR;
-      } else if (suggestion.category === CATEGORIES.TABLE && !categoriesIndex.TABLE) {
-        categoriesIndex.TABLE = suggestion.category;
-      } else if (suggestion.category === CATEGORIES.COLUMN && !categoriesIndex.COLUMN) {
-        categoriesIndex.COLUMN = suggestion.category;
-      } else if (suggestion.category === CATEGORIES.UDF && !categoriesIndex.UDF) {
-        categoriesIndex.UDF = suggestion.category;
-      }
-    });
-    const categories: Category[] = [];
-    Object.keys(categoriesIndex).forEach(key => {
-      categories.push(categoriesIndex[key]);
-    });
-    categories.sort((a, b) => a.label.localeCompare(b.label));
-    categories.unshift(CATEGORIES.ALL);
-    if (categories.indexOf(this.activeCategory) === -1) {
-      this.activeCategory = CATEGORIES.ALL;
-    }
-    this.availableCategories = categories;
-  }
-
-  get filtered(): Suggestion[] {
-    let result = this.entries;
-
-    if (this.filter) {
-      result = sqlUtils.autocompleteFilter(this.filter, result);
-      huePubSub.publish('hue.ace.autocompleter.match.updated');
-    }
-
-    this.updateAvailableCategories(result);
-
-    const activeCategory = this.activeCategory;
-
-    const categoriesCount: { [id: string]: number } = {};
-
-    result = result.filter(suggestion => {
-      if (typeof categoriesCount[suggestion.category.id] === 'undefined') {
-        categoriesCount[suggestion.category.id] = 0;
-      } else {
-        categoriesCount[suggestion.category.id]++;
-      }
-      if (
-        activeCategory !== CATEGORIES.POPULAR &&
-        categoriesCount[suggestion.category.id] >= 10 &&
-        suggestion.category.popular
-      ) {
-        return false;
-      }
-      return (
-        activeCategory === CATEGORIES.ALL ||
-        activeCategory === suggestion.category ||
-        (activeCategory === CATEGORIES.POPULAR && suggestion.popular)
-      );
-    });
-
-    sqlUtils.sortSuggestions(result, this.filter, this.sortOverride);
-    this.sortOverride = undefined;
-    return result;
-  }
-
-  get loading(): boolean {
-    return (
-      this.loadingKeywords ||
-      this.loadingFunctions ||
-      this.loadingDatabases ||
-      this.loadingTables ||
-      this.loadingColumns ||
-      this.loadingValues ||
-      this.loadingPaths ||
-      this.loadingJoins ||
-      this.loadingJoinConditions ||
-      this.loadingAggregateFunctions ||
-      this.loadingGroupBys ||
-      this.loadingOrderBys ||
-      this.loadingFilters ||
-      this.loadingPopularTables ||
-      this.loadingPopularColumns
-    );
   }
 
   dialect(): string {
@@ -473,8 +202,6 @@ class AutocompleteResults {
     this.loadingFilters = false;
     this.loadingPopularTables = false;
     this.loadingPopularColumns = false;
-
-    this.filter = '';
 
     if (this.parseResult.udfArgument) {
       await this.adjustForUdfArgument();
@@ -650,8 +377,8 @@ class AutocompleteResults {
     }
     return suggestKeywords.map(keyword => ({
       value: this.parseResult.lowerCase ? keyword.value.toLowerCase() : keyword.value,
-      meta: META_I18n.keyword,
-      category: CATEGORIES.KEYWORD,
+      meta: MetaLabels.Keyword,
+      category: Category.Keyword,
       weightAdjust: keyword.weight,
       popular: false
     }));
@@ -671,8 +398,8 @@ class AutocompleteResults {
         suggestColRefKeywords[typeForKeywords].forEach(keyword => {
           colRefKeywordSuggestions.push({
             value: this.parseResult.lowerCase ? keyword.toLowerCase() : keyword,
-            meta: META_I18n.keyword,
-            category: CATEGORIES.COLREF_KEYWORD,
+            meta: MetaLabels.Keyword,
+            category: Category.ColRefKeyword,
             popular: false,
             details: {
               type: colRef.type
@@ -693,7 +420,7 @@ class AutocompleteResults {
     return suggestIdentifiers.map(identifier => ({
       value: identifier.name,
       meta: identifier.type,
-      category: CATEGORIES.IDENTIFIER,
+      category: Category.Identifier,
       popular: false
     }));
   }
@@ -710,8 +437,8 @@ class AutocompleteResults {
       if (type === 'COLREF') {
         columnAliasSuggestions.push({
           value: columnAlias.name,
-          meta: META_I18n.alias,
-          category: CATEGORIES.COLUMN,
+          meta: MetaLabels.Alias,
+          category: Category.Column,
           popular: false,
           details: columnAlias
         });
@@ -722,7 +449,7 @@ class AutocompleteResults {
           columnAliasSuggestions.push({
             value: columnAlias.name,
             meta: resolvedType,
-            category: CATEGORIES.COLUMN,
+            category: Category.Column,
             popular: false,
             details: columnAlias
           });
@@ -731,7 +458,7 @@ class AutocompleteResults {
         columnAliasSuggestions.push({
           value: columnAlias.name,
           meta: type,
-          category: CATEGORIES.COLUMN,
+          category: Category.Column,
           popular: false,
           details: columnAlias
         });
@@ -755,8 +482,8 @@ class AutocompleteResults {
       commonTableExpressionSuggestions.push({
         value: prefix + expression.name,
         filterValue: expression.name,
-        meta: META_I18n.commonTableExpression,
-        category: CATEGORIES.CTE,
+        meta: MetaLabels.CTE,
+        category: Category.CTE,
         popular: false
       });
     });
@@ -771,7 +498,7 @@ class AutocompleteResults {
     try {
       const setOptions = await getSetOptions(this.executor.connector());
       return Object.keys(setOptions).map(name => ({
-        category: CATEGORIES.OPTION,
+        category: Category.Option,
         value: name,
         meta: '',
         popular: false,
@@ -808,7 +535,7 @@ class AutocompleteResults {
 
           const functionSuggestions: Suggestion[] = [];
           functionsToSuggest.map(udf => ({
-            category: CATEGORIES.UDF,
+            category: Category.UDF,
             value: udf.name + '()',
             meta: udf.returnTypes.join('|'),
             weightAdjust:
@@ -846,7 +573,7 @@ class AutocompleteResults {
           !!this.parseResult.suggestAnalyticFunctions
         );
         suggestions = functionsToSuggest.map(udf => ({
-          category: CATEGORIES.UDF,
+          category: Category.UDF,
           value: udf.name + '()',
           meta: udf.returnTypes.join('|'),
           weightAdjust:
@@ -888,8 +615,8 @@ class AutocompleteResults {
               (await sqlUtils.backTickIfNeeded(this.executor.connector(), name)) +
               (suggestDatabases.appendDot ? '.' : ''),
             filterValue: name,
-            meta: META_I18n.database,
-            category: CATEGORIES.DATABASE,
+            meta: MetaLabels.Database,
+            category: Category.Database,
             popular: false,
             hasCatalogEntry: true,
             details: dbEntry
@@ -956,8 +683,8 @@ class AutocompleteResults {
             value: prefix + (await sqlUtils.backTickIfNeeded(this.executor.connector(), name)),
             filterValue: name,
             tableName: name,
-            meta: META_I18n[tableEntry.getType().toLowerCase()],
-            category: CATEGORIES.TABLE,
+            meta: tableEntry.isView() ? MetaLabels.View : MetaLabels.Table,
+            category: Category.Table,
             popular: false,
             hasCatalogEntry: true,
             details: tableEntry
@@ -1048,15 +775,15 @@ class AutocompleteResults {
     if (this.dialect() === DIALECT.hive && /[^.]$/.test(this.editor.getTextBeforeCursor())) {
       columnSuggestions.push({
         value: 'BLOCK__OFFSET__INSIDE__FILE',
-        meta: META_I18n.virtual,
-        category: CATEGORIES.VIRTUAL_COLUMN,
+        meta: MetaLabels.Virtual,
+        category: Category.VirtualColumn,
         popular: false,
         details: { name: 'BLOCK__OFFSET__INSIDE__FILE' }
       });
       columnSuggestions.push({
         value: 'INPUT__FILE__NAME',
-        meta: META_I18n.virtual,
-        category: CATEGORIES.VIRTUAL_COLUMN,
+        meta: MetaLabels.Virtual,
+        category: Category.VirtualColumn,
         popular: false,
         details: { name: 'INPUT__FILE__NAME' }
       });
@@ -1084,7 +811,7 @@ class AutocompleteResults {
           value: await sqlUtils.backTickIfNeeded(this.executor.connector(), column.alias),
           filterValue: column.alias,
           meta: type,
-          category: CATEGORIES.COLUMN,
+          category: Category.Column,
           table: table,
           popular: false,
           details: column
@@ -1101,7 +828,7 @@ class AutocompleteResults {
           ),
           filterValue: column.identifierChain[column.identifierChain.length - 1].name,
           meta: type,
-          category: CATEGORIES.COLUMN,
+          category: Category.Column,
           table: table,
           popular: false,
           details: column
@@ -1131,7 +858,7 @@ class AutocompleteResults {
               value: await sqlUtils.backTickIfNeeded(connector, column.alias),
               filterValue: column.alias,
               meta: type,
-              category: CATEGORIES.COLUMN,
+              category: Category.Column,
               table: table,
               popular: false,
               details: column
@@ -1144,7 +871,7 @@ class AutocompleteResults {
               ),
               filterValue: column.identifierChain[column.identifierChain.length - 1].name,
               meta: type,
-              category: CATEGORIES.COLUMN,
+              category: Category.Column,
               table: table,
               popular: false,
               details: column
@@ -1222,7 +949,7 @@ class AutocompleteResults {
               value: name,
               meta: childEntry.getType(),
               table: table,
-              category: CATEGORIES.COLUMN,
+              category: Category.Column,
               popular: false,
               weightAdjust:
                 types[0].toUpperCase() !== 'T' &&
@@ -1261,7 +988,7 @@ class AutocompleteResults {
               value: field.name,
               meta: fieldType,
               table: table,
-              category: CATEGORIES.COLUMN,
+              category: Category.Column,
               popular: false,
               weightAdjust:
                 types[0].toUpperCase() !== 'T' &&
@@ -1345,8 +1072,8 @@ class AutocompleteResults {
       valueSuggestions.push({
         value:
           '${' + colRefResult.identifierChain[colRefResult.identifierChain.length - 1].name + '}',
-        meta: META_I18n.variable,
-        category: CATEGORIES.VARIABLE,
+        meta: MetaLabels.Variable,
+        category: Category.Variable,
         popular: false
       });
     }
@@ -1364,8 +1091,8 @@ class AutocompleteResults {
       colRef.samples.forEach(sample => {
         valueSuggestions.push({
           value: isString ? startQuote + sample + endQuote : String(sample),
-          meta: META_I18n.sample,
-          category: CATEGORIES.SAMPLE,
+          meta: MetaLabels.Sample,
+          category: Category.Sample,
           popular: false
         });
       });
@@ -1389,36 +1116,36 @@ class AutocompleteResults {
       suggestions = [
         {
           value: 'adl://',
-          meta: META_I18n.keyword,
-          category: CATEGORIES.KEYWORD,
+          meta: MetaLabels.Keyword,
+          category: Category.Keyword,
           weightAdjust: 0,
           popular: false
         },
         {
           value: 's3a://',
-          meta: META_I18n.keyword,
-          category: CATEGORIES.KEYWORD,
+          meta: MetaLabels.Keyword,
+          category: Category.Keyword,
           weightAdjust: 0,
           popular: false
         },
         {
           value: 'hdfs://',
-          meta: META_I18n.keyword,
-          category: CATEGORIES.KEYWORD,
+          meta: MetaLabels.Keyword,
+          category: Category.Keyword,
           weightAdjust: 0,
           popular: false
         },
         {
           value: 'abfs://',
-          meta: META_I18n.keyword,
-          category: CATEGORIES.KEYWORD,
+          meta: MetaLabels.Keyword,
+          category: Category.Keyword,
           weightAdjust: 0,
           popular: false
         },
         {
           value: '/',
-          meta: META_I18n.dir,
-          category: CATEGORIES.HDFS,
+          meta: MetaLabels.Dir,
+          category: Category.Files,
           popular: false
         }
       ];
@@ -1443,7 +1170,7 @@ class AutocompleteResults {
           suggestions.push({
             value: rootPath,
             meta: 'abfs',
-            category: CATEGORIES.HDFS,
+            category: Category.Files,
             weightAdjust: 0,
             popular: false
           });
@@ -1475,7 +1202,7 @@ class AutocompleteResults {
                   suggestions.push({
                     value: path === '' ? '/' + file.name : file.name,
                     meta: file.type,
-                    category: CATEGORIES.HDFS,
+                    category: Category.Files,
                     popular: false,
                     details: file
                   });
@@ -1611,10 +1338,10 @@ class AutocompleteResults {
             totalCount += value.totalQueryCount;
             joinSuggestions.push({
               value: suggestionString,
-              meta: META_I18n.join,
+              meta: MetaLabels.Join,
               category: suggestJoins.prependJoin
-                ? CATEGORIES.POPULAR_JOIN
-                : CATEGORIES.POPULAR_ACTIVE_JOIN,
+                ? Category.PopularJoin
+                : Category.PopularActiveJoin,
               popular: true,
               details: value
             });
@@ -1702,8 +1429,8 @@ class AutocompleteResults {
             totalCount += value.totalQueryCount;
             joinConditionSuggestions.push({
               value: suggestionString,
-              meta: META_I18n.joinCondition,
-              category: CATEGORIES.POPULAR_JOIN_CONDITION,
+              meta: MetaLabels.JoinCondition,
+              category: Category.PopularJoinCondition,
               popular: true,
               details: value
             });
@@ -1831,7 +1558,7 @@ class AutocompleteResults {
         aggregateFunctionsSuggestions.push({
           value: clean,
           meta: (value.function && value.function.returnTypes.join('|')) || '',
-          category: CATEGORIES.POPULAR_AGGREGATE,
+          category: Category.PopularAggregate,
           weightAdjust: Math.min(value.totalQueryCount, 99),
           popular: true,
           details: value
@@ -1913,11 +1640,11 @@ class AutocompleteResults {
           suggestions.push({
             value: prefix + filterValue,
             filterValue: filterValue,
-            meta: optimizerAttribute === 'groupByColumn' ? META_I18n.groupBy : META_I18n.orderBy,
+            meta: optimizerAttribute === 'groupByColumn' ? MetaLabels.GroupBy : MetaLabels.OrderBy,
             category:
               optimizerAttribute === 'groupByColumn'
-                ? CATEGORIES.POPULAR_GROUP_BY
-                : CATEGORIES.POPULAR_ORDER_BY,
+                ? Category.PopularGroupBy
+                : Category.PopularOrderBy,
             weightAdjust: Math.round(
               (100 *
                 (<{ columnCount: number }>entry.optimizerPopularity[optimizerAttribute])
@@ -2046,8 +1773,8 @@ class AutocompleteResults {
                   totalCount += popularValue.count;
                   filterSuggestions.push({
                     value: compVal,
-                    meta: META_I18n.filter,
-                    category: CATEGORIES.POPULAR_FILTER,
+                    meta: MetaLabels.Filter,
+                    category: Category.PopularFilter,
                     popular: false,
                     details: popularValue
                   });
