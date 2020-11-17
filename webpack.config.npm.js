@@ -32,29 +32,21 @@ const defaultConfig = Object.assign({}, require('./webpack.config'), {
   plugins: []
 });
 
-const npmSetupConfig = {
-  entry: {
-    'package.json': './package.json'
-  },
-  output: {
-    path: DIST_DIR,
-    filename: 'package.json'
-  },
-  plugins: [
-    new CleanWebpackPlugin([DIST_DIR]),
-    new CopyWebpackPlugin({
-      patterns: [
-        { from: './NPM-README.md', to: `${DIST_DIR}/README.md` },
+const npmSetupPlugins = [
+  new CleanWebpackPlugin([DIST_DIR]),
+  new CopyWebpackPlugin({
+    patterns: [
+      { from: './package.json', to: `${DIST_DIR}/package.json` },
+      { from: './NPM-README.md', to: `${DIST_DIR}/README.md` },
 
-        { from: `${JS_ROOT}/components`, to: `${DIST_DIR}/src/components` },
-        { from: `${JS_ROOT}/utils/hueUtils.js`, to: `${DIST_DIR}/src/utils/hueUtils.js` },
+      { from: `${JS_ROOT}/components`, to: `${DIST_DIR}/src/components` },
+      { from: `${JS_ROOT}/utils/hueUtils.js`, to: `${DIST_DIR}/src/utils/hueUtils.js` },
 
-        { from: `${JS_ROOT}/parse`, to: `${DIST_DIR}/src/parse` },
-        { from: `${JS_ROOT}/sql`, to: `${DIST_DIR}/src/sql` }
-      ]
-    })
-  ]
-};
+      { from: `${JS_ROOT}/parse`, to: `${DIST_DIR}/src/parse` },
+      { from: `${JS_ROOT}/sql`, to: `${DIST_DIR}/src/sql` }
+    ]
+  })
+];
 
 const webComponentsConfig = Object.assign({}, defaultConfig, {
   entry: {
@@ -63,9 +55,7 @@ const webComponentsConfig = Object.assign({}, defaultConfig, {
   output: {
     path: `${DIST_DIR}/components`
   },
-  plugins: [
-    new VueLoaderPlugin()
-  ]
+  plugins: npmSetupPlugins.concat(new VueLoaderPlugin())
 });
 
 const parserConf = Object.assign({}, defaultConfig, {
@@ -114,7 +104,6 @@ const parserConf = Object.assign({}, defaultConfig, {
 });
 
 module.exports = [
-  npmSetupConfig,
   webComponentsConfig,
   parserConf
 ];
