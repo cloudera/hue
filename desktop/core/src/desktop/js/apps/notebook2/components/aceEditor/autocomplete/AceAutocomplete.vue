@@ -34,7 +34,7 @@
               'border-color': activeCategory === category ? category.color : 'transparent'
             }"
             :class="{ active: activeCategory === category }"
-            @click="categoryClick(category, $event)"
+            @click="clickCategory(category, $event)"
           >
             {{ category.label }}
           </div>
@@ -50,7 +50,7 @@
             :key="activeCategory.categoryId + suggestion.category.categoryId + suggestion.value"
             class="autocompleter-suggestion"
             :class="{ selected: index === selectedIndex }"
-            @click="clickToInsert(index)"
+            @click="clickSuggestion(index)"
             @mouseover="hoveredIndex = index"
             @mouseout="hoveredIndex = null"
           >
@@ -70,34 +70,47 @@
         </div>
       </div>
     </div>
+    <div v-if="detailsComponent" class="autocompleter-details">
+      <component :is="detailsComponent" :suggestion="focusedEntry" />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-  import sqlUtils, { SortOverride } from 'sql/sqlUtils';
-  import huePubSub from 'utils/huePubSub';
-  import { Category, CategoryId, CategoryInfo, extractCategories } from './Category';
-  import MatchedText from './MatchedText.vue';
-  import Executor from 'apps/notebook2/execution/executor';
-  import { clickOutsideDirective } from 'components/directives/clickOutsideDirective';
-  import Spinner from 'components/Spinner.vue';
-  import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import { Ace } from 'ext/ace';
   import ace from 'ext/aceHelper';
-  import SqlAutocompleter from './SqlAutocompleter';
-  import { defer } from 'utils/hueUtils';
-  import { Prop } from 'vue-property-decorator';
-  import AutocompleteResults, { Suggestion } from './AutocompleteResults';
   import Vue from 'vue';
   import Component from 'vue-class-component';
+  import { Prop } from 'vue-property-decorator';
 
+  import { Category, CategoryId, CategoryInfo, extractCategories } from './Category';
+  import Executor from 'apps/notebook2/execution/executor';
+  import SubscriptionTracker from 'components/utils/SubscriptionTracker';
+  import sqlUtils, { SortOverride } from 'sql/sqlUtils';
+  import huePubSub from 'utils/huePubSub';
+  import { defer } from 'utils/hueUtils';
   import I18n from 'utils/i18n';
 
+  import AutocompleteResults, { Suggestion } from './AutocompleteResults';
+  import CatalogEntryDetailsPanel from './CatalogEntryDetailsPanel.vue';
+  import MatchedText from './MatchedText.vue';
+  import OptionDetailsPanel from './OptionDetailsPanel.vue';
+  import SqlAutocompleter from './SqlAutocompleter';
+  import UdfDetailsPanel from './UdfDetailsPanel.vue';
+  import Spinner from 'components/Spinner.vue';
+  import { clickOutsideDirective } from 'components/directives/clickOutsideDirective';
+
   const aceUtil = <Ace.AceUtil>ace.require('ace/autocomplete/util');
-  const HashHandler: typeof Ace.HashHandler = ace.require('ace/keyboard/hash_handler').HashHandler;
+  const HashHandler = <typeof Ace.HashHandler>ace.require('ace/keyboard/hash_handler').HashHandler;
 
   @Component({
-    components: { MatchedText, Spinner },
+    components: {
+      CatalogEntryDetailsPanel,
+      MatchedText,
+      OptionDetailsPanel,
+      Spinner,
+      UdfDetailsPanel
+    },
     methods: { I18n },
     directives: {
       'click-outside': clickOutsideDirective
@@ -113,29 +126,25 @@
     @Prop({ required: false, default: false })
     temporaryOnly?: boolean;
 
+    active = false;
     filter = '';
     availableCategories = [Category.All];
     activeCategory = Category.All;
-
-    active = false;
     left = 0;
     top = 0;
     selectedIndex: number | null = null;
     hoveredIndex: number | null = null;
     base: Ace.Anchor | null = null;
     sortOverride?: SortOverride | null = null;
-
     autocompleter?: SqlAutocompleter;
     autocompleteResults?: AutocompleteResults;
 
     changeTimeout = -1;
     positionInterval = -1;
     keyboardHandler: Ace.HashHandler | null = null;
-
     changeListener: (() => void) | null = null;
     mousedownListener = this.detach.bind(this);
     mousewheelListener = this.detach.bind(this);
-
     subTracker = new SubscriptionTracker();
 
     created(): void {
@@ -250,35 +259,24 @@
       );
     }
 
-    get loading(): boolean {
-      return (
-        !this.autocompleteResults ||
-        this.autocompleteResults.loadingKeywords ||
-        this.autocompleteResults.loadingFunctions ||
-        this.autocompleteResults.loadingDatabases ||
-        this.autocompleteResults.loadingTables ||
-        this.autocompleteResults.loadingColumns ||
-        this.autocompleteResults.loadingValues ||
-        this.autocompleteResults.loadingPaths ||
-        this.autocompleteResults.loadingJoins ||
-        this.autocompleteResults.loadingJoinConditions ||
-        this.autocompleteResults.loadingAggregateFunctions ||
-        this.autocompleteResults.loadingGroupBys ||
-        this.autocompleteResults.loadingOrderBys ||
-        this.autocompleteResults.loadingFilters ||
-        this.autocompleteResults.loadingPopularTables ||
-        this.autocompleteResults.loadingPopularColumns
-      );
+    destroyed(): void {
+      this.disposeEventHandlers();
+      this.subTracker.dispose();
     }
 
-    updateFilter(): void {
-      if (this.base) {
-        const pos = this.editor.getCursorPosition();
-        this.filter = this.editor.session.getTextRange({
-          start: this.base,
-          end: pos
-        });
+    get detailsComponent(): string | undefined {
+      if (this.focusedEntry && this.focusedEntry.details) {
+        if (this.focusedEntry.hasCatalogEntry) {
+          return 'CatalogEntryDetailsPanel';
+        }
+        if (this.focusedEntry.category.categoryId === CategoryId.UDF) {
+          return 'UdfDetailsPanel';
+        }
+        if (this.focusedEntry.category.categoryId === CategoryId.Option) {
+          return 'OptionDetailsPanel';
+        }
       }
+      return undefined;
     }
 
     get filtered(): Suggestion[] {
@@ -326,6 +324,74 @@
       this.sortOverride = undefined;
 
       return result;
+    }
+
+    get focusedEntry(): Suggestion | undefined {
+      if (this.filtered.length) {
+        if (this.hoveredIndex !== null) {
+          return this.filtered[this.hoveredIndex];
+        } else if (this.selectedIndex !== null) {
+          return this.filtered[this.selectedIndex];
+        }
+      }
+      return undefined;
+    }
+
+    get loading(): boolean {
+      return (
+        !this.autocompleteResults ||
+        this.autocompleteResults.loadingKeywords ||
+        this.autocompleteResults.loadingFunctions ||
+        this.autocompleteResults.loadingDatabases ||
+        this.autocompleteResults.loadingTables ||
+        this.autocompleteResults.loadingColumns ||
+        this.autocompleteResults.loadingValues ||
+        this.autocompleteResults.loadingPaths ||
+        this.autocompleteResults.loadingJoins ||
+        this.autocompleteResults.loadingJoinConditions ||
+        this.autocompleteResults.loadingAggregateFunctions ||
+        this.autocompleteResults.loadingGroupBys ||
+        this.autocompleteResults.loadingOrderBys ||
+        this.autocompleteResults.loadingFilters ||
+        this.autocompleteResults.loadingPopularTables ||
+        this.autocompleteResults.loadingPopularColumns
+      );
+    }
+
+    get visible(): boolean {
+      return this.active && (this.loading || !!this.filtered.length);
+    }
+
+    clickCategory(category: CategoryInfo, event: Event): void {
+      if (!this.autocompleteResults) {
+        return;
+      }
+      this.activeCategory = category;
+
+      event.stopPropagation();
+      this.editor.focus();
+    }
+
+    clickOutside(): void {
+      if (this.active) {
+        this.detach();
+      }
+    }
+
+    clickSuggestion(index: number): void {
+      this.selectedIndex = index;
+      this.insertSuggestion();
+      this.editor.focus();
+    }
+
+    updateFilter(): void {
+      if (this.base) {
+        const pos = this.editor.getCursorPosition();
+        this.filter = this.editor.session.getTextRange({
+          start: this.base,
+          end: pos
+        });
+      }
     }
 
     registerKeybindings(keyboardHandler: Ace.HashHandler): void {
@@ -398,12 +464,6 @@
       });
     }
 
-    clickToInsert(index: number): void {
-      this.selectedIndex = index;
-      this.insertSuggestion();
-      this.editor.focus();
-    }
-
     insertSuggestion(emptyCallback?: () => void): void {
       if (this.selectedIndex === null || !this.filtered.length) {
         this.detach();
@@ -444,10 +504,6 @@
       const lineHeight = renderer.layerConfig.lineHeight;
       this.top = newPos.top + rect.top - renderer.layerConfig.offset + lineHeight + 3;
       this.left = newPos.left + rect.left - renderer.scrollLeft + renderer.gutterWidth;
-    }
-
-    get visible(): boolean {
-      return this.active && (this.loading || !!this.filtered.length);
     }
 
     scrollSelectionIntoView(): void {
@@ -496,35 +552,6 @@
       }, 300);
     }
 
-    categoryClick(category: CategoryInfo, event: Event): void {
-      if (!this.autocompleteResults) {
-        return;
-      }
-      this.activeCategory = category;
-
-      event.stopPropagation();
-      this.editor.focus();
-    }
-
-    clickOutside(): void {
-      if (this.active) {
-        this.detach();
-      }
-    }
-
-    disposeEventHandlers(): void {
-      window.clearTimeout(this.changeTimeout);
-      window.clearInterval(this.positionInterval);
-      if (this.keyboardHandler) {
-        this.editor.keyBinding.removeKeyboardHandler(this.keyboardHandler);
-      }
-      if (this.changeListener) {
-        this.editor.off('changeSelection', this.changeListener);
-      }
-      this.editor.off('mousedown', this.mousedownListener);
-      this.editor.off('mousewheel', this.mousewheelListener);
-    }
-
     detach(): void {
       if (!this.autocompleteResults) {
         return;
@@ -541,9 +568,17 @@
       }
     }
 
-    destroyed(): void {
-      this.disposeEventHandlers();
-      this.subTracker.dispose();
+    disposeEventHandlers(): void {
+      window.clearTimeout(this.changeTimeout);
+      window.clearInterval(this.positionInterval);
+      if (this.keyboardHandler) {
+        this.editor.keyBinding.removeKeyboardHandler(this.keyboardHandler);
+      }
+      if (this.changeListener) {
+        this.editor.off('changeSelection', this.changeListener);
+      }
+      this.editor.off('mousedown', this.mousedownListener);
+      this.editor.off('mousewheel', this.mousewheelListener);
     }
   }
 </script>
