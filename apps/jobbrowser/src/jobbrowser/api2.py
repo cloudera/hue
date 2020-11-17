@@ -118,7 +118,9 @@ def action(request, interface=None, action=None):
     return serve_403_error(request)
 
   response['operation'] = operation
-  response.update(get_api(request.user, interface, cluster=cluster).action(app_ids, operation))
+  response.update(
+      get_api(request.user, interface, cluster=cluster).action(app_ids, operation)
+  )
 
   return JsonResponse(response)
 
@@ -188,9 +190,7 @@ def query_store_api(request, path=None):
       response['code'] = ex_response.status_code
       response['message'] = ex_response.reason
       response['content'] = ex_response.text
-
   else:
-
     if path == 'api/query/search':
       filters = json.loads(request.body)
       resp = get_api(request.user, interface='queries-hive').apps(filters['search'])
