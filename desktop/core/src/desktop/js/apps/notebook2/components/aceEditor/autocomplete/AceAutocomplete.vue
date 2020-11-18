@@ -81,6 +81,7 @@
 <script lang="ts">
   import { Ace } from 'ext/ace';
   import ace from 'ext/aceHelper';
+  import hueDebug from 'utils/hueDebug';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
@@ -90,7 +91,6 @@
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import sqlUtils, { SortOverride } from 'sql/sqlUtils';
   import huePubSub from 'utils/huePubSub';
-  import { defer } from 'utils/hueUtils';
   import I18n from 'utils/i18n';
 
   import AutocompleteResults, { Suggestion } from './AutocompleteResults';
@@ -128,6 +128,7 @@
     @Prop({ required: false, default: false })
     temporaryOnly?: boolean;
 
+    loading = false;
     active = false;
     filter = '';
     availableCategories = [Category.All];
@@ -140,6 +141,7 @@
     sortOverride?: SortOverride | null = null;
     autocompleter?: SqlAutocompleter;
     autocompleteResults?: AutocompleteResults;
+    suggestions: Suggestion[] = [];
 
     changeTimeout = -1;
     positionInterval = -1;
@@ -198,14 +200,6 @@
 
       this.autocompleteResults = this.autocompleter.autocompleteResults;
 
-      this.subTracker.subscribe('hue.ace.autocompleter.done', () => {
-        defer(() => {
-          if (this.active && !this.filtered.length && !this.loading) {
-            this.detach();
-          }
-        });
-      });
-
       this.subTracker.subscribe(
         'hue.ace.autocompleter.show',
         async (details: {
@@ -224,31 +218,41 @@
 
           this.positionAutocompleteDropdown();
 
-          const afterAutocomplete = () => {
-            newBase.$insertRight = true;
-            this.base = newBase;
-            if (this.autocompleteResults) {
-              this.filter = prefix;
-            }
-            this.active = true;
-            this.selectedIndex = 0;
-          };
+          if (this.active) {
+            this.detach();
+          }
 
-          if (
-            !this.active ||
-            !this.base ||
-            newBase.column !== this.base.column ||
-            newBase.row !== this.base.row
-          ) {
+          if (!this.base || newBase.column !== this.base.column || newBase.row !== this.base.row) {
             try {
-              await this.autocompleter.autocomplete();
-              afterAutocomplete();
-              this.attach();
+              this.loading = true;
+              const parseResult = await this.autocompleter.autocomplete();
+              if (hueDebug.showParseResult) {
+                // eslint-disable-next-line no-restricted-syntax
+                console.log(parseResult);
+              }
+
+              if (parseResult) {
+                this.suggestions = [];
+                this.autocompleteResults.update(parseResult, this.suggestions).finally(() => {
+                  this.loading = false;
+                });
+
+                this.selectedIndex = 0;
+                newBase.$insertRight = true;
+                this.base = newBase;
+                if (this.autocompleteResults) {
+                  this.filter = prefix;
+                }
+                this.active = true;
+                this.attach();
+              }
             } catch (err) {
-              afterAutocomplete();
+              if (typeof console.warn !== 'undefined') {
+                console.warn(err);
+              }
+              this.active = false;
+              this.detach();
             }
-          } else {
-            afterAutocomplete();
           }
         }
       );
@@ -286,7 +290,7 @@
         return [];
       }
 
-      let result = this.autocompleteResults.entries;
+      let result = this.suggestions;
 
       if (this.filter) {
         result = sqlUtils.autocompleteFilter(this.filter, result);
@@ -337,27 +341,6 @@
         }
       }
       return undefined;
-    }
-
-    get loading(): boolean {
-      return (
-        !this.autocompleteResults ||
-        this.autocompleteResults.loadingKeywords ||
-        this.autocompleteResults.loadingFunctions ||
-        this.autocompleteResults.loadingDatabases ||
-        this.autocompleteResults.loadingTables ||
-        this.autocompleteResults.loadingColumns ||
-        this.autocompleteResults.loadingValues ||
-        this.autocompleteResults.loadingPaths ||
-        this.autocompleteResults.loadingJoins ||
-        this.autocompleteResults.loadingJoinConditions ||
-        this.autocompleteResults.loadingAggregateFunctions ||
-        this.autocompleteResults.loadingGroupBys ||
-        this.autocompleteResults.loadingOrderBys ||
-        this.autocompleteResults.loadingFilters ||
-        this.autocompleteResults.loadingPopularTables ||
-        this.autocompleteResults.loadingPopularColumns
-      );
     }
 
     get visible(): boolean {
