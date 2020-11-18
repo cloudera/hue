@@ -6,7 +6,7 @@ draft: false
 The [Entity-relationship model](https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model) (ERD) provides an illustration of various SQL entities, and the relationship between them. Entity types supported by the ERD diagram are currently `Table` & `Literal`. It has a very generic architecture, and more types of entities can be supported in the future.
 
 {{< webcomp name="er-diagram"
-    src="demo/er-diagram.js"
+    src="/js/gethue/components/er-diagram.js"
     attrSrc="demo/attrs.json"
     events="entity-clicked:name"
 />}}
