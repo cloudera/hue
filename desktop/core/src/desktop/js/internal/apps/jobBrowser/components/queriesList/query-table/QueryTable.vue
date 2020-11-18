@@ -22,7 +22,11 @@
   <div class="query-table">
     <!-- <queries-search :searches="searches" :table-definition="tableDefinition" /> -->
     <div class="query-table-actions">
-      <search-input v-model="searchQuery" @search="searchQueryEnter" />
+      <search-input
+        v-model="searchQuery"
+        :placeholder="I18n('Query text, DAG ID or App ID')"
+        @search="searchQueryEnter"
+      />
 
       <div class="query-table-filters">
         <hue-icon type="hi-filter" /> Filter by:
@@ -77,7 +81,10 @@
             <input v-model="selectedQueries" type="checkbox" :value="query" />
           </template>
           <template #cell-query="query">
-            <hue-link @click="querySelected(query)">{{ query.query }}</hue-link>
+            <hue-link class="query-link" @click="querySelected(query)">
+              {{ query.query }}
+              <div class="query-popup">{{ query.query }}</div>
+            </hue-link>
           </template>
           <template #cell-tablesRead="query">
             <TablesList :tables="query.tablesRead" />
@@ -378,6 +385,7 @@
 
 <style lang="scss" scoped>
   @import '../../../../../../components/styles/colors';
+  @import '../../../../../../components/styles/mixins';
 
   .query-table {
     .query-table-actions {
@@ -426,6 +434,35 @@
         font-size: 20px;
         padding: 2px;
         color: $fluid-gray-500;
+      }
+    }
+
+    .query-link {
+      .query-popup {
+        position: absolute;
+
+        margin-top: 5px;
+
+        white-space: pre-wrap;
+        word-break: normal;
+        overflow-wrap: break-word;
+
+        pointer-events: none;
+
+        max-width: 1000px;
+        background-color: #fff;
+        border: 1px solid $hue-border-color;
+        border-radius: $hue-panel-border-radius;
+
+        padding: 10px;
+
+        visibility: hidden;
+      }
+
+      &:hover {
+        .query-popup {
+          visibility: visible;
+        }
       }
     }
   }
