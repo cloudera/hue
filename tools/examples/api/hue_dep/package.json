@@ -11,7 +11,7 @@
   "author": "Queso",
   "license": "ISC",
   "dependencies": {
-    "hue": "file:../../../.."
+    "gethue": "^4.8.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",

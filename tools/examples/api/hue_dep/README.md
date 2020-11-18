@@ -8,22 +8,6 @@
     npm run webpack   // Build demo app
     npm run app       // Run demo app
 
-In package.json there's a dependency on Hue git project:
-
-    "dependencies": {
-      "hue": "file:../../../.."
-    },
-
-Note that it can also be a GitHub link but takes a bit longer to do `npm install`.
-
-    "hue": "git://github.com/cloudera/hue.git"
-
-## NMP registry
-
-Alternatively, instead of requiring a git clone of the repository, the Hue package can be directly pulled from a `npm registry` as detailed in the [Component documentation](/developer/components/#npm-registry).
-
-    npm install --save gethue
-
 ## Output
 
 You should get the following JSON as output on running the app.
