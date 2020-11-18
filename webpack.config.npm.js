@@ -99,7 +99,9 @@ const parserConf = Object.assign({}, defaultConfig, {
     path: `${DIST_DIR}/parsers`,
     library: '[name]',
     libraryExport: "default",
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    umdNamedDefine: true,
+    globalObject: `(typeof self !== 'undefined' ? self : this)`
   },
 });
 
