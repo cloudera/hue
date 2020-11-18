@@ -36,8 +36,16 @@ liveParsers.forEach(parserEl => {
       const afterCursor = '';
       const debug = false;
 
-      const parsedObj = parser.parseSql(beforeCursor, afterCursor, debug);
-      jsonText.value = stringify(parsedObj);
+      if (parser.parseSql) {
+        const parsedObj = parser.parseSql(beforeCursor, afterCursor, debug);
+        jsonText.value = stringify(parsedObj);
+      } else if (parser.parseSyntax) {
+        const parsedObj = parser.parseSyntax(beforeCursor.trim(), afterCursor);
+        jsonText.value = stringify(parsedObj);
+      } else {
+        jsonText.value = '';
+        msg.innerHTML = 'Invalid parser!';
+      }
     } else {
       msg.innerHTML = 'Parser not loaded!';
     }
