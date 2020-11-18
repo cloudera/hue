@@ -39,6 +39,7 @@
 }
 .live-parser-container textarea:read-only {
   cursor: default;
+  height: 300px;
 }
 .live-parser-container .live-message {
   position: absolute;
