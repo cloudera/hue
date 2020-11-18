@@ -47,7 +47,9 @@
         <div>
           <div
             v-for="(suggestion, index) in filtered"
-            :key="activeCategory.categoryId + suggestion.category.categoryId + suggestion.value"
+            :key="
+              filter + activeCategory.categoryId + suggestion.category.categoryId + suggestion.value
+            "
             class="autocompleter-suggestion"
             :class="{ selected: index === selectedIndex }"
             @click="clickSuggestion(index)"
