@@ -27,7 +27,6 @@ import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
 import { AutocompleteParser, AutocompleteParseResult } from 'parse/types';
 import { EditorInterpreter } from 'types/config';
 import AutocompleteResults from './AutocompleteResults';
-import hueDebug from 'utils/hueDebug';
 import huePubSub from 'utils/huePubSub';
 import sqlParserRepository from 'parse/sql/sqlParserRepository';
 
@@ -147,7 +146,7 @@ export default class SqlAutocompleter implements Disposable {
     });
   }
 
-  async autocomplete(): Promise<void> {
+  async autocomplete(): Promise<AutocompleteParseResult | undefined> {
     let parseResult;
     try {
       huePubSub.publish(GET_ACTIVE_LOCATIONS_EVENT, (locations: ActiveStatementChangedEvent) => {
@@ -176,23 +175,7 @@ export default class SqlAutocompleter implements Disposable {
       }
     }
 
-    if (!parseResult) {
-      // This prevents Ace from inserting garbled text in case of exception
-      huePubSub.publish('hue.ace.autocompleter.done');
-    } else {
-      if (typeof hueDebug !== 'undefined' && hueDebug.showParseResult) {
-        // eslint-disable-next-line no-restricted-syntax
-        console.log(parseResult);
-      }
-      try {
-        await this.autocompleteResults.update(parseResult);
-      } catch (e) {
-        if (typeof console.warn !== 'undefined') {
-          console.warn(e);
-        }
-        huePubSub.publish('hue.ace.autocompleter.done');
-      }
-    }
+    return parseResult;
   }
 
   dispose(): void {

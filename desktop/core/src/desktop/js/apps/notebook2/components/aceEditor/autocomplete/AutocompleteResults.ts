@@ -45,7 +45,6 @@ import dataCatalog from 'catalog/dataCatalog';
 import { SetDetails, UdfDetails } from 'sql/reference/types';
 import { hueWindow } from 'types/types';
 import hueUtils from 'utils/hueUtils';
-import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import sqlUtils from 'sql/sqlUtils';
 import { matchesType } from 'sql/reference/typeUtils';
@@ -144,27 +143,10 @@ class AutocompleteResults {
   activeDatabase: string;
 
   parseResult!: AutocompleteParseResult;
-  entries: Suggestion[] = [];
   subTracker = new SubscriptionTracker();
   onCancelFunctions: (() => void)[] = [];
   lastKnownRequests: JQueryXHR[] = [];
   cancellablePromises: CancellableJqPromise<unknown>[] = [];
-
-  loadingKeywords = false;
-  loadingFunctions = false;
-  loadingDatabases = false;
-  loadingTables = false;
-  loadingColumns = false;
-  loadingValues = false;
-  loadingPaths = false;
-  loadingJoins = false;
-  loadingJoinConditions = false;
-  loadingAggregateFunctions = false;
-  loadingGroupBys = false;
-  loadingOrderBys = false;
-  loadingFilters = false;
-  loadingPopularTables = false;
-  loadingPopularColumns = false;
 
   constructor(options: { executor: Executor; editor: Ace.Editor; temporaryOnly: boolean }) {
     this.executor = options.executor;
@@ -177,31 +159,13 @@ class AutocompleteResults {
     return this.executor.connector().dialect || this.executor.connector().type;
   }
 
-  async update(parseResult: AutocompleteParseResult): Promise<void> {
+  async update(parseResult: AutocompleteParseResult, suggestions: Suggestion[]): Promise<void[]> {
     let cancelFn;
     while ((cancelFn = this.onCancelFunctions.pop())) {
       cancelFn();
     }
     this.activeDatabase = parseResult.useDatabase || this.executor.database();
     this.parseResult = parseResult;
-
-    this.entries = [];
-
-    this.loadingKeywords = false;
-    this.loadingFunctions = false;
-    this.loadingDatabases = false;
-    this.loadingTables = false;
-    this.loadingColumns = false;
-    this.loadingValues = false;
-    this.loadingPaths = false;
-    this.loadingJoins = false;
-    this.loadingJoinConditions = false;
-    this.loadingAggregateFunctions = false;
-    this.loadingGroupBys = false;
-    this.loadingOrderBys = false;
-    this.loadingFilters = false;
-    this.loadingPopularTables = false;
-    this.loadingPopularColumns = false;
 
     if (this.parseResult.udfArgument) {
       await this.adjustForUdfArgument();
@@ -213,9 +177,9 @@ class AutocompleteResults {
       const wrapped = new Promise<void>(resolve => {
         this.onCancelFunctions.push(resolve);
         promise
-          .then(suggestions => {
-            if (suggestions && suggestions.length) {
-              this.entries = [...this.entries, ...suggestions];
+          .then(newSuggestions => {
+            if (newSuggestions && newSuggestions.length) {
+              suggestions.push(...newSuggestions);
             }
             resolve();
           })
@@ -252,8 +216,7 @@ class AutocompleteResults {
       trackPromise(this.handlePopularColumns(columnsPromise));
     }
 
-    await Promise.all(promises);
-    huePubSub.publish('hue.ace.autocompleter.done');
+    return Promise.all(promises);
   }
 
   async adjustForUdfArgument(): Promise<void> {
@@ -389,7 +352,6 @@ class AutocompleteResults {
     if (!suggestColRefKeywords) {
       return [];
     }
-    this.loadingKeywords = true;
     // Wait for the column reference type to be resolved to pick the right keywords
     const colRef = await colRefPromise;
     const colRefKeywordSuggestions: Suggestion[] = [];
@@ -408,7 +370,6 @@ class AutocompleteResults {
         });
       }
     });
-    this.loadingKeywords = false;
     return colRefKeywordSuggestions;
   }
 
@@ -516,7 +477,6 @@ class AutocompleteResults {
       return [];
     }
 
-    this.loadingFunctions = true;
     let suggestions: Suggestion[] = [];
     if (
       suggestFunctions.types &&
@@ -587,7 +547,6 @@ class AutocompleteResults {
       } catch (err) {}
     }
 
-    this.loadingFunctions = false;
     return suggestions;
   }
 
@@ -596,7 +555,6 @@ class AutocompleteResults {
     if (!suggestDatabases) {
       return [];
     }
-    this.loadingDatabases = true;
     const databaseSuggestions: Suggestion[] = [];
     try {
       let prefix = suggestDatabases.prependQuestionMark ? '? ' : '';
@@ -625,7 +583,6 @@ class AutocompleteResults {
       }
     } catch (err) {}
 
-    this.loadingDatabases = false;
     return databaseSuggestions;
   }
 
@@ -634,7 +591,6 @@ class AutocompleteResults {
     if (!suggestTables) {
       return [];
     }
-    this.loadingTables = true;
 
     const getTableSuggestions = async (): Promise<Suggestion[]> => {
       let prefix = suggestTables.prependQuestionMark ? '? ' : '';
@@ -726,7 +682,6 @@ class AutocompleteResults {
       tableSuggestions = await getTableSuggestions();
     }
 
-    this.loadingTables = false;
     return tableSuggestions;
   }
 
@@ -742,7 +697,6 @@ class AutocompleteResults {
     if (!suggestColumns) {
       return [];
     }
-    this.loadingColumns = true;
 
     const columnSuggestions: Suggestion[] = [];
     // For multiple tables we need to merge and make sure identifiers are unique
@@ -789,7 +743,6 @@ class AutocompleteResults {
       });
     }
 
-    this.loadingColumns = false;
     return columnSuggestions;
   }
 
@@ -1078,7 +1031,6 @@ class AutocompleteResults {
       });
     }
 
-    this.loadingValues = true;
     const colRef = await colRefPromise;
 
     if (colRef.samples) {
@@ -1098,7 +1050,6 @@ class AutocompleteResults {
       });
     }
 
-    this.loadingValues = false;
     return valueSuggestions;
   }
 
@@ -1107,7 +1058,6 @@ class AutocompleteResults {
     if (!suggestHdfs) {
       return [];
     }
-    this.loadingPaths = true;
 
     let suggestions: Suggestion[] = [];
 
@@ -1174,7 +1124,6 @@ class AutocompleteResults {
             weightAdjust: 0,
             popular: false
           });
-          this.loadingPaths = false;
           return suggestions;
         }
       }
@@ -1218,7 +1167,6 @@ class AutocompleteResults {
       );
     });
 
-    this.loadingPaths = false;
     return suggestions;
   }
 
@@ -1245,7 +1193,6 @@ class AutocompleteResults {
     if (!(<hueWindow>window).HAS_OPTIMIZER || !suggestJoins) {
       return [];
     }
-    this.loadingJoins = true;
 
     const paths = this.tableIdentifierChainsToPaths(suggestJoins.tables);
     if (!paths.length) {
@@ -1358,7 +1305,6 @@ class AutocompleteResults {
       }
     } catch (err) {}
 
-    this.loadingJoins = false;
     return joinSuggestions;
   }
 
@@ -1367,7 +1313,6 @@ class AutocompleteResults {
     if (!(<hueWindow>window).HAS_OPTIMIZER || !suggestJoinConditions) {
       return [];
     }
-    this.loadingJoinConditions = true;
 
     const paths = this.tableIdentifierChainsToPaths(suggestJoinConditions.tables);
     if (!paths.length) {
@@ -1447,7 +1392,6 @@ class AutocompleteResults {
       }
     } catch (err) {}
 
-    this.loadingJoinConditions = true;
     return joinConditionSuggestions;
   }
 
@@ -1460,8 +1404,6 @@ class AutocompleteResults {
     ) {
       return [];
     }
-
-    this.loadingAggregateFunctions = true;
 
     const paths = this.tableIdentifierChainsToPaths(suggestAggregateFunctions.tables);
     if (!paths.length) {
@@ -1575,7 +1517,6 @@ class AutocompleteResults {
       });
     } catch (err) {}
 
-    this.loadingAggregateFunctions = false;
     return aggregateFunctionsSuggestions;
   }
 
@@ -1682,14 +1623,12 @@ class AutocompleteResults {
     if (!(<hueWindow>window).HAS_OPTIMIZER || !suggestGroupBys) {
       return [];
     }
-    this.loadingGroupBys = true;
-    const suggestions = await this.handlePopularGroupByOrOrderBy(
+
+    return await this.handlePopularGroupByOrOrderBy(
       'groupByColumn',
       suggestGroupBys,
       columnsPromise
     );
-    this.loadingGroupBys = false;
-    return suggestions;
   }
 
   async handleOrderBys(columnsPromise: Promise<Suggestion[]>): Promise<Suggestion[]> {
@@ -1697,14 +1636,11 @@ class AutocompleteResults {
     if (!(<hueWindow>window).HAS_OPTIMIZER || !suggestOrderBys) {
       return [];
     }
-    this.loadingOrderBys = true;
-    const suggestions = await this.handlePopularGroupByOrOrderBy(
+    return await this.handlePopularGroupByOrOrderBy(
       'orderByColumn',
       suggestOrderBys,
       columnsPromise
     );
-    this.loadingOrderBys = false;
-    return suggestions;
   }
 
   async handleFilters(): Promise<Suggestion[]> {
@@ -1712,7 +1648,6 @@ class AutocompleteResults {
     if (!(<hueWindow>window).HAS_OPTIMIZER || !suggestFilters) {
       return [];
     }
-    this.loadingFilters = true;
 
     const paths = this.tableIdentifierChainsToPaths(suggestFilters.tables);
     if (!paths.length) {
@@ -1792,7 +1727,6 @@ class AutocompleteResults {
       });
     } catch (err) {}
 
-    this.loadingFilters = false;
     return filterSuggestions;
   }
 
@@ -1801,8 +1735,6 @@ class AutocompleteResults {
     if (!(<hueWindow>window).HAS_OPTIMIZER || !suggestTables) {
       return [];
     }
-
-    this.loadingPopularTables = true;
 
     const db =
       suggestTables.identifierChain &&
@@ -1863,7 +1795,6 @@ class AutocompleteResults {
       }
     } catch (err) {}
 
-    this.loadingPopularTables = false;
     return [];
   }
 
@@ -1882,8 +1813,6 @@ class AutocompleteResults {
     if (!columnSuggestions.length) {
       return [];
     }
-
-    this.loadingPopularColumns = true;
 
     try {
       const paths: string[][] = [];
@@ -1966,7 +1895,6 @@ class AutocompleteResults {
       }
     } catch (err) {}
 
-    this.loadingPopularColumns = false;
     return [];
   }
 
