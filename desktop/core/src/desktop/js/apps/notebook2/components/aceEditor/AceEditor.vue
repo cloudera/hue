@@ -60,6 +60,7 @@
 
     subTracker = new SubscriptionTracker();
     editor: Ace.Editor | null = null;
+    aceLocationHandler: AceLocationHandler | null = null;
 
     private isSqlDialect(): boolean {
       return (<EditorInterpreter>this.executor.connector()).is_sql;
@@ -86,12 +87,12 @@
       this.subTracker.subscribe('assist.set.manual.visibility', resizeAce);
       this.subTracker.subscribe('split.panel.resized', resizeAce);
 
-      const aceLocationHandler = new AceLocationHandler({
+      this.aceLocationHandler = new AceLocationHandler({
         editor: editor,
         editorId: this.id,
         executor: this.executor
       });
-      this.subTracker.addDisposable(aceLocationHandler);
+      this.subTracker.addDisposable(this.aceLocationHandler);
 
       const aceGutterHandler = new AceGutterHandler({
         editor: editor,
@@ -173,16 +174,18 @@
         );
 
         if (errorHighlightingEnabled) {
-          aceLocationHandler.attachSqlSyntaxWorker();
+          this.aceLocationHandler.attachSqlSyntaxWorker();
         }
 
         editor.customMenuOptions.setErrorHighlighting = (enabled: boolean) => {
           errorHighlightingEnabled = enabled;
           apiHelper.setInTotalStorage('hue.ace', 'errorHighlightingEnabled', enabled);
-          if (enabled) {
-            aceLocationHandler.attachSqlSyntaxWorker();
-          } else {
-            aceLocationHandler.detachSqlSyntaxWorker();
+          if (this.aceLocationHandler) {
+            if (enabled) {
+              this.aceLocationHandler.attachSqlSyntaxWorker();
+            } else {
+              this.aceLocationHandler.detachSqlSyntaxWorker();
+            }
           }
         };
         editor.customMenuOptions.getErrorHighlighting = () => errorHighlightingEnabled;
@@ -294,6 +297,21 @@
       // const aceErrorsSub = snippet.aceErrors.subscribe(newErrors => {
       //   processErrorsAndWarnings('error', newErrors);
       // });
+
+      editor.commands.addCommand({
+        name: 'execute',
+        bindKey: { win: 'Ctrl-Enter', mac: 'Command-Enter|Ctrl-Enter' },
+        exec: async () => {
+          if (this.aceLocationHandler) {
+            this.aceLocationHandler.refreshStatementLocations();
+          }
+          if (this.editor && this.executor.activeExecutable) {
+            await this.executor.activeExecutable.reset();
+            await this.executor.activeExecutable.execute();
+          }
+        }
+      });
+
       window.setTimeout(() => {
         this.$emit('ace-created', editor);
       }, 3000);
