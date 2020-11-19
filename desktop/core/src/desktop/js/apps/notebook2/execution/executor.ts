@@ -36,6 +36,7 @@ export default class Executor {
   executables: Executable[] = [];
   variableSubstitionHandler?: VariableSubstitutionHandler;
   snippet?: Snippet;
+  activeExecutable?: Executable;
 
   constructor(options: {
     connector: KnockoutObservable<Connector>;
@@ -101,6 +102,7 @@ export default class Executor {
     }
 
     // Update the executables list
+    this.activeExecutable = executables.active;
     this.executables = executables.all;
 
     this.executables.forEach(executable => executable.notify());

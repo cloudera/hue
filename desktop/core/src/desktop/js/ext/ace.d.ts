@@ -22,6 +22,13 @@ declare namespace Ace {
     addError(message:string, line:number): void;
     addWarning(message:string, line:number): void;
     container: HTMLElement;
+    commands: {
+      addCommand(command: {
+        name: string,
+        bindKey: { win: string; mac: string },
+        exec(): void
+      }): void;
+    }
     completer: any;
     completers: any[];
     clearErrorsAndWarnings(type: string): void;
