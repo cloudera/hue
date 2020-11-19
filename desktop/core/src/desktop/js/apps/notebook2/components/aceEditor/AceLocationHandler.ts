@@ -110,9 +110,17 @@ export default class AceLocationHandler implements Disposable {
 
   subTracker: SubscriptionTracker = new SubscriptionTracker();
   availableDatabases = new Set<string>();
+  changeThrottle = -1;
   verifyThrottle = -1;
   updateTimeout = -1;
+  cursorChangePaused = false;
   sqlSyntaxWorkerSub?: HueSubscription;
+
+  activeStatement: ParsedSqlStatement | undefined;
+  lastKnownStatements = {
+    editorChangeTime: 0,
+    statements: <ParsedSqlStatement[]>[]
+  };
 
   constructor(options: {
     editor: Ace.Editor;
@@ -130,6 +138,7 @@ export default class AceLocationHandler implements Disposable {
     this.attachMouseListeners();
 
     this.subTracker.subscribe(this.executor.connector, this.updateAvailableDatabases.bind(this));
+    this.subTracker.trackTimeout(this.changeThrottle);
     this.subTracker.trackTimeout(this.verifyThrottle);
     this.subTracker.trackTimeout(this.updateTimeout);
     this.updateAvailableDatabases();
@@ -525,156 +534,21 @@ export default class AceLocationHandler implements Disposable {
   }
 
   attachStatementLocator(): void {
-    const lastKnownStatements = {
-      editorChangeTime: 0,
-      statements: <ParsedSqlStatement[]>[]
-    };
-    let activeStatement: ParsedSqlStatement | undefined;
-    //let lastExecutingStatement = null;
+    this.changeThrottle = window.setTimeout(this.parseForStatements.bind(this), 0);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const updateActiveStatement = (cursorChange?: boolean) => {
-      if (!this.isSqlDialect()) {
-        return;
-      }
-      const selectionRange = this.editor.getSelectionRange();
-      const cursorLocation = selectionRange.start;
-      if (!equalPositions(selectionRange.start, selectionRange.end)) {
-        // TODO: Figure out what this does and why it needs the result.statement_range
-        // if (!cursorChange && this.snippet.result && this.snippet.result.statement_range()) {
-        //   let executingStatement = this.snippet.result.statement_range();
-        //   // Row and col are 0 for both start and end on execute, so if the selection hasn't changed we'll use last known executed statement
-        //   if (
-        //     executingStatement.start.row === 0 &&
-        //     executingStatement.start.column === 0 &&
-        //     executingStatement.end.row === 0 &&
-        //     executingStatement.end.column === 0 &&
-        //     lastExecutingStatement
-        //   ) {
-        //     executingStatement = lastExecutingStatement;
-        //   }
-        //   if (executingStatement.start.row === 0) {
-        //     cursorLocation.column += executingStatement.start.column;
-        //   } else if (executingStatement.start.row !== 0 || executingStatement.start.column !== 0) {
-        //     cursorLocation.row += executingStatement.start.row;
-        //     cursorLocation.column = executingStatement.start.column;
-        //   }
-        //   lastExecutingStatement = executingStatement;
-        // } else {
-        //   lastExecutingStatement = null;
-        // }
-      }
+    window.setTimeout(this.updateActiveStatement.bind(this), 0);
 
-      const selectedStatements: ParsedSqlStatement[] = [];
-      const precedingStatements: ParsedSqlStatement[] = [];
-      const followingStatements: ParsedSqlStatement[] = [];
-      activeStatement = undefined;
-
-      const firstSelectionPoint = getFirstPosition(selectionRange.start, selectionRange.end);
-      const lastSelectionPoint =
-        selectionRange.start === firstSelectionPoint ? selectionRange.end : selectionRange.start;
-
-      let found = false;
-      let statementIndex = 0;
-      let insideSelection = false;
-      if (lastKnownStatements.statements.length === 1) {
-        activeStatement = lastKnownStatements.statements[0];
-      } else {
-        lastKnownStatements.statements.forEach(statement => {
-          if (!equalPositions(firstSelectionPoint, lastSelectionPoint)) {
-            if (!insideSelection && isPointInside(statement.location, firstSelectionPoint)) {
-              insideSelection = true;
-            }
-            if (insideSelection) {
-              selectedStatements.push(statement);
-
-              if (
-                isPointInside(statement.location, lastSelectionPoint) ||
-                (statement.location.last_line === lastSelectionPoint.row + 1 &&
-                  statement.location.last_column === lastSelectionPoint.column)
-              ) {
-                insideSelection = false;
-              }
-            }
-          }
-          if (isPointInside(statement.location, cursorLocation)) {
-            statementIndex++;
-            found = true;
-            activeStatement = statement;
-          } else if (!found) {
-            statementIndex++;
-            if (precedingStatements.length === STATEMENT_COUNT_AROUND_ACTIVE) {
-              precedingStatements.shift();
-            }
-            precedingStatements.push(statement);
-          } else if (found && followingStatements.length < STATEMENT_COUNT_AROUND_ACTIVE) {
-            followingStatements.push(statement);
-          }
-        });
-
-        // Can happen if multiple statements and the cursor is after the last one
-        if (!found) {
-          precedingStatements.pop();
-          activeStatement =
-            lastKnownStatements.statements[lastKnownStatements.statements.length - 1];
-        }
-      }
-
-      if (!selectedStatements.length && activeStatement) {
-        selectedStatements.push(activeStatement);
-      }
-
-      huePubSub.publish(ACTIVE_STATEMENT_CHANGED_EVENT, <ActiveStatementChangedEvent>{
-        id: this.editorId,
-        editorChangeTime: lastKnownStatements.editorChangeTime,
-        activeStatementIndex: statementIndex,
-        totalStatementCount: lastKnownStatements.statements.length,
-        precedingStatements: precedingStatements,
-        activeStatement: activeStatement,
-        selectedStatements: selectedStatements,
-        followingStatements: followingStatements
-      });
-
-      if (activeStatement) {
-        this.checkForSyntaxErrors(activeStatement.location, firstSelectionPoint);
-      }
-    };
-
-    const parseForStatements = () => {
-      if (this.isSqlDialect()) {
-        try {
-          const lastChangeTime = this.editor.lastChangeTime;
-          lastKnownStatements.statements = sqlStatementsParser.parse(this.editor.getValue());
-          lastKnownStatements.editorChangeTime = lastChangeTime;
-
-          const hueDebug = (<hueWindow>window).hueDebug;
-          if (hueDebug && hueDebug.logStatementLocations) {
-            // eslint-disable-next-line no-restricted-syntax
-            console.log(lastKnownStatements);
-          }
-        } catch (error) {
-          console.warn('Could not parse statements!');
-          console.warn(error);
-        }
-      }
-    };
-
-    let changeThrottle = window.setTimeout(parseForStatements, 0);
-    this.subTracker.trackTimeout(changeThrottle);
-
-    window.setTimeout(updateActiveStatement, 0);
-
-    let cursorChangePaused = false; // On change the cursor is also moved, this limits the calls while typing
+    this.cursorChangePaused = false; // On change the cursor is also moved, this limits the calls while typing
 
     let lastStart: Ace.Position;
     let lastEnd: Ace.Position;
     let lastCursorPosition: Ace.Position;
     const changeSelectionListener = this.editor.on('changeSelection', () => {
-      if (cursorChangePaused) {
+      if (this.cursorChangePaused) {
         return;
       }
-      window.clearTimeout(changeThrottle);
-      changeThrottle = window.setTimeout(() => {
+      window.clearTimeout(this.changeThrottle);
+      this.changeThrottle = window.setTimeout(() => {
         const newCursorPosition = this.editor.getCursorPosition();
         if (
           !lastCursorPosition ||
@@ -698,7 +572,7 @@ export default class AceLocationHandler implements Disposable {
             !lastEnd ||
             !equalPositions(lastEnd, newEnd))
         ) {
-          updateActiveStatement(true);
+          this.updateActiveStatement(true);
           lastStart = newStart;
           lastEnd = newEnd;
         }
@@ -711,12 +585,12 @@ export default class AceLocationHandler implements Disposable {
 
     const changeListener = this.editor.on('change', () => {
       if (this.isSqlDialect()) {
-        window.clearTimeout(changeThrottle);
-        cursorChangePaused = true;
-        changeThrottle = window.setTimeout(() => {
-          parseForStatements();
-          updateActiveStatement();
-          cursorChangePaused = false;
+        window.clearTimeout(this.changeThrottle);
+        this.cursorChangePaused = true;
+        this.changeThrottle = window.setTimeout(() => {
+          this.parseForStatements();
+          this.updateActiveStatement();
+          this.cursorChangePaused = false;
         }, 500);
         this.editor.lastChangeTime = Date.now();
       }
@@ -728,13 +602,145 @@ export default class AceLocationHandler implements Disposable {
 
     this.subTracker.subscribe(REFRESH_STATEMENT_LOCATIONS_EVENT, editorId => {
       if (editorId === this.editorId) {
-        cursorChangePaused = true;
-        window.clearTimeout(changeThrottle);
-        parseForStatements();
-        updateActiveStatement();
-        cursorChangePaused = false;
+        this.refreshStatementLocations();
       }
     });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  updateActiveStatement(cursorChange?: boolean): void {
+    if (!this.isSqlDialect()) {
+      return;
+    }
+    const selectionRange = this.editor.getSelectionRange();
+    const cursorLocation = selectionRange.start;
+    if (!equalPositions(selectionRange.start, selectionRange.end)) {
+      // TODO: Figure out what this does and why it needs the result.statement_range
+      // if (!cursorChange && this.snippet.result && this.snippet.result.statement_range()) {
+      //   let executingStatement = this.snippet.result.statement_range();
+      //   // Row and col are 0 for both start and end on execute, so if the selection hasn't changed we'll use last known executed statement
+      //   if (
+      //     executingStatement.start.row === 0 &&
+      //     executingStatement.start.column === 0 &&
+      //     executingStatement.end.row === 0 &&
+      //     executingStatement.end.column === 0 &&
+      //     lastExecutingStatement
+      //   ) {
+      //     executingStatement = lastExecutingStatement;
+      //   }
+      //   if (executingStatement.start.row === 0) {
+      //     cursorLocation.column += executingStatement.start.column;
+      //   } else if (executingStatement.start.row !== 0 || executingStatement.start.column !== 0) {
+      //     cursorLocation.row += executingStatement.start.row;
+      //     cursorLocation.column = executingStatement.start.column;
+      //   }
+      //   lastExecutingStatement = executingStatement;
+      // } else {
+      //   lastExecutingStatement = null;
+      // }
+    }
+
+    const selectedStatements: ParsedSqlStatement[] = [];
+    const precedingStatements: ParsedSqlStatement[] = [];
+    const followingStatements: ParsedSqlStatement[] = [];
+    this.activeStatement = undefined;
+
+    const firstSelectionPoint = getFirstPosition(selectionRange.start, selectionRange.end);
+    const lastSelectionPoint =
+      selectionRange.start === firstSelectionPoint ? selectionRange.end : selectionRange.start;
+
+    let found = false;
+    let statementIndex = 0;
+    let insideSelection = false;
+    if (this.lastKnownStatements.statements.length === 1) {
+      this.activeStatement = this.lastKnownStatements.statements[0];
+    } else {
+      this.lastKnownStatements.statements.forEach(statement => {
+        if (!equalPositions(firstSelectionPoint, lastSelectionPoint)) {
+          if (!insideSelection && isPointInside(statement.location, firstSelectionPoint)) {
+            insideSelection = true;
+          }
+          if (insideSelection) {
+            selectedStatements.push(statement);
+
+            if (
+              isPointInside(statement.location, lastSelectionPoint) ||
+              (statement.location.last_line === lastSelectionPoint.row + 1 &&
+                statement.location.last_column === lastSelectionPoint.column)
+            ) {
+              insideSelection = false;
+            }
+          }
+        }
+        if (isPointInside(statement.location, cursorLocation)) {
+          statementIndex++;
+          found = true;
+          this.activeStatement = statement;
+        } else if (!found) {
+          statementIndex++;
+          if (precedingStatements.length === STATEMENT_COUNT_AROUND_ACTIVE) {
+            precedingStatements.shift();
+          }
+          precedingStatements.push(statement);
+        } else if (found && followingStatements.length < STATEMENT_COUNT_AROUND_ACTIVE) {
+          followingStatements.push(statement);
+        }
+      });
+
+      // Can happen if multiple statements and the cursor is after the last one
+      if (!found) {
+        precedingStatements.pop();
+        this.activeStatement = this.lastKnownStatements.statements[
+          this.lastKnownStatements.statements.length - 1
+        ];
+      }
+    }
+
+    if (!selectedStatements.length && this.activeStatement) {
+      selectedStatements.push(this.activeStatement);
+    }
+
+    huePubSub.publish(ACTIVE_STATEMENT_CHANGED_EVENT, <ActiveStatementChangedEvent>{
+      id: this.editorId,
+      editorChangeTime: this.lastKnownStatements.editorChangeTime,
+      activeStatementIndex: statementIndex,
+      totalStatementCount: this.lastKnownStatements.statements.length,
+      precedingStatements: precedingStatements,
+      activeStatement: this.activeStatement,
+      selectedStatements: selectedStatements,
+      followingStatements: followingStatements
+    });
+
+    if (this.activeStatement) {
+      this.checkForSyntaxErrors(this.activeStatement.location, firstSelectionPoint);
+    }
+  }
+
+  parseForStatements(): void {
+    if (this.isSqlDialect()) {
+      try {
+        const lastChangeTime = this.editor.lastChangeTime;
+        this.lastKnownStatements.statements = sqlStatementsParser.parse(this.editor.getValue());
+        this.lastKnownStatements.editorChangeTime = lastChangeTime;
+
+        const hueDebug = (<hueWindow>window).hueDebug;
+        if (hueDebug && hueDebug.logStatementLocations) {
+          // eslint-disable-next-line no-restricted-syntax
+          console.log(this.lastKnownStatements);
+        }
+      } catch (error) {
+        console.warn('Could not parse statements!');
+        console.warn(error);
+      }
+    }
+  }
+
+  refreshStatementLocations(): void {
+    this.cursorChangePaused = true;
+    window.clearTimeout(this.changeThrottle);
+    this.parseForStatements();
+    this.updateActiveStatement();
+    this.cursorChangePaused = false;
   }
 
   clearMarkedErrors(type?: string): void {

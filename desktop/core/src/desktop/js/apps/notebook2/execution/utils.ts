@@ -24,6 +24,7 @@ export interface SyncSqlExecutablesResult {
   edited: SqlExecutable[];
   lost: SqlExecutable[];
   selected: SqlExecutable[];
+  active: SqlExecutable;
 }
 
 export const syncSqlExecutables = (
@@ -37,15 +38,16 @@ export const syncSqlExecutables = (
 
   const existingExecutables: (Executable | undefined)[] = executor.executables.concat();
 
-  const result: SyncSqlExecutablesResult = {
-    all: [],
-    edited: [],
-    lost: [],
-    selected: []
+  const result = {
+    all: <SqlExecutable[]>[],
+    edited: <SqlExecutable[]>[],
+    lost: <SqlExecutable[]>[],
+    selected: <SqlExecutable[]>[]
   };
 
   let activeDatabase = executor.database();
   let currentSelectedIndex = 0;
+  let activeStatementIndex = 0;
   allNewStatements.forEach((parsedStatement, index) => {
     if (/USE/i.test(parsedStatement.firstToken)) {
       const dbMatch = parsedStatement.statement.match(/use\s+([^;]+)/i);
@@ -72,6 +74,9 @@ export const syncSqlExecutables = (
         executor: executor
       });
     }
+    if (parsedStatement === statementDetails.activeStatement) {
+      activeStatementIndex = index;
+    }
     result.all.push(executable);
 
     if (
@@ -87,5 +92,5 @@ export const syncSqlExecutables = (
     executable => typeof executable !== 'undefined'
   ) as SqlExecutable[];
 
-  return result;
+  return { ...result, active: result.all[activeStatementIndex] };
 };
