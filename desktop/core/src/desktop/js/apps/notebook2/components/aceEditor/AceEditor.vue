@@ -44,13 +44,18 @@
   import { defer } from 'utils/hueUtils';
   import I18n from 'utils/i18n';
 
+  //taken from https://www.cs.tut.fi/~jkorpela/chars/spaces.html
+  const UNICODES_TO_REMOVE = /[\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u200B\u202F\u205F\u3000\uFEFF]/gi;
+
+  const removeUnicodes = (value: string) => value.replace(UNICODES_TO_REMOVE, ' ');
+
   @Component({
     components: { AceAutocomplete },
     methods: { I18n }
   })
   export default class AceEditor extends Vue {
     @Prop()
-    value!: string;
+    initialValue!: string;
     @Prop()
     id!: string;
     @Prop()
@@ -71,7 +76,7 @@
       if (!editorElement) {
         return;
       }
-      editorElement.textContent = this.value;
+      editorElement.textContent = this.initialValue;
       const editor = <Ace.Editor>ace.edit(editorElement);
 
       const resizeAce = () => {
@@ -298,6 +303,10 @@
       //   processErrorsAndWarnings('error', newErrors);
       // });
 
+      const triggerChange = () => {
+        this.$emit('value-changed', removeUnicodes(editor.getValue()));
+      };
+
       editor.commands.addCommand({
         name: 'execute',
         bindKey: { win: 'Ctrl-Enter', mac: 'Command-Enter|Ctrl-Enter' },
@@ -306,11 +315,15 @@
             this.aceLocationHandler.refreshStatementLocations();
           }
           if (this.editor && this.executor.activeExecutable) {
+            triggerChange();
             await this.executor.activeExecutable.reset();
             await this.executor.activeExecutable.execute();
           }
         }
       });
+
+      editor.on('change', triggerChange);
+      editor.on('blur', triggerChange);
 
       window.setTimeout(() => {
         this.$emit('ace-created', editor);

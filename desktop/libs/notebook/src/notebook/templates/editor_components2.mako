@@ -904,6 +904,9 @@
           vueEvents: {
             'ace-created': function (event) {
               ace(event.detail);
+            },
+            'value-changed': function (event) {
+              statement_raw(event.detail);
             }
           },
           vueKoProps: {

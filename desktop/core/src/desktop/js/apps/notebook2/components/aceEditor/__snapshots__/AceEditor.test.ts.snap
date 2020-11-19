@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AceEditor.vue should render 1`] = `
-<div>
+<div
+  value="some query"
+>
   <div
     class="ace-editor ace_editor ace-hue"
     id="some-id"

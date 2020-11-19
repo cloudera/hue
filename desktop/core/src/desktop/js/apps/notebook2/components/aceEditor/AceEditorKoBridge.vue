@@ -22,6 +22,8 @@
       :id="editorId"
       :executor="executor"
       :ace-options="aceOptions"
+      :initial-value="value"
+      @value-changed="valueChanged"
       @ace-created="aceCreated"
     />
   </div>
@@ -68,6 +70,10 @@
         });
         this.initialized = true;
       }
+    }
+
+    valueChanged(value: string): void {
+      this.$el.dispatchEvent(new CustomEvent('value-changed', { bubbles: true, detail: value }));
     }
 
     aceCreated(editor: Ace.Editor): void {
