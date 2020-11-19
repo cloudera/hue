@@ -81,6 +81,7 @@
 <script lang="ts">
   import { Ace } from 'ext/ace';
   import ace from 'ext/aceHelper';
+  import { REFRESH_STATEMENT_LOCATIONS_EVENT } from 'ko/bindings/ace/aceLocationHandler';
   import hueDebug from 'utils/hueDebug';
   import Vue from 'vue';
   import Component from 'vue-class-component';
@@ -143,6 +144,7 @@
     autocompleteResults?: AutocompleteResults;
     suggestions: Suggestion[] = [];
 
+    reTriggerTimeout = -1;
     changeTimeout = -1;
     positionInterval = -1;
     keyboardHandler: Ace.HashHandler | null = null;
@@ -207,7 +209,9 @@
           lineHeight: number;
           position: { top: number; left: number };
         }) => {
-          if (details.editor !== this.editor || !this.autocompleter) {
+          // The autocomplete can be triggered right after insertion of a suggestion
+          // when live autocomplete is enabled, hence if already active we ignore.
+          if (this.active || details.editor !== this.editor || !this.autocompleter) {
             return;
           }
           const session = this.editor.getSession();
@@ -216,13 +220,8 @@
           const prefix = aceUtil.retrievePrecedingIdentifier(line, pos.column);
           const newBase = session.doc.createAnchor(pos.row, pos.column - prefix.length);
 
-          this.positionAutocompleteDropdown();
-
-          if (this.active) {
-            this.detach();
-          }
-
           if (!this.base || newBase.column !== this.base.column || newBase.row !== this.base.row) {
+            this.positionAutocompleteDropdown();
             try {
               this.loading = true;
               const parseResult = await this.autocompleter.autocomplete();
@@ -250,7 +249,6 @@
               if (typeof console.warn !== 'undefined') {
                 console.warn(err);
               }
-              this.active = false;
               this.detach();
             }
           }
@@ -480,6 +478,42 @@
       this.editor.execCommand('insertstring', valueToInsert);
       this.editor.renderer.scrollCursorIntoView();
       this.detach();
+
+      if (this.editor.getOption('enableLiveAutocompletion')) {
+        if (/\S+\(\)$/.test(valueToInsert)) {
+          this.editor.moveCursorTo(
+            this.editor.getCursorPosition().row,
+            this.editor.getCursorPosition().column - 1
+          );
+          return;
+        }
+
+        window.clearTimeout(this.reTriggerTimeout);
+        this.reTriggerTimeout = window.setTimeout(() => {
+          if (this.active) {
+            return;
+          }
+
+          let reTrigger;
+          if (/(\? from \S+[^.]\s*$)/i.test(valueToInsert)) {
+            this.editor.moveCursorTo(
+              this.editor.getCursorPosition().row,
+              this.editor.getCursorPosition().column - (valueToInsert.length - 1)
+            );
+            this.editor.removeTextBeforeCursor(1);
+            reTrigger = true;
+          } else {
+            reTrigger = /\.$/.test(valueToInsert);
+          }
+
+          if (reTrigger) {
+            huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this.editorId);
+            window.setTimeout(() => {
+              this.editor.execCommand('startAutocomplete');
+            }, 1);
+          }
+        }, 400);
+      }
     }
 
     positionAutocompleteDropdown(): void {
