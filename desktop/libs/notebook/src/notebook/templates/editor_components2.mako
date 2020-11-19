@@ -900,7 +900,6 @@
         <div class="clearfix margin-bottom-20"></div>
         <!-- /ko -->
 
-        <!-- ko if: namespace() && compute() -->
         <ace-editor-ko-bridge data-bind="
           vueEvents: {
             'ace-created': function (event) {
@@ -919,7 +918,6 @@
             }
           }
         "></ace-editor-ko-bridge>
-        <!-- /ko -->
         <!-- ko component: { name: 'hue-editor-droppable-menu', params: { editor: ace.bind($data), parentDropTarget: '.editor' } } --><!-- /ko -->
 
 ##         <div class="ace-editor" data-bind="

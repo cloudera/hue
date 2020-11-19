@@ -111,6 +111,7 @@ export default class AceLocationHandler implements Disposable {
   subTracker: SubscriptionTracker = new SubscriptionTracker();
   availableDatabases = new Set<string>();
   verifyThrottle = -1;
+  updateTimeout = -1;
   sqlSyntaxWorkerSub?: HueSubscription;
 
   constructor(options: {
@@ -129,10 +130,17 @@ export default class AceLocationHandler implements Disposable {
     this.attachMouseListeners();
 
     this.subTracker.subscribe(this.executor.connector, this.updateAvailableDatabases.bind(this));
+    this.subTracker.trackTimeout(this.verifyThrottle);
+    this.subTracker.trackTimeout(this.updateTimeout);
     this.updateAvailableDatabases();
   }
 
   private updateAvailableDatabases() {
+    window.clearTimeout(this.updateTimeout);
+    if (!this.executor.namespace() || !this.executor.compute()) {
+      this.updateTimeout = window.setTimeout(this.updateAvailableDatabases.bind(this), 300);
+      return;
+    }
     dataCatalog
       .getChildren({
         connector: this.executor.connector(),
@@ -954,7 +962,7 @@ export default class AceLocationHandler implements Disposable {
   }
 
   verifyExists(tokens: Ace.HueToken[], allLocations: IdentifierLocation[]): void {
-    window.clearInterval(this.verifyThrottle);
+    window.clearTimeout(this.verifyThrottle);
     this.clearMarkedErrors('warning');
 
     if (!this.sqlSyntaxWorkerSub) {
