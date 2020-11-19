@@ -120,7 +120,7 @@ class HiveQueryApi(Api):
     if action.get('action') == 'kill':
       for queryid in appid:
         notebook = {}
-        snippet = {'result': {'handle': {'secret': queryid, 'guid': queryid}}}
+        snippet = {'result': {'handle': {'secret': queryid, 'guid': queryid, 'has_result_set': False}}}
         connector_id = 'hive'
 
         response = _get_notebook_api(self.user, connector_id).cancel(notebook, snippet)
