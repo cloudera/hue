@@ -456,6 +456,10 @@ With SqlAlchemy the dialect should be added to the Python system or Hue Python v
 
     ./build/env/bin/pip install pyhive
 
+This module might also be needed:
+
+    ./build/env/bin/pip install thrift_sasl
+
 Then give Hue the information about the database source:
 
     [[[sparksql]]]
