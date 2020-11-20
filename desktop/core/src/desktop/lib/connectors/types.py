@@ -169,7 +169,7 @@ CONNECTOR_TYPES = [
     'dialect': 'sparksql',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'api_url', 'value': 'http://sparksql-thrift-server:10000'},
+      {'name': 'url', 'value': 'hive://sparksql-thrift-server:10000'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
