@@ -387,7 +387,11 @@ CONNECTOR_TYPES = [
     'dialect': 'athena',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'awsathena+rest://XXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch'},
+      {
+        'name': 'url',
+        'value': 'awsathena+rest://XXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:'
+            '443/default?s3_staging_dir=s3://gethue-athena/scratch'
+      },
     ],
     'category': 'editor',
     'description': '',
@@ -600,7 +604,13 @@ CONNECTOR_TYPES = [
   {'nice_name': "Pig", 'dialect': 'pig', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
   {'nice_name': "Java", 'dialect': 'java', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
 
-  {'nice_name': "HDFS", 'dialect': 'hdfs', 'interface': 'rest', 'settings': [{'name': 'server_url', 'value': 'http://localhost:9870/webhdfs/v1'}, {'name': 'default_fs', 'value': 'fs_defaultfs=hdfs://localhost:8020'}], 'category': 'browsers', 'description': '', 'properties': {}},
+  {'nice_name': "HDFS", 'dialect': 'hdfs', 'interface': 'rest',
+    'settings': [
+      {'name': 'server_url', 'value': 'http://localhost:9870/webhdfs/v1'},
+      {'name': 'default_fs', 'value': 'fs_defaultfs=hdfs://localhost:8020'}
+    ],
+    'category': 'browsers', 'description': '', 'properties': {}
+  },
   {'nice_name': "YARN", 'dialect': 'yarn', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
   {'nice_name': "S3", 'dialect': 's3', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
   {'nice_name': "ADLS", 'dialect': 'adls-v1', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
@@ -616,8 +626,15 @@ CONNECTOR_TYPES = [
     'description': '',
     'properties': {}
   },
-  {'nice_name': "Atlas", 'dialect': 'atlas', 'interface': 'rest', 'settings': [], 'category': 'catalogs', 'description': '', 'properties': {}},
-  {'nice_name': "Navigator", 'dialect': 'navigator', 'interface': 'rest', 'settings': [], 'category': 'catalogs', 'description': '', 'properties': {}},
+  {
+    'nice_name': "Atlas", 'dialect': 'atlas', 'interface': 'rest', 'settings': [], 'category': 'catalogs', 'description': '',
+    'properties': {}
+  },
+  {
+    'nice_name': "Navigator", 'dialect': 'navigator', 'interface': 'rest', 'settings': [], 'category': 'catalogs',
+    'description': '',
+    'properties': {}
+  },
 
   {'nice_name': "Optimizer", 'dialect': 'optimizer', 'settings': [], 'category': 'optimizers', 'description': '', 'properties': {}},
 
