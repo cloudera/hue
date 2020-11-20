@@ -55,7 +55,6 @@ def get_connectors_instances(request):
 def new_connector(request, dialect):
   instance = get_connector_by_type(dialect)
 
-  instance['nice_name'] = dialect.title()
   instance['id'] = None
 
   return JsonResponse({'connector': instance})
