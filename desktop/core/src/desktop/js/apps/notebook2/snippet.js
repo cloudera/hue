@@ -25,7 +25,9 @@ import 'apps/notebook2/components/ko.snippetEditorActions';
 import 'apps/notebook2/components/ko.snippetResults';
 import 'apps/notebook2/components/ko.queryHistory';
 
-import './components/SqlEditor.vue';
+import './components/ExecutableActionsKoBridge.vue';
+import './components/EditorResizerKoBridge.vue';
+import './components/aceEditor/AceEditorKoBridge.vue';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';
@@ -43,6 +45,7 @@ import {
 } from 'apps/notebook2/execution/executable';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
+  CURSOR_POSITION_CHANGED_EVENT,
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
 import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from './components/ExecutableActions.vue';
@@ -234,7 +237,15 @@ export default class Snippet {
       this.parentNotebook.isHistory() ? snippetRaw.aceCursorPosition : null
     );
 
-    this.aceEditor = null;
+    this.ace = ko.observable();
+
+    this.ace.subscribe(newVal => {
+      if (newVal) {
+        if (!this.parentNotebook.isPresentationMode()) {
+          newVal.focus();
+        }
+      }
+    });
 
     this.errors = ko.observableArray([]);
 
@@ -281,7 +292,7 @@ export default class Snippet {
       if (newValue !== null) {
         apiHelper.setInTotalStorage('editor', 'last.selected.database', newValue);
         if (previousDatabase !== null && previousDatabase !== newValue) {
-          huePubSub.publish('editor.refresh.statement.locations', this);
+          huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this.id());
         }
         previousDatabase = newValue;
       }
@@ -338,7 +349,7 @@ export default class Snippet {
     this.associatedDocumentUuid.subscribe(val => {
       if (val !== '') {
         this.getExternalStatement();
-      } else {
+      } else if (this.ace()) {
         this.statement_raw('');
         this.ace().setValue('', 1);
       }
@@ -355,10 +366,16 @@ export default class Snippet {
       huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this);
     };
 
+    huePubSub.subscribe(CURSOR_POSITION_CHANGED_EVENT, details => {
+      if (details.editorId === this.id()) {
+        this.aceCursorPosition(details.position);
+      }
+    });
+
     huePubSub.subscribe(
       ACTIVE_STATEMENT_CHANGED_EVENT,
       statementDetails => {
-        if (this.ace() && this.ace().container.id === statementDetails.id) {
+        if (this.id() === statementDetails.id) {
           for (let i = statementDetails.precedingStatements.length - 1; i >= 0; i--) {
             if (statementDetails.precedingStatements[i].database) {
               this.availableDatabases().some(availableDatabase => {
@@ -436,7 +453,7 @@ export default class Snippet {
         this.properties(komapping.fromJS(getDefaultSnippetProperties(newValue)));
       }
       window.setTimeout(() => {
-        if (this.ace() !== null) {
+        if (this.ace()) {
           this.ace().focus();
         }
       }, 100);
@@ -689,10 +706,12 @@ export default class Snippet {
           this.hasSuggestion('error');
           this.complexity({ hints: [] });
         }
-        huePubSub.publish('editor.active.risks', {
-          editor: this.ace(),
-          risks: this.complexity() || {}
-        });
+        if (this.ace()) {
+          huePubSub.publish('editor.active.risks', {
+            editor: this.ace(),
+            risks: this.complexity() || {}
+          });
+        }
         lastCheckedComplexityStatement = this.statement();
       };
 
@@ -705,7 +724,7 @@ export default class Snippet {
           this.suggestion('');
         }
 
-        if (this.complexity() !== {}) {
+        if (this.complexity() !== {} && this.ace()) {
           this.complexity(undefined);
           huePubSub.publish('editor.active.risks', {
             editor: this.ace(),
@@ -823,16 +842,6 @@ export default class Snippet {
     }
   }
 
-  ace(newVal) {
-    if (newVal) {
-      this.aceEditor = newVal;
-      if (!this.parentNotebook.isPresentationMode()) {
-        this.aceEditor.focus();
-      }
-    }
-    return this.aceEditor;
-  }
-
   checkCompatibility() {
     this.hasSuggestion(null);
     this.compatibilitySourcePlatform(COMPATIBILITY_SOURCE_PLATFORMS[this.dialect()]);
@@ -883,7 +892,9 @@ export default class Snippet {
         if (data.status === 0) {
           this.externalStatementLoaded(true);
           this.statement_raw(data.statement);
-          this.ace().setValue(this.statement_raw(), 1);
+          if (this.ace()) {
+            this.ace().setValue(this.statement_raw(), 1);
+          }
         } else {
           this.handleAjaxError(data);
         }
@@ -1032,6 +1043,9 @@ export default class Snippet {
   }
 
   onKeydownInVariable(context, e) {
+    if (!this.ace()) {
+      return;
+    }
     if ((e.ctrlKey || e.metaKey) && e.which === 13) {
       // Ctrl-enter
       this.ace().commands.commands['execute'].exec();

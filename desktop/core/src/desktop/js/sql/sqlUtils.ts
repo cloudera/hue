@@ -21,7 +21,10 @@ import CancellableJqPromise from 'api/cancellableJqPromise';
 import dataCatalog from 'catalog/dataCatalog';
 import { IdentifierChainEntry, ParsedLocation, ParsedTable } from 'parse/types';
 import { isReserved } from 'sql/reference/sqlReferenceRepository';
-import { Suggestion } from 'sql/types';
+import {
+  CommentDetails,
+  Suggestion
+} from 'apps/notebook2/components/aceEditor/autocomplete/AutocompleteResults';
 import { Compute, Connector, Namespace } from 'types/config';
 
 const identifierEquals = (a?: string, b?: string): boolean =>
@@ -47,10 +50,12 @@ const autocompleteFilter = (filter: string, entries: Suggestion[]): Suggestion[]
       }
     } else if (
       suggestion.details &&
-      suggestion.details.comment &&
+      (<CommentDetails>suggestion.details).comment &&
       lowerCaseFilter.indexOf(' ') === -1
     ) {
-      foundIndex = suggestion.details.comment.toLowerCase().indexOf(lowerCaseFilter);
+      foundIndex = (<CommentDetails>suggestion.details).comment
+        .toLowerCase()
+        .indexOf(lowerCaseFilter);
       if (foundIndex !== -1) {
         suggestion.filterWeight = 1;
         suggestion.matchComment = true;
@@ -65,14 +70,14 @@ const autocompleteFilter = (filter: string, entries: Suggestion[]): Suggestion[]
   });
 };
 
-interface SortOverride {
+export interface SortOverride {
   partitionColumnsFirst?: boolean;
 }
 
 const sortSuggestions = (
   suggestions: Suggestion[],
   filter: string,
-  sortOverride?: SortOverride
+  sortOverride?: SortOverride | null
 ): void => {
   suggestions.sort((a, b) => {
     if (filter) {
@@ -98,8 +103,8 @@ const sortSuggestions = (
         return 1;
       }
     }
-    const aWeight = a.category.weight + (a.weightAdjust || 0);
-    const bWeight = b.category.weight + (b.weightAdjust || 0);
+    const aWeight = (a.category.weight || 0) + (a.weightAdjust || 0);
+    const bWeight = (b.category.weight || 0) + (b.weightAdjust || 0);
     if (typeof aWeight !== 'undefined' && typeof bWeight !== 'undefined' && bWeight !== aWeight) {
       return bWeight - aWeight;
     }

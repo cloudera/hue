@@ -21,7 +21,7 @@ import { CONTEXT_SELECTOR_COMPONENT } from 'ko/components/ko.contextSelector';
 import { HUE_DROP_DOWN_COMPONENT } from 'ko/components/ko.dropDown';
 import { SIMPLE_RESULT_GRID_COMPONENT } from 'apps/notebook2/components/resultGrid/ko.simpleResultGrid';
 
-import 'apps/notebook2/components/SqlEditor.vue';
+import 'apps/notebook2/components/ExecutableActionsKoBridge.vue';
 
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
@@ -84,9 +84,9 @@ const TEMPLATE = `
           }
         }
       "></div>
-      <sql-editor data-bind="vueKoProps: {
+      <executable-actions-ko-bridge data-bind="vueKoProps: {
           executableObservable: $parent.activeExecutable
-        }"></sql-editor>
+        }"></executable-actions-ko-bridge>
       <div data-bind="
         component: {
           name: '${ SIMPLE_RESULT_GRID_COMPONENT }',

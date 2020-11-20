@@ -69,7 +69,7 @@ from django.utils.translation import ugettext as _
             var suppressedRules = window.apiHelper.getFromTotalStorage('hue.syntax.checker', 'suppressedRules', {});
             suppressedRules[newValue.suppressRule] = true;
             window.apiHelper.setInTotalStorage('hue.syntax.checker', 'suppressedRules', suppressedRules);
-            huePubSub.publish('editor.refresh.statement.locations', params.snippet);
+            huePubSub.publish('editor.refresh.statement.locations', params.editorId);
           } else {
             params.editor.session.replace(params.range, newValue);
           }
