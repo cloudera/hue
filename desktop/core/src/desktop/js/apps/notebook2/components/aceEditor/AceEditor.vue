@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div>
+  <div class="ace-editor-component">
     <div :id="id" class="ace-editor" />
     <ace-autocomplete v-if="editor" :editor="editor" :editor-id="id" :executor="executor" />
   </div>
@@ -76,6 +76,10 @@
       if (!editorElement) {
         return;
       }
+
+      const height = localStorage.getItem('ace.editor.custom.height') || '128';
+      (<HTMLElement>this.$el).style.height = height + 'px';
+
       editorElement.textContent = this.initialValue;
       const editor = <Ace.Editor>ace.edit(editorElement);
 
@@ -325,13 +329,10 @@
       editor.on('change', triggerChange);
       editor.on('blur', triggerChange);
 
-      window.setTimeout(() => {
-        this.$emit('ace-created', editor);
-      }, 3000);
-
       editor.$blockScrolling = Infinity;
 
       this.editor = editor;
+      this.$emit('ace-created', editor);
     }
 
     destroyed(): void {
@@ -344,7 +345,11 @@
 </script>
 
 <style lang="scss" scoped>
-  .ace-editor {
-    height: 200px;
+  .ace-editor-component {
+    height: 100%;
+
+    .ace-editor {
+      height: 100%;
+    }
   }
 </style>

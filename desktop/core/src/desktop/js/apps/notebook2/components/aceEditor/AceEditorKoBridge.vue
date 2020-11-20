@@ -17,16 +17,15 @@
 -->
 
 <template>
-  <div v-if="initialized && editorId">
-    <ace-editor
-      :id="editorId"
-      :executor="executor"
-      :ace-options="aceOptions"
-      :initial-value="value"
-      @value-changed="valueChanged"
-      @ace-created="aceCreated"
-    />
-  </div>
+  <ace-editor
+    v-if="initialized && editorId"
+    :id="editorId"
+    :executor="executor"
+    :ace-options="aceOptions"
+    :initial-value="value"
+    @value-changed="valueChanged"
+    @ace-created="aceCreated"
+  />
 </template>
 
 <script lang="ts">
