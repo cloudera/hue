@@ -1232,15 +1232,9 @@
   </script>
 
   <script type="text/html" id="snippet-code-resizer${ suffix }">
-##     <div class="snippet-code-resizer" data-bind="
-##         aceResizer : {
-##           snippet: $data,
-##           target: '.ace-container-resizable',
-##           onStart: function () { huePubSub.publish('result.grid.hide.fixed.headers') },
-##           onStop: function () { huePubSub.publish('result.grid.redraw.fixed.headers') }
-##         }">
-##       <i class="fa fa-ellipsis-h"></i>
-##     </div>
+    <editor-resizer-ko-bridge data-bind="vueKoProps: {
+      editorObservable: ace
+    }"></editor-resizer-ko-bridge>
   </script>
 
   <script type="text/html" id="notebook-snippet-type-controls${ suffix }">

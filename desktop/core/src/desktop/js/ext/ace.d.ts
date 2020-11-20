@@ -67,7 +67,7 @@ declare namespace Ace {
       scrollCursorIntoView(position?: Position, u?: number): void;
       textToScreenCoordinates(row: number, column: number): { pageX: number; pageY: number }
     };
-    resize(force: boolean): void;
+    resize(force?: boolean): void;
     scrollToLine(line: number, u: boolean, v: boolean, callback: () => void): void;
     selection: {
       getRange(): Range;

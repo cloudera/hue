@@ -17,40 +17,35 @@
 -->
 
 <template>
-  <executable-actions
-    :executable="executable"
-    :before-execute="beforeExecute"
-    @limit-changed="limitChanged"
-  />
+  <editor-resizer :editor="editor" />
 </template>
 
 <script lang="ts">
-  import ExecutableActions from './ExecutableActions.vue';
-  import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
-  import SubscriptionTracker from 'components/utils/SubscriptionTracker';
+  import { Ace } from 'ext/ace';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
   import { wrap } from 'vue/webComponentWrapper';
 
-  @Component({
-    components: { ExecutableActions }
-  })
-  export default class ExecutableActionsKoBridge extends Vue {
-    @Prop()
-    executableObservable?: KnockoutObservable<SqlExecutable | undefined>;
-    @Prop()
-    beforeExecute?: () => Promise<void>;
+  import EditorResizer from 'apps/notebook2/components/EditorResizer.vue';
+  import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
+  @Component({
+    components: { EditorResizer }
+  })
+  export default class EditorResizerKoBridge extends Vue {
+    @Prop()
+    editorObservable?: KnockoutObservable<Ace.Editor | undefined>;
+
+    editor: Ace.Editor | null = null;
     subTracker = new SubscriptionTracker();
     initialized = false;
-    executable: SqlExecutable | null = null;
 
     updated(): void {
-      if (!this.initialized && this.executableObservable) {
-        this.executable = this.executableObservable() || null;
-        this.subTracker.subscribe(this.executableObservable, (executable: SqlExecutable) => {
-          this.executable = executable;
+      if (!this.initialized && this.editorObservable) {
+        this.editor = this.editorObservable() || null;
+        this.subTracker.subscribe(this.editorObservable, editor => {
+          this.editor = editor;
         });
         this.initialized = true;
       }
@@ -59,14 +54,8 @@
     destroyed(): void {
       this.subTracker.dispose();
     }
-
-    limitChanged(limit: number): void {
-      if (this.executable && this.executable.executor.defaultLimit) {
-        this.executable.executor.defaultLimit(limit);
-      }
-    }
   }
 
-  export const COMPONENT_NAME = 'executable-actions-ko-bridge';
-  wrap(COMPONENT_NAME, ExecutableActionsKoBridge);
+  export const COMPONENT_NAME = 'editor-resizer-ko-bridge';
+  wrap(COMPONENT_NAME, EditorResizerKoBridge);
 </script>
