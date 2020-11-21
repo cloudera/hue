@@ -347,7 +347,7 @@ class AssistStorageEntry {
    *
    * @param {string} path - The path, can include the type i.e. '/tmp' or 's3:/tmp'.
    * @param {string} [type] - Optional type, if not specified here or in the path 'hdfs' will be used.
-   * @return {Promise}
+   * @return {JQueryPromise<AssistStorageEntry>}
    */
   static getEntry(path, type) {
     const deferred = $.Deferred();

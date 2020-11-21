@@ -3,6 +3,62 @@ title: "SQL Parsers"
 draft: false
 ---
 
+## Live Demo
+
+{{< rawhtml >}}
+  <link rel="stylesheet" href="demo/styles.css">
+  <div class="live-parser-container">
+    <div class="parser-scripts-container"></div>
+    <select>
+      <option value="hiveAutocompleteParser">Hive Autocomplete Parser</option>
+      <option value="hiveSyntaxParser">Hive Syntax Parser</option>
+      <option disabled> </option>
+      <option value="impalaAutocompleteParser">Impala Autocomplete Parser</option>
+      <option value="impalaSyntaxParser">Impala Syntax Parser</option>
+      <option disabled> </option>
+      <option value="calciteAutocompleteParser">Calcite Autocomplete Parser</option>
+      <option value="calciteSyntaxParser">Calcite Syntax Parser</option>
+      <option disabled> </option>
+      <option value="elasticsearchAutocompleteParser">Elasticsearch Autocomplete Parser</option>
+      <option value="elasticsearchSyntaxParser">Elasticsearch Syntax Parser</option>
+      <option disabled> </option>
+      <option value="phoenixAutocompleteParser">Phoenix Autocomplete Parser</option>
+      <option value="phoenixSyntaxParser">Phoenix Syntax Parser</option>
+      <option disabled> </option>
+      <option value="druidAutocompleteParser">Druid Autocomplete Parser</option>
+      <option value="druidSyntaxParser">Druid Syntax Parser</option>
+      <option disabled> </option>
+      <option value="flinkAutocompleteParser">Flink Autocomplete Parser</option>
+      <option value="flinkSyntaxParser">Flink Syntax Parser</option>
+      <option disabled> </option>
+      <option value="ksqlAutocompleteParser">Ksql Autocomplete Parser</option>
+      <option value="ksqlSyntaxParser">Ksql Syntax Parser</option>
+      <option disabled> </option>
+      <option value="prestoAutocompleteParser">Presto Autocomplete Parser</option>
+      <option value="prestoSyntaxParser">Presto Syntax Parser</option>
+      <option disabled> </option>
+      <option value="genericAutocompleteParser">Generic Autocomplete Parser</option>
+      <option value="genericSyntaxParser">Generic Syntax Parser</option>
+    </select>
+    <div class="live-message"></div>
+    <label>Query <textarea>
+      SELECT accountid,
+            account.name,
+            sum(expectedrevenue) AS expected,
+            count(*) ct
+      FROM sfdc.opportunity_history
+      JOIN sfdc.account ON account.id = opportunity_history.accountid
+      WHERE opportunity_history.`snapshottime` = '2017-09-25'
+      GROUP BY accountid,
+              account.name
+      ORDER BY expected DESC
+      LIMIT 100;
+    </textarea></label>
+    <label>Parsed Result <textarea readonly></textarea></label>
+  </div>
+  <script src="demo/live-parser.js"></script>
+{{< /rawhtml >}}
+
 ## Import
 
 Import the parser you need with something like below and run it on an SQL statement:

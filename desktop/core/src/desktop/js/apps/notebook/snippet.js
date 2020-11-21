@@ -38,6 +38,11 @@ import {
   ASSIST_SET_SOURCE_EVENT
 } from 'ko/components/assist/events';
 import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
+import {
+  ACTIVE_STATEMENT_CHANGED_EVENT,
+  CURSOR_POSITION_CHANGED_EVENT,
+  REFRESH_STATEMENT_LOCATIONS_EVENT
+} from 'ko/bindings/ace/aceLocationHandler';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -342,7 +347,7 @@ class Snippet {
       if (newValue !== null) {
         apiHelper.setInTotalStorage('editor', 'last.selected.database', newValue);
         if (previousDatabase !== null && previousDatabase !== newValue) {
-          huePubSub.publish('editor.refresh.statement.locations', self);
+          huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, self.id());
         }
         previousDatabase = newValue;
       }
@@ -539,8 +544,14 @@ class Snippet {
     self.lastExecutedStatement = ko.observable(null);
     self.statementsList = ko.observableArray();
 
+    huePubSub.subscribe(CURSOR_POSITION_CHANGED_EVENT, details => {
+      if (details.editorId === self.id()) {
+        self.aceCursorPosition(details.position);
+      }
+    });
+
     huePubSub.subscribe(
-      'editor.active.statement.changed',
+      ACTIVE_STATEMENT_CHANGED_EVENT,
       statementDetails => {
         if (self.ace() && self.ace().container.id === statementDetails.id) {
           for (let i = statementDetails.precedingStatements.length - 1; i >= 0; i--) {
@@ -1760,7 +1771,7 @@ class Snippet {
       self.statusForButtons('executing');
 
       if (self.isSqlDialect()) {
-        huePubSub.publish('editor.refresh.statement.locations', self);
+        huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, self.id());
       }
 
       self.lastExecutedStatements = self.statement();

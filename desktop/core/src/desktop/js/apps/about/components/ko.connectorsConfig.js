@@ -66,7 +66,7 @@ const TEMPLATE = `
           valueUpdate: 'afterkeydown'
       ">
       <span>
-        <a href="https://docs.gethue.com/administrator/configuration/" target="_blank">
+        <a href="https://docs.gethue.com/administrator/configuration/connectors/" target="_blank">
           <i class="fa fa-question-circle"></i> ${ I18n('Help') }
         </a>
       </span>

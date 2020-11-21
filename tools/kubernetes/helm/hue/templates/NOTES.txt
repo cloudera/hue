@@ -2,7 +2,7 @@ Congratulations, you've launched the Hue SQL Editor for Data Warehouses!
 
 To check the status of your installation run:
 
-  helm list {{ .Release.Name }}
+  helm list --filter {{ .Release.Name }}
 
 
 Get the recommended URL below and start executing queries:

@@ -43,6 +43,37 @@ else:
 LOG = logging.getLogger(__name__)
 
 
+
+class TestHiveQueryApiNotebook():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    self.user = rewrite_user(User.objects.get(username="test"))
+
+
+  def test_kill_query(self):
+    with patch('jobbrowser.apis.hive_query_api._get_notebook_api') as _get_notebook_api:
+      cancel_call = Mock(return_value={'status': 0})
+      _get_notebook_api.return_value = Mock(cancel=cancel_call)
+
+      appid = 'd94d2fb4815a05c4:b1ccec1500000000'
+      data = {
+        'operation': json.dumps({'action': 'kill'}),
+        'interface': json.dumps('queries-hive'),
+        'app_ids': json.dumps([appid])
+      }
+      response = self.client.post("/jobbrowser/api/job/action/queries-hive/kill", data)
+      response_data = json.loads(response.content)
+
+      notebook = {}
+      snippet = {'result': {'handle': {'has_result_set': False, 'secret': appid, 'guid': appid}}}
+
+      _get_notebook_api.assert_called_once_with(self.user, 'hive')
+      cancel_call.assert_called_once_with(notebook, snippet)
+
+      assert_equal(0, response_data['status'])
+
+
 class TestHiveQueryApi():
 
   def setUp(self):
@@ -88,12 +119,12 @@ class TestHiveQueryApi():
       response = self.client.post("/jobbrowser/api/jobs/queries-hive", content_type='application/json', data=_data)
       data = json.loads(response.content)
 
-      assert_equal(2, len(data['queries'])) # pagination
-      assert_equal('3', data['queries'][0]['queryId']) # query id (with order_by)
-      assert_equal("SUCCESS", data['queries'][0]['status']) # facet selection
-      assert_true("select" in data['queries'][0]['query']) # search text
-      assert_equal(3, data['meta']['size']) # total filtered queries count
-      assert_equal(2, data['meta']['limit']) # limit value of filter
+      assert_equal(2, len(data['queries']))  # pagination
+      assert_equal('3', data['queries'][0]['queryId'])  # query id (with order_by)
+      assert_equal("SUCCESS", data['queries'][0]['status'])  # facet selection
+      assert_true("select" in data['queries'][0]['query'])  # search text
+      assert_equal(3, data['meta']['size'])  # total filtered queries count
+      assert_equal(2, data['meta']['limit'])  # limit value of filter
 
 
   # TODO

@@ -25,6 +25,7 @@ import {
   ExecutionHistory
 } from 'apps/notebook2/execution/apiUtils';
 import ExecutionResult from 'apps/notebook2/execution/executionResult';
+import { hueWindow } from 'types/types';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
@@ -66,11 +67,6 @@ export interface ExecutableRaw {
   progress: number;
   status: string;
   type: string;
-}
-
-interface hueWindow {
-  WS_CHANNEL?: string;
-  WEB_SOCKETS_ENABLED?: boolean;
 }
 
 const INITIAL_HANDLE: ExecutionHandle = {

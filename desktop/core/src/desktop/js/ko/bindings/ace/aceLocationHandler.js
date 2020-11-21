@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
+import ace from 'ext/aceHelper';
 
 import AssistStorageEntry from 'ko/components/assist/assistStorageEntry';
 import dataCatalog from 'catalog/dataCatalog';
@@ -36,6 +37,7 @@ import {
 
 export const REFRESH_STATEMENT_LOCATIONS_EVENT = 'editor.refresh.statement.locations';
 export const ACTIVE_STATEMENT_CHANGED_EVENT = 'editor.active.statement.changed';
+export const CURSOR_POSITION_CHANGED_EVENT = 'editor.cursor.position.changed';
 
 const STATEMENT_COUNT_AROUND_ACTIVE = 10;
 
@@ -421,7 +423,7 @@ class AceLocationHandler {
             }
           } else if (token.syntaxError) {
             huePubSub.publish('sql.syntax.dropdown.show', {
-              snippet: self.snippet,
+              editorId: self.snippet.id(),
               data: token.syntaxError,
               editor: self.editor,
               range: range,
@@ -634,7 +636,10 @@ class AceLocationHandler {
           lastCursorPosition.row !== newCursorPosition.row ||
           lastCursorPosition.column !== newCursorPosition.column
         ) {
-          self.snippet.aceCursorPosition(newCursorPosition);
+          huePubSub.publish(CURSOR_POSITION_CHANGED_EVENT, {
+            editorId: self.snippet.id(),
+            position: newCursorPosition
+          });
           lastCursorPosition = newCursorPosition;
         }
 
@@ -667,8 +672,8 @@ class AceLocationHandler {
       }
     });
 
-    const locateSubscription = huePubSub.subscribe(REFRESH_STATEMENT_LOCATIONS_EVENT, snippet => {
-      if (snippet === self.snippet) {
+    const locateSubscription = huePubSub.subscribe(REFRESH_STATEMENT_LOCATIONS_EVENT, editorId => {
+      if (editorId === self.snippet.id()) {
         cursorChangePaused = true;
         window.clearTimeout(changeThrottle);
         window.clearTimeout(updateThrottle);
@@ -842,7 +847,7 @@ class AceLocationHandler {
       }
     });
 
-    huePubSub.publish('editor.refresh.statement.locations', self.snippet);
+    huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, self.snippet.id());
   }
 
   detachSqlSyntaxWorker() {
@@ -1295,7 +1300,7 @@ class AceLocationHandler {
             .getSession()
             .getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
         }
-        if (token && token.value && /^\s*\$\{\s*$/.test(token.value)) {
+        if (token && token.value && /^\s*\${\s*$/.test(token.value)) {
           token = null;
         }
         if (token && token.value) {
