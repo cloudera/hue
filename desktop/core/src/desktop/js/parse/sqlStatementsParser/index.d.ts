@@ -1,12 +1,16 @@
 import { ParsedLocation } from 'parse/types';
 
-declare module 'parse/sqlStatementsParser' {
+export = sqlStatementsParser;
+
+declare const sqlStatementsParser = {
+  parse(statement: string): sqlStatementsParser.ParsedSqlStatement[];
+};
+
+declare namespace sqlStatementsParser {
   export interface ParsedSqlStatement {
     firstToken: string;
     statement: string;
     location: ParsedLocation;
     type: string;
   }
-
-  export function parse(statement: string): ParsedSqlStatement[];
 }

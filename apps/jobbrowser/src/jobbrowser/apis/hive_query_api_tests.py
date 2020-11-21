@@ -66,7 +66,7 @@ class TestHiveQueryApiNotebook():
       response_data = json.loads(response.content)
 
       notebook = {}
-      snippet = {'result': {'handle': {'secret': appid, 'guid': appid}}}
+      snippet = {'result': {'handle': {'has_result_set': False, 'secret': appid, 'guid': appid}}}
 
       _get_notebook_api.assert_called_once_with(self.user, 'hive')
       cancel_call.assert_called_once_with(notebook, snippet)

@@ -26,22 +26,23 @@ export interface ExecutorRaw {
 }
 
 export default class Executor {
-  connector: () => Connector;
-  compute: () => Compute;
-  namespace: () => Namespace;
-  database: () => string;
+  connector: KnockoutObservable<Connector>;
+  compute: KnockoutObservable<Compute>;
+  namespace: KnockoutObservable<Namespace>;
+  database: KnockoutObservable<string>;
   defaultLimit?: KnockoutObservable<number>;
   isSqlEngine?: boolean;
   isOptimizerEnabled?: boolean;
   executables: Executable[] = [];
   variableSubstitionHandler?: VariableSubstitutionHandler;
   snippet?: Snippet;
+  activeExecutable?: Executable;
 
   constructor(options: {
-    connector: () => Connector;
-    compute: () => Compute;
-    namespace: () => Namespace;
-    database: () => string;
+    connector: KnockoutObservable<Connector>;
+    compute: KnockoutObservable<Compute>;
+    namespace: KnockoutObservable<Namespace>;
+    database: KnockoutObservable<string>;
     defaultLimit?: KnockoutObservable<number>;
     isSqlEngine?: boolean;
     snippet?: Snippet;
@@ -101,6 +102,7 @@ export default class Executor {
     }
 
     // Update the executables list
+    this.activeExecutable = executables.active;
     this.executables = executables.all;
 
     this.executables.forEach(executable => executable.notify());
