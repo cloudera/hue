@@ -72,7 +72,7 @@ class LivyClient(object):
       self._client.set_kerberos_auth()
 
     if self.csrf_enabled:
-      self._client.set_headers({'X-Requested-By' : 'hue'})
+      self._client.set_headers({'X-Requested-By': 'hue'})
 
     self._client.set_verify(SSL_CERT_CA_VERIFY.get())
 
