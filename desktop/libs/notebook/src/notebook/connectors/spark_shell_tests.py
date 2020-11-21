@@ -55,8 +55,8 @@ class TestSparkApi(object):
         "value": 'file_a,file_b,file_c',
       }]
     props = self.api.get_livy_props('scala', test_properties)
-    assert_equal(props['files'],['file_a','file_b','file_c'])
-    
+    assert_equal(props['files'], ['file_a', 'file_b', 'file_c'])
+
   def test_create_session_with_config(self):
     lang = 'pyspark'
     properties = None
@@ -88,7 +88,7 @@ class TestSparkApi(object):
             if p['name'] == 'driverCores':
               cores = p['value']
           assert_equal(cores, 2)
-          
+
           # Case without user configuration. Expected 1 driverCores
           USE_DEFAULT_CONFIGURATION.get.return_value = True
           DefaultConfiguration.objects.get_configuration_for_user.return_value = None

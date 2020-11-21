@@ -69,7 +69,7 @@ class SparkApi(Api):
     # empty list '[]' for these four values.
     # Note also that Livy has a 90 second timeout for the session request to complete, this needs to
     # be increased for requests that take longer, for example when loading large archives.
-    for key in ['archives','jars','files','pyFiles']:
+    for key in ['archives', 'jars', 'files', 'pyFiles']:
       if key not in props:
         continue
       if type(props[key]) is list:

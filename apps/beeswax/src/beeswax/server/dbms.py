@@ -275,14 +275,14 @@ def get_query_server_config_via_connector(connector):
   return {
       'dialect': connector['dialect'],
       'server_name': full_connector_name,
-      'server_host': (connector['compute']['options'] if 'compute' in connector else connector['options'])['server_host'],
-      'server_port': int((connector['compute']['options'] if 'compute' in connector else connector['options'])['server_port']),
+      'server_host': server_host,
+      'server_port': server_port,
       'principal': 'TODO',
       'auth_username': AUTH_USERNAME.get(),
       'auth_password': AUTH_PASSWORD.get(),
 
       'impersonation_enabled': impersonation_enabled,
-      'use_sasl': connector['dialect'] in ('hive',),
+      'use_sasl': connector['dialect'] in ('hive', 'sparksql'),
       'SESSION_TIMEOUT_S': 15 * 60,
       'querycache_rows': 1000,
       'QUERY_TIMEOUT_S': 15 * 60,
