@@ -41,7 +41,12 @@ class BaseConnector(models.Model):
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
   dialect = models.CharField(max_length=32, db_index=True, help_text=_t('Type of connector, e.g. hive, mysql... '))
-  interface = models.CharField(max_length=32, db_index=True, help_text=_t('Type of interface, e.g. sqlalchemy, hiveserver2... '), default='sqlalchemy')
+  interface = models.CharField(
+      max_length=32,
+      db_index=True,
+      help_text=_t('Type of interface, e.g. sqlalchemy, hiveserver2... '),
+      default='sqlalchemy'
+  )
   settings = models.TextField(default='{}')
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
 
