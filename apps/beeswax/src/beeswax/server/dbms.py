@@ -362,7 +362,7 @@ class HiveServer2Dbms(object):
   def get_tables_meta(self, database='default', table_names='*', table_types=None):
     database = database.lower() # Impala is case sensitive
 
-    if self.server_name == 'beeswax':
+    if self.server_name in ('beeswax', 'sparksql'):
       identifier = self.to_matching_wildcard(table_names)
     else:
       identifier = None
@@ -375,7 +375,7 @@ class HiveServer2Dbms(object):
   def get_tables(self, database='default', table_names='*', table_types=None):
     database = database.lower() # Impala is case sensitive
 
-    if self.server_name == 'beeswax':
+    if self.server_name in ('beeswax', 'sparksql'):
       identifier = self.to_matching_wildcard(table_names)
     else:
       identifier = None
@@ -390,7 +390,11 @@ class HiveServer2Dbms(object):
       return self.client.get_table(database, table_name)
     except QueryServerException as e:
       LOG.debug("Seems like %s.%s could be a Kudu table" % (database, table_name))
-      if 'java.lang.ClassNotFoundException' in e.message and [prop for prop in self.get_table_properties(database, table_name, property_name='storage_handler').rows() if 'KuduStorageHandler' in prop[0]]:
+      if 'java.lang.ClassNotFoundException' in e.message and [
+            prop
+            for prop in self.get_table_properties(database, table_name, property_name='storage_handler').rows()
+            if 'KuduStorageHandler' in prop[0]
+        ]:
         query_server = get_query_server_config('impala')
         db = get(self.client.user, query_server)
         table = db.get_table(database, table_name)
@@ -736,7 +740,12 @@ class HiveServer2Dbms(object):
     if prefix:
       prefix_match = "WHERE CAST(%(column)s AS STRING) LIKE '%(prefix)s%%'" % {'column': column, 'prefix': prefix}
 
-    hql = 'SELECT %(column)s, COUNT(*) AS ct FROM `%(database)s`.`%(table)s` %(prefix_match)s GROUP BY %(column)s ORDER BY ct DESC LIMIT %(limit)s' % {
+    hql = '''
+      SELECT %(column)s, COUNT(*) AS ct
+      FROM `%(database)s`.`%(table)s` %(prefix_match)s
+      GROUP BY %(column)s
+      ORDER BY ct DESC
+      LIMIT %(limit)s''' % {
         'database': database, 'table': table, 'column': column, 'prefix_match': prefix_match, 'limit': limit,
     }
 
@@ -1018,7 +1027,11 @@ class HiveServer2Dbms(object):
     query_history.set_to_running()
     query_history.save()
 
-    LOG.debug("Updated QueryHistory id %s user %s statement_number: %s" % (query_history.id, self.client.user, query_history.statement_number))
+    LOG.debug(
+      "Updated QueryHistory id %s user %s statement_number: %s" % (
+        query_history.id, self.client.user, query_history.statement_number
+      )
+    )
 
     return query_history
 
@@ -1215,7 +1228,7 @@ class SubQueryTable(object):
     for col in cols:
       col.name = re.sub('^t\.', '', col.name)
       col.type = HiveFormat.FIELD_TYPE_TRANSLATE.get(col.type, 'string')
-    self.cols =  cols
+    self.cols = cols
     self.hdfs_link = None
     self.comment = None
     self.is_impala_only = False
