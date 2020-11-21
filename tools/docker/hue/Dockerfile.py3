@@ -61,7 +61,9 @@ RUN ./build/env/bin/pip install \
   # Avoid Django 3 pulling
   django_redis==4.11.0 \
   flower \
-  pyhive \
+  # SparkSql show tables
+  git+https://github.com/gethue/PyHive \
+  # pyhive \
   ksql \
   pydruid \
   pybigquery \
