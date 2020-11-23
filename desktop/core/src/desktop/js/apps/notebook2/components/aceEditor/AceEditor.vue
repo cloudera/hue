@@ -25,6 +25,8 @@
 
 <script lang="ts">
   import { INSERT_AT_CURSOR_EVENT } from 'ko/bindings/ace/ko.aceEditor';
+  import { IdentifierChainEntry } from 'parse/types';
+  import huePubSub from 'utils/huePubSub';
   import AceAutocomplete from './autocomplete/AceAutocomplete.vue';
   import $ from 'jquery';
   import { EditorInterpreter } from 'types/config';
@@ -67,6 +69,7 @@
     subTracker = new SubscriptionTracker();
     editor: Ace.Editor | null = null;
     aceLocationHandler: AceLocationHandler | null = null;
+    lastFocusedEditor = false;
 
     private isSqlDialect(): boolean {
       return (<EditorInterpreter>this.executor.connector()).is_sql;
@@ -223,8 +226,30 @@
         }
       });
 
+      const onFocus = (): void => {
+        huePubSub.publish('ace.editor.focused', editor);
+
+        // TODO: Figure out why this is needed
+        if (editor.session.$backMarkers) {
+          for (const marker in editor.session.$backMarkers) {
+            if (editor.session.$backMarkers[marker].clazz === 'highlighted') {
+              editor.session.removeMarker(editor.session.$backMarkers[marker].id);
+            }
+          }
+        }
+      };
+
       editor.on('change', triggerChange);
       editor.on('blur', triggerChange);
+      editor.on('focus', onFocus);
+
+      this.subTracker.addDisposable({
+        dispose: () => {
+          editor.off('change', triggerChange);
+          editor.off('blur', triggerChange);
+          editor.off('focus', onFocus);
+        }
+      });
 
       const resizeAce = () => {
         defer(() => {
@@ -236,20 +261,82 @@
         });
       };
 
+      this.subTracker.subscribe('ace.editor.focused', (editor: Ace.Editor): void => {
+        this.lastFocusedEditor = editor === this.editor;
+      });
+
       this.subTracker.subscribe('assist.set.manual.visibility', resizeAce);
       this.subTracker.subscribe('split.panel.resized', resizeAce);
 
+      this.editor = editor;
+      this.addInsertSubscribers();
+      this.$emit('ace-created', editor);
+    }
+
+    cursorAtStartOfStatement(): boolean {
+      return (
+        !!this.editor &&
+        (/^\s*$/.test(this.editor.getValue()) || /^.*;\s*$/.test(this.editor.getTextBeforeCursor()))
+      );
+    }
+
+    addInsertSubscribers(): void {
       this.subTracker.subscribe(
         INSERT_AT_CURSOR_EVENT,
         (details: { text: string; targetEditor: Ace.Editor; cursorEndAdjust?: number }): void => {
-          if (details.targetEditor === editor) {
+          if (details.targetEditor === this.editor || this.lastFocusedEditor) {
             this.insertSqlAtCursor(details.text, details.cursorEndAdjust);
           }
         }
       );
 
-      this.editor = editor;
-      this.$emit('ace-created', editor);
+      this.subTracker.subscribe(
+        'editor.insert.table.at.cursor',
+        (details: { name: string; database: string }) => {
+          if (!this.lastFocusedEditor) {
+            return;
+          }
+          const qualifiedName =
+            this.executor.database() === details.database
+              ? details.name
+              : `${details.database}.${details.name}`;
+          if (this.cursorAtStartOfStatement()) {
+            this.insertSqlAtCursor(`SELECT * FROM ${qualifiedName} LIMIT 100;`, -1);
+          } else {
+            this.insertSqlAtCursor(`${qualifiedName} `);
+          }
+        }
+      );
+
+      this.subTracker.subscribe(
+        'editor.insert.column.at.cursor',
+        (details: { name: string; table: string; database: string }): void => {
+          if (!this.lastFocusedEditor) {
+            return;
+          }
+          if (this.cursorAtStartOfStatement()) {
+            const qualifiedFromName =
+              this.executor.database() === details.database
+                ? details.table
+                : details.database + '.' + details.table;
+            this.insertSqlAtCursor(
+              `SELECT ${details.name} FROM ${qualifiedFromName} LIMIT 100;`,
+              -1
+            );
+          }
+        }
+      );
+
+      this.subTracker.subscribe(
+        'sample.error.insert.click',
+        (popoverEntry: { identifierChain: IdentifierChainEntry[] }): void => {
+          if (!this.lastFocusedEditor || !popoverEntry.identifierChain.length) {
+            return;
+          }
+          const table = popoverEntry.identifierChain[popoverEntry.identifierChain.length - 1].name;
+          this.insertSqlAtCursor(`SELECT * FROM ${table} LIMIT 100;`, -1);
+        }
+      );
     }
 
     addCustomAceConfigOptions(editor: Ace.Editor): void {
