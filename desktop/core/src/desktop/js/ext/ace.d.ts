@@ -125,6 +125,7 @@ declare namespace Ace {
   }
 
   export interface Marker {
+    id: number;
     clazz: string;
     dispose(): void;
     range: Range;
