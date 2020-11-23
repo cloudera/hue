@@ -24,6 +24,7 @@
 </template>
 
 <script lang="ts">
+  import { INSERT_AT_CURSOR_EVENT } from 'ko/bindings/ace/ko.aceEditor';
   import AceAutocomplete from './autocomplete/AceAutocomplete.vue';
   import $ from 'jquery';
   import { EditorInterpreter } from 'types/config';
@@ -331,8 +332,37 @@
 
       editor.$blockScrolling = Infinity;
 
+      this.subTracker.subscribe(
+        INSERT_AT_CURSOR_EVENT,
+        (details: { text: string; targetEditor: Ace.Editor; cursorEndAdjust?: number }): void => {
+          if (details.targetEditor === editor) {
+            this.insertSqlAtCursor(details.text, details.cursorEndAdjust);
+          }
+        }
+      );
+
       this.editor = editor;
       this.$emit('ace-created', editor);
+    }
+
+    insertSqlAtCursor(text: string, cursorEndAdjust?: number): void {
+      if (!this.editor) {
+        return;
+      }
+
+      const before = this.editor.getTextBeforeCursor();
+
+      const textToInsert = /\S+$/.test(before) ? ' ' + text : text;
+      this.editor.session.insert(this.editor.getCursorPosition(), textToInsert);
+      if (cursorEndAdjust) {
+        const positionAfterInsert = this.editor.getCursorPosition();
+        this.editor.moveCursorToPosition({
+          row: positionAfterInsert.row,
+          column: positionAfterInsert.column + cursorEndAdjust
+        });
+      }
+      this.editor.clearSelection();
+      this.editor.focus();
     }
 
     destroyed(): void {
