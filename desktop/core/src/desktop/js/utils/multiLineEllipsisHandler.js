@@ -43,7 +43,7 @@ class MultiLineEllipsisHandler {
     this.updateOverflowHeight();
 
     this.contents = options.text;
-    this.element.innerHTML = this.contents;
+    this.element.innerHTML = hueUtils.deXSS(this.contents);
 
     const linkRegex = /(?:(?:[a-z]+:\/\/)|www\.)[^\s\/]+(?:[.\/]\S+)*[^\s`!()\[\]{};:'".,<>?«»“”‘’]/gi;
 

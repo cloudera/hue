@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
+import sanitizeHtml from 'sanitize-html';
 
 export const bootstrapRatios = {
   span3() {
@@ -308,10 +309,7 @@ export const logError = error => {
 export const equalIgnoreCase = (a, b) => a && b && a.toLowerCase() === b.toLowerCase();
 
 const deXSS = str => {
-  if (typeof str !== 'undefined' && str !== null && typeof str === 'string') {
-    return str.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-  }
-  return str;
+  return sanitizeHtml(str);
 };
 
 export const getStyleFromCSSClass = cssClass => {
