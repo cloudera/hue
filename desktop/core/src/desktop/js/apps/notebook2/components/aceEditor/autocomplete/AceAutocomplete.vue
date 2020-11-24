@@ -233,7 +233,7 @@
                 console.log(parseResult);
               }
 
-              if (parseResult) {
+              if (parseResult && this.autocompleteResults) {
                 this.suggestions = [];
                 this.autocompleteResults.update(parseResult, this.suggestions).finally(() => {
                   this.loading = false;

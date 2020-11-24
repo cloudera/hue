@@ -50,12 +50,15 @@ declare namespace Ace {
       removeKeyboardHandler(hashHandler: HashHandler): void;
     }
     lastChangeTime: number;
+    moveCursorTo(row: number, col: number): void;
     moveCursorToPosition(position: Position): void;
     off(ev: string, callback: ((e: any) => any) | number): void;
     on(event: string, fn: (e: any) => any): number;
     removeTextAfterCursor(length: number): void;
+    removeTextBeforeCursor(length: number): void;
     renderer: {
       scrollLeft: number;
+      scroller: HTMLElement;
       gutterWidth: number;
       lineHeight: number;
       layerConfig: {
