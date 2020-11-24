@@ -62,6 +62,10 @@ exports[`AceEditor.vue should render 1`] = `
           />
         </div>
       </div>
+      <div
+        class="ace_invisible ace_emptyMessage"
+        style="margin-left: 6px;"
+      />
     </div>
     <div
       class="ace_scrollbar ace_scrollbar-v"

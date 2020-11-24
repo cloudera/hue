@@ -18,7 +18,7 @@
 
 <template>
   <div class="ace-editor-component">
-    <div :id="id" class="ace-editor" />
+    <div :id="id" ref="editorElement" class="ace-editor" />
     <ace-autocomplete v-if="editor" :editor="editor" :editor-id="id" :executor="executor" />
   </div>
 </template>
@@ -76,7 +76,7 @@
     }
 
     mounted(): void {
-      const editorElement = this.$el.querySelector('.ace-editor');
+      const editorElement = <HTMLElement>this.$refs['editorElement'];
       if (!editorElement) {
         return;
       }
@@ -239,15 +239,39 @@
         }
       };
 
+      const onPaste = (e: { text: string }): void => {
+        e.text = removeUnicodes(e.text);
+      };
+
+      let placeholderVisible = false;
+      const placeholderElement = this.createPlaceholderElement();
+      const onInput = () => {
+        if (!placeholderVisible) {
+          if (!editor.getValue().length) {
+            editor.renderer.scroller.append(placeholderElement);
+            placeholderVisible = true;
+          }
+        } else {
+          placeholderElement.remove();
+          placeholderVisible = false;
+        }
+      };
+
+      onInput();
+
       editor.on('change', triggerChange);
       editor.on('blur', triggerChange);
       editor.on('focus', onFocus);
+      editor.on('paste', onPaste);
+      editor.on('input', onInput);
 
       this.subTracker.addDisposable({
         dispose: () => {
           editor.off('change', triggerChange);
           editor.off('blur', triggerChange);
           editor.off('focus', onFocus);
+          editor.off('paster', onPaste);
+          editor.off('input', onInput);
         }
       });
 
@@ -271,6 +295,15 @@
       this.editor = editor;
       this.addInsertSubscribers();
       this.$emit('ace-created', editor);
+    }
+
+    createPlaceholderElement(): HTMLElement {
+      const element = document.createElement('div');
+      element.innerText = I18n('Example: SELECT * FROM tablename, or press CTRL + space');
+      element.style.marginLeft = '6px';
+      element.classList.add('ace_invisible');
+      element.classList.add('ace_emptyMessage');
+      return element;
     }
 
     cursorAtStartOfStatement(): boolean {
