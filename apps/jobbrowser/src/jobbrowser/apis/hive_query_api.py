@@ -17,7 +17,7 @@
 from builtins import filter
 
 import logging
-import re
+from logging import exception
 
 from datetime import datetime
 from django.utils.translation import ugettext as _
@@ -27,15 +27,16 @@ from desktop.lib.python_util import current_ms_from_utc
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
-from notebook.models import _get_notebook_api
+from notebook.models import _get_notebook_api, make_notebook
+
+from beeswax.models import QueryHistory
 
 from jobbrowser.apis.base_api import Api
-from jobbrowser.models import HiveQuery
 from jobbrowser.conf import QUERY_STORE
+from jobbrowser.models import HiveQuery
 
 
 LOG = logging.getLogger(__name__)
-
 
 class HiveQueryApi(Api):
   HEADERS = {'X-Requested-By': 'das'}
@@ -114,20 +115,39 @@ class HiveQueryApi(Api):
 
     return app
 
-  def action(self, appid, action):
-    message = {'message': '', 'status': 0}
+  def action(self, query_ids, action, request=None):
+    message = {'actions': {}, 'status': 0}
 
     if action.get('action') == 'kill':
-      for queryid in appid:
-        notebook = {}
-        snippet = {'result': {'handle': {'secret': queryid, 'guid': queryid, 'has_result_set': False}}}
-        connector_id = 'hive'
+      for query_id in query_ids:
+        action_details = {}
 
-        response = _get_notebook_api(self.user, connector_id).cancel(notebook, snippet)
-        message['status'] = response['status'] if response['status'] != 0 else message['status']
-        message['message'] = _('kill action performed')
+        try:
+          self.kill_query(query_id, request)
+          action_details['status'] = 0
+          action_details['message'] = _('kill action performed')
+        except Exception as ex:
+          LOG.error(ex)
+          message['status'] = -1
+          action_details['status'] = -1
+          action_details['message'] = _('kill action failed : %s' % str(ex))
+
+        message['actions'][query_id] = action_details;
 
     return message
+
+  def kill_query(self, query_id, request):
+    kill_sql = 'KILL QUERY "%s";' % query_id
+    job = make_notebook(
+        name=_('Kill query %s') % query_id,
+        editor_type='hive',
+        statement=kill_sql,
+        status='ready',
+        on_success_url='assist.db.refresh',
+        is_task=False,
+    )
+
+    job.execute_and_wait(request)
 
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}

@@ -119,7 +119,7 @@ def action(request, interface=None, action=None):
 
   response['operation'] = operation
   response.update(
-      get_api(request.user, interface, cluster=cluster).action(app_ids, operation)
+      get_api(request.user, interface, cluster=cluster).action(app_ids, operation, request)
   )
 
   return JsonResponse(response)
