@@ -52,24 +52,27 @@ class TestHiveQueryApiNotebook():
 
 
   def test_kill_query(self):
-    with patch('jobbrowser.apis.hive_query_api._get_notebook_api') as _get_notebook_api:
-      cancel_call = Mock(return_value={'status': 0})
-      _get_notebook_api.return_value = Mock(cancel=cancel_call)
+    with patch('jobbrowser.apis.hive_query_api.make_notebook') as make_notebook:
+      execute_and_wait = Mock()
+      make_notebook.return_value = Mock(execute_and_wait=execute_and_wait)
 
-      appid = 'd94d2fb4815a05c4:b1ccec1500000000'
+      query_id = 'hive_20201124114044_bd1b8d39-f18f-4d89-ae1b-7a35e7950579'
       data = {
         'operation': json.dumps({'action': 'kill'}),
         'interface': json.dumps('queries-hive'),
-        'app_ids': json.dumps([appid])
+        'app_ids': json.dumps([query_id])
       }
       response = self.client.post("/jobbrowser/api/job/action/queries-hive/kill", data)
       response_data = json.loads(response.content)
 
-      notebook = {}
-      snippet = {'result': {'handle': {'has_result_set': False, 'secret': appid, 'guid': appid}}}
-
-      _get_notebook_api.assert_called_once_with(self.user, 'hive')
-      cancel_call.assert_called_once_with(notebook, snippet)
+      make_notebook.assert_called_once_with(
+        name='Kill query %s' % query_id,
+        editor_type='hive',
+        statement='KILL QUERY "%s";' % query_id,
+        status='ready',
+        on_success_url='assist.db.refresh',
+        is_task=False,
+      )
 
       assert_equal(0, response_data['status'])
 
