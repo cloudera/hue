@@ -366,6 +366,10 @@ export default class Snippet {
       huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this);
     };
 
+    huePubSub.subscribe('ace.editor.focused', editor => {
+      this.inFocus(editor === this.ace());
+    });
+
     huePubSub.subscribe(CURSOR_POSITION_CHANGED_EVENT, details => {
       if (details.editorId === this.id()) {
         this.aceCursorPosition(details.position);
