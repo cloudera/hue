@@ -20,7 +20,11 @@
 HOME=${1:-"."}
 FOUND_ISSUE=-1
 
-files=`git diff --name-only origin/master --diff-filter=b | egrep .py$ | grep -v /ext-py/ | grep -v wsgiserver.py`
+files=`git diff --name-only origin/master --diff-filter=b | egrep .py$ | \
+  grep -v /ext-py/ | \
+  grep -v wsgiserver.py | \
+  grep -v /migrations/ | \
+  grep -v /org_migrations/`
 
 cd $HOME
 
