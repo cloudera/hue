@@ -14,8 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Disposable } from 'components/utils/SubscriptionTracker';
+import ace from 'ext/aceHelper';
 import { Ace } from 'ext/ace';
+import { Disposable } from 'components/utils/SubscriptionTracker';
 import { ParsedLocation } from 'parse/types';
 
 const clearGutterCss = (
