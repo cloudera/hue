@@ -21,6 +21,7 @@ declare namespace Ace {
     $blockScrolling: number;
     addError(message:string, line:number): void;
     addWarning(message:string, line:number): void;
+    clearSelection(): void;
     container: HTMLElement;
     commands: {
       addCommand(command: {
@@ -49,6 +50,7 @@ declare namespace Ace {
       removeKeyboardHandler(hashHandler: HashHandler): void;
     }
     lastChangeTime: number;
+    moveCursorToPosition(position: Position): void;
     off(ev: string, callback: ((e: any) => any) | number): void;
     on(event: string, fn: (e: any) => any): number;
     removeTextAfterCursor(length: number): void;
@@ -123,6 +125,7 @@ declare namespace Ace {
   }
 
   export interface Marker {
+    id: number;
     clazz: string;
     dispose(): void;
     range: Range;
@@ -138,6 +141,7 @@ declare namespace Ace {
     getTextRange(range: SimpleRange): string;
     getTokenAt(row: number, column: number): HueToken | null;
     getTokens(line?: number): HueToken[];
+    insert(position: Position, text: string): void;
     remove(range: Range): void;
     removeGutterDecoration(line: number, clazz: string): void;
     removeMarker(markerId: number): void;
