@@ -117,6 +117,7 @@ declare namespace Ace {
   export interface Document {
     createAnchor(position: Position): Anchor;
     createAnchor(x: number, y: number): Anchor;
+    replace(range: Range, text: string): void;
   }
 
   export interface Anchor extends Position {
@@ -140,6 +141,7 @@ declare namespace Ace {
     addGutterDecoration(line: number, clazz: string): void;
     addMarker(range: Range, clazz: string): number;
     doc: Document;
+    getDocument(): Document;
     getLine(row: number): number;
     getTextRange(range: SimpleRange): string;
     getTokenAt(row: number, column: number): HueToken | null;
