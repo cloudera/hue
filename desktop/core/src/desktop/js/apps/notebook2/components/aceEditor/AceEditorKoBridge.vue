@@ -20,11 +20,13 @@
   <ace-editor
     v-if="initialized && editorId"
     :id="editorId"
-    :executor="executor"
     :ace-options="aceOptions"
+    :executor="executor"
+    :initial-cursor-position="cursorPosition"
     :initial-value="value"
-    @value-changed="valueChanged"
     @ace-created="aceCreated"
+    @cursor-changed="cursorChanged"
+    @value-changed="valueChanged"
   />
 </template>
 
@@ -50,8 +52,11 @@
     @Prop()
     valueObservable!: KnockoutObservable<string | undefined>;
     @Prop()
+    cursorPositionObservable!: KnockoutObservable<Ace.Position | undefined>;
+    @Prop()
     aceOptions?: Ace.Options;
 
+    cursorPosition?: Ace.Position;
     value?: string;
     editorId?: string;
     subTracker = new SubscriptionTracker();
@@ -60,13 +65,25 @@
     updated(): void {
       if (!this.initialized) {
         this.value = this.valueObservable();
-        this.subTracker.subscribe(this.valueObservable, (value: string) => {
+        this.subTracker.subscribe(this.valueObservable, (value?: string) => {
           this.value = value;
         });
+
         this.editorId = this.idObservable();
-        this.subTracker.subscribe(this.idObservable, (id: string) => {
-          this.editorId = id;
-        });
+        if (!this.editorId) {
+          this.subTracker.whenDefined<string>(this.idObservable).then(id => {
+            this.editorId = id;
+          });
+        }
+
+        this.cursorPosition = this.cursorPositionObservable();
+        if (!this.cursorPosition) {
+          this.subTracker
+            .whenDefined<Ace.Position>(this.cursorPositionObservable)
+            .then(position => {
+              this.cursorPosition = position;
+            });
+        }
         this.initialized = true;
       }
     }
@@ -77,6 +94,12 @@
 
     aceCreated(editor: Ace.Editor): void {
       this.$el.dispatchEvent(new CustomEvent('ace-created', { bubbles: true, detail: editor }));
+    }
+
+    cursorChanged(cursorPosition: Ace.Position): void {
+      this.$el.dispatchEvent(
+        new CustomEvent('cursor-changed', { bubbles: true, detail: cursorPosition })
+      );
     }
 
     destroyed(): void {
