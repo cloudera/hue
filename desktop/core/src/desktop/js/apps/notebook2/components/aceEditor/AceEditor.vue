@@ -26,7 +26,7 @@
 <script lang="ts">
   import { CURSOR_POSITION_CHANGED_EVENT } from 'ko/bindings/ace/aceLocationHandler';
   import { INSERT_AT_CURSOR_EVENT } from 'ko/bindings/ace/ko.aceEditor';
-  import { IdentifierChainEntry } from 'parse/types';
+  import { IdentifierChainEntry, ParsedLocation } from 'parse/types';
   import huePubSub from 'utils/huePubSub';
   import AceAutocomplete from './autocomplete/AceAutocomplete.vue';
   import $ from 'jquery';
@@ -311,6 +311,20 @@
 
       this.subTracker.subscribe('assist.set.manual.visibility', resizeAce);
       this.subTracker.subscribe('split.panel.resized', resizeAce);
+
+      this.subTracker.subscribe(
+        'ace.replace',
+        (data: { text: string; location: ParsedLocation }): void => {
+          const Range = ace.require('ace/range').Range;
+          const range = new Range(
+            data.location.first_line - 1,
+            data.location.first_column - 1,
+            data.location.last_line - 1,
+            data.location.last_column - 1
+          );
+          editor.getSession().getDocument().replace(range, data.text);
+        }
+      );
 
       if (this.initialCursorPosition) {
         editor.moveCursorToPosition(this.initialCursorPosition);
