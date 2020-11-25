@@ -18,13 +18,14 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
+import { hueLocalStorage } from 'utils/hueUtils';
 
 ko.bindingHandlers.splitFlexDraggable = {
   init: function (element, valueAccessor) {
     const options = ko.unwrap(valueAccessor());
     let sidePanelWidth =
-      $.totalStorage(options.appName + '_' + options.orientation + '_panel_width') != null
-        ? $.totalStorage(options.appName + '_' + options.orientation + '_panel_width')
+      hueLocalStorage(options.appName + '_' + options.orientation + '_panel_width') != null
+        ? hueLocalStorage(options.appName + '_' + options.orientation + '_panel_width')
         : 290;
 
     const $resizer = $(element);
@@ -56,7 +57,7 @@ ko.bindingHandlers.splitFlexDraggable = {
       },
       stop: function () {
         sidePanelWidth = $sidePanel.width();
-        $.totalStorage(
+        hueLocalStorage(
           options.appName + '_' + options.orientation + '_panel_width',
           sidePanelWidth
         );

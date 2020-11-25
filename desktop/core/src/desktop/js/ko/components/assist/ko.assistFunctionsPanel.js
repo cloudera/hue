@@ -268,7 +268,7 @@ class AssistFunctionsPanel {
 
     this.activeConnectorUdfs.subscribe(async activeConnectorUdfs => {
       await activeConnectorUdfs.init();
-      apiHelper.setInTotalStorage(
+      apiHelper.setInLocalStorage(
         'assist',
         'function.panel.active.connector.type',
         activeConnectorUdfs.connector.type
@@ -293,7 +293,7 @@ class AssistFunctionsPanel {
     const configUpdated = () => {
       const lastActiveConnectorType =
         (this.activeConnector() && this.activeConnector().type) ||
-        apiHelper.getFromTotalStorage('assist', 'function.panel.active.connector.type');
+        apiHelper.getFromLocalStorage('assist', 'function.panel.active.connector.type');
 
       const availableConnectorUdfs = filterEditorConnectors(hasUdfCategories).map(
         connector => new ConnectorUdfCategories(connector)

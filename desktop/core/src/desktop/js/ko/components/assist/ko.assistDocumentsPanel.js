@@ -253,7 +253,7 @@ class AssistDocumentsPanel {
 
     self.highlightTypeFilter = ko.observable(false);
 
-    const lastOpenedUuid = apiHelper.getFromTotalStorage('assist', 'last.opened.assist.doc.uuid');
+    const lastOpenedUuid = apiHelper.getFromLocalStorage('assist', 'last.opened.assist.doc.uuid');
 
     if (lastOpenedUuid) {
       self.activeEntry(
@@ -283,7 +283,7 @@ class AssistDocumentsPanel {
             newEntry.definition() &&
             newEntry.definition().uuid
           ) {
-            apiHelper.setInTotalStorage(
+            apiHelper.setInLocalStorage(
               'assist',
               'last.opened.assist.doc.uuid',
               newEntry.definition().uuid
@@ -292,7 +292,7 @@ class AssistDocumentsPanel {
           loadedSub.dispose();
         });
       } else if (!newEntry.hasErrors() && newEntry.definition() && newEntry.definition().uuid) {
-        apiHelper.setInTotalStorage(
+        apiHelper.setInLocalStorage(
           'assist',
           'last.opened.assist.doc.uuid',
           newEntry.definition().uuid
@@ -396,7 +396,7 @@ class AssistDocumentsPanel {
       (self.activeEntry().definition() &&
         (self.activeEntry().definition().path !== '/' || self.activeEntry().definition().uuid))
     ) {
-      apiHelper.setInTotalStorage('assist', 'last.opened.assist.doc.uuid', null);
+      apiHelper.setInLocalStorage('assist', 'last.opened.assist.doc.uuid', null);
       self.activeEntry(
         new HueFileEntry({
           activeEntry: self.activeEntry,

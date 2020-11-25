@@ -112,7 +112,7 @@
       editor.session.setMode(getAceMode(this.executor.connector().dialect));
 
       if ((<hueWindow>window).ENABLE_SQL_SYNTAX_CHECK && window.Worker) {
-        let errorHighlightingEnabled = apiHelper.getFromTotalStorage(
+        let errorHighlightingEnabled = apiHelper.getFromLocalStorage(
           'hue.ace',
           'errorHighlightingEnabled',
           true
@@ -124,7 +124,7 @@
 
         editor.customMenuOptions.setErrorHighlighting = (enabled: boolean) => {
           errorHighlightingEnabled = enabled;
-          apiHelper.setInTotalStorage('hue.ace', 'errorHighlightingEnabled', enabled);
+          apiHelper.setInLocalStorage('hue.ace', 'errorHighlightingEnabled', enabled);
           if (this.aceLocationHandler) {
             if (enabled) {
               this.aceLocationHandler.attachSqlSyntaxWorker();
@@ -135,7 +135,7 @@
         };
         editor.customMenuOptions.getErrorHighlighting = () => errorHighlightingEnabled;
         editor.customMenuOptions.setClearIgnoredSyntaxChecks = () => {
-          apiHelper.setInTotalStorage('hue.syntax.checker', 'suppressedRules', {});
+          apiHelper.setInLocalStorage('hue.syntax.checker', 'suppressedRules', {});
           $('#setClearIgnoredSyntaxChecks')
             .hide()
             .before('<div style="margin-top:5px;float:right;">done</div>');
@@ -421,7 +421,7 @@
     }
 
     addCustomAceConfigOptions(editor: Ace.Editor): void {
-      let darkThemeEnabled = apiHelper.getFromTotalStorage('ace', 'dark.theme.enabled', false);
+      let darkThemeEnabled = apiHelper.getFromLocalStorage('ace', 'dark.theme.enabled', false);
 
       editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
 
@@ -434,13 +434,13 @@
       editor.customMenuOptions = {
         setEnableDarkTheme: (enabled: boolean): void => {
           darkThemeEnabled = enabled;
-          apiHelper.setInTotalStorage('ace', 'dark.theme.enabled', darkThemeEnabled);
+          apiHelper.setInLocalStorage('ace', 'dark.theme.enabled', darkThemeEnabled);
           editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
         },
         getEnableDarkTheme: () => darkThemeEnabled,
         setEnableAutocompleter: (enabled: boolean): void => {
           editor.setOption('enableBasicAutocompletion', enabled);
-          apiHelper.setInTotalStorage('hue.ace', 'enableBasicAutocompletion', enabled);
+          apiHelper.setInLocalStorage('hue.ace', 'enableBasicAutocompletion', enabled);
           const $enableLiveAutocompletionChecked = $('#setEnableLiveAutocompletion:checked');
           const $setEnableLiveAutocompletion = $('#setEnableLiveAutocompletion');
           if (enabled && $enableLiveAutocompletionChecked.length === 0) {
@@ -452,7 +452,7 @@
         getEnableAutocompleter: () => editor.getOption('enableBasicAutocompletion'),
         setEnableLiveAutocompletion: (enabled: boolean): void => {
           editor.setOption('enableLiveAutocompletion', enabled);
-          apiHelper.setInTotalStorage('hue.ace', 'enableLiveAutocompletion', enabled);
+          apiHelper.setInLocalStorage('hue.ace', 'enableLiveAutocompletion', enabled);
           if (enabled && $('#setEnableAutocompleter:checked').length === 0) {
             $('#setEnableAutocompleter').trigger('click');
           }
@@ -463,7 +463,7 @@
             size += 'px';
           }
           editor.setOption('fontSize', size);
-          apiHelper.setInTotalStorage('hue.ace', 'fontSize', size);
+          apiHelper.setInLocalStorage('hue.ace', 'fontSize', size);
         },
         getFontSize: (): string => {
           let size = <string>editor.getOption('fontSize');
@@ -476,7 +476,7 @@
     }
 
     configureEditorOptions(editor: Ace.Editor): void {
-      const enableBasicAutocompletion = apiHelper.getFromTotalStorage(
+      const enableBasicAutocompletion = apiHelper.getFromLocalStorage(
         'hue.ace',
         'enableBasicAutocompletion',
         true
@@ -484,12 +484,12 @@
 
       const enableLiveAutocompletion =
         enableBasicAutocompletion &&
-        apiHelper.getFromTotalStorage('hue.ace', 'enableLiveAutocompletion', true);
+        apiHelper.getFromLocalStorage('hue.ace', 'enableLiveAutocompletion', true);
 
       const editorOptions: Ace.Options = {
         enableBasicAutocompletion,
         enableLiveAutocompletion,
-        fontSize: apiHelper.getFromTotalStorage(
+        fontSize: apiHelper.getFromLocalStorage(
           'hue.ace',
           'fontSize',
           navigator.platform && navigator.platform.toLowerCase().indexOf('linux') > -1

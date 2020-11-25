@@ -156,7 +156,7 @@ class AssistDbNamespace {
         }
         if (!self.navigationSettings.rightAssist) {
           const entry = self.selectedDatabase().catalogEntry;
-          apiHelper.setInTotalStorage(
+          apiHelper.setInLocalStorage(
             'assist_' + entry.getConnector().id + '_' + entry.namespace.id,
             'lastSelectedDb',
             entry.name
@@ -164,7 +164,7 @@ class AssistDbNamespace {
           huePubSub.publish('assist.database.set', entry);
         }
       } else {
-        apiHelper.setInTotalStorage(
+        apiHelper.setInLocalStorage(
           'assist_' + self.connector.id + '_' + self.namespace.id,
           'lastSelectedDb',
           ''
@@ -189,7 +189,7 @@ class AssistDbNamespace {
         self.selectedDatabaseChanged();
         return;
       }
-      let lastSelectedDb = apiHelper.getFromTotalStorage(
+      let lastSelectedDb = apiHelper.getFromLocalStorage(
         'assist_' + self.sourceType + '_' + self.namespace.id,
         'lastSelectedDb'
       );

@@ -2057,7 +2057,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
   self.hasNewAdd = ko.observable(!!has_new_add_method);
   self.isQueryBuilder = ko.observable(false);
 
-  if ($.totalStorage('hue.enable.gridster') === false) {
+  if (hueUtils.hueLocalStorage('hue.enable.gridster') === false) {
     self.isGridster(false);
   }
 

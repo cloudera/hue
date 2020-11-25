@@ -63,7 +63,7 @@ class MetastoreSource {
 
     huePubSub.subscribe(ASSIST_DB_PANEL_IS_READY_EVENT, () => {
       this.lastLoadNamespacesDeferred.done(() => {
-        let lastSelectedDb = apiHelper.getFromTotalStorage(
+        let lastSelectedDb = apiHelper.getFromLocalStorage(
           'assist_' + this.type + '_' + this.namespace.id,
           'lastSelectedDb'
         );

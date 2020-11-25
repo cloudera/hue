@@ -117,7 +117,7 @@ class AssistHBasePanel {
     self.reload = () => {
       self.selectedHBaseEntry(root);
       root.loadEntries(() => {
-        const lastOpenendPath = apiHelper.getFromTotalStorage(
+        const lastOpenendPath = apiHelper.getFromLocalStorage(
           'assist',
           'last.opened.hbase.entry',
           null
@@ -136,7 +136,7 @@ class AssistHBasePanel {
 
     self.selectedHBaseEntry.subscribe(newEntry => {
       if (newEntry !== root || (newEntry === root && newEntry.loaded)) {
-        apiHelper.setInTotalStorage('assist', 'last.opened.hbase.entry', newEntry.path);
+        apiHelper.setInLocalStorage('assist', 'last.opened.hbase.entry', newEntry.path);
       }
     });
 

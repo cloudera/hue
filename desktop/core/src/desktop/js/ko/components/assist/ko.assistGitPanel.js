@@ -95,7 +95,7 @@ class AssistGitPanel {
 
     self.selectedGitEntry = ko.observable();
     self.reload = function () {
-      const lastKnownPath = apiHelper.getFromTotalStorage(
+      const lastKnownPath = apiHelper.getFromLocalStorage(
         'assist',
         'currentGitPath',
         window.USER_HOME_DIR
@@ -119,7 +119,7 @@ class AssistGitPanel {
 
     huePubSub.subscribe('assist.selectGitEntry', entry => {
       self.selectedGitEntry(entry);
-      apiHelper.setInTotalStorage('assist', 'currentGitPath', entry.path);
+      apiHelper.setInLocalStorage('assist', 'currentGitPath', entry.path);
     });
 
     huePubSub.subscribe('assist.git.refresh', () => {

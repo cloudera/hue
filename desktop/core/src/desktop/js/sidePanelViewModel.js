@@ -28,11 +28,11 @@ class SidePanelViewModel {
     const self = this;
     self.assistWithoutStorage = ko.observable(false);
     self.leftAssistVisible = ko.observable(
-      apiHelper.getFromTotalStorage('assist', 'left_assist_panel_visible', true)
+      apiHelper.getFromLocalStorage('assist', 'left_assist_panel_visible', true)
     );
     self.leftAssistVisible.subscribe(val => {
       if (!self.assistWithoutStorage()) {
-        apiHelper.setInTotalStorage('assist', 'left_assist_panel_visible', val);
+        apiHelper.setInLocalStorage('assist', 'left_assist_panel_visible', val);
       }
       hueAnalytics.convert('hue', 'leftAssistVisible/' + val);
       window.setTimeout(() => {
@@ -42,11 +42,11 @@ class SidePanelViewModel {
     });
 
     self.rightAssistVisible = ko.observable(
-      apiHelper.getFromTotalStorage('assist', 'right_assist_panel_visible', true)
+      apiHelper.getFromLocalStorage('assist', 'right_assist_panel_visible', true)
     );
     self.rightAssistVisible.subscribe(val => {
       if (!self.assistWithoutStorage()) {
-        apiHelper.setInTotalStorage('assist', 'right_assist_panel_visible', val);
+        apiHelper.setInLocalStorage('assist', 'right_assist_panel_visible', val);
       }
       hueAnalytics.convert('hue', 'rightAssistVisible/' + val);
       window.setTimeout(() => {

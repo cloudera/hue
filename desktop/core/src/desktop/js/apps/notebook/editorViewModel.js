@@ -281,21 +281,21 @@ class EditorViewModel {
     self.assistWithoutStorage = ko.observable(false);
 
     self.isLeftPanelVisible = ko.observable(
-      apiHelper.getFromTotalStorage('assist', 'assist_panel_visible', true)
+      apiHelper.getFromLocalStorage('assist', 'assist_panel_visible', true)
     );
     self.isLeftPanelVisible.subscribe(val => {
       if (!self.assistWithoutStorage()) {
-        apiHelper.setInTotalStorage('assist', 'assist_panel_visible', val);
+        apiHelper.setInLocalStorage('assist', 'assist_panel_visible', val);
       }
     });
 
     self.isRightPanelAvailable = ko.observable(options.assistAvailable && HAS_OPTIMIZER);
     self.isRightPanelVisible = ko.observable(
-      apiHelper.getFromTotalStorage('assist', 'right_assist_panel_visible', true)
+      apiHelper.getFromLocalStorage('assist', 'right_assist_panel_visible', true)
     );
     self.isRightPanelVisible.subscribe(val => {
       if (!self.assistWithoutStorage()) {
-        apiHelper.setInTotalStorage('assist', 'right_assist_panel_visible', val);
+        apiHelper.setInLocalStorage('assist', 'right_assist_panel_visible', val);
       }
     });
 

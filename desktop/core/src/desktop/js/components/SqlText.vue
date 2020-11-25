@@ -25,6 +25,7 @@
 <script lang="ts">
   import { formatSql } from 'apps/notebook2/apiUtils';
   import $ from 'jquery';
+  import { hueLocalStorage } from 'utils/hueUtils';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop, Watch } from 'vue-property-decorator';
@@ -69,8 +70,7 @@
       const res: string[] = [];
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore: totalStorage interface missing
-      config.loadModule(['theme', $.totalStorage('hue.ace.theme') || 'ace/theme/hue']);
+      config.loadModule(['theme', hueLocalStorage('hue.ace.theme') || 'ace/theme/hue']);
 
       const Text = text.Text;
 
