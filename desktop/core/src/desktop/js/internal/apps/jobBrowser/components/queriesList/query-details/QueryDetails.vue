@@ -21,12 +21,7 @@
     <div>
       <div class="buttons-container">
         <hue-button @click="showQueries">Queries</hue-button>
-
-        <!-- <hue-button v-if="!query.isComplete && stoppingQuery" disabled>
-          <em class="fa fa-spinner fa-pulse fa-fw" /> Stopping query
-        </hue-button>
-        <hue-button v-else-if="!query.isComplete" @click="stopQuery">Stop</hue-button> -->
-
+        <QueryKillButton :queries="[query]" @killed="$emit('reload')" />
         <a
           :href="`${HUE_BASE_URL}/jobbrowser/query-store/data-bundle/${query.queryId}`"
           target="_blank"
@@ -106,7 +101,6 @@
   import HueButton from '../../../../../../components/HueButton.vue';
   import Tab from '../../../../../../components/Tab.vue';
   import Tabs from '../../../../../../components/Tabs.vue';
-  import { kill } from '../api-utils/query';
   import HiveTimeline from './hive-timeline/HiveTimeline.vue';
   import ConfigsTable from './configs-table/ConfigsTable.vue';
   import QueryInfo from './QueryInfo.vue';
@@ -119,6 +113,7 @@
   import DagSwimlane from './dag-swimlane/DagSwimlane.vue';
 
   import LabeledInfo from '../components/LabeledInfo.vue';
+  import QueryKillButton from '../components/QueryKillButton.vue';
 
   import { Query } from '../index';
 
@@ -145,6 +140,7 @@
       DagGraph,
       DagSwimlane,
 
+      QueryKillButton,
       LabeledInfo
     }
   })
@@ -156,14 +152,6 @@
     showQueries?: () => void;
 
     HUE_BASE_URL = window.HUE_BASE_URL;
-
-    stoppingQuery = false;
-
-    async stopQuery(): void {
-      this.stoppingQuery = true;
-      await kill([this.query]);
-      this.stoppingQuery = false;
-    }
   }
 </script>
 
@@ -176,7 +164,13 @@
   }
 
   .download-link {
+    color: $hue-action-primary;
+    border-color: $hue-border-color;
     border-radius: $hue-panel-border-radius;
+
+    &:hover {
+      border-color: $fluid-blue-700;
+    }
   }
 
   .hue-layout-column {

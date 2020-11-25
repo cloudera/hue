@@ -81,6 +81,13 @@ export interface Table {
   database: string;
 }
 
+export enum QueryStatus {
+  STARTED = 'STARTED',
+  RUNNING = 'RUNNING',
+  SUCCESS = 'SUCCESS',
+  ERROR = 'ERROR'
+}
+
 export interface Query {
   appIds?: string[]; // TODO: From API or adaption? Type?
   clientIpAddress?: unknown; // TODO: string?
@@ -118,7 +125,7 @@ export interface Query {
   requestUser: string;
   sessionId: string;
   startTime: number;
-  status: string;
+  status: QueryStatus;
   tablesRead: Table[];
   tablesWritten?: Table[];
   tablesReadWithDatabase?: string; // TODO: From API or adaption? type?

@@ -18,8 +18,9 @@
 
 import api from './api';
 import { AxiosResponse } from 'axios';
-import { fetchExtendedQuery } from './query';
-import { Query, Vertex } from '..';
+import { fetchExtendedQuery, isRunning, waitIf } from './query';
+
+import { Query, QueryStatus, Vertex } from '../index.d';
 
 import queryMockResponse from '../test/api/hive_query_get_response_2.json';
 
@@ -56,5 +57,22 @@ describe('query.ts', () => {
     expect(query.query).toBe(queryMockResponse.query.query);
     expect(query.dags.length).toBe(1);
     expect(query.dags[0].vertices[0]).toBe(TEST_VERTEX_DATA);
+  });
+
+  it('Test isRunning', async () => {
+    expect(isRunning(<Query>{ status: QueryStatus.RUNNING })).toBeTruthy();
+    expect(isRunning(<Query>{ status: QueryStatus.ERROR })).toBeFalsy();
+  });
+
+  it('Test fetchQuery & waitIf', async () => {
+    const query = (queryMockResponse.query as unknown) as Query;
+    jest.spyOn(api, 'get').mockImplementation(
+      async (): Promise<AxiosResponse<{ query: Query; vertices: Vertex[] }>> =>
+        Promise.resolve(<AxiosResponse>{
+          data: { query: query }
+        })
+    );
+
+    expect(await waitIf(query, isRunning)).toBeFalsy();
   });
 });

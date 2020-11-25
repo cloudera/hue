@@ -31,11 +31,15 @@
       :queries="queries"
       :total-queries="(searchMeta && searchMeta.size) || 0"
       @diff-queries="diffQueries"
-      @kill-queries="killQueries"
       @query-selected="querySelected"
+      @reload="fetch(lastFetchOptions)"
       @search="fetch"
     />
-    <query-details v-else-if="selectedQuery" :query="selectedQuery" />
+    <query-details
+      v-else-if="selectedQuery"
+      :query="selectedQuery"
+      @reload="querySelected(selectedQuery)"
+    />
     <query-details-diff v-else :queries="queriesToDiff" />
   </div>
 </template>
@@ -49,7 +53,7 @@
   import HumanByteSize from '../../../../../components/HumanByteSize.vue';
   import TimeAgo from '../../../../../components/TimeAgo.vue';
   import { searchQueries, SearchFacet } from './api-utils/search';
-  import { fetchExtendedQuery, kill } from './api-utils/query';
+  import { fetchExtendedQuery } from './api-utils/query';
   import QueryDetailsDiff from './query-details/QueryDetailsDiff.vue';
   import QueryDetails from './query-details/QueryDetails.vue';
   import { Query, SearchMeta } from './index';
@@ -58,6 +62,13 @@
   import { AlertType } from '../../../../../components/InlineAlert.vue';
 
   const QUERY_ID_PARAM = 'queryId';
+
+  interface FetchOptions {
+    page: Page;
+    text?: string;
+    timeRange?: { from: number; to: number };
+    facets: SearchFacet[];
+  }
 
   @Component({
     components: { QueryDetailsDiff, QueryDetails, QueryTable, TimeAgo, HumanByteSize, InlineAlert }
@@ -69,16 +80,15 @@
     searchMeta: SearchMeta | null = null;
     error: Error | null = null;
 
+    lastFetchOptions!: FetchOptions;
+
     AlertType = AlertType;
 
-    async fetch(options: {
-      page: Page;
-      text?: string;
-      timeRange?: { from: number; to: number };
-      facets: SearchFacet[];
-    }): Promise<void> {
+    async fetch(options: FetchOptions): Promise<void> {
       // Initial fetch triggered by the paginator
       const now = Date.now();
+
+      this.lastFetchOptions = options;
       try {
         const searchResponse = await searchQueries({
           endTime: (options.timeRange && options.timeRange.to) || now,
@@ -137,11 +147,6 @@
       } catch (error) {
         this.error = error;
       }
-    }
-
-    async killQueries(queriesToKill: Query[]): Promise<void> {
-      await kill(queriesToKill);
-      // TODO: Refresh the queries?
     }
 
     async querySelected(query: Query): Promise<void> {

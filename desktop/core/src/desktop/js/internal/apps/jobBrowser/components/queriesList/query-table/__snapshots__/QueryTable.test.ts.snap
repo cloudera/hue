@@ -62,13 +62,9 @@ exports[`QueryTable.vue should render 1`] = `
       
       </hue-button-stub>
        
-      <hue-button-stub
-        disabled="true"
-      >
-        
-        Kill
-      
-      </hue-button-stub>
+      <querykillbutton-stub
+        queries=""
+      />
     </div>
   </div>
    

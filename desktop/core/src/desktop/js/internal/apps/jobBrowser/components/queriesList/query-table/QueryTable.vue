@@ -57,10 +57,7 @@
         <hue-button :disabled="selectedQueries.length !== 2" @click="diffQueries(selectedQueries)">
           {{ I18n('Compare') }}
         </hue-button>
-
-        <hue-button :disabled="selectedQueries.length === 0" @click="killQueries(selectedQueries)">
-          {{ I18n('Kill') }}
-        </hue-button>
+        <QueryKillButton :queries="selectedQueries" @killed="$emit('reload')" />
       </div>
     </div>
     <div class="query-table-container">
@@ -135,6 +132,7 @@
   import { fetchFacets } from '../api-utils/search';
   import QueriesSearch from '../components/QueriesSearch.vue';
   import { DataProcessor, Query, Search, TableDefinition } from '../index';
+  import QueryKillButton from '../components/QueryKillButton.vue';
 
   const DEFAULT_STATUS_FACET_VALUES: FacetValue[][] = [
     ['STARTED', { key: 'STARTED', value: 0 }],
@@ -156,6 +154,7 @@
       TablesList,
       ColumnSelectorPanel,
       QueriesSearch,
+      QueryKillButton,
       Paginator
     },
     methods: {

@@ -10,6 +10,10 @@ exports[`QueryDetails.vue should render 1`] = `
         Queries
       </hue-button-stub>
        
+      <querykillbutton-stub
+        queries="[object Object]"
+      />
+       
       <a
         class="btn btn-outline-primary download-link"
         download=""
