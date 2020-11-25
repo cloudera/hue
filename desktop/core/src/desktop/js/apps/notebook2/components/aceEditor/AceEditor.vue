@@ -262,11 +262,27 @@
 
       onInput();
 
+      const onMouseDown = (e: { domEvent: MouseEvent; $pos?: Ace.Position }): void => {
+        if (e.domEvent.button === 1) {
+          // middle click
+          const position = e.$pos;
+          if (!position) {
+            return;
+          }
+          const tempText = editor.getSelectedText();
+          editor.session.insert(position, tempText);
+          defer(() => {
+            editor.moveCursorTo(position.row, position.column + tempText.length);
+          });
+        }
+      };
+
       editor.on('change', triggerChange);
       editor.on('blur', triggerChange);
       editor.on('focus', onFocus);
       editor.on('paste', onPaste);
       editor.on('input', onInput);
+      editor.on('mousedown', onMouseDown);
 
       this.subTracker.addDisposable({
         dispose: () => {
@@ -275,6 +291,7 @@
           editor.off('focus', onFocus);
           editor.off('paster', onPaste);
           editor.off('input', onInput);
+          editor.off('mousedown', onMouseDown);
         }
       });
 
