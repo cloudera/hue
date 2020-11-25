@@ -41,6 +41,25 @@ export default class SubscriptionTracker {
     }
   }
 
+  async whenDefined<T>(observable: KnockoutSubscribable<T | undefined>): Promise<T> {
+    return new Promise((resolve, reject) => {
+      let disposed = false;
+      const sub = observable.subscribe(val => {
+        if (typeof val !== 'undefined') {
+          disposed = true;
+          sub.dispose();
+          resolve(val);
+        }
+      });
+      this.disposals.push(() => {
+        if (!disposed) {
+          sub.dispose();
+          reject();
+        }
+      });
+    });
+  }
+
   addDisposable(disposable: Disposable): void {
     this.disposals.push(disposable.dispose.bind(disposable));
   }

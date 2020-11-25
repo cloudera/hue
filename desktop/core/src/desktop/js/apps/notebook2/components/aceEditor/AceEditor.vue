@@ -24,6 +24,7 @@
 </template>
 
 <script lang="ts">
+  import { CURSOR_POSITION_CHANGED_EVENT } from 'ko/bindings/ace/aceLocationHandler';
   import { INSERT_AT_CURSOR_EVENT } from 'ko/bindings/ace/ko.aceEditor';
   import { IdentifierChainEntry } from 'parse/types';
   import huePubSub from 'utils/huePubSub';
@@ -57,8 +58,10 @@
     methods: { I18n }
   })
   export default class AceEditor extends Vue {
-    @Prop()
+    @Prop({ required: false, default: '' })
     initialValue!: string;
+    @Prop({ required: false })
+    initialCursorPosition?: Ace.Position;
     @Prop()
     id!: string;
     @Prop()
@@ -291,6 +294,20 @@
 
       this.subTracker.subscribe('assist.set.manual.visibility', resizeAce);
       this.subTracker.subscribe('split.panel.resized', resizeAce);
+
+      if (this.initialCursorPosition) {
+        editor.moveCursorToPosition(this.initialCursorPosition);
+        editor.renderer.scrollCursorIntoView();
+      }
+
+      this.subTracker.subscribe(
+        CURSOR_POSITION_CHANGED_EVENT,
+        (event: { editorId: string; position: Ace.Position }) => {
+          if (event.editorId === this.id) {
+            this.$emit('cursor-changed', event.position);
+          }
+        }
+      );
 
       this.editor = editor;
       this.addInsertSubscribers();
