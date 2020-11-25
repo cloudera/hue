@@ -3055,9 +3055,9 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       var self = this;
 
       self.apiHelper = window.apiHelper;
-      self.sourceType = window.location.getParameter('sourceType', true) || '${ source_type }';
-      self.namespaceId = window.location.getParameter('namespace', true);
-      self.computeId =  window.location.getParameter('compute', true);
+      self.sourceType = hueUtils.getParameter('sourceType', true) || '${ source_type }';
+      self.namespaceId = hueUtils.getParameter('namespace', true);
+      self.computeId =  hueUtils.getParameter('compute', true);
 
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();

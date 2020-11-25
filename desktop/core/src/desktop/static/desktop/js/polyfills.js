@@ -197,9 +197,3 @@ String.prototype.regexLastIndexOf = function (regex, startpos) {
   }
   return lastIndexOf;
 };
-
-if (!window.location.getParameter) {
-  window.location.getParameter = function (name, returnNull) {
-    return hueUtils.getSearchParameter(window.location.search, name, returnNull);
-  };
-}

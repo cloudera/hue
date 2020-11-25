@@ -14,29 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { HueDebug } from 'utils/hueDebug';
-
-export interface GenericApiResponse {
-  status: number;
-  message?: string;
-}
-
-declare global {
-  export interface Moment {
-    utc: (val: unknown) => Moment;
-    format: (format: string) => string;
-  }
-
-  const moment: Moment & ((val: unknown) => Moment);
-}
-
-export interface hueWindow {
-  HAS_OPTIMIZER?: boolean;
-  AUTOCOMPLETE_TIMEOUT?: number;
-  ENABLE_SQL_SYNTAX_CHECK?: boolean;
-  HUE_BASE_URL?: string;
-  LOGGED_USERNAME?: string;
-  WEB_SOCKETS_ENABLED?: boolean;
-  WS_CHANNEL?: string;
-  hueDebug?: HueDebug;
+interface JQuery {
+  jHueFileChooser(options: {
+    suppressErrors: boolean;
+    selectFolder: boolean;
+    createFolder: boolean;
+    uploadFile: boolean;
+    initialPath: string;
+    errorRedirectPath: string;
+    forceRefresh: boolean;
+    showExtraHome: boolean;
+    extraHomeProperties: { [prop: string]: string };
+    filterExtensions: string;
+    displayOnlyFolders: boolean;
+    onFolderChoose(path: string): void;
+    onFileChoose(path: string): void;
+  }): JQuery;
+  modal(options?: string): JQuery;
 }

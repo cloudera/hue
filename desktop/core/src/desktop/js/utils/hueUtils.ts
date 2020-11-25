@@ -16,141 +16,116 @@
 
 import $ from 'jquery';
 import sanitizeHtml from 'sanitize-html';
+import { hueWindow } from 'types/types';
 
 export const bootstrapRatios = {
-  span3() {
-    const windowWidth = $(window).width();
-    if (windowWidth >= 1200) {
+  span3(): number {
+    if (window.innerWidth >= 1200) {
       return 23.07692308;
-    } else if (windowWidth >= 768 && windowWidth <= 979) {
+    } else if (window.innerWidth >= 768 && window.innerWidth <= 979) {
       return 22.9281768;
     } else {
       return 23.17073171;
     }
   },
-  span9() {
-    const windowWidth = $(window).width();
-    if (windowWidth >= 1200) {
+  span9(): number {
+    if (window.innerWidth >= 1200) {
       return 74.35897436;
-    } else if (windowWidth >= 768 && windowWidth <= 979) {
+    } else if (window.innerWidth >= 768 && window.innerWidth <= 979) {
       return 74.30939227;
     } else {
       return 74.3902439;
     }
   },
-  margin() {
+  margin(): number {
     return 2.56410256;
   }
 };
 
 /**
- * Convert text to URLs
- * Selector arg can be jQuery or document.querySelectorAll()
- *
- * @param selectors
- * @return {default}
- */
-export const text2Url = selectors => {
-  let i = 0;
-  const len = selectors.length;
-
-  for (i; i < len; i++) {
-    const arr = [],
-      selector = selectors[i],
-      val = selector.innerHTML.replace(/&nbsp;/g, ' ').split(' ');
-
-    val.forEach(word => {
-      let matched = null;
-      const re = /(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?/gi;
-
-      if (re.test(word)) {
-        matched = word.match(re);
-        word = word.replace(matched, '<a href="' + matched + '">' + matched + '</a>');
-        arr.push(word);
-      } else {
-        arr.push(word);
-      }
-    });
-
-    selector.innerHTML = arr.join(' ');
-  }
-  return this;
-};
-
-/**
  * Create a in-memory div, set it's inner text(which jQuery automatically encodes)
  * then grab the encoded contents back out.
- *
- * @param value
- * @return {*|jQuery}
  */
-export const htmlEncode = value => {
-  return $('<div></div>').text(value).html();
+export const htmlEncode = (value: string): string => {
+  const element = document.createElement('div');
+  element.innerText = value;
+  return element.innerHTML;
 };
 
-export const html2text = value => {
-  return $('<div></div>')
-    .html(value)
-    .text()
-    .replace(/\u00A0/g, ' ');
+export const html2text = (value: string): string => {
+  const element = document.createElement('div');
+  element.innerHTML = value;
+  return element.innerText.replace(/\u00A0/g, ' ');
 };
 
-export const isFullScreen = () => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type PlainObject = { [name: string]: any };
+
+export const isFullScreen = (): boolean => {
   return (
     document.fullscreenElement ||
-    document.mozFullScreenElement ||
-    document.webkitFullscreenElement ||
-    document.msFullscreenElement
+    (<PlainObject>document).mozFullScreenElement ||
+    (<PlainObject>document).webkitFullscreenElement ||
+    (<PlainObject>document).msFullscreenElement
   );
 };
 
-export const goFullScreen = element => {
+export const goFullScreen = async (element: Element): Promise<void> => {
+  if (isFullScreen()) {
+    return;
+  }
   if (!element) {
     element = document.documentElement;
   }
 
+  if (element.requestFullscreen) {
+    return element.requestFullscreen();
+  }
+  const mixedBrowserElement = element as PlainObject;
+  if (mixedBrowserElement.msRequestFullscreen) {
+    return mixedBrowserElement.msRequestFullscreen();
+  }
+  if (mixedBrowserElement.mozRequestFullScreen) {
+    return mixedBrowserElement.mozRequestFullScreen();
+  }
+  if (mixedBrowserElement.webkitRequestFullscreen) {
+    return mixedBrowserElement.webkitRequestFullscreen(mixedBrowserElement.ALLOW_KEYBOARD_INPUT);
+  }
+};
+
+export const exitFullScreen = async (): Promise<void> => {
   if (!isFullScreen()) {
-    if (element.requestFullscreen) {
-      element.requestFullscreen();
-    } else if (element.msRequestFullscreen) {
-      element.msRequestFullscreen();
-    } else if (element.mozRequestFullScreen) {
-      element.mozRequestFullScreen();
-    } else if (element.webkitRequestFullscreen) {
-      element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-    }
+    return;
+  }
+  if (document.exitFullscreen) {
+    return document.exitFullscreen();
+  }
+  const mixedBrowserElement = document as PlainObject;
+  if (mixedBrowserElement.msExitFullscreen) {
+    return mixedBrowserElement.msExitFullscreen();
+  }
+  if (mixedBrowserElement.mozCancelFullScreen) {
+    return mixedBrowserElement.mozCancelFullScreen();
+  }
+  if (mixedBrowserElement.webkitExitFullscreen) {
+    return mixedBrowserElement.webkitExitFullscreen();
   }
 };
 
-export const exitFullScreen = () => {
+export const toggleFullScreen = async (element: Element): Promise<void> => {
   if (isFullScreen()) {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.msExitFullscreen) {
-      document.msExitFullscreen();
-    } else if (document.mozCancelFullScreen) {
-      document.mozCancelFullScreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    }
+    return exitFullScreen();
   }
+  return goFullScreen(element);
 };
 
-export const toggleFullScreen = element => {
-  if (isFullScreen()) {
-    exitFullScreen();
-  } else {
-    goFullScreen(element);
-  }
-};
-
-export const changeURL = (newURL, params) => {
+export const changeURL = (newURL: string, params?: PlainObject): void => {
   let extraSearch = '';
   if (params) {
     const newSearchKeys = Object.keys(params);
     if (newSearchKeys.length) {
       while (newSearchKeys.length) {
-        const newKey = newSearchKeys.pop();
+        const newKey = newSearchKeys.pop() || '';
         extraSearch += newKey + '=' + params[newKey];
         if (newSearchKeys.length) {
           extraSearch += '&';
@@ -160,10 +135,9 @@ export const changeURL = (newURL, params) => {
   }
 
   const hashSplit = newURL.split('#');
+  const hueBaseUrl = (<hueWindow>window).HUE_BASE_URL;
   const base =
-    hashSplit[0].length && hashSplit[0].indexOf(window.HUE_BASE_URL) !== 0
-      ? window.HUE_BASE_URL
-      : '';
+    hueBaseUrl && hashSplit[0].length && hashSplit[0].indexOf(hueBaseUrl) !== 0 ? hueBaseUrl : '';
   let url = base + hashSplit[0];
   if (extraSearch) {
     url += (url.indexOf('?') === -1 ? '?' : '&') + extraSearch;
@@ -174,16 +148,16 @@ export const changeURL = (newURL, params) => {
   } else if (window.location.hash) {
     url += window.location.hash;
   }
-  window.history.pushState(null, null, url);
+  window.history.pushState(null, '', url);
 };
 
-export const replaceURL = newURL => {
-  window.history.replaceState(null, null, newURL);
+export const replaceURL = (newURL: string): void => {
+  window.history.replaceState(null, '', newURL);
 };
 
-export const changeURLParameter = (param, value) => {
+export const changeURLParameter = (param: string, value: string | null): void => {
   let newSearch = '';
-  if (window.location.getParameter(param, true) !== null) {
+  if (getParameter(param, true) !== null) {
     newSearch += '?';
     window.location.search
       .replace(/\?/gi, '')
@@ -209,14 +183,14 @@ export const changeURLParameter = (param, value) => {
   changeURL(window.location.pathname + newSearch);
 };
 
-export const removeURLParameter = param => {
+export const removeURLParameter = (param: string): void => {
   changeURLParameter(param, null);
 };
 
-export const parseHivePseudoJson = pseudoJson => {
+export const parseHivePseudoJson = (pseudoJson: string): { [key: string]: string } => {
   // Hive returns a pseudo-json with parameters, like
   // "{Lead Developer=John Foo, Lead Developer Email=jfoo@somewhere.com, date=2013-07-11 }"
-  const parsedParams = {};
+  const parsedParams: { [key: string]: string } = {};
   if (pseudoJson && pseudoJson.length > 2) {
     const splits = pseudoJson.substring(1, pseudoJson.length - 1).split(', ');
     splits.forEach(part => {
@@ -228,15 +202,21 @@ export const parseHivePseudoJson = pseudoJson => {
   return parsedParams;
 };
 
-export const isOverflowing = element => {
-  if (element instanceof $) {
-    element = element[0];
-  }
-  return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
+export const isOverflowing = (element: HTMLElement | JQuery): boolean => {
+  const htmlElement = (<JQuery>element).jquery ? (<JQuery>element).get(0) : <HTMLElement>element;
+  return (
+    htmlElement.scrollHeight > htmlElement.clientHeight ||
+    htmlElement.scrollWidth > htmlElement.clientWidth
+  );
 };
 
-export const waitForRendered = (selector, condition, callback, timeout) => {
-  const $el = selector instanceof $ ? selector : $(selector);
+export const waitForRendered = (
+  selector: string | JQuery,
+  condition: (element: JQuery) => boolean,
+  callback: (element: JQuery) => void,
+  timeout?: number
+): void => {
+  const $el = (<JQuery>selector).jquery ? <JQuery>selector : $(<string>selector);
   if (condition($el)) {
     callback($el);
   } else {
@@ -248,7 +228,10 @@ export const waitForRendered = (selector, condition, callback, timeout) => {
   }
 };
 
-export const waitForObservable = (observable, callback) => {
+export const waitForObservable = (
+  observable: KnockoutObservable<unknown>,
+  callback: (observable: KnockoutObservable<unknown>) => void
+): void => {
   if (observable()) {
     callback(observable);
   } else {
@@ -261,7 +244,11 @@ export const waitForObservable = (observable, callback) => {
   }
 };
 
-export const waitForVariable = (variable, callback, timeout) => {
+export const waitForVariable = (
+  variable: unknown,
+  callback: (variable: unknown) => void,
+  timeout?: number
+): void => {
   if (variable) {
     callback(variable);
   } else {
@@ -271,33 +258,39 @@ export const waitForVariable = (variable, callback, timeout) => {
   }
 };
 
-export const scrollbarWidth = () => {
-  const $parent = $('<div style="width:50px;height:50px;overflow:auto"><div></div></div>').appendTo(
-    'body'
-  );
-  const $children = $parent.children();
-  const width = $children.innerWidth() - $children.height(99).innerWidth();
-  $parent.remove();
+export const scrollbarWidth = (): number => {
+  const parent = document.createElement('div');
+  parent.style.width = '50px';
+  parent.style.height = '50px';
+  parent.style.overflow = 'auto';
+  const child = document.createElement('div');
+  child.style.height = '100px';
+  parent.append(child);
+  document.body.append(child);
+  const width = child.offsetWidth - child.clientWidth;
+  parent.remove();
   return width;
 };
 
-export const getSearchParameter = (search, name, returnNull) => {
+export const getParameter = (name: string, nullAllowed?: boolean): string | null => {
+  return getSearchParameter(window.location.search, name, nullAllowed);
+};
+
+export const getSearchParameter = (
+  search: string,
+  name: string,
+  nullAllowed?: boolean
+): string | null => {
   name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
   const regex = new RegExp('[\\?&]' + name + '=([^&#]*)'),
     results = regex.exec(search);
-  if (returnNull && results === null) {
+  if (nullAllowed && results === null) {
     return null;
   }
   return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
 
-if (!window.location.getParameter) {
-  window.location.getParameter = function (name, returnNull) {
-    return getSearchParameter(window.location.search, name, returnNull);
-  };
-}
-
-export const logError = error => {
+export const logError = (error: string): void => {
   if (typeof window.console !== 'undefined' && typeof window.console.error !== 'undefined') {
     if (typeof error !== 'undefined') {
       console.error(error);
@@ -306,24 +299,27 @@ export const logError = error => {
   }
 };
 
-export const equalIgnoreCase = (a, b) => a && b && a.toLowerCase() === b.toLowerCase();
+export const equalIgnoreCase = (a?: string, b?: string): boolean =>
+  !!a && !!b && a.toLowerCase() === b.toLowerCase();
 
-const deXSS = str => {
-  return sanitizeHtml(str);
-};
+const deXSS = (str: string): string => sanitizeHtml(str);
 
-export const getStyleFromCSSClass = cssClass => {
+export const getStyleFromCSSClass = (
+  cssClass: string
+): CSSStyleDeclaration | CSSRule | undefined => {
   for (let i = 0; i < document.styleSheets.length; i++) {
     const cssClasses = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
     for (let x = 0; x < cssClasses.length; x++) {
-      if (cssClasses[x].selectorText === cssClass) {
-        return cssClasses[x].style ? cssClasses[x].style : cssClasses[x];
+      if ((<CSSStyleRule>cssClasses[x]).selectorText === cssClass) {
+        return (<CSSStyleRule>cssClasses[x]).style
+          ? (<CSSStyleRule>cssClasses[x]).style
+          : <CSSStyleRule>cssClasses[x];
       }
     }
   }
 };
 
-export const highlight = (text, searchTerm) => {
+export const highlight = (text: string, searchTerm: string): string => {
   if (searchTerm === '' || text === '') {
     return text;
   }
@@ -337,11 +333,10 @@ export const highlight = (text, searchTerm) => {
     const remLowerText = remText.toLowerCase();
     startIndex = remLowerText.indexOf(searchTerm);
     if (startIndex >= 0) {
-      highLightedText +=
-        remText.substring(0, startIndex) +
-        '<strong>' +
-        remText.substring(startIndex, startIndex + searchTerm.length) +
-        '</strong>';
+      highLightedText += `${remText.substring(0, startIndex)}<strong>${remText.substring(
+        startIndex,
+        startIndex + searchTerm.length
+      )}</strong>`;
       remText = remText.substring(startIndex + searchTerm.length);
     } else {
       highLightedText += remText;
@@ -351,7 +346,9 @@ export const highlight = (text, searchTerm) => {
   return highLightedText;
 };
 
-export const dfs = (node, callback) => {
+type Node = { [key: string]: Node };
+
+export const dfs = (node: Node, callback: (node: Node, key: string) => void): void => {
   if (!node || typeof node !== 'object') {
     return;
   }
@@ -361,55 +358,60 @@ export const dfs = (node, callback) => {
   });
 };
 
-export const deleteAllEmptyStringKey = node => {
-  const fDeleteEmptyStringKey = function (node, key) {
+export const deleteAllEmptyStringKeys = (node: Node): void => {
+  dfs(node, (node: Node, key: string) => {
     if (node[key] || typeof node[key] !== 'string') {
       return;
     }
     delete node[key];
-  };
-  dfs(node, fDeleteEmptyStringKey);
+  });
 };
 
-const s4 = () =>
+const s4 = (): string =>
   Math.floor((1 + Math.random()) * 0x10000)
     .toString(16)
     .substring(1);
 
-export const UUID = () =>
+export const UUID = (): string =>
   s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 
-export const escapeOutput = str => $('<span>').text(str).html().trim();
+export const escapeOutput = (str: string): string => htmlEncode(str).trim();
+
+type ComplexValueAccessor = () => {
+  value?: KnockoutObservable<string>;
+  displayJustLastBit?: boolean;
+};
 
 export const getFileBrowseButton = (
-  inputElement,
-  selectFolder,
-  valueAccessor,
-  stripHdfsPrefix,
-  allBindingsAccessor,
-  isAddon,
-  isNestedModal,
-  linkMarkup
-) => {
-  let _btn;
+  inputElement: JQuery<HTMLInputElement>,
+  selectFolder: string,
+  valueAccessor: KnockoutObservable<string> | ComplexValueAccessor,
+  stripHdfsPrefix: boolean,
+  allBindingsAccessor: KnockoutAllBindingsAccessor,
+  isAddon: boolean,
+  isNestedModal: boolean,
+  linkMarkup: boolean
+): JQuery => {
+  let button: JQuery;
   if (isAddon) {
-    _btn = $('<span>').addClass('add-on muted pointer filechooser-clickable').text('..');
+    button = $('<span>').addClass('add-on muted pointer filechooser-clickable').text('..');
   } else if (linkMarkup) {
-    _btn = $('<a>').addClass('btn').addClass('fileChooserBtn filechooser-clickable').text('..');
+    button = $('<a>').addClass('btn').addClass('fileChooserBtn filechooser-clickable').text('..');
   } else {
-    _btn = $('<button>')
+    button = $('<button>')
       .addClass('btn')
       .addClass('fileChooserBtn filechooser-clickable')
       .text('..');
   }
-  _btn.click(e => {
+  button.on('click', e => {
     e.preventDefault();
     if (!isNestedModal) {
       $('body').addClass('modal-open');
     }
 
     function callFileChooser() {
-      let _initialPath = $.trim(inputElement.val()) !== '' ? inputElement.val() : '/';
+      let initialPath: string =
+        (<string>inputElement.val()).trim() !== '' ? <string>inputElement.val() || '' : '/';
       if (
         (allBindingsAccessor &&
           allBindingsAccessor().filechooserOptions &&
@@ -417,13 +419,13 @@ export const getFileBrowseButton = (
           inputElement.val() === '') ||
         (allBindingsAccessor && allBindingsAccessor().filechooserPrefixSeparator)
       ) {
-        _initialPath = '';
+        initialPath = '';
       }
       if (inputElement.data('fullPath')) {
-        _initialPath = inputElement.data('fullPath');
+        initialPath = inputElement.data('fullPath');
       }
-      if (_initialPath.indexOf('hdfs://') > -1) {
-        _initialPath = _initialPath.substring(7);
+      if (initialPath.indexOf('hdfs://') > -1) {
+        initialPath = initialPath.substring(7);
       }
 
       let supportSelectFolder = !!selectFolder;
@@ -438,7 +440,7 @@ export const getFileBrowseButton = (
       $('#filechooser').jHueFileChooser({
         suppressErrors: true,
         selectFolder: supportSelectFolder,
-        onFolderChoose: function (filePath) {
+        onFolderChoose: filePath => {
           handleChoice(filePath, stripHdfsPrefix);
           if (selectFolder) {
             $('#chooseFile').modal('hide');
@@ -447,7 +449,7 @@ export const getFileBrowseButton = (
             }
           }
         },
-        onFileChoose: function (filePath) {
+        onFileChoose: filePath => {
           handleChoice(filePath, stripHdfsPrefix);
           $('#chooseFile').modal('hide');
           if (!isNestedModal) {
@@ -462,7 +464,7 @@ export const getFileBrowseButton = (
           allBindingsAccessor &&
           allBindingsAccessor().filechooserOptions &&
           allBindingsAccessor().filechooserOptions.uploadFile,
-        initialPath: _initialPath,
+        initialPath: initialPath,
         errorRedirectPath: '',
         forceRefresh: true,
         showExtraHome:
@@ -484,16 +486,7 @@ export const getFileBrowseButton = (
           allBindingsAccessor().filechooserOptions &&
           allBindingsAccessor().filechooserOptions.displayOnlyFolders
       });
-      if (window.isIE11) {
-        const oldFocus = $().modal.Constructor.prototype.enforceFocus;
-        $().modal.Constructor.prototype.enforceFocus = function () {};
-        $('#chooseFile').modal('show');
-        window.setTimeout(() => {
-          $().modal.Constructor.prototype.enforceFocus = oldFocus;
-        }, 5000);
-      } else {
-        $('#chooseFile').modal('show');
-      }
+      $('#chooseFile').modal('show');
       if (!isNestedModal) {
         $('#chooseFile').on('hidden', () => {
           $('body').removeClass('modal-open');
@@ -505,10 +498,10 @@ export const getFileBrowseButton = (
     // check if it's a relative path
     callFileChooser();
 
-    function handleChoice(filePath, stripHdfsPrefix) {
+    const handleChoice = (filePath: string, stripHdfsPrefix: boolean) => {
       if (allBindingsAccessor && allBindingsAccessor().filechooserPrefixSeparator) {
         filePath =
-          inputElement.val().split(allBindingsAccessor().filechooserPrefixSeparator)[0] +
+          (<string>inputElement.val()).split(allBindingsAccessor().filechooserPrefixSeparator)[0] +
           '=' +
           filePath;
       }
@@ -530,58 +523,61 @@ export const getFileBrowseButton = (
       } else {
         inputElement.val('hdfs://' + filePath);
       }
-      inputElement.change();
+      inputElement.trigger('change');
       if (valueAccessor) {
-        if (typeof valueAccessor() == 'function' || typeof valueAccessor().value == 'function') {
-          if (valueAccessor().value) {
-            valueAccessor().value(inputElement.val());
-            if (valueAccessor().displayJustLastBit) {
-              inputElement.data('fullPath', inputElement.val());
-              inputElement.attr('data-original-title', inputElement.val());
-              const _val = inputElement.val();
-              inputElement.val(_val.split('/')[_val.split('/').length - 1]);
+        if (
+          typeof valueAccessor() === 'function' ||
+          typeof (<ComplexValueAccessor>valueAccessor)().value === 'function'
+        ) {
+          const complex = (<ComplexValueAccessor>valueAccessor)();
+          if (complex.value) {
+            complex.value(<string>inputElement.val());
+            if (complex.displayJustLastBit) {
+              inputElement.data('fullPath', <string>inputElement.val());
+              inputElement.attr('data-original-title', <string>inputElement.val());
+              const value = <string>inputElement.val();
+              inputElement.val(value.split('/')[value.split('/').length - 1]);
             }
-          } else {
-            valueAccessor()(inputElement.val());
+            return;
           }
-        } else {
-          valueAccessor(inputElement.val());
         }
+        (<KnockoutObservable<string>>valueAccessor())(<string>inputElement.val());
       }
-    }
+    };
   });
   if (allBindingsAccessor && allBindingsAccessor().filechooserDisabled) {
-    _btn.addClass('disabled').attr('disabled', 'disabled');
+    button.addClass('disabled').attr('disabled', 'disabled');
   }
-  return _btn;
+  return button;
 };
 
-const stripHtml = html => {
+const stripHtml = (html: string): string => {
   const tmp = document.createElement('DIV');
   tmp.innerHTML = html;
   return tmp.textContent || tmp.innerText;
 };
 
-export const stripHtmlFromFunctions = template => {
+export const stripHtmlFromFunctions = (template: string): string => {
   // strips HTML from inside the functions
-  let _tmpl = template;
-  const _mustacheFunctions = _tmpl.match(/{{#(.[\s\S]*?){{\//g);
-  if (_mustacheFunctions) {
-    $.each(_mustacheFunctions, (cnt, fn) => {
-      _tmpl = _tmpl.replace(
+  let stripped = template;
+  const mustacheFunctions = stripped.match(/{{#(.[\s\S]*?){{\//g);
+  if (mustacheFunctions) {
+    mustacheFunctions.forEach(fn => {
+      stripped = stripped.replace(
         fn,
         fn.substr(0, fn.indexOf('}}') + 2) +
-          $.trim(stripHtml(fn.substr(fn.indexOf('}}') + 2).slice(0, -3))) +
+          stripHtml(fn.substr(fn.indexOf('}}') + 2).slice(0, -3)).trim() +
           '{{/'
       );
     });
   }
-  return _tmpl;
+  return stripped;
 };
 
-export const sleep = async timeout => new Promise(resolve => setTimeout(resolve, timeout));
+export const sleep = async (timeout: number): Promise<void> =>
+  new Promise(resolve => setTimeout(resolve, timeout));
 
-export const defer = async callback => {
+export const defer = async (callback: () => void): Promise<void> => {
   await sleep(0);
   if (callback) {
     callback();
@@ -589,34 +585,34 @@ export const defer = async callback => {
 };
 
 export default {
-  bootstrapRatios: bootstrapRatios,
-  getFileBrowseButton: getFileBrowseButton,
-  text2Url: text2Url,
-  htmlEncode: htmlEncode,
-  html2text: html2text,
-  isFullScreen: isFullScreen,
-  goFullScreen: goFullScreen,
-  exitFullScreen: exitFullScreen,
-  toggleFullScreen: toggleFullScreen,
-  changeURL: changeURL,
-  replaceURL: replaceURL,
-  changeURLParameter: changeURLParameter,
-  removeURLParameter: removeURLParameter,
-  parseHivePseudoJson: parseHivePseudoJson,
-  isOverflowing: isOverflowing,
-  waitForRendered: waitForRendered,
-  waitForObservable: waitForObservable,
-  waitForVariable: waitForVariable,
-  scrollbarWidth: scrollbarWidth,
-  getSearchParameter: getSearchParameter,
-  logError: logError,
-  equalIgnoreCase: equalIgnoreCase,
-  deXSS: deXSS,
-  getStyleFromCSSClass: getStyleFromCSSClass,
-  highlight: highlight,
-  dfs: dfs,
-  deleteAllEmptyStringKey: deleteAllEmptyStringKey,
-  UUID: UUID,
-  escapeOutput: escapeOutput,
-  stripHtmlFromFunctions: stripHtmlFromFunctions
+  bootstrapRatios,
+  changeURL,
+  changeURLParameter,
+  deleteAllEmptyStringKeys,
+  deXSS,
+  dfs,
+  equalIgnoreCase,
+  escapeOutput,
+  exitFullScreen,
+  getFileBrowseButton,
+  getParameter,
+  getSearchParameter,
+  getStyleFromCSSClass,
+  goFullScreen,
+  highlight,
+  html2text,
+  htmlEncode,
+  isFullScreen,
+  isOverflowing,
+  logError,
+  parseHivePseudoJson,
+  removeURLParameter,
+  replaceURL,
+  scrollbarWidth,
+  stripHtmlFromFunctions,
+  toggleFullScreen,
+  UUID,
+  waitForObservable,
+  waitForRendered,
+  waitForVariable
 };
