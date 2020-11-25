@@ -559,8 +559,8 @@ ${ layout.metastore_menubar() }
 
       ko.applyBindings(viewModel);
 
-      if (location.getParameter("error") != "") {
-        $.jHueNotify.error(location.getParameter("error"));
+      if (hueUtils.getParameter("error") != "") {
+        $.jHueNotify.error(hueUtils.getParameter("error"));
       }
 
       if ($(".removeBtn").length == 1) {
