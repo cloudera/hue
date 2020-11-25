@@ -3168,7 +3168,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           lastUpdateJobRequest = self._fetchJob(function (data) {
             var requests = [];
             if (['schedule', 'workflow'].indexOf(vm.job().type()) >= 0) {
-              window.hueUtils.deleteAllEmptyStringKey(data.app); // It's preferable for our backend to return empty strings for various values in order to initialize them, but they shouldn't overwrite any values that are currently set.
+              window.hueUtils.deleteAllEmptyStringKeys(data.app); // It's preferable for our backend to return empty strings for various values in order to initialize them, but they shouldn't overwrite any values that are currently set.
               var selectedIDs = []
               if (vm.job().coordinatorActions()) {
                 selectedIDs = vm.job().coordinatorActions().selectedJobs().map(

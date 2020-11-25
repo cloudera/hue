@@ -83,7 +83,7 @@
           $('#queryBuilder').hide();
           $('#queryBuilderAlert').show();
         }
-      }, 500, 'editor' + (window.location.getParameter('type') ? '-' + window.location.getParameter('type') : ''));
+      }, 500, 'editor' + (hueUtils.getParameter('type') ? '-' + hueUtils.getParameter('type') : ''));
 
     </script>
     <!-- End query builder imports -->

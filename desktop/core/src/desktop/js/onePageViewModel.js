@@ -472,7 +472,7 @@ class OnePageViewModel {
 
     page.base(window.HUE_BASE_URL + '/hue');
 
-    const getUrlParameter = name => window.location.getParameter(name) || '';
+    const getUrlParameter = name => hueUtils.getParameter(name) || '';
 
     self.lastContext = null;
 
