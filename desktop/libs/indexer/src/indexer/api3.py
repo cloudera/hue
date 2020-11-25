@@ -54,6 +54,7 @@ from indexer.indexers.envelope import _envelope_job
 from indexer.indexers.base import get_api
 from indexer.indexers.flink_sql import FlinkIndexer
 from indexer.indexers.morphline import MorphlineIndexer, _create_solr_collection
+from indexer.indexers.phoenix_sql import PhoenixIndexer
 from indexer.indexers.rdbms import run_sqoop, _get_api
 from indexer.indexers.sql import _create_database, _create_table
 from indexer.models import _save_pipeline
@@ -469,6 +470,27 @@ def importer_submit(request):
       destination,
       start_time
     )
+  elif destination['ouputFormat'] == 'big-table':
+    args = {
+      'source': source,
+      'destination': destination,
+      'start_time': start_time,
+      'dry_run': request.POST.get('show_command')
+    }
+    api = PhoenixIndexer(
+      request.user,
+      request.fs
+    )
+
+    job_nb = api.create_table_from_file(**args)
+
+    if request.POST.get('show_command'):
+      job_handle = {
+        'status': 0,
+        'commands': job_nb
+      }
+    else:
+      job_handle = job_nb.execute(request, batch=False)
   else:
     job_handle = _create_table(
       request,
