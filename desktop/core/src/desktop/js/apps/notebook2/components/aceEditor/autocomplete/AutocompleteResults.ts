@@ -1059,11 +1059,11 @@ class AutocompleteResults {
       return [];
     }
 
-    let suggestions: Suggestion[] = [];
+    const suggestions: Suggestion[] = [];
 
     let path = suggestHdfs.path;
     if (path === '') {
-      suggestions = [
+      suggestions.push(
         {
           value: 'adl://',
           meta: MetaLabels.Keyword,
@@ -1098,7 +1098,7 @@ class AutocompleteResults {
           category: Category.Files,
           popular: false
         }
-      ];
+      );
     }
 
     let fetchFunction = 'fetchHdfsPath';
@@ -1142,14 +1142,18 @@ class AutocompleteResults {
         fetchFunction
       ];
       this.lastKnownRequests.push(
-        apiHelperFn({
+        apiHelperFn.bind(apiHelper)({
           pathParts: parts,
           successCallback: (data: { error?: unknown; files: FileDetails[] }) => {
             if (!data.error) {
               data.files.forEach(file => {
                 if (file.name !== '..' && file.name !== '.') {
+                  let value = path === '' ? '/' + file.name : file.name;
+                  if (file.type === 'dir') {
+                    value += '/';
+                  }
                   suggestions.push({
-                    value: path === '' ? '/' + file.name : file.name,
+                    value,
                     meta: file.type,
                     category: Category.Files,
                     popular: false,
