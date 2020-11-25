@@ -41,6 +41,12 @@ class BaseConnector(models.Model):
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
   dialect = models.CharField(max_length=32, db_index=True, help_text=_t('Type of connector, e.g. hive, mysql... '))
+  interface = models.CharField(
+      max_length=32,
+      db_index=True,
+      help_text=_t('Type of interface, e.g. sqlalchemy, hiveserver2... '),
+      default='sqlalchemy'
+  )
   settings = models.TextField(default='{}')
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
 
@@ -60,6 +66,7 @@ class BaseConnector(models.Model):
       'name': self.name,
       'description': self.description,
       'dialect': self.dialect,
+      'interface': self.interface,
       'settings': self.settings,
       'last_modified': self.last_modified
     }
@@ -110,7 +117,7 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
         'nice_name': connector.name,
         'description': connector.description,
         'dialect': connector.dialect,
-        'interface': None,
+        'interface': connector.interface,
         'settings': json.loads(connector.settings),
         'is_demo': False,
       }
@@ -145,13 +152,18 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
 
 def _augment_connector_properties(connector):
   '''
-  Add the connector properties based on the dialect type to each connector.
+  Add the connector properties based on the dialect + interface matching to each connector.
   The connector type must exist in desktop/core/src/desktop/lib/connectors/types.py.
   '''
 
   connector_types = []
+  connector_type = None
 
   for connector_type in get_connectors_types():
+    if connector_type['dialect'] == connector['dialect'] and connector['interface'] and \
+          connector_type.get('interface') == connector.get('interface'):
+      connector_types.insert(0, connector_type)
+      break
     if connector_type['dialect'] == connector['dialect']:
       connector_types.insert(0, connector_type)
     elif connector['interface'] and connector_type.get('interface') == connector['interface']:

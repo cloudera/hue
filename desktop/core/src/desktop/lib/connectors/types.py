@@ -174,7 +174,7 @@ CONNECTOR_TYPES = [
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
-    'description': '',
+    'description': 'Via Thrift Server and SqlAlchemy interface',
     'properties': {
       'is_sql': True,
       'sql_identifier_quote': '`',
@@ -192,8 +192,37 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Livy",
-    'dialect': 'livy',
+    'nice_name': "SparkSQL",
+    'dialect': 'sparksql',
+    'interface': 'hiveserver2',
+    'settings': [
+      {'name': 'server_host', 'value': ''},
+      {'name': 'server_port', 'value': ''},
+      {'name': 'impersonation_enabled', 'value': False},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
+    ],
+    'category': 'editor',
+    'description': 'Via Thrift Server and Hive interface',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
+      'trim_statement_semicolon': False,
+    }
+  },
+  {
+    'nice_name': "SparkSQL",
+    'dialect': 'sparksql',
     'interface': 'livy',
     'settings': [
       {'name': 'api_url', 'value': 'http://localhost:8998'},
@@ -201,7 +230,7 @@ CONNECTOR_TYPES = [
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
-    'description': '',
+    'description': 'Via Livy server',
     'properties': {
       'is_sql': True,
       'sql_identifier_quote': '`',
@@ -664,8 +693,11 @@ def get_connectors_types():
 def get_connector_categories():
   return CATEGORIES
 
-def get_connector_by_type(dialect):
-  instance = [connector for connector in get_connectors_types() if connector['dialect'] == dialect]
+def get_connector_by_type(dialect, interface):
+  instance = [
+    connector
+    for connector in get_connectors_types() if connector['dialect'] == dialect and connector['interface'] == interface
+  ]
 
   if instance:
     return instance[0]
