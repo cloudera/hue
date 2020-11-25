@@ -907,11 +907,15 @@
             },
             'value-changed': function (event) {
               statement_raw(event.detail);
+            },
+            'cursor-changed': function (event) {
+              aceCursorPosition(event.detail);
             }
           },
           vueKoProps: {
             executor: executor,
             valueObservable: statement_raw,
+            cursorPositionObservable: aceCursorPosition,
             idObservable: id,
             aceOptions: {
               showLineNumbers: $root.editorMode(),

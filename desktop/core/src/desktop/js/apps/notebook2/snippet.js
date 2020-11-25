@@ -370,12 +370,6 @@ export default class Snippet {
       this.inFocus(editor === this.ace());
     });
 
-    huePubSub.subscribe(CURSOR_POSITION_CHANGED_EVENT, details => {
-      if (details.editorId === this.id()) {
-        this.aceCursorPosition(details.position);
-      }
-    });
-
     huePubSub.subscribe(
       ACTIVE_STATEMENT_CHANGED_EVENT,
       statementDetails => {
