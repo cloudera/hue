@@ -143,8 +143,8 @@ class MetastoreNamespace {
     const whenLoaded = clearCacheOnMissing => {
       if (!databaseName) {
         databaseName =
-          apiHelper.getFromTotalStorage('editor', 'last.selected.database') ||
-          apiHelper.getFromTotalStorage('metastore', 'last.selected.database') ||
+          apiHelper.getFromLocalStorage('editor', 'last.selected.database') ||
+          apiHelper.getFromLocalStorage('metastore', 'last.selected.database') ||
           'default';
         clearCacheOnMissing = false;
       }

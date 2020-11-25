@@ -96,7 +96,7 @@ registerBinding(NAME, {
 
     editor.session.setMode(snippet.getAceMode());
     editor.setOptions({
-      fontSize: apiHelper.getFromTotalStorage(
+      fontSize: apiHelper.getFromLocalStorage(
         'hue.ace',
         'fontSize',
         navigator.platform && navigator.platform.toLowerCase().indexOf('linux') > -1
@@ -152,7 +152,7 @@ registerBinding(NAME, {
       aceErrorsSub.dispose();
     });
 
-    let darkThemeEnabled = apiHelper.getFromTotalStorage('ace', 'dark.theme.enabled', false);
+    let darkThemeEnabled = apiHelper.getFromLocalStorage('ace', 'dark.theme.enabled', false);
     editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
 
     const editorOptions = {
@@ -174,7 +174,7 @@ registerBinding(NAME, {
     editor.customMenuOptions = {
       setEnableDarkTheme: function (enabled) {
         darkThemeEnabled = enabled;
-        apiHelper.setInTotalStorage('ace', 'dark.theme.enabled', darkThemeEnabled);
+        apiHelper.setInLocalStorage('ace', 'dark.theme.enabled', darkThemeEnabled);
         editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
       },
       getEnableDarkTheme: function () {
@@ -182,7 +182,7 @@ registerBinding(NAME, {
       },
       setEnableAutocompleter: function (enabled) {
         editor.setOption('enableBasicAutocompletion', enabled);
-        apiHelper.setInTotalStorage('hue.ace', 'enableBasicAutocompletion', enabled);
+        apiHelper.setInLocalStorage('hue.ace', 'enableBasicAutocompletion', enabled);
         const $enableLiveAutocompletionChecked = $('#setEnableLiveAutocompletion:checked');
         const $setEnableLiveAutocompletion = $('#setEnableLiveAutocompletion');
         if (enabled && $enableLiveAutocompletionChecked.length === 0) {
@@ -196,7 +196,7 @@ registerBinding(NAME, {
       },
       setEnableLiveAutocompletion: function (enabled) {
         editor.setOption('enableLiveAutocompletion', enabled);
-        apiHelper.setInTotalStorage('hue.ace', 'enableLiveAutocompletion', enabled);
+        apiHelper.setInLocalStorage('hue.ace', 'enableLiveAutocompletion', enabled);
         if (enabled && $('#setEnableAutocompleter:checked').length === 0) {
           $('#setEnableAutocompleter').trigger('click');
         }
@@ -209,7 +209,7 @@ registerBinding(NAME, {
           size += 'px';
         }
         editor.setOption('fontSize', size);
-        apiHelper.setInTotalStorage('hue.ace', 'fontSize', size);
+        apiHelper.setInLocalStorage('hue.ace', 'fontSize', size);
       },
       getFontSize: function () {
         let size = editor.getOption('fontSize');
@@ -221,7 +221,7 @@ registerBinding(NAME, {
     };
 
     if (window.ENABLE_SQL_SYNTAX_CHECK && window.Worker) {
-      let errorHighlightingEnabled = apiHelper.getFromTotalStorage(
+      let errorHighlightingEnabled = apiHelper.getFromLocalStorage(
         'hue.ace',
         'errorHighlightingEnabled',
         true
@@ -233,7 +233,7 @@ registerBinding(NAME, {
 
       editor.customMenuOptions.setErrorHighlighting = function (enabled) {
         errorHighlightingEnabled = enabled;
-        apiHelper.setInTotalStorage('hue.ace', 'errorHighlightingEnabled', enabled);
+        apiHelper.setInLocalStorage('hue.ace', 'errorHighlightingEnabled', enabled);
         if (enabled) {
           aceLocationHandler.attachSqlSyntaxWorker();
         } else {
@@ -244,7 +244,7 @@ registerBinding(NAME, {
         return errorHighlightingEnabled;
       };
       editor.customMenuOptions.setClearIgnoredSyntaxChecks = function () {
-        apiHelper.setInTotalStorage('hue.syntax.checker', 'suppressedRules', {});
+        apiHelper.setInLocalStorage('hue.syntax.checker', 'suppressedRules', {});
         $('#setClearIgnoredSyntaxChecks')
           .hide()
           .before('<div style="margin-top:5px;float:right;">done</div>');
@@ -256,13 +256,13 @@ registerBinding(NAME, {
 
     $.extend(editorOptions, aceOptions);
 
-    editorOptions['enableBasicAutocompletion'] = apiHelper.getFromTotalStorage(
+    editorOptions['enableBasicAutocompletion'] = apiHelper.getFromLocalStorage(
       'hue.ace',
       'enableBasicAutocompletion',
       true
     );
     if (editorOptions['enableBasicAutocompletion']) {
-      editorOptions['enableLiveAutocompletion'] = apiHelper.getFromTotalStorage(
+      editorOptions['enableLiveAutocompletion'] = apiHelper.getFromLocalStorage(
         'hue.ace',
         'enableLiveAutocompletion',
         true
@@ -500,7 +500,7 @@ registerBinding(NAME, {
       bindKey: { win: 'Ctrl-Alt-t', mac: 'Command-Alt-t' },
       exec: function () {
         darkThemeEnabled = !darkThemeEnabled;
-        apiHelper.setInTotalStorage('ace', 'dark.theme.enabled', darkThemeEnabled);
+        apiHelper.setInLocalStorage('ace', 'dark.theme.enabled', darkThemeEnabled);
         editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
       }
     });

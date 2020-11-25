@@ -32,7 +32,7 @@ class TopNavViewModel {
 
     // TODO: Drop. Just for PoC
     self.pocClusterMode = ko.observable();
-    apiHelper.withTotalStorage('topNav', 'multiCluster', self.pocClusterMode, 'dw');
+    apiHelper.withLocalStorage('topNav', 'multiCluster', self.pocClusterMode, 'dw');
     huePubSub.subscribe('set.multi.cluster.mode', self.pocClusterMode);
 
     self.hasJobBrowser = ko.observable(window.HAS_JOB_BROWSER);

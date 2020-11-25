@@ -192,7 +192,6 @@ Frontend third party dependencies (some checked in and some via npm)
 |Sprintf-js|1.1.2|BSD|https://www.npmjs.com/package/sprintf-js|
 |Tether|0.6.5|MIT|https://github.com/HubSpot/tether|
 |TopoJSON|1.0.0|BSD|https://github.com/topojson/topojson|
-|TotalStorage|1.1.3|MIT|https://github.com/Upstatement/jquery-total-storage|
 |TouchSwipe|1.6.18|MIT|https://github.com/mattbryson/TouchSwipe-Jquery-Plugin|
 |tzdetect.js|?|MIT|https://github.com/Canop/tzdetect.js|
 |Webpack|4.29.0|MIT|https://www.npmjs.com/package/webpack|

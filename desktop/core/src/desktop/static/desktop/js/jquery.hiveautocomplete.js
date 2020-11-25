@@ -129,12 +129,12 @@
     });
 
     function smartTooltipMaker() {
-      if (self.options.smartTooltip !== "" && typeof $.totalStorage !== "undefined" && $.totalStorage("jHueGenericAutocompleteTooltip") !== -1) {
+      if (self.options.smartTooltip !== "" && hueUtils && hueUtils.hueLocalStorage && hueUtils.hueLocalStorage("jHueGenericAutocompleteTooltip") !== -1) {
         var cnt = 0;
-        if ($.totalStorage("jHueGenericAutocompleteTooltip")) {
-          cnt = $.totalStorage("jHueGenericAutocompleteTooltip") + 1;
+        if (hueUtils.hueLocalStorage("jHueGenericAutocompleteTooltip")) {
+          cnt = hueUtils.hueLocalStorage("jHueGenericAutocompleteTooltip") + 1;
         }
-        $.totalStorage("jHueGenericAutocompleteTooltip", cnt);
+        hueUtils.hueLocalStorage("jHueGenericAutocompleteTooltip", cnt);
         if (cnt >= self.options.smartTooltipThreshold) {
           $el.tooltip({
             animation: true,
@@ -145,7 +145,7 @@
           window.setTimeout(function () {
             $el.tooltip("hide");
           }, 10000);
-          $.totalStorage("jHueGenericAutocompleteTooltip", -1);
+          hueUtils.hueLocalStorage("jHueGenericAutocompleteTooltip", -1);
         }
       }
     }

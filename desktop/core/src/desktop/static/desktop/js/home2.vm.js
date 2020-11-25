@@ -31,7 +31,7 @@ var HomeViewModel = (function () {
     self.apiHelper = window.apiHelper;
     self.isLeftPanelVisible = ko.observable(false);
     // Uncomment to enable the assist panel
-    // self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+    // self.apiHelper.withLocalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
     self.sharingEnabled = ko.observable(false);
 

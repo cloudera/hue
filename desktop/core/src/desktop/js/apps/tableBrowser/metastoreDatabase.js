@@ -179,7 +179,7 @@ class MetastoreDatabase {
         this.loadingAnalysis(false);
       });
 
-    apiHelper.setInTotalStorage('metastore', 'last.selected.database', this.name);
+    apiHelper.setInLocalStorage('metastore', 'last.selected.database', this.name);
   }
 
   setTableByName(tableName, callback) {

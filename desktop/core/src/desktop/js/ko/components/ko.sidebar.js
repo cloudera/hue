@@ -267,7 +267,7 @@ class Sidebar {
       }
     });
 
-    apiHelper.withTotalStorage('hue.sidebar', 'collabse', this.collapsed, true);
+    apiHelper.withLocalStorage('hue.sidebar', 'collabse', this.collapsed, true);
 
     this.items = ko.observableArray();
 

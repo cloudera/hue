@@ -16,6 +16,7 @@
 
 import $ from 'jquery';
 import * as ko from 'knockout';
+import { hueLocalStorage } from 'utils/hueUtils';
 
 // TODO: Depends on Ace
 
@@ -29,7 +30,7 @@ ko.bindingHandlers.readOnlyAce = {
       readOnly: true,
       maxLines: Infinity
     });
-    editor.setTheme($.totalStorage('hue.ace.theme') || 'ace/theme/hue');
+    editor.setTheme(hueLocalStorage('hue.ace.theme') || 'ace/theme/hue');
     $(element).data('aceEditor', editor);
   },
   update: function (element, valueAccessor, allBindingsAccessor) {

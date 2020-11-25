@@ -68,7 +68,7 @@ class ResizeHelper {
     initOriginalValues(0);
 
     self.saveSize = function () {
-      apiHelper.setInTotalStorage('assist', 'popover.size', {
+      apiHelper.setInLocalStorage('assist', 'popover.size', {
         width: $('.hue-popover').width(),
         height: $('.hue-popover').height()
       });

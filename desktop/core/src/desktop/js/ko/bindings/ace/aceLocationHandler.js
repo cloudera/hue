@@ -785,7 +785,7 @@ class AceLocationHandler {
         return;
       }
 
-      const suppressedRules = window.apiHelper.getFromTotalStorage(
+      const suppressedRules = window.apiHelper.getFromLocalStorage(
         'hue.syntax.checker',
         'suppressedRules',
         {}

@@ -47,10 +47,10 @@ class AssistDbSource {
     self.navigationSettings = options.navigationSettings;
     self.initialNamespace =
       options.initialNamespace ||
-      apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedNamespace');
+      apiHelper.getFromLocalStorage('contextSelector', 'lastSelectedNamespace');
     self.initialCompute =
       options.initialCompute ||
-      apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedCompute');
+      apiHelper.getFromLocalStorage('contextSelector', 'lastSelectedCompute');
 
     self.selectedNamespace = ko.observable();
     self.namespaces = ko.observableArray();

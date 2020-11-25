@@ -132,13 +132,13 @@ class RightAssistPanel {
     );
     this.schedulesTabAvailable = ko.observable(false);
 
-    this.lastActiveTabEditor = apiHelper.withTotalStorage(
+    this.lastActiveTabEditor = apiHelper.withLocalStorage(
       'assist',
       'last.open.right.panel',
       ko.observable(),
       EDITOR_ASSISTANT_TAB
     );
-    this.lastActiveTabDashboard = apiHelper.withTotalStorage(
+    this.lastActiveTabDashboard = apiHelper.withLocalStorage(
       'assist',
       'last.open.right.panel.dashboard',
       ko.observable(),

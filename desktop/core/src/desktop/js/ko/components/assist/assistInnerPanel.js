@@ -40,7 +40,7 @@ class AssistInnerPanel {
     self.iconSvg = options.iconSvg;
 
     self.visible = ko.observable(options.visible || true);
-    apiHelper.withTotalStorage(
+    apiHelper.withLocalStorage(
       'assist',
       'showingPanel_' + self.type,
       self.visible,
