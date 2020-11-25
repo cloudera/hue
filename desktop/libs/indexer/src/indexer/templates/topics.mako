@@ -513,13 +513,13 @@ ${ commonheader(_("Streams Browser"), "search", user, request, "60px") | n,unico
 
       // Should come from Kafka Schema or ZooKeeper
       var userPrefix = 'pai';
-      self.kafkaFieldNames = ko.observable($.totalStorage(userPrefix + '_kafka_topics_' + self.name() + '_kafkaFieldNames'));
+      self.kafkaFieldNames = ko.observable(hueUtils.hueLocalStorage(userPrefix + '_kafka_topics_' + self.name() + '_kafkaFieldNames'));
       self.kafkaFieldNames.subscribe(function(newValue) {
-        $.totalStorage(userPrefix + '_kafka_topics_' + self.name() + '_kafkaFieldNames', newValue);
+        hueUtils.hueLocalStorage(userPrefix + '_kafka_topics_' + self.name() + '_kafkaFieldNames', newValue);
       });
-      self.kafkaFieldTypes = ko.observable($.totalStorage(userPrefix + '_kafka_topics_' + self.name() + '_kafkaFieldTypes'));
+      self.kafkaFieldTypes = ko.observable(hueUtils.hueLocalStorage(userPrefix + '_kafka_topics_' + self.name() + '_kafkaFieldTypes'));
       self.kafkaFieldTypes.subscribe(function(newValue) {
-        $.totalStorage(userPrefix + '_kafka_topics_' + self.name() + '_kafkaFieldTypes', newValue)
+        hueUtils.hueLocalStorage(userPrefix + '_kafka_topics_' + self.name() + '_kafkaFieldTypes', newValue)
       });
 
       self.sample = ko.observableArray();
@@ -585,7 +585,7 @@ ${ commonheader(_("Streams Browser"), "search", user, request, "60px") | n,unico
       self.assistAvailable = ko.observable(true);
       self.apiHelper = window.apiHelper;
       self.isLeftPanelVisible = ko.observable();
-      self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+      self.apiHelper.withLocalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
       self.section = ko.observable('list-indexes');
       self.tab = ko.observable('');

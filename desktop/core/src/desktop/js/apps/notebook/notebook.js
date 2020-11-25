@@ -912,7 +912,7 @@ class Notebook {
       () => {
         if (self.type().indexOf('query') === 0) {
           const whenDatabaseAvailable = function (snippet) {
-            const lastSelectedDb = apiHelper.getFromTotalStorage(
+            const lastSelectedDb = apiHelper.getFromLocalStorage(
               'assist_' + snippet.type() + '_' + snippet.namespace().id,
               'lastSelectedDb'
             );

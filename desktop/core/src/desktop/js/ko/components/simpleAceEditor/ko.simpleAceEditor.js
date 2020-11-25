@@ -20,7 +20,7 @@ import ace from 'ext/aceHelper';
 
 import AceLocationHandler from 'ko/bindings/ace/aceLocationHandler';
 import componentUtils from 'ko/components/componentUtils';
-import hueUtils from 'utils/hueUtils';
+import { hueLocalStorage, UUID } from 'utils/hueUtils';
 import huePubSub from 'utils/huePubSub';
 import SolrFormulaAutocompleter from './solrFormulaAutocompleter';
 import SolrQueryAutocompleter from './solrQueryAutocompleter';
@@ -74,7 +74,7 @@ class SimpleAceEditor {
     let aceOptions = params.aceOptions || {};
 
     if (!$element.attr('id')) {
-      $element.attr('id', hueUtils.UUID());
+      $element.attr('id', UUID());
     }
 
     const editor = ace.edit($element.find('.ace-editor')[0]);
@@ -82,7 +82,7 @@ class SimpleAceEditor {
       editor.getSession().setMode('ace/mode/' + ko.unwrap(params.mode));
     }
     editor.$blockScrolling = Infinity;
-    editor.setTheme($.totalStorage('hue.ace.theme') || 'ace/theme/hue');
+    editor.setTheme(hueLocalStorage('hue.ace.theme') || 'ace/theme/hue');
     self.ace(editor);
 
     if (params.activeExecutable) {

@@ -3884,7 +3884,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.apiHelper = window.apiHelper;
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
-      self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+      self.apiHelper.withLocalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
       self.appConfig = ko.observable();
       self.clusterType = ko.observable();
       self.isMini = ko.observable(false);

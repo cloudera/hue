@@ -222,7 +222,7 @@ ${layout.metastore_menubar()}
 
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
-      self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+      self.apiHelper.withLocalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
       huePubSub.subscribe("assist.table.selected", function (entry) {
         location.href = '/metastore/table/' + entry.path[0] + '/' + entry.name + '?connector_id=' + entry.getConnector().id + '&namespace=' + entry.namespace.id;

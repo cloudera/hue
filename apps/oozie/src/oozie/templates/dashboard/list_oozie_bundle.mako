@@ -377,7 +377,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
       readOnly: true,
       maxLines: Infinity
     });
-    editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
+    editor.setTheme(hueUtils.hueLocalStorage("hue.ace.theme") || "ace/theme/hue");
     editor.getSession().setMode("ace/mode/xml");
 
     $(".confirmationModal").click(function(){

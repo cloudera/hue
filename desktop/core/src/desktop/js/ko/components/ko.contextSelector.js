@@ -104,7 +104,7 @@ const TYPES_INDEX = {
     hide: 'hideClusters',
     lastPromise: 'lastClustersPromise',
     contextCatalogFn: 'getClusters',
-    totalStorageId: 'lastSelectedCluster',
+    localStorageId: 'lastSelectedCluster',
     onSelect: 'onClusterSelect'
   },
   compute: {
@@ -114,7 +114,7 @@ const TYPES_INDEX = {
     hide: 'hideComputes',
     lastPromise: 'lastComputesPromise',
     contextCatalogFn: 'getComputes',
-    totalStorageId: 'lastSelectedCompute',
+    localStorageId: 'lastSelectedCompute',
     onSelect: 'onComputeSelect'
   },
   namespace: {
@@ -124,7 +124,7 @@ const TYPES_INDEX = {
     hide: 'hideNamespaces',
     lastPromise: 'lastNamespacesPromise',
     contextCatalogFn: 'getNamespaces',
-    totalStorageId: 'lastSelectedNamespace',
+    localStorageId: 'lastSelectedNamespace',
     onSelect: 'onNamespaceSelect'
   }
 };
@@ -193,7 +193,7 @@ const HueContextSelector = function (params) {
       if (params[type.onSelect]) {
         params[type.onSelect](selectedVal, previousVal);
       }
-      apiHelper.setInTotalStorage('contextSelector', type.totalStorageId, selectedVal);
+      apiHelper.setInLocalStorage('contextSelector', type.localStorageId, selectedVal);
 
       if (selectedVal && type === TYPES_INDEX.compute) {
         self.setMatchingNamespace(selectedVal);
@@ -274,9 +274,9 @@ HueContextSelector.prototype.setMatchingNamespace = function (compute) {
         const found = self[TYPES_INDEX.namespace.available]().some(namespace => {
           if (compute.namespace === namespace.id) {
             self[TYPES_INDEX.namespace.name](namespace);
-            apiHelper.setInTotalStorage(
+            apiHelper.setInLocalStorage(
               'contextSelector',
-              TYPES_INDEX.namespace.totalStorageId,
+              TYPES_INDEX.namespace.localStorageId,
               namespace
             );
             return true;
@@ -306,9 +306,9 @@ HueContextSelector.prototype.setMatchingCompute = function (namespace) {
         const found = self[TYPES_INDEX.compute.available]().some(compute => {
           if (namespace.id === compute.namespace) {
             self[TYPES_INDEX.compute.name](compute);
-            apiHelper.setInTotalStorage(
+            apiHelper.setInLocalStorage(
               'contextSelector',
-              TYPES_INDEX.compute.totalStorageId,
+              TYPES_INDEX.compute.localStorageId,
               namespace
             );
             return true;
@@ -360,11 +360,11 @@ HueContextSelector.prototype.reload = function (type) {
 
         if (
           !self[type.name]() &&
-          apiHelper.getFromTotalStorage('contextSelector', type.totalStorageId)
+          apiHelper.getFromLocalStorage('contextSelector', type.localStorageId)
         ) {
-          const lastSelected = apiHelper.getFromTotalStorage(
+          const lastSelected = apiHelper.getFromLocalStorage(
             'contextSelector',
-            type.totalStorageId
+            type.localStorageId
           );
           const found = available.some(other => {
             if (other.id === lastSelected.id) {
@@ -441,7 +441,7 @@ HueContextSelector.prototype.reloadDatabases = function () {
                   self.availableDatabases([]);
                 })
                 .always(() => {
-                  let lastSelectedDb = apiHelper.getFromTotalStorage(
+                  let lastSelectedDb = apiHelper.getFromLocalStorage(
                     'assist_' +
                       ko.unwrap(self.connector).id +
                       '_' +

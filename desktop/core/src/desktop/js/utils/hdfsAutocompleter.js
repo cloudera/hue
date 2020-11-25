@@ -34,7 +34,7 @@ class HdfsAutocompleter {
     self.timeout = options.timeout;
   }
 
-  getTotalStorageUserPrefix() {
+  getlocalStorageUserPrefix() {
     const self = this;
     return self.user;
   }

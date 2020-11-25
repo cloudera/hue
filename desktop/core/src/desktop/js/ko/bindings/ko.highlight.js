@@ -16,6 +16,7 @@
 
 import $ from 'jquery';
 import * as ko from 'knockout';
+import { hueLocalStorage } from 'utils/hueUtils';
 
 // TODO: Depends on Ace
 
@@ -58,7 +59,7 @@ ko.bindingHandlers.highlight = {
             Rules = impalaRules.ImpalaHighlightRules;
           }
 
-          config.loadModule(['theme', $.totalStorage('hue.ace.theme') || 'ace/theme/hue']);
+          config.loadModule(['theme', hueLocalStorage('hue.ace.theme') || 'ace/theme/hue']);
 
           const Text = text.Text;
 

@@ -83,9 +83,9 @@ function rdbms_getTableColumns(serverName, databaseName, tableName, textScanned,
     tableName = _aliases[tableName];
   }
 
-  if ($.totalStorage('rdbms_columns_' + serverName + '_' + databaseName + '_' + tableName) && $.totalStorage('rdbms_extended_columns_' + serverName + '_' + databaseName + '_' + tableName)) {
-    callback($.totalStorage('rdbms_columns_' + serverName + '_' + databaseName + '_' + tableName), $.totalStorage('rdbms_extended_columns_' + serverName + '_' + databaseName + '_' + tableName));
-    if ($.totalStorage('rdbms_timestamp_columns_' + serverName + '_' + databaseName + '_' + tableName) === null || rdbms_hasExpired($.totalStorage('rdbms_timestamp_columns_' + serverName + '_' + databaseName + '_' + tableName))){
+  if (hueUtils.hueLocalStorage('rdbms_columns_' + serverName + '_' + databaseName + '_' + tableName) && hueUtils.hueLocalStorage('rdbms_extended_columns_' + serverName + '_' + databaseName + '_' + tableName)) {
+    callback(hueUtils.hueLocalStorage('rdbms_columns_' + serverName + '_' + databaseName + '_' + tableName), hueUtils.hueLocalStorage('rdbms_extended_columns_' + serverName + '_' + databaseName + '_' + tableName));
+    if (hueUtils.hueLocalStorage('rdbms_timestamp_columns_' + serverName + '_' + databaseName + '_' + tableName) === null || rdbms_hasExpired(hueUtils.hueLocalStorage('rdbms_timestamp_columns_' + serverName + '_' + databaseName + '_' + tableName))){
       rdbms_jsoncalls({
         server: serverName,
         database: databaseName,
@@ -100,9 +100,9 @@ function rdbms_getTableColumns(serverName, databaseName, tableName, textScanned,
             }
           }
           else {
-            $.totalStorage('rdbms_columns_' + serverName + '_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
-            $.totalStorage('rdbms_extended_columns_' + serverName + '_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
-            $.totalStorage('rdbms_timestamp_columns_' + serverName + '_' + databaseName + '_' + tableName, (new Date()).getTime());
+            hueUtils.hueLocalStorage('rdbms_columns_' + serverName + '_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
+            hueUtils.hueLocalStorage('rdbms_extended_columns_' + serverName + '_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
+            hueUtils.hueLocalStorage('rdbms_timestamp_columns_' + serverName + '_' + databaseName + '_' + tableName, (new Date()).getTime());
           }
         }
       });
@@ -123,10 +123,10 @@ function rdbms_getTableColumns(serverName, databaseName, tableName, textScanned,
           }
         }
         else {
-          $.totalStorage('rdbms_columns_' + serverName + '_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
-          $.totalStorage('rdbms_extended_columns_' + serverName + '_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
-          $.totalStorage('rdbms_timestamp_columns_' + serverName + '_' + databaseName + '_' + tableName, (new Date()).getTime());
-          callback($.totalStorage('rdbms_columns_' + serverName + '_' + databaseName + '_' + tableName), $.totalStorage('rdbms_extended_columns_' + serverName + '_' + databaseName + '_' + tableName));
+          hueUtils.hueLocalStorage('rdbms_columns_' + serverName + '_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
+          hueUtils.hueLocalStorage('rdbms_extended_columns_' + serverName + '_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
+          hueUtils.hueLocalStorage('rdbms_timestamp_columns_' + serverName + '_' + databaseName + '_' + tableName, (new Date()).getTime());
+          callback(hueUtils.hueLocalStorage('rdbms_columns_' + serverName + '_' + databaseName + '_' + tableName), hueUtils.hueLocalStorage('rdbms_extended_columns_' + serverName + '_' + databaseName + '_' + tableName));
         }
       }
     });
@@ -134,9 +134,9 @@ function rdbms_getTableColumns(serverName, databaseName, tableName, textScanned,
 }
 
 function rdbms_getTables(serverName, databaseName, callback) {
-  if ($.totalStorage('rdbms_tables_' + serverName + '_' + databaseName)) {
-    callback($.totalStorage('rdbms_tables_' + serverName + '_' + databaseName));
-    if ($.totalStorage('rdbms_timestamp_tables_' + serverName + '_' + databaseName) === null || rdbms_hasExpired($.totalStorage('rdbms_timestamp_tables_' + serverName + '_' + databaseName))){
+  if (hueUtils.hueLocalStorage('rdbms_tables_' + serverName + '_' + databaseName)) {
+    callback(hueUtils.hueLocalStorage('rdbms_tables_' + serverName + '_' + databaseName));
+    if (hueUtils.hueLocalStorage('rdbms_timestamp_tables_' + serverName + '_' + databaseName) === null || rdbms_hasExpired(hueUtils.hueLocalStorage('rdbms_timestamp_tables_' + serverName + '_' + databaseName))){
       rdbms_jsoncalls({
         server: serverName,
         database: databaseName,
@@ -150,8 +150,8 @@ function rdbms_getTables(serverName, databaseName, callback) {
             }
           }
           else {
-            $.totalStorage('rdbms_tables_' + serverName + '_' + databaseName, data.tables.join(" "));
-            $.totalStorage('rdbms_timestamp_tables_' + serverName + '_' + databaseName, (new Date()).getTime());
+            hueUtils.hueLocalStorage('rdbms_tables_' + serverName + '_' + databaseName, data.tables.join(" "));
+            hueUtils.hueLocalStorage('rdbms_timestamp_tables_' + serverName + '_' + databaseName, (new Date()).getTime());
           }
         }
       });
@@ -171,9 +171,9 @@ function rdbms_getTables(serverName, databaseName, callback) {
           }
         }
         else {
-          $.totalStorage('rdbms_tables_' + serverName + '_' + databaseName, data.tables.join(" "));
-          $.totalStorage('rdbms_timestamp_tables_' + serverName + '_' + databaseName, (new Date()).getTime());
-          callback($.totalStorage('rdbms_tables_' + serverName + '_' + databaseName));
+          hueUtils.hueLocalStorage('rdbms_tables_' + serverName + '_' + databaseName, data.tables.join(" "));
+          hueUtils.hueLocalStorage('rdbms_timestamp_tables_' + serverName + '_' + databaseName, (new Date()).getTime());
+          callback(hueUtils.hueLocalStorage('rdbms_tables_' + serverName + '_' + databaseName));
         }
       }
     });

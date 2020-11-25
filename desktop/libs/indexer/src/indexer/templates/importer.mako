@@ -2031,8 +2031,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.kafkaSelectedTopics.subscribe(function(newValue) {
         if (newValue) {
           viewModel.createWizard.guessFieldTypes();
-          self.kafkaFieldNames($.totalStorage('pai' + '_kafka_topics_' + newValue + '_kafkaFieldNames'));
-          self.kafkaFieldTypes($.totalStorage('pai' + '_kafka_topics_' + newValue + '_kafkaFieldTypes'));
+          self.kafkaFieldNames(hueUtils.hueLocalStorage('pai' + '_kafka_topics_' + newValue + '_kafkaFieldNames'));
+          self.kafkaFieldTypes(hueUtils.hueLocalStorage('pai' + '_kafka_topics_' + newValue + '_kafkaFieldTypes'));
         }
       });
       self.kafkaSchemaManual = ko.observable('detect');
@@ -2040,12 +2040,12 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.kafkaFieldDelimiter = ko.observable(',');
       self.kafkaFieldNames = ko.observable('');
       self.kafkaFieldNames.subscribe(function(newValue) {
-        $.totalStorage('pai' + '_kafka_topics_' + self.kafkaSelectedTopics() + '_kafkaFieldNames', newValue);
+        hueUtils.hueLocalStorage('pai' + '_kafka_topics_' + self.kafkaSelectedTopics() + '_kafkaFieldNames', newValue);
         viewModel.createWizard.guessFieldTypes();
       });
       self.kafkaFieldTypes = ko.observable('');
       self.kafkaFieldTypes.subscribe(function(newValue) {
-        $.totalStorage('pai' + '_kafka_topics_' + self.kafkaSelectedTopics() + '_kafkaFieldTypes', newValue);
+        hueUtils.hueLocalStorage('pai' + '_kafka_topics_' + self.kafkaSelectedTopics() + '_kafkaFieldTypes', newValue);
         viewModel.createWizard.guessFieldTypes();
       });
       self.kafkaFieldSchemaPath = ko.observable('');
@@ -3064,7 +3064,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
-      self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+      self.apiHelper.withLocalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
       self.loadDefaultField = loadDefaultField;
 
       self.createWizard = new CreateWizard(self);

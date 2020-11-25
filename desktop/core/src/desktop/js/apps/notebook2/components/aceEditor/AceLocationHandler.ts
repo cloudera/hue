@@ -825,7 +825,7 @@ export default class AceLocationHandler implements Disposable {
         return;
       }
 
-      const suppressedRules = apiHelper.getFromTotalStorage(
+      const suppressedRules = apiHelper.getFromLocalStorage(
         'hue.syntax.checker',
         'suppressedRules',
         {}
