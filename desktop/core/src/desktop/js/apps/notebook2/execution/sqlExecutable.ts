@@ -135,15 +135,7 @@ export default class SqlExecutable extends Executable {
         errorCol += this.parsedStatement.location.first_column;
       }
 
-      const adjustedErr = err.replace(
-        match[0],
-        'line ' + errorLine + (errorCol !== null ? ':' + errorCol : '')
-      );
-
-      this.logs.errors.push(adjustedErr);
-      this.logs.notify();
-
-      return adjustedErr;
+      return err.replace(match[0], 'line ' + errorLine + (errorCol !== null ? ':' + errorCol : ''));
     }
     return err;
   }

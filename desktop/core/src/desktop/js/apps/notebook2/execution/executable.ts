@@ -224,8 +224,9 @@ export default abstract class Executable {
       } catch (err) {
         if (typeof err === 'string') {
           err = this.adaptError(err);
+          this.logs.errors.push(err);
+          this.logs.notify();
         }
-        this.logs.errors.push(err);
         throw err;
       }
 
