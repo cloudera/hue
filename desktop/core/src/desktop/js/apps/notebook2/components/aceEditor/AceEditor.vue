@@ -32,12 +32,11 @@
   import { Ace } from 'ext/ace';
 
   import AceAutocomplete from './autocomplete/AceAutocomplete.vue';
-
+  import AceGutterHandler from './AceGutterHandler';
   import AceLocationHandler from './AceLocationHandler';
   import Executor from 'apps/notebook2/execution/executor';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import { INSERT_AT_CURSOR_EVENT } from 'ko/bindings/ace/ko.aceEditor';
-  import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
   import { CURSOR_POSITION_CHANGED_EVENT } from 'ko/bindings/ace/aceLocationHandler';
   import { IdentifierChainEntry, ParsedLocation } from 'parse/types';
   import { EditorInterpreter } from 'types/config';
