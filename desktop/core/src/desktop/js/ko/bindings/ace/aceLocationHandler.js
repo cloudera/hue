@@ -17,21 +17,22 @@
 import $ from 'jquery';
 import ace from 'ext/aceHelper';
 
-import AssistStorageEntry from 'ko/components/assist/assistStorageEntry';
+import { DIALECT } from 'apps/notebook2/snippet';
 import dataCatalog from 'catalog/dataCatalog';
-import hueDebug from 'utils/hueDebug';
-import huePubSub from 'utils/huePubSub';
-import I18n from 'utils/i18n';
+import AssistStorageEntry from 'ko/components/assist/assistStorageEntry';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
 import sqlUtils from 'sql/sqlUtils';
-import stringDistance from 'sql/stringDistance';
-import { DIALECT } from 'apps/notebook2/snippet';
 import {
   POST_FROM_LOCATION_WORKER_EVENT,
   POST_FROM_SYNTAX_WORKER_EVENT,
   POST_TO_LOCATION_WORKER_EVENT,
   POST_TO_SYNTAX_WORKER_EVENT
 } from 'sql/sqlWorkerHandler';
+import stringDistance from 'sql/stringDistance';
+import hueDebug from 'utils/hueDebug';
+import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
+import { getFromLocalStorage } from 'utils/storageUtils';
 
 // TODO: depends on Ace, sqlStatementsParser
 
@@ -785,11 +786,7 @@ class AceLocationHandler {
         return;
       }
 
-      const suppressedRules = window.apiHelper.getFromLocalStorage(
-        'hue.syntax.checker',
-        'suppressedRules',
-        {}
-      );
+      const suppressedRules = getFromLocalStorage('hue.syntax.checker.suppressedRules', {});
       if (
         e.data.syntaxError &&
         e.data.syntaxError.ruleId &&

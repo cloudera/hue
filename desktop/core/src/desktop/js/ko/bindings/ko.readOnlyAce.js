@@ -16,7 +16,7 @@
 
 import $ from 'jquery';
 import * as ko from 'knockout';
-import { hueLocalStorage } from 'utils/hueUtils';
+import { hueLocalStorage } from 'utils/storageUtils';
 
 // TODO: Depends on Ace
 

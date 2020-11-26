@@ -5042,7 +5042,7 @@ $(document).ready(function () {
   huePubSub.subscribe('app.dom.unload', function (app) {
     if (app === 'dashboard') {
       %if is_report:
-      if (window.apiHelper.getFromLocalStorage('assist', 'right_assist_panel_visible', false)) {
+      if (window.hueUtils.hueLocalStorage('assist.right_assist_panel_visible')) {
         huePubSub.publish('right.assist.show');
       }
       %endif

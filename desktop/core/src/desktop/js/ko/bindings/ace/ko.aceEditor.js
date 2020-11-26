@@ -18,16 +18,14 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 import ace from 'ext/aceHelper';
 
-import apiHelper from 'api/apiHelper';
+import AceLocationHandlerV2 from 'apps/notebook2/components/aceEditor/AceLocationHandler';
 import AceLocationHandler, {
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
-
-import AceLocationHandlerV2 from 'apps/notebook2/components/aceEditor/AceLocationHandler';
-
-import huePubSub from 'utils/huePubSub';
 import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
 import { registerBinding } from 'ko/bindings/bindingUtils';
+import huePubSub from 'utils/huePubSub';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 export const NAME = 'aceEditor';
 export const INSERT_AT_CURSOR_EVENT = 'editor.insert.at.cursor';
@@ -96,9 +94,8 @@ registerBinding(NAME, {
 
     editor.session.setMode(snippet.getAceMode());
     editor.setOptions({
-      fontSize: apiHelper.getFromLocalStorage(
-        'hue.ace',
-        'fontSize',
+      fontSize: getFromLocalStorage(
+        'hue.ace.fontSize',
         navigator.platform && navigator.platform.toLowerCase().indexOf('linux') > -1
           ? '14px'
           : '12px'
@@ -152,7 +149,7 @@ registerBinding(NAME, {
       aceErrorsSub.dispose();
     });
 
-    let darkThemeEnabled = apiHelper.getFromLocalStorage('ace', 'dark.theme.enabled', false);
+    let darkThemeEnabled = getFromLocalStorage('ace.dark.theme.enabled', false);
     editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
 
     const editorOptions = {
@@ -174,7 +171,7 @@ registerBinding(NAME, {
     editor.customMenuOptions = {
       setEnableDarkTheme: function (enabled) {
         darkThemeEnabled = enabled;
-        apiHelper.setInLocalStorage('ace', 'dark.theme.enabled', darkThemeEnabled);
+        setInLocalStorage('ace.dark.theme.enabled', darkThemeEnabled);
         editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
       },
       getEnableDarkTheme: function () {
@@ -182,7 +179,7 @@ registerBinding(NAME, {
       },
       setEnableAutocompleter: function (enabled) {
         editor.setOption('enableBasicAutocompletion', enabled);
-        apiHelper.setInLocalStorage('hue.ace', 'enableBasicAutocompletion', enabled);
+        setInLocalStorage('hue.ace.enableBasicAutocompletion', enabled);
         const $enableLiveAutocompletionChecked = $('#setEnableLiveAutocompletion:checked');
         const $setEnableLiveAutocompletion = $('#setEnableLiveAutocompletion');
         if (enabled && $enableLiveAutocompletionChecked.length === 0) {
@@ -196,7 +193,7 @@ registerBinding(NAME, {
       },
       setEnableLiveAutocompletion: function (enabled) {
         editor.setOption('enableLiveAutocompletion', enabled);
-        apiHelper.setInLocalStorage('hue.ace', 'enableLiveAutocompletion', enabled);
+        setInLocalStorage('hue.ace.enableLiveAutocompletion', enabled);
         if (enabled && $('#setEnableAutocompleter:checked').length === 0) {
           $('#setEnableAutocompleter').trigger('click');
         }
@@ -209,7 +206,7 @@ registerBinding(NAME, {
           size += 'px';
         }
         editor.setOption('fontSize', size);
-        apiHelper.setInLocalStorage('hue.ace', 'fontSize', size);
+        setInLocalStorage('hue.ace.fontSize', size);
       },
       getFontSize: function () {
         let size = editor.getOption('fontSize');
@@ -221,11 +218,7 @@ registerBinding(NAME, {
     };
 
     if (window.ENABLE_SQL_SYNTAX_CHECK && window.Worker) {
-      let errorHighlightingEnabled = apiHelper.getFromLocalStorage(
-        'hue.ace',
-        'errorHighlightingEnabled',
-        true
-      );
+      let errorHighlightingEnabled = getFromLocalStorage('hue.ace.errorHighlightingEnabled', true);
 
       if (errorHighlightingEnabled) {
         aceLocationHandler.attachSqlSyntaxWorker();
@@ -233,7 +226,7 @@ registerBinding(NAME, {
 
       editor.customMenuOptions.setErrorHighlighting = function (enabled) {
         errorHighlightingEnabled = enabled;
-        apiHelper.setInLocalStorage('hue.ace', 'errorHighlightingEnabled', enabled);
+        setInLocalStorage('hue.ace.errorHighlightingEnabled', enabled);
         if (enabled) {
           aceLocationHandler.attachSqlSyntaxWorker();
         } else {
@@ -244,7 +237,7 @@ registerBinding(NAME, {
         return errorHighlightingEnabled;
       };
       editor.customMenuOptions.setClearIgnoredSyntaxChecks = function () {
-        apiHelper.setInLocalStorage('hue.syntax.checker', 'suppressedRules', {});
+        setInLocalStorage('hue.syntax.checker.suppressedRules', {});
         $('#setClearIgnoredSyntaxChecks')
           .hide()
           .before('<div style="margin-top:5px;float:right;">done</div>');
@@ -256,15 +249,13 @@ registerBinding(NAME, {
 
     $.extend(editorOptions, aceOptions);
 
-    editorOptions['enableBasicAutocompletion'] = apiHelper.getFromLocalStorage(
-      'hue.ace',
-      'enableBasicAutocompletion',
+    editorOptions['enableBasicAutocompletion'] = getFromLocalStorage(
+      'hue.ace.enableBasicAutocompletion',
       true
     );
     if (editorOptions['enableBasicAutocompletion']) {
-      editorOptions['enableLiveAutocompletion'] = apiHelper.getFromLocalStorage(
-        'hue.ace',
-        'enableLiveAutocompletion',
+      editorOptions['enableLiveAutocompletion'] = getFromLocalStorage(
+        'hue.ace.enableLiveAutocompletion',
         true
       );
     }
@@ -500,7 +491,7 @@ registerBinding(NAME, {
       bindKey: { win: 'Ctrl-Alt-t', mac: 'Command-Alt-t' },
       exec: function () {
         darkThemeEnabled = !darkThemeEnabled;
-        apiHelper.setInLocalStorage('ace', 'dark.theme.enabled', darkThemeEnabled);
+        setInLocalStorage('ace.dark.theme.enabled', darkThemeEnabled);
         editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
       }
     });

@@ -17,10 +17,10 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
-import AssistDbNamespace from 'ko/components/assist/assistDbNamespace';
 import contextCatalog, { NAMESPACES_REFRESHED_EVENT } from 'catalog/contextCatalog';
+import AssistDbNamespace from 'ko/components/assist/assistDbNamespace';
 import huePubSub from 'utils/huePubSub';
+import { getFromLocalStorage } from 'utils/storageUtils';
 
 class AssistDbSource {
   /**
@@ -46,11 +46,9 @@ class AssistDbSource {
     self.nonSqlType = options.nonSqlType;
     self.navigationSettings = options.navigationSettings;
     self.initialNamespace =
-      options.initialNamespace ||
-      apiHelper.getFromLocalStorage('contextSelector', 'lastSelectedNamespace');
+      options.initialNamespace || getFromLocalStorage('contextSelector.lastSelectedNamespace');
     self.initialCompute =
-      options.initialCompute ||
-      apiHelper.getFromLocalStorage('contextSelector', 'lastSelectedCompute');
+      options.initialCompute || getFromLocalStorage('contextSelector.lastSelectedCompute');
 
     self.selectedNamespace = ko.observable();
     self.namespaces = ko.observableArray();

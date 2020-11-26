@@ -24,12 +24,13 @@ import {
   simplePost,
   successResponseIsError
 } from './apiUtils';
+import * as URLS from './urls';
 import apiQueueManager from 'api/apiQueueManager';
 import CancellableJqPromise from 'api/cancellableJqPromise';
 import hueDebug from 'utils/hueDebug';
 import huePubSub from 'utils/huePubSub';
-import hueUtils, { hueLocalStorage } from 'utils/hueUtils';
-import * as URLS from './urls';
+import hueUtils from 'utils/hueUtils';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 export const LINK_SHARING_PERMS = {
   READ: 'read',
@@ -62,19 +63,19 @@ class ApiHelper {
     this.cancelActiveRequest = cancelActiveRequest; // TODO: Remove when job_browser.mako is in webpack
 
     huePubSub.subscribe('assist.clear.git.cache', () => {
-      hueLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'git' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'git' }), {});
     });
 
     huePubSub.subscribe('assist.clear.collections.cache', () => {
-      hueLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'collections' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'collections' }), {});
     });
 
     huePubSub.subscribe('assist.clear.hbase.cache', () => {
-      hueLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'hbase' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'hbase' }), {});
     });
 
     huePubSub.subscribe('assist.clear.document.cache', () => {
-      hueLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'document' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'document' }), {});
     });
 
     const clearAllCaches = () => {
@@ -86,14 +87,14 @@ class ApiHelper {
         sourceType: 'impala',
         clearAll: true
       });
-      hueLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'hdfs' }), {});
-      hueLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'adls' }), {});
-      hueLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'abfs' }), {});
-      hueLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'git' }), {});
-      hueLocalStorage(this.getAssistCacheIdentifier({ sourceType: 's3' }), {});
-      hueLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'collections' }), {});
-      hueLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'hbase' }), {});
-      hueLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'document' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'hdfs' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'adls' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'abfs' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'git' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 's3' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'collections' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'hbase' }), {});
+      setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: 'document' }), {});
     };
 
     huePubSub.subscribe('assist.clear.all.caches', clearAllCaches);
@@ -107,7 +108,7 @@ class ApiHelper {
   }
 
   clearStorageCache(sourceType) {
-    hueLocalStorage(this.getAssistCacheIdentifier({ sourceType: sourceType }), {});
+    setInLocalStorage(this.getAssistCacheIdentifier({ sourceType: sourceType }), {});
   }
 
   hasExpired(timestamp, cacheType) {
@@ -132,7 +133,7 @@ class ApiHelper {
    */
   fetchCached(options) {
     const cacheIdentifier = this.getAssistCacheIdentifier(options);
-    const cachedData = hueLocalStorage(cacheIdentifier) || {};
+    const cachedData = getFromLocalStorage(cacheIdentifier) || {};
     const cachedId = options.hash ? options.url + options.hash : options.url;
 
     if (
@@ -149,7 +150,7 @@ class ApiHelper {
           data: data
         };
         try {
-          hueLocalStorage(cacheIdentifier, cachedData);
+          setInLocalStorage(cacheIdentifier, cachedData);
         } catch (e) {}
       });
     } else {
@@ -162,81 +163,13 @@ class ApiHelper {
   }
 
   /**
-   * @param {string} sourceType
-   * @returns {string}
-   */
-  getlocalStorageUserPrefix(sourceType) {
-    return sourceType + '_' + window.LOGGED_USERNAME + '_' + window.location.hostname;
-  }
-
-  /**
    * @param {object} options
    * @param {string} options.sourceType
    * @param {string} [options.cacheType] - Default value 'default'
    * @returns {string}
    */
   getAssistCacheIdentifier(options) {
-    return (
-      'hue.assist.' +
-      (options.cacheType || 'default') +
-      '.' +
-      this.getlocalStorageUserPrefix(options.sourceType)
-    );
-  }
-
-  /**
-   *
-   * @param {string} owner - 'assist', 'viewModelA' etc.
-   * @param {string} id
-   * @param {*} [value] - Optional, undefined and null will remove the value
-   */
-  setInLocalStorage(owner, id, value) {
-    try {
-      const cachedData =
-        hueLocalStorage('hue.user.settings.' + this.getlocalStorageUserPrefix(owner)) || {};
-      if (typeof value !== 'undefined' && value !== null) {
-        cachedData[id] = value;
-        hueLocalStorage('hue.user.settings.' + this.getlocalStorageUserPrefix(owner), cachedData);
-      } else if (cachedData[id]) {
-        delete cachedData[id];
-        hueLocalStorage('hue.user.settings.' + this.getlocalStorageUserPrefix(owner), cachedData);
-      }
-    } catch (e) {}
-  }
-
-  /**
-   *
-   * @param {string} owner - 'assist', 'viewModelA' etc.
-   * @param {string} id
-   * @param {*} [defaultValue]
-   * @returns {*}
-   */
-  getFromLocalStorage(owner, id, defaultValue) {
-    const cachedData =
-      hueLocalStorage('hue.user.settings.' + this.getlocalStorageUserPrefix(owner)) || {};
-    return typeof cachedData[id] !== 'undefined' ? cachedData[id] : defaultValue;
-  }
-
-  /**
-   * @param {string} owner - 'assist', 'viewModelA' etc.
-   * @param {string} id
-   * @param {Observable} observable
-   * @param {*} [defaultValue] - Optional default value to use if not in total storage initially
-   */
-  withLocalStorage(owner, id, observable, defaultValue, noInit) {
-    const cachedValue = this.getFromLocalStorage(owner, id, defaultValue);
-
-    if (!noInit && cachedValue !== 'undefined') {
-      observable(cachedValue);
-    }
-
-    observable.subscribe(newValue => {
-      if (owner === 'assist' && id === 'assist_panel_visible') {
-        huePubSub.publish('assist.forceRender');
-      }
-      this.setInLocalStorage(owner, id, newValue);
-    });
-    return observable;
+    return 'hue.assist.' + (options.cacheType || 'default') + '.' + options.sourceType;
   }
 
   /**
@@ -1258,7 +1191,7 @@ class ApiHelper {
   clearDbCache(options) {
     const cacheIdentifier = this.getAssistCacheIdentifier(options);
     if (options.clearAll) {
-      hueLocalStorage(cacheIdentifier, {});
+      setInLocalStorage(cacheIdentifier, {});
     } else {
       let url = URLS.AUTOCOMPLETE_API_PREFIX;
       if (options.databaseName) {
@@ -1270,9 +1203,9 @@ class ApiHelper {
       if (options.fields) {
         url += options.fields.length > 0 ? '/' + options.fields.join('/') : '';
       }
-      const cachedData = hueLocalStorage(cacheIdentifier) || {};
+      const cachedData = getFromLocalStorage(cacheIdentifier) || {};
       delete cachedData[url];
-      hueLocalStorage(cacheIdentifier, cachedData);
+      getFromLocalStorage(cacheIdentifier, cachedData);
     }
   }
 

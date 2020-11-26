@@ -30,6 +30,7 @@ import {
   GET_ACTIVE_SNIPPET_CONNECTOR_EVENT
 } from 'apps/notebook2/events';
 import { CONFIG_REFRESHED_EVENT, findEditorConnector, getLastKnownConfig } from 'utils/hueConfig';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 class EditorViewModel {
   constructor(editor_id, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -281,21 +282,21 @@ class EditorViewModel {
     self.assistWithoutStorage = ko.observable(false);
 
     self.isLeftPanelVisible = ko.observable(
-      apiHelper.getFromLocalStorage('assist', 'assist_panel_visible', true)
+      getFromLocalStorage('assist.assist_panel_visible', true)
     );
     self.isLeftPanelVisible.subscribe(val => {
       if (!self.assistWithoutStorage()) {
-        apiHelper.setInLocalStorage('assist', 'assist_panel_visible', val);
+        setInLocalStorage('assist.assist_panel_visible', val);
       }
     });
 
     self.isRightPanelAvailable = ko.observable(options.assistAvailable && HAS_OPTIMIZER);
     self.isRightPanelVisible = ko.observable(
-      apiHelper.getFromLocalStorage('assist', 'right_assist_panel_visible', true)
+      getFromLocalStorage('assist.right_assist_panel_visible', true)
     );
     self.isRightPanelVisible.subscribe(val => {
       if (!self.assistWithoutStorage()) {
-        apiHelper.setInLocalStorage('assist', 'right_assist_panel_visible', val);
+        setInLocalStorage('assist.right_assist_panel_visible', val);
       }
     });
 
