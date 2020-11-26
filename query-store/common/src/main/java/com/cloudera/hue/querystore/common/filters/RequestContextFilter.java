@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RequestContextFilter implements ContainerRequestFilter {
   public static final String REQUEST_CONTEXT_PROPERTY_NAME = "REQUEST-CONTEXT";
   public static final String SESSION_USER_KEY = "user";
+  public static final String DO_AS_HEADER = "x-do-as";
 
   @Context
   private HttpServletRequest servletRequest;
@@ -33,9 +34,13 @@ public class RequestContextFilter implements ContainerRequestFilter {
     String username = null;
     boolean secure = true;
 
-    HttpSession session = servletRequest.getSession(false);
-    if (session != null) {
-      username = (String)session.getAttribute(SESSION_USER_KEY);
+    username = servletRequest.getHeader(DO_AS_HEADER);
+
+    if (username == null) {
+      HttpSession session = servletRequest.getSession(false);
+      if (session != null) {
+        username = (String)session.getAttribute(SESSION_USER_KEY);
+      }
     }
 
     if (username == null) {
