@@ -275,7 +275,7 @@ class SnippetResults extends DisposableComponent {
 
   updateFromExecutable(executable) {
     this.status(executable.status);
-    this.hasResultSet(executable.handle.has_result_set);
+    this.hasResultSet(executable.handle && executable.handle.has_result_set);
     if (!this.hasResultSet) {
       this.resetResultData();
     }
