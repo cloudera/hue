@@ -585,7 +585,10 @@ ${ commonheader(_("Streams Browser"), "search", user, request, "60px") | n,unico
       self.assistAvailable = ko.observable(true);
       self.apiHelper = window.apiHelper;
       self.isLeftPanelVisible = ko.observable();
-      self.apiHelper.withLocalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+      window.hueUtils.withLocalStorage('assist.assist_panel_visible', self.isLeftPanelVisible, true);
+      self.isLeftPanelVisible.subscribe(function () {
+        huePubSub.publish('assist.forceRender');
+      });
 
       self.section = ko.observable('list-indexes');
       self.tab = ko.observable('');

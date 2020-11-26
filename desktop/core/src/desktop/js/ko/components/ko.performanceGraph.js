@@ -17,9 +17,10 @@
 import * as d3 from 'd3';
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
 import componentUtils from './componentUtils';
+import apiHelper from 'api/apiHelper';
 import I18n from 'utils/i18n';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 export const NAME = 'performance-graph';
 
@@ -74,9 +75,7 @@ class PerformanceGraph {
     ];
 
     self.selectedGranularity = ko.observable(
-      self.availableGranularities[
-        apiHelper.getFromLocalStorage('warehouses', 'performanceGraphGranularity', 0)
-      ]
+      self.availableGranularities[getFromLocalStorage('warehouses.performanceGraphGranularity', 0)]
     );
     self.clusterName = ko.observable(params.clusterName);
 
@@ -101,7 +100,7 @@ class PerformanceGraph {
         self.selectedGranularity.subscribe(granularity => {
           for (let i = 0; i < self.availableGranularities.length; i++) {
             if (granularity === self.availableGranularities[i]) {
-              apiHelper.setInLocalStorage('warehouses', 'performanceGraphGranularity', i);
+              setInLocalStorage('warehouses.performanceGraphGranularity', i);
               break;
             }
           }
@@ -335,7 +334,7 @@ class PerformanceGraph {
         tooltip: options.tooltip,
         toggle: function () {
           enabled = !enabled;
-          apiHelper.setInLocalStorage('warehouses', options.id + 'GraphEnabled', enabled);
+          setInLocalStorage('warehouses.' + options.id + 'GraphEnabled', enabled);
           mainGroup
             .select('.highlight-point-' + options.id)
             .style('display', enabled ? null : 'none');
@@ -389,7 +388,7 @@ class PerformanceGraph {
       createLineGraph({
         id: 'queries',
         label: I18n('Queries'),
-        enabled: apiHelper.getFromLocalStorage('warehouses', 'queriesGraphEnabled', true),
+        enabled: getFromLocalStorage('warehouses.queriesGraphEnabled', true),
         color: '#A9DBF1',
         subLineColor: '#DCDCDC',
         area: true,
@@ -418,7 +417,7 @@ class PerformanceGraph {
       }),
       createLineGraph({
         id: 'cpu',
-        enabled: apiHelper.getFromLocalStorage('warehouses', 'cpuGraphEnabled', false),
+        enabled: getFromLocalStorage('warehouses.cpuGraphEnabled', false),
         label: I18n('CPU'),
         color: '#654C94',
         subLine: true,
@@ -434,7 +433,7 @@ class PerformanceGraph {
       }),
       createLineGraph({
         id: 'memory',
-        enabled: apiHelper.getFromLocalStorage('warehouses', 'memoryGraphEnabled', false),
+        enabled: getFromLocalStorage('warehouses.memoryGraphEnabled', false),
         label: I18n('Memory'),
         color: '#83C1B9',
         subLine: true,
@@ -450,7 +449,7 @@ class PerformanceGraph {
       }),
       createLineGraph({
         id: 'io',
-        enabled: apiHelper.getFromLocalStorage('warehouses', 'ioGraphEnabled', false),
+        enabled: getFromLocalStorage('warehouses.ioGraphEnabled', false),
         label: I18n('IO'),
         color: '#D4965E',
         subLine: true,

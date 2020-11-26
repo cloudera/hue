@@ -34,7 +34,8 @@ import apiHelper from 'api/apiHelper';
 import Executor from 'apps/notebook2/execution/executor';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
-import hueUtils, { defer, hueLocalStorage } from 'utils/hueUtils';
+import { defer, UUID } from 'utils/hueUtils';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import { HIDE_FIXED_HEADERS_EVENT, REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
@@ -200,7 +201,7 @@ export default class Snippet {
     this.parentVm = vm;
     this.parentNotebook = notebook;
 
-    this.id = ko.observable(snippetRaw.id || hueUtils.UUID());
+    this.id = ko.observable(snippetRaw.id || UUID());
     this.name = ko.observable(snippetRaw.name || '');
 
     this.connector = ko.observable();
@@ -290,7 +291,7 @@ export default class Snippet {
 
     this.database.subscribe(newValue => {
       if (newValue !== null) {
-        apiHelper.setInLocalStorage('editor', 'last.selected.database', newValue);
+        setInLocalStorage('editor.last.selected.database', newValue);
         if (previousDatabase !== null && previousDatabase !== newValue) {
           huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this.id());
         }
@@ -488,8 +489,8 @@ export default class Snippet {
     });
 
     let defaultShowLogs = true;
-    if (this.parentVm.editorMode() && hueLocalStorage('hue.editor.showLogs')) {
-      defaultShowLogs = hueLocalStorage('hue.editor.showLogs');
+    if (this.parentVm.editorMode() && getFromLocalStorage('hue.editor.showLogs')) {
+      defaultShowLogs = getFromLocalStorage('hue.editor.showLogs');
     }
     this.showLogs = ko.observable(snippetRaw.showLogs || defaultShowLogs);
     this.jobs = ko.observableArray(snippetRaw.jobs || []);
@@ -500,7 +501,7 @@ export default class Snippet {
     this.showLogs.subscribe(val => {
       huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
       if (this.parentVm.editorMode()) {
-        hueLocalStorage('hue.editor.showLogs', val);
+        setInLocalStorage('hue.editor.showLogs', val);
       }
     });
 
@@ -556,12 +557,10 @@ export default class Snippet {
       COMPATIBILITY_TARGET_PLATFORMS[this.dialect()]
     );
 
-    this.showOptimizer = ko.observable(
-      apiHelper.getFromLocalStorage('editor', 'show.optimizer', false)
-    );
+    this.showOptimizer = ko.observable(getFromLocalStorage('editor.show.optimizer', false));
     this.showOptimizer.subscribe(newValue => {
       if (newValue !== null) {
-        apiHelper.setInLocalStorage('editor', 'show.optimizer', newValue);
+        setInLocalStorage('editor.show.optimizer', newValue);
       }
     });
 

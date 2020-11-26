@@ -15,7 +15,8 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import { escapeOutput, hueLocalStorage } from 'utils/hueUtils';
+import { escapeOutput } from 'utils/hueUtils';
+import { hueLocalStorage } from 'utils/storageUtils';
 
 /*
  * jHue HDFS autocomplete plugin

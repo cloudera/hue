@@ -929,7 +929,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
       self.page = ko.observable(new Page(page));
       self.recordsPerPageChoices = ["15", "30", "45", "60", "100", "200", "1000"],
-      self.recordsPerPage = ko.observable(apiHelper.getFromLocalStorage('fb', 'records_per_page', 45));
+      self.recordsPerPage = ko.observable(hueUtils.hueLocalStorage('fb.records_per_page') || 45);
       self.targetPageNum = ko.observable(1);
       self.targetPath = ko.observable("${current_request_path | n,unicode }");
       self.sortBy = ko.observable("name");
@@ -1263,7 +1263,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       };
 
       self.recordsPerPage.subscribe(function (newValue) {
-        apiHelper.setInLocalStorage('fb', 'records_per_page', newValue)
+        window.hueUtils.hueLocalStorage('fb.records_per_page', newValue)
         self.retrieveData();
       });
 

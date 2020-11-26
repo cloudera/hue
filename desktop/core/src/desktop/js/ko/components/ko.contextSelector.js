@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
+import { ASSIST_SET_DATABASE_EVENT } from './assist/events';
 import componentUtils from './componentUtils';
 import contextCatalog, {
   CONTEXT_CATALOG_REFRESHED_EVENT,
@@ -26,7 +26,7 @@ import contextCatalog, {
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { ASSIST_SET_DATABASE_EVENT } from './assist/events';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 export const CONTEXT_SELECTOR_COMPONENT = 'hue-context-selector';
 
@@ -193,7 +193,7 @@ const HueContextSelector = function (params) {
       if (params[type.onSelect]) {
         params[type.onSelect](selectedVal, previousVal);
       }
-      apiHelper.setInLocalStorage('contextSelector', type.localStorageId, selectedVal);
+      setInLocalStorage('contextSelector.' + type.localStorageId, selectedVal);
 
       if (selectedVal && type === TYPES_INDEX.compute) {
         self.setMatchingNamespace(selectedVal);
@@ -274,11 +274,7 @@ HueContextSelector.prototype.setMatchingNamespace = function (compute) {
         const found = self[TYPES_INDEX.namespace.available]().some(namespace => {
           if (compute.namespace === namespace.id) {
             self[TYPES_INDEX.namespace.name](namespace);
-            apiHelper.setInLocalStorage(
-              'contextSelector',
-              TYPES_INDEX.namespace.localStorageId,
-              namespace
-            );
+            setInLocalStorage('contextSelector.' + TYPES_INDEX.namespace.localStorageId, namespace);
             return true;
           }
         });
@@ -306,11 +302,7 @@ HueContextSelector.prototype.setMatchingCompute = function (namespace) {
         const found = self[TYPES_INDEX.compute.available]().some(compute => {
           if (namespace.id === compute.namespace) {
             self[TYPES_INDEX.compute.name](compute);
-            apiHelper.setInLocalStorage(
-              'contextSelector',
-              TYPES_INDEX.compute.localStorageId,
-              namespace
-            );
+            setInLocalStorage('contextSelector.' + TYPES_INDEX.compute.localStorageId, namespace);
             return true;
           }
         });
@@ -358,14 +350,8 @@ HueContextSelector.prototype.reload = function (type) {
           });
         }
 
-        if (
-          !self[type.name]() &&
-          apiHelper.getFromLocalStorage('contextSelector', type.localStorageId)
-        ) {
-          const lastSelected = apiHelper.getFromLocalStorage(
-            'contextSelector',
-            type.localStorageId
-          );
+        if (!self[type.name]() && getFromLocalStorage('contextSelector.' + type.localStorageId)) {
+          const lastSelected = getFromLocalStorage('contextSelector.' + type.localStorageId);
           const found = available.some(other => {
             if (other.id === lastSelected.id) {
               self[type.name](other);
@@ -441,12 +427,12 @@ HueContextSelector.prototype.reloadDatabases = function () {
                   self.availableDatabases([]);
                 })
                 .always(() => {
-                  let lastSelectedDb = apiHelper.getFromLocalStorage(
+                  let lastSelectedDb = getFromLocalStorage(
                     'assist_' +
                       ko.unwrap(self.connector).id +
                       '_' +
-                      self[TYPES_INDEX.namespace.name]().id,
-                    'lastSelectedDb'
+                      self[TYPES_INDEX.namespace.name]().id +
+                      '.lastSelectedDb'
                   );
 
                   const updateAssist = lastSelectedDb !== '';
