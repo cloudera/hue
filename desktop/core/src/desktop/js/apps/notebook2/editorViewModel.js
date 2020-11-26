@@ -34,6 +34,7 @@ import {
   findEditorConnector,
   getLastKnownConfig
 } from 'utils/hueConfig';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 class EditorViewModel {
   constructor(editorId, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -145,21 +146,21 @@ class EditorViewModel {
     this.assistWithoutStorage = ko.observable(false);
 
     this.isLeftPanelVisible = ko.observable(
-      apiHelper.getFromLocalStorage('assist', 'assist_panel_visible', true)
+      getFromLocalStorage('assist.assist_panel_visible', true)
     );
     this.isLeftPanelVisible.subscribe(val => {
       if (!this.assistWithoutStorage()) {
-        apiHelper.setInLocalStorage('assist', 'assist_panel_visible', val);
+        setInLocalStorage('assist.assist_panel_visible', val);
       }
     });
 
     this.isRightPanelAvailable = ko.observable(options.assistAvailable && HAS_OPTIMIZER);
     this.isRightPanelVisible = ko.observable(
-      apiHelper.getFromLocalStorage('assist', 'right_assist_panel_visible', true)
+      getFromLocalStorage('assist.right_assist_panel_visible', true)
     );
     this.isRightPanelVisible.subscribe(val => {
       if (!this.assistWithoutStorage()) {
-        apiHelper.setInLocalStorage('assist', 'right_assist_panel_visible', val);
+        setInLocalStorage('assist.right_assist_panel_visible', val);
       }
     });
 

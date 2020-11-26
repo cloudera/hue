@@ -17,6 +17,7 @@
 import $ from 'jquery';
 import sanitizeHtml from 'sanitize-html';
 import { hueWindow } from 'types/types';
+import { hueLocalStorage, withLocalStorage } from './storageUtils';
 
 export const bootstrapRatios = {
   span3(): number {
@@ -584,27 +585,6 @@ export const defer = async (callback: () => void): Promise<void> => {
   }
 };
 
-export const hueLocalStorage = <T = string>(key: string, value?: T): T | null => {
-  if (window.localStorage) {
-    if (typeof value !== 'undefined') {
-      if (value === null) {
-        window.localStorage.removeItem(key);
-      } else {
-        window.localStorage.setItem(key, JSON.stringify(value));
-      }
-      return value;
-    }
-    const storedValue = window.localStorage.getItem(key);
-    if (storedValue && storedValue.length) {
-      try {
-        return JSON.parse(storedValue);
-      } catch (e) {}
-      return <T>(<unknown>storedValue);
-    }
-  }
-  return null;
-};
-
 export default {
   bootstrapRatios,
   changeURL,
@@ -621,6 +601,10 @@ export default {
   getStyleFromCSSClass,
   goFullScreen,
   highlight,
+  /**
+   * Exposed here for legacy code using global window.hueUtils, use utils/storageUtils instead.
+   * @deprecated
+   */
   hueLocalStorage,
   html2text,
   htmlEncode,
@@ -636,5 +620,10 @@ export default {
   UUID,
   waitForObservable,
   waitForRendered,
-  waitForVariable
+  waitForVariable,
+  /**
+   * Exposed here for legacy code using global window.hueUtils, use utils/storageUtils instead.
+   * @deprecated
+   */
+  withLocalStorage
 };

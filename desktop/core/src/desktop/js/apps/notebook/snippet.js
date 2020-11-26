@@ -24,7 +24,8 @@ import apiHelper from 'api/apiHelper';
 import dataCatalog from 'catalog/dataCatalog';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
-import hueUtils, { hueLocalStorage } from 'utils/hueUtils';
+import hueUtils from 'utils/hueUtils';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 import Result from 'apps/notebook/result';
 import Session from 'apps/notebook/session';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
@@ -345,7 +346,7 @@ class Snippet {
 
     self.database.subscribe(newValue => {
       if (newValue !== null) {
-        apiHelper.setInLocalStorage('editor', 'last.selected.database', newValue);
+        setInLocalStorage('editor.last.selected.database', newValue);
         if (previousDatabase !== null && previousDatabase !== newValue) {
           huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, self.id());
         }
@@ -1021,8 +1022,8 @@ class Snippet {
         : false
     );
     let defaultShowLogs = true;
-    if (vm.editorMode() && hueLocalStorage('hue.editor.showLogs')) {
-      defaultShowLogs = hueLocalStorage('hue.editor.showLogs');
+    if (vm.editorMode() && getFromLocalStorage('hue.editor.showLogs')) {
+      defaultShowLogs = getFromLocalStorage('hue.editor.showLogs');
     }
     self.showLogs = ko.observable(
       typeof snippet.showLogs !== 'undefined' && snippet.showLogs != null
@@ -1192,7 +1193,7 @@ class Snippet {
         self.getLogs();
       }
       if (vm.editorMode()) {
-        hueLocalStorage('hue.editor.showLogs', val);
+        setInLocalStorage('hue.editor.showLogs', val);
       }
     });
 
@@ -1455,12 +1456,10 @@ class Snippet {
     });
     self.compatibilityTargetPlatform = ko.observable(COMPATIBILITY_TARGET_PLATFORMS[self.type()]);
 
-    self.showOptimizer = ko.observable(
-      apiHelper.getFromLocalStorage('editor', 'show.optimizer', false)
-    );
+    self.showOptimizer = ko.observable(getFromLocalStorage('editor.show.optimizer', false));
     self.showOptimizer.subscribe(newValue => {
       if (newValue !== null) {
-        apiHelper.setInLocalStorage('editor', 'show.optimizer', newValue);
+        setInLocalStorage('editor.show.optimizer', newValue);
       }
     });
 

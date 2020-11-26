@@ -17,13 +17,13 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
-import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
+import * as propsMappers from './propsMappers';
 import MetastoreSource from 'apps/tableBrowser/metastoreSource';
 import dataCatalog from 'catalog/dataCatalog';
-import * as propsMappers from './propsMappers';
 import { findEditorConnector, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import huePubSub from 'utils/huePubSub';
+import hueUtils from 'utils/hueUtils';
+import { getFromLocalStorage, withLocalStorage } from 'utils/storageUtils';
 
 class MetastoreViewModel {
   /**
@@ -41,7 +41,10 @@ class MetastoreViewModel {
     this.partitionsLimit = options.partitionsLimit;
     this.assistAvailable = ko.observable(true);
     this.isLeftPanelVisible = ko.observable();
-    apiHelper.withLocalStorage('assist', 'assist_panel_visible', this.isLeftPanelVisible, true);
+    withLocalStorage('assist.assist_panel_visible', this.isLeftPanelVisible, true);
+    this.isLeftPanelVisible.subscribe(() => {
+      huePubSub.publish('assist.forceRender');
+    });
     this.optimizerEnabled = ko.observable(options.optimizerEnabled || false);
     this.navigatorEnabled = ko.observable(options.navigatorEnabled || false);
     this.appConfig = ko.observable();
@@ -404,11 +407,8 @@ class MetastoreViewModel {
         }
       }
 
-      if (
-        !namespaceId &&
-        apiHelper.getFromLocalStorage('contextSelector', 'lastSelectedNamespace')
-      ) {
-        namespaceId = apiHelper.getFromLocalStorage('contextSelector', 'lastSelectedNamespace').id;
+      if (!namespaceId && getFromLocalStorage('contextSelector.lastSelectedNamespace')) {
+        namespaceId = getFromLocalStorage('contextSelector.lastSelectedNamespace').id;
       }
 
       this.source().lastLoadNamespacesDeferred.done(() => {

@@ -17,10 +17,10 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
+import MetastoreDatabase from 'apps/tableBrowser/metastoreDatabase';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
-import MetastoreDatabase from 'apps/tableBrowser/metastoreDatabase';
+import { getFromLocalStorage } from 'utils/storageUtils';
 
 class MetastoreNamespace {
   constructor(options) {
@@ -143,8 +143,8 @@ class MetastoreNamespace {
     const whenLoaded = clearCacheOnMissing => {
       if (!databaseName) {
         databaseName =
-          apiHelper.getFromLocalStorage('editor', 'last.selected.database') ||
-          apiHelper.getFromLocalStorage('metastore', 'last.selected.database') ||
+          getFromLocalStorage('editor.last.selected.database') ||
+          getFromLocalStorage('metastore.last.selected.database') ||
           'default';
         clearCacheOnMissing = false;
       }

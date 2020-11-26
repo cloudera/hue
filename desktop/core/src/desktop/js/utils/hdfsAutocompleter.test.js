@@ -16,7 +16,7 @@
 
 import $ from 'jquery';
 import * as ko from 'knockout';
-import * as hueUtilsMock from './hueUtils';
+import * as storageUtilsMock from './storageUtils';
 
 import HdfsAutocompleter from './hdfsAutocompleter';
 describe('hdfsAutocompleter.js', () => {
@@ -38,7 +38,8 @@ describe('hdfsAutocompleter.js', () => {
   };
 
   beforeAll(() => {
-    jest.spyOn(hueUtilsMock, 'hueLocalStorage').mockImplementation(() => null);
+    jest.spyOn(storageUtilsMock, 'getFromLocalStorage').mockImplementation(() => null);
+    jest.spyOn(storageUtilsMock, 'setInLocalStorage').mockImplementation(() => null);
 
     jest.spyOn($, 'ajax').mockImplementation(options => {
       const firstUrlPart = options.url.split('?')[0];

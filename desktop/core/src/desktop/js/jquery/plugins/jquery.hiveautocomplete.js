@@ -18,7 +18,7 @@ import $ from 'jquery';
 
 import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
-import { hueLocalStorage } from 'utils/hueUtils';
+import { hueLocalStorage } from 'utils/storageUtils';
 
 /*
  * jHue generic autocomplete plugin

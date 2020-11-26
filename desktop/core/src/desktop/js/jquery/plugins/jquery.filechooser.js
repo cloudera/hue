@@ -19,8 +19,8 @@ import * as ko from 'knockout';
 import qq from 'ext/fileuploader.custom';
 
 import huePubSub from 'utils/huePubSub';
-import { hueLocalStorage } from 'utils/hueUtils';
 import I18n from 'utils/i18n';
+import { hueLocalStorage } from 'utils/storageUtils';
 
 /*
  * jHue fileChooser plugin

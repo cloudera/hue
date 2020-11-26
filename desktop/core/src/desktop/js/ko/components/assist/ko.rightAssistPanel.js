@@ -16,16 +16,16 @@
 
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
-import componentUtils from 'ko/components/componentUtils';
-import huePubSub from 'utils/huePubSub';
-import I18n from 'utils/i18n';
-import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
 import {
   ASSIST_LANG_REF_PANEL_SHOW_TOPIC_EVENT,
   ASSIST_LANG_REF_SHOW_TOPIC_EVENT,
   SHOW_RIGHT_ASSIST_EVENT
 } from './events';
+import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
+import componentUtils from 'ko/components/componentUtils';
+import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
+import { withLocalStorage } from 'utils/storageUtils';
 
 const EDITOR_ASSISTANT_TAB = 'editorAssistant';
 const DASHBOARD_ASSISTANT_TAB = 'dashboardAssistant';
@@ -132,16 +132,16 @@ class RightAssistPanel {
     );
     this.schedulesTabAvailable = ko.observable(false);
 
-    this.lastActiveTabEditor = apiHelper.withLocalStorage(
-      'assist',
-      'last.open.right.panel',
-      ko.observable(),
+    this.lastActiveTabEditor = ko.observable();
+    withLocalStorage(
+      'assist.last.open.right.panel',
+      this.lastActiveTabEditor,
       EDITOR_ASSISTANT_TAB
     );
-    this.lastActiveTabDashboard = apiHelper.withLocalStorage(
-      'assist',
-      'last.open.right.panel.dashboard',
-      ko.observable(),
+    this.lastActiveTabDashboard = ko.observable();
+    withLocalStorage(
+      'assist.last.open.right.panel.dashboard',
+      this.lastActiveTabDashboard,
       DASHBOARD_ASSISTANT_TAB
     );
 

@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
-import { hueLocalStorage } from 'utils/hueUtils';
+import { hueLocalStorage } from 'utils/storageUtils';
 
 ko.bindingHandlers.aceResizer = {
   init: function (element, valueAccessor) {

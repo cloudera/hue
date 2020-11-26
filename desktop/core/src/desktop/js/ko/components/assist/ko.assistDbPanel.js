@@ -17,18 +17,6 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
-import AssistDbSource from 'ko/components/assist/assistDbSource';
-import componentUtils from 'ko/components/componentUtils';
-import dataCatalog from 'catalog/dataCatalog';
-import huePubSub from 'utils/huePubSub';
-import I18n from 'utils/i18n';
-import {
-  CONFIG_REFRESHED_EVENT,
-  filterEditorConnectors,
-  findDashboardConnector,
-  findEditorConnector
-} from 'utils/hueConfig';
 import {
   ASSIST_DB_HIGHLIGHT_EVENT,
   ASSIST_DB_PANEL_IS_READY_EVENT,
@@ -41,8 +29,19 @@ import {
   ASSIST_SHOW_SQL_EVENT,
   SHOW_LEFT_ASSIST_EVENT
 } from './events';
-
 import { ASSIST_KEY_COMPONENT } from './ko.assistKey';
+import dataCatalog from 'catalog/dataCatalog';
+import AssistDbSource from 'ko/components/assist/assistDbSource';
+import componentUtils from 'ko/components/componentUtils';
+import huePubSub from 'utils/huePubSub';
+import {
+  CONFIG_REFRESHED_EVENT,
+  filterEditorConnectors,
+  findDashboardConnector,
+  findEditorConnector
+} from 'utils/hueConfig';
+import I18n from 'utils/i18n';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 const ASSIST_TABLE_TEMPLATES = `
   <script type="text/html" id="assist-no-database-entries">
@@ -675,12 +674,12 @@ class AssistDbPanel {
                     assistDbSource.selectedNamespace().selectedDatabase().catalogEntry
                   );
                 } else {
-                  let lastSelectedDb = apiHelper.getFromLocalStorage(
+                  let lastSelectedDb = getFromLocalStorage(
                     'assist_' +
                       connector.id +
                       '_' +
-                      assistDbSource.selectedNamespace().namespace.id,
-                    'lastSelectedDb'
+                      assistDbSource.selectedNamespace().namespace.id +
+                      '.lastSelectedDb'
                   );
                   if (!lastSelectedDb && lastSelectedDb !== '') {
                     lastSelectedDb = 'default';
@@ -732,9 +731,9 @@ class AssistDbPanel {
           if (newSource.namespaces().length === 0) {
             newSource.loadNamespaces();
           }
-          apiHelper.setInLocalStorage('assist', 'lastSelectedSource', newSource.sourceType);
+          setInLocalStorage('assist.lastSelectedSource', newSource.sourceType);
         } else {
-          apiHelper.setInLocalStorage('assist', 'lastSelectedSource');
+          setInLocalStorage('assist.lastSelectedSource', null);
         }
       });
     }
@@ -855,8 +854,10 @@ class AssistDbPanel {
 
       if (sources.indexOf(this.selectedSource()) === -1) {
         if (sources.length) {
-          const storageSourceType = apiHelper.getFromLocalStorage('assist', 'lastSelectedSource');
-          this.selectedSource(this.sourceIndex[storageSourceType] || sources[0]);
+          const storageSourceType = getFromLocalStorage('assist.lastSelectedSource');
+          this.selectedSource(
+            (storageSourceType && this.sourceIndex[storageSourceType]) || sources[0]
+          );
         } else {
           this.selectedSource(undefined);
         }

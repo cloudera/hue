@@ -17,12 +17,12 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
+import { ASSIST_ACTIVE_DB_CHANGED_EVENT, ASSIST_SET_DATABASE_EVENT } from './assist/events';
 import componentUtils from 'ko/components/componentUtils';
+import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
-import { ASSIST_ACTIVE_DB_CHANGED_EVENT, ASSIST_SET_DATABASE_EVENT } from './assist/events';
+import { withLocalStorage } from 'utils/storageUtils';
 
 export const NAME = 'hue-sidebar';
 
@@ -267,7 +267,7 @@ class Sidebar {
       }
     });
 
-    apiHelper.withLocalStorage('hue.sidebar', 'collabse', this.collapsed, true);
+    withLocalStorage('hue.sidebar.collapse', this.collapsed, true);
 
     this.items = ko.observableArray();
 
