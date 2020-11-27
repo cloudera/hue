@@ -12,6 +12,7 @@ hue:
     port: 5432
     user: "hue"
     password: "hue"
+    #password_script=echo ${DATABASE_PASSWORD}
     name: "hue"
     storageName: "microk8s-hostpath"
   interpreters: |
