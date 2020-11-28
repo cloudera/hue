@@ -129,13 +129,16 @@
     @Prop({ required: false, default: false })
     temporaryOnly?: boolean;
 
+    startLayout: DOMRect | null = null;
+    startPixelRatio = window.devicePixelRatio;
+    left = 0;
+    top = 0;
+
     loading = false;
     active = false;
     filter = '';
     availableCategories = [Category.All];
     activeCategory = Category.All;
-    left = 0;
-    top = 0;
     selectedIndex: number | null = null;
     hoveredIndex: number | null = null;
     base: Ace.Anchor | null = null;
@@ -150,7 +153,7 @@
     keyboardHandler: Ace.HashHandler | null = null;
     changeListener: (() => void) | null = null;
     mousedownListener = this.detach.bind(this);
-    mousewheelListener = this.detach.bind(this);
+    mousewheelListener = this.closeOnScroll.bind(this);
     subTracker = new SubscriptionTracker();
 
     created(): void {
@@ -230,7 +233,7 @@
                 console.log(parseResult);
               }
 
-              if (parseResult) {
+              if (parseResult && this.autocompleteResults) {
                 this.suggestions = [];
                 this.autocompleteResults.update(parseResult, this.suggestions).finally(() => {
                   this.loading = false;
@@ -535,9 +538,28 @@
       this.editor.focus();
     }
 
+    closeOnScroll(): void {
+      if (!this.active || !this.startLayout) {
+        return;
+      }
+      const newLayout = this.editor.container.getBoundingClientRect();
+      const yDiff = newLayout.top - this.startLayout.top;
+      const xDiff = newLayout.left - this.startLayout.left;
+      if (this.startPixelRatio !== window.devicePixelRatio) {
+        // Ignore zoom changes
+        this.startLayout = newLayout;
+      } else if (Math.abs(yDiff) > 10 || Math.abs(xDiff) > 10) {
+        // Close if scroll more than 10px in any direction
+        this.detach();
+      }
+    }
+
     attach(): void {
       this.updateFilter();
       this.disposeEventHandlers();
+
+      this.startLayout = this.editor.container.getBoundingClientRect();
+      this.startPixelRatio = window.devicePixelRatio;
 
       if (this.keyboardHandler) {
         this.editor.keyBinding.addKeyboardHandler(this.keyboardHandler);
@@ -547,28 +569,7 @@
       }
       this.editor.on('mousedown', this.mousedownListener);
       this.editor.on('mousewheel', this.mousewheelListener);
-
-      let currentOffset = {
-        top: this.editor.container.offsetTop,
-        left: this.editor.container.offsetLeft
-      };
-      let currentPixelRatio = window.devicePixelRatio; // Detect zoom changes
-
-      this.positionInterval = window.setInterval(() => {
-        const newOffset = {
-          top: this.editor.container.offsetTop,
-          left: this.editor.container.offsetLeft
-        };
-        if (currentPixelRatio !== window.devicePixelRatio) {
-          currentOffset = newOffset;
-          currentPixelRatio = window.devicePixelRatio;
-        } else if (
-          Math.abs(newOffset.top - currentOffset.top) > 20 ||
-          Math.abs(newOffset.left - currentOffset.left) > 20
-        ) {
-          this.detach();
-        }
-      }, 300);
+      this.positionInterval = window.setInterval(this.closeOnScroll.bind(this), 300);
     }
 
     detach(): void {

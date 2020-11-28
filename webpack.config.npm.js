@@ -40,7 +40,7 @@ const npmSetupPlugins = [
       { from: './NPM-README.md', to: `${DIST_DIR}/README.md` },
 
       { from: `${JS_ROOT}/components`, to: `${DIST_DIR}/src/components` },
-      { from: `${JS_ROOT}/utils/hueUtils.js`, to: `${DIST_DIR}/src/utils/hueUtils.js` },
+      { from: `${JS_ROOT}/utils/hueUtils.ts`, to: `${DIST_DIR}/src/utils/hueUtils.ts` },
 
       { from: `${JS_ROOT}/parse`, to: `${DIST_DIR}/src/parse` },
       { from: `${JS_ROOT}/sql`, to: `${DIST_DIR}/src/sql` }

@@ -675,7 +675,7 @@ class AssistDbPanel {
                     assistDbSource.selectedNamespace().selectedDatabase().catalogEntry
                   );
                 } else {
-                  let lastSelectedDb = apiHelper.getFromTotalStorage(
+                  let lastSelectedDb = apiHelper.getFromLocalStorage(
                     'assist_' +
                       connector.id +
                       '_' +
@@ -732,9 +732,9 @@ class AssistDbPanel {
           if (newSource.namespaces().length === 0) {
             newSource.loadNamespaces();
           }
-          apiHelper.setInTotalStorage('assist', 'lastSelectedSource', newSource.sourceType);
+          apiHelper.setInLocalStorage('assist', 'lastSelectedSource', newSource.sourceType);
         } else {
-          apiHelper.setInTotalStorage('assist', 'lastSelectedSource');
+          apiHelper.setInLocalStorage('assist', 'lastSelectedSource');
         }
       });
     }
@@ -855,7 +855,7 @@ class AssistDbPanel {
 
       if (sources.indexOf(this.selectedSource()) === -1) {
         if (sources.length) {
-          const storageSourceType = apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
+          const storageSourceType = apiHelper.getFromLocalStorage('assist', 'lastSelectedSource');
           this.selectedSource(this.sourceIndex[storageSourceType] || sources[0]);
         } else {
           this.selectedSource(undefined);

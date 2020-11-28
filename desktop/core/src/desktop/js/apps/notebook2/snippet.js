@@ -26,6 +26,7 @@ import 'apps/notebook2/components/ko.snippetResults';
 import 'apps/notebook2/components/ko.queryHistory';
 
 import './components/ExecutableActionsKoBridge.vue';
+import './components/EditorResizerKoBridge.vue';
 import './components/aceEditor/AceEditorKoBridge.vue';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
@@ -33,7 +34,7 @@ import apiHelper from 'api/apiHelper';
 import Executor from 'apps/notebook2/execution/executor';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
-import hueUtils, { defer } from 'utils/hueUtils';
+import hueUtils, { defer, hueLocalStorage } from 'utils/hueUtils';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import { HIDE_FIXED_HEADERS_EVENT, REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
@@ -236,7 +237,15 @@ export default class Snippet {
       this.parentNotebook.isHistory() ? snippetRaw.aceCursorPosition : null
     );
 
-    this.aceEditor = null;
+    this.ace = ko.observable();
+
+    this.ace.subscribe(newVal => {
+      if (newVal) {
+        if (!this.parentNotebook.isPresentationMode()) {
+          newVal.focus();
+        }
+      }
+    });
 
     this.errors = ko.observableArray([]);
 
@@ -281,7 +290,7 @@ export default class Snippet {
 
     this.database.subscribe(newValue => {
       if (newValue !== null) {
-        apiHelper.setInTotalStorage('editor', 'last.selected.database', newValue);
+        apiHelper.setInLocalStorage('editor', 'last.selected.database', newValue);
         if (previousDatabase !== null && previousDatabase !== newValue) {
           huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this.id());
         }
@@ -340,7 +349,7 @@ export default class Snippet {
     this.associatedDocumentUuid.subscribe(val => {
       if (val !== '') {
         this.getExternalStatement();
-      } else {
+      } else if (this.ace()) {
         this.statement_raw('');
         this.ace().setValue('', 1);
       }
@@ -357,10 +366,8 @@ export default class Snippet {
       huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this);
     };
 
-    huePubSub.subscribe(CURSOR_POSITION_CHANGED_EVENT, details => {
-      if (details.editorId === this.id()) {
-        this.aceCursorPosition(details.position);
-      }
+    huePubSub.subscribe('ace.editor.focused', editor => {
+      this.inFocus(editor === this.ace());
     });
 
     huePubSub.subscribe(
@@ -444,7 +451,7 @@ export default class Snippet {
         this.properties(komapping.fromJS(getDefaultSnippetProperties(newValue)));
       }
       window.setTimeout(() => {
-        if (this.ace() !== null) {
+        if (this.ace()) {
           this.ace().focus();
         }
       }, 100);
@@ -481,8 +488,8 @@ export default class Snippet {
     });
 
     let defaultShowLogs = true;
-    if (this.parentVm.editorMode() && $.totalStorage('hue.editor.showLogs')) {
-      defaultShowLogs = $.totalStorage('hue.editor.showLogs');
+    if (this.parentVm.editorMode() && hueLocalStorage('hue.editor.showLogs')) {
+      defaultShowLogs = hueLocalStorage('hue.editor.showLogs');
     }
     this.showLogs = ko.observable(snippetRaw.showLogs || defaultShowLogs);
     this.jobs = ko.observableArray(snippetRaw.jobs || []);
@@ -493,7 +500,7 @@ export default class Snippet {
     this.showLogs.subscribe(val => {
       huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
       if (this.parentVm.editorMode()) {
-        $.totalStorage('hue.editor.showLogs', val);
+        hueLocalStorage('hue.editor.showLogs', val);
       }
     });
 
@@ -550,11 +557,11 @@ export default class Snippet {
     );
 
     this.showOptimizer = ko.observable(
-      apiHelper.getFromTotalStorage('editor', 'show.optimizer', false)
+      apiHelper.getFromLocalStorage('editor', 'show.optimizer', false)
     );
     this.showOptimizer.subscribe(newValue => {
       if (newValue !== null) {
-        apiHelper.setInTotalStorage('editor', 'show.optimizer', newValue);
+        apiHelper.setInLocalStorage('editor', 'show.optimizer', newValue);
       }
     });
 
@@ -697,10 +704,12 @@ export default class Snippet {
           this.hasSuggestion('error');
           this.complexity({ hints: [] });
         }
-        huePubSub.publish('editor.active.risks', {
-          editor: this.ace(),
-          risks: this.complexity() || {}
-        });
+        if (this.ace()) {
+          huePubSub.publish('editor.active.risks', {
+            editor: this.ace(),
+            risks: this.complexity() || {}
+          });
+        }
         lastCheckedComplexityStatement = this.statement();
       };
 
@@ -713,7 +722,7 @@ export default class Snippet {
           this.suggestion('');
         }
 
-        if (this.complexity() !== {}) {
+        if (this.complexity() !== {} && this.ace()) {
           this.complexity(undefined);
           huePubSub.publish('editor.active.risks', {
             editor: this.ace(),
@@ -831,16 +840,6 @@ export default class Snippet {
     }
   }
 
-  ace(newVal) {
-    if (newVal) {
-      this.aceEditor = newVal;
-      if (!this.parentNotebook.isPresentationMode()) {
-        this.aceEditor.focus();
-      }
-    }
-    return this.aceEditor;
-  }
-
   checkCompatibility() {
     this.hasSuggestion(null);
     this.compatibilitySourcePlatform(COMPATIBILITY_SOURCE_PLATFORMS[this.dialect()]);
@@ -891,7 +890,9 @@ export default class Snippet {
         if (data.status === 0) {
           this.externalStatementLoaded(true);
           this.statement_raw(data.statement);
-          this.ace().setValue(this.statement_raw(), 1);
+          if (this.ace()) {
+            this.ace().setValue(this.statement_raw(), 1);
+          }
         } else {
           this.handleAjaxError(data);
         }
@@ -1040,6 +1041,9 @@ export default class Snippet {
   }
 
   onKeydownInVariable(context, e) {
+    if (!this.ace()) {
+      return;
+    }
     if ((e.ctrlKey || e.metaKey) && e.which === 13) {
       // Ctrl-enter
       this.ace().commands.commands['execute'].exec();

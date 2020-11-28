@@ -184,7 +184,7 @@ class AssistStoragePanel {
   constructor(options) {
     this.sources = ko.observableArray(options.sources);
 
-    const lastSourceType = apiHelper.getFromTotalStorage('assist', 'lastStorageSource', 'hdfs');
+    const lastSourceType = apiHelper.getFromLocalStorage('assist', 'lastStorageSource', 'hdfs');
 
     let foundLastSource = this.sources().find(source => source.type === lastSourceType);
 
@@ -202,7 +202,7 @@ class AssistStoragePanel {
     this.activeSource.subscribe(newValue => {
       if (newValue) {
         this.rootPath = getRootFilePath(this.activeSource());
-        apiHelper.setInTotalStorage('assist', 'lastStorageSource', newValue.type);
+        apiHelper.setInLocalStorage('assist', 'lastStorageSource', newValue.type);
         this.selectedStorageEntry(undefined);
         this.reload();
       }
@@ -210,7 +210,7 @@ class AssistStoragePanel {
 
     huePubSub.subscribe('assist.selectStorageEntry', entry => {
       this.selectedStorageEntry(entry);
-      apiHelper.setInTotalStorage('assist', 'currentStoragePath_' + entry.source.type, entry.path);
+      apiHelper.setInLocalStorage('assist', 'currentStoragePath_' + entry.source.type, entry.path);
     });
 
     huePubSub.subscribe('assist.storage.refresh', () => {
@@ -224,7 +224,7 @@ class AssistStoragePanel {
           ? '/'
           : window.USER_HOME_DIR;
       this.loadPath(path);
-      apiHelper.setInTotalStorage('assist', 'currentStoragePath_' + this.activeSource().type, path);
+      apiHelper.setInLocalStorage('assist', 'currentStoragePath_' + this.activeSource().type, path);
     });
 
     this.init();
@@ -258,7 +258,7 @@ class AssistStoragePanel {
 
   reload() {
     this.loadPath(
-      apiHelper.getFromTotalStorage(
+      apiHelper.getFromLocalStorage(
         'assist',
         'currentStoragePath_' + this.activeSource().type,
         this.activeSource().type === 'hdfs' ? window.USER_HOME_DIR : '/'

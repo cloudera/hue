@@ -547,7 +547,7 @@ ${ dashboard.import_layout() }
       readOnly: true,
       maxLines: Infinity
     });
-    editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
+    editor.setTheme(hueUtils.hueLocalStorage("hue.ace.theme") || "ace/theme/hue");
     editor.getSession().setMode("ace/mode/xml");
 
     // force refresh on tab change

@@ -66,6 +66,7 @@
     "plotly.js-dist": "1.45.3",
     "regenerator-runtime": "^0.13.3",
     "removeNPMAbsolutePaths": "^1.0.4",
+    "sanitize-html": "^2.1.2",
     "select2": "3.5.1",
     "selectize": "0.12.6",
     "selectize-plugin-clear": "0.0.3",
@@ -73,9 +74,9 @@
     "vue": "2.6.11",
     "vue-class-component": "7.2.3",
     "vue-custom-element": "3.2.14",
-    "vuejs-datepicker": "1.6.2",
     "vue-property-decorator": "9.0.0",
-    "vue-template-compiler": "2.6.11"
+    "vue-template-compiler": "2.6.11",
+    "vuejs-datepicker": "1.6.2"
   },
   "devDependencies": {
     "@babel/core": "7.10.2",
@@ -90,6 +91,7 @@
     "@types/jquery": "3.5.0",
     "@types/knockout": "3.4.67",
     "@types/luxon": "1.25.0",
+    "@types/sanitize-html": "1.27.0",
     "@types/webpack": "4.41.23",
     "@typescript-eslint/eslint-plugin": "3.4.0",
     "@typescript-eslint/parser": "3.4.0",

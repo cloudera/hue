@@ -18,6 +18,7 @@ import $ from 'jquery';
 
 import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
+import { hueLocalStorage } from 'utils/hueUtils';
 
 /*
  * jHue generic autocomplete plugin
@@ -146,14 +147,13 @@ Plugin.prototype.init = function () {
   function smartTooltipMaker() {
     if (
       self.options.smartTooltip !== '' &&
-      typeof $.totalStorage !== 'undefined' &&
-      $.totalStorage('jHueGenericAutocompleteTooltip') !== -1
+      hueLocalStorage('jHueGenericAutocompleteTooltip') !== -1
     ) {
       let cnt = 0;
-      if ($.totalStorage('jHueGenericAutocompleteTooltip')) {
-        cnt = $.totalStorage('jHueGenericAutocompleteTooltip') + 1;
+      if (hueLocalStorage('jHueGenericAutocompleteTooltip')) {
+        cnt = hueLocalStorage('jHueGenericAutocompleteTooltip') + 1;
       }
-      $.totalStorage('jHueGenericAutocompleteTooltip', cnt);
+      hueLocalStorage('jHueGenericAutocompleteTooltip', cnt);
       if (cnt >= self.options.smartTooltipThreshold) {
         $el
           .tooltip({
@@ -166,7 +166,7 @@ Plugin.prototype.init = function () {
         window.setTimeout(() => {
           $el.tooltip('hide');
         }, 10000);
-        $.totalStorage('jHueGenericAutocompleteTooltip', -1);
+        hueLocalStorage('jHueGenericAutocompleteTooltip', -1);
       }
     }
   }

@@ -92,7 +92,7 @@ class AssistPanel {
     self.visiblePanel = ko.observable();
 
     self.lastOpenPanelType = ko.observable();
-    apiHelper.withTotalStorage('assist', 'last.open.panel', self.lastOpenPanelType);
+    apiHelper.withLocalStorage('assist', 'last.open.panel', self.lastOpenPanelType);
 
     // TODO: Support dynamic config changes
     huePubSub.publish(GET_KNOWN_CONFIG_EVENT, clusterConfig => {

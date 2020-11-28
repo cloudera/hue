@@ -73,4 +73,34 @@ describe('hue.utils.js', () => {
   it('should remove JS code from a string', () => {
     expect(hueUtils.deXSS('hello <script>alert(123)</script>world')).toEqual('hello world');
   });
+
+  it('Should not remove strong tag from a string', () => {
+    expect(hueUtils.deXSS('<strong>Hello World</strong>')).toEqual('<strong>Hello World</strong>');
+  });
+
+  it('Should remove img tag from a string', () => {
+    expect(hueUtils.deXSS('<img src=asf onerror=alert(document.cookie) />hello')).toEqual('hello');
+  });
+
+  it('Should not remove p tag from a string', () => {
+    expect(hueUtils.deXSS('<p> Hello World </p>')).toEqual('<p> Hello World </p>');
+  });
+
+  it('Should not remove h1 tag from a string', () => {
+    expect(hueUtils.deXSS('<h1> Hello World </h1>')).toEqual('<h1> Hello World </h1>');
+  });
+
+  it('should preserve entities as such', () => {
+    expect(hueUtils.deXSS('<a name="&lt;silly&gt;">&lt;Kapow!&gt;</a>')).toEqual(
+      '<a name="&lt;silly&gt;">&lt;Kapow!&gt;</a>'
+    );
+  });
+
+  it('should dump comments', () => {
+    expect(hueUtils.deXSS('<p><!-- Blah blah -->Whee</p>')).toEqual('<p>Whee</p>');
+  });
+
+  it('should dump an uppercase javascript url', () => {
+    expect(hueUtils.deXSS('<a href="JAVASCRIPT:alert(\'foo\')">Hax</a>')).toEqual('<a>Hax</a>');
+  });
 });

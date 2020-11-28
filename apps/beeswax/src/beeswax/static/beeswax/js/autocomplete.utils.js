@@ -59,7 +59,7 @@ function hac_getTableAliases(textScanned) {
   return _aliases;
 }
 
-function hac_getTotalStorageUserPrefix() {
+function hac_getLocalStorageUserPrefix() {
   var _app = "";
   if (typeof HIVE_AUTOCOMPLETE_APP != "undefined") {
     _app = HIVE_AUTOCOMPLETE_APP;
@@ -80,9 +80,9 @@ function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
     tableName = _aliases[tableName];
   }
 
-  if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName) != null && $.totalStorage(hac_getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName) != null) {
-    callback($.totalStorage(hac_getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName), $.totalStorage(hac_getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName));
-    if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName) == null || hac_hasExpired($.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName))){
+  if (hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName) != null && hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName) != null) {
+    callback(hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName), hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName));
+    if (hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName) == null || hac_hasExpired(hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName))){
       hac_jsoncalls({
         database: databaseName,
         table: tableName,
@@ -94,9 +94,9 @@ function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
             hac_errorHandler(data);
           }
           else {
-            $.totalStorage(hac_getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
-            $.totalStorage(hac_getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
-            $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName, (new Date()).getTime());
+            hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
+            hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
+            hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName, (new Date()).getTime());
           }
         }
       });
@@ -114,10 +114,10 @@ function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
           hac_errorHandler(data);
         }
         else {
-          $.totalStorage(hac_getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
-          $.totalStorage(hac_getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
-          $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName, (new Date()).getTime());
-          callback($.totalStorage(hac_getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName), $.totalStorage(hac_getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName));
+          hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
+          hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
+          hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName, (new Date()).getTime());
+          callback(hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName), hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName));
         }
       }
     });
@@ -135,9 +135,9 @@ function hac_tableHasAlias(tableName, textScanned) {
 }
 
 function hac_getTables(databaseName, callback) {
-  if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + databaseName) != null) {
-    callback($.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + databaseName));
-    if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + databaseName) == null || hac_hasExpired($.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + databaseName))){
+  if (hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'tables_' + databaseName) != null) {
+    callback(hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'tables_' + databaseName));
+    if (hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'timestamp_tables_' + databaseName) == null || hac_hasExpired(hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'timestamp_tables_' + databaseName))){
       hac_jsoncalls({
         database: databaseName,
         onDataReceived: function (data) {
@@ -148,8 +148,8 @@ function hac_getTables(databaseName, callback) {
             hac_errorHandler(data);
           }
           else {
-            $.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + databaseName, data.tables.join(" "));
-            $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + databaseName, (new Date()).getTime());
+            hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'tables_' + databaseName, data.tables.join(" "));
+            hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'timestamp_tables_' + databaseName, (new Date()).getTime());
           }
         }
       });
@@ -167,9 +167,9 @@ function hac_getTables(databaseName, callback) {
         }
         else {
           if (data.tables) {
-            $.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + databaseName, data.tables.join(" "));
-            $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + databaseName, (new Date()).getTime());
-            callback($.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + databaseName));
+            hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'tables_' + databaseName, data.tables.join(" "));
+            hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'timestamp_tables_' + databaseName, (new Date()).getTime());
+            callback(hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'tables_' + databaseName));
           }
         }
       }
@@ -178,9 +178,9 @@ function hac_getTables(databaseName, callback) {
 }
 
 function hac_getDatabases(callback) {
-  if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'databases') != null) {
-    callback($.totalStorage(hac_getTotalStorageUserPrefix() + 'databases'));
-    if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_databases') == null || hac_hasExpired($.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_databases'))){
+  if (hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'databases') != null) {
+    callback(hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'databases'));
+    if (hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'timestamp_databases') == null || hac_hasExpired(hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'timestamp_databases'))){
       hac_jsoncalls({
         onDataReceived: function (data) {
           if (typeof HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK == "function") {
@@ -190,8 +190,8 @@ function hac_getDatabases(callback) {
             hac_errorHandler(data);
           }
           else {
-            $.totalStorage(hac_getTotalStorageUserPrefix() + 'databases', data.databases);
-            $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_databases', (new Date()).getTime());
+            hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'databases', data.databases);
+            hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'timestamp_databases', (new Date()).getTime());
           }
         }
       });
@@ -208,9 +208,9 @@ function hac_getDatabases(callback) {
         }
         else {
           if (data.databases) {
-            $.totalStorage(hac_getTotalStorageUserPrefix() + 'databases', data.databases);
-            $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_databases', (new Date()).getTime());
-            callback($.totalStorage(hac_getTotalStorageUserPrefix() + 'databases'));
+            hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'databases', data.databases);
+            hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'timestamp_databases', (new Date()).getTime());
+            callback(hueUtils.hueLocalStorage(hac_getLocalStorageUserPrefix() + 'databases'));
           }
         }
       }

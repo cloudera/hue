@@ -632,7 +632,7 @@ ${ utils.submit_popup_event() }
 
 
   % if ENABLE_DOCUMENT_ACTION.get():
-  var defaultSection = apiHelper.getFromTotalStorage('oozie', 'draggable_section', 'documents');
+  var defaultSection = apiHelper.getFromLocalStorage('oozie', 'draggable_section', 'documents');
   % else:
   var defaultSection = 'actions';
   % endif
@@ -887,7 +887,7 @@ ${ utils.submit_popup_event() }
     }, 'oozie');
 
     huePubSub.subscribe('oozie.draggable.section.change', function(val){
-      apiHelper.setInTotalStorage('oozie', 'draggable_section', val);
+      apiHelper.setInLocalStorage('oozie', 'draggable_section', val);
     });
 
     $(document).on("click", ".widget-main-section", function (e) {

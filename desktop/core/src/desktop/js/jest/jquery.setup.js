@@ -16,7 +16,6 @@
 
 import $ from 'jquery';
 import 'jquery.cookie';
-import 'ext/jquery.total-storage.1.1.3.min';
 
 global.$ = $;
 global.jQuery = $;

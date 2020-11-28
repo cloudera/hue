@@ -138,7 +138,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
   huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
   huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
 
-  if (location.getParameter('refresh') === 'true') {
+  if (hueUtils.getParameter('refresh') === 'true') {
     // TODO: Use connectors in the table browser
     const connector = {
       id: viewModel.source().type,

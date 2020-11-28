@@ -923,7 +923,7 @@ ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode 
       self.apiHelper = window.apiHelper;
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
-      self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+      self.apiHelper.withLocalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
       // wizard related
       self.wizardEnabled = ko.observable(false);

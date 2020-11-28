@@ -97,7 +97,7 @@ function RdbmsViewModel() {
     });
     self.servers(newServers);
 
-    var last = $.totalStorage('hueRdbmsLastServer') || ((newServers[0].length > 0) ? newServers[0].name() : null);
+    var last = hueUtils.hueLocalStorage('hueRdbmsLastServer') || ((newServers[0].length > 0) ? newServers[0].name() : null);
     if (last) {
       self.server(last);
       $.each(self.servers(), function(index, server) {
@@ -114,7 +114,7 @@ function RdbmsViewModel() {
     self.databases(databases);
 
     var key = 'hueRdbmsLastDatabase-' + self.server().name();
-    var last = $.totalStorage(key) || ((databases.length > 0) ? databases[0] : null);
+    var last = hueUtils.hueLocalStorage(key) || ((databases.length > 0) ? databases[0] : null);
     if (last) {
       self.database(last);
       self.chosenDatabase(last);
@@ -145,7 +145,7 @@ function RdbmsViewModel() {
       self.initialChoose = false;
     }
     else {
-      $.totalStorage('hueRdbmsLastServer', self.server().name());
+      hueUtils.hueLocalStorage('hueRdbmsLastServer', self.server().name());
     }
     self.fetchDatabases();
   });

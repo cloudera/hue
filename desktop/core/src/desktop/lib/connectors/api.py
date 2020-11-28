@@ -52,10 +52,9 @@ def get_connectors_instances(request):
   })
 
 
-def new_connector(request, dialect):
-  instance = get_connector_by_type(dialect)
+def new_connector(request, dialect, interface):
+  instance = get_connector_by_type(dialect, interface)
 
-  instance['nice_name'] = dialect.title()
   instance['id'] = None
 
   return JsonResponse({'connector': instance})
@@ -90,6 +89,7 @@ def update_connector(request):
       name=connector['nice_name'],
       description='',
       dialect=connector['dialect'],
+      interface=connector['interface'],
       settings=json.dumps(connector['settings'])
     )
     connector['id'] = instance.id

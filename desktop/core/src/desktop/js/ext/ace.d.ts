@@ -21,6 +21,7 @@ declare namespace Ace {
     $blockScrolling: number;
     addError(message:string, line:number): void;
     addWarning(message:string, line:number): void;
+    clearSelection(): void;
     container: HTMLElement;
     commands: {
       addCommand(command: {
@@ -49,11 +50,15 @@ declare namespace Ace {
       removeKeyboardHandler(hashHandler: HashHandler): void;
     }
     lastChangeTime: number;
+    moveCursorTo(row: number, col: number): void;
+    moveCursorToPosition(position: Position): void;
     off(ev: string, callback: ((e: any) => any) | number): void;
     on(event: string, fn: (e: any) => any): number;
     removeTextAfterCursor(length: number): void;
+    removeTextBeforeCursor(length: number): void;
     renderer: {
       scrollLeft: number;
+      scroller: HTMLElement;
       gutterWidth: number;
       lineHeight: number;
       layerConfig: {
@@ -67,7 +72,7 @@ declare namespace Ace {
       scrollCursorIntoView(position?: Position, u?: number): void;
       textToScreenCoordinates(row: number, column: number): { pageX: number; pageY: number }
     };
-    resize(force: boolean): void;
+    resize(force?: boolean): void;
     scrollToLine(line: number, u: boolean, v: boolean, callback: () => void): void;
     selection: {
       getRange(): Range;
@@ -112,6 +117,7 @@ declare namespace Ace {
   export interface Document {
     createAnchor(position: Position): Anchor;
     createAnchor(x: number, y: number): Anchor;
+    replace(range: Range, text: string): void;
   }
 
   export interface Anchor extends Position {
@@ -123,6 +129,7 @@ declare namespace Ace {
   }
 
   export interface Marker {
+    id: number;
     clazz: string;
     dispose(): void;
     range: Range;
@@ -134,10 +141,12 @@ declare namespace Ace {
     addGutterDecoration(line: number, clazz: string): void;
     addMarker(range: Range, clazz: string): number;
     doc: Document;
+    getDocument(): Document;
     getLine(row: number): number;
     getTextRange(range: SimpleRange): string;
     getTokenAt(row: number, column: number): HueToken | null;
     getTokens(line?: number): HueToken[];
+    insert(position: Position, text: string): void;
     remove(range: Range): void;
     removeGutterDecoration(line: number, clazz: string): void;
     removeMarker(markerId: number): void;

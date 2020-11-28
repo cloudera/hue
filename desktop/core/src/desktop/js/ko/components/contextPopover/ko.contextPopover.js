@@ -569,7 +569,7 @@ class ContextPopoverViewModel {
     self.left = ko.observable(0);
     self.top = ko.observable(0);
 
-    const popoverSize = apiHelper.getFromTotalStorage('assist', 'popover.size', {
+    const popoverSize = apiHelper.getFromLocalStorage('assist', 'popover.size', {
       width: 450,
       height: 400
     });

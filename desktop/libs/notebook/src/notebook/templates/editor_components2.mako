@@ -83,7 +83,7 @@
           $('#queryBuilder').hide();
           $('#queryBuilderAlert').show();
         }
-      }, 500, 'editor' + (window.location.getParameter('type') ? '-' + window.location.getParameter('type') : ''));
+      }, 500, 'editor' + (hueUtils.getParameter('type') ? '-' + hueUtils.getParameter('type') : ''));
 
     </script>
     <!-- End query builder imports -->
@@ -907,11 +907,15 @@
             },
             'value-changed': function (event) {
               statement_raw(event.detail);
+            },
+            'cursor-changed': function (event) {
+              aceCursorPosition(event.detail);
             }
           },
           vueKoProps: {
             executor: executor,
             valueObservable: statement_raw,
+            cursorPositionObservable: aceCursorPosition,
             idObservable: id,
             aceOptions: {
               showLineNumbers: $root.editorMode(),
@@ -1232,15 +1236,9 @@
   </script>
 
   <script type="text/html" id="snippet-code-resizer${ suffix }">
-##     <div class="snippet-code-resizer" data-bind="
-##         aceResizer : {
-##           snippet: $data,
-##           target: '.ace-container-resizable',
-##           onStart: function () { huePubSub.publish('result.grid.hide.fixed.headers') },
-##           onStop: function () { huePubSub.publish('result.grid.redraw.fixed.headers') }
-##         }">
-##       <i class="fa fa-ellipsis-h"></i>
-##     </div>
+    <editor-resizer-ko-bridge data-bind="vueKoProps: {
+      editorObservable: ace
+    }"></editor-resizer-ko-bridge>
   </script>
 
   <script type="text/html" id="notebook-snippet-type-controls${ suffix }">

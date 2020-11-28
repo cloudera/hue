@@ -169,12 +169,12 @@ CONNECTOR_TYPES = [
     'dialect': 'sparksql',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'api_url', 'value': 'http://sparksql-thrift-server:10000'},
+      {'name': 'url', 'value': 'hive://sparksql-thrift-server:10000'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
-    'description': '',
+    'description': 'Via Thrift Server and SqlAlchemy interface',
     'properties': {
       'is_sql': True,
       'sql_identifier_quote': '`',
@@ -192,8 +192,37 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Livy",
-    'dialect': 'livy',
+    'nice_name': "SparkSQL",
+    'dialect': 'sparksql',
+    'interface': 'hiveserver2',
+    'settings': [
+      {'name': 'server_host', 'value': ''},
+      {'name': 'server_port', 'value': ''},
+      {'name': 'impersonation_enabled', 'value': False},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
+    ],
+    'category': 'editor',
+    'description': 'Via Thrift Server and Hive interface',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
+      'trim_statement_semicolon': False,
+    }
+  },
+  {
+    'nice_name': "SparkSQL",
+    'dialect': 'sparksql',
     'interface': 'livy',
     'settings': [
       {'name': 'api_url', 'value': 'http://localhost:8998'},
@@ -201,7 +230,7 @@ CONNECTOR_TYPES = [
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'category': 'editor',
-    'description': '',
+    'description': 'Via Livy server',
     'properties': {
       'is_sql': True,
       'sql_identifier_quote': '`',
@@ -387,7 +416,11 @@ CONNECTOR_TYPES = [
     'dialect': 'athena',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'awsathena+rest://XXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch'},
+      {
+        'name': 'url',
+        'value': 'awsathena+rest://XXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:'
+            '443/default?s3_staging_dir=s3://gethue-athena/scratch'
+      },
     ],
     'category': 'editor',
     'description': '',
@@ -600,7 +633,13 @@ CONNECTOR_TYPES = [
   {'nice_name': "Pig", 'dialect': 'pig', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
   {'nice_name': "Java", 'dialect': 'java', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
 
-  {'nice_name': "HDFS", 'dialect': 'hdfs', 'interface': 'rest', 'settings': [{'name': 'server_url', 'value': 'http://localhost:9870/webhdfs/v1'}, {'name': 'default_fs', 'value': 'fs_defaultfs=hdfs://localhost:8020'}], 'category': 'browsers', 'description': '', 'properties': {}},
+  {'nice_name': "HDFS", 'dialect': 'hdfs', 'interface': 'rest',
+    'settings': [
+      {'name': 'server_url', 'value': 'http://localhost:9870/webhdfs/v1'},
+      {'name': 'default_fs', 'value': 'fs_defaultfs=hdfs://localhost:8020'}
+    ],
+    'category': 'browsers', 'description': '', 'properties': {}
+  },
   {'nice_name': "YARN", 'dialect': 'yarn', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
   {'nice_name': "S3", 'dialect': 's3', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
   {'nice_name': "ADLS", 'dialect': 'adls-v1', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
@@ -616,8 +655,15 @@ CONNECTOR_TYPES = [
     'description': '',
     'properties': {}
   },
-  {'nice_name': "Atlas", 'dialect': 'atlas', 'interface': 'rest', 'settings': [], 'category': 'catalogs', 'description': '', 'properties': {}},
-  {'nice_name': "Navigator", 'dialect': 'navigator', 'interface': 'rest', 'settings': [], 'category': 'catalogs', 'description': '', 'properties': {}},
+  {
+    'nice_name': "Atlas", 'dialect': 'atlas', 'interface': 'rest', 'settings': [], 'category': 'catalogs', 'description': '',
+    'properties': {}
+  },
+  {
+    'nice_name': "Navigator", 'dialect': 'navigator', 'interface': 'rest', 'settings': [], 'category': 'catalogs',
+    'description': '',
+    'properties': {}
+  },
 
   {'nice_name': "Optimizer", 'dialect': 'optimizer', 'settings': [], 'category': 'optimizers', 'description': '', 'properties': {}},
 
@@ -647,8 +693,11 @@ def get_connectors_types():
 def get_connector_categories():
   return CATEGORIES
 
-def get_connector_by_type(dialect):
-  instance = [connector for connector in get_connectors_types() if connector['dialect'] == dialect]
+def get_connector_by_type(dialect, interface):
+  instance = [
+    connector
+    for connector in get_connectors_types() if connector['dialect'] == dialect and connector['interface'] == interface
+  ]
 
   if instance:
     return instance[0]

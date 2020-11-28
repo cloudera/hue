@@ -85,7 +85,7 @@ ko.bindingHandlers.assistVerticalResizer = {
       return;
     }
 
-    const panelRatios = apiHelper.getFromTotalStorage('assist', 'innerPanelRatios', {});
+    const panelRatios = apiHelper.getFromLocalStorage('assist', 'innerPanelRatios', {});
 
     let totalRatios = 0;
     $.each($allPanels, (idx, panel) => {
@@ -253,7 +253,7 @@ ko.bindingHandlers.assistVerticalResizer = {
             panelRatios[panelDefinitions()[idx].type] =
               $(panel).outerHeight(true) / totalHeightForPanels;
           });
-          apiHelper.setInTotalStorage('assist', 'innerPanelRatios', panelRatios);
+          apiHelper.setInLocalStorage('assist', 'innerPanelRatios', panelRatios);
         }
       });
     });

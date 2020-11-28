@@ -41,7 +41,7 @@ class MetastoreViewModel {
     this.partitionsLimit = options.partitionsLimit;
     this.assistAvailable = ko.observable(true);
     this.isLeftPanelVisible = ko.observable();
-    apiHelper.withTotalStorage('assist', 'assist_panel_visible', this.isLeftPanelVisible, true);
+    apiHelper.withLocalStorage('assist', 'assist_panel_visible', this.isLeftPanelVisible, true);
     this.optimizerEnabled = ko.observable(options.optimizerEnabled || false);
     this.navigatorEnabled = ko.observable(options.navigatorEnabled || false);
     this.appConfig = ko.observable();
@@ -406,9 +406,9 @@ class MetastoreViewModel {
 
       if (
         !namespaceId &&
-        apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedNamespace')
+        apiHelper.getFromLocalStorage('contextSelector', 'lastSelectedNamespace')
       ) {
-        namespaceId = apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedNamespace').id;
+        namespaceId = apiHelper.getFromLocalStorage('contextSelector', 'lastSelectedNamespace').id;
       }
 
       this.source().lastLoadNamespacesDeferred.done(() => {

@@ -19,121 +19,124 @@ import * as ko from 'knockout';
 import qq from 'ext/fileuploader.custom';
 
 import huePubSub from 'utils/huePubSub';
+import { hueLocalStorage } from 'utils/hueUtils';
 import I18n from 'utils/i18n';
 
 /*
  * jHue fileChooser plugin
  */
 
-const pluginName = 'jHueFileChooser',
-  defaults = {
-    initialPath: '',
-    forceRefresh: false,
-    errorRedirectPath: '',
-    createFolder: true,
-    uploadFile: true,
-    selectFolder: false,
-    suppressErrors: false,
-    displayOnlyFolders: false,
-    showExtraHome: false,
-    extraHomeProperties: {},
-    filterExtensions: '',
-    labels: {
-      BACK: 'Back',
-      SELECT_FOLDER: 'Select this folder',
-      CREATE_FOLDER: 'Create folder',
-      FOLDER_NAME: 'Folder name',
-      CANCEL: 'Cancel',
-      FILE_NOT_FOUND: 'The file has not been found',
-      UPLOAD_FILE: 'Upload a file',
-      FAILED: 'Failed',
-      HOME: 'Home'
-    },
-    filesystems: ['hdfs'],
-    filesysteminfo: {
-      '': {
-        scheme: '',
-        root: '/',
-        home: '/?default_to_home',
-        icon: {
-          brand: 'fa-files-o',
-          home: 'fa-home'
-        },
-        label: {
-          home: 'home',
-          name: 'HDFS'
-        }
+const pluginName = 'jHueFileChooser';
+
+const defaults = {
+  initialPath: '',
+  forceRefresh: false,
+  errorRedirectPath: '',
+  createFolder: true,
+  uploadFile: true,
+  selectFolder: false,
+  suppressErrors: false,
+  displayOnlyFolders: false,
+  showExtraHome: false,
+  extraHomeProperties: {},
+  filterExtensions: '',
+  labels: {
+    BACK: 'Back',
+    SELECT_FOLDER: 'Select this folder',
+    CREATE_FOLDER: 'Create folder',
+    FOLDER_NAME: 'Folder name',
+    CANCEL: 'Cancel',
+    FILE_NOT_FOUND: 'The file has not been found',
+    UPLOAD_FILE: 'Upload a file',
+    FAILED: 'Failed',
+    HOME: 'Home'
+  },
+  filesystems: ['hdfs'],
+  filesysteminfo: {
+    '': {
+      scheme: '',
+      root: '/',
+      home: '/?default_to_home',
+      icon: {
+        brand: 'fa-files-o',
+        home: 'fa-home'
       },
-      hdfs: {
-        scheme: '',
-        root: '/',
-        home: '/?default_to_home',
-        icon: {
-          brand: 'fa-files-o',
-          home: 'fa-home'
-        },
-        label: {
-          home: 'home',
-          name: 'HDFS'
-        }
-      },
-      s3a: {
-        scheme: 's3a',
-        root: 's3a://',
-        home: 's3a://',
-        icon: {
-          brand: 'fa-cubes',
-          home: 'fa-cubes'
-        },
-        label: {
-          home: '',
-          name: 'S3'
-        }
-      },
-      adl: {
-        scheme: 'adl',
-        root: 'adl:/',
-        home: 'adl:/',
-        icon: {
-          svg: {
-            brand: '#hi-adls',
-            home: '#hi-adls'
-          },
-          brand: 'fa-windows',
-          home: 'fa-windows'
-        },
-        label: {
-          home: '',
-          name: 'ADLS'
-        }
-      },
-      abfs: {
-        scheme: 'abfs',
-        root: 'abfs://',
-        home: 'abfs://',
-        icon: {
-          svg: {
-            brand: '#hi-adls',
-            home: '#hi-adls'
-          },
-          brand: 'fa-windows',
-          home: 'fa-windows'
-        },
-        label: {
-          home: '',
-          name: 'ABFS'
-        }
+      label: {
+        home: 'home',
+        name: 'HDFS'
       }
     },
-    fsSelected: 'hdfs',
-    user: '',
-    onNavigate: function () {},
-    onFileChoose: function () {},
-    onFolderChoose: function () {},
-    onFolderChange: function () {},
-    onError: function () {}
+    hdfs: {
+      scheme: '',
+      root: '/',
+      home: '/?default_to_home',
+      icon: {
+        brand: 'fa-files-o',
+        home: 'fa-home'
+      },
+      label: {
+        home: 'home',
+        name: 'HDFS'
+      }
+    },
+    s3a: {
+      scheme: 's3a',
+      root: 's3a://',
+      home: 's3a://',
+      icon: {
+        brand: 'fa-cubes',
+        home: 'fa-cubes'
+      },
+      label: {
+        home: '',
+        name: 'S3'
+      }
+    },
+    adl: {
+      scheme: 'adl',
+      root: 'adl:/',
+      home: 'adl:/',
+      icon: {
+        svg: {
+          brand: '#hi-adls',
+          home: '#hi-adls'
+        },
+        brand: 'fa-windows',
+        home: 'fa-windows'
+      },
+      label: {
+        home: '',
+        name: 'ADLS'
+      }
+    },
+    abfs: {
+      scheme: 'abfs',
+      root: 'abfs://',
+      home: 'abfs://',
+      icon: {
+        svg: {
+          brand: '#hi-adls',
+          home: '#hi-adls'
+        },
+        brand: 'fa-windows',
+        home: 'fa-windows'
+      },
+      label: {
+        home: '',
+        name: 'ABFS'
+      }
+    }
   },
-  STORAGE_PREFIX = 'hueFileBrowserLastPathForUser_';
+  fsSelected: 'hdfs',
+  user: '',
+  onNavigate: function () {},
+  onFileChoose: function () {},
+  onFolderChoose: function () {},
+  onFolderChange: function () {},
+  onError: function () {}
+};
+
+const STORAGE_PREFIX = 'hueFileBrowserLastPathForUser_';
 
 const DEFAULT_I18n = {
   BACK: I18n('Back'),
@@ -177,16 +180,20 @@ Plugin.prototype.setOptions = function (options) {
     if (initialPath != '') {
       self.navigateTo(self.options.initialPath);
     } else if (
-      $.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null
+      hueLocalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null
     ) {
-      self.navigateTo($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected));
+      self.navigateTo(
+        hueLocalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected)
+      );
     } else {
       self.navigateTo('/?default_to_home');
     }
   } else if (initialPath != '') {
     self.navigateTo(self.options.initialPath);
-  } else if ($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null) {
-    self.navigateTo($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected));
+  } else if (
+    hueLocalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null
+  ) {
+    self.navigateTo(hueLocalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected));
   }
 };
 
@@ -246,7 +253,7 @@ Plugin.prototype.setFileSystems = function (filesystems) {
         $(this).siblings().removeClass('active');
         $(this).addClass('active');
         self.options.fsSelected = fs;
-        const storedPath = $.totalStorage(
+        const storedPath = hueLocalStorage(
           STORAGE_PREFIX + self.options.user + self.options.fsSelected
         );
         if (storedPath !== null) {
@@ -353,11 +360,12 @@ Plugin.prototype.navigateTo = function (path) {
         });
       _previousLink.appendTo($(_parent.element).find('.filechooser-tree'));
     } else {
-      if (data.type == 'file') {
+      if (data.type === 'file') {
         _parent.navigateTo(data.view.dirname);
         return;
       }
-      $.totalStorage(STORAGE_PREFIX + _parent.options.user + _parent.options.fsSelected, path);
+      hueLocalStorage(STORAGE_PREFIX + _parent.options.user + _parent.options.fsSelected, path);
+
       _parent.previousPath = path;
       _parent.options.onNavigate(_parent.previousPath);
 
@@ -813,9 +821,11 @@ Plugin.prototype.init = function () {
     if (initialPath != '') {
       self.navigateTo(self.options.initialPath);
     } else if (
-      $.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null
+      hueLocalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null
     ) {
-      self.navigateTo($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected));
+      self.navigateTo(
+        hueLocalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected)
+      );
     } else {
       self.navigateTo('/?default_to_home');
     }

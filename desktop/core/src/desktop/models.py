@@ -129,7 +129,10 @@ if not ENABLE_ORGANIZATIONS.get():
 
 
 class UserPreferences(models.Model):
-  """Holds arbitrary key/value strings."""
+  """
+  Holds arbitrary key/value strings.
+  Note: ideally user/jkeu should be unique together.
+  """
   user = models.ForeignKey(User)
   key = models.CharField(max_length=20)
   value = models.TextField(max_length=4096)
@@ -1723,7 +1726,8 @@ class ClusterConfig(object):
           editors,
           app_config.get('dashboard'),
           app_config.get('scheduler')
-        ] if app is not None
+        ]
+        if app is not None
       ],
       'default_sql_interpreter': default_sql_interpreter,
       'cluster_type': self.cluster_type,
@@ -1758,15 +1762,18 @@ class ClusterConfig(object):
     default_interpreter = default_app.get('interpreters')
 
     try:
-      user_default_app = json.loads(
-        UserPreferences.objects.get(user=self.user, key='default_app').value
-      )
+      user_preference = get_user_preferences(user=self.user, key='default_app')
+      if not user_preference:
+        raise UserPreferences.DoesNotExist()
+      user_default_app = json.loads(user_preference.value)
       if apps.get(user_default_app['app']):
         default_interpreter = []
         default_app = apps[user_default_app['app']]
         if default_app.get('interpreters'):
-          interpreters = [interpreter for interpreter in default_app['interpreters']
-                          if interpreter['type'] == user_default_app['interpreter']]
+          interpreters = [
+            interpreter
+            for interpreter in default_app['interpreters'] if interpreter['type'] == user_default_app['interpreter']
+          ]
           if interpreters:
             default_interpreter = interpreters
     except UserPreferences.DoesNotExist:
@@ -2177,8 +2184,13 @@ def get_user_preferences(user, key=None):
       return {key: x.value}
     except UserPreferences.DoesNotExist:
       return None
+    except UserPreferences.MultipleObjectsReturned:
+      for dup in UserPreferences.objects.filter(user=user, key=key)[1:]:
+        LOG.warn('Deleting UserPreferences duplicate %s' % dup)
+        dup.delete()
   else:
     return dict((x.key, x.value) for x in UserPreferences.objects.filter(user=user))
+
 
 
 def set_user_preferences(user, key, value):
