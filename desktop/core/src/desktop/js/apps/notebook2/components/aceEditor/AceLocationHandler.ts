@@ -17,7 +17,6 @@
 import { Ace } from 'ext/ace';
 import ace from 'ext/aceHelper';
 
-import apiHelper from 'api/apiHelper';
 import Executor from 'apps/notebook2/execution/executor';
 import DataCatalogEntry from 'catalog/dataCatalogEntry';
 import SubscriptionTracker, { Disposable } from 'components/utils/SubscriptionTracker';
@@ -44,6 +43,7 @@ import {
   POST_TO_LOCATION_WORKER_EVENT,
   POST_TO_SYNTAX_WORKER_EVENT
 } from 'sql/sqlWorkerHandler';
+import { getFromLocalStorage } from 'utils/storageUtils';
 
 export interface ActiveStatementChangedEvent {
   id: string;
@@ -825,9 +825,8 @@ export default class AceLocationHandler implements Disposable {
         return;
       }
 
-      const suppressedRules = apiHelper.getFromLocalStorage(
-        'hue.syntax.checker',
-        'suppressedRules',
+      const suppressedRules = getFromLocalStorage<{ [key: string]: boolean }>(
+        'hue.syntax.checker.suppressedRules',
         {}
       );
       if (

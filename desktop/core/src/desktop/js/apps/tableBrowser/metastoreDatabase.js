@@ -17,9 +17,9 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
 import MetastoreTable from 'apps/tableBrowser/metastoreTable';
+import { setInLocalStorage } from 'utils/storageUtils';
 
 class MetastoreDatabase {
   /**
@@ -179,7 +179,7 @@ class MetastoreDatabase {
         this.loadingAnalysis(false);
       });
 
-    apiHelper.setInLocalStorage('metastore', 'last.selected.database', this.name);
+    setInLocalStorage('metastore.last.selected.database', this.name);
   }
 
   setTableByName(tableName, callback) {

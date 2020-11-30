@@ -17,11 +17,11 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
-import AssistDbEntry from 'ko/components/assist/assistDbEntry';
-import dataCatalog from 'catalog/dataCatalog';
-import huePubSub from 'utils/huePubSub';
 import { ASSIST_ACTIVE_DB_CHANGED_EVENT } from './events';
+import dataCatalog from 'catalog/dataCatalog';
+import AssistDbEntry from 'ko/components/assist/assistDbEntry';
+import huePubSub from 'utils/huePubSub';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 class AssistDbNamespace {
   /**
@@ -156,18 +156,16 @@ class AssistDbNamespace {
         }
         if (!self.navigationSettings.rightAssist) {
           const entry = self.selectedDatabase().catalogEntry;
-          apiHelper.setInLocalStorage(
-            'assist_' + entry.getConnector().id + '_' + entry.namespace.id,
-            'lastSelectedDb',
+          setInLocalStorage(
+            'assist_' + entry.getConnector().id + '_' + entry.namespace.id + '.lastSelectedDb',
             entry.name
           );
           huePubSub.publish('assist.database.set', entry);
         }
       } else {
-        apiHelper.setInLocalStorage(
-          'assist_' + self.connector.id + '_' + self.namespace.id,
-          'lastSelectedDb',
-          ''
+        setInLocalStorage(
+          'assist_' + self.connector.id + '_' + self.namespace.id + '.lastSelectedDb',
+          null
         );
       }
     };
@@ -189,9 +187,8 @@ class AssistDbNamespace {
         self.selectedDatabaseChanged();
         return;
       }
-      let lastSelectedDb = apiHelper.getFromLocalStorage(
-        'assist_' + self.sourceType + '_' + self.namespace.id,
-        'lastSelectedDb'
+      let lastSelectedDb = getFromLocalStorage(
+        'assist_' + self.sourceType + '_' + self.namespace.id + '.lastSelectedDb'
       );
 
       if (!lastSelectedDb && lastSelectedDb !== '') {

@@ -1170,8 +1170,6 @@ var autocompleter = new AceAutocompleteWrapper({
   timeout: AUTOCOMPLETE_TIMEOUT
 });
 
-var localStorageUserPrefix = apiHelper.getlocalStorageUserPrefix(snippetType);
-
 var truncateOutput = function (obj) {
   //default to 20 characters (column output displays first 21 chars so we need to consider the length of both column name and type
   var chars = obj.chars || 20,
@@ -1709,9 +1707,9 @@ $(document).ready(function () {
   });
 
   % if not (design and design.id) and not ( query_history and query_history.id ):
-    if (hueUtils.hueLocalStorage(localStorageUserPrefix + "${app_name}_temp_query") != null && hueUtils.hueLocalStorage(localStorageUserPrefix + "${app_name}_temp_query") != "") {
+    if (hueUtils.hueLocalStorage("${app_name}_temp_query") != null && hueUtils.hueLocalStorage("${app_name}_temp_query") != "") {
       viewModel.queryEditorBlank(true);
-      codeMirror.setValue(hueUtils.hueLocalStorage(localStorageUserPrefix + "${app_name}_temp_query"));
+      codeMirror.setValue(hueUtils.hueLocalStorage("${app_name}_temp_query"));
     }
   % endif
 
@@ -2089,7 +2087,7 @@ function addResults(viewModel, dataTable, startRow, nextRow) {
 
 function resultsTable(e, data) {
   $("#results .dataTables_wrapper").animate({opacity: '1'}, 50);
-  hueUtils.hueLocalStorage(localStorageUserPrefix + "${app_name}_temp_query", null);
+  hueUtils.hueLocalStorage("${app_name}_temp_query", null);
   if (viewModel.design.results.columns().length > 0) {
     if (!dataTable) {
       if (viewModel.design.results.columns().length < 500) {
@@ -2369,7 +2367,7 @@ function tryCancelQuery() {
 }
 
 function createNewQuery() {
-  hueUtils.hueLocalStorage(localStorageUserPrefix + "${app_name}_temp_query", null);
+  hueUtils.hueLocalStorage("${app_name}_temp_query", null);
   location.href="${ url(app_name + ':execute_query') }";
 }
 
@@ -2765,7 +2763,7 @@ function cacheQueryTextEvents() {
     if (typeof codeMirror != "undefined") {
       codeMirror.on("change", function () {
         $(".query").val(codeMirror.getValue());
-        hueUtils.hueLocalStorage(localStorageUserPrefix + "${app_name}_temp_query", codeMirror.getValue());
+        hueUtils.hueLocalStorage("${app_name}_temp_query", codeMirror.getValue());
       });
       window.clearInterval(_waitForCodemirrorInit);
     }

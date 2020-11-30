@@ -17,7 +17,6 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
 import AssistInnerPanel from 'ko/components/assist/assistInnerPanel';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
@@ -29,6 +28,7 @@ import {
   ASSIST_SHOW_SQL_EVENT,
   SHOW_LEFT_ASSIST_EVENT
 } from './events';
+import { withLocalStorage } from 'utils/storageUtils';
 
 const TEMPLATE = `
   <script type="text/html" id="assist-panel-inner-header">
@@ -68,7 +68,7 @@ class AssistPanel {
    * @param {Object} params
    * @param {string} params.user
    * @param {boolean} params.onlySql - For the old query editors
-   * @param {string[]} params.visibleAssistPanels - Panels that will initially be shown regardless of total storage
+   * @param {string[]} params.visibleAssistPanels - Panels that will initially be shown regardless of localStorage
    * @param {Object} params.sql
    * @param {Object} params.sql.navigationSettings - enable/disable the links
    * @param {boolean} params.sql.navigationSettings.openItem - Example: true
@@ -92,7 +92,7 @@ class AssistPanel {
     self.visiblePanel = ko.observable();
 
     self.lastOpenPanelType = ko.observable();
-    apiHelper.withLocalStorage('assist', 'last.open.panel', self.lastOpenPanelType);
+    withLocalStorage('assist.last.open.panel', self.lastOpenPanelType);
 
     // TODO: Support dynamic config changes
     huePubSub.publish(GET_KNOWN_CONFIG_EVENT, clusterConfig => {

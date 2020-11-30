@@ -34,11 +34,6 @@ class HdfsAutocompleter {
     self.timeout = options.timeout;
   }
 
-  getlocalStorageUserPrefix() {
-    const self = this;
-    return self.user;
-  }
-
   hasExpired(timestamp) {
     return new Date().getTime() - timestamp > TIME_TO_LIVE_IN_MILLIS;
   }

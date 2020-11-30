@@ -23,12 +23,13 @@
 </template>
 
 <script lang="ts">
-  import { formatSql } from 'apps/notebook2/apiUtils';
   import $ from 'jquery';
-  import { hueLocalStorage } from 'utils/hueUtils';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop, Watch } from 'vue-property-decorator';
+
+  import { formatSql } from 'apps/notebook2/apiUtils';
+  import { hueLocalStorage } from 'utils/storageUtils';
 
   interface Ace {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
