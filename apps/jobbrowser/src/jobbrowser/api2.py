@@ -169,27 +169,42 @@ def profile(request):
     response['status'] = 0
     return JsonResponse(response)
 
+def _query_store_proxy(request, path=None):
+  response = {'status': -1}
+
+  headers = {
+    'x-do-as': request.user.username,
+    'X-Requested-By': 'das',
+    'Content-Type': 'application/json; charset=UTF-8'
+  }
+
+  client = HttpClient(QUERY_STORE.SERVER_URL.get())
+  resource = Resource(client)
+
+  if USE_SASL.get():
+    client.set_kerberos_auth()
+
+  try:
+    response = resource.invoke(request.method, path, request.GET.dict(), request.body, headers)
+  except RestException as e:
+    ex_response = e.get_parent_ex().response
+
+    if ex_response is not None:
+      response['code'] = ex_response.status_code
+      response['message'] = ex_response.reason
+      response['content'] = ex_response.text
+    else:
+      response['message'] = 'Query store not reachable!'
+      response['content'] = e.message
+
+  return response
 
 @api_error_handler
 def query_store_api(request, path=None):
   response = {'status': -1}
 
   if USE_PROXY.get():
-    content_type = 'application/json; charset=UTF-8'
-    headers = {'X-Requested-By': 'das', 'Content-Type': content_type}
-
-    client = HttpClient(QUERY_STORE.SERVER_URL.get())
-    resource = Resource(client)
-    if USE_SASL.get():
-      client.set_kerberos_auth()
-
-    try:
-      response = resource.invoke(request.method, path, request.GET.dict(), request.body, headers)
-    except RestException as e:
-      ex_response = e.get_parent_ex().response
-      response['code'] = ex_response.status_code
-      response['message'] = ex_response.reason
-      response['content'] = ex_response.text
+    response = _query_store_proxy(request, path)
   else:
     if path == 'api/query/search':
       filters = json.loads(request.body)
