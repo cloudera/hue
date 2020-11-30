@@ -37,8 +37,8 @@ const GENERIC = 'generic';
 const KEYWORD_REFS: { [attr: string]: () => Promise<{ RESERVED_WORDS?: Set<string> }> } = {
   calcite: async () => import(/* webpackChunkName: "calcite-ref" */ './calcite/reservedKeywords'),
   generic: async () => import(/* webpackChunkName: "generic-ref" */ './generic/reservedKeywords'),
-  hive: async () => import(/* webpackChunkName: "impala-ref" */ './hive/reservedKeywords'),
-  impala: async () => import(/* webpackChunkName: "hive-ref" */ './impala/reservedKeywords'),
+  hive: async () => import(/* webpackChunkName: "hive-ref" */ './hive/reservedKeywords'),
+  impala: async () => import(/* webpackChunkName: "impala-ref" */ './impala/reservedKeywords'),
   postgresql: async () =>
     import(/* webpackChunkName: "generic-ref" */ './postgresql/reservedKeywords'),
   presto: async () => import(/* webpackChunkName: "generic-ref" */ './presto/reservedKeywords')
