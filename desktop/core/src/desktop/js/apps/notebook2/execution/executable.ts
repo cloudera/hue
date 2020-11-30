@@ -260,7 +260,7 @@ export default abstract class Executable {
 
     let actualCheckCount = statusCheckCount || 0;
     if (!statusCheckCount) {
-      this.cancellables.push({
+      this.addCancellable({
         cancel: () => {
           window.clearTimeout(checkStatusTimeout);
         }
