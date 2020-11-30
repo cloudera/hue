@@ -136,7 +136,7 @@ class ExecutableLogs extends DisposableComponent {
   }
 
   updateFromExecutable(executable) {
-    this.hasResultset(executable.handle.has_result_set);
+    this.hasResultset(executable.handle && executable.handle.has_result_set);
     this.status(executable.status);
     this.sourceType(executable.sourceType);
     if (!this.compute) {

@@ -24,7 +24,6 @@
 </template>
 
 <script lang="ts">
-  import $ from 'jquery';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
@@ -33,12 +32,11 @@
   import { Ace } from 'ext/ace';
 
   import AceAutocomplete from './autocomplete/AceAutocomplete.vue';
-
+  import AceGutterHandler from './AceGutterHandler';
   import AceLocationHandler from './AceLocationHandler';
   import Executor from 'apps/notebook2/execution/executor';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import { INSERT_AT_CURSOR_EVENT } from 'ko/bindings/ace/ko.aceEditor';
-  import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
   import { CURSOR_POSITION_CHANGED_EVENT } from 'ko/bindings/ace/aceLocationHandler';
   import { IdentifierChainEntry, ParsedLocation } from 'parse/types';
   import { EditorInterpreter } from 'types/config';
@@ -135,9 +133,16 @@
         editor.customMenuOptions.getErrorHighlighting = () => errorHighlightingEnabled;
         editor.customMenuOptions.setClearIgnoredSyntaxChecks = () => {
           setInLocalStorage('hue.syntax.checker.suppressedRules', {});
-          $('#setClearIgnoredSyntaxChecks')
-            .hide()
-            .before('<div style="margin-top:5px;float:right;">done</div>');
+          const el = document.getElementById('setClearIgnoredSyntaxChecks');
+          if (!el || !el.parentNode) {
+            return;
+          }
+          el.style.display = 'none';
+          const doneElem = document.createElement('div');
+          doneElem.style.marginTop = '5px';
+          doneElem.style.float = 'right';
+          doneElem.innerText = 'done';
+          el.insertAdjacentElement('beforebegin', doneElem);
         };
         editor.customMenuOptions.getClearIgnoredSyntaxChecks = () => false;
       }
@@ -440,20 +445,18 @@
         setEnableAutocompleter: (enabled: boolean): void => {
           editor.setOption('enableBasicAutocompletion', enabled);
           setInLocalStorage('hue.ace.enableBasicAutocompletion', enabled);
-          const $enableLiveAutocompletionChecked = $('#setEnableLiveAutocompletion:checked');
-          const $setEnableLiveAutocompletion = $('#setEnableLiveAutocompletion');
-          if (enabled && $enableLiveAutocompletionChecked.length === 0) {
-            $setEnableLiveAutocompletion.trigger('click');
-          } else if (!enabled && $enableLiveAutocompletionChecked.length !== 0) {
-            $setEnableLiveAutocompletion.trigger('click');
+          const setElem = <HTMLInputElement>document.getElementById('setEnableLiveAutocompletion');
+          if (setElem && ((enabled && !setElem.checked) || (!enabled && setElem.checked))) {
+            setElem.click();
           }
         },
         getEnableAutocompleter: () => editor.getOption('enableBasicAutocompletion'),
         setEnableLiveAutocompletion: (enabled: boolean): void => {
           editor.setOption('enableLiveAutocompletion', enabled);
           setInLocalStorage('hue.ace.enableLiveAutocompletion', enabled);
-          if (enabled && $('#setEnableAutocompleter:checked').length === 0) {
-            $('#setEnableAutocompleter').trigger('click');
+          const setElem = <HTMLInputElement>document.getElementById('setEnableAutocompleter');
+          if (setElem && enabled && !setElem.checked) {
+            setElem.click();
           }
         },
         getEnableLiveAutocompletion: () => editor.getOption('enableLiveAutocompletion'),

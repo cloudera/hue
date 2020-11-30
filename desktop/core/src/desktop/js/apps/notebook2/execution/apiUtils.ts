@@ -217,16 +217,18 @@ export const executeStatement = async (options: ExecuteApiOptions): Promise<Exec
 
   executable.addCancellable({
     cancel: async () => {
+      if (executable.status !== EXECUTION_STATUS.running) {
+        return;
+      }
       try {
         const response = await executePromise;
         if (options.executable.handle !== response.handle) {
           options.executable.handle = response.handle;
         }
-        await cancelStatement(options);
-      } catch (err) {
-        console.warn('Failed cancelling statement');
-        console.warn(err);
-      }
+        if (response.handle) {
+          await cancelStatement(options);
+        }
+      } catch (err) {}
     }
   });
 

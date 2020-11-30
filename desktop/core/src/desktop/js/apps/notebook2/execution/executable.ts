@@ -58,7 +58,7 @@ export const EXECUTABLE_STATUS_TRANSITION_EVENT = 'hue.executable.status.transit
 export interface ExecutableRaw {
   executeEnded: number;
   executeStarted: number;
-  handle: ExecutionHandle;
+  handle?: ExecutionHandle;
   history?: ExecutionHistory;
   id: string;
   logs: ExecutionLogsRaw;
@@ -69,15 +69,15 @@ export interface ExecutableRaw {
   type: string;
 }
 
-const INITIAL_HANDLE: ExecutionHandle = {
-  statement_id: 0
-};
+// const INITIAL_HANDLE: ExecutionHandle = {
+//   statement_id: 0
+// };
 
 export default abstract class Executable {
   id: string = UUID();
   database?: string;
   executor: Executor;
-  handle: ExecutionHandle;
+  handle?: ExecutionHandle;
   operationId?: string;
   history?: ExecutionHistory;
   status = EXECUTION_STATUS.ready;
@@ -95,8 +95,6 @@ export default abstract class Executable {
 
   protected constructor(options: { executor: Executor }) {
     this.executor = options.executor;
-
-    this.handle = INITIAL_HANDLE;
     this.logs = new ExecutionLogs(this);
   }
 
@@ -226,12 +224,13 @@ export default abstract class Executable {
       } catch (err) {
         if (typeof err === 'string') {
           err = this.adaptError(err);
+          this.logs.errors.push(err);
+          this.logs.notify();
         }
-        this.logs.errors.push(err);
         throw err;
       }
 
-      if (this.handle.has_result_set && this.handle.sync) {
+      if (this.handle && this.handle.has_result_set && this.handle.sync) {
         this.result = new ExecutionResult(this);
         if (this.handle.sync) {
           if (this.handle.result) {
@@ -253,11 +252,15 @@ export default abstract class Executable {
   }
 
   async checkStatus(statusCheckCount?: number): Promise<void> {
+    if (!this.handle) {
+      return;
+    }
+
     let checkStatusTimeout = -1;
 
     let actualCheckCount = statusCheckCount || 0;
     if (!statusCheckCount) {
-      this.cancellables.push({
+      this.addCancellable({
         cancel: () => {
           window.clearTimeout(checkStatusTimeout);
         }
@@ -277,7 +280,7 @@ export default abstract class Executable {
         this.executeEnded = Date.now();
         this.setStatus(queryStatus.status);
         this.setProgress(100);
-        if (!this.result && this.handle.has_result_set) {
+        if (!this.result && this.handle && this.handle.has_result_set) {
           this.result = new ExecutionResult(this);
           this.result.fetchRows();
         }
@@ -378,7 +381,7 @@ export default abstract class Executable {
         await this.close();
       } catch (err) {}
     }
-    this.handle = INITIAL_HANDLE;
+    this.handle = undefined;
     this.setProgress(0);
     this.setStatus(EXECUTION_STATUS.ready);
   }
