@@ -22,7 +22,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const DIST_DIR = path.join(__dirname, 'npm_dist');
-const JS_ROOT =  path.join(__dirname, '/desktop/core/src/desktop/js');
+const JS_ROOT = path.join(__dirname, '/desktop/core/src/desktop/js');
 
 const defaultConfig = Object.assign({}, require('./webpack.config'), {
   mode: 'production',
@@ -39,18 +39,14 @@ const npmSetupPlugins = [
       { from: './package.json', to: `${DIST_DIR}/package.json` },
       { from: './NPM-README.md', to: `${DIST_DIR}/README.md` },
 
-      { from: `${JS_ROOT}/components`, to: `${DIST_DIR}/src/components` },
-      { from: `${JS_ROOT}/utils/hueUtils.ts`, to: `${DIST_DIR}/src/utils/hueUtils.ts` },
-
-      { from: `${JS_ROOT}/parse`, to: `${DIST_DIR}/src/parse` },
-      { from: `${JS_ROOT}/sql`, to: `${DIST_DIR}/src/sql` }
+      { from: JS_ROOT, to: `${DIST_DIR}/src` }
     ]
   })
 ];
 
 const webComponentsConfig = Object.assign({}, defaultConfig, {
   entry: {
-    'er-diagram': [`${JS_ROOT}/components/er-diagram/webcomp.ts`],
+    'er-diagram': [`${JS_ROOT}/components/er-diagram/webcomp.ts`]
   },
   output: {
     path: `${DIST_DIR}/components`
