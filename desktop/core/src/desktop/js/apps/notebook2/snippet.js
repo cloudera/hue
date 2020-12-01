@@ -954,37 +954,6 @@ export default class Snippet {
       });
     } else if (data.status === 1 || data.status === -1) {
       this.status(STATUS.failed);
-      const match = ERROR_REGEX.exec(data.message);
-      if (match) {
-        let errorLine = parseInt(match[1]);
-        let errorCol;
-        if (typeof match[3] !== 'undefined') {
-          errorCol = parseInt(match[3]);
-        }
-        if (this.positionStatement()) {
-          if (errorCol && errorLine === 1) {
-            errorCol += this.positionStatement().location.first_column;
-          }
-          errorLine += this.positionStatement().location.first_line - 1;
-        }
-
-        this.errors.push({
-          message: data.message.replace(
-            match[0],
-            'line ' + errorLine + (errorCol !== null ? ':' + errorCol : '')
-          ),
-          help: null,
-          line: errorLine - 1,
-          col: errorCol
-        });
-      } else {
-        this.errors.push({
-          message: data.message,
-          help: data.help,
-          line: null,
-          col: null
-        });
-      }
     } else {
       $(document).trigger('error', data.message);
       this.status(STATUS.failed);
