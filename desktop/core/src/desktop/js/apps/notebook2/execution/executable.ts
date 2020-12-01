@@ -91,6 +91,7 @@ export default abstract class Executable {
   nextExecutable?: Executable;
   observerState: { [key: string]: unknown } = {};
   lost = false;
+  edited = false;
 
   protected constructor(options: { executor: Executor }) {
     this.executor = options.executor;
@@ -190,6 +191,7 @@ export default abstract class Executable {
     if (!this.isReady()) {
       return;
     }
+    this.edited = false;
     this.executeStarted = Date.now();
 
     this.setStatus(EXECUTION_STATUS.running);

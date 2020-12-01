@@ -31,12 +31,13 @@ export const syncSqlExecutables = (
   executor: Executor,
   statementDetails: StatementDetails
 ): SyncSqlExecutablesResult => {
-  const allNewStatements = statementDetails.precedingStatements.concat(
+  const allNewStatements = [
+    ...statementDetails.precedingStatements,
     statementDetails.activeStatement,
-    statementDetails.followingStatements
-  );
+    ...statementDetails.followingStatements
+  ];
 
-  const existingExecutables: (Executable | undefined)[] = executor.executables.concat();
+  const existingExecutables: (Executable | undefined)[] = [...executor.executables];
 
   const result = {
     all: <SqlExecutable[]>[],
@@ -65,6 +66,7 @@ export const syncSqlExecutables = (
       executable.database = activeDatabase;
       executable.parsedStatement = parsedStatement;
       if (edited) {
+        executable.edited = true;
         result.edited.push(executable);
       }
     } else {
@@ -73,6 +75,7 @@ export const syncSqlExecutables = (
         database: activeDatabase,
         executor: executor
       });
+      executable.edited = true;
     }
     if (parsedStatement === statementDetails.activeStatement) {
       activeStatementIndex = index;
