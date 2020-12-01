@@ -18,6 +18,7 @@ RUN apt-get update -y && apt-get install -y \
   libffi-dev \
   libldap2-dev \
   libpq-dev \
+  libsnappy-dev \
   python-dev \
   python-setuptools \
   libgmp3-dev \
