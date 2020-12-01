@@ -34,7 +34,7 @@ const TEMPLATE = `
     <button type="button" class="close" data-bind="click: reset" aria-label="${I18n('Clear')}"><span aria-hidden="true">&times;</span></button>
   </div>
   <ul class="unstyled" data-bind="foreach: errors">
-    <li data-bind="text: $data"></li>
+    <li data-bind="text: $data.message"></li>
   </ul>
 </div>
 

@@ -16,10 +16,11 @@
 
 import ace from 'ext/aceHelper';
 import { Ace } from 'ext/ace';
+
 import { Disposable } from 'components/utils/SubscriptionTracker';
 import { ParsedLocation } from 'parse/types';
 
-const clearGutterCss = (
+const removeGutterDecoration = (
   cssClass: string,
   session: Ace.Session,
   startRow: number,
@@ -30,7 +31,7 @@ const clearGutterCss = (
   }
 };
 
-const setGutterCss = (
+const addGutterDecoration = (
   cssClass: string,
   session: Ace.Session,
   startRow: number,
@@ -43,19 +44,23 @@ const setGutterCss = (
 
 export default class AceAnchoredRange implements Disposable {
   editor: Ace.Editor;
-  startAnchor: Ace.Anchor;
-  endAnchor: Ace.Anchor;
+  gutterStart: Ace.Anchor;
+  gutterEnd: Ace.Anchor;
+  rowStart: Ace.Anchor;
+  rowEnd: Ace.Anchor;
 
   changed = false;
-  markerCssClasses: { [clazz: string]: number } = {};
-  gutterCssClasses: { [clazz: string]: { start: number; end: number } } = {};
+  rowMarkerSpec?: { cssClass: string; rowOffset: number; marker: number };
+  gutterSpec?: { cssClass: string; span: { start: number; end: number } };
   refreshThrottle = -1;
 
   constructor(editor: Ace.Editor) {
     this.editor = editor;
     const doc = this.editor.getSession().doc;
-    this.startAnchor = doc.createAnchor(0, 0);
-    this.endAnchor = doc.createAnchor(0, 0);
+    this.gutterStart = doc.createAnchor(0, 0);
+    this.gutterEnd = doc.createAnchor(0, 0);
+    this.rowStart = doc.createAnchor(0, 0);
+    this.rowEnd = doc.createAnchor(0, 0);
 
     this.attachChangeHandler();
   }
@@ -66,72 +71,97 @@ export default class AceAnchoredRange implements Disposable {
       this.refreshThrottle = window.setTimeout(this.refresh.bind(this), 10);
     };
 
-    this.startAnchor.on('change', throttledRefresh);
-    this.endAnchor.on('change', throttledRefresh);
+    this.gutterStart.on('change', throttledRefresh);
+    this.gutterEnd.on('change', throttledRefresh);
+    this.rowStart.on('change', throttledRefresh);
+    this.rowEnd.on('change', throttledRefresh);
   }
 
   refresh(): void {
     const session = this.editor.getSession();
-    const newStart = this.startAnchor.getPosition();
-    const newEnd = this.endAnchor.getPosition();
-
-    Object.keys(this.gutterCssClasses).forEach(cssClass => {
-      const rowSpan = this.gutterCssClasses[cssClass];
-      clearGutterCss(cssClass, session, rowSpan.start, rowSpan.end);
+    const newStart = this.gutterStart.getPosition();
+    const newEnd = this.gutterEnd.getPosition();
+    if (this.gutterSpec) {
+      const rowSpan = this.gutterSpec.span;
+      removeGutterDecoration(this.gutterSpec.cssClass, session, rowSpan.start, rowSpan.end);
       rowSpan.start = newStart.row;
       rowSpan.end = newEnd.row;
-      setGutterCss(cssClass, session, rowSpan.start, rowSpan.end);
-    });
+      addGutterDecoration(this.gutterSpec.cssClass, session, rowSpan.start, rowSpan.end);
+    }
+    if (this.rowMarkerSpec) {
+      const offset = this.rowMarkerSpec.rowOffset;
+      const cssClass = this.rowMarkerSpec.cssClass;
+      this.removeMarkerRowCss();
+      this.setMarkerRowCss(cssClass, offset);
+    }
   }
 
   move(parseLocation: ParsedLocation, leadingEmptyLineCount?: number): void {
     const lastRow = parseLocation.last_line - 1;
     const firstRow = Math.min(lastRow, parseLocation.first_line - 1 + (leadingEmptyLineCount || 0));
     const firstCol = leadingEmptyLineCount ? 0 : parseLocation.first_column;
-    this.startAnchor.setPosition(firstRow, firstCol);
-    this.endAnchor.setPosition(lastRow, parseLocation.last_column);
+    this.gutterStart.setPosition(firstRow, firstCol);
+    this.gutterEnd.setPosition(lastRow, parseLocation.last_column);
+    if (this.rowMarkerSpec) {
+      this.refreshRowAnchors(this.rowMarkerSpec.rowOffset);
+    }
   }
 
-  addGutterCss(cssClass: string): void {
+  setGutterCss(cssClass: string): void {
+    if (this.gutterSpec) {
+      this.removeGutterCss();
+    }
     const session = this.editor.getSession();
-    const startRow = this.startAnchor.getPosition().row;
-    const endRow = this.endAnchor.getPosition().row;
-    this.gutterCssClasses[cssClass] = { start: startRow, end: endRow };
-    setGutterCss(cssClass, session, startRow, endRow);
+    const startRow = this.gutterStart.getPosition().row;
+    const endRow = this.gutterEnd.getPosition().row;
+    this.gutterSpec = { cssClass, span: { start: startRow, end: endRow } };
+    addGutterDecoration(cssClass, session, startRow, endRow);
   }
 
-  addMarkerCss(cssClass: string): void {
-    if (!this.markerCssClasses[cssClass]) {
-      const AceRange = ace.require('ace/range').Range;
-      const range = new AceRange(0, 0, 0, 0);
-      range.start = this.startAnchor;
-      range.end = this.endAnchor;
-      this.markerCssClasses[cssClass] = this.editor.getSession().addMarker(range, cssClass);
+  refreshRowAnchors(rowOffset: number): void {
+    const markerRow = this.gutterStart.row + rowOffset;
+    this.rowStart.setPosition(markerRow, 0);
+    this.rowEnd.setPosition(markerRow, this.editor.getSession().getLine(markerRow).length);
+  }
+
+  setMarkerRowCss(cssClass: string, rowOffset: number): void {
+    if (this.rowMarkerSpec) {
+      this.removeMarkerRowCss();
+    }
+    this.refreshRowAnchors(rowOffset);
+    const AceRange = ace.require('ace/range').Range;
+    const range: Ace.Range = new AceRange(0, 0, 0, 0);
+    range.start = this.rowStart;
+    range.end = this.rowEnd;
+    const marker = this.editor.getSession().addMarker(range, cssClass);
+    this.rowMarkerSpec = { cssClass, rowOffset, marker };
+    this.rowMarkerSpec.marker = marker;
+  }
+
+  removeMarkerRowCss(): void {
+    if (this.rowMarkerSpec) {
+      this.editor.getSession().removeMarker(this.rowMarkerSpec.marker);
+      this.rowMarkerSpec = undefined;
     }
   }
 
-  removeMarkerCss(cssClass: string): void {
-    if (this.markerCssClasses[cssClass]) {
-      this.editor.getSession().removeMarker(this.markerCssClasses[cssClass]);
-      delete this.markerCssClasses[cssClass];
-    }
-  }
-
-  removeGutterCss(cssClass: string): void {
-    if (this.gutterCssClasses[cssClass]) {
+  removeGutterCss(): void {
+    if (this.gutterSpec) {
       const session = this.editor.getSession();
-      const rowSpan = this.gutterCssClasses[cssClass];
-      delete this.gutterCssClasses[cssClass];
-      clearGutterCss(cssClass, session, rowSpan.start, rowSpan.end);
+      const rowSpan = this.gutterSpec.span;
+      removeGutterDecoration(this.gutterSpec.cssClass, session, rowSpan.start, rowSpan.end);
+      this.gutterSpec = undefined;
     }
   }
 
   dispose(): void {
     window.clearTimeout(this.refreshThrottle);
-    this.startAnchor.detach();
-    this.endAnchor.detach();
+    this.gutterStart.detach();
+    this.gutterEnd.detach();
+    this.rowStart.detach();
+    this.rowEnd.detach();
 
-    Object.keys(this.gutterCssClasses).forEach(this.removeGutterCss.bind(this));
-    Object.keys(this.markerCssClasses).forEach(this.removeMarkerCss.bind(this));
+    this.removeGutterCss();
+    this.removeMarkerRowCss();
   }
 }
