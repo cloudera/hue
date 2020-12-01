@@ -95,9 +95,9 @@ export default class AceGutterHandler implements Disposable {
 
           if (executable.isRunning()) {
             anchor.setGutterCss(EXECUTING_CSS);
-          } else if (executable.isSuccess()) {
+          } else if (!executable.edited && executable.isSuccess()) {
             anchor.setGutterCss(COMPLETED_CSS);
-          } else if (executable.isFailed()) {
+          } else if (!executable.edited && executable.isFailed()) {
             anchor.setGutterCss(FAILED_CSS);
             if (executable.logs && executable.logs.errors.length) {
               const error = executable.logs.errors[0];
