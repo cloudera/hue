@@ -36,8 +36,8 @@ def get_current_app(frame=None):
   while frame:
     module = inspect.getmodule(frame.f_code)
     if not module:
-      raise Exception((
-          "No module for code %s (frame %s). Perhaps you have an old .pyc file hanging around?") %
+      raise Exception(
+          "No module for code %s (frame %s). Perhaps you have an old .pyc file hanging around?" %
           (repr(frame.f_code), repr(frame))
       )
     app = get_app_for_module(module)
@@ -45,15 +45,16 @@ def get_current_app(frame=None):
       return app
     frame = frame.f_back
 
-  # Did not find any app
   return None
 
 def get_app_for_module(module):
   for app in settings.INSTALLED_APPS:
     if module.__name__.startswith('desktop.lib.metrics.views'):
       return app
-    if module.__name__.startswith('desktop.lib.connectors'):
+    elif module.__name__.startswith('desktop.lib.analytics.views'):
       return app
-    if module.__name__.startswith(app) and not module.__name__.startswith("desktop.lib"):
+    elif module.__name__.startswith('desktop.lib.connectors'):
+      return app
+    elif module.__name__.startswith(app) and not module.__name__.startswith("desktop.lib"):
       return app
   return None
