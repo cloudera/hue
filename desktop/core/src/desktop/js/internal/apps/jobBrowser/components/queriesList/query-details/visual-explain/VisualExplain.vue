@@ -59,7 +59,7 @@
 
   import { Component, Prop, Vue } from 'vue-property-decorator';
   import { Query } from '../..';
-  import { toggleFullScreen } from '../../../../../../../utils/hueUtils.js';
+  import { toggleFullScreen } from 'utils/hueUtils';
 
   import { saveAs } from 'file-saver';
 

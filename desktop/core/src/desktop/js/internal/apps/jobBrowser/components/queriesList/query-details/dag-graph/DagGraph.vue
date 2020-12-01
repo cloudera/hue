@@ -168,7 +168,7 @@
   import { get } from 'lodash';
 
   import { Dag } from '../../index';
-  import { toggleFullScreen } from '../../../../../../../utils/hueUtils.js';
+  import { toggleFullScreen } from 'utils/hueUtils';
   import { graphifyData } from './data-processor';
   import createGraphView from './graph-view';
 
