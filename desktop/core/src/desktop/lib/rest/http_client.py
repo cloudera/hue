@@ -27,7 +27,7 @@ from django.utils.encoding import iri_to_uri, smart_str
 from django.utils.http import urlencode
 
 from requests import exceptions
-from requests.auth import AuthBase ,HTTPBasicAuth, HTTPDigestAuth
+from requests.auth import AuthBase, HTTPBasicAuth, HTTPDigestAuth
 from requests_kerberos import HTTPKerberosAuth, REQUIRED, OPTIONAL, DISABLED
 from urllib3.contrib import pyopenssl
 
@@ -58,7 +58,8 @@ def get_request_session(url, logger):
     with CACHE_SESSION_LOCK:
       CACHE_SESSION[url] = requests.Session()
       logger.debug("Setting request Session")
-      CACHE_SESSION[url].mount(url, requests.adapters.HTTPAdapter(pool_connections=conf.CHERRYPY_SERVER_THREADS.get(), pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get()))
+      CACHE_SESSION[url].mount(url, requests.adapters.HTTPAdapter(pool_connections=conf.CHERRYPY_SERVER_THREADS.get(),
+                                                                  pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get()))
       logger.debug("Setting session adapter for %s" % url)
 
   return CACHE_SESSION
@@ -199,6 +200,10 @@ class HttpClient(object):
         self.logger.warn("GET and DELETE methods do not pass any data. Path '%s'" % path)
         data = None
 
+    if headers and 'timeout' in headers:
+      timeout = int(headers['timeout'])
+      LOG.debug("Overriding timeout xxx via header value %d" % timeout)
+
     request_kwargs = {'allow_redirects': allow_redirects, 'timeout': timeout}
     if headers:
       request_kwargs['headers'] = headers
@@ -239,17 +244,17 @@ class HttpClient(object):
 
 
 class HTTPBearerAuth(AuthBase):
-    """Attaches HTTP Basic Authentication to the given Request object."""
+  """Attaches HTTP Basic Authentication to the given Request object."""
 
-    def __init__(self, token):
-        self.token = token
+  def __init__(self, token):
+    self.token = token
 
-    def __eq__(self, other):
-        return self.token == getattr(other, 'token', None)
+  def __eq__(self, other):
+    return self.token == getattr(other, 'token', None)
 
-    def __ne__(self, other):
-        return not self == other
+  def __ne__(self, other):
+    return not self == other
 
-    def __call__(self, r):
-        r.headers['Authorization'] = 'Bearer %s' % self.token
-        return r
+  def __call__(self, r):
+    r.headers['Authorization'] = 'Bearer %s' % self.token
+    return r
