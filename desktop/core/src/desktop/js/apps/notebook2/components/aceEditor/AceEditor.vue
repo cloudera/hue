@@ -168,52 +168,6 @@
         }
       }
 
-      // const processErrorsAndWarnings = (
-      //   type: string,
-      //   list: { line: number; message: string; col: number | null }[]
-      // ): void => {
-      //   editor.clearErrorsAndWarnings(type);
-      //   let offset = 0;
-      //   if ((<EditorInterpreter>this.executor.connector()).is_sql && editor.getSelectedText()) {
-      //     const selectionRange = editor.getSelectionRange();
-      //     offset = Math.min(selectionRange.start.row, selectionRange.end.row);
-      //   }
-      //   if (list.length > 0) {
-      //     list.forEach((item, cnt) => {
-      //       if (item.line !== null) {
-      //         if (type === 'error') {
-      //           editor.addError(item.message, item.line + offset);
-      //         } else {
-      //           editor.addWarning(item.message, item.line + offset);
-      //         }
-      //         if (cnt === 0) {
-      //           editor.scrollToLine(item.line + offset, true, true, () => {
-      //             /* empty */
-      //           });
-      //           if (item.col !== null) {
-      //             editor.renderer.scrollCursorIntoView(
-      //               { row: item.line + offset, column: item.col + 10 },
-      //               0.5
-      //             );
-      //           }
-      //         }
-      //       }
-      //     });
-      //   }
-      // };
-
-      // const errorsSub = snippet.errors.subscribe(newErrors => {
-      //   processErrorsAndWarnings('error', newErrors);
-      // });
-      //
-      // const aceWarningsSub = snippet.aceWarnings.subscribe(newWarnings => {
-      //   processErrorsAndWarnings('warning', newWarnings);
-      // });
-      //
-      // const aceErrorsSub = snippet.aceErrors.subscribe(newErrors => {
-      //   processErrorsAndWarnings('error', newErrors);
-      // });
-
       const triggerChange = () => {
         this.$emit('value-changed', removeUnicodes(editor.getValue()));
       };

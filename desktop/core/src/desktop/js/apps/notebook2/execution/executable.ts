@@ -29,7 +29,10 @@ import { hueWindow } from 'types/types';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
-import ExecutionLogs, { ExecutionLogsRaw } from 'apps/notebook2/execution/executionLogs';
+import ExecutionLogs, {
+  ExecutionError,
+  ExecutionLogsRaw
+} from 'apps/notebook2/execution/executionLogs';
 import hueUtils, { UUID } from 'utils/hueUtils';
 import Executor from 'apps/notebook2/execution/executor';
 
@@ -68,10 +71,6 @@ export interface ExecutableRaw {
   status: string;
   type: string;
 }
-
-// const INITIAL_HANDLE: ExecutionHandle = {
-//   statement_id: 0
-// };
 
 export default abstract class Executable {
   id: string = UUID();
@@ -222,9 +221,9 @@ export default abstract class Executable {
           });
         }
       } catch (err) {
-        if (typeof err === 'string') {
-          err = this.adaptError(err);
-          this.logs.errors.push(err);
+        if (err && (err.message || typeof err === 'string')) {
+          const adapted = this.adaptError((err.message && err.message) || err);
+          this.logs.errors.push(adapted);
           this.logs.notify();
         }
         throw err;
@@ -341,7 +340,7 @@ export default abstract class Executable {
 
   abstract async internalExecute(): Promise<ExecuteApiResponse>;
 
-  abstract adaptError(err: string): string;
+  abstract adaptError(err: string): ExecutionError;
 
   abstract canExecuteInBatch(): boolean;
 

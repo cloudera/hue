@@ -73,7 +73,7 @@ declare namespace Ace {
       textToScreenCoordinates(row: number, column: number): { pageX: number; pageY: number }
     };
     resize(force?: boolean): void;
-    scrollToLine(line: number, u: boolean, v: boolean, callback: () => void): void;
+    scrollToLine(line: number, center: boolean, animate: boolean, callback?: () => void): void;
     selection: {
       getRange(): Range;
       getAllRanges(): Range[];
@@ -93,7 +93,7 @@ declare namespace Ace {
   }
 
   export interface AceUtil {
-    retrievePrecedingIdentifier(row: number, column: number, regex?: RegExp): string;
+    retrievePrecedingIdentifier(line: string, column: number, regex?: RegExp): string;
   }
 
   export interface Position {
@@ -142,7 +142,7 @@ declare namespace Ace {
     addMarker(range: Range, clazz: string): number;
     doc: Document;
     getDocument(): Document;
-    getLine(row: number): number;
+    getLine(row: number): string;
     getTextRange(range: SimpleRange): string;
     getTokenAt(row: number, column: number): HueToken | null;
     getTokens(line?: number): HueToken[];

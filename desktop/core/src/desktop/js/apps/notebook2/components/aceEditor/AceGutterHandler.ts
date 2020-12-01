@@ -14,13 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Executor from 'apps/notebook2/execution/executor';
-import SubscriptionTracker, { Disposable } from 'components/utils/SubscriptionTracker';
 import { Ace } from 'ext/ace';
-import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
-import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
+
+import AceAnchoredRange from './AceAnchoredRange';
 import { ACTIVE_STATEMENT_CHANGED_EVENT } from './AceLocationHandler';
-import AceAnchoredRange from 'ko/bindings/ace/aceAnchoredRange';
+import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
+import Executor from 'apps/notebook2/execution/executor';
+import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
+import SubscriptionTracker, { Disposable } from 'components/utils/SubscriptionTracker';
+import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
 
 const LINE_BREAK_REGEX = /(\r\n)|(\n)|(\r)/g;
 const LEADING_WHITE_SPACE_REGEX = /^\s+/;
@@ -47,6 +49,7 @@ export default class AceGutterHandler implements Disposable {
   editor: Ace.Editor;
   editorId: string;
   executor: Executor;
+  trackedAnchors: Map<string, AceAnchoredRange> = new Map();
 
   subTracker: SubscriptionTracker = new SubscriptionTracker();
 
@@ -56,7 +59,7 @@ export default class AceGutterHandler implements Disposable {
     this.executor = options.executor;
 
     const activeStatementAnchor = new AceAnchoredRange(this.editor);
-    activeStatementAnchor.addGutterCss(ACTIVE_CSS);
+    activeStatementAnchor.setGutterCss(ACTIVE_CSS);
 
     this.subTracker.subscribe(ACTIVE_STATEMENT_CHANGED_EVENT, statementDetails => {
       if (statementDetails.id !== this.editorId || !statementDetails.activeStatement) {
@@ -69,35 +72,37 @@ export default class AceGutterHandler implements Disposable {
     this.subTracker.addDisposable(activeStatementAnchor);
 
     if (this.executor) {
-      this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
+      this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, (executable: SqlExecutable) => {
         if (executable.executor === this.executor) {
+          let anchor = this.trackedAnchors.get(executable.id);
+          if (!anchor) {
+            anchor = new AceAnchoredRange(this.editor);
+            this.trackedAnchors.set(executable.id, anchor);
+          }
+
           if (executable.lost) {
-            if (executable.observerState.aceAnchor) {
-              executable.observerState.aceAnchor.dispose();
-              delete executable.observerState.aceAnchor;
-            }
+            anchor.dispose();
+            this.trackedAnchors.delete(executable.id);
             return;
           }
 
+          anchor.removeGutterCss();
+          anchor.removeMarkerRowCss();
+
           const statement = executable.parsedStatement;
-          if (!executable.observerState.aceAnchor) {
-            executable.observerState.aceAnchor = new AceAnchoredRange(this.editor);
-          }
           const leadingEmptyLineCount = getLeadingEmptyLineCount(statement);
-          executable.observerState.aceAnchor.move(statement.location, leadingEmptyLineCount);
-          const anchoredRange = executable.observerState.aceAnchor;
-          anchoredRange.removeGutterCss(COMPLETED_CSS);
-          anchoredRange.removeGutterCss(EXECUTING_CSS);
-          anchoredRange.removeGutterCss(FAILED_CSS);
-          anchoredRange.removeMarkerCss(FAILED_MARKER_CSS);
+          anchor.move(statement.location, leadingEmptyLineCount);
 
           if (executable.isRunning()) {
-            anchoredRange.addGutterCss(EXECUTING_CSS);
+            anchor.setGutterCss(EXECUTING_CSS);
           } else if (executable.isSuccess()) {
-            anchoredRange.addGutterCss(COMPLETED_CSS);
+            anchor.setGutterCss(COMPLETED_CSS);
           } else if (executable.isFailed()) {
-            anchoredRange.addMarkerCss(FAILED_MARKER_CSS);
-            anchoredRange.addGutterCss(FAILED_CSS);
+            anchor.setGutterCss(FAILED_CSS);
+            if (executable.logs && executable.logs.errors.length) {
+              const error = executable.logs.errors[0];
+              anchor.setMarkerRowCss(FAILED_MARKER_CSS, error.row - leadingEmptyLineCount - 1);
+            }
           }
         }
       });
