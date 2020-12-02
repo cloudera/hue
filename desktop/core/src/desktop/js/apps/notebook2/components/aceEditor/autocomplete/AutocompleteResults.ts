@@ -48,7 +48,6 @@ import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
 import sqlUtils from 'sql/sqlUtils';
 import { matchesType } from 'sql/reference/typeUtils';
-import { DIALECT } from 'apps/notebook2/snippet';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { findBrowserConnector, getRootFilePath } from 'utils/hueConfig';
 import {
@@ -127,6 +126,9 @@ const MetaLabels = {
   View: I18n('view'),
   Virtual: I18n('virtual')
 };
+
+const HIVE_DIALECT = 'hive';
+const IMPALA_DIALECT = 'impala';
 
 const locateSubQuery = (subQueries: SubQuery[], subQueryName: string): SubQuery | undefined => {
   if (subQueries) {
@@ -653,7 +655,7 @@ class AutocompleteResults {
 
     let tableSuggestions: Suggestion[] = [];
     if (
-      this.dialect() === DIALECT.impala &&
+      this.dialect() === IMPALA_DIALECT &&
       suggestTables.identifierChain &&
       suggestTables.identifierChain.length === 1
     ) {
@@ -671,7 +673,7 @@ class AutocompleteResults {
         }
       } catch (err) {}
     } else if (
-      this.dialect() === DIALECT.impala &&
+      this.dialect() === IMPALA_DIALECT &&
       suggestTables.identifierChain &&
       suggestTables.identifierChain.length > 1
     ) {
@@ -726,7 +728,7 @@ class AutocompleteResults {
 
     AutocompleteResults.mergeColumns(columnSuggestions);
 
-    if (this.dialect() === DIALECT.hive && /[^.]$/.test(this.editor.getTextBeforeCursor())) {
+    if (this.dialect() === HIVE_DIALECT && /[^.]$/.test(this.editor.getTextBeforeCursor())) {
       columnSuggestions.push({
         value: 'BLOCK__OFFSET__INSIDE__FILE',
         meta: MetaLabels.Virtual,
@@ -889,7 +891,7 @@ class AutocompleteResults {
 
         for (const childEntry of childEntries) {
           let name = await sqlUtils.backTickIfNeeded(this.executor.connector(), childEntry.name);
-          if (this.dialect() === DIALECT.hive && (childEntry.isArray() || childEntry.isMap())) {
+          if (this.dialect() === HIVE_DIALECT && (childEntry.isArray() || childEntry.isMap())) {
             name += '[]';
           }
           if (
@@ -915,7 +917,7 @@ class AutocompleteResults {
           }
         }
         if (
-          this.dialect() === DIALECT.hive &&
+          this.dialect() === HIVE_DIALECT &&
           (dataCatalogEntry.isArray() || dataCatalogEntry.isMap())
         ) {
           // Remove 'item' or 'value' and 'key' for Hive
@@ -929,7 +931,7 @@ class AutocompleteResults {
           (sourceMeta.value && sourceMeta.value.fields) ||
           (sourceMeta.item && sourceMeta.item.fields);
         if (
-          (this.dialect() === DIALECT.impala || this.dialect() === DIALECT.hive) &&
+          (this.dialect() === IMPALA_DIALECT || this.dialect() === HIVE_DIALECT) &&
           complexExtras
         ) {
           complexExtras.forEach(field => {
@@ -2007,7 +2009,7 @@ class AutocompleteResults {
     ) {
       return qualifiedIdentifier.substring(this.activeDatabase.length + 1);
     }
-    if (this.dialect() === DIALECT.hive) {
+    if (this.dialect() === HIVE_DIALECT) {
       // Remove DB reference if given for Hive
       const parts = qualifiedIdentifier.split('.');
       if (parts.length > 2) {
@@ -2085,7 +2087,7 @@ class AutocompleteResults {
       });
 
       if (
-        this.dialect() === DIALECT.hive &&
+        this.dialect() === HIVE_DIALECT &&
         typeof sourceMeta.extended_columns !== 'undefined' &&
         sourceMeta.extended_columns.length === 1 &&
         /^(?:map|array|struct)/i.test(sourceMeta.extended_columns[0].type)
@@ -2114,7 +2116,7 @@ class AutocompleteResults {
 
     // For Hive it could be either:
     // SELECT col.struct FROM db.tbl -or- SELECT col.struct FROM tbl
-    if (path.length > 1 && (this.dialect() === DIALECT.impala || this.dialect() === DIALECT.hive)) {
+    if (path.length > 1 && (this.dialect() === IMPALA_DIALECT || this.dialect() === HIVE_DIALECT)) {
       const catalogEntry = await new Promise<DataCatalogEntry>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
         dataCatalog
