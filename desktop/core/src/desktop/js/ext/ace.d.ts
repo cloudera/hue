@@ -26,9 +26,10 @@ declare namespace Ace {
     commands: {
       addCommand(command: {
         name: string,
-        bindKey: { win: string; mac: string },
+        bindKey: { win: string; mac: string } | string,
         exec(): void
       }): void;
+      bindKey(key: { win: string; mac: string } | string, command: string): void;
     }
     completer: any;
     completers: any[];
@@ -82,7 +83,9 @@ declare namespace Ace {
     session: Session;
     setOption(option: string, value: OptionValue): void;
     setOptions(options: Options): void;
+    setReadOnly(readOnly: boolean): void;
     setTheme(theme: string): void;
+    setValue(value: string, cursorPosition: number): void;
     useHueAutocompleter: boolean;
   }
 
@@ -150,6 +153,7 @@ declare namespace Ace {
     remove(range: Range): void;
     removeGutterDecoration(line: number, clazz: string): void;
     removeMarker(markerId: number): void;
+    replace(range: Range, value: string): void;
     setMode(mode: string): void;
   }
 
