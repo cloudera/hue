@@ -36,7 +36,6 @@ import I18n from 'utils/i18n';
 import sqlStatementsParser, { ParsedSqlStatement } from 'parse/sqlStatementsParser';
 import sqlUtils from 'sql/sqlUtils';
 import stringDistance from 'sql/stringDistance';
-import { DIALECT } from 'apps/notebook2/snippet';
 import {
   POST_FROM_LOCATION_WORKER_EVENT,
   POST_FROM_SYNTAX_WORKER_EVENT,
@@ -59,6 +58,9 @@ export const REFRESH_STATEMENT_LOCATIONS_EVENT = 'editor.refresh.statement.locat
 export const ACTIVE_STATEMENT_CHANGED_EVENT = 'editor.active.statement.changed';
 export const CURSOR_POSITION_CHANGED_EVENT = 'editor.cursor.position.changed';
 export const GET_ACTIVE_LOCATIONS_EVENT = 'get.active.editor.locations';
+
+const HIVE_DIALECT = 'hive';
+const IMPALA_DIALECT = 'impala';
 
 const STATEMENT_COUNT_AROUND_ACTIVE = 10;
 
@@ -755,7 +757,7 @@ export default class AceLocationHandler implements Disposable {
   checkForSyntaxErrors(statementLocation: ParsedLocation, cursorPosition: Ace.Position): void {
     if (
       this.sqlSyntaxWorkerSub &&
-      (this.getDialect() === DIALECT.impala || this.getDialect() === DIALECT.hive)
+      (this.getDialect() === IMPALA_DIALECT || this.getDialect() === HIVE_DIALECT)
     ) {
       const AceRange = ace.require('ace/range').Range;
       const editorChangeTime = this.editor.lastChangeTime;
@@ -1289,7 +1291,7 @@ export default class AceLocationHandler implements Disposable {
         const tokensToVerify: Ace.HueToken[] = [];
 
         e.data.locations.forEach(location => {
-          if (location.type === 'statementType' && this.getDialect() !== DIALECT.impala) {
+          if (location.type === 'statementType' && this.getDialect() !== IMPALA_DIALECT) {
             // We currently only have a good mapping from statement types to impala topics.
             // TODO: Extract links between Hive topic IDs and statement types
             return;
@@ -1311,7 +1313,7 @@ export default class AceLocationHandler implements Disposable {
             // The parser isn't aware of the DDL so sometimes it marks complex columns as tables
             // I.e. "Impala SELECT a FROM b.c" Is 'b' a database or a table? If table then 'c' is complex
             if (
-              this.getDialect() === DIALECT.impala &&
+              this.getDialect() === IMPALA_DIALECT &&
               location.identifierChain.length > 2 &&
               (location.type === 'table' || location.type === 'column') &&
               this.isDatabase(location.identifierChain[0].name)
@@ -1384,7 +1386,7 @@ export default class AceLocationHandler implements Disposable {
           }
         });
 
-        if (this.getDialect() === DIALECT.impala || this.getDialect() === DIALECT.hive) {
+        if (this.getDialect() === IMPALA_DIALECT || this.getDialect() === HIVE_DIALECT) {
           this.verifyExists(tokensToVerify, e.data.activeStatementLocations);
         }
         huePubSub.publish('editor.active.locations', lastKnownLocations);
