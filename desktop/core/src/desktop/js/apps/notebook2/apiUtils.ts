@@ -14,25 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { simplePost } from 'api/apiUtilsV2';
-import { FORMAT_SQL_API } from 'api/urls';
+import axios from 'axios';
+
+type FormatSqlApiResponse = {
+  formatted_statements?: string;
+  status: number;
+};
+
+const FORMAT_SQL_API_URL = '/notebook/api/format';
 
 export const formatSql = async (options: {
   statements: string;
   silenceErrors?: boolean;
 }): Promise<string> => {
   try {
-    const response = await simplePost<
-      {
-        formatted_statements: string;
-        status: number;
-      },
-      { statements: string }
-    >(FORMAT_SQL_API, options, {
-      silenceErrors: !!options.silenceErrors,
-      ignoreSuccessErrors: true
-    });
-    return (response && response.formatted_statements) || options.statements;
+    const params = new URLSearchParams();
+    params.append('statements', options.statements);
+    const response = await axios.post<FormatSqlApiResponse>(FORMAT_SQL_API_URL, params);
+
+    if (response.data.status !== -1 && response.data.formatted_statements) {
+      return response.data.formatted_statements;
+    }
   } catch (err) {
     if (!options.silenceErrors) {
       throw err;
