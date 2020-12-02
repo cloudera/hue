@@ -146,7 +146,10 @@ class KSqlApi(object):
             line = line.strip()
 
           if is_select:
-            data_line = json.loads(line)
+            try:
+              data_line = json.loads(line)
+            except ValueError as e:
+              data_line = json.loads(line[:-1])  # Most probably record is not JSON
             if data_line.get('@type') == 'statement_error':
               raise KSqlApiException(data_line['message'])
             if data_line['row']:  # If limit not reached
