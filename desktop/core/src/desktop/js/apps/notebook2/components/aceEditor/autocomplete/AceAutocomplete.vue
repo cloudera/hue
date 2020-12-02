@@ -81,8 +81,6 @@
 <script lang="ts">
   import { Ace } from 'ext/ace';
   import ace from 'ext/aceHelper';
-  import { REFRESH_STATEMENT_LOCATIONS_EVENT } from 'ko/bindings/ace/aceLocationHandler';
-  import hueDebug from 'utils/hueDebug';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
@@ -102,9 +100,11 @@
   import UdfDetailsPanel from './UdfDetailsPanel.vue';
   import Spinner from 'components/Spinner.vue';
   import { clickOutsideDirective } from 'components/directives/clickOutsideDirective';
+  import hueDebug from 'utils/hueDebug';
 
   const aceUtil = <Ace.AceUtil>ace.require('ace/autocomplete/util');
   const HashHandler = <typeof Ace.HashHandler>ace.require('ace/keyboard/hash_handler').HashHandler;
+  const REFRESH_STATEMENT_LOCATIONS_EVENT = 'editor.refresh.statement.locations';
 
   @Component({
     components: {
