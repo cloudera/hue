@@ -25,7 +25,10 @@
     :initial-cursor-position="cursorPosition"
     :initial-value="value"
     @ace-created="aceCreated"
+    @create-new-doc="createNewDoc"
     @cursor-changed="cursorChanged"
+    @save-doc="saveDoc"
+    @toggle-presentation-mode="togglePresentationMode"
     @value-changed="valueChanged"
   />
 </template>
@@ -88,12 +91,16 @@
       }
     }
 
-    valueChanged(value: string): void {
-      this.$el.dispatchEvent(new CustomEvent('value-changed', { bubbles: true, detail: value }));
+    destroyed(): void {
+      this.subTracker.dispose();
     }
 
     aceCreated(editor: Ace.Editor): void {
       this.$el.dispatchEvent(new CustomEvent('ace-created', { bubbles: true, detail: editor }));
+    }
+
+    createNewDoc(): void {
+      this.$el.dispatchEvent(new CustomEvent('create-new-doc', { bubbles: true }));
     }
 
     cursorChanged(cursorPosition: Ace.Position): void {
@@ -102,8 +109,16 @@
       );
     }
 
-    destroyed(): void {
-      this.subTracker.dispose();
+    saveDoc(): void {
+      this.$el.dispatchEvent(new CustomEvent('save-doc', { bubbles: true }));
+    }
+
+    togglePresentationMode(): void {
+      this.$el.dispatchEvent(new CustomEvent('toggle-presentation-mode', { bubbles: true }));
+    }
+
+    valueChanged(value: string): void {
+      this.$el.dispatchEvent(new CustomEvent('value-changed', { bubbles: true, detail: value }));
     }
   }
 
