@@ -27,7 +27,6 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
-  import { wrap } from 'vue/webComponentWrapper';
   import ace, { getAceMode } from 'ext/aceHelper';
   import { Ace } from 'ext/ace';
 
@@ -574,9 +573,6 @@
       this.editor.commands.bindKey({ win: 'Ctrl-j', mac: 'Command-j|Ctrl-j' }, 'gotoline');
     }
   }
-
-  export const COMPONENT_NAME = 'ace-editor';
-  wrap(COMPONENT_NAME, AceEditor);
 </script>
 
 <style lang="scss" scoped>
