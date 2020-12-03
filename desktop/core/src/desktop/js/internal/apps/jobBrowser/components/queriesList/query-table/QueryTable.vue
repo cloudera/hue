@@ -24,9 +24,13 @@
     <div class="query-table-actions">
       <search-input
         v-model="searchQuery"
-        :placeholder="I18n('Query text, DAG ID or App ID')"
+        :placeholder="I18n('Query text or Query/DAG/App ID')"
+        :show-magnify="false"
         @search="searchQueryEnter"
       />
+      <hue-button @click="searchQueryEnter">
+        <em class="fa fa-search" />
+      </hue-button>
 
       <div class="query-table-filters">
         <hue-icon type="hi-filter" /> Filter by:
@@ -72,7 +76,11 @@
       <div class="query-table-right-panel">
         <hue-table :columns="visibleColumns" :rows="queries">
           <template #cell-status="query">
-            <status-indicator class="status-indicator" :value="query.status" />
+            <status-indicator
+              :title="query.status"
+              class="status-indicator"
+              :value="query.status"
+            />
           </template>
           <template #cell-select="query">
             <input v-model="selectedQueries" type="checkbox" :value="query" />
@@ -199,7 +207,7 @@
       { key: 'status', label: 'Status' },
       { key: 'query', label: 'Query' },
       { key: 'queueName', label: 'Queue' },
-      { key: 'userId', label: 'User' },
+      { key: 'requestUser', label: 'User' },
       {
         key: 'tablesRead',
         label: 'Tables Read'
