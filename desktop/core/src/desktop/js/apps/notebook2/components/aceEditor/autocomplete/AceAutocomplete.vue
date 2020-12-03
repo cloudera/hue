@@ -205,58 +205,63 @@
 
       this.autocompleteResults = this.autocompleter.autocompleteResults;
 
-      this.subTracker.subscribe(
-        'hue.ace.autocompleter.show',
-        async (details: {
-          editor: Ace.Editor;
-          lineHeight: number;
-          position: { top: number; left: number };
-        }) => {
-          // The autocomplete can be triggered right after insertion of a suggestion
-          // when live autocomplete is enabled, hence if already active we ignore.
-          if (this.active || details.editor !== this.editor || !this.autocompleter) {
-            return;
-          }
-          const session = this.editor.getSession();
-          const pos = this.editor.getCursorPosition();
-          const line = session.getLine(pos.row);
-          const prefix = aceUtil.retrievePrecedingIdentifier(line, pos.column);
-          const newBase = session.doc.createAnchor(pos.row, pos.column - prefix.length);
+      const showAutocomplete = async () => {
+        // The autocomplete can be triggered right after insertion of a suggestion
+        // when live autocomplete is enabled, hence if already active we ignore.
+        if (this.active || !this.autocompleter) {
+          return;
+        }
+        const session = this.editor.getSession();
+        const pos = this.editor.getCursorPosition();
+        const line = session.getLine(pos.row);
+        const prefix = aceUtil.retrievePrecedingIdentifier(line, pos.column);
+        const newBase = session.doc.createAnchor(pos.row, pos.column - prefix.length);
 
-          if (!this.base || newBase.column !== this.base.column || newBase.row !== this.base.row) {
-            this.positionAutocompleteDropdown();
-            try {
-              this.loading = true;
-              const parseResult = await this.autocompleter.autocomplete();
-              if (hueDebug.showParseResult) {
-                // eslint-disable-next-line no-restricted-syntax
-                console.log(parseResult);
-              }
-
-              if (parseResult && this.autocompleteResults) {
-                this.suggestions = [];
-                this.autocompleteResults.update(parseResult, this.suggestions).finally(() => {
-                  this.loading = false;
-                });
-
-                this.selectedIndex = 0;
-                newBase.$insertRight = true;
-                this.base = newBase;
-                if (this.autocompleteResults) {
-                  this.filter = prefix;
-                }
-                this.active = true;
-                this.attach();
-              }
-            } catch (err) {
-              if (typeof console.warn !== 'undefined') {
-                console.warn(err);
-              }
-              this.detach();
+        if (!this.base || newBase.column !== this.base.column || newBase.row !== this.base.row) {
+          this.positionAutocompleteDropdown();
+          try {
+            this.loading = true;
+            const parseResult = await this.autocompleter.autocomplete();
+            if (hueDebug.showParseResult) {
+              // eslint-disable-next-line no-restricted-syntax
+              console.log(parseResult);
             }
+
+            if (parseResult && this.autocompleteResults) {
+              this.suggestions = [];
+              this.autocompleteResults.update(parseResult, this.suggestions).finally(() => {
+                this.loading = false;
+              });
+
+              this.selectedIndex = 0;
+              newBase.$insertRight = true;
+              this.base = newBase;
+              if (this.autocompleteResults) {
+                this.filter = prefix;
+              }
+              this.active = true;
+              this.attach();
+            }
+          } catch (err) {
+            if (typeof console.warn !== 'undefined') {
+              console.warn(err);
+            }
+            this.detach();
           }
         }
-      );
+      };
+
+      this.editor.on('showAutocomplete', showAutocomplete);
+      const onHideAutocomplete = this.detach.bind(this);
+      this.editor.on('hideAutocomplete', onHideAutocomplete);
+      this.subTracker.subscribe('hue.ace.autocompleter.hide', onHideAutocomplete);
+
+      this.subTracker.addDisposable({
+        dispose: () => {
+          this.editor.off('showAutocomplete', showAutocomplete);
+          this.editor.off('hideAutocomplete', onHideAutocomplete);
+        }
+      });
 
       this.subTracker.subscribe(
         'editor.autocomplete.temporary.sort.override',

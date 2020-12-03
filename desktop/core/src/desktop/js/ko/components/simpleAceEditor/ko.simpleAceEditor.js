@@ -21,7 +21,6 @@ import ace from 'ext/aceHelper';
 import AceLocationHandler from 'ko/bindings/ace/aceLocationHandler';
 import componentUtils from 'ko/components/componentUtils';
 import { UUID } from 'utils/hueUtils';
-import huePubSub from 'utils/huePubSub';
 import { hueLocalStorage } from 'utils/storageUtils';
 import SolrFormulaAutocompleter from './solrFormulaAutocompleter';
 import SolrQueryAutocompleter from './solrQueryAutocompleter';
@@ -91,7 +90,7 @@ class SimpleAceEditor {
         name: 'execute',
         bindKey: { win: 'Ctrl-Enter', mac: 'Command-Enter|Ctrl-Enter' },
         exec: async () => {
-          huePubSub.publish('hue.ace.autocompleter.hide');
+          editor._signal('hideAutocomplete');
           const executable = params.activeExecutable();
           if (executable) {
             await executable.reset();
