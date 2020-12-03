@@ -18,6 +18,7 @@
 
 <template>
   <div class="queries-list">
+    <Spinner v-if="loading" size="xlarge" center="true" overlay="false" />
     <InlineAlert
       v-if="error"
       :type="AlertType.Error"
@@ -26,8 +27,15 @@
       show-close="true"
       @close="showQueries"
     />
+
+    <query-details
+      v-else-if="selectedQuery"
+      :query="selectedQuery"
+      @reload="querySelected(selectedQuery)"
+    />
+    <query-details-diff v-else-if="queriesToDiff" :queries="queriesToDiff" />
     <query-table
-      v-else-if="!selectedQuery && !queriesToDiff"
+      v-else
       :queries="queries"
       :total-queries="(searchMeta && searchMeta.size) || 0"
       @diff-queries="diffQueries"
@@ -35,12 +43,6 @@
       @reload="fetch(lastFetchOptions)"
       @search="fetch"
     />
-    <query-details
-      v-else-if="selectedQuery"
-      :query="selectedQuery"
-      @reload="querySelected(selectedQuery)"
-    />
-    <query-details-diff v-else :queries="queriesToDiff" />
   </div>
 </template>
 
@@ -60,6 +62,7 @@
   import QueryTable from './query-table/QueryTable.vue';
   import InlineAlert from '../../../../../components/InlineAlert.vue';
   import { AlertType } from '../../../../../components/InlineAlert.vue';
+  import Spinner from 'components/Spinner.vue';
 
   const QUERY_ID_PARAM = 'queryId';
 
@@ -71,7 +74,15 @@
   }
 
   @Component({
-    components: { QueryDetailsDiff, QueryDetails, QueryTable, TimeAgo, HumanByteSize, InlineAlert }
+    components: {
+      Spinner,
+      QueryDetailsDiff,
+      QueryDetails,
+      QueryTable,
+      TimeAgo,
+      HumanByteSize,
+      InlineAlert
+    }
   })
   export default class QueriesList extends Vue {
     selectedQuery: Query | null = null;
@@ -81,6 +92,7 @@
     error: Error | null = null;
 
     lastFetchOptions!: FetchOptions;
+    loading = false;
 
     AlertType = AlertType;
 
@@ -89,6 +101,7 @@
       const now = Date.now();
 
       this.lastFetchOptions = options;
+      this.loading = true;
       try {
         const searchResponse = await searchQueries({
           endTime: (options.timeRange && options.timeRange.to) || now,
@@ -104,6 +117,7 @@
       } catch (error) {
         this.error = error;
       }
+      this.loading = false;
     }
 
     @Provide()
@@ -141,21 +155,25 @@
       queriesToDiff.forEach((query, index) => {
         hueUtils.changeURLParameter(QUERY_ID_PARAM + index, query.queryId);
       });
+      this.loading = true;
       try {
         const fetchPromises = queriesToDiff.map(query => fetchExtendedQuery(query.queryId));
         this.queriesToDiff = await Promise.all(fetchPromises);
       } catch (error) {
         this.error = error;
       }
+      this.loading = false;
     }
 
     async querySelected(query: Query): Promise<void> {
       hueUtils.changeURLParameter(QUERY_ID_PARAM + 0, query.queryId);
+      this.loading = true;
       try {
         this.selectedQuery = await fetchExtendedQuery(query.queryId);
       } catch (error) {
         this.error = error;
       }
+      this.loading = false;
     }
   }
 </script>

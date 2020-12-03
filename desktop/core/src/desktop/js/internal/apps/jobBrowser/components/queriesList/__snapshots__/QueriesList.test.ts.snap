@@ -4,6 +4,8 @@ exports[`QueriesList.vue should render 1`] = `
 <div
   class="queries-list"
 >
+  <!---->
+   
   <query-table-stub
     queries=""
     totalqueries="0"
