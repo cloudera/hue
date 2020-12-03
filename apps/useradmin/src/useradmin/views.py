@@ -432,7 +432,9 @@ def edit_user(request, username=None):
     })
   else:
     if request.method == 'POST' and is_embeddable:
-      return JsonResponse({'status': -1, 'errors': [{'id': f.id_for_label, 'message': list(map(antixss, f.errors))} for f in form if f.errors]})
+      return JsonResponse({'status': -1,
+                           'errors': [{'id': f.id_for_label, 'message': list(map(antixss, f.errors))} for f in form if
+                                      f.errors]})
     else:
       return render('edit_user.mako', request, {
         'form': form,
@@ -1089,14 +1091,16 @@ def _import_ldap_members(connection, group, ldap_info, count=0, max_count=1, fai
     LOG.debug("Importing posix user %s into group %s" % (smart_str(posix_member), smart_str(group.name)))
     user_info = None
     try:
-      user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+      user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(),
+                                        user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
     except LdapSearchException as e:
       LOG.warn("Failed to find LDAP users: %s" % e)
 
     if user_info:
       users = _import_ldap_users_info(connection, user_info, failed_users=failed_users)
       if users:
-        LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (smart_str(posix_member), smart_str(users), smart_str(group.name)))
+        LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (
+        smart_str(posix_member), smart_str(users), smart_str(group.name)))
         group.user_set.add(*users)
 
 
@@ -1125,7 +1129,8 @@ def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1, faile
       user = ldap_access.get_ldap_user(username=user_info['username'])
       group.user_set.add(user)
     except User.DoesNotExist:
-      LOG.warn("Synchronizing user %s with group %s failed. User does not exist." % (smart_str(user_info['dn']), smart_str(group.name)))
+      LOG.warn("Synchronizing user %s with group %s failed. User does not exist." % (
+      smart_str(user_info['dn']), smart_str(group.name)))
 
   for group_info in groups_info:
     LOG.debug("Synchronizing group %s" % smart_str(group_info['dn']))
@@ -1140,7 +1145,8 @@ def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1, faile
     LOG.debug("Synchronizing posix user %s with group %s" % (smart_str(posix_member), smart_str(group.name)))
     users_info = []
     try:
-      users_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+      users_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(),
+                                         user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
     except LdapSearchException as e:
       LOG.warn("Failed to find LDAP users: %s" % e)
 
@@ -1149,7 +1155,8 @@ def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1, faile
         user = ldap_access.get_ldap_user(username=user_info['username'])
         group.user_set.add(user)
       except User.DoesNotExist:
-        LOG.warn("Synchronizing posix user %s with group %s failed. User does not exist." % (smart_str(posix_member), smart_str(group.name)))
+        LOG.warn("Synchronizing posix user %s with group %s failed. User does not exist." % (
+        smart_str(posix_member), smart_str(group.name)))
 
 
 def _import_ldap_nested_groups(connection, groupname_pattern, import_members=False, recursive_import_members=False,
@@ -1304,21 +1311,26 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
           # which are defined by 'uid'.
           user_info = None
           try:
-            user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+            user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(),
+                                              user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(),
+                                              find_by_dn=False)
           except LdapSearchException as e:
             LOG.warn("Failed to find LDAP user: %s" % e)
 
           if user_info:
             users = _import_ldap_users_info(connection, user_info, import_by_dn=False, failed_users=failed_users)
             if users:
-              LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (smart_str(posix_member), smart_str(users), smart_str(group.name)))
+              LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (
+              smart_str(posix_member), smart_str(users), smart_str(group.name)))
               group.user_set.add(*users)
 
       if sync_users:
         for posix_member in posix_members:
           user_info = []
           try:
-            user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+            user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(),
+                                              user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(),
+                                              find_by_dn=False)
           except LdapSearchException as e:
             LOG.warn("Failed to find LDAP user: %s" % e)
 
@@ -1369,4 +1381,4 @@ def _import_ldap_groups(connection, groupname_pattern, import_members=False, rec
 
 
 def _get_failed_operation_text(username, operation):
-    return '%(username)s is not allowed to perform %(operation)s' % {'username': username, 'operation': operation}
+  return '%(username)s is not allowed to perform %(operation)s' % {'username': username, 'operation': operation}
