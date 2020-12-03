@@ -889,7 +889,7 @@ def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
     members = group.gr_mem
     for member in members:
       if member not in user_groups:
-        user_groups[member] = [ hue_group ]
+        user_groups[member] = [hue_group]
       else:
         user_groups[member].append(hue_group)
 
@@ -926,7 +926,7 @@ def _check_remove_last_super(user_obj):
     return
 
   # Is there any other active superuser left?
-  all_active_su = User.objects.filter(is_superuser__exact = True, is_active__exact = True)
+  all_active_su = User.objects.filter(is_superuser__exact=True, is_active__exact=True)
   num_active_su = all_active_su.count()
 
   if num_active_su < 1:
@@ -1271,7 +1271,8 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
 
       for member in members:
         LOG.debug("Importing user %s" % smart_str(member))
-        group.user_set.add( *( _import_ldap_users(connection, member, import_by_dn=True, failed_users=failed_users) or [] ) )
+        group.user_set.add(
+          *(_import_ldap_users(connection, member, import_by_dn=True, failed_users=failed_users) or []))
 
     # Sync users
     if sync_users:
