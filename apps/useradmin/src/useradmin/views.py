@@ -400,7 +400,7 @@ def edit_user(request, username=None):
         if is_admin(request.user):
           return redirect(reverse('about:index'))
         else:
-          return redirect(reverse('desktop_views_home'))
+          return JsonResponse({'url': '/hue'})
       elif is_admin(request.user):
         if is_embeddable:
           return JsonResponse({'url': '/hue' + reverse(list_users)})
