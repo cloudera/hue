@@ -576,10 +576,7 @@ from desktop.views import _ko
           autocompleterDoneSub.remove();
         });
 
-        var autocompleterShowSub = huePubSub.subscribe('hue.ace.autocompleter.show', function (data) {
-          if (data.editor !== self.editor()) {
-            return;
-          }
+        var onShowAutocomplete = function (data) {
           var session = self.editor().getSession();
           var pos = self.editor().getCursorPosition();
           var line = session.getLine(pos.row);
@@ -604,18 +601,23 @@ from desktop.views import _ko
           } else {
             afterAutocomp();
           }
-        });
+        };
+
+        self.editor().on('showAutocomplete', onShowAutocomplete)
 
         self.disposeFunctions.push(function () {
-          autocompleterShowSub.remove();
-        });
+          self.editor().off('showAutocomplete', onShowAutocomplete);
+        })
 
-        var autocompleterHideSub = huePubSub.subscribe('hue.ace.autocompleter.hide', function () {
+        var onHideAutocomplete = function () {
           self.detach();
-        });
+        };
+        self.editor().on('hideAutocomplete', onHideAutocomplete)
+        var autocompleterHideSub = huePubSub.subscribe('hue.ace.autocompleter.hide', onHideAutocomplete);
 
         self.disposeFunctions.push(function () {
           autocompleterHideSub.remove();
+          self.editor().off('hideAutocomplete', onHideAutocomplete);
         });
       }
 
