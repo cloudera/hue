@@ -8,10 +8,15 @@ exports[`QueryTable.vue should render 1`] = `
     class="query-table-actions"
   >
     <search-input-stub
-      placeholder="Query text, DAG ID or App ID"
-      showmagnify="true"
+      placeholder="Query text or Query/DAG/App ID"
       value=""
     />
+     
+    <hue-button-stub>
+      <em
+        class="fa fa-search"
+      />
+    </hue-button-stub>
      
     <div
       class="query-table-filters"

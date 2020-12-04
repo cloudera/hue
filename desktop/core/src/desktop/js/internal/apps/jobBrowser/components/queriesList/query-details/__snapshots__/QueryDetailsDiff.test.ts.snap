@@ -109,7 +109,7 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
      
     <tab-stub
       class="hue-layout-row"
-      title="DAG Info"
+      title="DAG Info *"
     >
       <div
         class="hue-layout-column"

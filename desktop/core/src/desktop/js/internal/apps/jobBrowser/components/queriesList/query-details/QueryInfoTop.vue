@@ -20,6 +20,7 @@
   <div class="hue-info-box">
     <LabeledInfo label="Query ID" class="inline-info">
       {{ query.queryId }}
+      <a href="javascript:void(0);" class="fa fa-copy" @click="copyQueryId(query.queryId)" />
     </LabeledInfo>
 
     <LabeledInfo label="User" class="inline-info">
@@ -47,6 +48,10 @@
   })
   export default class QueryInfoTab extends Vue {
     @Prop({ required: true }) query!: Query;
+
+    copyQueryId(queryId: string): void {
+      navigator.clipboard.writeText(queryId);
+    }
   }
 </script>
 

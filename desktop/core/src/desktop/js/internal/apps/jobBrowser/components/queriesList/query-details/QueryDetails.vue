@@ -51,7 +51,7 @@
 
         <template v-if="query.dags.length">
           <!-- DAG Tabs -->
-          <tab title="DAG Info" class="hue-layout-column">
+          <tab :title="'DAG Info' + (hasDiagnostics ? ' *' : '')" class="hue-layout-column">
             <div v-for="dag in query.dags" :key="dag.dagInfo.id">
               <DagInfo :dag="dag" />
             </div>
@@ -115,7 +115,7 @@
   import LabeledInfo from '../components/LabeledInfo.vue';
   import QueryKillButton from '../components/QueryKillButton.vue';
 
-  import { Query } from '../index';
+  import { Query, Dag } from '../index';
 
   // TODO: Move it to a better place
   declare global {
@@ -150,6 +150,10 @@
 
     @Inject()
     showQueries?: () => void;
+
+    get hasDiagnostics(): boolean {
+      return this.query.dags.some((dag: Dag) => dag.dagDetails.diagnostics);
+    }
 
     HUE_BASE_URL = window.HUE_BASE_URL;
   }

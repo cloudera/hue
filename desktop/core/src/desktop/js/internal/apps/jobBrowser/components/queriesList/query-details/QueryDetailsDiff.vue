@@ -67,7 +67,7 @@
 
       <template v-if="queries[0].dags.length || queries[1].dags.length">
         <!-- DAG Tabs -->
-        <tab title="DAG Info" class="hue-layout-row">
+        <tab :title="'DAG Info' + (hasDiagnostics ? ' *' : '')" class="hue-layout-row">
           <div class="hue-layout-column">
             <DagInfo v-for="dag in queries[0].dags" :key="dag.dagInfo.dagId" :dag="dag" />
             <div v-if="!get(queries, '[0].dags.length')" class="hue-info-box">No DAGs!</div>
@@ -180,7 +180,7 @@
 
   import LabeledInfo from '../components/LabeledInfo.vue';
 
-  import { Query } from '../index';
+  import { Query, Dag } from '../index';
 
   import { get } from 'lodash';
 
@@ -211,6 +211,12 @@
     @Inject() showQueries?: () => void;
 
     hideSimilarValues = false;
+
+    get hasDiagnostics(): boolean {
+      return this.queries.some((query: Query) =>
+        query.dags.some((dag: Dag) => dag.dagDetails.diagnostics)
+      );
+    }
   }
 </script>
 
