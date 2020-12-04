@@ -61,7 +61,7 @@
         <hue-button :disabled="selectedQueries.length !== 2" @click="diffQueries(selectedQueries)">
           {{ I18n('Compare') }}
         </hue-button>
-        <QueryKillButton :queries="selectedQueries" @killed="$emit('reload')" />
+        <QueryKillButton :queries="selectedQueries" @killed="reload()" />
       </div>
     </div>
     <div class="query-table-container">
@@ -387,6 +387,11 @@
     killQueries(queries: Query[]): void {
       this.$emit('kill-queries', queries);
     }
+
+    reload(): void {
+      this.selectedQueries = [];
+      this.$emit('reload');
+    }
   }
 </script>
 
@@ -399,7 +404,7 @@
       margin-bottom: 20px;
       width: 100%;
 
-      /deep/ button {
+      /deep/ .hue-dropdown-panel button {
         margin-left: 10px;
       }
 

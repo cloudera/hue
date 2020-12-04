@@ -116,7 +116,7 @@
 
         const killedAll = await this.waitToKillAll(runingQueries);
         if (killedAll) {
-          this.buttonState = ButtonState.KILLED;
+          this.buttonState = ButtonState.NONE;
           this.$emit('killed');
         } else {
           this.buttonState = ButtonState.UNKNOWN;
