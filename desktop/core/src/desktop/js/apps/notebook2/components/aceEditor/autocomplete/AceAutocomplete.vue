@@ -81,6 +81,7 @@
 <script lang="ts">
   import { Ace } from 'ext/ace';
   import ace from 'ext/aceHelper';
+  import { AutocompleteParser } from 'parse/types';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
@@ -128,6 +129,9 @@
     editor!: Ace.Editor;
     @Prop({ required: false, default: false })
     temporaryOnly?: boolean;
+
+    @Prop({ required: false })
+    autocompleteParser?: AutocompleteParser;
 
     startLayout: DOMRect | null = null;
     startPixelRatio = window.devicePixelRatio;
@@ -198,7 +202,8 @@
         editorId: this.editorId,
         executor: this.executor,
         editor: this.editor,
-        temporaryOnly: this.temporaryOnly
+        temporaryOnly: this.temporaryOnly,
+        autocompleteParser: this.autocompleteParser
       });
 
       this.subTracker.addDisposable(this.autocompleter);
