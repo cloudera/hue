@@ -21,7 +21,6 @@ exports[`AceEditor.vue should render 1`] = `
     />
     <div
       class="ace_gutter"
-      style="display: none;"
     >
       <div
         class="ace_layer ace_gutter-layer ace_folding-enabled"
