@@ -26,8 +26,7 @@
       'hue-spinner-blackout': blackout
     }"
   >
-    <i
-      v-if="!overlay"
+    <em
       class="fa fa-spinner fa-spin"
       :style="{ width: center && inline ? '100%' : null }"
       :class="{
