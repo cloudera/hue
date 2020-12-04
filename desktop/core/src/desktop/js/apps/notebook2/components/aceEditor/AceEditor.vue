@@ -442,11 +442,11 @@
             : '12px'
         ),
         enableSnippets: true,
-        showGutter: false,
-        showLineNumbers: false,
+        showGutter: true,
+        showLineNumbers: true,
         showPrintMargin: false,
         scrollPastEnd: 0.1,
-        minLines: 1,
+        minLines: 3,
         maxLines: 25,
         tabSize: 2,
         useSoftTabs: true,
@@ -583,12 +583,6 @@
   }
 </script>
 
-<style lang="scss" scoped>
-  .ace-editor-component {
-    height: 100%;
-
-    .ace-editor {
-      height: 100%;
-    }
-  }
+<style lang="scss">
+  @import './AceEditor.scss';
 </style>
