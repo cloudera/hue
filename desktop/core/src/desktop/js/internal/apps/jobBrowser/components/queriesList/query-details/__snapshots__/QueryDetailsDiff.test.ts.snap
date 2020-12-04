@@ -97,7 +97,7 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
         <input
           type="checkbox"
         />
-         Hide Similar Values
+         Hide Equal Values
       
       </label>
        
@@ -253,8 +253,8 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
         <input
           type="checkbox"
         />
-         Hide Similar Values
-      
+         Hide Equal Values
+        
       </label>
        
       <counterstable-stub
@@ -272,8 +272,8 @@ exports[`QueryDetailsDiff.vue should render 1`] = `
         <input
           type="checkbox"
         />
-         Hide Similar Values
-      
+         Hide Equal Values
+        
       </label>
        
       <configstable-stub

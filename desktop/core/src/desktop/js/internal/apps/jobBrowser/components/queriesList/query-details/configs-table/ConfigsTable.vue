@@ -76,7 +76,8 @@
       const rowHash: Map<string, Row> = new Map();
       let rows: Row[];
 
-      this.configs.forEach((configSet: ConfigSet, index: number) => {
+      const configs = this.configs.filter((configSet: ConfigSet) => configSet.configs);
+      configs.forEach((configSet: ConfigSet, index: number) => {
         const configKey: string = this.generateValueColumnkey(index);
 
         for (const configName in configSet.configs) {

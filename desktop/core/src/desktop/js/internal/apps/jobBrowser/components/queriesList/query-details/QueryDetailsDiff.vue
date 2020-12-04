@@ -49,7 +49,7 @@
       </tab>
       <tab title="Query Config">
         <label class="hide-similar">
-          <input v-model="hideSimilarValues" type="checkbox" /> Hide Similar Values
+          <input v-model="hideSimilarValues" type="checkbox" /> Hide Equal Values
         </label>
         <ConfigsTable
           class="query-b-deep"
@@ -65,95 +65,97 @@
         />
       </tab>
 
-      <!-- DAG Tabs -->
-      <tab title="DAG Info" class="hue-layout-row">
-        <div class="hue-layout-column">
-          <DagInfo v-for="dag in queries[0].dags" :key="dag.dagInfo.dagId" :dag="dag" />
-          <div v-if="!get(queries, '[0].dags.length')" class="hue-info-box">No DAGs!</div>
-        </div>
-        <div class="hue-layout-column">
-          <DagInfo
-            v-for="dag in queries[1].dags"
-            :key="dag.dagInfo.dagId"
-            :dag="dag"
-            class="query-b"
-          />
-          <div v-if="!get(queries, '[1].dags.length')" class="hue-info-box query-b">No DAGs!</div>
-        </div>
-      </tab>
-      <tab title="DAG Flow" class="hue-layout-row">
-        <div class="hue-layout-column">
-          <div v-for="dag in queries[0].dags" :key="dag.dagInfo.dagId">
-            <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
-            <DagGraph :dag="dag" />
+      <template v-if="queries[0].dags.length || queries[1].dags.length">
+        <!-- DAG Tabs -->
+        <tab title="DAG Info" class="hue-layout-row">
+          <div class="hue-layout-column">
+            <DagInfo v-for="dag in queries[0].dags" :key="dag.dagInfo.dagId" :dag="dag" />
+            <div v-if="!get(queries, '[0].dags.length')" class="hue-info-box">No DAGs!</div>
           </div>
-          <div v-if="!get(queries, '[0].dags.length')" class="hue-info-box">No DAGs!</div>
-        </div>
-        <div class="hue-layout-column query-b-deep">
-          <div v-for="dag in queries[1].dags" :key="dag.dagInfo.dagId">
-            <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
-            <DagGraph :dag="dag" />
+          <div class="hue-layout-column">
+            <DagInfo
+              v-for="dag in queries[1].dags"
+              :key="dag.dagInfo.dagId"
+              :dag="dag"
+              class="query-b"
+            />
+            <div v-if="!get(queries, '[1].dags.length')" class="hue-info-box query-b">No DAGs!</div>
           </div>
-          <div v-if="!get(queries, '[1].dags.length')" class="hue-info-box query-b">No DAGs!</div>
-        </div>
-      </tab>
-      <tab title="DAG Swimlane" class="hue-layout-column">
-        <div class="hue-layout-column hue-info-box">
-          <div v-for="dag in queries[0].dags" :key="dag.dagInfo.dagId">
-            <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
-            <DagSwimlane :dag="dag" />
+        </tab>
+        <tab title="DAG Flow" class="hue-layout-row">
+          <div class="hue-layout-column">
+            <div v-for="dag in queries[0].dags" :key="dag.dagInfo.dagId">
+              <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
+              <DagGraph :dag="dag" />
+            </div>
+            <div v-if="!get(queries, '[0].dags.length')" class="hue-info-box">No DAGs!</div>
           </div>
-          <div v-if="!get(queries, '[0].dags.length')">No DAGs!</div>
-        </div>
-        <div class="hue-layout-column hue-info-box query-b">
-          <div v-for="dag in queries[1].dags" :key="dag.dagInfo.dagId">
-            <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
-            <DagSwimlane :dag="dag" />
+          <div class="hue-layout-column query-b-deep">
+            <div v-for="dag in queries[1].dags" :key="dag.dagInfo.dagId">
+              <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
+              <DagGraph :dag="dag" />
+            </div>
+            <div v-if="!get(queries, '[1].dags.length')" class="hue-info-box query-b">No DAGs!</div>
           </div>
-          <div v-if="!get(queries, '[1].dags.length')">No DAGs!</div>
-        </div>
-      </tab>
+        </tab>
+        <tab title="DAG Swimlane" class="hue-layout-column">
+          <div class="hue-layout-column hue-info-box">
+            <div v-for="dag in queries[0].dags" :key="dag.dagInfo.dagId">
+              <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
+              <DagSwimlane :dag="dag" />
+            </div>
+            <div v-if="!get(queries, '[0].dags.length')">No DAGs!</div>
+          </div>
+          <div class="hue-layout-column hue-info-box query-b">
+            <div v-for="dag in queries[1].dags" :key="dag.dagInfo.dagId">
+              <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
+              <DagSwimlane :dag="dag" />
+            </div>
+            <div v-if="!get(queries, '[1].dags.length')">No DAGs!</div>
+          </div>
+        </tab>
 
-      <tab title="DAG Counters">
-        <label class="hide-similar">
-          <input v-model="hideSimilarValues" type="checkbox" /> Hide Similar Values
-        </label>
-        <CountersTable
-          class="query-b-deep"
-          :hide-similar-values="hideSimilarValues"
-          :counters="
-            queries
-              .map((query, queryIndex) =>
-                query.dags.map(dag => ({
-                  title: `DAG : ${dag.dagInfo.dagId}`,
-                  counters: dag.dagDetails.counters,
-                  cssClass: queryIndex ? 'query-b' : ''
-                }))
-              )
-              .flat()
-          "
-        />
-      </tab>
-      <tab title="DAG Configurations">
-        <label class="hide-similar">
-          <input v-model="hideSimilarValues" type="checkbox" /> Hide Similar Values
-        </label>
-        <ConfigsTable
-          class="query-b-deep"
-          :hide-similar-values="hideSimilarValues"
-          :configs="
-            queries
-              .map((query, queryIndex) =>
-                query.dags.map(dag => ({
-                  title: `DAG : ${dag.dagInfo.dagId}`,
-                  configs: dag.config,
-                  cssClass: queryIndex ? 'query-b' : ''
-                }))
-              )
-              .flat()
-          "
-        />
-      </tab>
+        <tab title="DAG Counters">
+          <label class="hide-similar">
+            <input v-model="hideSimilarValues" type="checkbox" /> Hide Equal Values
+          </label>
+          <CountersTable
+            class="query-b-deep"
+            :hide-similar-values="hideSimilarValues"
+            :counters="
+              queries
+                .map((query, queryIndex) =>
+                  query.dags.map(dag => ({
+                    title: `DAG : ${dag.dagInfo.dagId}`,
+                    counters: dag.dagDetails.counters,
+                    cssClass: queryIndex ? 'query-b' : ''
+                  }))
+                )
+                .flat()
+            "
+          />
+        </tab>
+        <tab title="DAG Configurations">
+          <label class="hide-similar">
+            <input v-model="hideSimilarValues" type="checkbox" /> Hide Equal Values
+          </label>
+          <ConfigsTable
+            class="query-b-deep"
+            :hide-similar-values="hideSimilarValues"
+            :configs="
+              queries
+                .map((query, queryIndex) =>
+                  query.dags.map(dag => ({
+                    title: `DAG : ${dag.dagInfo.dagId}`,
+                    configs: dag.config,
+                    cssClass: queryIndex ? 'query-b' : ''
+                  }))
+                )
+                .flat()
+            "
+          />
+        </tab>
+      </template>
     </tabs>
   </div>
 </template>

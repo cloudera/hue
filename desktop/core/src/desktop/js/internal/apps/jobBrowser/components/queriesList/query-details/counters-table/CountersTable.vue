@@ -82,7 +82,8 @@
       const rowHash: Map<string, Row> = new Map();
       let rows: Row[];
 
-      this.counters.forEach((counterSet: CounterSet, index: number) => {
+      const counters = this.counters.filter((counterSet: CounterSet) => counterSet.counters);
+      counters.forEach((counterSet: CounterSet, index: number) => {
         const counterKey: string = this.generateValueColumnkey(index);
         counterSet.counters.forEach((counterGroup: CounterGroup) => {
           counterGroup.counters.forEach((counter: CounterDetails) => {
