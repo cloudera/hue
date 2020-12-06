@@ -1635,8 +1635,7 @@ Autocomplete.startCommand = {
             pos.top += rect.top - renderer.layerConfig.offset;
             pos.left += rect.left - editor.renderer.scrollLeft;
             pos.left += renderer.gutterWidth;
-
-            huePubSub.publish('hue.ace.autocompleter.show', { editor: editor, position: pos, lineHeight: lineHeight });
+            editor._signal('showAutocomplete', { position: pos, lineHeight: lineHeight });
             return;
         }
         if (!editor.completer)
@@ -1947,10 +1946,9 @@ var doLiveAutocomplete = function(e) {
             pos.top += rect.top - renderer.layerConfig.offset;
             pos.left += rect.left - editor.renderer.scrollLeft;
             pos.left += renderer.gutterWidth;
-
-            huePubSub.publish('hue.ace.autocompleter.show', { editor: editor, position: pos, lineHeight: lineHeight });
+            editor._signal('showAutocomplete', { position: pos, lineHeight: lineHeight });
         } else if (e.command.name === "backspace" && !prefix) {
-            huePubSub.publish('hue.ace.autocompleter.hide');
+            editor._signal('hideAutocomplete');
         }
         return;
     }

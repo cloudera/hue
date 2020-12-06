@@ -27,17 +27,15 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
-  import { wrap } from 'vue/webComponentWrapper';
   import ace, { getAceMode } from 'ext/aceHelper';
   import { Ace } from 'ext/ace';
 
   import AceAutocomplete from './autocomplete/AceAutocomplete.vue';
   import AceGutterHandler from './AceGutterHandler';
   import AceLocationHandler from './AceLocationHandler';
+  import { formatSql } from 'apps/notebook2/apiUtils';
   import Executor from 'apps/notebook2/execution/executor';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
-  import { INSERT_AT_CURSOR_EVENT } from 'ko/bindings/ace/ko.aceEditor';
-  import { CURSOR_POSITION_CHANGED_EVENT } from 'ko/bindings/ace/aceLocationHandler';
   import { IdentifierChainEntry, ParsedLocation } from 'parse/types';
   import { EditorInterpreter } from 'types/config';
   import { hueWindow } from 'types/types';
@@ -48,6 +46,9 @@
 
   // Taken from https://www.cs.tut.fi/~jkorpela/chars/spaces.html
   const UNICODES_TO_REMOVE = /[\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u200B\u202F\u205F\u3000\uFEFF]/gi;
+
+  const INSERT_AT_CURSOR_EVENT = 'editor.insert.at.cursor';
+  const CURSOR_POSITION_CHANGED_EVENT = 'editor.cursor.position.changed';
 
   const removeUnicodes = (value: string) => value.replace(UNICODES_TO_REMOVE, ' ');
 
@@ -168,25 +169,6 @@
         }
       }
 
-      const triggerChange = () => {
-        this.$emit('value-changed', removeUnicodes(editor.getValue()));
-      };
-
-      editor.commands.addCommand({
-        name: 'execute',
-        bindKey: { win: 'Ctrl-Enter', mac: 'Command-Enter|Ctrl-Enter' },
-        exec: async () => {
-          if (this.aceLocationHandler) {
-            this.aceLocationHandler.refreshStatementLocations();
-          }
-          if (this.editor && this.executor.activeExecutable) {
-            triggerChange();
-            await this.executor.activeExecutable.reset();
-            await this.executor.activeExecutable.execute();
-          }
-        }
-      });
-
       const onFocus = (): void => {
         huePubSub.publish('ace.editor.focused', editor);
 
@@ -235,8 +217,9 @@
         }
       };
 
-      editor.on('change', triggerChange);
-      editor.on('blur', triggerChange);
+      const boundTriggerChange = this.triggerChange.bind(this);
+      editor.on('change', boundTriggerChange);
+      editor.on('blur', boundTriggerChange);
       editor.on('focus', onFocus);
       editor.on('paste', onPaste);
       editor.on('input', onInput);
@@ -244,8 +227,8 @@
 
       this.subTracker.addDisposable({
         dispose: () => {
-          editor.off('change', triggerChange);
-          editor.off('blur', triggerChange);
+          editor.off('change', boundTriggerChange);
+          editor.off('blur', boundTriggerChange);
           editor.off('focus', onFocus);
           editor.off('paster', onPaste);
           editor.off('input', onInput);
@@ -299,6 +282,7 @@
       );
 
       this.editor = editor;
+      this.registerEditorCommands();
       this.addInsertSubscribers();
       this.$emit('ace-created', editor);
     }
@@ -487,10 +471,108 @@
     destroyed(): void {
       this.subTracker.dispose();
     }
-  }
 
-  export const COMPONENT_NAME = 'ace-editor';
-  wrap(COMPONENT_NAME, AceEditor);
+    triggerChange(): void {
+      if (this.editor) {
+        this.$emit('value-changed', removeUnicodes(this.editor.getValue()));
+      }
+    }
+
+    registerEditorCommands(): void {
+      if (!this.editor) {
+        return;
+      }
+
+      this.editor.commands.addCommand({
+        name: 'execute',
+        bindKey: { win: 'Ctrl-Enter', mac: 'Command-Enter|Ctrl-Enter' },
+        exec: async () => {
+          if (this.aceLocationHandler) {
+            this.aceLocationHandler.refreshStatementLocations();
+          }
+          if (this.editor && this.executor.activeExecutable) {
+            this.triggerChange();
+            await this.executor.activeExecutable.reset();
+            await this.executor.activeExecutable.execute();
+          }
+        }
+      });
+
+      this.editor.commands.addCommand({
+        name: 'switchTheme',
+        bindKey: { win: 'Ctrl-Alt-t', mac: 'Command-Alt-t' },
+        exec: () => {
+          if (
+            this.editor &&
+            this.editor.customMenuOptions &&
+            this.editor.customMenuOptions.getEnableDarkTheme &&
+            this.editor.customMenuOptions.setEnableDarkTheme
+          ) {
+            const enabled = this.editor.customMenuOptions.getEnableDarkTheme();
+            this.editor.customMenuOptions.setEnableDarkTheme(!enabled);
+          }
+        }
+      });
+
+      this.editor.commands.addCommand({
+        name: 'new',
+        bindKey: { win: 'Ctrl-e', mac: 'Command-e' },
+        exec: () => {
+          this.$emit('create-new-doc');
+        }
+      });
+
+      this.editor.commands.addCommand({
+        name: 'save',
+        bindKey: { win: 'Ctrl-s', mac: 'Command-s|Ctrl-s' },
+        exec: () => {
+          this.$emit('save-doc');
+        }
+      });
+
+      this.editor.commands.addCommand({
+        name: 'togglePresentationMode',
+        bindKey: { win: 'Ctrl-Shift-p', mac: 'Ctrl-Shift-p|Command-Shift-p' },
+        exec: () => {
+          this.$emit('toggle-presentation-mode');
+        }
+      });
+
+      this.editor.commands.addCommand({
+        name: 'format',
+        bindKey: {
+          win: 'Ctrl-i|Ctrl-Shift-f|Ctrl-Alt-l',
+          mac: 'Command-i|Ctrl-i|Ctrl-Shift-f|Command-Shift-f|Ctrl-Shift-l|Cmd-Shift-l'
+        },
+        exec: async () => {
+          if (this.editor) {
+            this.editor.setReadOnly(true);
+            try {
+              if (this.editor.getSelectedText()) {
+                const selectionRange = this.editor.getSelectionRange();
+                const formatted = await formatSql({
+                  statements: this.editor.getSelectedText(),
+                  silenceErrors: true
+                });
+                this.editor.getSession().replace(selectionRange, formatted);
+              } else {
+                const formatted = await formatSql({
+                  statements: this.editor.getValue(),
+                  silenceErrors: true
+                });
+                this.editor.setValue(formatted, 1);
+              }
+              this.triggerChange();
+            } catch (e) {}
+            this.editor.setReadOnly(false);
+          }
+        }
+      });
+
+      this.editor.commands.bindKey('Ctrl-P', 'golineup');
+      this.editor.commands.bindKey({ win: 'Ctrl-j', mac: 'Command-j|Ctrl-j' }, 'gotoline');
+    }
+  }
 </script>
 
 <style lang="scss" scoped>

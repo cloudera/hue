@@ -905,11 +905,20 @@
             'ace-created': function (event) {
               ace(event.detail);
             },
-            'value-changed': function (event) {
-              statement_raw(event.detail);
-            },
             'cursor-changed': function (event) {
               aceCursorPosition(event.detail);
+            },
+            'create-new-doc': function () {
+              huePubSub.publish('editor.create.new');
+            },
+            'save-doc': function () {
+              huePubSub.publish('editor.save');
+            },
+            'toggle-presentation-mode': function () {
+              huePubSub.publish('editor.presentation.toggle');
+            },
+            'value-changed': function (event) {
+              statement_raw(event.detail);
             }
           },
           vueKoProps: {
