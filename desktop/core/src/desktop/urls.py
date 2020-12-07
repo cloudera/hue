@@ -222,7 +222,7 @@ dynamic_patterns += [
 ]
 
 dynamic_patterns += [
-  url(r'^admin/?', include(admin.site.urls)),
+  url(r'^admin/?', admin.site.urls),
 ]
 
 if ENABLE_PROMETHEUS.get():
@@ -246,17 +246,17 @@ app_urls_patterns = []
 for app in appmanager.DESKTOP_MODULES:
   if app.urls:
     if app.is_url_namespaced:
-      namespace = {'namespace': app.name, 'app_name': app.name}
+      namespace = app.name
     else:
-      namespace = {}
+      namespace = None
     if namespace or app in appmanager.DESKTOP_APPS:
-      app_urls_patterns.append(url('^' + re.escape(app.name) + '/', include(app.urls, **namespace)))
+      app_urls_patterns.append(url('^' + re.escape(app.name) + '/', include(app.urls, namespace=namespace)))
       app.urls_imported = True
 
 static_patterns.append(
     url(r'^%s(?P<path>.*)$' % re.escape(settings.STATIC_URL.lstrip('/')),
       serve,
-      { 'document_root': settings.STATIC_ROOT })
+      {'document_root': settings.STATIC_ROOT})
 )
 
 urlpatterns = []
