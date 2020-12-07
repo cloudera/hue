@@ -30,11 +30,11 @@ from datetime import datetime
 
 from axes.decorators import watch_login
 import django.contrib.auth.views
-from django.core import urlresolvers
 from django.core.exceptions import SuspiciousOperation
 from django.contrib.auth import login, get_backends, authenticate
 from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from hadoop.fs.exceptions import WebHdfsException
@@ -93,7 +93,7 @@ def first_login_ever():
 
 
 # We want unique method name to represent HUE-3 vs HUE-4 method call.
-# This is required because of urlresolvers.reverse('desktop.auth.views.dt_login') below which needs uniqueness to work correctly.
+# This is required because of reverse('desktop.auth.views.dt_login') below which needs uniqueness to work correctly.
 @login_notrequired
 def dt_login_old(request, from_modal=False):
   return dt_login(request, from_modal)
@@ -155,7 +155,7 @@ def dt_login(request, from_modal=False):
           LOG.error('Could not create home directory at login for %s.' % user, exc_info=e)
 
         if require_change_password(userprofile):
-          return HttpResponseRedirect('/hue' + urlresolvers.reverse('useradmin.views.edit_user', kwargs={'username': user.username}))
+          return HttpResponseRedirect('/hue' + reverse('useradmin.views.edit_user', kwargs={'username': user.username}))
 
         userprofile.first_login = False
         userprofile.last_activity = datetime.now()
@@ -210,7 +210,7 @@ def dt_login(request, from_modal=False):
     renderable_path = 'login_modal.mako'
 
   response = render(renderable_path, request, {
-    'action': urlresolvers.reverse('desktop_auth_views_dt_login'),
+    'action': reverse('desktop_auth_views_dt_login'),
     'form': first_user_form or auth_form,
     'next': redirect_to,
     'first_login_ever': is_first_login_ever,
