@@ -56,7 +56,7 @@ const onMessage = msg => {
   clearTimeout(throttle);
   throttle = setTimeout(() => {
     if (msg.data.statementDetails) {
-      sqlParserRepository.getAutocompleter(msg.data.connector.dialect).then(parser => {
+      sqlParserRepository.getAutocompleteParser(msg.data.connector.dialect).then(parser => {
         let locations = [];
         const activeStatementLocations = [];
         msg.data.statementDetails.precedingStatements.forEach(statement => {

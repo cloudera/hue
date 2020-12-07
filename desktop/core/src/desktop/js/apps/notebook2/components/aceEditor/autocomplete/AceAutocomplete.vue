@@ -122,16 +122,16 @@
   })
   export default class AceAutocomplete extends Vue {
     @Prop({ required: true })
-    executor!: Executor;
+    autocompleteParser!: AutocompleteParser;
+    @Prop({ required: true })
+    editor!: Ace.Editor;
     @Prop({ required: true })
     editorId!: string;
     @Prop({ required: true })
-    editor!: Ace.Editor;
+    executor!: Executor;
+
     @Prop({ required: false, default: false })
     temporaryOnly?: boolean;
-
-    @Prop({ required: false })
-    autocompleteParser?: AutocompleteParser;
 
     startLayout: DOMRect | null = null;
     startPixelRatio = window.devicePixelRatio;

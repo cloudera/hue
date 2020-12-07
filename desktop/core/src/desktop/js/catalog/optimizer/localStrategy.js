@@ -27,7 +27,7 @@ export default class LocalStrategy extends BaseStrategy {
 
     // TODO: Get parser from repository, need to extract SqlFunctions dep first
     // to reduce size of main hue bundle
-    // const parser = await sqlParserRepository.getAutocompleter(snippet.dialect);
+    // const parser = await sqlParserRepository.getAutocompleteParser(snippet.dialect);
     const sqlParseResult = sqlAutocompleteParser.parseSql(snippet.statement + ' ', '');
 
     const hasLimit = sqlParseResult.locations.some(
