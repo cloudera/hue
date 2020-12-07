@@ -39,7 +39,7 @@
   import AceAutocomplete from './autocomplete/AceAutocomplete.vue';
   import AceGutterHandler from './AceGutterHandler';
   import AceLocationHandler from './AceLocationHandler';
-  import { formatSql } from 'apps/notebook2/apiUtils';
+  import { formatSql } from 'apps/notebook2/api';
   import Executor from 'apps/notebook2/execution/executor';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import {
