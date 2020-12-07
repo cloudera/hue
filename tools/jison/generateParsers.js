@@ -47,7 +47,7 @@ const PARSER_FOLDER = '../../desktop/core/src/desktop/js/parse/sql/';
 const OUTPUT_FOLDER = '../../desktop/core/src/desktop/js/parse/';
 const JISON_FOLDER = '../../desktop/core/src/desktop/js/parse/jison/';
 const SQL_PARSER_REPOSITORY_PATH =
-  '../../desktop/core/src/desktop/js/parse/sql/sqlParserRepository.js';
+  '../../desktop/core/src/desktop/js/parse/sql/sqlParserRepository.ts';
 const SYNTAX_PARSER_IMPORT_TEMPLATE =
   '  KEY: () => import(/* webpackChunkName: "KEY-parser" */ \'parse/sql/KEY/KEYSyntaxParser\')';
 const AUTOCOMPLETE_PARSER_IMPORT_TEMPLATE =
@@ -471,7 +471,7 @@ identifySqlParsers().then(() => {
       } else {
         const autocompParsers = [];
         const syntaxParsers = [];
-        console.log('Updating sqlParserRepository.js...');
+        console.log('Updating sqlParserRepository.ts...');
         Object.keys(parserDefinitions).forEach(key => {
           if (parserDefinitions[key].sqlParser === 'AUTOCOMPLETE') {
             autocompParsers.push(

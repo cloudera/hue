@@ -24,6 +24,7 @@
     :executor="executor"
     :initial-cursor-position="cursorPosition"
     :initial-value="value"
+    :sql-parser-provider="sqlParserProvider"
     @ace-created="aceCreated"
     @create-new-doc="createNewDoc"
     @cursor-changed="cursorChanged"
@@ -43,6 +44,7 @@
   import AceEditor from './AceEditor.vue';
   import Executor from 'apps/notebook2/execution/executor';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
+  import sqlParserRepository from 'parse/sql/sqlParserRepository';
 
   @Component({
     components: { AceEditor }
@@ -60,10 +62,11 @@
     aceOptions?: Ace.Options;
 
     cursorPosition?: Ace.Position;
-    value?: string;
     editorId?: string;
-    subTracker = new SubscriptionTracker();
     initialized = false;
+    sqlParserProvider = sqlParserRepository;
+    subTracker = new SubscriptionTracker();
+    value?: string;
 
     updated(): void {
       if (!this.initialized) {
