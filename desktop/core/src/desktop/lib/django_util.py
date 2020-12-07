@@ -25,7 +25,7 @@ import socket
 import datetime
 
 from django.conf import settings
-from django.core import urlresolvers, serializers
+from django.core import serializers
 from django.template import context as django_template_context
 from django.template.context_processors import csrf
 from django.core.serializers.json import DjangoJSONEncoder
@@ -34,6 +34,7 @@ from django.http import QueryDict, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response as django_render_to_response
 from django.template.context import RequestContext
 from django.template.loader import render_to_string as django_render_to_string
+from django.urls import reverse
 from django.utils.http import urlencode # this version is unicode-friendly
 from django.utils.translation import ungettext, ugettext
 from django.utils.timezone import get_current_timezone
@@ -129,7 +130,7 @@ def make_absolute(request, view_name, kwargs=None):
   Magic to make an absolute url.  In the template world,
   this is done with {% url %}.
   """
-  return request.build_absolute_uri(urlresolvers.reverse(view_name, kwargs=kwargs))
+  return request.build_absolute_uri(reverse(view_name, kwargs=kwargs))
 
 def _get_template_lib(template, kwargs):
   template_lib = kwargs.get('template_lib')
@@ -371,16 +372,16 @@ class TruncatingModel(models.Model):
 
 def reverse_with_get(view, args=None, kwargs=None, get=None):
   """
-  Version of urlresolvers.reverse that also manages get parameters.
+  Version of reverse that also manages get parameters.
 
-  view, args and kwargs are arguments passed to urlresolvers.reverse.
+  view, args and kwargs are arguments passed to reverse.
   Typically only one of args and kwargs are specified.
 
   get is a dictionary of extra get parameters.
   """
   if args is None:
     args = dict()
-  url = urlresolvers.reverse(view, args=args, kwargs=kwargs)
+  url = reverse(view, args=args, kwargs=kwargs)
   if get is not None and len(get) > 0:
     params = urlencode(get)
     url = url + "?" + params
@@ -412,21 +413,21 @@ def timesince(d=None, now=None, abbreviate=False, separator=','):
     chunks = (
       (60 * 60 * 24 * 365, lambda n: 'y'),
       (60 * 60 * 24 * 30, lambda n: 'm'),
-      (60 * 60 * 24 * 7, lambda n : 'w'),
-      (60 * 60 * 24, lambda n : 'd'),
+      (60 * 60 * 24 * 7, lambda n: 'w'),
+      (60 * 60 * 24, lambda n: 'd'),
       (60 * 60, lambda n: 'h'),
       (60, lambda n: 'm'),
-      (1, lambda n : 's'),
+      (1, lambda n: 's'),
     )
   else:
     chunks = (
       (60 * 60 * 24 * 365, lambda n: ungettext('year', 'years', n)),
       (60 * 60 * 24 * 30, lambda n: ungettext('month', 'months', n)),
-      (60 * 60 * 24 * 7, lambda n : ungettext('week', 'weeks', n)),
-      (60 * 60 * 24, lambda n : ungettext('day', 'days', n)),
+      (60 * 60 * 24 * 7, lambda n: ungettext('week', 'weeks', n)),
+      (60 * 60 * 24, lambda n: ungettext('day', 'days', n)),
       (60 * 60, lambda n: ungettext('hour', 'hours', n)),
       (60, lambda n: ungettext('minute', 'minutes', n)),
-      (1, lambda n : ungettext('second', 'seconds', n)),
+      (1, lambda n: ungettext('second', 'seconds', n)),
     )
 
   # Convert datetime.date to datetime.datetime for comparison.
@@ -472,7 +473,7 @@ def timesince(d=None, now=None, abbreviate=False, separator=','):
 
 # Backported from Django 1.7
 class JsonResponse(HttpResponse):
-    """
+  """
     An HTTP response class that consumes data to be serialized to JSON.
 
     :param data: Data to be dumped into json. By default only ``dict`` objects
@@ -485,13 +486,13 @@ class JsonResponse(HttpResponse):
     :param json_dumps_params: A dictionary of kwargs passed to json.dumps().
     """
 
-    def __init__(self, data, encoder=DjangoJSONEncoder, safe=True,
-                 json_dumps_params=None, **kwargs):
-        if safe and not isinstance(data, dict):
-            raise TypeError('In order to allow non-dict objects to be '
-                'serialized set the safe parameter to False')
-        if json_dumps_params is None:
-            json_dumps_params = {}
-        kwargs.setdefault('content_type', 'application/json')
-        data = json.dumps(data, cls=encoder, **json_dumps_params)
-        super(JsonResponse, self).__init__(content=data, **kwargs)
+  def __init__(self, data, encoder=DjangoJSONEncoder, safe=True,
+                json_dumps_params=None, **kwargs):
+    if safe and not isinstance(data, dict):
+      raise TypeError('In order to allow non-dict objects to be '
+        'serialized set the safe parameter to False')
+    if json_dumps_params is None:
+      json_dumps_params = {}
+    kwargs.setdefault('content_type', 'application/json')
+    data = json.dumps(data, cls=encoder, **json_dumps_params)
+    super(JsonResponse, self).__init__(content=data, **kwargs)

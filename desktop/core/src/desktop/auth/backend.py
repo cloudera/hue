@@ -46,10 +46,11 @@ import requests
 
 import django.contrib.auth.backends
 from django.contrib import auth
-from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpResponseRedirect
 from django.forms import ValidationError
+from django.urls import reverse
+
 try:
   from django_auth_ldap.backend import LDAPBackend
   from django_auth_ldap.config import LDAPSearch
