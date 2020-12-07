@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 
-from metadata.optimizer.base import Api, _get_table_name
+from metadata.optimizer.base import Api
 
 
 LOG = logging.getLogger(__name__)
@@ -88,30 +88,47 @@ class DummyClient(Api):
 
 
   def query_risk(self, query, source_platform, db_name, page_size=100, startingToken=None):
+    hints = []
+    response = {}
+
     return {
       'hints': hints,
       'noStats': response.get('noStats', []),
       'noDDL': response.get('noDDL', []),
     }
 
+
   def similar_queries(self, source_platform, query, page_size=100, startingToken=None):
     raise PopupException(_('Call not supported'))
 
 
   def top_filters(self, db_tables=None, page_size=100, startingToken=None):
-    results = {'result': []}
+    results = {'results': []}
 
     return results
 
 
   def top_aggs(self, db_tables=None, page_size=100, startingToken=None):
-    results = {'result': []}
+    results = {'results': []}
 
     return results
 
 
   def top_columns(self, db_tables=None, page_size=100, startingToken=None):
-    results = {'results': []}
+    results = {
+      'selectColumns': [{
+        "dbName": 'default',
+        "tableName": 'sample_07',
+        "columnName": 'description',
+        "columnCount": 2,
+        "groupbyCol": 0,
+        "selectCol": 2,
+        "filterCol": 0,
+        "joinCol": 0,
+        "orderbyCol": 0,
+        "workloadPercent": 100,
+      }
+    ]}
 
     return results
 
@@ -123,15 +140,6 @@ class DummyClient(Api):
 
 
   def top_databases(self, page_size=100, startingToken=None):
-    args = {
-      'tenant' : self._tenant_id,
-      'pageSize': page_size,
-      'startingToken': startingToken
-    }
+    results = {'results': []}
 
-    data = self._call('getTopDatabases', args)
-
-    if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
-      data['results'] = list(_secure_results(data['results'], self.user))
-
-    return data
+    return results
