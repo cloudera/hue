@@ -23,7 +23,7 @@ import {
   ExecuteApiResponse,
   ExecutionHandle,
   ExecutionHistory
-} from 'apps/notebook2/execution/apiUtils';
+} from 'apps/notebook2/execution/api';
 import ExecutionResult from 'apps/notebook2/execution/executionResult';
 import { hueWindow } from 'types/types';
 import hueAnalytics from 'utils/hueAnalytics';

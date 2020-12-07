@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ExecuteApiResponse, executeStatement } from 'apps/notebook2/execution/apiUtils';
+import { ExecuteApiResponse, executeStatement } from 'apps/notebook2/execution/api';
 import Executable, { ExecutableRaw } from 'apps/notebook2/execution/executable';
 import { ExecutionError } from 'apps/notebook2/execution/executionLogs';
 import Executor from 'apps/notebook2/execution/executor';

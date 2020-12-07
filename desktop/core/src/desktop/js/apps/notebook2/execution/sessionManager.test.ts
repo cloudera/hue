@@ -16,10 +16,10 @@
 
 import { CancellablePromise } from 'api/cancellablePromise';
 import { CLOSE_SESSION_API } from 'api/urls';
-import { AuthRequest, Session, SessionProperty } from './apiUtils';
+import { AuthRequest, Session, SessionProperty } from './api';
 
-import * as ApiUtils from './apiUtils';
-import * as ApiUtilsV2 from 'api/apiUtilsV2';
+import * as ExecutionApi from './api';
+import * as ApiUtils from 'api/utils';
 import sessionManager from './sessionManager';
 
 describe('sessionManager.ts', () => {
@@ -44,7 +44,7 @@ describe('sessionManager.ts', () => {
       }
       return sessionCount[type]++;
     };
-    spy = jest.spyOn(ApiUtils, 'createSession').mockImplementation(
+    spy = jest.spyOn(ExecutionApi, 'createSession').mockImplementation(
       async (options: {
         type: string;
         properties?: SessionProperty[];
@@ -82,7 +82,7 @@ describe('sessionManager.ts', () => {
 
     expect((await sessionManager.getAllSessions()).length).toEqual(0);
     expect(sessionManager.hasSession('impala')).toBeFalsy();
-    expect(ApiUtils.createSession).toHaveBeenCalledWith(sessionDetails);
+    expect(ExecutionApi.createSession).toHaveBeenCalledWith(sessionDetails);
   });
 
   it('should keep one sessions instance per type', async () => {
@@ -98,7 +98,7 @@ describe('sessionManager.ts', () => {
 
     expect((await sessionManager.getAllSessions()).length).toEqual(1);
     expect(sessionManager.hasSession('impala')).toBeTruthy();
-    expect(ApiUtils.createSession).toHaveBeenCalledTimes(1);
+    expect(ExecutionApi.createSession).toHaveBeenCalledTimes(1);
   });
 
   it('should keep track of multiple instance per type', async () => {
@@ -115,7 +115,7 @@ describe('sessionManager.ts', () => {
     expect((await sessionManager.getAllSessions()).length).toEqual(2);
     expect(sessionManager.hasSession('impala')).toBeTruthy();
     expect(sessionManager.hasSession('hive')).toBeTruthy();
-    expect(ApiUtils.createSession).toHaveBeenCalledTimes(2);
+    expect(ExecutionApi.createSession).toHaveBeenCalledTimes(2);
   });
 
   it('should stop tracking sessions when closed', async () => {
@@ -135,7 +135,7 @@ describe('sessionManager.ts', () => {
     //     }
     // Close the session
 
-    const postSpy = jest.spyOn(ApiUtilsV2, 'simplePost').mockImplementation(
+    const postSpy = jest.spyOn(ApiUtils, 'post').mockImplementation(
       (
         url: string,
         data: unknown,
@@ -154,8 +154,8 @@ describe('sessionManager.ts', () => {
     await sessionManager.closeSession(session);
 
     expect(sessionManager.hasSession('impala')).toBeFalsy();
-    expect(ApiUtils.createSession).toHaveBeenCalledTimes(1);
-    expect(ApiUtilsV2.simplePost).toHaveBeenCalledTimes(1);
+    expect(ExecutionApi.createSession).toHaveBeenCalledTimes(1);
+    expect(ApiUtils.post).toHaveBeenCalledTimes(1);
     postSpy.mockClear();
   });
 
@@ -169,7 +169,7 @@ describe('sessionManager.ts', () => {
     expect(sessionManager.hasSession('impala')).toBeTruthy();
 
     // Restart the session
-    const postSpy = jest.spyOn(ApiUtilsV2, 'simplePost').mockImplementation(
+    const postSpy = jest.spyOn(ApiUtils, 'post').mockImplementation(
       (): CancellablePromise<unknown> =>
         new CancellablePromise(resolve => {
           resolve();
@@ -180,8 +180,8 @@ describe('sessionManager.ts', () => {
     expect(session.session_id).toEqual('impala_1');
     expect(sessionManager.hasSession('impala')).toBeTruthy();
 
-    expect(ApiUtils.createSession).toHaveBeenCalledTimes(2);
-    expect(ApiUtilsV2.simplePost).toHaveBeenCalledTimes(1);
+    expect(ExecutionApi.createSession).toHaveBeenCalledTimes(2);
+    expect(ApiUtils.post).toHaveBeenCalledTimes(1);
     postSpy.mockClear();
   });
 });

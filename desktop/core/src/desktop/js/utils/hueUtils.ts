@@ -291,7 +291,7 @@ export const getSearchParameter = (
   return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
 
-export const logError = (error: string): void => {
+export const logError = (error: unknown): void => {
   if (typeof window.console !== 'undefined' && typeof window.console.error !== 'undefined') {
     if (typeof error !== 'undefined') {
       console.error(error);
