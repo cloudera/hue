@@ -29,11 +29,11 @@ except ImportError:
   LOG.warn('httplib2 module not found')
 
 import django.contrib.auth.views
-from django.core import urlresolvers
 from django.core.exceptions import SuspiciousOperation
 from django.contrib.auth import login, get_backends, authenticate
 from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from hadoop.fs.exceptions import WebHdfsException
 from useradmin.models import User
@@ -51,20 +51,20 @@ from liboauth.backend import OAuthBackend
 
 @login_notrequired
 def show_login_page(request, login_errors=False):
-   """Used by the non-jframe login"""
-   redirect_to = request.GET.get('next', '/')
-   is_first_login_ever = OAuthBackend.is_first_login_ever()
+  """Used by the non-jframe login"""
+  redirect_to = request.GET.get('next', '/')
+  is_first_login_ever = OAuthBackend.is_first_login_ever()
 
-   request.session.set_test_cookie()
-   return render('oauth-login.mako', request, {
-     'action': urlresolvers.reverse('oauth_login'),
-     'next': redirect_to,
-     'first_login_ever': is_first_login_ever,
-     'login_errors': request.method == 'POST' or login_errors,
-     'socialGoogle':   liboauth.conf.CONSUMER_KEY_GOOGLE.get() != "" and liboauth.conf.CONSUMER_SECRET_GOOGLE.get() != "",
-     'socialFacebook': liboauth.conf.CONSUMER_KEY_FACEBOOK.get() != "" and liboauth.conf.CONSUMER_SECRET_FACEBOOK.get() != "",
-     'socialLinkedin': liboauth.conf.CONSUMER_KEY_LINKEDIN.get() != "" and liboauth.conf.CONSUMER_SECRET_LINKEDIN.get() != "",
-     'socialTwitter':  liboauth.conf.CONSUMER_KEY_TWITTER.get() != "" and liboauth.conf.CONSUMER_SECRET_TWITTER.get() != ""
+  request.session.set_test_cookie()
+  return render('oauth-login.mako', request, {
+    'action': reverse('oauth_login'),
+    'next': redirect_to,
+    'first_login_ever': is_first_login_ever,
+    'login_errors': request.method == 'POST' or login_errors,
+    'socialGoogle': liboauth.conf.CONSUMER_KEY_GOOGLE.get() != "" and liboauth.conf.CONSUMER_SECRET_GOOGLE.get() != "",
+    'socialFacebook': liboauth.conf.CONSUMER_KEY_FACEBOOK.get() != "" and liboauth.conf.CONSUMER_SECRET_FACEBOOK.get() != "",
+    'socialLinkedin': liboauth.conf.CONSUMER_KEY_LINKEDIN.get() != "" and liboauth.conf.CONSUMER_SECRET_LINKEDIN.get() != "",
+    'socialTwitter': liboauth.conf.CONSUMER_KEY_TWITTER.get() != "" and liboauth.conf.CONSUMER_SECRET_TWITTER.get() != ""
  })
 
 
@@ -85,7 +85,7 @@ def oauth_authenticated(request):
   if access_token == "":
     return show_login_page(request, True)
 
-  user = authenticate(access_token = access_token)
+  user = authenticate(access_token=access_token)
   login(request, user)
 
   return HttpResponseRedirect(next)

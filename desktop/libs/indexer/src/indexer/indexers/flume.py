@@ -18,7 +18,7 @@ from builtins import object
 import logging
 import os
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from libzookeeper.conf import zkensemble
