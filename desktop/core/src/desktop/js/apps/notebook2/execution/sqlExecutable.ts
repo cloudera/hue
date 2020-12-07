@@ -100,7 +100,9 @@ export default class SqlExecutable extends Executable {
     executable.handle = executableRaw.handle;
     executable.history = executableRaw.history;
     executable.id = executableRaw.id;
-    executable.logs.errors = executableRaw.logs.errors;
+    if (executableRaw.logs.errors) {
+      executable.logs.errors = executableRaw.logs.errors.map(error => executable.adaptError(error));
+    }
     executable.logs.jobs = executableRaw.logs.jobs;
     executable.lost = executableRaw.lost;
     executable.observerState = executableRaw.observerState || {};
