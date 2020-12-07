@@ -20,7 +20,7 @@
   <div class="ace-editor-component">
     <div :id="id" ref="editorElement" class="ace-editor" />
     <ace-autocomplete
-      v-if="editor"
+      v-if="editor && autocompleteParser"
       :autocomplete-parser="autocompleteParser"
       :editor="editor"
       :editor-id="id"
@@ -42,7 +42,12 @@
   import { formatSql } from 'apps/notebook2/apiUtils';
   import Executor from 'apps/notebook2/execution/executor';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
-  import { AutocompleteParser, IdentifierChainEntry, ParsedLocation } from 'parse/types';
+  import {
+    AutocompleteParser,
+    IdentifierChainEntry,
+    ParsedLocation,
+    SqlParserProvider
+  } from 'parse/types';
   import { EditorInterpreter } from 'types/config';
   import { hueWindow } from 'types/types';
   import huePubSub from 'utils/huePubSub';
@@ -74,10 +79,11 @@
     @Prop({ required: false, default: () => ({}) })
     aceOptions?: Ace.Options;
     @Prop({ required: false })
-    autocompleteParser?: AutocompleteParser;
+    sqlParserProvider?: SqlParserProvider;
 
     subTracker = new SubscriptionTracker();
     editor: Ace.Editor | null = null;
+    autocompleteParser: AutocompleteParser | null = null;
     aceLocationHandler: AceLocationHandler | null = null;
     lastFocusedEditor = false;
 
@@ -89,6 +95,14 @@
       const editorElement = <HTMLElement>this.$refs['editorElement'];
       if (!editorElement) {
         return;
+      }
+
+      if (this.sqlParserProvider) {
+        this.sqlParserProvider
+          .getAutocompleteParser(this.executor.connector().dialect)
+          .then(autocompleteParser => {
+            this.autocompleteParser = autocompleteParser;
+          });
       }
 
       const height = localStorage.getItem('ace.editor.custom.height') || '128';
