@@ -1,0 +1,35 @@
+<settings>
+  <mirrors>
+    <mirror>
+      <id>public</id>
+      <mirrorOf>*</mirrorOf>
+      <url>https://nexus-private.hortonworks.com/nexus/content/groups/public</url>
+    </mirror>
+  </mirrors>
+  <profiles>
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <repositories>
+        <repository>
+          <id>hwxMaven</id>
+          <name>hwx maven</name>
+          <url>https://nexus-private.hortonworks.com/nexus/content/groups/public</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>cldrMaven</id>
+          <name>cm external maven</name>
+          <url>http://maven.jenkins.cloudera.com:8081/artifactory/cm-external-only</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+</settings>

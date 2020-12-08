@@ -2,26 +2,29 @@
 
 set -ex
 
+# Time marker for both stderr and stdout
+date; date 1>&2
+
 WORK_DIR=$(dirname $(readlink -f $0))
+. ${WORK_DIR}/common.sh
+
 HUE_SRC=$(realpath $WORK_DIR/../..)
 BUILD_DIR=$(realpath $HUE_SRC/../containerbuild$GBN)
+
 HUE_DIR=$WORK_DIR/hue
 APACHE_DIR=$WORK_DIR/huelb
 BASEHUE_DIR=$WORK_DIR/base/hue
 BASEHUELB_DIR=$WORK_DIR/base/huelb
-HUEBASE_VERSION=huebase_ubi:7.5.2
-HUELBBASE_VERSION=huelb_httpd_ubi:2.4
 COMPILEHUE_DIR=$WORK_DIR/compile/hue
-COMPILEHUE_VERSION=huecompile_ubi:7.5.2
-HUEUSER="hive"
-CONTAINER=$(uuidgen | cut -d"-" -f5)
+
+COMPILEHUE_VERSION=huecompile_ubi:$DOCKERHUEBASE_VERSION
+HUEBASE_VERSION=huebase_ubi:$DOCKERHUEBASE_VERSION
+HUELBBASE_VERSION=huelb_httpd_ubi:$DOCKERHUELB_VERSION
+
 CONTAINER_HUE_SRC=/root/hue
 CONTAINER_HUE_OPT=/opt
 
-if [ -z "$REGISTRY" ]; then
-  REGISTRY=${REGISTRY:-"docker.io/hortonworks"}
-fi
-
+# This step is performed inside the docker(compile step)
 compile_hue() {
   mkdir -p $CONTAINER_HUE_OPT
   cd $CONTAINER_HUE_SRC
@@ -32,13 +35,14 @@ compile_hue() {
   bash tools/relocatable.sh
 }
 
+# Compile the bits in the docker and copy it out
 docker_hue_compile() {
   export HUE_USER="hive"
   export HUE_CONF="/etc/hue"
   export HUE_HOME="/opt/${HUEUSER}"
   export HUE_CONF_DIR="${HUE_CONF}/conf"
   export HUE_LOG_DIR="/var/log/${HUEUSER}"
-  export UUID_GEN=$(uuidgen | cut -d"-" -f5)
+  export CONTAINER=$(uuidgen | cut -d"-" -f5)
 
   mkdir -p $BUILD_DIR
   docker run -dt --name $CONTAINER $COMPILEHUE_VERSION /bin/bash
@@ -46,27 +50,6 @@ docker_hue_compile() {
   docker container exec $CONTAINER $CONTAINER_HUE_SRC/tools/container/build.sh compile_hue
   docker container cp $CONTAINER:$CONTAINER_HUE_OPT/hue $BUILD_DIR
   docker container stop $CONTAINER
-}
-
-find_git_state() {
-  cd $HUE_SRC
-  export GBRANCH=$(git ls-remote  --get-url)"/commits/"$(git rev-parse --abbrev-ref HEAD)
-  export GSHA=$(git ls-remote  --get-url)"/commit/"$(git rev-list --no-walk HEAD)
-  export VERSION=$(grep "VERSION=" VERSION | cut -d"=" -f2 | cut -d'"' -f2)
-}
-
-subst_var() {
-  file_name=$1
-  if [[ -e $file_name ]]; then
-    if [[ "$file_name" == *"_template" ]]; then
-      out_name="${file_name::-9}.conf"
-    fi
-  fi
-
-  eval "cat <<EOF
-$(<$file_name)
-EOF
-" | tee $out_name 2> /dev/null
 }
 
 docker_hue_build() {
@@ -150,8 +133,6 @@ build_huecompilebase() {
 }
 
 pull_base_images() {
-  set +e
-
   docker pull ${REGISTRY}/$HUEBASE_VERSION
   if [[ $? != 0 ]]; then
     build_huebase
@@ -169,16 +150,45 @@ pull_base_images() {
     build_huecompilebase
   fi
   docker tag ${REGISTRY}/$COMPILEHUE_VERSION $COMPILEHUE_VERSION
+}
 
-  set -e
+hue_containers_build() {
+  pull_base_images
+  find_git_state
+
+  # compile hue code in compile container
+  docker_hue_compile
+
+  # package compiled hue code in runtime container
+  docker_hue_build
+  docker_huelb_build
+}
+
+wait_for_parallel_jobs() {
+  EXIT=0
+  for job in `jobs -p`; do
+    wait $job || let "EXIT+=1"
+  done
+
+  if [[ "$EXIT" == "0" ]]; then
+    exit 0
+  else
+    exit 1
+  fi
 }
 
 if [[ $1 == "compile_hue" ]]; then
   compile_hue
 else
-  pull_base_images
-  find_git_state
-  docker_hue_compile
-  docker_hue_build
-  docker_huelb_build
+  # Perform Hue Code Compilation and Docker packaging
+  hue_containers_build &
+
+  # Perform any other container build process
+  extra_container_build=$(find_extra_container_to_build)
+  if test -n "$extra_container_build"; then
+    $extra_container_build &
+  fi
+
+  # Wait for the parallel jobs to finish
+  wait_for_parallel_jobs
 fi
