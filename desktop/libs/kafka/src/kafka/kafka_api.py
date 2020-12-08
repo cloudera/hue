@@ -24,6 +24,7 @@ from django.utils.translation import ugettext as _
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from metadata.manager_client import ManagerApi
+from notebook.models import _get_notebook_api
 
 from kafka.conf import has_kafka_api
 from kafka.kafka_client import KafkaApi, KafkaApiException
@@ -101,7 +102,6 @@ def get_topics(user):
   if has_kafka_api():
     return KafkaApi().topics()
   else:
-    from metadata.models.bigquery_client import _get_notebook_api
     data = {
       'snippet': {},
       'database': 'topics'
@@ -115,8 +115,6 @@ def get_topics(user):
 
 
 def get_topic_data(user, name):
-  from metadata.models.bigquery_client import _get_notebook_api
-
   data = _get_notebook_api(user, connector_id=56).get_sample_data(snippet={})
   print(data)
   return data
