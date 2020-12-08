@@ -81,7 +81,7 @@
   import Component from 'vue-class-component';
   import { Prop, Watch } from 'vue-property-decorator';
 
-  import { Session } from 'apps/notebook2/execution/apiUtils';
+  import { Session } from 'apps/notebook2/execution/api';
   import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
   import sessionManager from 'apps/notebook2/execution/sessionManager';
 

@@ -75,7 +75,7 @@ class SqlAutocompleter {
               }
             }) + this.fixedPostfix();
           sqlParserRepository
-            .getAutocompleter(this.snippet.dialect())
+            .getAutocompleteParser(this.snippet.dialect())
             .then(autocompleteParser => {
               resolve(autocompleteParser.parseSql(beforeCursor, afterCursor));
             })
@@ -95,7 +95,7 @@ class SqlAutocompleter {
   async parseAll() {
     return new Promise((resolve, reject) => {
       sqlParserRepository
-        .getAutocompleter(this.snippet.dialect())
+        .getAutocompleteParser(this.snippet.dialect())
         .then(autocompleteParser => {
           resolve(
             autocompleteParser.parseSql(

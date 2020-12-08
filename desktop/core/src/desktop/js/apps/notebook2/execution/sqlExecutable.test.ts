@@ -21,7 +21,7 @@ import Executor from 'apps/notebook2/execution/executor';
 import SqlExecutable from './sqlExecutable';
 import { EXECUTION_STATUS } from './executable';
 import sessionManager from './sessionManager';
-import * as ApiUtils from 'api/apiUtilsV2';
+import * as ApiUtils from 'api/utils';
 import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
 
 describe('sqlExecutable.js', () => {
@@ -100,7 +100,7 @@ describe('sqlExecutable.js', () => {
       statusResolve = resolve;
     });
 
-    jest.spyOn(ApiUtils, 'simplePost').mockImplementation(
+    jest.spyOn(ApiUtils, 'post').mockImplementation(
       (url: string): CancellablePromise<unknown> => {
         currentApiHit++;
         if (url.indexOf(CREATE_SESSION_API) !== -1) {
@@ -159,7 +159,7 @@ describe('sqlExecutable.js', () => {
   //       })
   //   );
   //
-  //   jest.spyOn(ApiUtils, 'simplePost').mockImplementation(url => {
+  //   jest.spyOn(ApiUtils, 'post').mockImplementation(url => {
   //     expect(url).toEqual('/notebook/api/execute/impala');
   //     return simplePostDeferred;
   //   });
@@ -182,7 +182,7 @@ describe('sqlExecutable.js', () => {
   //
   //   const simplePostExeuteDeferred = $.Deferred();
   //   const simplePostCancelDeferred = $.Deferred();
-  //   jest.spyOn(ApiUtils, 'simplePost').mockImplementation(url => {
+  //   jest.spyOn(ApiUtils, 'post').mockImplementation(url => {
   //     if (url === '/notebook/api/execute/impala') {
   //       return simplePostExeuteDeferred;
   //     } else if (url === '/notebook/api/cancel_statement') {

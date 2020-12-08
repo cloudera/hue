@@ -18,44 +18,46 @@ import $ from 'jquery';
 
 import BaseStrategy from './baseStrategy';
 import dataCatalog from 'catalog/dataCatalog';
-import sqlAutocompleteParser from 'parse/sql/hive/hiveAutocompleteParser';
+import sqlParserRepository from 'parse/sql/sqlParserRepository';
 import I18n from 'utils/i18n';
 
 export default class LocalStrategy extends BaseStrategy {
   analyzeRisk(options) {
     const snippet = JSON.parse(options.snippetJson);
 
-    // TODO: Get parser from repository, need to extract SqlFunctions dep first
-    // to reduce size of main hue bundle
-    // const parser = await sqlParserRepository.getAutocompleter(snippet.dialect);
-    const sqlParseResult = sqlAutocompleteParser.parseSql(snippet.statement + ' ', '');
-
-    const hasLimit = sqlParseResult.locations.some(
-      location => location.type === 'limitClause' && !location.missing
-    );
-
     const deferred = $.Deferred();
-    deferred.resolve({
-      status: 0,
-      message: '',
-      query_complexity: {
-        hints: !hasLimit
-          ? [
-              {
-                riskTables: [],
-                riskAnalysis: I18n('Query has no limit'),
-                riskId: 22, // To change
-                risk: 'low',
-                riskRecommendation: I18n(
-                  'Append a limit clause to reduce the size of the result set'
-                )
-              }
-            ]
-          : [],
-        noStats: true,
-        noDDL: false
-      }
-    });
+    sqlParserRepository
+      .getAutocompleteParser(this.connector.dialect)
+      .then(sqlAutocompleteParser => {
+        const sqlParseResult = sqlAutocompleteParser.parseSql(snippet.statement + ' ', '');
+
+        const hasLimit = sqlParseResult.locations.some(
+          location => location.type === 'limitClause' && !location.missing
+        );
+
+        deferred.resolve({
+          status: 0,
+          message: '',
+          query_complexity: {
+            hints: !hasLimit
+              ? [
+                  {
+                    riskTables: [],
+                    riskAnalysis: I18n('Query has no limit'),
+                    riskId: 22, // To change
+                    risk: 'low',
+                    riskRecommendation: I18n(
+                      'Append a limit clause to reduce the size of the result set'
+                    )
+                  }
+                ]
+              : [],
+            noStats: true,
+            noDDL: false
+          }
+        });
+      });
+
     return deferred.promise();
   }
 
