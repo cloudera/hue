@@ -41,20 +41,35 @@ const reloadSourceMeta = function (dataCatalogEntry, options) {
     dataCatalogEntry.dataCatalog.invalidatePromise.always(() => {
       cancellablePromises.push(
         catalogUtils
-          .fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, options)
+          .fetchAndSave(
+            apiHelper.fetchSourceMetadata.bind(apiHelper),
+            val => {
+              dataCatalogEntry.sourceMeta = val;
+            },
+            dataCatalogEntry,
+            options
+          )
           .done(deferred.resolve)
           .fail(deferred.reject)
       );
     });
-    return dataCatalogEntry.trackedPromise(
-      'sourceMetaPromise',
-      new CancellableJqPromise(deferred, undefined, cancellablePromises)
-    );
+    return dataCatalogEntry.trackedPromise(promise => {
+      dataCatalogEntry.sourceMetaPromise = promise;
+    }, new CancellableJqPromise(deferred, undefined, cancellablePromises));
   }
 
   return dataCatalogEntry.trackedPromise(
-    'sourceMetaPromise',
-    catalogUtils.fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, options)
+    promise => {
+      dataCatalogEntry.sourceMetaPromise = promise;
+    },
+    catalogUtils.fetchAndSave(
+      apiHelper.fetchSourceMetadata.bind(apiHelper),
+      val => {
+        dataCatalogEntry.sourceMeta = val;
+      },
+      dataCatalogEntry,
+      options
+    )
   );
 };
 
@@ -71,10 +86,14 @@ const reloadNavigatorMeta = function (dataCatalogEntry, apiOptions) {
   if (dataCatalogEntry.canHaveNavigatorMetadata()) {
     return dataCatalogEntry
       .trackedPromise(
-        'navigatorMetaPromise',
+        promise => {
+          dataCatalogEntry.navigatorMetaPromise = promise;
+        },
         catalogUtils.fetchAndSave(
-          'fetchNavigatorMetadata',
-          'navigatorMeta',
+          apiHelper.fetchNavigatorMetadata.bind(apiHelper),
+          val => {
+            dataCatalogEntry.navigatorMeta = val;
+          },
           dataCatalogEntry,
           apiOptions
         )
@@ -101,10 +120,16 @@ const reloadNavigatorMeta = function (dataCatalogEntry, apiOptions) {
  */
 const reloadAnalysis = function (dataCatalogEntry, apiOptions) {
   return dataCatalogEntry.trackedPromise(
-    'analysisPromise',
+    promise => {
+      dataCatalogEntry.analysisPromise = promise;
+    },
     catalogUtils.fetchAndSave(
-      apiOptions && apiOptions.refreshAnalysis ? 'refreshAnalysis' : 'fetchAnalysis',
-      'analysis',
+      apiOptions && apiOptions.refreshAnalysis
+        ? apiHelper.refreshAnalysis.bind(apiHelper)
+        : apiHelper.fetchAnalysis.bind(apiHelper),
+      val => {
+        dataCatalogEntry.analysis = val;
+      },
       dataCatalogEntry,
       apiOptions
     )
@@ -122,8 +147,17 @@ const reloadAnalysis = function (dataCatalogEntry, apiOptions) {
  */
 const reloadPartitions = function (dataCatalogEntry, apiOptions) {
   return dataCatalogEntry.trackedPromise(
-    'partitionsPromise',
-    catalogUtils.fetchAndSave('fetchPartitions', 'partitions', dataCatalogEntry, apiOptions)
+    promise => {
+      dataCatalogEntry.partitionsPromise = promise;
+    },
+    catalogUtils.fetchAndSave(
+      apiHelper.fetchPartitions.bind(apiHelper),
+      val => {
+        dataCatalogEntry.partitions = val;
+      },
+      dataCatalogEntry,
+      apiOptions
+    )
   );
 };
 
@@ -138,8 +172,17 @@ const reloadPartitions = function (dataCatalogEntry, apiOptions) {
  */
 const reloadSample = function (dataCatalogEntry, apiOptions) {
   return dataCatalogEntry.trackedPromise(
-    'samplePromise',
-    catalogUtils.fetchAndSave('fetchSample', 'sample', dataCatalogEntry, apiOptions)
+    promise => {
+      dataCatalogEntry.samplePromise = promise;
+    },
+    catalogUtils.fetchAndSave(
+      apiHelper.fetchSample.bind(apiHelper),
+      val => {
+        dataCatalogEntry.sample = val;
+      },
+      dataCatalogEntry,
+      apiOptions
+    )
   );
 };
 
@@ -156,10 +199,14 @@ const reloadOptimizerMeta = function (dataCatalogEntry, apiOptions) {
   if (dataCatalogEntry.dataCatalog.canHaveOptimizerMeta()) {
     const optimizer = getOptimizer(dataCatalogEntry.dataCatalog.connector);
     return dataCatalogEntry.trackedPromise(
-      'optimizerMetaPromise',
+      promise => {
+        dataCatalogEntry.optimizerMetaPromise = promise;
+      },
       catalogUtils.fetchAndSave(
         optimizer.fetchOptimizerMeta.bind(optimizer),
-        'optimizerMeta',
+        val => {
+          dataCatalogEntry.optimizerMeta = val;
+        },
         dataCatalogEntry,
         apiOptions
       )
@@ -289,15 +336,14 @@ export default class DataCatalogEntry {
   /**
    * Helper function that ensure that cancellable promises are not tracked anymore when cancelled
    *
-   * @param {string} promiseName - The attribute name to use
+   * @param {Function} promiseSetter - The promise attribute to set
    * @param {CancellableJqPromise} cancellableJqPromise
    */
-  trackedPromise(promiseName, cancellableJqPromise) {
-    const self = this;
-    self[promiseName] = cancellableJqPromise;
+  trackedPromise(promiseSetter, cancellableJqPromise) {
+    promiseSetter(cancellableJqPromise);
     return cancellableJqPromise.fail(() => {
       if (cancellableJqPromise.cancelled) {
-        delete self[promiseName];
+        promiseSetter(undefined);
       }
     });
   }
@@ -518,10 +564,9 @@ export default class DataCatalogEntry {
       .fail(deferred.reject);
 
     return catalogUtils.applyCancellable(
-      self.trackedPromise(
-        'childrenPromise',
-        new CancellableJqPromise(deferred, undefined, [sourceMetaPromise])
-      ),
+      self.trackedPromise(promise => {
+        self.childrenPromise = promise;
+      }, new CancellableJqPromise(deferred, undefined, [sourceMetaPromise])),
       options
     );
   }
@@ -636,10 +681,9 @@ export default class DataCatalogEntry {
     );
 
     return catalogUtils.applyCancellable(
-      self.trackedPromise(
-        'navigatorMetaForChildrenPromise',
-        new CancellableJqPromise(deferred, null, cancellablePromises)
-      ),
+      self.trackedPromise(promise => {
+        self.navigatorMetaForChildrenPromise = promise;
+      }, new CancellableJqPromise(deferred, null, cancellablePromises)),
       options
     );
   }
@@ -782,10 +826,9 @@ export default class DataCatalogEntry {
     }
 
     return catalogUtils.applyCancellable(
-      self.trackedPromise(
-        'optimizerPopularityForChildrenPromise',
-        new CancellableJqPromise(deferred, undefined, cancellablePromises)
-      ),
+      self.trackedPromise(promise => {
+        self.optimizerPopularityForChildrenPromise = promise;
+      }, new CancellableJqPromise(deferred, undefined, cancellablePromises)),
       options
     );
   }
@@ -1725,10 +1768,9 @@ export default class DataCatalogEntry {
         .fail(revertToSpecific);
 
       return catalogUtils.applyCancellable(
-        self.trackedPromise(
-          'samplePromise',
-          new CancellableJqPromise(deferred, undefined, cancellablePromises)
-        ),
+        self.trackedPromise(promise => {
+          self.samplePromise = promise;
+        }, new CancellableJqPromise(deferred, undefined, cancellablePromises)),
         options
       );
     }
