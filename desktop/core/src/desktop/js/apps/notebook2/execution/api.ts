@@ -14,18 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { extractErrorMessage, simplePost, successResponseIsError } from 'api/apiUtilsV2';
-import {
-  CANCEL_STATEMENT_API,
-  CHECK_STATUS_API,
-  CLOSE_SESSION_API,
-  CLOSE_STATEMENT_API,
-  CREATE_SESSION_API,
-  EXECUTE_API_PREFIX,
-  FETCH_RESULT_DATA_API,
-  FETCH_RESULT_SIZE_API,
-  GET_LOGS_API
-} from 'api/urls';
+import { extractErrorMessage, post, successResponseIsError } from 'api/utils';
 import Executable, {
   ExecutableContext,
   EXECUTION_STATUS
@@ -147,6 +136,16 @@ export interface AuthRequest {
   message?: string;
 }
 
+const CANCEL_STATEMENT_API = '/notebook/api/cancel_statement';
+const CHECK_STATUS_API = '/notebook/api/check_status';
+const CLOSE_SESSION_API = '/notebook/api/close_session';
+const CLOSE_STATEMENT_API = '/notebook/api/close_statement';
+const CREATE_SESSION_API = '/notebook/api/create_session';
+const EXECUTE_API_PREFIX = '/notebook/api/execute/';
+const FETCH_RESULT_DATA_API = '/notebook/api/fetch_result_data';
+const FETCH_RESULT_SIZE_API = '/notebook/api/fetch_result_size';
+const GET_LOGS_API = '/notebook/api/get_logs';
+
 export const createSession = async (options: {
   type: string;
   properties?: SessionProperty[];
@@ -156,7 +155,7 @@ export const createSession = async (options: {
     session: JSON.stringify({ type: options.type, properties: options.properties || [] })
   };
 
-  const responsePromise = simplePost<
+  const responsePromise = post<
     {
       session?: Session;
       status: number;
@@ -190,7 +189,7 @@ export const closeSession = async (options: {
     session: JSON.stringify(options.session)
   };
 
-  await simplePost<void, { session: string }>(CLOSE_SESSION_API, data, {
+  await post<void, { session: string }>(CLOSE_SESSION_API, data, {
     silenceErrors: !!options.silenceErrors
   });
 };
@@ -202,7 +201,7 @@ export const executeStatement = async (options: ExecuteApiOptions): Promise<Exec
   const data = (await executable.toContext()) as ExecuteData;
   data.executable = executable.toJson();
 
-  const executePromise = simplePost<
+  const executePromise = post<
     {
       handle: ExecutionHandle;
       history_id?: number;
@@ -258,7 +257,7 @@ export const executeStatement = async (options: ExecuteApiOptions): Promise<Exec
 export const cancelStatement = async (options: ExecuteApiOptions): Promise<void> => {
   const data = await options.executable.toContext();
 
-  await simplePost<void, ExecutableContext>(CANCEL_STATEMENT_API, data, {
+  await post<void, ExecutableContext>(CANCEL_STATEMENT_API, data, {
     silenceErrors: !!options.silenceErrors
   });
 };
@@ -268,7 +267,7 @@ export const closeStatement = async (options: ExecuteApiOptions): Promise<void> 
     return;
   }
   const data = { operationId: options.executable.operationId };
-  await simplePost<void, { operationId: string }>(CLOSE_STATEMENT_API, data, {
+  await post<void, { operationId: string }>(CLOSE_STATEMENT_API, data, {
     silenceErrors: !!options.silenceErrors
   });
 };
@@ -281,7 +280,7 @@ export const checkExecutionStatus = async (
   }
 
   const data = { operationId: options.executable.operationId };
-  const responsePromise = simplePost<
+  const responsePromise = post<
     {
       query_status?: ExecuteStatusApiResponse;
       status: number;
@@ -317,17 +316,16 @@ export const fetchResults = async (options: {
   data.rows = options.rows;
   data.startOver = options.startOver;
 
-  const responsePromise = simplePost<string, FetchResultData>(FETCH_RESULT_DATA_API, data, {
-    silenceErrors: !!options.silenceErrors,
-    dataType: 'text'
-  });
-
-  options.executable.addCancellable(responsePromise);
-  const response = await (responsePromise as Promise<string>);
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const parsed = JSON.bigdataParse(response);
-  return parsed.result as ResultApiResponse;
+  const transformResponse = (response: unknown) => JSON.bigdataParse(response).result;
+
+  const responsePromise = post<ResultApiResponse>(FETCH_RESULT_DATA_API, data, {
+    silenceErrors: !!options.silenceErrors,
+    transformResponse
+  });
+
+  return responsePromise;
 };
 
 export const fetchResultSize = async (
@@ -335,7 +333,7 @@ export const fetchResultSize = async (
 ): Promise<ResultSizeApiResponse> => {
   const data = await options.executable.toContext();
 
-  const responsePromise = simplePost<
+  const responsePromise = post<
     {
       result: ResultSizeApiResponse;
     },
@@ -361,7 +359,7 @@ export const fetchLogs = async (options: {
   data.jobs = options.jobs && JSON.stringify(options.jobs);
   data.from = options.from || 0;
 
-  const responsePromise = simplePost<
+  const responsePromise = post<
     {
       logs: string;
       isFullLogs: boolean;

@@ -28,7 +28,7 @@
   import Component from 'vue-class-component';
   import { Prop, Watch } from 'vue-property-decorator';
 
-  import { formatSql } from 'apps/notebook2/apiUtils';
+  import { formatSql } from 'apps/notebook2/api';
   import { hueLocalStorage } from 'utils/storageUtils';
 
   interface Ace {
