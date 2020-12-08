@@ -47,7 +47,7 @@
 
   window.BANNER_TOP_HTML = '${ conf.CUSTOM.BANNER_TOP_HTML.get() }';
 
-  window.DISABLE_LOCAL_STORAGE= '${ conf.CUSTOM.DISABLE_LOCAL_STORAGE.get() }';
+  window.DISABLE_LOCAL_STORAGE = '${ conf.CUSTOM.DISABLE_LOCAL_STORAGE.get() }' === 'True';
 
   window.CACHEABLE_TTL = {
     default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
