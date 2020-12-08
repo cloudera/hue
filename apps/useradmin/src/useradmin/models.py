@@ -82,7 +82,7 @@ class UserProfile(models.Model):
     HUE = 1
     EXTERNAL = 2
 
-  user = models.OneToOneField(User, unique=True)
+  user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
   home_directory = models.CharField(editable=True, max_length=1024, null=True)
   creation_method = models.CharField(editable=True, null=False, max_length=64, default=CreationMethod.HUE.name)
   first_login = models.BooleanField(default=True, verbose_name=_t('First Login'), help_text=_t('If this is users first login.'))
