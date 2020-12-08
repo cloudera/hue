@@ -14,23 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import apiHelper from 'api/apiHelper';
-
 /**
  * Wrapper function around ApiHelper calls, it will also save the entry on success.
  *
- * @param {string|Function} apiHelperFunction - The name of the ApiHelper function to call
- * @param {string} attributeName - The attribute to set
+ * @param {Function} apiHelperFunction - The name of the ApiHelper function to call
+ * @param {Function} setFunction - The attribute to set
  * @param {DataCatalogEntry|MultiTableEntry} entry - The catalog entry
  * @param {Object} [apiOptions]
  * @param {boolean} [apiOptions.silenceErrors]
  */
-const fetchAndSave = (apiHelperFunction, attributeName, entry, apiOptions) => {
-  const func =
-    typeof apiHelperFunction === 'string'
-      ? apiHelper[apiHelperFunction].bind(apiHelper)
-      : apiHelperFunction;
-  return func({
+const fetchAndSave = (apiHelperFunction, setFunction, entry, apiOptions) => {
+  return apiHelperFunction({
     sourceType: entry.getConnector().id,
     compute: entry.compute,
     path: entry.path, // Set for DataCatalogEntry
@@ -39,7 +33,7 @@ const fetchAndSave = (apiHelperFunction, attributeName, entry, apiOptions) => {
     connector: entry.dataCatalog.connector,
     isView: entry.isView && entry.isView() // MultiTable entries don't have this property
   }).done(data => {
-    entry[attributeName] = data;
+    setFunction(data);
     entry.saveLater();
   });
 };
