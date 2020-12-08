@@ -111,11 +111,13 @@
         position: absolute;
         border: none;
         box-shadow: none;
-        padding: 5px;
         margin: 0;
-        font-size: 15px;
         line-height: 15px;
         background-color: transparent;
+
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
 
         &.magnify-icon-input {
           padding-left: 35px;

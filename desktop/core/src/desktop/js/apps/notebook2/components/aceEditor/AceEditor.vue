@@ -19,7 +19,13 @@
 <template>
   <div class="ace-editor-component">
     <div :id="id" ref="editorElement" class="ace-editor" />
-    <ace-autocomplete v-if="editor" :editor="editor" :editor-id="id" :executor="executor" />
+    <ace-autocomplete
+      v-if="editor"
+      :autocomplete-parser="autocompleteParser"
+      :editor="editor"
+      :editor-id="id"
+      :executor="executor"
+    />
   </div>
 </template>
 
@@ -36,7 +42,7 @@
   import { formatSql } from 'apps/notebook2/apiUtils';
   import Executor from 'apps/notebook2/execution/executor';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
-  import { IdentifierChainEntry, ParsedLocation } from 'parse/types';
+  import { AutocompleteParser, IdentifierChainEntry, ParsedLocation } from 'parse/types';
   import { EditorInterpreter } from 'types/config';
   import { hueWindow } from 'types/types';
   import huePubSub from 'utils/huePubSub';
@@ -67,6 +73,8 @@
     executor!: Executor;
     @Prop({ required: false, default: () => ({}) })
     aceOptions?: Ace.Options;
+    @Prop({ required: false })
+    autocompleteParser?: AutocompleteParser;
 
     subTracker = new SubscriptionTracker();
     editor: Ace.Editor | null = null;
@@ -434,11 +442,11 @@
             : '12px'
         ),
         enableSnippets: true,
-        showGutter: false,
-        showLineNumbers: false,
+        showGutter: true,
+        showLineNumbers: true,
         showPrintMargin: false,
         scrollPastEnd: 0.1,
-        minLines: 1,
+        minLines: 3,
         maxLines: 25,
         tabSize: 2,
         useSoftTabs: true,
@@ -575,12 +583,6 @@
   }
 </script>
 
-<style lang="scss" scoped>
-  .ace-editor-component {
-    height: 100%;
-
-    .ace-editor {
-      height: 100%;
-    }
-  }
+<style lang="scss">
+  @import './AceEditor.scss';
 </style>
