@@ -1765,7 +1765,7 @@ class ClusterConfig(object):
       user_preference = get_user_preferences(user=self.user, key='default_app')
       if not user_preference:
         raise UserPreferences.DoesNotExist()
-      user_default_app = json.loads(user_preference.value)
+      user_default_app = json.loads(user_preference)
       if apps.get(user_default_app['app']):
         default_interpreter = []
         default_app = apps[user_default_app['app']]
@@ -2188,6 +2188,8 @@ def get_user_preferences(user, key=None):
       for dup in UserPreferences.objects.filter(user=user, key=key)[1:]:
         LOG.warn('Deleting UserPreferences duplicate %s' % dup)
         dup.delete()
+      x = UserPreferences.objects.get(user=user, key=key)
+      return {key: x.value}
   else:
     return dict((x.key, x.value) for x in UserPreferences.objects.filter(user=user))
 
