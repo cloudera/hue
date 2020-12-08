@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ExecutionJob, fetchLogs } from 'apps/notebook2/execution/apiUtils';
+import { ExecutionJob, fetchLogs } from 'apps/notebook2/execution/api';
 import huePubSub from 'utils/huePubSub';
 import Executable, { EXECUTION_STATUS } from './executable';
 

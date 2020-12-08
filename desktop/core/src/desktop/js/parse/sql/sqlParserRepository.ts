@@ -15,6 +15,8 @@
 // limitations under the License.
 
 /* eslint-disable */
+import { AutocompleteParser, SqlParserProvider, SyntaxParser } from 'parse/types';
+
 /**
  * AUTOCOMPLETE_MODULES and SYNTAX_MODULES are generated, do not edit manually, see tools/jison/generateParsers.js
  */
@@ -44,16 +46,19 @@ const SYNTAX_MODULES = {
 };
 /* eslint-enable */
 
-class SqlParserRepository {
-  constructor() {
-    this.modulePromises = {};
-  }
+class SqlParserRepository implements SqlParserProvider {
+  modulePromises: { [dialect: string]: Promise<AutocompleteParser | SyntaxParser> } = {};
 
-  async getParser(dialect, parserType) {
+  async getParser(dialect: string, parserType: string): Promise<AutocompleteParser | SyntaxParser> {
     if (!this.modulePromises[dialect + parserType]) {
-      const modules = parserType === 'Autocomplete' ? AUTOCOMPLETE_MODULES : SYNTAX_MODULES;
+      const modules = <{ [dialect: string]: () => unknown }>(
+        (parserType === 'Autocomplete' ? AUTOCOMPLETE_MODULES : SYNTAX_MODULES)
+      );
+      const targetModule = <() => Promise<{ default: SyntaxParser | AutocompleteParser }>>(
+        (modules[dialect] || modules.generic)
+      );
+
       this.modulePromises[dialect + parserType] = new Promise((resolve, reject) => {
-        const targetModule = modules[dialect] || modules.generic;
         targetModule()
           .then(module => resolve(module.default))
           .catch(reject);
@@ -62,16 +67,14 @@ class SqlParserRepository {
     return this.modulePromises[dialect + parserType];
   }
 
-  /**
-   * @param dialect
-   * @return {Promise<*>}
-   */
-  async getAutocompleter(dialect) {
-    return this.getParser(dialect, 'Autocomplete');
+  async getAutocompleteParser(dialect: string): Promise<AutocompleteParser> {
+    const autocompleteParser = await this.getParser(dialect, 'Autocomplete');
+    return <AutocompleteParser>autocompleteParser;
   }
 
-  async getSyntaxParser(dialect) {
-    return this.getParser(dialect, 'Syntax');
+  async getSyntaxParser(dialect: string): Promise<SyntaxParser> {
+    const syntaxParser = await this.getParser(dialect, 'Syntax');
+    return <SyntaxParser>syntaxParser;
   }
 }
 

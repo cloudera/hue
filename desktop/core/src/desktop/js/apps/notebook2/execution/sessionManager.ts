@@ -20,7 +20,7 @@ import {
   createSession,
   Session,
   SessionProperty
-} from 'apps/notebook2/execution/apiUtils';
+} from 'apps/notebook2/execution/api';
 import huePubSub from 'utils/huePubSub';
 
 class SessionManager {

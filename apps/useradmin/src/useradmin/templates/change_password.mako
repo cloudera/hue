@@ -21,10 +21,13 @@ from useradmin.hue_password_policy import is_password_policy_enabled, get_passwo
 
 <%namespace name="layout" file="layout.mako" />
 
-${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
+% if not is_embeddable:
+  ${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
+% endif
+
 ${ layout.menubar(section='users') }
 
-<div class="useradmin container-fluid">
+<div id="editUserComponents"  class="useradmin container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Users - Change password: %(username)s') % dict(username=username)}</h1>
 
@@ -64,72 +67,30 @@ ${ layout.menubar(section='users') }
     </form>
   </div>
 </div>
-
-<script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
-<script>
-  routie.setPathname('/useradmin');
-</script>
-
-
 <script type="text/javascript">
-
 $(document).ready(function(){
  var currentStep = "step1";
-
- routie({
-    "step1":function () {
-      showStep("step1");
-    }
-  });
-
-  function showStep(step) {
-    currentStep = step;
-    if (step != "step1") {
-      $("#backBtn").removeClass("disabled");
-    } else {
-      $("#backBtn").addClass("disabled");
-    }
-
-    if (step != $(".stepDetails:last").attr("id")) {
-      $("#nextBtn").removeClass("disabled");
-    } else {
-      $("#nextBtn").addClass("disabled");
-    }
-
-    $("a.step").parent().removeClass("active");
-    $("a.step[href='#" + step + "']").parent().addClass("active");
-    $(".stepDetails").hide();
-    $("#" + step).show();
-  }
-
-  function validateStep(step) {
-    var proceed = true;
-    $("#" + step).find("[validate=true]").each(function () {
-      if ($(this).val().trim() == "") {
-        proceed = false;
-        routie(step);
-        $(this).parents(".control-group").addClass("error");
-        $(this).parent().find(".help-inline").remove();
-        $(this).after("<span class=\"help-inline\"><strong>${ _('This field is required.') }</strong></span>");
+  var $editUserComponents = $('#editUserComponents');
+  % if is_embeddable:
+  $editUserComponents.find('#editForm').attr('action', window.location.pathname.substr((window.HUE_BASE_URL + '/hue').length).replace(/\/$/, ''));
+  $editUserComponents.find('#editForm').ajaxForm({
+    dataType:  'json',
+    success: function(data) {
+      if (data && data.status == -1) {
+        renderUseradminErrors(data.errors);
       }
-    });
-    return proceed;
-  }
-
-  $("[validate=true]").change(function () {
-    $(this).parents(".control-group").removeClass("error");
-    $(this).parent().find(".help-inline").remove();
-  });
-
-  $("#editForm").on("submit", function(){
-    if validateStep("step1") {
-      return true;
+      else if (data && data.url) {
+        huePubSub.publish('open.link', data.url);
+        $.jHueNotify.info("${ _('User information updated correctly') }");
+      }
     }
-    return false;
-  })
+  });
+  % endif
 });
 </script>
 
 ${layout.commons()}
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

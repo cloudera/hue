@@ -20,7 +20,7 @@ import {
   ResultApiResponse,
   ResultMeta,
   ResultSizeApiResponse
-} from 'apps/notebook2/execution/apiUtils';
+} from 'apps/notebook2/execution/api';
 import { Observable } from 'knockout';
 import * as ko from 'knockout';
 

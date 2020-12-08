@@ -28,14 +28,13 @@ import { AutocompleteParser, AutocompleteParseResult } from 'parse/types';
 import { EditorInterpreter } from 'types/config';
 import AutocompleteResults from './AutocompleteResults';
 import huePubSub from 'utils/huePubSub';
-import sqlParserRepository from 'parse/sql/sqlParserRepository';
 
 export default class SqlAutocompleter implements Disposable {
   editor: Ace.Editor;
   executor: Executor;
   fixedPrefix: () => string;
   fixedPostfix: () => string;
-  autocompleteParser?: AutocompleteParser;
+  autocompleteParser: AutocompleteParser;
   autocompleteResults: AutocompleteResults;
   editorId: string;
 
@@ -51,7 +50,7 @@ export default class SqlAutocompleter implements Disposable {
     editor: Ace.Editor;
     fixedPrefix?: () => string;
     fixedPostfix?: () => string;
-    autocompleteParser?: AutocompleteParser;
+    autocompleteParser: AutocompleteParser;
   }) {
     this.editorId = options.editorId;
     this.editor = options.editor;
@@ -114,10 +113,7 @@ export default class SqlAutocompleter implements Disposable {
         }) + this.fixedPostfix();
 
       try {
-        const parser =
-          this.autocompleteParser ||
-          (await sqlParserRepository.getAutocompleter(this.getDialect()));
-        return parser.parseSql(beforeCursor, afterCursor);
+        return this.autocompleteParser.parseSql(beforeCursor, afterCursor);
       } catch (err) {
         console.warn(err);
       }
@@ -125,9 +121,11 @@ export default class SqlAutocompleter implements Disposable {
   }
 
   async parseAll(): Promise<AutocompleteParseResult | undefined> {
-    const parser = await sqlParserRepository.getAutocompleter(this.getDialect());
     try {
-      return parser.parseSql(this.editor.getTextBeforeCursor(), this.editor.getTextAfterCursor());
+      return this.autocompleteParser.parseSql(
+        this.editor.getTextBeforeCursor(),
+        this.editor.getTextAfterCursor()
+      );
     } catch (err) {
       console.warn(err);
     }
