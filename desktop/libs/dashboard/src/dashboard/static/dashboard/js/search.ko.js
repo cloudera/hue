@@ -2779,7 +2779,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
         if (self.additionalMustache != null && typeof self.additionalMustache == "function") {
           self.additionalMustache(item);
         }
-        doc.content = Mustache.render(_mustacheTmpl, item);
+        doc.content = window.Mustache.render(_mustacheTmpl, item);
       }
       return doc;
     }
