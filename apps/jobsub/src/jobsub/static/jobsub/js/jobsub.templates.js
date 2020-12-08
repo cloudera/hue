@@ -106,7 +106,7 @@ var Templates = (function($, ko) {
       if (el.length > 0 && el.html().length > 0) {
         return el;
       } else {
-        var html = Mustache.to_html(self.actions[id], context, self.partials);
+        var html = window.Mustache.render(self.actions[id], context, self.partials);
         // no jQuery here, IE8 doesn't like it.
         var scriptTag = document.createElement('script');
         scriptTag.setAttribute('id', id);

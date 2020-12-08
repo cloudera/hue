@@ -68,6 +68,7 @@
     "lodash": "4.17.19",
     "luxon": "1.25.0",
     "medium-editor": "5.23.3",
+    "mustache": "4.1.0",
     "page": "1.8.6",
     "plotly.js-dist": "1.45.3",
     "qs": "6.9.4",
