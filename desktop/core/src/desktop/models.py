@@ -133,7 +133,7 @@ class UserPreferences(models.Model):
   Holds arbitrary key/value strings.
   Note: ideally user/jkeu should be unique together.
   """
-  user = models.ForeignKey(User)
+  user = models.ForeignKey(User, on_delete=models.CASCADE)
   key = models.CharField(max_length=20)
   value = models.TextField(max_length=4096)
 
@@ -183,7 +183,7 @@ class DefaultConfiguration(models.Model):
 
   is_default = models.BooleanField(default=False, db_index=True)
   groups = models.ManyToManyField(Group, db_index=True, db_table='defaultconfiguration_groups')
-  user = models.ForeignKey(User, blank=True, null=True, db_index=True)
+  user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, db_index=True)
 
   objects = DefaultConfigurationManager()
 
@@ -307,7 +307,7 @@ class DocumentTag(models.Model):
   """
   Reserved tags can't be manually removed by the user.
   """
-  owner = models.ForeignKey(User, db_index=True)
+  owner = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
   tag = models.SlugField()
 
   DEFAULT = 'default' # Always there
@@ -637,7 +637,7 @@ class DocumentManager(models.Manager):
 
 class Document(models.Model):
 
-  owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'),
+  owner = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True, verbose_name=_t('Owner'),
                             help_text=_t('User who can own the job.'), related_name='doc_owner')
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
@@ -648,7 +648,7 @@ class Document(models.Model):
 
   tags = models.ManyToManyField(DocumentTag, db_index=True)
 
-  content_type = models.ForeignKey(ContentType)
+  content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
   object_id = models.PositiveIntegerField()
   content_object = GenericForeignKey('content_type', 'object_id')
 
@@ -901,7 +901,7 @@ class DocumentPermission(models.Model):
   READ_PERM = 'read'
   WRITE_PERM = 'write'
 
-  doc = models.ForeignKey(Document)
+  doc = models.ForeignKey(Document, on_delete=models.CASCADE)
 
   users = models.ManyToManyField(User, db_index=True, db_table='documentpermission_users')
   groups = models.ManyToManyField(Group, db_index=True, db_table='documentpermission_groups')
@@ -1133,7 +1133,14 @@ class Document2(models.Model):
   TRASH_DIR = '.Trash'
   EXAMPLES_DIR = 'examples'
 
-  owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Creator.'), related_name='doc2_owner')
+  owner = models.ForeignKey(
+    User,
+    on_delete=models.CASCADE,
+    db_index=True,
+    verbose_name=_t('Owner'),
+    help_text=_t('Creator.'),
+    related_name='doc2_owner'
+  )
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
   uuid = models.CharField(default=uuid_default, max_length=36, db_index=True)
@@ -1145,6 +1152,7 @@ class Document2(models.Model):
   )
   connector = models.ForeignKey(
       Connector,
+      on_delete=models.CASCADE,
       verbose_name=_t('Connector'),
       help_text=_t('Connector.'),
       blank=True,
@@ -1652,7 +1660,7 @@ class Document2Permission(models.Model):
   LINK_READ_PERM = 'link_read'
   LINK_WRITE_PERM = 'link_write'
 
-  doc = models.ForeignKey(Document2)
+  doc = models.ForeignKey(Document2, on_delete=models.CASCADE)
 
   users = models.ManyToManyField(User, db_index=True, db_table='documentpermission2_users')
   groups = models.ManyToManyField(Group, db_index=True, db_table='documentpermission2_groups')

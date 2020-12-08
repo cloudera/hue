@@ -33,7 +33,13 @@ from useradmin.models import User
 
 
 class Document(models.Model):
-  owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who can modify the job.'))
+  owner = models.ForeignKey(
+    User,
+    on_delete=models.CASCADE,
+    db_index=True,
+    verbose_name=_t('Owner'),
+    help_text=_t('User who can modify the job.')
+  )
   is_design = models.BooleanField(default=True, db_index=True, verbose_name=_t('Is a user document, not a document submission.'),
                                      help_text=_t('If the document is not a submitted job but a real query, script, workflow.'))
 
