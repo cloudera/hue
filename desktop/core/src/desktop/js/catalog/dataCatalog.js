@@ -59,6 +59,10 @@ const generateEntryCacheId = function (options) {
   return id;
 };
 
+const isFresh = (storeEntryValue, ttl) =>
+  !storeEntryValue.hueTimestamp ||
+  Date.now() - storeEntryValue.hueTimestamp < (ttl || CACHEABLE_TTL.default);
+
 /**
  * Helper function to fill a catalog entry with cached metadata.
  *
@@ -66,31 +70,55 @@ const generateEntryCacheId = function (options) {
  * @param {Object} storeEntry - The cached version
  */
 const mergeEntry = function (dataCatalogEntry, storeEntry) {
-  const mergeAttribute = function (attributeName, ttl, promiseName) {
-    if (
-      storeEntry.version === DATA_CATALOG_VERSION &&
-      storeEntry[attributeName] &&
-      (!storeEntry[attributeName].hueTimestamp ||
-        Date.now() - storeEntry[attributeName].hueTimestamp < ttl)
-    ) {
-      dataCatalogEntry[attributeName] = storeEntry[attributeName];
-      if (promiseName) {
-        dataCatalogEntry[promiseName] = $.Deferred()
-          .resolve(dataCatalogEntry[attributeName])
-          .promise();
-      }
-    }
-  };
+  if (storeEntry.version !== DATA_CATALOG_VERSION) {
+    return;
+  }
 
-  mergeAttribute('definition', CACHEABLE_TTL.default);
-  mergeAttribute('sourceMeta', CACHEABLE_TTL.default, 'sourceMetaPromise');
-  mergeAttribute('analysis', CACHEABLE_TTL.default, 'analysisPromise');
-  mergeAttribute('partitions', CACHEABLE_TTL.default, 'partitionsPromise');
-  mergeAttribute('sample', CACHEABLE_TTL.default, 'samplePromise');
-  mergeAttribute('navigatorMeta', CACHEABLE_TTL.default, 'navigatorMetaPromise');
+  if (storeEntry.definition && isFresh(storeEntry.definition)) {
+    dataCatalogEntry.definition = storeEntry.definition;
+  }
+  if (storeEntry.sourceMeta && isFresh(storeEntry.sourceMeta)) {
+    dataCatalogEntry.sourceMeta = storeEntry.sourceMeta;
+    dataCatalogEntry.sourceMetaPromise = $.Deferred()
+      .resolve(dataCatalogEntry.sourceMeta)
+      .promise();
+  }
+  if (storeEntry.analysis && isFresh(storeEntry.analysis)) {
+    dataCatalogEntry.analysis = storeEntry.analysis;
+    dataCatalogEntry.analysisPromise = $.Deferred().resolve(dataCatalogEntry.analysis).promise();
+  }
+  if (storeEntry.partitions && isFresh(storeEntry.partitions)) {
+    dataCatalogEntry.partitions = storeEntry.partitions;
+    dataCatalogEntry.partitionsPromise = $.Deferred()
+      .resolve(dataCatalogEntry.partitions)
+      .promise();
+  }
+  if (storeEntry.sample && isFresh(storeEntry.sample)) {
+    dataCatalogEntry.sample = storeEntry.sample;
+    dataCatalogEntry.samplePromise = $.Deferred().resolve(dataCatalogEntry.sample).promise();
+  }
+  if (storeEntry.navigatorMeta && isFresh(storeEntry.navigatorMeta)) {
+    dataCatalogEntry.navigatorMeta = storeEntry.navigatorMeta;
+    dataCatalogEntry.navigatorMetaPromise = $.Deferred()
+      .resolve(dataCatalogEntry.navigatorMeta)
+      .promise();
+  }
   if (dataCatalogEntry.getConnector().optimizer !== LOCAL_STRATEGY) {
-    mergeAttribute('optimizerMeta', CACHEABLE_TTL.optimizer, 'optimizerMetaPromise');
-    mergeAttribute('optimizerPopularity', CACHEABLE_TTL.optimizer);
+    if (storeEntry.optimizerMeta && isFresh(storeEntry.optimizerMeta, CACHEABLE_TTL.optimizer)) {
+      dataCatalogEntry.optimizerMeta = storeEntry.optimizerMeta;
+      dataCatalogEntry.optimizerMetaPromise = $.Deferred()
+        .resolve(dataCatalogEntry.optimizerMeta)
+        .promise();
+    }
+    if (
+      storeEntry.optimizerPopularity &&
+      isFresh(storeEntry.optimizerPopularity, CACHEABLE_TTL.optimizer)
+    ) {
+      dataCatalogEntry.optimizerPopularity = storeEntry.optimizerPopularity;
+      dataCatalogEntry.optimizerMetaPromise = $.Deferred()
+        .resolve(dataCatalogEntry.optimizerPopularity)
+        .promise();
+    }
   }
 };
 
@@ -101,29 +129,36 @@ const mergeEntry = function (dataCatalogEntry, storeEntry) {
  * @param {Object} storeEntry - The cached version
  */
 const mergeMultiTableEntry = function (multiTableCatalogEntry, storeEntry) {
-  if (multiTableCatalogEntry.getConnector().optimizer === LOCAL_STRATEGY) {
+  if (
+    multiTableCatalogEntry.getConnector().optimizer === LOCAL_STRATEGY ||
+    storeEntry.version !== DATA_CATALOG_VERSION
+  ) {
     return;
   }
-  const mergeAttribute = function (attributeName, ttl, promiseName) {
-    if (
-      storeEntry.version === DATA_CATALOG_VERSION &&
-      storeEntry[attributeName] &&
-      (!storeEntry[attributeName].hueTimestamp ||
-        Date.now() - storeEntry[attributeName].hueTimestamp < ttl)
-    ) {
-      multiTableCatalogEntry[attributeName] = storeEntry[attributeName];
-      if (promiseName) {
-        multiTableCatalogEntry[promiseName] = $.Deferred()
-          .resolve(multiTableCatalogEntry[attributeName])
-          .promise();
-      }
-    }
-  };
-
-  mergeAttribute('topAggs', CACHEABLE_TTL.optimizer, 'topAggsPromise');
-  mergeAttribute('topColumns', CACHEABLE_TTL.optimizer, 'topColumnsPromise');
-  mergeAttribute('topFilters', CACHEABLE_TTL.optimizer, 'topFiltersPromise');
-  mergeAttribute('topJoins', CACHEABLE_TTL.optimizer, 'topJoinsPromise');
+  if (storeEntry.topAggs && isFresh(storeEntry.topAggs, CACHEABLE_TTL.optimizer)) {
+    multiTableCatalogEntry.topAggs = storeEntry.topAggs;
+    multiTableCatalogEntry.topAggsPromise = $.Deferred()
+      .resolve(multiTableCatalogEntry.topAggs)
+      .promise();
+  }
+  if (storeEntry.topColumns && isFresh(storeEntry.topColumns, CACHEABLE_TTL.optimizer)) {
+    multiTableCatalogEntry.topColumns = storeEntry.topColumns;
+    multiTableCatalogEntry.topColumnsPromise = $.Deferred()
+      .resolve(multiTableCatalogEntry.topColumns)
+      .promise();
+  }
+  if (storeEntry.topFilters && isFresh(storeEntry.topFilters, CACHEABLE_TTL.optimizer)) {
+    multiTableCatalogEntry.topFilters = storeEntry.topFilters;
+    multiTableCatalogEntry.topFiltersPromise = $.Deferred()
+      .resolve(multiTableCatalogEntry.topFilters)
+      .promise();
+  }
+  if (storeEntry.topJoins && isFresh(storeEntry.topJoins, CACHEABLE_TTL.optimizer)) {
+    multiTableCatalogEntry.topJoins = storeEntry.topJoins;
+    multiTableCatalogEntry.topJoinsPromise = $.Deferred()
+      .resolve(multiTableCatalogEntry.topJoins)
+      .promise();
+  }
 };
 
 export class DataCatalog {
@@ -368,7 +403,9 @@ export class DataCatalog {
                   .done(entry => {
                     cancellablePromises.push(
                       entry.trackedPromise(
-                        'optimizerPopularityForChildrenPromise',
+                        promise => {
+                          entry.optimizerPopularityForChildrenPromise = promise;
+                        },
                         entry
                           .applyOptimizerResponseToChildren(perTable[path], options)
                           .done(entries => {
@@ -661,17 +698,15 @@ export class DataCatalog {
     self.entries[identifier] = deferred.promise();
 
     if (!cacheEnabled) {
-      deferred
-        .resolve(
-          new DataCatalogEntry({
-            dataCatalog: self,
-            namespace: options.namespace,
-            compute: options.compute,
-            path: options.path,
-            definition: options.definition
-          })
-        )
-        .promise();
+      deferred.resolve(
+        new DataCatalogEntry({
+          dataCatalog: self,
+          namespace: options.namespace,
+          compute: options.compute,
+          path: options.path,
+          definition: options.definition
+        })
+      );
     } else {
       self.store
         .getItem(identifier)
@@ -731,15 +766,13 @@ export class DataCatalog {
     self.multiTableEntries[identifier] = deferred.promise();
 
     if (!cacheEnabled) {
-      deferred
-        .resolve(
-          new MultiTableEntry({
-            identifier: identifier,
-            dataCatalog: self,
-            paths: options.paths
-          })
-        )
-        .promise();
+      deferred.resolve(
+        new MultiTableEntry({
+          identifier: identifier,
+          dataCatalog: self,
+          paths: options.paths
+        })
+      );
     } else {
       self.multiTableStore
         .getItem(identifier)

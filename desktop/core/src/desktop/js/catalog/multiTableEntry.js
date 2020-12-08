@@ -26,26 +26,27 @@ import { DataCatalog } from './dataCatalog';
  * @param {MultiTableEntry} multiTableEntry
  * @param {Object} [options]
  * @param {boolean} [options.silenceErrors] - Default true
- * @param {string} promiseAttribute
- * @param {string} dataAttribute
+ * @param {Function} promiseSetter
+ * @param {Function} dataAttributeSetter
  * @param {Function} apiHelperFunction
  * @return {CancellableJqPromise}
  */
 const genericOptimizerReload = function (
   multiTableEntry,
   options,
-  promiseAttribute,
-  dataAttribute,
+  promiseSetter,
+  dataAttributeSetter,
   apiHelperFunction
 ) {
   if (multiTableEntry.dataCatalog.canHaveOptimizerMeta()) {
     return multiTableEntry.trackedPromise(
-      promiseAttribute,
-      catalogUtils.fetchAndSave(apiHelperFunction, dataAttribute, multiTableEntry, options)
+      promiseSetter,
+      catalogUtils.fetchAndSave(apiHelperFunction, dataAttributeSetter, multiTableEntry, options)
     );
   }
-  multiTableEntry[promiseAttribute] = $.Deferred().reject();
-  return multiTableEntry[promiseAttribute];
+  const promise = $.Deferred().reject();
+  promiseSetter(promise);
+  return promise;
 };
 
 /**
@@ -57,21 +58,23 @@ const genericOptimizerReload = function (
  * @param {boolean} [options.refreshCache] - Default false
  * @param {boolean} [options.cachedOnly] - Default false
  * @param {boolean} [options.cancellable] - Default false
- * @param {string} promiseAttribute
- * @param {string} dataAttribute
+ * @param {Function} promiseSetter
+ * @param {Function} promiseGetter
+ * @param {Function} dataAttributeSetter
  * @param {Function} apiHelperFunction
  * @return {CancellableJqPromise}
  */
 const genericOptimizerGet = function (
   multiTableEntry,
   options,
-  promiseAttribute,
-  dataAttribute,
+  promiseSetter,
+  promiseGetter,
+  dataAttributeSetter,
   apiHelperFunction
 ) {
   if (DataCatalog.cacheEnabled() && options && options.cachedOnly) {
     return (
-      catalogUtils.applyCancellable(multiTableEntry[promiseAttribute], options) ||
+      catalogUtils.applyCancellable(promiseGetter(), options) ||
       $.Deferred().reject(false).promise()
     );
   }
@@ -80,20 +83,20 @@ const genericOptimizerGet = function (
       genericOptimizerReload(
         multiTableEntry,
         options,
-        promiseAttribute,
-        dataAttribute,
+        promiseSetter,
+        dataAttributeSetter,
         apiHelperFunction
       ),
       options
     );
   }
   return catalogUtils.applyCancellable(
-    multiTableEntry[promiseAttribute] ||
+    promiseGetter() ||
       genericOptimizerReload(
         multiTableEntry,
         options,
-        promiseAttribute,
-        dataAttribute,
+        promiseSetter,
+        dataAttributeSetter,
         apiHelperFunction
       ),
     options
@@ -154,15 +157,14 @@ class MultiTableEntry {
   /**
    * Helper function that ensure that cancellable promises are not tracked anymore when cancelled
    *
-   * @param {string} promiseName - The attribute name to use
+   * @param {Function} promiseSetter - The promise attribute to use
    * @param {CancellableJqPromise} cancellableJqPromise
    */
-  trackedPromise(promiseName, cancellableJqPromise) {
-    const self = this;
-    self[promiseName] = cancellableJqPromise;
+  trackedPromise(promiseSetter, cancellableJqPromise) {
+    promiseSetter(cancellableJqPromise);
     return cancellableJqPromise.fail(() => {
       if (cancellableJqPromise.cancelled) {
-        delete self[promiseName];
+        delete promiseSetter(undefined);
       }
     });
   }
@@ -201,8 +203,13 @@ class MultiTableEntry {
     return genericOptimizerGet(
       this,
       options,
-      'topAggsPromise',
-      'topAggs',
+      promise => {
+        this.topAggsPromise = promise;
+      },
+      () => this.topAggsPromise,
+      val => {
+        this.topAggs = val;
+      },
       optimizer.fetchTopAggs.bind(optimizer)
     );
   }
@@ -223,8 +230,13 @@ class MultiTableEntry {
     return genericOptimizerGet(
       this,
       options,
-      'topColumnsPromise',
-      'topColumns',
+      promise => {
+        this.topColumnsPromise = promise;
+      },
+      () => this.topColumnsPromise,
+      val => {
+        this.topColumns = val;
+      },
       optimizer.fetchTopColumns.bind(optimizer)
     );
   }
@@ -245,8 +257,13 @@ class MultiTableEntry {
     return genericOptimizerGet(
       this,
       options,
-      'topFiltersPromise',
-      'topFilters',
+      promise => {
+        this.topFiltersPromise = promise;
+      },
+      () => this.topFiltersPromise,
+      val => {
+        this.topFilters = val;
+      },
       optimizer.fetchTopFilters.bind(optimizer)
     );
   }
@@ -267,8 +284,13 @@ class MultiTableEntry {
     return genericOptimizerGet(
       this,
       options,
-      'topJoinsPromise',
-      'topJoins',
+      promise => {
+        this.topJoinsPromise = promise;
+      },
+      () => this.topJoinsPromise,
+      val => {
+        this.topJoins = val;
+      },
       optimizer.fetchTopJoins.bind(optimizer)
     );
   }
