@@ -190,4 +190,13 @@ export interface AutocompleteParser {
   parseSql(beforeCursor: string, afterCursor: string): AutocompleteParseResult;
 }
 
+export interface SyntaxParser {
+  parseSyntax(beforeCursor: string, afterCursor: string): unknown;
+}
+
+export interface SqlParserProvider {
+  getAutocompleteParser(dialect: string): Promise<AutocompleteParser>;
+  getSyntaxParser(dialect: string): Promise<SyntaxParser>;
+}
+
 declare const sqlStatementsParser: SqlStatementsParser;

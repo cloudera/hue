@@ -14,21 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery';
-import hueUtils from 'utils/hueUtils';
-import { CancellablePromise } from './cancellablePromise';
+import axios, { AxiosResponse, AxiosTransformer } from 'axios';
+import qs from 'qs';
 
-export const successResponseIsError = (response?: {
+import { CancellablePromise } from './cancellablePromise';
+import hueUtils from 'utils/hueUtils';
+
+export const successResponseIsError = (responseData?: {
   traceback?: string;
   status?: number;
   code?: number;
 }): boolean => {
   return (
-    typeof response !== 'undefined' &&
-    (typeof response.traceback !== 'undefined' ||
-      (typeof response.status !== 'undefined' && response.status !== 0) ||
-      response.code === 503 ||
-      response.code === 500)
+    typeof responseData !== 'undefined' &&
+    (typeof responseData.traceback !== 'undefined' ||
+      (typeof responseData.status !== 'undefined' && responseData.status !== 0) ||
+      responseData.code === 503 ||
+      responseData.code === 500)
   );
 };
 
@@ -74,17 +76,21 @@ export const extractErrorMessage = (
   return UNKNOWN_ERROR_MESSAGE;
 };
 
-export const simplePost = <T, U>(
+export const post = <T, U = unknown>(
   url: string,
   data?: U,
-  options?: { dataType?: string; silenceErrors?: boolean; ignoreSuccessErrors?: boolean }
+  options?: {
+    silenceErrors?: boolean;
+    ignoreSuccessErrors?: boolean;
+    transformResponse?: AxiosTransformer;
+  }
 ): CancellablePromise<T> =>
   new CancellablePromise((resolve, reject, onCancel) => {
-    const handleErrorResponse = (data: never): void => {
-      const errorMessage = extractErrorMessage(data);
+    const handleErrorResponse = (response: AxiosResponse<T>): void => {
+      const errorMessage = extractErrorMessage(response.data);
       reject(errorMessage);
       if (!options || !options.silenceErrors) {
-        hueUtils.logError(data);
+        hueUtils.logError(response.data);
         if (errorMessage.indexOf('AuthorizationException') === -1) {
           $(document).trigger('error', errorMessage);
         }
@@ -92,25 +98,33 @@ export const simplePost = <T, U>(
       reject(errorMessage);
     };
 
-    const request = $.post({
-      url: url,
-      data: data,
-      dataType: options && options.dataType
-    })
-      .done(data => {
-        if ((!options || !options.ignoreSuccessErrors) && successResponseIsError(data)) {
-          handleErrorResponse(data as never);
+    const cancelTokenSource = axios.CancelToken.source();
+    let completed = false;
+
+    axios
+      .post<T>(url, qs.stringify(data), {
+        cancelToken: cancelTokenSource.token,
+        transformResponse: options && options.transformResponse
+      })
+      .then(response => {
+        if ((!options || !options.ignoreSuccessErrors) && successResponseIsError(response.data)) {
+          handleErrorResponse(response);
         } else {
-          resolve(data);
+          resolve(response.data);
         }
       })
-      .fail(err => {
-        handleErrorResponse(err as never);
+      .catch(err => {
+        handleErrorResponse(err);
+      })
+      .finally(() => {
+        completed = true;
       });
 
     if (onCancel) {
       onCancel(() => {
-        cancelActiveRequest(request);
+        if (!completed) {
+          cancelTokenSource.cancel();
+        }
       });
     }
   });

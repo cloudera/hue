@@ -15,17 +15,17 @@
 // limitations under the License.
 
 function addTemplateFunctions(item) {
-  if (Mustache == "undefined") {
+  if (!window.Mustache) {
     return;
   }
 
   function genericDate(val, item) {
-    var d = moment(Mustache.render(val, item));
+    var d = moment(window.Mustache.render(val, item));
     if (d.isValid()) {
       return d;
     }
     else {
-      var number = parseInt(Mustache.render(val, item)) || '';
+      var number = parseInt(window.Mustache.render(val, item)) || '';
       if (number) {
         var d = moment(number * 1000); // timestamp * 1000
         if (d.isValid()) {
@@ -41,7 +41,7 @@ function addTemplateFunctions(item) {
       return d.format(format);
     }
     else {
-      return Mustache.render(val, item);
+      return window.Mustache.render(val, item);
     }
   }
 
@@ -49,17 +49,17 @@ function addTemplateFunctions(item) {
 
   item.hue_fn_preview = function () {
     return function (val) {
-      return '<a href="/filebrowser/view=/' + $.trim(Mustache.render(val, item)) + '">' + $.trim(Mustache.render(val, item)) + '</a>';
+      return '<a href="/filebrowser/view=/' + $.trim(window.Mustache.render(val, item)) + '">' + $.trim(window.Mustache.render(val, item)) + '</a>';
     }
   };
   item.hue_fn_embeddeddownload = function () {
     return function (val) {
-      return '<a href="/filebrowser/download=/' + $.trim(Mustache.render(val, item)) + '?disposition=inline">' + $.trim(Mustache.render(val, item)) + '</a>';
+      return '<a href="/filebrowser/download=/' + $.trim(window.Mustache.render(val, item)) + '?disposition=inline">' + $.trim(window.Mustache.render(val, item)) + '</a>';
     }
   };
   item.hue_fn_download = function () {
     return function (val) {
-      return '<a href="/filebrowser/download=/' + $.trim(Mustache.render(val, item)) + '">' + $.trim(Mustache.render(val, item)) + '</a>';
+      return '<a href="/filebrowser/download=/' + $.trim(window.Mustache.render(val, item)) + '">' + $.trim(window.Mustache.render(val, item)) + '</a>';
     }
   };
   item.hue_fn_date = function () {
@@ -84,12 +84,12 @@ function addTemplateFunctions(item) {
   };
   item.hue_fn_timestamp = function () {
     return function (val) {
-      var d = moment(Mustache.render(val, item));
+      var d = moment(window.Mustache.render(val, item));
       if (d.isValid()) {
         return d.valueOf();
       }
       else {
-        return Mustache.render(val, item);
+        return window.Mustache.render(val, item);
       }
     }
   };
@@ -100,7 +100,7 @@ function addTemplateFunctions(item) {
         return d.fromNow();
       }
       else {
-        return Mustache.render(val, item);
+        return window.Mustache.render(val, item);
       }
     }
   };
@@ -125,7 +125,7 @@ function addTemplateFunctions(item) {
 
   function _truncate(length) {
     return function (val) {
-      var _val = $.trim(Mustache.render(val, item));
+      var _val = $.trim(window.Mustache.render(val, item));
       if (_val.length > length) {
         return _val.substr(0, length) + "&hellip;";
       }

@@ -647,7 +647,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
     var utils = {
       //take an element with mustache templates as content and re-render
       renderElement: function (element, data) {
-        element.html(Mustache.render(element.html(), data));
+        element.html(window.Mustache.render(element.html(), data));
       },
       renderElements: function (selector, data) {
         if (selector == null || typeof(selector) == "undefined")
@@ -2565,7 +2565,6 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
 <script>
   routie.setPathname('/hbase');
 </script>
-<script src="${ static('desktop/ext/js/mustache.js') }" type="text/javascript" charset="utf-8"></script>
 
 %if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
