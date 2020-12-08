@@ -150,7 +150,7 @@ def get_key_expiry():
     return 86400
 
 
-HAS_IAM_DETECTION=Config(
+HAS_IAM_DETECTION = Config(
   help=_('Enable the detection of an IAM role providing the credentials automatically. It can take a few seconds.'),
   key='has_iam_detection',
   default=False,
@@ -245,7 +245,9 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
         type=coerce_bool
       ),
       KEY_EXPIRY=Config(
-        help=_('The time in seconds before a delegate key is expired. Used when filebrowser/redirect_download is used. Default to 4 Hours.'),
+        help=_(
+          'The time in seconds before a delegate key is expired. Used when filebrowser/redirect'
+          'download is used. Default to 4 Hours.'),
         key='key_expiry',
         default=14400,
         type=int
