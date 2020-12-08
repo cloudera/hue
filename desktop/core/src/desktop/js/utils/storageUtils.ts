@@ -22,7 +22,7 @@ type LocalStorageGet = {
 };
 export const getFromLocalStorage: LocalStorageGet = <T>(key: string, defaultValue?: T) => {
   const defaultOrNull = typeof defaultValue !== 'undefined' ? defaultValue : null;
-  if (!window.localStorage) {
+  if (!window.localStorage || window.DISABLE_LOCAL_STORAGE) {
     return defaultOrNull;
   }
 
@@ -37,7 +37,8 @@ export const getFromLocalStorage: LocalStorageGet = <T>(key: string, defaultValu
   if (storedValue && storedValue.length) {
     try {
       return JSON.parse(storedValue);
-    } catch (e) {}
+    } catch (e) {
+    }
     return <T>(<unknown>storedValue);
   }
   return defaultOrNull;
@@ -45,6 +46,10 @@ export const getFromLocalStorage: LocalStorageGet = <T>(key: string, defaultValu
 
 export const setInLocalStorage = (key: string, value: unknown): void => {
   if (!window.localStorage) {
+    return;
+  }
+  if (window.DISABLE_LOCAL_STORAGE) {
+    window.localStorage.clear();
     return;
   }
   const userKey = (<hueWindow>window).LOGGED_USERNAME
@@ -56,10 +61,12 @@ export const setInLocalStorage = (key: string, value: unknown): void => {
     let jsonString: string | undefined = undefined;
     try {
       jsonString = JSON.stringify(value);
-    } catch (e) {}
+    } catch (e) {
+    }
     try {
       window.localStorage.setItem(userKey, jsonString || String(value));
-    } catch (e) {}
+    } catch (e) {
+    }
   }
 };
 
