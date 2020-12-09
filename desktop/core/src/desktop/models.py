@@ -1925,7 +1925,8 @@ class ClusterConfig(object):
     remote_home_storage = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else None
 
     for hdfs_connector in hdfs_connectors:
-      home_path = remote_home_storage if remote_home_storage else self.user.get_home_directory().encode('utf-8')
+      force_home = remote_home_storage and not remote_home_storage.startswith('/')
+      home_path = self.user.get_home_directory(force_home=force_home).encode('utf-8')
       interpreters.append({
         'type': 'hdfs',
         'displayName': hdfs_connector,
