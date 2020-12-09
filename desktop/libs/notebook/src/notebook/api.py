@@ -572,7 +572,17 @@ def _historify(notebook, user):
 
 def _get_statement(notebook):
   if notebook['snippets'] and len(notebook['snippets']) > 0:
-    return Notebook.statement_with_variables(notebook['snippets'][0])
+    snippet = notebook['snippets'][0]
+    try:
+      if snippet.get('executor', {}).get('executables', []):  # With Connectors/Editor 2
+        executable = snippet['executor']['executables'][0]
+        if executable.get('handle'):
+          return executable['handle']['statement']
+        else:
+          return executable['parsedStatement']['statement']
+      return Notebook.statement_with_variables(snippet)
+    except KeyError as e:
+      LOG.warning('Could not get statement from query history: %s' % e)
   return ''
 
 @require_GET
