@@ -18,8 +18,8 @@
 from builtins import str
 import logging
 
-from django.core import urlresolvers
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from desktop.lib.parameterization import find_parameters, bind_parameters
@@ -47,16 +47,16 @@ class JobDesign(models.Model):
   data = models.TextField()
 
   def edit_url(self):
-    return urlresolvers.reverse("jobsub.views.edit_design", kwargs=dict(id=self.id))
+    return reverse("jobsub.views.edit_design", kwargs=dict(id=self.id))
 
   def clone_url(self):
-    return urlresolvers.reverse("jobsub.views.clone_design", kwargs=dict(id=self.id))
+    return reverse("jobsub.views.clone_design", kwargs=dict(id=self.id))
 
   def delete_url(self):
-    return urlresolvers.reverse("jobsub.views.delete_design", kwargs=dict(id=self.id))
+    return reverse("jobsub.views.delete_design", kwargs=dict(id=self.id))
 
   def submit_url(self):
-    return urlresolvers.reverse("jobsub.views.submit_design", kwargs=dict(id=self.id))
+    return reverse("jobsub.views.submit_design", kwargs=dict(id=self.id))
 
   def clone(self):
     clone_kwargs = dict([(field.name, getattr(self, field.name)) for field in self._meta.fields if field.name != 'id']);
