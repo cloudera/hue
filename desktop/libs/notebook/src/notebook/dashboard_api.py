@@ -110,7 +110,9 @@ class SQLDashboardApi(DashboardApi):
           for f in facet['properties']['facets']:
             mincount_fields_name.append(f['field'])
             mincount_field_name = 'count__' + '_'.join(mincount_fields_name)
-            mincount_fields_operation.append('COUNT(*) OVER (PARTITION BY %s) AS %s' % (', '.join(mincount_fields_name), mincount_field_name) )
+            mincount_fields_operation.append(
+              'COUNT(*) OVER (PARTITION BY %s) AS %s' % (', '.join(mincount_fields_name), mincount_field_name)
+            )
             mincount_where.append('%s >= %s' % (mincount_field_name, str(f['mincount'])))
           sql_from = '''(SELECT * FROM (SELECT *, %(fields)s
           FROM %(sql_from)s) default
@@ -120,7 +122,11 @@ class SQLDashboardApi(DashboardApi):
             'where': ' AND '.join(mincount_where)
           }
 
-        order_by = ', '.join([self._get_dimension_field(f)['order_by'] for f in reversed(facet['properties']['facets']) if f['sort'] != 'default'])
+        order_by = ', '.join([
+            self._get_dimension_field(f)['order_by']
+            for f in reversed(facet['properties']['facets']) if f['sort'] != 'default'
+          ]
+        )
 
         sql = '''SELECT %(fields)s
         FROM %(sql_from)s
@@ -137,7 +143,8 @@ class SQLDashboardApi(DashboardApi):
         }
       elif facet['type'] == 'function': # 1 dim only now
         aggregate_function = facet['properties']['facets'][0]['aggregate']['function']
-        if (aggregate_function == 'percentile' or aggregate_function == 'median') and not self._supports_percentile() and self._supports_cume_dist():
+        if (aggregate_function == 'percentile' or aggregate_function == 'median') and not self._supports_percentile() and \
+            self._supports_cume_dist():
           sql_from = '''
           (SELECT *
           FROM
@@ -435,7 +442,7 @@ class SQLDashboardApi(DashboardApi):
       field_fq = next(group)
       for fq in group:
         for f in fq['filter']:
-            field_fq['filter'].append(f)
+          field_fq['filter'].append(f)
       merged_fqs.append(field_fq)
 
     for fq in merged_fqs:
@@ -446,7 +453,9 @@ class SQLDashboardApi(DashboardApi):
           value = _filter['value']
           if value is not None:
             if isinstance(value, list):
-              field_conditions = [self._get_field_condition_formatting(collection, facet, _f) % (_f, exclude, _val) for _f, _val in zip(fq['field'], value)]
+              field_conditions = [
+                self._get_field_condition_formatting(collection, facet, _f) % (_f, exclude, _val) for _f, _val in zip(fq['field'], value)
+              ]
               field_conditions = [condition for condition in field_conditions if condition]
               if field_conditions:
                 f.append(' AND '.join(field_conditions))
@@ -505,18 +514,17 @@ class SQLDashboardApi(DashboardApi):
       return ''
 
 
-  @classmethod
-  def _get_aggregate_function(cls, facet):
+  def _get_aggregate_function(self, facet):
     fields = []
 
     if facet['aggregate']['function'] == 'median':
-      if cls._supports_median():
+      if self._supports_median():
         facet['aggregate']['function'] = 'MEDIAN'
         fields.append(facet['field'])
-      elif cls._supports_percentile():
+      elif self._supports_percentile():
         facet['aggregate']['function'] = 'PERCENTILE'
         fields.append('%s, 0.5' % facet['field'])
-      elif cls._supports_cume_dist():
+      elif self._supports_cume_dist():
         facet['aggregate']['function'] = 'MIN'
         fields.append(facet['field'])
       else:
@@ -526,9 +534,9 @@ class SQLDashboardApi(DashboardApi):
       facet['backticks'] = self.backticks
       fields.append('distinct %(backticks)s%(field)s%(backticks)s' % facet)
     elif facet['aggregate']['function'] == 'percentile':
-      if cls._supports_percentile():
-        fields.append('%s, %s' % (facet['field'], cls._zero_to_one(float(facet['aggregate']['percentile']))))
-      elif cls._supports_cume_dist():
+      if self._supports_percentile():
+        fields.append('%s, %s' % (facet['field'], self._zero_to_one(float(facet['aggregate']['percentile']))))
+      elif self._supports_cume_dist():
         facet['aggregate']['function'] = 'MIN'
         fields.append(facet['field'])
       else:
@@ -598,7 +606,8 @@ class SQLDashboardApi(DashboardApi):
       else:
         slot = facet['gap']
         select = """
-        floor(floor((%(backticks)s%(field)s%(backticks)s - %(start)s) / %(slot)s) * %(slot)s) + %(start)s AS %(backticks)s%(field_name)s_%(position)s%(backticks)s""" % { # Beware: start might be not in sync with the UI
+        floor(floor((%(backticks)s%(field)s%(backticks)s - %(start)s) / %(slot)s) * %(slot)s) + %(start)s AS '''
+        '''%(backticks)s%(field_name)s_%(position)s%(backticks)s""" % { # Beware: start might be not in sync with the UI
           'field': facet['field'],
           'slot': slot,
           'field_name': field_name,
@@ -626,7 +635,8 @@ class SQLDashboardApi(DashboardApi):
       'unit': unit.rstrip('S'),
       'sql_trunc': None,
       'sql_interval': '1 SECOND',
-      'timedelta': timedelta(seconds=1) # TODO: switch to dateutil.relativedelta or create a SELECT INTERVAL + N query to get all the buckets
+      # TODO: switch to dateutil.relativedelta or create a SELECT INTERVAL + N query to get all the buckets
+      'timedelta': timedelta(seconds=1)
     }
 
     if duration['unit'] == 'MINUTE':
@@ -671,11 +681,14 @@ class SQLDashboardApi(DashboardApi):
 
 
   def _is_number(self, _type):
-    return _type in ('int', 'long', 'bigint', 'float', 'INT_TYPE', 'DECIMAL_TYPE', 'DOUBLE_TYPE', 'FLOAT_TYPE', 'SMALLINT_TYPE', 'TINYINT_TYPE', 'BIGINT_TYPE')
+    return _type in (
+      'int', 'long', 'bigint', 'float', 'INT_TYPE', 'DECIMAL_TYPE', 'DOUBLE_TYPE', 'FLOAT_TYPE', 'SMALLINT_TYPE',
+      'TINYINT_TYPE', 'BIGINT_TYPE'
+    )
 
 
   def _is_date(self, _type):
-    return _type in ('timestamp','TIMESTAMP_TYPE')
+    return _type in ('timestamp', 'TIMESTAMP_TYPE')
 
 
   def _get_time_filter_range(self, collection, query):
@@ -810,7 +823,8 @@ class SQLDashboardApi(DashboardApi):
           })
     else: # Nested facets can have dimension > 2
       for row in rows:
-        value_fields = [f['field'] for f in dimension_fields]  # e.g. SELECT `job`, cast(salary / 11000 as INT) * 10 AS salary_range, `gender`, COUNT(*), avg(salary)
+        # e.g. SELECT `job`, cast(salary / 11000 as INT) * 10 AS salary_range, `gender`, COUNT(*), avg(salary)
+        value_fields = [f['field'] for f in dimension_fields]
         fq_values = row[:dimension]
         counts.append({
           "count": row[-1],
@@ -832,7 +846,13 @@ class SQLDashboardApi(DashboardApi):
   def _convert_notebook_function_facet(self, result, facet, query):
     rows = list(result['data'])
 
-    response = {"query": facet['id'], 'counts': {'percentage': 0, 'value': rows[0][0]}, "type": "function", "id": facet['id'], "label": facet['id']}
+    response = {
+      "query": facet['id'],
+      'counts': {'percentage': 0, 'value': rows[0][0]},
+      "type": "function",
+      "id": facet['id'],
+      "label": facet['id']
+    }
 
     return {'normalized_facets': [response]}
 
