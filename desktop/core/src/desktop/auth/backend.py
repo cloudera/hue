@@ -166,8 +166,8 @@ class DefaultUserAugmentor(object):
   def get_groups(self):
     return self._get_profile().get_groups()
 
-  def get_home_directory(self):
-    return REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() \
+  def get_home_directory(self, force_home=False):
+    return REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() and not force_home \
         else self._get_profile().home_directory
 
   def has_hue_permission(self, action, app):
