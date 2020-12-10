@@ -16,9 +16,9 @@
 
 import $ from 'jquery';
 
-import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import { resolveCatalogEntry } from 'sql/sqlUtils';
+import { applyCancellable } from '../catalog/catalogUtils';
 
 export const POST_TO_LOCATION_WORKER_EVENT = 'ace.sql.location.worker.post';
 export const POST_FROM_LOCATION_WORKER_EVENT = 'ace.sql.location.worker.message';
@@ -31,7 +31,7 @@ const attachEntryResolver = function (location, connector, namespace, compute) {
       options = {};
     }
     if (location.resolvePathPromise && !location.resolvePathPromise.cancelled) {
-      dataCatalog.applyCancellable(location.resolvePathPromise, options);
+      applyCancellable(location.resolvePathPromise, options);
       return location.resolvePathPromise;
     }
 

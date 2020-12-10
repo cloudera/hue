@@ -15,8 +15,8 @@
 // limitations under the License.
 
 import { koSetup } from 'jest/koTestUtils';
+import { CancellablePromise } from '../../api/cancellablePromise';
 import { NAME } from './ko.navTags';
-import $ from 'jquery';
 
 import 'ko/bindings/ko.tagEditor';
 
@@ -28,18 +28,20 @@ describe('ko.navTags.js', () => {
       catalogEntry: {
         isField: () => true,
         isComplex: () => false,
-        getChildren: () => $.Deferred().resolve([]),
-        getSample: () => $.Deferred().reject(),
-        loadNavigatorMetaForChildren: () => $.Deferred().reject(),
-        loadOptimizerPopularityForChildren: () => $.Deferred().reject(),
+        getChildren: () => CancellablePromise.resolve([]),
+        getSample: () => CancellablePromise.reject(),
+        loadNavigatorMetaForChildren: () => CancellablePromise.reject(),
+        loadOptimizerPopularityForChildren: () => CancellablePromise.reject(),
         isTableOrView: () => false,
         getDialect: () => 'impala',
         getNavigatorMeta: () =>
-          $.Deferred().resolve({
+          CancellablePromise.resolve({
             tags: ['testTag']
           })
       }
     });
+
+    await setup.waitForKoUpdate();
 
     expect(element.innerHTML).toMatchSnapshot();
   });

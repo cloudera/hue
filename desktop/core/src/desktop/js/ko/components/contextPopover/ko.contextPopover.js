@@ -16,6 +16,7 @@
 
 import $ from 'jquery';
 import * as ko from 'knockout';
+import { CancellablePromise } from '../../../api/cancellablePromise';
 
 import AsteriskContextTabs from './asteriskContextTabs';
 import CollectionContextTabs from './collectionContextTabs';
@@ -939,9 +940,11 @@ class SqlContextContentsGlobalSearch {
             path: path,
             definition: { type: params.data.type.toLowerCase() }
           })
-          .done(catalogEntry => {
+          .then(catalogEntry => {
             catalogEntry.navigatorMeta = params.data;
-            catalogEntry.navigatorMetaPromise = $.Deferred().resolve(catalogEntry.navigatorMeta);
+            catalogEntry.navigatorMetaPromise = CancellablePromise.resolve(
+              catalogEntry.navigatorMeta
+            );
             catalogEntry.saveLater();
             self.contents(new DataCatalogContext({ popover: self, catalogEntry: catalogEntry }));
           });

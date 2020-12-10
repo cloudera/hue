@@ -413,20 +413,20 @@ HueContextSelector.prototype.reloadDatabases = function () {
               path: [],
               definition: { type: 'source' }
             })
-            .done(sourceEntry => {
+            .then(sourceEntry => {
               sourceEntry
                 .getChildren({ silenceErrors: true })
-                .done(databaseEntries => {
+                .then(databaseEntries => {
                   const databaseNames = [];
                   databaseEntries.forEach(databaseEntry => {
                     databaseNames.push(databaseEntry.name);
                   });
                   self.availableDatabases(databaseNames);
                 })
-                .fail(() => {
+                .catch(() => {
                   self.availableDatabases([]);
                 })
-                .always(() => {
+                .finally(() => {
                   let lastSelectedDb = getFromLocalStorage(
                     'assist_' +
                       ko.unwrap(self.connector).id +

@@ -35,20 +35,20 @@ class MetastoreColumn {
     this.comment = ko.observable();
 
     this.comment.subscribe(newValue => {
-      this.catalogEntry.getComment().done(comment => {
+      this.catalogEntry.getComment().then(comment => {
         if (comment !== newValue) {
           this.catalogEntry
             .setComment(newValue)
-            .done(this.comment)
-            .fail(() => {
+            .then(this.comment)
+            .catch(() => {
               this.comment(comment);
             });
         }
       });
     });
 
-    this.table.catalogEntry.loadNavigatorMetaForChildren().done(() => {
-      this.catalogEntry.getComment().done(this.comment);
+    this.table.catalogEntry.loadNavigatorMetaForChildren().finally(() => {
+      this.catalogEntry.getComment().then(this.comment);
     });
   }
 
