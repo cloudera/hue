@@ -224,10 +224,10 @@ class SqlAlchemyApi(Api):
     statement = snippet['statement']
 
     if self.options['url'].startswith('phoenix://') or self.options['url'].startswith('presto://') or \
-        self.interpreter.get('dialect_properties') and self.interpreter['dialect_properties']['trim_statement_semicolon']:
+        self.interpreter['dialect_properties'].get('trim_statement_semicolon'):
       statement = statement.strip().rstrip(';')
 
-    if self.interpreter.get('dialect_properties', {}).get('has_use_statement') and snippet.get('database'):
+    if self.interpreter['dialect_properties'].get('has_use_statement') and snippet.get('database'):
       connection.execute('USE ' + snippet['database'])
 
     result = connection.execute(statement)
