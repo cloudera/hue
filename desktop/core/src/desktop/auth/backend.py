@@ -138,7 +138,7 @@ def is_admin(user):
   if hasattr(user, 'is_superuser') and not ENABLE_ORGANIZATIONS.get():
     is_admin = user.is_superuser
 
-  if not is_admin and user.is_authenticated():
+  if not is_admin and user.is_authenticated:
     try:
       user = rewrite_user(user)
       is_admin = user.is_admin if ENABLE_ORGANIZATIONS.get() else user.has_hue_permission(action="superuser", app="useradmin")

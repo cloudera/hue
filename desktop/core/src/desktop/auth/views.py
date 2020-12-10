@@ -185,14 +185,14 @@ def dt_login(request, from_modal=False):
     if hasattr(request, 'fs') and (
         'KnoxSpnegoDjangoBackend' in backend_names or 'SpnegoDjangoBackend' in backend_names or 'OIDCBackend' in backend_names or
         'SAML2Backend' in backend_names
-      ) and request.user.is_authenticated():
+      ) and request.user.is_authenticated:
       if request.fs is None:
         request.fs = fsmanager.get_filesystem(request.fs_ref)
       try:
         ensure_home_directory(request.fs, request.user)
       except (IOError, WebHdfsException) as e:
         LOG.error('Could not create home directory for %s user %s.' % ('OIDC' if 'OIDCBackend' in backend_names else 'SAML', request.user))
-    if request.user.is_authenticated() and not from_modal:
+    if request.user.is_authenticated and not from_modal:
       return HttpResponseRedirect(redirect_to)
 
   if is_active_directory and not is_ldap_option_selected and \
@@ -220,7 +220,7 @@ def dt_login(request, from_modal=False):
     'user': request.user
   })
 
-  if not request.user.is_authenticated():
+  if not request.user.is_authenticated:
     response.delete_cookie(LOAD_BALANCER_COOKIE) # Note: might be re-balanced to another Hue on login.
 
   return response
@@ -325,7 +325,7 @@ def oauth_authenticated(request):
 
 @login_notrequired
 def oidc_failed(request):
-  if request.user.is_authenticated():
+  if request.user.is_authenticated:
     return HttpResponseRedirect('/')
   access_warn(request, "401 Unauthorized by oidc")
   return render("oidc_failed.mako", request, dict(uri=request.build_absolute_uri()), status=401)

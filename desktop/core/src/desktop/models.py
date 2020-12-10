@@ -1941,7 +1941,7 @@ class ClusterConfig(object):
         'buttonName': _('Browse'),
         'tooltip': hdfs_connector,
         'page': '/filebrowser/' + (
-          not self.user.is_anonymous() and
+          not self.user.is_anonymous and
           'view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS) or ''
         )
       })
@@ -2169,7 +2169,7 @@ class Cluster(object):
 def _get_apps(user, section=None):
   current_app = None
   other_apps = []
-  if user.is_authenticated():
+  if user.is_authenticated:
     apps_list = appmanager.get_apps_dict(user)
     apps = list(apps_list.values())
     for app in apps:
