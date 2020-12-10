@@ -1916,11 +1916,11 @@ class ApiHelper {
    * @param {Object} options
    * @param {string} options.identity - The identifier for the Navigator entity to update
    * @param {Object} [options.properties]
-   * @param {Object} [options.modifiedCustomMetadata]
-   * @param {string[]} [options.deletedCustomMetadataKeys]
+   * @param {Object.<string|string>|undefined} [options.modifiedCustomMetadata]
+   * @param {string[]|undefined} [options.deletedCustomMetadataKeys]
    * @param {boolean} [options.silenceErrors]
    *
-   * @return {Promise}
+   * @return {JQueryPromise}
    */
   updateNavigatorProperties(options) {
     const data = { id: ko.mapping.toJSON(options.identity) };
@@ -1941,7 +1941,7 @@ class ApiHelper {
    * Lists all available navigator tags
    *
    * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
+   * @param {boolean|undefined} [options.silenceErrors]
    *
    * @return {CancellableJqPromise}
    */

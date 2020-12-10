@@ -116,7 +116,7 @@ export const simpleGet = (url, data, options) => {
  * @param {boolean} [options.silenceErrors]
  * @param {string} [options.dataType] - Default: Intelligent Guess (xml, json, script, text, html)
  *
- * @return {Promise}
+ * @return {JQueryPromise}
  */
 export const simplePost = (url, data, options) => {
   const deferred = $.Deferred();
