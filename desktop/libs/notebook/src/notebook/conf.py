@@ -375,7 +375,7 @@ def config_validator(user, interpreters=None):
   client = Client()
   client.force_login(user=user)
 
-  if not user.is_authenticated():
+  if not user.is_authenticated:
     res.append(('Editor', _('Could not authenticate with user %s to validate interpreters') % user))
 
   if interpreters is None:
