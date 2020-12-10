@@ -709,6 +709,20 @@ Alternative:
      interface=jdbc
      options='{"url": "jdbc:kylin://172.17.0.2:7070/learn_kylin", "driver": "org.apache.kylin.jdbc.Driver", "user": "ADMIN", "password": "KYLIN"}'
 
+### Dask SQL
+
+[dask-sql](https://dask-sql.readthedocs.io) adds a SQL layer on top of Dask.
+It uses the Presto wire protocol for communication, so the SqlAlchemy dialect for Presto should be added to the Python system or Hue Python virtual environment:
+
+    ./build/env/bin/pip install pyhive
+
+Then give Hue the information about the database source:
+
+    [[[dask-sql]]]
+      name=Dask SQL
+      interface=sqlalchemy
+      options='{"url": "presto://localhost:8080/catalog/default"}'
+
 ### Clickhouse
 
 The dialect should be added to the Python system or Hue Python virtual environment:
