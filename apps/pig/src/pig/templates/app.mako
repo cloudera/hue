@@ -1025,9 +1025,9 @@ ${ commonshare() | n,unicode }
           connector: { id: 'hive' },
           path: ['default'],
           silenceErrors: true
-        }).done(function (childEntries) {
+        }).then(function (childEntries) {
           availableTables = $.map(childEntries, function (entry) { return entry.name }).join(' ');
-        });
+        }).catch(function() {});
       });
     % endif
 

@@ -179,32 +179,30 @@ class FieldSamples {
     window.clearTimeout(self.refreshSampleTimeout);
     self.cancelRunningQueries();
     self.loadingSamples(true);
-    self.cancellablePromises.push(
-      self
-        .catalogEntry()
-        .getSample({
-          silenceErrors: true,
-          cancellable: true,
-          refreshCache: refreshCache,
-          operation: self.operation().type
-        })
-        .done(samples => {
-          if (samples.data && samples.data.length) {
-            self.columnSamples(samples.data);
-          }
-        })
-        .fail(() => {
-          self.hasErrors(true);
-        })
-        .always(() => {
-          self.loadingSamples(false);
-          if (self.refreshSampleTimeout && self.refreshSampleEnabled()) {
-            self.refreshSampleTimeout = window.setTimeout(() => {
-              self.loadSamples(true);
-            }, self.refreshSampleInterval);
-          }
-        })
-    );
+    const samplePromise = self.catalogEntry().getSample({
+      silenceErrors: true,
+      cancellable: true,
+      refreshCache: refreshCache,
+      operation: self.operation().type
+    });
+    self.cancellablePromises.push(samplePromise);
+    samplePromise
+      .then(samples => {
+        if (samples.data && samples.data.length) {
+          self.columnSamples(samples.data);
+        }
+      })
+      .catch(() => {
+        self.hasErrors(true);
+      })
+      .finally(() => {
+        self.loadingSamples(false);
+        if (self.refreshSampleTimeout && self.refreshSampleEnabled()) {
+          self.refreshSampleTimeout = window.setTimeout(() => {
+            self.loadSamples(true);
+          }, self.refreshSampleInterval);
+        }
+      });
   }
 
   cancelRunningQueries() {

@@ -70,7 +70,7 @@
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
 
-  import DataCatalogEntry from 'catalog/dataCatalogEntry';
+  import DataCatalogEntry from 'catalog/DataCatalogEntry';
   import I18n from 'utils/i18n';
   import { Suggestion } from './AutocompleteResults';
 

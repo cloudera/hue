@@ -15,12 +15,13 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
+import { CancellablePromise } from 'api/cancellablePromise';
 import dataCatalog from 'catalog/dataCatalog';
 import AceEditor from './AceEditor.vue';
 
 describe('AceEditor.vue', () => {
   it('should render', () => {
-    spyOn(dataCatalog, 'getChildren').and.returnValue(Promise.resolve([]));
+    spyOn(dataCatalog, 'getChildren').and.returnValue(CancellablePromise.resolve([]));
 
     const wrapper = shallowMount(AceEditor, {
       propsData: {
