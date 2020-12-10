@@ -120,3 +120,7 @@ axios.interceptors.request.use(config => {
   console.trace();
   return config;
 });
+
+process.on('unhandledRejection', err => {
+  fail(err);
+});
