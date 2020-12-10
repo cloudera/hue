@@ -31,11 +31,14 @@ declare global {
 }
 
 export interface hueWindow {
+  CACHEABLE_TTL?: { default?: number; optimizer?: number };
+  HAS_CATALOG?: boolean;
   HAS_OPTIMIZER?: boolean;
   AUTOCOMPLETE_TIMEOUT?: number;
   ENABLE_SQL_SYNTAX_CHECK?: boolean;
   HUE_BASE_URL?: string;
   LOGGED_USERNAME?: string;
+  OPTIMIZER_MODE?: string;
   WEB_SOCKETS_ENABLED?: boolean;
   WS_CHANNEL?: string;
   hueDebug?: HueDebug;
