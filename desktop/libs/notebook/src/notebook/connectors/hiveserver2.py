@@ -574,7 +574,7 @@ class HS2Api(Api):
         explanation = db.explain(query).textual
         statement = query.get_query_statement(0)
       except QueryServerException as ex:
-        raise QueryError(ex.message)
+        explanation = str(ex.message)
 
     return {
       'status': 0,
