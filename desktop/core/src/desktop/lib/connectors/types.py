@@ -397,7 +397,7 @@ CONNECTOR_TYPES = [
   },
   {
     'nice_name': 'Dask-sql',
-    'dialect': 'presto',
+    'dialect': 'dasksql',
     'interface': 'sqlalchemy',
     'settings': [
       {'name': 'url', 'value': 'presto://localhost:8080/catalog/default'},
