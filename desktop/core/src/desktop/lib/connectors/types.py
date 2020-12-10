@@ -369,6 +369,34 @@ CONNECTOR_TYPES = [
     }
   },
   {
+    'nice_name': 'Dask-sql',
+    'dialect': 'presto',
+    'interface': 'sqlalchemy',
+    'settings': [
+      {'name': 'url', 'value': 'presto://host:8080/catalog/default'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
+      {'name': 'has_impersonation', 'value': False},
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '"',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': True,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
+      'trim_statement_semicolon': True,
+    }
+  },
+  {
     'nice_name': "Elasticsearch SQL",
     'dialect': 'elasticsearch',
     'interface': 'sqlalchemy',
