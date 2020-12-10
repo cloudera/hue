@@ -226,7 +226,7 @@ class NavProperties {
       self.loading(true);
       self.catalogEntry
         .getNavigatorMeta()
-        .done(navigatorMeta => {
+        .then(navigatorMeta => {
           const keysAfterEdit = {};
           const modifiedCustomMetadata = {};
 
@@ -250,11 +250,11 @@ class NavProperties {
 
           self.catalogEntry
             .updateNavigatorCustomMetadata(modifiedCustomMetadata, deletedCustomMetadataKeys)
-            .always(() => {
+            .finally(() => {
               self.loadProperties();
             });
         })
-        .fail(() => {
+        .catch(() => {
           self.loadProperties();
         });
     }
@@ -284,7 +284,7 @@ class NavProperties {
 
     ko.unwrap(self.catalogEntry)
       .getNavigatorMeta()
-      .done(navigatorMeta => {
+      .then(navigatorMeta => {
         const newProps = [];
 
         if (navigatorMeta.classifications) {
@@ -312,10 +312,10 @@ class NavProperties {
         }
         self.properties(newProps);
       })
-      .fail(() => {
+      .catch(() => {
         self.hasErrors(true);
       })
-      .always(() => {
+      .finally(() => {
         self.loading(false);
       });
   }

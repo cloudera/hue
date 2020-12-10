@@ -325,16 +325,16 @@ class GlobalSearch {
     });
   }
 
-  initializeFacetValues() {
-    const self = this;
-    dataCatalog.getAllNavigatorTags({ silenceErrors: true }).done(facets => {
+  async initializeFacetValues() {
+    try {
+      const facets = await dataCatalog.getAllNavigatorTags({ silenceErrors: true });
       const facetValues = self.knownFacetValues();
       facetValues['tags'] = facets;
       facetValues['tag'] = facets;
       if (window.HAS_READ_ONLY_CATALOG) {
         facetValues['classification'] = facets;
       }
-    });
+    } catch (err) {}
   }
 
   cancelRunningRequests() {

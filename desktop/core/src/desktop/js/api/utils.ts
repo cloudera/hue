@@ -120,13 +120,11 @@ export const post = <T, U = unknown>(
         completed = true;
       });
 
-    if (onCancel) {
-      onCancel(() => {
-        if (!completed) {
-          cancelTokenSource.cancel();
-        }
-      });
-    }
+    onCancel(() => {
+      if (!completed) {
+        cancelTokenSource.cancel();
+      }
+    });
   });
 
 export const cancelActiveRequest = (request?: JQuery.jqXHR): void => {

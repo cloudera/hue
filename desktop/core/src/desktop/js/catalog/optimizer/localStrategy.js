@@ -89,9 +89,9 @@ export default class LocalStrategy extends BaseStrategy {
             };
             deferred.resolve(data);
           })
-          .fail(deferred.reject);
+          .catch(deferred.reject);
       })
-      .fail(deferred.reject);
+      .catch(deferred.reject);
 
     return deferred.promise();
   }
