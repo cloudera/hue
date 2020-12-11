@@ -309,7 +309,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
-      'has_use_statement': True,
+      'has_use_statement': False,
       'trim_statement_semicolon': True,
     }
   },
@@ -337,7 +337,7 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
       'has_reference_language': False,
       'has_reference_functions': False,
-      'has_use_statement': True,
+      'has_use_statement': False,
       'trim_statement_semicolon': False,
     }
   },

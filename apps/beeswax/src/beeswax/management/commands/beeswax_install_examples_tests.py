@@ -177,3 +177,27 @@ class TestTransactionalTables():
         SampleTable(table_data, 'hive', 'default').install(self.user)
 
         make_notebook.assert_called()
+
+
+  def test_create_phoenix_table(self):
+    table_data =   {
+      "data_file": "./tables/us_population.csv",
+      "create_sql": "CREATE TABLE IF NOT EXISTS us_population (\n  state CHAR(2) NOT NULL,\n  city VARCHAR NOT NULL,\n  population BIGINT\n  CONSTRAINT my_pk PRIMARY KEY (state, city)\n)\n",
+      "insert_sql": "UPSERT INTO us_population VALUES %(values)s",
+      "table_name": "us_population",
+      "dialects": ["phoenix"],
+      "transactional": True,
+      "is_multi_inserts": True
+    }
+
+    with patch('beeswax.management.commands.beeswax_install_examples.make_notebook') as make_notebook:
+      SampleTable(table_data, 'phoenix', 'default').install(self.user)
+
+      make_notebook.assert_called_with(
+        name='Insert data in sample table us_population',
+        editor_type='phoenix',
+        statement="UPSERT INTO us_population VALUES ('CA', 'San Jose', 912332)",
+        status='ready',
+        database='default',
+        on_success_url='assist.db.refresh', is_task=False
+      )
