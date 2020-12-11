@@ -68,7 +68,8 @@ class Command(BaseCommand):
       self.tables = options.get('tables')
 
     tables = 'tables_standard.json' if dialect not in ('hive', 'impala') else (
-        'tables_transactional.json' if has_concurrency_support() else 'tables.json'
+        'tables_transactional.json' if has_concurrency_support() else
+        'tables.json'
     )
     exception = None
 
@@ -128,6 +129,7 @@ class Command(BaseCommand):
     # Filter query list to HiveServer2 vs other interfaces
     app_type = HQL if dialect == 'hive' else IMPALA if dialect == 'impala' else RDBMS
     design_list = [d for d in design_list if int(d['type']) == app_type]
+
     if app_type == RDBMS:
       design_list = [d for d in design_list if dialect in d['dialects']]
     if self.queries is None:  # Manual install
@@ -168,6 +170,7 @@ class SampleTable(object):
     self.request = request
     self.columns = data_dict.get('columns')
     self.is_transactional = data_dict.get('transactional')
+    self.is_multi_inserts = data_dict.get('is_multi_inserts')
 
     # Sanity check
     self._data_dir = LOCAL_EXAMPLES_DATA_DIR.get()
@@ -357,8 +360,10 @@ class SampleTable(object):
 
     rows = [
       ', '.join(
-        col if is_number(col, i, columns) else "'%s'" % col.replace("'", "\\'") for i, col in enumerate(row)
-      ) for row in reader
+        col if is_number(col, i, columns) else "'%s'" % col.replace("'", "\\'")
+        for i, col in enumerate(row)
+      )
+      for row in reader
     ]
 
     return ', '.join('(%s)' % row for row in rows)
