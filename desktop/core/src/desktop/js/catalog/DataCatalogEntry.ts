@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import { Cancellable, CancellablePromise } from 'api/cancellablePromise';
+import { fetchSourceMeta } from 'catalog/api';
 import MultiTableEntry, { TopAggs, TopFilters, TopJoins } from 'catalog/MultiTableEntry';
 import { getOptimizer } from './optimizer/optimizer';
 import * as ko from 'knockout';
@@ -231,23 +232,25 @@ const reloadSourceMeta = (
         } catch (err) {}
       }
 
-      const fetchPromise = fetchAndSave<SourceMeta>(
-        (<(options: FetchOptions) => CancellableJqPromise<SourceMeta>>(
-          (<unknown>apiHelper.fetchSourceMetadata)
-        )).bind(apiHelper),
-        val => {
-          entry.sourceMeta = val;
-        },
-        entry,
-        options
-      );
-
-      onCancel(() => {
-        fetchPromise.cancel();
-        entry.sourceMetaPromise = undefined;
+      entry.sourceMetaPromise = fetchSourceMeta({
+        ...options,
+        entry
       });
 
-      fetchPromise.then(resolve).fail(reject);
+      onCancel(() => {
+        if (entry.sourceMetaPromise) {
+          entry.sourceMetaPromise.cancel();
+          entry.sourceMetaPromise = undefined;
+        }
+      });
+
+      try {
+        entry.sourceMeta = await entry.sourceMetaPromise;
+        resolve(entry.sourceMeta);
+        entry.saveLater();
+      } catch (err) {
+        reject(err);
+      }
     }
   );
   return entry.sourceMetaPromise;
