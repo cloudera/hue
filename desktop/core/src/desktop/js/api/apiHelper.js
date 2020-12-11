@@ -1789,64 +1789,6 @@ class ApiHelper {
   }
 
   /**
-   * Fetches a navigator entity for the given source and path
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {boolean} [options.isView] - Default false
-   * @param {string[]} options.path
-   *
-   * @return {CancellableJqPromise}
-   */
-  fetchNavigatorMetadata(options) {
-    const deferred = $.Deferred();
-    let url = URLS.NAV_API.FIND_ENTITY;
-
-    if (options.path.length === 1) {
-      url += '?type=database&name=' + options.path[0];
-    } else if (options.path.length === 2) {
-      url +=
-        (options.isView ? '?type=view' : '?type=table') +
-        '&database=' +
-        options.path[0] +
-        '&name=' +
-        options.path[1];
-    } else if (options.path.length === 3) {
-      url +=
-        '?type=field&database=' +
-        options.path[0] +
-        '&table=' +
-        options.path[1] +
-        '&name=' +
-        options.path[2];
-    } else {
-      return new CancellableJqPromise($.Deferred().reject());
-    }
-
-    const request = simplePost(
-      url,
-      {
-        notebook: {},
-        snippet: ko.mapping.toJSON({
-          type: 'nav'
-        })
-      },
-      {
-        silenceErrors: options.silenceErrors,
-        successCallback: data => {
-          data = data.entity || data;
-          data.hueTimestamp = Date.now();
-          deferred.resolve(data);
-        },
-        errorCallback: deferred.reject
-      }
-    );
-
-    return new CancellableJqPromise(deferred, request);
-  }
-
-  /**
    * Updates Navigator properties and custom metadata for the given entity
    *
    * @param {Object} options
