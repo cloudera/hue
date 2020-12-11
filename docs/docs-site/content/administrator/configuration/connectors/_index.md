@@ -9,7 +9,7 @@ Looking at improving or adding a new one? Go check the **[connector API section]
 
 ## Databases
 
-Hue connects to any database or warehouse via native or SqlAlchemy connectors. Connections can be configured via a UI after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) is done, until then they need to be added to the [Hue ini file](/administrator/configuration/). Except [impala] and [beeswax] which have a dedicated section, all the other ones should be appended below the [[interpreters]] of [notebook] e.g.:
+Hue connects to any database or warehouse via native or SqlAlchemy connectors that need to be added to the [Hue ini file](/administrator/configuration/). Except [impala] and [beeswax] which have a dedicated section, all the other ones should be appended below the [[interpreters]] of [notebook] e.g.:
 
     [notebook]
     [[interpreters]]
@@ -30,6 +30,17 @@ Most of the interpreters require to install their SqlAlchemy dialect (e.g. `./bu
 
 Read about [how to build your own parser](/developer/parsers/) if you are looking at better autocompletes for your the SQL dialects you use.
 
+**Beta**
+
+Connections can be configured via a UI after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) is done. The feature require Editor 2 which is also in beta.
+
+    [desktop]
+    enable_connectors=true
+
+    [notebook]
+    enable_notebook_2=true
+
+!["Connectors"](https://cdn.gethue.com/uploads/2020/12/hue-connectors-create.png)
 
 ### Apache Hive
 
