@@ -67,6 +67,7 @@ RUN ./build/env/bin/pip install \
   ksql \
   pydruid \
   pybigquery \
+  elasticsearch-dbapi \
   pyasn1==0.4.1 \
   gevent \
   eventlet \
