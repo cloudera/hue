@@ -15,17 +15,15 @@
 // limitations under the License.
 
 import { koSetup } from 'jest/koTestUtils';
+import { CancellablePromise } from '../../api/cancellablePromise';
 import { NAME } from './ko.pollingCatalogEntriesList';
-import $ from 'jquery';
-import ApiHelper from 'api/apiHelper';
+import * as CatalogApi from 'catalog/api';
 
 describe('ko.pollingCatalogEntriesList.js', () => {
   const setup = koSetup();
 
   it('should render component', async () => {
-    jest
-      .spyOn(ApiHelper, 'fetchSourceMetadata')
-      .mockImplementation(() => $.Deferred().reject().promise());
+    jest.spyOn(CatalogApi, 'fetchSourceMeta').mockImplementation(() => CancellablePromise.reject());
 
     const element = await setup.renderComponent(NAME, {
       sourceType: 'impala',
