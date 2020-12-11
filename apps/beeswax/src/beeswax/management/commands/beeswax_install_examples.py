@@ -67,9 +67,9 @@ class Command(BaseCommand):
       self.queries = options.get('queries')
       self.tables = options.get('tables')
 
-    tables = 'tables_standard.json' if dialect not in ('hive', 'impala') else (
+    tables = 'tables.json' if dialect not in ('hive', 'impala') else (
         'tables_transactional.json' if has_concurrency_support() else
-        'tables.json'
+        'tables_standard.json'
     )
     exception = None
 
