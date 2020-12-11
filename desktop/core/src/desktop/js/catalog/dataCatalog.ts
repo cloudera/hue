@@ -773,7 +773,9 @@ export class DataCatalog {
       }
       try {
         const storeEntry = await this.multiTableStore.getItem<StoreMultiTableEntry>(identifier);
-        mergeMultiTableEntry(newEntry, storeEntry);
+        if (storeEntry) {
+          mergeMultiTableEntry(newEntry, storeEntry);
+        }
       } catch (err) {
         console.warn(err);
       }
