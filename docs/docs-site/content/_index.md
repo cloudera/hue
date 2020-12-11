@@ -20,7 +20,7 @@ are executing 100s of 1000s of queries daily. It is free to install and also shi
 
 Hue is also ideal for building your own [Cloud SQL Editor](/developer/components/) and any contributions are welcome.
 
-!["Hue Editor"](https://cdn.gethue.com/uploads/2020/04/hue-4.7.png)
+!["Hue Editor"](https://cdn.gethue.com/uploads/2020/09/hue-4.8.png)
 
 
 Quick Start
