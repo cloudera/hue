@@ -99,10 +99,10 @@
         this.loadTimeout = window.setTimeout(() => {
           this.commentPromise = this.details
             .getComment({ silenceErrors: true, cancellable: true })
-            .done(comment => {
+            .then(comment => {
               this.comment = comment;
             })
-            .always(() => {
+            .finally(() => {
               this.loading = false;
             });
         }, COMMENT_LOAD_DELAY);
