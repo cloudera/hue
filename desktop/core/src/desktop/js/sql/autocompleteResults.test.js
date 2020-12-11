@@ -33,7 +33,7 @@ describe('AutocompleteResults.js', () => {
     status: 500
   };
 
-  jest.spyOn(CatalogApi, 'fetchSourceMeta').mockImplementation(options => {
+  jest.spyOn(CatalogApi, 'fetchSourceMetadata').mockImplementation(options => {
     if (Math.random() < 0.5) {
       return CancellablePromise.reject(failResponse);
     }

@@ -20,11 +20,17 @@ import qs from 'qs';
 import { CancellablePromise } from './cancellablePromise';
 import hueUtils from 'utils/hueUtils';
 
-export const successResponseIsError = (responseData?: {
-  traceback?: string;
-  status?: number;
+export interface DefaultApiResponse {
+  status: number;
   code?: number;
-}): boolean => {
+  error?: string | unknown;
+  message?: string;
+  responseText?: string;
+  statusText?: string;
+  traceback?: string;
+}
+
+export const successResponseIsError = (responseData?: DefaultApiResponse): boolean => {
   return (
     typeof responseData !== 'undefined' &&
     (typeof responseData.traceback !== 'undefined' ||
@@ -36,16 +42,7 @@ export const successResponseIsError = (responseData?: {
 
 const UNKNOWN_ERROR_MESSAGE = 'Unknown error occurred';
 
-export const extractErrorMessage = (
-  errorResponse?:
-    | {
-        statusText?: string;
-        responseText?: string;
-        message?: string;
-        error?: string | unknown;
-      }
-    | string
-): string => {
+export const extractErrorMessage = (errorResponse?: DefaultApiResponse | string): string => {
   if (!errorResponse) {
     return UNKNOWN_ERROR_MESSAGE;
   }
@@ -84,7 +81,7 @@ export const post = <T, U = unknown>(
     ignoreSuccessErrors?: boolean;
     transformResponse?: AxiosTransformer;
     handleResponse?: (
-      response: T
+      response: T & DefaultApiResponse
     ) => { valid: boolean; reason?: unknown; adjustedResponse?: T } | undefined;
   }
 ): CancellablePromise<T> =>
@@ -98,7 +95,7 @@ export const post = <T, U = unknown>(
       }
     };
 
-    const handleErrorResponse = (response: AxiosResponse<T>): void => {
+    const handleErrorResponse = (response: AxiosResponse<DefaultApiResponse>): void => {
       const errorMessage = extractErrorMessage(response.data);
       reject(errorMessage);
       notifyError(errorMessage, response.data);
@@ -108,7 +105,7 @@ export const post = <T, U = unknown>(
     let completed = false;
 
     axios
-      .post<T>(url, qs.stringify(data), {
+      .post<T & DefaultApiResponse>(url, qs.stringify(data), {
         cancelToken: cancelTokenSource.token,
         transformResponse: options && options.transformResponse
       })

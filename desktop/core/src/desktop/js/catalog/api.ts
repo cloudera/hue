@@ -15,20 +15,20 @@
 // limitations under the License.
 
 import { CancellablePromise } from 'api/cancellablePromise';
-import { extractErrorMessage, post, successResponseIsError } from 'api/utils';
-import DataCatalogEntry, { SourceMeta } from 'catalog/DataCatalogEntry';
+import { DefaultApiResponse, extractErrorMessage, post, successResponseIsError } from 'api/utils';
+import DataCatalogEntry, { NavigatorMeta, SourceMeta } from 'catalog/DataCatalogEntry';
 
-const AUTOCOMPLETE_API_PREFIX = '/notebook/api/autocomplete/';
+const AUTOCOMPLETE_URL_PREFIX = '/notebook/api/autocomplete/';
+const FIND_ENTITY_URL = '/metadata/api/catalog/find_entity';
 
-export const fetchSourceMeta = (options: {
+export const fetchSourceMetadata = (options: {
   entry: DataCatalogEntry;
   silenceErrors?: boolean;
-}): CancellablePromise<SourceMeta> => {
-  const url =
-    AUTOCOMPLETE_API_PREFIX + options.entry.path.join('/') + (options.entry.path.length ? '/' : '');
-
-  return post<SourceMeta & { status: number; code?: number; error?: string; message?: string }>(
-    url,
+}): CancellablePromise<SourceMeta> =>
+  post<SourceMeta>(
+    `${AUTOCOMPLETE_URL_PREFIX}${options.entry.path.join('/')}${
+      options.entry.path.length ? '/' : ''
+    }`,
     {
       notebook: {},
       snippet: JSON.stringify({
@@ -40,7 +40,7 @@ export const fetchSourceMeta = (options: {
     {
       ...options,
       handleResponse: response => {
-        const message = response.error || response.message || '';
+        const message = <string>response.error || response.message || '';
         const adjustedResponse = response;
         adjustedResponse.notFound =
           response.status === 0 &&
@@ -50,6 +50,54 @@ export const fetchSourceMeta = (options: {
         adjustedResponse.hueTimestamp = Date.now();
 
         const valid = adjustedResponse.notFound || !successResponseIsError(response);
+
+        if (!valid) {
+          return { valid, reason: extractErrorMessage(response) };
+        }
+        return { valid, adjustedResponse };
+      }
+    }
+  );
+
+export const fetchNavigatorMetadata = (options: {
+  entry: DataCatalogEntry;
+  silenceErrors?: boolean;
+}): CancellablePromise<NavigatorMeta> => {
+  const params = new URLSearchParams();
+
+  if (options.entry.path.length === 1) {
+    params.append('type', 'database');
+  } else if (options.entry.path.length === 2) {
+    params.append('type', options.entry.isView() ? 'view' : 'table');
+    params.append('database', options.entry.path[0]);
+  } else if (options.entry.path.length === 3) {
+    params.append('type', 'field');
+    params.append('database', options.entry.path[1]);
+    params.append('table', options.entry.path[1]);
+  } else {
+    return CancellablePromise.reject();
+  }
+  params.append('name', options.entry.path[options.entry.path.length - 1]);
+
+  return post<NavigatorMeta>(
+    `${FIND_ENTITY_URL}?${params}`,
+    {
+      notebook: {},
+      snippet: JSON.stringify({
+        type: options.entry.getConnector().id,
+        source: 'data'
+      }),
+      cluster: (options.entry.compute && JSON.stringify(options.entry.compute)) || '""'
+    },
+    {
+      ...options,
+      handleResponse: (
+        response: (NavigatorMeta | { entity: NavigatorMeta }) & DefaultApiResponse
+      ) => {
+        const adjustedResponse = (<{ entity: NavigatorMeta }>response).entity || response;
+        adjustedResponse.hueTimestamp = Date.now();
+
+        const valid = !successResponseIsError(response);
 
         if (!valid) {
           return { valid, reason: extractErrorMessage(response) };
