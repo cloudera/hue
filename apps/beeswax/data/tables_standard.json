@@ -7,4 +7,14 @@
     "dialects": ["mysql", "postgresql", "presto"],
     "transactional": true
   }
+  ,
+  {
+    "data_file": "./tables/us_population.csv",
+    "create_sql": "CREATE TABLE IF NOT EXISTS us_population (\n  state CHAR(2) NOT NULL,\n  city VARCHAR NOT NULL,\n  population BIGINT\n  CONSTRAINT my_pk PRIMARY KEY (state, city)\n)\n",
+    "insert_sql": "UPSERT INTO us_population VALUES %(values)s",
+    "table_name": "us_population",
+    "dialects": ["phoenix"],
+    "transactional": true,
+    "is_multi_inserts": true
+  }
 ]

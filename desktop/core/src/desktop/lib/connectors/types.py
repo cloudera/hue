@@ -290,7 +290,7 @@ CONNECTOR_TYPES = [
     'dialect': 'phoenix',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'phoenix://sql-phoenix.com:8765/'},
+      {'name': 'url', 'value': 'phoenix://localhost:8765/'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
