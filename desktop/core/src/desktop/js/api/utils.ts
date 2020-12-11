@@ -83,19 +83,25 @@ export const post = <T, U = unknown>(
     silenceErrors?: boolean;
     ignoreSuccessErrors?: boolean;
     transformResponse?: AxiosTransformer;
+    handleResponse?: (
+      response: T
+    ) => { valid: boolean; reason?: unknown; adjustedResponse?: T } | undefined;
   }
 ): CancellablePromise<T> =>
   new CancellablePromise((resolve, reject, onCancel) => {
+    const notifyError = (message: string, response: unknown): void => {
+      if (!options || !options.silenceErrors) {
+        hueUtils.logError(response);
+        if (message.indexOf('AuthorizationException') === -1) {
+          $(document).trigger('error', message);
+        }
+      }
+    };
+
     const handleErrorResponse = (response: AxiosResponse<T>): void => {
       const errorMessage = extractErrorMessage(response.data);
       reject(errorMessage);
-      if (!options || !options.silenceErrors) {
-        hueUtils.logError(response.data);
-        if (errorMessage.indexOf('AuthorizationException') === -1) {
-          $(document).trigger('error', errorMessage);
-        }
-      }
-      reject(errorMessage);
+      notifyError(errorMessage, response.data);
     };
 
     const cancelTokenSource = axios.CancelToken.source();
@@ -107,6 +113,18 @@ export const post = <T, U = unknown>(
         transformResponse: options && options.transformResponse
       })
       .then(response => {
+        if (options && options.handleResponse) {
+          const handledResponse = options.handleResponse(response.data);
+          if (handledResponse) {
+            if (handledResponse.valid) {
+              resolve(handledResponse.adjustedResponse || response.data);
+            } else {
+              reject(handledResponse.reason);
+              notifyError(String(handledResponse.reason), response.data);
+            }
+            return;
+          }
+        }
         if ((!options || !options.ignoreSuccessErrors) && successResponseIsError(response.data)) {
           handleErrorResponse(response);
         } else {
