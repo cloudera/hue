@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { Cancellable, CancellablePromise } from 'api/cancellablePromise';
-import { fetchSourceMeta } from 'catalog/api';
+import { fetchNavigatorMetadata, fetchSourceMetadata } from 'catalog/api';
 import MultiTableEntry, { TopAggs, TopFilters, TopJoins } from 'catalog/MultiTableEntry';
 import { getOptimizer } from './optimizer/optimizer';
 import * as ko from 'knockout';
@@ -226,31 +226,27 @@ const reloadSourceMeta = (
 ): CancellablePromise<SourceMeta> => {
   entry.sourceMetaPromise = new CancellablePromise<SourceMeta>(
     async (resolve, reject, onCancel) => {
+      onCancel(() => {
+        entry.sourceMetaPromise = undefined;
+      });
+
       if (entry.dataCatalog.invalidatePromise) {
         try {
           await entry.dataCatalog.invalidatePromise;
         } catch (err) {}
       }
 
-      entry.sourceMetaPromise = fetchSourceMeta({
-        ...options,
-        entry
-      });
-
-      onCancel(() => {
-        if (entry.sourceMetaPromise) {
-          entry.sourceMetaPromise.cancel();
-          entry.sourceMetaPromise = undefined;
-        }
-      });
-
       try {
-        entry.sourceMeta = await entry.sourceMetaPromise;
+        entry.sourceMeta = await fetchSourceMetadata({
+          ...options,
+          entry
+        });
         resolve(entry.sourceMeta);
-        entry.saveLater();
       } catch (err) {
         reject(err);
+        return;
       }
+      entry.saveLater();
     }
   );
   return entry.sourceMetaPromise;
@@ -261,39 +257,25 @@ const reloadSourceMeta = (
  */
 const reloadNavigatorMeta = (
   entry: DataCatalogEntry,
-  apiOptions?: { silenceErrors?: boolean }
+  options?: { silenceErrors?: boolean }
 ): CancellablePromise<NavigatorMeta> => {
   if (entry.canHaveNavigatorMetadata()) {
     entry.navigatorMetaPromise = new CancellablePromise<NavigatorMeta>(
-      (resolve, reject, onCancel) => {
-        const fetchPromise = fetchAndSave(
-          (<(options: FetchOptions) => CancellableJqPromise<NavigatorMeta>>(
-            (<unknown>apiHelper.fetchNavigatorMetadata)
-          )).bind(apiHelper),
-          val => {
-            entry.navigatorMeta = val;
-          },
-          entry,
-          apiOptions
-        );
-
+      async (resolve, reject, onCancel) => {
         onCancel(() => {
-          fetchPromise.cancel();
           entry.navigatorMetaPromise = undefined;
         });
-
-        fetchPromise
-          .then(navigatorMeta => {
-            if (!navigatorMeta) {
-              reject();
-            } else {
-              if (entry.commentObservable) {
-                entry.commentObservable(entry.getResolvedComment());
-              }
-              resolve(navigatorMeta);
-            }
-          })
-          .fail(reject);
+        try {
+          entry.navigatorMeta = await fetchNavigatorMetadata({ ...options, entry });
+          resolve(entry.navigatorMeta);
+          if (entry.commentObservable) {
+            entry.commentObservable(entry.getResolvedComment());
+          }
+        } catch (err) {
+          reject(err);
+          return;
+        }
+        entry.saveLater();
       }
     );
   } else {
