@@ -38,13 +38,12 @@ The [Dev Onboarding](https://docs.gethue.com/developer/development/#apache-hive)
 Support is native via a dedicated section.
 
     [beeswax]
+    # Host where HiveServer2 is running.
+    # If Kerberos security is enabled, use fully-qualified domain name (FQDN).
+    hive_server_host=localhost
 
-      # Host where HiveServer2 is running.
-      # If Kerberos security is enabled, use fully-qualified domain name (FQDN).
-      hive_server_host=localhost
-
-      # Port where HiveServer2 Thrift server runs on.
-      hive_server_port=10000
+    # Port where HiveServer2 Thrift server runs on.
+    hive_server_port=10000
 
 Read more about [LDAP or PAM pass-through authentication](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/) and [High Availability](../server/).
 
@@ -146,9 +145,9 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source following the `presto://{presto-coordinator}:{port}/{catalog}/{schema}` format:
 
     [[[presto]]]
-      name = Presto
-      interface=sqlalchemy
-      options='{"url": "presto://localhost:8080/tpch/default"}'
+    name = Presto
+    interface=sqlalchemy
+    options='{"url": "presto://localhost:8080/tpch/default"}'
 
 With impersonation:
 
@@ -206,9 +205,9 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source:
 
     [[[oracle]]]
-       name = Oracle
-       interface=sqlalchemy
-       options='{"url": "oracle://scott:tiger@dsn"}'
+    name = Oracle
+    interface=sqlalchemy
+    options='{"url": "oracle://scott:tiger@dsn"}'
 
 ### PostgreSQL
 
@@ -235,9 +234,9 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source:
 
     [[[athena]]]
-       name = AWS Athena
-       interface=sqlalchemy
-        options='{"url": "awsathena+rest://${AWS_ACCESS_KEY_ID}:${AWS_SECRET_ACCESS_KEY}@athena.${REGION}.amazonaws.com:443/${SCHEMA}?s3_staging_dir=${S3_BUCKET_DIRECTORY}"}'
+    name = AWS Athena
+    interface=sqlalchemy
+    options='{"url": "awsathena+rest://${AWS_ACCESS_KEY_ID}:${AWS_SECRET_ACCESS_KEY}@athena.${REGION}.amazonaws.com:443/${SCHEMA}?s3_staging_dir=${S3_BUCKET_DIRECTORY}"}'
 
 e.g.
 
@@ -374,9 +373,9 @@ From https://github.com/mxmzdlv/pybigquery.
 Then give Hue the information about the database source:
 
     [[[bigquery]]]
-       name = BigQuery
-       interface=sqlalchemy
-       options='{"url": "bigquery://project-XXXXXX", "credentials_json": "{\"type\": \"service_account\", ...}"}'
+    name = BigQuery
+    interface=sqlalchemy
+    options='{"url": "bigquery://project-XXXXXX", "credentials_json": "{\"type\": \"service_account\", ...}"}'
 
 Where to get the Json credentials? By creating a service account:
 
@@ -406,16 +405,16 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source:
 
     [[[teradata]]]
-       name = Teradata
-       interface=sqlalchemy
-       options='{"url": "teradata://user:pw@host"}'
+    name = Teradata
+    interface=sqlalchemy
+    options='{"url": "teradata://user:pw@host"}'
 
 Alternative:
 
     [[[teradata]]]
-      name=Teradata JDBC
-      interface=jdbc
-      options='{"url": "jdbc:teradata://sqoop-teradata-1400.sjc.cloudera.com/sqoop", "driver": "com.teradata.jdbc.TeraDriver", "user": "sqoop", "password": "sqoop"}'
+    name=Teradata JDBC
+    interface=jdbc
+    options='{"url": "jdbc:teradata://sqoop-teradata-1400.sjc.cloudera.com/sqoop", "driver": "com.teradata.jdbc.TeraDriver", "user": "sqoop", "password": "sqoop"}'
 
 ### DB2
 
@@ -428,16 +427,16 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source:
 
     [[[db2]]]
-       name = DB2
-       interface=sqlalchemy
-       options='{"url": "db2+ibm_db://user:pass@host[:port]/database"}'
+    name = DB2
+    interface=sqlalchemy
+    options='{"url": "db2+ibm_db://user:pass@host[:port]/database"}'
 
 Alternative:
 
     [[[db2]]]
-      name=DB2 JDBC
-      interface=jdbc
-      options='{"url": "jdbc:db2://db2.vpc.cloudera.com:50000/SQOOP", "driver": "com.ibm.db2.jcc.DB2Driver", "user": "DB2INST1", "password": "cloudera"}'
+    name=DB2 JDBC
+    interface=jdbc
+    options='{"url": "jdbc:db2://db2.vpc.cloudera.com:50000/SQOOP", "driver": "com.ibm.db2.jcc.DB2Driver", "user": "DB2INST1", "password": "cloudera"}'
 
 ### Apache Spark SQL
 
@@ -530,9 +529,9 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source:
 
     [[[mssql]]]
-       name = SQL Server
-       interface=sqlalchemy
-       options='{"url": "mssql+pymssql://<username>:<password>@<freetds_name>/?charset=utf8"}'
+    name = SQL Server
+    interface=sqlalchemy
+    options='{"url": "mssql+pymssql://<username>:<password>@<freetds_name>/?charset=utf8"}'
 
 Alternative:
 
@@ -552,9 +551,9 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source:
 
     [[[vertica]]]
-       name = Vertica
-       interface=sqlalchemy
-       options='{"url": "vertica+vertica_python://user:pwd@host:port/database"}'
+    name = Vertica
+    interface=sqlalchemy
+    options='{"url": "vertica+vertica_python://user:pwd@host:port/database"}'
 
 Alternative:
 
@@ -575,9 +574,9 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source:
 
     [[[redshift]]]
-       name = Redshift
-       interface=sqlalchemy
-       options='{"url": "redshift+psycopg2://username@host.amazonaws.com:5439/database"}'
+    name = Redshift
+    interface=sqlalchemy
+    options='{"url": "redshift+psycopg2://username@host.amazonaws.com:5439/database"}'
 
 
 ### Apache Drill
@@ -587,13 +586,13 @@ The dialect is available on https://github.com/JohnOmernik/sqlalchemy-drill
 Then give Hue the information about the database source:
 
     [[[drill]]]
-       name = Drill
-       interface=sqlalchemy
-       options='{"url": "drill+sadrill://..."}'
-       ## To use Drill with SQLAlchemy you will need to craft a connection string in the format below:
-       # drill+sadrill://<username>:<password>@<host>:<port>/<storage_plugin>?use_ssl=True
-       ## To connect to Drill running on a local machine running in embedded mode you can use the following connection string.
-       # drill+sadrill://localhost:8047/dfs?use_ssl=False
+    name = Drill
+    interface=sqlalchemy
+    options='{"url": "drill+sadrill://..."}'
+    ## To use Drill with SQLAlchemy you will need to craft a connection string in the format below:
+    # drill+sadrill://<username>:<password>@<host>:<port>/<storage_plugin>?use_ssl=True
+    ## To connect to Drill running on a local machine running in embedded mode you can use the following connection string.
+    # drill+sadrill://localhost:8047/dfs?use_ssl=False
 
 Alternative:
 
@@ -616,9 +615,9 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source:
 
     [[[sybase]]]
-       name = Sybase
-       interface=sqlalchemy
-       options='{"url": "sybase+pysybase://<username>:<password>@<dsn>/[database name]"}'
+    name = Sybase
+    interface=sqlalchemy
+    options='{"url": "sybase+pysybase://<username>:<password>@<dsn>/[database name]"}'
 
 
 ### SAP Hana
@@ -632,9 +631,9 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source:
 
     [[[db2]]]
-       name = DB2
-       interface=sqlalchemy
-       options='{"url": "hana://username:password@example.de:30015"}'
+    name = DB2
+    interface=sqlalchemy
+    options='{"url": "hana://username:password@example.de:30015"}'
 
 ### Apache Solr
 
@@ -651,9 +650,9 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source:
 
     [[[solr]]]
-       name = Solr SQL
-       interface=sqlalchemy
-       options='{"url": "solr://<username>:<password>@<host>:<port>/solr/<collection>[?use_ssl=true|false]"}'
+    name = Solr SQL
+    interface=sqlalchemy
+    options='{"url": "solr://<username>:<password>@<host>:<port>/solr/<collection>[?use_ssl=true|false]"}'
 
 **Note**
 
@@ -664,25 +663,24 @@ First make sure Solr is configured for Dashboards (cf. section just below):
 Then add the interpreter:
 
     [[[solr]]]
-      name = Solr SQL
-      interface=solr
-      ## Name of the collection handler
-      # options='{"collection": "default"}'
+    name = Solr SQL
+    interface=solr
+    ## Name of the collection handler
+    # options='{"collection": "default"}'
 
 #### Dashboards
 
 Hue ships the [dynamic dashboards](/user/querying/#dashboard)for exploring datasets visually. Just point to an existing Solr server:
 
     [search]
+    # URL of the Solr Server
+    solr_url=http://localhost:8983/solr/
 
-      # URL of the Solr Server
-      solr_url=http://localhost:8983/solr/
+    # Requires FQDN in solr_url if enabled
+    ## security_enabled=false
 
-      # Requires FQDN in solr_url if enabled
-      ## security_enabled=false
-
-      ## Query sent when no term is entered
-      ## empty_query=*:*
+    ## Query sent when no term is entered
+    ## empty_query=*:*
 
 
 ### Apache Kylin
@@ -698,16 +696,16 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source:
 
     [[[kylin]]]
-       name = Kylin
-       interface=sqlalchemy
-       options='{"url": "kylin://..."}'
+    name = Kylin
+    interface=sqlalchemy
+    options='{"url": "kylin://..."}'
 
 Alternative:
 
     [[[kylin]]]
-     name=kylin JDBC
-     interface=jdbc
-     options='{"url": "jdbc:kylin://172.17.0.2:7070/learn_kylin", "driver": "org.apache.kylin.jdbc.Driver", "user": "ADMIN", "password": "KYLIN"}'
+    name=kylin JDBC
+    interface=jdbc
+    options='{"url": "jdbc:kylin://172.17.0.2:7070/learn_kylin", "driver": "org.apache.kylin.jdbc.Driver", "user": "ADMIN", "password": "KYLIN"}'
 
 ### Dask SQL
 
@@ -719,9 +717,9 @@ It uses the Presto wire protocol for communication, so the SqlAlchemy dialect fo
 Then give Hue the information about the database source:
 
     [[[dask-sql]]]
-      name=Dask SQL
-      interface=sqlalchemy
-      options='{"url": "presto://localhost:8080/catalog/default"}'
+    name=Dask SQL
+    interface=sqlalchemy
+    options='{"url": "presto://localhost:8080/catalog/default"}'
 
 ### Clickhouse
 
@@ -732,18 +730,18 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source:
 
     [[[clickhouse]]]
-       name = Clickhouse
-       interface=sqlalchemy
-       options='{"url": "clickhouse://..."}'
+    name = Clickhouse
+    interface=sqlalchemy
+    options='{"url": "clickhouse://..."}'
 
 Alternative:
 
     [[[clickhouse]]]
-      name=ClickHouse
-      interface=jdbc
-      ## Specific options for connecting to the ClickHouse server.
-      ## The JDBC driver clickhouse-jdbc.jar and its related jars need to be in the CLASSPATH environment variable.
-      options='{"url": "jdbc:clickhouse://localhost:8123", "driver": "ru.yandex.clickhouse.ClickHouseDriver", "user": "readonly", "password": ""}'
+    name=ClickHouse
+    interface=jdbc
+    ## Specific options for connecting to the ClickHouse server.
+    ## The JDBC driver clickhouse-jdbc.jar and its related jars need to be in the CLASSPATH environment variable.
+    options='{"url": "jdbc:clickhouse://localhost:8123", "driver": "ru.yandex.clickhouse.ClickHouseDriver", "user": "readonly", "password": ""}'
 
 ### Elastic Search
 
@@ -752,9 +750,9 @@ The dialect for https://github.com/elastic/elasticsearch should be added to the 
     ./build/env/bin/pip install elasticsearch-dbapi
 
     [[[es]]]
-      name = Elastic Search
-      interface=sqlalchemy
-      options='{"url": "elasticsearch+http://localhost:9200/"}'
+    name = Elastic Search
+    interface=sqlalchemy
+    options='{"url": "elasticsearch+http://localhost:9200/"}'
 
 
 ### Apache Pinot DB
@@ -766,9 +764,9 @@ The dialect for https://pinot.apache.org should be added to the Python system or
 Then give Hue the information about the database source:
 
     [[[pinot]]]
-       name = Pinot
-       interface=sqlalchemy
-       options='{"url": "pinot+http://localhost:8099/query?server=http://localhost:9000/"}'
+    name = Pinot
+    interface=sqlalchemy
+    options='{"url": "pinot+http://localhost:8099/query?server=http://localhost:9000/"}'
 
 ### Snowflake
 
@@ -779,9 +777,9 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source:
 
     [[[snowflake]]]
-       name = Snowflake
-       interface=sqlalchemy
-       options='{"url": "snowflake://{user}:{password}@{account}/{database}"}'
+    name = Snowflake
+    interface=sqlalchemy
+    options='{"url": "snowflake://{user}:{password}@{account}/{database}"}'
 
 Note: account is the name in your URL domain. e.g.
 
@@ -800,9 +798,9 @@ Read more about is on the [snowflake-sqlalchemy page](https://docs.snowflake.net
 Just give Hue the information about the database source:
 
     [[[sqlite]]]
-       name = Sqlite
-       interface=sqlalchemy
-       options='{"url": "sqlite:///path/to/database.db"}'
+    name = Sqlite
+    interface=sqlalchemy
+    options='{"url": "sqlite:///path/to/database.db"}'
 
 ### Google Sheets
 
@@ -813,9 +811,9 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source:
 
     [[[GSheets]]]
-       name = Google Sheets
-       interface=sqlalchemy
-       options='{"url": "gsheets://"}'
+    name = Google Sheets
+    interface=sqlalchemy
+    options='{"url": "gsheets://"}'
 
 Read more on the [gsheetsdb page](https://github.com/betodealmeida/gsheets-db-api#authentication).
 
@@ -828,9 +826,9 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source:
 
     [[[greenplum]]]
-       name = Greenplum
-       interface=sqlalchemy
-       options='{"url": "postgresql+psycopg2://user:password@host:31335/database"}'
+    name = Greenplum
+    interface=sqlalchemy
+    options='{"url": "postgresql+psycopg2://user:password@host:31335/database"}'
 
 
 ## Storage
@@ -841,13 +839,13 @@ Hue supports one HDFS cluster. That cluster should be defined under the `[[[defa
 
     [hadoop]
 
-      # Configuration for HDFS NameNode
-      # ------------------------------------------------------------------------
-      [[hdfs_clusters]]
+    # Configuration for HDFS NameNode
+    # ------------------------------------------------------------------------
+    [[hdfs_clusters]]
 
-        [[[default]]]
-          fs_defaultfs=hdfs://hdfs-name-node.com:8020
-          webhdfs_url=http://hdfs-name-node.com:20101/webhdfs/v1
+    [[[default]]]
+    fs_defaultfs=hdfs://hdfs-name-node.com:8020
+    webhdfs_url=http://hdfs-name-node.com:20101/webhdfs/v1
 
 HA is supported by pointing to the HttpFs service instead of the NameNode.
 
@@ -1040,21 +1038,21 @@ In the `[metadata]` section, Hue is supporting Cloudera Navigator and Apache Atl
 
     [metadata]
     [[catalog]]
-      # The type of Catalog: Apache Atlas, Cloudera Navigator...
-      interface=atlas
-      # Catalog API URL (without version suffix).
-      api_url=http://localhost:21000/atlas/v2
+    # The type of Catalog: Apache Atlas, Cloudera Navigator...
+    interface=atlas
+    # Catalog API URL (without version suffix).
+    api_url=http://localhost:21000/atlas/v2
 
-      # Username of the CM user used for authentication.
-      ## server_user=hue
-      # Password of the user used for authentication.
-      server_password=
+    # Username of the CM user used for authentication.
+    ## server_user=hue
+    # Password of the user used for authentication.
+    server_password=
 
-      # Limits found entities to a specific cluster. When empty the entities from all clusters will be included in the search results.
-      ## search_cluster=
+    # Limits found entities to a specific cluster. When empty the entities from all clusters will be included in the search results.
+    ## search_cluster=
 
-      # Set to true when authenticating via kerberos instead of username/password
-      ## kerberos_enabled=false
+    # Set to true when authenticating via kerberos instead of username/password
+    ## kerberos_enabled=false
 
 ![Data Catalog Search](https://cdn.gethue.com/uploads/2019/06/SearchWithType_field_name.png)
 
@@ -1077,34 +1075,34 @@ This connector leverage the [Apache Livy REST Api](https://livy.incubator.apache
 In the `[[interpreters]]` section:
 
     [[[pyspark]]]
-      name=PySpark
-      interface=livy
+    name=PySpark
+    interface=livy
 
     [[[sql]]]
-      name=SparkSql
-      interface=livy
+    name=SparkSql
+    interface=livy
 
     [[[spark]]]
-      name=Scala
-      interface=livy
+    name=Scala
+    interface=livy
 
     [[[r]]]
-      name=R
-      interface=livy
+    name=R
+    interface=livy
 
 In the `[spark]` section:
 
     [spark]
-      # The Livy Server URL.
-      livy_server_url=http://localhost:8998
+    # The Livy Server URL.
+    livy_server_url=http://localhost:8998
 
 And if using Cloudera distribution, make sure you have notebooks enabled:
 
     [desktop]
-      app_blacklist=
+    app_blacklist=
 
     [notebook]
-      show_notebooks=true
+    show_notebooks=true
 
 **YARN: Spark session could not be created**
 
@@ -1159,15 +1157,15 @@ Do not forget to add the user running Hue (your current login in dev or hue in p
 Pig is native to Hue and depends on the [Oozie service](/administrator/configuration/connectors/#apache-oozie) to be configured:
 
     [[[pig]]]
-      name=Pig
-      interface=oozie
+    name=Pig
+    interface=oozie
 
 ### Apache Oozie
 
 In oder to schedule workflows, the `[liboozie]` section of the configuration file:
 
     [liboozie]
-      oozie_url=http://oozie-server.com:11000/oozie
+    oozie_url=http://oozie-server.com:11000/oozie
 
 Make sure that the [Share Lib](https://oozie.apache.org/docs/5.1.0/DG_QuickStart.html#Oozie_Share_Lib_Installation) is installed.
 
@@ -1192,27 +1190,27 @@ under the `[[[default]]]` and `[[[ha]]]` sub-sections.
     # ------------------------------------------------------------------------
     [[yarn_clusters]]
 
-      [[[default]]]
+    [[[default]]]
 
-        resourcemanager_host=yarn-rm.com
-        resourcemanager_api_url=http://yarn-rm.com:8088/
-        proxy_api_url=http://yarn-proxy.com:8088/
-        resourcemanager_port=8032
-        history_server_api_url=http://yarn-rhs-com:19888/
+    resourcemanager_host=yarn-rm.com
+    resourcemanager_api_url=http://yarn-rm.com:8088/
+    proxy_api_url=http://yarn-proxy.com:8088/
+    resourcemanager_port=8032
+    history_server_api_url=http://yarn-rhs-com:19888/
 
 ### Apache Sentry
 
 To have Hue point to a Sentry service and another host, modify these hue.ini properties:
 
     [libsentry]
-      # Hostname or IP of server.
-      hostname=localhost
+    # Hostname or IP of server.
+    hostname=localhost
 
-      # Port the sentry service is running on.
-      port=8038
+    # Port the sentry service is running on.
+    port=8038
 
-      # Sentry configuration directory, where sentry-site.xml is located.
-      sentry_conf_dir=/etc/sentry/conf
+    # Sentry configuration directory, where sentry-site.xml is located.
+    sentry_conf_dir=/etc/sentry/conf
 
 Hue will also automatically pick up the server name of HiveServer2 from the sentry-site.xml file of /etc/hive/conf.
 
@@ -1294,11 +1292,11 @@ Here is an example of sentry-site.xml
 
     [[knox]]
 
-      # This is a list of hosts that knox proxy requests can come from
-      ## knox_proxyhosts=server1.domain.com,server2.domain.com
+    # This is a list of hosts that knox proxy requests can come from
+    ## knox_proxyhosts=server1.domain.com,server2.domain.com
 
-      # List of Kerberos principal name which is allowed to impersonate others
-      ## knox_principal=knox1,knox2
+    # List of Kerberos principal name which is allowed to impersonate others
+    ## knox_principal=knox1,knox2
 
-      # Comma separated list of strings representing the ports that the Hue server can trust as knox port.
-      ## knox_ports=80,8443
+    # Comma separated list of strings representing the ports that the Hue server can trust as knox port.
+    ## knox_ports=80,8443
