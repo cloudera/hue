@@ -734,7 +734,7 @@ Then give Hue the information about the database source:
 
 ### Clickhouse
 
-The dialect should be added to the Python system or Hue Python virtual environment:
+The [qlalchemy-clickhouse](https://github.com/xzkostyan/clickhouse-sqlalchemy) dialect should be added to the Python system or Hue Python virtual environment:
 
     ./build/env/bin/pip install sqlalchemy-clickhouse
 
