@@ -17,7 +17,9 @@
 import $ from 'jquery';
 
 import ApiHelper from 'api/apiHelper';
+import * as CatalogApi from 'catalog/api';
 import * as apiUtils from 'sql/reference/apiUtils';
+import { CancellablePromise } from '../api/cancellablePromise';
 import AutocompleteResults from './autocompleteResults';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
@@ -31,40 +33,42 @@ describe('AutocompleteResults.js', () => {
     status: 500
   };
 
-  jest.spyOn(ApiHelper, 'fetchSourceMetadata').mockImplementation(options => {
-    const deferred = $.Deferred();
+  jest.spyOn(CatalogApi, 'fetchSourceMeta').mockImplementation(options => {
     if (Math.random() < 0.5) {
-      deferred.resolve(failResponse);
-    } else if (options.path.length === 0) {
-      deferred.resolve(JSON.parse('{"status": 0, "databases": ["default"]}'));
-    } else if (options.path.length === 1) {
-      deferred.resolve(
+      return CancellablePromise.reject(failResponse);
+    }
+    if (options.entry.path.length === 0) {
+      return CancellablePromise.resolve(JSON.parse('{"status": 0, "databases": ["default"]}'));
+    }
+    if (options.entry.path.length === 1) {
+      return CancellablePromise.resolve(
         JSON.parse(
           '{"status": 0, "tables_meta": [{"comment": "comment", "type": "Table", "name": "foo"}, {"comment": null, "type": "View", "name": "bar_view"}, {"comment": null, "type": "Table", "name": "bar"}]}'
         )
       );
-    } else if (options.path.length === 2) {
-      deferred.resolve(
+    }
+    if (options.entry.path.length === 2) {
+      return CancellablePromise.resolve(
         JSON.parse(
           '{"status": 0, "support_updates": false, "hdfs_link": "/filebrowser/view=/user/hive/warehouse/customers", "extended_columns": [{"comment": "", "type": "int", "name": "id"}, {"comment": "", "type": "string", "name": "name"}, {"comment": "", "type": "struct<email_format:string,frequency:string,categories:struct<promos:boolean,surveys:boolean>>", "name": "email_preferences"}, {"comment": "", "type": "map<string,struct<street_1:string,street_2:string,city:string,state:string,zip_code:string>>", "name": "addresses"}, {"comment": "", "type": "array<struct<order_id:string,order_date:string,items:array<struct<product_id:int,sku:string,name:string,price:double,qty:int>>>>", "name": "orders"}], "columns": ["id", "name", "email_preferences", "addresses", "orders"], "partition_keys": []}'
         )
       );
-    } else if (options.path.length === 3) {
-      deferred.resolve(
+    }
+    if (options.entry.path.length === 3) {
+      return CancellablePromise.resolve(
         JSON.parse(
           '{"status": 0, "comment": "", "type": "struct", "name": "email_preferences", "fields": [{"type": "string", "name": "email_format"}, {"type": "string", "name": "frequency"}, {"fields": [{"type": "boolean", "name": "promos"}, {"type": "boolean", "name": "surveys"}], "type": "struct", "name": "categories"}]}'
         )
       );
-    } else if (options.path.length > 3) {
-      deferred.resolve(
+    }
+    if (options.entry.path.length > 3) {
+      return CancellablePromise.resolve(
         JSON.parse(
           '{"status": 0, "fields": [{"type": "boolean", "name": "promos"}, {"type": "boolean", "name": "surveys"}], "type": "struct", "name": "categories"}'
         )
       );
-    } else {
-      deferred.reject();
     }
-    return deferred.promise();
+    return CancellablePromise.reject();
   });
 
   jest.spyOn(ApiHelper, 'fetchHdfsPath').mockImplementation(options => {
