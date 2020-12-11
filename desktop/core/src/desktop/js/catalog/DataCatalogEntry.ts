@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { Cancellable, CancellablePromise } from 'api/cancellablePromise';
-import { fetchNavigatorMetadata, fetchSourceMetadata } from 'catalog/api';
+import { fetchDescribe, fetchNavigatorMetadata, fetchSourceMetadata } from 'catalog/api';
 import MultiTableEntry, { TopAggs, TopFilters, TopJoins } from 'catalog/MultiTableEntry';
 import { getOptimizer } from './optimizer/optimizer';
 import * as ko from 'knockout';
@@ -289,31 +289,27 @@ const reloadNavigatorMeta = (
  */
 const reloadAnalysis = (
   entry: DataCatalogEntry,
-  apiOptions?: { silenceErrors?: boolean; refreshAnalysis?: boolean }
+  options?: { silenceErrors?: boolean; refreshAnalysis?: boolean }
 ): CancellablePromise<Analysis> => {
-  entry.analysisPromise = new CancellablePromise<Analysis>((resolve, reject, onCancel) => {
-    const apiFunction =
-      apiOptions && apiOptions.refreshAnalysis
-        ? apiHelper.refreshAnalysis.bind(apiHelper)
-        : apiHelper.fetchAnalysis.bind(apiHelper);
-
-    const fetchPromise = fetchAndSave(
-      (<(options: FetchOptions) => CancellableJqPromise<Analysis>>(<unknown>apiFunction)).bind(
-        apiHelper
-      ),
-      val => {
-        entry.analysis = val;
-      },
+  entry.analysisPromise = new CancellablePromise<Analysis>(async (resolve, reject, onCancel) => {
+    const fetchPromise = fetchDescribe({
       entry,
-      apiOptions
-    );
+      ...options
+    });
 
     onCancel(() => {
       fetchPromise.cancel();
-      entry.analysis = undefined;
+      entry.analysisPromise = undefined;
     });
 
-    fetchPromise.then(resolve).fail(reject);
+    try {
+      entry.analysis = await fetchPromise;
+      resolve(entry.analysis);
+    } catch (err) {
+      reject(err || 'Fetch failed');
+      return;
+    }
+    entry.saveLater();
   });
   return entry.analysisPromise;
 };
