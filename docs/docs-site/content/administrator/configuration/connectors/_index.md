@@ -749,6 +749,8 @@ The dialect for https://github.com/elastic/elasticsearch should be added to the 
 
     ./build/env/bin/pip install elasticsearch-dbapi
 
+Then give Hue the information about the database source:
+
     [[[es]]]
     name = Elastic Search
     interface=sqlalchemy
