@@ -185,11 +185,12 @@ class SampleTable(object):
 
 
   def install(self, django_user):
-    if has_concurrency_support() and not self.is_transactional:
-      LOG.info('Skipping table %s as non transactional' % self.name)
-      return
-    if not (has_concurrency_support() and self.is_transactional) and not cluster.get_hdfs():
-      raise PopupException('Requiring a File System to load its data')
+    if self.dialect in ('hive', 'impala'):
+      if has_concurrency_support() and not self.is_transactional:
+        LOG.info('Skipping table %s as non transactional' % self.name)
+        return
+      if not (has_concurrency_support() and self.is_transactional) and not cluster.get_hdfs():
+        raise PopupException('Requiring a File System to load its data')
 
     self.create(django_user)
 
@@ -228,19 +229,25 @@ class SampleTable(object):
 
 
   def load(self, django_user):
-    if has_concurrency_support() and self.is_transactional:
+    inserts = []
+
+    if (self.dialect not in ('hive', 'impala') or has_concurrency_support()) and self.is_transactional:
       with open(self._contents_file) as f:
         if self.insert_sql:
-          hql = self.insert_sql
+          sql_insert = self.insert_sql
         else:
-          hql = """
+          sql_insert = """
             INSERT INTO TABLE %(tablename)s
             VALUES %(values)s
             """
-        hql = hql % {
-          'tablename': self.name,
-          'values': self._get_sql_insert_values(f)
-        }
+        values = self._get_sql_insert_values(f)
+        for value in values:
+          inserts.append(
+            sql_insert % {
+              'tablename': self.name,
+              'values': value
+            }
+          )
     else:
       # Upload data to HDFS home of user then load (aka move) it into the Hive table (in the Hive metastore in HDFS).
       hdfs_root_destination = self._get_hdfs_root_destination(django_user)
@@ -252,12 +259,14 @@ class SampleTable(object):
           'tablename': self.name,
           'filename': hdfs_file_destination
         }
+      inserts.append(hql)
 
-    self._load_data_to_table(django_user, hql)
+    for insert in inserts:
+      self._load_data_to_table(django_user, insert)
 
 
   def load_partition(self, django_user, partition_spec, filepath, columns):
-    if has_concurrency_support() and self.is_transactional:
+    if (self.dialect not in ('hive', 'impala') or has_concurrency_support()) and self.is_transactional:
       with open(filepath) as f:
         hql = \
           """
@@ -267,7 +276,7 @@ class SampleTable(object):
           """ % {
             'tablename': self.name,
             'partition_spec': partition_spec,
-            'values': self._get_sql_insert_values(f, columns)
+            'values': ''.join(self._get_sql_insert_values(f, columns))
           }
     else:
       # Upload data found at filepath to HDFS home of user, the load intto a specific partition
@@ -353,20 +362,21 @@ class SampleTable(object):
     )
     job.execute_and_wait(self.request)
 
+
   def _get_sql_insert_values(self, f, columns=None):
     data = f.read()
     dialect = csv.Sniffer().sniff(data)
     reader = csv.reader(data.splitlines(), delimiter=dialect.delimiter)
 
     rows = [
-      ', '.join(
+      '(%s)' % ', '.join(
         col if is_number(col, i, columns) else "'%s'" % col.replace("'", "\\'")
         for i, col in enumerate(row)
       )
       for row in reader
     ]
 
-    return ', '.join('(%s)' % row for row in rows)
+    return rows if self.is_multi_inserts else [', '.join(rows)]
 
 
 def is_number(col, i, columns):
