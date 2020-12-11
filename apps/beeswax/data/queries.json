@@ -221,5 +221,25 @@
       "file_resources": [],
       "settings": []
     }
+  },
+  {
+    "name": "US City Population",
+    "desc": "Small samples of number of inhabitants in some US cities",
+    "dialects": ["phoenix"],
+    "type": "2",
+    "auto_load_only": false,
+    "data": {
+      "query": {
+        "query": "\nSELECT\n  state as \"State\",\n  count(city) as \"City Count\",\n  sum(population) as \"Population Sum\"\nFROM\n  us_population\nGROUP BY\n  state\nORDER BY\n  sum(population) DESC\n;",
+        "type": 0,
+        "email_notify": false,
+        "is_parameterized": false,
+        "database": ""
+      },
+      "functions": [],
+      "VERSION": "0.4.1",
+      "file_resources": [],
+      "settings": []
+    }
   }
 ]
