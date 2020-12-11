@@ -1286,57 +1286,6 @@ class ApiHelper {
   }
 
   /**
-   * Fetches the analysis for the given source and path
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {ContextCompute} options.compute
-   * @param {string} options.sourceType
-   * @param {string[]} options.path
-   *
-   * @return {CancellableJqPromise}
-   */
-  fetchAnalysis(options) {
-    const deferred = $.Deferred();
-
-    let url = '/notebook/api/describe/' + options.path[0];
-
-    if (options.path.length > 1) {
-      url += '/' + options.path[1] + '/';
-    }
-
-    if (options.path.length > 2) {
-      url += 'stats/' + options.path.slice(2).join('/');
-    }
-
-    const data = {
-      format: 'json',
-      cluster: JSON.stringify(options.compute),
-      source_type: options.sourceType
-    };
-
-    const request = simplePost(url, data, {
-      silenceErrors: options.silenceErrors,
-      successCallback: response => {
-        if (options.path.length === 1) {
-          if (response.data) {
-            response.data.hueTimestamp = Date.now();
-            deferred.resolve(response.data);
-          } else {
-            deferred.reject();
-          }
-        } else {
-          deferred.resolve(response);
-        }
-      },
-      errorCallback: deferred.reject
-    });
-
-    return new CancellableJqPromise(deferred, request);
-  }
-
-  /**
    * Fetches the partitions for the given path
    *
    * @param {Object} options
@@ -1390,74 +1339,6 @@ class ApiHelper {
       });
 
     return new CancellableJqPromise(deferred, request);
-  }
-
-  /**
-   * Refreshes the analysis for the given source and path
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {string} options.sourceType
-   * @param {ContextCompute} options.compute
-   * @param {string[]} options.path
-   *
-   * @return {CancellableJqPromise}
-   */
-  refreshAnalysis(options) {
-    if (options.path.length === 1) {
-      return this.fetchAnalysis(options);
-    }
-    const deferred = $.Deferred();
-
-    const promises = [];
-
-    const pollForAnalysis = (url, delay) => {
-      window.setTimeout(() => {
-        promises.push(
-          simplePost(url, undefined, {
-            silenceErrors: options.silenceErrors,
-            successCallback: data => {
-              promises.pop();
-              if (data.isSuccess) {
-                promises.push(
-                  this.fetchAnalysis(options).done(deferred.resolve).fail(deferred.reject)
-                );
-              } else if (data.isFailure) {
-                deferred.reject(data);
-              } else {
-                pollForAnalysis(url, 1000);
-              }
-            },
-            errorCallback: deferred.reject
-          })
-        );
-      }, delay);
-    };
-
-    const url =
-      '/' +
-      (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) +
-      '/api/analyze/' +
-      options.path.join('/') +
-      '/';
-
-    promises.push(
-      simplePost(url, undefined, {
-        silenceErrors: options.silenceErrors,
-        successCallback: data => {
-          promises.pop();
-          if (data.status === 0 && data.watch_url) {
-            pollForAnalysis(data.watch_url, 500);
-          } else {
-            deferred.reject();
-          }
-        },
-        errorCallback: deferred.reject
-      })
-    );
-
-    return new CancellableJqPromise(deferred, undefined, promises);
   }
 
   /**
