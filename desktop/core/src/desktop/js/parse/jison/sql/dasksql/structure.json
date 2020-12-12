@@ -1,8 +1,9 @@
 {
-  "lexer": "../generic/sql.jisonlex",
+  "lexer": "sql.jisonlex",
   "autocomplete": [
     "../generic/autocomplete_header.jison",
-    "../generic/create/create_table.jison",
+    "create/create_common.jison",
+    "create/create_table.jison",
     "create/create_view.jison",
     "../generic/select/cte_select_statement.jison",
     "../generic/select/from_clause.jison",
