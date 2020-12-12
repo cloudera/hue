@@ -727,7 +727,7 @@ It uses the Presto wire protocol for communication, so the SqlAlchemy dialect fo
 
 Then give Hue the information about the database source:
 
-    [[[dask-sql]]]
+    [[[dasksql]]]
     name=Dask SQL
     interface=sqlalchemy
     options='{"url": "presto://localhost:8080/catalog/default"}'

@@ -369,7 +369,7 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': 'Dask-sql',
+    'nice_name': 'Dasksql',
     'dialect': 'dasksql',
     'interface': 'sqlalchemy',
     'settings': [
