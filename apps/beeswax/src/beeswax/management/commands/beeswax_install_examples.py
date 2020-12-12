@@ -29,7 +29,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.conf import USE_NEW_EDITOR
 from desktop.models import Directory, Document, Document2, Document2Permission
 from hadoop import cluster
-from notebook.models import import_saved_beeswax_query, make_notebook
+from notebook.models import import_saved_beeswax_query, make_notebook, MockRequest
 from useradmin.models import get_default_user_group, install_sample_user, User
 
 from beeswax.design import hql_query
@@ -63,11 +63,12 @@ class Command(BaseCommand):
       db_name = options.get('db_name', 'default')
       interpreter = options.get('interpreter')  # Only when connectors are enabled. Later will deprecate `dialect`.
       user = options['user']
-      request = options['request']
+      request = options.get('request', MockRequest(user=user))
       self.queries = options.get('queries')
-      self.tables = options.get('tables')
+      self.tables = options.get('tables')  # Optional whitelist of table names
 
-    tables = 'tables.json' if dialect not in ('hive', 'impala') else (
+    tables = \
+        'tables.json' if dialect not in ('hive', 'impala') else (
         'tables_transactional.json' if has_concurrency_support() else
         'tables_standard.json'
     )
@@ -81,6 +82,7 @@ class Command(BaseCommand):
       self.install_queries(sample_user, dialect, interpreter=interpreter)
       self.install_tables(user, dialect, db_name, tables, interpreter=interpreter, request=request)
     except Exception as ex:
+      LOG.exception('Dialect %s sample install' % dialect)
       exception = ex
 
     if exception is not None:

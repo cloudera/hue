@@ -63,5 +63,4 @@ class Command(BaseCommand):
       LOG.info('Successfully installed sample notebook')
 
     from beeswax.management.commands.beeswax_install_examples import Command
-    app_name = 'beeswax'
-    Command().handle(app_name=app_name, user=user, tables='tables.json')
+    Command().handle(dialect='hive', user=user)
