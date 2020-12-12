@@ -26,4 +26,13 @@
     "dialects": ["flink"],
     "transactional": true
   }
+  ,
+  {
+    "data_file": null,
+    "create_sql": "CREATE STREAM user_behavior (\n  user_id BIGINT,\n  item_id BIGINT,\n  category_id BIGINT,\n  behavior STRING,\n  ts STRING\n) WITH (kafka_topic='user_behavior', value_format='json', partitions=1)\n",
+    "insert_sql": null,
+    "table_name": "user_behavior",
+    "dialects": ["ksql"],
+    "transactional": true
+  }
 ]
