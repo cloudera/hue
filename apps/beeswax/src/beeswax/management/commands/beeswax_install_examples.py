@@ -170,6 +170,7 @@ class SampleTable(object):
     else:
       self.partition_files = None
       self.filename = data_dict['data_file']
+    self._contents_file = None
     self.create_sql = data_dict['create_sql'].strip()
     self.insert_sql = data_dict.get('insert_sql')
     self.dialect = dialect
@@ -187,7 +188,7 @@ class SampleTable(object):
         filepath = os.path.join(self._data_dir, filename)
         self.partition_files[partition_spec] = filepath
         self._check_file_contents(filepath)
-    else:
+    elif self.filename:
       self._contents_file = os.path.join(self._data_dir, self.filename)
       self._check_file_contents(self._contents_file)
 
@@ -205,10 +206,11 @@ class SampleTable(object):
     if self.partition_files:
       for partition_spec, filepath in list(self.partition_files.items()):
         self.load_partition(django_user, partition_spec, filepath, columns=self.columns)
-    else:
+    elif self._contents_file:
       self.load(django_user)
 
     return True
+
 
   def create(self, django_user):
     """
@@ -413,8 +415,7 @@ class SampleQuery(object):
       query = SavedQuery.objects.get(owner=django_user, name=self.name, type=self.type)
     except SavedQuery.DoesNotExist:
       query = SavedQuery(owner=django_user, name=self.name, type=self.type, desc=self.desc)
-      # The data field needs to be a string. The sample file writes it
-      # as json (without encoding into a string) for readability.
+      # The data field needs to be a string. The sample file writes it as json (without encoding into a string) for readability.
       query.data = json.dumps(self.data)
       query.save()
       LOG.info('Successfully installed sample design: %s' % (self.name,))
@@ -454,7 +455,7 @@ class SampleQuery(object):
 
       # Share with default group
       examples_dir.share(django_user, Document2Permission.READ_PERM, groups=[get_default_user_group()])
-      LOG.info('Successfully installed sample query: %s' % (self.name,))
+      LOG.info('Successfully installed sample query: %s' % doc2)
 
 
   def _document_type(self, type, interpreter=None):

@@ -1189,6 +1189,9 @@ class Document2(models.Model):
     res = '%s - %s - %s - %s' % (force_unicode(self.name), self.owner, self.type, self.uuid)
     return force_unicode(res)
 
+  def __str__(self):
+    return self.__unicode__()
+
   @property
   def data_dict(self):
     if not self.data:

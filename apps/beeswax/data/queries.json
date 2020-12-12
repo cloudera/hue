@@ -241,5 +241,25 @@
       "file_resources": [],
       "settings": []
     }
+  },
+  {
+    "name": "Query and live display a live stream of data",
+    "desc": "Simple select of auto generated data or via the user table backed by a Kafka topic",
+    "dialects": ["flink"],
+    "type": "2",
+    "auto_load_only": false,
+    "data": {
+      "query": {
+        "query": "\nCREATE TABLE datagen (\n  f_sequence INT,\n  f_random INT,\n  f_random_str STRING,\n  ts AS localtimestamp,\n  WATERMARK FOR ts AS ts\n) WITH (\n  'connector' = 'datagen',\n  'rows-per-second'='5',\n  'fields.f_sequence.kind'='sequence',\n  'fields.f_sequence.start'='1',\n  'fields.f_sequence.end'='1000',\n  'fields.f_random.min'='1',\n  'fields.f_random.max'='1000',\n  'fields.f_random_str.length'='10'\n)\n;\n\nSELECT *\nFROM datagen\nLIMIT 50\n;\n\n\n\nCREATE TABLE user_behavior (\n  user_id BIGINT,\n  item_id BIGINT,\n  category_id BIGINT,\n  behavior STRING,\n  ts TIMESTAMP(3),\n  proctime AS PROCTIME(),   -- generates processing-time attribute using computed column\n  WATERMARK FOR ts AS ts - INTERVAL '5' SECOND  -- defines watermark on ts column, marks ts as event-time attribute\n) WITH (\n  'connector' = 'kafka',  -- using kafka connector\n  'topic' = 'user_behavior',  -- kafka topic\n  'scan.startup.mode' = 'earliest-offset',  -- reading from the beginning\n  'properties.bootstrap.servers' = 'kafka:9094',  -- kafka broker address\n  'format' = 'json'  -- the data format is json\n)\n;\n\nSELECT * \nFROM user_behavior \nLIMIT 50\n;\n\n\nSELECT\n  HOUR(TUMBLE_START(ts, INTERVAL '1' HOUR)) as hour_of_day,\n  COUNT(*) as buy_cnt\nFROM\n  user_behavior\nWHERE\n  behavior = 'buy'\nGROUP BY\n  TUMBLE(ts, INTERVAL '1' HOUR)\n;\n  ",
+        "type": 0,
+        "email_notify": false,
+        "is_parameterized": false,
+        "database": ""
+      },
+      "functions": [],
+      "VERSION": "0.4.1",
+      "file_resources": [],
+      "settings": []
+    }
   }
 ]
