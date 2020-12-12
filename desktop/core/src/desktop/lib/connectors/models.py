@@ -175,7 +175,7 @@ def _augment_connector_properties(connector):
 
   for connector_type in get_connectors_types():
     if connector_type['dialect'] == connector['dialect'] and connector['interface'] and \
-          connector_type.get('interface') == connector.get('interface'):
+        connector_type.get('interface') == connector.get('interface'):
       connector_types.insert(0, connector_type)
       break
     if connector_type['dialect'] == connector['dialect']:
