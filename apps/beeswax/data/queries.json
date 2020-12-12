@@ -261,5 +261,25 @@
       "file_resources": [],
       "settings": []
     }
+  },
+  {
+    "name": "Query and live display a live stream of data",
+    "desc": "List Kafka topics or a user table backed by a Kafka topic",
+    "dialects": ["ksql"],
+    "type": "2",
+    "auto_load_only": false,
+    "data": {
+      "query": {
+        "query": "\nSHOW TOPICS\n;\n\n\nCREATE STREAM user_behavior (\n  user_id BIGINT,\n  item_id BIGINT,\n  category_id BIGINT,\n  behavior STRING,\n  ts STRING\n) WITH (kafka_topic='user_behavior', value_format='json', partitions=1)\n;\n\n\nSELECT *\nFROM user_behavior\nEMIT CHANGES\nLIMIT 30\n;\n\n\nINSERT INTO user_behavior (\n  user_id ,\n  item_id ,\n  category_id ,\n  behavior ,\n  ts\n)\nVALUES\n(1, 10, 20, 'buy', '1602998392')\n;\n",
+        "type": 0,
+        "email_notify": false,
+        "is_parameterized": false,
+        "database": ""
+      },
+      "functions": [],
+      "VERSION": "0.4.1",
+      "file_resources": [],
+      "settings": []
+    }
   }
 ]
