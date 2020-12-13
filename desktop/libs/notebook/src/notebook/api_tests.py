@@ -45,7 +45,7 @@ from notebook.api import _historify
 from notebook.connectors.base import Notebook, QueryError, Api, QueryExpired
 from notebook.decorators import api_error_handler
 from notebook.conf import get_ordered_interpreters, INTERPRETERS_SHOWN_ON_WHEEL, INTERPRETERS
-from notebook.models import Analytics
+
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock
@@ -822,23 +822,6 @@ class TestQueriesMetrics(object):
       c = Client()
       response = c.get('/metrics')
       assert_true(b'hue_queries_numbers 12500.0' in response.content, response.content)
-
-
-class TestAnalytics(object):
-
-  def setUp(self):
-    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
-    self.user = User.objects.get(username="test")
-
-  def test_basic_stats(self):
-    try:
-      doc, created = Document2.objects.get_or_create(name='test_query_stats', type='query-hive', owner=self.user, data={})
-
-      Analytics.admin_stats()
-      Analytics.user_stats(user=self.user)
-      Analytics.query_stats(query=doc)
-    finally:
-      doc.delete()
 
 
 class TestEditor(object):
