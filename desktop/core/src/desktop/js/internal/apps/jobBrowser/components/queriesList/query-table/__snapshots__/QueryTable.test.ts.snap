@@ -32,13 +32,6 @@ exports[`QueryTable.vue should render 1`] = `
         valuelabels="[object Object]"
       />
        
-      <facet-selector-stub
-        disabled="true"
-        facet="[object Object]"
-        fieldlabel="User"
-        valuelabels="[object Object]"
-      />
-       
       <date-range-picker-stub />
        
       <hue-link-stub

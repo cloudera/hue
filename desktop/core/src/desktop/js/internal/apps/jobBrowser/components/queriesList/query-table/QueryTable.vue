@@ -42,14 +42,14 @@
           @facet-removed="facetRemoved"
           @facet-changed="facetChanged"
         />
-        <facet-selector
+        <!-- <facet-selector
           ref="userFacetSelector"
           :facet="userFacet"
           field-label="User"
           :disabled="userFacet.values.length === 0"
           @facet-removed="facetRemoved"
           @facet-changed="facetChanged"
-        />
+        /> -->
         <date-range-picker ref="rangePicker" @date-range-changed="timeRangeChanged" />
         <hue-link class="clear-link" @click="clearSearch">{{ I18n('Clear All') }}</hue-link>
         <hue-link class="columns-link" @click="toggleColumnSelector">
