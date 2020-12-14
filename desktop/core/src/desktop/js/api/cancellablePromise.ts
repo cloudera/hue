@@ -20,8 +20,8 @@ export interface Cancellable {
 
 export class CancellablePromise<T> extends Promise<T> implements Cancellable {
   private readonly onCancel?: () => void;
-  private readonly rejectHandler?: (reason?: unknown) => void;
   private cancelPrevented?: boolean;
+  private completed: () => boolean;
   cancelled?: boolean;
 
   constructor(
@@ -32,28 +32,30 @@ export class CancellablePromise<T> extends Promise<T> implements Cancellable {
     ) => void
   ) {
     let onCancel: undefined | (() => void) = undefined;
-    let rejectHandler: undefined | ((reason?: unknown) => void) = undefined;
-    super((resolve, reject) => {
-      rejectHandler = reject;
-      return handlers(resolve, reject, (cancelHandler: () => void) => (onCancel = cancelHandler));
-    });
-    this.rejectHandler = rejectHandler;
+    let completed = false;
+    super((resolve, reject) =>
+      handlers(
+        val => {
+          completed = true;
+          resolve(val);
+        },
+        err => {
+          completed = true;
+          reject(err);
+        },
+        (cancelHandler: () => void) => (onCancel = cancelHandler)
+      )
+    );
     this.onCancel = onCancel;
+    this.completed = () => completed;
   }
 
-  async cancel(): Promise<void> {
-    if (!this.cancelPrevented) {
-      const testSymbol = Symbol();
-      const firstToFinish = await Promise.race([this, Promise.resolve(testSymbol)]);
-      if (firstToFinish === testSymbol) {
-        if (this.onCancel) {
-          this.onCancel();
-        }
-        if (this.rejectHandler) {
-          this.rejectHandler();
-        }
-        this.cancelled = true;
+  cancel(): void {
+    if (!this.completed() && !this.cancelled && !this.cancelPrevented) {
+      if (this.onCancel) {
+        this.onCancel();
       }
+      this.cancelled = true;
     }
   }
 
