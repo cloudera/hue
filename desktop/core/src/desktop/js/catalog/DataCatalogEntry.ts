@@ -19,6 +19,7 @@ import {
   fetchDescribe,
   fetchNavigatorMetadata,
   fetchPartitions,
+  fetchSample,
   fetchSourceMetadata
 } from 'catalog/api';
 import MultiTableEntry, { TopAggs, TopFilters, TopJoins } from 'catalog/MultiTableEntry';
@@ -223,56 +224,10 @@ export interface OptimizerMeta extends TimestampedData {
   hueTimestamp?: number;
 }
 
-const setAndSave = async <T extends keyof DataCatalogEntry>(
-  entry: DataCatalogEntry,
-  attribute: T,
-  promise: Promise<DataCatalogEntry[T]>,
-  resolve: (val: DataCatalogEntry[T]) => void,
-  reject: (reason: unknown) => void
-): Promise<void> => {
-  try {
-    entry[attribute] = await promise;
-    resolve(entry[attribute]);
-  } catch (err) {
-    reject(err || 'Fetch failed');
-    return;
-  }
-  entry.saveLater();
-};
-
 const cachedOnly = (options?: CatalogGetOptions): boolean => !!(options && options.cachedOnly);
 
 const shouldReload = (options?: CatalogGetOptions & { refreshAnalysis?: boolean }): boolean =>
   !!(!DataCatalog.cacheEnabled() || (options && (options.refreshCache || options.refreshAnalysis)));
-
-/**
- * Helper function to reload the sample for the given entry
- */
-const reloadSample = (
-  entry: DataCatalogEntry,
-  apiOptions?: { silenceErrors?: boolean }
-): CancellablePromise<Sample> => {
-  entry.samplePromise = new CancellablePromise<Sample>((resolve, reject, onCancel) => {
-    const fetchPromise = fetchAndSave(
-      (<(options: FetchOptions) => CancellableJqPromise<Sample>>(
-        (<unknown>apiHelper.fetchSample)
-      )).bind(apiHelper),
-      val => {
-        entry.sample = val;
-      },
-      entry,
-      apiOptions
-    );
-
-    onCancel(() => {
-      fetchPromise.cancel();
-      entry.samplePromise = undefined;
-    });
-
-    fetchPromise.then(resolve).fail(reject);
-  });
-  return entry.samplePromise;
-};
 
 /**
  * Helper function to reload the nav opt metadata for the given entry
@@ -470,7 +425,14 @@ export default class DataCatalogEntry {
         this.analysisPromise = undefined;
       });
 
-      await setAndSave(this, 'analysis', fetchPromise, resolve, reject);
+      try {
+        this.analysis = await fetchPromise;
+        resolve(this.analysis);
+      } catch (err) {
+        reject(err || 'Fetch failed');
+        return;
+      }
+      this.saveLater();
     });
     return applyCancellable(this.analysisPromise, options);
   }
@@ -482,13 +444,14 @@ export default class DataCatalogEntry {
           onCancel(() => {
             this.navigatorMetaPromise = undefined;
           });
-          await setAndSave(
-            this,
-            'navigatorMeta',
-            fetchNavigatorMetadata({ ...options, entry: this }),
-            resolve,
-            reject
-          );
+          try {
+            this.navigatorMeta = await fetchNavigatorMetadata({ ...options, entry: this });
+            resolve(this.navigatorMeta);
+          } catch (err) {
+            reject(err || 'Fetch failed');
+            return;
+          }
+          this.saveLater();
           if (this.commentObservable) {
             this.commentObservable(this.getResolvedComment());
           }
@@ -507,16 +470,37 @@ export default class DataCatalogEntry {
           this.partitionsPromise = undefined;
         });
 
-        await setAndSave(
-          this,
-          'partitions',
-          fetchPartitions({ ...options, entry: this }),
-          resolve,
-          reject
-        );
+        try {
+          this.partitions = await fetchPartitions({ ...options, entry: this });
+          resolve(this.partitions);
+        } catch (err) {
+          reject(err || 'Fetch failed');
+          return;
+        }
+        this.saveLater();
       }
     );
     return applyCancellable(this.partitionsPromise, options);
+  }
+
+  private reloadSample(
+    options?: ReloadOptions & { operation?: string }
+  ): CancellablePromise<Sample> {
+    this.samplePromise = new CancellablePromise<Sample>(async (resolve, reject, onCancel) => {
+      onCancel(() => {
+        this.samplePromise = undefined;
+      });
+
+      try {
+        this.sample = await fetchSample({ ...options, entry: this });
+        resolve(this.sample);
+      } catch (err) {
+        reject(err || 'Fetch failed');
+        return;
+      }
+      this.saveLater();
+    });
+    return applyCancellable(this.samplePromise, options);
   }
 
   private reloadSourceMeta(options?: ReloadOptions): CancellablePromise<SourceMeta> {
@@ -532,16 +516,17 @@ export default class DataCatalogEntry {
           } catch (err) {}
         }
 
-        await setAndSave(
-          this,
-          'sourceMeta',
-          fetchSourceMetadata({
+        try {
+          this.sourceMeta = await fetchSourceMetadata({
             ...options,
             entry: this
-          }),
-          resolve,
-          reject
-        );
+          });
+          resolve(this.sourceMeta);
+        } catch (err) {
+          reject(err || 'Fetch failed');
+          return;
+        }
+        this.saveLater();
       }
     );
     return applyCancellable(this.sourceMetaPromise, options);
@@ -1603,19 +1588,10 @@ export default class DataCatalogEntry {
     // This prevents caching of any non-standard sample queries, i.e. DISTINCT etc.
     if (options && options.operation && options.operation !== 'default') {
       const operation = options.operation;
-      const samplePromise = new CancellablePromise<Sample>((resolve, reject, onCancel) => {
-        const fetchPromise = apiHelper.fetchSample({
-          sourceType: this.getConnector().id,
-          compute: this.compute,
-          path: this.path,
-          silenceErrors: !!(options && options.silenceErrors),
-          operation
-        });
-        onCancel(() => {
-          fetchPromise.cancel();
-        });
-
-        fetchPromise.done(resolve).fail(reject);
+      const samplePromise = fetchSample({
+        entry: this,
+        operation,
+        silenceErrors: options.silenceErrors
       });
       return applyCancellable(samplePromise, options);
     }
@@ -1671,7 +1647,7 @@ export default class DataCatalogEntry {
         if (cachedOnly(options)) {
           reject();
         } else {
-          const reloadPromise = applyCancellable(reloadSample(this, options), options);
+          const reloadPromise = this.reloadSample(options);
           cancellablePromises.push(reloadPromise);
           try {
             resolve(await reloadPromise);
@@ -1688,7 +1664,7 @@ export default class DataCatalogEntry {
       return CancellablePromise.reject();
     }
     if (!this.samplePromise || shouldReload(options)) {
-      return applyCancellable(reloadSample(this, options), options);
+      return this.reloadSample(options);
     }
     return applyCancellable(this.samplePromise, options);
   }
