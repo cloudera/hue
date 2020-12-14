@@ -14,15 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { CancellablePromise } from 'api/cancellablePromise';
+import { Cancellable, CancellablePromise } from 'api/cancellablePromise';
 import { DefaultApiResponse, extractErrorMessage, post, successResponseIsError } from 'api/utils';
+import { closeSession, ExecutionHandle } from 'apps/notebook2/execution/api';
 import DataCatalogEntry, {
   Analysis,
+  FieldSample,
   NavigatorMeta,
   Partitions,
+  Sample,
+  SampleMeta,
   SourceMeta
 } from 'catalog/DataCatalogEntry';
-import { sleep } from 'utils/hueUtils';
+import { hueWindow } from 'types/types';
+import { sleep, UUID } from 'utils/hueUtils';
 
 interface AnalyzeResponse {
   status: number;
@@ -35,10 +40,23 @@ interface SharedFetchOptions {
   silenceErrors?: boolean;
 }
 
+interface DescribeFetchOptions extends SharedFetchOptions {
+  refreshAnalysis?: boolean;
+}
+
+interface SampleFetchOptions extends SharedFetchOptions {
+  operation?: string;
+  sampleCount?: number;
+}
+
 const AUTOCOMPLETE_URL_PREFIX = '/notebook/api/autocomplete/';
+const CANCEL_STATEMENT_URL = '/notebook/api/cancel_statement';
+const CHECK_STATUS_URL = '/notebook/api/check_status';
 const DESCRIBE_URL = '/notebook/api/describe/';
+const FETCH_RESULT_DATA_URL = '/notebook/api/fetch_result_data';
 const FIND_ENTITY_URL = '/metadata/api/catalog/find_entity';
 const METASTORE_TABLE_URL_PREFIX = '/metastore/table/';
+const SAMPLE_URL_PREFIX = '/notebook/api/sample/';
 
 const getEntryUrlPath = (entry: DataCatalogEntry) =>
   entry.path.join('/') + (entry.path.length ? '/' : '');
@@ -97,9 +115,7 @@ export const fetchDescribe = ({
   entry,
   silenceErrors,
   refreshAnalysis
-}: SharedFetchOptions & {
-  refreshAnalysis?: boolean;
-}): CancellablePromise<Analysis> =>
+}: DescribeFetchOptions): CancellablePromise<Analysis> =>
   new CancellablePromise<Analysis>(async (resolve, reject, onCancel) => {
     if (entry.isSource()) {
       reject('Describe is not possible on the source');
@@ -238,6 +254,230 @@ export const fetchPartitions = ({
       }
     }
   );
+
+interface SampleResult {
+  type?: string;
+  handle?: ExecutionHandle;
+  data?: FieldSample[][];
+  meta?: SampleMeta[];
+}
+
+interface SampleResponse {
+  status?: string;
+  result?: SampleResult;
+  rows?: FieldSample[][];
+  full_headers?: SampleMeta[];
+}
+
+/**
+ * Checks the status for the given snippet ID
+ * Note: similar to notebook and search check_status.
+ *
+ * @param {Object} options
+ * @param {Object} options.notebookJson
+ * @param {Object} options.snippetJson
+ * @param {boolean} [options.silenceErrors]
+ *
+ * @return {CancellableJqPromise}
+ */
+const whenAvailable = (options: {
+  entry: DataCatalogEntry;
+  notebookJson: string;
+  snippetJson: string;
+  silenceErrors?: boolean;
+}) =>
+  new CancellablePromise<{ status?: string }>(async (resolve, reject, onCancel) => {
+    let promiseToCancel: Cancellable | undefined;
+    let cancelled = false;
+    onCancel(() => {
+      cancelled = true;
+      if (promiseToCancel) {
+        promiseToCancel.cancel();
+      }
+    });
+
+    const checkStatusPromise = post<{ query_status?: { status?: string } }>(
+      CHECK_STATUS_URL,
+      {
+        notebook: options.notebookJson,
+        snippet: options.snippetJson,
+        cluster: (options.entry.compute && JSON.stringify(options.entry.compute)) || '""'
+      },
+      { silenceErrors: options.silenceErrors }
+    );
+    try {
+      promiseToCancel = checkStatusPromise;
+      const response = await checkStatusPromise;
+
+      if (response && response.query_status && response.query_status.status) {
+        const status = response.query_status.status;
+        if (status === 'available') {
+          resolve(response.query_status);
+        } else if (status === 'running' || status === 'starting' || status === 'waiting') {
+          await sleep(500);
+          try {
+            if (!cancelled) {
+              const whenPromise = whenAvailable(options);
+              promiseToCancel = whenPromise;
+              resolve(await whenPromise);
+              return;
+            }
+          } catch (err) {}
+        }
+        reject(response.query_status);
+      } else {
+        reject('Cancelled');
+      }
+    } catch (err) {
+      reject(err);
+    }
+  });
+
+export const fetchSample = ({
+  entry,
+  silenceErrors,
+  operation,
+  sampleCount
+}: SampleFetchOptions): CancellablePromise<Sample> =>
+  new CancellablePromise<Sample>(async (resolve, reject, onCancel) => {
+    const cancellablePromises: Cancellable[] = [];
+
+    let notebookJson: string | undefined = undefined;
+    let snippetJson: string | undefined = undefined;
+
+    const cancelQuery = async () => {
+      if (notebookJson) {
+        try {
+          await post(
+            CANCEL_STATEMENT_URL,
+            {
+              notebook: notebookJson,
+              snippet: snippetJson,
+              cluster: (entry.compute && JSON.stringify(entry.compute)) || '""'
+            },
+            { silenceErrors: true }
+          );
+        } catch (err) {}
+      }
+    };
+
+    onCancel(() => {
+      cancellablePromises.forEach(cancellable => cancellable.cancel());
+    });
+
+    cancellablePromises.push({
+      cancel: async () => {
+        try {
+          await cancelQuery();
+        } catch (err) {}
+      }
+    });
+
+    const samplePromise = post<SampleResponse>(
+      `${SAMPLE_URL_PREFIX}${getEntryUrlPath(entry)}`,
+      {
+        notebook: {},
+        snippet: JSON.stringify({
+          type: entry.getConnector().id,
+          compute: entry.compute
+        }),
+        async: true,
+        operation: `"${operation || 'default'}"`,
+        cluster: (entry.compute && JSON.stringify(entry.compute)) || '""'
+      },
+      { silenceErrors }
+    );
+
+    try {
+      cancellablePromises.push(samplePromise);
+      const sampleResponse = await samplePromise;
+      cancellablePromises.pop();
+
+      const queryResult = {
+        id: UUID(),
+        type: (sampleResponse.result && sampleResponse.result.type) || entry.getConnector().id,
+        compute: entry.compute,
+        status: 'running',
+        result: sampleResponse.result || {}
+      };
+      queryResult.result.type = 'table';
+
+      notebookJson = JSON.stringify({ type: entry.getConnector().id });
+      snippetJson = JSON.stringify(queryResult);
+
+      if (sampleResponse && sampleResponse.rows) {
+        // Sync results
+        resolve({
+          type: 'table',
+          hueTimestamp: Date.now(),
+          data: sampleResponse.rows,
+          meta: sampleResponse.full_headers || []
+        });
+      } else {
+        const statusPromise = whenAvailable({
+          notebookJson: notebookJson,
+          snippetJson: snippetJson,
+          entry,
+          silenceErrors
+        });
+
+        cancellablePromises.push(statusPromise);
+        const resultStatus = await statusPromise;
+        cancellablePromises.pop();
+
+        if (resultStatus.status !== 'available') {
+          reject();
+          return;
+        }
+
+        snippetJson = JSON.stringify(queryResult);
+        const resultPromise = post<SampleResponse>(
+          FETCH_RESULT_DATA_URL,
+          {
+            notebook: notebookJson,
+            snippet: snippetJson,
+            rows: sampleCount || 100,
+            startOver: 'false'
+          },
+          { silenceErrors }
+        );
+
+        const sampleResponse = await resultPromise;
+
+        const sample: Sample = {
+          hueTimestamp: Date.now(),
+          type: 'table',
+          data: (sampleResponse.result && sampleResponse.result.data) || [],
+          meta: (sampleResponse.result && sampleResponse.result.meta) || []
+        };
+
+        resolve(sample);
+        cancellablePromises.pop();
+
+        const closeSessions = (<hueWindow>window).CLOSE_SESSIONS;
+        if (
+          closeSessions &&
+          closeSessions[entry.getConnector().dialect || ''] &&
+          queryResult.result.handle &&
+          queryResult.result.handle.session_id
+        ) {
+          try {
+            await closeSession({
+              session: {
+                id: queryResult.result.handle.session_id,
+                session_id: queryResult.result.handle.session_guid || '',
+                type: entry.getConnector().id,
+                properties: []
+              },
+              silenceErrors
+            });
+          } catch (err) {}
+        }
+      }
+    } catch (err) {
+      reject();
+    }
+  });
 
 export const fetchSourceMetadata = ({
   entry,
