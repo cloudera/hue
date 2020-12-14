@@ -16,6 +16,7 @@
 
 import CancellableJqPromise from 'api/cancellableJqPromise';
 import { CancellablePromise } from 'api/cancellablePromise';
+import { CatalogGetOptions } from 'catalog/dataCatalog';
 import DataCatalogEntry from 'catalog/DataCatalogEntry';
 import MultiTableEntry from 'catalog/MultiTableEntry';
 import { Compute, Connector } from 'types/config';
@@ -58,7 +59,7 @@ export const fetchAndSave = <T>(
 /**
  * Helper function that adds sets the silence errors option to true if not specified
  */
-export const setSilencedErrors = (options?: {
+export const forceSilencedErrors = (options?: {
   silenceErrors?: boolean;
 }): { silenceErrors?: boolean } => {
   if (!options) {
@@ -75,7 +76,7 @@ export const setSilencedErrors = (options?: {
  */
 export const applyCancellable = <T>(
   promise: CancellablePromise<T>,
-  options?: { cancellable?: boolean }
+  options?: Pick<CatalogGetOptions, 'cancellable'>
 ): CancellablePromise<T> => {
   if (promise && promise.preventCancel && (!options || !options.cancellable)) {
     promise.preventCancel();
