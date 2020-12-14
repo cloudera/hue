@@ -18,19 +18,19 @@
 import json
 import logging
 
-from django.http import HttpResponse, FileResponse
+from urllib.request import Request, urlopen
+
+from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
-from desktop.lib.rest.http_client import RestException
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.django_util import JsonResponse
-from desktop.lib.rest.http_client import HttpClient
-from desktop.lib.rest.resource import Resource
 from desktop.views import serve_403_error
-from beeswax.conf import USE_SASL
 
 from jobbrowser.apis.base_api import get_api
-from jobbrowser.conf import DISABLE_KILLING_JOBS, QUERY_STORE, USE_PROXY
+from jobbrowser.apis.query_store import query_store_proxy, stream_download_bundle
+
+from jobbrowser.conf import DISABLE_KILLING_JOBS, USE_PROXY
 
 LOG = logging.getLogger(__name__)
 
@@ -169,42 +169,13 @@ def profile(request):
     response['status'] = 0
     return JsonResponse(response)
 
-def _query_store_proxy(request, path=None):
-  response = {'status': -1}
-
-  headers = {
-    'x-do-as': request.user.username,
-    'X-Requested-By': 'das',
-    'Content-Type': 'application/json; charset=UTF-8'
-  }
-
-  client = HttpClient(QUERY_STORE.SERVER_URL.get())
-  resource = Resource(client)
-
-  if USE_SASL.get():
-    client.set_kerberos_auth()
-
-  try:
-    response = resource.invoke(request.method, path, request.GET.dict(), request.body, headers)
-  except RestException as e:
-    ex_response = e.get_parent_ex().response
-
-    if ex_response is not None:
-      response['code'] = ex_response.status_code
-      response['message'] = ex_response.reason
-      response['content'] = ex_response.text
-    else:
-      response['message'] = 'Query store not reachable!'
-      response['content'] = e.message
-
-  return response
 
 @api_error_handler
 def query_store_api(request, path=None):
   response = {'status': -1}
 
   if USE_PROXY.get():
-    response = _query_store_proxy(request, path)
+    response = query_store_proxy(request, path)
   else:
     if path == 'api/query/search':
       filters = json.loads(request.body)
@@ -216,16 +187,4 @@ def query_store_api(request, path=None):
 
 @api_error_handler
 def query_store_download_bundle(request, id=None):
-  response = {}
-
-  client = HttpClient(QUERY_STORE.SERVER_URL.get())
-  resource = Resource(client)
-  if USE_SASL.get():
-    client.set_kerberos_auth()
-
-  app = resource.get('api/data-bundle/' + id)
-
-  response = FileResponse((app, 'rb'), content_type='application/octet-stream')
-  response['Content-Disposition'] = 'attachment; filename=' + id + '.zip'
-
-  return response
+  return stream_download_bundle(request, id)
