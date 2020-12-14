@@ -228,7 +228,12 @@ class SqlAlchemyApi(Api):
       statement = statement.strip().rstrip(';')
 
     if self.interpreter['dialect_properties'].get('has_use_statement') and snippet.get('database'):
-      connection.execute('USE ' + snippet['database'])
+      connection.execute(
+        'USE %(sql_identifier_quote)s%(database)s%(sql_identifier_quote)s' % {
+          'sql_identifier_quote': self.interpreter['dialect_properties']['sql_identifier_quote'],
+          'database': snippet['database'],
+        }
+      )
 
     result = connection.execute(statement)
 
