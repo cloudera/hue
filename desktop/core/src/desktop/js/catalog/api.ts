@@ -16,7 +16,12 @@
 
 import { CancellablePromise } from 'api/cancellablePromise';
 import { DefaultApiResponse, extractErrorMessage, post, successResponseIsError } from 'api/utils';
-import DataCatalogEntry, { Analysis, NavigatorMeta, SourceMeta } from 'catalog/DataCatalogEntry';
+import DataCatalogEntry, {
+  Analysis,
+  NavigatorMeta,
+  Partitions,
+  SourceMeta
+} from 'catalog/DataCatalogEntry';
 import { sleep } from 'utils/hueUtils';
 
 interface AnalyzeResponse {
@@ -33,6 +38,10 @@ interface SharedFetchOptions {
 const AUTOCOMPLETE_URL_PREFIX = '/notebook/api/autocomplete/';
 const DESCRIBE_URL = '/notebook/api/describe/';
 const FIND_ENTITY_URL = '/metadata/api/catalog/find_entity';
+const METASTORE_TABLE_URL_PREFIX = '/metastore/table/';
+
+const getEntryUrlPath = (entry: DataCatalogEntry) =>
+  entry.path.join('/') + (entry.path.length ? '/' : '');
 
 const performAnalyze = ({
   entry,
@@ -64,7 +73,7 @@ const performAnalyze = ({
       const analyzeResponse = await post<DefaultApiResponse & { watch_url?: string }>(
         `/${
           entry.getConnector().id === 'hive' ? 'beeswax' : entry.getConnector().id
-        }/api/analyze/${entry.path.join('/')}/`,
+        }/api/analyze/${getEntryUrlPath(entry)}`,
         undefined,
         { silenceErrors }
       );
@@ -122,13 +131,14 @@ export const fetchDescribe = ({
       },
       {
         silenceErrors,
-        handleResponse: (response: Analysis & DefaultApiResponse) => {
+        handleSuccess: (response: Analysis & DefaultApiResponse, postResolve, postReject) => {
           if (successResponseIsError(response)) {
-            return { valid: false, reason: extractErrorMessage(response) };
+            postReject(extractErrorMessage(response));
+          } else {
+            const adjustedResponse = response;
+            adjustedResponse.hueTimestamp = Date.now();
+            postResolve(adjustedResponse);
           }
-          const adjustedResponse = response;
-          adjustedResponse.hueTimestamp = Date.now();
-          return { valid: true, adjustedResponse };
         }
       }
     );
@@ -173,30 +183,68 @@ export const fetchNavigatorMetadata = ({
     },
     {
       silenceErrors,
-      handleResponse: (
-        response: (NavigatorMeta | { entity: NavigatorMeta }) & DefaultApiResponse
+      handleSuccess: (
+        response: (NavigatorMeta | { entity: NavigatorMeta }) & DefaultApiResponse,
+        resolve,
+        reject
       ) => {
         if (successResponseIsError(response)) {
-          return {
-            valid: false,
-            reason: `Navigator meta failed: ${extractErrorMessage(response)}`
-          };
+          reject(extractErrorMessage(response));
+        } else {
+          const adjustedResponse = (<{ entity: NavigatorMeta }>response).entity || response;
+          adjustedResponse.hueTimestamp = Date.now();
+          resolve(adjustedResponse);
         }
-        const adjustedResponse = (<{ entity: NavigatorMeta }>response).entity || response;
-        adjustedResponse.hueTimestamp = Date.now();
-
-        return { valid: true, adjustedResponse };
       }
     }
   );
 };
+
+export const fetchPartitions = ({
+  entry,
+  silenceErrors
+}: SharedFetchOptions): CancellablePromise<Partitions> =>
+  post<Partitions>(
+    `${METASTORE_TABLE_URL_PREFIX}${getEntryUrlPath(entry)}partitions`,
+    {
+      format: 'json',
+      cluster: (entry.compute && JSON.stringify(entry.compute)) || '""'
+    },
+    {
+      silenceErrors,
+      handleSuccess: (response, resolve, reject) => {
+        const adjustedResponse = response || {};
+        adjustedResponse.hueTimestamp = Date.now();
+        if (successResponseIsError(response)) {
+          reject(`Partitions failed: ${extractErrorMessage(response)}`);
+        } else {
+          resolve(adjustedResponse);
+        }
+      },
+      handleError: (errorResponse, resolve, reject) => {
+        if (
+          errorResponse.response &&
+          errorResponse.response.data &&
+          errorResponse.response.data.indexOf('is not partitioned') !== -1
+        ) {
+          resolve({
+            hueTimestamp: Date.now(),
+            partition_keys_json: [],
+            partition_values_json: []
+          });
+        } else {
+          reject(errorResponse);
+        }
+      }
+    }
+  );
 
 export const fetchSourceMetadata = ({
   entry,
   silenceErrors
 }: SharedFetchOptions): CancellablePromise<SourceMeta> =>
   post<SourceMeta>(
-    `${AUTOCOMPLETE_URL_PREFIX}${entry.path.join('/')}${entry.path.length ? '/' : ''}`,
+    `${AUTOCOMPLETE_URL_PREFIX}${getEntryUrlPath(entry)}`,
     {
       notebook: {},
       snippet: JSON.stringify({
@@ -207,7 +255,7 @@ export const fetchSourceMetadata = ({
     },
     {
       silenceErrors,
-      handleResponse: response => {
+      handleSuccess: (response, resolve, reject) => {
         const message = <string>response.error || response.message || '';
         const adjustedResponse = response || {};
         adjustedResponse.notFound =
@@ -219,9 +267,10 @@ export const fetchSourceMetadata = ({
         adjustedResponse.hueTimestamp = Date.now();
 
         if (!adjustedResponse.notFound && successResponseIsError(response)) {
-          return { valid: false, reason: `Source meta failed: ${extractErrorMessage(response)}` };
+          reject(extractErrorMessage(response));
+        } else {
+          resolve(adjustedResponse);
         }
-        return { valid: true, adjustedResponse };
       }
     }
   );
