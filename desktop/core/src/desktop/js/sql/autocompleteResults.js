@@ -2091,6 +2091,7 @@ class AutocompleteResults {
       // The columnsDeferred gets resolved synchronously when the data is cached, if not, assume there are some suggestions.
       columnSuggestions = await columnsPromise;
     } catch (err) {}
+
     if (!columnSuggestions.length) {
       return [];
     }
