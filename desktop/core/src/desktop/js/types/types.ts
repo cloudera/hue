@@ -32,6 +32,7 @@ declare global {
 
 export interface hueWindow {
   CACHEABLE_TTL?: { default?: number; optimizer?: number };
+  CLOSE_SESSIONS?: { [dialect: string]: boolean };
   HAS_CATALOG?: boolean;
   HAS_OPTIMIZER?: boolean;
   AUTOCOMPLETE_TIMEOUT?: number;
