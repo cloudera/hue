@@ -176,7 +176,7 @@ class HttpClient(object):
     return self._session.headers.copy()
 
   def execute(self, http_method, path, params=None, data=None, headers=None, allow_redirects=False, urlencode=True,
-              files=None, clear_cookies=False, timeout=conf.REST_CONN_TIMEOUT.get()):
+              files=None, stream=False, clear_cookies=False, timeout=conf.REST_CONN_TIMEOUT.get()):
     """
     Submit an HTTP request.
     @param http_method: GET, POST, PUT, DELETE
@@ -187,6 +187,7 @@ class HttpClient(object):
     @param allow_redirects: requests should automatically resolve redirects.
     @param urlencode: percent encode paths.
     @param files: for posting Multipart-Encoded files
+    @param stream: Bool to stream the response
     @param clear_cookies: flag to force clear any cookies set in the current session
 
     @return: The result of urllib2.urlopen()
@@ -211,6 +212,8 @@ class HttpClient(object):
       request_kwargs['data'] = data
     if files:
       request_kwargs['files'] = files
+    if stream:
+      request_kwargs['stream'] = True
 
     if self._cookies and not clear_cookies:
       request_kwargs['cookies'] = self._cookies
