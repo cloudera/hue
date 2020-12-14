@@ -59,10 +59,5 @@ ${ layout.menubar(section='analytics') }
 
 
 <div id="analyticsComponents" class="container-fluid">
-
-  <a href="javascript:void(0)" data-bind="click: function() { selectedConnectorCategory('All'); section('installed-connectors-page'); }">
-    ${ _('Analytics') }
-  </a>
-
-  <textarea data-bind="text: stats" readonly></textarea>
+  <textarea data-bind="text: stats" readonly rows="5" style="width: 1000px"></textarea>
 </script>
