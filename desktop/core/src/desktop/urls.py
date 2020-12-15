@@ -250,7 +250,7 @@ for app in appmanager.DESKTOP_MODULES:
     else:
       namespace = None
     if namespace or app in appmanager.DESKTOP_APPS:
-      app_urls_patterns.append(url('^' + re.escape(app.name) + '/', include(app.urls, namespace=namespace)))
+      app_urls_patterns.append(url('^' + re.escape(app.name) + '/', include((app.urls, app.name), namespace=namespace)))
       app.urls_imported = True
 
 static_patterns.append(

@@ -122,7 +122,7 @@ class DataEngApi(Api):
     job_id = snippet['result']['handle']['id']
     return [{
         'name': job_id,
-        'url': reverse('jobbrowser.views.apps') + '#!' + job_id,
+        'url': reverse('jobbrowser:jobbrowser.views.apps') + '#!' + job_id,
         'started': True,
         'finished': False # Would need call to check_status
       }

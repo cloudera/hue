@@ -256,7 +256,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
       path = '/user/hive/warehouse/%s.db/test_partitions/baz=baz_one/boom=12345' % self.db_name
     else:
       path = '/user/hive/warehouse/test_partitions/baz=baz_one/boom=12345'
-    filebrowser_path = urllib.parse.unquote(reverse("filebrowser.views.view", kwargs={'path': path}))
+    filebrowser_path = urllib.parse.unquote(reverse("filebrowser:filebrowser.views.view", kwargs={'path': path}))
     assert_equal(response.request['PATH_INFO'], filebrowser_path)
 
   def test_drop_partition(self):

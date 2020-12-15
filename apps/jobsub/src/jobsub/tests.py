@@ -64,7 +64,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
     Workflow.objects.all().delete()
 
   def create_design(self):
-    response = self.client.post(reverse('jobsub.views.new_design',
+    response = self.client.post(reverse('jobsub:jobsub.views.new_design',
       kwargs={'node_type': 'mapreduce'}),
       data={'name': 'sleep_job',
             'description': '',
@@ -92,7 +92,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
     assert_equal(3, Link.objects.filter(parent__workflow=self.design).count())
 
   def test_save_design(self):
-    response = self.client.post(reverse('jobsub.views.save_design',
+    response = self.client.post(reverse('jobsub:jobsub.views.save_design',
       kwargs={'design_id': self.design.id}),
       data={'name': 'mapreduce1',
             'description': '',
@@ -108,7 +108,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
     assert_equal(self.design.start.get_child('to').get_full_node().files, '[{"dummy": "", "name": "test"}]')
 
   def test_get_design(self):
-    response = self.client.get(reverse('jobsub.views.get_design',
+    response = self.client.get(reverse('jobsub:jobsub.views.get_design',
       kwargs={'design_id': self.design.id}),
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     assert_equal(response.status_code, 200)
@@ -117,7 +117,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
     grant_access("jobsub_test_note_me", "jobsub_test_note_me", "jobsub")
     add_to_group("jobsub_test_note_me")
 
-    response = client_note_me.get(reverse('jobsub.views.get_design',
+    response = client_note_me.get(reverse('jobsub:jobsub.views.get_design',
       kwargs={'design_id': self.design.id}),
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     assert_equal(response.status_code, 500)
@@ -129,7 +129,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
     n_available = Document.objects.available_docs(Workflow, self.user).count()
     n_trashed = Document.objects.trashed_docs(Workflow, self.user).count()
 
-    response = self.client.post(reverse('jobsub.views.delete_design',
+    response = self.client.post(reverse('jobsub:jobsub.views.delete_design',
       kwargs={'design_id': self.design.id}),
       follow=True,
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -139,7 +139,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
     assert_equal(n_trashed + 1, Document.objects.trashed_docs(Workflow, self.user).count())
 
     # Destroy
-    response = self.client.post(reverse('jobsub.views.delete_design',
+    response = self.client.post(reverse('jobsub:jobsub.views.delete_design',
       kwargs={'design_id': self.design.id}) + '?skip_trash',
       follow=True,
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -153,7 +153,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
     raise SkipTest
     n_available = Document.objects.available_docs(Workflow, self.user).count()
 
-    response = self.client.post(reverse('jobsub.views.clone_design',
+    response = self.client.post(reverse('jobsub:jobsub.views.clone_design',
       kwargs={'design_id': self.design.id}),
       follow=True,
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -165,7 +165,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
     n_available = Document.objects.available_docs(Workflow, self.user).count()
     n_trashed = Document.objects.trashed_docs(Workflow, self.user).count()
 
-    response = self.client.post(reverse('jobsub.views.delete_design',
+    response = self.client.post(reverse('jobsub:jobsub.views.delete_design',
       kwargs={'design_id': self.design.id}),
       follow=True,
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -174,7 +174,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
     assert_equal(n_available - 1, Document.objects.available_docs(Workflow, self.user).count())
     assert_equal(n_trashed + 1, Document.objects.trashed_docs(Workflow, self.user).count())
 
-    response = self.client.post(reverse('jobsub.views.restore_design',
+    response = self.client.post(reverse('jobsub:jobsub.views.restore_design',
       kwargs={'design_id': self.design.id}),
       follow=True,
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')

@@ -53,10 +53,10 @@ ${layout.menubar(section='groups')}
       </%def>
       <%def name="creation()">
         %if is_admin(user):
-          <a id="addGroupBtn" href="${url('useradmin.views.edit_group')}" class="btn"><i
+          <a id="addGroupBtn" href="${url('useradmin:useradmin.views.edit_group')}" class="btn"><i
               class="fa fa-plus-circle"></i> ${_('Add group')}</a>
           % if is_ldap_setup:
-            <a id="addLdapGroupBtn" href="${url('useradmin.views.add_ldap_groups')}" class="btn"><i
+            <a id="addLdapGroupBtn" href="${url('useradmin:useradmin.views.add_ldap_groups')}" class="btn"><i
                 class="fa fa-refresh"></i> ${_('Add/Sync LDAP group')}</a>
           % endif
           <a href="http://gethue.com/making-hadoop-accessible-to-your-employees-with-ldap/"
@@ -92,7 +92,7 @@ ${layout.menubar(section='groups')}
           <td>
             % if is_admin(user):
               <strong><a title="${ _('Edit %(groupname)s') % dict(groupname=group.name) }"
-                        href="${ url('useradmin.views.edit_group', name=group.name) }"
+                        href="${ url('useradmin:useradmin.views.edit_group', name=group.name) }"
                         data-row-selector="true">${group.name}</a></strong>
             % else:
               <strong>${group.name}</strong>
@@ -115,7 +115,7 @@ ${layout.menubar(section='groups')}
     </table>
   </div>
   <div class="modal hide fade delete-group">
-    <form action="${ url('useradmin.views.delete_group') }" method="POST">
+    <form action="${ url('useradmin:useradmin.views.delete_group') }" method="POST">
       ${ csrf_token(request) | n,unicode }
       % if is_embeddable:
         <input type="hidden" value="true" name="is_embeddable" />

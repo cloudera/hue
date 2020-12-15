@@ -489,7 +489,7 @@ class HS2Api(Api):
 
       jobs = [{
           'name': job.get('job_id', ''),
-          'url': reverse('jobbrowser.views.single_job', kwargs={'job': job.get('job_id', '')}) if has_jobbrowser else '',
+          'url': reverse('jobbrowser:jobbrowser.views.single_job', kwargs={'job': job.get('job_id', '')}) if has_jobbrowser else '',
           'started': job.get('started', False),
           'finished': job.get('finished', False)
         }

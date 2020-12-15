@@ -179,12 +179,12 @@ ${ layout.menubar(section='workflows', dashboard=True) }
             % for child_id in action.externalChildIDs.split(','):
               <tr>
                 <td>
-                  <a href="${ url('jobbrowser.views.job_single_logs', job=child_id) }" title="${ _('View the logs') }" rel="tooltip">
+                  <a href="${ url('jobbrowser:jobbrowser.views.job_single_logs', job=child_id) }" title="${ _('View the logs') }" rel="tooltip">
                     <i class="fa fa-tasks"></i>
                   </a>
                 </td>
                 <td>
-                  <a href="${ url('jobbrowser.views.single_job', job=child_id) }">
+                  <a href="${ url('jobbrowser:jobbrowser.views.single_job', job=child_id) }">
                     ${ "_".join(child_id.split("_")[-2:]) }
                   </a>
                 </td>

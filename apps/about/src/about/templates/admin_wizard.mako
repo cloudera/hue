@@ -213,7 +213,7 @@ ${ layout.menubar(section='quick_start') }
           <div id="step4" class="stepDetails hide">
             <div>
               <h3>${ _('Create or import users') }</h3>
-              <a href="${ url('useradmin.views.list_users') }"
+              <a href="${ url('useradmin:useradmin.views.list_users') }"
                  % if not is_embeddable:
                  target="_blank"
                  % endif

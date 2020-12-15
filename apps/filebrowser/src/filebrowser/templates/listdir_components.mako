@@ -913,7 +913,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               }
 
               fileBrowserViewModel.targetPageNum(1);
-              fileBrowserViewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(this.url));
+              fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + stripHashes(this.url));
               updateHash(this.url);
             }
             else {
@@ -1156,7 +1156,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       self.showSummary = function () {
         self.isLoadingSummary(true);
         $("#contentSummaryModal").modal("show");
-        $.getJSON("${url('content_summary', path='')}" + self.selectedFile().path, function (data) {
+        $.getJSON("${url('filebrowser:content_summary', path='')}" + self.selectedFile().path, function (data) {
           if (data.status == 0) {
             self.contentSummary(ko.mapping.fromJS(data.summary));
             self.isLoadingSummary(false);
@@ -1333,12 +1333,12 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
             e.stopPropagation();
             e.preventDefault();
             fileBrowserViewModel.targetPageNum(1);
-            fileBrowserViewModel.targetPath("${url('filebrowser.views.view', path='')}?" + folderPath);
+            fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}?" + folderPath);
             updateHash('');
             fileBrowserViewModel.retrieveData();
           }
           else {
-            window.open("${url('filebrowser.views.view', path='')}?" + folderPath);
+            window.open("${url('filebrowser:filebrowser.views.view', path='')}?" + folderPath);
           }
         }
       }
@@ -1370,11 +1370,11 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       };
 
       self.editFile = function () {
-        huePubSub.publish('open.link', self.selectedFile().url.replace("${url('filebrowser.views.view', path='')}", "${url('filebrowser_views_edit', path='')}"));
+        huePubSub.publish('open.link', self.selectedFile().url.replace("${url('filebrowser:filebrowser.views.view', path='')}", "${url('filebrowser:filebrowser_views_edit', path='')}"));
       };
 
       self.downloadFile = function () {
-        huePubSub.publish('open.link', self.selectedFile().url.replace("${url('filebrowser.views.view', path='')}", "${url('filebrowser_views_download', path='')}"));
+        huePubSub.publish('open.link', self.selectedFile().url.replace("${url('filebrowser:filebrowser.views.view', path='')}", "${url('filebrowser:filebrowser_views_download', path='')}"));
       };
 
       self.renameFile = function () {
@@ -1384,7 +1384,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
         $("#newNameInput").val(self.selectedFile().name);
 
-        $("#renameForm").attr("action", "/filebrowser/rename?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
+        $("#renameForm").attr("action", "/filebrowser/rename?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
 
         $('#renameForm').ajaxForm({
           dataType:  'json',
@@ -1406,7 +1406,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
         $("#setReplFileName").text(self.selectedFile().path);
 
-        $("#setReplicationFactorForm").attr("action", "/filebrowser/set_replication?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
+        $("#setReplicationFactorForm").attr("action", "/filebrowser/set_replication?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
 
         $('#setReplicationFactorForm').ajaxForm({
           dataType: 'json',
@@ -1442,7 +1442,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
         if (!isMoveOnSelf){
           hiddenFields($("#moveForm"), "src_path", paths);
-          $("#moveForm").attr("action", "/filebrowser/move?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
+          $("#moveForm").attr("action", "/filebrowser/move?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
           $('#moveForm').ajaxForm({
             dataType:  'json',
             success: function() {
@@ -1500,7 +1500,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
         hiddenFields($("#copyForm"), "src_path", paths);
 
-        $("#copyForm").attr("action", "/filebrowser/copy?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
+        $("#copyForm").attr("action", "/filebrowser/copy?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
 
         $("#copyModal").modal({
           keyboard:true,
@@ -1552,7 +1552,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
           hiddenFields($("#chownForm"), 'path', paths);
 
-          $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
+          $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
 
           $("select[name='user']").val(self.selectedFile().stats.user);
 
@@ -1604,7 +1604,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
           hiddenFields($("#chmodForm"), 'path', paths);
 
-          $("#chmodForm").attr("action", "/filebrowser/chmod?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
+          $("#chmodForm").attr("action", "/filebrowser/chmod?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
 
           $("#changePermissionModal").modal({
             keyboard: true,
@@ -1652,7 +1652,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
         $("#deleteForm").attr("action", "/filebrowser/rmtree" + "?" +
           (self.skipTrash() ? "skip_trash=true&" : "") +
-          "next=${url('filebrowser.views.view', path='')}" + self.currentPath());
+          "next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
 
         $("#deleteModal").modal({
           keyboard:true,
@@ -1806,7 +1806,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       };
 
       self.createDirectory = function (formElement) {
-        $(formElement).attr("action", "/filebrowser/mkdir?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
+        $(formElement).attr("action", "/filebrowser/mkdir?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
         if ($.trim($("#newDirectoryNameInput").val()) == "") {
           $("#directoryNameRequiredAlert").show();
           $("#newDirectoryNameInput").addClass("fieldError");
@@ -1843,7 +1843,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       };
 
       self.createFile = function (formElement) {
-        $(formElement).attr("action", "/filebrowser/touch?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
+        $(formElement).attr("action", "/filebrowser/touch?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
         if ($.trim($("#newFileNameInput").val()) == "") {
           $("#fileNameRequiredAlert").show();
           $("#newFileNameInput").addClass("fieldError");
@@ -1882,7 +1882,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
         hiddenFields($("#restoreTrashForm"), 'path', paths);
 
-        $("#restoreTrashForm").attr("action", "/filebrowser/trash/restore?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
+        $("#restoreTrashForm").attr("action", "/filebrowser/trash/restore?next=${url('filebrowser:filebrowser.views.view', path='')}" + self.currentPath());
 
         $("#restoreTrashModal").modal({
           keyboard:true,
@@ -1911,7 +1911,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
         hiddenFields($("#purgeTrashForm"), 'path', paths);
 
-        $("#purgeTrashForm").attr("action", "/filebrowser/trash/purge?next=${url('filebrowser.views.view', path='')}" + fileBrowserViewModel.homeDir() + "/.Trash");
+        $("#purgeTrashForm").attr("action", "/filebrowser/trash/purge?next=${url('filebrowser:filebrowser.views.view', path='')}" + fileBrowserViewModel.homeDir() + "/.Trash");
 
         $("#purgeTrashModal").modal({
           keyboard:true,
@@ -2440,7 +2440,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           var targetPath = "";
           var hash = decodeURI(window.location.hash.substring(1));
           if (hash != null && hash != "" && hash.indexOf('/') > -1) {
-            targetPath = "${url('filebrowser.views.view', path='')}";
+            targetPath = "${url('filebrowser:filebrowser.views.view', path='')}";
             if (hash.indexOf("!!") != 0) {
               targetPath += stripHashes(encodeURIComponent(hash));
             }
@@ -2483,7 +2483,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         root: fileBrowserViewModel.rootTarget(),
         skipKeydownEvents: true,
         onEnter: function (el) {
-          fileBrowserViewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(el.val()));
+          fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + stripHashes(el.val()));
           fileBrowserViewModel.getStats(function (data) {
             if (data.type != null && data.type == "file") {
               %if is_embeddable:

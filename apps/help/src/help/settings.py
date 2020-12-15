@@ -18,3 +18,4 @@ NICE_NAME = "Help"
 REQUIRES_HADOOP = False
 ICON = "help/art/icon_help_24.png"
 MENU_INDEX = 90
+IS_URL_NAMESPACED = True

@@ -31,8 +31,8 @@
 <%
   path_enc = urllib_quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
   dirname_enc = urlencode(view['dirname'])
-  base_url = url('filebrowser.views.view', path=path_enc)
-  edit_url = url('filebrowser_views_edit', path=path_enc)
+  base_url = url('filebrowser:filebrowser.views.view', path=path_enc)
+  edit_url = url('filebrowser:filebrowser_views_edit', path=path_enc)
 %>
 <%namespace name="fb_components" file="fb_components.mako" />
 
@@ -51,7 +51,7 @@ ${ fb_components.menubar() }
         <!-- ko if: $root.file -->
         <ul class="nav nav-list">
           <!-- ko if: $root.isViewing -->
-            <li><a href="${url('filebrowser.views.view', path=dirname_enc)}"><i class="fa fa-reply"></i> ${_('Back')}</a></li>
+            <li><a href="${url('filebrowser:filebrowser.views.view', path=dirname_enc)}"><i class="fa fa-reply"></i> ${_('Back')}</a></li>
 
             <!-- ko if: $root.file().view.compression() && $root.file().view.compression() === "none" && $root.file().editable -->
               <li><a class="pointer" data-bind="click: $root.editFile"><i class="fa fa-pencil"></i> ${_('Edit file')}</a></li>
@@ -227,7 +227,7 @@ ${ fb_components.menubar() }
   }
 
   function getContent (callback) {
-    var _baseUrl = "${url('filebrowser.views.view', path=path_enc)}";
+    var _baseUrl = "${url('filebrowser:filebrowser.views.view', path=path_enc)}";
 
     viewModel.isLoading(true);
 
@@ -379,7 +379,7 @@ ${ fb_components.menubar() }
     }
 
     self.downloadFile = function () {
-      huePubSub.publish('open.link', "${url('filebrowser_views_download', path=path_enc)}");
+      huePubSub.publish('open.link', "${url('filebrowser:filebrowser_views_download', path=path_enc)}");
     };
 
     self.pageChanged = function () {

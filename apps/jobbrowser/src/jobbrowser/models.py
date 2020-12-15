@@ -209,7 +209,7 @@ class LinkJobLogs(object):
   @classmethod
   def _replace_mr_link(self, match):
     try:
-      return '<a href="/hue%s">%s</a>' % (reverse('jobbrowser.views.single_job', kwargs={'job': match.group(0)}), match.group(0))
+      return '<a href="/hue%s">%s</a>' % (reverse('jobbrowser:jobbrowser.views.single_job', kwargs={'job': match.group(0)}), match.group(0))
     except:
       LOG.exception('failed to replace mr links: %s' % (match.groups(),))
       return match.group(0)
