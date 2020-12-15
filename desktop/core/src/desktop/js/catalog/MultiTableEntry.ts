@@ -14,11 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { noop } from 'lodash';
+
+import DataCatalogEntry from 'catalog/DataCatalogEntry';
 import { CatalogGetOptions, DataCatalog, TimestampedData } from './dataCatalog';
-import CancellableJqPromise from 'api/cancellableJqPromise';
 import { CancellablePromise } from 'api/cancellablePromise';
-import { applyCancellable, fetchAndSave, FetchOptions } from 'catalog/catalogUtils';
-import { getOptimizer } from 'catalog/optimizer/optimizer';
+import { applyCancellable } from 'catalog/catalogUtils';
+import { getOptimizer, PopularityOptions } from 'catalog/optimizer/optimizer';
 import { UdfDetails } from 'sql/reference/types';
 import { Connector } from 'types/config';
 import { hueWindow } from 'types/types';
@@ -74,6 +76,25 @@ export interface TopColumns extends TimestampedData {
   values: unknown[];
 }
 
+const fetchAndSave = <T>(
+  optimizerFunction: (option: PopularityOptions) => CancellablePromise<T>,
+  setFunction: (val: T) => void,
+  entry: DataCatalogEntry | MultiTableEntry,
+  apiOptions?: { silenceErrors?: boolean; refreshAnalysis?: boolean }
+): CancellablePromise<T> => {
+  const promise = optimizerFunction({
+    paths: (<MultiTableEntry>entry).paths, // Set for MultiTableEntry
+    silenceErrors: apiOptions && apiOptions.silenceErrors
+  });
+  promise
+    .then(data => {
+      setFunction(data);
+      entry.saveLater();
+    })
+    .catch(noop);
+  return promise;
+};
+
 /**
  * Helper function to reload a Optimizer multi table attribute, like topAggs or topFilters
  */
@@ -82,7 +103,7 @@ const genericOptimizerReload = <T>(
   options: { silenceErrors?: boolean } | undefined,
   promiseSetter: (promise?: CancellablePromise<T>) => void,
   dataAttributeSetter: (val: T) => void,
-  apiHelperFunction: (option: FetchOptions) => CancellableJqPromise<T>
+  optimizerFunction: (option: PopularityOptions) => CancellablePromise<T>
 ): CancellablePromise<T> => {
   const promise = new CancellablePromise<T>((resolve, reject, onCancel) => {
     if (!multiTableEntry.dataCatalog.canHaveOptimizerMeta()) {
@@ -90,7 +111,7 @@ const genericOptimizerReload = <T>(
       return;
     }
     const fetchPromise = fetchAndSave(
-      apiHelperFunction,
+      optimizerFunction,
       dataAttributeSetter,
       multiTableEntry,
       options
@@ -101,11 +122,11 @@ const genericOptimizerReload = <T>(
       }
     });
 
-    fetchPromise.done(resolve).fail(() => {
+    fetchPromise.then(resolve).catch(err => {
       if (fetchPromise.cancelled) {
         promiseSetter(undefined);
       }
-      reject();
+      reject(err);
     });
   });
 
@@ -122,7 +143,7 @@ const genericOptimizerGet = <T>(
   promiseSetter: (promise?: CancellablePromise<T>) => void,
   promiseGetter: () => CancellablePromise<T> | undefined,
   dataAttributeSetter: (val: T) => void,
-  apiHelperFunction: (option: FetchOptions) => CancellableJqPromise<T>
+  apiHelperFunction: (option: PopularityOptions) => CancellablePromise<T>
 ): CancellablePromise<T> => {
   let promise = promiseGetter();
   if (DataCatalog.cacheEnabled() && options && options.cachedOnly) {
