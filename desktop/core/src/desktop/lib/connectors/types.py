@@ -29,16 +29,43 @@ LOG = logging.getLogger(__name__)
 
 CONNECTOR_TYPES = [
   {
-    'id': 'hive',
     'dialect': 'hive',
     'nice_name': 'Hive',
-    'description': '',
+    'description': 'Recommended',
     'category': 'editor',
     'interface': 'hiveserver2',
     'settings': [
       {'name': 'server_host', 'value': 'localhost'},
       {'name': 'server_port', 'value': 10000},
       {'name': 'is_llap', 'value': False},  # cf. _get_session_by_id() or create a separate connector
+    ],
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+      'has_reference_language': True,
+      'has_reference_functions': True,
+      'has_use_statement': True,
+      'trim_statement_semicolon': False,
+    }
+  },
+  {
+    'dialect': 'hive',
+    'nice_name': 'Hive',
+    'description': 'Via SqlAlchemy interface',
+    'category': 'editor',
+    'interface': 'sqlalchemy',
+    'settings': [
+      {'name': 'url', 'value': 'hive://localhost:10000'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
     'properties': {
       'is_sql': True,
