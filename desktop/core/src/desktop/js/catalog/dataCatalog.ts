@@ -112,7 +112,7 @@ export interface OptimizerResponseValues {
   selectColumns?: OptimizerResponsePopularity[];
 }
 
-export interface OptimizerResponse {
+export interface OptimizerResponse extends TimestampedData {
   top_tables?: OptimizerResponsePopularity[];
   values?: OptimizerResponseValues;
 }
@@ -315,12 +315,12 @@ export class DataCatalog {
    * Clears the data catalog and cache for the given path and any children thereof.
    */
   async clearStorageCascade(
-    namespace: Namespace,
-    compute: Compute,
-    pathToClear: string[]
+    namespace?: Namespace,
+    compute?: Compute,
+    pathToClear?: string[]
   ): Promise<void> {
     if (!namespace || !compute) {
-      if (pathToClear.length === 0) {
+      if (!pathToClear || pathToClear.length === 0) {
         this.entries = {};
         return this.store.clear();
       }
@@ -436,74 +436,73 @@ export class DataCatalog {
           return;
         }
 
-        const fetchPromise = getOptimizer(this.connector).fetchPopularity({
+        const optimizer = getOptimizer(this.connector);
+
+        const fetchPromise = optimizer.fetchPopularity({
           silenceErrors: true,
           paths: pathsToLoad
         });
         cancellablePromises.push(fetchPromise);
 
-        fetchPromise
-          .done((data: OptimizerResponse) => {
-            const perTable: { [path: string]: OptimizerResponse } = {};
+        try {
+          const data = await fetchPromise;
+          const perTable: { [path: string]: OptimizerResponse } = {};
 
-            const splitOptimizerValuesPerTable = (
-              listName: keyof OptimizerResponseValues
-            ): void => {
-              const values = data.values && data.values[listName];
-              if (values) {
-                values.forEach(column => {
-                  let tableMeta = perTable[column.dbName + '.' + column.tableName];
-                  if (!tableMeta) {
-                    tableMeta = { values: {} };
-                    perTable[column.dbName + '.' + column.tableName] = tableMeta;
+          const splitOptimizerValuesPerTable = (listName: keyof OptimizerResponseValues): void => {
+            const values = data.values && data.values[listName];
+            if (values) {
+              values.forEach(column => {
+                let tableMeta = perTable[column.dbName + '.' + column.tableName];
+                if (!tableMeta) {
+                  tableMeta = { values: {} };
+                  perTable[column.dbName + '.' + column.tableName] = tableMeta;
+                }
+                if (tableMeta.values) {
+                  let valuesList = tableMeta.values[listName];
+                  if (!valuesList) {
+                    valuesList = [];
+                    tableMeta.values[listName] = valuesList;
                   }
-                  if (tableMeta.values) {
-                    let valuesList = tableMeta.values[listName];
-                    if (!valuesList) {
-                      valuesList = [];
-                      tableMeta.values[listName] = valuesList;
-                    }
-                    valuesList.push(column);
-                  }
-                });
-              }
-            };
-
-            if (data.values) {
-              splitOptimizerValuesPerTable('filterColumns');
-              splitOptimizerValuesPerTable('groupbyColumns');
-              splitOptimizerValuesPerTable('joinColumns');
-              splitOptimizerValuesPerTable('orderbyColumns');
-              splitOptimizerValuesPerTable('selectColumns');
+                  valuesList.push(column);
+                }
+              });
             }
+          };
 
-            const tablePromises: Promise<void>[] = Object.keys(perTable).map(
-              path =>
-                new Promise<void>(async resolve => {
-                  try {
-                    const entry = await this.getEntry({
-                      namespace: options.namespace,
-                      compute: options.compute,
-                      path: path
-                    });
-                    const applyPromise = entry.applyOptimizerResponseToChildren(perTable[path], {
-                      ...options,
-                      silenceErrors: true
-                    });
-                    cancellablePromises.push(applyPromise);
-                    popularEntries.push(...(await applyPromise));
-                  } catch (err) {}
-                  resolve();
-                })
-            );
+          if (data.values) {
+            splitOptimizerValuesPerTable('filterColumns');
+            splitOptimizerValuesPerTable('groupbyColumns');
+            splitOptimizerValuesPerTable('joinColumns');
+            splitOptimizerValuesPerTable('orderbyColumns');
+            splitOptimizerValuesPerTable('selectColumns');
+          }
 
-            Promise.all(tablePromises).finally(() => {
-              resolve(popularEntries);
-            });
-          })
-          .fail(() => {
+          const tablePromises: Promise<void>[] = Object.keys(perTable).map(
+            path =>
+              new Promise<void>(async resolve => {
+                try {
+                  const entry = await this.getEntry({
+                    namespace: options.namespace,
+                    compute: options.compute,
+                    path: path
+                  });
+                  const applyPromise = entry.applyOptimizerResponseToChildren(perTable[path], {
+                    ...options,
+                    silenceErrors: true
+                  });
+                  cancellablePromises.push(applyPromise);
+                  popularEntries.push(...(await applyPromise));
+                } catch (err) {}
+                resolve();
+              })
+          );
+
+          Promise.all(tablePromises).finally(() => {
             resolve(popularEntries);
           });
+        } catch (err) {
+          resolve(popularEntries);
+        }
       }
     );
     return applyCancellable(popularityPromise);
@@ -856,14 +855,17 @@ export default {
     } & CatalogGetOptions
   ): CancellablePromise<DataCatalogEntry[]> =>
     new CancellablePromise<DataCatalogEntry[]>(async (resolve, reject, onCancel) => {
-      const entry = await getCatalog(options.connector).getEntry(options);
+      try {
+        const entry = await getCatalog(options.connector).getEntry(options);
+        const childPromise = entry.getChildren(options);
+        onCancel(() => {
+          childPromise.cancel();
+        });
 
-      const childPromise = entry.getChildren(options);
-      onCancel(() => {
-        childPromise.cancel();
-      });
-
-      return applyCancellable(childPromise, options);
+        resolve(applyCancellable(childPromise, options));
+      } catch (err) {
+        reject(err);
+      }
     }),
 
   getCatalog,
