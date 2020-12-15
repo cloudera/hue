@@ -51,10 +51,11 @@ class DataCatalogContext {
       const catalogEntry = self.catalogEntry();
       if (catalogEntry) {
         for (let i = 0; i < catalogEntry.path.length; i++) {
+          const path = catalogEntry.path.slice(0, i + 1);
           result.push({
             name: catalogEntry.path[i],
             isActive: i === catalogEntry.path.length - 1,
-            path: catalogEntry.path.slice(0, i + 1),
+            path,
             catalogEntry: self.catalogEntry,
             makeActive: function () {
               self
@@ -63,10 +64,13 @@ class DataCatalogContext {
                   namespace: self.catalogEntry().namespace,
                   compute: self.catalogEntry().compute,
                   connector: self.catalogEntry().connector,
-                  path: this.path,
+                  path,
                   temporaryOnly: self.catalogEntry().isTemporary
                 })
-                .then(self.catalogEntry);
+                .then(self.catalogEntry)
+                .catch(err => {
+                  console.warn(err);
+                });
             }
           });
         }
