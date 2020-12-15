@@ -16,6 +16,7 @@
 
 import axios, { AxiosError, AxiosTransformer } from 'axios';
 import qs from 'qs';
+import huePubSub from 'utils/huePubSub';
 
 import { CancellablePromise } from './cancellablePromise';
 import hueUtils from 'utils/hueUtils';
@@ -100,7 +101,7 @@ export const post = <T, U = unknown, E = string>(
       if (!options || !options.silenceErrors) {
         hueUtils.logError(response);
         if (message.indexOf('AuthorizationException') === -1) {
-          $(document).trigger('error', message);
+          huePubSub.publish('hue.error', message);
         }
       }
     };
