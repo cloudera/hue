@@ -313,7 +313,7 @@ class Notebook(object):
       if handle['status'] == 0 and handle['query_status']['status'] not in ('waiting', 'running'):
         if include_results and handle['query_status']['status'] == 'available':
           handle.update(
-            self.fetch_result_data(request.user, operation_id=operation_id)
+            self.fetch_result_data(request, operation_id=operation_id)
           )
           # TODO: close
         return handle
@@ -341,10 +341,10 @@ class Notebook(object):
 
     return _check_status(request, operation_id=operation_id)
 
-  def fetch_result_data(self, user, operation_id):
+  def fetch_result_data(self, request, operation_id):
     from notebook.api import _fetch_result_data
 
-    return _fetch_result_data(user, operation_id=operation_id, rows=100, start_over=False, nulls_only=True)
+    return _fetch_result_data(request, operation_id=operation_id, rows=100, start_over=False, nulls_only=True)
 
 
 def get_interpreter(connector_type, user=None):

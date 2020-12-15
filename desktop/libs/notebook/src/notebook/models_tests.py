@@ -20,15 +20,14 @@ import logging
 import json
 import sys
 
-from django.urls import reverse
 from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.connectors.models import Connector
+from desktop.models import Document2
 from useradmin.models import User
 
 from notebook.conf import EXAMPLES
-from notebook.models import install_custom_examples
+from notebook.models import install_custom_examples, Analytics
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock, MagicMock
@@ -37,6 +36,23 @@ else:
 
 
 LOG = logging.getLogger(__name__)
+
+
+class TestAnalytics(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test")
+
+  def test_basic_stats(self):
+    try:
+      doc, created = Document2.objects.get_or_create(name='test_query_stats', type='query-hive', owner=self.user, data={})
+
+      Analytics.admin_stats()
+      Analytics.user_stats(user=self.user)
+      Analytics.query_stats(query=doc)
+    finally:
+      doc.delete()
 
 
 class TestInstallCustomExamples():

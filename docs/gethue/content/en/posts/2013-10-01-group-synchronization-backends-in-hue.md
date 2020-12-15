@@ -74,7 +74,7 @@ categories:
   def sync(self, request):
     user = request.user
 
-    if not user or not user.is_authenticated():
+    if not user or not user.is_authenticated:
       return
 
     if not User.objects.filter(username=user.username, userprofile__creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists():

@@ -315,15 +315,14 @@ def fetch_result_data(request):
       snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
     )
 
-    response = _fetch_result_data(request.user, notebook, snippet, operation_id, rows=rows, start_over=start_over)
+    response = _fetch_result_data(request, notebook, snippet, operation_id, rows=rows, start_over=start_over)
     response['status'] = 0
 
     return JsonResponse(response)
 
 
-def _fetch_result_data(user, notebook=None, snippet=None, operation_id=None, rows=100, start_over=False, nulls_only=False):
-  snippet = _get_snippet(user, notebook, snippet, operation_id)
-  request = MockRequest(user)
+def _fetch_result_data(request, notebook=None, snippet=None, operation_id=None, rows=100, start_over=False, nulls_only=False):
+  snippet = _get_snippet(request.user, notebook, snippet, operation_id)
 
   response = {
     'result': get_api(request, snippet).fetch_result(notebook, snippet, rows, start_over)

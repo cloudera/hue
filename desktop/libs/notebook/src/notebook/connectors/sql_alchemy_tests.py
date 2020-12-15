@@ -254,7 +254,8 @@ class TestApi(object):
       'options': {
         'url': 'presto://hue:8080/hue',
         'session': {},
-      }
+      },
+      'dialect_properties': {},
     }
 
     with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._create_engine') as _create_engine:

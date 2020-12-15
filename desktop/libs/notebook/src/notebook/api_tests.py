@@ -45,7 +45,7 @@ from notebook.api import _historify
 from notebook.connectors.base import Notebook, QueryError, Api, QueryExpired
 from notebook.decorators import api_error_handler
 from notebook.conf import get_ordered_interpreters, INTERPRETERS_SHOWN_ON_WHEEL, INTERPRETERS
-from notebook.models import Analytics
+
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock
@@ -640,38 +640,38 @@ class TestNotebookApiMocked(object):
 def test_get_interpreters_to_show():
   default_interpreters = OrderedDict((
       ('hive', {
-          'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True, 'options': {}, 'dialect_properties': None,
+          'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True, 'options': {}, 'dialect_properties': {},
           'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
       }),
       ('spark', {
-          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': None,
+          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': {},
           'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
       }),
       ('pig', {
-          'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {}, 'dialect_properties': None,
+          'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {}, 'dialect_properties': {},
           'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
       }),
       ('java', {
-          'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': None,
+          'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': {},
           'is_catalog': False, 'category': 'editor', 'dialect': 'java'
       })
     ))
 
   expected_interpreters = OrderedDict((
       ('java', {
-        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': None,
+        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': {},
         'is_catalog': False, 'category': 'editor', 'dialect': 'java'
       }),
       ('pig', {
-        'name': 'Pig', 'interface': 'pig', 'is_sql': False, 'type': 'pig', 'options': {}, 'dialect_properties': None,
+        'name': 'Pig', 'interface': 'pig', 'is_sql': False, 'type': 'pig', 'options': {}, 'dialect_properties': {},
         'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
       }),
       ('hive', {
-          'name': 'Hive', 'interface': 'hiveserver2', 'is_sql': True, 'type': 'hive', 'options': {}, 'dialect_properties': None,
+          'name': 'Hive', 'interface': 'hiveserver2', 'is_sql': True, 'type': 'hive', 'options': {}, 'dialect_properties': {},
           'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
       }),
       ('spark', {
-          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': None,
+          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': {},
           'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
       })
     ))
@@ -687,11 +687,10 @@ def test_get_interpreters_to_show():
     appmanager.load_apps(APP_BLACKLIST.get())
     notebook.conf.INTERPRETERS_CACHE = None
 
+    # 'get_interpreters_to_show should return the same as get_interpreters when interpreters_shown_on_wheel is unset'
     assert_equal(
-      list(default_interpreters.values()), get_ordered_interpreters(),
-      'get_interpreters_to_show should return the same as get_interpreters when interpreters_shown_on_wheel is unset'
+      list(default_interpreters.values()), get_ordered_interpreters()
     )
-
 
     resets.append(INTERPRETERS_SHOWN_ON_WHEEL.set_for_testing('java,pig'))
 
@@ -823,23 +822,6 @@ class TestQueriesMetrics(object):
       c = Client()
       response = c.get('/metrics')
       assert_true(b'hue_queries_numbers 12500.0' in response.content, response.content)
-
-
-class TestAnalytics(object):
-
-  def setUp(self):
-    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
-    self.user = User.objects.get(username="test")
-
-  def test_basic_stats(self):
-    try:
-      doc, created = Document2.objects.get_or_create(name='test_query_stats', type='query-hive', owner=self.user, data={})
-
-      Analytics.admin_stats()
-      Analytics.user_stats(user=self.user)
-      Analytics.query_stats(query=doc)
-    finally:
-      doc.delete()
 
 
 class TestEditor(object):

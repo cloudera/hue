@@ -151,7 +151,7 @@ jobs:
           command: |
             cd /usr/share/hue
 
-            ./build/env/bin/hue test unit --with-xunit --with-cover
+            PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
 
       - run:
           name: run js tests
@@ -214,7 +214,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            ./build/env/bin/hue test unit --with-xunit --with-cover
+            PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
 
       # - run:
       #     name: install dependencies
@@ -248,7 +248,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            ./build/env/bin/hue test unit --with-xunit --with-cover
+            PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
 
 
 workflows:

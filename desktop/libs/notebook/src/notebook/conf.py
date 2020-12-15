@@ -127,7 +127,7 @@ def get_ordered_interpreters(user=None):
       "interface": i['interface'],
       "options": i['options'],
       'dialect': i.get('dialect', i['name']).lower(),
-      'dialect_properties': i.get('dialect_properties'),
+      'dialect_properties': i.get('dialect_properties') or {},  # Empty when connectors off
       'category': i.get('category', 'editor'),
       "is_sql": i.get('is_sql') or \
           i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy", "ksql", "flink"] or \
@@ -375,7 +375,7 @@ def config_validator(user, interpreters=None):
   client = Client()
   client.force_login(user=user)
 
-  if not user.is_authenticated():
+  if not user.is_authenticated:
     res.append(('Editor', _('Could not authenticate with user %s to validate interpreters') % user))
 
   if interpreters is None:
