@@ -19,6 +19,7 @@ NICE_NAME = "User Admin"
 REQUIRES_HADOOP = False
 ICON = "useradmin/art/icon_useradmin_48.png"
 MENU_INDEX = 60
+IS_URL_NAMESPACED = True
 
 PERMISSION_ACTIONS = (
   ("access_view:useradmin:edit_user", "Access to profile page on User Admin"),

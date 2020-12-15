@@ -361,7 +361,7 @@ def save_file(request):
   except Exception as e:
     raise PopupException(_("The file could not be saved"), detail=e)
 
-  request.path = reverse("filebrowser_views_edit", kwargs=dict(path=path))
+  request.path = reverse("filebrowser:filebrowser_views_edit", kwargs=dict(path=path))
   return edit(request, path, form)
 
 
@@ -665,7 +665,7 @@ def display(request, path):
   # display inline files just if it's not an ajax request
   if not request.is_ajax():
     if _can_inline_display(path):
-      return redirect(reverse('filebrowser_views_download', args=[path]) + '?disposition=inline')
+      return redirect(reverse('filebrowser:filebrowser_views_download', args=[path]) + '?disposition=inline')
 
   stats = request.fs.stats(path)
   encoding = request.GET.get('encoding') or i18n.get_site_encoding()

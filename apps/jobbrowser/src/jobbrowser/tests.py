@@ -132,7 +132,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
   def create_design(cls):
     job_name = '%s_%s' % (cls.username, 'sleep_job')
     if not Document.objects.available_docs(Workflow, cls.user).filter(name=job_name).exists():
-      response = cls.client.post(reverse('jobsub.views.new_design',
+      response = cls.client.post(reverse('jobsub:jobsub.views.new_design',
         kwargs={'node_type': 'mapreduce'}),
         data={'name': job_name,
               'description': '',
@@ -189,7 +189,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
       LOG.exception('failed to teardown tests')
 
     job_name = '%s_%s' % (TestJobBrowserWithHadoop.username, 'test_failed_jobs-1')
-    response = TestJobBrowserWithHadoop.client.post(reverse('jobsub.views.new_design', kwargs={'node_type': 'mapreduce'}), {
+    response = TestJobBrowserWithHadoop.client.post(reverse('jobsub:jobsub.views.new_design', kwargs={'node_type': 'mapreduce'}), {
         'name': [job_name],
         'description': ['description test_failed_jobs-1'],
         'args': '',

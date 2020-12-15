@@ -35,7 +35,7 @@ ${ comps.menubar() }
     <h1 class="card-heading simple">${_('Task View: Job: %(jobId)s') % dict(jobId=job.jobId_short)}</h1>
     <div class="card-body">
       <p>
-        <form method="get" action="${ url('jobbrowser.views.tasks', job=job.jobId) }">
+        <form method="get" action="${ url('jobbrowser:jobbrowser.views.tasks', job=job.jobId) }">
           <b>${_('Filter tasks:')}</b>
           <select name="taskstate" class="submitter">
             <option value="">${_('All states')}</option>
@@ -81,7 +81,7 @@ ${ comps.menubar() }
           <tr>
             <td data-row-selector-exclude="true">
                 %if t.taskAttemptIds:
-                <a href="${ url('single_task_attempt_logs', job=t.jobId, taskid=t.taskId, attemptid=t.taskAttemptIds[-1]) }" data-row-selector-exclude="true"><i class="fa fa-tasks"></i></a>
+                <a href="${ url('jobbrowser:single_task_attempt_logs', job=t.jobId, taskid=t.taskId, attemptid=t.taskAttemptIds[-1]) }" data-row-selector-exclude="true"><i class="fa fa-tasks"></i></a>
                 %endif
             </td>
             <td>${t.taskId_short}</td>
@@ -90,7 +90,7 @@ ${ comps.menubar() }
               <div class="bar">${ "%d" % (t.progress * 100) }%</div>
             </td>
             <td>
-              <a href="${ url('jobbrowser.views.tasks', job=job.jobId) }?${ get_state_link(request, 'taskstate', t.state.lower()) }"
+              <a href="${ url('jobbrowser:jobbrowser.views.tasks', job=job.jobId) }?${ get_state_link(request, 'taskstate', t.state.lower()) }"
                  title="${ _('Show only %(state)s tasks') % dict(state=t.state.lower()) }"
                  class="${ t.state.lower() }">${ t.state.lower() }
               </a>
@@ -98,7 +98,7 @@ ${ comps.menubar() }
             <td>${t.mostRecentState}</td>
             <td>${t.execStartTimeFormatted}</td>
             <td>${t.execFinishTimeFormatted}</td>
-            <td><a href="${ url('jobbrowser.views.single_task', job=job.jobId, taskid=t.taskId) }" data-row-selector="true">${_('Attempts')}</a></td>
+            <td><a href="${ url('jobbrowser:jobbrowser.views.single_task', job=job.jobId, taskid=t.taskId) }" data-row-selector="true">${_('Attempts')}</a></td>
           </tr>
         %endfor
         </tbody>

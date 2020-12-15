@@ -40,13 +40,13 @@
             <tr>
                 <td data-row-selector-exclude="true">
                 %if task.taskAttemptIds:
-                    <a href="${ url('single_task_attempt_logs', job=task.jobId, taskid=task.taskId, attemptid=task.taskAttemptIds[-1]) }"
+                    <a href="${ url('jobbrowser:single_task_attempt_logs', job=task.jobId, taskid=task.taskId, attemptid=task.taskAttemptIds[-1]) }"
                         data-row-selector="true"><i class="fa fa-tasks"></i>
                     </a>
                 %endif
                 </td>
                 <td>
-                    <a title="${_('View this task')}" href="${ url('jobbrowser.views.single_task', job=job.jobId, taskid=task.taskId) }"
+                    <a title="${_('View this task')}" href="${ url('jobbrowser:jobbrowser.views.single_task', job=job.jobId, taskid=task.taskId) }"
                         data-row-selector-exclude="true">${task.taskId_short}
                     </a>
                 </td>
@@ -241,7 +241,7 @@ ${ comps.menubar() }
           <li class="nav-header">${_('Status')}</li>
           <li class="white" id="jobStatus">&nbsp;</li>
           <li class="nav-header">${_('Logs')}</li>
-          <li><a href="${ url('jobbrowser.views.job_single_logs', job=job.jobId) }"><i class="fa fa-tasks"></i> ${_('Logs')}</a></li>
+          <li><a href="${ url('jobbrowser:jobbrowser.views.job_single_logs', job=job.jobId) }"><i class="fa fa-tasks"></i> ${_('Logs')}</a></li>
           % if not job.is_retired:
           <li class="nav-header">${_('Maps')}</li>
           <li class="white" id="jobMaps">&nbsp;</li>
@@ -309,7 +309,7 @@ ${ comps.menubar() }
                       % for attempt in job.job_attempts['jobAttempt']:
                       <tr>
                         <td>
-                          <a href="${ url('job_attempt_logs', job=job.jobId, attempt_index=loop.index) }" data-row-selector="true">
+                          <a href="${ url('jobbrowser:job_attempt_logs', job=job.jobId, attempt_index=loop.index) }" data-row-selector="true">
                             <i class="fa fa-tasks"></i>
                           </a>
                         </td>
@@ -330,14 +330,14 @@ ${ comps.menubar() }
                   <br/>
                 % else:
                   <div id="failedTasksContainer">
-                    <a style="float:right;margin-right:10px;margin-top: 10px" href="${url('jobbrowser.views.tasks', job=job.jobId)}?taskstate=failed">${_('View All Failed Tasks')} &raquo;</a>
+                    <a style="float:right;margin-right:10px;margin-top: 10px" href="${url('jobbrowser:jobbrowser.views.tasks', job=job.jobId)}?taskstate=failed">${_('View All Failed Tasks')} &raquo;</a>
                     <h3>${_('Failed Tasks')}</h3>
                     <div>
                       ${task_table('failedTasks', failed_tasks)}
                     </div>
                   </div>
                   <div>
-                  <a style="float:right;margin-right:10px;margin-top: 10px" href="${url('jobbrowser.views.tasks', job=job.jobId)}">${_('View All Tasks')} &raquo;</a>
+                  <a style="float:right;margin-right:10px;margin-top: 10px" href="${url('jobbrowser:jobbrowser.views.tasks', job=job.jobId)}">${_('View All Tasks')} &raquo;</a>
                   <h3>${_('Recent Tasks')}</h3>
                   <div>
                     ${task_table('recentTasks', recent_tasks)}

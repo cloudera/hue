@@ -16,3 +16,4 @@
 DJANGO_APPS = [ "proxy" ]
 NICE_NAME = "Proxy"
 REQUIRES_HADOOP = False
+IS_URL_NAMESPACED = True

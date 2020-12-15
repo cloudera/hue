@@ -332,7 +332,7 @@ def massage_job_urls_for_json(jobs):
   for job in jobs:
     massaged_jobs.append({
       'name': job,
-      'url': reverse('jobbrowser.views.single_job', kwargs={'job': job})
+      'url': reverse('jobbrowser:jobbrowser.views.single_job', kwargs={'job': job})
     })
   return massaged_jobs
 
