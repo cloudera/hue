@@ -212,7 +212,13 @@ class AceLocationHandler {
                                 return true;
                               });
                             }
+                          })
+                          .catch(() => {
+                            // Ignore
                           });
+                      })
+                      .catch(err => {
+                        // Ignore
                       });
                   }
                 }

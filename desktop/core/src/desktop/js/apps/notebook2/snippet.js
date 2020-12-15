@@ -792,7 +792,8 @@ export default class Snippet {
               }
               handleRiskResponse(data);
             })
-            .always(() => {
+            .catch(() => {})
+            .finally(() => {
               changeSubscription.dispose();
             });
         }
@@ -918,7 +919,8 @@ export default class Snippet {
         } else {
           $(document).trigger('error', data.message);
         }
-      });
+      })
+      .catch(() => {});
   }
 
   handleAjaxError(data, callback) {
@@ -1077,12 +1079,12 @@ export default class Snippet {
           $(document).trigger('error', data.message);
         }
       })
-      .fail(xhr => {
+      .catch(xhr => {
         if (xhr.status !== 502) {
           $(document).trigger('error', xhr.responseText);
         }
       })
-      .always(() => {
+      .finally(() => {
         this.compatibilityCheckRunning(false);
       });
   }

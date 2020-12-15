@@ -106,6 +106,7 @@ export interface AutocompleteParseResult {
     alias: string;
     columns: ColumnDetails[];
   }[];
+  locations: IdentifierLocation[];
   lowerCase: boolean;
   subQueries: SubQuery[];
   suggestAggregateFunctions?: {
