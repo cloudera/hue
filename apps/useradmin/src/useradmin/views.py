@@ -178,7 +178,7 @@ def massage_users_for_json(users, extended=False):
       'last_name': user.last_name,
       'email': user.email,
       'last_login': user.last_login,
-      'editURL': reverse('useradmin.views.edit_user', kwargs={'username': user.username})
+      'editURL': reverse('useradmin:useradmin.views.edit_user', kwargs={'username': user.username})
     }
     if extended:
       appendable['groups'] = massage_groups_for_json(user.groups.all())

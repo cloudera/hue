@@ -299,7 +299,7 @@ ${ hueIcons.symbols() }
       <ul class="dropdown-menu pull-right">
       % if view_profile:
       <li>
-        <a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-fw fa-key"></i>
+        <a href="${ url('useradmin:useradmin.views.edit_user', username=user.username) }"><i class="fa fa-fw fa-key"></i>
           % if is_ldap_setup:
             ${_('View Profile')}
           % else:
@@ -308,7 +308,7 @@ ${ hueIcons.symbols() }
         </a>
       </li>
         % if is_admin(user):
-          <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
+          <li><a href="${ url('useradmin:useradmin.views.list_users') }"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
         % endif
       % endif
       </ul>

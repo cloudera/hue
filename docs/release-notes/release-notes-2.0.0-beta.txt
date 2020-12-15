@@ -357,7 +357,7 @@ List of All Commits
 * HUE-633. [jobsub] Port examples to new design models
 * [test] Work around a webhdfs redirect bug in test
 * [doc] document dependency on libldap2-dev
-* HUE-648. [fb] filebrowser.views.view() makes too many filesystem calls
+* HUE-648. [fb] filebrowser:filebrowser.views.view() makes too many filesystem calls
 * HUE-635 Porting to Bootstrap 2
 * HUE-647 changed my home link and breadcrumbs
 * Various fixes: HUE-657, HUE-650, HUE-649, HUE-646, HUE-645, HUE-652, HUE-642 and HUE-643

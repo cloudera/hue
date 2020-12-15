@@ -109,7 +109,7 @@ def location_to_url(location, strict=True, is_embeddable=False):
       path = split_path[2]
 
     try:
-      filebrowser_path = reverse("filebrowser.views.view", kwargs=dict(path=path))
+      filebrowser_path = reverse("filebrowser:filebrowser.views.view", kwargs=dict(path=path))
     except Exception as e:
       LOG.warn('No table filesystem link: %s' % e)
       return None

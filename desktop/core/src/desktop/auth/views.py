@@ -155,7 +155,7 @@ def dt_login(request, from_modal=False):
           LOG.error('Could not create home directory at login for %s.' % user, exc_info=e)
 
         if require_change_password(userprofile):
-          return HttpResponseRedirect('/hue' + reverse('useradmin.views.edit_user', kwargs={'username': user.username}))
+          return HttpResponseRedirect('/hue' + reverse('useradmin:useradmin.views.edit_user', kwargs={'username': user.username}))
 
         userprofile.first_login = False
         userprofile.last_activity = datetime.now()

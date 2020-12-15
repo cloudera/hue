@@ -58,7 +58,7 @@ ${ commonheader("Hue Help", "help", user, request, "40px") | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
             % for app in apps:
-              <li class="${is_selected(app.name, current)}"><a href="${url("help.views.view", app=app.name, path="/")}">${app.nice_name}</a></li>
+              <li class="${is_selected(app.name, current)}"><a href="${url("help:help.views.view", app=app.name, path="/")}">${app.nice_name}</a></li>
             % endfor
         </ul>
       </div>
