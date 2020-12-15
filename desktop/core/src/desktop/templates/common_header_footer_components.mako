@@ -376,6 +376,9 @@ from metadata.conf import has_optimizer, OPTIMIZER
     $(document).on("warn", function (e, msg) {
       $.jHueNotify.warn(msg);
     });
+    window.huePubSub.subscribe('hue.error', function (msg) {
+      $.jHueNotify.error(msg);
+    });
     $(document).on("error", function (e, msg) {
       $.jHueNotify.error(msg);
     });
