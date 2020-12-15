@@ -27,13 +27,7 @@ import { getOptimizer } from './optimizer/optimizer';
 import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
-import CancellableJqPromise from 'api/cancellableJqPromise';
-import {
-  applyCancellable,
-  fetchAndSave,
-  FetchOptions,
-  forceSilencedErrors
-} from 'catalog/catalogUtils';
+import { applyCancellable, forceSilencedErrors } from 'catalog/catalogUtils';
 import { Compute, Connector, Namespace } from 'types/config';
 import { hueWindow } from 'types/types';
 import huePubSub from 'utils/huePubSub';
@@ -65,6 +59,10 @@ export interface KeySpecification {
   name: string;
 }
 
+export interface ForeignKeySpecification extends KeySpecification {
+  to: string;
+}
+
 export interface ExtendedColumn extends BaseDefinition, TimestampedData {
   name: string;
   type: string;
@@ -93,7 +91,7 @@ export interface TableSourceMeta extends TimestampedData {
   columns: string[];
   comment?: string | null;
   extended_columns: ExtendedColumn[];
-  foreign_keys?: KeySpecification[];
+  foreign_keys?: ForeignKeySpecification[];
   fields?: string[]; // TODO: On FieldSourceMeta?
   hdfs_link?: string;
   is_view?: boolean;
@@ -230,43 +228,6 @@ const shouldReload = (options?: CatalogGetOptions & { refreshAnalysis?: boolean 
   !!(!DataCatalog.cacheEnabled() || (options && (options.refreshCache || options.refreshAnalysis)));
 
 /**
- * Helper function to reload the nav opt metadata for the given entry
- */
-const reloadOptimizerMeta = (
-  entry: DataCatalogEntry,
-  apiOptions?: { silenceErrors?: boolean }
-): CancellablePromise<OptimizerMeta> => {
-  if (entry.dataCatalog.canHaveOptimizerMeta()) {
-    const optimizer = getOptimizer(entry.dataCatalog.connector);
-
-    entry.optimizerMetaPromise = new CancellablePromise<OptimizerMeta>(
-      (resolve, reject, onCancel) => {
-        const fetchPromise = fetchAndSave(
-          (<(options: FetchOptions) => CancellableJqPromise<OptimizerMeta>>(
-            (<unknown>optimizer.fetchOptimizerMeta)
-          )).bind(apiHelper),
-          val => {
-            entry.optimizerMeta = val;
-          },
-          entry,
-          apiOptions
-        );
-
-        onCancel(() => {
-          fetchPromise.cancel();
-          entry.optimizerMetaPromise = undefined;
-        });
-
-        fetchPromise.then(resolve).fail(reject);
-      }
-    );
-  } else {
-    entry.optimizerMetaPromise = CancellablePromise.reject();
-  }
-  return entry.optimizerMetaPromise;
-};
-
-/**
  * Helper function to get the multi table catalog version of a catalog entry
  */
 const getMultiTableEntry = async (catalogEntry: DataCatalogEntry): Promise<MultiTableEntry> => {
@@ -375,6 +336,9 @@ export default class DataCatalogEntry {
             parent.navigatorMetaForChildrenPromise = undefined;
             parent.optimizerPopularityForChildrenPromise = undefined;
           }
+        })
+        .catch(err => {
+          console.warn(err);
         });
     }
   }
@@ -382,7 +346,7 @@ export default class DataCatalogEntry {
   /**
    * Resets the entry and clears the cache
    */
-  async clearCache(options: {
+  async clearCache(options?: {
     cascade?: boolean;
     silenceErrors?: boolean;
     targetChild?: string;
@@ -422,7 +386,6 @@ export default class DataCatalogEntry {
 
       onCancel(() => {
         fetchPromise.cancel();
-        this.analysisPromise = undefined;
       });
 
       try {
@@ -439,58 +402,75 @@ export default class DataCatalogEntry {
 
   private reloadNavigatorMeta(options?: ReloadOptions): CancellablePromise<NavigatorMeta> {
     if (this.canHaveNavigatorMetadata()) {
-      this.navigatorMetaPromise = new CancellablePromise<NavigatorMeta>(
-        async (resolve, reject, onCancel) => {
-          onCancel(() => {
-            this.navigatorMetaPromise = undefined;
-          });
-          try {
-            this.navigatorMeta = await fetchNavigatorMetadata({ ...options, entry: this });
-            resolve(this.navigatorMeta);
-          } catch (err) {
-            reject(err || 'Fetch failed');
-            return;
-          }
-          this.saveLater();
-          if (this.commentObservable) {
-            this.commentObservable(this.getResolvedComment());
-          }
+      this.navigatorMetaPromise = new CancellablePromise<NavigatorMeta>(async (resolve, reject) => {
+        try {
+          this.navigatorMeta = await fetchNavigatorMetadata({ ...options, entry: this });
+          resolve(this.navigatorMeta);
+        } catch (err) {
+          reject(err || 'Fetch failed');
+          return;
         }
-      );
+        this.saveLater();
+        if (this.commentObservable) {
+          this.commentObservable(this.getResolvedComment());
+        }
+      });
     } else {
       this.navigatorMetaPromise = CancellablePromise.reject();
     }
     return applyCancellable(this.navigatorMetaPromise);
   }
 
-  private reloadPartitions(options?: ReloadOptions): CancellablePromise<Partitions> {
-    this.partitionsPromise = new CancellablePromise<Partitions>(
-      async (resolve, reject, onCancel) => {
-        onCancel(() => {
-          this.partitionsPromise = undefined;
-        });
+  /**
+   * Helper function to reload the nav opt metadata for the given entry
+   */
+  private reloadOptimizerMeta(options?: ReloadOptions): CancellablePromise<OptimizerMeta> {
+    const optimizer = getOptimizer(this.getConnector());
+    if (this.dataCatalog.canHaveOptimizerMeta()) {
+      this.optimizerMetaPromise = new CancellablePromise<OptimizerMeta>(
+        async (resolve, reject, onCancel) => {
+          const fetchPromise = optimizer.fetchOptimizerMeta({
+            path: this.path,
+            silenceErrors: options && options.silenceErrors
+          });
+          onCancel(() => {
+            fetchPromise.cancel();
+          });
 
-        try {
-          this.partitions = await fetchPartitions({ ...options, entry: this });
-          resolve(this.partitions);
-        } catch (err) {
-          reject(err || 'Fetch failed');
-          return;
+          try {
+            this.optimizerMeta = await fetchPromise;
+            resolve(this.optimizerMeta);
+          } catch (err) {
+            reject(err || 'Fetch failed');
+            return;
+          }
+          this.saveLater();
         }
-        this.saveLater();
+      );
+    } else {
+      this.optimizerMetaPromise = CancellablePromise.reject();
+    }
+    return applyCancellable(this.optimizerMetaPromise, options);
+  }
+
+  private reloadPartitions(options?: ReloadOptions): CancellablePromise<Partitions> {
+    this.partitionsPromise = new CancellablePromise<Partitions>(async (resolve, reject) => {
+      try {
+        this.partitions = await fetchPartitions({ ...options, entry: this });
+        resolve(this.partitions);
+      } catch (err) {
+        reject(err || 'Fetch failed');
+        return;
       }
-    );
+      this.saveLater();
+    });
     return applyCancellable(this.partitionsPromise, options);
   }
 
   private reloadSample(
     options?: ReloadOptions & { operation?: string }
   ): CancellablePromise<Sample> {
-    this.samplePromise = new CancellablePromise<Sample>(async (resolve, reject, onCancel) => {
-      onCancel(() => {
-        this.samplePromise = undefined;
-      });
-
+    this.samplePromise = new CancellablePromise<Sample>(async (resolve, reject) => {
       try {
         this.sample = await fetchSample({ ...options, entry: this });
         resolve(this.sample);
@@ -504,31 +484,25 @@ export default class DataCatalogEntry {
   }
 
   private reloadSourceMeta(options?: ReloadOptions): CancellablePromise<SourceMeta> {
-    this.sourceMetaPromise = new CancellablePromise<SourceMeta>(
-      async (resolve, reject, onCancel) => {
-        onCancel(() => {
-          this.sourceMetaPromise = undefined;
-        });
-
-        if (this.dataCatalog.invalidatePromise) {
-          try {
-            await this.dataCatalog.invalidatePromise;
-          } catch (err) {}
-        }
-
+    this.sourceMetaPromise = new CancellablePromise<SourceMeta>(async (resolve, reject) => {
+      if (this.dataCatalog.invalidatePromise) {
         try {
-          this.sourceMeta = await fetchSourceMetadata({
-            ...options,
-            entry: this
-          });
-          resolve(this.sourceMeta);
-        } catch (err) {
-          reject(err || 'Fetch failed');
-          return;
-        }
-        this.saveLater();
+          await this.dataCatalog.invalidatePromise;
+        } catch (err) {}
       }
-    );
+
+      try {
+        this.sourceMeta = await fetchSourceMetadata({
+          ...options,
+          entry: this
+        });
+        resolve(this.sourceMeta);
+      } catch (err) {
+        reject(err || 'Fetch failed');
+        return;
+      }
+      this.saveLater();
+    });
     return applyCancellable(this.sourceMetaPromise, options);
   }
 
@@ -573,6 +547,9 @@ export default class DataCatalogEntry {
    * Get the children of the catalog entry, columns for a table entry etc.
    */
   getChildren(options?: CatalogGetOptions): CancellablePromise<DataCatalogEntry[]> {
+    if (this.childrenPromise && this.childrenPromise.cancelled) {
+      this.childrenPromise = undefined;
+    }
     if (!this.childrenPromise && cachedOnly(options)) {
       return CancellablePromise.reject();
     }
@@ -584,16 +561,26 @@ export default class DataCatalogEntry {
     this.childrenPromise = new CancellablePromise<DataCatalogEntry[]>(
       async (resolve, reject, onCancel) => {
         let sourceMeta: SourceMeta | undefined;
+        let cancelled = false;
+        onCancel(() => {
+          cancelled = true;
+        });
         try {
-          const sourceMetaPromise = this.getSourceMeta(options);
-          onCancel(() => {
-            sourceMetaPromise.cancel();
-          });
-          sourceMeta = await sourceMetaPromise;
+          sourceMeta = await this.getSourceMeta(options);
         } catch (err) {}
 
-        if (!sourceMeta || sourceMeta.notFound) {
+        if (cancelled) {
+          reject('Cancelled');
+          return;
+        }
+
+        if (!sourceMeta) {
           reject('No source meta found');
+          return;
+        }
+
+        if (sourceMeta.notFound) {
+          resolve([]);
           return;
         }
 
@@ -636,37 +623,41 @@ export default class DataCatalogEntry {
               path: [...this.path, name]
             });
 
-            promise.then(catalogEntry => {
-              if (
-                !catalogEntry.definition ||
-                typeof catalogEntry.definition.index === 'undefined'
-              ) {
-                const definition: BaseDefinition =
-                  typeof entity === 'object' ? entity : { name: entity };
-                if (!definition.type) {
-                  if (this.path.length === 0) {
-                    definition.type = 'database';
-                  } else if (this.path.length === 1) {
-                    definition.type = 'table';
-                  } else if (this.path.length === 2) {
-                    definition.type = 'column';
+            promise
+              .then(catalogEntry => {
+                if (
+                  !catalogEntry.definition ||
+                  typeof catalogEntry.definition.index === 'undefined'
+                ) {
+                  const definition: BaseDefinition =
+                    typeof entity === 'object' ? entity : { name: entity };
+                  if (!definition.type) {
+                    if (this.path.length === 0) {
+                      definition.type = 'database';
+                    } else if (this.path.length === 1) {
+                      definition.type = 'table';
+                    } else if (this.path.length === 2) {
+                      definition.type = 'column';
+                    }
                   }
-                }
 
-                if ((<TableSourceMeta>sourceMeta).partition_keys) {
-                  definition.partitionKey = partitionKeys[name];
+                  if ((<TableSourceMeta>sourceMeta).partition_keys) {
+                    definition.partitionKey = partitionKeys[name];
+                  }
+                  if ((<TableSourceMeta>sourceMeta).primary_keys) {
+                    definition.primaryKey = primaryKeys[name];
+                  }
+                  if ((<TableSourceMeta>sourceMeta).foreign_keys) {
+                    definition.foreignKey = foreignKeys[name];
+                  }
+                  definition.index = index++;
+                  catalogEntry.definition = definition;
+                  catalogEntry.saveLater();
                 }
-                if ((<TableSourceMeta>sourceMeta).primary_keys) {
-                  definition.primaryKey = primaryKeys[name];
-                }
-                if ((<TableSourceMeta>sourceMeta).foreign_keys) {
-                  definition.foreignKey = foreignKeys[name];
-                }
-                definition.index = index++;
-                catalogEntry.definition = definition;
-                catalogEntry.saveLater();
-              }
-            });
+              })
+              .catch(err => {
+                console.warn(err);
+              });
             promises.push(promise);
           }
         });
@@ -688,17 +679,21 @@ export default class DataCatalogEntry {
                 compute: this.compute,
                 path: [...this.path, path]
               });
-              promise.then(catalogEntry => {
-                if (
-                  !catalogEntry.definition ||
-                  typeof catalogEntry.definition.index === 'undefined'
-                ) {
-                  definition.index = index++;
-                  definition.isMapValue = path === 'value';
-                  catalogEntry.definition = definition;
-                  catalogEntry.saveLater();
-                }
-              });
+              promise
+                .then(catalogEntry => {
+                  if (
+                    !catalogEntry.definition ||
+                    typeof catalogEntry.definition.index === 'undefined'
+                  ) {
+                    definition.index = index++;
+                    definition.isMapValue = path === 'value';
+                    catalogEntry.definition = definition;
+                    catalogEntry.saveLater();
+                  }
+                })
+                .catch(err => {
+                  console.warn(err);
+                });
               promises.push(promise);
             }
           });
@@ -717,6 +712,9 @@ export default class DataCatalogEntry {
   loadNavigatorMetaForChildren(
     options?: Omit<CatalogGetOptions, 'cachedOnly'>
   ): CancellablePromise<DataCatalogEntry[]> {
+    if (this.navigatorMetaForChildrenPromise && this.navigatorMetaForChildrenPromise.cancelled) {
+      this.navigatorMetaPromise = undefined;
+    }
     options = forceSilencedErrors(options);
 
     if (!this.canHaveNavigatorMetadata() || this.isField()) {
@@ -899,6 +897,12 @@ export default class DataCatalogEntry {
   loadOptimizerPopularityForChildren(
     options?: CatalogGetOptions
   ): CancellablePromise<DataCatalogEntry[]> {
+    if (
+      this.optimizerPopularityForChildrenPromise &&
+      this.optimizerPopularityForChildrenPromise.cancelled
+    ) {
+      this.optimizerPopularityForChildrenPromise = undefined;
+    }
     options = forceSilencedErrors(options);
 
     if (!this.dataCatalog.canHaveOptimizerMeta()) {
@@ -926,23 +930,28 @@ export default class DataCatalogEntry {
       );
     } else if (this.isDatabase() || this.isTableOrView()) {
       this.optimizerPopularityForChildrenPromise = new CancellablePromise<DataCatalogEntry[]>(
-        (resolve, reject, onCancel) => {
+        async (resolve, reject, onCancel) => {
           const cancellablePromises: Cancellable[] = [];
           onCancel(() => {
             cancellablePromises.forEach(cancellable => cancellable.cancel());
           });
 
-          const popularityPromise = getOptimizer(this.dataCatalog.connector).fetchPopularity({
+          const optimizer = getOptimizer(this.dataCatalog.connector);
+          const popularityPromise = optimizer.fetchPopularity({
             ...options,
             paths: [this.path]
           });
           cancellablePromises.push(popularityPromise);
 
-          popularityPromise.done((data: OptimizerResponse) => {
-            const applyPromise = this.applyOptimizerResponseToChildren(data, options);
+          try {
+            const optimzerResponse = await popularityPromise;
+            const applyPromise = this.applyOptimizerResponseToChildren(optimzerResponse, options);
             cancellablePromises.push(applyPromise);
-            applyPromise.then(resolve).catch(reject);
-          });
+            const entries = await applyPromise;
+            resolve(entries);
+          } catch (err) {
+            resolve([]);
+          }
         }
       );
     } else {
@@ -1034,7 +1043,6 @@ export default class DataCatalogEntry {
         resolve(this.definition.comment);
       } else {
         const sourceMetaPromise = this.getSourceMeta(options);
-        cancellablePromises.push(sourceMetaPromise);
         try {
           const sourceMeta = await sourceMetaPromise;
           resolve((sourceMeta && sourceMeta.comment) || '');
@@ -1310,7 +1318,7 @@ export default class DataCatalogEntry {
     if (this.isField()) {
       const type = this.getType();
       if (type) {
-        return `${displayName}(${type})`;
+        return `${displayName} (${type})`;
       }
     }
     return displayName;
@@ -1505,6 +1513,9 @@ export default class DataCatalogEntry {
    * Gets the source metadata for the entry. It will fetch it if not cached or if the refresh option is set.
    */
   getSourceMeta(options?: CatalogGetOptions): CancellablePromise<SourceMeta> {
+    if (this.sourceMetaPromise && this.sourceMetaPromise.cancelled) {
+      this.sourceMetaPromise = undefined;
+    }
     if (!this.sourceMetaPromise && cachedOnly(options)) {
       return CancellablePromise.reject();
     }
@@ -1522,6 +1533,9 @@ export default class DataCatalogEntry {
       refreshAnalysis?: boolean;
     }
   ): CancellablePromise<Analysis> {
+    if (this.analysisPromise && this.analysisPromise.cancelled) {
+      this.analysisPromise = undefined;
+    }
     if (!this.analysisPromise && cachedOnly(options)) {
       return CancellablePromise.reject();
     }
@@ -1535,6 +1549,9 @@ export default class DataCatalogEntry {
    * Gets the partitions for the entry. It will fetch it if not cached or if the refresh option is set.
    */
   getPartitions(options?: CatalogGetOptions): CancellablePromise<Partitions> {
+    if (this.partitionsPromise && this.partitionsPromise.cancelled) {
+      this.partitionsPromise = undefined;
+    }
     if (!this.isTableOrView() || (!this.partitionsPromise && cachedOnly(options))) {
       return CancellablePromise.reject();
     }
@@ -1548,6 +1565,9 @@ export default class DataCatalogEntry {
    * Gets the Navigator metadata for the entry. It will fetch it if not cached or if the refresh option is set.
    */
   getNavigatorMeta(options?: CatalogGetOptions): CancellablePromise<NavigatorMeta> {
+    if (this.navigatorMetaPromise && this.navigatorMetaPromise.cancelled) {
+      this.navigatorMetaPromise = undefined;
+    }
     options = forceSilencedErrors(options);
     if (!this.canHaveNavigatorMetadata() || (!this.navigatorMetaPromise && cachedOnly(options))) {
       return CancellablePromise.reject();
@@ -1562,6 +1582,9 @@ export default class DataCatalogEntry {
    * Gets the Nav Opt metadata for the entry. It will fetch it if not cached or if the refresh option is set.
    */
   getOptimizerMeta(options?: CatalogGetOptions): CancellablePromise<OptimizerMeta> {
+    if (this.optimizerMetaPromise && this.optimizerMetaPromise.cancelled) {
+      this.optimizerMetaPromise = undefined;
+    }
     options = forceSilencedErrors(options);
 
     if (!this.dataCatalog.canHaveOptimizerMeta() || !this.isTableOrView()) {
@@ -1571,7 +1594,7 @@ export default class DataCatalogEntry {
       return CancellablePromise.reject();
     }
     if (!this.optimizerMetaPromise || shouldReload(options)) {
-      return applyCancellable(reloadOptimizerMeta(this, options), options);
+      return this.reloadOptimizerMeta(options);
     }
     return applyCancellable(this.optimizerMetaPromise, options);
   }
@@ -1585,6 +1608,9 @@ export default class DataCatalogEntry {
       operation?: string;
     }
   ): CancellablePromise<Sample> {
+    if (this.samplePromise && this.samplePromise.cancelled) {
+      this.samplePromise = undefined;
+    }
     // This prevents caching of any non-standard sample queries, i.e. DISTINCT etc.
     if (options && options.operation && options.operation !== 'default') {
       const operation = options.operation;
@@ -1597,8 +1623,8 @@ export default class DataCatalogEntry {
     }
 
     // Check if parent has a sample that we can reuse
-    if (!this.samplePromise && this.isColumn()) {
-      const samplePromise = new CancellablePromise<Sample>(async (resolve, reject, onCancel) => {
+    if (!this.samplePromise && this.isColumn() && !shouldReload(options)) {
+      this.samplePromise = new CancellablePromise<Sample>(async (resolve, reject, onCancel) => {
         const cancellablePromises: Cancellable[] = [];
 
         onCancel(() => {
@@ -1627,7 +1653,7 @@ export default class DataCatalogEntry {
             };
             if (parentSample.meta) {
               for (let i = 0; i < parentSample.meta.length; i++) {
-                if (parentSample.meta[i].name.toLowerCase() === self.name.toLowerCase()) {
+                if (parentSample.meta[i].name.toLowerCase() === this.name.toLowerCase()) {
                   colSample.meta[0] = parentSample.meta[i];
                   parentSample.data.forEach(parentRow => {
                     colSample.data.push([parentRow[i]]);
@@ -1648,7 +1674,6 @@ export default class DataCatalogEntry {
           reject();
         } else {
           const reloadPromise = this.reloadSample(options);
-          cancellablePromises.push(reloadPromise);
           try {
             resolve(await reloadPromise);
           } catch (err) {
@@ -1656,8 +1681,7 @@ export default class DataCatalogEntry {
           }
         }
       });
-
-      return applyCancellable(samplePromise, options);
+      return applyCancellable(this.samplePromise, options);
     }
 
     if (!this.samplePromise && cachedOnly(options)) {
