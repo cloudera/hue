@@ -221,7 +221,7 @@ CONNECTOR_TYPES = [
       'has_reference_language': False,
       'has_reference_functions': False,
       'has_use_statement': False,
-      'trim_statement_semicolon': False,
+      'trim_statement_semicolon': True,
     }
   },
   {
