@@ -399,7 +399,6 @@ export class DataCatalog {
           if (tableEntry.optimizerPopularityForChildrenPromise) {
             const existingPopularEntries = await tableEntry.optimizerPopularityForChildrenPromise;
             popularEntries.push(...existingPopularEntries);
-            resolve();
           } else if (tableEntry.definition && tableEntry.definition.optimizerLoaded) {
             const childPromise = tableEntry.getChildren({ ...options, silenceErrors: true });
             cancellablePromises.push(childPromise);
@@ -409,13 +408,13 @@ export class DataCatalog {
                 popularEntries.push(childEntry);
               }
             });
-            resolve();
           } else {
             pathsToLoad.push(path);
           }
         } catch (err) {
           reject(err);
         }
+        resolve();
       });
       existingPromises.push(existingPromise);
     });
