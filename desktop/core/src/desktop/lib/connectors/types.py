@@ -36,8 +36,8 @@ CONNECTOR_TYPES = [
     'category': 'editor',
     'interface': 'hiveserver2',
     'settings': [
-      {'name': 'server_host', 'value': ''},
-      {'name': 'server_port', 'value': ''},
+      {'name': 'server_host', 'value': 'localhost'},
+      {'name': 'server_port', 'value': 10000},
       {'name': 'is_llap', 'value': False},  # cf. _get_session_by_id() or create a separate connector
     ],
     'properties': {
@@ -62,8 +62,8 @@ CONNECTOR_TYPES = [
     'dialect': 'impala',
     'interface': 'hiveserver2',
     'settings': [
-      {'name': 'server_host', 'value': ''},
-      {'name': 'server_port', 'value': ''},
+      {'name': 'server_host', 'value': 'localhost'},
+      {'name': 'server_port', 'value': 21050},
       {'name': 'impersonation_enabled', 'value': False},
     ],
     'category': 'editor',
@@ -90,7 +90,7 @@ CONNECTOR_TYPES = [
     'dialect': 'druid',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'},
+      {'name': 'url', 'value': 'druid://localhost:8082/druid/v2/sql/'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -146,7 +146,7 @@ CONNECTOR_TYPES = [
     'dialect': 'flink',
     'interface': 'flink',
     'settings': [
-      {'name': 'url', 'value': 'http://127.0.0.1:8083'},
+      {'name': 'url', 'value': 'http://localhost:8083'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -174,7 +174,7 @@ CONNECTOR_TYPES = [
     'dialect': 'sparksql',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'hive://sparksql-thrift-server:10000'},
+      {'name': 'url', 'value': 'hive://localhost:10000'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -202,8 +202,8 @@ CONNECTOR_TYPES = [
     'dialect': 'sparksql',
     'interface': 'hiveserver2',
     'settings': [
-      {'name': 'server_host', 'value': ''},
-      {'name': 'server_port', 'value': ''},
+      {'name': 'server_host', 'value': 'localhost'},
+      {'name': 'server_port', 'value': 10000},
       {'name': 'impersonation_enabled', 'value': False},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
@@ -288,7 +288,7 @@ CONNECTOR_TYPES = [
     'dialect': 'mysql',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'mysql://username:password@mysq-host:3306/hue'},
+      {'name': 'url', 'value': 'mysql://username:password@localhost:3306/hue'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -316,7 +316,7 @@ CONNECTOR_TYPES = [
     'dialect': 'postgresql',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'postgresql://username:password@host:5432/hue'},
+      {'name': 'url', 'value': 'postgresql://username:password@localhost:5432/hue'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -344,7 +344,7 @@ CONNECTOR_TYPES = [
     'dialect': 'presto',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'presto://host:8080/tpch'},
+      {'name': 'url', 'value': 'presto://localhost:8080/tpch'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
       {'name': 'has_impersonation', 'value': False},
@@ -373,7 +373,7 @@ CONNECTOR_TYPES = [
     'dialect': 'presto',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'presto://host:8080/catalog/default'},
+      {'name': 'url', 'value': 'presto://localhost:8080/catalog/default'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
       {'name': 'has_impersonation', 'value': False},
@@ -429,8 +429,8 @@ CONNECTOR_TYPES = [
     'dialect': 'calcite',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'server_host', 'value': ''},
-      {'name': 'server_port', 'value': ''},
+      {'name': 'server_host', 'value': 'localhost'},
+      {'name': 'server_port', 'value': 10000},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -567,7 +567,7 @@ CONNECTOR_TYPES = [
     'dialect': 'oracle',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'oracle://scott:tiger@dsn'},
+      {'name': 'url', 'value': 'oracle://user:password@localhost'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -595,7 +595,7 @@ CONNECTOR_TYPES = [
     'dialect': 'solr',
     'interface': 'solr',
     'settings': [
-      {'name': 'url', 'value': 'solr://<username>:<password>@<host>:<port>/solr/<collection>[?use_ssl=true|false]'},
+    {'name': 'url', 'value': 'solr://user:password@localhost:8983/solr/<collection>[?use_ssl=true|false]'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -651,7 +651,7 @@ CONNECTOR_TYPES = [
     'dialect': 'sql',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'jdbc:db2://gethue.com:50000/SQOOP'},
+      {'name': 'url', 'value': 'jdbc:db2://localhost:50000/SQOOP'},
       {'name': 'driver', 'value': 'com.ibm.db2.jcc.DB2Driver'},
       {'name': 'user', 'value': 'hue'},
       {'name': 'password', 'value': "hue"},
