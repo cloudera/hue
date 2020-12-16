@@ -941,7 +941,7 @@ class Snippet {
       self.variables().forEach(variable => {
         if (oLocations[variable.name()]) {
           activeSourcePromises.push(
-            oLocations[variable.name()].resolveCatalogEntry({ cancellable: true }).done(entry => {
+            oLocations[variable.name()].resolveCatalogEntry({ cancellable: true }).then(entry => {
               variable.path(entry.path.join('.'));
               variable.catalogEntry = entry;
 
@@ -1086,8 +1086,8 @@ class Snippet {
                 connector: self.connector(),
                 path: path
               })
-              .done(entry => {
-                entry.clearCache({ refreshCache: true, cascade: true, silenceErrors: true });
+              .then(entry => {
+                entry.clearCache({ cascade: true, silenceErrors: true });
               });
           }, 5000);
         }

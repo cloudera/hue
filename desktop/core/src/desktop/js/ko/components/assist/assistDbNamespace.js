@@ -118,7 +118,7 @@ class AssistDbNamespace {
       }
 
       if (window.HAS_OPTIMIZER && db && !db.popularityIndexSet && !self.nonSqlType) {
-        db.catalogEntry.loadOptimizerPopularityForChildren({ silenceErrors: true }).done(() => {
+        db.catalogEntry.loadOptimizerPopularityForChildren({ silenceErrors: true }).then(() => {
           const applyPopularity = () => {
             db.entries().forEach(entry => {
               if (
@@ -225,11 +225,11 @@ class AssistDbNamespace {
           path: [],
           definition: { type: 'source' }
         })
-        .done(catalogEntry => {
+        .then(catalogEntry => {
           self.catalogEntry = catalogEntry;
           self.catalogEntry
             .getChildren({ silenceErrors: self.navigationSettings.rightAssist })
-            .done(databaseEntries => {
+            .then(databaseEntries => {
               self.dbIndex = {};
               let hasNavMeta = false;
               const dbs = [];
@@ -253,7 +253,9 @@ class AssistDbNamespace {
               });
 
               if (!hasNavMeta && !self.nonSqlType) {
-                self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true });
+                try {
+                  self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true });
+                } catch (err) {}
               }
               self.databases(dbs);
 
@@ -261,10 +263,10 @@ class AssistDbNamespace {
                 callback();
               }
             })
-            .fail(() => {
+            .catch(() => {
               self.hasErrors(true);
             })
-            .always(() => {
+            .finally(() => {
               self.loaded(true);
               self.loadedDeferred.resolve();
               self.loading(false);

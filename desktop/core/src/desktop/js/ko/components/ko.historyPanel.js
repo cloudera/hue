@@ -281,7 +281,7 @@ class HistoryPanel {
                       connector: snippet.connector(),
                       path: []
                     })
-                    .done(entry => {
+                    .then(entry => {
                       entry.clearCache({ cascade: true, silenceErrors: true });
                     });
                 } else if (notebook.onSuccessUrl()) {

@@ -94,7 +94,7 @@ class AssistDashboardPanel {
           path: [fakeParentName],
           definition: { type: 'database' }
         })
-        .done(fakeDbCatalogEntry => {
+        .then(fakeDbCatalogEntry => {
           const assistFakeDb = new AssistDbEntry(
             fakeDbCatalogEntry,
             null,
@@ -114,7 +114,7 @@ class AssistDashboardPanel {
               ],
               definition: { type: 'table' }
             })
-            .done(collectionCatalogEntry => {
+            .then(collectionCatalogEntry => {
               const collectionEntry = new AssistDbEntry(
                 collectionCatalogEntry,
                 assistFakeDb,

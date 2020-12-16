@@ -56,12 +56,12 @@ class MetastoreDatabase {
     this.comment = ko.observable();
 
     this.comment.subscribe(newValue => {
-      this.catalogEntry.getComment().done(comment => {
+      this.catalogEntry.getComment().then(comment => {
         if (comment !== newValue) {
           this.catalogEntry
             .setComment(newValue)
-            .done(this.comment)
-            .fail(() => {
+            .then(this.comment)
+            .catch(() => {
               this.comment(comment);
             });
         }
@@ -110,18 +110,18 @@ class MetastoreDatabase {
       this.loadingComment(true);
       this.catalogEntry
         .getNavigatorMeta()
-        .done(this.navigatorMeta)
-        .always(() => {
+        .then(this.navigatorMeta)
+        .finally(() => {
           this.loadingComment(false);
         });
     }
 
-    this.catalogEntry.getComment().done(this.comment);
+    this.catalogEntry.getComment().then(this.comment);
 
     this.loadingTables(true);
     this.catalogEntry
       .getChildren()
-      .done(tableEntries => {
+      .then(tableEntries => {
         this.tables(
           tableEntries.map(
             tableEntry =>
@@ -137,12 +137,12 @@ class MetastoreDatabase {
           this.loadingTableComments(true);
           this.catalogEntry
             .loadNavigatorMetaForChildren()
-            .done(() => {
+            .then(() => {
               this.tables().forEach(table => {
                 table.navigatorMeta(table.catalogEntry.navigatorMeta);
               });
             })
-            .always(() => {
+            .finally(() => {
               this.loadingTableComments(false);
             });
         }
@@ -150,21 +150,21 @@ class MetastoreDatabase {
           this.loadingTablePopularity(true);
           this.catalogEntry
             .loadOptimizerPopularityForChildren()
-            .done(() => {
+            .then(() => {
               this.tables().forEach(table => {
                 table.optimizerStats(table.catalogEntry.optimizerPopularity);
               });
             })
-            .always(() => {
+            .finally(() => {
               this.loadingTablePopularity(false);
             });
         }
         this.loaded(true);
       })
-      .fail(() => {
+      .catch(() => {
         this.tables([]);
       })
-      .always(() => {
+      .finally(() => {
         this.loadingTables(false);
         if (callback) {
           callback();
@@ -174,8 +174,9 @@ class MetastoreDatabase {
     this.loadingAnalysis(true);
     this.catalogEntry
       .getAnalysis()
-      .done(this.stats)
-      .always(() => {
+      .then(this.stats)
+      .catch(() => {})
+      .finally(() => {
         this.loadingAnalysis(false);
       });
 

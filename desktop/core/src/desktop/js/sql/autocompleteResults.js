@@ -552,12 +552,12 @@ class AutocompleteResults {
         );
         const sourceMeta = await new Promise((resolve, reject) => {
           this.onCancelFunctions.push(reject);
-          const sourceMetaDeferred = catalogEntry.getSourceMeta({
+          const sourceMetaPromise = catalogEntry.getSourceMeta({
             silenceErrors: true,
             cancellable: true
           });
-          this.cancellablePromises.push(sourceMetaDeferred);
-          sourceMetaDeferred.done(resolve).fail(reject);
+          this.cancellablePromises.push(sourceMetaPromise);
+          sourceMetaPromise.then(resolve).catch(reject);
         });
         if (typeof sourceMeta.type !== 'undefined') {
           return sourceMeta; // sourceMeta.samples is used in handleValues.
@@ -579,15 +579,15 @@ class AutocompleteResults {
             path: [],
             temporaryOnly: this.temporaryOnly
           })
-          .done(resolve)
-          .fail(reject);
+          .then(resolve)
+          .catch(reject);
       });
 
       return await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const childrenDeferred = entry.getChildren({ silenceErrors: true, cancellable: true });
-        this.cancellablePromises.push(childrenDeferred);
-        childrenDeferred.done(resolve).fail(reject);
+        const childrenPromise = entry.getChildren({ silenceErrors: true, cancellable: true });
+        this.cancellablePromises.push(childrenPromise);
+        childrenPromise.then(resolve).catch(reject);
       });
     } catch (err) {
       return [];
@@ -886,15 +886,15 @@ class AutocompleteResults {
               path: [database],
               temporaryOnly: this.temporaryOnly
             })
-            .done(resolve)
-            .fail(reject);
+            .then(resolve)
+            .catch(reject);
         });
 
         const tableEntries = await new Promise((resolve, reject) => {
           this.onCancelFunctions.push(reject);
-          const childrenDeferred = dbEntry.getChildren({ silenceErrors: true, cancellable: true });
-          this.cancellablePromises.push(childrenDeferred);
-          childrenDeferred.done(resolve).fail(reject);
+          const childrenPromise = dbEntry.getChildren({ silenceErrors: true, cancellable: true });
+          this.cancellablePromises.push(childrenPromise);
+          childrenPromise.then(resolve).catch(reject);
         });
 
         for (const tableEntry of tableEntries) {
@@ -1125,22 +1125,22 @@ class AutocompleteResults {
       const addColumnsFromEntry = async dataCatalogEntry => {
         const sourceMeta = await new Promise((resolve, reject) => {
           this.onCancelFunctions.push(reject);
-          const sourceMetaDeferred = dataCatalogEntry.getSourceMeta({
+          const sourceMetaPromise = dataCatalogEntry.getSourceMeta({
             silenceErrors: true,
             cancellable: true
           });
-          this.cancellablePromises.push(sourceMetaDeferred);
-          sourceMetaDeferred.done(resolve).fail(reject);
+          this.cancellablePromises.push(sourceMetaPromise);
+          sourceMetaPromise.then(resolve).catch(reject);
         });
 
         const childEntries = await new Promise((resolve, reject) => {
           this.onCancelFunctions.push(reject);
-          const childrenDeferred = dataCatalogEntry.getChildren({
+          const childrenPromise = dataCatalogEntry.getChildren({
             silenceErrors: true,
             cancellable: true
           });
-          this.cancellablePromises.push(childrenDeferred);
-          childrenDeferred.done(resolve).fail(reject);
+          this.cancellablePromises.push(childrenPromise);
+          childrenPromise.then(resolve).catch(reject);
         });
 
         for (const childEntry of childEntries) {
@@ -1482,19 +1482,19 @@ class AutocompleteResults {
             connector: this.snippet.connector(),
             paths: paths
           })
-          .done(resolve)
-          .fail(reject);
+          .then(resolve)
+          .catch(reject);
       });
 
       const topJoins = await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const topJoinsDeferred = multiTableEntry.getTopJoins({
+        const topJoinsPromise = multiTableEntry.getTopJoins({
           silenceErrors: true,
           cancellable: true,
           connector: this.snippet.connector()
         });
-        this.cancellablePromises.push(topJoinsDeferred);
-        topJoinsDeferred.done(resolve).fail(reject);
+        this.cancellablePromises.push(topJoinsPromise);
+        topJoinsPromise.then(resolve).catch(reject);
       });
 
       let totalCount = 0;
@@ -1607,19 +1607,19 @@ class AutocompleteResults {
             connector: this.snippet.connector(),
             paths: paths
           })
-          .done(resolve)
-          .fail(reject);
+          .then(resolve)
+          .catch(reject);
       });
 
       const topJoins = await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const topJoinsDeferred = multiTableEntry.getTopJoins({
+        const topJoinsPromise = multiTableEntry.getTopJoins({
           silenceErrors: true,
           cancellable: true,
           connector: this.snippet.connector()
         });
-        this.cancellablePromises.push(topJoinsDeferred);
-        topJoinsDeferred.done(resolve).fail(reject);
+        this.cancellablePromises.push(topJoinsPromise);
+        topJoinsPromise.then(resolve).catch(reject);
       });
 
       let totalCount = 0;
@@ -1701,19 +1701,19 @@ class AutocompleteResults {
             connector: this.snippet.connector(),
             paths: paths
           })
-          .done(resolve)
-          .fail(reject);
+          .then(resolve)
+          .catch(reject);
       });
 
       const topAggs = await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const topAggsDeferred = multiTableEntry.getTopAggs({
+        const topAggsPromise = multiTableEntry.getTopAggs({
           silenceErrors: true,
           cancellable: true,
           connector: this.snippet.connector()
         });
-        this.cancellablePromises.push(topAggsDeferred);
-        topAggsDeferred.done(resolve).fail(reject);
+        this.cancellablePromises.push(topAggsPromise);
+        topAggsPromise.then(resolve).catch(reject);
       });
 
       if (!topAggs.values || !topAggs.values.length) {
@@ -1819,7 +1819,7 @@ class AutocompleteResults {
     try {
       const entries = await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const popularityDeferred = dataCatalog
+        const popularityPromise = dataCatalog
           .getCatalog(this.snippet.connector())
           .loadOptimizerPopularityForTables({
             namespace: this.snippet.namespace(),
@@ -1828,8 +1828,8 @@ class AutocompleteResults {
             silenceErrors: true,
             cancellable: true
           });
-        this.cancellablePromises.push(popularityDeferred);
-        popularityDeferred.done(resolve).fail(reject);
+        this.cancellablePromises.push(popularityPromise);
+        popularityPromise.then(resolve).catch(reject);
       });
 
       let totalColumnCount = 0;
@@ -1942,19 +1942,19 @@ class AutocompleteResults {
             connector: this.snippet.connector(),
             paths: paths
           })
-          .done(resolve)
-          .fail(reject);
+          .then(resolve)
+          .catch(reject);
       });
 
       const topFilters = await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const topFiltersDeferred = multiTableEntry.getTopFilters({
+        const topFiltersPromise = multiTableEntry.getTopFilters({
           silenceErrors: true,
           cancellable: true,
           connector: this.snippet.connector()
         });
-        this.cancellablePromises.push(topFiltersDeferred);
-        topFiltersDeferred.done(resolve).fail(reject);
+        this.cancellablePromises.push(topFiltersPromise);
+        topFiltersPromise.then(resolve).catch(reject);
       });
 
       let totalCount = 0;
@@ -2035,18 +2035,18 @@ class AutocompleteResults {
             path: [db],
             temporaryOnly: this.temporaryOnly
           })
-          .done(resolve)
-          .fail(reject);
+          .then(resolve)
+          .catch(reject);
       });
 
       const childEntries = await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const popularityDeferred = entry.loadOptimizerPopularityForChildren({
+        const popularityPromise = entry.loadOptimizerPopularityForChildren({
           silenceErrors: true,
           cancellable: true
         });
-        this.cancellablePromises.push(popularityDeferred);
-        popularityDeferred.done(resolve).fail(reject);
+        this.cancellablePromises.push(popularityPromise);
+        popularityPromise.then(resolve).catch(reject);
       });
 
       let totalPopularity = 0;
@@ -2116,7 +2116,7 @@ class AutocompleteResults {
 
       const popularEntries = await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const popularityDeferred = dataCatalog
+        const popularityPromise = dataCatalog
           .getCatalog(this.snippet.connector())
           .loadOptimizerPopularityForTables({
             namespace: this.snippet.namespace(),
@@ -2125,8 +2125,8 @@ class AutocompleteResults {
             silenceErrors: true,
             cancellable: true
           });
-        this.cancellablePromises.push(popularityDeferred);
-        popularityDeferred.done(resolve).fail(reject);
+        this.cancellablePromises.push(popularityPromise);
+        popularityPromise.then(resolve).catch(reject);
       });
 
       let valueAttribute = '';
@@ -2333,18 +2333,18 @@ class AutocompleteResults {
             path: fetchedPath,
             temporaryOnly: this.temporaryOnly
           })
-          .done(resolve)
-          .fail(reject);
+          .then(resolve)
+          .catch(reject);
       });
 
       const sourceMeta = await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const sourceMetaDeferred = catalogEntry.getSourceMeta({
+        const sourceMetaPromise = catalogEntry.getSourceMeta({
           silenceErrors: true,
           cancellable: true
         });
-        this.cancellablePromises.push(sourceMetaDeferred);
-        sourceMetaDeferred.done(resolve).fail(reject);
+        this.cancellablePromises.push(sourceMetaPromise);
+        sourceMetaPromise.then(resolve).catch(reject);
       });
 
       if (
@@ -2385,18 +2385,18 @@ class AutocompleteResults {
             path: [],
             temporaryOnly: this.temporaryOnly
           })
-          .done(resolve)
-          .fail(reject);
+          .then(resolve)
+          .catch(reject);
       });
 
       const databaseEntries = await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const childrenDeferred = catalogEntry.getChildren({
+        const childrenPromise = catalogEntry.getChildren({
           silenceErrors: true,
           cancellable: true
         });
-        this.cancellablePromises.push(childrenDeferred);
-        childrenDeferred.done(resolve).fail(reject);
+        this.cancellablePromises.push(childrenPromise);
+        childrenPromise.then(resolve).catch(reject);
       });
 
       const firstIsDb = databaseEntries.some(dbEntry =>

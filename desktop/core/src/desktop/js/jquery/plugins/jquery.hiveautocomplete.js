@@ -199,7 +199,7 @@ Plugin.prototype.init = function () {
               compute: compute,
               path: path
             })
-            .done(childEntries => {
+            .then(childEntries => {
               if (
                 childEntries.some(childEntry => {
                   return childEntry.name === target;
@@ -207,7 +207,8 @@ Plugin.prototype.init = function () {
               ) {
                 onPathChange($el.val());
               }
-            });
+            })
+            .catch(() => {});
         });
       }, 500);
     }
@@ -320,13 +321,14 @@ Plugin.prototype.init = function () {
           compute: compute,
           path: []
         })
-        .done(dbEntries => {
+        .then(dbEntries => {
           callback(
             $.map(dbEntries, entry => {
               return entry.name;
             })
           );
-        });
+        })
+        .catch(() => {});
     });
   };
 
@@ -340,8 +342,8 @@ Plugin.prototype.init = function () {
           connector: { id: self.options.apiHelperType },
           path: [database]
         })
-        .done(entry => {
-          entry.getSourceMeta().done(callback);
+        .then(entry => {
+          entry.getSourceMeta().then(callback);
         });
     });
   };
@@ -356,8 +358,8 @@ Plugin.prototype.init = function () {
           connector: { id: self.options.apiHelperType },
           path: [database, table]
         })
-        .done(entry => {
-          entry.getSourceMeta().done(callback);
+        .then(entry => {
+          entry.getSourceMeta().then(callback);
         });
     });
   };

@@ -29,7 +29,6 @@ import apiQueueManager from 'api/apiQueueManager';
 import CancellableJqPromise from 'api/cancellableJqPromise';
 import hueDebug from 'utils/hueDebug';
 import huePubSub from 'utils/huePubSub';
-import hueUtils from 'utils/hueUtils';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 export const LINK_SHARING_PERMS = {
@@ -37,25 +36,6 @@ export const LINK_SHARING_PERMS = {
   WRITE: 'write',
   OFF: 'off'
 };
-
-/**
- * Wrapper around the response from the Query API
- *
- * @param {string} sourceType
- * @param {Object} response
- *
- * @constructor
- */
-class QueryResult {
-  constructor(sourceType, compute, response) {
-    this.id = hueUtils.UUID();
-    this.type = response.result && response.result.type ? response.result.type : sourceType;
-    this.compute = compute;
-    this.status = response.status || 'running';
-    this.result = response.result || {};
-    this.result.type = 'table';
-  }
-}
 
 class ApiHelper {
   constructor() {
@@ -1246,70 +1226,6 @@ class ApiHelper {
     return deferred.resolve().promise();
   }
 
-  /**
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {ContextCompute} options.compute
-   * @param {boolean} [options.silenceErrors]
-   * @param {number} [options.timeout]
-   *
-   * @param {string[]} [options.path] - The path to fetch
-   *
-   * @return {CancellableJqPromise}
-   */
-  fetchSourceMetadata(options) {
-    const deferred = $.Deferred();
-
-    const isQuery = options.sourceType.indexOf('-query') !== -1;
-    const sourceType = isQuery ? options.sourceType.replace('-query', '') : options.sourceType;
-
-    const request = $.ajax({
-      type: 'POST',
-      url:
-        URLS.AUTOCOMPLETE_API_PREFIX +
-        (isQuery ? options.path.slice(1) : options.path).join('/') +
-        (options.path.length ? '/' : ''),
-      data: {
-        notebook: {},
-        snippet: ko.mapping.toJSON({
-          type: sourceType,
-          source: isQuery ? 'query' : 'data'
-        }),
-        cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
-      },
-      timeout: options.timeout
-    })
-      .done(data => {
-        data.notFound =
-          data.status === 0 &&
-          data.code === 500 &&
-          data.error &&
-          (data.error.indexOf('Error 10001') !== -1 ||
-            data.error.indexOf('AnalysisException') !== -1);
-        data.hueTimestamp = Date.now();
-
-        // TODO: Display warning in autocomplete when an entity can't be found
-        // Hive example: data.error: [...] SemanticException [Error 10001]: Table not found default.foo
-        // Impala example: data.error: [...] AnalysisException: Could not resolve path: 'default.foo'
-        if (!data.notFound && successResponseIsError(data)) {
-          assistErrorCallback({
-            silenceErrors: options.silenceErrors,
-            errorCallback: deferred.reject
-          })(data);
-        } else {
-          deferred.resolve(data);
-        }
-      })
-      .fail(
-        assistErrorCallback({
-          silenceErrors: options.silenceErrors,
-          errorCallback: deferred.reject
-        })
-      );
-
-    return new CancellableJqPromise(deferred, request);
-  }
-
   updateSourceMetadata(options) {
     let url;
     const data = {
@@ -1347,57 +1263,6 @@ class ApiHelper {
       }
     }
     return simplePost(url, data, options);
-  }
-
-  /**
-   * Fetches the analysis for the given source and path
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {ContextCompute} options.compute
-   * @param {string} options.sourceType
-   * @param {string[]} options.path
-   *
-   * @return {CancellableJqPromise}
-   */
-  fetchAnalysis(options) {
-    const deferred = $.Deferred();
-
-    let url = '/notebook/api/describe/' + options.path[0];
-
-    if (options.path.length > 1) {
-      url += '/' + options.path[1] + '/';
-    }
-
-    if (options.path.length > 2) {
-      url += 'stats/' + options.path.slice(2).join('/');
-    }
-
-    const data = {
-      format: 'json',
-      cluster: JSON.stringify(options.compute),
-      source_type: options.sourceType
-    };
-
-    const request = simplePost(url, data, {
-      silenceErrors: options.silenceErrors,
-      successCallback: response => {
-        if (options.path.length === 1) {
-          if (response.data) {
-            response.data.hueTimestamp = Date.now();
-            deferred.resolve(response.data);
-          } else {
-            deferred.reject();
-          }
-        } else {
-          deferred.resolve(response);
-        }
-      },
-      errorCallback: deferred.reject
-    });
-
-    return new CancellableJqPromise(deferred, request);
   }
 
   /**
@@ -1454,130 +1319,6 @@ class ApiHelper {
       });
 
     return new CancellableJqPromise(deferred, request);
-  }
-
-  /**
-   * Refreshes the analysis for the given source and path
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {string} options.sourceType
-   * @param {ContextCompute} options.compute
-   * @param {string[]} options.path
-   *
-   * @return {CancellableJqPromise}
-   */
-  refreshAnalysis(options) {
-    if (options.path.length === 1) {
-      return this.fetchAnalysis(options);
-    }
-    const deferred = $.Deferred();
-
-    const promises = [];
-
-    const pollForAnalysis = (url, delay) => {
-      window.setTimeout(() => {
-        promises.push(
-          simplePost(url, undefined, {
-            silenceErrors: options.silenceErrors,
-            successCallback: data => {
-              promises.pop();
-              if (data.isSuccess) {
-                promises.push(
-                  this.fetchAnalysis(options).done(deferred.resolve).fail(deferred.reject)
-                );
-              } else if (data.isFailure) {
-                deferred.reject(data);
-              } else {
-                pollForAnalysis(url, 1000);
-              }
-            },
-            errorCallback: deferred.reject
-          })
-        );
-      }, delay);
-    };
-
-    const url =
-      '/' +
-      (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) +
-      '/api/analyze/' +
-      options.path.join('/') +
-      '/';
-
-    promises.push(
-      simplePost(url, undefined, {
-        silenceErrors: options.silenceErrors,
-        successCallback: data => {
-          promises.pop();
-          if (data.status === 0 && data.watch_url) {
-            pollForAnalysis(data.watch_url, 500);
-          } else {
-            deferred.reject();
-          }
-        },
-        errorCallback: deferred.reject
-      })
-    );
-
-    return new CancellableJqPromise(deferred, undefined, promises);
-  }
-
-  /**
-   * Checks the status for the given snippet ID
-   * Note: similar to notebook and search check_status.
-   *
-   * @param {Object} options
-   * @param {Object} options.notebookJson
-   * @param {Object} options.snippetJson
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @return {CancellableJqPromise}
-   */
-  whenAvailable(options) {
-    const deferred = $.Deferred();
-    const cancellablePromises = [];
-
-    let waitTimeout = -1;
-
-    deferred.fail(() => {
-      window.clearTimeout(waitTimeout);
-    });
-
-    const waitForAvailable = () => {
-      const request = simplePost(
-        '/notebook/api/check_status',
-        {
-          notebook: options.notebookJson,
-          snippet: options.snippetJson,
-          cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
-        },
-        {
-          silenceErrors: options.silenceErrors
-        }
-      )
-        .done(response => {
-          if (response && response.query_status && response.query_status.status) {
-            const status = response.query_status.status;
-            if (status === 'available') {
-              deferred.resolve(response.query_status);
-            } else if (status === 'running' || status === 'starting' || status === 'waiting') {
-              waitTimeout = window.setTimeout(() => {
-                waitForAvailable();
-              }, 500);
-            } else {
-              deferred.reject(response.query_status);
-            }
-          }
-        })
-        .fail(deferred.reject);
-
-      cancellablePromises.push(new CancellableJqPromise(request, request));
-    };
-
-    waitForAvailable();
-    return new CancellableJqPromise(deferred, undefined, cancellablePromises);
   }
 
   clearNotebookHistory(options) {
@@ -1726,201 +1467,16 @@ class ApiHelper {
   }
 
   /**
-   * Fetches samples for the given source and path
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {string} options.sourceType
-   * @param {ContextCompute} options.compute
-   * @param {number} [options.sampleCount] - Default 100
-   * @param {string[]} options.path
-   * @param {string} [options.operation] - Default 'default'
-   *
-   * @return {CancellableJqPromise}
-   */
-  fetchSample(options) {
-    const deferred = $.Deferred();
-
-    const cancellablePromises = [];
-
-    let notebookJson = null;
-    let snippetJson = null;
-
-    const cancelQuery = () => {
-      if (notebookJson) {
-        simplePost(
-          '/notebook/api/cancel_statement',
-          {
-            notebook: notebookJson,
-            snippet: snippetJson,
-            cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
-          },
-          { silenceErrors: options.silenceErrors }
-        );
-      }
-    };
-
-    simplePost(
-      URLS.SAMPLE_API_PREFIX + options.path.join('/') + (options.path.length ? '/' : ''),
-      {
-        notebook: {},
-        snippet: JSON.stringify({
-          type: options.sourceType,
-          compute: options.compute
-        }),
-        async: true,
-        operation: '"' + (options.operation || 'default') + '"',
-        cluster: ko.mapping.toJSON(options.compute ? options.compute : '""')
-      },
-      {
-        silenceErrors: options.silenceErrors
-      }
-    )
-      .done(sampleResponse => {
-        const queryResult = new QueryResult(options.sourceType, options.compute, sampleResponse);
-
-        notebookJson = JSON.stringify({ type: options.sourceType });
-        snippetJson = JSON.stringify(queryResult);
-
-        if (sampleResponse && sampleResponse.rows) {
-          // Sync results
-          const data = { data: sampleResponse.rows, meta: sampleResponse.full_headers };
-          data.hueTimestamp = Date.now();
-          deferred.resolve(data);
-        } else {
-          cancellablePromises.push(
-            this.whenAvailable({
-              notebookJson: notebookJson,
-              snippetJson: snippetJson,
-              compute: options.compute,
-              silenceErrors: options.silenceErrors
-            })
-              .done(resultStatus => {
-                if (resultStatus) {
-                  $.extend(true, queryResult.result, {
-                    handle: resultStatus
-                  });
-                }
-                const resultRequest = simplePost(
-                  '/notebook/api/fetch_result_data',
-                  {
-                    notebook: notebookJson,
-                    snippet: JSON.stringify(queryResult),
-                    rows: options.sampleCount || 100,
-                    startOver: 'false'
-                  },
-                  {
-                    silenceErrors: options.silenceErrors
-                  }
-                )
-                  .done(sampleResponse => {
-                    const data = (sampleResponse && sampleResponse.result) || {
-                      data: [],
-                      meta: []
-                    };
-                    data.hueTimestamp = Date.now();
-                    deferred.resolve(data);
-
-                    if (
-                      window.CLOSE_SESSIONS[options.sourceType] &&
-                      queryResult.result.handle &&
-                      queryResult.result.handle.session_id
-                    ) {
-                      this.closeSession({
-                        session: {
-                          type: options.sourceType,
-                          id: queryResult.result.handle.session_id
-                        }
-                      });
-                    }
-                  })
-                  .fail(deferred.reject);
-
-                cancellablePromises.push(resultRequest, resultRequest);
-              })
-              .fail(deferred.reject)
-          );
-        }
-      })
-      .fail(deferred.reject);
-
-    cancellablePromises.push({
-      cancel: cancelQuery
-    });
-
-    return new CancellableJqPromise(deferred, undefined, cancellablePromises);
-  }
-
-  /**
-   * Fetches a navigator entity for the given source and path
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {boolean} [options.isView] - Default false
-   * @param {string[]} options.path
-   *
-   * @return {CancellableJqPromise}
-   */
-  fetchNavigatorMetadata(options) {
-    const deferred = $.Deferred();
-    let url = URLS.NAV_API.FIND_ENTITY;
-
-    if (options.path.length === 1) {
-      url += '?type=database&name=' + options.path[0];
-    } else if (options.path.length === 2) {
-      url +=
-        (options.isView ? '?type=view' : '?type=table') +
-        '&database=' +
-        options.path[0] +
-        '&name=' +
-        options.path[1];
-    } else if (options.path.length === 3) {
-      url +=
-        '?type=field&database=' +
-        options.path[0] +
-        '&table=' +
-        options.path[1] +
-        '&name=' +
-        options.path[2];
-    } else {
-      return new CancellableJqPromise($.Deferred().reject());
-    }
-
-    const request = simplePost(
-      url,
-      {
-        notebook: {},
-        snippet: ko.mapping.toJSON({
-          type: 'nav'
-        })
-      },
-      {
-        silenceErrors: options.silenceErrors,
-        successCallback: data => {
-          data = data.entity || data;
-          data.hueTimestamp = Date.now();
-          deferred.resolve(data);
-        },
-        errorCallback: deferred.reject
-      }
-    );
-
-    return new CancellableJqPromise(deferred, request);
-  }
-
-  /**
    * Updates Navigator properties and custom metadata for the given entity
    *
    * @param {Object} options
    * @param {string} options.identity - The identifier for the Navigator entity to update
    * @param {Object} [options.properties]
-   * @param {Object} [options.modifiedCustomMetadata]
-   * @param {string[]} [options.deletedCustomMetadataKeys]
+   * @param {Object.<string|string>|undefined} [options.modifiedCustomMetadata]
+   * @param {string[]|undefined} [options.deletedCustomMetadataKeys]
    * @param {boolean} [options.silenceErrors]
    *
-   * @return {Promise}
+   * @return {JQueryPromise}
    */
   updateNavigatorProperties(options) {
     const data = { id: ko.mapping.toJSON(options.identity) };
@@ -1941,7 +1497,7 @@ class ApiHelper {
    * Lists all available navigator tags
    *
    * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
+   * @param {boolean|undefined} [options.silenceErrors]
    *
    * @return {CancellableJqPromise}
    */

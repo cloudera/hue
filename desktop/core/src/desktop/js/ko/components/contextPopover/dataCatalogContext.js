@@ -51,10 +51,11 @@ class DataCatalogContext {
       const catalogEntry = self.catalogEntry();
       if (catalogEntry) {
         for (let i = 0; i < catalogEntry.path.length; i++) {
+          const path = catalogEntry.path.slice(0, i + 1);
           result.push({
             name: catalogEntry.path[i],
             isActive: i === catalogEntry.path.length - 1,
-            path: catalogEntry.path.slice(0, i + 1),
+            path,
             catalogEntry: self.catalogEntry,
             makeActive: function () {
               self
@@ -63,10 +64,13 @@ class DataCatalogContext {
                   namespace: self.catalogEntry().namespace,
                   compute: self.catalogEntry().compute,
                   connector: self.catalogEntry().connector,
-                  path: this.path,
+                  path,
                   temporaryOnly: self.catalogEntry().isTemporary
                 })
-                .done(self.catalogEntry);
+                .then(self.catalogEntry)
+                .catch(err => {
+                  console.warn(err);
+                });
             }
           });
         }
@@ -83,7 +87,7 @@ class DataCatalogContext {
 
   refresh() {
     const self = this;
-    self.catalogEntry().clearCache({ cascade: true }).always(self.load.bind(self));
+    self.catalogEntry().clearCache({ cascade: true }).finally(self.load.bind(self));
   }
 
   load() {
@@ -99,10 +103,10 @@ class DataCatalogContext {
       self
         .catalogEntry()
         .getSourceMeta({ cancellable: true })
-        .fail(() => {
+        .catch(() => {
           self.hasErrors(true);
         })
-        .always(() => {
+        .finally(() => {
           self.loading(false);
         })
     );
@@ -119,21 +123,21 @@ class DataCatalogContext {
             silenceErrors: true,
             cancellable: true
           })
-          .done(analysis => {
+          .then(analysis => {
             const found =
               analysis.properties &&
               analysis.properties.some(property => {
                 if (property.col_name.toLowerCase() === 'view original text:') {
                   apiHelper
                     .formatSql({ statements: property.data_type })
-                    .done(formatResponse => {
+                    .then(formatResponse => {
                       if (formatResponse.status === 0) {
                         viewSqlDeferred.resolve(formatResponse.formatted_statements);
                       } else {
                         viewSqlDeferred.resolve(property.data_type);
                       }
                     })
-                    .fail(() => {
+                    .catch(() => {
                       viewSqlDeferred.resolve(property.data_type);
                     });
                   return true;
@@ -144,14 +148,14 @@ class DataCatalogContext {
             }
             self.analysis(analysis);
           })
-          .fail(viewSqlDeferred.reject)
+          .catch(viewSqlDeferred.reject)
       );
     } else {
       viewSqlDeferred.reject();
     }
 
     self.activePromises.push(
-      self.catalogEntry().getComment({ silenceErrors: true, cancellable: true }).done(self.comment)
+      self.catalogEntry().getComment({ silenceErrors: true, cancellable: true }).then(self.comment)
     );
 
     $.when.apply($, self.activePromises).always(() => {

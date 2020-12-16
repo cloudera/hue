@@ -199,10 +199,10 @@ class AceLocationHandler {
                           return identifier.name;
                         })
                       })
-                      .done(entry => {
+                      .then(entry => {
                         entry
                           .getSourceMeta({ cachedOnly: true, silenceErrors: true })
-                          .done(sourceMeta => {
+                          .then(sourceMeta => {
                             if (sourceMeta && sourceMeta.extended_columns) {
                               sourceMeta.extended_columns.every(col => {
                                 if (col.name.toLowerCase() === colName) {
@@ -212,7 +212,13 @@ class AceLocationHandler {
                                 return true;
                               });
                             }
+                          })
+                          .catch(() => {
+                            // Ignore
                           });
+                      })
+                      .catch(err => {
+                        // Ignore
                       });
                   }
                 }
@@ -380,7 +386,7 @@ class AceLocationHandler {
               .resolveCatalogEntry({
                 temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly
               })
-              .done(entry => {
+              .then(entry => {
                 huePubSub.publish('context.popover.show', {
                   data: {
                     type: 'catalogEntry',
@@ -391,13 +397,13 @@ class AceLocationHandler {
                   source: source
                 });
               })
-              .fail(() => {
+              .catch(() => {
                 token.notFound = true;
               });
           } else if (token.parseLocation && !token.notFound) {
             // Asterisk, function etc.
             if (token.parseLocation.type === 'file') {
-              AssistStorageEntry.getEntry(token.parseLocation.path).done(entry => {
+              AssistStorageEntry.getEntry(token.parseLocation.path).then(entry => {
                 entry.open(true);
                 huePubSub.publish('context.popover.show', {
                   data: {
@@ -871,8 +877,8 @@ class AceLocationHandler {
         silenceErrors: true,
         cachedOnly: true
       })
-      .done(deferred.resolve)
-      .fail(() => {
+      .then(deferred.resolve)
+      .catch(() => {
         deferred.reject([]);
       });
     return deferred;
@@ -989,7 +995,7 @@ class AceLocationHandler {
                 cachedOnly: true,
                 silenceErrors: true
               })
-              .done(entries => {
+              .then(entries => {
                 const containsColumn = entries.some(entry => {
                   return sqlUtils.identifierEquals(entry.name, location.identifierChain[0].name);
                 });
@@ -1006,7 +1012,7 @@ class AceLocationHandler {
                   promise.resolve();
                 }
               })
-              .fail(promise.resolve);
+              .catch(promise.resolve);
           } else if (tablesToGo.length > 0) {
             findIdentifierChainInTable(tablesToGo);
           } else {
