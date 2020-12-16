@@ -278,6 +278,8 @@ class TestApi(object):
 
         # No Trim
         interpreter['options']['url'] = 'mysql://hue:3306/hue'
+        interpreter['dialect_properties']['trim_statement_semicolon'] = False
+        interpreter['dialect_properties']['sql_identifier_quote'] = '`'
 
         engine = SqlAlchemyApi(self.user, interpreter).execute(notebook, snippet)
 
