@@ -1773,7 +1773,7 @@ class ClusterConfig(object):
       user_preference = get_user_preferences(user=self.user, key='default_app')
       if not user_preference:
         raise UserPreferences.DoesNotExist()
-      user_default_app = json.loads(user_preference)
+      user_default_app = json.loads(user_preference['default_app'])
       if apps.get(user_default_app['app']):
         default_interpreter = []
         default_app = apps[user_default_app['app']]
