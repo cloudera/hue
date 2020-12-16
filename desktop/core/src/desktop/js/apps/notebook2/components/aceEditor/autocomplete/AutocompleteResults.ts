@@ -1886,7 +1886,7 @@ class AutocompleteResults {
         }
       });
 
-      if (!valueAttribute || Object.keys(popularityIndex).length === 0) {
+      if (!valueAttribute || popularityIndex.size === 0) {
         return [];
       }
 
