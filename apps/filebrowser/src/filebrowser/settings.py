@@ -31,5 +31,5 @@ PERMISSION_ACTIONS = (
   (PERMISSION_ACTION_S3, "Access to S3 from filebrowser and filepicker."),
   (PERMISSION_ACTION_ADLS, "Access to ADLS from filebrowser and filepicker."),
   (PERMISSION_ACTION_ABFS, "Access to ABFS from filebrowser and filepicker."),
-  (PERMISSION_ACTION_GS,  "Access to GS from filebrowser and filepicker.")
+  (PERMISSION_ACTION_GS, "Access to GS from filebrowser and filepicker.")
 )
