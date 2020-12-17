@@ -1773,7 +1773,7 @@ class ClusterConfig(object):
       user_preference = get_user_preferences(user=self.user, key='default_app')
       if not user_preference:
         raise UserPreferences.DoesNotExist()
-      user_default_app = json.loads(user_preference)
+      user_default_app = json.loads(user_preference['default_app'])
       if apps.get(user_default_app['app']):
         default_interpreter = []
         default_app = apps[user_default_app['app']]
@@ -1941,7 +1941,7 @@ class ClusterConfig(object):
         'buttonName': _('Browse'),
         'tooltip': hdfs_connector,
         'page': '/filebrowser/' + (
-          not self.user.is_anonymous() and
+          not self.user.is_anonymous and
           'view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS) or ''
         )
       })
@@ -2169,7 +2169,7 @@ class Cluster(object):
 def _get_apps(user, section=None):
   current_app = None
   other_apps = []
-  if user.is_authenticated():
+  if user.is_authenticated:
     apps_list = appmanager.get_apps_dict(user)
     apps = list(apps_list.values())
     for app in apps:

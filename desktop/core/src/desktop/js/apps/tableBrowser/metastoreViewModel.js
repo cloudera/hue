@@ -329,7 +329,8 @@ class MetastoreViewModel {
                           });
                       });
                   }
-                });
+                })
+                .catch(() => {});
             }
           };
 

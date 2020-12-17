@@ -22,14 +22,12 @@ from logging import exception
 from datetime import datetime
 from django.utils.translation import ugettext as _
 
+from beeswax.models import QueryHistory
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.python_util import current_ms_from_utc
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
-
-from notebook.models import _get_notebook_api, make_notebook
-
-from beeswax.models import QueryHistory
+from notebook.models import _get_notebook_api, make_notebook, MockRequest
 
 from jobbrowser.apis.base_api import Api
 from jobbrowser.conf import QUERY_STORE
@@ -115,7 +113,7 @@ class HiveQueryApi(Api):
 
     return app
 
-  def action(self, query_ids, action, request=None):
+  def action(self, query_ids, action):
     message = {'actions': {}, 'status': 0}
 
     if action.get('action') == 'kill':
@@ -123,6 +121,7 @@ class HiveQueryApi(Api):
         action_details = {}
 
         try:
+          request = MockRequest(user=self.user)
           self.kill_query(query_id, request)
           action_details['status'] = 0
           action_details['message'] = _('kill action performed')

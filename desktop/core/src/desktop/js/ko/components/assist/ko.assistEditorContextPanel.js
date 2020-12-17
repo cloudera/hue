@@ -24,7 +24,7 @@ import componentUtils from 'ko/components/componentUtils';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import DataCatalogEntry from 'catalog/dataCatalogEntry';
+import DataCatalogEntry from 'catalog/DataCatalogEntry';
 
 const TEMPLATE =
   ASSIST_TABLE_TEMPLATES +
@@ -420,7 +420,7 @@ class AssistEditorContextPanel {
                     path: [database],
                     definition: { type: 'database' }
                   })
-                  .done(catalogEntry => {
+                  .then(catalogEntry => {
                     databaseIndex[database] = new AssistDbEntry(
                       catalogEntry,
                       null,
@@ -432,7 +432,7 @@ class AssistEditorContextPanel {
                     updateTables = true;
                     dbDeferred.resolve(databaseIndex[database]);
                   })
-                  .fail(() => {
+                  .catch(() => {
                     dbDeferred.reject();
                   });
               }
@@ -441,7 +441,7 @@ class AssistEditorContextPanel {
                 .done(dbEntry => {
                   dbEntry.catalogEntry
                     .getChildren({ silenceErrors: true })
-                    .done(tableEntries => {
+                    .then(tableEntries => {
                       const tableName =
                         location.identifierChain[location.identifierChain.length - 1].name;
                       const found = tableEntries.some(tableEntry => {
@@ -483,7 +483,7 @@ class AssistEditorContextPanel {
                           }
                           self.reloading(true);
                           huePubSub.subscribeOnce('data.catalog.entry.refreshed', data => {
-                            data.entry.getSourceMeta({ silenceErrors: true }).always(() => {
+                            data.entry.getSourceMeta({ silenceErrors: true }).finally(() => {
                               self.reloading(false);
                             });
                           });
@@ -494,10 +494,10 @@ class AssistEditorContextPanel {
                               connector: activeLocations.connector,
                               path: []
                             })
-                            .done(sourceEntry => {
+                            .then(sourceEntry => {
                               sourceEntry
                                 .getChildren()
-                                .done(dbEntries => {
+                                .then(dbEntries => {
                                   let clearPromise;
                                   // Clear the database first if it exists without cascade
                                   const hasDb = dbEntries.some(dbEntry => {
@@ -516,15 +516,15 @@ class AssistEditorContextPanel {
                                       cascade: false
                                     });
                                   }
-                                  clearPromise.fail(() => {
+                                  clearPromise.catch(() => {
                                     self.reloading(false);
                                   });
                                 })
-                                .fail(() => {
+                                .catch(() => {
                                   self.reloading(false);
                                 });
                             })
-                            .fail(() => {
+                            .catch(() => {
                               self.reloading(false);
                             });
                         };
@@ -549,9 +549,9 @@ class AssistEditorContextPanel {
                         tableDeferred.resolve(missingEntry);
                       }
                     })
-                    .fail(tableDeferred.reject);
+                    .catch(tableDeferred.reject);
                 })
-                .fail(tableDeferred.reject);
+                .catch(tableDeferred.reject);
             }
           }
         });

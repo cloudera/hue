@@ -46,7 +46,7 @@ ko.bindingHandlers.storageContextPopover = {
       () => {
         return function () {
           const options = valueAccessor();
-          AssistStorageEntry.getEntry(options.path, options.type).done(entry => {
+          AssistStorageEntry.getEntry(options.path, options.type).then(entry => {
             const $source = $(element);
             const offset = $source.offset();
 

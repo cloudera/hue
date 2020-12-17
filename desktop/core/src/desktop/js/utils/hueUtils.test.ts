@@ -17,36 +17,6 @@
 import hueUtils from './hueUtils';
 
 describe('hue.utils.js', () => {
-  // In polyfills.js
-  // it("should skip the milliseconds in number format if the time is more than 60 seconds", function() {
-  //   expect(Number(10000000344).toHHMMSS()).toEqual('115d, 17h, 46m, 40s');
-  // });
-
-  // In polyfills.js
-  // it("should show the milliseconds in number format if the time is less than 60 seconds", function() {
-  //   expect(Number(10123).toHHMMSS()).toEqual('10.12s');
-  // });
-
-  // In polyfills.js
-  // it("should skip the seconds if it's zero and it's specified in the function", function() {
-  //   expect(Number(60000).toHHMMSS(true)).toEqual('1m');
-  // });
-
-  // In polyfills.js
-  // it("should have the String.startsWith polyfill", function() {
-  //   expect('banana'.startsWith('ba')).toBeTruthy();
-  // });
-
-  // In polyfills.js
-  // it("should have the String.endsWith polyfill", function() {
-  //   expect('banana'.endsWith('na')).toBeTruthy();
-  // });
-
-  // In polyfills.js
-  // it("should have the String.includes polyfill", function() {
-  //   expect('banana'.includes('anan')).toBeTruthy();
-  // });
-
   it('should change completely the URL', () => {
     hueUtils.changeURL('/banana');
 
@@ -68,6 +38,10 @@ describe('hue.utils.js', () => {
 
     expect(window.location.search).toEqual('');
     hueUtils.changeURL('/jasmine');
+  });
+
+  it('should return empty string when the value is undefined', () => {
+    expect(hueUtils.deXSS(undefined)).toEqual('');
   });
 
   it('should remove JS code from a string', () => {

@@ -29,15 +29,14 @@ LOG = logging.getLogger(__name__)
 
 CONNECTOR_TYPES = [
   {
-    'id': 'hive',
     'dialect': 'hive',
     'nice_name': 'Hive',
-    'description': '',
+    'description': 'Recommended',
     'category': 'editor',
     'interface': 'hiveserver2',
     'settings': [
-      {'name': 'server_host', 'value': ''},
-      {'name': 'server_port', 'value': ''},
+      {'name': 'server_host', 'value': 'localhost'},
+      {'name': 'server_port', 'value': 10000},
       {'name': 'is_llap', 'value': False},  # cf. _get_session_by_id() or create a separate connector
     ],
     'properties': {
@@ -58,12 +57,40 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Impala",
+    'dialect': 'hive',
+    'nice_name': 'Hive',
+    'description': 'Via SqlAlchemy interface',
+    'category': 'editor',
+    'interface': 'sqlalchemy',
+    'settings': [
+      {'name': 'url', 'value': 'hive://localhost:10000'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
+    ],
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+      'has_reference_language': True,
+      'has_reference_functions': True,
+      'has_use_statement': True,
+      'trim_statement_semicolon': False,
+    }
+  },
+  {
+    'nice_name': 'Impala',
     'dialect': 'impala',
     'interface': 'hiveserver2',
     'settings': [
-      {'name': 'server_host', 'value': ''},
-      {'name': 'server_port', 'value': ''},
+      {'name': 'server_host', 'value': 'localhost'},
+      {'name': 'server_port', 'value': 21050},
       {'name': 'impersonation_enabled', 'value': False},
     ],
     'category': 'editor',
@@ -86,11 +113,11 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Druid",
+    'nice_name': 'Druid',
     'dialect': 'druid',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'},
+      {'name': 'url', 'value': 'druid://localhost:8082/druid/v2/sql/'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -114,7 +141,7 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "ksqlDB",
+    'nice_name': 'ksqlDB',
     'dialect': 'ksql',
     'interface': 'ksql',
     'settings': [
@@ -142,11 +169,11 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Flink SQL",
+    'nice_name': 'Flink SQL',
     'dialect': 'flink',
     'interface': 'flink',
     'settings': [
-      {'name': 'url', 'value': 'http://127.0.0.1:8083'},
+      {'name': 'url', 'value': 'http://localhost:8083'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -170,11 +197,11 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "SparkSQL",
+    'nice_name': 'SparkSQL',
     'dialect': 'sparksql',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'hive://sparksql-thrift-server:10000'},
+      {'name': 'url', 'value': 'hive://localhost:10000'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -198,12 +225,12 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "SparkSQL",
+    'nice_name': 'SparkSQL',
     'dialect': 'sparksql',
     'interface': 'hiveserver2',
     'settings': [
-      {'name': 'server_host', 'value': ''},
-      {'name': 'server_port', 'value': ''},
+      {'name': 'server_host', 'value': 'localhost'},
+      {'name': 'server_port', 'value': 10000},
       {'name': 'impersonation_enabled', 'value': False},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
@@ -228,7 +255,7 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "SparkSQL",
+    'nice_name': 'SparkSQL',
     'dialect': 'sparksql',
     'interface': 'livy',
     'settings': [
@@ -256,7 +283,7 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Phoenix SQL",
+    'nice_name': 'Phoenix SQL',
     'dialect': 'phoenix',
     'interface': 'sqlalchemy',
     'settings': [
@@ -284,11 +311,11 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "MySQL",
+    'nice_name': 'MySQL',
     'dialect': 'mysql',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'mysql://username:password@mysq-host:3306/hue'},
+      {'name': 'url', 'value': 'mysql://username:password@localhost:3306/hue'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -312,11 +339,11 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "PostgreSQL",
+    'nice_name': 'PostgreSQL',
     'dialect': 'postgresql',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'postgresql://username:password@host:5432/hue'},
+      {'name': 'url', 'value': 'postgresql://username:password@localhost:5432/hue'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -340,11 +367,11 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Presto",
+    'nice_name': 'Presto',
     'dialect': 'presto',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'presto://host:8080/tpch'},
+      {'name': 'url', 'value': 'presto://localhost:8080/tpch'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
       {'name': 'has_impersonation', 'value': False},
@@ -373,7 +400,7 @@ CONNECTOR_TYPES = [
     'dialect': 'dasksql',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'presto://host:8080/catalog/default'},
+      {'name': 'url', 'value': 'presto://localhost:8080/catalog/default'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
       {'name': 'has_impersonation', 'value': False},
@@ -397,7 +424,7 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Elasticsearch SQL",
+    'nice_name': 'Elasticsearch SQL',
     'dialect': 'elasticsearch',
     'interface': 'sqlalchemy',
     'settings': [
@@ -425,12 +452,12 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Calcite",
+    'nice_name': 'Calcite',
     'dialect': 'calcite',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'server_host', 'value': ''},
-      {'name': 'server_port', 'value': ''},
+      {'name': 'server_host', 'value': 'localhost'},
+      {'name': 'server_port', 'value': 10000},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -454,7 +481,7 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Athena",
+    'nice_name': 'Athena',
     'dialect': 'athena',
     'interface': 'sqlalchemy',
     'settings': [
@@ -484,7 +511,7 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Redshift",
+    'nice_name': 'Redshift',
     'dialect': 'redshift',
     'interface': 'sqlalchemy',
     'settings': [
@@ -510,7 +537,7 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Snowflake",
+    'nice_name': 'Snowflake',
     'dialect': 'snowflake',
     'interface': 'sqlalchemy',
     'settings': [
@@ -536,7 +563,7 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Big Query",
+    'nice_name': 'Big Query',
     'dialect': 'bigquery',
     'interface': 'sqlalchemy',
     'settings': [
@@ -563,11 +590,11 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Oracle",
+    'nice_name': 'Oracle',
     'dialect': 'oracle',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'oracle://scott:tiger@dsn'},
+      {'name': 'url', 'value': 'oracle://user:password@localhost'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -591,11 +618,11 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "Solr SQL",
+    'nice_name': 'Solr SQL',
     'dialect': 'solr',
     'interface': 'solr',
     'settings': [
-      {'name': 'url', 'value': 'solr://<username>:<password>@<host>:<port>/solr/<collection>[?use_ssl=true|false]'},
+    {'name': 'url', 'value': 'solr://user:password@localhost:8983/solr/<collection>[?use_ssl=true|false]'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -619,7 +646,7 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "SQL Database",
+    'nice_name': 'SQL Database',
     'dialect': 'sql',
     'interface': 'sqlalchemy',
     'settings': [
@@ -647,14 +674,14 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': "SQL Database (JDBC)",
+    'nice_name': 'SQL Database (JDBC)',
     'dialect': 'sql',
     'interface': 'sqlalchemy',
     'settings': [
-      {'name': 'url', 'value': 'jdbc:db2://gethue.com:50000/SQOOP'},
+      {'name': 'url', 'value': 'jdbc:db2://localhost:50000/SQOOP'},
       {'name': 'driver', 'value': 'com.ibm.db2.jcc.DB2Driver'},
       {'name': 'user', 'value': 'hue'},
-      {'name': 'password', 'value': "hue"},
+      {'name': 'password', 'value': 'hue'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
     ],
@@ -678,26 +705,26 @@ CONNECTOR_TYPES = [
     }
   },
 
-  {'nice_name': "PySpark", 'dialect': 'pyspark', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
-  {'nice_name': "Spark", 'dialect': 'spark', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
-  {'nice_name': "Pig", 'dialect': 'pig', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
-  {'nice_name': "Java", 'dialect': 'java', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
+  {'nice_name': 'PySpark', 'dialect': 'pyspark', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
+  {'nice_name': 'Spark', 'dialect': 'spark', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
+  {'nice_name': 'Pig', 'dialect': 'pig', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
+  {'nice_name': 'Java', 'dialect': 'java', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
 
-  {'nice_name': "HDFS", 'dialect': 'hdfs', 'interface': 'rest',
+  {'nice_name': 'HDFS', 'dialect': 'hdfs', 'interface': 'rest',
     'settings': [
       {'name': 'server_url', 'value': 'http://localhost:9870/webhdfs/v1'},
       {'name': 'default_fs', 'value': 'fs_defaultfs=hdfs://localhost:8020'}
     ],
     'category': 'browsers', 'description': '', 'properties': {}
   },
-  {'nice_name': "YARN", 'dialect': 'yarn', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
-  {'nice_name': "S3", 'dialect': 's3', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
-  {'nice_name': "ADLS", 'dialect': 'adls-v1', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
+  {'nice_name': 'YARN', 'dialect': 'yarn', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
+  {'nice_name': 'S3', 'dialect': 's3', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
+  {'nice_name': 'ADLS', 'dialect': 'adls-v1', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
   # HBase
   # Solr
 
   {
-    'nice_name': "Hive Metastore",
+    'nice_name': 'Hive Metastore',
     'dialect': 'hms',
     'interface': 'hiveserver2',
     'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},],
@@ -706,19 +733,19 @@ CONNECTOR_TYPES = [
     'properties': {}
   },
   {
-    'nice_name': "Atlas", 'dialect': 'atlas', 'interface': 'rest', 'settings': [], 'category': 'catalogs', 'description': '',
+    'nice_name': 'Atlas', 'dialect': 'atlas', 'interface': 'rest', 'settings': [], 'category': 'catalogs', 'description': '',
     'properties': {}
   },
   {
-    'nice_name': "Navigator", 'dialect': 'navigator', 'interface': 'rest', 'settings': [], 'category': 'catalogs',
+    'nice_name': 'Navigator', 'dialect': 'navigator', 'interface': 'rest', 'settings': [], 'category': 'catalogs',
     'description': '',
     'properties': {}
   },
 
-  {'nice_name': "Optimizer", 'dialect': 'optimizer', 'settings': [], 'category': 'optimizers', 'description': '', 'properties': {}},
+  {'nice_name': 'Optimizer', 'dialect': 'optimizer', 'settings': [], 'category': 'optimizers', 'description': '', 'properties': {}},
 
-  {'nice_name': "Oozie", 'dialect': 'oozie', 'settings': [], 'category': 'schedulers', 'description': '', 'properties': {}},
-  {'nice_name': "Celery", 'dialect': 'celery', 'settings': [], 'category': 'schedulers', 'description': '', 'properties': {}},
+  {'nice_name': 'Oozie', 'dialect': 'oozie', 'settings': [], 'category': 'schedulers', 'description': '', 'properties': {}},
+  {'nice_name': 'Celery', 'dialect': 'celery', 'settings': [], 'category': 'schedulers', 'description': '', 'properties': {}},
 ]
 
 CONNECTOR_TYPES = [connector for connector in CONNECTOR_TYPES if connector['dialect'] not in CONNECTORS_BLACKLIST.get()]
@@ -728,12 +755,12 @@ if CONNECTORS_WHITELIST.get():
 
 
 CATEGORIES = [
-  {"name": "Editor", 'type': 'editor', 'description': ''},
-  {"name": "Browsers", 'type': 'browsers', 'description': ''},
-  {"name": "Catalogs", 'type': 'catalogs', 'description': ''},
-  {"name": "Optimizers", 'type': 'optimizers', 'description': ''},
-  {"name": "Schedulers", 'type': 'schedulers', 'description': ''},
-  {"name": "Plugins", 'type': 'plugins', 'description': ''},
+  {"name": 'Editor', 'type': 'editor', 'description': ''},
+  {"name": 'Browsers', 'type': 'browsers', 'description': ''},
+  {"name": 'Catalogs', 'type': 'catalogs', 'description': ''},
+  {"name": 'Optimizers', 'type': 'optimizers', 'description': ''},
+  {"name": 'Schedulers', 'type': 'schedulers', 'description': ''},
+  {"name": 'Plugins', 'type': 'plugins', 'description': ''},
 ]
 
 

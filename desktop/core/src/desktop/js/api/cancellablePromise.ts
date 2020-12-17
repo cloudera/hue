@@ -20,24 +20,58 @@ export interface Cancellable {
 
 export class CancellablePromise<T> extends Promise<T> implements Cancellable {
   private readonly onCancel?: () => void;
+  private cancelPrevented?: boolean;
+  private completed: () => boolean;
+  cancelled?: boolean;
 
   constructor(
     handlers: (
       resolve: (value?: T | PromiseLike<T>) => void,
       reject: (reason?: unknown) => void,
-      onCancel?: (cancelHandler: () => void) => void
+      onCancel: (cancelHandler: () => void) => void
     ) => void
   ) {
     let onCancel: undefined | (() => void) = undefined;
+    let completed = false;
     super((resolve, reject) =>
-      handlers(resolve, reject, (cancelHandler: () => void) => (onCancel = cancelHandler))
+      handlers(
+        val => {
+          completed = true;
+          resolve(val);
+        },
+        err => {
+          completed = true;
+          reject(err);
+        },
+        (cancelHandler: () => void) => (onCancel = cancelHandler)
+      )
     );
     this.onCancel = onCancel;
+    this.completed = () => completed;
   }
 
   cancel(): void {
-    if (this.onCancel) {
-      this.onCancel();
+    if (!this.completed() && !this.cancelled && !this.cancelPrevented) {
+      if (this.onCancel) {
+        this.onCancel();
+      }
+      this.cancelled = true;
     }
+  }
+
+  preventCancel(): void {
+    this.cancelPrevented = true;
+  }
+
+  static reject<T = unknown>(reason?: unknown): CancellablePromise<T> {
+    return new CancellablePromise<T>((resolve, reject) => {
+      reject(reason);
+    });
+  }
+
+  static resolve<T = unknown>(value?: T | PromiseLike<T>): CancellablePromise<T> {
+    return new CancellablePromise<T>(resolve => {
+      resolve(value);
+    });
   }
 }

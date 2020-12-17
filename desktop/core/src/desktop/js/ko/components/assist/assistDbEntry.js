@@ -343,7 +343,7 @@ class AssistDbEntry {
       if (!sourceMeta.notFound) {
         self.catalogEntry
           .getChildren({ silenceErrors: self.navigationSettings.rightAssist })
-          .done(catalogEntries => {
+          .then(catalogEntries => {
             self.hasErrors(false);
             self.loading(false);
             self.loaded = true;
@@ -367,16 +367,18 @@ class AssistDbEntry {
               callback();
             }
           })
-          .fail(() => {
+          .catch(() => {
             self.loading(false);
             self.loaded = true;
             self.hasErrors(true);
           });
 
         if (!self.assistDbNamespace.nonSqlType) {
-          self.catalogEntry.loadNavigatorMetaForChildren({
-            silenceErrors: self.navigationSettings.rightAssist
-          });
+          self.catalogEntry
+            .loadNavigatorMetaForChildren({
+              silenceErrors: self.navigationSettings.rightAssist
+            })
+            .finally(() => {});
         }
       } else {
         self.hasErrors(true);
@@ -401,7 +403,7 @@ class AssistDbEntry {
       (self.catalogEntry.isTable() || self.catalogEntry.isDatabase()) &&
       !self.assistDbNamespace.nonSqlType
     ) {
-      self.catalogEntry.loadOptimizerPopularityForChildren({ silenceErrors: true }).done(() => {
+      self.catalogEntry.loadOptimizerPopularityForChildren({ silenceErrors: true }).then(() => {
         loadEntriesDeferred.done(() => {
           if (!self.hasErrors()) {
             self.entries().forEach(entry => {
@@ -422,8 +424,8 @@ class AssistDbEntry {
 
     self.catalogEntry
       .getSourceMeta({ silenceErrors: self.navigationSettings.rightAssist })
-      .done(successCallback)
-      .fail(errorCallback);
+      .then(successCallback)
+      .catch(errorCallback);
   }
 
   /**

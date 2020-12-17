@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery';
 import { koSetup } from 'jest/koTestUtils';
+import { CancellablePromise } from '../../api/cancellablePromise';
 import { NAME } from './ko.catalogEntriesList';
 
 import 'ko/components/ko.inlineAutocomplete';
@@ -28,18 +28,68 @@ describe('ko.catalogEntriesList.js', () => {
   it('should render component', async () => {
     const element = await setup.renderComponent(NAME, {
       catalogEntry: {
-        isField: () => true,
+        compute: { id: 'foo' },
+        dataCatalog: {},
+        definition: {},
+        isTemporary: false,
+        name: 'foo',
+        namespace: { id: 'foo' },
+        path: ['foo'],
+        addNavigatorTags: () => Promise.reject(),
+        canHaveNavigatorMetadata: () => false,
+        clearCache: () => Promise.resolve(),
+        deleteNavigatorTags: () => Promise.reject(),
+        getAnalysis: () => CancellablePromise.reject(),
+        getChildren: () => CancellablePromise.resolve([]),
+        getComment: () => CancellablePromise.resolve(''),
+        getCommentObservable: () => undefined,
+        getConnector: () => {
+          id: 'impala';
+        },
+        getDialect: () => 'impala',
+        getDisplayName: () => 'foo',
+        getIndex: () => 0,
+        getNavigatorMeta: () => CancellablePromise.reject(),
+        getOptimizerMeta: () => CancellablePromise.reject(),
+        getParent: () => Promise.reject(),
+        getPartitions: () => CancellablePromise.reject(),
+        getQualifiedPath: () => '',
+        getRawType: () => 'int',
+        getResolvedComment: () => '',
+        getSample: () => CancellablePromise.reject(),
+        getSourceMeta: () => CancellablePromise.reject(),
+        getTitle: () => 'foo',
+        getTopAggs: () => CancellablePromise.reject(),
+        getTopFilters: () => CancellablePromise.reject(),
+        getTopJoins: () => CancellablePromise.reject(),
+        getType: () => 'int',
+        hasPossibleChildren: () => false,
+        hasResolvedComment: () => false,
+        isArray: () => false,
+        isColumn: () => true,
         isComplex: () => false,
         isDatabase: () => false,
-        getChildren: () => $.Deferred().resolve([]),
-        getSample: () => $.Deferred().reject(),
-        getDialect: () => 'impala',
-        loadNavigatorMetaForChildren: () => $.Deferred().reject(),
-        loadOptimizerPopularityForChildren: () => $.Deferred().reject(),
+        isField: () => true,
+        isForeignKey: () => false,
+        isKey: () => true,
+        isMapValue: () => false,
+        isMap: () => false,
+        isModel: () => false,
+        isPartitionKey: () => false,
+        isPrimaryKey: () => false,
+        isSource: () => false,
+        isTable: () => false,
         isTableOrView: () => false,
-        isSource: () => false
+        isView: () => false,
+        loadNavigatorMetaForChildren: () => CancellablePromise.reject(),
+        loadOptimizerPopularityForChildren: () => CancellablePromise.reject(),
+        reset: () => undefined,
+        save: () => Promise.resolve(),
+        saveLater: () => undefined,
+        setComment: () => Promise.resolve('')
       }
     });
+    await setup.waitForKoUpdate();
 
     expect(element.innerHTML).toMatchSnapshot();
   });

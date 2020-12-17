@@ -45,17 +45,17 @@ class MetastoreTableSamples {
     this.loading(true);
     this.metastoreTable.catalogEntry
       .getSample()
-      .done(sample => {
+      .then(sample => {
         this.rows(sample.data);
         this.headers(sample.meta.map(meta => meta.name));
         this.preview.rows(this.rows().slice(0, 3));
         this.preview.headers(this.headers());
       })
-      .fail(message => {
+      .catch(message => {
         this.errorMessage(message);
         this.hasErrors(true);
       })
-      .always(() => {
+      .finally(() => {
         this.loading(false);
         this.loaded(true);
       });

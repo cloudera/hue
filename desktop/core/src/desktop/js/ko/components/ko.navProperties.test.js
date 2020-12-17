@@ -15,8 +15,8 @@
 // limitations under the License.
 
 import { koSetup } from 'jest/koTestUtils';
+import { CancellablePromise } from '../../api/cancellablePromise';
 import { NAME } from './ko.navProperties';
-import $ from 'jquery';
 
 describe('ko.navProperties.js', () => {
   const setup = koSetup();
@@ -26,14 +26,14 @@ describe('ko.navProperties.js', () => {
       catalogEntry: {
         isField: () => true,
         isComplex: () => false,
-        getChildren: () => $.Deferred().resolve([]),
-        getSample: () => $.Deferred().reject(),
-        loadNavigatorMetaForChildren: () => $.Deferred().reject(),
-        loadOptimizerPopularityForChildren: () => $.Deferred().reject(),
+        getChildren: () => CancellablePromise.resolve([]),
+        getSample: () => CancellablePromise.reject(),
+        loadNavigatorMetaForChildren: () => CancellablePromise.reject(),
+        loadOptimizerPopularityForChildren: () => CancellablePromise.reject(),
         isTableOrView: () => false,
         getDialect: () => 'impala',
         getNavigatorMeta: () =>
-          $.Deferred().resolve({
+          CancellablePromise.resolve({
             properties: {
               testProp: 'testVal'
             }

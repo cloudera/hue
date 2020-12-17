@@ -2367,4 +2367,4 @@ def is_gs_enabled():
 
 def has_gs_access(user):
   from desktop.auth.backend import is_admin
-  return user.is_authenticated() and user.is_active and (is_admin(user) or user.has_hue_permission(action="gs_access", app="filebrowser"))
+  return user.is_authenticated and user.is_active and (is_admin(user) or user.has_hue_permission(action="gs_access", app="filebrowser"))

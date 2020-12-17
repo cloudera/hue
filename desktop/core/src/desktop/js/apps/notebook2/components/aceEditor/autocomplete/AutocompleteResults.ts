@@ -14,20 +14,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import CancellableJqPromise from 'api/cancellableJqPromise';
+import { CancellablePromise } from 'api/cancellablePromise';
 import { Category, CategoryInfo } from 'apps/notebook2/components/aceEditor/autocomplete/Category';
 import Executor from 'apps/notebook2/execution/executor';
 import DataCatalogEntry, {
-  Field,
-  OptimizerPopularity,
+  FieldSample,
+  FieldSourceMeta,
   SourceMeta,
+  TableSourceMeta
+} from 'catalog/DataCatalogEntry';
+import { OptimizerPopularity, OptimizerPopularitySubType } from 'catalog/dataCatalog';
+import MultiTableEntry, {
   TopAggs,
   TopAggValue,
   TopFilters,
   TopFilterValue,
   TopJoins,
   TopJoinValue
-} from 'catalog/dataCatalogEntry';
+} from 'catalog/MultiTableEntry';
 import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 import { Ace } from 'ext/ace';
 import {
@@ -60,7 +64,7 @@ import {
 
 interface ColumnReference {
   type: string;
-  samples?: (string | number)[];
+  sample?: FieldSample[][];
 }
 
 export interface ColRefKeywordDetails {
@@ -90,7 +94,7 @@ export interface Suggestion {
     | TopJoinValue
     | TopAggValue
     | TopFilterValue
-    | Field
+    | FieldSample
     | CommentDetails
     | { name: string };
   matchComment?: boolean;
@@ -148,7 +152,7 @@ class AutocompleteResults {
   subTracker = new SubscriptionTracker();
   onCancelFunctions: (() => void)[] = [];
   lastKnownRequests: JQueryXHR[] = [];
-  cancellablePromises: CancellableJqPromise<unknown>[] = [];
+  cancellablePromises: CancellablePromise<unknown>[] = [];
 
   constructor(options: { executor: Executor; editor: Ace.Editor; temporaryOnly: boolean }) {
     this.executor = options.executor;
@@ -292,15 +296,18 @@ class AutocompleteResults {
         if (catalogEntry) {
           const sourceMeta = await new Promise<SourceMeta>((resolve, reject) => {
             this.onCancelFunctions.push(reject);
-            const sourceMetaDeferred = catalogEntry.getSourceMeta({
+            const sourceMetaPromise = catalogEntry.getSourceMeta({
               silenceErrors: true,
               cancellable: true
             });
-            this.cancellablePromises.push(sourceMetaDeferred);
-            sourceMetaDeferred.done(resolve).fail(reject);
+            this.cancellablePromises.push(sourceMetaPromise);
+            sourceMetaPromise.then(resolve).catch(reject);
           });
-          if (sourceMeta.type) {
-            return { type: sourceMeta.type, samples: sourceMeta.samples }; // sourceMeta.samples is used in handleValues.
+          if ((<FieldSourceMeta>sourceMeta).type) {
+            return {
+              type: (<FieldSourceMeta>sourceMeta).type,
+              sample: (<FieldSourceMeta>sourceMeta).sample // sourceMeta.sample is used in handleValues.
+            };
           }
         }
       } catch (err) {}
@@ -320,15 +327,15 @@ class AutocompleteResults {
             path: [],
             temporaryOnly: this.temporaryOnly
           })
-          .done(resolve)
-          .fail(reject);
+          .then(resolve)
+          .catch(reject);
       });
 
       return await new Promise((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const childrenDeferred = entry.getChildren({ silenceErrors: true, cancellable: true });
-        this.cancellablePromises.push(childrenDeferred);
-        childrenDeferred.done(resolve).fail(reject);
+        const childrenPromise = entry.getChildren({ silenceErrors: true, cancellable: true });
+        this.cancellablePromises.push(childrenPromise);
+        childrenPromise.then(resolve).catch(reject);
       });
     } catch (err) {
       return [];
@@ -618,15 +625,15 @@ class AutocompleteResults {
               path: [database],
               temporaryOnly: this.temporaryOnly
             })
-            .done(resolve)
-            .fail(reject);
+            .then(resolve)
+            .catch(reject);
         });
 
         const tableEntries = await new Promise<DataCatalogEntry[]>((resolve, reject) => {
           this.onCancelFunctions.push(reject);
-          const childrenDeferred = dbEntry.getChildren({ silenceErrors: true, cancellable: true });
-          this.cancellablePromises.push(childrenDeferred);
-          childrenDeferred.done(resolve).fail(reject);
+          const childrenPromise = dbEntry.getChildren({ silenceErrors: true, cancellable: true });
+          this.cancellablePromises.push(childrenPromise);
+          childrenPromise.then(resolve).catch(reject);
         });
 
         for (const tableEntry of tableEntries) {
@@ -869,24 +876,24 @@ class AutocompleteResults {
       await this.addSubQueryColumns(table, columnSuggestions);
     } else if (typeof table.identifierChain !== 'undefined') {
       const addColumnsFromEntry = async (dataCatalogEntry: DataCatalogEntry): Promise<void> => {
-        const sourceMeta = await new Promise<SourceMeta>((resolve, reject) => {
+        const sourceMeta = (await new Promise<SourceMeta>((resolve, reject) => {
           this.onCancelFunctions.push(reject);
-          const sourceMetaDeferred = dataCatalogEntry.getSourceMeta({
+          const sourceMetaPromise = dataCatalogEntry.getSourceMeta({
             silenceErrors: true,
             cancellable: true
           });
-          this.cancellablePromises.push(sourceMetaDeferred);
-          sourceMetaDeferred.done(resolve).fail(reject);
-        });
+          this.cancellablePromises.push(sourceMetaPromise);
+          sourceMetaPromise.then(resolve).catch(reject);
+        })) as FieldSourceMeta;
 
         const childEntries = await new Promise<DataCatalogEntry[]>((resolve, reject) => {
           this.onCancelFunctions.push(reject);
-          const childrenDeferred = dataCatalogEntry.getChildren({
+          const childrenPromise = dataCatalogEntry.getChildren({
             silenceErrors: true,
             cancellable: true
           });
-          this.cancellablePromises.push(childrenDeferred);
-          childrenDeferred.done(resolve).fail(reject);
+          this.cancellablePromises.push(childrenPromise);
+          childrenPromise.then(resolve).catch(reject);
         });
 
         for (const childEntry of childEntries) {
@@ -1035,16 +1042,16 @@ class AutocompleteResults {
 
     const colRef = await colRefPromise;
 
-    if (colRef.samples) {
+    if (colRef.sample) {
       const isString = colRef.type === 'string';
       const startQuote = suggestValues.partialQuote ? '' : "'";
       const endQuote =
         typeof suggestValues.missingEndQuote !== 'undefined' && !suggestValues.missingEndQuote
           ? ''
           : suggestValues.partialQuote || "'";
-      colRef.samples.forEach(sample => {
+      colRef.sample.forEach(sample => {
         valueSuggestions.push({
-          value: isString ? startQuote + sample + endQuote : String(sample),
+          value: isString ? startQuote + sample[0] + endQuote : String(sample[0]),
           meta: MetaLabels.Sample,
           category: Category.Sample,
           popular: false
@@ -1207,7 +1214,7 @@ class AutocompleteResults {
 
     const joinSuggestions: Suggestion[] = [];
     try {
-      const multiTableEntry = await new Promise<DataCatalogEntry>((resolve, reject) => {
+      const multiTableEntry = await new Promise<MultiTableEntry>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
         dataCatalog
           .getMultiTableEntry({
@@ -1216,18 +1223,18 @@ class AutocompleteResults {
             connector: this.executor.connector(),
             paths: paths
           })
-          .done(resolve)
-          .fail(reject);
+          .then(resolve)
+          .catch(reject);
       });
 
       const topJoins = await new Promise<TopJoins>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const topJoinsDeferred = multiTableEntry.getTopJoins({
+        const topJoinsPromise = multiTableEntry.getTopJoins({
           silenceErrors: true,
           cancellable: true
         });
-        this.cancellablePromises.push(topJoinsDeferred);
-        topJoinsDeferred.done(resolve).fail(reject);
+        this.cancellablePromises.push(topJoinsPromise);
+        topJoinsPromise.then(resolve).catch(reject);
       });
 
       let totalCount = 0;
@@ -1328,7 +1335,7 @@ class AutocompleteResults {
     const joinConditionSuggestions: Suggestion[] = [];
 
     try {
-      const multiTableEntry = await new Promise<DataCatalogEntry>((resolve, reject) => {
+      const multiTableEntry = await new Promise<MultiTableEntry>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
         dataCatalog
           .getMultiTableEntry({
@@ -1337,18 +1344,18 @@ class AutocompleteResults {
             connector: this.executor.connector(),
             paths: paths
           })
-          .done(resolve)
-          .fail(reject);
+          .then(resolve)
+          .catch(reject);
       });
 
       const topJoins = await new Promise<TopJoins>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const topJoinsDeferred = multiTableEntry.getTopJoins({
+        const topJoinsPromise = multiTableEntry.getTopJoins({
           silenceErrors: true,
           cancellable: true
         });
-        this.cancellablePromises.push(topJoinsDeferred);
-        topJoinsDeferred.done(resolve).fail(reject);
+        this.cancellablePromises.push(topJoinsPromise);
+        topJoinsPromise.then(resolve).catch(reject);
       });
 
       let totalCount = 0;
@@ -1419,7 +1426,7 @@ class AutocompleteResults {
     const aggregateFunctionsSuggestions: Suggestion[] = [];
 
     try {
-      const multiTableEntry = await new Promise<DataCatalogEntry>((resolve, reject) => {
+      const multiTableEntry = await new Promise<MultiTableEntry>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
         dataCatalog
           .getMultiTableEntry({
@@ -1428,8 +1435,8 @@ class AutocompleteResults {
             connector: this.executor.connector(),
             paths: paths
           })
-          .done(resolve)
-          .fail(reject);
+          .then(resolve)
+          .catch(reject);
       });
 
       const topAggs = await new Promise<TopAggs>((resolve, reject) => {
@@ -1439,7 +1446,7 @@ class AutocompleteResults {
           cancellable: true
         });
         this.cancellablePromises.push(topAggsDeferred);
-        topAggsDeferred.done(resolve).fail(reject);
+        topAggsDeferred.then(resolve).catch(reject);
       });
 
       if (!topAggs.values || !topAggs.values.length) {
@@ -1527,7 +1534,7 @@ class AutocompleteResults {
   }
 
   async handlePopularGroupByOrOrderBy(
-    optimizerAttribute: string,
+    optimizerAttribute: keyof OptimizerPopularitySubType,
     suggestSpec: CommonPopularSuggestion,
     columnsPromise: Promise<Suggestion[]>
   ): Promise<Suggestion[]> {
@@ -1549,7 +1556,7 @@ class AutocompleteResults {
     try {
       const entries = await new Promise<DataCatalogEntry[]>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const popularityDeferred = dataCatalog
+        const popularityPromise = dataCatalog
           .getCatalog(this.executor.connector())
           .loadOptimizerPopularityForTables({
             namespace: this.executor.namespace(),
@@ -1558,8 +1565,8 @@ class AutocompleteResults {
             silenceErrors: true,
             cancellable: true
           });
-        this.cancellablePromises.push(popularityDeferred);
-        popularityDeferred.done(resolve).fail(reject);
+        this.cancellablePromises.push(popularityPromise);
+        popularityPromise.then(resolve).catch(reject);
       });
 
       let totalColumnCount = 0;
@@ -1569,10 +1576,12 @@ class AutocompleteResults {
         : '';
 
       entries.forEach(entry => {
-        if (entry.optimizerPopularity[optimizerAttribute]) {
-          totalColumnCount += (<{ columnCount: number }>(
-            entry.optimizerPopularity[optimizerAttribute]
-          )).columnCount;
+        if (!entry.optimizerPopularity) {
+          return;
+        }
+        const popularity = entry.optimizerPopularity[optimizerAttribute];
+        if (popularity) {
+          totalColumnCount += popularity.columnCount;
           matchedEntries.push(entry);
         }
       });
@@ -1580,8 +1589,13 @@ class AutocompleteResults {
       if (totalColumnCount > 0) {
         const suggestions: Suggestion[] = [];
         matchedEntries.forEach(entry => {
+          const popularity =
+            entry.optimizerPopularity && entry.optimizerPopularity[optimizerAttribute];
+          if (!popularity) {
+            return;
+          }
           const filterValue = this.createOptimizerIdentifierForColumn(
-            <OptimizerPopularity>entry.optimizerPopularity[optimizerAttribute],
+            popularity,
             suggestSpec.tables
           );
           suggestions.push({
@@ -1592,12 +1606,7 @@ class AutocompleteResults {
               optimizerAttribute === 'groupByColumn'
                 ? Category.PopularGroupBy
                 : Category.PopularOrderBy,
-            weightAdjust: Math.round(
-              (100 *
-                (<{ columnCount: number }>entry.optimizerPopularity[optimizerAttribute])
-                  .columnCount) /
-                totalColumnCount
-            ),
+            weightAdjust: Math.round((100 * popularity.columnCount) / totalColumnCount),
             popular: true,
             hasCatalogEntry: false,
             details: entry
@@ -1663,7 +1672,7 @@ class AutocompleteResults {
     const filterSuggestions: Suggestion[] = [];
 
     try {
-      const multiTableEntry = await new Promise<DataCatalogEntry>((resolve, reject) => {
+      const multiTableEntry = await new Promise<MultiTableEntry>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
         dataCatalog
           .getMultiTableEntry({
@@ -1672,18 +1681,18 @@ class AutocompleteResults {
             connector: this.executor.connector(),
             paths: paths
           })
-          .done(resolve)
-          .fail(reject);
+          .then(resolve)
+          .catch(reject);
       });
 
       const topFilters = await new Promise<TopFilters>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const topFiltersDeferred = multiTableEntry.getTopFilters({
+        const topFiltersPromise = multiTableEntry.getTopFilters({
           silenceErrors: true,
           cancellable: true
         });
-        this.cancellablePromises.push(topFiltersDeferred);
-        topFiltersDeferred.done(resolve).fail(reject);
+        this.cancellablePromises.push(topFiltersPromise);
+        topFiltersPromise.then(resolve).catch(reject);
       });
 
       let totalCount = 0;
@@ -1760,18 +1769,18 @@ class AutocompleteResults {
             path: [db],
             temporaryOnly: this.temporaryOnly
           })
-          .done(resolve)
-          .fail(reject);
+          .then(resolve)
+          .catch(reject);
       });
 
       const childEntries = await new Promise<DataCatalogEntry[]>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const popularityDeferred = entry.loadOptimizerPopularityForChildren({
+        const popularityPromise = entry.loadOptimizerPopularityForChildren({
           silenceErrors: true,
           cancellable: true
         });
-        this.cancellablePromises.push(popularityDeferred);
-        popularityDeferred.done(resolve).fail(reject);
+        this.cancellablePromises.push(popularityPromise);
+        popularityPromise.then(resolve).catch(reject);
       });
 
       let totalPopularity = 0;
@@ -1789,9 +1798,9 @@ class AutocompleteResults {
         tableSuggestions.forEach(suggestion => {
           const details = <DataCatalogEntry>suggestion.details;
           if (popularityIndex.has(details.name)) {
-            suggestion.relativePopularity = Math.round(
-              (100 * <number>details.optimizerPopularity.popularity) / totalPopularity
-            );
+            const popularity =
+              (details.optimizerPopularity && details.optimizerPopularity.popularity) || 0;
+            suggestion.relativePopularity = Math.round((100 * popularity) / totalPopularity);
             if (suggestion.relativePopularity >= 5) {
               suggestion.popular = true;
             }
@@ -1838,7 +1847,7 @@ class AutocompleteResults {
 
       const popularEntries = await new Promise<DataCatalogEntry[]>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const popularityDeferred = dataCatalog
+        const popularityPromise = dataCatalog
           .getCatalog(this.executor.connector())
           .loadOptimizerPopularityForTables({
             namespace: this.executor.namespace(),
@@ -1847,11 +1856,13 @@ class AutocompleteResults {
             silenceErrors: true,
             cancellable: true
           });
-        this.cancellablePromises.push(popularityDeferred);
-        popularityDeferred.done(resolve).fail(reject);
+        this.cancellablePromises.push(popularityPromise);
+        popularityPromise.then(resolve).catch(reject);
       });
 
-      let valueAttribute = '';
+      let valueAttribute:
+        | keyof Pick<OptimizerPopularitySubType, 'selectColumn' | 'groupByColumn' | 'orderByColumn'>
+        | undefined;
       switch (suggestColumns.source) {
         case 'select':
           valueAttribute = 'selectColumn';
@@ -1866,12 +1877,16 @@ class AutocompleteResults {
       const popularityIndex = new Set<string>();
 
       popularEntries.forEach(popularEntry => {
-        if (popularEntry.optimizerPopularity && popularEntry.optimizerPopularity[valueAttribute]) {
+        if (
+          valueAttribute &&
+          popularEntry.optimizerPopularity &&
+          popularEntry.optimizerPopularity[valueAttribute]
+        ) {
           popularityIndex.add(popularEntry.getQualifiedPath());
         }
       });
 
-      if (!valueAttribute || Object.keys(popularityIndex).length === 0) {
+      if (!valueAttribute || popularityIndex.size === 0) {
         return [];
       }
 
@@ -1879,19 +1894,32 @@ class AutocompleteResults {
       const matchedSuggestions: Suggestion[] = [];
       columnSuggestions.forEach(suggestion => {
         const details = <DataCatalogEntry>suggestion.details;
-        if (suggestion.hasCatalogEntry && popularityIndex.has(details.getQualifiedPath())) {
+        if (!valueAttribute) {
+          return;
+        }
+        const popularity =
+          details.optimizerPopularity && details.optimizerPopularity[valueAttribute];
+        if (
+          popularity &&
+          suggestion.hasCatalogEntry &&
+          popularityIndex.has(details.getQualifiedPath())
+        ) {
           matchedSuggestions.push(suggestion);
-          totalColumnCount += (<{ columnCount: number }>details.optimizerPopularity[valueAttribute])
-            .columnCount;
+          totalColumnCount += popularity.columnCount;
         }
       });
       if (totalColumnCount > 0) {
         matchedSuggestions.forEach(matchedSuggestion => {
           const details = <DataCatalogEntry>matchedSuggestion.details;
+          if (!details.optimizerPopularity || !valueAttribute) {
+            return;
+          }
+          const popularity = details.optimizerPopularity[valueAttribute];
+          if (!popularity) {
+            return;
+          }
           matchedSuggestion.relativePopularity = Math.round(
-            (100 *
-              (<{ columnCount: number }>details.optimizerPopularity[valueAttribute]).columnCount) /
-              totalColumnCount
+            (100 * popularity.columnCount) / totalColumnCount
           );
           if (matchedSuggestion.relativePopularity >= 5) {
             matchedSuggestion.popular = true;
@@ -2072,37 +2100,39 @@ class AutocompleteResults {
             path: <string[]>fetchedPath,
             temporaryOnly: this.temporaryOnly
           })
-          .done(resolve)
-          .fail(reject);
+          .then(resolve)
+          .catch(reject);
       });
 
       const sourceMeta = await new Promise<SourceMeta>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const sourceMetaDeferred = catalogEntry.getSourceMeta({
+        const sourceMetaPromise = catalogEntry.getSourceMeta({
           silenceErrors: true,
           cancellable: true
         });
-        this.cancellablePromises.push(sourceMetaDeferred);
-        sourceMetaDeferred.done(resolve).fail(reject);
+        this.cancellablePromises.push(sourceMetaPromise);
+        sourceMetaPromise.then(resolve).catch(reject);
       });
 
+      const extendedColumns = (<TableSourceMeta>sourceMeta).extended_columns;
       if (
         this.dialect() === HIVE_DIALECT &&
-        typeof sourceMeta.extended_columns !== 'undefined' &&
-        sourceMeta.extended_columns.length === 1 &&
-        /^(?:map|array|struct)/i.test(sourceMeta.extended_columns[0].type)
+        extendedColumns &&
+        extendedColumns.length === 1 &&
+        /^(?:map|array|struct)/i.test(extendedColumns[0].type)
       ) {
-        remainingPath.unshift(sourceMeta.extended_columns[0].name);
+        remainingPath.unshift(extendedColumns[0].name);
       }
+
       if (remainingPath.length) {
         if (/value|item|key/i.test(remainingPath[0])) {
           const path = remainingPath.shift();
           if (path) {
             fetchedPath.push(path);
           }
-        } else if (sourceMeta.type === 'array') {
+        } else if ((<FieldSourceMeta>sourceMeta).type === 'array') {
           fetchedPath.push('item');
-        } else if (sourceMeta.type === 'map') {
+        } else if ((<FieldSourceMeta>sourceMeta).type === 'map') {
           fetchedPath.push('value');
         }
         return await fetchFieldRecursive(remainingPath, fetchedPath);
@@ -2127,18 +2157,18 @@ class AutocompleteResults {
             path: [],
             temporaryOnly: this.temporaryOnly
           })
-          .done(resolve)
-          .fail(reject);
+          .then(resolve)
+          .catch(reject);
       });
 
       const databaseEntries = await new Promise<DataCatalogEntry[]>((resolve, reject) => {
         this.onCancelFunctions.push(reject);
-        const childrenDeferred = catalogEntry.getChildren({
+        const childrenPromise = catalogEntry.getChildren({
           silenceErrors: true,
           cancellable: true
         });
-        this.cancellablePromises.push(childrenDeferred);
-        childrenDeferred.done(resolve).fail(reject);
+        this.cancellablePromises.push(childrenPromise);
+        childrenPromise.then(resolve).catch(reject);
       });
 
       const firstIsDb = databaseEntries.some(dbEntry =>
