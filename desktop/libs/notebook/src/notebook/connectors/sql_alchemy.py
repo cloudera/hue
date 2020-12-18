@@ -296,7 +296,10 @@ class SqlAlchemyApi(Api):
     response = {'status': 'canceled'}
 
     if connection:
-      if snippet['result']['handle']['has_result_set']:
+      cursor = connection['result'].cursor
+      if self.options['url'].startswith('presto://') and cursor and cursor.poll():
+        response['status'] = 'running'
+      elif snippet['result']['handle']['has_result_set']:
         response['status'] = 'available'
       else:
         response['status'] = 'success'
@@ -304,6 +307,20 @@ class SqlAlchemyApi(Api):
       raise QueryExpired()
 
     return response
+
+  @query_error_handler
+  def progress(self, notebook, snippet, logs=''):
+    if self.options['url'].startswith('presto://'):
+      guid = snippet['result']['handle']['guid']
+      handle = CONNECTIONS.get(guid)
+      if not handle:
+        return 50
+      stats = handle['result'].cursor.poll()
+      if not stats:
+        return 100
+      stats = stats.get('stats', {})
+      return stats.get('completedSplits', 0) * 100 // stats.get('totalSplits', 1)
+    return 50
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):

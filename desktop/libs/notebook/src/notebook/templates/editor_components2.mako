@@ -1486,6 +1486,12 @@
           snippetIcon: 'fa-database',
           sqlDialect: true
         },
+        dasksql: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/dasksql',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
         elasticsearch: {
           placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
           aceMode: 'ace/mode/elasticsearch',
