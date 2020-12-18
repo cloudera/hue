@@ -373,10 +373,11 @@ class HS2Api(Api):
         'has_more': results.has_more,
         'data': results.rows(),
         'meta': [{
-          'name': column.name,
-          'type': column.type,
-          'comment': column.comment
-        } for column in results.data_table.cols()],
+            'name': column.name,
+            'type': column.type,
+            'comment': column.comment
+          } for column in results.data_table.cols()
+        ],
         'type': 'table'
     }
 

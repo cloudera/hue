@@ -170,7 +170,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
     response['code'] = 500
     response['error'] = str(e)
   except Exception as e:
-    LOG.warn('Autocomplete data fetching error: %s' % e)
+    LOG.exception('Autocomplete data fetching error')
     response['code'] = 500
     response['error'] = str(e)
 
@@ -233,10 +233,10 @@ def parameters(request, design_id=None):
     parameterization_form = parameterization_form_cls(prefix="parameterization")
 
     response['parameters'] = [{'parameter': field.html_name, 'name': field.name} for field in parameterization_form]
-    response['status']= 0
+    response['status'] = 0
   else:
     response['parameters'] = []
-    response['status']= 0
+    response['status'] = 0
 
   return JsonResponse(response)
 
@@ -433,7 +433,7 @@ def execute(request, design_id=None):
         'functions': query_form.functions.errors,
       }
   except RuntimeError as e:
-    response['message']= str(e)
+    response['message'] = str(e)
 
   return JsonResponse(response)
 
@@ -670,12 +670,17 @@ def save_results_hive_table(request, query_history_id):
         return JsonResponse(response)
 
       try:
-        query_history = db.create_table_as_a_select(request, query_history, form.target_database, form.cleaned_data['target_table'], result_meta)
+        query_history = db.create_table_as_a_select(
+          request, query_history, form.target_database, form.cleaned_data['target_table'], result_meta
+        )
         response['id'] = query_history.id
         response['query'] = query_history.query
         response['type'] = 'hive-table'
         response['path'] = form.cleaned_data['target_table']
-        response['success_url'] = reverse('metastore:describe_table', kwargs={'database': form.target_database, 'table': form.cleaned_data['target_table']})
+        response['success_url'] = reverse(
+          'metastore:describe_table',
+          kwargs={'database': form.target_database, 'table': form.cleaned_data['target_table']}
+        )
         response['watch_url'] = reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id})
       except Exception as ex:
         error_msg, log = expand_exception(ex, db)
