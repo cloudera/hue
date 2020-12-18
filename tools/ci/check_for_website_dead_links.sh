@@ -43,7 +43,7 @@ if [ "$?" -eq "0" ];
 
     muffet http://localhost:1313/ \
         --exclude "https://issues.cloudera.org*|http://localhost:5555*|https://issues.apache.org/jira*|https://github.com*\
-          |http://demo.gethue.com*|https://twitter.com/gethue" \
+          |http://demo.gethue.com*|https://twitter.com/gethue|https://github.com*" \
         --ignore-fragments \
         --timeout 15 \
         --concurrency 10
