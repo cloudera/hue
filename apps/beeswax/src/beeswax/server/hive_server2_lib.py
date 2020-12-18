@@ -17,7 +17,6 @@
 
 from builtins import next, filter, map, object
 import logging
-import itertools
 import json
 import re
 import sys
@@ -37,7 +36,7 @@ from desktop.conf import DEFAULT_USER
 from beeswax import conf as beeswax_conf, hive_site
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT
-from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory
+from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
 from beeswax.server.dbms import Table, DataTable, QueryServerException, InvalidSessionQueryServerException
 
 
@@ -286,7 +285,11 @@ class HiveServerTRow2(object):
 
   def col(self, colName):
     pos = self._get_col_position(colName)
-    return HiveServerTColumnValue2(self.cols[pos]).val[0] # Return only first element
+    try:
+      return HiveServerTColumnValue2(self.cols[pos]).val[0] # Return only first element
+    except:
+      # Bug with SparkSql
+      return ''
 
   def full_col(self, colName):
     pos = self._get_col_position(colName)
@@ -1324,8 +1327,9 @@ class HiveServerTableCompatible(HiveServerTable):
           'name': col.get('col_name', '').strip() if col.get('col_name') else '',
           'type': col.get('data_type', '').strip() if col.get('data_type') else '',
           'comment': col.get('comment', '').strip() if col.get('comment') else ''
-        }) for col in HiveServerTable.cols.fget(self)
-  ]
+        })
+        for col in HiveServerTable.cols.fget(self)
+    ]
 
 
 class ResultCompatible(object):
@@ -1505,9 +1509,10 @@ class HiveServerClientCompatible(object):
     massaged_tables = []
     for table in tables:
       massaged_tables.append({
-        'name': table['TABLE_NAME'],
-        'comment': table['REMARKS'],
-        'type': table['TABLE_TYPE'].capitalize()}
+          'name': table['TABLE_NAME'],
+          'comment': table['REMARKS'],
+          'type': table['TABLE_TYPE'].capitalize()
+        }
       )
     return massaged_tables
 

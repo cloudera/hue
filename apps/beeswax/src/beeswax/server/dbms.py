@@ -231,7 +231,7 @@ def get_query_server_config(name='beeswax', connector=None):
           'max_number_of_sessions': MAX_NUMBER_OF_SESSIONS.get()
         }
 
-    if name == 'sparksql': # Extends Hive as very similar
+    if name == 'sparksql':  # Extends Hive as very similar
       from spark.conf import SQL_SERVER_HOST as SPARK_SERVER_HOST, SQL_SERVER_PORT as SPARK_SERVER_PORT, USE_SASL as SPARK_USE_SASL
 
       query_server.update({
@@ -314,7 +314,8 @@ class HiveServer2Dbms(object):
   def __init__(self, client, server_type):
     self.client = client
     self.server_type = server_type
-    self.server_name = self.client.query_server['server_name']
+    self.server_name = self.client.query_server.get('dialect') if self.client.query_server['server_name'].isdigit() \
+        else self.client.query_server['server_name']
 
 
   @classmethod
@@ -360,29 +361,63 @@ class HiveServer2Dbms(object):
 
 
   def get_tables_meta(self, database='default', table_names='*', table_types=None):
-    database = database.lower() # Impala is case sensitive
+    database = database.lower()  # Impala is case sensitive
 
     if self.server_name in ('beeswax', 'sparksql'):
       identifier = self.to_matching_wildcard(table_names)
     else:
       identifier = None
-    tables = self.client.get_tables_meta(database, identifier, table_types)
+
+    if self.server_name == 'sparksql':
+      tables = self._get_tables_via_sparksql(database, table_names)
+    else:
+      tables = self.client.get_tables_meta(database, table_names)
+
     if len(tables) <= APPLY_NATURAL_SORT_MAX.get():
       tables = apply_natural_sort(tables, key='name')
     return tables
 
 
   def get_tables(self, database='default', table_names='*', table_types=None):
-    database = database.lower() # Impala is case sensitive
+    database = database.lower()  # Impala is case sensitive
 
     if self.server_name in ('beeswax', 'sparksql'):
       identifier = self.to_matching_wildcard(table_names)
     else:
       identifier = None
+
     tables = self.client.get_tables(database, identifier, table_types)
+
     if len(tables) <= APPLY_NATURAL_SORT_MAX.get():
       tables = apply_natural_sort(tables)
     return tables
+
+
+  def _get_tables_via_sparksql(self, database, table_names='*'):
+    hql = "SHOW TABLES IN %s" % database
+    if table_names != '*':
+      identifier = self.to_matching_wildcard(table_names)
+      hql += " LIKE '%s'" % (identifier)
+
+    query = hql_query(hql)
+    timeout = SERVER_CONN_TIMEOUT.get()
+
+    handle = self.execute_and_wait(query, timeout_sec=timeout)
+
+    if handle:
+      result = self.fetch(handle, rows=5000)
+      self.close(handle)
+
+      # We get back: database | tableName | isTemporary
+      return [{
+          'name': row[1],
+          'type': 'VIEW' if row[2] else 'TABLE',
+          'comment': ''
+        }
+        for row in result.rows()
+      ]
+    else:
+      return []
 
 
   def get_table(self, database, table_name):
