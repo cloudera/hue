@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery';
 import { simplePostAsync } from 'api/apiUtils';
 import { FETCH_CONFIG_API } from 'api/urls';
 import {
@@ -45,7 +44,7 @@ export const refreshConfig = async (): Promise<HueConfig> => {
         lastKnownConfig = apiResponse;
         resolve(lastKnownConfig);
       } else {
-        $(document).trigger('error', apiResponse.message);
+        huePubSub.publish('hue.error', apiResponse.message);
         reject();
       }
     } catch (err) {

@@ -290,8 +290,8 @@ class SampleEnrichedEntry {
       self
         .catalogEntry()
         .setComment(self.comment())
-        .done(self.comment)
-        .fail(() => {
+        .then(self.comment)
+        .catch(() => {
           self.comment(self.catalogEntry().getResolvedComment());
         });
     }
@@ -442,8 +442,10 @@ class CatalogEntriesList {
 
       const childPromise = self
         .catalogEntry()
-        .getChildren({ silenceErrors: true, cancellable: true })
-        .done(childEntries => {
+        .getChildren({ silenceErrors: true, cancellable: true });
+
+      childPromise
+        .then(childEntries => {
           const entries = $.map(childEntries, (entry, index) => {
             return new SampleEnrichedEntry(index, entry, onClick, onRowClick);
           });
@@ -451,60 +453,60 @@ class CatalogEntriesList {
           self.entries(entries);
           entriesAddedDeferred.resolve(entries);
         })
-        .fail(() => {
+        .catch(() => {
           self.hasErrors(true);
           entriesAddedDeferred.reject();
         })
-        .always(() => {
+        .finally(() => {
           self.loading(false);
         });
 
       if (self.catalogEntry().isTableOrView()) {
         const joinsPromise = self
           .catalogEntry()
-          .getTopJoins({ silenceErrors: true, cancellable: true })
-          .done(topJoins => {
-            if (topJoins && topJoins.values && topJoins.values.length) {
-              entriesAddedDeferred.done(entries => {
-                const entriesIndex = {};
-                entries.forEach(entry => {
-                  entriesIndex[entry.catalogEntry().path.join('.').toLowerCase()] = {
-                    joinColumnIndex: {},
-                    entry: entry
-                  };
-                });
-                topJoins.values.forEach(topJoin => {
-                  topJoin.joinCols.forEach(topJoinCols => {
-                    if (topJoinCols.columns.length === 2) {
-                      if (entriesIndex[topJoinCols.columns[0].toLowerCase()]) {
-                        entriesIndex[topJoinCols.columns[0].toLowerCase()].joinColumnIndex[
-                          topJoinCols.columns[1].toLowerCase()
-                        ] = topJoinCols.columns[1];
-                      } else if (entriesIndex[topJoinCols.columns[1].toLowerCase()]) {
-                        entriesIndex[topJoinCols.columns[1].toLowerCase()].joinColumnIndex[
-                          topJoinCols.columns[0].toLowerCase()
-                        ] = topJoinCols.columns[0];
-                      }
+          .getTopJoins({ silenceErrors: true, cancellable: true });
+        joinsPromise.then(topJoins => {
+          if (topJoins && topJoins.values && topJoins.values.length) {
+            entriesAddedDeferred.then(entries => {
+              const entriesIndex = {};
+              entries.forEach(entry => {
+                entriesIndex[entry.catalogEntry().path.join('.').toLowerCase()] = {
+                  joinColumnIndex: {},
+                  entry: entry
+                };
+              });
+              topJoins.values.forEach(topJoin => {
+                topJoin.joinCols.forEach(topJoinCols => {
+                  if (topJoinCols.columns.length === 2) {
+                    if (entriesIndex[topJoinCols.columns[0].toLowerCase()]) {
+                      entriesIndex[topJoinCols.columns[0].toLowerCase()].joinColumnIndex[
+                        topJoinCols.columns[1].toLowerCase()
+                      ] = topJoinCols.columns[1];
+                    } else if (entriesIndex[topJoinCols.columns[1].toLowerCase()]) {
+                      entriesIndex[topJoinCols.columns[1].toLowerCase()].joinColumnIndex[
+                        topJoinCols.columns[0].toLowerCase()
+                      ] = topJoinCols.columns[0];
                     }
-                  });
-                });
-                Object.keys(entriesIndex).forEach(key => {
-                  if (Object.keys(entriesIndex[key].joinColumnIndex).length) {
-                    entriesIndex[key].entry.joinColumns(
-                      Object.keys(entriesIndex[key].joinColumnIndex)
-                    );
                   }
                 });
               });
-            }
-          });
+              Object.keys(entriesIndex).forEach(key => {
+                if (Object.keys(entriesIndex[key].joinColumnIndex).length) {
+                  entriesIndex[key].entry.joinColumns(
+                    Object.keys(entriesIndex[key].joinColumnIndex)
+                  );
+                }
+              });
+            });
+          }
+        });
         self.cancellablePromises.push(joinsPromise);
       }
 
       const navMetaPromise = self
         .catalogEntry()
         .loadNavigatorMetaForChildren({ silenceErrors: true, cancellable: true })
-        .always(() => {
+        .finally(() => {
           self.loadingNav(false);
         });
 
@@ -515,9 +517,9 @@ class CatalogEntriesList {
         self
           .catalogEntry()
           .loadOptimizerPopularityForChildren({ silenceErrors: true, cancellable: true })
-          .done(popularEntries => {
+          .then(popularEntries => {
             if (popularEntries.length) {
-              childPromise.done(() => {
+              childPromise.then(() => {
                 const entryIndex = {};
                 self.entries().forEach(entry => {
                   entryIndex[entry.catalogEntry().name] = entry;
@@ -562,16 +564,15 @@ class CatalogEntriesList {
 
         const fetchSamples = function () {
           window.clearInterval(self.fetchSampleTimeout);
-          self.lastSamplePromise = self
-            .catalogEntry()
-            .getSample({
-              silenceErrors: true,
-              cancellable: true,
-              refreshCache: !firstSampleFetch
-            })
-            .done(sample => {
+          self.lastSamplePromise = self.catalogEntry().getSample({
+            silenceErrors: true,
+            cancellable: true,
+            refreshCache: !firstSampleFetch
+          });
+          self.lastSamplePromise
+            .then(sample => {
               childPromise
-                .done(() => {
+                .then(() => {
                   if (sample.meta && sample.meta.length && sample.data && sample.data.length) {
                     const entryIndex = {};
                     self.entries().forEach(entry => {
@@ -595,7 +596,7 @@ class CatalogEntriesList {
                     }
                   }
                 })
-                .always(() => {
+                .finally(() => {
                   self.loadingSamples(false);
                   firstSampleFetch = false;
                   if (self.refreshSampleInterval && self.sampleRefreshEnabled()) {
@@ -606,7 +607,7 @@ class CatalogEntriesList {
                   }
                 });
             })
-            .fail(() => {
+            .catch(() => {
               self.loadingSamples(false);
             });
         };

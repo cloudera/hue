@@ -78,11 +78,11 @@ class MetastoreNamespace {
         path: [],
         definition: { type: 'source' }
       })
-      .done(entry => {
+      .then(entry => {
         this.catalogEntry(entry);
         entry
           .getChildren()
-          .done(databaseEntries => {
+          .then(databaseEntries => {
             this.databases(
               databaseEntries.map(
                 databaseEntry =>
@@ -95,7 +95,7 @@ class MetastoreNamespace {
             );
             deferred.resolve();
           })
-          .fail(deferred.reject);
+          .catch(deferred.reject);
       });
 
     return this.lastLoadDatabasesPromise;

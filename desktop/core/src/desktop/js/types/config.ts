@@ -100,6 +100,7 @@ export interface Connector extends IdentifiableInterpreter {
   dialect_properties?: {
     sql_identifier_quote?: string;
   };
+  optimizer?: string;
 }
 
 export interface EditorInterpreter extends IdentifiableInterpreter {

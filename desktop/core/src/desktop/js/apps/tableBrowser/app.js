@@ -155,7 +155,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
         path: [],
         definition: { type: 'source' }
       })
-      .done(entry => {
+      .then(entry => {
         entry.clearCache({
           silenceErrors: true
         });

@@ -18,7 +18,7 @@ import { Ace } from 'ext/ace';
 import ace from 'ext/aceHelper';
 
 import Executor from 'apps/notebook2/execution/executor';
-import DataCatalogEntry from 'catalog/dataCatalogEntry';
+import DataCatalogEntry, { TableSourceMeta } from 'catalog/DataCatalogEntry';
 import SubscriptionTracker, { Disposable } from 'components/utils/SubscriptionTracker';
 import AssistStorageEntry from 'ko/components/assist/assistStorageEntry';
 import dataCatalog from 'catalog/dataCatalog';
@@ -146,25 +146,25 @@ export default class AceLocationHandler implements Disposable {
     this.updateAvailableDatabases();
   }
 
-  private updateAvailableDatabases() {
+  private async updateAvailableDatabases() {
     window.clearTimeout(this.updateTimeout);
     if (!this.executor.namespace() || !this.executor.compute()) {
       this.updateTimeout = window.setTimeout(this.updateAvailableDatabases.bind(this), 300);
       return;
     }
-    dataCatalog
-      .getChildren({
+    try {
+      const children = await dataCatalog.getChildren({
         connector: this.executor.connector(),
         namespace: this.executor.namespace(),
         compute: this.executor.compute(),
         path: <string[]>[]
-      })
-      .then(children => {
-        this.availableDatabases.clear();
-        children.forEach((dbEntry: DataCatalogEntry) => {
-          this.availableDatabases.add(dbEntry.name.toLowerCase());
-        });
       });
+
+      this.availableDatabases.clear();
+      children.forEach((dbEntry: DataCatalogEntry) => {
+        this.availableDatabases.add(dbEntry.name.toLowerCase());
+      });
+    } catch (err) {}
   }
 
   private isSqlDialect(): boolean {
@@ -282,12 +282,12 @@ export default class AceLocationHandler implements Disposable {
                         temporaryOnly: this.temporaryOnly,
                         path: tableChain.map(identifier => identifier.name)
                       })
-                      .done(entry => {
+                      .then(entry => {
                         entry
                           .getSourceMeta({ cachedOnly: true, silenceErrors: true })
-                          .done(sourceMeta => {
-                            if (sourceMeta && sourceMeta.extended_columns) {
-                              sourceMeta.extended_columns.every(
+                          .then(sourceMeta => {
+                            if (sourceMeta && (<TableSourceMeta>sourceMeta).extended_columns) {
+                              (<TableSourceMeta>sourceMeta).extended_columns.every(
                                 (col: { name: string; type: string }) => {
                                   if (col.name.toLowerCase() === colName) {
                                     colType = (col.type.match(/^[^<]*/g) || ['T'])[0];
@@ -468,7 +468,7 @@ export default class AceLocationHandler implements Disposable {
               .resolveCatalogEntry({
                 temporaryOnly: this.temporaryOnly
               })
-              .done(entry => {
+              .then(entry => {
                 huePubSub.publish('context.popover.show', {
                   data: {
                     type: 'catalogEntry',
@@ -479,7 +479,7 @@ export default class AceLocationHandler implements Disposable {
                   source: source
                 });
               })
-              .fail(() => {
+              .catch(() => {
                 token.notFound = true;
               });
           } else if (token.parseLocation && !token.notFound) {
@@ -903,19 +903,14 @@ export default class AceLocationHandler implements Disposable {
   }
 
   async fetchChildren(identifierChain: IdentifierChainEntry[]): Promise<DataCatalogEntry[]> {
-    return new Promise((resolve, reject) => {
-      dataCatalog
-        .getChildren({
-          connector: this.executor.connector(),
-          namespace: this.executor.namespace(),
-          compute: this.executor.compute(),
-          temporaryOnly: this.temporaryOnly,
-          path: identifierChain.map(identifier => identifier.name),
-          silenceErrors: true,
-          cachedOnly: true
-        })
-        .done(resolve)
-        .fail(reject);
+    return dataCatalog.getChildren({
+      connector: this.executor.connector(),
+      namespace: this.executor.namespace(),
+      compute: this.executor.compute(),
+      temporaryOnly: this.temporaryOnly,
+      path: identifierChain.map(identifier => identifier.name),
+      silenceErrors: true,
+      cachedOnly: true
     });
   }
 
@@ -960,9 +955,14 @@ export default class AceLocationHandler implements Disposable {
       token.parseLocation.identifierChain.length
     ) {
       // fetch the parent
-      return await this.fetchChildren(
-        token.parseLocation.identifierChain.slice(0, token.parseLocation.identifierChain.length - 1)
-      );
+      try {
+        return await this.fetchChildren(
+          token.parseLocation.identifierChain.slice(
+            0,
+            token.parseLocation.identifierChain.length - 1
+          )
+        );
+      } catch (err) {}
     }
 
     return [];
@@ -1035,7 +1035,7 @@ export default class AceLocationHandler implements Disposable {
                   cachedOnly: true,
                   silenceErrors: true
                 })
-                .done((entries: DataCatalogEntry[]) => {
+                .then((entries: DataCatalogEntry[]) => {
                   const containsColumn = entries.some(
                     entry =>
                       location.identifierChain &&
@@ -1055,7 +1055,7 @@ export default class AceLocationHandler implements Disposable {
                     resolve();
                   }
                 })
-                .fail(() => resolve());
+                .catch(() => resolve());
             } else if (tablesToGo.length > 0) {
               findIdentifierChainInTable(tablesToGo);
             } else {

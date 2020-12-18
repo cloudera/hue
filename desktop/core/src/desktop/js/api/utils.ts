@@ -14,17 +14,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import axios, { AxiosResponse, AxiosTransformer } from 'axios';
+import axios, { AxiosError, AxiosTransformer } from 'axios';
 import qs from 'qs';
+import huePubSub from 'utils/huePubSub';
 
 import { CancellablePromise } from './cancellablePromise';
 import hueUtils from 'utils/hueUtils';
 
-export const successResponseIsError = (responseData?: {
-  traceback?: string;
-  status?: number;
+export interface DefaultApiResponse {
+  status: number;
   code?: number;
-}): boolean => {
+  error?: string | unknown;
+  message?: string;
+  responseText?: string;
+  statusText?: string;
+  traceback?: string;
+}
+
+export const successResponseIsError = (responseData?: DefaultApiResponse): boolean => {
   return (
     typeof responseData !== 'undefined' &&
     (typeof responseData.traceback !== 'undefined' ||
@@ -37,14 +44,7 @@ export const successResponseIsError = (responseData?: {
 const UNKNOWN_ERROR_MESSAGE = 'Unknown error occurred';
 
 export const extractErrorMessage = (
-  errorResponse?:
-    | {
-        statusText?: string;
-        responseText?: string;
-        message?: string;
-        error?: string | unknown;
-      }
-    | string
+  errorResponse?: DefaultApiResponse | AxiosError | string
 ): string => {
   if (!errorResponse) {
     return UNKNOWN_ERROR_MESSAGE;
@@ -52,81 +52,110 @@ export const extractErrorMessage = (
   if (typeof errorResponse === 'string') {
     return errorResponse;
   }
-  if (errorResponse.statusText && errorResponse.statusText !== 'abort') {
-    return errorResponse.statusText;
+  const defaultResponse = <DefaultApiResponse>errorResponse;
+  if (defaultResponse.statusText && defaultResponse.statusText !== 'abort') {
+    return defaultResponse.statusText;
   }
-  if (errorResponse.responseText) {
+  if (defaultResponse.responseText) {
     try {
-      const errorJs = JSON.parse(errorResponse.responseText);
+      const errorJs = JSON.parse(defaultResponse.responseText);
       if (errorJs.message) {
         return errorJs.message;
       }
     } catch (err) {}
-    return errorResponse.responseText;
+    return defaultResponse.responseText;
   }
   if (errorResponse.message) {
     return errorResponse.message;
   }
-  if (errorResponse.statusText) {
-    return errorResponse.statusText;
+  if (defaultResponse.statusText) {
+    return defaultResponse.statusText;
   }
-  if (errorResponse.error && typeof errorResponse.error === 'string') {
-    return errorResponse.error;
+  if (defaultResponse.error && typeof defaultResponse.error === 'string') {
+    return defaultResponse.error;
   }
   return UNKNOWN_ERROR_MESSAGE;
 };
 
-export const post = <T, U = unknown>(
+export const post = <T, U = unknown, E = string>(
   url: string,
   data?: U,
   options?: {
     silenceErrors?: boolean;
     ignoreSuccessErrors?: boolean;
     transformResponse?: AxiosTransformer;
+    handleSuccess?: (
+      response: T & DefaultApiResponse,
+      resolve: (val: T) => void,
+      reject: (err: unknown) => void
+    ) => void;
+    handleError?: (
+      errorResponse: AxiosError<E>,
+      resolve: (val: T) => void,
+      reject: (err: unknown) => void
+    ) => void;
   }
 ): CancellablePromise<T> =>
   new CancellablePromise((resolve, reject, onCancel) => {
-    const handleErrorResponse = (response: AxiosResponse<T>): void => {
-      const errorMessage = extractErrorMessage(response.data);
-      reject(errorMessage);
+    const notifyError = (message: string, response: unknown): void => {
       if (!options || !options.silenceErrors) {
-        hueUtils.logError(response.data);
-        if (errorMessage.indexOf('AuthorizationException') === -1) {
-          $(document).trigger('error', errorMessage);
+        hueUtils.logError(response);
+        if (message.indexOf('AuthorizationException') === -1) {
+          huePubSub.publish('hue.error', message);
         }
       }
+    };
+
+    const handleErrorResponse = (err: AxiosError<DefaultApiResponse>): void => {
+      const errorMessage = extractErrorMessage(err.response && err.response.data);
       reject(errorMessage);
+      notifyError(errorMessage, (err && err.response) || err);
     };
 
     const cancelTokenSource = axios.CancelToken.source();
     let completed = false;
 
     axios
-      .post<T>(url, qs.stringify(data), {
+      .post<T & DefaultApiResponse>(url, qs.stringify(data), {
         cancelToken: cancelTokenSource.token,
         transformResponse: options && options.transformResponse
       })
       .then(response => {
-        if ((!options || !options.ignoreSuccessErrors) && successResponseIsError(response.data)) {
-          handleErrorResponse(response);
+        if (options && options.handleSuccess) {
+          options.handleSuccess(response.data, resolve, reason => {
+            reject(reason);
+            notifyError(String(reason), response.data);
+          });
+        } else if (
+          (!options || !options.ignoreSuccessErrors) &&
+          successResponseIsError(response.data)
+        ) {
+          const errorMessage = extractErrorMessage(response && response.data);
+          reject(errorMessage);
+          notifyError(errorMessage, response);
         } else {
           resolve(response.data);
         }
       })
-      .catch(err => {
-        handleErrorResponse(err);
+      .catch((err: AxiosError) => {
+        if (options && options.handleError) {
+          options.handleError(err, resolve, reason => {
+            handleErrorResponse(err);
+            notifyError(String(reason), err);
+          });
+        } else {
+          handleErrorResponse(err);
+        }
       })
       .finally(() => {
         completed = true;
       });
 
-    if (onCancel) {
-      onCancel(() => {
-        if (!completed) {
-          cancelTokenSource.cancel();
-        }
-      });
-    }
+    onCancel(() => {
+      if (!completed) {
+        cancelTokenSource.cancel();
+      }
+    });
   });
 
 export const cancelActiveRequest = (request?: JQuery.jqXHR): void => {

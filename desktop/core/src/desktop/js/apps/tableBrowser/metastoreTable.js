@@ -110,12 +110,12 @@ class MetastoreTable {
     );
 
     this.comment.subscribe(newValue => {
-      this.catalogEntry.getComment().done(comment => {
+      this.catalogEntry.getComment().then(comment => {
         if (comment !== newValue) {
           this.catalogEntry
             .setComment(newValue)
-            .done(this.comment)
-            .fail(() => {
+            .then(this.comment)
+            .catch(() => {
               this.comment(comment);
             });
         }
@@ -129,10 +129,10 @@ class MetastoreTable {
       this.refreshingTableStats(true);
       this.catalogEntry
         .getAnalysis({ refreshAnalysis: true, silenceErrors: true })
-        .done(() => {
+        .then(() => {
           this.fetchDetails();
         })
-        .fail(data => {
+        .catch(data => {
           this.refreshingTableStats(false);
           $.jHueNotify.error(
             I18n('An error occurred refreshing the table stats. Please try again.')
@@ -146,7 +146,7 @@ class MetastoreTable {
       this.loadingColumns(true);
       this.catalogEntry
         .getChildren()
-        .done(columnEntries => {
+        .then(columnEntries => {
           this.columns(
             columnEntries.map(
               columnEntry =>
@@ -159,7 +159,7 @@ class MetastoreTable {
 
           this.catalogEntry
             .getOptimizerMeta()
-            .done(optimizerMeta => {
+            .then(optimizerMeta => {
               this.optimizerDetails(optimizerMeta);
 
               const topColIndex = {};
@@ -173,14 +173,15 @@ class MetastoreTable {
                 }
               });
             })
-            .always(() => {
+            .catch(() => {})
+            .finally(() => {
               this.loadingQueries(false);
             });
         })
-        .fail(() => {
+        .catch(() => {
           this.columns([]);
         })
-        .always(() => {
+        .finally(() => {
           this.loadingColumns(false);
         });
     };
@@ -189,10 +190,10 @@ class MetastoreTable {
       this.loadingComment(true);
       this.database.catalogEntry
         .loadNavigatorMetaForChildren()
-        .done(() => {
-          this.catalogEntry.getComment().done(this.comment);
+        .then(() => {
+          this.catalogEntry.getComment().then(this.comment);
         })
-        .always(() => {
+        .finally(() => {
           this.loadingComment(false);
         });
 
@@ -202,7 +203,7 @@ class MetastoreTable {
 
       this.catalogEntry
         .getTopJoins({ silenceErrors: true })
-        .done(topJoins => {
+        .then(topJoins => {
           if (topJoins && topJoins.values) {
             const joins = [];
             const ownQidLower = this.catalogEntry.path.join('.').toLowerCase();
@@ -287,14 +288,14 @@ class MetastoreTable {
             this.topJoins(joins);
           }
         })
-        .always(() => {
+        .finally(() => {
           this.loadingTopJoins(false);
         });
 
       this.loadingDetails(true);
       this.catalogEntry
         .getAnalysis()
-        .done(analysis => {
+        .then(analysis => {
           this.tableDetails(analysis);
           this.tableStats(analysis.details.stats);
           this.loaded(true);
@@ -312,17 +313,17 @@ class MetastoreTable {
               if (property.col_name.toLowerCase() === 'view original text:') {
                 apiHelper
                   .formatSql({ statements: property.data_type })
-                  .done(formatResponse => {
+                  .then(formatResponse => {
                     this.viewSql(
                       formatResponse.status === 0
                         ? formatResponse.formatted_statements
                         : property.data_type
                     );
                   })
-                  .fail(() => {
+                  .catch(() => {
                     this.viewSql(property.data_type);
                   })
-                  .always(() => {
+                  .finally(() => {
                     this.loadingViewSql(false);
                   });
                 return true;
@@ -332,12 +333,12 @@ class MetastoreTable {
             this.loadingViewSql(false);
           }
         })
-        .fail(() => {
+        .catch(() => {
           this.partitions.loading(false);
           this.partitions.loaded(true);
           this.loadingViewSql(false);
         })
-        .always(() => {
+        .finally(() => {
           this.refreshingTableStats(false);
           this.loadingDetails(false);
         });

@@ -29,6 +29,7 @@ import 'ext/ace/mode-mysql';
 import 'ext/ace/mode-pgsql'
 import 'ext/ace/mode-phoenix';
 import 'ext/ace/mode-presto';
+import 'ext/ace/mode-dasksql';
 import 'ext/ace/mode-solr';
 import 'ext/ace/mode-sql';
 import 'ext/ace/mode-text';
@@ -43,6 +44,7 @@ import 'ext/ace/snippets/mysql';
 import 'ext/ace/snippets/pgsql';
 import 'ext/ace/snippets/phoenix';
 import 'ext/ace/snippets/presto';
+import 'ext/ace/snippets/dasksql';
 import 'ext/ace/snippets/solr';
 import 'ext/ace/snippets/sql';
 import 'ext/ace/snippets/text';
@@ -57,6 +59,7 @@ const DIALECT_ACE_MODE_MAPPING: { [dialect: string]: string } = {
   'druid': 'ace/mode/druid',
   'elasticsearch': 'ace/mode/elasticsearch',
   'flink': 'ace/mode/flink',
+  'dasksql': 'ace/mode/dasksql',
   'hive': 'ace/mode/hive',
   'impala': 'ace/mode/impala',
   'ksql': 'ace/mode/ksql',

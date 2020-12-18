@@ -106,10 +106,10 @@ class AsteriskData {
             connector: connector,
             path: path
           })
-          .done(entry => {
+          .then(entry => {
             entry
               .getSourceMeta({ silenceErrors: true })
-              .done(sourceMeta => {
+              .then(sourceMeta => {
                 if (typeof sourceMeta.extended_columns !== 'undefined') {
                   const newColumns = [];
                   sourceMeta.extended_columns.forEach(column => {
@@ -135,9 +135,9 @@ class AsteriskData {
                 }
                 fetchDeferred.resolve();
               })
-              .fail(fetchDeferred.reject);
+              .catch(fetchDeferred.reject);
           })
-          .fail(fetchDeferred.reject);
+          .catch(fetchDeferred.reject);
       }
     });
 

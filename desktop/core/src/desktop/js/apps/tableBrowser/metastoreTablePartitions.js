@@ -105,14 +105,14 @@ class MetastoreTablePartitions {
 
     this.metastoreTable.catalogEntry
       .getPartitions()
-      .done(partitions => {
+      .then(partitions => {
         this.keys(partitions.partition_keys_json);
         this.values(partitions.partition_values_json);
         this.preview.values(this.values().slice(0, 5));
         this.preview.keys(this.keys());
         huePubSub.publish('metastore.loaded.partitions');
       })
-      .always(() => {
+      .finally(() => {
         this.loading(false);
         this.loaded(true);
       });

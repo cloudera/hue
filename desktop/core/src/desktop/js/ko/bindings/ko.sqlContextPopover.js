@@ -60,7 +60,7 @@ ko.bindingHandlers.sqlContextPopover = {
               dialect: options.sourceType
             };
           }
-          dataCatalog.getEntry(options).done(entry => {
+          dataCatalog.getEntry(options).then(entry => {
             const $source = $(element);
             const offset = $source.offset();
             if (options.offset) {

@@ -16,7 +16,7 @@
 
 import { Cancellable } from 'api/cancellablePromise';
 import { DIALECT } from 'apps/notebook2/snippet';
-import DataCatalogEntry from 'catalog/dataCatalogEntry';
+import DataCatalogEntry, { FieldSourceMeta, SourceMeta } from 'catalog/DataCatalogEntry';
 import ko, { PureComputed } from 'knockout';
 import { Observable, ObservableArray } from 'knockout';
 import { IdentifierLocation } from 'parse/types';
@@ -355,10 +355,10 @@ export class VariableSubstitutionHandler {
       }
     }
 
-    const updateVariableType = (variable: Variable, sourceMeta?: { type?: string }) => {
+    const updateVariableType = (variable: Variable, sourceMeta?: SourceMeta) => {
       let type;
-      if (sourceMeta && sourceMeta.type) {
-        type = sourceMeta.type.toLowerCase();
+      if (sourceMeta && (<FieldSourceMeta>sourceMeta).type) {
+        type = (<FieldSourceMeta>sourceMeta).type.toLowerCase();
       } else {
         type = 'string';
       }
@@ -434,7 +434,7 @@ export class VariableSubstitutionHandler {
           });
         });
       } else {
-        updateVariableType(variable, {
+        updateVariableType(variable, <FieldSourceMeta>{
           type: 'text'
         });
       }

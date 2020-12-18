@@ -87,7 +87,10 @@ const parserConf = Object.assign({}, defaultConfig, {
     phoenixSyntaxParser: [`${JS_ROOT}/parse/sql/phoenix/phoenixSyntaxParser.js`],
 
     prestoAutocompleteParser: [`${JS_ROOT}/parse/sql/presto/prestoAutocompleteParser.js`],
-    prestoSyntaxParser: [`${JS_ROOT}/parse/sql/presto/prestoSyntaxParser.js`]
+    prestoSyntaxParser: [`${JS_ROOT}/parse/sql/presto/prestoSyntaxParser.js`],
+
+    dasksqlAutocompleteParser: [`${JS_ROOT}/parse/sql/dasksql/dasksqlAutocompleteParser.js`],
+    dasksqlSyntaxParser: [`${JS_ROOT}/parse/sql/dasksql/dasksqlSyntaxParser.js`]
   },
   performance: {
     hints: false,

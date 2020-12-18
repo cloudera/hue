@@ -738,9 +738,11 @@ from desktop.views import _ko
         } else {
           self.loading(true);
           self.loadTimeout = window.setTimeout(function () {
-            self.activePromises.push(self.catalogEntry.getComment({ silenceErrors: true, cancellable: true }).done(self.comment).always(function () {
+            var commentPromise = self.catalogEntry.getComment({ silenceErrors: true, cancellable: true });
+            self.activePromises.push(commentPromise);
+            commentPromise.then(self.comment).finally(function () {
               self.loading(false);
-            }));
+            });
           }, COMMENT_LOAD_DELAY);
         }
 

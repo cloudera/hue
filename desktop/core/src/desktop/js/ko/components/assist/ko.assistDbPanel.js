@@ -642,7 +642,7 @@ class AssistDbPanel {
                 connector: { id: 'solr' },
                 path: []
               })
-              .done(entry => {
+              .then(entry => {
                 entry.clearCache({ cascade: true });
               });
           }

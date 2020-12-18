@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import DataCatalogEntry from 'catalog/dataCatalogEntry';
-import $ from 'jquery';
+import { Cancellable, CancellablePromise } from 'api/cancellablePromise';
+import { applyCancellable } from 'catalog/catalogUtils';
+import DataCatalogEntry from 'catalog/DataCatalogEntry';
 
-import CancellableJqPromise from 'api/cancellableJqPromise';
 import dataCatalog from 'catalog/dataCatalog';
 import { IdentifierChainEntry, ParsedLocation, ParsedTable } from 'parse/types';
 import { isReserved } from 'sql/reference/sqlReferenceRepository';
@@ -130,40 +130,43 @@ export const resolveCatalogEntry = (options: {
   cancellable?: boolean;
   identifierChain?: IdentifierChainEntry[];
   tables?: ParsedTable[];
-}): CancellableJqPromise<DataCatalogEntry> => {
-  const cancellablePromises: CancellableJqPromise<unknown>[] = [];
-  const deferred = $.Deferred();
-  const promise = new CancellableJqPromise(deferred, undefined, cancellablePromises);
-  dataCatalog.applyCancellable(promise, { cancellable: !!options.cancellable });
+}): CancellablePromise<DataCatalogEntry> => {
+  const promise = new CancellablePromise<DataCatalogEntry>((resolve, reject, onCancel) => {
+    const cancellablePromises: Cancellable[] = [];
 
-  if (!options.identifierChain) {
-    deferred.reject();
-    return promise;
-  }
-
-  const findInTree = (currentEntry: DataCatalogEntry, fieldsToGo: string[]): void => {
-    if (fieldsToGo.length === 0) {
-      deferred.reject();
+    onCancel(() => {
+      cancellablePromises.forEach(cancellable => cancellable.cancel());
+    });
+    if (!options.identifierChain) {
+      reject();
       return;
     }
 
-    let nextField: string;
-    if (currentEntry.getType() === 'map') {
-      nextField = 'value';
-    } else if (currentEntry.getType() === 'array') {
-      nextField = 'item';
-    } else {
-      nextField = fieldsToGo.shift() || '';
-    }
+    const findInTree = (currentEntry: DataCatalogEntry, fieldsToGo: string[]): void => {
+      if (fieldsToGo.length === 0) {
+        reject();
+        return;
+      }
 
-    cancellablePromises.push(
-      currentEntry
-        .getChildren({
-          cancellable: !!options.cancellable,
-          cachedOnly: !!options.cachedOnly,
-          silenceErrors: true
-        })
-        .done(childEntries => {
+      let nextField: string;
+      if (currentEntry.getType() === 'map') {
+        nextField = 'value';
+      } else if (currentEntry.getType() === 'array') {
+        nextField = 'item';
+      } else {
+        nextField = fieldsToGo.shift() || '';
+      }
+
+      const childPromise = currentEntry.getChildren({
+        cancellable: !!options.cancellable,
+        cachedOnly: !!options.cachedOnly,
+        silenceErrors: true
+      });
+
+      cancellablePromises.push(childPromise);
+
+      childPromise
+        .then(childEntries => {
           let foundEntry = undefined;
           childEntries.some((childEntry: { name: string }) => {
             if (identifierEquals(childEntry.name, nextField)) {
@@ -174,40 +177,41 @@ export const resolveCatalogEntry = (options: {
           if (foundEntry && fieldsToGo.length) {
             findInTree(foundEntry, fieldsToGo);
           } else if (foundEntry) {
-            deferred.resolve(foundEntry);
+            resolve(foundEntry);
           } else {
-            deferred.reject();
+            reject();
           }
         })
-        .fail(deferred.reject)
-    );
-  };
+        .catch(reject);
+    };
 
-  const findTable = (tablesToGo: ParsedTable[]): void => {
-    if (tablesToGo.length === 0) {
-      deferred.reject();
-      return;
-    }
+    const findTable = (tablesToGo: ParsedTable[]): void => {
+      if (tablesToGo.length === 0) {
+        reject();
+        return;
+      }
 
-    const nextTable = tablesToGo.pop();
-    if (nextTable && typeof nextTable.subQuery !== 'undefined') {
-      findTable(tablesToGo);
-      return;
-    }
+      const nextTable = tablesToGo.pop();
+      if (nextTable && typeof nextTable.subQuery !== 'undefined') {
+        findTable(tablesToGo);
+        return;
+      }
 
-    cancellablePromises.push(
-      dataCatalog
-        .getChildren({
-          connector: options.connector,
-          namespace: options.namespace,
-          compute: options.compute,
-          path: identifierChainToPath((nextTable && nextTable.identifierChain) || []),
-          cachedOnly: !!options.cachedOnly,
-          cancellable: !!options.cancellable,
-          temporaryOnly: !!options.temporaryOnly,
-          silenceErrors: true
-        })
-        .done(childEntries => {
+      const childPromise = dataCatalog.getChildren({
+        connector: options.connector,
+        namespace: options.namespace,
+        compute: options.compute,
+        path: identifierChainToPath((nextTable && nextTable.identifierChain) || []),
+        cachedOnly: !!options.cachedOnly,
+        cancellable: !!options.cancellable,
+        temporaryOnly: !!options.temporaryOnly,
+        silenceErrors: true
+      });
+
+      cancellablePromises.push(childPromise);
+
+      childPromise
+        .then(childEntries => {
           let foundEntry = undefined;
           childEntries.some((childEntry: { name: string }) => {
             if (
@@ -223,35 +227,35 @@ export const resolveCatalogEntry = (options: {
           if (foundEntry && options.identifierChain && options.identifierChain.length > 1) {
             findInTree(foundEntry, identifierChainToPath(options.identifierChain.slice(1)));
           } else if (foundEntry) {
-            deferred.resolve(foundEntry);
+            resolve(foundEntry);
           } else {
             findTable(tablesToGo);
           }
         })
-        .fail(deferred.reject)
-    );
-  };
+        .catch(reject);
+    };
 
-  if (options.tables) {
-    findTable(options.tables.concat());
-  } else {
-    dataCatalog
-      .getEntry({
-        namespace: options.namespace,
-        compute: options.compute,
-        connector: options.connector,
-        path: [],
-        cachedOnly: !!options.cachedOnly,
-        temporaryOnly: !!options.temporaryOnly
-      })
-      .done(entry => {
-        if (options.identifierChain) {
-          findInTree(entry, identifierChainToPath(options.identifierChain));
-        }
-      });
-  }
+    if (options.tables) {
+      findTable(options.tables.concat());
+    } else {
+      dataCatalog
+        .getEntry({
+          namespace: options.namespace,
+          compute: options.compute,
+          connector: options.connector,
+          path: [],
+          cachedOnly: !!options.cachedOnly,
+          temporaryOnly: !!options.temporaryOnly
+        })
+        .then(entry => {
+          if (options.identifierChain) {
+            findInTree(entry, identifierChainToPath(options.identifierChain));
+          }
+        });
+    }
+  });
 
-  return promise;
+  return applyCancellable(promise, options);
 };
 
 export default {
