@@ -21,7 +21,7 @@ Next release is 4.9 [HUE-9488](https://issues.cloudera.org/browse/HUE-9488)
   * [ ] Charting and visualization revamp [HUE-6093](https://issues.cloudera.org/browse/HUE-6093)
   * [ ] Result Sharing (Google Spreadsheet, Slack...)
 * Core
-  * [ ] Task Server workers [HUE-8738](https://issues.cloudera.org/browse/HUE-8738)
+  * [ ] Task Server workers [#1526](https://github.com/cloudera/hue/issues/1526)
   * [ ] Result caching and storage [HUE-8787](https://issues.cloudera.org/browse/HUE-8787)
   * [ ] Reference architecture [HUE-8815](https://issues.cloudera.org/browse/HUE-8815)
   * [ ] Python 3 support [HUE-8737](https://issues.cloudera.org/browse/HUE-8737)
