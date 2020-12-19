@@ -464,7 +464,9 @@ Hue supports two interfaces: SqlAlchemy and native Thrift. Native Thrift should 
 
 With SqlAlchemy the dialect should be added to the Python system or Hue Python virtual environment:
 
-    ./build/env/bin/pip install pyhive
+    ./build/env/bin/pip install git+https://github.com/gethue/PyHive
+
+Note: SqlAlchemy interface requires the Hive connector which does not work out of the box because of the issue [#150](https://github.com/dropbox/PyHive/issues/150). But Hue ships and show a slightly patched module that works.
 
 This module might also be needed:
 
@@ -473,7 +475,7 @@ This module might also be needed:
 Then give Hue the information about the database source:
 
     [[[sparksql]]]
-    name = Spark SQL
+    name=Spark SQL
     interface=sqlalchemy
     options='{"url": "hive://user:password@host:10000/database"}'
 
