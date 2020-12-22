@@ -28,6 +28,7 @@ from django.contrib.sessions.models import Session
 from django.db import DatabaseError
 from django.db.models import Q
 from django.utils.translation import ugettext as _
+from django.utils.deprecation import MiddlewareMixin
 
 from desktop.auth.views import dt_logout
 from desktop.conf import AUTH, LDAP, SESSION
@@ -75,7 +76,7 @@ class LdapSynchronizationMiddleware(object):
       request.session.modified = True
 
 
-class LastActivityMiddleware(object):
+class LastActivityMiddleware(MiddlewareMixin):
   """
   Middleware to track the last activity of a user and automatically log out the user after a specified period of inactivity
   """
