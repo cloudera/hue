@@ -30,6 +30,7 @@ ko.bindingHandlers.dropzone = {
     }
     const options = {
       autoDiscover: false,
+      timeout: 300000,
       maxFilesize: 5000000,
       previewsContainer: '#progressStatusContent',
       previewTemplate:
