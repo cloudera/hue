@@ -218,20 +218,7 @@ import groups from an LDAP directory.
 ### Importing Groups
 
 1.  From the **Groups** tab, click **Add/sync LDAP group**.
-2.  Specify the group properties:
-
-<table>
-<tr><td>Name</td><td> The name of the group.</td></tr>
-<tr><td>Distinguished name</td><td> Indicate that Hue should use a full distinguished name for the
-    group.</td></tr>
-    <tr><td>Import new members</td><td>  Indicate that Hue should import the members of the group.</td></tr>
-        <tr><td>Import new members from all subgroups</td><td>
-    Indicate that Hue should import the members of the subgroups.</td></tr>
-            <tr><td>Create home directories</td><td> Indicate that Hue should create home directories in HDFS for the
-    imported members.</td></tr>
-</table>
-
-3.  Click **Add/sync group**.
+2.  Click **Add/sync group**.
 
 
 ## Permissions
@@ -248,4 +235,59 @@ Hue and the application features available to them.
 4.  Click **Update permission**. The new groups will appear in the
     Groups column in the **Hue Permissions** list.
 
-[Read more about it here](http://gethue.com/how-to-manage-permissions-in-hue/).
+### Example
+
+A company would like to use the following LDAP users and groups in Hue:
+
+  John Smith belonging to team A
+  Helen Taylor belonging to team B
+
+Assuming the following access requirements:
+
+  Team A should be able to use Beeswax, but nothing else.
+  Team B should only be able to see the Oozie dashboard with readonly permissions.
+
+In Hue 2 the scenarios can be addressed more appropriately. Users can be imported from LDAP by clicking “Add/Sync LDAP user” in Useradmin > Users:
+
+Similarly, groups can be imported from LDAP by clicking “Add/Sync LDAP group” in Useradmin > Groups.
+
+If a previously imported user’s information was updated recently, the information in Hue will need to be resynchronized. This can be achieved through the LDAP sync feature:
+
+Part A of the example can be addressed by explicitly allowing access Beeswax for Team A. This is managed in the “Groups” tab of the Useradmin app:
+
+The Team A group can be edited by clicking on its name, where access privileges for the group are selectable. Here, the “beeswax.access” permission would be selected and the others would be unselected:
+
+
+Part B of the example can be handled by explicitly defining access for Team B. This can be accomplished by following the same steps in part A, except for Team B. Every permission would be unselected except “oozie.dashboard_jobs_access”:
+
+By explicitly setting the app level permissions, the apps that these users will be able to see will change. For instance, Helen, who is a member of Team B, will only see the Oozie app available:
+
+### Programmatically
+
+Set permissions to a group via a Bash shell:
+
+    #!/bin/env bash
+
+    set -eu
+
+    host="localhost"
+    port="8888"
+    credentials="/home/hadoop/hue-config/hue_access_admin.txt" # password file
+    user="admin"
+    protocol="http"
+    group_name="spark02-user"
+    permissions_id1="10" # jobbrowser.access
+    permissions_id2="18" # spark.access
+    list_of_users="members=10&members=9&members=4" # number here is an order number for a user in the list of users
+
+    password=$(cat /home/hadoop/hue-config/hue_access_admin.txt | sed -n 's/admin:(.*)/\1/p')
+
+    curl ${protocol}://${host}:${port}/hue/accounts/login/?fromModal=true -o /dev/null -D - -c cookies.txt -s
+    x_csrftoken=$(grep csrftoken cookies.txt | cut -f 7)
+
+    curl -i -X POST ${protocol}://${host}:${port}/hue/accounts/login/?fromModal=true -d "username=${user}&password=${password}" -o /dev/null -D - -c cookies.txt -b cookies.txt -H "X-CSRFToken: ${x_csrftoken}" -s
+    x_csrftoken=$(grep csrftoken cookies.txt | cut -f 7)
+
+    curl -X POST ${protocol}://${host}:${port}/useradmin/groups/edit/${group_name}
+    -d "csrfmiddlewaretoken=${x_csrftoken}&name=${group_name}&permissions=${permissions_id1}&permissions=${permissions_id2}&${list_of_users}&is_embeddable=true",
+    -b cookies.txt -H "X-CSRFToken: ${x_csrftoken}"
