@@ -2116,6 +2116,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               dest: ops.path
             },
             autoDiscover: false,
+            timeout: 300000,
             maxFilesize: 5000000,
             previewsContainer: '#progressStatusContent',
             previewTemplate: '<div class="progress-row">' +
