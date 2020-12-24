@@ -55,6 +55,7 @@ export const LOCATION_TYPES = {
   ASTERISK: 'asterisk',
   COLUMN: 'column',
   DATABASE: 'database',
+  JOIN: 'join',
   FILE: 'file',
   FUNCTION: 'function',
   FUNCTION_ARGUMENT: 'functionArgument',
@@ -62,7 +63,9 @@ export const LOCATION_TYPES = {
   STATEMENT_TYPE: 'statementType',
   TABLE: 'table',
   UNKNOWN: 'unknown',
-  VARIABLE: 'variable'
+  VARIABLE: 'variable',
+  WHERE_CLAUSE: 'whereClause',
+  SUBQUERY: 'subQuery'
 };
 
 export const initSharedAutocomplete = parser => {
@@ -98,6 +101,16 @@ export const initSharedAutocomplete = parser => {
       type: LOCATION_TYPES.ASTERISK,
       location: adjustLocationForCursor(location),
       identifierChain: identifierChain
+    });
+  };
+
+  parser.addJoinLocation = (location, joinType, primary, valueExpression) => {
+    parser.yy.locations.push({
+      joinType,
+      primary,
+      valueExpression,
+      type: LOCATION_TYPES.JOIN,
+      location: adjustLocationForCursor(location)
     });
   };
 
@@ -606,6 +619,7 @@ const SYNTAX_PARSER_NOOP_FUNCTIONS = [
   'addCommonTableExpressions',
   'addCteAliasLocation',
   'addDatabaseLocation',
+  'addJoinLocation',
   'addFileLocation',
   'addFunctionArgumentLocations',
   'addFunctionLocation',
