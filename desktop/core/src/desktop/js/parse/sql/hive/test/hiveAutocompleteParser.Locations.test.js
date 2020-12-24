@@ -259,6 +259,23 @@ describe('hiveAutocompleteParser.js locations', () => {
           identifierChain: [{ name: 'testTable1' }]
         },
         {
+          joinType: 'JOIN',
+          primary: { identifierChain: [{ name: 'db1' }, { name: 'table2' }], join: true },
+          valueExpression: {
+            joinType: 'JOIN',
+            suggestJoinConditions: {
+              prependOn: true,
+              tablePrimaries: [
+                { identifierChain: [{ name: 'testTable1' }] },
+                { identifierChain: [{ name: 'db1' }, { name: 'table2' }], join: true }
+              ]
+            },
+            suggestKeywords: ['ON']
+          },
+          type: 'join',
+          location: { first_line: 1, last_line: 1, first_column: 26, last_column: 30 }
+        },
+        {
           type: 'database',
           location: { first_line: 1, last_line: 1, first_column: 31, last_column: 34 },
           identifierChain: [{ name: 'db1' }]
@@ -839,8 +856,8 @@ describe('hiveAutocompleteParser.js locations', () => {
             type: 'column',
             location: { first_line: 1, last_line: 1, first_column: 12, last_column: 23 },
             identifierChain: [{ name: 'description' }],
-            tables: [{ identifierChain: [{ name: 'sample_07' }], alias: 's07' }],
-            qualified: true
+            qualified: true,
+            tables: [{ identifierChain: [{ name: 'sample_07' }], alias: 's07' }]
           },
           {
             type: 'table',
@@ -851,8 +868,8 @@ describe('hiveAutocompleteParser.js locations', () => {
             type: 'column',
             location: { first_line: 1, last_line: 1, first_column: 29, last_column: 35 },
             identifierChain: [{ name: 'salary' }],
-            tables: [{ identifierChain: [{ name: 'sample_07' }], alias: 's07' }],
-            qualified: true
+            qualified: true,
+            tables: [{ identifierChain: [{ name: 'sample_07' }], alias: 's07' }]
           },
           {
             type: 'table',
@@ -863,8 +880,8 @@ describe('hiveAutocompleteParser.js locations', () => {
             type: 'column',
             location: { first_line: 1, last_line: 1, first_column: 41, last_column: 47 },
             identifierChain: [{ name: 'salary' }],
-            tables: [{ identifierChain: [{ name: 'sample_08' }], alias: 's08' }],
-            qualified: true
+            qualified: true,
+            tables: [{ identifierChain: [{ name: 'sample_08' }], alias: 's08' }]
           },
           {
             type: 'table',
@@ -875,8 +892,8 @@ describe('hiveAutocompleteParser.js locations', () => {
             type: 'column',
             location: { first_line: 2, last_line: 2, first_column: 7, last_column: 13 },
             identifierChain: [{ name: 'salary' }],
-            tables: [{ identifierChain: [{ name: 'sample_08' }], alias: 's08' }],
-            qualified: true
+            qualified: true,
+            tables: [{ identifierChain: [{ name: 'sample_08' }], alias: 's08' }]
           },
           {
             type: 'table',
@@ -887,8 +904,8 @@ describe('hiveAutocompleteParser.js locations', () => {
             type: 'column',
             location: { first_line: 2, last_line: 2, first_column: 20, last_column: 26 },
             identifierChain: [{ name: 'salary' }],
-            tables: [{ identifierChain: [{ name: 'sample_07' }], alias: 's07' }],
-            qualified: true
+            qualified: true,
+            tables: [{ identifierChain: [{ name: 'sample_07' }], alias: 's07' }]
           },
           {
             type: 'table',
@@ -901,6 +918,13 @@ describe('hiveAutocompleteParser.js locations', () => {
             alias: 's07',
             location: { first_line: 4, last_line: 4, first_column: 13, last_column: 16 },
             identifierChain: [{ name: 'sample_07' }]
+          },
+          {
+            joinType: 'JOIN',
+            primary: { identifierChain: [{ name: 'sample_08' }], alias: 's08', join: true },
+            valueExpression: { types: ['BOOLEAN'], text: 's07.code = s08.code', joinType: 'JOIN' },
+            type: 'join',
+            location: { first_line: 4, last_line: 4, first_column: 17, last_column: 21 }
           },
           {
             type: 'table',
@@ -923,8 +947,8 @@ describe('hiveAutocompleteParser.js locations', () => {
             type: 'column',
             location: { first_line: 5, last_line: 5, first_column: 10, last_column: 14 },
             identifierChain: [{ name: 'code' }],
-            tables: [{ identifierChain: [{ name: 'sample_07' }], alias: 's07' }],
-            qualified: true
+            qualified: true,
+            tables: [{ identifierChain: [{ name: 'sample_07' }], alias: 's07' }]
           },
           {
             type: 'table',
@@ -935,8 +959,8 @@ describe('hiveAutocompleteParser.js locations', () => {
             type: 'column',
             location: { first_line: 5, last_line: 5, first_column: 21, last_column: 25 },
             identifierChain: [{ name: 'code' }],
-            tables: [{ identifierChain: [{ name: 'sample_08' }], alias: 's08' }],
-            qualified: true
+            qualified: true,
+            tables: [{ identifierChain: [{ name: 'sample_08' }], alias: 's08' }]
           },
           {
             type: 'whereClause',
@@ -952,8 +976,8 @@ describe('hiveAutocompleteParser.js locations', () => {
             type: 'column',
             location: { first_line: 7, last_line: 7, first_column: 7, last_column: 13 },
             identifierChain: [{ name: 'salary' }],
-            tables: [{ identifierChain: [{ name: 'sample_07' }], alias: 's07' }],
-            qualified: true
+            qualified: true,
+            tables: [{ identifierChain: [{ name: 'sample_07' }], alias: 's07' }]
           },
           {
             type: 'table',
@@ -964,8 +988,8 @@ describe('hiveAutocompleteParser.js locations', () => {
             type: 'column',
             location: { first_line: 7, last_line: 7, first_column: 20, last_column: 26 },
             identifierChain: [{ name: 'salary' }],
-            tables: [{ identifierChain: [{ name: 'sample_08' }], alias: 's08' }],
-            qualified: true
+            qualified: true,
+            tables: [{ identifierChain: [{ name: 'sample_08' }], alias: 's08' }]
           },
           {
             type: 'table',
@@ -976,8 +1000,8 @@ describe('hiveAutocompleteParser.js locations', () => {
             type: 'column',
             location: { first_line: 8, last_line: 8, first_column: 14, last_column: 20 },
             identifierChain: [{ name: 'salary' }],
-            tables: [{ identifierChain: [{ name: 'sample_08' }], alias: 's08' }],
-            qualified: true
+            qualified: true,
+            tables: [{ identifierChain: [{ name: 'sample_08' }], alias: 's08' }]
           },
           {
             type: 'table',
@@ -988,8 +1012,8 @@ describe('hiveAutocompleteParser.js locations', () => {
             type: 'column',
             location: { first_line: 8, last_line: 8, first_column: 25, last_column: 31 },
             identifierChain: [{ name: 'salary' }],
-            tables: [{ identifierChain: [{ name: 'sample_07' }], alias: 's07' }],
-            qualified: true
+            qualified: true,
+            tables: [{ identifierChain: [{ name: 'sample_07' }], alias: 's07' }]
           },
           {
             type: 'limitClause',
@@ -1019,13 +1043,33 @@ describe('hiveAutocompleteParser.js locations', () => {
           type: 'column',
           location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 },
           identifierChain: [{ name: 'bl' }],
-          tables: [{ identifierChain: [{ name: 'blablabla' }] }, { subQuery: 's1' }],
-          qualified: false
+          qualified: false,
+          tables: [{ identifierChain: [{ name: 'blablabla' }] }, { subQuery: 's1' }]
         },
         {
           type: 'table',
           location: { first_line: 1, last_line: 1, first_column: 16, last_column: 25 },
           identifierChain: [{ name: 'blablabla' }]
+        },
+        {
+          joinType: 'JOIN',
+          primary: {
+            columns: [{ tables: [{ identifierChain: [{ name: 'blablabla' }] }] }],
+            alias: 's1'
+          },
+          valueExpression: {
+            joinType: 'JOIN',
+            suggestJoinConditions: {
+              prependOn: true,
+              tablePrimaries: [
+                { identifierChain: [{ name: 'blablabla' }] },
+                { subQueryAlias: 's1', join: true }
+              ]
+            },
+            suggestKeywords: ['ON']
+          },
+          type: 'join',
+          location: { first_line: 1, last_line: 1, first_column: 26, last_column: 30 }
         },
         {
           type: 'selectList',
@@ -1045,15 +1089,15 @@ describe('hiveAutocompleteParser.js locations', () => {
         },
         {
           type: 'whereClause',
-          subquery: true,
           missing: true,
-          location: { first_line: 1, last_line: 1, first_column: 55, last_column: 55 }
+          location: { first_line: 1, last_line: 1, first_column: 55, last_column: 55 },
+          subquery: true
         },
         {
           type: 'limitClause',
-          subquery: true,
           missing: true,
-          location: { first_line: 1, last_line: 1, first_column: 55, last_column: 55 }
+          location: { first_line: 1, last_line: 1, first_column: 55, last_column: 55 },
+          subquery: true
         },
         {
           type: 'alias',
@@ -1610,78 +1654,411 @@ describe('hiveAutocompleteParser.js locations', () => {
         },
         {
           type: 'column',
-          location: { first_line: 1, last_line: 1, first_column: 11, last_column: 14 },
-          identifierChain: [{ name: 'foo' }],
-          tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }],
-          qualified: true
+          location: {
+            first_line: 1,
+            last_line: 1,
+            first_column: 11,
+            last_column: 14
+          },
+          identifierChain: [
+            {
+              name: 'foo'
+            }
+          ],
+          qualified: true,
+          tables: [
+            {
+              identifierChain: [
+                {
+                  name: 'table1'
+                }
+              ],
+              alias: 't1'
+            }
+          ]
         },
         {
           type: 'table',
-          location: { first_line: 1, last_line: 1, first_column: 20, last_column: 26 },
-          identifierChain: [{ name: 'table1' }]
+          location: {
+            first_line: 1,
+            last_line: 1,
+            first_column: 20,
+            last_column: 26
+          },
+          identifierChain: [
+            {
+              name: 'table1'
+            }
+          ]
         },
         {
           type: 'alias',
           source: 'table',
           alias: 't1',
-          location: { first_line: 1, last_line: 1, first_column: 27, last_column: 29 },
-          identifierChain: [{ name: 'table1' }]
+          location: {
+            first_line: 1,
+            last_line: 1,
+            first_column: 27,
+            last_column: 29
+          },
+          identifierChain: [
+            {
+              name: 'table1'
+            }
+          ]
+        },
+        {
+          joinType: 'JOIN',
+          primary: {
+            identifierChain: [
+              {
+                name: 'table4'
+              }
+            ],
+            alias: 't4',
+            join: true
+          },
+          valueExpression: {
+            types: ['BOOLEAN'],
+            text: 't1.c1 = table2.c2',
+            joinType: {
+              joinType: {
+                joinType: 'CROSS JOIN',
+                suggestJoinConditions: {
+                  prependOn: true,
+                  tablePrimaries: [
+                    {
+                      identifierChain: [
+                        {
+                          name: 'table1'
+                        }
+                      ],
+                      alias: 't1'
+                    },
+                    {
+                      identifierChain: [
+                        {
+                          name: 'table2'
+                        }
+                      ],
+                      join: true
+                    }
+                  ]
+                },
+                suggestKeywords: ['ON']
+              },
+              suggestJoinConditions: {
+                prependOn: true,
+                tablePrimaries: [
+                  {
+                    identifierChain: [
+                      {
+                        name: 'table1'
+                      }
+                    ],
+                    alias: 't1'
+                  },
+                  {
+                    identifierChain: [
+                      {
+                        name: 'table2'
+                      }
+                    ],
+                    join: true
+                  },
+                  {
+                    identifierChain: [
+                      {
+                        name: 'table3'
+                      }
+                    ],
+                    join: true
+                  }
+                ]
+              },
+              suggestKeywords: ['ON']
+            }
+          },
+          type: 'join',
+          location: {
+            first_line: 1,
+            last_line: 1,
+            first_column: 30,
+            last_column: 70
+          }
+        },
+        {
+          joinType: 'LEFT OUTER JOIN',
+          primary: {
+            identifierChain: [
+              {
+                name: 'table3'
+              }
+            ],
+            join: true
+          },
+          valueExpression: {
+            joinType: {
+              joinType: 'CROSS JOIN',
+              suggestJoinConditions: {
+                prependOn: true,
+                tablePrimaries: [
+                  {
+                    identifierChain: [
+                      {
+                        name: 'table1'
+                      }
+                    ],
+                    alias: 't1'
+                  },
+                  {
+                    identifierChain: [
+                      {
+                        name: 'table2'
+                      }
+                    ],
+                    join: true
+                  }
+                ]
+              },
+              suggestKeywords: ['ON']
+            },
+            suggestJoinConditions: {
+              prependOn: true,
+              tablePrimaries: [
+                {
+                  identifierChain: [
+                    {
+                      name: 'table1'
+                    }
+                  ],
+                  alias: 't1'
+                },
+                {
+                  identifierChain: [
+                    {
+                      name: 'table2'
+                    }
+                  ],
+                  join: true
+                },
+                {
+                  identifierChain: [
+                    {
+                      name: 'table3'
+                    }
+                  ],
+                  join: true
+                }
+              ]
+            },
+            suggestKeywords: ['ON']
+          },
+          type: 'join',
+          location: {
+            first_line: 1,
+            last_line: 1,
+            first_column: 30,
+            last_column: 47
+          }
+        },
+        {
+          joinType: 'CROSS JOIN',
+          primary: {
+            identifierChain: [
+              {
+                name: 'table2'
+              }
+            ],
+            join: true
+          },
+          valueExpression: {
+            joinType: 'CROSS JOIN',
+            suggestJoinConditions: {
+              prependOn: true,
+              tablePrimaries: [
+                {
+                  identifierChain: [
+                    {
+                      name: 'table1'
+                    }
+                  ],
+                  alias: 't1'
+                },
+                {
+                  identifierChain: [
+                    {
+                      name: 'table2'
+                    }
+                  ],
+                  join: true
+                }
+              ]
+            },
+            suggestKeywords: ['ON']
+          },
+          type: 'join',
+          location: {
+            first_line: 1,
+            last_line: 1,
+            first_column: 30,
+            last_column: 40
+          }
         },
         {
           type: 'table',
-          location: { first_line: 1, last_line: 1, first_column: 41, last_column: 47 },
-          identifierChain: [{ name: 'table2' }]
+          location: {
+            first_line: 1,
+            last_line: 1,
+            first_column: 41,
+            last_column: 47
+          },
+          identifierChain: [
+            {
+              name: 'table2'
+            }
+          ]
         },
         {
           type: 'table',
-          location: { first_line: 1, last_line: 1, first_column: 64, last_column: 70 },
-          identifierChain: [{ name: 'table3' }]
+          location: {
+            first_line: 1,
+            last_line: 1,
+            first_column: 64,
+            last_column: 70
+          },
+          identifierChain: [
+            {
+              name: 'table3'
+            }
+          ]
         },
         {
           type: 'table',
-          location: { first_line: 1, last_line: 1, first_column: 76, last_column: 82 },
-          identifierChain: [{ name: 'table4' }]
+          location: {
+            first_line: 1,
+            last_line: 1,
+            first_column: 76,
+            last_column: 82
+          },
+          identifierChain: [
+            {
+              name: 'table4'
+            }
+          ]
         },
         {
           type: 'alias',
           source: 'table',
           alias: 't4',
-          location: { first_line: 1, last_line: 1, first_column: 83, last_column: 85 },
-          identifierChain: [{ name: 'table4' }]
+          location: {
+            first_line: 1,
+            last_line: 1,
+            first_column: 83,
+            last_column: 85
+          },
+          identifierChain: [
+            {
+              name: 'table4'
+            }
+          ]
         },
         {
           type: 'table',
-          location: { first_line: 1, last_line: 1, first_column: 90, last_column: 92 },
-          identifierChain: [{ name: 'table1' }]
+          location: {
+            first_line: 1,
+            last_line: 1,
+            first_column: 90,
+            last_column: 92
+          },
+          identifierChain: [
+            {
+              name: 'table1'
+            }
+          ]
         },
         {
           type: 'column',
-          location: { first_line: 1, last_line: 1, first_column: 93, last_column: 95 },
-          identifierChain: [{ name: 'c1' }],
-          tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }],
-          qualified: true
+          location: {
+            first_line: 1,
+            last_line: 1,
+            first_column: 93,
+            last_column: 95
+          },
+          identifierChain: [
+            {
+              name: 'c1'
+            }
+          ],
+          qualified: true,
+          tables: [
+            {
+              identifierChain: [
+                {
+                  name: 'table1'
+                }
+              ],
+              alias: 't1'
+            }
+          ]
         },
         {
           type: 'table',
-          location: { first_line: 1, last_line: 1, first_column: 98, last_column: 104 },
-          identifierChain: [{ name: 'table2' }]
+          location: {
+            first_line: 1,
+            last_line: 1,
+            first_column: 98,
+            last_column: 104
+          },
+          identifierChain: [
+            {
+              name: 'table2'
+            }
+          ]
         },
         {
           type: 'column',
-          location: { first_line: 1, last_line: 1, first_column: 105, last_column: 107 },
-          identifierChain: [{ name: 'c2' }],
-          tables: [{ identifierChain: [{ name: 'table2' }] }],
-          qualified: true
+          location: {
+            first_line: 1,
+            last_line: 1,
+            first_column: 105,
+            last_column: 107
+          },
+          identifierChain: [
+            {
+              name: 'c2'
+            }
+          ],
+          qualified: true,
+          tables: [
+            {
+              identifierChain: [
+                {
+                  name: 'table2'
+                }
+              ]
+            }
+          ]
         },
         {
           type: 'whereClause',
           missing: true,
-          location: { first_line: 1, last_line: 1, first_column: 108, last_column: 108 }
+          location: {
+            first_line: 1,
+            last_line: 1,
+            first_column: 108,
+            last_column: 108
+          }
         },
         {
           type: 'limitClause',
           missing: true,
-          location: { first_line: 1, last_line: 1, first_column: 108, last_column: 108 }
+          location: {
+            first_line: 1,
+            last_line: 1,
+            first_column: 108,
+            last_column: 108
+          }
         }
       ]
     });

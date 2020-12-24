@@ -2445,6 +2445,9 @@ Joins
      } else {
        $$ = {};
      }
+
+     parser.addJoinLocation(@1, $1, $2.primary, $$);
+
      $$.joinType = $1;
      if ($3.noJoinCondition) {
        $$.suggestJoinConditions = { prependOn: true, tablePrimaries: parser.yy.latestTablePrimaries.concat() }
@@ -2463,6 +2466,9 @@ Joins
      } else {
        $$ = {};
      }
+
+     parser.addJoinLocation(@1, $2, $3.primary, $$);
+
      $$.joinType = $1;
      if ($4.noJoinCondition) {
        $$.suggestJoinConditions = { prependOn: true, tablePrimaries: parser.yy.latestTablePrimaries.concat() }
