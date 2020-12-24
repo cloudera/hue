@@ -40,6 +40,10 @@ categories:
   - Development
 
 ---
+
+**December 2020**: GitHub pull requests are now prefered https://docs.gethue.com/developer/development/#development-process
+
+
 After the <a href="https://www.reviewboard.org/" target="_blank" rel="noopener noreferrer">Review Board</a> post, here is another tutorial about becoming an awesome Hue developer: how to run the Hue tests!
 
 Hue has two types of tests:
