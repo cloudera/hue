@@ -50,10 +50,10 @@ class JobDesign(models.Model):
     return reverse("jobsub.views.edit_design", kwargs=dict(id=self.id))
 
   def clone_url(self):
-    return reverse("jobsub.views.clone_design", kwargs=dict(id=self.id))
+    return reverse("jobsub:jobsub.views.clone_design", kwargs=dict(id=self.id))
 
   def delete_url(self):
-    return reverse("jobsub.views.delete_design", kwargs=dict(id=self.id))
+    return reverse("jobsub:jobsub.views.delete_design", kwargs=dict(id=self.id))
 
   def submit_url(self):
     return reverse("jobsub.views.submit_design", kwargs=dict(id=self.id))

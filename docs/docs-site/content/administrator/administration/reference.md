@@ -286,7 +286,7 @@ Here is one way to do it with [NGINX](http://gethue.com/using-nginx-to-speed-up-
 **Beta Feature**
 
 The task server is currently a work in progress to outsource all the blocking or resource intensive operations
-outside of the API server. Follow [HUE-8738](https://issues.cloudera.org/browse/HUE-8738) for more information
+outside of the API server. Follow [#1526](https://github.com/cloudera/hue/issues/1526) for more information
 on when first usable task will be released.
 
 Until then, here is how to try the task server service.

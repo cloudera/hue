@@ -30,10 +30,10 @@ ${ comps.menubar() }
           <li class="nav-header">${_('Attempt ID')}</li>
           <li class="white truncate-texts" title="${attempt.attemptId_short}">${attempt.attemptId_short}</li>
           <li class="nav-header">${_('Task')}</li>
-          <li><a href="${url('jobbrowser.views.single_task', job=joblnk.jobId, taskid=taskid)}" class="truncate-text" title="${task.taskId_short}">${task.taskId_short}</a>
+          <li><a href="${url('jobbrowser:jobbrowser.views.single_task', job=joblnk.jobId, taskid=taskid)}" class="truncate-text" title="${task.taskId_short}">${task.taskId_short}</a>
           </li>
           <li class="nav-header">${_('Job')}</li>
-          <li><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}" class="truncate-text" title="${joblnk.jobId_short}">${joblnk.jobId_short}</a></li>
+          <li><a href="${url('jobbrowser:jobbrowser.views.single_job', job=joblnk.jobId)}" class="truncate-text" title="${joblnk.jobId_short}">${joblnk.jobId_short}</a></li>
           <li class="nav-header">${_('Status')}</li>
           <li class="white">
               <%
@@ -57,8 +57,8 @@ ${ comps.menubar() }
         <div class="card-body">
           <p>
             <ul class="nav nav-tabs">
-              <li><a href="${ url('single_task_attempt', job=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }#tmetadata">${_('Metadata')}</a></li>
-              <li><a href="${ url('single_task_attempt', job=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }#tcounters">${_('Counters')}</a></li>
+              <li><a href="${ url('jobbrowser:single_task_attempt', job=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }#tmetadata">${_('Metadata')}</a></li>
+              <li><a href="${ url('jobbrowser:single_task_attempt', job=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }#tcounters">${_('Counters')}</a></li>
               <li class="active"><a href="#logs" data-toggle="tab">${_('Logs')}</a></li>
             </ul>
             <div class="tab-content">

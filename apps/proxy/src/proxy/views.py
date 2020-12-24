@@ -114,7 +114,7 @@ def proxy(request, host, port, path):
   return HttpResponse(resp_text, content_type=data.headers.get("content-type"))
 
 def _reverse(host, port, path):
-  return reverse("proxy.views.proxy", kwargs=dict(host=host, port=port, path=path))
+  return reverse("proxy:proxy.views.proxy", kwargs=dict(host=host, port=port, path=path))
 def _rewrite_url(url):
   """Used by _rewrite_links"""
   scheme, netloc, path, params, query, fragment = urlparse(url)

@@ -171,7 +171,7 @@ def make_notebook(
 
   if has_connectors():  # To improve
     data['dialect'] = interpreter['dialect']
-    data['type'] = 'phoenix-' + editor_connector # 'flink-' + editor_connector
+    data['type'] = '%s-%s' % (editor_type, editor_connector)  # e.g. 'flink-' + editor_connector
 
   if snippet_properties:
     data['snippets'][0]['properties'].update(snippet_properties)

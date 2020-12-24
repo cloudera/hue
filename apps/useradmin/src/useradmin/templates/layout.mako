@@ -64,30 +64,30 @@ def is_selected(section, matcher):
               </li>
               % if is_admin(user):
                 <li class="${is_selected(section, 'users')}">
-                  <a href="${ url('useradmin.views.list_users') }">
+                  <a href="${ url('useradmin:useradmin.views.list_users') }">
                     ${ _('Users') }
                   </a>
                 </li>
                 <li class="${is_selected(section, 'groups')}">
-                  <a href="${ url('useradmin.views.list_groups') }">
+                  <a href="${ url('useradmin:useradmin.views.list_groups') }">
                     ${ _('Groups') }
                   </a>
                 </li>
                 <li class="${is_selected(section, 'permissions')}">
-                  <a href="${ url('useradmin.views.list_permissions') }">
+                  <a href="${ url('useradmin:useradmin.views.list_permissions') }">
                     ${ _('Permissions') }
                   </a>
                 </li>
                 % if ENABLE_ORGANIZATIONS.get():
                 <li class="${is_selected(section, 'organizations')}">
-                  <a href="${ url('useradmin.views.list_organizations') }">
+                  <a href="${ url('useradmin:useradmin.views.list_organizations') }">
                     ${ _('Organizations') }
                   </a>
                 </li>
                 % endif
                 % if USE_DEFAULT_CONFIGURATION.get():
                 <li class="${is_selected(section, 'configurations')}">
-                  <a href="${ url('useradmin.views.list_configurations') }">
+                  <a href="${ url('useradmin:useradmin.views.list_configurations') }">
                     ${ _('Configurations') }
                   </a>
                 </li>

@@ -178,7 +178,7 @@ def massage_users_for_json(users, extended=False):
       'last_name': user.last_name,
       'email': user.email,
       'last_login': user.last_login,
-      'editURL': reverse('useradmin.views.edit_user', kwargs={'username': user.username})
+      'editURL': reverse('useradmin:useradmin.views.edit_user', kwargs={'username': user.username})
     }
     if extended:
       appendable['groups'] = massage_groups_for_json(user.groups.all())
@@ -237,10 +237,10 @@ def delete_user(request):
   is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
   if is_embeddable:
-    return JsonResponse({'url': '/hue' + reverse(list_users)})
+    return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_users')})
   else:
     request.info(_('The users were %s.') % action_text)
-    return redirect(reverse(list_users))
+    return redirect(reverse('useradmin:useradmin.views.list_users'))
 
 
 def delete_group(request):
@@ -269,10 +269,10 @@ def delete_group(request):
       is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
       if is_embeddable:
-        return JsonResponse({'url': '/hue' + reverse(list_groups)})
+        return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_groups')})
       else:
         request.info(_('The groups were deleted.'))
-        return redirect(reverse(list_groups))
+        return redirect(reverse('useradmin:useradmin.views.list_groups'))
     except Group.DoesNotExist:
       raise PopupException(_("Group not found."), error_code=404)
   else:
@@ -403,14 +403,14 @@ def edit_user(request, username=None):
           return JsonResponse({'url': '/hue'})
       elif is_admin(request.user):
         if is_embeddable:
-          return JsonResponse({'url': '/hue' + reverse(list_users)})
+          return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_users')})
         else:
-          return redirect(reverse(list_users))
+          return redirect(reverse('useradmin:useradmin.views.list_users'))
       else:
         if is_embeddable:
-          return JsonResponse({'url': '/hue' + reverse(edit_user, kwargs={'username': username})})
+          return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.edit_user', kwargs={'username': username})})
         else:
-          return redirect(reverse(edit_user, kwargs={'username': username}))
+          return redirect(reverse('useradmin:useradmin.views.edit_user', kwargs={'username': username}))
   else:
     # Initialize form values
     default_user_group = get_default_user_group()
@@ -495,7 +495,7 @@ def edit_group(request, name=None):
         }
 
       if is_embeddable:
-        return JsonResponse({'url': '/hue' + reverse(list_groups)})
+        return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_groups')})
       else:
         request.info(_('Group information updated'))
         return redirect('/useradmin/groups')
@@ -550,10 +550,10 @@ def edit_permission(request, app=None, priv=None):
       }
 
       if is_embeddable:
-        return JsonResponse({'url': '/hue' + reverse(list_permissions)})
+        return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_permissions')})
       else:
         request.info(_('Permission information updated'))
-        return redirect(reverse(list_permissions))
+        return redirect(reverse('useradmin:useradmin.views.list_permissions'))
   else:
     form = PermissionsEditForm(instance=instance)
   if request.method == 'POST' and is_embeddable:
@@ -629,7 +629,7 @@ def add_ldap_users(request):
         if is_embeddable:
           return JsonResponse({'status': 0})
         else:
-          return redirect(reverse(list_users))
+          return redirect(reverse('useradmin:useradmin.views.list_users'))
   else:
     form = AddLdapUsersForm()
 
@@ -705,9 +705,9 @@ def add_ldap_groups(request):
           request.warn(_('Failed to import following users: %s') % ', '.join(unique_users))
 
         if is_embeddable:
-          return JsonResponse({'url': '/hue' + reverse(list_groups)})
+          return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_groups')})
         else:
-          return redirect(reverse(list_groups))
+          return redirect(reverse('useradmin:useradmin.views.list_groups'))
 
       else:
         errors = form._errors.setdefault('groupname_pattern', ErrorList())
@@ -767,9 +767,9 @@ def sync_ldap_users_groups(request):
         request.warn(_('Failed to import following users: %s') % ', '.join(unique_users))
 
       if is_embeddable:
-        return JsonResponse({'url': '/hue' + reverse(list_users)})
+        return JsonResponse({'url': '/hue' + reverse('useradmin:useradmin.views.list_users')})
       else:
-        return redirect(reverse(list_users))
+        return redirect(reverse('useradmin:useradmin.views.list_users'))
   else:
     form = SyncLdapUsersGroupsForm()
 

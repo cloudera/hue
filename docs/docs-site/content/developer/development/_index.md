@@ -148,36 +148,19 @@ Second step is to configure the debug configuration
 
 **Note:**
 
-During the development process if you are facing any problem then, it is recommended to search for information on the [Forum](https://discourse.gethue.com/) and in the [bug tracker](https://github.com/cloudera/hue/issues?q=is%3Aissue+). If the solution is not found then, feel free to create an issue at https://github.com/cloudera/hue/issues.
+During the development process if you are facing any problem then, it is recommended to search for information on the [Forum](https://discourse.gethue.com/) and in the [bug tracker](https://github.com/cloudera/hue/issues?q=is%3Aissue+).
 
-Here is a tutorial about how to use the code review tool [Review Board](https://www.reviewboard.org/) for a better productivity!
+Here is a tutorial about how to sent a patch request for review.
 
 ### Setup
 
-Hue project uses Review Board and Pull Requests for code reviews. For more complex patches it's advisable to use RB than a plain pull request on github. The advantage of Pull Request is that the CI (syntax check, tests…) automatically runs for you (but the diff interface is not as friendly as Review Board).
-
-* Create accounts in https://review.cloudera.org, https://issues.cloudera.org/browse/HUE and https://github.com and share the usernames
-* Then, join the 'hue' group in your account https://review.cloudera.org/account/preferences/#groups
-* Then [download](https://www.reviewboard.org/downloads/rbtools/) the Review Board tools and install it.
+Hue project uses GitHub Pull Requests (PR) for code reviews. The advantage of Pull Request is that the CI (syntax check, tests...) automatically runs for you.
 
 If you've never used git and github before, there are bunch of things you need to [do](https://kbroman.org/github_tutorial/pages/first_time.html) before going further.
 
 Now, clone cloudera/hue:
 
     git clone https://github.com/cloudera/hue
-
-Then, go inside your git repository:
-
-    romain@runreal:~/projects/hue$ rbt setup-repo
-
-    Enter the Review Board server URL: https://review.cloudera.org
-    Use the Git repository 'hue' (git://github.com/cloudera/hue.git)? [Yes/No]: yes
-    Create '/home/romain/projects/hue/.reviewboardrc' with the following?
-    REVIEWBOARD_URL = "https://review.cloudera.org"
-    REPOSITORY = "hue"
-    BRANCH = "master"
-    [Yes/No]: yes
-    Config written to /home/romain/projects/hue/.reviewboardrc
 
 Create a new branch with the jira id (HUE-XXX) as the branch name:
 
@@ -193,30 +176,25 @@ Then make your changes in code:
 
 ### Post a review
 
-We have wrapped up the typical submission in a dedicated [tools/scripts/hue-review](https://github.com/cloudera/hue/blob/master/tools/scripts/hue-review) script prefilled with all the details of the commits:
+Either post via the GitHub CLI:
 
-Now we post the review:
+    gh pr create --fill --assignee=romainr --web
 
-    tools/scripts/hue-review HEAD~1..HEAD <reviewers> "HUE-XXX [component] <Ticket summary>" --bugs-closed=HUE-XXX
+Or push to your branch in your repository forks by doing one time:
 
-* Above command must return the review link as given in below example.
-* Go to the review link and varify details & press publish. All the reviewers will be informed with an email.
+    git remote add bob https://github.com/cloudera/hue
+    git fetch bob
 
-eg:
+Then just:
 
-    tools/scripts/hue-review HEAD~1..HEAD romain,enricoberti,erickt "HUE-2123 [beeswax] Handle cancel state properly" -bugs-closed=HUE-2123
+    git push bob HEAD:ISSUE-1000-fix
 
-    Review request #4501 posted.
-
-    https://review.cloudera.org/r/4501
-
-
-Et voila! Here is our review https://review.cloudera.org/r/4501.
+And create the pull request via the button on the https://github.com/cloudera/hue/tree/ISSUE-1000-fix page.
 
 **Note**:
 If you have more than one diff, update `HEAD~1..HEAD` accordingly (e.g. `HEAD~2..HEAD`)
 
-Now go to the ticket and add the Review Boad review link as a comment.
+In the PR, reference the [GitHub issues](https://github.com/cloudera/hue/issues) if it has one.
 
 ### Update a review
 
@@ -227,9 +205,9 @@ Modify the previous commit diff:
 
 Update the review:
 
-    rbt post -u -r <Review-board-id> HEAD~1..HEAD
+    git push bob HEAD:ISSUE-1000-fix -f
 
-Again, go to the review link and varify details & press publish.
+And it will automatically kick the CI and notify reviewers.
 
 ### Ship It
 
@@ -247,15 +225,12 @@ Once we get ship it from at least one reviewer, we can push the changes to maste
 * Once merged mark the review as submitted - **Close > Submitted**
 * Add the commit link to the ticket and mark it as resolved
 
-**Note**:
-
-For lightweight issues, Github [pull requests](https://github.com/cloudera/hue/pulls) are also welcomed! To learn how pull request works please refer this [link](https://github.com/asmeurer/git-workflow).
 
 ### Sump-up
 
-We hope that Review Board and these commands will make your life easier and encourage you to [contribute to Hue](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md) 😉
+We hope that these commands will make your life easier and encourage you to [contribute to Hue](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md) 😉
 
-As usual feel free to send feedback on the [hue-user](http://groups.google.com/a/cloudera.org/group/hue-user) list or [@gethue](https://twitter.com/gethue)!
+As usual feel free to send feedback on the [Forum](https://discourse.gethue.com/) list or [@gethue](https://twitter.com/gethue)!
 
 
 ## API Server

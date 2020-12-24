@@ -111,7 +111,7 @@ class UserProfile(models.Model):
     if self.user.is_superuser:
       return True
     if ENABLE_CONNECTORS.get() and app in ('jobbrowser', 'metastore', 'filebrowser', 'indexer', 'useradmin', 'notebook'):
-      if app == 'useradmin' and action == 'superuser':
+      if app == 'useradmin' and action in ('superuser', 'access_view:useradmin:edit_user'):  # Not implemented yet
         return False
       else:
         return True

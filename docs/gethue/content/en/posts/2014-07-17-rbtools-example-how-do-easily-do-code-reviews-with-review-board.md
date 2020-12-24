@@ -40,6 +40,9 @@ categories:
   - Development
 
 ---
+
+**December 2020**: GitHub pull requests are now prefered https://docs.gethue.com/developer/development/#development-process
+
 **Note:**
 
 During the development process if you are facing any problem then, it is recommended to check your issues at https://discourse.gethue.com/ and https://github.com/cloudera/hue/issues?q=is%3Aissue+. If the solution is not found then, feel free to create an issue at https://github.com/cloudera/hue/issues.

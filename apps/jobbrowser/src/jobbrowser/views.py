@@ -189,8 +189,8 @@ def massage_job_for_json(job, request=None, user=None):
     'name': hasattr(job, 'jobName') and job.jobName or '',
     'status': job.status,
     'yarnStatus': hasattr(job, 'yarnStatus') and job.yarnStatus or '',
-    'url': job.jobId and reverse('jobbrowser.views.single_job', kwargs={'job': job.jobId}) or '',
-    'logs': job.jobId and reverse('jobbrowser.views.job_single_logs', kwargs={'job': job.jobId}) or '',
+    'url': job.jobId and reverse('jobbrowser:jobbrowser.views.single_job', kwargs={'job': job.jobId}) or '',
+    'logs': job.jobId and reverse('jobbrowser:jobbrowser.views.job_single_logs', kwargs={'job': job.jobId}) or '',
     'queueName': hasattr(job, 'queueName') and job.queueName or _('N/A'),
     'priority': hasattr(job, 'priority') and job.priority or _('N/A'),
     'user': job.user,
@@ -219,7 +219,7 @@ def massage_job_for_json(job, request=None, user=None):
     'durationFormatted': hasattr(job, 'durationFormatted') and job.durationFormatted or '',
     'durationMs': hasattr(job, 'durationInMillis') and job.durationInMillis or 0,
     'canKill': can_kill_job(job, request.user if request else user),
-    'killUrl': job.jobId and reverse('kill_job', kwargs={'job': job.jobId}) or '',
+    'killUrl': job.jobId and reverse('jobbrowser:kill_job', kwargs={'job': job.jobId}) or '',
     'diagnostics': hasattr(job, 'diagnostics') and job.diagnostics or '',
   }
   return job
@@ -229,8 +229,8 @@ def massage_task_for_json(task):
   task = {
     'id': task.taskId,
     'shortId': task.taskId_short,
-    'url': task.taskId and reverse('jobbrowser.views.single_task', kwargs={'job': task.jobId, 'taskid': task.taskId}) or '',
-    'logs': task.taskAttemptIds and reverse('single_task_attempt_logs', kwargs={'job': task.jobId, 'taskid': task.taskId,
+    'url': task.taskId and reverse('jobbrowser:jobbrowser.views.single_task', kwargs={'job': task.jobId, 'taskid': task.taskId}) or '',
+    'logs': task.taskAttemptIds and reverse('jobbrowser:single_task_attempt_logs', kwargs={'job': task.jobId, 'taskid': task.taskId,
                                                                                 'attemptid': task.taskAttemptIds[-1]}) or '',
     'type': task.taskType
   }

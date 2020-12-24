@@ -46,8 +46,10 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
       ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
       # Make sure LDAP groups exist or they won't sync
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False,
+        import_members_recursive=False, sync_users=False, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False,
+        import_members_recursive=False, sync_users=False, import_by_dn=False)
 
       # Import curly who is part of TestUsers and Test Administrators
       import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'curly', sync_groups=False, import_by_dn=False)
@@ -97,19 +99,22 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
 
     try:
       # Import groups only
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False,
+        import_members_recursive=False, sync_users=False, import_by_dn=False)
       test_users = Group.objects.get(name='TestUsers')
       assert_true(LdapGroup.objects.filter(group=test_users).exists())
       assert_equal(test_users.user_set.all().count(), 0)
 
       # Import all members of TestUsers
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='TestUsers')
       assert_true(LdapGroup.objects.filter(group=test_users).exists())
       assert_equal(test_users.user_set.all().count(), 3)
 
       # Should import a group, but will only sync already-imported members
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       assert_equal(User.objects.all().count(), 3)
       assert_equal(Group.objects.all().count(), 2)
       test_admins = Group.objects.get(name='Test Administrators')
@@ -119,18 +124,21 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
 
       # Only sync already imported
       ldap_access.CACHED_LDAP_CONN.remove_user_group_for_test('uid=moe,ou=People,dc=example,dc=com', 'TestUsers')
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       assert_equal(test_users.user_set.all().count(), 2)
       assert_equal(User.objects.get(username='moe').groups.all().count(), 0)
 
       # Import missing user
       ldap_access.CACHED_LDAP_CONN.add_user_group_for_test('uid=moe,ou=People,dc=example,dc=com', 'TestUsers')
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       assert_equal(test_users.user_set.all().count(), 3)
       assert_equal(User.objects.get(username='moe').groups.all().count(), 1)
 
       # Import all members of TestUsers and members of subgroups
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True, import_members_recursive=True, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True,
+        import_members_recursive=True, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='TestUsers')
       assert_true(LdapGroup.objects.filter(group=test_users).exists())
       assert_equal(test_users.user_set.all().count(), 4)
@@ -140,7 +148,8 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       hue_group = Group.objects.create(name='OtherGroup')
       hue_group.user_set.add(hue_user)
       hue_group.save()
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'OtherGroup', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'OtherGroup', import_members=False,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       assert_false(LdapGroup.objects.filter(group=hue_group).exists())
       assert_true(hue_group.user_set.filter(username=hue_user.username).exists())
     finally:
@@ -159,19 +168,22 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
 
     try:
       # Import groups only
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False,
+        import_members_recursive=False, sync_users=False, import_by_dn=False)
       test_users = Group.objects.get(name='TestUsers')
       assert_true(LdapGroup.objects.filter(group=test_users).exists())
       assert_equal(test_users.user_set.all().count(), 0)
 
       # Import all members of TestUsers
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='TestUsers')
       assert_true(LdapGroup.objects.filter(group=test_users).exists())
       assert_equal(test_users.user_set.all().count(), 3)
 
       # Should import a group, but will only sync already-imported members
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       assert_equal(User.objects.all().count(), 3)
       assert_equal(Group.objects.all().count(), 2)
       test_admins = Group.objects.get(name='Test Administrators')
@@ -182,25 +194,29 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       # Only sync already imported
       assert_equal(test_users.user_set.all().count(), 3)
       ldap_access.CACHED_LDAP_CONN.remove_user_group_for_test('uid=moe,ou=People,dc=example,dc=com', 'TestUsers')
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       assert_equal(test_users.user_set.all().count(), 2)
       assert_equal(User.objects.get(username='moe').groups.all().count(), 0)
 
       # Import missing user
       ldap_access.CACHED_LDAP_CONN.add_user_group_for_test('uid=moe,ou=People,dc=example,dc=com', 'TestUsers')
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       assert_equal(test_users.user_set.all().count(), 3)
       assert_equal(User.objects.get(username='moe').groups.all().count(), 1)
 
       # Import all members of TestUsers and not members of suboordinate groups (even though specified)
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True, import_members_recursive=True, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True,
+        import_members_recursive=True, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='TestUsers')
       assert_true(LdapGroup.objects.filter(group=test_users).exists())
       assert_equal(test_users.user_set.all().count(), 3)
 
       # Nested group import
       # First without recursive import, then with.
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'NestedGroups', import_members=True, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'NestedGroups', import_members=True,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       nested_groups = Group.objects.get(name='NestedGroups')
       nested_group = Group.objects.get(name='NestedGroup')
       assert_true(LdapGroup.objects.filter(group=nested_groups).exists())
@@ -208,7 +224,8 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       assert_equal(nested_groups.user_set.all().count(), 0, nested_groups.user_set.all())
       assert_equal(nested_group.user_set.all().count(), 0, nested_group.user_set.all())
 
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'NestedGroups', import_members=True, import_members_recursive=True, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'NestedGroups', import_members=True,
+        import_members_recursive=True, sync_users=True, import_by_dn=False)
       nested_groups = Group.objects.get(name='NestedGroups')
       nested_group = Group.objects.get(name='NestedGroup')
       assert_true(LdapGroup.objects.filter(group=nested_groups).exists())
@@ -221,7 +238,8 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       hue_group = Group.objects.create(name='OtherGroup')
       hue_group.user_set.add(hue_user)
       hue_group.save()
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'OtherGroup', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'OtherGroup', import_members=False,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       assert_false(LdapGroup.objects.filter(group=hue_group).exists())
       assert_true(hue_group.user_set.filter(username=hue_user.username).exists())
     finally:
@@ -240,19 +258,22 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
 
     try:
       # Import groups only
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=False,
+        import_members_recursive=False, sync_users=False, import_by_dn=False)
       test_users = Group.objects.get(name='PosixGroup')
       assert_true(LdapGroup.objects.filter(group=test_users).exists())
       assert_equal(test_users.user_set.all().count(), 0)
 
       # Import all members of TestUsers
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='PosixGroup')
       assert_true(LdapGroup.objects.filter(group=test_users).exists())
       assert_equal(test_users.user_set.all().count(), 2)
 
       # Should import a group, but will only sync already-imported members
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       assert_equal(User.objects.all().count(), 2, User.objects.all())
       assert_equal(Group.objects.all().count(), 2, Group.objects.all())
       test_admins = Group.objects.get(name='Test Administrators')
@@ -262,18 +283,21 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
 
       # Only sync already imported
       ldap_access.CACHED_LDAP_CONN.remove_posix_user_group_for_test('posix_person', 'PosixGroup')
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=False,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       assert_equal(test_users.user_set.all().count(), 1)
       assert_equal(User.objects.get(username='posix_person').groups.all().count(), 0)
 
       # Import missing user
       ldap_access.CACHED_LDAP_CONN.add_posix_user_group_for_test('posix_person', 'PosixGroup')
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       assert_equal(test_users.user_set.all().count(), 2)
       assert_equal(User.objects.get(username='posix_person').groups.all().count(), 1)
 
       # Import all members of PosixGroup and members of subgroups
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True, import_members_recursive=True, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True,
+        import_members_recursive=True, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='PosixGroup')
       assert_true(LdapGroup.objects.filter(group=test_users).exists())
       assert_equal(test_users.user_set.all().count(), 3)
@@ -283,7 +307,8 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       hue_group = Group.objects.create(name='OtherGroup')
       hue_group.user_set.add(hue_user)
       hue_group.save()
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'OtherGroup', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'OtherGroup', import_members=False,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       assert_false(LdapGroup.objects.filter(group=hue_group).exists())
       assert_true(hue_group.user_set.filter(username=hue_user.username).exists())
     finally:
@@ -302,19 +327,22 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
 
     try:
       # Import groups only
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=False,
+        import_members_recursive=False, sync_users=False, import_by_dn=False)
       test_users = Group.objects.get(name='PosixGroup')
       assert_true(LdapGroup.objects.filter(group=test_users).exists())
       assert_equal(test_users.user_set.all().count(), 0)
 
       # Import all members of TestUsers
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='PosixGroup')
       assert_true(LdapGroup.objects.filter(group=test_users).exists())
       assert_equal(test_users.user_set.all().count(), 2)
 
       # Should import a group, but will only sync already-imported members
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       assert_equal(User.objects.all().count(), 2, User.objects.all())
       assert_equal(Group.objects.all().count(), 2, Group.objects.all())
       test_admins = Group.objects.get(name='Test Administrators')
@@ -324,18 +352,21 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
 
       # Only sync already imported
       ldap_access.CACHED_LDAP_CONN.remove_posix_user_group_for_test('posix_person', 'PosixGroup')
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=False,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       assert_equal(test_users.user_set.all().count(), 1)
       assert_equal(User.objects.get(username='posix_person').groups.all().count(), 0)
 
       # Import missing user
       ldap_access.CACHED_LDAP_CONN.add_posix_user_group_for_test('posix_person', 'PosixGroup')
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       assert_equal(test_users.user_set.all().count(), 2)
       assert_equal(User.objects.get(username='posix_person').groups.all().count(), 1)
 
       # Import all members of PosixGroup and members of subgroups (there should be no subgroups)
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True, import_members_recursive=True, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True,
+        import_members_recursive=True, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='PosixGroup')
       assert_true(LdapGroup.objects.filter(group=test_users).exists())
       assert_equal(test_users.user_set.all().count(), 2)
@@ -343,7 +374,8 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       # Import all members of NestedPosixGroups and members of subgroups
       reset_all_users()
       reset_all_groups()
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'NestedPosixGroups', import_members=True, import_members_recursive=True, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'NestedPosixGroups', import_members=True,
+        import_members_recursive=True, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='NestedPosixGroups')
       assert_true(LdapGroup.objects.filter(group=test_users).exists())
       assert_equal(test_users.user_set.all().count(), 0)
@@ -356,7 +388,8 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       hue_group = Group.objects.create(name='OtherGroup')
       hue_group.user_set.add(hue_user)
       hue_group.save()
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'OtherGroup', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'OtherGroup', import_members=False,
+        import_members_recursive=False, sync_users=True, import_by_dn=False)
       assert_false(LdapGroup.objects.filter(group=hue_group).exists())
       assert_true(hue_group.user_set.filter(username=hue_user.username).exists())
     finally:
@@ -393,8 +426,10 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       assert_equal(hue_user.first_name, 'Different')
 
       # Make sure LDAP groups exist or they won't sync
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
-      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False,
+        import_members_recursive=False, sync_users=False, import_by_dn=False)
+      import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False,
+        import_members_recursive=False, sync_users=False, import_by_dn=False)
       # Try importing a user and sync groups
       import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'curly', sync_groups=True, import_by_dn=False)
       curly = User.objects.get(username='curly')
@@ -451,7 +486,7 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
   def test_add_ldap_users(self):
     done = []
     try:
-      URL = reverse(add_ldap_users)
+      URL = reverse('useradmin:useradmin.views.add_ldap_users')
 
       # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
       ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
@@ -476,7 +511,9 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       assert_true("Username must not contain whitespaces and ':'" in response.context[0]['form'].errors['username_pattern'][0], response)
 
       # Test dn with spaces in username and dn (should fail)
-      response = c.post(URL, dict(username_pattern='uid=user with space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
+      response = c.post(
+        URL, dict(username_pattern='uid=user with space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True)
+      )
       assert_true(b"Could not get LDAP details for users in pattern" in response.content, response)
       response = c.get(reverse(desktop.views.log_view))
       whitespaces_message = "{username}: Username must not contain whitespaces".format(username='user with space')
@@ -485,7 +522,9 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       assert_true(whitespaces_message in response.content, response.content)
 
       # Test dn with spaces in dn, but not username (should succeed)
-      response = c.post(URL, dict(username_pattern='uid=user without space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
+      response = c.post(
+        URL, dict(username_pattern='uid=user without space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True)
+      )
       assert_true(User.objects.filter(username='spaceless').exists())
 
     finally:
@@ -500,7 +539,7 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
 
     done = []
     try:
-      URL = reverse(add_ldap_users)
+      URL = reverse('useradmin:useradmin.views.add_ldap_users')
 
       reset_all_users()
       reset_all_groups()
@@ -537,7 +576,7 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
 
 
   def test_add_ldap_groups(self):
-    URL = reverse(add_ldap_groups)
+    URL = reverse('useradmin:useradmin.views.add_ldap_groups')
 
     # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
     ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
@@ -567,7 +606,7 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
     assert_true('/useradmin/groups' in response['Location'], response)
 
   def test_sync_ldap_users_groups(self):
-    URL = reverse(sync_ldap_users_groups)
+    URL = reverse('useradmin:useradmin_views_sync_ldap_users_groups')
 
     # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
     ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
@@ -586,7 +625,9 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
 
     c = make_logged_in_client('test', is_superuser=True)
 
-    response = c.post(reverse(add_ldap_users), dict(username_pattern='moe', password1='test', password2='test'), follow=True)
+    response = c.post(
+      reverse('useradmin:useradmin.views.add_ldap_users'), dict(username_pattern='moe', password1='test', password2='test'), follow=True
+    )
     assert_true(b'There was an error when communicating with LDAP' in response.content, response)
 
 class TestUserAdminLdapDeprecatedWithHadoop(BaseUserAdminTests):
@@ -595,7 +636,7 @@ class TestUserAdminLdapDeprecatedWithHadoop(BaseUserAdminTests):
 
   def test_ensure_home_directory_add_ldap_users(self):
     try:
-      URL = reverse(add_ldap_users)
+      URL = reverse('useradmin:useradmin.views.add_ldap_users')
 
       # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
       ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
@@ -638,7 +679,7 @@ class TestUserAdminLdapDeprecatedWithHadoop(BaseUserAdminTests):
         cluster.fs.rmtree('/user/otherguy')
 
   def test_ensure_home_directory_sync_ldap_users_groups(self):
-    URL = reverse(sync_ldap_users_groups)
+    URL = reverse('useradmin:useradmin_views_sync_ldap_users_groups')
 
     # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
     ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
@@ -647,7 +688,7 @@ class TestUserAdminLdapDeprecatedWithHadoop(BaseUserAdminTests):
     c = make_logged_in_client(cluster.superuser, is_superuser=True)
     cluster.fs.setuser(cluster.superuser)
 
-    c.post(reverse(add_ldap_users), dict(username_pattern='curly', password1='test', password2='test'))
+    c.post(reverse('useradmin:useradmin.views.add_ldap_users'), dict(username_pattern='curly', password1='test', password2='test'))
     assert_false(cluster.fs.exists('/user/curly'))
     assert_true(c.post(URL, dict(ensure_home_directory=True)))
     assert_true(cluster.fs.exists('/user/curly'))

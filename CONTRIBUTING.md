@@ -29,15 +29,9 @@ Have a look at [how to quick build](https://docs.gethue.com/developer/developmen
 
 ## Reviews
 
-It is flexible:
+It is flexible but Github Pull request are handy.
 
-* **Github Pull request**
-Preferred way. Just post the [pull request](https://github.com/cloudera/hue/pulls) and reviewers will start from there. The CI will run a basic set of tests for you.
-
-* **Review Board**
-For large changes. Create an account on Hue's [Review Board](https://review.cloudera.org/groups/hue).
-Post the patch against the "hue-rw" repository. Enter "hue" in the "groups" field.
-Example: [https://review.cloudera.org/r/4019/](https://review.cloudera.org/r/4019/). Blog posts about using [Code Reviews](http://gethue.com/rbtools-example-how-do-easily-do-code-reviews-with-review-board/) and the [extended process](http://gethue.com/the-hue-team-development-process/).
+Just post the [pull request](https://github.com/cloudera/hue/pulls) and reviewers will start from there. The CI will run a basic set of tests for you.
 
 ## Coding Style
 

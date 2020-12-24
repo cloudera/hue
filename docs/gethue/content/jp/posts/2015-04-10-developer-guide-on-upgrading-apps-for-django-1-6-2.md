@@ -87,12 +87,12 @@ HueはDjango 1.4.5からDjango1.6.10にアップグレードされています�
 
 Djangoの`django.core.urlresolvers.reverse`（およびmakoスクリプトの `url`関数）は自動的に引数をエスケープします。従って、これらの関数の使用は、以下から：
 
-<pre><code class="python">&lt;a href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }"&gt;...&lt;/a&gt;
+<pre><code class="python">&lt;a href="${ url('useradmin:useradmin.views.edit_user', username=urllib.quote(user.username)) }"&gt;...&lt;/a&gt;
 </pre>
 
 下記のように更新します：
 
-<pre><code class="python">&lt;a href="${ url('useradmin.views.edit_user', username=user.username) }"&gt;...&lt;/a&gt;
+<pre><code class="python">&lt;a href="${ url('useradmin:useradmin.views.edit_user', username=user.username) }"&gt;...&lt;/a&gt;
 </pre>
 
 ### StreamingHttpResponse

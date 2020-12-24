@@ -32,11 +32,11 @@ ${ comps.menubar() }
           <li class="nav-header">${_('Attempt ID')}</li>
           <li class="white truncate-text" title="${attempt.attemptId_short}">${attempt.attemptId_short}</li>
           <li class="nav-header">${_('Task')}</li>
-          <li><a href="${url('jobbrowser.views.single_task', job=joblnk.jobId, taskid=taskid)}"
+          <li><a href="${url('jobbrowser:jobbrowser.views.single_task', job=joblnk.jobId, taskid=taskid)}"
                  class="truncate-text" title="${task.taskId_short}">${task.taskId_short}</a>
           </li>
           <li class="nav-header">${_('Job')}</li>
-          <li><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}"
+          <li><a href="${url('jobbrowser:jobbrowser.views.single_job', job=joblnk.jobId)}"
                  class="truncate-text" title="${joblnk.jobId_short}">${joblnk.jobId_short}</a></li>
           <li class="nav-header">${_('Status')}</li>
           <li class="white">
@@ -65,7 +65,7 @@ ${ comps.menubar() }
             <li class="active"><a href="#metadata" data-toggle="tab">${_('Metadata')}</a></li>
             <li><a href="#counters" data-toggle="tab">${_('Counters')}</a></li>
             <li><a
-                href="${ url('single_task_attempt_logs', job=task.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }">${_('Logs')}</a>
+                href="${ url('jobbrowser:single_task_attempt_logs', job=task.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }">${_('Logs')}</a>
             </li>
           </ul>
 
@@ -85,7 +85,7 @@ ${ comps.menubar() }
                 </tr>
                 <tr>
                   <td>${_('Task ID')}</td>
-                  <td><a href="${url('jobbrowser.views.single_task', job=joblnk.jobId, taskid=taskid)}"
+                  <td><a href="${url('jobbrowser:jobbrowser.views.single_task', job=joblnk.jobId, taskid=taskid)}"
                          title="${_('View this task')}">${task.taskId_short}</a></td>
                 </tr>
                 <tr>
@@ -94,7 +94,7 @@ ${ comps.menubar() }
                 </tr>
                 <tr>
                   <td>${_('JobId')}</td>
-                  <td><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}"
+                  <td><a href="${url('jobbrowser:jobbrowser.views.single_job', job=joblnk.jobId)}"
                          title="${_('View this job')}">${joblnk.jobId_short}</a></td>
                 </tr>
                 <tr>
