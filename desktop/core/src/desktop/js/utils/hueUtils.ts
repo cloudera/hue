@@ -303,7 +303,7 @@ export const logError = (error: unknown): void => {
 export const equalIgnoreCase = (a?: string, b?: string): boolean =>
   !!a && !!b && a.toLowerCase() === b.toLowerCase();
 
-export const deXSS = (str?: string): string => (str && sanitizeHtml(str)) || '';
+export const deXSS = (str?: string): string => (str !== undefined ) ?  sanitizeHtml(str) : '';
 
 export const getStyleFromCSSClass = (
   cssClass: string
