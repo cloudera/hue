@@ -44,6 +44,18 @@ describe('hue.utils.js', () => {
     expect(hueUtils.deXSS(undefined)).toEqual('');
   });
 
+  it('should return false when the value is false', () => {
+    expect(hueUtils.deXSS(false)).toEqual('false');
+  });
+
+  it('should return 0 when the value is 0', () => {
+    expect(hueUtils.deXSS(0)).toEqual('0');
+  });
+
+  it('should return null when the value is null', () => {
+    expect(hueUtils.deXSS(null)).toEqual('null');
+  });
+
   it('should remove JS code from a string', () => {
     expect(hueUtils.deXSS('hello <script>alert(123)</script>world')).toEqual('hello world');
   });
