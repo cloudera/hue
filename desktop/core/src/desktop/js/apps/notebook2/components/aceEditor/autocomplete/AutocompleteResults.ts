@@ -1793,7 +1793,7 @@ class AutocompleteResults {
         }
       });
 
-      if (totalPopularity > 0 && Object.keys(popularityIndex).length) {
+      if (totalPopularity > 0 && popularityIndex.size > 0) {
         const tableSuggestions = await tablesPromise;
         tableSuggestions.forEach(suggestion => {
           const details = <DataCatalogEntry>suggestion.details;
