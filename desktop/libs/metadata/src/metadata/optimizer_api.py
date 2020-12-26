@@ -350,7 +350,8 @@ def _convert_queries(queries_data):
         guid = snippet['result']['handle']['guid']
         if isinstance(guid, str):
           guid = guid.encode('utf-8')
-        original_query_id = '%s:%s' % struct.unpack(b"QQ", base64.decodestring(guid)) # unpack_guid uses '%016x:%016x' while optmizer api uses '%s:%s'.
+        # unpack_guid uses '%016x:%016x' while optmizer api uses '%s:%s'.
+        original_query_id = '%s:%s' % struct.unpack(b"QQ", base64.decodestring(guid))
         execution_time = snippet['result']['executionTime'] * 100 if snippet['status'] in ('available', 'expired') else -1
         statement = _clean_query(_get_statement(query_data))
         queries.append((original_query_id, execution_time, statement, snippet.get('database', 'default').strip()))
@@ -378,8 +379,13 @@ def upload_history(request):
 
     elif OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get() > 0:
       histories = [
-        (source_platform, Document2.objects.filter(type='query-%s' % source_platform, is_history=True, is_managed=False, is_trashed=False).order_by('-last_modified')[:OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get()])
-            for source_platform in ['hive', 'impala']
+        (
+          source_platform,
+          Document2.objects.filter(
+            type='query-%s' % source_platform, is_history=True, is_managed=False, is_trashed=False
+          ).order_by('-last_modified')[:OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get()]
+        )
+        for source_platform in ['hive', 'impala']
       ]
 
     for source_platform, history in histories:
@@ -467,12 +473,12 @@ def upload_table_stats(request):
 
         table_stats.append({
           'table_name': '%(database)s.%(table)s' % path, # DB Prefix
-          'num_rows':  stats.get('numRows', -1),
-          'last_modified_time':  stats.get('transient_lastDdlTime', -1),
-          'total_size':  stats.get('totalSize', -1),
-          'raw_data_size':  stats.get('rawDataSize', -1),
-          'num_files':  stats.get('numFiles', -1),
-          'num_partitions':  stats.get('numPartitions', -1),
+          'num_rows': stats.get('numRows', -1),
+          'last_modified_time': stats.get('transient_lastDdlTime', -1),
+          'total_size': stats.get('totalSize', -1),
+          'raw_data_size': stats.get('rawDataSize', -1),
+          'num_files': stats.get('numFiles', -1),
+          'num_partitions': stats.get('numPartitions', -1),
           # bytes_cached
           # cache_replication
           # format
@@ -480,14 +486,23 @@ def upload_table_stats(request):
 
       if with_columns_stats:
         if source_platform == 'impala':
-          colum_stats = json.loads(get_table_stats(mock_request, database=path['database'], table=path['table'], column=-1).content)['stats']
+          colum_stats = json.loads(
+            get_table_stats(mock_request, database=path['database'], table=path['table'], column=-1).content
+          )['stats']
         else:
           colum_stats = [
               json.loads(get_table_stats(mock_request, database=path['database'], table=path['table'], column=col).content)['stats']
               for col in full_table_stats['columns'][:25]
           ]
 
-        raw_column_stats = [dict([(key, val if val is not None else '') for col_stat in col for key, val in col_stat.items()]) for col in colum_stats]
+        raw_column_stats = [
+          dict([
+            (key, val if val is not None else '')
+              for col_stat in col for key, val in col_stat.items()
+            ]
+          )
+          for col in colum_stats
+        ]
 
         for col_stats in raw_column_stats:
           column_stats.append({
@@ -512,16 +527,19 @@ def upload_table_stats(request):
 
   if table_stats:
     response['upload_table_stats'] = api.upload(data=table_stats, data_type='table_stats', source_platform=source_platform)
-    response['upload_table_stats_status'] = 0 if response['upload_table_stats']['status']['state'] in ('WAITING', 'FINISHED', 'IN_PROGRESS') else -1
+    response['upload_table_stats_status'] = 0 if response['upload_table_stats']['status']['state'] in (
+      'WAITING', 'FINISHED', 'IN_PROGRESS') else -1
     response['status'] = response['upload_table_stats_status']
   if column_stats:
     response['upload_cols_stats'] = api.upload(data=column_stats, data_type='cols_stats', source_platform=source_platform)
-    response['upload_cols_stats_status'] = response['status'] if response['upload_cols_stats']['status']['state'] in ('WAITING', 'FINISHED', 'IN_PROGRESS') else -1
+    response['upload_cols_stats_status'] = response['status'] if response['upload_cols_stats']['status']['state'] in (
+      'WAITING', 'FINISHED', 'IN_PROGRESS') else -1
     if response['upload_cols_stats_status'] != 0:
       response['status'] = response['upload_cols_stats_status']
   if table_ddls:
     response['upload_table_ddl'] = api.upload(data=table_ddls, data_type='queries', source_platform=source_platform)
-    response['upload_table_ddl_status'] = response['status'] if response['upload_table_ddl']['status']['state'] in ('WAITING', 'FINISHED', 'IN_PROGRESS') else -1
+    response['upload_table_ddl_status'] = response['status'] if response['upload_table_ddl']['status']['state'] in (
+      'WAITING', 'FINISHED', 'IN_PROGRESS') else -1
     if response['upload_table_ddl_status'] != 0:
       response['status'] = response['upload_table_ddl_status']
 
