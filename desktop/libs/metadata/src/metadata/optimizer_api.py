@@ -127,7 +127,8 @@ def top_tables(request):
       'popularity': table['workloadPercent'],
       'column_count': table['columnCount'],
       'total': table['total'],
-    } for table in data['results']
+    }
+    for table in data['results']
   ]
 
   response['top_tables'] = tables
