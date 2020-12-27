@@ -8,7 +8,7 @@ jobs:
     docker:
       # specify the version you desire here
       # - image: circleci/python:3.8.0
-      - image: gethue/hue:latest
+      - image: gethue/hue:latest-py2
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -189,7 +189,7 @@ jobs:
 
   build-py3.6:
     docker:
-      - image: gethue/hue:latest # Should be circleci/python:3.6 at some point
+      - image: gethue/hue:latest-py2 # Should be circleci/python:3.6 at some point
 
     working_directory: ~/repo
 
@@ -230,7 +230,7 @@ jobs:
 
   build-py3.8:
     docker:
-      - image: gethue/hue:latest # Should be circleci/python:3.x at some point
+      - image: gethue/hue:latest-py2 # Should be circleci/python:3.x at some point
 
     working_directory: ~/repo
 
