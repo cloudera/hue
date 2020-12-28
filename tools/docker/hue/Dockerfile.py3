@@ -69,8 +69,8 @@ RUN ./build/env/bin/pip install \
   pybigquery \
   elasticsearch-dbapi \
   pyasn1==0.4.1 \
-  gevent \
-  eventlet \
+  # View some parquet files
+  python-snappy==0.5.4 \
   threadloop  # Needed for Jaeger \
   thrift-sasl==0.2.1
 
