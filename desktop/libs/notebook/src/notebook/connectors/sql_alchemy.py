@@ -296,7 +296,7 @@ class SqlAlchemyApi(Api):
 
     if connection:
       cursor = connection['result'].cursor
-      if self.options['url'].startswith('presto://') and cursor and cursor.poll():
+      if self.options['url'].startswith('presto://') and cursor and cursor._state == cursor._STATE_RUNNING:
         response['status'] = 'running'
       elif snippet['result']['handle']['has_result_set']:
         response['status'] = 'available'
