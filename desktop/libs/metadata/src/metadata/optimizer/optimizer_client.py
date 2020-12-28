@@ -191,10 +191,11 @@ class OptimizerClient(object):
 
   # Sentry permissions work bottom to top.
   # @check_privileges
-  def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None):
+  def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None, connector=None):
     return self._call(
       'getTopTables', {
         'tenant' : self._tenant_id,
+        'connector': connector,
         'dbName': database_name.lower(),
         'pageSize': page_size,
         'startingToken': startingToken
@@ -297,9 +298,10 @@ class OptimizerClient(object):
 
 
   @check_privileges
-  def top_columns(self, db_tables=None, page_size=100, startingToken=None):
+  def top_columns(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     args = {
       'tenant' : self._tenant_id,
+      'connector' : connector,
       'pageSize': page_size,
       'startingToken': startingToken
     }
@@ -315,9 +317,10 @@ class OptimizerClient(object):
 
 
   @check_privileges
-  def top_joins(self, db_tables=None, page_size=100, startingToken=None):
+  def top_joins(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     args = {
       'tenant' : self._tenant_id,
+      'connector': connector,
       'pageSize': page_size,
       'startingToken': startingToken
     }

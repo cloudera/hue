@@ -46,7 +46,7 @@ class DummyClient(Api):
     pass
 
 
-  def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None):
+  def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None, connector=None):
     data = {
       'results': [{
           "database": "default",
@@ -114,7 +114,7 @@ class DummyClient(Api):
     return results
 
 
-  def top_columns(self, db_tables=None, page_size=100, startingToken=None):
+  def top_columns(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     results = {
       'selectColumns': [{
         "dbName": 'default',
@@ -133,7 +133,7 @@ class DummyClient(Api):
     return results
 
 
-  def top_joins(self, db_tables=None, page_size=100, startingToken=None):
+  def top_joins(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     results = {'results': []}
 
     return results
