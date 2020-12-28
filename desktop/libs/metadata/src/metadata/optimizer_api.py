@@ -105,11 +105,12 @@ def top_tables(request):
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   database = request.POST.get('database', 'default')
+  connector = json.loads(request.POST.get('connector', '{}'))
   limit = request.POST.get('len', 1000)
 
   api = get_api(request.user, interface)
 
-  data = api.top_tables(database_name=database, page_size=limit)
+  data = api.top_tables(database_name=database, page_size=limit, connector=connector)
 
   if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
     checker = get_checker(user=self.user)
@@ -263,11 +264,12 @@ def top_joins(request):
   response = {'status': -1}
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
+  connector = json.loads(request.POST.get('connector', '{}'))
   db_tables = json.loads(request.POST.get('dbTables', '[]'))
 
   api = get_api(request.user, interface)
 
-  data = api.top_joins(db_tables=db_tables)
+  data = api.top_joins(db_tables=db_tables, connector=connector)
 
   if data:
     response['status'] = 0
@@ -325,11 +327,12 @@ def top_columns(request):
   response = {'status': -1}
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
+  connector = json.loads(request.POST.get('connector', '{}'))
   db_tables = json.loads(request.POST.get('dbTables', '[]'))
 
   api = get_api(request.user, interface)
 
-  data = api.top_columns(db_tables=db_tables)
+  data = api.top_columns(db_tables=db_tables, connector=connector)
 
   if data:
     response['status'] = 0
