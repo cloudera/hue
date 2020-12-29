@@ -5,6 +5,7 @@
     "create/create_common.jison",
     "create/create_table.jison",
     "create/create_view.jison",
+    "show/show.jison",
     "../generic/select/cte_select_statement.jison",
     "../generic/select/from_clause.jison",
     "../generic/select/group_by_clause.jison",
@@ -41,6 +42,10 @@
   ],
   "syntax": [
     "../generic/syntax_header.jison",
+    "create/create_common.jison",
+    "create/create_table.jison",
+    "create/create_view.jison",
+    "show/show.jison",
     "../generic/select/cte_select_statement.jison",
     "../generic/select/from_clause.jison",
     "../generic/select/group_by_clause.jison",
