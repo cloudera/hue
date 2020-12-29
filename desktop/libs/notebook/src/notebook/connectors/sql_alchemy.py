@@ -315,15 +315,15 @@ class SqlAlchemyApi(Api):
       guid = snippet['result']['handle']['guid']
       handle = CONNECTIONS.get(guid)
       stats = None
+      progress = 100
       try:
         if handle:
           stats = handle['result'].cursor.poll()
       except AssertionError as e:
         LOG.warn('Query probably not running anymore: %s' % e)
-      if not stats:
-        progress = 100
-      stats = stats.get('stats', {})
-      return stats.get('completedSplits', 0) * 100 // stats.get('totalSplits', 1)
+      if stats:
+        stats = stats.get('stats', {})
+        progress = stats.get('completedSplits', 0) * 100 // stats.get('totalSplits', 1)
     return progress
 
 
