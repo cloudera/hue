@@ -1901,12 +1901,13 @@ class ClusterConfig(object):
       _interpreters.extend([{
           'type': interpreter['type'],
           'id': interpreter['type'],
-          'displayName': interpreter['type'].title(),
-          'buttonName': interpreter['type'].title(),
+          'displayName': interpreter['name'].title(),
+          'buttonName': interpreter['name'].title(),
           'page': '/dashboard/new_search?engine=%(type)s' % interpreter,
-          'tooltip': _('%s Dashboard') % interpreter['type'].title(),
+          'tooltip': _('%s Dashboard') % interpreter['name'].title(),
           'is_sql': True
-        } for interpreter in interpreters
+        }
+        for interpreter in interpreters
       ])
 
       return {
