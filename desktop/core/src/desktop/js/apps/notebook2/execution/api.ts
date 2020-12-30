@@ -216,8 +216,12 @@ export const executeStatement = async (options: ExecuteApiOptions): Promise<Exec
 
   executable.addCancellable({
     cancel: async () => {
-      if (executable.status !== EXECUTION_STATUS.running) {
-        return;
+      if (
+        executable.status !== EXECUTION_STATUS.running &&
+        executable.status !== EXECUTION_STATUS.streaming
+      ) {
+        // executable.status seems to have been set to 'canceling' so ignoring for now
+        // return;
       }
       try {
         const response = await executePromise;
