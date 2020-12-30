@@ -52,7 +52,7 @@ import desktop.views
 from desktop import appmanager, metrics
 from desktop.auth.backend import is_admin
 from desktop.conf import AUTH, HTTP_ALLOWED_METHODS, ENABLE_PROMETHEUS, KNOX, DJANGO_DEBUG_MODE, AUDIT_EVENT_LOG_DIR, \
-    SERVER_USER, REDIRECT_WHITELIST, SECURE_CONTENT_SECURITY_POLICY, ENABLE_CONNECTORS
+    SERVER_USER, REDIRECT_WHITELIST, SECURE_CONTENT_SECURITY_POLICY, has_connectors
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n, fsmanager
 from desktop.lib.django_util import JsonResponse, render, render_json
@@ -319,7 +319,9 @@ class LoginAndPermissionMiddleware(object):
         access_view = ''
 
       app_accessed = request._desktop_app
-      app_libs_whitelist = ("desktop", "home", "home2", "about", "hue", "editor", "notebook", "indexer", "404", "500", "403")
+      app_libs_whitelist = ["desktop", "home", "home2", "about", "hue", "editor", "notebook", "indexer", "404", "500", "403"]
+      if has_connectors():
+        app_libs_whitelist.append("metadata")
       # Accessing an app can access an underlying other app.
       # e.g. impala or spark uses code from beeswax and so accessing impala shows up as beeswax here.
       # Here we trust the URL to be the real app we need to check the perms.
