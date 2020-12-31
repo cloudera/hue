@@ -181,6 +181,44 @@ class TestApi(object):
       SqlAlchemyApi(self.user, interpreter)._create_engine()
 
 
+  @raises(AuthenticationRequired)
+  def test_create_connection_error(self):
+    interpreter = {
+      'name': 'hive',
+      'options': {
+        'url': 'mysql://${USER}:${PASSWORD}@hue:3306/hue'
+      }
+    }
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
+      SqlAlchemyApi(self.user, interpreter)._create_connection(engine)
+
+  def test_create_connection(self):
+    interpreter = {
+      'name': 'hive',
+      'options': {
+        'url': 'mysql://${USER}:${PASSWORD}@hue:3306/hue',
+        'session': {
+          'properties': [
+            {
+              'name': 'user',
+              'value': 'test_user'
+            },
+            {
+              'name': 'password',
+              'value': 'test_pass'
+            }
+          ]
+        }
+      }
+    }
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
+      SqlAlchemyApi(self.user, interpreter)._create_connection(engine)
+
+
   def test_create_engine_with_impersonation(self):
     interpreter = {
       'name': 'hive',
@@ -258,32 +296,29 @@ class TestApi(object):
       'dialect_properties': {},
     }
 
-    with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._create_engine') as _create_engine:
-      with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._get_session') as _get_session:
-        execute = Mock(return_value=Mock(cursor=None))
-        _create_engine.return_value = Mock(
-          connect=Mock(
-            return_value=Mock(
-              execute=execute
-            )
+    with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._create_connection') as _create_connection:
+      with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._create_engine') as _create_engine:
+        with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._get_session') as _get_session:
+          execute = Mock(return_value=Mock(cursor=None))
+          _create_connection.return_value = Mock(
+            execute=execute
           )
-        )
-        notebook = {}
-        snippet = {'statement': 'SELECT 1;'}
+          notebook = {}
+          snippet = {'statement': 'SELECT 1;'}
 
-        # Trim
-        engine = SqlAlchemyApi(self.user, interpreter).execute(notebook, snippet)
+          # Trim
+          engine = SqlAlchemyApi(self.user, interpreter).execute(notebook, snippet)
 
-        execute.assert_called_with('SELECT 1')
+          execute.assert_called_with('SELECT 1')
 
-        # No Trim
-        interpreter['options']['url'] = 'mysql://hue:3306/hue'
-        interpreter['dialect_properties']['trim_statement_semicolon'] = False
-        interpreter['dialect_properties']['sql_identifier_quote'] = '`'
+          # No Trim
+          interpreter['options']['url'] = 'mysql://hue:3306/hue'
+          interpreter['dialect_properties']['trim_statement_semicolon'] = False
+          interpreter['dialect_properties']['sql_identifier_quote'] = '`'
 
-        engine = SqlAlchemyApi(self.user, interpreter).execute(notebook, snippet)
+          engine = SqlAlchemyApi(self.user, interpreter).execute(notebook, snippet)
 
-        execute.assert_called_with('SELECT 1;')
+          execute.assert_called_with('SELECT 1;')
 
 
 class TestDialects(object):
