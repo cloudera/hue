@@ -46,6 +46,8 @@ categories:
 
 ## Spark SQL
 
+**Update December 2020** [Executing Spark SQL via the Spark Thrift Server](https://gethue.com/blog/querying-spark-sql-with-spark-thrift-server-and-hue-editor/)
+
 [Spark SQL](https://spark.apache.org/docs/latest/sql-programming-guide.html) is convenient for embedding clean data querying logic within your Spark apps. Hue brings an Editor so that it is easier to develop your SQL snippets.
 
 As detailed in the documentation, Spark SQL comes with different [connectors](https://docs.gethue.com/administrator/configuration/connectors/#apache-spark-sql). Here we will just show with Livy.
