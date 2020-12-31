@@ -128,11 +128,14 @@ class SqlAlchemyApi(Api):
     else:
       self.backticks = '"' if re.match('^(postgresql://|awsathena|elasticsearch|phoenix)', self.options.get('url', '')) else '`'
 
-  def _get_engine(self):
-    engine_key = ENGINE_KEY % {
+  def _get_engine_key(self):
+    return ENGINE_KEY % {
       'username': self.user.username,
       'connector_name': self.interpreter['name']
     }
+  
+  def _get_engine(self):
+    engine_key = self._get_engine_key()
 
     if engine_key not in ENGINES:
       ENGINES[engine_key] = self._create_engine()
@@ -211,6 +214,20 @@ class SqlAlchemyApi(Api):
 
     return None
 
+
+  def _create_connection(self, engine):
+    connection = None
+    try:
+      connection = engine.connect()
+    except Exception as e:
+      engine_key = self._get_engine_key()
+      del ENGINES[engine_key]
+      
+      raise AuthenticationRequired(message='Could not establish connection to datasource')
+
+    return connection
+
+
   @query_error_handler
   def execute(self, notebook, snippet):
     guid = uuid.uuid4().hex
@@ -220,7 +237,7 @@ class SqlAlchemyApi(Api):
       self.options['session'] = session
 
     engine = self._get_engine()
-    connection = engine.connect()
+    connection = self._create_connection(engine)
     statement = snippet['statement']
 
     if self.interpreter['dialect_properties'].get('trim_statement_semicolon', True):
@@ -271,7 +288,7 @@ class SqlAlchemyApi(Api):
       self.options['session'] = session
 
     engine = self._get_engine()
-    connection = engine.connect()
+    connection = self._create_connection(engine)
     statement = snippet['statement']
 
     explanation = ''
@@ -536,7 +553,7 @@ class Assist(object):
           'backticks': self.backticks
       })
 
-    connection = self.engine.connect()
+    connection = self._create_connection(self.engine)
     try:
       result = connection.execute(statement)
       return result.cursor.description, result.fetchall()
