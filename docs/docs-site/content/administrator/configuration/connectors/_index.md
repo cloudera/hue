@@ -259,6 +259,8 @@ Note: Keys and S3 buckets need to be URL quoted but Hue does it automatically fo
 
 ### Apache Phoenix
 
+This [SQL Editor with Phoenix](https://gethue.com/sql-querying-apache-hbase-with-apache-phoenix/) post demoes the integration.
+
 The official Phoenix dialect is already shipped in Hue. However if you want to update it yourself:
 
     ./build/env/bin/pip install phoenixdb
@@ -450,6 +452,8 @@ Alternative:
     options='{"url": "jdbc:db2://db2.vpc.cloudera.com:50000/SQOOP", "driver": "com.ibm.db2.jcc.DB2Driver", "user": "DB2INST1", "password": "cloudera"}'
 
 ### Apache Spark SQL
+
+This [SQL Editor for Spark SQL](https://gethue.com/blog/querying-spark-sql-with-spark-thrift-server-and-hue-editor/) post demoes the integration.
 
 There are two ways to connect depending on your infrastructure:
 
