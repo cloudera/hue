@@ -15,9 +15,11 @@ Many companies and organizations use Hue to quickly answer questions via self-se
 * 1000+ customers
 * Top Fortune 500
 
-are executing 1000s of queries daily. It also ships in Cloudera Data Platform, GC DataProc, Amazon EMR, Open Data Hub...
+are executing 1000s of queries daily. It ships in Cloudera Data Platform, Google DataProc, Amazon EMR, Open Data Hub...
 
-Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/components/) and any contributions are welcome. Read more on [gethue.com](http://gethue.com).
+Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/components/) and any contributions are welcome.
+
+Read more on [gethue.com](http://gethue.com).
 
 ![Hue Editor](https://cdn.gethue.com/uploads/2020/09/hue-4.8.png)
 
