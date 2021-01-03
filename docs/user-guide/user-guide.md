@@ -369,11 +369,11 @@ As Solr SQL is pretty recent, there are some caveats, notably Solr lacks support
 
 which prevents a SQL UX experience comparable to the standard other databases (but we track it in [HUE-3686](https://issues.cloudera.org/browse/HUE-3686)).
 
-### Presto
+### Trino (formerly Presto SQL)
 
-Presto is a high performance, distributed SQL query engine for big data.
+Trino is a high performance, distributed SQL query engine for big data.
 
-[Read more about it here](https://prestosql.io/)
+[Read more about it here](https://trino.io/)
 
 ### PostgreSQL
 ### Redshift
