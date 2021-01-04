@@ -43,8 +43,8 @@
           <spinner :spin="loading" size="small" />
         </div>
       </div>
-      <div class="autocompleter-entries">
-        <div>
+      <div ref="entriesScrollDiv" class="autocompleter-entries">
+        <div ref="entriesDiv">
           <div
             v-for="(suggestion, index) in filtered"
             :key="
@@ -84,7 +84,7 @@
   import { AutocompleteParser } from 'parse/types';
   import Vue from 'vue';
   import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { Prop, Watch } from 'vue-property-decorator';
 
   import { Category, CategoryId, CategoryInfo, extractCategories } from './Category';
   import Executor from 'apps/notebook2/execution/executor';
@@ -343,6 +343,17 @@
       return result;
     }
 
+    @Watch('filter')
+    filterChanged(): void {
+      if (this.selectedIndex !== null) {
+        this.selectedIndex = 0;
+        const scrollDiv = <HTMLDivElement | undefined>this.$refs.entriesScrollDiv;
+        if (scrollDiv) {
+          scrollDiv.scrollTop = 0;
+        }
+      }
+    }
+
     get focusedEntry(): Suggestion | undefined {
       if (this.filtered.length) {
         if (this.hoveredIndex !== null) {
@@ -539,7 +550,29 @@
     }
 
     scrollSelectionIntoView(): void {
-      // TODO: implement
+      const scrollDiv = <HTMLDivElement | undefined>this.$refs.entriesScrollDiv;
+      const entriesDiv = <HTMLDivElement | undefined>this.$refs.entriesDiv;
+      if (
+        !scrollDiv ||
+        !entriesDiv ||
+        this.selectedIndex === null ||
+        entriesDiv.clientHeight < scrollDiv.clientHeight
+      ) {
+        return;
+      }
+      const entryHeight = entriesDiv.clientHeight / entriesDiv.childElementCount;
+      const firstVisibleIndex = Math.ceil(scrollDiv.scrollTop / entryHeight);
+      const visibleCount = scrollDiv.clientHeight / entryHeight;
+      const lastVisibleIndex = firstVisibleIndex + visibleCount - 1;
+
+      if (firstVisibleIndex <= this.selectedIndex && this.selectedIndex <= lastVisibleIndex) {
+        return;
+      }
+      if (this.selectedIndex < firstVisibleIndex) {
+        scrollDiv.scrollTop = this.selectedIndex * entryHeight;
+      } else {
+        scrollDiv.scrollTop = Math.round((this.selectedIndex - (visibleCount - 1)) * entryHeight);
+      }
     }
 
     suggestionSelected(index: number): void {
