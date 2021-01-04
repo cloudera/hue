@@ -15,9 +15,11 @@ Many companies and organizations use Hue to quickly answer questions via self-se
 * 1000+ customers
 * Top Fortune 500
 
-are executing 1000s of queries daily. It also ships in Cloudera Data Platform, GC DataProc, Amazon EMR, Open Data Hub...
+are executing 1000s of queries daily. It ships in Cloudera Data Platform, Google DataProc, Amazon EMR, Open Data Hub...
 
-Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/components/) and any contributions are welcome. Read more on [gethue.com](http://gethue.com).
+Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/components/) and any contributions are welcome.
+
+Read more on [gethue.com](http://gethue.com).
 
 ![Hue Editor](https://cdn.gethue.com/uploads/2020/09/hue-4.8.png)
 
@@ -28,7 +30,7 @@ You can start Hue via three ways described below. Once setup, you would then nee
 
 Quick Demos:
 
-* Docker Compose: [Flink SQL](https://gethue.com/blog/tutorial-query-live-data-stream-with-flink-sql/), [ksqlDB](https://gethue.com/blog/tutorial-query-live-data-stream-with-kafka-sql/), [HBase](https://gethue.com/blog/querying-live-kafka-data-in-apache-hbase-with-phoenix/)
+* Docker Compose: [Impala](https://gethue.com/blog/quickstart-sql-editor-for-apache-impala/), [Flink SQL](https://gethue.com/blog/tutorial-query-live-data-stream-with-flink-sql/), [ksqlDB](https://gethue.com/blog/tutorial-query-live-data-stream-with-kafka-sql/), [HBase](https://gethue.com/blog/querying-live-kafka-data-in-apache-hbase-with-phoenix/), [Spark SQL](https://gethue.com/blog/querying-spark-sql-with-spark-thrift-server-and-hue-editor/)
 * Live instance: [demo.gethue.com](https://demo.gethue.com/)
 
 The Forum [is here](https://discourse.gethue.com/) in case you are looking for help.

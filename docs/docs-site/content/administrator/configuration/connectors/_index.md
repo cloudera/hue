@@ -108,6 +108,8 @@ In order to prevent spamming zookeeper, HiveServer2 is cached for the life of th
 
 ### Apache Impala
 
+This [Impala SQL Editor](https://gethue.com/blog/quickstart-sql-editor-for-apache-impala/) post demoes the integration.
+
 Support is native via a dedicated section.
 
     [impala]
@@ -259,6 +261,8 @@ Note: Keys and S3 buckets need to be URL quoted but Hue does it automatically fo
 
 ### Apache Phoenix
 
+This [Phoenix SQL Editor](https://gethue.com/sql-querying-apache-hbase-with-apache-phoenix/) post demoes the integration.
+
 The official Phoenix dialect is already shipped in Hue. However if you want to update it yourself:
 
     ./build/env/bin/pip install phoenixdb
@@ -314,7 +318,7 @@ With impersonation:
 
 ### Apache Druid
 
-This [SQL Editor with Druid](https://gethue.com/quick-task-how-to-query-apache-druid-analytic-database/) post demoes the integration.
+This [Druid SQL Editor](https://gethue.com/quick-task-how-to-query-apache-druid-analytic-database/) post demoes the integration.
 
 First, make sure that Hue can talk to Druid via the [pydruid SqlAlchemy connector](https://github.com/druid-io/pydruid).
 
@@ -337,7 +341,7 @@ Adding the `+https` prefix will use HTTPS e.g.:
 
 ### Apache Flink
 
-This [Stream SQL Editor with Flink](https://gethue.com/blog/tutorial-query-live-data-stream-with-flink-sql/) post demoes the integration.
+This [Flink Stream SQL Editor](https://gethue.com/blog/tutorial-query-live-data-stream-with-flink-sql/) post demoes the integration.
 
 The dialect currently requires the [Flink SQL Gateway](https://github.com/ververica/flink-sql-gateway/releases) in order to submit queries.
 
@@ -355,7 +359,7 @@ Then add a Flink interpreter in the Hue configuration:
 
 ### ksqlDB
 
-This [Stream SQL Editor with ksqlDB](https://gethue.com/blog/tutorial-query-live-data-stream-with-kafka-sql/) post demoes the integration.
+This [ksqlDB Stream SQL Editor](https://gethue.com/blog/tutorial-query-live-data-stream-with-kafka-sql/) post demoes the integration.
 
 The ksql Python module should be added to the system or Hue Python virtual environment:
 
@@ -450,6 +454,8 @@ Alternative:
     options='{"url": "jdbc:db2://db2.vpc.cloudera.com:50000/SQOOP", "driver": "com.ibm.db2.jcc.DB2Driver", "user": "DB2INST1", "password": "cloudera"}'
 
 ### Apache Spark SQL
+
+This [Spark SQL Editor](https://gethue.com/blog/querying-spark-sql-with-spark-thrift-server-and-hue-editor/) post demoes the integration.
 
 There are two ways to connect depending on your infrastructure:
 
