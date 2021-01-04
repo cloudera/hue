@@ -30,7 +30,7 @@ You can start Hue via three ways described below. Once setup, you would then nee
 
 Quick Demos:
 
-* Docker Compose: [Flink SQL](https://gethue.com/blog/tutorial-query-live-data-stream-with-flink-sql/), [ksqlDB](https://gethue.com/blog/tutorial-query-live-data-stream-with-kafka-sql/), [HBase](https://gethue.com/blog/querying-live-kafka-data-in-apache-hbase-with-phoenix/), [Spark SQL](https://gethue.com/blog/querying-spark-sql-with-spark-thrift-server-and-hue-editor/)
+* Docker Compose: [Impala](https://gethue.com/blog/quickstart-sql-editor-for-apache-impala/), [Flink SQL](https://gethue.com/blog/tutorial-query-live-data-stream-with-flink-sql/), [ksqlDB](https://gethue.com/blog/tutorial-query-live-data-stream-with-kafka-sql/), [HBase](https://gethue.com/blog/querying-live-kafka-data-in-apache-hbase-with-phoenix/), [Spark SQL](https://gethue.com/blog/querying-spark-sql-with-spark-thrift-server-and-hue-editor/)
 * Live instance: [demo.gethue.com](https://demo.gethue.com/)
 
 The Forum [is here](https://discourse.gethue.com/) in case you are looking for help.
