@@ -60,6 +60,8 @@ import uuid
 import re
 import sys
 import textwrap
+import threading
+from contextlib import contextmanager
 
 from string import Template
 
@@ -92,6 +94,9 @@ URL_PATTERN = '(?P<driver_name>.+?://)(?P<host>[^:/ ]+):(?P<port>[0-9]*).*'
 
 LOG = logging.getLogger(__name__)
 
+@contextmanager
+def dummy_lock():
+  yield
 
 def query_error_handler(func):
   def decorator(*args, **kwargs):
@@ -256,6 +261,7 @@ class SqlAlchemyApi(Api):
     cache = {
       'connection': connection,
       'result': result,
+      'lock': dummy_lock() if not self.options['url'].startswith('presto://') else threading.Lock(),
       'meta': [
         {
           'name': col[0] if (type(col) is tuple or type(col) is dict) else col.name if hasattr(col, 'name') else col,
@@ -313,12 +319,13 @@ class SqlAlchemyApi(Api):
 
     if connection:
       cursor = connection['result'].cursor
-      if self.options['url'].startswith('presto://') and cursor and cursor.poll():
-        response['status'] = 'running'
-      elif snippet['result']['handle']['has_result_set']:
-        response['status'] = 'available'
-      else:
-        response['status'] = 'success'
+      with connection.get('lock', dummy_lock()):
+        if self.options['url'].startswith('presto://') and cursor and cursor.poll():
+          response['status'] = 'running'
+        elif snippet['result']['handle']['has_result_set']:
+          response['status'] = 'available'
+        else:
+          response['status'] = 'success'
     else:
       raise QueryExpired()
 
@@ -335,7 +342,8 @@ class SqlAlchemyApi(Api):
       progress = 100
       try:
         if handle and handle['result'].cursor:
-          stats = handle['result'].cursor.poll()
+          with handle.get('lock', dummy_lock()):
+            stats = handle['result'].cursor.poll()
       except AssertionError as e:
         LOG.warn('Query probably not running anymore: %s' % e)
       if stats:
@@ -350,7 +358,8 @@ class SqlAlchemyApi(Api):
     handle = CONNECTIONS.get(guid)
 
     if handle:
-      data = handle['result'].fetchmany(rows)
+      with handle.get('lock', dummy_lock()):
+        data = handle['result'].fetchmany(rows)
       meta = handle['meta']
       self._assign_types(data, meta)
     else:
