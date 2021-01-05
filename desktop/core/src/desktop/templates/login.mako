@@ -182,6 +182,13 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
       }, 1000);
     });
 
+    $(document).keypress(function (event) {
+        var keycode = event.keyCode ? event.keyCode : event.which;
+        if(keycode == '13') {
+          $("form").submit();
+        }
+    });
+
     %if 'AllowAllBackend' in backend_names:
       $('#id_password').val('password');
     %endif

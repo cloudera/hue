@@ -81,7 +81,7 @@
     }
 
     .text-input {
-      padding: 1px 10px 1px 19px;
+      padding: 0;
       border: 1px solid @cui-gray-400;
       border-radius: 4px;
       margin-bottom: 20px;
@@ -117,7 +117,8 @@
     input[type='password'],
     input[type='text']:hover,
     input[type='password']:hover {
-      padding: 0;
+      padding: 1px 10px 1px 19px;
+      box-sizing: border-box;
       border: none;
       box-shadow: none;
       background: @cui-white;
