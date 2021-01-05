@@ -366,12 +366,12 @@ class HiveServer2Dbms(object):
     if self.server_name in ('beeswax', 'sparksql'):
       identifier = self.to_matching_wildcard(table_names)
     else:
-      identifier = None
+      identifier = None  # Impala
 
     if self.server_name == 'sparksql':
-      tables = self._get_tables_via_sparksql(database, table_names)
+      tables = self._get_tables_via_sparksql(database, identifier)
     else:
-      tables = self.client.get_tables_meta(database, table_names)
+      tables = self.client.get_tables_meta(database, identifier)
 
     if len(tables) <= APPLY_NATURAL_SORT_MAX.get():
       tables = apply_natural_sort(tables, key='name')
