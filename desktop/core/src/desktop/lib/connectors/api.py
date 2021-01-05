@@ -82,6 +82,7 @@ def update_connector(request):
     instance.name = connector['nice_name']
     instance.description = connector['description']
     instance.settings = json.dumps(connector['settings'])
+    # TODO: if `sqlalchemy` interface, delete key in ENGINES
     instance.save()
   else:
     saved_as = True
@@ -106,6 +107,7 @@ def delete_connector(request):
 
   try:
     Connector.objects.get(id=connector['id']).delete()
+    # TODO: if `sqlalchemy` interface, delete key in ENGINES
   except Exception as e:
     raise PopupException(_('Error deleting connector %s: %s') % (connector['name'], e))
 
