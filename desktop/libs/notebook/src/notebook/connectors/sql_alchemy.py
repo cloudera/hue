@@ -133,7 +133,7 @@ class SqlAlchemyApi(Api):
       'username': self.user.username,
       'connector_name': self.interpreter['name']
     }
-  
+
   def _get_engine(self):
     engine_key = self._get_engine_key()
 
@@ -221,8 +221,8 @@ class SqlAlchemyApi(Api):
       connection = engine.connect()
     except Exception as e:
       engine_key = self._get_engine_key()
-      del ENGINES[engine_key]
-      
+      ENGINES.pop(engine_key, None)
+
       raise AuthenticationRequired(message='Could not establish connection to datasource')
 
     return connection
