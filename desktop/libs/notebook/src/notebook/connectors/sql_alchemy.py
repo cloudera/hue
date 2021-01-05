@@ -466,7 +466,7 @@ class SqlAlchemyApi(Api):
     engine = self._get_engine()
     inspector = inspect(engine)
 
-    assist = Assist(inspector, engine, backticks=self.backticks)
+    assist = Assist(inspector, engine, backticks=self.backticks, api=self)
     response = {'status': -1, 'result': {}}
 
     metadata, sample_data = assist.get_sample_data(database, table, column=column, operation=operation)
@@ -522,10 +522,11 @@ class SqlAlchemyApi(Api):
 
 class Assist(object):
 
-  def __init__(self, db, engine, backticks):
+  def __init__(self, db, engine, backticks, api=None):
     self.db = db
     self.engine = engine
     self.backticks = backticks
+    self.api = api
 
   def get_databases(self):
     return self.db.get_schema_names()
@@ -553,7 +554,7 @@ class Assist(object):
           'backticks': self.backticks
       })
 
-    connection = self._create_connection(self.engine)
+    connection = self.api._create_connection(self.engine)
     try:
       result = connection.execute(statement)
       return result.cursor.description, result.fetchall()
