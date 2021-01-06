@@ -42,7 +42,7 @@ from useradmin.views import import_ldap_users
 LOG = logging.getLogger(__name__)
 
 
-class LdapSynchronizationMiddleware(object):
+class LdapSynchronizationMiddleware(MiddlewareMixin):
   """
   Synchronize against LDAP authority.
   """
@@ -119,7 +119,7 @@ class LastActivityMiddleware(MiddlewareMixin):
     else:
       return math.floor((dt.microseconds + (dt.seconds + dt.days * 24 * 3600) * 10**6) / 10**6)
 
-class ConcurrentUserSessionMiddleware(object):
+class ConcurrentUserSessionMiddleware(MiddlewareMixin):
   """
   Middleware that remove concurrent user sessions when configured
   """
