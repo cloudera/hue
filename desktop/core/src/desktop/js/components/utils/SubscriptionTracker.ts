@@ -70,6 +70,17 @@ export default class SubscriptionTracker {
     });
   }
 
+  addEventListener<K extends keyof HTMLElementEventMap>(
+    element: HTMLElement | Document,
+    type: K,
+    listener: (ev: HTMLElementEventMap[K]) => unknown
+  ): void {
+    element.addEventListener(type, listener as EventListenerOrEventListenerObject);
+    this.disposals.push(() => {
+      element.removeEventListener(type, listener as EventListenerOrEventListenerObject);
+    });
+  }
+
   dispose(): void {
     while (this.disposals.length) {
       try {
