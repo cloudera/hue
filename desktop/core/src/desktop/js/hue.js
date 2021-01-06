@@ -57,9 +57,10 @@ import MultiLineEllipsisHandler from 'utils/multiLineEllipsisHandler';
 import sqlUtils from 'sql/sqlUtils';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 
+import 'components/sidebar/HueSidebarWebComponent';
+
 import 'ko/components/assist/assistViewModel';
 import OnePageViewModel from 'onePageViewModel';
-import SideBarViewModel from 'sideBarViewModel';
 import SidePanelViewModel from 'sidePanelViewModel';
 import TopNavViewModel from 'topNavViewModel';
 
@@ -133,12 +134,6 @@ $(document).ready(async () => {
 
   const topNavViewModel = new TopNavViewModel(onePageViewModel);
   ko.applyBindings(topNavViewModel, $('.top-nav')[0]);
-
-  const sidebarViewModel = new SideBarViewModel(onePageViewModel, topNavViewModel);
-  ko.applyBindings(sidebarViewModel, $('.hue-sidebar')[0]);
-  if (window.IS_MULTICLUSTER_ONLY) {
-    ko.applyBindings(sidebarViewModel, $('.hue-sidebar-container')[0]);
-  }
 
   $(document).on('hideHistoryModal', e => {
     $('#clearNotificationHistoryModal').modal('hide');
