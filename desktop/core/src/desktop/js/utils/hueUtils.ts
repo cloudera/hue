@@ -17,6 +17,7 @@
 import $ from 'jquery';
 import sanitizeHtml from 'sanitize-html';
 import { hueWindow } from 'types/types';
+import huePubSub from 'utils/huePubSub';
 import { hueLocalStorage, withLocalStorage } from './storageUtils';
 
 export const bootstrapRatios = {
@@ -574,6 +575,25 @@ export const stripHtmlFromFunctions = (template: string): string => {
     });
   }
   return stripped;
+};
+
+export const onHueLinkClick = (event: Event, url: string, target?: string): void => {
+  if (url.indexOf('http') === 0) {
+    window.open(url, target);
+  } else {
+    const prefix = (<hueWindow>window).HUE_BASE_URL + '/hue' + (url.indexOf('/') === 0 ? '' : '/');
+    if (target) {
+      window.open(prefix + url, target);
+    } else if (
+      (<KeyboardEvent>event).ctrlKey ||
+      (<KeyboardEvent>event).metaKey ||
+      (<KeyboardEvent>event).which === 2
+    ) {
+      window.open(prefix + url, '_blank');
+    } else {
+      huePubSub.publish('open.link', url);
+    }
+  }
 };
 
 export const sleep = async (timeout: number): Promise<void> =>

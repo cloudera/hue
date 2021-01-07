@@ -16,4 +16,25 @@
  limitations under the License.
 */
 
+@import './colors';
+
+$animation-duration-base: 0.2s;
+$animation-duration-slow: 0.3s;
+$text-color: $fluid-gray-900;
+$line-height-base: 1.4285;
+
+$font-size-sm: 12px;
+$font-size-base: 14px;
+$font-size-lg: 16px;
+$font-size-xl: 20px;
+
+$fluid-spacing-xxs: 4px;
+$fluid-spacing-xs: 8px;
+$fluid-spacing-s: 16px;
+$fluid-spacing-m: 24px;
+$fluid-spacing-l: 32px;
+$fluid-spacing-xl: 40px;
+$fluid-spacing-xxl: 48px;
+$fluid-spacing-giant: 64px;
+
 $fluid-border-radius: 3px;

@@ -33,13 +33,19 @@ declare global {
 export interface hueWindow {
   CACHEABLE_TTL?: { default?: number; optimizer?: number };
   CLOSE_SESSIONS?: { [dialect: string]: boolean };
+  CUSTOM_DASHBOARD_URL?: string;
   HAS_CATALOG?: boolean;
+  HAS_CONNECTORS?: boolean;
   HAS_OPTIMIZER?: boolean;
   AUTOCOMPLETE_TIMEOUT?: number;
   ENABLE_SQL_SYNTAX_CHECK?: boolean;
   HUE_BASE_URL?: string;
   LOGGED_USERNAME?: string;
   OPTIMIZER_MODE?: string;
+  SHOW_ADD_MORE_EDITORS?: boolean;
+  USER_IS_ADMIN?: boolean;
+  USER_IS_HUE_ADMIN?: boolean;
+  USER_VIEW_EDIT_USER_ENABLED?: boolean;
   WEB_SOCKETS_ENABLED?: boolean;
   WS_CHANNEL?: string;
   hueDebug?: HueDebug;
