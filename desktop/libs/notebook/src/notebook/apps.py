@@ -28,6 +28,9 @@ class NotebookConfig(AppConfig):
   verbose_name = "Notebook SQL Assistant"
 
   def ready(self):
+    from django.db import connection
     from notebook.models import install_custom_examples
 
-    install_custom_examples()
+    table_names = connection.introspection.table_names()
+    if 'auth_group' in table_names and 'auth_user' in table_names:
+      install_custom_examples()
