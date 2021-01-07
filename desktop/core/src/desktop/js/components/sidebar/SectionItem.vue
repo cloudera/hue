@@ -17,36 +17,22 @@
 -->
 
 <template>
-  <a href="javascript:void(0);" @click="clicked"><slot /></a>
+  <div class="sidebar-sidebar-section-name">{{ item.displayName }}</div>
 </template>
 
 <script lang="ts">
-  import { onHueLinkClick } from 'utils/hueUtils';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
-
-  interface hueWindow {
-    HUE_BASE_URL: string;
-  }
+  import { SidebarSectionItem } from './types';
 
   @Component
-  export default class HueLink extends Vue {
-    @Prop({ required: false })
-    url?: string;
-
-    created(): void {
-      delete this.$attrs.href;
-    }
-
-    clicked(event: Event): void {
-      if (this.url) {
-        onHueLinkClick(event, this.url, this.$attrs.target);
-      } else {
-        this.$emit('click');
-      }
-    }
+  export default class SectionItem extends Vue {
+    @Prop()
+    activeItemName?: string;
+    @Prop()
+    isCollapsed!: boolean;
+    @Prop()
+    item!: SidebarSectionItem;
   }
 </script>
-
-<style lang="scss" scoped></style>

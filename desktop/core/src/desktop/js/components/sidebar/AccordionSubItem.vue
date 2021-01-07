@@ -17,36 +17,36 @@
 -->
 
 <template>
-  <a href="javascript:void(0);" @click="clicked"><slot /></a>
+  <BaseNavigationItem
+    :key="item.name"
+    :css-classes="
+      active
+        ? 'sidebar-sidebar-item-accordion-sub-item sidebar-sidebar-item-accordion-sub-item-active'
+        : 'sidebar-sidebar-item-accordion-sub-item'
+    "
+    :disabled="disabled"
+    :item="item"
+  >
+    {{ item.displayName }}
+  </BaseNavigationItem>
 </template>
 
 <script lang="ts">
-  import { onHueLinkClick } from 'utils/hueUtils';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
+  import BaseNavigationItem from './BaseNavigationItem.vue';
+  import { SidebarAccordionSubItem } from './types';
 
-  interface hueWindow {
-    HUE_BASE_URL: string;
-  }
-
-  @Component
-  export default class HueLink extends Vue {
-    @Prop({ required: false })
-    url?: string;
-
-    created(): void {
-      delete this.$attrs.href;
-    }
-
-    clicked(event: Event): void {
-      if (this.url) {
-        onHueLinkClick(event, this.url, this.$attrs.target);
-      } else {
-        this.$emit('click');
-      }
-    }
+  @Component({
+    components: { BaseNavigationItem }
+  })
+  export default class AccordionSubItem extends Vue {
+    @Prop()
+    item!: SidebarAccordionSubItem;
+    @Prop()
+    active!: boolean;
+    @Prop({ default: false })
+    disabled?: boolean;
   }
 </script>
-
-<style lang="scss" scoped></style>

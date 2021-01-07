@@ -670,7 +670,13 @@ An alternative is to increase the NGINX timeouts from 30s to more minutes:
     nginx.ingress.kubernetes.io/proxy-read-timeout: '900'
     nginx.ingress.kubernetes.io/proxy-send-timeout: '900'
 
-## Customize the UI
+## Customization
+
+### Language
+
+The user language is auto-detected and can also be manually overriden as a [per user basis](/user/concept/#changing-the-language).
+
+If text strings are not all translated from English, feel free to improve the `django.po` files of the corresponding language and [recompile them](/developer/development/#internationalization). Those translation mappings are located across the project in [locale](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/locale) directories.
 
 ### Maps look and feel
 

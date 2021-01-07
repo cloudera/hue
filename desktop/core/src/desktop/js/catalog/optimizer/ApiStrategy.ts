@@ -28,12 +28,13 @@ import {
   RiskOptions,
   SimilarityOptions
 } from 'catalog/optimizer/optimizer';
+import { Connector } from 'types/config';
 
 /**
  * Fetches the popularity for various aspects of the given tables
  */
 const genericOptimizerMultiTableFetch = <T extends TimestampedData>(
-  { silenceErrors, paths }: PopularityOptions,
+  { silenceErrors, paths, connector }: PopularityOptions & { connector: Connector },
   url: string
 ): CancellablePromise<T> => {
   const dbTables = new Set<string>();
@@ -41,6 +42,7 @@ const genericOptimizerMultiTableFetch = <T extends TimestampedData>(
     dbTables.add(path.join('.'));
   });
   const data = {
+    connector: JSON.stringify(connector),
     dbTables: JSON.stringify([...dbTables.values()])
   };
 
@@ -68,6 +70,12 @@ const TOP_TABLES_URL = '/metadata/api/optimizer/top_tables';
 const TABLE_DETAILS_URL = '/metadata/api/optimizer/table_details';
 
 export default class ApiStrategy implements Optimizer {
+  connector: Connector;
+
+  constructor(connector: Connector) {
+    this.connector = connector;
+  }
+
   analyzeCompatibility({
     notebookJson,
     snippetJson,
@@ -78,6 +86,7 @@ export default class ApiStrategy implements Optimizer {
     return post<unknown>(
       COMPATIBILITY_URL,
       {
+        connector: JSON.stringify(this.connector),
         notebook: notebookJson,
         snippet: snippetJson,
         sourcePlatform,
@@ -95,6 +104,7 @@ export default class ApiStrategy implements Optimizer {
     return post<OptimizerRisk>(
       RISK_URL,
       {
+        connector: JSON.stringify(this.connector),
         notebook: notebookJson,
         snippet: snippetJson
       },
@@ -111,6 +121,7 @@ export default class ApiStrategy implements Optimizer {
     return post<unknown>(
       SIMILARITY_URL,
       {
+        connector: JSON.stringify(this.connector),
         notebook: notebookJson,
         snippet: snippetJson,
         sourcePlatform
@@ -128,11 +139,13 @@ export default class ApiStrategy implements Optimizer {
     if (paths.length === 1 && paths[0].length === 1) {
       url = TOP_TABLES_URL;
       data = {
+        connector: JSON.stringify(this.connector),
         database: paths[0][0]
       };
     } else {
       url = TOP_COLUMNS_URL;
       data = {
+        connector: JSON.stringify(this.connector),
         dbTables: JSON.stringify(paths.map(path => path.join('.')))
       };
     }
@@ -151,25 +164,38 @@ export default class ApiStrategy implements Optimizer {
   }
 
   fetchTopAggs(options: PopularityOptions): CancellablePromise<TopAggs> {
-    return genericOptimizerMultiTableFetch<TopAggs>(options, TOP_AGGS_URL);
+    return genericOptimizerMultiTableFetch<TopAggs>(
+      { ...options, connector: this.connector },
+      TOP_AGGS_URL
+    );
   }
 
   fetchTopColumns(options: PopularityOptions): CancellablePromise<TopColumns> {
-    return genericOptimizerMultiTableFetch<TopColumns>(options, TOP_COLUMNS_URL);
+    return genericOptimizerMultiTableFetch<TopColumns>(
+      { ...options, connector: this.connector },
+      TOP_COLUMNS_URL
+    );
   }
 
   fetchTopFilters(options: PopularityOptions): CancellablePromise<TopFilters> {
-    return genericOptimizerMultiTableFetch<TopFilters>(options, TOP_FILTERS_URL);
+    return genericOptimizerMultiTableFetch<TopFilters>(
+      { ...options, connector: this.connector },
+      TOP_FILTERS_URL
+    );
   }
 
   fetchTopJoins(options: PopularityOptions): CancellablePromise<TopJoins> {
-    return genericOptimizerMultiTableFetch<TopJoins>(options, TOP_JOINS_URL);
+    return genericOptimizerMultiTableFetch<TopJoins>(
+      { ...options, connector: this.connector },
+      TOP_JOINS_URL
+    );
   }
 
   fetchOptimizerMeta({ path, silenceErrors }: MetaOptions): CancellablePromise<OptimizerMeta> {
     return post<OptimizerMeta>(
       TABLE_DETAILS_URL,
       {
+        connector: JSON.stringify(this.connector),
         databaseName: path[0],
         tableName: path[1]
       },
