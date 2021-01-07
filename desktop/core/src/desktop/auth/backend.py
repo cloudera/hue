@@ -72,7 +72,7 @@ from desktop.settings import LOAD_BALANCER_COOKIE
 
 from filebrowser.conf import REMOTE_STORAGE_HOME
 from useradmin import ldap_access
-from useradmin.models import get_profile, get_default_user_group, UserProfile, User
+from useradmin.models import get_profile, get_default_user_group, install_sample_user, UserProfile, User
 from useradmin.organization import get_organization
 
 
@@ -307,7 +307,7 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
 
   def is_first_login_ever(self):
     """ Return true if no one has ever logged in."""
-    return User.objects.count() == 0
+    return User.objects.exclude(id=install_sample_user().id).count() == 0
 
 
 class ImpersonationBackend(django.contrib.auth.backends.ModelBackend):
@@ -403,7 +403,7 @@ class PamBackend(DesktopBackendBase):
 
     if pam.authenticate(username, password, AUTH.PAM_SERVICE.get()):
       is_super = False
-      if User.objects.count() == 0:
+      if User.objects.exclude(id=install_sample_user().id).count() == 0:
         is_super = True
 
       try:
@@ -642,7 +642,7 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
     username = self.clean_username(username)
     username = force_username_case(username)
     is_super = False
-    if User.objects.count() == 0:
+    if User.objects.exclude(id=install_sample_user().id).count() == 0:
       is_super = True
 
     try:
@@ -688,7 +688,7 @@ class KnoxSpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
     username = self.clean_username(username, request)
     username = force_username_case(username)
     is_super = False
-    if User.objects.count() == 0:
+    if User.objects.exclude(id=install_sample_user().id).count() == 0:
       is_super = True
 
     try:
@@ -732,7 +732,7 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
     username = self.clean_username(remote_user)
     username = force_username_case(username)
     is_super = False
-    if User.objects.count() == 0:
+    if User.objects.exclude(id=install_sample_user().id).count() == 0:
       is_super = True
 
     try:
