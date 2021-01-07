@@ -1721,6 +1721,8 @@ class Coordinator(Job):
     data_['cron_frequency'] = cron_frequency
     self.data = json.dumps(data_)
 
+  class Meta(object):
+    manager_inheritance_from_future = True
 
 class DatasetManager(models.Manager):
   def can_read_or_exception(self, request, dataset_id):
@@ -1984,6 +1986,8 @@ class Bundle(Job):
     xml = zfile.read('bundle.xml')
     return xml, metadata
 
+  class Meta(object):
+    manager_inheritance_from_future = True
 
 class HistoryManager(models.Manager):
   def create_from_submission(self, submission):

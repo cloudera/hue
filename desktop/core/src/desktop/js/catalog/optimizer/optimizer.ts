@@ -94,7 +94,7 @@ const createOptimizer = (connector: Connector): Optimizer => {
     return new LocalStrategy(connector);
   }
   if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
-    return new ApiStrategy();
+    return new ApiStrategy(connector);
   }
   return new BaseStrategy();
 };
