@@ -3,54 +3,49 @@
 FROM ubuntu:18.04
 LABEL description="Hue SQL Assistant - gethue.com"
 
-ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && apt-get install -y \
-  build-essential \
-  libkrb5-dev \
-  libmysqlclient-dev \
-  libssl-dev \
-  libsasl2-dev \
+  python3-pip \
+  libkrb5-dev  \
   libsasl2-modules-gssapi-mit \
-  libsqlite3-dev \
-  libtidy-dev \
+  libsasl2-dev \
+  libkrb5-dev \
   libxml2-dev \
   libxslt-dev \
-  libffi-dev \
+  libmysqlclient-dev \
   libldap2-dev \
-  libpq-dev \
   libsnappy-dev \
-  python-dev \
-  python-setuptools \
-  libgmp3-dev \
-  libz-dev \
-  software-properties-common \
-  curl \
-  git \
+  python3.6-venv \
   rsync \
+  curl \
   sudo \
-  maven \
-  gcc \
-  swig \
-  # openssl \ # Breaks build
-  xmlsec1 \
-  libxmlsec1-openssl \
-  krb5-config \
-  krb5-user \
-  && rm -rf /var/lib/apt/lists/*
+  git
 
-ADD . /hue
-WORKDIR /hue
-
-# Not doing a `make prod`, so manually getting production ini
-RUN rm desktop/conf/*
-COPY desktop/conf.dist desktop/conf
+RUN pip3 install --upgrade setuptools
+RUN pip3 install virtualenv
 
 # Need recent version for Ubuntu
 RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo bash - \
   && apt-get install -y nodejs
 
-RUN PREFIX=/usr/share make install
-RUN useradd -ms /bin/bash hue && chown -R hue /usr/share/hue
+RUN addgroup hue && useradd -r -u 1001 -g hue hue
+
+ADD . /hue
+WORKDIR /hue
+
+RUN chown -R hue /hue \
+  && mkdir /hue/build \
+  && chown -R hue /hue/build \
+  && mkdir /usr/share/hue \
+  && chown -R hue /usr/share/hue
+
+# Not doing a `make prod`, so manually getting production ini
+RUN rm desktop/conf/*
+COPY desktop/conf.dist desktop/conf
+
+RUN rm -r desktop/core/ext-py
+
+RUN PREFIX=/usr/share PYTHON_VER=python3.6 make install
+RUN chown -R hue /usr/share/hue
 
 # Only keep install dir
 # Note: get more minimal image by pulling install dir in a stage 2 image
@@ -59,10 +54,12 @@ RUN rm -rf /hue \
   && rm -rf node_modules
 
 # Install DB connectors
+# To move to requirements_connectors.txt
 RUN ./build/env/bin/pip install \
   psycopg2-binary \
   redis==2.10.6 \
-  django_redis \
+  # Avoid Django 3 pulling
+  django_redis==4.11.0 \
   flower \
   # SparkSql show tables
   git+https://github.com/gethue/PyHive \
@@ -74,13 +71,14 @@ RUN ./build/env/bin/pip install \
   pyasn1==0.4.1 \
   # View some parquet files
   python-snappy==0.5.4 \
-  gevent \
-  # Needed for Jaeger
-  threadloop \
+  threadloop  # Needed for Jaeger \
   thrift-sasl==0.2.1
 
-COPY tools/docker/hue/conf desktop/conf
+
+COPY tools/docker/hue/conf3 desktop/conf
 COPY tools/docker/hue/startup.sh .
+
+USER hue
 
 EXPOSE 8888
 CMD ["./startup.sh"]
