@@ -29,6 +29,7 @@ from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 
+from desktop.conf import has_connectors
 from desktop.context_processors import get_app_name
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
@@ -733,4 +734,7 @@ def _get_db(user, source_type=None, cluster=None):
 
 
 def _get_servername(db):
-  return 'hive' if db.server_name == 'beeswax' else db.server_name
+  if has_connectors():
+    return db.client.query_server['server_name']
+  else:
+    return 'hive' if db.server_name == 'beeswax' else db.server_name
