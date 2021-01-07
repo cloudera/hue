@@ -50,7 +50,7 @@ def get_multi_ldap_config():
 
 class TestUserAdminLdap(BaseUserAdminTests):
   def test_useradmin_ldap_user_group_membership_sync(self):
-    settings.MIDDLEWARE_CLASSES.append('useradmin.middleware.LdapSynchronizationMiddleware')
+    settings.MIDDLEWARE.append('useradmin.middleware.LdapSynchronizationMiddleware')
 
     # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
     ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
@@ -101,7 +101,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
       # Should have 2 groups now. 1 from LDAP and 1 from 'grant_access' call.
       assert_equal(3, user.groups.all().count(), user.groups.all())
     finally:
-      settings.MIDDLEWARE_CLASSES.remove('useradmin.middleware.LdapSynchronizationMiddleware')
+      settings.MIDDLEWARE.remove('useradmin.middleware.LdapSynchronizationMiddleware')
 
       for finish in reset:
         finish()

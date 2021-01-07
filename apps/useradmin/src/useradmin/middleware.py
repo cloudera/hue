@@ -28,6 +28,7 @@ from django.contrib.sessions.models import Session
 from django.db import DatabaseError
 from django.db.models import Q
 from django.utils.translation import ugettext as _
+from django.utils.deprecation import MiddlewareMixin
 
 from desktop.auth.views import dt_logout
 from desktop.conf import AUTH, LDAP, SESSION
@@ -41,7 +42,7 @@ from useradmin.views import import_ldap_users
 LOG = logging.getLogger(__name__)
 
 
-class LdapSynchronizationMiddleware(object):
+class LdapSynchronizationMiddleware(MiddlewareMixin):
   """
   Synchronize against LDAP authority.
   """
@@ -75,7 +76,7 @@ class LdapSynchronizationMiddleware(object):
       request.session.modified = True
 
 
-class LastActivityMiddleware(object):
+class LastActivityMiddleware(MiddlewareMixin):
   """
   Middleware to track the last activity of a user and automatically log out the user after a specified period of inactivity
   """
@@ -118,7 +119,7 @@ class LastActivityMiddleware(object):
     else:
       return math.floor((dt.microseconds + (dt.seconds + dt.days * 24 * 3600) * 10**6) / 10**6)
 
-class ConcurrentUserSessionMiddleware(object):
+class ConcurrentUserSessionMiddleware(MiddlewareMixin):
   """
   Middleware that remove concurrent user sessions when configured
   """
