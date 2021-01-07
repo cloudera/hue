@@ -282,7 +282,7 @@ def get_query_server_config_via_connector(connector):
       'auth_password': AUTH_PASSWORD.get(),
 
       'impersonation_enabled': impersonation_enabled,
-      'use_sasl': connector['dialect'] in ('hive', 'sparksql'),
+      'use_sasl': connector['options'].get('use_sasl', True),
       'SESSION_TIMEOUT_S': 15 * 60,
       'querycache_rows': 1000,
       'QUERY_TIMEOUT_S': 15 * 60,
