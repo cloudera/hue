@@ -117,9 +117,12 @@ def action(request, interface=None, action=None):
   if operation.get('action') == 'kill' and DISABLE_KILLING_JOBS.get():
     return serve_403_error(request)
 
+  action = operation.copy()
+  action['request'] = request
+
   response['operation'] = operation
   response.update(
-      get_api(request.user, interface, cluster=cluster).action(app_ids, operation)
+      get_api(request.user, interface, cluster=cluster).action(app_ids, action)
   )
 
   return JsonResponse(response)
