@@ -144,12 +144,13 @@ def table_details(request):
   response = {'status': -1}
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
+  connector = json.loads(request.POST.get('connector', '{}'))
   database_name = request.POST.get('databaseName')
   table_name = request.POST.get('tableName')
 
   api = get_api(request.user, interface)
 
-  data = api.table_details(database_name=database_name, table_name=table_name)
+  data = api.table_details(database_name=database_name, table_name=table_name, connector=connector)
 
   if data:
     response['status'] = 0
@@ -166,13 +167,14 @@ def query_compatibility(request):
   response = {'status': -1}
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
+  connector = json.loads(request.POST.get('connector', '{}'))
   source_platform = request.POST.get('sourcePlatform')
   target_platform = request.POST.get('targetPlatform')
   query = request.POST.get('query')
 
   api = get_api(request.user, interface)
 
-  data = api.query_compatibility(source_platform=source_platform, target_platform=target_platform, query=query)
+  data = api.query_compatibility(source_platform=source_platform, target_platform=target_platform, query=query, connector=connector)
 
   if data:
     response['status'] = 0
@@ -189,13 +191,14 @@ def query_risk(request):
   response = {'status': -1}
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
+  connector = json.loads(request.POST.get('connector', '{}'))
   query = json.loads(request.POST.get('query'))
   source_platform = request.POST.get('sourcePlatform')
   db_name = request.POST.get('dbName')
 
   api = get_api(request.user, interface)
 
-  data = api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
+  data = api.query_risk(query=query, source_platform=source_platform, db_name=db_name, connector=connector)
 
   if data:
     response['status'] = 0
@@ -212,12 +215,13 @@ def similar_queries(request):
   response = {'status': -1}
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
+  connector = json.loads(request.POST.get('connector', '{}'))
   source_platform = request.POST.get('sourcePlatform')
   query = json.loads(request.POST.get('query'))
 
   api = get_api(request.user, interface)
 
-  data = api.similar_queries(source_platform=source_platform, query=query)
+  data = api.similar_queries(source_platform=source_platform, query=query, connector=connector)
 
   if data:
     response['status'] = 0
@@ -234,12 +238,13 @@ def top_filters(request):
   response = {'status': -1}
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
+  connector = json.loads(request.POST.get('connector', '{}'))
   db_tables = json.loads(request.POST.get('dbTables', '[]'))
   column_name = request.POST.get('columnName') # Unused
 
   api = get_api(request.user, interface)
 
-  data = api.top_filters(db_tables=db_tables)
+  data = api.top_filters(db_tables=db_tables, connector=connector)
 
   if data:
     response['status'] = 0
@@ -286,11 +291,12 @@ def top_aggs(request):
   response = {'status': -1}
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
+  connector = json.loads(request.POST.get('connector', '{}'))
   db_tables = json.loads(request.POST.get('dbTables', '[]'))
 
   api = get_api(request.user, interface)
 
-  data = api.top_aggs(db_tables=db_tables)
+  data = api.top_aggs(db_tables=db_tables, connector=connector)
 
   if data:
     response['status'] = 0
@@ -307,10 +313,11 @@ def top_databases(request):
   response = {'status': -1}
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
+  connector = json.loads(request.POST.get('connector', '{}'))
 
   api = get_api(request.user, interface)
 
-  data = api.top_databases()
+  data = api.top_databases(connector=connector)
 
   if data:
     response['status'] = 0
