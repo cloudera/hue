@@ -880,13 +880,11 @@ class DocumentPermissionManager(models.Manager):
     perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=name)
 
     if users is not None:
-      perm.users = []
-      perm.users = users
+      perm.users.set(users)
       perm.save()
 
     if groups is not None:
-      perm.groups = []
-      perm.groups = groups
+      perm.groups.set(groups)
       perm.save()
 
     if not users and not groups:
@@ -1481,13 +1479,13 @@ class Document2(models.Model):
 
     perm, created = Document2Permission.objects.get_or_create(doc=self, perms=name)
 
-    perm.users = []
+    perm.users.clear()
     if users is not None:
-      perm.users = users
+      perm.users.set(users)
 
-    perm.groups = []
+    perm.groups.clear()
     if groups is not None:
-      perm.groups = groups
+      perm.groups.set(groups)
 
     perm.is_link_on = is_link_on
 
