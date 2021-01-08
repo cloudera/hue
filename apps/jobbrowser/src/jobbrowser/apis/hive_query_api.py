@@ -27,7 +27,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.python_util import current_ms_from_utc
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
-from notebook.models import _get_notebook_api, make_notebook, MockRequest
+from notebook.models import _get_notebook_api, make_notebook
 
 from jobbrowser.apis.base_api import Api
 from jobbrowser.conf import QUERY_STORE
@@ -121,8 +121,7 @@ class HiveQueryApi(Api):
         action_details = {}
 
         try:
-          request = MockRequest(user=self.user)
-          self.kill_query(query_id, request)
+          self.kill_query(query_id, action.get('request'))
           action_details['status'] = 0
           action_details['message'] = _('kill action performed')
         except Exception as ex:
