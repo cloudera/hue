@@ -307,7 +307,10 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
 
   def is_first_login_ever(self):
     """ Return true if no one has ever logged in."""
-    return User.objects.exclude(id=install_sample_user().id).count() == 0
+    if ENABLE_ORGANIZATIONS.get():  # Tmp
+      return False
+    else:
+      return User.objects.exclude(id=install_sample_user().id).count() == 0
 
 
 class ImpersonationBackend(django.contrib.auth.backends.ModelBackend):
