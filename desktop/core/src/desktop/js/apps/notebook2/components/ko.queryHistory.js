@@ -21,7 +21,7 @@ import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
 import I18n from 'utils/i18n';
-import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
+import { ExecutionStatus } from 'apps/notebook2/execution/executable';
 import { sleep } from 'utils/hueUtils';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
@@ -293,10 +293,10 @@ class QueryHistory extends DisposableComponent {
 
     this.loadingHistory(false);
     this.refreshStatus(
-      [EXECUTION_STATUS.starting, EXECUTION_STATUS.running, EXECUTION_STATUS.streaming],
+      [ExecutionStatus.starting, ExecutionStatus.running, ExecutionStatus.streaming],
       STARTING_RUNNING_INTERVAL
     );
-    this.refreshStatus([EXECUTION_STATUS.available], AVAILABLE_INTERVAL);
+    this.refreshStatus([ExecutionStatus.available], AVAILABLE_INTERVAL);
   }
 
   importHistory() {
@@ -329,9 +329,9 @@ class QueryHistory extends DisposableComponent {
           silenceErrors: true
         });
         if (response.status === -3) {
-          item.status(EXECUTION_STATUS.expired);
+          item.status(ExecutionStatus.expired);
         } else if (response.status !== 0) {
-          item.status(EXECUTION_STATUS.failed);
+          item.status(ExecutionStatus.failed);
         } else if (response.query_status.status) {
           item.status(response.query_status.status);
         }
