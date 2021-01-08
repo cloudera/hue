@@ -79,15 +79,15 @@ class DummyClient(Api):
     return data
 
 
-  def table_details(self, database_name, table_name, page_size=100, startingToken=None):
+  def table_details(self, database_name, table_name, page_size=100, startingToken=None, connector=None):
     return {}
 
 
-  def query_compatibility(self, source_platform, target_platform, query, page_size=100, startingToken=None):
+  def query_compatibility(self, source_platform, target_platform, query, page_size=100, startingToken=None, connector=None):
     return {}
 
 
-  def query_risk(self, query, source_platform, db_name, page_size=100, startingToken=None):
+  def query_risk(self, query, source_platform, db_name, page_size=100, startingToken=None, connector=None):
     hints = []
     response = {}
 
@@ -98,17 +98,17 @@ class DummyClient(Api):
     }
 
 
-  def similar_queries(self, source_platform, query, page_size=100, startingToken=None):
+  def similar_queries(self, source_platform, query, page_size=100, startingToken=None, connector=None):
     raise PopupException(_('Call not supported'))
 
 
-  def top_filters(self, db_tables=None, page_size=100, startingToken=None):
+  def top_filters(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     results = {'results': []}
 
     return results
 
 
-  def top_aggs(self, db_tables=None, page_size=100, startingToken=None):
+  def top_aggs(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     results = {'results': []}
 
     return results
@@ -139,7 +139,7 @@ class DummyClient(Api):
     return results
 
 
-  def top_databases(self, page_size=100, startingToken=None):
+  def top_databases(self, page_size=100, startingToken=None, connector=None):
     results = {'results': []}
 
     return results

@@ -210,10 +210,11 @@ class OptimizerClient(object):
 
 
   @check_privileges
-  def table_details(self, database_name, table_name, page_size=100, startingToken=None):
+  def table_details(self, database_name, table_name, page_size=100, startingToken=None, connector=None):
     return self._call(
       'getTablesDetail', {
         'tenant': self._tenant_id,
+        'connector': connector,
         'dbName': database_name.lower(),
         'tableName': table_name.lower(),
         'pageSize': page_size,
@@ -222,10 +223,11 @@ class OptimizerClient(object):
     )
 
 
-  def query_compatibility(self, source_platform, target_platform, query, page_size=100, startingToken=None):
+  def query_compatibility(self, source_platform, target_platform, query, page_size=100, startingToken=None, connector=None):
     return self._call(
       'getQueryCompatible', {
         'tenant': self._tenant_id,
+        'connector': connector,
         'query': query,
         'sourcePlatform': source_platform,
         'targetPlatform': target_platform,
@@ -234,10 +236,11 @@ class OptimizerClient(object):
     )
 
 
-  def query_risk(self, query, source_platform, db_name, page_size=100, startingToken=None):
+  def query_risk(self, query, source_platform, db_name, page_size=100, startingToken=None, connector=None):
     response = self._call(
       'getQueryRisk', {
         'tenant': self._tenant_id,
+        'connector': connector,
         'query': _clean_query(query),
         'dbName': db_name,
         'sourcePlatform': source_platform,
@@ -257,11 +260,12 @@ class OptimizerClient(object):
       'noDDL': response.get('noDDL', []),
     }
 
-  def similar_queries(self, source_platform, query, page_size=100, startingToken=None):
+  def similar_queries(self, source_platform, query, page_size=100, startingToken=None, connector=None):
     if is_admin(self.user):
       return self._call(
         'getSimilarQueries', {
           'tenant': self._tenant_id,
+          'connector': connector,
           'sourcePlatform': source_platform,
           'query': query,
           'pageSize': page_size,
@@ -273,9 +277,10 @@ class OptimizerClient(object):
 
 
   @check_privileges
-  def top_filters(self, db_tables=None, page_size=100, startingToken=None):
+  def top_filters(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     args = {
       'tenant': self._tenant_id,
+      'connector': connector,
       'pageSize': page_size,
       'startingToken': startingToken
     }
@@ -286,9 +291,10 @@ class OptimizerClient(object):
 
 
   @check_privileges
-  def top_aggs(self, db_tables=None, page_size=100, startingToken=None):
+  def top_aggs(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     args = {
       'tenant': self._tenant_id,
+      'connector': connector,
       'pageSize': page_size,
       'startingToken': startingToken
     }
@@ -353,9 +359,10 @@ class OptimizerClient(object):
     return results
 
 
-  def top_databases(self, page_size=100, startingToken=None):
+  def top_databases(self, page_size=100, startingToken=None, connector=None):
     args = {
       'tenant': self._tenant_id,
+      'connector': connector,
       'pageSize': page_size,
       'startingToken': startingToken
     }
