@@ -26,7 +26,7 @@ import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
 import { sleep } from 'utils/hueUtils';
-import Executable, { EXECUTION_STATUS } from './executable';
+import Executable, { ExecutionStatus } from './executable';
 
 export const RESULT_UPDATED_EVENT = 'hue.executable.result.updated';
 
@@ -87,12 +87,18 @@ export interface KoEnrichedMeta extends ResultMeta {
   originalIndex: number;
 }
 
+export type ResultRow = (string | number)[];
+
+export enum ResultType {
+  Table = 'table'
+}
+
 export default class ExecutionResult {
   executable: Executable;
   streaming: boolean;
 
-  type?: string;
-  rows: (string | number)[][] = [];
+  type?: ResultType;
+  rows: ResultRow[] = [];
   meta: ResultMeta[] = [];
 
   cleanedMeta: ResultMeta[] = [];
@@ -100,7 +106,7 @@ export default class ExecutionResult {
   cleanedStringMeta: ResultMeta[] = [];
   cleanedNumericMeta: ResultMeta[] = [];
   koEnrichedMeta: KoEnrichedMeta[] = [];
-  lastRows: (string | number)[][] = [];
+  lastRows: ResultRow[] = [];
   images = [];
 
   hasMore = true;
@@ -113,7 +119,7 @@ export default class ExecutionResult {
   }
 
   async fetchResultSize(): Promise<ResultSizeApiResponse | undefined> {
-    if (this.executable.status === EXECUTION_STATUS.failed) {
+    if (this.executable.status === ExecutionStatus.failed) {
       return;
     }
 

@@ -17,8 +17,9 @@
 import { extractErrorMessage, post, successResponseIsError } from 'api/utils';
 import Executable, {
   ExecutableContext,
-  EXECUTION_STATUS
+  ExecutionStatus
 } from 'apps/notebook2/execution/executable';
+import { ResultType } from 'apps/notebook2/execution/executionResult';
 
 type SessionPropertyValue = string | number | boolean | null | undefined;
 
@@ -54,7 +55,7 @@ export interface ResultApiResponse {
   has_more: boolean;
   isEscaped: boolean;
   meta: ResultMeta[];
-  type: string;
+  type: ResultType;
 }
 
 export interface ResultSizeApiResponse {
@@ -217,8 +218,8 @@ export const executeStatement = async (options: ExecuteApiOptions): Promise<Exec
   executable.addCancellable({
     cancel: async () => {
       if (
-        executable.status !== EXECUTION_STATUS.running &&
-        executable.status !== EXECUTION_STATUS.streaming
+        executable.status !== ExecutionStatus.running &&
+        executable.status !== ExecutionStatus.streaming
       ) {
         // executable.status seems to have been set to 'canceling' so ignoring for now
         // return;
@@ -304,10 +305,10 @@ export const checkExecutionStatus = async (
   }
 
   if (response.status === -3) {
-    return { status: EXECUTION_STATUS.expired };
+    return { status: ExecutionStatus.expired };
   }
 
-  return { status: EXECUTION_STATUS.failed, message: response.message };
+  return { status: ExecutionStatus.failed, message: response.message };
 };
 
 export const fetchResults = async (options: {

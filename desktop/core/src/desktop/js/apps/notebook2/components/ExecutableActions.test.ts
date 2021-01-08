@@ -17,7 +17,7 @@
 import huePubSub from 'utils/huePubSub';
 import Vue from 'vue';
 import { mount, shallowMount } from '@vue/test-utils';
-import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
+import { EXECUTABLE_UPDATED_EVENT, ExecutionStatus } from 'apps/notebook2/execution/executable';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 import ExecutableActions from './ExecutableActions.vue';
 
@@ -48,7 +48,7 @@ describe('ExecutableActions.vue', () => {
           id: 'foo'
         })
       },
-      status: EXECUTION_STATUS.ready
+      status: ExecutionStatus.ready
     };
 
     const wrapper = shallowMount(ExecutableActions, {
@@ -90,7 +90,7 @@ describe('ExecutableActions.vue', () => {
           type: 'foo'
         })
       },
-      status: EXECUTION_STATUS.ready
+      status: ExecutionStatus.ready
     };
 
     const wrapper = mount(ExecutableActions, {
@@ -111,7 +111,7 @@ describe('ExecutableActions.vue', () => {
     await Vue.nextTick();
 
     expect(executeCalled).toBeTruthy();
-    mockExecutable.status = EXECUTION_STATUS.running;
+    mockExecutable.status = ExecutionStatus.running;
     huePubSub.publish(EXECUTABLE_UPDATED_EVENT, mockExecutable);
 
     await Vue.nextTick();

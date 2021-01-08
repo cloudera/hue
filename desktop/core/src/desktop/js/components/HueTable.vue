@@ -16,6 +16,7 @@
   limitations under the License.
 -->
 
+<!-- eslint-disable vue/no-v-html -->
 <template>
   <div class="hue-table-container">
     <table class="hue-table">
@@ -43,6 +44,7 @@
         <tr v-for="(row, rowIndex) in rows" :key="rowIndex" @click="$emit('row-clicked', row)">
           <td v-for="(column, colIndex) in columns" :key="colIndex" :class="column.cssClass">
             <slot v-if="hasCellSlot(column)" :name="cellSlotName(column)" v-bind="row" />
+            <div v-else-if="column.htmlValue" v-html="row[column.key]" />
             <template v-else>
               {{ column.adapter ? column.adapter(column.key, row) : row[column.key] }}
             </template>
@@ -53,6 +55,7 @@
     </table>
   </div>
 </template>
+<!-- eslint-enable vue/no-v-html -->
 
 <script lang="ts">
   import Vue from 'vue';
@@ -104,7 +107,6 @@
             padding: 12px;
             border: none;
             text-align: left;
-
             height: 16px;
             max-width: 300px;
 
