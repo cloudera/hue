@@ -707,6 +707,33 @@ CONNECTOR_TYPES = [
       'trim_statement_semicolon': False,
     }
   },
+  {
+    'nice_name': 'SqlFlow',
+    'dialect': 'sqlflow',
+    'interface': 'sqlflow',
+    'settings': [
+      {'name': 'url', 'value': 'localhost:50051'},
+      {'name': 'datasource', 'value': 'hive://localhost:10000/iris'},
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': True,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
+      'has_use_statement': False,
+      'trim_statement_semicolon': False,
+    }
+  },
 
   {'nice_name': 'PySpark', 'dialect': 'pyspark', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
   {'nice_name': 'Spark', 'dialect': 'spark', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},

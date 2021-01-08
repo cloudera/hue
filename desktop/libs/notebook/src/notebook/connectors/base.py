@@ -466,6 +466,9 @@ def get_api(request, snippet):
     else:
       from notebook.connectors.jdbc import JdbcApi
       return JdbcApi(request.user, interpreter=interpreter)
+  elif interface == 'sqlflow':
+    from notebook.connectors.sqlflow import SqlFlowApi
+    return SqlFlowApi(request.user, interpreter=interpreter)
   elif interface == 'teradata':
     from notebook.connectors.jdbc_teradata import JdbcApiTeradata
     return JdbcApiTeradata(request.user, interpreter=interpreter)
