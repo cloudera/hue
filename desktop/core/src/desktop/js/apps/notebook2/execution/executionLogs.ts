@@ -16,7 +16,7 @@
 
 import { ExecutionJob, fetchLogs } from 'apps/notebook2/execution/api';
 import huePubSub from 'utils/huePubSub';
-import Executable, { EXECUTION_STATUS } from './executable';
+import Executable, { ExecutionStatus } from './executable';
 
 export const LOGS_UPDATED_EVENT = 'hue.executable.logs.updated';
 
@@ -84,11 +84,11 @@ export default class ExecutionLogs {
     if (!finalFetch) {
       const delay = this.executable.getExecutionTime() > 45000 ? 5000 : 1000;
       const fetchLogsTimeout = window.setTimeout(async () => {
-        // TODO: Fetch logs for EXECUTION_STATUS.streaming?
+        // TODO: Fetch logs for ExecutionStatus.streaming?
         await this.fetchLogs(
-          this.executable.status !== EXECUTION_STATUS.running &&
-            this.executable.status !== EXECUTION_STATUS.starting &&
-            this.executable.status !== EXECUTION_STATUS.waiting
+          this.executable.status !== ExecutionStatus.running &&
+            this.executable.status !== ExecutionStatus.starting &&
+            this.executable.status !== ExecutionStatus.waiting
         );
       }, delay);
 

@@ -348,3 +348,166 @@ exports[`HueTable.vue should render a table with adapter 1`] = `
   </table>
 </div>
 `;
+
+exports[`HueTable.vue should render a table with array rows 1`] = `
+<div
+  class="hue-table-container"
+>
+  <table
+    class="hue-table"
+  >
+    <caption>
+      
+      
+    
+    </caption>
+     
+    <thead>
+      <tr
+        class="header-row"
+      >
+        <th
+          scope="col"
+        >
+          
+          A
+        
+        </th>
+        <th
+          scope="col"
+        >
+          
+          D
+        
+        </th>
+        <th
+          scope="col"
+        >
+          
+          C
+        
+        </th>
+        <th
+          scope="col"
+        >
+          
+          B
+        
+        </th>
+         
+        <th
+          class="column-flush"
+          scope="col"
+        />
+      </tr>
+    </thead>
+     
+    <tbody>
+      <tr>
+        <td>
+          
+            5
+          
+        </td>
+        <td>
+          
+            false
+          
+        </td>
+        <td>
+          
+            
+          
+        </td>
+        <td>
+          
+            
+          
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+      <tr>
+        <td>
+          
+            6
+          
+        </td>
+        <td>
+          
+            true
+          
+        </td>
+        <td>
+          
+            
+          
+        </td>
+        <td>
+          
+            
+          
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+      <tr>
+        <td>
+          
+            7
+          
+        </td>
+        <td>
+          
+            false
+          
+        </td>
+        <td>
+          
+            
+          
+        </td>
+        <td>
+          
+            
+          
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+      <tr>
+        <td>
+          
+            8
+          
+        </td>
+        <td>
+          
+            true
+          
+        </td>
+        <td>
+          
+            
+          
+        </td>
+        <td>
+          
+            
+          
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+    </tbody>
+  </table>
+</div>
+`;

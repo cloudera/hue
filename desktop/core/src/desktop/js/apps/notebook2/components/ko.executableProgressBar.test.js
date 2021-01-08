@@ -17,14 +17,14 @@
 import huePubSub from 'utils/huePubSub';
 import { koSetup } from 'jest/koTestUtils';
 import { NAME } from './ko.executableProgressBar';
-import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
+import { EXECUTABLE_UPDATED_EVENT, ExecutionStatus } from 'apps/notebook2/execution/executable';
 
 describe('ko.executableProgressBar.js', () => {
   const setup = koSetup();
 
   it('should render component', async () => {
     const mockExecutable = {
-      status: EXECUTION_STATUS.ready,
+      status: ExecutionStatus.ready,
       progress: 0
     };
     const activeExecutable = () => mockExecutable;
@@ -38,7 +38,7 @@ describe('ko.executableProgressBar.js', () => {
 
   it('should reflect progress updates', async () => {
     const mockExecutable = {
-      status: EXECUTION_STATUS.ready,
+      status: ExecutionStatus.ready,
       progress: 0
     };
     const activeExecutable = () => mockExecutable;
@@ -51,7 +51,7 @@ describe('ko.executableProgressBar.js', () => {
     // Progress should be 2% initially
     expect(wrapper.querySelector('[data-test="bar"]').style['width']).toEqual('2%');
 
-    mockExecutable.status = EXECUTION_STATUS.running;
+    mockExecutable.status = ExecutionStatus.running;
     mockExecutable.progress = 10;
     huePubSub.publish(EXECUTABLE_UPDATED_EVENT, mockExecutable);
     await setup.waitForKoUpdate();
@@ -61,7 +61,7 @@ describe('ko.executableProgressBar.js', () => {
 
   it('should be 100% and have .progress-danger when failed', async () => {
     const mockExecutable = {
-      status: EXECUTION_STATUS.ready,
+      status: ExecutionStatus.ready,
       progress: 0
     };
     const activeExecutable = () => mockExecutable;
@@ -73,7 +73,7 @@ describe('ko.executableProgressBar.js', () => {
     expect(wrapper.querySelector('[data-test="bar"]').style['width']).toEqual('2%');
     expect(wrapper.querySelector('[data-test="' + NAME + '"].progress-danger')).toBeFalsy();
 
-    mockExecutable.status = EXECUTION_STATUS.failed;
+    mockExecutable.status = ExecutionStatus.failed;
     mockExecutable.progress = 10;
     huePubSub.publish(EXECUTABLE_UPDATED_EVENT, mockExecutable);
     await setup.waitForKoUpdate();

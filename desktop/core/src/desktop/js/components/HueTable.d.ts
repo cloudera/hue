@@ -16,10 +16,11 @@
 
 export interface Column<T> {
   label: string;
-  key: string;
+  key: string | number;
   cssClass?: string;
+  htmlValue?: boolean;
   headerCssClass?: string;
-  adapter?: (key: string, row: T) => string | number | boolean | undefined;
+  adapter?: (key: string | number, row: T) => string | number | boolean | undefined;
 }
 
-export type Row = { [key: string]: unknown };
+export type Row = { [key: string]: unknown } | unknown[];
