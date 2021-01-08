@@ -25,7 +25,7 @@ import { RESULT_CHART_COMPONENT } from 'apps/notebook2/components/resultChart/ko
 import { RESULT_GRID_COMPONENT } from 'apps/notebook2/components/resultGrid/ko.resultGrid';
 import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
 import { REDRAW_CHART_EVENT } from 'apps/notebook2/events';
-import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
+import { EXECUTABLE_UPDATED_EVENT, ExecutionStatus } from 'apps/notebook2/execution/executable';
 import { RESULT_TYPE, RESULT_UPDATED_EVENT } from 'apps/notebook2/execution/executionResult';
 import { attachTracker } from 'apps/notebook2/components/executableStateHandler';
 import { defer } from 'utils/hueUtils';
@@ -71,22 +71,9 @@ const TEMPLATE = `
     </div>
     <div class="table-results" data-bind="visible: type() === 'table', css: { 'table-results-notebook': notebookMode }" style="display: none;">
       <div data-bind="visible: !executing() && hasData() && showGrid()" style="display: none; position: relative;">
-        <!-- ko component: {
-          name: '${ RESULT_GRID_COMPONENT }',
-          params: {
-            activeExecutable: activeExecutable,
-            data: data,
-            streaming: streaming,
-            lastFetchedRows: lastFetchedRows,
-            fetchResult: fetchResult.bind($data),
-            hasMore: hasMore,
-            notebookMode: notebookMode,
-            isResultFullScreenMode: isResultFullScreenMode,
-            meta: meta,
-            resultsKlass: resultsKlass,
-            status: status
-          }
-        } --><!-- /ko -->
+        <execution-results-ko-bridge data-bind="vueKoProps: {
+          executableObservable: activeExecutable
+        }"></execution-results-ko-bridge>
       </div>
       <div data-bind="visible: !executing() && hasData() && showChart()" style="display: none; position: relative;">
         <!-- ko component: {
@@ -158,7 +145,7 @@ class SnippetResults extends DisposableComponent {
       }
     });
 
-    this.executing = ko.pureComputed(() => this.status() === EXECUTION_STATUS.running);
+    this.executing = ko.pureComputed(() => this.status() === ExecutionStatus.running);
 
     this.hasData = ko.pureComputed(() => this.data().length);
 

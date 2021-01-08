@@ -39,6 +39,26 @@ describe('HueTable.vue', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
+  it('should render a table with array rows', () => {
+    const wrapper = shallowMount(HueTable, {
+      propsData: {
+        columns: <Column<unknown>[]>[
+          { key: 1, label: 'A' },
+          { key: 2, label: 'D' },
+          { key: 3, label: 'C' },
+          { key: 4, label: 'B' }
+        ],
+        rows: <Row[]>[
+          ['1', 5, false, undefined],
+          ['2', 6, true, null],
+          ['3', 7, false],
+          ['4', 8, true]
+        ]
+      }
+    });
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
   it('should render a table with a custom component for a cell', () => {
     const wrapper = mount(HueTable, {
       scopedSlots: {
@@ -61,7 +81,7 @@ describe('HueTable.vue', () => {
   it('should render a table with adapter', () => {
     const wrapper = shallowMount(HueTable, {
       propsData: {
-        columns: <Column[]>[
+        columns: <Column<{ [key: string]: unknown }>[]>[
           { key: 'a', label: 'A' },
           {
             key: 'b',

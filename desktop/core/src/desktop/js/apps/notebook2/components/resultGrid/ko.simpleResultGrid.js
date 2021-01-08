@@ -30,7 +30,7 @@ import {
   SHOW_NORMAL_RESULT_EVENT
 } from 'apps/notebook2/events';
 import { trackResult } from 'apps/notebook2/components/executableStateHandler';
-import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
+import { ExecutionStatus } from 'apps/notebook2/execution/executable';
 
 export const SIMPLE_RESULT_GRID_COMPONENT = 'simple-result-grid';
 
@@ -83,7 +83,7 @@ class SimpleResultGrid extends DisposableComponent {
 
     // length > 99 comes from legacy code, likely related to data fetched twice.
     this.isExpired = ko.pureComputed(
-      () => this.status() === EXECUTION_STATUS.expired && this.data().length > 99
+      () => this.status() === ExecutionStatus.expired && this.data().length > 99
     );
 
     this.hueDatatable = undefined;

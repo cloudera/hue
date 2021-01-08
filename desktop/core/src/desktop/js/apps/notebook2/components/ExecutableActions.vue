@@ -82,7 +82,7 @@
   import { Prop, Watch } from 'vue-property-decorator';
 
   import { Session } from 'apps/notebook2/execution/api';
-  import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
+  import { EXECUTABLE_UPDATED_EVENT, ExecutionStatus } from 'apps/notebook2/execution/executable';
   import sessionManager from 'apps/notebook2/execution/sessionManager';
 
   export const EXECUTE_ACTIVE_EXECUTABLE_EVENT = 'executable.active.executable';
@@ -105,7 +105,7 @@
     partOfRunningExecution = false;
     limit: number | null = null;
     stopping = false;
-    status: string = EXECUTION_STATUS.ready;
+    status: ExecutionStatus = ExecutionStatus.ready;
     hasStatement = false;
 
     mounted(): void {
@@ -139,15 +139,15 @@
         !!this.executable &&
         !this.waiting &&
         !this.loadingSession &&
-        this.status !== EXECUTION_STATUS.running &&
-        this.status !== EXECUTION_STATUS.streaming
+        this.status !== ExecutionStatus.running &&
+        this.status !== ExecutionStatus.streaming
       );
     }
 
     get showStop(): boolean {
       return (
-        this.status === EXECUTION_STATUS.running ||
-        this.status === EXECUTION_STATUS.streaming ||
+        this.status === ExecutionStatus.running ||
+        this.status === ExecutionStatus.streaming ||
         this.waiting
       );
     }

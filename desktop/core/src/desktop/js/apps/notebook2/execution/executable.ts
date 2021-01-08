@@ -40,20 +40,20 @@ import Executor from 'apps/notebook2/execution/executor';
  *
  * @type {{running: string, canceling: string, canceled: string, expired: string, waiting: string, success: string, ready: string, available: string, closed: string, starting: string}}
  */
-export const EXECUTION_STATUS = {
-  available: 'available',
-  failed: 'failed',
-  success: 'success',
-  expired: 'expired',
-  running: 'running',
-  starting: 'starting',
-  waiting: 'waiting',
-  ready: 'ready',
-  streaming: 'streaming',
-  canceled: 'canceled',
-  canceling: 'canceling',
-  closed: 'closed'
-};
+export enum ExecutionStatus {
+  available = 'available',
+  failed = 'failed',
+  success = 'success',
+  expired = 'expired',
+  running = 'running',
+  starting = 'starting',
+  waiting = 'waiting',
+  ready = 'ready',
+  streaming = 'streaming',
+  canceled = 'canceled',
+  canceling = 'canceling',
+  closed = 'closed'
+}
 
 export const EXECUTABLE_UPDATED_EVENT = 'hue.executable.updated';
 export const EXECUTABLE_STATUS_TRANSITION_EVENT = 'hue.executable.status.transitioned';
@@ -79,7 +79,7 @@ export default abstract class Executable {
   handle?: ExecutionHandle;
   operationId?: string;
   history?: ExecutionHistory;
-  status = EXECUTION_STATUS.ready;
+  status = ExecutionStatus.ready;
   progress = 0;
   result?: ExecutionResult;
   logs: ExecutionLogs;
@@ -98,7 +98,7 @@ export default abstract class Executable {
     this.logs = new ExecutionLogs(this);
   }
 
-  setStatus(status: string): void {
+  setStatus(status: ExecutionStatus): void {
     const oldStatus = this.status;
     this.status = status;
     if (oldStatus !== status) {
@@ -133,22 +133,22 @@ export default abstract class Executable {
 
   isReady(): boolean {
     return (
-      this.status === EXECUTION_STATUS.ready ||
-      this.status === EXECUTION_STATUS.closed ||
-      this.status === EXECUTION_STATUS.canceled
+      this.status === ExecutionStatus.ready ||
+      this.status === ExecutionStatus.closed ||
+      this.status === ExecutionStatus.canceled
     );
   }
 
   isRunning(): boolean {
-    return this.status === EXECUTION_STATUS.running || this.status === EXECUTION_STATUS.streaming;
+    return this.status === ExecutionStatus.running || this.status === ExecutionStatus.streaming;
   }
 
   isSuccess(): boolean {
-    return this.status === EXECUTION_STATUS.success || this.status === EXECUTION_STATUS.available;
+    return this.status === ExecutionStatus.success || this.status === ExecutionStatus.available;
   }
 
   isFailed(): boolean {
-    return this.status === EXECUTION_STATUS.failed;
+    return this.status === ExecutionStatus.failed;
   }
 
   isPartOfRunningExecution(): boolean {
@@ -194,7 +194,7 @@ export default abstract class Executable {
     this.edited = false;
     this.executeStarted = Date.now();
 
-    this.setStatus(EXECUTION_STATUS.running);
+    this.setStatus(ExecutionStatus.running);
     this.setProgress(0);
     this.notify(true);
 
@@ -248,7 +248,7 @@ export default abstract class Executable {
       this.checkStatus();
       this.logs.fetchLogs();
     } catch (err) {
-      this.setStatus(EXECUTION_STATUS.failed);
+      this.setStatus(ExecutionStatus.failed);
     }
   }
 
@@ -272,12 +272,12 @@ export default abstract class Executable {
     const queryStatus = await checkExecutionStatus({ executable: this });
 
     switch (queryStatus.status) {
-      case EXECUTION_STATUS.success:
+      case ExecutionStatus.success:
         this.executeEnded = Date.now();
         this.setStatus(queryStatus.status);
         this.setProgress(99); // TODO: why 99 here (from old code)?
         break;
-      case EXECUTION_STATUS.available:
+      case ExecutionStatus.available:
         this.executeEnded = Date.now();
         this.setStatus(queryStatus.status);
         this.setProgress(100);
@@ -292,12 +292,12 @@ export default abstract class Executable {
           this.nextExecutable.execute();
         }
         break;
-      case EXECUTION_STATUS.canceled:
-      case EXECUTION_STATUS.expired:
+      case ExecutionStatus.canceled:
+      case ExecutionStatus.expired:
         this.executeEnded = Date.now();
         this.setStatus(queryStatus.status);
         break;
-      case EXECUTION_STATUS.streaming:
+      case ExecutionStatus.streaming:
         if (!queryStatus.result) {
           return;
         }
@@ -309,9 +309,9 @@ export default abstract class Executable {
           }
           this.result.handleResultResponse(queryStatus.result);
         }
-      case EXECUTION_STATUS.running:
-      case EXECUTION_STATUS.starting:
-      case EXECUTION_STATUS.waiting:
+      case ExecutionStatus.running:
+      case ExecutionStatus.starting:
+      case ExecutionStatus.waiting:
         this.setStatus(queryStatus.status);
         checkStatusTimeout = window.setTimeout(
           () => {
@@ -320,7 +320,7 @@ export default abstract class Executable {
           actualCheckCount > 45 ? 5000 : 1000
         );
         break;
-      case EXECUTION_STATUS.failed:
+      case ExecutionStatus.failed:
         this.executeEnded = Date.now();
         this.setStatus(queryStatus.status);
         if (queryStatus.message) {
@@ -331,7 +331,7 @@ export default abstract class Executable {
         break;
       default:
         this.executeEnded = Date.now();
-        this.setStatus(EXECUTION_STATUS.failed);
+        this.setStatus(ExecutionStatus.failed);
         console.warn('Got unknown status ' + queryStatus.status);
     }
   }
@@ -357,20 +357,20 @@ export default abstract class Executable {
   async cancel(): Promise<void> {
     if (
       this.cancellables.length &&
-      (this.status === EXECUTION_STATUS.running || this.status === EXECUTION_STATUS.streaming)
+      (this.status === ExecutionStatus.running || this.status === ExecutionStatus.streaming)
     ) {
       hueAnalytics.log(
         'notebook',
         'cancel/' + (this.executor.connector() ? this.executor.connector().dialect : '')
       );
-      this.setStatus(EXECUTION_STATUS.canceling);
+      this.setStatus(ExecutionStatus.canceling);
       while (this.cancellables.length) {
         const cancellable = this.cancellables.pop();
         if (cancellable) {
           await cancellable.cancel();
         }
       }
-      this.setStatus(EXECUTION_STATUS.canceled);
+      this.setStatus(ExecutionStatus.canceled);
     }
   }
 
@@ -384,7 +384,7 @@ export default abstract class Executable {
     }
     this.handle = undefined;
     this.setProgress(0);
-    this.setStatus(EXECUTION_STATUS.ready);
+    this.setStatus(ExecutionStatus.ready);
   }
 
   toJs(): ExecutableRaw {
@@ -423,7 +423,7 @@ export default abstract class Executable {
     } catch (err) {
       console.warn('Failed closing statement');
     }
-    this.setStatus(EXECUTION_STATUS.closed);
+    this.setStatus(ExecutionStatus.closed);
   }
 
   async toContext(id?: string): Promise<ExecutableContext> {

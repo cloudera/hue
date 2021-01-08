@@ -19,7 +19,7 @@ import { CHECK_STATUS_API, CREATE_SESSION_API, EXECUTE_API_PREFIX, GET_LOGS_API 
 
 import Executor from 'apps/notebook2/execution/executor';
 import SqlExecutable from './sqlExecutable';
-import { EXECUTION_STATUS } from './executable';
+import { ExecutionStatus } from './executable';
 import sessionManager from './sessionManager';
 import * as ApiUtils from 'api/utils';
 import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
@@ -121,7 +121,7 @@ describe('sqlExecutable.js', () => {
           });
         } else if (url.indexOf(CHECK_STATUS_API) !== -1) {
           checkStatusApiHit = currentApiHit;
-          statusResolve({ query_status: { status: EXECUTION_STATUS.available } });
+          statusResolve({ query_status: { status: ExecutionStatus.available } });
           return statusPromise;
         } else if (url.indexOf(GET_LOGS_API) !== -1) {
           getLogsApiHit = currentApiHit;
@@ -133,7 +133,7 @@ describe('sqlExecutable.js', () => {
       }
     );
 
-    expect(subject.status).toEqual(EXECUTION_STATUS.ready);
+    expect(subject.status).toEqual(ExecutionStatus.ready);
 
     await subject.execute();
     await statusPromise;
@@ -144,7 +144,7 @@ describe('sqlExecutable.js', () => {
     expect(checkStatusApiHit).toEqual(3);
     expect(getLogsApiHit).toEqual(4);
 
-    expect(subject.status).toEqual(EXECUTION_STATUS.available);
+    expect(subject.status).toEqual(ExecutionStatus.available);
   });
 
   // xit('should set the correct status after failed execute', done => {
@@ -168,11 +168,11 @@ describe('sqlExecutable.js', () => {
   //     .execute()
   //     .then(fail)
   //     .catch(() => {
-  //       expect(subject.status).toEqual(EXECUTION_STATUS.failed);
+  //       expect(subject.status).toEqual(ExecutionStatus.failed);
   //       done();
   //     });
   //
-  //   expect(subject.status).toEqual(EXECUTION_STATUS.running);
+  //   expect(subject.status).toEqual(ExecutionStatus.running);
   //
   //   simplePostDeferred.reject();
   // });
@@ -194,19 +194,19 @@ describe('sqlExecutable.js', () => {
   //   subject
   //     .execute()
   //     .then(() => {
-  //       expect(subject.status).toEqual(EXECUTION_STATUS.available);
+  //       expect(subject.status).toEqual(ExecutionStatus.available);
   //       subject.cancel().then(() => {
-  //         expect(subject.status).toEqual(EXECUTION_STATUS.canceled);
+  //         expect(subject.status).toEqual(ExecutionStatus.canceled);
   //         done();
   //       });
   //
-  //       expect(subject.status).toEqual(EXECUTION_STATUS.canceling);
+  //       expect(subject.status).toEqual(ExecutionStatus.canceling);
   //
   //       simplePostCancelDeferred.resolve();
   //     })
   //     .catch(fail);
   //
-  //   expect(subject.status).toEqual(EXECUTION_STATUS.running);
+  //   expect(subject.status).toEqual(ExecutionStatus.running);
   //
   //   simplePostExeuteDeferred.resolve({ handle: {} });
   // });

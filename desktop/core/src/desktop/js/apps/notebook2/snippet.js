@@ -28,6 +28,7 @@ import 'apps/notebook2/components/ko.queryHistory';
 import './components/ExecutableActionsKoBridge.vue';
 import './components/EditorResizerKoBridge.vue';
 import './components/aceEditor/AceEditorKoBridge.vue';
+import './components/result/ExecutionResultsKoBridge.vue';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';
@@ -42,7 +43,7 @@ import { HIDE_FIXED_HEADERS_EVENT, REDRAW_FIXED_HEADERS_EVENT } from 'apps/noteb
 import {
   EXECUTABLE_STATUS_TRANSITION_EVENT,
   EXECUTABLE_UPDATED_EVENT,
-  EXECUTION_STATUS
+  ExecutionStatus
 } from 'apps/notebook2/execution/executable';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
@@ -641,7 +642,7 @@ export default class Snippet {
         });
 
         this.executor.executables.forEach(async executable => {
-          if (executable.status !== EXECUTION_STATUS.ready) {
+          if (executable.status !== ExecutionStatus.ready) {
             await executable.checkStatus();
           } else {
             executable.notify();
@@ -661,9 +662,9 @@ export default class Snippet {
     huePubSub.subscribe(EXECUTABLE_STATUS_TRANSITION_EVENT, transitionDetails => {
       if (this.activeExecutable() === transitionDetails.executable) {
         if (
-          (transitionDetails.newStatus === EXECUTION_STATUS.available ||
-            transitionDetails.newStatus === EXECUTION_STATUS.failed ||
-            transitionDetails.newStatus === EXECUTION_STATUS.success) &&
+          (transitionDetails.newStatus === ExecutionStatus.available ||
+            transitionDetails.newStatus === ExecutionStatus.failed ||
+            transitionDetails.newStatus === ExecutionStatus.success) &&
           this.activeExecutable().history &&
           this.activeExecutable().handle
         ) {

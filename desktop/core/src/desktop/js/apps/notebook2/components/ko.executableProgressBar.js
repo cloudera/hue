@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import 'ko/bindings/ko.publish';
 
 import componentUtils from 'ko/components/componentUtils';
-import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
+import { EXECUTABLE_UPDATED_EVENT, ExecutionStatus } from 'apps/notebook2/execution/executable';
 import DisposableComponent from 'ko/components/DisposableComponent';
 import { sleep } from 'utils/hueUtils';
 
@@ -41,14 +41,14 @@ class ExecutableProgressBar extends DisposableComponent {
     this.progress = ko.observable(0);
 
     this.progressClass = ko.pureComputed(() => {
-      if (this.status() === EXECUTION_STATUS.failed) {
+      if (this.status() === ExecutionStatus.failed) {
         return 'progress-danger';
       }
       if (
         this.progress() === 0 &&
-        (this.status() === EXECUTION_STATUS.running ||
-          this.status() === EXECUTION_STATUS.streaming ||
-          this.status() === EXECUTION_STATUS.starting)
+        (this.status() === ExecutionStatus.running ||
+          this.status() === ExecutionStatus.streaming ||
+          this.status() === ExecutionStatus.starting)
       ) {
         return 'progress-starting';
       }
@@ -61,7 +61,7 @@ class ExecutableProgressBar extends DisposableComponent {
     });
 
     this.progressWidth = ko.pureComputed(() => {
-      if (this.status() === EXECUTION_STATUS.failed) {
+      if (this.status() === ExecutionStatus.failed) {
         return '100%';
       }
       return Math.max(2, this.progress()) + '%';
