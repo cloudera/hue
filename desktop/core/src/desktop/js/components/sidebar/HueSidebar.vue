@@ -394,7 +394,7 @@
                 subApps.push({
                   type: 'navigation',
                   name: 'addMoreInterpreters',
-                  displayName: I18n('Add more...'),
+                  displayName: I18n('Edit list...'),
                   url,
                   handler: (event: Event) => onHueLinkClick(event, url)
                 });
