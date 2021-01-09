@@ -556,6 +556,8 @@ class ApiWrapper():
         def _method(*args, **kwargs):
           return attr(*args, **dict(kwargs, postdict=self.request.POST, user_id=self.request.user.id))
         return _method
+      else:
+        LOG.debug('Skipping Task Server call %s' % name)
     return getattr(self.api, name)
 
 

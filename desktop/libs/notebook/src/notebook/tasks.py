@@ -493,7 +493,10 @@ def _cleanup(notebook, snippet):
 
 def _get_query_key(notebook, snippet):
   if ENABLE_NOTEBOOK_2.get():
-    query_key = snippet['executor']['executables'][0].get('history', {}).get('uuid')
+    if snippet.get('executable'):
+      query_key = snippet['executable']['id']
+    else:
+      query_key = snippet['executor']['executables'][0].get('history', {}).get('uuid')
   else:
     query_key = notebook['uuid']
 

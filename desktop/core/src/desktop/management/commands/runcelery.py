@@ -66,8 +66,15 @@ class Command(BaseCommand):
     return SERVER_HELP
 
 def runcelery(*args, **options):
-  #CeleryCommand().handle_argv(['worker', '--app=desktop.celery', '--concurrency=1', '--loglevel=DEBUG'])
-  opts = ['runcelery', 'worker', '--app=' + options['app'], '--concurrency=' + str(options['concurrency']), '--loglevel=' + options['loglevel']]
+  # Native does not load Hue's config
+  # CeleryCommand().handle_argv(['worker', '--app=desktop.celery', '--concurrency=1', '--loglevel=DEBUG'])
+  opts = [
+      'runcelery',
+      'worker',
+      '--app=' + options['app'],
+      '--concurrency=' + str(options['concurrency']),
+      '--loglevel=' + options['loglevel']
+  ]
   drop_privileges_if_necessary(CELERY_OPTIONS)
 
   if conf.DEV.get():
