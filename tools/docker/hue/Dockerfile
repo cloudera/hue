@@ -57,7 +57,6 @@ RUN rm -rf /hue \
 # To move to requirements_connectors.txt
 RUN ./build/env/bin/pip install \
   psycopg2-binary \
-  redis==2.10.6 \
   # Avoid Django 3 pulling
   django_redis==4.11.0 \
   flower \
