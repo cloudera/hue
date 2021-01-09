@@ -151,14 +151,20 @@ Alternative:
 
 ### Presto
 
+Formerly known as PrestoSQL and now call [Trino](#trino).
+
+### Trino
+
+Formerly known as PrestoSQL (hence still having 'presto' name in several parameters).
+
 The dialect should be added to the Python system or Hue Python virtual environment:
 
     ./build/env/bin/pip install pyhive
 
-Then give Hue the information about the database source following the `presto://{presto-coordinator}:{port}/{catalog}/{schema}` format:
+Then give Hue the information about the database source following the `presto://{trino-coordinator}:{port}/{catalog}/{schema}` format:
 
     [[[presto]]]
-    name = Presto
+    name = Trino
     interface=sqlalchemy
     options='{"url": "presto://localhost:8080/tpch/default"}'
 
@@ -191,7 +197,7 @@ Alternative interfaces.
 Direct:
 
     [[[presto]]]
-    name=Presto SQL
+    name=Trino
     interface=presto
     ## Specific options for connecting to the Presto server.
     ## To connect to Presto over HTTPS/SSL you will need to construct connection string like below:
@@ -202,10 +208,10 @@ Direct:
 
 JDBC:
 
-The client driver is maintained by the Presto Team and can be downloaded here: https://prestosql.io/docs/current/installation/jdbc.html
+The client driver is maintained by the Presto Team and can be downloaded here: https://trino.io/docs/current/installation/jdbc.html
 
     [[[presto]]]
-    name=Presto JDBC
+    name=Trino JDBC
     interface=jdbc
     options='{"url": "jdbc:presto://localhost:8080/", "driver": "io.prestosql.jdbc.PrestoDriver"}'
 
