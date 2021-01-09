@@ -151,7 +151,7 @@ Alternative:
 
 ### Presto
 
-Formerly known as PrestoSQL and now call [Trino](#trino).
+Formerly known as PrestoSQL and now called [Trino](#trino).
 
 ### Trino
 
@@ -226,7 +226,8 @@ Then give Hue the information about the database source:
     [[[oracle]]]
     name = Oracle
     interface=sqlalchemy
-    options='{"url": "oracle://scott:tiger@dsn"}'
+    options='{"url": "oracle://user:password@localhost"}'
+
 
 ### PostgreSQL
 
@@ -241,7 +242,7 @@ Then give Hue the information about the database source:
     [[[postgresql]]]
     name = PostgreSql
     interface=sqlalchemy
-    options='{"url": "postgresql+psycopg2://user:password@host:31335/database"}'
+    options='{"url": "postgresql+psycopg2://user:password@localhost:31335/database"}'
 
 
 ### AWS Athena
@@ -417,6 +418,24 @@ Supporting additional [connection parameters](https://github.com/mxmzdlv/pybigqu
       options='{"url": "bigquery://", "use_query_cache": "true"}'
 
 
+### Materialize
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+    ./build/env/bin/pip install psycopg2
+
+      or
+
+    ./build/env/bin/pip install psycopg2-binary
+
+Then give Hue the information about the database source:
+
+    [[[postgresql]]]
+    name = Materialize
+    interface=sqlalchemy
+    options='{"url": "postgresql://user:password@localhost:6875/"}'
+
+
 ### Teradata
 
 The dialect should be added to the Python system or Hue Python virtual environment:
@@ -428,7 +447,7 @@ Then give Hue the information about the database source:
     [[[teradata]]]
     name = Teradata
     interface=sqlalchemy
-    options='{"url": "teradata://user:pw@host"}'
+    options='{"url": "teradata://user:password@localhost"}'
 
 Alternative:
 
@@ -450,7 +469,7 @@ Then give Hue the information about the database source:
     [[[db2]]]
     name = DB2
     interface=sqlalchemy
-    options='{"url": "db2+ibm_db://user:pass@host[:port]/database"}'
+    options='{"url": "db2+ibm_db://user:password@hostname[:port]/database"}'
 
 Alternative:
 
@@ -489,7 +508,7 @@ Then give Hue the information about the database source:
     [[[sparksql]]]
     name=Spark SQL
     interface=sqlalchemy
-    options='{"url": "hive://user:password@host:10000/database"}'
+    options='{"url": "hive://user:password@localhost:10000/database"}'
 
 ##### Distributed SQL Engine / Thrift Server
 
@@ -578,7 +597,7 @@ Then give Hue the information about the database source:
     [[[vertica]]]
     name = Vertica
     interface=sqlalchemy
-    options='{"url": "vertica+vertica_python://user:pwd@host:port/database"}'
+    options='{"url": "vertica+vertica_python://user:pwd@localhost:port/database"}'
 
 Alternative:
 
@@ -855,7 +874,7 @@ Then give Hue the information about the database source:
     [[[greenplum]]]
     name = Greenplum
     interface=sqlalchemy
-    options='{"url": "postgresql+psycopg2://user:password@host:31335/database"}'
+    options='{"url": "postgresql+psycopg2://user:password@localhost:31335/database"}'
 
 
 ## Storage
