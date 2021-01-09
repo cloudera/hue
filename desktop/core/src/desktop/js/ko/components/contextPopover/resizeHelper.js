@@ -16,8 +16,8 @@
 
 import $ from 'jquery';
 
-import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
+import { setInLocalStorage } from 'utils/storageUtils';
 
 const HALF_SIZE_LIMIT_X = 130;
 const HALF_SIZE_LIMIT_Y = 100;
@@ -68,7 +68,7 @@ class ResizeHelper {
     initOriginalValues(0);
 
     self.saveSize = function () {
-      apiHelper.setInTotalStorage('assist', 'popover.size', {
+      setInLocalStorage('assist.popover.size', {
         width: $('.hue-popover').width(),
         height: $('.hue-popover').height()
       });

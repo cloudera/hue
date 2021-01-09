@@ -46,10 +46,11 @@ import requests
 
 import django.contrib.auth.backends
 from django.contrib import auth
-from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpResponseRedirect
 from django.forms import ValidationError
+from django.urls import reverse
+
 try:
   from django_auth_ldap.backend import LDAPBackend
   from django_auth_ldap.config import LDAPSearch
@@ -71,7 +72,7 @@ from desktop.settings import LOAD_BALANCER_COOKIE
 
 from filebrowser.conf import REMOTE_STORAGE_HOME
 from useradmin import ldap_access
-from useradmin.models import get_profile, get_default_user_group, UserProfile, User
+from useradmin.models import get_profile, get_default_user_group, install_sample_user, UserProfile, User
 from useradmin.organization import get_organization
 
 
@@ -137,7 +138,7 @@ def is_admin(user):
   if hasattr(user, 'is_superuser') and not ENABLE_ORGANIZATIONS.get():
     is_admin = user.is_superuser
 
-  if not is_admin and user.is_authenticated():
+  if not is_admin and user.is_authenticated:
     try:
       user = rewrite_user(user)
       is_admin = user.is_admin if ENABLE_ORGANIZATIONS.get() else user.has_hue_permission(action="superuser", app="useradmin")
@@ -166,8 +167,8 @@ class DefaultUserAugmentor(object):
   def get_groups(self):
     return self._get_profile().get_groups()
 
-  def get_home_directory(self):
-    return REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() \
+  def get_home_directory(self, force_home=False):
+    return REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() and not force_home \
         else self._get_profile().home_directory
 
   def has_hue_permission(self, action, app):
@@ -306,7 +307,7 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
 
   def is_first_login_ever(self):
     """ Return true if no one has ever logged in."""
-    return User.objects.count() == 0
+    return User.objects.exclude(id=install_sample_user().id).count() == 0
 
 
 class ImpersonationBackend(django.contrib.auth.backends.ModelBackend):
@@ -402,7 +403,7 @@ class PamBackend(DesktopBackendBase):
 
     if pam.authenticate(username, password, AUTH.PAM_SERVICE.get()):
       is_super = False
-      if User.objects.count() == 0:
+      if User.objects.exclude(id=install_sample_user().id).count() == 0:
         is_super = True
 
       try:
@@ -641,7 +642,7 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
     username = self.clean_username(username)
     username = force_username_case(username)
     is_super = False
-    if User.objects.count() == 0:
+    if User.objects.exclude(id=install_sample_user().id).count() == 0:
       is_super = True
 
     try:
@@ -687,7 +688,7 @@ class KnoxSpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
     username = self.clean_username(username, request)
     username = force_username_case(username)
     is_super = False
-    if User.objects.count() == 0:
+    if User.objects.exclude(id=install_sample_user().id).count() == 0:
       is_super = True
 
     try:
@@ -731,7 +732,7 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
     username = self.clean_username(remote_user)
     username = force_username_case(username)
     is_super = False
-    if User.objects.count() == 0:
+    if User.objects.exclude(id=install_sample_user().id).count() == 0:
       is_super = True
 
     try:

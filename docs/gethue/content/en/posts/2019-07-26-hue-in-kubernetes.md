@@ -44,6 +44,9 @@ categories:
   # - Version 4.5
 
 ---
+
+**Note** This post has been replaced by a more [recent Howto](/quickstart-hue-in-kubernetes/).
+
 Let&#8217;s see how to automate the deployment further and run this into a container orchestration like [Kubernetes][1].
 
 &nbsp;

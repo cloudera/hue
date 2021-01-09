@@ -314,6 +314,11 @@
   # Turn on the direct link sharing of saved document.
   ## enable_link_sharing=true
 
+  # Hue uses Localstorage to keep the users settings and database preferences.
+  # Please make this value true in case local storage should not be used
+  # default value is false
+  ## disable_local_storage = false
+
   # Administrators
   # ----------------
   [[django_admins]]
@@ -877,8 +882,8 @@
   ## Flag to turn on the Presentation mode of the editor.
   # enable_presentation=true
 
-  ## Flag to enable the SQL query builder of the table assist.
-  # enable_query_builder=true
+  ## Flag to enable the SQL query builder of the table assist (deprecated).
+  # enable_query_builder=false
 
   ## Flag to enable the creation of a coordinator for the current SQL query.
   # enable_query_scheduling=false
@@ -1021,6 +1026,13 @@
     # # options='{"url": "presto://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\", \"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
     # ## Presto Session properties when HTTPS is not enabled.
     # # options='{"url": "presto://username:password@localhost:8080/tpch/default","connect_args":"{\"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
+
+    # [[[dasksql]]]
+    # name=Dask-SQL
+    # interface=sqlalchemy
+    # ## Specific options for connecting to the dask-sql server.
+    # ## Please note, that dask-sql uses the presto protocol.
+    # # options='{"url": "presto://localhost:8080/catalog/default"}'
 
     # [[[clickhouse]]]
     #   name=ClickHouse

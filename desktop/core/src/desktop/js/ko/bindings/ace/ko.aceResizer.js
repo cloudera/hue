@@ -18,6 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
+import { hueLocalStorage } from 'utils/storageUtils';
 
 ko.bindingHandlers.aceResizer = {
   init: function (element, valueAccessor) {
@@ -29,7 +30,7 @@ ko.bindingHandlers.aceResizer = {
     const $execStatus = $resizer.prev('.snippet-execution-status');
     const $variables = $resizer.siblings('.snippet-row').find('.variables');
 
-    let lastEditorSize = $.totalStorage('hue.editor.editor.size') || 131;
+    let lastEditorSize = hueLocalStorage('hue.editor.editor.size') || 131;
     let editorHeight = Math.floor(lastEditorSize / 16);
     $target.height(lastEditorSize);
     let autoExpand =
@@ -51,7 +52,7 @@ ko.bindingHandlers.aceResizer = {
           $target.height(
             Math.max(
               ace().session.getLength() * 16,
-              $.totalStorage('hue.editor.editor.size') || 131
+              hueLocalStorage('hue.editor.editor.size') || 131
             )
           );
           resized = true;
@@ -97,7 +98,7 @@ ko.bindingHandlers.aceResizer = {
       stop: function (event, ui) {
         ui.offset.top = 0;
         ui.position.top = 0;
-        $.totalStorage('hue.editor.editor.size', $target.height());
+        hueLocalStorage('hue.editor.editor.size', $target.height());
         huePubSub.publish('redraw.fixed.headers');
         $(document).trigger('editorSizeChanged');
       }

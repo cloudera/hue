@@ -14,9 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery';
-
 import { koSetup } from 'jest/koTestUtils';
+import { CancellablePromise } from '../../api/cancellablePromise';
 import { NAME } from './ko.fieldSamples';
 
 import 'ko/components/ko.inlineAutocomplete';
@@ -30,15 +29,15 @@ describe('ko.fieldSamples.js', () => {
       catalogEntry: {
         isField: () => true,
         isComplex: () => false,
-        getChildren: () => $.Deferred().resolve([]),
-        getSample: () => $.Deferred().reject(),
-        loadNavigatorMetaForChildren: () => $.Deferred().reject(),
-        loadOptimizerPopularityForChildren: () => $.Deferred().reject(),
+        getChildren: () => CancellablePromise.resolve([]),
+        getSample: () => CancellablePromise.reject(),
+        loadNavigatorMetaForChildren: () => CancellablePromise.reject(),
+        loadOptimizerPopularityForChildren: () => CancellablePromise.reject(),
         isTableOrView: () => false,
         getDialect: () => 'impala'
       }
     });
-
+    await setup.waitForKoUpdate();
     expect(element.innerHTML).toMatchSnapshot();
   });
 });

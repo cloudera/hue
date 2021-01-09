@@ -30,6 +30,7 @@ import {
   ASSIST_IS_DB_PANEL_READY_EVENT,
   ASSIST_SET_DATABASE_EVENT
 } from 'ko/components/assist/events';
+import { getFromLocalStorage } from 'utils/storageUtils';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -912,9 +913,8 @@ class Notebook {
       () => {
         if (self.type().indexOf('query') === 0) {
           const whenDatabaseAvailable = function (snippet) {
-            const lastSelectedDb = apiHelper.getFromTotalStorage(
-              'assist_' + snippet.type() + '_' + snippet.namespace().id,
-              'lastSelectedDb'
+            const lastSelectedDb = getFromLocalStorage(
+              'assist_' + snippet.type() + '_' + snippet.namespace().id + '.lastSelectedDb'
             );
 
             huePubSub.publish(ASSIST_SET_DATABASE_EVENT, {

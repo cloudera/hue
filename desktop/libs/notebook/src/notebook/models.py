@@ -171,7 +171,7 @@ def make_notebook(
 
   if has_connectors():  # To improve
     data['dialect'] = interpreter['dialect']
-    data['type'] = 'flink-' + editor_connector
+    data['type'] = '%s-%s' % (editor_type, editor_connector)  # e.g. 'flink-' + editor_connector
 
   if snippet_properties:
     data['snippets'][0]['properties'].update(snippet_properties)
@@ -615,6 +615,13 @@ class Analytics(object):
       )
     )
     stats.append(('Active users 90 days', User.objects.filter(last_login__gte=three_months).count()))
+
+    stats.append(('\nDialect executions', ''))
+    queries = Document2.objects.filter(type__startswith='query-', is_trashed=False, is_managed=False)
+    last_month_qdialects = queries.filter(
+      last_modified__gte=one_month
+    ).values('type').annotate(c=Count('type')).values('type', 'c').order_by('-c')
+    stats.append(('30 days', ', '.join(['%(type)s: %(c)s' % d for d in last_month_qdialects])))
 
     return stats
 

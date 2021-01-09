@@ -30,11 +30,11 @@ from datetime import datetime
 
 from axes.decorators import watch_login
 import django.contrib.auth.views
-from django.core import urlresolvers
 from django.core.exceptions import SuspiciousOperation
 from django.contrib.auth import login, get_backends, authenticate
 from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from hadoop.fs.exceptions import WebHdfsException
@@ -93,7 +93,7 @@ def first_login_ever():
 
 
 # We want unique method name to represent HUE-3 vs HUE-4 method call.
-# This is required because of urlresolvers.reverse('desktop.auth.views.dt_login') below which needs uniqueness to work correctly.
+# This is required because of reverse('desktop.auth.views.dt_login') below which needs uniqueness to work correctly.
 @login_notrequired
 def dt_login_old(request, from_modal=False):
   return dt_login(request, from_modal)
@@ -155,7 +155,7 @@ def dt_login(request, from_modal=False):
           LOG.error('Could not create home directory at login for %s.' % user, exc_info=e)
 
         if require_change_password(userprofile):
-          return HttpResponseRedirect(urlresolvers.reverse('useradmin.views.edit_user', kwargs={'username': user.username}))
+          return HttpResponseRedirect('/hue' + reverse('useradmin:useradmin.views.edit_user', kwargs={'username': user.username}))
 
         userprofile.first_login = False
         userprofile.last_activity = datetime.now()
@@ -185,14 +185,14 @@ def dt_login(request, from_modal=False):
     if hasattr(request, 'fs') and (
         'KnoxSpnegoDjangoBackend' in backend_names or 'SpnegoDjangoBackend' in backend_names or 'OIDCBackend' in backend_names or
         'SAML2Backend' in backend_names
-      ) and request.user.is_authenticated():
+      ) and request.user.is_authenticated:
       if request.fs is None:
         request.fs = fsmanager.get_filesystem(request.fs_ref)
       try:
         ensure_home_directory(request.fs, request.user)
       except (IOError, WebHdfsException) as e:
         LOG.error('Could not create home directory for %s user %s.' % ('OIDC' if 'OIDCBackend' in backend_names else 'SAML', request.user))
-    if request.user.is_authenticated() and not from_modal:
+    if request.user.is_authenticated and not from_modal:
       return HttpResponseRedirect(redirect_to)
 
   if is_active_directory and not is_ldap_option_selected and \
@@ -210,7 +210,7 @@ def dt_login(request, from_modal=False):
     renderable_path = 'login_modal.mako'
 
   response = render(renderable_path, request, {
-    'action': urlresolvers.reverse('desktop_auth_views_dt_login'),
+    'action': reverse('desktop_auth_views_dt_login'),
     'form': first_user_form or auth_form,
     'next': redirect_to,
     'first_login_ever': is_first_login_ever,
@@ -220,7 +220,7 @@ def dt_login(request, from_modal=False):
     'user': request.user
   })
 
-  if not request.user.is_authenticated():
+  if not request.user.is_authenticated:
     response.delete_cookie(LOAD_BALANCER_COOKIE) # Note: might be re-balanced to another Hue on login.
 
   return response
@@ -325,7 +325,7 @@ def oauth_authenticated(request):
 
 @login_notrequired
 def oidc_failed(request):
-  if request.user.is_authenticated():
+  if request.user.is_authenticated:
     return HttpResponseRedirect('/')
   access_warn(request, "401 Unauthorized by oidc")
   return render("oidc_failed.mako", request, dict(uri=request.build_absolute_uri()), status=401)

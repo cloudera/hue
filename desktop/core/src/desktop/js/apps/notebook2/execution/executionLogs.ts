@@ -14,11 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ExecutionJob, fetchLogs } from 'apps/notebook2/execution/apiUtils';
+import { ExecutionJob, fetchLogs } from 'apps/notebook2/execution/api';
 import huePubSub from 'utils/huePubSub';
 import Executable, { EXECUTION_STATUS } from './executable';
 
 export const LOGS_UPDATED_EVENT = 'hue.executable.logs.updated';
+
+export interface ExecutionError {
+  row: number;
+  column: number;
+  message: string;
+}
 
 export interface ExecutionLogsRaw {
   jobs: ExecutionJob[];
@@ -30,7 +36,7 @@ export default class ExecutionLogs {
   fullLog = '';
   logLines = 0;
   jobs: ExecutionJob[] = [];
-  errors: string[] = [];
+  errors: ExecutionError[] = [];
 
   constructor(executable: Executable) {
     this.executable = executable;
@@ -97,7 +103,7 @@ export default class ExecutionLogs {
   toJs(): ExecutionLogsRaw {
     return {
       jobs: this.jobs,
-      errors: this.errors
+      errors: this.errors.map(err => err.message)
     };
   }
 }

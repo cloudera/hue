@@ -18,17 +18,18 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
+import { hueLocalStorage } from 'utils/storageUtils';
 
 ko.bindingHandlers.splitDraggable = {
   init: function (element, valueAccessor) {
     const options = ko.unwrap(valueAccessor());
     let leftPanelWidth =
-      $.totalStorage(options.appName + '_left_panel_width') != null
-        ? Math.max($.totalStorage(options.appName + '_left_panel_width'), 250)
+      hueLocalStorage(options.appName + '_left_panel_width') != null
+        ? Math.max(hueLocalStorage(options.appName + '_left_panel_width'), 250)
         : 250;
     let rightPanelWidth =
-      $.totalStorage(options.appName + '_right_panel_width') != null
-        ? Math.max($.totalStorage(options.appName + '_right_panel_width'), 250)
+      hueLocalStorage(options.appName + '_right_panel_width') != null
+        ? Math.max(hueLocalStorage(options.appName + '_right_panel_width'), 250)
         : 290;
 
     const containerSelector = options.containerSelector || '.panel-container';
@@ -154,9 +155,9 @@ ko.bindingHandlers.splitDraggable = {
       },
       stop: function () {
         if (isRightPanel) {
-          $.totalStorage(options.appName + '_right_panel_width', rightPanelWidth);
+          hueLocalStorage(options.appName + '_right_panel_width', rightPanelWidth);
         } else {
-          $.totalStorage(options.appName + '_left_panel_width', leftPanelWidth);
+          hueLocalStorage(options.appName + '_left_panel_width', leftPanelWidth);
         }
         window.setTimeout(positionPanels, 100);
         huePubSub.publish('split.panel.resized');

@@ -160,7 +160,7 @@ class OozieApi(Api):
       if action.externalId is not None:
         jobs.append({
           'name': action.externalId,
-          'url': reverse('jobbrowser.views.single_job', kwargs={'job': action.externalId}),
+          'url': reverse('jobbrowser:jobbrowser.views.single_job', kwargs={'job': action.externalId}),
           'started': action.startTime is not None,
           'finished': action.endTime is not None
         })

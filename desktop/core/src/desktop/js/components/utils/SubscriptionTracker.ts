@@ -16,6 +16,10 @@
 
 import huePubSub from 'utils/huePubSub';
 
+export interface Disposable {
+  dispose(): void;
+}
+
 export default class SubscriptionTracker {
   disposals: (() => void)[] = [];
 
@@ -35,6 +39,46 @@ export default class SubscriptionTracker {
         sub.dispose();
       });
     }
+  }
+
+  async whenDefined<T>(observable: KnockoutSubscribable<T | undefined>): Promise<T> {
+    return new Promise((resolve, reject) => {
+      let disposed = false;
+      const sub = observable.subscribe(val => {
+        if (typeof val !== 'undefined') {
+          disposed = true;
+          sub.dispose();
+          resolve(val);
+        }
+      });
+      this.disposals.push(() => {
+        if (!disposed) {
+          sub.dispose();
+          reject();
+        }
+      });
+    });
+  }
+
+  addDisposable(disposable: Disposable): void {
+    this.disposals.push(disposable.dispose.bind(disposable));
+  }
+
+  trackTimeout(timeout: number): void {
+    this.disposals.push(() => {
+      window.clearTimeout(timeout);
+    });
+  }
+
+  addEventListener<K extends keyof HTMLElementEventMap>(
+    element: HTMLElement | Document,
+    type: K,
+    listener: (ev: HTMLElementEventMap[K]) => unknown
+  ): void {
+    element.addEventListener(type, listener as EventListenerOrEventListenerObject);
+    this.disposals.push(() => {
+      element.removeEventListener(type, listener as EventListenerOrEventListenerObject);
+    });
   }
 
   dispose(): void {

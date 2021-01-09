@@ -15,8 +15,8 @@
 // limitations under the License.
 
 import $ from 'jquery';
-
-import hueUtils from 'utils/hueUtils';
+import { escapeOutput } from 'utils/hueUtils';
+import { hueLocalStorage } from 'utils/storageUtils';
 
 /*
  * jHue HDFS autocomplete plugin
@@ -106,16 +106,12 @@ Plugin.prototype.init = function () {
   });
 
   function smartTooltipMaker() {
-    if (
-      _this.options.smartTooltip != '' &&
-      typeof $.totalStorage != 'undefined' &&
-      $.totalStorage('jHueHdfsAutocompleteTooltip') != -1
-    ) {
+    if (_this.options.smartTooltip !== '' && hueLocalStorage('jHueHdfsAutocompleteTooltip') != -1) {
       let cnt = 0;
-      if ($.totalStorage('jHueHdfsAutocompleteTooltip') != null) {
-        cnt = $.totalStorage('jHueHdfsAutocompleteTooltip') + 1;
+      if (hueLocalStorage('jHueHdfsAutocompleteTooltip') != null) {
+        cnt = hueLocalStorage('jHueHdfsAutocompleteTooltip') + 1;
       }
-      $.totalStorage('jHueHdfsAutocompleteTooltip', cnt);
+      hueLocalStorage('jHueHdfsAutocompleteTooltip', cnt);
       if (cnt >= _this.options.smartTooltipThreshold) {
         _el
           .tooltip({
@@ -128,7 +124,7 @@ Plugin.prototype.init = function () {
         window.setTimeout(() => {
           _el.tooltip('hide');
         }, 10000);
-        $.totalStorage('jHueHdfsAutocompleteTooltip', -1);
+        hueLocalStorage('jHueHdfsAutocompleteTooltip', -1);
       }
     }
   }
@@ -255,11 +251,11 @@ Plugin.prototype.init = function () {
             }
             _currentFiles.push(
               '<li class="hdfsAutocompleteItem" data-value="' +
-                hueUtils.escapeOutput(item.name) +
+                escapeOutput(item.name) +
                 '"><i class="fa ' +
                 ico +
                 '"></i> ' +
-                hueUtils.escapeOutput(item.name) +
+                escapeOutput(item.name) +
                 '</li>'
             );
           }

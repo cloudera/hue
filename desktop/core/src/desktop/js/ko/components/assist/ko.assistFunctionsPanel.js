@@ -16,11 +16,8 @@
 
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
-import huePubSub from 'utils/huePubSub';
-import I18n from 'utils/i18n';
-import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'utils/hueConfig';
+import { HUE_DROP_DOWN_COMPONENT } from 'ko/components/ko.dropDown';
 import {
   CLEAR_UDF_CACHE_EVENT,
   DESCRIBE_UDF_EVENT,
@@ -28,7 +25,10 @@ import {
   hasUdfCategories,
   UDF_DESCRIBED_EVENT
 } from 'sql/reference/sqlReferenceRepository';
-import { HUE_DROP_DOWN_COMPONENT } from 'ko/components/ko.dropDown';
+import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'utils/hueConfig';
+import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 export const NAME = 'assist-functions-panel';
 // prettier-ignore
@@ -268,9 +268,8 @@ class AssistFunctionsPanel {
 
     this.activeConnectorUdfs.subscribe(async activeConnectorUdfs => {
       await activeConnectorUdfs.init();
-      apiHelper.setInTotalStorage(
-        'assist',
-        'function.panel.active.connector.type',
+      setInLocalStorage(
+        'assist.function.panel.active.connector.type',
         activeConnectorUdfs.connector.type
       );
     });
@@ -293,7 +292,7 @@ class AssistFunctionsPanel {
     const configUpdated = () => {
       const lastActiveConnectorType =
         (this.activeConnector() && this.activeConnector().type) ||
-        apiHelper.getFromTotalStorage('assist', 'function.panel.active.connector.type');
+        getFromLocalStorage('assist.function.panel.active.connector.type');
 
       const availableConnectorUdfs = filterEditorConnectors(hasUdfCategories).map(
         connector => new ConnectorUdfCategories(connector)

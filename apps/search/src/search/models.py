@@ -102,10 +102,11 @@ class Facet(models.Model):
 
         date_facets = tuple([
            ('facet.date', field_facet['field']),
-           ('f.%s.facet.date.start' % field_facet['field'], 'NOW-%(frequency)s%(unit)s/%(rounder)s' % {"frequency": start["frequency"], "unit": start["unit"], "rounder": gap["unit"]}),
+           ('f.%s.facet.date.start' % field_facet['field'], 'NOW-%(frequency)s%(unit)s/%(rounder)s' % {"frequency": start["frequency"],
+            "unit": start["unit"], "rounder": gap["unit"]}),
            ('f.%s.facet.date.end' % field_facet['field'], 'NOW-%(frequency)s%(unit)s' % end),
-           ('f.%s.facet.date.gap' % field_facet['field'], '+%(frequency)s%(unit)s' % gap),]
-        )
+           ('f.%s.facet.date.gap' % field_facet['field'], '+%(frequency)s%(unit)s' % gap),
+        ])
         params += date_facets
 
     return params
@@ -237,11 +238,19 @@ class Collection(models.Model):
       help_text=_t('Hue properties (e.g. results by pages number)')
   )
 
-  facets = models.ForeignKey(Facet)
-  result = models.ForeignKey(Result)
-  sorting = models.ForeignKey(Sorting)
+  facets = models.ForeignKey(Facet, on_delete=models.CASCADE)
+  result = models.ForeignKey(Result, on_delete=models.CASCADE)
+  sorting = models.ForeignKey(Sorting, on_delete=models.CASCADE)
 
-  owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who created the job.'), default=None, null=True)
+  owner = models.ForeignKey(
+    User,
+    on_delete=models.CASCADE,
+    db_index=True,
+    verbose_name=_t('Owner'),
+    help_text=_t('User who created the job.'),
+    default=None,
+    null=True
+  )
 
   _ATTRIBUTES = ['collection', 'layout', 'autocomplete']
   ICON = 'search/art/icon_search_48.png'
@@ -316,7 +325,9 @@ class Collection(models.Model):
       id_field = id_field[0]
 
     TEMPLATE = {
-      "extracode": escape("<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>\n\n<script>\n</script>"),
+      "extracode": escape(
+        "<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>\n\n<script>\n</script>"
+      ),
       "highlighting": [""],
       "properties": {"highlighting_enabled": True},
       "template": """
@@ -417,16 +428,16 @@ class Collection(models.Model):
     props['collection']['template']['extracode'] = escape(self.result.get_extracode())
     props['collection']['template']['isGridLayout'] = False
     props['layout'] = [
-          {"size":2,"rows":[{"widgets":[]}],"drops":["temp"],"klass":"card card-home card-column span2"},
-          {"size":10,"rows":[{"widgets":[
-              {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"html-resultset-widget",
-               "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]
-          }], "drops":["temp"],"klass":"card card-home card-column span10"}
+          {"size": 2, "rows": [{"widgets": []}], "drops": ["temp"], "klass": "card card-home card-column span2"},
+          {"size": 10, "rows": [{"widgets": [
+              {"size": 12, "name": "Grid Results", "id": "52f07188-f30f-1296-2450-f77e02e1a5c0", "widgetType": "html-resultset-widget",
+               "properties": {}, "offset": 0, "isLoading": True, "klass": "card card-widget span12"}]
+          }], "drops": ["temp"], "klass": "card card-home card-column span10"}
      ]
 
     from search.views import _create_facet
 
-    props['collection']['facets'] =[]
+    props['collection']['facets'] = []
     facets = self.facets.get_data()
 
     for facet_id in facets['order']:
@@ -435,6 +446,6 @@ class Collection(models.Model):
           props['collection']['facets'].append(
               _create_facet({'name': self.name}, user, facet_id, facet['label'], facet['field'], 'facet-widget'))
           props['layout'][0]['rows'][0]['widgets'].append({
-              "size":12,"name": facet['label'], "id":facet_id, "widgetType": "facet-widget",
-              "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"
+              "size": 12, "name": facet['label'], "id": facet_id, "widgetType": "facet-widget",
+              "properties": {}, "offset": 0, "isLoading": True, "klass": "card card-widget span12"
           })

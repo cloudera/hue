@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-  import huePubSub from '../utils/huePubSub';
+  import { onHueLinkClick } from 'utils/hueUtils';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
@@ -41,23 +41,7 @@
 
     clicked(event: Event): void {
       if (this.url) {
-        if (this.url.indexOf('http') === 0) {
-          window.open(this.url, this.$attrs.target);
-        } else {
-          const prefix =
-            (<hueWindow>window).HUE_BASE_URL + '/hue' + (this.url.indexOf('/') === 0 ? '' : '/');
-          if (this.$attrs.target) {
-            window.open(prefix + this.url, this.$attrs.target);
-          } else if (
-            (<KeyboardEvent>event).ctrlKey ||
-            (<KeyboardEvent>event).metaKey ||
-            (<KeyboardEvent>event).which === 2
-          ) {
-            window.open(prefix + this.url, '_blank');
-          } else {
-            huePubSub.publish('open.link', this.url);
-          }
-        }
+        onHueLinkClick(event, this.url, this.$attrs.target);
       } else {
         this.$emit('click');
       }

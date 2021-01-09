@@ -83,7 +83,7 @@
           $('#queryBuilder').hide();
           $('#queryBuilderAlert').show();
         }
-      }, 500, 'editor' + (window.location.getParameter('type') ? '-' + window.location.getParameter('type') : ''));
+      }, 500, 'editor' + (hueUtils.getParameter('type') ? '-' + hueUtils.getParameter('type') : ''));
 
     </script>
     <!-- End query builder imports -->
@@ -900,37 +900,73 @@
         <div class="clearfix margin-bottom-20"></div>
         <!-- /ko -->
 
-        <div class="ace-editor" data-bind="
-            visible: statementType() === 'text' || statementType() !== 'text' && externalStatementLoaded(),
-            css: {
-              'single-snippet-editor ace-editor-resizable' : $root.editorMode(),
-              'active-editor': inFocus
+        <ace-editor-ko-bridge data-bind="
+          vueEvents: {
+            'ace-created': function (event) {
+              ace(event.detail);
             },
-            attr: {
-              id: id
+            'cursor-changed': function (event) {
+              aceCursorPosition(event.detail);
             },
-            delayedOverflow: 'slow',
-            aceEditor: {
-              snippet: $data,
-              contextTooltip: '${ _ko("Right-click for details") }',
-              expandStar: '${ _ko("Right-click to expand with columns") }',
-##               highlightedRange: result.statement_range,
-              readOnly: $root.isPresentationMode(),
-              aceOptions: {
-                showLineNumbers: $root.editorMode(),
-                showGutter: $root.editorMode(),
-                maxLines: $root.editorMode() ? null : 25,
-                minLines: $root.editorMode() ? null : 3
-              }
+            'create-new-doc': function () {
+              huePubSub.publish('editor.create.new');
             },
-            style: {
-              'opacity': statementType() !== 'text' || $root.isPresentationMode() ? '0.75' : '1',
-              'min-height': $root.editorMode() ? '0' : '48px',
-              'top': $root.editorMode() && statementType() !== 'text' ? '60px' : '0'
+            'save-doc': function () {
+              huePubSub.publish('editor.save');
+            },
+            'toggle-presentation-mode': function () {
+              huePubSub.publish('editor.presentation.toggle');
+            },
+            'value-changed': function (event) {
+              statement_raw(event.detail);
             }
-          "></div>
-        <!-- ko component: { name: 'hueAceAutocompleter', params: { editor: ace.bind($data), snippet: $data } } --><!-- /ko -->
+          },
+          vueKoProps: {
+            executor: executor,
+            valueObservable: statement_raw,
+            cursorPositionObservable: aceCursorPosition,
+            idObservable: id,
+            aceOptions: {
+              showLineNumbers: $root.editorMode(),
+              showGutter: $root.editorMode(),
+              maxLines: $root.editorMode() ? null : 25,
+              minLines: $root.editorMode() ? null : 3
+            }
+          }
+        "></ace-editor-ko-bridge>
         <!-- ko component: { name: 'hue-editor-droppable-menu', params: { editor: ace.bind($data), parentDropTarget: '.editor' } } --><!-- /ko -->
+
+##         <div class="ace-editor" data-bind="
+##             visible: statementType() === 'text' || statementType() !== 'text' && externalStatementLoaded(),
+##             css: {
+##               'single-snippet-editor ace-editor-resizable' : $root.editorMode(),
+##               'active-editor': inFocus
+##             },
+##             attr: {
+##               id: id
+##             },
+##             delayedOverflow: 'slow',
+##             aceEditor: {
+##               snippet: $data,
+##               contextTooltip: '${ _ko("Right-click for details") }',
+##               expandStar: '${ _ko("Right-click to expand with columns") }',
+## ##               highlightedRange: result.statement_range,
+##               readOnly: $root.isPresentationMode(),
+##               aceOptions: {
+##                 showLineNumbers: $root.editorMode(),
+##                 showGutter: $root.editorMode(),
+##                 maxLines: $root.editorMode() ? null : 25,
+##                 minLines: $root.editorMode() ? null : 3
+##               }
+##             },
+##             style: {
+##               'opacity': statementType() !== 'text' || $root.isPresentationMode() ? '0.75' : '1',
+##               'min-height': $root.editorMode() ? '0' : '48px',
+##               'top': $root.editorMode() && statementType() !== 'text' ? '60px' : '0'
+##             }
+##           "></div>
+##         <!-- ko component: { name: 'hueAceAutocompleter', params: { editor: ace.bind($data), snippet: $data } } --><!-- /ko -->
+##         <!-- ko component: { name: 'hue-editor-droppable-menu', params: { editor: ace.bind($data), parentDropTarget: '.editor' } } --><!-- /ko -->
       </div>
 
       <div class="clearfix"></div>
@@ -1209,15 +1245,9 @@
   </script>
 
   <script type="text/html" id="snippet-code-resizer${ suffix }">
-    <div class="snippet-code-resizer" data-bind="
-        aceResizer : {
-          snippet: $data,
-          target: '.ace-container-resizable',
-          onStart: function () { huePubSub.publish('result.grid.hide.fixed.headers') },
-          onStop: function () { huePubSub.publish('result.grid.redraw.fixed.headers') }
-        }">
-      <i class="fa fa-ellipsis-h"></i>
-    </div>
+    <editor-resizer-ko-bridge data-bind="vueKoProps: {
+      editorObservable: ace
+    }"></editor-resizer-ko-bridge>
   </script>
 
   <script type="text/html" id="notebook-snippet-type-controls${ suffix }">
@@ -1238,10 +1268,10 @@
   <script type ="text/html" id="snippet-execution-controls${ suffix }">
     <div class="snippet-actions clearfix">
       <div class="pull-left">
-        <sql-editor data-bind="vueKoProps: {
+        <executable-actions-ko-bridge data-bind="vueKoProps: {
           executableObservable: activeExecutable,
           beforeExecute: beforeExecute
-        }"></sql-editor>
+        }"></executable-actions-ko-bridge>
       </div>
       <!-- ko if: isSqlDialect() && !$root.isPresentationMode() -->
       <div class="pull-right" data-bind="component: { name: 'snippet-editor-actions', params: { snippet: $data } }"></div>
@@ -1453,6 +1483,12 @@
         presto: {
           placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
           aceMode: 'ace/mode/presto',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
+        dasksql: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/dasksql',
           snippetIcon: 'fa-database',
           sqlDialect: true
         },

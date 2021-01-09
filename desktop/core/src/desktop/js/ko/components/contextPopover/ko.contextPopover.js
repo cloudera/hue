@@ -16,25 +16,26 @@
 
 import $ from 'jquery';
 import * as ko from 'knockout';
+import { CancellablePromise } from '../../../api/cancellablePromise';
 
-import apiHelper from 'api/apiHelper';
 import AsteriskContextTabs from './asteriskContextTabs';
 import CollectionContextTabs from './collectionContextTabs';
-import contextCatalog from 'catalog/contextCatalog';
-import dataCatalog from 'catalog/dataCatalog';
 import DataCatalogContext from './dataCatalogContext';
 import DocumentContext, { DOCUMENT_CONTEXT_TEMPLATE } from './documentContext';
 import FunctionContextTabs, { FUNCTION_CONTEXT_TEMPLATE } from './functionContext';
-import huePubSub from 'utils/huePubSub';
-import I18n from 'utils/i18n';
+import { DOCUMENT_CONTEXT_FOOTER } from './ko.documentContextFooter';
 import LangRefContext from './langRefContext';
 import PartitionContext, { PARTITION_CONTEXT_TEMPLATE } from './partitionContext';
 import ResizeHelper from './resizeHelper';
 import StorageContext from './storageContext';
+import contextCatalog from 'catalog/contextCatalog';
+import dataCatalog from 'catalog/dataCatalog';
 import { ASSIST_KEY_COMPONENT } from 'ko/components/assist/ko.assistKey';
 import componentUtils from 'ko/components/componentUtils';
 import { findEditorConnector, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
-import { DOCUMENT_CONTEXT_FOOTER } from './ko.documentContextFooter';
+import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
+import { getFromLocalStorage } from 'utils/storageUtils';
 
 export const CONTEXT_POPOVER_CLASS = 'hue-popover';
 export const HIDE_CONTEXT_POPOVER_EVENT = 'context.popover.hide';
@@ -569,7 +570,7 @@ class ContextPopoverViewModel {
     self.left = ko.observable(0);
     self.top = ko.observable(0);
 
-    const popoverSize = apiHelper.getFromTotalStorage('assist', 'popover.size', {
+    const popoverSize = getFromLocalStorage('assist.popover.size', {
       width: 450,
       height: 400
     });
@@ -939,9 +940,11 @@ class SqlContextContentsGlobalSearch {
             path: path,
             definition: { type: params.data.type.toLowerCase() }
           })
-          .done(catalogEntry => {
+          .then(catalogEntry => {
             catalogEntry.navigatorMeta = params.data;
-            catalogEntry.navigatorMetaPromise = $.Deferred().resolve(catalogEntry.navigatorMeta);
+            catalogEntry.navigatorMetaPromise = CancellablePromise.resolve(
+              catalogEntry.navigatorMeta
+            );
             catalogEntry.saveLater();
             self.contents(new DataCatalogContext({ popover: self, catalogEntry: catalogEntry }));
           });

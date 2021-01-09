@@ -28,7 +28,7 @@ import sys
 import time
 import zipfile
 
-from datetime import datetime,  timedelta
+from datetime import datetime, timedelta
 from string import Template
 from itertools import chain
 
@@ -120,7 +120,13 @@ class Job(models.Model):
   """
   Base class for Oozie Workflows, Coordinators and Bundles.
   """
-  owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Person who can modify the job.')) # Deprecated
+  owner = models.ForeignKey(
+    User,
+    on_delete=models.CASCADE,
+    db_index=True,
+    verbose_name=_t('Owner'),
+    help_text=_t('Person who can modify the job.')
+  ) # Deprecated
   name = models.CharField(max_length=255, blank=False, validators=[name_validator], # Deprecated
       help_text=_t('Name of the job, which must be unique per user.'), verbose_name=_t('Name'))
   description = models.CharField(max_length=1024, blank=True, verbose_name=_t('Description'), # Deprecated
@@ -340,8 +346,8 @@ class WorkflowManager(models.Manager):
 
 class Workflow(Job):
   is_single = models.BooleanField(default=False)
-  start = models.ForeignKey('Start', related_name='start_workflow', blank=True, null=True)
-  end  = models.ForeignKey('End', related_name='end_workflow',  blank=True, null=True)
+  start = models.ForeignKey('Start', on_delete=models.CASCADE, related_name='start_workflow', blank=True, null=True)
+  end = models.ForeignKey('End', on_delete=models.CASCADE, related_name='end_workflow', blank=True, null=True)
   job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
                                           'Properties specified in the Job Properties element override properties specified in the '
@@ -554,7 +560,9 @@ class Workflow(Job):
     actions_index = dict([(action.name, action) for action in actions])
     controls_index = dict([(control.name.strip(':'), control) for control in controls])
 
-    return django_mako.render_to_string(template, {'nodes': self.get_hierarchy(), 'index': index, 'actions': actions_index, 'controls': controls_index})
+    return django_mako.render_to_string(
+      template, {'nodes': self.get_hierarchy(), 'index': index, 'actions': actions_index, 'controls': controls_index}
+    )
 
   @classmethod
   def gen_status_graph_from_xml(cls, user, oozie_workflow):
@@ -566,7 +574,7 @@ class Workflow(Job):
         workflow.save()
 
         import_workflow(workflow, oozie_workflow.definition)
-        graph =  workflow.gen_status_graph(oozie_workflow)
+        graph = workflow.gen_status_graph(oozie_workflow)
         node_list = workflow.node_list
         workflow.delete(skip_trash=True)
         return graph, node_list
@@ -630,8 +638,8 @@ class Link(models.Model):
   # Links to exclude when using get_children_link(), get_parent_links() in the API
   META_LINKS = ('related',)
 
-  parent = models.ForeignKey('Node', related_name='child_node')
-  child = models.ForeignKey('Node', related_name='parent_node', verbose_name='')
+  parent = models.ForeignKey('Node', on_delete=models.CASCADE, related_name='child_node')
+  child = models.ForeignKey('Node', on_delete=models.CASCADE, related_name='parent_node', verbose_name='')
 
   name = models.CharField(max_length=40)
   comment = models.CharField(max_length=1024, default='', blank=True)
@@ -662,7 +670,7 @@ class Node(models.Model):
                                  help_text=_t('The purpose of the action.'))
   node_type = models.CharField(max_length=64, blank=False, verbose_name=_t('Type'),
                                help_text=_t('The type of action (e.g. MapReduce, Pig...)'))
-  workflow = models.ForeignKey(Workflow)
+  workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE)
   children = models.ManyToManyField('self', related_name='parents', symmetrical=False, through=Link)
   data = models.TextField(blank=True, default=json.dumps({}))
 
@@ -871,8 +879,11 @@ class Mapreduce(Action):
       help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
   job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production)'))
-  jar_path = models.CharField(max_length=PATH_MAX, verbose_name=_t('Jar name'),
-                              help_text=_t('Name or path to the %(program)s jar file on HDFS. E.g. examples.jar.') % {'program': 'MapReduce'})
+  jar_path = models.CharField(
+    max_length=PATH_MAX,
+    verbose_name=_t('Jar name'),
+    help_text=_t('Name or path to the %(program)s jar file on HDFS. E.g. examples.jar.') % {'program': 'MapReduce'}
+  )
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
                               help_text=_t('List of absolute paths to delete and then to create before starting the application. '
                                            'This should be used exclusively for directory cleanup.'))
@@ -948,11 +959,14 @@ class Java(Action):
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
                                           'Properties specified in the Job Properties element override properties specified in the '
                                           'files specified in the Job XML element.'))
-  capture_output = models.BooleanField(default=False, verbose_name=_t('Capture output'),
-                              help_text=_t('Capture output of the stdout of the %(program)s command execution. The %(program)s '
-                                           'command output must be in Java Properties file format and it must not exceed 2KB. '
-                                           'From within the workflow definition, the output of an %(program)s action node is accessible '
-                                           'via the String action:output(String node, String key) function') % {'program': node_type.title()})
+  capture_output = models.BooleanField(
+    default=False,
+    verbose_name=_t('Capture output'),
+    help_text=_t('Capture output of the stdout of the %(program)s command execution. The %(program)s '
+                  'command output must be in Java Properties file format and it must not exceed 2KB. '
+                  'From within the workflow definition, the output of an %(program)s action node is accessible '
+                  'via the String action:output(String node, String key) function') % {'program': node_type.title()}
+  )
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -1009,10 +1023,17 @@ class Hive(Action):
   PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares', 'sla', 'credentials')
   node_type = 'hive'
 
-  script_path = models.CharField(max_length=256, blank=False, verbose_name=_t('Script name'),
-                                 help_text=_t('Script name or path to the %(type)s script. E.g. my_script.sql.') % {'type': node_type.title()})
-  params = models.TextField(default="[]", verbose_name=_t('Parameters'),
-                            help_text=_t('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': node_type.title()})
+  script_path = models.CharField(
+    max_length=256,
+    blank=False,
+    verbose_name=_t('Script name'),
+    help_text=_t('Script name or path to the %(type)s script. E.g. my_script.sql.') % {'type': node_type.title()}
+  )
+  params = models.TextField(
+    default="[]",
+    verbose_name=_t('Parameters'),
+    help_text=_t('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': node_type.title()}
+  )
   files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
@@ -1023,8 +1044,14 @@ class Hive(Action):
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
                               help_text=_t('List of absolute paths to delete, then create, before starting the application. '
                                            'This should be used exclusively for directory cleanup.'))
-  job_xml = models.CharField(max_length=PATH_MAX, default='hive-config.xml', blank=True, verbose_name=_t('Job XML'),
-                             help_text=_t('Refer to a Hive hive-config.xml file bundled in the workflow deployment directory. Pick a name different than hive-site.xml.'))
+  job_xml = models.CharField(
+    max_length=PATH_MAX,
+    default='hive-config.xml',
+    blank=True,
+    verbose_name=_t('Job XML'),
+    help_text=_t('Refer to a Hive hive-config.xml file bundled in the workflow deployment directory. '
+                 'Pick a name different than hive-site.xml.')
+  )
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -1046,9 +1073,13 @@ class Sqoop(Action):
   PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares', 'sla', 'credentials')
   node_type = 'sqoop'
 
-  script_path = models.TextField(blank=True, verbose_name=_t('Command'), default='',
-                                 help_text=_t('The full %(type)s command. Either put it here or split it by spaces and insert the parts as multiple parameters below.')
-                                             % {'type': node_type.title()})
+  script_path = models.TextField(
+    blank=True,
+    verbose_name=_t('Command'),
+    default='',
+    help_text=_t('The full %(type)s command. Either put it here or split it by spaces and insert the parts as multiple parameters below.')
+                % {'type': node_type.title()}
+  )
   params = models.TextField(default="[]", verbose_name=_t('Parameters'),
                             help_text=_t('If no command is specified, split the command by spaces and insert the %(type)s parameters '
                                          'here e.g. import, --connect, jdbc:hsqldb:file:db.hsqldb, ...') % {'type': node_type.title()})
@@ -1095,11 +1126,14 @@ class Ssh(Action):
                              help_text=_t('The command that will be executed.'))
   params = models.TextField(default="[]", verbose_name=_t('Arguments'),
                             help_text=_t('The arguments of the %(type)s command.')  % {'type': node_type.title()})
-  capture_output = models.BooleanField(default=False, verbose_name=_t('Capture output'),
-                              help_text=_t('Capture output of the stdout of the %(program)s command execution. The %(program)s '
-                                           'command output must be in Java properties file format and it must not exceed 2KB. '
-                                           'From within the workflow definition, the output of an %(program)s action node is accessible '
-                                           'via the String action:output(String node, String key) function') % {'program': node_type.title()})
+  capture_output = models.BooleanField(
+    default=False,
+    verbose_name=_t('Capture output'),
+    help_text=_t('Capture output of the stdout of the %(program)s command execution. The %(program)s '
+                  'command output must be in Java properties file format and it must not exceed 2KB. '
+                  'From within the workflow definition, the output of an %(program)s action node is accessible '
+                  'via the String action:output(String node, String key) function') % {'program': node_type.title()}
+  )
 
   def get_params(self):
     return json.loads(self.params)
@@ -1126,11 +1160,14 @@ class Shell(Action):
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
                                           'Properties specified in the Job Properties element override properties specified in the '
                                           'files specified in the Job XML element.'))
-  capture_output = models.BooleanField(default=False, verbose_name=_t('Capture output'),
-                              help_text=_t('Capture output of the stdout of the %(program)s command execution. The %(program)s '
-                                           'command output must be in Java Properties file format and it must not exceed 2KB. '
-                                           'From within the workflow definition, the output of an %(program)s action node is accessible '
-                                           'via the String action:output(String node, String key) function') % {'program': node_type.title()})
+  capture_output = models.BooleanField(
+    default=False,
+    verbose_name=_t('Capture output'),
+    help_text=_t('Capture output of the stdout of the %(program)s command execution. The %(program)s '
+                  'command output must be in Java Properties file format and it must not exceed 2KB. '
+                  'From within the workflow definition, the output of an %(program)s action node is accessible '
+                  'via the String action:output(String node, String key) function') % {'program': node_type.title()}
+  )
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -1152,9 +1189,12 @@ class DistCp(Action):
   PARAM_FIELDS = ('job_properties', 'params', 'prepares', 'sla', 'credentials')
   node_type = 'distcp'
 
-  params = models.TextField(default="[]", verbose_name=_t('Arguments'),
-                            help_text=_t('The arguments of the %(type)s command. Put options first, then source paths, then destination path.')
-                                        % {'type': node_type.title()})
+  params = models.TextField(
+    default="[]",
+    verbose_name=_t('Arguments'),
+    help_text=_t('The arguments of the %(type)s command. Put options first, then source paths, then destination path.')
+                % {'type': node_type.title()}
+  )
   job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
@@ -1188,9 +1228,13 @@ class Fs(Action):
                                          'If the directory already exist it does a no-op.'))
   moves = models.TextField(default="[]", verbose_name=_t('Move file'), blank=True,
                             help_text=_t('Move a file or directory to another path.'))
-  chmods = models.TextField(default="[]", verbose_name=_t('Change permissions'), blank=True,
-                            help_text=_t('Change the permissions for the specified path. Permissions can be specified using the Unix Symbolic '
-                                         'representation (e.g. -rwxrw-rw-) or an octal representation (755).'))
+  chmods = models.TextField(
+    default="[]",
+    verbose_name=_t('Change permissions'),
+    blank=True,
+    help_text=_t('Change the permissions for the specified path. Permissions can be specified using the Unix Symbolic '
+                  'representation (e.g. -rwxrw-rw-) or an octal representation (755).')
+  )
   touchzs = models.TextField(default="[]", verbose_name=_t('Create or touch a file'), blank=True,
                             help_text=_t('Creates a zero length file in the specified path if none exists or touch it.'))
 
@@ -1225,12 +1269,22 @@ class SubWorkflow(Action):
   PARAM_FIELDS = ('subworkflow', 'propagate_configuration', 'job_properties', 'sla', 'credentials')
   node_type = 'subworkflow'
 
-  sub_workflow = models.ForeignKey(Workflow, default=None, db_index=True, blank=True, null=True, verbose_name=_t('Sub-workflow'),
-                            help_text=_t('The sub-workflow application to include. You must own all the sub-workflows.'))
+  sub_workflow = models.ForeignKey(
+    Workflow,
+    on_delete=models.CASCADE,
+    default=None,
+    db_index=True,
+    blank=True, null=True,
+    verbose_name=_t('Sub-workflow'),
+    help_text=_t('The sub-workflow application to include. You must own all the sub-workflows.')
+  )
   propagate_configuration = models.BooleanField(default=True, verbose_name=_t('Propagate configuration'), blank=True,
                             help_text=_t('If the workflow job configuration should be propagated to the child workflow.'))
-  job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
-                                    help_text=_t('Can be used to specify the job properties that are required to run the child workflow job.'))
+  job_properties = models.TextField(
+    default='[]',
+    verbose_name=_t('Hadoop job properties'),
+    help_text=_t('Can be used to specify the job properties that are required to run the child workflow job.')
+  )
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -1240,17 +1294,21 @@ class Generic(Action):
   PARAM_FIELDS = ('xml', 'credentials', 'sla', 'credentials')
   node_type = 'generic'
 
-  xml = models.TextField(default='', verbose_name=_t('XML of the custom action'),
-                         help_text=_t('This will be inserted verbatim in the action %(action)s. '
-                                      'E.g. all the XML content like %(xml_action)s '
-                                      'will be inserted into the action and produce %(full_action)s') % {
-                                      'action': '&lt;action name="email"&gt;...&lt;/action&gt;',
-                                      'xml_action': '&lt;email&gt;&lt;cc&gt;hue@hue.org&lt;/cc&gt;&lt;/email&gt;',
-                                      'full_action': '&lt;action name="email"&gt;&lt;email&gt;&lt;cc&gt;hue@hue.org&lt;/cc&gt;&lt;/email&gt;&lt;ok/&gt;&lt;error/&gt;&lt;/action&gt;'})
+  xml = models.TextField(
+    default='',
+    verbose_name=_t('XML of the custom action'),
+    help_text=_t('This will be inserted verbatim in the action %(action)s. '
+                'E.g. all the XML content like %(xml_action)s '
+                'will be inserted into the action and produce %(full_action)s') % {
+                'action': '&lt;action name="email"&gt;...&lt;/action&gt;',
+                'xml_action': '&lt;email&gt;&lt;cc&gt;hue@hue.org&lt;/cc&gt;&lt;/email&gt;',
+                'full_action': '&lt;action name="email"&gt;&lt;email&gt;&lt;cc&gt;hue@hue.org&lt;'
+                '/cc&gt;&lt;/email&gt;&lt;ok/&gt;&lt;error/&gt;&lt;/action&gt;'}
+  )
 
 
-Action.types = (Mapreduce.node_type, Streaming.node_type, Java.node_type, Pig.node_type, Hive.node_type, Sqoop.node_type, Ssh.node_type, Shell.node_type,
-                DistCp.node_type, Fs.node_type, Email.node_type, SubWorkflow.node_type, Generic.node_type)
+Action.types = (Mapreduce.node_type, Streaming.node_type, Java.node_type, Pig.node_type, Hive.node_type, Sqoop.node_type, Ssh.node_type,
+  Shell.node_type, DistCp.node_type, Fs.node_type, Email.node_type, SubWorkflow.node_type, Generic.node_type)
 
 
 class ControlFlow(Node):
@@ -1411,13 +1469,19 @@ class Coordinator(Job):
                                                            'data is periodically created.')) # unused
   frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days', verbose_name=_t('Frequency unit'),
                                     help_text=_t('The unit of the rate at which data is periodically created.')) # unused
-  timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles', verbose_name=_t('Timezone'),
-                              help_text=_t('The timezone of the coordinator. Only used for managing the daylight saving time changes when combining several coordinators.'))
+  timezone = models.CharField(
+    max_length=24,
+    choices=TIMEZONES,
+    default='America/Los_Angeles',
+    verbose_name=_t('Timezone'),
+    help_text=_t('The timezone of the coordinator. '
+      'Only used for managing the daylight saving time changes when combining several coordinators.')
+  )
   start = models.DateTimeField(auto_now=True, verbose_name=_t('Start'),
                                help_text=_t('When to start the first workflow.'))
   end = models.DateTimeField(auto_now=True, verbose_name=_t('End'),
                              help_text=_t('When to start the last workflow.'))
-  coordinatorworkflow = models.ForeignKey(Workflow, null=True, verbose_name=_t('Workflow'),
+  coordinatorworkflow = models.ForeignKey(Workflow, on_delete=models.CASCADE, null=True, verbose_name=_t('Workflow'),
                                help_text=_t('The workflow to schedule repeatedly.'))
   timeout = models.SmallIntegerField(null=True, blank=True, verbose_name=_t('Timeout'),
                                      help_text=_t('Number of minutes the coordinator action will be in '
@@ -1433,11 +1497,19 @@ class Coordinator(Job):
                                               'actions in the coordinator engine. The different execution strategies are \'oldest first\', '
                                               '\'newest first\' and \'last one only\'. A backlog normally happens because of delayed '
                                               'input data, concurrency control or because manual re-runs of coordinator jobs.'))
-  throttle = models.PositiveSmallIntegerField(null=True, blank=True, choices=FREQUENCY_NUMBERS, verbose_name=_t('Throttle'),
-                                 help_text=_t('The materialization or creation throttle value for its coordinator actions. '
-                                              'Number of maximum coordinator actions that are allowed to be in WAITING state concurrently.'))
-  job_properties = models.TextField(default='[]', verbose_name=_t('Workflow properties'),
-                                    help_text=_t('Additional properties to transmit to the workflow, e.g. limit=100, and EL functions, e.g. username=${coord:user()}'))
+  throttle = models.PositiveSmallIntegerField(
+    null=True,
+    blank=True,
+    choices=FREQUENCY_NUMBERS,
+    verbose_name=_t('Throttle'),
+    help_text=_t('The materialization or creation throttle value for its coordinator actions. '
+                'Number of maximum coordinator actions that are allowed to be in WAITING state concurrently.')
+  )
+  job_properties = models.TextField(
+    default='[]',
+    verbose_name=_t('Workflow properties'),
+    help_text=_t('Additional properties to transmit to the workflow, e.g. limit=100, and EL functions, e.g. username=${coord:user()}')
+  )
 
   HUE_ID = 'hue-id-c'
   ICON = 'oozie/art/icon_oozie_coordinator_48.png'
@@ -1459,7 +1531,8 @@ class Coordinator(Job):
     if mapping is None:
       mapping = {}
     tmpl = "editor/gen/coordinator.xml.mako"
-    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace')
+    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', 
+      django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace')
 
   def clone(self, new_owner=None):
     datasets = Dataset.objects.filter(coordinator=self)
@@ -1648,6 +1721,8 @@ class Coordinator(Job):
     data_['cron_frequency'] = cron_frequency
     self.data = json.dumps(data_)
 
+  class Meta(object):
+    manager_inheritance_from_future = True
 
 class DatasetManager(models.Manager):
   def can_read_or_exception(self, request, dataset_id):
@@ -1684,24 +1759,43 @@ class Dataset(models.Model):
                                                            'data is periodically created.'))
   frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days', verbose_name=_t('Frequency unit'),
                                     help_text=_t('The unit of the rate at which data is periodically created.'))
-  uri = models.CharField(max_length=1024, default='/data/${YEAR}${MONTH}${DAY}', verbose_name=_t('URI'),
-                         help_text=_t('The URI template that identifies the dataset and can be resolved into concrete URIs to identify a particular '
-                                      'dataset instance. The URI consist of constants (e.g. ${YEAR}/${MONTH}) and '
-                                      'configuration properties (e.g. /home/${USER}/projects/${PROJECT})'))
-  timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles', verbose_name=_t('Timezone'),
-                              help_text=_t('The timezone of the dataset. Only used for managing the daylight saving time changes when combining several datasets.'))
+  uri = models.CharField(
+    max_length=1024,
+    default='/data/${YEAR}${MONTH}${DAY}',
+    verbose_name=_t('URI'),
+    help_text=_t('The URI template that identifies the dataset and can be resolved into concrete URIs to identify a particular '
+                'dataset instance. The URI consist of constants (e.g. ${YEAR}/${MONTH}) and '
+                'configuration properties (e.g. /home/${USER}/projects/${PROJECT})')
+  )
+  timezone = models.CharField(
+    max_length=24,
+    choices=TIMEZONES,
+    default='America/Los_Angeles',
+    verbose_name=_t('Timezone'),
+    help_text=_t('The timezone of the dataset. Only used for managing the daylight saving time changes when combining several datasets.')
+  )
   done_flag = models.CharField(max_length=64, blank=True, default='', verbose_name=_t('Done flag'),
                                help_text=_t('The done file for the data set. If the Done flag is not specified, then Oozie '
                                             'configures Hadoop to create a _SUCCESS file in the output directory. If Done '
                                             'flag is set to empty, then Coordinator looks for the existence of the directory itself.'))
-  coordinator = models.ForeignKey(Coordinator, verbose_name=_t('Coordinator'),
+  coordinator = models.ForeignKey(Coordinator, on_delete=models.CASCADE, verbose_name=_t('Coordinator'),
                                   help_text=_t('The coordinator associated with this data.'))
   instance_choice = models.CharField(max_length=10, default='default', verbose_name=_t('Instance type'),
                                help_text=_t('Customize the date instance(s), e.g. define a range of dates, use EL functions...'))
-  advanced_start_instance  = models.CharField(max_length=128, default='0', verbose_name=_t('Start instance'),
-                               help_text=_t('Shift the frequency for gettting past/future start date or enter verbatim the Oozie start instance, e.g. ${coord:current(0)}'))
-  advanced_end_instance  = models.CharField(max_length=128, blank=True, default='0', verbose_name=_t('End instance'),
-                               help_text=_t('Optional: Shift the frequency for gettting past/future end dates or enter verbatim the Oozie end instance.'))
+  advanced_start_instance = models.CharField(
+    max_length=128,
+    default='0',
+    verbose_name=_t('Start instance'),
+    help_text=_t('Shift the frequency for gettting past/future start date or enter verbatim the Oozie start instance, '
+                 'e.g. ${coord:current(0)}')
+  )
+  advanced_end_instance = models.CharField(
+    max_length=128,
+    blank=True,
+    default='0',
+    verbose_name=_t('End instance'),
+    help_text=_t('Optional: Shift the frequency for gettting past/future end dates or enter verbatim the Oozie end instance.')
+  )
 
   objects = DatasetManager()
 
@@ -1753,23 +1847,27 @@ class Dataset(models.Model):
 class DataInput(models.Model):
   name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_t('Name of an input variable in the workflow.'),
                           help_text=_t('The name of the variable of the workflow to automatically fill up.'))
-  dataset = models.OneToOneField(Dataset, verbose_name=_t('The dataset representing format of the data input.'),
+  dataset = models.OneToOneField(Dataset, on_delete=models.CASCADE, verbose_name=_t('The dataset representing format of the data input.'),
                                  help_text=_t('The pattern of the input data we want to process.'))
-  coordinator = models.ForeignKey(Coordinator)
+  coordinator = models.ForeignKey(Coordinator, on_delete=models.CASCADE)
 
 
 class DataOutput(models.Model):
   name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_t('Name of an output variable in the workflow'),
                           help_text=_t('The name of the variable of the workflow to automatically filled up.'))
-  dataset = models.OneToOneField(Dataset, verbose_name=_t('The dataset representing the format of the data output.'),
-                                 help_text=_t('The pattern of the output data we want to generate.'))
-  coordinator = models.ForeignKey(Coordinator)
+  dataset = models.OneToOneField(
+    Dataset,
+    on_delete=models.CASCADE,
+    verbose_name=_t('The dataset representing the format of the data output.'),
+    help_text=_t('The pattern of the output data we want to generate.')
+  )
+  coordinator = models.ForeignKey(Coordinator, on_delete=models.CASCADE)
 
 
 class BundledCoordinator(models.Model):
-  bundle = models.ForeignKey('Bundle', verbose_name=_t('Bundle'),
+  bundle = models.ForeignKey('Bundle', on_delete=models.CASCADE, verbose_name=_t('Bundle'),
                              help_text=_t('The bundle regrouping all the coordinators.'))
-  coordinator = models.ForeignKey(Coordinator, verbose_name=_t('Coordinator'),
+  coordinator = models.ForeignKey(Coordinator, on_delete=models.CASCADE, verbose_name=_t('Coordinator'),
                                   help_text=_t('The coordinator to batch with other coordinators.'))
 
   parameters = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', verbose_name=_t('Parameters'),
@@ -1888,6 +1986,8 @@ class Bundle(Job):
     xml = zfile.read('bundle.xml')
     return xml, metadata
 
+  class Meta(object):
+    manager_inheritance_from_future = True
 
 class HistoryManager(models.Manager):
   def create_from_submission(self, submission):
@@ -1901,10 +2001,10 @@ class History(models.Model):
   """
   Contains information on submitted workflows/coordinators.
   """
-  submitter = models.ForeignKey(User, db_index=True)
+  submitter = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
   submission_date = models.DateTimeField(auto_now=True, db_index=True)
   oozie_job_id = models.CharField(max_length=128)
-  job = models.ForeignKey(Job, db_index=True)
+  job = models.ForeignKey(Job, on_delete=models.CASCADE, db_index=True)
   properties = models.TextField()
 
   objects = HistoryManager()

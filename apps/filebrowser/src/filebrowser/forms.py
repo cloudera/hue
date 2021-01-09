@@ -127,13 +127,13 @@ class SetReplicationFactorForm(forms.Form):
 class UploadFileForm(forms.Form):
   op = "upload"
   # The "hdfs" prefix in "hdfs_file" triggers the HDFSfileUploadHandler
-  hdfs_file = FileField(forms.Form, label=_("File to Upload"))
+  hdfs_file = FileField(label=_("File to Upload"))
   dest = PathField(label=_("Destination Path"), help_text=_("Filename or directory to upload to."))
   extract_archive = BooleanField(required=False)
 
 class UploadArchiveForm(forms.Form):
   op = "upload"
-  archive = FileField(forms.Form, label=_("Archive to Upload"))
+  archive = FileField(label=_("Archive to Upload"))
   dest = PathField(label=_("Destination Path"), help_text=_("Archive to upload to."))
 
 class RemoveForm(forms.Form):
@@ -189,8 +189,8 @@ class ChownForm(forms.Form):
   def __init__(self, *args, **kwargs):
     super(ChownForm, self).__init__(*args, **kwargs)
 
-    self.all_groups = [ group.name for group in Group.objects.all() ]
-    self.all_users = [ user.username for user in User.objects.all() ]
+    self.all_groups = [group.name for group in Group.objects.all()]
+    self.all_users = [user.username for user in User.objects.all()]
 
 class BaseChownFormSet(FormSet):
   op = "chown"

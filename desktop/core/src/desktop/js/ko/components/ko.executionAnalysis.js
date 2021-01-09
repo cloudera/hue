@@ -163,11 +163,11 @@ class ExecutionAnalysis {
         compute: compute,
         queryId: queryId
       })
-      .done(response => {
+      .then(response => {
         const analysis = response.query;
         self.analysis(analysis);
       })
-      .always(() => {
+      .finally(() => {
         self.loading(false);
       });
   }

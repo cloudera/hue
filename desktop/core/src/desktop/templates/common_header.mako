@@ -135,7 +135,7 @@ if USE_NEW_EDITOR.get():
 
   ${ commonHeaderFooterComponents.header_i18n_redirection() }
 
-  % if user.is_authenticated():
+  % if user.is_authenticated:
   <%
     global_constants_url = '/desktop/globalJsConstants.js?v=' + hue_version()
   %>
@@ -158,13 +158,13 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
 
-% if user.is_authenticated():
+% if user.is_authenticated:
   ${ hueAceAutocompleter.hueAceAutocompleter() }
 %endif
 
   ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 
-% if user.is_authenticated():
+% if user.is_authenticated:
   <script src="${ static('desktop/ext/js/localforage.min.js') }"></script>
 
   <script type="text/javascript">
@@ -223,7 +223,7 @@ ${ hueIcons.symbols() }
 <div class="navigator">
   <div class="pull-right">
 
-  % if user.is_authenticated() and section != 'login':
+  % if user.is_authenticated and section != 'login':
   <ul class="nav nav-pills">
     <li class="divider-vertical"></li>
     % if 'filebrowser' in apps:
@@ -299,7 +299,7 @@ ${ hueIcons.symbols() }
       <ul class="dropdown-menu pull-right">
       % if view_profile:
       <li>
-        <a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-fw fa-key"></i>
+        <a href="${ url('useradmin:useradmin.views.edit_user', username=user.username) }"><i class="fa fa-fw fa-key"></i>
           % if is_ldap_setup:
             ${_('View Profile')}
           % else:
@@ -308,7 +308,7 @@ ${ hueIcons.symbols() }
         </a>
       </li>
         % if is_admin(user):
-          <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
+          <li><a href="${ url('useradmin:useradmin.views.list_users') }"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
         % endif
       % endif
       </ul>
@@ -329,7 +329,7 @@ ${ hueIcons.symbols() }
         <use xlink:href="#hi-logo"></use>
       </svg>
     </a>
-    % if user.is_authenticated() and section != 'login':
+    % if user.is_authenticated and section != 'login':
      <ul class="nav nav-pills pull-left">
        <li><a title="${_('My documents')}" data-rel="navigator-tooltip" data-bind="hueLink: '${ home_url }'" style="padding-bottom:2px!important"><i class="fa fa-home" style="font-size: 19px"></i></a></li>
        <%

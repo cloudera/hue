@@ -11,34 +11,34 @@ draft: false
     <div class="parser-scripts-container"></div>
     <select>
       <option value="hiveAutocompleteParser">Hive Autocomplete Parser</option>
-      <option value="hiveSyntaxParser">Hive Syntax Parser</option>
+      <option value="hiveSyntaxParser">Hive Syntax Error Parser</option>
       <option disabled> </option>
       <option value="impalaAutocompleteParser">Impala Autocomplete Parser</option>
-      <option value="impalaSyntaxParser">Impala Syntax Parser</option>
+      <option value="impalaSyntaxParser">Impala Syntax Error Parser</option>
       <option disabled> </option>
       <option value="calciteAutocompleteParser">Calcite Autocomplete Parser</option>
-      <option value="calciteSyntaxParser">Calcite Syntax Parser</option>
+      <option value="calciteSyntaxParser">Calcite Syntax Error Parser</option>
       <option disabled> </option>
       <option value="elasticsearchAutocompleteParser">Elasticsearch Autocomplete Parser</option>
-      <option value="elasticsearchSyntaxParser">Elasticsearch Syntax Parser</option>
+      <option value="elasticsearchSyntaxParser">Elasticsearch Syntax Error Parser</option>
       <option disabled> </option>
       <option value="phoenixAutocompleteParser">Phoenix Autocomplete Parser</option>
-      <option value="phoenixSyntaxParser">Phoenix Syntax Parser</option>
+      <option value="phoenixSyntaxParser">Phoenix Syntax Error Parser</option>
       <option disabled> </option>
       <option value="druidAutocompleteParser">Druid Autocomplete Parser</option>
-      <option value="druidSyntaxParser">Druid Syntax Parser</option>
+      <option value="druidSyntaxParser">Druid Syntax Error Parser</option>
       <option disabled> </option>
       <option value="flinkAutocompleteParser">Flink Autocomplete Parser</option>
-      <option value="flinkSyntaxParser">Flink Syntax Parser</option>
+      <option value="flinkSyntaxParser">Flink Syntax Error Parser</option>
       <option disabled> </option>
       <option value="ksqlAutocompleteParser">Ksql Autocomplete Parser</option>
-      <option value="ksqlSyntaxParser">Ksql Syntax Parser</option>
+      <option value="ksqlSyntaxParser">Ksql Syntax Error Parser</option>
       <option disabled> </option>
       <option value="prestoAutocompleteParser">Presto Autocomplete Parser</option>
-      <option value="prestoSyntaxParser">Presto Syntax Parser</option>
+      <option value="prestoSyntaxParser">Presto Syntax Error Parser</option>
       <option disabled> </option>
       <option value="genericAutocompleteParser">Generic Autocomplete Parser</option>
-      <option value="genericSyntaxParser">Generic Syntax Parser</option>
+      <option value="genericSyntaxParser">Generic Syntax Error Parser</option>
     </select>
     <div class="live-message"></div>
     <label>Query <textarea>

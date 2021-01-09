@@ -150,7 +150,7 @@ def get_key_expiry():
     return 86400
 
 
-HAS_IAM_DETECTION=Config(
+HAS_IAM_DETECTION = Config(
   help=_('Enable the detection of an IAM role providing the credentials automatically. It can take a few seconds.'),
   key='has_iam_detection',
   default=False,
@@ -245,7 +245,9 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
         type=coerce_bool
       ),
       KEY_EXPIRY=Config(
-        help=_('The time in seconds before a delegate key is expired. Used when filebrowser/redirect_download is used. Default to 4 Hours.'),
+        help=_(
+          'The time in seconds before a delegate key is expired. Used when filebrowser/redirect'
+          'download is used. Default to 4 Hours.'),
         key='key_expiry',
         default=14400,
         type=int
@@ -257,7 +259,7 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
 
 def is_enabled():
   return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or \
-      has_iam_metadata()
+      has_iam_metadata() or conf_idbroker.is_idbroker_enabled('s3a')
 
 
 def is_ec2_instance():
@@ -315,7 +317,7 @@ def has_iam_metadata():
 
 def has_s3_access(user):
   from desktop.auth.backend import is_admin
-  return user.is_authenticated() and user.is_active and (is_admin(user) or user.has_hue_permission(action="s3_access", app="filebrowser"))
+  return user.is_authenticated and user.is_active and (is_admin(user) or user.has_hue_permission(action="s3_access", app="filebrowser"))
 
 
 def config_validator(user):

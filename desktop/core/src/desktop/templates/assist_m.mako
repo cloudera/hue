@@ -62,7 +62,10 @@ ${ commonheader_m(_('Assist'), 'assist', user, request) | n,unicode }
       self.apiHelper = window.apiHelper;
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
-      self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+      window.hueUtils.withLocalStorage('assist.assist_panel_visible', self.isLeftPanelVisible, true);
+      self.isLeftPanelVisible.subscribe(function () {
+        huePubSub.publish('assist.forceRender');
+      });
 
       self.sqlSourceTypes = [];
       self.availableLanguages = [];

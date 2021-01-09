@@ -81,7 +81,7 @@ This option currently only works with Hive and relies on Oozie until [HUE-8738](
 
 Flag to enable a lightweight SQL query builder where tables and columns can be dragged & dropped from the left table assist. Not to be confused with the [Query Builder](/user/querying/#dashboards).
 
-**Note** This feature is experimental.
+**Note** This feature is deprecated.
 
       [notebook]
       enable_query_builder=true

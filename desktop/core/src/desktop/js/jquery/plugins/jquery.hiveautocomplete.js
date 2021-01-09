@@ -18,6 +18,7 @@ import $ from 'jquery';
 
 import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
+import { hueLocalStorage } from 'utils/storageUtils';
 
 /*
  * jHue generic autocomplete plugin
@@ -146,14 +147,13 @@ Plugin.prototype.init = function () {
   function smartTooltipMaker() {
     if (
       self.options.smartTooltip !== '' &&
-      typeof $.totalStorage !== 'undefined' &&
-      $.totalStorage('jHueGenericAutocompleteTooltip') !== -1
+      hueLocalStorage('jHueGenericAutocompleteTooltip') !== -1
     ) {
       let cnt = 0;
-      if ($.totalStorage('jHueGenericAutocompleteTooltip')) {
-        cnt = $.totalStorage('jHueGenericAutocompleteTooltip') + 1;
+      if (hueLocalStorage('jHueGenericAutocompleteTooltip')) {
+        cnt = hueLocalStorage('jHueGenericAutocompleteTooltip') + 1;
       }
-      $.totalStorage('jHueGenericAutocompleteTooltip', cnt);
+      hueLocalStorage('jHueGenericAutocompleteTooltip', cnt);
       if (cnt >= self.options.smartTooltipThreshold) {
         $el
           .tooltip({
@@ -166,7 +166,7 @@ Plugin.prototype.init = function () {
         window.setTimeout(() => {
           $el.tooltip('hide');
         }, 10000);
-        $.totalStorage('jHueGenericAutocompleteTooltip', -1);
+        hueLocalStorage('jHueGenericAutocompleteTooltip', -1);
       }
     }
   }
@@ -199,7 +199,7 @@ Plugin.prototype.init = function () {
               compute: compute,
               path: path
             })
-            .done(childEntries => {
+            .then(childEntries => {
               if (
                 childEntries.some(childEntry => {
                   return childEntry.name === target;
@@ -207,7 +207,8 @@ Plugin.prototype.init = function () {
               ) {
                 onPathChange($el.val());
               }
-            });
+            })
+            .catch(() => {});
         });
       }, 500);
     }
@@ -320,13 +321,14 @@ Plugin.prototype.init = function () {
           compute: compute,
           path: []
         })
-        .done(dbEntries => {
+        .then(dbEntries => {
           callback(
             $.map(dbEntries, entry => {
               return entry.name;
             })
           );
-        });
+        })
+        .catch(() => {});
     });
   };
 
@@ -340,8 +342,8 @@ Plugin.prototype.init = function () {
           connector: { id: self.options.apiHelperType },
           path: [database]
         })
-        .done(entry => {
-          entry.getSourceMeta().done(callback);
+        .then(entry => {
+          entry.getSourceMeta().then(callback);
         });
     });
   };
@@ -356,8 +358,8 @@ Plugin.prototype.init = function () {
           connector: { id: self.options.apiHelperType },
           path: [database, table]
         })
-        .done(entry => {
-          entry.getSourceMeta().done(callback);
+        .then(entry => {
+          entry.getSourceMeta().then(callback);
         });
     });
   };

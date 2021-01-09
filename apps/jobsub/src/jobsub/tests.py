@@ -48,7 +48,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
     # Ensure access to MR folder.
     # Need to chmod because jobs are submitted as a
     # different user than what was previously used.
-    for i in range(0,10):
+    for i in range(0, 10):
       try:
         self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/tmp', 0o777, recursive=True)
         break
@@ -64,17 +64,30 @@ class TestJobsubWithHadoop(OozieServerProvider):
     Workflow.objects.all().delete()
 
   def create_design(self):
-    response = self.client.post(reverse('jobsub.views.new_design',
-      kwargs={'node_type': 'mapreduce'}),
-      data={'name': 'sleep_job',
-            'description': '',
-            'node_type': 'mapreduce',
-            'jar_path': '/user/hue/oozie/workspaces/lib/hadoop-examples.jar',
-            'prepares': '[]',
-            'files': '[]',
-            'archives': '[]',
-            'job_properties': '[{\"name\":\"mapred.reduce.tasks\",\"value\":\"1\"},{\"name\":\"mapred.mapper.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.reducer.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.mapoutput.key.class\",\"value\":\"org.apache.hadoop.io.IntWritable\"},{\"name\":\"mapred.mapoutput.value.class\",\"value\":\"org.apache.hadoop.io.NullWritable\"},{\"name\":\"mapred.output.format.class\",\"value\":\"org.apache.hadoop.mapred.lib.NullOutputFormat\"},{\"name\":\"mapred.input.format.class\",\"value\":\"org.apache.hadoop.examples.SleepJob$SleepInputFormat\"},{\"name\":\"mapred.partitioner.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.speculative.execution\",\"value\":\"false\"},{\"name\":\"sleep.job.map.sleep.time\",\"value\":\"0\"},{\"name\":\"sleep.job.reduce.sleep.time\",\"value\":\"${REDUCER_SLEEP_TIME}\"}]'},
-      HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    response = self.client.post(
+      reverse('jobsub:jobsub.views.new_design', kwargs={'node_type': 'mapreduce'}),
+      data={
+        'name': 'sleep_job',
+        'description': '',
+        'node_type': 'mapreduce',
+        'jar_path': '/user/hue/oozie/workspaces/lib/hadoop-examples.jar',
+        'prepares': '[]',
+        'files': '[]',
+        'archives': '[]',
+        'job_properties': ('[{\"name\":\"mapred.reduce.tasks\",\"value\":\"1\"},'
+          '{\"name\":\"mapred.mapper.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},'
+          '{\"name\":\"mapred.reducer.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},'
+          '{\"name\":\"mapred.mapoutput.key.class\",\"value\":\"org.apache.hadoop.io.IntWritable\"},'
+          '{\"name\":\"mapred.mapoutput.value.class\",\"value\":\"org.apache.hadoop.io.NullWritable\"},'
+          '{\"name\":\"mapred.output.format.class\",\"value\":\"org.apache.hadoop.mapred.lib.NullOutputFormat\"},'
+          '{\"name\":\"mapred.input.format.class\",\"value\":\"org.apache.hadoop.examples.SleepJob$SleepInputFormat\"},'
+          '{\"name\":\"mapred.partitioner.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},'
+          '{\"name\":\"mapred.speculative.execution\",\"value\":\"false\"},'
+          '{\"name\":\"sleep.job.map.sleep.time\",\"value\":\"0\"},'
+          '{\"name\":\"sleep.job.reduce.sleep.time\",\"value\":\"${REDUCER_SLEEP_TIME}\"}]')
+      },
+      HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+    )
     assert_equal(response.status_code, 200)
     return Workflow.objects.all()[0]
 
@@ -92,23 +105,36 @@ class TestJobsubWithHadoop(OozieServerProvider):
     assert_equal(3, Link.objects.filter(parent__workflow=self.design).count())
 
   def test_save_design(self):
-    response = self.client.post(reverse('jobsub.views.save_design',
-      kwargs={'design_id': self.design.id}),
-      data={'name': 'mapreduce1',
-            'description': '',
-            'node_type': 'mapreduce',
-            'jar_path': '/user/hue/oozie/workspaces/lib/hadoop-examples.jar',
-            'prepares': '[]',
-            'files': '[{"name": "test", "dummy": ""}]',
-            'archives': '[]',
-            'job_properties': '[{\"name\":\"mapred.reduce.tasks\",\"value\":\"1\"},{\"name\":\"mapred.mapper.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.reducer.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.mapoutput.key.class\",\"value\":\"org.apache.hadoop.io.IntWritable\"},{\"name\":\"mapred.mapoutput.value.class\",\"value\":\"org.apache.hadoop.io.NullWritable\"},{\"name\":\"mapred.output.format.class\",\"value\":\"org.apache.hadoop.mapred.lib.NullOutputFormat\"},{\"name\":\"mapred.input.format.class\",\"value\":\"org.apache.hadoop.examples.SleepJob$SleepInputFormat\"},{\"name\":\"mapred.partitioner.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.speculative.execution\",\"value\":\"false\"},{\"name\":\"sleep.job.map.sleep.time\",\"value\":\"0\"},{\"name\":\"sleep.job.reduce.sleep.time\",\"value\":\"${REDUCER_SLEEP_TIME}\"}]'},
-      HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    response = self.client.post(
+      reverse('jobsub:jobsub.views.save_design', kwargs={'design_id': self.design.id}),
+      data={
+        'name': 'mapreduce1',
+        'description': '',
+        'node_type': 'mapreduce',
+        'jar_path': '/user/hue/oozie/workspaces/lib/hadoop-examples.jar',
+        'prepares': '[]',
+        'files': '[{"name": "test", "dummy": ""}]',
+        'archives': '[]',
+        'job_properties': ('[{\"name\":\"mapred.reduce.tasks\",\"value\":\"1\"},'
+          '{\"name\":\"mapred.mapper.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},'
+          '{\"name\":\"mapred.reducer.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},'
+          '{\"name\":\"mapred.mapoutput.key.class\",\"value\":\"org.apache.hadoop.io.IntWritable\"},'
+          '{\"name\":\"mapred.mapoutput.value.class\",\"value\":\"org.apache.hadoop.io.NullWritable\"},'
+          '{\"name\":\"mapred.output.format.class\",\"value\":\"org.apache.hadoop.mapred.lib.NullOutputFormat\"},'
+          '{\"name\":\"mapred.input.format.class\",\"value\":\"org.apache.hadoop.examples.SleepJob$SleepInputFormat\"},'
+          '{\"name\":\"mapred.partitioner.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},'
+          '{\"name\":\"mapred.speculative.execution\",\"value\":\"false\"},'
+          '{\"name\":\"sleep.job.map.sleep.time\",\"value\":\"0\"},'
+          '{\"name\":\"sleep.job.reduce.sleep.time\",\"value\":\"${REDUCER_SLEEP_TIME}\"}]')
+      },
+      HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+    )
     assert_equal(response.status_code, 200)
     self.design = Workflow.objects.get(id=self.design.id)
     assert_equal(self.design.start.get_child('to').get_full_node().files, '[{"dummy": "", "name": "test"}]')
 
   def test_get_design(self):
-    response = self.client.get(reverse('jobsub.views.get_design',
+    response = self.client.get(reverse('jobsub:jobsub.views.get_design',
       kwargs={'design_id': self.design.id}),
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     assert_equal(response.status_code, 200)
@@ -117,7 +143,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
     grant_access("jobsub_test_note_me", "jobsub_test_note_me", "jobsub")
     add_to_group("jobsub_test_note_me")
 
-    response = client_note_me.get(reverse('jobsub.views.get_design',
+    response = client_note_me.get(reverse('jobsub:jobsub.views.get_design',
       kwargs={'design_id': self.design.id}),
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     assert_equal(response.status_code, 500)
@@ -129,7 +155,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
     n_available = Document.objects.available_docs(Workflow, self.user).count()
     n_trashed = Document.objects.trashed_docs(Workflow, self.user).count()
 
-    response = self.client.post(reverse('jobsub.views.delete_design',
+    response = self.client.post(reverse('jobsub:jobsub.views.delete_design',
       kwargs={'design_id': self.design.id}),
       follow=True,
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -139,7 +165,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
     assert_equal(n_trashed + 1, Document.objects.trashed_docs(Workflow, self.user).count())
 
     # Destroy
-    response = self.client.post(reverse('jobsub.views.delete_design',
+    response = self.client.post(reverse('jobsub:jobsub.views.delete_design',
       kwargs={'design_id': self.design.id}) + '?skip_trash',
       follow=True,
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -153,7 +179,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
     raise SkipTest
     n_available = Document.objects.available_docs(Workflow, self.user).count()
 
-    response = self.client.post(reverse('jobsub.views.clone_design',
+    response = self.client.post(reverse('jobsub:jobsub.views.clone_design',
       kwargs={'design_id': self.design.id}),
       follow=True,
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -165,7 +191,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
     n_available = Document.objects.available_docs(Workflow, self.user).count()
     n_trashed = Document.objects.trashed_docs(Workflow, self.user).count()
 
-    response = self.client.post(reverse('jobsub.views.delete_design',
+    response = self.client.post(reverse('jobsub:jobsub.views.delete_design',
       kwargs={'design_id': self.design.id}),
       follow=True,
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -174,7 +200,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
     assert_equal(n_available - 1, Document.objects.available_docs(Workflow, self.user).count())
     assert_equal(n_trashed + 1, Document.objects.trashed_docs(Workflow, self.user).count())
 
-    response = self.client.post(reverse('jobsub.views.restore_design',
+    response = self.client.post(reverse('jobsub:jobsub.views.restore_design',
       kwargs={'design_id': self.design.id}),
       follow=True,
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')

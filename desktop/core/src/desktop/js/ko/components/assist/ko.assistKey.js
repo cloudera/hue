@@ -82,11 +82,14 @@ class AssistKey {
         if (this.onForeignKeyClick) {
           // Ensure definition is loaded
           if (!entry.definition) {
-            entry.getParent().then(parentEntry => {
-              parentEntry.getChildren().then(() => {
-                this.onForeignKeyClick(entry);
-              });
-            });
+            entry
+              .getParent()
+              .then(parentEntry => {
+                parentEntry.getChildren().then(() => {
+                  this.onForeignKeyClick(entry);
+                });
+              })
+              .catch(() => {});
           } else {
             this.onForeignKeyClick(entry);
           }

@@ -13,11 +13,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-DJANGO_APPS=['jobsub']
+DJANGO_APPS = ['jobsub']
 NICE_NAME = "Job Designer"
 REQUIRES_HADOOP = True
+IS_URL_NAMESPACED = True
 
-MIDDLEWARE_CLASSES=[]
+MIDDLEWARE_CLASSES = []
 
 ICON = "jobsub/art/icon_jobsub_48.png"
 MENU_INDEX = 40

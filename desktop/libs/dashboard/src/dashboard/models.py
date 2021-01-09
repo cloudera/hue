@@ -198,7 +198,10 @@ class Collection2(object):
       label = name
 
     TEMPLATE = {
-      "extracode": escape("<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>\n\n<script>\n</script>"),
+      "extracode": escape(
+        "<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>"
+        "\n\n<script>\n</script>"
+      ),
       "highlighting": [""],
       "properties": {"highlighting_enabled": True},
       "template": """
@@ -212,7 +215,7 @@ class Collection2(object):
       "showFieldList": True,
       "showGrid": True,
       "showChart": False,
-      "chartSettings" : {
+      "chartSettings": {
         'chartType': 'bars',
         'chartSorting': 'none',
         'chartScatterGroup': None,
@@ -359,7 +362,9 @@ def range_pair(field, cat, fq_filter, iterable, end, collection_facet):
   is_single_unit_gap = re.match('^[\+\-]?1[A-Za-z]*$', str(collection_facet['properties']['gap'])) is not None
   is_up = collection_facet['properties']['sort'] == 'asc'
 
-  if collection_facet['properties']['sort'] == 'asc' and (collection_facet['type'] == 'range-up' or collection_facet['properties'].get('type') == 'range-up'):
+  if collection_facet['properties']['sort'] == 'asc' and (
+      collection_facet['type'] == 'range-up' or collection_facet['properties'].get('type') == 'range-up'
+    ):
     prev = None
     n = []
     for e in iterable:
@@ -390,7 +395,11 @@ def range_pair(field, cat, fq_filter, iterable, end, collection_facet):
       from_value = element
 
     pairs.append({
-        'field': field, 'from': from_value if isDate else int(element), 'value': count, 'to': to_value if isDate else int(to_value), 'selected': element in selected_values,
+        'field': field,
+        'from': from_value if isDate else int(element),
+        'value': count,
+        'to': to_value if isDate else int(to_value),
+        'selected': element in selected_values,
         'exclude': all([f['exclude'] for f in fq_filter if f['value'] == element]),
         'is_single_unit_gap': is_single_unit_gap,
         'total_counts': total_counts,
@@ -398,7 +407,8 @@ def range_pair(field, cat, fq_filter, iterable, end, collection_facet):
     })
     total_counts += counts.pop(0) if counts else 0
 
-  if collection_facet['properties']['sort'] == 'asc' and collection_facet['type'] != 'range-up' and collection_facet['properties'].get('type') != 'range-up':
+  if collection_facet['properties']['sort'] == 'asc' and collection_facet['type'] != 'range-up' and \
+      collection_facet['properties'].get('type') != 'range-up':
     pairs.reverse()
 
   return pairs
@@ -428,7 +438,8 @@ def range_pair2(facet_field, cat, fq_filter, iterable, end, facet, collection_fa
   next(to, None)
   counts = iterable[1::2]
   total_counts = counts.pop(0) if facet['sort'] == 'asc' else 0
-  sum_all = collection_facet and collection_facet['widgetType'] in ('timeline-widget', 'bucket-widget') and facet['type'] == 'range-up'
+  sum_all = collection_facet and collection_facet['widgetType'] in ('timeline-widget', 'bucket-widget') and \
+      facet['type'] == 'range-up'
 
   for element in a:
     next(to, None)
@@ -574,7 +585,11 @@ def augment_solr_response(response, collection, query):
 
           from libsolr.api import SolrApi
           aggregate_name = SolrApi._get_aggregate_function(f)
-          cols.append(aggregate_name + ('_%(field)s' % facet['properties']['facets'][last_seen_dim_col_index - 1] if aggregate_name in cols else ''))
+          cols.append(
+            aggregate_name + (
+              '_%(field)s' % facet['properties']['facets'][last_seen_dim_col_index - 1] if aggregate_name in cols else ''
+            )
+          )
         rows = []
 
         facet_one = collection_facet['properties']['facets'][0]
@@ -587,7 +602,8 @@ def augment_solr_response(response, collection, query):
           dimension = 3 if facet_one['isDate'] else 1
 
           # Single dimension or dimension 2 with analytics
-          if len(collection_facet['properties']['facets']) == 1 or len(collection_facet['properties']['facets']) == 2 and collection_facet['properties']['facets'][1]['aggregate']['function'] != 'count':
+          if len(collection_facet['properties']['facets']) == 1 or len(collection_facet['properties']['facets']) == 2 and \
+              collection_facet['properties']['facets'][1]['aggregate']['function'] != 'count':
             column = 'count'
             if len(collection_facet['properties']['facets']) == 2:
               agg_keys = _get_agg_keys(counts) if counts else []
@@ -639,7 +655,8 @@ def augment_solr_response(response, collection, query):
               extraSeries.append({'counts': _c, 'label': _name})
             counts = []
         elif collection_facet['properties'].get('isOldPivot'):
-          facet_fields = [collection_facet['field']] + [f['field'] for f in collection_facet['properties'].get('facets', []) if f['aggregate']['function'] == 'count']
+          facet_fields = [collection_facet['field']] + \
+              [f['field'] for f in collection_facet['properties'].get('facets', []) if f['aggregate']['function'] == 'count']
 
           column = 'count'
           agg_keys = _get_agg_keys(counts) if counts else []
@@ -651,7 +668,8 @@ def augment_solr_response(response, collection, query):
 
           #_convert_nested_to_augmented_pivot_nd(facet_fields, facet['id'], count, selected_values, dimension=2)
           dimension = len(facet_fields)
-        elif len(collection_facet['properties']['facets']) == 1 or (len(collection_facet['properties']['facets']) == 2 and collection_facet['properties']['facets'][1]['aggregate']['function'] != 'count'):
+        elif len(collection_facet['properties']['facets']) == 1 or (len(collection_facet['properties']['facets']) == 2 and \
+            collection_facet['properties']['facets'][1]['aggregate']['function'] != 'count'):
           # Dimension 1 with 1 count or agg
           dimension = 1
 
@@ -681,7 +699,8 @@ def augment_solr_response(response, collection, query):
 
           counts = [a for a in counts if len(a['fq_fields']) == actual_dimension]
 
-        num_bucket = response['facets'][name]['numBuckets'] if 'numBuckets' in response['facets'][name] else len(response['facets'][name])
+        num_bucket = response['facets'][name]['numBuckets'] \
+            if 'numBuckets' in response['facets'][name] else len(response['facets'][name])
         facet = {
           'id': collection_facet['id'],
           'field': facet['field'],
@@ -692,7 +711,12 @@ def augment_solr_response(response, collection, query):
           'dimension': dimension,
           'response': {'response': {'start': 0, 'numFound': num_bucket}}, # Todo * nested buckets + offsets
           'docs': [dict(list(zip(cols, row))) for row in rows],
-          'fieldsAttributes': [Collection2._make_gridlayout_header_field({'name': col, 'type': 'aggr' if '(' in col else 'string'}) for col in cols],
+          'fieldsAttributes': [
+            Collection2._make_gridlayout_header_field(
+                {'name': col, 'type': 'aggr' if '(' in col else 'string'}
+            )
+            for col in cols
+          ],
           'multiselect': collection_facet['properties']['facets'][0].get('multiselect', True)
         }
 
@@ -763,7 +787,10 @@ def augment_response(collection, query, response):
           if highlighting:
             escaped_highlighting = {}
             for field, hls in highlighting.items():
-              _hls = [escape(smart_unicode(hl, errors='replace')).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>') for hl in hls]
+              _hls = [
+                escape(smart_unicode(hl, errors='replace')).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>')
+                for hl in hls
+              ]
               escaped_highlighting[field] = _hls[0] if len(_hls) == 1 else _hls
 
             doc.update(escaped_highlighting)
@@ -821,8 +848,8 @@ def _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows):
 def __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected_values, _fields, agg_keys, rows):
   augmented = []
 
-  for bucket in counts: # For each dimension, go through each bucket and pick up the counts or aggregates, then go recursively in the next dimension
-    val = bucket['val']
+  for bucket in counts:  # For each dimension, go through each bucket and pick up the counts or aggregates,
+    val = bucket['val']  # then go recursively in the next dimension
     count = bucket['count']
     dim_row = [val]
 
@@ -858,7 +885,17 @@ def __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected
         next_dim = []
         new_rows = []
         if agg_key in bucket:
-          augmented += __augment_stats_2d(bucket[agg_key]['buckets'], val, _fq_fields, _fq_values, fq_filter, _selected_values, _fields[1:], _agg_keys, next_dim)
+          augmented += __augment_stats_2d(
+            bucket[agg_key]['buckets'],
+            val,
+            _fq_fields,
+            _fq_values,
+            fq_filter,
+            _selected_values,
+            _fields[1:],
+            _agg_keys,
+            next_dim
+          )
         for row in next_dim:
           new_rows.append(dim_row + row)
         dim_row = new_rows
@@ -910,7 +947,9 @@ def _convert_nested_to_augmented_pivot_nd(facet_fields, facet_id, counts, select
     if bucket in c:
       next_dimension = facet_fields[1:]
       if next_dimension:
-        _convert_nested_to_augmented_pivot_nd(next_dimension, facet_id, c[bucket], selected_values, fq_fields, fq_values, dimension=dimension+1)
+        _convert_nested_to_augmented_pivot_nd(
+          next_dimension, facet_id, c[bucket], selected_values, fq_fields, fq_values, dimension=dimension + 1
+        )
         c['pivot'] = c.pop(bucket)['buckets']
       else:
         c['count'] = c.pop(bucket)
@@ -962,9 +1001,11 @@ def extract_solr_exception_message(e):
     message = json.loads(e.message)
     msg = message['error'].get('msg')
     response['error'] = msg if msg else message['error']['trace']
-  except Exception as e2:
-    LOG.exception('Failed to extract json message: %s' % force_unicode(e2))
-    LOG.exception('Failed to parse json response: %s' % force_unicode(e))
+  except ValueError as e:
+    LOG.warn('Failed to parse json response: %s' % force_unicode(e))
+    response['error'] = force_unicode(e)
+  except Exception as e:
+    LOG.exception('Failed to extract json message: %s' % force_unicode(e))
     response['error'] = force_unicode(e)
 
   return response

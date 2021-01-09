@@ -17,14 +17,14 @@
 */
 
 // Colors
-$bg-color: #FFF;
-$dot-color: #BBB;
+$bg-color: #fff;
+$dot-color: #bbb;
 
 // Dimensions
 $dot-size: 1px;
 $dot-space: 10px;
 
-expand-icon{
+.expand-icon {
   font-size: 13px;
   font-weight: bold;
 
@@ -37,16 +37,14 @@ expand-icon{
   color: #0a78a3;
   border: 1px solid #d6d8db;
   border-radius: 5px;
-
   position: relative;
-
   font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
   line-height: 20px;
   font-size: 14px;
-
   background:
     linear-gradient(90deg, $bg-color ($dot-space - $dot-size), transparent 1%) center,
-    linear-gradient($bg-color ($dot-space - $dot-size), transparent 1%) center, $dot-color;
+    linear-gradient($bg-color ($dot-space - $dot-size), transparent 1%) center,
+    $dot-color;
   background-size: $dot-space $dot-space;
 
   .buttons-panel {
@@ -71,35 +69,33 @@ expand-icon{
   .erd-container {
     white-space: nowrap;
     min-height: 500px;
-
     position: relative;
 
     .entity-group {
       display: inline-block;
       width: 200px;
       padding: 15px 30px;
-
       white-space: normal;
-
       vertical-align: top;
 
       .entity-container {
         padding: 10px 0;
 
-        .left-point, .right-point {
+        .left-point,
+        .right-point {
           position: absolute;
-          width: 0px;
-          height: 0px;
+          width: 0;
+          height: 0;
           top: 1em;
         }
 
         .left-point {
           left: -1px;
         }
+
         .right-point {
           right: -1px;
         }
-
       }
     }
   }
@@ -107,12 +103,9 @@ expand-icon{
   .erd-relations {
     position: absolute;
     overflow: visible;
-
     top: 0;
     left: 0;
-
     opacity: 0.5;
-
     pointer-events: none;
 
     .relation-path {

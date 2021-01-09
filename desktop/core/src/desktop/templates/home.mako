@@ -355,7 +355,7 @@ ${ commonshare() | n,unicode }
 
     viewModel.selectedTag.subscribe(function (value) {
       $("#searchInput").val("");
-      $.totalStorage("hueHomeSelectedTag", value.id());
+      hueUtils.hueLocalStorage("hueHomeSelectedTag", value.id());
     });
 
     function getFirstAvailableDoc() {
@@ -378,8 +378,8 @@ ${ commonshare() | n,unicode }
       return viewModel.history();
     }
 
-    if ($.totalStorage("hueHomeSelectedTag") != null) {
-      var _preselectedTag = viewModel.getTagById($.totalStorage("hueHomeSelectedTag"));
+    if (hueUtils.hueLocalStorage("hueHomeSelectedTag") != null) {
+      var _preselectedTag = viewModel.getTagById(hueUtils.hueLocalStorage("hueHomeSelectedTag"));
       if (_preselectedTag != null) {
         viewModel.filterDocs(_preselectedTag);
       }

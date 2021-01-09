@@ -1,6 +1,6 @@
 {
   "name": "gethue",
-  "version": "4.8.2",
+  "version": "4.8.3",
   "description": "Hue is an Open source SQL Query Editor for Databases/Warehouses",
   "keywords": [
     "Query Editor",
@@ -31,14 +31,20 @@
   },
   "stylelint": {
     "extends": "stylelint-config-standard",
+    "plugins": [
+      "stylelint-scss"
+    ],
     "rules": {
+      "max-empty-lines": 4,
       "number-leading-zero": null,
-      "no-descending-specificity": null
+      "no-descending-specificity": null,
+      "at-rule-no-unknown": null,
+      "scss/at-rule-no-unknown": true
     }
   },
   "dependencies": {
     "@types/lodash": "^4.14.161",
-    "axios": "0.20.0",
+    "axios": "0.21.1",
     "clipboard": "1.7.1",
     "core-js": "^3.4.2",
     "d3": "5.7.0",
@@ -62,10 +68,13 @@
     "lodash": "4.17.19",
     "luxon": "1.25.0",
     "medium-editor": "5.23.3",
+    "mustache": "4.1.0",
     "page": "1.8.6",
     "plotly.js-dist": "1.45.3",
+    "qs": "6.9.4",
     "regenerator-runtime": "^0.13.3",
     "removeNPMAbsolutePaths": "^1.0.4",
+    "sanitize-html": "^2.1.2",
     "select2": "3.5.1",
     "selectize": "0.12.6",
     "selectize-plugin-clear": "0.0.3",
@@ -73,9 +82,10 @@
     "vue": "2.6.11",
     "vue-class-component": "7.2.3",
     "vue-custom-element": "3.2.14",
-    "vuejs-datepicker": "1.6.2",
+    "vue-fragment": "1.5.1",
     "vue-property-decorator": "9.0.0",
-    "vue-template-compiler": "2.6.11"
+    "vue-template-compiler": "2.6.11",
+    "vuejs-datepicker": "1.6.2"
   },
   "devDependencies": {
     "@babel/core": "7.10.2",
@@ -90,6 +100,8 @@
     "@types/jquery": "3.5.0",
     "@types/knockout": "3.4.67",
     "@types/luxon": "1.25.0",
+    "@types/qs": "6.9.4",
+    "@types/sanitize-html": "1.27.0",
     "@types/webpack": "4.41.23",
     "@typescript-eslint/eslint-plugin": "3.4.0",
     "@typescript-eslint/parser": "3.4.0",
@@ -129,6 +141,7 @@
     "style-loader": "^1.1.3",
     "stylelint": "13.6.0",
     "stylelint-config-standard": "20.0.0",
+    "stylelint-scss": "3.18.0",
     "ts-loader": "7.0.5",
     "typescript": "3.9.5",
     "vue-jest": "^3.0.6",
@@ -150,8 +163,8 @@
     "dev-workers": "webpack --config webpack.config.workers.js --watch -d",
     "less": "./node_modules/.bin/grunt less",
     "less-dev": "./node_modules/.bin/grunt watch",
-    "less-lint": "stylelint \"desktop/core/src/desktop/static/desktop/less/**/*.less\"",
-    "less-lint-fix": "npm run less-lint -- --fix",
+    "style-lint": "stylelint \"desktop/core/src/desktop/static/desktop/less/**/*.less\" \"desktop/core/src/desktop/js/**/*.scss\"",
+    "style-lint-fix": "npm run style-lint -- --fix",
     "lint": "eslint desktop/core/src/desktop/js tools/sql-docs tools/jison",
     "lint-debug": "npm run lint -- --debug",
     "lint-fix": "npm run lint -- --fix",

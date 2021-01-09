@@ -157,7 +157,7 @@ if USE_NEW_EDITOR.get():
     }
 
     // sets global apiHelper TTL
-    $.totalStorage('hue.cacheable.ttl', ${conf.CUSTOM.CACHEABLE_TTL.get()});
+    hueUtils.hueLocalStorage('hue.cacheable.ttl', ${conf.CUSTOM.CACHEABLE_TTL.get()});
 
     var IDLE_SESSION_TIMEOUT = -1;
 

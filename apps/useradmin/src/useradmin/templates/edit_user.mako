@@ -147,7 +147,7 @@ $(document).ready(function(){
   $editUserComponents.find("#id_groups").jHueSelector({
     selectAllLabel: "${_('Select all')}",
     searchPlaceholder: "${_('Search')}",
-    noChoicesFound: "${_('No groups found.')} <a href='${url('useradmin.views.edit_group')}'>${_('Create a new group now')} &raquo;</a>",
+    noChoicesFound: "${_('No groups found.')} <a href='${url('useradmin:useradmin.views.edit_group')}'>${_('Create a new group now')} &raquo;</a>",
     width:618,
     height:240
   });

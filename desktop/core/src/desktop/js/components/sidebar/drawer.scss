@@ -1,0 +1,432 @@
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// 'License'); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an 'AS IS' BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+@import '../styles/colors';
+@import '../styles/variables';
+@import './variables';
+
+$default-drawer-width: 248px;
+$large-drawer-width: 400px;
+
+$sidebar-drawer-in-front-z-index: $sidebar-z-index + 1;
+$sidebar-drawer-behind-z-index: $sidebar-z-index - 1;
+
+.sidebar-drawer {
+  position: fixed;
+  z-index: $sidebar-drawer-behind-z-index;
+  top: 0;
+  bottom: 0;
+  left: -$default-drawer-width;
+  width: $default-drawer-width;
+  overflow: hidden;
+  transition: all $animation-duration-base;
+  background: #fff;
+  opacity: 0;
+}
+
+.sidebar-drawer.open {
+  left: 0;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.28);
+  opacity: 1;
+}
+
+.sidebar-drawer.sidebar-app-drawer {
+  white-space: nowrap;
+  z-index: $sidebar-drawer-in-front-z-index;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+
+  .cdp-app-switcher-loading {
+    padding: 24px;
+  }
+
+  .cdp-app-switcher-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    margin: 0 0 $fluid-spacing-xs 0;
+    height: 56px;
+    flex-shrink: 0;
+  }
+
+  .cdp-app-switcher-indicator {
+    width: $sidebar-indicator-width;
+    height: 100%;
+  }
+
+  .cdp-app-switcher-app-icon {
+    margin-left: $fluid-spacing-m - $sidebar-indicator-width;
+  }
+
+  .cdp-app-switcher-app-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow: auto;
+
+    a {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      transition: background-color $animation-duration-base;
+
+      &:hover {
+        background-color: $fluid-gray-100;
+      }
+
+      svg {
+        font-size: 32px;
+        display: block;
+      }
+
+      span {
+        display: inline-block;
+        margin-left: 16px;
+        font-size: 14px;
+        color: $fluid-gray-700;
+      }
+    }
+  }
+}
+
+.sidebar-drawer-common-menu {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.sidebar-drawer-common-menu-header {
+  height: $sidebar-header-height;
+  border-bottom: 1px solid $fluid-gray-100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  padding: 0 24px;
+
+  img {
+    height: 20px;
+    width: 20px;
+  }
+}
+
+.sidebar-drawer-common-menu-body {
+  padding: 24px;
+  border-bottom: 1px solid $fluid-gray-100;
+  flex-grow: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.sidebar-drawer.sidebar-help-drawer {
+  left: -$large-drawer-width;
+  width: $large-drawer-width;
+
+  .menu-footer {
+    flex-shrink: 0;
+
+    h2 {
+      padding: 24px 24px 0 24px;
+    }
+  }
+
+  ul.nav-list {
+    list-style: none;
+    margin: 4px 0;
+    padding: 0;
+
+    li a {
+      height: 32px;
+      display: flex;
+      align-items: center;
+      color: $fluid-gray-700;
+      padding: 0 24px;
+
+      &:hover {
+        background-color: $fluid-gray-200;
+      }
+
+      svg {
+        margin-right: $fluid-spacing-xs;
+        font-size: 20px;
+        height: 20px;
+        width: 20px;
+      }
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    padding: 0;
+    color: $fluid-gray-800;
+    margin: 0 0 0.5em 0;
+  }
+
+  h1 {
+    font-size: 28px;
+    line-height: 36px;
+    font-weight: 300;
+    margin: 0;
+  }
+
+  h2 {
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 300;
+  }
+
+  h3 {
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 300;
+  }
+
+  h4 {
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: 500;
+  }
+
+  h5 {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+  }
+
+  h6 {
+    font-size: 12px;
+    line-height: 20px;
+    font-weight: 500;
+  }
+
+  p {
+    margin-bottom: 1em;
+    line-height: 20px;
+  }
+
+  .menu-body {
+    ul {
+      list-style-type: disc;
+
+      ul {
+        list-style-type: circle;
+
+        ul {
+          list-style-type: square;
+        }
+      }
+    }
+
+    ol {
+      list-style-type: decimal;
+    }
+
+    ol,
+    ul {
+      display: block;
+      line-height: 20px;
+      margin-block-start: 1em;
+      margin-block-end: 1em;
+      padding-inline-start: 40px;
+
+      ol,
+      ul {
+        margin-block-start: 0;
+        margin-block-end: 0;
+      }
+
+      li {
+        display: list-item;
+      }
+    }
+  }
+}
+
+.sidebar-drawer.sidebar-version-drawer {
+  left: -$large-drawer-width;
+  width: $large-drawer-width;
+
+  footer {
+    flex-shrink: 0;
+    padding: 24px;
+  }
+
+  dt {
+    font-size: $font-size-lg;
+  }
+
+  dd {
+    margin-bottom: $fluid-spacing-s;
+  }
+
+  ul {
+    list-style: none;
+    padding-inline-start: 0;
+  }
+}
+
+.sidebar-version-drawer-related-docs {
+  flex-shrink: 0;
+}
+
+.sidebar-drawer.sidebar-help-drawer,
+.sidebar-drawer.sidebar-user-drawer {
+  top: auto;
+  height: auto;
+  bottom: 20px;
+  transition: none;
+
+  .menu-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 16px 20px 16px;
+
+    .user-icon {
+      width: 36px;
+      height: 36px;
+      margin-right: 12px;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    > div {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    small {
+      font-size: $font-size-sm;
+    }
+  }
+}
+
+.sidebar-drawer-help-content,
+.sidebar-drawer-user-content {
+  ul {
+    list-style: none;
+    margin: 4px 0;
+    padding: 0;
+
+    li a,
+    li button {
+      height: 32px;
+      display: flex;
+      align-items: center;
+      color: $fluid-gray-700;
+      padding: 0 24px;
+      width: 100%;
+
+      &:hover {
+        background-color: $fluid-gray-200;
+      }
+
+      svg {
+        margin-left: 8px;
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+.sidebar-drawer-help-content-header {
+  h2 {
+    padding: 24px 24px 0 24px;
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 300;
+  }
+}
+
+.sidebar-drawer-user-content-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px 16px 20px 16px;
+
+  .sidebar-user-icon {
+    width: 36px;
+    height: 36px;
+    margin-right: 12px;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  > div {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  small {
+    font-size: $font-size-sm;
+  }
+}
+
+.sidebar-drawer.sidebar-tour-drawer {
+  left: -$large-drawer-width;
+  width: $large-drawer-width;
+
+  .cdp-panel-header {
+    height: $sidebar-header-height;
+    border-bottom: 1px solid $fluid-gray-300;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 0 24px;
+
+    h1 {
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-size: 20px;
+      font-weight: 400;
+      color: $fluid-gray-900;
+    }
+
+    img {
+      height: 20px;
+      width: 20px;
+    }
+
+    .cdp-back {
+      margin-right: 8px;
+    }
+  }
+
+  .cdp-panel-body {
+    padding: 20px 24px;
+
+    h2 {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-size: 16px;
+      font-weight: 400;
+      color: $fluid-gray-900;
+      margin-bottom: 20px;
+    }
+  }
+}

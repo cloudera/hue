@@ -15,27 +15,30 @@
 // limitations under the License.
 
 import $ from 'jquery';
+import ace from 'ext/aceHelper';
 
-import AssistStorageEntry from 'ko/components/assist/assistStorageEntry';
+import { DIALECT } from 'apps/notebook2/snippet';
 import dataCatalog from 'catalog/dataCatalog';
-import hueDebug from 'utils/hueDebug';
-import huePubSub from 'utils/huePubSub';
-import I18n from 'utils/i18n';
+import AssistStorageEntry from 'ko/components/assist/assistStorageEntry';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
 import sqlUtils from 'sql/sqlUtils';
-import stringDistance from 'sql/stringDistance';
-import { DIALECT } from 'apps/notebook2/snippet';
 import {
   POST_FROM_LOCATION_WORKER_EVENT,
   POST_FROM_SYNTAX_WORKER_EVENT,
   POST_TO_LOCATION_WORKER_EVENT,
   POST_TO_SYNTAX_WORKER_EVENT
 } from 'sql/sqlWorkerHandler';
+import stringDistance from 'sql/stringDistance';
+import hueDebug from 'utils/hueDebug';
+import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
+import { getFromLocalStorage } from 'utils/storageUtils';
 
 // TODO: depends on Ace, sqlStatementsParser
 
 export const REFRESH_STATEMENT_LOCATIONS_EVENT = 'editor.refresh.statement.locations';
 export const ACTIVE_STATEMENT_CHANGED_EVENT = 'editor.active.statement.changed';
+export const CURSOR_POSITION_CHANGED_EVENT = 'editor.cursor.position.changed';
 
 const STATEMENT_COUNT_AROUND_ACTIVE = 10;
 
@@ -196,10 +199,10 @@ class AceLocationHandler {
                           return identifier.name;
                         })
                       })
-                      .done(entry => {
+                      .then(entry => {
                         entry
                           .getSourceMeta({ cachedOnly: true, silenceErrors: true })
-                          .done(sourceMeta => {
+                          .then(sourceMeta => {
                             if (sourceMeta && sourceMeta.extended_columns) {
                               sourceMeta.extended_columns.every(col => {
                                 if (col.name.toLowerCase() === colName) {
@@ -209,7 +212,13 @@ class AceLocationHandler {
                                 return true;
                               });
                             }
+                          })
+                          .catch(() => {
+                            // Ignore
                           });
+                      })
+                      .catch(err => {
+                        // Ignore
                       });
                   }
                 }
@@ -377,7 +386,7 @@ class AceLocationHandler {
               .resolveCatalogEntry({
                 temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly
               })
-              .done(entry => {
+              .then(entry => {
                 huePubSub.publish('context.popover.show', {
                   data: {
                     type: 'catalogEntry',
@@ -388,13 +397,13 @@ class AceLocationHandler {
                   source: source
                 });
               })
-              .fail(() => {
+              .catch(() => {
                 token.notFound = true;
               });
           } else if (token.parseLocation && !token.notFound) {
             // Asterisk, function etc.
             if (token.parseLocation.type === 'file') {
-              AssistStorageEntry.getEntry(token.parseLocation.path).done(entry => {
+              AssistStorageEntry.getEntry(token.parseLocation.path).then(entry => {
                 entry.open(true);
                 huePubSub.publish('context.popover.show', {
                   data: {
@@ -421,7 +430,7 @@ class AceLocationHandler {
             }
           } else if (token.syntaxError) {
             huePubSub.publish('sql.syntax.dropdown.show', {
-              snippet: self.snippet,
+              editorId: self.snippet.id(),
               data: token.syntaxError,
               editor: self.editor,
               range: range,
@@ -634,7 +643,10 @@ class AceLocationHandler {
           lastCursorPosition.row !== newCursorPosition.row ||
           lastCursorPosition.column !== newCursorPosition.column
         ) {
-          self.snippet.aceCursorPosition(newCursorPosition);
+          huePubSub.publish(CURSOR_POSITION_CHANGED_EVENT, {
+            editorId: self.snippet.id(),
+            position: newCursorPosition
+          });
           lastCursorPosition = newCursorPosition;
         }
 
@@ -667,8 +679,8 @@ class AceLocationHandler {
       }
     });
 
-    const locateSubscription = huePubSub.subscribe(REFRESH_STATEMENT_LOCATIONS_EVENT, snippet => {
-      if (snippet === self.snippet) {
+    const locateSubscription = huePubSub.subscribe(REFRESH_STATEMENT_LOCATIONS_EVENT, editorId => {
+      if (editorId === self.snippet.id()) {
         cursorChangePaused = true;
         window.clearTimeout(changeThrottle);
         window.clearTimeout(updateThrottle);
@@ -780,11 +792,7 @@ class AceLocationHandler {
         return;
       }
 
-      const suppressedRules = window.apiHelper.getFromTotalStorage(
-        'hue.syntax.checker',
-        'suppressedRules',
-        {}
-      );
+      const suppressedRules = getFromLocalStorage('hue.syntax.checker.suppressedRules', {});
       if (
         e.data.syntaxError &&
         e.data.syntaxError.ruleId &&
@@ -842,7 +850,7 @@ class AceLocationHandler {
       }
     });
 
-    huePubSub.publish('editor.refresh.statement.locations', self.snippet);
+    huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, self.snippet.id());
   }
 
   detachSqlSyntaxWorker() {
@@ -869,8 +877,8 @@ class AceLocationHandler {
         silenceErrors: true,
         cachedOnly: true
       })
-      .done(deferred.resolve)
-      .fail(() => {
+      .then(deferred.resolve)
+      .catch(() => {
         deferred.reject([]);
       });
     return deferred;
@@ -987,7 +995,7 @@ class AceLocationHandler {
                 cachedOnly: true,
                 silenceErrors: true
               })
-              .done(entries => {
+              .then(entries => {
                 const containsColumn = entries.some(entry => {
                   return sqlUtils.identifierEquals(entry.name, location.identifierChain[0].name);
                 });
@@ -1004,7 +1012,7 @@ class AceLocationHandler {
                   promise.resolve();
                 }
               })
-              .fail(promise.resolve);
+              .catch(promise.resolve);
           } else if (tablesToGo.length > 0) {
             findIdentifierChainInTable(tablesToGo);
           } else {
@@ -1295,7 +1303,7 @@ class AceLocationHandler {
             .getSession()
             .getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
         }
-        if (token && token.value && /^\s*\$\{\s*$/.test(token.value)) {
+        if (token && token.value && /^\s*\${\s*$/.test(token.value)) {
           token = null;
         }
         if (token && token.value) {

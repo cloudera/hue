@@ -373,10 +373,11 @@ class HS2Api(Api):
         'has_more': results.has_more,
         'data': results.rows(),
         'meta': [{
-          'name': column.name,
-          'type': column.type,
-          'comment': column.comment
-        } for column in results.data_table.cols()],
+            'name': column.name,
+            'type': column.type,
+            'comment': column.comment
+          } for column in results.data_table.cols()
+        ],
         'type': 'table'
     }
 
@@ -488,7 +489,7 @@ class HS2Api(Api):
 
       jobs = [{
           'name': job.get('job_id', ''),
-          'url': reverse('jobbrowser.views.single_job', kwargs={'job': job.get('job_id', '')}) if has_jobbrowser else '',
+          'url': reverse('jobbrowser:jobbrowser.views.single_job', kwargs={'job': job.get('job_id', '')}) if has_jobbrowser else '',
           'started': job.get('started', False),
           'finished': job.get('finished', False)
         }
@@ -562,19 +563,24 @@ class HS2Api(Api):
     response = self._get_current_statement(notebook, snippet)
     session = self._get_session(notebook, snippet['type'])
 
-    query = self._prepare_hql_query(snippet, response.pop('statement'), session)
+    statement = response.pop('statement')
+    explanation = ''
 
-    try:
-      db.use(query.database)
+    query = self._prepare_hql_query(snippet, statement, session)
 
-      explanation = db.explain(query)
-    except QueryServerException as ex:
-      raise QueryError(ex.message)
+    if statement:
+      try:
+        db.use(query.database)
+
+        explanation = db.explain(query).textual
+        statement = query.get_query_statement(0)
+      except QueryServerException as ex:
+        explanation = str(ex.message)
 
     return {
       'status': 0,
-      'explanation': explanation.textual,
-      'statement': query.get_query_statement(0),
+      'explanation': explanation,
+      'statement': statement,
     }
 
 

@@ -32,7 +32,7 @@ LOG = logging.getLogger(__name__)
 
 def get_user_request_organization():
   request = CrequestMiddleware.get_request()
-  return request.user.organization if request and hasattr(request, 'user') and request.user.is_authenticated() else None
+  return request.user.organization if request and hasattr(request, 'user') and request.user.is_authenticated else None
 
 
 def _fitered_queryset(queryset, by_owner=False):
@@ -41,7 +41,7 @@ def _fitered_queryset(queryset, by_owner=False):
   # Avoid infinite recursion on very first retrieval of the user
   if ENABLE_ORGANIZATIONS.get() and \
       request and hasattr(request, 'user') and hasattr(request.user, '_wrapped') and type(request.user._wrapped) is not object and \
-      request.user.is_authenticated():
+      request.user.is_authenticated:
     if by_owner:
       filters = {'owner__organization': request.user.organization}
     else:

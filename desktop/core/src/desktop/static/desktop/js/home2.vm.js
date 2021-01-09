@@ -31,7 +31,10 @@ var HomeViewModel = (function () {
     self.apiHelper = window.apiHelper;
     self.isLeftPanelVisible = ko.observable(false);
     // Uncomment to enable the assist panel
-    // self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+    // window.hueUtils.withLocalStorage('assist.assist_panel_visible', self.isLeftPanelVisible, true);
+    // self.isLeftPanelVisible.subscribe(function () {
+    //   huePubSub.publish('assist.forceRender');
+    // });
 
     self.sharingEnabled = ko.observable(false);
 
@@ -46,7 +49,7 @@ var HomeViewModel = (function () {
 
     self.serverTypeFilter = ko.observable();
 
-    var initialType = window.location.getParameter('type') !== '' ? window.location.getParameter('type') : 'all';
+    var initialType = hueUtils.getParameter('type') !== '' ? hueUtils.getParameter('type') : 'all';
 
     DOCUMENT_TYPES.some(function (docType) {
       if (docType.type === initialType) {
@@ -83,11 +86,11 @@ var HomeViewModel = (function () {
         self.activeEntry().entries([]);
         self.activeEntry().load();
         if (!newVal || newVal.type === 'all') {
-          if (location.getParameter('type')) {
+          if (hueUtils.getParameter('type')) {
             hueUtils.removeURLParameter('type');
           }
         } else {
-          if (!location.getParameter('type') || location.getParameter('type') !== newVal.type) {
+          if (!hueUtils.getParameter('type') || hueUtils.getParameter('type') !== newVal.type) {
             hueUtils.changeURLParameter('type', newVal.type);
           }
         }
@@ -107,7 +110,7 @@ var HomeViewModel = (function () {
     var self = this;
     var entry = self.activeEntry().createNewEntry({
       definition: {
-        uuid: uuid || location.getParameter('uuid'),
+        uuid: uuid || hueUtils.getParameter('uuid'),
         name: 'unknown',
         type: 'directory',
         path: '/unknown'

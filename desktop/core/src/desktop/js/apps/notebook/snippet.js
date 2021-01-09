@@ -25,6 +25,7 @@ import dataCatalog from 'catalog/dataCatalog';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 import Result from 'apps/notebook/result';
 import Session from 'apps/notebook/session';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
@@ -38,6 +39,11 @@ import {
   ASSIST_SET_SOURCE_EVENT
 } from 'ko/components/assist/events';
 import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
+import {
+  ACTIVE_STATEMENT_CHANGED_EVENT,
+  CURSOR_POSITION_CHANGED_EVENT,
+  REFRESH_STATEMENT_LOCATIONS_EVENT
+} from 'ko/bindings/ace/aceLocationHandler';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -340,9 +346,9 @@ class Snippet {
 
     self.database.subscribe(newValue => {
       if (newValue !== null) {
-        apiHelper.setInTotalStorage('editor', 'last.selected.database', newValue);
+        setInLocalStorage('editor.last.selected.database', newValue);
         if (previousDatabase !== null && previousDatabase !== newValue) {
-          huePubSub.publish('editor.refresh.statement.locations', self);
+          huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, self.id());
         }
         previousDatabase = newValue;
       }
@@ -539,8 +545,14 @@ class Snippet {
     self.lastExecutedStatement = ko.observable(null);
     self.statementsList = ko.observableArray();
 
+    huePubSub.subscribe(CURSOR_POSITION_CHANGED_EVENT, details => {
+      if (details.editorId === self.id()) {
+        self.aceCursorPosition(details.position);
+      }
+    });
+
     huePubSub.subscribe(
-      'editor.active.statement.changed',
+      ACTIVE_STATEMENT_CHANGED_EVENT,
       statementDetails => {
         if (self.ace() && self.ace().container.id === statementDetails.id) {
           for (let i = statementDetails.precedingStatements.length - 1; i >= 0; i--) {
@@ -929,7 +941,7 @@ class Snippet {
       self.variables().forEach(variable => {
         if (oLocations[variable.name()]) {
           activeSourcePromises.push(
-            oLocations[variable.name()].resolveCatalogEntry({ cancellable: true }).done(entry => {
+            oLocations[variable.name()].resolveCatalogEntry({ cancellable: true }).then(entry => {
               variable.path(entry.path.join('.'));
               variable.catalogEntry = entry;
 
@@ -1010,8 +1022,8 @@ class Snippet {
         : false
     );
     let defaultShowLogs = true;
-    if (vm.editorMode() && $.totalStorage('hue.editor.showLogs')) {
-      defaultShowLogs = $.totalStorage('hue.editor.showLogs');
+    if (vm.editorMode() && getFromLocalStorage('hue.editor.showLogs')) {
+      defaultShowLogs = getFromLocalStorage('hue.editor.showLogs');
     }
     self.showLogs = ko.observable(
       typeof snippet.showLogs !== 'undefined' && snippet.showLogs != null
@@ -1074,8 +1086,8 @@ class Snippet {
                 connector: self.connector(),
                 path: path
               })
-              .done(entry => {
-                entry.clearCache({ refreshCache: true, cascade: true, silenceErrors: true });
+              .then(entry => {
+                entry.clearCache({ cascade: true, silenceErrors: true });
               });
           }, 5000);
         }
@@ -1181,12 +1193,12 @@ class Snippet {
         self.getLogs();
       }
       if (vm.editorMode()) {
-        $.totalStorage('hue.editor.showLogs', val);
+        setInLocalStorage('hue.editor.showLogs', val);
       }
     });
 
     self.isLoading = ko.computed(() => {
-      return self.status() == 'loading';
+      return self.status() === 'loading';
     });
 
     self.resultsKlass = ko.computed(() => {
@@ -1444,12 +1456,10 @@ class Snippet {
     });
     self.compatibilityTargetPlatform = ko.observable(COMPATIBILITY_TARGET_PLATFORMS[self.type()]);
 
-    self.showOptimizer = ko.observable(
-      apiHelper.getFromTotalStorage('editor', 'show.optimizer', false)
-    );
+    self.showOptimizer = ko.observable(getFromLocalStorage('editor.show.optimizer', false));
     self.showOptimizer.subscribe(newValue => {
       if (newValue !== null) {
-        apiHelper.setInTotalStorage('editor', 'show.optimizer', newValue);
+        setInLocalStorage('editor.show.optimizer', newValue);
       }
     });
 
@@ -1760,7 +1770,7 @@ class Snippet {
       self.statusForButtons('executing');
 
       if (self.isSqlDialect()) {
-        huePubSub.publish('editor.refresh.statement.locations', self);
+        huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, self.id());
       }
 
       self.lastExecutedStatements = self.statement();
@@ -2419,7 +2429,7 @@ class Snippet {
     self.checkDdlNotification = function () {
       if (
         self.lastExecutedStatement() &&
-        /ALTER|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i.test(
+        /ALTER|WITH|REFRESH|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i.test(
           self.lastExecutedStatement().firstToken
         )
       ) {

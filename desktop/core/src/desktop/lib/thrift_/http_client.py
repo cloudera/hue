@@ -72,7 +72,9 @@ class THttpClient(TTransportBase):
     return self._client is not None
 
   def setTimeout(self, ms):
-    pass
+    if not self._headers:
+      self._headers = {}
+    self._headers.update(timeout=str(int(ms / 1000)))
 
   def setCustomHeaders(self, headers):
     self._headers = headers

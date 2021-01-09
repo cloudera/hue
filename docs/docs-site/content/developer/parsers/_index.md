@@ -44,7 +44,7 @@ The parsers provide one function, parseSql, that accepts the text before the cur
 
 As an example:
 
-    sqlParserRepository.getAutocompleter('impala').then(parser => {
+    sqlParserRepository.getAutocompleteParser('impala').then(parser => {
       console.log(parser.parseSql('SELECT * FROM customers'));
     });
 

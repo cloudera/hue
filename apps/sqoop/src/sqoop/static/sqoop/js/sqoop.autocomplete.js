@@ -29,9 +29,9 @@ var autocomplete = (function($) {
         key = 'sqoop_' + server_type;
       }
     }
-    var val = $.totalStorage(key) || [];
+    var val = hueUtils.hueLocalStorage(key) || [];
     if (value) {
-      $.totalStorage(key, value);
+      hueUtils.hueLocalStorage(key, value);
     }
     return val;
   }

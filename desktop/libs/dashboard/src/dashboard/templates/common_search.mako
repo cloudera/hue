@@ -3070,7 +3070,6 @@ ${ dashboard.import_layout(True) }
 <script src="${ static('dashboard/js/search.utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.textsqueezer.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/shortcut.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/mustache.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('dashboard/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
@@ -5042,7 +5041,7 @@ $(document).ready(function () {
   huePubSub.subscribe('app.dom.unload', function (app) {
     if (app === 'dashboard') {
       %if is_report:
-      if (window.apiHelper.getFromTotalStorage('assist', 'right_assist_panel_visible', false)) {
+      if (window.hueUtils.hueLocalStorage('assist.right_assist_panel_visible')) {
         huePubSub.publish('right.assist.show');
       }
       %endif

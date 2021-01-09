@@ -17,8 +17,8 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 ko.bindingHandlers.assistVerticalResizer = {
   init: function (element, valueAccessor) {
@@ -85,7 +85,7 @@ ko.bindingHandlers.assistVerticalResizer = {
       return;
     }
 
-    const panelRatios = apiHelper.getFromTotalStorage('assist', 'innerPanelRatios', {});
+    const panelRatios = getFromLocalStorage('assist.innerPanelRatios', {});
 
     let totalRatios = 0;
     $.each($allPanels, (idx, panel) => {
@@ -253,7 +253,7 @@ ko.bindingHandlers.assistVerticalResizer = {
             panelRatios[panelDefinitions()[idx].type] =
               $(panel).outerHeight(true) / totalHeightForPanels;
           });
-          apiHelper.setInTotalStorage('assist', 'innerPanelRatios', panelRatios);
+          setInLocalStorage('assist.innerPanelRatios', panelRatios);
         }
       });
     });

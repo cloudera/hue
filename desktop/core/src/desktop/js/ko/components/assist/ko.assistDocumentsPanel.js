@@ -17,14 +17,14 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
-import componentUtils from 'ko/components/componentUtils';
+import { ASSIST_DOC_HIGHLIGHT_EVENT, ASSIST_SHOW_DOC_EVENT } from './events';
+import { DOCUMENT_TYPES } from 'doc/docSupport';
 import HueFileEntry from 'doc/hueFileEntry';
+import componentUtils from 'ko/components/componentUtils';
+import { CONFIG_REFRESHED_EVENT, getLastKnownConfig } from 'utils/hueConfig';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { DOCUMENT_TYPES } from 'doc/docSupport';
-import { ASSIST_DOC_HIGHLIGHT_EVENT, ASSIST_SHOW_DOC_EVENT } from './events';
-import { CONFIG_REFRESHED_EVENT, getLastKnownConfig } from 'utils/hueConfig';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 export const REFRESH_DOC_ASSIST_EVENT = 'assist.document.refresh';
 
@@ -253,7 +253,7 @@ class AssistDocumentsPanel {
 
     self.highlightTypeFilter = ko.observable(false);
 
-    const lastOpenedUuid = apiHelper.getFromTotalStorage('assist', 'last.opened.assist.doc.uuid');
+    const lastOpenedUuid = getFromLocalStorage('assist.last.opened.assist.doc.uuid');
 
     if (lastOpenedUuid) {
       self.activeEntry(
@@ -283,20 +283,12 @@ class AssistDocumentsPanel {
             newEntry.definition() &&
             newEntry.definition().uuid
           ) {
-            apiHelper.setInTotalStorage(
-              'assist',
-              'last.opened.assist.doc.uuid',
-              newEntry.definition().uuid
-            );
+            setInLocalStorage('assist.last.opened.assist.doc.uuid', newEntry.definition().uuid);
           }
           loadedSub.dispose();
         });
       } else if (!newEntry.hasErrors() && newEntry.definition() && newEntry.definition().uuid) {
-        apiHelper.setInTotalStorage(
-          'assist',
-          'last.opened.assist.doc.uuid',
-          newEntry.definition().uuid
-        );
+        setInLocalStorage('assist.last.opened.assist.doc.uuid', newEntry.definition().uuid);
       }
     });
 
@@ -396,7 +388,7 @@ class AssistDocumentsPanel {
       (self.activeEntry().definition() &&
         (self.activeEntry().definition().path !== '/' || self.activeEntry().definition().uuid))
     ) {
-      apiHelper.setInTotalStorage('assist', 'last.opened.assist.doc.uuid', null);
+      setInLocalStorage('assist.last.opened.assist.doc.uuid', null);
       self.activeEntry(
         new HueFileEntry({
           activeEntry: self.activeEntry,

@@ -57,9 +57,10 @@ import MultiLineEllipsisHandler from 'utils/multiLineEllipsisHandler';
 import sqlUtils from 'sql/sqlUtils';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 
+import 'components/sidebar/HueSidebarWebComponent';
+
 import 'ko/components/assist/assistViewModel';
 import OnePageViewModel from 'onePageViewModel';
-import SideBarViewModel from 'sideBarViewModel';
 import SidePanelViewModel from 'sidePanelViewModel';
 import TopNavViewModel from 'topNavViewModel';
 
@@ -73,24 +74,7 @@ import HueFileEntry from 'doc/hueFileEntry';
 import HueDocument from 'doc/hueDocument';
 import { getLastKnownConfig, refreshConfig } from 'utils/hueConfig';
 import { simpleGet } from 'api/apiUtils'; // In analytics.mako, metrics.mako, threads.mako
-
-// import all the other Vue SFCs here
-// and then create as many instances of Vue as needed.
-// NOTE: given the nature of the project, Vue should be referenced after the page load
-//
-// import Vue from 'vue';
-// import TrademarkBanner from 'vue/components/login/TrademarkBanner.vue';
-// window.addEventListener('DOMContentLoaded', () => {
-//   new Vue({
-//     el: '#vue-element-id',
-//     components: {
-//       TrademarkBanner
-//     },
-//     data: {
-//       message: 'Hello VueHue!'
-//     }
-//   });
-// });
+import Mustache from 'mustache'; // In hbase/templates/app.mako, jobsub.templates.js, search.ko.js, search.util.js
 
 // TODO: Migrate away
 window._ = _;
@@ -124,6 +108,7 @@ window.hueUtils = hueUtils;
 window.I18n = I18n;
 window.localforage = localforage;
 window.MultiLineEllipsisHandler = MultiLineEllipsisHandler;
+window.Mustache = Mustache;
 window.nv = nv;
 window.page = page;
 window.qq = qq;
@@ -149,12 +134,6 @@ $(document).ready(async () => {
 
   const topNavViewModel = new TopNavViewModel(onePageViewModel);
   ko.applyBindings(topNavViewModel, $('.top-nav')[0]);
-
-  const sidebarViewModel = new SideBarViewModel(onePageViewModel, topNavViewModel);
-  ko.applyBindings(sidebarViewModel, $('.hue-sidebar')[0]);
-  if (window.IS_MULTICLUSTER_ONLY) {
-    ko.applyBindings(sidebarViewModel, $('.hue-sidebar-container')[0]);
-  }
 
   $(document).on('hideHistoryModal', e => {
     $('#clearNotificationHistoryModal').modal('hide');

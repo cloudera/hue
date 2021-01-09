@@ -17,7 +17,6 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
 import contextCatalog, { NAMESPACES_REFRESHED_EVENT } from 'catalog/contextCatalog';
 import huePubSub from 'utils/huePubSub';
 import MetastoreNamespace from 'apps/tableBrowser/metastoreNamespace';
@@ -27,6 +26,7 @@ import {
   ASSIST_SET_DATABASE_EVENT
 } from 'ko/components/assist/events';
 import { findEditorConnector } from 'utils/hueConfig';
+import { getFromLocalStorage } from 'utils/storageUtils';
 
 class MetastoreSource {
   constructor(options) {
@@ -63,9 +63,8 @@ class MetastoreSource {
 
     huePubSub.subscribe(ASSIST_DB_PANEL_IS_READY_EVENT, () => {
       this.lastLoadNamespacesDeferred.done(() => {
-        let lastSelectedDb = apiHelper.getFromTotalStorage(
-          'assist_' + this.type + '_' + this.namespace.id,
-          'lastSelectedDb'
+        let lastSelectedDb = getFromLocalStorage(
+          'assist_' + this.type + '_' + this.namespace.id + '.lastSelectedDb'
         );
         if (!lastSelectedDb && lastSelectedDb !== '') {
           lastSelectedDb = 'default';

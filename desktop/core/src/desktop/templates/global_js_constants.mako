@@ -47,6 +47,8 @@
 
   window.BANNER_TOP_HTML = '${ conf.CUSTOM.BANNER_TOP_HTML.get() }';
 
+  window.DISABLE_LOCAL_STORAGE = '${ conf.DISABLE_LOCAL_STORAGE.get() }' === 'True';
+
   window.CACHEABLE_TTL = {
     default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
     optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() or 0 }
@@ -81,7 +83,7 @@
   window.HAS_SQL_DASHBOARD = '${ HAS_SQL_ENABLED.get() }' === 'True';
   window.CUSTOM_DASHBOARD_URL = '${ CUSTOM_DASHBOARD_URL.get() }';
 
-  window.DROPZONE_HOME_DIR = '${ user.get_home_directory() if not user.is_anonymous() else "" }';
+  window.DROPZONE_HOME_DIR = '${ user.get_home_directory() if not user.is_anonymous else "" }';
 
   window.DOWNLOAD_ROW_LIMIT = ${ DOWNLOAD_ROW_LIMIT.get() if hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get() >= 0 else 'undefined' };
   window.DOWNLOAD_BYTES_LIMIT = ${ DOWNLOAD_BYTES_LIMIT.get() if hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0 else 'undefined' };
@@ -155,7 +157,6 @@
     'Active namespace': '${ _('Active namespace') }',
     'Add a description...': '${ _('Add a description...') }',
     'Add filter': '${ _('Add filter') }',
-    'Add more...': '${ _('Add more...') }',
     'Add privilege': '${ _('Add privilege') }',
     'Add properties...': '${ _('Add properties...') }',
     'Add table': '${ _('Add table') }',
@@ -262,6 +263,7 @@
     'Done.': '${ _('Done.') }',
     'Drop a SQL file here': '${_('Drop a SQL file here')}',
     'Drop iPython/Zeppelin notebooks here': '${_('Drop iPython/Zeppelin notebooks here')}',
+    'Edit list...': '${ _('Edit list...') }',
     'Edit Profile': '${ _('Edit Profile') }',
     'Edit tags': '${ _('Edit tags') }',
     'Edit this privilege': '${ _('Edit this privilege') }',

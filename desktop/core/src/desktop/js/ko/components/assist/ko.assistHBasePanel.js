@@ -16,11 +16,11 @@
 
 import * as ko from 'knockout';
 
-import apiHelper from 'api/apiHelper';
 import AssistHBaseEntry from 'ko/components/assist/assistHBaseEntry';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 const TEMPLATE = `
   <script type="text/html" id="hbase-context-items">
@@ -117,11 +117,7 @@ class AssistHBasePanel {
     self.reload = () => {
       self.selectedHBaseEntry(root);
       root.loadEntries(() => {
-        const lastOpenendPath = apiHelper.getFromTotalStorage(
-          'assist',
-          'last.opened.hbase.entry',
-          null
-        );
+        const lastOpenendPath = getFromLocalStorage('assist.last.opened.hbase.entry');
         if (lastOpenendPath) {
           root.entries().every(entry => {
             if (entry.path === lastOpenendPath) {
@@ -136,7 +132,7 @@ class AssistHBasePanel {
 
     self.selectedHBaseEntry.subscribe(newEntry => {
       if (newEntry !== root || (newEntry === root && newEntry.loaded)) {
-        apiHelper.setInTotalStorage('assist', 'last.opened.hbase.entry', newEntry.path);
+        setInLocalStorage('assist.last.opened.hbase.entry', newEntry.path);
       }
     });
 

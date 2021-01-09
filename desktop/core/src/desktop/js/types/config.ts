@@ -55,7 +55,8 @@ export enum AppType {
   browser = 'browser',
   editor = 'editor',
   dashboard = 'dashboard',
-  scheduler = 'scheduler'
+  scheduler = 'scheduler',
+  sdkapps = 'sdkapps'
 }
 
 export interface HueConfig extends GenericApiResponse {
@@ -64,6 +65,7 @@ export interface HueConfig extends GenericApiResponse {
     catalogs?: CatalogInterpreter[];
     [AppType.dashboard]?: AppConfig<DashboardInterpreter>;
     [AppType.editor]?: EditorConfig;
+    [AppType.sdkapps]?: AppConfig<Interpreter>;
     home?: AppConfig<Interpreter>;
     [AppType.scheduler]?: AppConfig<SchedulerInterpreter>;
   };
@@ -100,6 +102,7 @@ export interface Connector extends IdentifiableInterpreter {
   dialect_properties?: {
     sql_identifier_quote?: string;
   };
+  optimizer?: string;
 }
 
 export interface EditorInterpreter extends IdentifiableInterpreter {
@@ -108,6 +111,7 @@ export interface EditorInterpreter extends IdentifiableInterpreter {
   is_sql: boolean;
   name: string;
   optimizer: string;
+  dialect: string;
 }
 
 /* eslint-disable @typescript-eslint/no-empty-interface */

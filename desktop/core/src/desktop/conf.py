@@ -993,7 +993,7 @@ CUSTOM = ConfigSection(
                    help=_("The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set to 0 it disables the cache.")),
     LOGO_SVG=Config("logo_svg",
                    default="",
-                   help=_("SVG code to replace the default Hue logo in the top bar and sign in screen")),
+                   help=_("SVG code to replace the default Hue logo in the top bar and sign in screen"))
 ))
 
 AUTH = ConfigSection(
@@ -1938,6 +1938,13 @@ ENABLE_LINK_SHARING = Config(
   type=coerce_bool,
   help=_('Turn on the direct link sharing of saved document.')
 )
+DISABLE_LOCAL_STORAGE = Config(
+  key='disable_local_storage',
+  default="false",
+  type=coerce_bool,
+  help=_("Hue uses Localstorage to keep the users settings and database preferences."
+         "Please make this value true in case local storage should not be used")
+)
 
 ENABLE_CONNECTORS = Config(
   key='enable_connectors',
@@ -2360,4 +2367,4 @@ def is_gs_enabled():
 
 def has_gs_access(user):
   from desktop.auth.backend import is_admin
-  return user.is_authenticated() and user.is_active and (is_admin(user) or user.has_hue_permission(action="gs_access", app="filebrowser"))
+  return user.is_authenticated and user.is_active and (is_admin(user) or user.has_hue_permission(action="gs_access", app="filebrowser"))

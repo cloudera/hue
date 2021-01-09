@@ -23,12 +23,16 @@ import {
   ExecuteApiResponse,
   ExecutionHandle,
   ExecutionHistory
-} from 'apps/notebook2/execution/apiUtils';
+} from 'apps/notebook2/execution/api';
 import ExecutionResult from 'apps/notebook2/execution/executionResult';
+import { hueWindow } from 'types/types';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
-import ExecutionLogs, { ExecutionLogsRaw } from 'apps/notebook2/execution/executionLogs';
+import ExecutionLogs, {
+  ExecutionError,
+  ExecutionLogsRaw
+} from 'apps/notebook2/execution/executionLogs';
 import hueUtils, { UUID } from 'utils/hueUtils';
 import Executor from 'apps/notebook2/execution/executor';
 
@@ -57,7 +61,7 @@ export const EXECUTABLE_STATUS_TRANSITION_EVENT = 'hue.executable.status.transit
 export interface ExecutableRaw {
   executeEnded: number;
   executeStarted: number;
-  handle: ExecutionHandle;
+  handle?: ExecutionHandle;
   history?: ExecutionHistory;
   id: string;
   logs: ExecutionLogsRaw;
@@ -68,20 +72,11 @@ export interface ExecutableRaw {
   type: string;
 }
 
-interface hueWindow {
-  WS_CHANNEL?: string;
-  WEB_SOCKETS_ENABLED?: boolean;
-}
-
-const INITIAL_HANDLE: ExecutionHandle = {
-  statement_id: 0
-};
-
 export default abstract class Executable {
   id: string = UUID();
   database?: string;
   executor: Executor;
-  handle: ExecutionHandle;
+  handle?: ExecutionHandle;
   operationId?: string;
   history?: ExecutionHistory;
   status = EXECUTION_STATUS.ready;
@@ -96,11 +91,10 @@ export default abstract class Executable {
   nextExecutable?: Executable;
   observerState: { [key: string]: unknown } = {};
   lost = false;
+  edited = false;
 
   protected constructor(options: { executor: Executor }) {
     this.executor = options.executor;
-
-    this.handle = INITIAL_HANDLE;
     this.logs = new ExecutionLogs(this);
   }
 
@@ -197,6 +191,7 @@ export default abstract class Executable {
     if (!this.isReady()) {
       return;
     }
+    this.edited = false;
     this.executeStarted = Date.now();
 
     this.setStatus(EXECUTION_STATUS.running);
@@ -228,14 +223,15 @@ export default abstract class Executable {
           });
         }
       } catch (err) {
-        if (typeof err === 'string') {
-          err = this.adaptError(err);
+        if (err && (err.message || typeof err === 'string')) {
+          const adapted = this.adaptError((err.message && err.message) || err);
+          this.logs.errors.push(adapted);
+          this.logs.notify();
         }
-        this.logs.errors.push(err);
         throw err;
       }
 
-      if (this.handle.has_result_set && this.handle.sync) {
+      if (this.handle && this.handle.has_result_set && this.handle.sync) {
         this.result = new ExecutionResult(this);
         if (this.handle.sync) {
           if (this.handle.result) {
@@ -257,11 +253,15 @@ export default abstract class Executable {
   }
 
   async checkStatus(statusCheckCount?: number): Promise<void> {
+    if (!this.handle) {
+      return;
+    }
+
     let checkStatusTimeout = -1;
 
     let actualCheckCount = statusCheckCount || 0;
     if (!statusCheckCount) {
-      this.cancellables.push({
+      this.addCancellable({
         cancel: () => {
           window.clearTimeout(checkStatusTimeout);
         }
@@ -281,7 +281,7 @@ export default abstract class Executable {
         this.executeEnded = Date.now();
         this.setStatus(queryStatus.status);
         this.setProgress(100);
-        if (!this.result && this.handle.has_result_set) {
+        if (!this.result && this.handle && this.handle.has_result_set) {
           this.result = new ExecutionResult(this);
           this.result.fetchRows();
         }
@@ -342,7 +342,7 @@ export default abstract class Executable {
 
   abstract async internalExecute(): Promise<ExecuteApiResponse>;
 
-  abstract adaptError(err: string): string;
+  abstract adaptError(err: string): ExecutionError;
 
   abstract canExecuteInBatch(): boolean;
 
@@ -382,7 +382,7 @@ export default abstract class Executable {
         await this.close();
       } catch (err) {}
     }
-    this.handle = INITIAL_HANDLE;
+    this.handle = undefined;
     this.setProgress(0);
     this.setStatus(EXECUTION_STATUS.ready);
   }

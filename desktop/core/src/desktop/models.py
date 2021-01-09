@@ -129,8 +129,11 @@ if not ENABLE_ORGANIZATIONS.get():
 
 
 class UserPreferences(models.Model):
-  """Holds arbitrary key/value strings."""
-  user = models.ForeignKey(User)
+  """
+  Holds arbitrary key/value strings.
+  Note: ideally user/jkeu should be unique together.
+  """
+  user = models.ForeignKey(User, on_delete=models.CASCADE)
   key = models.CharField(max_length=20)
   value = models.TextField(max_length=4096)
 
@@ -180,7 +183,7 @@ class DefaultConfiguration(models.Model):
 
   is_default = models.BooleanField(default=False, db_index=True)
   groups = models.ManyToManyField(Group, db_index=True, db_table='defaultconfiguration_groups')
-  user = models.ForeignKey(User, blank=True, null=True, db_index=True)
+  user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, db_index=True)
 
   objects = DefaultConfigurationManager()
 
@@ -304,7 +307,7 @@ class DocumentTag(models.Model):
   """
   Reserved tags can't be manually removed by the user.
   """
-  owner = models.ForeignKey(User, db_index=True)
+  owner = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
   tag = models.SlugField()
 
   DEFAULT = 'default' # Always there
@@ -634,7 +637,7 @@ class DocumentManager(models.Manager):
 
 class Document(models.Model):
 
-  owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'),
+  owner = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True, verbose_name=_t('Owner'),
                             help_text=_t('User who can own the job.'), related_name='doc_owner')
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
@@ -645,7 +648,7 @@ class Document(models.Model):
 
   tags = models.ManyToManyField(DocumentTag, db_index=True)
 
-  content_type = models.ForeignKey(ContentType)
+  content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
   object_id = models.PositiveIntegerField()
   content_object = GenericForeignKey('content_type', 'object_id')
 
@@ -877,13 +880,11 @@ class DocumentPermissionManager(models.Manager):
     perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=name)
 
     if users is not None:
-      perm.users = []
-      perm.users = users
+      perm.users.set(users)
       perm.save()
 
     if groups is not None:
-      perm.groups = []
-      perm.groups = groups
+      perm.groups.set(groups)
       perm.save()
 
     if not users and not groups:
@@ -898,7 +899,7 @@ class DocumentPermission(models.Model):
   READ_PERM = 'read'
   WRITE_PERM = 'write'
 
-  doc = models.ForeignKey(Document)
+  doc = models.ForeignKey(Document, on_delete=models.CASCADE)
 
   users = models.ManyToManyField(User, db_index=True, db_table='documentpermission_users')
   groups = models.ManyToManyField(Group, db_index=True, db_table='documentpermission_groups')
@@ -1130,7 +1131,14 @@ class Document2(models.Model):
   TRASH_DIR = '.Trash'
   EXAMPLES_DIR = 'examples'
 
-  owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Creator.'), related_name='doc2_owner')
+  owner = models.ForeignKey(
+    User,
+    on_delete=models.CASCADE,
+    db_index=True,
+    verbose_name=_t('Owner'),
+    help_text=_t('Creator.'),
+    related_name='doc2_owner'
+  )
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
   uuid = models.CharField(default=uuid_default, max_length=36, db_index=True)
@@ -1142,6 +1150,7 @@ class Document2(models.Model):
   )
   connector = models.ForeignKey(
       Connector,
+      on_delete=models.CASCADE,
       verbose_name=_t('Connector'),
       help_text=_t('Connector.'),
       blank=True,
@@ -1470,13 +1479,13 @@ class Document2(models.Model):
 
     perm, created = Document2Permission.objects.get_or_create(doc=self, perms=name)
 
-    perm.users = []
+    perm.users.clear()
     if users is not None:
-      perm.users = users
+      perm.users.set(users)
 
-    perm.groups = []
+    perm.groups.clear()
     if groups is not None:
-      perm.groups = groups
+      perm.groups.set(groups)
 
     perm.is_link_on = is_link_on
 
@@ -1649,7 +1658,7 @@ class Document2Permission(models.Model):
   LINK_READ_PERM = 'link_read'
   LINK_WRITE_PERM = 'link_write'
 
-  doc = models.ForeignKey(Document2)
+  doc = models.ForeignKey(Document2, on_delete=models.CASCADE)
 
   users = models.ManyToManyField(User, db_index=True, db_table='documentpermission2_users')
   groups = models.ManyToManyField(Group, db_index=True, db_table='documentpermission2_groups')
@@ -1723,7 +1732,8 @@ class ClusterConfig(object):
           editors,
           app_config.get('dashboard'),
           app_config.get('scheduler')
-        ] if app is not None
+        ]
+        if app is not None
       ],
       'default_sql_interpreter': default_sql_interpreter,
       'cluster_type': self.cluster_type,
@@ -1758,15 +1768,18 @@ class ClusterConfig(object):
     default_interpreter = default_app.get('interpreters')
 
     try:
-      user_default_app = json.loads(
-        UserPreferences.objects.get(user=self.user, key='default_app').value
-      )
+      user_preference = get_user_preferences(user=self.user, key='default_app')
+      if not user_preference:
+        raise UserPreferences.DoesNotExist()
+      user_default_app = json.loads(user_preference['default_app'])
       if apps.get(user_default_app['app']):
         default_interpreter = []
         default_app = apps[user_default_app['app']]
         if default_app.get('interpreters'):
-          interpreters = [interpreter for interpreter in default_app['interpreters']
-                          if interpreter['type'] == user_default_app['interpreter']]
+          interpreters = [
+            interpreter
+            for interpreter in default_app['interpreters'] if interpreter['type'] == user_default_app['interpreter']
+          ]
           if interpreters:
             default_interpreter = interpreters
     except UserPreferences.DoesNotExist:
@@ -1886,12 +1899,13 @@ class ClusterConfig(object):
       _interpreters.extend([{
           'type': interpreter['type'],
           'id': interpreter['type'],
-          'displayName': interpreter['type'].title(),
-          'buttonName': interpreter['type'].title(),
+          'displayName': interpreter['name'].title(),
+          'buttonName': interpreter['name'].title(),
           'page': '/dashboard/new_search?engine=%(type)s' % interpreter,
-          'tooltip': _('%s Dashboard') % interpreter['type'].title(),
+          'tooltip': _('%s Dashboard') % interpreter['name'].title(),
           'is_sql': True
-        } for interpreter in interpreters
+        }
+        for interpreter in interpreters
       ])
 
       return {
@@ -1918,14 +1932,15 @@ class ClusterConfig(object):
     remote_home_storage = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else None
 
     for hdfs_connector in hdfs_connectors:
-      home_path = remote_home_storage if remote_home_storage else self.user.get_home_directory().encode('utf-8')
+      force_home = remote_home_storage and not remote_home_storage.startswith('/')
+      home_path = self.user.get_home_directory(force_home=force_home).encode('utf-8')
       interpreters.append({
         'type': 'hdfs',
         'displayName': hdfs_connector,
         'buttonName': _('Browse'),
         'tooltip': hdfs_connector,
         'page': '/filebrowser/' + (
-          not self.user.is_anonymous() and
+          not self.user.is_anonymous and
           'view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS) or ''
         )
       })
@@ -2153,7 +2168,7 @@ class Cluster(object):
 def _get_apps(user, section=None):
   current_app = None
   other_apps = []
-  if user.is_authenticated():
+  if user.is_authenticated:
     apps_list = appmanager.get_apps_dict(user)
     apps = list(apps_list.values())
     for app in apps:
@@ -2177,8 +2192,15 @@ def get_user_preferences(user, key=None):
       return {key: x.value}
     except UserPreferences.DoesNotExist:
       return None
+    except UserPreferences.MultipleObjectsReturned:
+      for dup in UserPreferences.objects.filter(user=user, key=key)[1:]:
+        LOG.warn('Deleting UserPreferences duplicate %s' % dup)
+        dup.delete()
+      x = UserPreferences.objects.get(user=user, key=key)
+      return {key: x.value}
   else:
     return dict((x.key, x.value) for x in UserPreferences.objects.filter(user=user))
+
 
 
 def set_user_preferences(user, key, value):

@@ -32,7 +32,22 @@ class TestSparkApi(object):
 
   def setUp(self):
     self.user = 'hue_test'
-    self.api = SparkApi(self.user)
+    self.interpreter = {
+        'name': 'livy',
+        'options': {
+          'api_url': 'http://gethue.com:8998'
+        },
+      }
+    self.api = SparkApi(self.user, self.interpreter)
+
+
+  def test_get_api(self):
+    lang = 'pyspark'
+    properties = None
+
+    # with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
+    spark_api = self.api.get_api()
+    assert_equal(spark_api.__class__.__name__, 'LivyClient')
 
   def test_get_livy_props_method(self):
     test_properties = [{
@@ -40,8 +55,8 @@ class TestSparkApi(object):
         "value": 'file_a,file_b,file_c',
       }]
     props = self.api.get_livy_props('scala', test_properties)
-    assert_equal(props['files'],['file_a','file_b','file_c'])
-    
+    assert_equal(props['files'], ['file_a', 'file_b', 'file_c'])
+
   def test_create_session_with_config(self):
     lang = 'pyspark'
     properties = None
@@ -73,7 +88,7 @@ class TestSparkApi(object):
             if p['name'] == 'driverCores':
               cores = p['value']
           assert_equal(cores, 2)
-          
+
           # Case without user configuration. Expected 1 driverCores
           USE_DEFAULT_CONFIGURATION.get.return_value = True
           DefaultConfiguration.objects.get_configuration_for_user.return_value = None

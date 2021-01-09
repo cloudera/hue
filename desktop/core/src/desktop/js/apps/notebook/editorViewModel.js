@@ -30,6 +30,7 @@ import {
   GET_ACTIVE_SNIPPET_CONNECTOR_EVENT
 } from 'apps/notebook2/events';
 import { CONFIG_REFRESHED_EVENT, findEditorConnector, getLastKnownConfig } from 'utils/hueConfig';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 class EditorViewModel {
   constructor(editor_id, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -281,21 +282,21 @@ class EditorViewModel {
     self.assistWithoutStorage = ko.observable(false);
 
     self.isLeftPanelVisible = ko.observable(
-      apiHelper.getFromTotalStorage('assist', 'assist_panel_visible', true)
+      getFromLocalStorage('assist.assist_panel_visible', true)
     );
     self.isLeftPanelVisible.subscribe(val => {
       if (!self.assistWithoutStorage()) {
-        apiHelper.setInTotalStorage('assist', 'assist_panel_visible', val);
+        setInLocalStorage('assist.assist_panel_visible', val);
       }
     });
 
     self.isRightPanelAvailable = ko.observable(options.assistAvailable && HAS_OPTIMIZER);
     self.isRightPanelVisible = ko.observable(
-      apiHelper.getFromTotalStorage('assist', 'right_assist_panel_visible', true)
+      getFromLocalStorage('assist.right_assist_panel_visible', true)
     );
     self.isRightPanelVisible.subscribe(val => {
       if (!self.assistWithoutStorage()) {
-        apiHelper.setInTotalStorage('assist', 'right_assist_panel_visible', val);
+        setInLocalStorage('assist.right_assist_panel_visible', val);
       }
     });
 
@@ -438,14 +439,14 @@ class EditorViewModel {
     self.init = function () {
       if (editor_id) {
         self.openNotebook(editor_id);
-      } else if (window.location.getParameter('gist') !== '') {
-        self.newNotebook(window.location.getParameter('type'));
-      } else if (window.location.getParameter('editor') !== '') {
-        self.openNotebook(window.location.getParameter('editor'));
+      } else if (hueUtils.getParameter('gist') !== '') {
+        self.newNotebook(hueUtils.getParameter('type'));
+      } else if (hueUtils.getParameter('editor') !== '') {
+        self.openNotebook(hueUtils.getParameter('editor'));
       } else if (notebooks.length > 0) {
         self.loadNotebook(notebooks[0]); // Old way of loading json for /browse
-      } else if (window.location.getParameter('type') !== '') {
-        self.newNotebook(window.location.getParameter('type'));
+      } else if (hueUtils.getParameter('type') !== '') {
+        self.newNotebook(hueUtils.getParameter('type'));
       } else {
         self.newNotebook();
       }
@@ -625,8 +626,8 @@ class EditorViewModel {
         '/notebook/api/create_notebook',
         {
           type: connectorId,
-          directory_uuid: window.location.getParameter('directory_uuid'),
-          gist: self.isNotificationManager() ? undefined : window.location.getParameter('gist')
+          directory_uuid: hueUtils.getParameter('directory_uuid'),
+          gist: self.isNotificationManager() ? undefined : hueUtils.getParameter('gist')
         },
         data => {
           self.loadNotebook(data.notebook);
@@ -642,7 +643,7 @@ class EditorViewModel {
               snippet.currentQueryTab(queryTab);
             }
             huePubSub.publish('detach.scrolls', self.selectedNotebook().snippets()[0]);
-            if (window.location.getParameter('type') === '') {
+            if (hueUtils.getParameter('type') === '') {
               hueUtils.changeURLParameter('type', self.editorType());
             }
             if (!self.isNotificationManager()) {

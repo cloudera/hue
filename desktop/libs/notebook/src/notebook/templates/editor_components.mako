@@ -83,7 +83,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       $('#queryBuilder').hide();
       $('#queryBuilderAlert').show();
     }
-  }, 500, 'editor' + (window.location.getParameter('type') ? '-' + window.location.getParameter('type') : ''));
+  }, 500, 'editor' + (hueUtils.getParameter('type') ? '-' + hueUtils.getParameter('type') : ''));
 
 </script>
 <!-- End query builder imports -->
@@ -2111,6 +2111,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       presto: {
         placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
         aceMode: 'ace/mode/presto',
+        snippetIcon: 'fa-database',
+        sqlDialect: true
+      },
+      dasksql: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/dasksql',
         snippetIcon: 'fa-database',
         sqlDialect: true
       },

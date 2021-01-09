@@ -3168,7 +3168,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           lastUpdateJobRequest = self._fetchJob(function (data) {
             var requests = [];
             if (['schedule', 'workflow'].indexOf(vm.job().type()) >= 0) {
-              window.hueUtils.deleteAllEmptyStringKey(data.app); // It's preferable for our backend to return empty strings for various values in order to initialize them, but they shouldn't overwrite any values that are currently set.
+              window.hueUtils.deleteAllEmptyStringKeys(data.app); // It's preferable for our backend to return empty strings for various values in order to initialize them, but they shouldn't overwrite any values that are currently set.
               var selectedIDs = []
               if (vm.job().coordinatorActions()) {
                 selectedIDs = vm.job().coordinatorActions().selectedJobs().map(
@@ -3884,7 +3884,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.apiHelper = window.apiHelper;
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
-      self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+      window.hueUtils.withLocalStorage('assist.assist_panel_visible', self.isLeftPanelVisible, true);
+      self.isLeftPanelVisible.subscribe(function () {
+        huePubSub.publish('assist.forceRender');
+      });
+
       self.appConfig = ko.observable();
       self.clusterType = ko.observable();
       self.isMini = ko.observable(false);
@@ -3926,7 +3930,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return self.appConfig() && self.appConfig()['scheduler'] && self.appConfig()['scheduler']['interpreter_names'].indexOf('celery-beat') != -1;
         };
         var livyInterfaceCondition = function () {
-          return '${ is_mini }' == 'False' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+          return '${ is_mini }' == 'False' && self.appConfig() && self.appConfig()['editor'] && (self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1 || self.appConfig()['editor']['interpreter_names'].indexOf('sparksql') != -1);
         };
         var queryInterfaceCondition = function () {
           return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);

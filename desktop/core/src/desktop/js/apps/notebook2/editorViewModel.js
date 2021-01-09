@@ -34,6 +34,7 @@ import {
   findEditorConnector,
   getLastKnownConfig
 } from 'utils/hueConfig';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 class EditorViewModel {
   constructor(editorId, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -91,7 +92,7 @@ class EditorViewModel {
 
     this.activeConnector.subscribe(connector => {
       if (connector) {
-        if (window.location.getParameter('type') !== connector.id) {
+        if (hueUtils.getParameter('type') !== connector.id) {
           hueUtils.changeURLParameter('type', connector.id);
         }
         this.notifyDialectChange(connector.dialect, connector.is_sql);
@@ -145,21 +146,21 @@ class EditorViewModel {
     this.assistWithoutStorage = ko.observable(false);
 
     this.isLeftPanelVisible = ko.observable(
-      apiHelper.getFromTotalStorage('assist', 'assist_panel_visible', true)
+      getFromLocalStorage('assist.assist_panel_visible', true)
     );
     this.isLeftPanelVisible.subscribe(val => {
       if (!this.assistWithoutStorage()) {
-        apiHelper.setInTotalStorage('assist', 'assist_panel_visible', val);
+        setInLocalStorage('assist.assist_panel_visible', val);
       }
     });
 
     this.isRightPanelAvailable = ko.observable(options.assistAvailable && HAS_OPTIMIZER);
     this.isRightPanelVisible = ko.observable(
-      apiHelper.getFromTotalStorage('assist', 'right_assist_panel_visible', true)
+      getFromLocalStorage('assist.right_assist_panel_visible', true)
     );
     this.isRightPanelVisible.subscribe(val => {
       if (!this.assistWithoutStorage()) {
-        apiHelper.setInTotalStorage('assist', 'right_assist_panel_visible', val);
+        setInLocalStorage('assist.right_assist_panel_visible', val);
       }
     });
 
@@ -281,13 +282,10 @@ class EditorViewModel {
   async init() {
     if (this.editorId) {
       await this.openNotebook(this.editorId);
-    } else if (
-      window.location.getParameter('gist') !== '' ||
-      window.location.getParameter('type') !== ''
-    ) {
-      await this.newNotebook(window.location.getParameter('type'));
-    } else if (window.location.getParameter('editor') !== '') {
-      await this.openNotebook(window.location.getParameter('editor'));
+    } else if (hueUtils.getParameter('gist') !== '' || hueUtils.getParameter('type') !== '') {
+      await this.newNotebook(hueUtils.getParameter('type'));
+    } else if (hueUtils.getParameter('editor') !== '') {
+      await this.openNotebook(hueUtils.getParameter('editor'));
     } else if (this.notebooks.length > 0) {
       this.loadNotebook(this.notebooks[0]); // Old way of loading json for /browse
     } else {
@@ -342,8 +340,8 @@ class EditorViewModel {
     return new Promise((resolve, reject) => {
       $.post('/notebook/api/create_notebook', {
         type: connectorId,
-        directory_uuid: window.location.getParameter('directory_uuid'),
-        gist: this.isNotificationManager() ? undefined : window.location.getParameter('gist')
+        directory_uuid: hueUtils.getParameter('directory_uuid'),
+        gist: this.isNotificationManager() ? undefined : hueUtils.getParameter('gist')
       })
         .then(data => {
           this.loadNotebook(data.notebook);

@@ -34,7 +34,7 @@ const TEMPLATE = `
     <button type="button" class="close" data-bind="click: reset" aria-label="${I18n('Clear')}"><span aria-hidden="true">&times;</span></button>
   </div>
   <ul class="unstyled" data-bind="foreach: errors">
-    <li data-bind="text: $data"></li>
+    <li data-bind="text: $data.message"></li>
   </ul>
 </div>
 
@@ -136,7 +136,7 @@ class ExecutableLogs extends DisposableComponent {
   }
 
   updateFromExecutable(executable) {
-    this.hasResultset(executable.handle.has_result_set);
+    this.hasResultset(executable.handle && executable.handle.has_result_set);
     this.status(executable.status);
     this.sourceType(executable.sourceType);
     if (!this.compute) {
