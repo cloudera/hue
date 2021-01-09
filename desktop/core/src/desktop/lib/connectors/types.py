@@ -370,7 +370,7 @@ CONNECTOR_TYPES = [
     }
   },
   {
-    'nice_name': 'Presto',
+    'nice_name': 'Trino (Presto SQL)',
     'dialect': 'presto',
     'interface': 'sqlalchemy',
     'settings': [
