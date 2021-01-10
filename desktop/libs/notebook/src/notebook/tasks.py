@@ -495,8 +495,10 @@ def _get_query_key(notebook, snippet):
   if ENABLE_NOTEBOOK_2.get():
     if snippet.get('executable'):
       query_key = snippet['executable']['id']
-    else:
+    elif snippet.get('executor'):
       query_key = snippet['executor']['executables'][0].get('history', {}).get('uuid')
+    else:
+      query_key = notebook['uuid']  # get_logs()
   else:
     query_key = notebook['uuid']
 
