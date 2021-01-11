@@ -23,51 +23,12 @@
 %>
 
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
-<%namespace name="editorComponents2" file="editor_components2.mako" />
 <%namespace name="editorComponents" file="editor_components.mako" />
 <%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
 <%namespace name="hueAceAutocompleter" file="/hue_ace_autocompleter.mako" />
 
 
 <div id="notebookComponents" class="notebook">
-% if ENABLE_NOTEBOOK_2.get():
-  ${ editorComponents2.includes(is_embeddable=is_embeddable, suffix='notebook') }
-  ${ editorComponents2.topBar(suffix='notebook') }
-
-  <%editorComponents2:commonHTML is_embeddable="${is_embeddable}" suffix="notebook">
-    <%def name="addSnippetHTML()">
-      <h1 class="empty" data-bind="visible: $root.availableSnippets().length == 0">
-        ${ _('There are no snippets configured.') }
-
-        % if ENABLE_CONNECTORS.get() and is_admin(request.user):
-          <br>
-          <a data-bind="hueLink: '${ url('desktop.lib.connectors.views.index') }'" title="${ _('Open the connector configuration page') }">
-            <i class="fa fa-plus-circle"></i> ${ _('Add a Database connector') }
-          </a>
-        % endif
-      </h1>
-
-      <!-- ko if: $root.availableSnippets().length > 0 -->
-    <h1 class="empty" data-bind="visible: snippets().length == 0">
-      ${ _('Add a snippet to start your new notebook') }
-    </h1>
-
-    <div class="add-snippet" data-bind="component: {
-      name: 'add-snippet-menu',
-      params: {
-        notebook: $data,
-        availableSnippets: $root.availableSnippets
-      }
-    }">
-    </div>
-      <!-- /ko -->
-    </%def>
-  </%editorComponents2:commonHTML>
-
-  ${ notebookKoComponents.addSnippetMenu() }
-
-  ${ editorComponents2.commonJS(is_embeddable=is_embeddable, bindableElement='notebookComponents', suffix='notebook') }
-% else:
   ${ editorComponents.includes(is_embeddable=is_embeddable, suffix='notebook') }
   ${ editorComponents.topBar(suffix='notebook') }
   <%editorComponents:commonHTML is_embeddable="${is_embeddable}" suffix="notebook">
@@ -92,5 +53,4 @@
   ${ notebookKoComponents.addSnippetMenu() }
 
   ${ editorComponents.commonJS(is_embeddable=is_embeddable, bindableElement='notebookComponents', suffix='notebook') }
-% endif
 </div>
