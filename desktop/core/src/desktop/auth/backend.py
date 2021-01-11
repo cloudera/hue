@@ -32,6 +32,7 @@ from builtins import object
 from importlib import import_module
 
 import logging
+import sys
 LOG = logging.getLogger(__name__)
 
 try:
@@ -273,11 +274,18 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
   Allows the first user in, but otherwise delegates to Django's
   ModelBackend.
   """
-  def authenticate(self, username=None, email=None, password=None):
-    if email is not None:
-      username = email
+  def authenticate(self, *args, **kwargs):
+    if sys.version_info[0] > 2:
+      request = args[0]
+    else:
+      request = None
+
+    username = kwargs['username']
+    password = kwargs['password']
+
+    if 'email' in kwargs:
+      username = kwargs['email']
     username = force_username_case(username)
-    request = None
 
     user = super(AllowFirstUserDjangoBackend, self).authenticate(request, username=username, password=password)
 
@@ -318,11 +326,19 @@ class ImpersonationBackend(django.contrib.auth.backends.ModelBackend):
   Authenticate with a proxy user username/password but then login as another user.
   Does not support a multiple backends setup.
   """
-  def authenticate(self, username=None, password=None, login_as=None):
+  def authenticate(self, *args, **kwargs):
+    if sys.version_info[0] > 2:
+      request = args[0]
+    else:
+      request = None
+
+    username = kwargs['username']
+    password = kwargs['password']
+    login_as = kwargs['login_as']
+
     if not login_as:
       return
 
-    request = None
     authenticated = super(ImpersonationBackend, self).authenticate(request, username, password)
 
     if not authenticated:
