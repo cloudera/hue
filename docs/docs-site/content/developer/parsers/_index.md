@@ -91,7 +91,8 @@ Here’s a list of some of the different types of suggestions the parser can ide
 
 Parsers are generated and added to the repository using the command generateParsers.js under tools/jison/. To for instance generate all the Impala parsers you would run the following command in the hue folder:
 
-    node tools/jison/generateParsers.js impala
+    cd tools/jison
+    node generateParsers.js impala
 
 In reality two parsers are generated per dialect, one for syntax and one for autocomplete. The syntax parsers is a subset of the autocomplete parser with no error recovery and without the autocomplete specific grammar.
 
@@ -190,7 +191,9 @@ Our generateParsers tool can take an existing dialect and setup the source code 
 
 In the hue folder run:
 
-    node tools/jison/generateParsers.js -new generic postgresql
+    cd tools/jison
+    npm install
+    node generateParsers.js -new generic postgresql
 
 After the -new argument you specify an existing dialect to clone first and then the name of the new parser.
 
@@ -198,7 +201,8 @@ Once executed the tool has cloned the generic parser with tests and generated a 
 
 To regenerate the parsers after changes to the jison files run:
 
-    node tools/jison/generateParsers.js postgresql
+    cd tools/jison    
+    node generateParsers.js postgresql
 
 The tool will report any problems with the grammar. Note that it might still generate a parser if the grammar isn’t ambiguous but it’s likely that there will be test failures.
 
@@ -289,7 +293,7 @@ For the next one we’ll add some keyword suggestions after the user has typed R
       }
     ;
 
-Again, run `node tools/jison/generateParsers.js postgresql` then `npm run test -- postgresqlAutocompleteParser.test.js` and the tests should both be green.
+Again, run `cd  tools/jison/; node generateParsers.js postgresql` then `npm run test -- postgresqlAutocompleteParser.test.js` and the tests should both be green.
 
 We also want the autocompleter to suggest the keyword REINDEX when the user hasn’t typed anything, to do that let’s first add the following test with the other new ones in `postgresqlAutocompleteParser.test.js`:
 
