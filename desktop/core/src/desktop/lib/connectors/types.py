@@ -94,6 +94,7 @@ CONNECTOR_TYPES = [
       {'name': 'server_host', 'value': 'localhost'},
       {'name': 'server_port', 'value': 21050},
       {'name': 'impersonation_enabled', 'value': False},
+      {'name': 'use_sasl', 'value': False},
     ],
     'category': 'editor',
     'description': '',
