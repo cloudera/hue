@@ -56,6 +56,7 @@ export default class SqlExecutable extends Executable {
       this.executor.defaultLimit &&
       !isNaN(this.executor.defaultLimit()) &&
       this.executor.defaultLimit() > 0 &&
+      /\sfrom\s/i.test(statement) &&
       !/\slimit\s[0-9]/i.test(statement)
     ) {
       const endMatch = statement.match(SELECT_END_REGEX);
