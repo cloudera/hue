@@ -58,6 +58,10 @@ class EditorViewModel {
     this.isNotificationManager = ko.observable(!!options.is_notification_manager);
     this.selectedNotebook = ko.observable();
 
+    this.firstSnippet = ko.pureComputed(
+      () => this.selectedNotebook() && this.selectedNotebook().snippets()[0]
+    );
+
     this.editorMode = ko.observable(options.mode === 'editor');
     this.config = ko.observable();
 
