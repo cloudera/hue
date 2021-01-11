@@ -212,8 +212,8 @@ class WebHdfs(Hdfs):
 
   def _getparams(self):
     return {
-      "user.name" : WebHdfs.DEFAULT_USER,
-      "doas" : self.user
+      "user.name": WebHdfs.DEFAULT_USER,
+      "doas": self.user
     }
 
   def _getheaders(self):
@@ -246,7 +246,7 @@ class WebHdfs(Hdfs):
     #fs_normpath clears scheme:/ to scheme: which doesn't make sense
     split = urlparse(path)
     if not split.path:
-        path = split._replace(path="/").geturl()
+      path = split._replace(path="/").geturl()
     return path
 
   def netnormpath(self, path):
@@ -273,7 +273,7 @@ class WebHdfs(Hdfs):
     headers = self._getheaders()
     json = self._root.get(path, params, headers)
     filestatus_list = json['FileStatuses']['FileStatus']
-    return [ WebHdfsStat(st, path) for st in filestatus_list ]
+    return [WebHdfsStat(st, path) for st in filestatus_list]
 
   def listdir(self, path, glob=None):
     """
@@ -660,45 +660,45 @@ class WebHdfs(Hdfs):
 
 
   def remove_acl_entries(self, path, aclspec):
-      path = self.strip_normpath(path)
-      params = self._getparams()
-      params['op'] = 'REMOVEACLENTRIES'
-      params['aclspec'] = aclspec
-      headers = self._getheaders()
-      return self._root.put(path, params, headers=headers)
+    path = self.strip_normpath(path)
+    params = self._getparams()
+    params['op'] = 'REMOVEACLENTRIES'
+    params['aclspec'] = aclspec
+    headers = self._getheaders()
+    return self._root.put(path, params, headers=headers)
 
 
   def remove_default_acl(self, path):
-      path = self.strip_normpath(path)
-      params = self._getparams()
-      params['op'] = 'REMOVEDEFAULTACL'
-      headers = self._getheaders()
-      return self._root.put(path, params, headers=headers)
+    path = self.strip_normpath(path)
+    params = self._getparams()
+    params['op'] = 'REMOVEDEFAULTACL'
+    headers = self._getheaders()
+    return self._root.put(path, params, headers=headers)
 
 
   def remove_acl(self, path):
-      path = self.strip_normpath(path)
-      params = self._getparams()
-      params['op'] = 'REMOVEACL'
-      headers = self._getheaders()
-      return self._root.put(path, params, headers=headers)
+    path = self.strip_normpath(path)
+    params = self._getparams()
+    params['op'] = 'REMOVEACL'
+    headers = self._getheaders()
+    return self._root.put(path, params, headers=headers)
 
 
   def set_acl(self, path, aclspec):
-      path = self.strip_normpath(path)
-      params = self._getparams()
-      params['op'] = 'SETACL'
-      params['aclspec'] = aclspec
-      headers = self._getheaders()
-      return self._root.put(path, params, headers=headers)
+    path = self.strip_normpath(path)
+    params = self._getparams()
+    params['op'] = 'SETACL'
+    params['aclspec'] = aclspec
+    headers = self._getheaders()
+    return self._root.put(path, params, headers=headers)
 
 
   def get_acl_status(self, path):
-      path = self.strip_normpath(path)
-      params = self._getparams()
-      params['op'] = 'GETACLSTATUS'
-      headers = self._getheaders()
-      return self._root.get(path, params, headers=headers)
+    path = self.strip_normpath(path)
+    params = self._getparams()
+    params['op'] = 'GETACLSTATUS'
+    headers = self._getheaders()
+    return self._root.get(path, params, headers=headers)
 
 
   def check_access(self, path, aclspec='rw-'):
@@ -801,7 +801,7 @@ class WebHdfs(Hdfs):
     # changed below for directories to remain consistent
     if dir_mode is None:
       sb = self._stats(src)
-      dir_mode=oct(stat.S_IMODE(sb.mode))
+      dir_mode = oct(stat.S_IMODE(sb.mode))
 
     src = self.strip_normpath(src)
     dest = self.strip_normpath(dest)
