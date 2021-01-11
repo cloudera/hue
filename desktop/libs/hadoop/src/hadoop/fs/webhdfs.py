@@ -1039,6 +1039,9 @@ def test_fs_configuration(fs_config):
   """
   This is a config validation method. Returns a list of [(config_variable, error_message)].
   """
+  if not fs_config.IS_ENABLED.get():
+    return []
+
   fs = WebHdfs.from_config(fs_config)
   fs.setuser(fs.superuser)
 
