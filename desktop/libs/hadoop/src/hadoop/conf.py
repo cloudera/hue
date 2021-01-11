@@ -76,7 +76,7 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
           help="The equivalent of fs.defaultFS (aka fs.default.name)",
           default="hdfs://localhost:8020"
       ),
-      LOGICAL_NAME = Config(
+      LOGICAL_NAME=Config(
           "logical_name",
           default="",
           type=str,
@@ -117,10 +117,12 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
           default='/tmp',
           type=str
       ),
-      HADOOP_CONF_DIR = Config(
+      HADOOP_CONF_DIR=Config(
           key="hadoop_conf_dir",
           dynamic_default=get_hadoop_conf_dir_default,
-          help="Directory of the Hadoop configuration) Defaults to the environment variable HADOOP_CONF_DIR when set, or '/etc/hadoop/conf'."
+          help=
+            "Directory of the Hadoop configuration) Defaults to the environment variable HADOOP_CONF_DIR when set, "
+            "or '/etc/hadoop/conf'."
       ),
       IS_ENABLED=Config(
           'is_enabled',
