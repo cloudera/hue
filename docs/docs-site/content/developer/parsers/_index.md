@@ -5,9 +5,9 @@ draft: false
 weight: 2
 ---
 
-The parsers are the flagship part of Hue and power extremely advanced autocompletes and other [SQL functionalities](/user/querying/#autocomplete). They are running on the client side and comes with just a few megabytes of JavaScript that are cached by the browser. This provides a very reactive experience to the end user and allows to [import them](#using-hue-parsers-in-your-project) as classic JavaScript modules for your own development needs.
+The parsers are the flagship part of Hue and power extremely advanced autocompletes and other [SQL functionalities](/user/querying/#autocomplete). They are running on the client side and comes with just a few megabytes of JavaScript that are cached by the browser. This provides a very reactive experience to the end user and allows to [import them](#reusing-a-parser-in-your-project) as classic JavaScript modules for your own development needs.
 
-While the dynamic content like the list of tables, columns is obviously fetched via [remote endpoints](#sql-querying), all the SQL knowledge of the statements is available.
+While the dynamic content like the list of tables, columns is obviously fetched via [remote endpoints](/administrator/configuration/connectors/), all the SQL knowledge of the statements is available.
 
 The main dialects are:
 
@@ -24,6 +24,11 @@ This guide takes you through the steps necessary to create an autocompleter for 
 * Getting the list of tables, columns, UDFs... automatically
 * Suggesting fixes
 * Diffing, formatting... queries
+
+**Looking at quick code examples?**
+
+- Adding `SHOW` syntax to Flink SQL [GH-1399](https://github.com/cloudera/hue/issues/1399)
+- Adding a Dask SQL parser and connector [GH-1480](https://github.com/cloudera/hue/issues/1480)
 
 ## Parser Theory
 
@@ -176,10 +181,10 @@ and edit your hue config desktop/conf/pseudo-distributed.ini to contain:
 
     [notebook]
     [[interpreters]]
-      [[[postgresql]]]
-        name = postgresql
-        interface=sqlalchemy
-        options='{"url": "postgresql://hue:hue@host:31335/hue"}'
+    [[[postgresql]]]
+    name = postgresql
+    interface=sqlalchemy
+    options='{"url": "postgresql://hue:hue@localhost:31335/hue"}'
 
 Our generateParsers tool can take an existing dialect and setup the source code for a new parsers based on that.
 
@@ -371,9 +376,9 @@ In the KSQL case we have:
 
 And cf. above [prerequisites](#prerequisites), any interpreter snippet with `ksql` will pick-up the new highlighter:
 
-      [[[ksql]]]
-        name = KSQL Analytics
-        interface=ksql
+    [[[ksql]]]
+    name=KSQL Analytics
+    interface=ksql
 
 Note: after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) we will be able to have multiple interpreters on the same dialect (e.g. pointing to two different databases of the same type).
 
