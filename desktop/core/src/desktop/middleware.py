@@ -826,7 +826,7 @@ class EnsureSafeRedirectURLMiddleware(MiddlewareMixin):
       if any(regexp.match(location) for regexp in redirection_patterns):
         return response
 
-      if is_safe_url(location, request.get_host()):
+      if is_safe_url(location, allowed_hosts={request.get_host()}):
         return response
 
       if request.path in ['/oidc/authenticate/', '/oidc/callback/', '/oidc/logout/', '/hue/oidc_failed/']:
