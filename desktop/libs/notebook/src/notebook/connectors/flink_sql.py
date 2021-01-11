@@ -137,7 +137,8 @@ class FlinkSqlApi(Api):
             'comment': ''
           }
           for col in description
-        ] if has_result_set else [],
+        ]
+        if has_result_set else [],
         'type': 'table'
       }
     }
@@ -224,6 +225,25 @@ class FlinkSqlApi(Api):
         }
         for col in columns
       ]
+
+    return response
+
+
+  @query_error_handler
+  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+    if operation == 'hello':
+      snippet['statement'] = "SELECT 'Hello World!'"
+
+    notebook = {}
+    sample = self.execute(notebook, snippet)
+
+    response = {
+      'status': 0,
+      'result': {}
+    }
+
+    response['rows'] = sample['result']['data']
+    response['full_headers'] = sample['result']['meta']
 
     return response
 
