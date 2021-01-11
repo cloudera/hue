@@ -5,9 +5,9 @@ draft: false
 weight: 2
 ---
 
-The parsers are the flagship part of Hue and power extremely advanced autocompletes and other [SQL functionalities](/user/querying/#autocomplete). They are running on the client side and comes with just a few megabytes of JavaScript that are cached by the browser. This provides a very reactive experience to the end user and allows to [import them](#using-hue-parsers-in-your-project) as classic JavaScript modules for your own development needs.
+The parsers are the flagship part of Hue and power extremely advanced autocompletes and other [SQL functionalities](/user/querying/#autocomplete). They are running on the client side and comes with just a few megabytes of JavaScript that are cached by the browser. This provides a very reactive experience to the end user and allows to [import them](#reusing-a-parser-in-your-project) as classic JavaScript modules for your own development needs.
 
-While the dynamic content like the list of tables, columns is obviously fetched via [remote endpoints](#sql-querying), all the SQL knowledge of the statements is available.
+While the dynamic content like the list of tables, columns is obviously fetched via [remote endpoints](/administrator/configuration/connectors/), all the SQL knowledge of the statements is available.
 
 The main dialects are:
 
@@ -24,6 +24,11 @@ This guide takes you through the steps necessary to create an autocompleter for 
 * Getting the list of tables, columns, UDFs... automatically
 * Suggesting fixes
 * Diffing, formatting... queries
+
+**Looking at quick code examples?**
+
+- Adding `SHOW` syntax to Flink SQL [GH-1399](https://github.com/cloudera/hue/issues/1399)
+- Adding a Dask SQL parser and connector [GH-1480](https://github.com/cloudera/hue/issues/1480)
 
 ## Parser Theory
 
@@ -86,7 +91,8 @@ Here’s a list of some of the different types of suggestions the parser can ide
 
 Parsers are generated and added to the repository using the command generateParsers.js under tools/jison/. To for instance generate all the Impala parsers you would run the following command in the hue folder:
 
-    node tools/jison/generateParsers.js impala
+    cd tools/jison
+    node generateParsers.js impala
 
 In reality two parsers are generated per dialect, one for syntax and one for autocomplete. The syntax parsers is a subset of the autocomplete parser with no error recovery and without the autocomplete specific grammar.
 
@@ -176,16 +182,18 @@ and edit your hue config desktop/conf/pseudo-distributed.ini to contain:
 
     [notebook]
     [[interpreters]]
-      [[[postgresql]]]
-        name = postgresql
-        interface=sqlalchemy
-        options='{"url": "postgresql://hue:hue@host:31335/hue"}'
+    [[[postgresql]]]
+    name = postgresql
+    interface=sqlalchemy
+    options='{"url": "postgresql://hue:hue@localhost:31335/hue"}'
 
 Our generateParsers tool can take an existing dialect and setup the source code for a new parsers based on that.
 
 In the hue folder run:
 
-    node tools/jison/generateParsers.js -new generic postgresql
+    cd tools/jison
+    npm install
+    node generateParsers.js -new generic postgresql
 
 After the -new argument you specify an existing dialect to clone first and then the name of the new parser.
 
@@ -193,7 +201,8 @@ Once executed the tool has cloned the generic parser with tests and generated a 
 
 To regenerate the parsers after changes to the jison files run:
 
-    node tools/jison/generateParsers.js postgresql
+    cd tools/jison    
+    node generateParsers.js postgresql
 
 The tool will report any problems with the grammar. Note that it might still generate a parser if the grammar isn’t ambiguous but it’s likely that there will be test failures.
 
@@ -284,7 +293,7 @@ For the next one we’ll add some keyword suggestions after the user has typed R
       }
     ;
 
-Again, run `node tools/jison/generateParsers.js postgresql` then `npm run test -- postgresqlAutocompleteParser.test.js` and the tests should both be green.
+Again, run `cd  tools/jison/; node generateParsers.js postgresql` then `npm run test -- postgresqlAutocompleteParser.test.js` and the tests should both be green.
 
 We also want the autocompleter to suggest the keyword REINDEX when the user hasn’t typed anything, to do that let’s first add the following test with the other new ones in `postgresqlAutocompleteParser.test.js`:
 
@@ -371,9 +380,9 @@ In the KSQL case we have:
 
 And cf. above [prerequisites](#prerequisites), any interpreter snippet with `ksql` will pick-up the new highlighter:
 
-      [[[ksql]]]
-        name = KSQL Analytics
-        interface=ksql
+    [[[ksql]]]
+    name=KSQL Analytics
+    interface=ksql
 
 Note: after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) we will be able to have multiple interpreters on the same dialect (e.g. pointing to two different databases of the same type).
 
