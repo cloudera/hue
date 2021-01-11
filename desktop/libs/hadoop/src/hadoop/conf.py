@@ -118,10 +118,16 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
           type=str
       ),
       HADOOP_CONF_DIR = Config(
-        key="hadoop_conf_dir",
-        dynamic_default=get_hadoop_conf_dir_default,
-        help=_t("Directory of the Hadoop configuration) Defaults to the environment variable HADOOP_CONF_DIR when set, or '/etc/hadoop/conf'.")
-      )
+          key="hadoop_conf_dir",
+          dynamic_default=get_hadoop_conf_dir_default,
+          help="Directory of the Hadoop configuration) Defaults to the environment variable HADOOP_CONF_DIR when set, or '/etc/hadoop/conf'."
+      ),
+      IS_ENABLED=Config(
+          'is_enabled',
+          help="Whether Hue should list this HDFS cluster. For historical reason there is no way to disable HDFS.",
+          default=True,  # True here for backward compatibility
+          type=coerce_bool
+      ),
     )
   )
 )
