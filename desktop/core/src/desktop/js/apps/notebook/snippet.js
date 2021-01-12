@@ -31,7 +31,7 @@ import Session from 'apps/notebook/session';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
 import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistModal';
 import { cancelActiveRequest } from 'api/apiUtils';
-import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
+import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/editor/events';
 import { findEditorConnector } from 'utils/hueConfig';
 import {
   ASSIST_GET_DATABASE_EVENT,

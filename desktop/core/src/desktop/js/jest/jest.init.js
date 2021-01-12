@@ -18,7 +18,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
-import 'apps/notebook2/execution/sessionManager';
+import 'apps/editor/execution/sessionManager';
 import './jquery.setup';
 import './sqlTestUtils';
 

@@ -25,7 +25,7 @@ import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import sqlUtils from 'sql/sqlUtils';
 import { matchesType } from 'sql/reference/typeUtils';
-import { DIALECT } from 'apps/notebook2/snippet';
+import { DIALECT } from 'apps/editor/snippet';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { findBrowserConnector, getRootFilePath } from 'utils/hueConfig';
 import {
@@ -253,7 +253,7 @@ class AutocompleteResults {
    */
   constructor(options) {
     this.snippet = options.snippet;
-    this.dialect = () => (window.ENABLE_NOTEBOOK_2 ? this.snippet.dialect() : this.snippet.type());
+    this.dialect = () => this.snippet.type();
     this.editor = options.editor;
     this.temporaryOnly =
       options.snippet.autocompleteSettings && options.snippet.autocompleteSettings.temporaryOnly;
