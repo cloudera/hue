@@ -92,8 +92,8 @@ class TestHiveServerClient():
         Session.objects.filter(owner=self.user, application=self.query_server['server_name']).count()
       )
       assert_equal(
-        session.guid,
-        Session.objects.get_session(self.user, self.query_server['server_name']).guid.encode()
+        str(session.guid),
+        Session.objects.get_session(self.user, self.query_server['server_name']).guid
       )
 
   def test_get_configuration(self):
@@ -298,7 +298,7 @@ class TestHiveServerClient():
         client.get_table(database='database', table_name='table_name')
       except QueryServerException as e:
         if sys.version_info[0] > 2:
-          req_string = "TGetTablesReq(sessionHandle=TSessionHandle(sessionId=THandleIdentifier(guid=b'1', secret=b'1')), catalogName=None, schemaName='database', tableName='table_name', tableTypes=None)"
+          req_string = "TGetTablesReq(sessionHandle=TSessionHandle(sessionId=THandleIdentifier(guid=b'l\\xc4', secret=b'l\\xc4')), catalogName=None, schemaName='database', tableName='table_name', tableTypes=None)"
         else:
           req_string = "TGetTablesReq(schemaName='database', sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret='1', guid='1')), tableName='table_name', tableTypes=None, catalogName=None)"
         assert_equal(
