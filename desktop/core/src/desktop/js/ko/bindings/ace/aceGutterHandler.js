@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import huePubSub from 'utils/huePubSub';
-import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
+import { EXECUTABLE_UPDATED_EVENT } from 'apps/editor/execution/executable';
 import { ACTIVE_STATEMENT_CHANGED_EVENT } from 'ko/bindings/ace/aceLocationHandler';
 import AceAnchoredRange from 'ko/bindings/ace/aceAnchoredRange';
 

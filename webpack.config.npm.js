@@ -47,7 +47,7 @@ const npmSetupPlugins = [
 const webComponentsConfig = Object.assign({}, defaultConfig, {
   entry: {
     'er-diagram': [`${JS_ROOT}/components/er-diagram/webcomp.ts`],
-    'query-editor': [`${JS_ROOT}/apps/notebook2/components/aceEditor/QueryEditorWebComponent.ts`]
+    'query-editor': [`${JS_ROOT}/apps/editor/components/aceEditor/QueryEditorWebComponent.ts`]
   },
   output: {
     path: `${DIST_DIR}/components`

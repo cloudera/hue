@@ -41,7 +41,7 @@
 % endif
 <script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
 
-% for bundle in get_hue_bundles('notebook'):
+% for bundle in get_hue_bundles('editor'):
   ${ render_bundle(bundle) | n,unicode }
 % endfor
 
