@@ -19,7 +19,7 @@ import * as ko from 'knockout';
 
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
-import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
+import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/editor/events';
 import { SHOW_LEFT_ASSIST_EVENT, SHOW_RIGHT_ASSIST_EVENT } from 'ko/components/assist/events';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 

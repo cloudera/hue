@@ -139,9 +139,6 @@ ${ hueIcons.symbols() }
             <select data-bind="options: clusters, optionsText: 'name', value: 'id'" class="input-small" style="margin-top:8px">
             </select>
           % endif
-          <!-- ko if: window.ENABLE_NOTEBOOK_2 -->
-            <!-- ko component: 'quick-query-action' --><!-- /ko -->
-          <!-- /ko -->
           <!-- ko component: 'hue-history-panel' --><!-- /ko -->
           <!-- ko if: hasJobBrowser -->
             <!-- ko component: { name: 'hue-job-browser-links', params: { onePageViewModel: onePageViewModel }} --><!-- /ko -->

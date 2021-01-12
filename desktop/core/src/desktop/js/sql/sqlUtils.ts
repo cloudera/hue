@@ -24,7 +24,7 @@ import { isReserved } from 'sql/reference/sqlReferenceRepository';
 import {
   CommentDetails,
   Suggestion
-} from 'apps/notebook2/components/aceEditor/autocomplete/AutocompleteResults';
+} from 'apps/editor/components/aceEditor/autocomplete/AutocompleteResults';
 import { Compute, Connector, Namespace } from 'types/config';
 
 const identifierEquals = (a?: string, b?: string): boolean =>

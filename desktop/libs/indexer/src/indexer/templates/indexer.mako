@@ -842,7 +842,7 @@ ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode 
           self.editorId(resp.history_id);
           self.jobId(resp.handle.id);
           $('#notebook').html($('#notebook-progress').html());
-          self.editorVM = new EditorViewModel(resp.history_uuid, '', {
+          self.editorVM = new window.NotebookViewModel(resp.history_uuid, '', {
             user: '${ user.username }',
             userId: ${ user.id },
             languages: [{name: "Java SQL", type: "java"}],

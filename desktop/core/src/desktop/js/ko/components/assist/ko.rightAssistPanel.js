@@ -21,7 +21,7 @@ import {
   ASSIST_LANG_REF_SHOW_TOPIC_EVENT,
   SHOW_RIGHT_ASSIST_EVENT
 } from './events';
-import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/notebook2/events';
+import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/editor/events';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
