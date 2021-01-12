@@ -491,6 +491,7 @@ export const fetchSourceMetadata = ({
         type: entry.getConnector().id,
         source: 'data'
       }),
+      operation: entry.isModel() ? 'model' : 'default',
       cluster: (entry.compute && JSON.stringify(entry.compute)) || '""'
     },
     {
