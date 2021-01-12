@@ -19,7 +19,6 @@
   from desktop.views import commonfooter, commonshare
 
   from django.utils.translation import ugettext as _
-  from notebook.conf import ENABLE_NOTEBOOK_2
 %>
 
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
