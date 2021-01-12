@@ -80,7 +80,7 @@ def test_audit_logging_middleware_enable():
   with tempfile.NamedTemporaryFile("w+t") as log_tmp:
     log_path = log_tmp.name
     reset = AUDIT_EVENT_LOG_DIR.set_for_testing(log_path)
-    settings.MIDDLEWARE_CLASSES.append('desktop.middleware.AuditLoggingMiddleware') # Re-add middleware
+    settings.MIDDLEWARE.append('desktop.middleware.AuditLoggingMiddleware') # Re-add middleware
 
     try:
       # Check if we audit correctly
@@ -95,7 +95,7 @@ def test_audit_logging_middleware_enable():
         assert_equal('/useradmin/permissions/edit/beeswax/access', audit_record['url'], audit_record)
 
     finally:
-      settings.MIDDLEWARE_CLASSES.pop()
+      settings.MIDDLEWARE.pop()
       reset()
 
 def test_audit_logging_middleware_disable():
@@ -113,7 +113,7 @@ def test_audit_logging_middleware_disable():
 def test_ensure_safe_redirect_middleware():
   raise SkipTest
   done = []
-  settings.MIDDLEWARE_CLASSES.append('desktop.middleware.EnsureSafeRedirectURLMiddleware')
+  settings.MIDDLEWARE.append('desktop.middleware.EnsureSafeRedirectURLMiddleware')
   try:
     # Super user
     c = make_logged_in_client()
@@ -153,6 +153,6 @@ def test_ensure_safe_redirect_middleware():
     })
     assert_equal(302, response.status_code)
   finally:
-    settings.MIDDLEWARE_CLASSES.pop()
+    settings.MIDDLEWARE.pop()
     for finish in done:
       finish()
