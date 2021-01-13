@@ -103,6 +103,9 @@ if ENABLE_ORGANIZATIONS.get():
     def __str__(self):
       return self.name or self.domain
 
+    def natural_key(self):
+      return (self.name,)
+
 
 class OrganizationGroupManager(models.Manager):
 
@@ -110,9 +113,6 @@ class OrganizationGroupManager(models.Manager):
     """Make sure to restrict to only organization's groups"""
     queryset = super(OrganizationGroupManager, self).get_queryset()
     return _fitered_queryset(queryset)
-
-  def natural_key(self):
-    return (self.organization, self.name,)
 
 
 if ENABLE_ORGANIZATIONS.get():
@@ -142,6 +142,9 @@ if ENABLE_ORGANIZATIONS.get():
 
     def __str__(self):
       return '%s @ %s' % (self.name, self.organization)
+
+    def natural_key(self):
+      return (self.organization, self.name,)
 
 
 class UserManager(BaseUserManager):

@@ -80,8 +80,8 @@ if ENABLE_ORGANIZATIONS.get():
       queryset = super(ConnectorManager, self).get_queryset()
       return _fitered_queryset(queryset)
 
-    def natural_key(self):
-      return (self.organization, self.name,)
+    def get_by_natural_key(self, dialect, interface, organization):
+      return self.get(dialect=dialect, interface=interface, organization__name=organization)
 
   class Connector(BaseConnector):
     organization = models.ForeignKey('useradmin.Organization', on_delete=models.CASCADE)
@@ -99,8 +99,22 @@ if ENABLE_ORGANIZATIONS.get():
 
     def __str__(self):
       return '%s (%s) @ %s' % (self.name, self.dialect, self.organization)
+
+    def natural_key(self):
+      return (self.dialect, self.interface) + self.organization.natural_key()
 else:
-  class Connector(BaseConnector): pass
+  class ConnectorManager(models.Manager):
+
+    def get_by_natural_key(self, dialect, interface):
+      return self.get(dialect=dialect, interface=interface)
+
+  class Connector(BaseConnector):
+
+    objects = ConnectorManager()
+
+    def natural_key(self):
+      # Note: duplicates are still possible without key on the name
+      return (self.dialect, self.interface)
 
 
 def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None, user=None, connector_id=None):
