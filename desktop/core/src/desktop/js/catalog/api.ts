@@ -143,7 +143,8 @@ export const fetchDescribe = ({
       {
         format: 'json',
         cluster: JSON.stringify(entry.compute),
-        source_type: entry.getConnector().id
+        source_type: entry.getConnector().id,
+        connector: JSON.stringify(entry.getConnector())
       },
       {
         silenceErrors,
