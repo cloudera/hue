@@ -110,7 +110,8 @@ class Command(BaseCommand):
     table_list = [table_dict for table_dict in table_list if dialect in table_dict.get('dialects', [dialect])]
 
     if not table_list:
-      raise InstallException(_('No %s tables are available as samples') % dialect)
+      self.successes.append(_('No %s tables are available as samples') % dialect)
+      return
 
     for table_dict in table_list:
       if self.tables is None or table_dict['table_name'] in self.tables:
@@ -142,7 +143,8 @@ class Command(BaseCommand):
       design_list = [d for d in design_list if d['name'] in self.queries]
 
     if not design_list:
-      raise InstallException(_('No %s queries are available as samples') % dialect)
+      self.successes.append(_('No %s queries are available as samples') % dialect)
+      return
 
     for design_dict in design_list:
       design = SampleQuery(design_dict)
