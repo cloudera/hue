@@ -50,12 +50,14 @@ Real time data querying is becoming a modern standard. Who wants to wait until t
 
 This tutorial is based on the great Flink SQL demo [Building an End-to-End Streaming Application](https://flink.apache.org/2020/07/28/flink-sql-demo-building-e2e-streaming-application.html) but focuses on the end user querying experience.
 
+**Note** Here is a follow-up post demoing how to do [calculations on rolling logs windows](/blog/sql-querying-live-kafka-logs-and-sending-live-updates-with-flink-sql/) via TUMBLE and INSERT them into another stream.
+
 ## Components
 
 To keep things simple, all the pieces have been put together in a "one-click" Docker Compose project which contains:
 
 * Flink cluster from the [Flink SQL demo](https://flink.apache.org/2020/07/28/flink-sql-demo-building-e2e-streaming-application.html#starting-the-demo-environment)
-* The [Flink SQL Gateway](https://github.com/ververica/flink-sql-gateway) in order to be able to submit SQL queries via the Hue Editor. Previously explained in [SQL Editor for Apache Flink SQL](https://gethue.com/blog/sql-editor-for-apache-flink-sql/)
+* The [Flink SQL Gateway](https://github.com/ververica/flink-sql-gateway) in order to be able to submit SQL queries via the Hue Editor. Previously explained in [SQL Editor for Apache Flink SQL](/blog/sql-editor-for-apache-flink-sql/)
 * A [Hue Editor](https://github.com/cloudera/hue/tree/master/tools/docker/hue) already configured with the Flink Editor
 
 
@@ -203,7 +205,7 @@ Or perform a live count of the number of orders happening in each hour of the da
 
 &nbsp;
 
-In the next episodes, we will demo how to easily create tables directly from raw streams of data via the [importer](https://gethue.com/querying-exploring-the-instacart-dataset-part-1-ingesting-the-data/).
+In the next episodes, we will demo how to easily create tables directly from raw streams of data via the [importer](/querying-exploring-the-instacart-dataset-part-1-ingesting-the-data/).
 
 
 Any feedback or question? Feel free to comment here!
