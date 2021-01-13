@@ -137,7 +137,8 @@ class FlinkSqlApi(Api):
             'comment': ''
           }
           for col in description
-        ] if has_result_set else [],
+        ]
+        if has_result_set else [],
         'type': 'table'
       }
     }
@@ -211,11 +212,11 @@ class FlinkSqlApi(Api):
     response = {}
 
     if database is None:
-      response['databases'] = self.show_databases()
+      response['databases'] = self._show_databases()
     elif table is None:
-      response['tables_meta'] = self.show_tables(database)
+      response['tables_meta'] = self._show_tables(database)
     elif column is None:
-      columns = self.get_columns(database, table)
+      columns = self._get_columns(database, table)
       response['columns'] = [col['name'] for col in columns]
       response['extended_columns'] = [{
           'comment': col.get('comment'),
@@ -228,41 +229,23 @@ class FlinkSqlApi(Api):
     return response
 
 
-  def show_databases(self):
-    session = self._get_session()
-    session_id = session['id']
+  @query_error_handler
+  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+    if operation == 'hello':
+      snippet['statement'] = "SELECT 'Hello World!'"
 
-    resp = self.db.execute_statement(session_id=session_id, statement='SHOW DATABASES')
+    notebook = {}
+    sample = self.execute(notebook, snippet)
 
-    return [db[0] for db in resp['results'][0]['data']]
+    response = {
+      'status': 0,
+      'result': {}
+    }
 
+    response['rows'] = sample['result']['data']
+    response['full_headers'] = sample['result']['meta']
 
-  def show_tables(self, database):
-    session = self._get_session()
-    session_id = session['id']
-
-    resp = self.db.execute_statement(session_id=session_id, statement='USE %(database)s' % {'database': database})
-    resp = self.db.execute_statement(session_id=session_id, statement='SHOW TABLES')
-
-    return [table[0] for table in resp['results'][0]['data']]
-
-
-  def get_columns(self, database, table):
-    session = self._get_session()
-    session_id = session['id']
-
-    resp = self.db.execute_statement(session_id=session_id, statement='USE %(database)s' % {'database': database})
-    resp = self.db.execute_statement(session_id=session_id, statement='DESCRIBE %(table)s' % {'table': table})
-
-    columns = resp['results'][0]['columns']
-
-    return [{
-        'name': col['name'],
-        'type': col['type'],  # Types to unify
-        'comment': '',
-      }
-      for col in columns
-    ]
+    return response
 
 
   def cancel(self, notebook, snippet):
@@ -285,6 +268,43 @@ class FlinkSqlApi(Api):
     pass
     # session = self._get_session()
     # self.db.close_session(session['id'])
+
+
+  def _show_databases(self):
+    session = self._get_session()
+    session_id = session['id']
+
+    resp = self.db.execute_statement(session_id=session_id, statement='SHOW DATABASES')
+
+    return [db[0] for db in resp['results'][0]['data']]
+
+
+  def _show_tables(self, database):
+    session = self._get_session()
+    session_id = session['id']
+
+    resp = self.db.execute_statement(session_id=session_id, statement='USE %(database)s' % {'database': database})
+    resp = self.db.execute_statement(session_id=session_id, statement='SHOW TABLES')
+
+    return [table[0] for table in resp['results'][0]['data']]
+
+
+  def _get_columns(self, database, table):
+    session = self._get_session()
+    session_id = session['id']
+
+    resp = self.db.execute_statement(session_id=session_id, statement='USE %(database)s' % {'database': database})
+    resp = self.db.execute_statement(session_id=session_id, statement='DESCRIBE %(table)s' % {'table': table})
+
+    columns = resp['results'][0]['columns']
+
+    return [{
+        'name': col['name'],
+        'type': col['type'],  # Types to unify
+        'comment': '',
+      }
+      for col in columns
+    ]
 
 
 class FlinkSqlClient():
