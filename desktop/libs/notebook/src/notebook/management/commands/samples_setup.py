@@ -47,6 +47,8 @@ class Command(BaseCommand):
     )
 
   def handle(self, *args, **options):
+    LOG.info('Installing %s examples as %s' % (options.get('dialect') or 'all', options['username']))
+
     user = User.objects.get(username=options['username'])
     dialect = options.get('dialect')
 

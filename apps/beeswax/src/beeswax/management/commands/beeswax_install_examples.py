@@ -75,6 +75,7 @@ class Command(BaseCommand):
     )
     exception = None
 
+    LOG.info('Installing %s samples %s in DB %s owned by user %s' % (dialect, tables, db_name, user))
 
     self.successes = []
     self.errors = []
