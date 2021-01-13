@@ -1,5 +1,5 @@
 ---
-title: Easy Querying of live Kafka data in a Big Table like HBase with SQL
+title: Easy Querying of live Kafka data in a Big Table like HBase with Phoenix SQL
 author: Romain
 type: post
 date: 2020-11-17T00:00:00+00:00
@@ -44,7 +44,7 @@ categories:
   - Version 4.9
 
 ---
-Easy Querying of live Kafka data in a Big Table like HBase with SQL
+Phoenix brings SQL to HBase and let you query Kafka data streams
 
 *Initially published on https://medium.com/data-querying/phoenix-brings-sql-to-hbase-and-let-you-query-kafka-data-streams-8fd2edda1401*
 
