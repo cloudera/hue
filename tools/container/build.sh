@@ -134,19 +134,19 @@ build_huecompilebase() {
 
 pull_base_images() {
   docker pull ${REGISTRY}/$HUEBASE_VERSION
-  if [[ $? != 0 ]]; then
+  if [[ $? -ne 0 ]]; then
     build_huebase
   fi
   docker tag ${REGISTRY}/$HUEBASE_VERSION $HUEBASE_VERSION
 
   docker pull ${REGISTRY}/$HUELBBASE_VERSION
-  if [[ $? != 0 ]]; then
+  if [[ $? -ne 0 ]]; then
     build_huelbbase
   fi
   docker tag ${REGISTRY}/$HUELBBASE_VERSION $HUELBBASE_VERSION
 
   docker pull ${REGISTRY}/$COMPILEHUE_VERSION
-  if [[ $? != 0 ]]; then
+  if [[ $? -ne 0 ]]; then
     build_huecompilebase
   fi
   docker tag ${REGISTRY}/$COMPILEHUE_VERSION $COMPILEHUE_VERSION
@@ -166,7 +166,9 @@ hue_containers_build() {
 
 wait_for_parallel_jobs() {
   EXIT=0
+  jobs -l
   for job in `jobs -p`; do
+    echo $job
     wait $job || let "EXIT+=1"
   done
 
@@ -181,12 +183,12 @@ if [[ $1 == "compile_hue" ]]; then
   compile_hue
 else
   # Perform Hue Code Compilation and Docker packaging
-  hue_containers_build &
+  hue_containers_build
 
   # Perform any other container build process
   extra_container_build=$(find_extra_container_to_build)
   if test -n "$extra_container_build"; then
-    $extra_container_build &
+    $extra_container_build
   fi
 
   # Wait for the parallel jobs to finish

@@ -81,7 +81,7 @@ build_hueqpbase() {
 
 pull_qpbase_images() {
   docker pull ${REGISTRY}/$HUEQPBASE_VERSION
-  if [[ $? != 0 ]]; then
+  if [[ $? -ne  0 ]]; then
     build_hueqpbase
   fi
   docker tag ${REGISTRY}/$HUEQPBASE_VERSION $HUEQPBASE_VERSION
