@@ -48,38 +48,40 @@ class TestInstallExamples():
       with patch('notebook.views.get_interpreter') as get_interpreter:
         with patch('notebook.connectors.base.get_ordered_interpreters') as get_ordered_interpreters:
           with patch('beeswax.management.commands.beeswax_install_examples.make_notebook') as make_notebook:
+            with patch('beeswax.management.commands.beeswax_install_examples.cluster.get_hdfs') as get_hdfs:
+              get_hdfs.return_value = None
 
-            ConnectorObjects.get = Mock(
-              return_value=Connector(
-                id=10,
-                name='MySql',
-                dialect='mysql',
-              ),
-            )
+              ConnectorObjects.get = Mock(
+                return_value=Connector(
+                  id=10,
+                  name='MySql',
+                  dialect='mysql',
+                ),
+              )
 
-            get_interpreter.return_value = {'type': 10, 'dialect': 'mysql'}
-            get_ordered_interpreters.return_value = [
-              {
-                'name': 'MySql',
-                'type': 10,
-                'dialect': 'mysql',
-                'interface': 'sqlalchemy',
-              }
-            ]
+              get_interpreter.return_value = {'type': 10, 'dialect': 'mysql'}
+              get_ordered_interpreters.return_value = [
+                {
+                  'name': 'MySql',
+                  'type': 10,
+                  'dialect': 'mysql',
+                  'interface': 'sqlalchemy',
+                }
+              ]
 
-            resp = self.client.post(reverse('notebook:install_examples'), {'db_name': 'default'})
-            data = json.loads(resp.content)
+              resp = self.client.post(reverse('notebook:install_examples'), {'db_name': 'default', 'dialect': 'mysql'})
+              data = json.loads(resp.content)
 
-            assert_equal(0, data['status'], data)
-            assert_equal(
-                'Query Sample: Salary Analysis mysql installed. '
-                'Table default.employe_sample installed.',
-                data['message'],
-                data
-            )
-            assert_equal('', data['errorMessage'], data)
+              assert_equal(0, data['status'], data)
+              assert_equal(
+                  'Query Sample: Salary Analysis mysql installed. '
+                  'Table default.employe_sample installed.',
+                  data['message'],
+                  data
+              )
+              assert_equal('', data['errorMessage'], data)
 
-            make_notebook.assert_called()
+              make_notebook.assert_called()
 
 
   def test_install_via_load_hive(self):
