@@ -39,6 +39,7 @@ class Command(BaseCommand):
       user = User.objects.get(username=pwd.getpwuid(os.getuid()).pw_name)
     else:
       user = options['user']
+    dialect = options.get('dialect', 'hive')
 
     # Install sample notebook from fixture if notebook with sample UUID doesn't exist
     if not Document2.objects.filter(uuid="7f2ea775-e067-4fde-8f5f-4d704ab9b002").exists():
@@ -63,4 +64,4 @@ class Command(BaseCommand):
       LOG.info('Successfully installed sample notebook')
 
     from beeswax.management.commands.beeswax_install_examples import Command
-    Command().handle(dialect='hive', user=user)
+    Command().handle(dialect=dialect, user=user)

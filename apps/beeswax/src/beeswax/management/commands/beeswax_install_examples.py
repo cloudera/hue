@@ -58,6 +58,7 @@ class Command(BaseCommand):
       request = None
       self.queries = None
       self.tables = None
+      interpreter = None
     else:
       dialect = options['dialect']
       db_name = options.get('db_name', 'default')

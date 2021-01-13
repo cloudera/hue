@@ -412,7 +412,7 @@ def install_examples(request):
       response['errorMessage'] = ' '.join(errors)
       response['status'] = len(errors)
     else:
-      Command().handle(user=request.user)
+      Command().handle(user=request.user, dialect=request.POST.get('dialect', 'hive'))
       response['status'] = 0
       response['message'] = _('Examples refreshed')
   except Exception as e:
