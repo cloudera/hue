@@ -260,6 +260,7 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  padding-left: 5px;
 
   &.sidebar-active {
     color: $sidebar-selection-color;
@@ -298,11 +299,19 @@
   height: 0;
   transition: height $sidebar-animation-duration-base;
   overflow: hidden;
+
+  .sidebar-sidebar-spacer {
+    height: 5px;
+  }
 }
 
 .sidebar-sidebar-item-tooltip-accordion-items {
   overflow-x: hidden;
   border-top: 1px solid transparent;
+
+  .sidebar-sidebar-spacer {
+    height: 5px;
+  }
 }
 
 .sidebar-sidebar-item-tooltip-accordion-items-overflow-top {

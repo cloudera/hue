@@ -18,6 +18,7 @@
 
 <template>
   <BaseNavigationItem
+    v-if="item.type === 'navigation'"
     :key="item.name"
     :css-classes="
       active
@@ -29,9 +30,11 @@
   >
     {{ item.displayName }}
   </BaseNavigationItem>
+  <SpacerItem v-else-if="item.type === 'spacer'" />
 </template>
 
 <script lang="ts">
+  import SpacerItem from 'components/sidebar/SpacerItem.vue';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
@@ -39,7 +42,7 @@
   import { SidebarAccordionSubItem } from './types';
 
   @Component({
-    components: { BaseNavigationItem }
+    components: { SpacerItem, BaseNavigationItem }
   })
   export default class AccordionSubItem extends Vue {
     @Prop()
