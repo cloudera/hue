@@ -67,7 +67,6 @@ CONNECTOR_TYPES = [
       {'name': 'url', 'value': 'hive://localhost:10000'},
       {'name': 'has_ssh', 'value': False},
       {'name': 'ssh_server_host', 'value': '127.0.0.1'},
-      {'name': 'use_sasl', 'value': True},
     ],
     'properties': {
       'is_sql': True,
