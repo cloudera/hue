@@ -49,7 +49,7 @@
     ASSIST_ACTIVE_DB_CHANGED_EVENT,
     ASSIST_SET_DATABASE_EVENT
   } from 'ko/components/assist/events';
-  import { AppType, Connector, EditorInterpreter, HueConfig, Namespace } from 'types/config';
+  import { AppType, Connector, HueConfig, Namespace } from 'types/config';
   import { hueWindow } from 'types/types';
   import { CONFIG_REFRESHED_EVENT, getLastKnownConfig } from 'utils/hueConfig';
   import huePubSub from 'utils/huePubSub';
@@ -365,13 +365,7 @@
               });
             } else {
               const subApps: SidebarAccordionSubItem[] = [];
-              let lastWasSql = false;
-              let dividerAdded = false;
               config.interpreters.forEach(interpreter => {
-                if (!dividerAdded && lastWasSql && !(<EditorInterpreter>interpreter).is_sql) {
-                  subApps.push({ type: 'spacer' });
-                  dividerAdded = true;
-                }
                 const interpreterItem: SidebarAccordionSubItem = {
                   type: 'navigation',
                   name: `${appName}-${interpreter.type}`,
@@ -385,7 +379,6 @@
                 } else {
                   subApps.push(interpreterItem);
                 }
-                lastWasSql = (<EditorInterpreter>interpreter).is_sql;
               });
 
               if (appName === 'editor' && (<hueWindow>window).SHOW_ADD_MORE_EDITORS) {
