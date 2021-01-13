@@ -171,6 +171,7 @@
 .sidebar-sidebar-item,
 .sidebar-sidebar-spacer {
   height: $sidebar-item-height;
+  width: $sidebar-width;
   display: flex;
   align-items: center;
   color: $sidebar-default-text-color;
@@ -250,6 +251,7 @@
   }
 
   .sidebar-sidebar-item-accordion-sub-item {
+    width: $sidebar-width;
     margin-left: $fluid-spacing-s;
   }
 }
@@ -318,7 +320,8 @@
 }
 
 .sidebar-sidebar-item-accordion-sub-item {
-  font-size: $font-size-sm;
+  width: $sidebar-width - 52px;
+  font-size: $font-size-sm + 1px;
   margin-left: 52px;
   display: flex;
   align-items: center;
