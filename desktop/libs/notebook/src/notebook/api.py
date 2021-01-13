@@ -1020,8 +1020,9 @@ def describe(request, database, table=None, column=None):
   response = {'status': -1, 'message': ''}
   notebook = json.loads(request.POST.get('notebook', '{}'))
   source_type = request.POST.get('source_type', '')
-  snippet = {'type': source_type}
+  connector = json.loads(request.POST.get('connector', '{}'))
 
+  snippet = {'type': source_type, 'connector': connector}
   patch_snippet_for_connector(snippet)
 
   describe = get_api(request, snippet).describe(notebook, snippet, database, table, column=column)
