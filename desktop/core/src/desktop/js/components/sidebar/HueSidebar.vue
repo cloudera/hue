@@ -49,7 +49,7 @@
     ASSIST_ACTIVE_DB_CHANGED_EVENT,
     ASSIST_SET_DATABASE_EVENT
   } from 'ko/components/assist/events';
-  import { AppType, Connector, EditorInterpreter, HueConfig, Namespace } from 'types/config';
+  import { AppType, Connector, HueConfig, Namespace } from 'types/config';
   import { hueWindow } from 'types/types';
   import { CONFIG_REFRESHED_EVENT, getLastKnownConfig } from 'utils/hueConfig';
   import huePubSub from 'utils/huePubSub';
@@ -239,10 +239,13 @@
     currentAppChanged(appName: string): void {
       let adaptedName;
 
+      const params = new URLSearchParams(location.search);
       switch (appName) {
+        case 'dashboard':
+          adaptedName = params.get('engine') ? `${appName}-${params.get('engine')}` : appName;
+          break;
         case 'editor':
-          const params = new URLSearchParams(location.search);
-          adaptedName = params.get('type') || appName;
+          adaptedName = params.get('type') ? `${appName}-${params.get('type')}` : appName;
           break;
         case 'filebrowser':
           if (location.href.indexOf('=S3A') !== -1) {
@@ -265,13 +268,13 @@
           adaptedName = 'tables';
           break;
         case 'oozie_bundle':
-          adaptedName = 'oozie-bundle';
+          adaptedName = 'scheduler-oozie-bundle';
           break;
         case 'oozie_coordinator':
-          adaptedName = 'oozie-coordinator';
+          adaptedName = 'scheduler-oozie-coordinator';
           break;
         case 'oozie_workflow':
-          adaptedName = 'oozie-workflow';
+          adaptedName = 'scheduler-oozie-workflow';
           break;
         case 'security_hive':
           adaptedName = 'security';
@@ -283,7 +286,6 @@
         case 'useradmin_users':
           adaptedName = 'user';
           break;
-        case 'dashboard':
         case 'hbase':
         case 'importer':
         case 'indexes':
@@ -355,7 +357,7 @@
             if (config.interpreters.length === 1) {
               appsItems.push({
                 type: 'navigation',
-                name: config.name,
+                name: `${appName}-${config.name}`,
                 displayName: config.displayName,
                 iconHtml: getIconHtml(config.name),
                 url: config.page,
@@ -363,16 +365,10 @@
               });
             } else {
               const subApps: SidebarAccordionSubItem[] = [];
-              let lastWasSql = false;
-              let dividerAdded = false;
               config.interpreters.forEach(interpreter => {
-                if (!dividerAdded && lastWasSql && !(<EditorInterpreter>interpreter).is_sql) {
-                  subApps.push({ type: 'spacer' });
-                  dividerAdded = true;
-                }
                 const interpreterItem: SidebarAccordionSubItem = {
                   type: 'navigation',
-                  name: interpreter.type,
+                  name: `${appName}-${interpreter.type}`,
                   displayName: interpreter.displayName,
                   url: interpreter.page,
                   handler: (event: Event) => onHueLinkClick(event, interpreter.page)
@@ -383,7 +379,6 @@
                 } else {
                   subApps.push(interpreterItem);
                 }
-                lastWasSql = (<EditorInterpreter>interpreter).is_sql;
               });
 
               if (appName === 'editor' && (<hueWindow>window).SHOW_ADD_MORE_EDITORS) {
@@ -393,7 +388,7 @@
                   : 'https://docs.gethue.com/administrator/configuration/connectors/';
                 subApps.push({
                   type: 'navigation',
-                  name: 'addMoreInterpreters',
+                  name: 'editor-AddMoreInterpreters',
                   displayName: I18n('Edit list...'),
                   url,
                   handler: (event: Event) => onHueLinkClick(event, url)
