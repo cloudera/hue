@@ -31,7 +31,6 @@ from datetime import timedelta
 from django.contrib.sessions.models import Session
 from django.db.models import Count
 from django.db.models.functions import Trunc
-from django.urls import reverse
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
@@ -39,8 +38,8 @@ from desktop.conf import has_connectors, TASK_SERVER
 from desktop.lib.connectors.models import _get_installed_connectors
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.paths import SAFE_CHARACTERS_URI
-from desktop.models import Document2
-from useradmin.models import User
+from desktop.models import Directory, Document2
+from useradmin.models import User, install_sample_user
 
 from notebook.conf import EXAMPLES, get_ordered_interpreters
 from notebook.connectors.base import Notebook, get_api as _get_api, get_interpreter
@@ -541,6 +540,28 @@ def _update_property_value(properties, key, value):
 def _get_editor_type(editor_id):
   document = Document2.objects.get(id=editor_id)
   return document.type.rsplit('-', 1)[-1]
+
+
+def _get_example_directory(user):
+  home_dir = Directory.objects.get_home_directory(user)
+  examples_dir, created = Directory.objects.get_or_create(
+    parent_directory=home_dir,
+    owner=user,
+    name=Document2.EXAMPLES_DIR
+  )
+  return examples_dir
+
+def _get_dialect_example(dialect):
+  print(dialect)
+  sample_user = install_sample_user()
+  examples_dir = _get_example_directory(sample_user)
+
+  return Document2.objects.filter(
+      owner=sample_user,
+      type='query-%s' % dialect,
+      is_history=False,
+      parent_directory=examples_dir
+  ).first()
 
 
 class ApiWrapper():

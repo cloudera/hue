@@ -27,9 +27,9 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.conf import USE_NEW_EDITOR
-from desktop.models import Directory, Document, Document2, Document2Permission
+from desktop.models import Directory, Document2, Document2Permission
 from hadoop import cluster
-from notebook.models import import_saved_beeswax_query, make_notebook, MockRequest
+from notebook.models import import_saved_beeswax_query, make_notebook, MockRequest, _get_example_directory
 from useradmin.models import get_default_user_group, install_sample_user, User
 
 from beeswax.design import hql_query
@@ -420,13 +420,7 @@ class SampleQuery(object):
       LOG.info('Successfully installed sample design: %s' % (self.name,))
 
     if USE_NEW_EDITOR.get():
-      # Get or create sample user directories
-      home_dir = Directory.objects.get_home_directory(django_user)
-      examples_dir, created = Directory.objects.get_or_create(
-        parent_directory=home_dir,
-        owner=django_user,
-        name=Document2.EXAMPLES_DIR
-      )
+      examples_dir = _get_example_directory(django_user)
 
       document_type = self._document_type(self.type, interpreter)
       notebook = import_saved_beeswax_query(query, interpreter=interpreter)
