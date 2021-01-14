@@ -146,7 +146,28 @@
   .animation(hue-fade-in-frames 2s);
 }
 
+.fillAbsolute() {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
 // Flexbox mixins
+
+.flexRowLayout() {
+  .display-flex();
+  .flex-direction(column);
+
+  overflow: hidden;
+}
+
+.flexRowLayoutRow(@flex, @position: relative) {
+  .flex(@flex);
+
+  position: @position;
+}
 
 .display-flex() {
   display: -webkit-flex;

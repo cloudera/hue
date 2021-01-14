@@ -25,47 +25,20 @@
 
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
-<%namespace name="dashboard" file="/common_dashboard.mako" />
 <%namespace name="sqlSyntaxDropdown" file="/sql_syntax_dropdown.mako" />
 
-<link rel="stylesheet" href="${ static('dashboard/css/common_dashboard.css') }">
-<link rel="stylesheet" href="${ static('notebook/css/notebook2.css') }">
+<link rel="stylesheet" href="${ static('notebook/css/editor2.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/css/medium-editor.min.css') }">
-<link rel="stylesheet" href="${ static('desktop/css/bootstrap-medium-editor.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-datepicker.min.css') }">
 
-% if ENABLE_QUERY_SCHEDULING.get():
-<script src="${ static('oozie/js/coordinator-editor.ko.js') }"></script>
-<script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
-% endif
-<script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
+## % if ENABLE_QUERY_SCHEDULING.get():
+## <script src="${ static('oozie/js/coordinator-editor.ko.js') }"></script>
+## <script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
+## % endif
+## <script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
 
 % for bundle in get_hue_bundles('editor'):
   ${ render_bundle(bundle) | n,unicode }
 % endfor
-
-<style type="text/css">
-% if conf.CUSTOM.BANNER_TOP_HTML.get():
-  .search-bar {
-    top: 58px !important;
-  }
-
-  .show-assist,
-  .show-assist-right {
-    top: 110px !important;
-  }
-
-  .main-content {
-    top: 112px !important;
-  }
-
-  .context-panel {
-    height: calc(100% - 104px);
-    top: 104px;
-  }
-% endif
-</style>
 
 <script type="text/html" id="editor-snippet-icon">
   <!-- ko if: viewSettings().snippetImage -->
@@ -101,7 +74,7 @@
 % endif
 
     <div class="btn-group">
-      <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModaleditor').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }">
+      <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#editorSaveAsModal').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }">
         <i class="fa fa-save"></i>
       </a>
 
@@ -109,7 +82,7 @@
       <a class="btn dropdown-toggle" data-toggle="dropdown" href="javascript: void(0)"><span class="caret"></span></a>
       <ul class="dropdown-menu pull-right">
         <li>
-          <a class="pointer" data-bind="click: function() { $('#saveAsModaleditor').modal('show'); }">
+          <a class="pointer" data-bind="click: function() { $('#editorSaveAsModal').modal('show'); }">
             <i class="fa fa-fw fa-save"></i> ${ _('Save as...') }
           </a>
         </li>
@@ -164,101 +137,6 @@
   </div>
 </script>
 
-<script type="text/html" id="editor-query-tabs">
-  <div class="query-history-container" data-bind="onComplete: function(){ redrawFixedHeaders(200); }">
-    <div data-bind="delayedOverflow: 'slow', css: resultsKlass" style="margin-top: 5px; position: relative;">
-      <ul class="nav nav-tabs nav-tabs-editor">
-        <li data-bind="click: function() { currentQueryTab('queryHistory'); }, css: { 'active': currentQueryTab() == 'queryHistory' }">
-          <a class="inactive-action" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
-        </li>
-        <li class="margin-right-20" data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: { 'active': currentQueryTab() == 'savedQueries' }">
-          <a class="inactive-action" style="display:inline-block" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
-        </li>
-        <li data-bind="click: function() { currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
-          <a class="inactive-action" style="display:inline-block" href="#queryResults" data-toggle="tab">${_('Results')}
-##          <!-- ko if: result.rows() != null  -->
-##          (<span data-bind="text: result.rows().toLocaleString() + (dialect() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
-##          <!-- /ko -->
-          </a>
-        </li>
-        <!-- ko if: explanation -->
-        <li data-bind="click: function() { currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
-        <!-- /ko -->
-        <!-- ko foreach: pinnedContextTabs -->
-        <li data-bind="click: function() { $parent.currentQueryTab(tabId) }, css: { 'active': $parent.currentQueryTab() === tabId }">
-          <a class="inactive-action" data-toggle="tab" data-bind="attr: { 'href': '#' + tabId }">
-            <i class="snippet-icon fa" data-bind="css: iconClass"></i> <span data-bind="text: title"></span>
-            <div class="inline-block inactive-action margin-left-10 pointer" data-bind="click: function () { $parent.removeContextTab($data); }">
-              <i class="snippet-icon fa fa-times"></i>
-            </div>
-          </a>
-        </li>
-        <!-- /ko -->
-
-        <!-- ko if: HAS_WORKLOAD_ANALYTICS && dialect() === 'impala' -->
-        <li data-bind="visible: showExecutionAnalysis, click: function(){ currentQueryTab('executionAnalysis'); }, css: {'active': currentQueryTab() == 'executionAnalysis'}"><a class="inactive-action" href="#executionAnalysis" data-toggle="tab" data-bind="click: function(){ $('a[href=\'#executionAnalysis\']').tab('show'); }, event: {'shown': fetchExecutionAnalysis }"><span>${_('Execution Analysis')} </span><span></span></a></li>
-        <!-- /ko -->
-      </ul>
-
-      <div class="tab-content" style="border: none; overflow-x: hidden; min-height: 250px;">
-        <div class="tab-pane" id="queryHistory" style="min-height: 80px;" data-bind="css: { 'active': currentQueryTab() === 'queryHistory' }">
-          <!-- ko component: {
-            name: 'query-history',
-            params: {
-              currentNotebook: parentNotebook,
-              openFunction: parentVm.openNotebook.bind(parentVm),
-              dialect: dialect
-            }
-          } --><!-- /ko -->
-        </div>
-
-        <div class="tab-pane" id="savedQueries" data-bind="css: { 'active': currentQueryTab() === 'savedQueries' }" style="overflow: hidden">
-          <!-- ko component: {
-            name: 'saved-queries',
-            params: {
-              currentNotebook: parentNotebook,
-              openFunction: parentVm.openNotebook.bind(parentVm),
-              dialect: dialect,
-              currentTab: currentQueryTab
-            }
-          } --><!-- /ko -->
-        </div>
-
-        <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
-          <!-- ko if: ['text', 'jar', 'py', 'markdown'].indexOf(dialect()) === -1 -->
-          <!-- ko component: { name: 'snippet-results', params: {
-            activeExecutable: activeExecutable,
-            editorMode: parentVm.editorMode,
-            id: id,
-            isPresentationMode: parentNotebook.isPresentationMode,
-            isResultFullScreenMode: parentVm.isResultFullScreenMode,
-            resultsKlass: resultsKlass
-          }} --><!-- /ko -->
-          <!-- /ko -->
-        </div>
-
-        <!-- ko if: explanation -->
-        <div class="tab-pane" id="queryExplain" data-bind="css: {'active': currentQueryTab() == 'queryExplain'}">
-          <pre class="no-margin-bottom" data-bind="text: explanation"></pre>
-        </div>
-        <!-- /ko -->
-
-        <!-- ko if: HAS_WORKLOAD_ANALYTICS && dialect() === 'impala' -->
-        <div class="tab-pane" id="executionAnalysis" data-bind="css: {'active': currentQueryTab() == 'executionAnalysis'}" style="padding: 10px;">
-          <!-- ko component: { name: 'hue-execution-analysis' } --><!-- /ko -->
-        </div>
-        <!-- /ko -->
-
-        <!-- ko foreach: pinnedContextTabs -->
-        <div class="tab-pane" style="height: 300px; position: relative; overflow: hidden;" data-bind="attr: { 'id': tabId }, css: {'active': $parent.currentQueryTab() === tabId }">
-          <div style="display: flex; flex-direction: column; margin-top: 10px; overflow: hidden; height: 100%; position: relative;" data-bind="template: 'context-popover-contents'"></div>
-        </div>
-        <!-- /ko -->
-      </div>
-    </div>
-  </div>
-</script>
-
 <script type="text/html" id="doc-search-autocomp-item">
   <a>
     <div>
@@ -278,36 +156,6 @@
   <div rel="tooltip" data-placement="bottom" data-bind="tooltip, fadeVisible: is_redacted" title="${ _('The current query has been redacted to hide sensitive information.') }" class="inline-block margin-right-10">
     <i class="fa fa-low-vision warning"></i>
   </div>
-</script>
-
-<script type="text/html" id="editor-snippet-header">
-  <!-- ko if: $root.isPresentationMode() || $root.isResultFullScreenMode() -->
-  <div class="inline">
-    <!-- ko if: name() -->
-    <span data-bind="text: name"></span>
-    <!-- /ko -->
-    <!-- ko if: !name() && !$root.isHidingCode() -->
-    <span>${ _("Add -- comments on top of the SQL statement to display a title") }</span>
-    <!-- /ko -->
-  </div>
-  <!-- /ko -->
-
-  <!-- ko if: ! $root.isPresentationMode() && ! $root.isResultFullScreenMode() -->
-  <div class="inactive-action hover-actions inline">
-    <span class="inactive-action" data-bind="css: { 'empty-title': name() === '' }, editable: name, editableOptions: { emptytext: '${_ko('My Snippet')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;color: #DDD"></span>
-  </div>
-  <div class="hover-actions inline pull-right" style="font-size: 15px;">
-    <!-- ko template: { name: 'editor-query-redacted' } --><!-- /ko -->
-    <!-- ko template: { name: 'editor-longer-operation' } --><!-- /ko -->
-    ##       <span class="execution-timer" data-bind="visible: dialect() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
-
-    <!-- ko template: { name: 'snippet-header-database-selection' } --><!-- /ko -->
-
-    <a class="inactive-action move-widget" href="javascript:void(0)"><i class="fa fa-arrows"></i></a>
-    <a class="inactive-action" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Snippet settings') }"><i class="fa fa-cog"></i></a>
-    <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ $root.removeSnippet($parent, $data); }"><i class="fa fa-times"></i></a>
-  </div>
-  <!-- /ko -->
 </script>
 
 <script type="text/html" id="snippet-header-database-selection">
@@ -365,7 +213,7 @@
   </div>
 </script>
 
-<script type="text/html" id="editor-code-editor-snippet-body">
+<script type="text/html" id="editor-optimizer-alerts">
   <!-- ko if: window.HAS_OPTIMIZER && (dialect() == 'impala' || dialect() == 'hive') && ! $root.isPresentationMode() && ! $root.isResultFullScreenMode() -->
   <div class="optimizer-container" data-bind="css: { 'active': showOptimizer }">
     <!-- ko if: hasSuggestion() -->
@@ -442,119 +290,83 @@
     <!-- /ko -->
   </div>
   <!-- /ko -->
+</script>
 
+<script type="text/html" id="editor-code-editor">
+  <div style="width: 100%; height: 100%; position: relative;" class="editor-drop-target">
+##     <!-- ko if: statementType() == 'file' -->
+##       <div class="margin-top-10">
+##         <label class="pull-left" style="margin-top: 6px;margin-right: 10px;">${_('Query File')}</label>
+##         <input type="text" class="pull-left input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath, filechooserOptions: { skipInitialPathIfEmpty: true, linkMarkup: true }" placeholder="${ _('Path to file, e.g. /user/hue/sample.sql') }"/>
+##         <!-- ko if: statementPath() -->
+##           <div class="inline-block" style="margin-top: 4px">
+##             <a data-bind="hueLink: '/filebrowser/view=' + statementPath()" title="${ _('Open') }">
+##               <i class="fa fa-external-link-square"></i>
+##             </a>
+##           </div>
+##           <a class="btn" data-bind="click: function() { getExternalStatement(); }"><i class="fa fa-lg fa-refresh"></i></a>
+##         <!-- /ko -->
+##       </div>
+##       <div class="clearfix margin-bottom-20"></div>
+##     <!-- /ko -->
+##
+##     <!-- ko if: statementType() == 'document' -->
+##       <div class="margin-top-10">
+##         <!-- ko if: associatedDocumentLoading -->
+##           <i class="fa fa-spinner fa-spin muted"></i>
+##         <!-- /ko -->
+##         <label class="pull-left" style="margin-top: 6px;margin-right: 10px;" data-bind="visible: !associatedDocumentLoading()">${_('Document')}</label>
+##         <div class="selectize-wrapper" style="width: 300px;" data-bind="visible: !associatedDocumentLoading()">
+##           <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { loading: associatedDocumentLoading, value: associatedDocumentUuid, document: associatedDocument, type: dialect }"></select>
+##         </div>
+##         <!-- ko if: associatedDocument() -->
+##           <div class="pull-left" style="margin-top: 4px">
+##             <a data-bind="hueLink: associatedDocument().absoluteUrl" title="${ _('Open') }">
+##               <i class="fa fa-external-link-square"></i>
+##             </a>
+##             <span data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></span>
+##           </div>
+##         <!-- /ko -->
+##       </div>
+##       <div class="clearfix margin-bottom-20"></div>
+##     <!-- /ko -->
 
-  <div class="row-fluid" style="margin-bottom: 5px">
-    <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode() }, clickForAceFocus: ace.bind($data), visible: ! $root.isResultFullScreenMode() && ! ($root.isPresentationMode() && $root.isHidingCode())">
-      <!-- ko if: statementType() == 'file' -->
-      <div class="margin-top-10">
-        <label class="pull-left" style="margin-top: 6px;margin-right: 10px;">${_('Query File')}</label>
-        <input type="text" class="pull-left input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath, filechooserOptions: { skipInitialPathIfEmpty: true, linkMarkup: true }" placeholder="${ _('Path to file, e.g. /user/hue/sample.sql') }"/>
-        <!-- ko if: statementPath() -->
-        <div class="inline-block" style="margin-top: 4px">
-          <a data-bind="hueLink: '/filebrowser/view=' + statementPath()" title="${ _('Open') }">
-            <i class="fa fa-external-link-square"></i>
-          </a>
-        </div>
-        <a class="btn" data-bind="click: function() { getExternalStatement(); }"><i class="fa fa-lg fa-refresh"></i></a>
-        <!-- /ko -->
-      </div>
-      <div class="clearfix margin-bottom-20"></div>
-      <!-- /ko -->
-
-      <!-- ko if: statementType() == 'document' -->
-      <div class="margin-top-10">
-        <!-- ko if: associatedDocumentLoading -->
-        <i class="fa fa-spinner fa-spin muted"></i>
-        <!-- /ko -->
-        <label class="pull-left" style="margin-top: 6px;margin-right: 10px;" data-bind="visible: !associatedDocumentLoading()">${_('Document')}</label>
-        <div class="selectize-wrapper" style="width: 300px;" data-bind="visible: !associatedDocumentLoading()">
-          <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { loading: associatedDocumentLoading, value: associatedDocumentUuid, document: associatedDocument, type: dialect }"></select>
-        </div>
-        <!-- ko if: associatedDocument() -->
-        <div class="pull-left" style="margin-top: 4px">
-          <a data-bind="hueLink: associatedDocument().absoluteUrl" title="${ _('Open') }">
-            <i class="fa fa-external-link-square"></i>
-          </a>
-          <span data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></span>
-        </div>
-        <!-- /ko -->
-      </div>
-      <div class="clearfix margin-bottom-20"></div>
-      <!-- /ko -->
-
-      <ace-editor-ko-bridge data-bind="
-          vueEvents: {
-            'ace-created': function (event) {
-              ace(event.detail);
-            },
-            'cursor-changed': function (event) {
-              aceCursorPosition(event.detail);
-            },
-            'create-new-doc': function () {
-              huePubSub.publish('editor.create.new');
-            },
-            'save-doc': function () {
-              huePubSub.publish('editor.save');
-            },
-            'toggle-presentation-mode': function () {
-              huePubSub.publish('editor.presentation.toggle');
-            },
-            'value-changed': function (event) {
-              statement_raw(event.detail);
-            }
-          },
-          vueKoProps: {
-            executor: executor,
-            valueObservable: statement_raw,
-            cursorPositionObservable: aceCursorPosition,
-            idObservable: id,
-            aceOptions: {
-              showLineNumbers: $root.editorMode(),
-              showGutter: $root.editorMode(),
-              maxLines: $root.editorMode() ? null : 25,
-              minLines: $root.editorMode() ? null : 3
-            }
-          }
-        "></ace-editor-ko-bridge>
-      <!-- ko component: { name: 'hue-editor-droppable-menu', params: { editor: ace.bind($data), parentDropTarget: '.editor' } } --><!-- /ko -->
-
-##    <div class="ace-editor" data-bind="
-##      visible: statementType() === 'text' || statementType() !== 'text' && externalStatementLoaded(),
-##      css: {
-##        'single-snippet-editor ace-editor-resizable' : $root.editorMode(),
-##        'active-editor': inFocus
-##      },
-##      attr: {
-##        id: id
-##      },
-##      delayedOverflow: 'slow',
-##      aceEditor: {
-##        snippet: $data,
-##        contextTooltip: '${ _ko("Right-click for details") }',
-##        expandStar: '${ _ko("Right-click to expand with columns") }',
-## ##        highlightedRange: result.statement_range,
-##        readOnly: $root.isPresentationMode(),
-##        aceOptions: {
-##          showLineNumbers: $root.editorMode(),
-##          showGutter: $root.editorMode(),
-##          maxLines: $root.editorMode() ? null : 25,
-##          minLines: $root.editorMode() ? null : 3
-##        }
-##      },
-##      style: {
-##        'opacity': statementType() !== 'text' || $root.isPresentationMode() ? '0.75' : '1',
-##        'min-height': $root.editorMode() ? '0' : '48px',
-##        'top': $root.editorMode() && statementType() !== 'text' ? '60px' : '0'
-##      }
-##    "></div>
-##  <!-- ko component: { name: 'hueAceAutocompleter', params: { editor: ace.bind($data), snippet: $data } } --><!-- /ko -->
-##  <!-- ko component: { name: 'hue-editor-droppable-menu', params: { editor: ace.bind($data), parentDropTarget: '.editor' } } --><!-- /ko -->
-    </div>
-    <div class="clearfix"></div>
-    <!-- ko template: { if: ! $root.isPresentationMode() && ! $root.isResultFullScreenMode(), name: 'snippet-variables' }--><!-- /ko -->
+    <ace-editor-ko-bridge style="width:100%; height: 100%; position: relative;" data-bind="
+      vueEvents: {
+        'ace-created': function (event) {
+          ace(event.detail);
+        },
+        'cursor-changed': function (event) {
+          aceCursorPosition(event.detail);
+        },
+        'create-new-doc': function () {
+          huePubSub.publish('editor.create.new');
+        },
+        'save-doc': function () {
+          huePubSub.publish('editor.save');
+        },
+        'toggle-presentation-mode': function () {
+          huePubSub.publish('editor.presentation.toggle');
+        },
+        'value-changed': function (event) {
+          statement_raw(event.detail);
+        }
+      },
+      vueKoProps: {
+        executor: executor,
+        valueObservable: statement_raw,
+        cursorPositionObservable: aceCursorPosition,
+        idObservable: id,
+        aceOptions: {
+          showLineNumbers: $root.editorMode(),
+          showGutter: $root.editorMode(),
+          maxLines: $root.editorMode() ? null : 25,
+          minLines: $root.editorMode() ? null : 3
+        }
+      }
+    "></ace-editor-ko-bridge>
+    <!-- ko component: { name: 'hue-editor-droppable-menu', params: { editor: ace.bind($data), parentDropTarget: '.editor-drop-target' } } --><!-- /ko -->
   </div>
-  <div class="clearfix"></div>
 </script>
 
 <script type="text/html" id="editor-execution-actions">
@@ -651,29 +463,6 @@
       </li>
     </ul>
   </div>
-</script>
-
-<script type="text/html" id="editor-text-snippet-body">
-  <div data-bind="attr: {'id': 'editor_' + id()}, html: statement_raw, value: statement_raw, medium: {}" data-placeHolder="${ _('Type your text here, select some text to format it') }" class="text-snippet"></div>
-</script>
-
-<script type="text/html" id="editor-markdown-snippet-body">
-  <!-- ko ifnot: $root.isPresentationMode() -->
-  <div class="row-fluid">
-    <div class="span6" data-bind="clickForAceFocus: ace.bind($data)">
-      <div class="ace-editor" data-bind="attr: { id: id }, aceEditor: {
-        snippet: $data,
-        updateOnInput: true
-      }"></div>
-    </div>
-    <div class="span6">
-      <div data-bind="html: renderMarkdown, attr: {'id': 'liveMD' + id()}"></div>
-    </div>
-  </div>
-  <!-- /ko -->
-  <!-- ko if: $root.isPresentationMode() -->
-  <div data-bind="html: renderMarkdown"></div>
-  <!-- /ko -->
 </script>
 
 <script type="text/html" id="editor-executable-snippet-body">
@@ -844,8 +633,8 @@
   </div>
 </script>
 
-<script type ="text/html" id="editor-snippet-execution-controls">
-  <div class="snippet-actions clearfix">
+<script type ="text/html" id="editor-execution-controls">
+  <div class="snippet-actions" style="padding: 5px;">
     <div class="pull-left">
       <executable-actions-ko-bridge data-bind="vueKoProps: {
           executableObservable: activeExecutable,
@@ -918,295 +707,358 @@
   </div>
 </script>
 
-<div id="editorComponents" class="editorComponents notebook">
-  <div style="display: flex; flex-direction:column; height: 100%; width: 100%">
-    <div id="helpModaleditor" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <h2 class="modal-title">${_('Editor help')}</h2>
-      </div>
-      <div class="modal-body">
-        <!-- ko component: 'aceKeyboardShortcuts' --><!-- /ko -->
-      </div>
-      <div class="modal-footer">
-        <a href="javascript: void(0)" class="btn" data-dismiss="modal">${_('Close')}</a>
-      </div>
+<script type="text/html" id="editor-modals">
+  <div id="editorHelpModal" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${_('Editor help')}</h2>
     </div>
-    <div id="combinedContentModaleditor" class="modal hide" data-backdrop="true" style="width:780px;margin-left:-410px!important">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <h2 class="modal-title">${_('All Notebook content')}</h2>
-      </div>
-      <div class="modal-body">
-        <pre data-bind="oneClickSelect, text: combinedContent"></pre>
-      </div>
-      <div class="modal-footer">
-        <a href="javascript: void(0)" class="btn" data-dismiss="modal">${_('Close')}</a>
-      </div>
+    <div class="modal-body">
+      <!-- ko component: 'aceKeyboardShortcuts' --><!-- /ko -->
     </div>
-    <div class="submit-modal-editor modal hide"></div>
+    <div class="modal-footer">
+      <a href="javascript: void(0)" class="btn" data-dismiss="modal">${_('Close')}</a>
+    </div>
+  </div>
+  <div id="editorCombinedContentModal" class="modal hide" data-backdrop="true" style="width:780px;margin-left:-410px!important">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${_('All Notebook content')}</h2>
+    </div>
+    <div class="modal-body">
+      <pre data-bind="oneClickSelect, text: combinedContent"></pre>
+    </div>
+    <div class="modal-footer">
+      <a href="javascript: void(0)" class="btn" data-dismiss="modal">${_('Close')}</a>
+    </div>
+  </div>
+  <div class="submit-modal-editor modal hide"></div>
+  <div id="editorSaveAsModal" class="modal hide fade">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <!-- ko if: $root.editorMode() -->
+      <h2 class="modal-title">${_('Save query as...')}</h2>
+      <!-- /ko -->
+      <!-- ko ifnot: $root.editorMode() -->
+      <h2 class="modal-title">${_('Save notebook as...')}</h2>
+      <!-- /ko -->
+    </div>
 
-    <div style="flex: 0 0 auto;">
-      <div class="navbar hue-title-bar" data-bind="visible: ! $root.isPresentationMode() && ! $root.isResultFullScreenMode()">
-        <div class="navbar-inner">
-          <div class="container-fluid">
-
-            <!-- ko template: { name: 'editor-menu-buttons' } --><!-- /ko -->
-
-            <div class="nav-collapse">
-              <ul class="nav editor-nav">
-                <li class="app-header" style="display:none" data-bind="visible: true">
-                  <!-- ko if: editorMode -->
-                  <a data-bind="hueLink: '${ url('notebook:editor') }?type=' + editorType(), attr: { 'title': editorTitle() + '${ _(' Editor') }'}" style="cursor: pointer">
-                    <!-- ko template: { name: 'app-icon-template', data: { icon: editorType() } } --><!-- /ko -->
-
-                    <!-- ko switch: editorType() -->
-                    <!-- ko case: 'impala' -->Impala<!-- /ko -->
-                    <!-- ko case: 'rdbms' -->DB Query<!-- /ko -->
-                    <!-- ko case: 'pig' -->Pig<!-- /ko -->
-                    <!-- ko case: 'java' -->Java<!-- /ko -->
-                    <!-- ko case: 'spark2' -->Spark<!-- /ko -->
-                    <!-- ko case: 'sqoop1' -->Sqoop 1<!-- /ko -->
-                    <!-- ko case: 'distcp' -->DistCp<!-- /ko -->
-                    <!-- ko case: 'shell' -->Shell<!-- /ko -->
-                    <!-- ko case: 'mapreduce' -->MapReduce<!-- /ko -->
-                    <!-- ko case: ['beeswax', 'hive'] -->Hive<!-- /ko -->
-                    <!-- ko case: 'mapreduce' -->MapReduce<!-- /ko -->
-                    <!-- ko case: 'spark' -->Scala<!-- /ko -->
-                    <!-- ko case: 'pyspark' -->PySpark<!-- /ko -->
-                    <!-- ko case: 'r' -->R<!-- /ko -->
-                    <!-- ko case: 'jar' -->Spark Submit Jar<!-- /ko -->
-                    <!-- ko case: 'py' -->Spark Submit Python<!-- /ko -->
-                    <!-- ko case: 'solr' -->Solr SQL<!-- /ko -->
-                    <!-- ko case: 'kafkasql' -->Kafka SQL<!-- /ko -->
-                    <!-- ko case: 'markdown' -->Markdown<!-- /ko -->
-                    <!-- ko case: 'text' -->Text<!-- /ko -->
-                    <!-- ko case: 'clickhouse' -->ClickHouse<!-- /ko -->
-                    <!-- ko case: $default --><span data-bind="text: editorTitle()"></span><!-- /ko -->
-                    <!-- /ko -->
-                    <!-- ko component: { name: 'hue-favorite-app', params: { app: 'editor', interpreter: editorType() }} --><!-- /ko -->
-                  </a>
-                  <!-- /ko -->
-                  <!-- ko ifnot: editorMode -->
-                  <i class="fa fa-file-text-o app-icon" style="vertical-align: middle"></i>
-                  Notebook
-                  <!-- ko component: { name: 'hue-favorite-app', params: { app: 'notebook' }} --><!-- /ko -->
-                  <!-- /ko -->
-                </li>
-
-                <!-- ko with: selectedNotebook -->
-                <li class="no-horiz-padding">
-                  <a>&nbsp;</a>
-                </li>
-                <li data-bind="visible: isHistory" style="display: none" class="no-horiz-padding muted">
-                  <a title="${ _('This is a history query') }"><i class="fa fa-fw fa-history"></i></a>
-                </li>
-                <li data-bind="visible: directoryUuid" style="display: none" class="no-horiz-padding muted">
-                  <a title="${ _('Open directory of this query') }" data-bind="hueLink: '/home/?uuid=' + directoryUuid()"
-                     class="pointer inactive-action" href="javascript:void(0)"><i class="fa fa-fw fa-folder-o"></i>
-                  </a>
-                </li>
-                <li data-bind="visible: parentSavedQueryUuid" style="display: none" class="no-horiz-padding muted">
-                  <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" class="pointer inactive-action">
-                    <i class="fa fa-fw fa-file-o"></i>
-                  </a>
-                </li>
-                <li data-bind="visible: isSaved() && ! isHistory() && ! parentSavedQueryUuid()" style="display: none" class="no-horiz-padding muted">
-                  <a title="${ _('This is a saved query') }"><i class="fa fa-fw fa-file-o"></i></a>
-                </li>
-                <li data-bind="visible: isSchedulerJobRunning" style="display: none" class="no-horiz-padding muted">
-                  <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" class="pointer inactive-action">
-                    ${ _("Scheduling on") }
-                  </a>
-                </li>
-                <li class="query-name no-horiz-padding skip-width-calculation">
-                  <a href="javascript:void(0)">
-                    <div class="notebook-name-desc" data-bind="editable: name, editableOptions: { inputclass: 'notebook-name-input', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a name...')}', tpl: '<input type=\'text\' maxlength=\'255\'>' }"></div>
-                  </a>
-                </li>
-                <li class="skip-width-calculation" data-bind="tooltip: { placement: 'bottom', title: description }">
-                  <a href="javascript:void(0)">
-                    <div class="notebook-name-desc" data-bind="editable: description, editableOptions: { type: 'textarea', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a description...')}' }"></div>
-                  </a>
-                </li>
-                <!-- /ko -->
-              </ul>
-            </div>
+    <!-- ko if: $root.selectedNotebook() -->
+    <div class="modal-body">
+      <form class="form-horizontal">
+        <div class="control-group">
+          <label class="control-label">${_('Name')}</label>
+          <div class="controls">
+            <input type="text" class="input-xlarge" data-bind="value: $root.selectedNotebook().name, valueUpdate:'afterkeydown'"/>
           </div>
         </div>
-      </div>
+        <div class="control-group">
+          <label class="control-label">${_('Description')}</label>
+          <div class="controls">
+            <input type="text" class="input-xlarge" data-bind="value: $root.selectedNotebook().description, valueUpdate:'afterkeydown'" placeholder="${ _('(optional)') }"/>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+      <input type="button" class="btn btn-primary disable-feedback" value="${_('Save')}" data-dismiss="modal" data-bind="click: saveAsNotebook, enable: $root.selectedNotebook().name().length > 0"/>
+    </div>
+    <!-- /ko -->
+  </div>
 
-      <!-- ko if: $root.isResultFullScreenMode() -->
-      <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Collapse results') }" data-bind="click: function(){ $root.isResultFullScreenMode(false); }">
-        <i class="fa fa-times fa-fw"></i>
-      </a>
-      <!-- /ko -->
+  <!-- ko if: $root.selectedNotebook() -->
+  <!-- ko with: $root.selectedNotebook() -->
+  <div id="editorRetryModal" class="modal hide fade" data-keyboard="false" data-backdrop="static">
+    <div class="modal-header">
+      <h2 class="modal-title">${_('Operation timed out')}</h2>
+    </div>
+    <div class="modal-body">
+      <p>${_('The operation timed out. Do you want to retry?')}</p>
+    </div>
+    <div class="modal-footer">
+      <a class="btn" data-bind="click: retryModalCancel">${_('No')}</a>
+      <a class="btn btn-primary disable-feedback" data-bind="click: retryModalConfirm">${_('Yes, retry')}</a>
+    </div>
+  </div>
+  <!-- /ko -->
+  <!-- /ko -->
 
-      <!-- ko if: $root.isPresentationMode() -->
-      <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Exit presentation') }" data-bind="click: function(){ $root.selectedNotebook().isPresentationMode(false); }">
-        <i class="fa fa-times fa-fw"></i>
-      </a>
-      <!-- /ko -->
+  <div class="ace-filechooser" style="display:none;">
+    <div class="ace-filechooser-close">
+      <a class="pointer" data-bind="click: function(){ $('.ace-filechooser').hide(); }"><i class="fa fa-times"></i></a>
+    </div>
+    <div class="ace-filechooser-content">
+    </div>
+  </div>
+</script>
 
-      <div class="player-toolbar margin-top-10" data-bind="visible: $root.isPresentationMode()" style="display: none">
-        <!-- ko if: $root.isPresentationMode() -->
-        <!-- ko if: $root.selectedNotebook() -->
-        <!-- ko if: $root.selectedNotebook().name() || $root.selectedNotebook().description() -->
-        <h2 class="margin-left-30 margin-right-10 inline padding-left-5" data-bind="text: $root.selectedNotebook().name"></h2>
-        <h2 class="muted inline" data-bind="text: $root.selectedNotebook().description"></h2>
-        <div class="clearfix"></div>
-        <!-- /ko -->
-
+<script type="text/html" id="editor-navbar">
+  <div class="navbar hue-title-bar" data-bind="visible: ! $root.isPresentationMode() && ! $root.isResultFullScreenMode()">
+    <div class="navbar-inner">
+      <div class="container-fluid">
         <!-- ko template: { name: 'editor-menu-buttons' } --><!-- /ko -->
+        <div class="nav-collapse">
+          <ul class="nav editor-nav">
+            <li class="app-header" style="display:none" data-bind="visible: true">
+              <!-- ko if: editorMode -->
+              <a data-bind="hueLink: '${ url('notebook:editor') }?type=' + editorType(), attr: { 'title': editorTitle() + '${ _(' Editor') }'}" style="cursor: pointer">
+                <!-- ko template: { name: 'app-icon-template', data: { icon: editorType() } } --><!-- /ko -->
+                <!-- ko switch: editorType() -->
+                <!-- ko case: 'impala' -->Impala<!-- /ko -->
+                <!-- ko case: 'rdbms' -->DB Query<!-- /ko -->
+                <!-- ko case: 'pig' -->Pig<!-- /ko -->
+                <!-- ko case: 'java' -->Java<!-- /ko -->
+                <!-- ko case: 'spark2' -->Spark<!-- /ko -->
+                <!-- ko case: 'sqoop1' -->Sqoop 1<!-- /ko -->
+                <!-- ko case: 'distcp' -->DistCp<!-- /ko -->
+                <!-- ko case: 'shell' -->Shell<!-- /ko -->
+                <!-- ko case: 'mapreduce' -->MapReduce<!-- /ko -->
+                <!-- ko case: ['beeswax', 'hive'] -->Hive<!-- /ko -->
+                <!-- ko case: 'mapreduce' -->MapReduce<!-- /ko -->
+                <!-- ko case: 'spark' -->Scala<!-- /ko -->
+                <!-- ko case: 'pyspark' -->PySpark<!-- /ko -->
+                <!-- ko case: 'r' -->R<!-- /ko -->
+                <!-- ko case: 'jar' -->Spark Submit Jar<!-- /ko -->
+                <!-- ko case: 'py' -->Spark Submit Python<!-- /ko -->
+                <!-- ko case: 'solr' -->Solr SQL<!-- /ko -->
+                <!-- ko case: 'kafkasql' -->Kafka SQL<!-- /ko -->
+                <!-- ko case: 'markdown' -->Markdown<!-- /ko -->
+                <!-- ko case: 'text' -->Text<!-- /ko -->
+                <!-- ko case: 'clickhouse' -->ClickHouse<!-- /ko -->
+                <!-- ko case: $default --><span data-bind="text: editorTitle()"></span><!-- /ko -->
+                <!-- /ko -->
+                <!-- ko component: { name: 'hue-favorite-app', params: { app: 'editor', interpreter: editorType() }} --><!-- /ko -->
+              </a>
+              <!-- /ko -->
+              <!-- ko ifnot: editorMode -->
+              <i class="fa fa-file-text-o app-icon" style="vertical-align: middle"></i>
+              Notebook
+              <!-- ko component: { name: 'hue-favorite-app', params: { app: 'notebook' }} --><!-- /ko -->
+              <!-- /ko -->
+            </li>
 
-        <div class="margin-left-30 margin-top-10 padding-left-5 margin-bottom-20">
-          <!-- ko template: { name: 'editor-execution-actions' } --><!-- /ko -->
-          <!-- ko if: selectedNotebook().prePresentationModeSnippet -->
-          <!-- ko template: { if: $root.isPresentationMode(), name: 'snippet-variables', data: selectedNotebook().prePresentationModeSnippet }--><!-- /ko -->
-          <!-- /ko -->
+            <!-- ko with: selectedNotebook -->
+            <li class="no-horiz-padding">
+              <a>&nbsp;</a>
+            </li>
+            <li data-bind="visible: isHistory" style="display: none" class="no-horiz-padding muted">
+              <a title="${ _('This is a history query') }"><i class="fa fa-fw fa-history"></i></a>
+            </li>
+            <li data-bind="visible: directoryUuid" style="display: none" class="no-horiz-padding muted">
+              <a title="${ _('Open directory of this query') }" data-bind="hueLink: '/home/?uuid=' + directoryUuid()"
+                 class="pointer inactive-action" href="javascript:void(0)"><i class="fa fa-fw fa-folder-o"></i>
+              </a>
+            </li>
+            <li data-bind="visible: parentSavedQueryUuid" style="display: none" class="no-horiz-padding muted">
+              <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" class="pointer inactive-action">
+                <i class="fa fa-fw fa-file-o"></i>
+              </a>
+            </li>
+            <li data-bind="visible: isSaved() && ! isHistory() && ! parentSavedQueryUuid()" style="display: none" class="no-horiz-padding muted">
+              <a title="${ _('This is a saved query') }"><i class="fa fa-fw fa-file-o"></i></a>
+            </li>
+            <li data-bind="visible: isSchedulerJobRunning" style="display: none" class="no-horiz-padding muted">
+              <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" class="pointer inactive-action">
+                ${ _("Scheduling on") }
+              </a>
+            </li>
+            <li class="query-name no-horiz-padding skip-width-calculation">
+              <a href="javascript:void(0)">
+                <div class="notebook-name-desc" data-bind="editable: name, editableOptions: { inputclass: 'notebook-name-input', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a name...')}', tpl: '<input type=\'text\' maxlength=\'255\'>' }"></div>
+              </a>
+            </li>
+            <li class="skip-width-calculation" data-bind="tooltip: { placement: 'bottom', title: description }">
+              <a href="javascript:void(0)">
+                <div class="notebook-name-desc" data-bind="editable: description, editableOptions: { type: 'textarea', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a description...')}' }"></div>
+              </a>
+            </li>
+            <!-- /ko -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ko if: $root.isResultFullScreenMode() -->
+  <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Collapse results') }" data-bind="click: function(){ $root.isResultFullScreenMode(false); }">
+    <i class="fa fa-times fa-fw"></i>
+  </a>
+  <!-- /ko -->
+
+  <!-- ko if: $root.isPresentationMode() -->
+  <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Exit presentation') }" data-bind="click: function(){ $root.selectedNotebook().isPresentationMode(false); }">
+    <i class="fa fa-times fa-fw"></i>
+  </a>
+  <!-- /ko -->
+
+  <div class="player-toolbar margin-top-10" data-bind="visible: $root.isPresentationMode()" style="display: none">
+    <!-- ko if: $root.isPresentationMode() -->
+    <!-- ko if: $root.selectedNotebook() -->
+    <!-- ko if: $root.selectedNotebook().name() || $root.selectedNotebook().description() -->
+    <h2 class="margin-left-30 margin-right-10 inline padding-left-5" data-bind="text: $root.selectedNotebook().name"></h2>
+    <h2 class="muted inline" data-bind="text: $root.selectedNotebook().description"></h2>
+    <div class="clearfix"></div>
+    <!-- /ko -->
+
+    <!-- ko template: { name: 'editor-menu-buttons' } --><!-- /ko -->
+
+    <div class="margin-left-30 margin-top-10 padding-left-5 margin-bottom-20">
+      <!-- ko template: { name: 'editor-execution-actions' } --><!-- /ko -->
+      <!-- ko if: selectedNotebook().prePresentationModeSnippet -->
+      <!-- ko template: { if: $root.isPresentationMode(), name: 'snippet-variables', data: selectedNotebook().prePresentationModeSnippet }--><!-- /ko -->
+      <!-- /ko -->
+    </div>
+
+    <!-- /ko -->
+    <!-- /ko -->
+  </div>
+</script>
+
+<div id="editorComponents" class="editor">
+  <!-- ko template: { name: 'editor-modals' } --><!-- /ko -->
+  <div class="editor-nav-bar">
+    <!-- ko template: { name: 'editor-navbar' } --><!-- /ko -->
+  </div>
+  <div class="editor-app"  data-bind="with: firstSnippet">
+    <div class="editor-top">
+      <div class="editor-top-actions">
+        <!-- ko template: { name: 'editor-query-redacted' } --><!-- /ko -->
+        <!-- ko template: { name: 'editor-longer-operation' } --><!-- /ko -->
+        <div class="editor-top-right-actions">
+          <!-- ko template: { name: 'snippet-header-database-selection' } --><!-- /ko -->
+          <a href="javascript: void(0);" title="${ _('Show editor help') }" data-toggle="modal" data-target="#editorHelpModal">
+            <i class="fa fa-question"></i>
+          </a>
+        </div>
+      </div>
+      <div class="editor-settings-drawer">
+        <!-- ko template: 'editor-snippet-settings' --><!-- /ko -->
+      </div>
+##      <!-- ko template: { name: 'editor-optimizer-alerts' } --><!-- /ko -->
+      <div class="editor-code-editor">
+        <!-- ko template: { name: 'editor-code-editor' } --><!-- /ko -->
+      </div>
+##      <!-- ko template: { name: 'snippet-variables' }--><!-- /ko -->
+##      <!-- ko template: { name: 'editor-executable-snippet-body' } --><!-- /ko -->
+      <div class="editor-execute-status">
+        <!-- ko template: { name: 'editor-snippet-execution-status' } --><!-- /ko -->
+      </div>
+      <div class="editor-execute-actions">
+        <!-- ko template: { name: 'editor-execution-controls' } --><!-- /ko -->
+      </div>
+##      <!-- ko component: { name: 'executable-logs', params: {
+##        activeExecutable: activeExecutable,
+##        showLogs: showLogs,
+##        resultsKlass: resultsKlass,
+##        isPresentationMode: parentNotebook.isPresentationMode,
+##        isHidingCode: parentNotebook.isHidingCode
+##      }} --><!-- /ko -->
+    </div>
+    <div class="editor-divider"></div>
+    <div class="editor-bottom">
+      <ul class="editor-bottom-tabs nav nav-tabs">
+        <li data-bind="click: function() { currentQueryTab('queryHistory'); }, css: { 'active': currentQueryTab() == 'queryHistory' }">
+          <a class="inactive-action" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
+        </li>
+        <li class="margin-right-20" data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: { 'active': currentQueryTab() == 'savedQueries' }">
+          <a class="inactive-action" style="display:inline-block" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
+        </li>
+        <li data-bind="click: function() { currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
+          <a class="inactive-action" style="display:inline-block" href="#queryResults" data-toggle="tab">${_('Results')}
+##          <!-- ko if: result.rows() != null  -->
+##          (<span data-bind="text: result.rows().toLocaleString() + (dialect() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
+##          <!-- /ko -->
+          </a>
+        </li>
+        <!-- ko if: explanation -->
+        <li data-bind="click: function() { currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
+        <!-- /ko -->
+        <!-- ko foreach: pinnedContextTabs -->
+        <li data-bind="click: function() { $parent.currentQueryTab(tabId) }, css: { 'active': $parent.currentQueryTab() === tabId }">
+          <a class="inactive-action" data-toggle="tab" data-bind="attr: { 'href': '#' + tabId }">
+            <i class="snippet-icon fa" data-bind="css: iconClass"></i> <span data-bind="text: title"></span>
+            <div class="inline-block inactive-action margin-left-10 pointer" data-bind="click: function () { $parent.removeContextTab($data); }">
+              <i class="snippet-icon fa fa-times"></i>
+            </div>
+          </a>
+        </li>
+        <!-- /ko -->
+
+        <!-- ko if: HAS_WORKLOAD_ANALYTICS && dialect() === 'impala' -->
+        <li data-bind="visible: showExecutionAnalysis, click: function(){ currentQueryTab('executionAnalysis'); }, css: {'active': currentQueryTab() == 'executionAnalysis'}"><a class="inactive-action" href="#executionAnalysis" data-toggle="tab" data-bind="click: function(){ $('a[href=\'#executionAnalysis\']').tab('show'); }, event: {'shown': fetchExecutionAnalysis }"><span>${_('Execution Analysis')} </span><span></span></a></li>
+        <!-- /ko -->
+      </ul>
+      <div class="editor-bottom-tab-content tab-content">
+        <div class="tab-pane" id="queryHistory" data-bind="css: { 'active': currentQueryTab() === 'queryHistory' }">
+          <div class="editor-bottom-tab-panel">
+            <!-- ko component: {
+              name: 'query-history',
+              params: {
+                currentNotebook: parentNotebook,
+                openFunction: parentVm.openNotebook.bind(parentVm),
+                dialect: dialect
+              }
+            } --><!-- /ko -->
+          </div>
         </div>
 
+        <div class="tab-pane" id="savedQueries" data-bind="css: { 'active': currentQueryTab() === 'savedQueries' }" style="overflow: hidden">
+          <div class="editor-bottom-tab-panel">
+            <!-- ko component: {
+              name: 'saved-queries',
+              params: {
+                currentNotebook: parentNotebook,
+                openFunction: parentVm.openNotebook.bind(parentVm),
+                dialect: dialect,
+                currentTab: currentQueryTab
+              }
+            } --><!-- /ko -->
+          </div>
+        </div>
+
+        <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
+          <div class="editor-bottom-tab-panel">
+            <!-- ko component: { name: 'snippet-results', params: {
+              activeExecutable: activeExecutable,
+              editorMode: parentVm.editorMode,
+              id: id,
+              isPresentationMode: parentNotebook.isPresentationMode,
+              isResultFullScreenMode: parentVm.isResultFullScreenMode,
+              resultsKlass: resultsKlass
+            }} --><!-- /ko -->
+          </div>
+        </div>
+
+        <!-- ko if: explanation -->
+        <div class="tab-pane" id="queryExplain" data-bind="css: {'active': currentQueryTab() == 'queryExplain'}">
+          <div class="editor-bottom-tab-panel">
+            <pre class="no-margin-bottom" data-bind="text: explanation"></pre>
+          </div>
+        </div>
         <!-- /ko -->
+
+        <!-- ko if: HAS_WORKLOAD_ANALYTICS && dialect() === 'impala' -->
+        <div class="tab-pane" id="executionAnalysis" data-bind="css: {'active': currentQueryTab() == 'executionAnalysis'}">
+          <div class="editor-bottom-tab-panel">
+            <!-- ko component: { name: 'hue-execution-analysis' } --><!-- /ko -->
+          </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- ko foreach: pinnedContextTabs -->
+        <div class="tab-pane" data-bind="attr: { 'id': tabId }, css: {'active': $parent.currentQueryTab() === tabId }">
+          <div class="editor-bottom-tab-panel">
+            <div style="display: flex; flex-direction: column; margin-top: 10px; overflow: hidden; height: 100%; position: relative;" data-bind="template: 'context-popover-contents'"></div>
+          </div>
+        </div>
         <!-- /ko -->
       </div>
     </div>
-    <div style="flex: 1;">
-      <div class="main-content" data-bind="with: firstSnippet">
-        <div>
-          <div>
-            <div>
-              <div>
-                <!-- ko template: { name: 'editor-query-redacted' } --><!-- /ko -->
-                <!-- ko template: { name: 'editor-longer-operation' } --><!-- /ko -->
-                <!-- ko template: { name: 'snippet-header-database-selection' } --><!-- /ko -->
-                <a href="javascript: void(0);" title="${ _('Show editor help') }" data-toggle="modal" data-target="#helpModaleditor">
-                  <i class="fa fa-question"></i>
-                </a>
-              </div>
-            </div>
-            <!-- ko template: { if: ['text', 'jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(dialect()) === -1, name: 'editor-code-editor-snippet-body' } --><!-- /ko -->
-            <!-- ko template: { if: dialect() == 'text', name: 'editor-text-snippet-body' } --><!-- /ko -->
-            <!-- ko template: { if: dialect() == 'markdown', name: 'editor-markdown-snippet-body' } --><!-- /ko -->
-            <!-- ko template: { if: ['java', 'distcp', 'shell', 'mapreduce', 'jar', 'py', 'spark2'].indexOf(dialect()) !== -1, name: 'editor-executable-snippet-body' } --><!-- /ko -->
-          </div>
-          <div style="position: absolute; top:25px; width: 100%; z-index: 400;">
-            <!-- ko template: 'editor-snippet-settings' --><!-- /ko -->
-          </div>
-        </div>
-        <!-- ko template: { if: ['text', 'markdown'].indexOf(dialect()) == -1, name: 'editor-snippet-execution-status' } --><!-- /ko -->
-        <!-- ko template: { if: !$root.isResultFullScreenMode() && ['jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py'].indexOf(dialect()) === -1, name: 'editor-snippet-code-resizer' } --><!-- /ko -->
-        <div>
-          <!-- ko template: { if: ! $root.editorMode() && ! $root.isPresentationMode() && ! $root.isResultFullScreenMode(), name: 'editor-snippet-type-controls' } --><!-- /ko -->
-          <!-- ko template: { if: ['text', 'markdown'].indexOf(dialect()) == -1 && ! $root.isResultFullScreenMode(), name: 'editor-snippet-execution-controls' } --><!-- /ko -->
-        </div>
-        <!-- ko if: !$root.isResultFullScreenMode() -->
-        <!-- ko component: { name: 'executable-logs', params: {
-          activeExecutable: activeExecutable,
-          showLogs: showLogs,
-          resultsKlass: resultsKlass,
-          isPresentationMode: parentNotebook.isPresentationMode,
-          isHidingCode: parentNotebook.isHidingCode
-        }} --><!-- /ko -->
-        <!-- /ko -->
-        <!-- ko template: 'editor-query-tabs' --><!-- /ko -->
-      </div>
 
-      <div class="ace-filechooser" style="display:none;">
-        <div class="ace-filechooser-close">
-          <a class="pointer" data-bind="click: function(){ $('.ace-filechooser').hide(); }"><i class="fa fa-times"></i></a>
-        </div>
-        <div class="ace-filechooser-content">
-        </div>
-      </div>
-
-      <div id="removeSnippetModaleditor" class="modal hide fade">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-          <h2 class="modal-title">${_('Confirm Remove')}</h2>
-        </div>
-        <div class="modal-body">
-          <p>${_('Are you sure you want to remove this snippet?')}</p>
-        </div>
-        <div class="modal-footer" data-bind="with: $root.removeSnippetConfirmation">
-          <a class="btn" data-bind="click: function() { $root.removeSnippetConfirmation(null); $('#removeSnippetModaleditor').modal('hide'); }">${_('No')}</a>
-          <input type="submit" value="${_('Yes')}" class="btn btn-danger" data-bind="click: function() { notebook.snippets.remove(snippet); redrawFixedHeaders(100); $root.removeSnippetConfirmation(null); $('#removeSnippetModaleditor').modal('hide'); }" />
-        </div>
-      </div>
-
-
-      <div class="hoverMsg hide">
-        <!-- ko if: $root.editorMode() -->
-        <p class="hoverText">${_('Drop a SQL file here')}</p>
-        <!-- /ko -->
-        <!-- ko ifnot: $root.editorMode() -->
-        <p class="hoverText">${_('Drop iPython/Zeppelin notebooks here')}</p>
-        <!-- /ko -->
-      </div>
-
-
-      <div id="saveAsModaleditor" class="modal hide fade">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-          <!-- ko if: $root.editorMode() -->
-          <h2 class="modal-title">${_('Save query as...')}</h2>
-          <!-- /ko -->
-          <!-- ko ifnot: $root.editorMode() -->
-          <h2 class="modal-title">${_('Save notebook as...')}</h2>
-          <!-- /ko -->
-        </div>
-
-        <!-- ko if: $root.selectedNotebook() -->
-        <div class="modal-body">
-          <form class="form-horizontal">
-            <div class="control-group">
-              <label class="control-label">${_('Name')}</label>
-              <div class="controls">
-                <input type="text" class="input-xlarge" data-bind="value: $root.selectedNotebook().name, valueUpdate:'afterkeydown'"/>
-              </div>
-            </div>
-            <div class="control-group">
-              <label class="control-label">${_('Description')}</label>
-              <div class="controls">
-                <input type="text" class="input-xlarge" data-bind="value: $root.selectedNotebook().description, valueUpdate:'afterkeydown'" placeholder="${ _('(optional)') }"/>
-              </div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
-          <input type="button" class="btn btn-primary disable-feedback" value="${_('Save')}" data-dismiss="modal" data-bind="click: saveAsNotebook, enable: $root.selectedNotebook().name().length > 0"/>
-        </div>
-        <!-- /ko -->
-      </div>
-
-      <div id="saveToFileModaleditor" class="modal hide fade">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-          <h2 class="modal-title">${_('Are you sure you want to save back to File?')}</h2>
-        </div>
-
-        <div class="modal-footer">
-          <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
-          <input type="button" class="btn btn-primary disable-feedback" value="${_('Save')}" data-dismiss="modal" data-bind="click: function() { huePubSub.publish('save.snippet.to.file'); }"/>
-        </div>
-      </div>
-
-      <!-- ko if: $root.selectedNotebook() -->
-      <!-- ko with: $root.selectedNotebook() -->
-      <div id="retryModaleditor" class="modal hide fade" data-keyboard="false" data-backdrop="static">
-        <div class="modal-header">
-          <h2 class="modal-title">${_('Operation timed out')}</h2>
-        </div>
-        <div class="modal-body">
-          <p>${_('The operation timed out. Do you want to retry?')}</p>
-        </div>
-        <div class="modal-footer">
-          <a class="btn" data-bind="click: retryModalCancel">${_('No')}</a>
-          <a class="btn btn-primary disable-feedback" data-bind="click: retryModalConfirm">${_('Yes, retry')}</a>
-        </div>
-      </div>
-      <!-- /ko -->
-      <!-- /ko -->
+    <div class="hoverMsg hide">
+      <p class="hoverText">${_('Drop a SQL file here')}</p>
     </div>
   </div>
 </div>

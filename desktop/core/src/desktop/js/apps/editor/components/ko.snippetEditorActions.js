@@ -33,7 +33,7 @@ const TEMPLATE = `
       <i class="fa fa-fw fa-ellipsis-v"></i> ${I18n('More')}
       <span class="caret"></span>
     </button>
-    <ul class="dropdown-menu pull-right">
+    <ul class="dropdown-menu pull-right" style="position: fixed !important; transform: translateX(-143px); left: initial; right: initial; top: initial; bottom: initial;">
       <li>
         <a href="javascript:void(0)" data-bind="click: explain, css: {'disabled': !explainEnabled() }" title="${I18n(
           'Explain the current SQL query'
