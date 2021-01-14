@@ -429,21 +429,25 @@ class SampleQuery(object):
       )
 
       document_type = self._document_type(self.type, interpreter)
+      notebook = import_saved_beeswax_query(query, interpreter=interpreter)
+      data = notebook.get_data()
+      data['isSaved'] = True
+      uuid = data.get('uuid')
+      data = json.dumps(data)
       try:
-        # Don't overwrite
+        # Check if past example and recover or refresh it
+        # Actually would need some kind of uuid in case the name was changed
         doc2 = Document2.objects.get(owner=django_user, name=self.name, type=document_type, is_history=False)
-        # If document exists but has been trashed, recover from Trash
+        # If recover from Trash
         if doc2.parent_directory != examples_dir:
           doc2.parent_directory = examples_dir
-          doc2.save()
-      except Document2.DoesNotExist:
-        # Create document from saved query
-        notebook = import_saved_beeswax_query(query, interpreter=interpreter)
-        data = notebook.get_data()
-        data['isSaved'] = True
-        uuid = data.get('uuid')
-        data = json.dumps(data)
 
+        doc2.name = self.name
+        doc2.description = self.desc
+        doc2.data = data
+
+        doc2.save()
+      except Document2.DoesNotExist:
         doc2 = Document2.objects.create(
           uuid=uuid,
           owner=django_user,
