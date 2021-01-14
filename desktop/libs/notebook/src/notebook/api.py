@@ -40,10 +40,11 @@ from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from metadata.conf import OPTIMIZER
 
+from notebook.conf import EXAMPLES
 from notebook.connectors.base import Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name, patch_snippet_for_connector
 from notebook.connectors.hiveserver2 import HS2Api
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
-from notebook.models import escape_rows, make_notebook, upgrade_session_properties, get_api, MockRequest
+from notebook.models import escape_rows, make_notebook, upgrade_session_properties, get_api, _get_dialect_example
 
 if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_unquote
@@ -64,6 +65,9 @@ def create_notebook(request):
   editor_type = request.POST.get('type', 'notebook')
   gist_id = request.POST.get('gist')
   directory_uuid = request.POST.get('directory_uuid')
+
+  if EXAMPLES.AUTO_LOAD.get():
+    print(_get_dialect_example(dialect=editor_type))
 
   if gist_id:
     gist_doc = _get_gist_document(uuid=gist_id)
