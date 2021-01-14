@@ -322,7 +322,7 @@ def install_sample_user(django_user=None):
 
   if ENABLE_ORGANIZATIONS.get():
     lookup = {'email': django_username}
-    django_username_short = django_user.username_short
+    django_username_short = django_user.username_short if django_user else 'hue'
   else:
     lookup = {'username': django_username}
     django_username_short = django_username
