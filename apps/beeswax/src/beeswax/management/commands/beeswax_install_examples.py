@@ -137,8 +137,10 @@ class Command(BaseCommand):
 
     if app_type == RDBMS:
       design_list = [d for d in design_list if dialect in d['dialects']]
-    if self.queries is None:  # Manual install
+
+    if not self.queries:  # Manual install
       design_list = [d for d in design_list if not d.get('auto_load_only')]
+
     if self.queries:  # Automated install
       design_list = [d for d in design_list if d['name'] in self.queries]
 
