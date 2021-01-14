@@ -322,7 +322,7 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
       app_accessed = request._desktop_app
       app_libs_whitelist = ["desktop", "home", "home2", "about", "hue", "editor", "notebook", "indexer", "404", "500", "403"]
       if has_connectors():
-        app_libs_whitelist.append("metadata")
+        app_libs_whitelist.extend(['metadata', 'dashboard'])
       # Accessing an app can access an underlying other app.
       # e.g. impala or spark uses code from beeswax and so accessing impala shows up as beeswax here.
       # Here we trust the URL to be the real app we need to check the perms.
@@ -748,7 +748,7 @@ class SpnegoMiddleware(object):
       response['WWW-Authenticate'] = 'Negotiate'
       response.status = 401
 
-    return response 
+    return response
 
   def clean_host(self, pattern):
     hosts = []
