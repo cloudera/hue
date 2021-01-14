@@ -243,8 +243,6 @@ class OnePageViewModel {
         $(this).attr('href', link);
       });
 
-      $rawHtml.unwrap('span');
-
       const scriptPromises = loadScripts(scriptsToLoad);
 
       const evalScriptSync = function () {
@@ -259,7 +257,7 @@ class OnePageViewModel {
           });
         } else {
           // All evaluated
-          promise.resolve($rawHtml);
+          promise.resolve($rawHtml.children());
         }
       };
 
