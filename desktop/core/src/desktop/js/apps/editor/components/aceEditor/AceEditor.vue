@@ -105,9 +105,6 @@
           });
       }
 
-      const height = localStorage.getItem('ace.editor.custom.height') || '128';
-      (<HTMLElement>this.$el).style.height = height + 'px';
-
       editorElement.textContent = this.initialValue;
       const editor = <Ace.Editor>ace.edit(editorElement);
 
