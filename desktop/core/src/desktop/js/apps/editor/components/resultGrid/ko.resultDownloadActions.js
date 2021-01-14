@@ -190,7 +190,7 @@ class ResultDownloadActions extends DisposableComponent {
     // if (notebook.canSave()) {
     //   notebook.save()
     // } else {
-    //   $('#saveAsModaleditor').modal('show');
+    //   $('#editorSaveAsModal').modal('show');
     // }
   }
 }

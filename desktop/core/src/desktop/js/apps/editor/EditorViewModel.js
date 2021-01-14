@@ -143,8 +143,6 @@ export default class EditorViewModel {
       $(document).trigger('editingToggled');
     });
 
-    this.removeSnippetConfirmation = ko.observable();
-
     this.assistAvailable = ko.observable(options.assistAvailable);
 
     this.assistWithoutStorage = ko.observable(false);
@@ -263,7 +261,7 @@ export default class EditorViewModel {
         });
       this.combinedContent(statements);
     }
-    $('#combinedContentModal' + this.suffix).modal('show');
+    $('#editorCombinedContentModal').modal('show');
   }
 
   getSnippetName(snippetType) {
@@ -420,25 +418,6 @@ export default class EditorViewModel {
     const selectedNotebookUuid = this.selectedNotebook() && this.selectedNotebook().uuid();
     if (selectedNotebookUuid) {
       huePubSub.publish('doc.show.share.modal', selectedNotebookUuid);
-    }
-  }
-
-  removeSnippet(notebook, snippet) {
-    let hasContent = snippet.statement_raw().length > 0;
-    if (!hasContent) {
-      Object.keys(snippet.properties()).forEach(key => {
-        const value = snippet.properties()[key];
-        hasContent = hasContent || (ko.isObservable(value) && value().length > 0);
-      });
-    }
-    if (hasContent) {
-      this.removeSnippetConfirmation({ notebook: notebook, snippet: snippet });
-      $('#removeSnippetModal' + this.suffix).modal('show');
-    } else {
-      notebook.snippets.remove(snippet);
-      window.setTimeout(() => {
-        $(document).trigger('editorSizeChanged');
-      }, 100);
     }
   }
 

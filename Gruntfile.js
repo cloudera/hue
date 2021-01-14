@@ -43,7 +43,7 @@ module.exports = function(grunt) {
           'desktop/core/src/desktop/static/desktop/css/httperrors.css': 'desktop/core/src/desktop/static/desktop/less/httperrors.less',
           'apps/metastore/src/metastore/static/metastore/css/metastore.css': 'apps/metastore/src/metastore/static/metastore/less/metastore.less',
           'desktop/libs/notebook/src/notebook/static/notebook/css/notebook.css': 'desktop/libs/notebook/src/notebook/static/notebook/less/notebook.less',
-          'desktop/libs/notebook/src/notebook/static/notebook/css/notebook2.css': 'desktop/libs/notebook/src/notebook/static/notebook/less/notebook2.less',
+          'desktop/libs/notebook/src/notebook/static/notebook/css/editor2.css': 'desktop/libs/notebook/src/notebook/static/notebook/less/editor2.less',
           'desktop/libs/notebook/src/notebook/static/notebook/css/notebook-layout.css': 'desktop/libs/notebook/src/notebook/static/notebook/less/notebook-layout.less',
           'apps/oozie/src/oozie/static/oozie/css/workflow-editor.css': 'apps/oozie/src/oozie/static/oozie/less/workflow-editor.less',
           'apps/oozie/src/oozie/static/oozie/css/workflow.css': 'apps/oozie/src/oozie/static/oozie/less/workflow.less',
