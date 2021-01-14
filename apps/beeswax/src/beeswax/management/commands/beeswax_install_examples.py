@@ -27,9 +27,9 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.conf import USE_NEW_EDITOR
-from desktop.models import Directory, Document, Document2, Document2Permission
+from desktop.models import Directory, Document2, Document2Permission
 from hadoop import cluster
-from notebook.models import import_saved_beeswax_query, make_notebook, MockRequest
+from notebook.models import import_saved_beeswax_query, make_notebook, MockRequest, _get_example_directory
 from useradmin.models import get_default_user_group, install_sample_user, User
 
 from beeswax.design import hql_query
@@ -137,8 +137,10 @@ class Command(BaseCommand):
 
     if app_type == RDBMS:
       design_list = [d for d in design_list if dialect in d['dialects']]
-    if self.queries is None:  # Manual install
+
+    if not self.queries:  # Manual install
       design_list = [d for d in design_list if not d.get('auto_load_only')]
+
     if self.queries:  # Automated install
       design_list = [d for d in design_list if d['name'] in self.queries]
 
@@ -418,30 +420,28 @@ class SampleQuery(object):
       LOG.info('Successfully installed sample design: %s' % (self.name,))
 
     if USE_NEW_EDITOR.get():
-      # Get or create sample user directories
-      home_dir = Directory.objects.get_home_directory(django_user)
-      examples_dir, created = Directory.objects.get_or_create(
-        parent_directory=home_dir,
-        owner=django_user,
-        name=Document2.EXAMPLES_DIR
-      )
+      examples_dir = _get_example_directory(django_user)
 
       document_type = self._document_type(self.type, interpreter)
+      notebook = import_saved_beeswax_query(query, interpreter=interpreter)
+      data = notebook.get_data()
+      data['isSaved'] = True
+      uuid = data.get('uuid')
+      data = json.dumps(data)
       try:
-        # Don't overwrite
+        # Check if past example and recover or refresh it
+        # Actually would need some kind of uuid in case the name was changed
         doc2 = Document2.objects.get(owner=django_user, name=self.name, type=document_type, is_history=False)
-        # If document exists but has been trashed, recover from Trash
+        # If recover from Trash
         if doc2.parent_directory != examples_dir:
           doc2.parent_directory = examples_dir
-          doc2.save()
-      except Document2.DoesNotExist:
-        # Create document from saved query
-        notebook = import_saved_beeswax_query(query, interpreter=interpreter)
-        data = notebook.get_data()
-        data['isSaved'] = True
-        uuid = data.get('uuid')
-        data = json.dumps(data)
 
+        doc2.name = self.name
+        doc2.description = self.desc
+        doc2.data = data
+
+        doc2.save()
+      except Document2.DoesNotExist:
         doc2 = Document2.objects.create(
           uuid=uuid,
           owner=django_user,

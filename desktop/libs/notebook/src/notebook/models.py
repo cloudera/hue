@@ -31,16 +31,15 @@ from datetime import timedelta
 from django.contrib.sessions.models import Session
 from django.db.models import Count
 from django.db.models.functions import Trunc
-from django.urls import reverse
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
-
 from desktop.conf import has_connectors, TASK_SERVER
+from desktop.lib.connectors.models import _get_installed_connectors
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.paths import SAFE_CHARACTERS_URI
-from desktop.models import Document2
-from useradmin.models import User
+from desktop.models import Directory, Document2
+from useradmin.models import User, install_sample_user
 
 from notebook.conf import EXAMPLES, get_ordered_interpreters
 from notebook.connectors.base import Notebook, get_api as _get_api, get_interpreter
@@ -543,6 +542,28 @@ def _get_editor_type(editor_id):
   return document.type.rsplit('-', 1)[-1]
 
 
+def _get_example_directory(user):
+  home_dir = Directory.objects.get_home_directory(user)
+  examples_dir, created = Directory.objects.get_or_create(
+    parent_directory=home_dir,
+    owner=user,
+    name=Document2.EXAMPLES_DIR
+  )
+  return examples_dir
+
+def _get_dialect_example(dialect):
+  print(dialect)
+  sample_user = install_sample_user()
+  examples_dir = _get_example_directory(sample_user)
+
+  return Document2.objects.filter(
+      owner=sample_user,
+      type='query-%s' % dialect,
+      is_history=False,
+      parent_directory=examples_dir
+  ).first()
+
+
 class ApiWrapper():
   def __init__(self, request, snippet):
     self.request = request
@@ -713,18 +734,30 @@ def install_custom_examples():
   if EXAMPLES.AUTO_LOAD.get():
     from desktop.auth.backend import rewrite_user
     from beeswax.management.commands import beeswax_install_examples
-    from useradmin.models import get_default_user_group, install_sample_user, User
+    from useradmin.models import install_sample_user
 
     user = rewrite_user(
       install_sample_user()
     )
 
-    dialects = [
-      interpreter['dialect']
-      for interpreter in get_ordered_interpreters(user)
-      # Only for hive/impala currently, would also need to port to Notebook install examples.
-      if interpreter['dialect'] in ('hive', 'impala')
-    ]
+    if has_connectors():
+      interpreters = [
+        {
+          'type': connector['id'],
+          'dialect': connector['dialect']
+        }
+        for connector in _get_installed_connectors(category='editor')
+      ]
+    else:
+      interpreters = [
+        {
+          'type': interpreter['dialect'],
+          'dialect': interpreter['dialect']
+        }
+        for interpreter in get_ordered_interpreters(user)
+        # Only for hive/impala currently, would also need to port to Notebook install examples.
+        if interpreter['dialect'] in ('hive', 'impala')
+      ]
 
     queries = EXAMPLES.QUERIES.get()
     tables = EXAMPLES.TABLES.get()  # No-op. Only for the saved query samples, not the tables currently.
@@ -733,18 +766,16 @@ def install_custom_examples():
       'belonging to user %(user)s' % {
         'queries': queries,
         'tables': tables,
-        'dialects': dialects,
+        'dialects': [interpreter['dialect'] for interpreter in interpreters],
         'user': user
       }
     )
 
     result = []
 
-    for dialect in dialects:
-      interpreter = {'type': dialect, 'dialect': dialect}
-
+    for interpreter in interpreters:
       successes, errors = beeswax_install_examples.Command().handle(
-          dialect=dialect,
+          dialect=interpreter['dialect'],
           user=user,
           interpreter=interpreter,
           queries=queries,
@@ -752,7 +783,7 @@ def install_custom_examples():
           request=None
       )
       LOG.info('Dialect %(dialect)s installed samples: %(successes)s, %(errors)s,' % {
-        'dialect': dialect,
+        'dialect': interpreter['dialect'],
         'successes': successes,
         'errors': errors,
       })

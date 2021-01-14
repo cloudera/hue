@@ -265,6 +265,12 @@ EXAMPLES = ConfigSection(
       type=coerce_bool,
       default=False
     ),
+    AUTO_OPEN=Config(
+      'auto_open',
+      help=_t('If automatically loading the dialect example at Editor opening.'),
+      type=coerce_bool,
+      default=False
+    ),
     QUERIES=Config(
       'queries',
       help='Names of the saved queries to install. All if empty.',
