@@ -3,7 +3,6 @@
 exports[`AceEditor.vue should render 1`] = `
 <div
   class="ace-editor-component"
-  style="height: 128px;"
   value="some query"
 >
   <div
