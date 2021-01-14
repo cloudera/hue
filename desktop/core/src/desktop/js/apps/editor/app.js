@@ -371,7 +371,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
       if (viewModel.canSave()) {
         viewModel.saveNotebook();
       } else {
-        $('#saveAsModal' + window.EDITOR_SUFFIX).modal('show');
+        $('#editorSaveAsModal').modal('show');
       }
     };
 
@@ -599,11 +599,11 @@ huePubSub.subscribe('app.dom.loaded', app => {
           $('.navigator').hide();
           $('.add-snippet').hide();
 
-          if (window.BANNER_TOP_HTML) {
-            $('.main-content').attr('style', 'top: 31px !important');
-          } else {
-            $('.main-content').css('top', '1px');
-          }
+          // if (window.BANNER_TOP_HTML) {
+          //   $('.main-content').attr('style', 'top: 31px !important');
+          // } else {
+          //   $('.main-content').css('top', '1px');
+          // }
           window.setTimeout(() => {
             huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
           }, 200);
@@ -620,11 +620,11 @@ huePubSub.subscribe('app.dom.loaded', app => {
           }, 0);
           $('.navigator').show();
           $('.add-snippet').show();
-          if (window.BANNER_TOP_HTML) {
-            $('.main-content').css('top', '112px');
-          } else {
-            $('.main-content').css('top', '74px');
-          }
+          // if (window.BANNER_TOP_HTML) {
+          //   $('.main-content').css('top', '112px');
+          // } else {
+          //   $('.main-content').css('top', '74px');
+          // }
           window.setTimeout(() => {
             huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
           }, 200);
@@ -637,7 +637,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
     huePubSub.subscribe(
       'show.retry.modal',
       data => {
-        $('#retryModal' + window.EDITOR_SUFFIX).modal('show');
+        $('#editorRetryModal').modal('show');
       },
       HUE_PUB_SUB_EDITOR_ID
     );
@@ -645,7 +645,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
     huePubSub.subscribe(
       'hide.retry.modal',
       data => {
-        $('#retryModal' + window.EDITOR_SUFFIX).modal('hide');
+        $('#editorRetryModal' + window.EDITOR_SUFFIX).modal('hide');
       },
       HUE_PUB_SUB_EDITOR_ID
     );

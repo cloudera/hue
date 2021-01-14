@@ -20,15 +20,107 @@
 @import (reference) "cui/extra-variables.less";
 @import (reference) "hue-mixins.less";
 
-#editorComponents,
-#embeddable_editor,
-.editor-mode,
-.vertical-full,
-.content-panel {
-  height: 100%;
-}
+.editor {
+  .fillAbsolute();
+  .flexRowLayout();
 
-.notebook {
+  .editor-nav-bar {
+    .flexRowLayoutRow(0 0 32px);
+  }
+
+  .editor-app {
+    .flexRowLayoutRow(0 0 100%);
+    .flexRowLayout();
+
+    > .editor-top {
+      .flexRowLayoutRow(0 0 40%);
+      .flexRowLayout();
+      padding: 0 8px;
+
+      .editor-top-actions {
+        .flexRowLayoutRow(0 0 20px);
+
+        line-height: 32px;
+
+        .editor-top-right-actions {
+          float: right;
+
+          > * {
+            margin-left: 10px;
+          }
+        }
+      }
+
+      .editor-settings-drawer {
+        position: absolute;
+        width: 100%;
+        z-index: 400;
+      }
+
+      .editor-code-editor {
+        .flexRowLayoutRow(0 1 100%);
+
+        .ace_gutter {
+          background-color: transparent !important;
+          border-right: 1px solid @cui-gray-100;
+
+          > .ace_layer {
+            border-left: none;
+          }
+        }
+      }
+
+      .editor-execute-status {
+        .flexRowLayoutRow(1 0 5px);
+      }
+
+      .editor-execute-actions {
+        .flexRowLayoutRow(0 0 36px);
+      }
+    }
+
+    > .editor-divider {
+      .flexRowLayoutRow(0 0 2px);
+
+      border-bottom: 1px solid @cui-gray-300;
+    }
+
+    > .editor-bottom {
+      .flexRowLayoutRow(0 1 60%);
+      .flexRowLayout();
+
+      padding: 0 8px;
+
+      .editor-bottom-tabs {
+        .flexRowLayoutRow(0 0 38px);
+      }
+
+      .editor-bottom-tab-content {
+        .flexRowLayoutRow(0 1 100%);
+
+        .tab-pane {
+          .fillAbsolute();
+
+          .editor-bottom-tab-panel {
+            .fillAbsolute();
+            .flexRowLayout();
+
+            .snippet-tab-actions {
+              .flexRowLayoutRow(0 0 30px);
+            }
+
+            .snippet-tab-body {
+              .flexRowLayoutRow(0 1 100%);
+
+              overflow: auto;
+            }
+          }
+        }
+      }
+    }
+  }
+
+
   .snippet-move-placeholder {
     margin: 10px;
     height: 100px;
@@ -406,8 +498,6 @@
 
   .tab-content {
     background-color: @cui-white;
-    border-left: 1px solid @cui-default-border-color;
-    border-right: 1px solid @cui-default-border-color;
   }
 
   .editor-help {
