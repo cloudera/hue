@@ -49,8 +49,8 @@ from useradmin.organization import _fitered_queryset
 
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_K8S_ONLY, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS,\
-    has_connectors, TASK_SERVER, ENABLE_GIST, APP_BLACKLIST, ENABLE_SHARING
+from desktop.conf import get_clusters, IS_MULTICLUSTER_ONLY, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS, \
+    has_connectors, TASK_SERVER, APP_BLACKLIST, ENABLE_SHARING, ENABLE_CONNECTORS
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.connectors.models import Connector
@@ -100,7 +100,7 @@ def _version_from_properties(f):
 
 def get_sample_user_install(user):
   if ENABLE_ORGANIZATIONS.get():
-    organization = get_organization(email=user.email)
+    organization = get_organization(email=user.email if user else None)
     if organization.is_multi_user:
       return SAMPLE_USER_INSTALL + '@' + organization.domain
     else:

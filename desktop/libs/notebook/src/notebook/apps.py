@@ -32,5 +32,5 @@ class NotebookConfig(AppConfig):
     from notebook.models import install_custom_examples
 
     table_names = connection.introspection.table_names()
-    if 'auth_group' in table_names and 'auth_user' in table_names:
+    if 'auth_group' in table_names and ('auth_user' in table_names or 'useradmin_organizationuser' in table_names):
       install_custom_examples()

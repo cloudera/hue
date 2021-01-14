@@ -65,7 +65,7 @@ class Command(BaseCommand):
 
     for dialect in dialects:
       EditorCommand().handle(
-        app_name=dialect['dialect'],
+        app_name=dialect['dialect'],  # Unused?
         user=user,
         tables=tables,
         dialect=dialect['dialect'],
