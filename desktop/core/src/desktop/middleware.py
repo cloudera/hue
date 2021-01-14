@@ -47,6 +47,7 @@ from django.utils.http import urlquote, is_safe_url
 from django.utils.deprecation import MiddlewareMixin
 
 from hadoop import cluster
+from dashboard.conf import IS_ENABLED as DASHBOARD_ENABLED
 from useradmin.models import User
 
 import desktop.views
@@ -322,7 +323,9 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
       app_accessed = request._desktop_app
       app_libs_whitelist = ["desktop", "home", "home2", "about", "hue", "editor", "notebook", "indexer", "404", "500", "403"]
       if has_connectors():
-        app_libs_whitelist.extend(['metadata', 'dashboard'])
+        app_libs_whitelist.append('metadata')
+        if DASHBOARD_ENABLED.get():
+          app_libs_whitelist.append('dashboard')
       # Accessing an app can access an underlying other app.
       # e.g. impala or spark uses code from beeswax and so accessing impala shows up as beeswax here.
       # Here we trust the URL to be the real app we need to check the perms.
