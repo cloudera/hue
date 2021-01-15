@@ -43,7 +43,7 @@ def __get_root(*append):
   Returns the root directory of the project.
   """
   if append is None:
-    append = [ ]
+    append = []
   path = os.path.join(
               os.path.dirname(__file__),
               "..", "..", "..", "..", "..",
