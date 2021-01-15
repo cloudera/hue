@@ -19,7 +19,7 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
   <div class="hue-table-container">
-    <table class="hue-table">
+    <table class="hue-table" :class="{ 'hue-table-sticky-header': stickyHeader }">
       <caption>
         <!-- Because of Web:TableWithoutCaptionCheck -->
         {{
@@ -71,6 +71,8 @@
     columns?: Column<T>[];
     @Prop()
     caption?: string;
+    @Prop({ required: false, default: false })
+    stickyHeader?: boolean;
 
     hasCellSlot(column: Column<T>): boolean {
       return !!this.$scopedSlots[this.cellSlotName(column)];
@@ -122,6 +124,7 @@
           border-bottom: 1px solid $fluid-gray-300;
 
           th {
+            background-color: $fluid-white;
             color: $fluid-gray-700;
             font-size: 13px;
             font-weight: 500;
@@ -149,6 +152,27 @@
             &:last-of-type {
               padding-right: 8px;
             }
+          }
+        }
+      }
+
+      &.hue-table-sticky-header {
+        thead tr {
+          border-bottom: none;
+        }
+
+        thead th {
+          position: sticky;
+          position: -webkit-sticky;
+          top: 0;
+
+          &::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 100%;
+            bottom: 0;
+            border-bottom: 1px solid $fluid-gray-200;
           }
         }
       }
