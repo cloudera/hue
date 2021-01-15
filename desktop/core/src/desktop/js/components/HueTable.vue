@@ -18,7 +18,7 @@
 
 <!-- eslint-disable vue/no-v-html -->
 <template>
-  <div class="hue-table-container">
+  <div ref="tableContainer" class="hue-table-container" @scroll="onContainerScroll">
     <table class="hue-table" :class="{ 'hue-table-sticky-header': stickyHeader }">
       <caption>
         <!-- Because of Web:TableWithoutCaptionCheck -->
@@ -80,6 +80,13 @@
 
     cellSlotName(column: Column<T>): string {
       return 'cell-' + column.key;
+    }
+
+    onContainerScroll(): void {
+      const containerEl = <HTMLElement>this.$refs.tableContainer;
+      if (containerEl.scrollHeight === containerEl.scrollTop + containerEl.clientHeight) {
+        this.$emit('scroll-to-end');
+      }
     }
   }
 </script>
