@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <ResultGrid :rows="rows" :meta="meta" />
+  <ResultGrid :rows="rows" :meta="meta" :has-more="hasMore" @fetch-more="fetchMore" />
 </template>
 
 <script lang="ts">
@@ -62,6 +62,8 @@
     rows: ResultRow[] = [];
     meta: ResultMeta[] = [];
 
+    fetchResultThrottle = -1;
+
     mounted(): void {
       this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, (executable: Executable) => {
         if (this.executable === executable) {
@@ -74,6 +76,15 @@
           this.handleResultChange();
         }
       });
+    }
+
+    fetchMore(): void {
+      window.clearTimeout(this.fetchResultThrottle);
+      this.fetchResultThrottle = window.setTimeout(() => {
+        if (this.hasMore && this.executable && this.executable.result) {
+          this.executable.result.fetchRows({ rows: 100 });
+        }
+      }, 100);
     }
 
     @Watch('executable')
