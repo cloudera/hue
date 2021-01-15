@@ -65,9 +65,6 @@ def create_notebook(request):
   gist_id = request.POST.get('gist')
   directory_uuid = request.POST.get('directory_uuid')
 
-  if EXAMPLES.AUTO_LOAD.get():
-    print(_get_dialect_example(dialect=editor_type))
-
   if gist_id:
     gist_doc = _get_gist_document(uuid=gist_id)
     statement = json.loads(gist_doc.data)['statement']
@@ -81,6 +78,12 @@ def create_notebook(request):
     )
   else:
     editor = Notebook()
+
+    if EXAMPLES.AUTO_OPEN.get():
+      document = _get_dialect_example(dialect=editor_type)
+      if document:
+        editor = Notebook(document=document)
+        editor = upgrade_session_properties(request, editor)
 
   data = editor.get_data()
 

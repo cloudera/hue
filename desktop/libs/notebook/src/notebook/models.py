@@ -552,7 +552,6 @@ def _get_example_directory(user):
   return examples_dir
 
 def _get_dialect_example(dialect):
-  print(dialect)
   sample_user = install_sample_user()
   examples_dir = _get_example_directory(sample_user)
 
