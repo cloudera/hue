@@ -17,8 +17,13 @@
 -->
 
 <template>
-  <div class="result-grid">
-    <HueTable :columns="tableColumns" :rows="tableRows" :sticky-header="true" />
+  <div class="result-grid" :class="{ 'grayed-out': grayedOut }">
+    <HueTable
+      :columns="tableColumns"
+      :rows="tableRows"
+      :sticky-header="true"
+      @scroll-to-end="onScrollToEnd"
+    />
   </div>
 </template>
 
@@ -29,7 +34,7 @@
   import HueTable from 'components/HueTable.vue';
   import Vue from 'vue';
   import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { Prop, Watch } from 'vue-property-decorator';
 
   @Component({
     components: { HueTable }
@@ -39,6 +44,10 @@
     rows!: ResultRow[];
     @Prop()
     meta!: ResultMeta[];
+    @Prop()
+    hasMore!: boolean;
+
+    grayedOut = false;
 
     get tableColumns(): Column<ResultRow>[] {
       return this.meta.map(({ name }, index) => ({
@@ -51,6 +60,19 @@
     get tableRows(): Row[] {
       return this.rows;
     }
+
+    @Watch('rows')
+    @Watch('hasMore')
+    resultChanged(): void {
+      this.grayedOut = false;
+    }
+
+    onScrollToEnd(): void {
+      if (this.hasMore) {
+        this.grayedOut = true;
+        this.$emit('fetch-more');
+      }
+    }
   }
 </script>
 
@@ -59,5 +81,13 @@
     position: relative;
     height: 100%;
     width: 100%;
+
+    &.grayed-out {
+      opacity: 0.5;
+
+      /deep/ .hue-table-container {
+        overflow: hidden !important;
+      }
+    }
   }
 </style>
