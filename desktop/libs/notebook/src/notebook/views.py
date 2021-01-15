@@ -128,7 +128,7 @@ def editor(request, is_mobile=False, is_embeddable=False):
     gist_doc = _get_gist_document(uuid=gist_id)
     editor_type = gist_doc.extra
 
-  if EXAMPLES.AUTO_LOAD.get() and not editor_id:
+  if EXAMPLES.AUTO_OPEN.get() and not editor_id:
     sample_query = _get_dialect_example(dialect=editor_type)
     if sample_query:
       editor_id = sample_query.id
