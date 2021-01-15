@@ -35,80 +35,78 @@ export const NAME = 'snippet-results';
 
 // prettier-ignore
 const TEMPLATE = `
-<div class="snippet-row" data-bind="visible: visible" style="display: none;">
-  <div class="snippet-tab-actions">
-    <div class="btn-group">
-      <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showGrid, css: { 'active': showGrid }"><i class="fa fa-fw fa-th"></i> ${ I18n('Grid') }</button>
-      <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showChart, css: { 'active': showChart }"><i class="hcha fa-fw hcha-bar-chart"></i> ${ I18n('Chart') }</button>
-    </div>
-    <div class="btn-group pull-right">
-      <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: isResultFullScreenMode">
-        <!-- ko if: isResultFullScreenMode -->
-        <i class="fa fa-compress"></i> ${ I18n('Collapse') }
-        <!-- /ko -->
-        <!-- ko ifnot: isResultFullScreenMode -->
-        <i class="fa fa-expand"></i> ${ I18n('Expand') }
-        <!-- /ko -->
-      </button>
-    </div>
+<div class="snippet-tab-actions">
+  <div class="btn-group">
+    <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showGrid, css: { 'active': showGrid }"><i class="fa fa-fw fa-th"></i> ${ I18n('Grid') }</button>
+    <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showChart, css: { 'active': showChart }"><i class="hcha fa-fw hcha-bar-chart"></i> ${ I18n('Chart') }</button>
   </div>
+  <div class="btn-group pull-right">
+    <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: isResultFullScreenMode">
+      <!-- ko if: isResultFullScreenMode -->
+      <i class="fa fa-compress"></i> ${ I18n('Collapse') }
+      <!-- /ko -->
+      <!-- ko ifnot: isResultFullScreenMode -->
+      <i class="fa fa-expand"></i> ${ I18n('Expand') }
+      <!-- /ko -->
+    </button>
+  </div>
+</div>
 
-  <div class="snippet-tab-body">
-    <div data-bind="visible: type() !== 'table'" style="display:none; margin: 10px 0; overflow-y: auto">
-      <!-- ko if: data().length && data()[0][1] != "" -->
-      <pre data-bind="text: data()[0][1]" class="no-margin-bottom"></pre>
-      <!-- /ko -->
-      <!-- ko ifnot: data().length && data()[0][1] != "" -->
-      <pre class="no-margin-bottom"><i class="fa fa-check muted"></i> ${ I18n('Done.') }</pre>
-      <!-- /ko -->
-      <!-- ko if: images().length -->
-      <ul class="unstyled results-images" data-bind="foreach: images">
-        <li>
-          <img data-bind="attr: {'src': 'data:image/png;base64,' + $data}" class="margin-bottom-10"  alt="${ I18n('Result image') }"/>
-        </li>
-      </ul>
-      <!-- /ko -->
+<div class="result-tab-body">
+  <div data-bind="visible: type() !== 'table'" style="display:none; margin: 10px 0; overflow-y: auto">
+    <!-- ko if: data().length && data()[0][1] != "" -->
+    <pre data-bind="text: data()[0][1]" class="no-margin-bottom"></pre>
+    <!-- /ko -->
+    <!-- ko ifnot: data().length && data()[0][1] != "" -->
+    <pre class="no-margin-bottom"><i class="fa fa-check muted"></i> ${ I18n('Done.') }</pre>
+    <!-- /ko -->
+    <!-- ko if: images().length -->
+    <ul class="unstyled results-images" data-bind="foreach: images">
+      <li>
+        <img data-bind="attr: {'src': 'data:image/png;base64,' + $data}" class="margin-bottom-10"  alt="${ I18n('Result image') }"/>
+      </li>
+    </ul>
+    <!-- /ko -->
+  </div>
+  <div class="table-results" data-bind="visible: type() === 'table', css: { 'table-results-notebook': notebookMode }" style="display: none;">
+    <div class="table-results-inner" data-bind="visible: !executing() && hasData() && showGrid()" style="display: none; position: relative;">
+      <execution-results-ko-bridge class="table-results-bridge" data-bind="vueKoProps: {
+        executableObservable: activeExecutable
+      }"></execution-results-ko-bridge>
     </div>
-    <div class="table-results" data-bind="visible: type() === 'table', css: { 'table-results-notebook': notebookMode }" style="display: none;">
-      <div data-bind="visible: !executing() && hasData() && showGrid()" style="display: none; position: relative;">
-        <execution-results-ko-bridge data-bind="vueKoProps: {
-          executableObservable: activeExecutable
-        }"></execution-results-ko-bridge>
-      </div>
-      <div data-bind="visible: !executing() && hasData() && showChart()" style="display: none; position: relative;">
-        <!-- ko component: {
-          name: '${ RESULT_CHART_COMPONENT }',
-          params: {
-            activeExecutable: activeExecutable,
-            cleanedMeta: cleanedMeta,
-            cleanedDateTimeMeta: cleanedDateTimeMeta,
-            cleanedNumericMeta: cleanedNumericMeta,
-            cleanedStringMeta: cleanedStringMeta,
-            data: data,
-            id: id,
-            meta: meta,
-            showChart: showChart
-          }
-        } --><!-- /ko -->
-      </div>
-      <div data-bind="visible: !executing() && !hasData() && streaming()" style="display: none;">
-        <h1 class="empty">${ I18n('Waiting for streaming data...') }</h1>
-      </div>
-      <div data-bind="visible: !executing() && !hasData() && !hasResultSet() && status() === 'available' && fetchedOnce()" style="display: none;">
-        <h1 class="empty">${ I18n('Success.') }</h1>
-      </div>
-      <div data-bind="visible: !executing() && !hasData() && hasResultSet() && status() === 'available' && fetchedOnce()" style="display: none;">
-        <h1 class="empty">${ I18n('Empty result.') }</h1>
-      </div>
-      <div data-bind="visible: !executing() && !hasData() && status() === 'expired'" style="display: none;">
-        <h1 class="empty">${ I18n('Results have expired, rerun the query if needed.') }</h1>
-      </div>
-      <div data-bind="visible: executing" style="display: none;">
-        <h1 class="empty"><i class="fa fa-spinner fa-spin"></i> ${ I18n('Executing...') }</h1>
-      </div>
-      <ul id="wsResult">
-      </ul>
+    <div data-bind="visible: !executing() && hasData() && showChart()" style="display: none; position: relative;">
+      <!-- ko component: {
+        name: '${ RESULT_CHART_COMPONENT }',
+        params: {
+          activeExecutable: activeExecutable,
+          cleanedMeta: cleanedMeta,
+          cleanedDateTimeMeta: cleanedDateTimeMeta,
+          cleanedNumericMeta: cleanedNumericMeta,
+          cleanedStringMeta: cleanedStringMeta,
+          data: data,
+          id: id,
+          meta: meta,
+          showChart: showChart
+        }
+      } --><!-- /ko -->
     </div>
+    <div data-bind="visible: !executing() && !hasData() && streaming()" style="display: none;">
+      <h1 class="empty">${ I18n('Waiting for streaming data...') }</h1>
+    </div>
+    <div data-bind="visible: !executing() && !hasData() && !hasResultSet() && status() === 'available' && fetchedOnce()" style="display: none;">
+      <h1 class="empty">${ I18n('Success.') }</h1>
+    </div>
+    <div data-bind="visible: !executing() && !hasData() && hasResultSet() && status() === 'available' && fetchedOnce()" style="display: none;">
+      <h1 class="empty">${ I18n('Empty result.') }</h1>
+    </div>
+    <div data-bind="visible: !executing() && !hasData() && status() === 'expired'" style="display: none;">
+      <h1 class="empty">${ I18n('Results have expired, rerun the query if needed.') }</h1>
+    </div>
+    <div data-bind="visible: executing" style="display: none;">
+      <h1 class="empty"><i class="fa fa-spinner fa-spin"></i> ${ I18n('Executing...') }</h1>
+    </div>
+    <ul id="wsResult">
+    </ul>
   </div>
 </div>
 `;
