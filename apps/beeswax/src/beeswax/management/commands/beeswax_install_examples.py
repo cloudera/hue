@@ -430,15 +430,17 @@ class SampleQuery(object):
       uuid = data.get('uuid')
       data = json.dumps(data)
       try:
-        # Check if past example and recover or refresh it
-        # Actually would need some kind of uuid in case the name was changed
-        doc2 = Document2.objects.get(owner=django_user, name=self.name, type=document_type, is_history=False)
-        # If recover from Trash
+        # Recover from Trash if there or refresh content
+        doc2 = Document2.objects.get(uuid=uuid)
+
         if doc2.parent_directory != examples_dir:
           doc2.parent_directory = examples_dir
 
         doc2.name = self.name
+        doc2.owner = django_user
+        doc2.type = document_type
         doc2.description = self.desc
+        doc2.is_history = False
         doc2.data = data
 
         doc2.save()
