@@ -19,7 +19,7 @@ import logging
 
 from hadoop.core_site import get_conf
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _t
 
 LOG = logging.getLogger(__name__)
 
@@ -72,6 +72,6 @@ def config_validator():
         raise ValueError('Failed to obtain IDBroker Token')
     except Exception as e:
       LOG.exception('Failed to obtain IDBroker Token')
-      res.append(('idbroker', _('Failed to obtain IDBroker Token, check your IDBroker configuration.')))
+      res.append(('idbroker', _t('Failed to obtain IDBroker Token, check your IDBroker configuration.')))
 
   return res
