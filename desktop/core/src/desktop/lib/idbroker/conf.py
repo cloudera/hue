@@ -23,11 +23,11 @@ from django.utils.translation import ugettext_lazy as _t
 
 LOG = logging.getLogger(__name__)
 
-_CNF_CAB_ADDRESS='fs.%s.ext.cab.address' # http://host:8444/gateway
-_CNF_CAB_ADDRESS_DT_PATH='fs.%s.ext.cab.dt.path' # dt
-_CNF_CAB_ADDRESS_PATH='fs.%s.ext.cab.path' # aws-cab
-_CNF_CAB_USERNAME='fs.%s.ext.cab.username' # when not using kerberos
-_CNF_CAB_PASSWORD='fs.%s.ext.cab.password'
+_CNF_CAB_ADDRESS = 'fs.%s.ext.cab.address' # http://host:8444/gateway
+_CNF_CAB_ADDRESS_DT_PATH = 'fs.%s.ext.cab.dt.path' # dt
+_CNF_CAB_ADDRESS_PATH = 'fs.%s.ext.cab.path' # aws-cab
+_CNF_CAB_USERNAME = 'fs.%s.ext.cab.username' # when not using kerberos
+_CNF_CAB_PASSWORD = 'fs.%s.ext.cab.password'
 SUPPORTED_FS = {'s3a': 's3a', 'adl': 'azure', 'abfs': 'azure', 'azure': 'azure', 'gs': 'gs'}
 
 def validate_fs(fs=None):
