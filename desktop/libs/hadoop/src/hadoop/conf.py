@@ -121,8 +121,9 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
           key="hadoop_conf_dir",
           dynamic_default=get_hadoop_conf_dir_default,
           help=
-            "Directory of the Hadoop configuration) Defaults to the environment variable HADOOP_CONF_DIR when set, "
-            "or '/etc/hadoop/conf'."
+            "Directory of the Hadoop configuration. Defaults to the environment variable HADOOP_CONF_DIR when set, "
+            "or '/etc/hadoop/conf'.",
+          type=str
       ),
       IS_ENABLED=Config(
           'is_enabled',
