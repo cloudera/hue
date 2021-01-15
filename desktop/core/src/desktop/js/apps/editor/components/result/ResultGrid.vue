@@ -17,7 +17,9 @@
 -->
 
 <template>
-  <div><HueTable :columns="tableColumns" :rows="tableRows" /></div>
+  <div class="result-grid">
+    <HueTable :columns="tableColumns" :rows="tableRows" :sticky-header="true" />
+  </div>
 </template>
 
 <script lang="ts">
@@ -51,3 +53,11 @@
     }
   }
 </script>
+
+<style lang="scss" scoped>
+  .result-grid {
+    position: relative;
+    height: 100%;
+    width: 100%;
+  }
+</style>
