@@ -25,20 +25,21 @@
   .flexRowLayout();
 
   .editor-nav-bar {
-    .flexRowLayoutRow(0 0 32px);
+    .flexRowLayoutRow(0 0 50px);
   }
 
   .editor-app {
-    .flexRowLayoutRow(0 0 100%);
+    .flexRowLayoutRow(0 1 100%);
     .flexRowLayout();
 
     > .editor-top {
       .flexRowLayoutRow(0 0 40%);
       .flexRowLayout();
+
       padding: 0 8px;
 
       .editor-top-actions {
-        .flexRowLayoutRow(0 0 20px);
+        .flexRowLayoutRow(0 0 32px);
 
         line-height: 32px;
 
@@ -113,6 +114,29 @@
               .flexRowLayoutRow(0 1 100%);
 
               overflow: auto;
+            }
+
+            .result-tab-body {
+              .flexRowLayoutRow(0 1 100%);
+
+              overflow: hidden;
+
+              .table-results {
+                .fillAbsolute();
+
+                .table-results-inner,
+                .table-results-inner > .table-results-bridge {
+                  position: relative;
+                  height: 100%;
+                  width: 100%;
+                }
+
+                .table-results-inner .hue-table-container {
+                  height: 100%;
+                  width: 100%;
+                  overflow: auto;
+                }
+              }
             }
           }
         }
