@@ -45,6 +45,8 @@ websocket:
   replicas: 1
 monitoring:
   enabled: false
+alertrule:
+  enabled: false
 tracing:
   enabled: false
 cron:
