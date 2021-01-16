@@ -63,7 +63,8 @@ RUN ./build/env/bin/pip install \
   # SparkSql show tables
   git+https://github.com/gethue/PyHive \
   # pyhive \
-  ksql \
+  #ksql \
+  git+https://github.com/bryanyang0528/ksql-python \
   pydruid \
   pybigquery \
   elasticsearch-dbapi \
