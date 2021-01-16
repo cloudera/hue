@@ -270,7 +270,7 @@
     "auto_load_only": false,
     "data": {
       "query": {
-        "query": "\nSHOW TOPICS\n;\n\n\nCREATE STREAM user_behavior (\n  user_id BIGINT,\n  item_id BIGINT,\n  category_id BIGINT,\n  behavior STRING,\n  ts STRING\n) WITH (kafka_topic='user_behavior', value_format='json', partitions=1)\n;\n\n\nSELECT *\nFROM user_behavior\nEMIT CHANGES\nLIMIT 30\n;\n\n\nINSERT INTO user_behavior (\n  user_id ,\n  item_id ,\n  category_id ,\n  behavior ,\n  ts\n)\nVALUES\n(1, 10, 20, 'buy', '1602998392')\n;\n",
+        "query": "\nSHOW TOPICS\n;\n\n\nCREATE STREAM user_behavior (\n  user_id BIGINT,\n  item_id BIGINT,\n  category_id BIGINT,\n  behavior STRING,\n  ts STRING\n) WITH (kafka_topic='user_behavior', value_format='json', partitions=1)\n;\n\n\nSELECT *\nFROM user_behavior\nEMIT CHANGES\nLIMIT 5\n;\n\n\nINSERT INTO user_behavior (\n  user_id ,\n  item_id ,\n  category_id ,\n  behavior ,\n  ts\n)\nVALUES\n(1, 10, 20, 'buy', '1602998392')\n;\n",
         "type": 0,
         "email_notify": false,
         "is_parameterized": false,
@@ -290,7 +290,7 @@
     "auto_load_only": false,
     "data": {
       "query": {
-        "query": "\nSELECT\n    FLOOR(trip_distance / 5) * 5 AS \"distance\",\n    AVG(tip_amount) AS \"given tip\",\n    AVG(predict_price(total_amount, trip_distance, passenger_count)) AS \"predicted tip\"\nFROM \"nyc-taxi\"\nWHERE\n    trip_distance > 0 AND trip_distance < 50\nGROUP BY\n    FLOOR(trip_distance / 5) * 5\n;\n",
+        "query": "\nSELECT *\nFROM \"schema\".\"nyc-taxi\"\nLIMIT 100\n;\n\nSELECT\n    FLOOR(trip_distance / 5) * 5 AS \"distance\",\n    AVG(tip_amount) AS \"given tip\",\n    AVG(predict_price(total_amount, trip_distance, passenger_count)) AS \"predicted tip\"\nFROM \"nyc-taxi\"\nWHERE\n    trip_distance > 0 AND trip_distance < 50\nGROUP BY\n    FLOOR(trip_distance / 5) * 5\n;\n\nCREATE MODEL fare_estimator WITH (\n    model_class = 'sklearn.ensemble.GradientBoostingClassifier',\n    wrap_predict = True,\n    target_column = 'fare_amount'\n) AS (\n    SELECT trip_distance, fare_amount\n    FROM \"nyc-taxi\"\n    LIMIT 100\n)\n;\n",
         "type": 0,
         "email_notify": false,
         "is_parameterized": false,
