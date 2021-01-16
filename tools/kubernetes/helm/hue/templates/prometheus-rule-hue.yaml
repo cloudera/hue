@@ -11,7 +11,7 @@ spec:
     - name: hue-pod-monitor.alert.rules
       rules:
       - alert: hue_pods_are_down
-        expr: sum(up{job="hue",namespace="data-platform-staging"}) < 2 #Based on the replicas mentioned in values.yaml
+        expr: sum(up{job="hue",namespace="data-platform-staging"}) < {{ .Values.hue.replicas }} #Based on the replicas mentioned in values.yaml
         for: 30m #Change this based on your SLA
         labels:
           severity: High
