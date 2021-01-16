@@ -281,5 +281,25 @@
       "file_resources": [],
       "settings": []
     }
+  },
+  {
+    "name": "New York Taxi dataset Analysis",
+    "desc": "Regular SELECTs with custom Python UDF and create Machine Learning Model",
+    "dialects": ["dasksql"],
+    "type": "2",
+    "auto_load_only": false,
+    "data": {
+      "query": {
+        "query": "\nSELECT\n    FLOOR(trip_distance / 5) * 5 AS \"distance\",\n    AVG(tip_amount) AS \"given tip\",\n    AVG(predict_price(total_amount, trip_distance, passenger_count)) AS \"predicted tip\"\nFROM \"nyc-taxi\"\nWHERE\n    trip_distance > 0 AND trip_distance < 50\nGROUP BY\n    FLOOR(trip_distance / 5) * 5\n;\n",
+        "type": 0,
+        "email_notify": false,
+        "is_parameterized": false,
+        "database": ""
+      },
+      "functions": [],
+      "VERSION": "0.4.1",
+      "file_resources": [],
+      "settings": []
+    }
   }
 ]
