@@ -5,7 +5,7 @@ metadata:
   labels:
     prometheus: example
     role: alert-rules
-  name: prometheus-example-rules
+  name: hue
 spec:
   groups:
     - name: hue-pod-monitor.alert.rules
@@ -14,9 +14,8 @@ spec:
         expr: sum(up{job="hue",namespace="data-platform-staging"}) < 2 #Based on the replicas mentioned in values.yaml
         for: 30m #Change this based on your SLA
         labels:
-        #Labels required for your alert recognition 
           severity: High
         annotations:
-          summary: Hue pods are down 
-          impact: Users shall not be able to query via hue webui
+          summary: Some Hue pods are down
+          impact: Users might not be able to query via Hue Web UI
 {{ end }}
