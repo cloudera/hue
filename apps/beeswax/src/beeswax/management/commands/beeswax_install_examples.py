@@ -423,30 +423,31 @@ class SampleQuery(object):
     if USE_NEW_EDITOR.get():
       examples_dir = _get_example_directory(django_user)
 
-      document_type = self._document_type(self.type, interpreter)
+      document_type = self._document_type(self.type, interpreter)  # Issue of query-10 vs query-hive-10
       notebook = import_saved_beeswax_query(query, interpreter=interpreter)
-      data = notebook.get_data()
-      data['isSaved'] = True
-      uuid = data.get('uuid')
-      data = json.dumps(data)
-      try:
-        # Recover from Trash if there or refresh content
-        doc2 = Document2.objects.get(uuid=uuid)
 
-        if doc2.parent_directory != examples_dir:
+      try:
+        # Could move PK from a uuid in queries.json at some point to handle name changes without duplicating.
+        # And move to a simpler json format at some point.
+        doc2 = Document2.objects.get(owner=django_user, name=self.name, type=document_type, is_history=False)
+
+        if doc2.parent_directory != examples_dir:  # Recover from Trash or if moved
           doc2.parent_directory = examples_dir
 
-        doc2.name = self.name
-        doc2.owner = django_user
-        doc2.type = document_type
-        doc2.description = self.desc
-        doc2.is_history = False
-        doc2.data = data
+        data = json.loads(doc2.data)
+        data['uuid'] = doc2.uuid
+        doc2.data = json.dumps(data)  # Refresh content
 
         doc2.save()
       except Document2.DoesNotExist:
+        # Create new example
+        data = notebook.get_data()
+        data['isSaved'] = True
+        uuid = data.get('uuid')
+        data = json.dumps(data)
+
         doc2 = Document2.objects.create(
-          uuid=uuid,
+          uuid=uuid,  # Must the same as in the notebook data
           owner=django_user,
           parent_directory=examples_dir,
           name=self.name,
