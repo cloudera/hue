@@ -55,7 +55,9 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
     ${ csrf_token(request) | n,unicode }
 
     <div class="logo">
-      <svg style="height: 80px; width: 200px;"><use xlink:href="#hi-logo"></use></svg>
+      <a href="https://gethue.com">
+        <svg style="height: 80px; width: 200px;"><use xlink:href="#hi-logo"></use></svg>
+      </a>
     </div>
 
     <h3>Query. Explore. Repeat.</h3>
@@ -170,9 +172,6 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
   % if CUSTOM.LOGO_SVG.get():
     ${ _('Powered by') } <img src="${ static('desktop/art/hue-login-logo.png') }" width="40" style="vertical-align: middle"  alt="${ _('Hue logo') }"> -
   % endif
-    <a href="https://gethue.com">
-      gethue.com
-    </a>
   </trademark-banner>
 </div>
 
