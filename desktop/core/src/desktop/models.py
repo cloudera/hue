@@ -1150,7 +1150,7 @@ class Document2(models.Model):
   )
   connector = models.ForeignKey(
       Connector,
-      on_delete=models.CASCADE,
+      on_delete=models.CASCADE,  # /!\ Deleting a connector delete all its queries currently
       verbose_name=_t('Connector'),
       help_text=_t('Connector.'),
       blank=True,
