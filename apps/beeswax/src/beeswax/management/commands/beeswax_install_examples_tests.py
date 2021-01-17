@@ -64,7 +64,7 @@ class TestStandardTables():
         "settings": []
       }
     }
-    interpreter = {'type': 'mysql'}
+    interpreter = {'type': 'mysql', 'dialect': 'mysql'}
 
     design = SampleQuery(design_dict)
     assert_false(Document2.objects.filter(name='TestStandardTables Query').exists())
@@ -102,7 +102,7 @@ class TestHiveServer2():
         "settings": []
       }
     }
-    interpreter = {'type': 'hive'}
+    interpreter = {'type': 'hive', 'dialect': 'hive'}
 
     design = SampleQuery(design_dict)
     assert_false(Document2.objects.filter(name='TestBeswaxHiveTables Query').exists())
