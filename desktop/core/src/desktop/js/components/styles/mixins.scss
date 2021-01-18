@@ -35,7 +35,7 @@ $hue-panel-border-radius: 3px;
 @mixin nowrap-ellipsis {
   text-overflow: ellipsis;
   white-space: nowrap;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .no-select {
@@ -46,6 +46,11 @@ $hue-panel-border-radius: 3px;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+@mixin position-sticky {
+  position: sticky;
+  position: -webkit-sticky;
 }
 
 @mixin transition($args...) {
