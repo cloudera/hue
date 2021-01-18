@@ -22,6 +22,7 @@
       :columns="tableColumns"
       :rows="tableRows"
       :sticky-header="true"
+      :sticky-first-column="true"
       @scroll-to-end="onScrollToEnd"
     />
   </div>
