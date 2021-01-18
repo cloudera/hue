@@ -53,6 +53,9 @@ class AuthenticationRequired(Exception):
     super(AuthenticationRequired, self).__init__()
     self.message = message
 
+  def __str__(self):
+    return 'AuthenticationRequired: %s' % self.message
+
 class OperationTimeout(Exception):
   def __str__(self):
     return 'OperationTimeout'
