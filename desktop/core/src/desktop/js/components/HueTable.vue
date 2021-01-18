@@ -19,7 +19,7 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
   <div ref="tableContainer" class="hue-table-container" @scroll="onContainerScroll">
-    <table class="hue-table" :class="{ 'hue-table-sticky-header': stickyHeader }">
+    <table class="hue-table" :class="{ 'sticky-header': stickyHeader }">
       <caption>
         <!-- Because of Web:TableWithoutCaptionCheck -->
         {{
@@ -31,7 +31,10 @@
           <th
             v-for="(column, colIndex) in columns"
             :key="colIndex"
-            :class="column.headerCssClass"
+            :class="[
+              column.headerCssClass,
+              { 'sticky-first-col': stickyFirstColumn && colIndex === 0 }
+            ]"
             scope="col"
           >
             {{ column.label }}
@@ -42,7 +45,11 @@
       </thead>
       <tbody>
         <tr v-for="(row, rowIndex) in rows" :key="rowIndex" @click="$emit('row-clicked', row)">
-          <td v-for="(column, colIndex) in columns" :key="colIndex" :class="column.cssClass">
+          <td
+            v-for="(column, colIndex) in columns"
+            :key="colIndex"
+            :class="[column.cssClass, { 'sticky-first-col': stickyFirstColumn && colIndex === 0 }]"
+          >
             <slot v-if="hasCellSlot(column)" :name="cellSlotName(column)" v-bind="row" />
             <div v-else-if="column.htmlValue" v-html="row[column.key]" />
             <template v-else>
@@ -73,6 +80,8 @@
     caption?: string;
     @Prop({ required: false, default: false })
     stickyHeader?: boolean;
+    @Prop({ required: false, default: false })
+    stickyFirstColumn?: boolean;
 
     hasCellSlot(column: Column<T>): boolean {
       return !!this.$scopedSlots[this.cellSlotName(column)];
@@ -137,6 +146,14 @@
             font-weight: 500;
             white-space: nowrap;
 
+            &.sticky-first-col {
+              background-color: $fluid-white;
+              position: sticky;
+              position: -webkit-sticky;
+              left: 0;
+              z-index: 102;
+            }
+
             .sort-header {
               display: flex;
               cursor: pointer;
@@ -156,6 +173,14 @@
             color: $fluid-gray-900;
             font-size: 14px;
 
+            &.sticky-first-col {
+              background-color: $fluid-white;
+              position: sticky;
+              position: -webkit-sticky;
+              left: 0;
+              z-index: 100;
+            }
+
             &:last-of-type {
               padding-right: 8px;
             }
@@ -163,7 +188,7 @@
         }
       }
 
-      &.hue-table-sticky-header {
+      &.sticky-header {
         thead tr {
           border-bottom: none;
         }
@@ -172,6 +197,13 @@
           position: sticky;
           position: -webkit-sticky;
           top: 0;
+          z-index: 101;
+
+          &.sticky-first-col {
+            position: sticky;
+            position: -webkit-sticky;
+            top: 0;
+          }
 
           &::after {
             content: '';
