@@ -37,7 +37,8 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
 from metadata.conf import has_catalog
-from metadata.catalog_api import search_entities as metadata_search_entities, _highlight, search_entities_interactive as metadata_search_entities_interactive
+from metadata.catalog_api import search_entities as metadata_search_entities, _highlight, \
+  search_entities_interactive as metadata_search_entities_interactive
 from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi, DataWarehouse2Api
 from notebook.connectors.base import Notebook, get_interpreter
 from notebook.models import Analytics
@@ -188,7 +189,8 @@ def get_context_namespaces(request, interface):
         sdx_namespaces = SdxApi(request.user).list_namespaces()
 
       # Adding "fake" namespace for cluster without one
-      sdx_namespaces.extend([_cluster for _cluster in adb_clusters if not _cluster.get('namespaceCrn') or (IS_K8S_ONLY.get() and 'TERMINAT' not in _cluster['status'])])
+      sdx_namespaces.extend([_cluster for _cluster in adb_clusters if not _cluster.get('namespaceCrn') or \
+        (IS_K8S_ONLY.get() and 'TERMINAT' not in _cluster['status'])])
 
       namespaces.extend([{
           'id': namespace.get('crn', 'None'),
@@ -774,7 +776,9 @@ def export_documents(request):
 
   if doc_ids:
     doc_ids = ','.join(map(str, doc_ids))
-    management.call_command('dumpdata', 'desktop.Document2', primary_keys=doc_ids, indent=2, use_natural_foreign_keys=True, verbosity=2, stdout=f)
+    management.call_command(
+      'dumpdata', 'desktop.Document2', primary_keys=doc_ids, indent=2, use_natural_foreign_keys=True, verbosity=2, stdout=f
+    )
 
   if request.GET.get('format') == 'json':
     return JsonResponse(f.getvalue(), safe=False)
@@ -860,7 +864,7 @@ def import_documents(request):
   stdout = string_io()
   try:
     with transaction.atomic(): # We wrap both commands to commit loaddata & sync
-      management.call_command('loaddata', f.name, verbosity=3, traceback=True, stdout=stdout, commit=False) # We need to use commit=False because commit=True will close the connection and make Document.objects.sync fail.
+      management.call_command('loaddata', f.name, verbosity=3, traceback=True, stdout=stdout)
       Document.objects.sync()
 
     if request.POST.get('redirect'):
@@ -1158,8 +1162,8 @@ def _create_or_update_document_with_owner(doc, owner, uuids_map):
     history_deps_list = []
     for index, (uuid, version, is_history) in enumerate(doc['fields']['dependencies']):
       if not uuid in list(uuids_map.keys()) and not is_history and \
-              not Document2.objects.filter(uuid=uuid, version=version).exists():
-          raise PopupException(_('Cannot import document, dependency with UUID: %s not found.') % uuid)
+      not Document2.objects.filter(uuid=uuid, version=version).exists():
+        raise PopupException(_('Cannot import document, dependency with UUID: %s not found.') % uuid)
       elif is_history:
         history_deps_list.insert(0, index) # Insert in decreasing order to facilitate delete
         LOG.warn('History dependency with UUID: %s ignored while importing document %s' % (uuid, doc['fields']['name']))
