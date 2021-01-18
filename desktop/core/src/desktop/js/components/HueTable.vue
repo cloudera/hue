@@ -112,6 +112,7 @@
     .hue-table {
       line-height: 14px;
       table-layout: auto;
+      border-collapse: separate;
 
       thead,
       tbody {
@@ -122,11 +123,11 @@
           td {
             @include nowrap-ellipsis;
 
-            padding: 12px;
-            border: none;
-            text-align: left;
             height: 16px;
             max-width: 300px;
+            padding: 12px;
+            border-bottom: 1px solid $fluid-gray-300;
+            text-align: left;
 
             &.column-flush {
               width: 100%;
@@ -137,8 +138,6 @@
 
       thead {
         tr {
-          border-bottom: 1px solid $fluid-gray-300;
-
           th {
             background-color: $fluid-white;
             color: $fluid-gray-700;
@@ -167,16 +166,14 @@
 
       tbody {
         tr {
-          border-bottom: 1px solid $fluid-gray-200;
-
           td {
             color: $fluid-gray-900;
             font-size: 14px;
 
             &.sticky-first-col {
+              @include position-sticky;
+
               background-color: $fluid-white;
-              position: sticky;
-              position: -webkit-sticky;
               left: 0;
               z-index: 100;
             }
@@ -189,29 +186,16 @@
       }
 
       &.sticky-header {
-        thead tr {
-          border-bottom: none;
-        }
-
         thead th {
-          position: sticky;
-          position: -webkit-sticky;
+          @include position-sticky;
+
           top: 0;
           z-index: 101;
 
           &.sticky-first-col {
-            position: sticky;
-            position: -webkit-sticky;
-            top: 0;
-          }
+            @include position-sticky;
 
-          &::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            width: 100%;
-            bottom: 0;
-            border-bottom: 1px solid $fluid-gray-200;
+            top: 0;
           }
         }
       }
