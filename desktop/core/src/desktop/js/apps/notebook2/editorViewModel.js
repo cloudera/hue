@@ -318,7 +318,7 @@ class EditorViewModel {
     huePubSub.publish('recalculate.name.description.width');
   }
 
-  async newNotebook(connectorId, callback, queryTab) {
+  async newNotebook(connectorId, callback, queryTab, blank) {
     if (!connectorId) {
       connectorId = getLastKnownConfig().default_sql_interpreter;
     }
@@ -341,7 +341,8 @@ class EditorViewModel {
       $.post('/notebook/api/create_notebook', {
         type: connectorId,
         directory_uuid: hueUtils.getParameter('directory_uuid'),
-        gist: this.isNotificationManager() ? undefined : hueUtils.getParameter('gist')
+        gist: this.isNotificationManager() ? undefined : hueUtils.getParameter('gist'),
+        blank: typeof blank !== 'undefined'
       })
         .then(data => {
           this.loadNotebook(data.notebook);

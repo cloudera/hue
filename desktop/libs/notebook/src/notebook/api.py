@@ -64,6 +64,7 @@ def create_notebook(request):
   editor_type = request.POST.get('type', 'notebook')
   gist_id = request.POST.get('gist')
   directory_uuid = request.POST.get('directory_uuid')
+  is_blank = request.POST.get('blank', 'false') == 'true'
 
   if gist_id:
     gist_doc = _get_gist_document(uuid=gist_id)
@@ -79,7 +80,7 @@ def create_notebook(request):
   else:
     editor = Notebook()
 
-    if EXAMPLES.AUTO_OPEN.get():
+    if EXAMPLES.AUTO_OPEN.get() and not is_blank:
       document = _get_dialect_example(dialect=editor_type)
       if document:
         editor = Notebook(document=document)

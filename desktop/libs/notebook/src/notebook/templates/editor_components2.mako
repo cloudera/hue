@@ -268,7 +268,7 @@
         <ul class="dropdown-menu pull-right">
           <li>
             <!-- ko if: editorMode -->
-            <a href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTitle() + '${ _(' Query') }' }">
+            <a href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null, 'blank'); }, attr: { 'title': '${ _('New ') }' +  editorTitle() + '${ _(' Query') }' }">
               <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
             </a>
             <!-- /ko -->
