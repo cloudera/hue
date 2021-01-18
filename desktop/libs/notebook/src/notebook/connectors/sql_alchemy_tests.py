@@ -367,7 +367,7 @@ class TestAutocomplete(object):
       'options': {'url': 'phoenix://'}
     }
 
-    snippet = Mock()
+    snippet = MagicMock()
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
       with patch('notebook.connectors.sql_alchemy.inspect') as inspect:
         with patch('notebook.connectors.sql_alchemy.Assist') as Assist:
@@ -383,7 +383,7 @@ class TestAutocomplete(object):
       'options': {'url': 'phoenix://'}
     }
 
-    snippet = Mock()
+    snippet = MagicMock()
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
       with patch('notebook.connectors.sql_alchemy.inspect') as inspect:
         with patch('notebook.connectors.sql_alchemy.Assist') as Assist:
