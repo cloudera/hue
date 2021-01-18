@@ -105,6 +105,65 @@ describe('phoenixAutocompleteParser.js locations', () => {
     });
   });
 
+  it('should report locations for "select cos(1) as foo from customers order by foo;"', () => {
+    assertLocations({
+      beforeCursor: 'select cos(1) as foo from "customers" order by foo; ',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 49 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 21 }
+        },
+        {
+          type: 'function',
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 },
+          function: 'cos'
+        },
+        {
+          type: 'functionArgument',
+          location: { first_line: 1, last_line: 1, first_column: 12, last_column: 13 },
+          function: 'cos',
+          argumentPosition: 0,
+          identifierChain: [{ name: 'cos' }],
+          expression: { types: ['NUMBER'], text: '1' }
+        },
+        {
+          type: 'alias',
+          source: 'column',
+          alias: 'foo',
+          location: { first_line: 1, last_line: 1, first_column: 18, last_column: 21 },
+          parentLocation: { first_line: 1, last_line: 1, first_column: 8, last_column: 14 }
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 27, last_column: 36 },
+          identifierChain: [{ name: 'customers' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 36, last_column: 36 }
+        },
+        {
+          type: 'alias',
+          location: { first_line: 1, last_line: 1, first_column: 46, last_column: 49 },
+          alias: 'foo',
+          source: 'column',
+          parentLocation: { first_line: 1, last_line: 1, first_column: 8, last_column: 14 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 49, last_column: 49 }
+        }
+      ]
+    });
+  });
+
   it('should report locations for "WITH boo AS (SELECT * FROM tbl) SELECT * FROM boo; |"', () => {
     assertLocations({
       beforeCursor: 'WITH boo AS (SELECT * FROM tbl) SELECT * FROM boo; ',
