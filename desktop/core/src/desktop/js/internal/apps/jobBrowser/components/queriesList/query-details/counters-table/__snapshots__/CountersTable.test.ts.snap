@@ -1,8 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`CountersTable.vue should render 1`] = `
-<huetable-stub
-  columns="[object Object],[object Object]"
-  rows=""
-/>
+<div>
+  <h2>
+    No counters available!
+  </h2>
+</div>
 `;

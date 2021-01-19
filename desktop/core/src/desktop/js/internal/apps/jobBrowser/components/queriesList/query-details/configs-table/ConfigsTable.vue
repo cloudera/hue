@@ -17,7 +17,10 @@
 -->
 
 <template>
-  <HueTable :columns="columns" :rows="rows" />
+  <div>
+    <HueTable v-if="rows.length" :columns="columns" :rows="rows" />
+    <h2 v-else>No configurations available!</h2>
+  </div>
 </template>
 
 <script lang="ts">

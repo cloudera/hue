@@ -139,6 +139,9 @@
 
       padding: 10px;
 
+      overflow: hidden;
+      white-space: normal;
+
       border: 1px solid $fluid-gray-300;
       border-radius: $hue-panel-border-radius;
     }
