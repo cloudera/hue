@@ -15,11 +15,8 @@
 // limitations under the License.
 
 import * as ko from 'knockout';
+import $ from 'jquery';
 
-import componentUtils from 'ko/components/componentUtils';
-import DisposableComponent from 'ko/components/DisposableComponent';
-import hueAnalytics from 'utils/hueAnalytics';
-import I18n from 'utils/i18n';
 import {
   leafletMapChartTransformer,
   mapChartTransformer,
@@ -28,12 +25,18 @@ import {
   scatterChartTransformer,
   timelineChartTransformer
 } from './chartTransformers';
-import $ from 'jquery';
-import { UUID } from 'utils/hueUtils';
-import { REDRAW_CHART_EVENT } from 'apps/editor/events';
 import { attachTracker } from 'apps/editor/components/executableStateHandler';
+import { REDRAW_CHART_EVENT } from 'apps/editor/events';
+import { EXECUTABLE_UPDATED_EVENT, ExecutionStatus } from 'apps/editor/execution/executable';
+import { RESULT_TYPE, RESULT_UPDATED_EVENT } from 'apps/editor/execution/executionResult';
+import { CURRENT_QUERY_TAB_SWITCHED_EVENT } from 'apps/editor/snippet';
+import componentUtils from 'ko/components/componentUtils';
+import DisposableComponent from 'ko/components/DisposableComponent';
+import hueAnalytics from 'utils/hueAnalytics';
+import { defer, UUID } from 'utils/hueUtils';
+import I18n from 'utils/i18n';
 
-export const RESULT_CHART_COMPONENT = 'result-chart';
+export const RESULT_CHART_COMPONENT = 'snippet-result-chart';
 
 const TYPES = window.HUE_CHARTS.TYPES;
 
@@ -70,7 +73,7 @@ export const CHART_TIMELINE_TYPE = {
 
 // prettier-ignore
 const TEMPLATE = `
-<div class="snippet-tab-actions-append">
+<div class="snippet-tab-actions">
   <div class="btn-group">
     <button class="btn btn-mini btn-editor dropdown-toggle" data-toggle="dropdown">
       <!-- ko if: isBarChart -->
@@ -131,353 +134,386 @@ const TEMPLATE = `
       <i class="fa fa-cog"></i> ${ I18n('Settings') }
     </button>
   </div>
+  <div class="btn-group pull-right">
+    <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: isResultFullScreenMode">
+      <!-- ko if: isResultFullScreenMode -->
+      <i class="fa fa-compress"></i> ${ I18n('Collapse') }
+      <!-- /ko -->
+      <!-- ko ifnot: isResultFullScreenMode -->
+      <i class="fa fa-expand"></i> ${ I18n('Expand') }
+      <!-- /ko -->
+    </button>
+  </div>
 </div>
 
-<div class="split-result-container">
-  <div class="result-settings-panel" style="display: none;" data-bind="visible: chartSettingsVisible">
-    <div>
-      <!-- ko if: chartType -->
-      <!-- ko if: isTimelineChart() || isBarChart() -->
-      <ul class="nav nav-list" style="border: none; background-color: #FFF">
-        <li class="nav-header">${ I18n('type') }</li>
-      </ul>
-      <div>
-        <select data-bind="
-            selectedOptions: chartTimelineType,
-            optionsCaption: '${ I18n('Choose a type...') }',
-            select2: {
-              width: '100%',
-              placeholder: '${ I18n("Choose a type...") }',
-              update: chartTimelineType,
-              dropdownAutoWidth: true
+<div class="result-tab-body">
+  <div class="table-results" data-bind="visible: type() === 'table', css: { 'table-results-notebook': notebookMode }" style="display: none;">
+    <div class="chart-container" data-bind="visible: !executing() && hasData()" style="display: none; position: relative;">
+      <div class="split-result-container">
+        <div class="result-settings-panel" style="display: none;" data-bind="visible: chartSettingsVisible">
+          <div>
+            <!-- ko if: chartType -->
+            <!-- ko if: isTimelineChart() || isBarChart() -->
+            <ul class="nav nav-list" style="border: none; background-color: #FFF">
+              <li class="nav-header">${ I18n('type') }</li>
+            </ul>
+            <div>
+              <select data-bind="
+                  selectedOptions: chartTimelineType,
+                  optionsCaption: '${ I18n('Choose a type...') }',
+                  select2: {
+                    width: '100%',
+                    placeholder: '${ I18n("Choose a type...") }',
+                    update: chartTimelineType,
+                    dropdownAutoWidth: true
+                  }
+                ">
+                <option value="${ CHART_TIMELINE_TYPE.BAR }">${ I18n("Bars") }</option>
+                <option value="${ CHART_TIMELINE_TYPE.LINE }">${ I18n("Lines") }</option>
+              </select>
+            </div>
+            <!-- /ko -->
+      
+            <!-- ko if: isPieChart -->
+            <ul class="nav nav-list" style="border: none; background-color: #FFF">
+              <li class="nav-header">${ I18n('value') }</li>
+            </ul>
+            <div>
+              <select class="input-medium" data-bind="
+                  options: cleanedNumericMeta,
+                  optionsText: 'name',
+                  optionsValue: 'name',
+                  optionsCaption: '${ I18n('Choose a column...') }',
+                  select2: {
+                    width: '100%',
+                    placeholder: '${ I18n("Choose a column...") }',
+                    update: chartYSingle,
+                    dropdownAutoWidth: true
+                  }
+                "></select>
+            </div>
+            <ul class="nav nav-list" style="border: none; background-color: #FFF">
+              <li class="nav-header">${ I18n('legend') }</li>
+            </ul>
+            <div>
+              <select class="input-medium" data-bind="
+                  options: cleanedMeta,
+                  optionsText: 'name',
+                  optionsValue: 'name',
+                  optionsCaption: '${ I18n('Choose a column...') }',
+                  select2: {
+                    width: '100%',
+                    placeholder: '${ I18n("Choose a column...") }',
+                    update: chartX,
+                    dropdownAutoWidth: true
+                  }
+                "></select>
+            </div>
+            <!-- /ko -->
+      
+            <!-- ko ifnot: isPieChart -->
+            <ul class="nav nav-list" style="border: none; background-color: #FFF">
+              <li data-bind="visible: !isMapChart() && !isGradientMapChart()" class="nav-header">${ I18n('x-axis') }</li>
+              <li data-bind="visible: isGradientMapChart" class="nav-header">${ I18n('region') }</li>
+              <li data-bind="visible: isMapChart" class="nav-header">${ I18n('latitude') }</li>
+            </ul>
+            <div>
+              <select class="input-medium" data-bind="
+                  options: chartMetaOptions,
+                  optionsText: 'name',
+                  optionsValue: 'name',
+                  optionsCaption: '${ I18n('Choose a column...') }',
+                  select2: {
+                    width: '100%',
+                    placeholder: '${ I18n("Choose a column...") }',
+                    update: chartX,
+                    dropdownAutoWidth: true
+                  }
+                "></select>
+            </div>
+      
+            <ul class="nav nav-list" style="border: none; background-color: #FFF">
+              <li data-bind="visible: !isMapChart() && !isGradientMapChart()" class="nav-header">${ I18n('y-axis') }</li>
+              <li data-bind="visible: isGradientMapChart" class="nav-header">${ I18n('value') }</li>
+              <li data-bind="visible: isMapChart" class="nav-header">${ I18n('longitude') }</li>
+            </ul>
+      
+            <div style="max-height: 220px" data-bind="
+                delayedOverflow,
+                visible: ((isBarChart() && !chartXPivot()) || isLineChart() || isTimelineChart())
+              ">
+              <ul class="unstyled" data-bind="foreach: cleanedNumericMeta" style="margin-bottom: 0">
+                <li><label class="checkbox"><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartYMulti" /> <span data-bind="text: $data.name"></span></label></li>
+              </ul>
+            </div>
+            <div class="input-medium" data-bind="visible: (isBarChart() && chartXPivot()) || isMapChart() || isGradientMapChart() || isScatterChart()">
+              <select data-bind="
+                  options: isGradientMapChart() ? cleanedMeta : cleanedNumericMeta,
+                  optionsText: 'name',
+                  optionsValue: 'name',
+                  optionsCaption: '${ I18n('Choose a column...') }',
+                  select2: {
+                    width: '100%',
+                    placeholder: '${ I18n("Choose a column...") }',
+                    update: chartYSingle,
+                    dropdownAutoWidth: true
+                  }
+                "></select>
+            </div>
+            <!-- /ko -->
+      
+            <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: isBarChart">
+              <li class="nav-header">${ I18n('group') }</li>
+            </ul>
+            <div data-bind="visible: isBarChart">
+              <select class="input-medium" data-bind="
+                  options: cleanedMeta,
+                  optionsText: 'name',
+                  optionsValue: 'name',
+                  optionsCaption: '${ I18n('Choose a column to pivot...') }',
+                  select2: {
+                    width: '100%',
+                    placeholder: '${ I18n("Choose a column to pivot...") }',
+                    update: chartXPivot,
+                    dropdownAutoWidth: true
+                  }
+                "></select>
+            </div>
+      
+            <ul class="nav nav-list" style="border: none; background-color: #FFF">
+              <li class="nav-header">${ I18n('limit') }</li>
+            </ul>
+            <div>
+              <select class="input-medium" data-bind="
+                options: chartLimits,
+                optionsCaption: '${ I18n('Limit the number of results to...') }',
+                select2: {
+                  width: '100%',
+                  placeholder: '${ I18n('Limit the number of results to...') }',
+                  update: chartLimit,
+                  dropdownAutoWidth: true
+                }
+              "></select>
+            </div>
+      
+            <!-- ko if: isMapChart -->
+            <ul class="nav nav-list" style="border: none; background-color: #FFF">
+              <li class="nav-header">${ I18n('type') }</li>
+            </ul>
+            <div>
+              <select data-bind="
+                  selectedOptions: chartMapType,
+                  optionsCaption: '${ I18n('Choose a type...') }',
+                  select2: {
+                    width: '100%',
+                    placeholder: '${ I18n('Choose a type...') }',
+                    update: chartMapType,
+                    dropdownAutoWidth: true
+                  }
+                ">
+                <option value="${ CHART_MAP_TYPE.MARKER }">${ I18n("Markers") }</option>
+                <option value="${ CHART_MAP_TYPE.HEAT }">${ I18n("Heatmap") }</option>
+              </select>
+            </div>
+      
+            <!-- ko if: chartMapType() === '${ CHART_MAP_TYPE.MARKER }' -->
+            <ul class="nav nav-list" style="border: none; background-color: #FFF">
+              <li class="nav-header">${ I18n('label') }</li>
+            </ul>
+            <div>
+              <select class="input-medium" data-bind="
+                  options: cleanedMeta,
+                  optionsText: 'name',
+                  optionsValue: 'name',
+                  optionsCaption: '${ I18n('Choose a column...') }',
+                  select2: {
+                    width: '100%',
+                    placeholder: '${ I18n('Choose a column...') }',
+                    update: chartMapLabel,
+                    dropdownAutoWidth: true
+                  }
+                "></select>
+            </div>
+            <!-- /ko -->
+      
+            <!-- ko if: chartMapType() === '${ CHART_MAP_TYPE.HEAT }' -->
+            <ul class="nav nav-list" style="border: none; background-color: #FFF">
+              <li class="nav-header">${ I18n('intensity') }</li>
+            </ul>
+            <div>
+              <select class="input-medium" data-bind="
+                  options: cleanedNumericMeta,
+                  optionsText: 'name',
+                  optionsValue: 'name',
+                  optionsCaption: '${ I18n('Choose a column...') }',
+                  select2: {
+                    width: '100%',
+                    placeholder: '${ I18n('Choose a column...') }',
+                    update: chartMapHeat,
+                    dropdownAutoWidth: true
+                  }
+                "></select>
+            </div>
+            <!-- /ko -->
+            <!-- /ko -->
+      
+            <!-- ko if: isScatterChart -->
+            <ul class="nav nav-list" style="border: none; background-color: #FFF">
+              <li class="nav-header">${ I18n('scatter size') }</li>
+            </ul>
+            <div>
+              <select class="input-medium" data-bind="
+                  options: cleanedNumericMeta,
+                  optionsText: 'name',
+                  optionsValue: 'name',
+                  optionsCaption: '${ I18n('Choose a column...') }',
+                  select2: {
+                    width: '100%',
+                    placeholder: '${ I18n('Choose a column...') }',
+                    update: chartScatterSize,
+                    dropdownAutoWidth: true
+                  }
+                "></select>
+            </div>
+      
+            <ul class="nav nav-list" style="border: none; background-color: #FFF">
+              <li class="nav-header">${ I18n('scatter group') }</li>
+            </ul>
+            <div>
+              <select class="input-medium" data-bind="
+                  options: cleanedMeta,
+                  optionsText: 'name',
+                  optionsValue: 'name',
+                  optionsCaption: '${ I18n('Choose a column...') }',
+                  select2: {
+                    width: '100%',
+                    placeholder: '${ I18n('Choose a column...') }',
+                    update: chartScatterGroup,
+                    dropdownAutoWidth: true
+                  }
+                "></select>
+            </div>
+            <!-- /ko -->
+      
+            <!-- ko if: isGradientMapChart -->
+            <ul class="nav nav-list" style="border: none; background-color: #FFF">
+              <li class="nav-header">${ I18n('scope') }</li>
+            </ul>
+            <div data-bind="visible: chartType() != ''">
+              <select data-bind="
+                  selectedOptions: chartScope,
+                  optionsCaption: '${ I18n('Choose a scope...') }',
+                  select2: {
+                    width: '100%',
+                    placeholder: '${ I18n('Choose a scope...') }',
+                    update: chartScope,
+                    dropdownAutoWidth: true
+                  }
+                ">
+                <option value="${ CHART_SCOPE.WORLD }">${ I18n("World") }</option>
+                <option value="${ CHART_SCOPE.EUROPE }">${ I18n("Europe") }</option>
+                <option value="${ CHART_SCOPE.AUS }">${ I18n("Australia") }</option>
+                <option value="${ CHART_SCOPE.BRA }">${ I18n("Brazil") }</option>
+                <option value="${ CHART_SCOPE.CAN }">${ I18n("Canada") }</option>
+                <option value="${ CHART_SCOPE.CHN }">${ I18n("China") }</option>
+                <option value="${ CHART_SCOPE.FRA }">${ I18n("France") }</option>
+                <option value="${ CHART_SCOPE.DEU }">${ I18n("Germany") }</option>
+                <option value="${ CHART_SCOPE.ITA }">${ I18n("Italy") }</option>
+                <option value="${ CHART_SCOPE.JPN }">${ I18n("Japan") }</option>
+                <option value="${ CHART_SCOPE.GBR }">${ I18n("UK") }</option>
+                <option value="${ CHART_SCOPE.USA }">${ I18n("USA") }</option>
+              </select>
+            </div>
+            <!-- /ko -->
+      
+            <!-- ko ifnot: isMapChart() || isGradientMapChart() || isScatterChart()-->
+            <ul class="nav nav-list" style="border: none; background-color: #FFF">
+              <li class="nav-header">${ I18n('sorting') }</li>
+            </ul>
+            <div class="btn-group" data-toggle="buttons-radio">
+              <a rel="tooltip" data-placement="top" title="${ I18n('No sorting') }" href="javascript:void(0)" class="btn" data-bind="
+                  css: { 'active': chartSorting() === '${ CHART_SORTING.NONE }' },
+                  click: function() { chartSorting('${ CHART_SORTING.NONE }'); }
+                "><i class="fa fa-align-left fa-rotate-270"></i></a>
+              <a rel="tooltip" data-placement="top" title="${ I18n('Sort ascending') }" href="javascript:void(0)" class="btn" data-bind="
+                  css: { 'active': chartSorting() == '${ CHART_SORTING.ASC }' },
+                  click: function() { chartSorting('${ CHART_SORTING.ASC }'); }
+                "><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
+              <a rel="tooltip" data-placement="top" title="${ I18n('Sort descending') }" href="javascript:void(0)" class="btn" data-bind="
+                  css: { 'active': chartSorting() == '${ CHART_SORTING.DESC }' },
+                  click: function(){ chartSorting('${ CHART_SORTING.DESC }'); }
+                "><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
+            </div>
+            <!-- /ko -->
+            <!-- /ko -->
+          </div>
+        </div>
+      
+        <div class="split-result-resizer" style="display: none;" data-bind="
+            visible: chartSettingsVisible,
+            splitFlexDraggable : {
+              containerSelector: '.split-result-container',
+              sidePanelSelector: '.result-settings-panel',
+              sidePanelVisible: chartSettingsVisible,
+              orientation: 'left',
+              appName: 'result_chart',
+              onPosition: function() {  }
             }
-          ">
-          <option value="${ CHART_TIMELINE_TYPE.BAR }">${ I18n("Bars") }</option>
-          <option value="${ CHART_TIMELINE_TYPE.LINE }">${ I18n("Lines") }</option>
-        </select>
+          "><div class="resize-bar"></div>
+        </div>
+      
+        <div class="split-result-content chart-container">
+          <h1 class="empty" data-bind="visible: !hasDataForChart()" style="display:none">${ I18n('Select the chart parameters on the left') }</h1>
+      
+          <div data-bind="visible: hasDataForChart" style="display:none">
+            <!-- ko if: isPieChart -->
+            <div class="chart" data-bind="attr: { 'id': chartId }, pieChart: pieChartParams()"></div>
+            <!-- /ko -->
+      
+            <!-- ko if: isBarChart -->
+            <div class="chart" data-bind="attr: { 'id': chartId }, barChart: barChartParams()"></div>
+            <!-- /ko -->
+      
+            <!-- ko if: isLineChart -->
+            <div class="chart" data-bind="attr: { 'id': chartId }, lineChart: lineChartParams()"></div>
+            <!-- /ko -->
+      
+            <!-- ko if: isTimelineChart -->
+            <div class="chart" data-bind="attr:{ 'id': chartId }, timelineChart: timeLineChartParams()"></div>
+            <!-- /ko -->
+      
+            <!-- ko if: isMapChart -->
+            <div class="chart" data-bind="attr:{ 'id': chartId }, leafletMapChart: leafletMapChartParams()"></div>
+            <!-- /ko -->
+      
+            <!-- ko if: isGradientMapChart -->
+            <div class="chart" data-bind="attr:{ 'id': chartId }, mapChart: mapChartParams()"></div>
+            <!-- /ko -->
+      
+            <!-- ko if: isScatterChart -->
+            <div class="chart" data-bind="attr:{ 'id': chartId }, scatterChart: scatterChartParams()"></div>
+            <!-- /ko -->
+          </div>
+        </div>
       </div>
-      <!-- /ko -->
-
-      <!-- ko if: isPieChart -->
-      <ul class="nav nav-list" style="border: none; background-color: #FFF">
-        <li class="nav-header">${ I18n('value') }</li>
-      </ul>
-      <div>
-        <select class="input-medium" data-bind="
-            options: cleanedNumericMeta,
-            optionsText: 'name',
-            optionsValue: 'name',
-            optionsCaption: '${ I18n('Choose a column...') }',
-            select2: {
-              width: '100%',
-              placeholder: '${ I18n("Choose a column...") }',
-              update: chartYSingle,
-              dropdownAutoWidth: true
-            }
-          "></select>
-      </div>
-      <ul class="nav nav-list" style="border: none; background-color: #FFF">
-        <li class="nav-header">${ I18n('legend') }</li>
-      </ul>
-      <div>
-        <select class="input-medium" data-bind="
-            options: cleanedMeta,
-            optionsText: 'name',
-            optionsValue: 'name',
-            optionsCaption: '${ I18n('Choose a column...') }',
-            select2: {
-              width: '100%',
-              placeholder: '${ I18n("Choose a column...") }',
-              update: chartX,
-              dropdownAutoWidth: true
-            }
-          "></select>
-      </div>
-      <!-- /ko -->
-
-      <!-- ko ifnot: isPieChart -->
-      <ul class="nav nav-list" style="border: none; background-color: #FFF">
-        <li data-bind="visible: !isMapChart() && !isGradientMapChart()" class="nav-header">${ I18n('x-axis') }</li>
-        <li data-bind="visible: isGradientMapChart" class="nav-header">${ I18n('region') }</li>
-        <li data-bind="visible: isMapChart" class="nav-header">${ I18n('latitude') }</li>
-      </ul>
-      <div>
-        <select class="input-medium" data-bind="
-            options: chartMetaOptions,
-            optionsText: 'name',
-            optionsValue: 'name',
-            optionsCaption: '${ I18n('Choose a column...') }',
-            select2: {
-              width: '100%',
-              placeholder: '${ I18n("Choose a column...") }',
-              update: chartX,
-              dropdownAutoWidth: true
-            }
-          "></select>
-      </div>
-
-      <ul class="nav nav-list" style="border: none; background-color: #FFF">
-        <li data-bind="visible: !isMapChart() && !isGradientMapChart()" class="nav-header">${ I18n('y-axis') }</li>
-        <li data-bind="visible: isGradientMapChart" class="nav-header">${ I18n('value') }</li>
-        <li data-bind="visible: isMapChart" class="nav-header">${ I18n('longitude') }</li>
-      </ul>
-
-      <div style="max-height: 220px" data-bind="
-          delayedOverflow,
-          visible: ((isBarChart() && !chartXPivot()) || isLineChart() || isTimelineChart())
-        ">
-        <ul class="unstyled" data-bind="foreach: cleanedNumericMeta" style="margin-bottom: 0">
-          <li><label class="checkbox"><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartYMulti" /> <span data-bind="text: $data.name"></span></label></li>
-        </ul>
-      </div>
-      <div class="input-medium" data-bind="visible: (isBarChart() && chartXPivot()) || isMapChart() || isGradientMapChart() || isScatterChart()">
-        <select data-bind="
-            options: isGradientMapChart() ? cleanedMeta : cleanedNumericMeta,
-            optionsText: 'name',
-            optionsValue: 'name',
-            optionsCaption: '${ I18n('Choose a column...') }',
-            select2: {
-              width: '100%',
-              placeholder: '${ I18n("Choose a column...") }',
-              update: chartYSingle,
-              dropdownAutoWidth: true
-            }
-          "></select>
-      </div>
-      <!-- /ko -->
-
-      <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: isBarChart">
-        <li class="nav-header">${ I18n('group') }</li>
-      </ul>
-      <div data-bind="visible: isBarChart">
-        <select class="input-medium" data-bind="
-            options: cleanedMeta,
-            optionsText: 'name',
-            optionsValue: 'name',
-            optionsCaption: '${ I18n('Choose a column to pivot...') }',
-            select2: {
-              width: '100%',
-              placeholder: '${ I18n("Choose a column to pivot...") }',
-              update: chartXPivot,
-              dropdownAutoWidth: true
-            }
-          "></select>
-      </div>
-
-      <ul class="nav nav-list" style="border: none; background-color: #FFF">
-        <li class="nav-header">${ I18n('limit') }</li>
-      </ul>
-      <div>
-        <select class="input-medium" data-bind="
-          options: chartLimits,
-          optionsCaption: '${ I18n('Limit the number of results to...') }',
-          select2: {
-            width: '100%',
-            placeholder: '${ I18n('Limit the number of results to...') }',
-            update: chartLimit,
-            dropdownAutoWidth: true
-          }
-        "></select>
-      </div>
-
-      <!-- ko if: isMapChart -->
-      <ul class="nav nav-list" style="border: none; background-color: #FFF">
-        <li class="nav-header">${ I18n('type') }</li>
-      </ul>
-      <div>
-        <select data-bind="
-            selectedOptions: chartMapType,
-            optionsCaption: '${ I18n('Choose a type...') }',
-            select2: {
-              width: '100%',
-              placeholder: '${ I18n('Choose a type...') }',
-              update: chartMapType,
-              dropdownAutoWidth: true
-            }
-          ">
-          <option value="${ CHART_MAP_TYPE.MARKER }">${ I18n("Markers") }</option>
-          <option value="${ CHART_MAP_TYPE.HEAT }">${ I18n("Heatmap") }</option>
-        </select>
-      </div>
-
-      <!-- ko if: chartMapType() === '${ CHART_MAP_TYPE.MARKER }' -->
-      <ul class="nav nav-list" style="border: none; background-color: #FFF">
-        <li class="nav-header">${ I18n('label') }</li>
-      </ul>
-      <div>
-        <select class="input-medium" data-bind="
-            options: cleanedMeta,
-            optionsText: 'name',
-            optionsValue: 'name',
-            optionsCaption: '${ I18n('Choose a column...') }',
-            select2: {
-              width: '100%',
-              placeholder: '${ I18n('Choose a column...') }',
-              update: chartMapLabel,
-              dropdownAutoWidth: true
-            }
-          "></select>
-      </div>
-      <!-- /ko -->
-
-      <!-- ko if: chartMapType() === '${ CHART_MAP_TYPE.HEAT }' -->
-      <ul class="nav nav-list" style="border: none; background-color: #FFF">
-        <li class="nav-header">${ I18n('intensity') }</li>
-      </ul>
-      <div>
-        <select class="input-medium" data-bind="
-            options: cleanedNumericMeta,
-            optionsText: 'name',
-            optionsValue: 'name',
-            optionsCaption: '${ I18n('Choose a column...') }',
-            select2: {
-              width: '100%',
-              placeholder: '${ I18n('Choose a column...') }',
-              update: chartMapHeat,
-              dropdownAutoWidth: true
-            }
-          "></select>
-      </div>
-      <!-- /ko -->
-      <!-- /ko -->
-
-      <!-- ko if: isScatterChart -->
-      <ul class="nav nav-list" style="border: none; background-color: #FFF">
-        <li class="nav-header">${ I18n('scatter size') }</li>
-      </ul>
-      <div>
-        <select class="input-medium" data-bind="
-            options: cleanedNumericMeta,
-            optionsText: 'name',
-            optionsValue: 'name',
-            optionsCaption: '${ I18n('Choose a column...') }',
-            select2: {
-              width: '100%',
-              placeholder: '${ I18n('Choose a column...') }',
-              update: chartScatterSize,
-              dropdownAutoWidth: true
-            }
-          "></select>
-      </div>
-
-      <ul class="nav nav-list" style="border: none; background-color: #FFF">
-        <li class="nav-header">${ I18n('scatter group') }</li>
-      </ul>
-      <div>
-        <select class="input-medium" data-bind="
-            options: cleanedMeta,
-            optionsText: 'name',
-            optionsValue: 'name',
-            optionsCaption: '${ I18n('Choose a column...') }',
-            select2: {
-              width: '100%',
-              placeholder: '${ I18n('Choose a column...') }',
-              update: chartScatterGroup,
-              dropdownAutoWidth: true
-            }
-          "></select>
-      </div>
-      <!-- /ko -->
-
-      <!-- ko if: isGradientMapChart -->
-      <ul class="nav nav-list" style="border: none; background-color: #FFF">
-        <li class="nav-header">${ I18n('scope') }</li>
-      </ul>
-      <div data-bind="visible: chartType() != ''">
-        <select data-bind="
-            selectedOptions: chartScope,
-            optionsCaption: '${ I18n('Choose a scope...') }',
-            select2: {
-              width: '100%',
-              placeholder: '${ I18n('Choose a scope...') }',
-              update: chartScope,
-              dropdownAutoWidth: true
-            }
-          ">
-          <option value="${ CHART_SCOPE.WORLD }">${ I18n("World") }</option>
-          <option value="${ CHART_SCOPE.EUROPE }">${ I18n("Europe") }</option>
-          <option value="${ CHART_SCOPE.AUS }">${ I18n("Australia") }</option>
-          <option value="${ CHART_SCOPE.BRA }">${ I18n("Brazil") }</option>
-          <option value="${ CHART_SCOPE.CAN }">${ I18n("Canada") }</option>
-          <option value="${ CHART_SCOPE.CHN }">${ I18n("China") }</option>
-          <option value="${ CHART_SCOPE.FRA }">${ I18n("France") }</option>
-          <option value="${ CHART_SCOPE.DEU }">${ I18n("Germany") }</option>
-          <option value="${ CHART_SCOPE.ITA }">${ I18n("Italy") }</option>
-          <option value="${ CHART_SCOPE.JPN }">${ I18n("Japan") }</option>
-          <option value="${ CHART_SCOPE.GBR }">${ I18n("UK") }</option>
-          <option value="${ CHART_SCOPE.USA }">${ I18n("USA") }</option>
-        </select>
-      </div>
-      <!-- /ko -->
-
-      <!-- ko ifnot: isMapChart() || isGradientMapChart() || isScatterChart()-->
-      <ul class="nav nav-list" style="border: none; background-color: #FFF">
-        <li class="nav-header">${ I18n('sorting') }</li>
-      </ul>
-      <div class="btn-group" data-toggle="buttons-radio">
-        <a rel="tooltip" data-placement="top" title="${ I18n('No sorting') }" href="javascript:void(0)" class="btn" data-bind="
-            css: { 'active': chartSorting() === '${ CHART_SORTING.NONE }' },
-            click: function() { chartSorting('${ CHART_SORTING.NONE }'); }
-          "><i class="fa fa-align-left fa-rotate-270"></i></a>
-        <a rel="tooltip" data-placement="top" title="${ I18n('Sort ascending') }" href="javascript:void(0)" class="btn" data-bind="
-            css: { 'active': chartSorting() == '${ CHART_SORTING.ASC }' },
-            click: function() { chartSorting('${ CHART_SORTING.ASC }'); }
-          "><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
-        <a rel="tooltip" data-placement="top" title="${ I18n('Sort descending') }" href="javascript:void(0)" class="btn" data-bind="
-            css: { 'active': chartSorting() == '${ CHART_SORTING.DESC }' },
-            click: function(){ chartSorting('${ CHART_SORTING.DESC }'); }
-          "><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
-      </div>
-      <!-- /ko -->
-      <!-- /ko -->
     </div>
-  </div>
-
-  <div class="split-result-resizer" style="display: none;" data-bind="
-      visible: chartSettingsVisible,
-      splitFlexDraggable : {
-        containerSelector: '.split-result-container',
-        sidePanelSelector: '.result-settings-panel',
-        sidePanelVisible: chartSettingsVisible,
-        orientation: 'left',
-        appName: 'result_chart',
-        onPosition: function() {  }
-      }
-    "><div class="resize-bar"></div>
-  </div>
-
-  <div class="split-result-content chart-container">
-    <h1 class="empty" data-bind="visible: !hasDataForChart()" style="display:none">${ I18n('Select the chart parameters on the left') }</h1>
-
-    <div data-bind="visible: hasDataForChart" style="display:none">
-      <!-- ko if: isPieChart -->
-      <div class="chart" data-bind="attr: { 'id': chartId }, pieChart: pieChartParams()"></div>
-      <!-- /ko -->
-
-      <!-- ko if: isBarChart -->
-      <div class="chart" data-bind="attr: { 'id': chartId }, barChart: barChartParams()"></div>
-      <!-- /ko -->
-
-      <!-- ko if: isLineChart -->
-      <div class="chart" data-bind="attr: { 'id': chartId }, lineChart: lineChartParams()"></div>
-      <!-- /ko -->
-
-      <!-- ko if: isTimelineChart -->
-      <div class="chart" data-bind="attr:{ 'id': chartId }, timelineChart: timeLineChartParams()"></div>
-      <!-- /ko -->
-
-      <!-- ko if: isMapChart -->
-      <div class="chart" data-bind="attr:{ 'id': chartId }, leafletMapChart: leafletMapChartParams()"></div>
-      <!-- /ko -->
-
-      <!-- ko if: isGradientMapChart -->
-      <div class="chart" data-bind="attr:{ 'id': chartId }, mapChart: mapChartParams()"></div>
-      <!-- /ko -->
-
-      <!-- ko if: isScatterChart -->
-      <div class="chart" data-bind="attr:{ 'id': chartId }, scatterChart: scatterChartParams()"></div>
-      <!-- /ko -->
+    <div data-bind="visible: !executing() && !hasData() && streaming()" style="display: none;">
+      <h1 class="empty">${ I18n('Waiting for streaming data...') }</h1>
     </div>
+    <div data-bind="visible: !executing() && !hasData() && !hasResultSet() && status() === 'available' && fetchedOnce()" style="display: none;">
+      <h1 class="empty">${ I18n('Success.') }</h1>
+    </div>
+    <div data-bind="visible: !executing() && !hasData() && hasResultSet() && status() === 'available' && fetchedOnce()" style="display: none;">
+      <h1 class="empty">${ I18n('Empty result.') }</h1>
+    </div>
+    <div data-bind="visible: !executing() && !hasData() && status() === 'expired'" style="display: none;">
+      <h1 class="empty">${ I18n('Results have expired, rerun the query if needed.') }</h1>
+    </div>
+    <div data-bind="visible: executing" style="display: none;">
+      <h1 class="empty"><i class="fa fa-spinner fa-spin"></i> ${ I18n('Executing...') }</h1>
+    </div>
+    <ul id="wsResult">
+    </ul>
   </div>
 </div>
 `;
@@ -486,16 +522,72 @@ class ResultChart extends DisposableComponent {
   constructor(params) {
     super();
 
-    this.data = params.data;
-    this.id = params.id;
     this.activeExecutable = params.activeExecutable;
 
-    this.meta = params.meta;
-    this.cleanedMeta = params.cleanedMeta;
-    this.cleanedDateTimeMeta = params.cleanedDateTimeMeta;
-    this.cleanedNumericMeta = params.cleanedNumericMeta;
-    this.cleanedStringMeta = params.cleanedNumericMeta;
-    this.showChart = params.showChart;
+    this.editorMode = params.editorMode;
+    this.isPresentationMode = params.isPresentationMode;
+    this.isResultFullScreenMode = params.isResultFullScreenMode;
+    this.resultsKlass = params.resultsKlass;
+    this.id = params.id; // TODO: Get rid of
+
+    this.status = ko.observable();
+    this.type = ko.observable(RESULT_TYPE.TABLE);
+    this.meta = ko.observableArray();
+    this.streaming = ko.observable();
+    this.data = ko.observableArray();
+    this.lastFetchedRows = ko.observableArray();
+    this.images = ko.observableArray();
+    this.hasMore = ko.observable();
+    this.hasResultSet = ko.observable();
+    this.fetchedOnce = ko.observable(false);
+
+    this.subscribe(CURRENT_QUERY_TAB_SWITCHED_EVENT, queryTab => {
+      if (queryTab === 'queryChart') {
+        defer(() => {
+          this.redrawChart();
+        });
+      }
+    });
+
+    this.executing = ko.pureComputed(() => this.status() === ExecutionStatus.running);
+
+    this.hasData = ko.pureComputed(() => this.data().length);
+
+    this.notebookMode = ko.pureComputed(() => !this.editorMode() || this.isPresentationMode());
+
+    this.visible = ko.pureComputed(
+      () => !this.notebookMode() || this.executing() || this.hasResultSet()
+    );
+
+    this.cleanedMeta = ko.observableArray();
+    this.cleanedDateTimeMeta = ko.observableArray();
+    this.cleanedStringMeta = ko.observableArray();
+    this.cleanedNumericMeta = ko.observableArray();
+
+    this.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
+      if (this.activeExecutable() === executable) {
+        this.updateFromExecutable(executable);
+      }
+    });
+
+    let lastRenderedResult = undefined;
+    const handleResultChange = () => {
+      if (this.activeExecutable() && this.activeExecutable().result) {
+        const refresh = lastRenderedResult !== this.activeExecutable().result;
+        this.updateFromExecutionResult(this.activeExecutable().result, refresh);
+        lastRenderedResult = this.activeExecutable().result;
+      } else {
+        this.resetResultData();
+      }
+    };
+
+    this.subscribe(RESULT_UPDATED_EVENT, executionResult => {
+      if (this.activeExecutable() === executionResult.executable) {
+        handleResultChange();
+      }
+    });
+
+    this.subscribe(this.activeExecutable, handleResultChange);
 
     const trackedObservables = {
       chartLimit: undefined,
@@ -579,7 +671,6 @@ class ResultChart extends DisposableComponent {
       }
     });
 
-    this.subscribe(this.showChart, this.prepopulateChart.bind(this));
     this.subscribe(this.chartType, this.prepopulateChart.bind(this));
     this.subscribe(this.chartXPivot, this.prepopulateChart.bind(this));
 
@@ -681,6 +772,67 @@ class ResultChart extends DisposableComponent {
       window.clearTimeout(resizeTimeout);
       $(window).off('resize.' + resizeId);
     });
+  }
+
+  resetResultData() {
+    this.images([]);
+    this.lastFetchedRows([]);
+    this.data([]);
+    this.meta([]);
+    this.streaming(false);
+    this.cleanedMeta([]);
+    this.cleanedDateTimeMeta([]);
+    this.cleanedNumericMeta([]);
+    this.cleanedStringMeta([]);
+    this.hasMore(false);
+    this.type(RESULT_TYPE.TABLE);
+    // eslint-disable-next-line no-undef
+    $('#wsResult').empty();
+  }
+
+  updateFromExecutionResult(executionResult, refresh) {
+    if (refresh) {
+      this.resetResultData();
+    }
+
+    if (executionResult) {
+      this.fetchedOnce(executionResult.fetchedOnce);
+      this.hasMore(executionResult.hasMore);
+      this.type(executionResult.type);
+      this.streaming(executionResult.streaming);
+
+      if (!this.meta().length && executionResult.meta.length) {
+        this.meta(executionResult.koEnrichedMeta);
+        this.cleanedMeta(executionResult.cleanedMeta);
+        this.cleanedDateTimeMeta(executionResult.cleanedDateTimeMeta);
+        this.cleanedStringMeta(executionResult.cleanedStringMeta);
+        this.cleanedNumericMeta(executionResult.cleanedNumericMeta);
+      }
+
+      if (refresh) {
+        this.data(executionResult.rows.concat());
+      } else if (
+        executionResult.lastRows.length &&
+        this.data().length !== executionResult.rows.length
+      ) {
+        this.data.push(...executionResult.lastRows);
+      }
+      this.lastFetchedRows(executionResult.lastRows);
+    }
+  }
+
+  updateFromExecutable(executable) {
+    this.status(executable.status);
+    this.hasResultSet(executable.handle && executable.handle.has_result_set);
+    if (!this.hasResultSet) {
+      this.resetResultData();
+    }
+  }
+
+  fetchResult() {
+    if (this.activeExecutable() && this.activeExecutable().result) {
+      this.activeExecutable().result.fetchRows({ rows: 100 });
+    }
   }
 
   guessMetaField(originalField) {
