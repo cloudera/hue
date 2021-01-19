@@ -962,7 +962,7 @@
         <li data-bind="click: function() { currentQueryTab('queryHistory'); }, css: { 'active': currentQueryTab() == 'queryHistory' }">
           <a class="inactive-action" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
         </li>
-        <li class="margin-right-20" data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: { 'active': currentQueryTab() == 'savedQueries' }">
+        <li data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: { 'active': currentQueryTab() == 'savedQueries' }">
           <a class="inactive-action" style="display:inline-block" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
         </li>
         <li data-bind="click: function() { currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
@@ -971,6 +971,9 @@
 ##          (<span data-bind="text: result.rows().toLocaleString() + (dialect() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
 ##          <!-- /ko -->
           </a>
+        </li>
+        <li data-bind="click: function() { currentQueryTab('queryChart'); }, css: {'active': currentQueryTab() == 'queryChart'}">
+          <a class="inactive-action" style="display:inline-block" href="#queryChart" data-toggle="tab">${_('Chart')}</a>
         </li>
         <!-- ko if: explanation -->
         <li data-bind="click: function() { currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
@@ -1019,8 +1022,16 @@
         </div>
 
         <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
-          <div class="editor-bottom-tab-panel">
-            <!-- ko component: { name: 'snippet-results', params: {
+          <div class="execution-results-tab-panel">
+            <execution-results-ko-bridge class="table-results-bridge" data-bind="vueKoProps: {
+                executableObservable: activeExecutable
+              }"></execution-results-ko-bridge>
+          </div>
+        </div>
+
+        <div class="tab-pane" id="queryChart" data-bind="css: {'active': currentQueryTab() == 'queryChart'}">
+          <div class="editor-bottom-tab-panel editor-chart-panel">
+            <!-- ko component: { name: 'snippet-result-chart', params: {
               activeExecutable: activeExecutable,
               editorMode: parentVm.editorMode,
               id: id,
