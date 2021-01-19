@@ -99,4 +99,29 @@ describe('HueTable.vue', () => {
     });
     expect(wrapper.element).toMatchSnapshot();
   });
+
+  it('should render a stickt table with header and column css', () => {
+    const wrapper = shallowMount(HueTable, {
+      propsData: {
+        columns: <Column<{ [key: string]: unknown }>[]>[
+          {
+            key: 'a',
+            label: 'A',
+            headerCssClass: 'header-css-class-A',
+            cssClass: 'td-css-class-A'
+          },
+          { key: 'b', label: 'B', headerCssClass: 'header-css-class-B', cssClass: 'td-css-class-B' }
+        ],
+        stickyHeader: true,
+        stickyFirstColumn: true,
+        rows: <Row[]>[
+          { a: '1', b: 5 },
+          { a: '2', b: 6 },
+          { a: '3', b: 7 },
+          { a: '4', b: 8 }
+        ]
+      }
+    });
+    expect(wrapper.element).toMatchSnapshot();
+  });
 });
