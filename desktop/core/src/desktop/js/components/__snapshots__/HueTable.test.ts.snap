@@ -1,5 +1,132 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`HueTable.vue should render a stickt table with header and column css 1`] = `
+<div
+  class="hue-table-container"
+>
+  <table
+    class="hue-table sticky-header"
+  >
+    <caption>
+      
+      
+    
+    </caption>
+     
+    <thead>
+      <tr
+        class="header-row"
+      >
+        <th
+          class="header-css-class-A sticky-first-col"
+          scope="col"
+        >
+          
+          A
+        
+        </th>
+        <th
+          class="header-css-class-B"
+          scope="col"
+        >
+          
+          B
+        
+        </th>
+         
+        <th
+          class="column-flush"
+          scope="col"
+        />
+      </tr>
+    </thead>
+     
+    <tbody>
+      <tr>
+        <td
+          class="td-css-class-A sticky-first-col"
+        >
+          
+            1
+          
+        </td>
+        <td
+          class="td-css-class-B"
+        >
+          
+            5
+          
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+      <tr>
+        <td
+          class="td-css-class-A sticky-first-col"
+        >
+          
+            2
+          
+        </td>
+        <td
+          class="td-css-class-B"
+        >
+          
+            6
+          
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+      <tr>
+        <td
+          class="td-css-class-A sticky-first-col"
+        >
+          
+            3
+          
+        </td>
+        <td
+          class="td-css-class-B"
+        >
+          
+            7
+          
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+      <tr>
+        <td
+          class="td-css-class-A sticky-first-col"
+        >
+          
+            4
+          
+        </td>
+        <td
+          class="td-css-class-B"
+        >
+          
+            8
+          
+        </td>
+         
+        <td
+          class="column-flush"
+        />
+      </tr>
+    </tbody>
+  </table>
+</div>
+`;
+
 exports[`HueTable.vue should render a table 1`] = `
 <div
   class="hue-table-container"
