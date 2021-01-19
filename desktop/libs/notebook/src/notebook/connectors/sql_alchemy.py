@@ -223,7 +223,7 @@ class SqlAlchemyApi(Api):
       engine_key = self._get_engine_key()
       ENGINES.pop(engine_key, None)
 
-      raise AuthenticationRequired(message='Could not establish connection to datasource')
+      raise AuthenticationRequired(message='Could not establish connection to datasource: %s' % e)
 
     return connection
 
