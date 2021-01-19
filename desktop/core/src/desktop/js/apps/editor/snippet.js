@@ -22,7 +22,7 @@ import { markdown } from 'markdown';
 import 'apps/editor/components/ko.executableLogs';
 import 'apps/editor/components/ko.executableProgressBar';
 import 'apps/editor/components/ko.snippetEditorActions';
-import 'apps/editor/components/ko.snippetResults';
+import 'apps/editor/components/resultChart/ko.resultChart';
 import 'apps/editor/components/ko.queryHistory';
 
 import './components/ExecutableActionsKoBridge.vue';
