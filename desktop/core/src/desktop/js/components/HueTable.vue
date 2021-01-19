@@ -31,10 +31,7 @@
           <th
             v-for="(column, colIndex) in columns"
             :key="colIndex"
-            :class="[
-              column.headerCssClass,
-              { 'sticky-first-col': stickyFirstColumn && colIndex === 0 }
-            ]"
+            :class="cellClass(column.headerCssClass, colIndex)"
             scope="col"
           >
             {{ column.label }}
@@ -48,7 +45,7 @@
           <td
             v-for="(column, colIndex) in columns"
             :key="colIndex"
-            :class="[column.cssClass, { 'sticky-first-col': stickyFirstColumn && colIndex === 0 }]"
+            :class="cellClass(column.cssClass, colIndex)"
           >
             <slot v-if="hasCellSlot(column)" :name="cellSlotName(column)" v-bind="row" />
             <div v-else-if="column.htmlValue" v-html="row[column.key]" />
@@ -96,6 +93,17 @@
       if (containerEl.scrollHeight === containerEl.scrollTop + containerEl.clientHeight) {
         this.$emit('scroll-to-end');
       }
+    }
+
+    cellClass(cellClass: string | undefined, index: number): string | null {
+      // This prevents rendering of empty class="" for :class="[x,y]" when x and y are undefined
+      // Possibly fixed in Vue 3
+      if (cellClass && this.stickyFirstColumn && index === 0) {
+        return `${cellClass} sticky-first-col`;
+      } else if (this.stickyFirstColumn && index === 0) {
+        return 'sticky-first-col';
+      }
+      return cellClass || null;
     }
   }
 </script>
