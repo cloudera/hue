@@ -26,7 +26,7 @@ import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import LOTS_OF_PARSE_RESULTS from './test/lotsOfParseResults';
 import * as sqlReferenceRepository from 'sql/reference/sqlReferenceRepository';
-import { defer } from '../utils/hueUtils';
+import { sleep } from '../utils/hueUtils';
 
 describe('AutocompleteResults.js', () => {
   const failResponse = {
@@ -400,7 +400,7 @@ describe('AutocompleteResults.js', () => {
       suggestFunctions: {}
     });
 
-    await defer();
+    await sleep(0);
 
     expect(spy).toHaveBeenCalled();
 
@@ -427,7 +427,7 @@ describe('AutocompleteResults.js', () => {
       }
     });
 
-    await defer();
+    await sleep(0);
 
     expect(spy).toHaveBeenCalled();
 
@@ -465,7 +465,7 @@ describe('AutocompleteResults.js', () => {
       suggestSetOptions: {}
     });
 
-    await defer();
+    await sleep(0);
 
     expect(spy).toHaveBeenCalled();
 
