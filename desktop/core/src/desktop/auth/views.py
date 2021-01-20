@@ -260,7 +260,7 @@ def dt_logout(request, next_page=None):
   if len([backend for backend in backends if hasattr(backend, 'logout')]) == len(backends):
     LOG.warn("Failed to log out from all backends for user: %s" % (username))
 
-  response = django.contrib.auth.views.logout(request, next_page)
+  response = django.contrib.auth.views.LogoutView.as_view(next_page=next_page)(request)
   response.delete_cookie(LOAD_BALANCER_COOKIE)
   return response
 
