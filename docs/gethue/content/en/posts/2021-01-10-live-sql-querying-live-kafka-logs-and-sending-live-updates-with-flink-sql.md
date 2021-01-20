@@ -83,7 +83,7 @@ For fetching the Docker Compose [configuration](https://raw.githubusercontent.co
     mkdir stream-sql-logs
     cd stream-sql-logs
 
-    wget [https://raw.githubusercontent.com/romainr/query-demo/master/stream-sql-logs/docker-compose.yml](https://raw.githubusercontent.com/romainr/query-demo/master/stream-sql-logs/docker-compose.yml)
+    wget https://raw.githubusercontent.com/romainr/query-demo/master/stream-sql-logs/docker-compose.yml
 
     docker-compose up -d
     >
