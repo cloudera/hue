@@ -61,7 +61,7 @@
           <Ruler :scroll="scroll" :processor="processor" :zoom="zoom" />
         </div>
       </div>
-      <!-- {{em-tooltip contents=tooltipContents}} -->
+      <ToolTip :contents="tooltipContents" />
     </div>
   </div>
 </template>
@@ -73,6 +73,7 @@
   import { Component, Prop, Vue } from 'vue-property-decorator';
   import { Dag } from '../../index';
 
+  import ToolTip from './components/ToolTip.vue';
   import ProcessName from './components/ProcessName.vue';
   import ProcessVisual from './components/ProcessVisual.vue';
   import ConsolidatedProcess from './components/ConsolidatedProcess.vue';
@@ -89,6 +90,7 @@
 
   @Component({
     components: {
+      ToolTip,
       ProcessName,
       ProcessVisual,
       ConsolidatedProcess,

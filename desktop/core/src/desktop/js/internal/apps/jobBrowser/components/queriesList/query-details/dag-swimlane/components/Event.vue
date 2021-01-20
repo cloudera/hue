@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="dag-swimlane-event">
+  <div class="dag-swimlane-event" @mouseenter="mouseEnter" @mouseleave="mouseLeave">
     <div class="event-line" />
     <div class="event-bubble" />
   </div>
@@ -50,12 +50,8 @@
       currentComp.style.left = this.processor.timeToPositionPercent(this.event.time) + '%';
     }
 
-    sendAction(a: string, b: string, c: any, d: any): void {
-      // eslint-disable-next-line no-restricted-syntax
-      console.log(a, b, c, d);
-    }
     sendMouseAction(name: string, mouseEvent: MouseEvent): void {
-      this.sendAction(name, 'event', this.process, {
+      this.$emit(name, 'event', this.process, {
         mouseEvent: mouseEvent,
         events: [this.event]
       });

@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="dag-swimlane-process-name">
+  <div class="dag-swimlane-process-name" @mouseenter="mouseEnter" @mouseleave="mouseLeave">
     {{ process.name }}
   </div>
 </template>
@@ -32,13 +32,8 @@
   export default class ProcessName extends Vue {
     @Prop() process: any;
 
-    sendAction(a: string, b: string, c: any, d: any): void {
-      // eslint-disable-next-line no-restricted-syntax
-      console.log(a, b, c, d);
-    }
-
     sendMouseAction(name: string, mouseEvent: MouseEvent): void {
-      this.sendAction(name, 'process-name', this.process, {
+      this.$emit(name, 'process-name', this.process, {
         mouseEvent: mouseEvent
       });
     }

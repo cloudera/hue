@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="dag-swimlane-blocking-event">
+  <div class="dag-swimlane-blocking-event" @mouseenter="mouseEnter" @mouseleave="mouseLeave">
     <div class="event-line" />
   </div>
 </template>
@@ -61,12 +61,8 @@
       }
     }
 
-    sendAction(a: string, b: string, c: any, d: any): void {
-      // eslint-disable-next-line no-restricted-syntax
-      console.log(a, b, c, d);
-    }
     sendMouseAction(name: string, mouseEvent: MouseEvent): void {
-      this.sendAction(name, 'blocking-event', this.process, {
+      this.$emit(name, 'blocking-event', this.process, {
         mouseEvent: mouseEvent,
         blocking: this.blocking,
         blockingEvent: this.blockingEvent

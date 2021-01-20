@@ -17,7 +17,13 @@
 -->
 
 <template>
-  <div :class="'dag-swimlane-consolidated-process ' + (focused ? 'focused' : '')">&nbsp;</div>
+  <div
+    :class="'dag-swimlane-consolidated-process ' + (focused ? 'focused' : '')"
+    @mouseenter="mouseEnter"
+    @mouseleave="mouseLeave"
+  >
+    &nbsp;
+  </div>
 </template>
 
 <script lang="ts">
@@ -75,15 +81,11 @@
       }
     }
 
-    sendAction(a: string, b: string, c: any, d: any): void {
-      // eslint-disable-next-line no-restricted-syntax
-      console.log(a, b, c, d);
-    }
     sendMouseAction(name: string, mouseEvent: MouseEvent): void {
       const fromPos = this.fromPos || 0;
       const toPos = this.toPos || 0;
 
-      this.sendAction(name, 'consolidated-process', this.process, {
+      this.$emit(name, 'consolidated-process', this.process, {
         mouseEvent: mouseEvent,
         contribution: Math.floor(toPos - fromPos)
       });

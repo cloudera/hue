@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="dag-swimlane-process-visual">
+  <div class="dag-swimlane-process-visual" @mouseenter="mouseEnter" @mouseleave="mouseLeave">
     <div class="base-line" />
     <ProcessLine
       :process="process"
@@ -86,9 +86,8 @@
     @Prop() processor: any;
     @Prop() focusedProcess: any;
 
-    sendAction(a: string, b: string, c: any, d: any): void {
-      // eslint-disable-next-line no-restricted-syntax
-      console.log(a, b, c, d);
+    sendMouseAction(name: string, type: string, process: any, options: any): void {
+      this.$emit(name, type, process, options);
     }
 
     showTooltip(type: string, process: any, options: any): void {
@@ -98,11 +97,11 @@
         const eventsUnderMouse: any[] = [];
 
         const eventElements: NodeListOf<HTMLElement> = this.$el.querySelectorAll(
-          '.em-swimlane-event'
+          '.dag-swimlane-event'
         );
 
         eventElements.forEach((element: HTMLElement, index: number) => {
-          const offsetLeft = element.offsetLeft;
+          const offsetLeft = element.getBoundingClientRect().left;
           if (clientX >= offsetLeft - BUBBLE_DIA && clientX <= offsetLeft + BUBBLE_DIA) {
             eventsUnderMouse.push(events[index]);
           }
@@ -116,15 +115,15 @@
         }
       }
 
-      this.sendAction('showTooltip', type, process, options);
+      this.sendMouseAction('showTooltip', type, process, options);
     }
 
     hideTooltip(type: string, process: any, options: any): void {
-      this.sendAction('hideTooltip', type, process, options);
+      this.sendMouseAction('hideTooltip', type, process, options);
     }
 
     click(type: string, process: any, options: any): void {
-      this.sendAction('click', type, process, options);
+      this.sendMouseAction('click', type, process, options);
     }
   }
 </script>

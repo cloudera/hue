@@ -115,7 +115,7 @@ $border-lite: #e6e8eb;
 
 .dag-swimlane-consolidated-process {
   position: absolute;
-  cursor: pointer;
+  cursor: default;
 
   top: 0px;
   bottom: 0px;
@@ -151,7 +151,7 @@ $border-lite: #e6e8eb;
   border-right: 10px solid transparent;
 
   .process-line, .event-bar, .event-bubble {
-    cursor: pointer;
+    cursor: default;
   }
   .base-line {
     position: relative;

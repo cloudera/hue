@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div>
+  <div @mouseenter="mouseEnter" @mouseleave="mouseLeave">
     <div class="process-line" />
   </div>
 </template>
@@ -49,13 +49,8 @@
       }
     }
 
-    sendAction(a: string, b: string, c: any, d: any): void {
-      // eslint-disable-next-line no-restricted-syntax
-      console.log(a, b, c, d);
-    }
-
     sendMouseAction(name: string, mouseEvent: MouseEvent): void {
-      this.sendAction(name, 'process-line', this.process, {
+      this.$emit(name, 'process-line', this.process, {
         mouseEvent: mouseEvent
       });
     }

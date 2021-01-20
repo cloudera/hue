@@ -36,13 +36,8 @@
   export default class VertexName extends Vue {
     @Prop() process: any;
 
-    sendAction(a: string, b: string, c: any, d: any): void {
-      // eslint-disable-next-line no-restricted-syntax
-      console.log(a, b, c, d);
-    }
-
     sendMouseAction(name: string, mouseEvent: MouseEvent): void {
-      this.sendAction(name, 'process-name', this.process, {
+      this.$emit(name, 'process-name', this.process, {
         mouseEvent: mouseEvent
       });
     }

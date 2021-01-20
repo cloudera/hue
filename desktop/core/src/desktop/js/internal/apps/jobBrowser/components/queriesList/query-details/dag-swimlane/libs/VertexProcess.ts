@@ -38,8 +38,6 @@ export default class VertexProcess extends Process {
 
   blockingEventName = 'VERTEX_FINISHED';
 
-  getVisibleProps = null;
-
   edgeHash: any;
 
   eventBars = [
@@ -207,15 +205,40 @@ export default class VertexProcess extends Process {
       case 'process-name':
       case 'event-bar':
       case 'process-line':
-        const properties = this.getVisibleProps().map(definition => {
-          return {
-            name: definition.get('headerTitle'),
-            value: definition.getCellContent(this.vertex),
-            type: definition.cellDefinition.type,
-            format: definition.cellDefinition.format,
-            componentName: definition.cellComponentName
-          };
-        });
+        let properties: any[] = [];
+        const vertex: any = this.vertex;
+
+        if (vertex != null) {
+          properties = [
+            {
+              name: 'Status',
+              value: vertex.status
+            },
+            {
+              name: 'Start Time',
+              value: vertex.startTime,
+              type: 'time'
+            },
+            {
+              name: 'End Time',
+              value: vertex.endTime,
+              type: 'time'
+            },
+            {
+              name: 'Duration',
+              value: vertex.endTime ? vertex.endTime - vertex.startTime + 'ms' : '-',
+              type: 'duration'
+            },
+            {
+              name: 'Total Tasks',
+              value: vertex.taskCount
+            },
+            {
+              name: 'Succeeded Tasks',
+              value: vertex.succeededTaskCount
+            }
+          ];
+        }
 
         contents = [
           {
@@ -226,13 +249,13 @@ export default class VertexProcess extends Process {
         ];
         break;
       case 'event':
-        let edge;
-        contents = options.events.map(function (event) {
+        let edge: any;
+        contents = options.events.map(function (event: any) {
           let properties = [
             {
               name: 'Time',
               value: event.time,
-              type: 'date'
+              type: 'time'
             }
           ];
 
