@@ -93,7 +93,7 @@ if ENABLE_ORGANIZATIONS.get():
       return _fitered_queryset(queryset)
 
   class OrganizationConnectorPermission(ConnectorPermission):
-    organization = models.ForeignKey(Organization)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
 
     objects = OrganizationConnectorPermissionManager()
 

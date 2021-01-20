@@ -118,7 +118,7 @@ class OrganizationGroupManager(models.Manager):
 if ENABLE_ORGANIZATIONS.get():
   class OrganizationGroup(models.Model):
     name = models.CharField(_t('name'), max_length=80, unique=False)
-    organization = models.ForeignKey(Organization)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
 
     permissions = models.ManyToManyField(
         'HuePermission',
