@@ -17,15 +17,40 @@
 -->
 
 <template>
-  <ResultGrid :rows="rows" :meta="meta" :has-more="hasMore" @fetch-more="fetchMore" />
+  <div class="result-grid" :class="{ 'grayed-out': grayedOut }">
+    <HueTable
+      v-if="rows.length"
+      :columns="tableColumns"
+      :rows="rows"
+      :sticky-header="true"
+      :sticky-first-column="true"
+      @scroll-to-end="onScrollToEnd"
+    />
+    <div v-if="isExecuting">
+      <h1 class="empty"><i class="fa fa-spinner fa-spin" /> {{ I18n('Executing...') }}</h1>
+    </div>
+    <div v-else-if="hasEmptySuccessResult">
+      <h1 class="empty">{{ I18n('Success.') }}</h1>
+    </div>
+    <div v-else-if="isExpired">
+      <h1 class="empty">{{ I18n('Results have expired, rerun the query if needed.') }}</h1>
+    </div>
+    <div v-else-if="hasEmptyResult">
+      <h1 class="empty">{{ I18n('Empty result.') }}</h1>
+    </div>
+    <div v-else-if="isStreaming">
+      <h1 class="empty">{{ I18n('Waiting for streaming data...') }}</h1>
+    </div>
+    <div v-else-if="!rows.length && !executable.result">
+      <h1 class="empty">{{ I18n('Select and execute a query to see the result.') }}</h1>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop, Watch } from 'vue-property-decorator';
-
-  import ResultGrid from './ResultGrid.vue';
   import { ResultMeta } from 'apps/editor/execution/api';
   import Executable, {
     EXECUTABLE_UPDATED_EVENT,
@@ -36,33 +61,34 @@
     ResultRow,
     ResultType
   } from 'apps/editor/execution/executionResult';
+  import { Column } from 'components/HueTable';
+  import HueTable from 'components/HueTable.vue';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
+  import { defer } from 'utils/hueUtils';
+  import I18n from 'utils/i18n';
 
   @Component({
-    components: { ResultGrid }
+    components: { HueTable },
+    methods: { I18n }
   })
-  export default class ExecutionResults extends Vue {
+  export default class ResultTable extends Vue {
     @Prop()
     executable?: Executable;
 
-    subTracker = new SubscriptionTracker();
-
-    status: ExecutionStatus | null = null;
-    type = ResultType.Table;
-
+    grayedOut = false;
     fetchedOnce = false;
     hasResultSet = false;
     streaming = false;
     hasMore = false;
-
-    lastRenderedResult?: ExecutionResult;
-
-    images = [];
-    lastFetchedRows: ResultRow[] = [];
     rows: ResultRow[] = [];
     meta: ResultMeta[] = [];
 
-    fetchResultThrottle = -1;
+    status: ExecutionStatus | null = null;
+    type = ResultType.Table;
+    images = [];
+    lastFetchedRows: ResultRow[] = [];
+    lastRenderedResult?: ExecutionResult;
+    subTracker = new SubscriptionTracker();
 
     mounted(): void {
       this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, (executable: Executable) => {
@@ -78,13 +104,42 @@
       });
     }
 
-    fetchMore(): void {
-      window.clearTimeout(this.fetchResultThrottle);
-      this.fetchResultThrottle = window.setTimeout(() => {
-        if (this.hasMore && this.executable && this.executable.result) {
-          this.executable.result.fetchRows({ rows: 100 });
-        }
-      }, 100);
+    get hasEmptyResult(): boolean {
+      return (
+        this.rows.length === 0 &&
+        this.hasResultSet &&
+        this.status === ExecutionStatus.available &&
+        this.fetchedOnce
+      );
+    }
+
+    get hasEmptySuccessResult(): boolean {
+      return (
+        this.rows.length === 0 &&
+        !this.hasResultSet &&
+        this.status === ExecutionStatus.available &&
+        this.fetchedOnce
+      );
+    }
+
+    get isExecuting(): boolean {
+      return this.status === ExecutionStatus.running;
+    }
+
+    get isExpired(): boolean {
+      return this.status === ExecutionStatus.expired && this.rows.length > 0;
+    }
+
+    get isStreaming(): boolean {
+      return this.streaming && this.rows.length === 0 && this.status !== ExecutionStatus.running;
+    }
+
+    get tableColumns(): Column<ResultRow>[] {
+      return this.meta.map(({ name }, index) => ({
+        label: name,
+        key: index,
+        htmlValue: true
+      }));
     }
 
     @Watch('executable')
@@ -95,6 +150,19 @@
         this.lastRenderedResult = this.executable.result;
       } else {
         this.resetResultData();
+      }
+    }
+
+    async onScrollToEnd(): void {
+      if (this.hasMore && !this.grayedOut && this.executable && this.executable.result) {
+        this.grayedOut = true;
+        try {
+          await this.executable.result.fetchRows({ rows: 100 });
+        } catch (e) {}
+        defer(() => {
+          // Allow executable events to finish before enabling the result scroll again
+          this.grayedOut = false;
+        });
       }
     }
 
@@ -147,3 +215,19 @@
     }
   }
 </script>
+
+<style lang="scss" scoped>
+  .result-grid {
+    position: relative;
+    height: 100%;
+    width: 100%;
+
+    &.grayed-out {
+      opacity: 0.5;
+
+      /deep/ .hue-table-container {
+        overflow: hidden !important;
+      }
+    }
+  }
+</style>
