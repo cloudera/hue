@@ -280,11 +280,12 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
     else:
       request = None
 
-    username = kwargs['username']
     password = kwargs['password']
 
     if 'email' in kwargs:
       username = kwargs['email']
+    else:
+      username = kwargs['username']
     username = force_username_case(username)
 
     user = super(AllowFirstUserDjangoBackend, self).authenticate(request, username=username, password=password)

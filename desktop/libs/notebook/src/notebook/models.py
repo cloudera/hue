@@ -295,7 +295,7 @@ def import_saved_beeswax_query(bquery, interpreter=None):
   return make_notebook(
       name=bquery.name,
       description=bquery.desc,
-      editor_type=interpreter['type'] if interpreter else _convert_type(bquery.type, bquery.data),
+      editor_type=interpreter['dialect'] if interpreter else _convert_type(bquery.type, bquery.data),
       statement=design.hql_query,
       status='ready',
       files=design.file_resources,

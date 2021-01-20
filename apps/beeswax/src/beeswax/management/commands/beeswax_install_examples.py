@@ -423,7 +423,7 @@ class SampleQuery(object):
     if USE_NEW_EDITOR.get():
       examples_dir = _get_example_directory(django_user)
 
-      document_type = self._document_type(self.type, interpreter)  # Issue of query-10 vs query-hive-10
+      document_type = self._document_type(self.type, interpreter)
       notebook = import_saved_beeswax_query(query, interpreter=interpreter)
 
       try:
@@ -456,6 +456,8 @@ class SampleQuery(object):
           data=data
         )
 
+        # TODO: FK to connector object
+
       # Share with default group
       examples_dir.share(django_user, Document2Permission.READ_PERM, groups=[get_default_user_group()])
       LOG.info('Successfully installed sample query: %s' % doc2)
@@ -467,6 +469,6 @@ class SampleQuery(object):
     elif type == IMPALA:
       return 'query-impala'
     elif interpreter:
-      return 'query-%(type)s' % interpreter
+      return 'query-%(dialect)s' % interpreter
     else:
       return None
