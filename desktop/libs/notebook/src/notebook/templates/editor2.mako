@@ -1023,9 +1023,9 @@
 
         <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
           <div class="execution-results-tab-panel">
-            <execution-results-ko-bridge class="table-results-bridge" data-bind="vueKoProps: {
+            <result-table-ko-bridge class="table-results-bridge" data-bind="vueKoProps: {
                 executableObservable: activeExecutable
-              }"></execution-results-ko-bridge>
+              }"></result-table-ko-bridge>
           </div>
         </div>
 
