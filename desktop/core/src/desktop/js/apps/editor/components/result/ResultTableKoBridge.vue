@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <ExecutionResults :executable="executable" />
+  <ResultTable :executable="executable" />
 </template>
 
 <script lang="ts">
@@ -26,14 +26,14 @@
   import { Prop } from 'vue-property-decorator';
   import { wrap } from 'vue/webComponentWrapper';
 
-  import ExecutionResults from './ExecutionResults.vue';
+  import ResultTable from './ResultTable.vue';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
   @Component({
-    components: { ExecutionResults }
+    components: { ResultTable }
   })
-  export default class ExecutionResultsKoBridge extends Vue {
+  export default class ResultTableKoBridge extends Vue {
     @Prop()
     executableObservable?: KnockoutObservable<SqlExecutable | undefined>;
 
@@ -57,6 +57,6 @@
     }
   }
 
-  export const COMPONENT_NAME = 'execution-results-ko-bridge';
-  wrap(COMPONENT_NAME, ExecutionResultsKoBridge);
+  export const COMPONENT_NAME = 'result-table-ko-bridge';
+  wrap(COMPONENT_NAME, ResultTableKoBridge);
 </script>
