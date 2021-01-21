@@ -199,7 +199,7 @@ class ResultGrid extends DisposableComponent {
     this.element = element;
     this.activeExecutable = params.activeExecutable;
 
-    this.isResultFullScreenMode = params.isResultFullScreenMode;
+    this.bottomExpanded = params.bottomExpanded;
     this.notebookMode = params.notebookMode;
     this.hasMore = params.hasMore;
     this.fetchResult = params.fetchResult;

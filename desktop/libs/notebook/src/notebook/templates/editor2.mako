@@ -214,7 +214,7 @@
 </script>
 
 <script type="text/html" id="editor-optimizer-alerts">
-  <!-- ko if: window.HAS_OPTIMIZER && (dialect() == 'impala' || dialect() == 'hive') && ! $root.isPresentationMode() && ! $root.isResultFullScreenMode() -->
+  <!-- ko if: window.HAS_OPTIMIZER && (dialect() == 'impala' || dialect() == 'hive') && ! $root.isPresentationMode() -->
   <div class="optimizer-container" data-bind="css: { 'active': showOptimizer }">
     <!-- ko if: hasSuggestion() -->
     <!-- ko with: suggestion() -->
@@ -795,7 +795,7 @@
 </script>
 
 <script type="text/html" id="editor-navbar">
-  <div class="navbar hue-title-bar" data-bind="visible: ! $root.isPresentationMode() && ! $root.isResultFullScreenMode()">
+  <div class="navbar hue-title-bar" data-bind="visible: ! $root.isPresentationMode()">
     <div class="navbar-inner">
       <div class="container-fluid">
         <!-- ko template: { name: 'editor-menu-buttons' } --><!-- /ko -->
@@ -881,12 +881,6 @@
     </div>
   </div>
 
-  <!-- ko if: $root.isResultFullScreenMode() -->
-  <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Collapse results') }" data-bind="click: function(){ $root.isResultFullScreenMode(false); }">
-    <i class="fa fa-times fa-fw"></i>
-  </a>
-  <!-- /ko -->
-
   <!-- ko if: $root.isPresentationMode() -->
   <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Exit presentation') }" data-bind="click: function(){ $root.selectedNotebook().isPresentationMode(false); }">
     <i class="fa fa-times fa-fw"></i>
@@ -916,21 +910,24 @@
   </div>
 </script>
 
-<div id="editorComponents" class="editor">
+<div id="editorComponents" class="editor" data-bind="css: { 'editor-bottom-expanded': bottomExpanded, 'editor-top-expanded': topExpanded }">
   <!-- ko template: { name: 'editor-modals' } --><!-- /ko -->
   <div class="editor-nav-bar">
     <!-- ko template: { name: 'editor-navbar' } --><!-- /ko -->
   </div>
-  <div class="editor-app"  data-bind="with: firstSnippet">
+  <div class="editor-app" data-bind="with: firstSnippet">
     <div class="editor-top">
       <div class="editor-top-actions">
         <!-- ko template: { name: 'editor-query-redacted' } --><!-- /ko -->
         <!-- ko template: { name: 'editor-longer-operation' } --><!-- /ko -->
         <div class="editor-top-right-actions">
           <!-- ko template: { name: 'snippet-header-database-selection' } --><!-- /ko -->
-          <a href="javascript: void(0);" title="${ _('Show editor help') }" data-toggle="modal" data-target="#editorHelpModal">
+          <button title="${ _('Show editor help') }" data-toggle="modal" data-target="#editorHelpModal">
             <i class="fa fa-question"></i>
-          </a>
+          </button>
+          <button title="${ _('Expand editor') }" data-bind="toggle: $root.topExpanded">
+            <i class="fa" data-bind="css: { 'fa-expand': !$root.topExpanded(), 'fa-compress': $root.topExpanded() }"></i>
+          </button>
         </div>
       </div>
       <div class="editor-settings-drawer">
@@ -992,6 +989,12 @@
         <!-- ko if: HAS_WORKLOAD_ANALYTICS && dialect() === 'impala' -->
         <li data-bind="visible: showExecutionAnalysis, click: function(){ currentQueryTab('executionAnalysis'); }, css: {'active': currentQueryTab() == 'executionAnalysis'}"><a class="inactive-action" href="#executionAnalysis" data-toggle="tab" data-bind="click: function(){ $('a[href=\'#executionAnalysis\']').tab('show'); }, event: {'shown': fetchExecutionAnalysis }"><span>${_('Execution Analysis')} </span><span></span></a></li>
         <!-- /ko -->
+
+        <li class="editor-bottom-tab-actions">
+          <button data-bind="toggle: $root.bottomExpanded">
+            <i class="fa" data-bind="css: { 'fa-expand': !$root.bottomExpanded(), 'fa-compress': $root.bottomExpanded() }"></i>
+          </button>
+        </li>
       </ul>
       <div class="editor-bottom-tab-content tab-content">
         <div class="tab-pane" id="queryHistory" data-bind="css: { 'active': currentQueryTab() === 'queryHistory' }">
@@ -1036,7 +1039,6 @@
               editorMode: parentVm.editorMode,
               id: id,
               isPresentationMode: parentNotebook.isPresentationMode,
-              isResultFullScreenMode: parentVm.isResultFullScreenMode,
               resultsKlass: resultsKlass
             }} --><!-- /ko -->
           </div>

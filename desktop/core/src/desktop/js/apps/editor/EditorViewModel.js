@@ -113,7 +113,32 @@ export default class EditorViewModel {
         this.selectedNotebook().snippets().length === 1 &&
         this.selectedNotebook().snippets()[0].isSqlDialect()
     );
-    this.isResultFullScreenMode = ko.observable(false);
+
+    this.bottomExpanded = ko.observable(false);
+    this.topExpanded = ko.observable(false);
+
+    this.bottomExpanded.subscribe(newVal => {
+      if (newVal) {
+        if (this.topExpanded()) {
+          this.topExpanded(false);
+        }
+        huePubSub.publish('both.assists.hide', true);
+      } else {
+        huePubSub.publish('both.assists.revert', true);
+      }
+    });
+
+    this.topExpanded.subscribe(newVal => {
+      if (newVal) {
+        if (this.bottomExpanded()) {
+          this.bottomExpanded(false);
+        }
+        huePubSub.publish('left.assist.hide', true);
+      } else {
+        huePubSub.publish('both.assists.revert', true);
+      }
+    });
+
     this.isPresentationMode = ko.pureComputed(
       () => this.selectedNotebook() && this.selectedNotebook().isPresentationMode()
     );
