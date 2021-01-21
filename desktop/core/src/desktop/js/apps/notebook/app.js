@@ -1043,7 +1043,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
           $(window).bind('keydown', 'esc', exitPlayerMode);
         } else {
           hideFixedHeaders();
-          huePubSub.publish('both.assists.show', true);
+          huePubSub.publish('both.assists.revert', true);
           viewModel.assistWithoutStorage(true);
           viewModel.isLeftPanelVisible(wasLeftPanelVisible);
           viewModel.isRightPanelVisible(wasRightPanelVisible);

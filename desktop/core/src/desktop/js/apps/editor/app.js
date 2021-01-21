@@ -324,24 +324,19 @@ huePubSub.subscribe('app.dom.loaded', app => {
       huePubSub.publish('selected.notebook.changed', newVal);
     });
 
-    let wasResultFullScreenMode = false;
+    let wasBottomExpanded = false;
     let isAssistAvailable = viewModel.assistAvailable();
     let wasLeftPanelVisible = viewModel.isLeftPanelVisible();
     let wasRightPanelVisible = viewModel.isRightPanelVisible();
 
     const exitPlayerMode = () => {
-      if (!wasResultFullScreenMode) {
+      if (!wasBottomExpanded) {
         viewModel.selectedNotebook().isPresentationMode(false);
       } else {
-        viewModel.isResultFullScreenMode(false);
+        viewModel.bottomExpanded(false);
       }
-      wasResultFullScreenMode = false;
+      wasBottomExpanded = false;
     };
-
-    viewModel.isResultFullScreenMode.subscribe(newValue => {
-      wasResultFullScreenMode = newValue;
-      huePubSub.publish('editor.presentation.operate.toggle', newValue);
-    });
 
     viewModel.isLeftPanelVisible.subscribe(value => {
       huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
@@ -583,7 +578,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
           wasLeftPanelVisible = viewModel.isLeftPanelVisible();
           wasRightPanelVisible = viewModel.isRightPanelVisible();
 
-          if (wasResultFullScreenMode) {
+          if (wasBottomExpanded) {
             huePubSub.publish('both.assists.hide', true);
           } else {
             huePubSub.publish('right.assist.hide', true);
@@ -610,7 +605,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
           $(window).bind('keydown', 'esc', exitPlayerMode);
         } else {
           huePubSub.publish(HIDE_FIXED_HEADERS_EVENT);
-          huePubSub.publish('both.assists.show', true);
+          huePubSub.publish('both.assists.revert', true);
           viewModel.assistWithoutStorage(true);
           viewModel.isLeftPanelVisible(wasLeftPanelVisible);
           viewModel.isRightPanelVisible(wasRightPanelVisible);
