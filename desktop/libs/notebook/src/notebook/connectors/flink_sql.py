@@ -21,7 +21,6 @@ import logging
 import json
 import posixpath
 
-from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import force_unicode
