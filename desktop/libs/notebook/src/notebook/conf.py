@@ -201,7 +201,7 @@ ENABLE_QUERY_BUILDER = Config(
   key="enable_query_builder",
   help=_t("Flag to enable the SQL query builder of the table assist."),
   type=coerce_bool,
-  default=True
+  default=False
 )
 
 ENABLE_NOTEBOOK_2 = Config(
