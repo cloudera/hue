@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <ResultTable :executable="executable" />
+  <ResultTable :executable="executable" :show-maximize="true" />
 </template>
 
 <script lang="ts">

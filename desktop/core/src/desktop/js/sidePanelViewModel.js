@@ -22,6 +22,7 @@ import huePubSub from 'utils/huePubSub';
 import { ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT } from 'apps/editor/events';
 import { SHOW_LEFT_ASSIST_EVENT, SHOW_RIGHT_ASSIST_EVENT } from 'ko/components/assist/events';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
+import { defer } from './utils/hueUtils';
 
 class SidePanelViewModel {
   constructor() {
@@ -110,36 +111,48 @@ class SidePanelViewModel {
 
     huePubSub.publish('get.current.app.view.model');
 
-    let previousVisibilityValues = {};
-    huePubSub.subscribe('both.assists.hide', withoutStorage => {
-      previousVisibilityValues = {
-        left: self.leftAssistVisible(),
-        right: self.rightAssistVisible()
-      };
-      self.assistWithoutStorage(withoutStorage);
-      self.leftAssistVisible(false);
-      self.rightAssistVisible(false);
-      window.setTimeout(() => {
+    const previousVisibilityValues = {
+      left: undefined,
+      right: undefined
+    };
+
+    const hideAssists = (left, right, preventStorage) => {
+      previousVisibilityValues.left = undefined;
+      previousVisibilityValues.right = undefined;
+      self.assistWithoutStorage(preventStorage);
+      if (left) {
+        previousVisibilityValues.left = self.leftAssistVisible();
+        self.leftAssistVisible(false);
+      }
+      if (right) {
+        previousVisibilityValues.right = self.rightAssistVisible();
+        self.rightAssistVisible(false);
+      }
+      defer(() => {
         self.assistWithoutStorage(false);
-      }, 0);
+      });
+    };
+
+    huePubSub.subscribe('both.assists.hide', preventStorage => {
+      hideAssists(true, true, preventStorage);
     });
 
-    huePubSub.subscribe('both.assists.show', withoutStorage => {
-      self.assistWithoutStorage(withoutStorage);
-      self.leftAssistVisible(previousVisibilityValues.left);
-      self.rightAssistVisible(previousVisibilityValues.right);
-      window.setTimeout(() => {
-        self.assistWithoutStorage(false);
-      }, 0);
+    huePubSub.subscribe('right.assist.hide', preventStorage => {
+      hideAssists(false, true, preventStorage);
     });
 
-    huePubSub.subscribe('right.assist.hide', withoutStorage => {
-      previousVisibilityValues = {
-        left: self.leftAssistVisible(),
-        right: self.rightAssistVisible()
-      };
-      self.assistWithoutStorage(withoutStorage);
-      self.rightAssistVisible(false);
+    huePubSub.subscribe('left.assist.hide', preventStorage => {
+      hideAssists(true, false, preventStorage);
+    });
+
+    huePubSub.subscribe('both.assists.revert', preventStorage => {
+      self.assistWithoutStorage(preventStorage);
+      if (typeof previousVisibilityValues.left !== 'undefined') {
+        self.leftAssistVisible(previousVisibilityValues.left);
+      }
+      if (typeof previousVisibilityValues.right !== 'undefined' && self.rightAssistAvailable()) {
+        self.rightAssistVisible(previousVisibilityValues.right);
+      }
       window.setTimeout(() => {
         self.assistWithoutStorage(false);
       }, 0);
