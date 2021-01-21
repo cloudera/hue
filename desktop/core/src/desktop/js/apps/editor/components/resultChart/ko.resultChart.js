@@ -135,11 +135,11 @@ const TEMPLATE = `
     </button>
   </div>
   <div class="btn-group pull-right">
-    <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: isResultFullScreenMode">
-      <!-- ko if: isResultFullScreenMode -->
+    <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: bottomExpanded">
+      <!-- ko if: bottomExpanded -->
       <i class="fa fa-compress"></i> ${ I18n('Collapse') }
       <!-- /ko -->
-      <!-- ko ifnot: isResultFullScreenMode -->
+      <!-- ko ifnot: bottomExpanded -->
       <i class="fa fa-expand"></i> ${ I18n('Expand') }
       <!-- /ko -->
     </button>
@@ -526,7 +526,7 @@ class ResultChart extends DisposableComponent {
 
     this.editorMode = params.editorMode;
     this.isPresentationMode = params.isPresentationMode;
-    this.isResultFullScreenMode = params.isResultFullScreenMode;
+    this.bottomExpanded = params.bottomExpanded;
     this.resultsKlass = params.resultsKlass;
     this.id = params.id; // TODO: Get rid of
 

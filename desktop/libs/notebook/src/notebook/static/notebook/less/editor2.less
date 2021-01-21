@@ -49,6 +49,10 @@
           > * {
             margin-left: 10px;
           }
+
+          button {
+            .icon-only-button;
+          }
         }
       }
 
@@ -94,10 +98,24 @@
 
       .editor-bottom-tabs {
         .flexRowLayoutRow(0 0 38px);
+
+        li.editor-bottom-tab-actions {
+          .hue-ease-transition(opacity);
+
+          float: right;
+          padding: 6px;
+          opacity: 0;
+
+          button {
+            .icon-only-button;
+          }
+        }
       }
 
       .editor-bottom-tab-content {
         .flexRowLayoutRow(0 1 100%);
+
+        overflow: hidden;
 
         .tab-pane {
           .fillAbsolute();
@@ -190,6 +208,7 @@
               }
             }
           }
+
           .execution-results-tab-panel {
             .fillAbsolute();
 
@@ -206,11 +225,41 @@
           }
         }
       }
+
+      &:hover {
+        .editor-bottom-tabs li.editor-bottom-tab-actions {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  &.editor-top-expanded {
+    .editor-app .editor-top {
+      .flex-basis(100%);
+    }
+
+    .editor-nav-bar,
+    .editor-app .editor-divider,
+    .editor-app .editor-bottom {
+      display: none;
+    }
+  }
+
+  &.editor-bottom-expanded {
+    .editor-nav-bar,
+    .editor-app .editor-top,
+    .editor-app .editor-divider {
+      display: none;
+    }
+
+    .editor-app .editor-bottom {
+      .flex-basis(100%);
     }
   }
 
 
-
+  // TODO: Clean-out below
 
 
   .snippet-move-placeholder {

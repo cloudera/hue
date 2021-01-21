@@ -41,7 +41,7 @@
     <div v-else-if="isStreaming">
       <h1 class="empty">{{ I18n('Waiting for streaming data...') }}</h1>
     </div>
-    <div v-else-if="!rows.length && !executable.result">
+    <div v-else-if="!rows.length && (!executable || !executable.result)">
       <h1 class="empty">{{ I18n('Select and execute a query to see the result.') }}</h1>
     </div>
   </div>
@@ -106,7 +106,7 @@
 
     get hasEmptyResult(): boolean {
       return (
-        this.rows.length === 0 &&
+        !this.rows.length &&
         this.hasResultSet &&
         this.status === ExecutionStatus.available &&
         this.fetchedOnce
@@ -115,7 +115,7 @@
 
     get hasEmptySuccessResult(): boolean {
       return (
-        this.rows.length === 0 &&
+        !this.rows.length &&
         !this.hasResultSet &&
         this.status === ExecutionStatus.available &&
         this.fetchedOnce
@@ -127,11 +127,11 @@
     }
 
     get isExpired(): boolean {
-      return this.status === ExecutionStatus.expired && this.rows.length > 0;
+      return this.status === ExecutionStatus.expired && !this.rows.length;
     }
 
     get isStreaming(): boolean {
-      return this.streaming && this.rows.length === 0 && this.status !== ExecutionStatus.running;
+      return this.streaming && !this.rows.length && this.status !== ExecutionStatus.running;
     }
 
     get tableColumns(): Column<ResultRow>[] {
