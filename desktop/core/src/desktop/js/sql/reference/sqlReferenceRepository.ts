@@ -41,7 +41,8 @@ const KEYWORD_REFS: { [attr: string]: () => Promise<{ RESERVED_WORDS?: Set<strin
   impala: async () => import(/* webpackChunkName: "impala-ref" */ './impala/reservedKeywords'),
   postgresql: async () =>
     import(/* webpackChunkName: "generic-ref" */ './postgresql/reservedKeywords'),
-  presto: async () => import(/* webpackChunkName: "generic-ref" */ './presto/reservedKeywords')
+  presto: async () => import(/* webpackChunkName: "generic-ref" */ './presto/reservedKeywords'),
+  flink: async () => import(/* webpackChunkName: "flink-ref" */ './flink/reservedKeywords')
 };
 
 const SET_REFS: { [attr: string]: () => Promise<{ SET_OPTIONS?: SetOptions }> } = {
@@ -52,7 +53,8 @@ const UDF_REFS: { [attr: string]: () => Promise<{ UDF_CATEGORIES?: UdfCategory[]
   generic: async () => import(/* webpackChunkName: "generic-ref" */ './generic/udfReference'),
   hive: async () => import(/* webpackChunkName: "hive-ref" */ './hive/udfReference'),
   impala: async () => import(/* webpackChunkName: "impala-ref" */ './impala/udfReference'),
-  pig: async () => import(/* webpackChunkName: "pig-ref" */ './pig/udfReference')
+  pig: async () => import(/* webpackChunkName: "pig-ref" */ './pig/udfReference'),
+  flink: async () => import(/* webpackChunkName: "flink-ref" */ './flink/udfReference')
 };
 
 const IGNORED_UDF_REGEX = /^[!=$%&*+-/<>^|~]+$/;
