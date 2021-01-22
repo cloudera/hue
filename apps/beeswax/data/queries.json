@@ -230,7 +230,7 @@
     "auto_load_only": false,
     "data": {
       "query": {
-        "query": "\nSELECT\n  state as \"State\",\n  count(city) as \"City Count\",\n  sum(population) as \"Population Sum\"\nFROM\n  us_population\nGROUP BY\n  state\nORDER BY\n  sum(population) DESC\n;",
+        "query": "\nCREATE TABLE IF NOT EXISTS us_population (\n  state CHAR(2) NOT NULL,\n  city VARCHAR NOT NULL,\n  population BIGINT\n  CONSTRAINT my_pk PRIMARY KEY (state, city)\n);\n\n\nUPSERT INTO us_population VALUES ('NY','New York',8143197);\nUPSERT INTO us_population VALUES ('CA','Los Angeles',3844829);\nUPSERT INTO us_population VALUES ('IL','Chicago',2842518);\nUPSERT INTO us_population VALUES ('TX','Houston',2016582);\nUPSERT INTO us_population VALUES ('PA','Philadelphia',1463281);\nUPSERT INTO us_population VALUES ('AZ','Phoenix',1461575);\nUPSERT INTO us_population VALUES ('TX','San Antonio',1256509);\nUPSERT INTO us_population VALUES ('CA','San Diego',1255540);\nUPSERT INTO us_population VALUES ('TX','Dallas',1213825);\nUPSERT INTO us_population VALUES ('CA','San Jose',91233);\n\nSELECT\n  state as \"State\",\n  count(city) as \"City Count\",\n  sum(population) as \"Population Sum\"\nFROM\n  us_population\nGROUP BY\n  state\nORDER BY\n  sum(population) DESC\n;",
         "type": 0,
         "email_notify": false,
         "is_parameterized": false,

@@ -127,7 +127,7 @@ class HiveQuery(models.Model):
 
 
 class QueryDetails(models.Model):
-  hive_query = models.ForeignKey(HiveQuery, HiveQuery, unique=True, blank=True, null=True)
+  hive_query = models.ForeignKey(HiveQuery, on_delete=models.CASCADE, unique=True, blank=True, null=True)
   explain_plan_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
   configuration_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
   perf = models.TextField(blank=True, null=True)  # This field type is a guess.
@@ -155,7 +155,7 @@ class DagInfo(models.Model):
   queue_name = models.CharField(max_length=64, blank=True, null=True)
   caller_id = models.CharField(max_length=512, blank=True, null=True)
   caller_type = models.CharField(max_length=128, blank=True, null=True)
-  hive_query = models.ForeignKey('HiveQuery', HiveQuery, blank=True, null=True)
+  hive_query = models.ForeignKey('HiveQuery', on_delete=models.CASCADE, blank=True, null=True)
   created_at = models.DateTimeField(blank=True, null=True)
   source_file = models.TextField(blank=True, null=True)
 
@@ -165,8 +165,8 @@ class DagInfo(models.Model):
 
 
 class DagDetails(models.Model):
-  dag_info = models.ForeignKey('DagInfo', DagInfo, unique=True, blank=True, null=True)
-  hive_query = models.ForeignKey('HiveQuery', HiveQuery, blank=True, null=True)
+  dag_info = models.ForeignKey('DagInfo', on_delete=models.CASCADE, unique=True, blank=True, null=True)
+  hive_query = models.ForeignKey('HiveQuery', on_delete=models.CASCADE, blank=True, null=True)
   dag_plan_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
   vertex_name_id_mapping_raw = models.TextField(blank=True, null=True)  # This field type is a guess.
   diagnostics = models.TextField(blank=True, null=True)
