@@ -432,6 +432,11 @@ export const fetchSample = ({
         }
 
         snippetJson = JSON.stringify(queryResult);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const transformResponse = (response: unknown) => {
+          return JSON.bigdataParse(response);
+        };
         const resultPromise = post<SampleResponse>(
           FETCH_RESULT_DATA_URL,
           {
@@ -440,7 +445,7 @@ export const fetchSample = ({
             rows: sampleCount || 100,
             startOver: 'false'
           },
-          { silenceErrors }
+          { silenceErrors, transformResponse }
         );
 
         const sampleResponse = await resultPromise;
