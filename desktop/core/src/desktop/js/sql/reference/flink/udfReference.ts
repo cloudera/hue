@@ -61,7 +61,8 @@ const AUXILIARY_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'T' }], [{ type: 'T' }], [{ type: 'T' }]],
     signature: 'hop(time_attr, interval, interval)',
     draggable: 'hop(time_attr, interval, interval)',
-    description: 'Defines a hopping time window (called sliding window in the Table API). A hopping time window has a fixed duration (second interval parameter) and hops by a specified hop interval (first interval parameter)'
+    description:
+      'Defines a hopping time window (called sliding window in the Table API). A hopping time window has a fixed duration (second interval parameter) and hops by a specified hop interval (first interval parameter)'
   },
   hop_start: {
     name: 'hop_start',
@@ -69,7 +70,8 @@ const AUXILIARY_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'T' }], [{ type: 'T' }], [{ type: 'T' }]],
     signature: 'hop_start(time_attr, interval, interval)',
     draggable: 'hop_start(time_attr, interval, interval)',
-    description: 'Returns the timestamp of the inclusive lower bound of the corresponding hopping window.'
+    description:
+      'Returns the timestamp of the inclusive lower bound of the corresponding hopping window.'
   },
   hop_end: {
     name: 'hop_end',
@@ -77,7 +79,8 @@ const AUXILIARY_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'T' }], [{ type: 'T' }], [{ type: 'T' }]],
     signature: 'hop_end(time_attr, interval, interval)',
     draggable: 'hop_end(time_attr, interval, interval)',
-    description: 'Returns the timestamp of the inclusive upper bound of the corresponding hopping window.'
+    description:
+      'Returns the timestamp of the inclusive upper bound of the corresponding hopping window.'
   },
   hop_rowtime: {
     name: 'hop_rowtime',
@@ -85,7 +88,8 @@ const AUXILIARY_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'T' }], [{ type: 'T' }], [{ type: 'T' }]],
     signature: 'hop_rowtime(time_attr, interval, interval)',
     draggable: 'hop_rowtime(time_attr, interval, interval)',
-    description: 'Returns the timestamp of the inclusive upper bound of the corresponding hopping window.'
+    description:
+      'Returns the timestamp of the inclusive upper bound of the corresponding hopping window.'
   },
   hop_proctime: {
     name: 'hop_proctime',
@@ -93,7 +97,8 @@ const AUXILIARY_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'T' }], [{ type: 'T' }], [{ type: 'T' }]],
     signature: 'hop_proctime(time_attr, interval, interval)',
     draggable: 'hop_proctime(time_attr, interval, interval)',
-    description: 'Returns a proctime attribute that can be used in subsequent time-based operations such as interval joins and group window or over window aggregations.'
+    description:
+      'Returns a proctime attribute that can be used in subsequent time-based operations such as interval joins and group window or over window aggregations.'
   },
   session: {
     name: 'session',
@@ -101,7 +106,8 @@ const AUXILIARY_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'T' }], [{ type: 'T' }]],
     signature: 'session(time_attr, interval)',
     draggable: 'session(time_attr, interval)',
-    description: 'Defines a session time window. Session time windows do not have a fixed duration but their bounds are defined by a time interval of inactivity, i.e., a session window is closed if no event appears for a defined gap period.'
+    description:
+      'Defines a session time window. Session time windows do not have a fixed duration but their bounds are defined by a time interval of inactivity, i.e., a session window is closed if no event appears for a defined gap period.'
   },
   session_start: {
     name: 'session_start',
@@ -109,7 +115,8 @@ const AUXILIARY_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'T' }], [{ type: 'T' }]],
     signature: 'session_start(time_attr, interval)',
     draggable: 'session_start(time_attr, interval)',
-    description: 'Returns the timestamp of the inclusive lower bound of the corresponding session window.'
+    description:
+      'Returns the timestamp of the inclusive lower bound of the corresponding session window.'
   },
   session_end: {
     name: 'session_end',
@@ -117,7 +124,8 @@ const AUXILIARY_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'T' }], [{ type: 'T' }]],
     signature: 'session_end(time_attr, interval)',
     draggable: 'session_end(time_attr, interval)',
-    description: 'Returns the timestamp of the inclusive upper bound of the corresponding session window.'
+    description:
+      'Returns the timestamp of the inclusive upper bound of the corresponding session window.'
   },
   session_rowtime: {
     name: 'session_rowtime',
@@ -125,7 +133,8 @@ const AUXILIARY_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'T' }], [{ type: 'T' }]],
     signature: 'session_rowtime(time_attr, interval)',
     draggable: 'session_rowtime(time_attr, interval)',
-    description: 'Returns the timestamp of the inclusive upper bound of the corresponding session window.'
+    description:
+      'Returns the timestamp of the inclusive upper bound of the corresponding session window.'
   },
   session_proctime: {
     name: 'session_proctime',
@@ -133,7 +142,8 @@ const AUXILIARY_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'T' }], [{ type: 'T' }]],
     signature: 'session_proctime(time_attr, interval)',
     draggable: 'session_proctime(time_attr, interval)',
-    description: 'Returns a proctime attribute that can be used in subsequent time-based operations such as interval joins and group window or over window aggregations.'
+    description:
+      'Returns a proctime attribute that can be used in subsequent time-based operations such as interval joins and group window or over window aggregations.'
   },
   tumble: {
     name: 'tumble',
@@ -141,8 +151,8 @@ const AUXILIARY_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'T' }], [{ type: 'T' }]],
     signature: 'tumble(time_attr, interval)',
     draggable: 'tumble(time_attr, interval)',
-    description: 'Defines a tumbling time window. A tumbling time window assigns rows to non-overlapping, continuous windows with a fixed duration (interval). For example, a tumbling window of 5 minutes groups rows in 5 minutes intervals. Tumbling windows can be defined on event-time (stream + batch) or processing-time (stream).'
-
+    description:
+      'Defines a tumbling time window. A tumbling time window assigns rows to non-overlapping, continuous windows with a fixed duration (interval). For example, a tumbling window of 5 minutes groups rows in 5 minutes intervals. Tumbling windows can be defined on event-time (stream + batch) or processing-time (stream).'
   },
   tumble_start: {
     name: 'tumble_start',
@@ -150,7 +160,8 @@ const AUXILIARY_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'T' }], [{ type: 'T' }]],
     signature: 'tumble_start(time_attr, interval)',
     draggable: 'tumble_start(time_attr, interval)',
-    description: 'Returns the timestamp of the inclusive lower bound of the corresponding tumbling window.'
+    description:
+      'Returns the timestamp of the inclusive lower bound of the corresponding tumbling window.'
   },
   tumble_end: {
     name: 'tumble_end',
@@ -158,7 +169,8 @@ const AUXILIARY_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'T' }], [{ type: 'T' }]],
     signature: 'tumble_end(time_attr, interval)',
     draggable: 'tumble_end(time_attr, interval)',
-    description: 'Returns the timestamp of the exclusive upper bound of the corresponding tumbling window.'
+    description:
+      'Returns the timestamp of the exclusive upper bound of the corresponding tumbling window.'
   },
   tumble_rowtime: {
     name: 'tumble_rowtime',
@@ -166,7 +178,8 @@ const AUXILIARY_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'T' }], [{ type: 'T' }]],
     signature: 'tumble_rowtime(time_attr, interval)',
     draggable: 'tumble_rowtime(time_attr, interval)',
-    description: 'Returns the timestamp of the inclusive upper bound of the corresponding session window.'
+    description:
+      'Returns the timestamp of the inclusive upper bound of the corresponding session window.'
   },
   tumble_proctime: {
     name: 'tumble_proctime',
@@ -174,8 +187,9 @@ const AUXILIARY_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'T' }], [{ type: 'T' }]],
     signature: 'tumble_proctime(time_attr, interval)',
     draggable: 'tumble_proctime(time_attr, interval)',
-    description: 'Returns a proctime attribute that can be used in subsequent time-based operations such as interval joins and group window or over window aggregations.'
-  },
+    description:
+      'Returns a proctime attribute that can be used in subsequent time-based operations such as interval joins and group window or over window aggregations.'
+  }
 };
 
 export const UDF_CATEGORIES: UdfCategory[] = [

@@ -42,7 +42,7 @@ const KEYWORD_REFS: { [attr: string]: () => Promise<{ RESERVED_WORDS?: Set<strin
   postgresql: async () =>
     import(/* webpackChunkName: "generic-ref" */ './postgresql/reservedKeywords'),
   presto: async () => import(/* webpackChunkName: "generic-ref" */ './presto/reservedKeywords'),
-  flink: async() => import(/* webpackChunkName: "flink-ref" */ './flink/reservedKeywords'),
+  flink: async () => import(/* webpackChunkName: "flink-ref" */ './flink/reservedKeywords')
 };
 
 const SET_REFS: { [attr: string]: () => Promise<{ SET_OPTIONS?: SetOptions }> } = {
