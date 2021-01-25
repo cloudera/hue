@@ -26,7 +26,7 @@ import json
 
 LOG = logging.getLogger(__name__)
 
-from axes.decorators import FAILURE_LIMIT, LOCK_OUT_AT_FAILURE
+from axes.conf import settings
 from axes.models import AccessAttempt
 from axes.utils import reset
 try:
@@ -198,7 +198,7 @@ def massage_groups_for_json(groups):
 
 def is_user_locked_out(username):
   attempts = AccessAttempt.objects.filter(username=username)
-  return any(attempt.failures_since_start >= FAILURE_LIMIT and LOCK_OUT_AT_FAILURE for attempt in attempts)
+  return any(attempt.failures_since_start >= settings.AXES_FAILURE_LIMIT and settings.AXES_LOCK_OUT_AT_FAILURE for attempt in attempts)
 
 
 def delete_user(request):
