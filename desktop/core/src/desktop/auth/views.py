@@ -28,7 +28,7 @@ import logging
 import sys
 from datetime import datetime
 
-from axes.decorators import watch_login
+from axes.decorators import axes_dispatch
 import django.contrib.auth.views
 from django.core.exceptions import SuspiciousOperation
 from django.contrib.auth import login, get_backends, authenticate
@@ -100,7 +100,7 @@ def dt_login_old(request, from_modal=False):
 
 
 @login_notrequired
-@watch_login
+@axes_dispatch
 def dt_login(request, from_modal=False):
   if request.method == 'GET':
     redirect_to = request.GET.get('next', '/')
