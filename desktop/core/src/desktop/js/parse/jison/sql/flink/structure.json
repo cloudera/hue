@@ -54,7 +54,7 @@
     "../generic/sql_error.jison",
     "../generic/sql_main.jison",
     "show/sql_show.jison",
-    "describe/describe.jison",
+    "../calcite/describe/describe_table.jison",
     "../generic/sql_valueExpression.jison",
     "../generic/autocomplete_footer.jison"
   ],
@@ -111,7 +111,7 @@
     "../generic/use/use.jison",
     "../generic/sql_main.jison",
     "show/sql_show.jison",
-    "describe/describe.jison",
+    "../calcite/describe/describe_table.jison",
     "../generic/sql_valueExpression.jison",
     "../generic/syntax_footer.jison"
   ]
