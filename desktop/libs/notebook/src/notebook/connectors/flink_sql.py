@@ -294,12 +294,11 @@ class FlinkSqlApi(Api):
 
     resp = self.db.execute_statement(session_id=session_id, statement='USE %(database)s' % {'database': database})
     resp = self.db.execute_statement(session_id=session_id, statement='DESCRIBE %(table)s' % {'table': table})
-
-    columns = resp['results'][0]['columns']
+    columns = resp['results'][0]['data']
 
     return [{
-        'name': col['name'],
-        'type': col['type'],  # Types to unify
+        'name': col[0],
+        'type': col[1],  # Types to unify
         'comment': '',
       }
       for col in columns
