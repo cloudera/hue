@@ -31,7 +31,7 @@ To run the [demo app](https://github.com/cloudera/hue/tree/master/tools/examples
 2. In [package.json](https://github.com/cloudera/hue/blob/master/tools/examples/api/hue_dep/package.json), remove `"hue": "file:../../../.."` without touching the newly added gethue dependency
 3. In [src/app.js](https://github.com/cloudera/hue/blob/master/tools/examples/api/hue_dep/src/app.js), change the import line to:
 
-       import sqlAutocompleteParser from 'gethue/parse/sql/hive/hiveAutocompleteParser';
+       import sqlAutocompleteParser from 'gethue/lib/parsers/hiveAutocompleteParser';
 
 4. In [webpack.config.js](https://github.com/cloudera/hue/blob/master/tools/examples/api/hue_dep/webpack.config.js):
    - Change `'js'` to `'node_modules/gethue'` under `resolve.modules`
@@ -66,11 +66,11 @@ Here is an example on how to use the er-diagram component once installed:
 
 er-diagram can be imported into an html file using a simple script tag as follows.
 
-    <script type = "text/javascript" src="node_modules/gethue/web/er-diagram.js"></script>
+    <script type = "text/javascript" src="node_modules/gethue/lib/components/er-diagram.js"></script>
 
 If you are using a bundler like webpack. They can be imported using a normal import statement.
 
-    import 'gethue/web/er-diagram';
+    import 'gethue/lib/components/er-diagram';
 
 ### Instantiate
 
@@ -84,4 +84,4 @@ Please refer these [demo apps](https://github.com/cloudera/hue/tree/master/tools
 
 Internally these components are created using Vue.js & TypeScript. So you can even use them as plain Vue component, and take advantage of Vue features. Vue version of the components are under `gethue/components`.
 
-    import ERDiagram from 'gethue/components/er-diagram/index.vue';
+    import ERDiagram from 'gethue/lib/components/er-diagram/index.vue';
