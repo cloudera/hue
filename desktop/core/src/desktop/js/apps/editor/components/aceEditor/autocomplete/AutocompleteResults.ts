@@ -46,7 +46,7 @@ import {
 
 import apiHelper from 'api/apiHelper';
 import dataCatalog from 'catalog/dataCatalog';
-import { SetDetails, UdfDetails } from 'sql/reference/types';
+import { SetDetails, SqlReferenceProvider, UdfDetails } from 'sql/reference/types';
 import { hueWindow } from 'types/types';
 import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
@@ -58,9 +58,8 @@ import {
   findUdf,
   getArgumentDetailsForUdf,
   getUdfsWithReturnTypes,
-  getReturnTypesForUdf,
-  getSetOptions
-} from 'sql/reference/sqlReferenceRepository';
+  getReturnTypesForUdf
+} from 'sql/reference/sqlUdfRepository';
 
 interface ColumnReference {
   type: string;
@@ -147,6 +146,7 @@ class AutocompleteResults {
   editor: Ace.Editor;
   temporaryOnly: boolean;
   activeDatabase: string;
+  sqlReferenceProvider: SqlReferenceProvider;
 
   parseResult!: AutocompleteParseResult;
   subTracker = new SubscriptionTracker();
@@ -154,7 +154,13 @@ class AutocompleteResults {
   lastKnownRequests: JQueryXHR[] = [];
   cancellablePromises: CancellablePromise<unknown>[] = [];
 
-  constructor(options: { executor: Executor; editor: Ace.Editor; temporaryOnly: boolean }) {
+  constructor(options: {
+    sqlReferenceProvider: SqlReferenceProvider;
+    executor: Executor;
+    editor: Ace.Editor;
+    temporaryOnly: boolean;
+  }) {
+    this.sqlReferenceProvider = options.sqlReferenceProvider;
     this.executor = options.executor;
     this.editor = options.editor;
     this.temporaryOnly = options.temporaryOnly;
@@ -227,6 +233,7 @@ class AutocompleteResults {
 
   async adjustForUdfArgument(): Promise<void> {
     const foundArgumentDetails = (await getArgumentDetailsForUdf(
+      this.sqlReferenceProvider,
       this.executor.connector(),
       this.parseResult.udfArgument.name,
       this.parseResult.udfArgument.position
@@ -414,7 +421,11 @@ class AutocompleteResults {
         });
       } else if (type === 'UDFREF' && columnAlias.udfRef) {
         try {
-          const types = await getReturnTypesForUdf(this.executor.connector(), columnAlias.udfRef);
+          const types = await getReturnTypesForUdf(
+            this.sqlReferenceProvider,
+            this.executor.connector(),
+            columnAlias.udfRef
+          );
           const resolvedType = types.length === 1 ? types[0] : 'T';
           columnAliasSuggestions.push({
             value: columnAlias.name,
@@ -466,7 +477,9 @@ class AutocompleteResults {
       return [];
     }
     try {
-      const setOptions = await getSetOptions(this.executor.connector());
+      const setOptions = await this.sqlReferenceProvider.getSetOptions(
+        this.executor.connector().dialect || 'generic'
+      );
       return Object.keys(setOptions).map(name => ({
         category: Category.Option,
         value: name,
@@ -494,6 +507,7 @@ class AutocompleteResults {
       const getUdfsForTypes = async (types: string[]): Promise<Suggestion[]> => {
         try {
           const functionsToSuggest = await getUdfsWithReturnTypes(
+            this.sqlReferenceProvider,
             this.executor.connector(),
             types,
             !!this.parseResult.suggestAggregateFunctions,
@@ -527,7 +541,11 @@ class AutocompleteResults {
           const colRef = await colRefPromise;
           types = [colRef.type.toUpperCase()];
         } else if (suggestFunctions.udfRef) {
-          types = await getReturnTypesForUdf(this.executor.connector(), suggestFunctions.udfRef);
+          types = await getReturnTypesForUdf(
+            this.sqlReferenceProvider,
+            this.executor.connector(),
+            suggestFunctions.udfRef
+          );
         }
       } catch (err) {}
       suggestions = await getUdfsForTypes(types);
@@ -536,6 +554,7 @@ class AutocompleteResults {
 
       try {
         const functionsToSuggest = await getUdfsWithReturnTypes(
+          this.sqlReferenceProvider,
           this.executor.connector(),
           types,
           !!this.parseResult.suggestAggregateFunctions,
@@ -721,7 +740,11 @@ class AutocompleteResults {
         suggestColumns.types[0] === 'UDFREF' &&
         suggestColumns.udfRef
       ) {
-        types = await getReturnTypesForUdf(this.executor.connector(), suggestColumns.udfRef);
+        types = await getReturnTypesForUdf(
+          this.sqlReferenceProvider,
+          this.executor.connector(),
+          suggestColumns.udfRef
+        );
       }
     } catch (err) {}
 
@@ -1504,7 +1527,11 @@ class AutocompleteResults {
           clean = clean.replace(substitution.replace, substitution.with);
         });
 
-        const foundUdfs = await findUdf(this.executor.connector(), value.aggregateFunction);
+        const foundUdfs = await findUdf(
+          this.sqlReferenceProvider,
+          this.executor.connector(),
+          value.aggregateFunction
+        );
 
         // TODO: Support showing multiple UDFs with the same name but different category in the autocomplete details.
         // For instance, trunc appears both for dates with one description and for numbers with another description.
