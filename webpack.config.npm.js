@@ -39,7 +39,7 @@ const npmSetupPlugins = [
       { from: './package.json', to: `${DIST_DIR}/package.json` },
       { from: './NPM-README.md', to: `${DIST_DIR}/README.md` },
 
-      { from: JS_ROOT, to: `${DIST_DIR}/src` }
+      { from: JS_ROOT, to: `${DIST_DIR}` }
     ]
   })
 ];
@@ -50,7 +50,7 @@ const webComponentsConfig = Object.assign({}, defaultConfig, {
     'query-editor': [`${JS_ROOT}/apps/editor/components/aceEditor/QueryEditorWebComponent.ts`]
   },
   output: {
-    path: `${DIST_DIR}/components`
+    path: `${DIST_DIR}/lib/components`
   },
   plugins: npmSetupPlugins.concat(new VueLoaderPlugin())
 });
@@ -98,7 +98,7 @@ const parserConf = Object.assign({}, defaultConfig, {
     maxAssetSize: 1500000
   },
   output: {
-    path: `${DIST_DIR}/parsers`,
+    path: `${DIST_DIR}/lib/parsers`,
     library: '[name]',
     libraryExport: 'default',
     libraryTarget: 'umd',
