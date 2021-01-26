@@ -27,6 +27,7 @@ import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
 import { AutocompleteParser, AutocompleteParseResult } from 'parse/types';
 import { EditorInterpreter } from 'types/config';
 import AutocompleteResults from './AutocompleteResults';
+import { SqlReferenceProvider } from 'sql/reference/types';
 import huePubSub from 'utils/huePubSub';
 
 export default class SqlAutocompleter implements Disposable {
@@ -51,6 +52,7 @@ export default class SqlAutocompleter implements Disposable {
     fixedPrefix?: () => string;
     fixedPostfix?: () => string;
     autocompleteParser: AutocompleteParser;
+    sqlReferenceProvider: SqlReferenceProvider;
   }) {
     this.editorId = options.editorId;
     this.editor = options.editor;
@@ -60,6 +62,7 @@ export default class SqlAutocompleter implements Disposable {
     this.autocompleteParser = options.autocompleteParser;
 
     this.autocompleteResults = new AutocompleteResults({
+      sqlReferenceProvider: options.sqlReferenceProvider,
       executor: options.executor,
       editor: this.editor,
       temporaryOnly: !!options.temporaryOnly

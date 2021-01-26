@@ -20,7 +20,7 @@ import DataCatalogEntry from 'catalog/DataCatalogEntry';
 
 import dataCatalog from 'catalog/dataCatalog';
 import { IdentifierChainEntry, ParsedLocation, ParsedTable } from 'parse/types';
-import { isReserved } from 'sql/reference/sqlReferenceRepository';
+import sqlReferenceRepository from 'sql/reference/sqlReferenceRepository';
 import {
   CommentDetails,
   Suggestion
@@ -266,7 +266,10 @@ export default {
     if (identifier.indexOf(quoteChar) === 0) {
       return identifier;
     }
-    if (await isReserved(connector, identifier)) {
+    const reservedKeywords = await sqlReferenceRepository.getReservedKeywords(
+      connector.dialect || 'generic'
+    );
+    if (reservedKeywords.has(identifier.toUpperCase())) {
       return quoteChar + identifier + quoteChar;
     }
 
