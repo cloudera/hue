@@ -25,6 +25,7 @@
     :initial-cursor-position="cursorPosition"
     :initial-value="value"
     :sql-parser-provider="sqlParserProvider"
+    :sql-reference-provider="sqlReferenceProvider"
     @ace-created="aceCreated"
     @create-new-doc="createNewDoc"
     @cursor-changed="cursorChanged"
@@ -45,6 +46,7 @@
   import Executor from 'apps/editor/execution/executor';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import sqlParserRepository from 'parse/sql/sqlParserRepository';
+  import sqlReferenceRepository from 'sql/reference/sqlReferenceRepository';
 
   @Component({
     components: { AceEditor }
@@ -65,6 +67,7 @@
     editorId?: string;
     initialized = false;
     sqlParserProvider = sqlParserRepository;
+    sqlReferenceProvider = sqlReferenceRepository;
     subTracker = new SubscriptionTracker();
     value?: string;
 

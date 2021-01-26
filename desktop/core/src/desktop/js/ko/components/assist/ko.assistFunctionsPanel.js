@@ -18,13 +18,13 @@ import * as ko from 'knockout';
 
 import componentUtils from 'ko/components/componentUtils';
 import { HUE_DROP_DOWN_COMPONENT } from 'ko/components/ko.dropDown';
+import sqlReferenceRepository from 'sql/reference/sqlReferenceRepository';
 import {
   CLEAR_UDF_CACHE_EVENT,
   DESCRIBE_UDF_EVENT,
   getUdfCategories,
-  hasUdfCategories,
   UDF_DESCRIBED_EVENT
-} from 'sql/reference/sqlReferenceRepository';
+} from 'sql/reference/sqlUdfRepository';
 import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'utils/hueConfig';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
@@ -229,7 +229,7 @@ class ConnectorUdfCategories {
   async getUdfs() {
     this.loading(true);
     const categories = [];
-    const functions = await getUdfCategories(this.connector);
+    const functions = await getUdfCategories(sqlReferenceRepository, this.connector);
     functions.forEach(category => {
       const koCategory = {
         name: category.name,
@@ -294,9 +294,9 @@ class AssistFunctionsPanel {
         (this.activeConnector() && this.activeConnector().type) ||
         getFromLocalStorage('assist.function.panel.active.connector.type');
 
-      const availableConnectorUdfs = filterEditorConnectors(hasUdfCategories).map(
-        connector => new ConnectorUdfCategories(connector)
-      );
+      const availableConnectorUdfs = filterEditorConnectors(
+        connector => connector.dialect && sqlReferenceRepository.hasUdfCategories(connector.dialect)
+      ).map(connector => new ConnectorUdfCategories(connector));
 
       availableConnectorUdfs.sort((a, b) =>
         a.connector.displayName.localeCompare(b.connector.displayName)

@@ -101,6 +101,7 @@
   import UdfDetailsPanel from './UdfDetailsPanel.vue';
   import Spinner from 'components/Spinner.vue';
   import { clickOutsideDirective } from 'components/directives/clickOutsideDirective';
+  import { SqlReferenceProvider } from 'sql/reference/types';
   import hueDebug from 'utils/hueDebug';
 
   const aceUtil = <Ace.AceUtil>ace.require('ace/autocomplete/util');
@@ -123,6 +124,8 @@
   export default class AceAutocomplete extends Vue {
     @Prop({ required: true })
     autocompleteParser!: AutocompleteParser;
+    @Prop({ required: true })
+    sqlReferenceProvider!: SqlReferenceProvider;
     @Prop({ required: true })
     editor!: Ace.Editor;
     @Prop({ required: true })
@@ -203,7 +206,8 @@
         executor: this.executor,
         editor: this.editor,
         temporaryOnly: this.temporaryOnly,
-        autocompleteParser: this.autocompleteParser
+        autocompleteParser: this.autocompleteParser,
+        sqlReferenceProvider: this.sqlReferenceProvider
       });
 
       this.subTracker.addDisposable(this.autocompleter);
