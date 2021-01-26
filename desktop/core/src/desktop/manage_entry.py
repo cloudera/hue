@@ -45,7 +45,7 @@ def reload_with_cm_env(cm_managed):
       try:
         if cm_managed:
           sys.argv.append("--cm-managed")
- 
+
         sys.argv.append("--skip-reload")
         os.execv(sys.argv[0], sys.argv)
       except Exception as exc:
@@ -85,11 +85,8 @@ def entry():
 
   if len(sys.argv) > 1:
     subcommand = sys.argv[1]
-  if sys.version_info[0] < 3:
-    args = [None]
-  else:
-    args = []
-  parser = CommandParser(*args, usage="%(prog)s subcommand [options] [args]", add_help=False)
+
+  parser = CommandParser(None, usage="%(prog)s subcommand [options] [args]", add_help=False)
   parser.parse_known_args(sys.argv[2:])
 
   if len(sys.argv) > 1:
