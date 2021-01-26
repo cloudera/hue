@@ -22,6 +22,7 @@
     <ace-autocomplete
       v-if="editor && autocompleteParser"
       :autocomplete-parser="autocompleteParser"
+      :sql-reference-provider="sqlReferenceProvider"
       :editor="editor"
       :editor-id="id"
       :executor="executor"
@@ -54,6 +55,7 @@
   import { defer } from 'utils/hueUtils';
   import I18n from 'utils/i18n';
   import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
+  import { SqlReferenceProvider } from 'sql/reference/types';
 
   // Taken from https://www.cs.tut.fi/~jkorpela/chars/spaces.html
   const UNICODES_TO_REMOVE = /[\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u200B\u202F\u205F\u3000\uFEFF]/gi;
@@ -80,6 +82,8 @@
     aceOptions?: Ace.Options;
     @Prop({ required: false })
     sqlParserProvider?: SqlParserProvider;
+    @Prop({ required: false })
+    sqlReferenceProvider?: SqlReferenceProvider;
 
     subTracker = new SubscriptionTracker();
     editor: Ace.Editor | null = null;

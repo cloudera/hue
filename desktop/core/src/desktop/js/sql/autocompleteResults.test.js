@@ -25,7 +25,8 @@ import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import LOTS_OF_PARSE_RESULTS from './test/lotsOfParseResults';
-import * as sqlReferenceRepository from 'sql/reference/sqlReferenceRepository';
+import * as sqlUdfRepository from 'sql/reference/sqlUdfRepository';
+import sqlReferenceRepository from 'sql/reference/sqlReferenceRepository';
 import { sleep } from '../utils/hueUtils';
 
 describe('AutocompleteResults.js', () => {
@@ -380,7 +381,7 @@ describe('AutocompleteResults.js', () => {
   it('should handle parse results with functions', async () => {
     subject.entries([]);
 
-    const spy = spyOn(sqlReferenceRepository, 'getUdfsWithReturnTypes').and.callFake(async () =>
+    const spy = spyOn(sqlUdfRepository, 'getUdfsWithReturnTypes').and.callFake(async () =>
       Promise.resolve([
         {
           name: 'count',
@@ -413,7 +414,7 @@ describe('AutocompleteResults.js', () => {
   it('should handle parse results with udf argument keywords', async () => {
     subject.entries([]);
 
-    const spy = spyOn(sqlReferenceRepository, 'getArgumentDetailsForUdf').and.callFake(async () =>
+    const spy = spyOn(sqlUdfRepository, 'getArgumentDetailsForUdf').and.callFake(async () =>
       Promise.resolve([{ type: 'T', keywords: ['a', 'b'] }])
     );
 
@@ -440,9 +441,9 @@ describe('AutocompleteResults.js', () => {
     subject.entries([]);
 
     const spy = spyOn(sqlReferenceRepository, 'getSetOptions').and.callFake(
-      async connector =>
+      async dialect =>
         new Promise(resolve => {
-          expect(connector).toEqual(subject.snippet.connector());
+          expect(dialect).toEqual(subject.snippet.connector().dialect);
           resolve({
             OPTION_1: {
               description: 'Desc 1',
