@@ -26,6 +26,7 @@ import {
   Optimizer,
   OptimizerRisk,
   PopularityOptions,
+  RiskHint,
   RiskOptions,
   SimilarityOptions
 } from 'catalog/optimizer/optimizer';
@@ -46,38 +47,50 @@ export default class SqlAnalyzer implements Optimizer {
   }
 
   analyzeRisk(options: RiskOptions): CancellablePromise<OptimizerRisk> {
-    const snippet = JSON.parse(options.snippetJson);
-
-    return new CancellablePromise<OptimizerRisk>(async (resolve, reject) => {
+    return new CancellablePromise<OptimizerRisk>(async (resolve, reject, onCancel) => {
       if (!this.connector.dialect) {
         reject();
         return;
       }
-      const autocompleter = await sqlParserRepository.getAutocompleteParser(this.connector.dialect);
 
+      const apiPromise = this.apiStrategy.analyzeRisk({ ...options, silenceErrors: true });
+
+      onCancel(() => {
+        apiPromise.cancel();
+      });
+
+      const autocompleter = await sqlParserRepository.getAutocompleteParser(this.connector.dialect);
+      const snippet = JSON.parse(options.snippetJson);
       const sqlParseResult = autocompleter.parseSql(snippet.statement + ' ', '');
 
       const hasLimit = sqlParseResult.locations.some(
         location => location.type === 'limitClause' && !location.missing
       );
 
+      const hints: RiskHint[] = !hasLimit
+        ? [
+            {
+              riskTables: [],
+              riskAnalysis: I18n('Query has no limit'),
+              riskId: 22, // To change
+              risk: 'low',
+              riskRecommendation: I18n('Append a limit clause to reduce the size of the result set')
+            }
+          ]
+        : [];
+
+      try {
+        const apiResponse = await apiPromise;
+        if (apiResponse.query_complexity && apiResponse.query_complexity.hints) {
+          hints.push(...apiResponse.query_complexity.hints);
+        }
+      } catch (err) {}
+
       resolve({
         status: 0,
         message: '',
         query_complexity: {
-          hints: !hasLimit
-            ? [
-                {
-                  riskTables: [],
-                  riskAnalysis: I18n('Query has no limit'),
-                  riskId: 22, // To change
-                  risk: 'low',
-                  riskRecommendation: I18n(
-                    'Append a limit clause to reduce the size of the result set'
-                  )
-                }
-              ]
-            : [],
+          hints,
           noStats: true,
           noDDL: false
         }

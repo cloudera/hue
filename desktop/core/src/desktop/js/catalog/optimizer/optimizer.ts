@@ -37,17 +37,19 @@ export interface RiskOptions {
   silenceErrors?: boolean;
 }
 
+export interface RiskHint {
+  riskTables: unknown[];
+  riskAnalysis: string;
+  riskId: number;
+  risk: string;
+  riskRecommendation: string;
+}
+
 export interface OptimizerRisk {
   status: number;
   message: string;
   query_complexity: {
-    hints: {
-      riskTables: unknown[];
-      riskAnalysis: string;
-      riskId: number;
-      risk: string;
-      riskRecommendation: string;
-    }[];
+    hints: RiskHint[];
     noStats: boolean;
     noDDL: boolean;
   };
