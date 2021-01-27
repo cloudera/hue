@@ -15,8 +15,9 @@
 // limitations under the License.
 
 import { CancellablePromise } from 'api/cancellablePromise';
-import { OptimizerMeta } from 'catalog/DataCatalogEntry';
-import { TopAggs, TopColumns, TopFilters, TopJoins } from 'catalog/MultiTableEntry';
+import contextCatalog from 'catalog/contextCatalog';
+import { OptimizerMeta, TableSourceMeta } from 'catalog/DataCatalogEntry';
+import { TopAggs, TopColumns, TopFilters, TopJoins, TopJoinValue } from 'catalog/MultiTableEntry';
 import ApiStrategy from 'catalog/optimizer/ApiStrategy';
 import {
   API_STRATEGY,
@@ -29,9 +30,9 @@ import {
   SimilarityOptions
 } from 'catalog/optimizer/optimizer';
 
-import { OptimizerResponse } from 'catalog/dataCatalog';
+import dataCatalog, { OptimizerResponse } from 'catalog/dataCatalog';
 import sqlParserRepository from 'parse/sql/sqlParserRepository';
-import { Connector } from 'types/config';
+import { Connector, Namespace } from 'types/config';
 import { hueWindow } from 'types/types';
 import I18n from 'utils/i18n';
 
@@ -85,7 +86,57 @@ export default class SqlAnalyzer implements Optimizer {
   }
 
   fetchTopJoins(options: PopularityOptions): CancellablePromise<TopJoins> {
-    return this.apiStrategy.fetchTopJoins(options);
+    const apiPromise = this.apiStrategy.fetchTopJoins(options);
+
+    const path = options.paths[0].join('.');
+
+    return new CancellablePromise<TopJoins>((resolve, reject, onCancel) => {
+      contextCatalog
+        .getNamespaces({ connector: this.connector, silenceErrors: !options.silenceErrors })
+        .then(async (result: { namespaces: Namespace[] }) => {
+          if (!result.namespaces.length || !result.namespaces[0].computes.length) {
+            reject('No namespace or compute found');
+            console.warn(result);
+            return;
+          }
+          const entry = await dataCatalog.getEntry({
+            connector: this.connector,
+            path: path,
+            namespace: result.namespaces[0],
+            compute: result.namespaces[0].computes[0]
+          });
+
+          const sourceMetaPromise = entry.getSourceMeta(options);
+
+          onCancel(() => {
+            apiPromise.cancel();
+            sourceMetaPromise.cancel();
+          });
+
+          try {
+            const sourceMeta = await sourceMetaPromise;
+            const values: TopJoinValue[] = ((<TableSourceMeta>sourceMeta).foreign_keys || []).map(
+              key => ({
+                totalTableCount: 22,
+                totalQueryCount: 3,
+                joinCols: [{ columns: [path + '.' + key.name, key.to] }],
+                tables: [path].concat(key.to.split('.', 2).join('.')),
+                joinType: 'join'
+              })
+            );
+
+            try {
+              const apiResponse = await apiPromise;
+              values.push(...apiResponse.values);
+            } catch (err) {}
+
+            resolve({ values });
+          } catch (err) {
+            reject(err);
+          }
+        })
+        .catch(reject);
+    });
   }
 
   analyzeCompatibility(options: CompatibilityOptions): CancellablePromise<unknown> {
