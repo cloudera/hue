@@ -64,22 +64,16 @@ describe('calciteAutocompleteParser.js SELECT STREAM statements', () => {
       beforeCursor: 'SELECT STREAM ',
       afterCursor: '',
       noErrors: true,
-      containsKeywords: ['ALL', 'DISTINCT'],
       doesNotContainKeywords: ['STREAM'],
       expectedResult: {
-        lowerCase: false
-      }
-    });
-  });
-
-  it('should not suggest DISTINCT keyword after for "SELECT STREAM DISTINCT |"', () => {
-    assertAutoComplete({
-      beforeCursor: 'SELECT STREAM DISTINCT ',
-      afterCursor: '',
-      noErrors: true,
-      containsKeywords: undefined,
-      expectedResult: {
-        lowerCase: false
+        lowerCase: false,
+        suggestTables: {
+          prependFrom: true
+        },
+        suggestDatabases: {
+          prependFrom: true,
+          appendDot: true
+        }
       }
     });
   });

@@ -19,14 +19,14 @@ import * as ko from 'knockout';
 import { MULTI_NAME as SIMPLE_ACE_MULTI } from 'ko/components/simpleAceEditor/ko.simpleAceEditor';
 import { CONTEXT_SELECTOR_COMPONENT } from 'ko/components/ko.contextSelector';
 import { HUE_DROP_DOWN_COMPONENT } from 'ko/components/ko.dropDown';
-import { SIMPLE_RESULT_GRID_COMPONENT } from 'apps/notebook2/components/resultGrid/ko.simpleResultGrid';
+import { SIMPLE_RESULT_GRID_COMPONENT } from 'apps/editor/components/resultGrid/ko.simpleResultGrid';
 
-import 'apps/notebook2/components/ExecutableActionsKoBridge.vue';
+import 'apps/editor/components/ExecutableActionsKoBridge.vue';
 
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
-import Executor from 'apps/notebook2/execution/executor';
-import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
+import Executor from 'apps/editor/execution/executor';
+import SqlExecutable from 'apps/editor/execution/sqlExecutable';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
 import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'utils/hueConfig';
 

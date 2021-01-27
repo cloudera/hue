@@ -599,11 +599,8 @@ export const onHueLinkClick = (event: Event, url: string, target?: string): void
 export const sleep = async (timeout: number): Promise<void> =>
   new Promise(resolve => setTimeout(resolve, timeout));
 
-export const defer = async (callback: () => void): Promise<void> => {
-  await sleep(0);
-  if (callback) {
-    callback();
-  }
+export const defer = (callback: () => void): void => {
+  sleep(0).finally(callback);
 };
 
 export default {

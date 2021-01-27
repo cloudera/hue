@@ -16,7 +16,7 @@
 
 import { Cancellable, CancellablePromise } from 'api/cancellablePromise';
 import { DefaultApiResponse, extractErrorMessage, post, successResponseIsError } from 'api/utils';
-import { closeSession, ExecutionHandle } from 'apps/notebook2/execution/api';
+import { closeSession, ExecutionHandle } from 'apps/editor/execution/api';
 import DataCatalogEntry, {
   Analysis,
   FieldSample,

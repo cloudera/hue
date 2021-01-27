@@ -139,7 +139,8 @@ describe('calciteSyntaxParser.js', () => {
       'DROP',
       'TRUNCATE',
       'UPDATE',
-      'WITH'
+      'WITH',
+      'DESCRIBE'
     ]);
   });
 
@@ -157,7 +158,8 @@ describe('calciteSyntaxParser.js', () => {
       'drop',
       'truncate',
       'update',
-      'with'
+      'with',
+      'describe'
     ]);
   });
 
