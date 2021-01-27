@@ -39,6 +39,26 @@ describe('HueTable.vue', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
+  it('should render a table with array rows', () => {
+    const wrapper = shallowMount(HueTable, {
+      propsData: {
+        columns: <Column<unknown>[]>[
+          { key: 1, label: 'A' },
+          { key: 2, label: 'D' },
+          { key: 3, label: 'C' },
+          { key: 4, label: 'B' }
+        ],
+        rows: <Row[]>[
+          ['1', 5, false, undefined],
+          ['2', 6, true, null],
+          ['3', 7, false],
+          ['4', 8, true]
+        ]
+      }
+    });
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
   it('should render a table with a custom component for a cell', () => {
     const wrapper = mount(HueTable, {
       scopedSlots: {
@@ -61,7 +81,7 @@ describe('HueTable.vue', () => {
   it('should render a table with adapter', () => {
     const wrapper = shallowMount(HueTable, {
       propsData: {
-        columns: <Column[]>[
+        columns: <Column<{ [key: string]: unknown }>[]>[
           { key: 'a', label: 'A' },
           {
             key: 'b',
@@ -74,6 +94,31 @@ describe('HueTable.vue', () => {
           { a: '2', b: 6, c: 10 },
           { a: '3', b: 7, c: 11 },
           { a: '4', b: 8, c: 12 }
+        ]
+      }
+    });
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('should render a sticky table with header and column css', () => {
+    const wrapper = shallowMount(HueTable, {
+      propsData: {
+        columns: <Column<{ [key: string]: unknown }>[]>[
+          {
+            key: 'a',
+            label: 'A',
+            headerCssClass: 'header-css-class-A',
+            cssClass: 'td-css-class-A'
+          },
+          { key: 'b', label: 'B', headerCssClass: 'header-css-class-B', cssClass: 'td-css-class-B' }
+        ],
+        stickyHeader: true,
+        stickyFirstColumn: true,
+        rows: <Row[]>[
+          { a: '1', b: 5 },
+          { a: '2', b: 6 },
+          { a: '3', b: 7 },
+          { a: '4', b: 8 }
         ]
       }
     });

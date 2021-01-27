@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import huePubSub from 'utils/huePubSub';
-import sessionManager from 'apps/notebook2/execution/sessionManager';
+import sessionManager from 'apps/editor/execution/sessionManager';
 import { koSetup } from 'jest/koTestUtils';
 import { NAME, SESSION_PANEL_SHOW_EVENT } from './ko.sessionPanel';
 

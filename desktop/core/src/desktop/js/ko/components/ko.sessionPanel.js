@@ -24,7 +24,7 @@ import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import sessionManager from 'apps/notebook2/execution/sessionManager';
+import sessionManager from 'apps/editor/execution/sessionManager';
 
 export const NAME = 'session-panel';
 export const SESSION_PANEL_SHOW_EVENT = 'session.panel.show';

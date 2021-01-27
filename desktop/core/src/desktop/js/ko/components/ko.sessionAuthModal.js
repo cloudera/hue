@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import sessionManager from 'apps/notebook2/execution/sessionManager';
+import sessionManager from 'apps/editor/execution/sessionManager';
 
 export const SHOW_EVENT = 'show.session.auth.modal';
 export const SHOWN_EVENT = 'session.auth.modal.shown';
