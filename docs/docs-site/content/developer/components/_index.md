@@ -66,11 +66,11 @@ Here is an example on how to use the er-diagram component once installed:
 
 er-diagram can be imported into an html file using a simple script tag as follows.
 
-    <script type = "text/javascript" src="node_modules/gethue/web/er-diagram.js"></script>
+    <script type = "text/javascript" src="node_modules/gethue/components/er-diagram.js"></script>
 
 If you are using a bundler like webpack. They can be imported using a normal import statement.
 
-    import 'gethue/web/er-diagram';
+    import 'gethue/components/er-diagram';
 
 ### Instantiate
 
