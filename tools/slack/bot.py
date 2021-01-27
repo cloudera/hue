@@ -3,9 +3,10 @@ from slack_sdk import WebClient
 from pathlib import Path
 from dotenv import load_dotenv
  
+ #Create .env file and load it
 load_dotenv()
  
-client = WebClient(token = os.getenv('SLACK_BOT_TOKEN'))
+client = WebClient(token = os.getenv('SLACK_BOT_TOKEN')) # Add SLACK_BOT_TOKEN in .env 
  
 try:
   client.chat_postMessage(channel = '#dev-hue-bot', text = "test")
