@@ -125,6 +125,8 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
   if user is not None and not is_admin(user):  # Apply Permissions
     connectors_objects = connectors_objects.filter(huepermission__in=user.get_permissions())
 
+  connectors_objects = connectors_objects.order_by('id')
+
   connector_instances = [
       {
         'id': connector.id,
