@@ -6,10 +6,10 @@ from dotenv import load_dotenv
  #Create .env file and load it
 load_dotenv()
  
-client = WebClient(token = os.getenv('SLACK_BOT_TOKEN')) # Add SLACK_BOT_TOKEN in .env 
+client = WebClient(token=os.getenv('SLACK_BOT_TOKEN')) # Add SLACK_BOT_TOKEN in .env 
  
 try:
-  client.chat_postMessage(channel = '#dev-hue-bot', text = "test")
+  client.chat_postMessage(channel='#dev-hue-bot', text="test")
  
 except SlackApiError as err:
   # You will get a SlackApiError if "ok" is False
