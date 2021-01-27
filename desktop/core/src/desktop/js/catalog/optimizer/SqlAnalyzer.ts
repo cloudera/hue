@@ -15,10 +15,11 @@
 // limitations under the License.
 
 import { CancellablePromise } from 'api/cancellablePromise';
-import contextCatalog from 'catalog/contextCatalog';
-import { OptimizerMeta, TableSourceMeta } from 'catalog/DataCatalogEntry';
+import { OptimizerMeta } from 'catalog/DataCatalogEntry';
 import { TopAggs, TopColumns, TopFilters, TopJoins } from 'catalog/MultiTableEntry';
+import ApiStrategy from 'catalog/optimizer/ApiStrategy';
 import {
+  API_STRATEGY,
   CompatibilityOptions,
   MetaOptions,
   Optimizer,
@@ -28,15 +29,18 @@ import {
   SimilarityOptions
 } from 'catalog/optimizer/optimizer';
 
-import dataCatalog, { OptimizerResponse } from 'catalog/dataCatalog';
+import { OptimizerResponse } from 'catalog/dataCatalog';
 import sqlParserRepository from 'parse/sql/sqlParserRepository';
-import { Connector, Namespace } from 'types/config';
+import { Connector } from 'types/config';
+import { hueWindow } from 'types/types';
 import I18n from 'utils/i18n';
 
-export default class LocalStrategy implements Optimizer {
+export default class SqlAnalyzer implements Optimizer {
+  apiStrategy: ApiStrategy;
   connector: Connector;
 
   constructor(connector: Connector) {
+    this.apiStrategy = new ApiStrategy(connector);
     this.connector = connector;
   }
 
@@ -80,79 +84,56 @@ export default class LocalStrategy implements Optimizer {
     });
   }
 
-  fetchTopJoins({ paths, silenceErrors }: PopularityOptions): CancellablePromise<TopJoins> {
-    const path = paths[0].join('.');
-
-    return new CancellablePromise<TopJoins>((resolve, reject, onCancel) => {
-      contextCatalog
-        .getNamespaces({ connector: this.connector, silenceErrors: !silenceErrors })
-        .then(async (result: { namespaces: Namespace[] }) => {
-          if (!result.namespaces.length || !result.namespaces[0].computes.length) {
-            reject('No namespace or compute found');
-            console.warn(result);
-            return;
-          }
-          const entry = await dataCatalog.getEntry({
-            connector: this.connector,
-            path: path,
-            namespace: result.namespaces[0],
-            compute: result.namespaces[0].computes[0]
-          });
-
-          const sourceMetaPromise = entry.getSourceMeta({ silenceErrors });
-
-          onCancel(() => {
-            sourceMetaPromise.cancel();
-          });
-
-          const sourceMeta = await sourceMetaPromise;
-
-          resolve({
-            values: ((<TableSourceMeta>sourceMeta).foreign_keys || []).map(key => ({
-              totalTableCount: 22,
-              totalQueryCount: 3,
-              joinCols: [{ columns: [path + '.' + key.name, key.to] }],
-              tables: [path].concat(key.to.split('.', 2).join('.')),
-              joinType: 'join'
-            }))
-          });
-        })
-        .catch(reject);
-    });
+  fetchTopJoins(options: PopularityOptions): CancellablePromise<TopJoins> {
+    return this.apiStrategy.fetchTopJoins(options);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   analyzeCompatibility(options: CompatibilityOptions): CancellablePromise<unknown> {
+    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
+      return this.apiStrategy.analyzeCompatibility(options);
+    }
     return CancellablePromise.reject('analyzeCompatibility is not Implemented');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   analyzeSimilarity(options: SimilarityOptions): CancellablePromise<unknown> {
+    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
+      return this.apiStrategy.analyzeSimilarity(options);
+    }
     return CancellablePromise.reject('analyzeSimilarity is not Implemented');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fetchOptimizerMeta(options: MetaOptions): CancellablePromise<OptimizerMeta> {
+    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
+      return this.apiStrategy.fetchOptimizerMeta(options);
+    }
     return CancellablePromise.reject('fetchOptimizerMeta is not Implemented');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fetchPopularity(options: PopularityOptions): CancellablePromise<OptimizerResponse> {
+    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
+      return this.apiStrategy.fetchPopularity(options);
+    }
     return CancellablePromise.reject('fetchPopularity is not Implemented');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fetchTopAggs(options: PopularityOptions): CancellablePromise<TopAggs> {
+    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
+      return this.apiStrategy.fetchTopAggs(options);
+    }
     return CancellablePromise.reject('fetchTopAggs is not Implemented');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fetchTopColumns(options: PopularityOptions): CancellablePromise<TopColumns> {
+    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
+      return this.apiStrategy.fetchTopColumns(options);
+    }
     return CancellablePromise.reject('fetchTopColumns is not Implemented');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fetchTopFilters(options: PopularityOptions): CancellablePromise<TopFilters> {
+    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
+      return this.apiStrategy.fetchTopFilters(options);
+    }
     return CancellablePromise.reject('fetchTopFilters is not Implemented');
   }
 }
