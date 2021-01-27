@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`HueTable.vue should render a stickt table with header and column css 1`] = `
+exports[`HueTable.vue should render a sticky table with header and column css 1`] = `
 <div
   class="hue-table-container"
 >

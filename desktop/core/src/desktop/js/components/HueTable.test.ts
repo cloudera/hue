@@ -100,7 +100,7 @@ describe('HueTable.vue', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
-  it('should render a stickt table with header and column css', () => {
+  it('should render a sticky table with header and column css', () => {
     const wrapper = shallowMount(HueTable, {
       propsData: {
         columns: <Column<{ [key: string]: unknown }>[]>[
