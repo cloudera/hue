@@ -17,13 +17,16 @@
 import { CancellablePromise } from 'api/cancellablePromise';
 import contextCatalog from 'catalog/contextCatalog';
 import { OptimizerMeta, TableSourceMeta } from 'catalog/DataCatalogEntry';
-import { TopAggs, TopColumns, TopFilters, TopJoins } from 'catalog/MultiTableEntry';
+import { TopAggs, TopColumns, TopFilters, TopJoins, TopJoinValue } from 'catalog/MultiTableEntry';
+import ApiStrategy from 'catalog/optimizer/ApiStrategy';
 import {
+  API_STRATEGY,
   CompatibilityOptions,
   MetaOptions,
   Optimizer,
   OptimizerRisk,
   PopularityOptions,
+  RiskHint,
   RiskOptions,
   SimilarityOptions
 } from 'catalog/optimizer/optimizer';
@@ -31,48 +34,63 @@ import {
 import dataCatalog, { OptimizerResponse } from 'catalog/dataCatalog';
 import sqlParserRepository from 'parse/sql/sqlParserRepository';
 import { Connector, Namespace } from 'types/config';
+import { hueWindow } from 'types/types';
 import I18n from 'utils/i18n';
 
-export default class LocalStrategy implements Optimizer {
+export default class SqlAnalyzer implements Optimizer {
+  apiStrategy: ApiStrategy;
   connector: Connector;
 
   constructor(connector: Connector) {
+    this.apiStrategy = new ApiStrategy(connector);
     this.connector = connector;
   }
 
   analyzeRisk(options: RiskOptions): CancellablePromise<OptimizerRisk> {
-    const snippet = JSON.parse(options.snippetJson);
-
-    return new CancellablePromise<OptimizerRisk>(async (resolve, reject) => {
+    return new CancellablePromise<OptimizerRisk>(async (resolve, reject, onCancel) => {
       if (!this.connector.dialect) {
         reject();
         return;
       }
-      const autocompleter = await sqlParserRepository.getAutocompleteParser(this.connector.dialect);
 
+      const apiPromise = this.apiStrategy.analyzeRisk({ ...options, silenceErrors: true });
+
+      onCancel(() => {
+        apiPromise.cancel();
+      });
+
+      const autocompleter = await sqlParserRepository.getAutocompleteParser(this.connector.dialect);
+      const snippet = JSON.parse(options.snippetJson);
       const sqlParseResult = autocompleter.parseSql(snippet.statement + ' ', '');
 
       const hasLimit = sqlParseResult.locations.some(
         location => location.type === 'limitClause' && !location.missing
       );
 
+      const hints: RiskHint[] = !hasLimit
+        ? [
+            {
+              riskTables: [],
+              riskAnalysis: I18n('Query has no limit'),
+              riskId: 22, // To change
+              risk: 'low',
+              riskRecommendation: I18n('Append a limit clause to reduce the size of the result set')
+            }
+          ]
+        : [];
+
+      try {
+        const apiResponse = await apiPromise;
+        if (apiResponse.query_complexity && apiResponse.query_complexity.hints) {
+          hints.push(...apiResponse.query_complexity.hints);
+        }
+      } catch (err) {}
+
       resolve({
         status: 0,
         message: '',
         query_complexity: {
-          hints: !hasLimit
-            ? [
-                {
-                  riskTables: [],
-                  riskAnalysis: I18n('Query has no limit'),
-                  riskId: 22, // To change
-                  risk: 'low',
-                  riskRecommendation: I18n(
-                    'Append a limit clause to reduce the size of the result set'
-                  )
-                }
-              ]
-            : [],
+          hints,
           noStats: true,
           noDDL: false
         }
@@ -80,12 +98,14 @@ export default class LocalStrategy implements Optimizer {
     });
   }
 
-  fetchTopJoins({ paths, silenceErrors }: PopularityOptions): CancellablePromise<TopJoins> {
-    const path = paths[0].join('.');
+  fetchTopJoins(options: PopularityOptions): CancellablePromise<TopJoins> {
+    const apiPromise = this.apiStrategy.fetchTopJoins(options);
+
+    const path = options.paths[0].join('.');
 
     return new CancellablePromise<TopJoins>((resolve, reject, onCancel) => {
       contextCatalog
-        .getNamespaces({ connector: this.connector, silenceErrors: !silenceErrors })
+        .getNamespaces({ connector: this.connector, silenceErrors: !options.silenceErrors })
         .then(async (result: { namespaces: Namespace[] }) => {
           if (!result.namespaces.length || !result.namespaces[0].computes.length) {
             reject('No namespace or compute found');
@@ -99,60 +119,85 @@ export default class LocalStrategy implements Optimizer {
             compute: result.namespaces[0].computes[0]
           });
 
-          const sourceMetaPromise = entry.getSourceMeta({ silenceErrors });
+          const sourceMetaPromise = entry.getSourceMeta(options);
 
           onCancel(() => {
+            apiPromise.cancel();
             sourceMetaPromise.cancel();
           });
 
-          const sourceMeta = await sourceMetaPromise;
+          try {
+            const sourceMeta = await sourceMetaPromise;
+            const values: TopJoinValue[] = ((<TableSourceMeta>sourceMeta).foreign_keys || []).map(
+              key => ({
+                totalTableCount: 22,
+                totalQueryCount: 3,
+                joinCols: [{ columns: [path + '.' + key.name, key.to] }],
+                tables: [path].concat(key.to.split('.', 2).join('.')),
+                joinType: 'join'
+              })
+            );
 
-          resolve({
-            values: ((<TableSourceMeta>sourceMeta).foreign_keys || []).map(key => ({
-              totalTableCount: 22,
-              totalQueryCount: 3,
-              joinCols: [{ columns: [path + '.' + key.name, key.to] }],
-              tables: [path].concat(key.to.split('.', 2).join('.')),
-              joinType: 'join'
-            }))
-          });
+            try {
+              const apiResponse = await apiPromise;
+              values.push(...apiResponse.values);
+            } catch (err) {}
+
+            resolve({ values });
+          } catch (err) {
+            reject(err);
+          }
         })
         .catch(reject);
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   analyzeCompatibility(options: CompatibilityOptions): CancellablePromise<unknown> {
+    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
+      return this.apiStrategy.analyzeCompatibility(options);
+    }
     return CancellablePromise.reject('analyzeCompatibility is not Implemented');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   analyzeSimilarity(options: SimilarityOptions): CancellablePromise<unknown> {
+    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
+      return this.apiStrategy.analyzeSimilarity(options);
+    }
     return CancellablePromise.reject('analyzeSimilarity is not Implemented');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fetchOptimizerMeta(options: MetaOptions): CancellablePromise<OptimizerMeta> {
+    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
+      return this.apiStrategy.fetchOptimizerMeta(options);
+    }
     return CancellablePromise.reject('fetchOptimizerMeta is not Implemented');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fetchPopularity(options: PopularityOptions): CancellablePromise<OptimizerResponse> {
+    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
+      return this.apiStrategy.fetchPopularity(options);
+    }
     return CancellablePromise.reject('fetchPopularity is not Implemented');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fetchTopAggs(options: PopularityOptions): CancellablePromise<TopAggs> {
+    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
+      return this.apiStrategy.fetchTopAggs(options);
+    }
     return CancellablePromise.reject('fetchTopAggs is not Implemented');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fetchTopColumns(options: PopularityOptions): CancellablePromise<TopColumns> {
+    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
+      return this.apiStrategy.fetchTopColumns(options);
+    }
     return CancellablePromise.reject('fetchTopColumns is not Implemented');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fetchTopFilters(options: PopularityOptions): CancellablePromise<TopFilters> {
+    if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
+      return this.apiStrategy.fetchTopFilters(options);
+    }
     return CancellablePromise.reject('fetchTopFilters is not Implemented');
   }
 }

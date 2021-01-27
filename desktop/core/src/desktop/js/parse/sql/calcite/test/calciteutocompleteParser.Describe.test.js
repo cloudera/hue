@@ -16,7 +16,7 @@
 
 import calciteAutocompleteParser from '../calciteAutocompleteParser';
 
-describe('calciteAutocompleteParser.js SELECT STREAM statements', () => {
+describe('calciteAutocompleteParser.js DESCRIBE statements', () => {
   beforeAll(() => {
     calciteAutocompleteParser.yy.parseError = function (msg) {
       throw Error(msg);
@@ -35,45 +35,35 @@ describe('calciteAutocompleteParser.js SELECT STREAM statements', () => {
     ).toEqualDefinition(testDefinition);
   };
 
-  it('should suggest STREAM keywords for "SELECT |"', () => {
+  it('should suggest keywords for "|"', () => {
     assertAutoComplete({
-      beforeCursor: 'SELECT ',
+      beforeCursor: '',
       afterCursor: '',
-      noErrors: true,
-      containsKeywords: ['STREAM'],
+      containsKeywords: ['DESCRIBE'],
       expectedResult: {
-        lowerCase: false,
-        suggestTables: {
-          prependQuestionMark: true,
-          prependFrom: true
-        },
-        suggestAggregateFunctions: { tables: [] },
-        suggestAnalyticFunctions: true,
-        suggestFunctions: {},
-        suggestDatabases: {
-          prependQuestionMark: true,
-          prependFrom: true,
-          appendDot: true
-        }
+        lowerCase: false
       }
     });
   });
 
-  it('should suggest ALL keyword after for "SELECT STREAM |"', () => {
+  it('should suggest keywords for "DESCRIBE |"', () => {
     assertAutoComplete({
-      beforeCursor: 'SELECT STREAM ',
+      beforeCursor: 'DESCRIBE ',
       afterCursor: '',
-      noErrors: true,
-      doesNotContainKeywords: ['STREAM'],
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
+
+  it('should handle "DESCRIBE db.tbl;|"', () => {
+    assertAutoComplete({
+      beforeCursor: 'DESCRIBE db.tbl;',
+      afterCursor: '',
+      containsKeywords: ['SELECT'],
       expectedResult: {
         lowerCase: false,
-        suggestTables: {
-          prependFrom: true
-        },
-        suggestDatabases: {
-          prependFrom: true,
-          appendDot: true
-        }
+        locations: []
       }
     });
   });
