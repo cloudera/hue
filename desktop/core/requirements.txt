@@ -18,6 +18,7 @@ django-crequest==2018.5.11
 django-debug-panel==0.8.3
 django-debug-toolbar==1.9.1
 django-extensions==1.8.0
+django-ipware==2.1.0
 django-nose==1.4.7
 django_opentracing==1.1.0
 django_prometheus==1.0.15

@@ -45,7 +45,7 @@ def reload_with_cm_env(cm_managed):
       try:
         if cm_managed:
           sys.argv.append("--cm-managed")
- 
+
         sys.argv.append("--skip-reload")
         os.execv(sys.argv[0], sys.argv)
       except Exception as exc:
@@ -85,6 +85,7 @@ def entry():
 
   if len(sys.argv) > 1:
     subcommand = sys.argv[1]
+
   parser = CommandParser(None, usage="%(prog)s subcommand [options] [args]", add_help=False)
   parser.parse_known_args(sys.argv[2:])
 
@@ -92,9 +93,9 @@ def entry():
     prof_id = subcommand = sys.argv[1]
     #Check if this is a CM managed cluster
     if os.path.isfile(cm_config_file) and not cm_managed and not skip_reload:
-        print("ALERT: This appears to be a CM Managed environment")
-        print("ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment")
-        print("ALERT: Please run 'hue <command> --cm-managed'")
+      print("ALERT: This appears to be a CM Managed environment")
+      print("ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment")
+      print("ALERT: Please run 'hue <command> --cm-managed'")
   else:
     prof_id = str(os.getpid())
 
