@@ -17,7 +17,8 @@
 import * as ko from 'knockout';
 
 import I18n from 'utils/i18n';
-import { findUdf } from 'sql/reference/sqlReferenceRepository';
+import { findUdf } from 'sql/reference/sqlUdfRepository';
+import sqlReferenceRepository from 'sql/reference/sqlReferenceRepository';
 
 const TEMPLATE_NAME = 'context-popover-function-details';
 
@@ -44,7 +45,7 @@ class FunctionContextTabs {
     this.loading = ko.observable(true);
     this.hasErrors = ko.observable(false);
 
-    findUdf(connector, data.function)
+    findUdf(sqlReferenceRepository, connector, data.function)
       .then(udfs => {
         // TODO: Support showing multiple UDFs with the same name but different category in the context popover.
         // For instance, trunc appears both for dates with one description and for numbers with another description.

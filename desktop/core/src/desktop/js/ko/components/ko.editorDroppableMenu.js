@@ -23,7 +23,7 @@ import sqlUtils from 'sql/sqlUtils';
 import DisposableComponent from './DisposableComponent';
 import { DRAGGABLE_TEXT_META_EVENT } from 'ko/bindings/ko.draggableText';
 import { INSERT_AT_CURSOR_EVENT } from 'ko/bindings/ace/ko.aceEditor';
-import { defer, sleep } from 'utils/hueUtils';
+import { sleep } from 'utils/hueUtils';
 
 export const NAME = 'hue-editor-droppable-menu';
 
@@ -83,7 +83,7 @@ class EditorDroppableMenu extends DisposableComponent {
       $tableDropMenu,
       $('.content-panel'),
       async () => {
-        await defer();
+        await sleep(0);
         $(document).on('click.' + NAME, async () => {
           if (this.menu) {
             $tableDropMenu.css('opacity', 0);

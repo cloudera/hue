@@ -25,16 +25,16 @@ import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import sqlUtils from 'sql/sqlUtils';
 import { matchesType } from 'sql/reference/typeUtils';
-import { DIALECT } from 'apps/notebook2/snippet';
+import { DIALECT } from 'apps/editor/snippet';
 import { cancelActiveRequest } from 'api/apiUtils';
 import { findBrowserConnector, getRootFilePath } from 'utils/hueConfig';
 import {
   findUdf,
   getArgumentDetailsForUdf,
   getUdfsWithReturnTypes,
-  getReturnTypesForUdf,
-  getSetOptions
-} from './reference/sqlReferenceRepository';
+  getReturnTypesForUdf
+} from './reference/sqlUdfRepository';
+import sqlReferenceRepository from './reference/sqlReferenceRepository';
 
 const normalizedColors = HueColors.getNormalizedColors();
 
@@ -253,7 +253,7 @@ class AutocompleteResults {
    */
   constructor(options) {
     this.snippet = options.snippet;
-    this.dialect = () => (window.ENABLE_NOTEBOOK_2 ? this.snippet.dialect() : this.snippet.type());
+    this.dialect = () => this.snippet.type();
     this.editor = options.editor;
     this.temporaryOnly =
       options.snippet.autocompleteSettings && options.snippet.autocompleteSettings.temporaryOnly;
@@ -482,6 +482,7 @@ class AutocompleteResults {
 
   async adjustForUdfArgument() {
     const foundArgumentDetails = (await getArgumentDetailsForUdf(
+      sqlReferenceRepository,
       this.snippet.connector(),
       this.parseResult.udfArgument.name,
       this.parseResult.udfArgument.position
@@ -670,7 +671,11 @@ class AutocompleteResults {
         });
       } else if (type === 'UDFREF') {
         try {
-          const types = await getReturnTypesForUdf(this.snippet.connector(), columnAlias.udfRef);
+          const types = await getReturnTypesForUdf(
+            sqlReferenceRepository,
+            this.snippet.connector(),
+            columnAlias.udfRef
+          );
           const resolvedType = types.length === 1 ? types[0] : 'T';
           columnAliasSuggestions.push({
             value: columnAlias.name,
@@ -723,7 +728,9 @@ class AutocompleteResults {
       return [];
     }
     try {
-      const setOptions = await getSetOptions(this.snippet.connector());
+      const setOptions = await sqlReferenceRepository.getSetOptions(
+        this.snippet.connector().dialect || ''
+      );
       return Object.keys(setOptions).map(name => ({
         category: CATEGORIES.OPTION,
         value: name,
@@ -752,6 +759,7 @@ class AutocompleteResults {
       const getUdfsForTypes = async types => {
         try {
           const functionsToSuggest = await getUdfsWithReturnTypes(
+            sqlReferenceRepository,
             this.snippet.connector(),
             types,
             this.parseResult.suggestAggregateFunctions || false,
@@ -785,7 +793,11 @@ class AutocompleteResults {
           const colRef = await colRefPromise;
           types = [colRef.type.toUpperCase()];
         } else {
-          types = await getReturnTypesForUdf(this.snippet.connector(), suggestFunctions.udfRef);
+          types = await getReturnTypesForUdf(
+            sqlReferenceRepository,
+            this.snippet.connector(),
+            suggestFunctions.udfRef
+          );
         }
       } catch (err) {}
       suggestions = await getUdfsForTypes(types);
@@ -794,6 +806,7 @@ class AutocompleteResults {
 
       try {
         const functionsToSuggest = await getUdfsWithReturnTypes(
+          sqlReferenceRepository,
           this.snippet.connector(),
           types,
           this.parseResult.suggestAggregateFunctions || false,
@@ -977,7 +990,11 @@ class AutocompleteResults {
         const colRef = await colRefPromise;
         types = [colRef.type.toUpperCase()];
       } else if (suggestColumns.types && suggestColumns.types[0] === 'UDFREF') {
-        types = await getReturnTypesForUdf(this.snippet.connector(), suggestColumns.udfRef);
+        types = await getReturnTypesForUdf(
+          sqlReferenceRepository,
+          this.snippet.connector(),
+          suggestColumns.udfRef
+        );
       }
     } catch (err) {}
 
@@ -1771,7 +1788,11 @@ class AutocompleteResults {
           clean = clean.replace(substitution.replace, substitution.with);
         });
 
-        const foundUdfs = await findUdf(this.snippet.connector(), value.aggregateFunction);
+        const foundUdfs = await findUdf(
+          sqlReferenceRepository,
+          this.snippet.connector(),
+          value.aggregateFunction
+        );
 
         // TODO: Support showing multiple UDFs with the same name but different category in the autocomplete details.
         // For instance, trunc appears both for dates with one description and for numbers with another description.
