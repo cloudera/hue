@@ -135,11 +135,13 @@ describe('flinkSyntaxParser.js', () => {
       'ALTER',
       'INSERT',
       'CREATE',
+      'SHOW',
       'USE',
       'DROP',
       'TRUNCATE',
       'UPDATE',
-      'WITH'
+      'WITH',
+      'DESCRIBE'
     ]);
   });
 
@@ -153,11 +155,13 @@ describe('flinkSyntaxParser.js', () => {
       'alter',
       'insert',
       'create',
+      'show',
       'use',
       'drop',
       'truncate',
       'update',
-      'with'
+      'with',
+      'describe'
     ]);
   });
 
@@ -204,5 +208,40 @@ describe('flinkSyntaxParser.js', () => {
     );
 
     expectNonEqualIds('slelect ', '', 'select * form ', '');
+  });
+
+  it('should not find errors for "DESCRIBE tbl"', () => {
+    const result = flinkSyntaxParser.parseSyntax('DESCRIBE tbl;', '');
+    expect(result).toBeFalsy();
+  });
+
+  it('should not find errors for "DESCRIBE db.tbl"', () => {
+    const result = flinkSyntaxParser.parseSyntax('DESCRIBE db.tbl;', '');
+    expect(result).toBeFalsy();
+  });
+
+  it('should not find errors for "DESCRIBE ctlg.db.tbl"', () => {
+    const result = flinkSyntaxParser.parseSyntax('DESCRIBE ctlg.db.tbl;', '');
+    expect(result).toBeFalsy();
+  });
+
+  it('should find errors for "DESCRIBE fake.ctlg.db.tbl"', () => {
+    const result = flinkSyntaxParser.parseSyntax('DESCRIBE fake.ctlg.db.tbl;', '');
+    expect(result.incompleteStatement).toBeTruthy();
+  });
+
+  it('should report incomplete statement for "DESCRIBE"', () => {
+    const result = flinkSyntaxParser.parseSyntax('DESCRIBE', '');
+    expect(result.incompleteStatement).toBeTruthy();
+  });
+
+  it('should report incomplete statement for "DESCRIBE db.;"', () => {
+    const result = flinkSyntaxParser.parseSyntax('DESCRIBE db.;', '');
+    expect(result.incompleteStatement).toBeTruthy();
+  });
+
+  it('should report incomplete statement for "DESCRIBE ctlg.db.;"', () => {
+    const result = flinkSyntaxParser.parseSyntax('DESCRIBE ctlg.db.;', '');
+    expect(result.incompleteStatement).toBeTruthy();
   });
 });
