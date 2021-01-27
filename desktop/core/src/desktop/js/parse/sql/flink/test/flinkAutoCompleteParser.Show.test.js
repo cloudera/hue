@@ -17,87 +17,87 @@
 import flinkAutocompleteParser from '../flinkAutocompleteParser';
 
 describe('flinkAutocompleteParser.js SHOW statements', () => {
-    beforeAll(() => {
-        flinkAutocompleteParser.yy.parseError = function (msg) {
-            throw Error(msg);
-        };
-    });
-
-    const assertAutoComplete = testDefinition => {
-        const debug = false;
-
-        expect(
-            flinkAutocompleteParser.parseSql(
-                testDefinition.beforeCursor,
-                testDefinition.afterCursor,
-                debug
-            )
-        ).toEqualDefinition(testDefinition);
+  beforeAll(() => {
+    flinkAutocompleteParser.yy.parseError = function (msg) {
+      throw Error(msg);
     };
+  });
 
-    it('should suggest keywords for "|"', () => {
-        assertAutoComplete({
-            beforeCursor: '',
-            afterCursor: '',
-            containsKeywords: ['SHOW'],
-            expectedResult: {
-                lowerCase: false
-            }
-        });
-    });
+  const assertAutoComplete = testDefinition => {
+    const debug = false;
 
-    it('should suggest keywords for "SHOW |"', () => {
-        assertAutoComplete({
-            beforeCursor: 'SHOW ',
-            afterCursor: '',
-            expectedResult: {
-                lowerCase: false,
-                suggestKeywords: [
-                    'CATALOGS',
-                    'CURRENT CATALOG',
-                    'CURRENT DATABASE',
-                    'DATABASES',
-                    'FUNCTIONS',
-                    'TABLES',
-                    'VIEWS',
-                ]
-            }
-        });
-    });
+    expect(
+      flinkAutocompleteParser.parseSql(
+        testDefinition.beforeCursor,
+        testDefinition.afterCursor,
+        debug
+      )
+    ).toEqualDefinition(testDefinition);
+  };
 
-    it('should handle "SHOW CA"', () => {
-        assertAutoComplete({
-            beforeCursor: 'SHOW CA',
-            afterCursor: '',
-            noErrors: true,
-            containsKeywords: ['CATALOGS','CURRENT CATALOG'],
-            expectedResult: {
-                lowerCase: false
-            }
-        });
+  it('should suggest keywords for "|"', () => {
+    assertAutoComplete({
+      beforeCursor: '',
+      afterCursor: '',
+      containsKeywords: ['SHOW'],
+      expectedResult: {
+        lowerCase: false
+      }
     });
+  });
 
-    it('should handle "SHOW TAB"', () => {
-        assertAutoComplete({
-            beforeCursor: 'SHOW TAB',
-            afterCursor: '',
-            noErrors: true,
-            containsKeywords: ['TABLES','CURRENT DATABASE','DATABASES'],
-            expectedResult: {
-                lowerCase: false
-            }
-        });
+  it('should suggest keywords for "SHOW |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SHOW ',
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false,
+        suggestKeywords: [
+          'CATALOGS',
+          'CURRENT CATALOG',
+          'CURRENT DATABASE',
+          'DATABASES',
+          'FUNCTIONS',
+          'TABLES',
+          'VIEWS'
+        ]
+      }
     });
+  });
 
-    it('should handle "SHOW DAT"', () => {
-        assertAutoComplete({
-            beforeCursor: 'SHOW DAT',
-            afterCursor: '',
-            noErrors: true,
-            containsKeywords: ['DATABASES','CURRENT DATABASE'],
-            expectedResult: {
-                lowerCase: false
-            }
-        });
+  it('should handle "SHOW CA"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SHOW CA',
+      afterCursor: '',
+      noErrors: true,
+      containsKeywords: ['CATALOGS', 'CURRENT CATALOG'],
+      expectedResult: {
+        lowerCase: false
+      }
     });
+  });
+
+  it('should handle "SHOW TAB"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SHOW TAB',
+      afterCursor: '',
+      noErrors: true,
+      containsKeywords: ['TABLES', 'CURRENT DATABASE', 'DATABASES'],
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
+
+  it('should handle "SHOW DAT"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SHOW DAT',
+      afterCursor: '',
+      noErrors: true,
+      containsKeywords: ['DATABASES', 'CURRENT DATABASE'],
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
 });

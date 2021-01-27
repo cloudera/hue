@@ -17,88 +17,88 @@
 import flinkAutocompleteParser from '../flinkAutocompleteParser';
 
 describe('flinkAutocompleteParser.js DESCRIBE statements', () => {
-    beforeAll(() => {
-        flinkAutocompleteParser.yy.parseError = function (msg) {
-            throw Error(msg);
-        };
-    });
-
-    const assertAutoComplete = testDefinition => {
-        const debug = false;
-
-        expect(
-            flinkAutocompleteParser.parseSql(
-                testDefinition.beforeCursor,
-                testDefinition.afterCursor,
-                debug
-            )
-        ).toEqualDefinition(testDefinition);
+  beforeAll(() => {
+    flinkAutocompleteParser.yy.parseError = function (msg) {
+      throw Error(msg);
     };
+  });
 
-    it('should suggest keywords for "|"', () => {
-        assertAutoComplete({
-            beforeCursor: '',
-            afterCursor: '',
-            containsKeywords: ['DESCRIBE'],
-            expectedResult: {
-                lowerCase: false
-            }
-        });
-    });
+  const assertAutoComplete = testDefinition => {
+    const debug = false;
 
-    it('should suggest keywords for "DESCRIBE |"', () => {
-        assertAutoComplete({
-            beforeCursor: 'DESCRIBE ',
-            afterCursor: '',
-            expectedResult: {
-                lowerCase: false,
-                suggestTables: {},
-                suggestDatabases: { appendDot: true }
-            }
-        });
-    });
+    expect(
+      flinkAutocompleteParser.parseSql(
+        testDefinition.beforeCursor,
+        testDefinition.afterCursor,
+        debug
+      )
+    ).toEqualDefinition(testDefinition);
+  };
 
-    it('should handle "DESCRIBE db.tbl;|"', () => {
-        assertAutoComplete({
-            beforeCursor: 'DESCRIBE db.tbl;',
-            afterCursor: '',
-            containsKeywords: ['SELECT'],
-            expectedResult: {
-                lowerCase: false,
-                locations: [
-                    {
-                        type: 'statement',
-                        location: { first_line: 1, last_line: 1, first_column: 1, last_column: 16 }
-                    },
-                    {
-                        type: 'statementType',
-                        location: { first_line: 1, last_line: 1, first_column: 1, last_column: 9 },
-                        identifier: 'DESCRIBE'
-                    },
-                    {
-                        type: 'database',
-                        location: { first_line: 1, last_line: 1, first_column: 10, last_column: 12 },
-                        identifierChain: [{ name: 'db' }]
-                    },
-                    {
-                        type: 'table',
-                        location: { first_line: 1, last_line: 1, first_column: 13, last_column: 16 },
-                        identifierChain: [{ name: 'db' }, { name: 'tbl' }]
-                    }
-                ]
-            }
-        });
+  it('should suggest keywords for "|"', () => {
+    assertAutoComplete({
+      beforeCursor: '',
+      afterCursor: '',
+      containsKeywords: ['DESCRIBE'],
+      expectedResult: {
+        lowerCase: false
+      }
     });
+  });
 
-    it('should suggest tables for "DESCRIBE |"', () => {
-        assertAutoComplete({
-            beforeCursor: 'DESCRIBE ',
-            afterCursor: '',
-            expectedResult: {
-                lowerCase: false,
-                suggestTables: {},
-                suggestDatabases: { appendDot: true }
-            }
-        });
+  it('should suggest keywords for "DESCRIBE |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'DESCRIBE ',
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false,
+        suggestTables: {},
+        suggestDatabases: { appendDot: true }
+      }
     });
+  });
+
+  it('should handle "DESCRIBE db.tbl;|"', () => {
+    assertAutoComplete({
+      beforeCursor: 'DESCRIBE db.tbl;',
+      afterCursor: '',
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: false,
+        locations: [
+          {
+            type: 'statement',
+            location: { first_line: 1, last_line: 1, first_column: 1, last_column: 16 }
+          },
+          {
+            type: 'statementType',
+            location: { first_line: 1, last_line: 1, first_column: 1, last_column: 9 },
+            identifier: 'DESCRIBE'
+          },
+          {
+            type: 'database',
+            location: { first_line: 1, last_line: 1, first_column: 10, last_column: 12 },
+            identifierChain: [{ name: 'db' }]
+          },
+          {
+            type: 'table',
+            location: { first_line: 1, last_line: 1, first_column: 13, last_column: 16 },
+            identifierChain: [{ name: 'db' }, { name: 'tbl' }]
+          }
+        ]
+      }
+    });
+  });
+
+  it('should suggest tables for "DESCRIBE |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'DESCRIBE ',
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false,
+        suggestTables: {},
+        suggestDatabases: { appendDot: true }
+      }
+    });
+  });
 });

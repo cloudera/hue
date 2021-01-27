@@ -71,7 +71,8 @@ describe('calciteAutocompleteParser.js SELECT STREAM statements', () => {
           prependFrom: true
         },
         suggestDatabases: {
-          prependFrom: true, appendDot: true
+          prependFrom: true,
+          appendDot: true
         }
       }
     });

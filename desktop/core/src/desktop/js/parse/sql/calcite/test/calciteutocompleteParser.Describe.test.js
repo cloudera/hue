@@ -17,54 +17,54 @@
 import calciteAutocompleteParser from '../calciteAutocompleteParser';
 
 describe('calciteAutocompleteParser.js DESCRIBE statements', () => {
-    beforeAll(() => {
-        calciteAutocompleteParser.yy.parseError = function (msg) {
-            throw Error(msg);
-        };
-    });
-
-    const assertAutoComplete = testDefinition => {
-        const debug = false;
-
-        expect(
-            calciteAutocompleteParser.parseSql(
-                testDefinition.beforeCursor,
-                testDefinition.afterCursor,
-                debug
-            )
-        ).toEqualDefinition(testDefinition);
+  beforeAll(() => {
+    calciteAutocompleteParser.yy.parseError = function (msg) {
+      throw Error(msg);
     };
+  });
 
-    it('should suggest keywords for "|"', () => {
-        assertAutoComplete({
-            beforeCursor: '',
-            afterCursor: '',
-            containsKeywords: ['DESCRIBE'],
-            expectedResult: {
-                lowerCase: false
-            }
-        });
-    });
+  const assertAutoComplete = testDefinition => {
+    const debug = false;
 
-    it('should suggest keywords for "DESCRIBE |"', () => {
-        assertAutoComplete({
-            beforeCursor: 'DESCRIBE ',
-            afterCursor: '',
-            expectedResult: {
-                lowerCase: false,
-            }
-        });
-    });
+    expect(
+      calciteAutocompleteParser.parseSql(
+        testDefinition.beforeCursor,
+        testDefinition.afterCursor,
+        debug
+      )
+    ).toEqualDefinition(testDefinition);
+  };
 
-    it('should handle "DESCRIBE db.tbl;|"', () => {
-        assertAutoComplete({
-            beforeCursor: 'DESCRIBE db.tbl;',
-            afterCursor: '',
-            containsKeywords: ['SELECT'],
-            expectedResult: {
-                lowerCase: false,
-                locations: []
-            }
-        });
+  it('should suggest keywords for "|"', () => {
+    assertAutoComplete({
+      beforeCursor: '',
+      afterCursor: '',
+      containsKeywords: ['DESCRIBE'],
+      expectedResult: {
+        lowerCase: false
+      }
     });
+  });
+
+  it('should suggest keywords for "DESCRIBE |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'DESCRIBE ',
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false
+      }
+    });
+  });
+
+  it('should handle "DESCRIBE db.tbl;|"', () => {
+    assertAutoComplete({
+      beforeCursor: 'DESCRIBE db.tbl;',
+      afterCursor: '',
+      containsKeywords: ['SELECT'],
+      expectedResult: {
+        lowerCase: false,
+        locations: []
+      }
+    });
+  });
 });
