@@ -14,9 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ApiStrategy from './ApiStrategy';
-import LocalStrategy from './LocalStrategy';
-import BaseStrategy from './BaseStrategy';
+import NoopSqlAnalyzer from './NoopSqlAnalyzer';
+import SqlAnalyzer from 'catalog/optimizer/SqlAnalyzer';
 import { CancellablePromise } from 'api/cancellablePromise';
 import { OptimizerResponse } from 'catalog/dataCatalog';
 import { OptimizerMeta } from 'catalog/DataCatalogEntry';
@@ -90,13 +89,13 @@ export const API_STRATEGY = 'api';
 
 const createOptimizer = (connector: Connector): Optimizer => {
   // TODO: Remove window.OPTIMIZER_MODE and hardcoded { optimizer: 'api' } when 'connector.optimizer_mode' works.
-  if ((<hueWindow>window).OPTIMIZER_MODE === LOCAL_STRATEGY) {
-    return new LocalStrategy(connector);
+  if (
+    (<hueWindow>window).OPTIMIZER_MODE === LOCAL_STRATEGY ||
+    (<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY
+  ) {
+    return new SqlAnalyzer(connector);
   }
-  if ((<hueWindow>window).OPTIMIZER_MODE === API_STRATEGY) {
-    return new ApiStrategy(connector);
-  }
-  return new BaseStrategy();
+  return new NoopSqlAnalyzer();
 };
 
 export const getOptimizer = (connector: Connector): Optimizer => {
