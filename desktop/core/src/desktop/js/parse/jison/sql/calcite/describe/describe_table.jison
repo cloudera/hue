@@ -25,6 +25,10 @@ DataDefinition_EDIT
 DescribeStatement
  : 'DESCRIBE' SchemaQualifiedTableIdentifier
    {
+     parser.addTablePrimary($2);
+   }
+ | 'DESCRIBE' RegularOrBacktickedIdentifier '.' SchemaQualifiedTableIdentifier
+   {
      parser.addTablePrimary($3);
    }
  ;
@@ -38,6 +42,10 @@ DescribeStatement_EDIT
  | 'DESCRIBE' SchemaQualifiedTableIdentifier_EDIT
  | 'DESCRIBE' 'CURSOR' SchemaQualifiedTableIdentifier
    {
-     parser.addTablePrimary($4);
+     parser.addTablePrimary($3);
+   }
+ | 'DESCRIBE' RegularOrBacktickedIdentifier '.' SchemaQualifiedTableIdentifier 
+   {
+     parser.addTablePrimary($5);
    }
  ;
