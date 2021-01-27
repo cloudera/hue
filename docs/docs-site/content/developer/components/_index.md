@@ -84,4 +84,4 @@ Please refer these [demo apps](https://github.com/cloudera/hue/tree/master/tools
 
 Internally these components are created using Vue.js & TypeScript. So you can even use them as plain Vue component, and take advantage of Vue features. Vue version of the components are under `gethue/components`.
 
-    import ERDiagram from 'gethue/lib/components/er-diagram/index.vue';
+    import ERDiagram from 'gethue/components/er-diagram/index.vue';
