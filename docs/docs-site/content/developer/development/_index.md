@@ -226,7 +226,7 @@ Once we get ship it from at least one reviewer, we can push the changes to maste
 * Add the commit link to the ticket and mark it as resolved
 
 
-### Sump-up
+### Sump
 
 We hope that these commands will make your life easier and encourage you to [contribute to Hue](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md) 😉
 
@@ -969,7 +969,7 @@ and grab the `public` directory.
 
 ### Blog & Website
 
-Like for the [Documentation](#Documentation) install hugo. The content for each language is in its [own directory](https://github.com/cloudera/hue/tree/master/docs/gethue/content).
+Like for the [Documentation](#documentation-1) install hugo. The content for each language is in its [own directory](https://github.com/cloudera/hue/tree/master/docs/gethue/content).
 
 Blog posts are located in [docs/gethue/content/en/posts](https://github.com/cloudera/hue/tree/master/docs/gethue/content/en/posts).
 
