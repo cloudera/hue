@@ -65,8 +65,7 @@ import SidePanelViewModel from 'sidePanelViewModel';
 import TopNavViewModel from 'topNavViewModel';
 
 // TODO: Remove from global scope
-import EditorViewModel from 'apps/notebook/editorViewModel'; // In history, indexer, importer, editor etc.
-import EditorViewModel2 from 'apps/notebook2/editorViewModel'; // In history, indexer, importer, editor etc.
+import NotebookViewModel from 'apps/notebook/NotebookViewModel'; // In history, indexer, importer, editor etc.
 import HdfsAutocompleter from 'utils/hdfsAutocompleter';
 import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and notebook.ko
@@ -88,11 +87,7 @@ window.dataCatalog = dataCatalog;
 window.DOCUMENT_TYPE_I18n = DOCUMENT_TYPE_I18n;
 window.DOCUMENT_TYPES = DOCUMENT_TYPES;
 window.Dropzone = Dropzone;
-if (window.ENABLE_NOTEBOOK_2) {
-  window.EditorViewModel = EditorViewModel2;
-} else {
-  window.EditorViewModel = EditorViewModel;
-}
+window.NotebookViewModel = NotebookViewModel;
 window.filesize = filesize;
 window.getLastKnownConfig = getLastKnownConfig;
 window.HdfsAutocompleter = HdfsAutocompleter;

@@ -16,9 +16,10 @@
   limitations under the License.
 -->
 
+<!-- eslint-disable vue/no-v-html -->
 <template>
-  <div class="hue-table-container">
-    <table class="hue-table">
+  <div ref="tableContainer" class="hue-table-container" @scroll="onContainerScroll">
+    <table class="hue-table" :class="{ 'sticky-header': stickyHeader }">
       <caption>
         <!-- Because of Web:TableWithoutCaptionCheck -->
         {{
@@ -30,7 +31,7 @@
           <th
             v-for="(column, colIndex) in columns"
             :key="colIndex"
-            :class="column.headerCssClass"
+            :class="cellClass(column.headerCssClass, colIndex)"
             scope="col"
           >
             {{ column.label }}
@@ -41,8 +42,13 @@
       </thead>
       <tbody>
         <tr v-for="(row, rowIndex) in rows" :key="rowIndex" @click="$emit('row-clicked', row)">
-          <td v-for="(column, colIndex) in columns" :key="colIndex" :class="column.cssClass">
+          <td
+            v-for="(column, colIndex) in columns"
+            :key="colIndex"
+            :class="cellClass(column.cssClass, colIndex)"
+          >
             <slot v-if="hasCellSlot(column)" :name="cellSlotName(column)" v-bind="row" />
+            <div v-else-if="column.htmlValue" v-html="row[column.key]" />
             <template v-else>
               {{ column.adapter ? column.adapter(column.key, row) : row[column.key] }}
             </template>
@@ -53,6 +59,7 @@
     </table>
   </div>
 </template>
+<!-- eslint-enable vue/no-v-html -->
 
 <script lang="ts">
   import Vue from 'vue';
@@ -68,6 +75,10 @@
     columns?: Column<T>[];
     @Prop()
     caption?: string;
+    @Prop({ required: false, default: false })
+    stickyHeader?: boolean;
+    @Prop({ required: false, default: false })
+    stickyFirstColumn?: boolean;
 
     hasCellSlot(column: Column<T>): boolean {
       return !!this.$scopedSlots[this.cellSlotName(column)];
@@ -75,6 +86,24 @@
 
     cellSlotName(column: Column<T>): string {
       return 'cell-' + column.key;
+    }
+
+    onContainerScroll(): void {
+      const containerEl = <HTMLElement>this.$refs.tableContainer;
+      if (containerEl.scrollHeight === containerEl.scrollTop + containerEl.clientHeight) {
+        this.$emit('scroll-to-end');
+      }
+    }
+
+    cellClass(cellClass: string | undefined, index: number): string | null {
+      // This prevents rendering of empty class="" for :class="[x,y]" when x and y are undefined
+      // Possibly fixed in Vue 3
+      if (cellClass && this.stickyFirstColumn && index === 0) {
+        return `${cellClass} sticky-first-col`;
+      } else if (this.stickyFirstColumn && index === 0) {
+        return 'sticky-first-col';
+      }
+      return cellClass || null;
     }
   }
 </script>
@@ -91,6 +120,7 @@
     .hue-table {
       line-height: 14px;
       table-layout: auto;
+      border-collapse: separate;
 
       thead,
       tbody {
@@ -101,12 +131,11 @@
           td {
             @include nowrap-ellipsis;
 
-            padding: 12px;
-            border: none;
-            text-align: left;
-
             height: 16px;
             max-width: 300px;
+            padding: 12px;
+            border-bottom: 1px solid $fluid-gray-300;
+            text-align: left;
 
             &.column-flush {
               width: 100%;
@@ -117,13 +146,20 @@
 
       thead {
         tr {
-          border-bottom: 1px solid $fluid-gray-300;
-
           th {
+            background-color: $fluid-white;
             color: $fluid-gray-700;
             font-size: 13px;
             font-weight: 500;
             white-space: nowrap;
+
+            &.sticky-first-col {
+              background-color: $fluid-white;
+              position: sticky;
+              position: -webkit-sticky;
+              left: 0;
+              z-index: 102;
+            }
 
             .sort-header {
               display: flex;
@@ -138,15 +174,36 @@
 
       tbody {
         tr {
-          border-bottom: 1px solid $fluid-gray-200;
-
           td {
             color: $fluid-gray-900;
             font-size: 14px;
 
+            &.sticky-first-col {
+              @include position-sticky;
+
+              background-color: $fluid-white;
+              left: 0;
+              z-index: 100;
+            }
+
             &:last-of-type {
               padding-right: 8px;
             }
+          }
+        }
+      }
+
+      &.sticky-header {
+        thead th {
+          @include position-sticky;
+
+          top: 0;
+          z-index: 101;
+
+          &.sticky-first-col {
+            @include position-sticky;
+
+            top: 0;
           }
         }
       }

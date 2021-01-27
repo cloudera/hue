@@ -56,3 +56,10 @@ export interface SetDetails {
 export interface TypeConversion {
   [attr: string]: { [attr: string]: boolean };
 }
+
+export interface SqlReferenceProvider {
+  getReservedKeywords(dialect: string): Promise<Set<string>>;
+  getSetOptions(dialect: string): Promise<SetOptions>;
+  getUdfCategories(dialect: string): Promise<UdfCategory[]>;
+  hasUdfCategories(dialect: string): boolean;
+}

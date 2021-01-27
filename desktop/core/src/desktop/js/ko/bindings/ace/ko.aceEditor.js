@@ -18,7 +18,6 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 import ace from 'ext/aceHelper';
 
-import AceLocationHandlerV2 from 'apps/notebook2/components/aceEditor/AceLocationHandler';
 import AceLocationHandler, {
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
@@ -69,18 +68,12 @@ registerBinding(NAME, {
       resizePubSub.remove();
     });
 
-    const aceLocationHandler = window.ENABLE_NOTEBOOK_2
-      ? new AceLocationHandlerV2({
-          editor: editor,
-          editorId: $el.attr('id'),
-          executor: snippet.executor
-        })
-      : new AceLocationHandler({
-          editor: editor,
-          editorId: $el.attr('id'),
-          snippet: snippet,
-          i18n: { expandStar: options.expandStar, contextTooltip: options.contextTooltip }
-        });
+    const aceLocationHandler = new AceLocationHandler({
+      editor: editor,
+      editorId: $el.attr('id'),
+      snippet: snippet,
+      i18n: { expandStar: options.expandStar, contextTooltip: options.contextTooltip }
+    });
 
     const aceGutterHandler = new AceGutterHandler({
       editor: editor,
@@ -453,11 +446,7 @@ registerBinding(NAME, {
       // automagically change snippet type
       // TODO: Remove completely, check if used in code, '% dialect'
       const firstLine = editor.session.getLine(0);
-      if (
-        !window.ENABLE_NOTEBOOK_2 &&
-        firstLine.indexOf('%') === 0 &&
-        firstLine.charAt(firstLine.length - 1) === ' '
-      ) {
+      if (firstLine.indexOf('%') === 0 && firstLine.charAt(firstLine.length - 1) === ' ') {
         const availableSnippets = snippet.availableSnippets;
         let removeFirstLine = false;
         for (let i = 0; i < availableSnippets.length; i++) {

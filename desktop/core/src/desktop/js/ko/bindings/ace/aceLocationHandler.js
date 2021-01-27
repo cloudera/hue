@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import ace from 'ext/aceHelper';
 
-import { DIALECT } from 'apps/notebook2/snippet';
+import { DIALECT } from 'apps/editor/snippet';
 import dataCatalog from 'catalog/dataCatalog';
 import AssistStorageEntry from 'ko/components/assist/assistStorageEntry';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
@@ -65,7 +65,7 @@ class AceLocationHandler {
     self.attachSqlWorker();
     self.attachMouseListeners();
 
-    self.dialect = () => (window.ENABLE_NOTEBOOK_2 ? self.snippet.dialect() : self.snippet.type());
+    self.dialect = () => self.snippet.type();
 
     self.verifyThrottle = -1;
 
@@ -526,7 +526,7 @@ class AceLocationHandler {
         }
       }
 
-      if (cursorChange && activeStatement && !window.ENABLE_NOTEBOOK_2) {
+      if (cursorChange && activeStatement) {
         // Don't update when cursor stays in the same statement
         if (isPointInside(activeStatement.location, cursorLocation)) {
           return;
@@ -629,7 +629,6 @@ class AceLocationHandler {
     let cursorChangePaused = false; // On change the cursor is also moved, this limits the calls while typing
 
     let lastStart;
-    let lastEnd;
     let lastCursorPosition;
     const changeSelectionListener = self.editor.on('changeSelection', () => {
       if (cursorChangePaused) {
@@ -652,15 +651,10 @@ class AceLocationHandler {
 
         // The active statement is initially the top one in the selection, batch execution updates this.
         const newStart = self.editor.getSelectionRange().start;
-        const newEnd = self.editor.getSelectionRange().end;
-        if (
-          (self.snippet.isSqlDialect() && (!lastStart || !equalPositions(lastStart, newStart))) ||
-          (window.ENABLE_NOTEBOOK_2 && (!lastEnd || !equalPositions(lastEnd, newEnd)))
-        ) {
+        if (self.snippet.isSqlDialect() && (!lastStart || !equalPositions(lastStart, newStart))) {
           window.clearTimeout(updateThrottle);
           updateActiveStatement(true);
           lastStart = newStart;
-          lastEnd = newEnd;
         }
       }, 100);
     });
