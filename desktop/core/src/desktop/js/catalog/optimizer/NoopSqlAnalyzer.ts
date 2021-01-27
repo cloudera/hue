@@ -29,7 +29,7 @@ import {
 
 import { OptimizerResponse } from 'catalog/dataCatalog';
 
-export default class BaseStrategy implements Optimizer {
+export default class NoopSqlAnalyzer implements Optimizer {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   analyzeCompatibility(options: CompatibilityOptions): CancellablePromise<unknown> {
     return CancellablePromise.reject('analyzeCompatibility is not Implemented');
