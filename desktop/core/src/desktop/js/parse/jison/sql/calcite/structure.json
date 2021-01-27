@@ -55,6 +55,7 @@
     "select/select_stream.jison",
     "../generic/sql_error.jison",
     "../generic/sql_valueExpression.jison",
+    "describe/describe_table.jison",
     "../generic/autocomplete_footer.jison"
   ],
   "syntax": [
@@ -111,6 +112,7 @@
     "../generic/sql_main.jison",
     "select/select_stream.jison",
     "../generic/sql_valueExpression.jison",
+    "describe/describe_table.jison",
     "../generic/syntax_footer.jison"
   ]
 }
