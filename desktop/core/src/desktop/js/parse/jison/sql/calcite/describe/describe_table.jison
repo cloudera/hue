@@ -29,7 +29,7 @@ DescribeStatement
    }
  | 'DESCRIBE' RegularOrBacktickedIdentifier '.' SchemaQualifiedTableIdentifier
    {
-     parser.addTablePrimary($3);
+     parser.addTablePrimary($4);
    }
  ;
 
@@ -46,6 +46,6 @@ DescribeStatement_EDIT
    }
  | 'DESCRIBE' RegularOrBacktickedIdentifier '.' SchemaQualifiedTableIdentifier 
    {
-     parser.addTablePrimary($5);
+     parser.addTablePrimary($4);
    }
  ;

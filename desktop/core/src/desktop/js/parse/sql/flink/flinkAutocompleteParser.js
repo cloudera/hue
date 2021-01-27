@@ -115,7 +115,7 @@ case 12:
      parser.suggestSetOptions();
    
 break;
-case 38: case 47: case 243: case 247: case 506: case 626: case 1211: case 1215:
+case 38: case 47: case 243: case 247: case 506: case 626: case 1211: case 1212: case 1215: case 1216:
 
      parser.addTablePrimary($$[$0]);
    
@@ -398,7 +398,7 @@ case 233:
      }
    
 break;
-case 235: case 511: case 1212:
+case 235: case 511:
 
      parser.addTablePrimary($$[$0-1]);
    
@@ -2686,11 +2686,6 @@ break;
 case 1210:
 
      parser.suggestKeywords(['TABLES', 'CATALOGS', 'CURRENT CATALOG', 'DATABASES', 'CURRENT DATABASE', 'VIEWS', 'FUNCTIONS']);
-   
-break;
-case 1216:
-
-     parser.addTablePrimary($$[$01]);
    
 break;
 case 1218:

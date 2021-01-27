@@ -115,7 +115,7 @@ case 12:
      parser.suggestSetOptions();
    
 break;
-case 36: case 45: case 240: case 244: case 484: case 604: case 1217: case 1221:
+case 36: case 45: case 240: case 244: case 484: case 604: case 1217: case 1218: case 1221: case 1222:
 
      parser.addTablePrimary($$[$0]);
    
@@ -398,7 +398,7 @@ case 230:
      }
    
 break;
-case 232: case 489: case 1218:
+case 232: case 489:
 
      parser.addTablePrimary($$[$0-1]);
    
@@ -2852,11 +2852,6 @@ case 1213: case 1214: case 1215: case 1216:
 
      parser.valueExpressionSuggest();
      this.$ = { caseTypes: [{ types: ['T'] }] };
-   
-break;
-case 1222:
-
-     parser.addTablePrimary($$[$01]);
    
 break;
 }
