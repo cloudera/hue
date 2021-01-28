@@ -98,8 +98,9 @@
   import MatchedText from './MatchedText.vue';
   import SqlAutocompleter from './SqlAutocompleter';
   import CatalogEntryDetailsPanel from './details/CatalogEntryDetailsPanel.vue';
-  import JoinDetailsPanel from './details/JoinDetailsPanel.vue';
   import OptionDetailsPanel from './details/OptionDetailsPanel.vue';
+  import PopularAggregateUdfPanel from './details/PopularAggregateUdfPanel.vue';
+  import PopularDetailsPanel from './details/PopularDetailsPanel.vue';
   import UdfDetailsPanel from './details/UdfDetailsPanel.vue';
   import Spinner from 'components/Spinner.vue';
   import { clickOutsideDirective } from 'components/directives/clickOutsideDirective';
@@ -113,9 +114,10 @@
   @Component({
     components: {
       CatalogEntryDetailsPanel,
-      JoinDetailsPanel,
       MatchedText,
       OptionDetailsPanel,
+      PopularAggregateUdfPanel,
+      PopularDetailsPanel,
       Spinner,
       UdfDetailsPanel
     },

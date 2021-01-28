@@ -127,6 +127,7 @@ export const Category: { [categoryId in keyof typeof CategoryId]: CategoryInfo }
   PopularAggregate: {
     categoryId: CategoryId.PopularAggregate,
     color: Colors.Popular,
+    detailsComponent: 'PopularAggregateUdfPanel',
     label: I18n('Popular'),
     popular: true,
     weight: 1500
@@ -135,6 +136,7 @@ export const Category: { [categoryId in keyof typeof CategoryId]: CategoryInfo }
     categoryId: CategoryId.PopularActiveJoin,
     color: Colors.Popular,
     label: I18n('Popular'),
+    detailsComponent: 'PopularDetailsPanel',
     popular: true,
     weight: 1500
   },
@@ -142,12 +144,14 @@ export const Category: { [categoryId in keyof typeof CategoryId]: CategoryInfo }
     categoryId: CategoryId.PopularFilter,
     color: Colors.Popular,
     label: I18n('Popular'),
+    detailsComponent: 'PopularDetailsPanel',
     popular: true,
     weight: 1400
   },
   PopularGroupBy: {
     categoryId: CategoryId.PopularGroupBy,
     color: Colors.Popular,
+    detailsComponent: 'PopularDetailsPanel',
     label: I18n('Popular'),
     popular: true,
     weight: 1300
@@ -155,13 +159,14 @@ export const Category: { [categoryId in keyof typeof CategoryId]: CategoryInfo }
   PopularJoin: {
     categoryId: CategoryId.PopularJoin,
     color: Colors.Popular,
-    detailsComponent: 'JoinDetailsPanel',
+    detailsComponent: 'PopularDetailsPanel',
     label: I18n('Popular'),
     weight: 1500
   },
   PopularJoinCondition: {
     categoryId: CategoryId.PopularJoinCondition,
     color: Colors.Popular,
+    detailsComponent: 'PopularDetailsPanel',
     label: I18n('Popular'),
     popular: true,
     weight: 1500
@@ -169,6 +174,7 @@ export const Category: { [categoryId in keyof typeof CategoryId]: CategoryInfo }
   PopularOrderBy: {
     categoryId: CategoryId.PopularOrderBy,
     color: Colors.Popular,
+    detailsComponent: 'PopularDetailsPanel',
     label: I18n('Popular'),
     popular: true,
     weight: 1200
