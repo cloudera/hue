@@ -20,7 +20,7 @@
   <div>
     <div class="autocompleter-header">
       <i class="fa fa-fw fa-superscript" />
-      <span>{{ I18n('Popular Join') }}</span>
+      <span>{{ title }}</span>
       <i class="popular fa fa-fw fa-star-o" :title="popularityTitle" />
     </div>
     <div class="autocompleter-details-contents">
@@ -32,19 +32,23 @@
 </template>
 
 <script lang="ts">
-  import { Connector } from 'types/config';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
 
   import { Suggestion } from '../AutocompleteResults';
-  import { TopJoinValue } from 'catalog/MultiTableEntry';
+  import { CategoryId } from '../Category';
   import SqlText from 'components/SqlText.vue';
+  import { Connector } from 'types/config';
   import I18n from 'utils/i18n';
 
+  interface PopularityDetails {
+    workloadPercent?: number;
+    relativePopularity?: number;
+  }
+
   @Component({
-    components: { SqlText },
-    methods: { I18n }
+    components: { SqlText }
   })
   export default class JoinDetailsPanel extends Vue {
     @Prop({ required: true })
@@ -52,8 +56,8 @@
     @Prop({ required: false })
     connector?: Connector;
 
-    get details(): TopJoinValue {
-      return <TopJoinValue>this.suggestion.details;
+    get details(): PopularityDetails {
+      return <PopularityDetails>this.suggestion.details;
     }
 
     get dialect(): string | undefined {
@@ -61,7 +65,30 @@
     }
 
     get popularityTitle(): string {
-      return `${this.details.relativePopularity || '?'}%`;
+      if (
+        this.suggestion.category.categoryId === CategoryId.PopularGroupBy ||
+        this.suggestion.category.categoryId === CategoryId.PopularOrderBy
+      ) {
+        return `${I18n('Workload percent')}: ${this.details.workloadPercent || '?'}%`;
+      }
+      return `${I18n('Relative popularity')}: ${this.details.relativePopularity || '?'}%`;
+    }
+
+    get title(): string {
+      switch (this.suggestion.category.categoryId) {
+        case CategoryId.PopularFilter:
+          return I18n('Popular filter');
+        case CategoryId.PopularGroupBy:
+          return I18n('Popular group by');
+        case CategoryId.PopularOrderBy:
+          return I18n('Popular order by');
+        case CategoryId.PopularActiveJoin:
+        case CategoryId.PopularJoin:
+          return I18n('Popular join');
+        case CategoryId.PopularJoinCondition:
+          return I18n('Popular join condition');
+      }
+      return I18n('Popular');
     }
   }
 </script>
