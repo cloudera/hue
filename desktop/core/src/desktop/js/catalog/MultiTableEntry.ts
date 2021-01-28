@@ -26,6 +26,7 @@ import { Connector } from 'types/config';
 import { hueWindow } from 'types/types';
 
 export interface TopJoinValue {
+  totalTableCount: number;
   totalQueryCount: number;
   joinType: string;
   tables: string[];
