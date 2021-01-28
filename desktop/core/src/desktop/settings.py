@@ -412,7 +412,11 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', # TODO: Parameterize here for all the caches
         'LOCATION': 'unique-hue'
     },
+    'axes_cache': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    },
 }
+AXES_CACHE = 'axes_cache'
 CACHES_HIVE_DISCOVERY_KEY = 'hive_discovery'
 CACHES[CACHES_HIVE_DISCOVERY_KEY] = {
     'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',

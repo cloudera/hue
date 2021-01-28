@@ -1,0 +1,22 @@
+Metadata-Version: 1.1
+Name: django-ipware
+Version: 2.1.0
+Summary: A Django utility application that returns client's real IP address
+Home-page: https://github.com/un33k/django-ipware
+Author: Val Neekman
+Author-email: info@neekware.com
+License: MIT
+Description-Content-Type: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Topic :: Utilities

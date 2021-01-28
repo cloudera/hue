@@ -387,7 +387,7 @@ class OozieMockBase(object):
 
     wf = Workflow.objects.new_workflow(self.user)
     wf.name = name
-    wf.save()
+    # wf.save()
     wf.start.workflow = wf
     wf.end.workflow = wf
     wf.start.save()

@@ -24,6 +24,7 @@ files=`git diff --name-only origin/master --diff-filter=b | egrep .py$ | \
   grep -v /ext-py/ | \
   grep -v wsgiserver.py | \
   grep -v /migrations/ | \
+  grep -v apps/oozie/src/oozie/tests.py | \
   grep -v /org_migrations/`
 
 cd $HOME
