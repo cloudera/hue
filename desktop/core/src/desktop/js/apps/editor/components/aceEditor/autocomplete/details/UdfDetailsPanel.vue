@@ -18,15 +18,13 @@
 
 <template>
   <div>
-    <div class="autocompleter-header">{{ suggestion.value }}</div>
+    <div class="autocompleter-header">
+      <i class="fa fa-fw fa-superscript" />
+      <span>{{ udfName }}</span>
+    </div>
     <div class="autocompleter-details-contents">
       <div class="autocompleter-details-contents-inner">
-        <div class="details-code">
-          {{ I18n('Type:') }} <span>{{ details.type }}</span>
-        </div>
-        <div class="details-code">
-          {{ I18n('Default:') }} <span>{{ details.default }}</span>
-        </div>
+        <div class="details-code">{{ details.signature }}</div>
         <div class="details-description">{{ details.description }}</div>
       </div>
     </div>
@@ -34,22 +32,24 @@
 </template>
 
 <script lang="ts">
-  import { SetDetails } from 'sql/reference/types';
-  import I18n from 'utils/i18n';
-  import { Suggestion } from './AutocompleteResults';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
 
-  @Component({
-    methods: { I18n }
-  })
-  export default class OptionDetailsPanel extends Vue {
+  import { UdfDetails } from 'sql/reference/types';
+  import { Suggestion } from '../AutocompleteResults';
+
+  @Component
+  export default class UdfDetailsPanel extends Vue {
     @Prop({ required: true })
     suggestion!: Suggestion;
 
-    get details(): SetDetails {
-      return <SetDetails>this.suggestion.details;
+    get details(): UdfDetails {
+      return <UdfDetails>this.suggestion.details;
+    }
+
+    get udfName(): string {
+      return this.details.signature.substring(0, this.details.signature.indexOf('('));
     }
   }
 </script>

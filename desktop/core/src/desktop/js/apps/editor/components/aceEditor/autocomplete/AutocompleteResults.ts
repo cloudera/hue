@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Category, CategoryInfo } from './Category';
 import { CancellablePromise } from 'api/cancellablePromise';
-import { Category, CategoryInfo } from 'apps/editor/components/aceEditor/autocomplete/Category';
 import Executor from 'apps/editor/execution/executor';
 import DataCatalogEntry, {
   FieldSample,

@@ -20,21 +20,22 @@ import I18n from 'utils/i18n';
 export interface CategoryInfo {
   categoryId: CategoryId;
   color: string;
+  detailsComponent?: string;
   label: string;
-  weight?: number;
   popular?: boolean;
+  weight?: number;
 }
 
 enum Colors {
-  Popular = '#61bbff',
-  Keyword = '#0074d2',
   Column = '#2fae2f',
-  Table = '#ffa139',
   Database = '#517989',
-  Sample = '#fea7a7',
+  Files = '#9e1414',
   IdentCteVar = '#ca4f01',
-  UDF = '#acfbac',
-  Files = '#9e1414'
+  Keyword = '#0074d2',
+  Popular = '#61bbff',
+  Sample = '#fea7a7',
+  Table = '#ffa139',
+  UDF = '#acfbac'
 }
 
 export enum CategoryId {
@@ -68,6 +69,55 @@ export const Category: { [categoryId in keyof typeof CategoryId]: CategoryInfo }
     color: '#90ceff',
     label: I18n('All')
   },
+  ColRefKeyword: {
+    categoryId: CategoryId.ColRefKeyword,
+    color: Colors.Keyword,
+    label: I18n('Keywords'),
+    weight: 100
+  },
+  Column: {
+    categoryId: CategoryId.Column,
+    color: Colors.Column,
+    label: I18n('Columns'),
+    weight: 1000
+  },
+  CTE: {
+    categoryId: CategoryId.CTE,
+    color: Colors.IdentCteVar,
+    label: I18n('CTEs'),
+    weight: 700
+  },
+  Database: {
+    categoryId: CategoryId.Database,
+    color: Colors.Database,
+    label: I18n('Databases'),
+    weight: 500
+  },
+  Files: {
+    categoryId: CategoryId.Files,
+    color: Colors.Files,
+    label: I18n('Files'),
+    weight: 300
+  },
+  Identifier: {
+    categoryId: CategoryId.Identifier,
+    color: Colors.IdentCteVar,
+    label: I18n('Identifiers'),
+    weight: 800
+  },
+  Keyword: {
+    categoryId: CategoryId.Keyword,
+    color: Colors.Keyword,
+    label: I18n('Keywords'),
+    weight: 0
+  },
+  Option: {
+    categoryId: CategoryId.Option,
+    color: Colors.UDF,
+    detailsComponent: 'OptionDetailsPanel',
+    label: I18n('Options'),
+    weight: 400
+  },
   Popular: {
     categoryId: CategoryId.Popular,
     color: Colors.Popular,
@@ -76,129 +126,89 @@ export const Category: { [categoryId in keyof typeof CategoryId]: CategoryInfo }
   },
   PopularAggregate: {
     categoryId: CategoryId.PopularAggregate,
-    weight: 1500,
     color: Colors.Popular,
+    detailsComponent: 'PopularAggregateUdfPanel',
     label: I18n('Popular'),
-    popular: true
-  },
-  PopularGroupBy: {
-    categoryId: CategoryId.PopularGroupBy,
-    weight: 1300,
-    color: Colors.Popular,
-    label: I18n('Popular'),
-    popular: true
-  },
-  PopularOrderBy: {
-    categoryId: CategoryId.PopularOrderBy,
-    weight: 1200,
-    color: Colors.Popular,
-    label: I18n('Popular'),
-    popular: true
-  },
-  PopularFilter: {
-    categoryId: CategoryId.PopularFilter,
-    weight: 1400,
-    color: Colors.Popular,
-    label: I18n('Popular'),
-    popular: true
+    popular: true,
+    weight: 1500
   },
   PopularActiveJoin: {
     categoryId: CategoryId.PopularActiveJoin,
-    weight: 1500,
     color: Colors.Popular,
     label: I18n('Popular'),
-    popular: true
+    detailsComponent: 'PopularDetailsPanel',
+    popular: true,
+    weight: 1500
   },
-  PopularJoinCondition: {
-    categoryId: CategoryId.PopularJoinCondition,
-    weight: 1500,
+  PopularFilter: {
+    categoryId: CategoryId.PopularFilter,
     color: Colors.Popular,
     label: I18n('Popular'),
-    popular: true
+    detailsComponent: 'PopularDetailsPanel',
+    popular: true,
+    weight: 1400
   },
-  Column: {
-    categoryId: CategoryId.Column,
-    weight: 1000,
-    color: Colors.Column,
-    label: I18n('Columns')
-  },
-  Sample: {
-    categoryId: CategoryId.Sample,
-    weight: 900,
-    color: Colors.Sample,
-    label: I18n('Samples')
-  },
-  Identifier: {
-    categoryId: CategoryId.Identifier,
-    weight: 800,
-    color: Colors.IdentCteVar,
-    label: I18n('Identifiers')
-  },
-  CTE: {
-    categoryId: CategoryId.CTE,
-    weight: 700,
-    color: Colors.IdentCteVar,
-    label: I18n('CTEs')
-  },
-  Table: {
-    categoryId: CategoryId.Table,
-    weight: 600,
-    color: Colors.Table,
-    label: I18n('Tables')
-  },
-  Database: {
-    categoryId: CategoryId.Database,
-    weight: 500,
-    color: Colors.Database,
-    label: I18n('Databases')
-  },
-  UDF: {
-    categoryId: CategoryId.UDF,
-    weight: 400,
-    color: Colors.UDF,
-    label: I18n('UDFs')
-  },
-  Option: {
-    categoryId: CategoryId.Option,
-    weight: 400,
-    color: Colors.UDF,
-    label: I18n('Options')
-  },
-  Files: {
-    categoryId: CategoryId.Files,
-    weight: 300,
-    color: Colors.Files,
-    label: I18n('Files')
-  },
-  VirtualColumn: {
-    categoryId: CategoryId.VirtualColumn,
-    weight: 200,
-    color: Colors.Column,
-    label: I18n('Columns')
-  },
-  ColRefKeyword: {
-    categoryId: CategoryId.ColRefKeyword,
-    weight: 100,
-    color: Colors.Keyword,
-    label: I18n('Keywords')
-  },
-  Variable: {
-    categoryId: CategoryId.Variable,
-    weight: 50,
-    color: Colors.IdentCteVar,
-    label: I18n('Variables')
-  },
-  Keyword: {
-    categoryId: CategoryId.Keyword,
-    weight: 0,
-    color: Colors.Keyword,
-    label: I18n('Keywords')
+  PopularGroupBy: {
+    categoryId: CategoryId.PopularGroupBy,
+    color: Colors.Popular,
+    detailsComponent: 'PopularDetailsPanel',
+    label: I18n('Popular'),
+    popular: true,
+    weight: 1300
   },
   PopularJoin: {
     categoryId: CategoryId.PopularJoin,
-    weight: 1500,
     color: Colors.Popular,
-    label: I18n('Popular')
+    detailsComponent: 'PopularDetailsPanel',
+    label: I18n('Popular'),
+    weight: 1500
+  },
+  PopularJoinCondition: {
+    categoryId: CategoryId.PopularJoinCondition,
+    color: Colors.Popular,
+    detailsComponent: 'PopularDetailsPanel',
+    label: I18n('Popular'),
+    popular: true,
+    weight: 1500
+  },
+  PopularOrderBy: {
+    categoryId: CategoryId.PopularOrderBy,
+    color: Colors.Popular,
+    detailsComponent: 'PopularDetailsPanel',
+    label: I18n('Popular'),
+    popular: true,
+    weight: 1200
+  },
+  Sample: {
+    categoryId: CategoryId.Sample,
+    color: Colors.Sample,
+    label: I18n('Samples'),
+    weight: 900
+  },
+  Table: {
+    categoryId: CategoryId.Table,
+    color: Colors.Table,
+    label: I18n('Tables'),
+    weight: 600
+  },
+  UDF: {
+    categoryId: CategoryId.UDF,
+    detailsComponent: 'UdfDetailsPanel',
+    color: Colors.UDF,
+    label: I18n('UDFs'),
+    weight: 400
+  },
+  Variable: {
+    categoryId: CategoryId.Variable,
+    color: Colors.IdentCteVar,
+    label: I18n('Variables'),
+    weight: 50
+  },
+  VirtualColumn: {
+    categoryId: CategoryId.VirtualColumn,
+    color: Colors.Column,
+    label: I18n('Columns'),
+    weight: 200
   }
 };
 

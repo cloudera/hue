@@ -14,6 +14,7 @@
   .hue-ace-syntax-error {
     position: absolute;
     border-bottom: 1px dotted $hue-error-color;
+    border-bottom: 1px dotted $hue-error-color;
     border-radius: 0 !important;
   }
 
@@ -182,6 +183,12 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+
+    .popular {
+      color: $fluid-orange-300;
+      margin-top: 3px;
+      float: right;
+    }
   }
 
   .autocompleter-header-popularity {

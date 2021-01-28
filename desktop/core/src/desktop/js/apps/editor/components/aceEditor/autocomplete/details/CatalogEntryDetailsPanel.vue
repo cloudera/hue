@@ -70,9 +70,9 @@
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
 
+  import { Suggestion } from '../AutocompleteResults';
   import DataCatalogEntry from 'catalog/DataCatalogEntry';
   import I18n from 'utils/i18n';
-  import { Suggestion } from './AutocompleteResults';
 
   import Spinner from 'components/Spinner.vue';
 

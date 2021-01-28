@@ -73,7 +73,7 @@
       </div>
     </div>
     <div v-if="detailsComponent" class="autocompleter-details">
-      <component :is="detailsComponent" :suggestion="focusedEntry" />
+      <component :is="detailsComponent" :suggestion="focusedEntry" :connector="connector" />
     </div>
   </div>
 </template>
@@ -82,6 +82,7 @@
   import { Ace } from 'ext/ace';
   import ace from 'ext/aceHelper';
   import { AutocompleteParser } from 'parse/types';
+  import { Connector } from 'types/config';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop, Watch } from 'vue-property-decorator';
@@ -94,11 +95,13 @@
   import I18n from 'utils/i18n';
 
   import AutocompleteResults, { Suggestion } from './AutocompleteResults';
-  import CatalogEntryDetailsPanel from './CatalogEntryDetailsPanel.vue';
   import MatchedText from './MatchedText.vue';
-  import OptionDetailsPanel from './OptionDetailsPanel.vue';
   import SqlAutocompleter from './SqlAutocompleter';
-  import UdfDetailsPanel from './UdfDetailsPanel.vue';
+  import CatalogEntryDetailsPanel from './details/CatalogEntryDetailsPanel.vue';
+  import OptionDetailsPanel from './details/OptionDetailsPanel.vue';
+  import PopularAggregateUdfPanel from './details/PopularAggregateUdfPanel.vue';
+  import PopularDetailsPanel from './details/PopularDetailsPanel.vue';
+  import UdfDetailsPanel from './details/UdfDetailsPanel.vue';
   import Spinner from 'components/Spinner.vue';
   import { clickOutsideDirective } from 'components/directives/clickOutsideDirective';
   import { SqlReferenceProvider } from 'sql/reference/types';
@@ -113,6 +116,8 @@
       CatalogEntryDetailsPanel,
       MatchedText,
       OptionDetailsPanel,
+      PopularAggregateUdfPanel,
+      PopularDetailsPanel,
       Spinner,
       UdfDetailsPanel
     },
@@ -285,19 +290,19 @@
       this.subTracker.dispose();
     }
 
+    get connector(): Connector | undefined {
+      if (this.executor) {
+        return this.executor.connector();
+      }
+    }
+
     get detailsComponent(): string | undefined {
       if (this.focusedEntry && this.focusedEntry.details) {
         if (this.focusedEntry.hasCatalogEntry) {
           return 'CatalogEntryDetailsPanel';
         }
-        if (this.focusedEntry.category.categoryId === CategoryId.UDF) {
-          return 'UdfDetailsPanel';
-        }
-        if (this.focusedEntry.category.categoryId === CategoryId.Option) {
-          return 'OptionDetailsPanel';
-        }
+        return this.focusedEntry.category.detailsComponent;
       }
-      return undefined;
     }
 
     get filtered(): Suggestion[] {
