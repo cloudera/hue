@@ -1047,7 +1047,9 @@
         <!-- ko if: explanation -->
         <div class="tab-pane" id="queryExplain" data-bind="css: {'active': currentQueryTab() == 'queryExplain'}">
           <div class="editor-bottom-tab-panel">
-            <pre class="no-margin-bottom" data-bind="text: explanation"></pre>
+            <div style="width: 100%; height: 100%; overflow-y: auto;">
+              <pre class="no-margin-bottom" data-bind="text: explanation"></pre>
+            </div>
           </div>
         </div>
         <!-- /ko -->
