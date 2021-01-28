@@ -402,8 +402,10 @@ def test_error_handling():
     raise PopupException(exc_msg, title="earráid", detail=exc_msg)
 
   # Add an error view
-  error_url_pat = [ url('^500_internal_error$', error_raising_view),
-                    url('^popup_exception$', popup_exception_view)]
+  error_url_pat = [
+      url('^500_internal_error$', error_raising_view),
+      url('^popup_exception$', popup_exception_view)
+  ]
   desktop.urls.urlpatterns.extend(error_url_pat)
   try:
     def store_exc_info(*args, **kwargs):
@@ -906,7 +908,7 @@ class TestStrictRedirection(object):
   def _test_redirection(self, redirection_url, expected_status_code, **kwargs):
     data = self.user.copy()
     data['next'] = redirection_url
-    response = self.client.post('/hue/accounts/login/', data, **kwargs )
+    response = self.client.post('/hue/accounts/login/', data, **kwargs)
     assert_equal(expected_status_code, response.status_code)
     if expected_status_code == 403:
       error_msg = 'Redirect to ' + redirection_url + ' is not allowed.'
