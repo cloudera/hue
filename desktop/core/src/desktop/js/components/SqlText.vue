@@ -29,6 +29,7 @@
   import { Prop, Watch } from 'vue-property-decorator';
 
   import { formatSql } from 'apps/editor/api';
+  import { getAceMode } from 'ext/aceHelper';
   import { hueLocalStorage } from 'utils/storageUtils';
 
   interface Ace {
@@ -58,16 +59,19 @@
         return;
       }
       const ace = getAce();
-      const impalaRules = ace.require('ace/mode/impala_highlight_rules');
-      const hiveRules = ace.require('ace/mode/hive_highlight_rules');
       const tokenizer = ace.require('ace/tokenizer');
       const text = ace.require('ace/layer/text');
       const config = ace.require('ace/config');
 
       const Tokenizer = tokenizer.Tokenizer;
+      let ruleModule;
+      try {
+        ruleModule = ace.require(`${getAceMode(this.dialect)}_highlight_rules`);
+      } catch (err) {}
       const Rules =
-        this.dialect === 'impala' ? impalaRules.ImpalaHighlightRules : hiveRules.HiveHighlightRules;
-
+        ruleModule && Object.keys(ruleModule).length === 1
+          ? ruleModule[Object.keys(ruleModule)[0]]
+          : ace.require(`sql_highlight_rules`).SqlHighlightRules;
       const res: string[] = [];
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
