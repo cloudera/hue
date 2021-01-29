@@ -226,7 +226,7 @@ Once we get ship it from at least one reviewer, we can push the changes to maste
 * Add the commit link to the ticket and mark it as resolved
 
 
-### Sump
+### Sum-up
 
 We hope that these commands will make your life easier and encourage you to [contribute to Hue](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md) 😉
 
