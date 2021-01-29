@@ -120,3 +120,6 @@ docs/docs-site/public/
 
 # VSCode settings
 .vscode
+
+# environment file
+.env
