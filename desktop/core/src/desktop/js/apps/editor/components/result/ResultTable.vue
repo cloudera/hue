@@ -104,6 +104,10 @@
       });
     }
 
+    destroyed(): void {
+      this.subTracker.dispose();
+    }
+
     get hasEmptyResult(): boolean {
       return (
         !this.rows.length &&
@@ -153,7 +157,7 @@
       }
     }
 
-    async onScrollToEnd(): void {
+    async onScrollToEnd(): Promise<void> {
       if (this.hasMore && !this.grayedOut && this.executable && this.executable.result) {
         this.grayedOut = true;
         try {
