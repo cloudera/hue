@@ -988,9 +988,9 @@
         </li>
         <!-- /ko -->
 
-        <!-- ko if: HAS_WORKLOAD_ANALYTICS && dialect() === 'impala' -->
-        <li data-bind="visible: showExecutionAnalysis, click: function(){ currentQueryTab('executionAnalysis'); }, css: {'active': currentQueryTab() == 'executionAnalysis'}"><a class="inactive-action" href="#executionAnalysis" data-toggle="tab" data-bind="click: function(){ $('a[href=\'#executionAnalysis\']').tab('show'); }, event: {'shown': fetchExecutionAnalysis }"><span>${_('Execution Analysis')} </span><span></span></a></li>
-        <!-- /ko -->
+        <li data-bind="click: function(){ currentQueryTab('executionAnalysis'); }, css: {'active': currentQueryTab() == 'executionAnalysis'}">
+          <a class="inactive-action" href="#executionAnalysis" data-toggle="tab">${_('Execution Analysis')}</a>
+        </li>
 
         <li class="editor-bottom-tab-actions">
           <button data-bind="toggle: $root.bottomExpanded">
@@ -1056,13 +1056,13 @@
         </div>
         <!-- /ko -->
 
-        <!-- ko if: HAS_WORKLOAD_ANALYTICS && dialect() === 'impala' -->
         <div class="tab-pane" id="executionAnalysis" data-bind="css: {'active': currentQueryTab() == 'executionAnalysis'}">
-          <div class="editor-bottom-tab-panel">
-            <!-- ko component: { name: 'hue-execution-analysis' } --><!-- /ko -->
+          <div class="execution-analysis-tab-panel">
+            <execution-analysis-panel-ko-bridge class="execution-analysis-bridge" data-bind="vueKoProps: {
+                executableObservable: activeExecutable
+              }"></execution-analysis-panel-ko-bridge>
           </div>
         </div>
-        <!-- /ko -->
 
         <!-- ko foreach: pinnedContextTabs -->
         <div class="tab-pane" data-bind="attr: { 'id': tabId }, css: {'active': $parent.currentQueryTab() === tabId }">

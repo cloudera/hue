@@ -150,6 +150,29 @@ $hue-panel-border-radius: 3px;
   @include animation('fade-in-frames 2s');
 }
 
+@mixin fillAbsolute {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+// Flexbox mixins
+
+@mixin flexRowLayout {
+  @include display-flex();
+  @include flex-direction(column);
+
+  overflow: hidden;
+}
+
+@mixin flexRowLayoutRow($flex, $position: relative) {
+  @include flex($flex);
+
+  position: $position;
+}
+
 // Flexbox mixins
 
 @mixin display-flex() {
