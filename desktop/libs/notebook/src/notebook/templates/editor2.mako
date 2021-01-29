@@ -115,6 +115,11 @@
             <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
           </a>
         </li>
+        <li>
+          <a href="javascript:void(0)" title="${ _('Show Editor Help') }" data-toggle="modal" data-target="#editorHelpModal">
+            <i class="fa fa-fw fa-question"></i>  ${ _('Help') }
+          </a>
+        </li>
         <li class="divider"></li>
         <!-- ko if: $root.canSave -->
         <!-- ko if: sharingEnabled -->
@@ -922,9 +927,6 @@
         <!-- ko template: { name: 'editor-longer-operation' } --><!-- /ko -->
         <div class="editor-top-right-actions">
           <!-- ko template: { name: 'snippet-header-database-selection' } --><!-- /ko -->
-          <button title="${ _('Show editor help') }" data-toggle="modal" data-target="#editorHelpModal">
-            <i class="fa fa-question"></i>
-          </button>
           <button title="${ _('Expand editor') }" data-bind="toggle: $root.topExpanded">
             <i class="fa" data-bind="css: { 'fa-expand': !$root.topExpanded(), 'fa-compress': $root.topExpanded() }"></i>
           </button>
