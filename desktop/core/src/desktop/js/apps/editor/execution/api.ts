@@ -83,7 +83,11 @@ export interface ExecuteLogsApiResponse {
 }
 
 export interface ExecutionJob {
+  finished: boolean;
+  name: string;
   percentJob?: number;
+  started: boolean;
+  url: string;
 }
 
 export interface ExecutionHandle {

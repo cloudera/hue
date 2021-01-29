@@ -1,0 +1,29 @@
+@import '../../../../components/styles/colors.scss';
+@import '../../../../components/styles/mixins.scss';
+
+.execution-analysis-panel {
+  @include fillAbsolute;
+  @include flexRowLayout;
+
+  .execution-analysis-jobs,
+  .execution-analysis-logs {
+    @include flexRowLayout;
+
+    h4 {
+      @include flexRowLayoutRow(15px);
+    }
+
+    .execution-analysis-jobs-panel,
+    .execution-analysis-logs-panel {
+      @include flexRowLayoutRow(0 1 100%);
+    }
+  }
+
+  .execution-analysis-jobs {
+    @include flexRowLayoutRow(0 1 80px);
+  }
+
+  .execution-analysis-logs {
+    @include flexRowLayoutRow(0 1 100%);
+  }
+}

@@ -28,6 +28,7 @@ import 'apps/editor/components/ko.queryHistory';
 import './components/ExecutableActionsKoBridge.vue';
 import './components/EditorResizerKoBridge.vue';
 import './components/aceEditor/AceEditorKoBridge.vue';
+import './components/executionAnalysis/ExecutionAnalysisPanelKoBridge.vue';
 import './components/result/ResultTableKoBridge.vue';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
