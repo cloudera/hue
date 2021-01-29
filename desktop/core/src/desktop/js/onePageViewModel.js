@@ -636,7 +636,7 @@ class OnePageViewModel {
         url: '/jobbrowser/jobs/job_*',
         app: function (ctx) {
           page.redirect(
-            '/jobbrowser#!id=application_' + _.trimRight(ctx.params[0], '/').split('/')[0]
+            '/jobbrowser#!id=application_' + _.trimEnd(ctx.params[0], '/').split('/')[0]
           );
         }
       },
@@ -644,7 +644,7 @@ class OnePageViewModel {
         url: '/jobbrowser/jobs/application_*',
         app: function (ctx) {
           page.redirect(
-            '/jobbrowser#!id=application_' + _.trimRight(ctx.params[0], '/').split('/')[0]
+            '/jobbrowser#!id=application_' + _.trimEnd(ctx.params[0], '/').split('/')[0]
           );
         }
       },
