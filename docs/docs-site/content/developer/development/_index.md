@@ -827,9 +827,13 @@ Historically, the same thing used to be done with the `requires_hadoop` tag:
 
 ## Releasing
 
-The checklist below details the steps. Then send the release notes to the [Forum](https://discourse.gethue.com/), [hue-user](https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user), https://twitter.com/gethue !
+The checklist below details the steps. Then send the release notes to the [Forum](https://discourse.gethue.com/) and https://twitter.com/gethue!
+
+Also update https://wikipedia.org/wiki/Hue_(Software).
 
 ### Version
+
+Here is an example of [commit](https://github.com/cloudera/hue/commit/9de217d6b6).
 
 Update the versions to the next release (current release +1):
 
@@ -849,6 +853,8 @@ And add them and the authors to the release notes:
 
     git log --pretty="%an" | sort | uniq | sed 's/^\(.*\)/* \1/' > authors.txt
 
+### Git
+
 Pushing the release branch:
 
     git push origin HEAD:branch-4.8.0
@@ -857,6 +863,12 @@ Tagging the release:
 
     git tag -a release-4.8.0 -m "release-4.8.0"
     git push origin release-4.8.0
+
+Draft a new release on https://github.com/cloudera/hue/releases.
+
+Publish Github NPM package and Docker images at https://github.com/orgs/cloudera/packages?repo_name=hue.
+
+### Gethue
 
 Building the tarball release:
 
@@ -869,16 +881,9 @@ Push to the CDN:
 
     scp hue-4.8.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
 
-### Websites
+### Docker
 
-Other things to update:
-
-* In Jira, setting the [release as shipped](https://issues.cloudera.org/projects/HUE?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page&status=all) and moving all non finished jiras to another target. Also archiving old releases.
-* Create the after next release tag in Jira and Blog
-* Update Docker image https://hub.docker.com/u/gethue/
-* Update release date on https://wikipedia.org/wiki/Hue_(Software)
-
-Instructions:
+Docker image are at https://hub.docker.com/u/gethue/:
 
     docker build https://github.com/cloudera/hue.git#release-4.8.0 -t gethue/hue:4.8.0 -f tools/docker/hue/Dockerfile
     docker tag gethue/hue:4.8.0 gethue/hue:latest
@@ -898,20 +903,9 @@ Documentation is currently being auto refreshed every morning of the week and ru
 
 The manual process otherwise would be to [build it](#Documentation) and push it to the docs host.
 
-### Release
-
-    ssh root@docs.gethue.com
-    cd /var/www/docs.gethue.com
-    mkdir 4.8.0
-    rm latest; ln -s 4.8.0 latest
-
-    scp -r docs/docs-site/public/* root@docs.gethue.com:/var/www/docs.gethue.com/4.8.0
-
-    scp -r hue-4.6/build/release/prod/hue-4.8.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads/
-
 ### NPM registry
 
-To publish gethue to NPM registry, the following command would have to be run. Kindly refrain from using `npm publish`.
+To publish gethue to the [NPM registry](https://www.npmjs.com/package/gethue), the following command would have to be run.
 
     npm run publish-gethue
 
