@@ -21,7 +21,7 @@ Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.c
 
 Read more on [gethue.com](http://gethue.com).
 
-![Hue Editor](https://cdn.gethue.com/uploads/2020/09/hue-4.8.png)
+![Hue Editor](https://cdn.gethue.com/uploads/2021/02/hue-4.9.png)
 
 Getting Started
 ---------------
@@ -30,7 +30,7 @@ You can start Hue via three ways described below. Once setup, you would then nee
 
 Quick Demos:
 
-* Docker Compose: [Impala](https://gethue.com/blog/quickstart-sql-editor-for-apache-impala/), [Flink SQL](https://gethue.com/blog/tutorial-query-live-data-stream-with-flink-sql/), [ksqlDB](https://gethue.com/blog/tutorial-query-live-data-stream-with-kafka-sql/), [Phoenix SQL / HBase](https://gethue.com/blog/querying-live-kafka-data-in-apache-hbase-with-phoenix/), [Spark SQL](https://gethue.com/blog/querying-spark-sql-with-spark-thrift-server-and-hue-editor/)
+* Docker Compose: [Impala](https://gethue.com/blog/quickstart-sql-editor-for-apache-impala/), [Flink SQL](https://gethue.com/blog/sql-querying-live-kafka-logs-and-sending-live-updates-with-flink-sql/), [ksqlDB](https://gethue.com/blog/tutorial-query-live-data-stream-with-kafka-sql/), [Phoenix SQL / HBase](https://gethue.com/blog/querying-live-kafka-data-in-apache-hbase-with-phoenix/), [Spark SQL](https://gethue.com/blog/querying-spark-sql-with-spark-thrift-server-and-hue-editor/)
 * Live instance: [demo.gethue.com](https://demo.gethue.com/)
 
 The Forum [is here](https://discourse.gethue.com/) in case you are looking for help.
