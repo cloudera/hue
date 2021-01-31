@@ -13,9 +13,8 @@ This section goes into greater detail on how to build and reuse the components o
 ### Dependencies
 
 * The OS specific install instructions are listed in the [install guide](/administrator/installation/dependencies/)
-* Python 2.7+ (Python 3 support tracked in [HUE-8737](https://issues.cloudera.org/browse/HUE-8737))
-* Django (1.11 already included in the distribution)
-* Java (Java 1.8) (should go away after [HUE-8740](https://issues.cloudera.org/browse/HUE-8740))
+* Python 2.7+ or now Python 3
+* Django (2 soon 3 already included in the distribution)
 * Node.js ([10.0+](https://deb.nodesource.com/setup_10.x))
 
 ### Build & Start
@@ -154,7 +153,7 @@ Here is a tutorial about how to sent a patch request for review.
 
 ### Setup
 
-Hue project uses GitHub Pull Requests (PR) for code reviews. The advantage of Pull Request is that the CI (syntax check, tests...) automatically runs for you.
+Hue project uses GitHub Pull Requests (PR) for code reviews. It also automatically runs the CI (syntax check, tests...) for you.
 
 If you've never used git and github before, there are bunch of things you need to [do](https://kbroman.org/github_tutorial/pages/first_time.html) before going further.
 
@@ -162,17 +161,17 @@ Now, clone cloudera/hue:
 
     git clone https://github.com/cloudera/hue
 
-Create a new branch with the jira id (HUE-XXX) as the branch name:
+Create a new branch with the Github issue GH-XXX or explicit name as the branch name:
 
     git checkout master
     git pull --rebase origin master
-    git checkout -b HUE-XXX
+    git checkout -b GH-XXX
 
 Then make your changes in code:
 
     git add <file>
     git diff --cached
-    git commit -m "HUE-XXX <Ticket summary>"
+    git commit -m "GH-XXX <Ticket summary>"
 
 ### Post a review
 
@@ -187,9 +186,9 @@ Or push to your branch in your repository forks by doing one time:
 
 Then just:
 
-    git push bob HEAD:ISSUE-1000-fix
+    git push bob HEAD:GH-1000-fix
 
-And create the pull request via the button on the https://github.com/cloudera/hue/tree/ISSUE-1000-fix page.
+And create the pull request via the button on the https://github.com/cloudera/hue/tree/GH-1000-fix page.
 
 **Note**:
 If you have more than one diff, update `HEAD~1..HEAD` accordingly (e.g. `HEAD~2..HEAD`)
@@ -230,7 +229,7 @@ Once we get ship it from at least one reviewer, we can push the changes to maste
 
 We hope that these commands will make your life easier and encourage you to [contribute to Hue](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md) 😉
 
-As usual feel free to send feedback on the [Forum](https://discourse.gethue.com/) list or [@gethue](https://twitter.com/gethue)!
+As usual feel free to send feedback on the [Forum](https://discourse.gethue.com/) list or [GitHub issues](https://github.com/cloudera/hue/issues)!
 
 
 ## API Server
@@ -533,10 +532,10 @@ Developing applications for Hue requires a minimal amount of CSS
 
 In a nutshell, front-end development is using:
 
-* [Mako](http://www.makotemplates.org/) is the templating language (Mako to be slowly removed in [HUE-9036](https://issues.cloudera.org/browse/HUE-9036))
+* [Vue.js](https://vuejs.org/) to script the custom interactions
+* TypeScript
 * [Bootstrap](http://twitter.github.com/bootstrap/) to layout your app
-* [Knockout js](http://knockoutjs.com/) to script the custom interactions
-
+* [Mako](http://www.makotemplates.org/) is the templating language (currently being removed in favor of Vue.js))
 
 ### Javascript
 
@@ -813,17 +812,9 @@ Those are tagged with `integration` either at the class or method level:
       @attr('integration')
       def test_add_ldap_users_case_sensitivity(self):
         if is_live_cluster():
-          raise SkipTest('HUE-2897: Cannot yet guarantee database is case sensitive')
+          raise SkipTest('GH-2897: Cannot yet guarantee database is case sensitive')
 
         ...
-
-Historically, the same thing used to be done with the `requires_hadoop` tag:
-
-    from nose.plugins.attrib import attr
-
-    @attr('requires_hadoop')
-    def your_test():
-      ...
 
 ## Releasing
 
@@ -833,7 +824,7 @@ Also update https://wikipedia.org/wiki/Hue_(Software).
 
 ### Version
 
-Here is an example of [commit](https://github.com/cloudera/hue/commit/9de217d6b6).
+Here is an example of [release commit](https://github.com/cloudera/hue/commit/9de217d6b6).
 
 Update the versions to the next release (current release +1):
 
