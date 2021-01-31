@@ -83,19 +83,19 @@ Now under Hue open `desktop/conf/pseudo-distributed.ini` file in a text editor, 
 
 1. Directly below the `[[beeswax]]` line, add the following:
 
-        # Host where HiveServer2 is running.
-        hive_server_host=localhost
+    # Host where HiveServer2 is running.
+    hive_server_host=localhost
 
-        # Port where HiveServer2 Thrift server runs on.
-        hive_server_port=10000
+    # Port where HiveServer2 Thrift server runs on.
+    hive_server_port=10000
 
-        thrift_version=7
+    thrift_version=7
 
 2. Below the `[[interpreters]]` of `[notebook]`, add:
 
-        [[[hive]]]
-          name=Hive
-          interface=hiveserver2
+    [[[hive]]]
+    name=Hive
+    interface=hiveserver2
 
 And restart Hue, open the Editors and start typing your first queries!
 
@@ -702,7 +702,7 @@ To run the tests in watch mode:
 While in watch mode Jest will detect changes to all files and re-run related tests. There are
 also options to target specific files or tests. Press 'w' in the console to see the options.
 
-In order to update the test snapshots, let the first checks of tests complete and then 
+In order to update the test snapshots, let the first checks of tests complete and then
 press 'u' in the console to update the snapshots.
 
 Note: on certain OS like Ubuntu, running the tests via a global jest seems to not hang your system
