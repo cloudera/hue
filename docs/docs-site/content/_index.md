@@ -20,7 +20,7 @@ are executing 100s of 1000s of queries daily. It is free to install and also shi
 
 Hue is also ideal for building your own [Cloud SQL Editor](/developer/components/) and any contributions are welcome.
 
-!["Hue Editor"](https://cdn.gethue.com/uploads/2020/09/hue-4.8.png)
+!["Hue Editor"](https://cdn.gethue.com/uploads/2021/02/hue-4.9.png)
 
 
 Quick Start
@@ -42,6 +42,7 @@ Find how to reuse the SQL components/Parsers, call the API, extend Hue in the [D
 Releases
 --------
 
+* February 2, 2021 --- [Version 4.9.0](releases/release-notes-4.9.0/index.html)
 * September 23, 2020 --- [Version 4.8.0](releases/release-notes-4.8.0/index.html)
 * April 10, 2020 --- [Version 4.7.0](releases/release-notes-4.7.0/index.html)
 * December 5, 2019 --- [Version 4.6.0](releases/release-notes-4.6.0/index.html)

@@ -31,7 +31,9 @@ The client lib [MySQL-python](https://github.com/cloudera/hue/tree/master/deskto
 
 With the recent OSs like Ubuntu 20.04 or using Python 3, the MySQL-python lib won't compile properly and will produce an error similar to:
 
-    _mysql.c: Cannot open include file my_config.h
+    _mysql.c:44:10: fatal error: my_config.h: No such file or directory
+      44 | #include "my_config.h"
+          |          ^~~~~~~~~~~~~
 
 The lib folder needs to be swapped with https://pypi.org/project/mysqlclient/. Unfortunately for licensing reason (GPL vs Apache) this can't be officially done in the Hue repository.
 
