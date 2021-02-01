@@ -98,6 +98,15 @@ class DummyClient(Api):
     }
 
 
+  def predict(self, query, source_platform, connector):
+    hints = []
+    response = {}
+
+    return {
+      'hints': hints,
+    }
+
+
   def similar_queries(self, source_platform, query, page_size=100, startingToken=None, connector=None):
     raise PopupException(_('Call not supported'))
 
