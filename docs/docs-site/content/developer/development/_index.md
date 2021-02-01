@@ -703,6 +703,9 @@ To run the tests in watch mode:
 While in watch mode Jest will detect changes to all files and re-run related tests. There are
 also options to target specific files or tests. Press 'w' in the console to see the options.
 
+In order to update the test snapshots, let the first checks of tests complete and then 
+press 'u' in the console to update the snapshots.
+
 Note: on certain OS like Ubuntu, running the tests via a global jest seems to not hang your system
 
     npm install jest --global
