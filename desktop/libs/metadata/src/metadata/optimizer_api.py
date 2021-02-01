@@ -211,6 +211,29 @@ def query_risk(request):
 
 @require_POST
 @error_handler
+def predict(request):
+  response = {'status': -1}
+
+  interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
+  connector = json.loads(request.POST.get('connector', '{}'))
+  query = json.loads(request.POST.get('query', '""'))
+  source_platform = request.POST.get('sourcePlatform')
+
+  api = get_api(request.user, interface)
+
+  data = api.predict(query=query, source_platform=source_platform, connector=connector)
+
+  if data:
+    response['status'] = 0
+    response['predict'] = data
+  else:
+    response['message'] = 'Optimizer: %s' % data
+
+  return JsonResponse(response)
+
+
+@require_POST
+@error_handler
 def similar_queries(request):
   response = {'status': -1}
 
