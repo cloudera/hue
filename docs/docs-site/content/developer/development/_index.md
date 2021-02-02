@@ -848,12 +848,12 @@ And add them and the authors to the release notes:
 
 Pushing the release branch:
 
-    git push origin HEAD:branch-4.8.0
+    git push origin HEAD:branch-4.9.0
 
 Tagging the release:
 
-    git tag -a release-4.8.0 -m "release-4.8.0"
-    git push origin release-4.8.0
+    git tag -a release-4.9.0 -m "release-4.9.0"
+    git push origin release-4.9.0
 
 Draft a new release on https://github.com/cloudera/hue/releases.
 
@@ -863,36 +863,36 @@ Publish Github NPM package and Docker images at https://github.com/orgs/cloudera
 
 Building the tarball release:
 
-    git checkout -b release-4.8.0 release-4.8.0
+    git checkout -b release-4.9.0 release-4.9.0
     make prod
 
-You might need to upgrade the [Mysqlclient](https://docs.gethue.com/administrator/installation/dependencies/#mysql--mariadb) if seeing
+You might need to upgrade the [Mysqlclient](https://docs.gethue.com/administrator/installation/dependencies/#mysql--mariadb) if seeing:
 
     _mysql.c:44:10: fatal error: my_config.h: No such file or directory
       44 | #include "my_config.h"
           |          ^~~~~~~~~~~~~
 
-Source of the release: https://github.com/cloudera/hue/archive/release-4.8.0.zip
+Source of the release: https://github.com/cloudera/hue/archive/release-4.9.0.zip
 
 Push to the CDN:
 
-    scp hue-4.8.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
+    scp hue-4.9.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
 
 ### Docker
 
 Docker image are at https://hub.docker.com/u/gethue/:
 
-    docker build https://github.com/cloudera/hue.git#release-4.8.0 -t gethue/hue:4.8.0 -f tools/docker/hue/Dockerfile
-    docker tag gethue/hue:4.8.0 gethue/hue:latest
+    docker build https://github.com/cloudera/hue.git#release-4.9.0 -t gethue/hue:4.9.0 -f tools/docker/hue/Dockerfile
+    docker tag gethue/hue:4.9.0 gethue/hue:latest
     docker images
-    docker login
+    docker login -u gethue
     docker push gethue/hue
-    docker push gethue/hue:4.8.0
+    docker push gethue/hue:4.9.0
 
-    docker build . -t gethue/nginx:4.8.0 -f tools/docker/nginx/Dockerfile;
-    docker tag gethue/nginx:4.8.0 gethue/nginx:latest
+    docker build https://github.com/cloudera/hue.git#release-4.9.0 -t gethue/nginx:4.9.0 -f tools/docker/nginx/Dockerfile;
+    docker tag gethue/nginx:4.9.0 gethue/nginx:latest
     docker push gethue/nginx
-    docker push gethue/nginx:4.8.0
+    docker push gethue/nginx:4.9.0
 
 ### Documentation
 
