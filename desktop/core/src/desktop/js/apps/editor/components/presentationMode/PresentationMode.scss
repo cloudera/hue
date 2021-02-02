@@ -1,0 +1,39 @@
+@import '../../../../components/styles/colors.scss';
+@import '../../../../components/styles/mixins.scss';
+
+.presentation-mode {
+  @include fillAbsolute;
+  @include flexRowLayout;
+
+  .presentation-mode-header {
+    @include flexRowLayoutRow(0 0 auto);
+
+    padding: 10px;
+
+    .presentation-mode-close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+  }
+
+  .presentation-mode-body {
+    @include flexRowLayoutRow(0 1 100%);
+
+    overflow: auto;
+
+    .presentation-mode-statement {
+      margin: 10px;
+
+      .presentation-mode-sql-text {
+        margin-bottom: 5px;
+      }
+
+      .presentation-mode-result-panel {
+        position: relative;
+        max-height: 400px;
+        overflow: hidden;
+      }
+    }
+  }
+}

@@ -96,7 +96,7 @@
     @Prop()
     executable?: SqlExecutable;
     @Prop()
-    beforeExecute?: () => Promise<void>;
+    beforeExecute?: (executable: Executable) => Promise<void>;
 
     subTracker = new SubscriptionTracker();
 
@@ -158,7 +158,7 @@
         return;
       }
       if (this.beforeExecute) {
-        await this.beforeExecute();
+        await this.beforeExecute(this.executable);
       }
       await this.executable.reset();
       this.executable.execute();

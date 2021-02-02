@@ -27,7 +27,6 @@ import sessionManager from 'apps/editor/execution/sessionManager';
 import Snippet, { STATUS as SNIPPET_STATUS } from 'apps/editor/snippet';
 import { HISTORY_CLEARED_EVENT } from 'apps/editor/components/ko.queryHistory';
 import { UPDATE_SAVED_QUERIES_EVENT } from 'apps/editor/components/ko.savedQueries';
-import SqlExecutable from './execution/sqlExecutable';
 import {
   ASSIST_DB_PANEL_IS_READY_EVENT,
   ASSIST_IS_DB_PANEL_READY_EVENT,
@@ -54,10 +53,6 @@ export default class Notebook {
 
     this.isPresentationModeDefault = ko.observable(!!notebookRaw.isPresentationModeDefault);
     this.isPresentationMode = ko.observable(false);
-    this.isPresentationModeInitialized = ko.observable(false);
-    this.isPresentationMode.subscribe(this.onPresentationModeChange.bind(this));
-    this.presentationSnippets = ko.observable({});
-    this.prePresentationModeSnippet = undefined;
 
     this.isHidingCode = ko.observable(!!notebookRaw.isHidingCode);
 
@@ -111,18 +106,6 @@ export default class Notebook {
       notebookRaw.snippets.forEach(snippetRaw => {
         this.addSnippet(snippetRaw);
       });
-      if (
-        typeof notebookRaw.presentationSnippets != 'undefined' &&
-        notebookRaw.presentationSnippets != null
-      ) {
-        // Load
-        $.each(notebookRaw.presentationSnippets, (key, snippet) => {
-          snippet.status = 'ready'; // Protect from storm of check_statuses
-          const _snippet = new Snippet(vm, this, snippet);
-          _snippet.init();
-          this.presentationSnippets()[key] = _snippet;
-        });
-      }
     }
 
     huePubSub.subscribe(HISTORY_CLEARED_EVENT, () => {
@@ -426,100 +409,6 @@ export default class Notebook {
     });
   }
 
-  onPresentationModeChange(isPresentationMode) {
-    if (isPresentationMode) {
-      hueAnalytics.convert('editor', 'presentation');
-    }
-
-    // Problem with headers / row numbers redraw on full screen results
-    huePubSub.publish('editor.presentation.operate.toggle', isPresentationMode);
-    const newSnippets = [];
-
-    if (isPresentationMode) {
-      const sourceSnippet = this.snippets()[0];
-      this.prePresentationModeSnippet = sourceSnippet;
-      const statementKeys = {};
-
-      const database = sourceSnippet.database();
-
-      sourceSnippet.executor.executables.forEach(executable => {
-        const sqlStatement = executable.parsedStatement.statement;
-        const statementKey = sqlStatement.hashCode() + database;
-
-        let presentationSnippet;
-
-        if (!this.presentationSnippets()[statementKey]) {
-          const titleLines = [];
-          const statementLines = [];
-          sqlStatement
-            .trim()
-            .split('\n')
-            .forEach(line => {
-              if (line.trim().startsWith('--') && statementLines.length === 0) {
-                titleLines.push(line.substr(2));
-              } else {
-                statementLines.push(line);
-              }
-            });
-          presentationSnippet = new Snippet(this.parentVm, this, {
-            connector: sourceSnippet.connector(),
-            statement_raw: statementLines.join('\n'),
-            database: database,
-            name: titleLines.join('\n')
-          });
-          presentationSnippet.variableSubstitutionHandler =
-            sourceSnippet.variableSubstitutionHandler;
-          presentationSnippet.executor.variableSubstitionHandler =
-            sourceSnippet.variableSubstitutionHandler;
-          window.setTimeout(() => {
-            const executableRaw = executable.toJs();
-            const reattachedExecutable = SqlExecutable.fromJs(
-              presentationSnippet.executor,
-              executableRaw
-            );
-            reattachedExecutable.result = executable.result;
-            presentationSnippet.executor.executables = [reattachedExecutable];
-            presentationSnippet.activeExecutable(reattachedExecutable);
-          }, 1000); // TODO: Make it possible to set activeSnippet on Snippet creation
-          presentationSnippet.init();
-          this.presentationSnippets()[statementKey] = presentationSnippet;
-        } else {
-          presentationSnippet = this.presentationSnippets()[statementKey];
-        }
-        statementKeys[statementKey] = true;
-        newSnippets.push(presentationSnippet);
-      });
-
-      Object.keys(this.presentationSnippets()).forEach(key => {
-        // Dead statements
-        if (!statementKeys[key]) {
-          this.presentationSnippets()[key].executor.executables.forEach(executable => {
-            executable.cancelBatchChain();
-          });
-          delete this.presentationSnippets()[key];
-        }
-      });
-    } else {
-      newSnippets.push(this.prePresentationModeSnippet);
-    }
-    this.parentVm.editorMode(!isPresentationMode);
-    this.snippets(newSnippets);
-
-    newSnippets.forEach(snippet => {
-      huePubSub.publish('editor.redraw.data', { snippet: snippet });
-      if (this.isPresentationMode()) {
-        window.setTimeout(() => {
-          snippet.executor.executables.forEach(executable => {
-            executable.notify();
-            if (executable.result) {
-              executable.result.notify();
-            }
-          });
-        }, 1000); // TODO: Make it possible to set activeSnippet on Snippet creation
-      }
-    });
-  }
-
   async toContextJson() {
     return JSON.stringify({
       id: this.id(),
@@ -548,10 +437,6 @@ export default class Notebook {
       name: this.name(),
       onSuccessUrl: this.onSuccessUrl(),
       parentSavedQueryUuid: this.parentSavedQueryUuid(),
-      presentationSnippets: Object.keys(this.presentationSnippets()).reduce((result, key) => {
-        result[key] = this.presentationSnippets()[key].toJs();
-        return result;
-      }, {}),
       pubSubUrl: this.pubSubUrl(),
       result: {}, // TODO: Moved to executor but backend requires it
       sessions: await sessionManager.getAllSessions(),

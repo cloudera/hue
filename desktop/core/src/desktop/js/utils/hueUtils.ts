@@ -603,6 +603,10 @@ export const defer = (callback: () => void): void => {
   sleep(0).finally(callback);
 };
 
+export const noop = (): void => {
+  // noop
+};
+
 export default {
   bootstrapRatios,
   changeURL,
