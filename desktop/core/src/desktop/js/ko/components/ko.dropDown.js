@@ -27,7 +27,7 @@ const TEMPLATE = `
   <a class="inactive-action hue-drop-down-active" href="javascript:void(0)" data-bind="toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
     <!-- ko if: icon --><i class="fa" data-bind="css: icon"></i><!-- /ko -->
     <!-- ko if: !noLabel && value -->
-    <span class="hue-drop-down-selected" data-bind="text: value() && typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': value() && typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value() }" ></span>
+    <span class="hue-drop-down-selected" data-bind="text: value() && typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': titleTooltip }" ></span>
     <!-- /ko -->
     <i class="fa fa-caret-down"></i>
   </a>
@@ -160,6 +160,7 @@ class HueDropDown {
     self.labelAttribute = params.labelAttribute || 'label';
     self.icon = params.icon;
     self.value = params.value;
+    self.titleName = params.titleName;
     self.entries = params.entries;
     self.searchable = params.searchable || false;
     self.foreachVisible = params.foreachVisible || false;
@@ -171,6 +172,18 @@ class HueDropDown {
       return self.value() && typeof self.value() === 'object'
         ? self.value()[self.labelAttribute]
         : self.value();
+    });
+
+    self.titleTooltip = ko.pureComputed(() => {
+      const title =
+        self.value() && typeof self.value()[self.labelAttribute] !== 'undefined'
+          ? self.value()[self.labelAttribute]
+          : self.value();
+
+      if (typeof self.titleName == 'undefined') {
+        return title;
+      }
+      return self.titleName + ' ' + title;
     });
 
     const closeOnOutsideClick = function (e) {

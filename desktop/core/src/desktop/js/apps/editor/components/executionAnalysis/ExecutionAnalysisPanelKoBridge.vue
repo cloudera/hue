@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <ExecutionAnalysisPanel :executable="executable" />
+  <ExecutionAnalysisPanel :executable="executable" @execution-error="onExecutionError" />
 </template>
 
 <script lang="ts">
@@ -54,6 +54,10 @@
 
     destroyed(): void {
       this.subTracker.dispose();
+    }
+
+    onExecutionError(): void {
+      this.$el.dispatchEvent(new CustomEvent('execution-error', { bubbles: true }));
     }
   }
 

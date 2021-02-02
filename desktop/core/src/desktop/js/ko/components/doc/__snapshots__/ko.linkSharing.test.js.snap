@@ -24,7 +24,7 @@ exports[`ko.linkSharing.js should render component activated 1`] = `
       \\"><a class=\\"inactive-action hue-drop-down-active\\" href=\\"javascript:void(0)\\" data-bind=\\"toggle: dropDownVisible, css: { 'blue': dropDownVisible }\\">
     <!-- ko if: icon --><!-- /ko -->
     <!-- ko if: !noLabel && value -->
-    <span class=\\"hue-drop-down-selected\\" data-bind=\\"text: value() &amp;&amp; typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': value() &amp;&amp; typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value() }\\" title=\\"read\\">read</span>
+    <span class=\\"hue-drop-down-selected\\" data-bind=\\"text: value() &amp;&amp; typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': titleTooltip }\\" title=\\"read\\">read</span>
     <!-- /ko -->
     <i class=\\"fa fa-caret-down\\"></i>
   </a><input class=\\"hue-drop-down-input\\" type=\\"text\\" data-bind=\\"textInput: filter, attr: { 'placeHolder': inputPlaceHolder }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }\\" placeholder=\\"read\\" style=\\"display: none; color: rgb(170, 170, 170); min-height: 22px; margin-left: 10px;\\"><i class=\\"fa fa-caret-down\\"></i><div class=\\"hue-drop-down-container\\" data-bind=\\"css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition, 'hue-drop-down-container-searchable': searchable }, dropDownKeyUp: { onEsc: onEsc, onEnter: onEnter, dropDownVisible: dropDownVisible }\\">

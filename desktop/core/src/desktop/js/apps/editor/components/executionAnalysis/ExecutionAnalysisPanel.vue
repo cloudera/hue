@@ -22,6 +22,13 @@
       <h1 class="empty">{{ I18n('Select and execute a query to see the analysis.') }}</h1>
     </div>
 
+    <div v-if="analysisAvailable && errors.length" class="execution-analysis-errors">
+      <h4>{{ I18n('Errors') }}</h4>
+      <ul>
+        <li v-for="error of errors" :key="error.message">{{ error.message }}</li>
+      </ul>
+    </div>
+
     <div v-if="analysisAvailable && jobsAvailable" class="execution-analysis-jobs">
       <h4>{{ I18n('Jobs') }}</h4>
       <div class="execution-analysis-jobs-panel">
@@ -43,7 +50,7 @@
   import HueLink from 'components/HueLink.vue';
   import Vue from 'vue';
   import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { Prop, Watch } from 'vue-property-decorator';
 
   import './ExecutionAnalysisPanel.scss';
   import Executable, {
@@ -69,6 +76,7 @@
     logs = '';
     jobs: ExecutionJob[] = [];
     errors: ExecutionError[] = [];
+    notifiedErrors = false;
 
     subTracker = new SubscriptionTracker();
 
@@ -90,12 +98,23 @@
       }
     }
 
+    @Watch('errors')
+    executionError(errors: ExecutionError[]): void {
+      if (errors.length && !this.notifiedErrors) {
+        this.$emit('execution-error');
+      }
+      this.notifiedErrors = !!errors.length;
+    }
+
     destroyed(): void {
       this.subTracker.dispose();
     }
 
     get analysisAvailable(): boolean {
-      return !!this.executable && this.executable.status !== ExecutionStatus.ready;
+      return (
+        (!!this.executable && this.executable.status !== ExecutionStatus.ready) ||
+        !!this.errors.length
+      );
     }
 
     get jobsWithUrls(): ExecutionJob[] {

@@ -1058,9 +1058,14 @@
 
         <div class="tab-pane" id="executionAnalysis" data-bind="css: {'active': currentQueryTab() == 'executionAnalysis'}">
           <div class="execution-analysis-tab-panel">
-            <execution-analysis-panel-ko-bridge class="execution-analysis-bridge" data-bind="vueKoProps: {
+            <execution-analysis-panel-ko-bridge class="execution-analysis-bridge" data-bind="
+              vueKoProps: {
                 executableObservable: activeExecutable
-              }"></execution-analysis-panel-ko-bridge>
+              },
+              vueEvents: {
+                'execution-error': function () { currentQueryTab('executionAnalysis') }
+              }
+            "></execution-analysis-panel-ko-bridge>
           </div>
         </div>
 
