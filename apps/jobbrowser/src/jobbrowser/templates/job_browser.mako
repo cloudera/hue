@@ -3420,7 +3420,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         top: 0,
         left: 0
       }
-
+      self.redrawOnResize = function(){
+        huePubSub.publish('graph.draw.arrows');
+      }
       self.initialArrowsDrawingCount = 0;
       self.initialArrowsDrawing = function() {
         if (self.initialArrowsDrawingCount < 20) {
@@ -3435,21 +3437,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
         else {
           self.initialArrowsDrawingCount = 0;
-        }
-      }
-
-      self.updateArrowsInterval = -1;
-      self.updateArrows = function() {
-        if ($('canvas').length > 0 && $('canvas').position().top !== self.lastArrowsPosition.top && $('canvas').position().left !== self.lastArrowsPosition.left) {
-          self.lastArrowsPosition = $('canvas').position();
-        }
-        if ($('#workflow-page-graph${ SUFFIX }').is(':visible')){
-          if ($('canvas').length === 0){
-            huePubSub.publish('graph.draw.arrows');
-          }
-        }
-        else {
-          $('canvas').remove();
         }
       }
 
@@ -3478,9 +3465,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 response: response,
                 callback: function (r) {
                   $('#workflow-page-graph${ SUFFIX }').html(r);
-                  window.clearInterval(self.updateArrowsInterval);
                   self.initialArrowsDrawing();
-                  self.updateArrowsInterval = window.setInterval(self.updateArrows, 100, 'jobbrowser');
+                  $(window).on('resize',self.redrawOnResize);
                 }
               });
             }
