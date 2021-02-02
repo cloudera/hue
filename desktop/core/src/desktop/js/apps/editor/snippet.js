@@ -29,6 +29,7 @@ import './components/ExecutableActionsKoBridge.vue';
 import './components/EditorResizerKoBridge.vue';
 import './components/aceEditor/AceEditorKoBridge.vue';
 import './components/executionAnalysis/ExecutionAnalysisPanelKoBridge.vue';
+import './components/presentationMode/PresentationModeKoBridge.vue';
 import './components/result/ResultTableKoBridge.vue';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
@@ -406,19 +407,6 @@ export default class Snippet {
             this.statementsList(statementsList); // Or fetch on demand via editor.refresh.statement.locations and remove observableArray?
           } else {
             this.statementsList([]);
-          }
-          if (!this.parentNotebook.isPresentationModeInitialized()) {
-            if (this.parentNotebook.isPresentationModeDefault()) {
-              // When switching to presentation mode, the snippet in non presentation mode cannot get status notification.
-              // On initiailization, status is set to loading and does not get updated, because we moved to presentation mode.
-              this.status(STATUS.ready);
-            }
-            // Changing to presentation mode requires statementsList to be initialized. statementsList is initialized asynchronously.
-            // When presentation mode is default, we cannot change before statementsList has been calculated.
-            // Cleaner implementation would be to make toggleEditorMode statementsList asynchronous
-            // However this is currently impossible due to delete _notebook.presentationSnippets()[key];
-            this.parentNotebook.isPresentationModeInitialized(true);
-            this.parentNotebook.isPresentationMode(this.parentNotebook.isPresentationModeDefault());
           }
         }
       },
