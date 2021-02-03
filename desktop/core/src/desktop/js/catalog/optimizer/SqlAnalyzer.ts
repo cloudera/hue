@@ -74,6 +74,18 @@ export default class SqlAnalyzer implements Optimizer {
           ]
         : [];
 
+      const isSelectStar = await this.checkSelectStar(snippet.statement, this.connector.dialect);
+      if (isSelectStar) {
+        hints.push(
+          {
+            riskTables: [],
+            riskAnalysis: I18n('Query doing a SELECT *'), // Could be triggered only if column number > 10 (todo in Validator API)
+            riskId: 18,
+            risk: 'low',
+            riskRecommendation: I18n('Select only a subset of columns instead of all of them')
+          }
+        );
+
       try {
         const apiResponse = await apiPromise;
         if (apiResponse.query_complexity && apiResponse.query_complexity.hints) {
@@ -105,6 +117,21 @@ export default class SqlAnalyzer implements Optimizer {
       parsedStatement.locations.some(location => {
         return location.type === 'limitClause' && location.missing;
       })
+    );
+  }
+
+  async checkSelectStar(statement: string, dialect: string): Promise<boolean> {
+    const autocompleter = await sqlParserRepository.getAutocompleteParser(dialect);
+    const parsedStatement = autocompleter.parseSql(statement + ' ', '');
+
+    return (
+      parsedStatement.locations.some(
+        location => location.type === 'statementType' && location.identifier === 'SELECT'
+      ) &&
+      parsedStatement.locations.some(location => {
+        return location.type === 'selectList' && !location.missing;
+      }) &&
+      parsedStatement.locations.some(location => location.type === 'asterisk')
     );
   }
 
