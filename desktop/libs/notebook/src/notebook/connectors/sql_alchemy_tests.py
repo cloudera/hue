@@ -287,6 +287,8 @@ class TestApi(object):
             response = SqlAlchemyApi(self.user, self.interpreter).autocomplete(snippet, database='database1')
             assert_equal(response['tables_meta'][0]['name'], 'table1')
             assert_equal(response['tables_meta'][1]['name'], 'view1')
+            assert_equal(response['tables_meta'][0]['type'], 'Table')
+            assert_equal(response['tables_meta'][1]['type'], 'View')
 
 
   def test_get_sample_data_table(self):
