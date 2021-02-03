@@ -76,15 +76,14 @@ export default class SqlAnalyzer implements Optimizer {
 
       const isSelectStar = await this.checkSelectStar(snippet.statement, this.connector.dialect);
       if (isSelectStar) {
-        hints.push(
-          {
-            riskTables: [],
-            riskAnalysis: I18n('Query doing a SELECT *'), // Could be triggered only if column number > 10 (todo in Validator API)
-            riskId: 18,
-            risk: 'low',
-            riskRecommendation: I18n('Select only a subset of columns instead of all of them')
-          }
-        );
+        hints.push({
+          riskTables: [],
+          riskAnalysis: I18n('Query doing a SELECT *'), // Could be triggered only if column number > 10 (todo in Validator API)
+          riskId: 18,
+          risk: 'low',
+          riskRecommendation: I18n('Select only a subset of columns instead of all of them')
+        });
+      }
 
       try {
         const apiResponse = await apiPromise;
