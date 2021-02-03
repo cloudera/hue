@@ -118,7 +118,7 @@ const TEMPLATE =
             <div class="risk-list-description" data-bind="text: riskRecommendation"></div>
             <div class="risk-quickfix" data-bind="visible: (riskId === 17 || riskId === 18 || riskId === 22) && $parent.activeEditor() && $parent.activeLocations()" style="display:none;">
               <a href="javascript:void(0);" data-bind="click: function () { $parent.addFilter(riskId); hueAnalytics.convert('optimizer', 'addFilter/' + riskId); }">${I18n(
-                'Add filter'
+                'Fix me'
               )}</a>
             </div>
           </li>
