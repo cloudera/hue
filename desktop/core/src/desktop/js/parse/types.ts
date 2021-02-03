@@ -51,6 +51,7 @@ export interface SyntaxError {
 }
 
 export interface IdentifierLocation {
+  identifier: string;
   type: string;
   alias?: string;
   source?: string;
