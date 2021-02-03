@@ -80,11 +80,7 @@
     <BaseNavigationItemTooltip
       v-if="tooltip"
       :visible="isCollapsed"
-      :style="{
-        top: tooltip.top + 'px',
-        left: tooltip.right + 'px',
-        'max-height': tooltip.maxHeight + 'px'
-      }"
+      :style="tooltipStyle"
       role="tooltip"
     >
       <div
@@ -163,6 +159,29 @@
         return `${el.scrollHeight}px`;
       }
       return '0';
+    }
+
+    get tooltipStyle(): CSSStyleDeclaration | undefined {
+      if (!this.tooltip) {
+        return {};
+      }
+
+      if (this.isCollapsed) {
+        // Prevent the menu from showing outside the window
+        const height = this.item.children.length * 32 + 40;
+        const diff = this.tooltip.top + height - window.innerHeight;
+        if (diff > 0) {
+          return {
+            top: this.tooltip.top - diff - 5 + 'px',
+            left: this.tooltip.right + 'px'
+          };
+        }
+      }
+      return {
+        top: this.tooltip.top + 'px',
+        left: this.tooltip.right + 'px',
+        maxHeight: this.tooltip.maxHeight + 'px'
+      };
     }
 
     mounted(): void {
