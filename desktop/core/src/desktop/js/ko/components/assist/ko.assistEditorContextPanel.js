@@ -660,9 +660,10 @@ class AssistEditorContextPanel {
         }
 
         if (
+          riskId === 22 &&
           location.type === 'whereClause' &&
           !location.subquery &&
-          (location.missing || riskId === 22)
+          location.missing
         ) {
           this.activeEditor().moveCursorToPosition({
             row: location.location.last_line - 1,
@@ -682,6 +683,42 @@ class AssistEditorContextPanel {
           this.activeEditor().focus();
 
           if (riskId === 22) {
+            huePubSub.publish('editor.autocomplete.temporary.sort.override', {
+              partitionColumnsFirst: true
+            });
+          }
+
+          window.setTimeout(() => {
+            this.activeEditor().execCommand('startAutocomplete');
+          }, 1);
+
+          return false;
+        }
+
+        if (
+          riskId === 17 &&
+          location.type === 'limitClause' &&
+          !location.subquery &&
+          location.missing
+        ) {
+          this.activeEditor().moveCursorToPosition({
+            row: location.location.last_line - 1,
+            column: location.location.last_column - 1
+          });
+          this.activeEditor().clearSelection();
+
+          if (/\S$/.test(this.activeEditor().getTextBeforeCursor())) {
+            this.activeEditor().session.insert(this.activeEditor().getCursorPosition(), ' ');
+          }
+
+          const operation = 'LIMIT';
+          this.activeEditor().session.insert(
+            this.activeEditor().getCursorPosition(),
+            isLowerCase ? operation.toLowerCase() : operation
+          );
+          this.activeEditor().focus();
+
+          if (riskId === 17) {
             huePubSub.publish('editor.autocomplete.temporary.sort.override', {
               partitionColumnsFirst: true
             });

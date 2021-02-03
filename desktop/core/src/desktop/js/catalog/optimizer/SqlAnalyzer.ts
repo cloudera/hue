@@ -67,7 +67,7 @@ export default class SqlAnalyzer implements Optimizer {
             {
               riskTables: [],
               riskAnalysis: I18n('Query has no limit'),
-              riskId: 22, // To change
+              riskId: 17,
               risk: 'low',
               riskRecommendation: I18n('Append a limit clause to reduce the size of the result set')
             }
