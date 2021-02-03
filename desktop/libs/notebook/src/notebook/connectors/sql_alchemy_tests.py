@@ -273,6 +273,24 @@ class TestApi(object):
             [{'name': 'col1', 'type': 'STRING_TYPE', 'comment': ''}]
           )
 
+
+  def test_get_tables(self):
+    snippet = MagicMock()
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      with patch('notebook.connectors.sql_alchemy.inspect') as inspect:
+        with patch('notebook.connectors.sql_alchemy.Assist.get_table_names') as get_table_names:
+          with patch('notebook.connectors.sql_alchemy.Assist.get_view_names') as get_view_names:
+            get_table_names.return_value = ['table1']
+            get_view_names.return_value = ['view1']
+
+            response = SqlAlchemyApi(self.user, self.interpreter).autocomplete(snippet, database='database1')
+            assert_equal(response['tables_meta'][0]['name'], 'table1')
+            assert_equal(response['tables_meta'][1]['name'], 'view1')
+            assert_equal(response['tables_meta'][0]['type'], 'Table')
+            assert_equal(response['tables_meta'][1]['type'], 'View')
+
+
   def test_get_sample_data_table(self):
     snippet = Mock()
 
