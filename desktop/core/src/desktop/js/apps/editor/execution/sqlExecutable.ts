@@ -50,6 +50,7 @@ export default class SqlExecutable extends Executable {
 
   getStatement(): string {
     let statement = this.getRawStatement();
+
     if (
       this.parsedStatement.firstToken &&
       this.parsedStatement.firstToken.toLowerCase() === 'select' &&

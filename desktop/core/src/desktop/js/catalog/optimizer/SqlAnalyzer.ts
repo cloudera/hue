@@ -59,15 +59,10 @@ export default class SqlAnalyzer implements Optimizer {
         apiPromise.cancel();
       });
 
-      const autocompleter = await sqlParserRepository.getAutocompleteParser(this.connector.dialect);
       const snippet = JSON.parse(options.snippetJson);
-      const sqlParseResult = autocompleter.parseSql(snippet.statement + ' ', '');
+      const missingLimit = await this.checkMissingLimit(snippet.statement, this.connector.dialect);
 
-      const hasLimit = sqlParseResult.locations.some(
-        location => location.type === 'limitClause' && !location.missing
-      );
-
-      const hints: RiskHint[] = !hasLimit
+      const hints: RiskHint[] = missingLimit
         ? [
             {
               riskTables: [],
@@ -96,6 +91,21 @@ export default class SqlAnalyzer implements Optimizer {
         }
       });
     });
+  }
+
+  async checkMissingLimit(statement: string, dialect: string): Promise<boolean> {
+    const autocompleter = await sqlParserRepository.getAutocompleteParser(dialect);
+    const parsedStatement = autocompleter.parseSql(statement + ' ', '');
+
+    return (
+      parsedStatement.locations.some(
+        location => location.type === 'statementType' && location.identifier === 'SELECT'
+      ) &&
+      parsedStatement.locations.some(location => location.type === 'table') &&
+      parsedStatement.locations.some(location => {
+        return location.type === 'limitClause' && location.missing;
+      })
+    );
   }
 
   fetchTopJoins(options: PopularityOptions): CancellablePromise<TopJoins> {
