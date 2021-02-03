@@ -87,7 +87,7 @@ ${ dashboard.import_layout() }
                     _w = viewModel.getWidgetById('33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
                   }
                   else {
-                    var actionName = actionId.toLowerCase().substr(actionId.lastIndexOf('-') + 1)
+                    var actionName = actionId.toLowerCase().substr(actionId.lastIndexOf('@') + 1)
                     if ($("[id^=wdg_][id*=" + actionName + "]").length > 0) {
                       _w = viewModel.getWidgetById($("[id^=wdg_][id*=" + actionName + "]").attr("id").substr(4));
                     }
