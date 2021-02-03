@@ -693,6 +693,7 @@ class AssistEditorContextPanel {
 
           return false;
         }
+
         return true;
       });
     }
