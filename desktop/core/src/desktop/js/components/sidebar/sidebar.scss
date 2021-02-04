@@ -266,6 +266,22 @@
     color: $sidebar-selection-color;
     font-weight: 500;
   }
+
+  &.sidebar-tooltip-user-header {
+    height: 40px;
+    padding-top: 10px;
+
+    .sidebar-tooltip-username,
+    .sidebar-user-icon {
+      margin-left: 10px;
+    }
+
+    .sidebar-user-icon {
+      width: 30px;
+      height: 30px;
+      font-size: 18px;
+    }
+  }
 }
 
 .sidebar-accordion-item {
