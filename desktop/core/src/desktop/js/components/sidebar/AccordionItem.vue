@@ -82,6 +82,7 @@
       :visible="isCollapsed"
       :style="tooltipStyle"
       role="tooltip"
+      @click="onTooltipClick"
     >
       <div
         v-if="isUserMenu"
@@ -252,6 +253,10 @@
 
     onTooltipAccordionItemsScroll(event: Event): void {
       this.isTooltipScrolled = (event.target as HTMLElement).scrollTop > 0;
+    }
+
+    onTooltipClick(): void {
+      this.tooltip = null;
     }
 
     openTooltip(el: HTMLElement, fromKeyboard?: boolean): void {
