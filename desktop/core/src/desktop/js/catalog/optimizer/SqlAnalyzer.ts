@@ -106,30 +106,40 @@ export default class SqlAnalyzer implements Optimizer {
 
   async checkMissingLimit(statement: string, dialect: string): Promise<boolean> {
     const autocompleter = await sqlParserRepository.getAutocompleteParser(dialect);
-    const parsedStatement = autocompleter.parseSql(statement + ' ', '');
+    let parsedStatement;
+    try {
+      parsedStatement = autocompleter.parseSql(statement + ' ', '');
+    } catch (err) {
+      return false;
+    }
 
     return (
       parsedStatement.locations.some(
         location => location.type === 'statementType' && location.identifier === 'SELECT'
       ) &&
       parsedStatement.locations.some(location => location.type === 'table') &&
-      parsedStatement.locations.some(location => {
-        return location.type === 'limitClause' && location.missing;
-      })
+      parsedStatement.locations.some(
+        location => location.type === 'limitClause' && location.missing
+      )
     );
   }
 
   async checkSelectStar(statement: string, dialect: string): Promise<boolean> {
     const autocompleter = await sqlParserRepository.getAutocompleteParser(dialect);
-    const parsedStatement = autocompleter.parseSql(statement + ' ', '');
+    let parsedStatement;
+    try {
+      parsedStatement = autocompleter.parseSql(statement + ' ', '');
+    } catch (err) {
+      return false;
+    }
 
     return (
       parsedStatement.locations.some(
         location => location.type === 'statementType' && location.identifier === 'SELECT'
       ) &&
-      parsedStatement.locations.some(location => {
-        return location.type === 'selectList' && !location.missing;
-      }) &&
+      parsedStatement.locations.some(
+        location => location.type === 'selectList' && !location.missing
+      ) &&
       parsedStatement.locations.some(location => location.type === 'asterisk')
     );
   }
