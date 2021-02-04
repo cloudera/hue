@@ -274,3 +274,7 @@ if is_oidc_configured():
   urlpatterns += [
     url(r'^oidc/', include('mozilla_django_oidc.urls')),
   ]
+
+urlpatterns += [
+    url(r'^slack/', include('desktop.lib.botserver.urls')),
+  ]
