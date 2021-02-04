@@ -58,20 +58,20 @@ describe('SqlAnalyzer.ts', () => {
 
   describe('checkSelectStar', () => {
     it('Should detect a SELECT *', async () => {
-      const isMissingLimit = await new SqlAnalyzer(connectorA).checkSelectStar(
+      const isSelectStar = await new SqlAnalyzer(connectorA).checkSelectStar(
         'SELECT * FROM employee',
         'hive'
       );
 
-      expect(isMissingLimit).toBeTruthy();
+      expect(isSelectStar).toBeTruthy();
     });
     it('Should not warning from a non SELECT *', async () => {
-      const isMissingLimit = await new SqlAnalyzer(connectorA).checkSelectStar(
+      const isSelectStar = await new SqlAnalyzer(connectorA).checkSelectStar(
         'SELECT name FROM employee',
         'hive'
       );
 
-      expect(isMissingLimit).toBeFalsy();
+      expect(isSelectStar).toBeFalsy();
     });
   });
 });
