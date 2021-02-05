@@ -16,7 +16,7 @@
 # limitations under the License.
 
 from django.conf.urls import url
-from . import views
+from desktop.lib.botserver import views
 
 urlpatterns = [
   url(r'^events/', views.home, name='home')
