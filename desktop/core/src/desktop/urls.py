@@ -276,7 +276,7 @@ if is_oidc_configured():
   ]
 
 # Slack botserver URLs
-if SLACK.ENABLE_SLACK_INTEGRATION.get():
+if SLACK.IS_ENABLED.get():
   urlpatterns += [
     url(r'^slack/', include('desktop.lib.botserver.urls')),
   ]

@@ -707,9 +707,9 @@ SLACK = ConfigSection(
   key='slack',
   help=_("""Configuration options for slack """),
   members=dict(
-    ENABLE_SLACK_INTEGRATION=Config(
-      key='enable_slack_integration',
-      help=_('Enable slack bot server URLs "/slack/"'),
+    IS_ENABLED=Config(
+      key='is_enabled',
+      help=_('Turns on Slack application API endpoints'),
       default=True,
       type=coerce_bool),
   )
