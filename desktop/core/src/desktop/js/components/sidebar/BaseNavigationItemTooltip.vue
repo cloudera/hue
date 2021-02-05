@@ -20,6 +20,7 @@
   <div
     class="sidebar-sidebar-item-tooltip"
     :class="{ 'sidebar-sidebar-item-tooltip-visible': visible }"
+    @click="$emit('click')"
   >
     <slot />
   </div>
