@@ -275,6 +275,7 @@ if is_oidc_configured():
     url(r'^oidc/', include('mozilla_django_oidc.urls')),
   ]
 
+# Slack botserver URLs
 if SLACK.ENABLE_SLACK_INTEGRATION.get():
   urlpatterns += [
     url(r'^slack/', include('desktop.lib.botserver.urls')),

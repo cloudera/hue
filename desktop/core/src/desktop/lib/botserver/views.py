@@ -17,8 +17,9 @@
 
 from django.shortcuts import render
 from django.http import HttpResponse
+from desktop.lib.django_util import login_notrequired
 
-# Create your views here.
 
+@login_notrequired
 def home(request):
   return HttpResponse("Hello World")
