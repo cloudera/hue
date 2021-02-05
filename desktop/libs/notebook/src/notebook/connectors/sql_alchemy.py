@@ -202,7 +202,7 @@ class SqlAlchemyApi(Api):
     options.pop('has_impersonation', None)
     options.pop('ssh_server_host', None)
 
-    options['pool_pre_ping'] = True
+    options['pool_pre_ping'] = not url.startswith('phoenix://')  # Should be moved to dialect when connectors always on
 
     return create_engine(url, **options)
 
