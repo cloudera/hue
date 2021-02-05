@@ -46,7 +46,7 @@ from desktop import views as desktop_views
 from desktop import api as desktop_api
 from desktop import api2 as desktop_api2
 from desktop.auth import views as desktop_auth_views
-from desktop.conf import METRICS, USE_NEW_EDITOR, ENABLE_DJANGO_DEBUG_TOOL, ANALYTICS, has_connectors, ENABLE_PROMETHEUS
+from desktop.conf import METRICS, USE_NEW_EDITOR, ENABLE_DJANGO_DEBUG_TOOL, ANALYTICS, has_connectors, ENABLE_PROMETHEUS, SLACK
 from desktop.configuration import api as desktop_configuration_api
 from desktop.lib.vcs import api as desktop_lib_vcs_api
 from desktop.settings import is_oidc_configured
@@ -275,6 +275,7 @@ if is_oidc_configured():
     url(r'^oidc/', include('mozilla_django_oidc.urls')),
   ]
 
-urlpatterns += [
+if SLACK.ENABLE_SLACK_INTEGRATION.get():
+  urlpatterns += [
     url(r'^slack/', include('desktop.lib.botserver.urls')),
   ]
