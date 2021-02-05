@@ -186,7 +186,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
     $(document).keypress(function (event) {
         var keycode = event.keyCode ? event.keyCode : event.which;
         if(keycode == '13') {
-          $("form").submit();
+          $("[type=submit]").click();
         }
     });
 
