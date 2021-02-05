@@ -223,7 +223,7 @@ ENABLE_EXTERNAL_STATEMENT = Config(
   key="enable_external_statements",
   help=_t("Flag to enable the selection of queries from files, saved queries into the editor or as snippet."),
   type=coerce_bool,
-  default=True
+  default=False
 )
 
 ENABLE_BATCH_EXECUTE = Config(
