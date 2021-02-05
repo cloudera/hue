@@ -15,8 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.apps import AppConfig
+# from django.apps import AppConfig
 
 
-class BotserverConfig(AppConfig):
-  name = 'botserver'
+# class BotserverConfig(AppConfig):
+#   name = 'botserver'
