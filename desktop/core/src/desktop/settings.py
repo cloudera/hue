@@ -819,3 +819,14 @@ try:
 except ValueError:
   from desktop.monkey_patches import monkey_patch_md5
   monkey_patch_md5(MODULES_TO_PATCH)
+
+################################################################
+# SLACK API Configurations
+################################################################
+# Warning: Do not save your secrets here, instead export them as environment variables and read here
+
+# use your keys 
+SLACK_CLIENT_ID=''
+SLACK_CLIENT_SECRET=''
+SLACK_VERIFICATION_TOKEN=os.environ.get('SLACK_VERIFICATION_TOKEN')
+SLACK_BOT_USER_TOKEN=os.environ.get('SLACK_BOT_USER_TOKEN')
