@@ -51,7 +51,7 @@ python-daemon==2.2.4
 python-ldap==3.1.0
 python-oauth2==1.1.0
 pytidylib==0.3.2
-pytz==2015.2
+pytz==2021.1
 pyyaml>=4.2b1
 requests>=2.20.0
 requests-kerberos==0.12.0
