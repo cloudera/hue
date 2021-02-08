@@ -68,7 +68,7 @@ export interface IdentifierLocation {
   parentLocation?: ParsedLocation;
   path?: string;
   qualified?: boolean;
-  resolveCatalogEntry: (options: {
+  resolveCatalogEntry: (options?: {
     cancellable?: boolean;
     temporaryOnly?: boolean;
   }) => CancellablePromise<DataCatalogEntry>;
