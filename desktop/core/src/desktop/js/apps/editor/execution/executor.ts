@@ -17,9 +17,9 @@
 import Snippet from 'apps/editor/snippet';
 import Executable, { ExecutableRaw } from 'apps/editor/execution/executable';
 import { syncSqlExecutables } from 'apps/editor/execution/utils';
-import { VariableSubstitutionHandler } from 'apps/editor/variableSubstitution';
 import { StatementDetails } from 'parse/types';
 import { Compute, Connector, Namespace } from 'types/config';
+import { VariableIndex } from 'apps/editor/components/variableSubstitution/types';
 
 export interface ExecutorRaw {
   executables: ExecutableRaw[];
@@ -34,9 +34,9 @@ export default class Executor {
   isSqlEngine?: boolean;
   isOptimizerEnabled?: boolean;
   executables: Executable[] = [];
-  variableSubstitionHandler?: VariableSubstitutionHandler;
   snippet?: Snippet;
   activeExecutable?: Executable;
+  variables: VariableIndex = {};
 
   constructor(options: {
     connector: KnockoutObservable<Connector>;
@@ -48,7 +48,6 @@ export default class Executor {
     snippet?: Snippet;
     isOptimizerEnabled?: boolean;
     executables: Executable[];
-    variableSubstitionHandler?: VariableSubstitutionHandler;
   }) {
     this.connector = options.connector;
     this.compute = options.compute;
@@ -59,7 +58,6 @@ export default class Executor {
     this.executables = [];
     this.defaultLimit = options.defaultLimit;
     this.snippet = options.snippet;
-    this.variableSubstitionHandler = options.variableSubstitionHandler;
   }
 
   toJs(): ExecutorRaw {
