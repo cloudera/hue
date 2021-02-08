@@ -776,7 +776,7 @@ Then give Hue the information about the database source:
     [[[clickhouse]]]
     name = Clickhouse
     interface=sqlalchemy
-    options='{"url": "clickhouse://..."}'
+    options='{"url": "clickhouse://localhost:8123"}'
 
 Alternative:
 
