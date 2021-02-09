@@ -75,7 +75,6 @@
           :active-item-name="activeItemName"
         />
         <div class="sidebar-footer-bottom-row">
-          <div class="sidebar-footer-version-number"><!-- TODO: Add Version --></div>
           <BaseNavigationItem
             :css-classes="'sidebar-footer-collapse-btn'"
             :item="{
