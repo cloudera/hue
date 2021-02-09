@@ -718,7 +718,7 @@ SLACK = ConfigSection(
     IS_ENABLED=Config(
       key='is_enabled',
       help=_('Turns on Slack application API endpoints'),
-      default=True,
+      default=False,
       type=coerce_bool),
   )
 )
