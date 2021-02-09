@@ -34,6 +34,7 @@ export interface hueWindow {
   CACHEABLE_TTL?: { default?: number; optimizer?: number };
   CLOSE_SESSIONS?: { [dialect: string]: boolean };
   CUSTOM_DASHBOARD_URL?: string;
+  ENABLE_PREDICT?: boolean;
   HAS_CATALOG?: boolean;
   HAS_CONNECTORS?: boolean;
   HAS_OPTIMIZER?: boolean;
