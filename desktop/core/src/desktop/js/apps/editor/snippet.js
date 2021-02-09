@@ -1091,7 +1091,7 @@ export default class Snippet {
     this.showLongOperationWarning(false);
   }
 
-  toContextJson() {
+  toContextJson(statement) {
     return JSON.stringify({
       id: this.id(),
       type: this.dialect(),
@@ -1099,7 +1099,7 @@ export default class Snippet {
       defaultLimit: this.defaultLimit(),
       status: this.status(),
       statementType: this.statementType(),
-      statement: this.statement(),
+      statement: statement || this.statement(),
       aceCursorPosition: this.aceCursorPosition(),
       lastExecuted: this.lastExecuted(),
       statementPath: this.statementPath(),
