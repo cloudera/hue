@@ -171,6 +171,12 @@ OPTIMIZER = ConfigSection(
       default=False,
       type=coerce_bool
     ),
+    ENABLE_PREDICT = Config(
+      key="enable_predict",
+      help=_t("Enables the predict API for editor typeahead."),
+      default=False,
+      type=coerce_bool
+    ),
     QUERY_HISTORY_UPLOAD_LIMIT = Config(
       key="query_history_upload_limit",
       help=_t("Allow admins to upload the last N executed queries in the quick start wizard. Use 0 to disable."),
