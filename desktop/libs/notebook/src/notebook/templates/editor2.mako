@@ -904,7 +904,7 @@
               }
             },
             vueKoProps: {
-              initialVariables: []
+              initialVariables: executor.variables
             }
           "></variable-substitution-ko-bridge>
   ##      <!-- ko template: { name: 'editor-executable-snippet-body' } --><!-- /ko -->
