@@ -24,10 +24,14 @@
     :description="description"
     @before-execute="onBeforeExecute"
     @close="onClose"
+    @variables-changed="onVariablesChanged"
   />
 </template>
 
 <script lang="ts">
+  import { Variable } from 'apps/editor/components/variableSubstitution/types';
+  import { IdentifierLocation } from 'parse/types';
+  import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
@@ -45,9 +49,13 @@
     @Prop()
     executor: Executor | null = null;
     @Prop()
-    titleObservable: KnockoutObservable<string | undefined>;
+    titleObservable!: KnockoutObservable<string | undefined>;
     @Prop()
-    descriptionObservable: KnockoutObservable<string | undefined>;
+    descriptionObservable!: KnockoutObservable<string | undefined>;
+    @Prop()
+    initialVariables?: Variable[];
+
+    locations: IdentifierLocation[] = [];
 
     title: string | null = null;
     description: string | null = null;
@@ -58,15 +66,25 @@
 
     updated(): void {
       if (!this.initialized) {
-        this.title = this.titleObservable();
+        this.title = this.titleObservable() || null;
         this.subTracker.subscribe(this.titleObservable, (title?: string) => {
-          this.title = title;
+          this.title = title || null;
         });
 
-        this.description = this.descriptionObservable();
+        this.description = this.descriptionObservable() || null;
         this.subTracker.subscribe(this.descriptionObservable, (description?: string) => {
-          this.description = description;
+          this.description = description || null;
         });
+
+        this.subTracker.subscribe(
+          POST_FROM_LOCATION_WORKER_EVENT,
+          (e: { data?: { locations?: IdentifierLocation[] } }) => {
+            if (e.data && e.data.locations) {
+              this.locations = e.data.locations;
+            }
+          }
+        );
+
         this.initialized = true;
       }
     }
@@ -84,6 +102,12 @@
     onClose(): void {
       this.$el.dispatchEvent(
         new CustomEvent<void>('close', { bubbles: true })
+      );
+    }
+
+    onVariablesChanged(variables: Variable[]): void {
+      this.$el.dispatchEvent(
+        new CustomEvent<Variable[]>('variables-changed', { bubbles: true, detail: variables })
       );
     }
   }
