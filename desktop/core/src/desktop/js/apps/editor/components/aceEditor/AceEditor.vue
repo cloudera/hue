@@ -37,6 +37,7 @@
   import ace, { getAceMode } from 'ext/aceHelper';
   import { Ace } from 'ext/ace';
 
+  import { attachPredictTypeahead } from './acePredict';
   import AceAutocomplete from './autocomplete/AceAutocomplete.vue';
   import AceGutterHandler from './AceGutterHandler';
   import AceLocationHandler from './AceLocationHandler';
@@ -103,7 +104,7 @@
 
       if (this.sqlParserProvider) {
         this.sqlParserProvider
-          .getAutocompleteParser(this.executor.connector().dialect)
+          .getAutocompleteParser(this.executor.connector().dialect || 'generic')
           .then(autocompleteParser => {
             this.autocompleteParser = autocompleteParser;
           });
@@ -209,15 +210,17 @@
         e.text = removeUnicodes(e.text);
       };
 
+      if ((<hueWindow>window).ENABLE_PREDICT) {
+        attachPredictTypeahead(editor, this.executor.connector());
+      }
+
       let placeholderVisible = false;
       const placeholderElement = this.createPlaceholderElement();
       const onInput = () => {
-        if (!placeholderVisible) {
-          if (!editor.getValue().length) {
-            editor.renderer.scroller.append(placeholderElement);
-            placeholderVisible = true;
-          }
-        } else {
+        if (!placeholderVisible && !editor.getValue().length) {
+          editor.renderer.scroller.append(placeholderElement);
+          placeholderVisible = true;
+        } else if (placeholderVisible) {
           placeholderElement.remove();
           placeholderVisible = false;
         }

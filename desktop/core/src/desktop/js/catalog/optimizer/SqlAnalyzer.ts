@@ -26,6 +26,8 @@ import {
   Optimizer,
   OptimizerRisk,
   PopularityOptions,
+  PredictOptions,
+  PredictResponse,
   RiskHint,
   RiskOptions,
   SimilarityOptions
@@ -245,5 +247,9 @@ export default class SqlAnalyzer implements Optimizer {
       return this.apiStrategy.fetchTopFilters(options);
     }
     return CancellablePromise.reject('fetchTopFilters is not Implemented');
+  }
+
+  predict(options: PredictOptions): CancellablePromise<PredictResponse> {
+    return this.apiStrategy.predict(options);
   }
 }
