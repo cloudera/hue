@@ -27,7 +27,9 @@ declare namespace Ace {
       addCommand(command: {
         name: string,
         bindKey: { win: string; mac: string } | string,
-        exec(): void
+        exec(): void,
+        multiSelectAction?: string,
+        scrollIntoView?: string
       }): void;
       bindKey(key: { win: string; mac: string } | string, command: string): void;
     }
@@ -46,6 +48,7 @@ declare namespace Ace {
     getTextAfterCursor(): string;
     getTextBeforeCursor(): string;
     getValue(): string;
+    indent(): void;
     keyBinding: {
       addKeyboardHandler(hashHandler: HashHandler): void;
       removeKeyboardHandler(hashHandler: HashHandler): void;
