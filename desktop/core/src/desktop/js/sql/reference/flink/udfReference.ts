@@ -252,7 +252,7 @@ const DATE_FUNCTIONS: UdfCategoryFunctions = {
   }
 };
 
-const AUXILIARY_FUNCTIONS: UdfCategoryFunctions = {
+const GROUP_WINDOW_FUNCTIONS: UdfCategoryFunctions = {
   hop: {
     name: 'hop',
     returnTypes: ['T'],
@@ -476,6 +476,6 @@ export const UDF_CATEGORIES: UdfCategory[] = [
   { name: I18n('Aggregate'), isAggregate: true, functions: AGGREGATE_FUNCTIONS },
   { name: I18n('Analytic'), isAnalytic: true, functions: ANALYTIC_FUNCTIONS },
   { name: I18n('Date'), functions: DATE_FUNCTIONS },
-  { name: I18n('Misc'), functions: AUXILIARY_FUNCTIONS },
+  { name: I18n('Group Window Functions'), functions: GROUP_WINDOW_FUNCTIONS },
   { name: I18n('String'), functions: STRING_FUNCTIONS }
 ];
