@@ -2,3 +2,4 @@ docker_images:
     hue: __REGISTRY__/hue
     huelb: __REGISTRY__/huelb
     hueqp: __REGISTRY__/hueqp
+    hue_qp_ubi: __REGISTRY__/hue_qp_ubi
