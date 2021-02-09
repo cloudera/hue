@@ -868,6 +868,9 @@
           },
           'close': function () {
             parentNotebook.isPresentationMode(false);
+          },
+          'variables-changed': function (event) {
+            setVariables(event.detail);
           }
         },
         vueKoProps: {

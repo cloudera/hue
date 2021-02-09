@@ -25,6 +25,11 @@
         <i class="fa fa-times fa-fw" />
       </hue-button>
     </div>
+    <VariableSubstitution
+      :locations="locations"
+      :initial-variables="executor.variables"
+      @variables-changed="onVariablesChanged"
+    />
     <div class="presentation-mode-body">
       <div
         v-for="{ header, statement, executable } of presentationStatements"
@@ -45,6 +50,9 @@
 </template>
 
 <script lang="ts">
+  import { Variable } from 'apps/editor/components/variableSubstitution/types';
+  import VariableSubstitution from 'apps/editor/components/variableSubstitution/VariableSubstitution.vue';
+  import { IdentifierLocation } from 'parse/types';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
@@ -67,7 +75,7 @@
   const headerRegEx = /--(.*)$/m;
 
   @Component({
-    components: { HueButton, ResultTable, ExecutableActions, SqlText },
+    components: { VariableSubstitution, HueButton, ResultTable, ExecutableActions, SqlText },
     methods: { I18n }
   })
   export default class PresentationMode extends Vue {
@@ -77,6 +85,8 @@
     title?: string;
     @Prop({ required: false })
     description?: string;
+    @Prop()
+    locations!: IdentifierLocation[];
 
     get presentationStatements(): PresentationStatement[] {
       return (this.executor.executables as SqlExecutable[]).map(executable => {
@@ -103,6 +113,10 @@
     async beforeExecute(executable: SqlExecutable): Promise<void> {
       this.$emit('before-execute', executable);
       this.executor.activeExecutable = executable;
+    }
+
+    onVariablesChanged(variables: Variable[]): void {
+      this.$emit('variables-changed', variables);
     }
   }
 </script>
