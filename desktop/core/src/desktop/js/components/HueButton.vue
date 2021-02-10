@@ -35,25 +35,18 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent } from 'vue';
 
-  @Component
-  export default class HueButton extends Vue {
-    @Prop({ required: false })
-    primary?: boolean;
-    @Prop({ required: false })
-    alert?: boolean;
-    @Prop({ required: false })
-    borderless?: boolean;
-    @Prop({ required: false })
-    small?: boolean;
-    @Prop({ required: false })
-    large?: boolean;
-    @Prop({ required: false })
-    disabled?: boolean;
-  }
+  export default defineComponent({
+    props: {
+      primary: Boolean,
+      alert: Boolean,
+      borderless: Boolean,
+      small: Boolean,
+      large: Boolean,
+      disabled: Boolean,
+    }
+  })
 </script>
 
 <style lang="scss" scoped>
