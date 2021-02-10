@@ -17,7 +17,7 @@
  */
 
 import ERDiagram from './index.vue';
-import { wrap } from 'vue/webComponentWrapper';
+import { wrap } from 'vue/webComponentWrap';
 
 export const COMPONENT_NAME = 'er-diagram';
 wrap(COMPONENT_NAME, ERDiagram);
