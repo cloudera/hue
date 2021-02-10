@@ -261,13 +261,13 @@ class OptimizerClient(object):
     }
 
 
-  def predict(self, query, source_platform, connector):
+  def predict(self, before_cursor, after_cursor, connector):
     response = self._call(
       'predict', {
         'tenant': self._tenant_id,
         'connector': connector,
-        'query': _clean_query(query),
-        'sourcePlatform': source_platform,
+        'before_cursor': before_cursor,
+        'after_cursor': after_cursor,
       }
     )
 
