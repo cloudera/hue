@@ -23,19 +23,22 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent } from 'vue';
 
-  @Component
-  export default class HueIcon extends Vue {
-    @Prop({ required: true })
-    type!: string;
+  export default defineComponent({
+    props: {
+      type: {
+        type: String,
+        required: true
+      }
+    },
 
-    get xlinkAttr(): string {
-      return '#' + this.type;
+    computed: {
+      xlinkAttr(): string {
+        return '#' + this.type;
+      }
     }
-  }
+  });
 </script>
 
 <style lang="scss" scoped>
