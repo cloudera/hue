@@ -39,25 +39,36 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent } from 'vue';
 
-  @Component
-  export default class Spinner extends Vue {
-    @Prop({ required: false, default: true })
-    spin?: boolean;
-    @Prop({ required: false, default: 'default' })
-    size?: string;
-    @Prop({ required: false, default: false })
-    center?: boolean;
-    @Prop({ required: false, default: false })
-    overlay?: boolean;
-    @Prop({ required: false, default: false })
-    inline?: boolean;
-    @Prop({ required: false, default: false })
-    blackout?: boolean;
-  }
+  export default defineComponent({
+    props: {
+      spin: {
+        type: Boolean,
+        default: true
+      },
+      size: {
+        type: String,
+        default: 'default'
+      },
+      center: {
+        type: Boolean,
+        default: false
+      },
+      overlay: {
+        type: Boolean,
+        default: false
+      },
+      inline: {
+        type: Boolean,
+        default: false
+      },
+      blackout: {
+        type: Boolean,
+        default: false
+      }
+    }
+  });
 </script>
 
 <style lang="scss" scoped></style>
