@@ -24,53 +24,65 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop, Watch } from 'vue-property-decorator';
+  import { defineComponent } from 'vue';
 
   import I18n from 'utils/i18n';
 
-  @Component({
-    methods: { I18n }
-  })
-  export default class LogsPanel extends Vue {
-    @Prop()
-    logs = '';
-    @Prop({ required: false })
-    autoScroll = true;
-
-    ignoreNextScrollEvent = false;
-    userScrolled = false;
-
-    onScroll(): void {
-      if (!this.autoScroll) {
-        return;
+  export default defineComponent({
+    props: {
+      logs: {
+        type: String,
+        default: undefined
+      },
+      autoScroll: {
+        type: Boolean,
+        default: true
       }
-      const containerEl = <HTMLDivElement>this.$refs.logsContainer;
-      if (!this.ignoreNextScrollEvent && containerEl) {
-        this.userScrolled =
+    },
+
+    data(): {
+      ignoreNextScrollEvent: boolean;
+      userScrolled: boolean;
+    } {
+      return {
+        ignoreNextScrollEvent: false,
+        userScrolled: false
+      };
+    },
+
+    watch: {
+      logs(): void {
+        if (!this.autoScroll) {
+          return;
+        }
+        const containerEl = <HTMLDivElement>this.$refs.logsContainer;
+        if (
+          !this.userScrolled &&
           containerEl &&
-          containerEl.scrollHeight - containerEl.clientHeight - containerEl.scrollTop > 10;
+          containerEl.scrollHeight > containerEl.clientHeight
+        ) {
+          this.ignoreNextScrollEvent = true;
+          containerEl.scrollTop = containerEl.scrollHeight - containerEl.clientHeight;
+        }
       }
-      this.ignoreNextScrollEvent = false;
-    }
+    },
 
-    @Watch('logs', { immediate: true })
-    scrollToLatest(): void {
-      if (!this.autoScroll) {
-        return;
-      }
-      const containerEl = <HTMLDivElement>this.$refs.logsContainer;
-      if (
-        !this.userScrolled &&
-        containerEl &&
-        containerEl.scrollHeight > containerEl.clientHeight
-      ) {
-        this.ignoreNextScrollEvent = true;
-        containerEl.scrollTop = containerEl.scrollHeight - containerEl.clientHeight;
+    methods: {
+      I18n,
+      onScroll(): void {
+        if (!this.autoScroll) {
+          return;
+        }
+        const containerEl = <HTMLDivElement>this.$refs.logsContainer;
+        if (!this.ignoreNextScrollEvent && containerEl) {
+          this.userScrolled =
+            containerEl &&
+            containerEl.scrollHeight - containerEl.clientHeight - containerEl.scrollTop > 10;
+        }
+        this.ignoreNextScrollEvent = false;
       }
     }
-  }
+  });
 </script>
 
 <style lang="scss" scoped>
