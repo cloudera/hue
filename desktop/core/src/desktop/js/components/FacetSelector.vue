@@ -55,111 +55,147 @@
 </template>
 
 <script lang="ts">
-  import { Prop, Watch } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
+
   import I18n from '../utils/i18n';
   import DropdownPanel from './dropdown/DropdownPanel.vue';
   import HueButton from './HueButton.vue';
   import HueLink from './HueLink.vue';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Facet, SearchFacet } from './FacetSelector';
+  import { Facet, SearchFacet, FacetValueLabels } from './FacetSelector';
 
-  @Component({
-    components: { DropdownPanel, HueButton, HueLink },
-    methods: { I18n }
-  })
-  export default class StatusFacet extends Vue {
-    @Prop({ required: false, default: () => ({}) })
-    valueLabels!: FacetLabels;
-    @Prop({ required: false, default: null })
-    fieldLabel?: string;
-    @Prop({ required: true })
-    facet!: Facet;
-    @Prop({ required: false, default: false })
-    disabled!: boolean;
-    @Prop({ required: false, default: false })
-    filterEnabled!: boolean;
+  export default defineComponent({
+    components: {
+      DropdownPanel,
+      HueButton,
+      HueLink
+    },
 
-    selectedValues: string[] = [];
-    previousSelection: string[] = [];
-
-    lastKnownValues?: string[];
-
-    @Watch('facet.values')
-    initSelection(): void {
-      const newValues = this.facet.values.map(val => val.key);
-      if (!this.lastKnownValues) {
-        // Select all initially
-        this.selectedValues = newValues;
-        this.previousSelection = newValues;
-      } else {
-        // Keep previous selection on change
-        const selected = new Set(this.selectedValues);
-
-        // Select any new values that might have appeared
-        const oldValues = new Set(this.lastKnownValues);
-
-        this.selectedValues = newValues.filter(
-          newValue => selected.has(newValue) || !oldValues.has(newValue)
-        );
+    props: {
+      valueLabels: {
+        type: Object as PropType<FacetValueLabels>,
+        required: false,
+        default: () => ({})
+      },
+      fieldLabel: {
+        type: Object as PropType<string | null>,
+        required: false,
+        default: null
+      },
+      facet: {
+        type: Object as PropType<Facet>,
+        required: true
+      },
+      disabled: {
+        type: Boolean,
+        required: false,
+        default: false
+      },
+      filterEnabled: {
+        type: Boolean,
+        required: false,
+        default: false
       }
-      this.lastKnownValues = newValues;
-    }
+    },
 
-    clear(): void {
-      this.selectedValues = this.facet.values.map(val => val.key);
-      this.$emit('facet-removed', this.facet.facetField);
-    }
+    emits: ['facet-removed', 'facet-changed'],
 
-    get allSelected(): boolean {
-      return this.selectedValues.length === this.facet.values.length;
-    }
+    data(): {
+      selectedValues: string[];
+      previousSelection: string[];
 
-    set allSelected(val: boolean) {
-      if (val) {
+      lastKnownValues?: string[];
+    } {
+      return {
+        selectedValues: [],
+        previousSelection: []
+      };
+    },
+
+    computed: {
+      allSelected: {
+        get(): boolean {
+          return this.selectedValues.length === this.facet.values.length;
+        },
+        set(val: boolean) {
+          if (val) {
+            this.selectedValues = this.facet.values.map(val => val.key);
+          } else {
+            this.selectedValues = [];
+          }
+        }
+      },
+
+      applyDisabled(): boolean {
+        return !this.selectedValues.length;
+      },
+
+      label(): string {
+        if (this.allSelected) {
+          return `${this.fieldLabel || this.facet.facetField}: ${I18n('All')}`;
+        }
+        if (this.selectedValues.length === 1) {
+          return `${this.fieldLabel || this.facet.facetField}: ${
+            this.valueLabels[this.selectedValues[0]] || this.selectedValues[0]
+          }`;
+        }
+        if (this.selectedValues.length === 0) {
+          return `${this.fieldLabel || this.facet.facetField}: ${I18n('None')}`;
+        }
+        return `${this.fieldLabel || this.facet.facetField}: ${I18n('Multiple')}`;
+      }
+    },
+
+    created() {
+      this.$watch(
+        () => this.facet.values,
+        (): void => {
+          const newValues = this.facet.values.map(val => val.key);
+          if (!this.lastKnownValues) {
+            // Select all initially
+            this.selectedValues = newValues;
+            this.previousSelection = newValues;
+          } else {
+            // Keep previous selection on change
+            const selected = new Set(this.selectedValues);
+
+            // Select any new values that might have appeared
+            const oldValues = new Set(this.lastKnownValues);
+
+            this.selectedValues = newValues.filter(
+              newValue => selected.has(newValue) || !oldValues.has(newValue)
+            );
+          }
+          this.lastKnownValues = newValues;
+        }
+      );
+    },
+
+    methods: {
+      I18n,
+      clear(): void {
         this.selectedValues = this.facet.values.map(val => val.key);
-      } else {
-        this.selectedValues = [];
-      }
-    }
-
-    get applyDisabled(): boolean {
-      return !this.selectedValues.length;
-    }
-
-    get label(): string {
-      if (this.allSelected) {
-        return `${this.fieldLabel || this.facet.facetField}: ${I18n('All')}`;
-      }
-      if (this.selectedValues.length === 1) {
-        return `${this.fieldLabel || this.facet.facetField}: ${
-          this.valueLabels[this.selectedValues[0]] || this.selectedValues[0]
-        }`;
-      }
-      if (this.selectedValues.length === 0) {
-        return `${this.fieldLabel || this.facet.facetField}: ${I18n('None')}`;
-      }
-      return `${this.fieldLabel || this.facet.facetField}: ${I18n('Multiple')}`;
-    }
-
-    cancel(closePanel: () => void): void {
-      this.selectedValues = [...this.previousSelection];
-      closePanel();
-    }
-
-    apply(closePanel: () => void): void {
-      this.previousSelection = [...this.selectedValues];
-      if (this.allSelected) {
         this.$emit('facet-removed', this.facet.facetField);
-      } else {
-        this.$emit('facet-changed', <SearchFacet>{
-          field: this.facet.facetField,
-          values: this.selectedValues
-        });
+      },
+
+      cancel(closePanel: () => void): void {
+        this.selectedValues = [...this.previousSelection];
+        closePanel();
+      },
+
+      apply(closePanel: () => void): void {
+        this.previousSelection = [...this.selectedValues];
+        if (this.allSelected) {
+          this.$emit('facet-removed', this.facet.facetField);
+        } else {
+          this.$emit('facet-changed', <SearchFacet>{
+            field: this.facet.facetField,
+            values: this.selectedValues
+          });
+        }
+        closePanel();
       }
-      closePanel();
     }
-  }
+  });
 </script>
 
 <style lang="scss" scoped>
