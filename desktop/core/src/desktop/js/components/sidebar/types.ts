@@ -14,28 +14,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export interface SidebarNavigationItem {
-  type: 'navigation';
+export interface SidebarBaseItem {
   name: string;
-  displayName: string;
   url?: string;
   handler?: (event: Event) => void;
+}
+
+export interface SidebarNavigationItem extends SidebarBaseItem {
+  type: 'navigation';
+  displayName: string;
   iconHtml: string;
 }
 
-export type SidebarAccordionSubItem = SidebarSpacerItem | Omit<SidebarNavigationItem, 'iconHtml'>;
+export type SidebarNavigationSubItem = Omit<SidebarNavigationItem, 'iconHtml'>;
+
+export type SidebarAccordionSubItem = SidebarSpacerItem | SidebarNavigationSubItem;
 
 export interface SidebarSpacerItem {
   type: 'spacer';
 }
 
-export interface SidebarAccordionItem {
+export interface SidebarAccordionItem extends SidebarBaseItem {
   type: 'accordion';
-  name: string;
   iconHtml: string;
   displayName: string;
-  url?: string;
-  handler?: (event: Event) => void;
   children: SidebarAccordionSubItem[];
 }
 

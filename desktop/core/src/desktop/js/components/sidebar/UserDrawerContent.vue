@@ -26,8 +26,12 @@
       </div>
     </div>
     <ul>
-      <li v-for="childItem in children" :key="childItem.name">
-        <BaseNavigationItem :item="childItem" @click="hideDrawer">
+      <li v-for="(childItem, index) in children" :key="index">
+        <BaseNavigationItem
+          v-if="childItem.type === 'navigation'"
+          :item="childItem"
+          @click="hideDrawer"
+        >
           {{ childItem.displayName }}
         </BaseNavigationItem>
       </li>
@@ -41,29 +45,41 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Inject, Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
+
   import BaseNavigationItem from './BaseNavigationItem.vue';
-  import { SidebarAccordionSubItem, SidebarNavigationItem, UserDrawerItem } from './types';
+  import { SidebarAccordionSubItem, SidebarBaseItem, UserDrawerItem } from './types';
 
-  @Component({
-    components: { BaseNavigationItem }
-  })
-  export default class UserDrawerContent extends Vue {
-    @Inject()
-    hideDrawer!: () => void;
+  export default defineComponent({
+    components: { BaseNavigationItem },
 
-    @Prop()
-    item!: UserDrawerItem;
-    @Prop({ required: false, default: [] })
-    children?: SidebarAccordionSubItem[];
+    inject: ['hideDrawer'],
 
-    get logoutItem(): Pick<SidebarNavigationItem, 'handler' | 'name'> {
-      return {
-        handler: this.item.logoutHandler,
-        name: 'logout'
-      };
+    props: {
+      item: {
+        type: Object as PropType<UserDrawerItem>,
+        required: true
+      },
+      children: {
+        type: Object as PropType<SidebarAccordionSubItem[]>,
+        required: false,
+        default: []
+      }
+    },
+
+    data(): {
+      hideDrawer?: () => void;
+    } {
+      return {};
+    },
+
+    computed: {
+      logoutItem(): SidebarBaseItem {
+        return {
+          handler: this.item.logoutHandler,
+          name: 'logout'
+        };
+      }
     }
-  }
+  });
 </script>

@@ -15,6 +15,6 @@
 // limitations under the License.
 
 import HueSidebar from './HueSidebar.vue';
-import { wrap } from 'vue/webComponentWrapper';
+import { wrap } from 'vue/webComponentWrap';
 
 wrap('hue-sidebar-web-component', HueSidebar);

@@ -62,10 +62,10 @@
       :aria-hidden="!isOpen || isCollapsed"
     >
       <AccordionSubItem
-        v-for="subItem in item.children"
-        :key="subItem.name"
+        v-for="(subItem, index) in item.children"
+        :key="index"
         :item="subItem"
-        :active="activeItemName === subItem.name"
+        :active="activeItemName === getItemName(subItem)"
         :disabled="!isOpen || isCollapsed"
       />
     </div>
@@ -106,10 +106,10 @@
         @scroll="onTooltipAccordionItemsScroll"
       >
         <AccordionSubItem
-          v-for="child in item.children"
-          :key="child.name"
+          v-for="(child, index) in item.children"
+          :key="index"
           :item="child"
-          :active="activeItemName === child.name"
+          :active="activeItemName === getItemName(child)"
         />
       </div>
     </BaseNavigationItemTooltip>
@@ -118,12 +118,11 @@
 <!-- eslint-enable vue/no-v-html -->
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Inject, Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType, inject } from 'vue';
+
   import AccordionSubItem from './AccordionSubItem.vue';
   import BaseNavigationItemTooltip from './BaseNavigationItemTooltip.vue';
-  import { SidebarAccordionItem, SidebarNavigationItem } from './types';
+  import { SidebarAccordionItem, SidebarNavigationItem, SidebarAccordionSubItem } from './types';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
   interface Tooltip {
@@ -134,69 +133,90 @@
     fromKeyboard?: boolean;
   }
 
-  @Component({
-    components: { BaseNavigationItemTooltip, AccordionSubItem }
-  })
-  export default class AccordionItem extends Vue {
-    @Inject()
-    selectedItemChanged?: (itemName: string) => void;
+  export default defineComponent({
+    components: {
+      BaseNavigationItemTooltip,
+      AccordionSubItem
+    },
 
-    @Prop()
-    item!: SidebarAccordionItem;
-    @Prop()
-    isCollapsed!: boolean;
-    @Prop()
-    activeItemName?: string | null = null;
-
-    isOpen = false;
-    isTooltipScrolled = false;
-    tooltip: Tooltip | null = null;
-
-    subTracker = new SubscriptionTracker();
-
-    disposeParentScroll?: () => void;
-
-    get isActive(): boolean {
-      return (
-        this.item.name === this.activeItemName ||
-        this.item.children.some(item => (<SidebarNavigationItem>item).name === this.activeItemName)
-      );
-    }
-
-    get isUserMenu(): boolean {
-      return this.item.name === 'user';
-    }
-
-    get accordionItemsHeight(): string {
-      const el = <HTMLElement>this.$refs.accordionItems;
-      if (this.isOpen && el) {
-        return `${el.scrollHeight}px`;
+    props: {
+      item: {
+        type: Object as PropType<SidebarAccordionItem>,
+        required: true
+      },
+      isCollapsed: Boolean,
+      activeItemName: {
+        type: String,
+        default: ''
       }
-      return '0';
-    }
+    },
 
-    get tooltipStyle(): CSSStyleDeclaration | undefined {
-      if (!this.tooltip) {
-        return {};
-      }
-
-      if (this.isCollapsed) {
-        // Prevent the menu from showing outside the window
-        const height = this.item.children.length * 32 + (this.isUserMenu ? 50 : 40);
-        const diff = this.tooltip.top + height - window.innerHeight;
-        if (diff > 0) {
-          return {
-            top: this.tooltip.top - diff - 5 + 'px',
-            left: this.tooltip.right + 'px'
-          };
-        }
-      }
+    setup(): {
+      subTracker: SubscriptionTracker;
+      selectedItemChanged?: (itemName: string) => void;
+    } {
       return {
-        top: this.tooltip.top + 'px',
-        left: this.tooltip.right + 'px',
-        maxHeight: this.tooltip.maxHeight + 'px'
+        subTracker: new SubscriptionTracker(),
+
+        selectedItemChanged: inject('selectedItemChanged')
       };
-    }
+    },
+
+    data(): {
+      isOpen: boolean;
+      isTooltipScrolled: boolean;
+      tooltip: Tooltip | null;
+    } {
+      return {
+        isOpen: false,
+        isTooltipScrolled: false,
+        tooltip: null
+      };
+    },
+
+    computed: {
+      isActive(): boolean {
+        return (
+          this.item.name === this.activeItemName ||
+          this.item.children.some(
+            item => (<SidebarNavigationItem>item).name === this.activeItemName
+          )
+        );
+      },
+      isUserMenu(): boolean {
+        return this.item.name === 'user';
+      },
+      accordionItemsHeight(): string {
+        const el = <HTMLElement>this.$refs.accordionItems;
+        if (this.isOpen && el) {
+          return `${el.scrollHeight}px`;
+        }
+        return '0';
+      },
+      tooltipStyle(): Partial<CSSStyleDeclaration> {
+        if (!this.tooltip) {
+          return {};
+        }
+
+        if (this.isCollapsed) {
+          // Prevent the menu from showing outside the window
+          const height = this.item.children.length * 32 + (this.isUserMenu ? 50 : 40);
+          const diff = this.tooltip.top + height - window.innerHeight;
+          if (diff > 0) {
+            return {
+              top: this.tooltip.top - diff - 5 + 'px',
+              left: this.tooltip.right + 'px'
+            };
+          }
+        }
+
+        return {
+          top: this.tooltip.top + 'px',
+          left: this.tooltip.right + 'px',
+          maxHeight: this.tooltip.maxHeight + 'px'
+        };
+      }
+    },
 
     mounted(): void {
       const containerEl = <HTMLElement>this.$refs.containerRef;
@@ -208,85 +228,92 @@
           });
         }
       }
-    }
+    },
 
-    destroyed(): void {
+    unmounted(): void {
       this.subTracker.dispose();
-    }
+    },
 
-    onFocusOut(): void {
-      if (!this.tooltip) {
-        return;
-      }
-      window.setTimeout(() => {
-        const el = this.$refs.containerRef;
-        if (
-          el &&
-          this.tooltip &&
-          this.tooltip.fromKeyboard &&
-          !(<HTMLElement>el).contains(document.activeElement)
-        ) {
-          this.tooltip = null;
+    methods: {
+      getItemName(item: SidebarAccordionSubItem): string | undefined {
+        if (item.type === 'navigation') {
+          return item.name;
         }
-      }, 10);
-    }
-
-    onKeyPress(event: KeyboardEvent): void {
-      if ((event.key === 'Enter' || event.key === ' ') && this.isCollapsed) {
+      },
+      onFocusOut(): void {
         if (!this.tooltip) {
-          this.openTooltip(event.target as HTMLElement, true);
-        } else {
-          this.tooltip = null;
+          return;
+        }
+        window.setTimeout(() => {
+          const el = this.$refs.containerRef;
+          if (
+            el &&
+            this.tooltip &&
+            this.tooltip.fromKeyboard &&
+            !(<HTMLElement>el).contains(document.activeElement)
+          ) {
+            this.tooltip = null;
+          }
+        }, 10);
+      },
+
+      onKeyPress(event: KeyboardEvent): void {
+        if ((event.key === 'Enter' || event.key === ' ') && this.isCollapsed) {
+          if (!this.tooltip) {
+            this.openTooltip(event.target as HTMLElement, true);
+          } else {
+            this.tooltip = null;
+          }
+        }
+      },
+
+      onMouseEnter(event: MouseEvent): void {
+        if (this.isCollapsed) {
+          this.openTooltip(event.target as HTMLElement);
+        }
+      },
+
+      onMouseLeave(): void {
+        this.tooltip = null;
+      },
+
+      onTooltipAccordionItemsScroll(event: Event): void {
+        this.isTooltipScrolled = (event.target as HTMLElement).scrollTop > 0;
+      },
+
+      onTooltipClick(): void {
+        this.tooltip = null;
+      },
+
+      openTooltip(el: HTMLElement, fromKeyboard?: boolean): void {
+        const rect = el.getBoundingClientRect();
+        // maxHeight is needed for the edge-cases where the accordion tooltip content would
+        // otherwise render outside the viewport.
+        const maxHeight = window.innerHeight - rect.top;
+
+        this.isTooltipScrolled = false;
+        this.tooltip = {
+          top: rect.top,
+          right: rect.right,
+          height: rect.height,
+          maxHeight,
+          fromKeyboard
+        };
+      },
+
+      toggleOpen(event: MouseEvent): void {
+        if (!this.isCollapsed) {
+          this.isOpen = !this.isOpen;
+        } else if (this.item.handler) {
+          this.item.handler(event);
+          if (this.selectedItemChanged) {
+            const firstNavChild = (<SidebarNavigationItem[]>this.item.children).find(
+              item => item.name
+            );
+            this.selectedItemChanged((firstNavChild && firstNavChild.name) || this.item.name);
+          }
         }
       }
     }
-
-    onMouseEnter(event: MouseEvent): void {
-      if (this.isCollapsed) {
-        this.openTooltip(event.target as HTMLElement);
-      }
-    }
-
-    onMouseLeave(): void {
-      this.tooltip = null;
-    }
-
-    onTooltipAccordionItemsScroll(event: Event): void {
-      this.isTooltipScrolled = (event.target as HTMLElement).scrollTop > 0;
-    }
-
-    onTooltipClick(): void {
-      this.tooltip = null;
-    }
-
-    openTooltip(el: HTMLElement, fromKeyboard?: boolean): void {
-      const rect = el.getBoundingClientRect();
-      // maxHeight is needed for the edge-cases where the accordion tooltip content would
-      // otherwise render outside the viewport.
-      const maxHeight = window.innerHeight - rect.top;
-
-      this.isTooltipScrolled = false;
-      this.tooltip = {
-        top: rect.top,
-        right: rect.right,
-        height: rect.height,
-        maxHeight,
-        fromKeyboard
-      };
-    }
-
-    toggleOpen(event: MouseEvent): void {
-      if (!this.isCollapsed) {
-        this.isOpen = !this.isOpen;
-      } else if (this.item.handler) {
-        this.item.handler(event);
-        if (this.selectedItemChanged) {
-          const firstNavChild = (<SidebarNavigationItem[]>this.item.children).find(
-            item => item.name
-          );
-          this.selectedItemChanged((firstNavChild && firstNavChild.name) || this.item.name);
-        }
-      }
-    }
-  }
+  });
 </script>
