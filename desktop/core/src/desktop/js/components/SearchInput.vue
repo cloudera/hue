@@ -51,27 +51,41 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent } from 'vue';
+
   import I18n from '../utils/i18n';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
 
-  @Component
-  export default class SearchInput extends Vue {
-    @Prop({ required: false, default: true })
-    showMagnify?: boolean;
-    @Prop({ required: false, default: I18n('Search...') })
-    placeholder?: string;
-    @Prop({ required: false, default: '' })
-    value?: string;
+  export default defineComponent({
+    props: {
+      showMagnify: { type: Boolean, required: false, default: true },
+      placeholder: {
+        type: String,
+        default: I18n('Search...')
+      },
+      value: {
+        type: String,
+        default: ''
+      }
+    },
 
-    spin = false;
-    autocomplete = '';
-    throttle = -1;
-    hasFocus = false;
+    emits: ['input', 'search'],
+
+    data(): {
+      spin: boolean;
+      autocomplete: string;
+      throttle: number;
+      hasFocus: boolean;
+    } {
+      return {
+        spin: false,
+        autocomplete: '',
+        throttle: -1,
+        hasFocus: false
+      };
+    }
 
     // TODO: Add autocomplete logic...
-  }
+  });
 </script>
 
 <style lang="scss" scoped>
