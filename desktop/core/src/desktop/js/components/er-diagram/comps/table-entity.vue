@@ -59,28 +59,48 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
+
   import { Table } from '../lib/entities';
 
-  import './table-entity.scss';
+  export default defineComponent({
+    props: {
+      entity: {
+        type: Object as PropType<Table>,
+        required: true
+      },
+      maxColumns: {
+        type: Number,
+        default: 10
+      }
+    },
 
-  @Component
-  export default class TableEntity extends Vue {
-    @Prop() entity: Table;
-    @Prop({ default: 10 }) maxColumns: number;
+    emits: ['click', 'updated'],
 
-    maxCols = 0;
+    data(): {
+      maxCols: number;
+    } {
+      return {
+        maxCols: 0
+      };
+    },
 
     created(): void {
       this.maxCols = this.maxColumns;
-    }
-
-    expandColumns(): void {
-      this.maxCols = Number.MAX_SAFE_INTEGER;
-    }
+    },
 
     updated(): void {
       this.$emit('updated');
+    },
+
+    methods: {
+      expandColumns(): void {
+        this.maxCols = Number.MAX_SAFE_INTEGER;
+      }
     }
-  }
+  });
 </script>
+
+<style lang="scss">
+  @import './table-entity.scss';
+</style>
