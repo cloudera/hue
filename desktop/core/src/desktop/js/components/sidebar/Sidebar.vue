@@ -38,7 +38,7 @@
     </div>
     <div class="sidebar" :class="{ 'sidebar-collapsed': isCollapsed }">
       <div class="sidebar-header">
-        <a href="javascript:void(0);">
+        <a href="javascript:void(0);" @click="$emit('header-click', $event)">
           <svg>
             <use xlink:href="#hi-sidebar-logo" />
           </svg>
@@ -112,6 +112,7 @@
   import SidebarBody from './SidebarBody.vue';
   import SidebarDrawer from './SidebarDrawer.vue';
   import {
+    HelpDrawerItem,
     SidebarAccordionItem,
     SidebarAccordionSubItem,
     SidebarItem,
@@ -137,14 +138,14 @@
     sidebarItems!: SidebarItem[];
 
     @Prop({ required: false, default: true })
-    useDrawerForUser: boolean;
+    useDrawerForUser?: boolean;
     @Prop({ required: false })
     userDrawerItem: UserDrawerItem | null = null;
     @Prop({ required: false })
     userDrawerChildren: SidebarAccordionSubItem[] = [];
 
     @Prop({ required: false, default: true })
-    useDrawerForHelp: boolean;
+    useDrawerForHelp?: boolean;
     @Prop({ required: false })
     helpDrawerItem: HelpDrawerItem | null = null;
     @Prop({ required: false })
