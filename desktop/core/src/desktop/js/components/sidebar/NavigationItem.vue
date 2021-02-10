@@ -49,52 +49,67 @@
 <!-- eslint-enable vue/no-v-html -->
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
+
   import BaseNavigationItem from './BaseNavigationItem.vue';
   import BaseNavigationItemTooltip from './BaseNavigationItemTooltip.vue';
   import { SidebarNavigationItem } from './types';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
-  @Component({
-    components: { BaseNavigationItemTooltip, BaseNavigationItem }
-  })
-  export default class NavigationItem extends Vue {
-    @Prop()
-    isCollapsed!: boolean;
-    @Prop()
-    item!: SidebarNavigationItem;
-    @Prop()
-    activeItemName!: string | null;
+  export default defineComponent({
+    components: {
+      BaseNavigationItemTooltip,
+      BaseNavigationItem
+    },
 
-    subTracker = new SubscriptionTracker();
+    props: {
+      isCollapsed: Boolean,
+      item: {
+        type: Object as PropType<SidebarNavigationItem>,
+        required: true
+      },
+      activeItemName: Object as PropType<String | null>
+    },
 
-    get isActive(): boolean {
-      return this.item.name === this.activeItemName;
-    }
+    setup(): {
+      subTracker: SubscriptionTracker,
+      tooltip: DOMRect | null
+    } {
+      return {
+        subTracker: new SubscriptionTracker(),
+        tooltip: null
+      };
+    },
 
-    tooltip: DOMRect | null = null;
+    computed: {
+      isActive(): Boolean {
+        return this.item.name === this.activeItemName;
+      }
+    },
+
+    methods: {
+      showTooltip(event: MouseEvent): void {
+        if (!this.isCollapsed) {
+          return;
+        }
+        this.tooltip = (event.target as HTMLElement).getBoundingClientRect();
+      },
+
+      hideTooltip(): void {
+        this.tooltip = null;
+      }
+    },
 
     mounted(): void {
-      this.subTracker.addEventListener(<HTMLElement>this.$parent.$el, 'scroll', () => {
-        this.tooltip = null;
-      });
-    }
+      if(this.$parent) {
+        this.subTracker.addEventListener(<HTMLElement>this.$parent.$el, 'scroll', () => {
+          this.tooltip = null;
+        });
+      }
+    },
 
     destroyed(): void {
       this.subTracker.dispose();
     }
-
-    showTooltip(event: MouseEvent): void {
-      if (!this.isCollapsed) {
-        return;
-      }
-      this.tooltip = (event.target as HTMLElement).getBoundingClientRect();
-    }
-
-    hideTooltip(): void {
-      this.tooltip = null;
-    }
-  }
+  })
 </script>

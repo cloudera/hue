@@ -55,9 +55,8 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop, Watch } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
+
   import { overflowOnHover } from 'components/directives/overflowOnHoverDirective';
   import AccordionItem from './AccordionItem.vue';
   import NavigationItem from './NavigationItem.vue';
@@ -66,54 +65,72 @@
   import { SidebarItem } from './types';
   import { defer } from 'utils/hueUtils';
 
-  @Component({
+  export default defineComponent({
     components: { SpacerItem, NavigationItem, SectionItem, AccordionItem },
     directives: {
       'overflow-on-hover': overflowOnHover
+    },
+
+    props: {
+      items: {
+        type: Object as PropType<SidebarItem[]>,
+        required: true
+      },
+      isCollapsed: {
+        type: Boolean,
+        required: false
+      },
+      activeItemName: {
+        type: Object as PropType<String | null>,
+        default: null,
+        required: false
+      },
+    },
+
+    data(): {
+      showOverflowIndicatorTop: Boolean,
+      showOverflowIndicatorBtm: Boolean
+    } {
+      return {
+        showOverflowIndicatorTop: false,
+        showOverflowIndicatorBtm: false
+      };
+    },
+
+    watch: {
+      items(): void {
+        defer(() => {
+          this.detectOverflow(<HTMLElement>this.$refs.sidebarNav);
+        });
+      }
+    },
+
+    methods: {
+      onScroll(evt: Event): void {
+        const el = <HTMLElement | null>evt.target;
+        this.detectOverflow(el);
+      },
+      detectOverflow(el?: HTMLElement | null): void {
+        if (!el) {
+          return;
+        }
+        const hasOverflowOnTop = el.scrollTop > 0;
+        const hasOverflowOnBtm = el.scrollHeight - el.scrollTop > el.clientHeight;
+        if (hasOverflowOnTop && hasOverflowOnBtm) {
+          this.showOverflowIndicatorTop = true;
+          this.showOverflowIndicatorBtm = true;
+        } else if (hasOverflowOnTop) {
+          this.showOverflowIndicatorTop = true;
+          this.showOverflowIndicatorBtm = false;
+        } else if (hasOverflowOnBtm) {
+          this.showOverflowIndicatorTop = false;
+          this.showOverflowIndicatorBtm = true;
+        } else {
+          this.showOverflowIndicatorTop = false;
+          this.showOverflowIndicatorBtm = false;
+        }
+      }
     }
+
   })
-  export default class SidebarBody extends Vue {
-    @Prop()
-    items!: SidebarItem[];
-    @Prop()
-    isCollapsed!: boolean;
-    @Prop({ required: false })
-    activeItemName: string | null = null;
-
-    showOverflowIndicatorTop = false;
-    showOverflowIndicatorBtm = false;
-
-    @Watch('items', { immediate: true })
-    onItemsChange(): void {
-      defer(() => {
-        this.detectOverflow(<HTMLElement>this.$refs.sidebarNav);
-      });
-    }
-
-    onScroll(evt: Event): void {
-      const el = <HTMLElement | null>evt.target;
-      this.detectOverflow(el);
-    }
-
-    detectOverflow(el?: HTMLElement | null): void {
-      if (!el) {
-        return;
-      }
-      const hasOverflowOnTop = el.scrollTop > 0;
-      const hasOverflowOnBtm = el.scrollHeight - el.scrollTop > el.clientHeight;
-      if (hasOverflowOnTop && hasOverflowOnBtm) {
-        this.showOverflowIndicatorTop = true;
-        this.showOverflowIndicatorBtm = true;
-      } else if (hasOverflowOnTop) {
-        this.showOverflowIndicatorTop = true;
-        this.showOverflowIndicatorBtm = false;
-      } else if (hasOverflowOnBtm) {
-        this.showOverflowIndicatorTop = false;
-        this.showOverflowIndicatorBtm = true;
-      } else {
-        this.showOverflowIndicatorTop = false;
-        this.showOverflowIndicatorBtm = false;
-      }
-    }
-  }
 </script>
