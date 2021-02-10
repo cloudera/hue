@@ -39,10 +39,9 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent, PropType } from 'vue';
+
   import HueButton from './HueButton.vue';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
   import { Column } from 'components/HueTable';
 
   interface SelectableColumn {
@@ -50,45 +49,62 @@
     checked: boolean;
   }
 
-  @Component({
-    components: { HueButton }
-  })
-  export default class ColumnSelectorPanel extends Vue {
-    @Prop({ required: true })
-    columns!: Column<unknown>[];
-    @Prop({ required: true })
-    visibleColumns!: Column<unknown>[];
+  export default defineComponent({
+    components: { HueButton },
 
-    get selectableColumns(): SelectableColumn[] {
-      const visibleColsSet = new Set<Column<unknown>>(this.visibleColumns);
-      return this.columns.map(column => ({ column, checked: visibleColsSet.has(column) }));
-    }
-
-    filterText = '';
-
-    get columnsWithLabels(): SelectableColumn[] {
-      return this.selectableColumns.filter(column => column.column.label);
-    }
-
-    get filteredColumns(): SelectableColumn[] {
-      if (!this.filterText) {
-        return this.columnsWithLabels;
+    props: {
+      columns: {
+        type: Object as PropType<Column<unknown>[]>,
+        required: true
+      },
+      visibleColumns: {
+        type: Object as PropType<Column<unknown>[]>,
+        required: true
       }
-      const lowerFilter = this.filterText.toLowerCase();
-      return this.columnsWithLabels.filter(
-        col => col.column.label.toLowerCase().indexOf(lowerFilter) !== -1
-      );
-    }
+    },
 
-    apply(): void {
-      this.$emit(
-        'update:visible-columns',
-        this.selectableColumns
-          .filter(selectable => selectable.checked)
-          .map(selectable => selectable.column)
-      );
+    emits: ['update:visible-columns'],
+
+    data(): {
+      filterText: string;
+    } {
+      return {
+        filterText: ''
+      };
+    },
+
+    computed: {
+      selectableColumns(): SelectableColumn[] {
+        const visibleColsSet = new Set<Column<unknown>>(this.visibleColumns);
+        return this.columns.map(column => ({ column, checked: visibleColsSet.has(column) }));
+      },
+
+      columnsWithLabels(): SelectableColumn[] {
+        return this.selectableColumns.filter(column => column.column.label);
+      },
+
+      filteredColumns(): SelectableColumn[] {
+        if (!this.filterText) {
+          return this.columnsWithLabels;
+        }
+        const lowerFilter = this.filterText.toLowerCase();
+        return this.columnsWithLabels.filter(
+          col => col.column.label.toLowerCase().indexOf(lowerFilter) !== -1
+        );
+      }
+    },
+
+    methods: {
+      apply(): void {
+        this.$emit(
+          'update:visible-columns',
+          this.selectableColumns
+            .filter(selectable => selectable.checked)
+            .map(selectable => selectable.column)
+        );
+      }
     }
-  }
+  });
 </script>
 
 <style lang="scss" scoped>
