@@ -118,7 +118,7 @@
     "eslint-config-prettier": "6.11.0",
     "eslint-plugin-jest": "23.13.2",
     "eslint-plugin-prettier": "3.1.4",
-    "eslint-plugin-vue": "next",
+    "eslint-plugin-vue": "^7.5.0",
     "expose-loader": "0.7.5",
     "grunt": "^1.1.0",
     "grunt-contrib-less": "2.0.0",
