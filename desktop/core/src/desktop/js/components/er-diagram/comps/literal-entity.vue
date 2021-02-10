@@ -27,14 +27,17 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { defineComponent, PropType, ref } from 'vue';
   import { Literal } from '../lib/entities';
 
   import './literal-entity.scss';
 
-  @Component
-  export default class LiteralEntity extends Vue {
-    @Prop()
-    entity!: Literal;
-  }
+  export default defineComponent({
+    props: {
+      entity: {
+        type: Literal,
+        required: true
+      }
+    }
+  })
 </script>

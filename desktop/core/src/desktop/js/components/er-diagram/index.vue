@@ -121,7 +121,8 @@
         }
       },
       plotRelations(): void {
-        const relationPaths: NodeListOf<HTMLElement> = (this.$refs.erd as HTMLElement).querySelectorAll<HTMLElement>(
+        const erdEl = this.$refs.erd as HTMLElement;
+        const relationPaths: NodeListOf<HTMLElement> = erdEl.querySelectorAll<HTMLElement>(
           '.relation-path'
         );
         const offset: IPos | undefined = this.getSelectorPosition('.erd-relations');
