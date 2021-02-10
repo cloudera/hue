@@ -22,8 +22,12 @@
       <h2>Help</h2>
     </div>
     <ul>
-      <li v-for="childItem in children" :key="childItem.name">
-        <BaseNavigationItem :item="childItem" @click="hideDrawer">
+      <li v-for="(childItem, index) in children" :key="index">
+        <BaseNavigationItem
+          v-if="childItem.type === 'navigation'"
+          :item="childItem"
+          @click="hideDrawer"
+        >
           {{ childItem.displayName }}
         </BaseNavigationItem>
       </li>
@@ -32,20 +36,30 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Inject, Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType, inject } from 'vue';
+
   import BaseNavigationItem from './BaseNavigationItem.vue';
   import { SidebarAccordionSubItem } from './types';
 
-  @Component({
-    components: { BaseNavigationItem }
-  })
-  export default class SmallHelpDrawerContent extends Vue {
-    @Inject()
-    hideDrawer!: () => void;
+  export default defineComponent({
+    components: {
+      BaseNavigationItem
+    },
 
-    @Prop({ required: false, default: [] })
-    children?: SidebarAccordionSubItem[];
-  }
+    props: {
+      children: {
+        type: Object as PropType<SidebarAccordionSubItem[]>,
+        required: false,
+        default: []
+      }
+    },
+
+    setup(): {
+      hideDrawer?: () => void;
+    } {
+      return {
+        hideDrawer: inject('hideDrawer')
+      };
+    }
+  });
 </script>

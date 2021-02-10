@@ -17,58 +17,68 @@
 -->
 
 <template>
-  <Fragment>
-    <button
-      v-if="item.handler"
-      v-bind="$attrs"
-      :class="cssClasses"
-      class="sidebar-base-btn"
-      @click="onClick"
-    >
-      <slot />
-    </button>
-    <a
-      v-if="item.url && !item.handler"
-      :class="cssClasses"
-      :href="item.url"
-      v-bind="$attrs"
-      class="sidebar-base-link"
-      @click="onClick"
-    >
-      <slot />
-    </a>
-  </Fragment>
+  <button
+    v-if="item.handler"
+    v-bind="$attrs"
+    :class="cssClasses"
+    class="sidebar-base-btn"
+    @click="onClick"
+  >
+    <slot />
+  </button>
+  <a
+    v-if="item.url && !item.handler"
+    :class="cssClasses"
+    :href="item.url"
+    v-bind="$attrs"
+    class="sidebar-base-link"
+    @click="onClick"
+  >
+    <slot />
+  </a>
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import { Fragment } from 'vue-fragment';
-  import Component from 'vue-class-component';
-  import { Inject, Prop } from 'vue-property-decorator';
-  import { SidebarNavigationItem } from './types';
+  import { defineComponent, PropType, inject } from 'vue';
 
-  @Component({
-    components: { Fragment }
-  })
-  export default class BaseNavigationItem extends Vue {
-    @Inject()
-    selectedItemChanged?: (itemName: string) => void;
+  import { SidebarBaseItem } from './types';
 
-    @Prop()
-    item!: Pick<SidebarNavigationItem, 'url' | 'handler' | 'name'>;
-    @Prop({ default: false })
-    disabled?: boolean;
-    @Prop({ default: '' })
-    cssClasses?: string;
-
-    onClick(event: Event): void {
-      if (this.selectedItemChanged) {
-        this.selectedItemChanged(this.item.name);
+  export default defineComponent({
+    props: {
+      item: {
+        type: Object as PropType<SidebarBaseItem>,
+        required: true
+      },
+      disabled: {
+        type: Boolean,
+        default: false
+      },
+      cssClasses: {
+        type: String,
+        default: ''
       }
-      if (this.item.handler) {
-        this.item.handler(event);
+    },
+
+    emits: ['click'],
+
+    setup(): {
+      selectedItemChanged?: (itemName: string) => void;
+    } {
+      return {
+        selectedItemChanged: inject('selectedItemChanged')
+      };
+    },
+
+    methods: {
+      onClick(event: Event): void {
+        if (this.selectedItemChanged) {
+          this.selectedItemChanged(this.item.name);
+        }
+        if (this.item.handler) {
+          this.item.handler(event);
+        }
+        this.$emit('click');
       }
-      this.$emit('click');
     }
-  }
+  });
 </script>
