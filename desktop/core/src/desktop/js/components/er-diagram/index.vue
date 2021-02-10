@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="er-diagram">
+  <div class="er-diagram" ref="erd">
     <div class="buttons-panel">
       <button class="btn btn-default btn-sm" title="Toggle Fullscreen" @click="toggleFS">
         <expand-icon v-pre class="fa fa-expand" />
@@ -25,7 +25,7 @@
     </div>
 
     <div class="erd-scroll-panel">
-      <div class="erd-container">
+      <div class="erd-container" v-if="groups">
         <div v-for="(group, index) in groups" :key="index" class="entity-group">
           <div v-for="entity in group" :key="entity.id" class="entity-container">
             <TableEntity
@@ -44,7 +44,7 @@
         </div>
 
         <!-- Relations -->
-        <svg class="erd-relations">
+        <svg class="erd-relations" v-if="relations">
           <path
             v-for="(relation, index) in relations"
             :key="index"
@@ -59,7 +59,7 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { defineComponent, PropType, ref } from 'vue';
 
   import { groupEntities } from './lib/processor';
   import { IEntity, IRelation } from './lib/interfaces';
@@ -79,84 +79,91 @@
     y: number;
   }
 
-  @Component({
+  export default defineComponent({
     components: {
       TableEntity,
       LiteralEntity
-    }
-  })
-  export default class ERDiagram extends Vue {
-    @Prop()
-    entities!: IEntity[];
-    @Prop()
-    relations!: IRelation[];
+    },
 
-    EntityTypes = EntityTypes;
+    props: {
+      entities: Object as PropType<IEntity[]>,
+      relations: Object as PropType<IRelation[]>,
+    },
 
-    get groups(): IEntity[][] | undefined {
-      if (this.entities && this.relations) {
-        return groupEntities(this.entities, this.relations);
-      }
-    }
+    data() {
+      return {
+        EntityTypes
+      };
+    },
 
-    getSelectorPosition(selector: string, offset: IPos | undefined = undefined): IPos | undefined {
-      const element = this.$el.querySelector(selector);
-      if (element) {
-        const rect = element.getBoundingClientRect();
-        let x = rect.left;
-        let y = rect.top;
-
-        if (offset) {
-          x = x - offset.x;
-          y = y - offset.y + 1;
+    computed: {
+      groups(): IEntity[][] | undefined {
+        if (this.entities && this.relations) {
+          return groupEntities(this.entities, this.relations);
         }
-
-        return { x, y };
       }
-    }
+    },
 
-    plotRelations(): void {
-      const relationPaths: NodeListOf<HTMLElement> = this.$el.querySelectorAll<HTMLElement>(
-        '.relation-path'
-      );
-      const offset: IPos | undefined = this.getSelectorPosition('.erd-relations');
+    methods: {
+      getSelectorPosition(selector: string, offset: IPos | undefined = undefined): IPos | undefined {
+        const element = this.$el.querySelector(selector);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          let x = rect.left;
+          let y = rect.top;
 
-      relationPaths.forEach(element => {
-        const leftPos = this.getSelectorPosition(
-          `[data-entity-id~="${element.dataset.entityIdLeft}"] .right-point`,
-          offset
-        );
-        const rightPos = this.getSelectorPosition(
-          `[data-entity-id~="${element.dataset.entityIdRight}"] .left-point`,
-          offset
-        );
+          if (offset) {
+            x = x - offset.x;
+            y = y - offset.y + 1;
+          }
 
-        if (leftPos && rightPos) {
-          const path: string =
-            `M ${leftPos.x},${leftPos.y} C ${leftPos.x + CURVATURE},${leftPos.y} ` +
-            `${rightPos.x - CURVATURE},${rightPos.y} ${rightPos.x},${rightPos.y}`;
-          element.setAttribute('d', path);
-
-          element.style.visibility = 'visible';
-        } else {
-          element.style.visibility = 'hidden';
+          return { x, y };
         }
-      });
-    }
+      },
+      plotRelations(): void {
+        const relationPaths: NodeListOf<HTMLElement> = (this.$refs.erd as HTMLElement).querySelectorAll<HTMLElement>(
+          '.relation-path'
+        );
+        const offset: IPos | undefined = this.getSelectorPosition('.erd-relations');
+
+        relationPaths.forEach(element => {
+          const leftPos = this.getSelectorPosition(
+            `[data-entity-id~="${element.dataset.entityIdLeft}"] .right-point`,
+            offset
+          );
+          const rightPos = this.getSelectorPosition(
+            `[data-entity-id~="${element.dataset.entityIdRight}"] .left-point`,
+            offset
+          );
+
+          if (leftPos && rightPos) {
+            const path: string =
+              `M ${leftPos.x},${leftPos.y} C ${leftPos.x + CURVATURE},${leftPos.y} ` +
+              `${rightPos.x - CURVATURE},${rightPos.y} ${rightPos.x},${rightPos.y}`;
+            element.setAttribute('d', path);
+
+            element.style.visibility = 'visible';
+          } else {
+            element.style.visibility = 'hidden';
+          }
+        });
+      },
+      toggleFS(): void {
+        toggleFullScreen(this.$el);
+        this.$emit('toggle-fullscreen');
+      },
+
+      entityClicked(entity: IEntity): void {
+        this.$emit('entity-clicked', entity);
+      },
+
+    },
+
     updated(): void {
       this.plotRelations();
-    }
+    },
     mounted(): void {
       this.plotRelations();
-    }
-
-    toggleFS(): void {
-      toggleFullScreen(this.$el);
-      this.$emit('toggle-fullscreen');
-    }
-
-    entityClicked(entity: IEntity): void {
-      this.$emit('entity-clicked', entity);
-    }
-  }
+    },
+  })
 </script>
