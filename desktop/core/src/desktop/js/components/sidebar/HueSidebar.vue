@@ -29,6 +29,7 @@
     :is-collapsed="isCollapsed"
     :drawer-topic="drawerTopic"
     @toggle-collapsed="toggleCollapsed"
+    @header-click="onHeaderClick"
   />
 </template>
 
@@ -209,6 +210,10 @@
     toggleCollapsed(): void {
       this.isCollapsed = !this.isCollapsed;
       setInLocalStorage('hue.sidebar.collapse', this.isCollapsed);
+    }
+
+    onHeaderClick(event: MouseEvent): void {
+      onHueLinkClick(event, '/home');
     }
 
     mounted(): void {
