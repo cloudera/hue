@@ -1,6 +1,6 @@
 {
   "presets": [
-    "babel-preset-typescript-vue",
+    "babel-preset-typescript-vue3",
     "@babel/typescript",
     "@babel/preset-env"
   ],
