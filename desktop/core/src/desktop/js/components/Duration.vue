@@ -21,11 +21,10 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent } from 'vue';
+
   import { Duration as LuxonDuration, DurationUnit } from 'luxon';
   import I18n from '../utils/i18n';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
 
   const SHORT_LIMITS = [
     { unit: <DurationUnit>'years', postfix: 'year', appendS: true },
@@ -50,17 +49,21 @@
     return luxonDuration.toFormat('hh:mm:ss');
   };
 
-  @Component
-  export default class Duration extends Vue {
-    @Prop({ required: true })
-    value!: number;
-    @Prop({ required: false })
-    short?: boolean;
+  export default defineComponent({
+    props: {
+      value: {
+        type: Number,
+        required: true
+      },
+      short: Boolean
+    },
 
-    get duration(): string {
-      return duration(this.value, this.short);
+    computed: {
+      duration(): string {
+        return duration(this.value, this.short);
+      }
     }
-  }
+  });
 </script>
 
 <style lang="scss" scoped></style>
