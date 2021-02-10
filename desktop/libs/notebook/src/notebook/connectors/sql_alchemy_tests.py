@@ -339,6 +339,24 @@ class TestApi(object):
           execute.assert_called_with('SELECT 1;')
 
 
+  def test_get_log(self):
+    notebook = Mock()
+    snippet = MagicMock()
+
+    with patch('notebook.connectors.sql_alchemy.CONNECTIONS') as CONNECTIONS:
+      log = [
+        'INFO  : Compiling command(queryId=hive_20210217124246_d3ac774b-cdca-48d2-bfca-f23951ee2097): SELECT 1',
+        'INFO  : Semantic Analysis Completed (retrial = false)',
+        'INFO  : Completed compiling command(queryId=hive_20210217124246_d3ac774b-cdca-48d2-bfca-f23951ee2097); Time taken: 0.092 seconds',
+        'INFO  : Completed executing command(queryId=hive_20210217124246_d3ac774b-cdca-48d2-bfca-f23951ee2097); Time taken: 0.006 seconds',
+        'INFO  : OK'
+      ]
+      CONNECTIONS.get.return_value = {'logs': log}
+
+      data = SqlAlchemyApi(self.user, self.interpreter).get_log(notebook, snippet)
+      assert_equal(data, '\n'.join(log))
+
+
 class TestDialects(object):
 
   def setUp(self):
