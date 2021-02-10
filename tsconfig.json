@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
+    "jsx": "preserve",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "allowJs": true,
@@ -18,6 +19,10 @@
     "."
   ],
   "exclude": [
+    "ext",
+    "parse",
+    "jquery",
+
     "apps",
     "build",
     "dist",
