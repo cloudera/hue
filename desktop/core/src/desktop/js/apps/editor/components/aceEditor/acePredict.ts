@@ -72,9 +72,10 @@ export const attachPredictTypeahead = (editor: Ace.Editor, connector: Connector)
             beforeCursor: editor.getTextBeforeCursor(),
             afterCursor: editor.getTextAfterCursor()
           })
-          .then(response => {
-            if (response.prediction) {
-              setActivePredict(response.prediction);
+          .then(({ prediction }) => {
+            const beforeCursor = editor.getTextBeforeCursor();
+            if (prediction && prediction.toLowerCase().startsWith(beforeCursor.toLowerCase())) {
+              setActivePredict(beforeCursor + prediction.slice(beforeCursor.length));
             } else {
               removeActivePredict();
             }
