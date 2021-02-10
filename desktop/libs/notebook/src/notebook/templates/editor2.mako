@@ -868,6 +868,9 @@
           },
           'close': function () {
             parentNotebook.isPresentationMode(false);
+          },
+          'variables-changed': function (event) {
+            setVariables(event.detail);
           }
         },
         vueKoProps: {
@@ -904,7 +907,7 @@
               }
             },
             vueKoProps: {
-              initialVariables: []
+              initialVariables: executor.variables
             }
           "></variable-substitution-ko-bridge>
   ##      <!-- ko template: { name: 'editor-executable-snippet-body' } --><!-- /ko -->

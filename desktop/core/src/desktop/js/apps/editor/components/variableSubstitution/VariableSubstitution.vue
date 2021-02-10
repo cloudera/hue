@@ -119,10 +119,10 @@
 
   @Component
   export default class VariableSubstitution extends Vue {
-    @Prop({ required: false, default: [] })
-    initialVariables?: Variable[];
+    @Prop({ required: false, default: {} })
+    initialVariables?: { [name: string]: Variable };
     @Prop()
-    locations!: IdentifierLocation[];
+    locations?: IdentifierLocation[];
 
     knownVariables: { [name: string]: KnownVariable } = {};
 
@@ -134,7 +134,7 @@
 
     mounted(): void {
       if (this.initialVariables) {
-        this.initialVariables.forEach((variable, index) => {
+        Object.values(this.initialVariables).forEach((variable, index) => {
           const cloned = <KnownVariable>cloneDeep(variable);
           cloned.active = true;
           cloned.index = index;
@@ -155,77 +155,79 @@
     }
 
     @Watch('locations', { immediate: true })
-    updateFromLocations(locations: IdentifierLocation[]): void {
+    updateFromLocations(locations?: IdentifierLocation[]): void {
       const toDeactivate = new Set<string>(Object.keys(this.knownVariables));
 
-      locations
-        .filter(location => location.type === 'variable' && location.value)
-        .forEach(location => {
-          const match = location.value && location.value.match(LOCATION_VALUE_REGEX);
-          if (!match) {
-            return;
-          }
-
-          const name = match[1];
-          let variable = this.knownVariables[name];
-          if (variable) {
-            toDeactivate.delete(variable.name);
-            if (!variable.active) {
-              this.$set(variable, 'active', true);
+      if (locations) {
+        locations
+          .filter(location => location.type === 'variable' && location.value)
+          .forEach(location => {
+            const match = location.value && location.value.match(LOCATION_VALUE_REGEX);
+            if (!match) {
+              return;
             }
-          } else {
-            variable = {
-              meta: { type: 'text', placeholder: '', options: [] },
-              sample: [],
-              sampleUser: [],
-              step: '',
-              type: 'text',
-              value: '',
-              name: name,
-              active: true,
-              index: Object.keys(this.knownVariables).length + 1
-            };
-            this.$set(this.knownVariables, name, variable);
-          }
 
-          // Case for ${name=1} or ${name=a,b,c}
-          if (match[2]) {
-            const optionStrings = match[2].split(',');
-
-            // When it's just one option it's a placeholder only
-            if (optionStrings.length === 1) {
-              const option = parseOption(optionStrings[0]);
-              if (variable.meta.placeholder !== option.value) {
-                this.$set(variable.meta, 'placeholder', option.value);
+            const name = match[1];
+            let variable = this.knownVariables[name];
+            if (variable) {
+              toDeactivate.delete(variable.name);
+              if (!variable.active) {
+                this.$set(variable, 'active', true);
               }
-              variable.meta.options = [];
             } else {
-              variable.type = 'select';
-              variable.meta.placeholder = '';
-              variable.meta.options = optionStrings.map(parseOption);
+              variable = {
+                meta: { type: 'text', placeholder: '', options: [] },
+                sample: [],
+                sampleUser: [],
+                step: '',
+                type: 'text',
+                value: '',
+                name: name,
+                active: true,
+                index: Object.keys(this.knownVariables).length + 1
+              };
+              this.$set(this.knownVariables, name, variable);
             }
-          } else {
-            if (variable.type === 'select') {
-              // Revert to last known type if options are removed
-              if (variable.catalogEntry) {
-                updateFromDataCatalog(variable, variable.catalogEntry);
-              } else {
-                variable.type = 'text';
-              }
-            }
-            variable.meta.placeholder = '';
-            variable.meta.options = [];
-          }
 
-          if (location.colRef && location.resolveCatalogEntry) {
-            location
-              .resolveCatalogEntry()
-              .then(async entry => {
-                await updateFromDataCatalog(variable, entry);
-              })
-              .catch(noop);
-          }
-        });
+            // Case for ${name=1} or ${name=a,b,c}
+            if (match[2]) {
+              const optionStrings = match[2].split(',');
+
+              // When it's just one option it's a placeholder only
+              if (optionStrings.length === 1) {
+                const option = parseOption(optionStrings[0]);
+                if (variable.meta.placeholder !== option.value) {
+                  this.$set(variable.meta, 'placeholder', option.value);
+                }
+                variable.meta.options = [];
+              } else {
+                variable.type = 'select';
+                variable.meta.placeholder = '';
+                variable.meta.options = optionStrings.map(parseOption);
+              }
+            } else {
+              if (variable.type === 'select') {
+                // Revert to last known type if options are removed
+                if (variable.catalogEntry) {
+                  updateFromDataCatalog(variable, variable.catalogEntry);
+                } else {
+                  variable.type = 'text';
+                }
+              }
+              variable.meta.placeholder = '';
+              variable.meta.options = [];
+            }
+
+            if (location.colRef && location.resolveCatalogEntry) {
+              location
+                .resolveCatalogEntry()
+                .then(async entry => {
+                  await updateFromDataCatalog(variable, entry);
+                })
+                .catch(noop);
+            }
+          });
+      }
 
       toDeactivate.forEach(name => {
         const variable = this.knownVariables[name];
