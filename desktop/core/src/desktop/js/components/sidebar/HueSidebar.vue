@@ -34,11 +34,7 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Provide } from 'vue-property-decorator';
-  import './hueSidebar.scss';
-  import Sidebar from './Sidebar.vue';
+  import { defineComponent } from 'vue';
   import {
     HelpDrawerItem,
     SidebarAccordionItem,
@@ -47,6 +43,9 @@
     SidebarNavigationItem,
     UserDrawerItem
   } from './types';
+
+  import Sidebar from './Sidebar.vue';
+
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import {
     ASSIST_ACTIVE_DB_CHANGED_EVENT,
@@ -180,41 +179,71 @@
     }
   ];
 
-  @Component({
-    components: { Sidebar }
-  })
-  export default class HueSidebar extends Vue {
-    sidebarItems: SidebarItem[] = [];
-    activeItemName: string | null = null;
-    isCollapsed = getFromLocalStorage('hue.sidebar.collapse', true);
-    drawerTopic: string | null = null;
+  export default defineComponent({
+    components: {
+      Sidebar
+    },
 
-    userDrawerItem: UserDrawerItem = {
-      displayName: (<hueWindow>window).LOGGED_USERNAME || '',
-      logoutLabel: I18n('Log Out'),
-      logoutHandler: (event: Event) => onHueLinkClick(event, '/accounts/logout')
-    };
-    userDrawerChildren: SidebarAccordionSubItem[] = USER_DRAWER_CHILDREN;
+    provide(): {
+      selectedItemChanged: (itemName: string) => void;
+    } {
+      return {
+        selectedItemChanged: (itemName: string): void => {
+          if (
+            itemName !== 'user' &&
+            itemName !== 'help' &&
+            itemName !== 'sidebar-collapse-btn' &&
+            this.activeItemName !== itemName
+          ) {
+            this.activeItemName = itemName;
+          }
+        }
+      };
+    },
 
-    helpDrawerItem: HelpDrawerItem = {
-      displayName: I18n('Help'),
-      iconHtml: getIconHtml('support')
-    };
-    helpDrawerChildren: SidebarAccordionSubItem[] = HELP_DRAWER_CHILDREN;
+    setup(): {
+      userDrawerItem: UserDrawerItem;
+      userDrawerChildren: SidebarAccordionSubItem[];
 
-    lastEditorDatabase?: EditorDatabaseDetails;
-    lastAssistDatabase?: AssistDatabaseDetails;
+      helpDrawerItem: HelpDrawerItem;
+      helpDrawerChildren: SidebarAccordionSubItem[];
 
-    subTracker = new SubscriptionTracker();
+      lastEditorDatabase?: EditorDatabaseDetails;
+      lastAssistDatabase?: AssistDatabaseDetails;
 
-    toggleCollapsed(): void {
-      this.isCollapsed = !this.isCollapsed;
-      setInLocalStorage('hue.sidebar.collapse', this.isCollapsed);
-    }
+      subTracker: SubscriptionTracker;
+    } {
+      return {
+        userDrawerItem: {
+          displayName: (<hueWindow>window).LOGGED_USERNAME || '',
+          logoutLabel: I18n('Log Out'),
+          logoutHandler: (event: Event) => onHueLinkClick(event, '/accounts/logout')
+        },
+        userDrawerChildren: USER_DRAWER_CHILDREN,
 
-    onHeaderClick(event: MouseEvent): void {
-      onHueLinkClick(event, '/home');
-    }
+        helpDrawerItem: {
+          displayName: I18n('Help'),
+          iconHtml: getIconHtml('support')
+        },
+        helpDrawerChildren: HELP_DRAWER_CHILDREN,
+
+        subTracker: new SubscriptionTracker()
+      };
+    },
+
+    data(): {
+      sidebarItems: SidebarItem[];
+      activeItemName: string;
+      isCollapsed: boolean;
+      drawerTopic: string | null;
+    } {
+      return {
+        sidebarItems: [],
+        activeItemName: '',
+        isCollapsed: getFromLocalStorage('hue.sidebar.collapse', true),
+        drawerTopic: null
+      };
+    },
 
     mounted(): void {
       const config = getLastKnownConfig();
@@ -236,252 +265,257 @@
 
       this.subTracker.subscribe('set.current.app.name', this.currentAppChanged.bind(this));
       huePubSub.publish('get.current.app.name', this.currentAppChanged.bind(this));
-    }
+    },
 
-    @Provide()
-    selectedItemChanged(itemName: string): void {
-      if (
-        itemName !== 'user' &&
-        itemName !== 'help' &&
-        itemName !== 'sidebar-collapse-btn' &&
-        this.activeItemName !== itemName
-      ) {
-        this.activeItemName = itemName;
-      }
-    }
-
-    currentAppChanged(appName: string): void {
-      let adaptedName;
-
-      const params = new URLSearchParams(location.search);
-      switch (appName) {
-        case 'dashboard':
-          adaptedName = params.get('engine') ? `${appName}-${params.get('engine')}` : appName;
-          break;
-        case 'editor':
-          adaptedName = params.get('type') ? `${appName}-${params.get('type')}` : appName;
-          break;
-        case 'filebrowser':
-          if (location.href.indexOf('=S3A') !== -1) {
-            adaptedName = 's3';
-          } else if (location.href.indexOf('=adl') !== -1) {
-            adaptedName = 'adls';
-          } else if (location.href.indexOf('=abfs') !== -1) {
-            adaptedName = 'abfs';
-          } else {
-            adaptedName = 'hdfs';
-          }
-          break;
-        case 'jobbrowser':
-          adaptedName = 'yarn';
-          break;
-        case 'home':
-          adaptedName = 'documents';
-          break;
-        case 'metastore':
-          adaptedName = 'tables';
-          break;
-        case 'oozie_bundle':
-          adaptedName = 'scheduler-oozie-bundle';
-          break;
-        case 'oozie_coordinator':
-          adaptedName = 'scheduler-oozie-coordinator';
-          break;
-        case 'oozie_workflow':
-          adaptedName = 'scheduler-oozie-workflow';
-          break;
-        case 'security_hive':
-          adaptedName = 'security';
-          break;
-        case 'admin_wizard':
-        case 'userAdmin':
-        case 'userEdit':
-        case 'useradmin_edituser':
-        case 'useradmin_users':
-          adaptedName = 'user';
-          break;
-        case 'hbase':
-        case 'importer':
-        case 'indexes':
-        case 'kafka':
-          break;
-        default:
-          console.warn('No sidebar alternative for app: ' + appName);
-      }
-
-      if (this.activeItemName !== adaptedName) {
-        this.identifyActive(adaptedName || appName);
-      }
-    }
-
-    destroyed(): void {
+    unmounted(): void {
       this.subTracker.dispose();
-    }
+    },
 
-    identifyActive(possibleItemName: string): void {
-      if (!possibleItemName) {
-        return;
-      }
+    methods: {
+      onHeaderClick(event: MouseEvent): void {
+        onHueLinkClick(event, '/home');
+      },
+      toggleCollapsed(): void {
+        this.isCollapsed = !this.isCollapsed;
+        setInLocalStorage('hue.sidebar.collapse', this.isCollapsed);
+      },
+      currentAppChanged(appName: string): void {
+        let adaptedName;
 
-      const findInside = (items: (SidebarItem | SidebarAccordionSubItem)[]): string | undefined => {
-        let found: string | undefined = undefined;
-        items.some(item => {
-          if ((<SidebarAccordionItem>item).children) {
-            found = findInside((<SidebarAccordionItem>item).children);
-          }
-          const navigationItem = <SidebarNavigationItem>item;
-          if (!found && navigationItem.name === possibleItemName) {
-            found = navigationItem.name;
-          }
-          return found;
-        });
-        return found;
-      };
-
-      const foundName = findInside(this.sidebarItems);
-      if (foundName) {
-        this.activeItemName = foundName;
-      }
-    }
-
-    hueConfigUpdated(clusterConfig: HueConfig): void {
-      const items: SidebarItem[] = [];
-
-      if (clusterConfig && clusterConfig.app_config) {
-        const favourite = clusterConfig.main_button_action;
-        const appsItems: SidebarItem[] = [];
-        const appConfig = clusterConfig.app_config;
-
-        [AppType.editor, AppType.dashboard, AppType.scheduler, AppType.sdkapps].forEach(appName => {
-          const config = appConfig[appName];
-
-          if ((<hueWindow>window).CUSTOM_DASHBOARD_URL && appName === 'dashboard') {
-            appsItems.push({
-              type: 'navigation',
-              name: 'dashboard',
-              displayName: I18n('Dashboard'),
-              iconHtml: getIconHtml('dashboard'),
-              handler: () => {
-                window.open((<hueWindow>window).CUSTOM_DASHBOARD_URL, '_blank');
-              }
-            });
-            return;
-          }
-          if (config && config.interpreters.length) {
-            if (config.interpreters.length === 1) {
-              appsItems.push({
-                type: 'navigation',
-                name: `${appName}-${config.name}`,
-                displayName: config.displayName,
-                iconHtml: getIconHtml(config.name),
-                url: config.page,
-                handler: (event: Event) => onHueLinkClick(event, <string>config.page)
-              });
+        const params = new URLSearchParams(location.search);
+        switch (appName) {
+          case 'dashboard':
+            adaptedName = params.get('engine') ? `${appName}-${params.get('engine')}` : appName;
+            break;
+          case 'editor':
+            adaptedName = params.get('type') ? `${appName}-${params.get('type')}` : appName;
+            break;
+          case 'filebrowser':
+            if (location.href.indexOf('=S3A') !== -1) {
+              adaptedName = 's3';
+            } else if (location.href.indexOf('=adl') !== -1) {
+              adaptedName = 'adls';
+            } else if (location.href.indexOf('=abfs') !== -1) {
+              adaptedName = 'abfs';
             } else {
-              const subApps: SidebarAccordionSubItem[] = [];
-              config.interpreters.forEach(interpreter => {
-                const interpreterItem: SidebarAccordionSubItem = {
-                  type: 'navigation',
-                  name: `${appName}-${interpreter.type}`,
-                  displayName: interpreter.displayName,
-                  url: interpreter.page,
-                  handler: (event: Event) => onHueLinkClick(event, interpreter.page)
-                };
-                if (favourite && favourite.page === interpreter.page) {
-                  // Put the favourite on top
-                  subApps.unshift(interpreterItem);
-                } else {
-                  subApps.push(interpreterItem);
-                }
-              });
+              adaptedName = 'hdfs';
+            }
+            break;
+          case 'jobbrowser':
+            adaptedName = 'yarn';
+            break;
+          case 'home':
+            adaptedName = 'documents';
+            break;
+          case 'metastore':
+            adaptedName = 'tables';
+            break;
+          case 'oozie_bundle':
+            adaptedName = 'scheduler-oozie-bundle';
+            break;
+          case 'oozie_coordinator':
+            adaptedName = 'scheduler-oozie-coordinator';
+            break;
+          case 'oozie_workflow':
+            adaptedName = 'scheduler-oozie-workflow';
+            break;
+          case 'security_hive':
+            adaptedName = 'security';
+            break;
+          case 'admin_wizard':
+          case 'userAdmin':
+          case 'userEdit':
+          case 'useradmin_edituser':
+          case 'useradmin_users':
+            adaptedName = 'user';
+            break;
+          case 'hbase':
+          case 'importer':
+          case 'indexes':
+          case 'kafka':
+            break;
+          default:
+            console.warn('No sidebar alternative for app: ' + appName);
+        }
 
-              if (appName === 'editor' && (<hueWindow>window).SHOW_ADD_MORE_EDITORS) {
-                subApps.push({ type: 'spacer' });
-                const url = (<hueWindow>window).HAS_CONNECTORS
-                  ? '/desktop/connectors'
-                  : 'https://docs.gethue.com/administrator/configuration/connectors/';
-                subApps.push({
+        if (this.activeItemName !== adaptedName) {
+          this.identifyActive(adaptedName || appName);
+        }
+      },
+
+      identifyActive(possibleItemName: string): void {
+        if (!possibleItemName) {
+          return;
+        }
+
+        const findInside = (
+          items: (SidebarItem | SidebarAccordionSubItem)[]
+        ): string | undefined => {
+          let found: string | undefined = undefined;
+          items.some(item => {
+            if ((<SidebarAccordionItem>item).children) {
+              found = findInside((<SidebarAccordionItem>item).children);
+            }
+            const navigationItem = <SidebarNavigationItem>item;
+            if (!found && navigationItem.name === possibleItemName) {
+              found = navigationItem.name;
+            }
+            return found;
+          });
+          return found;
+        };
+
+        const foundName = findInside(this.sidebarItems);
+        if (foundName) {
+          this.activeItemName = foundName;
+        }
+      },
+
+      hueConfigUpdated(clusterConfig: HueConfig): void {
+        const items: SidebarItem[] = [];
+
+        if (clusterConfig && clusterConfig.app_config) {
+          const favourite = clusterConfig.main_button_action;
+          const appsItems: SidebarItem[] = [];
+          const appConfig = clusterConfig.app_config;
+
+          [AppType.editor, AppType.dashboard, AppType.scheduler, AppType.sdkapps].forEach(
+            appName => {
+              const config = appConfig[appName];
+
+              if ((<hueWindow>window).CUSTOM_DASHBOARD_URL && appName === 'dashboard') {
+                appsItems.push({
                   type: 'navigation',
-                  name: 'editor-AddMoreInterpreters',
-                  displayName: I18n('Edit list...'),
-                  url,
-                  handler: (event: Event) => onHueLinkClick(event, url)
+                  name: 'dashboard',
+                  displayName: I18n('Dashboard'),
+                  iconHtml: getIconHtml('dashboard'),
+                  handler: () => {
+                    window.open((<hueWindow>window).CUSTOM_DASHBOARD_URL, '_blank');
+                  }
+                });
+                return;
+              }
+              if (config && config.interpreters.length) {
+                if (config.interpreters.length === 1) {
+                  appsItems.push({
+                    type: 'navigation',
+                    name: `${appName}-${config.name}`,
+                    displayName: config.displayName,
+                    iconHtml: getIconHtml(config.name),
+                    url: config.page,
+                    handler: (event: Event) => onHueLinkClick(event, <string>config.page)
+                  });
+                } else {
+                  const subApps: SidebarAccordionSubItem[] = [];
+                  config.interpreters.forEach(interpreter => {
+                    const interpreterItem: SidebarAccordionSubItem = {
+                      type: 'navigation',
+                      name: `${appName}-${interpreter.type}`,
+                      displayName: interpreter.displayName,
+                      url: interpreter.page,
+                      handler: (event: Event) => onHueLinkClick(event, interpreter.page)
+                    };
+                    if (favourite && favourite.page === interpreter.page) {
+                      // Put the favourite on top
+                      subApps.unshift(interpreterItem);
+                    } else {
+                      subApps.push(interpreterItem);
+                    }
+                  });
+
+                  if (appName === 'editor' && (<hueWindow>window).SHOW_ADD_MORE_EDITORS) {
+                    subApps.push({ type: 'spacer' });
+                    const url = (<hueWindow>window).HAS_CONNECTORS
+                      ? '/desktop/connectors'
+                      : 'https://docs.gethue.com/administrator/configuration/connectors/';
+                    subApps.push({
+                      type: 'navigation',
+                      name: 'editor-AddMoreInterpreters',
+                      displayName: I18n('Edit list...'),
+                      url,
+                      handler: (event: Event) => onHueLinkClick(event, url)
+                    });
+                  }
+                  const mainUrl = (<SidebarNavigationItem>subApps[0]).url || config.page || '/';
+                  appsItems.push({
+                    type: 'accordion',
+                    name: config.name,
+                    displayName: config.displayName,
+                    url: mainUrl,
+                    handler: (event: Event) => onHueLinkClick(event, mainUrl),
+                    iconHtml: getIconHtml(config.name),
+                    children: subApps
+                  });
+                }
+              }
+            }
+          );
+
+          items.push(...appsItems);
+
+          const browserItems: SidebarItem[] = [];
+          if (appConfig.home) {
+            const url = appConfig.home.page || '/';
+            browserItems.push({
+              type: 'navigation',
+              name: 'documents',
+              displayName: appConfig.home.buttonName,
+              url,
+              handler: (event: Event) => onHueLinkClick(event, url),
+              iconHtml: getIconHtml('documents')
+            });
+          }
+          if (appConfig.browser && appConfig.browser.interpreters) {
+            appConfig.browser.interpreters.forEach(browser => {
+              if (browser.type === 'tables') {
+                browserItems.push({
+                  type: 'navigation',
+                  name: browser.type,
+                  displayName: browser.displayName,
+                  url: browser.page,
+                  handler: (event: Event) => {
+                    const details = this.lastEditorDatabase || this.lastAssistDatabase;
+                    let url = browser.page;
+                    if (details) {
+                      url += `/${
+                        (<EditorDatabaseDetails>details).name ||
+                        (<AssistDatabaseDetails>details).database
+                      }?connector_id=${details.connector.id}`;
+                    }
+                    onHueLinkClick(event, url);
+                  },
+                  iconHtml: getIconHtml(browser.type)
+                });
+              } else {
+                browserItems.push({
+                  type: 'navigation',
+                  name: browser.type,
+                  displayName: browser.displayName,
+                  url: browser.page,
+                  handler: (event: Event) => onHueLinkClick(event, browser.page),
+                  iconHtml: getIconHtml(browser.type)
                 });
               }
-              const mainUrl = (<SidebarNavigationItem>subApps[0]).url || config.page || '/';
-              appsItems.push({
-                type: 'accordion',
-                name: config.name,
-                displayName: config.displayName,
-                url: mainUrl,
-                handler: (event: Event) => onHueLinkClick(event, mainUrl),
-                iconHtml: getIconHtml(config.name),
-                children: subApps
-              });
-            }
+            });
           }
-        });
-
-        items.push(...appsItems);
-
-        const browserItems: SidebarItem[] = [];
-        if (appConfig.home) {
-          const url = appConfig.home.page || '/';
-          browserItems.push({
-            type: 'navigation',
-            name: 'documents',
-            displayName: appConfig.home.buttonName,
-            url,
-            handler: (event: Event) => onHueLinkClick(event, url),
-            iconHtml: getIconHtml('documents')
-          });
-        }
-        if (appConfig.browser && appConfig.browser.interpreters) {
-          appConfig.browser.interpreters.forEach(browser => {
-            if (browser.type === 'tables') {
-              browserItems.push({
-                type: 'navigation',
-                name: browser.type,
-                displayName: browser.displayName,
-                url: browser.page,
-                handler: (event: Event) => {
-                  const details = this.lastEditorDatabase || this.lastAssistDatabase;
-                  let url = browser.page;
-                  if (details) {
-                    url += `/${
-                      (<EditorDatabaseDetails>details).name ||
-                      (<AssistDatabaseDetails>details).database
-                    }?connector_id=${details.connector.id}`;
-                  }
-                  onHueLinkClick(event, url);
-                },
-                iconHtml: getIconHtml(browser.type)
-              });
-            } else {
-              browserItems.push({
-                type: 'navigation',
-                name: browser.type,
-                displayName: browser.displayName,
-                url: browser.page,
-                handler: (event: Event) => onHueLinkClick(event, browser.page),
-                iconHtml: getIconHtml(browser.type)
-              });
+          if (browserItems.length) {
+            if (items.length) {
+              items.push({ type: 'spacer' });
             }
-          });
-        }
-        if (browserItems.length) {
-          if (items.length) {
-            items.push({ type: 'spacer' });
+
+            items.push(...browserItems);
           }
 
-          items.push(...browserItems);
-        }
-
-        this.sidebarItems = items;
-        if (!this.activeItemName) {
-          huePubSub.publish('get.current.app.name', this.currentAppChanged.bind(this));
+          this.sidebarItems = items;
+          if (!this.activeItemName) {
+            huePubSub.publish('get.current.app.name', this.currentAppChanged.bind(this));
+          }
         }
       }
     }
-  }
+  });
 </script>
+
+<style lang="scss">
+  @import './hueSidebar.scss';
+</style>
