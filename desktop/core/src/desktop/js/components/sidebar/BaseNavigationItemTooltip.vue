@@ -27,13 +27,15 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent } from 'vue';
 
-  @Component
-  export default class BaseNavigationItemTooltip extends Vue {
-    @Prop({ default: false })
-    visible?: boolean;
-  }
+  export default defineComponent({
+    props: {
+      visible: {
+        type: Boolean,
+        default: false
+      }
+    },
+    emits: ['click']
+  });
 </script>

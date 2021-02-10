@@ -21,18 +21,24 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
+
   import { SidebarSectionItem } from './types';
 
-  @Component
-  export default class SectionItem extends Vue {
-    @Prop()
-    activeItemName?: string;
-    @Prop()
-    isCollapsed!: boolean;
-    @Prop()
-    item!: SidebarSectionItem;
-  }
+  export default defineComponent({
+    props: {
+      activeItemName: {
+        type: String,
+        default: ''
+      },
+      isCollapsed: {
+        type: Boolean,
+        required: false
+      },
+      item: {
+        type: Object as PropType<SidebarSectionItem>,
+        required: true
+      }
+    }
+  });
 </script>
