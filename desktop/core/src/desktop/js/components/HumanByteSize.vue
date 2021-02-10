@@ -21,9 +21,7 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent } from 'vue';
 
   const UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'];
 
@@ -43,14 +41,17 @@
   };
 
   @Component
-  export default class HumanByteSize extends Vue {
-    @Prop({ required: false })
-    value?: number;
+  export default defineComponent({
+    props: {
+      value: Number
+    },
 
-    get humanSize(): string {
-      return humanSize(this.value);
+    computed: {
+      humanSize(): string {
+        return humanSize(this.value);
+      }
     }
-  }
+  })
 </script>
 
 <style lang="scss" scoped></style>
