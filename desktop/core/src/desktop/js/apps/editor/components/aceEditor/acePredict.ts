@@ -51,6 +51,7 @@ export const attachPredictTypeahead = (editor: Ace.Editor, connector: Connector)
   };
 
   let activePredictPromise: CancellablePromise<PredictResponse> | undefined;
+  let lastPrediction: string | undefined;
 
   const updatePredictTypeahead = () => {
     if (activePredictPromise) {
@@ -73,12 +74,15 @@ export const attachPredictTypeahead = (editor: Ace.Editor, connector: Connector)
             afterCursor: editor.getTextAfterCursor()
           })
           .then(({ prediction }) => {
-            const beforeCursor = editor.getTextBeforeCursor();
-            if (prediction && prediction.toLowerCase().startsWith(beforeCursor.toLowerCase())) {
-              setActivePredict(beforeCursor + prediction.slice(beforeCursor.length));
-            } else {
-              removeActivePredict();
+            if (prediction !== lastPrediction) {
+              const beforeCursor = editor.getTextBeforeCursor();
+              if (prediction && prediction.toLowerCase().startsWith(beforeCursor.toLowerCase())) {
+                setActivePredict(beforeCursor + prediction.slice(beforeCursor.length));
+              } else {
+                removeActivePredict();
+              }
             }
+            lastPrediction = prediction;
           })
           .catch(() => {
             removeActivePredict();
@@ -100,6 +104,25 @@ export const attachPredictTypeahead = (editor: Ace.Editor, connector: Connector)
     },
     multiSelectAction: 'forEach',
     scrollIntoView: 'selectionPart'
+  });
+
+  editor.commands.addCommand({
+    name: 'forceIndent',
+    bindKey: { win: 'Shift-Tab', mac: 'Shift-Tab' },
+    exec: () => {
+      removeActivePredict();
+      editor.indent();
+    },
+    multiSelectAction: 'forEach',
+    scrollIntoView: 'selectionPart'
+  });
+
+  editor.commands.addCommand({
+    name: 'cancelPredict',
+    bindKey: { win: 'Escape', mac: 'Escape' },
+    exec: () => {
+      removeActivePredict();
+    }
   });
 
   const predictOnInput = () => {
