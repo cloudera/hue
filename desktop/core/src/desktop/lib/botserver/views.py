@@ -17,6 +17,7 @@
 
 import logging
 import json
+from pprint import pprint
 
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -32,8 +33,17 @@ SLACK_VERIFICATION_TOKEN = getattr(settings, 'SLACK_VERIFICATION_TOKEN', None)
 SLACK_BOT_USER_TOKEN = getattr(settings, 'SLACK_BOT_USER_TOKEN', None)
 
 
-Client = WebClient(token=SLACK_BOT_USER_TOKEN)
-BOT_ID = Client.api_call('auth.test')['user_id']
+slack_client = WebClient(token=SLACK_BOT_USER_TOKEN)
+appname = "SQL Assistant"
+
+def get_bot_id(botusername):
+  response = slack_client.api_call("users.list")
+  users = response["members"]
+  for user in users:
+    if 'name' in user and botusername in user.get('name') and not user.get('deleted'):
+      return user.get('id')
+
+BOT_ID = get_bot_id(appname)
 
 @login_notrequired
 @csrf_exempt
@@ -43,32 +53,31 @@ def slack_events(request):
   if slack_message['token'] != SLACK_VERIFICATION_TOKEN:
     return HttpResponse(status=403)
 
-  # verification challenge
+  # challenge verification
   if slack_message['type'] == 'url_verification':
     response_dict = {"challenge": slack_message.get('challenge')}
     return JsonResponse(response_dict, status=200)
   
-
-  # Bot greeting when User says "hello hue"
   if 'event' in slack_message:
     event_message = slack_message['event']
-   
-    user_id = event_message.get('user')
-
-    # ignore bot's own message
-    if BOT_ID == user_id:
-      return HttpResponse(status=200) 
-            
-    # process user's message              
-    text = event_message.get('text')                     
-    channel = event_message.get('channel')
-
-    bot_text = 'Hi <@{}> :wave:'.format(user_id)
-    if 'hello hue' in text.lower():
-      Client.api_call(api_method='chat.postMessage', json={'channel': channel,'text': bot_text})
-      return HttpResponse(status=200)
+    parse_events(event_message)
 
   return HttpResponse(status=200)
 
+def parse_events(event_message):
+  user_id = event_message.get('user')
+  text = event_message.get('text')
+  channel = event_message.get('channel')
 
+  # ignore bot's own message
+  if BOT_ID == user_id:
+    return HttpResponse(status=200)
+
+  if 'hello hue' in text.lower():
+    say_hi_user(channel, user_id)
   
+def say_hi_user(channel, user_id):
+  # App greets when user says "hello hue"
+  bot_message = f'Hi <@{user_id}> :wave:'
+  slack_client.api_call(api_method='chat.postMessage', json={'channel': channel, 'text': bot_message})
+  return HttpResponse(status=200)
