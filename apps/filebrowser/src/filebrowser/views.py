@@ -204,6 +204,17 @@ def view(request, path):
   decoded_path = unquote_url(path)
   if path != decoded_path:
     path = decoded_path
+
+  # default_abfs_home is set in bootstrap.js
+  if 'default_abfs_home' in request.GET:
+    from azure.abfs.__init__ import get_home_dir_for_ABFS
+    home_dir_path = get_home_dir_for_ABFS()
+    if request.fs.isdir(home_dir_path):
+      return format_preserving_redirect(
+          request,
+          '/filebrowser/view=' + urllib_quote(home_dir_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+      )
+
   # default_to_home is set in bootstrap.js
   if 'default_to_home' in request.GET:
     home_dir_path = request.user.get_home_directory()
