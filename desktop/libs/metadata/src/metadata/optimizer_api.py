@@ -225,7 +225,7 @@ def predict(request):
 
   if data:
     response['status'] = 0
-    response['predict'] = data
+    response['prediction'] = data['statement']
   else:
     response['message'] = 'Optimizer: %s' % data
 

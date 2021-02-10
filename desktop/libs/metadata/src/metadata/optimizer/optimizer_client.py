@@ -271,10 +271,10 @@ class OptimizerClient(object):
       }
     )
 
-    hints = response.get(source_platform, [])
+    predictions = response.get('predictions', [])
 
     return {
-      'hints': hints,
+      'statement': predictions[0]['statement']
     }
 
 
