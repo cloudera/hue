@@ -62,7 +62,7 @@
                 :style="{ 'background-color': suggestion.category.color }"
               />
               <matched-text :suggestion="suggestion" :filter="filter" />
-              <i v-if="suggestion.details && suggestion.details.primary_key" class="fa fa-key" />
+              <i v-if="suggestion.details && suggestion.details.hasOwnProperty('primary_key')" class="fa fa-key" />
             </div>
             <div class="autocompleter-suggestion-meta">
               <i v-if="suggestion.popular" class="fa fa-star-o popular-color" />
@@ -79,13 +79,12 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent, PropType } from 'vue';
+
   import { Ace } from 'ext/ace';
   import ace from 'ext/aceHelper';
   import { AutocompleteParser } from 'parse/types';
   import { Connector } from 'types/config';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop, Watch } from 'vue-property-decorator';
 
   import { Category, CategoryId, CategoryInfo, extractCategories } from './Category';
   import Executor from 'apps/editor/execution/executor';
@@ -111,7 +110,7 @@
   const HashHandler = <typeof Ace.HashHandler>ace.require('ace/keyboard/hash_handler').HashHandler;
   const REFRESH_STATEMENT_LOCATIONS_EVENT = 'editor.refresh.statement.locations';
 
-  @Component({
+  export default defineComponent({
     components: {
       CatalogEntryDetailsPanel,
       MatchedText,
@@ -121,52 +120,472 @@
       Spinner,
       UdfDetailsPanel
     },
-    methods: { I18n },
+
     directives: {
       'click-outside': clickOutsideDirective
-    }
-  })
-  export default class AceAutocomplete extends Vue {
-    @Prop({ required: true })
-    autocompleteParser!: AutocompleteParser;
-    @Prop({ required: true })
-    sqlReferenceProvider!: SqlReferenceProvider;
-    @Prop({ required: true })
-    editor!: Ace.Editor;
-    @Prop({ required: true })
-    editorId!: string;
-    @Prop({ required: true })
-    executor!: Executor;
+    },
 
-    @Prop({ required: false, default: false })
-    temporaryOnly?: boolean;
+    props: {
+      autocompleteParser: {
+        type: Object as PropType<AutocompleteParser>,
+        required: true
+      },
+      sqlReferenceProvider: {
+        type: Object as PropType<SqlReferenceProvider>,
+        required: true
+      },
+      editor: {
+        type: Object as PropType<Ace.Editor>,
+        required: true
+      },
+      editorId: {
+        type: String,
+        required: true
+      },
+      executor: {
+        type: Object as PropType<Executor>,
+        required: true
+      },
 
-    startLayout: DOMRect | null = null;
-    startPixelRatio = window.devicePixelRatio;
-    left = 0;
-    top = 0;
+      temporaryOnly: {
+        type: Boolean,
+        required: false,
+        default: false
+      }
+    },
 
-    loading = false;
-    active = false;
-    filter = '';
-    availableCategories = [Category.All];
-    activeCategory = Category.All;
-    selectedIndex: number | null = null;
-    hoveredIndex: number | null = null;
-    base: Ace.Anchor | null = null;
-    sortOverride?: SortOverride | null = null;
-    autocompleter?: SqlAutocompleter;
-    autocompleteResults?: AutocompleteResults;
-    suggestions: Suggestion[] = [];
+    setup(): {
+        startLayout: DOMRect | null,
+        startPixelRatio: number,
+        left: number,
+        top: number,
 
-    reTriggerTimeout = -1;
-    changeTimeout = -1;
-    positionInterval = -1;
-    keyboardHandler: Ace.HashHandler | null = null;
-    changeListener: (() => void) | null = null;
-    mousedownListener = this.detach.bind(this);
-    mousewheelListener = this.closeOnScroll.bind(this);
-    subTracker = new SubscriptionTracker();
+        loading: boolean,
+        active: boolean,
+        filter: string,
+        availableCategories: CategoryInfo[],
+        activeCategory: CategoryInfo,
+        selectedIndex: number | null,
+        hoveredIndex: number | null,
+        base: Ace.Anchor | null,
+        sortOverride?: SortOverride | null,
+        autocompleter?: SqlAutocompleter,
+        autocompleteResults?: AutocompleteResults,
+        suggestions: Suggestion[],
+
+        reTriggerTimeout: number,
+        changeTimeout: number,
+        positionInterval: number,
+        keyboardHandler: Ace.HashHandler | null,
+        changeListener: (() => void) | null,
+        subTracker: SubscriptionTracker
+    } {
+      return {
+        startLayout: null,
+        startPixelRatio: window.devicePixelRatio,
+        left: 0,
+        top: 0,
+
+        loading: false,
+        active: false,
+        filter: '',
+        availableCategories: [Category.All],
+        activeCategory: Category.All,
+        selectedIndex: null,
+        hoveredIndex: null,
+        base: null,
+        sortOverride: null,
+        suggestions: [],
+
+        reTriggerTimeout: -1,
+        changeTimeout: -1,
+        positionInterval: -1,
+        keyboardHandler: null,
+        changeListener: null,
+        subTracker: new SubscriptionTracker()
+      };
+    },
+
+    data(thisComp): {
+      mousedownListener: (e: Event) => void,
+      mousewheelListener: (e: Event) => void,
+    } {
+      return {
+        mousedownListener: thisComp.detach.bind(thisComp),
+        mousewheelListener: thisComp.closeOnScroll.bind(thisComp),
+      };
+    },
+
+    computed: {
+      connector(): Connector | undefined {
+        if (this.executor) {
+          return this.executor.connector();
+        }
+      },
+
+      detailsComponent(): string | undefined {
+        if (this.focusedEntry && this.focusedEntry.details) {
+          if (this.focusedEntry.hasCatalogEntry) {
+            return 'CatalogEntryDetailsPanel';
+          }
+          return this.focusedEntry.category.detailsComponent;
+        }
+      },
+
+      filtered(): Suggestion[] {
+        if (!this.autocompleteResults) {
+          return [];
+        }
+
+        let result = this.suggestions;
+
+        if (this.filter) {
+          result = sqlUtils.autocompleteFilter(this.filter, result);
+          huePubSub.publish('hue.ace.autocompleter.match.updated');
+        }
+
+        const categories = extractCategories(result);
+        if (categories.indexOf(this.activeCategory) === -1) {
+          this.activeCategory = Category.All;
+        }
+        this.availableCategories = categories;
+
+        const activeCategory = this.activeCategory;
+
+        const categoriesCount = new Map<CategoryId, number>();
+
+        result = result.filter(suggestion => {
+          categoriesCount.set(
+            suggestion.category.categoryId,
+            (categoriesCount.get(suggestion.category.categoryId) || 0) + 1
+          );
+          if (
+            activeCategory !== Category.Popular &&
+            (categoriesCount.get(suggestion.category.categoryId) || 0) >= 10 &&
+            suggestion.category.popular
+          ) {
+            return false;
+          }
+          return (
+            activeCategory === Category.All ||
+            activeCategory === suggestion.category ||
+            (activeCategory === Category.Popular && suggestion.popular)
+          );
+        });
+
+        sqlUtils.sortSuggestions(result, this.filter, this.sortOverride);
+        this.sortOverride = undefined;
+
+        return result;
+      },
+
+      focusedEntry(): Suggestion | undefined {
+        if (this.filtered.length) {
+          if (this.hoveredIndex !== null) {
+            return this.filtered[this.hoveredIndex];
+          } else if (this.selectedIndex !== null) {
+            return this.filtered[this.selectedIndex];
+          }
+        }
+        return undefined;
+      },
+
+      visible(): boolean {
+        return this.active && (this.loading || !!this.filtered.length);
+      },
+
+    },
+
+    methods: {
+      I18n,
+
+      clickCategory(category: CategoryInfo, event: Event): void {
+        if (!this.autocompleteResults) {
+          return;
+        }
+        this.activeCategory = category;
+
+        event.stopPropagation();
+        this.editor.focus();
+      },
+
+      clickOutside(): void {
+        if (this.active) {
+          this.detach();
+        }
+      },
+
+      clickSuggestion(index: number): void {
+        this.selectedIndex = index;
+        this.insertSuggestion();
+        this.editor.focus();
+      },
+
+      updateFilter(): void {
+        if (this.base) {
+          const pos = this.editor.getCursorPosition();
+          this.filter = this.editor.session.getTextRange({
+            start: this.base,
+            end: pos
+          });
+        }
+      },
+
+      registerKeybindings(keyboardHandler: Ace.HashHandler): void {
+        keyboardHandler.bindKeys({
+          Up: () => {
+            if (this.filtered.length <= 1) {
+              this.detach();
+              this.editor.execCommand('golineup');
+            } else if (this.selectedIndex) {
+              this.selectedIndex = this.selectedIndex - 1;
+              this.hoveredIndex = null;
+              this.scrollSelectionIntoView();
+            } else {
+              this.selectedIndex = this.filtered.length - 1;
+              this.hoveredIndex = null;
+              this.scrollSelectionIntoView();
+            }
+          },
+          Down: () => {
+            if (this.filtered.length <= 1) {
+              this.detach();
+              this.editor.execCommand('golinedown');
+            } else if (this.selectedIndex !== null && this.selectedIndex < this.filtered.length - 1) {
+              this.selectedIndex = this.selectedIndex + 1;
+              this.hoveredIndex = null;
+              this.scrollSelectionIntoView();
+            } else {
+              this.selectedIndex = 0;
+              this.hoveredIndex = null;
+              this.scrollSelectionIntoView();
+            }
+          },
+          'Ctrl-Up|Ctrl-Home': () => {
+            if (this.filtered.length <= 1) {
+              this.detach();
+              this.editor.execCommand('gotostart');
+            } else {
+              this.selectedIndex = 0;
+              this.hoveredIndex = null;
+              this.scrollSelectionIntoView();
+            }
+          },
+          'Ctrl-Down|Ctrl-End': () => {
+            if (this.filtered.length <= 1) {
+              this.detach();
+              this.editor.execCommand('gotoend');
+            } else if (this.filtered.length > 0) {
+              this.selectedIndex = this.filtered.length - 1;
+              this.hoveredIndex = null;
+              this.scrollSelectionIntoView();
+            }
+          },
+          Esc: () => {
+            this.detach();
+          },
+          Return: () => {
+            this.insertSuggestion(() => {
+              this.editor.execCommand('insertstring', '\n');
+            });
+          },
+          'Shift-Return': () => {
+            // TODO: Delete suffix
+            this.insertSuggestion();
+          },
+          Tab: () => {
+            this.insertSuggestion(() => {
+              this.editor.execCommand('indent');
+            });
+          }
+        });
+      },
+
+      insertSuggestion(emptyCallback?: () => void): void {
+        if (this.selectedIndex === null || !this.filtered.length) {
+          this.detach();
+          if (emptyCallback) {
+            emptyCallback();
+          }
+          return;
+        }
+
+        const selectedSuggestion = this.filtered[this.selectedIndex];
+        const valueToInsert = selectedSuggestion.value;
+
+        // Not always the case as we also match in comments
+        if (valueToInsert.toLowerCase() === this.filter.toLowerCase()) {
+          // Close the autocomplete when the user has typed a complete suggestion
+          this.detach();
+          return;
+        }
+
+        if (this.filter) {
+          const ranges = this.editor.selection.getAllRanges();
+          ranges.forEach(range => {
+            range.start.column -= this.filter.length;
+            this.editor.session.remove(range);
+          });
+        }
+
+        // TODO: Move cursor handling for '? FROM tbl' here
+        this.editor.execCommand('insertstring', valueToInsert);
+        this.editor.renderer.scrollCursorIntoView();
+        this.detach();
+
+        if (this.editor.getOption('enableLiveAutocompletion')) {
+          if (/\S+\(\)$/.test(valueToInsert)) {
+            this.editor.moveCursorTo(
+              this.editor.getCursorPosition().row,
+              this.editor.getCursorPosition().column - 1
+            );
+            return;
+          }
+
+          window.clearTimeout(this.reTriggerTimeout);
+          this.reTriggerTimeout = window.setTimeout(() => {
+            if (this.active) {
+              return;
+            }
+
+            let reTrigger;
+            if (/(\? from \S+[^.]\s*$)/i.test(valueToInsert)) {
+              this.editor.moveCursorTo(
+                this.editor.getCursorPosition().row,
+                this.editor.getCursorPosition().column - (valueToInsert.length - 1)
+              );
+              this.editor.removeTextBeforeCursor(1);
+              reTrigger = true;
+            } else {
+              reTrigger = /\.$/.test(valueToInsert);
+            }
+
+            if (reTrigger) {
+              huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this.editorId);
+              window.setTimeout(() => {
+                this.editor.execCommand('startAutocomplete');
+              }, 1);
+            }
+          }, 400);
+        }
+      },
+
+      positionAutocompleteDropdown(): void {
+        const renderer = this.editor.renderer;
+        const newPos = renderer.$cursorLayer.getPixelPosition(undefined, true);
+        const rect = this.editor.container.getBoundingClientRect();
+        const lineHeight = renderer.layerConfig.lineHeight;
+        this.top = newPos.top + rect.top - renderer.layerConfig.offset + lineHeight + 3;
+        this.left = newPos.left + rect.left - renderer.scrollLeft + renderer.gutterWidth;
+      },
+
+      scrollSelectionIntoView(): void {
+        const scrollDiv = <HTMLDivElement | undefined>this.$refs.entriesScrollDiv;
+        const entriesDiv = <HTMLDivElement | undefined>this.$refs.entriesDiv;
+        if (
+          !scrollDiv ||
+          !entriesDiv ||
+          this.selectedIndex === null ||
+          entriesDiv.clientHeight < scrollDiv.clientHeight
+        ) {
+          return;
+        }
+        const entryHeight = entriesDiv.clientHeight / entriesDiv.childElementCount;
+        const firstVisibleIndex = Math.ceil(scrollDiv.scrollTop / entryHeight);
+        const visibleCount = scrollDiv.clientHeight / entryHeight;
+        const lastVisibleIndex = firstVisibleIndex + visibleCount - 1;
+
+        if (firstVisibleIndex <= this.selectedIndex && this.selectedIndex <= lastVisibleIndex) {
+          return;
+        }
+        if (this.selectedIndex < firstVisibleIndex) {
+          scrollDiv.scrollTop = this.selectedIndex * entryHeight;
+        } else {
+          scrollDiv.scrollTop = Math.round((this.selectedIndex - (visibleCount - 1)) * entryHeight);
+        }
+      },
+
+      suggestionSelected(index: number): void {
+        this.selectedIndex = index;
+        this.insertSuggestion();
+        this.editor.focus();
+      },
+
+      closeOnScroll(): void {
+        if (!this.active || !this.startLayout) {
+          return;
+        }
+        const newLayout = this.editor.container.getBoundingClientRect();
+        const yDiff = newLayout.top - this.startLayout.top;
+        const xDiff = newLayout.left - this.startLayout.left;
+        if (this.startPixelRatio !== window.devicePixelRatio) {
+          // Ignore zoom changes
+          this.startLayout = newLayout;
+        } else if (Math.abs(yDiff) > 10 || Math.abs(xDiff) > 10) {
+          // Close if scroll more than 10px in any direction
+          this.detach();
+        }
+      },
+
+      attach(): void {
+        this.updateFilter();
+        this.disposeEventHandlers();
+
+        this.startLayout = this.editor.container.getBoundingClientRect();
+        this.startPixelRatio = window.devicePixelRatio;
+
+        if (this.keyboardHandler) {
+          this.editor.keyBinding.addKeyboardHandler(this.keyboardHandler);
+        }
+        if (this.changeListener) {
+          this.editor.on('changeSelection', this.changeListener);
+        }
+        this.editor.on('mousedown', this.mousedownListener);
+        this.editor.on('mousewheel', this.mousewheelListener);
+        this.positionInterval = window.setInterval(this.closeOnScroll.bind(this), 300);
+      },
+
+      detach(): void {
+        if (!this.autocompleteResults) {
+          return;
+        }
+        this.autocompleteResults.cancelRequests();
+        this.disposeEventHandlers();
+        if (!this.active) {
+          return;
+        }
+        this.active = false;
+        if (this.base) {
+          this.base.detach();
+          this.base = null;
+        }
+      },
+
+      disposeEventHandlers(): void {
+        window.clearTimeout(this.changeTimeout);
+        window.clearInterval(this.positionInterval);
+        if (this.keyboardHandler) {
+          this.editor.keyBinding.removeKeyboardHandler(this.keyboardHandler);
+        }
+        if (this.changeListener) {
+          this.editor.off('changeSelection', this.changeListener);
+        }
+        this.editor.off('mousedown', this.mousedownListener);
+        this.editor.off('mousewheel', this.mousewheelListener);
+      }
+    },
+
+    watch: {
+      filter(): void {
+        if (this.selectedIndex !== null) {
+          this.selectedIndex = 0;
+          const scrollDiv = <HTMLDivElement | undefined>this.$refs.entriesScrollDiv;
+          if (scrollDiv) {
+            scrollDiv.scrollTop = 0;
+          }
+        }
+      }
+    },
 
     created(): void {
       this.keyboardHandler = new HashHandler();
@@ -203,7 +622,7 @@
           }, 200);
         }
       };
-    }
+    },
 
     mounted(): void {
       this.autocompleter = new SqlAutocompleter({
@@ -283,374 +702,11 @@
           this.sortOverride = sortOverride;
         }
       );
-    }
+    },
 
     destroyed(): void {
       this.disposeEventHandlers();
       this.subTracker.dispose();
     }
-
-    get connector(): Connector | undefined {
-      if (this.executor) {
-        return this.executor.connector();
-      }
-    }
-
-    get detailsComponent(): string | undefined {
-      if (this.focusedEntry && this.focusedEntry.details) {
-        if (this.focusedEntry.hasCatalogEntry) {
-          return 'CatalogEntryDetailsPanel';
-        }
-        return this.focusedEntry.category.detailsComponent;
-      }
-    }
-
-    get filtered(): Suggestion[] {
-      if (!this.autocompleteResults) {
-        return [];
-      }
-
-      let result = this.suggestions;
-
-      if (this.filter) {
-        result = sqlUtils.autocompleteFilter(this.filter, result);
-        huePubSub.publish('hue.ace.autocompleter.match.updated');
-      }
-
-      const categories = extractCategories(result);
-      if (categories.indexOf(this.activeCategory) === -1) {
-        this.activeCategory = Category.All;
-      }
-      this.availableCategories = categories;
-
-      const activeCategory = this.activeCategory;
-
-      const categoriesCount = new Map<CategoryId, number>();
-
-      result = result.filter(suggestion => {
-        categoriesCount.set(
-          suggestion.category.categoryId,
-          (categoriesCount.get(suggestion.category.categoryId) || 0) + 1
-        );
-        if (
-          activeCategory !== Category.Popular &&
-          (categoriesCount.get(suggestion.category.categoryId) || 0) >= 10 &&
-          suggestion.category.popular
-        ) {
-          return false;
-        }
-        return (
-          activeCategory === Category.All ||
-          activeCategory === suggestion.category ||
-          (activeCategory === Category.Popular && suggestion.popular)
-        );
-      });
-
-      sqlUtils.sortSuggestions(result, this.filter, this.sortOverride);
-      this.sortOverride = undefined;
-
-      return result;
-    }
-
-    @Watch('filter')
-    filterChanged(): void {
-      if (this.selectedIndex !== null) {
-        this.selectedIndex = 0;
-        const scrollDiv = <HTMLDivElement | undefined>this.$refs.entriesScrollDiv;
-        if (scrollDiv) {
-          scrollDiv.scrollTop = 0;
-        }
-      }
-    }
-
-    get focusedEntry(): Suggestion | undefined {
-      if (this.filtered.length) {
-        if (this.hoveredIndex !== null) {
-          return this.filtered[this.hoveredIndex];
-        } else if (this.selectedIndex !== null) {
-          return this.filtered[this.selectedIndex];
-        }
-      }
-      return undefined;
-    }
-
-    get visible(): boolean {
-      return this.active && (this.loading || !!this.filtered.length);
-    }
-
-    clickCategory(category: CategoryInfo, event: Event): void {
-      if (!this.autocompleteResults) {
-        return;
-      }
-      this.activeCategory = category;
-
-      event.stopPropagation();
-      this.editor.focus();
-    }
-
-    clickOutside(): void {
-      if (this.active) {
-        this.detach();
-      }
-    }
-
-    clickSuggestion(index: number): void {
-      this.selectedIndex = index;
-      this.insertSuggestion();
-      this.editor.focus();
-    }
-
-    updateFilter(): void {
-      if (this.base) {
-        const pos = this.editor.getCursorPosition();
-        this.filter = this.editor.session.getTextRange({
-          start: this.base,
-          end: pos
-        });
-      }
-    }
-
-    registerKeybindings(keyboardHandler: Ace.HashHandler): void {
-      keyboardHandler.bindKeys({
-        Up: () => {
-          if (this.filtered.length <= 1) {
-            this.detach();
-            this.editor.execCommand('golineup');
-          } else if (this.selectedIndex) {
-            this.selectedIndex = this.selectedIndex - 1;
-            this.hoveredIndex = null;
-            this.scrollSelectionIntoView();
-          } else {
-            this.selectedIndex = this.filtered.length - 1;
-            this.hoveredIndex = null;
-            this.scrollSelectionIntoView();
-          }
-        },
-        Down: () => {
-          if (this.filtered.length <= 1) {
-            this.detach();
-            this.editor.execCommand('golinedown');
-          } else if (this.selectedIndex !== null && this.selectedIndex < this.filtered.length - 1) {
-            this.selectedIndex = this.selectedIndex + 1;
-            this.hoveredIndex = null;
-            this.scrollSelectionIntoView();
-          } else {
-            this.selectedIndex = 0;
-            this.hoveredIndex = null;
-            this.scrollSelectionIntoView();
-          }
-        },
-        'Ctrl-Up|Ctrl-Home': () => {
-          if (this.filtered.length <= 1) {
-            this.detach();
-            this.editor.execCommand('gotostart');
-          } else {
-            this.selectedIndex = 0;
-            this.hoveredIndex = null;
-            this.scrollSelectionIntoView();
-          }
-        },
-        'Ctrl-Down|Ctrl-End': () => {
-          if (this.filtered.length <= 1) {
-            this.detach();
-            this.editor.execCommand('gotoend');
-          } else if (this.filtered.length > 0) {
-            this.selectedIndex = this.filtered.length - 1;
-            this.hoveredIndex = null;
-            this.scrollSelectionIntoView();
-          }
-        },
-        Esc: () => {
-          this.detach();
-        },
-        Return: () => {
-          this.insertSuggestion(() => {
-            this.editor.execCommand('insertstring', '\n');
-          });
-        },
-        'Shift-Return': () => {
-          // TODO: Delete suffix
-          this.insertSuggestion();
-        },
-        Tab: () => {
-          this.insertSuggestion(() => {
-            this.editor.execCommand('indent');
-          });
-        }
-      });
-    }
-
-    insertSuggestion(emptyCallback?: () => void): void {
-      if (this.selectedIndex === null || !this.filtered.length) {
-        this.detach();
-        if (emptyCallback) {
-          emptyCallback();
-        }
-        return;
-      }
-
-      const selectedSuggestion = this.filtered[this.selectedIndex];
-      const valueToInsert = selectedSuggestion.value;
-
-      // Not always the case as we also match in comments
-      if (valueToInsert.toLowerCase() === this.filter.toLowerCase()) {
-        // Close the autocomplete when the user has typed a complete suggestion
-        this.detach();
-        return;
-      }
-
-      if (this.filter) {
-        const ranges = this.editor.selection.getAllRanges();
-        ranges.forEach(range => {
-          range.start.column -= this.filter.length;
-          this.editor.session.remove(range);
-        });
-      }
-
-      // TODO: Move cursor handling for '? FROM tbl' here
-      this.editor.execCommand('insertstring', valueToInsert);
-      this.editor.renderer.scrollCursorIntoView();
-      this.detach();
-
-      if (this.editor.getOption('enableLiveAutocompletion')) {
-        if (/\S+\(\)$/.test(valueToInsert)) {
-          this.editor.moveCursorTo(
-            this.editor.getCursorPosition().row,
-            this.editor.getCursorPosition().column - 1
-          );
-          return;
-        }
-
-        window.clearTimeout(this.reTriggerTimeout);
-        this.reTriggerTimeout = window.setTimeout(() => {
-          if (this.active) {
-            return;
-          }
-
-          let reTrigger;
-          if (/(\? from \S+[^.]\s*$)/i.test(valueToInsert)) {
-            this.editor.moveCursorTo(
-              this.editor.getCursorPosition().row,
-              this.editor.getCursorPosition().column - (valueToInsert.length - 1)
-            );
-            this.editor.removeTextBeforeCursor(1);
-            reTrigger = true;
-          } else {
-            reTrigger = /\.$/.test(valueToInsert);
-          }
-
-          if (reTrigger) {
-            huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this.editorId);
-            window.setTimeout(() => {
-              this.editor.execCommand('startAutocomplete');
-            }, 1);
-          }
-        }, 400);
-      }
-    }
-
-    positionAutocompleteDropdown(): void {
-      const renderer = this.editor.renderer;
-      const newPos = renderer.$cursorLayer.getPixelPosition(undefined, true);
-      const rect = this.editor.container.getBoundingClientRect();
-      const lineHeight = renderer.layerConfig.lineHeight;
-      this.top = newPos.top + rect.top - renderer.layerConfig.offset + lineHeight + 3;
-      this.left = newPos.left + rect.left - renderer.scrollLeft + renderer.gutterWidth;
-    }
-
-    scrollSelectionIntoView(): void {
-      const scrollDiv = <HTMLDivElement | undefined>this.$refs.entriesScrollDiv;
-      const entriesDiv = <HTMLDivElement | undefined>this.$refs.entriesDiv;
-      if (
-        !scrollDiv ||
-        !entriesDiv ||
-        this.selectedIndex === null ||
-        entriesDiv.clientHeight < scrollDiv.clientHeight
-      ) {
-        return;
-      }
-      const entryHeight = entriesDiv.clientHeight / entriesDiv.childElementCount;
-      const firstVisibleIndex = Math.ceil(scrollDiv.scrollTop / entryHeight);
-      const visibleCount = scrollDiv.clientHeight / entryHeight;
-      const lastVisibleIndex = firstVisibleIndex + visibleCount - 1;
-
-      if (firstVisibleIndex <= this.selectedIndex && this.selectedIndex <= lastVisibleIndex) {
-        return;
-      }
-      if (this.selectedIndex < firstVisibleIndex) {
-        scrollDiv.scrollTop = this.selectedIndex * entryHeight;
-      } else {
-        scrollDiv.scrollTop = Math.round((this.selectedIndex - (visibleCount - 1)) * entryHeight);
-      }
-    }
-
-    suggestionSelected(index: number): void {
-      this.selectedIndex = index;
-      this.insertSuggestion();
-      this.editor.focus();
-    }
-
-    closeOnScroll(): void {
-      if (!this.active || !this.startLayout) {
-        return;
-      }
-      const newLayout = this.editor.container.getBoundingClientRect();
-      const yDiff = newLayout.top - this.startLayout.top;
-      const xDiff = newLayout.left - this.startLayout.left;
-      if (this.startPixelRatio !== window.devicePixelRatio) {
-        // Ignore zoom changes
-        this.startLayout = newLayout;
-      } else if (Math.abs(yDiff) > 10 || Math.abs(xDiff) > 10) {
-        // Close if scroll more than 10px in any direction
-        this.detach();
-      }
-    }
-
-    attach(): void {
-      this.updateFilter();
-      this.disposeEventHandlers();
-
-      this.startLayout = this.editor.container.getBoundingClientRect();
-      this.startPixelRatio = window.devicePixelRatio;
-
-      if (this.keyboardHandler) {
-        this.editor.keyBinding.addKeyboardHandler(this.keyboardHandler);
-      }
-      if (this.changeListener) {
-        this.editor.on('changeSelection', this.changeListener);
-      }
-      this.editor.on('mousedown', this.mousedownListener);
-      this.editor.on('mousewheel', this.mousewheelListener);
-      this.positionInterval = window.setInterval(this.closeOnScroll.bind(this), 300);
-    }
-
-    detach(): void {
-      if (!this.autocompleteResults) {
-        return;
-      }
-      this.autocompleteResults.cancelRequests();
-      this.disposeEventHandlers();
-      if (!this.active) {
-        return;
-      }
-      this.active = false;
-      if (this.base) {
-        this.base.detach();
-        this.base = null;
-      }
-    }
-
-    disposeEventHandlers(): void {
-      window.clearTimeout(this.changeTimeout);
-      window.clearInterval(this.positionInterval);
-      if (this.keyboardHandler) {
-        this.editor.keyBinding.removeKeyboardHandler(this.keyboardHandler);
-      }
-      if (this.changeListener) {
-        this.editor.off('changeSelection', this.changeListener);
-      }
-      this.editor.off('mousedown', this.mousedownListener);
-      this.editor.off('mousewheel', this.mousewheelListener);
-    }
-  }
+  });
 </script>
