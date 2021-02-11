@@ -26,10 +26,9 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
-  import { wrap } from 'vue/webComponentWrapper';
+  import { defineComponent, PropType } from 'vue';
+
+  import { wrap } from 'vue/webComponentWrap';
 
   import { Variable } from './types';
   import VariableSubstitution from './VariableSubstitution.vue';
@@ -37,16 +36,33 @@
   import { IdentifierLocation } from 'parse/types';
   import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
 
-  @Component({
-    components: { VariableSubstitution }
-  })
-  export default class VariableSubstitutionKoBridge extends Vue {
-    @Prop()
-    initialVariables?: Variable[];
+  const VariableSubstitutionKoBridge = defineComponent({
+    components: {
+      VariableSubstitution
+    },
 
-    locations: IdentifierLocation[] = [];
+    props: {
+      initialVariables: {
+        type: Object as PropType<Variable[]>,
+        default: undefined
+      }
+    },
 
-    subTracker = new SubscriptionTracker();
+    setup(): {
+      subTracker: SubscriptionTracker;
+    } {
+      return {
+        subTracker: new SubscriptionTracker()
+      };
+    },
+
+    data(): {
+      locations: IdentifierLocation[];
+    } {
+      return {
+        locations: []
+      };
+    },
 
     mounted(): void {
       this.subTracker.subscribe(
@@ -57,15 +73,19 @@
           }
         }
       );
-    }
+    },
 
-    onVariablesChanged(variables: Variable[]): void {
-      this.$el.dispatchEvent(
-        new CustomEvent<Variable[]>('variables-changed', { bubbles: true, detail: variables })
-      );
+    methods: {
+      onVariablesChanged(variables: Variable[]): void {
+        this.$el.dispatchEvent(
+          new CustomEvent<Variable[]>('variables-changed', { bubbles: true, detail: variables })
+        );
+      }
     }
-  }
+  });
 
   export const COMPONENT_NAME = 'variable-substitution-ko-bridge';
   wrap(COMPONENT_NAME, VariableSubstitutionKoBridge);
+
+  export default VariableSubstitutionKoBridge;
 </script>
