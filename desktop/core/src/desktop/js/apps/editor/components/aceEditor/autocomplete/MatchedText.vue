@@ -23,42 +23,51 @@
 <!-- eslint-enable -->
 
 <script lang="ts">
+  import { defineComponent, PropType } from 'vue';
+
   import { Suggestion } from './AutocompleteResults';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
 
-  @Component
-  export default class Spinner extends Vue {
-    @Prop({ required: true })
-    suggestion!: Suggestion;
-    @Prop({ required: true })
-    filter!: string;
-    @Prop({ required: false, default: false })
-    isComment?: boolean;
-
-    get content(): string {
-      const value =
-        (this.isComment
-          ? (<{ comment?: string }>this.suggestion.details).comment
-          : this.suggestion.value) || '';
-      if (
-        this.filter &&
-        typeof this.suggestion.matchIndex !== 'undefined' &&
-        this.suggestion.matchIndex > -1 &&
-        typeof this.suggestion.matchLength !== 'undefined' &&
-        ((!this.isComment && !this.suggestion.matchComment) ||
-          (this.isComment && this.suggestion.matchComment))
-      ) {
-        const before = value.substring(0, this.suggestion.matchIndex);
-        const match = value.substring(
-          this.suggestion.matchIndex,
-          this.suggestion.matchIndex + this.suggestion.matchLength
-        );
-        const after = value.substring(this.suggestion.matchIndex + this.suggestion.matchLength);
-        return `${before}<b>${match}</b>${after}`;
+  export default defineComponent({
+    props: {
+      suggestion: {
+        type: Object as PropType<Suggestion>,
+        required: true
+      },
+      filter: {
+        type: String,
+        required: true
+      },
+      isComment: {
+        type: Boolean,
+        required: false,
+        default: false
       }
-      return value || '';
+    },
+
+    computed: {
+      content(): string {
+        const value =
+          (this.isComment
+            ? (<{ comment?: string }>this.suggestion.details).comment
+            : this.suggestion.value) || '';
+        if (
+          this.filter &&
+          typeof this.suggestion.matchIndex !== 'undefined' &&
+          this.suggestion.matchIndex > -1 &&
+          typeof this.suggestion.matchLength !== 'undefined' &&
+          ((!this.isComment && !this.suggestion.matchComment) ||
+            (this.isComment && this.suggestion.matchComment))
+        ) {
+          const before = value.substring(0, this.suggestion.matchIndex);
+          const match = value.substring(
+            this.suggestion.matchIndex,
+            this.suggestion.matchIndex + this.suggestion.matchLength
+          );
+          const after = value.substring(this.suggestion.matchIndex + this.suggestion.matchLength);
+          return `${before}<b>${match}</b>${after}`;
+        }
+        return value || '';
+      }
     }
-  }
+  });
 </script>
