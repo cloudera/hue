@@ -260,6 +260,24 @@ class OptimizerClient(object):
       'noDDL': response.get('noDDL', []),
     }
 
+
+  def predict(self, before_cursor, after_cursor, connector):
+    response = self._call(
+      'predict', {
+        'tenant': self._tenant_id,
+        'connector': connector,
+        'before_cursor': before_cursor,
+        'after_cursor': after_cursor,
+      }
+    )
+
+    predictions = response.get('predictions', [])
+
+    return {
+      'statement': predictions[0]['statement']
+    }
+
+
   def similar_queries(self, source_platform, query, page_size=100, startingToken=None, connector=None):
     if is_admin(self.user):
       return self._call(

@@ -34,6 +34,7 @@ PROD_INCLUDES := \
 	VERSION \
 	webpack-stats*.json \
 	package.json \
+	package-lock.json \
 	webpack.config*.js \
 	.babelrc \
 	tsconfig.json

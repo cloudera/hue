@@ -13,9 +13,8 @@ This section goes into greater detail on how to build and reuse the components o
 ### Dependencies
 
 * The OS specific install instructions are listed in the [install guide](/administrator/installation/dependencies/)
-* Python 2.7+ (Python 3 support tracked in [HUE-8737](https://issues.cloudera.org/browse/HUE-8737))
-* Django (1.11 already included in the distribution)
-* Java (Java 1.8) (should go away after [HUE-8740](https://issues.cloudera.org/browse/HUE-8740))
+* Python 2.7+ or now Python 3
+* Django (2 soon 3 already included in the distribution)
 * Node.js ([10.0+](https://deb.nodesource.com/setup_10.x))
 
 ### Build & Start
@@ -84,19 +83,19 @@ Now under Hue open `desktop/conf/pseudo-distributed.ini` file in a text editor, 
 
 1. Directly below the `[[beeswax]]` line, add the following:
 
-        # Host where HiveServer2 is running.
-        hive_server_host=localhost
+    # Host where HiveServer2 is running.
+    hive_server_host=localhost
 
-        # Port where HiveServer2 Thrift server runs on.
-        hive_server_port=10000
+    # Port where HiveServer2 Thrift server runs on.
+    hive_server_port=10000
 
-        thrift_version=7
+    thrift_version=7
 
 2. Below the `[[interpreters]]` of `[notebook]`, add:
 
-        [[[hive]]]
-          name=Hive
-          interface=hiveserver2
+    [[[hive]]]
+    name=Hive
+    interface=hiveserver2
 
 And restart Hue, open the Editors and start typing your first queries!
 
@@ -154,7 +153,7 @@ Here is a tutorial about how to sent a patch request for review.
 
 ### Setup
 
-Hue project uses GitHub Pull Requests (PR) for code reviews. The advantage of Pull Request is that the CI (syntax check, tests...) automatically runs for you.
+Hue project uses GitHub Pull Requests (PR) for code reviews. It also automatically runs the CI (syntax check, tests...) for you.
 
 If you've never used git and github before, there are bunch of things you need to [do](https://kbroman.org/github_tutorial/pages/first_time.html) before going further.
 
@@ -162,17 +161,17 @@ Now, clone cloudera/hue:
 
     git clone https://github.com/cloudera/hue
 
-Create a new branch with the jira id (HUE-XXX) as the branch name:
+Create a new branch with the Github issue GH-XXX or explicit name as the branch name:
 
     git checkout master
     git pull --rebase origin master
-    git checkout -b HUE-XXX
+    git checkout -b GH-XXX
 
 Then make your changes in code:
 
     git add <file>
     git diff --cached
-    git commit -m "HUE-XXX <Ticket summary>"
+    git commit -m "GH-XXX <Ticket summary>"
 
 ### Post a review
 
@@ -187,9 +186,9 @@ Or push to your branch in your repository forks by doing one time:
 
 Then just:
 
-    git push bob HEAD:ISSUE-1000-fix
+    git push bob HEAD:GH-1000-fix
 
-And create the pull request via the button on the https://github.com/cloudera/hue/tree/ISSUE-1000-fix page.
+And create the pull request via the button on the https://github.com/cloudera/hue/tree/GH-1000-fix page.
 
 **Note**:
 If you have more than one diff, update `HEAD~1..HEAD` accordingly (e.g. `HEAD~2..HEAD`)
@@ -226,11 +225,11 @@ Once we get ship it from at least one reviewer, we can push the changes to maste
 * Add the commit link to the ticket and mark it as resolved
 
 
-### Sump
+### Sum-up
 
 We hope that these commands will make your life easier and encourage you to [contribute to Hue](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md) 😉
 
-As usual feel free to send feedback on the [Forum](https://discourse.gethue.com/) list or [@gethue](https://twitter.com/gethue)!
+As usual feel free to send feedback on the [Forum](https://discourse.gethue.com/) list or [GitHub issues](https://github.com/cloudera/hue/issues)!
 
 
 ## API Server
@@ -533,10 +532,10 @@ Developing applications for Hue requires a minimal amount of CSS
 
 In a nutshell, front-end development is using:
 
-* [Mako](http://www.makotemplates.org/) is the templating language (Mako to be slowly removed in [HUE-9036](https://issues.cloudera.org/browse/HUE-9036))
+* [Vue.js](https://vuejs.org/) to script the custom interactions
+* TypeScript
 * [Bootstrap](http://twitter.github.com/bootstrap/) to layout your app
-* [Knockout js](http://knockoutjs.com/) to script the custom interactions
-
+* [Mako](http://www.makotemplates.org/) is the templating language (currently being removed in favor of Vue.js))
 
 ### Javascript
 
@@ -703,6 +702,9 @@ To run the tests in watch mode:
 While in watch mode Jest will detect changes to all files and re-run related tests. There are
 also options to target specific files or tests. Press 'w' in the console to see the options.
 
+In order to update the test snapshots, let the first checks of tests complete and then
+press 'u' in the console to update the snapshots.
+
 Note: on certain OS like Ubuntu, running the tests via a global jest seems to not hang your system
 
     npm install jest --global
@@ -810,23 +812,19 @@ Those are tagged with `integration` either at the class or method level:
       @attr('integration')
       def test_add_ldap_users_case_sensitivity(self):
         if is_live_cluster():
-          raise SkipTest('HUE-2897: Cannot yet guarantee database is case sensitive')
+          raise SkipTest('GH-2897: Cannot yet guarantee database is case sensitive')
 
         ...
 
-Historically, the same thing used to be done with the `requires_hadoop` tag:
-
-    from nose.plugins.attrib import attr
-
-    @attr('requires_hadoop')
-    def your_test():
-      ...
-
 ## Releasing
 
-The checklist below details the steps. Then send the release notes to the [Forum](https://discourse.gethue.com/), [hue-user](https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user), https://twitter.com/gethue !
+The checklist below details the steps. Then send the release notes to the [Forum](https://discourse.gethue.com/) and https://twitter.com/gethue!
+
+Also update https://wikipedia.org/wiki/Hue_(Software).
 
 ### Version
+
+Here is an example of [release commit](https://github.com/cloudera/hue/commit/9de217d6b6).
 
 Update the versions to the next release (current release +1):
 
@@ -846,48 +844,55 @@ And add them and the authors to the release notes:
 
     git log --pretty="%an" | sort | uniq | sed 's/^\(.*\)/* \1/' > authors.txt
 
+### Git
+
 Pushing the release branch:
 
-    git push origin HEAD:branch-4.8.0
+    git push origin HEAD:branch-4.9.0
 
 Tagging the release:
 
-    git tag -a release-4.8.0 -m "release-4.8.0"
-    git push origin release-4.8.0
+    git tag -a release-4.9.0 -m "release-4.9.0"
+    git push origin release-4.9.0
+
+Draft a new release on https://github.com/cloudera/hue/releases.
+
+Publish Github NPM package and Docker images at https://github.com/orgs/cloudera/packages?repo_name=hue.
+
+### Gethue
 
 Building the tarball release:
 
-    git checkout -b release-4.8.0 release-4.8.0
+    git checkout -b release-4.9.0 release-4.9.0
     make prod
 
-Source of the release: https://github.com/cloudera/hue/archive/release-4.8.0.zip
+You might need to upgrade the [Mysqlclient](https://docs.gethue.com/administrator/installation/dependencies/#mysql--mariadb) if seeing:
+
+    _mysql.c:44:10: fatal error: my_config.h: No such file or directory
+      44 | #include "my_config.h"
+          |          ^~~~~~~~~~~~~
+
+Source of the release: https://github.com/cloudera/hue/archive/release-4.9.0.zip
 
 Push to the CDN:
 
-    scp hue-4.8.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
+    scp hue-4.9.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
 
-### Websites
+### Docker
 
-Other things to update:
+Docker image are at https://hub.docker.com/u/gethue/:
 
-* In Jira, setting the [release as shipped](https://issues.cloudera.org/projects/HUE?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page&status=all) and moving all non finished jiras to another target. Also archiving old releases.
-* Create the after next release tag in Jira and Blog
-* Update Docker image https://hub.docker.com/u/gethue/
-* Update release date on https://wikipedia.org/wiki/Hue_(Software)
-
-Instructions:
-
-    docker build https://github.com/cloudera/hue.git#release-4.8.0 -t gethue/hue:4.8.0 -f tools/docker/hue/Dockerfile
-    docker tag gethue/hue:4.8.0 gethue/hue:latest
+    docker build https://github.com/cloudera/hue.git#release-4.9.0 -t gethue/hue:4.9.0 -f tools/docker/hue/Dockerfile
+    docker tag gethue/hue:4.9.0 gethue/hue:latest
     docker images
-    docker login
+    docker login -u gethue
     docker push gethue/hue
-    docker push gethue/hue:4.8.0
+    docker push gethue/hue:4.9.0
 
-    docker build . -t gethue/nginx:4.8.0 -f tools/docker/nginx/Dockerfile;
-    docker tag gethue/nginx:4.8.0 gethue/nginx:latest
+    docker build https://github.com/cloudera/hue.git#release-4.9.0 -t gethue/nginx:4.9.0 -f tools/docker/nginx/Dockerfile;
+    docker tag gethue/nginx:4.9.0 gethue/nginx:latest
     docker push gethue/nginx
-    docker push gethue/nginx:4.8.0
+    docker push gethue/nginx:4.9.0
 
 ### Documentation
 
@@ -895,20 +900,9 @@ Documentation is currently being auto refreshed every morning of the week and ru
 
 The manual process otherwise would be to [build it](#Documentation) and push it to the docs host.
 
-### Release
-
-    ssh root@docs.gethue.com
-    cd /var/www/docs.gethue.com
-    mkdir 4.8.0
-    rm latest; ln -s 4.8.0 latest
-
-    scp -r docs/docs-site/public/* root@docs.gethue.com:/var/www/docs.gethue.com/4.8.0
-
-    scp -r hue-4.6/build/release/prod/hue-4.8.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads/
-
 ### NPM registry
 
-To publish gethue to NPM registry, the following command would have to be run. Kindly refrain from using `npm publish`.
+To publish gethue to the [NPM registry](https://www.npmjs.com/package/gethue), the following command would have to be run.
 
     npm run publish-gethue
 

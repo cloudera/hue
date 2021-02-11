@@ -26,6 +26,8 @@ import {
   Optimizer,
   OptimizerRisk,
   PopularityOptions,
+  PredictOptions,
+  PredictResponse,
   RiskHint,
   RiskOptions,
   SimilarityOptions
@@ -59,25 +61,31 @@ export default class SqlAnalyzer implements Optimizer {
         apiPromise.cancel();
       });
 
-      const autocompleter = await sqlParserRepository.getAutocompleteParser(this.connector.dialect);
       const snippet = JSON.parse(options.snippetJson);
-      const sqlParseResult = autocompleter.parseSql(snippet.statement + ' ', '');
+      const missingLimit = await this.checkMissingLimit(snippet.statement, this.connector.dialect);
 
-      const hasLimit = sqlParseResult.locations.some(
-        location => location.type === 'limitClause' && !location.missing
-      );
-
-      const hints: RiskHint[] = !hasLimit
+      const hints: RiskHint[] = missingLimit
         ? [
             {
               riskTables: [],
               riskAnalysis: I18n('Query has no limit'),
-              riskId: 22, // To change
+              riskId: 17,
               risk: 'low',
               riskRecommendation: I18n('Append a limit clause to reduce the size of the result set')
             }
           ]
         : [];
+
+      const isSelectStar = await this.checkSelectStar(snippet.statement, this.connector.dialect);
+      if (isSelectStar) {
+        hints.push({
+          riskTables: [],
+          riskAnalysis: I18n('Query doing a SELECT *'), // Could be triggered only if column number > 10 (todo in Validator API)
+          riskId: 18,
+          risk: 'low',
+          riskRecommendation: I18n('Select only a subset of columns instead of all of them')
+        });
+      }
 
       try {
         const apiResponse = await apiPromise;
@@ -96,6 +104,46 @@ export default class SqlAnalyzer implements Optimizer {
         }
       });
     });
+  }
+
+  async checkMissingLimit(statement: string, dialect: string): Promise<boolean> {
+    const autocompleter = await sqlParserRepository.getAutocompleteParser(dialect);
+    let parsedStatement;
+    try {
+      parsedStatement = autocompleter.parseSql(statement + ' ', '');
+    } catch (err) {
+      return false;
+    }
+
+    return (
+      parsedStatement.locations.some(
+        location => location.type === 'statementType' && location.identifier === 'SELECT'
+      ) &&
+      parsedStatement.locations.some(location => location.type === 'table') &&
+      parsedStatement.locations.some(
+        location => location.type === 'limitClause' && location.missing
+      )
+    );
+  }
+
+  async checkSelectStar(statement: string, dialect: string): Promise<boolean> {
+    const autocompleter = await sqlParserRepository.getAutocompleteParser(dialect);
+    let parsedStatement;
+    try {
+      parsedStatement = autocompleter.parseSql(statement + ' ', '');
+    } catch (err) {
+      return false;
+    }
+
+    return (
+      parsedStatement.locations.some(
+        location => location.type === 'statementType' && location.identifier === 'SELECT'
+      ) &&
+      parsedStatement.locations.some(
+        location => location.type === 'selectList' && !location.missing
+      ) &&
+      parsedStatement.locations.some(location => location.type === 'asterisk')
+    );
   }
 
   fetchTopJoins(options: PopularityOptions): CancellablePromise<TopJoins> {
@@ -199,5 +247,9 @@ export default class SqlAnalyzer implements Optimizer {
       return this.apiStrategy.fetchTopFilters(options);
     }
     return CancellablePromise.reject('fetchTopFilters is not Implemented');
+  }
+
+  predict(options: PredictOptions): CancellablePromise<PredictResponse> {
+    return this.apiStrategy.predict(options);
   }
 }

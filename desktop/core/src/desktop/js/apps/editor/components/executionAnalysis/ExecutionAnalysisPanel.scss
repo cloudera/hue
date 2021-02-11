@@ -1,0 +1,50 @@
+@import '../../../../components/styles/colors.scss';
+@import '../../../../components/styles/mixins.scss';
+
+.execution-analysis-panel {
+  @include fillAbsolute;
+  @include flexRowLayout;
+
+  .execution-analysis-errors,
+  .execution-analysis-jobs,
+  .execution-analysis-logs {
+    @include flexRowLayout;
+
+    h4 {
+      @include flexRowLayoutRow(0 0 auto);
+
+      margin: 0;
+      padding-bottom: 10px;
+    }
+
+    .execution-analysis-logs-panel {
+      font-size: 12px;
+    }
+
+    .execution-analysis-jobs-panel,
+    .execution-analysis-logs-panel {
+      @include flexRowLayoutRow(0 1 100%);
+    }
+  }
+
+  .execution-analysis-errors,
+  .execution-analysis-jobs {
+    @include flexRowLayoutRow(1 0 auto);
+
+    padding-bottom: 10px;
+  }
+
+  .execution-analysis-errors {
+    ul {
+      background-color: $fluid-red-050;
+      color: $fluid-red-700;
+      list-style: none;
+      padding: 5px 10px;
+      margin: 0;
+    }
+  }
+
+  .execution-analysis-logs {
+    @include flexRowLayoutRow(0 1 100%);
+  }
+}

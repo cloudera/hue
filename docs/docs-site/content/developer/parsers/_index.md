@@ -148,7 +148,7 @@ This would be able to parse a statement like 'SELECT a, b, c FROM some_table' (d
 
 To turn this into an autocompleter we add the notion of a cursor. Often, the user has the cursor somewhere in the statement. In the previous section, we were assuming that the query was already typed and the user had not mouse cursor within it.
 
-The cursor is represented as an obscure character that is unlikely to be used in a statement. Currently '\u2020' was picked, the dagger, identified as 'CURSOR' in the lexer. The actual parsed string is therefore beforeCursor + ‘\u2020’ + afterCursor.
+The cursor is represented as an obscure character that is unlikely to be used in a statement. Currently '\u2020' was picked, the dagger, identified as 'CURSOR' in the lexer. The actual parsed string is therefore beforeCursor + '\u2020' + afterCursor.
 
 For the statement above we’d add an extra rule with an _EDIT postfix like this:
 
@@ -164,7 +164,15 @@ For the statement above we’d add an extra rule with an _EDIT postfix like this
       | 'SELECT' ColumnList_EDIT 'FROM' Identifier --> { suggestColumns: { table: $4 } }
       ;
 
-So for example if a cursor without any text is encountered, it will tell us to suggest the ‘SELECT’ keyword etc.
+So for example if a cursor without any text is encountered, it will tell us to suggest the 'SELECT' keyword etc.
+
+### Why an extra space
+
+The extra space is just for the documentation to show the complete output with locations, it should indeed be clarified a bit. The reason for the extra space is that the parser ignores partial words, consider the following where | denotes the cursor:
+
+    SELECT * FROM som|
+
+The parser will treat this as "SELECT * FROM |" and it leaves it up to the editor logic to filter any tables, starting with "som".
 
 ## Tutorial: Creating a parser
 
@@ -201,7 +209,7 @@ Once executed the tool has cloned the generic parser with tests and generated a 
 
 To regenerate the parsers after changes to the jison files run:
 
-    cd tools/jison    
+    cd tools/jison
     node generateParsers.js postgresql
 
 The tool will report any problems with the grammar. Note that it might still generate a parser if the grammar isn’t ambiguous but it’s likely that there will be test failures.
@@ -383,8 +391,6 @@ And cf. above [prerequisites](#prerequisites), any interpreter snippet with `ksq
     [[[ksql]]]
     name=KSQL Analytics
     interface=ksql
-
-Note: after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) we will be able to have multiple interpreters on the same dialect (e.g. pointing to two different databases of the same type).
 
 ## Reusing a parser in your project
 

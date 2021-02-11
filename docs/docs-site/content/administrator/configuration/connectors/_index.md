@@ -776,7 +776,18 @@ Then give Hue the information about the database source:
     [[[clickhouse]]]
     name = Clickhouse
     interface=sqlalchemy
-    options='{"url": "clickhouse://..."}'
+    # e.g. clickhouse://user:password@example.com:8124/test?protocol=https
+    options='{"url": "clickhouse://localhost:8123"}'
+
+Note:
+
+If facing an error like:
+
+    ModuleNotFoundError: No module named 'connector'
+
+Update:
+
+    ./build/env/bin/pip install pytz==2021.1
 
 Alternative:
 

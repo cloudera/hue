@@ -19,6 +19,7 @@ import Executable, { ExecutableRaw } from 'apps/editor/execution/executable';
 import { ExecutionError } from 'apps/editor/execution/executionLogs';
 import Executor from 'apps/editor/execution/executor';
 import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
+import { VariableIndex } from '../components/variableSubstitution/types';
 
 const BATCHABLE_STATEMENT_TYPES = /ALTER|WITH|REFRESH|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i;
 
@@ -29,6 +30,27 @@ export interface SqlExecutableRaw extends ExecutableRaw {
   database: string;
   parsedStatement: ParsedSqlStatement;
 }
+
+const substituteVariables = (statement: string, variables: VariableIndex): string => {
+  if (!Object.keys(variables).length) {
+    return statement;
+  }
+
+  const variablesString = Object.values(variables)
+    .map(variable => variable.name)
+    .join('|');
+
+  return statement.replace(
+    RegExp('([^\\\\])?\\${(' + variablesString + ')(=[^}]*)?}', 'g'),
+    (match, p1, p2) => {
+      const { value, type, meta } = variables[p2];
+      const pad = type === 'datetime-local' && value.length === 16 ? ':00' : ''; // Chrome drops the seconds from the timestamp when it's at 0 second.
+      const isValuePresent = //If value is string there is a need to check whether it is empty
+        typeof value === 'string' ? value : value !== undefined && value !== null;
+      return p1 + (isValuePresent ? value + pad : meta.placeholder);
+    }
+  );
+};
 
 export default class SqlExecutable extends Executable {
   database: string;
@@ -50,6 +72,7 @@ export default class SqlExecutable extends Executable {
 
   getStatement(): string {
     let statement = this.getRawStatement();
+
     if (
       this.parsedStatement.firstToken &&
       this.parsedStatement.firstToken.toLowerCase() === 'select' &&
@@ -68,8 +91,8 @@ export default class SqlExecutable extends Executable {
       }
     }
 
-    if (this.executor.variableSubstitionHandler) {
-      statement = this.executor.variableSubstitionHandler.substitute(statement);
+    if (this.executor.variables) {
+      statement = substituteVariables(statement, this.executor.variables);
     }
 
     return statement;

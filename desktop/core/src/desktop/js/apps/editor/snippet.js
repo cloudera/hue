@@ -28,7 +28,10 @@ import 'apps/editor/components/ko.queryHistory';
 import './components/ExecutableActionsKoBridge.vue';
 import './components/EditorResizerKoBridge.vue';
 import './components/aceEditor/AceEditorKoBridge.vue';
+import './components/executionAnalysis/ExecutionAnalysisPanelKoBridge.vue';
+import './components/presentationMode/PresentationModeKoBridge.vue';
 import './components/result/ResultTableKoBridge.vue';
+import './components/variableSubstitution/VariableSubstitutionKoBridge.vue';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';
@@ -47,7 +50,6 @@ import {
 } from 'apps/editor/execution/executable';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
-  CURSOR_POSITION_CHANGED_EVENT,
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
 import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from './components/ExecutableActions.vue';
@@ -60,8 +62,6 @@ import {
   ASSIST_GET_SOURCE_EVENT,
   ASSIST_SET_SOURCE_EVENT
 } from 'ko/components/assist/events';
-import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
-import { VariableSubstitutionHandler } from './variableSubstitution';
 
 // TODO: Remove for ENABLE_NOTEBOOK_2. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
@@ -406,19 +406,6 @@ export default class Snippet {
           } else {
             this.statementsList([]);
           }
-          if (!this.parentNotebook.isPresentationModeInitialized()) {
-            if (this.parentNotebook.isPresentationModeDefault()) {
-              // When switching to presentation mode, the snippet in non presentation mode cannot get status notification.
-              // On initiailization, status is set to loading and does not get updated, because we moved to presentation mode.
-              this.status(STATUS.ready);
-            }
-            // Changing to presentation mode requires statementsList to be initialized. statementsList is initialized asynchronously.
-            // When presentation mode is default, we cannot change before statementsList has been calculated.
-            // Cleaner implementation would be to make toggleEditorMode statementsList asynchronous
-            // However this is currently impossible due to delete _notebook.presentationSnippets()[key];
-            this.parentNotebook.isPresentationModeInitialized(true);
-            this.parentNotebook.isPresentationMode(this.parentNotebook.isPresentationModeDefault());
-          }
         }
       },
       this.parentVm.huePubSubId
@@ -459,20 +446,7 @@ export default class Snippet {
       }, 100);
     });
 
-    this.variableSubstitutionHandler = new VariableSubstitutionHandler(
-      this.connector,
-      this.statement_raw,
-      snippetRaw.variables
-    );
-
-    this.variableSubstitutionHandler.variables.subscribe(() => {
-      $(document).trigger('updateResultHeaders', this);
-    });
-
-    huePubSub.subscribe(POST_FROM_LOCATION_WORKER_EVENT, e => {
-      this.variableSubstitutionHandler.cancelRunningRequests();
-      this.variableSubstitutionHandler.updateFromLocations(e.data.locations);
-    });
+    this.initialVariables = snippetRaw.variables || [];
 
     this.statement = ko.pureComputed(() => {
       let statement = this.statement_raw();
@@ -624,8 +598,7 @@ export default class Snippet {
       defaultLimit: this.defaultLimit,
       isOptimizerEnabled: this.parentVm.isOptimizerEnabled(),
       snippet: this,
-      isSqlEngine: this.isSqlDialect,
-      variableSubstitionHandler: this.variableSubstitutionHandler
+      isSqlEngine: this.isSqlDialect
     });
 
     if (snippetRaw.executor) {
@@ -810,6 +783,10 @@ export default class Snippet {
         this.checkComplexity();
       });
     }
+  }
+
+  setVariables(variables) {
+    this.executor.variables = variables;
   }
 
   changeDialect(dialect) {
@@ -1114,7 +1091,7 @@ export default class Snippet {
     this.showLongOperationWarning(false);
   }
 
-  toContextJson() {
+  toContextJson(statement) {
     return JSON.stringify({
       id: this.id(),
       type: this.dialect(),
@@ -1122,7 +1099,7 @@ export default class Snippet {
       defaultLimit: this.defaultLimit(),
       status: this.status(),
       statementType: this.statementType(),
-      statement: this.statement(),
+      statement: statement || this.statement(),
       aceCursorPosition: this.aceCursorPosition(),
       lastExecuted: this.lastExecuted(),
       statementPath: this.statementPath(),
@@ -1162,7 +1139,7 @@ export default class Snippet {
       statementType: this.statementType(),
       status: this.status(),
       type: this.dialect(), // TODO: Drop once connectors are stable
-      variables: this.variableSubstitutionHandler.variables().map(variable => variable.toJs()),
+      variables: this.variables,
       wasBatchExecuted: this.wasBatchExecuted()
     };
   }

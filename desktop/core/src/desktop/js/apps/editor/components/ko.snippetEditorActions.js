@@ -64,24 +64,6 @@ const TEMPLATE = `
           <i class="fa fa-fw fa-eraser"></i> ${I18n('Clear')}
         </a>
       </li>
-      <!-- ko if: window.HAS_OPTIMIZER -->
-      <li>
-        <a href="javascript:void(0)" data-bind="click: checkCompatibility, css: {'disabled': !compatibilityEnabled() }" title="${I18n(
-          'Get hints on how to port SQL from other databases'
-        )}">
-          <i class="fa fa-fw fa-random"></i> ${I18n('Check compatibility')}
-        </a>
-      </li>
-      <!-- ko if: window.DJANGO_DEBUG_MODE && window.USER_IS_ADMIN -->
-      <li>
-        <a href="javascript:void(0)" data-bind="publish: 'editor.upload.history'" title="${I18n(
-          'Load recent queries in order to improve recommendations'
-        )}">
-          <i class="fa fa-fw fa-cloud-upload"></i> ${I18n('Upload optimizer history')}
-        </a>
-      </li>
-      <!-- /ko -->
-      <!-- /ko -->
       <li>
         <a href="javascript:void(0)" data-bind="toggle: snippet.settingsVisible, visible: snippet.hasProperties" title="${I18n(
           'Query settings'

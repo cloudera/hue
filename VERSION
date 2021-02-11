@@ -17,4 +17,4 @@
 # This file should be the one source of truth for for versions within HUE.
 # It is at least included by each of the default hue app's setup.py.
 
-VERSION="4.8.0"
+VERSION="4.9.0"

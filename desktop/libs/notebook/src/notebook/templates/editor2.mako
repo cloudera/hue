@@ -115,6 +115,11 @@
             <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
           </a>
         </li>
+        <li>
+          <a href="javascript:void(0)" title="${ _('Show Editor Help') }" data-toggle="modal" data-target="#editorHelpModal">
+            <i class="fa fa-fw fa-question"></i>  ${ _('Help') }
+          </a>
+        </li>
         <li class="divider"></li>
         <!-- ko if: $root.canSave -->
         <!-- ko if: sharingEnabled -->
@@ -294,43 +299,6 @@
 
 <script type="text/html" id="editor-code-editor">
   <div style="width: 100%; height: 100%; position: relative;" class="editor-drop-target">
-##     <!-- ko if: statementType() == 'file' -->
-##       <div class="margin-top-10">
-##         <label class="pull-left" style="margin-top: 6px;margin-right: 10px;">${_('Query File')}</label>
-##         <input type="text" class="pull-left input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath, filechooserOptions: { skipInitialPathIfEmpty: true, linkMarkup: true }" placeholder="${ _('Path to file, e.g. /user/hue/sample.sql') }"/>
-##         <!-- ko if: statementPath() -->
-##           <div class="inline-block" style="margin-top: 4px">
-##             <a data-bind="hueLink: '/filebrowser/view=' + statementPath()" title="${ _('Open') }">
-##               <i class="fa fa-external-link-square"></i>
-##             </a>
-##           </div>
-##           <a class="btn" data-bind="click: function() { getExternalStatement(); }"><i class="fa fa-lg fa-refresh"></i></a>
-##         <!-- /ko -->
-##       </div>
-##       <div class="clearfix margin-bottom-20"></div>
-##     <!-- /ko -->
-##
-##     <!-- ko if: statementType() == 'document' -->
-##       <div class="margin-top-10">
-##         <!-- ko if: associatedDocumentLoading -->
-##           <i class="fa fa-spinner fa-spin muted"></i>
-##         <!-- /ko -->
-##         <label class="pull-left" style="margin-top: 6px;margin-right: 10px;" data-bind="visible: !associatedDocumentLoading()">${_('Document')}</label>
-##         <div class="selectize-wrapper" style="width: 300px;" data-bind="visible: !associatedDocumentLoading()">
-##           <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { loading: associatedDocumentLoading, value: associatedDocumentUuid, document: associatedDocument, type: dialect }"></select>
-##         </div>
-##         <!-- ko if: associatedDocument() -->
-##           <div class="pull-left" style="margin-top: 4px">
-##             <a data-bind="hueLink: associatedDocument().absoluteUrl" title="${ _('Open') }">
-##               <i class="fa fa-external-link-square"></i>
-##             </a>
-##             <span data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></span>
-##           </div>
-##         <!-- /ko -->
-##       </div>
-##       <div class="clearfix margin-bottom-20"></div>
-##     <!-- /ko -->
-
     <ace-editor-ko-bridge style="width:100%; height: 100%; position: relative;" data-bind="
       vueEvents: {
         'ace-created': function (event) {
@@ -414,56 +382,58 @@
   </div>
 </script>
 
-<script type="text/html" id="snippet-variables">
-  <div class="variables" data-bind="with: variableSubstitutionHandler">
-    <ul data-bind="foreach: variables" class="unstyled inline">
-      <li>
-        <div class="input-prepend margin-top-10">
-          <!-- ko ifnot: path() -->
-          <span class="muted add-on" data-bind="text: name"></span>
-          <!-- /ko -->
-          <!-- ko if: path() -->
-          <a href="javascript:void(0);" data-bind="click: $root.showContextPopover" style="float: left"> <span class="muted add-on" data-bind="text: name"></span></a>
-          <!-- /ko -->
-          <!-- ko if: meta.type() === 'text' -->
-          <!-- ko if: meta.placeholder() -->
-          <input class="input-medium" type="text" data-bind="value: value, attr: { value: value, type: type, placeholder: meta.placeholder() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
-          <!-- /ko -->
-          <!-- ko ifnot: meta.placeholder() -->
-          <!-- ko if: type() == 'datetime-local' -->
-          <input class="input-medium" type="text" data-bind="attr: { value: value }, value: value, datepicker: { momentFormat: 'YYYY-MM-DD HH:mm:ss.S' }">
-          <!-- /ko -->
-          <!-- ko if: type() == 'date' -->
-          <input class="input-medium" type="text" data-bind="attr: { value: value }, value: value, datepicker: { momentFormat: 'YYYY-MM-DD' }">
-          <!-- /ko -->
-          <!-- ko if: type() == 'checkbox' -->
-          <input class="input-medium" type="checkbox" data-bind="checked: value">
-          <!-- /ko -->
-          <!-- ko ifnot: (type() == 'datetime-local' || type() == 'date' || type() == 'checkbox') -->
-          <input class="input-medium" type="text" value="true" data-bind="value: value, attr: { value: value,  type: type() || 'text', step: step }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
-          <!-- /ko -->
-          <!-- /ko -->
-          <!-- /ko -->
-          <!-- ko if: meta.type() === 'select' -->
-          <select data-bind="
-                selectize: sample,
-                optionsText: 'text',
-                optionsValue: 'value',
-                selectizeOptions: {
-                  create: function (input) {
-                    sampleUser().push({ text: ko.observable(input), value: ko.observable(input) });
-                    return { text: input, value: input };
-                  }
-                },
-                value: value,
-                event: { 'keydown': $parent.onKeydownInVariable }
-              "></select>
-          <!-- /ko -->
-        </div>
-      </li>
-    </ul>
-  </div>
-</script>
+
+## TODO: Move additional types to VariableSubstitution.vue
+## <script type="text/html" id="snippet-variables">
+##   <div class="variables" data-bind="with: variableSubstitutionHandler">
+##     <ul data-bind="foreach: variables" class="unstyled inline">
+##       <li>
+##         <div class="input-prepend margin-top-10">
+##           <!-- ko ifnot: path() -->
+##           <span class="muted add-on" data-bind="text: name"></span>
+##           <!-- /ko -->
+##           <!-- ko if: path() -->
+##           <a href="javascript:void(0);" data-bind="click: $root.showContextPopover" style="float: left"> <span class="muted add-on" data-bind="text: name"></span></a>
+##           <!-- /ko -->
+##           <!-- ko if: meta.type() === 'text' -->
+##           <!-- ko if: meta.placeholder() -->
+##           <input class="input-medium" type="text" data-bind="value: value, attr: { value: value, type: type, placeholder: meta.placeholder() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
+##           <!-- /ko -->
+##           <!-- ko ifnot: meta.placeholder() -->
+##           <!-- ko if: type() == 'datetime-local' -->
+##           <input class="input-medium" type="text" data-bind="attr: { value: value }, value: value, datepicker: { momentFormat: 'YYYY-MM-DD HH:mm:ss.S' }">
+##           <!-- /ko -->
+##           <!-- ko if: type() == 'date' -->
+##           <input class="input-medium" type="text" data-bind="attr: { value: value }, value: value, datepicker: { momentFormat: 'YYYY-MM-DD' }">
+##           <!-- /ko -->
+##           <!-- ko if: type() == 'checkbox' -->
+##           <input class="input-medium" type="checkbox" data-bind="checked: value">
+##           <!-- /ko -->
+##           <!-- ko ifnot: (type() == 'datetime-local' || type() == 'date' || type() == 'checkbox') -->
+##           <input class="input-medium" type="text" value="true" data-bind="value: value, attr: { value: value,  type: type() || 'text', step: step }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
+##           <!-- /ko -->
+##           <!-- /ko -->
+##           <!-- /ko -->
+##           <!-- ko if: meta.type() === 'select' -->
+##           <select data-bind="
+##                 selectize: sample,
+##                 optionsText: 'text',
+##                 optionsValue: 'value',
+##                 selectizeOptions: {
+##                   create: function (input) {
+##                     sampleUser().push({ text: ko.observable(input), value: ko.observable(input) });
+##                     return { text: input, value: input };
+##                   }
+##                 },
+##                 value: value,
+##                 event: { 'keydown': $parent.onKeydownInVariable }
+##               "></select>
+##           <!-- /ko -->
+##         </div>
+##       </li>
+##     </ul>
+##   </div>
+## </script>
 
 <script type="text/html" id="editor-executable-snippet-body">
   <div style="padding:10px;">
@@ -795,7 +765,7 @@
 </script>
 
 <script type="text/html" id="editor-navbar">
-  <div class="navbar hue-title-bar" data-bind="visible: ! $root.isPresentationMode()">
+  <div class="navbar hue-title-bar">
     <div class="navbar-inner">
       <div class="container-fluid">
         <!-- ko template: { name: 'editor-menu-buttons' } --><!-- /ko -->
@@ -880,201 +850,201 @@
       </div>
     </div>
   </div>
-
-  <!-- ko if: $root.isPresentationMode() -->
-  <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Exit presentation') }" data-bind="click: function(){ $root.selectedNotebook().isPresentationMode(false); }">
-    <i class="fa fa-times fa-fw"></i>
-  </a>
-  <!-- /ko -->
-
-  <div class="player-toolbar margin-top-10" data-bind="visible: $root.isPresentationMode()" style="display: none">
-    <!-- ko if: $root.isPresentationMode() -->
-    <!-- ko if: $root.selectedNotebook() -->
-    <!-- ko if: $root.selectedNotebook().name() || $root.selectedNotebook().description() -->
-    <h2 class="margin-left-30 margin-right-10 inline padding-left-5" data-bind="text: $root.selectedNotebook().name"></h2>
-    <h2 class="muted inline" data-bind="text: $root.selectedNotebook().description"></h2>
-    <div class="clearfix"></div>
-    <!-- /ko -->
-
-    <!-- ko template: { name: 'editor-menu-buttons' } --><!-- /ko -->
-
-    <div class="margin-left-30 margin-top-10 padding-left-5 margin-bottom-20">
-      <!-- ko template: { name: 'editor-execution-actions' } --><!-- /ko -->
-      <!-- ko if: selectedNotebook().prePresentationModeSnippet -->
-      <!-- ko template: { if: $root.isPresentationMode(), name: 'snippet-variables', data: selectedNotebook().prePresentationModeSnippet }--><!-- /ko -->
-      <!-- /ko -->
-    </div>
-
-    <!-- /ko -->
-    <!-- /ko -->
-  </div>
 </script>
 
 <div id="editorComponents" class="editor" data-bind="css: { 'editor-bottom-expanded': bottomExpanded, 'editor-top-expanded': topExpanded }">
   <!-- ko template: { name: 'editor-modals' } --><!-- /ko -->
+  <!-- ko if: !isPresentationModeEnabled() || !isPresentationMode() -->
   <div class="editor-nav-bar">
     <!-- ko template: { name: 'editor-navbar' } --><!-- /ko -->
   </div>
+  <!-- /ko -->
   <div class="editor-app" data-bind="with: firstSnippet">
-    <div class="editor-top">
-      <div class="editor-top-actions">
-        <!-- ko template: { name: 'editor-query-redacted' } --><!-- /ko -->
-        <!-- ko template: { name: 'editor-longer-operation' } --><!-- /ko -->
-        <div class="editor-top-right-actions">
-          <!-- ko template: { name: 'snippet-header-database-selection' } --><!-- /ko -->
-          <button title="${ _('Show editor help') }" data-toggle="modal" data-target="#editorHelpModal">
-            <i class="fa fa-question"></i>
-          </button>
-          <button title="${ _('Expand editor') }" data-bind="toggle: $root.topExpanded">
-            <i class="fa" data-bind="css: { 'fa-expand': !$root.topExpanded(), 'fa-compress': $root.topExpanded() }"></i>
-          </button>
+    <!-- ko if: $parent.isPresentationModeEnabled() && $parent.isPresentationMode() -->
+      <presentation-mode-ko-bridge style="width:100%; height: 100%; position: relative;" data-bind="
+        vueEvents: {
+          'before-execute': function (event) {
+            activeExecutable(event.detail);
+          },
+          'close': function () {
+            parentNotebook.isPresentationMode(false);
+          },
+          'variables-changed': function (event) {
+            setVariables(event.detail);
+          }
+        },
+        vueKoProps: {
+          executor: executor,
+          titleObservable: parentNotebook.name,
+          descriptionObservable: parentNotebook.description
+        }
+      "></presentation-mode-ko-bridge>
+    <!-- /ko -->
+    <!-- ko ifnot: $parent.isPresentationModeEnabled() && $parent.isPresentationMode() -->
+      <div class="editor-top">
+        <div class="editor-top-actions">
+          <!-- ko template: { name: 'editor-query-redacted' } --><!-- /ko -->
+          <!-- ko template: { name: 'editor-longer-operation' } --><!-- /ko -->
+          <div class="editor-top-right-actions">
+            <!-- ko template: { name: 'snippet-header-database-selection' } --><!-- /ko -->
+            <button title="${ _('Expand editor') }" data-bind="toggle: $root.topExpanded">
+              <i class="fa" data-bind="css: { 'fa-expand': !$root.topExpanded(), 'fa-compress': $root.topExpanded() }"></i>
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="editor-settings-drawer">
-        <!-- ko template: 'editor-snippet-settings' --><!-- /ko -->
-      </div>
-##      <!-- ko template: { name: 'editor-optimizer-alerts' } --><!-- /ko -->
-      <div class="editor-code-editor">
-        <!-- ko template: { name: 'editor-code-editor' } --><!-- /ko -->
-      </div>
-##      <!-- ko template: { name: 'snippet-variables' }--><!-- /ko -->
-##      <!-- ko template: { name: 'editor-executable-snippet-body' } --><!-- /ko -->
-      <div class="editor-execute-status">
-        <!-- ko template: { name: 'editor-snippet-execution-status' } --><!-- /ko -->
-      </div>
-      <div class="editor-execute-actions">
-        <!-- ko template: { name: 'editor-execution-controls' } --><!-- /ko -->
-      </div>
-##      <!-- ko component: { name: 'executable-logs', params: {
-##        activeExecutable: activeExecutable,
-##        showLogs: showLogs,
-##        resultsKlass: resultsKlass,
-##        isPresentationMode: parentNotebook.isPresentationMode,
-##        isHidingCode: parentNotebook.isHidingCode
-##      }} --><!-- /ko -->
-    </div>
-    <div class="editor-divider"></div>
-    <div class="editor-bottom">
-      <ul class="editor-bottom-tabs nav nav-tabs">
-        <li data-bind="click: function() { currentQueryTab('queryHistory'); }, css: { 'active': currentQueryTab() == 'queryHistory' }">
-          <a class="inactive-action" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
-        </li>
-        <li data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: { 'active': currentQueryTab() == 'savedQueries' }">
-          <a class="inactive-action" style="display:inline-block" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
-        </li>
-        <li data-bind="click: function() { currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
-          <a class="inactive-action" style="display:inline-block" href="#queryResults" data-toggle="tab">${_('Results')}
-##          <!-- ko if: result.rows() != null  -->
-##          (<span data-bind="text: result.rows().toLocaleString() + (dialect() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
-##          <!-- /ko -->
-          </a>
-        </li>
-        <li data-bind="click: function() { currentQueryTab('queryChart'); }, css: {'active': currentQueryTab() == 'queryChart'}">
-          <a class="inactive-action" style="display:inline-block" href="#queryChart" data-toggle="tab">${_('Chart')}</a>
-        </li>
-        <!-- ko if: explanation -->
-        <li data-bind="click: function() { currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
-        <!-- /ko -->
-        <!-- ko foreach: pinnedContextTabs -->
-        <li data-bind="click: function() { $parent.currentQueryTab(tabId) }, css: { 'active': $parent.currentQueryTab() === tabId }">
-          <a class="inactive-action" data-toggle="tab" data-bind="attr: { 'href': '#' + tabId }">
-            <i class="snippet-icon fa" data-bind="css: iconClass"></i> <span data-bind="text: title"></span>
-            <div class="inline-block inactive-action margin-left-10 pointer" data-bind="click: function () { $parent.removeContextTab($data); }">
-              <i class="snippet-icon fa fa-times"></i>
-            </div>
-          </a>
-        </li>
-        <!-- /ko -->
-
-        <!-- ko if: HAS_WORKLOAD_ANALYTICS && dialect() === 'impala' -->
-        <li data-bind="visible: showExecutionAnalysis, click: function(){ currentQueryTab('executionAnalysis'); }, css: {'active': currentQueryTab() == 'executionAnalysis'}"><a class="inactive-action" href="#executionAnalysis" data-toggle="tab" data-bind="click: function(){ $('a[href=\'#executionAnalysis\']').tab('show'); }, event: {'shown': fetchExecutionAnalysis }"><span>${_('Execution Analysis')} </span><span></span></a></li>
-        <!-- /ko -->
-
-        <li class="editor-bottom-tab-actions">
-          <button data-bind="toggle: $root.bottomExpanded">
-            <i class="fa" data-bind="css: { 'fa-expand': !$root.bottomExpanded(), 'fa-compress': $root.bottomExpanded() }"></i>
-          </button>
-        </li>
-      </ul>
-      <div class="editor-bottom-tab-content tab-content">
-        <div class="tab-pane" id="queryHistory" data-bind="css: { 'active': currentQueryTab() === 'queryHistory' }">
-          <div class="editor-bottom-tab-panel">
-            <!-- ko component: {
-              name: 'query-history',
-              params: {
-                currentNotebook: parentNotebook,
-                openFunction: parentVm.openNotebook.bind(parentVm),
-                dialect: dialect
+        <div class="editor-settings-drawer">
+          <!-- ko template: 'editor-snippet-settings' --><!-- /ko -->
+        </div>
+  ##      <!-- ko template: { name: 'editor-optimizer-alerts' } --><!-- /ko -->
+        <div class="editor-code-editor">
+          <!-- ko template: { name: 'editor-code-editor' } --><!-- /ko -->
+        </div>
+  ##      <!-- ko template: { name: 'snippet-variables' }--><!-- /ko -->
+          <variable-substitution-ko-bridge data-bind="
+            vueEvents: {
+              'variables-changed': function (event) {
+                setVariables(event.detail);
               }
-            } --><!-- /ko -->
-          </div>
+            },
+            vueKoProps: {
+              initialVariables: executor.variables
+            }
+          "></variable-substitution-ko-bridge>
+  ##      <!-- ko template: { name: 'editor-executable-snippet-body' } --><!-- /ko -->
+        <div class="editor-execute-status">
+          <!-- ko template: { name: 'editor-snippet-execution-status' } --><!-- /ko -->
         </div>
-
-        <div class="tab-pane" id="savedQueries" data-bind="css: { 'active': currentQueryTab() === 'savedQueries' }" style="overflow: hidden">
-          <div class="editor-bottom-tab-panel">
-            <!-- ko component: {
-              name: 'saved-queries',
-              params: {
-                currentNotebook: parentNotebook,
-                openFunction: parentVm.openNotebook.bind(parentVm),
-                dialect: dialect,
-                currentTab: currentQueryTab
-              }
-            } --><!-- /ko -->
-          </div>
+        <div class="editor-execute-actions">
+          <!-- ko template: { name: 'editor-execution-controls' } --><!-- /ko -->
         </div>
+      </div>
+      <div class="editor-divider"></div>
+      <div class="editor-bottom">
+        <ul class="editor-bottom-tabs nav nav-tabs">
+          <li data-bind="click: function() { currentQueryTab('queryHistory'); }, css: { 'active': currentQueryTab() == 'queryHistory' }">
+            <a class="inactive-action" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
+          </li>
+          <li data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: { 'active': currentQueryTab() == 'savedQueries' }">
+            <a class="inactive-action" style="display:inline-block" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
+          </li>
+          <li data-bind="click: function() { currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
+            <a class="inactive-action" style="display:inline-block" href="#queryResults" data-toggle="tab">${_('Results')}
+  ##          <!-- ko if: result.rows() != null  -->
+  ##          (<span data-bind="text: result.rows().toLocaleString() + (dialect() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
+  ##          <!-- /ko -->
+            </a>
+          </li>
+          <li data-bind="click: function() { currentQueryTab('queryChart'); }, css: {'active': currentQueryTab() == 'queryChart'}">
+            <a class="inactive-action" style="display:inline-block" href="#queryChart" data-toggle="tab">${_('Chart')}</a>
+          </li>
+          <!-- ko if: explanation -->
+          <li data-bind="click: function() { currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
+          <!-- /ko -->
+          <!-- ko foreach: pinnedContextTabs -->
+          <li data-bind="click: function() { $parent.currentQueryTab(tabId) }, css: { 'active': $parent.currentQueryTab() === tabId }">
+            <a class="inactive-action" data-toggle="tab" data-bind="attr: { 'href': '#' + tabId }">
+              <i class="snippet-icon fa" data-bind="css: iconClass"></i> <span data-bind="text: title"></span>
+              <div class="inline-block inactive-action margin-left-10 pointer" data-bind="click: function () { $parent.removeContextTab($data); }">
+                <i class="snippet-icon fa fa-times"></i>
+              </div>
+            </a>
+          </li>
+          <!-- /ko -->
 
-        <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
-          <div class="execution-results-tab-panel">
-            <result-table-ko-bridge class="table-results-bridge" data-bind="vueKoProps: {
-                executableObservable: activeExecutable
-              }"></result-table-ko-bridge>
-          </div>
-        </div>
+          <li data-bind="click: function(){ currentQueryTab('executionAnalysis'); }, css: {'active': currentQueryTab() == 'executionAnalysis'}">
+            <a class="inactive-action" href="#executionAnalysis" data-toggle="tab">${_('Execution Analysis')}</a>
+          </li>
 
-        <div class="tab-pane" id="queryChart" data-bind="css: {'active': currentQueryTab() == 'queryChart'}">
-          <div class="editor-bottom-tab-panel editor-chart-panel">
-            <!-- ko component: { name: 'snippet-result-chart', params: {
-              activeExecutable: activeExecutable,
-              editorMode: parentVm.editorMode,
-              id: id,
-              isPresentationMode: parentNotebook.isPresentationMode,
-              resultsKlass: resultsKlass
-            }} --><!-- /ko -->
-          </div>
-        </div>
-
-        <!-- ko if: explanation -->
-        <div class="tab-pane" id="queryExplain" data-bind="css: {'active': currentQueryTab() == 'queryExplain'}">
-          <div class="editor-bottom-tab-panel">
-            <div style="width: 100%; height: 100%; overflow-y: auto;">
-              <pre class="no-margin-bottom" data-bind="text: explanation"></pre>
+          <li class="editor-bottom-tab-actions">
+            <button data-bind="toggle: $root.bottomExpanded">
+              <i class="fa" data-bind="css: { 'fa-expand': !$root.bottomExpanded(), 'fa-compress': $root.bottomExpanded() }"></i>
+            </button>
+          </li>
+        </ul>
+        <div class="editor-bottom-tab-content tab-content">
+          <div class="tab-pane" id="queryHistory" data-bind="css: { 'active': currentQueryTab() === 'queryHistory' }">
+            <div class="editor-bottom-tab-panel">
+              <!-- ko component: {
+                name: 'query-history',
+                params: {
+                  currentNotebook: parentNotebook,
+                  openFunction: parentVm.openNotebook.bind(parentVm),
+                  dialect: dialect
+                }
+              } --><!-- /ko -->
             </div>
           </div>
-        </div>
-        <!-- /ko -->
 
-        <!-- ko if: HAS_WORKLOAD_ANALYTICS && dialect() === 'impala' -->
-        <div class="tab-pane" id="executionAnalysis" data-bind="css: {'active': currentQueryTab() == 'executionAnalysis'}">
-          <div class="editor-bottom-tab-panel">
-            <!-- ko component: { name: 'hue-execution-analysis' } --><!-- /ko -->
+          <div class="tab-pane" id="savedQueries" data-bind="css: { 'active': currentQueryTab() === 'savedQueries' }" style="overflow: hidden">
+            <div class="editor-bottom-tab-panel">
+              <!-- ko component: {
+                name: 'saved-queries',
+                params: {
+                  currentNotebook: parentNotebook,
+                  openFunction: parentVm.openNotebook.bind(parentVm),
+                  dialect: dialect,
+                  currentTab: currentQueryTab
+                }
+              } --><!-- /ko -->
+            </div>
           </div>
-        </div>
-        <!-- /ko -->
 
-        <!-- ko foreach: pinnedContextTabs -->
-        <div class="tab-pane" data-bind="attr: { 'id': tabId }, css: {'active': $parent.currentQueryTab() === tabId }">
-          <div class="editor-bottom-tab-panel">
-            <div style="display: flex; flex-direction: column; margin-top: 10px; overflow: hidden; height: 100%; position: relative;" data-bind="template: 'context-popover-contents'"></div>
+          <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
+            <div class="execution-results-tab-panel">
+              <result-table-ko-bridge class="table-results-bridge" data-bind="vueKoProps: {
+                  executableObservable: activeExecutable
+                }"></result-table-ko-bridge>
+            </div>
           </div>
+
+          <div class="tab-pane" id="queryChart" data-bind="css: {'active': currentQueryTab() == 'queryChart'}">
+            <div class="editor-bottom-tab-panel editor-chart-panel">
+              <!-- ko component: { name: 'snippet-result-chart', params: {
+                activeExecutable: activeExecutable,
+                editorMode: parentVm.editorMode,
+                id: id,
+                isPresentationMode: parentNotebook.isPresentationMode,
+                resultsKlass: resultsKlass
+              }} --><!-- /ko -->
+            </div>
+          </div>
+
+          <!-- ko if: explanation -->
+          <div class="tab-pane" id="queryExplain" data-bind="css: {'active': currentQueryTab() == 'queryExplain'}">
+            <div class="editor-bottom-tab-panel">
+              <div style="width: 100%; height: 100%; overflow-y: auto;">
+                <pre class="no-margin-bottom" data-bind="text: explanation"></pre>
+              </div>
+            </div>
+          </div>
+          <!-- /ko -->
+
+          <div class="tab-pane" id="executionAnalysis" data-bind="css: {'active': currentQueryTab() == 'executionAnalysis'}">
+            <div class="execution-analysis-tab-panel">
+              <execution-analysis-panel-ko-bridge class="execution-analysis-bridge" data-bind="
+                vueKoProps: {
+                  executableObservable: activeExecutable
+                },
+                vueEvents: {
+                  'execution-error': function () { currentQueryTab('executionAnalysis') }
+                }
+              "></execution-analysis-panel-ko-bridge>
+            </div>
+          </div>
+
+          <!-- ko foreach: pinnedContextTabs -->
+          <div class="tab-pane" data-bind="attr: { 'id': tabId }, css: {'active': $parent.currentQueryTab() === tabId }">
+            <div class="editor-bottom-tab-panel">
+              <div style="display: flex; flex-direction: column; margin-top: 10px; overflow: hidden; height: 100%; position: relative;" data-bind="template: 'context-popover-contents'"></div>
+            </div>
+          </div>
+          <!-- /ko -->
         </div>
-        <!-- /ko -->
       </div>
-    </div>
-
-    <div class="hoverMsg hide">
-      <p class="hoverText">${_('Drop a SQL file here')}</p>
-    </div>
+      <div class="hoverMsg hide">
+        <p class="hoverText">${_('Drop a SQL file here')}</p>
+      </div>
+    <!-- /ko -->
   </div>
 </div>
 

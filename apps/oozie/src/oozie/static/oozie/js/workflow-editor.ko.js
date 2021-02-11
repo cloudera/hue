@@ -1287,6 +1287,12 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
           heightCorrection = $workflowWidgets.scrollTop();
           widthCorrection = $workflowWidgets.scrollLeft();
         }
+       var $jobBrowserGraphTab = $('#workflow-page-graph');
+        if ($jobBrowserGraphTab.length > 0) {
+          $painter = $jobBrowserGraphTab;
+          heightCorrection = $jobBrowserGraphTab.scrollTop();
+          widthCorrection = $jobBrowserGraphTab.scrollLeft();
+        }
 
         var _fromCenter = {
           x: _from.position().left + widthCorrection + _from.outerWidth() / 2,

@@ -202,7 +202,7 @@ class SqlAlchemyApi(Api):
     options.pop('has_impersonation', None)
     options.pop('ssh_server_host', None)
 
-    options['pool_pre_ping'] = True
+    options['pool_pre_ping'] = not url.startswith('phoenix://')  # Should be moved to dialect when connectors always on
 
     return create_engine(url, **options)
 
@@ -438,9 +438,12 @@ class SqlAlchemyApi(Api):
       response['databases'] = [db or '' for db in assist.get_databases()]
     elif table is None:
       tables_meta = []
-      for t in assist.get_tables(database):
+      for t in assist.get_table_names(database):
         t = self._fix_bigquery_db_prefixes(t)
         tables_meta.append({'name': t, 'type': 'Table', 'comment': ''})
+      for t in assist.get_view_names(database):
+        t = self._fix_bigquery_db_prefixes(t)
+        tables_meta.append({'name': t, 'type': 'View', 'comment': ''})
       response['tables_meta'] = tables_meta
     elif column is None:
       columns = assist.get_columns(database, table)
@@ -536,8 +539,14 @@ class Assist(object):
   def get_databases(self):
     return self.db.get_schema_names()
 
-  def get_tables(self, database, table_names=[]):
+  def get_table_names(self, database, table_names=[]):
     return self.db.get_table_names(database)
+
+  def get_view_names(self, database, view_names=[]):
+    return self.db.get_view_names(database)
+
+  def get_tables(self, database, table_names=[]):
+    return self.get_table_names(database) + self.get_view_names(database)
 
   def get_columns(self, database, table):
     return self.db.get_columns(table, database)

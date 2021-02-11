@@ -703,6 +703,17 @@ METRICS = ConfigSection(
   )
 )
 
+SLACK = ConfigSection(
+  key='slack',
+  help=_("""Configuration options for slack """),
+  members=dict(
+    IS_ENABLED=Config(
+      key='is_enabled',
+      help=_('Turns on Slack application API endpoints'),
+      default=False,
+      type=coerce_bool),
+  )
+)
 
 ANALYTICS = ConfigSection(
   key='analytics',

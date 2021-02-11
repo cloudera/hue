@@ -37,6 +37,7 @@
 
 <script lang="ts">
   import { Ace } from 'ext/ace';
+  import { noop } from 'utils/hueUtils';
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import { Prop } from 'vue-property-decorator';
@@ -80,9 +81,12 @@
 
         this.editorId = this.idObservable();
         if (!this.editorId) {
-          this.subTracker.whenDefined<string>(this.idObservable).then(id => {
-            this.editorId = id;
-          });
+          this.subTracker
+            .whenDefined<string>(this.idObservable)
+            .then(id => {
+              this.editorId = id;
+            })
+            .catch(noop);
         }
 
         this.cursorPosition = this.cursorPositionObservable();
@@ -91,7 +95,8 @@
             .whenDefined<Ace.Position>(this.cursorPositionObservable)
             .then(position => {
               this.cursorPosition = position;
-            });
+            })
+            .catch(noop);
         }
         this.initialized = true;
       }

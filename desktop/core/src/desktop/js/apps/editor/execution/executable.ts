@@ -431,7 +431,7 @@ export default abstract class Executable {
     if (this.executor.snippet) {
       return {
         operationId: this.operationId,
-        snippet: this.executor.snippet.toContextJson(),
+        snippet: this.executor.snippet.toContextJson(this.getStatement()),
         notebook: JSON.stringify(await this.executor.snippet.parentNotebook.toJs())
       };
     }
