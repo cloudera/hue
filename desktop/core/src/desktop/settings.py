@@ -195,7 +195,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.staticfiles',
 
-    'django.contrib.admin',
     'django_extensions',
 
     # 'debug_toolbar',
