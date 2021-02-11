@@ -23,44 +23,59 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Inject, Prop, Watch } from 'vue-property-decorator';
+  import { defineComponent, inject, Component } from 'vue';
 
-  @Component
-  export default class Tab extends Vue {
-    @Inject()
-    addTab?: (tab: Tab) => void;
-    @Inject()
-    removeTab?: (tab: Tab) => void;
-
-    @Prop({ required: true })
-    title!: string;
-    @Prop({ default: false })
-    lazy!: boolean;
-
-    isActive = false;
-    rendered = false;
-
-    @Watch('isActive')
-    onActive(): void {
-      if (this.isActive) {
-        this.rendered = true;
+  const Tab:Component = defineComponent({
+    name: 'Tab',
+    props: {
+      title: {
+        type: String,
+        required: true
+      },
+      lazy: {
+        type: Boolean,
+        default: false
       }
-    }
+    },
+
+    setup(): {
+      addTab?: (tab: typeof Tab) => void,
+      removeTab?: (tab: typeof Tab) => void,
+
+        isActive: boolean,
+        rendered: boolean
+    } {
+      return {
+        addTab: inject('addTab'),
+        removeTab: inject('removeTab'),
+
+        isActive: false,
+        rendered: false
+      };
+    },
+
+    watch: {
+      isActive(): void {
+        if (this.isActive) {
+          this.rendered = true;
+        }
+      }
+    },
 
     mounted(): void {
       if (this.addTab) {
         this.addTab(this);
       }
-    }
+    },
 
     destroyed(): void {
       if (this.removeTab) {
         this.removeTab(this);
       }
     }
-  }
+  })
+
+  export default Tab;
 </script>
 
 <style lang="scss" scoped></style>
