@@ -21,10 +21,9 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent } from 'vue';
+
   import I18n from '../utils/i18n';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
 
   const SECOND = { val: 1000, text: 'second' };
   const MINUTE = { val: SECOND.val * 60, text: 'minute' };
@@ -47,16 +46,21 @@
     return I18n('now');
   };
 
-  @Component
-  export default class TimeAgo extends Vue {
-    @Prop({ required: true })
-    value!: number;
+  export default defineComponent({
+    props: {
+      value: {
+        type: Number,
+        required: true
+      }
+    },
 
-    // TODO: Add timezone support
-    get timeAgo(): string {
-      return timeAgo(this.value);
+    computed: {
+      // TODO: Add timezone support
+      timeAgo(): string {
+        return timeAgo(this.value);
+      }
     }
-  }
+  });
 </script>
 
 <style lang="scss" scoped></style>
