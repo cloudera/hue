@@ -4,8 +4,8 @@ exports[`Tab.vue should render 1`] = `
 <div
   style="display: none;"
 >
-  <div>
-    Some tab content
-  </div>
+  
+  <stub />
+  
 </div>
 `;
