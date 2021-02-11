@@ -34,7 +34,6 @@ desktop.lib.metrics.file_reporter.start_file_reporter()
 
 from django.conf import settings
 from django.conf.urls import include, url
-from django.contrib import admin
 from django.views.static import serve
 
 from notebook import views as notebook_views
@@ -58,7 +57,6 @@ handler403 = 'desktop.views.serve_403_error'
 handler404 = 'desktop.views.serve_404_error'
 handler500 = 'desktop.views.serve_500_error'
 
-admin.autodiscover()
 
 # Some django-wide URLs
 dynamic_patterns = [
@@ -219,10 +217,6 @@ if ANALYTICS.IS_ENABLED.get():
 
 dynamic_patterns += [
   url(r'^scheduler/', include('desktop.lib.scheduler.urls'))
-]
-
-dynamic_patterns += [
-  url(r'^admin/?', admin.site.urls),
 ]
 
 if ENABLE_PROMETHEUS.get():
