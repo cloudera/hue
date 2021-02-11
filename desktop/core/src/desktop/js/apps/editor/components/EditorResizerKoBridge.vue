@@ -21,25 +21,44 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent, PropType } from 'vue';
+
   import { Ace } from 'ext/ace';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
-  import { wrap } from 'vue/webComponentWrapper';
+
+  import { wrap } from 'vue/webComponentWrap';
 
   import EditorResizer from 'apps/editor/components/EditorResizer.vue';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
-  @Component({
-    components: { EditorResizer }
-  })
-  export default class EditorResizerKoBridge extends Vue {
-    @Prop()
-    editorObservable?: KnockoutObservable<Ace.Editor | undefined>;
+  const EditorResizerKoBridge = defineComponent({
+    components: {
+      EditorResizer
+    },
 
-    editor: Ace.Editor | null = null;
-    subTracker = new SubscriptionTracker();
-    initialized = false;
+    props: {
+      editorObservable: {
+        type: Object as PropType<KnockoutObservable<Ace.Editor | undefined>>,
+        required: true
+      }
+    },
+
+    setup(): {
+      subTracker: SubscriptionTracker;
+    } {
+      return {
+        subTracker: new SubscriptionTracker()
+      };
+    },
+
+    data(): {
+      editor: Ace.Editor | null;
+      initialized: boolean;
+    } {
+      return {
+        editor: null,
+        initialized: false
+      };
+    },
 
     updated(): void {
       if (!this.initialized && this.editorObservable) {
@@ -49,13 +68,15 @@
         });
         this.initialized = true;
       }
-    }
+    },
 
-    destroyed(): void {
+    unmounted(): void {
       this.subTracker.dispose();
     }
-  }
+  });
 
   export const COMPONENT_NAME = 'editor-resizer-ko-bridge';
   wrap(COMPONENT_NAME, EditorResizerKoBridge);
+
+  export default EditorResizerKoBridge;
 </script>
