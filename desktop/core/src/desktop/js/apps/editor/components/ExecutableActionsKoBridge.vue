@@ -25,26 +25,47 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent, PropType } from 'vue';
+
   import ExecutableActions from './ExecutableActions.vue';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
-  import { wrap } from 'vue/webComponentWrapper';
 
-  @Component({
-    components: { ExecutableActions }
-  })
-  export default class ExecutableActionsKoBridge extends Vue {
-    @Prop()
-    executableObservable?: KnockoutObservable<SqlExecutable | undefined>;
-    @Prop()
-    beforeExecute?: () => Promise<void>;
+  import { wrap } from 'vue/webComponentWrap';
 
-    subTracker = new SubscriptionTracker();
-    initialized = false;
-    executable: SqlExecutable | null = null;
+  const ExecutableActionsKoBridge = defineComponent({
+    components: {
+      ExecutableActions
+    },
+
+    props: {
+      executableObservable: {
+        type: Object as PropType<KnockoutObservable<SqlExecutable | undefined>>,
+        default: undefined
+      },
+      beforeExecute: {
+        type: Object as PropType<() => Promise<void>>,
+        default: undefined
+      }
+    },
+
+    setup(): {
+      subTracker: SubscriptionTracker;
+    } {
+      return {
+        subTracker: new SubscriptionTracker()
+      };
+    },
+
+    data(): {
+      initialized: boolean;
+      executable: SqlExecutable | null;
+    } {
+      return {
+        initialized: false,
+        executable: null
+      };
+    },
 
     updated(): void {
       if (!this.initialized && this.executableObservable) {
@@ -54,19 +75,23 @@
         });
         this.initialized = true;
       }
-    }
+    },
 
-    destroyed(): void {
+    unmounted(): void {
       this.subTracker.dispose();
-    }
+    },
 
-    limitChanged(limit: number): void {
-      if (this.executable && this.executable.executor.defaultLimit) {
-        this.executable.executor.defaultLimit(limit);
+    methods: {
+      limitChanged(limit: number): void {
+        if (this.executable && this.executable.executor.defaultLimit) {
+          this.executable.executor.defaultLimit(limit);
+        }
       }
     }
-  }
+  });
 
   export const COMPONENT_NAME = 'executable-actions-ko-bridge';
   wrap(COMPONENT_NAME, ExecutableActionsKoBridge);
+
+  export default ExecutableActionsKoBridge;
 </script>
