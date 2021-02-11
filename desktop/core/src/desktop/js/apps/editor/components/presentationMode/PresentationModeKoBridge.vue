@@ -29,12 +29,11 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent, PropType } from 'vue';
+
   import { Variable } from 'apps/editor/components/variableSubstitution/types';
   import { IdentifierLocation } from 'parse/types';
   import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
   import { wrap } from 'vue/webComponentWrapper';
 
   import PresentationMode from './PresentationMode.vue';
@@ -42,27 +41,68 @@
   import Executor from 'apps/editor/execution/executor';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
-  @Component({
-    components: { PresentationMode }
-  })
-  export default class PresentationModeKoBridge extends Vue {
-    @Prop()
-    executor: Executor | null = null;
-    @Prop()
-    titleObservable!: KnockoutObservable<string | undefined>;
-    @Prop()
-    descriptionObservable!: KnockoutObservable<string | undefined>;
-    @Prop()
-    initialVariables?: Variable[];
+  const PresentationModeKoBridge = defineComponent({
+    components: {
+      PresentationMode
+    },
 
-    locations: IdentifierLocation[] = [];
+    props: {
+      executor: {
+        type: Object as PropType<Executor | null>,
+        default: null
+      },
+      titleObservable: {
+        type: Object as PropType<KnockoutObservable<string | undefined>>,
+        required: true
+      },
+      descriptionObservable: {
+        type: Object as PropType<KnockoutObservable<string | undefined>>,
+        required: true
+      },
+      initialVariables: Object as PropType<Variable[]>
+    },
 
-    title: string | null = null;
-    description: string | null = null;
+    setup(): {
+        locations: IdentifierLocation[],
 
-    initialized = false;
+        title: string | null,
+        description: string | null,
 
-    subTracker = new SubscriptionTracker();
+        initialized: boolean,
+
+        subTracker: SubscriptionTracker
+    } {
+      return {
+        locations: [],
+
+        title: null,
+        description: null,
+
+        initialized: false,
+
+        subTracker: new SubscriptionTracker()
+      };
+    },
+
+    methods: {
+      onBeforeExecute(executable: Executable): void {
+        this.$el.dispatchEvent(
+          new CustomEvent<Executable>('before-execute', { bubbles: true, detail: executable })
+        );
+      },
+
+      onClose(): void {
+        this.$el.dispatchEvent(
+          new CustomEvent<void>('close', { bubbles: true })
+        );
+      },
+
+      onVariablesChanged(variables: Variable[]): void {
+        this.$el.dispatchEvent(
+          new CustomEvent<Variable[]>('variables-changed', { bubbles: true, detail: variables })
+        );
+      }
+    },
 
     updated(): void {
       if (!this.initialized) {
@@ -87,30 +127,12 @@
 
         this.initialized = true;
       }
-    }
+    },
 
     destroyed(): void {
       this.subTracker.dispose();
     }
-
-    onBeforeExecute(executable: Executable): void {
-      this.$el.dispatchEvent(
-        new CustomEvent<Executable>('before-execute', { bubbles: true, detail: executable })
-      );
-    }
-
-    onClose(): void {
-      this.$el.dispatchEvent(
-        new CustomEvent<void>('close', { bubbles: true })
-      );
-    }
-
-    onVariablesChanged(variables: Variable[]): void {
-      this.$el.dispatchEvent(
-        new CustomEvent<Variable[]>('variables-changed', { bubbles: true, detail: variables })
-      );
-    }
-  }
+  });
 
   export const COMPONENT_NAME = 'presentation-mode-ko-bridge';
   wrap(COMPONENT_NAME, PresentationModeKoBridge);

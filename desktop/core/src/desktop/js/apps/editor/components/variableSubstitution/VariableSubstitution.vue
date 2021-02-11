@@ -123,7 +123,10 @@
         required: false,
         default: {}
       },
-      locations: Object as PropType<IdentifierLocation[]>
+      locations: {
+        type: Object as PropType<IdentifierLocation[]>,
+        required: false
+      }
     },
 
     setup(): {
