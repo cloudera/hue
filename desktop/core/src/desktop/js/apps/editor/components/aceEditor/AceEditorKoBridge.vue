@@ -36,44 +36,79 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent, PropType } from 'vue';
+
   import { Ace } from 'ext/ace';
   import { noop } from 'utils/hueUtils';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
-  import { wrap } from 'vue/webComponentWrapper';
+
+  import { wrap } from 'vue/webComponentWrap';
 
   import AceEditor from './AceEditor.vue';
   import Executor from 'apps/editor/execution/executor';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
-  import sqlParserRepository from 'parse/sql/sqlParserRepository';
-  import sqlReferenceRepository from 'sql/reference/sqlReferenceRepository';
+  import sqlParserRepository, { SqlParserRepository } from 'parse/sql/sqlParserRepository';
+  import sqlReferenceRepository, {
+    SqlReferenceRepository
+  } from 'sql/reference/sqlReferenceRepository';
 
-  @Component({
-    components: { AceEditor }
-  })
-  export default class AceEditorKoBridge extends Vue {
-    @Prop()
-    executor!: Executor;
-    @Prop()
-    idObservable!: KnockoutObservable<string | undefined>;
-    @Prop()
-    valueObservable!: KnockoutObservable<string | undefined>;
-    @Prop()
-    cursorPositionObservable!: KnockoutObservable<Ace.Position | undefined>;
-    @Prop()
-    aceOptions?: Ace.Options;
+  const AceEditorKoBridge = defineComponent({
+    components: {
+      AceEditor
+    },
 
-    cursorPosition?: Ace.Position;
-    editorId?: string;
-    initialized = false;
-    sqlParserProvider = sqlParserRepository;
-    sqlReferenceProvider = sqlReferenceRepository;
-    subTracker = new SubscriptionTracker();
-    value?: string;
+    props: {
+      executor: {
+        type: Object as PropType<Executor>,
+        default: undefined
+      },
+      idObservable: {
+        type: Object as PropType<KnockoutObservable<string | undefined>>,
+        default: undefined
+      },
+      valueObservable: {
+        type: Object as PropType<KnockoutObservable<string | undefined>>,
+        default: undefined
+      },
+      cursorPositionObservable: {
+        type: Object as PropType<KnockoutObservable<Ace.Position | undefined>>,
+        default: undefined
+      },
+      aceOptions: {
+        type: Object as PropType<Ace.Options>,
+        default: undefined
+      }
+    },
+
+    setup(): {
+      sqlParserProvider: SqlParserRepository;
+      sqlReferenceProvider: SqlReferenceRepository;
+      subTracker: SubscriptionTracker;
+    } {
+      return {
+        sqlParserProvider: sqlParserRepository,
+        sqlReferenceProvider: sqlReferenceRepository,
+        subTracker: new SubscriptionTracker()
+      };
+    },
+
+    data(): {
+      cursorPosition?: Ace.Position;
+      editorId?: string;
+      initialized: boolean;
+      value?: string;
+    } {
+      return {
+        initialized: false
+      };
+    },
 
     updated(): void {
-      if (!this.initialized) {
+      if (
+        !this.initialized &&
+        this.valueObservable &&
+        this.idObservable &&
+        this.cursorPositionObservable
+      ) {
         this.value = this.valueObservable();
         this.subTracker.subscribe(this.valueObservable, (value?: string) => {
           this.value = value;
@@ -100,39 +135,43 @@
         }
         this.initialized = true;
       }
-    }
+    },
 
-    destroyed(): void {
+    unmounted(): void {
       this.subTracker.dispose();
-    }
+    },
 
-    aceCreated(editor: Ace.Editor): void {
-      this.$el.dispatchEvent(new CustomEvent('ace-created', { bubbles: true, detail: editor }));
-    }
+    methods: {
+      aceCreated(editor: Ace.Editor): void {
+        this.$el.dispatchEvent(new CustomEvent('ace-created', { bubbles: true, detail: editor }));
+      },
 
-    createNewDoc(): void {
-      this.$el.dispatchEvent(new CustomEvent('create-new-doc', { bubbles: true }));
-    }
+      createNewDoc(): void {
+        this.$el.dispatchEvent(new CustomEvent('create-new-doc', { bubbles: true }));
+      },
 
-    cursorChanged(cursorPosition: Ace.Position): void {
-      this.$el.dispatchEvent(
-        new CustomEvent('cursor-changed', { bubbles: true, detail: cursorPosition })
-      );
-    }
+      cursorChanged(cursorPosition: Ace.Position): void {
+        this.$el.dispatchEvent(
+          new CustomEvent('cursor-changed', { bubbles: true, detail: cursorPosition })
+        );
+      },
 
-    saveDoc(): void {
-      this.$el.dispatchEvent(new CustomEvent('save-doc', { bubbles: true }));
-    }
+      saveDoc(): void {
+        this.$el.dispatchEvent(new CustomEvent('save-doc', { bubbles: true }));
+      },
 
-    togglePresentationMode(): void {
-      this.$el.dispatchEvent(new CustomEvent('toggle-presentation-mode', { bubbles: true }));
-    }
+      togglePresentationMode(): void {
+        this.$el.dispatchEvent(new CustomEvent('toggle-presentation-mode', { bubbles: true }));
+      },
 
-    valueChanged(value: string): void {
-      this.$el.dispatchEvent(new CustomEvent('value-changed', { bubbles: true, detail: value }));
+      valueChanged(value: string): void {
+        this.$el.dispatchEvent(new CustomEvent('value-changed', { bubbles: true, detail: value }));
+      }
     }
-  }
+  });
 
   export const COMPONENT_NAME = 'ace-editor-ko-bridge';
   wrap(COMPONENT_NAME, AceEditorKoBridge);
+
+  export default AceEditorKoBridge;
 </script>
