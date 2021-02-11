@@ -21,15 +21,19 @@ import DropdownMenu from './DropdownMenu.vue';
 describe('DropdownMenu.vue', () => {
   it('should render empty dropdown', () => {
     const wrapper = shallowMount(DropdownMenu, {
-      stubs: { 'dropdown-panel': DropdownPanel }
+      global: {
+        stubs: { 'dropdown-panel': DropdownPanel }
+      }
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('should render dropdown with slots', () => {
     const wrapper = shallowMount(DropdownMenu, {
-      stubs: { 'dropdown-panel': DropdownPanel },
-      scopedSlots: {
+      global: {
+        stubs: { 'dropdown-panel': DropdownPanel }
+      },
+      slots: {
         default: '<div>Some item</div>'
       }
     });

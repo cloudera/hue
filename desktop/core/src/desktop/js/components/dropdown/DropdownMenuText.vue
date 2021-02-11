@@ -24,15 +24,17 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent } from 'vue';
 
-  @Component
-  export default class DropdownMenuText extends Vue {
-    @Prop({ required: false, default: '' })
-    text;
-  }
+  export default defineComponent({
+    props: {
+      text: {
+        type: String,
+        required: false,
+        default: ''
+      }
+    }
+  });
 </script>
 
 <style lang="scss" scoped>
