@@ -17,16 +17,20 @@
 -->
 
 <template>
-  <div v-if="!lazy || rendered" v-show="isActive">
+  <div v-if="!lazy || rendered" v-show="def.isActive">
     <slot />
   </div>
 </template>
 
 <script lang="ts">
-  import { defineComponent, inject, Component } from 'vue';
+  import { defineComponent, inject } from 'vue';
 
-  const Tab:Component = defineComponent({
-    name: 'Tab',
+  export interface TabRef {
+    title: string,
+    isActive: boolean
+  }
+
+  export default defineComponent({
     props: {
       title: {
         type: String,
@@ -38,44 +42,48 @@
       }
     },
 
-    setup(): {
-      addTab?: (tab: typeof Tab) => void,
-      removeTab?: (tab: typeof Tab) => void,
+    setup(props): {
+      addTab?: (tab: TabRef) => void,
+      removeTab?: (tab: TabRef) => void,
 
-        isActive: boolean,
-        rendered: boolean
+      def: TabRef,
+      rendered: boolean
     } {
       return {
         addTab: inject('addTab'),
         removeTab: inject('removeTab'),
 
-        isActive: false,
+        def: {
+          title: props.title,
+          isActive: false
+        },
         rendered: false
       };
     },
 
-    watch: {
-      isActive(): void {
-        if (this.isActive) {
-          this.rendered = true;
+    created() {
+      this.$watch(
+        (): Boolean => this.def.isActive,
+        (isActive: Boolean): void => {
+          if (isActive) {
+            this.rendered = true;
+          }
         }
-      }
+      );
     },
 
     mounted(): void {
       if (this.addTab) {
-        this.addTab(this);
+        this.addTab(this.def);
       }
     },
 
     destroyed(): void {
       if (this.removeTab) {
-        this.removeTab(this);
+        this.removeTab(this.def);
       }
     }
   })
-
-  export default Tab;
 </script>
 
 <style lang="scss" scoped></style>
