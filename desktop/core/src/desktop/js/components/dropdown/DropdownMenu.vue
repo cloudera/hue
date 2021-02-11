@@ -29,20 +29,28 @@
 </template>
 
 <script lang="ts">
-  import DropdownPanel from './DropdownPanel.vue';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent } from 'vue';
 
-  @Component({
-    components: { DropdownPanel }
-  })
-  export default class DropdownMenu extends Vue {
-    @Prop({ required: false, default: '' })
-    text!: string;
-    @Prop({ required: false, default: false })
-    link!: boolean;
-  }
+  import DropdownPanel from './DropdownPanel.vue';
+
+  export default defineComponent({
+    components: {
+      DropdownPanel
+    },
+
+    props: {
+      text: {
+        type: String,
+        required: false,
+        default: ''
+      },
+      link: {
+        type: Boolean,
+        required: false,
+        default: false
+      }
+    }
+  });
 </script>
 
 <style lang="scss" scoped>
