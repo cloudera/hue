@@ -31,7 +31,10 @@
 
   export default defineComponent({
     props: {
-      url: String
+      url: {
+        type: String,
+        required: false
+      }
     },
 
     methods: {

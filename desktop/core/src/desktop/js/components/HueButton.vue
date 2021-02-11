@@ -39,12 +39,30 @@
 
   export default defineComponent({
     props: {
-      primary: Boolean,
-      alert: Boolean,
-      borderless: Boolean,
-      small: Boolean,
-      large: Boolean,
-      disabled: Boolean,
+      primary: {
+        type: Boolean,
+        required: false
+      },
+      alert: {
+        type: Boolean,
+        required: false
+      },
+      borderless: {
+        type: Boolean,
+        required: false
+      },
+      small: {
+        type: Boolean,
+        required: false
+      },
+      large: {
+        type: Boolean,
+        required: false
+      },
+      disabled: {
+        type: Boolean,
+        required: false
+      }
     }
   })
 </script>
