@@ -42,7 +42,7 @@ const UDF_REFS: { [attr: string]: () => Promise<{ UDF_CATEGORIES?: UdfCategory[]
   flink: async () => import(/* webpackChunkName: "flink-ref" */ './flink/udfReference')
 };
 
-class SqlReferenceRepository implements SqlReferenceProvider {
+export class SqlReferenceRepository implements SqlReferenceProvider {
   async getReservedKeywords(dialect: string): Promise<Set<string>> {
     const refImport = KEYWORD_REFS[dialect] || KEYWORD_REFS[GENERIC];
     const module = await refImport();
