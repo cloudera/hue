@@ -34,23 +34,28 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
 
   import { Suggestion } from '../AutocompleteResults';
   import { SetDetails } from 'sql/reference/types';
   import I18n from 'utils/i18n';
 
-  @Component({
-    methods: { I18n }
-  })
-  export default class OptionDetailsPanel extends Vue {
-    @Prop({ required: true })
-    suggestion!: Suggestion;
+  export default defineComponent({
+    props: {
+      suggestion: {
+        type: Object as PropType<Suggestion>,
+        required: true
+      }
+    },
 
-    get details(): SetDetails {
-      return <SetDetails>this.suggestion.details;
+    computed: {
+      details(): SetDetails {
+        return <SetDetails>this.suggestion.details;
+      }
+    },
+
+    methods: {
+      I18n
     }
-  }
+  });
 </script>

@@ -32,9 +32,7 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
 
   import { Suggestion } from '../AutocompleteResults';
   import { CategoryId } from '../Category';
@@ -47,48 +45,57 @@
     relativePopularity?: number;
   }
 
-  @Component({
-    components: { SqlText }
-  })
-  export default class JoinDetailsPanel extends Vue {
-    @Prop({ required: true })
-    suggestion!: Suggestion;
-    @Prop({ required: false })
-    connector?: Connector;
+  export default defineComponent({
+    components: {
+      SqlText
+    },
 
-    get details(): PopularityDetails {
-      return <PopularityDetails>this.suggestion.details;
-    }
-
-    get dialect(): string | undefined {
-      return this.connector && this.connector.dialect;
-    }
-
-    get popularityTitle(): string {
-      if (
-        this.suggestion.category.categoryId === CategoryId.PopularGroupBy ||
-        this.suggestion.category.categoryId === CategoryId.PopularOrderBy
-      ) {
-        return `${I18n('Workload percent')}: ${this.details.workloadPercent || '?'}%`;
+    props: {
+      suggestion: {
+        type: Object as PropType<Suggestion>,
+        required: true
+      },
+      connector: {
+        type: Object as PropType<Connector>,
+        default: undefined
       }
-      return `${I18n('Relative popularity')}: ${this.details.relativePopularity || '?'}%`;
-    }
+    },
 
-    get title(): string {
-      switch (this.suggestion.category.categoryId) {
-        case CategoryId.PopularFilter:
-          return I18n('Popular filter');
-        case CategoryId.PopularGroupBy:
-          return I18n('Popular group by');
-        case CategoryId.PopularOrderBy:
-          return I18n('Popular order by');
-        case CategoryId.PopularActiveJoin:
-        case CategoryId.PopularJoin:
-          return I18n('Popular join');
-        case CategoryId.PopularJoinCondition:
-          return I18n('Popular join condition');
+    computed: {
+      details(): PopularityDetails {
+        return <PopularityDetails>this.suggestion.details;
+      },
+
+      dialect(): string | undefined {
+        return this.connector && this.connector.dialect;
+      },
+
+      popularityTitle(): string {
+        if (
+          this.suggestion.category.categoryId === CategoryId.PopularGroupBy ||
+          this.suggestion.category.categoryId === CategoryId.PopularOrderBy
+        ) {
+          return `${I18n('Workload percent')}: ${this.details.workloadPercent || '?'}%`;
+        }
+        return `${I18n('Relative popularity')}: ${this.details.relativePopularity || '?'}%`;
+      },
+
+      title(): string {
+        switch (this.suggestion.category.categoryId) {
+          case CategoryId.PopularFilter:
+            return I18n('Popular filter');
+          case CategoryId.PopularGroupBy:
+            return I18n('Popular group by');
+          case CategoryId.PopularOrderBy:
+            return I18n('Popular order by');
+          case CategoryId.PopularActiveJoin:
+          case CategoryId.PopularJoin:
+            return I18n('Popular join');
+          case CategoryId.PopularJoinCondition:
+            return I18n('Popular join condition');
+        }
+        return I18n('Popular');
       }
-      return I18n('Popular');
     }
-  }
+  });
 </script>
