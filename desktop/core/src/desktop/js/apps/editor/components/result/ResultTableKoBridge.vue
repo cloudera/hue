@@ -21,26 +21,36 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
+
   import { wrap } from 'vue/webComponentWrapper';
 
   import ResultTable from './ResultTable.vue';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
-  @Component({
-    components: { ResultTable }
-  })
-  export default class ResultTableKoBridge extends Vue {
-    @Prop()
-    executableObservable?: KnockoutObservable<SqlExecutable | undefined>;
+  const ResultTableKoBridge = defineComponent({
+    components: {
+      ResultTable
+    },
 
-    initialized = false;
-    executable: SqlExecutable | null = null;
+    props: {
+      executableObservable: Object as PropType<KnockoutObservable<SqlExecutable | undefined>>
+    },
 
-    subTracker = new SubscriptionTracker();
+    setup(): {
+        initialized: Boolean,
+        executable: SqlExecutable | null,
+
+        subTracker: SubscriptionTracker
+    } {
+      return {
+        initialized: false,
+        executable: null,
+
+        subTracker: new SubscriptionTracker()
+      };
+    },
 
     updated(): void {
       if (!this.initialized && this.executableObservable) {
@@ -50,12 +60,12 @@
         });
         this.initialized = true;
       }
-    }
+    },
 
     destroyed(): void {
       this.subTracker.dispose();
     }
-  }
+  });
 
   export const COMPONENT_NAME = 'result-table-ko-bridge';
   wrap(COMPONENT_NAME, ResultTableKoBridge);
