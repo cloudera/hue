@@ -224,10 +224,6 @@
       };
     },
 
-    onHeaderClick(event: MouseEvent): void {
-      onHueLinkClick(event, '/home');
-    }
-
     mounted(): void {
       const config = getLastKnownConfig();
       if (config) {
@@ -251,6 +247,9 @@
     },
 
     methods: {
+      onHeaderClick(event: MouseEvent): void {
+        onHueLinkClick(event, '/home');
+      },
       toggleCollapsed(): void {
         this.isCollapsed = !this.isCollapsed;
         setInLocalStorage('hue.sidebar.collapse', this.isCollapsed);
