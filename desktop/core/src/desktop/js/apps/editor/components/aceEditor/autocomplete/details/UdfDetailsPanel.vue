@@ -32,24 +32,28 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
 
   import { UdfDetails } from 'sql/reference/types';
   import { Suggestion } from '../AutocompleteResults';
 
-  @Component
-  export default class UdfDetailsPanel extends Vue {
-    @Prop({ required: true })
-    suggestion!: Suggestion;
+  export default defineComponent({
 
-    get details(): UdfDetails {
-      return <UdfDetails>this.suggestion.details;
-    }
+    props: {
+      suggestion: {
+        type: Object as PropType<Suggestion>,
+        required: true
+      },
+    },
 
-    get udfName(): string {
-      return this.details.signature.substring(0, this.details.signature.indexOf('('));
+    computed: {
+      details(): UdfDetails {
+        return <UdfDetails>this.suggestion.details;
+      },
+
+      udfName(): string {
+        return this.details.signature.substring(0, this.details.signature.indexOf('('));
+      }
     }
-  }
+  });
 </script>
