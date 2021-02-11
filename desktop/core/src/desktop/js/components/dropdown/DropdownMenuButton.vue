@@ -23,11 +23,9 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
+  import { defineComponent } from 'vue';
 
-  @Component
-  export default class DropdownMenuButton extends Vue {}
+  export default defineComponent({});
 </script>
 
 <style lang="scss" scoped></style>
