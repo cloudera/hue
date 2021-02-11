@@ -34,14 +34,6 @@ const config = {
   mode: 'development',
   module: {
     rules: [
-      // {
-      //   test: /\.tsx?$/,
-      //   loader: 'ts-loader',
-      //   options: {
-      //     appendTsSuffixTo: [/\.vue$/],
-      //   },
-      //   exclude: /node_modules/,
-      // },
       {
         test: /\.tsx?$/,
         exclude: /node_modules/,
@@ -64,7 +56,7 @@ const config = {
         options: {
           shadowMode: true,
           loaders: {
-            less: ['vue-style-loader', 'css-loader', 'less-loader', 'sass-loader']
+            less: ['css-loader', 'less-loader', 'sass-loader']
           }
         }
       }
@@ -100,7 +92,7 @@ const config = {
     modules: ['node_modules', 'js'],
     alias: {
       bootstrap: __dirname + '/node_modules/bootstrap-2.3.2/js',
-      vue$: __dirname + '/node_modules/vue/dist/vue.esm.browser.min.js'
+      vue$: __dirname + '/node_modules/vue/dist/vue.esm-browser.prod.js'
     }
   }
 };
