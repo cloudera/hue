@@ -46,11 +46,10 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent, PropType } from 'vue';
+
   import { ExecutionJob } from 'apps/editor/execution/api';
   import HueLink from 'components/HueLink.vue';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop, Watch } from 'vue-property-decorator';
 
   import './ExecutionAnalysisPanel.scss';
   import Executable, {
@@ -65,20 +64,44 @@
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import I18n from 'utils/i18n';
 
-  @Component({
-    components: { HueLink, LogsPanel },
-    methods: { I18n }
-  })
-  export default class ExecutionAnalysisPanel extends Vue {
-    @Prop()
-    executable?: Executable;
+  export default defineComponent({
+    components: {
+      HueLink,
+      LogsPanel
+    },
 
-    logs = '';
-    jobs: ExecutionJob[] = [];
-    errors: ExecutionError[] = [];
-    notifiedErrors = false;
+    props: {
+      executable: Object as PropType<Executable>
+    },
 
-    subTracker = new SubscriptionTracker();
+    setup(): {
+      logs: String,
+      jobs: ExecutionJob[],
+      errors: ExecutionError[],
+      notifiedErrors: boolean,
+
+      subTracker: SubscriptionTracker,
+    } {
+      return {
+        logs: '',
+        jobs: [],
+        errors: [],
+        notifiedErrors: false,
+
+        subTracker: new SubscriptionTracker()
+      };
+    },
+
+    methods: {
+      I18n,
+      updateFromExecutionLogs(executionLogs: ExecutionLogs): void {
+        if (this.executable === executionLogs.executable) {
+          this.logs = executionLogs.fullLog;
+          this.jobs = executionLogs.jobs;
+          this.errors = executionLogs.errors;
+        }
+      }
+    },
 
     mounted(): void {
       this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, (executable: Executable) => {
@@ -88,41 +111,36 @@
       });
 
       this.subTracker.subscribe(LOGS_UPDATED_EVENT, this.updateFromExecutionLogs.bind(this));
-    }
+    },
 
-    updateFromExecutionLogs(executionLogs: ExecutionLogs): void {
-      if (this.executable === executionLogs.executable) {
-        this.logs = executionLogs.fullLog;
-        this.jobs = executionLogs.jobs;
-        this.errors = executionLogs.errors;
+    computed: {
+      analysisAvailable(): boolean {
+        return (
+          (!!this.executable && this.executable.status !== ExecutionStatus.ready) ||
+          !!this.errors.length
+        );
+      },
+
+      jobsWithUrls(): ExecutionJob[] {
+        return (this.jobs && this.jobs.filter(job => job.url)) || [];
+      },
+
+      jobsAvailable(): boolean {
+        return !!this.jobsWithUrls.length;
       }
-    }
+    },
 
-    @Watch('errors')
-    executionError(errors: ExecutionError[]): void {
+    watch: {
+      errors(errors: ExecutionError[]): void {
       if (errors.length && !this.notifiedErrors) {
         this.$emit('execution-error');
       }
       this.notifiedErrors = !!errors.length;
     }
+    },
 
     destroyed(): void {
       this.subTracker.dispose();
-    }
-
-    get analysisAvailable(): boolean {
-      return (
-        (!!this.executable && this.executable.status !== ExecutionStatus.ready) ||
-        !!this.errors.length
-      );
-    }
-
-    get jobsWithUrls(): ExecutionJob[] {
-      return (this.jobs && this.jobs.filter(job => job.url)) || [];
-    }
-
-    get jobsAvailable(): boolean {
-      return !!this.jobsWithUrls.length;
-    }
-  }
+    },
+  });
 </script>

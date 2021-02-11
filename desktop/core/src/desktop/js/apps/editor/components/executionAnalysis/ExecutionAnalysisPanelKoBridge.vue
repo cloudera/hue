@@ -21,26 +21,42 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
+
   import { wrap } from 'vue/webComponentWrapper';
 
   import ExecutionAnalysisPanel from './ExecutionAnalysisPanel.vue';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
-  @Component({
-    components: { ExecutionAnalysisPanel }
-  })
-  export default class ExecutionAnalysisPanelKoBridge extends Vue {
-    @Prop()
-    executableObservable?: KnockoutObservable<SqlExecutable | undefined>;
+  const ExecutionAnalysisPanelKoBridge = defineComponent({
+    components: {
+      ExecutionAnalysisPanel
+    },
 
-    initialized = false;
-    executable: SqlExecutable | null = null;
+    props: {
+      executableObservable: Object as PropType<KnockoutObservable<SqlExecutable | undefined>>
+    },
 
-    subTracker = new SubscriptionTracker();
+    setup(): {
+      initialized: boolean,
+      executable: SqlExecutable | null,
+
+      subTracker: SubscriptionTracker
+    } {
+      return {
+        initialized: false,
+        executable: null,
+
+        subTracker: new SubscriptionTracker()
+      };
+    },
+
+    methods: {
+      onExecutionError(): void {
+        this.$el.dispatchEvent(new CustomEvent('execution-error', { bubbles: true }));
+      }
+    },
 
     updated(): void {
       if (!this.initialized && this.executableObservable) {
@@ -50,16 +66,12 @@
         });
         this.initialized = true;
       }
-    }
+    },
 
     destroyed(): void {
       this.subTracker.dispose();
     }
-
-    onExecutionError(): void {
-      this.$el.dispatchEvent(new CustomEvent('execution-error', { bubbles: true }));
-    }
-  }
+  });
 
   export const COMPONENT_NAME = 'execution-analysis-panel-ko-bridge';
   wrap(COMPONENT_NAME, ExecutionAnalysisPanelKoBridge);
