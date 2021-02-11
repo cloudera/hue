@@ -26,9 +26,8 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
+
   import { wrap } from 'vue/webComponentWrapper';
 
   import { Variable } from './types';
@@ -37,16 +36,34 @@
   import { IdentifierLocation } from 'parse/types';
   import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
 
-  @Component({
-    components: { VariableSubstitution }
-  })
-  export default class VariableSubstitutionKoBridge extends Vue {
-    @Prop()
-    initialVariables?: Variable[];
+  const VariableSubstitutionKoBridge = defineComponent({
+    components: {
+      VariableSubstitution
+    },
 
-    locations: IdentifierLocation[] = [];
+    props: {
+      initialVariables: Object as PropType<Variable[]>
+    },
 
-    subTracker = new SubscriptionTracker();
+    setup(): {
+      locations: IdentifierLocation[],
+
+      subTracker: SubscriptionTracker
+    } {
+      return {
+        locations: [],
+
+        subTracker: new SubscriptionTracker()
+      };
+    },
+
+    methods: {
+      onVariablesChanged(variables: Variable[]): void {
+        this.$el.dispatchEvent(
+          new CustomEvent<Variable[]>('variables-changed', { bubbles: true, detail: variables })
+        );
+      }
+    },
 
     mounted(): void {
       this.subTracker.subscribe(
@@ -59,12 +76,7 @@
       );
     }
 
-    onVariablesChanged(variables: Variable[]): void {
-      this.$el.dispatchEvent(
-        new CustomEvent<Variable[]>('variables-changed', { bubbles: true, detail: variables })
-      );
-    }
-  }
+  });
 
   export const COMPONENT_NAME = 'variable-substitution-ko-bridge';
   wrap(COMPONENT_NAME, VariableSubstitutionKoBridge);
