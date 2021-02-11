@@ -35,40 +35,52 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Provide } from 'vue-property-decorator';
-  import Tab from './Tab.vue';
+  import { defineComponent } from 'vue';
 
-  @Component
-  export default class Tabs extends Vue {
-    tabs: Tab[] = [];
+  import { TabRef } from './Tab.vue';
 
-    @Provide()
-    addTab(tab: Tab): void {
-      this.tabs.push(tab);
-      if (this.tabs.length === 1) {
-        this.selectTab(this.tabs[0]);
-      }
-    }
-
-    @Provide()
-    removeTab(tab: Tab): void {
-      const index = this.tabs.indexOf(tab);
-      if (index !== -1) {
-        this.$delete(this.tabs, index);
-        if (tab.isActive && this.tabs.length) {
-          this.tabs[Math.max(0, index - 1)].isActive = true;
+  export default defineComponent({
+    provide(): {
+      addTab: (tab: TabRef) => void;
+      removeTab: (tab: TabRef) => void;
+    } {
+      return {
+        addTab: (tab: TabRef): void => {
+          if (!this.tabs.find(t => t.title === tab.title)) {
+            this.tabs.push(tab);
+            if (this.tabs.length === 1) {
+              this.selectTab(this.tabs[0]);
+            }
+          }
+        },
+        removeTab: (tab: TabRef): void => {
+          const index = this.tabs.indexOf(tab);
+          if (index !== -1) {
+            this.tabs.splice(index, 1);
+            if (tab.isActive && this.tabs.length) {
+              this.tabs[Math.max(0, index - 1)].isActive = true;
+            }
+          }
         }
+      };
+    },
+
+    data(): {
+      tabs: TabRef[];
+    } {
+      return {
+        tabs: []
+      };
+    },
+
+    methods: {
+      selectTab(tab: TabRef): void {
+        this.tabs.forEach(other => {
+          other.isActive = other === tab;
+        });
       }
     }
-
-    selectTab(tab: Tab): void {
-      this.tabs.forEach(other => {
-        other.isActive = other === tab;
-      });
-    }
-  }
+  });
 </script>
 
 <style lang="scss" scoped>

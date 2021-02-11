@@ -22,12 +22,14 @@ describe('Tab.vue', () => {
     let reportedTab: Tab | undefined;
     const wrapper = shallowMount(Tab, {
       propsData: { title: 'Tab title' },
-      provide: {
-        addTab: (tab: Tab): void => {
-          reportedTab = tab;
-        },
-        removeTab: () => {
-          // Empty
+      global: {
+        provide: {
+          addTab: (tab: Tab): void => {
+            reportedTab = tab;
+          },
+          removeTab: () => {
+            // Empty
+          }
         }
       },
       slots: {
