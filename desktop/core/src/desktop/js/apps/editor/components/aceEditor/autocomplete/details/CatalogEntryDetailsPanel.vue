@@ -65,10 +65,9 @@
 </template>
 
 <script lang="ts">
-  import CancellableJqPromise from 'api/cancellableJqPromise';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
+
+  import { CancellablePromise } from 'api/cancellablePromise';
 
   import { Suggestion } from '../AutocompleteResults';
   import DataCatalogEntry from 'catalog/DataCatalogEntry';
@@ -78,18 +77,45 @@
 
   const COMMENT_LOAD_DELAY = 1500;
 
-  @Component({
-    components: { Spinner },
-    methods: { I18n }
-  })
-  export default class CatalogEntryDetailsPanel extends Vue {
-    @Prop({ required: true })
-    suggestion!: Suggestion;
+  export default defineComponent({
+    components: {
+      Spinner
+    },
 
-    loading = false;
-    comment: string | null = null;
-    loadTimeout = -1;
-    commentPromise: CancellableJqPromise<string> | null = null;
+    props: {
+      suggestion: {
+        type: Object as PropType<Suggestion>,
+        required: true
+      }
+    },
+
+    data(): {
+      loading: boolean;
+      comment: string | null;
+      loadTimeout: number;
+      commentPromise: CancellablePromise<string> | null;
+    } {
+      return {
+        loading: false,
+        comment: null,
+        loadTimeout: -1,
+        commentPromise: null
+      };
+    },
+
+    computed: {
+      details(): DataCatalogEntry {
+        return <DataCatalogEntry>this.suggestion.details;
+      },
+
+      popularityTitle(): string {
+        return `${I18n('Popularity')} ${this.suggestion.relativePopularity}%`;
+      },
+
+      showTitle(): boolean {
+        return false;
+      }
+    },
 
     mounted(): void {
       if (this.details.hasResolvedComment()) {
@@ -97,9 +123,9 @@
       } else {
         this.loading = true;
         this.loadTimeout = window.setTimeout(() => {
-          this.commentPromise = this.details
-            .getComment({ silenceErrors: true, cancellable: true })
-            .then(comment => {
+          this.commentPromise = this.details.getComment({ silenceErrors: true, cancellable: true });
+          this.commentPromise
+            .then((comment: string) => {
               this.comment = comment;
             })
             .finally(() => {
@@ -107,25 +133,17 @@
             });
         }, COMMENT_LOAD_DELAY);
       }
-    }
+    },
 
-    destroyed(): void {
+    unmounted(): void {
       window.clearTimeout(this.loadTimeout);
       if (this.commentPromise) {
         this.commentPromise.cancel();
       }
-    }
+    },
 
-    get details(): DataCatalogEntry {
-      return <DataCatalogEntry>this.suggestion.details;
+    methods: {
+      I18n
     }
-
-    get popularityTitle(): string {
-      return `${I18n('Popularity')} ${this.suggestion.relativePopularity}%`;
-    }
-
-    get showTitle(): boolean {
-      return false;
-    }
-  }
+  });
 </script>
