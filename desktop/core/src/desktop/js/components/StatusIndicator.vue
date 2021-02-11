@@ -25,35 +25,42 @@
 
 <script lang="ts">
   import HueIcon from './HueIcon.vue';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+
+  import { defineComponent } from 'vue';
 
   // TODO: Support additional statuses
   // TODO: Support spinner
-  const ICON_MAPPING = {
+  const ICON_MAPPING: { [value: string]: string } = {
     success: 'hi-status-success',
     error: 'hi-status-error',
     warning: 'hi-status-warning',
     stopped: 'hi-status-stopped'
   };
 
-  @Component({
-    components: { HueIcon }
-  })
-  export default class StatusIndicator extends Vue {
-    @Prop({ required: true, default: 'unknown' })
-    value: string;
+  export default defineComponent({
+    components: {
+      HueIcon
+    },
 
-    get icon(): string | null {
-      return ICON_MAPPING[this.value.toLowerCase()];
-    }
+    props: {
+      value: {
+        type: String,
+        required: true,
+        default: 'unknown'
+      }
+    },
 
-    get spin(): boolean {
-      const lowerValue = this.value.toLowerCase();
-      return lowerValue === 'started' || lowerValue === 'running';
+    computed: {
+      icon(): string | undefined {
+        return ICON_MAPPING[this.value.toLowerCase()];
+      },
+
+      spin(): boolean {
+        const lowerValue = this.value.toLowerCase();
+        return lowerValue === 'started' || lowerValue === 'running';
+      }
     }
-  }
+  });
 </script>
 
 <style lang="scss" scoped></style>
