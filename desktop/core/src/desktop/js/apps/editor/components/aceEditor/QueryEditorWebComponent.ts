@@ -16,7 +16,7 @@
 
 import axios from 'axios';
 import AceEditor from './AceEditor.vue';
-import { wrap } from 'vue/webComponentWrapper';
+import { wrap } from 'vue/webComponentWrap';
 import style from '!!css-loader!sass-loader!./AceEditor.scss';
 
 wrap('query-editor', AceEditor, {
