@@ -70,5 +70,5 @@
   });
 
   export const COMPONENT_NAME = 'editor-resizer-ko-bridge';
-  wrap(COMPONENT_NAME, EditorResizerKoBridge);
+  export default wrap(COMPONENT_NAME, EditorResizerKoBridge);
 </script>

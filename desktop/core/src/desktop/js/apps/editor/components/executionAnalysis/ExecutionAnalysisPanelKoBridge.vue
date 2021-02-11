@@ -74,5 +74,5 @@
   });
 
   export const COMPONENT_NAME = 'execution-analysis-panel-ko-bridge';
-  wrap(COMPONENT_NAME, ExecutionAnalysisPanelKoBridge);
+  export default wrap(COMPONENT_NAME, ExecutionAnalysisPanelKoBridge);
 </script>

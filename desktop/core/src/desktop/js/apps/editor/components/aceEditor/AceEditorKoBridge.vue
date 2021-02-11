@@ -152,5 +152,5 @@
   });
 
   export const COMPONENT_NAME = 'ace-editor-ko-bridge';
-  wrap(COMPONENT_NAME, AceEditorKoBridge);
+  export default wrap(COMPONENT_NAME, AceEditorKoBridge);
 </script>
