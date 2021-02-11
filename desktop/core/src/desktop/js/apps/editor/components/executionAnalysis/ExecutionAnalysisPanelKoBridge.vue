@@ -21,26 +21,43 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
-  import { wrap } from 'vue/webComponentWrapper';
+  import { defineComponent, PropType } from 'vue';
+
+  import { wrap } from 'vue/webComponentWrap';
 
   import ExecutionAnalysisPanel from './ExecutionAnalysisPanel.vue';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
-  @Component({
-    components: { ExecutionAnalysisPanel }
-  })
-  export default class ExecutionAnalysisPanelKoBridge extends Vue {
-    @Prop()
-    executableObservable?: KnockoutObservable<SqlExecutable | undefined>;
+  const ExecutionAnalysisPanelKoBridge = defineComponent({
+    components: {
+      ExecutionAnalysisPanel
+    },
 
-    initialized = false;
-    executable: SqlExecutable | null = null;
+    props: {
+      executableObservable: {
+        type: Object as PropType<KnockoutObservable<SqlExecutable | undefined>>,
+        default: undefined
+      }
+    },
 
-    subTracker = new SubscriptionTracker();
+    setup(): {
+      subTracker: SubscriptionTracker;
+    } {
+      return {
+        subTracker: new SubscriptionTracker()
+      };
+    },
+
+    data(): {
+      initialized: boolean;
+      executable: SqlExecutable | null;
+    } {
+      return {
+        initialized: false,
+        executable: null
+      };
+    },
 
     updated(): void {
       if (!this.initialized && this.executableObservable) {
@@ -50,17 +67,21 @@
         });
         this.initialized = true;
       }
-    }
+    },
 
-    destroyed(): void {
+    unmounted(): void {
       this.subTracker.dispose();
-    }
+    },
 
-    onExecutionError(): void {
-      this.$el.dispatchEvent(new CustomEvent('execution-error', { bubbles: true }));
+    methods: {
+      onExecutionError(): void {
+        this.$el.dispatchEvent(new CustomEvent('execution-error', { bubbles: true }));
+      }
     }
-  }
+  });
 
   export const COMPONENT_NAME = 'execution-analysis-panel-ko-bridge';
   wrap(COMPONENT_NAME, ExecutionAnalysisPanelKoBridge);
+
+  export default ExecutionAnalysisPanelKoBridge;
 </script>
