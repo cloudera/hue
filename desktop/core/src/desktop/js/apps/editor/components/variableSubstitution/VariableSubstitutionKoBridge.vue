@@ -79,5 +79,7 @@
   });
 
   export const COMPONENT_NAME = 'variable-substitution-ko-bridge';
-  export default wrap(COMPONENT_NAME, VariableSubstitutionKoBridge);
+  wrap(COMPONENT_NAME, VariableSubstitutionKoBridge);
+
+  export default VariableSubstitutionKoBridge;
 </script>

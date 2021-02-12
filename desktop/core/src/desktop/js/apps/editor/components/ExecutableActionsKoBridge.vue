@@ -79,5 +79,7 @@
   });
 
   export const COMPONENT_NAME = 'executable-actions-ko-bridge';
-  export default wrap(COMPONENT_NAME, ExecutableActionsKoBridge);
+  wrap(COMPONENT_NAME, ExecutableActionsKoBridge);
+
+  export default ExecutableActionsKoBridge;
 </script>

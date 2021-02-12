@@ -135,5 +135,7 @@
   });
 
   export const COMPONENT_NAME = 'presentation-mode-ko-bridge';
-  export default wrap(COMPONENT_NAME, PresentationModeKoBridge);
+  wrap(COMPONENT_NAME, PresentationModeKoBridge);
+
+  export default PresentationModeKoBridge;
 </script>

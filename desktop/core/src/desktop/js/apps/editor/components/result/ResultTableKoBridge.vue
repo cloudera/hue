@@ -68,5 +68,7 @@
   });
 
   export const COMPONENT_NAME = 'result-table-ko-bridge';
-  export default wrap(COMPONENT_NAME, ResultTableKoBridge);
+  wrap(COMPONENT_NAME, ResultTableKoBridge);
+
+  export default ResultTableKoBridge;
 </script>
