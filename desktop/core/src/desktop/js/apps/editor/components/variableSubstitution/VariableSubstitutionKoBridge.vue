@@ -28,7 +28,7 @@
 <script lang="ts">
   import { defineComponent, PropType } from 'vue';
 
-  import { wrap } from 'vue/webComponentWrapper';
+  import { wrap } from 'vue/webComponentWrap';
 
   import { Variable } from './types';
   import VariableSubstitution from './VariableSubstitution.vue';

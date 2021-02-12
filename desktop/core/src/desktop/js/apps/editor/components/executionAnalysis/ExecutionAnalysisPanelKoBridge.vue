@@ -23,7 +23,7 @@
 <script lang="ts">
   import { defineComponent, PropType } from 'vue';
 
-  import { wrap } from 'vue/webComponentWrapper';
+  import { wrap } from 'vue/webComponentWrap';
 
   import ExecutionAnalysisPanel from './ExecutionAnalysisPanel.vue';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';

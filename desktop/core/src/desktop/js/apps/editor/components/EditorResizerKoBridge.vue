@@ -25,7 +25,7 @@
 
   import { Ace } from 'ext/ace';
 
-  import { wrap } from 'vue/webComponentWrapper';
+  import { wrap } from 'vue/webComponentWrap';
 
   import EditorResizer from 'apps/editor/components/EditorResizer.vue';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';

@@ -31,7 +31,7 @@
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
-  import { wrap } from 'vue/webComponentWrapper';
+  import { wrap } from 'vue/webComponentWrap';
 
   const ExecutableActionsKoBridge = defineComponent({
     components: {

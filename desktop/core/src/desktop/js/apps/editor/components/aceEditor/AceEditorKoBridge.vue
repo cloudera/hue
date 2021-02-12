@@ -41,7 +41,7 @@
   import { Ace } from 'ext/ace';
   import { noop } from 'utils/hueUtils';
 
-  import { wrap } from 'vue/webComponentWrapper';
+  import { wrap } from 'vue/webComponentWrap';
 
   import AceEditor from './AceEditor.vue';
   import Executor from 'apps/editor/execution/executor';
