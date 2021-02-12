@@ -355,6 +355,11 @@ SERVER_EMAIL = desktop.conf.DJANGO_SERVER_EMAIL.get()
 EMAIL_BACKEND = desktop.conf.DJANGO_EMAIL_BACKEND.get()
 EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
 
+# Permissive CORS
+if desktop.conf.CORS_ENABLED.get():
+  INSTALLED_APPS.append('corsheaders')
+  MIDDLEWARE.append('corsheaders.middleware.CorsMiddleware')
+  CORS_ALLOW_ALL_ORIGINS = True
 
 # Configure database
 if os.getenv('DESKTOP_DB_CONFIG'):

@@ -14,6 +14,7 @@ django-axes==4.5.4
 django_babel==0.6.2
 django-celery-beat==1.4.0
 django_celery_results==1.0.4
+django-cors-headers==3.7.0
 django-crequest==2018.5.11
 django-debug-panel==0.8.3
 django-debug-toolbar==1.9.1
