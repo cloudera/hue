@@ -46,6 +46,7 @@
 
   import './hueSidebar.scss';
   import Sidebar from './Sidebar.vue';
+
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import {
     ASSIST_ACTIVE_DB_CHANGED_EVENT,
@@ -485,7 +486,7 @@
       },
     },
 
-    destroyed(): void {
+    unmounted(): void {
       this.subTracker.dispose();
     },
 

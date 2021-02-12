@@ -138,7 +138,7 @@
       }
     },
 
-    destroyed(): void {
+    unmounted(): void {
       window.clearTimeout(this.loadTimeout);
       if (this.commentPromise) {
         this.commentPromise.cancel();

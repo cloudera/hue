@@ -64,7 +64,7 @@
       }
     },
 
-    destroyed(): void {
+    unmounted(): void {
       this.subTracker.dispose();
     }
   });

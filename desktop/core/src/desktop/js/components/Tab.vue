@@ -78,7 +78,7 @@
       }
     },
 
-    destroyed(): void {
+    unmounted(): void {
       if (this.removeTab) {
         this.removeTab(this.def);
       }

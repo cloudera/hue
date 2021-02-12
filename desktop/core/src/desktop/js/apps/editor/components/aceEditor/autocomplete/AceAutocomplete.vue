@@ -704,7 +704,7 @@
       );
     },
 
-    destroyed(): void {
+    unmounted(): void {
       this.disposeEventHandlers();
       this.subTracker.dispose();
     }

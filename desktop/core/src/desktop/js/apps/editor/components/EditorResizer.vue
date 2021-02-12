@@ -124,7 +124,7 @@
       }
     },
 
-    destroyed(): void {
+    unmounted(): void {
       document.removeEventListener('mousemove', this.onMouseMove);
       document.removeEventListener('mouseup', this.onMouseUp);
       this.subTracker.dispose();

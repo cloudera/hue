@@ -626,7 +626,7 @@
       this.$emit('ace-created', editor);
     },
 
-    destroyed(): void {
+    unmounted(): void {
       this.subTracker.dispose();
     }
   });
