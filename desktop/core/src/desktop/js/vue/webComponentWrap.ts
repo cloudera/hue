@@ -1,4 +1,4 @@
-import { ComponentOptions, Component } from 'vue';
+import { ComponentOptions, Component, ComponentInternalInstance } from 'vue';
 import wrapper from './wrapper/index';
 
 export interface HueComponentOptions<T extends Component> extends ComponentOptions<T> {
@@ -6,7 +6,7 @@ export interface HueComponentOptions<T extends Component> extends ComponentOptio
 }
 
 const isRegistered = function(tag: string): boolean {
-  return document.createElement(tag).constructor !== HTMLElement;
+  return window.customElements.get(tag) !== undefined;
 }
 
 export const wrap = <T extends Component>(
