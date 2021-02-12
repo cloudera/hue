@@ -55,32 +55,26 @@ _Update June 5th 2018: boolean variables were introduced in 4.3_
 
 ## Sharing
 
- {.p1}
-
 In Hue 4.1, we added the ability to share any query you've saved with other Hue users so that you can collaborate and share your hard work. To share, access the editor right hand menu.
 
-[<img src="https://cdn.gethue.com/uploads/2018/04/btn_share.png"class="alignnone size-full wp-image-5323" />][1]
+<img src="https://cdn.gethue.com/uploads/2018/04/btn_share.png" class="alignnone size-full wp-image-5323" />
 
 <p class="p1">
   Once there, you have autocomplete for the users in Hue and you can decide if they should have write access.
 </p>
 
-[<img src="https://cdn.gethue.com/uploads/2018/04/modal_share.png"class="alignnone size-medium wp-image-5318" />][2]
+<img src="https://cdn.gethue.com/uploads/2018/04/modal_share.png" class="alignnone size-medium wp-image-5318" />
 
 ## Variables
-
- {.p1}
 
 <p class="p1">
   For some time, you've been able to define variables in SQL queries so that you could easily configure parameters in queries. Variables are also a great way to allow other users to customize shared queries with the values they need.
 </p>
 
-[<img src="https://cdn.gethue.com/uploads/2018/04/variables_basic.png"class="alignnone size-medium wp-image-5319" />][3]
+<img src="https://cdn.gethue.com/uploads/2018/04/variables_basic.png" class="alignnone size-medium wp-image-5319" />
 
 <pre><code class="bash">
-
 select * from web_logs where country_code = "${country_code}"
-
 </code></pre>
 
 <p class="p1">
@@ -90,17 +84,13 @@ select * from web_logs where country_code = "${country_code}"
 **Single Valued**
 
 <pre><code class="bash">
-
 select * from web_logs where country_code = "${country_code=US}"
-
 </code></pre>
 
 **Multi Valued**
 
 <pre><code class="bash">
-
 select * from web_logs where country_code = "${country_code=CA, FR, US}"
-
 </code></pre>
 
 <p class="p1">
@@ -108,30 +98,28 @@ select * from web_logs where country_code = "${country_code=CA, FR, US}"
 </p>
 
 <pre><code class="bash">
-
 select * from web_logs where country_code = "${country_code=CA(Canada), FR(France), US(United States)}"
-
 </code></pre>
 
-[<img src="https://cdn.gethue.com/uploads/2018/04/variables_multi.png"class="alignnone size-full wp-image-5321" />][4]
+<img src="https://cdn.gethue.com/uploads/2018/04/variables_multi.png" class="alignnone size-full wp-image-5321" />
 
 <p class="p1">
   In Hue 4.3, we're adding the ability to display the column assist when clicking on the variable name, which should be handy when figuring out which value to use.
 </p>
 
-[<img src="https://cdn.gethue.com/uploads/2018/04/variables_popover.png"class="alignnone size-full wp-image-5322" />][5]
+<img src="https://cdn.gethue.com/uploads/2018/04/variables_popover.png" class="alignnone size-full wp-image-5322" />
 
 <p class="p1">
   If you're like us, remembering the correct format for dates and timestamps is the last thing you have on your mind. When the data type for the column is available in the metastore for the aforementioned types, Hue will default the value to today's date and you'll be able to pick the date from a calendar.
 </p>
 
-[<img src="https://cdn.gethue.com/uploads/2018/04/variables_calendar.png"class="alignnone size-medium wp-image-5320" />][6]
+<img src="https://cdn.gethue.com/uploads/2018/04/variables_calendar.png" class="alignnone size-medium wp-image-5320" />
 
 <p class="p1">
   In Hue 4.3, we made a small improvement by displaying checkbox when using boolean values as the data type.
 </p>
 
-[<img src="https://cdn.gethue.com/uploads/2018/04/Screen-Shot-2018-06-04-at-4.52.44-PM.png"class="size-full wp-image-5387" />][7]
+<img src="https://cdn.gethue.com/uploads/2018/04/Screen-Shot-2018-06-04-at-4.52.44-PM.png" class="size-full wp-image-5387" />
 
 <p class="p1">
   <h2 class="p1">
