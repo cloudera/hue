@@ -16,7 +16,7 @@
 
 /**
  * Port of https://github.com/vuejs/vue-web-component-wrapper/blob/master/src/index.js for Vue 3 support
- * Mustb be removed once @vuejs/vue-web-component-wrapper starts supporting Vue 3
+ * To remove once @vuejs/vue-web-component-wrapper starts supporting Vue 3 - https://github.com/vuejs/vue-web-component-wrapper/issues/93
 */
 
 import { Component, h, createApp, App, ComponentPublicInstance, VNode, ComponentOptionsWithObjectProps } from 'vue';
