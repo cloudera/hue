@@ -89,7 +89,7 @@
       }
     },
 
-    setup(): {
+    data(): {
       loading: boolean,
       comment: string | null,
       loadTimeout: number,
