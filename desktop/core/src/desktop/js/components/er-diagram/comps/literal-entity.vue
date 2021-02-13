@@ -30,8 +30,6 @@
   import { defineComponent, PropType, ref } from 'vue';
   import { Literal } from '../lib/entities';
 
-  import './literal-entity.scss';
-
   export default defineComponent({
     props: {
       entity: {
@@ -41,3 +39,7 @@
     }
   })
 </script>
+
+<style lang="scss">
+  @import "./literal-entity.scss";
+</style>

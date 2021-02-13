@@ -37,7 +37,6 @@
   import { cloneDeep } from 'lodash';
 
   import { Variable, VariableIndex, VariableOption } from './types';
-  import './VariableSubstitution.scss';
   import { IdentifierLocation } from 'parse/types';
   import DataCatalogEntry, { FieldSourceMeta } from 'catalog/DataCatalogEntry';
   import { noop } from 'utils/hueUtils';
@@ -255,3 +254,7 @@
     }
   });
 </script>
+
+<style lang="scss">
+  @import "./VariableSubstitution.scss";
+</style>

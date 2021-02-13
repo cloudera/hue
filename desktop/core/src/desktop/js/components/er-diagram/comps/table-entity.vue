@@ -63,8 +63,6 @@
 
   import { Table } from '../lib/entities';
 
-  import './table-entity.scss';
-
   export default defineComponent({
     props: {
       entity: {
@@ -100,3 +98,7 @@
     }
   })
 </script>
+
+<style lang="scss">
+  @import "./table-entity.scss";
+</style>

@@ -70,8 +70,6 @@
   import TableEntity from './comps/table-entity.vue';
   import LiteralEntity from './comps/literal-entity.vue';
 
-  import './er-diagram.scss';
-
   const CURVATURE = 40;
 
   interface IPos {
@@ -168,3 +166,7 @@
     },
   })
 </script>
+
+<style lang="scss">
+  @import "./er-diagram.scss";
+</style>

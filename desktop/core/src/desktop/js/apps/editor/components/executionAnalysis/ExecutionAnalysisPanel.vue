@@ -51,7 +51,6 @@
   import { ExecutionJob } from 'apps/editor/execution/api';
   import HueLink from 'components/HueLink.vue';
 
-  import './ExecutionAnalysisPanel.scss';
   import Executable, {
     EXECUTABLE_UPDATED_EVENT,
     ExecutionStatus
@@ -144,3 +143,7 @@
     },
   });
 </script>
+
+<style lang="scss">
+  @import "./ExecutionAnalysisPanel.scss";
+</style>

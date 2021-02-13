@@ -44,7 +44,6 @@
     UserDrawerItem
   } from './types';
 
-  import './hueSidebar.scss';
   import Sidebar from './Sidebar.vue';
 
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
@@ -508,3 +507,7 @@
     }
   })
 </script>
+
+<style lang="scss">
+  @import "./hueSidebar.scss";
+</style>

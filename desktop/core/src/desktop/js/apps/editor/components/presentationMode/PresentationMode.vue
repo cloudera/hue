@@ -56,7 +56,6 @@
   import VariableSubstitution from 'apps/editor/components/variableSubstitution/VariableSubstitution.vue';
   import { IdentifierLocation } from 'parse/types';
 
-  import './PresentationMode.scss';
   import ExecutableActions from 'apps/editor/components/ExecutableActions.vue';
   import ResultTable from 'apps/editor/components/result/ResultTable.vue';
   import Executor from 'apps/editor/execution/executor';
@@ -139,3 +138,7 @@
     }
   });
 </script>
+
+<style lang="scss">
+  @import "./PresentationMode.scss";
+</style>
