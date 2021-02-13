@@ -72,19 +72,25 @@
     },
 
     setup(): {
-      cursorPosition?: Ace.Position,
-      editorId?: string,
-      initialized: boolean,
       sqlParserProvider: SqlParserRepository,
       sqlReferenceProvider: SqlReferenceRepository,
       subTracker: SubscriptionTracker,
+    } {
+      return {
+        sqlParserProvider: sqlParserRepository,
+        sqlReferenceProvider: sqlReferenceRepository,
+        subTracker: new SubscriptionTracker()
+      };
+    },
+
+    data(): {
+      cursorPosition?: Ace.Position,
+      editorId?: string,
+      initialized: boolean,
       value?: string
     } {
       return {
         initialized: false,
-        sqlParserProvider: sqlParserRepository,
-        sqlReferenceProvider: sqlReferenceRepository,
-        subTracker: new SubscriptionTracker()
       };
     },
 

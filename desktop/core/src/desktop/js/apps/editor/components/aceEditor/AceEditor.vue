@@ -105,13 +105,19 @@
 
     setup(): {
       subTracker: SubscriptionTracker,
+    } {
+      return {
+        subTracker: new SubscriptionTracker(),
+      };
+    },
+
+    data(): {
       editor: Ace.Editor | null,
       autocompleteParser: AutocompleteParser | null,
       aceLocationHandler: AceLocationHandler | null,
       lastFocusedEditor: boolean
     } {
       return {
-        subTracker: new SubscriptionTracker(),
         editor: null,
         autocompleteParser: null,
         aceLocationHandler: null,
