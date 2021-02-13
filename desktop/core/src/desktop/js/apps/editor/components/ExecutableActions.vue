@@ -100,7 +100,13 @@
 
     setup(): {
       subTracker: SubscriptionTracker,
+    } {
+      return {
+        subTracker: new SubscriptionTracker(),
+      };
+    },
 
+    data(): {
       loadingSession: boolean,
       lastSession: Session | null,
       partOfRunningExecution: boolean,
@@ -110,8 +116,6 @@
       hasStatement: boolean
     } {
       return {
-        subTracker: new SubscriptionTracker(),
-
         loadingSession: true,
         lastSession: null,
         partOfRunningExecution: false,

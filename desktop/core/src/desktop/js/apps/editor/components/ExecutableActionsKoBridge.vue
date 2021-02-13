@@ -45,11 +45,17 @@
 
     setup(): {
       subTracker: SubscriptionTracker,
+    } {
+      return {
+        subTracker: new SubscriptionTracker(),
+      };
+    },
+
+    data(): {
       initialized: boolean,
       executable: SqlExecutable | null
     } {
       return {
-        subTracker: new SubscriptionTracker(),
         initialized: false,
         executable: null
       };
