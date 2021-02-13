@@ -47,7 +47,6 @@
       removeTab?: (tab: TabRef) => void,
 
       def: TabRef,
-      rendered: boolean
     } {
       return {
         addTab: inject('addTab'),
@@ -57,6 +56,13 @@
           title: props.title,
           isActive: false
         },
+      };
+    },
+
+    data(): {
+      rendered: boolean
+    } {
+      return {
         rendered: false
       };
     },

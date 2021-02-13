@@ -40,7 +40,8 @@
   import { TabRef } from './Tab.vue';
 
   export default defineComponent({
-    setup(): {
+
+    data(): {
       tabs: TabRef[]
     } {
       return {
