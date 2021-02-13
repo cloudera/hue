@@ -53,11 +53,11 @@
       },
       titleObservable: {
         type: Object as PropType<KnockoutObservable<string | undefined>>,
-        required: true
+        required: false
       },
       descriptionObservable: {
         type: Object as PropType<KnockoutObservable<string | undefined>>,
-        required: true
+        required: false
       },
       initialVariables: Object as PropType<Variable[]>
     },
@@ -109,7 +109,8 @@
     },
 
     updated(): void {
-      if (!this.initialized) {
+      if (!this.initialized && this.titleObservable && this.descriptionObservable) {
+
         this.title = this.titleObservable() || null;
         this.subTracker.subscribe(this.titleObservable, (title?: string) => {
           this.title = title || null;

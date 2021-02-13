@@ -58,15 +58,15 @@
       executor: Object as PropType<Executor>,
       idObservable: {
         type: Object as PropType<KnockoutObservable<string | undefined>>,
-        required: true
+        required: false
       },
       valueObservable: {
         type: Object as PropType<KnockoutObservable<string | undefined>>,
-        required: true
+        required: false
       },
       cursorPositionObservable: {
         type: Object as PropType<KnockoutObservable<Ace.Position | undefined>>,
-        required: true
+        required: false
       },
       aceOptions: Object as PropType<Ace.Options>
     },
@@ -123,7 +123,7 @@
     },
 
     updated(): void {
-      if (!this.initialized) {
+      if (!this.initialized && this.valueObservable && this.idObservable && this.cursorPositionObservable) {
         this.value = this.valueObservable();
         this.subTracker.subscribe(this.valueObservable, (value?: string) => {
           this.value = value;
