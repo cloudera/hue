@@ -1,25 +1,47 @@
-import { Component, h, createApp, App, ComponentPublicInstance } from 'vue';
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// 'License'); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an 'AS IS' BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * Port of https://github.com/vuejs/vue-web-component-wrapper/blob/master/src/index.js for Vue 3 support
+ * Mustb be removed once @vuejs/vue-web-component-wrapper starts supporting Vue 3
+*/
+
+import { Component, h, createApp, App, ComponentPublicInstance, VNode, ComponentOptionsWithObjectProps } from 'vue';
+
+import { toHandlerKey } from '@vue/shared';
 
 import {
+  KeyHash,
   toVNodes,
   camelize,
   hyphenate,
   callHooks,
-  injectHook,
-  getInitialProps,
+  setInitialProps,
   createCustomEvent,
   convertAttributeValue
 } from './utils'
 
-type ComponentInternal  = Partial<Component> &  {
-  props: { [key: string]: any }
-}
+/**
+ * Vue 3 wrapper to convert a Vue component into Web Component. Supports reactive attributes, events & slots.
+ * @param component: Component - Component object created using Vue's defineComponent function
+ * @param eventNames: string[] - Event names to be fired in kabab case. Events must be added using addEventListener, inline events doesnt work as of now.
+*/
+export default function wrap (component: Component, eventNames: string[] = []) {
 
-type KeyHash = { [key: string]: any };
-
-export default function wrap (comp: Component) {
-
-  const component: ComponentInternal = <ComponentInternal><unknown>comp;
+  const componentObj: ComponentOptionsWithObjectProps = <ComponentOptionsWithObjectProps>component;
 
   let isInitialized = false;
 
@@ -27,171 +49,149 @@ export default function wrap (comp: Component) {
   let camelizedPropsList: string [];
   let camelizedPropsMap: KeyHash;
 
-  function initialize (component: ComponentInternal) {
+  function initialize () {
     if (isInitialized) return;
 
     // extract props info
-    const propsList: string[] = Array.isArray(component.props)
-      ? component.props
-      : Object.keys(component.props || {})
+    const propsList: string[] = Array.isArray(componentObj.props)
+      ? componentObj.props
+      : Object.keys(componentObj.props || {})
     hyphenatedPropsList = propsList.map(hyphenate)
     camelizedPropsList = propsList.map(camelize)
 
-    const originalPropsAsObject = Array.isArray(component.props) ? {} : component.props || {}
+    const originalPropsAsObject = Array.isArray(componentObj.props) ? {} : componentObj.props || {}
     camelizedPropsMap = camelizedPropsList.reduce((map: KeyHash, key, i) => {
       map[key] = originalPropsAsObject[propsList[i]]
       return map
     }, {})
 
-    // In Vue3 beforeCreate and created are replaced by the setup method
-
-    // // proxy $emit to native DOM events
-    // injectHook(component, 'setup', function () {
-    //   const emit = this.$emit
-    //   this.$emit = (name, ...args) => {
-    //     this.$root.$options.customElement.dispatchEvent(createCustomEvent(name, args))
-    //     return emit.call(this, name, ...args)
-    //   }
-    // })
-
-    // injectHook(component, 'created', function () {
-    //   // sync default props values to wrapper on created
-    //   camelizedPropsList.forEach(key => {
-    //     this.$root.props[key] = this[key]
-    //   })
-    // })
-
-    // proxy props as Element properties
-    camelizedPropsList.forEach(key => {
-      Object.defineProperty(CustomElement.prototype, key, {
-        get () {
-          return this._wrapper.props[key]
-        },
-        set (newVal) {
-          this._wrapper.props[key] = newVal
-        },
-        enumerable: false,
-        configurable: true
-      })
-    })
-
-    isInitialized = true
+    isInitialized = true;
   }
-
-  // function syncAttribute (el: CustomElement, key: string): void {
-  //   const camelized = camelize(key)
-  //   const value = el.hasAttribute(key) ? el.getAttribute(key) : undefined
-  //   el._wrapper.props[camelized] = convertAttributeValue(
-  //     value,
-  //     key,
-  //     camelizedPropsMap[camelized]
-  //   )
-  // }
 
   class CustomElement extends HTMLElement {
     _wrapper: App;
     _component?: ComponentPublicInstance;
 
+    _props!: KeyHash;
+    _slotChildren!: (VNode | null)[];
+    _emit!: Function;
+    _mounted: boolean = false;
+
     constructor () {
-      const self = super()
+      super()
 
-      //this.attachShadow({ mode: 'open' })
+      const eventProxies = this.createEventProxies(eventNames);
 
-      const wrapper: App = this._wrapper = createApp({
-        name: 'shadow-root',
-        data () {
-          return {
-            props: {},
-            slotChildren: []
-          }
-        },
+      this._props = {};
+      this._slotChildren = [];
+
+      const self = this;
+      this._wrapper = createApp({
         render () {
-          return h(component, {
-            // ref: 'inner',
-            props: this.props
-          }, this.slotChildren)
+          return h(componentObj, Object.assign({}, self._props, eventProxies), () => self._slotChildren);
+        },
+        mounted() {
+          self._mounted = true;
+        },
+        unmounted() {
+          self._mounted = false;
         }
-      })
+      });
 
-      // // Use MutationObserver to react to future attribute & slot content change
-      // const observer = new MutationObserver(mutations => {
-      //   let hasChildrenChange = false
-      //   for (let i = 0; i < mutations.length; i++) {
-      //     const m = mutations[i]
-      //     if (isInitialized && m.type === 'attributes' && m.target === this) {
-      //       syncAttribute(this, m.attributeName)
-      //     } else {
-      //       hasChildrenChange = true
-      //     }
-      //   }
+      // Use MutationObserver to react to future attribute & slot content change
+      const observer = new MutationObserver(mutations => {
+        let hasChildrenChange = false;
 
-      //   if (hasChildrenChange) {
-      //     // TODO: Make this working
-      //     // wrapper.slotChildren = Object.freeze(toVNodes(
-      //     //   h,
-      //     //   this.childNodes
-      //     // ))
-      //   }
-      // })
+        for (let i = 0; i < mutations.length; i++) {
+          const m = mutations[i]
 
-      // observer.observe(this, {
-      //   childList: true,
-      //   subtree: true,
-      //   characterData: true,
-      //   attributes: true
-      // })
+          if (isInitialized && m.type === 'attributes' && m.target === this) {
+            if(m.attributeName) {
+              this.syncAttribute(m.attributeName);
+            }
+          } else {
+            hasChildrenChange = true;
+          }
+        }
+
+        if (hasChildrenChange) {
+          //this.syncSlots(); Commenting as this is causing an infinit $forceUpdate loop, will fix if required!
+        }
+      });
+
+      observer.observe(this, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+        attributes: true
+      });
     }
 
-    get vueComponent (): ComponentPublicInstance | undefined {
-        return this._component;
+    createEventProxies(eventNames: string[]): { [name: string]: Function } {
+      const eventProxies: { [name: string]: Function } = {};
+
+      eventNames.forEach(name => {
+        let handlerName = toHandlerKey(camelize(name))
+        eventProxies[handlerName] = (...args: any[]): void => {
+          this.dispatchEvent(createCustomEvent(name, args));
+        };
+      });
+
+      return eventProxies;
+    }
+
+    syncAttribute(key: string): void {
+      const camelized = camelize(key);
+      const value = this.hasAttribute(key) ? this.getAttribute(key) : undefined;
+
+      this._props[camelized] = convertAttributeValue(
+        value,
+        key,
+        camelizedPropsMap[camelized]
+      );
+
+      this._component?.$forceUpdate();
+    }
+
+    syncSlots(): void {
+      this._slotChildren = toVNodes(this.childNodes);
+      this._component?.$forceUpdate();
+    }
+
+    syncInitialAttributes(): void {
+      this._props = setInitialProps(camelizedPropsList);
+
+      hyphenatedPropsList.forEach(key => {
+        this.syncAttribute(key);
+      })
     }
 
     connectedCallback () {
-      this._component = this._wrapper.mount(this);
-      callHooks(this._component, 'activated');
+      if (!this._component || !this._mounted) {
+
+        if (isInitialized) {
+          // initialize attributes
+          this.syncInitialAttributes();
+        }
+
+        // initialize children
+        this.syncSlots();
+
+        // Mount the component
+        this._component = this._wrapper.mount(this);
+
+      } else {
+        // Call mounted on re-insert
+        callHooks(this._component, 'mounted')
+      }
     }
 
-    // connectedCallback () {
-    //   const wrapper = this._wrapper
-    //   if (!wrapper._isMounted) {
-    //     // initialize attributes
-    //     const syncInitialAttributes = () => {
-    //       wrapper.props = getInitialProps(camelizedPropsList)
-    //       hyphenatedPropsList.forEach(key => {
-    //         syncAttribute(this, key)
-    //       })
-    //     }
-
-    //     if (isInitialized) {
-    //       syncInitialAttributes()
-    //     } else {
-    //       // async & unresolved
-    //       component().then(resolved => {
-    //         if (resolved.__esModule || resolved[Symbol.toStringTag] === 'Module') {
-    //           resolved = resolved.default
-    //         }
-    //         initialize(resolved)
-    //         syncInitialAttributes()
-    //       })
-    //     }
-
-    //     // initialize children
-    //     wrapper.slotChildren = Object.freeze(toVNodes(
-    //       h,
-    //       this.childNodes
-    //     ))
-    //     //wrapper.mount(this.shadowRoot)
-    //   } else {
-    //     callHooks(this.vueComponent, 'activated')
-    //   }
-    // }
-
     disconnectedCallback () {
-      callHooks(this.vueComponent, 'deactivated')
+      callHooks(this._component, 'unmounted');
     }
   }
 
-  initialize(component)
+  initialize();
 
   return CustomElement
 }
