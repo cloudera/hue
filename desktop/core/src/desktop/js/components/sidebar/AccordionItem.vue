@@ -149,23 +149,25 @@
     },
 
     setup(): {
+      subTracker: SubscriptionTracker,
+      selectedItemChanged?: (itemName: string) => void
+    } {
+      return {
+        subTracker: new SubscriptionTracker(),
+
+        selectedItemChanged: inject("selectedItemChanged")
+      };
+    },
+
+    data(): {
       isOpen: Boolean,
       isTooltipScrolled: Boolean,
       tooltip: Tooltip | null,
-      subTracker: SubscriptionTracker,
-      disposeParentScroll: Function,
-      selectedItemChanged?: (itemName: string) => void
     } {
       return {
         isOpen: false,
         isTooltipScrolled: false,
         tooltip: null,
-
-        subTracker: new SubscriptionTracker(),
-
-        disposeParentScroll: () => {},
-
-        selectedItemChanged: inject("selectedItemChanged")
       };
     },
 

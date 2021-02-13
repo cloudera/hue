@@ -73,10 +73,16 @@
 
     setup(): {
       subTracker: SubscriptionTracker,
-      tooltip: DOMRect | null
     } {
       return {
         subTracker: new SubscriptionTracker(),
+      };
+    },
+
+    data(): {
+      tooltip: DOMRect | null
+    } {
+      return {
         tooltip: null
       };
     },

@@ -174,7 +174,7 @@
 
     emits: ["toggle-collapsed", "header-click"],
 
-    setup(props): {
+    data(props): {
       drawerTopicInternal: String | null
     } {
       return {

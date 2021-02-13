@@ -185,11 +185,6 @@
     },
 
     setup(): {
-        sidebarItems: SidebarItem[],
-        activeItemName: string | null,
-        isCollapsed: boolean,
-        drawerTopic: string | null,
-
         userDrawerItem: UserDrawerItem,
         userDrawerChildren: SidebarAccordionSubItem[],
 
@@ -202,11 +197,6 @@
         subTracker: SubscriptionTracker
     } {
       return {
-        sidebarItems: [],
-        activeItemName: null,
-        isCollapsed: getFromLocalStorage('hue.sidebar.collapse', true),
-        drawerTopic: null,
-
         userDrawerItem: {
           displayName: (<hueWindow>window).LOGGED_USERNAME || '',
           logoutLabel: I18n('Log Out'),
@@ -221,6 +211,21 @@
         helpDrawerChildren: HELP_DRAWER_CHILDREN,
 
         subTracker: new SubscriptionTracker()
+      };
+    },
+
+    data(): {
+        sidebarItems: SidebarItem[],
+        activeItemName: string | null,
+        isCollapsed: boolean,
+        drawerTopic: string | null,
+
+    } {
+      return {
+        sidebarItems: [],
+        activeItemName: null,
+        isCollapsed: getFromLocalStorage('hue.sidebar.collapse', true),
+        drawerTopic: null,
       };
     },
 
