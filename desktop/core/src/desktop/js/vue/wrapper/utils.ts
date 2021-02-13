@@ -27,9 +27,12 @@ export function injectHook (options: KeyHash, key: string, hook: Function) {
 
 export function callHooks (vm: ComponentPublicInstance | undefined, hook: string) {
   if (vm) {
-    const hooks = vm.$options[hook] || [];
+    let hooks = vm.$options[hook] || [];
+    if(!Array.isArray(hooks)) {
+      hooks = [hooks];
+    }
     hooks.forEach((hook: Function) => {
-      hook.call(vm)
+      hook.call(vm);
     });
   }
 }
