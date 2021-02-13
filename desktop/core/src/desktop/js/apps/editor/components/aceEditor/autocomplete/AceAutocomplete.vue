@@ -155,6 +155,14 @@
     },
 
     setup(): {
+        subTracker: SubscriptionTracker
+    } {
+      return {
+        subTracker: new SubscriptionTracker()
+      };
+    },
+
+    data(): {
         startLayout: DOMRect | null,
         startPixelRatio: number,
         left: number,
@@ -178,7 +186,6 @@
         positionInterval: number,
         keyboardHandler: Ace.HashHandler | null,
         changeListener: (() => void) | null,
-        subTracker: SubscriptionTracker
     } {
       return {
         startLayout: null,
@@ -202,7 +209,6 @@
         positionInterval: -1,
         keyboardHandler: null,
         changeListener: null,
-        subTracker: new SubscriptionTracker()
       };
     },
 
