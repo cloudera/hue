@@ -89,14 +89,20 @@
     },
 
     setup(): {
+      presetLimits: number[]
+    } {
+      return {
+        presetLimits: PRESET_LIMITS
+      };
+    },
+
+    data(): {
       currentPage: number,
       limit: number,
-      presetLimits: number[]
     } {
       return {
         currentPage: 1,
         limit: DEFAULT_LIMIT,
-        presetLimits: PRESET_LIMITS
       };
     },
 

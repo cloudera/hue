@@ -37,7 +37,7 @@
       }
     },
 
-    setup(): {
+    data(): {
       ignoreNextScrollEvent: Boolean,
       userScrolled: Boolean
     } {

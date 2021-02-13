@@ -97,7 +97,7 @@
       }
     },
 
-    setup(props): {
+    data(props): {
       selectedValues: string[],
       previousSelection: string[],
 

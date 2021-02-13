@@ -156,13 +156,11 @@ import { bool } from 'ext/ace/worker-javascript';
 
     setup(): {
       rangeSets: Range[][],
-      selectedRange: Range,
 
       customRange: Range
     } {
       return {
         rangeSets: RANGE_SETS,
-        selectedRange: DEFAULT_RANGE,
 
         customRange: {
           title: I18n('Custom Range'),
@@ -170,6 +168,14 @@ import { bool } from 'ext/ace/worker-javascript';
           to: RANGE_NOW.toMillis(),
           custom: true
         }
+      };
+    },
+
+    data(): {
+      selectedRange: Range,
+    } {
+      return {
+        selectedRange: DEFAULT_RANGE,
       };
     },
 

@@ -68,7 +68,7 @@
       }
     },
 
-    setup(): {
+    data(): {
       spin: boolean,
       autocomplete: string,
       throttle: number,

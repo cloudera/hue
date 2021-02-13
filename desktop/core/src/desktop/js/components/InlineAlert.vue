@@ -93,7 +93,7 @@
       showClose: Boolean
     },
 
-    setup(): {
+    data(): {
       showDetails: Boolean,
     } {
       return {

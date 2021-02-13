@@ -64,7 +64,7 @@
 
     },
 
-    setup(): {
+    data(): {
       filterText: string
     } {
       return {
