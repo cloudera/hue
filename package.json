@@ -139,6 +139,7 @@
     "stylelint": "13.6.0",
     "stylelint-config-standard": "20.0.0",
     "stylelint-scss": "3.18.0",
+    "ts-jest": "^26.5.1",
     "ts-loader": "7.0.5",
     "typescript": "3.9.5",
     "vti": "0.0.24",
