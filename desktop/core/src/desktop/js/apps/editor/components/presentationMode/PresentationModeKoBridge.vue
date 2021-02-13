@@ -63,14 +63,20 @@
     },
 
     setup(): {
+        subTracker: SubscriptionTracker
+    } {
+      return {
+        subTracker: new SubscriptionTracker()
+      };
+    },
+
+    data(): {
         locations: IdentifierLocation[],
 
         title: string | null,
         description: string | null,
 
         initialized: boolean,
-
-        subTracker: SubscriptionTracker
     } {
       return {
         locations: [],
@@ -79,8 +85,6 @@
         description: null,
 
         initialized: false,
-
-        subTracker: new SubscriptionTracker()
       };
     },
 
