@@ -76,20 +76,27 @@
     },
 
     setup(): {
-        grayedOut: Boolean,
-        fetchedOnce: Boolean,
-        hasResultSet: Boolean,
-        streaming: Boolean,
-        hasMore: Boolean,
-        rows: ResultRow[],
-        meta: ResultMeta[],
+      subTracker: SubscriptionTracker
+    } {
+      return {
+        subTracker: new SubscriptionTracker()
+      };
+    },
 
-        status: ExecutionStatus | null,
-        type: ResultType,
-        images: [],
-        lastFetchedRows: ResultRow[],
-        lastRenderedResult?: ExecutionResult,
-        subTracker: SubscriptionTracker
+    data(): {
+      grayedOut: Boolean,
+      fetchedOnce: Boolean,
+      hasResultSet: Boolean,
+      streaming: Boolean,
+      hasMore: Boolean,
+      rows: ResultRow[],
+      meta: ResultMeta[],
+
+      status: ExecutionStatus | null,
+      type: ResultType,
+      images: [],
+      lastFetchedRows: ResultRow[],
+      lastRenderedResult?: ExecutionResult,
     } {
       return {
         grayedOut: false,
@@ -104,7 +111,6 @@
         type: ResultType.Table,
         images: [],
         lastFetchedRows: [],
-        subTracker: new SubscriptionTracker()
       };
     },
 

@@ -39,16 +39,20 @@
     },
 
     setup(): {
-        initialized: Boolean,
-        executable: SqlExecutable | null,
+      subTracker: SubscriptionTracker
+    } {
+      return {
+        subTracker: new SubscriptionTracker()
+      };
+    },
 
-        subTracker: SubscriptionTracker
+    data(): {
+      initialized: Boolean,
+      executable: SqlExecutable | null,
     } {
       return {
         initialized: false,
         executable: null,
-
-        subTracker: new SubscriptionTracker()
       };
     },
 
