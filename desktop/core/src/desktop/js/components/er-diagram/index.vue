@@ -88,7 +88,7 @@
       relations: Object as PropType<IRelation[]>,
     },
 
-    data() {
+    setup() {
       return {
         EntityTypes
       };

@@ -75,7 +75,7 @@
       }
     },
 
-    setup(): {
+    data(): {
       maxCols: number
     } {
       return {
