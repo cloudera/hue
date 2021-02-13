@@ -48,29 +48,29 @@
 
     setup(): {
         subTracker: SubscriptionTracker,
-
-        newHeight: number,
-        startHeight: number,
-        startY: number,
-
-        targetElement: HTMLElement | null
     } {
       return {
         subTracker: new SubscriptionTracker(),
-
-        newHeight: 0,
-        startHeight: 0,
-        startY: 0,
-
-        targetElement: null
       };
     },
 
     data(thisComp): {
+      newHeight: number,
+      startHeight: number,
+      startY: number,
+
+      targetElement: HTMLElement | null,
+
       onMouseMove: (event: Event) => void,
       onMouseUp: (event: Event) => void,
     } {
       return {
+        newHeight: 0,
+        startHeight: 0,
+        startY: 0,
+
+        targetElement: null,
+
         onMouseMove: thisComp.drag.bind(this),
         onMouseUp: thisComp.stop.bind(this)
       };

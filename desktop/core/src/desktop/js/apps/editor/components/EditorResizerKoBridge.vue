@@ -43,15 +43,21 @@
     },
 
     setup(): {
-      editor: Ace.Editor | null,
       subTracker: SubscriptionTracker,
+    } {
+      return {
+        subTracker: new SubscriptionTracker(),
+      };
+    },
+
+    data(): {
+      editor: Ace.Editor | null,
       initialized: boolean
     } {
       return {
         editor: null,
-        subTracker: new SubscriptionTracker(),
         initialized: false
-      };
+      }
     },
 
     updated(): void {
