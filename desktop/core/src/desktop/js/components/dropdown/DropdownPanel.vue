@@ -84,7 +84,7 @@
       }
     },
 
-    setup(): {
+    data(): {
       panelOpen: boolean,
 
       positionTop: boolean,
