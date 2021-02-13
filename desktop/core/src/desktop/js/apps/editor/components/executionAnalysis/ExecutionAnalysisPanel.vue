@@ -74,20 +74,24 @@
     },
 
     setup(): {
+      subTracker: SubscriptionTracker,
+    } {
+      return {
+        subTracker: new SubscriptionTracker()
+      };
+    },
+
+    data(): {
       logs: String,
       jobs: ExecutionJob[],
       errors: ExecutionError[],
       notifiedErrors: boolean,
-
-      subTracker: SubscriptionTracker,
     } {
       return {
         logs: '',
         jobs: [],
         errors: [],
         notifiedErrors: false,
-
-        subTracker: new SubscriptionTracker()
       };
     },
 
