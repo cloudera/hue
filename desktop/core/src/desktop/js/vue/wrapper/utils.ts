@@ -1,4 +1,6 @@
-import { Component, ComponentPublicInstance } from "vue"
+import { ComponentPublicInstance, h, VNode } from "vue";
+
+export type KeyHash = { [key: string]: any };
 
 const camelizeRE = /-(\w)/g
 export const camelize = (str: string): string => {
@@ -10,15 +12,15 @@ export const hyphenate = (str: string): string => {
   return str.replace(hyphenateRE, '-$1').toLowerCase()
 }
 
-export function getInitialProps (propsList: string[]) {
-  const res: { [key: string]: any } = {}
+export function setInitialProps(propsList: string[]): KeyHash {
+  const res: KeyHash = {}
   propsList.forEach(key => {
     res[key] = undefined
   })
   return res
 }
 
-export function injectHook (options: { [key: string]: any }, key: string, hook: Function) {
+export function injectHook (options: KeyHash, key: string, hook: Function) {
   options[key] = [].concat(options[key] || [])
   options[key].unshift(hook)
 }
@@ -40,59 +42,63 @@ export function createCustomEvent (name: string, args: any) {
   })
 }
 
-const isBoolean = val => /function Boolean/.test(String(val))
-const isNumber = val => /function Number/.test(String(val))
+const isBoolean = (val: any) => /function Boolean/.test(String(val));
+const isNumber = (val: any) => /function Number/.test(String(val));
 
-export function convertAttributeValue (value, name, { type } = {}) {
+export function convertAttributeValue (value: any, name: string, { type }: { type?: any } = {}) {
   if (isBoolean(type)) {
     if (value === 'true' || value === 'false') {
-      return value === 'true'
+      return value === 'true';
     }
     if (value === '' || value === name) {
-      return true
+      return true;
     }
-    return value != null
+    return value != null;
   } else if (isNumber(type)) {
-    const parsed = parseFloat(value, 10)
-    return isNaN(parsed) ? value : parsed
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? value : parsed;
   } else {
-    return value
+    return value;
   }
 }
 
-export function toVNodes (h, children) {
-  const res = []
+export function toVNodes (children: NodeListOf<ChildNode>): (VNode | null)[] {
+  const res: (VNode | null)[] = [];
+
   for (let i = 0, l = children.length; i < l; i++) {
-    res.push(toVNode(h, children[i]))
+    res.push(toVNode(children[i]));
   }
-  return res
+
+  return res;
 }
 
-function toVNode (h, node) {
+function toVNode (node: any): VNode | null {
   if (node.nodeType === 3) {
-    return node.data.trim() ? node.data : null
+    return node.data.trim() ? node.data : null;
   } else if (node.nodeType === 1) {
     const data = {
       attrs: getAttributes(node),
       domProps: {
         innerHTML: node.innerHTML
       }
-    }
+    };
+
     if (data.attrs.slot) {
-      data.slot = data.attrs.slot
-      delete data.attrs.slot
+      data.slot = data.attrs.slot;
+      delete data.attrs.slot;
     }
-    return h(node.tagName, data)
+
+    return h(node.tagName, data);
   } else {
     return null
   }
 }
 
-function getAttributes (node) {
-  const res = {}
+function getAttributes (node: any): KeyHash {
+  const res: KeyHash = {};
   for (let i = 0, l = node.attributes.length; i < l; i++) {
-    const attr = node.attributes[i]
-    res[attr.nodeName] = attr.nodeValue
+    const attr = node.attributes[i];
+    res[attr.nodeName] = attr.nodeValue;
   }
-  return res
+  return res;
 }
