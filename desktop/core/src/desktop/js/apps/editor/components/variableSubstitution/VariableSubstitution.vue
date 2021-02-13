@@ -128,7 +128,7 @@
       }
     },
 
-    setup(): {
+    data(): {
       knownVariables: { [name: string]: KnownVariable }
     } {
       return {

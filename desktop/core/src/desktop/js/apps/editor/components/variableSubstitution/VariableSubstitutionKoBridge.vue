@@ -46,14 +46,18 @@
     },
 
     setup(): {
-      locations: IdentifierLocation[],
-
       subTracker: SubscriptionTracker
     } {
       return {
-        locations: [],
-
         subTracker: new SubscriptionTracker()
+      };
+    },
+
+    data(): {
+      locations: IdentifierLocation[],
+    } {
+      return {
+        locations: [],
       };
     },
 
