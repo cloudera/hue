@@ -17,82 +17,80 @@
 -->
 
 <template>
-  <div>
-    <div class="sidebar-drawers" :class="{ 'sidebar-collapsed': isCollapsed }">
-      <SidebarDrawer
-        :show="drawerTopic === 'help'"
-        class="sidebar-user-drawer sidebar-right-drawer"
-        aria-label="Help"
-        @close="() => closeDrawer('help')"
-      >
-        <HelpDrawerContent :children="helpDrawerChildren" />
-      </SidebarDrawer>
-      <SidebarDrawer
-        :show="drawerTopic === 'user'"
-        class="sidebar-user-drawer sidebar-right-drawer"
-        aria-label="User Info"
-        @close="() => closeDrawer('user')"
-      >
-        <UserDrawerContent :item="userDrawerItem" :children="userDrawerChildren" />
-      </SidebarDrawer>
+  <div class="sidebar-drawers" :class="{ 'sidebar-collapsed': isCollapsed }">
+    <SidebarDrawer
+      :show="drawerTopic === 'help'"
+      class="sidebar-user-drawer sidebar-right-drawer"
+      aria-label="Help"
+      @close="() => closeDrawer('help')"
+    >
+      <HelpDrawerContent :children="helpDrawerChildren" />
+    </SidebarDrawer>
+    <SidebarDrawer
+      :show="drawerTopic === 'user'"
+      class="sidebar-user-drawer sidebar-right-drawer"
+      aria-label="User Info"
+      @close="() => closeDrawer('user')"
+    >
+      <UserDrawerContent :item="userDrawerItem" :children="userDrawerChildren" />
+    </SidebarDrawer>
+  </div>
+  <div class="sidebar" :class="{ 'sidebar-collapsed': isCollapsed }">
+    <div class="sidebar-header">
+      <a href="javascript:void(0);" @click="$emit('header-click', $event)">
+        <svg>
+          <use xlink:href="#hi-sidebar-logo" />
+        </svg>
+      </a>
     </div>
-    <div class="sidebar" :class="{ 'sidebar-collapsed': isCollapsed }">
-      <div class="sidebar-header">
-        <a href="javascript:void(0);" @click="$emit('header-click', $event)">
-          <svg>
-            <use xlink:href="#hi-sidebar-logo" />
-          </svg>
-        </a>
-      </div>
-      <SidebarBody
-        :items="sidebarItems"
+    <SidebarBody
+      :items="sidebarItems"
+      :is-collapsed="isCollapsed"
+      :active-item-name="activeItemName"
+    />
+    <div class="sidebar-footer">
+      <NavigationItem
+        v-if="helpItem && useDrawerForHelp"
+        :item="helpItem"
         :is-collapsed="isCollapsed"
         :active-item-name="activeItemName"
       />
-      <div class="sidebar-footer">
-        <NavigationItem
-          v-if="helpItem && useDrawerForHelp"
-          :item="helpItem"
-          :is-collapsed="isCollapsed"
-          :active-item-name="activeItemName"
-        />
-        <AccordionItem
-          v-if="helpItem && !useDrawerForHelp"
-          :item="helpItem"
-          :is-collapsed="isCollapsed"
-          :active-item-name="activeItemName"
-        />
-        <NavigationItem
-          v-if="userItem && useDrawerForUser"
-          :item="userItem"
-          :is-collapsed="isCollapsed"
-          :active-item-name="activeItemName"
-        />
-        <AccordionItem
-          v-if="userItem && !useDrawerForUser"
-          :item="userItem"
-          :is-collapsed="isCollapsed"
-          :active-item-name="activeItemName"
-        />
-        <div class="sidebar-footer-bottom-row">
-          <BaseNavigationItem
-            :css-classes="'sidebar-footer-collapse-btn'"
-            :item="{
-              handler: () => $emit('toggle-collapsed'),
-              name: 'sidebar-collapse-btn'
-            }"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-              <path
-                fill="#adb2b6"
-                fill-rule="evenodd"
-                d="M18.62 4l-7.903 7.956L18.615 20 20 18.516l-6.432-6.552 6.426-6.47L18.62 4zm-6.719 0L4 11.956 11.897 20l1.385-1.484-6.432-6.552 6.427-6.47L11.901 4z"
-              />
-            </svg>
-          </BaseNavigationItem>
-        </div>
-        <div class="sidebar-footer-bottom-color-line" />
+      <AccordionItem
+        v-if="helpItem && !useDrawerForHelp"
+        :item="helpItem"
+        :is-collapsed="isCollapsed"
+        :active-item-name="activeItemName"
+      />
+      <NavigationItem
+        v-if="userItem && useDrawerForUser"
+        :item="userItem"
+        :is-collapsed="isCollapsed"
+        :active-item-name="activeItemName"
+      />
+      <AccordionItem
+        v-if="userItem && !useDrawerForUser"
+        :item="userItem"
+        :is-collapsed="isCollapsed"
+        :active-item-name="activeItemName"
+      />
+      <div class="sidebar-footer-bottom-row">
+        <BaseNavigationItem
+          :css-classes="'sidebar-footer-collapse-btn'"
+          :item="{
+            handler: () => $emit('toggle-collapsed'),
+            name: 'sidebar-collapse-btn'
+          }"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <path
+              fill="#adb2b6"
+              fill-rule="evenodd"
+              d="M18.62 4l-7.903 7.956L18.615 20 20 18.516l-6.432-6.552 6.426-6.47L18.62 4zm-6.719 0L4 11.956 11.897 20l1.385-1.484-6.432-6.552 6.427-6.47L11.901 4z"
+            />
+          </svg>
+        </BaseNavigationItem>
       </div>
+      <div class="sidebar-footer-bottom-color-line" />
     </div>
   </div>
 </template>
