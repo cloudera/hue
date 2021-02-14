@@ -27,7 +27,7 @@
 
   export default defineComponent({
     setup(): {
-      title: string,
+      title: string;
     } {
       return {
         title: 'Web Component'

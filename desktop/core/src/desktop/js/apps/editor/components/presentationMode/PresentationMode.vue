@@ -101,7 +101,7 @@
       }
     },
 
-    emits: ['before-execute', 'variables-changed'],
+    emits: ['before-execute', 'variables-changed', 'close'],
 
     computed: {
       presentationStatements(): PresentationStatement[] {
