@@ -88,8 +88,10 @@
       }
     },
 
+    emits: ['page-changed'],
+
     setup(): {
-      presetLimits: number[]
+      presetLimits: number[];
     } {
       return {
         presetLimits: PRESET_LIMITS
@@ -97,12 +99,12 @@
     },
 
     data(): {
-      currentPage: number,
-      limit: number,
+      currentPage: number;
+      limit: number;
     } {
       return {
         currentPage: 1,
-        limit: DEFAULT_LIMIT,
+        limit: DEFAULT_LIMIT
       };
     },
 
@@ -118,6 +120,16 @@
       totalPages(): number {
         return Math.ceil(this.totalEntries / this.limit) || 1;
       }
+    },
+
+    watch: {
+      currentPage(): void {
+        this.notifyPageChanged();
+      }
+    },
+
+    mounted(): void {
+      this.notifyPageChanged();
     },
 
     methods: {
@@ -156,20 +168,8 @@
           this.notifyPageChanged(); // this.limit isn't watched
         }
       }
-
-    },
-
-    watch: {
-      currentPage(): void {
-        this.notifyPageChanged();
-      }
-    },
-
-    mounted(): void {
-      this.notifyPageChanged();
     }
-
-  })
+  });
 </script>
 
 <style lang="scss" scoped>
