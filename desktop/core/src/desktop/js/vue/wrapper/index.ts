@@ -88,7 +88,8 @@ export default function wrap (component: Component, eventNames: string[] = []) {
       const self = this;
       this._wrapper = createApp({
         render () {
-          return h(componentObj, Object.assign({}, self._props, eventProxies), () => self._slotChildren);
+          const props = Object.assign({}, self._props, eventProxies);
+          return h(componentObj, props, () => self._slotChildren);
         },
         mounted() {
           self._mounted = true;
