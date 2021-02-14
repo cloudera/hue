@@ -23,7 +23,11 @@
     </div>
     <ul>
       <li v-for="(childItem, index) in children" :key="index">
-        <BaseNavigationItem v-if="childItem.type === 'navigation'" :item="childItem" @click="hideDrawer">
+        <BaseNavigationItem
+          v-if="childItem.type === 'navigation'"
+          :item="childItem"
+          @click="hideDrawer"
+        >
           {{ childItem.displayName }}
         </BaseNavigationItem>
       </li>
@@ -51,11 +55,11 @@
     },
 
     setup(): {
-      hideDrawer?: () => void
+      hideDrawer?: () => void;
     } {
       return {
         hideDrawer: inject('hideDrawer')
-      }
+      };
     }
-  })
+  });
 </script>
