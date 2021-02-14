@@ -17,15 +17,15 @@
 -->
 
 <template>
-  <div class="er-diagram" ref="erd">
+  <div ref="erd" class="er-diagram">
     <div class="buttons-panel">
       <button class="btn btn-default btn-sm" title="Toggle Fullscreen" @click="toggleFS">
-        <expand-icon v-pre class="fa fa-expand" />
+        <expand-icon v-pre class="fa fa-expand">&#8203;</expand-icon>
       </button>
     </div>
 
     <div class="erd-scroll-panel">
-      <div class="erd-container" v-if="groups">
+      <div v-if="groups" class="erd-container">
         <div v-for="(group, index) in groups" :key="index" class="entity-group">
           <div v-for="entity in group" :key="entity.id" class="entity-container">
             <TableEntity
@@ -44,7 +44,7 @@
         </div>
 
         <!-- Relations -->
-        <svg class="erd-relations" v-if="relations">
+        <svg v-if="relations" class="erd-relations">
           <path
             v-for="(relation, index) in relations"
             :key="index"
@@ -59,7 +59,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, PropType, ref } from 'vue';
+  import { defineComponent, PropType } from 'vue';
 
   import { groupEntities } from './lib/processor';
   import { IEntity, IRelation } from './lib/interfaces';
@@ -84,9 +84,17 @@
     },
 
     props: {
-      entities: Object as PropType<IEntity[]>,
-      relations: Object as PropType<IRelation[]>,
+      entities: {
+        type: Object as PropType<IEntity[]>,
+        default: []
+      },
+      relations: {
+        type: Object as PropType<IRelation[]>,
+        default: []
+      }
     },
+
+    emits: ['toggle-fullscreen', 'entity-clicked'],
 
     setup() {
       return {
@@ -99,11 +107,22 @@
         if (this.entities && this.relations) {
           return groupEntities(this.entities, this.relations);
         }
+        return undefined;
       }
     },
 
+    updated(): void {
+      this.plotRelations();
+    },
+    mounted(): void {
+      this.plotRelations();
+    },
+
     methods: {
-      getSelectorPosition(selector: string, offset: IPos | undefined = undefined): IPos | undefined {
+      getSelectorPosition(
+        selector: string,
+        offset: IPos | undefined = undefined
+      ): IPos | undefined {
         const element = this.$el.querySelector(selector);
         if (element) {
           const rect = element.getBoundingClientRect();
@@ -154,19 +173,11 @@
 
       entityClicked(entity: IEntity): void {
         this.$emit('entity-clicked', entity);
-      },
-
-    },
-
-    updated(): void {
-      this.plotRelations();
-    },
-    mounted(): void {
-      this.plotRelations();
-    },
-  })
+      }
+    }
+  });
 </script>
 
 <style lang="scss">
-  @import "./er-diagram.scss";
+  @import './er-diagram.scss';
 </style>

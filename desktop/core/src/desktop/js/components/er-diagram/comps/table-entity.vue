@@ -59,14 +59,14 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent } from 'vue';
+  import { defineComponent, PropType } from 'vue';
 
   import { Table } from '../lib/entities';
 
   export default defineComponent({
     props: {
       entity: {
-        type: Table,
+        type: Object as PropType<Table>,
         required: true
       },
       maxColumns: {
@@ -75,18 +75,14 @@
       }
     },
 
+    emits: ['click', 'updated'],
+
     data(): {
-      maxCols: number
+      maxCols: number;
     } {
       return {
         maxCols: 0
       };
-    },
-
-    methods: {
-      expandColumns(): void {
-        this.maxCols = Number.MAX_SAFE_INTEGER;
-      }
     },
 
     created(): void {
@@ -95,10 +91,16 @@
 
     updated(): void {
       this.$emit('updated');
+    },
+
+    methods: {
+      expandColumns(): void {
+        this.maxCols = Number.MAX_SAFE_INTEGER;
+      }
     }
-  })
+  });
 </script>
 
 <style lang="scss">
-  @import "./table-entity.scss";
+  @import './table-entity.scss';
 </style>
