@@ -233,13 +233,13 @@
 
     data(): {
       sidebarItems: SidebarItem[];
-      activeItemName: string | null;
+      activeItemName: string;
       isCollapsed: boolean;
       drawerTopic: string | null;
     } {
       return {
         sidebarItems: [],
-        activeItemName: null,
+        activeItemName: '',
         isCollapsed: getFromLocalStorage('hue.sidebar.collapse', true),
         drawerTopic: null
       };
