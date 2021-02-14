@@ -17,7 +17,9 @@
 -->
 
 <template>
-  <div ref="root" class="snippet-code-resizer" @mousedown="start"><i class="fa fa-ellipsis-h" /></div>
+  <div ref="root" class="snippet-code-resizer" @mousedown="start">
+    <i class="fa fa-ellipsis-h" />
+  </div>
 </template>
 
 <script lang="ts">
@@ -38,31 +40,28 @@
         type: Object as PropType<Ace.Editor | null>,
         required: false,
         default: null
-      },
-
-      panelSelector: {
-        type: String,
-        required: false
       }
     },
 
     setup(): {
-        subTracker: SubscriptionTracker,
+      subTracker: SubscriptionTracker;
     } {
       return {
-        subTracker: new SubscriptionTracker(),
+        subTracker: new SubscriptionTracker()
       };
     },
 
-    data(thisComp): {
-      newHeight: number,
-      startHeight: number,
-      startY: number,
+    data(
+      thisComp
+    ): {
+      newHeight: number;
+      startHeight: number;
+      startY: number;
 
-      targetElement: HTMLElement | null,
+      targetElement: HTMLElement | null;
 
-      onMouseMove: (event: Event) => void,
-      onMouseUp: (event: Event) => void,
+      onMouseMove: (event: Event) => void;
+      onMouseUp: (event: Event) => void;
     } {
       return {
         newHeight: 0,
@@ -74,6 +73,12 @@
         onMouseMove: thisComp.drag.bind(this),
         onMouseUp: thisComp.stop.bind(this)
       };
+    },
+
+    unmounted(): void {
+      document.removeEventListener('mousemove', this.onMouseMove);
+      document.removeEventListener('mouseup', this.onMouseUp);
+      this.subTracker.dispose();
     },
 
     methods: {
@@ -89,7 +94,9 @@
       },
 
       findTarget(): void {
-        const contentPanel = (this.$refs.root as HTMLElement).closest<HTMLElement>(CONTENT_PANEL_SELECTOR);
+        const contentPanel = (this.$refs.root as HTMLElement).closest<HTMLElement>(
+          CONTENT_PANEL_SELECTOR
+        );
         if (contentPanel) {
           this.targetElement = contentPanel.querySelector<HTMLElement>(TARGET_ELEMENT_SELECTOR);
         }
@@ -122,12 +129,6 @@
         document.removeEventListener('mouseup', this.onMouseUp);
         localStorage.setItem(CUSTOM_HEIGHT_STORAGE_KEY, String(this.newHeight));
       }
-    },
-
-    unmounted(): void {
-      document.removeEventListener('mousemove', this.onMouseMove);
-      document.removeEventListener('mouseup', this.onMouseUp);
-      this.subTracker.dispose();
     }
   });
 </script>
