@@ -35,11 +35,14 @@
     },
 
     props: {
-      executableObservable: Object as PropType<KnockoutObservable<SqlExecutable | undefined>>
+      executableObservable: {
+        type: Object as PropType<KnockoutObservable<SqlExecutable | undefined>>,
+        default: undefined
+      }
     },
 
     setup(): {
-      subTracker: SubscriptionTracker
+      subTracker: SubscriptionTracker;
     } {
       return {
         subTracker: new SubscriptionTracker()
@@ -47,12 +50,12 @@
     },
 
     data(): {
-      initialized: Boolean,
-      executable: SqlExecutable | null,
+      initialized: boolean;
+      executable: SqlExecutable | null;
     } {
       return {
         initialized: false,
-        executable: null,
+        executable: null
       };
     },
 

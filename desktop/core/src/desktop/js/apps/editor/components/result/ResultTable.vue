@@ -72,11 +72,14 @@
     },
 
     props: {
-      executable: Object as PropType<Executable>
+      executable: {
+        type: Object as PropType<Executable>,
+        default: undefined
+      }
     },
 
     setup(): {
-      subTracker: SubscriptionTracker
+      subTracker: SubscriptionTracker;
     } {
       return {
         subTracker: new SubscriptionTracker()
@@ -84,19 +87,19 @@
     },
 
     data(): {
-      grayedOut: Boolean,
-      fetchedOnce: Boolean,
-      hasResultSet: Boolean,
-      streaming: Boolean,
-      hasMore: Boolean,
-      rows: ResultRow[],
-      meta: ResultMeta[],
+      grayedOut: boolean;
+      fetchedOnce: boolean;
+      hasResultSet: boolean;
+      streaming: boolean;
+      hasMore: boolean;
+      rows: ResultRow[];
+      meta: ResultMeta[];
 
-      status: ExecutionStatus | null,
-      type: ResultType,
-      images: [],
-      lastFetchedRows: ResultRow[],
-      lastRenderedResult?: ExecutionResult,
+      status: ExecutionStatus | null;
+      type: ResultType;
+      images: [];
+      lastFetchedRows: ResultRow[];
+      lastRenderedResult?: ExecutionResult;
     } {
       return {
         grayedOut: false,
@@ -110,12 +113,12 @@
         status: null,
         type: ResultType.Table,
         images: [],
-        lastFetchedRows: [],
+        lastFetchedRows: []
       };
     },
 
     computed: {
-      hasEmptyResult(): Boolean {
+      hasEmptyResult(): boolean {
         return (
           !this.rows.length &&
           this.hasResultSet &&
@@ -152,6 +155,30 @@
           htmlValue: true
         }));
       }
+    },
+
+    watch: {
+      executable(): void {
+        this.handleResultChange();
+      }
+    },
+
+    mounted(): void {
+      this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, (executable: Executable) => {
+        if (this.executable === executable) {
+          this.updateFromExecutable(executable);
+        }
+      });
+
+      this.subTracker.subscribe(RESULT_UPDATED_EVENT, (executionResult: ExecutionResult) => {
+        if (this.executable === executionResult.executable) {
+          this.handleResultChange();
+        }
+      });
+    },
+
+    unmounted(): void {
+      this.subTracker.dispose();
     },
 
     methods: {
@@ -226,30 +253,6 @@
           this.lastFetchedRows = executionResult.lastRows;
         }
       }
-    },
-
-    watch: {
-      executable(): void {
-        this.handleResultChange();
-      }
-    },
-
-    mounted(): void {
-      this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, (executable: Executable) => {
-        if (this.executable === executable) {
-          this.updateFromExecutable(executable);
-        }
-      });
-
-      this.subTracker.subscribe(RESULT_UPDATED_EVENT, (executionResult: ExecutionResult) => {
-        if (this.executable === executionResult.executable) {
-          this.handleResultChange();
-        }
-      });
-    },
-
-    unmounted(): void {
-      this.subTracker.dispose();
     }
   });
 </script>
