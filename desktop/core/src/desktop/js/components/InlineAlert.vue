@@ -87,30 +87,38 @@
         default: AlertType.Unknown
       },
 
-      message: String,
-      details: String,
+      message: {
+        type: String,
+        default: undefined
+      },
+      details: {
+        type: String,
+        default: undefined
+      },
 
       showClose: Boolean
     },
 
+    emits: ['close'],
+
     data(): {
-      showDetails: Boolean,
+      showDetails: boolean;
     } {
       return {
         showDetails: false
       };
     },
 
-    methods: {
-      I18n
-    },
-
     computed: {
       definition(): AlertDef {
         return TYPE_DEFS.get(this.type) || UNKNOWN_DEF;
       }
+    },
+
+    methods: {
+      I18n
     }
-  })
+  });
 </script>
 
 <style lang="scss" scoped>
