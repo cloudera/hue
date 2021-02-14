@@ -90,16 +90,16 @@
     },
 
     data(): {
-      loading: boolean,
-      comment: string | null,
-      loadTimeout: number,
-      commentPromise: CancellablePromise<string> | null
+      loading: boolean;
+      comment: string | null;
+      loadTimeout: number;
+      commentPromise: CancellablePromise<string> | null;
     } {
       return {
         loading: false,
         comment: null,
         loadTimeout: -1,
-        commentPromise: null,
+        commentPromise: null
       };
     },
 
@@ -117,10 +117,6 @@
       }
     },
 
-    methods: {
-      I18n
-    },
-
     mounted(): void {
       if (this.details.hasResolvedComment()) {
         this.comment = this.details.getResolvedComment();
@@ -128,12 +124,13 @@
         this.loading = true;
         this.loadTimeout = window.setTimeout(() => {
           this.commentPromise = this.details.getComment({ silenceErrors: true, cancellable: true });
-          this.commentPromise.then((comment: string) => {
-            this.comment = comment;
-          })
-          .finally(() => {
-            this.loading = false;
-          });
+          this.commentPromise
+            .then((comment: string) => {
+              this.comment = comment;
+            })
+            .finally(() => {
+              this.loading = false;
+            });
         }, COMMENT_LOAD_DELAY);
       }
     },
@@ -143,6 +140,10 @@
       if (this.commentPromise) {
         this.commentPromise.cancel();
       }
+    },
+
+    methods: {
+      I18n
     }
   });
 </script>
