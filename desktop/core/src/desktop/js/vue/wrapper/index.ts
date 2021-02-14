@@ -47,10 +47,7 @@ import {
  * @param component: Component - Component object created using Vue's defineComponent function
  * @param eventNames: string[] - Event names to be fired in kabab case. Events must be added using addEventListener, inline events doesnt work as of now.
  */
-export default function wrap(
-  component: Component,
-  eventNames: string[] = []
-): CustomElementConstructor {
+export default function wrap(component: Component): CustomElementConstructor {
   const componentObj: ComponentOptionsWithObjectProps = <ComponentOptionsWithObjectProps>component;
 
   let isInitialized = false;
@@ -91,7 +88,7 @@ export default function wrap(
     constructor() {
       super();
 
-      const eventProxies = this.createEventProxies(eventNames);
+      const eventProxies = this.createEventProxies(<string[]>componentObj.emits);
 
       this._props = {};
       this._slotChildren = [];
@@ -140,15 +137,19 @@ export default function wrap(
       });
     }
 
-    createEventProxies(eventNames: string[]): { [name: string]: (...args: unknown[]) => void } {
+    createEventProxies(
+      eventNames: string[] | undefined
+    ): { [name: string]: (...args: unknown[]) => void } {
       const eventProxies: { [name: string]: (...args: unknown[]) => void } = {};
 
-      eventNames.forEach(name => {
-        const handlerName = toHandlerKey(camelize(name));
-        eventProxies[handlerName] = (...args: unknown[]): void => {
-          this.dispatchEvent(createCustomEvent(name, args));
-        };
-      });
+      if (eventNames) {
+        eventNames.forEach(name => {
+          const handlerName = toHandlerKey(camelize(name));
+          eventProxies[handlerName] = (...args: unknown[]): void => {
+            this.dispatchEvent(createCustomEvent(name, args));
+          };
+        });
+      }
 
       return eventProxies;
     }
@@ -158,7 +159,7 @@ export default function wrap(
       let value = undefined;
 
       if (this.hasOwnProperty(key)) {
-        value = this[key];
+        value = (<KeyHash>this)[key];
       } else if (this.hasAttribute(key)) {
         value = this.getAttribute(key);
       }
