@@ -62,6 +62,16 @@
       }
     },
 
+    watch: {
+      async value(): Promise<void> {
+        this.renderAce();
+      }
+    },
+
+    mounted(): void {
+      this.renderAce();
+    },
+
     methods: {
       async renderAce(): Promise<void> {
         if (!this.value) {
@@ -141,7 +151,11 @@
           const tokens = tok.getLineTokens(line);
 
           if (tokens && tokens.tokens.length) {
-            renderSimpleLine(new Text(document.createElement('div')), renderedTokens, tokens.tokens);
+            renderSimpleLine(
+              new Text(document.createElement('div')),
+              renderedTokens,
+              tokens.tokens
+            );
           }
 
           res.push(
@@ -165,20 +179,9 @@
           $(this.$el).css({ overflow: 'auto' });
         }
         $(this.$el).find('.ace_invisible_space').remove();
-
       }
-    },
-
-    watch: {
-      async value(): Promise<void> {
-        this.renderAce();
-      }
-    },
-
-    mounted(): void {
-      this.renderAce();
     }
-  })
+  });
 </script>
 
 <style lang="scss" scoped></style>
