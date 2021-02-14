@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, PropType, inject } from 'vue';
+  import { defineComponent } from 'vue';
   import {
     HelpDrawerItem,
     SidebarAccordionItem,
@@ -184,17 +184,34 @@
       Sidebar
     },
 
+    provide(): {
+      selectedItemChanged: (itemName: string) => void;
+    } {
+      return {
+        selectedItemChanged: (itemName: string): void => {
+          if (
+            itemName !== 'user' &&
+            itemName !== 'help' &&
+            itemName !== 'sidebar-collapse-btn' &&
+            this.activeItemName !== itemName
+          ) {
+            this.activeItemName = itemName;
+          }
+        }
+      };
+    },
+
     setup(): {
-        userDrawerItem: UserDrawerItem,
-        userDrawerChildren: SidebarAccordionSubItem[],
+      userDrawerItem: UserDrawerItem;
+      userDrawerChildren: SidebarAccordionSubItem[];
 
-        helpDrawerItem: HelpDrawerItem,
-        helpDrawerChildren: SidebarAccordionSubItem[],
+      helpDrawerItem: HelpDrawerItem;
+      helpDrawerChildren: SidebarAccordionSubItem[];
 
-        lastEditorDatabase?: EditorDatabaseDetails,
-        lastAssistDatabase?: AssistDatabaseDetails,
+      lastEditorDatabase?: EditorDatabaseDetails;
+      lastAssistDatabase?: AssistDatabaseDetails;
 
-        subTracker: SubscriptionTracker
+      subTracker: SubscriptionTracker;
     } {
       return {
         userDrawerItem: {
@@ -215,17 +232,16 @@
     },
 
     data(): {
-        sidebarItems: SidebarItem[],
-        activeItemName: string | null,
-        isCollapsed: boolean,
-        drawerTopic: string | null,
-
+      sidebarItems: SidebarItem[];
+      activeItemName: string | null;
+      isCollapsed: boolean;
+      drawerTopic: string | null;
     } {
       return {
         sidebarItems: [],
         activeItemName: null,
         isCollapsed: getFromLocalStorage('hue.sidebar.collapse', true),
-        drawerTopic: null,
+        drawerTopic: null
       };
     },
 
@@ -249,6 +265,10 @@
 
       this.subTracker.subscribe('set.current.app.name', this.currentAppChanged.bind(this));
       huePubSub.publish('get.current.app.name', this.currentAppChanged.bind(this));
+    },
+
+    unmounted(): void {
+      this.subTracker.dispose();
     },
 
     methods: {
@@ -328,7 +348,9 @@
           return;
         }
 
-        const findInside = (items: (SidebarItem | SidebarAccordionSubItem)[]): string | undefined => {
+        const findInside = (
+          items: (SidebarItem | SidebarAccordionSubItem)[]
+        ): string | undefined => {
           let found: string | undefined = undefined;
           items.some(item => {
             if ((<SidebarAccordionItem>item).children) {
@@ -357,75 +379,77 @@
           const appsItems: SidebarItem[] = [];
           const appConfig = clusterConfig.app_config;
 
-          [AppType.editor, AppType.dashboard, AppType.scheduler, AppType.sdkapps].forEach(appName => {
-            const config = appConfig[appName];
+          [AppType.editor, AppType.dashboard, AppType.scheduler, AppType.sdkapps].forEach(
+            appName => {
+              const config = appConfig[appName];
 
-            if ((<hueWindow>window).CUSTOM_DASHBOARD_URL && appName === 'dashboard') {
-              appsItems.push({
-                type: 'navigation',
-                name: 'dashboard',
-                displayName: I18n('Dashboard'),
-                iconHtml: getIconHtml('dashboard'),
-                handler: () => {
-                  window.open((<hueWindow>window).CUSTOM_DASHBOARD_URL, '_blank');
-                }
-              });
-              return;
-            }
-            if (config && config.interpreters.length) {
-              if (config.interpreters.length === 1) {
+              if ((<hueWindow>window).CUSTOM_DASHBOARD_URL && appName === 'dashboard') {
                 appsItems.push({
                   type: 'navigation',
-                  name: `${appName}-${config.name}`,
-                  displayName: config.displayName,
-                  iconHtml: getIconHtml(config.name),
-                  url: config.page,
-                  handler: (event: Event) => onHueLinkClick(event, <string>config.page)
-                });
-              } else {
-                const subApps: SidebarAccordionSubItem[] = [];
-                config.interpreters.forEach(interpreter => {
-                  const interpreterItem: SidebarAccordionSubItem = {
-                    type: 'navigation',
-                    name: `${appName}-${interpreter.type}`,
-                    displayName: interpreter.displayName,
-                    url: interpreter.page,
-                    handler: (event: Event) => onHueLinkClick(event, interpreter.page)
-                  };
-                  if (favourite && favourite.page === interpreter.page) {
-                    // Put the favourite on top
-                    subApps.unshift(interpreterItem);
-                  } else {
-                    subApps.push(interpreterItem);
+                  name: 'dashboard',
+                  displayName: I18n('Dashboard'),
+                  iconHtml: getIconHtml('dashboard'),
+                  handler: () => {
+                    window.open((<hueWindow>window).CUSTOM_DASHBOARD_URL, '_blank');
                   }
                 });
-
-                if (appName === 'editor' && (<hueWindow>window).SHOW_ADD_MORE_EDITORS) {
-                  subApps.push({ type: 'spacer' });
-                  const url = (<hueWindow>window).HAS_CONNECTORS
-                    ? '/desktop/connectors'
-                    : 'https://docs.gethue.com/administrator/configuration/connectors/';
-                  subApps.push({
+                return;
+              }
+              if (config && config.interpreters.length) {
+                if (config.interpreters.length === 1) {
+                  appsItems.push({
                     type: 'navigation',
-                    name: 'editor-AddMoreInterpreters',
-                    displayName: I18n('Edit list...'),
-                    url,
-                    handler: (event: Event) => onHueLinkClick(event, url)
+                    name: `${appName}-${config.name}`,
+                    displayName: config.displayName,
+                    iconHtml: getIconHtml(config.name),
+                    url: config.page,
+                    handler: (event: Event) => onHueLinkClick(event, <string>config.page)
+                  });
+                } else {
+                  const subApps: SidebarAccordionSubItem[] = [];
+                  config.interpreters.forEach(interpreter => {
+                    const interpreterItem: SidebarAccordionSubItem = {
+                      type: 'navigation',
+                      name: `${appName}-${interpreter.type}`,
+                      displayName: interpreter.displayName,
+                      url: interpreter.page,
+                      handler: (event: Event) => onHueLinkClick(event, interpreter.page)
+                    };
+                    if (favourite && favourite.page === interpreter.page) {
+                      // Put the favourite on top
+                      subApps.unshift(interpreterItem);
+                    } else {
+                      subApps.push(interpreterItem);
+                    }
+                  });
+
+                  if (appName === 'editor' && (<hueWindow>window).SHOW_ADD_MORE_EDITORS) {
+                    subApps.push({ type: 'spacer' });
+                    const url = (<hueWindow>window).HAS_CONNECTORS
+                      ? '/desktop/connectors'
+                      : 'https://docs.gethue.com/administrator/configuration/connectors/';
+                    subApps.push({
+                      type: 'navigation',
+                      name: 'editor-AddMoreInterpreters',
+                      displayName: I18n('Edit list...'),
+                      url,
+                      handler: (event: Event) => onHueLinkClick(event, url)
+                    });
+                  }
+                  const mainUrl = (<SidebarNavigationItem>subApps[0]).url || config.page || '/';
+                  appsItems.push({
+                    type: 'accordion',
+                    name: config.name,
+                    displayName: config.displayName,
+                    url: mainUrl,
+                    handler: (event: Event) => onHueLinkClick(event, mainUrl),
+                    iconHtml: getIconHtml(config.name),
+                    children: subApps
                   });
                 }
-                const mainUrl = (<SidebarNavigationItem>subApps[0]).url || config.page || '/';
-                appsItems.push({
-                  type: 'accordion',
-                  name: config.name,
-                  displayName: config.displayName,
-                  url: mainUrl,
-                  handler: (event: Event) => onHueLinkClick(event, mainUrl),
-                  iconHtml: getIconHtml(config.name),
-                  children: subApps
-                });
               }
             }
-          });
+          );
 
           items.push(...appsItems);
 
@@ -487,32 +511,11 @@
             huePubSub.publish('get.current.app.name', this.currentAppChanged.bind(this));
           }
         }
-      },
-    },
-
-    unmounted(): void {
-      this.subTracker.dispose();
-    },
-
-    provide(): {
-      selectedItemChanged: (itemName: string) => void
-    } {
-      return {
-        selectedItemChanged: (itemName: string): void => {
-          if (
-            itemName !== 'user' &&
-            itemName !== 'help' &&
-            itemName !== 'sidebar-collapse-btn' &&
-            this.activeItemName !== itemName
-          ) {
-            this.activeItemName = itemName;
-          }
-        }
-      };
+      }
     }
-  })
+  });
 </script>
 
 <style lang="scss">
-  @import "./hueSidebar.scss";
+  @import './hueSidebar.scss';
 </style>
