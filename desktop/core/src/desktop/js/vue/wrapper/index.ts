@@ -17,9 +17,17 @@
 /**
  * Port of https://github.com/vuejs/vue-web-component-wrapper/blob/master/src/index.js for Vue 3 support
  * To remove once @vuejs/vue-web-component-wrapper starts supporting Vue 3 - https://github.com/vuejs/vue-web-component-wrapper/issues/93
-*/
+ */
 
-import { Component, h, createApp, App, ComponentPublicInstance, VNode, ComponentOptionsWithObjectProps } from 'vue';
+import {
+  Component,
+  h,
+  createApp,
+  App,
+  ComponentPublicInstance,
+  VNode,
+  ComponentOptionsWithObjectProps
+} from 'vue';
 
 import { toHandlerKey } from '@vue/shared';
 
@@ -32,38 +40,42 @@ import {
   setInitialProps,
   createCustomEvent,
   convertAttributeValue
-} from './utils'
+} from './utils';
 
 /**
  * Vue 3 wrapper to convert a Vue component into Web Component. Supports reactive attributes, events & slots.
  * @param component: Component - Component object created using Vue's defineComponent function
  * @param eventNames: string[] - Event names to be fired in kabab case. Events must be added using addEventListener, inline events doesnt work as of now.
-*/
-export default function wrap (component: Component, eventNames: string[] = []) {
-
+ */
+export default function wrap(
+  component: Component,
+  eventNames: string[] = []
+): CustomElementConstructor {
   const componentObj: ComponentOptionsWithObjectProps = <ComponentOptionsWithObjectProps>component;
 
   let isInitialized = false;
 
   let hyphenatedPropsList: string[];
-  let camelizedPropsList: string [];
+  let camelizedPropsList: string[];
   let camelizedPropsMap: KeyHash;
 
-  function initialize () {
-    if (isInitialized) return;
+  function initialize() {
+    if (isInitialized) {
+      return;
+    }
 
     // extract props info
     const propsList: string[] = Array.isArray(componentObj.props)
       ? componentObj.props
-      : Object.keys(componentObj.props || {})
-    hyphenatedPropsList = propsList.map(hyphenate)
-    camelizedPropsList = propsList.map(camelize)
+      : Object.keys(componentObj.props || {});
+    hyphenatedPropsList = propsList.map(hyphenate);
+    camelizedPropsList = propsList.map(camelize);
 
-    const originalPropsAsObject = Array.isArray(componentObj.props) ? {} : componentObj.props || {}
+    const originalPropsAsObject = Array.isArray(componentObj.props) ? {} : componentObj.props || {};
     camelizedPropsMap = camelizedPropsList.reduce((map: KeyHash, key, i) => {
-      map[key] = originalPropsAsObject[propsList[i]]
-      return map
-    }, {})
+      map[key] = originalPropsAsObject[propsList[i]];
+      return map;
+    }, {});
 
     isInitialized = true;
   }
@@ -74,20 +86,20 @@ export default function wrap (component: Component, eventNames: string[] = []) {
 
     _props!: KeyHash;
     _slotChildren!: (VNode | null)[];
-    _emit!: Function;
-    _mounted: boolean = false;
+    _mounted = false;
 
-    constructor () {
-      super()
+    constructor() {
+      super();
 
       const eventProxies = this.createEventProxies(eventNames);
 
       this._props = {};
       this._slotChildren = [];
 
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       const self = this;
       this._wrapper = createApp({
-        render () {
+        render() {
           const props = Object.assign({}, self._props, eventProxies);
           return h(componentObj, props, () => self._slotChildren);
         },
@@ -104,10 +116,10 @@ export default function wrap (component: Component, eventNames: string[] = []) {
         let hasChildrenChange = false;
 
         for (let i = 0; i < mutations.length; i++) {
-          const m = mutations[i]
+          const m = mutations[i];
 
           if (isInitialized && m.type === 'attributes' && m.target === this) {
-            if(m.attributeName) {
+            if (m.attributeName) {
               this.syncAttribute(m.attributeName);
             }
           } else {
@@ -128,12 +140,12 @@ export default function wrap (component: Component, eventNames: string[] = []) {
       });
     }
 
-    createEventProxies(eventNames: string[]): { [name: string]: Function } {
-      const eventProxies: { [name: string]: Function } = {};
+    createEventProxies(eventNames: string[]): { [name: string]: (...args: unknown[]) => void } {
+      const eventProxies: { [name: string]: (...args: unknown[]) => void } = {};
 
       eventNames.forEach(name => {
-        let handlerName = toHandlerKey(camelize(name))
-        eventProxies[handlerName] = (...args: any[]): void => {
+        const handlerName = toHandlerKey(camelize(name));
+        eventProxies[handlerName] = (...args: unknown[]): void => {
           this.dispatchEvent(createCustomEvent(name, args));
         };
       });
@@ -145,11 +157,7 @@ export default function wrap (component: Component, eventNames: string[] = []) {
       const camelized = camelize(key);
       const value = this.hasAttribute(key) ? this.getAttribute(key) : undefined;
 
-      this._props[camelized] = convertAttributeValue(
-        value,
-        key,
-        camelizedPropsMap[camelized]
-      );
+      this._props[camelized] = convertAttributeValue(value, key, camelizedPropsMap[camelized]);
 
       this._component?.$forceUpdate();
     }
@@ -164,12 +172,11 @@ export default function wrap (component: Component, eventNames: string[] = []) {
 
       hyphenatedPropsList.forEach(key => {
         this.syncAttribute(key);
-      })
+      });
     }
 
-    connectedCallback () {
+    connectedCallback() {
       if (!this._component || !this._mounted) {
-
         if (isInitialized) {
           // initialize attributes
           this.syncInitialAttributes();
@@ -180,19 +187,18 @@ export default function wrap (component: Component, eventNames: string[] = []) {
 
         // Mount the component
         this._component = this._wrapper.mount(this);
-
       } else {
         // Call mounted on re-insert
-        callHooks(this._component, 'mounted')
+        callHooks(this._component, 'mounted');
       }
     }
 
-    disconnectedCallback () {
+    disconnectedCallback() {
       callHooks(this._component, 'unmounted');
     }
   }
 
   initialize();
 
-  return CustomElement
+  return CustomElement;
 }

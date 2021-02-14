@@ -21,9 +21,9 @@ export interface HueComponentOptions<T extends Component> extends ComponentOptio
   hueBaseUrl?: string;
 }
 
-const isRegistered = function(tag: string): boolean {
+const isRegistered = function (tag: string): boolean {
   return window.customElements.get(tag) !== undefined;
-}
+};
 
 export const wrap = <T extends Component>(
   tag: string,
@@ -31,7 +31,7 @@ export const wrap = <T extends Component>(
   options?: ElementDefinitionOptions,
   eventNames?: string[]
 ): void => {
-  if(!isRegistered(tag)) {
+  if (!isRegistered(tag)) {
     const customElement: CustomElementConstructor = wrapper(component, eventNames);
     window.customElements.define(tag, customElement, options);
   }
