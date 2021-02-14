@@ -26,8 +26,8 @@
   import { defineComponent, inject } from 'vue';
 
   export interface TabRef {
-    title: string,
-    isActive: boolean
+    title: string;
+    isActive: boolean;
   }
 
   export default defineComponent({
@@ -42,11 +42,13 @@
       }
     },
 
-    setup(props): {
-      addTab?: (tab: TabRef) => void,
-      removeTab?: (tab: TabRef) => void,
+    setup(
+      props
+    ): {
+      addTab?: (tab: TabRef) => void;
+      removeTab?: (tab: TabRef) => void;
 
-      def: TabRef,
+      def: TabRef;
     } {
       return {
         addTab: inject('addTab'),
@@ -55,12 +57,12 @@
         def: {
           title: props.title,
           isActive: false
-        },
+        }
       };
     },
 
     data(): {
-      rendered: boolean
+      rendered: boolean;
     } {
       return {
         rendered: false
@@ -69,8 +71,8 @@
 
     created() {
       this.$watch(
-        (): Boolean => this.def.isActive,
-        (isActive: Boolean): void => {
+        (): boolean => this.def.isActive,
+        (isActive: boolean): void => {
           if (isActive) {
             this.rendered = true;
           }
@@ -89,7 +91,7 @@
         this.removeTab(this.def);
       }
     }
-  })
+  });
 </script>
 
 <style lang="scss" scoped></style>

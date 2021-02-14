@@ -40,26 +40,9 @@
   import { TabRef } from './Tab.vue';
 
   export default defineComponent({
-
-    data(): {
-      tabs: TabRef[]
-    } {
-      return {
-        tabs: []
-      };
-    },
-
-    methods: {
-      selectTab(tab: TabRef): void {
-        this.tabs.forEach(other => {
-          other.isActive = other === tab;
-        });
-      }
-    },
-
     provide(): {
-      addTab: (tab: TabRef) => void,
-      removeTab: (tab: TabRef) => void
+      addTab: (tab: TabRef) => void;
+      removeTab: (tab: TabRef) => void;
     } {
       return {
         addTab: (tab: TabRef): void => {
@@ -79,8 +62,24 @@
           }
         }
       };
+    },
+
+    data(): {
+      tabs: TabRef[];
+    } {
+      return {
+        tabs: []
+      };
+    },
+
+    methods: {
+      selectTab(tab: TabRef): void {
+        this.tabs.forEach(other => {
+          other.isActive = other === tab;
+        });
+      }
     }
-  })
+  });
 </script>
 
 <style lang="scss" scoped>
