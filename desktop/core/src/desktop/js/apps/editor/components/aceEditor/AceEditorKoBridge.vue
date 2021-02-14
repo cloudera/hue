@@ -47,7 +47,9 @@
   import Executor from 'apps/editor/execution/executor';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import sqlParserRepository, { SqlParserRepository } from 'parse/sql/sqlParserRepository';
-  import sqlReferenceRepository, { SqlReferenceRepository } from 'sql/reference/sqlReferenceRepository';
+  import sqlReferenceRepository, {
+    SqlReferenceRepository
+  } from 'sql/reference/sqlReferenceRepository';
 
   const AceEditorKoBridge = defineComponent({
     components: {
@@ -55,26 +57,32 @@
     },
 
     props: {
-      executor: Object as PropType<Executor>,
+      executor: {
+        type: Object as PropType<Executor>,
+        default: undefined
+      },
       idObservable: {
         type: Object as PropType<KnockoutObservable<string | undefined>>,
-        required: false
+        default: undefined
       },
       valueObservable: {
         type: Object as PropType<KnockoutObservable<string | undefined>>,
-        required: false
+        default: undefined
       },
       cursorPositionObservable: {
         type: Object as PropType<KnockoutObservable<Ace.Position | undefined>>,
-        required: false
+        default: undefined
       },
-      aceOptions: Object as PropType<Ace.Options>
+      aceOptions: {
+        type: Object as PropType<Ace.Options>,
+        default: undefined
+      }
     },
 
     setup(): {
-      sqlParserProvider: SqlParserRepository,
-      sqlReferenceProvider: SqlReferenceRepository,
-      subTracker: SubscriptionTracker,
+      sqlParserProvider: SqlParserRepository;
+      sqlReferenceProvider: SqlReferenceRepository;
+      subTracker: SubscriptionTracker;
     } {
       return {
         sqlParserProvider: sqlParserRepository,
@@ -84,46 +92,23 @@
     },
 
     data(): {
-      cursorPosition?: Ace.Position,
-      editorId?: string,
-      initialized: boolean,
-      value?: string
+      cursorPosition?: Ace.Position;
+      editorId?: string;
+      initialized: boolean;
+      value?: string;
     } {
       return {
-        initialized: false,
+        initialized: false
       };
     },
 
-    methods: {
-      aceCreated(editor: Ace.Editor): void {
-        this.$el.dispatchEvent(new CustomEvent('ace-created', { bubbles: true, detail: editor }));
-      },
-
-      createNewDoc(): void {
-        this.$el.dispatchEvent(new CustomEvent('create-new-doc', { bubbles: true }));
-      },
-
-      cursorChanged(cursorPosition: Ace.Position): void {
-        this.$el.dispatchEvent(
-          new CustomEvent('cursor-changed', { bubbles: true, detail: cursorPosition })
-        );
-      },
-
-      saveDoc(): void {
-        this.$el.dispatchEvent(new CustomEvent('save-doc', { bubbles: true }));
-      },
-
-      togglePresentationMode(): void {
-        this.$el.dispatchEvent(new CustomEvent('toggle-presentation-mode', { bubbles: true }));
-      },
-
-      valueChanged(value: string): void {
-        this.$el.dispatchEvent(new CustomEvent('value-changed', { bubbles: true, detail: value }));
-      }
-    },
-
     updated(): void {
-      if (!this.initialized && this.valueObservable && this.idObservable && this.cursorPositionObservable) {
+      if (
+        !this.initialized &&
+        this.valueObservable &&
+        this.idObservable &&
+        this.cursorPositionObservable
+      ) {
         this.value = this.valueObservable();
         this.subTracker.subscribe(this.valueObservable, (value?: string) => {
           this.value = value;
@@ -154,6 +139,34 @@
 
     unmounted(): void {
       this.subTracker.dispose();
+    },
+
+    methods: {
+      aceCreated(editor: Ace.Editor): void {
+        this.$el.dispatchEvent(new CustomEvent('ace-created', { bubbles: true, detail: editor }));
+      },
+
+      createNewDoc(): void {
+        this.$el.dispatchEvent(new CustomEvent('create-new-doc', { bubbles: true }));
+      },
+
+      cursorChanged(cursorPosition: Ace.Position): void {
+        this.$el.dispatchEvent(
+          new CustomEvent('cursor-changed', { bubbles: true, detail: cursorPosition })
+        );
+      },
+
+      saveDoc(): void {
+        this.$el.dispatchEvent(new CustomEvent('save-doc', { bubbles: true }));
+      },
+
+      togglePresentationMode(): void {
+        this.$el.dispatchEvent(new CustomEvent('toggle-presentation-mode', { bubbles: true }));
+      },
+
+      valueChanged(value: string): void {
+        this.$el.dispatchEvent(new CustomEvent('value-changed', { bubbles: true, detail: value }));
+      }
     }
   });
 
