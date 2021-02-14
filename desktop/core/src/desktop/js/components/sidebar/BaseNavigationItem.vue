@@ -59,12 +59,14 @@
       }
     },
 
-    setup(props): {
-      selectedItemChanged?: (itemName: string) => void
+    emits: ['click'],
+
+    setup(): {
+      selectedItemChanged?: (itemName: string) => void;
     } {
       return {
         selectedItemChanged: inject('selectedItemChanged')
-      }
+      };
     },
 
     methods: {
@@ -78,5 +80,5 @@
         this.$emit('click');
       }
     }
-  })
+  });
 </script>

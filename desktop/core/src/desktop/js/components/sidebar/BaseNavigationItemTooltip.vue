@@ -35,6 +35,7 @@
         type: Boolean,
         default: false
       }
-    }
-  })
+    },
+    emits: ['click']
+  });
 </script>
