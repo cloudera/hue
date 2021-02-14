@@ -81,15 +81,14 @@
         required: false
       },
       activeItemName: {
-        type: Object as PropType<String | null>,
-        default: null,
-        required: false
-      },
+        type: String,
+        default: ''
+      }
     },
 
     data(): {
-      showOverflowIndicatorTop: Boolean,
-      showOverflowIndicatorBtm: Boolean
+      showOverflowIndicatorTop: boolean;
+      showOverflowIndicatorBtm: boolean;
     } {
       return {
         showOverflowIndicatorTop: false,
@@ -131,6 +130,5 @@
         }
       }
     }
-
-  })
+  });
 </script>
