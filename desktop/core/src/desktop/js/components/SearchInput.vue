@@ -68,11 +68,13 @@
       }
     },
 
+    emits: ['input', 'search'],
+
     data(): {
-      spin: boolean,
-      autocomplete: string,
-      throttle: number,
-      hasFocus: boolean
+      spin: boolean;
+      autocomplete: string;
+      throttle: number;
+      hasFocus: boolean;
     } {
       return {
         spin: false,
@@ -83,7 +85,7 @@
     }
 
     // TODO: Add autocomplete logic...
-  })
+  });
 </script>
 
 <style lang="scss" scoped>

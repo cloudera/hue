@@ -63,7 +63,7 @@
         return duration(this.value, this.short);
       }
     }
-  })
+  });
 </script>
 
 <style lang="scss" scoped></style>

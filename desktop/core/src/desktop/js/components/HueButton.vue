@@ -63,8 +63,10 @@
         type: Boolean,
         required: false
       }
-    }
-  })
+    },
+
+    emits: ['click']
+  });
 </script>
 
 <style lang="scss" scoped>

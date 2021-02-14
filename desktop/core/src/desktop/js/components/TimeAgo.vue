@@ -60,7 +60,7 @@
         return timeAgo(this.value);
       }
     }
-  })
+  });
 </script>
 
 <style lang="scss" scoped></style>

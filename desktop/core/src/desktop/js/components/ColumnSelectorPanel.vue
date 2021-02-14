@@ -61,11 +61,12 @@
         type: Object as PropType<Column<unknown>[]>,
         required: true
       }
-
     },
 
+    emits: ['update:visible-columns'],
+
     data(): {
-      filterText: string
+      filterText: string;
     } {
       return {
         filterText: ''
@@ -103,7 +104,7 @@
         );
       }
     }
-  })
+  });
 </script>
 
 <style lang="scss" scoped>

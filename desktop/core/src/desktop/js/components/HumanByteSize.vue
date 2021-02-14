@@ -40,10 +40,12 @@
     return `${unitValue} ${UNITS[unitIndex]}`;
   };
 
-  @Component
   export default defineComponent({
     props: {
-      value: Number
+      value: {
+        type: Number,
+        default: 0
+      }
     },
 
     computed: {
@@ -51,7 +53,7 @@
         return humanSize(this.value);
       }
     }
-  })
+  });
 </script>
 
 <style lang="scss" scoped></style>

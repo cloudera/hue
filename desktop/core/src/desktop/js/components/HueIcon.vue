@@ -38,7 +38,7 @@
         return '#' + this.type;
       }
     }
-  })
+  });
 </script>
 
 <style lang="scss" scoped>

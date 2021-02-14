@@ -60,7 +60,7 @@
         return lowerValue === 'started' || lowerValue === 'running';
       }
     }
-  })
+  });
 </script>
 
 <style lang="scss" scoped></style>

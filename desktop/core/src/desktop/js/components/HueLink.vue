@@ -33,8 +33,15 @@
     props: {
       url: {
         type: String,
-        required: false
+        required: false,
+        default: ''
       }
+    },
+
+    emits: ['click'],
+
+    created(): void {
+      delete this.$attrs.href;
     },
 
     methods: {
@@ -45,12 +52,8 @@
           this.$emit('click');
         }
       }
-    },
-
-    created(): void {
-      delete this.$attrs.href;
-    },
-  })
+    }
+  });
 </script>
 
 <style lang="scss" scoped></style>
