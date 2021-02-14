@@ -124,12 +124,15 @@
       },
       locations: {
         type: Object as PropType<IdentifierLocation[]>,
-        required: false
+        required: false,
+        default: undefined
       }
     },
 
+    emits: ['variables-changed'],
+
     data(): {
-      knownVariables: { [name: string]: KnownVariable }
+      knownVariables: { [name: string]: KnownVariable };
     } {
       return {
         knownVariables: {}
@@ -256,5 +259,5 @@
 </script>
 
 <style lang="scss">
-  @import "./VariableSubstitution.scss";
+  @import './VariableSubstitution.scss';
 </style>

@@ -42,11 +42,14 @@
     },
 
     props: {
-      initialVariables: Object as PropType<Variable[]>
+      initialVariables: {
+        type: Object as PropType<Variable[]>,
+        default: undefined
+      }
     },
 
     setup(): {
-      subTracker: SubscriptionTracker
+      subTracker: SubscriptionTracker;
     } {
       return {
         subTracker: new SubscriptionTracker()
@@ -54,19 +57,11 @@
     },
 
     data(): {
-      locations: IdentifierLocation[],
+      locations: IdentifierLocation[];
     } {
       return {
-        locations: [],
+        locations: []
       };
-    },
-
-    methods: {
-      onVariablesChanged(variables: Variable[]): void {
-        this.$el.dispatchEvent(
-          new CustomEvent<Variable[]>('variables-changed', { bubbles: true, detail: variables })
-        );
-      }
     },
 
     mounted(): void {
@@ -78,8 +73,15 @@
           }
         }
       );
-    }
+    },
 
+    methods: {
+      onVariablesChanged(variables: Variable[]): void {
+        this.$el.dispatchEvent(
+          new CustomEvent<Variable[]>('variables-changed', { bubbles: true, detail: variables })
+        );
+      }
+    }
   });
 
   export const COMPONENT_NAME = 'variable-substitution-ko-bridge';
