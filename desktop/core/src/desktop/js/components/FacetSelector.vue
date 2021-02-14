@@ -63,7 +63,7 @@
   import HueLink from './HueLink.vue';
   import { Facet, SearchFacet, FacetValueLabels } from './FacetSelector';
 
- export default defineComponent({
+  export default defineComponent({
     components: {
       DropdownPanel,
       HueButton,
@@ -97,11 +97,13 @@
       }
     },
 
-    data(props): {
-      selectedValues: string[],
-      previousSelection: string[],
+    emits: ['facet-removed', 'facet-changed'],
 
-      lastKnownValues?: string[]
+    data(): {
+      selectedValues: string[];
+      previousSelection: string[];
+
+      lastKnownValues?: string[];
     } {
       return {
         selectedValues: [],
@@ -143,6 +145,31 @@
       }
     },
 
+    created() {
+      this.$watch(
+        () => this.facet.values,
+        (): void => {
+          const newValues = this.facet.values.map(val => val.key);
+          if (!this.lastKnownValues) {
+            // Select all initially
+            this.selectedValues = newValues;
+            this.previousSelection = newValues;
+          } else {
+            // Keep previous selection on change
+            const selected = new Set(this.selectedValues);
+
+            // Select any new values that might have appeared
+            const oldValues = new Set(this.lastKnownValues);
+
+            this.selectedValues = newValues.filter(
+              newValue => selected.has(newValue) || !oldValues.has(newValue)
+            );
+          }
+          this.lastKnownValues = newValues;
+        }
+      );
+    },
+
     methods: {
       I18n,
       clear(): void {
@@ -167,33 +194,8 @@
         }
         closePanel();
       }
-    },
-
-    created() {
-      this.$watch(
-        () => this.facet.values,
-        (): void => {
-          const newValues = this.facet.values.map(val => val.key);
-          if (!this.lastKnownValues) {
-            // Select all initially
-            this.selectedValues = newValues;
-            this.previousSelection = newValues;
-          } else {
-            // Keep previous selection on change
-            const selected = new Set(this.selectedValues);
-
-            // Select any new values that might have appeared
-            const oldValues = new Set(this.lastKnownValues);
-
-            this.selectedValues = newValues.filter(
-              newValue => selected.has(newValue) || !oldValues.has(newValue)
-            );
-          }
-          this.lastKnownValues = newValues;
-      })
     }
-
-  })
+  });
 </script>
 
 <style lang="scss" scoped>
