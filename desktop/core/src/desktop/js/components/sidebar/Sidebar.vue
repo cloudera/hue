@@ -125,6 +125,8 @@
       SidebarBody
     },
 
+    emits: ["toggle-collapsed", "header-click"],
+
     props: {
       sidebarItems: {
         type: Object as PropType<SidebarItem[]>,
@@ -169,8 +171,6 @@
         default: null
       }
     },
-
-    emits: ["toggle-collapsed", "header-click"],
 
     data(props): {
       drawerTopicInternal: String | null
