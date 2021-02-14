@@ -25,7 +25,9 @@
 <script lang="ts">
   import { defineComponent } from 'vue';
 
-  export default defineComponent({});
+  export default defineComponent({
+    emits: ['click']
+  });
 </script>
 
 <style lang="scss" scoped></style>

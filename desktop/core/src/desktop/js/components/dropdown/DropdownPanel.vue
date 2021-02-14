@@ -85,10 +85,10 @@
     },
 
     data(): {
-      panelOpen: boolean,
+      panelOpen: boolean;
 
-      positionTop: boolean,
-      positionLeft: boolean,
+      positionTop: boolean;
+      positionLeft: boolean;
     } {
       return {
         panelOpen: false,
@@ -123,7 +123,7 @@
         }
       }
     }
-  })
+  });
 </script>
 
 <style lang="scss" scoped>
