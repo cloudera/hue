@@ -62,7 +62,10 @@
                 :style="{ 'background-color': suggestion.category.color }"
               />
               <matched-text :suggestion="suggestion" :filter="filter" />
-              <i v-if="suggestion.details && suggestion.details.hasOwnProperty('primary_key')" class="fa fa-key" />
+              <i
+                v-if="suggestion.details && suggestion.details.hasOwnProperty('primary_key')"
+                class="fa fa-key"
+              />
             </div>
             <div class="autocompleter-suggestion-meta">
               <i v-if="suggestion.popular" class="fa fa-star-o popular-color" />
@@ -155,7 +158,7 @@
     },
 
     setup(): {
-        subTracker: SubscriptionTracker
+      subTracker: SubscriptionTracker;
     } {
       return {
         subTracker: new SubscriptionTracker()
@@ -163,29 +166,29 @@
     },
 
     data(): {
-        startLayout: DOMRect | null,
-        startPixelRatio: number,
-        left: number,
-        top: number,
+      startLayout: DOMRect | null;
+      startPixelRatio: number;
+      left: number;
+      top: number;
 
-        loading: boolean,
-        active: boolean,
-        filter: string,
-        availableCategories: CategoryInfo[],
-        activeCategory: CategoryInfo,
-        selectedIndex: number | null,
-        hoveredIndex: number | null,
-        base: Ace.Anchor | null,
-        sortOverride?: SortOverride | null,
-        autocompleter?: SqlAutocompleter,
-        autocompleteResults?: AutocompleteResults,
-        suggestions: Suggestion[],
+      loading: boolean;
+      active: boolean;
+      filter: string;
+      availableCategories: CategoryInfo[];
+      activeCategory: CategoryInfo;
+      selectedIndex: number | null;
+      hoveredIndex: number | null;
+      base: Ace.Anchor | null;
+      sortOverride?: SortOverride | null;
+      autocompleter?: SqlAutocompleter;
+      autocompleteResults?: AutocompleteResults;
+      suggestions: Suggestion[];
 
-        reTriggerTimeout: number,
-        changeTimeout: number,
-        positionInterval: number,
-        keyboardHandler: Ace.HashHandler | null,
-        changeListener: (() => void) | null,
+      reTriggerTimeout: number;
+      changeTimeout: number;
+      positionInterval: number;
+      keyboardHandler: Ace.HashHandler | null;
+      changeListener: (() => void) | null;
     } {
       return {
         startLayout: null,
@@ -208,17 +211,19 @@
         changeTimeout: -1,
         positionInterval: -1,
         keyboardHandler: null,
-        changeListener: null,
+        changeListener: null
       };
     },
 
-    data(thisComp): {
-      mousedownListener: (e: Event) => void,
-      mousewheelListener: (e: Event) => void,
+    data(
+      thisComp
+    ): {
+      mousedownListener: (e: Event) => void;
+      mousewheelListener: (e: Event) => void;
     } {
       return {
         mousedownListener: thisComp.detach.bind(thisComp),
-        mousewheelListener: thisComp.closeOnScroll.bind(thisComp),
+        mousewheelListener: thisComp.closeOnScroll.bind(thisComp)
       };
     },
 
@@ -227,6 +232,7 @@
         if (this.executor) {
           return this.executor.connector();
         }
+        return undefined;
       },
 
       detailsComponent(): string | undefined {
@@ -236,6 +242,7 @@
           }
           return this.focusedEntry.category.detailsComponent;
         }
+        return undefined;
       },
 
       filtered(): Suggestion[] {
@@ -252,8 +259,10 @@
 
         const categories = extractCategories(result);
         if (categories.indexOf(this.activeCategory) === -1) {
+          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
           this.activeCategory = Category.All;
         }
+        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
         this.availableCategories = categories;
 
         const activeCategory = this.activeCategory;
@@ -280,6 +289,7 @@
         });
 
         sqlUtils.sortSuggestions(result, this.filter, this.sortOverride);
+        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
         this.sortOverride = undefined;
 
         return result;
@@ -298,8 +308,141 @@
 
       visible(): boolean {
         return this.active && (this.loading || !!this.filtered.length);
-      },
+      }
+    },
 
+    watch: {
+      filter(): void {
+        if (this.selectedIndex !== null) {
+          this.selectedIndex = 0;
+          const scrollDiv = <HTMLDivElement | undefined>this.$refs.entriesScrollDiv;
+          if (scrollDiv) {
+            scrollDiv.scrollTop = 0;
+          }
+        }
+      }
+    },
+
+    created(): void {
+      this.keyboardHandler = new HashHandler();
+      this.registerKeybindings(this.keyboardHandler);
+
+      this.changeListener = () => {
+        if (!this.autocompleteResults) {
+          return;
+        }
+        window.clearTimeout(this.changeTimeout);
+        const cursor = this.editor.selection.lead;
+        if (this.base && (cursor.row !== this.base.row || cursor.column < this.base.column)) {
+          this.detach();
+        } else {
+          this.changeTimeout = window.setTimeout(() => {
+            if (!this.autocompleteResults || !this.base) {
+              return;
+            }
+            const pos = this.editor.getCursorPosition();
+            if (this.active && this.autocompleter && this.autocompleter.onPartial) {
+              this.autocompleter.onPartial(
+                aceUtil.retrievePrecedingIdentifier(
+                  this.editor.session.getLine(pos.row),
+                  pos.column
+                )
+              );
+            }
+            this.updateFilter();
+            this.positionAutocompleteDropdown();
+
+            if (!this.filtered.length) {
+              this.detach();
+            }
+          }, 200);
+        }
+      };
+    },
+
+    mounted(): void {
+      this.autocompleter = new SqlAutocompleter({
+        editorId: this.editorId,
+        executor: this.executor,
+        editor: this.editor,
+        temporaryOnly: this.temporaryOnly,
+        autocompleteParser: this.autocompleteParser,
+        sqlReferenceProvider: this.sqlReferenceProvider
+      });
+
+      this.subTracker.addDisposable(this.autocompleter);
+
+      this.autocompleteResults = this.autocompleter.autocompleteResults;
+
+      const showAutocomplete = async () => {
+        // The autocomplete can be triggered right after insertion of a suggestion
+        // when live autocomplete is enabled, hence if already active we ignore.
+        if (this.active || !this.autocompleter) {
+          return;
+        }
+        const session = this.editor.getSession();
+        const pos = this.editor.getCursorPosition();
+        const line = session.getLine(pos.row);
+        const prefix = aceUtil.retrievePrecedingIdentifier(line, pos.column);
+        const newBase = session.doc.createAnchor(pos.row, pos.column - prefix.length);
+
+        if (!this.base || newBase.column !== this.base.column || newBase.row !== this.base.row) {
+          this.positionAutocompleteDropdown();
+          try {
+            this.loading = true;
+            const parseResult = await this.autocompleter.autocomplete();
+            if (hueDebug.showParseResult) {
+              // eslint-disable-next-line no-restricted-syntax
+              console.log(parseResult);
+            }
+
+            if (parseResult && this.autocompleteResults) {
+              this.suggestions = [];
+              this.autocompleteResults.update(parseResult, this.suggestions).finally(() => {
+                this.loading = false;
+              });
+
+              this.selectedIndex = 0;
+              newBase.$insertRight = true;
+              this.base = newBase;
+              if (this.autocompleteResults) {
+                this.filter = prefix;
+              }
+              this.active = true;
+              this.attach();
+            }
+          } catch (err) {
+            if (typeof console.warn !== 'undefined') {
+              console.warn(err);
+            }
+            this.detach();
+          }
+        }
+      };
+
+      this.editor.on('showAutocomplete', showAutocomplete);
+      const onHideAutocomplete = this.detach.bind(this);
+      this.editor.on('hideAutocomplete', onHideAutocomplete);
+      this.subTracker.subscribe('hue.ace.autocompleter.hide', onHideAutocomplete);
+
+      this.subTracker.addDisposable({
+        dispose: () => {
+          this.editor.off('showAutocomplete', showAutocomplete);
+          this.editor.off('hideAutocomplete', onHideAutocomplete);
+        }
+      });
+
+      this.subTracker.subscribe(
+        'editor.autocomplete.temporary.sort.override',
+        (sortOverride: SortOverride): void => {
+          this.sortOverride = sortOverride;
+        }
+      );
+    },
+
+    unmounted(): void {
+      this.disposeEventHandlers();
+      this.subTracker.dispose();
     },
 
     methods: {
@@ -357,7 +500,10 @@
             if (this.filtered.length <= 1) {
               this.detach();
               this.editor.execCommand('golinedown');
-            } else if (this.selectedIndex !== null && this.selectedIndex < this.filtered.length - 1) {
+            } else if (
+              this.selectedIndex !== null &&
+              this.selectedIndex < this.filtered.length - 1
+            ) {
               this.selectedIndex = this.selectedIndex + 1;
               this.hoveredIndex = null;
               this.scrollSelectionIntoView();
@@ -579,140 +725,6 @@
         this.editor.off('mousedown', this.mousedownListener);
         this.editor.off('mousewheel', this.mousewheelListener);
       }
-    },
-
-    watch: {
-      filter(): void {
-        if (this.selectedIndex !== null) {
-          this.selectedIndex = 0;
-          const scrollDiv = <HTMLDivElement | undefined>this.$refs.entriesScrollDiv;
-          if (scrollDiv) {
-            scrollDiv.scrollTop = 0;
-          }
-        }
-      }
-    },
-
-    created(): void {
-      this.keyboardHandler = new HashHandler();
-      this.registerKeybindings(this.keyboardHandler);
-
-      this.changeListener = () => {
-        if (!this.autocompleteResults) {
-          return;
-        }
-        window.clearTimeout(this.changeTimeout);
-        const cursor = this.editor.selection.lead;
-        if (this.base && (cursor.row !== this.base.row || cursor.column < this.base.column)) {
-          this.detach();
-        } else {
-          this.changeTimeout = window.setTimeout(() => {
-            if (!this.autocompleteResults || !this.base) {
-              return;
-            }
-            const pos = this.editor.getCursorPosition();
-            if (this.active && this.autocompleter && this.autocompleter.onPartial) {
-              this.autocompleter.onPartial(
-                aceUtil.retrievePrecedingIdentifier(
-                  this.editor.session.getLine(pos.row),
-                  pos.column
-                )
-              );
-            }
-            this.updateFilter();
-            this.positionAutocompleteDropdown();
-
-            if (!this.filtered.length) {
-              this.detach();
-            }
-          }, 200);
-        }
-      };
-    },
-
-    mounted(): void {
-      this.autocompleter = new SqlAutocompleter({
-        editorId: this.editorId,
-        executor: this.executor,
-        editor: this.editor,
-        temporaryOnly: this.temporaryOnly,
-        autocompleteParser: this.autocompleteParser,
-        sqlReferenceProvider: this.sqlReferenceProvider
-      });
-
-      this.subTracker.addDisposable(this.autocompleter);
-
-      this.autocompleteResults = this.autocompleter.autocompleteResults;
-
-      const showAutocomplete = async () => {
-        // The autocomplete can be triggered right after insertion of a suggestion
-        // when live autocomplete is enabled, hence if already active we ignore.
-        if (this.active || !this.autocompleter) {
-          return;
-        }
-        const session = this.editor.getSession();
-        const pos = this.editor.getCursorPosition();
-        const line = session.getLine(pos.row);
-        const prefix = aceUtil.retrievePrecedingIdentifier(line, pos.column);
-        const newBase = session.doc.createAnchor(pos.row, pos.column - prefix.length);
-
-        if (!this.base || newBase.column !== this.base.column || newBase.row !== this.base.row) {
-          this.positionAutocompleteDropdown();
-          try {
-            this.loading = true;
-            const parseResult = await this.autocompleter.autocomplete();
-            if (hueDebug.showParseResult) {
-              // eslint-disable-next-line no-restricted-syntax
-              console.log(parseResult);
-            }
-
-            if (parseResult && this.autocompleteResults) {
-              this.suggestions = [];
-              this.autocompleteResults.update(parseResult, this.suggestions).finally(() => {
-                this.loading = false;
-              });
-
-              this.selectedIndex = 0;
-              newBase.$insertRight = true;
-              this.base = newBase;
-              if (this.autocompleteResults) {
-                this.filter = prefix;
-              }
-              this.active = true;
-              this.attach();
-            }
-          } catch (err) {
-            if (typeof console.warn !== 'undefined') {
-              console.warn(err);
-            }
-            this.detach();
-          }
-        }
-      };
-
-      this.editor.on('showAutocomplete', showAutocomplete);
-      const onHideAutocomplete = this.detach.bind(this);
-      this.editor.on('hideAutocomplete', onHideAutocomplete);
-      this.subTracker.subscribe('hue.ace.autocompleter.hide', onHideAutocomplete);
-
-      this.subTracker.addDisposable({
-        dispose: () => {
-          this.editor.off('showAutocomplete', showAutocomplete);
-          this.editor.off('hideAutocomplete', onHideAutocomplete);
-        }
-      });
-
-      this.subTracker.subscribe(
-        'editor.autocomplete.temporary.sort.override',
-        (sortOverride: SortOverride): void => {
-          this.sortOverride = sortOverride;
-        }
-      );
-    },
-
-    unmounted(): void {
-      this.disposeEventHandlers();
-      this.subTracker.dispose();
     }
   });
 </script>
