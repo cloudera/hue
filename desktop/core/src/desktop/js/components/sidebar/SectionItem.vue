@@ -27,15 +27,18 @@
 
   export default defineComponent({
     props: {
-      activeItemName: Object as PropType<String | null>,
+      activeItemName: {
+        type: String,
+        default: ''
+      },
       isCollapsed: {
         type: Boolean,
         required: false
       },
       item: {
         type: Object as PropType<SidebarSectionItem>,
-        required: false
+        required: true
       }
     }
-  })
+  });
 </script>

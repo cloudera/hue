@@ -27,7 +27,11 @@
     </div>
     <ul>
       <li v-for="(childItem, index) in children" :key="index">
-        <BaseNavigationItem v-if="childItem.type === 'navigation'" :item="childItem" @click="hideDrawer">
+        <BaseNavigationItem
+          v-if="childItem.type === 'navigation'"
+          :item="childItem"
+          @click="hideDrawer"
+        >
           {{ childItem.displayName }}
         </BaseNavigationItem>
       </li>
@@ -51,12 +55,6 @@
 
     inject: ['hideDrawer'],
 
-    data(): {
-      hideDrawer?: () => void
-    } {
-      return {}
-    },
-
     props: {
       item: {
         type: Object as PropType<UserDrawerItem>,
@@ -69,6 +67,12 @@
       }
     },
 
+    data(): {
+      hideDrawer?: () => void;
+    } {
+      return {};
+    },
+
     computed: {
       logoutItem(): SidebarBaseItem {
         return {
@@ -77,6 +81,5 @@
         };
       }
     }
-
-  })
+  });
 </script>
