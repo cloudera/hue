@@ -24,13 +24,16 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, PropType } from 'vue';
+  import { defineComponent } from 'vue';
 
   import I18n from 'utils/i18n';
 
   export default defineComponent({
     props: {
-      logs: String,
+      logs: {
+        type: String,
+        default: undefined
+      },
       autoScroll: {
         type: Boolean,
         default: true
@@ -38,29 +41,13 @@
     },
 
     data(): {
-      ignoreNextScrollEvent: Boolean,
-      userScrolled: Boolean
+      ignoreNextScrollEvent: boolean;
+      userScrolled: boolean;
     } {
       return {
         ignoreNextScrollEvent: false,
         userScrolled: false
       };
-    },
-
-    methods: {
-      I18n,
-      onScroll(): void {
-        if (!this.autoScroll) {
-          return;
-        }
-        const containerEl = <HTMLDivElement>this.$refs.logsContainer;
-        if (!this.ignoreNextScrollEvent && containerEl) {
-          this.userScrolled =
-            containerEl &&
-            containerEl.scrollHeight - containerEl.clientHeight - containerEl.scrollTop > 10;
-        }
-        this.ignoreNextScrollEvent = false;
-      }
     },
 
     watch: {
@@ -78,8 +65,24 @@
           containerEl.scrollTop = containerEl.scrollHeight - containerEl.clientHeight;
         }
       }
+    },
+
+    methods: {
+      I18n,
+      onScroll(): void {
+        if (!this.autoScroll) {
+          return;
+        }
+        const containerEl = <HTMLDivElement>this.$refs.logsContainer;
+        if (!this.ignoreNextScrollEvent && containerEl) {
+          this.userScrolled =
+            containerEl &&
+            containerEl.scrollHeight - containerEl.clientHeight - containerEl.scrollTop > 10;
+        }
+        this.ignoreNextScrollEvent = false;
+      }
     }
-  })
+  });
 </script>
 
 <style lang="scss" scoped>
