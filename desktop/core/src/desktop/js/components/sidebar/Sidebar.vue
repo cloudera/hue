@@ -125,8 +125,6 @@
       SidebarBody
     },
 
-    emits: ["toggle-collapsed", "header-click"],
-
     props: {
       sidebarItems: {
         type: Object as PropType<SidebarItem[]>,
@@ -158,7 +156,7 @@
       },
 
       activeItemName: {
-        type: Object as PropType<string | null>,
+        type: String,
         required: true
       },
       isCollapsed: {
@@ -172,8 +170,12 @@
       }
     },
 
-    data(props): {
-      drawerTopicInternal: String | null
+    emits: ['toggle-collapsed', 'header-click'],
+
+    data(
+      props
+    ): {
+      drawerTopicInternal: string | null;
     } {
       return {
         drawerTopicInternal: props.drawerTopic
@@ -245,10 +247,10 @@
         }
       }
     }
-  })
+  });
 </script>
 
 <style lang="scss">
-  @import "./drawer.scss";
-  @import "./sidebar.scss";
+  @import './drawer.scss';
+  @import './sidebar.scss';
 </style>
