@@ -48,12 +48,14 @@
       }
     },
 
-    methods: { I18n },
-
     computed: {
       details(): SetDetails {
         return <SetDetails>this.suggestion.details;
       }
+    },
+
+    methods: {
+      I18n
     }
-  })
+  });
 </script>

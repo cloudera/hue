@@ -38,12 +38,11 @@
   import { Suggestion } from '../AutocompleteResults';
 
   export default defineComponent({
-
     props: {
       suggestion: {
         type: Object as PropType<Suggestion>,
         required: true
-      },
+      }
     },
 
     computed: {

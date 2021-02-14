@@ -49,9 +49,6 @@
     components: {
       SqlText
     },
-    methods: {
-      I18n
-    },
 
     props: {
       suggestion: {
@@ -60,8 +57,8 @@
       },
       connector: {
         type: Object as PropType<Connector>,
-        required: false
-      },
+        default: undefined
+      }
     },
 
     computed: {
@@ -79,7 +76,11 @@
 
       popularityTitle(): string {
         return `${I18n('Relative popularity')}: ${this.details.relativePopularity || '?'}%`;
-      },
+      }
+    },
+
+    methods: {
+      I18n
     }
   });
 </script>

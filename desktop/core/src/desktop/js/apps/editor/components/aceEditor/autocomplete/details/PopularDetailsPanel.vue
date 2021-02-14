@@ -57,8 +57,8 @@
       },
       connector: {
         type: Object as PropType<Connector>,
-        required: false
-      },
+        default: undefined
+      }
     },
 
     computed: {
