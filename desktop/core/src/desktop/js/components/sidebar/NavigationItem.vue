@@ -68,19 +68,22 @@
         type: Object as PropType<SidebarNavigationItem>,
         required: true
       },
-      activeItemName: Object as PropType<String | null>
+      activeItemName: {
+        type: String,
+        default: ''
+      }
     },
 
     setup(): {
-      subTracker: SubscriptionTracker,
+      subTracker: SubscriptionTracker;
     } {
       return {
-        subTracker: new SubscriptionTracker(),
+        subTracker: new SubscriptionTracker()
       };
     },
 
     data(): {
-      tooltip: DOMRect | null
+      tooltip: DOMRect | null;
     } {
       return {
         tooltip: null
@@ -88,9 +91,21 @@
     },
 
     computed: {
-      isActive(): Boolean {
+      isActive(): boolean {
         return this.item.name === this.activeItemName;
       }
+    },
+
+    mounted(): void {
+      if (this.$parent) {
+        this.subTracker.addEventListener(<HTMLElement>this.$parent.$el, 'scroll', () => {
+          this.tooltip = null;
+        });
+      }
+    },
+
+    unmounted(): void {
+      this.subTracker.dispose();
     },
 
     methods: {
@@ -104,18 +119,6 @@
       hideTooltip(): void {
         this.tooltip = null;
       }
-    },
-
-    mounted(): void {
-      if(this.$parent) {
-        this.subTracker.addEventListener(<HTMLElement>this.$parent.$el, 'scroll', () => {
-          this.tooltip = null;
-        });
-      }
-    },
-
-    unmounted(): void {
-      this.subTracker.dispose();
     }
-  })
+  });
 </script>
