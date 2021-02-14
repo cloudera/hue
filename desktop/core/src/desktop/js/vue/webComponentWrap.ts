@@ -28,11 +28,10 @@ const isRegistered = function (tag: string): boolean {
 export const wrap = <T extends Component>(
   tag: string,
   component: { new (): T },
-  options?: ElementDefinitionOptions,
-  eventNames?: string[]
+  options?: ElementDefinitionOptions
 ): void => {
   if (!isRegistered(tag)) {
-    const customElement: CustomElementConstructor = wrapper(component, eventNames);
+    const customElement: CustomElementConstructor = wrapper(component);
     window.customElements.define(tag, customElement, options);
   }
 };
