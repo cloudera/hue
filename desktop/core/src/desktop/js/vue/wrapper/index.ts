@@ -98,6 +98,7 @@ export default function wrap(component: Component): CustomElementConstructor {
       this._wrapper = createApp({
         render() {
           const props = Object.assign({}, self._props, eventProxies);
+          delete props.dataVApp;
           return h(componentObj, props, () => self._slotChildren);
         },
         mounted() {
