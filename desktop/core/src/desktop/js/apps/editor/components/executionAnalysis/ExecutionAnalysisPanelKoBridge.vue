@@ -35,11 +35,14 @@
     },
 
     props: {
-      executableObservable: Object as PropType<KnockoutObservable<SqlExecutable | undefined>>
+      executableObservable: {
+        type: Object as PropType<KnockoutObservable<SqlExecutable | undefined>>,
+        default: undefined
+      }
     },
 
     setup(): {
-      subTracker: SubscriptionTracker
+      subTracker: SubscriptionTracker;
     } {
       return {
         subTracker: new SubscriptionTracker()
@@ -47,19 +50,13 @@
     },
 
     data(): {
-      initialized: boolean,
-      executable: SqlExecutable | null,
+      initialized: boolean;
+      executable: SqlExecutable | null;
     } {
       return {
         initialized: false,
-        executable: null,
+        executable: null
       };
-    },
-
-    methods: {
-      onExecutionError(): void {
-        this.$el.dispatchEvent(new CustomEvent('execution-error', { bubbles: true }));
-      }
     },
 
     updated(): void {
@@ -74,6 +71,12 @@
 
     unmounted(): void {
       this.subTracker.dispose();
+    },
+
+    methods: {
+      onExecutionError(): void {
+        this.$el.dispatchEvent(new CustomEvent('execution-error', { bubbles: true }));
+      }
     }
   });
 

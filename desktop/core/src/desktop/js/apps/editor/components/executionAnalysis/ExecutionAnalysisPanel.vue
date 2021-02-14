@@ -70,11 +70,16 @@
     },
 
     props: {
-      executable: Object as PropType<Executable>
+      executable: {
+        type: Object as PropType<Executable>,
+        default: undefined
+      }
     },
 
+    emits: ['execution-error'],
+
     setup(): {
-      subTracker: SubscriptionTracker,
+      subTracker: SubscriptionTracker;
     } {
       return {
         subTracker: new SubscriptionTracker()
@@ -82,38 +87,17 @@
     },
 
     data(): {
-      logs: String,
-      jobs: ExecutionJob[],
-      errors: ExecutionError[],
-      notifiedErrors: boolean,
+      logs: string;
+      jobs: ExecutionJob[];
+      errors: ExecutionError[];
+      notifiedErrors: boolean;
     } {
       return {
         logs: '',
         jobs: [],
         errors: [],
-        notifiedErrors: false,
+        notifiedErrors: false
       };
-    },
-
-    methods: {
-      I18n,
-      updateFromExecutionLogs(executionLogs: ExecutionLogs): void {
-        if (this.executable === executionLogs.executable) {
-          this.logs = executionLogs.fullLog;
-          this.jobs = executionLogs.jobs;
-          this.errors = executionLogs.errors;
-        }
-      }
-    },
-
-    mounted(): void {
-      this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, (executable: Executable) => {
-        if (executable.logs) {
-          this.updateFromExecutionLogs(executable.logs);
-        }
-      });
-
-      this.subTracker.subscribe(LOGS_UPDATED_EVENT, this.updateFromExecutionLogs.bind(this));
     },
 
     computed: {
@@ -135,19 +119,40 @@
 
     watch: {
       errors(errors: ExecutionError[]): void {
-      if (errors.length && !this.notifiedErrors) {
-        this.$emit('execution-error');
+        if (errors.length && !this.notifiedErrors) {
+          this.$emit('execution-error');
+        }
+        this.notifiedErrors = !!errors.length;
       }
-      this.notifiedErrors = !!errors.length;
-    }
+    },
+
+    mounted(): void {
+      this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, (executable: Executable) => {
+        if (executable.logs) {
+          this.updateFromExecutionLogs(executable.logs);
+        }
+      });
+
+      this.subTracker.subscribe(LOGS_UPDATED_EVENT, this.updateFromExecutionLogs.bind(this));
     },
 
     unmounted(): void {
       this.subTracker.dispose();
     },
+
+    methods: {
+      I18n,
+      updateFromExecutionLogs(executionLogs: ExecutionLogs): void {
+        if (this.executable === executionLogs.executable) {
+          this.logs = executionLogs.fullLog;
+          this.jobs = executionLogs.jobs;
+          this.errors = executionLogs.errors;
+        }
+      }
+    }
   });
 </script>
 
 <style lang="scss">
-  @import "./ExecutionAnalysisPanel.scss";
+  @import './ExecutionAnalysisPanel.scss';
 </style>
