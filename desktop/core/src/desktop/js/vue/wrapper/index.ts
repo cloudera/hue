@@ -155,7 +155,13 @@ export default function wrap(
 
     syncAttribute(key: string): void {
       const camelized = camelize(key);
-      const value = this.hasAttribute(key) ? this.getAttribute(key) : undefined;
+      let value = undefined;
+
+      if (this.hasOwnProperty(key)) {
+        value = this[key];
+      } else if (this.hasAttribute(key)) {
+        value = this.getAttribute(key);
+      }
 
       this._props[camelized] = convertAttributeValue(value, key, camelizedPropsMap[camelized]);
 
