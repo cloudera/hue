@@ -51,19 +51,23 @@
         type: Object as PropType<Executor | null>,
         default: null
       },
+
       titleObservable: {
         type: Object as PropType<KnockoutObservable<string | undefined>>,
-        required: false
+        default: undefined
       },
       descriptionObservable: {
         type: Object as PropType<KnockoutObservable<string | undefined>>,
-        required: false
+        default: undefined
       },
-      initialVariables: Object as PropType<Variable[]>
+      initialVariables: {
+        type: Object as PropType<Variable[]>,
+        default: undefined
+      }
     },
 
     setup(): {
-        subTracker: SubscriptionTracker
+      subTracker: SubscriptionTracker;
     } {
       return {
         subTracker: new SubscriptionTracker()
@@ -71,12 +75,12 @@
     },
 
     data(): {
-        locations: IdentifierLocation[],
+      locations: IdentifierLocation[];
 
-        title: string | null,
-        description: string | null,
+      title: string | null;
+      description: string | null;
 
-        initialized: boolean,
+      initialized: boolean;
     } {
       return {
         locations: [],
@@ -84,33 +88,12 @@
         title: null,
         description: null,
 
-        initialized: false,
+        initialized: false
       };
-    },
-
-    methods: {
-      onBeforeExecute(executable: Executable): void {
-        this.$el.dispatchEvent(
-          new CustomEvent<Executable>('before-execute', { bubbles: true, detail: executable })
-        );
-      },
-
-      onClose(): void {
-        this.$el.dispatchEvent(
-          new CustomEvent<void>('close', { bubbles: true })
-        );
-      },
-
-      onVariablesChanged(variables: Variable[]): void {
-        this.$el.dispatchEvent(
-          new CustomEvent<Variable[]>('variables-changed', { bubbles: true, detail: variables })
-        );
-      }
     },
 
     updated(): void {
       if (!this.initialized && this.titleObservable && this.descriptionObservable) {
-
         this.title = this.titleObservable() || null;
         this.subTracker.subscribe(this.titleObservable, (title?: string) => {
           this.title = title || null;
@@ -136,6 +119,26 @@
 
     unmounted(): void {
       this.subTracker.dispose();
+    },
+
+    methods: {
+      onBeforeExecute(executable: Executable): void {
+        this.$el.dispatchEvent(
+          new CustomEvent<Executable>('before-execute', { bubbles: true, detail: executable })
+        );
+      },
+
+      onClose(): void {
+        this.$el.dispatchEvent(
+          new CustomEvent<void>('close', { bubbles: true })
+        );
+      },
+
+      onVariablesChanged(variables: Variable[]): void {
+        this.$el.dispatchEvent(
+          new CustomEvent<Variable[]>('variables-changed', { bubbles: true, detail: variables })
+        );
+      }
     }
   });
 

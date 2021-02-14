@@ -86,19 +86,22 @@
         type: Object as PropType<Executor>,
         required: true
       },
+
       title: {
         type: String,
-        required: false
+        default: undefined
       },
       description: {
         type: String,
-        required: false
+        default: undefined
       },
       locations: {
         type: Object as PropType<IdentifierLocation[]>,
-        required: false
+        default: undefined
       }
     },
+
+    emits: ['before-execute', 'variables-changed'],
 
     computed: {
       presentationStatements(): PresentationStatement[] {
@@ -129,6 +132,8 @@
 
       async beforeExecute(executable: SqlExecutable): Promise<void> {
         this.$emit('before-execute', executable);
+
+        // eslint-disable-next-line vue/no-mutating-props
         this.executor.activeExecutable = executable;
       },
 
@@ -140,5 +145,5 @@
 </script>
 
 <style lang="scss">
-  @import "./PresentationMode.scss";
+  @import './PresentationMode.scss';
 </style>
