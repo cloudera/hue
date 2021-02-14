@@ -435,6 +435,8 @@ export const fetchSample = ({
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const transformResponse = (response: unknown) => {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           return JSON.bigdataParse(response);
         };
         const resultPromise = post<SampleResponse>(
