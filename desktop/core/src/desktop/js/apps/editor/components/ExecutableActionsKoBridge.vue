@@ -39,34 +39,32 @@
     },
 
     props: {
-      executableObservable: Object as PropType<KnockoutObservable<SqlExecutable | undefined>>,
-      beforeExecute: Object as PropType<() => Promise<void>>
+      executableObservable: {
+        type: Object as PropType<KnockoutObservable<SqlExecutable | undefined>>,
+        default: undefined
+      },
+      beforeExecute: {
+        type: Object as PropType<() => Promise<void>>,
+        default: undefined
+      }
     },
 
     setup(): {
-      subTracker: SubscriptionTracker,
+      subTracker: SubscriptionTracker;
     } {
       return {
-        subTracker: new SubscriptionTracker(),
+        subTracker: new SubscriptionTracker()
       };
     },
 
     data(): {
-      initialized: boolean,
-      executable: SqlExecutable | null
+      initialized: boolean;
+      executable: SqlExecutable | null;
     } {
       return {
         initialized: false,
         executable: null
       };
-    },
-
-    methods: {
-      limitChanged(limit: number): void {
-        if (this.executable && this.executable.executor.defaultLimit) {
-          this.executable.executor.defaultLimit(limit);
-        }
-      }
     },
 
     updated(): void {
@@ -81,6 +79,14 @@
 
     unmounted(): void {
       this.subTracker.dispose();
+    },
+
+    methods: {
+      limitChanged(limit: number): void {
+        if (this.executable && this.executable.executor.defaultLimit) {
+          this.executable.executor.defaultLimit(limit);
+        }
+      }
     }
   });
 

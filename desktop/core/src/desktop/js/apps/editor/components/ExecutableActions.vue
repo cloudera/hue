@@ -94,26 +94,34 @@
     },
 
     props: {
-      executable: Object as PropType<SqlExecutable>,
-      beforeExecute: Object as PropType<(executable: Executable) => Promise<void>>
+      executable: {
+        type: Object as PropType<SqlExecutable>,
+        default: undefined
+      },
+      beforeExecute: {
+        type: Object as PropType<(executable: Executable) => Promise<void>>,
+        default: undefined
+      }
     },
 
+    emits: ['limit-changed'],
+
     setup(): {
-      subTracker: SubscriptionTracker,
+      subTracker: SubscriptionTracker;
     } {
       return {
-        subTracker: new SubscriptionTracker(),
+        subTracker: new SubscriptionTracker()
       };
     },
 
     data(): {
-      loadingSession: boolean,
-      lastSession: Session | null,
-      partOfRunningExecution: boolean,
-      limit: number | null,
-      stopping: boolean,
-      status: ExecutionStatus,
-      hasStatement: boolean
+      loadingSession: boolean;
+      lastSession: Session | null;
+      partOfRunningExecution: boolean;
+      limit: number | null;
+      stopping: boolean;
+      status: ExecutionStatus;
+      hasStatement: boolean;
     } {
       return {
         loadingSession: true,
@@ -154,6 +162,32 @@
       }
     },
 
+    watch: {
+      executable(): void {
+        if (this.executable) {
+          this.updateFromExecutable(this.executable);
+        }
+      }
+    },
+
+    mounted(): void {
+      this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
+        if (this.executable === executable) {
+          this.updateFromExecutable(executable);
+        }
+      });
+
+      this.subTracker.subscribe(EXECUTE_ACTIVE_EXECUTABLE_EVENT, executable => {
+        if (this.executable === executable) {
+          this.execute();
+        }
+      });
+    },
+
+    unmounted(): void {
+      this.subTracker.dispose();
+    },
+
     methods: {
       I18n,
 
@@ -186,7 +220,8 @@
           !executable.parsedStatement ||
           !WHITE_SPACE_REGEX.test(executable.parsedStatement.statement);
         this.partOfRunningExecution = executable.isPartOfRunningExecution();
-        this.limit = (executable.executor.defaultLimit && executable.executor.defaultLimit()) || null;
+        this.limit =
+          (executable.executor.defaultLimit && executable.executor.defaultLimit()) || null;
         if (waitForSession) {
           this.loadingSession = true;
           this.lastSession = null;
@@ -196,32 +231,6 @@
           });
         }
       }
-    },
-
-    watch: {
-      executable(): void {
-        if (this.executable) {
-          this.updateFromExecutable(this.executable);
-        }
-      }
-    },
-
-    mounted(): void {
-      this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
-        if (this.executable === executable) {
-          this.updateFromExecutable(executable);
-        }
-      });
-
-      this.subTracker.subscribe(EXECUTE_ACTIVE_EXECUTABLE_EVENT, executable => {
-        if (this.executable === executable) {
-          this.execute();
-        }
-      });
-    },
-
-    unmounted(): void {
-      this.subTracker.dispose();
     }
   });
 </script>
