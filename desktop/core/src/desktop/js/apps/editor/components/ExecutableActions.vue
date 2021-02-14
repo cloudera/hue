@@ -21,7 +21,7 @@
     <hue-button
       v-if="loadingSession"
       key="loading-button"
-      small="true"
+      :small="true"
       :disabled="disabled"
       :title="I18n('Creating session')"
     >
@@ -31,8 +31,8 @@
     <hue-button
       v-if="showExecute"
       key="execute-button"
-      small="true"
-      primary="true"
+      :small="true"
+      :primary="true"
       :disabled="disabled"
       @click="execute"
     >
@@ -42,7 +42,7 @@
     <hue-button
       v-if="showStop && !stopping"
       key="stop-button"
-      small="true"
+      :small="true"
       alert="true"
       @click="stop"
     >
@@ -172,6 +172,7 @@
 
     mounted(): void {
       this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
+        debugger;
         if (this.executable === executable) {
           this.updateFromExecutable(executable);
         }
