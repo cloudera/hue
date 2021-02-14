@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, PropType, ref } from 'vue';
+  import { defineComponent } from 'vue';
   import { Literal } from '../lib/entities';
 
   export default defineComponent({
@@ -36,10 +36,11 @@
         type: Literal,
         required: true
       }
-    }
-  })
+    },
+    emits: ['click']
+  });
 </script>
 
 <style lang="scss">
-  @import "./literal-entity.scss";
+  @import './literal-entity.scss';
 </style>
