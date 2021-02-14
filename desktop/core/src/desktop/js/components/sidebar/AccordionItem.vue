@@ -145,29 +145,32 @@
         required: true
       },
       isCollapsed: Boolean,
-      activeItemName: Object as PropType<String | null>
+      activeItemName: {
+        type: String,
+        default: ''
+      }
     },
 
     setup(): {
-      subTracker: SubscriptionTracker,
-      selectedItemChanged?: (itemName: string) => void
+      subTracker: SubscriptionTracker;
+      selectedItemChanged?: (itemName: string) => void;
     } {
       return {
         subTracker: new SubscriptionTracker(),
 
-        selectedItemChanged: inject("selectedItemChanged")
+        selectedItemChanged: inject('selectedItemChanged')
       };
     },
 
     data(): {
-      isOpen: Boolean,
-      isTooltipScrolled: Boolean,
-      tooltip: Tooltip | null,
+      isOpen: boolean;
+      isTooltipScrolled: boolean;
+      tooltip: Tooltip | null;
     } {
       return {
         isOpen: false,
         isTooltipScrolled: false,
-        tooltip: null,
+        tooltip: null
       };
     },
 
@@ -175,7 +178,9 @@
       isActive(): boolean {
         return (
           this.item.name === this.activeItemName ||
-          this.item.children.some(item => (<SidebarNavigationItem>item).name === this.activeItemName)
+          this.item.children.some(
+            item => (<SidebarNavigationItem>item).name === this.activeItemName
+          )
         );
       },
       isUserMenu(): boolean {
@@ -213,9 +218,25 @@
       }
     },
 
+    mounted(): void {
+      const containerEl = <HTMLElement>this.$refs.containerRef;
+      if (containerEl) {
+        const parent = containerEl.parentElement;
+        if (parent) {
+          this.subTracker.addEventListener(parent, 'scroll', () => {
+            this.tooltip = null;
+          });
+        }
+      }
+    },
+
+    unmounted(): void {
+      this.subTracker.dispose();
+    },
+
     methods: {
       getItemName(item: SidebarAccordionSubItem): string | undefined {
-        if(item.type === 'navigation') {
+        if (item.type === 'navigation') {
           return item.name;
         }
       },
@@ -293,24 +314,6 @@
           }
         }
       }
-
-    },
-
-    mounted(): void {
-      const containerEl = <HTMLElement>this.$refs.containerRef;
-      if (containerEl) {
-        const parent = containerEl.parentElement;
-        if (parent) {
-          this.subTracker.addEventListener(parent, 'scroll', () => {
-            this.tooltip = null;
-          });
-        }
-      }
-    },
-
-    unmounted(): void {
-      this.subTracker.dispose();
-    },
-
-  })
+    }
+  });
 </script>
