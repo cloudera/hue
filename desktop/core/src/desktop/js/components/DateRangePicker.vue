@@ -85,7 +85,6 @@
   import HueButton from './HueButton.vue';
   import I18n from '../utils/i18n';
   import DropdownPanel from './dropdown/DropdownPanel.vue';
-import { bool } from 'ext/ace/worker-javascript';
 
   const SECOND = 1000;
   const MINUTE = 60 * SECOND;
@@ -154,10 +153,12 @@ import { bool } from 'ext/ace/worker-javascript';
       }
     },
 
-    setup(): {
-      rangeSets: Range[][],
+    emits: ['date-range-changed'],
 
-      customRange: Range
+    setup(): {
+      rangeSets: Range[][];
+
+      customRange: Range;
     } {
       return {
         rangeSets: RANGE_SETS,
@@ -172,10 +173,10 @@ import { bool } from 'ext/ace/worker-javascript';
     },
 
     data(): {
-      selectedRange: Range,
+      selectedRange: Range;
     } {
       return {
-        selectedRange: DEFAULT_RANGE,
+        selectedRange: DEFAULT_RANGE
       };
     },
 
@@ -184,12 +185,14 @@ import { bool } from 'ext/ace/worker-javascript';
         if (this.selectedRange.custom) {
           return this.selectedRange.from;
         }
+        return undefined;
       },
 
       customTo(): number | undefined {
         if (this.selectedRange.custom) {
           return this.selectedRange.to;
         }
+        return undefined;
       }
     },
 
@@ -249,7 +252,7 @@ import { bool } from 'ext/ace/worker-javascript';
         closePanel();
       }
     }
-  })
+  });
 </script>
 
 <style lang="scss" scoped>
