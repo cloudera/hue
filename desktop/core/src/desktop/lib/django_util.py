@@ -31,7 +31,7 @@ from django.template.context_processors import csrf
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.http import QueryDict, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response as django_render_to_response
+from django.shortcuts import render as django_render
 from django.template.context import RequestContext
 from django.template.loader import render_to_string as django_render_to_string
 from django.urls import reverse
@@ -150,7 +150,7 @@ def _render_to_response(template, request, *args, **kwargs):
   template_lib = _get_template_lib(template, kwargs)
   if template_lib == DJANGO:
     kwargs.update(csrf(request))
-    return django_render_to_response(template, *args, **kwargs)
+    return django_render(request, template, *args, **kwargs)
   elif template_lib == MAKO:
     return django_mako.render_to_response(template, *args, **kwargs)
   else:
