@@ -62,11 +62,11 @@
 <!-- eslint-enable vue/no-v-html -->
 
 <script lang="ts">
-  import { defineComponent, PropType } from 'vue';
+  import { defineComponent, PropType, Component } from 'vue';
 
   import { Column, Row } from './HueTable';
 
-  export default <T>(): DefineComponent =>
+  export default <T>(): Component =>
     defineComponent({
       props: {
         rows: {
