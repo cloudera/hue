@@ -22,6 +22,12 @@ spec:
   - host: {{ .Values.ingress.domain }}
     http:
       paths:
+      {{ if .Values.hue.api.enabled }}
+      - backend:
+          serviceName: hue-api
+          servicePort: 8005
+        path: /api(.*)
+      {{- end -}}
       - backend:
           serviceName: hue-balancer
           servicePort: 80

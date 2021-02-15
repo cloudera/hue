@@ -1,0 +1,15 @@
+{{- if .Values.hue.api.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: hue-api
+  labels:
+    pod: hue-api
+spec:
+  selector:
+    pod: hue-api
+  ports:
+  - name: hue-api
+    port: 8005
+  type: NodePort
+{{- end -}}
