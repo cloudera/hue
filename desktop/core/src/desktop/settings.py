@@ -823,10 +823,8 @@ except ValueError:
 ################################################################
 # SLACK API Configurations
 ################################################################
-# Warning: Do not save your secrets here, instead export them as environment variables and read here
 
-# use your keys 
-SLACK_CLIENT_ID = ''
-SLACK_CLIENT_SECRET = ''
-SLACK_VERIFICATION_TOKEN = os.environ.get('SLACK_VERIFICATION_TOKEN')
-SLACK_BOT_USER_TOKEN = os.environ.get('SLACK_BOT_USER_TOKEN')
+SLACK_CLIENT_ID = desktop.conf.SLACK.SLACK_CLIENT_ID.get()
+SLACK_CLIENT_SECRET = desktop.conf.SLACK.SLACK_CLIENT_SECRET.get()
+SLACK_VERIFICATION_TOKEN = desktop.conf.SLACK.SLACK_VERIFICATION_TOKEN.get()
+SLACK_BOT_USER_TOKEN = desktop.conf.SLACK.SLACK_BOT_USER_TOKEN.get()
