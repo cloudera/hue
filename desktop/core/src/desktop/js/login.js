@@ -24,15 +24,14 @@ window.Dropzone = Dropzone;
 window.hueAnalytics = hueAnalytics;
 window.huePubSub = huePubSub;
 
-import Vue from 'vue';
+import { createApp } from 'vue';
 import TrademarkBanner from 'vue/components/login/TrademarkBanner.vue';
 
 window.addEventListener('DOMContentLoaded', () => {
-  new Vue({
-    el: '#trademark',
+  createApp({
     components: {
       'trademark-banner': TrademarkBanner
     },
     data: () => ({})
-  });
+  }).mount('#trademark');
 });
