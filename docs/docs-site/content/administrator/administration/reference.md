@@ -13,7 +13,7 @@ A recommended setup consists in:
 
 Typical setups range from 2 to 5 Hue servers, e.g. 3 Hue servers, 300+ unique users, peaks at 125 users/hour with 300 queries
 
-In practice ~50 users / Hue peak time is the rule of thumb. This is accounting for the worse case scenarios and it will go much higher with the upcoming Task Server [HUE-8738](https://issues.cloudera.org/browse/HUE-8738) and Gunicorn [HUE-8739](https://issues.cloudera.org/browse/HUE-8739) integrations. Most of the scale issues are actually related to resource intensive operations like large download of query results or when an RPC call from Hue to a service is slow (e.g. submitting a query hangs when Hive is slow), not by the number of users.
+In practice ~50 users / Hue peak time is the rule of thumb. This is accounting for the worse case scenarios and it will go much higher with the upcoming [Task Server](#task-server) and Gunicorn integrations. Most of the scale issues are actually related to resource intensive operations like large download of query results or when an RPC call from Hue to a service is slow (e.g. submitting a query hangs when Hive is slow), not by the number of users.
 
 ![Reference Architecture](/images/hue_architecture.png)
 
@@ -57,7 +57,7 @@ Hue is often run with:
 
 * Cherrypy with [NGINX](http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/) (recommended)
 * Cherrypy with HTTPD (built-in when using Cloudera Manager) (recommended)
-* Gunicorn is coming with [HUE-8739](https://issues.cloudera.org/browse/HUE-8739)
+* Gunicorn
 * [Apache mod Python](http://gethue.com/how-to-run-hue-with-the-apache-server/)
 
 ## Queries life cycle
