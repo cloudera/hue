@@ -33,7 +33,7 @@ from django.forms.fields import MultiValueField, CharField, ChoiceField, Boolean
 from django.forms.widgets import MultiWidget, Select, TextInput, Textarea, HiddenInput, Input
 from django.utils import formats
 from django.utils.safestring import mark_safe
-from django.utils.encoding import python_2_unicode_compatible
+from six import python_2_unicode_compatible
 
 import desktop.lib.i18n
 from desktop.lib.i18n import smart_str
@@ -51,7 +51,7 @@ LOG = logging.getLogger(__name__)
 try:
   from django.utils.encoding import StrAndUnicode
 except ImportError:
-  from django.utils.encoding import python_2_unicode_compatible
+  from six import python_2_unicode_compatible
 
   @python_2_unicode_compatible
   class StrAndUnicode(object):
