@@ -130,6 +130,19 @@ def is_https_enabled():
   """Hue is configured for HTTPS."""
   return bool(SSL_CERTIFICATE.get() and SSL_PRIVATE_KEY.get())
 
+def get_slack_client_id():
+  return os.environ.get('SLACK_CLIENT_ID')
+
+def get_slack_client_secret():
+  return os.environ.get('SLACK_CLIENT_SECRET')
+
+def get_slack_verification_token():
+  return os.environ.get('SLACK_VERIFICATION_TOKEN')
+
+def get_slack_bot_user_token():
+  return os.environ.get('SLACK_BOT_USER_TOKEN')
+
+
 USE_CHERRYPY_SERVER = Config(
   key="use_cherrypy_server",
   help=_("If set to true, CherryPy will be used. Otherwise, Gunicorn will be used as the webserver."),
@@ -717,9 +730,34 @@ SLACK = ConfigSection(
   members=dict(
     IS_ENABLED=Config(
       key='is_enabled',
-      help=_('Turns on Slack application API endpoints'),
+      help=_('Enables Slack application API endpoints'),
+      type=coerce_bool,
       default=False,
-      type=coerce_bool),
+      ),
+    SLACK_CLIENT_ID=Config(
+        key='slack_client_id',
+        type=str,
+        private=True,
+        dynamic_default=get_slack_client_id,
+      ),
+    SLACK_CLIENT_SECRET=Config(
+        key='slack_client_secret',
+        type=str,
+        private=True,
+        dynamic_default=get_slack_client_secret,
+      ),
+    SLACK_VERIFICATION_TOKEN=Config(
+        key='slack_verification_token',
+        type=str,
+        private=True,
+        dynamic_default=get_slack_verification_token,
+      ),
+    SLACK_BOT_USER_TOKEN=Config(
+        key='slack_bot_user_token',
+        type=str,
+        private=True,
+        dynamic_default=get_slack_bot_user_token,
+      ),
   )
 )
 
