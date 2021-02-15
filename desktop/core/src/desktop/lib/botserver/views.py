@@ -34,16 +34,8 @@ SLACK_BOT_USER_TOKEN = getattr(settings, 'SLACK_BOT_USER_TOKEN', None)
 
 
 slack_client = WebClient(token=SLACK_BOT_USER_TOKEN)
-appname = "SQL Assistant"
+appname = "hue_bot"
 
-def get_bot_id(botusername):
-  response = slack_client.api_call("users.list")
-  users = response["members"]
-  for user in users:
-    if 'name' in user and botusername in user.get('name') and not user.get('deleted'):
-      return user.get('id')
-
-BOT_ID = get_bot_id(appname)
 
 @login_notrequired
 @csrf_exempt
@@ -68,6 +60,7 @@ def parse_events(event_message):
   user_id = event_message.get('user')
   text = event_message.get('text')
   channel = event_message.get('channel')
+  BOT_ID = get_bot_id(appname)
 
   # ignore bot's own message
   if BOT_ID == user_id:
@@ -81,3 +74,10 @@ def say_hi_user(channel, user_id):
   bot_message = f'Hi <@{user_id}> :wave:'
   slack_client.api_call(api_method='chat.postMessage', json={'channel': channel, 'text': bot_message})
   return HttpResponse(status=200)
+
+def get_bot_id(botusername):
+  response = slack_client.api_call('users.list')
+  users = response['members']
+  for user in users:
+    if 'name' in user and botusername in user.get('name') and not user.get('deleted'):
+      return user.get('id')
