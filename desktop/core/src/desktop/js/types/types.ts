@@ -50,4 +50,5 @@ export interface hueWindow {
   WEB_SOCKETS_ENABLED?: boolean;
   WS_CHANNEL?: string;
   hueDebug?: HueDebug;
+  DISABLE_LOCAL_STORAGE?: boolean;
 }
