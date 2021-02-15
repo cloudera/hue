@@ -4,11 +4,16 @@ exports[`Tabs.vue should render empty tabs 1`] = `
 <div
   class="hue-tabs"
 >
-  <ul />
-   
+  <ul>
+    
+    
+  </ul>
   <div
     class="hue-tab-container"
-  />
+  >
+    
+    
+  </div>
 </div>
 `;
 
@@ -17,35 +22,40 @@ exports[`Tabs.vue should render tabs 1`] = `
   class="hue-tabs"
 >
   <ul>
+    
     <li
       class="active"
     >
-      
       foo
-    
     </li>
     <li
       class=""
     >
-      
       bar
-    
     </li>
+    
   </ul>
-   
   <div
     class="hue-tab-container"
   >
+    
+    
     <div
-      style=""
+      style="display: none;"
     >
+      
       foo
+      
     </div>
     <div
       style="display: none;"
     >
+      
       bar
+      
     </div>
+    
+    
   </div>
 </div>
 `;

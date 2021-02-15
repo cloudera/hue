@@ -84,13 +84,16 @@
       if (this.addTab) {
         this.addTab(this.def);
       }
-    },
-
-    unmounted(): void {
-      if (this.removeTab) {
-        this.removeTab(this.def);
-      }
     }
+
+    // TODO
+    // destroyed(): was deprecated, need to rearchitect the component.
+    // Whenever parent is rendered mount, unmount is called causing an to prevent infinit loop.
+    // unmounted(): void {
+    //   if (this.removeTab) {
+    //     this.removeTab(this.def);
+    //   }
+    // }
   });
 </script>
 

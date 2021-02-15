@@ -46,9 +46,11 @@
     } {
       return {
         addTab: (tab: TabRef): void => {
-          this.tabs.push(tab);
-          if (this.tabs.length === 1) {
-            this.selectTab(this.tabs[0]);
+          if (!this.tabs.find(t => t.title === tab.title)) {
+            this.tabs.push(tab);
+            if (this.tabs.length === 1) {
+              this.selectTab(this.tabs[0]);
+            }
           }
         },
         removeTab: (tab: TabRef): void => {
@@ -58,7 +60,6 @@
             if (tab.isActive && this.tabs.length) {
               this.tabs[Math.max(0, index - 1)].isActive = true;
             }
-            this.$forceUpdate();
           }
         }
       };
