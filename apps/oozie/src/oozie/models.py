@@ -1722,7 +1722,8 @@ class Coordinator(Job):
     self.data = json.dumps(data_)
 
   class Meta(object):
-    manager_inheritance_from_future = True
+    if sys.version_info[0] < 3:
+      manager_inheritance_from_future = True
 
 class DatasetManager(models.Manager):
   def can_read_or_exception(self, request, dataset_id):
@@ -1987,7 +1988,8 @@ class Bundle(Job):
     return xml, metadata
 
   class Meta(object):
-    manager_inheritance_from_future = True
+    if sys.version_info[0] < 3:
+      manager_inheritance_from_future = True
 
 class HistoryManager(models.Manager):
   def create_from_submission(self, submission):
