@@ -28,7 +28,7 @@ from django.forms.models import inlineformset_factory
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.template.defaultfilters import strip_tags
-from django.utils.functional import curry
+from functools import partial
 from django.utils.http import http_date
 from django.utils.translation import ugettext as _, activate as activate_translation
 
@@ -475,17 +475,17 @@ def edit_coordinator(request, coordinator):
 
   DatasetFormSet = inlineformset_factory(Coordinator, Dataset, form=DatasetForm, max_num=0, can_order=False, can_delete=True)
   DataInputFormSet = inlineformset_factory(Coordinator, DataInput, form=DataInputForm, max_num=0, can_order=False, can_delete=True)
-  DataInputFormSet.form = staticmethod(curry(DataInputForm, coordinator=coordinator))
+  DataInputFormSet.form = staticmethod(partial(DataInputForm, coordinator=coordinator))
   DataOutputFormSet = inlineformset_factory(Coordinator, DataOutput, form=DataOutputForm, max_num=0, can_order=False, can_delete=True)
-  DataOutputFormSet.form = staticmethod(curry(DataOutputForm, coordinator=coordinator))
+  DataOutputFormSet.form = staticmethod(partial(DataOutputForm, coordinator=coordinator))
 
   dataset = Dataset(coordinator=coordinator)
   dataset_form = DatasetForm(instance=dataset, prefix='create')
 
   NewDataInputFormSet = inlineformset_factory(Coordinator, DataInput, form=DataInputForm, extra=0, can_order=False, can_delete=False)
-  NewDataInputFormSet.form = staticmethod(curry(DataInputForm, coordinator=coordinator))
+  NewDataInputFormSet.form = staticmethod(partial(DataInputForm, coordinator=coordinator))
   NewDataOutputFormSet = inlineformset_factory(Coordinator, DataOutput, form=DataOutputForm, extra=0, can_order=False, can_delete=False)
-  NewDataOutputFormSet.form = staticmethod(curry(DataOutputForm, coordinator=coordinator))
+  NewDataOutputFormSet.form = staticmethod(partial(DataOutputForm, coordinator=coordinator))
 
   enable_cron_scheduling = ENABLE_CRON_SCHEDULING.get()
 
