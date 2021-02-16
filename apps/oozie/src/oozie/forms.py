@@ -17,13 +17,13 @@
 
 from builtins import object
 import logging
-from datetime import datetime,  timedelta
+from datetime import datetime, timedelta
 from time import mktime, struct_time
 
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms.widgets import TextInput
-from django.utils.functional import curry
+from functools import partial
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.django_forms import MultiForm, SplitDateTimeWidget
@@ -101,7 +101,7 @@ class ImportJobsubDesignForm(forms.Form):
   """Used for specifying what oozie actions to import"""
   def __init__(self, choices=[], *args, **kwargs):
     super(ImportJobsubDesignForm, self).__init__(*args, **kwargs)
-    self.fields['jobsub_id'] = forms.ChoiceField(choices=choices, widget=forms.RadioSelect(attrs={'class':'radio'}))
+    self.fields['jobsub_id'] = forms.ChoiceField(choices=choices, widget=forms.RadioSelect(attrs={'class': 'radio'}))
 
 
 class NodeForm(forms.ModelForm):
@@ -286,8 +286,8 @@ class SubWorkflowForm(forms.ModelForm):
     user = kwargs.pop('user')
     workflow = kwargs.pop('workflow')
     super(SubWorkflowForm, self).__init__(*args, **kwargs)
-    choices=((wf.id, wf) for wf in Document.objects.available(Workflow, user) if workflow.id != id)
-    self.fields['sub_workflow'] = forms.ChoiceField(choices=choices, required=False, widget=forms.RadioSelect(attrs={'class':'radio'}))
+    choices = ((wf.id, wf) for wf in Document.objects.available(Workflow, user) if workflow.id != id)
+    self.fields['sub_workflow'] = forms.ChoiceField(choices=choices, required=False, widget=forms.RadioSelect(attrs={'class': 'radio'}))
 
   class Meta(object):
     model = SubWorkflow
@@ -353,7 +353,7 @@ class CoordinatorForm(forms.ModelForm):
     model = Coordinator
     exclude = ('owner', 'deployment_dir')
     if hasattr(ENABLE_CRON_SCHEDULING, 'get') and ENABLE_CRON_SCHEDULING.get():
-        exclude += ('frequency_number', 'frequency_unit')
+      exclude += ('frequency_number', 'frequency_unit')
     widgets = {
       'description': forms.TextInput(attrs={'class': 'span5'}),
       'parameters': forms.widgets.HiddenInput(),
@@ -388,7 +388,9 @@ class ImportCoordinatorForm(CoordinatorForm):
                                  required=False)
 
   class Meta(CoordinatorForm.Meta):
-    exclude = ('owner', 'deployment_dir', 'timezone', 'frequency_number', 'frequency_unit', 'schema_version', 'job_properties', 'parameters')
+    exclude = (
+      'owner', 'deployment_dir', 'timezone', 'frequency_number', 'frequency_unit', 'schema_version', 'job_properties', 'parameters'
+    )
 
 
 class DatasetForm(forms.ModelForm):
@@ -419,7 +421,9 @@ class DataInputForm(forms.ModelForm):
     super(DataInputForm, self).__init__(*args, **kwargs)
     self.fields['dataset'].queryset = Dataset.objects.filter(coordinator=coordinator)
     if coordinator.coordinatorworkflow:
-      self.fields['name'].widget = forms.Select(choices=((param, param) for param in set(coordinator.coordinatorworkflow.find_parameters())))
+      self.fields['name'].widget = forms.Select(
+        choices=((param, param) for param in set(coordinator.coordinatorworkflow.find_parameters()))
+      )
 
 
 class DataOutputForm(forms.ModelForm):
@@ -433,7 +437,9 @@ class DataOutputForm(forms.ModelForm):
     super(DataOutputForm, self).__init__(*args, **kwargs)
     self.fields['dataset'].queryset = Dataset.objects.filter(coordinator=coordinator)
     if coordinator.coordinatorworkflow:
-      self.fields['name'].widget = forms.Select(choices=((param, param) for param in set(coordinator.coordinatorworkflow.find_parameters())))
+      self.fields['name'].widget = forms.Select(
+        choices=((param, param) for param in set(coordinator.coordinatorworkflow.find_parameters()))
+      )
 
 
 _node_type_TO_FORM_CLS = {
@@ -481,8 +487,12 @@ class RerunForm(forms.Form):
 
 
 class RerunCoordForm(forms.Form):
-  refresh = forms.BooleanField(initial=True, required=False, help_text=_t("Used to indicate if user wants to refresh an action's input and output events"))
-  nocleanup = forms.BooleanField(initial=True, required=False, help_text=_t('Used to indicate if user wants to cleanup output events for given rerun actions'))
+  refresh = forms.BooleanField(
+    initial=True, required=False, help_text=_t("Used to indicate if user wants to refresh an action's input and output events")
+  )
+  nocleanup = forms.BooleanField(
+    initial=True, required=False, help_text=_t('Used to indicate if user wants to cleanup output events for given rerun actions')
+  )
   actions = forms.MultipleChoiceField(required=True)
   return_json = forms.BooleanField(required=False, widget=forms.HiddenInput)
 
@@ -499,8 +509,12 @@ class RerunCoordForm(forms.Form):
 
 
 class RerunBundleForm(forms.Form):
-  refresh = forms.BooleanField(initial=True, required=False, help_text=_t("Used to indicate if user wants to refresh an action's input and output events"))
-  nocleanup = forms.BooleanField(initial=True, required=False, help_text=_t('Used to indicate if user wants to cleanup output events for given rerun actions'))
+  refresh = forms.BooleanField(
+    initial=True, required=False, help_text=_t("Used to indicate if user wants to refresh an action's input and output events")
+  )
+  nocleanup = forms.BooleanField(
+    initial=True, required=False, help_text=_t('Used to indicate if user wants to cleanup output events for given rerun actions')
+  )
   coordinators = forms.MultipleChoiceField(required=True)
   start = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT], required=False, initial=datetime.today(),
                                    widget=SplitDateTimeWidget(attrs={'class': 'input-small', 'id': 'rerun_start'},
@@ -547,9 +561,12 @@ class BundleForm(forms.ModelForm):
     }
 
 class UpdateCoordinatorForm(forms.Form):
-  endTime = forms.SplitDateTimeField(label='End Time', input_time_formats=[TIME_FORMAT], required=False, initial=datetime.today() + timedelta(days=3),
-                                 widget=SplitDateTimeWidget(attrs={'class': 'input-small fa fa-calendar', 'id': 'update_endtime'},
-                                                            date_format=DATE_FORMAT, time_format=TIME_FORMAT))
+  endTime = forms.SplitDateTimeField(
+    label='End Time', input_time_formats=[TIME_FORMAT], required=False, initial=datetime.today() + timedelta(days=3),
+    widget=SplitDateTimeWidget(
+      attrs={'class': 'input-small fa fa-calendar', 'id': 'update_endtime'}, date_format=DATE_FORMAT, time_format=TIME_FORMAT
+    )
+  )
 
   pauseTime = forms.SplitDateTimeField(label='Pause Time', input_time_formats=[TIME_FORMAT], required=False, initial=None,
                                  widget=SplitDateTimeWidget(attrs={'class': 'input-small fa fa-calendar', 'id': 'update_pausetime'},
@@ -574,7 +591,7 @@ def design_form_by_type(node_type, user, workflow):
   klass_form = _node_type_TO_FORM_CLS[node_type]
 
   if node_type == 'subworkflow':
-    klass_form = curry(klass_form, user=user, workflow=workflow)
+    klass_form = partial(klass_form, user=user, workflow=workflow)
 
   return klass_form
 
