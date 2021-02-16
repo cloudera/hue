@@ -31,9 +31,10 @@
             v-for="category in availableCategories"
             :key="category.label"
             :style="{
-              'border-color': activeCategory === category ? category.color : 'transparent'
+              'border-color':
+                activeCategory.categoryId === category.categoryId ? category.color : 'transparent'
             }"
-            :class="{ active: activeCategory === category }"
+            :class="{ active: activeCategory.categoryId === category.categoryId }"
             @click="clickCategory(category, $event)"
           >
             {{ category.label }}
@@ -96,7 +97,7 @@
   import huePubSub from 'utils/huePubSub';
   import I18n from 'utils/i18n';
 
-  import AutocompleteResults, { Suggestion } from './AutocompleteResults';
+  import { Suggestion } from './AutocompleteResults';
   import MatchedText from './MatchedText.vue';
   import SqlAutocompleter from './SqlAutocompleter';
   import CatalogEntryDetailsPanel from './details/CatalogEntryDetailsPanel.vue';
@@ -123,11 +124,9 @@
       Spinner,
       UdfDetailsPanel
     },
-
     directives: {
       'click-outside': clickOutsideDirective
     },
-
     props: {
       autocompleteParser: {
         type: Object as PropType<AutocompleteParser>,
@@ -149,49 +148,33 @@
         type: Object as PropType<Executor>,
         required: true
       },
-
       temporaryOnly: {
         type: Boolean,
         required: false,
         default: false
       }
     },
+    setup(props) {
+      const subTracker = new SubscriptionTracker();
 
-    setup(): {
-      subTracker: SubscriptionTracker;
-    } {
-      return {
-        subTracker: new SubscriptionTracker()
-      };
+      const autocompleter = new SqlAutocompleter({
+        editorId: props.editorId,
+        executor: props.executor,
+        editor: props.editor,
+        temporaryOnly: props.temporaryOnly,
+        autocompleteParser: props.autocompleteParser,
+        sqlReferenceProvider: props.sqlReferenceProvider
+      });
+
+      const autocompleteResults = autocompleter.autocompleteResults;
+
+      subTracker.addDisposable(autocompleter);
+
+      return { subTracker, autocompleter, autocompleteResults };
     },
-
-    data(): {
-      startLayout: DOMRect | null;
-      startPixelRatio: number;
-      left: number;
-      top: number;
-
-      loading: boolean;
-      active: boolean;
-      filter: string;
-      availableCategories: CategoryInfo[];
-      activeCategory: CategoryInfo;
-      selectedIndex: number | null;
-      hoveredIndex: number | null;
-      base: Ace.Anchor | null;
-      sortOverride?: SortOverride | null;
-      autocompleter?: SqlAutocompleter;
-      autocompleteResults?: AutocompleteResults;
-      suggestions: Suggestion[];
-
-      reTriggerTimeout: number;
-      changeTimeout: number;
-      positionInterval: number;
-      keyboardHandler: Ace.HashHandler | null;
-      changeListener: (() => void) | null;
-    } {
+    data(component) {
       return {
-        startLayout: null,
+        startLayout: null as DOMRect | null,
         startPixelRatio: window.devicePixelRatio,
         left: 0,
         top: 0,
@@ -199,34 +182,23 @@
         loading: false,
         active: false,
         filter: '',
-        availableCategories: [Category.All],
         activeCategory: Category.All,
-        selectedIndex: null,
-        hoveredIndex: null,
-        base: null,
-        sortOverride: null,
-        suggestions: [],
+        selectedIndex: null as number | null,
+        hoveredIndex: null as number | null,
+        base: null as Ace.Anchor | null,
+        sortOverride: null as SortOverride | null,
+        suggestions: [] as Suggestion[],
 
         reTriggerTimeout: -1,
         changeTimeout: -1,
         positionInterval: -1,
-        keyboardHandler: null,
-        changeListener: null
+        keyboardHandler: null as Ace.HashHandler | null,
+        changeListener: null as (() => void) | null,
+
+        mousedownListener: component.detach.bind(component),
+        mousewheelListener: component.closeOnScroll.bind(component)
       };
     },
-
-    data(
-      thisComp
-    ): {
-      mousedownListener: (e: Event) => void;
-      mousewheelListener: (e: Event) => void;
-    } {
-      return {
-        mousedownListener: thisComp.detach.bind(thisComp),
-        mousewheelListener: thisComp.closeOnScroll.bind(thisComp)
-      };
-    },
-
     computed: {
       connector(): Connector | undefined {
         if (this.executor) {
@@ -244,7 +216,9 @@
         }
         return undefined;
       },
-
+      availableCategories(): CategoryInfo[] {
+        return extractCategories(this.suggestions);
+      },
       filtered(): Suggestion[] {
         if (!this.autocompleteResults) {
           return [];
@@ -257,18 +231,9 @@
           huePubSub.publish('hue.ace.autocompleter.match.updated');
         }
 
-        const categories = extractCategories(result);
-        if (categories.indexOf(this.activeCategory) === -1) {
-          // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-          this.activeCategory = Category.All;
-        }
-        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-        this.availableCategories = categories;
-
         const activeCategory = this.activeCategory;
 
         const categoriesCount = new Map<CategoryId, number>();
-
         result = result.filter(suggestion => {
           categoriesCount.set(
             suggestion.category.categoryId,
@@ -282,16 +247,15 @@
             return false;
           }
           return (
-            activeCategory === Category.All ||
-            activeCategory === suggestion.category ||
-            (activeCategory === Category.Popular && suggestion.popular)
+            activeCategory.categoryId === Category.All.categoryId ||
+            activeCategory.categoryId === suggestion.category.categoryId ||
+            (activeCategory.categoryId === Category.Popular.categoryId && suggestion.popular)
           );
         });
 
         sqlUtils.sortSuggestions(result, this.filter, this.sortOverride);
         // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-        this.sortOverride = undefined;
-
+        this.sortOverride = null;
         return result;
       },
 
@@ -310,7 +274,6 @@
         return this.active && (this.loading || !!this.filtered.length);
       }
     },
-
     watch: {
       filter(): void {
         if (this.selectedIndex !== null) {
@@ -320,9 +283,13 @@
             scrollDiv.scrollTop = 0;
           }
         }
+      },
+      availableCategories(categories): void {
+        if (categories.indexOf(this.activeCategory) === -1) {
+          this.activeCategory = categories[0];
+        }
       }
     },
-
     created(): void {
       this.keyboardHandler = new HashHandler();
       this.registerKeybindings(this.keyboardHandler);
@@ -359,21 +326,7 @@
         }
       };
     },
-
     mounted(): void {
-      this.autocompleter = new SqlAutocompleter({
-        editorId: this.editorId,
-        executor: this.executor,
-        editor: this.editor,
-        temporaryOnly: this.temporaryOnly,
-        autocompleteParser: this.autocompleteParser,
-        sqlReferenceProvider: this.sqlReferenceProvider
-      });
-
-      this.subTracker.addDisposable(this.autocompleter);
-
-      this.autocompleteResults = this.autocompleter.autocompleteResults;
-
       const showAutocomplete = async () => {
         // The autocomplete can be triggered right after insertion of a suggestion
         // when live autocomplete is enabled, hence if already active we ignore.

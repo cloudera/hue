@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <ResultTable :executable="executable" />
+  <ResultTable v-if="executable" :executable="executable" />
 </template>
 
 <script lang="ts">
@@ -36,17 +36,14 @@
 
     props: {
       executableObservable: {
-        type: Object as PropType<KnockoutObservable<SqlExecutable | undefined>>,
-        default: undefined
+        type: Object as PropType<KnockoutObservable<SqlExecutable | null>> | null,
+        default: null
       }
     },
 
-    setup(): {
-      subTracker: SubscriptionTracker;
-    } {
-      return {
-        subTracker: new SubscriptionTracker()
-      };
+    setup() {
+      const subTracker = new SubscriptionTracker();
+      return { subTracker };
     },
 
     data(): {
