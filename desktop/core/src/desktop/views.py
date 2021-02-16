@@ -34,7 +34,7 @@ import validate
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.shortcuts import render_to_response
+from django.shortcuts import render as django_render
 from django.http import HttpResponse
 from django.http.response import StreamingHttpResponse
 from django.urls import reverse
@@ -283,7 +283,7 @@ def download_log_view(request):
         LOG.exception("Couldn't construct zip file to write logs")
         return log_view(request)
 
-  return render_to_response("logs.mako", dict(log=[_("No logs found.")], is_embeddable=request.GET.get('is_embeddable', False)))
+  return django_render(request, "logs.mako", dict(log=[_("No logs found.")], is_embeddable=request.GET.get('is_embeddable', False)))
 
 
 def bootstrap(request):
