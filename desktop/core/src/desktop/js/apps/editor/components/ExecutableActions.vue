@@ -106,28 +106,17 @@
 
     emits: ['limit-changed'],
 
-    setup(): {
-      subTracker: SubscriptionTracker;
-    } {
-      return {
-        subTracker: new SubscriptionTracker()
-      };
+    setup() {
+      const subTracker = new SubscriptionTracker();
+      return { subTracker };
     },
 
-    data(): {
-      loadingSession: boolean;
-      lastSession: Session | null;
-      partOfRunningExecution: boolean;
-      limit: number | null;
-      stopping: boolean;
-      status: ExecutionStatus;
-      hasStatement: boolean;
-    } {
+    data() {
       return {
         loadingSession: true,
-        lastSession: null,
+        lastSession: null as Session | null,
         partOfRunningExecution: false,
-        limit: null,
+        limit: null as number | null,
         stopping: false,
         status: ExecutionStatus.ready,
         hasStatement: false
@@ -172,8 +161,7 @@
 
     mounted(): void {
       this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
-        debugger;
-        if (this.executable === executable) {
+        if (this.executable.id === executable.id) {
           this.updateFromExecutable(executable);
         }
       });

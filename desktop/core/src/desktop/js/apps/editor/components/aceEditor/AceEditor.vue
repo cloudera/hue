@@ -69,7 +69,6 @@
     components: {
       AceAutocomplete
     },
-
     props: {
       initialValue: {
         type: String,
@@ -93,7 +92,6 @@
         required: false,
         default: () => ({})
       },
-
       sqlParserProvider: {
         type: Object as PropType<SqlParserProvider>,
         default: undefined
@@ -103,7 +101,6 @@
         default: undefined
       }
     },
-
     emits: [
       'value-changed',
       'create-new-doc',
@@ -112,29 +109,18 @@
       'ace-created',
       'cursor-changed'
     ],
-
-    setup(): {
-      subTracker: SubscriptionTracker;
-    } {
-      return {
-        subTracker: new SubscriptionTracker()
-      };
+    setup() {
+      const subTracker = new SubscriptionTracker();
+      return { subTracker };
     },
-
-    data(): {
-      editor: Ace.Editor | null;
-      autocompleteParser: AutocompleteParser | null;
-      aceLocationHandler: AceLocationHandler | null;
-      lastFocusedEditor: boolean;
-    } {
+    data() {
       return {
-        editor: null,
-        autocompleteParser: null,
-        aceLocationHandler: null,
+        editor: null as Ace.Editor | null,
+        autocompleteParser: null as AutocompleteParser | null,
+        aceLocationHandler: null as AceLocationHandler | null,
         lastFocusedEditor: false
       };
     },
-
     mounted(): void {
       const editorElement = <HTMLElement>this.$refs['editorElement'];
       if (!editorElement) {

@@ -72,7 +72,7 @@
     props: {
       executable: {
         type: Object as PropType<Executable>,
-        default: undefined
+        required: true
       }
     },
 
@@ -102,10 +102,7 @@
 
     computed: {
       analysisAvailable(): boolean {
-        return (
-          (!!this.executable && this.executable.status !== ExecutionStatus.ready) ||
-          !!this.errors.length
-        );
+        return this.executable.status !== ExecutionStatus.ready || !!this.errors.length;
       },
 
       jobsWithUrls(): ExecutionJob[] {
@@ -143,7 +140,7 @@
     methods: {
       I18n,
       updateFromExecutionLogs(executionLogs: ExecutionLogs): void {
-        if (this.executable === executionLogs.executable) {
+        if (this.executable.id === executionLogs.executable.id) {
           this.logs = executionLogs.fullLog;
           this.jobs = executionLogs.jobs;
           this.errors = executionLogs.errors;
