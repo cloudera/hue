@@ -62,69 +62,68 @@
 <!-- eslint-enable vue/no-v-html -->
 
 <script lang="ts">
-  import { defineComponent, PropType, Component } from 'vue';
+  import { defineComponent, PropType } from 'vue';
 
   import { Column, Row } from './HueTable';
 
-  export default <T>(): Component =>
-    defineComponent({
-      props: {
-        rows: {
-          type: Object as PropType<Row[]>,
-          required: false,
-          default: () => []
-        },
-        columns: {
-          type: Object as PropType<Column<T>[]>,
-          required: false,
-          default: () => []
-        },
-        caption: {
-          type: String,
-          default: undefined
-        },
-        stickyHeader: {
-          type: Boolean,
-          required: false,
-          default: false
-        },
-        stickyFirstColumn: {
-          type: Boolean,
-          required: false,
-          default: false
+  export default defineComponent({
+    props: {
+      rows: {
+        type: Object as PropType<Row[]>,
+        required: false,
+        default: () => []
+      },
+      columns: {
+        type: Object as PropType<Column<unknown>[]>,
+        required: false,
+        default: () => []
+      },
+      caption: {
+        type: String,
+        default: undefined
+      },
+      stickyHeader: {
+        type: Boolean,
+        required: false,
+        default: false
+      },
+      stickyFirstColumn: {
+        type: Boolean,
+        required: false,
+        default: false
+      }
+    },
+
+    emits: ['scroll-to-end', 'row-clicked'],
+
+    methods: {
+      hasCellSlot(column: Column<unknown>): boolean {
+        return !!this.$slots[this.cellSlotName(column)];
+      },
+
+      cellSlotName(column: Column<unknown>): string {
+        return 'cell-' + column.key;
+      },
+
+      onContainerScroll(): void {
+        const containerEl = <HTMLElement>this.$refs.tableContainer;
+        if (containerEl.scrollHeight === containerEl.scrollTop + containerEl.clientHeight) {
+          this.$emit('scroll-to-end');
         }
       },
 
-      emits: ['scroll-to-end', 'row-clicked'],
-
-      methods: {
-        hasCellSlot(column: Column<T>): boolean {
-          return !!this.$slots[this.cellSlotName(column)];
-        },
-
-        cellSlotName(column: Column<T>): string {
-          return 'cell-' + column.key;
-        },
-
-        onContainerScroll(): void {
-          const containerEl = <HTMLElement>this.$refs.tableContainer;
-          if (containerEl.scrollHeight === containerEl.scrollTop + containerEl.clientHeight) {
-            this.$emit('scroll-to-end');
-          }
-        },
-
-        cellClass(cellClass: string | undefined, index: number): string | null {
-          // This prevents rendering of empty class="" for :class="[x,y]" when x and y are undefined
-          // Possibly fixed in Vue 3
-          if (cellClass && this.stickyFirstColumn && index === 0) {
-            return `${cellClass} sticky-first-col`;
-          } else if (this.stickyFirstColumn && index === 0) {
-            return 'sticky-first-col';
-          }
-          return cellClass || null;
+      cellClass(cellClass: string | undefined, index: number): string | null {
+        // This prevents rendering of empty class="" for :class="[x,y]" when x and y are undefined
+        // Possibly fixed in Vue 3
+        if (cellClass && this.stickyFirstColumn && index === 0) {
+          return `${cellClass} sticky-first-col`;
+        } else if (this.stickyFirstColumn && index === 0) {
+          return 'sticky-first-col';
         }
+        return cellClass || null;
       }
-    });
+    }
+  });
 </script>
 
 <style lang="scss" scoped>

@@ -75,7 +75,8 @@ export default {
             whenWorkerIsReady(worker, message);
           }, 500);
         } else {
-          worker.postMessage(message);
+          // To JSON and back as Vue creates proxy objects with methods which are not serializable
+          worker.postMessage(JSON.parse(JSON.stringify(message)));
         }
       };
 

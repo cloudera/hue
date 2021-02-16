@@ -17,7 +17,11 @@
 -->
 
 <template>
-  <ExecutionAnalysisPanel :executable="executable" @execution-error="onExecutionError" />
+  <ExecutionAnalysisPanel
+    v-if="executable"
+    :executable="executable"
+    @execution-error="onExecutionError"
+  />
 </template>
 
 <script lang="ts">
@@ -36,26 +40,20 @@
 
     props: {
       executableObservable: {
-        type: Object as PropType<KnockoutObservable<SqlExecutable | undefined>>,
-        default: undefined
+        type: Object as PropType<KnockoutObservable<SqlExecutable | undefined>> | null,
+        default: null
       }
     },
 
-    setup(): {
-      subTracker: SubscriptionTracker;
-    } {
-      return {
-        subTracker: new SubscriptionTracker()
-      };
+    setup() {
+      const subTracker = new SubscriptionTracker();
+      return { subTracker };
     },
 
-    data(): {
-      initialized: boolean;
-      executable: SqlExecutable | null;
-    } {
+    data() {
       return {
         initialized: false,
-        executable: null
+        executable: null as SqlExecutable | null
       };
     },
 

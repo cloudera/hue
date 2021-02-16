@@ -85,7 +85,7 @@ const TEMPLATE = `
         }
       "></div>
       <executable-actions-ko-bridge data-bind="vueKoProps: {
-          executableObservable: $parent.activeExecutable
+          'executable-observable': $parent.activeExecutable
         }"></executable-actions-ko-bridge>
       <div data-bind="
         component: {
