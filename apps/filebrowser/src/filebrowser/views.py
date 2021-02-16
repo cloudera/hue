@@ -41,7 +41,7 @@ from django.http import Http404, StreamingHttpResponse, HttpResponseNotModified,
 from django.views.decorators.http import require_http_methods
 from django.views.static import was_modified_since
 from django.shortcuts import redirect
-from django.utils.functional import curry
+from functools import partial
 from django.utils.http import http_date
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
@@ -1273,7 +1273,7 @@ def chmod(request):
                "other_read", "other_write", "other_execute"]
   params = ["path"]
   def bulk_chmod(*args, **kwargs):
-    op = curry(request.fs.chmod, recursive=request.POST.get('recursive', False))
+    op = partial(request.fs.chmod, recursive=request.POST.get('recursive', False))
     for arg in args:
       op(urllib_unquote(arg['path']), arg['mode'])
   # mode here is abused: on input, it's a string, but when retrieved,
@@ -1298,7 +1298,7 @@ def chown(request):
   recurring = ["user", "group", "user_other", "group_other"]
   params = ["path"]
   def bulk_chown(*args, **kwargs):
-    op = curry(request.fs.chown, recursive=request.POST.get('recursive', False))
+    op = partial(request.fs.chown, recursive=request.POST.get('recursive', False))
     for arg in args:
       varg = [urllib_unquote(arg[param]) for param in param_names]
       op(*varg)
