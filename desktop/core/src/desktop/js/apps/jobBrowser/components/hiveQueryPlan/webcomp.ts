@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { wrap } from 'vue/webComponentWrapper';
+import { wrap } from 'vue/webComponentWrap';
 import HiveQueryPlan from './HiveQueryPlan.vue';
 
 export const HIVE_QUERY_PLAN_COMPONENT = 'hive-query-plan';
