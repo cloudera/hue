@@ -95,7 +95,7 @@ LANGUAGES = [
   ('ja', _('Japanese')),
   ('ko', _('Korean')),
   ('pt', _('Portuguese')),
-  ('pt_BR', _('Brazilian Portuguese')),
+  ('pt-br', _('Brazilian Portuguese')),
   ('zh-CN', _('Simplified Chinese')),
 ]
 
