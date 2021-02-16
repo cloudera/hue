@@ -29,43 +29,71 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent, PropType } from 'vue';
+
   import { Variable } from 'apps/editor/components/variableSubstitution/types';
   import { IdentifierLocation } from 'parse/types';
   import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
-  import { wrap } from 'vue/webComponentWrapper';
+  import { wrap } from 'vue/webComponentWrap';
 
   import PresentationMode from './PresentationMode.vue';
   import Executable from 'apps/editor/execution/executable';
   import Executor from 'apps/editor/execution/executor';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
-  @Component({
-    components: { PresentationMode }
-  })
-  export default class PresentationModeKoBridge extends Vue {
-    @Prop()
-    executor: Executor | null = null;
-    @Prop()
-    titleObservable!: KnockoutObservable<string | undefined>;
-    @Prop()
-    descriptionObservable!: KnockoutObservable<string | undefined>;
-    @Prop()
-    initialVariables?: Variable[];
+  const PresentationModeKoBridge = defineComponent({
+    components: {
+      PresentationMode
+    },
 
-    locations: IdentifierLocation[] = [];
+    props: {
+      executor: {
+        type: Object as PropType<Executor | null>,
+        default: null
+      },
 
-    title: string | null = null;
-    description: string | null = null;
+      titleObservable: {
+        type: Object as PropType<KnockoutObservable<string | undefined>>,
+        default: undefined
+      },
+      descriptionObservable: {
+        type: Object as PropType<KnockoutObservable<string | undefined>>,
+        default: undefined
+      },
+      initialVariables: {
+        type: Object as PropType<Variable[]>,
+        default: undefined
+      }
+    },
 
-    initialized = false;
+    setup(): {
+      subTracker: SubscriptionTracker;
+    } {
+      return {
+        subTracker: new SubscriptionTracker()
+      };
+    },
 
-    subTracker = new SubscriptionTracker();
+    data(): {
+      locations: IdentifierLocation[];
+
+      title: string | null;
+      description: string | null;
+
+      initialized: boolean;
+    } {
+      return {
+        locations: [],
+
+        title: null,
+        description: null,
+
+        initialized: false
+      };
+    },
 
     updated(): void {
-      if (!this.initialized) {
+      if (!this.initialized && this.titleObservable && this.descriptionObservable) {
         this.title = this.titleObservable() || null;
         this.subTracker.subscribe(this.titleObservable, (title?: string) => {
           this.title = title || null;
@@ -87,31 +115,35 @@
 
         this.initialized = true;
       }
-    }
+    },
 
-    destroyed(): void {
+    unmounted(): void {
       this.subTracker.dispose();
-    }
+    },
 
-    onBeforeExecute(executable: Executable): void {
-      this.$el.dispatchEvent(
-        new CustomEvent<Executable>('before-execute', { bubbles: true, detail: executable })
-      );
-    }
+    methods: {
+      onBeforeExecute(executable: Executable): void {
+        this.$el.dispatchEvent(
+          new CustomEvent<Executable>('before-execute', { bubbles: true, detail: executable })
+        );
+      },
 
-    onClose(): void {
-      this.$el.dispatchEvent(
-        new CustomEvent<void>('close', { bubbles: true })
-      );
-    }
+      onClose(): void {
+        this.$el.dispatchEvent(
+          new CustomEvent<void>('close', { bubbles: true })
+        );
+      },
 
-    onVariablesChanged(variables: Variable[]): void {
-      this.$el.dispatchEvent(
-        new CustomEvent<Variable[]>('variables-changed', { bubbles: true, detail: variables })
-      );
+      onVariablesChanged(variables: Variable[]): void {
+        this.$el.dispatchEvent(
+          new CustomEvent<Variable[]>('variables-changed', { bubbles: true, detail: variables })
+        );
+      }
     }
-  }
+  });
 
   export const COMPONENT_NAME = 'presentation-mode-ko-bridge';
   wrap(COMPONENT_NAME, PresentationModeKoBridge);
+
+  export default PresentationModeKoBridge;
 </script>
