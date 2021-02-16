@@ -412,7 +412,9 @@ def create_coordinator(request, workflow=None):
     if coordinator_form.is_valid():
       coordinator = coordinator_form.save()
       if enable_cron_scheduling:
-        coordinator.cron_frequency = {'frequency': request.POST.get('cron_frequency'), 'isAdvancedCron': request.POST.get('isAdvancedCron') == 'on'}
+        coordinator.cron_frequency = {
+          'frequency': request.POST.get('cron_frequency'), 'isAdvancedCron': request.POST.get('isAdvancedCron') == 'on'
+        }
       coordinator.save()
       Document.objects.link(coordinator, owner=coordinator.owner, name=coordinator.name, description=coordinator.description)
       return redirect(reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id}) + "#step3")
@@ -507,7 +509,9 @@ def edit_coordinator(request, coordinator):
       new_data_output_formset.save()
       coordinator.sla = json.loads(request.POST.get('sla'))
       if enable_cron_scheduling:
-        coordinator.cron_frequency = {'frequency': strip_tags(request.POST.get('cron_frequency')), 'isAdvancedCron': request.POST.get('isAdvancedCron') == 'on'}
+        coordinator.cron_frequency = {
+          'frequency': strip_tags(request.POST.get('cron_frequency')), 'isAdvancedCron': request.POST.get('isAdvancedCron') == 'on'
+        }
       coordinator.save()
 
       request.info(_('Coordinator saved.'))
@@ -663,7 +667,7 @@ def submit_coordinator(request, coordinator):
 
   popup = render('editor/submit_job_popup.mako', request, {
                  'params_form': params_form,
-                 'action': reverse('oozie:submit_coordinator',  kwargs={'coordinator': coordinator.id})
+                 'action': reverse('oozie:submit_coordinator', kwargs={'coordinator': coordinator.id})
                 }, force_template=True).content
   if not isinstance(popup, str):
     popup = popup.decode('utf-8')
@@ -751,7 +755,9 @@ def restore_bundle(request):
 def edit_bundle(request, bundle):
   history = History.objects.filter(submitter=request.user, job=bundle).order_by('-submission_date')
 
-  BundledCoordinatorFormSet = inlineformset_factory(Bundle, BundledCoordinator, form=BundledCoordinatorForm, max_num=0, can_order=False, can_delete=True)
+  BundledCoordinatorFormSet = inlineformset_factory(
+    Bundle, BundledCoordinator, form=BundledCoordinatorForm, max_num=0, can_order=False, can_delete=True
+  )
   bundle_form = BundleForm(instance=bundle)
 
   if request.method == 'POST':
@@ -785,7 +791,9 @@ def create_bundled_coordinator(request, bundle):
   response = {'status': -1, 'data': 'None'}
 
   if request.method == 'POST':
-    bundled_coordinator_form = BundledCoordinatorForm(request.POST, instance=bundled_coordinator_instance, prefix='create-bundled-coordinator')
+    bundled_coordinator_form = BundledCoordinatorForm(
+      request.POST, instance=bundled_coordinator_instance, prefix='create-bundled-coordinator'
+    )
 
     if bundled_coordinator_form.is_valid():
       bundled_coordinator_form.save()
@@ -820,7 +828,9 @@ def edit_bundled_coordinator(request, bundle, bundled_coordinator):
   response = {'status': -1, 'data': 'None'}
 
   if request.method == 'POST':
-    bundled_coordinator_form = BundledCoordinatorForm(request.POST, instance=bundled_coordinator_instance, prefix='edit-bundled-coordinator')
+    bundled_coordinator_form = BundledCoordinatorForm(
+      request.POST, instance=bundled_coordinator_instance, prefix='edit-bundled-coordinator'
+    )
 
     if bundled_coordinator_form.is_valid():
       bundled_coordinator_form.save()
@@ -874,7 +884,7 @@ def submit_bundle(request, bundle):
 
   popup = render('editor/submit_job_popup.mako', request, {
                  'params_form': params_form,
-                 'action': reverse('oozie:submit_bundle',  kwargs={'bundle': bundle.id})
+                 'action': reverse('oozie:submit_bundle', kwargs={'bundle': bundle.id})
                 }, force_template=True).content
   if not isinstance(popup, str):
     popup = popup.decode('utf-8')
