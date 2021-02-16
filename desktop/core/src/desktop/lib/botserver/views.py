@@ -71,12 +71,14 @@ def parse_events(event_message):
     say_hi_user(channel, user_id)
   
 def say_hi_user(channel, user_id):
-  # App greets when user says "hello hue"
+  """Bot sends Hi<username> message in a specific channel"""
   bot_message = f'Hi <@{user_id}> :wave:'
-  slack_client.api_call(api_method='chat.postMessage', json={'channel': channel, 'text': bot_message})
-  return HttpResponse(status=200)
+  response = slack_client.api_call(api_method='chat.postMessage', json={'channel': channel, 'text': bot_message})
+  if response["ok"]:
+    return HttpResponse(status=200)
 
 def get_bot_id(botusername):
+  """Takes in bot username, Returns the bot id"""
   response = slack_client.api_call('users.list')
   users = response['members']
   for user in users:
