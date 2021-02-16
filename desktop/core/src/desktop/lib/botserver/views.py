@@ -41,21 +41,25 @@ appname = "hue_bot"
 @login_notrequired
 @csrf_exempt
 def slack_events(request):
-  slack_message = json.loads(request.body.decode('utf-8'))
+  try:
+    slack_message = json.loads(request.body)
 
-  if slack_message['token'] != SLACK_VERIFICATION_TOKEN:
-    return HttpResponse(status=403)
+    if slack_message['token'] != SLACK_VERIFICATION_TOKEN:
+      return HttpResponse(status=403)
 
-  # challenge verification
-  if slack_message['type'] == 'url_verification':
-    response_dict = {"challenge": slack_message.get('challenge')}
-    return JsonResponse(response_dict, status=200)
+      # challenge verification
+    if slack_message['type'] == 'url_verification':
+        response_dict = {"challenge": slack_message.get('challenge')}
+        return JsonResponse(response_dict, status=200)
+    
+    if 'event' in slack_message:
+        event_message = slack_message['event']
+        parse_events(event_message)
+  except Exception as e:
+    LOG.exception('Response content is not valid JSON in %s' % slack_events)
   
-  if 'event' in slack_message:
-    event_message = slack_message['event']
-    parse_events(event_message)
-
   return HttpResponse(status=200)
+
 
 def parse_events(event_message):
   user_id = event_message.get('user')
@@ -82,5 +86,5 @@ def get_bot_id(botusername):
   response = slack_client.api_call('users.list')
   users = response['members']
   for user in users:
-    if 'name' in user and botusername in user.get('name') and not user.get('deleted'):
+    if botusername in user.get('name', '') and not user.get('deleted'):
       return user.get('id')

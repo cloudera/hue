@@ -63,7 +63,16 @@ class TestBotServer(unittest.TestCase):
       }
       response = say_hi_user("channel", "user_id")
       assert_equal(response.status_code, 200)
+  
+  def test_slack_events(self):
+    payload =  {"token": "Jhj5dZrVaK7ZwHHjRyZWjbDl",
+    "challenge": "3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P",
+    "type": "message"}
+    client = Client()
+    response = client.post('/slack/events/', payload)
+    assert_equal(response.status_code, 200)
 
+  
   
 
 
