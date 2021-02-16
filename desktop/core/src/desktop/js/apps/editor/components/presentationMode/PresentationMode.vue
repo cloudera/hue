@@ -50,14 +50,12 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent, PropType } from 'vue';
+
   import { Variable } from 'apps/editor/components/variableSubstitution/types';
   import VariableSubstitution from 'apps/editor/components/variableSubstitution/VariableSubstitution.vue';
   import { IdentifierLocation } from 'parse/types';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
 
-  import './PresentationMode.scss';
   import ExecutableActions from 'apps/editor/components/ExecutableActions.vue';
   import ResultTable from 'apps/editor/components/result/ResultTable.vue';
   import Executor from 'apps/editor/execution/executor';
@@ -74,49 +72,78 @@
 
   const headerRegEx = /--(.*)$/m;
 
-  @Component({
-    components: { VariableSubstitution, HueButton, ResultTable, ExecutableActions, SqlText },
-    methods: { I18n }
-  })
-  export default class PresentationMode extends Vue {
-    @Prop()
-    executor!: Executor;
-    @Prop({ required: false })
-    title?: string;
-    @Prop({ required: false })
-    description?: string;
-    @Prop()
-    locations!: IdentifierLocation[];
+  export default defineComponent({
+    components: {
+      VariableSubstitution,
+      HueButton,
+      ResultTable,
+      ExecutableActions,
+      SqlText
+    },
 
-    get presentationStatements(): PresentationStatement[] {
-      return (this.executor.executables as SqlExecutable[]).map(executable => {
-        let statement = executable.parsedStatement.statement.trim();
-        let header: string | undefined = undefined;
-        const headerMatch = statement.match(headerRegEx);
-        if (headerMatch && headerMatch.index === 0) {
-          header = headerMatch[1].trim();
-          statement = statement.replace(headerMatch[0], '').trim();
-        }
+    props: {
+      executor: {
+        type: Object as PropType<Executor>,
+        required: true
+      },
 
-        return {
-          executable,
-          statement,
-          header
-        };
-      });
+      title: {
+        type: String,
+        default: undefined
+      },
+      description: {
+        type: String,
+        default: undefined
+      },
+      locations: {
+        type: Object as PropType<IdentifierLocation[]>,
+        default: undefined
+      }
+    },
+
+    emits: ['before-execute', 'variables-changed', 'close'],
+
+    computed: {
+      presentationStatements(): PresentationStatement[] {
+        return (this.executor.executables as SqlExecutable[]).map(executable => {
+          let statement = executable.parsedStatement.statement.trim();
+          let header: string | undefined = undefined;
+          const headerMatch = statement.match(headerRegEx);
+          if (headerMatch && headerMatch.index === 0) {
+            header = headerMatch[1].trim();
+            statement = statement.replace(headerMatch[0], '').trim();
+          }
+
+          return {
+            executable,
+            statement,
+            header
+          };
+        });
+      },
+
+      dialect(): string {
+        return this.executor.connector().dialect as string;
+      }
+    },
+
+    methods: {
+      I18n,
+
+      async beforeExecute(executable: SqlExecutable): Promise<void> {
+        this.$emit('before-execute', executable);
+
+        // eslint-disable-next-line vue/no-mutating-props
+        this.executor.activeExecutable = executable;
+      },
+
+      onVariablesChanged(variables: Variable[]): void {
+        this.$emit('variables-changed', variables);
+      }
     }
-
-    get dialect(): string {
-      return this.executor.connector().dialect as string;
-    }
-
-    async beforeExecute(executable: SqlExecutable): Promise<void> {
-      this.$emit('before-execute', executable);
-      this.executor.activeExecutable = executable;
-    }
-
-    onVariablesChanged(variables: Variable[]): void {
-      this.$emit('variables-changed', variables);
-    }
-  }
+  });
 </script>
+
+<style lang="scss">
+  @import './PresentationMode.scss';
+</style>
