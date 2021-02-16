@@ -21,7 +21,7 @@ import unittest
 import sys
 
 from nose.tools import assert_equal, assert_true
-from django.test import TestCase
+from django.test import TestCase, Client
 from desktop.lib.botserver.views import *
 
 if sys.version_info[0] > 2:
@@ -33,8 +33,8 @@ LOG = logging.getLogger(__name__)
 
 class TestBotServer(unittest.TestCase):
   def test_get_bot_id(self):
-    with patch('desktop.lib.botserver.views.slack_client') as slack_client_mock:
-      slack_client_mock.api_call("users.list").return_value = {
+    with patch('desktop.lib.botserver.views.slack_client.api_call') as api_call:
+      api_call.return_value = {
         'members': [
           {
             'name': 'hue_bot',
@@ -43,8 +43,27 @@ class TestBotServer(unittest.TestCase):
           }
         ]
       }
-      bot_id = get_bot_id('hue_bot')
-      assert_equal(bot_id, 'U01K99VEDR9')
+      assert_equal(get_bot_id('hue_bot'), 'U01K99VEDR9')
+
+      api_call.return_value = {
+        'members': [
+          {
+            'name': 'hue_bot',
+            'deleted': True,
+            'id': 'U01K99VEDR9'
+          }
+        ]
+      }
+      assert_equal(get_bot_id('hue_bot'), None)
+
+  def test_say_hi_user(self):
+    with patch('desktop.lib.botserver.views.slack_client.api_call') as api_call:
+      api_call.return_value = {
+        "ok": True
+      }
+      response = say_hi_user("channel", "user_id")
+      assert_equal(response.status_code, 200)
+
   
 
 
