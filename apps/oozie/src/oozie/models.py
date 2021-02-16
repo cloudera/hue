@@ -1470,7 +1470,7 @@ class Coordinator(Job):
   frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days', verbose_name=_t('Frequency unit'),
                                     help_text=_t('The unit of the rate at which data is periodically created.')) # unused
   timezone = models.CharField(
-    max_length=24,
+    max_length=32,
     choices=TIMEZONES,
     default='America/Los_Angeles',
     verbose_name=_t('Timezone'),
@@ -1769,7 +1769,7 @@ class Dataset(models.Model):
                 'configuration properties (e.g. /home/${USER}/projects/${PROJECT})')
   )
   timezone = models.CharField(
-    max_length=24,
+    max_length=32,
     choices=TIMEZONES,
     default='America/Los_Angeles',
     verbose_name=_t('Timezone'),
