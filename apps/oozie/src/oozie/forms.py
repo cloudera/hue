@@ -23,7 +23,7 @@ from time import mktime, struct_time
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms.widgets import TextInput
-from django.utils.functional import curry
+from functools import partial
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.django_forms import MultiForm, SplitDateTimeWidget
@@ -574,7 +574,7 @@ def design_form_by_type(node_type, user, workflow):
   klass_form = _node_type_TO_FORM_CLS[node_type]
 
   if node_type == 'subworkflow':
-    klass_form = curry(klass_form, user=user, workflow=workflow)
+    klass_form = partial(klass_form, user=user, workflow=workflow)
 
   return klass_form
 
