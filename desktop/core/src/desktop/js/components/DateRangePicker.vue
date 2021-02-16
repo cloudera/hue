@@ -80,7 +80,7 @@
 
   import { Range } from './DateRangePicker';
   import { DateTime } from 'luxon';
-  import Datepicker from 'vuejs-datepicker';
+  import Datepicker from 'vue3-datepicker';
   import HueLink from './HueLink.vue';
   import HueButton from './HueButton.vue';
   import I18n from '../utils/i18n';
