@@ -819,12 +819,3 @@ try:
 except ValueError:
   from desktop.monkey_patches import monkey_patch_md5
   monkey_patch_md5(MODULES_TO_PATCH)
-
-################################################################
-# SLACK API Configurations
-################################################################
-
-SLACK_CLIENT_ID = desktop.conf.SLACK.SLACK_CLIENT_ID.get()
-SLACK_CLIENT_SECRET = desktop.conf.SLACK.SLACK_CLIENT_SECRET.get()
-SLACK_VERIFICATION_TOKEN = desktop.conf.SLACK.SLACK_VERIFICATION_TOKEN.get()
-SLACK_BOT_USER_TOKEN = desktop.conf.SLACK.SLACK_BOT_USER_TOKEN.get()

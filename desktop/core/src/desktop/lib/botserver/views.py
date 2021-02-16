@@ -22,6 +22,7 @@ from pprint import pprint
 from django.shortcuts import render
 from django.http import HttpResponse
 from desktop.lib.django_util import login_notrequired, JsonResponse
+from desktop import conf
 from django.views.decorators.csrf import csrf_exempt
 
 from django.conf import settings
@@ -29,8 +30,8 @@ from slack_sdk import WebClient
 
 LOG = logging.getLogger(__name__)
 
-SLACK_VERIFICATION_TOKEN = getattr(settings, 'SLACK_VERIFICATION_TOKEN', None)
-SLACK_BOT_USER_TOKEN = getattr(settings, 'SLACK_BOT_USER_TOKEN', None)
+SLACK_VERIFICATION_TOKEN = conf.SLACK.SLACK_VERIFICATION_TOKEN.get()
+SLACK_BOT_USER_TOKEN = conf.SLACK.SLACK_BOT_USER_TOKEN.get()
 
 
 slack_client = WebClient(token=SLACK_BOT_USER_TOKEN)

@@ -131,15 +131,19 @@ def is_https_enabled():
   return bool(SSL_CERTIFICATE.get() and SSL_PRIVATE_KEY.get())
 
 def get_slack_client_id():
+  """Returns Slack Client ID if set as environment variable else None"""
   return os.environ.get('SLACK_CLIENT_ID')
 
 def get_slack_client_secret():
+  """Returns Slack Client Secret if set as environment variable else None"""
   return os.environ.get('SLACK_CLIENT_SECRET')
 
 def get_slack_verification_token():
+  """Returns Slack Verification Token if set as environment variable else None"""
   return os.environ.get('SLACK_VERIFICATION_TOKEN')
 
 def get_slack_bot_user_token():
+  """Returns Slack Bot User Token if set as environment variable else None"""
   return os.environ.get('SLACK_BOT_USER_TOKEN')
 
 
