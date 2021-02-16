@@ -46,16 +46,13 @@
   import AceEditor from './AceEditor.vue';
   import Executor from 'apps/editor/execution/executor';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
-  import sqlParserRepository, { SqlParserRepository } from 'parse/sql/sqlParserRepository';
-  import sqlReferenceRepository, {
-    SqlReferenceRepository
-  } from 'sql/reference/sqlReferenceRepository';
+  import sqlParserRepository from 'parse/sql/sqlParserRepository';
+  import sqlReferenceRepository from 'sql/reference/sqlReferenceRepository';
 
   const AceEditorKoBridge = defineComponent({
     components: {
       AceEditor
     },
-
     props: {
       executor: {
         type: Object as PropType<Executor>,
@@ -78,30 +75,21 @@
         default: undefined
       }
     },
-
-    setup(): {
-      sqlParserProvider: SqlParserRepository;
-      sqlReferenceProvider: SqlReferenceRepository;
-      subTracker: SubscriptionTracker;
-    } {
+    setup() {
       return {
         sqlParserProvider: sqlParserRepository,
         sqlReferenceProvider: sqlReferenceRepository,
         subTracker: new SubscriptionTracker()
       };
     },
-
-    data(): {
-      cursorPosition?: Ace.Position;
-      editorId?: string;
-      initialized: boolean;
-      value?: string;
-    } {
+    data() {
       return {
+        cursorPosition: null as Ace.Position | null,
+        editorId: null as string | null,
+        value: null as string | null,
         initialized: false
       };
     },
-
     updated(): void {
       if (
         !this.initialized &&
@@ -109,12 +97,12 @@
         this.idObservable &&
         this.cursorPositionObservable
       ) {
-        this.value = this.valueObservable();
+        this.value = this.valueObservable() || null;
         this.subTracker.subscribe(this.valueObservable, (value?: string) => {
-          this.value = value;
+          this.value = value || null;
         });
 
-        this.editorId = this.idObservable();
+        this.editorId = this.idObservable() || null;
         if (!this.editorId) {
           this.subTracker
             .whenDefined<string>(this.idObservable)
@@ -124,7 +112,7 @@
             .catch(noop);
         }
 
-        this.cursorPosition = this.cursorPositionObservable();
+        this.cursorPosition = this.cursorPositionObservable() || null;
         if (!this.cursorPosition) {
           this.subTracker
             .whenDefined<Ace.Position>(this.cursorPositionObservable)

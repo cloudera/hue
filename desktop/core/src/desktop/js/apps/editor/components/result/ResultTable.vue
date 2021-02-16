@@ -26,7 +26,7 @@
       :sticky-first-column="true"
       @scroll-to-end="onScrollToEnd"
     />
-    <div v-if="isExecuting">
+    <div v-else-if="isExecuting">
       <h1 class="empty"><i class="fa fa-spinner fa-spin" /> {{ I18n('Executing...') }}</h1>
     </div>
     <div v-else-if="hasEmptySuccessResult">
@@ -74,46 +74,30 @@
     props: {
       executable: {
         type: Object as PropType<Executable>,
-        default: undefined
+        required: true
       }
     },
 
-    setup(): {
-      subTracker: SubscriptionTracker;
-    } {
-      return {
-        subTracker: new SubscriptionTracker()
-      };
+    setup() {
+      const subTracker = new SubscriptionTracker();
+      return { subTracker };
     },
 
-    data(): {
-      grayedOut: boolean;
-      fetchedOnce: boolean;
-      hasResultSet: boolean;
-      streaming: boolean;
-      hasMore: boolean;
-      rows: ResultRow[];
-      meta: ResultMeta[];
-
-      status: ExecutionStatus | null;
-      type: ResultType;
-      images: [];
-      lastFetchedRows: ResultRow[];
-      lastRenderedResult?: ExecutionResult;
-    } {
+    data() {
       return {
         grayedOut: false,
         fetchedOnce: false,
         hasResultSet: false,
         streaming: false,
         hasMore: false,
-        rows: [],
-        meta: [],
+        rows: [] as ResultRow[],
+        meta: [] as ResultMeta[],
 
-        status: null,
+        status: null as ExecutionStatus | null,
         type: ResultType.Table,
-        images: [],
-        lastFetchedRows: []
+        images: [] as string[],
+        lastFetchedRows: [] as ResultRow[],
+        lastRenderedResult: null as ExecutionResult | null
       };
     },
 
@@ -165,13 +149,13 @@
 
     mounted(): void {
       this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, (executable: Executable) => {
-        if (this.executable === executable) {
+        if (this.executable.id === executable.id) {
           this.updateFromExecutable(executable);
         }
       });
 
       this.subTracker.subscribe(RESULT_UPDATED_EVENT, (executionResult: ExecutionResult) => {
-        if (this.executable === executionResult.executable) {
+        if (this.executable.id === executionResult.executable.id) {
           this.handleResultChange();
         }
       });

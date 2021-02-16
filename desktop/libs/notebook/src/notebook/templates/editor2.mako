@@ -322,10 +322,10 @@
       },
       vueKoProps: {
         executor: executor,
-        valueObservable: statement_raw,
-        cursorPositionObservable: aceCursorPosition,
-        idObservable: id,
-        aceOptions: {
+        'value-observable': statement_raw,
+        'cursor-position-observable': aceCursorPosition,
+        'id-observable': id,
+        'ace-options': {
           showLineNumbers: $root.editorMode(),
           showGutter: $root.editorMode(),
           maxLines: $root.editorMode() ? null : 25,
@@ -584,7 +584,7 @@
 
 <script type="text/html" id="editor-snippet-code-resizer">
   <editor-resizer-ko-bridge data-bind="vueKoProps: {
-      editorObservable: ace
+      'editor-observable': ace
     }"></editor-resizer-ko-bridge>
 </script>
 
@@ -607,8 +607,8 @@
   <div class="snippet-actions" style="padding: 5px;">
     <div class="pull-left">
       <executable-actions-ko-bridge data-bind="vueKoProps: {
-          executableObservable: activeExecutable,
-          beforeExecute: beforeExecute
+          'executable-observable': activeExecutable,
+          'before-execute': beforeExecute
         }"></executable-actions-ko-bridge>
     </div>
     <!-- ko if: isSqlDialect() && !$root.isPresentationMode() -->
@@ -875,8 +875,8 @@
         },
         vueKoProps: {
           executor: executor,
-          titleObservable: parentNotebook.name,
-          descriptionObservable: parentNotebook.description
+          'title-observable': parentNotebook.name,
+          'description-observable': parentNotebook.description
         }
       "></presentation-mode-ko-bridge>
     <!-- /ko -->
@@ -907,7 +907,7 @@
               }
             },
             vueKoProps: {
-              initialVariables: executor.variables
+              'initial-variables': executor.variables
             }
           "></variable-substitution-ko-bridge>
   ##      <!-- ko template: { name: 'editor-executable-snippet-body' } --><!-- /ko -->
@@ -992,7 +992,7 @@
           <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
             <div class="execution-results-tab-panel">
               <result-table-ko-bridge class="table-results-bridge" data-bind="vueKoProps: {
-                  executableObservable: activeExecutable
+                  'executable-observable': activeExecutable
                 }"></result-table-ko-bridge>
             </div>
           </div>
@@ -1023,7 +1023,7 @@
             <div class="execution-analysis-tab-panel">
               <execution-analysis-panel-ko-bridge class="execution-analysis-bridge" data-bind="
                 vueKoProps: {
-                  executableObservable: activeExecutable
+                  'executable-observable': activeExecutable
                 },
                 vueEvents: {
                   'execution-error': function () { currentQueryTab('executionAnalysis') }
