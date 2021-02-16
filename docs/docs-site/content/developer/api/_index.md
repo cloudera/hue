@@ -7,13 +7,12 @@ weight: 4
 
 # REST
 
-The REST API is not properly public yet and can (will) be simplified in the current work in progress [HUE-1450](https://issues.cloudera.org/browse/HUE-1450).
-
-Hue is Ajax based and has a REST API used by the browser to communicate (e.g. submit an SQL query, list some S3 files in a buck...) with the Hue server which will then perform the operation with the remote services. Currently this API is private and subject to change but can already be reused for prove of concepts until the proper public API is released.
+The user interface communicates (e.g. submit an SQL query, list some S3 files in a buck...) with the API server via a REST API which will then perform the operation with the remote services. Currently this API is private and subject to change but can already be reused for prove of concepts until the proper public API is released.
 
 In general we want to authenticate with a username and password, retrieve a `session` and [CSRF](https://docs.djangoproject.com/en/3.1/ref/csrf/) cookies and provide them in the follow-up calls so that Hue knows who we are and won't block you.
 
-The [API documentation](https://docs.gethue.com/developer/api/) has been refreshed and list new endpoints.
+**Note** The REST API will be properly public with versioning in [Hue 5](https://github.com/cloudera/hue/projects/5).
+
 
 ## Quickstart
 
@@ -503,7 +502,7 @@ Adding/updating a comment with the dummy backend:
 
 
 
-# Programming
+# SDK
 
 Here is some overview about using the Python commands an shell and some examples below:
 

@@ -23,6 +23,8 @@ import {
   Optimizer,
   OptimizerRisk,
   PopularityOptions,
+  PredictOptions,
+  PredictResponse,
   RiskOptions,
   SimilarityOptions
 } from 'catalog/optimizer/optimizer';
@@ -73,5 +75,10 @@ export default class NoopSqlAnalyzer implements Optimizer {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fetchTopJoins(options: PopularityOptions): CancellablePromise<TopJoins> {
     return CancellablePromise.reject('fetchTopJoins is not Implemented');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  predict(options: PredictOptions): CancellablePromise<PredictResponse> {
+    return CancellablePromise.reject('predict is not Implemented');
   }
 }

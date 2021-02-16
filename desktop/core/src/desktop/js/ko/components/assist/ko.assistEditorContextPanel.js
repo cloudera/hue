@@ -116,9 +116,9 @@ const TEMPLATE =
           <li>
             <div class="risk-list-title" data-bind="css: { 'risk-list-high' : risk === 'high', 'risk-list-normal':  risk !== 'high' }, tooltip: { title: risk + ' ' + riskTables }"><span data-bind="text: riskAnalysis"></span></div>
             <div class="risk-list-description" data-bind="text: riskRecommendation"></div>
-            <div class="risk-quickfix" data-bind="visible: (riskId === 17 || riskId === 22) && $parent.activeEditor() && $parent.activeLocations()" style="display:none;">
+            <div class="risk-quickfix" data-bind="visible: (riskId === 17 || riskId === 18 || riskId === 22) && $parent.activeEditor() && $parent.activeLocations()" style="display:none;">
               <a href="javascript:void(0);" data-bind="click: function () { $parent.addFilter(riskId); hueAnalytics.convert('optimizer', 'addFilter/' + riskId); }">${I18n(
-                'Add filter'
+                'Fix me'
               )}</a>
             </div>
           </li>
@@ -660,9 +660,10 @@ class AssistEditorContextPanel {
         }
 
         if (
+          riskId === 22 &&
           location.type === 'whereClause' &&
           !location.subquery &&
-          (location.missing || riskId === 22)
+          location.missing
         ) {
           this.activeEditor().moveCursorToPosition({
             row: location.location.last_line - 1,
@@ -693,6 +694,54 @@ class AssistEditorContextPanel {
 
           return false;
         }
+
+        if (
+          riskId === 17 &&
+          location.type === 'limitClause' &&
+          !location.subquery &&
+          location.missing
+        ) {
+          this.activeEditor().moveCursorToPosition({
+            row: location.location.last_line - 1,
+            column: location.location.last_column - 1
+          });
+          this.activeEditor().clearSelection();
+
+          if (/\S$/.test(this.activeEditor().getTextBeforeCursor())) {
+            this.activeEditor().session.insert(this.activeEditor().getCursorPosition(), ' ');
+          }
+
+          const operation = 'LIMIT';
+          this.activeEditor().session.insert(
+            this.activeEditor().getCursorPosition(),
+            isLowerCase ? operation.toLowerCase() : operation
+          );
+          this.activeEditor().focus();
+
+          window.setTimeout(() => {
+            this.activeEditor().execCommand('startAutocomplete');
+          }, 1);
+
+          return false;
+        }
+
+        if (riskId === 18 && location.type === 'asterisk' && !location.subquery) {
+          this.activeEditor().moveCursorToPosition({
+            row: location.location.last_line - 1,
+            column: location.location.last_column - 1
+          });
+
+          this.activeEditor().clearSelection();
+          this.activeEditor().removeTextBeforeCursor(1);
+          this.activeEditor().focus();
+
+          window.setTimeout(() => {
+            this.activeEditor().execCommand('startAutocomplete');
+          }, 1);
+
+          return false;
+        }
+
         return true;
       });
     }

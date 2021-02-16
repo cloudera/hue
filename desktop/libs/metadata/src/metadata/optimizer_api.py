@@ -216,16 +216,16 @@ def predict(request):
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   connector = json.loads(request.POST.get('connector', '{}'))
-  query = json.loads(request.POST.get('query', '""'))
-  source_platform = request.POST.get('sourcePlatform')
+  before_cursor = request.POST.get('beforeCursor', '')
+  after_cursor = request.POST.get('afterCursor', '')
 
   api = get_api(request.user, interface)
 
-  data = api.predict(query=query, source_platform=source_platform, connector=connector)
+  data = api.predict(before_cursor=before_cursor, after_cursor=after_cursor, connector=connector)
 
   if data:
     response['status'] = 0
-    response['predict'] = data
+    response['prediction'] = data['statement']
   else:
     response['message'] = 'Optimizer: %s' % data
 

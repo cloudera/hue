@@ -19,14 +19,17 @@
 <template>
   <Sidebar
     :sidebar-items="sidebarItems"
+    :use-drawer-for-user="false"
     :user-drawer-item="userDrawerItem"
     :user-drawer-children="userDrawerChildren"
+    :use-drawer-for-help="false"
     :help-drawer-item="helpDrawerItem"
     :help-drawer-children="helpDrawerChildren"
     :active-item-name="activeItemName"
     :is-collapsed="isCollapsed"
     :drawer-topic="drawerTopic"
     @toggle-collapsed="toggleCollapsed"
+    @header-click="onHeaderClick"
   />
 </template>
 
@@ -147,6 +150,13 @@
     });
   }
 
+  USER_DRAWER_CHILDREN.push({
+    type: 'navigation',
+    name: 'logOut',
+    displayName: I18n('Log Out'),
+    handler: (event: Event) => onHueLinkClick(event, '/accounts/logout')
+  });
+
   const HELP_DRAWER_CHILDREN: Omit<SidebarNavigationItem, 'iconHtml'>[] = [
     {
       type: 'navigation',
@@ -200,6 +210,10 @@
     toggleCollapsed(): void {
       this.isCollapsed = !this.isCollapsed;
       setInLocalStorage('hue.sidebar.collapse', this.isCollapsed);
+    }
+
+    onHeaderClick(event: MouseEvent): void {
+      onHueLinkClick(event, '/home');
     }
 
     mounted(): void {

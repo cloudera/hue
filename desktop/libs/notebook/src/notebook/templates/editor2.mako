@@ -382,56 +382,58 @@
   </div>
 </script>
 
-<script type="text/html" id="snippet-variables">
-  <div class="variables" data-bind="with: variableSubstitutionHandler">
-    <ul data-bind="foreach: variables" class="unstyled inline">
-      <li>
-        <div class="input-prepend margin-top-10">
-          <!-- ko ifnot: path() -->
-          <span class="muted add-on" data-bind="text: name"></span>
-          <!-- /ko -->
-          <!-- ko if: path() -->
-          <a href="javascript:void(0);" data-bind="click: $root.showContextPopover" style="float: left"> <span class="muted add-on" data-bind="text: name"></span></a>
-          <!-- /ko -->
-          <!-- ko if: meta.type() === 'text' -->
-          <!-- ko if: meta.placeholder() -->
-          <input class="input-medium" type="text" data-bind="value: value, attr: { value: value, type: type, placeholder: meta.placeholder() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
-          <!-- /ko -->
-          <!-- ko ifnot: meta.placeholder() -->
-          <!-- ko if: type() == 'datetime-local' -->
-          <input class="input-medium" type="text" data-bind="attr: { value: value }, value: value, datepicker: { momentFormat: 'YYYY-MM-DD HH:mm:ss.S' }">
-          <!-- /ko -->
-          <!-- ko if: type() == 'date' -->
-          <input class="input-medium" type="text" data-bind="attr: { value: value }, value: value, datepicker: { momentFormat: 'YYYY-MM-DD' }">
-          <!-- /ko -->
-          <!-- ko if: type() == 'checkbox' -->
-          <input class="input-medium" type="checkbox" data-bind="checked: value">
-          <!-- /ko -->
-          <!-- ko ifnot: (type() == 'datetime-local' || type() == 'date' || type() == 'checkbox') -->
-          <input class="input-medium" type="text" value="true" data-bind="value: value, attr: { value: value,  type: type() || 'text', step: step }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
-          <!-- /ko -->
-          <!-- /ko -->
-          <!-- /ko -->
-          <!-- ko if: meta.type() === 'select' -->
-          <select data-bind="
-                selectize: sample,
-                optionsText: 'text',
-                optionsValue: 'value',
-                selectizeOptions: {
-                  create: function (input) {
-                    sampleUser().push({ text: ko.observable(input), value: ko.observable(input) });
-                    return { text: input, value: input };
-                  }
-                },
-                value: value,
-                event: { 'keydown': $parent.onKeydownInVariable }
-              "></select>
-          <!-- /ko -->
-        </div>
-      </li>
-    </ul>
-  </div>
-</script>
+
+## TODO: Move additional types to VariableSubstitution.vue
+## <script type="text/html" id="snippet-variables">
+##   <div class="variables" data-bind="with: variableSubstitutionHandler">
+##     <ul data-bind="foreach: variables" class="unstyled inline">
+##       <li>
+##         <div class="input-prepend margin-top-10">
+##           <!-- ko ifnot: path() -->
+##           <span class="muted add-on" data-bind="text: name"></span>
+##           <!-- /ko -->
+##           <!-- ko if: path() -->
+##           <a href="javascript:void(0);" data-bind="click: $root.showContextPopover" style="float: left"> <span class="muted add-on" data-bind="text: name"></span></a>
+##           <!-- /ko -->
+##           <!-- ko if: meta.type() === 'text' -->
+##           <!-- ko if: meta.placeholder() -->
+##           <input class="input-medium" type="text" data-bind="value: value, attr: { value: value, type: type, placeholder: meta.placeholder() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
+##           <!-- /ko -->
+##           <!-- ko ifnot: meta.placeholder() -->
+##           <!-- ko if: type() == 'datetime-local' -->
+##           <input class="input-medium" type="text" data-bind="attr: { value: value }, value: value, datepicker: { momentFormat: 'YYYY-MM-DD HH:mm:ss.S' }">
+##           <!-- /ko -->
+##           <!-- ko if: type() == 'date' -->
+##           <input class="input-medium" type="text" data-bind="attr: { value: value }, value: value, datepicker: { momentFormat: 'YYYY-MM-DD' }">
+##           <!-- /ko -->
+##           <!-- ko if: type() == 'checkbox' -->
+##           <input class="input-medium" type="checkbox" data-bind="checked: value">
+##           <!-- /ko -->
+##           <!-- ko ifnot: (type() == 'datetime-local' || type() == 'date' || type() == 'checkbox') -->
+##           <input class="input-medium" type="text" value="true" data-bind="value: value, attr: { value: value,  type: type() || 'text', step: step }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
+##           <!-- /ko -->
+##           <!-- /ko -->
+##           <!-- /ko -->
+##           <!-- ko if: meta.type() === 'select' -->
+##           <select data-bind="
+##                 selectize: sample,
+##                 optionsText: 'text',
+##                 optionsValue: 'value',
+##                 selectizeOptions: {
+##                   create: function (input) {
+##                     sampleUser().push({ text: ko.observable(input), value: ko.observable(input) });
+##                     return { text: input, value: input };
+##                   }
+##                 },
+##                 value: value,
+##                 event: { 'keydown': $parent.onKeydownInVariable }
+##               "></select>
+##           <!-- /ko -->
+##         </div>
+##       </li>
+##     </ul>
+##   </div>
+## </script>
 
 <script type="text/html" id="editor-executable-snippet-body">
   <div style="padding:10px;">
@@ -866,6 +868,9 @@
           },
           'close': function () {
             parentNotebook.isPresentationMode(false);
+          },
+          'variables-changed': function (event) {
+            setVariables(event.detail);
           }
         },
         vueKoProps: {
@@ -895,6 +900,16 @@
           <!-- ko template: { name: 'editor-code-editor' } --><!-- /ko -->
         </div>
   ##      <!-- ko template: { name: 'snippet-variables' }--><!-- /ko -->
+          <variable-substitution-ko-bridge data-bind="
+            vueEvents: {
+              'variables-changed': function (event) {
+                setVariables(event.detail);
+              }
+            },
+            vueKoProps: {
+              initialVariables: executor.variables
+            }
+          "></variable-substitution-ko-bridge>
   ##      <!-- ko template: { name: 'editor-executable-snippet-body' } --><!-- /ko -->
         <div class="editor-execute-status">
           <!-- ko template: { name: 'editor-snippet-execution-status' } --><!-- /ko -->

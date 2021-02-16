@@ -1,14 +1,14 @@
 [
   {
     "data_file": "sample_07.csv",
-    "create_sql": "CREATE TABLE `sample_07` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nSTORED AS parquet\nTBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')\n",
+    "create_sql": "CREATE TABLE `sample_07` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nSTORED AS parquet\n",
     "table_name": "sample_07",
     "transactional": true,
     "dialects": ["hive", "impala"]
   },
   {
     "data_file": "sample_08.csv",
-    "create_sql": "CREATE TABLE `sample_08` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nSTORED AS parquet\nTBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')\n",
+    "create_sql": "CREATE TABLE `sample_08` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nSTORED AS parquet\n",
     "table_name": "sample_08",
     "transactional": true,
     "dialects": ["hive", "impala"]

@@ -34,7 +34,6 @@ desktop.lib.metrics.file_reporter.start_file_reporter()
 
 from django.conf import settings
 from django.conf.urls import include, url
-from django.contrib import admin
 from django.views.static import serve
 
 from notebook import views as notebook_views
@@ -46,7 +45,7 @@ from desktop import views as desktop_views
 from desktop import api as desktop_api
 from desktop import api2 as desktop_api2
 from desktop.auth import views as desktop_auth_views
-from desktop.conf import METRICS, USE_NEW_EDITOR, ENABLE_DJANGO_DEBUG_TOOL, ANALYTICS, has_connectors, ENABLE_PROMETHEUS
+from desktop.conf import METRICS, USE_NEW_EDITOR, ENABLE_DJANGO_DEBUG_TOOL, ANALYTICS, has_connectors, ENABLE_PROMETHEUS, SLACK
 from desktop.configuration import api as desktop_configuration_api
 from desktop.lib.vcs import api as desktop_lib_vcs_api
 from desktop.settings import is_oidc_configured
@@ -58,7 +57,6 @@ handler403 = 'desktop.views.serve_403_error'
 handler404 = 'desktop.views.serve_404_error'
 handler500 = 'desktop.views.serve_500_error'
 
-admin.autodiscover()
 
 # Some django-wide URLs
 dynamic_patterns = [
@@ -221,10 +219,6 @@ dynamic_patterns += [
   url(r'^scheduler/', include('desktop.lib.scheduler.urls'))
 ]
 
-dynamic_patterns += [
-  url(r'^admin/?', admin.site.urls),
-]
-
 if ENABLE_PROMETHEUS.get():
   dynamic_patterns += [
     url('', include('django_prometheus.urls')),
@@ -273,4 +267,10 @@ if settings.DEBUG and ENABLE_DJANGO_DEBUG_TOOL.get():
 if is_oidc_configured():
   urlpatterns += [
     url(r'^oidc/', include('mozilla_django_oidc.urls')),
+  ]
+
+# Slack botserver URLs
+if SLACK.IS_ENABLED.get():
+  urlpatterns += [
+    url(r'^slack/', include('desktop.lib.botserver.urls')),
   ]

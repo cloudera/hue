@@ -80,14 +80,20 @@
     <BaseNavigationItemTooltip
       v-if="tooltip"
       :visible="isCollapsed"
-      :style="{
-        top: tooltip.top + 'px',
-        left: tooltip.right + 'px',
-        'max-height': tooltip.maxHeight + 'px'
-      }"
+      :style="tooltipStyle"
       role="tooltip"
+      @click="onTooltipClick"
     >
       <div
+        v-if="isUserMenu"
+        class="sidebar-sidebar-item-tooltip-primary sidebar-tooltip-user-header"
+        :class="{ 'sidebar-active': isActive }"
+      >
+        <div class="sidebar-user-icon" role="img">{{ item.displayName[0].toUpperCase() }}</div>
+        <div class="sidebar-tooltip-username">{{ item.displayName }}</div>
+      </div>
+      <div
+        v-else
         class="sidebar-sidebar-item-tooltip-primary"
         :class="{ 'sidebar-active': isActive }"
         :style="{ height: tooltip.height + 'px' }"
@@ -157,12 +163,39 @@
       );
     }
 
+    get isUserMenu(): boolean {
+      return this.item.name === 'user';
+    }
+
     get accordionItemsHeight(): string {
       const el = <HTMLElement>this.$refs.accordionItems;
       if (this.isOpen && el) {
         return `${el.scrollHeight}px`;
       }
       return '0';
+    }
+
+    get tooltipStyle(): CSSStyleDeclaration | undefined {
+      if (!this.tooltip) {
+        return {};
+      }
+
+      if (this.isCollapsed) {
+        // Prevent the menu from showing outside the window
+        const height = this.item.children.length * 32 + (this.isUserMenu ? 50 : 40);
+        const diff = this.tooltip.top + height - window.innerHeight;
+        if (diff > 0) {
+          return {
+            top: this.tooltip.top - diff - 5 + 'px',
+            left: this.tooltip.right + 'px'
+          };
+        }
+      }
+      return {
+        top: this.tooltip.top + 'px',
+        left: this.tooltip.right + 'px',
+        maxHeight: this.tooltip.maxHeight + 'px'
+      };
     }
 
     mounted(): void {
@@ -220,6 +253,10 @@
 
     onTooltipAccordionItemsScroll(event: Event): void {
       this.isTooltipScrolled = (event.target as HTMLElement).scrollTop > 0;
+    }
+
+    onTooltipClick(): void {
+      this.tooltip = null;
     }
 
     openTooltip(el: HTMLElement, fromKeyboard?: boolean): void {

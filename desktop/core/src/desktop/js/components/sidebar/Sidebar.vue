@@ -38,7 +38,7 @@
     </div>
     <div class="sidebar" :class="{ 'sidebar-collapsed': isCollapsed }">
       <div class="sidebar-header">
-        <a href="javascript:void(0);">
+        <a href="javascript:void(0);" @click="$emit('header-click', $event)">
           <svg>
             <use xlink:href="#hi-sidebar-logo" />
           </svg>
@@ -51,19 +51,30 @@
       />
       <div class="sidebar-footer">
         <NavigationItem
-          v-if="helpItem"
+          v-if="helpItem && useDrawerForHelp"
+          :item="helpItem"
+          :is-collapsed="isCollapsed"
+          :active-item-name="activeItemName"
+        />
+        <AccordionItem
+          v-if="helpItem && !useDrawerForHelp"
           :item="helpItem"
           :is-collapsed="isCollapsed"
           :active-item-name="activeItemName"
         />
         <NavigationItem
-          v-if="userItem"
+          v-if="userItem && useDrawerForUser"
+          :item="userItem"
+          :is-collapsed="isCollapsed"
+          :active-item-name="activeItemName"
+        />
+        <AccordionItem
+          v-if="userItem && !useDrawerForUser"
           :item="userItem"
           :is-collapsed="isCollapsed"
           :active-item-name="activeItemName"
         />
         <div class="sidebar-footer-bottom-row">
-          <div class="sidebar-footer-version-number"><!-- TODO: Add Version --></div>
           <BaseNavigationItem
             :css-classes="'sidebar-footer-collapse-btn'"
             :item="{
@@ -91,6 +102,8 @@
   import Component from 'vue-class-component';
   import { Fragment } from 'vue-fragment';
   import { Prop } from 'vue-property-decorator';
+
+  import AccordionItem from './AccordionItem.vue';
   import BaseNavigationItem from './BaseNavigationItem.vue';
   import './drawer.scss';
   import HelpDrawerContent from './HelpDrawerContent.vue';
@@ -99,6 +112,8 @@
   import SidebarBody from './SidebarBody.vue';
   import SidebarDrawer from './SidebarDrawer.vue';
   import {
+    HelpDrawerItem,
+    SidebarAccordionItem,
     SidebarAccordionSubItem,
     SidebarItem,
     SidebarNavigationItem,
@@ -108,6 +123,7 @@
 
   @Component({
     components: {
+      AccordionItem,
       HelpDrawerContent,
       UserDrawerContent,
       SidebarDrawer,
@@ -121,11 +137,15 @@
     @Prop()
     sidebarItems!: SidebarItem[];
 
+    @Prop({ required: false, default: true })
+    useDrawerForUser?: boolean;
     @Prop({ required: false })
     userDrawerItem: UserDrawerItem | null = null;
     @Prop({ required: false })
     userDrawerChildren: SidebarAccordionSubItem[] = [];
 
+    @Prop({ required: false, default: true })
+    useDrawerForHelp?: boolean;
     @Prop({ required: false })
     helpDrawerItem: HelpDrawerItem | null = null;
     @Prop({ required: false })
@@ -144,33 +164,53 @@
       }
     }
 
-    get helpItem(): SidebarNavigationItem | null {
+    get helpItem(): SidebarAccordionItem | SidebarNavigationItem | null {
       if (!this.helpDrawerItem) {
         return null;
       }
-      return {
-        type: 'navigation',
+      const sharedProps = {
         name: 'help',
         displayName: this.helpDrawerItem.displayName,
-        iconHtml: this.helpDrawerItem.iconHtml,
-        handler: () => {
-          this.drawerTopic = 'help';
-        }
+        iconHtml: this.helpDrawerItem.iconHtml
+      };
+      if (this.useDrawerForHelp) {
+        return {
+          type: 'navigation',
+          ...sharedProps,
+          handler: () => {
+            this.drawerTopic = 'help';
+          }
+        };
+      }
+      return {
+        type: 'accordion',
+        ...sharedProps,
+        children: this.helpDrawerChildren
       };
     }
 
-    get userItem(): SidebarNavigationItem | null {
+    get userItem(): SidebarAccordionItem | SidebarNavigationItem | null {
       if (!this.userDrawerItem) {
         return null;
       }
-      return {
-        type: 'navigation',
+      const sharedProps = {
         name: 'user',
         displayName: this.userDrawerItem.displayName,
-        iconHtml: `<div class="sidebar-user-icon" role="img">${this.userDrawerItem.displayName[0].toUpperCase()}</div>`,
-        handler: () => {
-          this.drawerTopic = 'user';
-        }
+        iconHtml: `<div class="sidebar-user-icon" role="img">${this.userDrawerItem.displayName[0].toUpperCase()}</div>`
+      };
+      if (this.useDrawerForUser) {
+        return {
+          type: 'navigation',
+          ...sharedProps,
+          handler: () => {
+            this.drawerTopic = 'user';
+          }
+        };
+      }
+      return {
+        type: 'accordion',
+        ...sharedProps,
+        children: this.userDrawerChildren
       };
     }
   }

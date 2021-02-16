@@ -25,6 +25,8 @@ import {
   Optimizer,
   OptimizerRisk,
   PopularityOptions,
+  PredictOptions,
+  PredictResponse,
   RiskOptions,
   SimilarityOptions
 } from 'catalog/optimizer/optimizer';
@@ -60,6 +62,7 @@ const genericOptimizerMultiTableFetch = <T extends TimestampedData>(
 };
 
 const COMPATIBILITY_URL = '/notebook/api/optimizer/statement/compatibility';
+const PREDICT_URL = '/metadata/api/optimizer/predict';
 const RISK_URL = '/notebook/api/optimizer/statement/risk';
 const SIMILARITY_URL = '/notebook/api/optimizer/statement/similarity';
 const TOP_AGGS_URL = '/metadata/api/optimizer/top_aggs';
@@ -207,6 +210,23 @@ export default class ApiStrategy implements Optimizer {
             resolve(response.details);
           }
           reject(extractErrorMessage(response));
+        }
+      }
+    );
+  }
+
+  predict({ beforeCursor, afterCursor }: PredictOptions): CancellablePromise<PredictResponse> {
+    return post<PredictResponse>(
+      PREDICT_URL,
+      {
+        connector: JSON.stringify(this.connector),
+        beforeCursor,
+        afterCursor
+      },
+      {
+        silenceErrors: true,
+        handleSuccess: (response: PredictResponse, resolve) => {
+          resolve(response);
         }
       }
     );

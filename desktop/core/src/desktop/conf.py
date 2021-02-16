@@ -553,6 +553,14 @@ REST_CONN_TIMEOUT = Config(
   type=int,
   help=_('Timeout in seconds for REST calls.'))
 
+CORS_ENABLED = Config(
+  key="cors_enabled",
+  help=_("To set to true when using a decoupled UI."),
+  type=coerce_bool,
+  default=False
+)
+
+
 VCS = UnspecifiedConfigSection(
   "vcs",
   help="One entry for each Version Control",
@@ -703,6 +711,17 @@ METRICS = ConfigSection(
   )
 )
 
+SLACK = ConfigSection(
+  key='slack',
+  help=_("""Configuration options for slack """),
+  members=dict(
+    IS_ENABLED=Config(
+      key='is_enabled',
+      help=_('Turns on Slack application API endpoints'),
+      default=False,
+      type=coerce_bool),
+  )
+)
 
 ANALYTICS = ConfigSection(
   key='analytics',

@@ -41,7 +41,7 @@ from django.http import Http404, StreamingHttpResponse, HttpResponseNotModified,
 from django.views.decorators.http import require_http_methods
 from django.views.static import was_modified_since
 from django.shortcuts import redirect
-from django.utils.functional import curry
+from functools import partial
 from django.utils.http import http_date
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
@@ -204,7 +204,18 @@ def view(request, path):
   decoded_path = unquote_url(path)
   if path != decoded_path:
     path = decoded_path
-  # default_to_home is set in bootstrap.js
+
+  # default_abfs_home is set in jquery.filechooser.js
+  if 'default_abfs_home' in request.GET:
+    from azure.abfs.__init__ import get_home_dir_for_ABFS
+    home_dir_path = get_home_dir_for_ABFS()
+    if request.fs.isdir(home_dir_path):
+      return format_preserving_redirect(
+          request,
+          '/filebrowser/view=' + urllib_quote(home_dir_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+      )
+
+  # default_to_home is set in jquery.filechooser.js
   if 'default_to_home' in request.GET:
     home_dir_path = request.user.get_home_directory()
     if request.fs.isdir(home_dir_path):
@@ -213,7 +224,7 @@ def view(request, path):
           '/filebrowser/view=' + urllib_quote(home_dir_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
       )
 
-  # default_to_home is set in bootstrap.js
+  # default_to_home is set in jquery.filechooser.js
   if 'default_to_trash' in request.GET:
     home_trash_path = _home_trash_path(request.fs, request.user, path)
     if request.fs.isdir(home_trash_path):
@@ -1262,7 +1273,7 @@ def chmod(request):
                "other_read", "other_write", "other_execute"]
   params = ["path"]
   def bulk_chmod(*args, **kwargs):
-    op = curry(request.fs.chmod, recursive=request.POST.get('recursive', False))
+    op = partial(request.fs.chmod, recursive=request.POST.get('recursive', False))
     for arg in args:
       op(urllib_unquote(arg['path']), arg['mode'])
   # mode here is abused: on input, it's a string, but when retrieved,
@@ -1287,7 +1298,7 @@ def chown(request):
   recurring = ["user", "group", "user_other", "group_other"]
   params = ["path"]
   def bulk_chown(*args, **kwargs):
-    op = curry(request.fs.chown, recursive=request.POST.get('recursive', False))
+    op = partial(request.fs.chown, recursive=request.POST.get('recursive', False))
     for arg in args:
       varg = [urllib_unquote(arg[param]) for param in param_names]
       op(*varg)

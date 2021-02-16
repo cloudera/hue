@@ -1470,7 +1470,7 @@ class Coordinator(Job):
   frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days', verbose_name=_t('Frequency unit'),
                                     help_text=_t('The unit of the rate at which data is periodically created.')) # unused
   timezone = models.CharField(
-    max_length=24,
+    max_length=32,
     choices=TIMEZONES,
     default='America/Los_Angeles',
     verbose_name=_t('Timezone'),
@@ -1722,7 +1722,8 @@ class Coordinator(Job):
     self.data = json.dumps(data_)
 
   class Meta(object):
-    manager_inheritance_from_future = True
+    if sys.version_info[0] < 3:
+      manager_inheritance_from_future = True
 
 class DatasetManager(models.Manager):
   def can_read_or_exception(self, request, dataset_id):
@@ -1768,7 +1769,7 @@ class Dataset(models.Model):
                 'configuration properties (e.g. /home/${USER}/projects/${PROJECT})')
   )
   timezone = models.CharField(
-    max_length=24,
+    max_length=32,
     choices=TIMEZONES,
     default='America/Los_Angeles',
     verbose_name=_t('Timezone'),
@@ -1987,7 +1988,8 @@ class Bundle(Job):
     return xml, metadata
 
   class Meta(object):
-    manager_inheritance_from_future = True
+    if sys.version_info[0] < 3:
+      manager_inheritance_from_future = True
 
 class HistoryManager(models.Manager):
   def create_from_submission(self, submission):

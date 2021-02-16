@@ -236,7 +236,7 @@
   background-color: $sidebar-bg-color;
   overflow: hidden;
   width: 233px;
-  z-index: 2;
+  z-index: 1002;
   opacity: 0;
 
   // when displaying accordion items in a tooltip, they could overlaps the bottom of the page
@@ -265,6 +265,22 @@
   &.sidebar-active {
     color: $sidebar-selection-color;
     font-weight: 500;
+  }
+
+  &.sidebar-tooltip-user-header {
+    height: 40px;
+    padding-top: 10px;
+
+    .sidebar-tooltip-username,
+    .sidebar-user-icon {
+      margin-left: 10px;
+    }
+
+    .sidebar-user-icon {
+      width: 30px;
+      height: 30px;
+      font-size: 18px;
+    }
   }
 }
 
@@ -325,7 +341,7 @@
   height: 80px;
   transform: rotate(339deg);
   transform-origin: 100% 0;
-  z-index: 1;
+  z-index: 1001;
 }
 
 .sidebar-sidebar-item-accordion-sub-item {

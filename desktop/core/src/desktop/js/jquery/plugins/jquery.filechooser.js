@@ -112,7 +112,7 @@ const defaults = {
     abfs: {
       scheme: 'abfs',
       root: 'abfs://',
-      home: 'abfs://',
+      home: '/?default_abfs_home',
       icon: {
         svg: {
           brand: '#hi-adls',
