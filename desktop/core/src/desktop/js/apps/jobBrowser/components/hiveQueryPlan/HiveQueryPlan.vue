@@ -23,13 +23,17 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
+  import { defineComponent } from 'vue';
 
-  @Component
-  export default class HiveQueryPlan extends Vue {
-    title = 'Web Component';
-  }
+  export default defineComponent({
+    setup(): {
+      title: string;
+    } {
+      return {
+        title: 'Web Component'
+      };
+    }
+  });
 </script>
 
 <style lang="scss" scoped>
