@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { wrap } from 'vue/webComponentWrapper';
+import { wrap } from 'vue/webComponentWrap';
 import QueriesList from './QueriesList.vue';
 
 export const COMPONENT_NAME = 'queries-list';
