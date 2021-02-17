@@ -3,7 +3,7 @@
 # to work.  Also note, they all make use of Hue's configuration and the /proc directory.  This
 # means these scripts MUST be run as ROOT.
 
-git clone https://github.com/cmconner156/hue_scripts /opt/cloudera/hue_scripts
+git clone https://github.com/cloudera/hue/tree/master/tools/ops/script_runner /opt/cloudera/hue_scripts
 cd /opt/cloudera/hue_scripts
 ./script_runner
 
@@ -86,7 +86,7 @@ script_runner remove_duplicate_user_preferences
 
 - This will remove duplicate entries in the table desktop_userpreferences.
 
-script_runner remove_orphaned_docs 
+script_runner remove_orphaned_docs
 
 - This will remove broken docs that do not have an owner.
 
