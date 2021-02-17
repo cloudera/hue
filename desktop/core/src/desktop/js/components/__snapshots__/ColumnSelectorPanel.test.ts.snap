@@ -14,19 +14,15 @@ exports[`ColumnSelectorPanel.vue should render 1`] = `
         type="text"
       />
     </li>
-     
+    
+    
   </ul>
-   
   <div
     class="column-selector-actions"
   >
     <hue-button-stub
       type="button"
-    >
-      
-      Apply
-    
-    </hue-button-stub>
+    />
   </div>
 </div>
 `;
@@ -45,15 +41,13 @@ exports[`ColumnSelectorPanel.vue should render with checkboxes 1`] = `
         type="text"
       />
     </li>
-     
+    
     <li>
       <label>
         <input
           type="checkbox"
         />
-        
-        A
-      
+         A
       </label>
     </li>
     <li>
@@ -61,23 +55,17 @@ exports[`ColumnSelectorPanel.vue should render with checkboxes 1`] = `
         <input
           type="checkbox"
         />
-        
-        B
-      
+         B
       </label>
     </li>
+    
   </ul>
-   
   <div
     class="column-selector-actions"
   >
     <hue-button-stub
       type="button"
-    >
-      
-      Apply
-    
-    </hue-button-stub>
+    />
   </div>
 </div>
 `;
