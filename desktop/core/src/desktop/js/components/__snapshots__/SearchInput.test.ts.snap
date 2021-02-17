@@ -9,7 +9,6 @@ exports[`SearchInput.vue should render 1`] = `
       class="magnify-icon fa fa-fw fa-search"
       style="top: 6px;"
     />
-     
     <form
       autocomplete="off"
     >
@@ -22,11 +21,10 @@ exports[`SearchInput.vue should render 1`] = `
         spellcheck="false"
         type="text"
       />
-       
       <input
         autocomplete="do-not-autocomplete"
         class="hue-search-input-overlay magnify-icon-input"
-        disabled="disabled"
+        disabled=""
         type="text"
       />
     </form>

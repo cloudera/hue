@@ -4,5 +4,8 @@ exports[`HueButton.vue should render 1`] = `
 <button
   class="hue-btn"
   type="button"
-/>
+>
+  
+  
+</button>
 `;
