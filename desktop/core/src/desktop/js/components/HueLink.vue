@@ -40,10 +40,6 @@
 
     emits: ['click'],
 
-    created(): void {
-      delete this.$attrs.href;
-    },
-
     methods: {
       clicked(event: Event): void {
         if (this.url && this.$attrs.target) {
