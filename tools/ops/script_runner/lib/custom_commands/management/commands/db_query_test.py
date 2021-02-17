@@ -1,4 +1,21 @@
 #!/usr/bin/env python
+
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
 import sys
 import time
@@ -104,13 +121,13 @@ class Command(BaseCommand):
              junk, query = line.split("QUERY = u'")
              query, param_base = query.split("' - PARAMS = (")
              params, junk = param_base.split(");")
-    
+
              if params.endswith(','):
                params = params[:-1]
 
              params = paramsFixRegex.sub(",", params)
              params = params.split(',')
-             
+
              loopCount = len(params) - 1
              while(loopCount >= 0):
                i = loopCount
@@ -120,10 +137,10 @@ class Command(BaseCommand):
                  query = updateArgsRegex.sub("'%s'" % Oracle_datetime.from_datetime(datetime.datetime.now()), query)
                else:
                  if "oracle" in desktop.conf.DATABASE.ENGINE.get():
-                   params[i] = trueFixRegex.sub("1", params[i], re.IGNORECASE)  
-                   params[i] = falseFixRegex.sub("0", params[i], re.IGNORECASE)  
+                   params[i] = trueFixRegex.sub("1", params[i], re.IGNORECASE)
+                   params[i] = falseFixRegex.sub("0", params[i], re.IGNORECASE)
                query = updateArgsRegex.sub(params[i], query)
-             
+
              cursor = connection.cursor()
              cursor.execute(query)
              try:
@@ -145,5 +162,3 @@ class Command(BaseCommand):
     end = time.time()
     elapsed = (end - start)
     LOG.debug("Total queries: %s: time elapsed (seconds): %.2f" % (count, elapsed))
-
-
