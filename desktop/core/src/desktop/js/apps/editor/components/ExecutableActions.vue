@@ -43,7 +43,7 @@
       v-if="showStop && !stopping"
       key="stop-button"
       :small="true"
-      alert="true"
+      :alert="true"
       @click="stop"
     >
       <i class="fa fa-stop fa-fw" />
@@ -51,7 +51,7 @@
       <span v-else>{{ I18n('Stop') }}</span>
     </hue-button>
 
-    <hue-button v-if="showStop && stopping" key="stopping-button" small="true" alert="true">
+    <hue-button v-if="showStop && stopping" key="stopping-button" :small="true" :alert="true">
       <i class="fa fa-fw fa-spinner fa-spin" /> {{ I18n('Stopping') }}
     </hue-button>
 
@@ -152,22 +152,25 @@
     },
 
     watch: {
-      executable(): void {
-        if (this.executable) {
-          this.updateFromExecutable(this.executable);
-        }
+      executable: {
+        handler(): void {
+          if (this.executable) {
+            this.updateFromExecutable(this.executable);
+          }
+        },
+        immediate: true
       }
     },
 
     mounted(): void {
       this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
-        if (this.executable.id === executable.id) {
+        if (this.executable != undefined && this.executable.id === executable.id) {
           this.updateFromExecutable(executable);
         }
       });
 
       this.subTracker.subscribe(EXECUTE_ACTIVE_EXECUTABLE_EVENT, executable => {
-        if (this.executable === executable) {
+        if (this.executable != undefined && this.executable === executable) {
           this.execute();
         }
       });
