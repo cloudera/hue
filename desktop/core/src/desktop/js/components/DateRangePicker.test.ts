@@ -22,7 +22,9 @@ describe('DateRangePicker.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(DateRangePicker, {
       global: {
-        stubs: { 'dropdown-panel': DropdownPanel }
+        stubs: {
+          DropdownPanel
+        }
       }
     });
     expect(wrapper.element).toMatchSnapshot();
