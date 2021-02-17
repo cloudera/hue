@@ -19,10 +19,12 @@ import logging
 import json
 from pprint import pprint
 
+from desktop import conf
 from django.shortcuts import render
 from django.http import HttpResponse
 from desktop.lib.django_util import login_notrequired, JsonResponse
-from desktop import conf
+from desktop.lib.exceptions_renderable import PopupException
+from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 
 from django.conf import settings
@@ -43,20 +45,20 @@ appname = "hue_bot"
 def slack_events(request):
   try:
     slack_message = json.loads(request.body)
-
+    
     if slack_message['token'] != SLACK_VERIFICATION_TOKEN:
       return HttpResponse(status=403)
 
       # challenge verification
     if slack_message['type'] == 'url_verification':
-        response_dict = {"challenge": slack_message.get('challenge')}
+        response_dict = {"challenge": slack_message['challenge']}
         return JsonResponse(response_dict, status=200)
     
     if 'event' in slack_message:
         event_message = slack_message['event']
         parse_events(event_message)
-  except Exception as e:
-    LOG.exception('Response content is not valid JSON in %s' % slack_events)
+  except Exception as ex:
+    raise PopupException(_("Response content is not valid JSON"), detail=ex)
   
   return HttpResponse(status=200)
 
@@ -72,14 +74,18 @@ def parse_events(event_message):
     return HttpResponse(status=200)
 
   if 'hello hue' in text.lower():
-    say_hi_user(channel, user_id)
+    response = say_hi_user(channel, user_id)
+    if response['ok']:
+      return HttpResponse(status=200)
+    else:
+      raise PopupException(response["error"])
+
   
 def say_hi_user(channel, user_id):
   """Bot sends Hi<username> message in a specific channel"""
   bot_message = f'Hi <@{user_id}> :wave:'
   response = slack_client.api_call(api_method='chat.postMessage', json={'channel': channel, 'text': bot_message})
-  if response["ok"]:
-    return HttpResponse(status=200)
+  return response
 
 def get_bot_id(botusername):
   """Takes in bot username, Returns the bot id"""
