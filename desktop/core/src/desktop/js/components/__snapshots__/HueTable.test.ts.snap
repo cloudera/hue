@@ -8,120 +8,121 @@ exports[`HueTable.vue should render a sticky table with header and column css 1`
     class="hue-table sticky-header"
   >
     <caption>
+      <!-- Because of Web:TableWithoutCaptionCheck -->
       
-      
-    
     </caption>
-     
     <thead>
       <tr
         class="header-row"
       >
+        
         <th
           class="header-css-class-A sticky-first-col"
           scope="col"
         >
-          
           A
-        
         </th>
         <th
           class="header-css-class-B"
           scope="col"
         >
-          
           B
-        
         </th>
-         
+        
+        <!-- To fill the blank space to the right when table width is smaller than available horizontal space -->
         <th
           class="column-flush"
           scope="col"
         />
       </tr>
     </thead>
-     
     <tbody>
+      
       <tr>
+        
         <td
           class="td-css-class-A sticky-first-col"
         >
           
-            1
+          1
           
         </td>
         <td
           class="td-css-class-B"
         >
           
-            5
+          5
           
         </td>
-         
+        
         <td
           class="column-flush"
         />
       </tr>
       <tr>
+        
         <td
           class="td-css-class-A sticky-first-col"
         >
           
-            2
+          2
           
         </td>
         <td
           class="td-css-class-B"
         >
           
-            6
+          6
           
         </td>
-         
+        
         <td
           class="column-flush"
         />
       </tr>
       <tr>
+        
         <td
           class="td-css-class-A sticky-first-col"
         >
           
-            3
+          3
           
         </td>
         <td
           class="td-css-class-B"
         >
           
-            7
+          7
           
         </td>
-         
+        
         <td
           class="column-flush"
         />
       </tr>
       <tr>
+        
         <td
           class="td-css-class-A sticky-first-col"
         >
           
-            4
+          4
           
         </td>
         <td
           class="td-css-class-B"
         >
           
-            8
+          8
           
         </td>
-         
+        
         <td
           class="column-flush"
         />
       </tr>
+      
     </tbody>
   </table>
 </div>
@@ -135,156 +136,189 @@ exports[`HueTable.vue should render a table 1`] = `
     class="hue-table"
   >
     <caption>
+      <!-- Because of Web:TableWithoutCaptionCheck -->
       
-      
-    
     </caption>
-     
     <thead>
       <tr
         class="header-row"
       >
+        
         <th
+          class=""
           scope="col"
         >
-          
           A
-        
         </th>
         <th
+          class=""
           scope="col"
         >
-          
           D
-        
         </th>
         <th
+          class=""
           scope="col"
         >
-          
           C
-        
         </th>
         <th
+          class=""
           scope="col"
         >
-          
           B
-        
         </th>
-         
+        
+        <!-- To fill the blank space to the right when table width is smaller than available horizontal space -->
         <th
           class="column-flush"
           scope="col"
         />
       </tr>
     </thead>
-     
     <tbody>
+      
       <tr>
-        <td>
+        
+        <td
+          class=""
+        >
           
-            1
-          
-        </td>
-        <td>
-          
-            
+          1
           
         </td>
-        <td>
+        <td
+          class=""
+        >
           
-            false
           
-        </td>
-        <td>
-          
-            5
           
         </td>
-         
+        <td
+          class=""
+        >
+          
+          false
+          
+        </td>
+        <td
+          class=""
+        >
+          
+          5
+          
+        </td>
+        
         <td
           class="column-flush"
         />
       </tr>
       <tr>
-        <td>
+        
+        <td
+          class=""
+        >
           
-            2
-          
-        </td>
-        <td>
-          
-            
+          2
           
         </td>
-        <td>
+        <td
+          class=""
+        >
           
-            true
           
-        </td>
-        <td>
-          
-            6
           
         </td>
-         
+        <td
+          class=""
+        >
+          
+          true
+          
+        </td>
+        <td
+          class=""
+        >
+          
+          6
+          
+        </td>
+        
         <td
           class="column-flush"
         />
       </tr>
       <tr>
-        <td>
+        
+        <td
+          class=""
+        >
           
-            3
-          
-        </td>
-        <td>
-          
-            
+          3
           
         </td>
-        <td>
+        <td
+          class=""
+        >
           
-            false
           
-        </td>
-        <td>
-          
-            7
           
         </td>
-         
+        <td
+          class=""
+        >
+          
+          false
+          
+        </td>
+        <td
+          class=""
+        >
+          
+          7
+          
+        </td>
+        
         <td
           class="column-flush"
         />
       </tr>
       <tr>
-        <td>
+        
+        <td
+          class=""
+        >
           
-            4
-          
-        </td>
-        <td>
-          
-            
+          4
           
         </td>
-        <td>
+        <td
+          class=""
+        >
           
-            true
           
-        </td>
-        <td>
-          
-            8
           
         </td>
-         
+        <td
+          class=""
+        >
+          
+          true
+          
+        </td>
+        <td
+          class=""
+        >
+          
+          8
+          
+        </td>
+        
         <td
           class="column-flush"
         />
       </tr>
+      
     </tbody>
   </table>
 </div>
@@ -298,70 +332,79 @@ exports[`HueTable.vue should render a table with a custom component for a cell 1
     class="hue-table"
   >
     <caption>
+      <!-- Because of Web:TableWithoutCaptionCheck -->
       
-      
-    
     </caption>
-     
     <thead>
       <tr
         class="header-row"
       >
+        
         <th
+          class=""
           scope="col"
         >
-          
           A
-        
         </th>
         <th
+          class=""
           scope="col"
         >
-          
           B
-        
         </th>
-         
+        
+        <!-- To fill the blank space to the right when table width is smaller than available horizontal space -->
         <th
           class="column-flush"
           scope="col"
         />
       </tr>
     </thead>
-     
     <tbody>
+      
       <tr>
-        <td>
-          <div>
-            3
-          </div>
-        </td>
-        <td>
+        
+        <td
+          class=""
+        >
           
-            2
+          1
           
         </td>
-         
+        <td
+          class=""
+        >
+          
+          2
+          
+        </td>
+        
         <td
           class="column-flush"
         />
       </tr>
       <tr>
-        <td>
-          <div>
-            9
-          </div>
-        </td>
-        <td>
+        
+        <td
+          class=""
+        >
           
-            5
+          4
           
         </td>
-         
+        <td
+          class=""
+        >
+          
+          5
+          
+        </td>
+        
         <td
           class="column-flush"
         />
       </tr>
+      
     </tbody>
   </table>
 </div>
@@ -375,102 +418,121 @@ exports[`HueTable.vue should render a table with adapter 1`] = `
     class="hue-table"
   >
     <caption>
+      <!-- Because of Web:TableWithoutCaptionCheck -->
       
-      
-    
     </caption>
-     
     <thead>
       <tr
         class="header-row"
       >
+        
         <th
+          class=""
           scope="col"
         >
-          
           A
-        
         </th>
         <th
+          class=""
           scope="col"
         >
-          
           B + C
-        
         </th>
-         
+        
+        <!-- To fill the blank space to the right when table width is smaller than available horizontal space -->
         <th
           class="column-flush"
           scope="col"
         />
       </tr>
     </thead>
-     
     <tbody>
+      
       <tr>
-        <td>
+        
+        <td
+          class=""
+        >
           
-            1
-          
-        </td>
-        <td>
-          
-            14
+          1
           
         </td>
-         
+        <td
+          class=""
+        >
+          
+          14
+          
+        </td>
+        
         <td
           class="column-flush"
         />
       </tr>
       <tr>
-        <td>
+        
+        <td
+          class=""
+        >
           
-            2
-          
-        </td>
-        <td>
-          
-            16
+          2
           
         </td>
-         
+        <td
+          class=""
+        >
+          
+          16
+          
+        </td>
+        
         <td
           class="column-flush"
         />
       </tr>
       <tr>
-        <td>
+        
+        <td
+          class=""
+        >
           
-            3
-          
-        </td>
-        <td>
-          
-            18
+          3
           
         </td>
-         
+        <td
+          class=""
+        >
+          
+          18
+          
+        </td>
+        
         <td
           class="column-flush"
         />
       </tr>
       <tr>
-        <td>
+        
+        <td
+          class=""
+        >
           
-            4
-          
-        </td>
-        <td>
-          
-            20
+          4
           
         </td>
-         
+        <td
+          class=""
+        >
+          
+          20
+          
+        </td>
+        
         <td
           class="column-flush"
         />
       </tr>
+      
     </tbody>
   </table>
 </div>
@@ -484,156 +546,189 @@ exports[`HueTable.vue should render a table with array rows 1`] = `
     class="hue-table"
   >
     <caption>
+      <!-- Because of Web:TableWithoutCaptionCheck -->
       
-      
-    
     </caption>
-     
     <thead>
       <tr
         class="header-row"
       >
+        
         <th
+          class=""
           scope="col"
         >
-          
           A
-        
         </th>
         <th
+          class=""
           scope="col"
         >
-          
           D
-        
         </th>
         <th
+          class=""
           scope="col"
         >
-          
           C
-        
         </th>
         <th
+          class=""
           scope="col"
         >
-          
           B
-        
         </th>
-         
+        
+        <!-- To fill the blank space to the right when table width is smaller than available horizontal space -->
         <th
           class="column-flush"
           scope="col"
         />
       </tr>
     </thead>
-     
     <tbody>
+      
       <tr>
-        <td>
+        
+        <td
+          class=""
+        >
           
-            5
-          
-        </td>
-        <td>
-          
-            false
+          5
           
         </td>
-        <td>
+        <td
+          class=""
+        >
           
-            
-          
-        </td>
-        <td>
-          
-            
+          false
           
         </td>
-         
+        <td
+          class=""
+        >
+          
+          
+          
+        </td>
+        <td
+          class=""
+        >
+          
+          
+          
+        </td>
+        
         <td
           class="column-flush"
         />
       </tr>
       <tr>
-        <td>
+        
+        <td
+          class=""
+        >
           
-            6
-          
-        </td>
-        <td>
-          
-            true
+          6
           
         </td>
-        <td>
+        <td
+          class=""
+        >
           
-            
-          
-        </td>
-        <td>
-          
-            
+          true
           
         </td>
-         
+        <td
+          class=""
+        >
+          
+          
+          
+        </td>
+        <td
+          class=""
+        >
+          
+          
+          
+        </td>
+        
         <td
           class="column-flush"
         />
       </tr>
       <tr>
-        <td>
+        
+        <td
+          class=""
+        >
           
-            7
-          
-        </td>
-        <td>
-          
-            false
+          7
           
         </td>
-        <td>
+        <td
+          class=""
+        >
           
-            
-          
-        </td>
-        <td>
-          
-            
+          false
           
         </td>
-         
+        <td
+          class=""
+        >
+          
+          
+          
+        </td>
+        <td
+          class=""
+        >
+          
+          
+          
+        </td>
+        
         <td
           class="column-flush"
         />
       </tr>
       <tr>
-        <td>
+        
+        <td
+          class=""
+        >
           
-            8
-          
-        </td>
-        <td>
-          
-            true
+          8
           
         </td>
-        <td>
+        <td
+          class=""
+        >
           
-            
-          
-        </td>
-        <td>
-          
-            
+          true
           
         </td>
-         
+        <td
+          class=""
+        >
+          
+          
+          
+        </td>
+        <td
+          class=""
+        >
+          
+          
+          
+        </td>
+        
         <td
           class="column-flush"
         />
       </tr>
+      
     </tbody>
   </table>
 </div>

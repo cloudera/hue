@@ -3,24 +3,18 @@
 exports[`DateRangePicker.vue should render 1`] = `
 <div
   class="hue-dropdown-panel"
+  inline="false"
 >
-  <button
-    class="hue-btn"
-    type="button"
-  >
-    
-    Last 7 days 
-    <i
-      class="fa fa-caret-down"
-    />
-  </button>
-   
+  <hue-button-stub
+    disabled="false"
+  />
   <div
     class="hue-dropdown-container"
   >
     <div
       class="hue-dropdown-inner"
     >
+      
       <div
         class="date-range-picker-panel"
       >
@@ -36,256 +30,199 @@ exports[`DateRangePicker.vue should render 1`] = `
               <header>
                 Quick Ranges
               </header>
-               
               <div
                 class="preset-list"
               >
+                
                 <div
                   class="preset-column"
                 >
+                  
                   <div
-                    class="preset-value selected"
+                    class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last 7 days
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last 30 days
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last 60 days
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last 90 days
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last 6 months
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last 1 year
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last 2 years
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last 5 years
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
+                  
                 </div>
                 <div
                   class="preset-column"
                 >
+                  
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last 5 minutes
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last 15 minutes
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last 30 minutes
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last 1 hour
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last 3 hours
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last 6 hours
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last 12 hours
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last 24 hours
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
+                  
                 </div>
                 <div
                   class="preset-column"
                 >
+                  
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Today
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Yesterday
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      This week
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last week
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      This month
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last month
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      This year
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
                   <div
                     class="preset-value"
                   >
-                    <hue-link-stub>
-                      Last year
-                    </hue-link-stub>
+                    <hue-link-stub />
                   </div>
+                  
                 </div>
+                
               </div>
             </div>
           </div>
-           
           <div
             class="date-range-picker-custom"
           >
             <header>
               Time Range
             </header>
-             
             <div>
               <div
                 class="range-header"
               >
                 FROM:
               </div>
-               
               <datepicker-stub
-                calendarclass="range-calendar"
+                calendar-class="range-calendar"
                 format="dd/MM/yyyy"
-                inputclass="range-input"
-                language="[object Object]"
-                maximumview="year"
-                minimumview="day"
+                input-class="range-input"
                 placeholder="DD/MM/YYYY"
                 typeable="true"
               />
             </div>
-             
             <div>
               <div
                 class="range-header"
               >
                 TO:
               </div>
-               
               <datepicker-stub
-                calendarclass="range-calendar"
+                calendar-class="range-calendar"
                 format="dd/MM/yyyy"
-                inputclass="range-input"
-                language="[object Object]"
-                maximumview="year"
-                minimumview="day"
+                input-class="range-input"
                 placeholder="DD/MM/YYYY"
                 typeable="true"
               />
             </div>
           </div>
         </div>
-         
         <div
           class="date-range-picker-footer"
         >
-          <hue-link-stub>
-            Cancel
-          </hue-link-stub>
-           
+          <hue-link-stub />
           <hue-button-stub
             primary="true"
             small="true"
-          >
-            Apply
-          </hue-button-stub>
+          />
         </div>
       </div>
+      
     </div>
   </div>
 </div>
