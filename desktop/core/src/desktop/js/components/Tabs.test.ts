@@ -32,7 +32,7 @@ describe('Tabs.vue', () => {
       },
       global: {
         stubs: {
-          tab: Tab
+          Tab
         }
       }
     });
