@@ -99,9 +99,9 @@ describe('ExecutableActions.vue', () => {
       }
     });
 
-    expect(spy).toHaveBeenCalled();
-
     await nextTick();
+
+    expect(spy).toHaveBeenCalled();
 
     // Click play
     expect(executeCalled).toBeFalsy();
