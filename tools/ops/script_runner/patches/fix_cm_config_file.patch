@@ -1,0 +1,20 @@
+diff --git a/desktop/core/src/desktop/manage_entry.py b/desktop/core/src/desktop/manage_entry.py
+index e02436ff73..e9971df789 100644
+--- a/desktop/core/src/desktop/manage_entry.py
++++ b/desktop/core/src/desktop/manage_entry.py
+@@ -41,6 +41,7 @@ def entry():
+   from django.core.management.base import BaseCommand
+ 
+   os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'desktop.settings')
++  cm_config_file = '/etc/cloudera-scm-agent/config.ini'
+ 
+   # What's the subcommand being run?
+   # This code uses the same logic from django.core.management to handle command args
+@@ -57,7 +58,6 @@ def entry():
+                         "import_ldap_group", "import_ldap_user", "sync_ldap_users_and_groups", "useradmin_sync_with_unix" ]
+     if subcommand in commands_req_db:
+       #Check if this is a CM managed cluster
+-      cm_config_file = '/etc/cloudera-scm-agent/config.ini'
+       if os.path.isfile(cm_config_file) and "--cm-managed" not in sys.argv:
+         if not "HUE_CONF_DIR" in os.environ:
+           print "ALERT: This appears to be a CM Managed environment"
