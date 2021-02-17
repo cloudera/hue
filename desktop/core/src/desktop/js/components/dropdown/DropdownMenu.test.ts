@@ -22,7 +22,9 @@ describe('DropdownMenu.vue', () => {
   it('should render empty dropdown', () => {
     const wrapper = shallowMount(DropdownMenu, {
       global: {
-        stubs: { 'dropdown-panel': DropdownPanel }
+        stubs: {
+          DropdownPanel
+        }
       }
     });
     expect(wrapper.element).toMatchSnapshot();
@@ -31,7 +33,9 @@ describe('DropdownMenu.vue', () => {
   it('should render dropdown with slots', () => {
     const wrapper = shallowMount(DropdownMenu, {
       global: {
-        stubs: { 'dropdown-panel': DropdownPanel }
+        stubs: {
+          DropdownPanel
+        }
       },
       slots: {
         default: '<div>Some item</div>'
