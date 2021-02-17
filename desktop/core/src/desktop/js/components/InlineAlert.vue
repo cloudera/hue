@@ -82,8 +82,7 @@
   export default defineComponent({
     props: {
       type: {
-        type: Object as PropType<AlertType>,
-        required: true,
+        type: Number as PropType<AlertType>,
         default: AlertType.Unknown
       },
 
