@@ -24,7 +24,7 @@ describe('LiteralEntity UTs', () => {
   test('Empty instance created', () => {
     const wrapper = shallowMount(LiteralEntity, {
       propsData: {
-        entity: {}
+        entity: new Literal('abc')
       }
     });
 

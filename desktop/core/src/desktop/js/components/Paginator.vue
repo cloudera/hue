@@ -22,7 +22,7 @@
       {{ offset + 1 }}-{{ Math.min(offset + limit, totalEntries) }} of {{ totalEntries }}
     </div>
     Rows per page:
-    <dropdown-menu :link="true" :text="limit">
+    <dropdown-menu :link="true" :text="String(limit)">
       <dropdown-menu-button
         v-for="presetLimit of presetLimits"
         :key="presetLimit"
