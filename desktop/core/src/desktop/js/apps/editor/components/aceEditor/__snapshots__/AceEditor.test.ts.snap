@@ -96,7 +96,6 @@ exports[`AceEditor.vue should render 1`] = `
       </div>
     </div>
   </div>
-   
-  <!---->
+  <!--v-if-->
 </div>
 `;
