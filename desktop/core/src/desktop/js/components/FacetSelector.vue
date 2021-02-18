@@ -64,6 +64,7 @@
   import { Facet, SearchFacet, FacetValueLabels } from './FacetSelector';
 
   export default defineComponent({
+    name: 'FacetSelector',
     components: {
       DropdownPanel,
       HueButton,
@@ -226,11 +227,11 @@
       }
     }
 
-    /deep/ label {
+    ::v-deep(label) {
       margin: 0;
     }
 
-    /deep/ input {
+    ::v-deep(input) {
       margin: 0 10px 0 0;
     }
 

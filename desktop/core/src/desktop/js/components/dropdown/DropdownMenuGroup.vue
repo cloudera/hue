@@ -29,6 +29,7 @@
   import { defineComponent } from 'vue';
 
   export default defineComponent({
+    name: 'DropdownMenuGroup',
     props: {
       header: {
         type: String,

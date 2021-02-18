@@ -31,6 +31,7 @@
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
   const EditorResizerKoBridge = defineComponent({
+    name: 'EditorResizerKoBridge',
     components: {
       EditorResizer
     },

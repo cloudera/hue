@@ -38,6 +38,7 @@
   import { Suggestion } from '../AutocompleteResults';
 
   export default defineComponent({
+    name: 'UdfDetailsPanel',
     props: {
       suggestion: {
         type: Object as PropType<Suggestion>,

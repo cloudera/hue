@@ -66,6 +66,7 @@
   import { defer } from 'utils/hueUtils';
 
   export default defineComponent({
+    name: 'SidebarBody',
     components: { SpacerItem, NavigationItem, SectionItem, AccordionItem },
     directives: {
       'overflow-on-hover': overflowOnHover

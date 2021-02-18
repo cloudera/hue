@@ -42,6 +42,7 @@
   import { SidebarAccordionSubItem } from './types';
 
   export default defineComponent({
+    name: 'HelpDrawerContent',
     components: {
       BaseNavigationItem
     },

@@ -46,6 +46,7 @@
   }
 
   export default defineComponent({
+    name: 'PopularDetailsPanel',
     components: {
       SqlText
     },

@@ -180,6 +180,7 @@
   ];
 
   export default defineComponent({
+    name: 'HueSidebar',
     components: {
       Sidebar
     },

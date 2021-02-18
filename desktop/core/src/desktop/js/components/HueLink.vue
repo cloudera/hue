@@ -30,6 +30,7 @@
   }
 
   export default defineComponent({
+    name: 'HueLink',
     props: {
       url: {
         type: String,

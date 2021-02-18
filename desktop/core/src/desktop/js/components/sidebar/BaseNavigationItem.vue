@@ -44,6 +44,7 @@
   import { SidebarBaseItem } from './types';
 
   export default defineComponent({
+    name: 'BaseNavigationItem',
     props: {
       item: {
         type: Object as PropType<SidebarBaseItem>,
