@@ -25,8 +25,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, PropType } from 'vue';
-
+  import { defineComponent, PropType, onUpdated, onBeforeUnmount, ref } from 'vue';
   import { wrap } from 'vue/webComponentWrap';
 
   import ExecutionAnalysisPanel from './ExecutionAnalysisPanel.vue';
@@ -38,40 +37,30 @@
     components: {
       ExecutionAnalysisPanel
     },
-
     props: {
       executableObservable: {
         type: Object as PropType<KnockoutObservable<SqlExecutable | undefined>> | null,
         default: null
       }
     },
-
-    setup() {
+    setup(props) {
       const subTracker = new SubscriptionTracker();
-      return { subTracker };
-    },
+      onBeforeUnmount(subTracker.dispose.bind(subTracker));
 
-    data() {
-      return {
-        initialized: false,
-        executable: null as SqlExecutable | null
-      };
-    },
+      let initialized = false;
+      const executable = ref<SqlExecutable | null>(null);
+      onUpdated(() => {
+        if (!initialized && props.executableObservable) {
+          executable.value = props.executableObservable() || null;
+          subTracker.subscribe(props.executableObservable, newExecutable => {
+            executable.value = newExecutable || null;
+          });
+          initialized = true;
+        }
+      });
 
-    updated(): void {
-      if (!this.initialized && this.executableObservable) {
-        this.executable = this.executableObservable() || null;
-        this.subTracker.subscribe(this.executableObservable, executable => {
-          this.executable = executable || null;
-        });
-        this.initialized = true;
-      }
+      return { executable };
     },
-
-    unmounted(): void {
-      this.subTracker.dispose();
-    },
-
     methods: {
       onExecutionError(): void {
         this.$el.dispatchEvent(new CustomEvent('execution-error', { bubbles: true }));
