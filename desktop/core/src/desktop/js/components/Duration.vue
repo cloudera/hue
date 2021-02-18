@@ -50,6 +50,7 @@
   };
 
   export default defineComponent({
+    name: 'Duration',
     props: {
       value: {
         type: Number,

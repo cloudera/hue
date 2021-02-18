@@ -64,6 +64,7 @@
   import I18n from 'utils/i18n';
 
   export default defineComponent({
+    name: 'ExecutionAnalysisPanel',
     components: {
       HueLink,
       LogsPanel

@@ -115,6 +115,7 @@
   const REFRESH_STATEMENT_LOCATIONS_EVENT = 'editor.refresh.statement.locations';
 
   export default defineComponent({
+    name: 'AceAutocomplete',
     components: {
       CatalogEntryDetailsPanel,
       MatchedText,

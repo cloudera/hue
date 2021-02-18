@@ -28,6 +28,7 @@
   import { Suggestion } from './AutocompleteResults';
 
   export default defineComponent({
+    name: 'MatchedText',
     props: {
       suggestion: {
         type: Object as PropType<Suggestion>,

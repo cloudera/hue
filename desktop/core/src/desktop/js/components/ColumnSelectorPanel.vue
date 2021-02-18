@@ -50,6 +50,7 @@
   }
 
   export default defineComponent({
+    name: 'ColumnSelectorPanel',
     components: { HueButton },
 
     props: {

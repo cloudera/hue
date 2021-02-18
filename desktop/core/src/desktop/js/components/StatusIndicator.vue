@@ -38,6 +38,7 @@
   };
 
   export default defineComponent({
+    name: 'StatusIndicator',
     components: {
       HueIcon
     },

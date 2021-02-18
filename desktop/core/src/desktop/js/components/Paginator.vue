@@ -75,6 +75,7 @@
   const PRESET_LIMITS = [DEFAULT_LIMIT, 50, 100];
 
   export default defineComponent({
+    name: 'Paginator',
     components: {
       HueIcon,
       DropdownMenu,
