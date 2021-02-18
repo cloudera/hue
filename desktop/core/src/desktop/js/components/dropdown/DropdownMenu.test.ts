@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
+import DropdownDrawer from './DropdownDrawer.vue';
 import DropdownPanel from './DropdownPanel.vue';
 import DropdownMenu from './DropdownMenu.vue';
 
@@ -23,7 +24,8 @@ describe('DropdownMenu.vue', () => {
     const wrapper = shallowMount(DropdownMenu, {
       global: {
         stubs: {
-          DropdownPanel
+          DropdownPanel,
+          DropdownDrawer
         }
       }
     });
@@ -34,7 +36,8 @@ describe('DropdownMenu.vue', () => {
     const wrapper = shallowMount(DropdownMenu, {
       global: {
         stubs: {
-          DropdownPanel
+          DropdownPanel,
+          DropdownDrawer
         }
       },
       slots: {

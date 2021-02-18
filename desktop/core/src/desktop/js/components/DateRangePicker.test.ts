@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
+import DropdownDrawer from './dropdown/DropdownDrawer.vue';
 import DropdownPanel from './dropdown/DropdownPanel.vue';
 import DateRangePicker from './DateRangePicker.vue';
 
@@ -23,6 +24,7 @@ describe('DateRangePicker.vue', () => {
     const wrapper = shallowMount(DateRangePicker, {
       global: {
         stubs: {
+          DropdownDrawer,
           DropdownPanel
         }
       }
