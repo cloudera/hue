@@ -226,11 +226,11 @@
       }
     }
 
-    /deep/ label {
+    ::v-deep(label) {
       margin: 0;
     }
 
-    /deep/ input {
+    ::v-deep(input) {
       margin: 0 10px 0 0;
     }
 
