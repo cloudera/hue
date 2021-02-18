@@ -14,27 +14,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { DirectiveOptions } from 'vue';
+import { Directive } from 'vue';
+import { defer } from '../../utils/hueUtils';
 
 interface ClickOutsideHTMLElement extends HTMLElement {
   clickOutsideHandler?: (event: MouseEvent) => void;
 }
 
-export const clickOutsideDirective: DirectiveOptions = {
-  bind: (element: ClickOutsideHTMLElement, binding, vNode) => {
-    element.clickOutsideHandler = (event: MouseEvent) => {
-      if (
-        vNode.context &&
-        vNode.context[binding.expression] &&
-        document.contains(<Node>event.target) &&
-        !element.contains(<Node>event.target)
-      ) {
-        vNode.context[binding.expression](event);
+export const clickOutsideDirective: Directive<
+  ClickOutsideHTMLElement,
+  ((event: MouseEvent) => void) | undefined
+> = {
+  mounted: (element, binding) => {
+    defer(() => {
+      if (binding.value && typeof binding.value === 'function') {
+        element.clickOutsideHandler = (event: MouseEvent) => {
+          if (
+            binding.value &&
+            document.contains(<Node>event.target) &&
+            !element.contains(<Node>event.target)
+          ) {
+            binding.value(event);
+          }
+        };
+        document.addEventListener('click', element.clickOutsideHandler);
       }
-    };
-    document.addEventListener('click', element.clickOutsideHandler);
+    });
   },
-  unbind: (element: ClickOutsideHTMLElement) => {
+  unmounted: element => {
     if (element.clickOutsideHandler) {
       document.removeEventListener('click', element.clickOutsideHandler);
       element.clickOutsideHandler = undefined;
