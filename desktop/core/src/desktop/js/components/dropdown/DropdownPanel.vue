@@ -38,6 +38,7 @@
   import HueLink from '../HueLink.vue';
 
   export default defineComponent({
+    name: 'DropdownPanel',
     components: {
       DropdownDrawer,
       HueButton,

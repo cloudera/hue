@@ -34,6 +34,7 @@
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
   const ExecutionAnalysisPanelKoBridge = defineComponent({
+    name: 'ExecutionAnalysisPanelKoBridge',
     components: {
       ExecutionAnalysisPanel
     },

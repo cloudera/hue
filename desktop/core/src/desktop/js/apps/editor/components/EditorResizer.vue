@@ -35,6 +35,7 @@
   const CONTENT_PANEL_SELECTOR = '.content-panel';
 
   export default defineComponent({
+    name: 'EditorResizer',
     props: {
       editor: {
         type: Object as PropType<Ace.Editor | null>,

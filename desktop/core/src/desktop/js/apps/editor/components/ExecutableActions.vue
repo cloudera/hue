@@ -89,6 +89,7 @@
   const WHITE_SPACE_REGEX = /^\s*$/;
 
   export default defineComponent({
+    name: 'ExecutableActions',
     components: {
       HueButton
     },

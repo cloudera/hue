@@ -27,6 +27,7 @@
   import { defineComponent } from 'vue';
 
   export default defineComponent({
+    name: 'DropdownMenuItem',
     props: {
       text: {
         type: String,
@@ -35,5 +36,3 @@
     }
   });
 </script>
-
-<style lang="scss" scoped></style>

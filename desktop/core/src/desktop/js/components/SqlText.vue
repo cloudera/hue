@@ -39,6 +39,7 @@
   const getAce = (): Ace => (window as any).ace;
 
   export default defineComponent({
+    name: 'SqlText',
     props: {
       dialect: {
         type: String,
