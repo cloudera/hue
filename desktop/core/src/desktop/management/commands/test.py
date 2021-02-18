@@ -28,7 +28,7 @@ from django.test.utils import get_runner
 from django_nose import runner
 
 #import south.management.commands
-from django.utils import six
+import six
 from django.utils.translation import deactivate
 import sys
 import textwrap
