@@ -37,6 +37,7 @@
   import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
 
   const VariableSubstitutionKoBridge = defineComponent({
+    name: 'VariableSubstitutionKoBridge',
     components: {
       VariableSubstitution
     },

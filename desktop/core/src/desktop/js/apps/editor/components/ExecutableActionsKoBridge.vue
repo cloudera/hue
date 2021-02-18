@@ -34,6 +34,7 @@
   import { wrap } from 'vue/webComponentWrap';
 
   const ExecutableActionsKoBridge = defineComponent({
+    name: 'ExecutableActionsKoBridge',
     components: {
       ExecutableActions
     },

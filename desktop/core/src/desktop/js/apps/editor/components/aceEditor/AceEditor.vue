@@ -66,6 +66,7 @@
   const removeUnicodes = (value: string) => value.replace(UNICODES_TO_REMOVE, ' ');
 
   export default defineComponent({
+    name: 'AceEditor',
     components: {
       AceAutocomplete
     },

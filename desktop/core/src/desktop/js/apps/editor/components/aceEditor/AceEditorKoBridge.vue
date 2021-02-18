@@ -50,6 +50,7 @@
   import sqlReferenceRepository from 'sql/reference/sqlReferenceRepository';
 
   const AceEditorKoBridge = defineComponent({
+    name: 'AceEditorKoBridge',
     components: {
       AceEditor
     },

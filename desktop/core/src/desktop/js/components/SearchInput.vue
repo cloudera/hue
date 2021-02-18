@@ -56,6 +56,7 @@
   import I18n from '../utils/i18n';
 
   export default defineComponent({
+    name: 'SearchInput',
     props: {
       showMagnify: { type: Boolean, required: false, default: true },
       placeholder: {

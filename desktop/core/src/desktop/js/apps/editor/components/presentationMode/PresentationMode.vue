@@ -73,6 +73,7 @@
   const headerRegEx = /--(.*)$/m;
 
   export default defineComponent({
+    name: 'PresentationMode',
     components: {
       VariableSubstitution,
       HueButton,

@@ -67,6 +67,7 @@
   import { Column, Row } from './HueTable';
 
   export default defineComponent({
+    name: 'HueTable',
     props: {
       rows: {
         type: Object as PropType<Row[]>,

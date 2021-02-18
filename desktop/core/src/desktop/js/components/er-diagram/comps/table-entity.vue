@@ -64,6 +64,7 @@
   import { Table } from '../lib/entities';
 
   export default defineComponent({
+    name: 'TableEntity',
     props: {
       entity: {
         type: Object as PropType<Table>,

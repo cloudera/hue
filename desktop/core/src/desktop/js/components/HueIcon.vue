@@ -26,6 +26,7 @@
   import { defineComponent } from 'vue';
 
   export default defineComponent({
+    name: 'HueIcon',
     props: {
       type: {
         type: String,
