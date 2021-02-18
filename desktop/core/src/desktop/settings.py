@@ -42,6 +42,8 @@ from desktop.lib.python_util import force_dict_to_strings
 from aws.conf import is_enabled as is_s3_enabled
 from azure.conf import is_abfs_enabled
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', '..', '..'))
