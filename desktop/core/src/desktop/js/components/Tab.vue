@@ -31,6 +31,7 @@
   }
 
   export default defineComponent({
+    name: 'Tab',
     props: {
       title: {
         type: String,

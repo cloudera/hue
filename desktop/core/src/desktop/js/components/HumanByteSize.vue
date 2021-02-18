@@ -41,6 +41,7 @@
   };
 
   export default defineComponent({
+    name: 'HumanByteSize',
     props: {
       value: {
         type: Number,

@@ -47,6 +47,7 @@
   };
 
   export default defineComponent({
+    name: 'TimeAgo',
     props: {
       value: {
         type: Number,

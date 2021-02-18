@@ -32,6 +32,7 @@
   import DropdownPanel from './DropdownPanel.vue';
 
   export default defineComponent({
+    name: 'DropdownMenu',
     components: {
       DropdownPanel
     },

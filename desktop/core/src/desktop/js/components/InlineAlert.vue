@@ -80,6 +80,7 @@
   ]);
 
   export default defineComponent({
+    name: 'InlineAlert',
     props: {
       type: {
         type: Number as PropType<AlertType>,

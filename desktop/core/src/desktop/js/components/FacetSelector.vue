@@ -64,6 +64,7 @@
   import { Facet, SearchFacet, FacetValueLabels } from './FacetSelector';
 
   export default defineComponent({
+    name: 'FacetSelector',
     components: {
       DropdownPanel,
       HueButton,

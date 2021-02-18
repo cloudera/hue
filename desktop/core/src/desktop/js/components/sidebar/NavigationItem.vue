@@ -57,6 +57,7 @@
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
   export default defineComponent({
+    name: 'NavigationItem',
     components: {
       BaseNavigationItemTooltip,
       BaseNavigationItem

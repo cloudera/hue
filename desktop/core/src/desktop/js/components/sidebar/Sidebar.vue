@@ -115,6 +115,7 @@
   import UserDrawerContent from './UserDrawerContent.vue';
 
   export default defineComponent({
+    name: 'Sidebar',
     components: {
       AccordionItem,
       HelpDrawerContent,

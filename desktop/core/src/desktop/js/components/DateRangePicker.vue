@@ -138,6 +138,7 @@
   const DEFAULT_RANGE = RANGE_SETS[0][0];
 
   export default defineComponent({
+    name: 'DateRangePicker',
     components: {
       Datepicker,
       DropdownPanel,

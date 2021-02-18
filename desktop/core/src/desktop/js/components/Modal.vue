@@ -45,6 +45,7 @@
   // Based on https://vuejs.org/v2/examples/modal.html
 
   export default defineComponent({
+    name: 'Modal',
     emits: ['close']
   });
 </script>

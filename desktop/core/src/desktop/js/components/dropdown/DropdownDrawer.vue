@@ -53,6 +53,7 @@
   });
 
   export default defineComponent({
+    name: 'DropdownDrawer',
     directives: {
       'click-outside': clickOutsideDirective
     },

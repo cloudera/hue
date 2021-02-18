@@ -30,6 +30,7 @@
   import { defineComponent } from 'vue';
 
   export default defineComponent({
+    name: 'BaseNavigationItemTooltip',
     props: {
       visible: {
         type: Boolean,

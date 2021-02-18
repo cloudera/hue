@@ -26,6 +26,7 @@
   import { SidebarSectionItem } from './types';
 
   export default defineComponent({
+    name: 'SectionItem',
     props: {
       activeItemName: {
         type: String,

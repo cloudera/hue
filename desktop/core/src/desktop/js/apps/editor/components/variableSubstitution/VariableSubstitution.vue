@@ -116,6 +116,7 @@
   };
 
   export default defineComponent({
+    name: 'VariableSubstitution',
     props: {
       initialVariables: {
         type: Object as PropType<{ [name: string]: Variable }>,
