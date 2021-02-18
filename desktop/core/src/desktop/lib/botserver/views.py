@@ -51,12 +51,12 @@ def slack_events(request):
 
       # challenge verification
     if slack_message['type'] == 'url_verification':
-        response_dict = {"challenge": slack_message['challenge']}
-        return JsonResponse(response_dict, status=200)
+      response_dict = {"challenge": slack_message['challenge']}
+      return JsonResponse(response_dict, status=200)
     
     if 'event' in slack_message:
-        event_message = slack_message['event']
-        parse_events(event_message)
+      event_message = slack_message['event']
+      parse_events(event_message)
   except Exception as ex:
     raise PopupException(_("Response content is not valid JSON"), detail=ex)
   
