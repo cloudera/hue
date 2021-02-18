@@ -40,25 +40,26 @@
 
     <div v-if="analysisAvailable" class="execution-analysis-logs">
       <h4>{{ I18n('Logs') }}</h4>
-      <LogsPanel class="execution-analysis-logs-panel" :logs="logs" />
+      <LogsPanel class="execution-analysis-logs-panel" :logs="executionLogs" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-  import { defineComponent, PropType } from 'vue';
+  import { debounce } from 'lodash';
+  import { defineComponent, computed, onBeforeUnmount, ref, reactive } from 'vue';
 
   import { ExecutionJob } from 'apps/editor/execution/api';
-  import HueLink from 'components/HueLink.vue';
-
   import Executable, {
     EXECUTABLE_UPDATED_EVENT,
     ExecutionStatus
   } from 'apps/editor/execution/executable';
+  import SqlExecutable from 'apps/editor/execution/sqlExecutable';
   import ExecutionLogs, {
     ExecutionError,
     LOGS_UPDATED_EVENT
   } from 'apps/editor/execution/executionLogs';
+  import HueLink from 'components/HueLink.vue';
   import LogsPanel from 'components/LogsPanel.vue';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import I18n from 'utils/i18n';
@@ -69,84 +70,67 @@
       HueLink,
       LogsPanel
     },
-
     props: {
       executable: {
-        type: Object as PropType<Executable>,
+        type: SqlExecutable,
         required: true
       }
     },
-
     emits: ['execution-error'],
+    setup(props, { emit }) {
+      const subTracker = new SubscriptionTracker();
+      onBeforeUnmount(subTracker.dispose.bind(subTracker));
 
-    setup(): {
-      subTracker: SubscriptionTracker;
-    } {
-      return {
-        subTracker: new SubscriptionTracker()
-      };
-    },
+      const analysisAvailable = ref(false);
+      const executionLogs = ref('');
+      const jobs = reactive<ExecutionJob[]>([]);
+      const errors = reactive<ExecutionError[]>([]);
 
-    data(): {
-      logs: string;
-      jobs: ExecutionJob[];
-      errors: ExecutionError[];
-      notifiedErrors: boolean;
-    } {
-      return {
-        logs: '',
-        jobs: [],
-        errors: [],
-        notifiedErrors: false
-      };
-    },
+      const jobsAvailable = computed(() => !!jobs.length);
+      const jobsWithUrls = computed(() => jobs.filter(job => job.url));
 
-    computed: {
-      analysisAvailable(): boolean {
-        return this.executable.status !== ExecutionStatus.ready || !!this.errors.length;
-      },
+      let notifiedErrors = false;
 
-      jobsWithUrls(): ExecutionJob[] {
-        return (this.jobs && this.jobs.filter(job => job.url)) || [];
-      },
+      const debouncedUpdate = debounce((executable: Executable): void => {
+        const { status, logs } = executable;
+        executionLogs.value = logs.fullLog;
+        jobs.splice(0, jobs.length, ...logs.jobs);
+        errors.splice(0, errors.length, ...logs.errors);
 
-      jobsAvailable(): boolean {
-        return !!this.jobsWithUrls.length;
-      }
-    },
+        analysisAvailable.value = status !== ExecutionStatus.ready || !!errors.length;
 
-    watch: {
-      errors(errors: ExecutionError[]): void {
-        if (errors.length && !this.notifiedErrors) {
-          this.$emit('execution-error');
+        if (errors.length && !notifiedErrors) {
+          emit('execution-error');
         }
-        this.notifiedErrors = !!errors.length;
-      }
-    },
+        notifiedErrors = !!errors.length;
+      }, 5);
 
-    mounted(): void {
-      this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, (executable: Executable) => {
-        if (executable.logs) {
-          this.updateFromExecutionLogs(executable.logs);
+      const updateFromExecutable = (executable: Executable): void => {
+        if (props.executable.id !== executable.id) {
+          return;
         }
+        debouncedUpdate.cancel();
+        debouncedUpdate(executable);
+      };
+
+      updateFromExecutable(props.executable);
+
+      subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, updateFromExecutable);
+
+      subTracker.subscribe(LOGS_UPDATED_EVENT, (executionLogs: ExecutionLogs) => {
+        updateFromExecutable(executionLogs.executable);
       });
 
-      this.subTracker.subscribe(LOGS_UPDATED_EVENT, this.updateFromExecutionLogs.bind(this));
-    },
-
-    unmounted(): void {
-      this.subTracker.dispose();
-    },
-
-    methods: {
-      I18n,
-      updateFromExecutionLogs(executionLogs: ExecutionLogs): void {
-        if (this.executable.id === executionLogs.executable.id) {
-          this.logs = executionLogs.fullLog;
-          this.jobs = executionLogs.jobs;
-          this.errors = executionLogs.errors;
-        }
-      }
+      return {
+        analysisAvailable,
+        executionLogs,
+        jobs,
+        jobsAvailable,
+        jobsWithUrls,
+        errors,
+        notifiedErrors,
+        I18n
+      };
     }
   });
 </script>
