@@ -18,13 +18,11 @@
 
 <template>
   <dropdown-panel class="hue-dropdown-menu" :text="text" :link="link">
-    <template #contents="{ closePanel }">
-      <div class="hue-dropdown-menu-inner" @click="closePanel">
-        <ul>
-          <slot />
-        </ul>
-      </div>
-    </template>
+    <div class="hue-dropdown-menu-inner">
+      <ul>
+        <slot />
+      </ul>
+    </div>
   </dropdown-panel>
 </template>
 
@@ -66,7 +64,7 @@
       overflow-x: hidden;
       overflow-y: auto;
 
-      /deep/ ul {
+      ::v-deep(ul) {
         overflow-x: hidden;
         margin: 0 !important;
         padding: 0;

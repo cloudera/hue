@@ -17,58 +17,32 @@
 -->
 
 <template>
-  <div v-click-outside="clickOutside" class="hue-dropdown-panel">
-    <hue-link v-if="link" :disabled="disabled" @click="togglePanel">
+  <div class="hue-dropdown-panel">
+    <hue-link v-if="link" ref="triggerLinkElement" :disabled="disabled" @click="toggleDrawer">
       {{ text }} <i class="fa fa-caret-down" />
     </hue-link>
-    <hue-button v-else :disabled="disabled" @click="togglePanel">
+    <hue-button v-else ref="triggerButtonElement" :disabled="disabled" @click="toggleDrawer">
       {{ text }} <i class="fa fa-caret-down" />
     </hue-button>
-    <div class="hue-dropdown-container" :class="{ open: panelOpen }">
-      <div
-        class="hue-dropdown-inner"
-        :class="{ 'position-top': positionTop, 'position-left': positionLeft }"
-      >
-        <slot name="contents" :closePanel="closePanel" />
-      </div>
-    </div>
+    <DropdownDrawer :open="open" :trigger-element="triggerElement" @close="closeDrawer">
+      <slot />
+    </DropdownDrawer>
   </div>
 </template>
 
 <script lang="ts">
   import { defineComponent } from 'vue';
 
-  import { clickOutsideDirective } from '../directives/clickOutsideDirective';
+  import DropdownDrawer from './DropdownDrawer.vue';
   import HueButton from '../HueButton.vue';
   import HueLink from '../HueLink.vue';
 
-  interface OutsideStatus {
-    left: boolean;
-    right: boolean;
-    top: boolean;
-    bottom: boolean;
-  }
-
-  const isOutsideViewport = (element: Element): OutsideStatus => {
-    const clientRect = element.getBoundingClientRect();
-    return {
-      top: clientRect.top < 0,
-      right: clientRect.right > window.innerWidth,
-      bottom: clientRect.bottom > window.innerHeight,
-      left: clientRect.left < 0
-    };
-  };
-
   export default defineComponent({
     components: {
+      DropdownDrawer,
       HueButton,
       HueLink
     },
-
-    directives: {
-      'click-outside': clickOutsideDirective
-    },
-
     props: {
       text: {
         type: String,
@@ -83,96 +57,29 @@
         default: false
       }
     },
-
-    data(): {
-      panelOpen: boolean;
-
-      positionTop: boolean;
-      positionLeft: boolean;
-    } {
+    data() {
       return {
-        panelOpen: false,
-
-        positionTop: false,
-        positionLeft: false
+        open: false,
+        triggerElement: null as HTMLElement | null
       };
     },
-
+    mounted() {
+      this.triggerElement =
+        <HTMLElement>(this.$refs.triggerLinkElement || this.$refs.triggerButtonElement) || null;
+    },
     methods: {
-      togglePanel(): void {
-        if (!this.panelOpen) {
-          const dropdownElement = this.$el.getElementsByClassName('hue-dropdown-container');
-          if (dropdownElement.length) {
-            const outsideStatus = isOutsideViewport(dropdownElement[0]);
-            this.positionTop = outsideStatus.bottom;
-            this.positionLeft = outsideStatus.right;
-          }
-        }
-        this.panelOpen = !this.panelOpen;
+      toggleDrawer(): void {
+        this.open = !this.open;
       },
-
-      closePanel(): void {
-        if (this.panelOpen) {
-          this.togglePanel();
-        }
-      },
-
-      clickOutside(): void {
-        if (this.panelOpen) {
-          this.panelOpen = false;
-        }
+      closeDrawer(): void {
+        this.open = false;
       }
     }
   });
 </script>
 
 <style lang="scss" scoped>
-  @import '../styles/colors';
-  @import '../styles/mixins';
-
   .hue-dropdown-panel {
     display: inline-block;
-
-    .hue-dropdown-container {
-      position: fixed;
-      z-index: 1061;
-
-      &.open {
-        position: absolute;
-        .hue-dropdown-inner {
-          display: block;
-        }
-      }
-
-      .hue-dropdown-inner {
-        display: none;
-        z-index: 1000;
-        float: left;
-        position: absolute;
-        margin: 2px 0 0;
-        padding: 0;
-        background-color: $fluid-white;
-        border: 1px solid $hue-border-color;
-        border-radius: $hue-panel-border-radius;
-
-        @include box-shadow(0, 5px, 10px, rgba(0, 0, 0, 0.2));
-
-        &:not(.position-top) {
-          top: 100%;
-        }
-
-        &.position-top {
-          bottom: 20px; // TODO: Calculate based on link/button dimensions
-        }
-
-        &:not(.position-left) {
-          left: 0;
-        }
-
-        &.position-left {
-          right: 0; // TODO: Calculate based on link/button dimensions
-        }
-      }
-    }
   }
 </style>

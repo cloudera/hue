@@ -15,28 +15,16 @@
 // limitations under the License.
 
 import { shallowMount } from '@vue/test-utils';
-import DropdownPanel from './DropdownPanel.vue';
 import DropdownDrawer from './DropdownDrawer.vue';
 
-describe('DropdownPanel.vue', () => {
-  it('should render empty dropdown panel', () => {
-    const wrapper = shallowMount(DropdownPanel, {
-      global: {
-        stubs: {
-          DropdownDrawer
-        }
-      }
-    });
+describe('DropdownDrawer.vue', () => {
+  it('should render empty dropdown drawer', () => {
+    const wrapper = shallowMount(DropdownDrawer);
     expect(wrapper.element).toMatchSnapshot();
   });
 
-  it('should render dropdown panel with slots', () => {
-    const wrapper = shallowMount(DropdownPanel, {
-      global: {
-        stubs: {
-          DropdownDrawer
-        }
-      },
+  it('should render dropdown drawer with slots', () => {
+    const wrapper = shallowMount(DropdownDrawer, {
       slots: {
         default: '<div>Some item</div>'
       }
