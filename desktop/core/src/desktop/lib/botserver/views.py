@@ -83,7 +83,7 @@ def parse_events(event_message):
   
 def say_hi_user(channel, user_id):
   """Bot sends Hi<username> message in a specific channel"""
-  bot_message = f'Hi <@{user_id}> :wave:'
+  bot_message = 'Hi <@{}> :wave:'.format(user_id)
   response = slack_client.api_call(api_method='chat.postMessage', json={'channel': channel, 'text': bot_message})
   return response
 
