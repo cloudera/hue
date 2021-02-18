@@ -250,7 +250,7 @@
     &.grayed-out {
       opacity: 0.5;
 
-      /deep/ .hue-table-container {
+      ::v-deep(.hue-table-container) {
         overflow: hidden !important;
       }
     }

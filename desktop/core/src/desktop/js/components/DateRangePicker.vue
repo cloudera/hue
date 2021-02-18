@@ -310,7 +310,7 @@
           text-transform: uppercase;
         }
 
-        /deep/ .range-input {
+        ::v-deep(.range-input) {
           padding: 4px;
           height: 28px;
           line-height: 24px;
@@ -320,7 +320,7 @@
           border-radius: 3px;
         }
 
-        /deep/ .range-calendar {
+        ::v-deep(.range-calendar) {
           width: 230px;
 
           .cell {
