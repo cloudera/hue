@@ -26,15 +26,16 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent } from 'vue';
 
-  @Component
-  export default class DropdownMenuGroup extends Vue {
-    @Prop({ required: true })
-    header!: string;
-  }
+  export default defineComponent({
+    props: {
+      header: {
+        type: String,
+        required: true
+      }
+    }
+  });
 </script>
 
 <style lang="scss" scoped>

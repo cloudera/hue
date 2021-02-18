@@ -7,7 +7,9 @@ exports[`DropdownMenuGroup.vue should render 1`] = `
   >
     Some Header
   </header>
-   
-  <ul />
+  <ul>
+    
+    
+  </ul>
 </li>
 `;

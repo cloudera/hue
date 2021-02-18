@@ -74,14 +74,14 @@ describe('TableEntity UTs', () => {
     expect(wrapper.findAll('.columns-container .column-entity .left-point')).toHaveLength(2);
     expect(wrapper.findAll('.columns-container .column-entity .right-point')).toHaveLength(2);
 
-    expect(wrapper.findAll('.columns-container .column-entity').at(0).text()).toBe(columnNames[0]);
+    expect(wrapper.findAll('.columns-container .column-entity')[0].text()).toBe(columnNames[0]);
     expect(
-      wrapper.findAll('.columns-container .column-entity').at(0).attributes('data-entity-id')
+      wrapper.findAll('.columns-container .column-entity')[0].attributes('data-entity-id')
     ).toBe(`${tableId}.${columnNames[0]}`);
 
-    expect(wrapper.findAll('.columns-container .column-entity').at(1).text()).toBe(columnNames[1]);
+    expect(wrapper.findAll('.columns-container .column-entity')[1].text()).toBe(columnNames[1]);
     expect(
-      wrapper.findAll('.columns-container .column-entity').at(1).attributes('data-entity-id')
+      wrapper.findAll('.columns-container .column-entity')[1].attributes('data-entity-id')
     ).toBe(`${tableId}.${columnNames[1]}`);
 
     expect(wrapper.find('.grouped-columns').exists()).toBeFalsy();
@@ -120,8 +120,8 @@ describe('TableEntity UTs', () => {
     const columnElements = wrapper.findAll('.columns-container .column-entity');
     columns.forEach((column: Column, index: number) => {
       if (index < defaultMaxColumns) {
-        expect(columnElements.at(index).text()).toBe(column.name);
-        expect(columnElements.at(index).attributes('data-entity-id')).toBe(column.id);
+        expect(columnElements[index].text()).toBe(column.name);
+        expect(columnElements[index].attributes('data-entity-id')).toBe(column.id);
       } else {
         expect(groupedEntitiesIds.includes(column.id)).toBeTruthy();
       }

@@ -36,12 +36,11 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent } from 'vue';
+
   import { clickOutsideDirective } from '../directives/clickOutsideDirective';
   import HueButton from '../HueButton.vue';
   import HueLink from '../HueLink.vue';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
 
   interface OutsideStatus {
     left: boolean;
@@ -60,49 +59,71 @@
     };
   };
 
-  @Component({
-    components: { HueButton, HueLink },
+  export default defineComponent({
+    components: {
+      HueButton,
+      HueLink
+    },
+
     directives: {
       'click-outside': clickOutsideDirective
-    }
-  })
-  export default class DropdownPanel extends Vue {
-    @Prop({ required: false, default: '' })
-    text!: string;
-    @Prop({ required: false, default: false })
-    link!: boolean;
-    @Prop({ required: false, default: false })
-    disabled!: boolean;
+    },
 
-    panelOpen = false;
+    props: {
+      text: {
+        type: String,
+        default: ''
+      },
+      link: {
+        type: Boolean,
+        default: false
+      },
+      disabled: {
+        type: Boolean,
+        default: false
+      }
+    },
 
-    positionTop = false;
-    positionLeft = false;
+    data(): {
+      panelOpen: boolean;
 
-    togglePanel(): void {
-      if (!this.panelOpen) {
-        const dropdownElement = this.$el.getElementsByClassName('hue-dropdown-container');
-        if (dropdownElement.length) {
-          const outsideStatus = isOutsideViewport(dropdownElement[0]);
-          this.positionTop = outsideStatus.bottom;
-          this.positionLeft = outsideStatus.right;
+      positionTop: boolean;
+      positionLeft: boolean;
+    } {
+      return {
+        panelOpen: false,
+
+        positionTop: false,
+        positionLeft: false
+      };
+    },
+
+    methods: {
+      togglePanel(): void {
+        if (!this.panelOpen) {
+          const dropdownElement = this.$el.getElementsByClassName('hue-dropdown-container');
+          if (dropdownElement.length) {
+            const outsideStatus = isOutsideViewport(dropdownElement[0]);
+            this.positionTop = outsideStatus.bottom;
+            this.positionLeft = outsideStatus.right;
+          }
+        }
+        this.panelOpen = !this.panelOpen;
+      },
+
+      closePanel(): void {
+        if (this.panelOpen) {
+          this.togglePanel();
+        }
+      },
+
+      clickOutside(): void {
+        if (this.panelOpen) {
+          this.panelOpen = false;
         }
       }
-      this.panelOpen = !this.panelOpen;
     }
-
-    closePanel(): void {
-      if (this.panelOpen) {
-        this.togglePanel();
-      }
-    }
-
-    clickOutside(): void {
-      if (this.panelOpen) {
-        this.panelOpen = false;
-      }
-    }
-  }
+  });
 </script>
 
 <style lang="scss" scoped>

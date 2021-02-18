@@ -21,7 +21,7 @@
     <hue-button
       v-if="loadingSession"
       key="loading-button"
-      small="true"
+      :small="true"
       :disabled="disabled"
       :title="I18n('Creating session')"
     >
@@ -31,8 +31,8 @@
     <hue-button
       v-if="showExecute"
       key="execute-button"
-      small="true"
-      primary="true"
+      :small="true"
+      :primary="true"
       :disabled="disabled"
       @click="execute"
     >
@@ -42,8 +42,8 @@
     <hue-button
       v-if="showStop && !stopping"
       key="stop-button"
-      small="true"
-      alert="true"
+      :small="true"
+      :alert="true"
       @click="stop"
     >
       <i class="fa fa-stop fa-fw" />
@@ -51,7 +51,7 @@
       <span v-else>{{ I18n('Stop') }}</span>
     </hue-button>
 
-    <hue-button v-if="showStop && stopping" key="stopping-button" small="true" alert="true">
+    <hue-button v-if="showStop && stopping" key="stopping-button" :small="true" :alert="true">
       <i class="fa fa-fw fa-spinner fa-spin" /> {{ I18n('Stopping') }}
     </hue-button>
 
@@ -72,14 +72,14 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent, PropType } from 'vue';
+
+  import Executable from 'apps/editor/execution/executable';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
   import HueButton from 'components/HueButton.vue';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import huePubSub from 'utils/huePubSub';
   import I18n from 'utils/i18n';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop, Watch } from 'vue-property-decorator';
 
   import { Session } from 'apps/editor/execution/api';
   import { EXECUTABLE_UPDATED_EVENT, ExecutionStatus } from 'apps/editor/execution/executable';
@@ -88,117 +88,143 @@
   export const EXECUTE_ACTIVE_EXECUTABLE_EVENT = 'executable.active.executable';
   const WHITE_SPACE_REGEX = /^\s*$/;
 
-  @Component({
-    components: { HueButton },
-    methods: { I18n }
-  })
-  export default class ExecutableActions extends Vue {
-    @Prop()
-    executable?: SqlExecutable;
-    @Prop()
-    beforeExecute?: (executable: Executable) => Promise<void>;
+  export default defineComponent({
+    components: {
+      HueButton
+    },
 
-    subTracker = new SubscriptionTracker();
+    props: {
+      executable: {
+        type: Object as PropType<SqlExecutable>,
+        default: undefined
+      },
+      beforeExecute: {
+        type: Object as PropType<(executable: Executable) => Promise<void>>,
+        default: undefined
+      }
+    },
 
-    loadingSession = true;
-    lastSession: Session | null = null;
-    partOfRunningExecution = false;
-    limit: number | null = null;
-    stopping = false;
-    status: ExecutionStatus = ExecutionStatus.ready;
-    hasStatement = false;
+    emits: ['limit-changed'],
+
+    setup() {
+      const subTracker = new SubscriptionTracker();
+      return { subTracker };
+    },
+
+    data() {
+      return {
+        loadingSession: true,
+        lastSession: null as Session | null,
+        partOfRunningExecution: false,
+        limit: null as number | null,
+        stopping: false,
+        status: ExecutionStatus.ready,
+        hasStatement: false
+      };
+    },
+
+    computed: {
+      waiting(): boolean {
+        return !!(this.executable && this.executable.isReady() && this.partOfRunningExecution);
+      },
+
+      disabled(): boolean {
+        return this.loadingSession || !this.executable || !this.hasStatement;
+      },
+
+      showExecute(): boolean {
+        return (
+          !!this.executable &&
+          !this.waiting &&
+          !this.loadingSession &&
+          this.status !== ExecutionStatus.running &&
+          this.status !== ExecutionStatus.streaming
+        );
+      },
+
+      showStop(): boolean {
+        return (
+          this.status === ExecutionStatus.running ||
+          this.status === ExecutionStatus.streaming ||
+          this.waiting
+        );
+      }
+    },
+
+    watch: {
+      executable: {
+        handler(): void {
+          if (this.executable) {
+            this.updateFromExecutable(this.executable);
+          }
+        },
+        immediate: true
+      }
+    },
 
     mounted(): void {
       this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
-        if (this.executable === executable) {
+        if (this.executable != undefined && this.executable.id === executable.id) {
           this.updateFromExecutable(executable);
         }
       });
 
       this.subTracker.subscribe(EXECUTE_ACTIVE_EXECUTABLE_EVENT, executable => {
-        if (this.executable === executable) {
+        if (this.executable != undefined && this.executable === executable) {
           this.execute();
         }
       });
-    }
+    },
 
-    destroyed(): void {
+    unmounted(): void {
       this.subTracker.dispose();
-    }
+    },
 
-    get waiting(): boolean {
-      return !!(this.executable && this.executable.isReady() && this.partOfRunningExecution);
-    }
+    methods: {
+      I18n,
 
-    get disabled(): boolean {
-      return this.loadingSession || !this.executable || !this.hasStatement;
-    }
+      async execute(): Promise<void> {
+        huePubSub.publish('hue.ace.autocompleter.hide');
+        if (!this.executable) {
+          return;
+        }
+        if (this.beforeExecute) {
+          await this.beforeExecute(this.executable);
+        }
+        await this.executable.reset();
+        this.executable.execute();
+      },
 
-    get showExecute(): boolean {
-      return (
-        !!this.executable &&
-        !this.waiting &&
-        !this.loadingSession &&
-        this.status !== ExecutionStatus.running &&
-        this.status !== ExecutionStatus.streaming
-      );
-    }
+      async stop(): Promise<void> {
+        if (this.stopping || !this.executable) {
+          return;
+        }
+        this.stopping = true;
+        await this.executable.cancelBatchChain(true);
+        this.stopping = false;
+      },
 
-    get showStop(): boolean {
-      return (
-        this.status === ExecutionStatus.running ||
-        this.status === ExecutionStatus.streaming ||
-        this.waiting
-      );
-    }
-
-    async execute(): Promise<void> {
-      huePubSub.publish('hue.ace.autocompleter.hide');
-      if (!this.executable) {
-        return;
-      }
-      if (this.beforeExecute) {
-        await this.beforeExecute(this.executable);
-      }
-      await this.executable.reset();
-      this.executable.execute();
-    }
-
-    async stop(): Promise<void> {
-      if (this.stopping || !this.executable) {
-        return;
-      }
-      this.stopping = true;
-      await this.executable.cancelBatchChain(true);
-      this.stopping = false;
-    }
-
-    @Watch('executable', { immediate: true })
-    executableChanged(): void {
-      if (this.executable) {
-        this.updateFromExecutable(this.executable);
+      updateFromExecutable(executable: SqlExecutable): void {
+        const waitForSession =
+          !this.lastSession || this.lastSession.type !== executable.executor.connector().type;
+        this.status = executable.status;
+        this.hasStatement =
+          !executable.parsedStatement ||
+          !WHITE_SPACE_REGEX.test(executable.parsedStatement.statement);
+        this.partOfRunningExecution = executable.isPartOfRunningExecution();
+        this.limit =
+          (executable.executor.defaultLimit && executable.executor.defaultLimit()) || null;
+        if (waitForSession) {
+          this.loadingSession = true;
+          this.lastSession = null;
+          sessionManager.getSession({ type: executable.executor.connector().id }).then(session => {
+            this.lastSession = session;
+            this.loadingSession = false;
+          });
+        }
       }
     }
-
-    updateFromExecutable(executable: SqlExecutable): void {
-      const waitForSession =
-        !this.lastSession || this.lastSession.type !== executable.executor.connector().type;
-      this.status = executable.status;
-      this.hasStatement =
-        !executable.parsedStatement ||
-        !WHITE_SPACE_REGEX.test(executable.parsedStatement.statement);
-      this.partOfRunningExecution = executable.isPartOfRunningExecution();
-      this.limit = (executable.executor.defaultLimit && executable.executor.defaultLimit()) || null;
-      if (waitForSession) {
-        this.loadingSession = true;
-        this.lastSession = null;
-        sessionManager.getSession({ type: executable.executor.connector().id }).then(session => {
-          this.lastSession = session;
-          this.loadingSession = false;
-        });
-      }
-    }
-  }
+  });
 </script>
 
 <style lang="scss" scoped>

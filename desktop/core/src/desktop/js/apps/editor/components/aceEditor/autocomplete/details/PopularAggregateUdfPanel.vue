@@ -37,9 +37,7 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
 
   import { Suggestion } from '../AutocompleteResults';
   import { TopAggValue } from 'catalog/MultiTableEntry';
@@ -47,30 +45,42 @@
   import { Connector } from 'types/config';
   import I18n from 'utils/i18n';
 
-  @Component({
-    components: { SqlText },
-    methods: { I18n }
-  })
-  export default class PopularAggregateUdfPanel extends Vue {
-    @Prop({ required: true })
-    suggestion!: Suggestion;
-    @Prop({ required: false })
-    connector?: Connector;
+  export default defineComponent({
+    components: {
+      SqlText
+    },
 
-    get details(): TopAggValue {
-      return <TopAggValue>this.suggestion.details;
-    }
+    props: {
+      suggestion: {
+        type: Object as PropType<Suggestion>,
+        required: true
+      },
+      connector: {
+        type: Object as PropType<Connector>,
+        default: undefined
+      }
+    },
 
-    get description(): string {
-      return (this.details.function && this.details.function.description) || '';
-    }
+    computed: {
+      details(): TopAggValue {
+        return <TopAggValue>this.suggestion.details;
+      },
 
-    get dialect(): string | undefined {
-      return this.connector && this.connector.dialect;
-    }
+      description(): string {
+        return (this.details.function && this.details.function.description) || '';
+      },
 
-    get popularityTitle(): string {
-      return `${I18n('Relative popularity')}: ${this.details.relativePopularity || '?'}%`;
+      dialect(): string | undefined {
+        return this.connector && this.connector.dialect;
+      },
+
+      popularityTitle(): string {
+        return `${I18n('Relative popularity')}: ${this.details.relativePopularity || '?'}%`;
+      }
+    },
+
+    methods: {
+      I18n
     }
-  }
+  });
 </script>

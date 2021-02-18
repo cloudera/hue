@@ -46,9 +46,8 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
+
   import I18n from 'utils/i18n';
 
   export enum AlertType {
@@ -80,29 +79,45 @@
     [AlertType.Unknown, UNKNOWN_DEF]
   ]);
 
-  @Component({
+  export default defineComponent({
+    props: {
+      type: {
+        type: Number as PropType<AlertType>,
+        default: AlertType.Unknown
+      },
+
+      message: {
+        type: String,
+        default: undefined
+      },
+      details: {
+        type: String,
+        default: undefined
+      },
+
+      showClose: Boolean
+    },
+
+    emits: ['close'],
+
+    data(): {
+      showDetails: boolean;
+    } {
+      return {
+        showDetails: false
+      };
+    },
+
+    computed: {
+      definition(): AlertDef {
+        return TYPE_DEFS.get(this.type) || UNKNOWN_DEF;
+      }
+    },
+
     methods: {
       I18n
     }
-  })
-  export default class InlineAlert extends Vue {
-    @Prop({ required: true, default: AlertType.Unknown })
-    type!: AlertType;
-
-    @Prop()
-    message!: string;
-    @Prop()
-    details!: string;
-
-    @Prop({ default: false })
-    showClose!: boolean;
-
-    showDetails = false;
-
-    get definition(): AlertDef {
-      return TYPE_DEFS.get(this.type) || UNKNOWN_DEF;
-    }
-  }
+  });
 </script>
 
 <style lang="scss" scoped>

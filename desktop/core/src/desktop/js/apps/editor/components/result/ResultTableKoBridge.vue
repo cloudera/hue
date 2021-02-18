@@ -17,30 +17,44 @@
 -->
 
 <template>
-  <ResultTable :executable="executable" />
+  <ResultTable v-if="executable" :executable="executable" />
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
-  import { wrap } from 'vue/webComponentWrapper';
+  import { defineComponent, PropType } from 'vue';
+
+  import { wrap } from 'vue/webComponentWrap';
 
   import ResultTable from './ResultTable.vue';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
-  @Component({
-    components: { ResultTable }
-  })
-  export default class ResultTableKoBridge extends Vue {
-    @Prop()
-    executableObservable?: KnockoutObservable<SqlExecutable | undefined>;
+  const ResultTableKoBridge = defineComponent({
+    components: {
+      ResultTable
+    },
 
-    initialized = false;
-    executable: SqlExecutable | null = null;
+    props: {
+      executableObservable: {
+        type: Object as PropType<KnockoutObservable<SqlExecutable | null>> | null,
+        default: null
+      }
+    },
 
-    subTracker = new SubscriptionTracker();
+    setup() {
+      const subTracker = new SubscriptionTracker();
+      return { subTracker };
+    },
+
+    data(): {
+      initialized: boolean;
+      executable: SqlExecutable | null;
+    } {
+      return {
+        initialized: false,
+        executable: null
+      };
+    },
 
     updated(): void {
       if (!this.initialized && this.executableObservable) {
@@ -50,13 +64,15 @@
         });
         this.initialized = true;
       }
-    }
+    },
 
-    destroyed(): void {
+    unmounted(): void {
       this.subTracker.dispose();
     }
-  }
+  });
 
   export const COMPONENT_NAME = 'result-table-ko-bridge';
   wrap(COMPONENT_NAME, ResultTableKoBridge);
+
+  export default ResultTableKoBridge;
 </script>

@@ -8,20 +8,10 @@ exports[`ExecutableActions.vue should render 1`] = `
     disabled="true"
     small="true"
     title="Creating session"
-  >
-    <i
-      class="fa fa-fw fa-spinner fa-spin"
-    />
-     Loading
-  
-  </hue-button-stub>
-   
-  <!---->
-   
-  <!---->
-   
-  <!---->
-   
+  />
+  <!--v-if-->
+  <!--v-if-->
+  <!--v-if-->
   <form
     autocomplete="off"
     class="inline-block margin-left-10"
@@ -43,23 +33,14 @@ exports[`ExecutableActions.vue should show execute once the session is loaded 1`
 <div
   class="snippet-execute-actions"
 >
-  <!---->
-   
+  <!--v-if-->
   <hue-button-stub
+    disabled="false"
     primary="true"
     small="true"
-  >
-    <i
-      class="fa fa-play fa-fw"
-    />
-     Execute
-  
-  </hue-button-stub>
-   
-  <!---->
-   
-  <!---->
-   
+  />
+  <!--v-if-->
+  <!--v-if-->
   <form
     autocomplete="off"
     class="inline-block margin-left-10"

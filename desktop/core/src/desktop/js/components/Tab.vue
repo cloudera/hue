@@ -17,50 +17,84 @@
 -->
 
 <template>
-  <div v-if="!lazy || rendered" v-show="isActive">
+  <div v-if="!lazy || rendered" v-show="def.isActive">
     <slot />
   </div>
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Inject, Prop, Watch } from 'vue-property-decorator';
+  import { defineComponent, inject } from 'vue';
 
-  @Component
-  export default class Tab extends Vue {
-    @Inject()
-    addTab?: (tab: Tab) => void;
-    @Inject()
-    removeTab?: (tab: Tab) => void;
+  export interface TabRef {
+    title: string;
+    isActive: boolean;
+  }
 
-    @Prop({ required: true })
-    title!: string;
-    @Prop({ default: false })
-    lazy!: boolean;
-
-    isActive = false;
-    rendered = false;
-
-    @Watch('isActive')
-    onActive(): void {
-      if (this.isActive) {
-        this.rendered = true;
+  export default defineComponent({
+    props: {
+      title: {
+        type: String,
+        required: true
+      },
+      lazy: {
+        type: Boolean,
+        default: false
       }
-    }
+    },
+
+    setup(
+      props
+    ): {
+      addTab?: (tab: TabRef) => void;
+      removeTab?: (tab: TabRef) => void;
+
+      def: TabRef;
+    } {
+      return {
+        addTab: inject('addTab'),
+        removeTab: inject('removeTab'),
+
+        def: {
+          title: props.title,
+          isActive: false
+        }
+      };
+    },
+
+    data(): {
+      rendered: boolean;
+    } {
+      return {
+        rendered: false
+      };
+    },
+
+    created() {
+      this.$watch(
+        (): boolean => this.def.isActive,
+        (isActive: boolean): void => {
+          if (isActive) {
+            this.rendered = true;
+          }
+        }
+      );
+    },
 
     mounted(): void {
       if (this.addTab) {
-        this.addTab(this);
+        this.addTab(this.def);
       }
     }
 
-    destroyed(): void {
-      if (this.removeTab) {
-        this.removeTab(this);
-      }
-    }
-  }
+    // TODO
+    // destroyed(): was deprecated, need to rearchitect the component.
+    // Whenever parent is rendered mount, unmount is called causing an to prevent infinit loop.
+    // unmounted(): void {
+    //   if (this.removeTab) {
+    //     this.removeTab(this.def);
+    //   }
+    // }
+  });
 </script>
 
 <style lang="scss" scoped></style>

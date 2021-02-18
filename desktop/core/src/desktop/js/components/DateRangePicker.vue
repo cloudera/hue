@@ -76,15 +76,14 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent } from 'vue';
+
   import { Range } from './DateRangePicker';
   import { DateTime } from 'luxon';
-  import Datepicker from 'vuejs-datepicker';
+  import Datepicker from 'vue3-datepicker';
   import HueLink from './HueLink.vue';
   import HueButton from './HueButton.vue';
   import I18n from '../utils/i18n';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
   import DropdownPanel from './dropdown/DropdownPanel.vue';
 
   const SECOND = 1000;
@@ -138,88 +137,122 @@
 
   const DEFAULT_RANGE = RANGE_SETS[0][0];
 
-  @Component({
-    components: { Datepicker, DropdownPanel, HueButton, HueLink }
-  })
-  export default class DateRangePicker extends Vue {
-    @Prop({ required: false, default: false })
-    inline?: boolean;
+  export default defineComponent({
+    components: {
+      Datepicker,
+      DropdownPanel,
+      HueButton,
+      HueLink
+    },
 
-    rangeSets = RANGE_SETS;
-    selectedRange: Range = DEFAULT_RANGE;
-
-    customRange: Range = {
-      title: I18n('Custom Range'),
-      from: RANGE_NOW.toMillis() - this.selectedRange.from,
-      to: RANGE_NOW.toMillis(),
-      custom: true
-    };
-
-    get customFrom(): number | undefined {
-      if (this.selectedRange.custom) {
-        return this.selectedRange.from;
+    props: {
+      inline: {
+        type: Boolean,
+        required: false,
+        default: false
       }
-    }
+    },
 
-    get customTo(): number | undefined {
-      if (this.selectedRange.custom) {
-        return this.selectedRange.to;
-      }
-    }
+    emits: ['date-range-changed'],
 
-    // TODO: Switch to v-model and value prop
-    clear(): void {
-      if (this.selectedRange !== DEFAULT_RANGE) {
-        this.selectedRange = DEFAULT_RANGE;
-        this.notify();
-      }
-    }
+    setup(): {
+      rangeSets: Range[][];
 
-    setCustomFrom(from?: Date): void {
-      if (from) {
-        Vue.set(this.customRange, 'from', from.valueOf());
-        if (this.customRange.from > this.customRange.to) {
-          Vue.set(this.customRange, 'to', this.customRange.from);
-        }
-        this.selectedRange = this.customRange;
-      }
-    }
+      customRange: Range;
+    } {
+      return {
+        rangeSets: RANGE_SETS,
 
-    setCustomTo(to?: Date): void {
-      if (to) {
-        Vue.set(this.customRange, 'to', to.valueOf());
-        if (this.customRange.to < this.customRange.from) {
-          Vue.set(this.customRange, 'from', this.customRange.to);
-        }
-        this.selectedRange = this.customRange;
-      }
-    }
-
-    notify(): void {
-      let range: Range;
-      if (this.selectedRange.custom) {
-        range = {
-          title: this.selectedRange.title,
-          from: DateTime.fromMillis(this.selectedRange.from).startOf('day').valueOf(),
-          to: DateTime.fromMillis(this.selectedRange.to).endOf('day').valueOf(),
+        customRange: {
+          title: I18n('Custom Range'),
+          from: RANGE_NOW.toMillis() - DEFAULT_RANGE.from,
+          to: RANGE_NOW.toMillis(),
           custom: true
-        };
-      } else {
-        const now = DateTime.utc().valueOf();
-        range = {
-          title: this.selectedRange.title,
-          from: now - this.selectedRange.from,
-          to: now - this.selectedRange.to
-        };
-      }
-      this.$emit('date-range-changed', range);
-    }
+        }
+      };
+    },
 
-    apply(closePanel: () => void): void {
-      this.notify();
-      closePanel();
+    data(): {
+      selectedRange: Range;
+    } {
+      return {
+        selectedRange: DEFAULT_RANGE
+      };
+    },
+
+    computed: {
+      customFrom(): number | undefined {
+        if (this.selectedRange.custom) {
+          return this.selectedRange.from;
+        }
+        return undefined;
+      },
+
+      customTo(): number | undefined {
+        if (this.selectedRange.custom) {
+          return this.selectedRange.to;
+        }
+        return undefined;
+      }
+    },
+
+    methods: {
+      // TODO: Switch to v-model and value prop
+      clear(): void {
+        if (this.selectedRange !== DEFAULT_RANGE) {
+          this.selectedRange = DEFAULT_RANGE;
+          this.notify();
+        }
+      },
+
+      setCustomFrom(from?: Date): void {
+        if (from) {
+          this.customRange.from = from.valueOf();
+          if (this.customRange.from > this.customRange.to) {
+            this.customRange.to = this.customRange.from;
+          }
+          this.selectedRange = this.customRange;
+          this.$forceUpdate();
+        }
+      },
+
+      setCustomTo(to?: Date): void {
+        if (to) {
+          this.customRange.to = to.valueOf();
+          if (this.customRange.to < this.customRange.from) {
+            this.customRange.from = this.customRange.to;
+          }
+          this.selectedRange = this.customRange;
+          this.$forceUpdate();
+        }
+      },
+
+      notify(): void {
+        let range: Range;
+        if (this.selectedRange.custom) {
+          range = {
+            title: this.selectedRange.title,
+            from: DateTime.fromMillis(this.selectedRange.from).startOf('day').valueOf(),
+            to: DateTime.fromMillis(this.selectedRange.to).endOf('day').valueOf(),
+            custom: true
+          };
+        } else {
+          const now = DateTime.utc().valueOf();
+          range = {
+            title: this.selectedRange.title,
+            from: now - this.selectedRange.from,
+            to: now - this.selectedRange.to
+          };
+        }
+        this.$emit('date-range-changed', range);
+      },
+
+      apply(closePanel: () => void): void {
+        this.notify();
+        closePanel();
+      }
     }
-  }
+  });
 </script>
 
 <style lang="scss" scoped>

@@ -21,7 +21,11 @@ import DateRangePicker from './DateRangePicker.vue';
 describe('DateRangePicker.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(DateRangePicker, {
-      stubs: { 'dropdown-panel': DropdownPanel }
+      global: {
+        stubs: {
+          DropdownPanel
+        }
+      }
     });
     expect(wrapper.element).toMatchSnapshot();
   });

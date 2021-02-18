@@ -31,9 +31,8 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
+
   import ace, { getAceMode } from 'ext/aceHelper';
   import { Ace } from 'ext/ace';
 
@@ -66,36 +65,62 @@
 
   const removeUnicodes = (value: string) => value.replace(UNICODES_TO_REMOVE, ' ');
 
-  @Component({
-    components: { AceAutocomplete },
-    methods: { I18n }
-  })
-  export default class AceEditor extends Vue {
-    @Prop({ required: false, default: '' })
-    initialValue!: string;
-    @Prop({ required: false })
-    initialCursorPosition?: Ace.Position;
-    @Prop()
-    id!: string;
-    @Prop()
-    executor!: Executor;
-    @Prop({ required: false, default: () => ({}) })
-    aceOptions?: Ace.Options;
-    @Prop({ required: false })
-    sqlParserProvider?: SqlParserProvider;
-    @Prop({ required: false })
-    sqlReferenceProvider?: SqlReferenceProvider;
-
-    subTracker = new SubscriptionTracker();
-    editor: Ace.Editor | null = null;
-    autocompleteParser: AutocompleteParser | null = null;
-    aceLocationHandler: AceLocationHandler | null = null;
-    lastFocusedEditor = false;
-
-    private isSqlDialect(): boolean {
-      return (<EditorInterpreter>this.executor.connector()).is_sql;
-    }
-
+  export default defineComponent({
+    components: {
+      AceAutocomplete
+    },
+    props: {
+      initialValue: {
+        type: String,
+        required: false,
+        default: ''
+      },
+      initialCursorPosition: {
+        type: Object as PropType<Ace.Position>,
+        default: undefined
+      },
+      id: {
+        type: String,
+        required: true
+      },
+      executor: {
+        type: Object as PropType<Executor>,
+        required: true
+      },
+      aceOptions: {
+        type: Object as PropType<Ace.Options>,
+        required: false,
+        default: () => ({})
+      },
+      sqlParserProvider: {
+        type: Object as PropType<SqlParserProvider>,
+        default: undefined
+      },
+      sqlReferenceProvider: {
+        type: Object as PropType<SqlReferenceProvider>,
+        default: undefined
+      }
+    },
+    emits: [
+      'value-changed',
+      'create-new-doc',
+      'save-doc',
+      'toggle-presentation-mode',
+      'ace-created',
+      'cursor-changed'
+    ],
+    setup() {
+      const subTracker = new SubscriptionTracker();
+      return { subTracker };
+    },
+    data() {
+      return {
+        editor: null as Ace.Editor | null,
+        autocompleteParser: null as AutocompleteParser | null,
+        aceLocationHandler: null as AceLocationHandler | null,
+        lastFocusedEditor: false
+      };
+    },
     mounted(): void {
       const editorElement = <HTMLElement>this.$refs['editorElement'];
       if (!editorElement) {
@@ -311,294 +336,313 @@
       this.registerEditorCommands();
       this.addInsertSubscribers();
       this.$emit('ace-created', editor);
-    }
+    },
 
-    createPlaceholderElement(): HTMLElement {
-      const element = document.createElement('div');
-      element.innerText = I18n('Example: SELECT * FROM tablename, or press CTRL + space');
-      element.style.marginLeft = '6px';
-      element.classList.add('ace_invisible');
-      element.classList.add('ace_emptyMessage');
-      return element;
-    }
-
-    cursorAtStartOfStatement(): boolean {
-      return (
-        !!this.editor &&
-        (/^\s*$/.test(this.editor.getValue()) || /^.*;\s*$/.test(this.editor.getTextBeforeCursor()))
-      );
-    }
-
-    addInsertSubscribers(): void {
-      this.subTracker.subscribe(
-        INSERT_AT_CURSOR_EVENT,
-        (details: { text: string; targetEditor: Ace.Editor; cursorEndAdjust?: number }): void => {
-          if (details.targetEditor === this.editor || this.lastFocusedEditor) {
-            this.insertSqlAtCursor(details.text, details.cursorEndAdjust);
-          }
-        }
-      );
-
-      this.subTracker.subscribe(
-        'editor.insert.table.at.cursor',
-        (details: { name: string; database: string }) => {
-          if (!this.lastFocusedEditor) {
-            return;
-          }
-          const qualifiedName =
-            this.executor.database() === details.database
-              ? details.name
-              : `${details.database}.${details.name}`;
-          if (this.cursorAtStartOfStatement()) {
-            this.insertSqlAtCursor(`SELECT * FROM ${qualifiedName} LIMIT 100;`, -1);
-          } else {
-            this.insertSqlAtCursor(`${qualifiedName} `);
-          }
-        }
-      );
-
-      this.subTracker.subscribe(
-        'editor.insert.column.at.cursor',
-        (details: { name: string; table: string; database: string }): void => {
-          if (!this.lastFocusedEditor) {
-            return;
-          }
-          if (this.cursorAtStartOfStatement()) {
-            const qualifiedFromName =
-              this.executor.database() === details.database
-                ? details.table
-                : details.database + '.' + details.table;
-            this.insertSqlAtCursor(
-              `SELECT ${details.name} FROM ${qualifiedFromName} LIMIT 100;`,
-              -1
-            );
-          }
-        }
-      );
-
-      this.subTracker.subscribe(
-        'sample.error.insert.click',
-        (popoverEntry: { identifierChain: IdentifierChainEntry[] }): void => {
-          if (!this.lastFocusedEditor || !popoverEntry.identifierChain.length) {
-            return;
-          }
-          const table = popoverEntry.identifierChain[popoverEntry.identifierChain.length - 1].name;
-          this.insertSqlAtCursor(`SELECT * FROM ${table} LIMIT 100;`, -1);
-        }
-      );
-    }
-
-    addCustomAceConfigOptions(editor: Ace.Editor): void {
-      let darkThemeEnabled = getFromLocalStorage('ace.dark.theme.enabled', false);
-
-      editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
-
-      editor.enabledMenuOptions = {
-        setShowInvisibles: true,
-        setTabSize: true,
-        setShowGutter: true
-      };
-
-      editor.customMenuOptions = {
-        setEnableDarkTheme: (enabled: boolean): void => {
-          darkThemeEnabled = enabled;
-          setInLocalStorage('ace.dark.theme.enabled', darkThemeEnabled);
-          editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
-        },
-        getEnableDarkTheme: () => darkThemeEnabled,
-        setEnableAutocompleter: (enabled: boolean): void => {
-          editor.setOption('enableBasicAutocompletion', enabled);
-          setInLocalStorage('hue.ace.enableBasicAutocompletion', enabled);
-          const setElem = <HTMLInputElement>document.getElementById('setEnableLiveAutocompletion');
-          if (setElem && ((enabled && !setElem.checked) || (!enabled && setElem.checked))) {
-            setElem.click();
-          }
-        },
-        getEnableAutocompleter: () => editor.getOption('enableBasicAutocompletion'),
-        setEnableLiveAutocompletion: (enabled: boolean): void => {
-          editor.setOption('enableLiveAutocompletion', enabled);
-          setInLocalStorage('hue.ace.enableLiveAutocompletion', enabled);
-          const setElem = <HTMLInputElement>document.getElementById('setEnableAutocompleter');
-          if (setElem && enabled && !setElem.checked) {
-            setElem.click();
-          }
-        },
-        getEnableLiveAutocompletion: () => editor.getOption('enableLiveAutocompletion'),
-        setFontSize: (size: string): void => {
-          if (size.toLowerCase().indexOf('px') === -1 && size.toLowerCase().indexOf('em') === -1) {
-            size += 'px';
-          }
-          editor.setOption('fontSize', size);
-          setInLocalStorage('hue.ace.fontSize', size);
-        },
-        getFontSize: (): string => {
-          let size = <string>editor.getOption('fontSize');
-          if (size.toLowerCase().indexOf('px') === -1 && size.toLowerCase().indexOf('em') === -1) {
-            size += 'px';
-          }
-          return size;
-        }
-      };
-    }
-
-    configureEditorOptions(editor: Ace.Editor): void {
-      const enableBasicAutocompletion = getFromLocalStorage(
-        'hue.ace.enableBasicAutocompletion',
-        true
-      );
-
-      const enableLiveAutocompletion =
-        enableBasicAutocompletion && getFromLocalStorage('hue.ace.enableLiveAutocompletion', true);
-
-      const editorOptions: Ace.Options = {
-        enableBasicAutocompletion,
-        enableLiveAutocompletion,
-        fontSize: getFromLocalStorage(
-          'hue.ace.fontSize',
-          navigator.platform && navigator.platform.toLowerCase().indexOf('linux') > -1
-            ? '14px'
-            : '12px'
-        ),
-        enableSnippets: true,
-        showGutter: true,
-        showLineNumbers: true,
-        showPrintMargin: false,
-        scrollPastEnd: 0.1,
-        minLines: 3,
-        maxLines: 25,
-        tabSize: 2,
-        useSoftTabs: true,
-        ...this.aceOptions
-      };
-
-      editor.setOptions(editorOptions);
-    }
-
-    insertSqlAtCursor(text: string, cursorEndAdjust?: number): void {
-      if (!this.editor) {
-        return;
-      }
-
-      const before = this.editor.getTextBeforeCursor();
-
-      const textToInsert = /\S+$/.test(before) ? ' ' + text : text;
-      this.editor.session.insert(this.editor.getCursorPosition(), textToInsert);
-      if (cursorEndAdjust) {
-        const positionAfterInsert = this.editor.getCursorPosition();
-        this.editor.moveCursorToPosition({
-          row: positionAfterInsert.row,
-          column: positionAfterInsert.column + cursorEndAdjust
-        });
-      }
-      this.editor.clearSelection();
-      this.editor.focus();
-    }
-
-    destroyed(): void {
+    unmounted(): void {
       this.subTracker.dispose();
-    }
+    },
 
-    triggerChange(): void {
-      if (this.editor) {
-        this.$emit('value-changed', removeUnicodes(this.editor.getValue()));
-      }
-    }
+    methods: {
+      I18n,
 
-    registerEditorCommands(): void {
-      if (!this.editor) {
-        return;
-      }
+      isSqlDialect(): boolean {
+        return (<EditorInterpreter>this.executor.connector()).is_sql;
+      },
 
-      this.editor.commands.addCommand({
-        name: 'execute',
-        bindKey: { win: 'Ctrl-Enter', mac: 'Command-Enter|Ctrl-Enter' },
-        exec: async () => {
-          if (this.aceLocationHandler) {
-            this.aceLocationHandler.refreshStatementLocations();
+      createPlaceholderElement(): HTMLElement {
+        const element = document.createElement('div');
+        element.innerText = I18n('Example: SELECT * FROM tablename, or press CTRL + space');
+        element.style.marginLeft = '6px';
+        element.classList.add('ace_invisible');
+        element.classList.add('ace_emptyMessage');
+        return element;
+      },
+
+      cursorAtStartOfStatement(): boolean {
+        return (
+          !!this.editor &&
+          (/^\s*$/.test(this.editor.getValue()) ||
+            /^.*;\s*$/.test(this.editor.getTextBeforeCursor()))
+        );
+      },
+
+      addInsertSubscribers(): void {
+        this.subTracker.subscribe(
+          INSERT_AT_CURSOR_EVENT,
+          (details: { text: string; targetEditor: Ace.Editor; cursorEndAdjust?: number }): void => {
+            if (details.targetEditor === this.editor || this.lastFocusedEditor) {
+              this.insertSqlAtCursor(details.text, details.cursorEndAdjust);
+            }
           }
-          if (this.editor && this.executor.activeExecutable) {
-            this.triggerChange();
-            await this.executor.activeExecutable.reset();
-            await this.executor.activeExecutable.execute();
+        );
+
+        this.subTracker.subscribe(
+          'editor.insert.table.at.cursor',
+          (details: { name: string; database: string }) => {
+            if (!this.lastFocusedEditor) {
+              return;
+            }
+            const qualifiedName =
+              this.executor.database() === details.database
+                ? details.name
+                : `${details.database}.${details.name}`;
+            if (this.cursorAtStartOfStatement()) {
+              this.insertSqlAtCursor(`SELECT * FROM ${qualifiedName} LIMIT 100;`, -1);
+            } else {
+              this.insertSqlAtCursor(`${qualifiedName} `);
+            }
           }
-        }
-      });
+        );
 
-      this.editor.commands.addCommand({
-        name: 'switchTheme',
-        bindKey: { win: 'Ctrl-Alt-t', mac: 'Command-Alt-t' },
-        exec: () => {
-          if (
-            this.editor &&
-            this.editor.customMenuOptions &&
-            this.editor.customMenuOptions.getEnableDarkTheme &&
-            this.editor.customMenuOptions.setEnableDarkTheme
-          ) {
-            const enabled = this.editor.customMenuOptions.getEnableDarkTheme();
-            this.editor.customMenuOptions.setEnableDarkTheme(!enabled);
+        this.subTracker.subscribe(
+          'editor.insert.column.at.cursor',
+          (details: { name: string; table: string; database: string }): void => {
+            if (!this.lastFocusedEditor) {
+              return;
+            }
+            if (this.cursorAtStartOfStatement()) {
+              const qualifiedFromName =
+                this.executor.database() === details.database
+                  ? details.table
+                  : details.database + '.' + details.table;
+              this.insertSqlAtCursor(
+                `SELECT ${details.name} FROM ${qualifiedFromName} LIMIT 100;`,
+                -1
+              );
+            }
           }
-        }
-      });
+        );
 
-      this.editor.commands.addCommand({
-        name: 'new',
-        bindKey: { win: 'Ctrl-e', mac: 'Command-e' },
-        exec: () => {
-          this.$emit('create-new-doc');
-        }
-      });
+        this.subTracker.subscribe(
+          'sample.error.insert.click',
+          (popoverEntry: { identifierChain: IdentifierChainEntry[] }): void => {
+            if (!this.lastFocusedEditor || !popoverEntry.identifierChain.length) {
+              return;
+            }
+            const table =
+              popoverEntry.identifierChain[popoverEntry.identifierChain.length - 1].name;
+            this.insertSqlAtCursor(`SELECT * FROM ${table} LIMIT 100;`, -1);
+          }
+        );
+      },
 
-      this.editor.commands.addCommand({
-        name: 'save',
-        bindKey: { win: 'Ctrl-s', mac: 'Command-s|Ctrl-s' },
-        exec: () => {
-          this.$emit('save-doc');
-        }
-      });
+      addCustomAceConfigOptions(editor: Ace.Editor): void {
+        let darkThemeEnabled = getFromLocalStorage('ace.dark.theme.enabled', false);
 
-      this.editor.commands.addCommand({
-        name: 'togglePresentationMode',
-        bindKey: { win: 'Ctrl-Shift-p', mac: 'Ctrl-Shift-p|Command-Shift-p' },
-        exec: () => {
-          this.$emit('toggle-presentation-mode');
-        }
-      });
+        editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
 
-      this.editor.commands.addCommand({
-        name: 'format',
-        bindKey: {
-          win: 'Ctrl-i|Ctrl-Shift-f|Ctrl-Alt-l',
-          mac: 'Command-i|Ctrl-i|Ctrl-Shift-f|Command-Shift-f|Ctrl-Shift-l|Cmd-Shift-l'
-        },
-        exec: async () => {
-          if (this.editor) {
-            this.editor.setReadOnly(true);
-            try {
-              if (this.editor.getSelectedText()) {
-                const selectionRange = this.editor.getSelectionRange();
-                const formatted = await formatSql({
-                  statements: this.editor.getSelectedText(),
-                  silenceErrors: true
-                });
-                this.editor.getSession().replace(selectionRange, formatted);
-              } else {
-                const formatted = await formatSql({
-                  statements: this.editor.getValue(),
-                  silenceErrors: true
-                });
-                this.editor.setValue(formatted, 1);
-              }
+        editor.enabledMenuOptions = {
+          setShowInvisibles: true,
+          setTabSize: true,
+          setShowGutter: true
+        };
+
+        editor.customMenuOptions = {
+          setEnableDarkTheme: (enabled: boolean): void => {
+            darkThemeEnabled = enabled;
+            setInLocalStorage('ace.dark.theme.enabled', darkThemeEnabled);
+            editor.setTheme(darkThemeEnabled ? 'ace/theme/hue_dark' : 'ace/theme/hue');
+          },
+          getEnableDarkTheme: () => darkThemeEnabled,
+          setEnableAutocompleter: (enabled: boolean): void => {
+            editor.setOption('enableBasicAutocompletion', enabled);
+            setInLocalStorage('hue.ace.enableBasicAutocompletion', enabled);
+            const setElem = <HTMLInputElement>(
+              document.getElementById('setEnableLiveAutocompletion')
+            );
+            if (setElem && ((enabled && !setElem.checked) || (!enabled && setElem.checked))) {
+              setElem.click();
+            }
+          },
+          getEnableAutocompleter: () => editor.getOption('enableBasicAutocompletion'),
+          setEnableLiveAutocompletion: (enabled: boolean): void => {
+            editor.setOption('enableLiveAutocompletion', enabled);
+            setInLocalStorage('hue.ace.enableLiveAutocompletion', enabled);
+            const setElem = <HTMLInputElement>document.getElementById('setEnableAutocompleter');
+            if (setElem && enabled && !setElem.checked) {
+              setElem.click();
+            }
+          },
+          getEnableLiveAutocompletion: () => editor.getOption('enableLiveAutocompletion'),
+          setFontSize: (size: string): void => {
+            if (
+              size.toLowerCase().indexOf('px') === -1 &&
+              size.toLowerCase().indexOf('em') === -1
+            ) {
+              size += 'px';
+            }
+            editor.setOption('fontSize', size);
+            setInLocalStorage('hue.ace.fontSize', size);
+          },
+          getFontSize: (): string => {
+            let size = <string>editor.getOption('fontSize');
+            if (
+              size.toLowerCase().indexOf('px') === -1 &&
+              size.toLowerCase().indexOf('em') === -1
+            ) {
+              size += 'px';
+            }
+            return size;
+          }
+        };
+      },
+
+      configureEditorOptions(editor: Ace.Editor): void {
+        const enableBasicAutocompletion = getFromLocalStorage(
+          'hue.ace.enableBasicAutocompletion',
+          true
+        );
+
+        const enableLiveAutocompletion =
+          enableBasicAutocompletion &&
+          getFromLocalStorage('hue.ace.enableLiveAutocompletion', true);
+
+        const editorOptions: Ace.Options = {
+          enableBasicAutocompletion,
+          enableLiveAutocompletion,
+          fontSize: getFromLocalStorage(
+            'hue.ace.fontSize',
+            navigator.platform && navigator.platform.toLowerCase().indexOf('linux') > -1
+              ? '14px'
+              : '12px'
+          ),
+          enableSnippets: true,
+          showGutter: true,
+          showLineNumbers: true,
+          showPrintMargin: false,
+          scrollPastEnd: 0.1,
+          minLines: 3,
+          maxLines: 25,
+          tabSize: 2,
+          useSoftTabs: true,
+          ...this.aceOptions
+        };
+
+        editor.setOptions(editorOptions);
+      },
+
+      insertSqlAtCursor(text: string, cursorEndAdjust?: number): void {
+        if (!this.editor) {
+          return;
+        }
+
+        const before = this.editor.getTextBeforeCursor();
+
+        const textToInsert = /\S+$/.test(before) ? ' ' + text : text;
+        this.editor.session.insert(this.editor.getCursorPosition(), textToInsert);
+        if (cursorEndAdjust) {
+          const positionAfterInsert = this.editor.getCursorPosition();
+          this.editor.moveCursorToPosition({
+            row: positionAfterInsert.row,
+            column: positionAfterInsert.column + cursorEndAdjust
+          });
+        }
+        this.editor.clearSelection();
+        this.editor.focus();
+      },
+
+      triggerChange(): void {
+        if (this.editor) {
+          this.$emit('value-changed', removeUnicodes(this.editor.getValue()));
+        }
+      },
+
+      registerEditorCommands(): void {
+        if (!this.editor) {
+          return;
+        }
+
+        this.editor.commands.addCommand({
+          name: 'execute',
+          bindKey: { win: 'Ctrl-Enter', mac: 'Command-Enter|Ctrl-Enter' },
+          exec: async () => {
+            if (this.aceLocationHandler) {
+              this.aceLocationHandler.refreshStatementLocations();
+            }
+            if (this.editor && this.executor.activeExecutable) {
               this.triggerChange();
-            } catch (e) {}
-            this.editor.setReadOnly(false);
+              await this.executor.activeExecutable.reset();
+              await this.executor.activeExecutable.execute();
+            }
           }
-        }
-      });
+        });
 
-      this.editor.commands.bindKey('Ctrl-P', 'golineup');
-      this.editor.commands.bindKey({ win: 'Ctrl-j', mac: 'Command-j|Ctrl-j' }, 'gotoline');
+        this.editor.commands.addCommand({
+          name: 'switchTheme',
+          bindKey: { win: 'Ctrl-Alt-t', mac: 'Command-Alt-t' },
+          exec: () => {
+            if (
+              this.editor &&
+              this.editor.customMenuOptions &&
+              this.editor.customMenuOptions.getEnableDarkTheme &&
+              this.editor.customMenuOptions.setEnableDarkTheme
+            ) {
+              const enabled = this.editor.customMenuOptions.getEnableDarkTheme();
+              this.editor.customMenuOptions.setEnableDarkTheme(!enabled);
+            }
+          }
+        });
+
+        this.editor.commands.addCommand({
+          name: 'new',
+          bindKey: { win: 'Ctrl-e', mac: 'Command-e' },
+          exec: () => {
+            this.$emit('create-new-doc');
+          }
+        });
+
+        this.editor.commands.addCommand({
+          name: 'save',
+          bindKey: { win: 'Ctrl-s', mac: 'Command-s|Ctrl-s' },
+          exec: () => {
+            this.$emit('save-doc');
+          }
+        });
+
+        this.editor.commands.addCommand({
+          name: 'togglePresentationMode',
+          bindKey: { win: 'Ctrl-Shift-p', mac: 'Ctrl-Shift-p|Command-Shift-p' },
+          exec: () => {
+            this.$emit('toggle-presentation-mode');
+          }
+        });
+
+        this.editor.commands.addCommand({
+          name: 'format',
+          bindKey: {
+            win: 'Ctrl-i|Ctrl-Shift-f|Ctrl-Alt-l',
+            mac: 'Command-i|Ctrl-i|Ctrl-Shift-f|Command-Shift-f|Ctrl-Shift-l|Cmd-Shift-l'
+          },
+          exec: async () => {
+            if (this.editor) {
+              this.editor.setReadOnly(true);
+              try {
+                if (this.editor.getSelectedText()) {
+                  const selectionRange = this.editor.getSelectionRange();
+                  const formatted = await formatSql({
+                    statements: this.editor.getSelectedText(),
+                    silenceErrors: true
+                  });
+                  this.editor.getSession().replace(selectionRange, formatted);
+                } else {
+                  const formatted = await formatSql({
+                    statements: this.editor.getValue(),
+                    silenceErrors: true
+                  });
+                  this.editor.setValue(formatted, 1);
+                }
+                this.triggerChange();
+              } catch (e) {}
+              this.editor.setReadOnly(false);
+            }
+          }
+        });
+
+        this.editor.commands.bindKey('Ctrl-P', 'golineup');
+        this.editor.commands.bindKey({ win: 'Ctrl-j', mac: 'Command-j|Ctrl-j' }, 'gotoline');
+      }
     }
-  }
+  });
 </script>
 
 <style lang="scss">

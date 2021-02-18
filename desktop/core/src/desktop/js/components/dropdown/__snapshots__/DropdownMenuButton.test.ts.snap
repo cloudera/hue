@@ -2,6 +2,9 @@
 
 exports[`DropdownMenuButton.vue should render 1`] = `
 <li>
-  <button />
+  <button>
+    
+    
+  </button>
 </li>
 `;

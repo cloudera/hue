@@ -34,22 +34,28 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent, PropType } from 'vue';
+
   import SpacerItem from 'components/sidebar/SpacerItem.vue';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
   import BaseNavigationItem from './BaseNavigationItem.vue';
   import { SidebarAccordionSubItem } from './types';
 
-  @Component({
-    components: { SpacerItem, BaseNavigationItem }
-  })
-  export default class AccordionSubItem extends Vue {
-    @Prop()
-    item!: SidebarAccordionSubItem;
-    @Prop()
-    active!: boolean;
-    @Prop({ default: false })
-    disabled?: boolean;
-  }
+  export default defineComponent({
+    components: {
+      SpacerItem,
+      BaseNavigationItem
+    },
+
+    props: {
+      item: {
+        type: Object as PropType<SidebarAccordionSubItem>,
+        required: true
+      },
+      active: Boolean,
+      disabled: {
+        type: Boolean,
+        default: false
+      }
+    }
+  });
 </script>

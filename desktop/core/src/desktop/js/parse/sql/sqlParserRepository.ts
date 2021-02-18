@@ -48,7 +48,7 @@ const SYNTAX_MODULES = {
 };
 /* eslint-enable */
 
-class SqlParserRepository implements SqlParserProvider {
+export class SqlParserRepository implements SqlParserProvider {
   modulePromises: { [dialect: string]: Promise<AutocompleteParser | SyntaxParser> } = {};
 
   async getParser(dialect: string, parserType: string): Promise<AutocompleteParser | SyntaxParser> {

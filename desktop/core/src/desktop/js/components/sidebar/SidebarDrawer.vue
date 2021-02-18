@@ -23,19 +23,46 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop, Provide, Watch } from 'vue-property-decorator';
+  import { defineComponent } from 'vue';
+
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import { defer } from 'utils/hueUtils';
 
-  @Component
-  export default class SidebarDrawer extends Vue {
-    @Prop()
-    show!: boolean;
+  export default defineComponent({
+    provide(): {
+      hideDrawer: () => void;
+    } {
+      return {
+        hideDrawer: (): void => {
+          this.$emit('close');
+        }
+      };
+    },
 
-    subTracker = new SubscriptionTracker();
-    deferredShow = false;
+    props: {
+      show: Boolean
+    },
+
+    emits: ['close'],
+
+    data(): {
+      subTracker: SubscriptionTracker;
+      deferredShow: boolean;
+    } {
+      return {
+        subTracker: new SubscriptionTracker(),
+        deferredShow: false
+      };
+    },
+
+    watch: {
+      show(newValue: boolean): void {
+        // deferredShow is used to prevent closing it immediately after the document click event triggered by opening
+        defer(() => {
+          this.deferredShow = newValue;
+        });
+      }
+    },
 
     mounted(): void {
       this.subTracker.addEventListener(document, 'click', (event: MouseEvent) => {
@@ -48,18 +75,5 @@
         }
       });
     }
-
-    @Watch('show', { immediate: true })
-    showChanged(newValue: boolean): void {
-      // deferredShow is used to prevent closing it immediately after the document click event triggered by opening
-      defer(() => {
-        this.deferredShow = newValue;
-      });
-    }
-
-    @Provide()
-    hideDrawer(): void {
-      this.$emit('close');
-    }
-  }
+  });
 </script>

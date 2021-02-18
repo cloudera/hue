@@ -21,32 +21,35 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent } from 'vue';
+
   import { onHueLinkClick } from 'utils/hueUtils';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
 
   interface hueWindow {
     HUE_BASE_URL: string;
   }
 
-  @Component
-  export default class HueLink extends Vue {
-    @Prop({ required: false })
-    url?: string;
+  export default defineComponent({
+    props: {
+      url: {
+        type: String,
+        required: false,
+        default: ''
+      }
+    },
 
-    created(): void {
-      delete this.$attrs.href;
-    }
+    emits: ['click'],
 
-    clicked(event: Event): void {
-      if (this.url) {
-        onHueLinkClick(event, this.url, this.$attrs.target);
-      } else {
-        this.$emit('click');
+    methods: {
+      clicked(event: Event): void {
+        if (this.url && this.$attrs.target) {
+          onHueLinkClick(event, this.url, <string>this.$attrs.target);
+        } else {
+          this.$emit('click');
+        }
       }
     }
-  }
+  });
 </script>
 
 <style lang="scss" scoped></style>

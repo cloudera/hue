@@ -18,6 +18,10 @@
     "."
   ],
   "exclude": [
+    "ext",
+    "parse",
+    "jquery",
+
     "apps",
     "build",
     "dist",

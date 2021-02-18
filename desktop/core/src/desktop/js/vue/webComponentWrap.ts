@@ -14,7 +14,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import HueSidebar from './HueSidebar.vue';
-import { wrap } from 'vue/webComponentWrap';
+import { ComponentOptions, Component } from 'vue';
+import wrapper from './wrapper/index';
 
-wrap('hue-sidebar-web-component', HueSidebar);
+export interface HueComponentOptions<T extends Component> extends ComponentOptions<T> {
+  hueBaseUrl?: string;
+}
+
+const isRegistered = function (tag: string): boolean {
+  return window.customElements.get(tag) !== undefined;
+};
+
+export const wrap = <T extends Component>(
+  tag: string,
+  component: { new (): T },
+  options?: ElementDefinitionOptions
+): void => {
+  if (!isRegistered(tag)) {
+    const customElement: CustomElementConstructor = wrapper(component);
+    window.customElements.define(tag, customElement, options);
+  }
+};

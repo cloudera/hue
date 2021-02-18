@@ -22,7 +22,7 @@
       {{ offset + 1 }}-{{ Math.min(offset + limit, totalEntries) }} of {{ totalEntries }}
     </div>
     Rows per page:
-    <dropdown-menu :link="true" :text="limit">
+    <dropdown-menu :link="true" :text="String(limit)">
       <dropdown-menu-button
         v-for="presetLimit of presetLimits"
         :key="presetLimit"
@@ -65,80 +65,111 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent } from 'vue';
+
   import HueIcon from './HueIcon.vue';
   import DropdownMenu from './dropdown/DropdownMenu.vue';
   import DropdownMenuButton from './dropdown/DropdownMenuButton.vue';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop, Watch } from 'vue-property-decorator';
 
   const DEFAULT_LIMIT = 25;
   const PRESET_LIMITS = [DEFAULT_LIMIT, 50, 100];
 
-  @Component({
-    components: { HueIcon, DropdownMenu, DropdownMenuButton }
-  })
-  export default class Paginator extends Vue {
-    @Prop({ required: true })
-    totalEntries!: number;
+  export default defineComponent({
+    components: {
+      HueIcon,
+      DropdownMenu,
+      DropdownMenuButton
+    },
 
-    currentPage = 1;
-    limit = DEFAULT_LIMIT;
-    presetLimits = PRESET_LIMITS;
+    props: {
+      totalEntries: {
+        type: Number,
+        required: true
+      }
+    },
+
+    emits: ['page-changed'],
+
+    setup(): {
+      presetLimits: number[];
+    } {
+      return {
+        presetLimits: PRESET_LIMITS
+      };
+    },
+
+    data(): {
+      currentPage: number;
+      limit: number;
+    } {
+      return {
+        currentPage: 1,
+        limit: DEFAULT_LIMIT
+      };
+    },
+
+    computed: {
+      offset(): number {
+        return (this.currentPage - 1) * this.limit;
+      },
+
+      lastDisplayedIndex(): number {
+        return Math.min(this.offset + this.limit, this.totalEntries - 1);
+      },
+
+      totalPages(): number {
+        return Math.ceil(this.totalEntries / this.limit) || 1;
+      }
+    },
+
+    watch: {
+      currentPage(): void {
+        this.notifyPageChanged();
+      }
+    },
 
     mounted(): void {
       this.notifyPageChanged();
-    }
+    },
 
-    get offset(): number {
-      return (this.currentPage - 1) * this.limit;
-    }
+    methods: {
+      notifyPageChanged(): void {
+        this.$emit('page-changed', {
+          offset: this.offset,
+          limit: this.limit
+        });
+      },
 
-    get lastDisplayedIndex(): number {
-      return Math.min(this.offset + this.limit, this.totalEntries - 1);
-    }
+      gotoFirstPage(): void {
+        this.currentPage = 1;
+      },
 
-    get totalPages(): number {
-      return Math.ceil(this.totalEntries / this.limit) || 1;
-    }
+      gotoPreviousPage(): void {
+        this.currentPage = Math.max(this.currentPage - 1, 1);
+      },
 
-    @Watch('currentPage')
-    notifyPageChanged(): void {
-      this.$emit('page-changed', {
-        offset: this.offset,
-        limit: this.limit
-      });
-    }
+      gotoNextPage(): void {
+        this.currentPage = Math.min(this.currentPage + 1, this.totalPages);
+      },
 
-    gotoFirstPage(): void {
-      this.currentPage = 1;
-    }
+      gotoLastPage(): void {
+        this.currentPage = this.totalPages;
+      },
 
-    gotoPreviousPage(): void {
-      this.currentPage = Math.max(this.currentPage - 1, 1);
-    }
-
-    gotoNextPage(): void {
-      this.currentPage = Math.min(this.currentPage + 1, this.totalPages);
-    }
-
-    gotoLastPage(): void {
-      this.currentPage = this.totalPages;
-    }
-
-    setLimit(limit: number): void {
-      if (limit === this.limit) {
-        return;
-      }
-      const factor = limit / this.limit;
-      this.limit = limit;
-      const lastCurrentPage = this.currentPage;
-      this.currentPage = Math.floor((this.currentPage - 1) / factor) + 1;
-      if (lastCurrentPage === this.currentPage) {
-        this.notifyPageChanged(); // this.limit isn't watched
+      setLimit(limit: number): void {
+        if (limit === this.limit) {
+          return;
+        }
+        const factor = limit / this.limit;
+        this.limit = limit;
+        const lastCurrentPage = this.currentPage;
+        this.currentPage = Math.floor((this.currentPage - 1) / factor) + 1;
+        if (lastCurrentPage === this.currentPage) {
+          this.notifyPageChanged(); // this.limit isn't watched
+        }
       }
     }
-  }
+  });
 </script>
 
 <style lang="scss" scoped>

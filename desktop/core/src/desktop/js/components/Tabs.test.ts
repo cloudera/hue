@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Vue from 'vue';
+import { nextTick } from 'vue';
 import { mount, shallowMount } from '@vue/test-utils';
 import Tabs from './Tabs.vue';
 import Tab from './Tab.vue';
@@ -30,11 +30,14 @@ describe('Tabs.vue', () => {
       slots: {
         default: '<tab title="foo">foo</tab><tab title="bar">bar</tab>'
       },
-      stubs: {
-        tab: Tab
+      global: {
+        stubs: {
+          Tab
+        }
       }
     });
-    await Vue.nextTick();
+
+    await nextTick();
     expect(wrapper.element).toMatchSnapshot();
   });
 });

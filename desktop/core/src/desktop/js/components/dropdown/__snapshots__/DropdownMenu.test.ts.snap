@@ -4,32 +4,26 @@ exports[`DropdownMenu.vue should render dropdown with slots 1`] = `
 <div
   class="hue-dropdown-panel hue-dropdown-menu"
 >
-  <button
-    class="hue-btn"
-    type="button"
-  >
-    
-     
-    <i
-      class="fa fa-caret-down"
-    />
-  </button>
-   
+  <hue-button-stub
+    disabled="false"
+  />
   <div
     class="hue-dropdown-container"
   >
     <div
       class="hue-dropdown-inner"
     >
+      
       <div
         class="hue-dropdown-menu-inner"
       >
         <ul>
-          <div>
-            Some item
-          </div>
+          
+          <stub />
+          
         </ul>
       </div>
+      
     </div>
   </div>
 </div>
@@ -39,28 +33,25 @@ exports[`DropdownMenu.vue should render empty dropdown 1`] = `
 <div
   class="hue-dropdown-panel hue-dropdown-menu"
 >
-  <button
-    class="hue-btn"
-    type="button"
-  >
-    
-     
-    <i
-      class="fa fa-caret-down"
-    />
-  </button>
-   
+  <hue-button-stub
+    disabled="false"
+  />
   <div
     class="hue-dropdown-container"
   >
     <div
       class="hue-dropdown-inner"
     >
+      
       <div
         class="hue-dropdown-menu-inner"
       >
-        <ul />
+        <ul>
+          
+          
+        </ul>
       </div>
+      
     </div>
   </div>
 </div>
