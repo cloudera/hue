@@ -20,24 +20,22 @@ import json
 from pprint import pprint
 
 from desktop import conf
-from django.shortcuts import render
 from django.http import HttpResponse
 from desktop.lib.django_util import login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 
-from django.conf import settings
-from slack_sdk import WebClient
-
 LOG = logging.getLogger(__name__)
 
 SLACK_VERIFICATION_TOKEN = conf.SLACK.SLACK_VERIFICATION_TOKEN.get()
 SLACK_BOT_USER_TOKEN = conf.SLACK.SLACK_BOT_USER_TOKEN.get()
 
-
-slack_client = WebClient(token=SLACK_BOT_USER_TOKEN)
-appname = "hue_bot"
+slack_client, appname = None, None
+if conf.SLACK.IS_ENABLED.get():
+  from slack_sdk import WebClient
+  slack_client = WebClient(token=SLACK_BOT_USER_TOKEN)
+  appname = "hue_bot"
 
 
 @login_notrequired
@@ -57,8 +55,8 @@ def slack_events(request):
     if 'event' in slack_message:
       event_message = slack_message['event']
       parse_events(event_message)
-  except Exception as ex:
-    raise PopupException(_("Response content is not valid JSON"), detail=ex)
+  except ValueError as e:
+    raise PopupException(_("Response content is not valid JSON"), detail=e)
   
   return HttpResponse(status=200)
 
@@ -67,18 +65,22 @@ def parse_events(event_message):
   user_id = event_message.get('user')
   text = event_message.get('text')
   channel = event_message.get('channel')
-  BOT_ID = get_bot_id(appname)
+
+  BOT_ID = None
+  if appname is not None:
+    BOT_ID = get_bot_id(appname)
 
   # ignore bot's own message
   if BOT_ID == user_id:
     return HttpResponse(status=200)
-
-  if 'hello hue' in text.lower():
-    response = say_hi_user(channel, user_id)
-    if response['ok']:
-      return HttpResponse(status=200)
-    else:
-      raise PopupException(response["error"])
+  
+  if slack_client is not None:
+    if 'hello hue' in text.lower():
+      response = say_hi_user(channel, user_id)
+      if response['ok']:
+        return HttpResponse(status=200)
+      else:
+        raise PopupException(response["error"])
 
   
 def say_hi_user(channel, user_id):
