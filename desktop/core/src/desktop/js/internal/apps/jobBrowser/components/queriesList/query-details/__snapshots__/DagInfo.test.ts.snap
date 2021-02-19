@@ -4,60 +4,30 @@ exports[`DagInfo.vue should render 1`] = `
 <div
   class="hue-info-box"
 >
-  <labeledinfo-stub
+  <labeled-info-stub
     class="inline-info"
     label="DAG ID"
-  >
-    
-    dag_1600683331174_0003_2
-  
-  </labeledinfo-stub>
-   
-  <labeledinfo-stub
+  />
+  <labeled-info-stub
     class="inline-info"
     label="DAG Name"
-  >
-    
-    select count(*) from ...productcategories.id (Stage-1)
-  
-  </labeledinfo-stub>
-   
-  <labeledinfo-stub
+  />
+  <labeled-info-stub
     class="inline-info"
     label="Status"
-  >
-    
-    SUCCEEDED
-  
-  </labeledinfo-stub>
-   
-  <labeledinfo-stub
+  />
+  <labeled-info-stub
     class="inline-info"
     label="Duration"
-  >
-    <duration-stub
-      value="260"
-    />
-  </labeledinfo-stub>
-   
-  <labeledinfo-stub
+  />
+  <labeled-info-stub
     class="inline-info"
     label="Start Time"
-  >
-    <time-ago-stub
-      value="1601036209263"
-    />
-  </labeledinfo-stub>
-   
-  <labeledinfo-stub
+  />
+  <labeled-info-stub
     class="inline-info"
     label="End Time"
-  >
-    <time-ago-stub
-      value="1601036209523"
-    />
-  </labeledinfo-stub>
-   
-  <!---->
+  />
+  <!--v-if-->
 </div>
 `;

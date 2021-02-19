@@ -31,7 +31,11 @@
     </LabeledInfo>
 
     <LabeledInfo label="Duration" class="inline-info">
-      <duration v-if="dag.dagInfo.endTime" :value="dag.dagInfo.endTime - dag.dagInfo.startTime" />
+      <duration
+        v-if="dag.dagInfo.endTime"
+        :value="dag.dagInfo.endTime - dag.dagInfo.startTime"
+        :short="false"
+      />
     </LabeledInfo>
 
     <LabeledInfo label="Start Time" class="inline-info">
@@ -49,8 +53,7 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import { Component, Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
 
   import Duration from '../../../../../../components/Duration.vue';
   import TimeAgo from '../../../../../../components/TimeAgo.vue';
@@ -58,12 +61,19 @@
 
   import { Dag } from '..';
 
-  @Component({
-    components: { Duration, TimeAgo, LabeledInfo }
-  })
-  export default class DagInfo extends Vue {
-    @Prop({ required: true }) dag!: Dag;
-  }
+  export default defineComponent({
+    components: {
+      Duration,
+      TimeAgo,
+      LabeledInfo
+    },
+    props: {
+      dag: {
+        type: Object as PropType<Dag>,
+        required: true
+      }
+    }
+  });
 </script>
 
 <style lang="scss" scoped>
