@@ -61,8 +61,11 @@ export interface Vertex {
 export interface Dag {
   dagInfo: {
     dagId: string;
+    dagName: string;
     applicationId: string;
     status: string;
+    startTime: number;
+    endTime: number;
   };
   dagDetails: {
     counters: CounterGroup[];
@@ -88,6 +91,8 @@ export enum QueryStatus {
   ERROR = 'ERROR'
 }
 
+export type Perf = { [key: string]: number };
+
 export interface Query {
   appIds?: string[]; // TODO: From API or adaption? Type?
   clientIpAddress?: unknown; // TODO: string?
@@ -100,7 +105,7 @@ export interface Query {
   databasesUsed: { [name: string]: number }[];
   details?: {
     diagnostics?: string;
-    perf?: unknown;
+    perf?: Perf;
     configuration?: { [key: string]: unknown }; // TODO: value type string?
     explainPlan?: unknown; // TODO: type?
   };

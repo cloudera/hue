@@ -15,42 +15,30 @@ exports[`HiveTimeline.vue should render 1`] = `
         data-value="0"
         title="Pre-Execution + DAG construction"
       >
-        
-        Pre-Execution + DAG construction
-      
+         Pre-Execution + DAG construction 
       </div>
-       
       <div
         class="bar"
         data-value="0"
         title="DAG Submission"
       >
-        
-        DAG Submission
-      
+         DAG Submission 
       </div>
-       
       <div
         class="bar"
         data-value="0"
         title="DAG Runtime"
       >
-        
-        DAG Runtime
-      
+         DAG Runtime 
       </div>
-       
       <div
         class="bar"
         data-value="0"
         title="Post Execution"
       >
-        
-        Post Execution
-      
+         Post Execution 
       </div>
     </div>
-     
     <div
       class="sub-groups"
     >
@@ -59,93 +47,66 @@ exports[`HiveTimeline.vue should render 1`] = `
         data-value="0"
         title="Compile"
       >
-        
-        Compile
-      
+         Compile 
       </div>
-       
       <div
         class="bar"
         data-value="0"
         title="Parse"
       >
-        
-        Parse
-      
+         Parse 
       </div>
-       
       <div
         class="bar"
         data-value="0"
         title="Build Dag"
       >
-        
-        Build Dag
-      
+         Build Dag 
       </div>
-       
       <div
         class="bar"
         data-value="0"
         title="Submit Dag"
       >
-        
-        Submit Dag
-      
+         Submit Dag 
       </div>
-       
       <div
         class="bar"
         data-value="0"
         title="Submit To Running"
       >
-        
-        Submit To Running
-      
+         Submit To Running 
       </div>
-       
       <div
         class="bar"
         data-value="0"
         title="Run Dag"
       >
-        
-        Run Dag
-      
+         Run Dag 
       </div>
-       
       <div
         class="bar"
         data-value="0"
         title="Post Logging Hook"
       >
-        
-        Post ATS Hook
-      
+         Post ATS Hook 
       </div>
-       
       <div
         class="bar"
         data-value="0"
         title="Remove Files"
       >
-        
-        Remove Files
-      
+         Remove Files 
       </div>
-       
       <div
         class="bar"
         data-value="0"
         title="Rename Or Move Files"
       >
-        
-        Rename Or Move Files
-      
+         Rename Or Move Files 
       </div>
     </div>
   </div>
-   
   <div
     class="timeline-details"
   >
@@ -159,49 +120,40 @@ exports[`HiveTimeline.vue should render 1`] = `
             colspan="2"
             scope="colgroup"
           >
-            
-            Pre-Execution + DAG construction : 0ms
-          
+             Pre-Execution + DAG construction : 0ms
           </th>
         </tr>
       </thead>
-       
       <tbody>
         <tr>
           <td>
             <i />
             Compile
           </td>
-           
           <td>
             0ms
           </td>
         </tr>
-         
         <tr>
           <td>
             <i />
             Parse
           </td>
-           
           <td>
             0ms
           </td>
         </tr>
-         
         <tr>
           <td>
             <i />
             Build Dag
           </td>
-           
           <td>
             0ms
           </td>
         </tr>
       </tbody>
     </table>
-     
     <table
       aria-describedby="DAG Submission"
       class="detail-list"
@@ -212,38 +164,31 @@ exports[`HiveTimeline.vue should render 1`] = `
             colspan="2"
             scope="colgroup"
           >
-            
-            DAG Submission : 0ms
-          
+             DAG Submission : 0ms
           </th>
         </tr>
       </thead>
-       
       <tbody>
         <tr>
           <td>
             <i />
             Submit Dag
           </td>
-           
           <td>
             0ms
           </td>
         </tr>
-         
         <tr>
           <td>
             <i />
             Submit To Running
           </td>
-           
           <td>
             0ms
           </td>
         </tr>
       </tbody>
     </table>
-     
     <table
       aria-describedby="DAG Runtime"
       class="detail-list"
@@ -254,27 +199,22 @@ exports[`HiveTimeline.vue should render 1`] = `
             colspan="2"
             scope="colgroup"
           >
-            
-            DAG Runtime : 0ms
-          
+             DAG Runtime : 0ms
           </th>
         </tr>
       </thead>
-       
       <tbody>
         <tr>
           <td>
             <i />
             Run Dag
           </td>
-           
           <td>
             0ms
           </td>
         </tr>
       </tbody>
     </table>
-     
     <table
       aria-describedby="Post Execution"
       class="detail-list"
@@ -285,19 +225,14 @@ exports[`HiveTimeline.vue should render 1`] = `
             colspan="2"
             scope="colgroup"
           >
-            
-            Post Execution : 0ms
-          
+             Post Execution : 0ms
           </th>
         </tr>
       </thead>
-       
       <tbody>
-        <!---->
-         
-        <!---->
-         
-        <!---->
+        <!--v-if-->
+        <!--v-if-->
+        <!--v-if-->
       </tbody>
     </table>
   </div>

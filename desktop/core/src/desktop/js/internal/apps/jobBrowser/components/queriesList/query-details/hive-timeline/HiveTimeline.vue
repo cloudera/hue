@@ -178,44 +178,50 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
+
   import { duration } from '../../../../../../../components/Duration.vue';
   import NormalizedHivePerf from './NormalizedHivePerf';
 
   import './hive-timeline.scss';
+  import { Perf } from '../..';
 
-  @Component({
-    methods: {
-      fmtDuration: val => duration(val, true)
-    }
-  })
-  export default class HiveTimeline extends Vue {
-    @Prop()
-    perf: unknown;
+  export default defineComponent({
+    props: {
+      perf: {
+        type: Object as PropType<Perf>,
+        default: undefined
+      }
+    },
 
-    get normalizedPerf(): NormalizedHivePerf {
-      return new NormalizedHivePerf(this.perf);
-    }
-
-    alignBars(bars: NodeListOf<HTMLElement>, perf: NormalizedHivePerf): void {
-      bars.forEach((bar: HTMLElement) => {
-        const perfValue = parseInt(bar.dataset.value || '0');
-        const widthPercent = (perfValue / perf.total) * 100;
-        bar.style.width = `${widthPercent}%`;
-      });
-    }
-
-    alignTimeline(): void {
-      this.alignBars(this.$el.querySelectorAll('.sub-groups .bar'), this.normalizedPerf);
-      this.alignBars(this.$el.querySelectorAll('.groups .bar'), this.normalizedPerf);
-    }
+    computed: {
+      normalizedPerf(): NormalizedHivePerf {
+        return new NormalizedHivePerf(this.perf);
+      }
+    },
 
     mounted(): void {
       this.alignTimeline();
-    }
+    },
 
     updated(): void {
       this.alignTimeline();
+    },
+
+    methods: {
+      fmtDuration: (val: number) => duration(val, true),
+
+      alignBars(bars: NodeListOf<HTMLElement>, perf: NormalizedHivePerf): void {
+        bars.forEach((bar: HTMLElement) => {
+          const perfValue = parseInt(bar.dataset.value || '0');
+          const widthPercent = (perfValue / perf.total) * 100;
+          bar.style.width = `${widthPercent}%`;
+        });
+      },
+      alignTimeline(): void {
+        this.alignBars(this.$el.querySelectorAll('.sub-groups .bar'), this.normalizedPerf);
+        this.alignBars(this.$el.querySelectorAll('.groups .bar'), this.normalizedPerf);
+      }
     }
-  }
+  });
 </script>

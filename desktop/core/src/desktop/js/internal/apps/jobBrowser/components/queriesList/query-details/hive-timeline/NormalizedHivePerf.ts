@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import { Perf } from '../..';
+
 export default class NormalizedHivePerf {
   compile = 0;
   parse = 0;
@@ -38,7 +40,7 @@ export default class NormalizedHivePerf {
   };
   total: number;
 
-  constructor(perf: unknown) {
+  constructor(perf: Perf) {
     perf = perf || {};
     Object.assign(this, perf);
 
