@@ -74,25 +74,27 @@ def parse_events(event_message):
   if BOT_ID == user_id:
     return HttpResponse(status=200)
   
-  if slack_client is not None:
-    if 'hello hue' in text.lower():
-      response = say_hi_user(channel, user_id)
-      if response['ok']:
-        return HttpResponse(status=200)
-      else:
-        raise PopupException(response["error"])
+  if 'hello hue' in text.lower():
+    response = say_hi_user(channel, user_id)
+    if response['ok']:
+      return HttpResponse(status=200)
+    else:
+      raise PopupException(response["error"])
 
   
 def say_hi_user(channel, user_id):
   """Bot sends Hi<username> message in a specific channel"""
+
   bot_message = 'Hi <@{}> :wave:'.format(user_id)
-  response = slack_client.api_call(api_method='chat.postMessage', json={'channel': channel, 'text': bot_message})
-  return response
+  if slack_client is not None:
+    return slack_client.api_call(api_method='chat.postMessage', json={'channel': channel, 'text': bot_message})
 
 def get_bot_id(botusername):
   """Takes in bot username, Returns the bot id"""
-  response = slack_client.api_call('users.list')
-  users = response['members']
-  for user in users:
-    if botusername in user.get('name', '') and not user.get('deleted'):
-      return user.get('id')
+  
+  if slack_client is not None:
+    response = slack_client.api_call('users.list')
+    users = response['members']
+    for user in users:
+      if botusername in user.get('name', '') and not user.get('deleted'):
+        return user.get('id')
