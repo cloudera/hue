@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, PropType } from 'vue';
+  import { defineComponent, PropType, ref, toRefs } from 'vue';
 
   import { Ace } from 'ext/ace';
 
@@ -35,44 +35,23 @@
     components: {
       EditorResizer
     },
-
     props: {
       editorObservable: {
         type: Object as PropType<KnockoutObservable<Ace.Editor | undefined>>,
         required: true
       }
     },
+    setup(props) {
+      const subTracker = new SubscriptionTracker();
+      const { editorObservable } = toRefs(props);
 
-    setup(): {
-      subTracker: SubscriptionTracker;
-    } {
+      const editor = ref<Ace.Editor | null>(null);
+
+      subTracker.trackObservable(editorObservable, editor);
+
       return {
-        subTracker: new SubscriptionTracker()
+        editor
       };
-    },
-
-    data(): {
-      editor: Ace.Editor | null;
-      initialized: boolean;
-    } {
-      return {
-        editor: null,
-        initialized: false
-      };
-    },
-
-    updated(): void {
-      if (!this.initialized && this.editorObservable) {
-        this.editor = this.editorObservable() || null;
-        this.subTracker.subscribe(this.editorObservable, editor => {
-          this.editor = editor;
-        });
-        this.initialized = true;
-      }
-    },
-
-    unmounted(): void {
-      this.subTracker.dispose();
     }
   });
 

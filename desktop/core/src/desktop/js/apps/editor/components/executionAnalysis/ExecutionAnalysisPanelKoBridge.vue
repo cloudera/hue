@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, PropType, onUpdated, onBeforeUnmount, ref } from 'vue';
+  import { defineComponent, PropType, ref, toRefs } from 'vue';
   import { wrap } from 'vue/webComponentWrap';
 
   import ExecutionAnalysisPanel from './ExecutionAnalysisPanel.vue';
@@ -45,19 +45,11 @@
     },
     setup(props) {
       const subTracker = new SubscriptionTracker();
-      onBeforeUnmount(subTracker.dispose.bind(subTracker));
+      const { executableObservable } = toRefs(props);
 
-      let initialized = false;
       const executable = ref<SqlExecutable | null>(null);
-      onUpdated(() => {
-        if (!initialized && props.executableObservable) {
-          executable.value = props.executableObservable() || null;
-          subTracker.subscribe(props.executableObservable, newExecutable => {
-            executable.value = newExecutable || null;
-          });
-          initialized = true;
-        }
-      });
+
+      subTracker.trackObservable(executableObservable, executable);
 
       return { executable };
     },
