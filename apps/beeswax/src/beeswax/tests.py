@@ -2910,7 +2910,10 @@ class TestWithMockedServer(object):
 
   def test_get_history_xss(self):
     sql = 'SELECT count(sample_07.salary) FROM sample_07;"><iFrAME>src="javascript:alert(\'Hue has an xss\');"></iFraME>'
-    sql_escaped = b'SELECT count(sample_07.salary) FROM sample_07;&quot;&gt;&lt;iFrAME&gt;src=&quot;javascript:alert(&#39;Hue has an xss&#39;);&quot;&gt;&lt;/iFraME&gt;'
+    if sys.version_info[0] < 3:
+      sql_escaped = b'SELECT count(sample_07.salary) FROM sample_07;&quot;&gt;&lt;iFrAME&gt;src=&quot;javascript:alert(&#39;Hue has an xss&#39;);&quot;&gt;&lt;/iFraME&gt;'
+    else:
+      sql_escaped = b'SELECT count(sample_07.salary) FROM sample_07;&quot;&gt;&lt;iFrAME&gt;src=&quot;javascript:alert(&#x27;Hue has an xss&#x27;);&quot;&gt;&lt;/iFraME&gt;'
 
     response = _make_query(self.client, sql, submission_type='Save', name='My Name 1', desc='My Description')
     content = json.loads(response.content)
