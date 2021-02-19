@@ -27,37 +27,42 @@
 </template>
 
 <script lang="ts">
-  import { Vue, Component, Prop } from 'vue-property-decorator';
+  import { defineComponent, VNodeNormalizedChildren } from 'vue';
   import I18n from 'utils/i18n';
 
-  @Component({
-    methods: {
-      I18n
-    }
-  })
-  export default class LabeledInfo extends Vue {
-    @Prop({ required: true })
-    label!: string;
-
-    validateText(text: string | undefined): boolean {
-      if (text) {
-        text = text.replace(/(\r\n|\n|\r)/gm, '');
-        return !!text.trim();
+  export default defineComponent({
+    props: {
+      label: {
+        type: String,
+        required: true
       }
-      return false;
-    }
+    },
 
-    get showSlot(): boolean {
-      if (this.$slots.default) {
-        for (const node of this.$slots.default) {
-          if (node && (node.tag || this.validateText(node.text))) {
-            return true;
+    computed: {
+      showSlot(): boolean {
+        if (this.$slots.default) {
+          for (const node of this.$slots.default()) {
+            if (node && (node.type || this.validateTextChildren(node.children))) {
+              return true;
+            }
           }
         }
+        return false;
       }
-      return false;
+    },
+
+    methods: {
+      I18n,
+
+      validateTextChildren(text: VNodeNormalizedChildren): boolean {
+        if (typeof text === 'string') {
+          text = text.replace(/(\r\n|\n|\r)/gm, '');
+          return !!text.trim();
+        }
+        return false;
+      }
     }
-  }
+  });
 </script>
 
 <style lang="scss" scoped>

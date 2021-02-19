@@ -14,14 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import LabeledInfo from './LabeledInfo.vue';
 
 describe('LabeledInfo.vue', () => {
   it('should render', () => {
-    const wrapper = shallowMount(LabeledInfo, {
+    const wrapper = mount(LabeledInfo, {
       propsData: {
         label: 'TestLable'
+      },
+      slots: {
+        default: '<div>Some item</div>'
       }
     });
     expect(wrapper.element).toMatchSnapshot();
