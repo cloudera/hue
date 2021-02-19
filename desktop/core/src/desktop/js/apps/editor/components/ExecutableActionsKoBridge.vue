@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, PropType } from 'vue';
+  import { defineComponent, PropType, ref, toRefs } from 'vue';
 
   import ExecutableActions from './ExecutableActions.vue';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
@@ -38,7 +38,6 @@
     components: {
       ExecutableActions
     },
-
     props: {
       executableObservable: {
         type: Object as PropType<KnockoutObservable<SqlExecutable | undefined>>,
@@ -49,39 +48,18 @@
         default: undefined
       }
     },
+    setup(props) {
+      const subTracker = new SubscriptionTracker();
+      const { executableObservable } = toRefs(props);
 
-    setup(): {
-      subTracker: SubscriptionTracker;
-    } {
+      const executable = ref<SqlExecutable | null>(null);
+
+      subTracker.trackObservable(executableObservable, executable);
+
       return {
-        subTracker: new SubscriptionTracker()
+        executable
       };
     },
-
-    data(): {
-      initialized: boolean;
-      executable: SqlExecutable | null;
-    } {
-      return {
-        initialized: false,
-        executable: null
-      };
-    },
-
-    updated(): void {
-      if (!this.initialized && this.executableObservable) {
-        this.executable = this.executableObservable() || null;
-        this.subTracker.subscribe(this.executableObservable, (executable: SqlExecutable) => {
-          this.executable = executable;
-        });
-        this.initialized = true;
-      }
-    },
-
-    unmounted(): void {
-      this.subTracker.dispose();
-    },
-
     methods: {
       limitChanged(limit: number): void {
         if (this.executable && this.executable.executor.defaultLimit) {
