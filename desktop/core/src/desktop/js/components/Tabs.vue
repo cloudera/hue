@@ -40,6 +40,7 @@
   import { TabRef } from './Tab.vue';
 
   export default defineComponent({
+    name: 'Tabs',
     provide(): {
       addTab: (tab: TabRef) => void;
       removeTab: (tab: TabRef) => void;

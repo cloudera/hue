@@ -42,6 +42,7 @@
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
   const PresentationModeKoBridge = defineComponent({
+    name: 'PresentationModeKoBridge',
     components: {
       PresentationMode
     },

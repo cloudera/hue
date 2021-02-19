@@ -31,6 +31,7 @@
   import { Literal } from '../lib/entities';
 
   export default defineComponent({
+    name: 'LiteralEntity',
     props: {
       entity: {
         type: Literal,

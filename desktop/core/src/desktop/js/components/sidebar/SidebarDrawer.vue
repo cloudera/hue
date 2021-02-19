@@ -29,6 +29,7 @@
   import { defer } from 'utils/hueUtils';
 
   export default defineComponent({
+    name: 'SidebarDrawer',
     provide(): {
       hideDrawer: () => void;
     } {

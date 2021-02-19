@@ -724,10 +724,12 @@ class Analytics(object):
 
 
 class MockRequest():
-  def __init__(self, user):
+  def __init__(self, user, fs=None, jt=None):
     self.user = user
+    self.fs = fs
+    self.jt = jt
     self.POST = {}
-
+    self.GET = {}
 
 def install_custom_examples():
   if EXAMPLES.AUTO_LOAD.get():

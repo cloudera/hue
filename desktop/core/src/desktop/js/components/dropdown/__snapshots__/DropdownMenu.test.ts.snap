@@ -8,23 +8,9 @@ exports[`DropdownMenu.vue should render dropdown with slots 1`] = `
     disabled="false"
   />
   <div
-    class="hue-dropdown-container"
+    class="hue-dropdown-drawer"
   >
-    <div
-      class="hue-dropdown-inner"
-    >
-      
-      <div
-        class="hue-dropdown-menu-inner"
-      >
-        <ul>
-          
-          <stub />
-          
-        </ul>
-      </div>
-      
-    </div>
+    <!--v-if-->
   </div>
 </div>
 `;
@@ -37,22 +23,9 @@ exports[`DropdownMenu.vue should render empty dropdown 1`] = `
     disabled="false"
   />
   <div
-    class="hue-dropdown-container"
+    class="hue-dropdown-drawer"
   >
-    <div
-      class="hue-dropdown-inner"
-    >
-      
-      <div
-        class="hue-dropdown-menu-inner"
-      >
-        <ul>
-          
-          
-        </ul>
-      </div>
-      
-    </div>
+    <!--v-if-->
   </div>
 </div>
 `;

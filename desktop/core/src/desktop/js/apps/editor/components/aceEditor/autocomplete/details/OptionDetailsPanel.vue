@@ -41,6 +41,7 @@
   import I18n from 'utils/i18n';
 
   export default defineComponent({
+    name: 'OptionDetailsPanel',
     props: {
       suggestion: {
         type: Object as PropType<Suggestion>,

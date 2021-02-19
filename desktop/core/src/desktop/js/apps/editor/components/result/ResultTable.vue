@@ -67,6 +67,7 @@
   import I18n from 'utils/i18n';
 
   export default defineComponent({
+    name: 'ResultTable',
     components: {
       HueTable
     },
@@ -250,7 +251,7 @@
     &.grayed-out {
       opacity: 0.5;
 
-      /deep/ .hue-table-container {
+      ::v-deep(.hue-table-container) {
         overflow: hidden !important;
       }
     }

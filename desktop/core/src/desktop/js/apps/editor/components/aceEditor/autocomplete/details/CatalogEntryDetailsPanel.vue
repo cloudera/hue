@@ -78,6 +78,7 @@
   const COMMENT_LOAD_DELAY = 1500;
 
   export default defineComponent({
+    name: 'CatalogEntryDetailsPanel',
     components: {
       Spinner
     },

@@ -78,6 +78,7 @@
   }
 
   export default defineComponent({
+    name: 'ERDiagram',
     components: {
       TableEntity,
       LiteralEntity

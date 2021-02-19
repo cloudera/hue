@@ -134,6 +134,7 @@
   }
 
   export default defineComponent({
+    name: 'AccordionItem',
     components: {
       BaseNavigationItemTooltip,
       AccordionSubItem

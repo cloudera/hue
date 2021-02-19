@@ -51,6 +51,7 @@
   import { SidebarAccordionSubItem, SidebarBaseItem, UserDrawerItem } from './types';
 
   export default defineComponent({
+    name: 'UserDrawerContent',
     components: { BaseNavigationItem },
 
     inject: ['hideDrawer'],

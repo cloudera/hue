@@ -30,6 +30,7 @@
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
   const ResultTableKoBridge = defineComponent({
+    name: 'ResultTableKoBridge',
     components: {
       ResultTable
     },

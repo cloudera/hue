@@ -38,6 +38,7 @@
   import { defineComponent } from 'vue';
 
   export default defineComponent({
+    name: 'HueButton',
     props: {
       primary: {
         type: Boolean,

@@ -41,6 +41,7 @@
   import { SidebarAccordionSubItem } from './types';
 
   export default defineComponent({
+    name: 'AccordionSubItem',
     components: {
       SpacerItem,
       BaseNavigationItem

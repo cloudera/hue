@@ -27,6 +27,7 @@
   import { defineComponent } from 'vue';
 
   export default defineComponent({
+    name: 'DropdownMenuText',
     props: {
       text: {
         type: String,
