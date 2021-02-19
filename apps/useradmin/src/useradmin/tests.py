@@ -1111,7 +1111,10 @@ class TestUserAdmin(BaseUserAdminTests):
         language="en-us><script>alert('Hacked')</script>"
         )
     )
-    assert_true(b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
+    if sys.version_info[0] < 3:
+      assert_true(b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
+    else:
+      assert_true(b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#x27;Hacked&#x27;)&lt;/script&gt; is not one of the available choices.' in response.content)
     # Hue 4 Admin
     response = edit_user.post('/useradmin/users/edit/admin', dict(
         username="admin",
@@ -1133,7 +1136,10 @@ class TestUserAdmin(BaseUserAdminTests):
         language="en-us><script>alert('Hacked')</script>"
         )
     )
-    assert_true(b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
+    if sys.version_info[0] < 3:
+      assert_true(b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
+    else:
+      assert_true(b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#x27;Hacked&#x27;)&lt;/script&gt; is not one of the available choices.' in response.content)
     # Hue 4, User with access to useradmin app
     response = edit_user.post('/useradmin/users/edit/edit_user', dict(
         username="edit_user",
