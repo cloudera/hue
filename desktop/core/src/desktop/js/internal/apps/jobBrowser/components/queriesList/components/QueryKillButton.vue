@@ -19,19 +19,17 @@
 <template>
   <hue-button v-if="info" :disabled="info.disable" @click="killQueries">
     <em v-if="info.icon" :class="`fa ${info.icon}`" />
-    {{ info.msg }}
+    {{ info.msg }} {{ info.disable }}
   </hue-button>
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import { Component, Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
   import I18n from 'utils/i18n';
 
-  import { isRunning, kill, waitIf } from '../api-utils/query';
-  import HueButton from '../../../../../../components/HueButton.vue';
-
   import { Query } from '../index';
+  import { isRunning, kill, waitIf } from '../api-utils/query';
+  import HueButton from 'components/HueButton.vue';
 
   enum ButtonState {
     NONE = 0,
@@ -42,90 +40,97 @@
     UNKNOWN
   }
 
-  @Component({
+  export default defineComponent({
+    name: 'QueryKillButton',
     components: {
       HueButton
-    }
-  })
-  export default class QueryKillButton extends Vue {
-    @Prop({ required: true })
-    queries!: Query[];
-
-    buttonState = ButtonState.NONE;
-
-    get info(): { msg: string; icon: string; disable: boolean } | null {
-      let msg = '';
-      let icon = '';
-      let disable = true;
-
-      const hasRunningQuery = this.queries && this.queries.some((query: Query) => isRunning(query));
-      const displayState: ButtonState = hasRunningQuery
-        ? this.buttonState || ButtonState.KILL
-        : ButtonState.NONE;
-
-      switch (displayState) {
-        case ButtonState.NONE:
-          msg = 'Kill';
-          break;
-        case ButtonState.KILL:
-          msg = 'Kill';
-          disable = false;
-          break;
-        case ButtonState.KILLING:
-          msg = 'Killing...';
-          icon = 'fa-circle-o-notch fa-spin';
-          break;
-        case ButtonState.KILLED:
-          msg = 'Killed';
-          break;
-        case ButtonState.ERROR:
-          msg = 'Error!';
-          icon = 'fa-exclamation-triangle';
-          break;
-        case ButtonState.UNKNOWN:
-          msg = 'Unknown!';
-          icon = 'fa-exclamation-triangle';
-          break;
-        default:
-          return null;
+    },
+    props: {
+      queries: {
+        type: Array as PropType<Query[]>,
+        required: true
       }
+    },
+    emits: ['killed'],
+    data() {
       return {
-        msg: I18n(msg),
-        icon,
-        disable
+        buttonState: ButtonState.NONE
       };
-    }
+    },
+    computed: {
+      info(): { msg: string; icon: string; disable: boolean } | null {
+        let msg = '';
+        let icon = '';
+        let disable = true;
 
-    async waitToKillAll(runingQueries: Query[]): Promise<boolean> {
-      let killedAll = true;
-      for (const query of runingQueries) {
-        if (await waitIf(query, isRunning)) {
-          killedAll = false;
-          break;
+        const hasRunningQuery =
+          this.queries && this.queries.some((query: Query) => isRunning(query));
+        const displayState = hasRunningQuery
+          ? this.buttonState || ButtonState.KILL
+          : ButtonState.NONE;
+
+        switch (displayState) {
+          case ButtonState.NONE:
+            msg = 'Kill';
+            break;
+          case ButtonState.KILL:
+            msg = 'Kill';
+            disable = false;
+            break;
+          case ButtonState.KILLING:
+            msg = 'Killing...';
+            icon = 'fa-circle-o-notch fa-spin';
+            break;
+          case ButtonState.KILLED:
+            msg = 'Killed';
+            break;
+          case ButtonState.ERROR:
+            msg = 'Error!';
+            icon = 'fa-exclamation-triangle';
+            break;
+          case ButtonState.UNKNOWN:
+            msg = 'Unknown!';
+            icon = 'fa-exclamation-triangle';
+            break;
+          default:
+            return null;
+        }
+        return {
+          msg: I18n(msg),
+          icon,
+          disable
+        };
+      }
+    },
+    methods: {
+      async waitToKillAll(runingQueries: Query[]): Promise<boolean> {
+        let killedAll = true;
+        for (const query of runingQueries) {
+          if (await waitIf(query, isRunning)) {
+            killedAll = false;
+            break;
+          }
+        }
+        return killedAll;
+      },
+      async killQueries(): Promise<void> {
+        this.buttonState = ButtonState.KILLING;
+        const runingQueries: Query[] = this.queries.filter((query: Query) => isRunning(query));
+
+        try {
+          await kill(runingQueries);
+
+          const killedAll = await this.waitToKillAll(runingQueries);
+          if (killedAll) {
+            this.buttonState = ButtonState.NONE;
+            this.$emit('killed');
+          } else {
+            this.buttonState = ButtonState.UNKNOWN;
+          }
+        } catch (e) {
+          this.buttonState = ButtonState.ERROR;
         }
       }
-      return killedAll;
     }
-
-    async killQueries(): void {
-      this.buttonState = ButtonState.KILLING;
-      const runingQueries: Query[] = this.queries.filter((query: Query) => isRunning(query));
-
-      try {
-        await kill(runingQueries);
-
-        const killedAll = await this.waitToKillAll(runingQueries);
-        if (killedAll) {
-          this.buttonState = ButtonState.NONE;
-          this.$emit('killed');
-        } else {
-          this.buttonState = ButtonState.UNKNOWN;
-        }
-      } catch (e) {
-        this.buttonState = ButtonState.ERROR;
-      }
-    }
-  }
+  });
 </script>
-
-<style lang="scss" scoped></style>

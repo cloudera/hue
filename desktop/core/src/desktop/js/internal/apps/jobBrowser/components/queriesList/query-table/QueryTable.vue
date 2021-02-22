@@ -42,14 +42,6 @@
           @facet-removed="facetRemoved"
           @facet-changed="facetChanged"
         />
-        <!-- <facet-selector
-          ref="userFacetSelector"
-          :facet="userFacet"
-          field-label="User"
-          :disabled="userFacet.values.length === 0"
-          @facet-removed="facetRemoved"
-          @facet-changed="facetChanged"
-        /> -->
         <date-range-picker ref="rangePicker" @date-range-changed="timeRangeChanged" />
         <hue-link class="clear-link" @click="clearSearch">{{ I18n('Clear All') }}</hue-link>
         <hue-link class="columns-link" @click="toggleColumnSelector">
@@ -110,46 +102,39 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
-  import { Range } from '../../../../../../components/DateRangePicker';
-  import { Page } from '../../../../../../components/Paginator';
-  import I18n from '../../../../../../utils/i18n';
-  import DateRangePicker from '../../../../../../components/DateRangePicker.vue';
-  import { duration } from '../../../../../../components/Duration.vue';
-  import { humanSize } from '../../../../../../components/HumanByteSize.vue';
-  import HueButton from '../../../../../../components/HueButton.vue';
-  import HueIcon from '../../../../../../components/HueIcon.vue';
-  import HueLink from '../../../../../../components/HueLink.vue';
-  import { timeAgo } from '../../../../../../components/TimeAgo.vue';
-  import HueTable from '../../../../../../components/HueTable.vue';
-  import Paginator from '../../../../../../components/Paginator.vue';
-  import SearchInput from '../../../../../../components/SearchInput.vue';
-  import StatusIndicator from '../../../../../../components/StatusIndicator.vue';
-  import { Column } from '../../../../../../components/HueTable';
-  import ColumnSelectorPanel from '../../../../../../components/ColumnSelectorPanel.vue';
-  import FacetSelector from '../../../../../../components/FacetSelector.vue';
-  import TablesList from '../components/TablesList.vue';
-  import {
-    Facet,
-    FacetValue,
-    FacetValueLabels,
-    SearchFacet
-  } from '../../../../../../components/FacetSelector';
+  import { defineComponent, PropType } from 'vue';
+
   import { fetchFacets } from '../api-utils/search';
-  import QueriesSearch from '../components/QueriesSearch.vue';
   import { DataProcessor, Query, Search, TableDefinition } from '../index';
   import QueryKillButton from '../components/QueryKillButton.vue';
+  import TablesList from '../components/TablesList.vue';
+  import ColumnSelectorPanel from 'components/ColumnSelectorPanel.vue';
+  import { Range } from 'components/DateRangePicker';
+  import DateRangePicker from 'components/DateRangePicker.vue';
+  import { duration } from 'components/Duration.vue';
+  import { Facet, FacetValue, FacetValueLabels, SearchFacet } from 'components/FacetSelector';
+  import FacetSelector from 'components/FacetSelector.vue';
+  import HueButton from 'components/HueButton.vue';
+  import HueIcon from 'components/HueIcon.vue';
+  import HueLink from 'components/HueLink.vue';
+  import HueTable from 'components/HueTable.vue';
+  import { Column } from 'components/HueTable';
+  import { humanSize } from 'components/HumanByteSize.vue';
+  import Paginator, { Page } from 'components/Paginator';
+  import SearchInput from 'components/SearchInput.vue';
+  import StatusIndicator from 'components/StatusIndicator.vue';
+  import { timeAgo } from 'components/TimeAgo.vue';
+  import I18n from 'utils/i18n';
 
-  const DEFAULT_STATUS_FACET_VALUES: FacetValue[][] = [
+  const DEFAULT_STATUS_FACET_VALUES: [][] = [
     ['STARTED', { key: 'STARTED', value: 0 }],
     ['RUNNING', { key: 'RUNNING', value: 0 }],
     ['SUCCESS', { key: 'SUCCESS', value: 0 }],
     ['ERROR', { key: 'ERROR', value: 0 }]
   ];
 
-  @Component({
+  export default defineComponent({
+    name: 'QueryTable',
     components: {
       FacetSelector,
       HueIcon,
@@ -161,238 +146,233 @@
       HueTable,
       TablesList,
       ColumnSelectorPanel,
-      QueriesSearch,
       QueryKillButton,
       Paginator
     },
-    methods: {
-      I18n: I18n
-    }
-  })
-  export default class QueryTable extends Vue {
-    @Prop({ required: true })
-    queries!: Query[];
-    @Prop({ required: true })
-    totalQueries!: number;
-
-    searches: Search[] = [];
-    visibleColumns: Column<Query>[] = [];
-    columnSelectorIsVisible = false;
-    selectedQueries: Query[] = [];
-
-    currentPage?: Page;
-    searchQuery = '';
-    timeRange?: Range;
-    facets: { [field: string]: SearchFacet } = {};
-
-    statusFacet: Facet = {
-      facetField: 'status',
-      values: []
-    };
-
-    statusValueLabels: FacetValueLabels = {
-      STARTED: I18n('Started'),
-      RUNNING: I18n('Running'),
-      SUCCESS: I18n('Success'),
-      ERROR: I18n('Error')
-    };
-
-    userFacet: Facet = {
-      facetField: 'userId',
-      values: []
-    };
-
-    columns: Column<Query>[] = [
-      { key: 'select', label: '' },
-      { key: 'status', label: 'Status' },
-      { key: 'query', label: 'Query' },
-      { key: 'queueName', label: 'Queue' },
-      { key: 'requestUser', label: 'User' },
-      {
-        key: 'tablesRead',
-        label: 'Tables Read'
+    props: {
+      queries: {
+        type: Array as PropType<Query[]>,
+        required: true
       },
-      {
-        key: 'tablesWritten',
-        label: 'Tables Written'
-      },
-      {
-        key: 'startTime',
-        label: 'Start Time',
-        adapter: (key: string, query: Query): string => timeAgo(query.startTime)
-      },
-      {
-        key: 'elapsedTime',
-        label: 'Duration',
-        adapter: (key: string, query: Query): string =>
-          (query.elapsedTime && duration(query.elapsedTime)) || ''
-      },
-      {
-        key: 'dagIDs',
-        label: 'DAG IDs',
-        adapter: (key: string, query: Query): string =>
-          query.dags.map(dag => dag.dagInfo.dagId).join(',')
-      },
-      {
-        key: 'appID',
-        label: 'Application ID',
-        adapter: (key: string, query: Query): string =>
-          query.dags[0] && query.dags[0].dagInfo.applicationId
-      },
-      { key: 'cpuTime', label: 'CPU Time' },
-      {
-        key: 'physicalMemory',
-        label: 'Physical Memory',
-        adapter: (key: string, query: Query): string => humanSize(query.physicalMemory)
-      },
-      {
-        key: 'virtualMemory',
-        label: 'Virtual Memory',
-        adapter: (key: string, query: Query): string => humanSize(query.virtualMemory)
-      },
-      {
-        key: 'dataRead',
-        label: 'Data Read',
-        adapter: (key: string, query: Query): string => humanSize(query.dataRead)
-      },
-      {
-        key: 'dataWritten',
-        label: 'Data Written',
-        adapter: (key: string, query: Query): string => humanSize(query.dataWritten)
-      },
-      { key: 'executionMode', label: 'Execution Mode' },
-      { key: 'usedCBO', label: 'Cost Based Optimizer (CBO)' }
-    ];
+      totalQueries: {
+        type: Number,
+        required: true
+      }
+    },
+    emits: ['diff-queries', 'kill-queries', 'query-selected', 'reload', 'search'],
+    setup() {
+      const statusValueLabels: FacetValueLabels = {
+        STARTED: I18n('Started'),
+        RUNNING: I18n('Running'),
+        SUCCESS: I18n('Success'),
+        ERROR: I18n('Error')
+      };
 
-    // TODO: Properly initiate TableDefinition
-    tableDefinition: TableDefinition = {
-      rangeData: {
-        title: 'Some title'
-      },
-      columnPreferences: [{ id: 'some id' }]
-    };
+      const columns: Column<Query>[] = [
+        { key: 'select', label: '' },
+        { key: 'status', label: 'Status' },
+        { key: 'query', label: 'Query' },
+        { key: 'queueName', label: 'Queue' },
+        { key: 'requestUser', label: 'User' },
+        {
+          key: 'tablesRead',
+          label: 'Tables Read'
+        },
+        {
+          key: 'tablesWritten',
+          label: 'Tables Written'
+        },
+        {
+          key: 'startTime',
+          label: 'Start Time',
+          adapter: (ke, query) => timeAgo(query.startTime)
+        },
+        {
+          key: 'elapsedTime',
+          label: 'Duration',
+          adapter: (key, query) => (query.elapsedTime && duration(query.elapsedTime)) || ''
+        },
+        {
+          key: 'dagIDs',
+          label: 'DAG IDs',
+          adapter: (key, query) => query.dags.map(dag => dag.dagInfo.dagId).join(',')
+        },
+        {
+          key: 'appID',
+          label: 'Application ID',
+          adapter: (key, query) => query.dags[0] && query.dags[0].dagInfo.applicationId
+        },
+        { key: 'cpuTime', label: 'CPU Time' },
+        {
+          key: 'physicalMemory',
+          label: 'Physical Memory',
+          adapter: (key, query) => humanSize(query.physicalMemory)
+        },
+        {
+          key: 'virtualMemory',
+          label: 'Virtual Memory',
+          adapter: (key, query) => humanSize(query.virtualMemory)
+        },
+        {
+          key: 'dataRead',
+          label: 'Data Read',
+          adapter: (key, query) => humanSize(query.dataRead)
+        },
+        {
+          key: 'dataWritten',
+          label: 'Data Written',
+          adapter: (key, query) => humanSize(query.dataWritten)
+        },
+        { key: 'executionMode', label: 'Execution Mode' },
+        { key: 'usedCBO', label: 'Cost Based Optimizer (CBO)' }
+      ];
 
-    // TODO: Properly initiate DataProcessor
-    dataProcessor: DataProcessor = {
-      facets: { fieldCount: 0 }
-    };
+      const notifyThrottle = -1;
 
-    notifyThrottle = -1;
-
-    async mounted(): void {
-      this.visibleColumns = [...this.columns];
-      this.setStatusFacetValues([]);
-    }
-
+      return { columns, statusValueLabels, notifyThrottle };
+    },
+    data() {
+      return {
+        searches: [] as Search[],
+        columnSelectorIsVisible: false,
+        visibleColumns: [] as Column<Query>[],
+        selectedQueries: [] as Query[],
+        currentPage: null as Page | null,
+        searchQuery: '',
+        timeRange: null as Range | null,
+        facets: {} as { [field: string]: SearchFacet },
+        statusFacet: {
+          facetField: 'status',
+          values: []
+        } as Facet,
+        userFacet: {
+          facetField: 'userId',
+          values: []
+        } as Facet,
+        // TODO: Properly initiate TableDefinition
+        tableDefinition: {
+          rangeData: {
+            title: 'Some title'
+          },
+          columnPreferences: [{ id: 'some id' }]
+        } as TableDefinition,
+        // TODO: Properly initiate DataProcessor
+        dataProcessor: {
+          facets: { fieldCount: 0 }
+        } as DataProcessor
+      };
+    },
     async created(): Promise<void> {
       // this.searches = await fetchSuggestedSearches({ entityType: 'query' });
-    }
+    },
+    mounted(): void {
+      this.visibleColumns = [...this.columns];
+      this.setStatusFacetValues([]);
+    },
+    methods: {
+      clearSearch(): void {
+        this.searchQuery = '';
+        (this.$refs.rangePicker as typeof DateRangePicker).clear();
+        (this.$refs.statusFacetSelector as typeof FacetSelector).clear();
+        (this.$refs.userFacetSelector as typeof FacetSelector).clear();
+      },
+      diffQueries(queries: Query[]): void {
+        this.$emit('diff-queries', queries);
+      },
+      facetChanged(searchFacet: SearchFacet): void {
+        this.facets[searchFacet.field] = searchFacet;
+        this.notifySearch();
+      },
+      facetRemoved(field: string): void {
+        if (this.facets[field]) {
+          delete this.facets[field];
+          this.notifySearch();
+        }
+      },
+      killQueries(queries: Query[]): void {
+        this.$emit('kill-queries', queries);
+      },
+      notifySearch(): void {
+        window.clearTimeout(this.notifyThrottle);
+        this.notifyThrottle = window.setTimeout(async () => {
+          this.$emit('search', {
+            page: this.currentPage,
+            text: this.searchQuery,
+            timeRange: this.timeRange,
+            facets: Object.values(this.facets)
+          });
 
-    updateVisibleColumns(columns: Column<Query>[]): void {
-      this.visibleColumns = columns;
-      this.columnSelectorIsVisible = false;
-    }
+          const now = Date.now();
+          try {
+            const facetResponse = await fetchFacets({
+              startTime: this.timeRange?.from || now - 1000 * 60 * 60 * 24 * 7,
+              endTime: this.timeRange?.to || now,
+              facetFields: ['status', 'userId']
+            });
+            facetResponse.facets.forEach(facet => {
+              if (facet.facetField === 'userId') {
+                this.userFacet.values.splice(0, this.userFacet.values.length, ...facet.values);
+              } else if (facet.facetField === 'status') {
+                this.setStatusFacetValues(facet.values);
+              }
+            });
+          } catch (err) {
+            this.setStatusFacetValues([]);
+          }
+        }, 0);
+      },
+      pageChanged(page: Page): void {
+        this.currentPage = page;
+        this.notifySearch();
+      },
+      querySelected(query: Query): void {
+        this.$emit('query-selected', query);
+      },
+      reload(): void {
+        this.selectedQueries = [];
+        this.$emit('reload');
+      },
+      searchQueryEnter(searchQuery: string): void {
+        this.searchQuery = searchQuery;
+        if (this.currentPage && this.currentPage.offset !== 0) {
+          // pageChanged will notify
+          const limit = this.currentPage.limit;
+          this.currentPage = { offset: 0, limit };
+        } else {
+          this.notifySearch();
+        }
+      },
+      setStatusFacetValues(values: FacetValue[]): void {
+        const valueMap = new Map<string, FacetValue>(DEFAULT_STATUS_FACET_VALUES);
 
-    toggleColumnSelector(): void {
-      this.columnSelectorIsVisible = !this.columnSelectorIsVisible;
-    }
-
-    notifySearch(): void {
-      window.clearTimeout(this.notifyThrottle);
-      this.notifyThrottle = window.setTimeout(async () => {
-        this.$emit('search', {
-          page: this.currentPage,
-          text: this.searchQuery,
-          timeRange: this.timeRange,
-          facets: Object.values(this.facets)
+        values.forEach(val => {
+          const facet = valueMap.get(val.key);
+          if (facet) {
+            facet.value = val.value;
+          }
         });
 
-        const now = Date.now();
-        try {
-          const facetResponse = await fetchFacets({
-            startTime: this.timeRange?.from || now - 1000 * 60 * 60 * 24 * 7,
-            endTime: this.timeRange?.to || now,
-            facetFields: ['status', 'userId']
-          });
-          facetResponse.facets.forEach(facet => {
-            if (facet.facetField === 'userId') {
-              this.$set(this.userFacet, 'values', facet.values);
-            } else if (facet.facetField === 'status') {
-              this.setStatusFacetValues(facet.values);
-            }
-          });
-        } catch (err) {
-          this.setStatusFacetValues([]);
-        }
-      }, 0);
-    }
-
-    setStatusFacetValues(values: FacetValue[]): void {
-      const valueMap = new Map<string, FacetValue>(DEFAULT_STATUS_FACET_VALUES);
-
-      values.forEach(val => {
-        valueMap.get(val.key).value = val.value;
-      });
-
-      this.$set(this.statusFacet, 'values', [...valueMap.values()]);
-    }
-
-    clearSearch(): void {
-      this.searchQuery = '';
-      (<DateRangePicker>this.$refs.rangePicker).clear();
-      (<FacetSelector>this.$refs.statusFacetSelector).clear();
-      (<FacetSelector>this.$refs.userFacetSelector).clear();
-    }
-
-    pageChanged(page: Page): void {
-      this.currentPage = page;
-      this.notifySearch();
-    }
-
-    timeRangeChanged(timeRange: Range): void {
-      this.timeRange = timeRange;
-      this.notifySearch();
-    }
-
-    facetRemoved(field: string): void {
-      if (this.facets[field]) {
-        delete this.facets[field];
+        // For some reason [...valueMap.values()] throws exception
+        const facetValues = [];
+        valueMap.forEach(val => {
+          facetValues.push(val);
+        });
+        this.statusFacet.values.splice(0, this.statusFacet.values.length, facetValues);
+      },
+      timeRangeChanged(timeRange: Range): void {
+        this.timeRange = timeRange;
         this.notifySearch();
-      }
+      },
+      toggleColumnSelector(): void {
+        this.columnSelectorIsVisible = !this.columnSelectorIsVisible;
+      },
+      updateVisibleColumns(columns: Column<Query>[]): void {
+        this.visibleColumns = columns;
+        this.columnSelectorIsVisible = false;
+      },
+      I18n
     }
-
-    facetChanged(searchFacet: SearchFacet): void {
-      this.facets[searchFacet.field] = searchFacet;
-      this.notifySearch();
-    }
-
-    searchQueryEnter(searchQuery: string): void {
-      this.searchQuery = searchQuery;
-      if (this.currentPage && this.currentPage.offset !== 0) {
-        // pageChanged will notify
-        (<Paginator>this.$refs.paginator).gotoFirstPage();
-      } else {
-        this.notifySearch();
-      }
-    }
-
-    querySelected(query: Query): void {
-      this.$emit('query-selected', query);
-    }
-
-    diffQueries(queries: Query[]): void {
-      this.$emit('diff-queries', queries);
-    }
-
-    killQueries(queries: Query[]): void {
-      this.$emit('kill-queries', queries);
-    }
-
-    reload(): void {
-      this.selectedQueries = [];
-      this.$emit('reload');
-    }
-  }
+  });
 </script>
 
 <style lang="scss" scoped>
@@ -404,7 +384,7 @@
       margin-bottom: 20px;
       width: 100%;
 
-      /deep/ .hue-dropdown-panel button {
+      ::v-deep(.hue-dropdown-panel button) {
         margin-left: 10px;
       }
 
@@ -442,7 +422,7 @@
       font-size: 24px;
       margin: 4px;
 
-      /deep/ i {
+      ::v-deep(i) {
         font-size: 20px;
         padding: 2px;
         color: $fluid-gray-500;

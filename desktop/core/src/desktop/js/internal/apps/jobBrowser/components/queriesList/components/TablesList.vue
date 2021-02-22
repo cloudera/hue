@@ -21,24 +21,26 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import { Component, Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
 
   import { Table } from '..';
 
   const DEFAULT_TXT = '-';
 
-  @Component
-  export default class TablesList extends Vue {
-    @Prop({ required: true }) tables!: Table[];
-
-    get tablesWithDbTxt(): string {
-      if (this.tables && this.tables.length) {
-        return this.tables.map((table: Table) => `${table.table} (${table.database})`).join(', ');
+  export default defineComponent({
+    props: {
+      tables: {
+        type: Array as PropType<Table[]>,
+        required: true
       }
-      return DEFAULT_TXT;
+    },
+    computed: {
+      tablesWithDbTxt(): string {
+        if (this.tables && this.tables.length) {
+          return this.tables.map((table: Table) => `${table.table} (${table.database})`).join(', ');
+        }
+        return DEFAULT_TXT;
+      }
     }
-  }
+  });
 </script>
-
-<style lang="scss" scoped></style>

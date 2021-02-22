@@ -14,28 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { shallowMount, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 
 import QueryKillButton from './QueryKillButton.vue';
-
 import { QueryStatus } from '../index.d';
-import { sleep } from '../../../../../../utils/hueUtils';
+import { sleep } from 'utils/hueUtils';
 
 import * as queryApiUtils from '../api-utils/query';
 
 describe('QueryKillButton.vue', () => {
-  it('should render disabled', () => {
-    const wrapper = shallowMount(QueryKillButton, {
+  it('should render disabled', async () => {
+    const wrapper = mount(QueryKillButton, {
       propsData: {
         queries: []
       }
     });
     expect(wrapper.text()).toContain('Kill');
-    expect(wrapper.attributes('disabled')).toBeTruthy();
+    expect(wrapper.attributes('disabled')).toBeDefined();
   });
 
   it('should render Kill, disabled', () => {
-    const wrapper = shallowMount(QueryKillButton, {
+    const wrapper = mount(QueryKillButton, {
       propsData: {
         queries: [
           {
@@ -45,11 +44,11 @@ describe('QueryKillButton.vue', () => {
       }
     });
     expect(wrapper.text()).toContain('Kill');
-    expect(wrapper.attributes('disabled')).toBeTruthy();
+    expect(wrapper.attributes('disabled')).toBeDefined();
   });
 
   it('should render Kill', () => {
-    const wrapper = shallowMount(QueryKillButton, {
+    const wrapper = mount(QueryKillButton, {
       propsData: {
         queries: [
           {
@@ -59,7 +58,7 @@ describe('QueryKillButton.vue', () => {
       }
     });
     expect(wrapper.text()).toContain('Kill');
-    expect(wrapper.attributes('disabled')).toBeFalsy();
+    expect(wrapper.attributes('disabled')).toBeUndefined();
   });
 
   it('should render Killing, disabled', async () => {
@@ -74,7 +73,7 @@ describe('QueryKillButton.vue', () => {
     });
     await wrapper.trigger('click');
     expect(wrapper.text()).toContain('Killing');
-    expect(wrapper.attributes('disabled')).toBeTruthy();
+    expect(wrapper.attributes('disabled')).toBeDefined();
   });
 
   it('should render Error, disabled', async () => {
@@ -97,7 +96,7 @@ describe('QueryKillButton.vue', () => {
     await wrapper.trigger('click');
     await sleep(100);
     expect(wrapper.text()).toContain('Error');
-    expect(wrapper.attributes('disabled')).toBeTruthy();
+    expect(wrapper.attributes('disabled')).toBeDefined();
   });
 
   it('should render Unknown, disabled', async () => {
@@ -121,6 +120,6 @@ describe('QueryKillButton.vue', () => {
     await wrapper.trigger('click');
     await sleep(100);
     expect(wrapper.text()).toContain('Unknown');
-    expect(wrapper.attributes('disabled')).toBeTruthy();
+    expect(wrapper.attributes('disabled')).toBeDefined();
   });
 });

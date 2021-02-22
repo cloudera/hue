@@ -17,10 +17,16 @@
 import { shallowMount } from '@vue/test-utils';
 import { Search, TableDefinition } from '../index';
 import QueriesSearch from './QueriesSearch.vue';
+import DropdownMenu from 'components/dropdown/DropdownMenu.vue';
 
 describe('QueriesSearch.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(QueriesSearch, {
+      global: {
+        stubs: {
+          DropdownMenu
+        }
+      },
       propsData: {
         tableDefinition: <TableDefinition>{
           rangeData: {

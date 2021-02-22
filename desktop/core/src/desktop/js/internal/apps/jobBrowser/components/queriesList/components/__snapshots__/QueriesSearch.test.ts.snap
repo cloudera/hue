@@ -5,50 +5,16 @@ exports[`QueriesSearch.vue should render 1`] = `
   <div
     class="input-group"
   >
-    <dropdown-menu-stub
+    <dropdown-panel-stub
+      class="hue-dropdown-menu"
+      link="false"
       text="Searches"
-    >
-      <dropdown-menu-group-stub
-        header="Suggested"
-      >
-        <!---->
-         
-        <dropdown-menu-button-stub>
-          
-          Suggested search
-        
-        </dropdown-menu-button-stub>
-      </dropdown-menu-group-stub>
-       
-      <dropdown-menu-group-stub
-        header="Suggested"
-      >
-        <!---->
-         
-        <dropdown-menu-item-stub>
-          <a
-            href="javascript: void(0);"
-          >
-            Saved search
-          </a>
-           
-          <i
-            aria-hidden="true"
-            class="fa fa-times"
-          />
-          
-          Saved search
-        
-        </dropdown-menu-item-stub>
-      </dropdown-menu-group-stub>
-    </dropdown-menu-stub>
-     
+    />
     <input
       class="form-control"
       placeholder="Search Queries"
       type="search"
     />
-     
     <div
       class="input-group-btn time-dropdown"
     >
@@ -59,21 +25,18 @@ exports[`QueriesSearch.vue should render 1`] = `
         data-toggle="dropdown"
         type="button"
       >
-        
         Some title 
         <span
           class="caret"
         />
       </button>
-       
       <div
         class="dropdown-menu range-panel pull-right"
       >
         <range-panel-stub
-          tabledefinition="[object Object]"
+          table-definition="[object Object]"
         />
       </div>
-       
       <button
         class="btn btn-default search"
         type="button"
@@ -84,7 +47,6 @@ exports[`QueriesSearch.vue should render 1`] = `
         />
       </button>
     </div>
-     
     <div
       class="input-group-btn save-button"
     >
@@ -99,7 +61,6 @@ exports[`QueriesSearch.vue should render 1`] = `
       </button>
     </div>
   </div>
-   
-  <!---->
+  <!--v-if-->
 </div>
 `;

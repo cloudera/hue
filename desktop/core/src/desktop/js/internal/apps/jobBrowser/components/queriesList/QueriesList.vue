@@ -47,21 +47,17 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Provide } from 'vue-property-decorator';
-  import { Page } from '../../../../../components/Paginator';
-  import hueUtils from '../../../../../utils/hueUtils';
-  import HumanByteSize from '../../../../../components/HumanByteSize.vue';
-  import TimeAgo from '../../../../../components/TimeAgo.vue';
+  import { defineComponent } from 'vue';
+
+  import hueUtils from 'utils/hueUtils';
   import { searchQueries, SearchFacet } from './api-utils/search';
   import { fetchExtendedQuery } from './api-utils/query';
   import QueryDetailsDiff from './query-details/QueryDetailsDiff.vue';
   import QueryDetails from './query-details/QueryDetails.vue';
-  import { Query, SearchMeta } from './index';
   import QueryTable from './query-table/QueryTable.vue';
-  import InlineAlert from '../../../../../components/InlineAlert.vue';
-  import { AlertType } from '../../../../../components/InlineAlert.vue';
+  import { Query, SearchMeta } from './index';
+  import InlineAlert, { AlertType } from 'components/InlineAlert.vue';
+  import { Page } from 'components/Paginator';
   import Spinner from 'components/Spinner.vue';
 
   const QUERY_ID_PARAM = 'queryId';
@@ -73,67 +69,43 @@
     facets: SearchFacet[];
   }
 
-  @Component({
+  export default defineComponent({
+    name: 'QueriesList',
     components: {
-      Spinner,
-      QueryDetailsDiff,
+      InlineAlert,
       QueryDetails,
+      QueryDetailsDiff,
       QueryTable,
-      TimeAgo,
-      HumanByteSize,
-      InlineAlert
-    }
-  })
-  export default class QueriesList extends Vue {
-    selectedQuery: Query | null = null;
-    queriesToDiff: Query[] | null = null;
-    queries: Query[] = [];
-    searchMeta: SearchMeta | null = null;
-    error: Error | null = null;
+      Spinner
+    },
+    provide() {
+      return {
+        showQueries: () => {
+          this.selectedQuery = null;
+          this.queriesToDiff = null;
+          this.error = null;
 
-    lastFetchOptions!: FetchOptions;
-    loading = false;
-
-    AlertType = AlertType;
-
-    async fetch(options: FetchOptions): Promise<void> {
-      // Initial fetch triggered by the paginator
-      const now = Date.now();
-
-      this.lastFetchOptions = options;
-      this.loading = true;
-      try {
-        const searchResponse = await searchQueries({
-          endTime: (options.timeRange && options.timeRange.to) || now,
-          limit: options.page.limit,
-          offset: options.page.offset,
-          facets: options.facets,
-          text: options.text,
-          sortText: 'startTime:DESC',
-          startTime: (options.timeRange && options.timeRange.from) || now - 1000 * 60 * 60 * 24 * 7
-        });
-        this.searchMeta = searchResponse.meta;
-        this.queries = searchResponse.queries;
-      } catch (error) {
-        this.error = error;
-      }
-      this.loading = false;
-    }
-
-    @Provide()
-    showQueries(): void {
-      this.selectedQuery = null;
-      this.queriesToDiff = null;
-      this.error = null;
-
-      const urlParams = new URLSearchParams(window.location.search);
-      let index = 0;
-      while (urlParams.get(QUERY_ID_PARAM + index)) {
-        hueUtils.removeURLParameter(QUERY_ID_PARAM + index);
-        index++;
-      }
-    }
-
+          const urlParams = new URLSearchParams(window.location.search);
+          let index = 0;
+          while (urlParams.get(QUERY_ID_PARAM + index)) {
+            hueUtils.removeURLParameter(QUERY_ID_PARAM + index);
+            index++;
+          }
+        }
+      };
+    },
+    data() {
+      return {
+        AlertType: AlertType,
+        error: null as Error | null,
+        lastFetchOptions: null as FetchOptions | null,
+        loading: false,
+        queries: [] as Query[],
+        queriesToDiff: null as Query[] | null,
+        searchMeta: null as SearchMeta | null,
+        selectedQuery: null as Query | null
+      };
+    },
     async created(): Promise<void> {
       const urlParams = new URLSearchParams(window.location.search);
 
@@ -149,33 +121,57 @@
       } else if (queryIdValues.length > 1) {
         await this.diffQueries(<Query[]>queryIdValues.map(queryId => ({ queryId })));
       }
-    }
+    },
+    methods: {
+      async fetch(options: FetchOptions): Promise<void> {
+        // Initial fetch triggered by the paginator
+        const now = Date.now();
 
-    async diffQueries(queriesToDiff: Query[]): Promise<void> {
-      queriesToDiff.forEach((query, index) => {
-        hueUtils.changeURLParameter(QUERY_ID_PARAM + index, query.queryId);
-      });
-      this.loading = true;
-      try {
-        const fetchPromises = queriesToDiff.map(query => fetchExtendedQuery(query.queryId));
-        this.queriesToDiff = await Promise.all(fetchPromises);
-      } catch (error) {
-        this.error = error;
+        this.lastFetchOptions = options;
+        this.loading = true;
+        try {
+          const searchResponse = await searchQueries({
+            endTime: (options.timeRange && options.timeRange.to) || now,
+            limit: options.page.limit,
+            offset: options.page.offset,
+            facets: options.facets,
+            text: options.text,
+            sortText: 'startTime:DESC',
+            startTime:
+              (options.timeRange && options.timeRange.from) || now - 1000 * 60 * 60 * 24 * 7
+          });
+          this.searchMeta = searchResponse.meta;
+          this.queries = searchResponse.queries;
+        } catch (error) {
+          this.error = error;
+        }
+        this.loading = false;
+      },
+      async diffQueries(queriesToDiff: Query[]): Promise<void> {
+        queriesToDiff.forEach((query, index) => {
+          hueUtils.changeURLParameter(QUERY_ID_PARAM + index, query.queryId);
+        });
+        this.loading = true;
+        try {
+          const fetchPromises = queriesToDiff.map(query => fetchExtendedQuery(query.queryId));
+          this.queriesToDiff = await Promise.all(fetchPromises);
+        } catch (error) {
+          this.error = error;
+        }
+        this.loading = false;
+      },
+      async querySelected(query: Query): Promise<void> {
+        hueUtils.changeURLParameter(QUERY_ID_PARAM + 0, query.queryId);
+        this.loading = true;
+        try {
+          this.selectedQuery = await fetchExtendedQuery(query.queryId);
+        } catch (error) {
+          this.error = error;
+        }
+        this.loading = false;
       }
-      this.loading = false;
     }
-
-    async querySelected(query: Query): Promise<void> {
-      hueUtils.changeURLParameter(QUERY_ID_PARAM + 0, query.queryId);
-      this.loading = true;
-      try {
-        this.selectedQuery = await fetchExtendedQuery(query.queryId);
-      } catch (error) {
-        this.error = error;
-      }
-      this.loading = false;
-    }
-  }
+  });
 </script>
 
 <style lang="scss" scoped>

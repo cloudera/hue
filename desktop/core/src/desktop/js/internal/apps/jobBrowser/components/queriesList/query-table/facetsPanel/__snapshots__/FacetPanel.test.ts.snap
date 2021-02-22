@@ -7,22 +7,22 @@ exports[`FacetsPanel.vue should render 1`] = `
   <ul
     class="field-list"
   >
-    <!---->
-     
+    <!--v-if-->
+    
     <facet-value-list-stub
       facet="[object Object]"
-      selectedvalues="[object Object],[object Object]"
+      selected-values="[object Object],[object Object]"
     />
     <facet-value-list-stub
       facet="[object Object]"
-      selectedvalues="[object Object]"
+      selected-values="[object Object]"
     />
     <facet-value-list-stub
       facet="[object Object]"
-      selectedvalues="[object Object]"
+      selected-values="[object Object]"
     />
+    
   </ul>
-   
   <div
     class="buttons"
   >
@@ -32,7 +32,6 @@ exports[`FacetsPanel.vue should render 1`] = `
     >
       Apply
     </button>
-     
     <button
       class="btn btn-default"
       type="button"

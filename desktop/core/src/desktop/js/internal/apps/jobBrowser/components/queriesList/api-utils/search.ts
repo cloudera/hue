@@ -81,7 +81,7 @@ export const fetchSuggestedSearches = async (options: {
 export interface FacetsParams {
   startTime: number;
   endTime: number;
-  facetFields: string;
+  facetFields: string | string[];
 }
 
 export interface FacetsResponse {

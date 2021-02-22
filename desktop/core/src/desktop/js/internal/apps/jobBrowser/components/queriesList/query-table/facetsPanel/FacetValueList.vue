@@ -56,75 +56,80 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
-  import { Facet, FacetValue } from '../../../../../../../components/FacetSelector';
+  import { defineComponent, PropType } from 'vue';
+  import { Facet, FacetValue } from 'components/FacetSelector';
 
   interface SelectableFacetValue {
     selected: boolean;
     facetValue: FacetValue;
   }
 
-  @Component
-  export default class FacetValueList extends Vue {
-    @Prop({ required: true })
-    facet!: Facet;
-    @Prop({ required: true })
-    selectedValues!: FacetValue[];
-
-    open = false;
-    filter = '';
-
-    get selectableFacetValues(): SelectableFacetValue[] {
-      return this.facet.values.map(facetValue => ({
-        facetValue,
-        selected: this.selectedValues.indexOf(facetValue) !== -1
-      }));
-    }
-
-    get selectedFacetValues(): FacetValue[] {
-      const selectedFacetValues: FacetValue[] = [];
-      this.selectableFacetValues.forEach(selectable => {
-        if (selectable.selected) {
-          selectedFacetValues.push(selectable.facetValue);
-        }
-      });
-      return selectedFacetValues;
-    }
-
-    get filteredFacetValues(): SelectableFacetValue[] {
-      if (!this.filter) {
-        return this.selectableFacetValues;
+  export default defineComponent({
+    name: 'FacetValueList',
+    props: {
+      facet: {
+        type: Object as PropType<Facet>,
+        required: true
+      },
+      selectedValues: {
+        type: Array as PropType<FacetValue[]>,
+        required: true
       }
-      const filterLower = this.filter.toLowerCase();
-      return this.selectableFacetValues.filter(
-        val => val.facetValue.key.toLowerCase().indexOf(filterLower) != -1
-      );
+    },
+    emits: ['values-selected'],
+    data() {
+      return {
+        open: false,
+        filter: ''
+      };
+    },
+    computed: {
+      filteredFacetValues(): SelectableFacetValue[] {
+        if (!this.filter) {
+          return this.selectableFacetValues;
+        }
+        const filterLower = this.filter.toLowerCase();
+        return this.selectableFacetValues.filter(
+          val => val.facetValue.key.toLowerCase().indexOf(filterLower) != -1
+        );
+      },
+      selectableFacetValues(): SelectableFacetValue[] {
+        return this.facet.values.map(facetValue => ({
+          facetValue,
+          selected: this.selectedValues.indexOf(facetValue) !== -1
+        }));
+      },
+      selectedFacetValues(): FacetValue[] {
+        const selectedFacetValues: FacetValue[] = [];
+        this.selectableFacetValues.forEach(selectable => {
+          if (selectable.selected) {
+            selectedFacetValues.push(selectable.facetValue);
+          }
+        });
+        return selectedFacetValues;
+      }
+    },
+    methods: {
+      onChange(): void {
+        this.$emit('values-selected', this.selectedFacetValues);
+      },
+      onlySelect(selectable: SelectableFacetValue): void {
+        this.selectableFacetValues.forEach(otherSelectable => {
+          otherSelectable.selected = otherSelectable === selectable;
+        });
+        this.onChange();
+      },
+      selectAll(): void {
+        this.selectableFacetValues.forEach(selectable => {
+          selectable.selected = true;
+        });
+        this.onChange();
+      },
+      toggleOpen(): void {
+        this.open = !this.open;
+      }
     }
-
-    toggleOpen(): void {
-      this.open = !this.open;
-    }
-
-    onChange(): void {
-      this.$emit('values-selected', this.selectedFacetValues);
-    }
-
-    selectAll(): void {
-      this.selectableFacetValues.forEach(selectable => {
-        selectable.selected = true;
-      });
-      this.onChange();
-    }
-
-    onlySelect(selectable: SelectableFacetValue): void {
-      this.selectableFacetValues.forEach(otherSelectable => {
-        otherSelectable.selected = otherSelectable === selectable;
-      });
-      this.onChange();
-    }
-  }
+  });
 </script>
 
 <style lang="scss" scoped></style>

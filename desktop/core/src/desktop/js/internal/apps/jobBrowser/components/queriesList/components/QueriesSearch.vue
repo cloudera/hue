@@ -25,21 +25,23 @@
             No suggestions
           </dropdown-menu-text>
           <dropdown-menu-button
-            v-for="search in listedSearches.suggested"
-            :key="search.name"
-            @click="searchSelected(search)"
+            v-for="listedSearch in listedSearches.suggested"
+            :key="listedSearch.name"
+            @click="searchSelected(listedSearch)"
           >
-            {{ search.name }}
+            {{ listedSearch.name }}
           </dropdown-menu-button>
         </dropdown-menu-group>
         <dropdown-menu-group header="Suggested">
           <dropdown-menu-text v-if="!listedSearches.saved.length">
             No saved searches
           </dropdown-menu-text>
-          <dropdown-menu-item v-for="search in listedSearches.saved" :key="search.name">
-            <a href="javascript: void(0);" @click="searchSelected(search)">{{ search.name }}</a>
-            <i class="fa fa-times" aria-hidden="true" @click="deleteSearch(search)" />
-            {{ search.name }}
+          <dropdown-menu-item v-for="listedSearch in listedSearches.saved" :key="listedSearch.name">
+            <a href="javascript: void(0);" @click="searchSelected(listedSearch)">{{
+              listedSearch.name
+            }}</a>
+            <i class="fa fa-times" aria-hidden="true" @click="deleteSearch(listedSearch)" />
+            {{ listedSearch.name }}
           </dropdown-menu-item>
         </dropdown-menu-group>
       </dropdown-menu>
@@ -101,21 +103,20 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
 
-  import DropdownMenu from '../../../../../../components/dropdown/DropdownMenu.vue';
-  import DropdownMenuGroup from '../../../../../../components/dropdown/DropdownMenuGroup.vue';
-  import DropdownMenuItem from '../../../../../../components/dropdown/DropdownMenuItem.vue';
-  import DropdownMenuButton from '../../../../../../components/dropdown/DropdownMenuButton.vue';
-  import DropdownMenuText from '../../../../../../components/dropdown/DropdownMenuText.vue';
-  import Modal from '../../../../../../components/Modal.vue';
   import RangePanel from './RangePanel.vue';
-  import { Search, TableDefinition } from '../index';
   import * as api from '../api-utils/search';
+  import { Search, TableDefinition } from '../index';
+  import DropdownMenu from 'components/dropdown/DropdownMenu.vue';
+  import DropdownMenuGroup from 'components/dropdown/DropdownMenuGroup.vue';
+  import DropdownMenuItem from 'components/dropdown/DropdownMenuItem.vue';
+  import DropdownMenuButton from 'components/dropdown/DropdownMenuButton.vue';
+  import DropdownMenuText from 'components/dropdown/DropdownMenuText.vue';
+  import Modal from 'components/Modal.vue';
 
-  @Component({
+  export default defineComponent({
+    name: 'QueriesSearch',
     components: {
       DropdownMenuItem,
       DropdownMenuText,
@@ -124,62 +125,65 @@
       DropdownMenu,
       Modal,
       RangePanel
-    }
-  })
-  export default class QueriesSearch extends Vue {
-    @Prop({ required: true })
-    searches!: Search[];
-    @Prop({ required: true })
-    tableDefinition!: TableDefinition;
-
-    searchText = '';
-    searchName = '';
-    includeFilterAndColumns = false;
-
-    isShowingSaveModal = false;
-
-    get listedSearches(): { suggested: Search[]; saved: Search[] } {
-      const result = { suggested: <Search[]>[], saved: <Search[]>[] };
-      this.searches.forEach(search => {
-        if (search.category === 'SUGGEST') {
-          result.suggested.push(search);
-        } else if (search.category === 'SAVED') {
-          result.saved.push(search);
-        }
-      });
-      return result;
-    }
-
-    async deleteSearch(search: Search): Promise<void> {
-      await api.deleteSearch(search);
-    }
-
-    searchSelected(search: Search): void {
-      this.searchText = search.clause;
-    }
-
-    search(): void {
-      this.$emit('search', this.searchText);
-    }
-
-    toggleSaveModal(): void {
-      this.isShowingSaveModal = !this.isShowingSaveModal;
-    }
-
-    async saveSearch(): Promise<void> {
-      this.toggleSaveModal();
-      if (this.searchName) {
-        await api.saveSearch({
-          name: this.searchName,
-          category: 'SAVED',
-          type: 'ADVANCED',
-          entity: 'query',
-          clause: this.searchText
+    },
+    props: {
+      searches: {
+        type: Array as PropType<Search[]>,
+        required: true
+      },
+      tableDefinition: {
+        type: Object as PropType<TableDefinition>,
+        required: true
+      }
+    },
+    emits: ['search'],
+    data() {
+      return {
+        searchText: '',
+        searchName: '',
+        includeFilterAndColumns: false,
+        isShowingSaveModal: false
+      };
+    },
+    computed: {
+      listedSearches(): { suggested: Search[]; saved: Search[] } {
+        const result = { suggested: <Search[]>[], saved: <Search[]>[] };
+        this.searches.forEach(search => {
+          if (search.category === 'SUGGEST') {
+            result.suggested.push(search);
+          } else if (search.category === 'SAVED') {
+            result.saved.push(search);
+          }
         });
-        this.searchName = '';
+        return result;
+      }
+    },
+    methods: {
+      async deleteSearch(search: Search): Promise<void> {
+        await api.deleteSearch(search);
+      },
+      async saveSearch(): Promise<void> {
+        this.toggleSaveModal();
+        if (this.searchName) {
+          await api.saveSearch({
+            name: this.searchName,
+            category: 'SAVED',
+            type: 'ADVANCED',
+            entity: 'query',
+            clause: this.searchText
+          });
+          this.searchName = '';
+        }
+      },
+      search(): void {
+        this.$emit('search', this.searchText);
+      },
+      searchSelected(search: Search): void {
+        this.searchText = search.clause;
+      },
+      toggleSaveModal(): void {
+        this.isShowingSaveModal = !this.isShowingSaveModal;
       }
     }
-  }
+  });
 </script>
-
-<style lang="scss" scoped></style>

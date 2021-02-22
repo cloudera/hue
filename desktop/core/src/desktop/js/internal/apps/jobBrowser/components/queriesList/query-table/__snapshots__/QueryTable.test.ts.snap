@@ -4,73 +4,51 @@ exports[`QueryTable.vue should render 1`] = `
 <div
   class="query-table"
 >
+  <!-- &lt;queries-search :searches="searches" :table-definition="tableDefinition" /&gt; -->
   <div
     class="query-table-actions"
   >
     <search-input-stub
+      modelvalue=""
       placeholder="Query text or Query/DAG/App ID"
-      value=""
+      show-magnify="false"
     />
-     
-    <hue-button-stub>
-      <em
-        class="fa fa-search"
-      />
-    </hue-button-stub>
-     
+    <hue-button-stub />
     <div
       class="query-table-filters"
     >
       <hue-icon-stub
         type="hi-filter"
       />
-       Filter by:
-      
+       Filter by: 
       <facet-selector-stub
         facet="[object Object]"
-        fieldlabel="Status"
-        valuelabels="[object Object]"
+        field-label="Status"
+        value-labels="[object Object]"
       />
-       
       <date-range-picker-stub />
-       
       <hue-link-stub
         class="clear-link"
-      >
-        Clear All
-      </hue-link-stub>
-       
+      />
       <hue-link-stub
         class="columns-link"
-      >
-        
-        Columns
-      
-      </hue-link-stub>
+      />
     </div>
-     
     <div
       class="query-table-actions-right"
     >
       <hue-button-stub
         disabled="true"
-      >
-        
-        Compare
-      
-      </hue-button-stub>
-       
-      <querykillbutton-stub
+      />
+      <query-kill-button-stub
         queries=""
       />
     </div>
   </div>
-   
   <div
     class="query-table-container"
   >
-    <!---->
-     
+    <!--v-if-->
     <div
       class="query-table-right-panel"
     >
@@ -80,9 +58,8 @@ exports[`QueryTable.vue should render 1`] = `
       />
     </div>
   </div>
-   
   <paginator-stub
-    totalentries="0"
+    total-entries="0"
   />
 </div>
 `;

@@ -42,59 +42,62 @@
 </template>
 
 <script lang="ts">
-  import { Facet, FacetValue } from '../../../../../../../components/FacetSelector';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
   import FacetValueList from './FacetValueList.vue';
+  import { Facet, FacetValue } from 'components/FacetSelector';
 
   interface FacetSelection {
     facet: Facet;
     selectedValues: FacetValue[];
   }
 
-  @Component({
-    components: { FacetValueList }
-  })
-  export default class FacetsPanel extends Vue {
-    @Prop({ required: true })
-    facets!: Facet[];
-
-    filter = '';
-
-    get facetSelection(): FacetSelection[] {
-      return this.facets.map(facet => ({ facet, selectedValues: [...facet.values] }));
-    }
-
-    get filteredFacets(): FacetSelection[] {
-      if (!this.filter) {
-        return this.facetSelection;
+  export default defineComponent({
+    name: 'FacetsPanel',
+    components: { FacetValueList },
+    props: {
+      facets: {
+        type: Array as PropType<Facet[]>,
+        required: true
       }
-      const filterLower = this.filter.toLowerCase();
-      return this.facetSelection.filter(
-        selection => selection.facet.facetField.toLowerCase().indexOf(filterLower) !== -1
-      );
-    }
-
-    apply(): void {
-      const searchFacets: { field: string; values: string[] }[] = [];
-      this.facetSelection.forEach(selection => {
-        if (selection.facet.values.length !== selection.selectedValues.length) {
-          searchFacets.push({
-            field: selection.facet.facetField,
-            values: selection.selectedValues.map(value => value.key)
-          });
+    },
+    emits: ['search-facets-changed'],
+    data() {
+      return { filter: '' };
+    },
+    computed: {
+      facetSelection(): FacetSelection[] {
+        return this.facets.map(facet => ({ facet, selectedValues: [...facet.values] }));
+      },
+      filteredFacets(): FacetSelection[] {
+        if (!this.filter) {
+          return this.facetSelection;
         }
-      });
-      this.$emit('search-facets-changed', searchFacets);
+        const filterLower = this.filter.toLowerCase();
+        return this.facetSelection.filter(
+          selection => selection.facet.facetField.toLowerCase().indexOf(filterLower) !== -1
+        );
+      }
+    },
+    methods: {
+      apply(): void {
+        const searchFacets: { field: string; values: string[] }[] = [];
+        this.facetSelection.forEach(selection => {
+          if (selection.facet.values.length !== selection.selectedValues.length) {
+            searchFacets.push({
+              field: selection.facet.facetField,
+              values: selection.selectedValues.map(value => value.key)
+            });
+          }
+        });
+        this.$emit('search-facets-changed', searchFacets);
+      },
+      clear(): void {
+        this.facetSelection.forEach(selection => {
+          selection.selectedValues = [...selection.facet.values];
+        });
+      }
     }
-
-    clear(): void {
-      this.facetSelection.forEach(selection => {
-        selection.selectedValues = [...selection.facet.values];
-      });
-    }
-  }
+  });
 </script>
 
 <style lang="scss" scoped></style>

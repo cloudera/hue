@@ -17,7 +17,7 @@
  */
 
 import QueriesList from './QueriesList.vue';
-import { wrap } from '../../../../../vue/webComponentWrapper';
+import { wrap } from 'vue/webComponentWrap';
 
 export const COMPONENT_NAME = 'queries-list';
 wrap(COMPONENT_NAME, QueriesList);

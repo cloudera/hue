@@ -12,9 +12,7 @@ exports[`RangePanel.vue should render 1`] = `
     >
       Time Range
     </div>
-    
-    FROM
-    
+     FROM 
     <div
       class="form-group"
     >
@@ -26,7 +24,6 @@ exports[`RangePanel.vue should render 1`] = `
           class="form-control"
           type="text"
         />
-         
         <span
           class="input-group-addon"
         >
@@ -36,9 +33,7 @@ exports[`RangePanel.vue should render 1`] = `
         </span>
       </div>
     </div>
-    
-    TO
-    
+     TO 
     <div
       class="form-group"
     >
@@ -50,7 +45,6 @@ exports[`RangePanel.vue should render 1`] = `
           class="form-control"
           type="text"
         />
-         
         <span
           class="input-group-addon"
         >
@@ -60,7 +54,6 @@ exports[`RangePanel.vue should render 1`] = `
         </span>
       </div>
     </div>
-     
     <div
       class="input-group-btn"
     >
@@ -72,7 +65,6 @@ exports[`RangePanel.vue should render 1`] = `
       </button>
     </div>
   </div>
-   
   <div
     class="col-md-8 quick-range-panel"
   >
@@ -81,14 +73,15 @@ exports[`RangePanel.vue should render 1`] = `
     >
       Quick Range
     </div>
-     
     <div
       class="row"
     >
+      
       <div
         class="col-md-3"
       >
         <ul>
+          
           <li>
             <a
               href="#"
@@ -145,12 +138,14 @@ exports[`RangePanel.vue should render 1`] = `
               Last 5 year
             </a>
           </li>
+          
         </ul>
       </div>
       <div
         class="col-md-3"
       >
         <ul>
+          
           <li>
             <a
               href="#"
@@ -193,12 +188,14 @@ exports[`RangePanel.vue should render 1`] = `
               Previous year
             </a>
           </li>
+          
         </ul>
       </div>
       <div
         class="col-md-3"
       >
         <ul>
+          
           <li>
             <a
               href="#"
@@ -241,12 +238,14 @@ exports[`RangePanel.vue should render 1`] = `
               This year
             </a>
           </li>
+          
         </ul>
       </div>
       <div
         class="col-md-3"
       >
         <ul>
+          
           <li>
             <a
               href="#"
@@ -303,8 +302,10 @@ exports[`RangePanel.vue should render 1`] = `
               Last 24 hours
             </a>
           </li>
+          
         </ul>
       </div>
+      
     </div>
   </div>
 </div>

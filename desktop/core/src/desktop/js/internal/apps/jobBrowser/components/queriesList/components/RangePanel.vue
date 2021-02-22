@@ -59,9 +59,8 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
+
   import { TableDefinition } from '../index';
 
   const BASE = {
@@ -119,35 +118,25 @@
     ]
   ];
 
-  // const CUSTOM_RANGE = {
-  //   title: 'Custom Range',
-  //   base: BASE.CUSTOM
-  // };
-
-  // const DATEPICKER_OPTIONS = {
-  //   minView: 2,
-  //   format: 'mm/dd/yyyy',
-  //   autoclose: true
-  // };
-
-  // TODO: Add date picker component
-
-  @Component
-  export default class RangePanel extends Vue {
-    @Prop({ required: true })
-    tableDefinition!: TableDefinition;
-
-    rangeSets = RANGE_SETS;
-
-    setCustomRange(): void {
-      // TODO: Implement
+  export default defineComponent({
+    name: 'RangePanel',
+    props: {
+      tableDefinition: {
+        type: Object as PropType<TableDefinition>,
+        required: true
+      }
+    },
+    setup() {
+      return { rangeSets: RANGE_SETS };
+    },
+    methods: {
+      setCustomRange(): void {
+        // TODO: Implement
+      },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      setRange(range: Range): void {
+        // TODO: Implement
+      }
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    setRange(range: Range): void {
-      // TODO: Implement
-    }
-  }
+  });
 </script>
-
-<style lang="scss" scoped></style>
