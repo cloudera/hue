@@ -23,12 +23,14 @@ import queryMockResponseB from '../test/api/hive_query_get_response_3.json';
 describe('QueryDetailsDiff.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(QueryDetailsDiff, {
-      propsData: {
+      props: {
         queries: [queryMockResponseA.query, queryMockResponseB.query]
       },
-      provide: {
-        showQueries: () => {
-          // Empty
+      global: {
+        provide: {
+          showQueries: () => {
+            // Empty
+          }
         }
       }
     });

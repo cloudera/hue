@@ -161,7 +161,7 @@
 </template>
 
 <script lang="ts">
-  import { Component, Inject, Prop, Vue } from 'vue-property-decorator';
+  import { defineComponent, PropType, inject } from 'vue';
 
   import HueButton from '../../../../../../components/HueButton.vue';
   import Tab from '../../../../../../components/Tab.vue';
@@ -184,7 +184,7 @@
 
   import { get } from 'lodash';
 
-  @Component({
+  export default defineComponent({
     components: {
       HueButton,
       Tab,
@@ -202,22 +202,39 @@
 
       LabeledInfo
     },
+
+    props: {
+      queries: {
+        type: Array as PropType<Query[]>,
+        required: true
+      }
+    },
+
+    setup() {
+      const showQueries: (() => void | undefined) | undefined = inject('showQueries');
+      return {
+        showQueries
+      };
+    },
+
+    data() {
+      return {
+        hideSimilarValues: false
+      };
+    },
+
+    computed: {
+      hasDiagnostics(): boolean {
+        return this.queries.some((query: Query) =>
+          query.dags.some((dag: Dag) => dag.dagDetails.diagnostics)
+        );
+      }
+    },
+
     methods: {
       get
     }
-  })
-  export default class QueryDetails extends Vue {
-    @Prop({ required: true }) queries!: Query[];
-    @Inject() showQueries?: () => void;
-
-    hideSimilarValues = false;
-
-    get hasDiagnostics(): boolean {
-      return this.queries.some((query: Query) =>
-        query.dags.some((dag: Dag) => dag.dagDetails.diagnostics)
-      );
-    }
-  }
+  });
 </script>
 
 <style lang="scss" scoped>
