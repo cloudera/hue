@@ -149,7 +149,7 @@ export interface Query {
   startTime: number;
   status: QueryStatus;
   tablesRead: Table[];
-  tablesWritten?: Table[];
+  tablesWritten: Table[];
   tablesReadWithDatabase?: string; // TODO: From API or adaption? type?
   tablesWrittenWithDatabase?: string; // TODO: From API or adaption? type?
   threadId: string;

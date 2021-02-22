@@ -8,98 +8,48 @@ exports[`QueryInfo.vue should render 1`] = `
     <div
       class="hue-info-box"
     >
-      <labeledinfo-stub
+      <labeled-info-stub
         label="Query"
-      >
-        <sql-text-stub
-          enableoverflow="true"
-          format="true"
-        />
-      </labeledinfo-stub>
+      />
     </div>
   </div>
-   
   <div>
     <div
       class="hue-info-box"
     >
-      <labeledinfo-stub
+      <labeled-info-stub
         label="Start Time"
-      >
-        <!---->
-      </labeledinfo-stub>
-       
-      <labeledinfo-stub
+      />
+      <labeled-info-stub
         label="End Time"
-      >
-        <!---->
-      </labeledinfo-stub>
-       
-      <labeledinfo-stub
+      />
+      <labeled-info-stub
         label="Duration"
-      >
-        <!---->
-      </labeledinfo-stub>
-       
-      <labeledinfo-stub
+      />
+      <labeled-info-stub
         label="Tables Read"
-      >
-        <tableslist-stub />
-      </labeledinfo-stub>
-       
-      <labeledinfo-stub
+      />
+      <labeled-info-stub
         label="Tables Written"
-      >
-        <tableslist-stub />
-      </labeledinfo-stub>
-       
-      <labeledinfo-stub
+      />
+      <labeled-info-stub
         label="Application ID"
-      >
-        
-        
-      
-      </labeledinfo-stub>
-       
-      <labeledinfo-stub
+      />
+      <labeled-info-stub
         label="DAG ID"
-      >
-        
-        
-      
-      </labeledinfo-stub>
-       
-      <labeledinfo-stub
+      />
+      <labeled-info-stub
         label="Session ID"
-      >
-        
-        
-      
-      </labeledinfo-stub>
-       
-      <labeledinfo-stub
+      />
+      <labeled-info-stub
         label="LLAP App ID"
-      >
-        
-        
-      
-      </labeledinfo-stub>
-       
-      <labeledinfo-stub
+      />
+      <labeled-info-stub
         label="Thread Id"
-      >
-        
-        
-      
-      </labeledinfo-stub>
-       
-      <labeledinfo-stub
+      />
+      <labeled-info-stub
         label="Queue"
-      >
-        <span>
-          None
-        </span>
-      </labeledinfo-stub>
+      />
     </div>
   </div>
 </div>

@@ -36,7 +36,7 @@
         </LabeledInfo>
 
         <LabeledInfo label="Duration">
-          <duration v-if="query.elapsedTime" :value="query.elapsedTime" />
+          <duration v-if="query.elapsedTime" :value="query.elapsedTime" :short="true" />
         </LabeledInfo>
 
         <LabeledInfo label="Tables Read">
@@ -77,8 +77,7 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import { Component, Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
 
   import Duration from '../../../../../../components/Duration.vue';
   import SqlText from '../../../../../../components/SqlText.vue';
@@ -88,16 +87,26 @@
 
   import { Query } from '..';
 
-  @Component({
-    components: { Duration, TimeAgo, SqlText, TablesList, LabeledInfo }
-  })
-  export default class QueryInfoTab extends Vue {
-    @Prop({ required: true })
-    query!: Query;
+  export default defineComponent({
+    components: {
+      Duration,
+      TimeAgo,
+      SqlText,
+      TablesList,
+      LabeledInfo
+    },
 
-    @Prop({ default: 'row' })
-    layout!: string;
-  }
+    props: {
+      query: {
+        type: Object as PropType<Query>,
+        required: true
+      },
+      layout: {
+        type: String as PropType<'row' | 'column'>,
+        default: 'row'
+      }
+    }
+  });
 </script>
 
 <style lang="scss" scoped>
