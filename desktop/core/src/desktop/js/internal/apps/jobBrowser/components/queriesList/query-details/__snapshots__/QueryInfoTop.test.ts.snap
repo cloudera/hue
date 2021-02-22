@@ -4,38 +4,17 @@ exports[`QueryInfoTop.vue should render 1`] = `
 <div
   class="hue-info-box"
 >
-  <labeledinfo-stub
+  <labeled-info-stub
     class="inline-info"
     label="Query ID"
-  >
-    
-    
-    
-    <a
-      class="fa fa-copy"
-      href="javascript:void(0);"
-    />
-  </labeledinfo-stub>
-   
-  <labeledinfo-stub
+  />
+  <labeled-info-stub
     class="inline-info"
     label="User"
-  >
-    
-    
-  
-  </labeledinfo-stub>
-   
-  <labeledinfo-stub
+  />
+  <labeled-info-stub
     class="inline-info"
     label="Status"
-  >
-    <statusindicator-stub
-      value="unknown"
-    />
-    
-    
-  
-  </labeledinfo-stub>
+  />
 </div>
 `;

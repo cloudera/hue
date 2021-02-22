@@ -23,7 +23,7 @@ import QueryInfoTop from './QueryInfoTop.vue';
 describe('QueryInfoTop.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(QueryInfoTop, {
-      propsData: {
+      props: {
         query: <Query>{
           details: {}
         }

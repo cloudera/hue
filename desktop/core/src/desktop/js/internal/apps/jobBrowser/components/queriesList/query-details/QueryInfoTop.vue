@@ -35,24 +35,32 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import { Component, Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
 
   import StatusIndicator from '../../../../../../components/StatusIndicator.vue';
   import LabeledInfo from '../components/LabeledInfo.vue';
 
   import { Query } from '..';
 
-  @Component({
-    components: { StatusIndicator, LabeledInfo }
-  })
-  export default class QueryInfoTab extends Vue {
-    @Prop({ required: true }) query!: Query;
+  export default defineComponent({
+    components: {
+      StatusIndicator,
+      LabeledInfo
+    },
 
-    copyQueryId(queryId: string): void {
-      navigator.clipboard.writeText(queryId);
+    props: {
+      query: {
+        type: Object as PropType<Query>,
+        required: true
+      }
+    },
+
+    methods: {
+      copyQueryId(queryId: string): void {
+        navigator.clipboard.writeText(queryId);
+      }
     }
-  }
+  });
 </script>
 
 <style lang="scss" scoped>
