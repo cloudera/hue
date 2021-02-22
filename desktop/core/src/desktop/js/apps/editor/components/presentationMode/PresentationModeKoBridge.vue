@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, PropType } from 'vue';
+  import { defineComponent, PropType, reactive, ref, toRefs } from 'vue';
 
   import { Variable } from 'apps/editor/components/variableSubstitution/types';
   import { IdentifierLocation } from 'parse/types';
@@ -46,95 +46,61 @@
     components: {
       PresentationMode
     },
-
     props: {
-      executor: {
-        type: Object as PropType<Executor | null>,
-        default: null
-      },
-
-      titleObservable: {
-        type: Object as PropType<KnockoutObservable<string | undefined>>,
-        default: undefined
-      },
       descriptionObservable: {
         type: Object as PropType<KnockoutObservable<string | undefined>>,
         default: undefined
       },
+      executor: {
+        type: Object as PropType<Executor | null>,
+        default: null
+      },
       initialVariables: {
         type: Object as PropType<Variable[]>,
         default: undefined
+      },
+      titleObservable: {
+        type: Object as PropType<KnockoutObservable<string | undefined>>,
+        default: undefined
       }
     },
+    setup(props) {
+      const subTracker = new SubscriptionTracker();
+      const { descriptionObservable, titleObservable } = toRefs(props);
 
-    setup(): {
-      subTracker: SubscriptionTracker;
-    } {
-      return {
-        subTracker: new SubscriptionTracker()
-      };
-    },
+      const description = ref<string | null>(null);
+      const locations = reactive<IdentifierLocation[]>([]);
+      const title = ref<string | null>(null);
 
-    data(): {
-      locations: IdentifierLocation[];
+      subTracker.trackObservable(descriptionObservable, description);
+      subTracker.trackObservable(titleObservable, title);
 
-      title: string | null;
-      description: string | null;
-
-      initialized: boolean;
-    } {
-      return {
-        locations: [],
-
-        title: null,
-        description: null,
-
-        initialized: false
-      };
-    },
-
-    updated(): void {
-      if (!this.initialized && this.titleObservable && this.descriptionObservable) {
-        this.title = this.titleObservable() || null;
-        this.subTracker.subscribe(this.titleObservable, (title?: string) => {
-          this.title = title || null;
-        });
-
-        this.description = this.descriptionObservable() || null;
-        this.subTracker.subscribe(this.descriptionObservable, (description?: string) => {
-          this.description = description || null;
-        });
-
-        this.subTracker.subscribe(
-          POST_FROM_LOCATION_WORKER_EVENT,
-          (e: { data?: { locations?: IdentifierLocation[] } }) => {
-            if (e.data && e.data.locations) {
-              this.locations = e.data.locations;
-            }
+      subTracker.subscribe(
+        POST_FROM_LOCATION_WORKER_EVENT,
+        (e: { data?: { locations?: IdentifierLocation[] } }) => {
+          if (e.data && e.data.locations) {
+            locations.splice(0, locations.length, ...e.data.locations);
           }
-        );
+        }
+      );
 
-        this.initialized = true;
-      }
+      return {
+        description,
+        locations,
+        title
+      };
     },
-
-    unmounted(): void {
-      this.subTracker.dispose();
-    },
-
     methods: {
       onBeforeExecute(executable: Executable): void {
         this.$el.dispatchEvent(
           new CustomEvent<Executable>('before-execute', { bubbles: true, detail: executable })
         );
       },
-
       onClose(): void {
         this.$el.dispatchEvent(
           new CustomEvent<void>('close', { bubbles: true })
         );
       },
-
       onVariablesChanged(variables: Variable[]): void {
         this.$el.dispatchEvent(
           new CustomEvent<Variable[]>('variables-changed', { bubbles: true, detail: variables })

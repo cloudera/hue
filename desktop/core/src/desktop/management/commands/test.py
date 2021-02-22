@@ -28,7 +28,7 @@ from django.test.utils import get_runner
 from django_nose import runner
 
 #import south.management.commands
-from django.utils import six
+import six
 from django.utils.translation import deactivate
 import sys
 import textwrap
@@ -38,57 +38,57 @@ from desktop import appmanager
 from desktop.lib import django_mako
 
 if six.PY3:
-    from types import SimpleNamespace
+  from types import SimpleNamespace
 else:
-    class SimpleNamespace(object):
-        pass
+  class SimpleNamespace(object):
+    pass
 
 class _TestState(object):
-    pass
+  pass
 
 
 def setup_test_environment(debug=None):
-    """
-    Perform global pre-test setup, such as installing the instrumented template
-    renderer and setting the email backend to the locmem email backend.
-    """
-    if hasattr(_TestState, 'saved_data'):
-        # Executing this function twice would overwrite the saved values.
-        raise RuntimeError(
-            "setup_test_environment() was already called and can't be called "
-            "again without first calling teardown_test_environment()."
-        )
+  """
+  Perform global pre-test setup, such as installing the instrumented template
+  renderer and setting the email backend to the locmem email backend.
+  """
+  if hasattr(_TestState, 'saved_data'):
+    # Executing this function twice would overwrite the saved values.
+    raise RuntimeError(
+        "setup_test_environment() was already called and can't be called "
+        "again without first calling teardown_test_environment()."
+    )
 
-    if debug is None:
-        debug = settings.DEBUG
+  if debug is None:
+    debug = settings.DEBUG
 
-    saved_data = SimpleNamespace()
-    _TestState.saved_data = saved_data
+  saved_data = SimpleNamespace()
+  _TestState.saved_data = saved_data
 
-    saved_data.allowed_hosts = settings.ALLOWED_HOSTS
-    # Add the default host of the test client.
-    settings.ALLOWED_HOSTS = list(settings.ALLOWED_HOSTS) + ['testserver']
+  saved_data.allowed_hosts = settings.ALLOWED_HOSTS
+  # Add the default host of the test client.
+  settings.ALLOWED_HOSTS = list(settings.ALLOWED_HOSTS) + ['testserver']
 
-    saved_data.debug = settings.DEBUG
-    settings.DEBUG = debug
+  saved_data.debug = settings.DEBUG
+  settings.DEBUG = debug
 
-    django_mako.render_to_string = django_mako.render_to_string_test
+  django_mako.render_to_string = django_mako.render_to_string_test
 
-    deactivate()
+  deactivate()
 
 
 def teardown_test_environment():
-    """
-    Perform any global post-test teardown, such as restoring the original
-    template renderer and restoring the email sending functions.
-    """
-    saved_data = _TestState.saved_data
+  """
+  Perform any global post-test teardown, such as restoring the original
+  template renderer and restoring the email sending functions.
+  """
+  saved_data = _TestState.saved_data
 
-    settings.ALLOWED_HOSTS = saved_data.allowed_hosts
-    settings.DEBUG = saved_data.debug
-    django_mako.render_to_string = django_mako.render_to_string_normal
+  settings.ALLOWED_HOSTS = saved_data.allowed_hosts
+  settings.DEBUG = saved_data.debug
+  django_mako.render_to_string = django_mako.render_to_string_normal
 
-    del _TestState.saved_data
+  del _TestState.saved_data
 
 
 class Command(BaseCommand):
@@ -103,8 +103,8 @@ class Command(BaseCommand):
       specific      Explicitly run specific tests using nose.
                     For example, to run all the filebrower tests or
                     to run a specific test function, use
-                       test specific filebrowser
-                       test specific useradmin.tests:test_user_admin
+                        test specific filebrowser
+                        test specific useradmin.tests:test_user_admin
                     All additional arguments are passed directly to nose.
 
       list_modules  List test modules for all desktop applications and libraries
@@ -141,7 +141,7 @@ class Command(BaseCommand):
       sys.exit(1)
 
     nose_args = None
-    all_apps = [ app.module.__name__ for app in appmanager.DESKTOP_MODULES ]
+    all_apps = [app.module.__name__ for app in appmanager.DESKTOP_MODULES]
 
     if args[0] == "all":
       nose_args = args + all_apps

@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, PropType } from 'vue';
+  import { defineComponent, PropType, ref, toRefs } from 'vue';
 
   import { wrap } from 'vue/webComponentWrap';
 
@@ -34,41 +34,23 @@
     components: {
       ResultTable
     },
-
     props: {
       executableObservable: {
         type: Object as PropType<KnockoutObservable<SqlExecutable | null>> | null,
         default: null
       }
     },
-
-    setup() {
+    setup(props) {
       const subTracker = new SubscriptionTracker();
-      return { subTracker };
-    },
+      const { executableObservable } = toRefs(props);
 
-    data(): {
-      initialized: boolean;
-      executable: SqlExecutable | null;
-    } {
+      const executable = ref<SqlExecutable | null>(null);
+
+      subTracker.trackObservable(executableObservable, executable);
+
       return {
-        initialized: false,
-        executable: null
+        executable
       };
-    },
-
-    updated(): void {
-      if (!this.initialized && this.executableObservable) {
-        this.executable = this.executableObservable() || null;
-        this.subTracker.subscribe(this.executableObservable, executable => {
-          this.executable = executable || null;
-        });
-        this.initialized = true;
-      }
-    },
-
-    unmounted(): void {
-      this.subTracker.dispose();
     }
   });
 
