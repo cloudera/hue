@@ -285,8 +285,8 @@
         this.focusedProcess = undefined;
       },
 
-      click(type: string, process: Process, options: unknown): void {
-        // this.sendAction('click', type, process, options);
+      click(): void {
+        // Received params - type: string, process: Process, options: unknown
       }
     }
   });
