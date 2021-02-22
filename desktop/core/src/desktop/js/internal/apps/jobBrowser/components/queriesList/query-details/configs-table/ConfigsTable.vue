@@ -24,12 +24,15 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
 
-  import { Column, Row } from '../../../../../../../components/HueTable';
+  import { Column } from '../../../../../../../components/HueTable';
   import HueTable from '../../../../../../../components/HueTable.vue';
 
   import ConfigSet from './ConfigSet';
+
+  //TODO: Must be imported from components/HueTable.d
+  type Row = { [key: string]: unknown };
 
   const DEFAULT_VALUE_COLUMN_TITLE = 'Config Value';
   const NAME_COLUMNS: Column<Row>[] = [
@@ -39,69 +42,83 @@
     }
   ];
 
-  @Component({
+  export default defineComponent({
     components: {
       HueTable
-    }
-  })
-  export default class ConfigsTable extends Vue {
-    @Prop({ required: true }) configs!: ConfigSet[];
-    @Prop({ default: false }) hideSimilarValues!: boolean;
+    },
 
-    generateValueColumnkey(index: number): string {
-      return `configSet_${index}`;
-    }
-
-    get columns(): Column<Row>[] {
-      const valueColumns: Column<Row>[] = [];
-
-      this.configs.forEach((configSet: ConfigSet, index: number) => {
-        valueColumns.push({
-          label: configSet.title || DEFAULT_VALUE_COLUMN_TITLE,
-          key: this.generateValueColumnkey(index),
-          headerCssClass: configSet.cssClass,
-          cssClass: configSet.cssClass
-        });
-      });
-
-      return NAME_COLUMNS.concat(valueColumns);
-    }
-
-    countValues(row: Row, valueCount: number): number {
-      const values: Set<string | unknown> = new Set();
-      for (let i = 0; i < valueCount; i++) {
-        values.add(row[this.generateValueColumnkey(i)]);
+    props: {
+      configs: {
+        type: Object as PropType<ConfigSet[]>,
+        required: true
+      },
+      hideSimilarValues: {
+        type: Boolean,
+        default: false
       }
-      return values.size;
-    }
+    },
 
-    get rows(): Row[] {
-      const rowHash: Map<string, Row> = new Map();
-      let rows: Row[];
+    computed: {
+      rows(): Row[] {
+        const rowHash: Map<string, Row> = new Map();
+        let rows: Row[];
 
-      const configs = this.configs.filter((configSet: ConfigSet) => configSet.configs);
-      configs.forEach((configSet: ConfigSet, index: number) => {
-        const configKey: string = this.generateValueColumnkey(index);
+        const configs = this.configs.filter((configSet: ConfigSet) => configSet.configs);
+        configs.forEach((configSet: ConfigSet, index: number) => {
+          const configKey: string = this.generateValueColumnkey(index);
 
-        for (const configName in configSet.configs) {
-          let row: Row | undefined = rowHash.get(configName);
-          if (!row) {
-            row = { configName };
-            rowHash.set(configName, row);
+          for (const configName in configSet.configs) {
+            let row: Row | undefined = rowHash.get(configName);
+            if (!row) {
+              row = { configName };
+              rowHash.set(configName, row);
+            }
+            row[configKey] = configSet.configs[configName];
           }
-          row[configKey] = configSet.configs[configName];
-        }
-      });
-
-      rows = Array.from(rowHash.values());
-
-      if (this.hideSimilarValues) {
-        rows = rows.filter((row: Row) => {
-          return this.countValues(row, this.configs.length) > 1;
         });
-      }
 
-      return rows;
+        rows = Array.from(rowHash.values());
+
+        if (this.hideSimilarValues) {
+          rows = rows.filter((row: Row) => this.areDifferent(row, this.configs.length));
+        }
+
+        return rows;
+      },
+
+      columns(): Column<Row>[] {
+        const valueColumns: Column<Row>[] = [];
+
+        this.configs.forEach((configSet: ConfigSet, index: number) => {
+          valueColumns.push({
+            label: configSet.title || DEFAULT_VALUE_COLUMN_TITLE,
+            key: this.generateValueColumnkey(index),
+            headerCssClass: configSet.cssClass,
+            cssClass: configSet.cssClass
+          });
+        });
+
+        return NAME_COLUMNS.concat(valueColumns);
+      }
+    },
+
+    methods: {
+      generateValueColumnkey(index: number): string {
+        return `configSet_${index}`;
+      },
+
+      areDifferent(row: Row, valueCount: number): boolean {
+        if (valueCount > 1) {
+          const firstVal = row[this.generateValueColumnkey(0)];
+          for (let i = 1; i < valueCount; i++) {
+            if (row[this.generateValueColumnkey(i)] !== firstVal) {
+              return true;
+            }
+          }
+          return false;
+        }
+        return true;
+      }
     }
-  }
+  });
 </script>
