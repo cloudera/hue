@@ -88,10 +88,42 @@ import Tip from './tip';
  *
  */
 
-export default function createGraphView() {
+export interface GraphView {
+  create: (component: any, element: HTMLElement, data: any) => void;
+  fitGraph: () => void;
+  additionalDisplay: (hide: boolean) => void;
+  toggleLayouts: () => boolean;
+}
+
+interface Pos {
+  x: number;
+  y: number;
+}
+
+interface Layout {
+  hSpacing: number;
+  vSpacing: number;
+  depthSpacing: number;
+  linkDelta: number;
+  projector: (x: number, y: number) => Pos;
+  pathFormatter: (
+    mx: number,
+    my: number,
+    q1x1: number,
+    q1y1: number,
+    q1x: number,
+    q1y: number,
+    q2x1: number,
+    q2y1: number,
+    q2x: number,
+    q2y: number
+  ) => string;
+}
+
+export default function createGraphView(): GraphView {
   const PADDING = 30; // Adding to be applied on the svg view
 
-  const LAYOUTS = {
+  const LAYOUTS: { [name: string]: Layout } = {
     // The view supports two layouts - left to right and top to bottom.
     leftToRight: {
       hSpacing: 180, // Horizontal spacing between nodes
@@ -162,7 +194,7 @@ export default function createGraphView() {
   let _data = null; // Data object created by data processor
   let _treeData = null; // Points to root data node of the tree structure
   let _treeLayout = null; // Instance of d3 tree layout helper
-  let _layout = null; // Current layout, one of the values defined in LAYOUTS object
+  let _layout: Layout = null; // Current layout, one of the values defined in LAYOUTS object
 
   let _svg = null; // jQuery instance of svg DOM element
   let _g = null; // For pan and zoom: Svg DOM group element that encloses all the displayed items
@@ -1000,7 +1032,7 @@ export default function createGraphView() {
     /**
      * Toggle graph layouts between the available options
      */
-    toggleLayouts: function () {
+    toggleLayouts: function (): boolean {
       _setLayout(_layout === LAYOUTS.topToBottom ? LAYOUTS.leftToRight : LAYOUTS.topToBottom);
       return _layout === LAYOUTS.topToBottom;
     }

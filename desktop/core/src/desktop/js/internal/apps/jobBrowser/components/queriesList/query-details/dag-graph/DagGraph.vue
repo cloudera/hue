@@ -156,100 +156,113 @@
         <div class="tip-list" />
       </div>
     </div>
-    <!-- <div id="dialog-container"></div> -->
   </div>
 </template>
 
 <script lang="ts">
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
-  /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
-
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
   import { get } from 'lodash';
 
-  import { Dag } from '../../index';
+  import { Dag, DagPlan, Vertex, DagPlanVertex } from '../../index';
   import { toggleFullScreen } from 'utils/hueUtils';
   import { graphifyData } from './data-processor';
   import createGraphView from './graph-view';
 
   import './dag-graph.scss';
 
-  // TODO: Refactor - This is just a direct port from Ember.js and many things can be improved using Vue.js features
-
-  @Component
-  export default class DagGraph extends Vue {
-    @Prop({ required: true }) dag!: Dag;
-
-    vertices!: any[];
-    edges!: any;
-    vertexGroups!: any[];
-
-    graphView: any = null;
-
-    pathname = window.location.pathname + window.location.search;
-
-    errMessage = '';
-
-    // Butto controls
-    isHorizontal = false;
-    hideAdditionals = false;
-    isFullscreen = false;
-
-    /**
-     * dagPlanVertices - Contains vertex relation details - Edge Ids and additional Inputs / Outputs etc
-     * eventVertices - Contains complete vertex information from vertex events
-     * We combine both and create an array of vertices with all details
-     */
-    combineVertexData(dagPlanVertices: any[], eventVertices: any[]): any[] {
-      const verticesHash: Map<string, any> = new Map();
-
-      dagPlanVertices.forEach((vertex: any) => {
-        verticesHash.set(vertex.vertexName, { ...vertex });
-      });
-
-      eventVertices.forEach((vertex: any) => {
-        verticesHash.get(vertex.name).data = vertex;
-      });
-
-      return Array.from(verticesHash.values());
-    }
-
-    created(): void {
-      if (get(this, 'dag.dagDetails.dagPlan') && get(this, 'dag.vertices')) {
-        const dagPlan: any = this.dag.dagDetails.dagPlan;
-        this.vertices = this.combineVertexData(dagPlan.vertices, this.dag.vertices);
-        this.edges = dagPlan.edges;
-        this.vertexGroups = dagPlan.vertexGroups;
+  export default defineComponent({
+    props: {
+      dag: {
+        type: Object as PropType<Dag>,
+        required: true
       }
-    }
+    },
 
-    // Actions
-    tglOrientation(): void {
-      const isTopBottom = this.graphView.toggleLayouts();
-      this.isHorizontal = !isTopBottom;
-    }
-    tglAdditionals(): void {
-      this.hideAdditionals = !this.hideAdditionals;
-      this.graphView.additionalDisplay(this.hideAdditionals);
-    }
-    fullscreen(): void {
-      this.isFullscreen = !this.isFullscreen;
-      toggleFullScreen(this.$el);
-    }
-    fitGraph(): void {
-      this.graphView.fitGraph();
-    }
+    setup() {
+      return {
+        graphView: createGraphView(),
+        pathname: window.location.pathname + window.location.search
+      };
+    },
+
+    data() {
+      let vertices: DagPlanVertex[] | undefined = undefined;
+      let edges: unknown[] | undefined = undefined;
+      let vertexGroups: unknown[] | undefined = undefined;
+
+      if (get(this, 'dag.dagDetails.dagPlan') && get(this, 'dag.vertices')) {
+        const dagPlan: DagPlan = this.dag.dagDetails.dagPlan;
+        vertices = this.combineVertexData(dagPlan.vertices, this.dag.vertices);
+        edges = dagPlan.edges;
+        vertexGroups = dagPlan.vertexGroups;
+      }
+
+      return {
+        errMessage: '',
+
+        vertices,
+        edges,
+        vertexGroups,
+
+        isHorizontal: false,
+        hideAdditionals: false,
+        isFullscreen: false
+      };
+    },
 
     mounted(): void {
       if (!this.vertices) {
         this.errMessage = 'Vertices not found!';
-      } else if (!this.vertices.find((vertex: any) => !vertex.outEdgeIds)) {
+      } else if (!this.vertices.find((vertex: DagPlanVertex) => !vertex.outEdgeIds)) {
         this.errMessage = 'Sink vertex not found!';
       } else {
-        this.graphView = createGraphView();
         const graph = graphifyData(this.vertices, this.edges, this.vertexGroups);
         this.graphView.create(this, this.$el, graph);
       }
+    },
+
+    methods: {
+      /**
+       * dagPlanVertices - Contains vertex relation details - Edge Ids and additional Inputs / Outputs etc
+       * eventVertices - Contains complete vertex information from vertex events
+       * We combine both and create an array of vertices with all details
+       */
+      combineVertexData(
+        dagPlanVertices: DagPlanVertex[],
+        eventVertices: Vertex[]
+      ): DagPlanVertex[] {
+        const verticesHash: Map<string, DagPlanVertex> = new Map();
+
+        dagPlanVertices.forEach((vertex: DagPlanVertex) => {
+          verticesHash.set(vertex.vertexName, { ...vertex });
+        });
+
+        eventVertices.forEach((vertex: Vertex) => {
+          const dpVertex: DagPlanVertex | undefined = verticesHash.get(vertex.name);
+          if (dpVertex) {
+            dpVertex.data = vertex;
+          }
+        });
+
+        return Array.from(verticesHash.values());
+      },
+
+      // Actions
+      tglOrientation(): void {
+        const isTopBottom = this.graphView.toggleLayouts();
+        this.isHorizontal = !isTopBottom;
+      },
+      tglAdditionals(): void {
+        this.hideAdditionals = !this.hideAdditionals;
+        this.graphView.additionalDisplay(this.hideAdditionals);
+      },
+      fullscreen(): void {
+        this.isFullscreen = !this.isFullscreen;
+        toggleFullScreen(this.$el);
+      },
+      fitGraph(): void {
+        this.graphView.fitGraph();
+      }
     }
-  }
+  });
 </script>

@@ -57,6 +57,20 @@ export interface Vertex {
   };
 }
 
+export interface DagPlanVertex {
+  vertexName: string;
+
+  outEdgeIds: unknown[];
+
+  data: Vertex;
+}
+
+export interface DagPlan {
+  vertices: DagPlanVertex[];
+  edges: unknown[];
+  vertexGroups: unknown[];
+}
+
 // TODO: Flatten and cleanup DAG object
 export interface Dag {
   dagInfo: {
@@ -69,7 +83,7 @@ export interface Dag {
   };
   dagDetails: {
     counters: CounterGroup[];
-    dagPlan: unknown; // TODO: type?
+    dagPlan: DagPlan;
     diagnostics: string;
     hiveQueryId: number;
     id: number;

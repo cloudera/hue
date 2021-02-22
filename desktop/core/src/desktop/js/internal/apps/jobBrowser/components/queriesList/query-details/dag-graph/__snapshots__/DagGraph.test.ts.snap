@@ -15,57 +15,51 @@ exports[`DagGraph.vue should render 1`] = `
           id="vertex-bg"
           rx="5"
           ry="5"
-          style="fill: url(/hue#vertex-grad);"
+          style="fill: url(/hue#vertex-grad); filter: url(/hue#grey-glow);"
           width="80"
           x="-40"
           y="-15"
         />
-         
         <rect
           class="input-node-bg"
           height="30"
           id="input-bg"
           rx="15"
           ry="15"
-          style="fill: url(/hue#input-grad);"
+          style="fill: url(/hue#input-grad); filter: url(/hue#grey-glow);"
           width="80"
           x="-40"
           y="-15"
         />
-         
         <rect
           class="output-node-bg"
           height="30"
           id="output-bg"
           rx="15"
           ry="15"
-          style="fill: url(/hue#output-grad);"
+          style="fill: url(/hue#output-grad); filter: url(/hue#grey-glow);"
           width="80"
           x="-40"
           y="-15"
         />
-         
         <circle
           class="task-bubble-bg"
           id="task-bubble"
           r="10"
-          style="fill: url(/hue#task-grad);"
+          style="fill: url(/hue#task-grad); filter: url(/hue#grey-glow);"
         />
-         
         <circle
           class="input-node-bg"
           id="io-bubble"
           r="10"
-          style="fill: url(/hue#input-grad);"
+          style="fill: url(/hue#input-grad); filter: url(/hue#grey-glow);"
         />
-         
         <circle
           class="group-bubble-bg"
           id="group-bubble"
           r="8"
-          style="fill: url(/hue#group-grad);"
+          style="fill: url(/hue#group-grad); filter: url(/hue#grey-glow);"
         />
-         
         <marker
           id="arrow-marker"
           markerHeight="2"
@@ -78,7 +72,6 @@ exports[`DagGraph.vue should render 1`] = `
             style="fill: #aaa;"
           />
         </marker>
-         
         <radialgradient
           cx="50%"
           cy="50%"
@@ -91,13 +84,11 @@ exports[`DagGraph.vue should render 1`] = `
             offset="0%"
             style="stop-color: rgb(176, 196, 222);"
           />
-           
           <stop
             offset="100%"
             style="stop-color: rgb(118, 156, 205);"
           />
         </radialgradient>
-         
         <radialgradient
           cx="50%"
           cy="50%"
@@ -110,13 +101,11 @@ exports[`DagGraph.vue should render 1`] = `
             offset="0%"
             style="stop-color: rgb(173, 255, 46);"
           />
-           
           <stop
             offset="100%"
             style="stop-color: rgb(145, 215, 35);"
           />
         </radialgradient>
-         
         <radialgradient
           cx="50%"
           cy="50%"
@@ -129,13 +118,11 @@ exports[`DagGraph.vue should render 1`] = `
             offset="0%"
             style="stop-color: rgb(250, 128, 114);"
           />
-           
           <stop
             offset="100%"
             style="stop-color: rgb(210, 100, 87);"
           />
         </radialgradient>
-         
         <radialgradient
           cx="50%"
           cy="50%"
@@ -148,13 +135,11 @@ exports[`DagGraph.vue should render 1`] = `
             offset="0%"
             style="stop-color: rgb(208, 191, 209);"
           />
-           
           <stop
             offset="100%"
             style="stop-color: rgb(175, 143, 177);"
           />
         </radialgradient>
-         
         <radialgradient
           cx="50%"
           cy="50%"
@@ -167,34 +152,29 @@ exports[`DagGraph.vue should render 1`] = `
             offset="0%"
             style="stop-color: rgb(187, 187, 187);"
           />
-           
           <stop
             offset="100%"
             style="stop-color: rgb(153, 153, 153);"
           />
         </radialgradient>
-         
         <filter
           id="grey-glow"
         >
           <fecolormatrix
             type="matrix"
             values="0 0 0 0   0
-                    0 0 0 0   0
-                    0 0 0 0   0
-                    0 0 0 0.3 0"
+                      0 0 0 0   0
+                      0 0 0 0   0
+                      0 0 0 0.3 0"
           />
-           
           <fegaussianblur
             result="coloredBlur"
             stdDeviation="2.5"
           />
-           
           <femerge>
             <femergenode
               in="coloredBlur"
             />
-             
             <femergenode
               in="SourceGraphic"
             />
@@ -433,7 +413,6 @@ exports[`DagGraph.vue should render 1`] = `
       </g>
     </svg>
   </div>
-   
   <div
     class="button-panel"
   >
@@ -441,23 +420,19 @@ exports[`DagGraph.vue should render 1`] = `
       class="tgl-additionals fa fa-circle "
       title="Toggle source/sink visibility"
     />
-     
     <em
       class="tgl-orientation fa fa-share-alt fa-rotate-180"
       title="Toggle orientation"
     />
-     
     <em
       class="fit-graph fa fa-arrows-alt"
       title="Fit DAG to viewport"
     />
-     
     <em
       class="tgl-fullscreen fa fa-expand"
       title="Toggle fullscreen"
     />
   </div>
-   
   <div
     class="tool-tip"
   >
@@ -469,11 +444,9 @@ exports[`DagGraph.vue should render 1`] = `
       >
         Title
       </div>
-       
       <div
         class="tip-text"
       />
-       
       <div
         class="tip-list"
       />
