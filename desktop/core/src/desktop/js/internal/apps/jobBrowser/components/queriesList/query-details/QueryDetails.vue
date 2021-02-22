@@ -43,27 +43,27 @@
           <VisualExplain :query="query" />
         </tab>
         <tab title="Timeline">
-          <HiveTimeline :perf="query.details.perf" />
+          <HiveTimeline :perf="query.details && query.details.perf" />
         </tab>
         <tab title="Query Config">
-          <ConfigsTable :configs="[{ configs: query.details.configuration }]" />
+          <ConfigsTable :configs="[{ configs: query.details && query.details.configuration }]" />
         </tab>
 
         <template v-if="query.dags.length">
           <!-- DAG Tabs -->
           <tab :title="'DAG Info' + (hasDiagnostics ? ' *' : '')" class="hue-layout-column">
-            <div v-for="dag in query.dags" :key="dag.dagInfo.id">
+            <div v-for="dag in query.dags" :key="dag.dagInfo.dagId">
               <DagInfo :dag="dag" />
             </div>
           </tab>
           <tab title="DAG Flow" class="hue-layout-column">
-            <div v-for="dag in query.dags" :key="dag.dagInfo.id">
+            <div v-for="dag in query.dags" :key="dag.dagInfo.dagId">
               <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
               <DagGraph :dag="dag" />
             </div>
           </tab>
           <tab title="DAG Swimlane" class="hue-layout-column">
-            <div v-for="dag in query.dags" :key="dag.dagInfo.id">
+            <div v-for="dag in query.dags" :key="dag.dagInfo.dagId">
               <LabeledInfo label="DAG">{{ dag.dagInfo.dagId }}</LabeledInfo>
               <DagSwimlane :dag="dag" />
             </div>
@@ -95,8 +95,7 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import { Component, Inject, Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType, inject } from 'vue';
 
   import HueButton from '../../../../../../components/HueButton.vue';
   import Tab from '../../../../../../components/Tab.vue';
@@ -116,15 +115,9 @@
   import QueryKillButton from '../components/QueryKillButton.vue';
 
   import { Query, Dag } from '../index';
+  import { hueWindow } from 'types/types';
 
-  // TODO: Move it to a better place
-  declare global {
-    interface Window {
-      HUE_BASE_URL: string;
-    }
-  }
-
-  @Component({
+  export default defineComponent({
     components: {
       Tab,
       Tabs,
@@ -142,21 +135,33 @@
 
       QueryKillButton,
       LabeledInfo
+    },
+
+    props: {
+      query: {
+        type: Object as PropType<Query>,
+        required: true
+      }
+    },
+
+    emits: ['reload'],
+
+    setup(): {
+      showQueries?: () => void;
+      HUE_BASE_URL?: string;
+    } {
+      return {
+        showQueries: inject('showQueries'),
+        HUE_BASE_URL: (<hueWindow>window).HUE_BASE_URL
+      };
+    },
+
+    computed: {
+      hasDiagnostics(): boolean {
+        return this.query.dags.some((dag: Dag) => dag.dagDetails.diagnostics);
+      }
     }
-  })
-  export default class QueryDetails extends Vue {
-    @Prop({ required: true })
-    query!: Query;
-
-    @Inject()
-    showQueries?: () => void;
-
-    get hasDiagnostics(): boolean {
-      return this.query.dags.some((dag: Dag) => dag.dagDetails.diagnostics);
-    }
-
-    HUE_BASE_URL = window.HUE_BASE_URL;
-  }
+  });
 </script>
 
 <style lang="scss" scoped>

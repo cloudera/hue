@@ -25,9 +25,11 @@ describe('QueryDetails.vue', () => {
       propsData: {
         query: queryMockResponse.query
       },
-      provide: {
-        showQueries: () => {
-          // Empty
+      global: {
+        provide: {
+          showQueries: () => {
+            // Empty
+          }
         }
       }
     });
