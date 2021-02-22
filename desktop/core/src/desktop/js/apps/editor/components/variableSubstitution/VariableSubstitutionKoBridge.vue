@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, PropType } from 'vue';
+  import { defineComponent, PropType, reactive } from 'vue';
 
   import { wrap } from 'vue/webComponentWrap';
 
@@ -41,41 +41,26 @@
     components: {
       VariableSubstitution
     },
-
     props: {
       initialVariables: {
         type: Object as PropType<Variable[]>,
         default: undefined
       }
     },
+    setup() {
+      const subTracker = new SubscriptionTracker();
 
-    setup(): {
-      subTracker: SubscriptionTracker;
-    } {
-      return {
-        subTracker: new SubscriptionTracker()
-      };
-    },
+      const locations = reactive<IdentifierLocation[]>([]);
 
-    data(): {
-      locations: IdentifierLocation[];
-    } {
-      return {
-        locations: []
-      };
-    },
-
-    mounted(): void {
-      this.subTracker.subscribe(
+      subTracker.subscribe(
         POST_FROM_LOCATION_WORKER_EVENT,
         (e: { data?: { locations?: IdentifierLocation[] } }) => {
           if (e.data && e.data.locations) {
-            this.locations = e.data.locations;
+            locations.splice(0, locations.length, ...e.data.locations);
           }
         }
       );
     },
-
     methods: {
       onVariablesChanged(variables: Variable[]): void {
         this.$el.dispatchEvent(

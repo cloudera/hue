@@ -78,7 +78,7 @@
         default: () => ({})
       },
       fieldLabel: {
-        type: Object as PropType<string | null>,
+        type: String as PropType<string | null>,
         required: false,
         default: null
       },

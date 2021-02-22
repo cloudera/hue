@@ -25,8 +25,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, PropType } from 'vue';
-
+  import { defineComponent, PropType, ref, toRefs } from 'vue';
   import { wrap } from 'vue/webComponentWrap';
 
   import ExecutionAnalysisPanel from './ExecutionAnalysisPanel.vue';
@@ -38,40 +37,22 @@
     components: {
       ExecutionAnalysisPanel
     },
-
     props: {
       executableObservable: {
         type: Object as PropType<KnockoutObservable<SqlExecutable | undefined>> | null,
         default: null
       }
     },
-
-    setup() {
+    setup(props) {
       const subTracker = new SubscriptionTracker();
-      return { subTracker };
-    },
+      const { executableObservable } = toRefs(props);
 
-    data() {
-      return {
-        initialized: false,
-        executable: null as SqlExecutable | null
-      };
-    },
+      const executable = ref<SqlExecutable | null>(null);
 
-    updated(): void {
-      if (!this.initialized && this.executableObservable) {
-        this.executable = this.executableObservable() || null;
-        this.subTracker.subscribe(this.executableObservable, executable => {
-          this.executable = executable || null;
-        });
-        this.initialized = true;
-      }
-    },
+      subTracker.trackObservable(executableObservable, executable);
 
-    unmounted(): void {
-      this.subTracker.dispose();
+      return { executable };
     },
-
     methods: {
       onExecutionError(): void {
         this.$el.dispatchEvent(new CustomEvent('execution-error', { bubbles: true }));
