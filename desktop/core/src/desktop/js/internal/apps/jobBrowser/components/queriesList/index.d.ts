@@ -16,6 +16,9 @@
  * limitations under the License.
  */
 
+// Todo: Move upstream
+export type KeyHash<T> = { [key: string]: T };
+
 export interface CounterDetails {
   counterName: string;
   counterValue: string;

@@ -22,7 +22,7 @@ import queryMockResponse from '../../test/api/hive_query_get_response_3.json';
 describe('DagSwimlane.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(DagSwimlane, {
-      propsData: {
+      props: {
         dag: queryMockResponse.query.dags[0]
       }
     });

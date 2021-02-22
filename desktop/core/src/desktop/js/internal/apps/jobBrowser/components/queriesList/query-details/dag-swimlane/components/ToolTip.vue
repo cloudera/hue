@@ -22,7 +22,7 @@
       <div class="tool-tip-title">
         {{ content.title }}
       </div>
-      <div class="tool-tip-properties">
+      <div v-if="content.properties" class="tool-tip-properties">
         <div v-for="prop in content.properties" :key="prop.name" class="tool-tip-prop">
           {{ prop.name }}&nbsp;:&nbsp;
           {{ prop.type === 'time' ? new Date(prop.value).toUTCString() : prop.value }}
@@ -33,38 +33,43 @@
 </template>
 
 <script lang="ts">
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
-  /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+  import { defineComponent, PropType } from 'vue';
 
   import $ from 'jquery';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { TooltipContent } from '../libs/Process';
 
-  @Component
-  export default class ToolTip extends Vue {
-    @Prop() contents: any;
+  export default defineComponent({
+    props: {
+      contents: {
+        type: Object as PropType<TooltipContent[] | null>,
+        default: null
+      }
+    },
 
-    mounted(): void {
-      document.addEventListener('mousemove', this.onMouseMove, false);
-    }
-    beforeDestroy(): void {
-      document.removeEventListener('mousemove', this.onMouseMove, false);
-    }
+    methods: {
+      mounted(): void {
+        document.addEventListener('mousemove', this.onMouseMove, false);
+      },
+      beforeDestroy(): void {
+        document.removeEventListener('mousemove', this.onMouseMove, false);
+      },
 
-    onMouseMove(event: MouseEvent): void {
-      if (this.contents != null) {
-        let offsetX = 0;
-        if (event.clientX > window.innerWidth / 2) {
-          offsetX = this.$el.getBoundingClientRect().width;
+      onMouseMove(event: MouseEvent): void {
+        if (this.contents != null) {
+          let offsetX = 0;
+          if (event.clientX > window.innerWidth / 2) {
+            offsetX = this.$el.getBoundingClientRect().width;
+          }
+
+          $(this.$el).css({
+            visibility: 'visible',
+            left: event.clientX - offsetX,
+            top: event.clientY
+          });
         }
-
-        $(this.$el).css({
-          visibility: 'visible',
-          left: event.clientX - offsetX,
-          top: event.clientY
-        });
       }
     }
-  }
+  });
 </script>
 
 <style lang="scss" scoped>

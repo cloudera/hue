@@ -23,31 +23,36 @@
 </template>
 
 <script lang="ts">
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
-  /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+  import { defineComponent, PropType } from 'vue';
 
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import Process from '../libs/Process';
 
-  @Component
-  export default class ProcessName extends Vue {
-    @Prop() process: any;
+  export default defineComponent({
+    props: {
+      process: {
+        type: Object as PropType<Process>,
+        required: true
+      }
+    },
 
-    sendMouseAction(name: string, mouseEvent: MouseEvent): void {
-      this.$emit(name, 'process-name', this.process, {
-        mouseEvent: mouseEvent
-      });
+    methods: {
+      sendMouseAction(name: string, mouseEvent: MouseEvent): void {
+        this.$emit(name, 'process-name', this.process, {
+          mouseEvent: mouseEvent
+        });
+      },
+
+      mouseEnter(mouseEvent: MouseEvent): void {
+        this.sendMouseAction('showTooltip', mouseEvent);
+      },
+
+      mouseLeave(mouseEvent: MouseEvent): void {
+        this.sendMouseAction('hideTooltip', mouseEvent);
+      },
+
+      mouseUp(mouseEvent: MouseEvent): void {
+        this.sendMouseAction('click', mouseEvent);
+      }
     }
-
-    mouseEnter(mouseEvent: MouseEvent): void {
-      this.sendMouseAction('showTooltip', mouseEvent);
-    }
-
-    mouseLeave(mouseEvent: MouseEvent): void {
-      this.sendMouseAction('hideTooltip', mouseEvent);
-    }
-
-    mouseUp(mouseEvent: MouseEvent): void {
-      this.sendMouseAction('click', mouseEvent);
-    }
-  }
+  });
 </script>

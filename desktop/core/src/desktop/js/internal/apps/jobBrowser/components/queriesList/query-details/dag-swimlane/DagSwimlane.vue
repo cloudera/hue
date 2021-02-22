@@ -67,11 +67,8 @@
 </template>
 
 <script lang="ts">
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
-  /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
-
-  import { Component, Prop, Vue } from 'vue-property-decorator';
-  import { Dag } from '../../index';
+  import { defineComponent, PropType } from 'vue';
+  import { Dag, KeyHash } from '../../index';
 
   import ToolTip from './components/ToolTip.vue';
   import ProcessName from './components/ProcessName.vue';
@@ -81,85 +78,137 @@
   import { createProcesses } from './libs/VertexProcess';
 
   import Processor from './libs/Processor';
-  import Process from './libs/Process';
+  import Process, { TooltipContent } from './libs/Process';
 
   import './dag-swimlane.scss';
 
-  // TODO: Refactor - This is just a direct port from Ember.js and many things can be optimised using Vue.js features
   // TODO: Use dag-swimlane-vertex-name.scss
 
-  @Component({
+  export default defineComponent({
     components: {
       ToolTip,
       ProcessName,
       ProcessVisual,
       ConsolidatedProcess,
       Ruler
-    }
-  })
-  export default class DagSwimlane extends Vue {
-    @Prop({ required: true }) dag!: Dag;
-    @Prop({ default: true }) consolidate!: boolean;
+    },
 
-    processes!: Process[];
-    processor: Processor = new Processor();
-    focusedProcess: Process | undefined;
-
-    tooltipContents = null;
-
-    errMessage = '';
-
-    scroll = 0;
-    zoom = 100;
-
-    // Watch : "processes.@each.startEvent"
-    startTime(processes: Process[]): number {
-      if (processes.length) {
-        let startTime = processes[0].startEvent.time;
-        processes.forEach(process => {
-          const time = process.startEvent.time;
-          if (startTime > time) {
-            startTime = time;
-          }
-        });
-        return startTime;
+    props: {
+      dag: {
+        type: Object as PropType<Dag>,
+        required: true
+      },
+      consolidate: {
+        type: Boolean,
+        default: true
       }
-      return 0;
-    }
+    },
 
-    // Watch - "processes.@each.endEvent"
-    endTime(processes: Process[]): number {
-      if (processes.length) {
-        let endTime = processes[0].endEvent.time;
-        processes.forEach(process => {
-          const time = process.endEvent.time;
-          if (endTime < time) {
-            endTime = time;
+    setup(): {
+      processor: Processor;
+      focusedProcess?: Process;
+    } {
+      return {
+        processor: new Processor()
+      };
+    },
+
+    data(): {
+      processes: Process[];
+      tooltipContents: TooltipContent[] | null;
+
+      errMessage: string;
+
+      scroll: number;
+      zoom: number;
+    } {
+      const processes: Process[] = [];
+
+      return {
+        processes,
+
+        tooltipContents: null,
+
+        errMessage: '',
+
+        scroll: 0,
+        zoom: 100
+      };
+    },
+
+    computed: {
+      // Watch - "processes.@each.blockers"
+      normalizedProcesses(): Process[] {
+        const processes = this.processes;
+        let normalizedProcesses: Process[];
+        const idHash: KeyHash<number> = {};
+        let containsBlockers = false;
+        const processor = this.processor;
+
+        // Validate and reset blocking
+        processes.forEach(function (process) {
+          if (!(process instanceof Process)) {
+            console.error('em-swimlane : Unknown type, must be of type Process');
           }
+
+          if (process.blockers.length) {
+            containsBlockers = true;
+          }
+          process.blocking = [];
         });
-        return endTime;
+
+        if (containsBlockers) {
+          normalizedProcesses = [];
+
+          // Recreate blocking list
+          processes.forEach(process => {
+            const blockers = process.blockers;
+            if (blockers) {
+              blockers.forEach((blocker: Process) => {
+                blocker.blocking.push(process);
+              });
+            }
+          });
+
+          // Give an array of the processes in blocking order
+          processes.forEach((process: Process) => {
+            if (process.blocking.length === 0) {
+              // The root processes
+              normalizedProcesses.push(process);
+              normalizedProcesses.push.apply(normalizedProcesses, process.getAllBlockers());
+            }
+          });
+          normalizedProcesses.reverse();
+          normalizedProcesses = normalizedProcesses.filter((process: Process, index: number) => {
+            // Filters out the recurring processes in the list (after graph traversal), we just
+            // need the top processes
+            const id = process._id;
+            if (idHash[id] === undefined) {
+              idHash[id] = index;
+            }
+            return idHash[id] === index;
+          });
+        } else {
+          normalizedProcesses = processes;
+        }
+
+        // Set process colors & index
+        normalizedProcesses.forEach(function (process, index) {
+          process.index = index;
+          process.color = processor.createProcessColor(index, 0);
+        });
+
+        return normalizedProcesses; // Note: Was an Ember Array
       }
-      return 0;
-    }
+    },
 
-    // Watch - "startTime", "endTime", "processes.length"
-    // On - Init
-    processorSetup(): void {
-      const processes = createProcesses(this.dag);
-
-      this.processes = processes;
-      this.processor.startTime = this.startTime(processes);
-      this.processor.endTime = this.endTime(processes);
-      this.processor.processCount = this.processes.length;
-    }
-
-    created(): void {
+    mounted(): void {
       try {
         this.processorSetup();
       } catch (e) {
         this.errMessage = 'Invalid data!';
       }
-    }
+    },
 
     // mounted(): void {
     //   this.onZoom();
@@ -180,91 +229,65 @@
     //   };
     // }
 
-    willDestroy(): void {
+    unmounted() {
       // Release listeners
-    }
+    },
 
-    // Watch - "processes.@each.blockers"
-    get normalizedProcesses(): any[] {
-      const processes = this.processes;
-      let normalizedProcesses: any[];
-      const idHash: any = {};
-      let containsBlockers = false;
-      const processor = this.processor;
-
-      // Validate and reset blocking
-      processes.forEach(function (process) {
-        if (!(process instanceof Process)) {
-          console.error('em-swimlane : Unknown type, must be of type Process');
+    methods: {
+      // Watch : "processes.@each.startEvent"
+      startTime(processes: Process[]): number {
+        if (processes.length) {
+          let startTime = processes[0].startTime;
+          processes.forEach(process => {
+            const time = process.startTime;
+            if (startTime > time) {
+              startTime = time;
+            }
+          });
+          return startTime;
         }
+        return 0;
+      },
 
-        if (process.blockers.length) {
-          containsBlockers = true;
+      // Watch - "processes.@each.endEvent"
+      endTime(processes: Process[]): number {
+        if (processes.length) {
+          let endTime = processes[0].endTime;
+          processes.forEach(process => {
+            const time = process.endTime;
+            if (endTime < time) {
+              endTime = time;
+            }
+          });
+          return endTime;
         }
-        process.blocking = [];
-      });
+        return 0;
+      },
 
-      if (containsBlockers) {
-        normalizedProcesses = [];
+      // Watch - "startTime", "endTime", "processes.length"
+      // On - Init
+      processorSetup(): void {
+        const processes = createProcesses(this.dag);
 
-        // Recreate blocking list
-        processes.forEach(process => {
-          const blockers = process.blockers;
-          if (blockers) {
-            blockers.forEach((blocker: any) => {
-              blocker.blocking.push(process);
-            });
-          }
-        });
+        this.processes = processes;
+        this.processor.startTime = this.startTime(processes);
+        this.processor.endTime = this.endTime(processes);
+        this.processor.processCount = this.processes.length;
+      },
 
-        // Give an array of the processes in blocking order
-        processes.forEach((process: Process) => {
-          if (process.blocking.length === 0) {
-            // The root processes
-            normalizedProcesses.push(process);
-            normalizedProcesses.push.apply(normalizedProcesses, process.getAllBlockers());
-          }
-        });
-        normalizedProcesses.reverse();
-        normalizedProcesses = normalizedProcesses.filter((process: Process, index: number) => {
-          // Filters out the recurring processes in the list (after graph traversal), we just
-          // need the top processes
-          const id = process._id;
-          if (idHash[id] === undefined) {
-            idHash[id] = index;
-          }
-          return idHash[id] === index;
-        });
-      } else {
-        normalizedProcesses = processes;
+      showTooltip(type: string, process: Process, options: unknown): void {
+        this.tooltipContents = process.getTooltipContents(type, options);
+        this.focusedProcess = process;
+      },
+
+      hideTooltip(): void {
+        this.tooltipContents = null;
+        this.focusedProcess = undefined;
+      },
+
+      click(type: string, process: Process, options: unknown): void {
+        // this.sendAction('click', type, process, options);
       }
-
-      // Set process colors & index
-      normalizedProcesses.forEach(function (process, index) {
-        process.index = index;
-        process.color = processor.createProcessColor(index, 0);
-      });
-
-      return normalizedProcesses; // Note: Was an Ember Array
     }
-
-    showTooltip(type: string, process: Process, options: any): void {
-      this.tooltipContents = process.getTooltipContents(type, options);
-      this.focusedProcess = process;
-    }
-
-    hideTooltip(): void {
-      this.tooltipContents = null;
-      this.focusedProcess = undefined;
-    }
-
-    sendAction(a: string, b: string, c: any, d: any): void {
-      // eslint-disable-next-line no-restricted-syntax
-      console.log(a, b, c, d);
-    }
-
-    click(type: string, process: Process, options: any): void {
-      this.sendAction('click', type, process, options);
-    }
-  }
+  });
 </script>

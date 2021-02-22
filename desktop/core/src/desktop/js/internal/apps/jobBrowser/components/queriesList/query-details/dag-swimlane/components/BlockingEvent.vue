@@ -23,33 +23,43 @@
 </template>
 
 <script lang="ts">
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
-  /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+  import { defineComponent, PropType } from 'vue';
 
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import Process, { ProcessEvent } from '../libs/Process';
+  import Processor from '../libs/Processor';
 
-  @Component
-  export default class BlockingEvent extends Vue {
-    @Prop() process: any;
-    @Prop() blocking: any;
+  export default defineComponent({
+    props: {
+      process: {
+        type: Object as PropType<Process>,
+        required: true
+      },
+      blocking: {
+        type: Object as PropType<Process>,
+        required: true
+      },
 
-    @Prop() processor: any;
+      processor: {
+        type: Object as PropType<Processor>,
+        required: true
+      }
+    },
 
-    get blockingEvent(): any {
-      const events = this.process.events;
-      const blockingEventName = this.process.blockingEventName;
+    computed: {
+      blockingEvent(): ProcessEvent | undefined {
+        const events = this.process.events;
+        const blockingEventName = this.process.blockingEventName;
 
-      return events.find(function (event: any) {
-        return event.name === blockingEventName;
-      });
-    }
+        return events.find((event: ProcessEvent) => event.name === blockingEventName);
+      }
+    },
 
     // Watch: "blockingEvent.time", "processor.timeWindow"
     mounted(): void {
-      const blockTime: number = this.blockingEvent.time;
+      const blockTime: number = this.blockingEvent ? this.blockingEvent.time : 0;
       let blockerEventHeight: number;
 
-      if (blockTime && this.blocking.endEvent.time >= blockTime) {
+      if (blockTime && this.blocking.endEvent && this.blocking.endEvent.time >= blockTime) {
         blockerEventHeight = (this.blocking.index - this.process.index) * 30;
 
         const currentComp: HTMLElement = <HTMLElement>this.$el;
@@ -59,22 +69,24 @@
         eventLine.style.height = `${blockerEventHeight}px`;
         eventLine.style.borderColor = this.process.getColor();
       }
-    }
+    },
 
-    sendMouseAction(name: string, mouseEvent: MouseEvent): void {
-      this.$emit(name, 'blocking-event', this.process, {
-        mouseEvent: mouseEvent,
-        blocking: this.blocking,
-        blockingEvent: this.blockingEvent
-      });
-    }
+    methods: {
+      sendMouseAction(name: string, mouseEvent: MouseEvent): void {
+        this.$emit(name, 'blocking-event', this.process, {
+          mouseEvent: mouseEvent,
+          blocking: this.blocking,
+          blockingEvent: this.blockingEvent
+        });
+      },
 
-    mouseEnter(mouseEvent: MouseEvent): void {
-      this.sendMouseAction('showTooltip', mouseEvent);
-    }
+      mouseEnter(mouseEvent: MouseEvent): void {
+        this.sendMouseAction('showTooltip', mouseEvent);
+      },
 
-    mouseLeave(mouseEvent: MouseEvent): void {
-      this.sendMouseAction('hideTooltip', mouseEvent);
+      mouseLeave(mouseEvent: MouseEvent): void {
+        this.sendMouseAction('hideTooltip', mouseEvent);
+      }
     }
-  }
+  });
 </script>

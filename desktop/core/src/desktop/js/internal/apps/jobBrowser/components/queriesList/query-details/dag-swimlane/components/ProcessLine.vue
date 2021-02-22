@@ -23,20 +23,28 @@
 </template>
 
 <script lang="ts">
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
-  /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+  import { defineComponent, PropType } from 'vue';
 
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import Process from '../libs/Process';
+  import Processor from '../libs/Processor';
 
-  @Component
-  export default class ProcessLine extends Vue {
-    @Prop() process: any;
-    @Prop() processor: any;
+  export default defineComponent({
+    props: {
+      process: {
+        type: Object as PropType<Process>,
+        required: true
+      },
+
+      processor: {
+        type: Object as PropType<Processor>,
+        required: true
+      }
+    },
 
     // Watch : "process.startEvent.time", "process.endEvent.time", "processor.timeWindow"
     mounted(): void {
-      const startPos = this.processor.timeToPositionPercent(this.process.startEvent.time);
-      const endPos = this.processor.timeToPositionPercent(this.process.endEvent.time);
+      const startPos = this.processor.timeToPositionPercent(this.process.startTime);
+      const endPos = this.processor.timeToPositionPercent(this.process.endTime);
 
       const processLine: HTMLElement = <HTMLElement>this.$el.querySelector('.process-line');
 
@@ -47,24 +55,26 @@
           backgroundColor: this.process.getColor()
         });
       }
-    }
+    },
 
-    sendMouseAction(name: string, mouseEvent: MouseEvent): void {
-      this.$emit(name, 'process-line', this.process, {
-        mouseEvent: mouseEvent
-      });
-    }
+    methods: {
+      sendMouseAction(name: string, mouseEvent: MouseEvent): void {
+        this.$emit(name, 'process-line', this.process, {
+          mouseEvent: mouseEvent
+        });
+      },
 
-    mouseEnter(mouseEvent: MouseEvent): void {
-      this.sendMouseAction('showTooltip', mouseEvent);
-    }
+      mouseEnter(mouseEvent: MouseEvent): void {
+        this.sendMouseAction('showTooltip', mouseEvent);
+      },
 
-    mouseLeave(mouseEvent: MouseEvent): void {
-      this.sendMouseAction('hideTooltip', mouseEvent);
-    }
+      mouseLeave(mouseEvent: MouseEvent): void {
+        this.sendMouseAction('hideTooltip', mouseEvent);
+      },
 
-    mouseUp(mouseEvent: MouseEvent): void {
-      this.sendMouseAction('click', mouseEvent);
+      mouseUp(mouseEvent: MouseEvent): void {
+        this.sendMouseAction('click', mouseEvent);
+      }
     }
-  }
+  });
 </script>

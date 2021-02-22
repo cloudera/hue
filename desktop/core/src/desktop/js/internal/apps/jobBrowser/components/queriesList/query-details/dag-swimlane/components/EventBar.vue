@@ -23,38 +23,49 @@
 </template>
 
 <script lang="ts">
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
-  /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+  import { defineComponent, PropType } from 'vue';
 
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import Process, { ProcessEvent, EventBar } from '../libs/Process';
+  import Processor from '../libs/Processor';
 
-  @Component
-  export default class EventBar extends Vue {
-    @Prop() bar: any;
-    @Prop() barIndex: any = 0;
+  export default defineComponent({
+    props: {
+      bar: {
+        type: Object as PropType<EventBar>,
+        required: true
+      },
+      barIndex: {
+        type: Number,
+        default: 0
+      },
 
-    @Prop() process: any;
-    @Prop() processor: any;
+      process: {
+        type: Object as PropType<Process>,
+        required: true
+      },
+      processor: {
+        type: Object as PropType<Processor>,
+        required: true
+      }
+    },
 
-    // Watch : "process.events.@each.name", "bar.fromEvent"
-    get fromEvent(): any {
-      const events = this.process.events;
-      const fromEventName = this.bar.fromEvent;
+    computed: {
+      // Watch : "process.events.@each.name", "bar.fromEvent"
+      fromEvent(): ProcessEvent | undefined {
+        const events = this.process.events;
+        const fromEventName = this.bar.fromEvent;
 
-      return events.find(function (event: any) {
-        return event.name === fromEventName;
-      });
-    }
+        return events.find((event: ProcessEvent) => event.name === fromEventName);
+      },
 
-    // Watch : "process.events.@each.name", "bar.toEvent"
-    get toEvent(): any {
-      const events = this.process.events;
-      const toEventName = this.bar.toEvent;
+      // Watch : "process.events.@each.name", "bar.toEvent"
+      toEvent(): ProcessEvent | undefined {
+        const events = this.process.events;
+        const toEventName = this.bar.toEvent;
 
-      return events.find(function (event: any) {
-        return event.name === toEventName;
-      });
-    }
+        return events.find((event: ProcessEvent) => event.name === toEventName);
+      }
+    },
 
     // Watch : "fromEvent.time", "toEvent.time", "barIndex", "processor.timeWindow"
     mounted(): void {
@@ -78,27 +89,29 @@
       } else {
         currentComp.style.display = 'none';
       }
-    }
+    },
 
-    sendMouseAction(name: string, mouseEvent: MouseEvent): void {
-      this.$emit(name, 'event-bar', this.process, {
-        mouseEvent: mouseEvent,
-        bar: this.bar,
-        fromEvent: this.fromEvent,
-        toEvent: this.toEvent
-      });
-    }
+    methods: {
+      sendMouseAction(name: string, mouseEvent: MouseEvent): void {
+        this.$emit(name, 'event-bar', this.process, {
+          mouseEvent: mouseEvent,
+          bar: this.bar,
+          fromEvent: this.fromEvent,
+          toEvent: this.toEvent
+        });
+      },
 
-    mouseEnter(mouseEvent: MouseEvent): void {
-      this.sendMouseAction('showTooltip', mouseEvent);
-    }
+      mouseEnter(mouseEvent: MouseEvent): void {
+        this.sendMouseAction('showTooltip', mouseEvent);
+      },
 
-    mouseLeave(mouseEvent: MouseEvent): void {
-      this.sendMouseAction('hideTooltip', mouseEvent);
-    }
+      mouseLeave(mouseEvent: MouseEvent): void {
+        this.sendMouseAction('hideTooltip', mouseEvent);
+      },
 
-    mouseUp(mouseEvent: MouseEvent): void {
-      this.sendMouseAction('click', mouseEvent);
+      mouseUp(mouseEvent: MouseEvent): void {
+        this.sendMouseAction('click', mouseEvent);
+      }
     }
-  }
+  });
 </script>

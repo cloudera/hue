@@ -24,29 +24,46 @@
  *
  */
 
-/* eslint-disable  @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+import { KeyHash } from '../../..';
 
 let processIndex = 1;
+
+export interface ProcessEvent {
+  name: string;
+  time: number;
+}
+
+export interface EventBar {
+  fromEvent: string;
+  toEvent: string;
+  color?: string;
+}
+
+export interface ToolTipProp {
+  name: string;
+  value: string | number;
+  type: string;
+}
+
+export interface TooltipContent {
+  title?: string | null;
+  description?: string;
+  properties?: ToolTipProp[];
+}
 
 export default class Process {
   _id = '';
 
   name = null;
-  private _events = []; // An array of objects with name and time as mandatory(else error) properties.
-  public get events() {
-    return this._events;
-  }
-  public set events(value) {
-    this._events = value;
-  }
-  eventBars = null;
+  eventBars: EventBar[] = [];
+
+  events: ProcessEvent[] = [];
 
   index = 0;
   color = null;
 
-  blockers = []; // Array of processes that's blocking the current process
-  blocking = []; // Array of processes blocked by the current process
+  blockers: Process[] = []; // Array of processes that's blocking the current process
+  blocking: Process[] = []; // Array of processes blocked by the current process
 
   blockingEventName = null;
 
@@ -70,7 +87,8 @@ export default class Process {
   }
 
   getBarColor(barIndex: number): string {
-    return this.getColor(1 - barIndex / (this.eventBars && this.eventBars.length) || 0);
+    const barCount = this.eventBars.length || 1;
+    return this.getColor(1 - barIndex / barCount);
   }
 
   getConsolidateColor(): string {
@@ -78,20 +96,22 @@ export default class Process {
   }
 
   get consolidateStartTime(): number {
-    return this.startEvent.time;
+    const event: ProcessEvent | undefined = this.startEvent;
+    return event ? event.time : 0;
   }
 
   get consolidateEndTime(): number {
-    return this.endEvent.time;
+    const event: ProcessEvent | undefined = this.endEvent;
+    return event ? event.time : 0;
   }
 
   // Watch : "events.@each.time"
-  get startEvent(): any {
-    let startEvent;
+  get startEvent(): ProcessEvent | undefined {
+    let startEvent: ProcessEvent | undefined = undefined;
     if (this.events) {
       startEvent = this.events[0];
       this.events.forEach(event => {
-        if (startEvent.time > event.time) {
+        if (startEvent && startEvent.time > event.time) {
           startEvent = event;
         }
       });
@@ -100,12 +120,12 @@ export default class Process {
   }
 
   // Watch : "events.@each.time"
-  get endEvent(): any {
-    let endEvent;
+  get endEvent(): ProcessEvent | undefined {
+    let endEvent: ProcessEvent | undefined;
     if (this.events) {
       endEvent = this.events[this.events.length - 1];
       this.events.forEach(event => {
-        if (endEvent.time < event.time) {
+        if (endEvent && endEvent.time < event.time) {
           endEvent = event;
         }
       });
@@ -113,8 +133,16 @@ export default class Process {
     return endEvent;
   }
 
-  getAllBlockers(parentHash: any = {}): any {
-    const blockers = [];
+  get startTime(): number {
+    return this.startEvent ? this.startEvent.time : 0;
+  }
+
+  get endTime(): number {
+    return this.endEvent ? this.endEvent.time : 0;
+  }
+
+  getAllBlockers(parentHash: KeyHash<boolean> = {}): Process[] {
+    const blockers: Process[] = [];
     const currentId = this._id;
 
     parentHash = parentHash || {}; // To keep a check on cyclic blockers
@@ -133,11 +161,11 @@ export default class Process {
     return blockers;
   }
 
-  getTooltipContents(type: string): any {
+  getTooltipContents(type: string, options?: unknown): TooltipContent[] {
     return [
       {
         title: this.name,
-        description: 'Mouse on : ' + type
+        description: 'Mouse on : ' + type + options
       }
     ];
   }

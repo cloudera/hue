@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="dag-swimlane-process-visual" @mouseenter="mouseEnter" @mouseleave="mouseLeave">
+  <div class="dag-swimlane-process-visual">
     <div class="base-line" />
     <ProcessLine
       :process="process"
@@ -47,7 +47,7 @@
       @hideTooltip="hideTooltip"
       @click="click"
     />
-    <Event
+    <EventToken
       v-for="event in process.events"
       :key="event.name"
       :event="event"
@@ -61,69 +61,82 @@
 </template>
 
 <script lang="ts">
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
-  /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+  import { defineComponent, PropType } from 'vue';
 
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import Process, { ProcessEvent } from '../libs/Process';
+  import Processor from '../libs/Processor';
 
   import ProcessLine from './ProcessLine.vue';
   import BlockingEvent from './BlockingEvent.vue';
   import EventBar from './EventBar.vue';
-  import Event from './Event.vue';
+  import EventToken from './EventToken.vue';
 
   const BUBBLE_DIA = 10; // Same as that in css
 
-  @Component({
+  export default defineComponent({
     components: {
       ProcessLine,
       BlockingEvent,
       EventBar,
-      Event
-    }
-  })
-  export default class ProcessVisual extends Vue {
-    @Prop() process: any;
-    @Prop() processor: any;
-    @Prop() focusedProcess: any;
+      EventToken
+    },
 
-    sendMouseAction(name: string, type: string, process: any, options: any): void {
-      this.$emit(name, type, process, options);
-    }
+    props: {
+      process: {
+        type: Object as PropType<Process>,
+        required: true
+      },
 
-    showTooltip(type: string, process: any, options: any): void {
-      if (type === 'event') {
-        const clientX = options.mouseEvent.clientX;
-        const events = process.events;
-        const eventsUnderMouse: any[] = [];
-
-        const eventElements: NodeListOf<HTMLElement> = this.$el.querySelectorAll(
-          '.dag-swimlane-event'
-        );
-
-        eventElements.forEach((element: HTMLElement, index: number) => {
-          const offsetLeft = element.getBoundingClientRect().left;
-          if (clientX >= offsetLeft - BUBBLE_DIA && clientX <= offsetLeft + BUBBLE_DIA) {
-            eventsUnderMouse.push(events[index]);
-          }
-        });
-
-        if (events.length) {
-          eventsUnderMouse.sort(function (eventA, eventB) {
-            return eventA.time - eventB.time;
-          });
-          options.events = eventsUnderMouse;
-        }
+      processor: {
+        type: Object as PropType<Processor>,
+        required: true
       }
+    },
 
-      this.sendMouseAction('showTooltip', type, process, options);
-    }
+    methods: {
+      sendMouseAction(name: string, type: string, process: Process, options: unknown): void {
+        this.$emit(name, type, process, options);
+      },
 
-    hideTooltip(type: string, process: any, options: any): void {
-      this.sendMouseAction('hideTooltip', type, process, options);
-    }
+      showTooltip(
+        type: string,
+        process: Process,
+        options: { mouseEvent: MouseEvent; events: ProcessEvent[] }
+      ): void {
+        if (type === 'event') {
+          const clientX = options.mouseEvent.clientX;
+          const events = process.events;
+          const eventsUnderMouse: ProcessEvent[] = [];
 
-    click(type: string, process: any, options: any): void {
-      this.sendMouseAction('click', type, process, options);
+          const eventElements: NodeListOf<HTMLElement> = this.$el.querySelectorAll(
+            '.dag-swimlane-event'
+          );
+
+          eventElements.forEach((element: HTMLElement, index: number) => {
+            const offsetLeft = element.getBoundingClientRect().left;
+            if (clientX >= offsetLeft - BUBBLE_DIA && clientX <= offsetLeft + BUBBLE_DIA) {
+              eventsUnderMouse.push(events[index]);
+            }
+          });
+
+          if (events.length) {
+            eventsUnderMouse.sort(function (eventA, eventB) {
+              return eventA.time - eventB.time;
+            });
+            options.events = eventsUnderMouse;
+          }
+        }
+
+        this.sendMouseAction('showTooltip', type, process, options);
+      },
+
+      hideTooltip(type: string, process: Process, options: unknown): void {
+        this.sendMouseAction('hideTooltip', type, process, options);
+      },
+
+      click(type: string, process: Process, options: unknown): void {
+        this.sendMouseAction('click', type, process, options);
+      }
     }
-  }
+  });
 </script>

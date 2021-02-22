@@ -8,61 +8,28 @@ exports[`DagSwimlane.vue should render 1`] = `
     <div
       class="process-names"
     >
-      <processname-stub
-        process="[object Object]"
-      />
-      <processname-stub
-        process="[object Object]"
-      />
-      <processname-stub
-        process="[object Object]"
-      />
-       
+      
+      
       <div
         class="consolidated-view-label"
       >
-        
-        Consolidated
-      
+         Consolidated 
       </div>
     </div>
-     
     <div
       class="process-visuals"
     >
       <div
         class="zoom-panel"
       >
-        <processvisual-stub
-          process="[object Object]"
-          processor="[object Object]"
-        />
-        <processvisual-stub
-          process="[object Object]"
-          processor="[object Object]"
-        />
-        <processvisual-stub
-          process="[object Object]"
-          processor="[object Object]"
-        />
-         
+        
+        
         <div
           class="consolidated-view"
         >
-          <consolidatedprocess-stub
-            process="[object Object]"
-            processor="[object Object]"
-          />
-          <consolidatedprocess-stub
-            process="[object Object]"
-            processor="[object Object]"
-          />
-          <consolidatedprocess-stub
-            process="[object Object]"
-            processor="[object Object]"
-          />
+          
+          
         </div>
-         
         <ruler-stub
           processor="[object Object]"
           scroll="0"
@@ -70,8 +37,7 @@ exports[`DagSwimlane.vue should render 1`] = `
         />
       </div>
     </div>
-     
-    <tooltip-stub />
+    <tool-tip-stub />
   </div>
 </div>
 `;

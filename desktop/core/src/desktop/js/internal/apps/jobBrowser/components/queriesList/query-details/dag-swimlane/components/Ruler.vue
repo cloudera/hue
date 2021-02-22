@@ -40,80 +40,96 @@
 </template>
 
 <script lang="ts">
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
-  /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+  import { defineComponent, PropType } from 'vue';
 
-  import { Component, Prop, Vue } from 'vue-property-decorator';
   import { duration } from '../../../../../../../../components/Duration.vue';
+  import Processor from '../libs/Processor';
 
   const DEFAULT_MARK_COUNT = 10;
 
-  @Component({
-    methods: {
-      fmtDuration: val => duration(val, true)
-    }
-  })
-  export default class Ruler extends Vue {
-    @Prop() zoom: any;
-    @Prop() processor: any;
-    @Prop() scroll: any = 0;
-
-    // Watch : "processor.timeWindow", "zoom"
-    get markDef(): any {
-      const markCount = Math.floor((DEFAULT_MARK_COUNT * this.zoom) / 100);
-      const timeWindow = this.processor.timeWindow;
-      const duration = moment.duration(Math.floor(timeWindow / markCount));
-
-      let markWindow = 0;
-      let styleWidth = 0;
-      let markUnit = 'Milliseconds';
-      let markBaseValue = 0;
-
-      if ((markBaseValue = duration.years())) {
-        markUnit = 'Years';
-      } else if ((markBaseValue = duration.months())) {
-        markUnit = 'Months';
-      } else if ((markBaseValue = duration.days())) {
-        markUnit = 'Days';
-      } else if ((markBaseValue = duration.hours())) {
-        markUnit = 'Hours';
-      } else if ((markBaseValue = duration.minutes())) {
-        markUnit = 'Minutes';
-      } else if ((markBaseValue = duration.seconds())) {
-        markUnit = 'Seconds';
-      } else {
-        markBaseValue = duration.milliseconds();
-      }
-
-      if (markBaseValue > 10) {
-        markBaseValue = Math.floor(markBaseValue / 10) * 10;
-      }
-
-      markWindow = moment.duration(markBaseValue, markUnit.toLowerCase()).asMilliseconds();
-      styleWidth = (markWindow / timeWindow) * 100;
-
-      return {
-        unit: markUnit,
-        baseValue: markBaseValue,
-        markWindow: markWindow,
-        style: `width: ${styleWidth}%;`, // TODO: Check if this works
-        count: Math.floor((100 / styleWidth) * 1.1)
-      };
-    }
-
-    // Watch : "processor.timeWindow", "markDef"
-    get marks(): any {
-      const def = this.markDef;
-      const markWindow = def.markWindow;
-      const marks = [];
-
-      for (let i = 0, count = def.count; i < count; i++) {
-        marks.push({
-          duration: Math.floor(markWindow * i)
-        });
-      }
-
-      return marks;
-    }
+  interface Mark {
+    duration: number;
   }
+
+  export default defineComponent({
+    props: {
+      zoom: {
+        type: Number,
+        default: 1
+      },
+      scroll: {
+        type: Number,
+        default: 0
+      },
+
+      processor: {
+        type: Object as PropType<Processor>,
+        required: true
+      }
+    },
+
+    computed: {
+      // Watch : "processor.timeWindow", "zoom"
+      markDef() {
+        const markCount = Math.floor((DEFAULT_MARK_COUNT * this.zoom) / 100);
+        const timeWindow = this.processor.timeWindow;
+        const duration = moment.duration(Math.floor(timeWindow / markCount));
+
+        let markWindow = 0;
+        let styleWidth = 0;
+        let markUnit = 'Milliseconds';
+        let markBaseValue = 0;
+
+        if ((markBaseValue = duration.years())) {
+          markUnit = 'Years';
+        } else if ((markBaseValue = duration.months())) {
+          markUnit = 'Months';
+        } else if ((markBaseValue = duration.days())) {
+          markUnit = 'Days';
+        } else if ((markBaseValue = duration.hours())) {
+          markUnit = 'Hours';
+        } else if ((markBaseValue = duration.minutes())) {
+          markUnit = 'Minutes';
+        } else if ((markBaseValue = duration.seconds())) {
+          markUnit = 'Seconds';
+        } else {
+          markBaseValue = duration.milliseconds();
+        }
+
+        if (markBaseValue > 10) {
+          markBaseValue = Math.floor(markBaseValue / 10) * 10;
+        }
+
+        markWindow = moment.duration(markBaseValue, markUnit.toLowerCase()).asMilliseconds();
+        styleWidth = (markWindow / timeWindow) * 100;
+
+        return {
+          unit: markUnit,
+          baseValue: markBaseValue,
+          markWindow: markWindow,
+          style: `width: ${styleWidth}%;`, // TODO: Check if this works
+          count: Math.floor((100 / styleWidth) * 1.1)
+        };
+      },
+
+      // Watch : "processor.timeWindow", "markDef"
+      marks(): Mark[] {
+        const def = this.markDef;
+        const markWindow = def.markWindow;
+        const marks: Mark[] = [];
+
+        for (let i = 0, count = def.count; i < count; i++) {
+          marks.push({
+            duration: Math.floor(markWindow * i)
+          });
+        }
+
+        return marks;
+      }
+    },
+
+    methods: {
+      fmtDuration: (val: number) => duration(val, true)
+    }
+  });
 </script>

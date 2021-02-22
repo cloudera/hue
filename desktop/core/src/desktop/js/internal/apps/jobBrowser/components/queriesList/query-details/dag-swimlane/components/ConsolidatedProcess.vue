@@ -27,39 +27,52 @@
 </template>
 
 <script lang="ts">
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
-  /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+  import { defineComponent, PropType } from 'vue';
 
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import Process from '../libs/Process';
+  import Processor from '../libs/Processor';
 
-  @Component
-  export default class ConsolidatedProcess extends Vue {
-    @Prop() process: any;
-    @Prop() processor: any;
-    @Prop() focusedProcess: any;
+  export default defineComponent({
+    props: {
+      process: {
+        type: Object as PropType<Process>,
+        required: true
+      },
+      focusedProcess: {
+        type: Object as PropType<Process>,
+        required: true
+      },
 
-    // Watch : "process", "focusedProcess"
-    get focused(): boolean {
-      return this.process === this.focusedProcess;
-    }
-
-    // Watch : "process.consolidateStartTime", "processor.timeWindow"
-    get fromPos(): number {
-      const time = this.process.consolidateStartTime;
-      if (time) {
-        return this.processor.timeToPositionPercent(time);
+      processor: {
+        type: Object as PropType<Processor>,
+        required: true
       }
-      return 0;
-    }
+    },
 
-    // Watch : "process.consolidateEndTime", "processor.timeWindow"
-    get toPos(): number {
-      const time = this.process.consolidateEndTime;
-      if (time) {
-        return this.processor.timeToPositionPercent(time);
+    computed: {
+      // Watch : "process", "focusedProcess"
+      focused(): boolean {
+        return this.process === this.focusedProcess;
+      },
+
+      // Watch : "process.consolidateStartTime", "processor.timeWindow"
+      fromPos(): number {
+        const time = this.process.consolidateStartTime;
+        if (time) {
+          return this.processor.timeToPositionPercent(time);
+        }
+        return 0;
+      },
+
+      // Watch : "process.consolidateEndTime", "processor.timeWindow"
+      toPos(): number {
+        const time = this.process.consolidateEndTime;
+        if (time) {
+          return this.processor.timeToPositionPercent(time);
+        }
+        return 0;
       }
-      return 0;
-    }
+    },
 
     // Watch : "fromPos", "toPos"
     mounted(): void {
@@ -79,28 +92,30 @@
       } else {
         currentComp.style.display = 'none';
       }
-    }
+    },
 
-    sendMouseAction(name: string, mouseEvent: MouseEvent): void {
-      const fromPos = this.fromPos || 0;
-      const toPos = this.toPos || 0;
+    methods: {
+      sendMouseAction(name: string, mouseEvent: MouseEvent): void {
+        const fromPos = this.fromPos || 0;
+        const toPos = this.toPos || 0;
 
-      this.$emit(name, 'consolidated-process', this.process, {
-        mouseEvent: mouseEvent,
-        contribution: Math.floor(toPos - fromPos)
-      });
-    }
+        this.$emit(name, 'consolidated-process', this.process, {
+          mouseEvent: mouseEvent,
+          contribution: Math.floor(toPos - fromPos)
+        });
+      },
 
-    mouseEnter(mouseEvent: MouseEvent): void {
-      this.sendMouseAction('showTooltip', mouseEvent);
-    }
+      mouseEnter(mouseEvent: MouseEvent): void {
+        this.sendMouseAction('showTooltip', mouseEvent);
+      },
 
-    mouseLeave(mouseEvent: MouseEvent): void {
-      this.sendMouseAction('hideTooltip', mouseEvent);
-    }
+      mouseLeave(mouseEvent: MouseEvent): void {
+        this.sendMouseAction('hideTooltip', mouseEvent);
+      },
 
-    mouseUp(mouseEvent: MouseEvent): void {
-      this.sendMouseAction('click', mouseEvent);
+      mouseUp(mouseEvent: MouseEvent): void {
+        this.sendMouseAction('click', mouseEvent);
+      }
     }
-  }
+  });
 </script>
