@@ -19,5 +19,5 @@ from django.conf.urls import url
 from desktop.lib.botserver import views
 
 urlpatterns = [
-  url(r'^events/', views.home, name='home')
+  url(r'^events/', views.slack_events, name='slack_events')
 ]
