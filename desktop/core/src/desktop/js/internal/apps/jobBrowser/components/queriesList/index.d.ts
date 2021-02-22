@@ -120,7 +120,7 @@ export interface Query {
   dataRead?: number; // TODO: type?
   dataWritten?: number; // TODO: type?
   databasesUsed: { [name: string]: number }[];
-  details?: {
+  details: {
     diagnostics?: string;
     perf?: Perf;
     configuration?: { [key: string]: unknown }; // TODO: value type string?
