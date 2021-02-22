@@ -24,14 +24,17 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
 
-  import { Column, Row } from '../../../../../../../components/HueTable';
+  import { Column } from '../../../../../../../components/HueTable';
   import HueTable from '../../../../../../../components/HueTable.vue';
 
   import { CounterGroup, CounterDetails } from '../../index';
 
   import CounterSet from './CounterSet';
+
+  //TODO: Must be imported from components/HueTable.d
+  type Row = { [key: string]: unknown };
 
   const DEFAULT_VALUE_COLUMN_TITLE = 'Counter Value';
   const NAME_COLUMNS: Column<Row>[] = [
@@ -45,74 +48,87 @@
     }
   ];
 
-  @Component({
+  export default defineComponent({
     components: {
       HueTable
-    }
-  })
-  export default class CountersTable extends Vue {
-    @Prop({ required: true }) counters!: CounterSet[];
-    @Prop({ default: false }) hideSimilarValues!: boolean;
+    },
 
-    generateValueColumnkey(index: number): string {
-      return `counterSet_${index}`;
-    }
-
-    get columns(): Column<Row>[] {
-      const valueColumns: Column<Row>[] = [];
-
-      this.counters.forEach((counterSet: CounterSet, index: number) => {
-        valueColumns.push({
-          label: counterSet.title || DEFAULT_VALUE_COLUMN_TITLE,
-          key: this.generateValueColumnkey(index),
-          headerCssClass: counterSet.cssClass,
-          cssClass: counterSet.cssClass
-        });
-      });
-
-      return NAME_COLUMNS.concat(valueColumns);
-    }
-
-    countValues(row: Row, valueCount: number): number {
-      const values: Set<string | unknown> = new Set();
-      for (let i = 0; i < valueCount; i++) {
-        values.add(row[this.generateValueColumnkey(i)]);
+    props: {
+      counters: {
+        type: Object as PropType<CounterSet[]>,
+        required: true
+      },
+      hideSimilarValues: {
+        type: Boolean,
+        default: false
       }
-      return values.size;
-    }
+    },
 
-    get rows(): Row[] {
-      const rowHash: Map<string, Row> = new Map();
-      let rows: Row[];
+    computed: {
+      columns(): Column<Row>[] {
+        const valueColumns: Column<Row>[] = [];
 
-      const counters = this.counters.filter((counterSet: CounterSet) => counterSet.counters);
-      counters.forEach((counterSet: CounterSet, index: number) => {
-        const counterKey: string = this.generateValueColumnkey(index);
-        counterSet.counters.forEach((counterGroup: CounterGroup) => {
-          counterGroup.counters.forEach((counter: CounterDetails) => {
-            const counterId: string = counterGroup.counterGroupName + counter.counterName;
-            let row: Row | undefined = rowHash.get(counterId);
-            if (!row) {
-              row = {
-                groupName: counterGroup.counterGroupName,
-                counterName: counter.counterName
-              };
-              rowHash.set(counterId, row);
-            }
-            row[counterKey] = counter.counterValue;
+        this.counters.forEach((counterSet: CounterSet, index: number) => {
+          valueColumns.push({
+            label: counterSet.title || DEFAULT_VALUE_COLUMN_TITLE,
+            key: this.generateValueColumnkey(index),
+            headerCssClass: counterSet.cssClass,
+            cssClass: counterSet.cssClass
           });
         });
-      });
 
-      rows = Array.from(rowHash.values());
+        return NAME_COLUMNS.concat(valueColumns);
+      },
+      rows(): Row[] {
+        const rowHash: Map<string, Row> = new Map();
+        let rows: Row[];
 
-      if (this.hideSimilarValues) {
-        rows = rows.filter((row: Row) => {
-          return this.countValues(row, this.counters.length) > 1;
+        const counters = this.counters.filter((counterSet: CounterSet) => counterSet.counters);
+        counters.forEach((counterSet: CounterSet, index: number) => {
+          const counterKey: string = this.generateValueColumnkey(index);
+          counterSet.counters.forEach((counterGroup: CounterGroup) => {
+            counterGroup.counters.forEach((counter: CounterDetails) => {
+              const counterId: string = counterGroup.counterGroupName + counter.counterName;
+              let row: Row | undefined = rowHash.get(counterId);
+              if (!row) {
+                row = {
+                  groupName: counterGroup.counterGroupName,
+                  counterName: counter.counterName
+                };
+                rowHash.set(counterId, row);
+              }
+              row[counterKey] = counter.counterValue;
+            });
+          });
         });
-      }
 
-      return rows;
+        rows = Array.from(rowHash.values());
+
+        if (this.hideSimilarValues) {
+          rows = rows.filter((row: Row) => this.areDifferent(row, this.counters.length));
+        }
+
+        return rows;
+      }
+    },
+
+    methods: {
+      generateValueColumnkey(index: number): string {
+        return `counterSet_${index}`;
+      },
+
+      areDifferent(row: Row, valueCount: number): boolean {
+        if (valueCount > 1) {
+          const firstVal = row[this.generateValueColumnkey(0)];
+          for (let i = 1; i < valueCount; i++) {
+            if (row[this.generateValueColumnkey(i)] !== firstVal) {
+              return true;
+            }
+          }
+          return false;
+        }
+        return true;
+      }
     }
-  }
+  });
 </script>
