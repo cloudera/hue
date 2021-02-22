@@ -15,7 +15,6 @@ exports[`VisualExplain.vue should render 1`] = `
         class="fa fa-expand"
       />
     </button>
-     
     <button
       class="download-button btn btn-default"
       title="Download explain JSON"
@@ -26,11 +25,9 @@ exports[`VisualExplain.vue should render 1`] = `
       />
     </button>
   </div>
-   
   <div
     class="explain-container"
   />
-   
-  <!---->
+  <!--v-if-->
 </div>
 `;

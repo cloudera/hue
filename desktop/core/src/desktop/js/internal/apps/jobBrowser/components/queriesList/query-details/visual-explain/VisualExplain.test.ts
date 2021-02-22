@@ -22,7 +22,7 @@ import queryMockResponse from '../../test/api/hive_query_get_response_3.json';
 describe('VisualExplain.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(VisualExplain, {
-      propsData: {
+      props: {
         query: queryMockResponse.query
       }
     });

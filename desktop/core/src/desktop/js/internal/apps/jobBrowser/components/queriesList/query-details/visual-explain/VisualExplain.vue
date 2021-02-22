@@ -54,11 +54,9 @@
 </template>
 
 <script lang="ts">
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
-  /* eslint-disable @typescript-eslint/explicit-module-boundary-types*/
+  import { defineComponent, PropType } from 'vue';
 
-  import { Component, Prop, Vue } from 'vue-property-decorator';
-  import { Query } from '../..';
+  import { Query, KeyHash } from '../..';
   import { toggleFullScreen } from 'utils/hueUtils';
 
   import { saveAs } from 'file-saver';
@@ -67,29 +65,32 @@
 
   import './visual-explain.scss';
 
-  @Component
-  export default class VisualExplain extends Vue {
-    @Prop({ required: true }) query!: Query;
-
-    explainPlan: any;
-
-    explainDetailData = '';
-    vectorizedInfo = '';
-
-    explainRendered: any = true;
-
-    created(): void {
-      if (this.query && this.query.details) {
-        this.explainPlan = this.query.details.explainPlan;
+  export default defineComponent({
+    props: {
+      query: {
+        type: Object as PropType<Query>,
+        required: true
       }
-    }
+    },
 
-    get isQueryRunning(): boolean {
-      return this.query && this.query.status.toLowerCase() == 'running';
-    }
+    data() {
+      return {
+        explainPlan: this.query && this.query.details ? this.query.details.explainPlan : null,
+        explainDetailData: '',
+        vectorizedInfo: '',
+
+        explainRendered: true
+      };
+    },
+
+    computed: {
+      isQueryRunning(): boolean {
+        return this.query && this.query.status.toLowerCase() == 'running';
+      }
+    },
 
     mounted(): void {
-      const onRequestDetail = (data: any, vectorized: any) => {
+      const onRequestDetail = (data: KeyHash<unknown>, vectorized: KeyHash<string>) => {
         this.explainDetailData = JSON.stringify(data, null, '  ');
         this.vectorizedInfo = vectorized['Execution mode:'];
       };
@@ -105,30 +106,32 @@
           );
         }
       }, 200);
-    }
+    },
 
-    toggleFullscreen(): void {
-      toggleFullScreen(this.$el);
-    }
+    methods: {
+      toggleFullscreen(): void {
+        toggleFullScreen(this.$el);
+      },
 
-    downloadExplain(): void {
-      const explainData = Object.assign({}, this.explainPlan);
+      downloadExplain(): void {
+        const explainData: KeyHash<string> = Object.assign({}, this.explainPlan);
 
-      if (explainData.CBOPlan) {
-        explainData.CBOPlan = JSON.parse(explainData.CBOPlan);
+        if (explainData.CBOPlan) {
+          explainData.CBOPlan = JSON.parse(explainData.CBOPlan);
+        }
+        const file = new Blob([JSON.stringify(explainData, null, 2)], {
+          type: 'text/plain;charset=utf-8'
+        });
+        saveAs(file, this.query.queryId + '_explain.json');
+      },
+
+      closePopup(event: MouseEvent): void {
+        this.explainDetailData = '';
+        this.vectorizedInfo = '';
+        event.preventDefault();
       }
-      const file = new Blob([JSON.stringify(explainData, null, 2)], {
-        type: 'text/plain;charset=utf-8'
-      });
-      saveAs(file, this.query.queryId + '_explain.json');
     }
-
-    closePopup(event: MouseEvent): void {
-      this.explainDetailData = '';
-      this.vectorizedInfo = '';
-      event.preventDefault();
-    }
-  }
+  });
 </script>
 
 <style lang="scss" scoped></style>
