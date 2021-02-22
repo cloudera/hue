@@ -4,14 +4,13 @@ Babel==2.5.1
 boto==2.46.1
 celery[redis]==4.4.5  # For Python 3.8
 cffi==1.13.2
-channels==2.1.6
-channels-redis==2.3.2
+channels==3.0.3
+channels-redis==3.2.0
 configobj==5.0.6
 cryptography==3.3.2
-django-auth-ldap==1.3.0
-Django==2.2.17
+django-auth-ldap==2.3.0
+Django==3.0.12
 django-axes==5.13.0
-django_babel==0.6.2
 django-celery-beat==1.4.0
 django_celery_results==1.0.4
 django-cors-headers==3.7.0
@@ -64,3 +63,4 @@ sqlparse==0.4.1
 tablib==0.13.0
 thrift==0.13.0
 thrift-sasl==0.4.2
+git+git://github.com/agl29/django-babel.git

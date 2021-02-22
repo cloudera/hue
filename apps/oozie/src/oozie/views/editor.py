@@ -398,7 +398,7 @@ def schedule_workflow(request, workflow):
 
 
 @check_job_access_permission()
-def create_coordinator(request, workflow=None):
+def create_coordinator(request, workflow=None, *args, **kwargs):
   if workflow is not None:
     coordinator = Coordinator(owner=request.user, schema_version="uri:oozie:coordinator:0.2", coordinatorworkflow=workflow)
   else:
