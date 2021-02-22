@@ -20,12 +20,12 @@ import komapping from 'knockout.mapping';
 import { markdown } from 'markdown';
 
 import 'apps/editor/components/ko.executableLogs';
-import 'apps/editor/components/ko.executableProgressBar';
 import 'apps/editor/components/ko.snippetEditorActions';
 import 'apps/editor/components/resultChart/ko.resultChart';
 import 'apps/editor/components/ko.queryHistory';
 
 import './components/ExecutableActionsKoBridge.vue';
+import './components/ExecutableProgressBarKoBridge.vue';
 import './components/EditorResizerKoBridge.vue';
 import './components/aceEditor/AceEditorKoBridge.vue';
 import './components/executionAnalysis/ExecutionAnalysisPanelKoBridge.vue';

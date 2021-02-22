@@ -912,7 +912,10 @@
           "></variable-substitution-ko-bridge>
   ##      <!-- ko template: { name: 'editor-executable-snippet-body' } --><!-- /ko -->
         <div class="editor-execute-status">
-          <!-- ko template: { name: 'editor-snippet-execution-status' } --><!-- /ko -->
+          <executable-progress-bar-ko-bridge data-bind="vueKoProps: {
+            'executable-observable': activeExecutable
+          }"></executable-progress-bar-ko-bridge>
+  ##      <!-- ko template: { name: 'editor-snippet-execution-status' } --><!-- /ko -->
         </div>
         <div class="editor-execute-actions">
           <!-- ko template: { name: 'editor-execution-controls' } --><!-- /ko -->
