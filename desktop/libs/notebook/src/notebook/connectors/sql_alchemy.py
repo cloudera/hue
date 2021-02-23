@@ -67,6 +67,7 @@ from django.core.cache import caches
 from django.utils.translation import ugettext as _
 from sqlalchemy import create_engine, inspect, Table, MetaData
 from sqlalchemy.exc import OperationalError, UnsupportedCompilationError, CompileError
+from TCLIService.ttypes import TOperationState
 
 from desktop.lib import export_csvxls
 from desktop.lib.i18n import force_unicode
@@ -251,9 +252,25 @@ class SqlAlchemyApi(Api):
         }
       )
 
-    result = connection.execute(statement)
+    async_ = self.interpreter['dialect'] == 'hive'
+    if async_:
+      result = connection.execute(statement, async_=async_)
+    else:
+      result = connection.execute(statement)
 
-    logs = [message for message in result.cursor.fetch_logs()] if result.cursor and hasattr(result.cursor, 'fetch_logs') else []
+    logs = []
+
+    if result.cursor and hasattr(result.cursor, 'poll'):
+      status = result.cursor.poll().operationState
+
+      if result.cursor and hasattr(result.cursor, 'fetch_logs'):
+        logs += result.cursor.fetch_logs()
+
+        while status in (TOperationState.INITIALIZED_STATE, TOperationState.RUNNING_STATE):
+          logs += result.cursor.fetch_logs()
+
+          status = result.cursor.poll().operationState
+
     cache = {
       'logs': logs,
       'connection': connection,
@@ -270,7 +287,7 @@ class SqlAlchemyApi(Api):
     CONNECTIONS[guid] = cache
 
     return {
-      'sync': False,
+      'sync': async_,
       'has_result_set': result.cursor != None,
       'modified_row_count': 0,
       'guid': guid,

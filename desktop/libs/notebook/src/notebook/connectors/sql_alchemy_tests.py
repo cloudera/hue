@@ -311,6 +311,7 @@ class TestApi(object):
         'url': 'presto://hue:8080/hue',
         'session': {},
       },
+      'dialect': '',
       'dialect_properties': {},
     }
 
@@ -355,6 +356,33 @@ class TestApi(object):
 
       data = SqlAlchemyApi(self.user, self.interpreter).get_log(notebook, snippet)
       assert_equal(data, '\n'.join(log))
+
+
+  def test_execute_statement_with_async(self):
+    interpreter = {
+      'name': 'Hive',
+      'type': 'hive',
+      'options': {
+        'url': 'hive://hue:8080/hue',
+        'session': {},
+      },
+      'dialect': 'hive',
+      'dialect_properties': {},
+    }
+
+    with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._create_connection') as _create_connection:
+      with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._create_engine') as _create_engine:
+        with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._get_session') as _get_session:
+          execute = Mock(return_value=Mock(cursor=None))
+          _create_connection.return_value = Mock(
+            execute=execute
+          )
+          notebook = {}
+          snippet = {'statement': 'SELECT 1'}
+
+          engine = SqlAlchemyApi(self.user, interpreter).execute(notebook, snippet)
+
+          execute.assert_called_with('SELECT 1', async_=True)
 
 
 class TestDialects(object):
