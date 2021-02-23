@@ -63,7 +63,7 @@
 <script lang="ts">
   import { defineComponent, PropType } from 'vue';
 
-  import Process, { ProcessEvent } from '../libs/Process';
+  import VertexProcess, { ProcessEvent } from '../libs/VertexProcess';
   import Processor from '../libs/Processor';
 
   import ProcessLine from './ProcessLine.vue';
@@ -83,7 +83,7 @@
 
     props: {
       process: {
-        type: Object as PropType<Process>,
+        type: Object as PropType<VertexProcess>,
         required: true
       },
 

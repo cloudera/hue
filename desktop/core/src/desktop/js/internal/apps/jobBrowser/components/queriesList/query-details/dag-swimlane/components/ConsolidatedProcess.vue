@@ -29,18 +29,18 @@
 <script lang="ts">
   import { defineComponent, PropType } from 'vue';
 
-  import Process from '../libs/Process';
+  import VertexProcess from '../libs/VertexProcess';
   import Processor from '../libs/Processor';
 
   export default defineComponent({
     props: {
       process: {
-        type: Object as PropType<Process>,
+        type: Object as PropType<VertexProcess>,
         required: true
       },
       focusedProcess: {
-        type: Object as PropType<Process>,
-        required: true
+        type: Object as PropType<VertexProcess>,
+        default: undefined
       },
 
       processor: {

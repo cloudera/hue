@@ -36,7 +36,7 @@
   import { defineComponent, PropType } from 'vue';
 
   import $ from 'jquery';
-  import { TooltipContent } from '../libs/Process';
+  import { TooltipContent } from '../libs/VertexProcess';
 
   export default defineComponent({
     props: {
@@ -46,14 +46,14 @@
       }
     },
 
-    methods: {
-      mounted(): void {
-        document.addEventListener('mousemove', this.onMouseMove, false);
-      },
-      beforeDestroy(): void {
-        document.removeEventListener('mousemove', this.onMouseMove, false);
-      },
+    mounted(): void {
+      document.addEventListener('mousemove', this.onMouseMove, false);
+    },
+    unmounted(): void {
+      document.removeEventListener('mousemove', this.onMouseMove, false);
+    },
 
+    methods: {
       onMouseMove(event: MouseEvent): void {
         if (this.contents != null) {
           let offsetX = 0;
@@ -72,7 +72,7 @@
   });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
   .tool-tip-container {
     position: fixed;
     display: inline-block;

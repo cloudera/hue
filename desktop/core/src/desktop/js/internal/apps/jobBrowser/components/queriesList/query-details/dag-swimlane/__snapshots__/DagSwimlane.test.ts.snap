@@ -9,6 +9,15 @@ exports[`DagSwimlane.vue should render 1`] = `
       class="process-names"
     >
       
+      <process-name-stub
+        process="[object Object]"
+      />
+      <process-name-stub
+        process="[object Object]"
+      />
+      <process-name-stub
+        process="[object Object]"
+      />
       
       <div
         class="consolidated-view-label"
@@ -23,11 +32,35 @@ exports[`DagSwimlane.vue should render 1`] = `
         class="zoom-panel"
       >
         
+        <process-visual-stub
+          process="[object Object]"
+          processor="[object Object]"
+        />
+        <process-visual-stub
+          process="[object Object]"
+          processor="[object Object]"
+        />
+        <process-visual-stub
+          process="[object Object]"
+          processor="[object Object]"
+        />
         
         <div
           class="consolidated-view"
         >
           
+          <consolidated-process-stub
+            process="[object Object]"
+            processor="[object Object]"
+          />
+          <consolidated-process-stub
+            process="[object Object]"
+            processor="[object Object]"
+          />
+          <consolidated-process-stub
+            process="[object Object]"
+            processor="[object Object]"
+          />
           
         </div>
         <ruler-stub

@@ -25,7 +25,7 @@
 <script lang="ts">
   import { defineComponent, PropType } from 'vue';
 
-  import Process, { ProcessEvent, EventBar } from '../libs/Process';
+  import VertexProcess, { ProcessEvent, EventBar } from '../libs/VertexProcess';
   import Processor from '../libs/Processor';
 
   export default defineComponent({
@@ -40,7 +40,7 @@
       },
 
       process: {
-        type: Object as PropType<Process>,
+        type: Object as PropType<VertexProcess>,
         required: true
       },
       processor: {
