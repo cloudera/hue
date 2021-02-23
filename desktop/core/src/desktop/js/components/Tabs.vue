@@ -22,8 +22,8 @@
       <li
         v-for="tab in tabs"
         :key="tab.title"
-        :class="{ active: tab.isActive }"
-        @click="selectTab(tab)"
+        :class="{ active: selectedTabRef === tab }"
+        @click="selectedTabRef = tab"
       >
         {{ tab.title }}
       </li>
@@ -35,51 +35,50 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent } from 'vue';
+  import { defineComponent, ref, provide } from 'vue';
 
   import { TabRef } from './Tab.vue';
 
+  export const ADD_TAB_KEY = 'addTab';
+  export const REMOVE_TAB_KEY = 'removeTab';
+
+  export const SELECTED_TAB_KEY = 'selectedTabRef';
+
   export default defineComponent({
     name: 'Tabs',
-    provide(): {
-      addTab: (tab: TabRef) => void;
-      removeTab: (tab: TabRef) => void;
-    } {
-      return {
-        addTab: (tab: TabRef): void => {
-          if (!this.tabs.find(t => t.title === tab.title)) {
-            this.tabs.push(tab);
-            if (this.tabs.length === 1) {
-              this.selectTab(this.tabs[0]);
-            }
-          }
-        },
-        removeTab: (tab: TabRef): void => {
-          const index = this.tabs.indexOf(tab);
-          if (index !== -1) {
-            this.tabs.splice(index, 1);
-            if (tab.isActive && this.tabs.length) {
-              this.tabs[Math.max(0, index - 1)].isActive = true;
-            }
+
+    setup() {
+      const tabs = ref<TabRef[]>([]);
+      const selectedTabRef = ref<TabRef | null>(null);
+
+      function addTab(tab: TabRef): void {
+        if (!tabs.value.find(t => t.title === tab.title)) {
+          tabs.value.push(tab);
+          if (tabs.value.length === 1) {
+            selectedTabRef.value = tabs.value[0];
           }
         }
-      };
-    },
-
-    data(): {
-      tabs: TabRef[];
-    } {
-      return {
-        tabs: []
-      };
-    },
-
-    methods: {
-      selectTab(tab: TabRef): void {
-        this.tabs.forEach(other => {
-          other.isActive = other === tab;
-        });
       }
+
+      function removeTab(tab: TabRef): void {
+        const index = tabs.value.indexOf(tab);
+        if (index !== -1) {
+          tabs.value.splice(index, 1);
+          if (tab === selectedTabRef.value && tabs.value.length) {
+            selectedTabRef.value = tabs.value[Math.max(0, index - 1)];
+          }
+        }
+      }
+
+      provide(ADD_TAB_KEY, (tab: TabRef) => addTab(tab));
+      provide(REMOVE_TAB_KEY, (tab: TabRef) => removeTab(tab));
+
+      provide(SELECTED_TAB_KEY, selectedTabRef);
+
+      return {
+        tabs,
+        selectedTabRef
+      };
     }
   });
 </script>
