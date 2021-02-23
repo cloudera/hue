@@ -579,7 +579,10 @@ class LdapBackend(object):
     try:
       allowed_group = self.check_ldap_access_groups(server, username)
       if allowed_group:
-        user = self._backend.authenticate(username=username, password=password)
+        if sys.version_info[0] > 2:
+          user = self._backend.authenticate(request, username=username, password=password)
+        else:
+          user = self._backend.authenticate(username=username, password=password)
       else:
         LOG.warn("%s not in an allowed login group" % username)
         return None
