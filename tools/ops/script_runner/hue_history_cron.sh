@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -15,35 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Checking all python changes in the new commits
+#Clean up old history to keep DB from growing too large
 
-HOME=${1:-"."}
-FOUND_ISSUE=-1
-
-files=`git diff --name-only origin/master --diff-filter=b | egrep .py$ | \
-  grep -v /ext-py/ | \
-  grep -v wsgiserver.py | \
-  grep -v /migrations/ | \
-  grep -v apps/oozie/src/oozie/tests.py | \
-  grep -v tools/ops/ | \
-  grep -v /org_migrations/`
-
-cd $HOME
-
-if [ ! -z "$files" ];
-then
-  ./build/env/bin/hue runpylint --files "$files"
-  FOUND_ISSUE=$?
-else
-  echo "No Python code files changed present"
-  FOUND_ISSUE=0
-fi
-
-if [ "$FOUND_ISSUE" -eq "0" ]
-then
-  echo "No Python code styling issues found"
-else
-  echo "Found some Python code styling issues"
-fi
-
-exit $FOUND_ISSUE
+SCRIPT_DIR="$( cd -P "$( dirname "$0" )" && pwd )"
+${SCRIPT_DIR}/script_runner hue_desktop_document_cleanup --keep-days 30

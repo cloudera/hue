@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,36 +14,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# A couple of test cases for the log buffer
+#
 
-# Checking all python changes in the new commits
+import log_buffer
+import logging
+import unittest
 
-HOME=${1:-"."}
-FOUND_ISSUE=-1
+class TestLogBuffer(unittest.TestCase):
+  def test_logger(self):
+    logger = logging.getLogger()
+    handler = log_buffer.FixedBufferHandler()
+    logger.addHandler(handler)
+    msg = "My test logging message"
+    logger.warn(msg)
+    self.assertEquals(msg, str(handler.buf))
 
-files=`git diff --name-only origin/master --diff-filter=b | egrep .py$ | \
-  grep -v /ext-py/ | \
-  grep -v wsgiserver.py | \
-  grep -v /migrations/ | \
-  grep -v apps/oozie/src/oozie/tests.py | \
-  grep -v tools/ops/ | \
-  grep -v /org_migrations/`
+  def test_overflow(self):
+    buffer = log_buffer.FixedBuffer(maxsize=10)
+    buffer.insert("0123456789")
+    buffer.insert("abcde")
+    self.assertEquals("56789\nabcde", str(buffer))
 
-cd $HOME
-
-if [ ! -z "$files" ];
-then
-  ./build/env/bin/hue runpylint --files "$files"
-  FOUND_ISSUE=$?
-else
-  echo "No Python code files changed present"
-  FOUND_ISSUE=0
-fi
-
-if [ "$FOUND_ISSUE" -eq "0" ]
-then
-  echo "No Python code styling issues found"
-else
-  echo "Found some Python code styling issues"
-fi
-
-exit $FOUND_ISSUE
+if __name__ == '__main__':
+  unittest.main()
