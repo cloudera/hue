@@ -97,7 +97,7 @@
     }
 
     > .inline-info {
-      flex-basis: 600px;
+      flex-basis: 500px;
     }
   }
 </style>

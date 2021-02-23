@@ -39,7 +39,7 @@
         <tab title="Query Info">
           <QueryInfo :query="query" />
         </tab>
-        <tab title="Visual Explain" lazy="true">
+        <tab title="Visual Explain" :lazy="true">
           <VisualExplain :query="query" />
         </tab>
         <tab title="Timeline">
@@ -170,6 +170,9 @@
 
   .buttons-container {
     margin-bottom: 20px;
+    .hue-btn {
+      margin-right: 5px;
+    }
   }
 
   .download-link {

@@ -33,7 +33,7 @@
         <QueryInfo :query="queries[0]" layout="column" />
         <QueryInfo :query="queries[1]" layout="column" class="query-b-deep" />
       </tab>
-      <tab title="Visual Explain" lazy="true" class="hue-layout-row">
+      <tab title="Visual Explain" :lazy="true" class="hue-layout-row">
         <VisualExplain :query="queries[0]" />
         <VisualExplain :query="queries[1]" class="query-b" />
       </tab>

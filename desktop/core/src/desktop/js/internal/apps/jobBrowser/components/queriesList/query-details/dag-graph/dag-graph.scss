@@ -103,6 +103,8 @@ $unknown-color: crimson;
 
       cursor: pointer;
 
+      margin-left: 5px;
+
       border: 1px solid $border-lite;
       background-color: $bg-lite;
 
@@ -137,7 +139,7 @@ $unknown-color: crimson;
     }
   }
 
-  .fullscreen {
+  .fullscreen, &:fullscreen {
     height: 100%;
     margin: 0px;
 
