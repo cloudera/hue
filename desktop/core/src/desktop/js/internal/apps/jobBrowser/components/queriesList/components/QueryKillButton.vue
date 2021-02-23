@@ -19,7 +19,7 @@
 <template>
   <hue-button v-if="info" :disabled="info.disable" @click="killQueries">
     <em v-if="info.icon" :class="`fa ${info.icon}`" />
-    {{ info.msg }} {{ info.disable }}
+    {{ info.msg }}
   </hue-button>
 </template>
 

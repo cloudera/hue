@@ -29,12 +29,20 @@ export interface CounterGroup {
   counters: CounterDetails[];
 }
 
+export interface VertexEvent {
+  eventtype: string;
+  timestamp: number;
+  eventinfo: KeyHash<unknown>;
+}
+
 export interface Vertex {
   id: number;
   name: string;
   vertexId: string;
   dagId: number;
   taskCount: number;
+
+  events?: VertexEvent[];
 
   succeededTaskCount: number;
   completedTaskCount: number;
@@ -50,6 +58,8 @@ export interface Vertex {
   initRequestedTime: number;
   startRequestedTime: number;
   status: string;
+  finalStatus?: string;
+
   counters: CounterGroup[];
   stats: {
     firstTaskStartTime: number;
@@ -70,7 +80,7 @@ export interface DagPlanVertex {
 
 export interface DagPlan {
   vertices: DagPlanVertex[];
-  edges: unknown[];
+  edges: KeyHash<string>[];
   vertexGroups: unknown[];
 }
 

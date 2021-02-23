@@ -126,12 +126,12 @@
   import { timeAgo } from 'components/TimeAgo.vue';
   import I18n from 'utils/i18n';
 
-  const DEFAULT_STATUS_FACET_VALUES: [][] = [
+  const DEFAULT_STATUS_FACET_VALUES: Map<string, FacetValue> = new Map<string, FacetValue>([
     ['STARTED', { key: 'STARTED', value: 0 }],
     ['RUNNING', { key: 'RUNNING', value: 0 }],
     ['SUCCESS', { key: 'SUCCESS', value: 0 }],
     ['ERROR', { key: 'ERROR', value: 0 }]
-  ];
+  ]);
 
   export default defineComponent({
     name: 'QueryTable',
@@ -343,21 +343,19 @@
         }
       },
       setStatusFacetValues(values: FacetValue[]): void {
-        const valueMap = new Map<string, FacetValue>(DEFAULT_STATUS_FACET_VALUES);
-
         values.forEach(val => {
-          const facet = valueMap.get(val.key);
+          const facet = DEFAULT_STATUS_FACET_VALUES.get(val.key);
           if (facet) {
             facet.value = val.value;
           }
         });
 
         // For some reason [...valueMap.values()] throws exception
-        const facetValues = [];
-        valueMap.forEach(val => {
+        const facetValues: FacetValue[] = [];
+        DEFAULT_STATUS_FACET_VALUES.forEach(val => {
           facetValues.push(val);
         });
-        this.statusFacet.values.splice(0, this.statusFacet.values.length, facetValues);
+        this.statusFacet.values.splice(0, this.statusFacet.values.length, ...facetValues);
       },
       timeRangeChanged(timeRange: Range): void {
         this.timeRange = timeRange;
@@ -386,6 +384,10 @@
 
       ::v-deep(.hue-dropdown-panel button) {
         margin-left: 10px;
+      }
+
+      .hue-btn {
+        margin-left: 5px;
       }
 
       .query-table-filters {

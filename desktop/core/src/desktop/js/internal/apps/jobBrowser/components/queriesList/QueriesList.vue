@@ -18,7 +18,7 @@
 
 <template>
   <div class="queries-list">
-    <Spinner v-if="loading" size="xlarge" center="true" overlay="false" />
+    <Spinner v-if="loading" size="xlarge" :center="true" :overlay="true" />
     <InlineAlert
       v-if="error"
       :type="AlertType.Error"
@@ -31,7 +31,7 @@
     <query-details
       v-else-if="selectedQuery"
       :query="selectedQuery"
-      @reload="querySelected(selectedQuery)"
+      @reload="selectedQuery && querySelected(selectedQuery)"
     />
     <query-details-diff v-else-if="queriesToDiff" :queries="queriesToDiff" />
     <query-table
@@ -40,7 +40,7 @@
       :total-queries="(searchMeta && searchMeta.size) || 0"
       @diff-queries="diffQueries"
       @query-selected="querySelected"
-      @reload="fetch(lastFetchOptions)"
+      @reload="lastFetchOptions && fetch(lastFetchOptions)"
       @search="fetch"
     />
   </div>
@@ -59,6 +59,7 @@
   import InlineAlert, { AlertType } from 'components/InlineAlert.vue';
   import { Page } from 'components/Paginator';
   import Spinner from 'components/Spinner.vue';
+  import { ApiError } from './api-utils/api';
 
   const QUERY_ID_PARAM = 'queryId';
 
@@ -80,24 +81,13 @@
     },
     provide() {
       return {
-        showQueries: () => {
-          this.selectedQuery = null;
-          this.queriesToDiff = null;
-          this.error = null;
-
-          const urlParams = new URLSearchParams(window.location.search);
-          let index = 0;
-          while (urlParams.get(QUERY_ID_PARAM + index)) {
-            hueUtils.removeURLParameter(QUERY_ID_PARAM + index);
-            index++;
-          }
-        }
+        showQueries: () => this.showQueries()
       };
     },
     data() {
       return {
         AlertType: AlertType,
-        error: null as Error | null,
+        error: null as ApiError | null,
         lastFetchOptions: null as FetchOptions | null,
         loading: false,
         queries: [] as Query[],
@@ -123,6 +113,19 @@
       }
     },
     methods: {
+      showQueries(): void {
+        this.selectedQuery = null;
+        this.queriesToDiff = null;
+        this.error = null;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        let index = 0;
+        while (urlParams.get(QUERY_ID_PARAM + index)) {
+          hueUtils.removeURLParameter(QUERY_ID_PARAM + index);
+          index++;
+        }
+      },
+
       async fetch(options: FetchOptions): Promise<void> {
         // Initial fetch triggered by the paginator
         const now = Date.now();
