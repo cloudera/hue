@@ -29,7 +29,8 @@ describe('Tab.vue', () => {
           },
           removeTab: () => {
             // Empty
-          }
+          },
+          selectedTabRef: null
         }
       },
       slots: {
