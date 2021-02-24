@@ -1,4 +1,4 @@
-{{- if .Values.hue.api.enabled -}}
+{{- if .Values.api.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
