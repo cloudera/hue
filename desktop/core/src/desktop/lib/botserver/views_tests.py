@@ -21,6 +21,7 @@ import unittest
 import sys
 
 from nose.tools import assert_equal, assert_true
+from nose.plugins.skip import SkipTest
 from django.test import TestCase, Client
 from desktop.lib.botserver.views import *
 from desktop import conf
@@ -32,36 +33,17 @@ else:
 
 LOG = logging.getLogger(__name__)
 
-if conf.SLACK.IS_ENABLED.get():
-  class TestBotServer(unittest.TestCase):
-    def test_get_bot_id(self):
-      with patch('desktop.lib.botserver.views.slack_client.api_call') as api_call:
-        api_call.return_value = {
-          'members': [
-            {
-              'name': 'hue_bot',
-              'deleted': False,
-              'id': 'U01K99VEDR9'
-            }
-          ]
-        }
-        assert_equal(get_bot_id('hue_bot'), 'U01K99VEDR9')
+class TestBotServer(unittest.TestCase):
+  
+  @classmethod
+  def setUpClass(cls):
+    if not conf.SLACK.IS_ENABLED.get():
+      raise SkipTest
 
-        api_call.return_value = {
-          'members': [
-            {
-              'name': 'hue_bot',
-              'deleted': True,
-              'id': 'U01K99VEDR9'
-            }
-          ]
-        }
-        assert_equal(get_bot_id('hue_bot'), None)
-
-    def test_say_hi_user(self):
-      with patch('desktop.lib.botserver.views.slack_client.api_call') as api_call:
-        api_call.return_value = {
-          "ok": True
-        }
-        response = say_hi_user("channel", "user_id")
-        assert_true(response['ok'])
+  def test_say_hi_user(self):
+    with patch('desktop.lib.botserver.views.slack_client.api_call') as api_call:
+      api_call.return_value = {
+        "ok": True
+      }
+      response = say_hi_user("channel", "user_id")
+      assert_true(response['ok'])
