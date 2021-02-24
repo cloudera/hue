@@ -15,8 +15,6 @@ hue:
     #password_script=echo ${DATABASE_PASSWORD}
     name: "hue"
     storageName: "microk8s-hostpath"
-  api:
-    enabled: false
   interpreters: |
     [[[postgresql]]]
       name = postgresql
@@ -37,6 +35,8 @@ hue:
     celery_result_backend=redis://redis:6379/0
 balancer:
   enabled: true
+api:
+  enabled: false
 workers:
   enabled: false
   replicas: 1
