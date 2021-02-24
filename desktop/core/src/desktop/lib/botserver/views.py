@@ -18,26 +18,25 @@
 import logging
 import json
 from pprint import pprint
-
+ 
 from desktop import conf
 from django.http import HttpResponse
 from desktop.lib.django_util import login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
-
+ 
 LOG = logging.getLogger(__name__)
-
+ 
 SLACK_VERIFICATION_TOKEN = conf.SLACK.SLACK_VERIFICATION_TOKEN.get()
 SLACK_BOT_USER_TOKEN = conf.SLACK.SLACK_BOT_USER_TOKEN.get()
-
-slack_client, appname = None, None
+ 
+slack_client = None
 if conf.SLACK.IS_ENABLED.get():
   from slack_sdk import WebClient
   slack_client = WebClient(token=SLACK_BOT_USER_TOKEN)
-  appname = "hue_bot"
-
-
+ 
+ 
 @login_notrequired
 @csrf_exempt
 def slack_events(request):
@@ -46,7 +45,7 @@ def slack_events(request):
     
     if slack_message['token'] != SLACK_VERIFICATION_TOKEN:
       return HttpResponse(status=403)
-
+  
       # challenge verification
     if slack_message['type'] == 'url_verification':
       response_dict = {"challenge": slack_message['challenge']}
@@ -57,43 +56,43 @@ def slack_events(request):
       parse_events(event_message)
   except ValueError as e:
     raise PopupException(_("Response content is not valid JSON"), detail=e)
-  
+
   return HttpResponse(status=200)
+ 
+ 
+def parse_events(event):
+  """
+  Parses the event according to its 'type'
+  """
 
-
-def parse_events(event_message):
-  user_id = event_message.get('user')
-  text = event_message.get('text')
-  channel = event_message.get('channel')
-
-  BOT_ID = None
-  if appname is not None:
-    BOT_ID = get_bot_id(appname)
-
-  # ignore bot's own message
-  if BOT_ID == user_id:
-    return HttpResponse(status=200)
+  if event.get('type') == 'message':
+    user_id = event.get('user')
+    text = event.get('text')
+    channel = event.get('channel')
   
-  if slack_client is not None:
-    if 'hello hue' in text.lower():
-      response = say_hi_user(channel, user_id)
-      if response['ok']:
-        return HttpResponse(status=200)
-      else:
-        raise PopupException(response["error"])
+    # ignore bot's own message since
+    # that will cause an infinite loop of messages if we respond
+    if event.get('bot_id'):
+      return HttpResponse(status=200)
+    
+    if slack_client:
+      if text and 'hello hue' in text.lower():
+        response = say_hi_user(channel, user_id)
+        if response['ok']:
+          return HttpResponse(status=200)
+        else:
+          raise PopupException(response["error"])
 
-  
+  if event.get('type') == 'link_shared':
+    channel = event.get('channel')
+    ts = event.get('message_ts')
+    inks = event.get('links')
+ 
+ 
 def say_hi_user(channel, user_id):
-  """Bot sends Hi<username> message in a specific channel"""
-
+  """
+  Sends Hi<user_id> message in a specific channel.
+  """
+ 
   bot_message = 'Hi <@{}> :wave:'.format(user_id)
   return slack_client.api_call(api_method='chat.postMessage', json={'channel': channel, 'text': bot_message})
-
-def get_bot_id(botusername):
-  """Takes in bot username, Returns the bot id"""
-  
-  response = slack_client.api_call('users.list')
-  users = response['members']
-  for user in users:
-    if botusername in user.get('name', '') and not user.get('deleted'):
-      return user.get('id')
