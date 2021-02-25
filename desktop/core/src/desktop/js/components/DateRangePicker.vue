@@ -18,7 +18,7 @@
 
 <template>
   <dropdown-panel :text="selectedRange.title" :inline="inline">
-    <template #contents="{ closePanel }">
+    <template #default="{ closePanel }">
       <div class="date-range-picker-panel">
         <div class="date-range-picker-body">
           <div class="date-range-picker-preset">

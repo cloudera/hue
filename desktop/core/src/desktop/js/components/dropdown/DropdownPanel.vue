@@ -24,8 +24,13 @@
     <hue-button v-else ref="triggerButtonElement" :disabled="disabled" @click="toggleDrawer">
       {{ text }} <i class="fa fa-caret-down" />
     </hue-button>
-    <DropdownDrawer :open="open" :trigger-element="triggerElement" @close="closeDrawer">
-      <slot />
+    <DropdownDrawer
+      :open="open"
+      :trigger-element="triggerElement"
+      :close-on-click="false"
+      @close="closeDrawer"
+    >
+      <slot :close-panel="closeDrawer" />
     </DropdownDrawer>
   </div>
 </template>
