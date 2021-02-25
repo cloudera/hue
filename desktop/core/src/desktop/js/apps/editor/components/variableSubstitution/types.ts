@@ -17,7 +17,7 @@
 import DataCatalogEntry from 'catalog/DataCatalogEntry';
 
 export interface VariableOption {
-  text: string;
+  label: string;
   value: string;
 }
 
