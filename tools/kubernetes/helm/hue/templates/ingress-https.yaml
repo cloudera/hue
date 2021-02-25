@@ -7,7 +7,6 @@ metadata:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-hue-prod
     cert-manager.io/acme-challenge-type: http01
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-name: "hue-balancer"
@@ -23,18 +22,24 @@ spec:
   - host: {{ .Values.ingress.domain }}
     http:
       paths:
-      {{ if .Values.api.enabled }}
-      - backend:
-          serviceName: hue-api
-          servicePort: 8005
-        path: /api/(.*)
-      {{ end }}
       - backend:
           serviceName: hue-balancer
           servicePort: 80
-        path: /(.*)
+        path: /
+  {{ if .Values.api.enabled }}
+  - host: {{ .Values.api.domain }}
+    http:
+      paths:
+      - backend:
+          serviceName: hue-api
+          servicePort: 8005
+        path: /
+  {{ end }}
   tls:
   - hosts:
     - {{ .Values.ingress.domain }}
+    {{ if .Values.api.enabled }}
+    - {{ .Values.api.domain }}
+    {{ end }}
     secretName: letsencrypt-hue-prod-tls
 {{- end -}}
