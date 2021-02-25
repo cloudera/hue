@@ -15,11 +15,34 @@
 // limitations under the License.
 
 import { Directive } from 'vue';
-import { defer } from '../../utils/hueUtils';
+import { defer } from 'utils/hueUtils';
 
 interface ClickOutsideHTMLElement extends HTMLElement {
   clickOutsideHandler?: (event: MouseEvent) => void;
 }
+
+export const removeClickOutsideHandler = (element: ClickOutsideHTMLElement): void => {
+  if (element.clickOutsideHandler) {
+    document.removeEventListener('click', element.clickOutsideHandler);
+    element.clickOutsideHandler = undefined;
+  }
+};
+
+export const addClickOutsideHandler = (
+  element: ClickOutsideHTMLElement,
+  callback: (event: MouseEvent) => void
+): (() => void) => {
+  removeClickOutsideHandler(element);
+  element.clickOutsideHandler = (event: MouseEvent) => {
+    if (document.contains(<Node>event.target) && !element.contains(<Node>event.target)) {
+      callback(event);
+    }
+  };
+  document.addEventListener('click', element.clickOutsideHandler);
+  return () => {
+    removeClickOutsideHandler(element);
+  };
+};
 
 export const clickOutsideDirective: Directive<
   ClickOutsideHTMLElement,
@@ -28,23 +51,9 @@ export const clickOutsideDirective: Directive<
   mounted: (element, binding) => {
     defer(() => {
       if (binding.value && typeof binding.value === 'function') {
-        element.clickOutsideHandler = (event: MouseEvent) => {
-          if (
-            binding.value &&
-            document.contains(<Node>event.target) &&
-            !element.contains(<Node>event.target)
-          ) {
-            binding.value(event);
-          }
-        };
-        document.addEventListener('click', element.clickOutsideHandler);
+        addClickOutsideHandler(element, binding.value);
       }
     });
   },
-  unmounted: element => {
-    if (element.clickOutsideHandler) {
-      document.removeEventListener('click', element.clickOutsideHandler);
-      element.clickOutsideHandler = undefined;
-    }
-  }
+  unmounted: removeClickOutsideHandler
 };
