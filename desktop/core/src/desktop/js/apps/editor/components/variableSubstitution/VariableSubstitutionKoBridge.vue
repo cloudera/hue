@@ -26,15 +26,14 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, PropType, reactive } from 'vue';
-
-  import { wrap } from 'vue/webComponentWrap';
+  import { defineComponent, PropType, ref } from 'vue';
 
   import { Variable } from './types';
   import VariableSubstitution from './VariableSubstitution.vue';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import { IdentifierLocation } from 'parse/types';
   import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
+  import { wrap } from 'vue/webComponentWrap';
 
   const VariableSubstitutionKoBridge = defineComponent({
     name: 'VariableSubstitutionKoBridge',
@@ -50,16 +49,18 @@
     setup() {
       const subTracker = new SubscriptionTracker();
 
-      const locations = reactive<IdentifierLocation[]>([]);
+      const locations = ref<IdentifierLocation[]>([]);
 
       subTracker.subscribe(
         POST_FROM_LOCATION_WORKER_EVENT,
         (e: { data?: { locations?: IdentifierLocation[] } }) => {
           if (e.data && e.data.locations) {
-            locations.splice(0, locations.length, ...e.data.locations);
+            locations.value = e.data.locations;
           }
         }
       );
+
+      return { locations };
     },
     methods: {
       onVariablesChanged(variables: Variable[]): void {
