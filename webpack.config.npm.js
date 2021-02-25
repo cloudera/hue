@@ -27,9 +27,9 @@ const JS_ROOT = path.join(__dirname, '/desktop/core/src/desktop/js');
 const WRAPPER_DIR = `${__dirname}/tools/vue3-webcomponent-wrapper`;
 
 const defaultConfig = Object.assign({}, require('./webpack.config'), {
-  mode: 'production',
+  mode: 'development',
   optimization: {
-    minimize: true
+    minimize: false
   },
   plugins: []
 });
@@ -156,11 +156,11 @@ const parserConfig = Object.assign({}, defaultConfig, {
     dasksqlAutocompleteParser: [`${JS_ROOT}/parse/sql/dasksql/dasksqlAutocompleteParser.js`],
     dasksqlSyntaxParser: [`${JS_ROOT}/parse/sql/dasksql/dasksqlSyntaxParser.js`]
   },
-  performance: {
-    hints: false,
-    maxEntrypointSize: 1500000,
-    maxAssetSize: 1500000
-  },
+  // performance: {
+  //   hints: false,
+  //   maxEntrypointSize: 1500000,
+  //   maxAssetSize: 1500000
+  // },
   output: {
     path: `${DIST_DIR}/lib/parsers`,
     library: '[name]',
