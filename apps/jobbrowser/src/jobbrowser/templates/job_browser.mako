@@ -481,9 +481,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <!-- /ko -->
               <div id="slas" data-bind="visible: interface() === 'slas'"></div>
 
-              <div id="queries" data-bind="visible: interface() === 'queries'">
+              <!-- ko if: interface() === 'queries' -->
                 <queries-list></queries-list>
-              </div>
+              <!-- /ko -->
 
               <!-- ko if: interface() === 'oozie-info' -->
                 <!-- ko hueSpinner: { spin: oozieInfoLoading(), center: true, size: 'xlarge' } --><!-- /ko -->
