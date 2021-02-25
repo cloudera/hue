@@ -23,12 +23,12 @@
     <!-- <queries-search :searches="searches" :table-definition="tableDefinition" /> -->
     <div class="query-table-actions">
       <search-input
-        v-model="searchQuery"
+        :value="searchText"
         :placeholder="I18n('Query text or Query/DAG/App ID')"
         :show-magnify="false"
-        @search="searchQueryEnter"
+        @search="searchQueries"
       />
-      <hue-button @click="searchQueryEnter">
+      <hue-button @click="searchQueries">
         <em class="fa fa-search" />
       </hue-button>
 
@@ -54,6 +54,9 @@
           {{ I18n('Compare') }}
         </hue-button>
         <QueryKillButton :queries="selectedQueries" @killed="reload()" />
+        <hue-button @click="searchQueries">
+          {{ I18n('Refresh') }}
+        </hue-button>
       </div>
     </div>
     <div class="query-table-container">
@@ -238,7 +241,7 @@
         visibleColumns: [] as Column<Query>[],
         selectedQueries: [] as Query[],
         currentPage: null as Page | null,
-        searchQuery: '',
+        searchText: '',
         timeRange: null as Range | null,
         facets: {} as { [field: string]: SearchFacet },
         statusFacet: {
@@ -271,10 +274,9 @@
     },
     methods: {
       clearSearch(): void {
-        this.searchQuery = '';
+        this.searchText = '';
         (this.$refs.rangePicker as typeof DateRangePicker).clear();
         (this.$refs.statusFacetSelector as typeof FacetSelector).clear();
-        (this.$refs.userFacetSelector as typeof FacetSelector).clear();
       },
       diffQueries(queries: Query[]): void {
         this.$emit('diff-queries', queries);
@@ -297,7 +299,7 @@
         this.notifyThrottle = window.setTimeout(async () => {
           this.$emit('search', {
             page: this.currentPage,
-            text: this.searchQuery,
+            text: this.searchText,
             timeRange: this.timeRange,
             facets: Object.values(this.facets)
           });
@@ -332,8 +334,11 @@
         this.selectedQueries = [];
         this.$emit('reload');
       },
-      searchQueryEnter(searchQuery: string): void {
-        this.searchQuery = searchQuery;
+      searchQueries(searchText: string): void {
+        if(searchText !== undefined) {
+          this.searchText = searchText;
+        }
+
         if (this.currentPage && this.currentPage.offset !== 0) {
           // pageChanged will notify
           const limit = this.currentPage.limit;
