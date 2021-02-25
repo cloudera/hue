@@ -2,15 +2,48 @@
 @import '../../../../components/styles/mixins.scss';
 
 .variable-substitution {
-  margin: 10px 5px 0 5px;
+  padding: 5px;
 
   >:not(:first-child) {
     margin-left: 10px;
   }
 
+  > div {
+    display: inline-block;
+    height: 28px;
+    vertical-align: top;
+    line-height: 20px;
+  }
+
   .variable-value {
     display: inline-block;
-    font-size: 0; // Removes space between label and input
+    height: 28px;
+
+    .combo-box {
+      display: inline-block;
+      border: 0;
+      padding: 0;
+      width: 160px;
+      height: 28px;
+
+      .typeahead-input {
+        height: 100%;
+      }
+
+      input {
+        font-size: 14px;
+        border: 1px solid $fluid-gray-300;
+        margin: 0;
+        padding: 3px 6px;
+        border-radius: 0 2px 2px 0;
+
+        &:active,
+        &:focus {
+          outline: none;
+          border-color: $hue-primary-color-dark;
+        }
+      }
+    }
 
     .variable-label,
     .variable-input {
