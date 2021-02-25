@@ -46,4 +46,5 @@ class TestBotServer(unittest.TestCase):
         "ok": True
       }
       response = say_hi_user("channel", "user_id")
+      api_call.assert_called_with(api_method='chat.postMessage', json={'channel': 'channel', 'text': 'Hi <@user_id> :wave:'})
       assert_true(response['ok'])
