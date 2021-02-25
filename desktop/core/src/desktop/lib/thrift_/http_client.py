@@ -27,9 +27,9 @@ from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
 if sys.version_info[0] > 2:
-  from io import StringIO as string_io
+  from io import BytesIO as buffer_writer
 else:
-  from cStringIO import StringIO as string_io
+  from cStringIO import StringIO as buffer_writer
 
 LOG = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ class THttpClient(TTransportBase):
     self._client = HttpClient(self._base_url, logger=LOG)
     self._data = None
     self._headers = None
-    self._wbuf = string_io()
+    self._wbuf = buffer_writer()
 
   def open(self):
     pass
@@ -87,7 +87,7 @@ class THttpClient(TTransportBase):
 
   def flush(self):
     data = self._wbuf.getvalue()
-    self._wbuf = string_io()
+    self._wbuf = buffer_writer()
 
     # POST
     self._root = Resource(self._client)

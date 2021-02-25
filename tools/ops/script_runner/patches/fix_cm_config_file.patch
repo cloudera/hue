@@ -1,0 +1,36 @@
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+diff --git a/desktop/core/src/desktop/manage_entry.py b/desktop/core/src/desktop/manage_entry.py
+index e02436ff73..e9971df789 100644
+--- a/desktop/core/src/desktop/manage_entry.py
++++ b/desktop/core/src/desktop/manage_entry.py
+@@ -41,6 +41,7 @@ def entry():
+   from django.core.management.base import BaseCommand
+
+   os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'desktop.settings')
++  cm_config_file = '/etc/cloudera-scm-agent/config.ini'
+
+   # What's the subcommand being run?
+   # This code uses the same logic from django.core.management to handle command args
+@@ -57,7 +58,6 @@ def entry():
+                         "import_ldap_group", "import_ldap_user", "sync_ldap_users_and_groups", "useradmin_sync_with_unix" ]
+     if subcommand in commands_req_db:
+       #Check if this is a CM managed cluster
+-      cm_config_file = '/etc/cloudera-scm-agent/config.ini'
+       if os.path.isfile(cm_config_file) and "--cm-managed" not in sys.argv:
+         if not "HUE_CONF_DIR" in os.environ:
+           print "ALERT: This appears to be a CM Managed environment"
