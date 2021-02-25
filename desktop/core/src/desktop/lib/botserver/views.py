@@ -105,45 +105,36 @@ def parse_events(event):
         database = doc2_data['snippets'][0]['database']
 
         payload = {
-          'unfurls': {
-            item['url']: {
-              "attachments": [
-                {
-                  "blocks": [
-                    {
-                      "type": "section",
-                      "text": {
-                        "type": "mrkdwn",
-                        "text": "\n*<{}|Hue - SQL Editor>*".format((item['url']))
-                      }
-                    },
-                    {
-                      "type": "divider"
-                    },
-                    {
-                      "type": "section",
-                      "text": {
-                        "type": "mrkdwn",
-                        "text": query_statement
-                      }
-                    },
-                    {
-                      "type": "section",
-                      "fields": [
-                        {
-                          "type": "mrkdwn",
-                          "text": "*Dialect:*\n{}".format(dialect)
-                        },
-                        {
-                          "type": "mrkdwn",
-                          "text": "*Database:*\n{}".format(database)
-                        }
-                      ]
-                    }
-                  ]
+          item['url']: {
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "\n*<{}|Hue - SQL Editor>*".format((item['url']))
                 }
-              ]
-            }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": query_statement
+                }
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Dialect:*\n{}".format(dialect)
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Database:*\n{}".format(database)
+                  }
+                ]
+              }
+            ]
           }
         }
 
