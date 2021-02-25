@@ -64,39 +64,6 @@
 
       overflow-x: hidden;
       overflow-y: auto;
-
-      ::v-deep(ul) {
-        overflow-x: hidden;
-        margin: 0 !important;
-        padding: 0;
-        list-style: none;
-        font-size: 13px;
-
-        li {
-          color: $fluid-gray-800;
-
-          button,
-          a {
-            display: block;
-            width: 100%;
-            padding: 6px 16px;
-            clear: both;
-            font-weight: 400;
-            text-align: inherit;
-            white-space: nowrap;
-            background-color: transparent;
-            border: 0;
-            position: relative;
-            outline: 0;
-
-            &:hover,
-            &.active,
-            &.focus {
-              background-color: $hue-primary-color-light;
-            }
-          }
-        }
-      }
     }
   }
 </style>
