@@ -18,16 +18,19 @@
 
 <template>
   <div class="variable-substitution">
-    <span v-for="variable of activeVariables" :key="variable.name">
+    <div v-for="variable of activeVariables" :key="variable.name">
       <div class="variable-value">
         <div class="variable-label">{{ variable.name }}</div>
         <input
+          v-if="variable.meta.options.length === 0"
           v-model="variable.value"
           class="variable-input"
+          autocomplete="no"
           :placeholder="variable.meta.placeholder"
         />
+        <ComboBox v-else v-model="variable.value" :options="variable.meta.options" />
       </div>
-    </span>
+    </div>
   </div>
 </template>
 
@@ -37,8 +40,9 @@
   import { cloneDeep } from 'lodash';
 
   import { Variable, VariableIndex, VariableOption } from './types';
-  import { IdentifierLocation } from 'parse/types';
   import DataCatalogEntry, { FieldSourceMeta } from 'catalog/DataCatalogEntry';
+  import ComboBox from 'components/ComboBox.vue';
+  import { IdentifierLocation } from 'parse/types';
   import { noop } from 'utils/hueUtils';
 
   const NAMED_OPTION_REGEX = /^(.+)\(([^)]+)\)$/;
@@ -54,13 +58,13 @@
     if (namedMatch) {
       return {
         value: namedMatch[1].trim(),
-        text: namedMatch[2].trim()
+        label: namedMatch[2].trim()
       };
     }
     const trimmed = val.trim();
     return {
       value: trimmed,
-      text: trimmed
+      label: trimmed
     };
   };
 
@@ -117,6 +121,7 @@
 
   export default defineComponent({
     name: 'VariableSubstitution',
+    components: { ComboBox },
     props: {
       initialVariables: {
         type: Object as PropType<{ [name: string]: Variable }>,
@@ -129,17 +134,12 @@
         default: undefined
       }
     },
-
     emits: ['variables-changed'],
-
-    data(): {
-      knownVariables: { [name: string]: KnownVariable };
-    } {
+    data() {
       return {
-        knownVariables: {}
+        knownVariables: {} as { [name: string]: KnownVariable }
       };
     },
-
     computed: {
       activeVariables(): Variable[] {
         const active = Object.values(this.knownVariables).filter(variable => variable.active);
@@ -147,7 +147,6 @@
         return active;
       }
     },
-
     watch: {
       activeVariables(): void {
         this.$emit(
@@ -244,7 +243,6 @@
         });
       }
     },
-
     mounted(): void {
       if (this.initialVariables) {
         Object.values(this.initialVariables).forEach((variable, index) => {

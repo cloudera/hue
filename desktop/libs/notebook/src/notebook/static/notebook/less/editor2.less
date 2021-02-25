@@ -79,6 +79,27 @@
         .flexRowLayoutRow(1 0 5px);
       }
 
+      .editor-code-editor {
+        .flexRowLayoutRow(0 1 100%);
+
+        .ace_gutter {
+          background-color: transparent !important;
+          border-right: 1px solid @cui-gray-100;
+
+          > .ace_layer {
+            border-left: none;
+          }
+        }
+      }
+
+      .editor-variable-substitution {
+        .flexRowLayoutRow(1);
+      }
+
+      .editor-execute-status {
+        .flexRowLayoutRow(1 0 5px);
+      }
+
       .editor-execute-actions {
         .flexRowLayoutRow(0 0 36px);
       }

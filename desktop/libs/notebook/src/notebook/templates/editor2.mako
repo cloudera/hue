@@ -899,24 +899,26 @@
         <div class="editor-code-editor">
           <!-- ko template: { name: 'editor-code-editor' } --><!-- /ko -->
         </div>
-  ##      <!-- ko template: { name: 'snippet-variables' }--><!-- /ko -->
-          <variable-substitution-ko-bridge data-bind="
-            vueEvents: {
-              'variables-changed': function (event) {
-                setVariables(event.detail);
-              }
-            },
-            vueKoProps: {
-              'initial-variables': executor.variables
-            }
-          "></variable-substitution-ko-bridge>
-  ##      <!-- ko template: { name: 'editor-executable-snippet-body' } --><!-- /ko -->
         <div class="editor-execute-status">
-          <executable-progress-bar-ko-bridge data-bind="vueKoProps: {
+              <executable-progress-bar-ko-bridge data-bind="vueKoProps: {
             'executable-observable': activeExecutable
           }"></executable-progress-bar-ko-bridge>
-  ##      <!-- ko template: { name: 'editor-snippet-execution-status' } --><!-- /ko -->
+              ##      <!-- ko template: { name: 'editor-snippet-execution-status' } --><!-- /ko -->
         </div>
+  ##      <!-- ko template: { name: 'snippet-variables' }--><!-- /ko -->
+        <div class="editor-variable-substitution">
+          <variable-substitution-ko-bridge data-bind="
+              vueEvents: {
+                'variables-changed': function (event) {
+                  setVariables(event.detail);
+                }
+              },
+              vueKoProps: {
+                'initial-variables': executor.variables
+              }
+            "></variable-substitution-ko-bridge>
+        </div>
+  ##      <!-- ko template: { name: 'editor-executable-snippet-body' } --><!-- /ko -->
         <div class="editor-execute-actions">
           <!-- ko template: { name: 'editor-execution-controls' } --><!-- /ko -->
         </div>
