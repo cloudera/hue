@@ -98,6 +98,7 @@
           this.position.left = '';
           this.position.right = `${rightOffset}px`;
         }
+
         defer(() => {
           addClickOutsideHandler(this.$el, event => {
             if (this.triggerElement !== event.target) {
@@ -105,6 +106,8 @@
             }
           });
         });
+
+        this.$forceUpdate();
       }
     },
     methods: {
@@ -123,7 +126,7 @@
 
   .hue-dropdown-drawer {
     position: fixed;
-    z-index: 1061;
+    z-index: 10610;
 
     &.open {
       .hue-dropdown-drawer-inner {
