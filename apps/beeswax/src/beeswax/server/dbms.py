@@ -38,6 +38,7 @@ from desktop.settings import CACHES_HIVE_DISCOVERY_KEY
 from indexer.file_format import HiveFormat
 from libzookeeper import conf as libzookeeper_conf
 
+from azure.abfs import abfspath
 from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_SERVER_HOST, HIVE_HTTP_THRIFT_PORT, HIVE_METASTORE_HOST, \
     HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
     AUTH_USERNAME, AUTH_PASSWORD, APPLY_NATURAL_SORT_MAX, QUERY_PARTITIONS_LIMIT, HIVE_DISCOVERY_HIVESERVER2_ZNODE, \
@@ -806,7 +807,10 @@ class HiveServer2Dbms(object):
 
   def load_data(self, database, table, form_data, design, generate_ddl_only=False):
     hql = "LOAD DATA INPATH"
-    hql += " '%(path)s'" % form_data
+    source_path = "%(path)s" % form_data
+    if source_path.lower().startswith("abfs"): #this is to check if its using an ABFS path
+      source_path = abfspath(source_path)
+    hql += " '%s'" % source_path
     if form_data['overwrite']:
       hql += " OVERWRITE"
     hql += " INTO TABLE "
