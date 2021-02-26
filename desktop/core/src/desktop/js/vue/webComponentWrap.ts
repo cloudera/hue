@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { ComponentOptions, Component } from 'vue';
-import wrapper from './wrapper/index';
+import wrapper, { WebComponentOptions } from './wrapper/index';
 
 export interface HueComponentOptions<T extends Component> extends ComponentOptions<T> {
   hueBaseUrl?: string;
@@ -28,10 +28,10 @@ const isRegistered = function (tag: string): boolean {
 export const wrap = <T extends Component>(
   tag: string,
   component: { new (): T },
-  options?: ElementDefinitionOptions
+  options?: WebComponentOptions
 ): void => {
   if (!isRegistered(tag)) {
-    const customElement: CustomElementConstructor = wrapper(component);
-    window.customElements.define(tag, customElement, options);
+    const customElement: CustomElementConstructor = wrapper(component, options);
+    window.customElements.define(tag, customElement);
   }
 };
