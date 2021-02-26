@@ -38,16 +38,24 @@ const npmSetupPlugins = [
     patterns: [
       { from: './package.json', to: `${DIST_DIR}/package.json` },
       { from: './NPM-README.md', to: `${DIST_DIR}/README.md` },
-
-      { from: JS_ROOT, to: `${DIST_DIR}` }
+      { from: JS_ROOT, to: `${DIST_DIR}/src` }
     ]
   })
 ];
 
+const libConfig = Object.assign({}, defaultConfig, {
+  entry: {
+    executor: [`${JS_ROOT}/apps/editor/execution/executor.ts`]
+  },
+  output: {
+    path: `${DIST_DIR}/lib/`
+  }
+});
+
 const webComponentsConfig = Object.assign({}, defaultConfig, {
   entry: {
     'er-diagram': [`${JS_ROOT}/components/er-diagram/webcomp.ts`],
-    'query-editor': [`${JS_ROOT}/apps/editor/components/aceEditor/QueryEditorWebComponent.ts`]
+    'query-editor-components': [`${JS_ROOT}/apps/editor/components/QueryEditorWebComponent.ts`]
   },
   output: {
     path: `${DIST_DIR}/lib/components`
@@ -55,7 +63,7 @@ const webComponentsConfig = Object.assign({}, defaultConfig, {
   plugins: npmSetupPlugins.concat(new VueLoaderPlugin())
 });
 
-const parserConf = Object.assign({}, defaultConfig, {
+const parserConfig = Object.assign({}, defaultConfig, {
   entry: {
     calciteAutocompleteParser: [`${JS_ROOT}/parse/sql/calcite/calciteAutocompleteParser.js`],
     calciteSyntaxParser: [`${JS_ROOT}/parse/sql/calcite/calciteSyntaxParser.js`],
@@ -107,4 +115,4 @@ const parserConf = Object.assign({}, defaultConfig, {
   }
 });
 
-module.exports = [webComponentsConfig, parserConf];
+module.exports = [libConfig, webComponentsConfig, parserConfig];
