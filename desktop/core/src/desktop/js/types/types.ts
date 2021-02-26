@@ -25,19 +25,6 @@ declare global {
   export interface Moment {
     utc: (val: unknown) => Moment;
     format: (format: string) => string;
-    duration: (
-      value: number,
-      unit?: string
-    ) => {
-      years: () => number;
-      months: () => number;
-      days: () => number;
-      hours: () => number;
-      minutes: () => number;
-      seconds: () => number;
-      milliseconds: () => number;
-      asMilliseconds: () => number;
-    };
   }
 
   const moment: Moment & ((val: unknown) => Moment);
