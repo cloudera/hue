@@ -1,46 +1,29 @@
-# Getting Started with Create React App
+# Getting Started with SQL Scratchpad
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This projects demonstrates how you can use the Hue web components from within a React project to
+create a SQL Scratchpad.
 
-## Available Scripts
+It's based on a clean create-react-app project, relevant changes are:
 
-In the project directory, you can run:
+- gethue dependency in package.json, note that this can also be pulled in from the npm repo by specifing a version > 4.9)
+- "components" folder with React wrappers around the Hue web components
+- App.tsx using the React wrappers
 
-### `npm start`
+We wrap the web components to be able to set certain attributes/properties on the web component elements that are required by the web components.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## To run this project
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### In the Hue root folder:
+1. `npm install`
+2. `npm run webpack-npm`
+   
+### In this project folder:
+3. `npm install`
+4. `npm start`
+5. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-### `npm test`
+## Base project creation steps (for reference)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+1. `npx create-react-app sql-scratchpad --template typescript`
+2. add `"gethue": "file:../../../../npm_dist"` to dependencies in package.json
+3. add `SKIP_PREFLIGHT_CHECK=true` to .env (required when running inside nested Hue folder)
