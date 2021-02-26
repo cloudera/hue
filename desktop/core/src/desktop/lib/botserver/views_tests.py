@@ -20,7 +20,7 @@ import logging
 import unittest
 import sys
 
-from nose.tools import assert_equal, assert_true
+from nose.tools import assert_equal, assert_true, assert_false
 from nose.plugins.skip import SkipTest
 from django.test import TestCase, Client
 from desktop.lib.botserver.views import *
@@ -48,3 +48,19 @@ class TestBotServer(unittest.TestCase):
       response = say_hi_user("channel", "user_id")
       api_call.assert_called_with(api_method='chat.postMessage', json={'channel': 'channel', 'text': 'Hi <@user_id> :wave:'})
       assert_true(response['ok'])
+  
+  def test_handle_on_message(self):
+    with patch('desktop.lib.botserver.views.say_hi_user') as say_hi_user:
+      
+      response = handle_on_message("channel", "bot_id", "text", "user_id")
+      assert_equal(response.status_code, 200)
+      assert_false(say_hi_user.called)
+      
+      handle_on_message("channel", None, None, "user_id")
+      assert_false(say_hi_user.called)
+
+      handle_on_message("channel", None, "text", "user_id")
+      assert_false(say_hi_user.called)
+
+      handle_on_message("channel", None, "hello hue test", "user_id")
+      assert_true(say_hi_user.called)
