@@ -47,7 +47,6 @@ export default class Executor {
     isSqlEngine?: boolean;
     snippet?: Snippet;
     isOptimizerEnabled?: boolean;
-    executables: Executable[];
   }) {
     this.connector = options.connector;
     this.compute = options.compute;
