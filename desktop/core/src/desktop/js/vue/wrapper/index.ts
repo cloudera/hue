@@ -42,12 +42,17 @@ import {
   convertAttributeValue
 } from './utils';
 
+export interface WebComponentOptions {
+  connectedCallback?(): void;
+}
+
 /**
  * Vue 3 wrapper to convert a Vue component into Web Component. Supports reactive attributes, events & slots.
- * @param component: Component - Component object created using Vue's defineComponent function
- * @param eventNames: string[] - Event names to be fired in kabab case. Events must be added using addEventListener, inline events doesnt work as of now.
  */
-export default function wrap(component: Component): CustomElementConstructor {
+export default function wrap(
+  component: Component,
+  options?: WebComponentOptions
+): CustomElementConstructor {
   const componentObj: ComponentOptionsWithObjectProps = <ComponentOptionsWithObjectProps>component;
 
   let isInitialized = false;
@@ -198,6 +203,9 @@ export default function wrap(component: Component): CustomElementConstructor {
       } else {
         // Call mounted on re-insert
         callHooks(this._component, 'mounted');
+      }
+      if (options?.connectedCallback) {
+        options.connectedCallback.bind(this)();
       }
     }
 
