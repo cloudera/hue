@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-const path = require('path');
-const { VueLoaderPlugin } = require('vue-loader');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const path = require('path');
+const { VueLoaderPlugin } = require('vue-loader');
 
 const DIST_DIR = path.join(__dirname, 'npm_dist');
 const JS_ROOT = path.join(__dirname, '/desktop/core/src/desktop/js');
@@ -32,24 +32,32 @@ const defaultConfig = Object.assign({}, require('./webpack.config'), {
   plugins: []
 });
 
-const npmSetupPlugins = [
-  new CleanWebpackPlugin([DIST_DIR]),
-  new CopyWebpackPlugin({
-    patterns: [
-      { from: './package.json', to: `${DIST_DIR}/package.json` },
-      { from: './NPM-README.md', to: `${DIST_DIR}/README.md` },
-      { from: JS_ROOT, to: `${DIST_DIR}/src` }
-    ]
-  })
-];
-
 const libConfig = Object.assign({}, defaultConfig, {
   entry: {
     executor: [`${JS_ROOT}/apps/editor/execution/executor.ts`]
   },
   output: {
-    path: `${DIST_DIR}/lib/`
-  }
+    path: `${DIST_DIR}/lib/execution`,
+    library: '[name]',
+    libraryExport: 'default',
+    libraryTarget: 'umd',
+    umdNamedDefine: true,
+    globalObject: `(typeof self !== 'undefined' ? self : this)`
+  },
+  plugins: [
+    new CleanWebpackPlugin([DIST_DIR]),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: './package.json', to: `${DIST_DIR}/package.json` },
+        { from: './NPM-README.md', to: `${DIST_DIR}/README.md` },
+        { from: JS_ROOT, to: `${DIST_DIR}/src` },
+        {
+          from: `${JS_ROOT}/apps/editor/execution/executor.d.ts`,
+          to: `${DIST_DIR}/lib/execution`
+        }
+      ]
+    })
+  ]
 });
 
 const webComponentsConfig = Object.assign({}, defaultConfig, {
@@ -60,7 +68,7 @@ const webComponentsConfig = Object.assign({}, defaultConfig, {
   output: {
     path: `${DIST_DIR}/lib/components`
   },
-  plugins: npmSetupPlugins.concat(new VueLoaderPlugin())
+  plugins: [new VueLoaderPlugin()]
 });
 
 const parserConfig = Object.assign({}, defaultConfig, {
