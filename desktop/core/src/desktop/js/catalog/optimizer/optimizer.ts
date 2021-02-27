@@ -72,6 +72,15 @@ export interface MetaOptions {
   silenceErrors?: boolean;
 }
 
+export interface PredictOptions {
+  beforeCursor: string;
+  afterCursor: string;
+}
+
+export interface PredictResponse {
+  prediction?: string;
+}
+
 export interface Optimizer {
   analyzeRisk(options: RiskOptions): CancellablePromise<OptimizerRisk>;
   analyzeSimilarity(options: SimilarityOptions): CancellablePromise<unknown>;
@@ -82,6 +91,7 @@ export interface Optimizer {
   fetchTopFilters(options: PopularityOptions): CancellablePromise<TopFilters>;
   fetchTopJoins(options: PopularityOptions): CancellablePromise<TopJoins>;
   fetchOptimizerMeta(options: MetaOptions): CancellablePromise<OptimizerMeta>;
+  predict(options: PredictOptions): CancellablePromise<PredictResponse>;
 }
 
 const optimizerInstances: { [connectorId: string]: Optimizer | undefined } = {};

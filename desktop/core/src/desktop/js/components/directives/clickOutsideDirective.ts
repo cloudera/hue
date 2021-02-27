@@ -14,30 +14,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { DirectiveOptions } from 'vue';
+import { Directive } from 'vue';
+import { defer } from 'utils/hueUtils';
 
 interface ClickOutsideHTMLElement extends HTMLElement {
   clickOutsideHandler?: (event: MouseEvent) => void;
 }
 
-export const clickOutsideDirective: DirectiveOptions = {
-  bind: (element: ClickOutsideHTMLElement, binding, vNode) => {
-    element.clickOutsideHandler = (event: MouseEvent) => {
-      if (
-        vNode.context &&
-        vNode.context[binding.expression] &&
-        document.contains(<Node>event.target) &&
-        !element.contains(<Node>event.target)
-      ) {
-        vNode.context[binding.expression](event);
-      }
-    };
-    document.addEventListener('click', element.clickOutsideHandler);
-  },
-  unbind: (element: ClickOutsideHTMLElement) => {
-    if (element.clickOutsideHandler) {
-      document.removeEventListener('click', element.clickOutsideHandler);
-      element.clickOutsideHandler = undefined;
-    }
+export const removeClickOutsideHandler = (element: ClickOutsideHTMLElement): void => {
+  if (element.clickOutsideHandler) {
+    document.removeEventListener('click', element.clickOutsideHandler);
+    element.clickOutsideHandler = undefined;
   }
+};
+
+export const addClickOutsideHandler = (
+  element: ClickOutsideHTMLElement,
+  callback: (event: MouseEvent) => void
+): (() => void) => {
+  removeClickOutsideHandler(element);
+  element.clickOutsideHandler = (event: MouseEvent) => {
+    if (document.contains(<Node>event.target) && !element.contains(<Node>event.target)) {
+      callback(event);
+    }
+  };
+  document.addEventListener('click', element.clickOutsideHandler);
+  return () => {
+    removeClickOutsideHandler(element);
+  };
+};
+
+export const clickOutsideDirective: Directive<
+  ClickOutsideHTMLElement,
+  ((event: MouseEvent) => void) | undefined
+> = {
+  mounted: (element, binding) => {
+    defer(() => {
+      if (binding.value && typeof binding.value === 'function') {
+        addClickOutsideHandler(element, binding.value);
+      }
+    });
+  },
+  unmounted: removeClickOutsideHandler
 };

@@ -87,9 +87,13 @@ ${ dashboard.import_layout() }
                     _w = viewModel.getWidgetById('33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
                   }
                   else {
-                    var actionName = actionId.toLowerCase().substr(actionId.lastIndexOf('@') + 1)
-                    if ($("[id^=wdg_][id*=" + actionName + "]").length > 0) {
-                      _w = viewModel.getWidgetById($("[id^=wdg_][id*=" + actionName + "]").attr("id").substr(4));
+                    var actionNameNew = actionId.toLowerCase().substr(actionId.lastIndexOf('@') + 1)
+                    var actionNameOld = actionId.toLowerCase().substr(actionId.lastIndexOf('-') + 1)
+                    if ($("[id^=wdg_][id*=" + actionNameNew + "]").length > 0) {
+                      _w = viewModel.getWidgetById($("[id^=wdg_][id*=" + actionNameNew + "]").attr("id").substr(4));
+                    }
+                    else if ($("[id^=wdg_][id*=" + actionNameOld + "]").length > 0) {
+                      _w = viewModel.getWidgetById($("[id^=wdg_][id*=" + actionNameOld + "]").attr("id").substr(4));
                     }
                     else {
                       _w = viewModel.getWidgetById('33430f0f-ebfa-c3ec-f237-3e77efa03d0a');

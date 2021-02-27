@@ -154,8 +154,8 @@ describe('ERDiagram integration tests', () => {
     expect(wrapper.findAll('.entity-container')).toHaveLength(tableCount);
     expect(wrapper.findAll('.relation-path')).toHaveLength(2);
 
-    expect(wrapper.findAll('.relation-path').at(0).attributes('d')).toBe('M 0,1 C 40,1 -40,1 0,1');
-    expect(wrapper.findAll('.relation-path').at(1).attributes('d')).toBe('M 0,1 C 40,1 -40,1 0,1');
+    expect(wrapper.findAll('.relation-path')[0].attributes('d')).toBe('M 0,1 C 40,1 -40,1 0,1');
+    expect(wrapper.findAll('.relation-path')[1].attributes('d')).toBe('M 0,1 C 40,1 -40,1 0,1');
   });
 
   test('Real data test', () => {
@@ -171,8 +171,8 @@ describe('ERDiagram integration tests', () => {
 
     expect(wrapper.findAll('.entity-group')).toHaveLength(2);
 
-    expect(wrapper.findAll('.relation-path').at(0).attributes('d')).toBe('M 0,1 C 40,1 -40,1 0,1');
-    expect(wrapper.findAll('.relation-path').at(1).attributes('d')).toBe('M 0,1 C 40,1 -40,1 0,1');
-    expect(wrapper.findAll('.relation-path').at(2).attributes('d')).toBe('M 0,1 C 40,1 -40,1 0,1');
+    expect(wrapper.findAll('.relation-path')[0].attributes('d')).toBe('M 0,1 C 40,1 -40,1 0,1');
+    expect(wrapper.findAll('.relation-path')[1].attributes('d')).toBe('M 0,1 C 40,1 -40,1 0,1');
+    expect(wrapper.findAll('.relation-path')[2].attributes('d')).toBe('M 0,1 C 40,1 -40,1 0,1');
   });
 });

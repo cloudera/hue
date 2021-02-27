@@ -921,8 +921,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 <script type="text/html" id="snippet-header-statement-type${ suffix }">
   % if ENABLE_EXTERNAL_STATEMENT.get():
   <!-- ko if: isSqlDialect() -->
-    <span class="editor-header-title">${ _('Type') }</span>
-    <div data-bind="component: { name: 'hue-drop-down', params: { value: statementType, entries: statementTypes, linkTitle: '${ _ko('Statement type') }' } }" style="display: inline-block"></div>
+    <div data-bind="component: { name: 'hue-drop-down', params: { titleName: '${ _ko('Type') }', value: statementType, entries: statementTypes, linkTitle: '${ _ko('Statement type') }' } }" style="display: inline-block"></div>
   <!-- /ko -->
   % endif
 </script>

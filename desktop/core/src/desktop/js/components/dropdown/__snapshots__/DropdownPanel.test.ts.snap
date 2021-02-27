@@ -4,20 +4,13 @@ exports[`DropdownPanel.vue should render dropdown panel with slots 1`] = `
 <div
   class="hue-dropdown-panel"
 >
-  <hue-button-stub>
-    
-     
-    <i
-      class="fa fa-caret-down"
-    />
-  </hue-button-stub>
-   
+  <hue-button-stub
+    disabled="false"
+  />
   <div
-    class="hue-dropdown-container"
+    class="hue-dropdown-drawer"
   >
-    <div
-      class="hue-dropdown-inner"
-    />
+    <!--v-if-->
   </div>
 </div>
 `;
@@ -26,20 +19,13 @@ exports[`DropdownPanel.vue should render empty dropdown panel 1`] = `
 <div
   class="hue-dropdown-panel"
 >
-  <hue-button-stub>
-    
-     
-    <i
-      class="fa fa-caret-down"
-    />
-  </hue-button-stub>
-   
+  <hue-button-stub
+    disabled="false"
+  />
   <div
-    class="hue-dropdown-container"
+    class="hue-dropdown-drawer"
   >
-    <div
-      class="hue-dropdown-inner"
-    />
+    <!--v-if-->
   </div>
 </div>
 `;

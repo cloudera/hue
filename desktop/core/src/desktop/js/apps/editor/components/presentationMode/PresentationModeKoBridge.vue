@@ -24,70 +24,93 @@
     :description="description"
     @before-execute="onBeforeExecute"
     @close="onClose"
+    @variables-changed="onVariablesChanged"
   />
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
-  import { wrap } from 'vue/webComponentWrapper';
+  import { defineComponent, PropType, reactive, ref, toRefs } from 'vue';
+
+  import { Variable } from 'apps/editor/components/variableSubstitution/types';
+  import { IdentifierLocation } from 'parse/types';
+  import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/sqlWorkerHandler';
+  import { wrap } from 'vue/webComponentWrap';
 
   import PresentationMode from './PresentationMode.vue';
   import Executable from 'apps/editor/execution/executable';
   import Executor from 'apps/editor/execution/executor';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
 
-  @Component({
-    components: { PresentationMode }
-  })
-  export default class PresentationModeKoBridge extends Vue {
-    @Prop()
-    executor: Executor | null = null;
-    @Prop()
-    titleObservable: KnockoutObservable<string | undefined>;
-    @Prop()
-    descriptionObservable: KnockoutObservable<string | undefined>;
+  const PresentationModeKoBridge = defineComponent({
+    name: 'PresentationModeKoBridge',
+    components: {
+      PresentationMode
+    },
+    props: {
+      descriptionObservable: {
+        type: Object as PropType<KnockoutObservable<string | undefined>>,
+        default: undefined
+      },
+      executor: {
+        type: Object as PropType<Executor | null>,
+        default: null
+      },
+      initialVariables: {
+        type: Object as PropType<Variable[]>,
+        default: undefined
+      },
+      titleObservable: {
+        type: Object as PropType<KnockoutObservable<string | undefined>>,
+        default: undefined
+      }
+    },
+    setup(props) {
+      const subTracker = new SubscriptionTracker();
+      const { descriptionObservable, titleObservable } = toRefs(props);
 
-    title: string | null = null;
-    description: string | null = null;
+      const description = ref<string | null>(null);
+      const locations = reactive<IdentifierLocation[]>([]);
+      const title = ref<string | null>(null);
 
-    initialized = false;
+      subTracker.trackObservable(descriptionObservable, description);
+      subTracker.trackObservable(titleObservable, title);
 
-    subTracker = new SubscriptionTracker();
+      subTracker.subscribe(
+        POST_FROM_LOCATION_WORKER_EVENT,
+        (e: { data?: { locations?: IdentifierLocation[] } }) => {
+          if (e.data && e.data.locations) {
+            locations.splice(0, locations.length, ...e.data.locations);
+          }
+        }
+      );
 
-    updated(): void {
-      if (!this.initialized) {
-        this.title = this.titleObservable();
-        this.subTracker.subscribe(this.titleObservable, (title?: string) => {
-          this.title = title;
-        });
-
-        this.description = this.descriptionObservable();
-        this.subTracker.subscribe(this.descriptionObservable, (description?: string) => {
-          this.description = description;
-        });
-        this.initialized = true;
+      return {
+        description,
+        locations,
+        title
+      };
+    },
+    methods: {
+      onBeforeExecute(executable: Executable): void {
+        this.$el.dispatchEvent(
+          new CustomEvent<Executable>('before-execute', { bubbles: true, detail: executable })
+        );
+      },
+      onClose(): void {
+        this.$el.dispatchEvent(
+          new CustomEvent<void>('close', { bubbles: true })
+        );
+      },
+      onVariablesChanged(variables: Variable[]): void {
+        this.$el.dispatchEvent(
+          new CustomEvent<Variable[]>('variables-changed', { bubbles: true, detail: variables })
+        );
       }
     }
-
-    destroyed(): void {
-      this.subTracker.dispose();
-    }
-
-    onBeforeExecute(executable: Executable): void {
-      this.$el.dispatchEvent(
-        new CustomEvent<Executable>('before-execute', { bubbles: true, detail: executable })
-      );
-    }
-
-    onClose(): void {
-      this.$el.dispatchEvent(
-        new CustomEvent<void>('close', { bubbles: true })
-      );
-    }
-  }
+  });
 
   export const COMPONENT_NAME = 'presentation-mode-ko-bridge';
   wrap(COMPONENT_NAME, PresentationModeKoBridge);
+
+  export default PresentationModeKoBridge;
 </script>

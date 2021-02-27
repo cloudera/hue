@@ -5,7 +5,7 @@ draft: false
 weight: 3
 ---
 
-The file to edit is `hue.ini` (wich is based on this [template](https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini)). The actual values used by the API server can be checked on the [Dump Config](/administrator/administration/operations/#configuration) page.
+The file to edit is `hue.ini` (which is based on this [template](https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini)). The actual values used by the API server can be checked on the [Dump Config](/administrator/administration/operations/#configuration) page.
 
 
 The most important sections to configure are about the:

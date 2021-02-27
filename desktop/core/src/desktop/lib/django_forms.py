@@ -33,7 +33,6 @@ from django.forms.fields import MultiValueField, CharField, ChoiceField, Boolean
 from django.forms.widgets import MultiWidget, Select, TextInput, Textarea, HiddenInput, Input
 from django.utils import formats
 from django.utils.safestring import mark_safe
-from django.utils.encoding import python_2_unicode_compatible
 
 import desktop.lib.i18n
 from desktop.lib.i18n import smart_str
@@ -51,7 +50,7 @@ LOG = logging.getLogger(__name__)
 try:
   from django.utils.encoding import StrAndUnicode
 except ImportError:
-  from django.utils.encoding import python_2_unicode_compatible
+  from six import python_2_unicode_compatible
 
   @python_2_unicode_compatible
   class StrAndUnicode(object):
@@ -148,7 +147,7 @@ class ChoiceOrOtherWidget(MultiWidget):
   """
   def __init__(self, attrs=None, choices=()):
     self.choices = choices
-    self.values = [ val for pres, val in choices if val != OTHER_VAL ]
+    self.values = [val for pres, val in choices if val != OTHER_VAL]
     widgets = (
       Select(attrs=attrs, choices=choices),
       TextInput(attrs=attrs)
@@ -165,13 +164,13 @@ class ChoiceOrOtherField(MultiValueField):
   def __init__(self, choices, initial=None, *args, **kwargs):
     assert not kwargs.get('required', False), "required=True is not supported"
 
-    allchoices = [ x for x in choices ] # Force choices into a list.
-    allchoices.append( (OTHER_VAL, OTHER_PRES) )
+    allchoices = [x for x in choices] # Force choices into a list.
+    allchoices.append((OTHER_VAL, OTHER_PRES))
     self.widget = ChoiceOrOtherWidget(choices=allchoices)
     choice_initial, other_initial = None, None
     if initial is not None:
       # Match initial against one of the values
-      if initial in [ x for x, y in choices ]:
+      if initial in [x for x, y in choices]:
         choice_initial = initial
       else:
         choice_initial = OTHER_VAL
@@ -290,7 +289,7 @@ class MultiForm(object):
   def has_subform_data(self, subform_name, data):
     """Test if data contains any information bound for the subform"""
     prefix = self.add_prefix(subform_name)
-    return len([ k.startswith(prefix) for k in list(data.keys()) ]) != 0
+    return len([k.startswith(prefix) for k in list(data.keys())]) != 0
 
   def add_subform(self, name, form_cls, data=None):
     """Dynamically extend this MultiForm to include a new subform"""
@@ -358,7 +357,7 @@ class SubmitButton(Input):
 
 
 class ManagementForm(forms.Form):
-  add = BooleanField(widget=SubmitButton,required=False)
+  add = BooleanField(widget=SubmitButton, required=False)
   next_form_id = forms.IntegerField(widget=forms.HiddenInput, initial=0)
 
   def __init__(self, add_label='+', *args, **kwargs):
@@ -383,7 +382,7 @@ class ManagementForm(forms.Form):
   def form_counts(self):
     """form_counts() -> The max number of forms, some could be non-existent (deleted)."""
     try:
-      return int(self.data[ self.add_prefix('next_form_id') ])
+      return int(self.data[self.add_prefix('next_form_id')])
     except KeyError:
       return self.fields['next_form_id'].initial
 
@@ -427,7 +426,7 @@ class BaseSimpleFormSet(StrAndUnicode):
       n_initial = self.initial and len(self.initial) or 0
       form = ManagementForm(prefix=self.prefix,
                             add_label=self.add_label,
-                            initial={ 'next_form_id': n_initial })
+                            initial={'next_form_id': n_initial})
     self.management_form = form
 
   def empty_form(self):
@@ -550,7 +549,7 @@ class DependencyAwareForm(forms.Form):
       """Calculates data for single item."""
       return self.add_prefix(cond), str(required_value), self.add_prefix(child)
 
-    return [ data(*x) for x in self.dependencies ]
+    return [data(*x) for x in self.dependencies]
 
   def render_dep_metadata(self):
     return urllib_quote_plus(json.dumps(self._calculate_data(), separators=(',', ':')))

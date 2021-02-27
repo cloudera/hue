@@ -21,6 +21,7 @@ from builtins import object
 import json
 import logging
 import re
+import sys
 import time
 import unittest
 
@@ -490,7 +491,10 @@ class TestMapReduce2NoHadoop(object):
     assert_false(can_modify_job('test3', response.context[0]['job']))
 
     response2 = self.c3.get('/jobbrowser/jobs/job_1356251510842_0054')
-    assert_true(b'don&#39;t have permission to access job' in response2.content, response2.content)
+    if sys.version_info[0] < 3:
+      assert_true(b'don&#39;t have permission to access job' in response2.content, response2.content)
+    else:
+      assert_true(b'don&#x27;t have permission to access job' in response2.content, response2.content)
 
   def test_kill_job(self):
     job_id = 'application_1356251510842_0054'

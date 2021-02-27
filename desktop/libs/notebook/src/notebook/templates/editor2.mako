@@ -322,10 +322,10 @@
       },
       vueKoProps: {
         executor: executor,
-        valueObservable: statement_raw,
-        cursorPositionObservable: aceCursorPosition,
-        idObservable: id,
-        aceOptions: {
+        'value-observable': statement_raw,
+        'cursor-position-observable': aceCursorPosition,
+        'id-observable': id,
+        'ace-options': {
           showLineNumbers: $root.editorMode(),
           showGutter: $root.editorMode(),
           maxLines: $root.editorMode() ? null : 25,
@@ -382,56 +382,58 @@
   </div>
 </script>
 
-<script type="text/html" id="snippet-variables">
-  <div class="variables" data-bind="with: variableSubstitutionHandler">
-    <ul data-bind="foreach: variables" class="unstyled inline">
-      <li>
-        <div class="input-prepend margin-top-10">
-          <!-- ko ifnot: path() -->
-          <span class="muted add-on" data-bind="text: name"></span>
-          <!-- /ko -->
-          <!-- ko if: path() -->
-          <a href="javascript:void(0);" data-bind="click: $root.showContextPopover" style="float: left"> <span class="muted add-on" data-bind="text: name"></span></a>
-          <!-- /ko -->
-          <!-- ko if: meta.type() === 'text' -->
-          <!-- ko if: meta.placeholder() -->
-          <input class="input-medium" type="text" data-bind="value: value, attr: { value: value, type: type, placeholder: meta.placeholder() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
-          <!-- /ko -->
-          <!-- ko ifnot: meta.placeholder() -->
-          <!-- ko if: type() == 'datetime-local' -->
-          <input class="input-medium" type="text" data-bind="attr: { value: value }, value: value, datepicker: { momentFormat: 'YYYY-MM-DD HH:mm:ss.S' }">
-          <!-- /ko -->
-          <!-- ko if: type() == 'date' -->
-          <input class="input-medium" type="text" data-bind="attr: { value: value }, value: value, datepicker: { momentFormat: 'YYYY-MM-DD' }">
-          <!-- /ko -->
-          <!-- ko if: type() == 'checkbox' -->
-          <input class="input-medium" type="checkbox" data-bind="checked: value">
-          <!-- /ko -->
-          <!-- ko ifnot: (type() == 'datetime-local' || type() == 'date' || type() == 'checkbox') -->
-          <input class="input-medium" type="text" value="true" data-bind="value: value, attr: { value: value,  type: type() || 'text', step: step }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
-          <!-- /ko -->
-          <!-- /ko -->
-          <!-- /ko -->
-          <!-- ko if: meta.type() === 'select' -->
-          <select data-bind="
-                selectize: sample,
-                optionsText: 'text',
-                optionsValue: 'value',
-                selectizeOptions: {
-                  create: function (input) {
-                    sampleUser().push({ text: ko.observable(input), value: ko.observable(input) });
-                    return { text: input, value: input };
-                  }
-                },
-                value: value,
-                event: { 'keydown': $parent.onKeydownInVariable }
-              "></select>
-          <!-- /ko -->
-        </div>
-      </li>
-    </ul>
-  </div>
-</script>
+
+## TODO: Move additional types to VariableSubstitution.vue
+## <script type="text/html" id="snippet-variables">
+##   <div class="variables" data-bind="with: variableSubstitutionHandler">
+##     <ul data-bind="foreach: variables" class="unstyled inline">
+##       <li>
+##         <div class="input-prepend margin-top-10">
+##           <!-- ko ifnot: path() -->
+##           <span class="muted add-on" data-bind="text: name"></span>
+##           <!-- /ko -->
+##           <!-- ko if: path() -->
+##           <a href="javascript:void(0);" data-bind="click: $root.showContextPopover" style="float: left"> <span class="muted add-on" data-bind="text: name"></span></a>
+##           <!-- /ko -->
+##           <!-- ko if: meta.type() === 'text' -->
+##           <!-- ko if: meta.placeholder() -->
+##           <input class="input-medium" type="text" data-bind="value: value, attr: { value: value, type: type, placeholder: meta.placeholder() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
+##           <!-- /ko -->
+##           <!-- ko ifnot: meta.placeholder() -->
+##           <!-- ko if: type() == 'datetime-local' -->
+##           <input class="input-medium" type="text" data-bind="attr: { value: value }, value: value, datepicker: { momentFormat: 'YYYY-MM-DD HH:mm:ss.S' }">
+##           <!-- /ko -->
+##           <!-- ko if: type() == 'date' -->
+##           <input class="input-medium" type="text" data-bind="attr: { value: value }, value: value, datepicker: { momentFormat: 'YYYY-MM-DD' }">
+##           <!-- /ko -->
+##           <!-- ko if: type() == 'checkbox' -->
+##           <input class="input-medium" type="checkbox" data-bind="checked: value">
+##           <!-- /ko -->
+##           <!-- ko ifnot: (type() == 'datetime-local' || type() == 'date' || type() == 'checkbox') -->
+##           <input class="input-medium" type="text" value="true" data-bind="value: value, attr: { value: value,  type: type() || 'text', step: step }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
+##           <!-- /ko -->
+##           <!-- /ko -->
+##           <!-- /ko -->
+##           <!-- ko if: meta.type() === 'select' -->
+##           <select data-bind="
+##                 selectize: sample,
+##                 optionsText: 'text',
+##                 optionsValue: 'value',
+##                 selectizeOptions: {
+##                   create: function (input) {
+##                     sampleUser().push({ text: ko.observable(input), value: ko.observable(input) });
+##                     return { text: input, value: input };
+##                   }
+##                 },
+##                 value: value,
+##                 event: { 'keydown': $parent.onKeydownInVariable }
+##               "></select>
+##           <!-- /ko -->
+##         </div>
+##       </li>
+##     </ul>
+##   </div>
+## </script>
 
 <script type="text/html" id="editor-executable-snippet-body">
   <div style="padding:10px;">
@@ -582,7 +584,7 @@
 
 <script type="text/html" id="editor-snippet-code-resizer">
   <editor-resizer-ko-bridge data-bind="vueKoProps: {
-      editorObservable: ace
+      'editor-observable': ace
     }"></editor-resizer-ko-bridge>
 </script>
 
@@ -605,8 +607,8 @@
   <div class="snippet-actions" style="padding: 5px;">
     <div class="pull-left">
       <executable-actions-ko-bridge data-bind="vueKoProps: {
-          executableObservable: activeExecutable,
-          beforeExecute: beforeExecute
+          'executable-observable': activeExecutable,
+          'before-execute': beforeExecute
         }"></executable-actions-ko-bridge>
     </div>
     <!-- ko if: isSqlDialect() && !$root.isPresentationMode() -->
@@ -866,12 +868,15 @@
           },
           'close': function () {
             parentNotebook.isPresentationMode(false);
+          },
+          'variables-changed': function (event) {
+            setVariables(event.detail);
           }
         },
         vueKoProps: {
           executor: executor,
-          titleObservable: parentNotebook.name,
-          descriptionObservable: parentNotebook.description
+          'title-observable': parentNotebook.name,
+          'description-observable': parentNotebook.description
         }
       "></presentation-mode-ko-bridge>
     <!-- /ko -->
@@ -894,11 +899,26 @@
         <div class="editor-code-editor">
           <!-- ko template: { name: 'editor-code-editor' } --><!-- /ko -->
         </div>
-  ##      <!-- ko template: { name: 'snippet-variables' }--><!-- /ko -->
-  ##      <!-- ko template: { name: 'editor-executable-snippet-body' } --><!-- /ko -->
         <div class="editor-execute-status">
-          <!-- ko template: { name: 'editor-snippet-execution-status' } --><!-- /ko -->
+              <executable-progress-bar-ko-bridge data-bind="vueKoProps: {
+            'executable-observable': activeExecutable
+          }"></executable-progress-bar-ko-bridge>
+              ##      <!-- ko template: { name: 'editor-snippet-execution-status' } --><!-- /ko -->
         </div>
+  ##      <!-- ko template: { name: 'snippet-variables' }--><!-- /ko -->
+        <div class="editor-variable-substitution">
+          <variable-substitution-ko-bridge data-bind="
+              vueEvents: {
+                'variables-changed': function (event) {
+                  setVariables(event.detail);
+                }
+              },
+              vueKoProps: {
+                'initial-variables': executor.variables
+              }
+            "></variable-substitution-ko-bridge>
+        </div>
+  ##      <!-- ko template: { name: 'editor-executable-snippet-body' } --><!-- /ko -->
         <div class="editor-execute-actions">
           <!-- ko template: { name: 'editor-execution-controls' } --><!-- /ko -->
         </div>
@@ -977,7 +997,7 @@
           <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
             <div class="execution-results-tab-panel">
               <result-table-ko-bridge class="table-results-bridge" data-bind="vueKoProps: {
-                  executableObservable: activeExecutable
+                  'executable-observable': activeExecutable
                 }"></result-table-ko-bridge>
             </div>
           </div>
@@ -1008,7 +1028,7 @@
             <div class="execution-analysis-tab-panel">
               <execution-analysis-panel-ko-bridge class="execution-analysis-bridge" data-bind="
                 vueKoProps: {
-                  executableObservable: activeExecutable
+                  'executable-observable': activeExecutable
                 },
                 vueEvents: {
                   'execution-error': function () { currentQueryTab('executionAnalysis') }

@@ -21,7 +21,7 @@ import sys
 from django.core import management
 from django.core.management import get_commands
 from django.test import SimpleTestCase
-from django.utils.six import StringIO
+from six import StringIO
 
 class CmdTests(SimpleTestCase):
   def checkcmd(self):

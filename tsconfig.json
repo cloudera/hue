@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "node",
@@ -18,6 +20,9 @@
     "."
   ],
   "exclude": [
+    "ext",
+    "parse",
+    "jquery",
     "apps",
     "build",
     "dist",

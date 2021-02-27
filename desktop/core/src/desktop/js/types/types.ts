@@ -25,6 +25,19 @@ declare global {
   export interface Moment {
     utc: (val: unknown) => Moment;
     format: (format: string) => string;
+    duration: (
+      value: number,
+      unit?: string
+    ) => {
+      years: () => number;
+      months: () => number;
+      days: () => number;
+      hours: () => number;
+      minutes: () => number;
+      seconds: () => number;
+      milliseconds: () => number;
+      asMilliseconds: () => number;
+    };
   }
 
   const moment: Moment & ((val: unknown) => Moment);
@@ -34,6 +47,7 @@ export interface hueWindow {
   CACHEABLE_TTL?: { default?: number; optimizer?: number };
   CLOSE_SESSIONS?: { [dialect: string]: boolean };
   CUSTOM_DASHBOARD_URL?: string;
+  ENABLE_PREDICT?: boolean;
   HAS_CATALOG?: boolean;
   HAS_CONNECTORS?: boolean;
   HAS_OPTIMIZER?: boolean;
@@ -49,4 +63,5 @@ export interface hueWindow {
   WEB_SOCKETS_ENABLED?: boolean;
   WS_CHANNEL?: string;
   hueDebug?: HueDebug;
+  DISABLE_LOCAL_STORAGE?: boolean;
 }

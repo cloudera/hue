@@ -16,17 +16,24 @@
 
 import * as ko from 'knockout';
 
+function setProps(el, props) {
+  for (const key in props) {
+    el.setAttribute(key, props[key]);
+  }
+  Object.assign(el, props);
+}
+
 ko.bindingHandlers.vueKoProps = {
   init: (element, valueAccessor) => {
     const data = valueAccessor();
-    Object.assign(element, data);
+    setProps(element, data);
   }
 };
 
 ko.bindingHandlers.vueProps = {
   init: (element, valueAccessor) => {
     const data = valueAccessor();
-    Object.assign(element, ko.toJS(data));
+    setProps(element, ko.toJS(data));
   }
 };
 

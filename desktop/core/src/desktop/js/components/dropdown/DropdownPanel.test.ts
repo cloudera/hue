@@ -16,16 +16,28 @@
 
 import { shallowMount } from '@vue/test-utils';
 import DropdownPanel from './DropdownPanel.vue';
+import DropdownDrawer from './DropdownDrawer.vue';
 
 describe('DropdownPanel.vue', () => {
   it('should render empty dropdown panel', () => {
-    const wrapper = shallowMount(DropdownPanel);
+    const wrapper = shallowMount(DropdownPanel, {
+      global: {
+        stubs: {
+          DropdownDrawer
+        }
+      }
+    });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('should render dropdown panel with slots', () => {
     const wrapper = shallowMount(DropdownPanel, {
-      scopedSlots: {
+      global: {
+        stubs: {
+          DropdownDrawer
+        }
+      },
+      slots: {
         default: '<div>Some item</div>'
       }
     });

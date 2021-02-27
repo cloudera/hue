@@ -95,7 +95,7 @@ LANGUAGES = [
   ('ja', _('Japanese')),
   ('ko', _('Korean')),
   ('pt', _('Portuguese')),
-  ('pt_BR', _('Brazilian Portuguese')),
+  ('pt-br', _('Brazilian Portuguese')),
   ('zh-CN', _('Simplified Chinese')),
 ]
 
@@ -129,7 +129,7 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'desktop', 'libs', 'liboauth', 'src', 'liboauth', 'static'),
 )
 
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStorage'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 # For Django admin interface
 STATIC_URL = '/static/'
@@ -195,7 +195,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.staticfiles',
 
-    'django.contrib.admin',
     'django_extensions',
 
     # 'debug_toolbar',
@@ -356,6 +355,11 @@ SERVER_EMAIL = desktop.conf.DJANGO_SERVER_EMAIL.get()
 EMAIL_BACKEND = desktop.conf.DJANGO_EMAIL_BACKEND.get()
 EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
 
+# Permissive CORS
+if desktop.conf.CORS_ENABLED.get():
+  INSTALLED_APPS.append('corsheaders')
+  MIDDLEWARE.append('corsheaders.middleware.CorsMiddleware')
+  CORS_ALLOW_ALL_ORIGINS = True
 
 # Configure database
 if os.getenv('DESKTOP_DB_CONFIG'):

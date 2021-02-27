@@ -18,31 +18,38 @@
 
 <template>
   <dropdown-panel class="hue-dropdown-menu" :text="text" :link="link">
-    <template #contents="{ closePanel }">
-      <div class="hue-dropdown-menu-inner" @click="closePanel">
-        <ul>
-          <slot />
-        </ul>
-      </div>
-    </template>
+    <div class="hue-dropdown-menu-inner">
+      <ul>
+        <slot />
+      </ul>
+    </div>
   </dropdown-panel>
 </template>
 
 <script lang="ts">
-  import DropdownPanel from './DropdownPanel.vue';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent } from 'vue';
 
-  @Component({
-    components: { DropdownPanel }
-  })
-  export default class DropdownMenu extends Vue {
-    @Prop({ required: false, default: '' })
-    text!: string;
-    @Prop({ required: false, default: false })
-    link!: boolean;
-  }
+  import DropdownPanel from './DropdownPanel.vue';
+
+  export default defineComponent({
+    name: 'DropdownMenu',
+    components: {
+      DropdownPanel
+    },
+
+    props: {
+      text: {
+        type: String,
+        required: false,
+        default: ''
+      },
+      link: {
+        type: Boolean,
+        required: false,
+        default: false
+      }
+    }
+  });
 </script>
 
 <style lang="scss" scoped>
@@ -57,39 +64,6 @@
 
       overflow-x: hidden;
       overflow-y: auto;
-
-      /deep/ ul {
-        overflow-x: hidden;
-        margin: 0 !important;
-        padding: 0;
-        list-style: none;
-        font-size: 13px;
-
-        li {
-          color: $fluid-gray-800;
-
-          button,
-          a {
-            display: block;
-            width: 100%;
-            padding: 6px 16px;
-            clear: both;
-            font-weight: 400;
-            text-align: inherit;
-            white-space: nowrap;
-            background-color: transparent;
-            border: 0;
-            position: relative;
-            outline: 0;
-
-            &:hover,
-            &.active,
-            &.focus {
-              background-color: $hue-primary-color-light;
-            }
-          }
-        }
-      }
     }
   }
 </style>

@@ -101,6 +101,15 @@ module.exports = {
       }
     },
     {
+      files: ['*.d.ts'],
+      extends: ['plugin:@typescript-eslint/recommended'],
+      parser: '@typescript-eslint/parser',
+      plugins: ['jest', '@typescript-eslint'],
+      rules: {
+        'no-useless-constructor': 0
+      }
+    },
+    {
       files: ['*.ts'],
       extends: ['plugin:@typescript-eslint/recommended'],
       parser: '@typescript-eslint/parser',

@@ -14,14 +14,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { onBeforeUnmount, watch } from 'vue';
+
 import huePubSub from 'utils/huePubSub';
+import { Ref } from 'vue';
 
 export interface Disposable {
   dispose(): void;
 }
 
+const valueOrNull = <T>(val?: T): T | null => (typeof val === 'undefined' ? null : val);
+
 export default class SubscriptionTracker {
+  disposed = false;
   disposals: (() => void)[] = [];
+
+  constructor() {
+    onBeforeUnmount(this.dispose.bind(this));
+  }
+
+  addDisposable(disposable: Disposable): void {
+    this.disposals.push(disposable.dispose.bind(disposable));
+  }
+
+  addEventListener<K extends keyof HTMLElementEventMap>(
+    element: HTMLElement | Document,
+    type: K,
+    listener: (ev: HTMLElementEventMap[K]) => unknown
+  ): void {
+    element.addEventListener(type, listener as EventListenerOrEventListenerObject);
+    this.disposals.push(() => {
+      element.removeEventListener(type, listener as EventListenerOrEventListenerObject);
+    });
+  }
 
   subscribe(
     subscribable: string | KnockoutSubscribable<unknown>,
@@ -41,27 +66,35 @@ export default class SubscriptionTracker {
     }
   }
 
-  async whenDefined<T>(observable: KnockoutSubscribable<T | undefined>): Promise<T> {
-    return new Promise((resolve, reject) => {
-      let disposed = false;
-      const sub = observable.subscribe(val => {
-        if (typeof val !== 'undefined') {
-          disposed = true;
-          sub.dispose();
-          resolve(val);
-        }
-      });
-      this.disposals.push(() => {
-        if (!disposed) {
-          sub.dispose();
-          reject();
-        }
+  /**
+   * Helper function to link knockout observable with Vue refs. Note that it will update the Vue ref on changes to
+   * the knockout observable but not the other way around.
+   */
+  trackObservable<T>(
+    observableRef: Ref<KnockoutObservable<T | undefined | null>>,
+    vueRef: Ref<T | null>
+  ): void {
+    const whenDef = new Promise<KnockoutObservable<T | null | undefined>>(resolve => {
+      const stop = watch(
+        observableRef,
+        observable => {
+          if (observable) {
+            resolve(observable);
+            stop();
+          }
+        },
+        { immediate: true }
+      );
+    });
+    whenDef.then(observable => {
+      if (this.disposed) {
+        return;
+      }
+      vueRef.value = valueOrNull(observable());
+      this.subscribe(observable, (newVal?: T) => {
+        vueRef.value = valueOrNull(newVal);
       });
     });
-  }
-
-  addDisposable(disposable: Disposable): void {
-    this.disposals.push(disposable.dispose.bind(disposable));
   }
 
   trackTimeout(timeout: number): void {
@@ -70,18 +103,8 @@ export default class SubscriptionTracker {
     });
   }
 
-  addEventListener<K extends keyof HTMLElementEventMap>(
-    element: HTMLElement | Document,
-    type: K,
-    listener: (ev: HTMLElementEventMap[K]) => unknown
-  ): void {
-    element.addEventListener(type, listener as EventListenerOrEventListenerObject);
-    this.disposals.push(() => {
-      element.removeEventListener(type, listener as EventListenerOrEventListenerObject);
-    });
-  }
-
   dispose(): void {
+    this.disposed = true;
     while (this.disposals.length) {
       try {
         const disposeFn = this.disposals.pop();

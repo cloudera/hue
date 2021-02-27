@@ -25,6 +25,11 @@
         <i class="fa fa-times fa-fw" />
       </hue-button>
     </div>
+    <VariableSubstitution
+      :locations="locations"
+      :initial-variables="executor.variables"
+      @variables-changed="onVariablesChanged"
+    />
     <div class="presentation-mode-body">
       <div
         v-for="{ header, statement, executable } of presentationStatements"
@@ -45,11 +50,12 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
+  import { defineComponent, PropType } from 'vue';
 
-  import './PresentationMode.scss';
+  import { Variable } from 'apps/editor/components/variableSubstitution/types';
+  import VariableSubstitution from 'apps/editor/components/variableSubstitution/VariableSubstitution.vue';
+  import { IdentifierLocation } from 'parse/types';
+
   import ExecutableActions from 'apps/editor/components/ExecutableActions.vue';
   import ResultTable from 'apps/editor/components/result/ResultTable.vue';
   import Executor from 'apps/editor/execution/executor';
@@ -66,43 +72,79 @@
 
   const headerRegEx = /--(.*)$/m;
 
-  @Component({
-    components: { HueButton, ResultTable, ExecutableActions, SqlText },
-    methods: { I18n }
-  })
-  export default class PresentationMode extends Vue {
-    @Prop()
-    executor!: Executor;
-    @Prop({ required: false })
-    title?: string;
-    @Prop({ required: false })
-    description?: string;
+  export default defineComponent({
+    name: 'PresentationMode',
+    components: {
+      VariableSubstitution,
+      HueButton,
+      ResultTable,
+      ExecutableActions,
+      SqlText
+    },
 
-    get presentationStatements(): PresentationStatement[] {
-      return (this.executor.executables as SqlExecutable[]).map(executable => {
-        let statement = executable.parsedStatement.statement.trim();
-        let header: string | undefined = undefined;
-        const headerMatch = statement.match(headerRegEx);
-        if (headerMatch && headerMatch.index === 0) {
-          header = headerMatch[1].trim();
-          statement = statement.replace(headerMatch[0], '').trim();
-        }
+    props: {
+      executor: {
+        type: Object as PropType<Executor>,
+        required: true
+      },
 
-        return {
-          executable,
-          statement,
-          header
-        };
-      });
+      title: {
+        type: String,
+        default: undefined
+      },
+      description: {
+        type: String,
+        default: undefined
+      },
+      locations: {
+        type: Object as PropType<IdentifierLocation[]>,
+        default: undefined
+      }
+    },
+
+    emits: ['before-execute', 'variables-changed', 'close'],
+
+    computed: {
+      presentationStatements(): PresentationStatement[] {
+        return (this.executor.executables as SqlExecutable[]).map(executable => {
+          let statement = executable.parsedStatement.statement.trim();
+          let header: string | undefined = undefined;
+          const headerMatch = statement.match(headerRegEx);
+          if (headerMatch && headerMatch.index === 0) {
+            header = headerMatch[1].trim();
+            statement = statement.replace(headerMatch[0], '').trim();
+          }
+
+          return {
+            executable,
+            statement,
+            header
+          };
+        });
+      },
+
+      dialect(): string {
+        return this.executor.connector().dialect as string;
+      }
+    },
+
+    methods: {
+      I18n,
+
+      async beforeExecute(executable: SqlExecutable): Promise<void> {
+        this.$emit('before-execute', executable);
+
+        // eslint-disable-next-line vue/no-mutating-props
+        this.executor.activeExecutable = executable;
+      },
+
+      onVariablesChanged(variables: Variable[]): void {
+        this.$emit('variables-changed', variables);
+      }
     }
-
-    get dialect(): string {
-      return this.executor.connector().dialect as string;
-    }
-
-    async beforeExecute(executable: SqlExecutable): Promise<void> {
-      this.$emit('before-execute', executable);
-      this.executor.activeExecutable = executable;
-    }
-  }
+  });
 </script>
+
+<style lang="scss">
+  @import './PresentationMode.scss';
+</style>

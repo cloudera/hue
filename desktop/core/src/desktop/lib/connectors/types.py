@@ -649,6 +649,34 @@ CONNECTOR_TYPES = [
     }
   },
   {
+    'nice_name': 'Clickhouse',
+    'dialect': 'clickhouse',
+    'interface': 'sqlalchemy',
+    'settings': [
+      {'name': 'url', 'value': 'clickhouse://localhost:8123'},
+      {'name': 'has_ssh', 'value': False},
+      {'name': 'ssh_server_host', 'value': '127.0.0.1'},
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '"',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': False,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+      'has_reference_language': False,
+      'has_reference_functions': False,
+      'has_use_statement': False,
+      'trim_statement_semicolon': True,
+    }
+  },
+  {
     'nice_name': 'Solr SQL',
     'dialect': 'solr',
     'interface': 'solr',

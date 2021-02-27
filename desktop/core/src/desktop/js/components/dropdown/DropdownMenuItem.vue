@@ -24,11 +24,15 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
+  import { defineComponent } from 'vue';
 
-  @Component
-  export default class DropdownMenuItem extends Vue {}
+  export default defineComponent({
+    name: 'DropdownMenuItem',
+    props: {
+      text: {
+        type: String,
+        default: undefined
+      }
+    }
+  });
 </script>
-
-<style lang="scss" scoped></style>

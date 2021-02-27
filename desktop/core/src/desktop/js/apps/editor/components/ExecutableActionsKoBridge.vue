@@ -25,48 +25,52 @@
 </template>
 
 <script lang="ts">
+  import { defineComponent, PropType, ref, toRefs } from 'vue';
+
   import ExecutableActions from './ExecutableActions.vue';
   import SqlExecutable from 'apps/editor/execution/sqlExecutable';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop } from 'vue-property-decorator';
-  import { wrap } from 'vue/webComponentWrapper';
 
-  @Component({
-    components: { ExecutableActions }
-  })
-  export default class ExecutableActionsKoBridge extends Vue {
-    @Prop()
-    executableObservable?: KnockoutObservable<SqlExecutable | undefined>;
-    @Prop()
-    beforeExecute?: () => Promise<void>;
+  import { wrap } from 'vue/webComponentWrap';
 
-    subTracker = new SubscriptionTracker();
-    initialized = false;
-    executable: SqlExecutable | null = null;
+  const ExecutableActionsKoBridge = defineComponent({
+    name: 'ExecutableActionsKoBridge',
+    components: {
+      ExecutableActions
+    },
+    props: {
+      executableObservable: {
+        type: Object as PropType<KnockoutObservable<SqlExecutable | undefined>>,
+        default: undefined
+      },
+      beforeExecute: {
+        type: Object as PropType<() => Promise<void>>,
+        default: undefined
+      }
+    },
+    setup(props) {
+      const subTracker = new SubscriptionTracker();
+      const { executableObservable } = toRefs(props);
 
-    updated(): void {
-      if (!this.initialized && this.executableObservable) {
-        this.executable = this.executableObservable() || null;
-        this.subTracker.subscribe(this.executableObservable, (executable: SqlExecutable) => {
-          this.executable = executable;
-        });
-        this.initialized = true;
+      const executable = ref<SqlExecutable | null>(null);
+
+      subTracker.trackObservable(executableObservable, executable);
+
+      return {
+        executable
+      };
+    },
+    methods: {
+      limitChanged(limit: number): void {
+        if (this.executable && this.executable.executor.defaultLimit) {
+          this.executable.executor.defaultLimit(limit);
+        }
       }
     }
-
-    destroyed(): void {
-      this.subTracker.dispose();
-    }
-
-    limitChanged(limit: number): void {
-      if (this.executable && this.executable.executor.defaultLimit) {
-        this.executable.executor.defaultLimit(limit);
-      }
-    }
-  }
+  });
 
   export const COMPONENT_NAME = 'executable-actions-ko-bridge';
   wrap(COMPONENT_NAME, ExecutableActionsKoBridge);
+
+  export default ExecutableActionsKoBridge;
 </script>

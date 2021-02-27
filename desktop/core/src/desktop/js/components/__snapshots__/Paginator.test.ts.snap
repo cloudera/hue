@@ -7,34 +7,13 @@ exports[`Paginator.vue should render 1`] = `
   <div
     class="page-status"
   >
-    
     1-25 of 500
-  
   </div>
-  
-  Rows per page:
-  
+   Rows per page: 
   <dropdown-menu-stub
     link="true"
     text="25"
-  >
-    <dropdown-menu-button-stub>
-      
-      25
-    
-    </dropdown-menu-button-stub>
-    <dropdown-menu-button-stub>
-      
-      50
-    
-    </dropdown-menu-button-stub>
-    <dropdown-menu-button-stub>
-      
-      100
-    
-    </dropdown-menu-button-stub>
-  </dropdown-menu-stub>
-   
+  />
   <div
     class="navigation-actions"
   >
@@ -46,7 +25,6 @@ exports[`Paginator.vue should render 1`] = `
         type="hi-chevron-left-limit"
       />
     </a>
-     
     <a
       class="disabled"
       href="javascript: void(0);"
@@ -55,7 +33,6 @@ exports[`Paginator.vue should render 1`] = `
         type="hi-chevron-left"
       />
     </a>
-     
     <a
       class=""
       href="javascript: void(0);"
@@ -64,7 +41,6 @@ exports[`Paginator.vue should render 1`] = `
         type="hi-chevron-right"
       />
     </a>
-     
     <a
       class=""
       href="javascript: void(0);"

@@ -40,89 +40,101 @@
 
     <div v-if="analysisAvailable" class="execution-analysis-logs">
       <h4>{{ I18n('Logs') }}</h4>
-      <LogsPanel class="execution-analysis-logs-panel" :logs="logs" />
+      <LogsPanel class="execution-analysis-logs-panel" :logs="executionLogs" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-  import { ExecutionJob } from 'apps/editor/execution/api';
-  import HueLink from 'components/HueLink.vue';
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Prop, Watch } from 'vue-property-decorator';
+  import { debounce } from 'lodash';
+  import { defineComponent, computed, onBeforeUnmount, ref, reactive } from 'vue';
 
-  import './ExecutionAnalysisPanel.scss';
+  import { ExecutionJob } from 'apps/editor/execution/api';
   import Executable, {
     EXECUTABLE_UPDATED_EVENT,
     ExecutionStatus
   } from 'apps/editor/execution/executable';
+  import SqlExecutable from 'apps/editor/execution/sqlExecutable';
   import ExecutionLogs, {
     ExecutionError,
     LOGS_UPDATED_EVENT
   } from 'apps/editor/execution/executionLogs';
+  import HueLink from 'components/HueLink.vue';
   import LogsPanel from 'components/LogsPanel.vue';
   import SubscriptionTracker from 'components/utils/SubscriptionTracker';
   import I18n from 'utils/i18n';
 
-  @Component({
-    components: { HueLink, LogsPanel },
-    methods: { I18n }
-  })
-  export default class ExecutionAnalysisPanel extends Vue {
-    @Prop()
-    executable?: Executable;
+  export default defineComponent({
+    name: 'ExecutionAnalysisPanel',
+    components: {
+      HueLink,
+      LogsPanel
+    },
+    props: {
+      executable: {
+        type: SqlExecutable,
+        required: true
+      }
+    },
+    emits: ['execution-error'],
+    setup(props, { emit }) {
+      const subTracker = new SubscriptionTracker();
+      onBeforeUnmount(subTracker.dispose.bind(subTracker));
 
-    logs = '';
-    jobs: ExecutionJob[] = [];
-    errors: ExecutionError[] = [];
-    notifiedErrors = false;
+      const analysisAvailable = ref(false);
+      const executionLogs = ref('');
+      const jobs = reactive<ExecutionJob[]>([]);
+      const errors = reactive<ExecutionError[]>([]);
 
-    subTracker = new SubscriptionTracker();
+      const jobsAvailable = computed(() => !!jobs.length);
+      const jobsWithUrls = computed(() => jobs.filter(job => job.url));
 
-    mounted(): void {
-      this.subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, (executable: Executable) => {
-        if (executable.logs) {
-          this.updateFromExecutionLogs(executable.logs);
+      let notifiedErrors = false;
+
+      const debouncedUpdate = debounce((executable: Executable): void => {
+        const { status, logs } = executable;
+        executionLogs.value = logs.fullLog;
+        jobs.splice(0, jobs.length, ...logs.jobs);
+        errors.splice(0, errors.length, ...logs.errors);
+
+        analysisAvailable.value = status !== ExecutionStatus.ready || !!errors.length;
+
+        if (errors.length && !notifiedErrors) {
+          emit('execution-error');
         }
+        notifiedErrors = !!errors.length;
+      }, 5);
+
+      const updateFromExecutable = (executable: Executable): void => {
+        if (props.executable.id !== executable.id) {
+          return;
+        }
+        debouncedUpdate.cancel();
+        debouncedUpdate(executable);
+      };
+
+      updateFromExecutable(props.executable);
+
+      subTracker.subscribe(EXECUTABLE_UPDATED_EVENT, updateFromExecutable);
+
+      subTracker.subscribe(LOGS_UPDATED_EVENT, (executionLogs: ExecutionLogs) => {
+        updateFromExecutable(executionLogs.executable);
       });
 
-      this.subTracker.subscribe(LOGS_UPDATED_EVENT, this.updateFromExecutionLogs.bind(this));
+      return {
+        analysisAvailable,
+        executionLogs,
+        jobs,
+        jobsAvailable,
+        jobsWithUrls,
+        errors,
+        notifiedErrors,
+        I18n
+      };
     }
-
-    updateFromExecutionLogs(executionLogs: ExecutionLogs): void {
-      if (this.executable === executionLogs.executable) {
-        this.logs = executionLogs.fullLog;
-        this.jobs = executionLogs.jobs;
-        this.errors = executionLogs.errors;
-      }
-    }
-
-    @Watch('errors')
-    executionError(errors: ExecutionError[]): void {
-      if (errors.length && !this.notifiedErrors) {
-        this.$emit('execution-error');
-      }
-      this.notifiedErrors = !!errors.length;
-    }
-
-    destroyed(): void {
-      this.subTracker.dispose();
-    }
-
-    get analysisAvailable(): boolean {
-      return (
-        (!!this.executable && this.executable.status !== ExecutionStatus.ready) ||
-        !!this.errors.length
-      );
-    }
-
-    get jobsWithUrls(): ExecutionJob[] {
-      return (this.jobs && this.jobs.filter(job => job.url)) || [];
-    }
-
-    get jobsAvailable(): boolean {
-      return !!this.jobsWithUrls.length;
-    }
-  }
+  });
 </script>
+
+<style lang="scss">
+  @import './ExecutionAnalysisPanel.scss';
+</style>

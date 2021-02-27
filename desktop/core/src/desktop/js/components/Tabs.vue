@@ -22,8 +22,8 @@
       <li
         v-for="tab in tabs"
         :key="tab.title"
-        :class="{ active: tab.isActive }"
-        @click="selectTab(tab)"
+        :class="{ active: selectedTabRef === tab }"
+        @click="selectedTabRef = tab"
       >
         {{ tab.title }}
       </li>
@@ -35,40 +35,52 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Provide } from 'vue-property-decorator';
-  import Tab from './Tab.vue';
+  import { defineComponent, ref, provide } from 'vue';
 
-  @Component
-  export default class Tabs extends Vue {
-    tabs: Tab[] = [];
+  import { TabRef } from './Tab.vue';
 
-    @Provide()
-    addTab(tab: Tab): void {
-      this.tabs.push(tab);
-      if (this.tabs.length === 1) {
-        this.selectTab(this.tabs[0]);
-      }
-    }
+  export const ADD_TAB_KEY = 'addTab';
+  export const REMOVE_TAB_KEY = 'removeTab';
 
-    @Provide()
-    removeTab(tab: Tab): void {
-      const index = this.tabs.indexOf(tab);
-      if (index !== -1) {
-        this.$delete(this.tabs, index);
-        if (tab.isActive && this.tabs.length) {
-          this.tabs[Math.max(0, index - 1)].isActive = true;
+  export const SELECTED_TAB_KEY = 'selectedTabRef';
+
+  export default defineComponent({
+    name: 'Tabs',
+
+    setup() {
+      const tabs = ref<TabRef[]>([]);
+      const selectedTabRef = ref<TabRef | null>(null);
+
+      function addTab(tab: TabRef): void {
+        if (!tabs.value.find(t => t.title === tab.title)) {
+          tabs.value.push(tab);
+          if (tabs.value.length === 1) {
+            selectedTabRef.value = tabs.value[0];
+          }
         }
       }
-    }
 
-    selectTab(tab: Tab): void {
-      this.tabs.forEach(other => {
-        other.isActive = other === tab;
-      });
+      function removeTab(tab: TabRef): void {
+        const index = tabs.value.indexOf(tab);
+        if (index !== -1) {
+          tabs.value.splice(index, 1);
+          if (tab === selectedTabRef.value && tabs.value.length) {
+            selectedTabRef.value = tabs.value[Math.max(0, index - 1)];
+          }
+        }
+      }
+
+      provide(ADD_TAB_KEY, (tab: TabRef) => addTab(tab));
+      provide(REMOVE_TAB_KEY, (tab: TabRef) => removeTab(tab));
+
+      provide(SELECTED_TAB_KEY, selectedTabRef);
+
+      return {
+        tabs,
+        selectedTabRef
+      };
     }
-  }
+  });
 </script>
 
 <style lang="scss" scoped>

@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import huePubSub from 'utils/huePubSub';
-import Vue from 'vue';
+import { nextTick } from 'vue';
 import { mount, shallowMount } from '@vue/test-utils';
 import { EXECUTABLE_UPDATED_EVENT, ExecutionStatus } from 'apps/editor/execution/executable';
 import sessionManager from 'apps/editor/execution/sessionManager';
@@ -57,7 +57,7 @@ describe('ExecutableActions.vue', () => {
       }
     });
 
-    await Vue.nextTick();
+    await nextTick();
 
     expect(spy).toHaveBeenCalled();
     expect(wrapper.element).toMatchSnapshot();
@@ -99,29 +99,29 @@ describe('ExecutableActions.vue', () => {
       }
     });
 
-    expect(spy).toHaveBeenCalled();
+    await nextTick();
 
-    await Vue.nextTick();
+    expect(spy).toHaveBeenCalled();
 
     // Click play
     expect(executeCalled).toBeFalsy();
     expect(wrapper.get('button').text()).toContain('Execute');
     wrapper.get('button').trigger('click');
 
-    await Vue.nextTick();
+    await nextTick();
 
     expect(executeCalled).toBeTruthy();
     mockExecutable.status = ExecutionStatus.running;
     huePubSub.publish(EXECUTABLE_UPDATED_EVENT, mockExecutable);
 
-    await Vue.nextTick();
+    await nextTick();
 
     // Click stop
     expect(cancelCalled).toBeFalsy();
     expect(wrapper.get('button').text()).toContain('Stop');
     wrapper.get('button').trigger('click');
 
-    await Vue.nextTick();
+    await nextTick();
 
     expect(cancelCalled).toBeTruthy();
   });

@@ -26,8 +26,20 @@ spec:
           serviceName: hue-balancer
           servicePort: 80
         path: /
+  {{ if .Values.api.enabled }}
+  - host: {{ .Values.api.domain }}
+    http:
+      paths:
+      - backend:
+          serviceName: hue-api
+          servicePort: 8005
+        path: /
+  {{ end }}
   tls:
   - hosts:
     - {{ .Values.ingress.domain }}
+    {{ if .Values.api.enabled }}
+    - {{ .Values.api.domain }}
+    {{ end }}
     secretName: letsencrypt-hue-prod-tls
 {{- end -}}

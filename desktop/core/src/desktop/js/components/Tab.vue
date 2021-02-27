@@ -23,44 +23,79 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import { Inject, Prop, Watch } from 'vue-property-decorator';
+  import { defineComponent, inject } from 'vue';
+  import { SELECTED_TAB_KEY, ADD_TAB_KEY, REMOVE_TAB_KEY } from './Tabs.vue';
 
-  @Component
-  export default class Tab extends Vue {
-    @Inject()
-    addTab?: (tab: Tab) => void;
-    @Inject()
-    removeTab?: (tab: Tab) => void;
+  export interface TabRef {
+    title: string;
+  }
 
-    @Prop({ required: true })
-    title!: string;
-    @Prop({ default: false })
-    lazy!: boolean;
+  export default defineComponent({
+    name: 'Tab',
 
-    isActive = false;
-    rendered = false;
-
-    @Watch('isActive')
-    onActive(): void {
-      if (this.isActive) {
-        this.rendered = true;
+    props: {
+      title: {
+        type: String,
+        required: true
+      },
+      lazy: {
+        type: Boolean,
+        default: false
       }
-    }
+    },
+
+    setup(props) {
+      const addTab: ((tab: TabRef) => void) | undefined = inject(ADD_TAB_KEY);
+      const removeTab: ((tab: TabRef) => void) | undefined = inject(REMOVE_TAB_KEY);
+
+      const selectedTabRef: TabRef | undefined = inject(SELECTED_TAB_KEY);
+
+      return {
+        addTab,
+        removeTab,
+        selectedTabRef,
+
+        ref: {
+          title: props.title
+        }
+      };
+    },
+
+    data() {
+      return {
+        rendered: false
+      };
+    },
+
+    computed: {
+      isActive(): boolean {
+        return this.ref.title === this.selectedTabRef?.title;
+      }
+    },
+
+    watch: {
+      selectedTabRef(): void {
+        if (this.isActive) {
+          this.rendered = true;
+        }
+      }
+    },
 
     mounted(): void {
       if (this.addTab) {
-        this.addTab(this);
+        this.addTab(this.ref);
       }
     }
 
-    destroyed(): void {
-      if (this.removeTab) {
-        this.removeTab(this);
-      }
-    }
-  }
+    // TODO
+    // destroyed(): was deprecated, need to rearchitect the component.
+    // Whenever parent is rendered mount, unmount is called causing an to prevent infinit loop.
+    // unmounted(): void {
+    //   if (this.removeTab) {
+    //     this.removeTab(this.def);
+    //   }
+    // }
+  });
 </script>
 
 <style lang="scss" scoped></style>

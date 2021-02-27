@@ -14,18 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import axios from 'axios';
-import AceEditor from './AceEditor.vue';
-import { wrap } from 'vue/webComponentWrapper';
-import style from '!!css-loader!sass-loader!./AceEditor.scss';
+import { shallowMount } from '@vue/test-utils';
+import DropdownDrawer from './DropdownDrawer.vue';
 
-wrap('query-editor', AceEditor, {
-  shadowCss: style,
-  connectedCallback() {
-    const element = <HTMLElement>this;
-    const hueBaseUrl = element.getAttribute('hue-base-url');
-    if (hueBaseUrl) {
-      axios.defaults.baseURL = hueBaseUrl;
-    }
-  }
+describe('DropdownDrawer.vue', () => {
+  it('should render empty dropdown drawer', () => {
+    const wrapper = shallowMount(DropdownDrawer);
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('should render dropdown drawer with slots', () => {
+    const wrapper = shallowMount(DropdownDrawer, {
+      slots: {
+        default: '<div>Some item</div>'
+      }
+    });
+    expect(wrapper.element).toMatchSnapshot();
+  });
 });
