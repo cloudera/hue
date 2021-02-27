@@ -298,6 +298,10 @@ class SqlAlchemyApi(Api):
     if statement:
       if self.options['url'].startswith('bigquery://'):
         explanation = ''
+      else:
+        result = connection.execute('EXPLAIN '+ statement)
+
+        explanation = "\n".join("{}: {},".format(k, v) for row in result for k, v in row.items())
 
     return {
       'status': 0,
