@@ -243,6 +243,28 @@ class TestApi(object):
       create_engine.assert_called_with('presto://test@hue:8080/hue', pool_pre_ping=True)
 
 
+  def test_explain(self):
+
+    with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._create_connection') as _create_connection:
+      with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._create_engine') as _create_engine:
+        with patch('notebook.connectors.sql_alchemy.SqlAlchemyApi._get_session') as _get_session:
+
+          result = [{"id": 1}, {"select_type": "SIMPLE"}, {"Extra": "No tables used"}]
+          
+          execute = Mock(return_value=result)
+          _create_connection.return_value = Mock(
+            execute=execute
+          )
+          notebook = {}
+          snippet = {'statement': 'SELECT 1;'}
+
+          explanation = 'id: 1,\nselect_type: SIMPLE,\nExtra: No tables used,'
+
+          response = SqlAlchemyApi(self.user, self. interpreter).explain(notebook, snippet)
+
+        assert_equal(explanation, response['explanation'])
+
+
   def test_check_status(self):
     notebook = Mock()
 
