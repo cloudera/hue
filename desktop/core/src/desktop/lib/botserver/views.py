@@ -110,7 +110,7 @@ def handle_on_link_shared(channel_id, message_ts, links):
     payload = _make_unfurl_payload(item['url'], statement, dialect, created_by)
     response = slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload)
     if not response['ok']:
-        raise PopupException(_("Cannot unfurl link"), detail=response["error"])
+      raise PopupException(_("Cannot unfurl link"), detail=response["error"])
 
 def _make_unfurl_payload(url, statement, dialect, created_by):
   payload = {
