@@ -78,8 +78,8 @@ class TestBotServer(unittest.TestCase):
         
             client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
             user = User.objects.get(username="test")
-            channel_id = "channel_id"
-            message_ts = "123.1"
+            channel_id = "channel"
+            message_ts = "12.1"
 
             # qhistory link
             links = [{"url": "https://demo.gethue.com/hue/editor?editor=123456"}]
@@ -104,5 +104,5 @@ class TestBotServer(unittest.TestCase):
             assert_true(chat_unfurl.called)
 
             # Cannot unfurl link
-            assert_raises(PopupException, handle_on_link_shared, "channel_id", "123.1", [{"url": "https://demo.gethue.com/hue/editor/?type=4"}])
-            assert_raises(PopupException, handle_on_link_shared, "channel_id", "123.1", [{"url": "http://demo.gethue.com/hue/gist?uuids/=xyz"}])
+            assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": "https://demo.gethue.com/hue/editor/?type=4"}])
+            assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": "http://demo.gethue.com/hue/gist?uuids/=xyz"}])
