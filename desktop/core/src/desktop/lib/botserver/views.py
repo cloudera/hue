@@ -78,7 +78,7 @@ def parse_events(event):
 
 
 def handle_on_message(channel_id, bot_id, text, user_id):
-  # ignore bot's own message since that will cause an infinite loop of messages if we respond.
+  # Ignore bot's own message since that will cause an infinite loop of messages if we respond.
   if bot_id:
     return HttpResponse(status=200)
   
@@ -93,84 +93,26 @@ def handle_on_message(channel_id, bot_id, text, user_id):
 def handle_on_link_shared(channel_id, message_ts, links):
   for item in links:
     path = urlsplit(item['url'])[2]
-    queryid_or_uuid = urlsplit(item['url'])[3]  # if /hue/editor/ then query_id else if /hue/gist then uuid
+    id_type, qid_or_uuid = urlsplit(item['url'])[3].split('=')
 
-    if path == '/hue/editor':
-      query_id = queryid_or_uuid.split('=')[1]
-      doc2 = Document2.objects.get(id=query_id)
-      doc2_data = json.loads(doc2.data)
+    if path == '/hue/editor' and id_type == 'editor':
+      doc = Document2.objects.get(id=qid_or_uuid)
+    elif path == '/hue/gist' and id_type == 'uuid' and ENABLE_GIST_PREVIEW.get():
+      doc = _get_gist_document(uuid=qid_or_uuid)
+    else:
+      raise PopupException(_("Cannot unfurl link"))
 
-      statement = doc2_data['snippets'][0]['statement_raw']
-      dialect = doc2_data['dialect'].capitalize()
-      database = doc2_data['snippets'][0]['database'].capitalize()
-      
-      payload = make_query_history_payload(item['url'], statement, dialect, database)
-      response = slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload)
-      if response['ok']:
-        raise PopupException(_("Cannot unfurl query history link"), detail=response["error"])
+    doc_data = json.loads(doc.data)
+    statement = doc_data['snippets'][0]['statement_raw'] if id_type == 'editor' else doc_data['statement_raw']
+    dialect = doc_data['dialect'].capitalize() if id_type == 'editor' else doc.extra.capitalize()
+    created_by = doc.owner.get_full_name() or doc.owner.username
 
-    if path == '/hue/gist' and ENABLE_GIST_PREVIEW.get():
-      gist_uuid = queryid_or_uuid.split('=')[1]
-      gist_doc = _get_gist_document(uuid=gist_uuid)
-      gist_doc_data = json.loads(gist_doc.data)
+    payload = _make_unfurl_payload(item['url'], statement, dialect, created_by)
+    response = slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload)
+    if not response['ok']:
+        raise PopupException(_("Cannot unfurl link"), detail=response["error"])
 
-      statement = gist_doc_data['statement_raw']
-      created_by = gist_doc.owner.get_full_name() or gist_doc.owner.username
-      dialect = gist_doc.extra.capitalize()
-      
-      payload = make_gist_payload(item['url'], statement, dialect, created_by)
-      response = slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload)
-      if not response['ok']:
-        raise PopupException(_("Cannot unfurl gist link"), detail=response["error"])
-
-def say_hi_user(channel_id, user_id):
-  """
-  Sends Hi<user_id> message in a specific channel.
-
-  """
-  bot_message = 'Hi <@{}> :wave:'.format(user_id)
-  return slack_client.api_call(api_method='chat.postMessage', json={'channel': channel_id, 'text': bot_message})
-
-
-def make_gist_payload(url, statement, dialect, created_by):
-  gist_payload = {
-    url: {
-      "color": "#025BA6",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "\n*<{}|Hue - SQL Gist>*".format(url)
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": statement if len(statement) < 150 else (statement[:150] + '...')
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Dialect:*\n{}".format(dialect)
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Created By:*\n{}".format(created_by)
-            }
-          ]
-        }
-      ]
-    }
-  }
-  return gist_payload
-
-
-def make_query_history_payload(url, statement, dialect, database):
+def _make_unfurl_payload(url, statement, dialect, created_by):
   payload = {
     url: {
       "color": "#025BA6",
@@ -198,7 +140,7 @@ def make_query_history_payload(url, statement, dialect, database):
             },
             {
               "type": "mrkdwn",
-              "text": "*Database:*\n{}".format(database)
+              "text": "*Created By:*\n{}".format(created_by)
             }
           ]
         }
@@ -207,3 +149,10 @@ def make_query_history_payload(url, statement, dialect, database):
   }
   return payload
 
+def say_hi_user(channel_id, user_id):
+  """
+  Sends Hi<user_id> message in a specific channel.
+
+  """
+  bot_message = 'Hi <@{}> :wave:'.format(user_id)
+  return slack_client.api_call(api_method='chat.postMessage', json={'channel': channel_id, 'text': bot_message})
