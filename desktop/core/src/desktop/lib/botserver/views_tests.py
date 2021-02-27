@@ -91,7 +91,9 @@ class TestBotServer(unittest.TestCase):
               }]
             }
             document2_objects_get.return_value = Mock(data=json.dumps(doc_data), owner=user)
+
             handle_on_link_shared(channel_id, message_ts, links)
+            
             mock_unfurl_payload.assert_called_with(links[0]["url"], "SELECT 5000", "Mysql", "test")
             assert_true(chat_unfurl.called)
 
@@ -99,7 +101,9 @@ class TestBotServer(unittest.TestCase):
             doc_data = {"statement_raw": "SELECT 98765"}
             _get_gist_document.return_value = Mock(data=json.dumps(doc_data), owner=user, extra='mysql')
             links = [{"url": "http://demo.gethue.com/hue/gist?uuid=random"}]
+
             handle_on_link_shared(channel_id, message_ts, links)
+            
             mock_unfurl_payload.assert_called_with(links[0]["url"], "SELECT 98765", "Mysql", "test")
             assert_true(chat_unfurl.called)
 
