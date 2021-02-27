@@ -800,26 +800,17 @@ class CryptoBackendXmlSec1(CryptoBackend):
         logger.debug('Decrypt input len: %d', len(enctext))
         _, fil = make_temp(enctext, decode=False)
 
-        named_pipe = None
-        if key_file is not None:
-            if passphrase is not None:
-                named_pipe = NamedPipe()
-                # Decrypt the certificate
-                with open(key_file) as f, open(named_pipe.name, 'wb') as g:
-                    key = crypto.load_privatekey(crypto.FILETYPE_PEM, f.read(), passphrase=passphrase)
-                    g.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, key))
-                key_file = named_pipe.name
-
         com_list = [
             self.xmlsec,
             '--decrypt',
-            '--privkey-pem', key_file,
             '--id-attr:{id_attr}'.format(id_attr=id_attr),
             ENC_KEY_CLASS,
         ]
 
         try:
-            (_stdout, _stderr, output) = self._run_xmlsec(com_list, [fil])
+            (_stdout, _stderr, output) = self._run_xmlsec(com_list, [fil],
+                                                          key_file=key_file,
+                                                          passphrase=passphrase)
         except XmlsecError as e:
             six.raise_from(DecryptError(com_list), e)
 
@@ -841,26 +832,15 @@ class CryptoBackendXmlSec1(CryptoBackend):
             statement = str(statement)
 
         _, fil = make_temp(
-            statement,
+            "%s" % statement,
             suffix='.xml',
             decode=False,
             delete=self._xmlsec_delete_tmpfiles,
         )
 
-        named_pipe = None
-        if key_file is not None:
-            if passphrase is not None:
-                named_pipe = NamedPipe()
-                # Decrypt the certificate
-                with open(key_file) as f, open(named_pipe.name, 'wb') as g:
-                    key = crypto.load_privatekey(crypto.FILETYPE_PEM, f.read(), passphrase=passphrase)
-                    g.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, key))
-                key_file = named_pipe.name
-
         com_list = [
             self.xmlsec,
             '--sign',
-            '--privkey-pem', key_file,
             '--id-attr:{id_attr_name}'.format(id_attr_name=id_attr),
             node_name,
         ]
@@ -869,7 +849,9 @@ class CryptoBackendXmlSec1(CryptoBackend):
             com_list.extend(['--node-id', node_id])
 
         try:
-            (stdout, stderr, output) = self._run_xmlsec(com_list, [fil])
+            (stdout, stderr, output) = self._run_xmlsec(com_list, [fil],
+                                                        key_file=key_file,
+                                                        passphrase=passphrase)
         except XmlsecError as e:
             raise SignatureError(com_list)
 
@@ -922,7 +904,7 @@ class CryptoBackendXmlSec1(CryptoBackend):
 
         return parse_xmlsec_output(stderr)
 
-    def _run_xmlsec(self, com_list, extra_args):
+    def _run_xmlsec(self, com_list, extra_args, key_file=None, passphrase=None):
         """
         Common code to invoke xmlsec and parse the output.
         :param com_list: Key-value parameter list for xmlsec
@@ -932,11 +914,40 @@ class CryptoBackendXmlSec1(CryptoBackend):
         """
         with NamedTemporaryFile(suffix='.xml', delete=self._xmlsec_delete_tmpfiles) as ntf:
             com_list.extend(['--output', ntf.name])
+
+            # Unfortunately there's no safe way to pass a password to xmlsec1.
+            # Instead, we'll decrypt the certificate and write it into a named pipe,
+            # which we'll pass to xmlsec1.
+            named_pipe = None
+            if key_file is not None:
+                if passphrase is not None:
+                    named_pipe = NamedPipe()
+
+                    # Decrypt the certificate, but don't write it into the FIFO
+                    # until after we've started xmlsec1.
+                    key_content = ''
+                    with open(key_file, 'r') as f:
+                        key_content = f.read()
+                    key = crypto.load_privatekey(crypto.FILETYPE_PEM, key_content, passphrase=str(passphrase))
+
+                    key_file = named_pipe.name
+
+                com_list.extend(["--privkey-pem", key_file])
+
             com_list += extra_args
 
             logger.debug('xmlsec command: %s', ' '.join(com_list))
 
             pof = Popen(com_list, stderr=PIPE, stdout=PIPE)
+
+            if named_pipe is not None:
+                # Finally, write the key into our named pipe.
+                try:
+                    with open(named_pipe.name, 'wb') as f:
+                        f.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, key))
+                finally:
+                    named_pipe.close()
+
             p_out, p_err = pof.communicate()
             p_out = p_out.decode()
             p_err = p_err.decode()
@@ -1425,6 +1436,8 @@ class SecurityContext(object):
         :param enctext: The encrypted text as a string
         :return: The decrypted text
         """
+        if key_file is None or len(key_file.strip()) == 0:
+            key_file = self.key_file
         if passphrase is None:
             passphrase = self.key_file_passphrase
 
@@ -1537,14 +1550,28 @@ class SecurityContext(object):
         for _, pem_file in certs:
             try:
                 last_pem_file = pem_file
-                if self.verify_signature(
-                        decoded_xml,
-                        pem_file,
-                        node_name=node_name,
-                        node_id=item.id,
-                        id_attr=id_attr):
-                    verified = True
-                    break
+
+                if origdoc is not None:
+                    try:
+                        if self.verify_signature(origdoc, pem_file,
+                                                 node_name=node_name,
+                                                 node_id=item.id,
+                                                 id_attr=id_attr):
+                            verified = True
+                            break
+                    except Exception:
+                        if self.verify_signature(decoded_xml, pem_file,
+                                                 node_name=node_name,
+                                                 node_id=item.id,
+                                                 id_attr=id_attr):
+                            verified = True
+                            break
+                else:
+                    if self.verify_signature(decoded_xml, pem_file,
+                                             node_name=node_name,
+                                             node_id=item.id, id_attr=id_attr):
+                        verified = True
+                        break
             except XmlsecError as exc:
                 logger.error('check_sig: %s', exc)
                 pass

@@ -25,6 +25,8 @@ from nose.tools import assert_equal, assert_true
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
 
+from azure.conf import ABFS_CLUSTERS
+from beeswax.server import dbms
 from indexer.indexers.sql import SQLIndexer
 
 
@@ -579,3 +581,25 @@ def test_generate_create_empty_kudu_table():
   `vrfcn_city_lon` double , PRIMARY KEY (acct_client)
 )   STORED AS kudu TBLPROPERTIES("transactional" = "false")
 ;''' in sql, sql)
+
+
+def test_create_ddl_with_abfs():
+  finish = ABFS_CLUSTERS.set_for_testing(
+    {
+      'default': {
+        'fs_defaultfs': 'abfs://my-data@yingstorage.dfs.core.windows.net',
+        'webhdfs_url': 'https://yingstorage.dfs.core.windows.net'
+      }
+    }
+  )
+
+  form_data = {'path': u'abfs://my-data/test_data/cars.csv', 'partition_columns': [], 'overwrite': False}
+  sql = ''
+  request = MockRequest(fs=MockFs())
+  query_server_config = dbms.get_query_server_config(name='impala')
+  db = dbms.get(request.user, query_server=query_server_config)
+  try:
+    sql = "\n\n%s;" % db.load_data('default', 'cars', form_data, None, generate_ddl_only=True)
+  finally:
+    finish()
+  assert_true(u"\'abfs://my-data@yingstorage.dfs.core.windows.net/test_data/cars.csv\'" in sql)

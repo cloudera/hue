@@ -37,6 +37,7 @@ balancer:
   enabled: true
 api:
   enabled: false
+  domain: api.gethue.com
 workers:
   enabled: false
   replicas: 1

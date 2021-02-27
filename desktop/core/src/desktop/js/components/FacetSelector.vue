@@ -18,7 +18,7 @@
 
 <template>
   <dropdown-panel :text="label" :disabled="disabled">
-    <template #contents="{ closePanel }">
+    <template #default="slotProps">
       <div class="facet-selector">
         <div v-if="facet.values.length > 1" class="facet-select-all">
           <div class="facet-list-entry">
@@ -39,12 +39,12 @@
           </div>
         </div>
         <div class="facet-selector-actions">
-          <hue-link @click="cancel(closePanel)">{{ I18n('Cancel') }}</hue-link>
+          <hue-link @click="cancel(slotProps.closePanel)">{{ I18n('Cancel') }}</hue-link>
           <hue-button
             :small="true"
             :primary="true"
             :disabled="applyDisabled"
-            @click="apply(closePanel)"
+            @click="apply(slotProps.closePanel)"
           >
             {{ I18n('Apply') }}
           </hue-button>
