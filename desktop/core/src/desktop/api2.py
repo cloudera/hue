@@ -520,13 +520,23 @@ def create_directory(request):
 
   parent_dir = Directory.objects.get_by_uuid(user=request.user, uuid=parent_uuid, perm_type='write')
 
-  directory = Directory.objects.create(name=name, owner=request.user, parent_directory=parent_dir)
-
-  return JsonResponse({
+  # Check if directory already exists then return it to avoid creating duplicate directory
+  try:
+    dir_exist = Directory.objects.get(name=name, owner=request.user, parent_directory=parent_dir)
+    
+    if dir_exist.name == name:
+      return JsonResponse({
+        'status': 0,
+        'directory': dir_exist.to_dict()
+      })
+  except:
+    # If directory not present then create it
+    directory = Directory.objects.create(name=name, owner=request.user, parent_directory=parent_dir)
+    return JsonResponse({
       'status': 0,
       'directory': directory.to_dict()
-  })
-
+    })
+  
 
 @api_error_handler
 @require_POST
