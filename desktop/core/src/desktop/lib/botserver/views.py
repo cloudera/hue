@@ -26,8 +26,6 @@ from desktop.lib.django_util import login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2, _get_gist_document
 
-from notebook.decorators import check_document_access_permission
-
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
@@ -91,7 +89,6 @@ def handle_on_message(channel_id, bot_id, text, user_id):
       if not response['ok']:
         raise PopupException(_("Error posting message"), detail=response["error"])
 
-@check_document_access_permission
 def handle_on_link_shared(channel_id, message_ts, links):
   for item in links:
     path = urlsplit(item['url'])[2]
@@ -110,7 +107,8 @@ def handle_on_link_shared(channel_id, message_ts, links):
       dialect = doc_data['dialect'].capitalize() if id_type == 'editor' else doc.extra.capitalize()
       created_by = doc.owner.get_full_name() or doc.owner.username
     except Document2.DoesNotExist:
-      raise PopupException(_("Document with {key}={value} does not exist").format(key='uuid' if id_type == 'uuid' else 'id', value=qid_or_uuid))
+      msg = "Document with {key}={value} does not exist".format(key='uuid' if id_type == 'uuid' else 'id', value=qid_or_uuid)
+      raise PopupException(_(msg))
 
     payload = _make_unfurl_payload(item['url'], statement, dialect, created_by)
     response = slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload)
