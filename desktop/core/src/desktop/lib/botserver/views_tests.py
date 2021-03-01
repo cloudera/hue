@@ -107,6 +107,17 @@ class TestBotServer(unittest.TestCase):
             mock_unfurl_payload.assert_called_with(links[0]["url"], "SELECT 98765", "Mysql", "test")
             assert_true(chat_unfurl.called)
 
-            # Cannot unfurl link
-            assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": "https://demo.gethue.com/hue/editor/?type=4"}])
-            assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": "http://demo.gethue.com/hue/gist?uuids/=xyz"}])
+            # Cannot unfurl link with invalid links
+            inv_qhistory_url = "https://demo.gethue.com/hue/editor/?type=4"
+            inv_gist_url = "http://demo.gethue.com/hue/gist?uuids/=xyz"
+            assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": inv_qhistory_url}])
+            assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": inv_gist_url}])
+
+            # Document does not exist
+            document2_objects_get.side_effect = PopupException('message')
+            _get_gist_document.side_effect = PopupException('message')
+            
+            qhistory_url = "https://demo.gethue.com/hue/editor?editor=109644"
+            gist_url = "https://demo.gethue.com/hue/gist?uuid=6d1c407b-d999-4dfd-ad23-d3a46c19a427"
+            assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": qhistory_url}])
+            assert_raises(PopupException, handle_on_link_shared, "channel", "12.1", [{"url": gist_url}])
