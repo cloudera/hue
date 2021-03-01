@@ -29,7 +29,7 @@ import {
   ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
   GET_ACTIVE_SNIPPET_CONNECTOR_EVENT
 } from 'apps/editor/events';
-import { CONFIG_REFRESHED_EVENT, findEditorConnector, getLastKnownConfig } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, findEditorConnector, getLastKnownConfig } from 'config/hueConfig';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 export default class NotebookViewModel {

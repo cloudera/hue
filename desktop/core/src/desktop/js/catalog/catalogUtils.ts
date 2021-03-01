@@ -16,7 +16,7 @@
 
 import { CancellablePromise } from 'api/cancellablePromise';
 import { CatalogGetOptions } from 'catalog/dataCatalog';
-import { Compute, Connector } from 'types/config';
+import { Compute, Connector } from 'config/types';
 
 export interface FetchOptions {
   sourceType: string;

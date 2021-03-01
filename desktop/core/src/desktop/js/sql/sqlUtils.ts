@@ -25,7 +25,7 @@ import {
   CommentDetails,
   Suggestion
 } from 'apps/editor/components/aceEditor/autocomplete/AutocompleteResults';
-import { Compute, Connector, Namespace } from 'types/config';
+import { Compute, Connector, Namespace } from 'config/types';
 
 const identifierEquals = (a?: string, b?: string): boolean =>
   !!a &&

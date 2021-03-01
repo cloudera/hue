@@ -17,7 +17,7 @@
 import { CancellablePromise } from 'api/cancellablePromise';
 import dataCatalog from 'catalog/dataCatalog';
 import DataCatalogEntry, { Sample } from 'catalog/DataCatalogEntry';
-import { Compute, Connector, Namespace } from 'types/config';
+import { Compute, Connector, Namespace } from 'config/types';
 import * as CatalogApi from './api';
 
 const connectorOne: Connector = {

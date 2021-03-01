@@ -28,7 +28,7 @@ import DisposableComponent from 'ko/components/DisposableComponent';
 import Executor from 'apps/editor/execution/executor';
 import SqlExecutable from 'apps/editor/execution/sqlExecutable';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
-import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'utils/hueConfig';
+import { CONFIG_REFRESHED_EVENT, filterEditorConnectors } from 'config/hueConfig';
 
 export const NAME = 'quick-query-context';
 

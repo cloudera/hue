@@ -25,7 +25,7 @@ import {
   ASSIST_IS_DB_PANEL_READY_EVENT,
   ASSIST_SET_DATABASE_EVENT
 } from 'ko/components/assist/events';
-import { findEditorConnector } from 'utils/hueConfig';
+import { findEditorConnector } from 'config/hueConfig';
 import { getFromLocalStorage } from 'utils/storageUtils';
 
 class MetastoreSource {
